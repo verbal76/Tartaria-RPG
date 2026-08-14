@@ -1015,6 +1015,21 @@ interface CurrentScene {
   /** OTA-973 — Phase A of real heights: optional per-noun elevation placements
    *  (noun → structure + tier). Absent/empty = everything is on the ground,
    *  which is every scene until the Phase-B seeder ships. */
+  /** ⚠⚠ OTA-1256 — THE NOUNS THIS SCENE PLACED ON PURPOSE, so the 8-slot display
+   *  cap cannot throw them away on a later recompute. Scene build force-prepends
+   *  spawned GEAR and the WATER SOURCE; the cardinal-step re-shuffle then replaced
+   *  the whole window with a blind 8-from-pool pick and re-applied neither — so
+   *  gear was guaranteed when you ARRIVED at a location and could vanish on the
+   *  next step inside it, with no new spawn line in the log to explain where it
+   *  went. Owner, on golem: *"I have not seen armor or weapons in the last few
+   *  tiles."* Not a drop-rate change and not a bad run: the drop happened, the
+   *  display threw it away.
+   *
+   *  Stamped ONCE at scene build and read by every later recompute, so the
+   *  guarantee lives in one place instead of being re-derived (and forgotten) at
+   *  each call site. Ported from golem OTA-1244 — line-agnostic, and the bug it
+   *  fixes dates to OTA-302 (2026-06-05), long before any picker work. */
+  pinnedAmbientNouns?: string[];
   nounPlacements?: Record<string, { structure: string; tier: number }>;
   /** OTA-1229 — nouns the Aetheric Torch has marked as actually worth
    *  investigating in THIS scene (✦ on the investigate chips). Stamped by
@@ -6330,31 +6345,65 @@ function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
   }
 }
 
+/** Mean roll of an NdM dice string ("2d6" → 7). 0 on anything unparseable, so an
+ *  odd catalog row loses a comparison instead of throwing inside a grant. */
+function _avgDamageDice(d: string | undefined): number {
+  const m = /^(\d+)d(\d+)$/.exec(String(d ?? ''));
+  return m ? Number(m[1]) * (Number(m[2]) + 1) / 2 : 0;
+}
+
+// ⚠⚠ OTA-1256 — RETURNS TRUE IF IT ACTUALLY READIED THE CUDGEL, because the caller
+// narrates the result. It used to return void and the beat printed "[equipped]"
+// unconditionally — see the intercept for the measurement.
 function grantTutorialItem(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   id: TutorialPropId,
-): void {
+): boolean {
   const player = get().player;
-  if (!player) return;
-  if (get().tutorialPropsConsumed[id]) return;
+  if (!player) return false;
+  if (get().tutorialPropsConsumed[id]) return false;
   const item = makeTutorialItem(id);
-  if (!item) return;
+  if (!item) return false;
+  // ⚠⚠ OTA-1256 — THE OLD GUARD WAS A NAME CHECK ON A TAG CONCEPT, AND IT NEVER
+  // FIRED ONCE. It substring-matched the equipped weapon's NAME against the word
+  // barehand — but the barehanded starter is called "Mud-fist Wraps", and
+  // barehanded is a TAG, not part of any name. Measured against RACE_PRIMARY: not
+  // one of the four starting weapons (Mud-fist Wraps, Rusted Blade, Tartarian
+  // Spear, Pyric Wand) carries that substring, so the branch has been unreachable
+  // for EVERY race since it was written — while the beat announced "[equipped]" to
+  // all of them.
+  //
+  // ⚠ AND FIVE OF THE SEVEN SHOULD HAVE HAD IT: the Cudgel is 1d8 against Rusted
+  // Blade 1d6 and Pyric Wand 1d6. Only the Spear (2d6) and the Wraps (1d10) out-hit
+  // it, and those two keep what they are holding — which is what the original
+  // comment ("if the player has nothing better there") always meant.
+  //
+  // ⚠ Found on golem and ported straight across: the guard predates every picker
+  // change and is a plain correctness bug on this line too.
+  let readied = false;
+  if (id === 'cudgel') {
+    const held = player.equipped?.main
+      ? resolveEquippedItem(player, 'main')
+      : null;
+    const heldAvg = held ? _avgDamageDice(findWeaponByName(held.name)?.damageDice) : 0;
+    readied = _avgDamageDice(findWeaponByName('Cudgel')?.damageDice) > heldAvg;
+  }
   set((s) => {
     if (!s.player) return {};
     // Add to inventory + mark consumed.
     const inventory = [...s.player.inventory, item];
-    let equipped = s.player.equipped;
-    // Auto-equip the cudgel to weapon slot if the player has nothing
-    // better there. Keeps the post-tutorial player combat-ready.
-    if (id === 'cudgel' && (!equipped?.main || equipped.main.includes('barehand'))) {
-      equipped = { ...(equipped ?? {}), main: 'Cudgel' };
-    }
+    const equipped = readied
+      // ⚠ The id too — the old line set the NAME alone, so the slot pointed at
+      // "first item called Cudgel" rather than the instance just granted.
+      ? { ...(s.player.equipped ?? {}), main: 'Cudgel', mainId: item.id }
+      : s.player.equipped;
     return {
       player: { ...s.player, inventory, equipped },
       tutorialPropsConsumed: { ...s.tutorialPropsConsumed, [id]: true },
     };
   });
+  return readied;
 }
 
 // arb25 — patch the live scene to reflect a building room: its interactables
@@ -6415,6 +6464,12 @@ function patchSceneForBuildingRoom(
         microMicroId: buildingRoomMicroId,
         ambientNouns: nouns,
         displayedAmbientNouns: nouns,
+        // ⚠ OTA-1256 — a building interior replaces the pool wholesale, so the
+        // outdoor tile's pins name nouns that are not here. They would be filtered
+        // out harmlessly (pins only apply to nouns still in the pool), but leaving
+        // a stale list on the scene is how the next reader gets it wrong. Indoors
+        // shows every interactable anyway — no window to protect.
+        pinnedAmbientNouns: [],
         transitArea: `${b.name} · ${room.shortName}`,
         // Indoors is peaceful — clear any wilderness combat / hooks.
         ...FRESH_ENEMY_ARRAYS,
@@ -10932,6 +10987,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (waterSourceNouns.length > 0) {
       displayedAmbientNouns = Array.from(new Set([...waterSourceNouns, ...displayedAmbientNouns]));
     }
+    // ⚠⚠ OTA-1256 — AND RECORD THE GUARANTEE, so it survives every later recompute.
+    // Two prepends above; the cardinal-step re-shuffle honoured neither.
+    const pinnedAmbientNouns = Array.from(new Set([...sceneGearNouns, ...waterSourceNouns]));
     // arb39 — persistent-room emptiness for hub interiors (the tutorial
     // outpost rooms, capital halls, etc.). Once an interactable has been
     // taken or salvaged in this room, it stays gone on re-entry — closing
@@ -11169,7 +11227,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
-      vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, microMicroId,
+      vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, pinnedAmbientNouns, microMicroId,
       nounPlacements: scenePerchPlacements,
       missionBoard,
       wanderer,
@@ -12518,9 +12576,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       //     same verb under the hood.
       if (tStep?.id === 'cudgel' && /\btake\s+.*cudgel\b/i.test(trimmed)) {
         if (!_opts?.silent) get().appendLog('player', trimmed);
-        grantTutorialItem(get, set, 'cudgel');
-        get().appendLog('world', 'You stoop and lift the cudgel. The lashing is loose but the head is solid. You equip it without thinking.');
-        get().appendLog('reward', '✦ Cudgel (Common). [equipped]');
+        // ⚠⚠ OTA-1256 — SAY WHERE IT WENT, BECAUSE IT DID NOT ALWAYS GO ANYWHERE.
+        // From a golem device log, a Tartarian Giant one line apart:
+        //     [reward] ✦ Cudgel (Common). [equipped]
+        //     [debug] stats: ... worn: main=Mud-fist Wraps
+        // The mark said equipped and the hand held the starter. Both lines here
+        // were unconditional, and the auto-equip guard they described never fired
+        // for any race (see grantTutorialItem).
+        const readiedCudgel = grantTutorialItem(get, set, 'cudgel');
+        get().appendLog('world', readiedCudgel
+          ? 'You stoop and lift the cudgel. The lashing is loose but the head is solid. It settles into your grip without thinking.'
+          : 'You stoop and lift the cudgel. The lashing is loose but the head is solid. It goes into your pack — what you are already swinging hits harder.');
+        get().appendLog('reward', readiedCudgel ? '✦ Cudgel (Common). [equipped]' : '✦ Cudgel (Common).');
         // Acknowledge the pickup before the next instruction — a beat of
         // pacing so the Arbiter doesn't snap straight into "now salvage".
         get().appendLog('arbiter', '"Good. Keep it close."');
@@ -29083,7 +29150,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Cantor-pairing-style mix: hashes (x, y) → a single 32-bit
       // seed that distinguishes (-3, 5) from (5, -3) and from (3, 5).
       const seed = (((step.x + 1000) & 0xffff) * 65537) ^ ((step.y + 1000) & 0xffff);
-      const next = shuffleSliceSeeded(pool, AMBIENT_DISPLAY_CAP, seed);
+      // ⚠⚠ OTA-1256 — THE PLACED NOUNS SURVIVE THE STEP. Scene build force-prepends
+      // spawned gear and the water source so the cap cannot crowd them out; this
+      // block (OTA-302, 2026-06-05) replaced the whole window with a blind pick and
+      // re-applied neither. Measured on golem: on a 16-noun tile carrying 2 pieces
+      // of gear, THREE QUARTERS of steps hid it.
+      //
+      // ⚠ Pins take their slots FIRST and the shuffle fills what is left, so the
+      // variety this block exists for is preserved everywhere it does not conflict
+      // with something the scene placed on purpose. Pins are capped defensively —
+      // at most 3 gear + 1 water today, but a future placer must not be able to
+      // fill the window and starve the shuffle entirely.
+      const pins = (s.currentScene.pinnedAmbientNouns ?? []).filter((n) => pool.includes(n));
+      const pinned = pins.slice(0, Math.max(0, AMBIENT_DISPLAY_CAP - 2));
+      const rest = shuffleSliceSeeded(
+        pool.filter((n) => !pinned.includes(n)),
+        Math.max(0, AMBIENT_DISPLAY_CAP - pinned.length),
+        seed,
+      );
+      const next = Array.from(new Set([...pinned, ...rest])).slice(0, AMBIENT_DISPLAY_CAP);
       return { currentScene: { ...s.currentScene, displayedAmbientNouns: next } };
     });
     // Re-entry narration — when a cardinal step lands on a tile the
@@ -34342,12 +34427,17 @@ function resolveHookOneStep(
       };
       const newAmbient = replaceIn(s.currentScene.ambientNouns);
       const newDisplayed = replaceIn(s.currentScene.displayedAmbientNouns);
-      if (!newAmbient && !newDisplayed) return {};
+      // ⚠ OTA-1256 — the pins get renamed too. They are gated on membership of
+      // `ambientNouns`, so a pinned noun renamed there but not here would silently
+      // stop being pinned — the guarantee would survive the rename in name only.
+      const newPinned = replaceIn(s.currentScene.pinnedAmbientNouns);
+      if (!newAmbient && !newDisplayed && !newPinned) return {};
       return {
         currentScene: {
           ...s.currentScene,
           ...(newAmbient ? { ambientNouns: newAmbient } : {}),
           ...(newDisplayed ? { displayedAmbientNouns: newDisplayed } : {}),
+          ...(newPinned ? { pinnedAmbientNouns: newPinned } : {}),
         },
       };
     });

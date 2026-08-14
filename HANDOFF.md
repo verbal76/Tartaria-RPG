@@ -1676,7 +1676,28 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THE LOOK BEAT HAD NO LOCKDOWN (2026-08-13, latest). HAL — PORTED FROM
+- **⚠⚠ TWO GOLEM-FOUND BUGS PORTED (2026-08-14, latest). HAL.** HAL OTA-1256.
+  Owner: *"if these are needed on Hal to correct play the way Hal is with no other
+  changes towards golem's new direction then port them."*
+
+  ⚠⚠ **THE PLACED NOUNS DID NOT SURVIVE A STEP.** Scene build prepends spawned gear
+  + the water source; the cardinal-step re-shuffle (OTA-302, 2026-06-05) replaced
+  the window with a blind pick and re-applied neither. **Measured: on a 16-noun tile
+  with 2 pieces of gear, three quarters of steps hid it.** Now `pinnedAmbientNouns`,
+  stamped once at scene build and read by the re-shuffle.
+
+  ⚠⚠ **AND THE CUDGEL WAS NEVER EQUIPPED, FOR ANY RACE.** The guard substring-
+  matched the weapon NAME against the word barehand; the barehanded starter is
+  called Mud-fist Wraps and barehanded is a TAG. Five of seven races (1d8 beats
+  Rusted Blade / Pyric Wand 1d6) were denied it while all seven were told
+  "[equipped]". Real damage comparison now, and the narration is conditional.
+
+  ⚠ **WHAT WAS DELIBERATELY LEFT BEHIND:** golem's either-hand rule (a cudgel it
+  cannot beat goes to the empty off hand) and its dog-quest prop pin. Those are
+  picker direction; the suite asserts they are absent here.
+  Full story: the VERSION.md 4.29.161 row.
+
+- **⚠⚠ THE LOOK BEAT HAD NO LOCKDOWN (2026-08-13). HAL — PORTED FROM
   GOLEM.** HAL OTA-1255, from golem OTA-1249, at the owner's explicit direction:
   *"the look around you button fix can go to Hal."* The loot-picker work it was
   found alongside stays golem-only. **HAL had the identical bug.**
