@@ -1536,6 +1536,111 @@ wasted seconds and starving every other job behind it).
    live LLM NPC conversation. ⚠ Note the correction OTA-1106 forced: speed
    work was assumed to live here and mostly does **not**.
 
+### ⚠⚠ PLAN OF ACTION — THE NARRATION TRACK (owner-requested 2026-08-14, NOT YET STARTED)
+
+Owner, on the four narration findings: *"let's get a plan of action for these."*
+**Nothing below is implemented.** Ordered cheapest-first, each step paired with the
+measurement that says whether it worked, so a step that does not move its number
+gets reverted instead of kept on faith.
+
+**⚠ THE ONE RULE FOR THIS TRACK:** every item here is about the model saying
+something FALSE or costing time for NOTHING. Neither is a prose-quality problem, so
+do not "improve the prompt" as a fix — change what is asked, when it is asked, or
+whether the answer is kept.
+
+---
+
+**N1 — A BANKED INTRO NARRATED A PAST ACTION. (correctness, cheapest, do first)**
+
+Evidence, 2026-08-14 golem log: `"You climb down the arch, feeling the weight of
+the city's collapse before you"` spoken on ARRIVAL at the Court of Standards — four
+rooms and forty seconds after the climb, which happened in the Atrium.
+
+Cause, traced: `sceneIntroBank` is keyed by **location id**, and every outpost hub
+room shares `monarch_waystation`. A line written while the player was in one room is
+spent on arrival in another. The banked text can also describe a transient PLAYER
+ACTION, which is only ever true in the instant it was written.
+
+Steps:
+  1. Key the bank by the same room granularity the scene uses (location id +
+     `hubRoomId` / `microMicroId`), so a line is only spent where it was written.
+  2. Refuse to bank a line that narrates the player DOING something — the existing
+     `isSecondPersonActionOpener` check already exists for the ambient channel and
+     is not applied to the intro bank. Reuse it; do not write a second one.
+  3. Measure: replay a hub walk and count banked lines whose opener is an action
+     verb. Target zero. Before the change it is reproducible in one walk.
+
+**N2 — PREEMPTION IS STRUCTURAL, NOT BAD LUCK. (waste, cheap)**
+
+`INTRO_IDLE_MS = 6_000` arms `scene_intro_fill`; that job's own telemetry reports
+~9s typical (9009ms in the 2026-08-14 log; an older sweep measured avg 9.5s / max
+11.4s). **The trigger is shorter than the job, so preemption is the EXPECTED
+outcome.** Same log: one intro preempted at 5555ms and discarded, 0 tokens out.
+
+Steps:
+  1. Raise the idle threshold above the measured p50 of the job it arms, and read
+     the threshold FROM the telemetry rather than hardcoding a second number that
+     can drift from the first.
+  2. Measure: discarded-ms as a share of total model ms, per session. An older
+     full-session sweep measured **224.5s discarded of 684.5s (33%)**. Target: cut
+     the `scene_intro_fill` share of that in half.
+
+**N3 — FINISHED TEXT IS BINNED. (waste)**
+
+A preempted job that had already produced text throws it away. A banked line costs
+zero model time later, so text that arrives late is still worth keeping — that was
+the entire point of the bank (OTA-1129).
+
+Steps:
+  1. On preemption, if the job produced usable text, BANK it instead of discarding.
+  2. ⚠ Guard it with the same freshness rules a fresh line gets (N1 step 2, and the
+     near-duplicate check) — a late line is exactly the one most likely to describe
+     a situation that has moved on.
+  3. Measure: `✂ DISCARDED` count per session with non-zero `out Nt`. Target zero.
+
+**N4 — THE PROMPT CACHE NEVER REUSES ANYTHING. (waste, largest ceiling, do last)**
+
+`reuse 0t` on EVERY call in every log. OTA-1108 already established this is real and
+not a telemetry artefact: `cachedTokens` comes back as exactly in+out, so the KV
+cache grows by what each call did and reuses nothing across calls.
+
+Steps:
+  1. Establish whether the prompts share a stable PREFIX at all today. They are
+     assembled per-call from location + inventory + hooks, so probably not — which
+     makes this a prompt-STRUCTURE change (fixed system preamble first, volatile
+     context last), not a cache-config change.
+  2. Only then look at whether the binding keeps a session KV cache across calls.
+  3. Measure: `reuse Nt` non-zero on the second and later calls of a session.
+  ⚠ **Do not start here.** It is the biggest win and the biggest change, and N1–N3
+  are correctness and waste fixes that stand on their own.
+
+**N5 — THE MODEL INVENTED A LOCATION, AND SPOKE IT. (correctness, needs a repro)**
+
+"Black Market Bazaar" was narrated at the Giant-Watch Shrine, aloud. Off-canon
+ENTITY names are already filtered on the ambient channel
+(`sentenceNamesOffCanonEntity`); off-canon PLACE names are not.
+
+Steps:
+  1. Reuse the ambient channel's off-canon check for place names, sourced from the
+     shipped locations list — one checker, both channels.
+  2. Measure: census the locations file for names the model could plausibly emit,
+     then replay. ⚠ This one is thin on evidence — ONE sighting — so it deserves a
+     second log before implementing, not a speculative filter.
+
+**N6 — ML HEALTH BLAMED A JS CRASH ON THE MODEL. (diagnostic honesty)**
+
+After the OTA-1245 render crash, ML health reported *"recovering — detected a crash
+on previous launch"*. Likely the success breadcrumb had not flushed before the JS
+thread died, so a SCREEN bug reads as an ENGINE crash. Harmless at 0/2 — but the
+threshold is 2, and two JS crashes would auto-disable Qwen for an unrelated reason.
+
+Steps:
+  1. Stamp the breadcrumb as soon as the model reports ready, not at the end of the
+     first successful generation.
+  2. Distinguish a JS-thread crash from a native one before counting it toward the
+     disable threshold.
+  3. Measure: force a JS crash and confirm the ML crash counter does NOT move.
+
 ### ⚠ WATCH LIST — SEEN IN A LOG, NOT YET ACTED ON
 
 Owner: *"keep the handoff as an open item."* These are observations from
@@ -1543,6 +1648,40 @@ device logs that were deliberately NOT changed in the OTA that spotted them —
 either because the sample is thin or because the fix is a design call rather
 than a bug fix. They are here so a later log can promote them instead of
 rediscovering them.
+
+- **⚠⚠ PUNCHLIST P19 — THE `heavy sims` CI JOB IS RED ON EVERY COMMIT AND IT IS A
+  STALE TEST, NOT A REGRESSION (2026-08-14). HELD AT OWNER'S DIRECTION** — *"put on
+  the punchlist and hold on that."* Do not re-investigate from scratch; the
+  diagnosis below is finished and only the DECISION is outstanding.
+
+  Three tests fail, byte-identical across commits, so nothing recent moved them:
+
+  | test | expected | received |
+  |---|---|---|
+  | `playerInputChaosSim` — head-noun match resolves the right item | ≥ 0.95 | **0.03** |
+  | `movementStress` — approach success rate | ≥ 0.75 | 0.714 |
+  | `encounterStress` — stepDirection spawns a skirmish enemy | true | false |
+
+  ⚠⚠ **THE 0.03 LOOKS LIKE A CATASTROPHE AND IS THE OPPOSITE.** It reads as "item
+  resolution is 3% correct". The fuzzer feeds a WRONG adjective at a single-item
+  inventory and demands a match anyway — `Rusted Blade ← "use the monarch blade"`,
+  `Stone Spear ← "use the titan spear"`. **OTA-1149 deliberately stopped doing
+  that**, in its own words: *"nothing agrees and the input DID carry a token no
+  candidate accounts for — return undefined, because a miss is recoverable and a
+  confident wrong answer spends an item."* **The test asserts the contract OTA-1149
+  replaced.** Verified by hand against a single-item inventory: `use the rusted
+  blade` / `use the blade` / `use rusted blade` / `use blade` all resolve; only the
+  invented adjective refuses.
+
+  ⚠ **THE JOB IS `continue-on-error: true`, so CI reports SUCCESS** and you have to
+  open the job to see any of this. That is the part with a cost: a genuinely broken
+  sim would look identical from the outside.
+
+  **THE DECISION, when it is taken:** split it into two assertions — honest inputs
+  ≥95%, invented-adjective inputs ≤5%. That is strictly better than retargeting,
+  because it would have caught OTA-1149's own bug in the first place. `movementStress`
+  is a 0.036 miss against a threshold its own comment calls approximate and
+  `encounterStress` is a random spawn; both are noise beside this one.
 
 - **REST AMBUSH — MEASURED, AND IT IS FINE.** Read the numbers before
   changing anything (2026-08-05): rest ambush is **22% base in the wild / 8% in
@@ -1644,8 +1783,33 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE CUDGEL ACTUALLY EQUIPS NOW (2026-08-14,
-  latest).** Golem OTA-1254. Same merge-or-revert decision point. **⚠ THE GUARD BUG
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — EVERY MAIN SCREEN MOUNTS NOW (2026-08-14,
+  latest).** Golem OTA-1255. ⚠ **THE TEST IS LINE-AGNOSTIC AND HAL SHOULD HAVE ONE
+  TOO** — the crash class has nothing to do with the picker.
+
+  ⚠⚠ **MEASURED: five of the six main screens had ZERO suites that mount them.**
+  ExplorationScreen had 8 (from OTA-1246, after I shipped the crash); Inventory,
+  Vendor, Crafting, Character and Contracts had none — InventoryScreen appeared in
+  one suite as a `readFileSync` source pin.
+
+  ⚠⚠ **A SOURCE PIN PROVES A LINE EXISTS, NEVER THAT A COMPONENT RENDERS IT.**
+  `tsc` cannot see a TDZ inside a closure; `no-use-before-define` can but flags
+  2,869 pre-existing sites. **Mount tests are the only guard for this class.**
+
+  ⚠⚠ **AND AN EMPTY RENDER IS NOT ENOUGH** — OTA-1246's first guard passed with the
+  bug still live because an empty scene never CALLS the dead reference. Every screen
+  here mounts against a real `startNewGame` player with gear, a stack, a
+  consumable, a scene and a live vendor; a final assertion guards the fixture.
+
+  ⚠ **VERIFIED BY MUTATION IN THE REAL SHAPE.** A first attempt used a module-scope
+  const, which correctly did NOT fail — the module is evaluated before render, so
+  that is not a TDZ. **A mutation that does not reproduce the real shape proves
+  nothing.** ⚠ And the first vendor fixture invented a crash: it used `inventory:`
+  where the type has `offers:`. Checked before believing it — all 30 authored
+  vendors carry `offers`. **A wrong fixture is as expensive as a missed bug.**
+  Full story: the VERSION.md 4.29.183 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE CUDGEL ACTUALLY EQUIPS NOW (2026-08-14).** Golem OTA-1254. Same merge-or-revert decision point. **⚠ THE GUARD BUG
   IS LINE-AGNOSTIC AND HAL HAS IT TOO** — the dead barehand check predates the
   picker work entirely.
 
