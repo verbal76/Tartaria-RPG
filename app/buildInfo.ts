@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.189';
+export const DISPLAY_VERSION = '4.29.190';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23422,7 +23422,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ⚠ SalvageModal.tsx now has ZERO importers. Left on disk, not deleted, while
 // the picker trial's merge-or-revert is the owner's open call.
 // DISPLAY_VERSION 4.29.189. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-14-1266-dead-salvage-predicates';
+// ⚠⚠ OTA-1267 — THE BUTTON CRAWL, AND THE SUITE THAT WAS NEVER IN THE GATE.
+// Owner: "are we able to crawl the new options and the tutorial"
+// ⚠⚠ FIRST FINDING, BEFORE ANY NEW CODE: OTA-1263's suite was named
+// ...AndPacedSweep — and fast CI's ignore list excludes any path containing
+// "Sweep" (it means the heavy sims). The 14 tests passed by hand and NEVER ran
+// in the gate. Renamed ...AndPacedInvestigateAll; measured the whole exclusion
+// list afterward — every other excluded file is a genuine heavy sim.
+// ⚠⚠ THE ANSWER TO THE QUESTION IS NOW YES, TWICE OVER. The typed path was
+// already crawled (playtestTutorialWalk); the BUTTON path — the lit chip, the
+// picker rows, the lock, the buzz, the ★ — had only per-beat suites, and it is
+// the path every device-log defect lived on. playtestTutorialButtonCrawl now
+// presses its way from the name to EXPLORE in one continuous run: every beat
+// advanced by finding the control on the RENDERED screen, typed input only
+// where the design says typed (name, rope). At every locked beat it also
+// presses EVERYTHING off-script (never SKIP) and requires the world fingerprint
+// — beat, player clock, room, hp, inventory, equipment — identical after each.
+// ⚠ MUTATION-VERIFIED: disabling QuickBtn's blocked-gate makes the very first
+// sweep throw "lock leak"; the gap-throw fired three times during development
+// (climb row regex, my own guesses wrong each time — the room's climbable is a
+// "rusted aether-tether grapple point", which no English climb-word list hits;
+// the crawl now reads the same isClimbable source the screen reads).
+// ⚠ Fake timers per ota1236's pattern — ten real-timer mounts crashed the
+// worker via RN's Animated driver racing teardown. The door popup's 450ms
+// delay is advanced past explicitly, and is asserted by pressing THROUGH it.
+// New suite playtestTutorialButtonCrawl (6 assertions over an 8-beat run,
+// ~9s). 807 suites / 7574 tests. DISPLAY_VERSION 4.29.190. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-14-1267-the-button-crawl';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1266-dead-salvage-predicates';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1264-negation-and-questions';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1263-green-light-and-paced-sweep';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-13-1247-hint-fires-when-it-should';

@@ -1839,8 +1839,46 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ GOLEM — A RETIRED FILE KEPT ALIVE BY A FALSE CLAIM OF MINE (2026-08-14,
-  latest).** Golem OTA-1266. Found while auditing golem against the owner's bar:
+- **⚠⚠⚠ GOLEM — THE BUTTON CRAWL, AND THE SUITE THAT WAS NEVER IN THE GATE
+  (2026-08-14, latest).** Golem OTA-1267. Owner: *"are we able to crawl the new
+  options and the tutorial"*.
+
+  ⚠⚠ **FIRST FINDING, BEFORE ANY NEW CODE:** OTA-1263's suite was named
+  `...AndPacedSweep`, and fast CI's ignore list excludes any path containing
+  **"Sweep"** (it means the heavy sims). **Its 14 tests passed by hand and never
+  ran in the gate.** Renamed `...AndPacedInvestigateAll`. The whole exclusion
+  list was then measured: every other excluded file is a genuine heavy sim, and
+  HAL has no accidental exclusions. ⚠ The lesson is the naming rule, now stated
+  here: **a fast-CI suite must not carry Stress/Chaos/Probe/Smoke/Sweep/Sim in
+  its filename**, and a new suite's presence in `--listTests` is checked, not
+  assumed.
+
+  ⚠⚠ **THE ANSWER TO THE OWNER'S QUESTION IS NOW YES, TWICE OVER.** The typed
+  path was already crawled (`playtestTutorialWalk`, in CI). The BUTTON path —
+  the lit chip, the picker rows, the lock, the buzz, the ★ — had only per-beat
+  suites, **and it is the path every device-log defect lived on** (five-vest
+  payout, 2-of-7 cudgel, fourteen refusals, the ★ label). The typed walk stayed
+  green through all of them. `playtestTutorialButtonCrawl` now plays the
+  tutorial with a thumb: one seeded game, every beat advanced by pressing the
+  control on the RENDERED screen; typed input only where the design says typed
+  (name, rope). At every locked beat it presses EVERYTHING off-script except
+  SKIP and requires the world fingerprint (beat, player clock, room, hp,
+  inventory, equipment) identical after each press — ~50 real presses.
+
+  ⚠ **MUTATION-VERIFIED:** disabling QuickBtn's blocked-gate throws `lock leak`
+  on the first sweep — under the mutation, pressing the look chip at the NAME
+  beat submits 'look' as the player's NAME. ⚠ The crawl's own first draft was
+  wrong twice and the gap-throw caught both: English climb-words missed the
+  room's real climbable (a "rusted aether-tether grapple point" — it now reads
+  the screen's own `isClimbable` source), and the EXPLORE popup's 450ms delay
+  is advanced past explicitly. Fake timers per ota1236 (real-timer mounts
+  crashed the worker via RN's Animated driver racing teardown).
+
+  807 suites / 7574 tests. ⚠ STILL GOLEM-ONLY — the crawl is picker-shaped and
+  does not port.
+
+- **⚠⚠ GOLEM — A RETIRED FILE KEPT ALIVE BY A FALSE CLAIM OF MINE
+  (2026-08-14).** Golem OTA-1266. Found while auditing golem against the owner's bar:
   *"golem is the newest version of the game, golem must be 100%... we need to
   improve golem until it's playtestable."*
 
