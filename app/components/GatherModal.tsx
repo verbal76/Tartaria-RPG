@@ -67,7 +67,8 @@ import {
 } from 'react-native';
 import {
   classifyGatherNoun, isUpgradeOverEquipped, sortGatherRows, gatherIcon,
-  isActionableGatherKind, laneForKind, type GatherRow, type GatherLane,
+  isActionableGatherKind, laneForKind, upgradeEquipSlot,
+  type GatherRow, type GatherLane,
 } from '../engine/gatherSort';
 import type { PlayerCharacter } from '../engine/types';
 
@@ -250,11 +251,20 @@ export function GatherModal({
     // was the one row in this card whose tail did not name its own action. That is
     // exactly the deduction the colour layout exists to delete. The ★, the brighter
     // outline and the gold all still carry "better"; the tail carries "worn".
+    // ⚠⚠ OTA-1252 — AND IT NAMES THE HAND. Owner: *"isn't there an option to equip a
+    // picked up weapon to any empty hand?"* There is now, so `→ worn` would be the
+    // same vagueness one step smaller: a weapon that fills a bare off hand and one
+    // that displaces your main are different decisions, and the row is where the
+    // player decides. Armor keeps `worn` — it has exactly one slot and the name of
+    // it (chest / head / feet) is already obvious from the item.
+    const wear = upgrade ? upgradeEquipSlot(player, noun) : null;
     const tail =
       lane === 'lead' ? 'INVESTIGATE'
-        : upgrade ? '★ → worn'
-          : lane === 'scrap' ? 'salvage'
-            : '→ pack';
+        : wear?.slot === 'main' ? '★ → main hand'
+          : wear?.slot === 'off' ? '★ → off hand'
+            : upgrade ? '★ → worn'
+              : lane === 'scrap' ? 'salvage'
+                : '→ pack';
     return (
       <Pressable
         key={noun}
@@ -288,8 +298,8 @@ export function GatherModal({
             ? `${noun}. Not yet — the Arbiter has asked for something else first.`
             : lane === 'lead'
               ? `${noun}. Worth a look. Tap to investigate. No bulk action will touch this.`
-              : upgrade
-                ? `Upgrade. ${noun}. Tap to take it and put it on.`
+              : wear
+                ? `Upgrade. ${noun}. Tap to take it and ${wear.slot === 'main' || wear.slot === 'off' ? `ready it in your ${wear.slot === 'main' ? 'main' : 'off'} hand` : 'put it on'}.`
                 : `${noun}. ${lane === 'scrap' ? 'Tap to salvage' : 'Tap to take'}`
         }
       >

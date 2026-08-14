@@ -2091,7 +2091,7 @@ export function ExplorationScreen() {
           // time" since the owner first asked about the mark (OTA-1237); it just had
           // never done it. The slot comes from the same catalog lookups the mark
           // does, so a row cannot show ★ and then have nowhere to go.
-          const wear = isUpgradeOverEquipped(player, noun) ? upgradeEquipSlot(noun) : null;
+          const wear = isUpgradeOverEquipped(player, noun) ? upgradeEquipSlot(player, noun) : null;
           takeAmbientNoun(noun);
           // ⚠ ONLY IF IT ACTUALLY LANDED. The take can refuse — a full pack, an
           // already-worked-over noun — and both refuse by logging rather than

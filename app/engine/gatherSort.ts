@@ -119,9 +119,26 @@ export function isUpgradeOverEquipped(player: PlayerCharacter | null, noun: stri
 
   const weapon = weaponByName(noun);
   if (weapon) {
-    const held = resolveEquippedItem(player, 'main');
-    if (!held) return true;
-    const heldWeapon = weaponByName(held.name);
+    // ⚠⚠ OTA-1252 — AN EMPTY HAND IS AN EMPTY SLOT. Owner: *"isn't there an option
+    // to equip a picked up weapon to any empty hand?"* There is — `validSlotsForItem`
+    // has returned `['main', 'off']` for every weapon since long before this file
+    // existed, the off hand swings in combat (`offHandSwing`), and the quick row
+    // draws an `off:` button for it. This function never looked at it: it compared
+    // against the MAIN hand alone, so a weapon that could have filled a bare off
+    // hand for free was not marked and had no way into it from the picker.
+    //
+    // ⚠ THE ARMOR BRANCH ABOVE ALREADY SAYS THE RULE — `if (!worn) return true`,
+    // nothing there means anything is an improvement. The weapon branch just never
+    // asked the same question of the second hand. This makes them symmetric rather
+    // than inventing a new policy.
+    //
+    // ⚠ A TWO-HANDER IS NOT A FREE-HAND CASE: it takes both, so equipping one with
+    // a full main hand DISPLACES that weapon. It earns the mark only by beating
+    // what is in the main hand, the same as before.
+    const main = resolveEquippedItem(player, 'main');
+    if (!main) return true;
+    if (weapon.style !== 'two_handed' && !resolveEquippedItem(player, 'off')) return true;
+    const heldWeapon = weaponByName(main.name);
     if (!heldWeapon) return false;
     return averageDamage(weapon.damageDice) > averageDamage(heldWeapon.damageDice);
   }
@@ -156,14 +173,38 @@ const ARMOR_SLOT_TO_EQUIP: Readonly<Record<string, EquipSlot>> = {
  *  exact name. Equipping by the noun the player tapped would fail on every loose
  *  match with "I don't see a blade on you", which is a refusal for a take that
  *  just succeeded. One lookup, both answers. */
-export function upgradeEquipSlot(noun: string): { name: string; slot: EquipSlot } | null {
+export function upgradeEquipSlot(
+  player: PlayerCharacter | null,
+  noun: string,
+): { name: string; slot: EquipSlot } | null {
   const armor = armorByName(noun);
   if (armor) {
     const slot = ARMOR_SLOT_TO_EQUIP[armor.slot];
     return slot ? { name: armor.name, slot } : null;
   }
   const weapon = weaponByName(noun);
-  if (weapon) return { name: weapon.name, slot: 'main' };
+  if (!weapon) return null;
+  // ⚠⚠ OTA-1252 — WHICH HAND, AND THE ORDER IS THE WHOLE ANSWER. Owner: *"isn't
+  // there an option to equip a picked up weapon to any empty hand?"*
+  //
+  // ⚠ BETTER-THAN-MAIN WINS OVER FREE-HAND, and getting that backwards is the
+  // obvious bug: fill-the-free-hand-first would drop a Bone Splitter Axe into the
+  // off hand and leave a worse cudgel swinging in the main. A player picking up a
+  // clearly better weapon means it for their good hand.
+  //
+  // ⚠ A two-hander is always 'main' — `equipItem` displaces the off hand for it
+  // and says so, and main is the canonical two-handed slot everywhere else.
+  if (!player || weapon.style === 'two_handed') return { name: weapon.name, slot: 'main' };
+  const main = resolveEquippedItem(player, 'main');
+  if (!main) return { name: weapon.name, slot: 'main' };
+  const heldWeapon = weaponByName(main.name);
+  const beatsMain = heldWeapon
+    ? averageDamage(weapon.damageDice) > averageDamage(heldWeapon.damageDice)
+    : false;
+  if (beatsMain) return { name: weapon.name, slot: 'main' };
+  if (!resolveEquippedItem(player, 'off')) return { name: weapon.name, slot: 'off' };
+  // Both hands full and it beats neither — the mark would not have fired, but a
+  // caller that asks anyway gets the honest answer rather than a silent swap.
   return null;
 }
 

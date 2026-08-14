@@ -1644,7 +1644,30 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE ★ TAKES AND WEARS (2026-08-14, latest).**
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — EITHER HAND (2026-08-14, latest).** Golem
+  OTA-1252. Same merge-or-revert decision point.
+
+  Owner: *"isn't there an option to equip a picked up weapon to any empty hand?"*
+
+  ⚠⚠ **THERE IS, EVERYWHERE EXCEPT THE PICKER.** `validSlotsForItem` returns
+  `['main', 'off']` for every weapon and always has; the off hand swings in combat,
+  resolves its own reach, and has its own quick-row button. The picker's upgrade
+  mark compared against the MAIN hand alone, so a weapon that could have filled a
+  bare off hand for free carried no ★ — and OTA-1251's one-tap equip hardcoded
+  `slot: 'main'`, which would have displaced a good weapon to fill a full hand.
+
+  ⚠ **THE RULE WAS ALREADY ONE BRANCH UP** — the armor arm says `if (!worn) return
+  true`. The weapon arm never asked that of the second hand. Symmetry, not policy.
+
+  ⚠⚠ **BETTER-THAN-MAIN WINS OVER FREE-HAND.** Fill-the-free-hand-first is the
+  obvious implementation and it is wrong: it leaves the worse weapon in the good
+  hand. ⚠ **A two-hander is never a free-hand case** — it takes both, so it earns
+  the mark only by out-damaging the main hand.
+
+  ⚠ The row names the hand (`★ → main hand` / `★ → off hand`); armor keeps `→
+  worn`. Full story: the VERSION.md 4.29.180 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE ★ TAKES AND WEARS (2026-08-14).**
   Golem OTA-1251. Same merge-or-revert decision point.
 
   Owner: *"why are we doing inventory stuff? it was supposed to highlight the fact

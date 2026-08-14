@@ -68,7 +68,7 @@ describe('OTA-1251 — a ★ row goes somewhere', () => {
     // and this test would catch it if someone split them.
     for (const noun of ["Mud-Warden's Vest", 'Reclaimer\'s Cloak', 'Rough Hewn Mask']) {
       expect(isUpgradeOverEquipped(BARE as never, noun)).toBe(true);
-      expect(upgradeEquipSlot(noun)).not.toBeNull();
+      expect(upgradeEquipSlot(BARE as never, noun)).not.toBeNull();
     }
   });
 
@@ -77,14 +77,16 @@ describe('OTA-1251 — a ★ row goes somewhere', () => {
     // under the catalog name, and `equipItem` matches the pack by exact name. So
     // equipping by the tapped word would fail on every loose match — a refusal
     // ("I don't see a blade on you") for a take that had just succeeded.
-    const vest = upgradeEquipSlot("mud-warden's vest");
+    const vest = upgradeEquipSlot(BARE as never, "mud-warden's vest");
     expect(vest).toEqual({ name: "Mud-Warden's Vest", slot: 'chest' });
   });
 
-  it('⚠ a weapon upgrade goes to the main hand; scenery goes nowhere', () => {
-    expect(upgradeEquipSlot('Bone Splitter Axe')?.slot).toBe('main');
-    expect(upgradeEquipSlot('brick')).toBeNull();
-    expect(upgradeEquipSlot('mud-glazed library archive console')).toBeNull();
+  it('⚠ a weapon goes to a bare main hand; scenery goes nowhere', () => {
+    // ⚠ OTA-1252 made the hand depend on what is held — see that suite for the
+    // full table. With both hands bare it is still the main hand.
+    expect(upgradeEquipSlot(BARE as never, 'Bone Splitter Axe')?.slot).toBe('main');
+    expect(upgradeEquipSlot(BARE as never, 'brick')).toBeNull();
+    expect(upgradeEquipSlot(BARE as never, 'mud-glazed library archive console')).toBeNull();
   });
 });
 
