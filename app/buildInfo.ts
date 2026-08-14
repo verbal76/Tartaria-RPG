@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.187';
+export const DISPLAY_VERSION = '4.29.188';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23383,7 +23383,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // accepted by that device; a fresh install was what broke the loop.
 // New suite ota1174BugReportLoads (10 tests).
 // DISPLAY_VERSION 4.29.107.
-export const OTA_BUILD_ID = '2026-08-14-1263-green-light-and-paced-sweep';
+// ⚠⚠ OTA-1264 — "do not open the chest" was OPENING the chest.
+// Measured before the fix: 10 of 10 negated phrasings executed the negated
+// action at confidence 1.00. There was no negation handling anywhere in the
+// parser or the validator — not a weak rule, no rule.
+// ⚠ The obvious fix was the wrong one. "The verb was buried mid-sentence" is
+// true but is DESIGNED behaviour: the hit-rate corpus has twenty `verbose` rows
+// expecting exactly that ("maybe I should rest for a while" → rest). Penalising
+// a buried verb would have been a regression. Measuring first stopped it.
+// ⚠ Second find, from reading the list: `where` and `when` were missing from the
+// `ask` synonyms while their four siblings were present, so a question that
+// named an action performed it ("where can I sleep" → 8 game hours).
+// ⚠ Third, and the one that would have shipped this INERT: a demoted parse falls
+// through to the Qwen resolver, whose job is to find an actionable verb. It is
+// answered in the store and stopped before it gets there.
+// New suite ota1264NegationAndQuestions (34 tests). 806 suites / 7588 tests.
+// DISPLAY_VERSION 4.29.188. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-14-1264-negation-and-questions';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1263-green-light-and-paced-sweep';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-13-1247-hint-fires-when-it-should';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-13-1246-render-crash-fix';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-13-1245-the-picker-is-taught';

@@ -1839,8 +1839,61 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE GREEN LIGHT AND THE PACED SWEEP (2026-08-14,
-  latest).** Golem OTA-1263. **Two of the four were my own from this session.**
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — "DO NOT OPEN THE CHEST" WAS OPENING THE CHEST
+  (2026-08-14, latest).** Golem OTA-1264.
+
+  Owner, on a note from the 4.29.186 log: *"so this still needs addressed?"* The
+  note said his typed sentence — *"and I have to hit ignore rest to close it."* —
+  parsed as `rest` at confidence 1.00 and cost him 8 game hours. He was talking to
+  me, not the game, so I had filed it as a curiosity. **Measuring it turned up
+  something much worse underneath.**
+
+  ⚠⚠ **THE OBVIOUS FIX WAS THE WRONG ONE, AND MEASURING FIRST IS WHAT STOPPED IT.**
+  The natural read is "the verb was buried mid-sentence and position is not a
+  factor in confidence" — true, the scan takes the first minimum-distance hit
+  anywhere in the token stream. But `parserHitRate`'s corpus **deliberately expects
+  that**: twenty rows under `category: 'verbose'`, including *"maybe I should rest
+  for a while and recover"* → rest. A positional penalty would have broken a
+  well-tested product decision. The measurement killed that fix before it was built.
+
+  ⚠⚠ **WHAT THE MEASUREMENT ACTUALLY FOUND — 10 OF 10 NEGATED COMMANDS EXECUTED
+  THE NEGATED ACTION, AT FULL CONFIDENCE.** `do not open the chest` → open. `dont
+  attack the guard` → attack. `never eat the strange fungus` → rest (8 game hours +
+  an ambush roll). `I would rather not fight` → attack. There was **no negation
+  handling anywhere in the parser or the validator** — not a weak rule, no rule.
+  Unlike the verbose case, this contradicts the design rather than expressing it.
+  New validator rule `negated_command`: scan backward from the verb, stop at a
+  coordinating conjunction (negation does not scope across "so"/"but"/"and", so
+  *"I have nothing SO I will attack"* is still an attack), window 4 — **measured,
+  not picked**: the longest real distance is 3 (*"I do not want to sleep"*).
+
+  ⚠⚠ **SECOND FIND, FROM READING THE LIST:** `where` and `when` were **missing**
+  from the `ask` synonyms while `what`/`who`/`how`/`why` were all present. So a
+  question that named an action performed it — *"where can I sleep"* slept eight
+  hours, *"when does the shop open"* opened the chest. The wh-word sits at index 0
+  and the scan takes the FIRST minimum-distance hit, so restoring the two words is
+  the whole fix; **no new mechanism**. Corpus `question` 14/15 → **15/15**,
+  dictionary-domain hit rate 98.3% → **99.2%**.
+
+  ⚠⚠ **THIRD, AND THE ONE THAT WOULD HAVE SHIPPED THIS INERT:** a demoted parse
+  falls through to the **Qwen resolver**, whose entire job is to find an actionable
+  verb in the sentence. Handing it *"do not open the chest"* is asking for `open`
+  back. Every other demotion means "I could not work out what you wanted" and
+  belongs there; this one means the player was perfectly clear and the clear thing
+  was DON'T. It is answered in the store and **stopped before the fallback gate** —
+  and the test pins the ORDERING, because the ordering IS the fix. **Same shape as
+  the N2 mistake earlier this session: a change that looked right and never fired.**
+
+  ⚠ **`describeIssues` HAS ITS FIRST CALLER since OTA-205** — ~1000 OTAs of dead
+  code; demoted parses had always fallen through to the generic refusal. The
+  remaining issue codes **still have no consumer**, which is a live gap, not a
+  finished job.
+
+  New suite ota1264NegationAndQuestions (34). 806 suites / 7588 tests. All 274
+  parser tests green. ⚠ STILL GOLEM-ONLY.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE GREEN LIGHT AND THE PACED SWEEP (2026-08-14).**
+  Golem OTA-1263. **Two of the four were my own from this session.**
 
   ⚠⚠ **OTA-1258's N2 FIX NEVER FIRED.** It looked up `j.job === 'scene_intro'`; the
   label is `narration:scene_intro_fill`. Every fill fell back to the 6s floor —
