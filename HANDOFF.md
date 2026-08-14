@@ -1676,7 +1676,29 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ TWO GOLEM-FOUND BUGS PORTED (2026-08-14, latest). HAL.** HAL OTA-1256.
+- **⚠⚠ EVERY MAIN SCREEN MOUNTS NOW (2026-08-14, latest). HAL — PORTED FROM
+  GOLEM.** HAL OTA-1257, from golem OTA-1255. Owner: *"yes port the mount tests to
+  Hal."*
+
+  ⚠⚠ **MEASURED: exactly ONE suite on this line called `renderer.create` at all**
+  (and it mounts InputBox, not a screen). **No screen had ever been rendered by a
+  test on HAL.** ⚠ Six screens covered here, not golem's five — golem got an
+  ExplorationScreen guard from OTA-1246 after that crash reached a phone; HAL never
+  did, so the screen that actually broke is included.
+
+  ⚠⚠ **A SOURCE PIN PROVES A LINE EXISTS, NEVER THAT A COMPONENT RENDERS IT.** The
+  class is a render-time reference in its temporal dead zone: `tsc` cannot see it
+  inside a closure, and `no-use-before-define` flags 2,869 pre-existing sites so it
+  cannot be a gate. **Mount tests are the only guard.**
+
+  ⚠⚠ **AND AN EMPTY RENDER IS NOT ENOUGH** — golem's first guard passed with the bug
+  live because an empty scene never CALLS the dead reference. Real player, real
+  gear, real scene, real vendor; a final assertion guards the fixture.
+
+  ⚠ **Verified by mutation ON THIS LINE**, not assumed from golem's run.
+  Full story: the VERSION.md 4.29.162 row.
+
+- **⚠⚠ TWO GOLEM-FOUND BUGS PORTED (2026-08-14). HAL.** HAL OTA-1256.
   Owner: *"if these are needed on Hal to correct play the way Hal is with no other
   changes towards golem's new direction then port them."*
 
