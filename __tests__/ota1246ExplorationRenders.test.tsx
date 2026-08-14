@@ -101,7 +101,9 @@ describe('OTA-1246 — the screen actually mounts', () => {
     const isAmbientConsumed = at('  const isAmbientConsumed = (noun: string): boolean => {');
     const isFuzzyConsumed = at('  const isFuzzyConsumed = (chipNoun: string, pool: Set<string>): boolean =>');
     const gatherChips = at('  const gatherChips = useMemo(');
-    const gatherLaneCount = at('  const gatherLaneCount = useMemo(');
+    // ⚠ OTA-1263 renamed this memo (it returns lanes AND rows now). The ORDERING
+    // rule it guards is unchanged: a render-time memo must sit below what it calls.
+    const gatherLaneCount = at('  const gatherCounts = useMemo(');
     expect(gatherChips).toBeGreaterThan(isAmbientConsumed);
     expect(gatherChips).toBeGreaterThan(isFuzzyConsumed);
     expect(gatherLaneCount).toBeGreaterThan(gatherChips);

@@ -1640,11 +1640,17 @@ move. The field survives as a tombstone carrying the jni.cpp citation so nobody
 re-derives it. ⚠⚠ **A METRIC THAT CANNOT MOVE IS WORSE THAN NO METRIC — IT READS
 AS EVIDENCE**, and it sent two OTAs' worth of planning at a non-problem.
 
-⚠ **STILL OPEN, and it is a different item:** `investigate_lore` measured
-**64.7 ms/prompt-token** against `scene_intro`'s 3.67–12.2. That is where the
-prefill money actually is. It is a SHORT prompt (128t) taking a LONG read, which
-smells like a cold prefix — a different channel every time — rather than a big
-one. Worth its own measurement before anything is built.
+⚠⚠ **THE "STILL OPEN" ITEM THIS OTA CLOSED WITH IS WITHDRAWN (OTA-1263).** It read:
+*"investigate_lore measured 64.7 ms/prompt-token — that is where the prefill money
+actually is."* **That number was impossible.** The row was `ok 6863ms read 8286ms/
+write 4020ms` — twelve seconds of reported work inside a seven-second call — and
+OTA-1139 had ALREADY established that llama.rn's native `prompt_ms` is not always
+per-call, which is why the aggregate rejects such samples. The per-call line added
+here did not copy that guard, so it printed one and I built a finding on it.
+⚠ The next device log settled the real behaviour: three consecutive
+`investigate_lore` calls at 59.2 (cold, itself impossible), then **2.4 and
+2.5 ms/t** — prefix reuse working, exactly as concluded from the source above.
+**A guard that exists in one place and not its twin will be paid for.**
 
 **N5 — THE MODEL INVENTED A LOCATION, AND SPOKE IT. (correctness, needs a repro)**
 
@@ -1833,8 +1839,32 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — N6, A JS CRASH IS NOT AN ML CRASH (2026-08-14,
-  latest).** Golem OTA-1261. ⚠ **LINE-AGNOSTIC** — mlHealth is shared.
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE GREEN LIGHT AND THE PACED SWEEP (2026-08-14,
+  latest).** Golem OTA-1263. **Two of the four were my own from this session.**
+
+  ⚠⚠ **OTA-1258's N2 FIX NEVER FIRED.** It looked up `j.job === 'scene_intro'`; the
+  label is `narration:scene_intro_fill`. Every fill fell back to the 6s floor —
+  the behaviour N2 existed to change — and the debug line I added to prove it had
+  worked said `armed after 6000ms idle` three times. ⚠ **PRINT THE NUMBER A CHANGE
+  DEPENDS ON, THEN GO AND READ IT.**
+
+  ⚠⚠ **OTA-1259's PER-CALL `ms/t` PRINTED IMPOSSIBLE NUMBERS.** OTA-1139's guard
+  (prefill must be ≤ its own call) lived on the aggregate and was not copied to the
+  new per-call line, so it printed one and I filed a finding on it. ⚠ **A guard
+  that exists in one place and not its twin will be paid for.**
+
+  ⚠⚠ **THE TAKE / SALVAGE GREEN CAME FROM TWO RETIRED MODALS' PREDICATES** —
+  `takeableCount` / `salvageableCount`, written in 2026-05 to mirror TakeModal and
+  SalvageModal, both gone since OTA-1233. Deleted; the green reads `gatherChips`
+  now. **Seventh rule-computed-twice this session.** ⚠ And an empty room answers in
+  the FEED rather than in a card you must dismiss — OTA-1240's explanation was
+  right, the modal was the wrong place for it.
+
+  ⚠ **INVESTIGATE ALL IS PACED** at 2.2s per result (measured: five landed inside
+  50ms). Both aborts survive and now run before EACH submit rather than once per
+  frame. Full story: the VERSION.md 4.29.187 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — N6, A JS CRASH IS NOT AN ML CRASH (2026-08-14).** Golem OTA-1261. ⚠ **LINE-AGNOSTIC** — mlHealth is shared.
 
   The 4.29.173 report showed a JS render crash beside `ML runtime health: recovering
   — detected a crash on previous launch`. ⚠⚠ **The breadcrumb cannot tell them apart

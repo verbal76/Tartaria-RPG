@@ -122,7 +122,10 @@ describe('OTA-1108 — the cache number was being read backwards', () => {
     // A cold call and a warm one are two visibly different numbers here, which is
     // the whole point: this one CAN move.
     const store = src('app/state/gameStore.ts');
-    expect(store).toContain('(r.prefillMs / r.promptTokens).toFixed(1)');
+    // ⚠ OTA-1263 added OTA-1139's sanity guard to this line (a prefill longer than
+    // its own call is not a measurement), so the expression is non-null-asserted.
+    expect(store).toContain('(r.prefillMs! / r.promptTokens!).toFixed(1)');
+    expect(store).toContain('const prefillIsPossible = r.prefillMs != null');
     expect(store).toContain('${msPerTok}');
   });
 

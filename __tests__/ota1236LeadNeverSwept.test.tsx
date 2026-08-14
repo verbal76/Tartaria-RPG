@@ -262,7 +262,12 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
     const block = screen.slice(i, i + 600);
     expect(block).toContain('orderByStoryTier(nouns');
     expect(block).toContain('currentScene?.enemies ?? []).length > 0');
-    expect(block).toContain('break;');
+    // ⚠ OTA-1263 paced the sweep, so the abort is an early `return` out of the
+    // scheduled step rather than a `break` out of a for-loop. **The rule is
+    // unchanged and is what matters:** the enemy check runs before every submit,
+    // and now it runs before EACH one rather than once per frame — which is
+    // strictly stronger, because the sweep is live for seconds.
+    expect(block).toContain("(s.currentScene?.enemies ?? []).length > 0) return;");
   });
 
   it('⚠⚠ the investigate picker LISTS in the same order it SWEEPS', () => {

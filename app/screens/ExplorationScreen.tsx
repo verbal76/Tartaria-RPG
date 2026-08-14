@@ -19,6 +19,11 @@ import { SearchModal } from '../components/SearchModal';
 import { isSalvageable as isSalvageableForModal } from '../components/SalvageModal';
 import { BrandedModal } from '../components/BrandedModal';
 import { GatherModal } from '../components/GatherModal'; // OTA-1233 — one picker, both verbs
+
+/** ⚠ OTA-1263 — the beat between INVESTIGATE ALL's results. The owner asked for
+ *  "maybe 2+3 seconds"; 2.2s is the low end of that, because the sweep can be six
+ *  nouns long and the whole point is that it stays readable, not that it stalls. */
+const INVESTIGATE_ALL_GAP_MS = 2_200;
 // OTA-1251 — the ★ takes AND wears; both read from the same catalog lookups.
 import { isUpgradeOverEquipped, upgradeEquipSlot } from '../engine/gatherSort';
 import { ClimbModal } from '../components/ClimbModal';
@@ -633,18 +638,33 @@ export function ExplorationScreen() {
   // from `gatherChips` — the same array the picker renders — so the teaching hint
   // cannot fire over a room that turns out to have one lane, or stay silent over
   // one that has three.
-  const gatherLaneCount = useMemo(() => {
+  // ⚠⚠ OTA-1263 — AND HOW MANY ROWS, WHICH IS WHAT LIGHTS THE BUTTON. Owner, typed
+  // into the game: *"take /salvage is still green but the popup has nothing in it
+  // to claim."* The button's green came from `takeableCount` + `salvageableCount`,
+  // two predicates written in 2026-05 to mirror TakeModal's and SalvageModal's
+  // filter chains — **two modals that have not existed since OTA-1233.** They were
+  // never updated to match GatherModal, so the light and the card had drifted into
+  // different opinions about what the room holds.
+  //
+  // ⚠ THE SEVENTH TIME THIS SESSION FOR A RULE COMPUTED TWICE. The picker renders
+  // `gatherChips`; so does the lane count; so does this now. One array, one answer.
+  const gatherCounts = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { classifyGatherNoun: cls, laneForKind: lane } =
       require('../engine/gatherSort') as typeof import('../engine/gatherSort');
     const lanes = new Set<string>();
+    let rows = 0;
     for (const c of gatherChips) {
       if (c.consumed) continue;
       const l = lane(cls(c.noun));
-      if (l) lanes.add(l);
+      if (l) { lanes.add(l); rows += 1; }
     }
-    return lanes.size;
+    return { lanes: lanes.size, rows };
   }, [gatherChips]);
+  const gatherLaneCount = gatherCounts.lanes;
+  /** ⚠ Rows the picker would actually draw. Zero = an empty card, so the button
+   *  must not promise one. */
+  const gatherRowCount = gatherCounts.rows;
 
   // ⚠⚠ OTA-1249 — THE CARD WAITS FOR THE PICKER TO CLOSE. Owner: *"when you hit
   // the button, the new popup should jump in, then when you close it it should
@@ -1406,7 +1426,28 @@ export function ExplorationScreen() {
             onOpenAskArbiter={() => setAskArbiterOpen(true)}
             onOpenMissions={() => { useGameStore.getState().maybeAdvanceTutorial('main_quest'); setScreen('contracts'); }}
             onOpenSalvage={() => { Keyboard.dismiss(); setSalvageOpen(true); }}
-            onOpenTake={() => { Keyboard.dismiss(); setTakeOpen(true); }}
+            // ⚠⚠ OTA-1263 — AN EMPTY ROOM ANSWERS IN THE FEED, NOT IN A CARD YOU
+            // HAVE TO DISMISS. Owner: *"and I have to hit ignore rest to close
+            // it."* OTA-1240 taught the picker to auto-close when the PLAYER
+            // empties it, but deliberately made an already-empty open explain
+            // itself and wait — *"a player who needs an explanation, not a
+            // dismissal."* The explanation was right; the modal was the wrong
+            // place for it. One line in the feed says the same thing, costs no
+            // tap, and can be read at the player's own pace.
+            //
+            // ⚠ The button still WORKS when dark — it is not blocked. Refusing the
+            // tap outright would be the silent-control bug (OTA-1164); this answers.
+            onOpenTake={() => {
+              Keyboard.dismiss();
+              if (gatherRowCount === 0) {
+                useGameStore.getState().appendLog(
+                  'world',
+                  'Nothing here to take or pry apart. The room is picked clean.',
+                );
+                return;
+              }
+              setTakeOpen(true);
+            }}
             onOpenClimb={() => setClimbOpen(true)}
             onFuse={activeBuildingId === 'market' ? () => useGameStore.getState().submitPlayerAction('fuse') : undefined}
             hasTorch={!!(player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && canonicalItemTags(i).includes('light') && i.quantity > 0)}
@@ -1444,54 +1485,14 @@ export function ExplorationScreen() {
             inventory={player?.inventory ?? []}
             range={currentScene?.range ?? null}
             knockedOutPresent={(currentScene?.enemyKnockedOut ?? []).some(Boolean)}
-            takeableCount={(() => {
-              // 2026-05-25 [UI-2] — green tone fires only when the
-              // count of nouns the TakeModal will ACTUALLY render is
-              // > 0. Mirror TakeModal's filter chain exactly:
-              //   1. Scene noun has a catalog item (findCatalogItem
-              //      !== null) — otherwise the take verb refuses.
-              //   2. Not oversized (small enough to carry).
-              //   3. Not already consumed (consumed chips are
-              //      filtered out inside TakeModal:150-152).
-              // First version of this count was too lenient (just
-              // "not climbable AND not salvageable") and lit the
-              // button green when the modal would open empty.
-              const sceneNouns = currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [];
-              return sceneNouns.filter(
-                (n) => findCatalogItem(n) !== null
-                  && !isOversized(n)
-                  && !isAmbientConsumed(n),
-              ).length + (tutBeat === 'cudgel' ? 1 : 0); // tutorial cudgel prop
-            })()}
-            salvageableCount={(() => {
-              // 2026-05-25 — count predicate now uses SalvageModal's
-              // exported isSalvageable (= SALVAGE_PATTERN regex OR
-              // isCuratedSalvageable). Previously used
-              // interactionTags.isSalvageable, which diverged in both
-              // directions and lit SALVAGE green when modal was empty
-              // (and vice versa).
-              // OTA-753 — read displayedAmbientNouns directly (like TAKE),
-              // NOT buildChipPool. buildChipPool re-slices to 5 for the
-              // investigate row, which dropped reserved salvage nouns off
-              // the end and left this count (and the SALVAGE modal) empty.
-              // OTA-948 — the button glowed green from the top of a pillar while
-              // the engine refused every ground salvage ("The shelf is down
-              // there. Climb down to reach it."). Filter to nouns actually
-              // REACHABLE at this elevation first — the same rule as the
-              // engine's elevated-investigate gate, via one shared helper.
-              const salvSource = reachableWhileElevated(
-                currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
-                currentScene?.elevatedOn?.noun ?? null,
-                !!currentScene?.elevatedOverlayMeta,
-                // OTA-950 — Phase A of real heights: placed nouns count only at
-                // their own structure + tier (and never from the ground).
-                currentScene?.nounPlacements ?? null,
-                currentScene?.elevatedOn?.tier ?? 0,
-              );
-              return salvSource.filter(
-                (n) => !isAmbientConsumed(n) && isSalvageableForModal(n),
-              ).length + (tutBeat === 'scrap' ? 1 : 0); // tutorial chest-plate prop
-            })()}
+            // ⚠⚠ OTA-1263 — ONE ARRAY LIGHTS THE BUTTON AND FILLS THE CARD. Owner:
+            // *"take /salvage is still green but the popup has nothing in it to
+            // claim."* Both counts below mirrored TakeModal / SalvageModal, retired
+            // at OTA-1233, and had drifted from what GatherModal actually renders.
+            // `gatherRowCount` is derived from `gatherChips` — the exact array the
+            // picker draws — so the light cannot disagree with the card again.
+            takeableCount={gatherRowCount}
+            salvageableCount={0}
             climbableCount={(() => {
               // 2026-05-25 — green tone for CLIMB when the scene has at
               // least one climbable noun the modal will render AND it's
@@ -2008,13 +2009,35 @@ export function ExplorationScreen() {
         // firing commands into a fight the player has not seen yet is how a sweep
         // silently eats half the room. A story hook is the milder case of the same
         // thing — it opens a popup the queued lines push out of sight.
+        // ⚠⚠ OTA-1263 — ONE AT A TIME, WITH A BEAT BETWEEN. Owner, typed into the
+        // game: *"I don't think investigate all should be instant, resolve them one
+        // at a time when you hit it giving each maybe 2+3 seconds to see a
+        // result?"* Measured from the same log, five investigates landed inside
+        // FIFTY MILLISECONDS and three more inside forty — the whole sweep arrived
+        // as one wall of text with no way to tell which line answered which noun.
+        //
+        // ⚠ THE ABORTS ARE UNCHANGED AND NOW MATTER MORE, because the sweep is
+        // live for seconds instead of a single frame: it still stops the instant an
+        // enemy is on the board (OTA-1236 — firing commands into a fight the player
+        // has not seen yet is how a sweep eats half the room), and it now also
+        // stops if the player acts, since a paced sweep must never talk over them.
         onInvestigateAll={(nouns) => {
           setSearchOpen(false);
           const ordered = orderByStoryTier(nouns, (n) => n, leadCtx);
-          for (const n of ordered) {
-            if ((useGameStore.getState().currentScene?.enemies ?? []).length > 0) break;
-            submit(`investigate ${n}`);
-          }
+          const startedAt = useGameStore.getState().lastPlayerActionAt;
+          let i = 0;
+          const step = (): void => {
+            if (i >= ordered.length) return;
+            const s = useGameStore.getState();
+            if ((s.currentScene?.enemies ?? []).length > 0) return;
+            // ⚠ The player did something of their own — stop rather than queue
+            // lines behind whatever they just asked for.
+            if (s.lastPlayerActionAt !== startedAt && i > 0) return;
+            submit(`investigate ${ordered[i]!}`);
+            i += 1;
+            if (i < ordered.length) setTimeout(step, INVESTIGATE_ALL_GAP_MS);
+          };
+          step();
         }}
         leadNouns={leadNouns}
         onCancel={() => setSearchOpen(false)}

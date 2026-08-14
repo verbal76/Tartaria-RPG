@@ -248,10 +248,17 @@ describe('OTA-1183 — INVESTIGATE ALL', () => {
     const src = SRC('app/screens/ExplorationScreen.tsx');
     const i = src.indexOf('onInvestigateAll={(nouns) => {');
     expect(i).toBeGreaterThan(-1);
-    const block = src.slice(i, i + 600);
-    expect(block).toContain('submit(`investigate ${n}`)');
-    // Still a loop over nouns, still no bulk resolver anywhere.
-    expect(block).toMatch(/for \(const n of [A-Za-z]+\)/);
+    // ⚠ OTA-1263 PACED the sweep at the owner's request ("resolve them one at a
+    // time... maybe 2+3 seconds to see a result"), so the synchronous for-loop
+    // became a self-scheduling step, the loop variable became an index, and the
+    // block grew past the old 600-char window. **The rule this guards is unchanged
+    // and is what is asserted:** it drives the REAL investigate path, one submit
+    // per noun, with no second resolver anywhere.
+    const block = src.slice(i, i + 1200);
+    expect(block).toContain('submit(`investigate ${ordered[i]!}`)');
+    // Still one submit per noun, walked in order, and still no bulk resolver.
+    expect(block).toContain('const ordered = orderByStoryTier(');
+    expect(block).toContain('i += 1;');
     expect(src).not.toContain('investigateAllAmbient');
   });
 });

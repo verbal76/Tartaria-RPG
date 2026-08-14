@@ -135,9 +135,12 @@ describe('OTA-1245 — taught where it is true', () => {
     // hint that promised lanes the picker would not show would be the fourth.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     expect(screen).toContain('chips={gatherChips}');
-    const i = screen.indexOf('const gatherLaneCount = useMemo(');
+    // ⚠ OTA-1263 widened this memo to return ROWS as well as lanes, because the
+    // TAKE / SALVAGE button's green now reads it too. Same array, same derivation;
+    // only the shape of the return changed.
+    const i = screen.indexOf('const gatherCounts = useMemo(');
     expect(i).toBeGreaterThan(-1);
-    const block = screen.slice(i, i + 700);
+    const block = screen.slice(i, i + 900);
     expect(block).toContain('for (const c of gatherChips)');
     expect(block).toContain('c.consumed');          // a spent row is not a lane
     expect(block).toContain('}, [gatherChips]);');  // and it tracks that array

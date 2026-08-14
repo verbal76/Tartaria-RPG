@@ -142,7 +142,12 @@ describe('OTA-1258 N2 — the trigger is no longer shorter than the job', () => 
     const i = store.indexOf('const introIdleMs = (): number => {');
     expect(i).toBeGreaterThan(-1);
     const block = store.slice(i, i + 500);
-    expect(block).toContain("qwenJobStats().find((j) => j.job === 'scene_intro')");
+    // ⚠⚠ OTA-1263 CORRECTED THIS PIN AND THE CODE UNDER IT. The lookup used the
+    // bare intent `'scene_intro'`, but the telemetry label is
+    // `narration:scene_intro_fill` — so it never matched and the threshold never
+    // moved off its floor. **The pin asserted the mechanism I wrote, not that the
+    // mechanism finds anything**, which is why it passed over a dead fix.
+    expect(block).toContain("qwenJobStats().find((j) => j.job === 'narration:scene_intro_fill')");
     expect(block).toContain('st.avgMs');
     expect(block).toContain('st.count < 3');
     // The old fixed constant is gone as a trigger.

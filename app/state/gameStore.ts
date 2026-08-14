@@ -8384,8 +8384,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // now instead of only the ten-call rollup (OTA-1127 added it there). A cold
       // call and a warm one are then two visibly different numbers.
       // **A metric that cannot move is worse than no metric: it reads as evidence.**
-      const msPerTok = r.prefillMs != null && r.promptTokens
-        ? ` ${(r.prefillMs / r.promptTokens).toFixed(1)}ms/t`
+      // ⚠⚠ OTA-1263 — AND IT OBEYS THE SAME SANITY GUARD THE AGGREGATE DOES.
+      // OTA-1139 already found that llama.rn's native `prompt_ms` is not always
+      // per-call: the range rejects any sample whose prefill exceeds the whole
+      // call, because a 54-second prefill inside a 5-second call is not a
+      // measurement. OTA-1259 added this per-call figure and DID NOT copy that
+      // guard, so the line printed numbers the rollup deliberately refuses.
+      //
+      // ⚠⚠ AND IT COST A WRONG FINDING IMMEDIATELY. OTA-1259 filed
+      // `investigate_lore` at "64.7 ms/prompt-token — where the prefill money
+      // actually is". That row was `ok 6863ms read 8286ms/write 4020ms`: twelve
+      // seconds of reported work inside a seven-second call. **The number was
+      // impossible and I built a finding on it.** The next log settled the real
+      // behaviour — three consecutive `investigate_lore` calls at 59.2 (cold, and
+      // itself impossible), then **2.4 and 2.5 ms/t** — which is prefix reuse
+      // working, exactly as OTA-1259 concluded from the source.
+      const prefillIsPossible = r.prefillMs != null
+        && r.prefillMs <= r.totalMs
+        && (r.promptTokens ?? 0) > 0;
+      const msPerTok = prefillIsPossible
+        ? ` ${(r.prefillMs! / r.promptTokens!).toFixed(1)}ms/t`
         : '';
       const stop = r.stop === 'limit' ? ' HIT-CAP' : '';
       get().appendLog('debug', `qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms${wait}${split}${sizes}${msPerTok}${stop} (${r.chars}ch)`);
@@ -8567,8 +8585,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
          *  stillness; it does not promise it. The win is the RATE, and the next
          *  device log is what says whether it moved — which is why the chosen
          *  value is printed beside the fill. */
+        // ⚠⚠ OTA-1263 — OTA-1258's VERSION OF THIS NEVER FIRED. It looked up
+        // `j.job === 'scene_intro'`, but the telemetry label for this job is
+        // `narration:scene_intro_fill` (`job: opts?.bankOnly ?
+        // \`narration:${intent}_fill\` : \`narration:${intent}\``). The find never
+        // matched, `st` was always undefined, and every fill fell back to the 6s
+        // floor — the exact behaviour N2 set out to change.
+        //
+        // ⚠⚠ AND THE DEVICE LOG SAID SO PLAINLY, THREE TIMES: `homework: intro-fill
+        // armed after 6000ms idle`, in a session carrying several 6–9s
+        // `scene_intro_fill` samples. **The line I added to prove the change had
+        // worked is the line that proved it had not.** Print the number a change
+        // depends on, then read it.
         const introIdleMs = (): number => {
-          const st = qwenJobStats().find((j) => j.job === 'scene_intro');
+          const st = qwenJobStats().find((j) => j.job === 'narration:scene_intro_fill');
           // Fewer than three samples is not a measurement — hold the old floor.
           if (!st || st.count < 3 || st.avgMs <= 0) return INTRO_IDLE_FLOOR_MS;
           return Math.min(
