@@ -1644,8 +1644,32 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE PICKER NOW OBEYS THE BEAT (2026-08-13,
-  latest).** Golem OTA-1250. Same merge-or-revert decision point.
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE ★ TAKES AND WEARS (2026-08-14, latest).**
+  Golem OTA-1251. Same merge-or-revert decision point.
+
+  Owner: *"why are we doing inventory stuff? it was supposed to highlight the fact
+  you can select and equip the vest from the popup, not from inventory."*
+
+  ⚠⚠ **THE ★ HAS MEANT "PICKED AND EQUIPPED AT THE SAME TIME" SINCE HE FIRST ASKED
+  ABOUT THE MARK** (OTA-1237). I changed the glyph and never built the behaviour,
+  so the star was a label you went and acted on elsewhere — and OTA-1248 wrote a
+  tutorial beat around that detour. ⚠ **ANSWERING THE LITERAL QUESTION AND NOT THE
+  ONE BEHIND IT IS HOW A MISSING FEATURE SURVIVES A DIRECT ENQUIRY ABOUT ITSELF.**
+
+  ⚠⚠ **OTA-1250's LOCK TURNED THE DETOUR INTO A DEAD END, WHICH IS HOW IT
+  SURFACED** — fourteen refusals in ninety seconds, the nudge telling him to do
+  what he had just done. ⚠ **A lock is only as good as the action it permits.**
+
+  ⚠ **THE TAIL NAMES THE ACTION** (`★ → worn`, not `BETTER`) — every other row in
+  the card already did, and the upgrade row is the one whose tap now differs.
+
+  ⚠ One lookup returns slot AND catalog name, so a loose scene noun equips the
+  piece the take actually granted; and it only equips if the take landed, since a
+  full pack and a spent noun both refuse by logging.
+  Full story: the VERSION.md 4.29.179 row.
+
+- **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — THE PICKER NOW OBEYS THE BEAT (2026-08-13).**
+  Golem OTA-1250. Same merge-or-revert decision point.
 
   Owner, from a device run on the build shipped an hour earlier: *"I broke it by
   just grabbing stuff, you should only be able to do what it says, the other button

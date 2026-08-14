@@ -73,11 +73,16 @@ describe('OTA-1248 — the armor beat', () => {
   });
 
   it('⚠⚠ it teaches the ★ mark AND the equip — the two things nothing else taught', () => {
+    // ⚠ OTA-1251 CHANGED WHERE THE EQUIP HAPPENS, not whether it is taught. Owner:
+    // *"it was supposed to highlight the fact you can select and equip the vest
+    // from the popup, not from inventory."* The word "equip" left the copy with it;
+    // the beat now names the ★ and the single tap. ota1251 owns the pack-free
+    // assertions.
     const body = (beat as { body?: string }).body ?? '';
     const arbiter = (beat as { arbiter?: string }).arbiter ?? '';
     expect(body).toContain('★');           // the upgrade mark, named where it shows
-    expect(body.toLowerCase()).toContain('equip');
-    expect(arbiter.toLowerCase()).toMatch(/put it on|equip/);
+    expect(body.toLowerCase()).toMatch(/put it on|wear|equip/);
+    expect(arbiter.toLowerCase()).toMatch(/put it on|straight onto|equip/);
   });
 
   it('⚠⚠ the vest does NOT auto-equip — that is the entire lesson', () => {

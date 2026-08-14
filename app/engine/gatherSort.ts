@@ -139,6 +139,34 @@ const ARMOR_SLOT_TO_EQUIP: Readonly<Record<string, EquipSlot>> = {
   head: 'head', chest: 'chest', hands: 'hands', legs: 'legs', feet: 'feet', cloak: 'cloak',
 };
 
+/** ⚠⚠ OTA-1251 — WHERE A ★ UPGRADE GOES WHEN YOU TAP IT. Owner, on the armor
+ *  beat: *"it was supposed to highlight the fact you can select and equip the vest
+ *  from the popup, not from inventory."* The ★ has meant "picked and equipped at
+ *  the same time" since he first asked about the mark (OTA-1237) — it was never
+ *  meant to be a label you then go and act on somewhere else.
+ *
+ *  ⚠ Resolved from the SAME catalog lookups `isUpgradeOverEquipped` compares with,
+ *  so the mark and the slot cannot disagree: a row cannot show ★ and then have
+ *  nowhere to go. Returns null for anything that is not a wearable or wieldable
+ *  catalog piece, and the caller falls back to a plain take.
+ *
+ *  ⚠⚠ IT RETURNS THE CATALOG NAME TOO, AND THAT IS NOT A CONVENIENCE. A scene noun
+ *  is matched LOOSELY — "blade" resolves to a Rusted Blade — but `takeAmbientNoun`
+ *  grants the item under its CATALOG name, and `equipItem` matches the pack by
+ *  exact name. Equipping by the noun the player tapped would fail on every loose
+ *  match with "I don't see a blade on you", which is a refusal for a take that
+ *  just succeeded. One lookup, both answers. */
+export function upgradeEquipSlot(noun: string): { name: string; slot: EquipSlot } | null {
+  const armor = armorByName(noun);
+  if (armor) {
+    const slot = ARMOR_SLOT_TO_EQUIP[armor.slot];
+    return slot ? { name: armor.name, slot } : null;
+  }
+  const weapon = weaponByName(noun);
+  if (weapon) return { name: weapon.name, slot: 'main' };
+  return null;
+}
+
 function equippedInSlot(player: PlayerCharacter, slot: string): InventoryItem | null {
   const equipSlot = ARMOR_SLOT_TO_EQUIP[slot];
   if (!equipSlot) return null;

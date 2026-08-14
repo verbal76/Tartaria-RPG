@@ -19,6 +19,8 @@ import { SearchModal } from '../components/SearchModal';
 import { isSalvageable as isSalvageableForModal } from '../components/SalvageModal';
 import { BrandedModal } from '../components/BrandedModal';
 import { GatherModal } from '../components/GatherModal'; // OTA-1233 — one picker, both verbs
+// OTA-1251 — the ★ takes AND wears; both read from the same catalog lookups.
+import { isUpgradeOverEquipped, upgradeEquipSlot } from '../engine/gatherSort';
 import { ClimbModal } from '../components/ClimbModal';
 import { TorchProbeModal } from '../components/TorchProbeModal';
 import { HookContinueModal } from '../components/HookContinueModal';
@@ -2064,21 +2066,43 @@ export function ExplorationScreen() {
             submit('take cudgel');
             return;
           }
-          // ⚠⚠ OTA-1250 — AND NOW IT CLOSES, REVERSING OTA-1248's CALL ON THIS ONE
-          // LINE. That reasoning was "the beat completes on the EQUIP, so closing
-          // would hide the room the owner asked to be shown" — but the owner's next
-          // run said the opposite about what should happen while it is open: *"you
-          // should only be able to do what it says."* With the lock in place the
-          // vest is the only live row, so once it is taken the card has nothing the
-          // player may touch but IGNORE — and the next step (open your pack) sits
-          // BEHIND this modal. A card whose every control refuses is worse than a
-          // closed one.
+          // ⚠⚠ OTA-1251 — THE ARMOR BEAT IS ONE TAP, IN THIS CARD. Owner: *"why are
+          // we doing inventory stuff? it was supposed to highlight the fact you can
+          // select and equip the vest from the popup, not from inventory."* OTA-1248
+          // built the beat as take-here-then-equip-in-the-pack, which sent the
+          // player out of the card the beat was teaching — and OTA-1250's lock then
+          // made that dead end visible: his log shows fourteen refusals in ninety
+          // seconds, the Arbiter repeating "take the vest from TAKE / SALVAGE" at a
+          // player who had already taken it. The tap grants AND wears.
           if (tutBeat === 'armor' && /vest|warden/i.test(noun)) {
             setTakeOpen(false);
             submit(`take ${noun}`);
+            // ⚠ The grant is a synchronous `set`, so the vest is in the pack by the
+            // time this reads it — and it is checked rather than assumed, because
+            // `grantTutorialItem` refuses a second grant and a full pack refuses the
+            // first. equipItem advances the beat from its own top.
+            if ((useGameStore.getState().player?.inventory ?? []).some((i) => /vest/i.test(i.name))) {
+              useGameStore.getState().equipItem("Mud-Warden's Vest", 'chest');
+            }
             return;
           }
+          // ⚠⚠ AND THE SAME RULE OUTSIDE THE TUTORIAL — the ★ is not a label you go
+          // and act on somewhere else. It has meant "picked and equipped at the same
+          // time" since the owner first asked about the mark (OTA-1237); it just had
+          // never done it. The slot comes from the same catalog lookups the mark
+          // does, so a row cannot show ★ and then have nowhere to go.
+          const wear = isUpgradeOverEquipped(player, noun) ? upgradeEquipSlot(noun) : null;
           takeAmbientNoun(noun);
+          // ⚠ ONLY IF IT ACTUALLY LANDED. The take can refuse — a full pack, an
+          // already-worked-over noun — and both refuse by logging rather than
+          // throwing. Equipping regardless would answer the refusal with a second
+          // one ("I don't see it on you") for a player who did nothing wrong.
+          if (wear) {
+            const held = useGameStore.getState().player?.inventory ?? [];
+            if (held.some((i) => i.name.toLowerCase() === wear.name.toLowerCase() && i.quantity > 0)) {
+              useGameStore.getState().equipItem(wear.name, wear.slot);
+            }
+          }
         }}
         onSalvage={(noun) => {
           Keyboard.dismiss();

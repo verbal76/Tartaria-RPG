@@ -176,14 +176,20 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     // picker marks it ★ BETTER on its own. The beat points at a mark the player is
     // actually looking at rather than describing one.
     id: 'armor',
-    remind: 'take the vest, then equip it from your pack',
+    // ⚠⚠ OTA-1251 — THE BEAT TEACHES THE ★, NOT THE PACK. Owner, on the OTA-1248
+    // version of this copy: *"why are we doing inventory stuff? it was supposed to
+    // highlight the fact you can select and equip the vest from the popup, not from
+    // inventory."* The old wording sent the player OUT of the card the beat exists
+    // to teach, and OTA-1250's lock turned that detour into a dead end — his log
+    // shows fourteen refusals in ninety seconds. A ★ row takes and wears in one tap.
+    remind: 'tap the ★ vest in TAKE / SALVAGE — one tap puts it on',
     screen: 'exploration',
     area: 'quick-row',
     pulse: true,
     title: 'Wear Something',
-    body: 'A Mud-Warden\'s Vest is here, marked ★ BETTER — that mark means it beats what you have on. Take it, then open your pack and equip it.',
+    body: 'A Mud-Warden\'s Vest is here, marked ★ — that means it beats what you have on. Tap it in TAKE / SALVAGE and you put it on in the same move.',
     arbiter:
-      '"That vest is better than bare cloth, and the star says so. Take it — then put it on. Nothing equips itself but the blade in your hand."',
+      '"That vest is better than bare cloth, and the star says so. Open TAKE / SALVAGE and tap it — a starred piece goes straight onto your back."',
   },
   {
     id: 'rope',

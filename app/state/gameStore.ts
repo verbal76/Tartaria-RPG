@@ -12539,13 +12539,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // an item the engine did not hand over is worse than a dead button — the
         // player has no way to tell which of the five they actually own.
         if (get().tutorialPropsConsumed.vest) {
-          get().appendLog('arbiter', '"You have it already. Open your pack and put it on."');
+          get().appendLog('arbiter', '"You have it already — it is on your back."');
           return;
         }
         grantTutorialItem(get, set, 'vest');
         get().appendLog('world', "You lift the vest. Mud-warden plate, laced onto a hide backing — heavier than it looks, and it has kept someone alive before.");
         get().appendLog('reward', "✦ Mud-Warden's Vest (Common).");
-        get().appendLog('arbiter', '"In your pack. It does you no good in there — open the pack and put it on."');
+        // ⚠⚠ OTA-1251 — NO "OPEN YOUR PACK" LINE. The tap that fires this also
+        // equips (the picker's ★ path), so the old line described a chore the
+        // player no longer has and the beat no longer waits on. equipItem speaks
+        // its own "you put it on" line a beat later.
         return;
       }
       // (c) Tutorial scrap of the chest plate. Mirrors the salvage
@@ -30051,7 +30054,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       look: 'tap the glowing LOOK AROUND YOU button to get your bearings.',
       cudgel: 'tap the glowing TAKE / SALVAGE button, then tap the cudgel in the list.',
       rope: "type 'take rope' in the box, then tap ACT.",
-      armor: 'take the vest from TAKE / SALVAGE, then open your pack and equip it.',
+      armor: 'tap the ★ vest inside TAKE / SALVAGE — one tap puts it on.',
       scrap: 'tap the glowing TAKE / SALVAGE button, then tap the chest plate under SALVAGE.',
       climb: 'tap the glowing CLIMB button.',
       investigate: 'tap the glowing INVESTIGATE button and look at the door.',

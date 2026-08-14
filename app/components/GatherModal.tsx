@@ -243,9 +243,16 @@ export function GatherModal({
   const renderRow = (row: GatherRow, lane: GatherLane) => {
     const { noun, kind, upgrade, consumed } = row;
     const locked = isLocked(noun);
+    // ⚠⚠ OTA-1251 — THE TAIL SAYS WHAT THE TAP DOES, AND FOR A ★ THAT IS NO LONGER
+    // "→ pack". Owner: *"it was supposed to highlight the fact you can select and
+    // equip the vest from the popup, not from inventory."* An upgrade row now takes
+    // AND wears in one tap, so the old tail — `BETTER`, which describes the ITEM —
+    // was the one row in this card whose tail did not name its own action. That is
+    // exactly the deduction the colour layout exists to delete. The ★, the brighter
+    // outline and the gold all still carry "better"; the tail carries "worn".
     const tail =
       lane === 'lead' ? 'INVESTIGATE'
-        : upgrade ? 'BETTER'
+        : upgrade ? '★ → worn'
           : lane === 'scrap' ? 'salvage'
             : '→ pack';
     return (
@@ -281,7 +288,9 @@ export function GatherModal({
             ? `${noun}. Not yet — the Arbiter has asked for something else first.`
             : lane === 'lead'
               ? `${noun}. Worth a look. Tap to investigate. No bulk action will touch this.`
-              : `${upgrade ? 'Upgrade. ' : ''}${noun}. ${lane === 'scrap' ? 'Tap to salvage' : 'Tap to take'}`
+              : upgrade
+                ? `Upgrade. ${noun}. Tap to take it and put it on.`
+                : `${noun}. ${lane === 'scrap' ? 'Tap to salvage' : 'Tap to take'}`
         }
       >
         <Text style={[

@@ -281,7 +281,9 @@ describe('OTA-1250 — the prop goes spent when it is taken', () => {
     expect(guard).toBeLessThan(reward);
     expect(block.slice(guard, grant)).toContain('return;');
     // It still says something — a silent refusal is the bug one layer down.
-    expect(block.slice(guard, grant)).toContain('Open your pack and put it on.');
+    // ⚠ OTA-1251 re-worded it: the tap that takes now also WEARS, so "open your
+    // pack" described a chore the player no longer has.
+    expect(block.slice(guard, grant)).toContain('it is on your back');
   });
 
   it('⚠ taking the vest now CLOSES the picker — nothing left in it is legal', () => {
