@@ -110,7 +110,18 @@ describe("OTA-1147 — the first-person opener, and what it must NOT eat", () =>
 
   it('it sits with the other register filters, not somewhere new', () => {
     // RETARGETED BY OTA-1148 — the opener regex became a two-sided predicate.
-    const chain = SRC.slice(SRC.indexOf("!/^\\s*they\\s/i.test(s)"));
+    // ⚠⚠ RE-ANCHORED BY OTA-1260, and the reason is worth keeping: this sliced
+    // from the FIRST occurrence of the `they`-opener filter, which appears in TWO
+    // functions (narrateViaArbiter's survivors chain and the ambient chain). So
+    // the window began in the wrong function and only passed because nothing
+    // between them mentioned the predicate. The moment N1 added an action-opener
+    // check to the intro BANK, the window picked that up instead — a false failure
+    // about ordering in a chain this test does not police.
+    // **Anchor a slice to the function you mean, not to a string that happens to
+    // be unique today.**
+    const ambientAt = SRC.indexOf('async function maybeGenerateAmbientArbiter');
+    expect(ambientAt).toBeGreaterThan(0);
+    const chain = SRC.slice(ambientAt);
     expect(chain.indexOf('const firstPerson =')).toBeLessThan(chain.indexOf('isSecondPersonActionOpener'));
   });
 });

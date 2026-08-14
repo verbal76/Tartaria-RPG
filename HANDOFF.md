@@ -1676,7 +1676,35 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ EVERY MAIN SCREEN MOUNTS NOW (2026-08-14, latest). HAL — PORTED FROM
+- **⚠⚠ NARRATION N1–N3 (2026-08-14, latest). HAL — PORTED FROM GOLEM.** HAL
+  OTA-1260, from golem OTA-1258. Owner: *"measure first, then port n1-n3 to hal."*
+  All three predate every picker change; HAL carried all three bugs unchanged.
+
+  ⚠⚠ **N1 — the bank was keyed by LOCATION and every outpost room shares one**, so
+  a line written in the Atrium was spent at the Court. Keyed by room now; the
+  prefetch only targets tiles, so hub rooms fall through to the live path. **And a
+  banked line may not narrate a player ACTION** — true only in the instant it was
+  written, and the bank is the one channel where time passes.
+
+  ⚠⚠ **N2 — the trigger was SHORTER than the job it arms** (6s vs a measured ~9s).
+  The threshold reads the telemetry now. ⚠ **A second constant restating a measured
+  number always drifts from it.**
+
+  ⚠⚠ **N3 — the runtime always returned the partial text and this function binned
+  it.** A fill has nothing to speak, so late text is free text later. ⚠ Guarded: a
+  partial cut mid-sentence is still refused.
+
+  ⚠⚠ **THE SAME THREE OLDER SUITES FAILED HERE AS ON GOLEM**, under this line's
+  numbering (ota1054 / ota1147 / ota1152) — each had pinned a MECHANISM rather than
+  the rule. **Anchor a slice to the function you mean, not to a string that happens
+  to be unique today.** Full story: the VERSION.md 4.29.163 row.
+
+  ⚠ **N4 was MEASURED on golem and CLOSED — do not port it, there is nothing to
+  port.** Its premise was wrong three ways; see golem OTA-1259. The telemetry fix
+  it produced is worth porting separately if this line's logs are ever read for
+  cache behaviour.
+
+- **⚠⚠ EVERY MAIN SCREEN MOUNTS NOW (2026-08-14). HAL — PORTED FROM
   GOLEM.** HAL OTA-1257, from golem OTA-1255. Owner: *"yes port the mount tests to
   Hal."*
 

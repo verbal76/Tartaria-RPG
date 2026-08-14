@@ -182,7 +182,7 @@ import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGrac
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
-import { setQwenTelemetrySink, setQwenDiscardSink, noteQwenDiscarded, qwenCallCount, qwenTelemetrySummary } from '../ai/generation/qwenTelemetry';
+import { setQwenTelemetrySink, setQwenDiscardSink, noteQwenDiscarded, qwenCallCount, qwenTelemetrySummary, qwenJobStats } from '../ai/generation/qwenTelemetry';
 // OTA-1200 — live llama-context counter. Instrument only; changes no behaviour.
 // OTA-1202 — the ledger is now READ as well as fed: the memory handler compares the
 // release count across a dispose so it can report what it actually freed.
@@ -8568,7 +8568,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
         /** Six seconds of stillness. Long enough that stepping through a
          *  corridor never triggers it, short enough that a player reading the
          *  room description has already paid for the next one. */
-        const INTRO_IDLE_MS = 6_000;
+        const INTRO_IDLE_FLOOR_MS = 6_000;
+        /** ⚠ A ceiling, so a single pathological sample cannot switch the feature
+         *  off. Twenty seconds of stillness is already a player who has put the
+         *  phone down. */
+        const INTRO_IDLE_CEIL_MS = 20_000;
+        /** ⚠⚠ OTA-1260 (N2) — THE TRIGGER WAS SHORTER THAN THE JOB IT ARMS, SO
+         *  PREEMPTION WAS THE EXPECTED OUTCOME RATHER THAN THE EXCEPTION.
+         *
+         *  The floor is 6s. This job's own telemetry reports ~9s typical — 9009ms
+         *  in a golem device log, and an earlier full-session sweep measured avg
+         *  9.5s / max 11.4s. A fill armed at six seconds of stillness is therefore
+         *  started with a THREE-SECOND HOLE in it: any action in that window kills
+         *  it, and the same log shows exactly that (one intro preempted at 5555ms,
+         *  discarded, zero tokens out).
+         *
+         *  ⚠ READ FROM THE TELEMETRY, NOT HARDCODED. A second constant claiming
+         *  "the job takes about N" is a copy of a number that already exists and
+         *  will drift from it. `avgMs` is the same figure the debug rollup prints,
+         *  so the threshold and the log can never disagree.
+         *
+         *  ⚠ IT IS A PROXY, NOT A GUARANTEE. Past stillness predicts future
+         *  stillness; it does not promise it. The win is the RATE, and the next
+         *  device log is what says whether it moved — which is why the chosen
+         *  value is printed beside the fill. */
+        const introIdleMs = (): number => {
+          const st = qwenJobStats().find((j) => j.job === 'scene_intro');
+          // Fewer than three samples is not a measurement — hold the old floor.
+          if (!st || st.count < 3 || st.avgMs <= 0) return INTRO_IDLE_FLOOR_MS;
+          return Math.min(
+            INTRO_IDLE_CEIL_MS,
+            Math.max(INTRO_IDLE_FLOOR_MS, Math.round(st.avgMs * 1.25)),
+          );
+        };
         /** Wider than the item gap: an intro costs a full narration-sized
          *  generation, and two banked lines per room is the whole target. */
         const INTRO_FILL_GAP_MS = 45_000;
@@ -8579,7 +8611,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (introFillInFlight) return false;
           if (Date.now() - lastIntroFillAt < INTRO_FILL_GAP_MS) return false;
           const lastAct = get().lastPlayerActionAt;
-          if (lastAct === null || Date.now() - lastAct < INTRO_IDLE_MS) return false;
+          const idleNeeded = introIdleMs();
+          if (lastAct === null || Date.now() - lastAct < idleNeeded) return false;
           const target = introPrefetchCandidates(get)
             .find((l) => (sceneIntroBank.get(l.id)?.length ?? 0) < INTRO_BANK_PER_LOC);
           if (!target) return false;
@@ -8604,6 +8637,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             { bankOnly: true, forLocation: target },
           ).catch(() => { /* fail closed — the live path still works */ })
             .finally(() => { introFillInFlight = false; });
+          // ⚠ The threshold this fill was armed at, so a device log can tell a
+          // preemption caused by a bad threshold from one caused by a busy player.
+          get().appendLog('debug', `homework: intro-fill armed after ${idleNeeded}ms idle`);
           return true;
         };
         let lastHomeworkAt = 0;
@@ -12380,7 +12416,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // free line is still the wrong line mid-fight. It was also written
         // against a scene with no enemies in it, so spending it into an
         // ambush would describe a room that is no longer the situation.
-        const banked = hasEnemies ? null : takeBankedSceneIntro(get, location.id);
+        // ⚠⚠ OTA-1260 (N1) — keyed by the ROOM, so an outpost interior cannot
+        // spend a line written about a different room of the same tile. The
+        // prefetch only ever targets tiles (`introPrefetchCandidates` returns []
+        // in a hub), so hub rooms have no bank and fall through to the live path.
+        const banked = hasEnemies
+          ? null
+          : takeBankedSceneIntro(get, introBankKey(location.id, inHub ? hubRoomId : null));
         if (banked) {
           get().appendLog('arbiter', banked);
           // OTA-1154 — the arrival beat IS this tile's one aside. Spending the
@@ -42106,6 +42148,12 @@ export function _sceneIntroBankSize(): number {
   for (const v of sceneIntroBank.values()) n += v.length;
   return n;
 }
+/** ⚠ OTA-1260 (N1) — exported so the suite exercises the REAL key builder rather
+ *  than re-deriving the `loc#room` format, which is exactly the kind of second
+ *  copy that drifts. */
+export function _introBankKeyForTest(locId: string, hubRoomId: string | null): string {
+  return introBankKey(locId, hubRoomId);
+}
 export function _bankSceneIntroForTest(locId: string, text: string): void {
   bankSceneIntro(locId, text);
 }
@@ -42114,6 +42162,27 @@ export function _takeBankedSceneIntroForTest(locId: string): string | null {
 }
 export const _INTRO_BANK_PER_LOC = INTRO_BANK_PER_LOC;
 export const _INTRO_BANK_TOTAL = INTRO_BANK_TOTAL;
+
+/** ⚠⚠ OTA-1260 (N1) — THE BANK KEY CARRIES THE ROOM, NOT JUST THE TILE.
+ *
+ *  Every room inside an outpost shares one location id — a golem device log shows
+ *  the Atrium, the Court, the Arsenal and the Workshop all reporting
+ *  `loc=monarch_waystation`. Keyed by location alone, a line written while the
+ *  player stood in one room was SPENT on arrival in another, which is how
+ *  `"You climb down the arch, feeling the weight of the city's collapse before
+ *  you"` came out of the Arbiter's mouth at the Court of Standards — four rooms
+ *  and forty seconds after the climb, which happened in the Atrium.
+ *
+ *  ⚠ THE PREFETCH WRITES FOR TILES, so hub rooms simply have no bank and fall
+ *  through to the live path. That is the honest outcome: **we never wrote a line
+ *  about the Court, so we should not speak one there.** Losing instant arrival
+ *  inside outposts is the correct price for not describing the wrong room.
+ *
+ *  Found on golem, ported straight across: the bank predates every picker change
+ *  and this is a plain correctness bug on this line too. */
+function introBankKey(locId: string, hubRoomId: string | null | undefined): string {
+  return hubRoomId ? `${locId}#${hubRoomId}` : locId;
+}
 
 function bankSceneIntro(locId: string, text: string): void {
   if (!locId || !text) return;
@@ -42699,10 +42768,22 @@ async function narrateViaArbiter(
         homework: opts?.bankOnly === true,
       },
     );
-    if (myEpoch !== arbiterGenerationEpoch) {
-      // OTA-1152 — for a FILL this is the ordinary outcome, not a loss: the
-      // player acted, the harness cut the job short, and nothing was owed.
-      noteQwenDiscarded(opts?.bankOnly ? 'intro-fill:preempted' : 'cancelled:player-acted-again');
+    // ⚠⚠ OTA-1260 (N3) — A PREEMPTED FILL KEEPS ITS TEXT INSTEAD OF BINNING IT.
+    // The runtime has ALWAYS returned the tokens that had already assembled
+    // (`const text = (assembled || result.text || '')` in LlamaRuntime) — this
+    // function then threw them away on the epoch check, before any of the
+    // cleaning below had run. For a LIVE narration that is correct: the player
+    // has moved on and the line must not be spoken. **For a FILL there is nothing
+    // to speak** — it goes into the bank and is re-vetted again at spend time, so
+    // late text is still free text later. That was the entire premise of the bank
+    // (OTA-1129); the preempt path just never got the memo.
+    const preemptedFill = opts?.bankOnly === true && myEpoch !== arbiterGenerationEpoch;
+    if (myEpoch !== arbiterGenerationEpoch && !preemptedFill) {
+      // ⚠ OTA-1152 called this "the ordinary outcome" for a FILL. OTA-1260 (N3)
+      // took fills OUT of this branch entirely — they keep their text now — so
+      // only a LIVE narration reaches here, and for a live line this really is a
+      // loss the player never sees: they moved on before it finished.
+      noteQwenDiscarded('cancelled:player-acted-again');
       return;
     }
     // Trim to the last complete sentence so we never display a partial
@@ -42760,10 +42841,35 @@ async function narrateViaArbiter(
     if (opts?.bankOnly) {
       // A fill that fell through to the template banked nothing — the template
       // is already free and already available at arrival.
-      if (usedFallback || repDup) {
-        noteQwenDiscarded(repDup ? 'intro-fill:near-dup' : 'intro-fill:∅');
+      // ⚠⚠ OTA-1260 (N1) — A BANKED LINE MUST NOT NARRATE AN ACTION. The bank is
+      // the one channel where TIME PASSES between writing and speaking, so a
+      // sentence about what the player is DOING is true only in the instant it was
+      // generated. The ambient channel has filtered this shape since it was built;
+      // the intro bank never did. **One checker, both channels** — a second copy
+      // of the rule would drift from the first.
+      const introOpener = finalText.split(/(?<=[.!?])\s+/)[0] ?? '';
+      const narratesAction = isSecondPersonActionOpener(introOpener);
+      // ⚠⚠ OTA-1260 (N3) — A PREEMPTED PARTIAL MUST END IN A WHOLE SENTENCE.
+      // `trimToLastSentence` returns its input UNCHANGED when it finds no terminal
+      // punctuation ("no terminal punctuation found — keep the raw text"), which is
+      // right for a completed generation and wrong for one cut mid-word: banking
+      // that would store `"…a single chair faces"` and speak it later as if it were
+      // finished. Only the preempted path can produce that, so only it pays it.
+      const endsWhole = /[.!?]["']?$/.test(finalText);
+      const truncated = preemptedFill && !endsWhole;
+      if (usedFallback || repDup || narratesAction || truncated) {
+        noteQwenDiscarded(
+          truncated ? 'intro-fill:preempted-partial'
+            : narratesAction ? 'intro-fill:action-opener'
+              : repDup ? 'intro-fill:near-dup' : 'intro-fill:∅',
+        );
       } else {
-        bankSceneIntro(forLoc?.id ?? scene.location.id, finalText);
+        bankSceneIntro(
+          forLoc
+            ? introBankKey(forLoc.id, null)
+            : introBankKey(scene.location.id, get().player?.hubRoomId ?? null),
+          finalText,
+        );
       }
       get().appendLog('debug',
         `homework: scene_intro "${forLoc?.name ?? scene.location.name}"`
