@@ -12252,7 +12252,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // uses, so the directions are consistent across the session.
     // Skipped on the opening scene — the player is being introduced;
     // the macro radar lands on their next move, when context is welcome.
-    if (!opts?.isOpening) {
+    // ⚠⚠ OTA-1300 (port of golem OTA-1298) — AND NOT WHILE YOU ARE INDOORS.
+    // Owner, reading his log: "it said leave The Outpost first but I'm seeing
+    // cardinal directions." Every interior room printed BOTH the room graph's
+    // paths AND the overland compass, back to back — two different norths, the
+    // second describing a map you cannot walk until you leave, which the line
+    // above it just finished saying. The radar is a WILDERNESS instrument;
+    // indoors it has nothing to describe.
+    const indoors = !!hubRoom || !!get().activeBuildingId;
+    if (!opts?.isOpening && !indoors) {
       try {
         const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
         const map = generateWorldMap(seed, player.currentLocationId);

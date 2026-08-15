@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.161';
+export const DISPLAY_VERSION = '4.29.162';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23762,7 +23762,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // preserved in VERSION.md's steam block; the code from those OTAs is either
 // PC-layer (kept above) or already in golem.
 // DISPLAY_VERSION 4.29.161 (steam line). Content parity: golem 4.29.206.
-export const OTA_BUILD_ID = '2026-08-15-1297-steam-resync-to-golem';
+// ⚠⚠ OTA-1300 — NO OVERLAND COMPASS INDOORS (port of golem OTA-1298). Every
+// interior room printed the room graph's paths AND the overland compass back
+// to back — two different norths, the second describing a map you cannot walk
+// until you leave. Owner: "it said leave The Outpost first but I'm seeing
+// cardinal directions." Gated on being indoors (hub room OR building); the
+// radar returns the moment you step out. New suite ota1300NoCompassIndoors (3).
+// 823 suites / 7702 tests. DISPLAY_VERSION 4.29.162 (steam line).
+export const OTA_BUILD_ID = '2026-08-15-1300-no-compass-indoors';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1297-steam-resync-to-golem';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1294-title-list-tells-the-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1292-lore-back-stays-in-game';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1281-nine-outposts-walked';
