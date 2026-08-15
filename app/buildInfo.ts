@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.206';
+export const DISPLAY_VERSION = '4.29.207';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23734,7 +23734,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // snapshot (ports 1296); HAL port 1295. New suite
 // ota1294TitleListTellsTheTruth (2). 822 suites / 7699 tests.
 // DISPLAY_VERSION 4.29.206. ⚠ GOLEM-ONLY (ports same sitting).
-export const OTA_BUILD_ID = '2026-08-15-1294-title-list-tells-the-truth';
+// ⚠⚠ OTA-1298 — THE GAME PRINTED TWO DIFFERENT NORTHS, BACK TO BACK. Owner,
+// reading his 4.29.206 log: "it said leave The Outpost first but I'm seeing
+// cardinal directions." Every interior room printed BOTH:
+//   Paths: north to Promenade · south to Landing 1. (Type 'leave outpost'…)
+//   [Dynasty Border Post] north: open ground · east: Tartarian Pilgrim Camp…
+// The first is the room graph — the only movement that works indoors. The
+// second is the OVERLAND compass, describing a map you cannot walk until you
+// leave, which the line directly above it has just finished telling you.
+// ⚠ OTA-1279 made this WORSE rather than better: now that interior norths are
+// correct and consistent, a bogus second north beside them is pure noise. The
+// radar is a wilderness instrument — gated on being indoors (hub room OR
+// building), so it vanishes inside and returns the moment you step out.
+// New suite ota1298NoCompassIndoors (3). 823 suites / 7702 tests.
+// DISPLAY_VERSION 4.29.207. Ports: HAL 1299, steam 1300 (same sitting).
+export const OTA_BUILD_ID = '2026-08-15-1298-no-compass-indoors';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1294-title-list-tells-the-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1292-lore-back-stays-in-game';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1281-nine-outposts-walked';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1280-gift-ends-at-the-door';

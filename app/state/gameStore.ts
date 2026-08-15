@@ -12252,7 +12252,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // uses, so the directions are consistent across the session.
     // Skipped on the opening scene — the player is being introduced;
     // the macro radar lands on their next move, when context is welcome.
-    if (!opts?.isOpening) {
+    // ⚠⚠ OTA-1298 — AND NOT WHILE YOU ARE INDOORS. Owner, reading his own log:
+    // *"it said leave The Outpost first but I'm seeing cardinal directions."*
+    // Every interior room printed BOTH lines, back to back:
+    //
+    //   Paths: north to Promenade · south to Landing 1. (Type 'leave outpost'…)
+    //   [Dynasty Border Post] north: open ground · east: Tartarian Pilgrim Camp…
+    //
+    // TWO DIFFERENT NORTHS, one after the other. The first is the room graph —
+    // the only movement that works in here. The second is the OVERLAND compass,
+    // which cannot be walked at all until you leave, and which the line above it
+    // has just finished saying so. It read as the game contradicting itself, and
+    // on the corrected map (OTA-1279) it is worse: interior norths are now
+    // meaningful and consistent, so a second bogus north beside them is pure
+    // noise. The radar is a WILDERNESS instrument; indoors it has nothing to
+    // describe. Same reason the building interior never wanted it.
+    const indoors = !!hubRoom || !!get().activeBuildingId;
+    if (!opts?.isOpening && !indoors) {
       try {
         const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
         const map = generateWorldMap(seed, player.currentLocationId);
