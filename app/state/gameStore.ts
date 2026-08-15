@@ -269,6 +269,7 @@ import {
   resolveHubTravel,
   isLeaveHubCommand,
   isBareExitCommand,
+  matchHubRoomName,
 } from '../engine/hub';
 import {
   getBuilding,
@@ -13576,7 +13577,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
     }
-    const parsed = parseInput(trimmed, parseCtx);
+    let parsed = parseInput(trimmed, parseCtx);
+    // ⚠⚠ OTA-1274 — A BARE ROOM NAME OUTRANKS WHATEVER VERB IT HAPPENS TO BE.
+    // The odd-name audit (owner: "there was a room called break") found the
+    // defect class: hub rooms whose typed names ARE parser verbs. `vault`
+    // jumped, `break` attacked, `forge` opened crafting, `chamber` climbed via
+    // fuzzy 'clamber' — every skin had at least one room you could not walk to
+    // by typing its name. Buildings solved this in arb25 by resolving room
+    // names BEFORE the parser; hubs never got the same door. The matcher is
+    // STRICT (the whole input is the room, articles and go-words aside), so
+    // "break the door" still swings and only "break"/"breakroom" walks.
+    if (player.hubRoomId && parsed.intent !== 'travel') {
+      const named = matchHubRoomName(
+        trimmed,
+        player.hubRoomId,
+        new Set(get().worldMemory.hubVisited ?? []),
+        hubSkinFactionFor(player.currentLocationId, player.factionId),
+      );
+      if (named) {
+        parsed = { ...parsed, intent: 'travel', confidence: 1, matchedVerb: 'go', target: trimmed, validationIssues: undefined };
+      }
+    }
     // OTA-128 — silent re-dispatch (drink-of-consumable, etc.) skips
     // the [player] echo so the player doesn't see two input lines
     // for one typed action.
@@ -17922,7 +17943,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // typed attempts on the owner's device before the taught phrase landed.
         if (player.hubRoomId && !isLeaveHubCommand(trimmed) && !isBareExitCommand(trimmed)) {
           const hubVisited = new Set(get().worldMemory.hubVisited ?? []);
-          const interiorMove = resolveHubTravel(player.hubRoomId, trimmed, hubVisited);
+          const interiorMove = resolveHubTravel(player.hubRoomId, trimmed, hubVisited,
+            // ⚠ OTA-1274 — match the names the player is actually reading.
+            hubSkinFactionFor(player.currentLocationId, player.factionId));
           if (interiorMove) {
             set((s) => (s.player ? { player: { ...s.player, hubRoomId: interiorMove.roomId } } : s));
             const dest = hubRoomFor(interiorMove.roomId, hubSkinFactionFor(player.currentLocationId, player.factionId));

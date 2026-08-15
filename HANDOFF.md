@@ -1839,7 +1839,30 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM — FREEZE SOLVED + THE GIFT SAYS WHO (2026-08-15, latest).** Golem
+- **⚠⚠ GOLEM — ROOM NAMES WALK (2026-08-15, latest).** Golem OTA-1274. Owner:
+  *"check all outpost rooms for odd names. there was a room called break"* —
+  and a SECOND FREEZE reported in the same message, log not yet received.
+
+  ⚠⚠ The audit (every skin's chips through the real parser) found the class
+  under his catch: `Vault`→jump, `Break`→attack, `Forge`→craft, `Chamber`→
+  climb, `Plans`→ready, `Reading`→reload — every skin had rooms you could not
+  walk to by typing their name. Plus duplicate chips (VIGIL ×2, PLANS ×2) and
+  a sleeping room whose chip read CRASH. Root fix: `matchHubRoomName`, a
+  STRICT pre-parser intercept mirroring the buildings' arb25 rule — bare room
+  name walks, "break the door" still swings, fast-travel stays earned. Also
+  found: `resolveHubTravel` only ever matched BASE names — **typed skin names
+  (e.g. Dynasty's 'promenade') never worked for any faction** — both helpers
+  are skin-aware now. Renames: Break→Breakroom, Crash Room→Cell Bunks,
+  dup VIGIL→Shrine, dup PLANS→Plan Floor/Plan Room. ota1274RoomNamesWalk (7).
+
+  ⚠⚠ **SECOND FREEZE, OPEN — the deciding question is in the next About
+  block**: if `Qwen completion guard` was still benching Qwen (template mode)
+  when it froze, the completion-crash verdict does NOT cover this one and a
+  new investigation starts; if it was the retry boot, the Tensor G5 kernel
+  variant is confirmed as the suspect and kernel-fallback work begins.
+  The owner has been asked for the relaunch COPY ALL.
+
+- **⚠⚠⚠ GOLEM — FREEZE SOLVED + THE GIFT SAYS WHO (2026-08-15).** Golem
   OTA-1273.
 
   ⚠⚠ **THE FREEZE IS SOLVED, BY THE INSTRUMENTS.** The owner's 4.29.194 About

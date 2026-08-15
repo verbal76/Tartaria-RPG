@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.196';
+export const DISPLAY_VERSION = '4.29.197';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23528,7 +23528,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // GIVE tap now logs its [player] line first, on every outcome, like every
 // picker tap always has. New suite ota1273GiftSaysWho (3).
 // 812 suites / 7596 tests. DISPLAY_VERSION 4.29.196. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-15-1273-the-gift-says-who';
+// ⚠⚠ OTA-1274 — "THERE WAS A ROOM CALLED BREAK" — THE ODD-NAME AUDIT, AND THE
+// DEFECT CLASS UNDER IT. Running every skin's chip names through the REAL
+// parser: Vault→jump 1.00 (base+dynasty), Break→attack 1.00 (his find),
+// Forge→craft 1.00 (×3 skins), Chamber→climb 0.82 ('clamber'), Plans→ready
+// 0.82, Reading→reload 0.64. In EVERY skin, typing some room's own name did
+// something other than walk. Plus two duplicate chips (VIGIL ×2, PLANS ×2)
+// and a sleeping room whose chip read CRASH — in an app being debugged for
+// freezes.
+// ⚠⚠ ROOT FIX = THE INTERCEPT, NOT A RENAME TREADMILL. Buildings resolve room
+// names BEFORE the parser (arb25); hubs now get the same door via
+// matchHubRoomName — STRICT whole-input matching ("break the door" still
+// swings; only the bare name walks), honoring the earned-fast-travel rule.
+// ⚠⚠ AND HUB TRAVEL IS FINALLY SKIN-AWARE: resolveHubTravel matched only the
+// BASE layout's names, so a Dynasty player typing 'promenade' — the word on
+// their own screen — never matched 'Square'. Typed skin names never worked,
+// for anyone, in any faction. Both helpers now read the skin.
+// Renames for the genuinely odd: Break→Breakroom (chip; the room keeps its
+// name), The Crash Room→The Cell Bunks, dup VIGIL→Shrine, dup PLANS→Plan
+// Floor/Plan Room. Imperial/Royal/Forge kept — flavor, now walkable anyway.
+// New suite ota1274RoomNamesWalk (7). 813 suites / 7603 tests.
+// DISPLAY_VERSION 4.29.197. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-15-1274-room-names-walk';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1273-the-gift-says-who';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1272-the-doorstep-grace';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1271-the-workshop-door';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1270-sweep-exit-and-the-shared-draft';

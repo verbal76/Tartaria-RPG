@@ -260,10 +260,24 @@ export function resolveHubTravel(
   fromRoomId: string,
   rawInput: string,
   visitedRoomIds: ReadonlySet<string>,
+  // ⚠ OTA-1274 — the SKIN the player is actually reading. Name matching below
+  // used to check only the base layout's names, so a Dynasty player typing
+  // 'go promenade' (the name on their screen) never matched 'Square' (the
+  // name in the base file). Optional so older callers keep their behaviour.
+  skinFactionId?: string | null,
 ): { roomId: string; via: 'cardinal' | 'adjacent' | 'fast_travel' } | null {
   const here = findHubRoom(fromRoomId);
   if (!here) return null;
   const text = rawInput.toLowerCase();
+  const namesFor = (roomId: string): string[] => {
+    const base = findHubRoom(roomId);
+    const skinned = hubRoomFor(roomId, skinFactionId ?? null);
+    const out: string[] = [roomId.toLowerCase()];
+    for (const r of [base, skinned]) {
+      if (r) { out.push(r.shortName.toLowerCase(), r.name.toLowerCase()); }
+    }
+    return out;
+  };
   // Cardinal first.
   for (const dir of ['north', 'south', 'east', 'west'] as const) {
     if (new RegExp(`\\b${dir}\\b`).test(text)) {
@@ -277,11 +291,7 @@ export function resolveHubTravel(
     if (!targetId) continue;
     const room = findHubRoom(targetId);
     if (!room) continue;
-    if (
-      text.includes(room.shortName.toLowerCase()) ||
-      text.includes(room.name.toLowerCase()) ||
-      text.includes(room.id.toLowerCase())
-    ) {
+    if (namesFor(targetId).some((n) => text.includes(n))) {
       return { roomId: targetId, via: 'adjacent' };
     }
   }
@@ -289,13 +299,54 @@ export function resolveHubTravel(
   for (const room of HUB.rooms) {
     if (room.id === fromRoomId) continue;
     if (!visitedRoomIds.has(room.id)) continue;
-    if (
-      text.includes(room.shortName.toLowerCase()) ||
-      text.includes(room.name.toLowerCase()) ||
-      text.includes(room.id.toLowerCase())
-    ) {
+    if (namesFor(room.id).some((n) => text.includes(n))) {
       return { roomId: room.id, via: 'fast_travel' };
     }
+  }
+  return null;
+}
+
+/** ⚠⚠ OTA-1274 — a bare room name, matched STRICTLY, for the pre-parser
+ *  intercept. The owner asked for an odd-name audit ("there was a room called
+ *  break") and the audit found the real defect class underneath: room chips
+ *  whose names ARE parser verbs. Typing `vault` jumped (conf 1.00), `break`
+ *  attacked, `forge` opened crafting, `chamber` climbed via fuzzy 'clamber' —
+ *  in every skin the typed name of some room did something other than walk.
+ *
+ *  resolveHubTravel cannot gate the intercept: it substring-matches, so
+ *  "break the door" would walk to the Break Room instead of attacking the
+ *  door. This matcher demands the WHOLE input be the room (after an optional
+ *  go/visit/enter lead-in and articles), and only offers rooms the travel
+ *  rules could actually reach: adjacent always, elsewhere only if visited
+ *  (the same earned-fast-travel rule resolveHubTravel enforces). */
+export function matchHubRoomName(
+  rawInput: string,
+  fromRoomId: string,
+  visitedRoomIds: ReadonlySet<string>,
+  skinFactionId?: string | null,
+): string | null {
+  const here = findHubRoom(fromRoomId);
+  if (!here) return null;
+  const text = rawInput.toLowerCase().trim()
+    .replace(/^(go\s+to|goto|go|enter|visit|to)\s+/, '')
+    .replace(/^the\s+/, '')
+    .trim();
+  if (!text) return null;
+  const isMatch = (roomId: string): boolean => {
+    for (const r of [findHubRoom(roomId), hubRoomFor(roomId, skinFactionId ?? null)]) {
+      if (!r) continue;
+      const name = r.name.toLowerCase().replace(/^the\s+/, '');
+      if (text === r.shortName.toLowerCase() || text === name || text === roomId.toLowerCase()) return true;
+    }
+    return false;
+  };
+  for (const dir of ['north', 'south', 'east', 'west'] as const) {
+    const targetId = here.exits[dir];
+    if (targetId && isMatch(targetId)) return targetId;
+  }
+  for (const room of HUB.rooms) {
+    if (room.id === fromRoomId || !visitedRoomIds.has(room.id)) continue;
+    if (isMatch(room.id)) return room.id;
   }
   return null;
 }
