@@ -99,6 +99,7 @@ export function ContractsScreen() {
   const setFactionQuestActive = useGameStore((s) => s.setFactionQuestActive);
   const setContractActive = useGameStore((s) => s.setContractActive);
   const routeMission = useGameStore((s) => s.routeMission);
+  const routeGreatClimb = useGameStore((s) => s.routeGreatClimb);
   const discardLead = useGameStore((s) => s.discardLead);
   // OTA-1037 — the refusal strip answers THIS visit's taps; don't let a stale line
   // greet the next visit to the screen.
@@ -110,7 +111,7 @@ export function ContractsScreen() {
   const requestTravelConfirm = useGameStore((s) => s.requestTravelConfirm);
   const setWhisperCourse = useGameStore((s) => s.setWhisperCourse);
   const appendLog = useGameStore((s) => s.appendLog);
-  const [pendingRoute, setPendingRoute] = useState<{ id: string; name: string; missionId?: string } | null>(null);
+  const [pendingRoute, setPendingRoute] = useState<{ id: string; name: string; missionId?: string; climbId?: string } | null>(null);
   // 2026-05-25 — branded refusal modal for hub-room gate. Same
   // palette as the rest of the game; replaces native Alert.alert.
   const [tab, setTab] = useState<Tab>('contracts');
@@ -906,7 +907,30 @@ export function ContractsScreen() {
                         ? 'Crown taken — its Skyreacher piece is claimed.'
                         : 'Climb it (Hardened Climbing Strap + a whole Reclaimer\'s Rope) and beat the summit guardian for its Skyreacher piece and an Aether Collection Beacon.'}
                     </Text>
-                  </View>
+                    {/* ⚠⚠ OTA-1305 — THE FIVE TOWERS WERE THE ONLY MISSIONS YOU
+                        COULD NOT ROUTE TO. Owner, after reading the chart: "all
+                        five beacon towers are known grid locations so I should
+                        be able to autoroute to it… it should ask me if I want to
+                        set an auto route like the rest of the missions."
+                        He was right, and the destination was never in doubt —
+                        every GreatClimb carries its own `locationId`. This
+                        section (OTA-912) simply rendered read-only cards, and no
+                        walker ever caught it because every climb test TELEPORTS
+                        (`currentLocationId: climb.locationId`) instead of
+                        travelling, so the route was never once exercised. */}
+                    {!done && movesLine(c.locationId)}
+                    {!done && player?.currentLocationId !== c.locationId && (
+                      <Pressable
+                        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                        onPress={() => setPendingRoute({ id: c.locationId, name: safeLocName(c.locationId), climbId: c.id })}
+                        accessibilityRole="button"
+                      >
+                        <Text style={styles.routeBtnText}>▸ SET COURSE TO {safeLocName(c.locationId).toUpperCase()}</Text>
+                      </Pressable>
+                    )}
+                    {!done && player?.currentLocationId === c.locationId && (
+                      <Text style={styles.routeHereNote}>▸ You're here — start the climb.</Text>
+                    )}                  </View>
                 );
               })}
               <Text style={styles.mainQuestHint}>
@@ -1885,6 +1909,7 @@ export function ContractsScreen() {
                     setScreen('exploration');
                     return;
                   }
+
                   // 2026-05-25 OTA-035 — outpost-aware confirmation.
                   // Was a hard refusal ("leave the outpost first, then
                   // come back"); now a Yes/No prompt: confirm to leave

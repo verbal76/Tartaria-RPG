@@ -154,7 +154,25 @@ describe('OTA-1249 — the main quest walker: creation to credits, nine factions
         player: {
           ...p0,
           hp: 800, hpMax: 800, stamina: 200, staminaMax: 200,
-          stats: { ...p0.stats, strength: 20, dexterity: 20 },
+          // ⚠⚠ OTA-1302 — INT BELONGS IN THIS LIST TOO, AND ITS ABSENCE WAS A
+          // KNIFE-EDGE. The line above this one says "strong enough to end every
+          // fight the walk starts" — but it buffed only STR and DEX, and several
+          // starting weapons (the Pyric Wand among them) scale on INTELLIGENCE.
+          // A wand-carrying walker therefore swung at INT 7 all the way to the
+          // Nexus. `drainRolls` pins every d20 to 15, so that attack totalled a
+          // FIXED 15 + 7 + 2 = 24 every single round — and Heir Atalan-Drowned
+          // at Samarran has AC 25. Not an unlucky streak: an arithmetically
+          // unwinnable fight, identical on every round, for as many rounds as
+          // the budget allowed.
+          //
+          // ⚠ It passed before only because the guardian's scaling happened to
+          // land at AC 24 or lower for the exact gear that run produced. OTA-1302
+          // changed which gear a tile offers, the scaling moved by one, and the
+          // knife-edge fell the other way — which is why the failure wandered
+          // between capitals and factions every time the suite was filtered or
+          // reordered. Buffing the stat the weapon actually uses removes the
+          // edge instead of re-balancing it: no real player is capped at 24.
+          stats: { ...p0.stats, strength: 20, dexterity: 20, intelligence: 20, wisdom: 20 },
           activeHunts: [], activeMysteries: [], activeStorylines: [], activeQuests: [],
         },
       });
