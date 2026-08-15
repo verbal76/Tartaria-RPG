@@ -237,7 +237,12 @@ describe('OTA-1206 — INVESTIGATE ALL', () => {
     // Investigate resolves through hooks, ambient nouns, items, puzzles and elevation
     // gates. A bulk re-implementation would be a new set of failure modes; looping the
     // real submit cannot resolve differently from the manual taps it replaces.
+    // ⚠ OTA-1290 re-pointed this pin: the instant `for` loop became the PACED
+    // sweep (one noun per beat, stops on enemies / player action). The rule
+    // guarded here is unchanged — each step still fires the REAL submit path,
+    // no second resolver — the sweep just breathes between steps now.
     const src = SRC('app/screens/ExplorationScreen.tsx');
-    expect(src).toContain('for (const n of nouns) submit(`investigate ${n}`);');
+    expect(src).toContain('submit(`investigate ${nouns[i]!}`);');
+    expect(src).toContain('setTimeout(step, INVESTIGATE_ALL_GAP_MS);');
   });
 });

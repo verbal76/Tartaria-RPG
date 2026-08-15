@@ -1150,6 +1150,15 @@ export interface PlayerCharacter {
    *  current clock, so stepping out of a just-cleared outpost doesn't drop a fresh
    *  ambush mid-loot. Absent for legacy saves → treated as 0 (no grace). */
   bossDefeatGraceUntilHours?: number;
+  /** ⚠⚠ OTA-1291 (port of golem OTA-1272) — free-passage counter after walking
+   *  out of an outpost. Owner, after 4 Mud Wasps killed a fresh character ON
+   *  the exit tile: "a pack of enemies right outside the door is rough get at
+   *  least 2 free tile moves, then whatever." Set to SAFE_EXIT_FREE_SCENES
+   *  (3 = the exit scene + 2 tile moves) at the outpost-exit path; each
+   *  wilderness beginScene under grace suppresses the encounter roll and
+   *  decrements, and each overland step's hostile spawners consult it.
+   *  Absent → 0 (no grace). */
+  safeExitMovesLeft?: number;
   /** OTA-804 — unbanked "honest custom" credit toward faction standing from
    *  BUYING. Buying accrues standing as a slow afterthought: TC spent banks here
    *  and grants +1 standing per BUY_REP_TC_PER_STANDING TC, remainder carried.

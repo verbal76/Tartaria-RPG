@@ -15,6 +15,12 @@ import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
 import { SalvageModal, isSalvageable as isSalvageableForModal } from '../components/SalvageModal';
 import { BrandedModal } from '../components/BrandedModal';
+
+/** ⚠ OTA-1290 (port of golem OTA-1263) — the beat between INVESTIGATE ALL's
+ *  results. The owner asked for "maybe 2+3 seconds"; 2.2s is the low end of
+ *  that, because the sweep can be six nouns long and the whole point is that
+ *  it stays readable, not that it stalls. */
+const INVESTIGATE_ALL_GAP_MS = 2_200;
 import { TakeModal } from '../components/TakeModal';
 import { ClimbModal } from '../components/ClimbModal';
 import { TorchProbeModal } from '../components/TorchProbeModal';
@@ -1766,9 +1772,34 @@ export function ExplorationScreen() {
         // a new set of failure modes for a cosmetic gain. Looping the real path cannot
         // resolve anything differently from the manual taps it replaces — which is the
         // property that matters for a completability fix.
+        // ⚠⚠ OTA-1290 (port of golem OTA-1263 + 1268) — PACED, AND IT STOPS.
+        // The old loop fired every noun in one instant: a wall of text nobody
+        // could read, and it kept firing into a fight if an enemy landed
+        // mid-sweep. One noun per beat now; the sweep stops the instant an
+        // enemy is on the board, and stops if the player acts — a paced sweep
+        // must never talk over them.
+        // ⚠⚠ The 1268 half: the abort watermark is re-read AFTER each of the
+        // sweep's own submits, because submitPlayerAction stamps
+        // lastPlayerActionAt on EVERY submit including the sweep's own — the
+        // first version read its own footstep as "the player acted" and
+        // resolved exactly ONE noun on the owner's device.
         onInvestigateAll={(nouns) => {
           setSearchOpen(false);
-          for (const n of nouns) submit(`investigate ${n}`);
+          let watermark = useGameStore.getState().lastPlayerActionAt;
+          let i = 0;
+          const step = (): void => {
+            if (i >= nouns.length) return;
+            const s = useGameStore.getState();
+            if ((s.currentScene?.enemies ?? []).length > 0) return;
+            // The player did something of their own — stop rather than queue
+            // lines behind whatever they just asked for.
+            if (s.lastPlayerActionAt !== watermark) return;
+            submit(`investigate ${nouns[i]!}`);
+            watermark = useGameStore.getState().lastPlayerActionAt;
+            i += 1;
+            if (i < nouns.length) setTimeout(step, INVESTIGATE_ALL_GAP_MS);
+          };
+          step();
         }}
         onCancel={() => setSearchOpen(false)}
       />

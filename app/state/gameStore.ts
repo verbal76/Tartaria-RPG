@@ -4179,6 +4179,13 @@ function musterPatrols(
 // gives a terse warning as they arrive. Killing raiders shifts standing (see the
 // kill-handler). Deliberately avoidable: the player can still flee.
 const RAID_MIN_HOURS = 20;      // min in-game hours between raids
+// ⚠⚠ OTA-1291 (port of golem OTA-1272) — the owner's doorstep rule: "get at
+// least 2 free tile moves, then whatever." 3 = the exit scene itself + the
+// next 2 overland moves; every one of those wilderness beginScenes suppresses
+// the encounter roll and burns one unit. Not hours-based on purpose — he asked
+// for MOVES, and a player who stands still shouldn't have the window rot out
+// from under them.
+const SAFE_EXIT_FREE_SCENES = 3;
 const RAID_TRIGGER_CHANCE = 0.3; // per eligible action, once past the cooldown
 
 // OTA-849/850 — build + inject a FACTION-tagged party into the current scene. Shared
@@ -4731,6 +4738,11 @@ function maybeSpawnRaid(
   if (scene.vendor) return;
   if (underRoof(s, player)) return;
   if (player.hpMax > 0 && player.hp / player.hpMax < 0.5) return;
+  // ⚠⚠ OTA-1291 — the doorstep grace holds the war party too. On golem this
+  // was the FIFTH spawner found (a rival-faction raid two steps from the gate
+  // killed the probe run after the first four were gated); it consults the
+  // counter and does not burn it — the burn belongs to the movement paths.
+  if ((player.safeExitMovesLeft ?? 0) > 0) return;
   const hour = player.hoursElapsed ?? 0;
   const last = s.worldMemory.lastRaidHour;
   if (last !== undefined && hour - last < RAID_MIN_HOURS) return;
@@ -10643,7 +10655,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // encounters are suppressed so stepping out of the outpost you just cleared
     // doesn't drop a fresh ambush on you mid-loot. Lapses on game-time.
     const inBossGrace = (player?.bossDefeatGraceUntilHours ?? 0) > hoursElapsed;
-    const suppressEncounter = enforcePeace || recentlyCleared || !!hubRoom || isNeutralMarket || inBossGrace;
+    // ⚠⚠ OTA-1291 (port of golem OTA-1272) — the doorstep grace. While
+    // free-passage units remain, the encounter roll is skipped and one unit is
+    // burned per wilderness scene.
+    const inExitGrace = !hubRoom && (player?.safeExitMovesLeft ?? 0) > 0;
+    if (inExitGrace) {
+      set((s) => (s.player
+        ? { player: { ...s.player, safeExitMovesLeft: Math.max(0, (s.player.safeExitMovesLeft ?? 0) - 1) } }
+        : s));
+    }
+    const suppressEncounter = enforcePeace || recentlyCleared || !!hubRoom || isNeutralMarket || inBossGrace || inExitGrace;
     // Phase 4 §4.3 — biome-curated encounter pools. If the Micro-Micro
     // has a possibleEncounters list, pick rarity-weighted from THAT pool
     // (so the Buried Skyscraper Upper only spawns Aetherbats, Reclaimer
@@ -18080,7 +18101,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // spent an hour (four typed attempts on the owner's golem device
           // before the taught phrase landed; HAL had it identically).
           if (isLeaveHubCommand(trimmed) || isBareExitCommand(trimmed)) {
-            set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+            // ⚠ OTA-1291 — free passage out the door (exit + 2 moves).
+            set((s) => (s.player ? { player: { ...s.player, hubRoomId: null, safeExitMovesLeft: SAFE_EXIT_FREE_SCENES } } : s));
             set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
             get().appendLog(
               'world',
@@ -18148,7 +18170,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // read "Irma Ironhand is here" after the gate fell away.
             // Same applies to leftover hooks and chip pools. beginScene
             // is the canonical scene-rebuild path; use it.
-            set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+            set((s) => (s.player ? { player: { ...s.player, hubRoomId: null, safeExitMovesLeft: SAFE_EXIT_FREE_SCENES } } : s)); // OTA-1291
             const currentPlayer = get().player ?? player;
             set({ player: advanceTime(spendTravelStamina(currentPlayer), 1) });
             get().appendLog(
@@ -28988,7 +29010,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // spend stamina + advance time, narrate departure, then
     // beginScene with skipHubEntry so we don't re-enter the gate.
     if (player.hubRoomId) {
-      set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+      set((s) => (s.player ? { player: { ...s.player, hubRoomId: null, safeExitMovesLeft: SAFE_EXIT_FREE_SCENES } } : s)); // OTA-1291
       set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
       get().appendLog(
         'world',
@@ -29281,6 +29303,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set((s) => (s.player ? { player: { ...s.player, recentTileHistory: nextHistory } } : s));
     }
 
+    // ⚠⚠ OTA-1291 (port of golem OTA-1272) — THE DOORSTEP GRACE, STEP HALF.
+    // beginScene's suppression covers the exit tile; every overland step has
+    // its OWN spawn machines (revenant, corruption purifier, Aetherkin rise,
+    // wasteland roll), so the grace is computed once at function scope and
+    // each hostile spawner checks it. One unit burns per step; friendly spawns
+    // still roll — the owner asked for safety, not an empty world.
+    const graceUnitsNow = get().player?.safeExitMovesLeft ?? 0;
+    const stepUnderExitGrace = graceUnitsNow > 0;
+    if (stepUnderExitGrace) {
+      set((s) => (s.player ? { player: { ...s.player, safeExitMovesLeft: graceUnitsNow - 1 } } : s));
+    }
+
     if (tileIsNovel) {
       // 2026-05-25 — train WIS on every successful NOVEL cardinal step.
       // Walking the buried world earns wisdom (per playtester spec).
@@ -29508,7 +29542,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const rvTileKey = rvPlayer ? `${rvPlayer.currentLocationId}:${rvPlayer.mapX}:${rvPlayer.mapY}` : '';
         const rvRolled = get().worldMemory.revenantRolledTiles ?? [];
         const rvProven = ((rvPlayer?.milestones?.enemiesDefeated ?? 0) >= 10) || ((rvPlayer?.hoursElapsed ?? 0) >= 12);
-        if (rvPlayer && rvScene && peacefulWild && tileIsNovel && !hasLiveEscort
+        if (!stepUnderExitGrace && rvPlayer && rvScene && peacefulWild && tileIsNovel && !hasLiveEscort
             && (rvScene.enemies ?? []).length === 0 && (rvPlayer.hpMax ?? 0) >= 60
             && rvProven && !rvRolled.includes(rvTileKey)) {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -29621,7 +29655,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const { corruptionTierOf, corruptionExtraEncounterChance } = require('../engine/corruption');
       const liveScene = get().currentScene;
       const livePlayer = get().player;
-      if (livePlayer && liveScene && (!liveScene.enemies || liveScene.enemies.length === 0) && !livePlayer.hubRoomId) {
+      if (!stepUnderExitGrace && livePlayer && liveScene && (!liveScene.enemies || liveScene.enemies.length === 0) && !livePlayer.hubRoomId) {
         const tier = corruptionTierOf(livePlayer.corruption ?? 0);
         const extraChance = corruptionExtraEncounterChance(tier);
         const stepsSince = (livePlayer.stepsSinceLastPurifier ?? 0) + 1;
@@ -29685,7 +29719,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     {
       const liveScene = get().currentScene;
       const livePlayer = get().player;
-      const openPeaceful = !!liveScene
+      const openPeaceful = !stepUnderExitGrace
+        && !!liveScene
         && (!liveScene.enemies || liveScene.enemies.length === 0)
         && !liveScene.vendor;
       if (openPeaceful && livePlayer && !livePlayer.hubRoomId && !get().activeBuildingId
@@ -29799,7 +29834,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // snapshot is now stale; using it would let wasteland encounters
     // stack on top of a fresh corruption spawn.
     const liveSceneForEncounter = get().currentScene;
-    if (liveSceneForEncounter && liveSceneForEncounter.enemies.length === 0) {
+    if (liveSceneForEncounter && liveSceneForEncounter.enemies.length === 0 && !stepUnderExitGrace) {
       const wasteSteps = (get().wastelandStepsSinceEncounter ?? 0) + 1;
       set(() => ({ wastelandStepsSinceEncounter: wasteSteps }));
       // OTA-218 — also track peaceful travel for the combat-starvation
@@ -30304,7 +30339,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // path) so the main_quest beat lands them in the open with the MAIN
     // QUEST objective chip in view.
     if (player?.hubRoomId) {
-      set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+      set((s) => (s.player ? { player: { ...s.player, hubRoomId: null, safeExitMovesLeft: SAFE_EXIT_FREE_SCENES } } : s)); // OTA-1291
       set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
       get().appendLog(
         'world',

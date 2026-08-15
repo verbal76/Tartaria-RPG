@@ -1676,7 +1676,28 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ THE FOUR-FIX BATCH + ✓ MARKS (2026-08-15, latest). HAL — ALL PORTED
+- **⚠⚠⚠ THE CAMOUFLAGE AUDIT — TWO MORE FOUND, BOTH PORTED (2026-08-15,
+  latest). HAL OTA-1290 + 1291.** The owner asked the right question: *"is
+  there anything else like the ✓ fix that was camouflaged by a partial OTA
+  push that was golem gated?"* A buildInfo diff of every trial-range OTA
+  against this line found exactly two, both his own features/rulings that
+  never crossed:
+  · 1290 — INVESTIGATE ALL (his OTA-1206 button) fired every noun in one
+    instant loop here, and kept firing into a fight. Now paced (2.2s beats),
+    stops on enemies, stops on player action, and the 1268 watermark fix rode
+    in so it cannot abort on its own footsteps. Behaviour-level suite.
+  · 1291 — the doorstep grace ("get at least 2 free tile moves, then
+    whatever") — exit scene + 2 moves free; five hostile spawn machines
+    gated; raid consults without burning; three walk-out doors stamp it.
+  ⚠ Confirmed NOT applicable, checked not assumed: golem's story-tier sweep
+  ordering (no storyNouns here), 1266 (dead import in the trial's
+  SalvageModal), 1267 (golem's picker-button crawl suite; its fast-CI naming
+  lesson was already applied when porting suites). ⚠ AUDIT METHOD for future
+  sittings: `grep -oE "OTA-12[0-9][0-9]" buildInfo` on both lines, diff, read
+  the golem-only entries' ledger blurbs, classify trial vs general. Beware
+  line-wrapped numbers producing false positives (1278/1281 wrapped mid-token).
+
+- **⚠⚠⚠ THE FOUR-FIX BATCH + ✓ MARKS (2026-08-15). HAL — ALL PORTED
   FROM GOLEM UNDER THE PRECEDENCE RULING** (*"I don't want open errors"* /
   *"port all 4"*). HAL OTA-1285…1289 in one sitting:
   · 1285 bare `exit`/`leave` mean leave (golem 1269) — one predicate, four

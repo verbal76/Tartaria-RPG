@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.173';
+export const DISPLAY_VERSION = '4.29.175';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24634,7 +24634,36 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 1277 has NO landing site here: gatherSort/upgradeEquipSlot is picker-trial
 // machinery and does not exist on this line (checked, not assumed). New suite
 // ota1289VisitedMarks (2). DISPLAY_VERSION 4.29.173.
-export const OTA_BUILD_ID = '2026-08-15-1289-visited-marks';
+// ⚠⚠ OTA-1290 — INVESTIGATE ALL IS PACED, AND IT STOPS (port of golem
+// OTA-1263 + 1268; found by the owner's camouflage audit: "is there anything
+// else like the ✓ fix that was camouflaged by a partial OTA push?"). The old
+// loop fired every noun in one instant — a wall of text — and kept firing
+// into a fight if an enemy landed mid-sweep. One noun per 2.2s beat now; the
+// sweep stops the instant an enemy is on the board and stops if the player
+// acts. The 1268 half rode in: the abort watermark is re-read AFTER each of
+// the sweep's own submits (submitPlayerAction stamps lastPlayerActionAt on
+// EVERY submit, including the sweep's own — the naive version read its own
+// footstep as "the player acted" and resolved exactly ONE noun). ⚠ Golem's
+// story-tier ordering did NOT ride along — storyNouns is a golem system with
+// no landing site here; nouns sweep in display order. New suite
+// ota1290InvestigateAllActuallySweeps (4, behaviour-level — it runs the real
+// screen and counts what resolves). DISPLAY_VERSION 4.29.174.
+// ⚠⚠ OTA-1291 — THE DOORSTEP GRACE (port of golem OTA-1272, same audit).
+// Owner, after 4 Mud Wasps killed a fresh character ON the exit tile: "a pack
+// of enemies right outside the door is rough get at least 2 free tile moves,
+// then whatever." Walking out of an outpost grants free passage for the exit
+// scene + the next 2 overland moves: beginScene suppresses the encounter roll
+// and burns a unit; each overland step's hostile spawners (revenant,
+// corruption purifier, Aetherkin rise, wasteland roll) check the same counter,
+// and the war-party raid consults it without burning it. Friendly spawns
+// still roll — safety, not an empty world. All three walk-out doors stamp the
+// counter (typed leave, tutorial leave, main-quest walk-out). New suite
+// ota1291DoorstepGrace (4). ota1206's pin re-pointed from the instant loop to
+// the paced one (rule unchanged: real submit path, no second resolver).
+// 803 suites / 7500 tests. DISPLAY_VERSION 4.29.175.
+export const OTA_BUILD_ID = '2026-08-15-1291-doorstep-grace';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1290-investigate-all-actually-sweeps';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1289-visited-marks';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1288-freeze-forensics';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1287-rewarm-debounce-both-doors';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1286-gift-says-who';
