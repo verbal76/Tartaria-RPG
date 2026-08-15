@@ -270,6 +270,7 @@ import {
   hubNameForFaction,
   hubSkinFactionFor,
   hubOwnerFaction,
+  findHubRoom,
   resolveHubTravel,
   isLeaveHubCommand,
   isBareExitCommand,
@@ -13678,7 +13679,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const named = matchHubRoomName(
         trimmed,
         player.hubRoomId,
-        new Set(get().worldMemory.hubVisited ?? []),
         hubSkinFactionFor(player.currentLocationId, player.factionId),
       );
       if (named) {
@@ -18029,19 +18029,58 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // wander that narrated a floorboard search and spent an hour — four
         // typed attempts on the owner's device before the taught phrase landed.
         if (player.hubRoomId && !isLeaveHubCommand(trimmed) && !isBareExitCommand(trimmed)) {
-          const hubVisited = new Set(get().worldMemory.hubVisited ?? []);
-          const interiorMove = resolveHubTravel(player.hubRoomId, trimmed, hubVisited,
+          const skin = hubSkinFactionFor(player.currentLocationId, player.factionId);
+          const interiorMove = resolveHubTravel(player.hubRoomId, trimmed,
             // ⚠ OTA-1274 — match the names the player is actually reading.
-            hubSkinFactionFor(player.currentLocationId, player.factionId));
+            skin);
+          // ⚠⚠ OTA-1279 — A NAMED ROOM THAT IS NOT ONE STEP AWAY IS A REFUSAL,
+          // NOT A JUMP. The old fast-travel branch teleported the player to any
+          // room they had already seen; the owner's navigation spec forbids it
+          // ("move ONE GRAPH EDGE AT A TIME", "dead ends must behave as dead
+          // ends"). The refusal carries the door that heads that way, because
+          // being told "no" with no direction is what had him cycling fifteen
+          // room names looking for the exit.
+          // ⚠⚠ OTA-1279 — A CARDINAL WITH NO DOOR ON IT NO LONGER EJECTS YOU.
+          // It used to resolve to nothing and fall through to the overland
+          // handler, which walked the player clean out of the building. With
+          // the corrected topology most rooms have one or two doors, so this
+          // would have fired constantly.
+          if (interiorMove && interiorMove.via === 'no_exit_that_way') {
+            const hereRoom = findHubRoom(player.hubRoomId);
+            const ways = (['north', 'south', 'east', 'west'] as const)
+              .filter((d) => hereRoom?.exits[d])
+              .map((d) => `${d} to the ${hubRoomFor(hereRoom!.exits[d]!, skin)?.shortName ?? d}`);
+            get().appendLog(
+              'world',
+              ways.length
+                ? `No way ${interiorMove.dir} from here. You can go ${ways.join(', ')}.`
+                : `No way ${interiorMove.dir} from here.`,
+            );
+            break;
+          }
+          if (interiorMove && interiorMove.via === 'not_adjacent') {
+            const want = hubRoomFor(interiorMove.roomId, skin);
+            const step = interiorMove.firstStep ? hubRoomFor(interiorMove.firstStep, skin) : null;
+            const dir = interiorMove.firstStep
+              ? (['north', 'south', 'east', 'west'] as const).find(
+                  (d) => findHubRoom(player.hubRoomId!)?.exits[d] === interiorMove.firstStep,
+                )
+              : undefined;
+            get().appendLog(
+              'world',
+              step && dir
+                ? `The ${want?.shortName ?? 'room'} isn't off this one. Head ${dir} to the ${step.shortName} to start that way.`
+                : `The ${want?.shortName ?? 'room'} isn't off this one, and there's no way through from here.`,
+            );
+            break;
+          }
           if (interiorMove) {
             set((s) => (s.player ? { player: { ...s.player, hubRoomId: interiorMove.roomId } } : s));
-            const dest = hubRoomFor(interiorMove.roomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
+            const dest = hubRoomFor(interiorMove.roomId, skin);
             if (dest) {
               get().appendLog(
                 'world',
-                interiorMove.via === 'fast_travel'
-                  ? `You cut across the outpost to the ${dest.shortName}.`
-                  : `You head ${interiorMove.via === 'cardinal' ? 'on' : 'over'} to the ${dest.shortName}.`,
+                `You head ${interiorMove.via === 'cardinal' ? 'on' : 'over'} to the ${dest.shortName}.`,
               );
             }
             get().beginScene();

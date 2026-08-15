@@ -104,22 +104,34 @@ describe('OTA-1271 — the layout invariant', () => {
     expect(hubDefinesExitRoom()).toBe(true);
   });
 
-  it('⚠⚠ the Gate AND the Workshop are exit rooms; the deep rooms are not', () => {
+  // ⚠⚠ OTA-1279 MOVED THE SPARE DOOR, ON THE OWNER'S OWN LATER RULING:
+  // *"there's a central hub structure where there's a central room that's where
+  // the ex[it] should be."* OTA-1271 put it on the Workshop because at the time
+  // the Workshop was the outpost's northern junction. Under the repaired graph
+  // the Workshop is R04 — a DEAD END in the far north corner, the worst room in
+  // the building to hide the way out in. What this suite really guards is his
+  // floor — "all outposts should have at least 1 exit" — and that still holds;
+  // only which room carries it changed.
+  it('⚠⚠ the Gate AND the central room are exit rooms; the deep rooms are not', () => {
     const byId = Object.fromEntries(HUB.rooms.map((r) => [r.id, r]));
     expect(roomIsExit(byId.outpost_gate)).toBe(true);
-    expect(roomIsExit(byId.outpost_workshop)).toBe(true);
+    expect(roomIsExit(byId.outpost_central)).toBe(true);
     // 1194's half of the ruling survives: no door through the armory wall,
     // and the vault — the deep room the owner was stranded near — stays
     // doorless so its locked-treasury fiction holds.
     expect(roomIsExit(byId.outpost_armory)).toBe(false);
     expect(roomIsExit(byId.outpost_relic_vault)).toBe(false);
-    expect(roomIsExit(byId.outpost_central)).toBe(false);
+    expect(roomIsExit(byId.outpost_workshop)).toBe(false);
   });
 
-  it('⚠ the workshop keeps its identity — the door is an addition, not a rewrite', () => {
+  it('⚠ the rooms keep their identity — the door is an addition, not a rewrite', () => {
     const ws = HUB.rooms.find((r) => r.id === 'outpost_workshop')!;
     for (const t of ['workshop', 'crafting', 'vendor', 'safe', 'outpost']) {
       expect(ws.tags).toContain(t);
+    }
+    const mid = HUB.rooms.find((r) => r.id === 'outpost_central')!;
+    for (const t of ['hub', 'central', 'safe', 'outpost']) {
+      expect(mid.tags).toContain(t);
     }
   });
 });
@@ -144,22 +156,23 @@ describe('OTA-1271 — played on the real screen', () => {
     useGameStore.getState().chooseTutorialExplore();
   });
 
-  it('⚠⚠ EXIT shows at the Gate, shows at the Workshop, and NOT in the Vault', () => {
+  it('⚠⚠ EXIT shows at the Gate, shows in the middle, and NOT in the Vault', () => {
     expect(useGameStore.getState().player?.hubRoomId).toBe('outpost_gate');
     expect(exitChipVisible()).toBe(true);
-    // Walk there — hub fast-travel ('go to the workshop') is earned by a
-    // prior visit, and this is a fresh character.
-    useGameStore.getState().submitPlayerAction('go north');   // gate → square
-    useGameStore.getState().submitPlayerAction('go north');   // square → workshop
-    expect(useGameStore.getState().player?.hubRoomId).toBe('outpost_workshop');
+    // ⚠ OTA-1279 — walked one legal edge at a time. The old version of this
+    // test used `go to the workshop` and relied on earned fast-travel, which
+    // the owner's navigation spec deleted.
+    useGameStore.getState().submitPlayerAction('go north');   // gate → square (R10→R01)
+    expect(useGameStore.getState().player?.hubRoomId).toBe('outpost_central');
     expect(exitChipVisible()).toBe(true);          // ← the owner's missing button
-    useGameStore.getState().submitPlayerAction('go north');   // workshop → vault
+    useGameStore.getState().submitPlayerAction('go north');   // square → vault (R01→R02)
     expect(useGameStore.getState().player?.hubRoomId).toBe('outpost_relic_vault');
     expect(exitChipVisible()).toBe(false);         // ← 1194's half still holds
   });
 
-  it('⚠⚠ leaving FROM the workshop narrates its own door, not the gate', () => {
-    useGameStore.getState().submitPlayerAction('go to the workshop'); // visited now — fast-travel earned
+  it('⚠⚠ leaving FROM the middle narrates its own door, not the gate', () => {
+    useGameStore.getState().submitPlayerAction('go south');   // vault → square
+    expect(useGameStore.getState().player?.hubRoomId).toBe('outpost_central');
     const from = useGameStore.getState().gameLog.length;
     useGameStore.getState().submitPlayerAction('leave outpost');
     expect(useGameStore.getState().player?.hubRoomId).toBeNull();

@@ -139,10 +139,20 @@ describe('⚠⚠ OTA-1186 — no call site still passes the player’s faction r
           if (call.startsWith('hubNameForFaction(factionId)')) continue;  // arb105, below
           if (src.slice(Math.max(0, i - 60), i + 80).includes(arb105)) continue;
           // ⚠ Two accepted spellings: the resolver called inline, or its result hoisted
-          // into a local (InputBox computes `skinFactionId` once for a useMemo dep list).
+          // into a local (InputBox computes it once for a useMemo dep list).
           // What must NEVER appear is the player's faction handed straight to a hub call.
+          //
+          // ⚠⚠ OTA-1279 — THIS USED TO ACCEPT THE LITERAL NAME `skinFactionId`, WHICH
+          // GUARDED THE SPELLING RATHER THAN THE RULE. A correct hoist under any other
+          // name failed (the gameStore's `skin`), and — far worse — a RAW faction id
+          // would have sailed through unnoticed if someone happened to name it
+          // `skinFactionId`. A bare identifier now counts only when this file actually
+          // assigns it from the resolver, which is what the rule was ever about.
           const line = call.split('\n')[0]!;
-          const resolved = line.includes('hubSkinFactionFor') || line.includes('skinFactionId');
+          const local = /,\s*([A-Za-z_$][\w$]*)\s*\)/.exec(line)?.[1];
+          const hoisted = !!local
+            && new RegExp(`(?:const|let)\\s+${local}\\s*=\\s*[^;]*hubSkinFactionFor\\(`).test(src);
+          const resolved = line.includes('hubSkinFactionFor') || hoisted;
           expect({ rel, line, resolved }).toEqual({ rel, line, resolved: true });
         }
       }

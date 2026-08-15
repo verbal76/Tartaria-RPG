@@ -1839,8 +1839,58 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM — WATCHDOG BYPASS FIXED; THE OUTPOST MAP IS BROKEN (2026-08-15,
-  latest).** Golem OTA-1278.
+- **⚠⚠⚠ GOLEM — THE OUTPOST IS ONE GRAPH IN NINE SETS OF CLOTHES (2026-08-15,
+  latest).** Golem OTA-1279. The owner answered OTA-1278's audit with the
+  Revivalist Camp artwork and a written navigation specification. Its governing
+  line: **"The artwork does not determine movement. The room graph does."**
+
+  **THE MODEL, AS HE LAYERED IT.**
+  · LAYER 1 `app/engine/outpostGraph.ts` — the universal 15-node topology
+    (R01…R15). 14 connections, **each declared ONCE, with the return edge
+    GENERATED**. An asymmetric exit is no longer a bug that can be introduced;
+    it is a shape the data cannot take. This is the ninth-plus time this project
+    has paid for one rule living in two places, and the first time the fix was
+    to make the second place impossible rather than to police it.
+  · LAYER 2 `static_hub.json` + `hub_faction_variants.json` — names,
+    descriptions, NPCs, tags. **`static_hub.json` no longer carries a single
+    hand-typed `exits` block.** Each room names the node it occupies
+    (`structuralId`) and `hub.ts` composes the doors at load, throwing at import
+    if a node is missing or double-claimed. Any outpost added later inherits the
+    check for free.
+
+  **OTA-1278's MEASUREMENT IS REPAIRED.** The 10 one-way exits and the 2
+  unreachable rooms (Chapel, Culvert) are gone: **15/15 reachable, every pair
+  symmetric**, pinned against his adjacency list transcribed verbatim into the
+  test. ⚠ His crosswalk needed **no renaming** — all 14 mapped rooms already sat
+  on the node their name implied. Only the wiring had rotted.
+
+  **⚠⚠ FAST-TRAVEL IS DELETED.** His spec: *"move ONE GRAPH EDGE AT A TIME"*,
+  *"dead ends must behave as dead ends."* Naming a far room is now a refusal
+  that **names the first step toward it** — directions, not teleportation,
+  because a bare "no" is what had him cycling fifteen room names looking for the
+  exit. `matchHubRoomName` widened to every room in the same stroke, so a room's
+  name never fires the verb it collides with (`vault`, `forge`) even before the
+  first visit — the last of OTA-1274's hole.
+
+  **⚠⚠ FOUND WHILE REPAIRING — A REAL BUG THE OLD GEOMETRY WAS HIDING.** A
+  cardinal with no door on it resolved to nothing and **fell through to OVERLAND
+  travel**: a wrong `go north` inside the outpost walked the player out of the
+  building. Harmless while nearly every room had four exits; with the corrected
+  topology **8 of 15 rooms are dead ends with one door**, so three cardinals in
+  four would have ejected them. Refused in-hub now, listing the doors that exist.
+
+  **⚠ THE EXIT MOVED TO THE MIDDLE**, his ruling (*"there's a central room
+  that's where the exit should be"*). OTA-1271 had put the spare door on the
+  Workshop, which under the corrected graph is R04 — a dead end in the far north
+  corner, the worst room in the outpost to hide the way out in.
+
+  **⚠ ONE OPEN ITEM, HIS CALL.** The artwork labels R07 *THE CRASH ROOM*; in
+  game it reads *The Cell Bunks*, renamed at OTA-1274 to kill the parser
+  collision on the chip `crash`. Same node, one stale label on the image —
+  re-render the art or keep the rename.
+
+- **⚠⚠ GOLEM — WATCHDOG BYPASS FIXED; THE OUTPOST MAP IS BROKEN (2026-08-15).**
+  Golem OTA-1278.
 
   **(1) FIXED.** OTA-1275 debounced App.tsx's re-warm; the qwen-watchdog has its
   OWN AppState listener and reinitialised anyway. The log proves it by ORDER —

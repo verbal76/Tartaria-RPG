@@ -148,21 +148,50 @@ describe('OTA-1274 — typing a room name walks you there', () => {
     expect(feed).not.toContain('nothing to attack');
   });
 
-  it('⚠⚠ "evidence" fast-travels once EARNED — the visited rule survives the intercept', () => {
-    // Not yet visited: the bare name must NOT teleport.
-    useGameStore.getState().submitPlayerAction('evidence');
+  // ⚠⚠ OTA-1279 REPLACED THIS TEST'S RULE. It used to pin earned fast-travel:
+  // a bare room name jumped you across the outpost once you had visited that
+  // room. The owner's navigation spec deletes that outright — *"Do NOT
+  // automatically calculate a path and teleport the player through intermediate
+  // rooms... Normal room navigation should move ONE GRAPH EDGE AT A TIME."*
+  // What OTA-1274 actually bought — a room name never firing the verb it
+  // collides with — is what survives, and it now holds for unvisited rooms too.
+  it('⚠⚠ "documents" is REFUSED, not jumped to — and the refusal points the way', () => {
+    // The Document Room (outpost_lab, node R03) is three steps off. Naming it
+    // must not attack, must not jump, and must not eject the player overland.
+    const from = useGameStore.getState().gameLog.length;
+    useGameStore.getState().submitPlayerAction('documents');
     expect(room()).toBe('outpost_messhall');
-    // Walk there once (breakroom → operations → lab → evidence)...
-    useGameStore.getState().submitPlayerAction('go east');
-    useGameStore.getState().submitPlayerAction('go north');
-    useGameStore.getState().submitPlayerAction('go north');
-    expect(room()).toBe('outpost_relic_vault');
-    // ...leave, and now the bare name jumps.
-    useGameStore.getState().submitPlayerAction('go south');
-    useGameStore.getState().submitPlayerAction('go south');
+    const feed = useGameStore.getState().gameLog.slice(from)
+      .map((e: { text: string }) => String(e.text)).join(' | ').toLowerCase();
+    expect(feed).toContain("isn't off this one");
+    // The first step named is the one the graph says: back east to Operations.
+    expect(feed).toContain('head east');
+  });
+
+  it('⚠⚠ ...and walking it by hand takes exactly the three steps the graph says', () => {
+    useGameStore.getState().submitPlayerAction('go east');    // Mess  → Operations (R05→R01)
     expect(room()).toBe('outpost_central');
+    useGameStore.getState().submitPlayerAction('go north');   // → Evidence Vault  (R01→R02)
+    expect(room()).toBe('outpost_relic_vault');
+    useGameStore.getState().submitPlayerAction('go west');    // → Document Room   (R02→R03)
+    expect(room()).toBe('outpost_lab');
+    // Adjacent-by-name still just walks — from here the vault block is one step.
     useGameStore.getState().submitPlayerAction('evidence');
     expect(room()).toBe('outpost_relic_vault');
+  });
+
+  it('⚠⚠ a cardinal with no door on it REFUSES — it used to walk you out of the outpost', () => {
+    // The vault block (R02) has south/west/east and no north. Pre-OTA-1279 an
+    // unmatched cardinal fell through to the overland handler and cleared
+    // hubRoomId — you typed `go north` in a dead end and left the building.
+    const from = useGameStore.getState().gameLog.length;
+    useGameStore.getState().submitPlayerAction('go north');
+    expect(room()).toBe('outpost_relic_vault');
+    const feed = useGameStore.getState().gameLog.slice(from)
+      .map((e: { text: string }) => String(e.text)).join(' | ').toLowerCase();
+    expect(feed).toContain('no way north from here');
+    // ...and it lists the doors that DO exist, so the refusal is navigable.
+    expect(feed).toContain('you can go');
   });
 
   it('⚠⚠ "break the door" still SWINGS — the matcher is whole-input strict', () => {

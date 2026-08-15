@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.201';
+export const DISPLAY_VERSION = '4.29.202';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23640,7 +23640,39 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // map to read, not mine to invent. Reported with the full table instead.
 // New suite ota1278WatchdogRespectsDebounce (6). 817 suites / 7637 tests.
 // DISPLAY_VERSION 4.29.201. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-15-1278-watchdog-respects-debounce';
+// ⚠⚠ OTA-1279 — THE OUTPOST IS ONE GRAPH IN NINE SETS OF CLOTHES.
+// The owner supplied the Revivalist Camp artwork and a written navigation
+// specification. Its governing line: "The artwork does not determine movement.
+// The room graph does." Implemented exactly as layered:
+//   LAYER 1 app/engine/outpostGraph.ts — the universal 15-node topology (R01…
+//     R15). 14 connections, each declared ONCE; the return edge is GENERATED.
+//     Asymmetry is no longer a bug that can be introduced — it is unrepresentable.
+//   LAYER 2 static_hub.json + hub_faction_variants.json — names, descriptions,
+//     NPCs, tags. static_hub.json no longer carries a single hand-typed `exits`
+//     block; each room names the node it occupies and hub.ts composes the doors.
+// FIXES OTA-1278's measurement: the 10 one-way exits and the 2 unreachable rooms
+// (Chapel, Culvert) are gone — 15/15 reachable, every pair symmetric, checked at
+// import and pinned by test. His crosswalk needed no renaming: all 14 mapped
+// rooms already sat on the node their name implied. Only the wiring had rotted.
+// ⚠⚠ FAST-TRAVEL DELETED, per his spec ("move ONE GRAPH EDGE AT A TIME", "dead
+// ends must behave as dead ends"). Naming a far room is now a refusal that names
+// the first step toward it — directions, not teleportation, because a bare "no"
+// is what had him cycling fifteen room names.
+// ⚠⚠ FOUND WHILE REPAIRING: a cardinal with no door on it resolved to nothing
+// and FELL THROUGH TO OVERLAND TRAVEL — a wrong `go north` walked the player out
+// of the building. Latent when most rooms had four exits; with the corrected
+// topology 8 of 15 rooms are dead ends, so it would have fired constantly.
+// Refused in-hub now, listing the doors that do exist.
+// ⚠ THE EXIT MOVED TO THE MIDDLE, his ruling ("there's a central room that's
+// where the exit should be"). OTA-1271 had put the spare door on the Workshop,
+// which under the corrected graph is R04 — a dead end in the far north corner.
+// ⚠ ONE KNOWN MISMATCH, owner's call: the artwork labels R07 "THE CRASH ROOM";
+// in game it reads "The Cell Bunks" (renamed at OTA-1274 to kill a parser
+// collision on the chip `crash`). Same node, one stale label on the image.
+// New suite ota1279UniversalOutpostGraph (25). 818 suites / 7668 tests.
+// DISPLAY_VERSION 4.29.202. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-15-1279-universal-outpost-graph';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1278-watchdog-respects-debounce';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1277-rooms-and-gear';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1276-freeze-forensics';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1275-rewarm-debounce';
