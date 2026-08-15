@@ -168,6 +168,14 @@ try {
   // the dev environment surfaces errors well enough on its own.
 }
 
+// ⚠⚠ OTA-1275 — how long the app must stay in the FOREGROUND before the parked
+// Qwen model is rebuilt. Measured against the owner's own log-copy workflow,
+// whose foreground visits ran 2.3s / 2.5s / 2.4s / 6.9s while he switched out to
+// paste each part: 8s clears all of that churn, and a real play session passes
+// it without noticing. Not a guess at a "nice" number — the number that makes
+// app-switching free.
+const QWEN_REWARM_DELAY_MS = 8_000;
+
 export default function App() {
   const screen = useGameStore((s) => s.currentScreen);
   const hydrated = useGameStore((s) => s.hydrated);
@@ -181,6 +189,10 @@ export default function App() {
   // `active` handler knows to re-warm it. (Manual disable / failed / skipped
   // never set this, so we never fight the user's choice.)
   const qwenParkedRef = useRef(false);
+  // ⚠⚠ OTA-1275 — the re-warm timer. See the app-state handler below: the model
+  // reload is DEBOUNCED on continuous foreground so app-switching cannot thrash
+  // a ~425MB native load/free cycle every couple of seconds.
+  const qwenRewarmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Android immersive mode — hide the navigation bar (3-button bar at
   // the bottom) and let the status bar overlay-swipe back. Same UX as
@@ -559,6 +571,14 @@ export default function App() {
         // template/reason=qwen-not-ready; the long-travel log showed exactly
         // this — init succeeded at boot, then status=idle for 20 min). Remember
         // that WE parked a ready model so `active` knows to bring it back.
+        // ⚠⚠ OTA-1275 — CANCEL ANY PENDING RE-WARM, on `inactive` too. This is
+        // the half that stops the thrash: a foreground visit shorter than the
+        // debounce never loads the model at all, so leaving again costs nothing.
+        if (qwenRewarmTimer.current) {
+          clearTimeout(qwenRewarmTimer.current);
+          qwenRewarmTimer.current = null;
+          useGameStore.getState().appendLog('debug', 'qwen: re-warm cancelled (left the foreground first)');
+        }
         if (status === 'background') {
           if (useGameStore.getState().qwenStatus === 'ready') qwenParkedRef.current = true;
           void shutdownQwen();
@@ -588,14 +608,47 @@ export default function App() {
         // in the background. Without this, one transient background killed the
         // Arbiter's LLM voice for the rest of the session. Guarded by the
         // parked flag so a user who manually disabled Qwen stays disabled.
-        if (qwenParkedRef.current) {
-          qwenParkedRef.current = false;
-          void bootQwen();
+        // ⚠⚠ OTA-1275 — DEBOUNCED, because the un-debounced version turned the
+        // owner's own bug-report workflow into a memory grinder. His 4.29.197
+        // log, while he was copying it to me in parts:
+        //
+        //   14:00:22 active   ctx OPENED  ≈425MB
+        //   14:00:25 background ctx RELEASED   (2.5s later)
+        //   14:00:28 active   ctx OPENED  ≈425MB
+        //   14:00:31 background ctx RELEASED   (2.3s later)
+        //   14:00:35 active   ctx OPENED  ≈425MB
+        //   14:00:41 active   ctx OPENED  ≈425MB
+        //
+        // SIX full model loads in four minutes, four of them inside twenty
+        // seconds — every app-switch tore down and rebuilt ~425MB of native
+        // context. arb140 was right that a parked model must come back; it just
+        // brought it back INSTANTLY, so every switch-away paid full price.
+        //
+        // ⚠ And a 2.5s visit is shorter than the load itself ("~1-5s context
+        // reload"), so the release lands DURING an in-flight init — precisely
+        // the orphan shape OTA-1177 filed as its leading unmeasured suspect
+        // (dispose before `this.context` is assigned frees nothing). Waiting for
+        // a settled foreground makes that race structurally unreachable rather
+        // than merely unlikely.
+        //
+        // The dump on `background` stays IMMEDIATE — that is the jetsam fix, and
+        // holding 425MB while backgrounded is what gets us killed. Only the
+        // reload waits.
+        if (qwenParkedRef.current && !qwenRewarmTimer.current) {
+          qwenRewarmTimer.current = setTimeout(() => {
+            qwenRewarmTimer.current = null;
+            qwenParkedRef.current = false;
+            useGameStore.getState().appendLog('debug', `qwen: re-warming after ${QWEN_REWARM_DELAY_MS}ms settled foreground`);
+            void bootQwen();
+          }, QWEN_REWARM_DELAY_MS);
         }
       }
     };
     const sub = AppState.addEventListener('change', onChange);
-    return () => sub.remove();
+    return () => {
+      sub.remove();
+      if (qwenRewarmTimer.current) { clearTimeout(qwenRewarmTimer.current); qwenRewarmTimer.current = null; }
+    };
   }, [shutdownCognitive, resumeCognitive, shutdownQwen, bootQwen]);
 
   // OTA-368 — periodic autosave. persist() fires on every meaningful

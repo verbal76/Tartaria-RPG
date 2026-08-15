@@ -1839,7 +1839,33 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ GOLEM — ROOM NAMES WALK (2026-08-15, latest).** Golem OTA-1274. Owner:
+- **⚠⚠⚠ GOLEM — THE BUG REPORT WAS THE BUG (2026-08-15, latest).** Golem
+  OTA-1275. The owner reported a second freeze; the NEW tail of his 4.29.197
+  paste (after 13:56) is a record of him SENDING the report, and it is the
+  smoking gun: `ctx OPENED ≈425MB` / `RELEASED` at 11.0s / OPENED / RELEASED at
+  6.9s / OPENED / RELEASED at **2.5s** / OPENED / RELEASED **2.3s** / OPENED /
+  RELEASED **2.4s** / OPENED. **Six full native context builds in four minutes,
+  four inside twenty seconds** — one per switch to the chat app to paste a part.
+
+  ⚠⚠ **arb140 was RIGHT and still caused it**: a parked model must come back on
+  foreground (or one background benches the Arbiter all session) — it just came
+  back INSTANTLY, so every app-switch paid teardown + ~425MB rebuild. ⚠ And a
+  2.3s foreground is SHORTER THAN THE LOAD ("~1-5s"), so the release lands
+  during an in-flight init — **OTA-1177's leading unmeasured orphan suspect**,
+  now structurally unreachable.
+
+  FIX keeps the asymmetry: dump on `background` stays IMMEDIATE (the jetsam
+  fix); only the rebuild waits, `QWEN_REWARM_DELAY_MS = 8s` of settled
+  foreground, cancelled on leaving. 8s measured from his own visit lengths.
+  ⚠ My expectation was wrong and the suite records it: 6→**2**, not 6→1 (the
+  opening 11s foreground is a real session). New suite ota1275RewarmDebounce (8).
+
+  ⚠ **STILL OPEN:** whether this is THE freeze. The completion-crash verdict
+  (OTA-1273) covered freeze #1; this is a second, independent memory-thrash
+  mechanism on the same device. Next device log decides — the new
+  `qwen: re-warm cancelled` / `re-warming after 8000ms` lines grade it directly.
+
+- **⚠⚠ GOLEM — ROOM NAMES WALK (2026-08-15).** Golem OTA-1274. Owner:
   *"check all outpost rooms for odd names. there was a room called break"* —
   and a SECOND FREEZE reported in the same message, log not yet received.
 

@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.197';
+export const DISPLAY_VERSION = '4.29.198';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23549,7 +23549,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Floor/Plan Room. Imperial/Royal/Forge kept — flavor, now walkable anyway.
 // New suite ota1274RoomNamesWalk (7). 813 suites / 7603 tests.
 // DISPLAY_VERSION 4.29.197. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-15-1274-room-names-walk';
+// ⚠⚠ OTA-1275 — THE BUG REPORT WAS THE BUG: SIX 425MB MODEL LOADS IN FOUR
+// MINUTES, CAUSED BY COPYING THE LOG.
+// The owner's 4.29.197 tail, while he switched out to paste each part:
+//   OPENED 425MB / RELEASED after 11.0s / OPENED / RELEASED after 6.9s /
+//   OPENED / RELEASED 2.5s / OPENED / RELEASED 2.3s / OPENED / RELEASED 2.4s /
+//   OPENED  — six full native context builds, four inside twenty seconds.
+// arb140 was RIGHT that a parked model must come back (one transient background
+// used to bench the Arbiter for a whole session) — it just came back INSTANTLY,
+// so every app-switch paid a full teardown + ~425MB rebuild.
+// ⚠ And a 2.3s foreground is SHORTER THAN THE LOAD ("~1-5s context reload"), so
+// the next release lands DURING an in-flight init — precisely the orphan shape
+// OTA-1177 filed as its leading unmeasured suspect. The debounce makes that
+// race unreachable rather than merely unlikely.
+// FIX: the dump on `background` stays IMMEDIATE (that IS the jetsam fix); only
+// the REBUILD waits for QWEN_REWARM_DELAY_MS = 8s of settled foreground, and
+// leaving cancels it. His four switch-loads drop to zero; a real return still
+// re-warms. 8s is measured against his own visits (2.3/2.4/2.6/6.9s), not
+// picked. Both decisions log a line so the next device log grades this.
+// ⚠ MY OWN EXPECTATION WAS WRONG AND THE TEST SAYS SO: I asserted his session
+// would fall 6→1; it falls 6→2, because the opening 11s foreground is itself a
+// real play session. The four middle loads are what vanish.
+// New suite ota1275RewarmDebounce (8). 814 suites / 7611 tests.
+// DISPLAY_VERSION 4.29.198. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-15-1275-rewarm-debounce';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1274-room-names-walk';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1273-the-gift-says-who';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1272-the-doorstep-grace';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1271-the-workshop-door';
