@@ -1856,9 +1856,14 @@ rediscovering them.
   whole batch shipped as HAL OTA-1285…1289 (see HAL's HANDOFF). Full port map
   under this ruling: golem 1279/1281→HAL-1282, 1280→HAL-1283, 1274→HAL-1284,
   1269→HAL-1285, 1273→HAL-1286, 1275+1278→HAL-1287, 1276→HAL-1288,
-  1277p1→HAL-1289. ⚠ NOTHING non-directional remains unported; what stays
-  golem-only IS the trial (picker UI, investigate-all pacing, exploration
-  draft, gear auto-pick ranking — no landing site on HAL, checked).
+  1277p1→HAL-1289, and — from the owner's camouflage audit ("is there
+  anything else like the ✓ fix?") — 1263+1268→HAL-1290 (paced INVESTIGATE
+  ALL; HAL's fired every noun in one instant loop and kept firing into
+  fights) and 1272→HAL-1291 (doorstep grace; his 2-free-moves ruling had
+  only ever landed on golem). ⚠ NOTHING non-directional remains unported;
+  what stays golem-only IS the trial (picker UI, exploration draft, gear
+  auto-pick ranking + story-tier sweep ordering — no landing sites on HAL,
+  checked). Audit method recorded in HAL's HANDOFF.
 
 - **⚠⚠⚠ GOLEM — ALL NINE OUTPOSTS WALKED; TWO NAME-MATCH DEFECTS FIXED
   (2026-08-15).** Golem OTA-1281, answering the owner's acceptance
