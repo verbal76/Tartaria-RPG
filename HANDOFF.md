@@ -1695,10 +1695,13 @@ rediscovering them.
   rooms became dead ends). Longest-name-wins matching (Order's "Cells"/"Cell").
   Exit in the central room per the owner's ruling; the OTA-1274 variant
   renames rode along because HAL still shipped the DUPLICATE "Plans"/"Vigil"
-  chips (owner ruled "keep the rename"). ⚠ NOT ported: golem's
-  matchHubRoomName bare-name intercept (OTA-1274) — bare `vault`/`forge`
-  still hit parser verbs on this line; only `go to the <room>` phrasing gets
-  the new matching. A candidate for a future port, noted, not smuggled.
+  chips (owner ruled "keep the rename"). ⚠ The matchHubRoomName
+  bare-name intercept (golem OTA-1274) ported same sitting as OTA-1284 on the
+  owner's ruling ("I don't want open errors") — bare `vault`/`forge`/`break`
+  now walk on this line too. The port surfaced a live gap: the store passed NO
+  skin to resolveHubTravel, so typed screen names promoted to travel and then
+  failed to resolve. Skin rides into resolution now; the store-level suite
+  (not the engine sweep) is what caught it.
 
   **THE GIFT DOOR.** Backing out of the gift-mode inventory with BACK left
   `giftMode` armed; the next pack visit was still a gift picker. The guard

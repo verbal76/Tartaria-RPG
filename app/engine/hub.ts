@@ -378,6 +378,66 @@ export function hubFirstStepToward(fromRoomId: string, toRoomId: string): string
   return node ? (hubRoomAtNode(node)?.id ?? null) : null;
 }
 
+/** ⚠⚠ OTA-1284 (port of golem OTA-1274/1279/1281) — a bare room name, matched STRICTLY, for the pre-parser
+ *  intercept. The owner asked for an odd-name audit ("there was a room called
+ *  break") and the audit found the real defect class underneath: room chips
+ *  whose names ARE parser verbs. Typing `vault` jumped (conf 1.00), `break`
+ *  attacked, `forge` opened crafting, `chamber` climbed via fuzzy 'clamber' —
+ *  in every skin the typed name of some room did something other than walk.
+ *
+ *  resolveHubTravel cannot gate the intercept: it substring-matches, so
+ *  "break the door" would walk to the Break Room instead of attacking the
+ *  door. This matcher demands the WHOLE input be the room (after an optional
+ *  go/visit/enter lead-in and articles).
+ *
+ *  ⚠⚠ Matches EVERY room, not only visited ones (golem OTA-1279's widening).
+ *  The old visited-gate was inherited from fast-travel, and fast-travel is gone.
+ *  Leaving it in place would mean a room's name still fired a parser verb right
+ *  up until the first time you walked in — `vault` jumping, `forge` opening
+ *  crafting — which is the exact hole OTA-1274 was opened to close. Naming an
+ *  unreachable room is no longer a jump anywhere; resolveHubTravel refuses it
+ *  and points at the right door instead. */
+export function matchHubRoomName(
+  rawInput: string,
+  fromRoomId: string,
+  skinFactionId?: string | null,
+): string | null {
+  const here = findHubRoom(fromRoomId);
+  if (!here) return null;
+  const text = rawInput.toLowerCase().trim()
+    .replace(/^(go\s+to|goto|go|enter|visit|to)\s+/, '')
+    .replace(/^the\s+/, '')
+    .trim();
+  if (!text) return null;
+  // ⚠ The SKIN pass outranks the BASE pass (golem OTA-1280-era layering). One faction can label a
+  // room with another room's base name (conspiracy: the Workshop reads "Lab",
+  // while outpost_lab's base shortName is also "Lab"). The player types what is
+  // on their screen, so the screen name must win the tie — previously it won by
+  // array-index luck, which is not a rule.
+  const isMatch = (roomId: string, layer: 'skin' | 'base'): boolean => {
+    const r = layer === 'skin'
+      ? (skinFactionId ? VARIANTS.factions?.[skinFactionId]?.[roomId] : undefined)
+      : findHubRoom(roomId);
+    if (!r || typeof r.shortName !== 'string' || typeof r.name !== 'string') {
+      return layer === 'base' && text === roomId.toLowerCase();
+    }
+    const name = r.name.toLowerCase().replace(/^the\s+/, '');
+    return text === r.shortName.toLowerCase() || text === name
+      || (layer === 'base' && text === roomId.toLowerCase());
+  };
+  for (const layer of ['skin', 'base'] as const) {
+    for (const dir of DIRECTIONS) {
+      const targetId = here.exits[dir];
+      if (targetId && isMatch(targetId, layer)) return targetId;
+    }
+    for (const room of HUB.rooms) {
+      if (room.id === fromRoomId) continue;
+      if (isMatch(room.id, layer)) return room.id;
+    }
+  }
+  return null;
+}
+
 /** True when the input is asking to leave the hub entirely. */
 export function isLeaveHubCommand(rawInput: string): boolean {
   return /\b(leave|exit)\s+(the\s+)?(outpost|hub|camp|reclaimers'?)\b/i.test(rawInput) ||

@@ -264,6 +264,7 @@ import {
   findHubRoom,
   resolveHubTravel,
   isLeaveHubCommand,
+  matchHubRoomName,
 } from '../engine/hub';
 import {
   getBuilding,
@@ -13505,7 +13506,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
     }
-    const parsed = parseInput(trimmed, parseCtx);
+    let parsed = parseInput(trimmed, parseCtx);
+    // ⚠⚠ OTA-1284 (port of golem OTA-1274) — A BARE ROOM NAME OUTRANKS WHATEVER
+    // VERB IT HAPPENS TO BE. Hub rooms whose typed names ARE parser verbs:
+    // `vault` jumped, `break` attacked, `forge` opened crafting, `chamber`
+    // climbed via fuzzy 'clamber' — in every skin, typing some room's own name
+    // did something other than walk. Buildings solved this in arb25 by
+    // resolving room names BEFORE the parser; hubs get the same door. The
+    // matcher is STRICT (the whole input is the room, articles and go-words
+    // aside), so "break the door" still swings and only the bare name walks.
+    if (player.hubRoomId && parsed.intent !== 'travel') {
+      const named = matchHubRoomName(
+        trimmed,
+        player.hubRoomId,
+        hubSkinFactionFor(player.currentLocationId, player.factionId),
+      );
+      if (named) {
+        parsed = { ...parsed, intent: 'travel', confidence: 1, matchedVerb: 'go', target: trimmed, validationIssues: undefined };
+      }
+    }
     // OTA-128 — silent re-dispatch (drink-of-consumable, etc.) skips
     // the [player] echo so the player doesn't see two input lines
     // for one typed action.
@@ -17848,7 +17867,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // and falls through to the gated/charged path.
         if (player.hubRoomId && !isLeaveHubCommand(trimmed)) {
           const skin = hubSkinFactionFor(player.currentLocationId, player.factionId);
-          const interiorMove = resolveHubTravel(player.hubRoomId, trimmed);
+          // ⚠ OTA-1284 — the skin rides into resolution: the player types the
+          // name on THEIR screen ('operations', 'promenade'), not the base
+          // layout's. Without this the bare-name intercept promoted the input
+          // to travel and the resolver then failed to recognise the very name
+          // that triggered it.
+          const interiorMove = resolveHubTravel(player.hubRoomId, trimmed, skin);
           // ⚠⚠ OTA-1282 (port of golem OTA-1279) — A CARDINAL WITH NO DOOR ON
           // IT NO LONGER EJECTS YOU. It used to resolve to nothing and fall
           // through to the overland handler, which walked the player clean out

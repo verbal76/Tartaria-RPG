@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.167';
+export const DISPLAY_VERSION = '4.29.168';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24583,7 +24583,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // BEFORE navigating and never trip it. His rule: "if I leave that screen, I'm
 // no longer giving a gift." New suite ota1283GiftEndsAtTheDoor (5).
 // 795 suites / 7453 tests. DISPLAY_VERSION 4.29.167.
-export const OTA_BUILD_ID = '2026-08-15-1283-gift-ends-at-the-door';
+// ⚠⚠ OTA-1284 — BARE ROOM NAMES WALK (port of golem OTA-1274, owner-directed:
+// "I don't want open errors"). Hub rooms whose typed names ARE parser verbs:
+// `vault` jumped, `break` attacked, `forge` opened crafting, `chamber` climbed
+// via fuzzy 'clamber'. matchHubRoomName resolves a STRICT whole-input room
+// name BEFORE the parser (articles and go-words aside), so "break the door"
+// still swings and only the bare name walks. Skin-layer priority: the name on
+// the player's SCREEN outranks another room's base name. ⚠ FOUND IN THE PORT:
+// the store called resolveHubTravel WITHOUT the skin, so the intercept
+// promoted 'operations' to travel and the resolver then failed to recognise
+// the very name that triggered it — skin now rides into resolution (the
+// 1282 engine sweep passed skin explicitly, which is why it stayed green
+// while the played path was broken; the store-level suite closes that gap).
+// New suite ota1284BareRoomNames (9). 796 suites / 7462 tests.
+// DISPLAY_VERSION 4.29.168.
+export const OTA_BUILD_ID = '2026-08-15-1284-bare-room-names-walk';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1283-gift-ends-at-the-door';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1282-universal-outpost-graph';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1265-negation-and-questions';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1262-js-crash-is-not-an-ml-crash';
