@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.177';
+export const DISPLAY_VERSION = '4.29.178';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24679,7 +24679,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // owner-ordered back-button audit — all other backs on this line verified
 // correct. New suite ota1295TitleListTellsTheTruth (2). 805 suites / 7506
 // tests. DISPLAY_VERSION 4.29.177.
-export const OTA_BUILD_ID = '2026-08-15-1295-title-list-tells-the-truth';
+// ⚠⚠ OTA-1299 — NO OVERLAND COMPASS INDOORS (port of golem OTA-1298). Every
+// interior room printed the room graph's paths AND the overland compass back
+// to back — two different norths, the second describing a map you cannot walk
+// until you leave. Owner: "it said leave The Outpost first but I'm seeing
+// cardinal directions." Gated on being indoors (hub room OR building); the
+// radar returns the moment you step out. New suite ota1299NoCompassIndoors (3).
+// 806 suites / 7509 tests. DISPLAY_VERSION 4.29.178.
+export const OTA_BUILD_ID = '2026-08-15-1299-no-compass-indoors';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1295-title-list-tells-the-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1293-lore-back-stays-in-game';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1291-doorstep-grace';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1290-investigate-all-actually-sweeps';
