@@ -1374,6 +1374,9 @@ export interface PlayerCharacter {
    *  courses to the objective, then auto-courses to the turn-in once the work is
    *  done. Cleared on turn-in, abandon, deactivate, or a manual divert. */
   routedMission?: { id: string; phase: 'to_objective' | 'to_turnin' } | null;
+  /** ⚠ OTA-1304 — the Great Climb the player has set course for, so the tower
+   *  reads as "the mission you're on" the way every other routed kind does. */
+  routedClimbId?: string | null;
   /** IDs of faction quests the player has turned in. */
   completedFactionQuestIds?: string[];
   /** Active monster hunts with per-stage progress. `tracked === false` = the

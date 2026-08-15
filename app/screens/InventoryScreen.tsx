@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 
 import { useGameStore } from '../state/gameStore';
 import {
   CATEGORY_COLORS,
+  rarityHexColor, // ⚠ OTA-1312 — one palette, shared
+
   CATEGORY_LABEL,
   CATEGORY_ORDER,
   groupInventoryByCategory,
@@ -2422,15 +2424,6 @@ function ItemRow({
 // player sees in the item modal's rarity line. Kept local to this
 // file because the only other call site (the modal) imports its own
 // version; centralizing would be premature.
-function rarityHexColor(rarity: string | null | undefined): string {
-  switch (rarity) {
-    case 'Legendary': return '#e07a5f';
-    case 'Rare': return '#b88ce0';
-    case 'Uncommon': return '#9ec96a';
-    default: return '#c9a86a'; // Common / undefined
-  }
-}
-
 const styles = StyleSheet.create({
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
   // OTA-1154 — gift mode banner. Completion-green, matching the COMPLETE button

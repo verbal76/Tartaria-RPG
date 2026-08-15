@@ -41,6 +41,30 @@ export const CATEGORY_COLORS: Record<InventoryCategory, string> = {
   quest: '#d9c34a', // gold — reserved objective items (locked)
 };
 
+/** ⚠⚠ OTA-1312 — THE RARITY PALETTE, ONCE.
+ *
+ *  These four hexes were copy-pasted into FOUR files — `rarityHexColor` in the
+ *  inventory, `rarityColor` in the vendor, another in RecipesView, and a
+ *  style-returning one in BrandedModal — all identical, none aware of the
+ *  others. OTA-1232 already noted two of them by name while working out what
+ *  "beige" meant. A fifth was about to be written for the salvage modal, so the
+ *  palette moved here instead, next to CATEGORY_COLORS where the other shared
+ *  colour vocabulary already lives.
+ *
+ *  ⚠ `default:` covers Common AND anything with a missing or unrecognised
+ *  rarity — the two are NOT the same thing, and any selection logic that keys on
+ *  the colour rather than the rarity will sweep unknowns by accident. */
+export const RARITY_COLORS: Record<string, string> = {
+  Legendary: '#e07a5f',
+  Rare: '#b88ce0',
+  Uncommon: '#9ec96a',
+  Common: '#c9a86a',
+};
+
+export function rarityHexColor(rarity: string | null | undefined): string {
+  return RARITY_COLORS[rarity ?? ''] ?? '#c9a86a';
+}
+
 export const CATEGORY_LABEL: Record<InventoryCategory, string> = {
   weapon: 'Weapons',
   armor: 'Armor',

@@ -96,11 +96,13 @@ describe('cardinal movement ambient-noun variety', () => {
     });
 
     const tileSnapshots: Record<string, string[]> = {};
+    const gearSeen: string[] = [];
     function snapshot(label: string) {
       const p = store.getState().player!;
       const s = store.getState().currentScene!;
       const key = `${label}@${p.mapX},${p.mapY}`;
       tileSnapshots[key] = [...(s.displayedAmbientNouns ?? [])];
+      gearSeen.push(...((s as { tileGearNouns?: string[] }).tileGearNouns ?? []));
     }
 
     snapshot('start');
@@ -135,15 +137,29 @@ describe('cardinal movement ambient-noun variety', () => {
       // match.)
       const sameCoord = startKey.split('@')[1] === backCoords.split('@')[1];
       if (sameCoord) {
-        expect(tileSnapshots[backCoords]!.join('|')).toBe(tileSnapshots[startKey]!.join('|'));
+        // ⚠ OTA-1301 — compare the POOL-derived portion. The tile's gear is
+        // seeded per tile, but the cross-tile variety window (OTA-973) can hide
+        // a pick on the return leg — deliberately, and that is not the shuffle
+        // determinism this line exists to guard.
+        const poolOnly = (k: string): string =>
+          tileSnapshots[k]!.filter((n) => bigPool.includes(n)).join('|');
+        expect(poolOnly(backCoords)).toBe(poolOnly(startKey));
       }
     }
     void startCoords;
 
     // Every displayed list must be drawn FROM the pool — no rogue
     // entries snuck in.
+    //
+    // ⚠ OTA-1301 — "from the pool" is about the SHUFFLE not inventing nouns. A
+    // cardinal step also PLACES that tile's gear, which is a deliberate addition,
+    // not a rogue entry — so gear is allowed and everything else must still come
+    // from the pool. Pinning it this way keeps the original guarantee intact: a
+    // shuffle that invented a noun would still fail here.
+    const placedGear = new Set(gearSeen);
     for (const list of Object.values(tileSnapshots)) {
       for (const noun of list) {
+        if (placedGear.has(noun)) continue;
         expect(bigPool).toContain(noun);
       }
     }
@@ -173,6 +189,16 @@ describe('cardinal movement ambient-noun variety', () => {
     store.getState().stepDirection('south');
     const after = store.getState().currentScene!.displayedAmbientNouns ?? [];
     // Pool ≤ 8 should pass through as-is (no shuffle, no truncation).
-    expect(after.sort().join('|')).toBe([...smallPool].sort().join('|'));
+    //
+    // ⚠ OTA-1301 — this used to assert the displayed list was BYTE-IDENTICAL to
+    // the pool, which is a stronger claim than the rule it is named for and than
+    // its own comment makes. The rule is that a small pool is not shuffled and
+    // not truncated. Landing on a new tile also places that tile's gear, and a
+    // byte-identity assertion called that a regression. Pin the rule: every
+    // authored noun survives, in order, and the only additions are the gear the
+    // step just placed — so a genuine truncation or re-order still fails here.
+    const gear = (store.getState().currentScene as { tileGearNouns?: string[] }).tileGearNouns ?? [];
+    expect(after.filter((n) => smallPool.includes(n))).toEqual(smallPool);
+    expect(after.filter((n) => !smallPool.includes(n))).toEqual(gear);
   });
 });

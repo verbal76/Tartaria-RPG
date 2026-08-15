@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.207';
+export const DISPLAY_VERSION = '4.29.212';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23748,7 +23748,44 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // building), so it vanishes inside and returns the moment you step out.
 // New suite ota1298NoCompassIndoors (3). 823 suites / 7702 tests.
 // DISPLAY_VERSION 4.29.207. Ports: HAL 1299, steam 1300 (same sitting).
-export const OTA_BUILD_ID = '2026-08-15-1298-no-compass-indoors';
+// ⚠⚠ OTA-1301 — FIVE CONTRADICTIONS FROM ONE OVERLAND WALK. The overland
+// compass printed inside buildings (the LOOK path OTA-1298 never reached, whose
+// one guard was dead code); `leave outpost` outdoors cost an hour for nothing;
+// pinned arrival-tile gear followed the player across tiles and re-granted on
+// each one — an unbounded item farm; the flee line named a chamber on open mud;
+// and every step printed two departure sentences. New suite ota1301 (11).
+// 823 suites / 7713 tests. DISPLAY_VERSION 4.29.208.
+// ⚠⚠ OTA-1304 — THE FIVE BEACON TOWERS ROUTE LIKE EVERY OTHER MISSION. Owner,
+// after reading a Skyreacher chart: "all five beacon towers are known grid
+// locations so I should be able to autoroute to it… it should ask me if I want
+// to set an auto route like the rest of the missions." CONTRACTS rendered the
+// towers as read-only cards (OTA-912) with no route affordance, though every
+// GreatClimb carries its own locationId. They now offer SET COURSE through the
+// same confirm modal, and routing one makes it the mission you're on — every
+// other kind pauses, the SINGLE-ACTIVE rule setFactionQuestActive documents.
+// ⚠ No walker could have caught it: every climb suite reaches its tower by
+// assigning currentLocationId, so none of them ever travelled. New suite
+// ota1304 (6) walks the journey for real. 825 suites / 7722 tests.
+// DISPLAY_VERSION 4.29.209.
+// ⚠⚠ OTA-1307 — SELL ALL COMMON GEAR HAD NO CONFIRM BUTTON. The buttons
+// chain answered every mode except bulkSellCommonGear, so it fell to the terminal
+// fallback: one neutral-tone OK wired to cancel. Owner spotted the dullness, which
+// was the diagnosis. The selling logic was never missing — confirmAction has had a
+// complete branch since OTA-1232; nothing could reach it. New suite ota1307 (4).
+// 826 suites / 7726 tests. DISPLAY_VERSION 4.29.210.
+// ⚠⚠ OTA-1312 — SALVAGE POPUP GOES AMBER; rarity moves to a left edge in the
+// shared palette (which existed in four copies and now exists in one).
+// ⚠⚠ OTA-1311 — THE INFINITE LIFE GLITCH. Restore minted a live copy of a DEAD
+// character, bypassing the Resurrection Gem. Restore is now gated on the
+// character having actually disappeared: not on the roster, and not on the roll
+// of the Fallen (an uncapped seed register, so an old death cannot be waited
+// out and deleting the corpse does not help). New suites ota1311 (10) + ota1312 (7).
+// 828 suites / 7743 tests. DISPLAY_VERSION 4.29.212.
+export const OTA_BUILD_ID = '2026-08-15-1312-amber-salvage-and-restore-gate';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1307-sell-all-actually-sells';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1304-towers-route-like-missions';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1301-world-stops-contradicting-itself';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1298-no-compass-indoors';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1294-title-list-tells-the-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1292-lore-back-stays-in-game';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1281-nine-outposts-walked';
