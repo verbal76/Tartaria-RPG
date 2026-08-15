@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.193';
+export const DISPLAY_VERSION = '4.29.194';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23475,7 +23475,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suites: ota1268InvestigateAllActuallySweeps (4, behavioural, mutation-
 // verified), ota1269BareExit (5), ota1270SharedDraft (5). 809 suites / 7584 tests.
 // DISPLAY_VERSION 4.29.193. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-15-1270-sweep-exit-and-the-shared-draft';
+// ⚠⚠ OTA-1271 — THE WORKSHOP GETS A DOOR, AND EVERY OUTPOST IS GUARANTEED ONE.
+// Owner: "add an exit button there or find a room named after a room that
+// would normally have an exit... all outposts should have at least 1 exit."
+// This OVERRULES OTA-1194's gate-only EXIT rule by the same authority that set
+// it — but it is not exit-everywhere: the gate keeps `entrance`, the Workshop
+// (his named anchor; a working shop has a service door) gains `exterior_door`,
+// roomIsExit honours either tag, and the armory/vault walls stay walls.
+// The chip stays data-driven (InputBox decides nothing about which rooms have
+// doors), leaving from the workshop narrates ITS door rather than a gate it
+// never used, and the ≥1-exit floor is a tested invariant on the layout —
+// nine faction skins share this one graph, skins rewrite strings never tags,
+// so one assertion covers all nine.
+// New suite ota1271WorkshopDoor (5, incl. the real screen showing EXIT at the
+// gate AND the workshop and NOT in the vault). 810 suites / 7589 tests.
+// DISPLAY_VERSION 4.29.194. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-15-1271-the-workshop-door';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1270-sweep-exit-and-the-shared-draft';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1267-the-button-crawl';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1266-dead-salvage-predicates';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1264-negation-and-questions';

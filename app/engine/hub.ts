@@ -218,14 +218,24 @@ export function hubEntryRoomId(): string {
 // Owner, on being shown that the better version was on the branch nobody plays:
 // *"ok then bring hal up to the better version."*
 
-/** True when this room is the hub's way OUT — the gate/entrance (tagged "entrance" in the
- *  layout; the Gate is the only one). The EXIT chip belongs only here.
+/** True when this room has a way OUT of the hub — the gate (tagged `entrance`) or a room
+ *  with its own door to the outside (tagged `exterior_door`).
+ *
+ *  ⚠⚠ OTA-1271 — THE OWNER OVERRULED THE GATE-ONLY RULE FROM HIS OWN PLAYTEST. OTA-1194
+ *  restricted the EXIT chip to the gate ("leaving through the armory is not how the
+ *  outpost is laid out") — and then he spent a session stranded in the workshop cluster
+ *  typing "why is there no exit button". His ruling: *"add an exit button there [the
+ *  anchor rooms] or find a room named after a room that would normally have an exit...
+ *  all outposts should have at least 1 exit."* The Workshop now carries `exterior_door`
+ *  (a working shop would have a service door); the layout invariant — at least one
+ *  exit-bearing room per hub — is pinned by ota1271's test, not by hope.
  *
  *  ⚠ Tags survive the per-faction string overrides — `hubRoomFor` re-skins name,
  *  shortName and description and nothing else — so this holds for every faction's hub,
  *  including under OTA-1186's skin-by-site. */
 export function roomIsExit(room: HubRoom | null | undefined): boolean {
-  return !!room && Array.isArray(room.tags) && room.tags.includes('entrance');
+  return !!room && Array.isArray(room.tags)
+    && (room.tags.includes('entrance') || room.tags.includes('exterior_door'));
 }
 
 /** True when the hub layout marks an explicit exit/gate room at all.
@@ -235,7 +245,7 @@ export function roomIsExit(room: HubRoom | null | undefined): boolean {
  *  rule whose failure mode is "the player cannot leave the building" would be a far worse
  *  defect than the one it fixes. */
 export function hubDefinesExitRoom(): boolean {
-  return HUB.rooms.some((r) => Array.isArray(r.tags) && r.tags.includes('entrance'));
+  return HUB.rooms.some((r) => roomIsExit(r));
 }
 
 /** Resolve a player input against the current hub room's exits. Returns

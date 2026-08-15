@@ -1839,8 +1839,22 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠ GOLEM — THE WORKSHOP DOOR (2026-08-15, latest).** Golem OTA-1271. Owner:
+  *"add an exit button there or find a room named after a room that would
+  normally have an exit and put it in that room. all outposts should have at
+  least 1 exit."*
+
+  **Overrules OTA-1194's gate-only EXIT chip, by the same authority that set
+  it** — but it is not exit-everywhere: the gate keeps `entrance`, the Workshop
+  gains `exterior_door` (his named anchor; a working shop has a service door),
+  `roomIsExit` honours either tag, and the armory/vault walls stay walls. The
+  chip stays data-driven; leaving from the workshop narrates its own side door;
+  and **"at least 1 exit per outpost" is a tested invariant on the layout** —
+  nine skins share one room graph, skins rewrite strings never tags, one
+  assertion covers all nine. New suite ota1271WorkshopDoor (5).
+
 - **⚠⚠⚠ GOLEM — THE FIRST REAL DEVICE SESSION: A FREEZE, A ONE-NOUN SWEEP, AND
-  FOUR WAYS TO NOT LEAVE AN OUTPOST (2026-08-15, latest).** Golem OTA-1268/1269/
+  FOUR WAYS TO NOT LEAVE AN OUTPOST (2026-08-15).** Golem OTA-1268/1269/
   1270, from the owner's 4.29.190 playtest (referred by *"it froze on me"* + a
   follow-up log carrying three typed complaints).
 

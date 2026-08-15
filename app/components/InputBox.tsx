@@ -307,10 +307,15 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     return out;
   }, [hubRoom, skinFactionId]);
 
-  // ⚠ OTA-1194 (PUNCHLIST P11) — the EXIT chip belongs ONLY in the gate room. Showing it in
-  // every room let the player leave through the armory or the mess, which is not how the
-  // outpost is laid out. Ported up from golem-line, where it has been correct since
-  // 2026-06-27 while the live line was not.
+  // ⚠ OTA-1194 (PUNCHLIST P11) — the EXIT chip belongs only in rooms that HAVE a door out.
+  // Showing it in every room let the player leave through the armory or the mess, which is
+  // not how the outpost is laid out.
+  //
+  // ⚠⚠ OTA-1271 — the owner overruled gate-ONLY from his own playtest ("why is there no
+  // exit button", stranded in the workshop cluster): rooms tagged `exterior_door` in the
+  // layout now carry the chip too (the Workshop's service door is the first). The rule
+  // stays data-driven through roomIsExit — this component decides nothing about WHICH
+  // rooms have doors.
   //
   // ⚠ The Gate is also the spawn room, so EXIT is still present where the tutorial's
   // `explore_or_leave` beat needs it — the beat is unaffected.

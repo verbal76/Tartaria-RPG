@@ -158,7 +158,8 @@
         "crafting",
         "vendor",
         "safe",
-        "outpost"
+        "outpost",
+        "exterior_door"
       ],
       "interactables": [
         "bench",

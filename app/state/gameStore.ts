@@ -17968,11 +17968,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // ⚠ OTA-1269 — same predicate as the free-interior gate above; a bare
           // `exit` that passed that gate must not fall to the wander here.
           if (isLeaveHubCommand(trimmed) || isBareExitCommand(trimmed)) {
+            // ⚠ OTA-1271 — say which door. The Workshop carries its own exterior
+            // door now (owner: "all outposts should have at least 1 exit", and
+            // the workshop is his named anchor); leaving from an exterior_door
+            // room must not narrate a walk back through the gate it didn't use.
+            const leavingRoom = hubRoomFor(player.hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
+            const viaSideDoor = !!leavingRoom
+              && Array.isArray(leavingRoom.tags)
+              && leavingRoom.tags.includes('exterior_door')
+              && !leavingRoom.tags.includes('entrance');
             set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
             set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
             get().appendLog(
               'world',
-              `You walk back through the gate and out into the open ground. The outpost falls away behind you.`,
+              viaSideDoor
+                ? `You let yourself out ${leavingRoom!.shortName ? `the ${leavingRoom!.shortName}'s` : 'a'} side door and into the open ground. The outpost falls away behind you.`
+                : `You walk back through the gate and out into the open ground. The outpost falls away behind you.`,
             );
             // skipHubEntry — otherwise beginScene re-enters the gate
             // because the player's currentLocationId is still the
