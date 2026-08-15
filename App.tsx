@@ -17,6 +17,7 @@ import {
   markMLInitSucceeded,
   clearInFlightBreadcrumbs,
 } from './app/diagnostics/mlHealth';
+import { clearLiveBreadcrumb } from './app/engine/saveSystem'; // OTA-1276
 import { TitleScreen } from './app/screens/TitleScreen';
 import { SplashOverlay } from './app/components/SplashOverlay';
 import { CharacterCreationScreen } from './app/screens/CharacterCreationScreen';
@@ -592,6 +593,10 @@ export default function App() {
         // falsely benching the Arbiter (the user never crashes, yet the guard
         // disabled Qwen + flagged a Kokoro "voice crash" off one benign close).
         void clearInFlightBreadcrumbs();
+        // ⚠⚠ OTA-1276 — an ORDERLY exit clears the live breadcrumb, so one that
+        // SURVIVES to the next boot means the process died while still live —
+        // the swipe-kill after a hard freeze. Same discipline as arb126 above.
+        void clearLiveBreadcrumb();
       } else if (status === 'active') {
         void resumeCognitive();
         // Re-hide the navigation bar — Android sometimes restores it

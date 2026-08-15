@@ -124,9 +124,13 @@ import {
   ensureFirstInstallSeed,
   getLastSaveWriteError,
   consumeSaveReclaimedFlag,
+  stampLiveBreadcrumb,          // OTA-1276
+  readLiveBreadcrumb,           // OTA-1276
+  clearLiveBreadcrumb,          // OTA-1276
   type SlotSummary,
 } from '../engine/saveSystem';
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
+import { setLastBootBreadcrumb } from '../diagnostics/runtimePressure'; // OTA-1276
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName, nameWasAltered } from '../engine/playerName';
 import { AppState, Platform } from 'react-native'; // OTA-1032 — foreground hook for the Qwen watchdog; OTA-1228 — desktop guard
@@ -2465,6 +2469,18 @@ export function noteSaveKb(kb: number): void { rpLastSaveKb = kb; }
 export function logUiTap(label: string): void {
   try {
     useGameStore.getState().appendLog('debug', `ui: tap "${label}"`);
+    // ⚠⚠ OTA-1276 — AND STAMP IT WHERE A WEDGE CANNOT SWALLOW IT. The line
+    // above goes into the BATCHED disk log, which drains on a promise chain —
+    // and a wedged JS thread never drains it, so the last lines before a freeze
+    // are lost and the log appears to end early. This single tiny write races
+    // ahead of the wedge, so the next boot can name the last control touched.
+    const st = useGameStore.getState();
+    stampLiveBreadcrumb({
+      at: Date.now(),
+      what: `tap "${label}"`,
+      screen: st.currentScreen,
+      room: st.player?.hubRoomId ?? st.player?.currentLocationId ?? undefined,
+    });
   } catch { /* never let instrumentation break a control */ }
 }
 
@@ -8381,6 +8397,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   async hydrate() {
+    // ⚠⚠ OTA-1276 — READ THE SURVIVOR FIRST, then clear it. A breadcrumb still
+    // on disk at boot means the LAST session died while it was live: no orderly
+    // background, no clean exit. That is the swipe-kill the owner has had to do
+    // after every hard freeze, and it is the only record of what the app was
+    // doing at the moment the JS thread stopped — the batched disk log cannot
+    // say, because its pending lines never drain through a wedge.
+    try {
+      const crumb = await readLiveBreadcrumb();
+      if (crumb) {
+        setLastBootBreadcrumb(crumb);
+        get().appendLog('debug',
+          `freeze forensics: last boot ended mid-action — ${crumb.what} @ ${crumb.room ?? '?'} (${new Date(crumb.at).toISOString()})`);
+        await clearLiveBreadcrumb();
+      }
+    } catch { /* forensics must never block a boot */ }
     // OTA-1105 — Qwen telemetry sink. Every generation records at the runtime
     // boundary (qwenTelemetry.ts); this surfaces each call in the debug log —
     // `qwen⏱ <job> <outcome> <total>ms` with the lock-wait share when it is a
@@ -12544,6 +12575,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // records that idleness ENDED, this records when it began counting again.
     // The scene-intro bank measures its stillness from here.
     set({ lastPlayerActionAt: Date.now() });
+    // ⚠⚠ OTA-1276 — the unbatched breadcrumb, at the one door every typed and
+    // chip-driven action passes through. See saveSystem.stampLiveBreadcrumb:
+    // the batched disk log cannot survive a JS wedge, this can.
+    try {
+      const bcPlayer = get().player;
+      stampLiveBreadcrumb({
+        at: Date.now(),
+        what: `action "${trimmed.slice(0, 60)}"`,
+        screen: get().currentScreen,
+        room: bcPlayer?.hubRoomId ?? bcPlayer?.currentLocationId ?? undefined,
+      });
+    } catch { /* instrumentation never blocks an action */ }
 
     // OTA-1076 — the talk/parley sheets don't lock the screen the way the old
     // modals did (that was the point: the feed stays readable, and so do the

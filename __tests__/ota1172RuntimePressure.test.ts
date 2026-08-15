@@ -230,7 +230,12 @@ describe('OTA-1172 — the tap breadcrumb', () => {
     // button. Every one of these paths is wrapped.
     const i = STORE.indexOf('export function logUiTap');
     expect(i).toBeGreaterThan(-1);
-    const block = STORE.slice(i, i + 400);
+    // ⚠ OTA-1276 widened this window: logUiTap now also stamps the unbatched
+    // freeze breadcrumb (the batched log cannot survive a JS wedge), and its
+    // incident note pushed the closing `catch` past 400 chars. The RULE this
+    // pins — instrumentation is wrapped and can never break a control — is
+    // unchanged, and now covers BOTH writes.
+    const block = STORE.slice(i, i + 1200);
     expect(block).toContain('try {');
     expect(block).toContain('catch');
   });

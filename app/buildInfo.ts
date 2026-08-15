@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.198';
+export const DISPLAY_VERSION = '4.29.199';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23572,7 +23572,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // real play session. The four middle loads are what vanish.
 // New suite ota1275RewarmDebounce (8). 814 suites / 7611 tests.
 // DISPLAY_VERSION 4.29.198. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-15-1275-rewarm-debounce';
+// ⚠⚠ OTA-1276 — THE LOG CANNOT SHOW THE FREEZE, AND MY DIAGNOSIS READ ITS
+// CUTOFF AS THE FREEZE POINT. The owner corrected the theory and the correction
+// IS the diagnosis: he freezes MID-GAME cycling outpost rooms scavenging, not
+// while copying logs (that was only the after-action report — all OTA-1275's
+// thrash actually was). Freeze #2 gave the decisive detail: "it froze every
+// button ... but the text box in the middle was still scrollable."
+// ⚠⚠ IN RN THAT IS A SIGNATURE: ScrollView scrolling is native and survives a
+// dead JS thread; onPress needs JS. Buttons dead + scroll alive = THE JS THREAD
+// IS WEDGED. (The nav bar returning on swipe-up is a system gesture — proves
+// nothing about JS.)
+// ⚠⚠ AND A WEDGE TAKES THE WHOLE INSTRUMENT SUITE WITH IT: appendLogToDisk
+// batches into pendingLogLines and drains on a PROMISE CHAIN (never drains →
+// the last lines before a freeze never reach disk); the freeze sampler is a
+// setTimeout; and Clock A, commented as "the NATIVE frame callback", is
+// requestAnimationFrame — a JS timer in RN (JSTimers.js:257). So "Freeze watch:
+// no stalls seen" prints straight through a hard freeze, and the disk log ends
+// at the last successful FLUSH, which can be many actions early. I replayed the
+// wrong scene twice off that cutoff.
+// FIX = an instrument written AHEAD of the wedge: one tiny single-key
+// breadcrumb, never batched, never chained, stamped on every UI tap and every
+// player action with screen + room. Cleared on an orderly exit, so a survivor at
+// next boot means the process died live (the swipe-kill after a freeze). The
+// report now prints what the app was ACTUALLY doing last and says out loud that
+// the log's tail is untrustworthy.
+// ⚠ NOT A FIX FOR THE FREEZE — an instrument that will NAME it next time. The
+// loop itself is still unfound; bounded-loop review of the scavenge path came
+// up clean.
+// New suite ota1276FreezeForensics (10). 815 suites / 7621 tests.
+// DISPLAY_VERSION 4.29.199. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-15-1276-freeze-forensics';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1275-rewarm-debounce';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1274-room-names-walk';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1273-the-gift-says-who';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1272-the-doorstep-grace';

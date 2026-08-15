@@ -1839,7 +1839,32 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM — THE BUG REPORT WAS THE BUG (2026-08-15, latest).** Golem
+- **⚠⚠⚠ GOLEM — THE LOG CANNOT SHOW THE FREEZE (2026-08-15, latest).** Golem
+  OTA-1276. **The owner's correction is the diagnosis.** He freezes MID-GAME
+  cycling outpost rooms scavenging — not while copying logs (that was the
+  after-action report, which is all OTA-1275's thrash was).
+
+  ⚠⚠ **FREEZE #2's SIGNATURE:** *"it froze every single tap button... but the
+  text box in the middle was still scrollable."* In RN, ScrollView scrolling is
+  native and survives a dead JS thread; `onPress` needs JS. **Buttons dead +
+  scroll alive = the JS thread is WEDGED.**
+
+  ⚠⚠ **AND A WEDGE KILLS EVERY INSTRUMENT AT ONCE.** `appendLogToDisk` batches
+  and drains on a PROMISE CHAIN → the last lines before a freeze never reach
+  disk. The freeze sampler is `setTimeout`. Clock A — commented as "the NATIVE
+  frame callback" — is `requestAnimationFrame`, **a JS timer in RN**
+  (JSTimers.js:257). So "no stalls seen" prints through a hard freeze and **the
+  log ends at the last FLUSH, not the freeze**. ⚠⚠ **I read that cutoff as the
+  freeze point and replayed the wrong scene, twice.**
+
+  FIX: `stampLiveBreadcrumb` — a tiny single-key write, never batched/chained,
+  on every tap and action, with screen + room. Cleared on orderly exit, so a
+  survivor at boot = died live. The report names the last real action and warns
+  that the log tail is unreliable. ⚠ **NOT a fix for the freeze — the
+  instrument that will name it.** The loop is still unfound; all `while` loops
+  in the scavenge path reviewed and bounded. New suite ota1276FreezeForensics (10).
+
+- **⚠⚠⚠ GOLEM — THE BUG REPORT WAS THE BUG (2026-08-15).** Golem
   OTA-1275. The owner reported a second freeze; the NEW tail of his 4.29.197
   paste (after 13:56) is a record of him SENDING the report, and it is the
   smoking gun: `ctx OPENED ≈425MB` / `RELEASED` at 11.0s / OPENED / RELEASED at
