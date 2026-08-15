@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.195';
+export const DISPLAY_VERSION = '4.29.196';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23508,7 +23508,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Shield-down is proven too: same tile, same hot dice, grace spent → spawn.
 // New suite ota1272DoorstepGrace (4). 811 suites / 7593 tests.
 // DISPLAY_VERSION 4.29.195. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-15-1272-the-doorstep-grace';
+// ⚠⚠ OTA-1273 — THE FEED SHOWED THE INSULT AND NEVER THE GIFT — AND THE
+// FREEZE VERDICT ARRIVED IN THE SAME LOG.
+// ⚠⚠ FREEZE: SOLVED, BY THE INSTRUMENTS. The 4.29.194 About block reads
+// "Qwen completion guard: auto-disabled after 1 completion crashes (template
+// narration in use; auto-retry in 3 boots)" + "Boot stage: qwen:skipped".
+// The 02:17 freeze was the process dying INSIDE a native llama.rn completion
+// (scene narration) on the owner's Pixel 10 Pro XL — Tensor G5, kernel
+// rnllama_v8_2_fp16_dotprod, sveUsed=false i8mm=true. The guard chain worked:
+// crash detected next boot, Qwen benched, the whole 03:06 session ran on
+// template narration (every "qwen-not-ready" line), auto-retry armed. No code
+// change here — the next step is DEVICE evidence of whether the retry boot
+// crashes again on this SoC (if it does, the kernel variant is the suspect).
+// ⚠⚠ THE FIX THAT DID SHIP: giveGift logged only the RECIPIENT's half of the
+// exchange. The owner's log showed a vendor insult + "Standing -2" arriving
+// out of nowhere, 12s after his last typed line — a designed tastes-system
+// hit (hated gift, refused, docked) that read as a spontaneous standing dock
+// to him AND to the triage that chased it across two sessions as a bug. A
+// GIVE tap now logs its [player] line first, on every outcome, like every
+// picker tap always has. New suite ota1273GiftSaysWho (3).
+// 812 suites / 7596 tests. DISPLAY_VERSION 4.29.196. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-15-1273-the-gift-says-who';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1272-the-doorstep-grace';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1271-the-workshop-door';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1270-sweep-exit-and-the-shared-draft';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1267-the-button-crawl';

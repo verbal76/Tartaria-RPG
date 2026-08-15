@@ -1839,7 +1839,29 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ GOLEM — THE DOORSTEP GRACE (2026-08-15, latest).** Golem OTA-1272.
+- **⚠⚠⚠ GOLEM — FREEZE SOLVED + THE GIFT SAYS WHO (2026-08-15, latest).** Golem
+  OTA-1273.
+
+  ⚠⚠ **THE FREEZE IS SOLVED, BY THE INSTRUMENTS.** The owner's 4.29.194 About
+  block: *"Qwen completion guard: auto-disabled after 1 completion crashes
+  (template narration in use; auto-retry in 3 boots)"*, `Boot stage:
+  qwen:skipped`, zero model contexts. **The 02:17 freeze was the process dying
+  inside a native llama.rn completion** on his Pixel 10 Pro XL — new Tensor G5,
+  kernel `rnllama_v8_2_fp16_dotprod`, `sveUsed=false i8mm=true`. The guard
+  chain worked end to end: detected next boot, Qwen benched, whole session
+  playable on templates, auto-retry armed. ⚠ **No code changed — the retry
+  boot is the next evidence.** If Qwen crashes again on this SoC, the kernel
+  variant is the suspect and fallback work begins; if it holds, one-off.
+
+  ⚠⚠ **THE FIX THAT SHIPPED:** `giveGift` logged only the recipient's half.
+  His log showed a vendor insult + "Standing -2" arriving out of nowhere 12s
+  after his last typed line — a DESIGNED tastes-system hit (hated gift →
+  refused + insulted + docked) that read as a spontaneous standing dock, to
+  him and to this triage, across two sessions. A GIVE tap now logs
+  `[player] give the X to Y` first, every outcome, like every picker tap.
+  New suite ota1273GiftSaysWho (3).
+
+- **⚠⚠ GOLEM — THE DOORSTEP GRACE (2026-08-15).** Golem OTA-1272.
   Owner, after 4 Mud Wasps killed his fresh character ON the exit tile: *"a
   pack of enemies right outside the door is rough get at least 2 free tile
   moves, then whatever."*

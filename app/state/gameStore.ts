@@ -8086,6 +8086,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!g?.toId || !g.toName || !player) { done(); return; }
     const item = player.inventory.find((i) => i.id === itemId);
     if (!item) { done(); return; }
+    // ⚠⚠ OTA-1273 — SAY WHAT THE PLAYER DID. Every outcome below writes the
+    // RECIPIENT'S half of the exchange and nothing wrote the player's: the
+    // owner's log showed "I still could not build anything out of Aetheric
+    // Locket. Get it off the bench." + "Standing -2" arriving out of NOWHERE,
+    // twelve seconds after his last typed line — a designed tastes-system hit
+    // that read as a spontaneous standing dock, to him and to the triage that
+    // chased it as a bug. A GIVE tap is an action like any picker tap, and
+    // picker taps log their player line.
+    get().appendLog('player', `give the ${item.name} to ${g.toName}`);
     // ⚠ OTA-1154 — THE SAME PREDICATE THE INVENTORY USED TO DRAW THE BUTTON.
     // The UI hides GIVE on anything blocked, so reaching this is either a stale
     // tap or a caller that skipped the UI; either way it refuses with the reason
