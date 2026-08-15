@@ -1871,9 +1871,10 @@ rediscovering them.
   all end the mode identically and no button carries the rule. Completed gives
   clear BEFORE navigating and never trip it. Owner's rule verbatim in the
   suite: "if I leave that screen, I'm no longer giving a gift."
-  ⚠ HAL PARITY UNCHECKED: gift mode predates the picker trial (OTA-1154), so
-  HAL likely has the same hole — check `giftMode`/`setScreen` on HAL next HAL
-  sitting; the guard ports clean if so.
+  ⚠ HAL PARITY: RESOLVED same sitting — owner ordered the port ("the gift and
+  map fix should port to hal"). HAL OTA-1283 carries this guard; HAL OTA-1282
+  carries the outpost graph (golem 1279+1281, including the variant renames —
+  HAL still shipped the duplicate "Plans"/"Vigil" chips).
 
 - **⚠⚠⚠ GOLEM — THE OUTPOST IS ONE GRAPH IN NINE SETS OF CLOTHES (2026-08-15).**
   Golem OTA-1279. The owner answered OTA-1278's audit with the
