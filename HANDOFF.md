@@ -1839,7 +1839,28 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ GOLEM — THE WORKSHOP DOOR (2026-08-15, latest).** Golem OTA-1271. Owner:
+- **⚠⚠ GOLEM — THE DOORSTEP GRACE (2026-08-15, latest).** Golem OTA-1272.
+  Owner, after 4 Mud Wasps killed his fresh character ON the exit tile: *"a
+  pack of enemies right outside the door is rough get at least 2 free tile
+  moves, then whatever."*
+
+  Walking out of an outpost grants free passage for the exit scene + the next
+  TWO overland moves, counted in MOVES as asked. `safeExitMovesLeft` is stamped
+  at all four exit doors, burns per wilderness scene/step, persists in saves.
+
+  ⚠⚠ **FIVE SPAWN MACHINES, NOT ONE — THE FIFTH FOUND THE HONEST WAY.**
+  beginScene's roll was the wasps' door; the overland step has four more
+  (wasteland, corruption purifier, Aetherkin rise, revenant) — and the first
+  draft gated those, passed on fair dice, **then the probe run died to a
+  Forgotten Order war party two steps from the gate** (`maybeSpawnRaid`, a
+  fifth spawner nobody had listed). ⚠ The free-move test now runs on HOT DICE
+  (Math.random pinned so every spawn roll wants to fire): any future ungated
+  spawner fails deterministically instead of surfacing as a device death.
+  Shield-down is proven the same way, so grace cannot have neutered
+  encounters everywhere. Friendly spawns still roll. New suite
+  ota1272DoorstepGrace (4).
+
+- **⚠⚠ GOLEM — THE WORKSHOP DOOR (2026-08-15).** Golem OTA-1271. Owner:
   *"add an exit button there or find a room named after a room that would
   normally have an exit and put it in that room. all outposts should have at
   least 1 exit."*

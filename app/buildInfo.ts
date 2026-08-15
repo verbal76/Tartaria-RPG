@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.194';
+export const DISPLAY_VERSION = '4.29.195';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23490,7 +23490,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New suite ota1271WorkshopDoor (5, incl. the real screen showing EXIT at the
 // gate AND the workshop and NOT in the vault). 810 suites / 7589 tests.
 // DISPLAY_VERSION 4.29.194. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-15-1271-the-workshop-door';
+// ⚠⚠ OTA-1272 — THE DOORSTEP GRACE. Owner, after 4 Mud Wasps killed a fresh
+// character ON the exit tile: "a pack of enemies right outside the door is
+// rough get at least 2 free tile moves, then whatever."
+// Walking out of an outpost now grants free passage for the exit scene + the
+// next TWO overland moves (SAFE_EXIT_FREE_SCENES=3), counted in MOVES as he
+// asked, not hours. player.safeExitMovesLeft is stamped at all four exit
+// doors, burns one unit per wilderness scene/step, and persists across saves.
+// ⚠⚠ FIVE SPAWN MACHINES, NOT ONE. beginScene's roll was the wasps' door; the
+// overland step carries four more (wasteland roll, corruption purifier,
+// Aetherkin rise, revenant) — and a FIFTH, the rival-faction war party, was
+// found the honest way: the first draft gated four, passed on fair dice, and
+// the probe run died to a Forgotten Order war party two steps from the gate.
+// The suite's free-move leg now runs on HOT DICE (Math.random pinned so every
+// spawn roll in the game wants to fire) — any future ungated spawner fails it
+// deterministically. Friendly spawns (stall, trinket, escort) still roll.
+// Shield-down is proven too: same tile, same hot dice, grace spent → spawn.
+// New suite ota1272DoorstepGrace (4). 811 suites / 7593 tests.
+// DISPLAY_VERSION 4.29.195. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-15-1272-the-doorstep-grace';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1271-the-workshop-door';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1270-sweep-exit-and-the-shared-draft';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1267-the-button-crawl';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1266-dead-salvage-predicates';
