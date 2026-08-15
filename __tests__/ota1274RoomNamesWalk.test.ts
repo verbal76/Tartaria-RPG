@@ -200,9 +200,15 @@ describe('OTA-1274 — typing a room name walks you there', () => {
     expect(room()).toBe(before);   // no walk — the verb keeps its sentence
   });
 
-  it('⚠ the intercept never fires outside a hub', () => {
+  it('⚠ the intercept never fires outside a hub', async () => {
     // Outside, 'vault' is honestly the jump verb again — the override is a
     // hub-room rule, not a global rename of the verb.
+    // ⚠ OTA-1284 hardening (found on HAL's twin of this test): leave from the
+    // SAFE gate on a fresh character. The walking tests above can leave a
+    // spawned hostile in a deep room, and with an enemy in the scene
+    // 'leave outpost' is combat movement, not a door.
+    await freshConspiracyAtExplore();
+    expect(room()).toBe('outpost_gate');
     useGameStore.getState().submitPlayerAction('leave outpost');
     expect(room()).toBeNull();
     const before = useGameStore.getState().player!.hoursElapsed ?? 0;
