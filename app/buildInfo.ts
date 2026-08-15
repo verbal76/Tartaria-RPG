@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.159';
+export const DISPLAY_VERSION = '4.29.160';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24570,7 +24570,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New tests folded into ota1198MemoryInterlock (15 total). ota1195
 // assertions RETARGETED, not weakened - both came out stronger.
 // DISPLAY_VERSION 4.29.109.
-export const OTA_BUILD_ID = '2026-08-12-1254-verbs-do-not-eat-each-other';
+// ⚠⚠ OTA-1296 — THE LORE TRAPDOOR + THE SNAPSHOT TITLE LIST (ports of golem
+// OTA-1292 + 1294, owner-ordered back-button audit across all three lines).
+// (1) LoreScreen's BACK was hard-wired setScreen('title') while the
+// exploration crest nav links here mid-game — reading the bestiary dumped a
+// live session onto the character select. Conditional now: live character →
+// exploration. (2) The character select was a boot-time snapshot; a character
+// created this session was missing from it, so that select read as a WIPE on
+// the owner's golem device while the disk record was intact. TitleScreen
+// refreshes the slot list on every mount. Audit result for this line: every
+// other back is correct (in-game screens → exploration, creation/ending →
+// title, Settings conditional). New suites ota1296LoreBackStaysInGame (4) +
+// ota1296TitleListTellsTheTruth (2). DISPLAY_VERSION 4.29.160.
+export const OTA_BUILD_ID = '2026-08-15-1296-back-buttons-act-correctly';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-12-1254-verbs-do-not-eat-each-other';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-12-1253-name-hygiene';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-11-1252-desktop-controls';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-11-1251-desktop-first-run';

@@ -1676,7 +1676,17 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ THREE VERBS SHARING TWO MARKERS (2026-08-12, latest). HAL ONLY so far —
+- **⚠⚠⚠ BACK BUTTONS ACT CORRECTLY (2026-08-15, latest). STEAM OTA-1296 —
+  ports of golem OTA-1292 + 1294, from the owner-ordered audit of every back
+  button on all three lines.** (1) LoreScreen's BACK was hard-wired to the
+  title while the exploration crest nav links there mid-game — reading the
+  bestiary dumped a live session onto the character select. Conditional now.
+  (2) The character select was a boot-time snapshot — a character created
+  this session was missing from it, which on the owner's golem device read
+  as a WIPE while the disk record was intact. The list refreshes on every
+  mount. Every other back on this line verified correct.
+
+- **⚠⚠ THREE VERBS SHARING TWO MARKERS (2026-08-12). HAL ONLY so far —
   golem batch pending.** HAL OTA-1254. Owner, from a phone session:
   *"investigate kills salvage sometimes, salvage can kill items in take."* Both
   true, and **the contract is written down in `app/engine/types.ts` on the marker
