@@ -230,7 +230,10 @@ describe('OTA-1195 — the tap breadcrumb', () => {
     // button. Every one of these paths is wrapped.
     const i = STORE.indexOf('export function logUiTap');
     expect(i).toBeGreaterThan(-1);
-    const block = STORE.slice(i, i + 400);
+    // ⚠ Window widened 400→1200 at OTA-1288: the freeze-breadcrumb stamp (and
+    // its why-comment) now live inside the same try. The RULE is unchanged —
+    // the whole body is wrapped and a throw can never reach the press handler.
+    const block = STORE.slice(i, i + 1200);
     expect(block).toContain('try {');
     expect(block).toContain('catch');
   });

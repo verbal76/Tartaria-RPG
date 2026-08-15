@@ -290,18 +290,28 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // its existing thing; only the chip LABEL changes. Outside a hub
   // the row renders cardinals as before.
   const hubRoom = useMemo(() => (hubRoomId ? hubRoomFor(hubRoomId, skinFactionId) : null), [hubRoomId, skinFactionId]);
+  // ⚠⚠ OTA-1289 (port of golem OTA-1277) — the ✓ visited mark. Owner: "I don't
+  // know if I've been to a room yet or not... put a little symbol in the room
+  // button if it's already been explored... I'm cycling through like 15 names."
+  // His golem log proved it: Memorial visit 5, Workshop visit 4, Hearth visit 3,
+  // inside seven minutes. Reads worldMemory.hubVisited — the SAME set beginScene
+  // earns per room entered — so the mark can never disagree with the game.
+  const hubVisited = useGameStore((st) => st.worldMemory.hubVisited);
   const hubExitChips: Array<{ label: string; submit: string }> = useMemo(() => {
     if (!hubRoom) return [];
+    const seen = new Set(hubVisited ?? []);
     const out: Array<{ label: string; submit: string }> = [];
     for (const dir of ['north', 'south', 'east', 'west'] as const) {
       const targetId = hubRoom.exits[dir];
       if (!targetId) continue;
       const targetRoom = hubRoomFor(targetId, skinFactionId);
-      const label = targetRoom?.shortName?.toUpperCase() ?? dir.toUpperCase();
-      out.push({ label, submit: `go ${dir}` });
+      const name = targetRoom?.shortName?.toUpperCase() ?? dir.toUpperCase();
+      // ✓ = already walked. Prefixed rather than suffixed so the marks line up
+      // in a row of four chips and read as a column at a glance.
+      out.push({ label: seen.has(targetId) ? `✓ ${name}` : name, submit: `go ${dir}` });
     }
     return out;
-  }, [hubRoom, skinFactionId]);
+  }, [hubRoom, skinFactionId, hubVisited]);
 
   // ⚠ OTA-1217 (PUNCHLIST P11) — the EXIT chip belongs ONLY in the gate room. Showing it in
   // every room let the player leave through the armory or the mess, which is not how the

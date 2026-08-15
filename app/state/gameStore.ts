@@ -120,7 +120,11 @@ import {
   getLastSaveWriteError,
   consumeSaveReclaimedFlag,
   type SlotSummary,
+  stampLiveBreadcrumb,          // OTA-1288
+  readLiveBreadcrumb,           // OTA-1288
+  clearLiveBreadcrumb,          // OTA-1288
 } from '../engine/saveSystem';
+import { setLastBootBreadcrumb } from '../diagnostics/runtimePressure'; // OTA-1288
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName, nameWasAltered } from '../engine/playerName';
@@ -264,6 +268,7 @@ import {
   findHubRoom,
   resolveHubTravel,
   isLeaveHubCommand,
+  isBareExitCommand,
   matchHubRoomName,
 } from '../engine/hub';
 import {
@@ -2117,6 +2122,20 @@ let qwenReinitCeilingLogged = false;
 // the app was genuinely put away and the context genuinely disposed. Tracking the two
 // separately is what stops an incidental twitch from buying a 400MB reload.
 let qwenTrulyBackgrounded = false;
+// ⚠⚠ OTA-1287 (port of golem OTA-1278) — the shared settle gate. App.tsx
+// debounces its re-warm; the watchdog must observe the SAME quiet period or it
+// simply re-opens the door App.tsx just closed. Mirrors QWEN_REWARM_DELAY_MS.
+const QWEN_FOREGROUND_SETTLE_MS = 8_000;
+let qwenForegroundSince: number | null = null;
+let qwenUnsettledLogged = false;
+function qwenForegroundSettled(): boolean {
+  // Unknown (tests / headless) reads as settled — the gate must never be the
+  // reason a legitimate recovery cannot happen.
+  if (qwenForegroundSince === null) return true;
+  return Date.now() - qwenForegroundSince >= QWEN_FOREGROUND_SETTLE_MS;
+}
+export function _qwenSetForegroundSince(t: number | null): void { qwenForegroundSince = t; }
+export function _qwenForegroundSettled(): boolean { return qwenForegroundSettled(); }
 let qwenReinitAttempts = 0;
 let qwenBackoffLevel = 0;
 let qwenHeldWhileBackgroundLogged = false;
@@ -2252,6 +2271,23 @@ function runQwenHealthCheck(
         }
         return false;
       }
+      // ⚠⚠ OTA-1287 (port of golem OTA-1278) — THE WATCHDOG MUST NOT WALK
+      // THROUGH THE DEBOUNCE. Golem's log proved the bypass by ORDER: the
+      // watchdog fired 2ms BEFORE the appstate line it was reacting to, and
+      // three ~425MB loads landed across three 3-second visits with BOTH
+      // debounce cancels logging. App.tsx owns the re-warm policy; this owns
+      // recovery DURING play. They must agree, and a rule enforced in one
+      // place only is not a rule.
+      if (!qwenForegroundSettled()) {
+        if (!qwenUnsettledLogged) {
+          qwenUnsettledLogged = true;
+          get().appendLog('debug',
+            'qwen-watchdog: holding reinit — foreground has not settled '
+            + `(${QWEN_FOREGROUND_SETTLE_MS}ms). App-switching must not cost a ~425MB load.`);
+        }
+        return false;
+      }
+      qwenUnsettledLogged = false;
       // Not ready and not making progress (idle / failed / dormant ready-but-
       // dead / wedged): kick a fresh reinit. Keeps retrying so a transient
       // memory-pressure failure doesn't strand Qwen for the session — but
@@ -2374,8 +2410,16 @@ function startQwenWatchdog(
       // and OTA-1107's own comment says "kicking a ~400MB context load from the
       // background is guaranteed wasted work". iOS walked straight through that rule.
       // Requiring a genuine `background` first is what closes it.
-      if (next === 'background') { qwenTrulyBackgrounded = true; return; }
+      if (next === 'background') {
+        qwenTrulyBackgrounded = true;
+        qwenForegroundSince = null;   // OTA-1287 — the clock restarts on return
+        return;
+      }
       if (next !== 'active') return; // `inactive` alone is a twitch, not a return.
+      // ⚠ OTA-1287 — stamp the return, then let the gate above decide. The tick
+      // still runs (backoff resets, health is still checked); what it may no
+      // longer do is spend ~425MB on a foreground that has not settled.
+      if (qwenForegroundSince === null) qwenForegroundSince = Date.now();
       if (!qwenTrulyBackgrounded) return;
       qwenTrulyBackgrounded = false;
       qwenBackoffLevel = 0;
@@ -2456,6 +2500,19 @@ export function noteSaveKb(kb: number): void { rpLastSaveKb = kb; }
 export function logUiTap(label: string): void {
   try {
     useGameStore.getState().appendLog('debug', `ui: tap "${label}"`);
+    // ⚠⚠ OTA-1288 (port of golem OTA-1276) — AND STAMP IT WHERE A WEDGE CANNOT
+    // SWALLOW IT. The line above goes into the BATCHED disk log, which drains
+    // on a promise chain — and a wedged JS thread never drains it, so the last
+    // lines before a freeze are lost and the log appears to end early. This
+    // single tiny write races ahead of the wedge, so the next boot can name
+    // the last control touched.
+    const bcSt = useGameStore.getState();
+    stampLiveBreadcrumb({
+      at: Date.now(),
+      what: `tap "${label}"`,
+      screen: bcSt.currentScreen,
+      room: bcSt.player?.hubRoomId ?? bcSt.player?.currentLocationId ?? undefined,
+    });
   } catch { /* never let instrumentation break a control */ }
 }
 
@@ -8105,6 +8162,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!g?.toId || !g.toName || !player) { done(); return; }
     const item = player.inventory.find((i) => i.id === itemId);
     if (!item) { done(); return; }
+    // ⚠⚠ OTA-1286 (port of golem OTA-1273) — SAY WHAT THE PLAYER DID. Every
+    // outcome below writes the RECIPIENT'S half of the exchange and nothing
+    // wrote the player's: on the owner's golem device a designed tastes-system
+    // hit ("Standing -2") arrived twelve seconds after his last typed line and
+    // read as a spontaneous standing dock — to him AND to the triage that
+    // chased it as a bug. A GIVE tap is an action like any other tap, and taps
+    // log their player line.
+    get().appendLog('player', `give the ${item.name} to ${g.toName}`);
     // ⚠ OTA-1177 — THE SAME PREDICATE THE INVENTORY USED TO DRAW THE BUTTON.
     // The UI hides GIVE on anything blocked, so reaching this is either a stale
     // tap or a caller that skipped the UI; either way it refuses with the reason
@@ -8391,6 +8456,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   async hydrate() {
+    // ⚠⚠ OTA-1288 (port of golem OTA-1276) — READ THE SURVIVOR FIRST, then
+    // clear it. A breadcrumb still on disk at boot means the LAST session died
+    // while it was live: no orderly background, no clean exit — the swipe-kill
+    // after a hard freeze. It is the only record of what the app was doing at
+    // the moment the JS thread stopped; the batched disk log cannot say.
+    try {
+      const crumb = await readLiveBreadcrumb();
+      if (crumb) {
+        setLastBootBreadcrumb(crumb);
+        get().appendLog('debug',
+          `freeze forensics: last boot ended mid-action — ${crumb.what} @ ${crumb.room ?? '?'} (${new Date(crumb.at).toISOString()})`);
+        await clearLiveBreadcrumb();
+      }
+    } catch { /* forensics must never block a boot */ }
     // OTA-1128 — Qwen telemetry sink. Every generation records at the runtime
     // boundary (qwenTelemetry.ts); this surfaces each call in the debug log —
     // `qwen⏱ <job> <outcome> <total>ms` with the lock-wait share when it is a
@@ -12509,6 +12588,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // records that idleness ENDED, this records when it began counting again.
     // The scene-intro bank measures its stillness from here.
     set({ lastPlayerActionAt: Date.now() });
+    // ⚠⚠ OTA-1288 (port of golem OTA-1276) — the unbatched breadcrumb, at the
+    // one door every typed and chip-driven action passes through. The batched
+    // disk log cannot survive a JS wedge; this can.
+    try {
+      const bcPlayer = get().player;
+      stampLiveBreadcrumb({
+        at: Date.now(),
+        what: `action "${trimmed.slice(0, 60)}"`,
+        screen: get().currentScreen,
+        room: bcPlayer?.hubRoomId ?? bcPlayer?.currentLocationId ?? undefined,
+      });
+    } catch { /* instrumentation never blocks an action */ }
 
     // OTA-1099 — the talk/parley sheets don't lock the screen the way the old
     // modals did (that was the point: the feed stays readable, and so do the
@@ -12725,8 +12816,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // allowance would REFUSE the very command the beat asks for — the typed
         // twin of the greyed-out button.
         const isLookCmd = /^\s*(look|look\s+around(\s+you)?|examine\s+room|survey)\s*$/i.test(trimmed);
-        const isLeaveCmd = isLeaveHubCommand(trimmed)
-          || /^\s*(exit|outside|step\s+out|get\s+out)\s*$/i.test(trimmed);
+        // ⚠ OTA-1285 (port of golem OTA-1269) — ONE bare-exit rule, shared.
+        // This allowance and the building EXIT below each carried their own
+        // inline regex, and neither agreed with the travel path — bare `leave`
+        // was refused here while `exit` fell through to overland wander.
+        const isLeaveCmd = isLeaveHubCommand(trimmed) || isBareExitCommand(trimmed);
         // OTA-1063 — the lockdown must never outrank a live enemy. A summit
         // overlay (or any other spawn) can drop a hostile into a tutorial
         // beat, and before this every verb but the beat's own was refused:
@@ -12855,7 +12949,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const inBuilding = get().activeBuildingId;
       if (inBuilding) {
         // EXIT back to the open world.
-        if (isLeaveHubCommand(trimmed) || /^\s*(exit|outside|step\s+out|get\s+out)\s*$/i.test(trimmed)) {
+        if (isLeaveHubCommand(trimmed) || isBareExitCommand(trimmed)) {
           if (!_opts?.silent) get().appendLog('player', trimmed);
           get().exitBuilding();
           return;
@@ -17865,7 +17959,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // stamina gate below, so 0 stamina never blocks an interior step.
         // Leaving the outpost (isLeaveHubCommand) is real overland travel
         // and falls through to the gated/charged path.
-        if (player.hubRoomId && !isLeaveHubCommand(trimmed)) {
+        if (player.hubRoomId && !isLeaveHubCommand(trimmed) && !isBareExitCommand(trimmed)) {
           const skin = hubSkinFactionFor(player.currentLocationId, player.factionId);
           // ⚠ OTA-1284 — the skin rides into resolution: the player types the
           // name on THEIR screen ('operations', 'promenade'), not the base
@@ -17980,7 +18074,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // 'go north' meaning the gate→square step instead of a Macro
         // tile shift, and 'go armory' a direct room jump.
         if (player.hubRoomId) {
-          if (isLeaveHubCommand(trimmed)) {
+          // ⚠ OTA-1285 — bare `exit` / `leave` count as leaving. Before this
+          // they fell through into overland travel with NO destination: at
+          // zero stamina a stamina refusal, otherwise a narrated wander that
+          // spent an hour (four typed attempts on the owner's golem device
+          // before the taught phrase landed; HAL had it identically).
+          if (isLeaveHubCommand(trimmed) || isBareExitCommand(trimmed)) {
             set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
             set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
             get().appendLog(

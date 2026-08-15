@@ -139,7 +139,9 @@ describe('OTA-1196 — an iOS twitch no longer buys a 400MB reload', () => {
     // three times, each pair ~350ms apart, each buying a fresh reload.
     const code = codeOnly(STORE);
     expect(code).not.toContain("if (next === 'active') { qwenBackoffLevel = 0; tick(); }");
-    expect(code).toContain("if (next === 'background') { qwenTrulyBackgrounded = true; return; }");
+    // ⚠ OTA-1287 widened this handler (foreground-settle clock restart rode in);
+    // the RULE is unchanged: only a genuine `background` sets the flag.
+    expect(code).toMatch(/if \(next === 'background'\) \{[\s\S]{0,300}?qwenTrulyBackgrounded = true;/);
     expect(code).toContain("if (next !== 'active') return;");
     expect(code).toContain('if (!qwenTrulyBackgrounded) return;');
   });
@@ -162,7 +164,7 @@ describe('OTA-1196 — an iOS twitch no longer buys a 400MB reload', () => {
     // that one site is the `background` branch.
     const assigns = STORE.match(/qwenTrulyBackgrounded = true/g) ?? [];
     expect(assigns.length).toBe(1);
-    expect(STORE).toContain("if (next === 'background') { qwenTrulyBackgrounded = true; return; }");
+    expect(STORE).toMatch(/if \(next === 'background'\) \{[\s\S]{0,300}?qwenTrulyBackgrounded = true;/);
   });
 });
 

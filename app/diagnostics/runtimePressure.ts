@@ -153,8 +153,28 @@ export interface PressureSnapshot {
 
 /** The block that rides along in every COPY / SHARE bug report, so the counts are visible
  *  in the header rather than only reconstructable by reading 146 log lines. */
+// ⚠⚠ OTA-1288 (port of golem OTA-1276) — the breadcrumb that survived the LAST
+// boot, if any. Loaded once at hydrate (see gameStore) and printed here, because
+// the freeze this file was built for is one it structurally CANNOT see: a wedged
+// JS thread stops the setTimeout sampler and requestAnimationFrame alike (both
+// are JS timers in RN), so "no stalls seen" prints straight through a hard
+// freeze. The breadcrumb is written ahead of the wedge instead of measured
+// after it.
+let rpLastBreadcrumb: { at: number; what: string; screen?: string; room?: string } | null = null;
+export function setLastBootBreadcrumb(c: typeof rpLastBreadcrumb): void { rpLastBreadcrumb = c; }
+
 export function runtimePressureSummary(s: PressureSnapshot): string {
   const out: string[] = ['Runtime pressure'];
+  if (rpLastBreadcrumb) {
+    const ago = Math.max(0, Date.now() - rpLastBreadcrumb.at);
+    const mins = Math.round(ago / 60_000);
+    out.push(`  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.`);
+    out.push(`     Last thing the app did: ${rpLastBreadcrumb.what}`);
+    out.push(`     Where: ${rpLastBreadcrumb.room ?? '(unknown)'} on ${rpLastBreadcrumb.screen ?? '(unknown)'} screen`);
+    out.push(`     When: ${new Date(rpLastBreadcrumb.at).toISOString()} (${mins} min before this boot)`);
+    out.push(`     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines`);
+    out.push(`       die in memory when the JS thread wedges. Trust this line over it.`);
+  }
   out.push(s.memoryWarnings === 0
     ? `  Memory warnings: none this session`
     : `  ⚠ Memory warnings: ${s.memoryWarnings} this session`);

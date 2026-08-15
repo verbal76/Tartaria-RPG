@@ -444,3 +444,17 @@ export function isLeaveHubCommand(rawInput: string): boolean {
          /\bleave\s+the\s+gate\b/i.test(rawInput) ||
          /\b(head|go|walk|travel)\s+(out|outside|into the wild)\b/i.test(rawInput);
 }
+
+/** ⚠⚠ OTA-1285 (port of golem OTA-1269) — a bare "get me out of here", with no container named.
+ *  Owner's device run: he typed `exit`, then `leave`, four attempts — bare
+ *  `exit` fell through the hub gate into overland travel with no target and
+ *  narrated a floorboard search (+1h); bare `leave` was refused by the wander
+ *  path's hook-thread block; only the taught phrase `leave outpost` worked.
+ *  The bare-word rule ALREADY existed twice before this function — the
+ *  tutorial's explore_or_leave allowance and the building-interior EXIT each
+ *  carried their own inline regex, and neither agreed with the travel path —
+ *  the session's recurring rule-computed-twice failure, in its ninth suit.
+ *  One predicate now, three callers, and bare `leave` counts everywhere. */
+export function isBareExitCommand(rawInput: string): boolean {
+  return /^\s*(exit|leave|outside|step\s+out|get\s+out(\s+of\s+here)?|leave\s+here)\s*$/i.test(rawInput);
+}

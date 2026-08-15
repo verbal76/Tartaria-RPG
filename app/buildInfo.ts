@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.168';
+export const DISPLAY_VERSION = '4.29.173';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24597,7 +24597,49 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // while the played path was broken; the store-level suite closes that gap).
 // New suite ota1284BareRoomNames (9). 796 suites / 7462 tests.
 // DISPLAY_VERSION 4.29.168.
-export const OTA_BUILD_ID = '2026-08-15-1284-bare-room-names-walk';
+// ⚠⚠ OTA-1285 — BARE EXIT/LEAVE MEAN LEAVE (port of golem OTA-1269). Bare
+// `exit` fell through the hub gate into overland travel with no target and
+// narrated a floorboard search (+1h); bare `leave` was refused by the wander
+// path. The bare-word rule already existed as two disagreeing inline regexes
+// (tutorial allowance, building EXIT) — one predicate now, four callers.
+// New suite ota1285BareExit (5). DISPLAY_VERSION 4.29.169.
+// ⚠⚠ OTA-1286 — GIFTS SAY WHAT YOU DID (port of golem OTA-1273). Every gift
+// outcome wrote the recipient's half and nothing wrote the player's — a
+// designed tastes-system standing hit read as a spontaneous dock. One player
+// line at the top of giveGift. New suite ota1286GiftSaysWho (3).
+// DISPLAY_VERSION 4.29.170.
+// ⚠⚠ OTA-1287 — THE 425MB RELOAD THRASH, BOTH DOORS (port of golem OTA-1275 +
+// 1278). App.tsx re-warmed the parked model INSTANTLY on every foreground —
+// six full loads in four minutes on the owner's golem device, and HAL had the
+// identical arb140 code. Re-warm now waits for an 8s settled foreground, the
+// cancel fires on inactive too, and the watchdog observes the SAME settle
+// window (golem proved by log ORDER that it bypassed the debounce — fired 2ms
+// before the appstate line it reacted to). Dump on background stays immediate;
+// only the reload waits. Suites ota1287RewarmDebounce (8) +
+// ota1287WatchdogRespectsDebounce (6), pinned equal so the doors cannot drift.
+// DISPLAY_VERSION 4.29.171.
+// ⚠⚠ OTA-1288 — FREEZE FORENSICS BREADCRUMB (port of golem OTA-1276). The
+// batched disk log CANNOT show a freeze: pendingLogLines drain on a promise
+// chain and a wedged JS thread never drains it, the setTimeout sampler dies,
+// and rAF is a JS timer in RN — so "no stalls seen" prints through a hard
+// freeze and the log's tail lies. One tiny UNBATCHED single-key write at every
+// tap and every action, cleared on orderly exit; a survivor at boot means the
+// process died live and the About report says LAST BOOT DIED MID-ACTION with
+// the action, room and time — and says the log tail is unreliable. New suite
+// ota1288FreezeForensics (10). DISPLAY_VERSION 4.29.172.
+// ⚠⚠ OTA-1289 — ✓ VISITED MARKS (port of golem OTA-1277 part 1, owner: "is
+// the ✓ really only applicable to golem?"). Room chips show ✓ when already
+// walked, read off worldMemory.hubVisited — the same set beginScene earns —
+// so the mark cannot disagree with the game. ⚠ The gear-ranking half of golem
+// 1277 has NO landing site here: gatherSort/upgradeEquipSlot is picker-trial
+// machinery and does not exist on this line (checked, not assumed). New suite
+// ota1289VisitedMarks (2). DISPLAY_VERSION 4.29.173.
+export const OTA_BUILD_ID = '2026-08-15-1289-visited-marks';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1288-freeze-forensics';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1287-rewarm-debounce-both-doors';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1286-gift-says-who';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1285-bare-exit';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1284-bare-room-names-walk';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1283-gift-ends-at-the-door';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1282-universal-outpost-graph';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1265-negation-and-questions';

@@ -609,6 +609,60 @@ export function appendLogToDisk(line: string): Promise<void> {
   return logWriteChain;
 }
 
+// ⚠⚠ OTA-1288 (port of golem OTA-1276) — THE LIVE BREADCRUMB, AND WHY IT CANNOT USE THE CHAIN ABOVE.
+//
+// The owner froze mid-game twice and both times the disk log simply STOPPED —
+// and I read those cutoffs as the freeze point. They are not. `appendLogToDisk`
+// batches into `pendingLogLines` and drains on a PROMISE CHAIN, and promises are
+// serviced by the JS thread. **A wedged JS thread never drains the buffer**, so
+// the final lines before a freeze die in memory and never reach disk. The log
+// ends at the last successful FLUSH, which can be many actions earlier.
+//
+// His freeze #2 is what proved the wedge: buttons dead, feed still scrollable.
+// In React Native scrolling is native and survives; onPress needs JS. So the JS
+// thread is stuck in a loop — which also stops the batch drain, the setTimeout
+// freeze sampler AND requestAnimationFrame (a JS timer in RN, JSTimers.js:257),
+// which is why "Freeze watch: no stalls seen" printed straight through a freeze.
+//
+// So this breadcrumb is deliberately NOT batched and NOT chained: one tiny
+// single-key write, issued the moment an action starts, with no read-modify-write
+// of the 400KB log. It races ahead of the wedge instead of queueing behind it.
+// Next boot reads it and can say what the app was ACTUALLY doing last.
+const LAST_BREADCRUMB_KEY = '@tartaria/lastBreadcrumb';
+
+export interface LiveBreadcrumb {
+  at: number;
+  what: string;
+  screen?: string;
+  room?: string;
+}
+
+/** Fire-and-forget. Never awaited by callers — a breadcrumb that could block an
+ *  action would be a worse bug than the one it documents. */
+export function stampLiveBreadcrumb(crumb: LiveBreadcrumb): void {
+  try {
+    void AsyncStorage.setItem(LAST_BREADCRUMB_KEY, JSON.stringify(crumb)).catch(() => { /* ignore */ });
+  } catch { /* never let instrumentation break the game */ }
+}
+
+export async function readLiveBreadcrumb(): Promise<LiveBreadcrumb | null> {
+  try {
+    const raw = await AsyncStorage.getItem(LAST_BREADCRUMB_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw) as LiveBreadcrumb;
+    return typeof p?.at === 'number' && typeof p?.what === 'string' ? p : null;
+  } catch { return null; }
+}
+
+/** Cleared on an ORDERLY exit (background / save-and-quit). A breadcrumb that
+ *  SURVIVES to the next boot therefore means the process died while it was
+ *  still live — the signature of the hard freeze + swipe-kill the owner keeps
+ *  having to do. Same discipline as arb126's in-flight crash breadcrumbs. */
+export async function clearLiveBreadcrumb(): Promise<void> {
+  try { await AsyncStorage.removeItem(LAST_BREADCRUMB_KEY); } catch { /* ignore */ }
+}
+
+
 // Block until every queued log write has flushed to disk. Called by
 // LogScreen before reading so COPY ALL captures the entire history,
 // not whatever snapshot won the race at unmount time.

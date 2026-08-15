@@ -1676,7 +1676,28 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ THE OUTPOST GRAPH + GIFT-MODE DOOR (2026-08-15, latest). HAL — BOTH
+- **⚠⚠⚠ THE FOUR-FIX BATCH + ✓ MARKS (2026-08-15, latest). HAL — ALL PORTED
+  FROM GOLEM UNDER THE PRECEDENCE RULING** (*"I don't want open errors"* /
+  *"port all 4"*). HAL OTA-1285…1289 in one sitting:
+  · 1285 bare `exit`/`leave` mean leave (golem 1269) — one predicate, four
+    callers; the overland-wander hole is closed.
+  · 1286 gifts say what you did (golem 1273) — the player line lands before
+    any outcome.
+  · 1287 the 425MB reload thrash, BOTH doors (golem 1275+1278) — 8s settled-
+    foreground debounce on the re-warm AND the watchdog, pinned equal.
+  · 1288 freeze forensics breadcrumb (golem 1276) — unbatched single-key
+    stamp at every tap/action; a survivor at boot prints LAST BOOT DIED
+    MID-ACTION in the About report. HAL freezes are now diagnosable.
+  · 1289 ✓ visited marks (golem 1277 part 1), on the owner's challenge —
+    he was right, it reads a memory HAL already keeps. ⚠ The gear-ranking
+    half has NO landing site here (gatherSort/upgradeEquipSlot is
+    picker-trial code; checked, not assumed) — it arrives if the trial
+    merges.
+  With these, every non-directional golem fix known to this file is on HAL.
+  What remains golem-only IS the trial: picker UI, investigate-all pacing,
+  exploration draft, gear auto-pick, salvage modal.
+
+- **⚠⚠⚠ THE OUTPOST GRAPH + GIFT-MODE DOOR (2026-08-15). HAL — BOTH
   PORTED FROM GOLEM, OWNER-DIRECTED** (*"the gift and map fix should port to
   hal"*). HAL OTA-1282 (from golem OTA-1279 + 1281) and OTA-1283 (from golem
   OTA-1280).
