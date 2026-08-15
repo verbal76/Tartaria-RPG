@@ -1,4 +1,4 @@
-// OTA-963 — BOSS SPOILS TABLE. Owner spec: "there shouldn't be any boss fight that ends
+// OTA-940 — BOSS SPOILS TABLE. Owner spec: "there shouldn't be any boss fight that ends
 // in mud cloth and scrap metal — they're supposed to be dropping high-end materials,
 // some good recipes, rare-but-not-Legendary armor and weapons; Guardians and Tower
 // bosses drop Legendary but already have their own loot table."

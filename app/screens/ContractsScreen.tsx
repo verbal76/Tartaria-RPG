@@ -11,7 +11,7 @@ import { findFactionQuestById, FACTION_QUESTS, type FactionQuestDef } from '../e
 import { missionTurnInReady } from '../engine/missionReady';
 import { escortToggleLabel } from '../engine/escort';
 import { FACTIONS } from '../engine/factions';
-// OTA-1073 — Phase 1 slice 2: the Chronicle's people column.
+// OTA-1050 — Phase 1 slice 2: the Chronicle's people column.
 import { knownPeople, npcRegard, REGARD_LABEL, dealingsSummary } from '../engine/npcMemory';
 import { startingLocationForFaction } from '../engine/character';
 import { missionObjectiveLocationId } from '../engine/missionRouting';
@@ -32,7 +32,7 @@ import {
   phaseHint,
   LOST_CAPITAL_LOCATIONS,
   coreGateNextAction,
-  canStayAtTheNexus, // OTA-1248 — the earned fourth door
+  canStayAtTheNexus, // OTA-1225 — the earned fourth door
 } from '../engine/mainQuest';
 import { GUARDIANS_BY_CAPITAL } from '../engine/coreGuardians';
 
@@ -100,7 +100,7 @@ export function ContractsScreen() {
   const setContractActive = useGameStore((s) => s.setContractActive);
   const routeMission = useGameStore((s) => s.routeMission);
   const discardLead = useGameStore((s) => s.discardLead);
-  // OTA-1037 — the refusal strip answers THIS visit's taps; don't let a stale line
+  // OTA-1014 — the refusal strip answers THIS visit's taps; don't let a stale line
   // greet the next visit to the screen.
   useEffect(() => () => { useGameStore.getState().clearContractsNotice(); }, []);
   const turnInSigil = useGameStore((s) => s.turnInSigil);
@@ -121,7 +121,7 @@ export function ContractsScreen() {
   // toggle inside the expanded Primary Objective box. Local state (view option),
   // matching the screen's other toggles; not persisted.
   //
-  // OTA-1175 — the boolean became a THREE-WAY MODE when READY TO HAND IN joined
+  // OTA-1152 — the boolean became a THREE-WAY MODE when READY TO HAND IN joined
   // it. Two independent toggles would have allowed four states, two of them
   // nonsense ("ready first, but don't sort by distance" — ready contracts sort by
   // distance BY DEFINITION here). One mode, two buttons, each tap clearing the
@@ -195,12 +195,12 @@ export function ContractsScreen() {
     const info = ck ? contractMarkerByKey[ck] : undefined;
     return info ? <Text style={styles.contractBadge}>{info.number}◆ </Text> : null;
   };
-  // ⚠ OTA-1190 — `tracked` GATES THE ROUTE. This offered ROUTE on a PAUSED contract, so
+  // ⚠ OTA-1167 — `tracked` GATES THE ROUTE. This offered ROUTE on a PAUSED contract, so
   // a player could walk the whole way to an objective for a run that is not advancing,
   // arrive, meet nothing to do with the contract, and reasonably conclude the hunt was
   // broken. (Reported: routed to a hunt anchor, fought a Core Guardian, no hunt beat —
   // because the run had never been activated.) The card already SAID "⏸ PAUSED" two rows
-  // up; the button beneath it disagreed. Same defect family as OTA-1187: a control that
+  // up; the button beneath it disagreed. Same defect family as OTA-1164: a control that
   // acts without the state that gives it meaning.
   const contractRoute = (toggleKey: string, tracked = true) => {
     const ck = toContractKey(toggleKey);
@@ -261,7 +261,7 @@ export function ContractsScreen() {
   // else leave the order untouched. Placeless entries (null) sort last. Sections
   // are never merged — this only reorders within one type, keeping the grouping.
   //
-  // OTA-1175 — in READY mode the ready-to-hand-in entries rise to the top of
+  // OTA-1152 — in READY mode the ready-to-hand-in entries rise to the top of
   // their section first, THEN distance breaks the tie inside each half. Sections
   // that pass no `readyOf` (nothing in them can be handed in) simply sort by
   // distance in both modes, which is what they did before.
@@ -378,7 +378,7 @@ export function ContractsScreen() {
   const hasRelic = (name: string) =>
     (player.inventory ?? []).some((i) => i.name === name && (i.quantity ?? 1) > 0);
 
-  // OTA-1175 — READINESS, ONCE, FOR EVERY KIND. These three wrappers are the only
+  // OTA-1152 — READINESS, ONCE, FOR EVERY KIND. These three wrappers are the only
   // places this screen asks "can it be handed in?", and all three go through
   // engine/missionReady. The card pills, the COMPLETE gates and the READY TO HAND
   // IN sort therefore cannot disagree — which they could before, when each section
@@ -407,7 +407,7 @@ export function ContractsScreen() {
     hasItem: hasRelic,
   });
 
-  // OTA-1175 — a faction contract's card swaps the distance it shows once the work
+  // OTA-1152 — a faction contract's card swaps the distance it shows once the work
   // is done: en route it points at the OBJECTIVE, ready it points at the faction
   // HOME you hand it in at. The distance SORT was still keying off the objective,
   // so a ready contract sorted by a number its own card was not displaying. One
@@ -418,7 +418,7 @@ export function ContractsScreen() {
     return factionRecReady(fq.rec, fq.def) ? home : (missionObjectiveLocationId(fq.def) ?? home);
   };
 
-  // OTA-1175 — THE READY TO HAND IN ROLL-UP. The owner asked for the ready ones
+  // OTA-1152 — THE READY TO HAND IN ROLL-UP. The owner asked for the ready ones
   // "right to the top", pulled FROM the groups — floating them inside their own
   // section would not have done that: a ready faction contract sits below Hunts,
   // Mysteries and Storylines, so "top of its group" can still be most of a screen
@@ -493,7 +493,7 @@ export function ContractsScreen() {
       (movesTo(b.locId) ?? Number.POSITIVE_INFINITY),
   );
 
-  // OTA-1025 — count only records whose DEF still resolves: the cards filter
+  // OTA-1002 — count only records whose DEF still resolves: the cards filter
   // orphans out, and the header must agree (never "6 ACTIVE" over 5 cards).
   const totalActive =
     hunts.filter((h) => h.def).length
@@ -515,7 +515,7 @@ export function ContractsScreen() {
 
   return (
     <View style={styles.container}>
-      {/* OTA-1228 — v2 id: the body gained the host hand-in rule (OTA-1224) and dismissals
+      {/* OTA-1205 — v2 id: the body gained the host hand-in rule (OTA-1201) and dismissals
           are per-install, so the old id would hide the new line from existing testers. */}
       <FirstTimeHint
         id="contracts_first_open_v2"
@@ -549,7 +549,7 @@ export function ContractsScreen() {
         // they've attempted, and which Capitals are still untouched.
         if (!player) return null;
         const mq = ensureMainQuest(player.mainQuest);
-        // OTA-1248 — asked once per render, at the same place the phase is read.
+        // OTA-1225 — asked once per render, at the same place the phase is read.
         const canStay = canStayAtTheNexus(player, worldMemory);
         const recoveredCount = mq.coresRecovered.length;
         const fledByCapital = (worldMemory.memorableEvents ?? []).reduce<Record<string, number>>(
@@ -623,7 +623,7 @@ export function ContractsScreen() {
                   <Text style={styles.mqTrackerHead}>9 CAPITALS · {recoveredCount}/9 CORES</Text>
                   {/* arb-fix — same SORT BY DISTANCE toggle, here for the Capital list.
                       Reorders the 9 Capitals nearest-first (finished ones sink).
-                      OTA-1175 — deliberately NOT given the READY mode: a Capital is a
+                      OTA-1152 — deliberately NOT given the READY mode: a Capital is a
                       boss objective, not a contract, so it has nothing to hand in. It
                       still lights while READY mode runs, because that mode orders the
                       Capitals by distance too — the button is telling the truth. */}
@@ -743,7 +743,7 @@ export function ContractsScreen() {
                 >
                   <Text style={styles.mainQuestChoiceText}>PRESERVE</Text>
                 </TouchableOpacity>
-                {/* ⚠⚠ OTA-1248 — THE EARNED FOURTH. Rendered only when the run
+                {/* ⚠⚠ OTA-1225 — THE EARNED FOURTH. Rendered only when the run
                     earned it, and NEVER as a disabled or greyed row: a player
                     who has not earned STAY must not be shown a door they cannot
                     open. The three above are unconditional and always will be. */}
@@ -793,7 +793,7 @@ export function ContractsScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* OTA-1037 — refusal strip: when a COMPLETE tap is refused (wrong faction, no
+      {/* OTA-1014 — refusal strip: when a COMPLETE tap is refused (wrong faction, no
           agent in scene, work not done), the Arbiter's line lands HERE, where
           the player is looking — not only in the world feed behind this screen. */}
       {contractsNotice ? (
@@ -814,7 +814,7 @@ export function ContractsScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         {/* arb-fix — SORT BY DISTANCE toggle. Reorders every mission section by
             moves-to-target (nearest first) while keeping each type grouped.
-            OTA-1175 — READY TO HAND IN joins it on the right, same style. The two
+            OTA-1152 — READY TO HAND IN joins it on the right, same style. The two
             share one mode, so lighting either one clears the other. */}
         <View style={styles.sortRow}>
           <Pressable
@@ -844,7 +844,7 @@ export function ContractsScreen() {
             </Text>
           </Pressable>
         </View>
-        {/* OTA-1175 — the roll-up itself: every ready contract, pulled from its
+        {/* OTA-1152 — the roll-up itself: every ready contract, pulled from its
             group to the top, nearest first. Only in READY mode; the full cards
             stay in their sections below either way. */}
         {sortMode === 'ready' && (
@@ -1005,13 +1005,13 @@ export function ContractsScreen() {
                   along the way show up here.
                 </Text>
               ) : (
-                // OTA-1073 — this was a roll-call: a name, a role, a place.
+                // OTA-1050 — this was a roll-call: a name, a role, a place.
                 // It now reports the RELATIONSHIP, ordered by how each person
                 // regards you, with the dealings that got them there. The
                 // ledger is the same one the greeting layer reads, so the
                 // Chronicle and the world can never disagree about who knows
                 // you. Anyone on the old npcsMet list without a relation (a
-                // Guardian, a pre-OTA-1072 save mid-migration) still shows,
+                // Guardian, a pre-OTA-1049 save mid-migration) still shows,
                 // with no claim made about a relationship there is no record
                 // of — the honest blank.
                 (worldMemory.npcsMet ?? []).map((n) => {
@@ -1082,7 +1082,7 @@ export function ContractsScreen() {
                 const timerLabel = !hasClock ? 'no deadline'
                   : lapsed ? '⏳ LAPSED'
                   : `⏳ ${Math.ceil(left)}h left`;
-                // ⚠ OTA-1187 — THE WHOLE CARD WAS A SET-COURSE BUTTON, and it stayed one
+                // ⚠ OTA-1164 — THE WHOLE CARD WAS A SET-COURSE BUTTON, and it stayed one
                 // even when there was no course to set. Standing on the quarry's outpost,
                 // a tap did nothing and said nothing while the card still read "tap to set
                 // course". Same four-state machine the World screen uses, from the same
@@ -1123,7 +1123,7 @@ export function ContractsScreen() {
                     <Text style={styles.cardHint}>
                       {b.progress}/{b.count} put down · pays {b.rewardTc} TC + {b.giverName} standing
                     </Text>
-                    {/* ⚠ OTA-1187 — this line used to be a flat "· tap to set course" that
+                    {/* ⚠ OTA-1164 — this line used to be a flat "· tap to set course" that
                         was a lie in three of the four states. It now says what tapping will
                         actually do, or why there is nothing to tap. */}
                     <Text style={canRoute ? styles.cardHint : styles.bountyCourseNote}>
@@ -1469,7 +1469,7 @@ export function ContractsScreen() {
                       const objId = readyToTurnIn ? home : (missionObjectiveLocationId(def) ?? home);
                       let objName = objId;
                       try { objName = getLocationById(objId).name ?? objId; } catch { /* keep id */ }
-                      // OTA-1037 — routed requires a LIVE course. Quit-navigating used
+                      // OTA-1014 — routed requires a LIVE course. Quit-navigating used
                       // to leave routedMission set, so this note (which replaces
                       // the ROUTE button) wedged the card until deactivate →
                       // reactivate. Gating on the course also HEALS saves already
@@ -1514,7 +1514,7 @@ export function ContractsScreen() {
                       accessibilityState={{ selected: tracked }}
                     >
                       <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
-                        {/* OTA-986 — name the party the toggle stands down / recalls. */}
+                        {/* OTA-963 — name the party the toggle stands down / recalls. */}
                         {escortToggleLabel(tracked, rec.escort && rec.escort.hp > 0 ? rec.escort : null)}
                       </Text>
                     </Pressable>
@@ -1924,7 +1924,7 @@ function cap(s: string): string {
 // Found fragments show their full body; undiscovered fragments show
 // the discovery hint as a teaser.
 function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllProgress> }) {
-  // OTA-1206 — opens the full-story overlay. The store action re-checks completeness, so
+  // OTA-1183 — opens the full-story overlay. The store action re-checks completeness, so
   // this button cannot show a story the player has not actually finished.
   const openStoryReveal = useGameStore((s) => s.openStoryReveal);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -1988,13 +1988,13 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
                     <Text style={styles.completeBanner}>
                       ✦ {story.characterName}&apos;s story is complete — every fragment recovered.
                     </Text>
-                    {/* OTA-1207 — the standing buff this story pays, if it pays one.
+                    {/* OTA-1184 — the standing buff this story pays, if it pays one.
                         ⚠ Not every story does, by the owner's design, so the absence of a
                         line here is correct rather than a missing feature. */}
                     {storyPerkLabel(story.id) && (
                       <Text style={styles.perkLine}>✦ {storyPerkLabel(story.id)}</Text>
                     )}
-                    {/* ⚠ OTA-1206 — READ IT WHOLE, ON DEMAND. The completion screen raises
+                    {/* ⚠ OTA-1183 — READ IT WHOLE, ON DEMAND. The completion screen raises
                         itself once, at the moment the set closes. Without this button that
                         is the ONLY time the assembled story is ever readable end to end,
                         which is the same "ends in nothing" defect one step further along
@@ -2020,13 +2020,13 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
 }
 
 const styles = StyleSheet.create({
-  // OTA-1206 — READ THE WHOLE STORY, on a completed set.
+  // OTA-1183 — READ THE WHOLE STORY, on a completed set.
   readStoryBtn: {
     alignSelf: 'flex-start', marginTop: 10, paddingVertical: 8, paddingHorizontal: 16,
     borderWidth: 1, borderColor: '#3a4348', backgroundColor: '#141a1d',
   },
   readStoryText: { color: '#cdbf99', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
-  // OTA-1207 — the permanent buff a completed story grants.
+  // OTA-1184 — the permanent buff a completed story grants.
   perkLine: { color: '#8fbf9f', fontSize: 12, marginTop: 6, fontStyle: 'italic', lineHeight: 18 },
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
   // v2.4.1 (OTA 033) — Primary Objective card. Sits at the top of
@@ -2281,7 +2281,7 @@ const styles = StyleSheet.create({
   },
   sortBarOn: { borderColor: '#7fb0a8', backgroundColor: '#141d1c' },
   sortBarPressed: { opacity: 0.7 },
-  // OTA-1175 — the two sort buttons share the row; READY sits to the right of
+  // OTA-1152 — the two sort buttons share the row; READY sits to the right of
   // BY DISTANCE, same shape, and lights the completion-green the COMPLETE button
   // uses so "ready" reads as the same idea in both places.
   sortRow: { flexDirection: 'row', gap: 6 },
@@ -2315,7 +2315,7 @@ const styles = StyleSheet.create({
   difficultyChipDangerous: { color: '#e07a5f' },
   cardBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
   cardHint: { color: '#c9a86a', fontSize: 11, fontStyle: 'italic', marginTop: 4, letterSpacing: 0.5 },
-  // OTA-1187 — the non-tappable course states. Muted, not the gold call-to-action
+  // OTA-1164 — the non-tappable course states. Muted, not the gold call-to-action
   // colour, so a status line never reads as something to press.
   bountyCourseNote: { color: '#a2977b', fontSize: 11, fontStyle: 'italic', marginTop: 4, letterSpacing: 0.5 },
   // OTA-866 — bounty countdown: a bordered time pill + a draining bar.
@@ -2357,7 +2357,7 @@ const styles = StyleSheet.create({
   routeBtnPressed: { opacity: 0.7 },
   routeBtnText: { color: '#9ec0ef', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
   routeHereNote: { marginTop: 10, color: '#9ec96a', fontSize: 11, fontStyle: 'italic' },
-  // OTA-1037 — refusal strip: amber warning treatment, distinct from the green route
+  // OTA-1014 — refusal strip: amber warning treatment, distinct from the green route
   // notes and the teal activate toggle.
   contractsNotice: {
     marginTop: 8,

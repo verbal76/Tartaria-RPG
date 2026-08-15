@@ -1,4 +1,4 @@
-name: Build · iOS (macOS runner)
+name: iOS Build (native, GitHub Actions macOS fallback)
 
 # Backup iOS build path for when EAS Build is down. Runs the entire
 # build on GitHub's `macos-14` runner using xcodebuild directly —

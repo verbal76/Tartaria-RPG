@@ -37,12 +37,12 @@ export interface WorldEventEffect {
   tideDelta?: Record<string, number>;
   /** A faction fields extra roaming patrols. */
   musterPatrols?: { factionId: string; count: number };
-  /** ⚠⚠ OTA-1180 — NO EVENT IN THIS CATALOGUE MAY USE THIS. Owner's rule: "you
+  /** ⚠⚠ OTA-1157 — NO EVENT IN THIS CATALOGUE MAY USE THIS. Owner's rule: "you
    *  should work to get standing, not earn it by breathing." The two that did are
    *  documented above; both now pay a tide. The field and the store's handler are
    *  kept ONLY for a future AUTHORED beat the player actually walks into — never
    *  for the ambient world tick, which fires on a clock the player never touches.
-   *  `ota1180AmbientStandingOff` asserts the catalogue's repDelta count is ZERO. */
+   *  `ota1157AmbientStandingOff` asserts the catalogue's repDelta count is ZERO. */
   repDelta?: { factionId: string; delta: number };
   /** A bounty is fresh on the board (the store surfaces an Arbiter nudge). */
   offerBounty?: boolean;
@@ -181,14 +181,14 @@ const EVENTS: EventDef[] = [
     },
   },
   {
-    // ⚠ OTA-1180 — NO `repDelta`. THE WORLD DOES NOT MOVE YOUR STANDING ANY MORE.
+    // ⚠ OTA-1157 — NO `repDelta`. THE WORLD DOES NOT MOVE YOUR STANDING ANY MORE.
     // Owner: "you should work to get standing, not earn it by breathing."
     // This used to pay +2 — plus the −1 that a +2 cascades to each rival — gated on
     // `favored` (≥10), which is BOTH the eligibility test and the target pool, so it
     // fed whoever was already ahead, starting from a home faction that begins AT 10.
     // ⚠ The rumor is REWRITTEN WITH the effect, deliberately. The old line ("they
     // count you a friend now") is a STANDING CLAIM; leaving it with nothing behind
-    // it would be OTA-1179 finding 9 all over again — text describing a rule the
+    // it would be OTA-1156 finding 9 all over again — text describing a rule the
     // code does not have. A defection genuinely strengthens the faction it lands
     // in, so it pays a TIDE instead: a real consequence, about the world, not you.
     kind: 'defector', weight: 5, eligible: (ctx) => favored(ctx).length > 0,
@@ -257,7 +257,7 @@ const EVENTS: EventDef[] = [
     },
   },
   {
-    // ⚠ OTA-1180 — the second of the two, same reasoning as `defector` above.
+    // ⚠ OTA-1157 — the second of the two, same reasoning as `defector` above.
     // ("remembered your name" was the standing claim; a windfall makes them
     // stronger, which is a tide, and which they get whether they like you or not.)
     kind: 'windfall', weight: 4, eligible: (ctx) => favored(ctx).length > 0,
@@ -312,12 +312,12 @@ export interface Patrol {
   homeY: number;
   /** Per-patrol phase so two patrols of the same faction don't overlap. */
   phase: number;
-  /** ⚠ OTA-1244 — a QUARRY group placed by a bounty contract (OTA-1189), not part of
+  /** ⚠ OTA-1221 — a QUARRY group placed by a bounty contract (OTA-1166), not part of
    *  the faction's fielded army. maintainPatrols must neither count these toward the
    *  faction's patrol target nor cull them as excess — without the flag, the war
    *  maintenance tick deleted the freshly-seeded quarry within the hour (they append
    *  LAST, and the trim drops from the tail), so the player arrived to an empty
-   *  contract ground: the exact failure OTA-1189 exists to remove. */
+   *  contract ground: the exact failure OTA-1166 exists to remove. */
   quarry?: boolean;
 }
 

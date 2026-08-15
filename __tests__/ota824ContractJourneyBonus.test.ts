@@ -1,4 +1,4 @@
-// B2 (OTA-824) — remote "send word" hand-ins are gone; every contract is a face-to-face
+// B2 (OTA-804) — remote "send word" hand-ins are gone; every contract is a face-to-face
 // turn-in you must travel to. To keep a long trek worth it ("I don't want a 32-time trip
 // worth 20 TC"), turn-in pays a LONG-HAUL bonus scaled to how remote the hand-in tile is
 // from the starter region. This locks the bonus math: 0 at the hub, scaling with
@@ -18,7 +18,7 @@ const REMOTE = remoteCandidates
   .map((id) => ({ id, d: (() => { const c = canonicalCellOf(id); return Math.abs(c.x - hubCell.x) + Math.abs(c.y - hubCell.y); })() }))
   .sort((a, b) => b.d - a.d)[0]!;
 
-describe('OTA-824 — contract long-haul journey bonus', () => {
+describe('OTA-804 — contract long-haul journey bonus', () => {
   it('pays nothing extra for a hand-in AT the starter hub', () => {
     expect(contractTurnInRemoteness(HUB)).toBe(0);
     expect(contractJourneyBonusTc(HUB, 100)).toBe(0);

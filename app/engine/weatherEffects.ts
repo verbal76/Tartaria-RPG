@@ -108,7 +108,7 @@ const WEATHER_EFFECTS: Record<
   calm: { prob: 0, build: () => ZERO_TICK },
 };
 
-// OTA-946 — a weather's ELEMENT (read off its tags) maps to the armour-coating resist
+// OTA-923 — a weather's ELEMENT (read off its tags) maps to the armour-coating resist
 // kind that counters it. Generalises the OTA-934 cold rule to every element: an
 // electrical coating shrugs off an Aether-lightning storm exactly as a cold coating
 // shrugs off a blizzard. Weather with no elemental counterpart (physical hail, ash,
@@ -118,7 +118,7 @@ const WEATHER_RESIST_ELEMENT: Record<string, string> = {
   lightning: 'electrical',
   flame: 'burn',
   burn: 'burn',
-  // OTA-957 — black rain's bite is a corruption notch, and corruption has been a first-class
+  // OTA-934 — black rain's bite is a corruption notch, and corruption has been a first-class
   // armour resist since OTA-874; its 'tainted' tag was simply never mapped, so a
   // corruption-coated piece silently did nothing against it. Plain 'rain' stays unmapped
   // (wetness is not an element), and psychic fog stays uncounterable BY DESIGN — some
@@ -126,7 +126,7 @@ const WEATHER_RESIST_ELEMENT: Record<string, string> = {
   tainted: 'corruption',
 };
 
-/** OTA-957 — does the player's armour resist list counter this weather's element? ANY mapped
+/** OTA-934 — does the player's armour resist list counter this weather's element? ANY mapped
  *  tag covered cancels — the same rule tickWeather has applied since OTA-946, now shared
  *  by the penalty/stat helpers too, so preparation defeats the WHOLE weather, not just
  *  its damage tick ("I coated for the storm — why am I still slowed?"). */
@@ -170,7 +170,7 @@ export function weatherBlocksRepositioning(weather: WeatherEntry | null): boolea
  */
 export function weatherRepositionCost(weather: WeatherEntry | null, resistKinds: string[] = []): number {
   if (!weather) return 1;
-  // OTA-957 — was cold-only; now any matching element resist moves freely in its weather.
+  // OTA-934 — was cold-only; now any matching element resist moves freely in its weather.
   if (weatherCounteredByResists(weather, resistKinds)) return 1;
   if (weather.id === 'iron_fog' || weather.id === 'silent_blizzard') return 2;
   return 1;
@@ -183,7 +183,7 @@ export function weatherRepositionCost(weather: WeatherEntry | null, resistKinds:
  */
 export function weatherAttackPenalty(weather: WeatherEntry | null, resistKinds: string[] = []): number {
   if (!weather) return 0;
-  // OTA-957 — was cold-only; now any matching element resist sees clearly in its weather.
+  // OTA-934 — was cold-only; now any matching element resist sees clearly in its weather.
   if (weatherCounteredByResists(weather, resistKinds)) return 0;
   switch (weather.id) {
     case 'iron_fog': return 2;       // can barely see the target
@@ -233,7 +233,7 @@ export function weatherStatModifiers(weather: WeatherEntry | null, resistKinds: 
   if (!weather) return {};
   const base = baseWeatherStatModifiers(weather);
   if (!weatherCounteredByResists(weather, resistKinds)) return base;
-  // OTA-957 — a matching resist shrugs off the weather's PENALTIES only. Its buffs (the
+  // OTA-934 — a matching resist shrugs off the weather's PENALTIES only. Its buffs (the
   // Aether-resonance +INT under an electrical storm) are not harm to be soaked — an
   // insulated player keeps them. All-negative weathers (a blizzard vs a cold coat)
   // reduce to {} exactly as the old cold-only rule did.

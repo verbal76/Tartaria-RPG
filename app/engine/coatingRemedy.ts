@@ -1,6 +1,6 @@
-// OTA-764 — coatings are tri-modal: paint one on a WEAPON for an offensive DOT, on
+// OTA-745 — coatings are tri-modal: paint one on a WEAPON for an offensive DOT, on
 // ARMOR for resistance (both via the inventory "Coat" action), or DRINK it for the
-// defensive counter to its own element. OTA-765 — a coating is DRINKABLE only if there
+// defensive counter to its own element. OTA-746 — a coating is DRINKABLE only if there
 // is a real player-side ailment/counter for it. 'acid' has no player 'acid' status (its
 // offense is enemy armor-shred), so it can't be drunk — coat it instead. A hypothetical
 // 'hamster' coating with no player counterpart is likewise not drinkable. This keeps a
@@ -38,7 +38,7 @@ export function coatingElementFromTags(tags: readonly string[] | undefined): Coa
  *  only when its element has a counter (isCoatingDrinkable). Drives whether the
  *  inventory offers a "Use/Drink" action at all. */
 export function coatingItemDrinkable(item: { name?: string; tags?: readonly string[] }): boolean {
-  // OTA-1020 — canonical tags when the caller passes a real item (stale instance
+  // OTA-997 — canonical tags when the caller passes a real item (stale instance
   // snapshots otherwise let an old vial present as freely drinkable).
   const tags = item.name
     ? canonicalItemTags({ name: item.name, tags: item.tags })

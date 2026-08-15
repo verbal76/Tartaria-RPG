@@ -55,7 +55,7 @@ export interface TitleProgress {
   maxCorruption: number;
   /** Storms survived while a companion (dog/golem) was alive. */
   stormsSurvivedWithCompanion: number;
-  /** OTA-1070 — strikes your golem has LANDED. golem_whisperer's canon is
+  /** OTA-1047 — strikes your golem has LANDED. golem_whisperer's canon is
    *  "successfully control an Aether Golem"; merely having one stand beside
    *  you was never control. */
   golemStrikesLanded: number;
@@ -79,7 +79,7 @@ export interface TitleProgress {
   /** Distinct great climbs crested (of 5). At 5 the Skyreacher title lands
    *  and the Skyreacher armor set is complete. */
   greatClimbsCompleted: number;
-  /** OTA-1206 — collectible character-stories fully assembled (of 10). At 10 the
+  /** OTA-1183 — collectible character-stories fully assembled (of 10). At 10 the
    *  Historian title lands. ⚠ Counts COMPLETED STORIES, not fragments: 57 fragments
    *  spread unevenly across 10 stories (5–7 each), so a fragment count would make the
    *  last story worth the same as the first and the title would land early. */
@@ -139,12 +139,12 @@ export interface TitlePerks {
   // ── Skyreacher (OTA-910) ──────────────────────────────────────────────
   climbFallHalved: boolean;     // Skyreacher — halves climb-fall damage
   dexterityBonus: number;       // Skyreacher — passive +DEX (folds into effectiveStats)
-  /** OTA-1207 — flat damage added when the swing's type is electrical or aetheric.
+  /** OTA-1184 — flat damage added when the swing's type is electrical or aetheric.
    *  Granted by the Elior Zalmar collectible story. ⚠ Consumed in the store's attack
    *  path beside the mechanical-damage die; a perk with no consumer is a new
    *  "ends in nothing" and this one is wired. */
   electricalDamageBonus: number;
-  /** ⚠ OTA-1212 — passive +CHA from the Siren of Zharak's Teeth story. Folds into
+  /** ⚠ OTA-1189 — passive +CHA from the Siren of Zharak's Teeth story. Folds into
    *  `effectiveStats` the same way OTA-910's Skyreacher DEX does, so the two live
    *  consumers — diplomacy checks and the CHA vendor discount — pick it up with no
    *  new plumbing and no call site able to miss it. */
@@ -199,7 +199,7 @@ export const WIRED_TITLES: TitleDef[] = [
   {
     id: 'etherbound_survivor',
     // OTA-350 — a survivor of the wastes has learned to keep to cover. (perk below)
-    // OTA-1069 — was >= 1, which one ambient weather tick satisfied.
+    // OTA-1046 — was >= 1, which one ambient weather tick satisfied.
     earned: (_pl, p) => p.stormsSurvived >= STORM_TICKS_FOR_SURVIVOR,
     perk: (a) => { a.envHazardSaveBonus += 2; a.stealthBonus += 1; },
   },
@@ -211,7 +211,7 @@ export const WIRED_TITLES: TitleDef[] = [
   },
   {
     id: 'scion_of_the_giants',
-    // OTA-1070 — was descent alone, both fields set at character creation.
+    // OTA-1047 — was descent alone, both fields set at character creation.
     // Descent is the prerequisite; standing is the proof.
     earned: (pl) => pl.raceId === 'tartarian_giant'
       && GIANT_RESPECTING_FACTIONS.has(pl.factionId)
@@ -227,7 +227,7 @@ export const WIRED_TITLES: TitleDef[] = [
   },
   {
     id: 'golem_whisperer',
-    // OTA-1070 — was `!!pl.golem`: summon once, hold the title. Canon asks for
+    // OTA-1047 — was `!!pl.golem`: summon once, hold the title. Canon asks for
     // CONTROL, so the golem has to have fought for you. Deliberately NOT also
     // gated on a golem being alive right now — the title is a record of what
     // you did, and it should not blink out when a golem falls.
@@ -242,7 +242,7 @@ export const WIRED_TITLES: TitleDef[] = [
   },
   {
     id: 'architects_eye',
-    // OTA-1070 — was 1. One patch job is not an eye for architecture.
+    // OTA-1047 — was 1. One patch job is not an eye for architecture.
     earned: (_pl, p) => p.repairsCompleted >= REPAIRS_FOR_ARCHITECTS_EYE,
     perk: (a) => { a.repairBonus += 2; },
   },
@@ -259,7 +259,7 @@ export const WIRED_TITLES: TitleDef[] = [
   {
     id: 'aetheric_attuned',
     // survive a direct brush with an Etheric anomaly (a storm tick counts).
-    // OTA-1069 — was `>= 1 || maxCorruption >= 5`. BOTH branches were free: one
+    // OTA-1046 — was `>= 1 || maxCorruption >= 5`. BOTH branches were free: one
     // ambient tick, or the couple of corruption a few ticks hand you. This perk
     // halves all Aetheric damage, so it is pitched highest of the three.
     earned: (_pl, p) => p.stormsSurvived >= STORM_TICKS_FOR_ATTUNED
@@ -268,7 +268,7 @@ export const WIRED_TITLES: TitleDef[] = [
   },
   {
     id: 'stormcaller',
-    // OTA-1069 — was >= 1: one tick with a dog or golem alive.
+    // OTA-1046 — was >= 1: one tick with a dog or golem alive.
     earned: (_pl, p) => p.stormsSurvivedWithCompanion >= STORM_TICKS_FOR_STORMCALLER,
     perk: (a) => { a.ethericShield = true; },
   },
@@ -286,7 +286,7 @@ export const WIRED_TITLES: TitleDef[] = [
     // OTA-350 — one who reads the unseen paths also moves along them unseen.
     perk: (a) => { a.pathfinder = true; a.stealthBonus += 1; },
   },
-  // ⚠ OTA-1206 — THE 22nd TITLE, AND THE FIRST NOT FROM THE OWNER'S CANON DOCX.
+  // ⚠ OTA-1183 — THE 22nd TITLE, AND THE FIRST NOT FROM THE OWNER'S CANON DOCX.
   // `data/lore/arbiter-titles.json` was ingested verbatim from
   // Arbiter_Assigned_Titles_for_Players.docx and held exactly 21, all of them wired.
   // This one is new, added on the owner's instruction (2026-08-09): *"you should get a
@@ -352,7 +352,7 @@ export function isHiddenTitle(id: string): boolean {
 // an honest, present-tense description of the PASSIVE effect the engine now
 // applies. Titles absent here fall back to the canon string.
 // ---------------------------------------------------------------------------
-// OTA-1069 — STORM-TITLE THRESHOLDS.
+// OTA-1046 — STORM-TITLE THRESHOLDS.
 //
 // Owner: "you shouldn't be able to earn titles in the tutorial. what titles are
 // so easy to get that you earn them in the tutorial? they should take effort."
@@ -375,9 +375,9 @@ export function isHiddenTitle(id: string): boolean {
 // aetheric_attuned is pitched highest of the three because its perk is the
 // strongest: it HALVES all Aetheric damage, in combat and from weather.
 // ---------------------------------------------------------------------------
-// OTA-1070 — the last three free titles.
+// OTA-1047 — the last three free titles.
 //
-// OTA-1069 raised the storm family and flagged these as still cheap. The owner:
+// OTA-1046 raised the storm family and flagged these as still cheap. The owner:
 // "fix the other three." Each was checked against its own canon requirement in
 // arbiter-titles.json, and in all three cases the code was not testing what the
 // canon actually asks for:
@@ -463,7 +463,7 @@ export function newlyEarnedTitles(player: PlayerCharacter): string[] {
 /** Aggregate passive perks from the player's earned titles AND completed collectible
  *  stories.
  *
- *  ⚠⚠ OTA-1207 — STORY PERKS MERGE HERE, INTO THE ONE ACCUMULATOR, ON PURPOSE. Every
+ *  ⚠⚠ OTA-1184 — STORY PERKS MERGE HERE, INTO THE ONE ACCUMULATOR, ON PURPOSE. Every
  *  existing consumer already calls this function (`equipment.ts:779`,
  *  `combatRules.ts:828`, the sell-price path, the ruins-AC path), so folding the story
  *  perks in at the source means `tradeBonus`, `ruinsDefenseBonus` and

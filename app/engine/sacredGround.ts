@@ -1,4 +1,4 @@
-// sacredGround.ts — OTA-1235. THE MARKET TRUCE, AS LAW.
+// sacredGround.ts — OTA-1212. THE MARKET TRUCE, AS LAW.
 //
 // Owner, after a Conspiracy Architects war party killed Verbal ON Hidden
 // Market ground: "the hidden market is sacred tartarian ground. it's like

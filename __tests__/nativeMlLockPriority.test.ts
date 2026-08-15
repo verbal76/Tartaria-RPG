@@ -14,7 +14,7 @@ function defer<T = void>() {
 const tick = () => new Promise((r) => setTimeout(r, 0));
 
 describe('OTA-634 — priority native-ML lock', () => {
-  // ⚠ RE-AUTHORED BY OTA-1153, and the rename is the point. OTA-634's headline
+  // ⚠ RE-AUTHORED BY OTA-1130, and the rename is the point. OTA-634's headline
   // claim — "runs LLM ahead of queued voice" — is no longer true, because the
   // owner overruled the trade behind it: they were reading a line and then
   // hearing it ten seconds later, since the voice sat behind an entire
@@ -51,7 +51,7 @@ describe('OTA-634 — priority native-ML lock', () => {
     await Promise.all([pA, pB, pC, pD]);
 
     // A first (it was already running); then C jumps ahead (VOICE outranks the
-    // LLM as of OTA-1153); then B before D (FIFO among the equal-priority ops).
+    // LLM as of OTA-1130); then B before D (FIFO among the equal-priority ops).
     expect(order).toEqual(['A', 'C', 'B', 'D']);
     expect(maxInFlight).toBe(1); // exclusivity preserved
   });

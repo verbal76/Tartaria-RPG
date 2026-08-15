@@ -10,7 +10,7 @@
 //            > silence (between sessions)
 //
 // Volume + on/off are read from audioSettings (persisted via AsyncStorage).
-// OTA-1051 — transitions CROSSFADE (owner: "they should Crossfade into each
+// OTA-1028 — transitions CROSSFADE (owner: "they should Crossfade into each
 // other", not cut each other off): the outgoing and incoming tracks ramp in
 // the same stepped loop, epoch-guarded so rapid context changes can't stack
 // two live tracks. Entering boss/combat or the market is a FAST crossfade —
@@ -83,7 +83,7 @@ let audioModeReady = false;
 // bug where rapid state changes (e.g. wander → combat → wander) would
 // leave two tracks playing simultaneously.
 let transitionEpoch = 0;
-// OTA-1051 — two crossfade speeds. SMOOTH for the reflective beds (explore /
+// OTA-1028 — two crossfade speeds. SMOOTH for the reflective beds (explore /
 // menu melt into each other); SHIFT when entering boss/combat or the market
 // so the change lands as a deliberate gear-change, not a slow blend.
 const SMOOTH_FADE_MS = 2200;
@@ -193,7 +193,7 @@ async function stopHard(id: string): Promise<void> {
   }
 }
 
-// OTA-1051 — pause KEEPING position, so a bed track interrupted by a fight
+// OTA-1028 — pause KEEPING position, so a bed track interrupted by a fight
 // or a market visit picks back up mid-phrase instead of restarting.
 async function pauseInPlace(id: string): Promise<void> {
   const sound = sounds[id];
@@ -207,7 +207,7 @@ async function pauseInPlace(id: string): Promise<void> {
   }
 }
 
-// OTA-1051 — defensive sweep before a crossfade: silence anything a
+// OTA-1028 — defensive sweep before a crossfade: silence anything a
 // superseded mid-flight transition may have left playing that is neither
 // the outgoing nor the incoming track of THIS transition.
 async function pauseStrays(keepA: string | null, keepB: string | null): Promise<void> {
@@ -217,7 +217,7 @@ async function pauseStrays(keepA: string | null, keepB: string | null): Promise<
   }
 }
 
-// OTA-1051 — THE crossfade. Outgoing and incoming ramp in the same stepped
+// OTA-1028 — THE crossfade. Outgoing and incoming ramp in the same stepped
 // loop (a true crossfade, not stop-then-fade-in); the outgoing track then
 // pauses in place. `fresh` restarts the incoming track from the top (combat
 // tiers); a resumed bed keeps its position.
@@ -299,7 +299,7 @@ export async function setActiveContext(desired: Context | null): Promise<void> {
     if (prevId) await pauseInPlace(prevId);
     return;
   }
-  // OTA-1051 — resume the context's own interrupted track when the
+  // OTA-1028 — resume the context's own interrupted track when the
   // interruption was short (a fight, a market stop); otherwise rotate to a
   // fresh pick. Resume reads the entry from the TARGET pool so a track that
   // sits in two pools (Misty Compass) keeps that pool's authored mix.

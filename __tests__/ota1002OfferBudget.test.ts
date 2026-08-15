@@ -1,4 +1,4 @@
-// OTA-1002 — #121: the offer firehose. Root cause: four independent offer
+// OTA-979 — #121: the offer firehose. Root cause: four independent offer
 // emitters in the scene-entry vendor block (contract / bounty board / mystery
 // notice / thick scroll), each firing whenever its pool was stocked — no
 // aggregate budget. Agents now pitch two rotating categories per macro visit.
@@ -8,7 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { FACTION_QUESTS, availableFactionQuests } from '../app/engine/factionQuests';
 
-describe('OTA-1002 — offer budget + all_or_nothing rep floors', () => {
+describe('OTA-979 — offer budget + all_or_nothing rep floors', () => {
   it('every all_or_nothing escort demands rep 25+ (earned trust, not a newcomer trap)', () => {
     const aon = FACTION_QUESTS.filter((q) => q.escort?.mode === 'all_or_nothing');
     expect(aon.length).toBeGreaterThanOrEqual(8);
@@ -29,7 +29,7 @@ describe('OTA-1002 — offer budget + all_or_nothing rep floors', () => {
       path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'),
       'utf8',
     );
-    // OTA-1016 — the rotation is keyed on PITCHES (offerPitchSeq), not travel:
+    // OTA-993 — the rotation is keyed on PITCHES (offerPitchSeq), not travel:
     // macroVisitSeq keying phase-locked any vendor on a 4-hop circuit to the
     // same two categories forever. The x2 step makes two consecutive pitches
     // cover all four categories, honestly this time.
@@ -59,7 +59,7 @@ describe('OTA-1002 — offer budget + all_or_nothing rep floors', () => {
       const next = new Set([cats[nextRot]!, cats[(nextRot + 1) % 4]!]);
       expect(now.size).toBe(2);
       const union = new Set([...now, ...next]);
-      // OTA-1016 — the old +1 walk covered only 3-of-4 here while this very test's
+      // OTA-993 — the old +1 walk covered only 3-of-4 here while this very test's
       // NAME claimed two-visit coverage. The x2 step delivers all four.
       expect(union.size).toBe(4);
     }

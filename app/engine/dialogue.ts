@@ -1,4 +1,4 @@
-// OTA-1081 — PHASE 2, VERTICAL SLICE: GIVE THE WORLD A MOUTH.
+// OTA-1058 — PHASE 2, VERTICAL SLICE: GIVE THE WORLD A MOUTH.
 //
 // A `talk <npc>` exchange with a named vendor: a short list of topics, each
 // gated on what has actually passed between you, each with an authored reply.
@@ -27,7 +27,7 @@ import rawTopics from '../data/npcs/dialogue_topics.json';
 import type { NpcRegard } from './npcMemory';
 import type { MainQuestPhase } from './types';
 
-/** OTA-1082 — the story's own order, for `minChapter`. The main quest is a
+/** OTA-1059 — the story's own order, for `minChapter`. The main quest is a
  *  LINE, not a set, so "from the descent onwards" is a real thing to say and a
  *  topic that only makes sense after the Nexus should not be reachable at the
  *  hook. `ended` sits last so post-ending topics stay open. */
@@ -52,33 +52,33 @@ export interface TopicGate {
   minContractsTurnedIn?: number;
   /** Player's standing with the NPC's faction. */
   minStanding?: number;
-  /** OTA-1082 — earliest main-quest phase this topic makes sense in. The fifth
+  /** OTA-1059 — earliest main-quest phase this topic makes sense in. The fifth
    *  and last gate dimension the build plan called for. */
   minChapter?: MainQuestPhase;
-  /** OTA-1082 — Cores recovered. `cores` is a long phase (five Cores inside
+  /** OTA-1059 — Cores recovered. `cores` is a long phase (five Cores inside
    *  it), so phase alone cannot express "once you are most of the way". */
   minCores?: number;
-  /** ⚠ OTA-1088 — WHAT YOU CHOSE. `"<forkId>:<optionId>"`, matched against
+  /** ⚠ OTA-1065 — WHAT YOU CHOSE. `"<forkId>:<optionId>"`, matched against
    *  storyForks.choiceKeys(player). This is the third place a Phase 3 decision
    *  lands and the only one that happens in the middle of the game rather than
    *  at the moment of choosing or at the ending: the cast built over
-   *  OTA-1081..1087 can know what you did and open a topic about it.
+   *  OTA-1058..1087 can know what you did and open a topic about it.
    *
    *  One string rather than two fields, deliberately — a gate that took a fork
    *  and an option separately would have a second way to be half-specified. */
   requiresChoice?: string;
-  /** OTA-1113 — gifts this person LOVED (npcMemory rel.lovedGifts). A topic
+  /** OTA-1090 — gifts this person LOVED (npcMemory rel.lovedGifts). A topic
    *  behind this gate opens because you honored who they are, not because you
    *  showed up often — a different road to intimacy than regard alone, and the
-   *  one the OTA-1114 personal topics (marriage, origin, fears) lean on. */
+   *  one the OTA-1091 personal topics (marriage, origin, fears) lean on. */
   minLovedGifts?: number;
-  /** OTA-1113 — times they have mumbled about losing things after a clean lift
+  /** OTA-1090 — times they have mumbled about losing things after a clean lift
    *  (rel.pocketsMumbled). The DARK gate: a topic only a thief ever hears —
    *  someone airing suspicions to the very person robbing them blind. */
   minPocketsMumbled?: number;
 }
 
-/** OTA-1084 — what a topic HANDS YOU, once, the first time it is raised.
+/** OTA-1061 — what a topic HANDS YOU, once, the first time it is raised.
  *
  *  Until now a conversation was flavour: gated, characterful, and inert. The
  *  neighbouring system already pays — parley gives a lead or their goods — so a
@@ -90,7 +90,7 @@ export interface TopicGate {
  *  the side; it is the same fact being read twice, which is why it cannot drift.
  *
  *  ⚠ NO STANDING HERE. Deliberate. OTA-803 deleted gifting because faction
- *  standing had a side door, and OTA-1083 reopened the verb only behind a
+ *  standing had a side door, and OTA-1060 reopened the verb only behind a
  *  lifetime per-faction budget. Letting topics grant standing would be a
  *  SECOND door into the same economy, with no budget on it. Talk pays in
  *  information and occasionally coin — never in reputation. */
@@ -131,23 +131,23 @@ export interface TalkContext {
   standing: number;
   titles: string[];
   hasRecentRaidNews: boolean;
-  /** OTA-1082 — where the player is in the main quest, and how many Cores they
+  /** OTA-1059 — where the player is in the main quest, and how many Cores they
    *  hold. Both default safely for a character who has not started it. */
   chapter: MainQuestPhase;
   cores: number;
-  /** OTA-1088 — `"<forkId>:<optionId>"` for every Phase 3 question this
+  /** OTA-1065 — `"<forkId>:<optionId>"` for every Phase 3 question this
    *  character has answered. Empty for a run that has not been asked one. */
   choices: string[];
-  /** OTA-1113 — gifts this person loved / pocket-loss mumbles delivered, read
+  /** OTA-1090 — gifts this person loved / pocket-loss mumbles delivered, read
    *  off the same per-person ledger as everything else. OPTIONAL, defaulting
    *  to 0 in gateAllows, so the many existing TalkContext call sites (and the
-   *  OTA-1081..1088 test contexts) stay valid — a missing ledger reads as
+   *  OTA-1058..1088 test contexts) stay valid — a missing ledger reads as
    *  "nothing has passed between you", which is also what it means. */
   lovedGifts?: number;
   pocketsMumbled?: number;
 }
 
-/** OTA-1085 — THE CLASS KEY: topics for people who are not authored one by one.
+/** OTA-1062 — THE CLASS KEY: topics for people who are not authored one by one.
  *
  *  The vendor cast is 30 named individuals and each got their own entry. The
  *  rest of the population cannot work that way and should not:
@@ -238,7 +238,7 @@ export function topicsFor(npcId: string, ctx: TalkContext): Topic[] {
 }
 
 /** What they say. Indexed off how many times this topic has been raised rather
- *  than rolled, for the same reason the greeting layer is indexed (OTA-1072):
+ *  than rolled, for the same reason the greeting layer is indexed (OTA-1049):
  *  an NPC who answers the same question differently on a replay of the same
  *  state reads as broken, not as varied. */
 export function topicReply(topic: Topic, timesAsked: number): string {
@@ -246,7 +246,7 @@ export function topicReply(topic: Topic, timesAsked: number): string {
   return topic.lines[timesAsked % topic.lines.length]!;
 }
 
-// ─── OTA-1113 — THE DOOR THE PLAYER CAN SEE ─────────────────────────────────
+// ─── OTA-1090 — THE DOOR THE PLAYER CAN SEE ─────────────────────────────────
 //
 // 141 of the cast's topics sit behind gates, and until now a locked topic was
 // INVISIBLE: a stranger saw three questions and had no way to know Irma is a
@@ -289,7 +289,7 @@ export function lockedTeaserLabel(npcName: string, regard: NpcRegard, count: num
   return `…${count} ${noun} ${npcName} doesn't tell strangers`;
 }
 
-/** OTA-1113 — tapping the teaser gets a DEFLECTION, in voice: not a menu
+/** OTA-1090 — tapping the teaser gets a DEFLECTION, in voice: not a menu
  *  refusal but the person telling you, in character, that the rest is earned.
  *  Three lines per rung, indexed by taps THIS conversation (deterministic —
  *  same state, same line, like every reply in this module). The trusted set

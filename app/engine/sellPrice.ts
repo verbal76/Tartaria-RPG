@@ -122,7 +122,7 @@ export function sellPriceFor(
   // OR sold: it's only ever earned atop a great climb, and a merchant can't put
   // a price on something that can't be replaced. Nominal 1 TC so the sell UI
   // stays consistent without turning the reward into a cash pump.
-  // OTA-1022 — canonical: a Skyreacher piece earned before the tag shipped sold at
+  // OTA-999 — canonical: a Skyreacher piece earned before the tag shipped sold at
   // full Legendary rate — an unreplaceable climb reward turned into a cash pump.
   if (canonicalItemTags(item).includes('collect_only')) {
     return 1;
@@ -145,7 +145,7 @@ export function sellPriceFor(
       return applySellCaps(item, withRapport(raw));
     }
   }
-  // OTA-1023 — canonical kind + rarity: the snapshot is mint-frozen (kind heals
+  // OTA-1000 — canonical kind + rarity: the snapshot is mint-frozen (kind heals
   // upgrade-only, rarity never), so a promoted material sold at its old tier
   // forever — and the stack-merge spread the stale row onto every new copy.
   const sellKind = canonicalItemKind(item);
@@ -161,13 +161,13 @@ export function sellPriceFor(
   const baseTable = GEAR_KINDS.has(sellKind) ? GEAR_RARITY_BASE : RARITY_BASE;
   const base = baseTable[sellRarity] ?? 5;
   const dur = durabilityFraction(item);
-  // OTA-966 — TROPHY DISCOUNT. Uncatalogued monster-part drops mint at the enemy's own
+  // OTA-943 — TROPHY DISCOUNT. Uncatalogued monster-part drops mint at the enemy's own
   // rarity (the fix for "a Legendary hide worth 2 TC"), but at FULL rate every
   // Legendary non-boss converged on the same ~382 TC/kill — flat and ~7x the old
   // faucet. Trophies (flavor parts no recipe consumes) sell at HALF a real
   // material's rate: enemies that drop genuine materials are worth seeking out,
   // trophy-only kills still pay respectably, the tier spreads back out.
-  // OTA-1023 — catalog-AUTHORITATIVE trophy: the stamp marks a catalog-ABSENT part;
+  // OTA-1000 — catalog-AUTHORITATIVE trophy: the stamp marks a catalog-ABSENT part;
   // once the name is promoted into the catalog the discount must die with it
   // (a tag union can only add, never retire — and the merged stack kept
   // halving every new correctly-minted copy).

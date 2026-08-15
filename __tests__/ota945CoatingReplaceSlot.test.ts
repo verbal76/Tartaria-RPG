@@ -37,7 +37,7 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-// OTA-945 — a coat that lands on a FULL item replaces the CHOSEN slot/resist, not blindly slot 1.
+// OTA-922 — a coat that lands on a FULL item replaces the CHOSEN slot/resist, not blindly slot 1.
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import type { InventoryItem } from '../app/engine/types';
@@ -50,7 +50,7 @@ async function boot(name: string) {
   return store;
 }
 
-describe('OTA-945 — coating-slot / resist replace targeting', () => {
+describe('OTA-922 — coating-slot / resist replace targeting', () => {
   it('WEAPON: replacing slot 2 keeps slot 1 and overwrites only slot 2', async () => {
     const store = await boot('CoatReplWeap');
     const weaponId = 'ota945_weap';
@@ -75,8 +75,8 @@ describe('OTA-945 — coating-slot / resist replace targeting', () => {
     const w = store.getState().player!.inventory.find((i) => i.id === weaponId)! as unknown as {
       coating?: { kind?: string }; coating2?: { kind?: string };
     };
-    expect(w.coating?.kind).toBe('electrical'); // slot 1 untouched
-    expect(w.coating2?.kind).toBe('acid');      // slot 2 replaced poison -> acid
+    expect(w.coating?.kind).toBe('electrical');
+    expect(w.coating2?.kind).toBe('acid');
   });
 
   it('ARMOR: replacing a picked resist strips only that one and adds the new type', async () => {
@@ -98,10 +98,10 @@ describe('OTA-945 — coating-slot / resist replace targeting', () => {
 
     const a = store.getState().player!.inventory.find((i) => i.id === armorId)! as unknown as { addedResists?: string[] };
     const resists = (a.addedResists ?? []).map((r) => r.toLowerCase());
-    expect(resists).not.toContain('poison');   // stripped
-    expect(resists).toContain('corruption');   // added
-    expect(resists).toContain('acid');         // untouched
-    expect(resists).toContain('burn');         // untouched
-    expect(resists.length).toBe(3);            // still capped
+    expect(resists).not.toContain('poison');
+    expect(resists).toContain('corruption');
+    expect(resists).toContain('acid');
+    expect(resists).toContain('burn');
+    expect(resists.length).toBe(3);
   });
 });

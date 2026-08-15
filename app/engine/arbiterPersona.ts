@@ -1,4 +1,4 @@
-// OTA-1090 — PHASE 5: THE ARBITER BECOMES SOMEONE.
+// OTA-1067 — PHASE 5: THE ARBITER BECOMES SOMEONE.
 //
 // The build plan, verbatim: "Memory of what you've done, an opinion that
 // shifts with your choices, and an arc across the nine Cores. It has more
@@ -111,7 +111,7 @@ export interface RegardPart {
   /** Shown on the character sheet. The player is allowed to know why. */
   label: string;
   value: number;
-  /** OTA-1184 — marks a row the sheet can DRILL INTO. Only 'gifts' so far: the
+  /** OTA-1161 — marks a row the sheet can DRILL INTO. Only 'gifts' so far: the
    *  count is a summary of `npcRelations[].gifts`, and the player asked to see
    *  what he gave, to whom, and how it landed. Absent = a plain, flat row. */
   kind?: 'gifts';
@@ -143,7 +143,7 @@ export function regardParts(
   }
   if (outstanding > 0) parts.push({ label: `${outstanding} wrong${outstanding === 1 ? '' : 's'} still standing`, value: clamp(outstanding * -6, -24, 0) });
   if (cleared > 0) parts.push({ label: `${cleared} debt${cleared === 1 ? '' : 's'} made good`, value: clamp(cleared * 4, 0, 12) });
-  // ⚠ OTA-1184 — "things given away" → "gifts given". The owner's wording, and the
+  // ⚠ OTA-1161 — "things given away" → "gifts given". The owner's wording, and the
   // better one: "given away" reads as loss or charity when the mechanic is a gift
   // with a named recipient and a reaction. It is also the word every OTHER surface
   // uses (the GIVE button, the gift picker, giftBoons, giftTastes) — this sheet row
@@ -178,7 +178,7 @@ export function regardParts(
   // ── What you ANSWERED (Phase 3). The heaviest single input, deliberately:
   //    these are the only places the game ever asked you a question with no
   //    right answer and made you pick. ──
-  // OTA-1108 — ITEMISED. This used to be one aggregate row ("1 answer he
+  // OTA-1085 — ITEMISED. This used to be one aggregate row ("1 answer he
   // was standing there for  -5") and the owner, reading his own sheet,
   // could not name the answer it was charging him for. Each judged answer
   // is now its own row, labelled with the words the player actually chose
@@ -360,7 +360,7 @@ export function dueArbiterBeat(
 
   // ⚠ THE LOWEST UNSPOKEN STANCE UP TO WHERE HE IS — not the current one.
   //
-  // Found by the phases 0-5 playtest harness (OTA-1091), which walked a run to
+  // Found by the phases 0-5 playtest harness (OTA-1068), which walked a run to
   // nine Cores and came back with `witness, invested, implicated, named`:
   // 'interested' never fired. Asking only about the CURRENT stance means that
   // crossing two thresholds between two arrivals drops the intermediate beat
@@ -418,7 +418,7 @@ export function arbiterNameBeat(
   return data.nameBeat || null;
 }
 
-/** ⚠ Asking is a REAL ROUTE, not a hidden one. OTA-1087's audit found a whole
+/** ⚠ Asking is a REAL ROUTE, not a hidden one. OTA-1064's audit found a whole
  *  phase of authored content that nothing in the game could reach; the fix
  *  there was to test reachability, and the rule here is the same. The player
  *  types "what is your name" — that is the door. This is the one matcher, so

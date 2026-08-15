@@ -37,14 +37,14 @@ jest.mock('expo-updates', () => ({}));
 // played live: EVERY faction × EVERY motive × EVERY ending — 9 × 5 × 4 = 180
 // complete games, each one real character creation → revelation → nine Core
 // Guardian kills through the real dice → descent → the Nexus (cinematic +
-// Reckoning) → the ending chosen and recorded. The ota1249 spine walker is the
+// Reckoning) → the ending chosen and recorded. The ota1226 spine walker is the
 // per-push guarantee (9 runs, rotated); THIS is the occasional deep proof that
 // no cell of the matrix hides a wedge.
 //
 // ⚠ "Sweep" in the filename keeps it OUT of test:ci:fast (same exclusion as
 // the stress sims) — it is an ON-DEMAND gate, run before store pushes or after
 // story-engine surgery:   npx jest completionist --forceExit
-// Wall time ~5 minutes. Harness traps: ota1242 header + ota1249's two.
+// Wall time ~5 minutes. Harness traps: ota1219 header + ota1226's two.
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { LOST_CAPITAL_LOCATIONS, canStayAtTheNexus, ensureMainQuest } from '../app/engine/mainQuest';

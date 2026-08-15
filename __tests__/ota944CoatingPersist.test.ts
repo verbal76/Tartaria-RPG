@@ -37,8 +37,8 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-// OTA-944 — regression lock: a weapon's SECOND coating (coating2) must survive the full
-// save round-trip. Investigation of "the corruption coating vanished from the Mud-fist Wraps"
+// OTA-921 — regression lock: a weapon's SECOND coating (coating2) must survive the full
+// save round-trip. Investigation of "the corruption coating vanished from a dual-coated weapon"
 // proved persistence is clean on the current build; this pins it so it stays that way.
 // (The real destroy vector was the one-tap 'replace' coat action, hardened in InventoryScreen.)
 import { useGameStore, backfillPlayer } from '../app/state/gameStore';
@@ -68,14 +68,12 @@ function dualCoatedWraps(): InventoryItem {
   } as unknown as InventoryItem;
 }
 
-describe('OTA-944 — coating2 survives the save round-trip', () => {
+describe('OTA-921 — coating2 survives the save round-trip', () => {
   it('keeps both coatings + the second slot through stringify -> parse -> backfillPlayer', async () => {
     const store = await boot('CoatTwoRegress');
     const base = store.getState().player as PlayerCharacter;
     const withWraps: PlayerCharacter = { ...base, inventory: [...base.inventory, dualCoatedWraps()] };
 
-    // Full persistence path: the slot save is JSON.stringify(state) and load is JSON.parse
-    // -> backfillPlayer. Round-trip exactly that.
     const serialized = JSON.parse(JSON.stringify(withWraps)) as PlayerCharacter;
     const out = backfillPlayer(serialized);
 

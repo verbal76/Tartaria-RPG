@@ -106,7 +106,7 @@ export function grantItem(
     // rolled stats. Never stack a row that carries either marker.
     if (existing.instanceStats || newItem.instanceStats) return false;
     if (existing.uniqueStats || newItem.uniqueStats) return false;
-    // OTA-717 — a DURABILITY-tracked item is per-instance wear, even when its
+    // OTA-700 — a DURABILITY-tracked item is per-instance wear, even when its
     // KIND is normally "always stackable." A Climbing Rope / Pry Bar / torch /
     // compass is kind:'misc', but it carries durability, and merging a FRESH
     // (full) one into a WORN stack silently discards the new durability — the

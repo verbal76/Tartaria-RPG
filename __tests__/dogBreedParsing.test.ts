@@ -11,7 +11,7 @@
 // When no preamble matches, the raw input is preserved (no false-
 // positive stripping). Trailing punctuation is stripped too.
 //
-// OTA-1050 UPDATE — the typed three-step takeover was replaced by the
+// OTA-1027 UPDATE — the typed three-step takeover was replaced by the
 // DogOnboardingModal popup; the same parsing now runs inside
 // confirmDogOnboarding. These tests drive the popup commit directly.
 

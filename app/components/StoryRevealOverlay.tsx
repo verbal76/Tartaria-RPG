@@ -1,4 +1,4 @@
-// OTA-1206 — THE STORY, WHOLE. The payoff a completed collectible set never had.
+// OTA-1183 — THE STORY, WHOLE. The payoff a completed collectible set never had.
 //
 // ⚠ PUNCHLIST P1: finishing a 5–7 fragment character story used to flip a pill style and
 // print a banner on a screen the player had to go looking for. 57 fragments — the largest
@@ -8,7 +8,7 @@
 // the chapters screens that put the whole story together to read, and it should say
 // whatever the collectable sets name is is complete."*
 //
-// So this is modelled on ChapterCardOverlay (OTA-1043) — same full-screen register, same
+// So this is modelled on ChapterCardOverlay (OTA-1020) — same full-screen register, same
 // dark ground, same tap-to-dismiss — with one deliberate difference: **the chapter card
 // dismisses on a tap anywhere, and this does not.** A chapter card is a marker over
 // narration already waiting underneath; this is the thing the player spent the whole loop

@@ -1,4 +1,4 @@
-// OTA-1072 — PHASE 1, SLICE 1: NPCs REMEMBER YOU.
+// OTA-1049 — PHASE 1, SLICE 1: NPCs REMEMBER YOU.
 //
 // Before this, the only record of a person was `worldMemory.npcsMet` — a list
 // appended once and never touched again (`recordNpcMet` returns the memory
@@ -19,9 +19,9 @@
 // they greet you with is indexed off the meeting count rather than picked at
 // random — varied across visits, identical on any replay of the same state.
 import type { NpcRelation, NpcMet, OutpostRaid, WorldMemory } from './types';
-// OTA-1075 — rememberNpcMeeting pairs the two stores; see below.
+// OTA-1052 — rememberNpcMeeting pairs the two stores; see below.
 import { recordNpcMet } from './worldMemory';
-// OTA-1178 — see healFactionId, just above recordNpcSighting.
+// OTA-1155 — see healFactionId, just above recordNpcSighting.
 import { canonicalFactionId } from './factions';
 
 /** Three separate arrivals in front of someone and they know your face. */
@@ -32,9 +32,9 @@ export const TC_FOR_TRUSTED = 1500;
 /** In-game hours away before a greeting acknowledges the gap (3 days). */
 export const LONG_ABSENCE_HOURS = 72;
 
-/** OTA-1076 — TC of honest custom that buys back ONE caught theft.
+/** OTA-1053 — TC of honest custom that buys back ONE caught theft.
  *
- *  OTA-1072 made `wronged` permanent and I flagged that as a decision the owner
+ *  OTA-1049 made `wronged` permanent and I flagged that as a decision the owner
  *  might want reversed. Permanent is the wrong call: it turns one failed DEX
  *  roll into a stall the player can never use properly again, in a game whose
  *  whole steal system is built to be attempted. But cheap forgiveness is worse
@@ -46,13 +46,13 @@ export const LONG_ABSENCE_HOURS = 72;
  *  bill, so a repeat thief digs a hole faster than they can fill it. */
 export const AMENDS_TC_PER_WRONG = 600;
 
-/** OTA-1080 — renamed from vendorLedgerId. It stopped being about vendors three
+/** OTA-1057 — renamed from vendorLedgerId. It stopped being about vendors three
  *  OTAs ago (roadside, Hidden Market, overlay), and now covers wanderers and
  *  escort leaders too; a name that lies about its scope is how the "three
- *  install sites" comment in OTA-1078 got written. The old name stays as an
+ *  install sites" comment in OTA-1055 got written. The old name stays as an
  *  alias so nothing has to churn.
  *
- *  OTA-1078 — THE ONE RULE FOR WHO SOMEBODY IS, moved here from gameStore.
+ *  OTA-1055 — THE ONE RULE FOR WHO SOMEBODY IS, moved here from gameStore.
  *
  *  It lived in the store as a private function, which meant the test suite
  *  re-implemented it and then tested the copy — change the real rule and every
@@ -62,7 +62,7 @@ export const AMENDS_TC_PER_WRONG = 600;
  *  RUNTIME IDENTITY IS NOT LEDGER IDENTITY, and both directions have bitten:
  *   - roadside traders mint `roadside_<demeanor>_<Date.now()>`, a fresh id every
  *     spawn, while name and description come from a fixed archetype — one
- *     person split into unbounded strangers (OTA-1076).
+ *     person split into unbounded strangers (OTA-1053).
  *   - Hidden Market stalls do the opposite: a FIXED `hidden_market_<category>`
  *     id while resolveStallIdentity rotates name, title AND faction daily across
  *     six authored reps — six people merged into one row, with the relation's
@@ -72,11 +72,11 @@ export function npcLedgerId(vendor: { id?: string; name: string }): string {
   const id = vendor.id ?? '';
   if (id.startsWith('roadside_')) return `roadside:${slug(vendor.name)}`;
   if (id.startsWith('hidden_market_')) return `${id}:${slug(vendor.name)}`;
-  // OTA-1078 — elevated-overlay traders mint `overlay_<id>_<base36 ms>`, the
+  // OTA-1055 — elevated-overlay traders mint `overlay_<id>_<base36 ms>`, the
   // same per-spawn shape that made roadside traders litter the save. They are
   // five authored characters, so key them by who they are.
   if (id.startsWith('overlay_')) return `overlay:${slug(vendor.name)}`;
-  // OTA-1080 — WANDERERS. makeWanderer mints `wanderer_<archetype>_<tile seed>`,
+  // OTA-1057 — WANDERERS. makeWanderer mints `wanderer_<archetype>_<tile seed>`,
   // so the same person met on two tiles was two rows — the roadside leak again,
   // in a system that had no ledger presence at all. Archetype + name IS the
   // person: the cast is ARCHETYPES x FIRST_NAMES and both come off the seed.
@@ -84,14 +84,14 @@ export function npcLedgerId(vendor: { id?: string; name: string }): string {
     const arch = id.split('_')[1] ?? 'traveler';
     return `wanderer:${arch}:${slug(vendor.name)}`;
   }
-  // OTA-1080 — ESCORT LEADERS. The party is a POOL (label, hp, count) with no
+  // OTA-1057 — ESCORT LEADERS. The party is a POOL (label, hp, count) with no
   // individuals in it, so there was nobody to remember. The pool now names the
   // person walking at the front, and that is who goes on the ledger.
   if (id.startsWith('escort_')) return `escort:${slug(vendor.name)}`;
   return id || `vendor:${slug(vendor.name)}`;
 }
 
-/** OTA-1080 — the pre-rename name. Kept so the store's `vendorNpcId` alias and
+/** OTA-1057 — the pre-rename name. Kept so the store's `vendorNpcId` alias and
  *  every existing import keep working. */
 export const vendorLedgerId = npcLedgerId;
 
@@ -145,7 +145,7 @@ export function getRelation(memory: WorldMemory, id: string): NpcRelation | null
 
 /** One arrival in front of this NPC. Unlike recordNpcMet this is NOT
  *  idempotent — repetition is the whole signal. */
-/** ⚠ OTA-1178 — A RECORDED factionId IS STICKY, so a bad one is permanent.
+/** ⚠ OTA-1155 — A RECORDED factionId IS STICKY, so a bad one is permanent.
  *
  *  OTA-834 found four stall reps carrying RACE ids where faction ids belong and
  *  fixed the ROSTER — but never the saves. A player who met one of those vendors
@@ -172,9 +172,9 @@ export function recordNpcSighting(
 ): WorldMemory {
   const seeded = seedRelationsFromMet(memory);
   const prev = seeded.npcRelations?.[npc.id];
-  // ⚠ OTA-1078 — A SIGHTING AT THE SAME CLOCK IS THE SAME VISIT, not a new one.
+  // ⚠ OTA-1055 — A SIGHTING AT THE SAME CLOCK IS THE SAME VISIT, not a new one.
   //
-  // OTA-1072 counted every arrival, on the assumption that an arrival is a
+  // OTA-1049 counted every arrival, on the assumption that an arrival is a
   // visit. It is not. Walking between two Hidden Market stall tabs re-installs
   // both vendors with no in-game time passing at all, so a review measured a
   // stall rep at SIX meetings after six taps — past MEETINGS_FOR_NAME, so a
@@ -211,7 +211,7 @@ export function recordNpcSighting(
     role: npc.role ?? base.role,
     factionId: healFactionId(npc.factionId ?? base.factionId),
     meetings: base.meetings + 1,
-    // OTA-1075 — remember WHEN THEY LAST SAW YOU before overwriting it with
+    // OTA-1052 — remember WHEN THEY LAST SAW YOU before overwriting it with
     // "now". The greeting is composed after this write, so an absence line
     // measured against lastSeenHours always saw a gap of zero. Undefined on a
     // first meeting: someone cannot have missed you before they met you.
@@ -222,14 +222,14 @@ export function recordNpcSighting(
   return { ...seeded, npcRelations: { ...(seeded.npcRelations ?? {}), [npc.id]: next } };
 }
 
-/** OTA-1075 — THE ONE WAY TO RECORD MEETING SOMEBODY.
+/** OTA-1052 — THE ONE WAY TO RECORD MEETING SOMEBODY.
  *
  *  Two stores have to move together and they have opposite rules: `npcsMet` is
  *  a list of PEOPLE and is idempotent (meeting someone twice does not make two
  *  of them), while the relation counts EVERY arrival because repetition is the
  *  only thing that turns a stranger into a regular.
  *
- *  OTA-1072 wired them as two calls at one site and left the other two
+ *  OTA-1049 wired them as two calls at one site and left the other two
  *  recordNpcMet sites (both Core Guardians) unpaired, so a Guardian appeared in
  *  the Chronicle's people column with a blank where its regard should be. That
  *  gap could reopen every time someone adds an NPC. Pairing them here makes the
@@ -239,13 +239,13 @@ export function rememberNpcMeeting(
   npc: NpcMet,
   opts: { nowMs: number; hoursElapsed: number },
 ): WorldMemory {
-  // ⚠ SEED FIRST. OTA-1072 wrote these in the order (recordNpcMet, then
+  // ⚠ SEED FIRST. OTA-1049 wrote these in the order (recordNpcMet, then
   // recordNpcSighting) and that DOUBLE-COUNTED every first meeting: on a save
   // with no npcRelations yet, the sighting's own seedRelationsFromMet ran
   // against an npcsMet list that already contained the person just added, so it
   // manufactured a relation at meetings=1 and then the sighting incremented it
   // to 2. A first-ever arrival therefore read as a SECOND meeting — which
-  // OTA-1073's `seenBefore = meetings >= 2` turned into greeting a total
+  // OTA-1050's `seenBefore = meetings >= 2` turned into greeting a total
   // stranger as a returning face.
   //
   // Seeding before the append makes the inner seed a no-op (npcRelations is
@@ -255,7 +255,7 @@ export function rememberNpcMeeting(
   return recordNpcSighting(recordNpcMet(seeded, npc), npc, opts);
 }
 
-/** OTA-1076 — clean up the rows the timestamped roadside id already leaked.
+/** OTA-1053 — clean up the rows the timestamped roadside id already leaked.
  *
  *  Builds 4.28.83–4.28.86 keyed roadside traders on `roadside_<demeanor>_<ms>`,
  *  so every spawn left a permanent, never-revisited row in BOTH stores. Anyone
@@ -267,7 +267,7 @@ export function rememberNpcMeeting(
  *  rows removed are by definition worthless — a spawn-unique key can never be
  *  seen twice, so none of them holds a relationship that could still matter. */
 export function pruneSpawnKeyedRelations(memory: WorldMemory): WorldMemory {
-  // OTA-1078 — THE SECOND GENERATION OF LEDGER LITTER. 4.28.87/88 keyed every
+  // OTA-1055 — THE SECOND GENERATION OF LEDGER LITTER. 4.28.87/88 keyed every
   // roadside trader by ARCHETYPE, so live saves hold `roadside:road_hawker` and
   // `roadside:sketchy_stall`. Now that the archetypes have a real cast, nothing
   // will ever mint those two ids again — and an orphan is not harmless here:
@@ -280,7 +280,7 @@ export function pruneSpawnKeyedRelations(memory: WorldMemory): WorldMemory {
     /^roadside_[a-z]+_\d{10,}$/.test(id) || /^overlay_.+_[a-z0-9]{6,}$/.test(id) || LEGACY_ARCHETYPE_KEYS.has(id);
   const rels = memory.npcRelations ?? {};
   const keys = Object.keys(rels);
-  // OTA-1078 — AND THE AMENDS BANK CARRIED BY THOSE SAME SAVES. 4.28.87 fed the
+  // OTA-1055 — AND THE AMENDS BANK CARRIED BY THOSE SAME SAVES. 4.28.87 fed the
   // bank from `tcTraded`, which counts SALES, so a shipped save can hold
   // `wrongs: 0, amendsTc: 49_400` earned by offloading loot on somebody. Rob
   // them twice, buy a 1 TC trinket, and both wrongs evaporate. Rather than
@@ -314,13 +314,13 @@ export function recordNpcDealing(
   memory: WorldMemory,
   id: string,
   patch: Partial<Pick<NpcRelation, 'trades' | 'tcTraded' | 'contractsTaken' | 'contractsTurnedIn' | 'wrongs'
-    /** OTA-1104 — clean lifts and mumbles delivered; see the NpcRelation fields. */
+    /** OTA-1081 — clean lifts and mumbles delivered; see the NpcRelation fields. */
     | 'pocketsLifted' | 'pocketsMumbled'
-    /** OTA-1109 — hour-stamp of the newest raid they've told the player about
+    /** OTA-1086 — hour-stamp of the newest raid they've told the player about
      *  (max-merged, not incremented). Gates raidNewsFor so a sacking is news
      *  exactly once per person. */
     | 'raidHeardAtHours'>>
-    /** OTA-1078 — TC the player SPENT here, which is the only kind that can pay
+    /** OTA-1055 — TC the player SPENT here, which is the only kind that can pay
      *  a debt. `tcTraded` counts business in both directions, so inferring
      *  amends from it meant SELLING to someone you robbed settled the debt AND
      *  paid you for it. Restitution has to cost something. */
@@ -336,16 +336,16 @@ export function recordNpcDealing(
     contractsTaken: prev.contractsTaken + (patch.contractsTaken ?? 0),
     contractsTurnedIn: prev.contractsTurnedIn + (patch.contractsTurnedIn ?? 0),
     wrongs: prev.wrongs + (patch.wrongs ?? 0),
-    // OTA-1104 — the mumble ledger. Increment-only, like every other dealing.
+    // OTA-1081 — the mumble ledger. Increment-only, like every other dealing.
     pocketsLifted: (prev.pocketsLifted ?? 0) + (patch.pocketsLifted ?? 0),
     pocketsMumbled: (prev.pocketsMumbled ?? 0) + (patch.pocketsMumbled ?? 0),
-    // OTA-1109 — a STAMP, not a counter: keep the newest raid hour they've
+    // OTA-1086 — a STAMP, not a counter: keep the newest raid hour they've
     // reported. Max-merge so a stale caller can never un-tell a newer raid.
     raidHeardAtHours: patch.raidHeardAtHours !== undefined
       ? Math.max(prev.raidHeardAtHours ?? 0, patch.raidHeardAtHours)
       : prev.raidHeardAtHours,
   };
-  // OTA-1076 — RESTITUTION. Coin that crosses the table of somebody you were
+  // OTA-1053 — RESTITUTION. Coin that crosses the table of somebody you were
   // caught stealing from is banked as amends; enough of it buys one wrong back.
   // Deliberately only counts custom AFTER the theft (patch.tcTraded), never the
   // history that preceded it — you cannot pre-pay for a robbery.
@@ -368,14 +368,14 @@ export function recordNpcDealing(
       outstanding -= 1;
       cleared += 1;
     }
-    // ⚠ OTA-1078 — THE BANK IS SPENT WHEN THE DEBT IS. Keeping the residue let
+    // ⚠ OTA-1055 — THE BANK IS SPENT WHEN THE DEBT IS. Keeping the residue let
     // it pre-pay the NEXT robbery: settle a 600 debt with 1100 TC and 500 sits
     // in the bank; rob them again and 100 TC clears it. That is the exact
     // inverse of this feature's own rule ("a repeat thief digs the hole faster
     // than they can fill it"), and it survived review because every amends test
     // spent an exact multiple of 600, so a residue never existed.
     // Change is not credit. Only an OUTSTANDING debt banks anything.
-    // ⚠ OTA-1078, SECOND PASS — THE FIRST FIX ONLY COVERED FULL SETTLEMENT.
+    // ⚠ OTA-1055, SECOND PASS — THE FIRST FIX ONLY COVERED FULL SETTLEMENT.
     // Zeroing on `outstanding === 0` left the residue of a PARTIAL clear alive,
     // and a partial residue can be as large as 600*outstanding-1. Measured: three
     // thefts, spend 2999 -> one cleared with 1199 banked; rob again -> the bank
@@ -395,7 +395,7 @@ export function recordNpcDealing(
       ...(cleared > 0 ? { amendsCleared: (prev.amendsCleared ?? 0) + cleared } : {}),
     };
   }
-  // OTA-1078 — and the same rule when the patch is a theft ALONE (spent === 0
+  // OTA-1055 — and the same rule when the patch is a theft ALONE (spent === 0
   // skips the block above entirely, which is how a banked residue survived a
   // fresh robbery in the first place).
   if (addedWrongs > 0 && (next.amendsTc ?? 0) > 0) next = { ...next, amendsTc: 0 };
@@ -424,7 +424,7 @@ export function npcRegard(rel: NpcRelation | null | undefined): NpcRegard {
   if (rel.wrongs > 0) return 'wronged';
   if (rel.contractsTurnedIn >= 2 || rel.tcTraded >= TC_FOR_TRUSTED) return 'trusted';
   if (rel.trades >= 3 || rel.contractsTurnedIn >= 1 || rel.tcTraded >= TC_FOR_FAMILIAR) return 'familiar';
-  // OTA-1073 — contractsTaken belongs on this rung. Slice 1 let it earn the
+  // OTA-1050 — contractsTaken belongs on this rung. Slice 1 let it earn the
   // player's NAME (knowsPlayerName) but not any regard, so someone who had
   // handed you work was ranked below someone you had merely walked past three
   // times. Found by a slice-2 test; the ladder was wrong, not the test.
@@ -432,7 +432,7 @@ export function npcRegard(rel: NpcRelation | null | undefined): NpcRegard {
   return 'met';
 }
 
-/** OTA-1077 — how many raid records to keep. Enough that a player who has been
+/** OTA-1054 — how many raid records to keep. Enough that a player who has been
  *  away a long while still hears about it; short enough that the save does not
  *  grow a war diary. */
 export const RAID_MEMORY_CAP = 12;
@@ -457,11 +457,11 @@ export function raidNewsFor(
   const regard = npcRegard(rel);
   if (regard !== 'known' && regard !== 'familiar' && regard !== 'trusted') return null;
   const since = rel.prevSeenHours;
-  // OTA-1078 — the upper bound was missing: the parameter was received and
+  // OTA-1055 — the upper bound was missing: the parameter was received and
   // ignored, so a raid stamped in the future would still have qualified. It
   // cannot happen today (atHours comes off the same player clock), but a
   // silently unused parameter is a hole waiting for the next caller.
-  // OTA-1109 — "since they last saw you" was the WRONG gate for repeat
+  // OTA-1086 — "since they last saw you" was the WRONG gate for repeat
   // suppression: quick room-hops don't advance prevSeenHours, so the same
   // sacking was re-told on every re-entry (Tarek, four visits in a row).
   // Told-ness is now recorded on the relation (raidHeardAtHours, stamped by
@@ -471,7 +471,7 @@ export function raidNewsFor(
     (r) => r.defenderId === rel.factionId && r.atHours > since && r.atHours <= hoursNow && r.atHours > alreadyTold,
   );
   if (mine.length === 0) return null;
-  // OTA-1078 — the locationId tie-break below is BELT AND BRACES, not a live
+  // OTA-1055 — the locationId tie-break below is BELT AND BRACES, not a live
   // discriminator: locationId is FACTION_STARTING_LOCATION[defenderId] and the
   // filter has already pinned defenderId, so every candidate shares it. It
   // stays because it makes the reduce total-ordered rather than array-ordered,
@@ -492,7 +492,7 @@ export function raidNewsLine(
   playerName: string | null | undefined,
 ): string {
   const you = npcAddress(rel, playerName);
-  // OTA-1078 — say the place's NAME. This de-slugged the id, so a person who
+  // OTA-1055 — say the place's NAME. This de-slugged the id, so a person who
   // lives at Reclaimer's Stake called it "reclaimer stake" and the Tartarian
   // Pilgrim Camp came out as "pilgrim waycamp". The store now stamps the
   // authored name onto the record; the humanised id remains only as the
@@ -508,7 +508,7 @@ export function raidNewsLine(
   }
 }
 
-/** OTA-1076 — what the relationship is worth at the counter.
+/** OTA-1053 — what the relationship is worth at the counter.
  *
  *  Deliberately small. Faction standing, CHA/rapport, tides and war heat
  *  already move prices; if the relationship swung harder than all of those it
@@ -529,7 +529,7 @@ export function regardPriceMult(regard: NpcRegard): number {
 
 /** True when enough in-game time has passed that a greeting should say so.
  *
- *  OTA-1075 — MUST be read AFTER this arrival's recordNpcSighting, which is
+ *  OTA-1052 — MUST be read AFTER this arrival's recordNpcSighting, which is
  *  where the store calls it. The gap is measured against `prevSeenHours` (the
  *  visit before this one), NOT `lastSeenHours` — the sighting sets that to the
  *  current clock, so the original version compared now against now and returned
@@ -539,7 +539,7 @@ export function regardPriceMult(regard: NpcRegard): number {
  *  the rule without ever exercising the wiring.
  *
  *  Undefined prevSeenHours — a first meeting, or a relation migrated from a
- *  pre-OTA-1072 save — is not an absence. There is no prior visit to be absent
+ *  pre-OTA-1049 save — is not an absence. There is no prior visit to be absent
  *  from, and inventing one would greet a brand-new face with "it's been a long
  *  stretch". */
 export function longAbsence(rel: NpcRelation | null | undefined, hoursNow: number): boolean {
@@ -641,7 +641,7 @@ export function npcAbsenceLine(
 }
 
 // ---------------------------------------------------------------------------
-// OTA-1073 — PHASE 1, SLICE 2.
+// OTA-1050 — PHASE 1, SLICE 2.
 // ---------------------------------------------------------------------------
 
 /** Player-facing name for a rung of the ladder, for the Chronicle's people
@@ -668,11 +668,11 @@ export function dealingsSummary(rel: NpcRelation | null | undefined): string {
   if (contracts > 0) bits.push(`${contracts} contract${contracts === 1 ? '' : 's'} finished`);
   else if (rel.contractsTaken > 0) bits.push(`${rel.contractsTaken} taken`);
   if (rel.wrongs > 0) bits.push(rel.wrongs === 1 ? 'caught stealing' : `caught stealing ×${rel.wrongs}`);
-  // OTA-1078 — amendsCleared was WRITE-ONLY. types.ts documents it as existing
+  // OTA-1055 — amendsCleared was WRITE-ONLY. types.ts documents it as existing
   // "so the Chronicle can say a debt was settled rather than silently erasing
   // that it ever happened", and then nothing read it, so a paid debt vanished
   // without trace — the exact outcome the field was added to prevent.
-  // OTA-1078 — "old", because `wrongs` and `amendsCleared` are independent
+  // OTA-1055 — "old", because `wrongs` and `amendsCleared` are independent
   // counters and a player who steals, pays, then steals again has both. The
   // bare wording rendered as "caught stealing · a debt settled", which reads as
   // a contradiction and implies the wrong shown was the one paid for.
@@ -737,7 +737,7 @@ export function gossipLine(
   return `${speakerName} tilts their head. "${subject.name} mentioned you, ${you}. Said you were worth dealing with — and ${subject.name} doesn't say that about many."`;
 }
 
-/** OTA-1104 — THE MUMBLE. Someone whose pocket was lifted CLEAN eventually
+/** OTA-1081 — THE MUMBLE. Someone whose pocket was lifted CLEAN eventually
  *  notices the loss — out loud, on a later meeting, without ever looking at
  *  the player. The owner's spec in as many words: "they should eventually
  *  mumble about always losing things or some other statement so you know

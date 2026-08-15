@@ -314,7 +314,7 @@ export function isGolemSubstitutePart(
   kind: GolemKind,
   item: { name: string; kind?: string; tags?: readonly string[] },
 ): boolean {
-  // OTA-1023 — canonical kind + tags: a stale aether material fed the golem and
+  // OTA-1000 — canonical kind + tags: a stale aether material fed the golem and
   // NOTHING happened (element tag missing from the snapshot), while the
   // name-based exact-fuel sibling check worked — two rules, one item.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -384,7 +384,7 @@ export function consumeFuel<T extends { name: string; quantity: number }>(
 
 
 // ---------------------------------------------------------------------------
-// OTA-1067 — the golem card's ROLL pool. Mirrors the dog card's shuffle bag
+// OTA-1044 — the golem card's ROLL pool. Mirrors the dog card's shuffle bag
 // (dogCompanion.defaultDogName): 50 authored names, Fisher-Yates, no repeat
 // until the bag is exhausted, and a refill guard so the seam can't hand back
 // the name that just came out. The golem card previously had NO suggestion

@@ -1,4 +1,4 @@
-// OTA-670 — uniform ACTIVATE / DEACTIVATE (pause) across every contract kind.
+// OTA-655 — uniform ACTIVATE / DEACTIVATE (pause) across every contract kind.
 // Before this, only faction quests had a `tracked` pause flag; hunts, mysteries,
 // storylines, whispers, leads, and the parley had no way to be set aside. This
 // verifies setContractActive toggles each kind's pause flag (per-contract, NOT
@@ -59,7 +59,7 @@ async function freshGame() {
   return store;
 }
 
-describe('setContractActive — uniform activate/deactivate (OTA-670)', () => {
+describe('setContractActive — uniform activate/deactivate (OTA-655)', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
   it('deactivates and re-activates a HUNT (per-contract; other hunts untouched)', async () => {
@@ -124,7 +124,7 @@ describe('setContractActive — uniform activate/deactivate (OTA-670)', () => {
   });
 });
 
-describe('abandonContract — now drops whispers + the parley (OTA-670)', () => {
+describe('abandonContract — now drops whispers + the parley (OTA-655)', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
   it('abandon whisper removes it and marks it completed (no re-plant)', async () => {

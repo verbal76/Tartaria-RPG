@@ -31,7 +31,7 @@ export type ItemPreview = {
   description: string;
   /** Compact list of mechanical lines: "Damage: 2d6 (slashing)", "AC +2", etc. */
   stats: string[];
-  /** OTA-1061 — the equip slot for armor ('head' | 'chest' | 'legs' | 'cloak' |
+  /** OTA-1038 — the equip slot for armor ('head' | 'chest' | 'legs' | 'cloak' |
    *  'feet' | 'hands'), absent for everything else. It was already baked into
    *  `kindLabel` as prose ("Hands Armor"), which meant any caller wanting to
    *  show or FILTER by slot had to parse English back out of it. Carried as
@@ -92,7 +92,7 @@ export function getItemPreviewForInstance(item: {
       stats.push(`Resists: ${u.resistance}`);
     }
     if (u.special) stats.push(`Special: ${u.special}`);
-    // ⚠ OTA-1183 — A FUSED PIECE STILL EARNS ITS CATALOG REGEN, so it must still say
+    // ⚠ OTA-1160 — A FUSED PIECE STILL EARNS ITS CATALOG REGEN, so it must still say
     // so. `aggregateEquippedRegen` resolves the worn piece with `findArmorByName`
     // and never looks at uniqueStats, so fusing "Echoing Steps Boots" keeps the
     // hpRegen 2 while this branch — which builds its lines from the ROLL, not the
@@ -106,7 +106,7 @@ export function getItemPreviewForInstance(item: {
     return {
       name: item.name,
       kindLabel,
-      // OTA-1061 — a fused piece keeps its slot too; the roll never moves it.
+      // OTA-1038 — a fused piece keeps its slot too; the roll never moves it.
       slot: u.armorSlot,
       rarity: u.rarity,
       description: item.description ?? '',
@@ -239,7 +239,7 @@ function previewArmor(a: CatalogArmor): ItemPreview {
   const resists = armorResistances(a);
   if (resists.length > 0) stats.push(`Resists: ${resists.join(', ')}`);
   if (a.statBonus) stats.push(`${a.statBonus.stat.toUpperCase().slice(0, 3)} +${a.statBonus.amount}`);
-  // ⚠ OTA-1183 — REGEN WAS INVISIBLE ON EVERY SURFACE. Owner: "how am I supposed to
+  // ⚠ OTA-1160 — REGEN WAS INVISIBLE ON EVERY SURFACE. Owner: "how am I supposed to
   // know I had regen, I almost sold these." He was wearing Echoing Steps Boots —
   // hpRegen 2, which is the ENTIRE HP_REGEN_CAP — and the inventory row read
   // "AC +2 · DEX +2". 93 of 293 armour pieces carry regen (31 hpRegen, 62
@@ -257,7 +257,7 @@ function previewArmor(a: CatalogArmor): ItemPreview {
   return { name: a.name, kindLabel: `${slotLabel} Armor`, slot: a.slot, rarity: a.rarity, description: a.description, stats };
 }
 
-/** OTA-1183 — ONE spelling of the regen line, so the row, the preview and the fused
+/** OTA-1160 — ONE spelling of the regen line, so the row, the preview and the fused
  *  path can never word it differently. Null when the piece has none.
  *  ⚠ It says "per action" because that is the real cadence: it ticks once per
  *  command inside submitPlayerAction — not per hour, not per rest. A player who
@@ -281,7 +281,7 @@ function previewAccessory(x: CatalogAccessory, kind: 'Amulet' | 'Ring'): ItemPre
   return { name: x.name, kindLabel: kind, rarity: x.rarity, description: x.description, stats };
 }
 
-/** OTA-1017 — the preview promises what USE will actually deliver: the #120-scaled
+/** OTA-994 — the preview promises what USE will actually deliver: the #120-scaled
  *  heal for the live character's frame. Outside a live game (no player yet)
  *  the flat catalog value stands. Lazy store require — gameStore imports this
  *  module, so a static import would cycle. */
@@ -335,7 +335,7 @@ function previewGear(g: CatalogGear): ItemPreview {
     }
     if (g.effect.cureBleed) stats.push('Cures: bleed');
     if (g.effect.revealScene) stats.push('Reveals hidden scene hooks');
-    // OTA-721 — surface a WEAPON-COATING's actual output so the RECIPES-tab
+    // OTA-704 — surface a WEAPON-COATING's actual output so the RECIPES-tab
     // card shows what it does, not just "Tags: weapon_coating, burn". Playtester
     // ask: "you have incendiary AND another fire coating — I can't tell which
     // has the better output, I'm picking by cooler name." Now each coating row

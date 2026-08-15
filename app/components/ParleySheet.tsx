@@ -6,7 +6,7 @@
 // verb never sees this — they committed already. See engine/parley.ts +
 // gameStore.resolveParley.
 //
-// OTA-1099 — rebuilt as a BOTTOM SHEET, same slot and skin as the DiceRoller
+// OTA-1076 — rebuilt as a BOTTOM SHEET, same slot and skin as the DiceRoller
 // and the TalkSheet ("I think all talking should be like this" — owner). The
 // temperament read and the stakes sit above tappable choices; the feed stays
 // readable the whole time. "Just talk" swaps this sheet for the TalkSheet in
@@ -66,7 +66,7 @@ export function ParleySheet() {
         <Text style={styles.choiceHint}>{hardHint}</Text>
       </TouchableOpacity>
 
-      {/* OTA-1087 — THE THIRD OPTION, and the only door the seven wanderer
+      {/* OTA-1064 — THE THIRD OPTION, and the only door the seven wanderer
           archetypes have. This CLOSES the parley without rolling, the wanderer
           stays in the scene, and walking out of the conversation gets this
           sheet back. Talking to somebody must never spend the chance to deal

@@ -13,16 +13,16 @@ import factionsData from '../data/factions/factions.json';
 import { JOIN_THRESHOLD, BUY_REP_TC_PER_STANDING } from '../engine/factions';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
-// OTA-1089 — Phase 4 difficulty, and the only place it can be eased.
+// OTA-1066 — Phase 4 difficulty, and the only place it can be eased.
 import {
   PRESET_TIERS, PRESSURE_PROFILES, pressureOf, canChangeTo,
-  // ⚠ OTA-1181 — the REAL hunting line, not a copy of it. This screen has form
+  // ⚠ OTA-1158 — the REAL hunting line, not a copy of it. This screen has form
   // for hardcoding a threshold next to a comment citing the constant (see the
-  // OTA-1179 note below); the whole point of the new warning is that it agrees
+  // OTA-1156 note below); the whole point of the new warning is that it agrees
   // with the code that acts on it.
   HOSTILE_STANDING,
 } from '../engine/pressure';
-// OTA-1090 — Phase 5: where the Arbiter stands, and what he thinks of you.
+// OTA-1067 — Phase 5: where the Arbiter stands, and what he thinks of you.
 import { arbiterSheetLines } from '../engine/arbiterPersona';
 import { hpBreakdown, hpBreakdownLine } from '../engine/hpBreakdown';
 import { giftLedger, giftLedgerLine } from '../engine/giftLedger';
@@ -69,13 +69,13 @@ export function CharacterScreen() {
   const scene = useGameStore((s) => s.currentScene);
   const worldMemory = useGameStore((s) => s.worldMemory);
   const setScreen = useGameStore((s) => s.setScreen);
-  const replayStoryIntro = useGameStore((s) => s.replayStoryIntro); // OTA-1046
+  const replayStoryIntro = useGameStore((s) => s.replayStoryIntro); // OTA-1023
   // arb119 — per-section collapse (hook must precede the early return below).
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   // OTA-848 — tap-to-expand: the AC breakdown, and which title's provenance is open.
   const [acOpen, setAcOpen] = useState(false);
   const [openTitle, setOpenTitle] = useState<string | null>(null);
-  // OTA-1184 — the gift ledger drills into the Arbiter's "N gifts given" row.
+  // OTA-1161 — the gift ledger drills into the Arbiter's "N gifts given" row.
   const [giftsOpen, setGiftsOpen] = useState(false);
 
   if (!player) {
@@ -105,10 +105,10 @@ export function CharacterScreen() {
     : `${barehand.count}d${barehand.sides}${barehand.bonus > 0 ? '+' : ''}${barehand.bonus}`;
   const tier = corruptionTierOf(player.corruption ?? 0);
 
-  // OTA-1090 [Phase 5] — where the Arbiter stands in the arc, what he thinks
+  // OTA-1067 [Phase 5] — where the Arbiter stands in the arc, what he thinks
   // of this character, and the itemised reasons for it.
   const arbiter = arbiterSheetLines(player, worldMemory);
-  // OTA-1184 — the two read models this sheet gained: where hpMax came from, and
+  // OTA-1161 — the two read models this sheet gained: where hpMax came from, and
   // what was given to whom. Both derive from state already saved; neither writes.
   const hpParts = hpBreakdown(player, worldMemory);
   const ledger = giftLedger(worldMemory);
@@ -126,7 +126,7 @@ export function CharacterScreen() {
   // arb119 — section header helper, mirroring the inventory headers: each section
   // title is a tappable plate (semi-transparent backing so the gold label reads
   // over any background) with a ▾/▴ chevron that folds the section away.
-  const setPressure = useGameStore((st) => st.setPressure); // OTA-1089
+  const setPressure = useGameStore((st) => st.setPressure); // OTA-1066
 
   const sectionHeader = (key: string, label: string) => (
     <TouchableOpacity
@@ -159,7 +159,7 @@ export function CharacterScreen() {
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title} accessibilityRole="header">CHARACTER</Text>
-        {/* OTA-1046 — REPLAY OPENING lives here now (owner's placement:
+        {/* OTA-1023 — REPLAY OPENING lives here now (owner's placement:
             "across the top is back, character, and then replay opening").
             The crawl overlay mounts globally, so it plays right over this
             screen — no navigation needed. */}
@@ -191,7 +191,7 @@ export function CharacterScreen() {
             </View>
             <Text style={styles.barValue}>{player.hp}/{player.hpMax}</Text>
           </View>
-          {/* ⚠ OTA-1184 — WHERE THE MAX CAME FROM. Owner: "for AC it shows your base
+          {/* ⚠ OTA-1161 — WHERE THE MAX CAME FROM. Owner: "for AC it shows your base
               and your buffs. HP just says HP not what my base number was so I can see
               the progression, I didn't roll a 29 at start." hpMax is a BAKED total —
               creation roll + distinct-kill milestones + gear — and nothing recorded
@@ -216,7 +216,7 @@ export function CharacterScreen() {
         </View>
 
         {/* ── HOW MUCH IT TAKES ─────────────────────────────────── */}
-        {/* OTA-1089 — PHASE 4's toggle, after creation. It lives on the sheet
+        {/* OTA-1066 — PHASE 4's toggle, after creation. It lives on the sheet
             rather than a settings menu because it is a fact about this
             character, like their race — and the plan's warning that overtuned
             pressure is the likeliest way to make the game worse is exactly why
@@ -253,7 +253,7 @@ export function CharacterScreen() {
         )}
 
         {/* ── THE ARBITER ───────────────────────────────────────── */}
-        {/* ⚠ OTA-1090 — PHASE 5. Where he stands in the arc, what he currently
+        {/* ⚠ OTA-1067 — PHASE 5. Where he stands in the arc, what he currently
             thinks of you, and the ITEMISED WHY.
             A hidden opinion score is the same legibility failure the Phase 4
             tide lines were written to close: the game quietly decides something
@@ -275,7 +275,7 @@ export function CharacterScreen() {
                       <View style={styles.kvRow}>
                         <Text style={styles.kvValue}>
                           {part.label}
-                          {/* ⚠ OTA-1184 — the affordance. A tappable row that looks
+                          {/* ⚠ OTA-1161 — the affordance. A tappable row that looks
                               identical to a flat one is a feature nobody finds. */}
                           {part.kind === 'gifts' ? <Text style={styles.tapHint}>{giftsOpen ? '  ▾' : '  ›'}</Text> : null}
                         </Text>
@@ -300,9 +300,9 @@ export function CharacterScreen() {
                                   <Text style={styles.giftMeta}>
                                     day {e.day}
                                     {/* ⚠ Only shown when it was actually recorded — a
-                                        gift given before OTA-1184 has no reaction on
+                                        gift given before OTA-1161 has no reaction on
                                         file, and inventing one would be worse than a
-                                        blank: OTA-1176 rewrote the taste table under
+                                        blank: OTA-1153 rewrote the taste table under
                                         those older entries. */}
                                     {e.standingDelta ? ` · standing ${e.standingDelta > 0 ? '+' : ''}${e.standingDelta}` : ''}
                                     {!e.reaction ? ' · reaction not recorded' : ''}
@@ -469,12 +469,12 @@ export function CharacterScreen() {
             I see that on my character page?" Lists every faction the
             player has any standing in, sorted highest first. The join
             threshold is JOIN_THRESHOLD (engine/factions.ts) — read, not
-            copied, since OTA-1179; shows a checkmark on factions the
+            copied, since OTA-1156; shows a checkmark on factions the
             player qualifies to join.
             Each faction's standing gates quest / hunt / mystery /
             storyline visibility via minRep; high standing means more
             contracts surface from that faction's vendors.
-            ⚠ OTA-1181 — and it runs the OTHER way too, which this panel
+            ⚠ OTA-1158 — and it runs the OTHER way too, which this panel
             never said. Below 0 a faction's patrols engage; at
             HOSTILE_STANDING they hunt you on their ground. That end now
             gets a ☠/⚠ tag per row and a warning line under the list,
@@ -496,13 +496,13 @@ export function CharacterScreen() {
             }
             return rows.map(({ row, meta }) => {
               const standing = row.standing;
-              // OTA-1179 — the constant, not a copy of it. The comment above this
+              // OTA-1156 — the constant, not a copy of it. The comment above this
               // block already cited "per JOIN_THRESHOLD in engine/factions.ts" while
               // hardcoding 20 twice, so the ✓ and the colour could disagree with the
               // rule they claim to show if the threshold ever moved.
               const qualifies = standing >= JOIN_THRESHOLD;
               const isOwn = row.factionId === player.factionId;
-              // ⚠ OTA-1181 — THE DANGEROUS END OF THIS NUMBER GETS A WORD, NOT JUST A
+              // ⚠ OTA-1158 — THE DANGEROUS END OF THIS NUMBER GETS A WORD, NOT JUST A
               // COLOUR. The sheet has always marked the good end (✓ at JOIN_THRESHOLD)
               // and left the bad end to a shade of orange nothing explains. Standing at
               // or below HOSTILE_STANDING is the single most consequential state in the
@@ -542,7 +542,7 @@ export function CharacterScreen() {
             +{JOIN_THRESHOLD} unlocks joining, and high standing surfaces more of their contracts
             (hunts, mysteries, storylines) when you meet their vendors.
           </Text>
-          {/* ⚠ OTA-1181 — SEPARATE LINE, AND IT IS THE ONE THAT MATTERS. The rule
+          {/* ⚠ OTA-1158 — SEPARATE LINE, AND IT IS THE ONE THAT MATTERS. The rule
               nothing in the game stated: standing is not only an unlock ladder, it is
               a threat gauge. Kept out of the paragraph above so it cannot be skimmed
               past, and it names both thresholds because they are DIFFERENT numbers
@@ -1063,7 +1063,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  // OTA-1046 — header REPLAY OPENING button; sized to balance the BACK pill.
+  // OTA-1023 — header REPLAY OPENING button; sized to balance the BACK pill.
   replayBtn: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',
@@ -1175,13 +1175,13 @@ const styles = StyleSheet.create({
   tideWaning: { color: '#c98a6a', fontSize: 10, fontWeight: '400' },
   kvValue: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   kvSub: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', marginTop: -2, marginBottom: 4 },
-  // OTA-1184 — the HP provenance line and the gift ledger.
+  // OTA-1161 — the HP provenance line and the gift ledger.
   hpBreakdown: { color: '#8a7a5a', fontSize: 10, marginTop: -2, marginBottom: 2, marginLeft: 46 },
   giftLedger: { marginTop: 6, marginBottom: 4, paddingLeft: 10, borderLeftWidth: 2, borderLeftColor: '#3a3226' },
   giftRow: { marginBottom: 6 },
   giftLine: { color: '#e6d8b3', fontSize: 12 },
   giftMeta: { color: '#8a7a5a', fontSize: 10, fontStyle: 'italic' },
-  // OTA-1181 — the threat end of a standing row, and the rule under the list.
+  // OTA-1158 — the threat end of a standing row, and the rule under the list.
   // Deliberately NOT italic like kvSub: this one is a warning, not a footnote.
   huntedTag: { color: '#e07a5f', fontSize: 10, fontWeight: '700' },
   nearHuntedTag: { color: '#c98a6a', fontSize: 10, fontWeight: '400' },

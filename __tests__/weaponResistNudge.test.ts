@@ -1,5 +1,5 @@
-// OTA-1111 — the combat wiring for the resist-nudge moved to the per-scene
-// CurrentScene.resistWear counter (see ota1111GuardCrack.test.ts); combat no
+// OTA-1088 — the combat wiring for the resist-nudge moved to the per-scene
+// CurrentScene.resistWear counter (see ota1088GuardCrack.test.ts); combat no
 // longer writes weaponResistStreak. This suite still locks the retired
 // field's state surface so legacy saves/snapshots that carry it load cleanly.
 //

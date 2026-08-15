@@ -63,7 +63,7 @@ export function mulberry32(a: number): () => number {
  *  Uncommon so the loop stays mostly-common per the design. */
 export function pickTakeableGearForScene(
   seedKey: string,
-  // OTA-1014 — #119a: recently-spawned names (lowercase) to avoid — the caller
+  // OTA-991 — #119a: recently-spawned names (lowercase) to avoid — the caller
   // keeps a small cross-tile ring so adjacent tiles stop rolling the same
   // gear. The guard cap below prevents a large exclude set from starving
   // the loop; worst case a tile offers fewer picks, never an infinite spin.
@@ -84,7 +84,7 @@ export function pickTakeableGearForScene(
     seen.add(name);
     picks.push(name);
   }
-  // OTA-1014 — the window filters AFTER the seeded draw, never inside it. Filtering
+  // OTA-991 — the window filters AFTER the seeded draw, never inside it. Filtering
   // inside the loop consumed extra RNG draws for excluded names, which made the
   // accepted picks a function of (seed, window) instead of seed alone — and a
   // rotating window then dealt the same tile DIFFERENT gear on re-entry (the

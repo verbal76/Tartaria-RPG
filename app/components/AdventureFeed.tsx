@@ -23,7 +23,7 @@ const ARBITER_COLOR = '#c9a86a';
 const PLAYER_COLOR = '#7fb8ff';
 const COMBAT_COLOR = '#e07a5f';
 const REWARD_COLOR = '#9ec96a';
-// OTA-673 — mission reminders get their own clear YELLOW voice (more yellow than
+// OTA-658 — mission reminders get their own clear YELLOW voice (more yellow than
 // the muted world tan) with a MISSION chip, so a tracked mission "slaps you in the
 // face" in the feed. The mission NAME renders in a brighter accent yellow so it
 // reads as a proper title you can find under CONTRACTS.
@@ -52,7 +52,7 @@ const channelColors: Record<LogChannel, string> = {
   // quests in a color that is noticably different... let's use
   // purple like the notes."
   dog_quest: '#b88ce0',
-  // OTA-673 — the standing "current mission" reminder, yellow + MISSION chip.
+  // OTA-658 — the standing "current mission" reminder, yellow + MISSION chip.
   mission: MISSION_COLOR,
 };
 
@@ -72,13 +72,13 @@ function tagForChannel(channel: LogChannel): string | null {
   // OTA-177 — DOG QUEST tag so the purple beats also carry a
   // chip-label header, matching how ARBITER / NOTE lines render.
   if (channel === 'dog_quest') return 'DOG QUEST';
-  // OTA-673 — MISSION chip: the yellow line already stands out; the tag names
+  // OTA-658 — MISSION chip: the yellow line already stands out; the tag names
   // the concept so the player learns "this is a mission, it's in my CONTRACTS."
   if (channel === 'mission') return 'MISSION';
   return null;
 }
 
-// OTA-673 — render a mission reminder with its NAME (everything up to the first
+// OTA-658 — render a mission reminder with its NAME (everything up to the first
 // ':') in the brighter accent, the rest of the objective in the base mission
 // yellow. Mirrors renderBodyWithEnemyHighlight's span approach.
 function renderMissionBody(text: string, baseColor: string): React.ReactNode {
@@ -175,7 +175,7 @@ export function AdventureFeed({ entries, enemyNames }: Props) {
         // for the same at-a-glance scan. Playtester: "if I do damage
         // please put that wording in green ... if they attack and
         // miss me put just the word Miss in green at the end".
-        // OTA-1074 — `storyBeat` rides alongside combatOutcome on the same
+        // OTA-1051 — `storyBeat` rides alongside combatOutcome on the same
         // meta bag. A flag rather than a LogChannel member on purpose: the
         // channel drives TTS routing, HIDDEN_CHANNELS and the copy-all export,
         // and a story beat needs none of that changed — only how it LOOKS.
@@ -212,7 +212,7 @@ export function AdventureFeed({ entries, enemyNames }: Props) {
         }
 
         const color = channelColors[entry.channel];
-        // OTA-1074 — a story beat keeps its channel voice (the Arbiter still
+        // OTA-1051 — a story beat keeps its channel voice (the Arbiter still
         // sounds like the Arbiter) and gains a rule above it plus a STORY chip.
         // The rule is what actually does the work: it breaks the wall of feed
         // text so the eye stops, which is the whole complaint — the main quest
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
   entry: { marginBottom: 24 },
   tag: { fontSize: 10, fontWeight: '700', letterSpacing: 2, marginBottom: 4 },
   body: { fontSize: 14, lineHeight: 22 },
-  // OTA-1074 — story beats. Extra air above and below so the beat sits in its
+  // OTA-1051 — story beats. Extra air above and below so the beat sits in its
   // own space rather than in the column of loot lines, a gold rule to stop the
   // eye, and slightly larger, looser type. Gold (#c9a86a) is the house accent
   // already used by MissionCompleteModal and the naming cards, so a story beat

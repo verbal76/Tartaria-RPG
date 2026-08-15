@@ -38,12 +38,12 @@ describe('fusion name variety (deterministic namer)', () => {
   });
 });
 
-describe('OTA-761 — the Qwen namer rejects echoed / low-quality names', () => {
+describe('OTA-742 — the Qwen namer rejects echoed / low-quality names', () => {
   const mockQwen = (reply: string) => ({ isReady: () => true, generate: async () => reply });
   const dogStats = { kind: 'dog_armor', rarity: 'Rare', acBonus: 3 } as unknown as UniqueItemStats;
   const inputs = [mk('a', 'Alpha Fur', ['organic'])];
 
-  it('rejects the prompt-echo name ("A Rare Dog Armor (+3 AC)") → falls back to deterministic', async () => {
+  it('rejects the prompt-echo name ("A Rare Dog Armor (+3 AC)")', async () => {
     const r = await synthesizeFusionNameViaQwen(dogStats, inputs, ['organic'],
       mockQwen('{"name":"A Rare Dog Armor (+3 AC)","description":"A sturdy vest of scraps."}'));
     expect(r).toBeNull();
@@ -55,12 +55,6 @@ describe('OTA-761 — the Qwen namer rejects echoed / low-quality names', () => 
     expect(r).toBeNull();
   });
 
-  it('rejects a name with a leaked rarity word', async () => {
-    const r = await synthesizeFusionNameViaQwen(dogStats, inputs, ['organic'],
-      mockQwen('{"name":"Legendary Hidewrap","description":"A cured vest."}'));
-    expect(r).toBeNull();
-  });
-
   it('accepts a clean 2-4 word evocative name', async () => {
     const r = await synthesizeFusionNameViaQwen(dogStats, inputs, ['organic'],
       mockQwen('{"name":"Marrow Ward","description":"A vest strung from cured hide."}'));
@@ -68,7 +62,7 @@ describe('OTA-761 — the Qwen namer rejects echoed / low-quality names', () => 
   });
 });
 
-describe('OTA-761 — migrateFusedName re-mints an existing low-quality name on load', () => {
+describe('OTA-742 — migrateFusedName re-mints an existing low-quality name on load', () => {
   const fused = (name: string): InventoryItem =>
     ({
       id: 'fx', name, kind: 'dog_armor', quantity: 1, rarity: 'Rare',

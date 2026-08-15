@@ -1,4 +1,4 @@
-// OTA-825 — exploit close (reverify workflow, CONFIRMED high-severity). A thrown
+// OTA-805 — exploit close (reverify workflow, CONFIRMED high-severity). A thrown
 // attack is a PLAYER TURN, but the typed-throw path never let the enemy group act,
 // so throwing was a COUNTER-FREE ranged attack (and it skipped enemy regen, which
 // only ticks inside applyEnemyCounter). Even a bare "throw a stone" chipped the
@@ -33,7 +33,7 @@ jest.mock('expo-av', () => ({
 
 import { useGameStore } from '../app/state/gameStore';
 
-it('OTA-825 — throwing at a surviving enemy draws an enemy counter (no free ranged loop)', async () => {
+it('OTA-805 — throwing at a surviving enemy draws an enemy counter (no free ranged loop)', async () => {
   await useGameStore.getState().hydrate();
   await useGameStore.getState().startNewGame({ name: 'Chucker', raceId: 'reclaimer', factionId: 'reclaimers_guild' });
   useGameStore.getState().skipTutorial?.();

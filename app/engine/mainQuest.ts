@@ -447,7 +447,7 @@ export const NEXUS_SLOT_BEATS: readonly NexusSlotBeat[] = [
   },
 ];
 
-/** ⚠⚠ OTA-1248 — THE GATE ON THE FOURTH DOOR, AND WHY IT IS THIS ONE.
+/** ⚠⚠ OTA-1225 — THE GATE ON THE FOURTH DOOR, AND WHY IT IS THIS ONE.
  *
  *  The owner's worry about gating an ending, stated plainly: *"unless this is
  *  advertised everywhere and the Arbiter narrates the consequences constantly,
@@ -485,7 +485,7 @@ export function canStayAtTheNexus(
   }
 }
 
-/** ⚠⚠ OTA-1248 — THE RECKONING. Before the doors, the Arbiter reads the run
+/** ⚠⚠ OTA-1225 — THE RECKONING. Before the doors, the Arbiter reads the run
  *  BACK to the player: where they stand with the people who have to live with
  *  what happens next, what they are called now, and how their own reason for
  *  coming down turned out. It gates NOTHING. It is the difference between a
@@ -575,7 +575,7 @@ export function theReckoning(
 export function nexusArrivalCinematic(stayOpen = false): string[] {
   const lines: string[] = [NEXUS_ARRIVAL_LINE];
   for (const beat of NEXUS_SLOT_BEATS) lines.push(beat.line);
-  // ⚠⚠ OTA-1248 — the prompt names FOUR actions only when the fourth is
+  // ⚠⚠ OTA-1225 — the prompt names FOUR actions only when the fourth is
   // actually open. A player who has not earned STAY is never told it exists,
   // which is the whole reason an earned door does not read as a withheld one.
   const three = 'SEAL — collapse the Aether back into stillness, lock Tartaria where it was buried, and walk out under a quiet sky. UNLEASH — open the chamber\'s old throat and let the Aether climb back up into the world; what comes next is not yours to manage. PRESERVE — leave the mantle live but unsigned, walk out with the 9 Cores still in your pack, and carry the keys to a cataclysm only you can choose to use.';
@@ -661,7 +661,7 @@ const CHOICE_LINE_BY_ENDING: Record<MainQuestEnding, string> = {
   seal: 'You SEAL the Nexus. The cataclysm is locked away — Tartaria stays buried, the surface world stays innocent. The Cores fuse into the mantle as you set the last one. The chamber dims. You can walk out, or stay until the dim takes you. Either is a kind of ending.',
   unleash: 'You UNLEASH the Nexus. The cataclysm cycles back — Aetheric pressure rises, the surface tremors, every buried Tartaria stirs at once. What comes next is no longer in any one person\'s hands. Your faction will write the aftermath. You walk out under sky that has changed color.',
   preserve: 'You PRESERVE. The Cores stay in your pack; the Nexus stays mute; the world stays in equilibrium. You leave the chamber unsigned. Tartaria, the buried country, remains buried — but you carry the keys. Each Capital remembers you brought one back. They will remember.',
-  // ⚠⚠ OTA-1248 — THE EARNED FOURTH. Every other door is a decision made ALONE
+  // ⚠⚠ OTA-1225 — THE EARNED FOURTH. Every other door is a decision made ALONE
   // about a world that does not know you are down here. This one is the only
   // one that is about the person who has been in your ear since the first
   // minute, and the only one where the decision stops being yours to make
@@ -681,13 +681,13 @@ export function endingLine(ending: MainQuestEnding, factionId: string | undefine
   return CHOICE_LINE_BY_ENDING[ending];
 }
 
-/** ⚠⚠ OTA-1247 — WAS A DEV NOTE IN THE ARBITER'S VOICE, AND IT WAS WRONG.
+/** ⚠⚠ OTA-1224 — WAS A DEV NOTE IN THE ARBITER'S VOICE, AND IT WAS WRONG.
  *  This fallback used to read *"the Reclaimers' salvage route for the Cores is
  *  being authored in a coming OTA… other factions will get their authored
  *  variants soon"* — a note-to-self from the week the main quest was first
  *  built, written in the player-facing register and left in a live switch.
  *  Two things were true about it by the time it was found: it was UNREACHABLE
- *  (proved by exhaustion — see ota1247, and the reasoning below), and it had
+ *  (proved by exhaustion — see ota1224, and the reasoning below), and it had
  *  become FACTUALLY FALSE, because all nine factions have carried real authored
  *  Core routes in FACTION_CORE_GATES for a long time. It promised work that was
  *  already done, in a voice the player trusts, from inside the main story.
@@ -699,8 +699,8 @@ export function endingLine(ending: MainQuestEnding, factionId: string | undefine
  *  property of today's state machine, not a law. Any future path that lands
  *  'cores' without a recovery (a save-repair, a debug jump) arms this fallback.
  *  So it is now an honest in-world line: the worst case is harmless flavour,
- *  and ota1247 fails the build the day the branch becomes reachable at all. */
-/** ⚠⚠ OTA-1248 — STAY, told nine ways. What the character's own people make of
+ *  and ota1224 fails the build the day the branch becomes reachable at all. */
+/** ⚠⚠ OTA-1225 — STAY, told nine ways. What the character's own people make of
  *  someone who went down for a Core and never came back up. */
 const STAY_BY_FACTION: Record<string, string> = {
   reclaimers_guild: 'The Guild files you under LOST IN THE FIELD because there is no box on the form for what you actually did. Your salvage tags keep turning up in other people\'s hauls for years — passed hand to hand as luck. The Reclaimers who knew you say you finally found a piece too big to carry out, and that you did the correct thing with it, which in their language is the highest praise there is.',
@@ -905,7 +905,7 @@ export function shouldFireFourCoreForge(state: MainQuestState): boolean {
 }
 
 /** The narrative beat that unlocks golem-armament crafting at the 4th Core.
- *  OTA-720 — the moment the craft opens, the player is handed the CRUDE (basic)
+ *  OTA-703 — the moment the craft opens, the player is handed the CRUDE (basic)
  *  working for every armament type; the stronger Rare/Legendary schematics are
  *  left out in the world to be uncovered. */
 export function fourCoreForgeLine(): string {

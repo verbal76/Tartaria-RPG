@@ -34,7 +34,7 @@ const MATERIAL_NAMES = new Set(
   (((materialsData as unknown as { materials?: { name: string }[] }).materials ?? []))
     .map((m) => m.name.toLowerCase()),
 );
-// OTA-1057 — SCARCE materials. Owner asked for "limited amounts of Aether Mud
+// OTA-1034 — SCARCE materials. Owner asked for "limited amounts of Aether Mud
 // to named vendors for sale". Mud is a MATERIAL, and materials otherwise roll
 // 1-10 per visit — enough to walk away with five golems' worth from one
 // counter. These roll a deliberately tight band instead: a real supply you can
@@ -88,9 +88,9 @@ interface RoadsideArchetype {
   title: string;
   demeanor: 'honest' | 'sketchy';
   description: string;
-  /** OTA-1078 — the CAST that works this archetype's stall. See
+  /** OTA-1055 — the CAST that works this archetype's stall. See
    *  pickRoadsideTrader. Optional so a pack that omits it still loads (the
-   *  archetype name is then used, which is the pre-OTA-1078 behaviour). */
+   *  archetype name is then used, which is the pre-OTA-1055 behaviour). */
   people?: string[];
   pool: RoadsidePoolEntry[];
 }
@@ -187,10 +187,10 @@ export function pickRoadsideTrader(): VendorInstance {
   // OTA-729 — the fence/roadside trader sometimes carries a premium ware too.
   const roadsidePremium = maybePremiumOffer(offers);
   if (roadsidePremium) offers.push(roadsidePremium);
-  // OTA-1078 — A PERSON, NOT A STALL TYPE.
+  // OTA-1055 — A PERSON, NOT A STALL TYPE.
   //
   // There are exactly two archetypes, and their `name` fields are furniture:
-  // "Road Hawker" and "Sketchy Stall". OTA-1076 fixed a real leak — the runtime
+  // "Road Hawker" and "Sketchy Stall". OTA-1053 fixed a real leak — the runtime
   // id carried Date.now(), so the ledger split one trader into an unbounded run
   // of one-encounter strangers — but keyed the replacement off that name, which
   // over-corrected into the opposite error: every honest roadside trader on the
@@ -441,7 +441,7 @@ function resolveStallIdentity(category: StallCategory): { id: string; name: stri
 
 // Rarity-tiered stock depth. Stackable stalls (materials, food/consumables) are
 // bulk-buyable at the low end (grab 10 eggs / 10 commons); rare/legendary wares
-// stay scarce. Instance stalls (weapons, armor) are 1-2 per line.
+// stay scarce. Instance stalls (weapons, armor) are always 1 per line.
 function stallStockQuantity(rarity: string | undefined, category: StallCategory): number {
   // Weapons/armor are per-instance gear — never bulk-stack a shelf line.
   const stackable = category === 'materials' || category === 'food';

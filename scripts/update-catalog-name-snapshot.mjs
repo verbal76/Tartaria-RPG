@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// OTA-1025 — regenerate the catalog-name snapshot. Run this in the SAME commit as
+// OTA-1002 — regenerate the catalog-name snapshot. Run this in the SAME commit as
 // any content OTA that adds/renames/removes item names. The companion lock
 // test fails the build if a snapshot name disappears from the catalogs
 // without a LEGACY_ITEM_RENAMES migration entry (HANDOFF §3a rename policy).

@@ -231,7 +231,7 @@ export function lookupCraftedItem(resultName: string): {
   return { kind: 'misc', rarity: 'Common', tags: [] };
 }
 
-/** OTA-961 — canonical loot-name resolution for every drop path (kill roll, knockout
+/** OTA-938 — canonical loot-name resolution for every drop path (kill roll, knockout
  *  strip, hard-won bonus). The audit found 136 authored loot names in NO catalog:
  *  the exact-match lookupCraftedItem chain silently minted each as a 2-TC tagless
  *  Common misc, so a Legendary beast's trophy was worth the same as a Mud Boar's
@@ -244,7 +244,7 @@ export function lookupCraftedItem(resultName: string): {
  *       hide prices like a Legendary find, not junk. Trophies carry the 'trophy'
  *       tag (sellable + identifiable; no recipe consumes them). The curated pass
  *       deciding which trophies become REAL items builds on top of this. */
-/** OTA-965 — loot-name synonyms (provable only). Deliberately NOT the ambient pickup
+/** OTA-942 — loot-name synonyms (provable only). Deliberately NOT the ambient pickup
  *  alias map: pickup aliases assume scene-noun context and misfire on loot names. */
 const LOOT_NAME_ALIASES: Record<string, string> = {
   'aetherwing': 'Aether Wing',
@@ -259,7 +259,7 @@ export function resolveLootItem(rawName: string, enemyRarity?: Rarity): {
   tags: string[];
   baseDurability?: number;
 } {
-  // OTA-965 — exact (case-insensitive, alias-FREE) catalog membership always wins: a
+  // OTA-942 — exact (case-insensitive, alias-FREE) catalog membership always wins: a
   // real catalog name must never be rerouted by a pickup alias (v2 audit SEV-2).
   const direct = findCatalogItem(rawName, { aliases: false });
   if (direct) return direct;
@@ -295,7 +295,7 @@ export function findCatalogItem(name: string, opts?: { aliases?: boolean }): {
   // harpoon') map to a single canonical catalog item. Aliases
   // give the pickup path 30+ extra recognisable nouns without
   // authoring new catalog entries.
-  // OTA-965 — opts.aliases === false skips the ambient-noun alias layer. The v2 loot
+  // OTA-942 — opts.aliases === false skips the ambient-noun alias layer. The v2 loot
   // audit caught why that matters: those aliases were authored for scene PICKUPS
   // ('rope coil' -> 'Climbing Rope'), and running LOOT names through them backfired —
   // the old 'aether residue' -> 'Aether Dust' pickup alias silently converted the
@@ -363,7 +363,7 @@ export function isFusedInventoryItem(item: { uniqueStats?: unknown; tags?: reado
   return (item.tags ?? []).some((t) => t.toLowerCase() === 'fused');
 }
 
-/** OTA-756 — is this name used as a recipe INGREDIENT anywhere in the book?
+/** OTA-737 — is this name used as a recipe INGREDIENT anywhere in the book?
  *  Drives the forge's "junk loot only" gate (1a): an authored 'loot' reagent
  *  that feeds a recipe stays protected from the Crucible, so fusing can never
  *  cannibalize your crafting stock. Name-exact + lowercased; memoized because
@@ -407,7 +407,7 @@ const MATERIAL_SUBSTITUTE_TAGS: Record<string, string[]> = {
   'small rock': ['stone', 'mudstone', 'improvised'],
   'aetheric shard': ['aether', 'crystal'],
   'bone shard': ['organic', 'bone'],
-  // OTA-763 — mud recipes (the Common Mud Scanner, the starter Mud Golem, …) now
+  // OTA-744 — mud recipes (the Common Mud Scanner, the starter Mud Golem, …) now
   // accept any cheap mud-tagged material the player actually forages, so a pack full
   // of Mud Essence / Aetheric Sludge / Aether Mud satisfies an "Aether Mud" or
   // "Mud Fragment" slot instead of demanding those exact names. The rarity guard in
@@ -429,12 +429,12 @@ function isSubstitutable(item: InventoryItem): boolean {
   if (item.kind !== 'misc') return false;
   if (item.stolen) return false;
   if (item.reservedForFusion) return false;
-  // OTA-763 — never auto-consume a Rare/Legendary material as a cheap-slot substitute
+  // OTA-744 — never auto-consume a Rare/Legendary material as a cheap-slot substitute
   // (a Rare Mudstone standing in for a Common Mud Fragment, an Aetheric Cloth for
   // Patched Cloth, a Golem Core for an Aetheric Shard). The exact-named material still
   // crafts; this only stops a valuable mat vanishing into a low-tier recipe via the
   // tag drain. Common/Uncommon materials (the intended junk-fills-junk pool) still flow.
-  // OTA-1022 — canonical rarity: a stale-Common instance of a since-promoted
+  // OTA-999 — canonical rarity: a stale-Common instance of a since-promoted
   // Legendary (Titan Core, Dragon Scale...) defeated this guard entirely and
   // the tag drain ATE it into a low-tier recipe with no confirmation.
   const subRarity = canonicalItemRarity(item);
@@ -528,7 +528,7 @@ export function previewSubstitutionsList(
     for (const item of inventory) {
       if (stillNeed <= 0) break;
       if (!isSubstitutable(item)) continue;
-      // OTA-1024 — an item that IS one of the recipe's exact ingredients never
+      // OTA-1001 — an item that IS one of the recipe's exact ingredients never
       // doubles as a tag substitute for another slot (canonical tags widened
       // eligibility and exposed this: the recipe's own Stick fed the rock slot).
       if (ingredients.some((ig) => ig.name.toLowerCase() === item.name.toLowerCase())) continue;
@@ -585,7 +585,7 @@ export function consumeIngredientsList(
       if (need <= 0) break;
       if (item.quantity <= 0) continue;
       if (!isSubstitutable(item)) continue;
-      // OTA-1024 — mirror of the preview loop's exact-ingredient exclusion.
+      // OTA-1001 — mirror of the preview loop's exact-ingredient exclusion.
       if (ingredients.some((ig) => ig.name.toLowerCase() === item.name.toLowerCase())) continue;
       if (!canonicalItemTags(item).some((t) => tagSet.has(t))) continue;
       const take = Math.min(item.quantity, need);
@@ -605,7 +605,7 @@ export function consumeIngredientsList(
  *  consumed it once, so the craft went through paying one material short. This
  *  allocates each item to the first ingredient that claims it, exactly as the
  *  drain does, so canCraft can never approve a craft the drain would underpay. */
-// OTA-1027 — PER-INVENTORY annotation cache. ingredientShortfall annotated every
+// OTA-1004 — PER-INVENTORY annotation cache. ingredientShortfall annotated every
 // item (canonical tags + substitutability + catalog lookups) PER RECIPE, so
 // the craft badge and every repairs-tab re-render paid
 // O(recipes x inventory x catalog) — ~900ms in the harness, seconds-per-tap
@@ -630,7 +630,7 @@ function ingredientShortfall(
     SHORTFALL_META.set(inventory as unknown as object, meta);
   }
   const pool = meta.map((e) => ({ name: e.name, tags: e.tags, qty: e.qty, sub: e.sub }));
-  // OTA-1027 — parity with the preview/drain loops' exact-ingredient exclusion: an
+  // OTA-1004 — parity with the preview/drain loops' exact-ingredient exclusion: an
   // item that IS one of the recipe's exact ingredients never doubles as a tag
   // substitute for another slot. canCraft kept the old rule after the loops
   // gained it, so approve and drain could disagree (the OTA-613 hazard).
@@ -729,7 +729,7 @@ export function consumeIngredients(
   return consumeIngredientsList(inventory, recipe.ingredients);
 }
 
-/** OTA-1006 — how many of this recipe the pack can actually make RIGHT NOW.
+/** OTA-983 — how many of this recipe the pack can actually make RIGHT NOW.
  *  Simulates the real drain one craft at a time (substitution-aware, because
  *  consumeIngredientsList runs the same canonical-first / substitute-tag passes
  *  the craft does), so "MAX" is an honest number rather than a division that
@@ -951,13 +951,13 @@ export function findMaterialByName(name: string): CatalogMaterial | null {
 
 /** Same for gear — small catalog (6 items as of OTA 192) but the
  *  effect resolver needs a uniform lookup interface. */
-/** OTA-1020 — CANONICAL tags for an inventory item: its own instance tags UNION
+/** OTA-997 — CANONICAL tags for an inventory item: its own instance tags UNION
  *  the catalog row's (matched by name across weapons/armor/gear/exploration/
  *  materials). Inventory instances persist the tag set from the moment they
  *  were MINTED, so an item acquired before a catalog tag existed carries a
  *  stale set forever — identity checks must read the catalog, never trust the
  *  snapshot alone. Lowercased. Non-catalog names (fused gear) return own tags. */
-// OTA-1026 — PER-NAME MEMO. The canonical helpers went from micro to macro cost
+// OTA-1003 — PER-NAME MEMO. The canonical helpers went from micro to macro cost
 // when the snapshot audit routed ~40 sites through them: each call ran up to
 // NINE linear catalog scans, and loops (substitution drains, per-item loot
 // filters) multiplied that into a blocked JS thread on the KILL beat — the
@@ -983,7 +983,7 @@ export function canonicalItemTags(item: { name: string; tags?: readonly string[]
   return Array.from(new Set([...own, ...cat]));
 }
 
-/** OTA-1026 — memoized findCatalogItem for the kind/rarity helpers (same
+/** OTA-1003 — memoized findCatalogItem for the kind/rarity helpers (same
  *  aliases:false semantics; catalogs are static per process). */
 function canonicalRowFor(name: string): ReturnType<typeof findCatalogItem> {
   let row = CANON_ROW_CACHE.get(name);
@@ -994,7 +994,7 @@ function canonicalRowFor(name: string): ReturnType<typeof findCatalogItem> {
   return row;
 }
 
-/** OTA-1022 — canonical KIND: fused pieces stay instance-authoritative
+/** OTA-999 — canonical KIND: fused pieces stay instance-authoritative
  *  (uniqueStats.kind), catalog rows answer by name, and only a non-catalog
  *  name falls back to the persisted snapshot. The load-time kind heal is
  *  UPGRADE-only (never applies a demotion to 'misc'), so decision sites must
@@ -1009,7 +1009,7 @@ export function canonicalItemKind(
   return item.kind ?? 'misc';
 }
 
-/** OTA-1022 — canonical RARITY. Instance rarity is NEVER healed on load anywhere,
+/** OTA-999 — canonical RARITY. Instance rarity is NEVER healed on load anywhere,
  *  so a since-promoted material still reads its mint-time tier forever (and
  *  the stack-merge spreads it to every new copy). Catalog wins for catalog
  *  names; fused/uncatalogued instances keep their own. */
@@ -1044,7 +1044,7 @@ export function fuzzyFindArmor(text: string): CatalogArmor | null {
   return ARMOR.find((a) => a.name.toLowerCase().includes(t) || t.includes(a.name.toLowerCase())) ?? null;
 }
 
-// OTA-762 — spread the WEAKNESSES so no single damage type is the near-universal
+// OTA-743 — spread the WEAKNESSES so no single damage type is the near-universal
 // answer. Pre-OTA, bludgeoning was the weakness for Aetheric Mutation + Aetheric
 // Creature + Automation — the three most common types in the aetheric wasteland
 // (56 of 109 enemies) — so every fight rewarded the same blunt weapon. And four

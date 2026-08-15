@@ -6,7 +6,7 @@ jest.mock('react-native', () => ({
   View: 'View',
   Text: 'Text',
   StyleSheet: { create: (s: unknown) => s },
-  // ⚠ OTA-1252 — StatsPanel now reads STAT_ROW_MAX_WIDTH (the cap that stops
+  // ⚠ OTA-1229 — StatsPanel now reads STAT_ROW_MAX_WIDTH (the cap that stops
   // the stat row stretching on a desktop monitor), and that constant is
   // platform-aware. This mock is deliberately PARTIAL, so it needs the key
   // explicitly; 'ios' keeps this suite on the native branch, which is the one

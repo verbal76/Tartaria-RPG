@@ -53,7 +53,7 @@ function actionsFor(item: InventoryItem, equippedSlots: ReadonlyMap<string, stri
   const fx = resolveItemEffect(item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
   const offEligible = slots.includes('off') && !equippedInSlots.includes('off');
   const anySlotFree = slots.some((s) => !equippedInSlots.includes(s));
-  // OTA-765 — a coat-only coating (acid: no player ailment to counter) offers no
+  // OTA-746 — a coat-only coating (acid: no player ailment to counter) offers no
   // drink/use action; it can still be worked into a weapon or armor.
   if ((isConsumable || fx !== null || (anySlotFree && (offEligible || slots.length > 0))) && coatingItemDrinkable(item)) {
     acts.push(isConsumable ? `use(${consumeVerb(item)})` : offEligible ? 'use(off)' : 'use');
@@ -72,7 +72,7 @@ function actionsFor(item: InventoryItem, equippedSlots: ReadonlyMap<string, stri
   }
   // SAVE FOR FUSION — only inferred items, only when not already
   // reserved. Mirrors the OTA-194 heart-tap gate.
-  // OTA-756 — forge-reservable now = shared predicate (2a excludes weapon/armor,
+  // OTA-737 — forge-reservable now = shared predicate (2a excludes weapon/armor,
   // 1a includes no-recipe 'loot' reagents). release-from-fusion still shows on ANY
   // reserved item so a stranded reserve can be freed.
   if (isForgeReservableItem(item) && !item.reservedForFusion) acts.push('save-for-fusion');

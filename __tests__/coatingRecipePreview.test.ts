@@ -1,4 +1,4 @@
-// OTA-721 — the RECIPES tab splits FOOD & HEALTH from WEAPON COATINGS (coatings
+// OTA-704 — the RECIPES tab splits FOOD & HEALTH from WEAPON COATINGS (coatings
 // are consumables tagged 'weapon_coating'), and each coating row now shows its
 // actual output so the player can tell the strong variant from the flavorful-name
 // one. This pins both: the coating-detection predicate + the preview surfacing.
@@ -11,7 +11,7 @@ const isCoating = (result: string): boolean =>
 const coatingLine = (name: string): string | undefined =>
   getItemPreview(name).stats.find((s) => s.startsWith('Coats weapon'));
 
-describe('OTA-721 — coatings split out of food', () => {
+describe('OTA-704 — coatings split out of food', () => {
   it('weapon coatings are detected; food/health items are not', () => {
     for (const n of ['Incendiary Paste', 'Poison Vial', 'Plague Vial', 'Static Paste']) {
       expect(isCoating(n)).toBe(true);
@@ -22,7 +22,7 @@ describe('OTA-721 — coatings split out of food', () => {
   });
 });
 
-describe('OTA-721 — coating output is legible on the recipe card', () => {
+describe('OTA-704 — coating output is legible on the recipe card', () => {
   it('a coating row shows its damage dice + type', () => {
     expect(coatingLine('Incendiary Paste')).toBe('Coats weapon: +1d4 burn (Burning)');
     expect(coatingLine('Poison Vial')).toBe('Coats weapon: +1d4 poison (Poisoned)');

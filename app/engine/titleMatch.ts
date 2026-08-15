@@ -1,4 +1,4 @@
-// OTA-1211 — TITLE MATCHING THAT SURVIVES THE PARSER'S OWN STOP-WORD STRIPPING.
+// OTA-1188 — TITLE MATCHING THAT SURVIVES THE PARSER'S OWN STOP-WORD STRIPPING.
 //
 // ⚠⚠ THE DEFECT, MEASURED (2026-08-09). A live probe typed `send word Fragment of the Red
 // Tower` while holding exactly that mystery. The parser resolved it perfectly —
@@ -10,7 +10,7 @@
 // **The parser strips "of the"; the finders require it.** `"fragment red tower"` is not a
 // substring of `"fragment of the red tower"` and does not contain it, so the match fails.
 //
-// ⚠ THIS IS NOT A COURIER BUG AND IT PREDATES OTA-1211. It breaks the typed turn-in of
+// ⚠ THIS IS NOT A COURIER BUG AND IT PREDATES OTA-1188. It breaks the typed turn-in of
 // ANY contract whose title carries a word the parser drops — it was simply invisible while
 // "send word" was refused outright before it ever reached a finder, and while most players
 // use the Contracts screen's COMPLETE button instead of typing.
@@ -69,14 +69,14 @@ export function findByTitle<T extends { title: string }>(
   const exact = pool.find((x) => x.title.toLowerCase() === t);
   if (exact) return exact;
 
-  // ⚠⚠ OTA-1216 (PUNCHLIST P12) — SUBSTRING NO LONGER GUESSES.
+  // ⚠⚠ OTA-1193 (PUNCHLIST P12) — SUBSTRING NO LONGER GUESSES.
   //
   // This was `pool.find(...)`, which returns the FIRST match even when several fit. Hold
   // "Red Tower Fragment Cache" and "Red Tower Fragment Vault", type `turn in red tower
   // fragment`, and the game silently closed whichever happened to sit earlier in the
   // catalog — with a real payout attached and no way for the player to know it had chosen.
   //
-  // ⚠ It was left alone deliberately in OTA-1211: that change dropped a shared resolver
+  // ⚠ It was left alone deliberately in OTA-1188: that change dropped a shared resolver
   // into four widely-used finders, and its entire safety argument was that it could only
   // ever WIDEN what matched, never change an answer the old code already gave. Fixing this
   // inside it would have broken that promise. It was filed as P12 instead, with a test

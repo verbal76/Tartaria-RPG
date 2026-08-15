@@ -25,11 +25,11 @@ export function hasFactionRapport(
   factionId: string | null | undefined,
 ): boolean {
   if (!factionId) return false;
-  // ⚠ OTA-1179 — heal the id BEFORE building a quest id out of it. A legacy race id
+  // ⚠ OTA-1156 — heal the id BEFORE building a quest id out of it. A legacy race id
   // yields `fq_architectural_sentinels_rapport`, which exists in no quest catalogue,
   // so this returns false and the CHA discount is PERMANENTLY 0, with no log line —
   // for a vendor whose rapport quest the player did actually complete. Same root as
-  // the OTA-1178 gift bug, failing silently on the read side instead of loudly.
+  // the OTA-1155 gift bug, failing silently on the read side instead of loudly.
   const id = canonicalFactionId(factionId) ?? factionId;
   return (completedFactionQuestIds ?? []).includes(rapportQuestId(id));
 }

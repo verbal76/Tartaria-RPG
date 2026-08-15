@@ -221,7 +221,7 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
     // (move on, never hang the player) so we use a local helper
     // that resolves with null on the deadline.
     const disposeWithDeadline = <T,>(label: string, p: Promise<T> | T, ms = 3000): Promise<T | null> => {
-      // OTA-1064 — hold the deadline timer so it can be cleared when the
+      // OTA-1041 — hold the deadline timer so it can be cleared when the
       // dispose wins the race. Before this the timer stayed armed for its
       // full 3s after the work had already finished; harmless in production
       // (reloadAsync follows immediately) but it kept four dangling handles
@@ -242,7 +242,7 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
         }),
       ]).finally(() => { if (timer !== undefined) clearTimeout(timer); });
     };
-    // OTA-1064 — the four disposes used to run in SERIES, each with its own
+    // OTA-1041 — the four disposes used to run in SERIES, each with its own
     // 3-second deadline. Worst case that is 12 seconds of a screen that looks
     // frozen, with no progress indication beyond a static "Releasing
     // resources…". That window is the leading suspect for the reported

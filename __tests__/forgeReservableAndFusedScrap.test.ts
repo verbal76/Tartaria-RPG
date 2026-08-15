@@ -1,4 +1,4 @@
-// OTA-756 — three forge changes:
+// OTA-737 — three forge changes:
 //   (1a) authored 'loot' reagents with NO recipe use become forge-reservable;
 //        recipe-critical loot stays protected.
 //   (2a) inferred weapons/armor are NOT forge-reservable (they used to show a ♥
@@ -18,7 +18,7 @@ const COMMON_MATS = new Set([
   'Spider Silk', 'Aether Crystal', 'Aether Residue',
 ]);
 
-describe('OTA-756 (1a/2a) — forge reservability', () => {
+describe('OTA-737 (1a/2a) — forge reservability', () => {
   it('inferred misc junk is reservable', () => {
     expect(isForgeReservableItem(mk({ name: 'Weird Goo', kind: 'misc', tags: ['organic'] }))).toBe(true);
   });
@@ -51,7 +51,7 @@ describe('OTA-756 (1a/2a) — forge reservability', () => {
   });
 });
 
-describe('OTA-756 (3) — fused weapon/armor scraps to Uncommon/Rare only', () => {
+describe('OTA-737 (3) — fused weapon/armor scraps to Uncommon/Rare only', () => {
   const fusedWeapon = mk({ name: 'Ghost-Charged Gouge', kind: 'weapon', rarity: 'Legendary', tags: ['fused', 'unique', 'aetheric'], uniqueStats: {} as UniqueItemStats });
   const fusedArmorRare = mk({ name: 'Pulse-Woven Cuirass', kind: 'armor', rarity: 'Rare', tags: ['fused', 'unique', 'aetheric'], uniqueStats: {} as UniqueItemStats });
 
@@ -75,7 +75,7 @@ describe('OTA-756 (3) — fused weapon/armor scraps to Uncommon/Rare only', () =
   });
 });
 
-describe('OTA-759 — fused resistance follows the DOMINANT material, not always aether', () => {
+describe('OTA-740 — fused resistance follows the DOMINANT material, not always aether', () => {
   const mkI = (name: string, tags: string[]): InventoryItem =>
     ({ id: name, name, kind: 'misc', rarity: 'Common', quantity: 1, tags } as InventoryItem);
 

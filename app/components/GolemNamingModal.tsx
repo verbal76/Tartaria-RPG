@@ -1,10 +1,10 @@
-// OTA-1050 — GOLEM NAMING POPUP. Same treatment as the dog onboarding: the
+// OTA-1027 — GOLEM NAMING POPUP. Same treatment as the dog onboarding: the
 // old flow captured the NEXT TYPED INPUT as the golem's name (or "skip"),
 // which read as just another feed line and could swallow a combat command.
 // Raised whenever pendingGolemNaming is set and a golem stands; a flag left
 // over from a golem that died/dismissed before naming self-clears.
 //
-// OTA-1067 — brought in line with the dog card (OTA-1066). This card carried
+// OTA-1044 — brought in line with the dog card (OTA-1043). This card carried
 // the same three faults, found by reading it rather than by a device report,
 // so the owner never had to hit them twice:
 //
@@ -42,7 +42,7 @@ export function GolemNamingModal() {
     if (pending && !golem) confirm(null);
   }, [pending, golem, confirm]);
 
-  // OTA-1067 — let the summon line be read first.
+  // OTA-1044 — let the summon line be read first.
   const armed = !!pending && !!golem;
   const blocked = !!notice;
   useEffect(() => {
@@ -125,7 +125,7 @@ export function GolemNamingModal() {
   );
 }
 
-// OTA-1067 — palette matched to MissionCompleteModal / DogOnboardingModal.
+// OTA-1044 — palette matched to MissionCompleteModal / DogOnboardingModal.
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,

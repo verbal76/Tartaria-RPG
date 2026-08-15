@@ -11,7 +11,7 @@ import type {
   WorldMemory,
 } from './types';
 import { withArticle, withArticleCap } from './grammar';
-// OTA-1090 — Phase 5: the Arbiter's arc across the Cores and his opinion of
+// OTA-1067 — Phase 5: the Arbiter's arc across the Cores and his opinion of
 // the player, both derived from the save.
 import { arbiterRemark } from './arbiterPersona';
 import { pick, chance, rotatingPick } from './rng';
@@ -595,7 +595,7 @@ export interface ArbiterContext {
   hasFood?: boolean;
 }
 
-// OTA-1049 — the mood arrives one action STALE (the cognitive read for the
+// OTA-1026 — the mood arrives one action STALE (the cognitive read for the
 // current action lands after this line prints), so the first peaceful action
 // after a fight still reads AGGRESSION — and every AGGRESSION line
 // presupposes a live opponent ("don't make me decide which one of you to
@@ -650,7 +650,7 @@ const COMBAT_REMARKS = [
 // ("the heir atalan-drowned is patient"). Generic creatures still lowercase cleanly
 // ("the mud boar"). Keyed off the `boss` flag (Core Guardians + boss-gate spawns all
 // carry it), so the fix is scoped to exactly the named threats.
-// OTA-1116 — AND FACTION FIGHTERS ARE NAMED TOO. dressFactionFighter builds
+// OTA-1093 — AND FACTION FIGHTERS ARE NAMED TOO. dressFactionFighter builds
 // "<Faction> Raider N" and stamps a factionId, which the boss flag never
 // covered — so the owner's log read "The Arbiter watches the conspiracy
 // architects raider 1." A carried factionId is the same signal as `boss`: this
@@ -1171,7 +1171,7 @@ export function buildArbiterSceneIntro(ctx: SceneIntroContext): string {
     if (pool && pool.length > 0) return pick(pool);
   }
 
-  // ⚠ OTA-1090 — PHASE 5. ~15% — who the Arbiter is, in passing.
+  // ⚠ OTA-1067 — PHASE 5. ~15% — who the Arbiter is, in passing.
   //
   // This branch is where the phase lands in play. It used to be a flat pick
   // from thirteen lines that knew nothing: the same confession on hour two and

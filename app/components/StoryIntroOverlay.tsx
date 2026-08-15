@@ -1,9 +1,9 @@
-// OTA-1041 — THE OPENING CRAWL. Owner: "we need a scrolling text intro akin to
+// OTA-1018 — THE OPENING CRAWL. Owner: "we need a scrolling text intro akin to
 // the Skyrim criminal-in-a-cart intro to describe why you are there, why you
 // are doing this and what you want to happen."
 //
 // Full-screen paged crawl shown over the first scene of a new game (and on
-// demand via REPLAY OPENING in the CharacterScreen header — OTA-1046; it was
+// demand via REPLAY OPENING in the CharacterScreen header — OTA-1023; it was
 // on About before, whose title-screen entry path has no player to gate on).
 // Each page drifts up out of the dark as
 // it fades in — slow enough to read as a title crawl, fast enough not to fight

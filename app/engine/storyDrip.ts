@@ -1,4 +1,4 @@
-// OTA-1044 — THE MOTIVE DRIP (golem-line story feature, phase 3 of 3).
+// OTA-1021 — THE MOTIVE DRIP (golem-line story feature, phase 3 of 3).
 //
 // Owner: "we need to keep updating the player as they play." Phases 1-2 made
 // the story speak at the big landmarks (the crawl, the chapter cards, the
@@ -48,7 +48,7 @@ interface MissingResolutionBlock {
 
 interface DripData {
   beats: Record<string, DripBeat[]>;
-  /** ⚠⚠ OTA-1246 — keyed by MOTIVE now, not just the one. Every motive has
+  /** ⚠⚠ OTA-1223 — keyed by MOTIVE now, not just the one. Every motive has
    *  three authored answers; exactly one of the three carries `defeat` lines
    *  and is therefore the boss variant. */
   resolutions: Record<string, Record<string, MissingResolutionBlock>>;
@@ -59,7 +59,7 @@ const data = dripData as unknown as DripData;
 export type MissingResolutionKind = 'grave' | 'lie' | 'walker';
 export const MISSING_RESOLUTION_KINDS: readonly MissingResolutionKind[] = ['grave', 'lie', 'walker'] as const;
 
-/** ⚠⚠ OTA-1246 — EVERY MOTIVE ENDS SOMEWHERE. The Missing's trail was the only
+/** ⚠⚠ OTA-1223 — EVERY MOTIVE ENDS SOMEWHERE. The Missing's trail was the only
  *  reason-you-came-down with an in-world payoff scene; Debt, Exile, Calling and
  *  Record got five drip beats, two forks, and an epilogue paragraph — but never
  *  the moment where the thing you came for is finally in front of you. Owner's
@@ -90,7 +90,7 @@ export function isMissingWalker(enemy: { traits?: string[] } | null | undefined)
   return !!enemy?.traits?.includes(MISSING_WALKER_TRAIT);
 }
 
-/** ⚠⚠ OTA-1246 — the general marker. `motive_resolution:<motive>:<kind>` carries
+/** ⚠⚠ OTA-1223 — the general marker. `motive_resolution:<motive>:<kind>` carries
  *  everything the defeat hook needs to close the thread and grant the keepsake,
  *  so the four new boss answers need no per-motive plumbing in the store. The
  *  Missing walker keeps MISSING_WALKER_TRAIT as well — its own tests, and any
@@ -167,7 +167,7 @@ export function storySeed(p: Pick<PlayerCharacter, 'name' | 'raceId' | 'factionI
 // names — the intro never fixes who they were to you, and neither do we.
 const MISSING_NAMES = ['Maren', 'Joska', 'Edda', 'Tam', 'Veyra', 'Coll', 'Isen', 'Rhoda'] as const;
 
-/** OTA-1246 — the figure at the centre of each motive's ending, dealt the same
+/** OTA-1223 — the figure at the centre of each motive's ending, dealt the same
  *  way the missing person always was: the creditor house, the magistrate who
  *  signed, the one who heard the hum first, the other chronicler. Stable per
  *  character, different across characters, filled into {name} in the authored
@@ -247,7 +247,7 @@ export function missingResolutionDue(
   return resolutionDue(p);
 }
 
-/** ⚠⚠ OTA-1246 — the general gate, for every motive: all five of this motive's
+/** ⚠⚠ OTA-1223 — the general gate, for every motive: all five of this motive's
  *  drip beats seen, three Cores carried, not yet resolved. The caller fires it
  *  on the next Lost Capital arrival. Identical pacing to the Missing trail —
  *  the reason you came down answers itself in the last third of the run, once
@@ -264,7 +264,7 @@ export function resolutionDue(
 
 /** What this character's motive resolved to, if it has. `missingResolved` is the
  *  ORIGINAL field and stays authoritative for the Missing motive — a save that
- *  finished that trail before OTA-1246 reads correctly with no migration. */
+ *  finished that trail before OTA-1223 reads correctly with no migration. */
 export function resolvedKindOf(
   p: Pick<PlayerCharacter, 'storyMotive' | 'missingResolved' | 'motiveResolved'>,
 ): string | null {
@@ -286,11 +286,11 @@ export function resolutionBlock(motiveId: string | undefined, kind: string, figu
   return {
     arrival: block.arrival.map((l) => ({ ...l, text: fill(l.text, personName) })),
     defeat: block.defeat?.map((l) => ({ ...l, text: fill(l.text, personName) })),
-    // ⚠ OTA-1246 — the KEEPSAKE gets filled too. It never was: the original
+    // ⚠ OTA-1223 — the KEEPSAKE gets filled too. It never was: the original
     // three Missing keepsakes happened to carry no {name}, so the omission was
     // invisible until an authored keepsake used one — at which point the raw
     // token would have shipped inside an item the player keeps forever. The
-    // audit in ota1246 pins every field of every block against the token.
+    // audit in ota1223 pins every field of every block against the token.
     keepsake: {
       name: fill(block.keepsake.name, personName),
       description: fill(block.keepsake.description, personName),
@@ -308,7 +308,7 @@ export function missingResolvedEpilogue(
   return resolvedEpilogue(p);
 }
 
-/** ⚠ OTA-1246 — EndingScreen override for EVERY motive: once the reason you came
+/** ⚠ OTA-1223 — EndingScreen override for EVERY motive: once the reason you came
  *  down has been answered in the world, the standard epilogue (which assumes the
  *  question is still open) gives way to the resolution's own closing. Null when
  *  the character never reached their answer — those still read the open-question

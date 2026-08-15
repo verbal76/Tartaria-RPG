@@ -1,4 +1,4 @@
-// OTA-829 — the FUSABLE inventory filter (isForgeReservableItem) listed the
+// OTA-809 — the FUSABLE inventory filter (isForgeReservableItem) listed the
 // player's main-quest Capital "Cores" — un-fusible Legendary quest items. They're
 // catalog-absent, so they fell through to the `isInferredItem` shortcut and read as
 // reservable junk BEFORE the FORGE_LOOT_BLOCK_TAGS guard (quest/relic/sigil/...)
@@ -15,7 +15,7 @@ const mk = (p: Partial<InventoryItem> & { name: string }): InventoryItem =>
 const questCore = (name: string): InventoryItem =>
   mk({ name, kind: 'relic', rarity: 'Legendary', tags: ['quest', 'aetheric_core', 'main_quest'] });
 
-describe('OTA-829 — main-quest Cores are never forge-reservable', () => {
+describe('OTA-809 — main-quest Cores are never forge-reservable', () => {
   it('a Capital Core (quest/relic, catalog-absent) is NOT reservable', () => {
     expect(isForgeReservableItem(questCore('Samarran Core'))).toBe(false);
     expect(isForgeReservableItem(questCore('Nimari Core'))).toBe(false);

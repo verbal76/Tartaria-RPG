@@ -30,7 +30,7 @@ export function traitACBonus(traits: readonly string[] | undefined): number {
   let bonus = 0;
   for (const t of traits) {
     if (t === 'armored') bonus += 2;
-    // OTA-1225 — a raised Aether Shield IS armour while it stands: same +3 the player's
+    // OTA-1202 — a raised Aether Shield IS armour while it stands: same +3 the player's
     // field grants, read here so enemyAC and the panel agree for free.
     else if (t === 'field:aether_shield') bonus += 3;
     else if (t === 'weak_armor') bonus -= 2;
@@ -85,7 +85,7 @@ export function traitDamageMultiplier(
     if (!arg) continue;
     if (key === 'resist' && canonicalDamageType(arg) === wt) return { multiplier: 0.5, match: 'resist' };
     if (key === 'vulnerable' && canonicalDamageType(arg) === wt) return { multiplier: 1.5, match: 'vulnerable' };
-    // ⚠ OTA-1116 — `inured:<type>` CANCELS this individual's kind-wide WEAKNESS
+    // ⚠ OTA-1093 — `inured:<type>` CANCELS this individual's kind-wide WEAKNESS
     // to that type. It does NOT make the hit worse; it makes it ordinary. See
     // combineDamageTypeMatch, and randomizeEnemyDefense which is the only thing
     // that stamps it. The distinction is the whole point of this OTA: the
@@ -97,27 +97,22 @@ export function traitDamageMultiplier(
   return { multiplier: 1, match: 'normal' };
 }
 
-/** OTA-715 — reconcile the creature-TYPE damage table with an enemy's
+/** OTA-698 — reconcile the creature-TYPE damage table with an enemy's
  *  authored resist/vulnerable TRAIT for the same damage type.
  *
  *  The two systems are meant to STACK when they agree — a Construct
- *  ("resist:slashing" by type) that ALSO carries a "resist:slashing" trait
- *  halves twice (×0.25). But when they DISAGREE — e.g. an "Aetheric
- *  Creature" (type resists aetheric) authored `vulnerable:aetheric` — the
- *  old code multiplied 0.5 × 1.5 = 0.75 and printed BOTH "shrugs off" and
+ *  (resist:slashing by type) that ALSO carries a resist:slashing trait
+ *  halves twice (x0.25). But when they DISAGREE — e.g. an Aetheric
+ *  Creature (type resists aetheric) authored vulnerable:aetheric — the
+ *  old code multiplied 0.5 x 1.5 = 0.75 and printed BOTH "shrugs off" and
  *  "vulnerable" on the same hit, and the swap-nag steered the player away
  *  from the enemy's real weakness. A per-enemy authored trait is a
- *  deliberate override, so on a DISCORD the trait wins; otherwise the two
- *  stack as before.
- *
- *  Inputs are the `match` outputs of applyDamageTypeModifier (type) and
- *  traitDamageMultiplier (trait). Returns the effective multiplier and a
- *  single 'weak' | 'resist' | 'normal' label for messaging. */
+ *  deliberate override, so on a DISCORD the trait wins; otherwise stack. */
 export function combineDamageTypeMatch(
   typeMatch: 'weak' | 'resist' | 'normal',
   traitMatch: 'resist' | 'vulnerable' | 'normal' | 'inured',
 ): { multiplier: number; match: 'weak' | 'resist' | 'normal' } {
-  // OTA-1116 — `inured` is a CANCELLATION, not a direction, so it resolves
+  // OTA-1093 — `inured` is a CANCELLATION, not a direction, so it resolves
   // before the stack/discord math: whatever the type table says, this
   // individual takes that type as an ordinary hit. It can only ever cancel a
   // WEAKNESS — an inured trait on a type the kind already resists leaves the
@@ -132,11 +127,9 @@ export function combineDamageTypeMatch(
   const traitMult = traitMatch === 'vulnerable' ? 1.5 : traitMatch === 'resist' ? 0.5 : 1;
   const typeDir = typeMatch === 'weak' ? 1 : typeMatch === 'resist' ? -1 : 0;
   const traitDir = traitMatch === 'vulnerable' ? 1 : traitMatch === 'resist' ? -1 : 0;
-  // Discordant (one resists, the other is vulnerable) → authored trait wins.
   if (typeDir !== 0 && traitDir !== 0 && typeDir !== traitDir) {
     return { multiplier: traitMult, match: traitMatch === 'vulnerable' ? 'weak' : 'resist' };
   }
-  // Concordant or one-sided → stack (unchanged behavior).
   const multiplier = typeMult * traitMult;
   return { multiplier, match: multiplier > 1 ? 'weak' : multiplier < 1 ? 'resist' : 'normal' };
 }
@@ -191,7 +184,7 @@ export function traitDodgeChance(traits: readonly string[] | undefined): number 
   if (!traits) return 0;
   let chance = 0;
   for (const t of traits) {
-    // OTA-935 — trimmed (agile 0.25->0.18, quick 0.15->0.12) so a slippery foe slips the
+    // OTA-912 — trimmed (agile 0.25->0.18, quick 0.15->0.12) so a slippery foe slips the
     // odd blow without stonewalling a long fight.
     if (t === 'agile') chance = Math.max(chance, 0.18);
     else if (t === 'quick') chance = Math.max(chance, 0.12);
@@ -199,7 +192,7 @@ export function traitDodgeChance(traits: readonly string[] | undefined): number 
   return chance;
 }
 
-/** OTA-935 — a CRUSHING blow can't be twisted clear. A crit never dodges, and beating the
+/** OTA-912 — a CRUSHING blow can't be twisted clear. A crit never dodges, and beating the
  *  enemy's AC by DODGE_BEATEN_MARGIN or more always lands (no more "rolled 29, whiffed").
  *  Only marginal hits face the (reduced) trait dodge chance. */
 export const DODGE_BEATEN_MARGIN = 8;
@@ -237,7 +230,7 @@ const TRAIT_LABEL: Record<string, string> = {
 
 export function describeTrait(t: string): string {
   {
-    // OTA-1225 — technique-family traits get real names in the portrait.
+    // OTA-1202 — technique-family traits get real names in the portrait.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const AT = require('./aetherTechniques') as typeof import('./aetherTechniques');
     const tech = AT.describeTechniqueTrait(t);

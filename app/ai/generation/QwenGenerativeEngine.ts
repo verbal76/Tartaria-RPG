@@ -50,12 +50,12 @@ export interface GenerateOptions {
   topP?: number;
   /** Top-k sampling. Default 40. */
   topK?: number;
-  /** OTA-1128 — telemetry label for this call. See qwenTelemetry.ts. */
+  /** OTA-1105 — telemetry label for this call. See qwenTelemetry.ts. */
   job?: string;
-  /** OTA-1146 — idle-time work nobody asked for: queues below voice AND is cut
+  /** OTA-1123 — idle-time work nobody asked for: queues below voice AND is cut
    *  short the moment the player needs the model. See LlamaGenerateOptions. */
   homework?: boolean;
-  /** OTA-1157 — keeps its priority but can be cut short when higher-priority
+  /** OTA-1134 — keeps its priority but can be cut short when higher-priority
    *  work arrives. Item synthesis sets this; narration does not. See
    *  LlamaGenerateOptions.interruptible for the full reasoning. */
   interruptible?: boolean;
@@ -88,7 +88,7 @@ export class QwenGenerativeEngine {
   private lastError: string | null = null;
   private runtime: LlamaRuntime | null = null;
   private modelId: string = DEFAULT_QWEN_MODEL_ID;
-  // OTA-1107 — the two guards that stop background-bounce thrash (the
+  // OTA-1084 — the two guards that stop background-bounce thrash (the
   // 11-part log-export session: every switch-away disposed the context,
   // every return kicked a fresh ~400MB load, 10+ overlapping attempts
   // in a minute):
@@ -136,7 +136,7 @@ export class QwenGenerativeEngine {
    *  fallback path (e.g., deterministic fusion) covers the current
    *  interaction; the warm-up is for the NEXT one. */
   async forceReinitialize(opts: QwenInitOptions = {}): Promise<void> {
-    // OTA-1107 — a load is already warming up: join it instead of resetting
+    // OTA-1084 — a load is already warming up: join it instead of resetting
     // status underneath it and stacking a second concurrent context load.
     if (this.initInFlight) return this.initInFlight;
     this.status = 'idle';
@@ -180,7 +180,7 @@ export class QwenGenerativeEngine {
   }
 
   private async runInitialize(opts: QwenInitOptions): Promise<void> {
-    // OTA-1107 — snapshot the lifecycle generation. If dispose() runs while
+    // OTA-1084 — snapshot the lifecycle generation. If dispose() runs while
     // this load is in flight (app backgrounded mid-reload), the result is
     // stale and must be thrown away, not installed as 'ready'.
     const gen = this.lifecycleGen;
@@ -226,11 +226,11 @@ export class QwenGenerativeEngine {
         threads: opts.threads ?? 2,
       });
       if (this.lifecycleGen !== gen) {
-        // OTA-1107 — dispose() landed while the context was loading. The app
+        // OTA-1084 — dispose() landed while the context was loading. The app
         // wanted the memory back; a straggler load must not resurrect a
         // ~400MB context in the background. Tear the fresh one down.
         //
-        // ⚠ OTA-1200 — COUNTED, BECAUSE READING THIS CODE IS NOT THE SAME AS WATCHING IT
+        // ⚠ OTA-1177 — COUNTED, BECAUSE READING THIS CODE IS NOT THE SAME AS WATCHING IT
         // RUN. This guard looks correct on the page, and it was still the leading orphan
         // suspect after the 1.9GB jetsam reports — precisely because nothing proved it
         // executes. If the device log shows orphans climbing while this counter sits at
@@ -302,9 +302,9 @@ export class QwenGenerativeEngine {
    * free memory cleanly.
    */
   async dispose(): Promise<void> {
-    // OTA-1107 — mark any in-flight load stale (see lifecycleGen above).
+    // OTA-1084 — mark any in-flight load stale (see lifecycleGen above).
     this.lifecycleGen += 1;
-    // ⚠ OTA-1142 — STATUS LEAVES 'ready' FIRST, AND THIS IS THE WHOLE FIX.
+    // ⚠ OTA-1119 — STATUS LEAVES 'ready' FIRST, AND THIS IS THE WHOLE FIX.
     // `isDormant()` is defined as "status==='ready' but the runtime is gone",
     // and this method used to produce exactly that state for as long as its own
     // teardown took. LlamaRuntime.dispose() nulls its context SYNCHRONOUSLY on
@@ -320,7 +320,7 @@ export class QwenGenerativeEngine {
     // 8.8 seconds of wall time with ZERO prefill and ZERO decode: a call that
     // entered a detached context, did no native work, and returned nothing —
     // and it happened seconds after an OTA session start, which is the one
-    // shutdown path that runs in the FOREGROUND where OTA-1107's
+    // shutdown path that runs in the FOREGROUND where OTA-1084's
     // don't-reload-while-backgrounded guard does not apply.
     // Setting status here costs nothing and closes the window entirely: an
     // engine that is shutting down now says 'idle', which is true, instead of

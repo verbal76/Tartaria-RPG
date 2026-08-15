@@ -39,7 +39,7 @@ jest.mock('expo-updates', () => ({}));
 //     then plays it out for real — quiet answers resolve on arrival, boss
 //     answers spawn/kill/close — keepsake, thread mark, epilogue override, all
 //     fifteen cells.
-//  B. EVERY BOUNTY PAIR, LIVE (9 givers × 8 targets = 72). The ota1244 walker
+//  B. EVERY BOUNTY PAIR, LIVE (9 givers × 8 targets = 72). The ota1221 walker
 //     proves one pair end to end; a pair is authored DATA (politics, outposts,
 //     names), and any cell could hide a dead outpost or a broken freeze.
 //  C. THE FULL ENDING-TEXT MATRIX (9 × 5 × 4 × 3 = 540 + fallbacks). Every
@@ -118,7 +118,7 @@ describe('COMPLETIONIST A — every motive through every resolution, live (15 ce
   const RACE = () => getRaces()[0]!.id;
   const FACTION = () => getFactions()[0]!.id;
   /** The dealer reads `${name}|${raceId}|${factionId}` — search names until it
-   *  deals the kind this cell needs. The spread test in ota1246 guarantees all
+   *  deals the kind this cell needs. The spread test in ota1223 guarantees all
    *  three kinds are reachable, so this always terminates early. */
   function nameForKind(motive: string, kind: string): string {
     for (let i = 0; i < 500; i++) {
@@ -238,7 +238,7 @@ describe('COMPLETIONIST B — every bounty pair, live (72 cells)', () => {
         expect({ giver: giver.id, target: target.id, accepted: !!accepted }).toEqual({ giver: giver.id, target: target.id, accepted: true });
         expect(accepted!.politics).toBeTruthy();
 
-        // Arrive on the contract's ground → the quarry seeds (OTA-1244 flag).
+        // Arrive on the contract's ground → the quarry seeds (OTA-1221 flag).
         const cell = canonicalCellOf(targetLoc!);
         useGameStore.setState({
           player: { ...store.getState().player!, currentLocationId: targetLoc!, hubRoomId: null, gridX: cell.x, gridY: cell.y },

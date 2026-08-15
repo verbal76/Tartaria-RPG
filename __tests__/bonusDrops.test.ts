@@ -1,4 +1,4 @@
-// OTA-716 — a Fallout-4-ish sprinkle of GOOD crafting materials on top of
+// OTA-699 — a Fallout-4-ish sprinkle of GOOD crafting materials on top of
 // the basic loot flood, at two engagement moments: a hard-won fight, and a
 // completed (easy-to-miss) story thread. Purely additive; materials only.
 
@@ -21,7 +21,7 @@ function lcg(seed: number): () => number {
   return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 0x100000000; };
 }
 
-describe('OTA-716 — isHardWonFight', () => {
+describe('OTA-699 — isHardWonFight', () => {
   it('true for tanky / Rare+ / boss enemies', () => {
     expect(isHardWonFight({ hp: 110, rarity: 'Common' })).toBe(true);   // high HP
     expect(isHardWonFight({ hp: 10, rarity: 'Rare' })).toBe(true);      // rare
@@ -33,7 +33,7 @@ describe('OTA-716 — isHardWonFight', () => {
   });
 });
 
-describe('OTA-716 — rollBonusMaterial tiers', () => {
+describe('OTA-699 — rollBonusMaterial tiers', () => {
   it('picks Uncommon / Rare / Legendary by the roll band', () => {
     expect(rollBonusMaterial(seq([0.5, 0])).rarity).toBe('Uncommon');
     expect(rollBonusMaterial(seq([0.8, 0])).rarity).toBe('Rare');
@@ -46,7 +46,7 @@ describe('OTA-716 — rollBonusMaterial tiers', () => {
   });
 });
 
-describe('OTA-716 — maybeCombatBonus (additive, hard-won only)', () => {
+describe('OTA-699 — maybeCombatBonus (additive, hard-won only)', () => {
   it('never fires for a weak fight, however lucky the roll', () => {
     expect(maybeCombatBonus({ hp: 18, rarity: 'Common' }, seq([0.0, 0.0, 0.0]))).toBeNull();
   });
@@ -61,14 +61,14 @@ describe('OTA-716 — maybeCombatBonus (additive, hard-won only)', () => {
   });
 });
 
-describe('OTA-716 — maybeLoreHookBonus', () => {
+describe('OTA-699 — maybeLoreHookBonus', () => {
   it('fires below the chance, not above', () => {
     expect(maybeLoreHookBonus(seq([0.1, 0.5, 0]))).toBeTruthy();
     expect(maybeLoreHookBonus(seq([0.95, 0, 0]))).toBeNull();
   });
 });
 
-describe('OTA-716 — cadence is a sprinkle, not every fight', () => {
+describe('OTA-699 — cadence is a sprinkle, not every fight', () => {
   it('hard-won combat bonus lands near its configured rate', () => {
     const rng = lcg(0xBEEF);
     let hits = 0;

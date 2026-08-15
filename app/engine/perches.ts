@@ -1,4 +1,4 @@
-// OTA-974 — Phase B of the real-heights model: PERCHES. Small objects tucked
+// OTA-951 — Phase B of the real-heights model: PERCHES. Small objects tucked
 // partway up taller climbable structures (a nest at tier 2 of the tower, a
 // satchel wedged in the mortar at tier 3), so climbing is exploration and not
 // just a top-of-climb lottery. Pure module: templates, a deterministic

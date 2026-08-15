@@ -17,7 +17,7 @@ export type Intent =
   | 'ask'
   | 'craft'
   | 'equip'
-  /** OTA-1083 — RESTORED. Removed in OTA-803 because gift-for-rep undercut the
+  /** OTA-1060 — RESTORED. Removed in OTA-803 because gift-for-rep undercut the
    *  standing economy; see GIFT_STANDING_FACTION_CAP for how that door is kept
    *  shut this time. */
   | 'gift'
@@ -80,7 +80,7 @@ export type Intent =
   | 'press'
   | 'push'
   | 'pull'
-  // OTA-710 — call-to-action gestures. Evocative verbs a scene's prose
+  // OTA-693 — call-to-action gestures. Evocative verbs a scene's prose
   // invites ("knock on the steeple", "ring the bells", "touch the pillar",
   // "pray at the altar") that aren't mechanical puzzle inputs. They route
   // through the hook resolver when an active hook matches; otherwise they
@@ -258,7 +258,7 @@ export interface Enemy {
    *  might list ["sentinel", "guardian", "statue"] so `attack the sentinel`
    *  resolves to the canonical entity. Lowercase, no punctuation. */
   aliases?: string[];
-  /** OTA-1139 — this body arrived INSTEAD of a party of N (the `elite`
+  /** OTA-1116 — this body arrived INSTEAD of a party of N (the `elite`
    *  difficulty dial). Carries the count so the defeat path can pay the
    *  party's worth in loot rather than one corpse's: spoils are rolled per
    *  body, and paying less for a harder fight is the fake-difficulty trap the
@@ -427,7 +427,7 @@ export interface TimelineEvent {
   summary: string;
 }
 
-/** OTA-1017 — the actual kit a fallen character died in: full item copies (minus
+/** OTA-994 — the actual kit a fallen character died in: full item copies (minus
  *  instance id / stack count, slot kept) so a Hollowed revenant can give back
  *  the REAL gear — fused stats and all — instead of a look-alike or trophy. */
 export type FallenGearPiece = Omit<InventoryItem, 'id' | 'quantity'> & { slot: string };
@@ -599,7 +599,7 @@ export interface UniqueItemStats {
    *  (applied by aggregateEquippedStatBonuses' fused-item pass). Fusion
    *  inherits a stealth bonus when the inputs include stealthy gear. */
   statBonus?: { stat: keyof Stats; amount: number };
-  /** OTA-978 — weapon reach identity, chosen at forge time (the form noun is
+  /** OTA-955 — weapon reach identity, chosen at forge time (the form noun is
    *  picked to MATCH it: Spike/Maul = melee, Spear/Pike = long, Bow/Caster =
    *  ranged). melee = close only; long = mid+close; ranged = every band.
    *  Older forges are back-stamped on load from their name. */
@@ -682,7 +682,7 @@ export interface FactionStanding { factionId: string; standing: number; }
  *  for the whole group; it bleeds collateral in fights and the escort fails when
  *  it hits 0. `label` is the one-word cargo name shown in the HUD. */
 export interface EscortPool {
-  /** OTA-1080 — the one walking at the front, and the only member of the party
+  /** OTA-1057 — the one walking at the front, and the only member of the party
    *  with an identity. An escort was a pool of hit points with a label; when
    *  ledger coverage came to escorts there was nobody in it to remember. Absent
    *  on saves written before this OTA. */
@@ -869,7 +869,7 @@ export type StatusEffectKind =
   // hands). Cleared by drinking a cold coating (the warming counter) or by waiting it
   // out. Gives the new cold coating a real player-side ailment so it's drinkable.
   | 'chilled'
-  // OTA-1112 — anti-stun-lock. Granted automatically the moment a stun or
+  // OTA-1089 — anti-stun-lock. Granted automatically the moment a stun or
   // paralyze takes hold: while braced runs, further incapacitations cannot
   // land, so a pack of concussive hitters re-rolling 20% per landed blow
   // can't chain the player's turns away (sim: 844 stuns/run before this).
@@ -928,10 +928,10 @@ export type StatusEffectKind =
   // damage dice (buildCombatSteps peeks it; rollMods consumes it on the swing,
   // hit or miss — the window closes either way).
   | 'perfect_opening'
-  // OTA-936 — successful-dodge GROUP defense: while you're still moving off a read, the
+  // OTA-913 — successful-dodge GROUP defense: while you're still moving off a read, the
   // OTHER attackers this volley swing at +3 to your AC. Lasts one volley, then clears.
   | 'evasive'
-  // OTA-1218 — AETHER TECHNIQUES (PUNCHLIST P16). Two of the four techniques need a
+  // OTA-1195 — AETHER TECHNIQUES (PUNCHLIST P16). Two of the four techniques need a
   // status to live in; the other two ride machinery that already exists (Veil of Ether
   // applies 'stealthed', Resonance Cascade is ordinary damage).
   //
@@ -984,7 +984,7 @@ export type MainQuestPhase =
   | 'choice'
   | 'ended';
 
-/** ⚠⚠ OTA-1248 — 'stay' is the EARNED fourth ending. It is never offered by
+/** ⚠⚠ OTA-1225 — 'stay' is the EARNED fourth ending. It is never offered by
  *  default and it never replaces one of the three: the base doors stay open to
  *  every character forever, so nothing is ever taken away from a player who
  *  cannot see why. See `canStayAtTheNexus` — the gate is the Arbiter's regard
@@ -1014,23 +1014,23 @@ export interface PlayerCharacter {
   name: string;
   raceId: string;
   factionId: string;
-  /** OTA-1041 — THE REASON YOU CAME DOWN. One of engine/story's five motive
+  /** OTA-1018 — THE REASON YOU CAME DOWN. One of engine/story's five motive
    *  ids (debt / missing / exile / calling / record). Picked at character
    *  creation; saves that predate the feature are dealt one deterministically
    *  in backfillPlayer so phase-2/3 story beats stay stable per character. */
   storyMotive?: string;
-  /** OTA-1041 — the opening crawl was seen (or skipped). Old saves are
+  /** OTA-1018 — the opening crawl was seen (or skipped). Old saves are
    *  backfilled to true so the intro never ambushes an existing character. */
   storyIntroSeen?: boolean;
-  /** OTA-1045 — TRUE when the player themselves picked this character's
+  /** OTA-1022 — TRUE when the player themselves picked this character's
    *  motive (creation step 3, or the one-time veteran picker). FALSE/absent
    *  = the motive was dealt by backfill and the load path owes the player
    *  one "why did you come down?" ask. */
   storyMotiveChosen?: boolean;
-  /** OTA-1044 — motive-drip beat ids already delivered to the feed (strict
+  /** OTA-1021 — motive-drip beat ids already delivered to the feed (strict
    *  order, one-shot each; see engine/storyDrip.ts). Absent = none yet. */
   storyBeatsSeen?: string[];
-  /** OTA-1186 — Jakar Nine-Halls has already explained how bounties work. One-shot,
+  /** OTA-1163 — Jakar Nine-Halls has already explained how bounties work. One-shot,
    *  set on the first accepted contract.
    *  ⚠ DELIBERATELY NOT BACKFILLED TO TRUE ON OLD SAVES, which is the opposite of what
    *  `storyIntroSeen` does. That flag hides a cutscene an existing character has already
@@ -1040,13 +1040,13 @@ export interface PlayerCharacter {
    *  owner ran a 23-tile contract on the wrong model of all three. Absent reads as false,
    *  so every existing character gets it once on their next accept. */
   bountyPrimerSeen?: boolean;
-  /** ⚠ OTA-1193 — rounds until DODGE can be set again. Counts DOWN by one per action
+  /** ⚠ OTA-1170 — rounds until DODGE can be set again. Counts DOWN by one per action
    *  taken; 0/absent = ready. Absent on every existing save, which reads as READY — a
    *  migration must never lock a player out of a move they had yesterday.
    *  Rounds, not seconds: see engine/dodgeCooldown for why the owner's "10-15 seconds"
    *  was deliberately translated into turns. */
   dodgeCooldown?: number;
-  /** ⚠ OTA-1089 — PHASE 4 DIFFICULTY, chosen on the last step of character
+  /** ⚠ OTA-1066 — PHASE 4 DIFFICULTY, chosen on the last step of character
    *  creation and LOWERABLE MID-RUN BUT NEVER RAISABLE (engine/pressure.ts
    *  canChangeTo). Absent = DEFAULT_PRESSURE ('owed'), which is what every
    *  save written before this OTA reads as: the game exactly as it has always
@@ -1054,17 +1054,17 @@ export interface PlayerCharacter {
    *  finds that too much can drop a tier from Settings without abandoning the
    *  character, which is the escape hatch that makes an honest default safe. */
   pressure?: string;
-  /** ⚠ OTA-1136 — the CUSTOM difficulty payload: `{ intensity, systems[] }`.
+  /** ⚠ OTA-1113 — the CUSTOM difficulty payload: `{ intensity, systems[] }`.
    *  Present only when `pressure === 'custom'`; every preset run leaves it
    *  absent. See engine/pressure.ts normalizeCustom — it is read tolerantly,
    *  so a hand-edited or newer save cannot throw here. */
   pressureCustom?: { intensity: string; systems: string[] };
-  /** OTA-1089 — the highest TIDE stage this character has been told about, so
+  /** OTA-1066 — the highest TIDE stage this character has been told about, so
    *  the crossing line fires once per stage rather than on every step inside
    *  it. Derived state would be wrong here: the stage is a function of hours,
    *  and "have you been told" is not. */
   tideStageSeen?: number;
-  /** ⚠ OTA-1088 — PHASE 3 BRANCH STATE. forkId → optionId, one entry per
+  /** ⚠ OTA-1065 — PHASE 3 BRANCH STATE. forkId → optionId, one entry per
    *  question this character has answered. This is the ONLY thing the fork
    *  system persists: which fork is due, whether a card should be showing, and
    *  every downstream consequence are all DERIVED from this map plus state the
@@ -1077,12 +1077,12 @@ export interface PlayerCharacter {
    *  player's story that silently never happens. A map of answers cannot be
    *  dropped that way: absent means unanswered means ask again.
    *
-   *  Absent on every save older than OTA-1088, which reads correctly as "has
+   *  Absent on every save older than OTA-1065, which reads correctly as "has
    *  not answered anything yet" — those characters get their questions at the
    *  next phase they qualify for. Unknown ids from a newer build are ignored
    *  rather than crashing. */
   storyChoices?: Record<string, string>;
-  /** ⚠ OTA-1090 — PHASE 5. The one-shot Arbiter beats already SPOKEN
+  /** ⚠ OTA-1067 — PHASE 5. The one-shot Arbiter beats already SPOKEN
    *  ('stance:invested', 'regard:warm'), and the only thing the persona system
    *  persists.
    *
@@ -1092,18 +1092,18 @@ export interface PlayerCharacter {
    *  "has he already said this" is genuinely not derivable from anything else,
    *  so it is recorded, exactly like tideStageSeen.
    *
-   *  Absent on every save older than OTA-1090, which reads correctly as "he has
+   *  Absent on every save older than OTA-1067, which reads correctly as "he has
    *  not said any of it yet" — a long-running character hears the beats they
    *  have already earned, one per arrival, rather than silently missing the
    *  whole arc. Unknown keys from a newer build are inert. */
   arbiterBeatsSeen?: string[];
-  /** ⚠ OTA-1091 — the weather whose stat line the player has ALREADY been
+  /** ⚠ OTA-1068 — the weather whose stat line the player has ALREADY been
    *  told about, so the same conditions are not re-announced on every scene.
    *
    *  Found by the phases 0-5 playtest harness, which walks a run and reads the
    *  feed the player actually sees: "Weather effect — Eerie Calm: +1 WIS"
    *  appeared SIXTEEN times in one walk, because the line fired on every
-   *  beginScene and OTA-1017 persists weather per location for six game-hours
+   *  beginScene and OTA-994 persists weather per location for six game-hours
    *  — so an unchanged sky repeats itself at every arrival.
    *
    *  Keyed on the WEATHER, not the location: walking calm → storm → calm should
@@ -1111,11 +1111,11 @@ export interface PlayerCharacter {
    *  Absent on older saves, which reads as "not told yet" and costs one
    *  redundant line after the update rather than a silence. */
   weatherEffectSeen?: string;
-  /** OTA-1044 — how The Missing side-thread ended for this character
+  /** OTA-1021 — how The Missing side-thread ended for this character
    *  ('grave' | 'lie' | 'walker'), set when the resolution fires. Also keys
    *  the EndingScreen epilogue override. Absent = trail still open. */
   missingResolved?: string;
-  /** ⚠ OTA-1246 — how THIS character's motive answered itself, for all five
+  /** ⚠ OTA-1223 — how THIS character's motive answered itself, for all five
    *  reasons ('settled'/'collector'/'pardon'/'choir'/'censor'/…). Set when the
    *  resolution fires; keys the EndingScreen epilogue override. Absent = the
    *  question is still open, and the open-question epilogue still reads true.
@@ -1127,7 +1127,7 @@ export interface PlayerCharacter {
   hpMax: number;
   stamina: number;
   staminaMax: number;
-  /** ⚠ OTA-1141 — SAVE FOSSIL. DO NOT WIRE ANYTHING TO THIS.
+  /** ⚠ OTA-1118 — SAVE FOSSIL. DO NOT WIRE ANYTHING TO THIS.
    *  Hunger was a real mechanic once: +1 every 8 in-game hours unfed, capped
    *  at 5, shrinking the usable stamina ceiling, reset by eating. It was
    *  REMOVED — "a hidden, unexplained mechanic whose ONLY effect was shrinking
@@ -1150,6 +1150,13 @@ export interface PlayerCharacter {
    *  current clock, so stepping out of a just-cleared outpost doesn't drop a fresh
    *  ambush mid-loot. Absent for legacy saves → treated as 0 (no grace). */
   bossDefeatGraceUntilHours?: number;
+  /** ⚠⚠ OTA-1272 — free-passage counter after walking out of an outpost. Owner,
+   *  after 4 Mud Wasps killed a fresh character ON the exit tile: "a pack of
+   *  enemies right outside the door is rough get at least 2 free tile moves,
+   *  then whatever." Set to SAFE_EXIT_FREE_SCENES (3 = the exit scene + 2 tile
+   *  moves) at every outpost-exit path; each wilderness beginScene under grace
+   *  suppresses the encounter roll and decrements. Absent → 0 (no grace). */
+  safeExitMovesLeft?: number;
   /** OTA-804 — unbanked "honest custom" credit toward faction standing from
    *  BUYING. Buying accrues standing as a slow afterthought: TC spent banks here
    *  and grants +1 standing per BUY_REP_TC_PER_STANDING TC, remainder carried.
@@ -1210,7 +1217,7 @@ export interface PlayerCharacter {
    *  being brokered. Set when the player ACCEPTS the parley offer; `done` once
    *  the alliance is sealed. See engine/broker.ts. */
   brokerMission?: import('./broker').BrokerMission;
-  /** OTA-671 — set when the player DECLINES the stumbled-onto parley offer, so
+  /** OTA-656 — set when the player DECLINES the stumbled-onto parley offer, so
    *  approaching the leaders again doesn't re-pop the accept/decline prompt on
    *  every ambient action. Cleared by an explicit PARLEY (re-opens the offer) or
    *  by accepting. Transient nudge state. */
@@ -1220,14 +1227,13 @@ export interface PlayerCharacter {
    *  Without this gate, the fuse verb would be usable anywhere; the
    *  encounter is the discovery moment that earns the right. */
   fusionPending?: boolean;
-  /** OTA-712 — a live provocable NPC travel encounter (e.g. the Aetherkin
+  /** OTA-695 — a live provocable NPC travel encounter (e.g. the Aetherkin
    *  mourner) is offering its temptation ("reach for a coin and you will
    *  not reach it twice"). Set from the encounter's data-driven `provoke`
    *  block when it lands; cleared on the next travel step OR when the player
    *  provokes it — which spawns the named enemy + applies the corruption
    *  and narration the CONTENT authored. Fully data-driven: the engine
-   *  holds no encounter-specific enemy name or prose. (Replaces the OTA-711
-   *  boolean aetherkinCoinPending — old saves just drop the transient flag.) */
+   *  holds no encounter-specific enemy name or prose. */
   pendingProvoke?: {
     enemy: string;
     corruption?: number;
@@ -1407,7 +1413,7 @@ export interface PlayerCharacter {
    *  completed, expired, declined). Prevents re-planting the same
    *  whisper twice on the same character. */
   completedWhisperIds?: string[];
-  /** ⚠ OTA-1213 (PUNCHLIST P13) — the heart of the Labyrinth has been reached ONCE.
+  /** ⚠ OTA-1190 (PUNCHLIST P13) — the heart of the Labyrinth has been reached ONCE.
    *  The maze is fully re-enterable (`enterLabyrinth` carries no attempt gate), so the
    *  lore ending and its keepsake are gated on this rather than paid per run — a
    *  repeatable loop with a repeatable reward is a farm, which is the one thing the
@@ -1415,16 +1421,16 @@ export interface PlayerCharacter {
    *  "not yet seen", so a character who already walked it gets the ending next time. */
   labyrinthHeartSeen?: boolean;
 
-  /** ⚠ OTA-1214 — AETHER TECHNIQUES the character has learned. Ids from
+  /** ⚠ OTA-1191 — AETHER TECHNIQUES the character has learned. Ids from
    *  `engine/aetherTechniques.ts`. Absent on an old save reads as "knows none", which is
    *  correct: they are acquired, never granted at creation. */
-  /** ⚠ OTA-1221 (PUNCHLIST P17) — the lore concepts this character has actually had
+  /** ⚠ OTA-1198 (PUNCHLIST P17) — the lore concepts this character has actually had
    *  answered, by id. `titleProgress.loreRead` counts DISTINCT entries here rather than
    *  every ask, so Scholar of Forgotten Lore means three different things read, not one
    *  thing read three times. Absent on older saves; `?? []` covers them. */
   loreConceptsRead?: string[];
   knownTechniques?: string[];
-  /** ⚠ OTA-1214 — per-technique practice count, keyed by technique id (owner: growth is
+  /** ⚠ OTA-1191 — per-technique practice count, keyed by technique id (owner: growth is
    *  per-technique, not one global aether skill, so a character specialises into what they
    *  actually practise). Only MEANINGFUL uses increment it — see `practiceCounts`. */
   techniqueProficiency?: Record<string, number>;
@@ -1466,7 +1472,7 @@ export interface PlayerCharacter {
    *  and never yanks the player back on later loads. */
   _placedWestOfHiddenMarket510?: boolean;
   /** OTA-784's `_freshMarketEntry784` / `_skipMarketAutoEnterOnce` repair flags
-   *  were removed in OTA-794 (the failed-OTA save reset they served is done);
+   *  were removed in OTA-774 (the failed-OTA save reset they served is done);
    *  old saves may still carry the keys — they're ignored. */
   /** Last cardinal direction the player traveled. Lets "continue" /
    *  "keep going" / "onward" repeat the previous step without forcing the
@@ -1511,18 +1517,18 @@ export interface PlayerCharacter {
    *  in loadSlotIntoGame). See DogCompanion interface above and the
    *  framework spec in HANDOFF.md §0.A. */
   dog?: DogCompanion | null;
-  /** OTA-938 — latches the one-time dead/abandoned-dog revive migration so it fires exactly
+  /** OTA-915 — latches the one-time dead/abandoned-dog revive migration so it fires exactly
    *  once ever. A dog lost AFTER this OTA stays lost (death mechanic intact going forward). */
-  /** @deprecated OTA-949 — the one-time dog-revive migration was retired; this flag is now
+  /** @deprecated OTA-926 — the one-time dog-revive migration was retired; this flag is now
    *  inert (kept for save/test back-compat only; nothing reads it). */
-  dogRevivedOta938?: boolean;
-  /** OTA-941 — latches the one-time owner Mud Siren rematch (refund + re-stage) so it fires once. */
-  /** @deprecated OTA-948 — the rematch was reverted and its load-path wiring removed; this
+  dogRevivedOta915?: boolean;
+  /** OTA-918 — latches the one-time owner Mud Siren rematch (refund + re-stage) so it fires once. */
+  /** @deprecated OTA-925 — the rematch was reverted and its load-path wiring removed; this
    *  flag is inert (kept for save back-compat only; nothing reads or writes it). */
   mudSirenRematchOta941?: boolean;
-  /** OTA-942 — latches the one-time owner clean-slate prep (full HP/stamina, gear repaired,
+  /** OTA-919 — latches the one-time owner clean-slate prep (full HP/stamina, gear repaired,
    *  throwables/consumables topped up) that pairs with the OTA-941 rematch. */
-  /** @deprecated OTA-948 — the rematch was reverted and its load-path wiring removed; this
+  /** @deprecated OTA-925 — the rematch was reverted and its load-path wiring removed; this
    *  flag is inert (kept for save back-compat only; nothing reads or writes it). */
   mudSirenRematchOta942?: boolean;
 }
@@ -1576,7 +1582,7 @@ export interface DogCompanion {
    *  Arbiter reminder so it fires once per down-event, not every tick.
    *  Cleared alongside downedAtHour when the dog is healed back up. */
   bleedWarned?: boolean;
-  /** OTA-938 — how many escalating bleed-out beats have fired this down-event (0..3, at
+  /** OTA-915 — how many escalating bleed-out beats have fired this down-event (0..3, at
    *  1/4, 1/2, 3/4 of the window). Latches so each fires once. Cleared when healed back up. */
   bleedWarnStage?: number;
   /** Poplar Anvil — lowest loyalty band already warned about (50/30/15).
@@ -1729,7 +1735,7 @@ export interface GameLogEntry {
   meta?: Record<string, unknown>;
 }
 
-/** OTA-1174 — one exchange with one NPC: what you asked and what they said.
+/** OTA-1151 — one exchange with one NPC: what you asked and what they said.
  *  Stored rather than derived, because the log window that used to carry it
  *  closes with the conversation and the log itself is capped. */
 export interface TalkTurn {
@@ -1765,7 +1771,7 @@ export interface MemorableEvent {
     // (Tainted / Corrupted / Hollowed). Records the aether's arc on the soul so the
     // Chronicle can show how far they've fallen, not just the current number.
     | 'corruption_tier'
-    // ⚠ OTA-1213 (PUNCHLIST P13) — the player stood at the heart of the Labyrinth of
+    // ⚠ OTA-1190 (PUNCHLIST P13) — the player stood at the heart of the Labyrinth of
     // Shadows and learned what Iskan-Veil's masking Core actually does. Recorded so
     // the Arbiter can reference it and the Chronicle can show it; a lore beat this
     // size should leave a mark on the character, not just scroll past in the feed.
@@ -1808,11 +1814,11 @@ export interface CanonLocation {
 
 export interface WorldMemory {
   tagCounts: Record<string, number>;
-  /** OTA-1014 — #122: the CURRENT local sky. Weather persists per location visit —
+  /** OTA-991 — #122: the CURRENT local sky. Weather persists per location visit —
    *  a scene rebuild at the same spot inside ~6 game-hours reuses this instead
    *  of re-rolling, so conditions read as weather, not a slot machine. */
   sceneWeather?: { id: string; locationId: string; rolledAtHours: number };
-  /** OTA-1017 — #122 completed: the sky is remembered PER LOCATION (the single slot
+  /** OTA-994 — #122 completed: the sky is remembered PER LOCATION (the single slot
    *  above is legacy — read once as migration, no longer written). Entries
    *  self-prune once stale (>= 6 game-hours old). */
   sceneWeatherByLoc?: Record<string, { id: string; rolledAtHours: number }>;
@@ -1835,14 +1841,14 @@ export interface WorldMemory {
    *  concept the player has with factions. Seeded from lore, then earned through actual
    *  patrol clashes; decides who fights whom. Two neutrals can grudge into war from zero. */
   factionRelations?: import('./factionRelations').RelationsMatrix;
-  /** ⚠ OTA-1188 — where the player last CLOSED a bounty. The anti-camp rule refuses a new
+  /** ⚠ OTA-1165 — where the player last CLOSED a bounty. The anti-camp rule refuses a new
    *  contract from that same board until one has been cleared somewhere else, so a player
    *  cannot park at one outpost farming its board forever. Absent on every existing save,
    *  which reads as "no camp in progress" — the permissive direction, deliberately: a
    *  migration must never retroactively lock a player out of work they could take
    *  yesterday. */
   lastBountyClearedOutpostId?: string;
-  /** ⚠ OTA-1191 — THE ROAD ODOMETER. Tiles walked that were not already in the recent-cell
+  /** ⚠ OTA-1168 — THE ROAD ODOMETER. Tiles walked that were not already in the recent-cell
    *  ring below; every `ODOMETER_STEP` of them is +1 max stamina, forever. Distinct from
    *  the `MILESTONE_TRAVEL_STEP` track, which counts DISTINCT DESTINATIONS and therefore
    *  stops paying out once the 36 locations are seen. Absent = 0 on every existing save,
@@ -1916,14 +1922,14 @@ export interface WorldMemory {
    *  bloats the save — a tile older than the window can roll again, which requires
    *  crossing that many fresh tiles first, so it's still not a practical farm. */
   wandererRolledTiles?: string[];
-  /** OTA-988 — outdoor tiles that already rolled for a stranded-traveler escort
+  /** OTA-965 — outdoor tiles that already rolled for a stranded-traveler escort
    *  hook. Same one-roll-per-tile, sliding-window anti-farm as
    *  wandererRolledTiles. */
   strandedEscortRolledTiles?: string[];
-  /** OTA-1017 — ground already diced for a Hollowed door never re-rolls (mirrors the
+  /** OTA-994 — ground already diced for a Hollowed door never re-rolls (mirrors the
    *  stranded-escort tile bank; tileIsNovel alone re-arms after 50 tiles). */
   revenantRolledTiles?: string[];
-  /** OTA-998 — the Hollowed revenant currently standing in the scene (the fallen
+  /** OTA-975 — the Hollowed revenant currently standing in the scene (the fallen
    *  record it was built from); cleared when put to rest. */
   activeRevenant?: { name: string; ts: number; raceName: string; epitaph: string; locationName: string; kills: number; corruption: string; hours: number; gearNames?: string[]; gear?: FallenGearPiece[]; avengedBy?: string; avengedTs?: number };
   /** HANDOFF #15b — hub rooms the player has visited at least once.
@@ -1939,24 +1945,24 @@ export interface WorldMemory {
    *  who they've actually spoken with. Optional + defaulted so
    *  legacy saves load cleanly. */
   npcsMet?: NpcMet[];
-  /** OTA-1072 — per-NPC relationship state, keyed by the same id as npcsMet.
+  /** OTA-1049 — per-NPC relationship state, keyed by the same id as npcsMet.
    *  Absent on saves written before that OTA; seedRelationsFromMet() migrates
    *  them on first touch rather than in a save-load pass. */
   npcRelations?: Record<string, NpcRelation>;
-  /** OTA-1077 — recent outpost assaults, newest last, capped. Feeds the "your
+  /** OTA-1054 — recent outpost assaults, newest last, capped. Feeds the "your
    *  outpost was hit while I was away" beat in a greeting. */
   recentRaids?: OutpostRaid[];
-  /** OTA-1109 — archetype ids of the last few wasteland encounters, newest
+  /** OTA-1086 — archetype ids of the last few wasteland encounters, newest
    *  first, capped at RECENT_ENCOUNTER_MEMORY. The travel picker excludes
    *  these so an authored set-piece (the Phoenix-Feather scam vendor) can't
    *  replay back-to-back. */
   recentEncounterArchetypes?: string[];
-  /** OTA-1081 — how many times each authored talk topic has been raised, keyed
+  /** OTA-1058 — how many times each authored talk topic has been raised, keyed
    *  `<npcId>:<topicId>`. Drives "I have told you that one" rather than
    *  replaying a line as though neither of you remembers the last two minutes.
    *  Bounded by the authored topic count, so it cannot grow with play. */
   talkedTopics?: Record<string, number>;
-  /** ⚠ OTA-1174 — THE CONVERSATION REMEMBERS. Owner: *"I would like the talk
+  /** ⚠ OTA-1151 — THE CONVERSATION REMEMBERS. Owner: *"I would like the talk
    *  screens to remember the conversations and type the question on an
    *  off-white so later we know what we asked. with so many conversations it
    *  will get confusing without a history."*
@@ -1970,15 +1976,15 @@ export interface WorldMemory {
    *  another view.
    *
    *  ⚠ BOUNDED, because worldMemory is persisted on every action. Authored
-   *  topics per NPC are finite (14-16 since OTA-1114), so the natural ceiling
+   *  topics per NPC are finite (14-16 since OTA-1091), so the natural ceiling
    *  is low — but re-asks and secondary cast pools are not, hence the hard cap
    *  in recordTalkTurn. */
   npcTranscripts?: Record<string, TalkTurn[]>;
-  /** OTA-1083 — LIFETIME standing each faction has been granted via gifts.
+  /** OTA-1060 — LIFETIME standing each faction has been granted via gifts.
    *  Metered against GIFT_STANDING_FACTION_CAP so the verb OTA-803 deleted
    *  cannot come back as the side door it was deleted for. */
   giftStandingGranted?: Record<string, number>;
-  /** ⚠ OTA-1182 — LIFETIME standing each faction has been granted as SPILLOVER from
+  /** ⚠ OTA-1159 — LIFETIME standing each faction has been granted as SPILLOVER from
    *  a hostile act against one of their rivals. Any standing loss cascades the
    *  inverse to rivals, so a caught theft pays +5 and an extortion +3 to everyone
    *  who hates the victim — uncapped, where a GIFT has been budgeted since OTA-803.
@@ -2045,17 +2051,17 @@ export interface WorldMemory {
   /** OTA-912 — great-climb ids UNLOCKED by using their chart. The climbable prop
    *  only spawns at a landmark once its id is in here (access is gated on maps). */
   unlockedGreatClimbs?: string[];
-  /** OTA-1014 — #119a: last ~10 ambient takeable gear names rolled into scenes,
+  /** OTA-991 — #119a: last ~10 ambient takeable gear names rolled into scenes,
    *  newest last. Fed back into pickTakeableGearForScene as an exclude window
    *  so adjacent tiles stop offering the same Rail Saber three times in a
    *  ninety-second walk. */
   recentTakeableGearNames?: string[];
-  /** OTA-1014 — location:noun keys of faction sigils already pried. PERMANENT — the
+  /** OTA-991 — location:noun keys of faction sigils already pried. PERMANENT — the
    *  arb105 restock deliberately does not clear it; a faction's mark comes off
    *  a place once, then the noun yields rubble coin. Closes the round-trip
    *  sigil farm the OTA-1000 guaranteed-yield branch opened. */
   salvagedSigilKeys?: string[];
-  /** OTA-1016 — how many times an agent has actually PITCHED offers. Keys the
+  /** OTA-993 — how many times an agent has actually PITCHED offers. Keys the
    *  category rotation; travel-count keying phase-locked circuit routes. */
   offerPitchSeq?: number;
   /** OTA-912 — distinct great-climb ids whose SUMMIT BOSS has been defeated.
@@ -2105,7 +2111,7 @@ export interface NpcMet {
   firstMetAt?: number;
 }
 
-/** OTA-1072 — the per-person ledger behind NpcMet. NpcMet answers "have you
+/** OTA-1049 — the per-person ledger behind NpcMet. NpcMet answers "have you
  *  ever stood in a room with this NPC"; this answers "what has passed between
  *  you". Keyed by the same id. See app/engine/npcMemory.ts. */
 export interface NpcRelation {
@@ -2119,12 +2125,12 @@ export interface NpcRelation {
   lastSeenAt: number;
   /** player.hoursElapsed at the most recent sighting. */
   lastSeenHours: number;
-  /** OTA-1075 — player.hoursElapsed at the sighting BEFORE the most recent one.
+  /** OTA-1052 — player.hoursElapsed at the sighting BEFORE the most recent one.
    *  This is what an absence line actually needs. `lastSeenHours` is overwritten
    *  with "now" the moment the player walks in, and the greeting is composed
    *  after that, so measuring the gap against it always yielded zero — the
    *  absence line was unreachable in play. Undefined on a first meeting and on
-   *  relations migrated from a pre-OTA-1072 save. */
+   *  relations migrated from a pre-OTA-1049 save. */
   prevSeenHours?: number;
   /** Scene arrivals in front of this NPC. NOT deduped; repetition is signal. */
   meetings: number;
@@ -2136,7 +2142,7 @@ export interface NpcRelation {
   contractsTurnedIn: number;
   /** Thefts, attacks — anything that makes them watch your hands. */
   wrongs: number;
-  /** OTA-1104 — CLEAN pockets lifted off this person (they never caught you).
+  /** OTA-1081 — CLEAN pockets lifted off this person (they never caught you).
    *  Feeds the delayed "always losing things" mumble: on a later meeting they
    *  notice the loss out loud WITHOUT suspecting you — the player learns the
    *  theft registered and that they got away with it. A caught lift records a
@@ -2146,29 +2152,29 @@ export interface NpcRelation {
    *  pocketsLifted > pocketsMumbled, once per later meeting — deterministic,
    *  no roll, and it can never repeat past what was actually taken. */
   pocketsMumbled?: number;
-  /** OTA-1109 — game-hour stamp of the newest raid this person has told the
+  /** OTA-1086 — game-hour stamp of the newest raid this person has told the
    *  player about. raidNewsFor only surfaces raids NEWER than this, so the
    *  same sacking is news exactly once (Tarek repeated "the Conspiracy
    *  Architects raided our outpost" verbatim on four consecutive visits —
    *  the old gate keyed on prevSeenHours, which quick room-hops inside the
    *  same hour never advanced). */
   raidHeardAtHours?: number;
-  /** OTA-1106 — tastes the player has WITNESSED through gift reactions:
+  /** OTA-1083 — tastes the player has WITNESSED through gift reactions:
    *  entries like 'loves:metal', 'loves:Aether Mud', 'cold:food'. The gift
    *  picker shows these — what you've learned, never the authored list. */
   giftTastes?: string[];
   /** Gifts that landed LOVED — the proof you honored who they are. Gates the
    *  return gift alongside trusted regard. */
   lovedGifts?: number;
-  /** OTA-1106 — the one-time return gift at trusted has been handed over. */
+  /** OTA-1083 — the one-time return gift at trusted has been handed over. */
   returnGiftGiven?: boolean;
-  /** OTA-1076 — TC of honest custom banked toward buying back a caught theft.
+  /** OTA-1053 — TC of honest custom banked toward buying back a caught theft.
    *  Only coin spent AFTER the wrong counts; see AMENDS_TC_PER_WRONG. */
   amendsTc?: number;
   /** How many wrongs have been paid off. Kept so the Chronicle can say a debt
    *  was settled rather than silently erasing that it ever happened. */
   amendsCleared?: number;
-  /** OTA-1083 — WHAT YOU GAVE THEM, by name. The owner's requirement in as many
+  /** OTA-1060 — WHAT YOU GAVE THEM, by name. The owner's requirement in as many
    *  words: they remember that you gave them that particular item. A warmth
    *  number would not have been this; the object is the point. Bounded in
    *  practice by GIFT_BOONS_PER_PERSON plus the repeat decay — there is no
@@ -2176,7 +2182,7 @@ export interface NpcRelation {
   gifts?: {
     name: string;
     atHours: number;
-    /** ⚠ OTA-1184 — HOW THEY TOOK IT. Owner: the ledger should show "what you gave
+    /** ⚠ OTA-1161 — HOW THEY TOOK IT. Owner: the ledger should show "what you gave
      *  to whom and how they received it." The reaction was computed by `resolveGift`
      *  at the moment of giving and then thrown away, so a gift that INSULTED
      *  somebody looked identical on the record to one they loved.
@@ -2184,12 +2190,12 @@ export interface NpcRelation {
      *  this field, and the ledger must render those as "reaction not recorded"
      *  rather than inventing one. Do not backfill it — a guessed reaction on a
      *  historical gift is worse than an honest blank, because tastes have changed
-     *  since (OTA-1176 rewrote the whole preference table). */
+     *  since (OTA-1153 rewrote the whole preference table). */
     reaction?: 'loved' | 'liked' | 'polite' | 'disliked' | 'insulted';
     /** The standing that actually moved, as reported at the time. */
     standingDelta?: number;
   }[];
-  /** ⚠ OTA-1087 — THE LARGEST FACTION-STANDING HIT ALREADY TAKEN FOR BEING
+  /** ⚠ OTA-1064 — THE LARGEST FACTION-STANDING HIT ALREADY TAKEN FOR BEING
    *  HOSTILE TO THIS PERSON, as a magnitude. Load-bearing anti-exploit state.
    *
    *  applyRepChange propagates HALF of any delta to the target faction's rivals
@@ -2206,12 +2212,12 @@ export interface NpcRelation {
    *  repeat of the same or a lighter one costs nothing, because you have already
    *  paid for what you are to them. */
   standingDocked?: number;
-  /** OTA-1083 — how many gifts have actually MOVED this relationship. Capped,
+  /** OTA-1060 — how many gifts have actually MOVED this relationship. Capped,
    *  so warmth stays something you mostly earn by doing rather than shopping. */
   giftBoons?: number;
 }
 
-/** OTA-1077 — an outpost assault the offscreen war sim actually carried out.
+/** OTA-1054 — an outpost assault the offscreen war sim actually carried out.
  *  The sim (OTA-844/864/867) has raided outposts since it shipped, but the
  *  events it emitted named only FACTIONS and went only to the World board. This
  *  record keeps the same event joined to the LOCATION and the clock, so the
@@ -2224,7 +2230,7 @@ export interface OutpostRaid {
   attackerName: string;
   /** The defender's home location — FACTION_STARTING_LOCATION[defenderId]. */
   locationId: string;
-  /** OTA-1078 — the AUTHORED name of that place, resolved at write time.
+  /** OTA-1055 — the AUTHORED name of that place, resolved at write time.
    *  The line is spoken by somebody who lives there, and de-slugging the id
    *  handed them "reclaimer stake" and "pilgrim waycamp" for grounds the game
    *  calls Reclaimer's Stake and the Tartarian Pilgrim Camp. npcMemory has no

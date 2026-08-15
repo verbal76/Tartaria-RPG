@@ -214,7 +214,7 @@ describe('Disease Sample crafted items (OTA-370)', () => {
 
   // OTA-480 — armor-shred cap scales on bosses so acid gets SOME extra headroom
   // against the +6 boss-AC wall (a normal foe still caps at base).
-  // ⚠ RETARGETED for OTA-1165 (owner tuning): the bonus was 6 — full parity with
+  // ⚠ RETARGETED for OTA-1142 (owner tuning): the bonus was 6 — full parity with
   // the boss AC bonus — which let acid strip a boss 11 AC and, combined with
   // weakness-stagger, turned bosses into training dummies (exploit report E1,
   // stagger-lock). Now 2: acid still pays against bosses, it just can't erase

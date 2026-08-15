@@ -23,7 +23,7 @@ export type GestureFamily =
   | 'touch'
   | 'reverent'
   | 'manipulate'
-  // OTA-1178 — sitting down, which the game's own prose invites constantly
+  // OTA-1155 — sitting down, which the game's own prose invites constantly
   // ("there's a bowl of something hot for you if you'll sit") and which no verb
   // list accepted until now.
   | 'settle';
@@ -85,7 +85,7 @@ const LINES: Record<GestureFamily, string[]> = {
   ],
 };
 
-/** OTA-1178 — lines for a gesture the player made at NOTHING IN PARTICULAR.
+/** OTA-1155 — lines for a gesture the player made at NOTHING IN PARTICULAR.
  *
  *  ⚠ The other six families lean on `fillNoun`'s "the dark ahead" for a bare
  *  verb, and that reads fine when you are reaching out at an unlit room. It does
@@ -115,10 +115,10 @@ function fillNoun(noun: string | null | undefined): string {
  *  target (may be empty). Pure aside from Math.random line-selection,
  *  matching the rest of the flavor pools in this engine.
  *
- *  ⚠ OTA-1178 — `opts.person` suppresses the definite article. Every line here
+ *  ⚠ OTA-1155 — `opts.person` suppresses the definite article. Every line here
  *  hardcoded `the {noun}`, which is right for a door and wrong for a human being:
  *  "You lay a hand on THE Halem the Trader". Nobody had hit it before because the
- *  only gestures anyone aimed at a person were vocal ones, and OTA-1178's `sit`
+ *  only gestures anyone aimed at a person were vocal ones, and OTA-1155's `sit`
  *  is aimed at a person almost every time it is typed. The caller decides, because
  *  the caller is the one holding the scene's people (matchTalkable) — capitalisation
  *  cannot decide it, since catalog nouns are Title Case too and DO want the article. */

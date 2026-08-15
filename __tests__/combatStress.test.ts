@@ -101,7 +101,7 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
   // 700-day forced-encounter sim — genuinely heavy (~300s observed), with no
   // logic failure; it was just tipping over tight timeouts on slower machines.
   // Give wide headroom so it never reads as a spurious timeout.
-  // OTA-1033 — 480s was July's headroom; 130 OTAs of engine growth later a full
+  // OTA-1010 — 480s was July's headroom; 130 OTAs of engine growth later a full
   // 20 000-action run measures ~610s on the CI container. Budget follows reality.
   jest.setTimeout(900000);
 
@@ -169,7 +169,7 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
         inventory: stockedInv,
         equipped: {
           ...(p0.equipped ?? {}),
-          // OTA-1033 — carry instance IDS like a real loaded save (backfillPlayer
+          // OTA-1010 — carry instance IDS like a real loaded save (backfillPlayer
           // stamps them at load; this hand-built state bypasses load). Without
           // offId, the attack-with-instrument off-hand guard fell through and
           // round 7's "attack with Pocket Knife" bound the knife to BOTH hands.
@@ -204,17 +204,17 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
     // spot death-spiral / runaway-stamina behavior.
     const hpSamples: number[] = [];
     const staminaSamples: number[] = [];
-    // OTA-1110 — STALL COMPOSITION + TIME-TO-KILL telemetry (Workstream A:
+    // OTA-1087 — STALL COMPOSITION + TIME-TO-KILL telemetry (Workstream A:
     // fights that end). The 25-round guard has been tripping at ~4.7% and the
     // report only said HOW MANY stalled, never WHICH matchups or WHY. Every
     // stall now records the enemy signature, the player's hands, and how many
     // combat lines were resisted; every kill records its round count per
-    // enemy. The report prints both tables so the retier pass (OTA-1112)
+    // enemy. The report prints both tables so the retier pass (OTA-1089)
     // works a named list instead of a feeling. Log scanning is by entry ID
     // (the sim trims gameLog to 40 per turn, so length offsets lie).
     const stallDetails: Array<{
       enemies: string; resisted: number; combatLines: number; main: string; off: string;
-      // OTA-1112 — stall anatomy: what the player's rounds in the stalled
+      // OTA-1089 — stall anatomy: what the player's rounds in the stalled
       // phase actually WERE. playerDmg = landed player damage lines,
       // refusals = swings refused (wrong range etc.), ko = knockout lines
       // (a KO'd humanoid stays in the lineup at HP>0 — kills nobody),
@@ -316,10 +316,10 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
       try {
         store.getState().submitPlayerAction(text);
       } catch (e: any) {
-        // OTA-1036 — ARMED TRIPWIRE for the raid-window `tc.challengeForLocation
+        // OTA-1013 — ARMED TRIPWIRE for the raid-window `tc.challengeForLocation
         // is not a function` ghost (seen twice on 2026-07-28, both under the
         // since-fixed 6-8 GB mock-leak heap pressure; never reproduced across
-        // 3 armed attempts + 4 clean full runs after OTA-1035). If it EVER
+        // 3 armed attempts + 4 clean full runs after the leak fix). If it EVER
         // recurs, this captures the stack, the live module shape, and heap —
         // the diagnosis writes itself. Costs nothing on the healthy path.
         try {
@@ -536,7 +536,7 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
       }
 
       // ── Combat is live ──────────────────────────────────────────
-      // OTA-1033 — ENGINE-SPAWNED fights (patrols, raids — living-world features
+      // OTA-1010 — ENGINE-SPAWNED fights (patrols, raids — living-world features
       // newer than this harness) arrive outside injectEnemy, so the verb
       // rotation stayed stuck mid-beatdown: the sim never re-advanced from mid
       // and attack-spammed a close-only weapon into the 25-round guard, every
@@ -549,7 +549,7 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
       if (encSig !== lastEncounterSig) {
         lastEncounterSig = encSig;
         combatRoundsInEncounter = 0;
-        // OTA-1110 — fresh composition window for the new membership.
+        // OTA-1087 — fresh composition window for the new membership.
         encResisted = 0;
         encCombatLines = 0;
         encPlayerDmg = 0;
@@ -559,9 +559,9 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
         seenCombatIds = new Set<string>();
       }
       combatRoundsInEncounter++;
-      // Stall guard — OTA-1112: the round budget scales with pack size. The
+      // Stall guard — OTA-1089: the round budget scales with pack size. The
       // flat 25 was calibrated for solo fights; a 5-member pack is five
-      // sequential kills (~4-6 landed hits each per the OTA-1110 kill table),
+      // sequential kills (~4-6 landed hits each per the OTA-1087 kill table),
       // so it earns +5 rounds per extra member before it counts as
       // pathological. The 2.5% cap on the assertion below is UNCHANGED — what
       // changed is that a legitimately long pack fight is no longer conflated
@@ -569,7 +569,7 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
       const stallBudget = 25 + 5 * Math.max(0, (sc?.enemies.length ?? 1) - 1);
       if (combatRoundsInEncounter > stallBudget) {
         stalled++;
-        // OTA-1110 — name the matchup before force-ending it.
+        // OTA-1087 — name the matchup before force-ending it.
         scanCombatLog();
         {
           const eqp = store.getState().player?.equipped;
@@ -676,7 +676,7 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
           break;
         default:
           // Beat-down phase — keep swinging the equipped weapon.
-          // OTA-1112 — RANGE-AWARE: under slow-weather repositioning (Iron
+          // OTA-1089 — RANGE-AWARE: under slow-weather repositioning (Iron
           // Fog / Silent Blizzard) a single advance only accrues progress
           // toward the band change, and a direction flip resets it — so the
           // fixed rotation (advance r4, retreat r8, advance r9) could leave
@@ -704,7 +704,7 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
       submit(action, verb);
       diffStatuses();
       recordStatusSnapshot();
-      scanCombatLog(); // OTA-1110 — fold this action's combat lines into the window
+      scanCombatLog(); // OTA-1087 — fold this action's combat lines into the window
 
       // Verify the defensive verb produced its status. OTA — dodge was
       // REDESIGNED (the dodge-dominance tuning): it resolves an immediate
@@ -731,7 +731,7 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
       const defeatedNow = snapshotMilestones();
       if (defeatedNow > prevDefeatedSnap) {
         wins++;
-        // OTA-1110 — time-to-kill per matchup, for the retier target list.
+        // OTA-1087 — time-to-kill per matchup, for the retier target list.
         (killRounds[encSig] ??= []).push(combatRoundsInEncounter);
         prevDefeated = defeatedNow;
         recordLootGrant(prevInvSize);
@@ -802,7 +802,7 @@ ${Object.entries(rangeBandsSeen).map(([k, v]) => `  ${k}: ${v}`).join('\n') || '
 Advances issued:      ${advanceCount.v}
 Retreats issued:      ${retreatCount.v}
 
-── OTA-1110 · stalled matchups (enemy | count | avg resisted-line share | hands) ──
+── OTA-1087 · stalled matchups (enemy | count | avg resisted-line share | hands) ──
 ${(() => {
   if (stallDetails.length === 0) return '  (none stalled)';
   const g = new Map<string, { n: number; res: number; lines: number; hands: Set<string>; pd: number; ref: number; ko: number; stun: number }>();
@@ -817,7 +817,7 @@ ${(() => {
     .join('\n');
 })()}
 
-── OTA-1110 · slowest kills (avg rounds to kill, min 3 kills) ──
+── OTA-1087 · slowest kills (avg rounds to kill, min 3 kills) ──
 ${(() => {
   const rows = Object.entries(killRounds)
     .filter(([, r]) => r.length >= 3)
@@ -877,7 +877,7 @@ First 5 crashes:      ${crashes.slice(0, 5).join(' | ') || '(none)'}
     //    a standalone 'blocking' status — only dodge and take_cover grant
     //    their own +AC effect now. Asserting block here tested removed
     //    behavior; the verb is still exercised above and must not crash.
-    // OTA — dodge asserts its CONTEST outcomes (perfect_opening / evasive);
+    // OTA-1010 — dodge asserts its CONTEST outcomes (perfect_opening / evasive);
     // the persistent 'dodging' +AC status this once tested is retired.
     expect(defensiveAcApplied.dodge ?? 0).toBeGreaterThan(0);
     expect(defensiveAcApplied.take_cover ?? 0).toBeGreaterThan(0);
@@ -893,7 +893,7 @@ First 5 crashes:      ${crashes.slice(0, 5).join(' | ') || '(none)'}
     //    on a tiny stall RATE (< 1%) instead of absolute zero so a single
     //    bad-luck fight doesn't fail the suite, while a real reach/loop
     //    deadlock (which would stall a large fraction of fights) still trips.
-    // OTA-1040 — RE-BASELINED ON MEASURED EVIDENCE. The 1% ceiling was set against
+    // OTA-1017 — RE-BASELINED ON MEASURED EVIDENCE. The 1% ceiling was set against
     // an observed 0.06% (1/1552) in the comment above; the real rate has drifted
     // ~20x since, unnoticed because this suite sat RED for 8 days before OTA-1033
     // revived it. Measured 4 seeds x 2 arms (~850-900 encounters each) while

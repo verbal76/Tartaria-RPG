@@ -277,7 +277,7 @@ function pickWeightedBiome<T extends { weight: number; name: string }>(
 const RARITY_RANK: Record<string, number> = {
   Common: 0, Uncommon: 1, Rare: 2, Epic: 3, Legendary: 4,
 };
-/** OTA-1222 — the same rarity curve `pickLootFromLadder` uses, so a substitution drawn
+/** OTA-1199 — the same rarity curve `pickLootFromLadder` uses, so a substitution drawn
  *  here and one drawn there cannot skew differently. Legendary stays rare INSIDE an
  *  already-rare 10% window. */
 const SITE_RARITY_WEIGHT: Record<Rarity, number> = { Common: 10, Uncommon: 5, Rare: 2, Legendary: 1 };
@@ -379,7 +379,7 @@ function format(line: string, target: string): string {
  *  Search / harvest stay loot-heavy; investigate becomes hook-heavy
  *  so the player who CHOOSES to investigate is rewarded with story
  *  threads, not loot they could grind from search. */
-/** ⚠⚠ OTA-1222 (PUNCHLIST P15) — THE SITE-LOOT SUBSTITUTION RATE.
+/** ⚠⚠ OTA-1199 (PUNCHLIST P15) — THE SITE-LOOT SUBSTITUTION RATE.
  *
  *  Owner: *"it goes from the tuned pool and has a small percentage to pull from the
  *  alternate loot table as a replacement item for something already on the list."*
@@ -405,7 +405,7 @@ export function rollAreaSearch(
     intent?: 'search' | 'investigate' | 'harvest';
     rareLootBias?: number;
     biomeTags?: readonly string[];
-    /** OTA-1222 — this place's OWN authored loot rows (engine/encounter.ts
+    /** OTA-1199 — this place's OWN authored loot rows (engine/encounter.ts
      *  `ladderLootPool`). Empty or absent leaves behaviour exactly as it was. */
     siteLoot?: readonly { name: string; rarity: Rarity }[];
   },
@@ -454,7 +454,7 @@ export function rollAreaSearch(
         if (rarityRank(alt.rarity) > rarityRank(found.rarity)) found = alt;
       }
     }
-    // ⚠⚠ OTA-1222 — THE SUBSTITUTION, and it happens LAST. Everything above — the find
+    // ⚠⚠ OTA-1199 — THE SUBSTITUTION, and it happens LAST. Everything above — the find
     // window, loot-luck, the biome weighting — has already decided that a find happens and
     // what tier it is. This swaps the OBJECT and nothing else, so a place that authored its
     // own loot occasionally hands you something that belongs to it instead of another

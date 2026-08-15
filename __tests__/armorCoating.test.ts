@@ -1,4 +1,4 @@
-// HaL2001 (ported from engine_Dev) — coat armor for damage resists. A weapon-coating
+// golem (ported from engine_Dev) — coat armor for damage resists. A weapon-coating
 // vial can be worked into an ARMOR piece for a permanent damage-type resist; while
 // worn, aggregateArmor adds it to the slot and the existing applyArmorResistance
 // combat path reduces incoming damage of that type. Covers the resist math + the
@@ -76,7 +76,7 @@ describe('applyCoatingToArmor store action', () => {
     const inv = store.getState().player!.inventory;
     const armor = inv.find((i) => i.id === 'a1')!;
     expect(armor.addedResists).toEqual(['poison']);
-    expect(inv.find((i) => i.id === 'v1')).toBeFalsy();
+    expect(inv.find((i) => i.id === 'v1')).toBeFalsy(); // vial consumed
   });
 
   it('refuses a duplicate resist type (does not waste the vial)', async () => {
@@ -84,8 +84,8 @@ describe('applyCoatingToArmor store action', () => {
     seed(store, [vial('v2'), { ...plate('a2'), addedResists: ['poison'] }]);
     store.getState().applyCoatingToArmor('v2', 'a2');
     const inv = store.getState().player!.inventory;
-    expect(inv.find((i) => i.id === 'a2')!.addedResists).toEqual(['poison']);
-    expect(inv.find((i) => i.id === 'v2')).toBeTruthy();
+    expect(inv.find((i) => i.id === 'a2')!.addedResists).toEqual(['poison']); // unchanged
+    expect(inv.find((i) => i.id === 'v2')).toBeTruthy(); // vial NOT consumed
   });
 
   it('caps a piece at 3 worked-in resists', async () => {
@@ -93,7 +93,7 @@ describe('applyCoatingToArmor store action', () => {
     seed(store, [vial('v3'), { ...plate('a3'), addedResists: ['acid', 'corruption', 'cold'] }]);
     store.getState().applyCoatingToArmor('v3', 'a3');
     const inv = store.getState().player!.inventory;
-    expect(inv.find((i) => i.id === 'a3')!.addedResists).toHaveLength(3);
-    expect(inv.find((i) => i.id === 'v3')).toBeTruthy();
+    expect(inv.find((i) => i.id === 'a3')!.addedResists).toHaveLength(3); // not added
+    expect(inv.find((i) => i.id === 'v3')).toBeTruthy(); // vial NOT consumed
   });
 });

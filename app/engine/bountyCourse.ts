@@ -1,4 +1,4 @@
-// OTA-1187 — WHAT THE "SET COURSE" CONTROL ON A HELD BOUNTY SHOULD SAY.
+// OTA-1164 — WHAT THE "SET COURSE" CONTROL ON A HELD BOUNTY SHOULD SAY.
 //
 // Owner: "once you accept a bounty there's a separate block that asks you to auto
 // route. it changes colors cuz it registers your choice but it doesn't actually auto

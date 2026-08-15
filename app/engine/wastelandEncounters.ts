@@ -64,7 +64,7 @@ export interface WastelandArchetype {
    *  user's explicit ask: "we need a way to start quests" that
    *  isn't tied to a faction vendor. */
   quest_hook?: { kind: 'hunt' | 'mystery'; id: string };
-  /** OTA-712 — provocable NPC encounter. When a `type:'npc'` archetype
+  /** OTA-695 — provocable NPC encounter. When a `type:'npc'` archetype
    *  carries a `provoke` block, its lore_note is a real dare ("reach for a
    *  coin and you will not reach it twice"). The engine arms the temptation
    *  when the encounter lands; a provoking verb (take/reach/steal/disturb/
@@ -76,7 +76,7 @@ export interface WastelandArchetype {
   provoke?: EncounterProvoke;
 }
 
-/** OTA-712 — data-driven provoke payload for a provocable NPC encounter. */
+/** OTA-695 — data-driven provoke payload for a provocable NPC encounter. */
 export interface EncounterProvoke {
   /** Enemy name to spawn on provocation (resolved via findEnemyByName). */
   enemy: string;
@@ -115,7 +115,7 @@ export interface WastelandEncounter {
   /** Mini-dungeon only — quest to auto-add to the player's active
    *  board. Null when the dungeon is loot-only. */
   questHook: { kind: 'hunt' | 'mystery'; id: string } | null;
-  /** OTA-712 — provoke payload for a provocable NPC encounter, else null. */
+  /** OTA-695 — provoke payload for a provocable NPC encounter, else null. */
   provoke: EncounterProvoke | null;
 }
 
@@ -139,7 +139,7 @@ interface PickOptions {
    *  to carry the lens trips over Crucibles roughly twice as often.
    *  Other archetypes unaffected. */
   aethericVision?: boolean;
-  /** ⚠ OTA-1136 — the difficulty tier's `discovery` dial. Multiplies the
+  /** ⚠ OTA-1113 — the difficulty tier's `discovery` dial. Multiplies the
    *  weight of the archetypes that HELP you (vendors, treasure caches,
    *  fusion benches) rather than the ones that fight you.
    *
@@ -166,7 +166,7 @@ interface PickOptions {
    *  Curve: 1.0× at 0–2 steps, 2.0× at 3–4, 4.0× at 5+. Reset
    *  to 0 in stepDirection when an enemy actually spawns. */
   stepsSinceCombat?: number;
-  /** OTA-713 — auto-route variety bias. When the player is on a plotted
+  /** OTA-696 — auto-route variety bias. When the player is on a plotted
    *  course (setTravelCourse / continueTravel), the NON-combat archetypes
    *  (treasure / npc / fusion_bench — the "different encounters") get a
    *  small weight multiplier so a route feels a little more eventful and
@@ -174,7 +174,7 @@ interface PickOptions {
    *  dungeon) are untouched, so this raises variety while nudging the
    *  combat FRACTION down, not up — no extra high-level fights. */
   autoTravel?: boolean;
-  /** OTA-1109 — archetype ids of the player's most recent encounters
+  /** OTA-1086 — archetype ids of the player's most recent encounters
    *  (newest first, capped at RECENT_ENCOUNTER_MEMORY by the caller).
    *  These are EXCLUDED from the pick so an authored set-piece cannot
    *  repeat back-to-back — the owner met the Phoenix-Feather scam vendor
@@ -185,13 +185,13 @@ interface PickOptions {
   recentArchetypeIds?: readonly string[];
 }
 
-/** OTA-1109 — how many recent encounter archetypes stay off the table.
+/** OTA-1086 — how many recent encounter archetypes stay off the table.
  *  8 ≈ two-to-three in-game days of travel at the ~7-8-step encounter
  *  cadence, and small enough that a biome with ~15 eligible archetypes
  *  always keeps a real pool. */
 export const RECENT_ENCOUNTER_MEMORY = 8;
 
-/** OTA-713 — how hard auto-route favors non-combat variety. Deliberately
+/** OTA-696 — how hard auto-route favors non-combat variety. Deliberately
  *  small ("only slightly more"): 1.3× lifts the treasure/npc/fusion-bench
  *  share a few points without swamping the combat rotation, which the
  *  combat-starvation curve still pulls back after a peaceful stretch. */
@@ -261,7 +261,7 @@ export function pickWastelandEncounter(
     }
   }
   if (allEligible.length === 0) return null;
-  // OTA-1109 — keep the last few encounters off the table (see PickOptions.
+  // OTA-1086 — keep the last few encounters off the table (see PickOptions.
   // recentArchetypeIds). Falls back to the full pool rather than a silent step
   // if the biome is too narrow to exclude anything.
   const recent = new Set(opts.recentArchetypeIds ?? []);
@@ -297,10 +297,10 @@ export function pickWastelandEncounter(
     if (opts.aethericVision && a.type === 'fusion_bench') mult *= 2.0;
     // OTA-218 — combat-starvation bias.
     if (isCombat(a.type)) mult *= combatStarvationMult;
-    // OTA-713 — auto-route variety bias. Lift the NON-combat archetypes so
+    // OTA-696 — auto-route variety bias. Lift the NON-combat archetypes so
     // a plotted course brings in more different (non-fight) encounters.
     if (opts.autoTravel && !isCombat(a.type)) mult *= AUTO_TRAVEL_VARIETY_MULT;
-    // ⚠ OTA-1136 — the difficulty tier's generosity with help. Applies to the
+    // ⚠ OTA-1113 — the difficulty tier's generosity with help. Applies to the
     // archetypes that give rather than take: a vendor stall, a cache, a
     // Crucible, a hidden site. Combat archetypes are untouched — making a
     // gentle run find FEWER fights is the `spawn` dial's job, and doing it

@@ -351,7 +351,7 @@ describe('Meta navigation stress', () => {
 
     // ── Main stress loop: 700 in-game days ───────────────────────
     const TARGET_DAY = 700;
-    // OTA-1034 — bounded from 28000 into the sim's measured stable range. The
+    // OTA-1011 — bounded from 28000 into the sim's measured stable range. The
     // heap-probe characterization (2026-07-28): flat ~220 MB until ~action
     // 2000, then a DETERMINISTIC ~1 MB/action pure-heap leak (big strings; V8
     // dies in StringSubstring at 8 GB by ~9750). AsyncStorage stays ~1 MB /
@@ -359,7 +359,7 @@ describe('Meta navigation stress', () => {
     // the concrete entry point for the §8 OPEN ITEM "world/persist tail
     // growth" investigation. 4500 actions completed at ~2 GB peak; 4000 keeps
     // margin and still cycles all 11 screens + save/load dozens of times.
-    // OTA-1035 — ROOT-CAUSED AND FIXED: the retention was the official jest.fn
+    // OTA-1012 — ROOT-CAUSED AND FIXED: the retention was the official jest.fn
     // AsyncStorage mock recording every setItem argument (each a capped
     // ~400 KB disk-log buffer) — see test-utils/asyncStorageMock.js. The
     // bound stays purely as a wall-clock budget; raise it freely if needed.

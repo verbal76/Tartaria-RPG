@@ -1,4 +1,4 @@
-// OTA-827 [Group-K] — close the four content/damage-type gaps the audit surfaced
+// OTA-807 [Group-K] — close the four content/damage-type gaps the audit surfaced
 // (the player's rulings): (1) add `cold` as a real damage type so the two Core
 // Guardians' authored vulnerable:cold/resist:cold traits can finally fire (frost
 // weapons now exist); (2) `force` weapons canonicalize to aetheric so they interact
@@ -11,7 +11,7 @@ import { applyDamageTypeModifier } from '../app/engine/crafting';
 import { traitDamageMultiplier, combineDamageTypeMatch } from '../app/engine/enemyTraits';
 import { canonicalDamageType, parseDamageTypeKeyword } from '../app/engine/damageTypes';
 
-describe('OTA-827 (cold) — cold is a real, reachable damage type', () => {
+describe('OTA-807 (cold) — cold is a real, reachable damage type', () => {
   it('a frost weapon canonicalizes to cold and a "Frost Maul" string parses as cold', () => {
     expect(canonicalDamageType('frost')).toBe('cold');
     expect(canonicalDamageType('ice')).toBe('cold');
@@ -38,7 +38,7 @@ describe('OTA-827 (cold) — cold is a real, reachable damage type', () => {
   });
 });
 
-describe('OTA-827 (force) — force weapons interact as aetheric', () => {
+describe('OTA-807 (force) — force weapons interact as aetheric', () => {
   it('a force weapon is resisted by an aetheric-resistant foe (was neutral pre-fix)', () => {
     expect(canonicalDamageType('force')).toBe('aetheric');
     // Aetheric Mutation resists aetheric → a force runecaster is now resisted.
@@ -48,7 +48,7 @@ describe('OTA-827 (force) — force weapons interact as aetheric', () => {
   });
 });
 
-describe('OTA-827 (poison) — poison is anti-organic', () => {
+describe('OTA-807 (poison) — poison is anti-organic', () => {
   it('living/organic enemies are weak to poison; machines/undead still resist it', () => {
     expect(applyDamageTypeModifier(10, 'poison', 'Human').match).toBe('weak');
     expect(applyDamageTypeModifier(10, 'poison', 'Animal').match).toBe('weak');
@@ -58,7 +58,7 @@ describe('OTA-827 (poison) — poison is anti-organic', () => {
   });
 });
 
-describe('OTA-827 — the double-weak reconcile still compounds', () => {
+describe('OTA-807 — the double-weak reconcile still compounds', () => {
   it('a Construct weak to cold (type) AND vulnerable:cold (trait) compounds to 2.25x', () => {
     const typeMatch = applyDamageTypeModifier(10, 'cold', 'Construct').match; // weak
     const traitMatch = traitDamageMultiplier(['vulnerable:cold'], 'cold').match; // vulnerable

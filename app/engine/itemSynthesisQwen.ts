@@ -68,7 +68,7 @@ export async function synthesizeItemViaQwen(
   name: string,
   hintTags: readonly string[],
   qwen: ItemSynthEngine,
-  // ⚠ OTA-1149 — HOMEWORK. The first real slot of the headroom track. When the
+  // ⚠ OTA-1126 — HOMEWORK. The first real slot of the headroom track. When the
   // player is reading a menu rather than waiting on the engine, this runs
   // ahead of time so the item popup is already written when they open it.
   // Everything else is identical: same prompt, same clamps, same cache, same
@@ -82,8 +82,8 @@ export async function synthesizeItemViaQwen(
   const cached = getCachedSynth(name);
   if (cached) return cached;
 
-  // ⚠ OTA-1132 — THE PROMPT WAS A SPECIFICATION, AND IT GOT A SPECIFICATION
-  // BACK. The OTA-1131 log ran this job three times and every one failed:
+  // ⚠ OTA-1109 — THE PROMPT WAS A SPECIFICATION, AND IT GOT A SPECIFICATION
+  // BACK. The OTA-1108 log ran this job three times and every one failed:
   //   item_synthesis n3 avg13.7s max19.6s in310t→out119t cap2 ∅1 ✂2/32.2s
   // 41 seconds, three `item_synth:unparseable`, nothing cached. Two of the
   // three ran into the 180-token cap having written 472 and 488 characters
@@ -100,7 +100,7 @@ export async function synthesizeItemViaQwen(
   // with the rules folded into it as inline hints rather than a separate
   // section. ~900 → ~430 characters (≈310 → ≈150 prompt tokens), which is
   // also prefill this job pays on every single call.
-  // ⚠ OTA-1138 — THE PIPES WERE THE BUG. OTA-1132 shrank this prompt and gave
+  // ⚠ OTA-1115 — THE PIPES WERE THE BUG. OTA-1109 shrank this prompt and gave
   // the discard reason the raw text, and the very next device log paid that
   // off by showing what actually fails:
   //   item_synthesis ok 10374ms … in 219t→out 239t HIT-CAP (604ch)
@@ -122,7 +122,7 @@ export async function synthesizeItemViaQwen(
   // shape); both of those were reasonable reads of the evidence available at
   // the time, and neither would have helped, because a model looping on `|`
   // will loop on `|` in any budget at any size.
-  // ⚠ OTA-1157 — THE PROMPT TAUGHT THE MODEL TO FAIL ITS OWN VALIDATOR, and this
+  // ⚠ OTA-1134 — THE PROMPT TAUGHT THE MODEL TO FAIL ITS OWN VALIDATOR, and this
   // is the fourth consecutive OTA on this job. The previous three chased the
   // token cap, then the shape, then the pipe loop. Every device log since has
   // still shown the SAME outcome — four generations, four discards, all
@@ -144,7 +144,7 @@ export async function synthesizeItemViaQwen(
   // ⚠ THE FIX IS TO SHOW THE NESTING, NOT TO DESCRIBE IT. Every example is now a
   // COMPLETE reply with `"effect"` wrapped where it actually belongs, so there
   // is no bare object to copy and no ambiguity about which "kind" is which. The
-  // allowed-values prose stays (it is what OTA-1138 replaced the pipe
+  // allowed-values prose stays (it is what OTA-1115 replaced the pipe
   // alternation with, and the pipe loop has not returned since).
   const systemPrompt = [
     'Stat-balance one item for a text RPG. Reply with ONE line: a single JSON object, nothing before or after it.',
@@ -173,20 +173,20 @@ export async function synthesizeItemViaQwen(
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
-      // OTA-1132 — 180 was guaranteeing failure: two of three calls in the
-      // OTA-1131 log spent the entire budget and still had an open brace. The
+      // OTA-1109 — 180 was guaranteeing failure: two of three calls in the
+      // OTA-1108 log spent the entire budget and still had an open brace. The
       // leaner shape above should make the extra headroom unnecessary in the
       // normal case, and a cap only costs time when it is actually reached —
       // so this is insurance, not a decision to generate more.
       {
         maxNewTokens: 240,
         temperature: 0.1,
-        // OTA-1149 — priced separately so idle work never hides inside the
+        // OTA-1126 — priced separately so idle work never hides inside the
         // interactive number. A slot that looks cheap because its cost was
         // averaged with something else is how a budget gets lost.
         job: opts?.homework ? 'item_synthesis_hw' : 'item_synthesis',
         homework: opts?.homework,
-        // ⚠ OTA-1157 — CUT ME SHORT IF THE VOICE NEEDS THE LOCK. The device log
+        // ⚠ OTA-1134 — CUT ME SHORT IF THE VOICE NEEDS THE LOCK. The device log
         // measured a welcome-back line waiting 3,940 ms behind one of these,
         // for a synthesis that then failed its own validator. Enrichment losing
         // a description is the cheaper loss: the item keeps its static row and
@@ -199,18 +199,18 @@ export async function synthesizeItemViaQwen(
     return null;
   }
 
-  // OTA-1132 — an empty return is a DIFFERENT failure from an unparseable
-  // one and must not be filed under it. The OTA-1131 log has
+  // OTA-1109 — an empty return is a DIFFERENT failure from an unparseable
+  // one and must not be filed under it. The OTA-1108 log has
   // `item_synthesis empty 8809ms read 0ms/write 0ms in 309t→out 0t` moments
   // before the watchdog reported "Qwen dormant … the native context was
   // released" — that is the dormancy bug, not a model that wrote bad JSON,
   // and calling it `unparseable` would have sent the next investigation at
   // the parser.
   if (!raw.trim()) {
-    // ⚠ OTA-1161 — AN INTERRUPTED CALL IS NOT AN EMPTY ONE. OTA-1157 made this
+    // ⚠ OTA-1138 — AN INTERRUPTED CALL IS NOT AN EMPTY ONE. OTA-1134 made this
     // job preemptible, and the very next log showed the label lying about it:
     // `item_synthesis preempted 3535ms` … `DISCARDED — item_synth:empty`. Empty
-    // is the DORMANCY signature (OTA-1142's watchdog keys off it); preempted is
+    // is the DORMANCY signature (OTA-1119's watchdog keys off it); preempted is
     // the voice winning the lock, which is the feature working as built. Same
     // reason twice over: a discard label the next investigation will trust has
     // to name what actually happened.
@@ -218,8 +218,8 @@ export async function synthesizeItemViaQwen(
     return null;
   }
 
-  // ⚠ OTA-1131 — this was the app's most expensive silent failure. The
-  // OTA-1130 device log caught one at `item_synthesis ok 9528ms … out 179t …
+  // ⚠ OTA-1108 — this was the app's most expensive silent failure. The
+  // OTA-1107 device log caught one at `item_synthesis ok 9528ms … out 179t …
   // HIT-CAP (813ch)`: 179 tokens against a 180 cap, so generation was cut off
   // mid-object, and 813 characters for a shape that needs about 200 means the
   // model rambled past the JSON before the cap stopped it. Nine and a half
@@ -228,14 +228,14 @@ export async function synthesizeItemViaQwen(
   // truncated tail), and whatever still fails is reported as the waste it is.
   const obj = extractJsonObject(raw);
   if (!obj) {
-    // ⚠ OTA-1132 — NAME THE CULPRIT INSTEAD OF GUESSING AT IT. OTA-1131 made
+    // ⚠ OTA-1109 — NAME THE CULPRIT INSTEAD OF GUESSING AT IT. OTA-1108 made
     // this failure visible and the next log showed it happening three times
     // out of three — but `unparseable` does not say WHETHER the model wrote
     // prose, opened a markdown fence, emitted two objects, or simply ran long.
-    // The ambient ∅ mystery was closed the same way (OTA-1057) by printing
+    // The ambient ∅ mystery was closed the same way (OTA-1034) by printing
     // the raw text beside the verdict. The reason string rides the existing
     // discard sink into the debug channel, so this needs no new plumbing.
-    // OTA-1138 — and now that the pipe loop is a KNOWN failure with a known
+    // OTA-1115 — and now that the pipe loop is a KNOWN failure with a known
     // cause, it gets its own name. If it ever comes back, the next log should
     // say so in one word instead of making someone re-derive it from 160
     // characters of raw text. `unparseable` stays for everything else.
@@ -245,9 +245,9 @@ export async function synthesizeItemViaQwen(
     return null;
   }
 
-  // ⚠ OTA-1157 — NAME THE CULPRIT. This was the LAST discard path in the file
+  // ⚠ OTA-1134 — NAME THE CULPRIT. This was the LAST discard path in the file
   // that reported only that it happened. Its neighbours all print what they
-  // saw (OTA-1132 added that, OTA-1057 before it), and the payoff is exactly
+  // saw (OTA-1109 added that, OTA-1034 before it), and the payoff is exactly
   // the same here: four device logs said `rejected-by-clamp` four times and not
   // one of them said WHICH of the clamp's two rejections fired, so the cause
   // had to be re-derived from the source instead of read off the log.
@@ -265,7 +265,7 @@ export async function synthesizeItemViaQwen(
   return validated;
 }
 
-/** OTA-1138 — did the model fall into the pipe loop this OTA removed the cause
+/** OTA-1115 — did the model fall into the pipe loop this OTA removed the cause
  *  of? The signature is a run of `|`-separated fragments where the SAME token
  *  keeps repeating: `"kind":"misc|invented|lorem|quest|tool|misc|misc|misc|…`.
  *  Three or more pipes with a repeat among the segments is the pattern; a
@@ -283,7 +283,7 @@ export function looksLikeAlternationLoop(raw: string): boolean {
  *  occasionally wraps its JSON in markdown fences or adds a sentence
  *  of prose. Returns null on any failure.
  *
- *  ⚠ OTA-1131 — first-to-LAST brace was the bug. `raw.lastIndexOf('}')` is
+ *  ⚠ OTA-1108 — first-to-LAST brace was the bug. `raw.lastIndexOf('}')` is
  *  correct only when the response contains exactly one object. Two things in
  *  the device log break that:
  *

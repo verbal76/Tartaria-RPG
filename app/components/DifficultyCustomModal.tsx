@@ -1,4 +1,4 @@
-// OTA-1136 — CUSTOM DIFFICULTY. Owner: "create a custom selection that fires a
+// OTA-1113 — CUSTOM DIFFICULTY. Owner: "create a custom selection that fires a
 // popup and lets you check what systems they want to effect."
 //
 // The survey the owner brought back names the roguelite pattern — Slay the

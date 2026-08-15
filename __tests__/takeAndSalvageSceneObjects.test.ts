@@ -1,4 +1,4 @@
-// OTA-710 — two scene-interaction dead-ends the playtest log surfaced.
+// OTA-693 — two scene-interaction dead-ends the playtest log surfaced.
 //
 //  (1) TAKE a weapon-named scene noun. The player saw an "ice axe" in
 //      the room, typed `take ice axe`, and the engine refused ("part of
@@ -75,7 +75,7 @@ function tailLog(n = 8): string {
   return useGameStore.getState().gameLog.slice(-n).map((e) => e.text).join('\n');
 }
 
-describe('OTA-710 — take infers a weapon from a weapon-named scene noun', () => {
+describe('OTA-693 — take infers a weapon from a weapon-named scene noun', () => {
   beforeAll(() => {
     console.log = () => {};
     console.warn = () => {};
@@ -131,7 +131,7 @@ describe('OTA-710 — take infers a weapon from a weapon-named scene noun', () =
   });
 });
 
-describe('OTA-710 — salvage falls back to the context-resolved noun', () => {
+describe('OTA-693 — salvage falls back to the context-resolved noun', () => {
   beforeAll(() => {
     console.log = () => {};
     console.warn = () => {};
@@ -182,7 +182,7 @@ describe('OTA-710 — salvage falls back to the context-resolved noun', () => {
   });
 });
 
-describe('OTA-760 — an OPENED container is not also salvageable (no double-dip)', () => {
+describe('OTA-741 — an OPENED container is not also salvageable (no double-dip)', () => {
   beforeAll(() => {
     console.log = () => {};
     console.warn = () => {};
@@ -203,11 +203,8 @@ describe('OTA-760 — an OPENED container is not also salvageable (no double-dip
       },
     });
 
-    // OPEN the container (rolls its contents + resolves the object).
     store.getState().submitPlayerAction('open lockbox');
 
-    // The fix: opening records the noun as a searched ambient noun (and an opened
-    // container) on whichever room key the player is standing in.
     const rooms = store.getState().worldMemory.visitedRooms ?? {};
     const searchedSomewhere = Object.values(rooms).some(
       (r) => (r.searchedAmbientNouns ?? []).includes('lockbox'),
@@ -218,9 +215,6 @@ describe('OTA-760 — an OPENED container is not also salvageable (no double-dip
     expect(openedSomewhere).toBe(true);
     expect(searchedSomewhere).toBe(true);
 
-    // A subsequent SALVAGE ALL over the same lockbox must be a no-op: the harvest
-    // handler spends 0.25h per noun it actually works, so a skipped noun advances
-    // the clock by 0. (Pre-fix the lockbox was re-worked and paid out again.)
     const hoursBefore = store.getState().player!.hoursElapsed ?? 0;
     store.getState().salvageAllAmbient(['lockbox']);
     const hoursAfter = store.getState().player!.hoursElapsed ?? 0;
@@ -228,7 +222,7 @@ describe('OTA-760 — an OPENED container is not also salvageable (no double-dip
   });
 });
 
-describe('OTA-770 — attack wording + rousing an animate scene noun', () => {
+describe('OTA-750 — attack wording + rousing an animate scene noun', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
   const setScene = (store: ReturnType<typeof bootstrap> extends Promise<infer S> ? S : never, nouns: string[]) => {
@@ -245,8 +239,6 @@ describe('OTA-770 — attack wording + rousing an animate scene noun', () => {
     const store = await bootstrap('Smasher');
     setScene(store, ['debris', 'rubble']);
     store.getState().submitPlayerAction('attack the debris');
-    // The old shared search line ("You sift ... pull out a piece worth keeping") is gone;
-    // an attack reads as a strike whatever the roll.
     expect(tailLog(10)).not.toMatch(/\bsift\b/i);
   });
 

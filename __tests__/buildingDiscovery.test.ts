@@ -89,8 +89,7 @@ describe('arb36 — organic building entry', () => {
 
   // Playtester walked up to an enterable structure, did other things, then `look`ed
   // and saw no reminder it was enterable — thought they were already inside. The
-  // look-around now surfaces the ENTER affordance whenever a structure stands on the
-  // tile and they haven't stepped in yet.
+  // look-around now surfaces the ENTER affordance when a structure stands on the tile.
   it('LOOK surfaces the ENTER affordance when a structure stands on this tile', async () => {
     const store = await boot();
     const scene = store.getState().currentScene!;
@@ -104,7 +103,6 @@ describe('arb36 — organic building entry', () => {
   it('LOOK does NOT claim you are "near" a structure once you have entered it', async () => {
     const store = await boot();
     const scene = store.getState().currentScene!;
-    // Inside the building now — the look should describe the interior, not a "near" nudge.
     store.setState({ currentScene: { ...scene, sceneBuilding: 'shack' }, activeBuildingId: 'shack' });
     store.getState().submitPlayerAction('look');
     const feed = store.getState().gameLog.map((e) => e.text).join('\n');

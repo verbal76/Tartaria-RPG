@@ -1,4 +1,4 @@
-// OTA-711 — three glitches a playtest log surfaced:
+// OTA-694 — three glitches a playtest log surfaced:
 //
 //  (1) INVESTIGATE flavor. The generic no-loot pool used handheld phrasing
 //      ("you turn the {noun} in your hands", "you weigh the {noun}") on
@@ -64,10 +64,10 @@ import { pickWastelandEncounter } from '../app/engine/wastelandEncounters';
 
 const HANDHELD = /in your hands|you weigh the|you let it go/i;
 
-describe('OTA-711 — investigate flavor never treats architecture as handheld', () => {
+describe('OTA-694 — investigate flavor never treats architecture as handheld', () => {
   // These nouns fall through to the generic category (no dedicated keyword
   // template) AND classify as fixed features.
-  // OTA-714 — includes the nouns the playtest log caught still slipping
+  // OTA-697 — includes the nouns the playtest log caught still slipping
   // through ("floorboards", "pegs", "ladder") plus the generic catch-all.
   const FIXED = ['stair', 'landing', 'anchor bolt', 'toolbench', 'ledge', 'scaffold', 'buttress', 'floor',
     'floorboards', 'pegs', 'ladder', 'descent bell', 'plank', 'lever', 'signal cord'];
@@ -87,7 +87,7 @@ describe('OTA-711 — investigate flavor never treats architecture as handheld',
   });
 });
 
-describe('OTA-711 — item-use nudge requires a whole-word overlap', () => {
+describe('OTA-694 — item-use nudge requires a whole-word overlap', () => {
   it('"disturb the aetherkin" does not suggest "use flame of aether"', () => {
     const parsed = parseInput('disturb the aetherkin', {
       inventory: [{ id: 'r1', name: 'Flame of Aether', kind: 'relic', quantity: 1, tags: [] }] as any,
@@ -105,7 +105,7 @@ describe('OTA-711 — item-use nudge requires a whole-word overlap', () => {
   });
 });
 
-describe('OTA-712 — provoke is data-driven (pulled from the encounter JSON)', () => {
+describe('OTA-695 — provoke is data-driven (pulled from the encounter JSON)', () => {
   it('the aetherkin_mourner archetype resolves a provoke block with an enemy + nouns + line', () => {
     // forceArchetype bypasses the biome/roll gates and resolves the named
     // archetype straight from wasteland_encounters.json — proving the enemy
@@ -132,7 +132,7 @@ describe('OTA-712 — provoke is data-driven (pulled from the encounter JSON)', 
   });
 });
 
-describe('OTA-711 — Aetherkin makes good on the threat', () => {
+describe('OTA-694 — Aetherkin makes good on the threat', () => {
   beforeAll(() => {
     console.log = () => {};
     console.warn = () => {};

@@ -1,4 +1,4 @@
-// OTA-1088 — PHASE 3: MAKE THE STORY ASK QUESTIONS.
+// OTA-1065 — PHASE 3: MAKE THE STORY ASK QUESTIONS.
 //
 // The build plan, verbatim: "the audience that pays premium for text is paying
 // for consequence, and right now you have exactly one fork in the game. The
@@ -38,7 +38,7 @@
 //   2. IN THE ENDING — an epilogue sentence, permanently, on EndingScreen.
 //      The motive epilogue still closes the arc; these say what you DID.
 //   3. IN THE WORLD — Phase 2 topics can gate on `requiresChoice`, so the cast
-//      built over OTA-1081..1087 can know what you chose and say so.
+//      built over OTA-1058..1087 can know what you chose and say so.
 //
 // All authored text lives in app/data/story/forks.json — same contract as
 // intro.json / chapters.json / drip.json, so the writing is revisable without
@@ -62,7 +62,7 @@ export interface ForkEffects {
   whisper?: string;
   /** ⚠ ONE-SHOT faction standing. Bounded and authored, and it is a STORY
    *  beat rather than an economy: it fires once per character, ever, because
-   *  the fork itself can only be answered once. See OTA-1087 for why anything
+   *  the fork itself can only be answered once. See OTA-1064 for why anything
    *  repeatable must never touch standing. */
   standing?: { factionId: string; delta: number };
   /** A title, awarded outright. */

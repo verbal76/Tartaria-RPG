@@ -1,4 +1,4 @@
-// OTA-1083 — GIVING SOMEBODY SOMETHING.
+// OTA-1060 — GIVING SOMEBODY SOMETHING.
 //
 // Owner's design: type `gift`, pick an item, pick a person; you get a discount,
 // a standing bump or some other boon, and THEY REMEMBER THAT YOU GAVE THEM THAT
@@ -7,7 +7,7 @@
 // the object is a relationship.
 //
 // ── WHY THIS IS NOT JUST "SPEND TC FOR REGARD" ────────────────────────────
-// Buying already moves the ledger (OTA-1072 tcTraded, OTA-1076 amends). If a
+// Buying already moves the ledger (OTA-1049 tcTraded, OTA-1053 amends). If a
 // gift were only worth its price, the optimal play would be to hand over the
 // most expensive thing you own and nothing else would matter. So value is a
 // FLOOR, not the score: below the floor it is an insult, above it the reaction
@@ -27,7 +27,7 @@
 //
 // Deterministic throughout: the same gift to the same person in the same state
 // produces the same reaction, for the reason every other line in this system is
-// deterministic (OTA-1072) — an NPC whose gratitude is a dice roll reads as
+// deterministic (OTA-1049) — an NPC whose gratitude is a dice roll reads as
 // broken rather than as varied.
 import rawPrefs from '../data/npcs/gift_prefs.json';
 import type { NpcRelation } from './types';
@@ -64,10 +64,10 @@ export const STANDING_INSULT = 2;
  *
  *  The uncapped part of a gift is the PERSONAL relationship, which is contained
  *  by construction: it moves one ledger row, it buys that person's discount
- *  (OTA-1076 regardPriceMult), and it cannot cascade to anybody else. */
+ *  (OTA-1053 regardPriceMult), and it cannot cascade to anybody else. */
 export const GIFT_STANDING_FACTION_CAP = 10;
 
-/** OTA-1176 — 'disliked' is a NEW tier between polite and insulted. The owner
+/** OTA-1153 — 'disliked' is a NEW tier between polite and insulted. The owner
  *  asked for like / love / DISLIKE lists, and the schema had no dislike: the old
  *  `coldTags` resolved to 'polite', which is what an item they have no opinion
  *  about gets. So a smith shrugging at a pastry and a smith who actively does not
@@ -85,19 +85,19 @@ interface GiftPref {
   lovesTags?: string[];
   /** Exact item names they are delighted by — sharper than a tag. */
   lovesItems?: string[];
-  /** OTA-1176 — the MIDDLE tier: things that suit them without delighting them.
+  /** OTA-1153 — the MIDDLE tier: things that suit them without delighting them.
    *  Before this, 'liked' could only be reached by raw price (>= 6x the floor),
    *  so a cheap thing perfectly matched to somebody's trade was a shrug while any
    *  expensive thing was a win. That made the whole system a price check wearing
    *  a personality. */
   likesTags?: string[];
   likesItems?: string[];
-  /** OTA-1176 — things they actively do not want. */
+  /** OTA-1153 — things they actively do not want. */
   dislikesTags?: string[];
   dislikesItems?: string[];
   /** Legacy name for dislikesTags, still read so old data keeps working. */
   coldTags?: string[];
-  /** OTA-1106 — the one-time return gift at trusted: the item they push
+  /** OTA-1083 — the one-time return gift at trusted: the item they push
    *  across the counter, and the words they do it with. Only the authored
    *  cast carries one — a return gift requires having tastes to honor. */
   returnGift?: string;
@@ -105,7 +105,7 @@ interface GiftPref {
   /** Said when they love it. `{item}` is replaced. */
   lovedLine?: string;
   likedLine?: string;
-  /** OTA-1176 — said when it is something they actively did not want. */
+  /** OTA-1153 — said when it is something they actively did not want. */
   dislikeLine?: string;
   politeLine?: string;
   insultLine?: string;
@@ -113,7 +113,7 @@ interface GiftPref {
 
 const PREFS = (rawPrefs as { npcs: Record<string, GiftPref>; fallback: GiftPref }).npcs;
 const FALLBACK = (rawPrefs as { fallback: GiftPref }).fallback;
-/** OTA-1176 — ONE PERSON, TWO NAMES. Five shopkeepers also work a Hidden Market
+/** OTA-1153 — ONE PERSON, TWO NAMES. Five shopkeepers also work a Hidden Market
  *  stall, and the Market spells some of them differently: the shop knows
  *  `halem_trader`, the Market calls him "Halem the Trader", which slugs to
  *  `halem_the_trader`. Without this map those are two strangers who happen to
@@ -121,7 +121,7 @@ const FALLBACK = (rawPrefs as { fallback: GiftPref }).fallback;
  *  Aliases point the spelling at the canonical entry — never a second copy. */
 const ALIASES = ((rawPrefs as { aliases?: Record<string, string> }).aliases ?? {});
 
-/** OTA-1176 — THE LOOKUP CHAIN, and why a flat map could never have covered the cast.
+/** OTA-1153 — THE LOOKUP CHAIN, and why a flat map could never have covered the cast.
  *
  *  Ledger ids are not all authored constants (see npcLedgerId). Fixed shopkeepers
  *  key as `irma_ironhand`, but roadside traders key as `roadside:<name>`, Hidden
@@ -184,7 +184,7 @@ export function giftBoonsUsed(rel: NpcRelation | null | undefined): number {
   return rel?.giftBoons ?? 0;
 }
 
-/** OTA-1176 — every tag/name test in this file goes through these two, so a
+/** OTA-1153 — every tag/name test in this file goes through these two, so a
  *  casing or whitespace difference cannot make one tier match where another
  *  would not. */
 const hasTag = (list: string[] | undefined, tags: string[]) =>
@@ -198,7 +198,7 @@ const isNamed = (list: string[] | undefined, name: string) =>
  *  favourite is the sharper statement about a person. Then loves, then dislikes,
  *  then likes: dislikes sit ABOVE likes so a broad `likesTags` cannot rescue
  *  something the same person was written to not want. Price is the LAST word and
- *  only for items nobody has an opinion about — before OTA-1176 it was effectively
+ *  only for items nobody has an opinion about — before OTA-1153 it was effectively
  *  the only word, which made the whole system a price check in a costume. */
 export function reactionFor(npcId: string, item: GiftItem, npcName?: string): GiftReaction {
   if (item.worth < GIFT_FLOOR_TC) return 'insulted';
@@ -288,7 +288,7 @@ export function giftMemoryLine(rel: NpcRelation | null | undefined): string {
 
 export const GIFT_PREF_NPC_IDS = Object.keys(PREFS);
 
-/** OTA-1106 — WHAT A REACTION TEACHES. When a gift lands, the reaction is the
+/** OTA-1083 — WHAT A REACTION TEACHES. When a gift lands, the reaction is the
  *  tell: a LOVED reaction reveals which taste it hit (tag or exact item), a
  *  POLITE reaction on a matched cold tag reveals the shrug. Returns ledger
  *  entries like 'loves:metal', 'loves:Aether Mud', 'cold:food' — the gift
@@ -301,7 +301,7 @@ export function tasteDiscoveries(npcId: string, item: GiftItem, reaction: GiftRe
     if (isNamed(p.lovesItems, item.name)) found.push(`loves:${item.name}`);
     for (const t of p.lovesTags ?? []) if (tags.includes(t.trim().toLowerCase())) found.push(`loves:${t}`);
   }
-  // OTA-1176 — the middle and negative tiers are learnable too. Without this the
+  // OTA-1153 — the middle and negative tiers are learnable too. Without this the
   // picker could only ever show what somebody LOVES, so a player had no way to
   // record "asked, and they did not want it" except by remembering it themselves.
   if (reaction === 'liked') {
@@ -315,7 +315,7 @@ export function tasteDiscoveries(npcId: string, item: GiftItem, reaction: GiftRe
   return found;
 }
 
-/** OTA-1106 — the authored return gift, if this person has one. */
+/** OTA-1083 — the authored return gift, if this person has one. */
 export function returnGiftFor(npcId: string, npcName?: string): { item: string; line: string } | null {
   const p = giftPrefFor(npcId, npcName);
   if (!p.returnGift) return null;

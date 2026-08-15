@@ -25,7 +25,7 @@ export function findFaction(id: string): Faction | null {
   return FACTIONS.find((f) => f.id === id) ?? null;
 }
 
-/** ⚠ OTA-1178 — RACE IDS SITTING WHERE FACTION IDS BELONG.
+/** ⚠ OTA-1155 — RACE IDS SITTING WHERE FACTION IDS BELONG.
  *
  *  OTA-834 found four stall reps carrying RACE ids instead of faction ids and
  *  remapped the ROSTER — but a save that had already met one of those vendors
@@ -65,7 +65,7 @@ export function applyRepChange(
   standing: readonly FactionStanding[],
   withFaction: string,
   delta: number,
-  /** ⚠ OTA-1188 — WHO COUNTS AS FRIEND AND FOE, supplied by the caller.
+  /** ⚠ OTA-1165 — WHO COUNTS AS FRIEND AND FOE, supplied by the caller.
    *
    *  The default (omitting this) reads `factions.json`'s static `allies`/`rivals`, which
    *  are the ORIGINAL TREATIES and never change — while the GRUDGES & ALLIANCES panel
@@ -116,9 +116,9 @@ export function applyRepChange(
   return { standing: next, changed };
 }
 
-/** ⚠ OTA-1179 — READS HEAL THE ID TOO, not just writes.
+/** ⚠ OTA-1156 — READS HEAL THE ID TOO, not just writes.
  *
- *  OTA-1178 taught `applyRepChange`'s callers to canonicalise, because a legacy
+ *  OTA-1155 taught `applyRepChange`'s callers to canonicalise, because a legacy
  *  race id on an old save made a gift grant nothing while claiming success. The
  *  READ side was left as it was, and it has the same hole with a quieter failure:
  *  this returns **0 — indistinguishable from genuinely neutral** — so a player who
@@ -145,10 +145,10 @@ export function meetsJoinThreshold(standing: readonly FactionStanding[], faction
   return getStanding(standing, factionId) >= JOIN_THRESHOLD;
 }
 
-/** ⚠ OTA-1181 — TC of honest custom that banks 1 standing with a faction's traders.
+/** ⚠ OTA-1158 — TC of honest custom that banks 1 standing with a faction's traders.
  *  Lifted out of `gameStore.buyFromVendor`, where it was a function-local const, so
  *  the character sheet can STATE the rule instead of printing a second copy of the
  *  number. The in-game glossary said purchases were worth "+1" with no denominator
- *  at all — off by this entire constant, and exactly the drift OTA-1179 #8 cleaned
+ *  at all — off by this entire constant, and exactly the drift OTA-1156 #8 cleaned
  *  up for JOIN_THRESHOLD. One definition, two readers. */
 export const BUY_REP_TC_PER_STANDING = 500;

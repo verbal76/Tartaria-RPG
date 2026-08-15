@@ -15,7 +15,7 @@ const DEFAULT_ESCORT_LABEL = 'Escort party';
 /** Fraction of the player's combat damage the escort party takes as collateral each
  *  time the player is hit. EXTRA damage on the party pool — never subtracted from
  *  the player's own hit.
- *  OTA-989 — tuned 0.30 -> 0.20 after running the missions through their paces:
+ *  OTA-966 — tuned 0.30 -> 0.20 after running the missions through their paces:
  *  at 0.30 a SOLO party (the stranded travelers, the Envoy, the Confessor —
  *  pool ~42-45 at current player HP) failed inside ~1 hard pack fight
  *  (~15-25 landed hits x 2-3 collateral), which made every solo contract a
@@ -64,7 +64,7 @@ export function escorteeMaxHp(playerHpMax: number): number {
 
 /** Build a fresh shared-pool escort party for an accepted quest. The pool max is
  *  the SUM of `count` members' HP, so a 3-person party is ~3x one member. */
-/** OTA-1080 — WHO IS WALKING AT THE FRONT.
+/** OTA-1057 — WHO IS WALKING AT THE FRONT.
  *
  *  An escort was a POOL — label, hp, count — with no individuals in it, so when
  *  the ledger came to cover escorts there was literally nobody to remember. You
@@ -98,7 +98,7 @@ export function spawnEscortPool(count: number, playerHpMax: number, label: strin
     hp: hpMax,
     hpMax,
     count,
-    // OTA-1080 — the person the ledger remembers. Optional on the type so saves
+    // OTA-1057 — the person the ledger remembers. Optional on the type so saves
     // written before this OTA load without one and simply have no leader.
     leaderName: escortLeaderName(count, hpMax, finalLabel),
   };
@@ -119,7 +119,7 @@ export function livingEscortPools(
   return out;
 }
 
-/** OTA-986 — Contracts-screen toggle label (engine_Dev's polish, owner-approved):
+/** OTA-963 — Contracts-screen toggle label (engine_Dev's polish, owner-approved):
  *  when the contract carries a LIVING escort party, the ACTIVATE / DEACTIVATE
  *  button names what it does to them — "stand down your Surveyors" / "recall
  *  your Surveyors" — instead of a bare toggle. */

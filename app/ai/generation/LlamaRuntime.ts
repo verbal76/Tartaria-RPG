@@ -143,12 +143,12 @@ export interface LlamaGenerateOptions {
   topK?: number;
   /** Per-token callback for streaming. Receives just the new token text. */
   onToken?: (token: string) => void;
-  /** OTA-1128 — telemetry label for this call ('flourish', 'forge_name', a
+  /** OTA-1105 — telemetry label for this call ('flourish', 'forge_name', a
    *  narration intent…). Unlabeled calls record as 'unlabeled' so a new
    *  consumer that forgets the tag still shows up in the stats instead of
    *  vanishing from them. */
   job?: string;
-  /** ⚠ OTA-1146 — HOMEWORK. Idle-time work nobody asked for. Two consequences,
+  /** ⚠ OTA-1123 — HOMEWORK. Idle-time work nobody asked for. Two consequences,
    *  and they only make sense together:
    *    · it queues at ML_PRIORITY_HOMEWORK, BELOW voice, so it never delays
    *      anything the player is waiting on that hasn't started yet; and
@@ -159,7 +159,7 @@ export interface LlamaGenerateOptions {
    *  native call in flight. Owner's requirement was that idle work cost the
    *  player nothing, and this is the half that delivers it. */
   homework?: boolean;
-  /** ⚠ OTA-1157 — INTERRUPTIBLE, BUT NOT DEPRIORITISED. The distinction matters
+  /** ⚠ OTA-1134 — INTERRUPTIBLE, BUT NOT DEPRIORITISED. The distinction matters
    *  and it is the whole of this flag.
    *
    *  Homework is both: it queues BELOW everything and it can be cut short.
@@ -169,7 +169,7 @@ export interface LlamaGenerateOptions {
    *    qwen⏱  item_synthesis ok 3847ms → DISCARDED — item_synth:rejected-by-clamp
    *
    *  Kokoro needed 859 ms. It waited 3,940 — almost exactly the length of an
-   *  item synthesis that then threw its own output away. OTA-1153 raised the
+   *  item synthesis that then threw its own output away. OTA-1130 raised the
    *  voice above the LLM, but priority only reorders WAITERS; the synthesis had
    *  already started, and nothing could reach in and stop it.
    *
@@ -194,7 +194,7 @@ export class LlamaRuntime {
   private context: LlamaContext | null = null;
   private modelPath: string | null = null;
 
-  /** ⚠ OTA-1200 — TELLS THE TWO REASONS `dispose()` FINDS NOTHING APART, AND THE
+  /** ⚠ OTA-1177 — TELLS THE TWO REASONS `dispose()` FINDS NOTHING APART, AND THE
    *  INSTRUMENT IS WORTHLESS WITHOUT IT.
    *
    *  `dispose()` bails on `if (!ctx) return;` in two completely different situations:
@@ -226,11 +226,11 @@ export class LlamaRuntime {
     if (!info.exists) {
       throw new Error(`GGUF model file not found at ${opts.modelPath}`);
     }
-    // ⚠⚠ OTA-1196 — THE MODEL LOAD NOW TAKES THE NATIVE-ML LOCK. IT NEVER DID, AND IT IS
+    // ⚠⚠ OTA-1173 — THE MODEL LOAD NOW TAKES THE NATIVE-ML LOCK. IT NEVER DID, AND IT IS
     // THE BIGGEST ALLOCATION IN THE APP.
     //
     // Completion took the lock (OTA-459's Tensor G5 SIGSEGV). Release took the lock
-    // (OTA-1146). The ~400MB CONTEXT LOAD — larger than either — was the one native call
+    // (OTA-1123). The ~400MB CONTEXT LOAD — larger than either — was the one native call
     // going in unserialized, so a reload could land on top of a Kokoro synth and a Qwen
     // completion at the same instant.
     //
@@ -245,7 +245,7 @@ export class LlamaRuntime {
     //
     // ⚠ ML_PRIORITY_LLM, so a voice line still OUTRANKS a reload: the player hears the
     // Arbiter on time and the reload waits its turn, which is the right trade both ways.
-    // OTA-1200 — the flag is raised BEFORE the await and lowered in a `.finally`, so it is
+    // OTA-1177 — the flag is raised BEFORE the await and lowered in a `.finally`, so it is
     // true for exactly the window in which `this.context` is still null but a ~400MB
     // allocation is already under way. That window is the one dispose() cannot free.
     this.loadInFlight = true;
@@ -265,7 +265,7 @@ export class LlamaRuntime {
       n_batch: opts.batch ?? 512,
       n_ubatch: opts.ubatch ?? 128,
     }), ML_PRIORITY_LLM).finally(() => { this.loadInFlight = false; });
-    // OTA-1200 — a native context now exists. Counted here and NOT one line earlier:
+    // OTA-1177 — a native context now exists. Counted here and NOT one line earlier:
     // before `initLlama` resolves there is nothing allocated we could account for, and a
     // load that throws must not inflate the count.
     noteContextOpened();
@@ -311,7 +311,7 @@ export class LlamaRuntime {
       await ml.markQwenCompletionStart();
       markDone = ml.markQwenCompletionDone;
     } catch { /* guard module unavailable — proceed without the breadcrumb */ }
-    // OTA-1128 — telemetry. Measured HERE, at the one boundary every consumer
+    // OTA-1105 — telemetry. Measured HERE, at the one boundary every consumer
     // crosses, so nine call sites get timing without nine hand-rolled timers.
     // The wait/generate split is the point: this call queues behind the shared
     // native-ML lock (arb159), so a "29-second generation" can be four seconds
@@ -323,7 +323,7 @@ export class LlamaRuntime {
       // arb159 — run the completion through the shared native-ML lock so it
       // never overlaps a Kokoro TTS synth (the two heavy native workloads
       // contending crashed the process on Tensor G5).
-      // OTA-1146 — homework runs below voice and can be cut short. The hook is
+      // OTA-1123 — homework runs below voice and can be cut short. The hook is
       // handed to the lock, which fires it the instant higher-priority work is
       // enqueued; llama.cpp then ends the completion early and we keep whatever
       // tokens had already assembled. `stopCompletion` is the same call the
@@ -351,7 +351,7 @@ export class LlamaRuntime {
         );
       },
       opts.homework ? ML_PRIORITY_HOMEWORK : ML_PRIORITY_LLM,
-      // OTA-1157 — the hook is now independent of the priority. Homework gets it
+      // OTA-1134 — the hook is now independent of the priority. Homework gets it
       // because it is idle work; item synthesis gets it because it holds the lock
       // long enough to make the voice late (see `interruptible`). Narration gets
       // neither, on purpose.
@@ -367,8 +367,8 @@ export class LlamaRuntime {
       // Prefer assembled tokens (already stripped of prompt) but fall back to
       // the final text the native side returns.
       const text = (assembled || result.text || '').trim();
-      // ⚠ OTA-1130 — llama.cpp has been computing the exact read/write split
-      // this whole time and we were throwing the object away. OTA-1129's whole
+      // ⚠ OTA-1107 — llama.cpp has been computing the exact read/write split
+      // this whole time and we were throwing the object away. OTA-1106's whole
       // diagnosis (prefill dominates) was INFERRED from wall-clock; `timings`
       // states it outright, per call, for free. Optional-chained throughout:
       // the field is absent in older llama.rn builds and in the jest mock, and
@@ -387,7 +387,7 @@ export class LlamaRuntime {
         totalMs: Date.now() - telT0,
         waitMs: Math.max(0, telLockAt - telT0),
         chars: text.length,
-        // ⚠ OTA-1142 — DISTINGUISH "the model said nothing" FROM "there was no
+        // ⚠ OTA-1119 — DISTINGUISH "the model said nothing" FROM "there was no
         // model". Both used to record as `empty`, and the device log had one of
         // each: a real silent generation, and `empty 8809ms read 0ms/write 0ms
         // in 309t→out 0t` — 8.8 seconds of wall time with ZERO prefill and ZERO
@@ -399,7 +399,7 @@ export class LlamaRuntime {
         // says whether the context outlived the call. A prompt problem and a
         // lifecycle problem get investigated in opposite directions, so filing
         // them under one word cost a whole round of guessing.
-        // OTA-1146 — a preempted homework job is reported as such whatever it
+        // OTA-1123 — a preempted homework job is reported as such whatever it
         // returned. Partial text from a job we cut short is not an 'ok' the
         // stats should average latency over, and an empty one is not the
         // model failing — it is the model being told to stop.
@@ -440,23 +440,23 @@ export class LlamaRuntime {
   }
 
   async dispose(): Promise<void> {
-    // CRASH FIX (librnllama isPredicting SIGSEGV). The app disposes Qwen on
-    // BACKGROUND (App.tsx AppState → shutdownQwen → this.dispose()). completion()
-    // runs under the native-ML lock, but release() did NOT — so backgrounding the
-    // game mid-narration freed the llama context out from under the running
+    // CRASH FIX (librnllama isPredicting SIGSEGV, Play Console / 2.4.1 internal
+    // testing). `completion()` runs under the native-ML lock, but release() did
+    // NOT — so if dispose() fired while a prediction was still running on the
+    // native thread (model switch, screen unmount, app backgrounding, OTA-apply
+    // teardown), release() freed the llama context out from under the running
     // completion. llama.rn's internal isPredicting() check then dereferenced the
-    // freed context and SIGSEGV'd (Java_com_rnllama_LlamaContext_isPredicting) —
-    // the "switched away mid-sentence, came back to a dead game" crash.
+    // freed context and SIGSEGV'd (Java_com_rnllama_LlamaContext_isPredicting).
     //
-    // Fix: detach the context first (no new completion can start), stop any
-    // in-flight prediction, then release THROUGH the same runExclusiveNativeMl
-    // lock as completion() so the free is serialized behind the running
-    // prediction and the window is closed.
+    // The fix: (1) detach the context first so no NEW completion can start on it;
+    // (2) ask any in-flight prediction to stop so the lock frees promptly; (3)
+    // release THROUGH the same runExclusiveNativeMl lock as completion(), so the
+    // free is serialized behind the running prediction and the window is closed.
     const ctx = this.context;
     this.context = null;
     this.modelPath = null;
     if (!ctx) {
-      // ⚠⚠ OTA-1200 — THE LINE THIS OTA WAS BUILT TO PRODUCE. Nothing changes here; we
+      // ⚠⚠ OTA-1177 — THE LINE THIS OTA WAS BUILT TO PRODUCE. Nothing changes here; we
       // only record WHICH of the two empty disposes this was. `loadInFlight` true means a
       // ~400MB load is running right now and this call freed zero bytes — see the field's
       // comment. False is the routine case (never loaded, or disposed twice) and stays
@@ -472,7 +472,7 @@ export class LlamaRuntime {
     }
     try {
       await runExclusiveNativeMl(() => Promise.resolve(ctx.release()));
-      // OTA-1200 — counted only on the path where release() actually returned. A throw
+      // OTA-1177 — counted only on the path where release() actually returned. A throw
       // below leaves the context unaccounted for, which is exactly the honest reading:
       // we do not know that it was freed.
       noteContextReleased();

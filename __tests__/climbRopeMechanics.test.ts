@@ -132,7 +132,7 @@ describe('OTA 23-007 — climb mechanics', () => {
     });
   });
 
-  describe('OTA-936 — stamina shortfall while UP HOLDS (no fall)', () => {
+  describe('OTA-913 — stamina shortfall while UP HOLDS (no fall)', () => {
     it('plain rope, stamina < 2 while UP: HOLDS — no fall, no HP lost, elevation kept', async () => {
       const store = await setupClimber('Climbing Rope', {
         hp: 30, hpMax: 30, stamina: 1, staminaMax: 10,
@@ -214,14 +214,14 @@ describe('OTA 23-007 — climb mechanics', () => {
       expect(after.hp).toBe(before.hp);
       expect(after.stamina).toBe(before.stamina);
       const logs = store.getState().gameLog.map((e) => e.text).join('\n');
-      // OTA-1039 — a plain Climbing Rope now gets its OWN refusal naming what the
+      // OTA-1016 — a plain Climbing Rope now gets its OWN refusal naming what the
       // line can't do; the generic wall line still covers the no-rope case.
       // The invariant under test is that rest is REFUSED, not its phrasing.
       expect(logs).toMatch(/can't sleep on a wall|won't hold you asleep/i);
     });
 
     it("Reclaimer's Rope: rest is REFUSED while elevated — only the strap anchors one", async () => {
-      // OTA-1040 — OWNER'S RULE CHANGE: a rope no longer anchors a rest on ANY
+      // OTA-1017 — OWNER'S RULE CHANGE: a rope no longer anchors a rest on ANY
       // climb ("you need the hardened climbing strap for that"). This test
       // asserted the old allowance; it now guards the new rule from both
       // sides — nothing recovers, and the refusal explains itself.

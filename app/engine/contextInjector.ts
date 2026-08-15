@@ -69,7 +69,7 @@ export interface ContextInputs {
 
 export interface SceneSlice {
   location: Location;
-  /** ⚠ OTA-1152 — NULLABLE, and this is a type CORRECTION rather than a
+  /** ⚠ OTA-1129 — NULLABLE, and this is a type CORRECTION rather than a
    *  loosening. `deriveEnvironment` has always guarded `scene.weather?.name`
    *  and simply omitted the weather clause when there was none; the type just
    *  never admitted it. A pre-generated scene intro narrates a place the player
@@ -155,9 +155,9 @@ function buildLadderEnvironment(
 //   - "triggered the Tartarian Trap, energy lance strikes began..." →
 //     hallucinated events that never happened
 //   - Mid-sentence trailing cutoffs
-/** ⚠ OTA-1144 — THE CACHED PREAMBLE, AND WHY IT IS FIRST.
+/** ⚠ OTA-1121 — THE CACHED PREAMBLE, AND WHY IT IS FIRST.
  *
- *  OTA-1131 measured prefix reuse at exactly ZERO across a whole session and
+ *  OTA-1108 measured prefix reuse at exactly ZERO across a whole session and
  *  read it as "the cache saves us nothing". It wasn't the cache. llama.cpp
  *  reuses the longest COMMON PREFIX between the last prompt and this one, and
  *  every prompt we built put a VARIABLE line second — the room name, on line
@@ -171,7 +171,7 @@ function buildLadderEnvironment(
  *
  *  So the fix is ORDER, not content: everything stable goes in front, the
  *  scene facts follow, and the imperative stays last. Nothing here is reworded
- *  except the handful of "above"/"below" pointers the move forces — OTA-1131
+ *  except the handful of "above"/"below" pointers the move forces — OTA-1108
  *  is the standing lesson that a prompt which refers to a section that isn't
  *  where it says costs a whole generation.
  *
@@ -188,7 +188,7 @@ const SHARED_PREAMBLE =
   "NEVER write 'the adventurer', 'the figure', 'the explorer', or any " +
   'third-person stand-in for the player.';
 
-// ⚠ OTA-1151 — THE PROMPT WAS SAYING THE SAME THING FOUR TIMES.
+// ⚠ OTA-1128 — THE PROMPT WAS SAYING THE SAME THING FOUR TIMES.
 //
 // Measured, not guessed. A representative scene_intro prompt came to 3,194
 // characters / ~888 tokens, and the device log priced prefill at 12.9 ms per
@@ -222,8 +222,8 @@ const SHARED_PREAMBLE =
 const VOICE_RULES =
   'Sentences must START with ' +
   '"You" or "Your" or with a direct action verb in second person. ' +
-  // OTA-1144 — "above" → "below": these rules now PRECEDE the SYSTEM FACTS
-  // block so they can be cached. The pointer has to follow the move (OTA-1131
+  // OTA-1121 — "above" → "below": these rules now PRECEDE the SYSTEM FACTS
+  // block so they can be cached. The pointer has to follow the move (OTA-1108
   // is what a prompt that lies about its own layout costs).
   'Do not invent emotions, motivations, traps, mechanics, events, or ' +
   'outcomes that are not listed in the SYSTEM FACTS below. Only narrate ' +
@@ -234,9 +234,9 @@ const VOICE_RULES =
   'Aetheric verbs cast, channel, weave, incant. ' +
   'End on a complete sentence.';
 
-// ⚠ OTA-1131 — THE AMBIENT PROMPT WAS ARGUING WITH ITSELF.
+// ⚠ OTA-1108 — THE AMBIENT PROMPT WAS ARGUING WITH ITSELF.
 //
-// OTA-1129 stripped the SYSTEM FACTS block out of the ambient prompt (exits,
+// OTA-1106 stripped the SYSTEM FACTS block out of the ambient prompt (exits,
 // entities, environment, pack — all scene-reaction material the ambient brief
 // forbids) and left the shared VOICE_RULES in place. VOICE_RULES was written
 // for the reaction path and says, in order: "Only narrate the player's last
@@ -245,7 +245,7 @@ const VOICE_RULES =
 // then says "DO NOT narrate or react to their last action".
 //
 // So the beat was being told to narrate the last action AND not to, and twice
-// referred to a section that no longer exists in its own prompt. The OTA-1130
+// referred to a section that no longer exists in its own prompt. The OTA-1107
 // device log shows the model resolving that the wrong way — the discard is
 // logged as `reason=action-opener`, which is precisely "it narrated the last
 // action", and the whole 8-second generation is thrown away.
@@ -261,12 +261,12 @@ const VOICE_RULES =
 // original failure was third-person recap), the no-invented-places rule
 // (rewritten to point at the anchor line the lean prompt DOES carry), and the
 // finish-your-sentence rule.
-// OTA-1144 — the shared second-person lock moved into SHARED_PREAMBLE (it was
+// OTA-1121 — the shared second-person lock moved into SHARED_PREAMBLE (it was
 // byte-identical here and in VOICE_RULES, which is exactly the kind of text
 // worth having in front of the first variable byte). What remains is what is
 // ambient-specific. "named above" → "named below": the scene anchor now
 // follows these rules rather than preceding them.
-// OTA-1151 — three clauses removed as duplicates, not as trims: the
+// OTA-1128 — three clauses removed as duplicates, not as trims: the
 // begins-with-"The player" clause is contained in SHARED_PREAMBLE's blanket
 // ban, and the don't-name-places + end-early pair now live once, in
 // NO_INVENTED_PLACES, which this branch already prints directly above.
@@ -276,7 +276,7 @@ const AMBIENT_VOICE_RULES =
   'outcomes — nothing is happening; this is a quiet moment. ' +
   'End on a complete sentence.';
 
-// ⚠ OTA-1144 — EACH JOB IS NOW TWO PIECES, AND THE SPLIT IS DELIBERATE.
+// ⚠ OTA-1121 — EACH JOB IS NOW TWO PIECES, AND THE SPLIT IS DELIBERATE.
 //   *_RULES — stable, goes in FRONT of the scene facts so it can be cached.
 //   *_TASK  — the imperative, stays LAST, immediately before generation.
 // Both halves keep their original wording. The task stays at the end because
@@ -307,7 +307,7 @@ const COMBAT_TASK =
 // to the last action (the canned templates own reactions), so its latency never
 // reads as late. Reflective/relational, never advice, one short line. The shared
 // VOICE_RULES still pin it to second-person English with no third-person recap.
-// OTA-1053 — this brief used to OPEN with a complete, narration-shaped,
+// OTA-1030 — this brief used to OPEN with a complete, narration-shaped,
 // second-person sentence about having travelled at the character's side: the
 // exact register the model was being asked to produce, handed to it ready to
 // copy. The owner watched it come back verbatim as an Arbiter line. Every
@@ -318,10 +318,10 @@ const AMBIENT_RULES =
   'DO NOT narrate or react to their last action; this is idle companion talk ' +
   'between moments, not a response to anything. Warm or wry, never advice or ' +
   'instructions. Never repeat or restate any of these directions. ' +
-  // OTA-1131 — the ambient voice block, not the reaction one. See
+  // OTA-1108 — the ambient voice block, not the reaction one. See
   // AMBIENT_VOICE_RULES: the shared rules told this beat to narrate the last
   // action (which its own brief forbids) and referred twice to a SYSTEM FACTS
-  // section OTA-1129 removed from this prompt.
+  // section OTA-1106 removed from this prompt.
   AMBIENT_VOICE_RULES;
 
 const AMBIENT_TASK =
@@ -329,11 +329,11 @@ const AMBIENT_TASK =
   'come, their growth, the road behind you both, or your changing read of them. ' +
   'ONE short sentence — about 18 words, no more.';
 
-/** OTA-1144 — the generic half of the location anchor. Carries no room name, so
+/** OTA-1121 — the generic half of the location anchor. Carries no room name, so
  *  it lives in the cached prefix; the room-specific half stays in the tail
  *  where it is closest to generation. Both halves together say what the single
  *  interpolated line used to say on its own. */
-// OTA-1151 — this is now the ONLY statement of the rule, for both branches.
+// OTA-1128 — this is now the ONLY statement of the rule, for both branches.
 // It absorbed the copy that lived in VOICE_RULES (with its examples) and the
 // copy in AMBIENT_VOICE_RULES, plus the end-early escape hatch that both
 // carried. The examples are kept because they are what makes the rule
@@ -357,8 +357,8 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
     : ctx.in_combat
     ? COMBAT_TASK
     : PEACEFUL_TASK;
-  // ⚠ OTA-1129 — AMBIENT GETS A LEAN PROMPT, AND THE REASON IS MEASURED.
-  // OTA-1128's telemetry showed ambient taking 16.8s (14.5s of it generating,
+  // ⚠ OTA-1106 — AMBIENT GETS A LEAN PROMPT, AND THE REASON IS MEASURED.
+  // OTA-1105's telemetry showed ambient taking 16.8s (14.5s of it generating,
   // only 2.3s queued) to produce 139 characters, while investigate_lore made
   // 132 characters in 1.1s on the same model. Same output size, 13× the time —
   // because the cost is PREFILL: ambient was reading a ~1,145-token scene
@@ -372,8 +372,8 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
   // is kept verbatim: without it the model pulls place names out of training
   // data — the original reason it exists) and a short read on the player.
   if (ctx.ambient) {
-    // OTA-1144 — STABLE PREFIX → VARIABLE BODY → IMPERATIVE TAIL. Same content
-    // as OTA-1129's lean prompt; the room name simply stopped being the second
+    // OTA-1121 — STABLE PREFIX → VARIABLE BODY → IMPERATIVE TAIL. Same content
+    // as OTA-1106's lean prompt; the room name simply stopped being the second
     // line, which is what capped the reusable prefix at 14 tokens.
     const leanSystem = [
       SHARED_PREAMBLE,
@@ -406,7 +406,7 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
     hasVendor: /vendor/i.test(ctx.active_entities ?? ''),
     playerFactionId: ctx.player_faction_id,
   });
-  // OTA-1144 — same STABLE PREFIX → VARIABLE BODY → IMPERATIVE TAIL shape as
+  // OTA-1121 — same STABLE PREFIX → VARIABLE BODY → IMPERATIVE TAIL shape as
   // the ambient branch, and the preamble is deliberately the SAME text so an
   // ambient call that follows a narration call still reuses something. The
   // interpolated anchor keeps only its room-specific half here; the generic
@@ -417,7 +417,7 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
     rules,
     '',
     `[SYSTEM FACTS - DO NOT INVENT EXITS, ENEMIES, OR PLACE NAMES]`,
-    // OTA-1151 — ONE anchor line, not two. `Location: <biome> - <room>` and
+    // OTA-1128 — ONE anchor line, not two. `Location: <biome> - <room>` and
     // the bolded "the player is at <room>, if you name any place it MUST be
     // <room>" said the same thing back to back, and NO_INVENTED_PLACES had
     // already said it a third time in the prefix. This keeps the bolded form
@@ -529,7 +529,7 @@ export function formatPlayerStats(player: PlayerCharacter | null): string {
   const parts: string[] = [];
   parts.push(`HP ${player.hp}/${player.hpMax}`);
   parts.push(`Stamina ${player.stamina}/${player.staminaMax}`);
-  // ⚠ OTA-1156 — `player.ac` is the RACIAL BASE and is never updated on equip,
+  // ⚠ OTA-1133 — `player.ac` is the RACIAL BASE and is never updated on equip,
   // so this line told the model "AC 10" while the player's sheet read 16 in
   // eight pieces of armour. The model then repeated it — one device log has the
   // whole stat block leaking into the feed with AC 10 in it.
@@ -568,12 +568,12 @@ function prettyEffect(kind: string): string {
  *
  * Token economy rule (TDD §3.3): comma-separated, never JSON.
  */
-/** ⚠ OTA-1129 — CAP ON THE STOWED LIST. This dumped EVERY row, uncapped, into
+/** ⚠ OTA-1106 — CAP ON THE STOWED LIST. This dumped EVERY row, uncapped, into
  *  a prompt the model has to READ before it writes a word. A salvage-heavy
  *  playthrough carries 70+ distinct rows; the device log's pack put ~1,440
  *  characters of item names into every narration and ambient prompt — a third
  *  of the whole prompt, and the difference between a 2-second generation and a
- *  15-second one (see the OTA-1128 telemetry: prompt PREFILL dominates, not
+ *  15-second one (see the OTA-1105 telemetry: prompt PREFILL dominates, not
  *  output). The narrator needs to know what you FIGHT with and roughly what you
  *  are carrying, never the full manifest — so the worn kit is always named in
  *  full and the stowed list is capped, with an honest "…and N more" so the

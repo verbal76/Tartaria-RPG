@@ -1,4 +1,4 @@
-// OTA-1195 — MEMORY WARNINGS, APP-STATE CHURN, AND A FREEZE DETECTOR.
+// OTA-1172 — MEMORY WARNINGS, APP-STATE CHURN, AND A FREEZE DETECTOR.
 //
 // Owner, after a hard lock on an iPhone that this log could not explain: *"add in memory
 // warning codes to the log so you can track them, whatever debug information you need.
@@ -93,7 +93,7 @@ export interface MemoryWarningContext {
   appState?: string;
   /** Most recent persisted save size in KB, when known. */
   saveKb?: number;
-  /** ⚠⚠ OTA-1202 — THE OTHER NATIVE MODEL, AND IT WAS MISSING FROM THIS LINE ENTIRELY.
+  /** ⚠⚠ OTA-1179 — THE OTHER NATIVE MODEL, AND IT WAS MISSING FROM THIS LINE ENTIRELY.
    *  Qwen is not the only large native allocation in this app: the bundled voice
    *  (Kokoro, via react-native-executorch) is a second one, and TTSManager's own comment
    *  prices a voice swap at "~100 MB to the pool". The owner's 2026-08-09 report is the
@@ -118,7 +118,7 @@ export function memoryWarningLine(
   const bits: string[] = [];
   if (ctx.appState) bits.push(`app=${ctx.appState}`);
   if (ctx.qwenStatus) bits.push(`qwen='${ctx.qwenStatus}'`);
-  // OTA-1202 — sits next to qwen deliberately: the pair is the question ("which of our
+  // OTA-1179 — sits next to qwen deliberately: the pair is the question ("which of our
   // two native models was actually up when the OS complained"), and split across two
   // lines it would not read as one.
   if (ctx.kokoroPhase) bits.push(`voice='${ctx.kokoroPhase}'`);
@@ -153,8 +153,27 @@ export interface PressureSnapshot {
 
 /** The block that rides along in every COPY / SHARE bug report, so the counts are visible
  *  in the header rather than only reconstructable by reading 146 log lines. */
+// ⚠⚠ OTA-1276 — the breadcrumb that survived the LAST boot, if any. Loaded once at
+// hydrate (see gameStore) and printed here, because the freeze this file was built for
+// has turned out to be one this file structurally CANNOT see: a wedged JS thread stops
+// the setTimeout sampler and requestAnimationFrame alike (both are JS timers in RN), so
+// "no stalls seen" prints straight through a hard freeze. The breadcrumb is written
+// ahead of the wedge instead of measured after it.
+let rpLastBreadcrumb: { at: number; what: string; screen?: string; room?: string } | null = null;
+export function setLastBootBreadcrumb(c: typeof rpLastBreadcrumb): void { rpLastBreadcrumb = c; }
+
 export function runtimePressureSummary(s: PressureSnapshot): string {
   const out: string[] = ['Runtime pressure'];
+  if (rpLastBreadcrumb) {
+    const ago = Math.max(0, Date.now() - rpLastBreadcrumb.at);
+    const mins = Math.round(ago / 60_000);
+    out.push(`  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.`);
+    out.push(`     Last thing the app did: ${rpLastBreadcrumb.what}`);
+    out.push(`     Where: ${rpLastBreadcrumb.room ?? '(unknown)'} on ${rpLastBreadcrumb.screen ?? '(unknown)'} screen`);
+    out.push(`     When: ${new Date(rpLastBreadcrumb.at).toISOString()} (${mins} min before this boot)`);
+    out.push(`     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines`);
+    out.push(`       die in memory when the JS thread wedges. Trust this line over it.`);
+  }
   out.push(s.memoryWarnings === 0
     ? `  Memory warnings: none this session`
     : `  ⚠ Memory warnings: ${s.memoryWarnings} this session`);

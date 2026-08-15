@@ -1,4 +1,4 @@
-// OTA-1214 — AETHER TECHNIQUES. The mage gap, filled with science.
+// OTA-1191 — AETHER TECHNIQUES. The mage gap, filled with science.
 //
 // Owner (2026-08-09): *"I would like to have players get aether powers based off of the
 // spells… this fills the mage gap, but these are science not magic."*
@@ -68,7 +68,7 @@ export const AETHER_TECHNIQUES: readonly AetherTechnique[] = [
     intRequired: 14,
     baseDc: 15,
     baseDose: 3,
-    // ⚠ OTA-1218 — REWORDED TO MATCH WHAT SHIPPED. This said "once per encounter", which
+    // ⚠ OTA-1195 — REWORDED TO MATCH WHAT SHIPPED. This said "once per encounter", which
     // the implementation cannot honestly claim: the slip is a 3-round status like every
     // other held field, so it can lapse unused and it can be re-channelled in the same
     // fight (for another dose, and another turn). A tab that promises one thing while the
@@ -119,9 +119,9 @@ export function findTechnique(id: string | null | undefined): AetherTechnique | 
 /** Loose name match, for the parser. Deliberately strict about which techniques it will
  *  answer to — an ambiguous match returns null rather than guessing, the P12 rule.
  *
- *  ⚠⚠ OTA-1223 — A THIRD TIER, tokens, because the parser strips small words. `channel
+ *  ⚠⚠ OTA-1200 — A THIRD TIER, tokens, because the parser strips small words. `channel
  *  veil of ether` reaches this as "veil ether", and two tiers of matching could not find
- *  the technique under ITS OWN NAME — the exact dropped-word defect OTA-1211 found in the
+ *  the technique under ITS OWN NAME — the exact dropped-word defect OTA-1188 found in the
  *  contract finders, rebuilt here five days later. Found by the P18 fix's own test.
  *  Same rules as titleMatch.ts: the tier runs only where substring found NOTHING (two
  *  substring hits still REFUSE — "ether" fits both Veil and Shield and must take
@@ -145,7 +145,7 @@ export function findTechniqueByName(text: string): AetherTechnique | null {
   return byTokens.length === 1 ? byTokens[0]! : null;
 }
 
-// ─── OTA-1225 — ENEMIES CHANNEL TOO (PUNCHLIST P16, the mirror) ─────────────────────────
+// ─── OTA-1202 — ENEMIES CHANNEL TOO (PUNCHLIST P16, the mirror) ─────────────────────────
 //
 // Owner (2026-08-09): *"once this is working we will mirror it to enemies and have them
 // applied like the resists are"* — and the resists are TRAITS, stamped per spawn by
@@ -292,7 +292,7 @@ export function usesOf(player: PlayerCharacter | null | undefined, id: string): 
 
 // ─── Fuel ───────────────────────────────────────────────────────────────────────────────
 
-/** ⚠ OTA-1218 — THE SAME LIST THE `shape` DISCIPLINE USES, IN THE SAME ORDER, AND THAT IS
+/** ⚠ OTA-1195 — THE SAME LIST THE `shape` DISCIPLINE USES, IN THE SAME ORDER, AND THAT IS
  *  DELIBERATE. `runAethercraft` picks fuel CHEAPEST-FIRST after OTA-970, where reaching
  *  into inventory order silently ate a playtester's equipped Aetheric Locket. A technique
  *  that reached differently would re-open that bug on a second path, so it reaches the
@@ -332,7 +332,7 @@ export function techniqueTextPrice(tech: AetherTechnique): number {
   return tech.tier === 'Uncommon' ? 250 : tech.tier === 'Rare' ? 600 : 1400;
 }
 
-/** OTA-1228 — the ONE spelling of "is this item a Procedure Text". The pack search,
+/** OTA-1205 — the ONE spelling of "is this item a Procedure Text". The pack search,
  *  the inventory READ button, and the first-time card all key off it; three inline
  *  copies of the prefix check is how one of them drifts. */
 export function isProcedureTextName(name: string): boolean {
@@ -356,7 +356,7 @@ export function techniqueForFaction(factionId: string): AetherTechnique {
   return AETHER_TECHNIQUES[h % AETHER_TECHNIQUES.length]!;
 }
 
-/** ⚠⚠ OTA-1226 (PUNCHLIST P16, route C) — FOUR STORYLINES PAY A PROCEDURE TEXT.
+/** ⚠⚠ OTA-1203 (PUNCHLIST P16, route C) — FOUR STORYLINES PAY A PROCEDURE TEXT.
  *
  *  Owner: *"push it through all routes, three doors makes it accessible even with bad
  *  faction standing."* This is the story door: finish the arc, the faction hands you the
@@ -367,7 +367,7 @@ export function techniqueForFaction(factionId: string): AetherTechnique {
  *    Scripture in Stone (Stone Builders, minRep 4) → Aether Shield — wards written in rock,
  *      and deliberately the LOWEST bar for the cheapest technique.
  *    Sasha's Gambit (Revivalists) → Temporal Slip — the old-ways faction whose own
- *      fighters channel it (OTA-1225).
+ *      fighters channel it (OTA-1202).
  *    The Silence Protocol (Conspiracy Architects) → Veil of Ether — concealment is their
  *      entire creed.
  *    The Drowned Library (Forgotten Order) → Resonance Cascade — a forbidden procedure

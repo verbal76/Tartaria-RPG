@@ -1,4 +1,4 @@
-// OTA-1133 — THE DEATH SCREEN. Owner: "The second my HP hits 0 for whatever
+// OTA-1110 — THE DEATH SCREEN. Owner: "The second my HP hits 0 for whatever
 // reason there should be a crossfade between the game screen and a new screen
 // like the intro screen that gives a brief description of my death lore style
 // and how it ties to my reason for entering the mud world and after a few
@@ -32,7 +32,7 @@ const FADE_IN_MS = 1600;
 const TEXT_IN_MS = 1400;
 const TEXT_DELAY_MS = 900;
 /** How long the screen holds before handing over on its own.
- *  OTA-1142 — 11s → 16s on the owner's call: *"increase the delay on death
+ *  OTA-1119 — 11s → 16s on the owner's call: *"increase the delay on death
  *  before it goes to the character collection screen by 5 seconds. they can
  *  always tap to close if they want."* The tap-to-leave escape is what makes a
  *  long hold safe — the floor is how long a player who wants to read gets, and

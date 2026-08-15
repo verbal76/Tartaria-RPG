@@ -1,6 +1,6 @@
-// ⚠⚠ OTA-1252 — THE PURE LAYOUT NUMBERS, WITH NO RUNTIME ATTACHED.
+// ⚠⚠ OTA-1229 — THE PURE LAYOUT NUMBERS, WITH NO RUNTIME ATTACHED.
 //
-// These two constants were born in `displayScale.ts` (OTA-1250) alongside the
+// These two constants were born in `displayScale.ts` (OTA-1227) alongside the
 // UI-scale setting — and that setting needs AsyncStorage, which made a plain
 // width number cost every importer a storage dependency.
 //
@@ -27,7 +27,7 @@ export const CONTENT_MAX_WIDTH = Platform.OS === 'web' ? 1024 : 600;
  *  StatsPanel lays its five stat columns out with `flex: 1` — equal shares of
  *  whatever width the panel has. On a phone the panel is ~360px, the columns
  *  land at ~70px, and the 9px labels sit snug against them; that pairing is the
- *  design. OTA-1250 widened the desktop column to 1024 without touching the
+ *  design. OTA-1227 widened the desktop column to 1024 without touching the
  *  type scale, so the same five cells stretched to ~100px each and the row read
  *  as five numbers adrift in a field of gaps.
  *

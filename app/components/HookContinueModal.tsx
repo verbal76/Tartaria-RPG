@@ -33,11 +33,11 @@ import type { HookContinueStage } from '../engine/types';
 //     resolved. The title flips to "★★ STORY THREAD COMPLETE" so
 //     the player knows tapping CONTINUE means "I'm done reading."
 //
-// OTA-1030 — the terminal stage shows a single COMPLETE button (owner: "the
+// OTA-1007 — the terminal stage shows a single COMPLETE button (owner: "the
 // last part of the story thread is completed, so it shouldn't say continue
 // or abandon — it should only say complete").
 //
-// OTA-1050 — COMPLETE just dismisses. The follow-up mission-complete popup is
+// OTA-1027 — COMPLETE just dismisses. The follow-up mission-complete popup is
 // gone (owner: "I think we can do without the story hook pop-up... we just
 // need to show the reward a little more prominently") — the completed state
 // now renders the final payout in a boxed YOUR REWARD strip above the button.
@@ -60,9 +60,9 @@ interface Props {
   completed: boolean;
   onContinue: () => void;
   onAbandon: () => void;
-  /** OTA-1030 — COMPLETE on the terminal stage (wire to dismissHookContinue).
+  /** OTA-1007 — COMPLETE on the terminal stage (wire to dismissHookContinue).
    *  On a completed thread this is the ONLY button — nothing left to continue
-   *  or abandon — and scrim taps / the back button route here too. OTA-1050:
+   *  or abandon — and scrim taps / the back button route here too. OTA-1027:
    *  dismisses only; no second popup follows. */
   onComplete: () => void;
   /** OTA-284 — vendor name when the current scene has a spawned
@@ -101,7 +101,7 @@ export function HookContinueModal({
 }: Props) {
   const scrollRef = useRef<ScrollView>(null);
 
-  // OTA-1050 — the payout to spotlight in the completed state: the newest
+  // OTA-1027 — the payout to spotlight in the completed state: the newest
   // stage that carried a reward (the terminal stage in practice).
   const finalReward = completed
     ? [...stageHistory].reverse().find((s) => s.reward)?.reward
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   stageLine: { color: '#e6d8b3', fontSize: 13, lineHeight: 19 },
   stageReward: { color: '#9ec96a', fontSize: 12, lineHeight: 17 },
   stageArbiter: { color: '#bf9b6a', fontSize: 12, fontStyle: 'italic', lineHeight: 17 },
-  // OTA-1050 — completed-state reward strip: the payout in reward-channel
+  // OTA-1027 — completed-state reward strip: the payout in reward-channel
   // green, boxed and centered above COMPLETE so it can't be missed.
   rewardStrip: {
     borderColor: '#9ec96a',

@@ -1,4 +1,4 @@
-name: Build · iOS (EAS)
+name: iOS Build (Tartaria Realms)
 
 # OTA-302 submit pass — rebuild + AUTO-SUBMIT to TestFlight. The earlier
 # [build-ios] run built the IPA but with submit:false, and the manual
@@ -115,7 +115,7 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
-      # ⚠⚠ OTA-1205 — THE PREVIEW PROFILE HAS NEVER BEEN ABLE TO BUILD, AND IT IS THE
+      # ⚠⚠ OTA-1182 — THE PREVIEW PROFILE HAS NEVER BEEN ABLE TO BUILD, AND IT IS THE
       # DEFAULT. `preview` is `distribution: internal` (eas.json), which needs ad-hoc
       # provisioning credentials this project does not hold — see the notes at the bottom
       # of this file recording the same failure twice already (arb172, OTA-302: "the

@@ -8,10 +8,9 @@ name: CI
 #   • typecheck (tests)   — RATCHET. the pre-existing test-fixture debt is frozen at a
 #                            committed baseline; new/edited tests must typecheck (the
 #                            count can only shrink, never grow).
-#   • lint                — BLOCKING. ESLint 9 flat config (eslint.config.js), a lean
-#                            high-signal rule set (genuine-bug rules only) that the tree
-#                            already passes. Previously "reported" only because no flat
-#                            config existed and the job errored; now it runs and blocks.
+#   • lint                — BLOCKING. ESLint 9 flat config (eslint.config.js), lean
+#                            high-signal rule set the tree passes. Previously reported
+#                            only because no flat config existed and the job errored.
 #   • test (fast)         — jest, BLOCKING. The 467 deterministic unit/integration
 #                            suites (~3950 tests) — the real regression ratchet. All
 #                            green and stable: the 24 formerly-red suites were triaged
@@ -79,12 +78,9 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci --no-audit --no-fund
-      # ESLint 9 flat config (eslint.config.js). Deliberately LEAN — enforces
-      # only genuine-bug rules (dupe keys, unreachable, use-isnan, valid-typeof,
-      # no-fallthrough, …) that the codebase already passes; stylistic/whole-tree
-      # churn rules are off or warn. Green today, blocks real regressions.
-      # BLOCKING now that the config exists and passes (it never ran before —
-      # there was no flat config, so the job errored out and was non-blocking).
+      # ESLint 9 flat config (eslint.config.js), lean high-signal rule set the
+      # tree already passes. BLOCKING now that the config exists (it never ran
+      # before — no flat config, so the job errored and was non-blocking).
       - name: Lint (blocking)
         run: npm run lint
       # HANDOFF prohibition ratchet. HANDOFF.md is a one-way write channel between

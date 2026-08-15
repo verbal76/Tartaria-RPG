@@ -1,4 +1,4 @@
-// OTA-1200 — COUNT THE LIVE MODEL CONTEXTS. AN INSTRUMENT, NOT A FIX.
+// OTA-1177 — COUNT THE LIVE MODEL CONTEXTS. AN INSTRUMENT, NOT A FIX.
 //
 // ⚠⚠ THE MEASUREMENT THAT MADE THIS NECESSARY. Three JetsamEvent reports off the owner's
 // iPhone XR (3 GB), all three naming us:
@@ -22,12 +22,12 @@
 // If a dispose lands while `initLlama` is still in flight, `this.context` has not been
 // assigned yet, so it frees NOTHING — and the load then completes and hands a ~400 MB
 // native context to an object nobody holds. Four or five orphans is 1.6–2.0 GB, which
-// matches the measurement. That is exactly the shape of the OTA-1196 loop: load → memory
+// matches the measurement. That is exactly the shape of the OTA-1173 loop: load → memory
 // warning → dispose (frees nothing) → load again.
 //
 // ⚠⚠⚠ AND THE REASON THIS SHIPS ALONE, WITH NO FIX ATTACHED. Owner's rule, written after a
 // day spent building on an unmeasured cause: **measure the cause, or ship an instrument.**
-// OTA-1195 wrote that rule down; OTA-1196 overrode it with a well-argued paragraph and
+// OTA-1172 wrote that rule down; OTA-1173 overrode it with a well-argued paragraph and
 // created the loop it was trying to prevent. The candidate above is not a number yet, so
 // nothing here changes behaviour. The next device log makes it a number, and then the fix
 // is written against evidence instead of a story.

@@ -1,5 +1,5 @@
 /* eslint-disable no-undef, @typescript-eslint/no-unused-expressions */
-// OTA-1035 — PLAIN AsyncStorage test mock (no jest.fn). The official
+// OTA-1012 — PLAIN AsyncStorage test mock (no jest.fn). The official
 // @react-native-async-storage jest mock wraps every method in jest.fn(),
 // and jest.fn RECORDS EVERY CALL'S ARGUMENTS forever. The disk game-log
 // appends a ~400 KB buffer per line (see saveSystem.appendLogToDisk), so

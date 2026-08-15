@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
-import { getStoryMotives } from '../engine/story'; // OTA-1041
-// OTA-1089 — Phase 4: the last thing you say before you walk.
+import { getStoryMotives } from '../engine/story'; // OTA-1018
+// OTA-1066 — Phase 4: the last thing you say before you walk.
 import { PRESET_TIERS, PRESSURE_PROFILES, DEFAULT_PRESSURE, DIFFICULTY_SYSTEMS, type PressureTier, type PressureCustom } from '../engine/pressure';
-// OTA-1136 — the CUSTOM row's popup.
+// OTA-1113 — the CUSTOM row's popup.
 import { DifficultyCustomModal } from '../components/DifficultyCustomModal';
 
 // Tungsten Spire — the 'name' step is gone. New flow: race → faction →
@@ -14,9 +14,9 @@ import { DifficultyCustomModal } from '../components/DifficultyCustomModal';
 // removes the in-screen TextInput that was driving the Android soft-
 // keyboard race the Nickel Tine + Zinc Anvil OTAs were chasing.
 
-// OTA-1041 — a third step: THE REASON YOU CAME DOWN. The motive shapes the
+// OTA-1018 — a third step: THE REASON YOU CAME DOWN. The motive shapes the
 // opening crawl and (phases 2-3) the story beats woven through the main quest.
-// OTA-1089 — a fourth and final step: HOW MUCH DOES THE MUD TAKE? It sits
+// OTA-1066 — a fourth and final step: HOW MUCH DOES THE MUD TAKE? It sits
 // AFTER the motive on purpose. You say why you came down, and then you say what
 // you are prepared to have it cost — which is the same order the Arbiter would
 // ask in, and the last thing decided before the crawl starts.
@@ -27,7 +27,7 @@ const STEP_TITLE: Record<Step, string> = {
   race: 'CHOOSE YOUR RACE',
   faction: 'CHOOSE YOUR FACTION',
   motive: 'WHY DID YOU COME DOWN?',
-  // OTA-1097 — was 'HOW MUCH DOES IT TAKE?'. Owner: "replace it with a more
+  // OTA-1074 — was 'HOW MUCH DOES IT TAKE?'. Owner: "replace it with a more
   // recognizable difficulty level title." The evocative header worked as
   // flavor but failed as signage — a new player picking a permanent,
   // never-raisable setting deserves to know instantly that THIS is the
@@ -49,8 +49,8 @@ export function CharacterCreationScreen() {
   const [raceId, setRaceId] = useState(races[0]!.id);
   const [factionId, setFactionId] = useState(factions[0]!.id);
   const [motiveId, setMotiveId] = useState(motives[0]!.id);
-  const [pressure, setPressure] = useState<PressureTier>(DEFAULT_PRESSURE); // OTA-1089
-  // OTA-1136 — CUSTOM. `pressureCustom` is only sent when the tier is 'custom';
+  const [pressure, setPressure] = useState<PressureTier>(DEFAULT_PRESSURE); // OTA-1066
+  // OTA-1113 — CUSTOM. `pressureCustom` is only sent when the tier is 'custom';
   // picking a preset afterwards leaves it behind rather than clearing it, so a
   // player who tries custom, backs out to a preset, then returns finds their
   // switches where they left them.
@@ -184,7 +184,7 @@ export function CharacterCreationScreen() {
 
         {step === 'motive' && (
           <>
-            {/* OTA-1041 — THE REASON YOU CAME DOWN. The pick shapes the opening
+            {/* OTA-1018 — THE REASON YOU CAME DOWN. The pick shapes the opening
                 crawl now and the story beats woven through the main quest in
                 later phases. There is no wrong answer and no stat attached —
                 this is who you are, not what you roll. */}
@@ -212,7 +212,7 @@ export function CharacterCreationScreen() {
 
         {step === 'pressure' && (
           <>
-            {/* OTA-1089 — PHASE 4 BEHIND ITS TOGGLE. Every option carries a
+            {/* OTA-1066 — PHASE 4 BEHIND ITS TOGGLE. Every option carries a
                 plain subtitle: a difficulty name that sounds good and explains
                 nothing is a trap on a screen you cannot revisit. */}
             <Text style={styles.contextLine}>
@@ -235,7 +235,7 @@ export function CharacterCreationScreen() {
                 </TouchableOpacity>
               );
             })}
-            {/* OTA-1136 — CUSTOM sits BELOW the four presets on purpose. The
+            {/* OTA-1113 — CUSTOM sits BELOW the four presets on purpose. The
                 survey is explicit that sliders give the best experience and the
                 worst discoverability, so the presets stay the front door and
                 this is the advanced option behind it. */}

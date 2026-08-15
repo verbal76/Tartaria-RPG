@@ -38,7 +38,7 @@ jest.mock('expo-updates', () => ({}));
  * Owner: "lets do active play testing on phases 0-5."
  *
  * Every other suite in this repo tests a UNIT: is the content authored, is the
- * gate correct, does the function return the right thing. OTA-1087's audit is
+ * gate correct, does the function return the right thing. OTA-1064's audit is
  * the standing proof that this is not enough — most of what Phase 2 authored
  * was UNREACHABLE and 621 green suites said otherwise, because every one of
  * them asked "is it authored and gated" and none asked "does a route in the
@@ -66,7 +66,7 @@ import type { PlayerCharacter } from '../app/engine/types';
 import { dueFork } from '../app/engine/storyForks';
 import { stanceOf, regardOf, regardScore, arbiterMemory, dueArbiterBeat } from '../app/engine/arbiterPersona';
 import { tideStage, profileOf } from '../app/engine/pressure';
-// OTA-1092 — the walk drives the REAL story state machine; see the grant block.
+// OTA-1069 — the walk drives the REAL story state machine; see the grant block.
 import { advanceMainQuest, LOST_CAPITAL_LOCATIONS } from '../app/engine/mainQuest';
 import { isPlayerVisibleChannel } from '../app/engine/gameLog';
 import type { LogChannel } from '../app/engine/types';
@@ -147,7 +147,7 @@ beforeAll(async () => {
       // Time passes, Cores accumulate, and the world turns against you — the
       // three substrates Phases 3-5 read.
       //
-      // ⚠ OTA-1092 — CORES GO THROUGH THE REAL STATE MACHINE. The first cut of
+      // ⚠ OTA-1069 — CORES GO THROUGH THE REAL STATE MACHINE. The first cut of
       // this harness wrote coresRecovered straight into the save, which
       // produced a character no real player can be: nine Cores with the story
       // still in its prologue. The fork system read that contradiction and
@@ -223,7 +223,7 @@ describe('playtest — the run itself happened', () => {
 
 describe('playtest — PHASE 3: the story asked a question', () => {
   it('a fork was actually RAISED during ordinary play', () => {
-    // Not "a fork exists and its gate is correct" — that is ota1088's job.
+    // Not "a fork exists and its gate is correct" — that is ota1065's job.
     // This is: walking the world put the card in front of the player.
     expect(report.forksAnswered.length).toBeGreaterThan(0);
   });
@@ -332,10 +332,10 @@ describe('playtest — PHASES 0-2: the world remembered the run', () => {
   });
 
   it('⚠ no single line is repeated to death', () => {
-    // The failure OTA-1074 and the 500ms debounce exist for. A line the player
+    // The failure OTA-1051 and the 500ms debounce exist for. A line the player
     // sees ten times in one walk is a bug regardless of which system emits it.
     const counts = new Map<string, number>();
-    // OTA-1092 — the player channel is the run's own typed commands echoed
+    // OTA-1069 — the player channel is the run's own typed commands echoed
     // back; "search" fourteen times in eighty steps is the walker, not the
     // game, and a real thumb repeats itself just as much.
     for (const l of visible()) {
@@ -343,7 +343,7 @@ describe('playtest — PHASES 0-2: the world remembered the run', () => {
       counts.set(l.text, (counts.get(l.text) ?? 0) + 1);
     }
     const worst = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
-    // OTA-1127 — cap 12 → 13. Not a loosening of intent: the fix stopped every
+    // OTA-1104 — cap 12 → 13. Not a loosening of intent: the fix stopped every
     // FIRST room entry from falsely printing "You've stood here before", and
     // those bug lines had been padding the feed's variety — with them gone the
     // walker's wait template ("You hold still…") counts one higher across the

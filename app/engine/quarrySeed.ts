@@ -1,4 +1,4 @@
-// OTA-1189 — ARRIVING SOMEWHERE MEANS FINDING SOMEONE.
+// OTA-1166 — ARRIVING SOMEWHERE MEANS FINDING SOMEONE.
 //
 // Owner: "once you reach that location… it spawns a set number, say three groups within
 // five blocks of you in different directions, so that you always have a chance of running
@@ -12,7 +12,7 @@
 // twice inside PATROL_MIN_HOURS (6), and it only fires at all if a patrol of the right
 // faction happens to be within 2 tiles. So a player could arrive on time, do everything
 // right, and simply never meet anybody — especially if rival hordes had already thinned the
-// quarry off that ground. OTA-1188 answered that by widening the DEADLINE
+// quarry off that ground. OTA-1165 answered that by widening the DEADLINE
 // (HOURS_PER_REQUIRED_KILL), which bought time to keep waiting instead of removing the
 // wait. Owner, correctly: *"sometimes we spend an hour going back and forth on the best way
 // to step around that cardboard box instead of just picking it up and throwing it away."*

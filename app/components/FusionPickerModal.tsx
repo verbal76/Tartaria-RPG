@@ -47,13 +47,13 @@ export function FusionPickerModal() {
   // OTA-873 — pieces eligible for a coating-channel upgrade. A WEAPON that's
   // coatable and not already dual-slot gains a 2nd coating slot; an ARMOR /
   // DOG-VEST not already upgraded gains +1 resist capacity.
-  // OTA-1117 — the eligibility test moved into crucibleUpgradeVerdict so the list
+  // OTA-1094 — the eligibility test moved into crucibleUpgradeVerdict so the list
   // and the store's refusal come from one place, and every candidate now carries
   // the REASON when it can't be upgraded (see the empty-section copy below).
   const isArmorPiece = (i: InventoryItem) =>
     i.kind === 'armor' || i.kind === 'dog_armor'
     || i.uniqueStats?.kind === 'armor' || i.uniqueStats?.kind === 'dog_armor';
-  // OTA-1051 — the upgrade target list, grouped + badged (owner: "listed as all
+  // OTA-1028 — the upgrade target list, grouped + badged (owner: "listed as all
   // armor that can be upgraded, then all weapons. and it should say which are
   // equipped. I want to be able to upgrade what I am wearing"). Worn pieces
   // sort first in each group and carry an EQUIPPED badge — same instance-id
@@ -71,7 +71,7 @@ export function FusionPickerModal() {
   );
   const isWorn = (i: InventoryItem): boolean => equippedIds.has(i.id);
   const wornFirst = (a: InventoryItem, b: InventoryItem) => Number(isWorn(b)) - Number(isWorn(a));
-  // OTA-1117 — every candidate, upgradeable or not, with its verdict attached.
+  // OTA-1094 — every candidate, upgradeable or not, with its verdict attached.
   // A blocked piece is still LISTED (greyed, with the reason) so the player never
   // faces a heading that just isn't there.
   type Candidate = { item: InventoryItem; blocked: string | null; group: 'armor' | 'weapon' };
@@ -182,11 +182,11 @@ export function FusionPickerModal() {
                     <Text style={styles.empty}>You are carrying no weapons, armor, or dog vests for the Crucible to work on.</Text>
                   ) : (
                     <ScrollView style={styles.list} nestedScrollEnabled>
-                      {/* OTA-1051 — grouped: ALL upgradeable armor (incl. dog vests), then
+                      {/* OTA-1028 — grouped: ALL upgradeable armor (incl. dog vests), then
                           ALL weapons; worn pieces first in each group with an EQUIPPED
                           badge so upgrading what you're wearing is a deliberate,
                           visible choice.
-                          OTA-1117 — BOTH headings now always render, and a heading with
+                          OTA-1094 — BOTH headings now always render, and a heading with
                           nothing tappable lists the pieces it had to turn away and why.
                           Owner: "went to upgrade at the fuse and it only allowed me to
                           pick armor no weapons." Roughly half the weapon catalog is
@@ -356,13 +356,13 @@ const styles = StyleSheet.create({
   // the (secondary) rarity. Right-aligned so the type column lines up down the list.
   rowType: { color: '#9ec96a', fontSize: 11, fontWeight: '600', marginLeft: 8, textAlign: 'right' },
   rowMeta: { color: '#a2977b', fontSize: 10, marginLeft: 8 },
-  // OTA-1051 — upgrade list grouping + worn badge (amber matches the
+  // OTA-1028 — upgrade list grouping + worn badge (amber matches the
   // inventory EQUIPPED badge palette).
   sectionLabel: { color: '#8aa0a4', fontSize: 10, fontWeight: '700', letterSpacing: 1.2, marginTop: 8, marginBottom: 4 },
   rowNameWrap: { flex: 1 },
   rowNameTight: { flex: 0 },
   equippedTag: { color: '#c9a86a', fontSize: 9, fontWeight: '700', letterSpacing: 1.5, marginTop: 2 },
-  // OTA-1117 — the "nothing here, and here's why" layer. A heading with no
+  // OTA-1094 — the "nothing here, and here's why" layer. A heading with no
   // tappable rows says so, then lists the pieces it turned away with the reason,
   // greyed and inert so they read as explanation rather than as broken buttons.
   sectionNone: { color: '#a2977b', fontSize: 11, fontStyle: 'italic', marginBottom: 4, paddingHorizontal: 8 },

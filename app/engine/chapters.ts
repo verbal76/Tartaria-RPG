@@ -1,4 +1,4 @@
-// OTA-1043 — CHAPTER CARDS (golem-line story feature, phase 2 of 3).
+// OTA-1020 — CHAPTER CARDS (golem-line story feature, phase 2 of 3).
 //
 // Owner: "we need to keep updating the player as they play." The main quest
 // already advances through a phase spine (mainQuest.ts: hook → revelation →
@@ -6,7 +6,7 @@
 // the feed — but feed lines scroll away like everything else. A CHAPTER CARD
 // is the cinematic marker the crawl promised: a full-screen title beat at
 // every phase transition, carrying a universal body paragraph plus a line
-// written for YOUR story motive (OTA-1041), so the game keeps answering
+// written for YOUR story motive (OTA-1018), so the game keeps answering
 // "why am I doing this?" in the player's own terms as the arc turns.
 //
 // Four transitions get cards (the crawl itself is Chapter I):

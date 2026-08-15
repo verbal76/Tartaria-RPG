@@ -55,7 +55,7 @@ export interface ContractMarker {
   number: number;
 }
 
-/** ⚠⚠ OTA-1241 — THE POSTER STOPS LYING ABOUT THE MAP. 15 of 18 hunts NAME a
+/** ⚠⚠ OTA-1218 — THE POSTER STOPS LYING ABOUT THE MAP. 15 of 18 hunts NAME a
  *  real, walkable location on their poster ("Drakova", "Yuldra-Tul", "the
  *  Obsidian Pillars"...) while the anchor sat at the generic BIOME cell — a
  *  player who read the poster and walked to the named place got the "Not here"
@@ -91,10 +91,10 @@ export function resolvePosterLocation(targetLocationName: string | null | undefi
   return idx.get(cleaned) ?? idx.get(cleaned.replace(/^the\s+/, '')) ?? idx.get(`the ${cleaned}`);
 }
 
-/** OTA-1236 — THE hunt's anchor, exported: the same tile the card's "You're at",
+/** OTA-1213 — THE hunt's anchor, exported: the same tile the card's "You're at",
  *  the atlas pin, and the stage-advancement gate all read. One spelling of
  *  "where this hunt happens" — the gate and the pin can never disagree.
- *  OTA-1241 — and that one spelling now honors the place the POSTER names. */
+ *  OTA-1218 — and that one spelling now honors the place the POSTER names. */
 export function huntAnchorId(def: {
   biomeTag?: string;
   factionId?: string | null;
@@ -185,7 +185,7 @@ export function contractTurnInRemoteness(anchorId: string): number {
   return Math.abs(a.x - hub.x) + Math.abs(a.y - hub.y);
 }
 
-/** ⚠⚠ OTA-1210 (PUNCHLIST P7) — THE BONUS NOW MEASURES THE TRIP THE PLAYER MADE.
+/** ⚠⚠ OTA-1187 (PUNCHLIST P7) — THE BONUS NOW MEASURES THE TRIP THE PLAYER MADE.
  *
  *  The requirement is in OTA-824's own commit body: *"make the journey worth the loot — no
  *  32-time trip worth 20 TC."* What shipped measured `contractTurnInRemoteness` — how far

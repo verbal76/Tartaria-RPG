@@ -83,7 +83,7 @@ describe('OTA-911 — dodge / flee are off while elevated on a climb', () => {
     const store = await bootElevated();
     await store.getState().submitPlayerAction('flee');
     const logs = store.getState().gameLog.map((e) => e.text).join('\n');
-    // OTA-976 — flee IS legal in wall FIGHTS now (rolled; see the wall-flee suite);
+    // OTA-953 — flee IS legal in wall FIGHTS now (rolled; see the wall-flee suite);
     // with no enemies it stays refused, with the pointer at plain climbing down.
     expect(logs).toMatch(/Nothing up here is chasing you/i);
   });

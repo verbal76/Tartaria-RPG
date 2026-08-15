@@ -116,12 +116,12 @@ export function extractLoreQuery(rawText: string): string {
   return t;
 }
 
-/** ⚠⚠ OTA-1221 — THE OFFLINE LORE PATH (PUNCHLIST P17).
+/** ⚠⚠ OTA-1198 — THE OFFLINE LORE PATH (PUNCHLIST P17).
  *
  *  `findClosestLoreConcept` returns null the moment the embedder is not ready, and the
  *  store's ask-handler ticked `loreRead` ONLY inside that branch. So on any device where
- *  the narration model fails to load — which is the owner's own device across OTA-1203,
- *  OTA-1204 and OTA-1205 (`Narration engine: failed`) — the counter never moved and **Scholar of
+ *  the narration model fails to load — which is the owner's own device across OTA-1180,
+ *  OTA-1181 and OTA-1182 (`Narration engine: failed`) — the counter never moved and **Scholar of
  *  Forgotten Lore could not be earned at all.** 177 authored concepts, unreachable, because
  *  the only door needed a model that was not there.
  *
@@ -130,7 +130,7 @@ export function extractLoreQuery(rawText: string): string {
  *  is better at "what's the mud thing?" — it stays FIRST and nothing about it changes. This
  *  is what runs when it is unavailable, or when it looks and finds nothing.
  *
- *  Three tiers, deliberately the same shape as `titleMatch.ts` (OTA-1211/1216):
+ *  Three tiers, deliberately the same shape as `titleMatch.ts` (OTA-1188/1216):
  *    1. exact label,
  *    2. label substring — ambiguity REFUSES rather than guessing,
  *    3. token subset over label + searchText, scored, best distinct winner.

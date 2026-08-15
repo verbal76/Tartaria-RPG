@@ -16,12 +16,26 @@
 
 import staticHubData from '../data/world/static_hub.json';
 import variantsData from '../data/world/hub_faction_variants.json';
+import {
+  DIRECTIONS,
+  OUTPOST_EXITS,
+  outpostFirstStep,
+  type Direction,
+  type StructuralId,
+} from './outpostGraph';
 
 export interface HubRoom {
   id: string;
+  /** ⚠⚠ OTA-1279 — which node of the universal outpost graph this room IS.
+   *  Navigation is decided by this, never by the room's name, its faction skin,
+   *  or where the artist drew it. See app/engine/outpostGraph.ts. */
+  structuralId: StructuralId;
   name: string;
   shortName: string;
   description: string;
+  /** ⚠⚠ DERIVED, NOT AUTHORED. Composed from OUTPOST_EXITS at module load —
+   *  static_hub.json no longer carries exits, because hand-typed exits are what
+   *  rotted into 10 one-way doors and 2 unreachable rooms before OTA-1279. */
   exits: {
     north: string | null;
     south: string | null;
@@ -52,7 +66,54 @@ interface HubData {
   rooms: HubRoom[];
 }
 
-export const HUB: HubData = staticHubData as HubData;
+export const HUB: HubData = staticHubData as unknown as HubData;
+
+// ⚠⚠ OTA-1279 — COMPOSE THE EXIT TABLE FROM THE GRAPH, ONCE, AT LOAD.
+//
+// static_hub.json declares only which structural node each room occupies. The
+// connections come from outpostGraph.ts and are stamped onto the room objects
+// here, so every existing reader (InputBox's chips, resolveHubTravel,
+// beginScene's description) keeps working against `room.exits` unchanged while
+// there is now exactly one place a connection can be written.
+//
+// The self-check below is not decoration. A layout that is missing a node, or
+// doubles one up, would strand rooms silently — which is precisely the bug this
+// OTA exists to end — so it throws at import rather than shipping a map the
+// player can get lost in. Any faction outpost added later inherits the same
+// check for free.
+const ROOM_BY_STRUCTURAL: Map<StructuralId, string> = (() => {
+  const map = new Map<StructuralId, string>();
+  for (const room of HUB.rooms) {
+    if (!room.structuralId) {
+      throw new Error(`hub layout: room '${room.id}' declares no structuralId`);
+    }
+    if (!OUTPOST_EXITS[room.structuralId]) {
+      throw new Error(`hub layout: room '${room.id}' claims unknown node '${room.structuralId}'`);
+    }
+    const taken = map.get(room.structuralId);
+    if (taken) {
+      throw new Error(`hub layout: '${room.id}' and '${taken}' both claim node ${room.structuralId}`);
+    }
+    map.set(room.structuralId, room.id);
+  }
+  return map;
+})();
+
+for (const room of HUB.rooms) {
+  const canon = OUTPOST_EXITS[room.structuralId];
+  const exits = { north: null, south: null, east: null, west: null } as HubRoom['exits'];
+  for (const dir of DIRECTIONS) {
+    const node = canon[dir];
+    exits[dir] = node ? (ROOM_BY_STRUCTURAL.get(node) ?? null) : null;
+  }
+  room.exits = exits;
+}
+
+/** The room occupying a given structural node, or null if this layout omits it. */
+export function hubRoomAtNode(node: StructuralId): HubRoom | null {
+  const id = ROOM_BY_STRUCTURAL.get(node);
+  return id ? (HUB.rooms.find((r) => r.id === id) ?? null) : null;
+}
 
 const HUB_LOCATION_SET: ReadonlySet<string> = new Set(
   HUB.hubLocationIds ?? [HUB.hubLocationId],
@@ -77,7 +138,7 @@ export function hubNameForFaction(factionId: string | null | undefined): string 
   return map[factionId] ?? fallback;
 }
 
-// ⚠⚠ OTA-1209 — WHOSE COLOURS A HUB SITE WEARS. It used to be the PLAYER'S, everywhere.
+// ⚠⚠ OTA-1186 — WHOSE COLOURS A HUB SITE WEARS. It used to be the PLAYER'S, everywhere.
 //
 // `hubRoomFor` and `hubNameForFaction` were called with `player.factionId` at all 17 of
 // their call sites, so a Mud Monarch saw "The Atrium" and "Monarch Court" at every outpost
@@ -149,7 +210,7 @@ interface FactionRoomOverride {
   name?: string;
   shortName?: string;
   description?: string;
-  /** OTA-1126 — whether THIS faction's skin of the room stands under open
+  /** OTA-1103 — whether THIS faction's skin of the room stands under open
    *  sky. The weather engine's open-air default is keyed on the base hub
    *  graph (gate / square / culvert are Reclaimer courtyards), but a
    *  faction re-skin can move the same room indoors: the Architects' gate
@@ -184,7 +245,7 @@ export function hubRoomFor(
   };
 }
 
-/** OTA-1126 — is this hub room open to the sky for THIS faction's skin?
+/** OTA-1103 — is this hub room open to the sky for THIS faction's skin?
  *  `fallback` is the base hub graph's call (the gameStore's open-air room
  *  set); a faction variant that declares `open_air` overrides it in either
  *  direction. The weather tick is the consumer: a Conspiracy "gate" is a
@@ -206,7 +267,7 @@ export function hubEntryRoomId(): string {
   return HUB.rooms[0]?.id ?? '';
 }
 
-// ⚠⚠ OTA-1217 (PUNCHLIST P11) — PORTED UP FROM golem-line, WHERE IT HAS LIVED SINCE
+// ⚠⚠ OTA-1194 (PUNCHLIST P11) — PORTED UP FROM golem-line, WHERE IT HAS LIVED SINCE
 // 2026-06-27 (`fix(golem-line): EXIT chip only in the gate room`, e04a6ed5).
 //
 // It was never brought across, so the LIVE line — the one with the Apple testers on it —
@@ -218,14 +279,24 @@ export function hubEntryRoomId(): string {
 // Owner, on being shown that the better version was on the branch nobody plays:
 // *"ok then bring hal up to the better version."*
 
-/** True when this room is the hub's way OUT — the gate/entrance (tagged "entrance" in the
- *  layout; the Gate is the only one). The EXIT chip belongs only here.
+/** True when this room has a way OUT of the hub — the gate (tagged `entrance`) or a room
+ *  with its own door to the outside (tagged `exterior_door`).
+ *
+ *  ⚠⚠ OTA-1271 — THE OWNER OVERRULED THE GATE-ONLY RULE FROM HIS OWN PLAYTEST. OTA-1194
+ *  restricted the EXIT chip to the gate ("leaving through the armory is not how the
+ *  outpost is laid out") — and then he spent a session stranded in the workshop cluster
+ *  typing "why is there no exit button". His ruling: *"add an exit button there [the
+ *  anchor rooms] or find a room named after a room that would normally have an exit...
+ *  all outposts should have at least 1 exit."* The Workshop now carries `exterior_door`
+ *  (a working shop would have a service door); the layout invariant — at least one
+ *  exit-bearing room per hub — is pinned by ota1271's test, not by hope.
  *
  *  ⚠ Tags survive the per-faction string overrides — `hubRoomFor` re-skins name,
  *  shortName and description and nothing else — so this holds for every faction's hub,
- *  including under OTA-1209's skin-by-site. */
+ *  including under OTA-1186's skin-by-site. */
 export function roomIsExit(room: HubRoom | null | undefined): boolean {
-  return !!room && Array.isArray(room.tags) && room.tags.includes('entrance');
+  return !!room && Array.isArray(room.tags)
+    && (room.tags.includes('entrance') || room.tags.includes('exterior_door'));
 }
 
 /** True when the hub layout marks an explicit exit/gate room at all.
@@ -235,56 +306,170 @@ export function roomIsExit(room: HubRoom | null | undefined): boolean {
  *  rule whose failure mode is "the player cannot leave the building" would be a far worse
  *  defect than the one it fixes. */
 export function hubDefinesExitRoom(): boolean {
-  return HUB.rooms.some((r) => Array.isArray(r.tags) && r.tags.includes('entrance'));
+  return HUB.rooms.some((r) => roomIsExit(r));
 }
 
-/** Resolve a player input against the current hub room's exits. Returns
- *  the target room id, or null if no exit matches. Supports:
+export type HubTravel =
+  | { roomId: string; via: 'cardinal' | 'adjacent' }
+  /** ⚠⚠ The player named a real room that is NOT one step away. This is a
+   *  REFUSAL carrying directions, not a move: `roomId` is where they asked to
+   *  go and `firstStep` is the adjacent room that heads that way. */
+  | { roomId: string; via: 'not_adjacent'; firstStep: string | null }
+  /** ⚠⚠ The player asked for a cardinal this room has no door on. Found while
+   *  repairing the graph: this used to return null and the command fell through
+   *  to OVERLAND travel — a wrong `go north` inside the outpost walked the
+   *  player out of the building and into the wild. Harmless when nearly every
+   *  room had four exits; with the corrected topology 8 of the 15 rooms are
+   *  dead ends with exactly one door, so three cardinals out of four would have
+   *  ejected them. */
+  | { roomId: null; via: 'no_exit_that_way'; dir: Direction };
+
+/** Resolve a player input against the current hub room's exits. Returns null if
+ *  the input names nothing in the outpost. Supports:
  *    - Cardinal direction in the input ('go north')
  *    - shortName / name / id of an adjacent room ('go armory')
- *    - shortName / name / id of ANY hub room ('go to the workshop') —
- *      jumps directly to that room. Useful for fast-travel within the
- *      hub once the player has visited a room.
- */
+ *    - shortName / name / id of ANY hub room ('go to the workshop') — which is
+ *      REFUSED with directions unless it is adjacent.
+ *
+ *  ⚠⚠ OTA-1279 — THE FAST-TRAVEL JUMP IS GONE. It used to teleport the player
+ *  to any room they had visited before, which the owner's navigation spec rules
+ *  out in as many words: *"Do NOT automatically calculate a path and teleport
+ *  the player through intermediate rooms... Normal room navigation should move
+ *  ONE GRAPH EDGE AT A TIME."* Dead ends have to behave as dead ends or the
+ *  outpost has no shape at all.
+ *
+ *  ⚠ But a bare refusal is what got him lost in the first place, so a named
+ *  room that is out of reach answers with the door that leads toward it. One
+ *  step is still all the player gets; they just stop having to guess which. */
 export function resolveHubTravel(
   fromRoomId: string,
   rawInput: string,
-  visitedRoomIds: ReadonlySet<string>,
-): { roomId: string; via: 'cardinal' | 'adjacent' | 'fast_travel' } | null {
+  // ⚠ OTA-1274 — the SKIN the player is actually reading. Name matching below
+  // used to check only the base layout's names, so a Dynasty player typing
+  // 'go promenade' (the name on their screen) never matched 'Square' (the
+  // name in the base file). Optional so older callers keep their behaviour.
+  skinFactionId?: string | null,
+): HubTravel | null {
   const here = findHubRoom(fromRoomId);
   if (!here) return null;
   const text = rawInput.toLowerCase();
+  const namesFor = (roomId: string): string[] => {
+    const base = findHubRoom(roomId);
+    const skinned = hubRoomFor(roomId, skinFactionId ?? null);
+    const out: string[] = [roomId.toLowerCase()];
+    for (const r of [base, skinned]) {
+      if (r) { out.push(r.shortName.toLowerCase(), r.name.toLowerCase()); }
+    }
+    return out;
+  };
   // Cardinal first.
-  for (const dir of ['north', 'south', 'east', 'west'] as const) {
+  let deadCardinal: Direction | null = null;
+  for (const dir of DIRECTIONS) {
     if (new RegExp(`\\b${dir}\\b`).test(text)) {
       const target = here.exits[dir];
       if (target) return { roomId: target, via: 'cardinal' };
+      // Remembered, not returned yet: "go north to the mess" still has a room
+      // name in it that may well be a legal step.
+      deadCardinal ??= dir;
     }
   }
+  // ⚠⚠ OTA-1280 — LONGEST NAME WINS, in both phases. First-substring-found was
+  // wrong whenever one room's name is a prefix of another's, and the Order skin
+  // ships exactly that pair: Quarters reads "Cells", the Chapel reads "Cell".
+  // Typing `cells` — the word on the player's screen — matched the Chapel's
+  // 'cell' first (direction order) and walked them into the wrong room. Found
+  // by the nine-skin crawl, not by play.
+  const bestMatch = (roomIds: string[]): string | null => {
+    let best: { roomId: string; len: number } | null = null;
+    for (const roomId of roomIds) {
+      for (const n of namesFor(roomId)) {
+        if (text.includes(n) && (!best || n.length > best.len)) best = { roomId, len: n.length };
+      }
+    }
+    return best?.roomId ?? null;
+  };
   // Adjacent named room (any exit).
-  for (const dir of ['north', 'south', 'east', 'west'] as const) {
-    const targetId = here.exits[dir];
-    if (!targetId) continue;
-    const room = findHubRoom(targetId);
-    if (!room) continue;
-    if (
-      text.includes(room.shortName.toLowerCase()) ||
-      text.includes(room.name.toLowerCase()) ||
-      text.includes(room.id.toLowerCase())
-    ) {
-      return { roomId: targetId, via: 'adjacent' };
-    }
+  const adjacent = bestMatch(
+    DIRECTIONS.map((d) => here.exits[d]).filter((x): x is string => !!x),
+  );
+  if (adjacent) return { roomId: adjacent, via: 'adjacent' };
+  // A real room, further off. Refused — with the first step named.
+  const far = bestMatch(HUB.rooms.map((r) => r.id).filter((id) => id !== fromRoomId));
+  if (far) {
+    return { roomId: far, via: 'not_adjacent', firstStep: hubFirstStepToward(fromRoomId, far) };
   }
-  // Fast-travel — any room the player has already visited.
-  for (const room of HUB.rooms) {
-    if (room.id === fromRoomId) continue;
-    if (!visitedRoomIds.has(room.id)) continue;
-    if (
-      text.includes(room.shortName.toLowerCase()) ||
-      text.includes(room.name.toLowerCase()) ||
-      text.includes(room.id.toLowerCase())
-    ) {
-      return { roomId: room.id, via: 'fast_travel' };
+  // A cardinal with no door on it. Refused HERE so it cannot fall through to
+  // overland travel and carry the player out of the outpost.
+  if (deadCardinal) return { roomId: null, via: 'no_exit_that_way', dir: deadCardinal };
+  return null;
+}
+
+/** ⚠ The adjacent room that starts the shortest walk from one room to another —
+ *  a signpost, never a shortcut. Returns null when they are the same room, when
+ *  either is unknown, or when no route exists. */
+export function hubFirstStepToward(fromRoomId: string, toRoomId: string): string | null {
+  const from = findHubRoom(fromRoomId);
+  const to = findHubRoom(toRoomId);
+  if (!from || !to) return null;
+  const node = outpostFirstStep(from.structuralId, to.structuralId);
+  return node ? (hubRoomAtNode(node)?.id ?? null) : null;
+}
+
+/** ⚠⚠ OTA-1274 — a bare room name, matched STRICTLY, for the pre-parser
+ *  intercept. The owner asked for an odd-name audit ("there was a room called
+ *  break") and the audit found the real defect class underneath: room chips
+ *  whose names ARE parser verbs. Typing `vault` jumped (conf 1.00), `break`
+ *  attacked, `forge` opened crafting, `chamber` climbed via fuzzy 'clamber' —
+ *  in every skin the typed name of some room did something other than walk.
+ *
+ *  resolveHubTravel cannot gate the intercept: it substring-matches, so
+ *  "break the door" would walk to the Break Room instead of attacking the
+ *  door. This matcher demands the WHOLE input be the room (after an optional
+ *  go/visit/enter lead-in and articles).
+ *
+ *  ⚠⚠ OTA-1279 — IT NOW MATCHES EVERY ROOM, NOT ONLY THE ONES ALREADY VISITED.
+ *  The old visited-gate was inherited from fast-travel, and fast-travel is gone.
+ *  Leaving it in place would mean a room's name still fired a parser verb right
+ *  up until the first time you walked in — `vault` jumping, `forge` opening
+ *  crafting — which is the exact hole OTA-1274 was opened to close. Naming an
+ *  unreachable room is no longer a jump anywhere; resolveHubTravel refuses it
+ *  and points at the right door instead. */
+export function matchHubRoomName(
+  rawInput: string,
+  fromRoomId: string,
+  skinFactionId?: string | null,
+): string | null {
+  const here = findHubRoom(fromRoomId);
+  if (!here) return null;
+  const text = rawInput.toLowerCase().trim()
+    .replace(/^(go\s+to|goto|go|enter|visit|to)\s+/, '')
+    .replace(/^the\s+/, '')
+    .trim();
+  if (!text) return null;
+  // ⚠ OTA-1280 — the SKIN pass outranks the BASE pass. One faction can label a
+  // room with another room's base name (conspiracy: the Workshop reads "Lab",
+  // while outpost_lab's base shortName is also "Lab"). The player types what is
+  // on their screen, so the screen name must win the tie — previously it won by
+  // array-index luck, which is not a rule.
+  const isMatch = (roomId: string, layer: 'skin' | 'base'): boolean => {
+    const r = layer === 'skin'
+      ? (skinFactionId ? VARIANTS.factions?.[skinFactionId]?.[roomId] : undefined)
+      : findHubRoom(roomId);
+    if (!r || typeof r.shortName !== 'string' || typeof r.name !== 'string') {
+      return layer === 'base' && text === roomId.toLowerCase();
+    }
+    const name = r.name.toLowerCase().replace(/^the\s+/, '');
+    return text === r.shortName.toLowerCase() || text === name
+      || (layer === 'base' && text === roomId.toLowerCase());
+  };
+  for (const layer of ['skin', 'base'] as const) {
+    for (const dir of DIRECTIONS) {
+      const targetId = here.exits[dir];
+      if (targetId && isMatch(targetId, layer)) return targetId;
+    }
+    for (const room of HUB.rooms) {
+      if (room.id === fromRoomId) continue;
+      if (isMatch(room.id, layer)) return room.id;
     }
   }
   return null;
@@ -295,4 +480,18 @@ export function isLeaveHubCommand(rawInput: string): boolean {
   return /\b(leave|exit)\s+(the\s+)?(outpost|hub|camp|reclaimers'?)\b/i.test(rawInput) ||
          /\bleave\s+the\s+gate\b/i.test(rawInput) ||
          /\b(head|go|walk|travel)\s+(out|outside|into the wild)\b/i.test(rawInput);
+}
+
+/** ⚠⚠ OTA-1269 — a bare "get me out of here", with no container named.
+ *  Owner's device run: he typed `exit`, then `leave`, four attempts — bare
+ *  `exit` fell through the hub gate into overland travel with no target and
+ *  narrated a floorboard search (+1h); bare `leave` was refused by the wander
+ *  path's hook-thread block; only the taught phrase `leave outpost` worked.
+ *  The bare-word rule ALREADY existed twice before this function — the
+ *  tutorial's explore_or_leave allowance and the building-interior EXIT each
+ *  carried their own inline regex, and neither agreed with the travel path —
+ *  the session's recurring rule-computed-twice failure, in its ninth suit.
+ *  One predicate now, three callers, and bare `leave` counts everywhere. */
+export function isBareExitCommand(rawInput: string): boolean {
+  return /^\s*(exit|leave|outside|step\s+out|get\s+out(\s+of\s+here)?|leave\s+here)\s*$/i.test(rawInput);
 }

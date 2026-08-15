@@ -1,7 +1,7 @@
-// OTA-947 — defense de-runaway: AC tail-trim, enemy hit floor, mitigation floor.
+// OTA-924 — defense de-runaway: AC tail-trim, enemy hit floor, mitigation floor.
 import { trimStandingAc } from '../app/engine/equipment';
 
-describe('OTA-947 — AC tail-trim (trimStandingAc)', () => {
+describe('OTA-924 — AC tail-trim (trimStandingAc)', () => {
   it('leaves AC at or below the knee untouched', () => {
     expect(trimStandingAc(10)).toBe(10);
     expect(trimStandingAc(22)).toBe(22);
@@ -17,7 +17,7 @@ describe('OTA-947 — AC tail-trim (trimStandingAc)', () => {
   });
 });
 
-describe('OTA-947 — hit floor math (needed-roll cap)', () => {
+describe('OTA-924 — hit floor math (needed-roll cap)', () => {
   // mirrors the combat rule: enemy hits if atkRoll >= clamp(effectiveAc - atkBonus, 2, CAP)
   const CAP = 13;
   const neededNat = (ac: number, atk: number) => Math.max(2, Math.min(CAP, ac - atk));
@@ -31,7 +31,7 @@ describe('OTA-947 — hit floor math (needed-roll cap)', () => {
   });
 });
 
-describe('OTA-947 — mitigation floor math', () => {
+describe('OTA-924 — mitigation floor math', () => {
   const FLOOR = 0.30;
   const applyFloor = (raw: number, mitigated: number) => Math.max(mitigated, Math.round(raw * FLOOR));
   it('lifts an over-mitigated hit to >= 30% of raw', () => {

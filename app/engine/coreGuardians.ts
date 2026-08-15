@@ -89,7 +89,7 @@ interface TierProfile {
 // (+3/+4/+5). HP, damage, and the trait layering are unchanged, so the fight
 // still has teeth and the late-game stays demanding.
 const TIER_PROFILES: Record<GuardianTier, TierProfile> = {
-  // ⚠ OTA-1165 (owner tuning) — 1.4 → 1.0: YOUR FIRST GUARDIAN IS THE BASE.
+  // ⚠ OTA-1142 (owner tuning) — 1.4 → 1.0: YOUR FIRST GUARDIAN IS THE BASE.
   // The ×1.4 predates OTA-926's canonical-base switch: it was tuned against
   // per-Capital sheets of 30-50 HP, where tier 1 landed ~42-70. When the base
   // became a flat 42 for everyone, the first rung quietly inherited a 40%
@@ -178,7 +178,7 @@ export function guardianOverLevel(player: PlayerCharacter, tier: GuardianTier): 
   return Math.min(1.9, Math.max(1, guardianPlayerPower(player) / expected));
 }
 
-/** OTA-954 — MONOTONE STAGING FLOOR. At a FIXED player power, the next tier's bigger
+/** OTA-931 — MONOTONE STAGING FLOOR. At a FIXED player power, the next tier's bigger
  *  expected-power divisor makes `over` DROP, and in the early tiers it drops faster
  *  than the tier's hpMult step climbs — so an over-leveled player could meet a NEXT
  *  Guardian that staged out WEAKER (e.g. power 20: T1 = 69 HP, T2 = 67), and the AP
@@ -200,7 +200,7 @@ export function monotoneTierHp(player: PlayerCharacter, tier: GuardianTier): num
   return run;
 }
 
-/** OTA-954 — the same floor for the tier's AP delta (acBonus + over-level power bonus).
+/** OTA-931 — the same floor for the tier's AP delta (acBonus + over-level power bonus).
  *  AC and attack-to-hit BOTH derive from abilityPoint, so this keeps the Guardian's
  *  threat monotone across tiers too. Non-strict (AP is coarse; equal threat across a
  *  tier boundary is acceptable — HP already strictly climbs). */
@@ -215,7 +215,7 @@ export function monotoneTierApDelta(player: PlayerCharacter, tier: GuardianTier)
   return run;
 }
 
-/** OTA-1048 — OVER-LEVEL DAMAGE BONUS. The over-level factor lifts HP, AC and
+/** OTA-1025 — OVER-LEVEL DAMAGE BONUS. The over-level factor lifts HP, AC and
  *  attack, but the damage DIE stayed the authored tier value — so against an
  *  over-leveled player the Guardian lived longer and hit more often, yet each
  *  hit stayed tuned for a fresh arrival's HP pool. Owner, after the 2nd
@@ -258,7 +258,7 @@ export function spawnGuardianForCapital(
   // Guardians use a canonical base × the tier's hpMult; the final Guardian (last Core
   // in the run) is the game's last boss — a fixed ~20-round wall. Over-level applies to
   // both (upward-only), so an over-prepared player still meets a real fight.
-  // OTA-954 — non-final tiers stage through the monotone floor (see monotoneTierHp);
+  // OTA-931 — non-final tiers stage through the monotone floor (see monotoneTierHp);
   // the final wall is already far above tier 8's ceiling, so it keeps its direct
   // override (the floor would be a no-op there).
   const hp = isFinalGuardian(coresCount)
@@ -273,7 +273,7 @@ export function spawnGuardianForCapital(
   const apMatch = apStr.match(/^(\w+)\s+(\d+)/);
   const statName = apMatch ? apMatch[1] : 'Strength';
   const apNum = apMatch ? parseInt(apMatch[2]!, 10) : 6;
-  // OTA-954 — tier acBonus + over-level power bonus (+0 at/under the curve, up to +7
+  // OTA-931 — tier acBonus + over-level power bonus (+0 at/under the curve, up to +7
   // heavily over-leveled), floored monotone across tiers via monotoneTierApDelta.
   const scaledAp = `${statName} ${apNum + monotoneTierApDelta(player, tier)}`;
   // Merge traits: signature + tier extras. Deduped.
@@ -283,7 +283,7 @@ export function spawnGuardianForCapital(
     ...(def.base.traits ?? []),
     ...profile.extraTraits,
   ]));
-  // OTA-1048 — the tier die plus the over-level flat bonus (see
+  // OTA-1025 — the tier die plus the over-level flat bonus (see
   // monotoneTierDmgBonus). Authored 'NdM+K' shape is preserved.
   const dmgBonus = monotoneTierDmgBonus(player, tier);
   const dm = profile.damage.match(/^(\d+d\d+)\+(\d+)$/);
@@ -446,7 +446,7 @@ export function guardianGearUniqueStats(
 
 // ----- Guardian definitions ----------------------------------------------
 //
-// OTA-798 — every Guardian carries an authored `vulnerable:<type>` +
+// OTA-778 — every Guardian carries an authored `vulnerable:<type>` +
 // `resist:<type>` trait so the weakness/resistance system engages in combat AND
 // the EnemyPanel surfaces their defenses. Previously the Guardians' snake_case
 // `type` (aether_construct / mud_revenant) wasn't in crafting.ts TYPE_RESISTANCE_MAP

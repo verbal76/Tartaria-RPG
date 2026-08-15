@@ -11,7 +11,7 @@
 // The engine checks stamina BEFORE the rope-snap, so a spent rope + empty tank
 // reads as 'no_stamina' (rest first) — same as the engine's "rest first" refusal.
 //
-// OTA-799 — the rope is usable down to its LAST point: the button stays GREEN
+// OTA-779 — the rope is usable down to its LAST point: the button stays GREEN
 // while the rope has any durability (a low rope climbs and breaks gracefully at
 // 0, with a fraying warning first). Only a spent rope (≤ 0) blocks. Was ≤ 15
 // (one climb's wear), which stranded a whole climb and read the button red while
@@ -62,7 +62,7 @@ export function climbBlockReason(inp: ClimbReadinessInputs): ClimbBlockReason {
   const cost = climbStaminaCost(inp.hasReclaimersRope, inp.wearsClimbStrap);
   if (inp.stamina < cost) return 'no_stamina'; // engine: "rest first" (checked first)
   if (inp.activeRopeDurability != null && inp.activeRopeDurability <= 0) {
-    return 'frayed_rope';                    // OTA-799: only a SPENT rope blocks
+    return 'frayed_rope';                    // OTA-779: only a SPENT rope blocks
   }
   return null;                               // ready
 }

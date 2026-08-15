@@ -76,12 +76,12 @@ describe('OTA-801 C3 — post-boss grace window', () => {
   });
 });
 
-describe('OTA-801 C1 — Crucible with reserved-but-insufficient pieces REFUSES (superseded by OTA-1007)', () => {
+describe('OTA-801 C1 — Crucible with reserved-but-insufficient pieces REFUSES (superseded by OTA-984)', () => {
   it('does NOT open a picker it cannot act in — it names the shortfall and closes', async () => {
     const store = await boot('Forger');
     const p0 = store.getState().player!;
     // Reserve ONE eligible piece — below the 3-item gate, so the gate fails.
-    // OTA-801 opened the picker here to dodge refusal spam; OTA-1007 reverses that
+    // OTA-801 opened the picker here to dodge refusal spam; OTA-984 reverses that
     // (owner: "if you don't have enough to fuse, don't have you still go
     // through the menu"). A menu with a dead FUSE button and NO log line read
     // on device as "I thought I was fusing" for ten minutes.

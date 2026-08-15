@@ -12,7 +12,7 @@ import {
 describe('faction-quests.json schema', () => {
   it('every quest is a staged quest (>=2 beats), a fetch quest, or an escort', () => {
     for (const q of FACTION_QUESTS) {
-      // OTA-985 — ESCORT contracts are the third kind: no stages, no fetch — the
+      // OTA-962 — ESCORT contracts are the third kind: no stages, no fetch — the
       // journey IS the objective (deliver the party alive to turn in).
       if (q.escort || /_escort$/.test(q.id)) {
         expect((q.escort?.label ?? '').length).toBeGreaterThan(0);

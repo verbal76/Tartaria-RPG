@@ -1,5 +1,5 @@
 {
-  "_note": "OTA-1090 / Phase 5. Every line the Arbiter has an OPINION in. forkRegard and forkEcho are keyed '<forkId>:<optionId>' and must stay in lockstep — arbiterPersonaProblems() fails the build if either side has an orphan. memory.* lines MUST contain a {it} slot.",
+  "_note": "OTA-1067 / Phase 5. Every line the Arbiter has an OPINION in. forkRegard and forkEcho are keyed '<forkId>:<optionId>' and must stay in lockstep — arbiterPersonaProblems() fails the build if either side has an orphan. memory.* lines MUST contain a {it} slot.",
 
   "forkRegard": {
     "debt_collector:pay_partial": 5,

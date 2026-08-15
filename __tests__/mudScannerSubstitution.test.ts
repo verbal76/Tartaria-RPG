@@ -1,4 +1,4 @@
-// OTA-763 — mud recipes accept the cheap mud the player actually forages, and a
+// OTA-744 — mud recipes accept the cheap mud the player actually forages, and a
 // craft never eats a Rare+ material as a low-tier substitute.
 //
 // Playtest: a pack with Mud Essence ×9 / Aetheric Sludge / Aether Mud still couldn't
@@ -22,7 +22,7 @@ const pack = (): InventoryItem[] => [
   mk('Scrap Metal', 80, ['metal']),
 ];
 
-describe('OTA-763 — Mud Scanner builds from foraged mud; Rare Mudstone is preserved', () => {
+describe('OTA-744 — Mud Scanner builds from foraged mud; Rare Mudstone is preserved', () => {
   const recipe = RECIPES.find((r) => r.result === 'Mud Scanner');
 
   it('the recipe exists', () => {

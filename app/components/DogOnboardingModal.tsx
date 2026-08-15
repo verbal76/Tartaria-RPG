@@ -1,4 +1,4 @@
-// OTA-1050 — DOG ONBOARDING POPUP. A playtester at the rescue moment typed
+// OTA-1027 — DOG ONBOARDING POPUP. A playtester at the rescue moment typed
 // "rest", thought the naming beat was another fight, and the old in-feed
 // takeover silently stored "rest" as the breed. The three asks (breed, name,
 // sex) now land together on one blocking card in the house style — answers
@@ -7,7 +7,7 @@
 // through the old typed flow heals here too (its part-answers pre-fill).
 // No dismiss-without-answering: the dog is already rescued; it needs a name.
 //
-// OTA-1066 — two owner reports against this card:
+// OTA-1043 — two owner reports against this card:
 //
 //  (1) "fired too fast — I hadn't seen the results of the fight and that I had
 //      won before that popped on the screen." completeRescueScenario sets
@@ -32,7 +32,7 @@ import { defaultDogName } from '../engine/dogCompanion';
 /** How long the fight result gets the screen to itself once any competing
  *  card is gone. Long enough to read "you won" and the spoils; short enough
  *  that the pause reads as a beat rather than a hang. */
-// OTA-1098 — 4000 → 3200 at the owner's direction ("just a hair" shorter):
+// OTA-1075 — 4000 → 3200 at the owner's direction ("just a hair" shorter):
 // still long enough to read the purple victory beat, no longer long enough
 // to start typing into the feed before the card lands.
 export const DOG_CARD_DWELL_MS = 3200;
@@ -46,7 +46,7 @@ export function DogOnboardingModal() {
   const [breed, setBreed] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
   const [sex, setSex] = useState<'boy' | 'girl' | null>(null);
-  // OTA-1066 — the read-the-fight-first gate.
+  // OTA-1043 — the read-the-fight-first gate.
   const [ready, setReady] = useState(false);
 
   const armed = !!pending;
@@ -159,7 +159,7 @@ export function DogOnboardingModal() {
   );
 }
 
-// OTA-1066 — palette matched to MissionCompleteModal, the house reference for
+// OTA-1043 — palette matched to MissionCompleteModal, the house reference for
 // a blocking card. Warm body over a translucent backdrop (you can still see
 // the game behind it, which is the point — the fight result stays visible),
 // gold border and accents, cream title. The previous cold slate/cyan scheme

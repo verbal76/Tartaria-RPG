@@ -41,7 +41,7 @@ import { loadCrashSave, clearCrashSave, buildCrashSaveExport, type CrashSaveCapt
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import { readSlotLog, loadSlot, importSaveAsNewSlot, type SlotSummary } from '../engine/saveSystem';
-// OTA-1201 — character backup / restore.
+// OTA-1178 — character backup / restore.
 import { encodeSaveExport, decodeSaveExport } from '../engine/saveExport';
 import { OTA_BUILD_ID, MINIMUM_RECOMMENDED_APK_BUILD } from '../buildInfo';
 import { getBuildCodename, getBuildCodenameOrNull, getApkCodename } from '../buildCodename';
@@ -56,8 +56,8 @@ import { speak as ttsSpeak } from '../voice/TTSManager';
 import type { MainQuestPhase } from '../engine/types';
 import { checkAndApplyOTA } from '../updates/checkAndApplyOTA';
 import { useReadableMuted } from '../ui/displaySettings';
-import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1250 — one column width, platform-aware
-import { modelBootPercent, modelsStillLoading } from '../ui/modelBootProgress'; // OTA-1251 — the 51% bar, made testable
+import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
+import { modelBootPercent, modelsStillLoading } from '../ui/modelBootProgress'; // OTA-1228 — the 51% bar, made testable
 
 const races = racesData as { id: string; name: string }[];
 const locations = locationsData as { id: string; name: string }[];
@@ -121,7 +121,7 @@ export function TitleScreen() {
     | { kind: 'resurrect'; slot: SlotSummary }
     | { kind: 'fallen'; slot: SlotSummary }
     | { kind: 'exit' }
-    // OTA-1201 — restore result. One modal for both outcomes: a restore that
+    // OTA-1178 — restore result. One modal for both outcomes: a restore that
     // failed has to say WHY in words the player can act on (almost always
     // "something truncated your paste"), and a restore that worked has to name
     // the character so they know the right one came back.
@@ -174,12 +174,16 @@ export function TitleScreen() {
   const cognitiveStatus = useGameStore((s) => s.cognitiveStatus);
   const [kokoroPhase, setKokoroPhase] = useState<KokoroState>(() => getKokoroState());
   useEffect(() => onKokoroStateChange(setKokoroPhase), []);
-  // ⚠⚠ OTA-1296 (port of golem OTA-1294) — THE SLOT LIST REFRESHES EVERY TIME
-  // THIS SCREEN APPEARS. It used to be a boot-time snapshot (filled at hydrate,
-  // re-read only on pull-to-refresh, restore, or delete), so a character
-  // created THIS session was missing from it — on the owner's device the
-  // title showed no character at all mid-session and read as a wipe, while the
-  // disk record was intact the whole time. The screen must tell the truth.
+  // ⚠⚠ OTA-1294 — THE SLOT LIST REFRESHES EVERY TIME THIS SCREEN APPEARS. It
+  // used to be a BOOT-TIME SNAPSHOT: filled at hydrate, re-read only on
+  // pull-to-refresh, restore, or delete. A character created THIS session was
+  // not in it — so when the lore trapdoor (OTA-1292) threw the owner onto the
+  // title mid-game, the select showed no character at all and read as a wipe.
+  // His own diagnosis, verbatim: "my character selection screen really wasn't
+  // a character selection screen. it was a hallucination and it hadn't saved
+  // and updated in that aspect so it didn't see the character which was still
+  // live." The character was on disk the whole time (the relaunch proved it:
+  // "Welcome back, Francis"); the screen just never re-looked. Now it does.
   useEffect(() => { void refreshSlots(); }, [refreshSlots]);
   // OTA-471 — the opening splash now lives in <SplashOverlay/> at the AppShell
   // root (full-bleed). The title screen just renders the menu + a compact loading
@@ -273,7 +277,7 @@ export function TitleScreen() {
   // OTA 006 — separate latch for the SHARE action so the COPIED
   // and SHARED flashes don't fight each other on the same row.
   const [sharedSlotId, setSharedSlotId] = useState<string | null>(null);
-  // OTA-1201 — per-row "✓ BACKED UP" flash, same cadence as COPIED / SHARED.
+  // OTA-1178 — per-row "✓ BACKED UP" flash, same cadence as COPIED / SHARED.
   const [backedUpSlotId, setBackedUpSlotId] = useState<string | null>(null);
   // OTA-063 — bug-report modal state. Open via the REPORT BUG button
   // on the bottom bar. On send, build the full report (description +
@@ -472,7 +476,7 @@ export function TitleScreen() {
     }
   };
 
-  // ⚠⚠ OTA-1201 — BACK UP A CHARACTER. The owner reinstalled to clear a memory
+  // ⚠⚠ OTA-1178 — BACK UP A CHARACTER. The owner reinstalled to clear a memory
   // kill on 2026-08-08 and the character was gone for good: every save lives in
   // AsyncStorage, which iOS deletes with the app, and nothing anywhere held a
   // copy. OTA-344's atomic writes and OTA-395's trimming protect a save from
@@ -484,7 +488,7 @@ export function TitleScreen() {
   // truncate larger pastes" (OTA-023), and Share exists here precisely to bypass
   // that (OTA-006/215). The clipboard copy still happens so a short save can be
   // pasted straight into a note, but the share sheet is what opens.
-  // OTA-1231 — the encode/share body moved to app/ui/backupCharacter.ts so
+  // OTA-1208 — the encode/share body moved to app/ui/backupCharacter.ts so
   // Settings → RUN (the living character's door now) and this screen (the dead
   // rows' only door) cannot drift apart.
   const backUpSlot = async (slot: SlotSummary) => {
@@ -501,7 +505,7 @@ export function TitleScreen() {
     }
   };
 
-  // ⚠⚠ OTA-1201 — RESTORE. Reads the clipboard, and NEVER overwrites: an import
+  // ⚠⚠ OTA-1178 — RESTORE. Reads the clipboard, and NEVER overwrites: an import
   // always mints a new slot (importSaveAsNewSlot). A player restoring a backup
   // has already lost a character once, and no confirm dialog is a good enough
   // guard against a mis-tap costing them a second one.
@@ -771,9 +775,7 @@ export function TitleScreen() {
             └─ {item.dogName} ({item.dogBreed ?? 'dog'})
           </Text>
         )}
-        {/* OTA-725 — golem sub-line. Mirrors the dog line so a bound golem shows
-            on the slot tile too (the char-select screen used to list only the
-            character + dog and drop the golem). */}
+        {/* OTA-707 — golem sub-line (mirrors the dog line). */}
         {item.golemName && (
           <Text style={styles.slotDogLine}>
             └─ {item.golemName} ({item.golemKind ?? 'golem'})
@@ -796,12 +798,12 @@ export function TitleScreen() {
             )}
           </Text>
         )}
-        {/* ⚠ OTA-1231 — BACK UP on DEAD rows only (owner: the button on every
+        {/* ⚠ OTA-1208 — BACK UP on DEAD rows only (owner: the button on every
             living row "makes the game look broken to testers"). A dead
             character can never be loaded into a session, so this row is its
             ONLY door — the button stays. A LIVING character backs up from
             Settings → RUN, beside SAVE, where the thought actually occurs.
-            OTA-1201's rule ("a backup you can only take after the character
+            OTA-1178's rule ("a backup you can only take after the character
             dies is not a backup") still holds — the capability moved rooms,
             it did not narrow. */}
         {item.dead && (
@@ -897,7 +899,7 @@ export function TitleScreen() {
         // .golem → GOLEM, .engine → ENGINE, base (.tartarprim) → TARTARIA.
         // (Previously everything that wasn't .arbiters fell through to "GOLEM",
         // so the HaL / Tartaria build mislabeled itself as GOLEM.)
-        // ⚠ OTA-1251 — THE DESKTOP LINE NEEDS ITS OWN NAME. Owner, on the PC
+        // ⚠ OTA-1228 — THE DESKTOP LINE NEEDS ITS OWN NAME. Owner, on the PC
         // build: *"this says Tartaria Build, that's HAL — this should be Steam
         // Beta Build."* Right, and the reason it said TARTARIA is that the
         // mapping above reads `Application.applicationId`, which on desktop is
@@ -944,7 +946,7 @@ export function TitleScreen() {
           is still running after the splash, this thin bar carries the progress +
           a short keep-open hint instead of the old wall of text. */}
       {modelsLoading && (() => {
-        // ⚠ OTA-1251 — the arithmetic moved to app/ui/modelBootProgress.ts, where a
+        // ⚠ OTA-1228 — the arithmetic moved to app/ui/modelBootProgress.ts, where a
         // test can reach it. It had a real defect while it lived inline here (Qwen's
         // 'failed'/'skipped' scored 0.1 instead of 1) and that defect was half of the
         // owner's frozen 51%. Inline JSX math is untestable math.
@@ -1159,7 +1161,7 @@ export function TitleScreen() {
                 {bootGateOpen ? 'New Tartarian' : `${bootGateReason}`}
               </Text>
             </TouchableOpacity>
-            {/* OTA-1201 — restore a backed-up character from the clipboard.
+            {/* OTA-1178 — restore a backed-up character from the clipboard.
                 Sits under New Tartarian because that is where a player goes when
                 they have no character and want one. It never overwrites: a
                 restore always arrives as an additional character. */}

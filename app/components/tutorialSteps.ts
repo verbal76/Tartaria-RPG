@@ -82,13 +82,35 @@ export interface TutorialStep {
   remind?: string;
 }
 
-/** OTA-1063 — verbs the tutorial lockdown always lets through while an
+/** OTA-1040 — verbs the tutorial lockdown always lets through while an
  *  enemy is live. Self-defence, disengagement, and consumables: everything
  *  a cornered player needs. Deliberately NOT world verbs (travel, craft,
  *  fuse, rest) — the lockdown still holds for those, so the tutorial can't
  *  be walked out of sideways. */
 export const TUTORIAL_SELF_DEFENCE =
   /\b(attack|strike|hit|swing|shoot|fire|stab|slash|punch|kick|throw|flee|run|escape|retreat|dodge|block|sneak|hide|use|drink|eat|equip|wield|talk|parley)\b/i;
+
+// arb108 — beats that hold the player in the OUTPOST tutorial lockdown: from the
+// name beat through the stay/leave choice. While locked, only the current beat's
+// instructed control works; everything else dims and buzzes. The lock lifts once
+// the player chooses (tutorialExploreChosen) or the beat advances past
+// explore_or_leave (main_quest / pick_city are post-choice).
+//
+// ⚠⚠ OTA-1249 — 'look' ADDED, AND THE LIST MOVED HERE. Owner: *"you should type
+// your name, then get the prompt for look around you, and it should be the only
+// button highlighted."* It was not the only one — it was one of eleven live
+// buttons, because 'look' was the one beat between 'name' and 'explore_or_leave'
+// missing from this list, so the lockdown simply switched off for the length of
+// it. The beat lit LOOK AROUND YOU green and left travel, investigate, take /
+// salvage, craft, inventory and the rest tappable beside it.
+//
+// ⚠ AND IT LIVED IN TWO PLACES — an identical literal array in InputBox and in
+// ExplorationScreen. That is the defect this session has now paid for five times
+// (OTA-1236, 1241, 1244, 1245): a rule computed twice drifts. One export, both
+// readers.
+export const TUT_LOCK_BEATS: readonly string[] = [
+  'name', 'look', 'cudgel', 'armor', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave',
+];
 
 // Tungsten Spire — the new 10-beat in-feed sequence. Each beat is
 // driven by a specific player action; the state machine in gameStore
@@ -106,15 +128,6 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'The Arbiter looks up. "Your name, traveler. Type it, then tap ACT."',
   },
   {
-    // OTA-1094 — CONVERGED FROM GOLEM-LINE, at the owner's direction: "never
-    // noted that lapse in the tutorial, HAL should have the look around you
-    // beat as well." golem commit 5d23d6fd added this beat on that line only
-    // and it was never flagged for porting; the tutorial walk exposed the gap
-    // a month later. The store handler (maybeAdvanceTutorial('look') at the
-    // end of the look-around function) and the InputBox chip-lighting were
-    // ALREADY here — only this step definition was missing, so the beat is
-    // one insertion, verbatim from golem.
-    //
     // The orientation tool — taught FIRST, before the player picks anything up,
     // because it's the "where am I / re-read the room" button. Tapping LOOK
     // AROUND YOU calls maybeAdvanceTutorial('look') and InputBox lights this
@@ -137,9 +150,46 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     area: 'quick-row',
     pulse: true,
     title: 'Take the Cudgel',
-    body: 'Tap TAKE in the quick-action row to pick up the cudgel at your feet.',
+    // ⚠⚠ OTA-1237 — THE INTRO TAUGHT TWO BUTTONS THAT NO LONGER EXIST. Owner: *"we
+    // have to rework the intro now to reflect the new system."* Since OTA-1233 the
+    // quick row carries ONE `take / salvage` button over ONE picker, and these beats
+    // still named the two retired labels one at a time — so a first-time player
+    // hunted the row for a word that is not on it. The overrides meant the beat WORKED
+    // when they found the right button, which is the worst kind of stale copy: not
+    // broken enough to fail a test, just wrong enough to strand someone on turn one.
+    // ⚠ OTA-1245 — the claim trimmed to what the beat can SHOW. This picker is
+    // narrowed to the cudgel alone, so the old line's promise of the entire room in
+    // one card was contradicted by the very next frame. The full layout is taught by
+    // the `picker_colour_lanes` hint on the first real multi-lane room, where it is
+    // actually true.
+    body: 'Tap TAKE / SALVAGE in the quick-action row — it opens the room. Tap the cudgel at your feet to pick it up.',
     arbiter:
-      '"A cudgel, by your boots. Tap TAKE. You\'ll want a weapon."',
+      '"A cudgel, by your boots. Tap TAKE / SALVAGE, then tap the cudgel. You\'ll want a weapon."',
+  },
+  {
+    // ⚠⚠ OTA-1248 — THE EQUIP STEP, WHICH THE TUTORIAL HAD NEVER TAUGHT. Owner:
+    // *"we should also have them equip a piece of updated armor."* The cudgel
+    // AUTO-equips on grant, so a player could finish the whole tutorial having
+    // never once opened their pack — and then wander the wastes wearing nothing.
+    //
+    // ⚠ The vest is a REAL catalog piece against an EMPTY chest slot, so the
+    // picker marks it ★ BETTER on its own. The beat points at a mark the player is
+    // actually looking at rather than describing one.
+    id: 'armor',
+    // ⚠⚠ OTA-1251 — THE BEAT TEACHES THE ★, NOT THE PACK. Owner, on the OTA-1248
+    // version of this copy: *"why are we doing inventory stuff? it was supposed to
+    // highlight the fact you can select and equip the vest from the popup, not from
+    // inventory."* The old wording sent the player OUT of the card the beat exists
+    // to teach, and OTA-1250's lock turned that detour into a dead end — his log
+    // shows fourteen refusals in ninety seconds. A ★ row takes and wears in one tap.
+    remind: 'tap the ★ vest in TAKE / SALVAGE — one tap puts it on',
+    screen: 'exploration',
+    area: 'quick-row',
+    pulse: true,
+    title: 'Wear Something',
+    body: 'A Mud-Warden\'s Vest is here, marked ★ — that means it beats what you have on. Tap it in TAKE / SALVAGE and you put it on in the same move.',
+    arbiter:
+      '"That vest is better than bare cloth, and the star says so. Open TAKE / SALVAGE and tap it — a starred piece goes straight onto your back."',
   },
   {
     id: 'rope',
@@ -159,9 +209,15 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     area: 'quick-row',
     pulse: true,
     title: 'Salvage the Broken Plate',
-    body: 'That broken chest plate has nothing left in it. Tap SALVAGE to break it down for parts.',
+    // ⚠ Same button as the cudgel beat, and saying so is the lesson: one picker
+    // holds both verbs, and the room tells you which one a thing answers to. The
+    // plate comes up under the yellow SALVAGE heading (OTA-1243 renamed the lane).
+    // ⚠ OTA-1245 — "group" implied neighbours the beat does not show. It DOES come
+    // up under a yellow SALVAGE heading, so the colour vocabulary is introduced
+    // truthfully here and pays off when the real board appears.
+    body: 'That broken chest plate has nothing left in it. Open TAKE / SALVAGE again — the plate comes up under yellow SALVAGE. Tap it to break it down.',
     arbiter:
-      '"That broken plate is worth more in pieces. Tap SALVAGE."',
+      '"That broken plate is worth more in pieces. Same button as before — TAKE / SALVAGE. The yellow ones salvage. Tap the plate."',
   },
   {
     id: 'climb',

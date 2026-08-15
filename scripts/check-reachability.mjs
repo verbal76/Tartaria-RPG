@@ -13,7 +13,7 @@
 // code — that is the P2 class of finding in PUNCHLIST.md, which took reading the spawn
 // logic to see. A clean run here means "no dangling references", NOT "everything is
 // reachable". Saying otherwise would make this the sort of green check that teaches people
-// to stop looking, which this repo has already been burned by once (see OTA-1205 and the
+// to stop looking, which this repo has already been burned by once (see OTA-1182 and the
 // permanently-red iOS build).
 //
 // Usage:  node scripts/check-reachability.mjs

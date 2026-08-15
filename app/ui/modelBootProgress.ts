@@ -1,4 +1,4 @@
-// ⚠⚠ OTA-1251 — THE 51% THAT NEVER MOVED, EXTRACTED SO IT CAN BE PROVEN.
+// ⚠⚠ OTA-1228 — THE 51% THAT NEVER MOVED, EXTRACTED SO IT CAN BE PROVEN.
 //
 // Owner, on the PC build: *"I think the arbiter first time setup has frozen, it
 // did this before on my Steam Deck. it's been a few minutes and it's hanging at

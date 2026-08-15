@@ -46,7 +46,7 @@ describe('titles — earning engine', () => {
   });
 
   it('storm survival awards Etherbound Survivor + Aetheric Attuned', () => {
-    // OTA-1069 — this asserted stormsSurvived: 1, which was the defect itself:
+    // OTA-1046 — this asserted stormsSurvived: 1, which was the defect itself:
     // one tick of ambient weather paid out both titles, in the tutorial, before
     // the player had done anything. Retargeted to the real thresholds so the
     // test still proves the titles ARE reachable without re-encoding the bug.
@@ -57,7 +57,7 @@ describe('titles — earning engine', () => {
     expect(got).toContain('aetheric_attuned');
   });
 
-  it('one ambient storm tick awards NOTHING (OTA-1069)', () => {
+  it('one ambient storm tick awards NOTHING (OTA-1046)', () => {
     const got = evaluateEarnedTitles(mk({ titleProgress: withTitleProgress({ stormsSurvived: 1 }) }));
     expect(got).not.toContain('etherbound_survivor');
     expect(got).not.toContain('aetheric_attuned');
@@ -76,7 +76,7 @@ describe('titles — earning engine', () => {
   });
 
   it('derived titles: Scion (race+faction), Explorer (locations), Golem (companion), Aetherborn (race+corruption)', () => {
-    // OTA-1070 — descent alone used to award this, and both fields are set at
+    // OTA-1047 — descent alone used to award this, and both fields are set at
     // CHARACTER CREATION, so the assertion below was pinning "earned for free".
     // Canon asks the player to PROVE descent; standing is the proof.
     expect(evaluateEarnedTitles(mk({ raceId: 'tartarian_giant', factionId: 'servants_of_giants' }))).not.toContain('scion_of_the_giants');
@@ -89,7 +89,7 @@ describe('titles — earning engine', () => {
       factionStanding: [{ factionId: 'mud_monarchs', standing: STANDING_FOR_SCION }],
     }))).not.toContain('scion_of_the_giants');
     expect(evaluateEarnedTitles(mk({ mainQuest: { coresRecovered: ['asgardar'] } }))).toContain('etheric_explorer');
-    // OTA-1070 — was `!!player.golem`. Canon asks for CONTROL, so the golem has
+    // OTA-1047 — was `!!player.golem`. Canon asks for CONTROL, so the golem has
     // to have actually fought for you.
     expect(evaluateEarnedTitles(mk({ golem: { hp: 10 } }))).not.toContain('golem_whisperer');
     expect(evaluateEarnedTitles(mk({
@@ -102,7 +102,7 @@ describe('titles — earning engine', () => {
 
   it('fusion + repair award their titles', () => {
     expect(evaluateEarnedTitles(mk({ titleProgress: withTitleProgress({ fusionsCompleted: 1 }) }))).toContain('master_of_aethercraft');
-    // OTA-1070 — was 1 repair.
+    // OTA-1047 — was 1 repair.
     expect(evaluateEarnedTitles(mk({ titleProgress: withTitleProgress({ repairsCompleted: 1 }) }))).not.toContain('architects_eye');
     expect(evaluateEarnedTitles(mk({
       titleProgress: withTitleProgress({ repairsCompleted: REPAIRS_FOR_ARCHITECTS_EYE }),
@@ -115,10 +115,10 @@ describe('titles — earning engine', () => {
   });
 
   it('wires every title in the catalogue (14 Tier-A/B + 6 Tier-C + Skyreacher + Historian)', () => {
-    // ⚠ OTA-1206 — was `.toBe(21)`. A 22nd title (Historian of the Buried World) landed on
+    // ⚠ OTA-1183 — was `.toBe(21)`. A 22nd title (Historian of the Buried World) landed on
     // owner instruction, and a hardcoded count turns every future title into a red test
     // rather than a wiring check. The real claim — that the engine list and the data
-    // catalogue agree exactly — is pinned in ota1206CollectionPayoff.
+    // catalogue agree exactly — is pinned in ota1183CollectionPayoff.
     expect(WIRED_TITLE_IDS.size).toBeGreaterThanOrEqual(21);
     expect(WIRED_TITLE_IDS.has('guild_broker')).toBe(true);
     expect(WIRED_TITLE_IDS.has('speaker_of_forgotten_tongues')).toBe(true);

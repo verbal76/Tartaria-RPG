@@ -1,11 +1,11 @@
-// OTA-1184 — WHAT YOU GAVE, TO WHOM, AND HOW THEY TOOK IT.
+// OTA-1161 — WHAT YOU GAVE, TO WHOM, AND HOW THEY TOOK IT.
 //
 // Owner: "instead of things given away under arbitor, it should say gifts given,
 // and if you tap it, it should show you what you gave to whom and how they
 // received it."
 //
 // The data was always there — `npcRelations[id].gifts` has recorded the object by
-// name since OTA-1083 — but nothing read it back. The sheet showed a bare count and
+// name since OTA-1060 — but nothing read it back. The sheet showed a bare count and
 // the reaction was computed at give-time and dropped on the floor, so the record
 // could not distinguish a gift somebody loved from one that insulted them.
 //
@@ -25,7 +25,7 @@ export interface GiftLedgerEntry {
   atHours: number;
   /** In-game day, 1-based, matching how the feed talks about time. */
   day: number;
-  /** How it landed. Undefined for gifts given before OTA-1184 started recording it. */
+  /** How it landed. Undefined for gifts given before OTA-1161 started recording it. */
   reaction?: 'loved' | 'liked' | 'polite' | 'disliked' | 'insulted';
   /** Faction standing that actually moved, when it was recorded. */
   standingDelta?: number;
@@ -34,7 +34,7 @@ export interface GiftLedgerEntry {
 /** Player-facing phrasing for a reaction. ⚠ Kept here rather than in the screen so
  *  the ledger and any future surface (a Chronicle line, a vendor recap) describe the
  *  same reaction with the same word. `disliked` is deliberately NOT an insult —
- *  OTA-1176 introduced that tier precisely because a shrug and a refusal had been
+ *  OTA-1153 introduced that tier precisely because a shrug and a refusal had been
  *  reading identically. */
 export const REACTION_WORD: Record<string, string> = {
   loved: 'loved it',
@@ -71,7 +71,7 @@ export function giftLedger(
 
 /** The one-line summary a ledger row renders as. Reaction is omitted rather than
  *  guessed when it was never recorded — an invented reaction on a historical gift
- *  would be worse than a blank, because OTA-1176 rewrote the entire taste table
+ *  would be worse than a blank, because OTA-1153 rewrote the entire taste table
  *  underneath those older entries. */
 export function giftLedgerLine(e: GiftLedgerEntry): string {
   const word = e.reaction ? REACTION_WORD[e.reaction] : null;

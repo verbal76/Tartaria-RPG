@@ -1,7 +1,7 @@
 import type { SaveState } from './types';
 import { OTA_BUILD_ID } from '../buildInfo';
 
-// OTA-1201 — SAVE EXPORT / IMPORT. A CHARACTER YOU CAN GET BACK.
+// OTA-1178 — SAVE EXPORT / IMPORT. A CHARACTER YOU CAN GET BACK.
 //
 // ⚠⚠ WHY THIS EXISTS, and it is not hypothetical. On 2026-08-08 the owner
 // reinstalled the app to clear a memory kill and **the character was gone —

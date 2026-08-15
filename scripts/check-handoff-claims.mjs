@@ -49,7 +49,7 @@ import { dirname, join } from 'node:path';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const baselineFile = join(root, '.ci-handoff-claims-baseline');
-// OTA-1200 — second ratchet, own baseline. Separate files so one debt shrinking cannot
+// OTA-1177 — second ratchet, own baseline. Separate files so one debt shrinking cannot
 // mask the other growing.
 const causeBaselineFile = join(root, '.ci-handoff-causes-baseline');
 // HANDOFF-ARCHIVE.md is deliberately NOT scanned: it is frozen history, kept
@@ -97,8 +97,8 @@ const ISO_DATE = /\b20\d\d-\d\d-\d\d\b/;
 // ⚠⚠ WHY THIS EXISTS, and it cost a full day to learn. 2026-08-08: a crash arrived with
 // no JS error recorded. I reasoned my way to "memory pressure from an unserialized
 // ~400MB model load", wrote a persuasive paragraph, and shipped a BEHAVIOUR change on
-// it (OTA-1196). It built a reload loop — seven ~400MB allocations in forty seconds —
-// which OTA-1198 then had to interlock. The measurement finally arrived as three
+// it (OTA-1173). It built a reload loop — seven ~400MB allocations in forty seconds —
+// which OTA-1175 then had to interlock. The measurement finally arrived as three
 // JetsamEvent reports (2026-08-08): `per-process-limit`, 118454–121207 rpages, i.e.
 // ~1.9GB. Memory WAS the domain; the mechanism I asserted was not the one, and the fix
 // aimed at it made things worse.
@@ -110,7 +110,7 @@ const ISO_DATE = /\b20\d\d-\d\d-\d\d\b/;
 //
 // THE RULE THE OWNER AND I AGREED: **measure the cause, or ship an instrument.** This
 // gate is the enforcement, because the previous enforcement was me remembering — and
-// OTA-1195 had already WRITTEN that rule into its own source before OTA-1196 overrode
+// OTA-1172 had already WRITTEN that rule into its own source before OTA-1173 overrode
 // it the same afternoon. A rule that lives only in prose loses to a good argument.
 //
 // WHAT TRIPS IT: a sentence ASSERTING a cause ("the cause was X", "caused by Y", "the
@@ -123,7 +123,7 @@ const ISO_DATE = /\b20\d\d-\d\d-\d\d\b/;
 //   2. A verification verb near an ISO date, the same receipt the prohibition pass
 //      takes.
 //   3. HEDGE IT HONESTLY — "candidate", "hypothesis", "suspected", "unmeasured". This
-//      is not a loophole, it is the OTHER half of the rule working: OTA-1200 shipped a
+//      is not a loophole, it is the OTHER half of the rule working: OTA-1177 shipped a
 //      counter for an orphaned-context THEORY and said so in those words, which is
 //      exactly the behaviour this gate wants. Naming a guess as a guess costs one word
 //      and stops it hardening into a premise three messages later.
@@ -231,7 +231,7 @@ if (causeCount > causeBaseline) {
   console.error(
     `[check-handoff-claims] FAIL — ${causeCount} unmeasured cause claims, baseline ${causeBaseline}.\n\n` +
       'A new sentence names the CAUSE of something without saying how that was established.\n' +
-      'That is the exact move that produced OTA-1196: a well-argued mechanism, shipped as a\n' +
+      'That is the exact move that produced OTA-1173: a well-argued mechanism, shipped as a\n' +
       'behaviour change, that built a reload loop — while the real measurement (three\n' +
       'JetsamEvent reports, ~1.9GB, per-process-limit) did not arrive until a day later.\n\n' +
       'Fix it in one of three ways, and the third is fully legitimate:\n' +

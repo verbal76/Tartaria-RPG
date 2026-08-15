@@ -1,5 +1,5 @@
 {
-  "_comment": "OTA-1066 — the ROLL button's name pool. Was three hardcoded names (Rust, Cinder, Marrow) drawn with replacement, so a player tapping ROLL fifteen times saw the same two or three over and over. Fifty names now, drawn from a shuffle bag so consecutive taps never repeat until the bag is exhausted. Mix of grounded working-dog names and buried-world flavor: the player is naming a rescued animal, not christening a relic, so the list stays sayable.",
+  "_comment": "OTA-1043 — the ROLL button's name pool. Was three hardcoded names (Rust, Cinder, Marrow) drawn with replacement, so a player tapping ROLL fifteen times saw the same two or three over and over. Fifty names now, drawn from a shuffle bag so consecutive taps never repeat until the bag is exhausted. Mix of grounded working-dog names and buried-world flavor: the player is naming a rescued animal, not christening a relic, so the list stays sayable.",
   "names": [
     "Rust",
     "Cinder",

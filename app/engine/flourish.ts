@@ -1,4 +1,4 @@
-// OTA-1086 — THE FLOURISH. One short beat of stage business after a reply.
+// OTA-1063 — THE FLOURISH. One short beat of stage business after a reply.
 //
 // The build plan's wording for this, and the shape of the whole thing:
 // "the LLM contributes at most one short flourish line per exchange, off the
@@ -13,7 +13,7 @@
 // every topic in a set would need its own copy of it.
 //
 // ── WHY THE MODEL IS STILL NOT IN THE CRITICAL PATH ───────────────────────
-// OTA-1081 shipped the conversation entirely synchronous because a 14-20s
+// OTA-1058 shipped the conversation entirely synchronous because a 14-20s
 // local generation in front of a tapped topic is a loading screen. Nothing about that has
 // changed, so the flourish does NOT wait for a model either. The order is
 // inverted instead: the TEMPLATE is the product, always available, always
@@ -81,7 +81,7 @@ const KIND_RULES: { kind: FlourishKind; words: string[] }[] = [
 
 /** The bucket for a person, from whatever the ledger and the id know about
  *  them. `role` is the vendor's job title where there is one; `npcId` carries
- *  the class key for everybody procedural (OTA-1085). */
+ *  the class key for everybody procedural (OTA-1062). */
 export function flourishKindFor(npcId: string, role?: string | null): FlourishKind | null {
   const hay = `${role ?? ''} ${npcId}`.toLowerCase();
   for (const rule of KIND_RULES) {
@@ -92,7 +92,7 @@ export function flourishKindFor(npcId: string, role?: string | null): FlourishKi
 
 /** Stable, cheap, and NOT a random source. Two players in the same state get
  *  the same beat, for the same reason every other line in this system is
- *  deterministic (OTA-1072): a person whose gestures reshuffle on a replay
+ *  deterministic (OTA-1049): a person whose gestures reshuffle on a replay
  *  reads as broken rather than as alive. */
 function hash(s: string): number {
   let h = 2166136261;
@@ -154,8 +154,8 @@ export function flourishFor(req: FlourishRequest): string | null {
  *   - no quotes and no question marks — the model does not get to put words in
  *     anybody's mouth here, that is what the authored topic lines are for;
  *   - no first person and no second-person opener, which are the two registers
- *     the ambient path already proved this model falls into (OTA-1054);
- *   - no instruction echo, which OTA-1053 caught streaming raw to the screen. */
+ *     the ambient path already proved this model falls into (OTA-1031);
+ *   - no instruction echo, which OTA-1030 caught streaming raw to the screen. */
 export function vetModelFlourish(raw: string, npcName: string): string | null {
   const first = (raw ?? '').trim().split(/(?<=[.!?])\s+/)[0]?.trim() ?? '';
   if (!first) return null;

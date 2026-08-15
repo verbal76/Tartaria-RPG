@@ -1,4 +1,4 @@
-// OTA-1083 / rewritten OTA-1177 — the RECIPIENT picker.
+// OTA-1060 / rewritten OTA-1154 — the RECIPIENT picker.
 //
 // It was two steps in one modal: who, then what. The second step is gone — the
 // GIFT button now opens the pack and GIVE appears on the item's own popup, so
@@ -13,7 +13,7 @@ import { useGameStore } from '../state/gameStore';
 import { BrandedModal } from './BrandedModal';
 import { getRelation } from '../engine/npcMemory';
 
-/** OTA-1106 — what the player has WITNESSED of this person's tastes, phrased
+/** OTA-1083 — what the player has WITNESSED of this person's tastes, phrased
  *  for the picker. Entries are ledger strings ('loves:metal', 'cold:food')
  *  recorded only when a gift's reaction revealed them — never the authored
  *  list. Empty until you've learned something. */
@@ -21,11 +21,11 @@ function knownTastesLine(tastes: readonly string[] | undefined): string | null {
   if (!tastes || tastes.length === 0) return null;
   const phrased = tastes.map((t) => {
     const [kind, subject] = [t.slice(0, t.indexOf(':')), t.slice(t.indexOf(':') + 1)];
-    // ⚠ OTA-1176 — THREE TIERS NOW, AND THE ELSE-BRANCH USED TO SWALLOW THEM.
+    // ⚠ OTA-1153 — THREE TIERS NOW, AND THE ELSE-BRANCH USED TO SWALLOW THEM.
     // This was `kind === 'loves' ? loves : 'no use for'`, so the moment `likes:`
     // discoveries existed they would have rendered as "no use for" — the picker
     // telling the player the exact opposite of what they had just witnessed.
-    // `cold:` is the pre-OTA-1176 spelling of `dislikes:` and still sits in old
+    // `cold:` is the pre-OTA-1153 spelling of `dislikes:` and still sits in old
     // saves' ledgers, so it is read here rather than migrated.
     if (kind === 'loves') return `loves ${subject}`;
     if (kind === 'likes') return `likes ${subject}`;
@@ -42,7 +42,7 @@ export function GiftModal() {
 
   if (!ctx) return null;
 
-  // ⚠ OTA-1177 — THIS IS NOW A RECIPIENT PICKER AND NOTHING ELSE.
+  // ⚠ OTA-1154 — THIS IS NOW A RECIPIENT PICKER AND NOTHING ELSE.
   //
   // It used to be two steps: who, then what. The second step listed only your
   // TWELVE most valuable items (sorted by worth, sliced), which meant a cheap

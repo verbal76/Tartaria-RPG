@@ -149,7 +149,7 @@ describe('Two-year chaos simulation of Tartaria Realms', () => {
   // 2x the wander steps per cross-grid trip; 2 years of sim hits this
   // proportionally harder.
   // 2026-05-24 — cut 730d → 180d per playtester ask; timeout 900s → 240s.
-  // OTA-1034 — the old budget predated ~130 OTAs of engine growth (same measured
+// OTA-1011 — the old budget predated ~130 OTAs of engine growth (same measured
 // drift as combatStress, which needed 480s -> 900s). Budget follows reality.
 jest.setTimeout(900000);
 

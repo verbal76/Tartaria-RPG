@@ -194,7 +194,7 @@ export function extractAmbientNouns(description: string | undefined | null): str
 // ambient string is still what we return so display + downstream
 // logic stays untouched.
 export function normalizeForCompare(s: string): string {
-  // OTA-939 — strip the possessive 's (and any stray apostrophes) so a possessive scene
+  // OTA-916 — strip the possessive 's (and any stray apostrophes) so a possessive scene
   // noun ("scribe's quill") matches the parser's apostrophe-stripped tokens ("scribe quill").
   // Without this, `salvage scribe's quill` missed the scene noun entirely and fell through to
   // a fuzzy INVENTORY match (the owner's "Phoenix Feather Quill"), dead-ending the salvage on
@@ -230,7 +230,7 @@ export function matchAmbientNoun(target: string, ambient: readonly string[]): st
   for (const noun of sorted) {
     if (normalizeForCompare(noun) === t) return noun;
   }
-  // OTA-970 — passes 2 + 3 rebuilt at the WORD level. The old passes were raw
+  // OTA-947 — passes 2 + 3 rebuilt at the WORD level. The old passes were raw
   // substring checks, and substrings don't respect word edges: with no "arch"
   // in the scene, pass 3's n.includes(t) happily found the "arch" hiding
   // INSIDE "research chart" — so "attack the arch" swung at a paper chart

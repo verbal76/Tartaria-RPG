@@ -409,7 +409,7 @@ export function rollElevatedOverlay(
   return pick;
 }
 
-/** OTA-996 — #119b: the place-word for the climb-down narration. Overlay ids
+/** OTA-973 — #119b: the place-word for the climb-down narration. Overlay ids
  *  double as labels, and the trader/lookout overlays are named after their
  *  OCCUPANT — so the descent line read "You climb down from the forgotten
  *  scholar". Every person-overlay maps to its perch; unknown ids keep the

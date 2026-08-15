@@ -1,4 +1,4 @@
-// OTA-1193 — DODGE GETS A COOLDOWN, AND THE BUTTON SHOWS IT.
+// OTA-1170 — DODGE GETS A COOLDOWN, AND THE BUTTON SHOWS IT.
 //
 // Owner: "put a cooldown timer on dodge. once it's used have it turn red and slowly fill
 // back to blue; when it's full blue it can be used again. make the color fill left to
@@ -26,11 +26,11 @@
  *  tool in a long fight (~11 uses) instead of being removed from boss play. */
 export const DODGE_COOLDOWN_ROUNDS = 3;
 
-/** ⚠ OTA-1194 — THE LOCK IS PER DIFFICULTY TIER NOW, and this is the only place that
+/** ⚠ OTA-1171 — THE LOCK IS PER DIFFICULTY TIER NOW, and this is the only place that
  *  turns the tier's multiplier into rounds. Owner: *"use this as a baseline and tune the
  *  other levels accordingly."* The constant above stays the BASELINE — it is what 'owed',
  *  the identity row, resolves to — and the tiers are multiples of it: salvage 0 (no
- *  cooldown at all, the pre-OTA-1193 game), owed 3, let_it_come 4, bury_me 5.
+ *  cooldown at all, the pre-OTA-1170 game), owed 3, let_it_come 4, bury_me 5.
  *
  *  ⚠ Takes a plain number rather than a player, deliberately: this file imports NOTHING,
  *  and it stays that way so `pressure.ts` can depend on it without a cycle. The caller
@@ -49,7 +49,7 @@ export function dodgeCooldownRounds(dodgeLock: number | undefined): number {
  *  than to time. The owner asked for a hard edge and no fade; a continuous value here
  *  would invite the renderer to animate between frames and undo that.
  *
- *  ⚠ OTA-1194 — `max` is THE TIER'S round count, not the constant. The denominator has to
+ *  ⚠ OTA-1171 — `max` is THE TIER'S round count, not the constant. The denominator has to
  *  be the same number the store armed, or the bar lies: at bury_me's 5 rounds a bar
  *  divided by 3 would read full blue with two beats still locked, and the chip would
  *  refuse a tap it visibly invited. Defaults to the baseline so every existing caller and
@@ -70,7 +70,7 @@ export function dodgeReady(cooldown: number | undefined): boolean {
 
 /** The refusal. ⚠ It names the ROUNDS remaining, not seconds, so the player learns the
  *  unit the bar is actually counting in. A cooldown that refuses without saying how long
- *  is the OTA-1187 defect again. */
+ *  is the OTA-1164 defect again. */
 export function dodgeCooldownLine(cooldown: number | undefined): string {
   const c = Math.max(1, Math.round(cooldown ?? 1));
   return `You're still recovering your footing — ${c} more ${c === 1 ? 'beat' : 'beats'} before you can set for another dodge.`;

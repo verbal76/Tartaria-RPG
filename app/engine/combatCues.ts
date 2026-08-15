@@ -1,4 +1,4 @@
-// OTA-959 — combat LEGIBILITY cues ("show me my build is working"). The math already
+// OTA-936 — combat LEGIBILITY cues ("show me my build is working"). The math already
 // runs — armor resists, coatings, title/race halves — but it surfaces only as terse
 // bracket clauses ("[armor -40%, title 1/2]"). These once-per-encounter plain-language
 // lines make the defensive half of the build FELT: praise when a matched resist soaks

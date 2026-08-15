@@ -1,4 +1,4 @@
-// OTA-1089 — PHASE 4: LET THE DEBT COME DUE, BEHIND A DIFFICULTY TOGGLE.
+// OTA-1066 — PHASE 4: LET THE DEBT COME DUE, BEHIND A DIFFICULTY TOGGLE.
 //
 // The build plan: "the ledger actually calls. Corruption, standing and elapsed
 // time produce consequences you can feel. You have every substrate already —
@@ -36,7 +36,7 @@
 // change rule: ⚠ IT CAN BE LOWERED MID-RUN AND NEVER RAISED. You can always
 // ask the buried country for less; you cannot retroactively claim you took
 // more. See canChangeTo.
-// ⚠⚠ OTA-1136 — THE RULE ABOVE IS NOW EXPLICITLY AMENDED, ON THE OWNER'S CALL.
+// ⚠⚠ OTA-1113 — THE RULE ABOVE IS NOW EXPLICITLY AMENDED, ON THE OWNER'S CALL.
 //
 // Everything above this line is the ORIGINAL design and it still holds for the
 // four dials it shipped with. But its founding restriction — "pressure only
@@ -59,7 +59,7 @@
 //   • ⚠ WHAT PROTECTS THE TUNING — the identity row. Every dial is defined so
 //     that 'owed' changes nothing, and every consumer must be written so that
 //     the 'owed' value is a mathematical no-op, not a value that happens to be
-//     close. The tests enforce this: see ota1136DifficultySystems.
+//     close. The tests enforce this: see ota1113DifficultySystems.
 //
 // ── THE THREE LEVER TYPES ────────────────────────────────────────────────
 // From the survey, and worth keeping in view because it predicts which of
@@ -72,10 +72,10 @@
 // cost/benefit visible rather than defaulting to a multiplier because a
 // multiplier is a config value.
 //
-// ⚠ AND THE TRAP THIS GAME HAS ALREADY HIT ONCE: damage sponges. OTA-1111
+// ⚠ AND THE TRAP THIS GAME HAS ALREADY HIT ONCE: damage sponges. OTA-1088
 // shipped guard-crack precisely because resisted fights refused to end, and
 // combatStress exists to measure stall rate. So NO dial here scales enemy HP
-// or damage, and the pack-size dial is paired with the swing cap (OTA-1112) in
+// or damage, and the pack-size dial is paired with the swing cap (OTA-1089) in
 // its consumer — growing the pack without growing the cap turns 'bury_me' into
 // a stall generator, which is longer rather than harder.
 import type { PlayerCharacter } from './types';
@@ -84,7 +84,7 @@ export type PressureTier = 'salvage' | 'owed' | 'let_it_come' | 'bury_me' | 'cus
 
 /** Ascending. Index IS the ordering, and canChangeTo is the only place that
  *  matters — a tier's position must never be inferred anywhere else.
- *  ⚠ OTA-1136 — 'custom' is deliberately NOT in this list. It has no position
+ *  ⚠ OTA-1113 — 'custom' is deliberately NOT in this list. It has no position
  *  on a one-dimensional ladder because it is not a point on one: it is a set of
  *  per-system choices. See canChangeTo for how the lower-only rule survives
  *  that. */
@@ -119,12 +119,12 @@ export interface PressureProfile {
   /** EXPOSURE — multiplier on weather HP bite. Same rule. */
   exposure: number;
 
-  // ── OTA-1136 — THE GAME-WIDE DIALS ────────────────────────────────────
+  // ── OTA-1113 — THE GAME-WIDE DIALS ────────────────────────────────────
   // Every one of these is defined so that 'owed' is a mathematical no-op.
   // A consumer that cannot honour that must not use the dial.
 
   /** MULTIPLIER — the wasteland encounter roll. 1.0 = the shipped 0.29 /
-   *  0.225 (OTA-1134). Scales the chance a step produces an encounter AT
+   *  0.225 (OTA-1111). Scales the chance a step produces an encounter AT
    *  ALL; what KIND it produces is `discovery` below. */
   spawn: number;
   /** MULTIPLIER — how generous the world is with the encounters that HELP:
@@ -136,7 +136,7 @@ export interface PressureProfile {
   discovery: number;
   /** MULTIPLIER — bodies in an attack party. The owner asked for both
    *  directions: 'salvage' shrinks packs, 'bury_me' grows them. ⚠ Its
-   *  consumer MUST scale the OTA-1112 swing cap alongside it; see the header. */
+   *  consumer MUST scale the OTA-1089 swing cap alongside it; see the header. */
   pack: number;
   /** MULTIPLIER — loot found per tile. ⚠ Kept gentle on purpose: this stacks
    *  with TIDE's price drift, and cutting supply while raising prices is the
@@ -157,12 +157,12 @@ export interface PressureProfile {
    *  discovered). true = discovery only, nothing given away. */
   witholdIntel: boolean;
 
-  // ── OTA-1194 — THE THREE COMBAT-FEEL DIALS ────────────────────────────
-  // Owner, after the OTA-1192/1193 balance pass landed: *"if I'm tuning this to
+  // ── OTA-1171 — THE THREE COMBAT-FEEL DIALS ────────────────────────────
+  // Owner, after the OTA-1169/1193 balance pass landed: *"if I'm tuning this to
   // be normal difficulty level just above the bottom, can you use this as a
   // baseline and tune the other levels accordingly."*
   //
-  // ⚠ WHY THESE THREE AND NOT A NEW MULTIPLIER. OTA-1190 through 1193 changed
+  // ⚠ WHY THESE THREE AND NOT A NEW MULTIPLIER. OTA-1167 through 1193 changed
   // how the game FEELS in a fight — the hunt scaler learned to read gear, HP
   // regen moved to per-tile, and dodge got a cooldown. Every one of those is a
   // GLOBAL constant. So the gentlest tier took the identical nerf the owner's
@@ -171,12 +171,12 @@ export interface PressureProfile {
   // decide whether you feel invincible is not a ladder.
   //
   // ⚠⚠ AND `gearBlend` KNOWINGLY CROSSES THIS FILE'S OWN LINE — recorded here
-  // rather than quietly worked around, the same way OTA-1136 recorded its
+  // rather than quietly worked around, the same way OTA-1113 recorded its
   // reversal. The header says: *"NO dial here scales enemy HP or damage."* This
   // one does, at one remove: it changes how much of your kit `overLevelT` can
   // see, which moves the spawn's tier, which moves its stats.
   //   • WHY IT IS STILL RIGHT — the prohibition exists to forbid DAMAGE SPONGES
-  //     (see OTA-1111 guard-crack and the combatStress stall metric). This is
+  //     (see OTA-1088 guard-crack and the combatStress stall metric). This is
   //     the opposite failure mode: the complaint is that a fully-kitted
   //     character fights the world a fresh arrival fights. Scaling the blend
   //     makes the world MATCH the player rather than inflating a health bar,
@@ -186,27 +186,27 @@ export interface PressureProfile {
   //     baseline the owner is playing right now is the baseline that ships.
 
   /** MULTIPLIER on `DODGE_COOLDOWN_ROUNDS` (3). ⚠ `salvage` is **0**, i.e. no
-   *  cooldown at all — deliberately the pre-OTA-1193 behaviour, because the
+   *  cooldown at all — deliberately the pre-OTA-1170 behaviour, because the
    *  free-dodge loop is exactly the safety net a struggling player is asking
    *  for when they pick the gentlest tier. Written as thirds so the product is
    *  a whole number of rounds and the intent is readable at the call site. */
   dodgeLock: number;
   /** MULTIPLIER on HP regen from worn armour. ⚠ Only the PER-TILE HP half —
-   *  stamina regen is untouched, for the same reason OTA-1192 left it alone
+   *  stamina regen is untouched, for the same reason OTA-1169 left it alone
    *  (it is barely a combat resource, and tiles already drain it). Above 1.0 a
    *  gentler tier mends faster on the road. */
   mend: number;
   /** MULTIPLIER on `GEAR_POWER_BLEND` (0.5). 1.0 = the shipped half weight. At
    *  `bury_me` this reaches **2.0 → the full designed weight of 1.0**, which
-   *  OTA-1182 wrote and then deliberately shipped at half awaiting device
+   *  OTA-1159 wrote and then deliberately shipped at half awaiting device
    *  evidence: the top tier is where that evidence costs least. ⚠ It can never
    *  make the world EASIER than authored — `gearPowerTerm` clamps both terms at
    *  0 above a fresh-arrival baseline, so a multiplier only scales something
    *  already non-negative. */
   gearBlend: number;
 
-  // ⚠ OTA-1140 — THE `hunger` DIAL IS GONE, AND THIS IS WHY.
-  // OTA-1136 wrote it as "MULTIPLIER — hunger clock rate. 1.0 = +1 stamina
+  // ⚠ OTA-1117 — THE `hunger` DIAL IS GONE, AND THIS IS WHY.
+  // OTA-1113 wrote it as "MULTIPLIER — hunger clock rate. 1.0 = +1 stamina
   // penalty per 8 in-game hours, exactly as shipped." That description was
   // wrong when it was written. Hunger had ALREADY been removed from the game:
   // `effectiveStaminaMax` ignores `hungerStaminaPenalty` outright, and both
@@ -234,7 +234,7 @@ export const PRESSURE_PROFILES: Record<Exclude<PressureTier, 'custom'>, Pressure
     tide: 0, hostile: 0, creep: 0.5, exposure: 0.5,
     spawn: 0.6, discovery: 1.4, pack: 0.7, loot: 1.25, elite: 0,
     witholdIdentity: false, witholdIntel: false,
-    // ⚠ dodgeLock 0 = NO cooldown, the pre-OTA-1193 game. This tier's whole
+    // ⚠ dodgeLock 0 = NO cooldown, the pre-OTA-1170 game. This tier's whole
     // promise is "the mud lets you work"; taking the safety net away from the
     // player who asked for one is the wrong direction on the wrong rung.
     dodgeLock: 0, mend: 1.5, gearBlend: 0.5,
@@ -246,7 +246,7 @@ export const PRESSURE_PROFILES: Record<Exclude<PressureTier, 'custom'>, Pressure
     tide: 1, hostile: 1, creep: 1, exposure: 1,
     // ⚠ THE IDENTITY ROW. Every value here must be a no-op. This is what
     // protects a year of combat tuning from the amendment in the header, and
-    // ota1136DifficultySystems asserts it verbatim.
+    // ota1113DifficultySystems asserts it verbatim.
     spawn: 1, discovery: 1, pack: 1, loot: 1, elite: 0,
     witholdIdentity: false, witholdIntel: false,
     // ⚠ THE IDENTITY ROW CONTINUES. 1 × 3 rounds = the shipped 3, ×1 regen, and
@@ -281,13 +281,13 @@ export const PRESSURE_PROFILES: Record<Exclude<PressureTier, 'custom'>, Pressure
     // so a longer lock would delete the stance from normal play rather than
     // rationing it, and a tool you never get to use is not a harder game.
     // ⚠ gearBlend 2 takes GEAR_POWER_BLEND to its full designed 1.0 — the
-    // weight OTA-1182 wrote and shipped at half pending evidence.
+    // weight OTA-1159 wrote and shipped at half pending evidence.
     dodgeLock: 5 / 3, mend: 0.5, gearBlend: 2,
   },
 };
 
 export function isPressureTier(v: string | undefined | null): v is PressureTier {
-  // ⚠ OTA-1136 — 'custom' IS a valid tier and must validate here, even though
+  // ⚠ OTA-1113 — 'custom' IS a valid tier and must validate here, even though
   // it is deliberately absent from PRESSURE_ORDER (it has no rung on the
   // ladder — see canChangeTo). Testing membership of the ORDER alone silently
   // demoted every custom character to the default: pressureOf fell through to
@@ -296,13 +296,13 @@ export function isPressureTier(v: string | undefined | null): v is PressureTier 
 }
 
 /** The tier this character is playing. Absent = DEFAULT_PRESSURE, which is
- *  what every pre-OTA-1089 save reads as. Tolerant of a junk value from a
+ *  what every pre-OTA-1066 save reads as. Tolerant of a junk value from a
  *  hand-edited or newer save rather than throwing at it. */
 export function pressureOf(p: Pick<PlayerCharacter, 'pressure'> | null | undefined): PressureTier {
   return isPressureTier(p?.pressure) ? p!.pressure! : DEFAULT_PRESSURE;
 }
 
-/** ⚠ OTA-1136 — COMPOSES for a CUSTOM character. Every consumer that already
+/** ⚠ OTA-1113 — COMPOSES for a CUSTOM character. Every consumer that already
  *  read `profileOf(player).tide` keeps working and becomes custom-aware for
  *  free, without each site having to learn that a fifth tier exists. A preset
  *  returns its own row untouched (same object identity as before), so this is
@@ -332,7 +332,7 @@ export function profileOf(
     elite: pickOf('elite').elite,
     witholdIdentity: pickOf('identity').witholdIdentity,
     witholdIntel: pickOf('intel').witholdIntel,
-    // OTA-1194 — each governed by its own switch, so "let it come, but leave my
+    // OTA-1171 — each governed by its own switch, so "let it come, but leave my
     // dodge alone" is expressible like every other system here.
     dodgeLock: pickOf('dodgeLock').dodgeLock,
     mend: pickOf('mend').mend,
@@ -345,7 +345,7 @@ export function profileOf(
  *  "Bury me with them" that they spent on "I only came for the salvage."
  *  Equality is allowed so a no-op tap is not an error.
  *
- *  ⚠ OTA-1136 — AND CUSTOM DOES NOT GET TO BE A BACK DOOR. A set of per-system
+ *  ⚠ OTA-1113 — AND CUSTOM DOES NOT GET TO BE A BACK DOOR. A set of per-system
  *  switches has no position on a one-dimensional ladder, which is exactly the
  *  shape a player could have used to climb: pick 'salvage', then "customise"
  *  to bury_me numbers on every system and call it a sidegrade. So a custom
@@ -472,7 +472,7 @@ export function scaledWeatherBite(raw: number, profile: PressureProfile): number
 }
 
 
-// ── OTA-1136 — CUSTOM: PICK THE INTENSITY, THEN PICK WHAT IT TOUCHES ──────
+// ── OTA-1113 — CUSTOM: PICK THE INTENSITY, THEN PICK WHAT IT TOUCHES ──────
 //
 // Owner: "create a custom selection that fires a popup and lets you check what
 // systems they want to effect."
@@ -499,7 +499,7 @@ export type DifficultySystemId =
   | 'spawn' | 'discovery' | 'pack' | 'loot' | 'elite'
   | 'identity' | 'intel'
   | 'tide' | 'hostile' | 'creep' | 'exposure'
-  // OTA-1194 — the three combat-feel dials.
+  // OTA-1171 — the three combat-feel dials.
   | 'dodgeLock' | 'mend' | 'gearBlend';
 
 export interface DifficultySystem {
@@ -522,7 +522,7 @@ export const DIFFICULTY_SYSTEMS: readonly DifficultySystem[] = [
     blurb: 'How many bodies come at you at once.' },
   { id: 'elite', label: 'Elites instead of numbers', kind: 'content',
     blurb: 'A group of common foes sometimes arrives as one dangerous one instead.' },
-  // OTA-1194 — grouped with the other fight dials, above the world dials,
+  // OTA-1171 — grouped with the other fight dials, above the world dials,
   // because these are the three the player will feel first.
   { id: 'dodgeLock', label: 'Dodge recharge', kind: 'multiplier',
     blurb: 'How many beats you spend recovering your footing before you can set for another dodge.' },
@@ -589,14 +589,14 @@ export function dialOf<K extends keyof PressureProfile>(
 }
 
 /** ⚠ PACK SIZE AND THE SWING CAP MOVE TOGETHER, ALWAYS. Growing a pack without
- *  growing OTA-1112's per-round swing cap does not make the fight harder, it
+ *  growing OTA-1089's per-round swing cap does not make the fight harder, it
  *  makes it longer — bodies queue up behind a cap that never let them act, and
  *  the sim's stall tail comes straight back. Both consumers call this. */
 export function scaledPackSize(base: number, mult: number): number {
   return Math.max(1, Math.round(base * mult));
 }
 
-/** ⚠ OTA-1194 — PER-TILE HP REGEN, SCALED BY TIER. Rounds rather than floors, and that
+/** ⚠ OTA-1171 — PER-TILE HP REGEN, SCALED BY TIER. Rounds rather than floors, and that
  *  choice is load-bearing in both directions:
  *   • At the cap — `HP_REGEN_CAP` is 2, and the owner's run wears the full 2 — bury_me's
  *     ×0.5 gives 1. That is the real halving, landing exactly where the problem was

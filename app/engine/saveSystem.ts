@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { FallenGearPiece, SaveState } from './types';
 import { capDiskLog } from './diskLogCap';
-// OTA-1201 — import path trims like the store's persist path does; saveSlot does not.
+// OTA-1178 — import path trims like the store's persist path does; saveSlot does not.
 import { trimSaveStateToFit } from './saveTrim';
 
 // v2 schema: multi-slot. Each character is its own keyed save with its
@@ -49,7 +49,7 @@ export interface SlotSummary {
    *  abandoned / dead dogs leave these fields undefined. */
   dogName?: string;
   dogBreed?: string;
-  /** OTA-725 — golem companion snapshot, mirroring the dog fields. Only
+  /** OTA-707 — golem companion snapshot, mirroring the dog fields. Only
    *  populated when the save carries a living golem (hp > 0), so the slot tile
    *  shows the whole party at a glance and never dangles a crumbled golem. */
   golemName?: string;
@@ -105,14 +105,14 @@ export interface FallenHero {
   hours: number;
   /** Wall-clock death time (for ordering / recency). */
   ts: number;
-  /** OTA-998 — display names of the gear they died wearing: the Hollowed
+  /** OTA-975 — display names of the gear they died wearing: the Hollowed
    *  revenant's kit + drop pool. Absent on pre-998 records — the revenant
    *  builder synthesizes a seeded kit instead. */
   gearNames?: string[];
-  /** OTA-1017 — full copies of the died-in kit (instance stats and all), so the
+  /** OTA-994 — full copies of the died-in kit (instance stats and all), so the
    *  revenant hands back the REAL gear. Absent on records that predate it. */
   gear?: FallenGearPiece[];
-  /** OTA-998 — set once their Hollowed revenant is put to rest. */
+  /** OTA-975 — set once their Hollowed revenant is put to rest. */
   avengedBy?: string;
   avengedTs?: number;
 }
@@ -128,14 +128,14 @@ export async function recordFallen(hero: FallenHero): Promise<number> {
   return next.length;
 }
 
-/** OTA-998 — mark a fallen entry (matched by death ts) put to rest. Install-wide. */
+/** OTA-975 — mark a fallen entry (matched by death ts) put to rest. Install-wide. */
 export async function markFallenAvenged(ts: number, by: string): Promise<void> {
   const stash = await loadGlobalStash();
   const next = (stash.fallen ?? []).map((f) => (f.ts === ts ? { ...f, avengedBy: by, avengedTs: Date.now() } : f));
   await saveGlobalStash({ ...stash, fallen: next });
 }
 
-/** OTA-1017 — pin a SYNTHESIZED (pre-snapshot) revenant kit onto its record the
+/** OTA-994 — pin a SYNTHESIZED (pre-snapshot) revenant kit onto its record the
  *  first time it is generated, so a later catalog edit can never reshuffle the
  *  gear a named fallen wears. Never overwrites a real recorded kit. */
 export async function pinFallenGearNames(ts: number, gearNames: string[]): Promise<void> {
@@ -195,7 +195,7 @@ export async function ensureFirstInstallSeed(): Promise<{ seeded: boolean; gems:
   return { seeded: true, gems: stash.resurrectionGems };
 }
 
-// OTA-958 — arb89 grantDevGemOnce + OTA-461 grantTestSupplyGiftOnce are RETIRED. The
+// OTA-935 — arb89 grantDevGemOnce + OTA-461 grantTestSupplyGiftOnce are RETIRED. The
 // OTA-948/949 dev-grant cleanup moved the dev gem + supply kit to the tutorial
 // name-commit (creation-only) and removed every load-path grant, which left these
 // once-per-slot latch functions with zero callers. The devGemGrantedSlots /
@@ -472,8 +472,7 @@ export async function saveSlot(slotId: string, state: SaveState): Promise<void> 
       dogBreed: state.player.dog && state.player.dog.status !== 'abandoned' && state.player.dog.status !== 'dead'
         ? state.player.dog.breed
         : undefined,
-      // OTA-725 — golem snapshot. Only when a living golem is bound (hp > 0), so
-      // a summoned/kept golem shows on the slot tile beside the dog.
+      // OTA-707 — golem snapshot. Only when a living golem is bound (hp > 0).
       golemName: state.player.golem && state.player.golem.hp > 0 ? state.player.golem.name : undefined,
       golemKind: state.player.golem && state.player.golem.hp > 0
         ? state.player.golem.kind.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
@@ -489,7 +488,7 @@ async function readCreatedAt(slotId: string): Promise<number | null> {
   return found?.createdAt ?? null;
 }
 
-/** OTA-1201 — restore an exported character. ⚠⚠ ALWAYS A NEW SLOT, NEVER AN
+/** OTA-1178 — restore an exported character. ⚠⚠ ALWAYS A NEW SLOT, NEVER AN
  *  OVERWRITE, and this is the property the whole feature is built around: a
  *  player restoring a backup has already lost something once, and no confirm
  *  dialog is a good enough guard against a mis-tap that would cost them a second
@@ -576,7 +575,7 @@ export function clearLastLogWriteError(): void {
   lastLogWriteError = null;
 }
 
-// OTA-1035 — BATCHED. The per-line version did a FULL read-modify-write of the
+// OTA-1012 — BATCHED. The per-line version did a FULL read-modify-write of the
 // capped ~400 KB disk log for EVERY line — and one player action emits
 // several lines, so a full log cost megabytes of AsyncStorage bridge traffic
 // per action on device. Lines now land in a pending buffer; ONE chain link
@@ -607,6 +606,59 @@ export function appendLogToDisk(line: string): Promise<void> {
     }
   });
   return logWriteChain;
+}
+
+// ⚠⚠ OTA-1276 — THE LIVE BREADCRUMB, AND WHY IT CANNOT USE THE CHAIN ABOVE.
+//
+// The owner froze mid-game twice and both times the disk log simply STOPPED —
+// and I read those cutoffs as the freeze point. They are not. `appendLogToDisk`
+// batches into `pendingLogLines` and drains on a PROMISE CHAIN, and promises are
+// serviced by the JS thread. **A wedged JS thread never drains the buffer**, so
+// the final lines before a freeze die in memory and never reach disk. The log
+// ends at the last successful FLUSH, which can be many actions earlier.
+//
+// His freeze #2 is what proved the wedge: buttons dead, feed still scrollable.
+// In React Native scrolling is native and survives; onPress needs JS. So the JS
+// thread is stuck in a loop — which also stops the batch drain, the setTimeout
+// freeze sampler AND requestAnimationFrame (a JS timer in RN, JSTimers.js:257),
+// which is why "Freeze watch: no stalls seen" printed straight through a freeze.
+//
+// So this breadcrumb is deliberately NOT batched and NOT chained: one tiny
+// single-key write, issued the moment an action starts, with no read-modify-write
+// of the 400KB log. It races ahead of the wedge instead of queueing behind it.
+// Next boot reads it and can say what the app was ACTUALLY doing last.
+const LAST_BREADCRUMB_KEY = '@tartaria/lastBreadcrumb';
+
+export interface LiveBreadcrumb {
+  at: number;
+  what: string;
+  screen?: string;
+  room?: string;
+}
+
+/** Fire-and-forget. Never awaited by callers — a breadcrumb that could block an
+ *  action would be a worse bug than the one it documents. */
+export function stampLiveBreadcrumb(crumb: LiveBreadcrumb): void {
+  try {
+    void AsyncStorage.setItem(LAST_BREADCRUMB_KEY, JSON.stringify(crumb)).catch(() => { /* ignore */ });
+  } catch { /* never let instrumentation break the game */ }
+}
+
+export async function readLiveBreadcrumb(): Promise<LiveBreadcrumb | null> {
+  try {
+    const raw = await AsyncStorage.getItem(LAST_BREADCRUMB_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw) as LiveBreadcrumb;
+    return typeof p?.at === 'number' && typeof p?.what === 'string' ? p : null;
+  } catch { return null; }
+}
+
+/** Cleared on an ORDERLY exit (background / save-and-quit). A breadcrumb that
+ *  SURVIVES to the next boot therefore means the process died while it was
+ *  still live — the signature of the hard freeze + swipe-kill the owner keeps
+ *  having to do. Same discipline as arb126's in-flight crash breadcrumbs. */
+export async function clearLiveBreadcrumb(): Promise<void> {
+  try { await AsyncStorage.removeItem(LAST_BREADCRUMB_KEY); } catch { /* ignore */ }
 }
 
 // Block until every queued log write has flushed to disk. Called by

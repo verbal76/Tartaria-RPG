@@ -1,4 +1,4 @@
-// OTA-674 — building rooms must remember what you've cleared across a
+// OTA-659 — building rooms must remember what you've cleared across a
 // save→exit→rehydrate cycle. Building state is intentionally transient across
 // load (you resume outside), and the tile's outdoor micro-micro re-rolls when the
 // scene rebuilds — but building-room consumed nouns used to be keyed by that
@@ -61,7 +61,7 @@ async function freshGame() {
   return store;
 }
 
-describe('building room cleared state survives reload (OTA-674)', () => {
+describe('building room cleared state survives reload (OTA-659)', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
   it('stamps a stable building-room micro id and keeps a cleared noun cleared across a simulated reload', async () => {

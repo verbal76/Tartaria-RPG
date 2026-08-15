@@ -293,7 +293,7 @@ export function LoreCodexBody() {
             <Text style={styles.fallenEmpty}>No one has fallen yet. Tartaria is patient.</Text>
           ) : (
             <>
-              {/* OTA-1018 — the header counts the ones still out there. */}
+              {/* OTA-995 — the header counts the ones still out there. */}
               <Text style={styles.counter}>
                 {fallen.length} remembered
                 {fallen.some((h) => !h.avengedBy)
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
   // OTA-845 — The Fallen memorial.
   fallenEntry: { borderLeftWidth: 3, borderLeftColor: '#6a5a4a' },
   fallenEmpty: { color: '#a2977b', fontSize: 12, fontStyle: 'italic', marginTop: 8 },
-  // OTA-1018 — un-avenged entries carry a live warning, amber against the memorial browns.
+  // OTA-995 — un-avenged entries carry a live warning, amber against the memorial browns.
   fallenWalking: { color: '#d9a441', fontSize: 12, fontStyle: 'italic', marginTop: 2 },
   lockedName: { color: '#a2977b', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   lockedSub: { color: '#9a8f79', fontSize: 10, marginTop: 2, fontStyle: 'italic' }, // OTA-920 — was #5a5245 (2.45:1, failed WCAG AA)

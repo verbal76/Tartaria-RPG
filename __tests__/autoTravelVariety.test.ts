@@ -1,4 +1,4 @@
-// OTA-713 — auto-route travel is slightly more eventful and, more
+// OTA-696 — auto-route travel is slightly more eventful and, more
 // importantly, more VARIED: on a plotted course the non-combat archetypes
 // (treasure / npc / fusion_bench — "different encounters") get a small
 // weight bias, so a route brings in more variety WITHOUT more fights.
@@ -44,7 +44,7 @@ function sample(autoTravel: boolean, iterations: number) {
   return { combat, nonCombat, total: combat + nonCombat, types };
 }
 
-describe('OTA-713 — auto-route variety bias', () => {
+describe('OTA-696 — auto-route variety bias', () => {
   const N = 4000;
 
   it('lowers the combat fraction on a plotted course (more non-combat variety)', () => {

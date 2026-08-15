@@ -30,7 +30,7 @@ export function stripArbiterFrame(text: string): string {
     if (m[1]) quoted.push(m[1].trim());
   }
   if (quoted.length > 0) {
-    // ⚠ OTA-1161 — THE ATTRIBUTION COMMA CAME ALONG FOR THE RIDE. Dialogue
+    // ⚠ OTA-1138 — THE ATTRIBUTION COMMA CAME ALONG FOR THE RIDE. Dialogue
     // convention puts a comma INSIDE the closing quote when narration follows:
     //
     //   "You attack as if you mean to leave," the Arbiter murmurs. "Good."
@@ -39,7 +39,7 @@ export function stripArbiterFrame(text: string): string {
     // immersion ask) used to join the pieces raw, producing
     // "…mean to leave, Good." — the two sentences fused by a comma that only
     // ever existed to hand off to the attribution we just deleted. Kokoro then
-    // read them as one run-on, and the OTA-1159 sentence beat never fired
+    // read them as one run-on, and the OTA-1136 sentence beat never fired
     // because there was no terminator left to fire on.
     //
     // The comma is promoted to a full stop ONLY when it was the attribution

@@ -36,11 +36,10 @@ export interface MicroLocation {
   id: string;
   name: string;
   description: string;
-  /** OTA-769 — an ENCLOSED interior / buried-underworld micro-area (a mausoleum,
-   *  catacombs, a facility) whose rooms read as indoors ("vaulted ceiling", "into
-   *  the Grand Hall"). These must NOT be handed to an OUTDOOR surface tile — doing so
-   *  stamped an indoor room name + hall exits onto a player traveling open silt. The
-   *  surface random-assignment skips them; the DESCEND path still reaches them. */
+  /** OTA-749 — an ENCLOSED interior / buried-underworld micro-area whose rooms read
+   *  as indoors. Must NOT be handed to an OUTDOOR surface tile (that stamped an indoor
+   *  room name + hall exits onto a player traveling open silt). Surface assignment
+   *  skips them; the DESCEND path still reaches them. */
   indoor?: boolean;
   microMicroLocations: MicroMicroLocation[];
 }
@@ -194,11 +193,8 @@ export function pickRandomMicroMicroIn(
   if (!macro) return null;
   const candidates: LadderTriple[] = [];
   for (const micro of macro.microLocations) {
-    // OTA-769 — a SURFACE tile never adopts an indoor micro-area (the mausoleum's
-    // Grand Hall etc.); only the DESCEND path (includeIndoor) reaches those. When a
-    // macro is ALL-indoor (e.g. The Aetherstone Deep), a surface tile resolves to no
-    // micro-area at all — it just reads as the outdoor location, and 'go down' opens
-    // the buried rooms.
+    // OTA-749 — a SURFACE tile never adopts an indoor micro-area; only DESCEND
+    // (includeIndoor) reaches those. An all-indoor macro yields no surface micro-area.
     if (micro.indoor && !opts?.includeIndoor) continue;
     for (const microMicro of micro.microMicroLocations) {
       candidates.push({ macro, micro, microMicro });

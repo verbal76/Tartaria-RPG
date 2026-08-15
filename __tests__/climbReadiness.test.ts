@@ -40,7 +40,7 @@ describe('OTA-628 — climbBlockReason', () => {
     expect(climbBlockReason({ ...base, wearsClimbStrap: true, stamina: 0 })).toBe('no_stamina');
   });
 
-  // OTA-799 — a rope is usable down to its LAST point. Only a SPENT rope
+  // OTA-779 — a rope is usable down to its LAST point. Only a SPENT rope
   // (durability ≤ 0) blocks; a low-but-usable rope is green (it climbs and
   // breaks gracefully at 0, with a fraying warning first). Was ≤ wear-per-tier
   // (15), which stranded a whole climb and read red while the rope could pull.

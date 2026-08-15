@@ -93,7 +93,7 @@ describe('atomic saveSlot — failure leaves the live save intact, never throws'
     // Make the verify read-back return the WRONG bytes on BOTH stage attempts
     // (the initial stage AND the OTA-406 post-reclaim retry) — a persistent
     // truncated/quota-capped staged write, so the save genuinely can't land.
-    // OTA-1035 — the shared AsyncStorage mock is PLAIN now (no global jest.fn
+    // OTA-1012 — the shared AsyncStorage mock is PLAIN now (no global jest.fn
     // retention); failure injection uses a suite-scoped spy that calls through.
     jest.spyOn(AsyncStorage, 'getItem')
       .mockImplementationOnce(() => Promise.resolve('garbage-not-the-payload'))

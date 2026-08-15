@@ -5,7 +5,7 @@
 // (so real names like "Mary-Jane" or "O'Brien" survive), collapse whitespace,
 // trim, and hard-cap the length.
 //
-// ⚠⚠ OTA-1253 — TWO HOLES THE ORIGINAL RULE COULD NOT SEE, both found by running
+// ⚠⚠ OTA-1230 — TWO HOLES THE ORIGINAL RULE COULD NOT SEE, both found by running
 // the shipped sanitizer against real input rather than reading it. Owner: *"are
 // we able to stop people from entering emojis in any special characters in the
 // name line?"* Mostly yes, already — but "letters" is a bigger category than it
@@ -38,7 +38,7 @@
 // on one base, and that is the line drawn here.
 //
 // ⚠ WHAT THIS IS NOT: a security boundary. The name is stored as a plain string
-// and rendered through <Text>, which has no markup path — see the OTA-1253 audit
+// and rendered through <Text>, which has no markup path — see the OTA-1230 audit
 // in VERSION.md. This function exists so the name is READABLE and SPEAKABLE, not
 // because anything downstream is unsafe with odd characters in it.
 
@@ -90,7 +90,7 @@ export function sanitizePlayerName(raw: string): string {
     // hyphen. Everything else — emoji, digits, punctuation, symbols — is dropped.
     .replace(/[^\p{L}\p{M}\s'\-]/gu, '')
     .replace(/\s+/g, ' ')
-    // ⚠ OTA-1253 — hyphen and apostrophe are kept for Mary-Jane and O'Brien, and
+    // ⚠ OTA-1230 — hyphen and apostrophe are kept for Mary-Jane and O'Brien, and
     // that allowance was being used as a loophole: "Rob--------" and "''''Rob"
     // cleaned to themselves, because every character in them is on the keep
     // list. Collapse runs to one, and never let a name open or close on
@@ -104,7 +104,7 @@ export function sanitizePlayerName(raw: string): string {
     .replace(/[\s'\-]+$/g, '');
 }
 
-/** ⚠ OTA-1253 — DID THE CLEAN CHANGE ANYTHING THE PLAYER TYPED? The strip used to
+/** ⚠ OTA-1230 — DID THE CLEAN CHANGE ANYTHING THE PLAYER TYPED? The strip used to
  *  be silent: type "Verbal123" and you simply became "Verbal", with no line
  *  anywhere saying so, and the first time you noticed was the character sheet.
  *  Callers use this to say it out loud once, in the Arbiter's voice.

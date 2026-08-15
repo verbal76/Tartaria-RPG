@@ -72,7 +72,7 @@ const CROSSFADE_MS = 12;
 // a sentence boundary the batch is joined with SENTENCE_PAUSE_MS of real silence
 // instead of the gap-removing crossfade. EDGE_FADE_MS tapers each chunk into and
 // out of that silence so the join stays click-free.
-// ⚠ OTA-1159 — 160 → 280. The owner, on the welcome-back line: *"there should
+// ⚠ OTA-1136 — 160 → 280. The owner, on the welcome-back line: *"there should
 // be a slight delay after the name, like how we use a comma to pause a
 // sentence."* 160 ms is under the ~200 ms a listener reads as a deliberate
 // beat, so a full stop landed as a breath and the two sentences ran together.
@@ -132,18 +132,18 @@ interface QueuedUtterance {
    *  audio is the wrong voice and gets discarded; we re-run
    *  forward() with the current voice instead. */
   prefetchVoiceId?: string | null;
-  /** OTA-1155 — true for the first chunk of a line. Only the head reports the
+  /** OTA-1132 — true for the first chunk of a line. Only the head reports the
    *  text-to-audio gap; later chunks are waiting on their own predecessor, not
    *  on the delay the player experienced. */
   lineHead?: boolean;
-  /** ⚠ OTA-1153 — WHEN THIS LINE WENT ON SCREEN. The player has already read it
+  /** ⚠ OTA-1130 — WHEN THIS LINE WENT ON SCREEN. The player has already read it
    *  by the time we get here; this is the clock against which "you read it then
    *  hear it 10 seconds later" is measured. Stamped at enqueue, because that is
    *  the same instant `appendLog` put the text in the feed. */
   queuedAt?: number;
 }
 
-/** ⚠ OTA-1153 — HOW LATE IS TOO LATE. Owner: *"that's what makes the voice feel
+/** ⚠ OTA-1130 — HOW LATE IS TOO LATE. Owner: *"that's what makes the voice feel
  *  late sometimes, you read it then hear it 10 seconds later."* Past this point
  *  speaking the line is worse than silence: the player has read it, moved on,
  *  and the audio arrives as an echo of something they already know, laid over
@@ -204,7 +204,7 @@ const queue: QueuedUtterance[] = [];
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const endsOnTerminator = (s: string): boolean => /[.!?]['")\]]*$/.test(s.trim());
 
-/** ⚠ OTA-1153 — EXTRACTED SO TWO CALLERS SPLIT IDENTICALLY. `speak()` has always
+/** ⚠ OTA-1130 — EXTRACTED SO TWO CALLERS SPLIT IDENTICALLY. `speak()` has always
  *  chunked here; `presynthesize()` now has to produce the SAME chunks, because
  *  the pre-synthesis cache is keyed per chunk and read at enqueue. A split that
  *  differed by one character between the two would miss every single time, and
@@ -245,9 +245,9 @@ function chunkForSpeech(prepared: string): string[] {
   return chunks;
 }
 
-// ⚠ OTA-1153 — THE PRE-SYNTHESIS CACHE, and why it exists at all.
+// ⚠ OTA-1130 — THE PRE-SYNTHESIS CACHE, and why it exists at all.
 //
-// OTA-1152 banked scene intros so the TEXT lands the instant the player walks
+// OTA-1129 banked scene intros so the TEXT lands the instant the player walks
 // in. That made the read-then-hear gap MORE visible, not less: the words became
 // free while the voice still had to be synthesised on arrival. The bank is also
 // what makes the real fix possible for the first time — if the line exists
@@ -280,7 +280,7 @@ function takePresynth(voiceId: string, chunk: string): Float32Array | undefined 
  *
  *  The priority is the whole safety argument. This runs during idle time and
  *  must never delay a line the player is waiting on, so it sits below both the
- *  live voice and the LLM — and OTA-1146's harness cuts it short the moment
+ *  live voice and the LLM — and OTA-1123's harness cuts it short the moment
  *  either arrives. Failure is free: the cache simply misses and the line is
  *  synthesised the ordinary way.
  *
@@ -290,7 +290,7 @@ function takePresynth(voiceId: string, chunk: string): Float32Array | undefined 
 export async function presynthesize(text: string, voiceId?: string | null): Promise<boolean> {
   const settings = getVoiceSettings();
   if (!settings.ttsEnabled) return false;
-  // ⚠ OTA-1163 (pressure test) — EVICT, DON'T WEDGE. The cap used to REFUSE
+  // ⚠ OTA-1140 (pressure test) — EVICT, DON'T WEDGE. The cap used to REFUSE
   // when full, and nothing but an exact-key hit ever removed an entry — so six
   // orphans (a voice change invalidates every key; a bank eviction strands its
   // audio; a duplicate-skip leaves one unspent) made pre-synthesis a permanent
@@ -331,7 +331,7 @@ export async function presynthesize(text: string, voiceId?: string | null): Prom
 export function _resetPresynth(): void { presynth.clear(); }
 export function _presynthSize(): number { return presynth.size; }
 
-/** ⚠ OTA-1155 — THE VOICE LOG SINK. The owner, after clocking the gap by hand:
+/** ⚠ OTA-1132 — THE VOICE LOG SINK. The owner, after clocking the gap by hand:
  *  *"are the text lines and spoken lines timestamped when they fire? this would
  *  help measure the gap."* They were not — `appendLog` timestamps the TEXT, and
  *  nothing at all fired when audio actually began, so the only instrument was a
@@ -349,7 +349,7 @@ function logv(line: string): void {
   try { voiceLogSink?.(line); } catch { /* a broken sink must never break audio */ }
 }
 
-/** OTA-1155 — split the lock WAIT from the synthesis itself. Both are "why the
+/** OTA-1132 — split the lock WAIT from the synthesis itself. Both are "why the
  *  voice was late", but they have completely different fixes: waiting means
  *  something else held the native-ML lock (a Qwen job), while a slow synth means
  *  the line was long or the device was busy. Reporting one number for both would
@@ -364,7 +364,7 @@ function inferSerial(
   // never overlaps a Qwen completion. The lock STAYS (it's what stopped the
   // crash); the arb161 fix is on the Qwen side — a generation cooldown so Qwen
   // doesn't grab this lock on every beat and starve the voice.
-  // OTA-1153 — voice now runs ABOVE the LLM (reversing OTA-634): a narration
+  // OTA-1130 — voice now runs ABOVE the LLM (reversing OTA-634): a narration
   // delayed two seconds is invisible, a voice delayed ten is the most obvious
   // defect in the game. The lock still guarantees one-at-a-time.
   const enqueuedAt = Date.now();
@@ -564,7 +564,7 @@ let prewarmStarted = false;
  *  to call when the model is already ready (returns immediately). */
 export async function prewarmKokoro(): Promise<void> {
   if (prewarmStarted) return;
-  // ⚠⚠ OTA-1251 — NOT ON DESKTOP. THIS IS THE 51% FREEZE.
+  // ⚠⚠ OTA-1228 — NOT ON DESKTOP. THIS IS THE 51% FREEZE.
   //
   // Owner, on the PC build: *"I think the arbiter first time setup has frozen,
   // it did this before on my Steam Deck. it's been a few minutes and it's
@@ -665,7 +665,7 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
   }
   const inFlight = LOADING.get(voiceId);
   if (inFlight) return inFlight;
-  // ⚠ OTA-1251 — the second half of the desktop guard, and the load-bearing one.
+  // ⚠ OTA-1228 — the second half of the desktop guard, and the load-bearing one.
   // The prewarm is the only caller at boot, but a vendor voice swap reaches here
   // too, and one un-awaited executorch call is all it takes to re-wedge the state
   // machine at 'loading'. The existing `fromModelName` check below does NOT cover
@@ -870,7 +870,7 @@ export function speak(text: string, voiceId?: string | null, channel?: string, o
   }
   const chunks = chunkForSpeech(prepared);
   const resolvedVoice = voiceId ?? arbiterVoiceId();
-  // ⚠ OTA-1167 — does this line need the native-ML lock at all? A banked
+  // ⚠ OTA-1144 — does this line need the native-ML lock at all? A banked
   // (pre-synthesised) chunk plays straight from memory; only a chunk we still
   // have to infer will contend with a Qwen job, and only that case may reserve.
   let needsSynth = false;
@@ -880,21 +880,21 @@ export function speak(text: string, voiceId?: string | null, channel?: string, o
     queue.push({
       id: nextId++, text: chunk, voiceId: resolvedVoice, channel, lineId: id,
       endsSentence: endsOnTerminator(chunk),
-      // OTA-1153 — the read-clock starts now; see STALE_LINE_MS. Stamped on
+      // OTA-1130 — the read-clock starts now; see STALE_LINE_MS. Stamped on
       // EVERY chunk so the stale sweep can price any of them.
       queuedAt: Date.now(),
-      // OTA-1155 — but only the FIRST chunk reports the gap. A three-sentence
+      // OTA-1132 — but only the FIRST chunk reports the gap. A three-sentence
       // line would otherwise log three times and the second and third would be
       // measuring the wrong thing entirely — the wait for their own turn behind
       // the sentence before them, not the delay the player felt.
       lineHead: ci === 0,
-      // ⚠ OTA-1153 — PRE-SYNTHESISED AUDIO, if this line was banked ahead of
+      // ⚠ OTA-1130 — PRE-SYNTHESISED AUDIO, if this line was banked ahead of
       // time. When it hits, drain() plays without inferring at all and the
       // voice lands with the text instead of behind it.
       resolvedSamples: banked,
     });
   }
-  // ⚠ OTA-1167 — CLAIM THE SLOT NOW, not when drain() finally reaches the lock.
+  // ⚠ OTA-1144 — CLAIM THE SLOT NOW, not when drain() finally reaches the lock.
   // Between this push and that call, drain awaits the voice model and a durable
   // crash breadcrumb; the device log caught an item synthesis taking the lock
   // inside exactly that gap and holding it for 3.5 s of uninterruptible prefill
@@ -906,7 +906,7 @@ export function speak(text: string, voiceId?: string | null, channel?: string, o
 
 async function drain(): Promise<void> {
   if (currentlySpeaking) return;
-  // ⚠ OTA-1153 — DON'T READ ME SOMETHING I FINISHED READING. Drop whole lines
+  // ⚠ OTA-1130 — DON'T READ ME SOMETHING I FINISHED READING. Drop whole lines
   // whose text has been on screen longer than STALE_LINE_MS before a syllable
   // of them ever played. Keyed by lineId so a line is dropped ENTIRE — never
   // half-spoken, which would be worse than either extreme.
@@ -932,7 +932,7 @@ async function drain(): Promise<void> {
   if (!next) {
     // Nothing left to speak — restore music to full volume.
     void setMusicDuck(false);
-    // OTA-1167 — the queue drained (every line spoken, or the stale sweep took
+    // OTA-1144 — the queue drained (every line spoken, or the stale sweep took
     // them). Nothing is coming to claim the reservation, so drop it now.
     releaseVoiceSlot();
     return;
@@ -965,7 +965,7 @@ async function drain(): Promise<void> {
     // re-infer with the current model.
     const prefetchStillValid = !!next.prefetch
       && (next.prefetchVoiceId === undefined || next.prefetchVoiceId === targetVoice);
-    // ⚠ OTA-1155 — MEASURE THE GAP THE OWNER WAS TIMING BY HAND.
+    // ⚠ OTA-1132 — MEASURE THE GAP THE OWNER WAS TIMING BY HAND.
     // Three separate numbers, because they have three different fixes:
     //   gap   — text on screen → first audio. The thing actually complained
     //           about ("5-6 second delay between welcome back text and when
@@ -973,7 +973,7 @@ async function drain(): Promise<void> {
     //   wait  — of that, how long the native-ML lock was held by something
     //           else. A Qwen job in front of us.
     //   synth — how long Kokoro itself took once it had the lock.
-    // Plus whether the audio came from OTA-1153's pre-synthesis cache, which is
+    // Plus whether the audio came from OTA-1130's pre-synthesis cache, which is
     // the one case where the gap should be near zero — if `cached` shows and
     // the gap is still large, the cache is not the win it was meant to be.
     const timing = { waitMs: 0 };
@@ -984,7 +984,7 @@ async function drain(): Promise<void> {
         ? next.resolvedSamples
         : prefetchStillValid ? await next.prefetch! : await inferSerial(model, next.text, settings.rate, timing),
     );
-    // ⚠ OTA-1167 — the audio for this chunk is in hand (banked, prefetched, or
+    // ⚠ OTA-1144 — the audio for this chunk is in hand (banked, prefetched, or
     // just synthesised under the lock), so the reservation has done its job.
     // Released HERE rather than left to expire so an LLM job waits the real
     // handoff — a few hundred ms — and never the whole deadline.
@@ -1040,7 +1040,7 @@ async function drain(): Promise<void> {
     if (batch.length === 1) {
       // Single chunk — playPcm trims + fades it.
       combined = firstSamples;
-      // ⚠ OTA-1159 — AND IT STILL OWES THE SENTENCE ITS BEAT. The gap above is
+      // ⚠ OTA-1136 — AND IT STILL OWES THE SENTENCE ITS BEAT. The gap above is
       // applied by joinBatch, which only runs when two or more chunks were
       // bundled — and bundling depends on whether the NEXT chunk happened to be
       // inferred yet. So the identical line paused after the full stop or did
@@ -1240,7 +1240,7 @@ function trimSilenceLeadTrail(samples: Float32Array, sampleRate: number): Float3
   const n = samples.length;
   if (n === 0) return samples;
   const THRESHOLD = 0.01;                            // |amp| counted as "sound"
-  // ⚠ OTA-1171 — HEAD GUARD 8ms → 45ms. Owner: *"there has been a few times
+  // ⚠ OTA-1148 — HEAD GUARD 8ms → 45ms. Owner: *"there has been a few times
   // where the arbiter has started speaking and has either skipped his first
   // word or started partway through it."*
   //

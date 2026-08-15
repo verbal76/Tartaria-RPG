@@ -1,5 +1,8 @@
-name: Build · Android APK
+name: Android Build (Tartaria Realms)
 
+# trigger-touch 2026-06-27c: golem-line preview build incl. look-around active-thread + equip-feed-quiet + the librnllama
+# isPredicting crash fix. app/** is paths-ignored, so this non-ignored edit is
+# what fires the build for an app-code-only change on golem-line.
 # OTA-302 (Ember Anvil) — trigger-touch for the production AAB of the
 # arbiters-line working build (arb70) promoted onto the HaL2001 conduit.
 # build-apk's paths-ignore skips app/**, so an OTA bump alone won't fire the
@@ -61,6 +64,11 @@ on:
       - 'release/**'
       - 'claude/**'
       - 'HaL2001'
+      # golem-line is intentionally NOT auto-built anymore — it now ships JS via
+      # the isolated eas-update-golem.yml OTA (golem-line channel only). APKs for
+      # golem (native / version changes) are built manually via workflow_dispatch
+      # against the golem-line ref, so we stop burning build minutes on every JS
+      # tweak.
     tags:
       - 'v*'
     paths-ignore:

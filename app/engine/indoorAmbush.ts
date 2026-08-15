@@ -1,4 +1,4 @@
-// OTA-1055 — WHO CAN AMBUSH YOU INDOORS. A rest-ambush used to draw from the
+// OTA-1032 — WHO CAN AMBUSH YOU INDOORS. A rest-ambush used to draw from the
 // wilderness table wherever you slept, so the owner's log has a Rare 202-HP Mud
 // Cyclops materialising in the Builders' crew bunks inside fortified Asgardar,
 // narrated as if it crossed open country. The ODDS were already right (a hub
@@ -30,7 +30,7 @@ export const INDOOR_AMBUSHERS: Readonly<Record<string, readonly string[]>> = {
     'Iron Spider', 'Rust Lurker', 'Plague Moth', 'Mud-Wracked Aetherkin',
   ],
   // A serious intrusion: a hired blade, a guard-machine, a haunting.
-  // OTA-1056 — Mud Monarch Purifier added: a zealot-knight is exactly the kind
+  // OTA-1033 — Mud Monarch Purifier added: a zealot-knight is exactly the kind
   // of armed caller a capital gets, and he was the one martial human the cast
   // had left out.
   Rare: [
@@ -46,7 +46,7 @@ export const INDOOR_AMBUSHERS: Readonly<Record<string, readonly string[]>> = {
   ],
 };
 
-// OTA-1056 — RAIDERS AND SOLDIERS WEARING A FACTION'S COLOURS. Owner asked the
+// OTA-1033 — RAIDERS AND SOLDIERS WEARING A FACTION'S COLOURS. Owner asked the
 // indoor list to cover raiders and soldiers explicitly. The roster only has six
 // humans total and exactly one martial one below Legendary, so a named-enemy
 // list alone can't carry "a rival faction broke in" at every tier. The game
@@ -58,7 +58,7 @@ export const INDOOR_AMBUSHERS: Readonly<Record<string, readonly string[]>> = {
 // Common is deliberately absent: the cheapest human body is Uncommon, and a
 // Common-tier intruder in a fortified capital is a rat or a loose drone, not a
 // soldier. A soldier is a serious visit by definition.
-// OTA-1058 — the list now lives in factionBodies.ts, because the OUTDOOR raid
+// OTA-1035 — the list now lives in factionBodies.ts, because the OUTDOOR raid
 // builder needed the same one. Re-exported under the old name so nothing that
 // reads the indoor cast has to know where it moved.
 export { FACTION_BODIES as INDOOR_FACTION_BODIES } from './factionBodies';
@@ -73,7 +73,7 @@ export function pickIndoorFactionIntruder(
   factionId: string,
   factionName: string,
 ): Enemy | null {
-  // OTA-1058 — no `nearest`: indoors, a Common-tier intruder really is a rat, and
+  // OTA-1035 — no `nearest`: indoors, a Common-tier intruder really is a rat, and
   // the caller wants the null so it can fall back to the creature cast.
   const body = fb.pickFactionBody(rarity);
   if (!body) return null;
@@ -85,7 +85,7 @@ export function indoorAmbusherNames(): string[] {
   return Object.values(INDOOR_AMBUSHERS).flatMap((names) => [...names]);
 }
 
-// OTA-1056 — the three groups the owner named, so a future edit can't drop one.
+// OTA-1033 — the three groups the owner named, so a future edit can't drop one.
 // (Faction raiders/soldiers are BUILT, not listed, so they're covered by the
 // INDOOR_FACTION_BODIES check rather than by name.)
 export const INDOOR_RAIDERS: readonly string[] = [

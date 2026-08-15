@@ -162,7 +162,7 @@ export function isGreatClimbNoun(noun: string | null | undefined): boolean {
   return greatClimbFor(noun) != null;
 }
 
-/** OTA-1016 — true only when the noun IS one of a climb's authored nouns (article-
+/** OTA-993 — true only when the noun IS one of a climb's authored nouns (article-
  *  stripped, exact), not merely a phrase containing its token. The token
  *  matcher made "Skyreacher Map 2 of 5 — Asgardar Spire" (a purchasable map)
  *  climbable because it contains "asgardar". */

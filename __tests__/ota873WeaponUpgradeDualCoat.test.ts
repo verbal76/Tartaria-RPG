@@ -133,7 +133,7 @@ describe('OTA-873 — upgradeWeaponCoatingSlot + dual-slot applyCoating', () => 
     expect(inv.filter((i) => i.name.startsWith('Odd Fragment'))).toHaveLength(5); // nothing consumed
   });
 
-  // OTA-1117 — RETARGETED. This used to assert the stack was REFUSED outright.
+  // OTA-1094 — RETARGETED. This used to assert the stack was REFUSED outright.
   // That refusal told the player to "split one off first" — an instruction the game
   // gives no way to follow, so a stacked piece could never be upgraded at all and
   // the picker hid it. The upgrade now PEELS one unit (the same move OTA-800 makes

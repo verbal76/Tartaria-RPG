@@ -669,7 +669,7 @@ describe('OTA-110-CHAOS — playerInputChaosSim', () => {
       const idx = src.indexOf('if (player.stamina < climbStaminaCost)');
       expect(idx).toBeGreaterThan(0);
       // Window wide enough to span the OTA-356 fork (ground-refusal + fall).
-      // OTA-1034 — 1600 chars stopped reaching climbFall( once later OTAs grew
+      // OTA-1011 — 1600 chars stopped reaching climbFall( once later OTAs grew
       // the refusal branch's comments (measured 2504 today); margin added.
       const window = src.slice(idx, idx + 5000);
       // The mid-climb fall path is still present...

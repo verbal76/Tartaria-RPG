@@ -1,9 +1,9 @@
-// OTA-1088 — THE DECISION. Full-screen, and the only overlay in the game that
+// OTA-1065 — THE DECISION. Full-screen, and the only overlay in the game that
 // will not let you tap past it.
 //
 // ⚠ NO BACKDROP DISMISS AND NO CLOSE BUTTON, unlike every other modal here.
 // A chapter card is a marker and holds nothing a fast tap could lose
-// (OTA-1043); this holds a choice, and a choice a player can dismiss by
+// (OTA-1020); this holds a choice, and a choice a player can dismiss by
 // accident is a chapter of their story deleted by a stray thumb. There is no
 // "decide later" because there is nowhere for a later decision to live — the
 // question is derived from the save (storyForks.dueFork), so backing out would
@@ -73,7 +73,7 @@ export function StoryForkOverlay() {
   );
 }
 
-// OTA-1095 — RESTYLED ONTO THE HOUSE TOKENS. The owner's style audit found
+// OTA-1072 — RESTYLED ONTO THE HOUSE TOKENS. The owner's style audit found
 // this overlay wearing nine colors that appear NOWHERE else in the app — an
 // invented palette in the same earthy family as the base game but sharing not
 // one token with it. Every value below is now a color the game already owns:

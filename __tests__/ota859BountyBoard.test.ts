@@ -81,7 +81,7 @@ describe('OTA-859 — the store holds several bounties and grinds them together'
     const bB = mkBounty('beta', 'monarchs', 'monarch_waystation2', 3);
     const bC = mkBounty('gamma', 'ghost', 'ghost_hollow', 3);
 
-    // ⚠ OTA-1188 — accepting now requires a FROZEN BOARD: the contract stamps the politics
+    // ⚠ OTA-1165 — accepting now requires a FROZEN BOARD: the contract stamps the politics
     // it was signed under, so there must be a snapshot to stamp. The freeze AUTO-RELEASES
     // on a SUCCESSFUL accept — but a REFUSED one deliberately leaves it held, so the player
     // can fix what was wrong and try again without re-reading the board. That is why this

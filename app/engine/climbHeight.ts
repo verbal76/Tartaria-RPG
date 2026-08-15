@@ -126,13 +126,13 @@ export function sameClimbNoun(a: string, b: string): boolean {
   return longer.endsWith(' ' + shorter);
 }
 
-// OTA-971 — the engine's elevated-investigate gate (gameStore) refuses any ambient
+// OTA-948 — the engine's elevated-investigate gate (gameStore) refuses any ambient
 // noun that isn't the thing you're standing on while elevatedOn is set and no
 // rooftop overlay is active. This is that SAME rule as a pure filter, so UI
 // affordances (the SALVAGE button tone, the salvage picker) agree with the
 // engine instead of advertising ground nouns the engine will refuse. Owner,
 // from a pillar: "the color of the button tells me there is [something]".
-// OTA-973 — Phase A of the real-heights model. A scene noun can be PLACED on a
+// OTA-950 — Phase A of the real-heights model. A scene noun can be PLACED on a
 // climbable structure at a tier (a nest at tier 2 of the tower). Placements
 // live on CurrentScene.nounPlacements; a noun with no placement is on the
 // ground, which is every noun in every scene until the Phase-B seeder ships —
@@ -181,7 +181,7 @@ export function reachableWhileElevated(
   });
 }
 
-// OTA-975 — base climb-fall damage (pre-title-perk shaves), extracted from the
+// OTA-952 — base climb-fall damage (pre-title-perk shaves), extracted from the
 // gameStore climbFall helper so the zero-stamina descent SLIDE can share the
 // exact same math at half rate. floor(hpMax × (0.12 + 0.055 × tier)), cap 0.9.
 export function computeClimbFallBase(hpMax: number, tierFallenFrom: number): number {

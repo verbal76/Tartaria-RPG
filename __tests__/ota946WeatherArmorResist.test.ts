@@ -1,4 +1,4 @@
-// OTA-946 — a matching armour coating resist cancels that element's weather bite,
+// OTA-923 — a matching armour coating resist cancels that element's weather bite,
 // generalising the OTA-934 cold rule. Electrical coating vs Aether-lightning, etc.
 import { tickWeather } from '../app/engine/weatherEffects';
 import type { WeatherEntry, PlayerCharacter } from '../app/engine/types';
@@ -8,7 +8,7 @@ const blizzard = { id: 'silent_blizzard', name: 'Silent Blizzard', description: 
 const hail = { id: 'glass_hail', name: 'Glass Hail', description: '', tags: ['hail', 'physical_damage'] } as unknown as WeatherEntry;
 const player = {} as PlayerCharacter;
 
-describe('OTA-946 — armour elemental resist cancels matching weather', () => {
+describe('OTA-923 — armour elemental resist cancels matching weather', () => {
   it('electrical resist cancels the Aether-lightning bite', () => {
     const spy = jest.spyOn(Math, 'random').mockReturnValue(0); // would force the proc + damage
     try {

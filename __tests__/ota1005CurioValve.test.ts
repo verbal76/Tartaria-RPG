@@ -1,4 +1,4 @@
-// OTA-1005 — the CURIO VALVE. The Fusing Crucible was built (OTA-193/194/195) to
+// OTA-982 — the CURIO VALVE. The Fusing Crucible was built (OTA-193/194/195) to
 // give catalog-ABSENT "inferred" junk a destiny, from the owner's own challenge:
 // "we are generating an endless stream of items that will never have a real
 // use." Two later cleanups starved it — arb61 filtered salvage output down to
@@ -23,7 +23,7 @@ function asItem(name: string, rarity = 'Common', id = 'c'): InventoryItem {
   } as unknown as InventoryItem;
 }
 
-describe('OTA-1005 — curios refuel the Crucible', () => {
+describe('OTA-982 — curios refuel the Crucible', () => {
   it('THE DRAIN LOCK: every curio is catalog-ABSENT — never backfill these', () => {
     // If this fails, someone added a curio to materials.json (or any catalog).
     // That silently retires it as Crucible fuel — the exact drift that starved

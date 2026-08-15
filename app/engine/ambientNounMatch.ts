@@ -61,7 +61,7 @@ export function isNounConsumed(chipNoun: string, pool: Iterable<string>): boolea
   return false;
 }
 
-/** OTA-953 — normNoun first (so possessive / "of" / hyphen variants reconcile), then split to
+/** OTA-930 — normNoun first (so possessive / "of" / hyphen variants reconcile), then split to
  *  WORDS with a light plural fold ("pillars" -> "pillar"; double-s words like "glass" keep
  *  their s so they don't fold to nonsense). Used by the flavor-exhausted matchers below. */
 export function nounTokens(s: string): string[] {
@@ -71,7 +71,7 @@ export function nounTokens(s: string): string[] {
     .map((w) => (w.length > 3 && w.endsWith('s') && !w.endsWith('ss') ? w.slice(0, -1) : w));
 }
 
-/** OTA-953 — WORD-level noun match for the flavorExhaustedNouns pools. The raw bidirectional
+/** OTA-930 — WORD-level noun match for the flavorExhaustedNouns pools. The raw bidirectional
  *  SUBSTRING rule those matchers used hid unrelated nouns that merely share letters:
  *  "rack" hid "cRACKed terminal", "vat" hid "obserVATion window", "well" hid "dWELLer torch"
  *  — the authored room pools carry 10 such letter-collision pairs. Two nouns now match only when
@@ -97,7 +97,7 @@ export function nounTokensMatch(a: string, b: string): boolean {
   return false;
 }
 
-/** OTA-953 — pool check for a room's flavorExhaustedNouns: true when any recorded entry
+/** OTA-930 — pool check for a room's flavorExhaustedNouns: true when any recorded entry
  *  word-matches the display noun. Empty entries and climb markers can never match
  *  (nounTokens('' ) is empty; "climbed:noun:tN" tokens never equal real noun words). */
 export function isNounFlavorExhausted(chipNoun: string, pool: Iterable<string>): boolean {

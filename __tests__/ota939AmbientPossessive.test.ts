@@ -1,10 +1,10 @@
-// OTA-939 — a possessive scene noun ("scribe's quill") must match the parser's
+// OTA-916 — a possessive scene noun ("scribe's quill") must match the parser's
 // apostrophe-stripped tokens ("scribe quill"), so `salvage scribe's quill` hits the SCENE
 // object instead of falling through to a fuzzy inventory match (the owner's Phoenix Feather
 // Quill) and dead-ending on "already worked over".
 import { matchAmbientNoun, normalizeForCompare } from '../app/engine/ambientNouns';
 
-describe('OTA-939 — possessive scene nouns resolve', () => {
+describe('OTA-916 — possessive scene nouns resolve', () => {
   it('normalizeForCompare strips the possessive apostrophe-s', () => {
     expect(normalizeForCompare("scribe's quill")).toBe('scribe quill');
     expect(normalizeForCompare("scribe's quill")).toBe(normalizeForCompare('scribe quill'));

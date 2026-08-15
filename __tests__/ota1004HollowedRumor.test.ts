@@ -32,7 +32,7 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-// OTA-1004 — THE HOLLOWED, part 2: the HINT route. OTA-998 gave the fallen a
+// OTA-981 — THE HOLLOWED, part 2: the HINT route. OTA-998 gave the fallen a
 // random-encounter door (a 4% wild roll spawns the revenant outright). The
 // owner asked for both — "hint missions that can be picked up AND random
 // encounters" — so the same wild spawner now also plants a rumour marker the
@@ -53,7 +53,7 @@ const FH: FallenHero = {
   locationName: 'the Sentinel Ward', kills: 120, corruption: 'Untouched', hours: 40, ts: 4321,
 };
 
-describe('OTA-1004 — the Hollowed leave a trail', () => {
+describe('OTA-981 — the Hollowed leave a trail', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
   afterAll(() => { _setFallenCacheForTests(null); });
 
@@ -118,7 +118,7 @@ describe('OTA-1004 — the Hollowed leave a trail', () => {
 
   it('category lock: the wild spawner offers BOTH doors — direct boss and rumour', () => {
     const src = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
-    // OTA-1014 — the plant now CARRIES the named fallen (chainId `fallen:<ts>`), so
+    // OTA-991 — the plant now CARRIES the named fallen (chainId `fallen:<ts>`), so
     // the thing that rises is the thing the tale named.
     expect(src).toContain("plantFallenHook('fallen_whisper', `fallen:${fr.ts}`)");
     expect(src).toContain("spawn: fallen_whisper rumor");

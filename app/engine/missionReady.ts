@@ -1,6 +1,6 @@
 import { factionQuestReady, type FactionQuestDef } from './factionQuests';
 
-/** OTA-1175 — ONE definition of "ready to hand in", for every contract kind.
+/** OTA-1152 — ONE definition of "ready to hand in", for every contract kind.
  *
  *  ⚠ WHY THIS MODULE EXISTS. Until now "ready" was three separate expressions
  *  computed inline in three different sections of ContractsScreen:

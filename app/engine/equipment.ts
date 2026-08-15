@@ -147,7 +147,7 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   return [];
 }
 
-// OTA-1137 — GROUP EQUIP / UNEQUIP. Owner: "you should be able to pick your
+// OTA-1114 — GROUP EQUIP / UNEQUIP. Owner: "you should be able to pick your
 // armor hold and select a group and either equip all or unequip all depending
 // on what you selected."
 //
@@ -185,7 +185,7 @@ function takesBothHands(item: InventoryItem): boolean {
 }
 
 /**
- * OTA-1137 — resolve a multi-selection into a conflict-free equip plan.
+ * OTA-1114 — resolve a multi-selection into a conflict-free equip plan.
  * `worn` is the set of instance ids already on the body: those belong to the
  * UNEQUIP side of the bar and are skipped here rather than counted as failures,
  * so a mixed selection produces an honest number on each button.
@@ -306,7 +306,7 @@ export function equippedInstanceIds(player: PlayerCharacter): Set<string> {
   return ids;
 }
 
-/** OTA-1117 — everything the player has WORN right now, the dog's vest included.
+/** OTA-1094 — everything the player has WORN right now, the dog's vest included.
  *  equippedInstanceIds only knows the player's own slots; the vest lives on
  *  `player.dog.equipped` and so never counted, which is why "float what I'm
  *  wearing to the top" quietly skipped the dog. Every gear list that floats worn
@@ -330,7 +330,7 @@ export function wornInstanceIds(player: PlayerCharacter): Set<string> {
   return ids;
 }
 
-/** OTA-1117 — the comparator every gear list uses to float worn pieces. A stable
+/** OTA-1094 — the comparator every gear list uses to float worn pieces. A stable
  *  PRE-key: worn before unworn, ties handed back to the caller's own sort axis.
  *  Owner: "whenever a list of armor or weapons pops up sort equipped items to the
  *  top." */
@@ -568,7 +568,7 @@ export function aggregateEquippedRegen(player: PlayerCharacter): { stamina: numb
 // equip/unequip handlers bake this delta into `player.hpMax` (Option B: hpMax
 // is read in 100+ sites, so adjusting it on equip is simpler + drift-free vs an
 // effective-max computed everywhere).
-// OTA-947 — LIGHT AC TAIL-TRIM. Raw standing AC climbs untouched up to `knee`; every
+// OTA-924 — LIGHT AC TAIL-TRIM. Raw standing AC climbs untouched up to `knee`; every
 // point past it counts at `rate`, so a fully-fused Legendary set stays strong (a raw ~37
 // lands ~28) without buying literal immunity — a d20+atk vs AC 37 could only ever land on
 // a natural 20. Every equipped piece still adds AC; only the runaway tail bends. Shared by
@@ -578,7 +578,7 @@ export function trimStandingAc(rawAc: number, knee = 22, rate = 0.4): number {
   return Math.round(knee + (rawAc - knee) * rate);
 }
 
-/** ⚠ OTA-1156 — THE ONE ANSWER TO "WHAT IS MY AC", AND WHY IT HAD TO EXIST.
+/** ⚠ OTA-1133 — THE ONE ANSWER TO "WHAT IS MY AC", AND WHY IT HAD TO EXIST.
  *
  *  The owner reported this three times as a DROP — *"AC 16 → AC 10, recurring"* —
  *  and it was never a drop. It was two surfaces disagreeing, permanently.
@@ -613,9 +613,9 @@ export function standingAc(player: PlayerCharacter | null | undefined): number {
   return trimStandingAc((player.ac ?? 10) + gear.worn + gear.accessories);
 }
 
-/** ⚠ OTA-1158 — THE GEAR STACK, ONCE, WITH THE JEWELLERY IN IT.
+/** ⚠ OTA-1135 — THE GEAR STACK, ONCE, WITH THE JEWELLERY IN IT.
  *
- *  OTA-1156 said "one function, one answer, everywhere" and then shipped a
+ *  OTA-1133 said "one function, one answer, everywhere" and then shipped a
  *  function that answered a DIFFERENT question from the one combat asks. The
  *  owner found it in one screen: *"my base AC is 10, on the character card's
  *  small form it says 15 (armor), when I click on it to expand it it says 18."*
@@ -636,7 +636,7 @@ export function standingAc(player: PlayerCharacter | null | undefined): number {
  *
  *  ⚠ THIS IS THE IMPLEMENTATION, AND `aggregateArmor` CALLS IT. Making the
  *  panel add rings on its own would have produced a third inline copy of the
- *  same arithmetic — the exact failure OTA-1156 was written to end. The store
+ *  same arithmetic — the exact failure OTA-1133 was written to end. The store
  *  keeps its resistance walk (it needs the per-slot tagging combat weights) but
  *  no longer owns an AC sum of its own.
  *
@@ -778,7 +778,7 @@ export function effectiveStats(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const titlePerks = require('./titles').titlePerkModifiers(player);
   const titleDex = titlePerks.dexterityBonus ?? 0;
-  // ⚠ OTA-1212 — the Siren story's +CHA rides the same aggregate, for the same reason:
+  // ⚠ OTA-1189 — the Siren story's +CHA rides the same aggregate, for the same reason:
   // one injection point means diplomacy checks and the CHA vendor discount both honour it.
   const titleCha = titlePerks.charismaBonus ?? 0;
   // engine_Dev — floor every effective stat at 1 so stacked debuffs (weather + corruption + damage-

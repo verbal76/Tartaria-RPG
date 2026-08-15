@@ -1,4 +1,4 @@
-// OTA-1058 — WHAT A FACTION FIGHTER IS MADE OF. Owner: "let's fix the loot drop
+// OTA-1035 — WHAT A FACTION FIGHTER IS MADE OF. Owner: "let's fix the loot drop
 // issue you noticed where humans drop beast loot."
 //
 // The game builds a faction's soldiers by RESKINNING an existing roster entry —
@@ -87,7 +87,7 @@ export function dressFactionFighter(
     ...body,
     name: label,
     factionId,
-    // ⚠⚠ OTA-1178 — A DRESSED FIGHTER IS RANK AND FILE. NEVER A BOSS.
+    // ⚠⚠ OTA-1155 — A DRESSED FIGHTER IS RANK AND FILE. NEVER A BOSS.
     //
     // The roster's only Legendary human is the Tartarian Reaver — 310 HP, 3D8,
     // Strength 12, `boss: true` — so a Legendary tile roll picks it with
@@ -110,7 +110,7 @@ export function dressFactionFighter(
     // written to permanent world memory under a mook's name.
     //
     // ⚠ THE GATE UPSTREAM WAS ALREADY RIGHT and that is what hid this. The wild
-    // roll filters `!e.boss` before ever reaching here — but OTA-1058 then
+    // roll filters `!e.boss` before ever reaching here — but OTA-1035 then
     // REPLACES the filtered template with a body picked fresh from the roster,
     // downstream of the filter, so the filter guards a value that gets thrown
     // away. The raid builder's own comment promises "difficulty is unmoved …
@@ -119,7 +119,7 @@ export function dressFactionFighter(
     // raid and the indoor ambush come through this one function — and because
     // dropping the Reaver from the list would make pickFactionBody return null
     // at Legendary, whose `?? tmpl` fallback reinstates the beast-loot bug
-    // OTA-1058 existed to kill.
+    // OTA-1035 existed to kill.
     boss: false,
     aliases: [
       noun.toLowerCase(), 'soldier', 'raider', 'intruder',

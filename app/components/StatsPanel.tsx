@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import type { PlayerCharacter } from '../engine/types';
-import { STAT_ROW_MAX_WIDTH } from '../ui/layoutConstants'; // OTA-1252 — pure constant: no storage in a render path
+import { STAT_ROW_MAX_WIDTH } from '../ui/layoutConstants'; // OTA-1229 — pure constant: no storage in a render path
 import racesData from '../data/races/races.json';
 import { resolveDisplayArmorByName } from '../engine/itemResolution';
 import { coatedDisplayName } from '../engine/weaponCoating';
@@ -176,8 +176,8 @@ export function StatsPanel({ player, enemyPower }: Props) {
   // catalog-absent) contributes its acBonus to the displayed AC. Without
   // this the StatsPanel desyncs from aggregateArmor (gameStore.ts:17372)
   // which already handles uniqueStats — combat saw +2 AC, display showed 0.
-  // OTA-947 — show the trimmed standing AC so the panel matches what combat resolves against.
-  // ⚠ OTA-1156 — and it is the SHARED helper now, not a fourth inline copy of
+  // OTA-924 — show the trimmed standing AC so the panel matches what combat resolves against.
+  // ⚠ OTA-1133 — and it is the SHARED helper now, not a fourth inline copy of
   // the same sum. This panel was right all along; what was wrong is that the
   // Arbiter and the LLM prompt printed the raw `player.ac` (the RACIAL BASE)
   // instead, so the sheet said 16 while the Arbiter answered 10 to the same
@@ -245,7 +245,7 @@ export function StatsPanel({ player, enemyPower }: Props) {
   // character box."
   const golemShows = !!player.golem && player.golem.hp > 0;
 
-  // OTA-938 — a downed dog (benched at 0 HP, bleed-out clock running) shows a live
+  // OTA-915 — a downed dog (benched at 0 HP, bleed-out clock running) shows a live
   // "⏳ Nh — feed to save" countdown by its name instead of the plain HP, so the 24h
   // window is impossible to miss. Healthy/climb-benched dogs keep the normal HP readout.
   // 24 = gameStore's DOG_BLEED_OUT_HOURS (hardcoded to keep this component store-free).
@@ -299,7 +299,7 @@ export function StatsPanel({ player, enemyPower }: Props) {
           </Text>
         </View>
       ) : null}
-      {/* OTA-985 — escort party the player is protecting: ONE row per active escort
+      {/* OTA-962 — escort party the player is protecting: ONE row per active escort
           (shared pool), color by remaining fraction. Parked parties are hidden. */}
       {livingEscortPools(player.activeFactionQuests).map((p, i) => {
         const frac = p.hpMax > 0 ? p.hp / p.hpMax : 0;
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
   powerUp: { color: '#9ec96a' },
   powerDown: { color: '#e07a5f' },
   dogName: { color: '#c9a86a', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
-  // OTA-938 — downed-dog bleed-out countdown: urgent red, wider to fit the "feed to save" call.
+  // OTA-915 — downed-dog bleed-out countdown: urgent red, wider to fit the "feed to save" call.
   dogDown: { color: '#e5484d', fontSize: 12, fontWeight: '700', flexShrink: 0, maxWidth: 200 },
   // OTA-145 — golem row sits right-aligned beneath the dog name row.
   // Slightly muted color (slate-mauve) so it reads as a secondary
@@ -437,13 +437,13 @@ const styles = StyleSheet.create({
   tapHint: { color: '#a2977b', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
   companion: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5, fontWeight: '700' },
   contracts: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
-  // ⚠⚠ OTA-1252 — THE STAT ROW STOPS SPREADING ON A MONITOR. Owner, on the PC
+  // ⚠⚠ OTA-1229 — THE STAT ROW STOPS SPREADING ON A MONITOR. Owner, on the PC
   // build: *"the character portrait text and spacing didn't scale it
   // stretched."* Exactly what happened, and the cause is the line directly
   // below this one: `stat: { flex: 1 }` gives every column an EQUAL SHARE OF
   // WHATEVER WIDTH IT IS GIVEN. That is right on a phone, where the panel is
   // ~360px and five columns land at ~70px each — the measure these 9px labels
-  // and 12px values were drawn against. OTA-1250 widened the desktop column to
+  // and 12px values were drawn against. OTA-1227 widened the desktop column to
   // 1024, the panel went to ~500, and the same five cells stretched to ~100
   // each. Nothing got bigger; the gaps did. Stretched, precisely.
   //

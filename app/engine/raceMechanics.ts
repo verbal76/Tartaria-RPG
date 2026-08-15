@@ -145,7 +145,7 @@ export function detectACContexts(
   for (const slotItem of Object.values(equipped)) {
     if (!slotItem) continue;
     const item = player.inventory.find((i) => i.name === slotItem);
-    // OTA-1024 — canonical: a stale equipped piece silently dropped its racial
+    // OTA-1001 — canonical: a stale equipped piece silently dropped its racial
     // conditional bonus (the sheet implied protection combat didn't grant).
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { canonicalItemKind: rmk, canonicalItemTags: rmt } = require('./crafting') as typeof import('./crafting');

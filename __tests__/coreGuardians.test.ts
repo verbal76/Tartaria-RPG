@@ -99,7 +99,7 @@ describe('Core Guardians', () => {
       expect(g!.boss).toBe(true);
       expect(g!.traits).toContain(CORE_GUARDIAN_TRAIT);
     });
-    // OTA-798 — every Guardian must carry an authored weakness + resistance so
+    // OTA-778 — every Guardian must carry an authored weakness + resistance so
     // the "Weakness exposed" combat lines and the EnemyPanel actually engage
     // (players asked why Guardians showed no weakness/strength). Guardian types
     // (aether_construct / mud_revenant) aren't in the type-resistance map, so the

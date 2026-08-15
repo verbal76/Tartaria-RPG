@@ -28,10 +28,10 @@ export function canScrap(item: InventoryItem): boolean {
   // bound to the character until the final act. Block scrap up
   // front so the player can't accidentally feed a Core to the
   // forge.
-  // OTA-1022 — the ONE quest-lock predicate (canonical tags), not a raw snapshot read.
+  // OTA-999 — the ONE quest-lock predicate (canonical tags), not a raw snapshot read.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   if ((require('./questItems') as typeof import('./questItems')).isQuestLockedItem(item)) return false;
-  // OTA-1023 — canonical kind: the load heal is upgrade-only, so a demoted piece
+  // OTA-1000 — canonical kind: the load heal is upgrade-only, so a demoted piece
   // (relic->misc Climbing Rope) kept its old action set forever.
   const scrapKind = canonicalItemKind(item);
   if (scrapKind === 'weapon' || scrapKind === 'armor' || scrapKind === 'relic') return true;
@@ -93,7 +93,7 @@ function rarityScrapBonus(rarity: InventoryItem['rarity']): number {
 export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   const tags = new Set(canonicalItemTags(item));
   const grants: Array<{ name: string; quantity: number }> = [];
-  // OTA-1023 — canonical rarity (never healed on load): a stale-Common piece
+  // OTA-1000 — canonical rarity (never healed on load): a stale-Common piece
   // scrapped at rb=0 forever and never yielded the Golem Core it owes.
   const rb = rarityScrapBonus(canonicalItemRarity(item));
   const half = Math.floor(rb / 2);
@@ -103,7 +103,7 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   const outKind = canonicalItemKind(item);
   const isWeaponLike = outKind === 'weapon' || tags.has('weapon');
   const isArmorLike = outKind === 'armor' || tags.has('armor') || outKind === 'dog_armor';
-  // OTA-756 — a FUSED weapon/armor is a one-of-a-kind Crucible forge. Breaking one
+  // OTA-737 — a FUSED weapon/armor is a one-of-a-kind Crucible forge. Breaking one
   // down should never hand back Commons: the player spent scarce reserved inputs to
   // make it, so it yields Uncommon/Rare aether stock scaled by the forge's rarity.
   // Detected inline (uniqueStats OR the 'fused' tag — same rule as isFusedInventoryItem)
@@ -201,11 +201,9 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
     grants.push({ name: 'Mudstone', quantity: 1 });
   }
   // Cloth / fiber → Patched Cloth, and SPIDER SILK (a 7-recipe fiber) from
-  // organic gear. OTA-676 — `rope` is cordage (fiber): a Climbing Rope / Broken
-  // Rope is `rope`-tagged with no cloth/fiber tag, so it used to fall through to
-  // the bare Stick+Small Rock fallback — you mended a ROPE with sticks and rocks,
-  // and repairCostMaterials (= scrap × 2) charged the same. Treat rope as fiber so
-  // it scraps/repairs into Patched Cloth like other cordage.
+  // organic gear. OTA-661 — `rope` is cordage (fiber): a rope-tagged item with no
+  // cloth/fiber tag fell through to the bare Stick+Small Rock fallback, so a
+  // Climbing Rope scrapped/repaired with sticks and rocks. Treat rope as fiber.
   if (tags.has('cloth') || tags.has('fiber') || tags.has('organic') || tags.has('rope') || isArmorLike) {
     grants.push({ name: 'Patched Cloth', quantity: 2 + half });
     if (tags.has('organic')) grants.push({ name: 'Spider Silk', quantity: 1 });

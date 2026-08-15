@@ -47,7 +47,7 @@ export function repairGluedNarration(text: string): string {
   return s.replace(/\s{2,}/g, ' ').trim();
 }
 
-// OTA-1053 — INSTRUCTION-ECHO DETECTOR. The local model is small enough that it
+// OTA-1030 — INSTRUCTION-ECHO DETECTOR. The local model is small enough that it
 // sometimes answers a prompt by reciting the prompt: the owner watched the
 // ambient brief's own opening sentence appear at Asgardar as an Arbiter line.
 // These patterns are meta-text about HOW to narrate — a word-count, a "do not"
@@ -71,8 +71,8 @@ const INSTRUCTION_ECHO_PATTERNS: readonly RegExp[] = [
   /\b(the|their) last action\b/i,
   /\bavailable player actions\b/i,
   /\bidle companion talk\b/i,
-  // ⚠ OTA-1154 — THE PROMPT'S OWN FIELD LABELS, TAKEN VERBATIM FROM THE LOG.
-  // The device log for OTA-1152 carried this, on screen AND voiced aloud:
+  // ⚠ OTA-1131 — THE PROMPT'S OWN FIELD LABELS, TAKEN VERBATIM FROM THE LOG.
+  // The device log for OTA-1129 carried this, on screen AND voiced aloud:
   //
   //   [arbiter] Your read of them: HP 24/24, Stamina 8/14, AC 10 You, the
   //             seasoned traveler, have
@@ -83,7 +83,7 @@ const INSTRUCTION_ECHO_PATTERNS: readonly RegExp[] = [
   // which is just as much prompt and reads even worse, because it puts raw
   // numbers in the narrator's mouth.
   //
-  // Anchored on the literal strings the prompt emits, per OTA-1148's rule:
+  // Anchored on the literal strings the prompt emits, per OTA-1125's rule:
   // when a log hands you the exact failing input, build the guard around THAT
   // STRING rather than around a reconstruction of it.
   /\byour read of them\b/i,
@@ -112,7 +112,7 @@ export function looksLikeInstructionEcho(text: string): boolean {
   return INSTRUCTION_ECHO_PATTERNS.some((re) => re.test(text));
 }
 
-// OTA-1054 — "You …" openers, split by REGISTER rather than banned outright.
+// OTA-1031 — "You …" openers, split by REGISTER rather than banned outright.
 // The ambient companion filter used to drop every sentence starting with "You",
 // to kill a real failure (the model narrating invented scenery — "You step
 // back, surveying the alleyway" — inside a room that has no alleyway). But the
@@ -124,8 +124,8 @@ export function looksLikeInstructionEcho(text: string): boolean {
 // present-tense action ("You step / turn / reach"); a reflection — the thing
 // ambient exists to produce — opens with a state or perfect ("You have come…",
 // "You've grown…", "You carry it better now"). Allow the second, drop the first.
-// OTA-1062 — THE WHITELIST WAS FAIL-CLOSED, AND THAT IS WHY THE FEATURE NEVER
-// WORKED. OTA-1054 listed the reflective openers it knew and dropped everything
+// OTA-1039 — THE WHITELIST WAS FAIL-CLOSED, AND THAT IS WHY THE FEATURE NEVER
+// WORKED. OTA-1031 listed the reflective openers it knew and dropped everything
 // else that began with "You" — so any phrasing nobody anticipated was killed on
 // sight. The owner's instrumented log finally caught it in the act:
 //

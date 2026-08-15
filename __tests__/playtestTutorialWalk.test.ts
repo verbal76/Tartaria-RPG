@@ -36,7 +36,7 @@ jest.mock('expo-updates', () => ({}));
  * ⚠ THE TUTORIAL WALK — ONBOARDING PLAYED THE WAY A NEW PLAYER PLAYS IT.
  *
  * The phases 0-5 harness deliberately skips onboarding (it clears the
- * tutorial holds in its first breath), which left OTA-1063..1065 — the climb
+ * tutorial holds in its first breath), which left OTA-1040..1065 — the climb
  * softlock fix, the teardown, the tutorial voice — covered by unit suites
  * only. This walk closes that edge: a brand-new character, the opening crawl
  * dismissed the way a thumb dismisses it, and every tutorial beat advanced by
@@ -44,7 +44,7 @@ jest.mock('expo-updates', () => ({}));
  *
  * Same rules as the main harness: seeded, feed-graded, loose about prose and
  * strict about SHAPES — every beat's instruction reached the feed, the
- * lockdown refused an off-script command by RESTATING the ask (the OTA-1063
+ * lockdown refused an off-script command by RESTATING the ask (the OTA-1040
  * complaint was a refusal with no way to comply), and the tutorial ENDS.
  */
 jest.setTimeout(180_000);
@@ -122,7 +122,7 @@ beforeAll(async () => {
       if (beatsSeen[beatsSeen.length - 1] !== id) beatsSeen.push(id);
 
       // ⚠ Once, mid-sequence: type something off-script and record what the
-      // lockdown says back. OTA-1063's complaint was a refusal that told the
+      // lockdown says back. OTA-1040's complaint was a refusal that told the
       // player they were wrong without telling them what right looked like.
       if (id === 'rope' && !probedLockdown) {
         probedLockdown = true;
@@ -134,6 +134,19 @@ beforeAll(async () => {
         continue;
       }
 
+      // ⚠⚠ OTA-1248 — the `armor` beat is TWO actions, and that is the whole point
+      // of it: the cudgel auto-equips, so nothing in the tutorial had ever taught a
+      // player to open their pack. Take, then WEAR — the beat completes on the
+      // equip, not the take, so a walk that only took it would stall here.
+      if (id === 'armor') {
+        const worn = useGameStore.getState().player?.equipped?.chest;
+        if (worn) { useGameStore.getState().maybeAdvanceTutorial('armor'); continue; }
+        const held = (useGameStore.getState().player?.inventory ?? [])
+          .some((i: { name: string }) => /vest/i.test(i.name));
+        if (!held) { useGameStore.getState().submitPlayerAction("take the Mud-Warden's Vest"); continue; }
+        useGameStore.getState().equipItem("Mud-Warden's Vest", 'chest');
+        continue;
+      }
       if (id === 'climb') {
         // The beat's own instruction: "you go up in stages... top out, then
         // climb back down" — completion fires on the way DOWN. State-aware
@@ -204,7 +217,7 @@ describe('tutorial walk — a new player gets from the crawl to the road', () =>
   });
 
   it('⚠ the lockdown refuses off-script commands by RESTATING the ask', () => {
-    // OTA-1063: "do what I've asked of you" with the instruction scrolled off
+    // OTA-1040: "do what I've asked of you" with the instruction scrolled off
     // the feed is a refusal with no way to comply. The refusal must carry the
     // current beat's remind text.
     expect(report.refusalTexts.length).toBeGreaterThan(0);

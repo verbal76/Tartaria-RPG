@@ -1,4 +1,4 @@
-// OTA-1021 — LEGACY CATALOG-NAME MIGRATIONS. A catalog rename/removal MUST land an
+// OTA-998 — LEGACY CATALOG-NAME MIGRATIONS. A catalog rename/removal MUST land an
 // entry here in the SAME OTA (HANDOFF §3a rename policy). Keys are retired
 // names; values are the surviving rows that inherit the instance. Applied by
 // backfillPlayer on every load to: the inventory, every equipped slot name,

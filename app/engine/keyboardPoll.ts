@@ -1,4 +1,4 @@
-// OTA-956 — pure decision logic for the KeyboardInputBar reliability poll, extracted so
+// OTA-933 — pure decision logic for the KeyboardInputBar reliability poll, extracted so
 // the per-tick rules are unit-testable (the failure mode needs real OS keyboard timing,
 // so the component wiring stays thin and the decisions live here).
 //

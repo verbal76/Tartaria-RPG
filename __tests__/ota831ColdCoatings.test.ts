@@ -1,4 +1,4 @@
-// OTA-831 — cold coatings. We added the cold damage TYPE (OTA-827) but no coatings;
+// OTA-811 — cold coatings. We added the cold damage TYPE (OTA-827) but no coatings;
 // this adds cold as a full coating family (matching poison/burn/electrical): two
 // craftable variants (Frost Paste, Rime Draught) that coat a WEAPON for a cold DOT
 // (anti-machine), coat ARMOR for cold resist, DRINK to heal + shake a chill, and
@@ -12,7 +12,7 @@ import { applyDamageTypeModifier } from '../app/engine/crafting';
 import { traitDamageMultiplier, combineDamageTypeMatch } from '../app/engine/enemyTraits';
 import type { InventoryItem, PlayerCharacter, WeaponCoating } from '../app/engine/types';
 
-describe('OTA-831 — cold is a full coating family', () => {
+describe('OTA-811 — cold is a full coating family', () => {
   it('cold is a known coating element with a blurb + DOT status kind', () => {
     expect(COATING_ELEMENTS).toContain('cold');
     expect(coatingStatusKind('cold' as WeaponCoating['kind'])).toBe('cold_coat');

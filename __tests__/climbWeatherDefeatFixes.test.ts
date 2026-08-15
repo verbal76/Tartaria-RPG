@@ -53,12 +53,12 @@ import type { InventoryItem } from '../app/engine/types';
 
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
-// ── Fix #1 — OTA-799: a rope is usable to its LAST point ──────────────────────
+// ── Fix #1 — OTA-779: a rope is usable to its LAST point ──────────────────────
 // The old OTA-625 behavior snapped/refused a rope at durability ≤ ROPE_WEAR_PER_
 // TIER (15), stranding a whole climb and dropping the player with no warning.
 // Now: a low rope climbs, breaks GRACEFULLY at 0 (no fall), fires a fraying
 // warning while low, and only a truly SPENT rope (0) fails.
-describe('OTA-799 — rope usable to its last point (graceful break, warn low, fail at 0)', () => {
+describe('OTA-779 — rope usable to its last point (graceful break, warn low, fail at 0)', () => {
   async function setup(elevated: boolean, durability: number) {
     const store = useGameStore;
     await store.getState().hydrate();
@@ -197,7 +197,7 @@ describe('OTA-625 #3 — weather damage cannot fire on back-to-back actions', ()
       store.getState().submitPlayerAction('look around');
       const afterHit = store.getState().player!;
       expect(afterHit.hp).toBe(39); // glass_hail chips exactly 1
-      expect(afterHit.weatherTickCooldown).toBe(5); // OTA-1003 — #122: gap 2 -> 5
+      expect(afterHit.weatherTickCooldown).toBe(5); // OTA-980 — #122: gap 2 -> 5
 
       store.getState().submitPlayerAction('look around');
       const afterGap = store.getState().player!;

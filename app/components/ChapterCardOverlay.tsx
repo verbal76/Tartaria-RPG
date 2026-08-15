@@ -1,4 +1,4 @@
-// OTA-1043 — THE CHAPTER CARD. Full-screen title beat raised at every
+// OTA-1020 — THE CHAPTER CARD. Full-screen title beat raised at every
 // main-quest phase transition (see engine/chapters.ts for which). One tap
 // anywhere dismisses; the feed narration for the transition is already
 // waiting underneath, so the card is a marker, not a gate — it holds no

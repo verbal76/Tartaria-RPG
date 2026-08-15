@@ -51,7 +51,7 @@ const CANONICAL_VERB: Record<Intent, string> = {
   stealth: 'sneak',
   attack: 'attack',
   diplomacy: 'talk',
-  gift: 'gift', // OTA-1083 — restored; see parser.ts for why it was removed.
+  gift: 'gift', // OTA-1060 — restored; see parser.ts for why it was removed.
   escape: 'flee',
   investigate: 'search',
   rest: 'rest',
@@ -104,7 +104,7 @@ const CANONICAL_VERB: Record<Intent, string> = {
   press: 'press',
   push: 'push',
   pull: 'pull',
-  // OTA-710 — call-to-action gesture. 'ring' sits at position 0 in the
+  // OTA-693 — call-to-action gesture. 'ring' sits at position 0 in the
   // gesture VERB_SYNONYMS array, so it round-trips through parseInput.
   gesture: 'ring',
   // OTA-239 — Tool Pouch verbs.

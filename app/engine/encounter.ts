@@ -35,7 +35,7 @@ const rarityWeights: Record<Rarity, number> = {
   Legendary: 1,
 };
 
-// OTA-1003 — #122: LOCALE BIAS. Weather reads the ground it falls on: Aetheric
+// OTA-980 — #122: LOCALE BIAS. Weather reads the ground it falls on: Aetheric
 // country draws its own lightning, mud country its black rain, ash country its
 // storms, the frozen reaches their blizzards. Keyword match over the
 // location's id + name; biased ids get their novelty weight multiplied, so
@@ -57,7 +57,7 @@ export function pickWeather(
   memory: WorldMemory,
   location?: { id: string; name: string; tags?: readonly string[] } | null,
 ): WeatherEntry {
-  // OTA-1016 — the location's TAGS carry its climate (yuldra_tul's frost, the ten
+  // OTA-993 — the location's TAGS carry its climate (yuldra_tul's frost, the ten
   // borderlands outposts' mud, the spires' aetheric cores). Matching id+name
   // alone left 31 of 36 locations with an unbiased sky and the frost/ash rows
   // matching nothing at all.
@@ -96,7 +96,7 @@ export function pickHazardForLocation(location: Location, dangerBoost = 0): Haza
 // big Legendary doesn't explode, and a fresh arrival in a danger-0 zone is left
 // EXACTLY as authored — "low level is still low level". Knobs are all here.
 
-// ⚠ OTA-1182 — THE SCALER NOW KNOWS WHAT YOU ARE WEARING AND SWINGING.
+// ⚠ OTA-1159 — THE SCALER NOW KNOWS WHAT YOU ARE WEARING AND SWINGING.
 //
 // Owner: his AC went 20 → 26 and the difficulty did not move. It could not — the
 // power proxy below was `bestCombatStat + hpMax / 10`, and AC was not an input at
@@ -136,10 +136,10 @@ export const GEAR_POWER_BLEND = 0.5;
 /** The gear half of the power proxy: what your armour and your weapon are worth above
  *  what you walked in with. Clamped at 0 — gear never lowers difficulty.
  *
- *  ⚠ OTA-1194 — `tierBlend` is the DIFFICULTY TIER's multiplier on top of the shipped
+ *  ⚠ OTA-1171 — `tierBlend` is the DIFFICULTY TIER's multiplier on top of the shipped
  *  half weight: salvage 0.5 (effective 0.25), owed 1 (effective 0.5 — the identity row,
  *  unchanged), let_it_come 1.5, bury_me 2 (effective 1.0, the full designed weight
- *  OTA-1182 wrote and then held back pending device evidence).
+ *  OTA-1159 wrote and then held back pending device evidence).
  *  ⚠ It multiplies terms that are ALREADY clamped at 0, so no tier can make the world
  *  easier than authored — a fresh arrival reads exactly 0 at every rung. Defaults to 1,
  *  so every existing caller and every tooling call is bit-for-bit unchanged. */
@@ -151,15 +151,15 @@ export function gearPowerTerm(ac: number, avgWeaponDamage: number, tierBlend: nu
 }
 
 /** How strong is this character. Best offensive stat + a slice of the HP pool, plus —
- *  since OTA-1182 — a scaled slice of what they are WEARING and SWINGING.
+ *  since OTA-1159 — a scaled slice of what they are WEARING and SWINGING.
  *  ⚠ `gear` is OPTIONAL so the pure stat/HP proxy stays callable for tooling and for
  *  the Guardian curve this is kept in sync with. Omitting it reproduces the old value
- *  EXACTLY, which is what keeps the OTA-1182 diff readable and its blast radius the
+ *  EXACTLY, which is what keeps the OTA-1159 diff readable and its blast radius the
  *  set of call sites that opted in. */
 export function enemyScalePower(
   bestCombatStat: number,
   hpMax: number,
-  /** ⚠ OTA-1194 — `tierBlend` is the difficulty tier's weight on the gear terms.
+  /** ⚠ OTA-1171 — `tierBlend` is the difficulty tier's weight on the gear terms.
    *  Absent = 1 = the shipped half weight, so an omitted tier is the baseline and never
    *  accidentally a free pass. */
   gear?: { ac: number; avgWeaponDamage: number; tierBlend?: number },
@@ -181,7 +181,7 @@ export function overLevelT(power: number): number {
   return Math.max(0, Math.min(1, (power - 14) / 18));
 }
 
-// OTA-819 — THEMATIC (Pokémon-route) weakness. OTA-818 rolled a fully RANDOM weakness,
+// OTA-799 — THEMATIC (Pokémon-route) weakness. OTA-818 rolled a fully RANDOM weakness,
 // which killed the "1-kit-fits-all" staleness but read as nonsense (a mud creature weak
 // to cold) and broke immersion. This keeps the VARIETY but makes it BELIEVABLE: each
 // creature TYPE has a small pool of thematically-plausible weaknesses, and a spawn rolls
@@ -238,7 +238,7 @@ export function randomizeEnemyDefense(enemy: Enemy, rng: () => number = Math.ran
   // Neutralize the type-map's DEFAULT weaknesses (bar the rolled one) so the old
   // fixed answer doesn't still work.
   //
-  // ⚠ OTA-1116 — THIS WRITES `inured:`, NOT `resist:`. `resist:` does not
+  // ⚠ OTA-1093 — THIS WRITES `inured:`, NOT `resist:`. `resist:` does not
   // neutralize a weakness, it INVERTS it. A Human is weak to four types
   // (piercing, slashing, poison, corruption); this loop rolled one to keep and
   // turned the other three into ×0.5 armour, so every human in the game
@@ -263,7 +263,7 @@ export function randomizeEnemyDefense(enemy: Enemy, rng: () => number = Math.ran
     const wall = pick(map.resist.filter((r) => r !== newWeak));
     if (wall && !traits.includes(`resist:${wall}`)) traits.push(`resist:${wall}`);
   }
-  // ⚠ OTA-1225 (PUNCHLIST P16) — the technique roll rides the SAME profiler, so it is
+  // ⚠ OTA-1202 (PUNCHLIST P16) — the technique roll rides the SAME profiler, so it is
   // per-spawn, idempotent via `profiled`, and listed in the portrait like the resists.
   // ⚠⚠ IT DRAWS FROM `rng` LAST, after every legacy roll, and that ordering is
   // LOAD-BEARING: the first placement sat between the weakness and the wall draws, which
@@ -314,7 +314,7 @@ export function scaledEnemyForContext(enemy: Enemy, danger: number, power: numbe
   return randomizeEnemyDefense({ ...enemy, hp, abilityPoint: bumpAbilityPointNumber(enemy.abilityPoint, bonus) }, rng);
 }
 
-// OTA-817 — PACK-AWARE scaling. A pack must be scaled as a PACKAGE, not per-body: if
+// OTA-797 — PACK-AWARE scaling. A pack must be scaled as a PACKAGE, not per-body: if
 // you floored each of 3 foes to a solo target (3 × ~34-64) and stood them together,
 // the trio would out-HP a boss — and with 3 attacks/round it would be brutal (player's
 // call: "scale multiples as a package not individually"). So a multi-enemy encounter
@@ -438,7 +438,7 @@ function rarityCapForDanger(danger: number): Rarity {
   return danger >= 4 ? 'Legendary' : danger >= 3 ? 'Rare' : danger >= 2 ? 'Uncommon' : 'Common';
 }
 
-// OTA-817 — MIXED-ROLE PACKS. The scene-arrival path lets a single "curated" ladder
+// OTA-797 — MIXED-ROLE PACKS. The scene-arrival path lets a single "curated" ladder
 // enemy pre-empt the group roll, so in any explored (laddered) area you almost never
 // faced more than one foe — the multi-enemy target-swipe UI and the companions it
 // demands hadn't been seen in weeks. This ADDS role-diverse pack members to a rolled
@@ -531,7 +531,7 @@ export function getLocationById(id: string): Location {
   const { allKnownLocations } = require('./worldMap') as typeof import('./worldMap');
   const known = allKnownLocations().find((l) => l.id === id);
   if (!known) {
-    // OTA-1025 — a persisted id that no longer resolves silently rendered
+    // OTA-1002 — a persisted id that no longer resolves silently rendered
     // locations[0] while the grid math used a hash-phantom cell. Make it loud
     // so a future rename/removal is caught in the first playtest log.
     // eslint-disable-next-line no-console
@@ -582,7 +582,7 @@ export function pickEncounterFromLadder(triple: LadderTriple | null | undefined)
  * fail to resolve. The caller (area-search, dig, etc.) builds the actual
  * InventoryItem from the name via lookupCraftedItem.
  */
-/** ⚠⚠ OTA-1222 (PUNCHLIST P15) — NEVER AS RANDOM SEARCH LOOT.
+/** ⚠⚠ OTA-1199 (PUNCHLIST P15) — NEVER AS RANDOM SEARCH LOOT.
  *
  *  Both of these are somebody's PAYOUT. `Mud Monarch Seal` is the reward for a faction
  *  storyline; `Mask of Tartaria's Last King` is a Legendary exploration piece. They sit in

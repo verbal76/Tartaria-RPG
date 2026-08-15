@@ -30,17 +30,17 @@ accumulates guesses is a punch list nobody trusts by item twenty.
 ## STILL OPEN — the whole list, 2026-08-10
 
 ⚠ Seventeen items have been filed. **Sixteen are closed and two were reclassified as
-not-defects — the list stands at ZERO open items as of OTA-1226 (2026-08-10).** The
+not-defects — the list stands at ZERO open items as of OTA-1203 (2026-08-10).** The
 closed and reclassified entries are kept below with their reasoning rather than deleted —
 a punch list you can only read forwards is a punch list nobody can audit.
 
 | # | Item | Kind | Where it stands |
 |---|---|---|---|
-| **P9** | *(closed 2026-08-10, OTA-1224)* Anchor the vendors to the site | DESIGN | ✅ **CLOSED to the owner's four rulings.** Hand-in host-specific through ONE seam; grab untouched and pinned; host gear behind the join threshold; paid roads carry the hostile case. |
-| **P15** | *(loot half closed 2026-08-10, OTA-1222)* The ladder's loot half was never called | WIRING | ⚠⚠ **Re-measured 2026-08-10 (OTA-1220) and the original filing was WRONG** — `loot_tables.json` IS imported. The real defect: `pickLootFromLadder` has **no caller**, while its enemy twin `pickEncounterFromLadder` is called twice. 27 pools / 153 entries, all resolving, with no door. **Blocked on one owner decision** (see the entry). `relics.json` is SUPERSEDED — 7 of 13 already ship. |
-| **P18** | *(closed 2026-08-10, OTA-1223)* Veil outside combat paid for nothing | ENDS IN NOTHING | ✅ **CLOSED — fix 1.** Refuses an empty room at zero cost. The fix's test also caught `channel veil of ether` failing to resolve (dropped-word class); token tier added. |
-| **P17** | *(closed 2026-08-10, OTA-1221)* Scholar of Forgotten Lore was unearnable without the narration model | UNFINISHABLE | ✅ **CLOSED.** The offline answer path already existed since OTA-233 — it just never credited the player. Also closed the nonsense-ask farm the credit would have opened. |
-| **P16** | *(closed 2026-08-10, OTA-1218/1225/1226)* Aether techniques | IN PROGRESS | ✅ **CLOSED in three passes.** Player side (OTA-1218: buy, channel, four effects, tab), enemy mirror (OTA-1225: trait rail, ~1 in 4, channel costs the swing), and all three acquisition doors (OTA-1226: rapport purchase, found texts at four aether sites, storyline grants — owner: *"push it through all routes"*). |
+| **P9** | *(closed 2026-08-10, OTA-1201)* Anchor the vendors to the site | DESIGN | ✅ **CLOSED to the owner's four rulings.** Hand-in host-specific through ONE seam; grab untouched and pinned; host gear behind the join threshold; paid roads carry the hostile case. |
+| **P15** | *(loot half closed 2026-08-10, OTA-1199)* The ladder's loot half was never called | WIRING | ⚠⚠ **Re-measured 2026-08-10 (OTA-1197) and the original filing was WRONG** — `loot_tables.json` IS imported. The real defect: `pickLootFromLadder` has **no caller**, while its enemy twin `pickEncounterFromLadder` is called twice. 27 pools / 153 entries, all resolving, with no door. **Blocked on one owner decision** (see the entry). `relics.json` is SUPERSEDED — 7 of 13 already ship. |
+| **P18** | *(closed 2026-08-10, OTA-1200)* Veil outside combat paid for nothing | ENDS IN NOTHING | ✅ **CLOSED — fix 1.** Refuses an empty room at zero cost. The fix's test also caught `channel veil of ether` failing to resolve (dropped-word class); token tier added. |
+| **P17** | *(closed 2026-08-10, OTA-1198)* Scholar of Forgotten Lore was unearnable without the narration model | UNFINISHABLE | ✅ **CLOSED.** The offline answer path already existed since OTA-233 — it just never credited the player. Also closed the nonsense-ask farm the credit would have opened. |
+| **P16** | *(closed 2026-08-10, OTA-1195/1202/1203)* Aether techniques | IN PROGRESS | ✅ **CLOSED in three passes.** Player side (OTA-1195: buy, channel, four effects, tab), enemy mirror (OTA-1202: trait rail, ~1 in 4, channel costs the swing), and all three acquisition doors (OTA-1203: rapport purchase, found texts at four aether sites, storyline grants — owner: *"push it through all routes"*). |
 
 **The two former PARTIALs — RESOLVED by owner ruling (2026-08-10):**
 
@@ -50,14 +50,14 @@ a punch list you can only read forwards is a punch list nobody can audit.
 
 | | Status |
 |---|---|
-| Dog rescue | ✅ **CLOSED AS DESIGNED.** The loop is ACQUISITION: rescue → the naming popup (`confirmDogOnboarding`) → the dog joins with the Arbiter's acknowledgement. Verified: `dogRescueIntegration` + `ota1050DogGolemPopups`. |
-| Golem creation | ✅ **CLOSED AS DESIGNED.** Summon → `pendingGolemNaming` popup → *"You gave it life. You might as well give it a name."* Verified: `golemCompanion` + `ota1050DogGolemPopups`. 70 tests across the three suites, re-run green 2026-08-10. |
+| Dog rescue | ✅ **CLOSED AS DESIGNED.** The loop is ACQUISITION: rescue → the naming popup (`confirmDogOnboarding`) → the dog joins with the Arbiter's acknowledgement. Verified: `dogRescueIntegration` + `ota1027DogGolemPopups`. |
+| Golem creation | ✅ **CLOSED AS DESIGNED.** Summon → `pendingGolemNaming` popup → *"You gave it life. You might as well give it a name."* Verified: `golemCompanion` + `ota1027DogGolemPopups`. 70 tests across the three suites, re-run green 2026-08-10. |
 
 ⚠ The audit called these "no completion event to trace" — which was true as an
 observation and wrong as a diagnosis: it was looking for a STORY ending on loops whose
 entire purpose is to hand you a companion. The companion, named, IS the payout.
 
-✅ **THE 18 WIRED ROWS ARE NOW TRACED (2026-08-10, OTA-1219).** Every one was walked live:
+✅ **THE 18 WIRED ROWS ARE NOW TRACED (2026-08-10, OTA-1196).** Every one was walked live:
 started from a state a player could be in, finished through the public action the UI calls,
 and asserted on a payoff the player can see. See **WIRED → TRACED** in the audit ledger
 below for the per-loop evidence. ⚠ Five of my own assertions flagged healthy code and were
@@ -72,7 +72,7 @@ wrong; all five are written up there rather than quietly fixed.
 - **Kind:** UNFINISHABLE *(in practice — completable only by grinding random spawns)*
 - **Scale:** **9 of 18 mysteries, 8 of 14 storylines**, across **6 of the 9 factions**
 - **Found:** 2026-08-09 reachability pass
-- ## ✅ **CLOSED — OTA-1208.** The trading post brokers any faction's contract for 20%.
+- ## ✅ **CLOSED — OTA-1185.** The trading post brokers any faction's contract for 20%.
 - ⚠ **The scale line above is WRONG in both directions** — corrected below, after the
   original text. It is left standing rather than edited so the mistake is legible.
 - ⚠ **The world-feel half of this was NOT closed here** and is now **P9** (anchor the
@@ -127,7 +127,7 @@ turn-in path does not honour it either way.
 
 **Everything above this line is the original entry, kept as written.** Building the fix
 meant driving the real store instead of reading it, and two of the claims above did not
-survive that. Both corrections are pinned by `ota1208BrokerLive`.
+survive that. Both corrections are pinned by `ota1185BrokerLive`.
 
 ### Correction 1 — the claim about your OWN faction is FALSE
 
@@ -162,7 +162,7 @@ Anchored at every outpost, and who they actually answer for:
 | Jorah the Scholar | lab | `forgotten_order` (not re-pointed) |
 | Halem the Trader | gate, mess | nobody — `faction: null` refused everything |
 
-So before OTA-1208, always reachable = **your own faction + Reclaimers + Forgotten Order**.
+So before OTA-1185, always reachable = **your own faction + Reclaimers + Forgotten Order**.
 Everything else needed the 1-in-30 roll:
 
 | The player is… | Contracts gated behind a 1-in-30 roll |
@@ -328,7 +328,7 @@ negotiable.
 
 ### P3 — The remote hand-in was designed as the escape hatch for exactly this, and is dead code
 
-## ✅ **CLOSED — OTA-1211.** The courier carries REPORTS: 25% cut, full rep, no long-haul bonus, 12 in-game hours charged up front. Hunts and fetch deliveries still refuse it.
+## ✅ **CLOSED — OTA-1188.** The courier carries REPORTS: 25% cut, full rep, no long-haul bonus, 12 in-game hours charged up front. Hunts and fetch deliveries still refuse it.
 
 - **Kind:** UNFINISHABLE *(contributing cause of P2)*
 - **Found:** 2026-08-09, while verifying P2
@@ -419,11 +419,11 @@ and **not** to the one contract type that can be.
 
 | Guard | OTA | Date | What it stops |
 |---|---|---|---|
-| Anti-camp (`lastBountyClearedOutpostId`) | OTA-1188 | 2026-08 | *"no second contract from the board you just collected on"* |
-| Standing-on-target refusal | OTA-1188 | 2026-08 | 0-tile contracts — accept and finish without moving |
-| Board must be FROZEN to accept | OTA-1187 / OTA-1188 | 2026-08 | Politics-shopping the payout |
+| Anti-camp (`lastBountyClearedOutpostId`) | OTA-1165 | 2026-08 | *"no second contract from the board you just collected on"* |
+| Standing-on-target refusal | OTA-1165 | 2026-08 | 0-tile contracts — accept and finish without moving |
+| Board must be FROZEN to accept | OTA-1164 / OTA-1165 | 2026-08 | Politics-shopping the payout |
 | `MAX_ACTIVE_BOUNTIES = 3` | OTA-850 / OTA-859 | 2026-07 | Unbounded slate stacking |
-| Distance-aware deadline | OTA-862 / OTA-863 / OTA-1185 | 2026-07→08 | 24h + 2.5h/tile + 6h per required kill |
+| Distance-aware deadline | OTA-862 / OTA-863 / OTA-1162 | 2026-07→08 | 24h + 2.5h/tile + 6h per required kill |
 
 <!-- ⚠ Every OTA reference in this file carries its `OTA-` prefix on purpose. The
      golem renumberer only rewrites prefixed numbers, and in a slash list only the
@@ -436,7 +436,7 @@ itself, and the two are not meant to match. The pre-floor references are shared 
 from before the split and read the same on both.
 
 <!-- ⚠ THAT PARAGRAPH DELIBERATELY CONTAINS NO EXAMPLE PAIR. It first read
-     "on golem-line these read 23 lower (OTA-1188 → OTA-1165)" — and the renumberer
+     "on golem-line these read 23 lower (OTA-1165 → OTA-1142)" — and the renumberer
      rewrote BOTH sides on the way across, so golem's copy explained the offset using
      golem's own numbers on both ends and said nothing at all. Any sentence here that
      has to stay true on both lines must not name a number. -->
@@ -534,7 +534,7 @@ different question is a defect nobody works. **B stays inside P3, because B *is*
 
 ### P7 — The long-haul bonus pays for where you STAND, not for the trip you made
 
-## ✅ **CLOSED — OTA-1210.** It measures accept-cell → turn-in-cell now.
+## ✅ **CLOSED — OTA-1187.** It measures accept-cell → turn-in-cell now.
 
 - **Kind:** WRONG PAYOUT *(a shipped requirement, implemented inverted)*
 - **Found:** 2026-08-09, during the P3 audit
@@ -568,7 +568,7 @@ silently paying zero on a trip the player already made.
 
 ### P8 — A finished bounty cannot be handed in at the board that posted it
 
-## ✅ **CLOSED — OTA-1210.** Board and hall take it back, via one shared resolver.
+## ✅ **CLOSED — OTA-1187.** Board and hall take it back, via one shared resolver.
 
 - **Kind:** ENDS IN NOTHING *(a real stranding, reachable in ordinary play)*
 - **Found:** 2026-08-09, during the P3 audit
@@ -600,7 +600,7 @@ already has, rather than writing a second one. One shared helper, four call site
 
 ### P9 — Anchor the vendors to the site, not to the player
 
-## ✅ **CLOSED — OTA-1224, to the owner's four rulings (2026-08-10):** *(1) "keep the grab like it is … make handin specific"* — hand-in counterparty is now the SITE OWNER at the nine owned sites, through the one seam every handler shares; the offer side is untouched and pinned. *(2) "host gear depending on faction status"* — the armory stocks the host's line behind the JOIN threshold. *(3)* hostile ground uses the already-shipped paid roads (courier 75% / market 90% / Halem 80%). *(4)* anchors only; Halem stays the factionless broker; Irma stays Irma. Live suite ota1224HostHandIn (7).
+## ✅ **CLOSED — OTA-1201, to the owner's four rulings (2026-08-10):** *(1) "keep the grab like it is … make handin specific"* — hand-in counterparty is now the SITE OWNER at the nine owned sites, through the one seam every handler shares; the offer side is untouched and pinned. *(2) "host gear depending on faction status"* — the armory stocks the host's line behind the JOIN threshold. *(3)* hostile ground uses the already-shipped paid roads (courier 75% / market 90% / Halem 80%). *(4)* anchors only; Halem stays the factionless broker; Irma stays Irma. Live suite ota1201HostHandIn (7).
 
 
 - **Kind:** DESIGN — *the world does not feel like factions hold ground*
@@ -612,11 +612,11 @@ already has, rather than writing a second one. One shared helper, four call site
 
 | | Status |
 |---|---|
-| Halem the broker | ✅ shipped, OTA-1208 |
-| Skin the rooms by the SITE's faction | ✅ shipped, OTA-1209 |
+| Halem the broker | ✅ shipped, OTA-1185 |
+| Skin the rooms by the SITE's faction | ✅ shipped, OTA-1186 |
 | **Anchor the VENDORS by the site's faction** | **this item** |
 
-**What is left.** OTA-1209 makes the Architect Blind *read* as Architect ground. It does
+**What is left.** OTA-1186 makes the Architect Blind *read* as Architect ground. It does
 not change **who stands in it**. The armory quartermaster there is still the Irma anchor
 re-pointed to the player's own faction, and the workshop and lab still answer for the
 Reclaimers and the Forgotten Order at every site in the world.
@@ -627,7 +627,7 @@ they offer** (`gameStore.ts:11571 / 11596 / 11621 / 11646`). So anchoring vendor
 where you *get* work as well as where you hand it in. That is the 55 `vendor.faction` reads,
 and it is the part that deserves the caution the owner has been giving it.
 
-⚠⚠ **THE SEAM OTA-1209 LEAVES, WRITTEN DOWN SO IT IS NOT LATER FOUND AS A BUG:** after the
+⚠⚠ **THE SEAM OTA-1186 LEAVES, WRITTEN DOWN SO IT IS NOT LATER FOUND AS A BUG:** after the
 reskin, a site's rooms carry that faction's names while its armory quartermaster still
 answers for the player's faction. It is invisible in play — Irma's own name and dialogue
 do not change — but it is a real inconsistency and it is this item's to close.
@@ -640,7 +640,7 @@ instead of stranding the contract. **P9 can now be taken purely on its merits.**
 
 ### P13 — Finishing the Labyrinth imperfectly ends in nothing
 
-## ✅ **CLOSED — OTA-1213.** The heart of the maze now reveals what Iskan-Veil's masking Core is still doing, with a keepsake. Once per character; the Wayfarer title still rides the clean run only.
+## ✅ **CLOSED — OTA-1190.** The heart of the maze now reveals what Iskan-Veil's masking Core is still doing, with a keepsake. Once per character; the Wayfarer title still rides the clean run only.
 
 - **Kind:** ENDS IN NOTHING
 - **Found:** 2026-08-09, second-round audit of the 14 untraced loops
@@ -688,13 +688,13 @@ call, exactly as with the runecasters.
 
 ### P18 — Veil of Ether channelled outside combat pays for nothing
 
-## ✅ **CLOSED — OTA-1223, fix 1.** The Veil now refuses an empty room before fuel is touched, with the reason spoken and zero cost. ⚠ The fix's own test found a second OTA-1218 defect: the parser strips small words, so `channel veil of ether` could not resolve the technique under its own name — `findTechniqueByName` now carries titleMatch's token tier, ambiguity still refusing. Shield/Slip pre-channelling confirmed deliberate and left as designed.
+## ✅ **CLOSED — OTA-1200, fix 1.** The Veil now refuses an empty room before fuel is touched, with the reason spoken and zero cost. ⚠ The fix's own test found a second OTA-1195 defect: the parser strips small words, so `channel veil of ether` could not resolve the technique under its own name — `findTechniqueByName` now carries titleMatch's token tier, ambiguity still refusing. Shield/Slip pre-channelling confirmed deliberate and left as designed.
 
 - **Kind:** ENDS IN NOTHING *(a successful channel whose effect the next action deletes)*
-- **Found:** 2026-08-10, Monday full audit of the weekend's work (OTA-1218's own review)
+- **Found:** 2026-08-10, Monday full audit of the weekend's work (OTA-1195's own review)
 
 **What happens.** Veil of Ether applies the existing `stealthed` status — a deliberate
-OTA-1218 decision, and the right one in combat. But `stealthed` is in
+OTA-1195 decision, and the right one in combat. But `stealthed` is in
 `COMBAT_ONLY_STATUSES`, and the tick expires every combat-only status on the first action
 taken with **no enemies present**. So a Veil channelled out of combat costs the fuel, the
 4-corruption dose and 10 in-game minutes, succeeds, prints its success line — and the very
@@ -720,15 +720,15 @@ intended.
 
 ### P16 — Aether techniques: foundation shipped, not yet reachable
 
-## ✅ **CLOSED — OTA-1226 (2026-08-10).** All three acquisition doors open, per the owner's ruling — *"push it through all routes, three doors makes it accessable even with bad faction standing"*: rapport purchase (1218), found texts at the four aether-heavy ladder sites through OTA-1222's own substitution roll (zero standing required), and storyline grants on top of the authored rewards. One teaching seam (`teachFromProcedureText`), INT-gated at read time, refusals keep the text. With 1218 (player side) and 1225 (enemy mirror), P16 is done end to end.
+## ✅ **CLOSED — OTA-1203 (2026-08-10).** All three acquisition doors open, per the owner's ruling — *"push it through all routes, three doors makes it accessable even with bad faction standing"*: rapport purchase (1195), found texts at the four aether-heavy ladder sites through OTA-1199's own substitution roll (zero standing required), and storyline grants on top of the authored rewards. One teaching seam (`teachFromProcedureText`), INT-gated at read time, refusals keep the text. With 1195 (player side) and 1202 (enemy mirror), P16 is done end to end.
 
-## 🟡 **MIRRORED — OTA-1225 (2026-08-10).** Enemies channel too, per the owner's rulings: aether + mud kinds + Revivalist humans, ~1 in 4, Cascade IN (cornered, kickback and all), and the channel costs the enemy its swing — the player's turn cost, reflected. Ridden on the trait rail so the portrait shows every stage, exactly like the resists.
+## 🟡 **MIRRORED — OTA-1202 (2026-08-10).** Enemies channel too, per the owner's rulings: aether + mud kinds + Revivalist humans, ~1 in 4, Cascade IN (cornered, kickback and all), and the channel costs the enemy its swing — the player's turn cost, reflected. Ridden on the trait rail so the portrait shows every stage, exactly like the resists.
 
-## 🟡 **REACHABLE — OTA-1218.** A player can now buy a procedure from a rapport vendor, see all four in the Aetheric tab, and `channel` one; the effect lands, the dose is charged, and in a fight it costs the round. **Steps 1–5 done.** ⚠ It stays OPEN for the owner's last instruction on it — *"once this is working we will mirror it to enemies and have them applied like the resists are"* — and for the two acquisition routes not yet built (found texts, contract rewards).
+## 🟡 **REACHABLE — OTA-1195.** A player can now buy a procedure from a rapport vendor, see all four in the Aetheric tab, and `channel` one; the effect lands, the dose is charged, and in a fight it costs the round. **Steps 1–5 done.** ⚠ It stays OPEN for the owner's last instruction on it — *"once this is working we will mirror it to enemies and have them applied like the resists are"* — and for the two acquisition routes not yet built (found texts, contract rewards).
 
 - **Kind:** IN PROGRESS *(kept on this list until a player could use one — they can)*
 - **Started:** 2026-08-09, at the owner's direction
-- **Reachable:** 2026-08-10 (OTA-1218) · **Mirrored:** OTA-1225 · **Closed:** OTA-1226
+- **Reachable:** 2026-08-10 (OTA-1195) · **Mirrored:** OTA-1202 · **Closed:** OTA-1203
 
 Owner: *"I would like to have players get aether powers based off of the spells, once this
 is working we will mirror it to enemies and have them applied like the resists are. this
@@ -752,7 +752,7 @@ techniques. Building all ten would have shipped seven of them twice under two ru
 committed as foundation with its next step named rather than abandoned, but it does not
 come off this list until a player can channel one.
 
-**The five steps, all shipped in OTA-1218:**
+**The five steps, all shipped in OTA-1195:**
 
 | | | |
 |---|---|---|
@@ -778,7 +778,7 @@ rule is that no defensive stack buys literal immunity.
 
 ### P17 — Scholar of Forgotten Lore could not be earned without the narration model
 
-## ✅ **CLOSED — OTA-1221.** The offline answer path now counts as reading lore, and it counts DISTINCT concepts rather than asks.
+## ✅ **CLOSED — OTA-1198.** The offline answer path now counts as reading lore, and it counts DISTINCT concepts rather than asks.
 
 - **Kind:** UNFINISHABLE *(a title with no reachable route on an affected device)*
 - **Found:** 2026-08-10, while reading P15's loot tables — five lore texts in the pools led to the question "how does a player read lore at all?"
@@ -790,7 +790,7 @@ question.
 
 ⚠⚠ **On a device where the narration model does not load, the title was unearnable.** That
 is not hypothetical: the owner's own device reads `Narration engine: failed` across
-OTA-1203, OTA-1204 and OTA-1205.
+OTA-1180, OTA-1181 and OTA-1182.
 
 ⚠⚠ **AND THE GAME WAS ANSWERING THE QUESTIONS THE WHOLE TIME.** A keyword lookup over
 `concepts.json` has answered lore offline since OTA-233 — and then `break`s, before the
@@ -824,19 +824,19 @@ stripped before matching, pinned by test.
 player can move the number. That is the WIRED-vs-TRACED gap reappearing inside a test
 written to close it.
 
-**Tests:** `ota1221OfflineLore` (12), every live case driven with **no narration model at
+**Tests:** `ota1198OfflineLore` (12), every live case driven with **no narration model at
 all** — which is the condition under test, not a workaround.
 
 ---
 
 ### P15 — Two of the three relic data files have no importers
 
-## ✅ **THE LOOT HALF IS CLOSED — OTA-1222.** Owner's call: *"it goes from the tuned pool and has a small percentage to pull from the alternate loot table as a replacement item for something already on the list."* Shipped at **10%**, one constant, REPLACEMENT not addition — the drop rate does not move and no extra objects enter the economy. The two unique quest rewards are excluded at the shared resolver. ⛔ `relics.json` stays SUPERSEDED — nothing to do.
+## ✅ **THE LOOT HALF IS CLOSED — OTA-1199.** Owner's call: *"it goes from the tuned pool and has a small percentage to pull from the alternate loot table as a replacement item for something already on the list."* Shipped at **10%**, one constant, REPLACEMENT not addition — the drop rate does not move and no extra objects enter the economy. The two unique quest rewards are excluded at the shared resolver. ⛔ `relics.json` stays SUPERSEDED — nothing to do.
 
-## ⚠⚠ **CORRECTED 2026-08-10 (OTA-1220) — THE ORIGINAL FILING WAS WRONG, AND IN THE SAME WAY P4 WAS.** It said `loot_tables.json` has **zero importers**. It has one, `engine/encounter.ts:8`, and I filed it off a search rather than a read. The original text is left below the correction so the mistake stays legible. The real defect is narrower, sharper, and still real.
+## ⚠⚠ **CORRECTED 2026-08-10 (OTA-1197) — THE ORIGINAL FILING WAS WRONG, AND IN THE SAME WAY P4 WAS.** It said `loot_tables.json` has **zero importers**. It has one, `engine/encounter.ts:8`, and I filed it off a search rather than a read. The original text is left below the correction so the mistake stays legible. The real defect is narrower, sharper, and still real.
 
 - **Kind:** *(one wiring omission + one superseded file)*
-- **Found:** 2026-08-09, second-round audit · **Measured:** 2026-08-10, suite `ota1220RelicDataAudit` (8)
+- **Found:** 2026-08-09, second-round audit · **Measured:** 2026-08-10, suite `ota1197RelicDataAudit` (8)
 
 ### What a READ establishes
 
@@ -872,7 +872,7 @@ one that includes Rare and Legendary rows.** That is a loot-economy decision, an
 catalogues rather than invents.
 
 **The question was, in one line: should searching a place pull from that place's authored
-loot table, or keep pulling from the pool it uses today?** ✅ **ANSWERED (OTA-1222):
+loot table, or keep pulling from the pool it uses today?** ✅ **ANSWERED (OTA-1199):
 both — the tuned pool stays primary and 10% of finds are swapped for something the place
 authored.** ⚠ The pool is not "flat Common", which I said once and had to correct: it is two
 tuned pools retuned across five OTAs against specific playtester complaints.
@@ -921,18 +921,18 @@ nothing checks that the two still agree.
 
 ### P12 — A typed contract name that fits two titles silently closes one of them
 
-## ✅ **CLOSED — OTA-1216.** The substring tier refuses instead of guessing. ⚠ It caught a live case immediately: `accept drakova` matched TWO hunts and a shipped test was pinning the arbitrary pick as correct.
+## ✅ **CLOSED — OTA-1193.** The substring tier refuses instead of guessing. ⚠ It caught a live case immediately: `accept drakova` matched TWO hunts and a shipped test was pinning the arbitrary pick as correct.
 
-- **Kind:** WRONG TARGET *(pre-existing; found 2026-08-09 while building OTA-1211)*
-- ⚠ **Not introduced by OTA-1211, and deliberately not fixed there.**
+- **Kind:** WRONG TARGET *(pre-existing; found 2026-08-09 while building OTA-1188)*
+- ⚠ **Not introduced by OTA-1188, and deliberately not fixed there.**
 
 All four contract finders resolve a typed title in tiers: exact, then substring either way,
-then (as of OTA-1211) token match. **The substring tier uses `pool.find()`, which returns
+then (as of OTA-1188) token match. **The substring tier uses `pool.find()`, which returns
 the FIRST match even when several fit.** So a player holding *"Red Tower Fragment Cache"*
 and *"Red Tower Fragment Vault"* who types `turn in red tower fragment` closes whichever
 happens to sit earlier in the catalog — silently, with a real payout attached.
 
-⚠ **The OTA-1211 token tier already refuses on ambiguity**, so the new behaviour is safe.
+⚠ **The OTA-1188 token tier already refuses on ambiguity**, so the new behaviour is safe.
 The old tier is the one that guesses.
 
 ⚠ **Why it was left alone:** the entire safety argument for dropping a shared resolver into
@@ -949,10 +949,10 @@ behaviour change, which is why it is a decision rather than a patch.
 
 ### P11 — HaL2001 lets you leave the outpost from any room; golem-line does not
 
-## ✅ **CLOSED — OTA-1217.** Owner: *"ok then bring hal up to the better version."* The fix was ported UP rather than stripped from golem, so the live line gained the correct geography and `InputBox.tsx` stops diverging.
+## ✅ **CLOSED — OTA-1194.** Owner: *"ok then bring hal up to the better version."* The fix was ported UP rather than stripped from golem, so the live line gained the correct geography and `InputBox.tsx` stops diverging.
 
 - **Kind:** LINE DIVERGENCE *(not a defect on either line — a decision that was only ever made on one of them)*
-- **Found:** 2026-08-09, when `verify-parity` flagged `InputBox.tsx` during the OTA-1209 port
+- **Found:** 2026-08-09, when `verify-parity` flagged `InputBox.tsx` during the OTA-1186 port
 - ⚠ **Not an "ends in nothing."** Filed here because it is the owner's call and because it
   will keep flagging parity on every future port that touches this file.
 
@@ -986,10 +986,10 @@ only option that keeps `InputBox.tsx` diverging forever.
 
 ### P10 — The Hidden Market hands out contracts it cannot take back
 
-## ✅ **CLOSED — OTA-1215.** Its stalls broker at **10%**, against the trading post's 20% — geography, not generosity: one location you travel to versus a broker at every gate.
+## ✅ **CLOSED — OTA-1192.** Its stalls broker at **10%**, against the trading post's 20% — geography, not generosity: one location you travel to versus a broker at every gate.
 
 - **Kind:** INCOHERENCE *(no longer a dead end — the broker covers it)*
-- **Found:** 2026-08-09, while building OTA-1208
+- **Found:** 2026-08-09, while building OTA-1185
 
 A Hidden Market stall is already a broker on the **accept** side: `isBrokerVendorId`
 (`gameStore.ts:5750`, `VendorContractsModal.tsx:23`) makes `hidden_market_*` stalls post
@@ -1000,7 +1000,7 @@ a board to pick from no matter who you've been running with."*
 Builders rep will hand you a Mud Monarch mystery and then refuse to take it back. **A
 broker that only brokers in one direction.**
 
-⚠ **Deliberately NOT fixed in OTA-1208, and the reasoning matters:** including
+⚠ **Deliberately NOT fixed in OTA-1185, and the reasoning matters:** including
 `hidden_market_*` in `isContractBroker` would have been a one-line change, but it would
 also have started charging a 20% cut at an existing, working location the owner did not
 ask me to touch. And it is no longer a dead end — Halem takes those contracts at any
@@ -1014,9 +1014,9 @@ line either way.
 
 ### P6 — The Siren of Zharak's Teeth was chosen for a perk, and there is nothing to attach it to
 
-## ✅ **CLOSED — OTA-1212.** Owner: *"p6 charisma?"* — +1 CHA, consumed by diplomacy checks and the CHA vendor discount, injected at `effectiveStats`.
+## ✅ **CLOSED — OTA-1189.** Owner: *"p6 charisma?"* — +1 CHA, consumed by diplomacy checks and the CHA vendor discount, injected at `effectiveStats`.
 
-- **Kind:** *(open design question — raised by OTA-1207, not a defect)*
+- **Kind:** *(open design question — raised by OTA-1184, not a defect)*
 - **Found:** 2026-08-09, while building the story perks
 
 The owner picked six stories for buffs; five shipped. **The Siren of Zharak's Teeth did
@@ -1094,7 +1094,7 @@ were meant to be, and that is the owner's answer, not mine.
 
 ### P5 — The store says the location challenges are switched off. They are all on.
 
-## ✅ **CLOSED — OTA-1210.** The false comment is gone; a test pins the premise.
+## ✅ **CLOSED — OTA-1187.** The false comment is gone; a test pins the premise.
 
 - **Kind:** *(neither — a stale claim that would mislead the next audit)*
 - **Found:** 2026-08-09 full loop audit
@@ -1140,7 +1140,7 @@ Recorded so the audit is not re-run on them, and so a future regression has a ba
 
 ## CLOSED
 
-### ✅ P1 — Collectible story sets (closed by OTA-1206, 2026-08-09)
+### ✅ P1 — Collectible story sets (closed by OTA-1183, 2026-08-09)
 
 **Was:** 10 stories / 57 fragments completing into a pill style and a banner on a screen
 the player had to navigate to. No reward, no title, no notification.
@@ -1165,7 +1165,7 @@ the player had to navigate to. No reward, no title, no notification.
    data row; **the name is the owner's to change.**
 4. **INVESTIGATE ALL** — mirrors SALVAGE ALL / TAKE ALL; sweeps only actionable chips.
 
-**Tests:** `ota1206CollectionPayoff` (27). Four older assertions retargeted from hardcoded
+**Tests:** `ota1183CollectionPayoff` (27). Four older assertions retargeted from hardcoded
 counts to self-maintaining ones — they had turned every future title and every new
 completion path into a red test.
 
@@ -1237,7 +1237,7 @@ below.
 which is what the bar asks — but none had been walked end to end the way mysteries were,
 and mysteries is precisely the loop that looked fine until it didn't.
 
-## ⚠⚠ WIRED → TRACED (2026-08-10, OTA-1219)
+## ⚠⚠ WIRED → TRACED (2026-08-10, OTA-1196)
 
 Owner: *"audit this for traced and make sure the loops are functional."* Every WIRED row was
 then walked. The bar for a promotion was the same three things, live, against the real
@@ -1250,7 +1250,7 @@ UI calls, and assert a payoff the PLAYER can see.**
 | Fusion | **TRACED** | `confirmFusionSelection` → a named weapon exists, all three inputs are consumed |
 | Recipe discovery | **TRACED** | the picker drained 200 times: every pick is NEW, and it terminates |
 | Stat training | **TRACED** | the ledger fills and the stat on the sheet actually rises |
-| Gifting | **TRACED** | `giveGift` → item leaves, the NPC remembers, the taste is learned; and an UNMET recipient is refused WITHOUT eating the item (the OTA-1087 guard) |
+| Gifting | **TRACED** | `giveGift` → item leaves, the NPC remembers, the taste is learned; and an UNMET recipient is refused WITHOUT eating the item (the OTA-1064 guard) |
 | Titles | **TRACED** | every WIRED title is earnable under some race × faction × maxed sheet — none is a dead entry; every passive perk is attached to a real title |
 | Corruption | **TRACED** | a corrupted sheet rolls measurably worse, pays more, and draws more encounters; all four tiers reachable, every crossing has a line |
 | Golem companion | **TRACED** | `summon golem` → a companion with real HP and a real attack die |
@@ -1262,10 +1262,10 @@ UI calls, and assert a payoff the PLAYER can see.**
 | Aetherkin | **TRACED** | encounters build in both contexts and EVERY authored variant name resolves to a real enemy; the revering factions are real factions |
 | Hook puzzles | **TRACED** | every hook kind has a chain and every chain ENDS in something |
 | The Fallen | **TRACED** | a fallen hero becomes a fightable enemy, defeat has words, and avenging writes back so the same ghost is not raised twice |
-| Story forks | **TRACED** | already proved end to end by `ota1088StoryForks` — answer → TC change → narration → never returns |
+| Story forks | **TRACED** | already proved end to end by `ota1065StoryForks` — answer → TC change → narration → never returns |
 | Resurrection gems | **TRACED** | already proved end to end by `resurrectSlotGemSafety` — revives at the backfilled hpMax spending EXACTLY one gem, refuses with none |
 
-**Suites:** `ota1219LoopAuditA/B/C/D`. ⚠ Two loops were NOT re-tested (forks, gems) because
+**Suites:** `ota1196LoopAuditA/B/C/D`. ⚠ Two loops were NOT re-tested (forks, gems) because
 existing suites already drive them end to end; a second weaker version would add a file and
 prove nothing.
 
@@ -1320,11 +1320,11 @@ Owner: *"audit the other 14 loops when done give me a new punch list."*
 | Crafting / Aethercraft | ✅ wired — 39 importers |
 | Corruption arc | ✅ wired — 4 importers; tiers drive stats, prices, encounter rate |
 | Core Guardians | ✅ **TRACED** — `core_recovered` advances the main-quest phase, which drives chapters, Arbiter stance and the ending |
-| Titles | ✅ **TRACED** — every engine title has a data row and vice versa (pinned by test since OTA-1206) |
+| Titles | ✅ **TRACED** — every engine title has a data row and vice versa (pinned by test since OTA-1183) |
 | Whispers | ✅ pays — TC on completion (`gameStore.ts:34435`) |
 | Dog rescue arc | ✅ **CLOSED AS DESIGNED** *(owner ruling 2026-08-10: acquisition loop — the naming popup + Arbiter comment IS the completion; was marked PARTIAL for lacking a story ending it was never meant to have)* |
 | Golem companion arc | ✅ **CLOSED AS DESIGNED** *(same ruling; summon → naming popup → Arbiter acknowledgement, all tested)* |
-| Mysteries (the finding half) | ✅ wired — stage advance + artifact gate; turn-in closed by OTA-1208 |
+| Mysteries (the finding half) | ✅ wired — stage advance + artifact gate; turn-in closed by OTA-1185 |
 | **Maze / Labyrinth** | ❌ **P13** — an imperfect run ends in nothing |
 | **Buried Skyscraper** | ❌ **P14** — 100-floor dungeon, no entry point |
 | *(found alongside)* Relics data | ❌ **P15** — 2 of 3 files orphaned, 126 entries |

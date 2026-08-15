@@ -7,7 +7,7 @@ import locationsData from '../data/locations/locations.json';
 
 const objectives = objectivesData as QuestObjective[];
 
-/** ⚠⚠ OTA-1237 — EVERY LEAD VERB HAS A TRIGGER. The owner asked, after the hunt
+/** ⚠⚠ OTA-1214 — EVERY LEAD VERB HAS A TRIGGER. The owner asked, after the hunt
  *  fix: "every mission, hunt, whisper, and every other style of side quest?" —
  *  and the check found LEADS effectively 100% uncompletable: the only
  *  completion trigger was kill-verb name matching ('kill/slay/defeat/hunt/
@@ -15,7 +15,7 @@ const objectives = objectivesData as QuestObjective[];
  *  Every lead ever generated accumulated forever (the OTA-011 note even
  *  recorded that history, then fixed only the kill shape).
  *
- *  The contract, same law as OTA-1236: AT the lead's own pinned location,
+ *  The contract, same law as OTA-1213: AT the lead's own pinned location,
  *  performing a verb-matched intent completes it; kill-shaped verbs also
  *  complete on any enemy defeated at the site. The audit test walks
  *  objectives.json and fails the build if a verb ever ships without an entry

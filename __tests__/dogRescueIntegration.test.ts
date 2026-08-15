@@ -197,7 +197,7 @@ describe('OTA-124 vandalistic — rescue scenario × race matrix (engine surface
       expect(onboarding).toBeTruthy();
       expect(onboarding?.stage).toBe('breed');
       expect(onboarding?.rescueData.scenario).toBe('smelter');
-      // OTA-1050 — typed input is never an answer anymore; the popup commits
+      // OTA-1027 — typed input is never an answer anymore; the popup commits
       // all three fields at once. A stray typed line first, to prove it
       // cannot corrupt the pending ask...
       store.getState().submitPlayerAction('rest');

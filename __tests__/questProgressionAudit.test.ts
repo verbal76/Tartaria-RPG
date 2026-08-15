@@ -301,7 +301,7 @@ describe('Quest progression audit', () => {
       const titleSnippet = q.title.split(' ').slice(0, 3).join(' ');
 
       // Accept via direct store action — engine path under test.
-      // OTA-993 (#117) — stranded escorts are HOOK-granted only: boards, vendors,
+      // OTA-970 (#117) — stranded escorts are HOOK-granted only: boards, vendors,
       // and acceptFactionQuest refuse them by design (you find the stranded
       // soul in the wild). Seed the active record the way applyHookEffect's
       // start_escort_contract does, then walk stages + turn-in exactly like

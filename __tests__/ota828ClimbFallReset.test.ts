@@ -42,7 +42,7 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore } from '../app/state/gameStore';
 import type { InventoryItem } from '../app/engine/types';
 
-// OTA-828 — a climb FALL must wipe THIS climb's cleared-tier progress: you resume
+// OTA-808 — a climb FALL must wipe THIS climb's cleared-tier progress: you resume
 // from the ground, not the tier you fell off (player ruling: "you shouldn't resume
 // climb at the same level you fell from — start all the way over").
 
@@ -68,7 +68,7 @@ const climbMarks = (store: typeof useGameStore): string[] => {
   return Object.values(rooms).flatMap((r) => (r as { searchedAmbientNouns?: string[] }).searchedAmbientNouns ?? []);
 };
 
-describe('OTA-828 — a climb fall restarts the climb from the ground', () => {
+describe('OTA-808 — a climb fall restarts the climb from the ground', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
   it('clears a tier, then a fall strips this climb progress marker', async () => {
@@ -77,7 +77,7 @@ describe('OTA-828 — a climb fall restarts the climb from the ground', () => {
     expect(store.getState().currentScene?.elevatedOn).not.toBeNull();
     expect(climbMarks(store).some((m) => m.startsWith('climbed:tower'))).toBe(true);
 
-    // OTA-936 — a stamina shortfall no longer drops you; trigger a REAL fall (a rope worn
+    // OTA-913 — a stamina shortfall no longer drops you; trigger a REAL fall (a rope worn
     // through to nothing) to exercise the OTA-828 climb-reset instead.
     store.setState({
       player: {

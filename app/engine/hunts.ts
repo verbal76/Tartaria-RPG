@@ -7,7 +7,7 @@ import { findByTitle } from './titleMatch';
 import huntsData from '../data/quests/hunts.json';
 import type { PlayerCharacter, Enemy } from './types';
 import enemiesData from '../data/enemies/enemies.json';
-// OTA-1190 — the shared over-level curve, so a hunt boss reads the player the same way
+// OTA-1167 — the shared over-level curve, so a hunt boss reads the player the same way
 // every other spawner does rather than inventing its own measure.
 import { overLevelT } from './encounter';
 
@@ -188,9 +188,9 @@ export function findHuntById(id: string): HuntDef | null {
   return HUNTS.find((h) => h.id === id) ?? null;
 }
 
-/** ⚠⚠ OTA-1242 — THE FIRST STAGE A VERB CAN PAY. Every hunt opens on a
+/** ⚠⚠ OTA-1219 — THE FIRST STAGE A VERB CAN PAY. Every hunt opens on a
  *  pure-narration stage (checkKind: null) whose text plays at ACCEPT — but the
- *  record used to START at that index, and the OTA-1236 verb matcher can never
+ *  record used to START at that index, and the OTA-1213 verb matcher can never
  *  match a null kind. Mysteries and storylines auto-consume narration stages
  *  (OTA-871); hunts never got that loop, so every hunt accepted after 1236 was
  *  wedged at stage 0 forever — no verb, no dice, nothing could move it. The
@@ -221,7 +221,7 @@ export function availableHunts(
   );
 }
 
-// ⚠ OTA-1211 — delegates to the shared three-tier resolver. The first two tiers are
+// ⚠ OTA-1188 — delegates to the shared three-tier resolver. The first two tiers are
 // the exact behaviour this function always had; the third catches the case the
 // parser creates by stripping stop words ("fragment red tower" vs "Fragment of the
 // Red Tower"), and only ever runs where this used to return null. See titleMatch.ts.
@@ -229,7 +229,7 @@ export function fuzzyFindHunt(text: string, pool: readonly HuntDef[]): HuntDef |
   return findByTitle(text, pool);
 }
 
-/** ⚠ OTA-1190 — ceiling on the boss HP multiplier at full over-level. The old curve
+/** ⚠ OTA-1167 — ceiling on the boss HP multiplier at full over-level. The old curve
  *  topped out at an effective 1.6, driven by `hpMax` alone. */
 export const HUNT_HP_CEILING = 2.2;
 /** Over-level fraction at which the boss gains a damage die. Was `hpMax > 50`, which a
@@ -238,10 +238,10 @@ export const HUNT_DAMAGE_STEP_T = 0.5;
 
 // Build a scaled clone of the target enemy.
 //
-// ⚠ OTA-1190 — IT USED TO SCALE ON `hpMax` AND NOTHING ELSE:
+// ⚠ OTA-1167 — IT USED TO SCALE ON `hpMax` AND NOTHING ELSE:
 //     hpFactor = min(1.6, max(1.0, hpMax / 30))
 // which is 1.0 — NO SCALING WHATSOEVER — for every character under 30 max HP, and blind
-// to stats, weapon damage and AC. OTA-1182 built `enemyScalePower` precisely because
+// to stats, weapon damage and AC. OTA-1159 built `enemyScalePower` precisely because
 // "how strong is this character" had two different answers, and routed seven spawners
 // through it. THIS WAS THE SPAWNER THAT GOT MISSED: a fully kitted character at 29 max
 // HP fought exactly the boss a fresh arrival did.

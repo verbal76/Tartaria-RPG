@@ -1,4 +1,4 @@
-// OTA-715 — reconcile the creature-TYPE damage table with an enemy's
+// OTA-698 — reconcile the creature-TYPE damage table with an enemy's
 // authored resist/vulnerable TRAIT for the SAME damage type.
 //
 // Playtest log: the Aetheric Banshee (type "Aetheric Creature", which the
@@ -16,7 +16,7 @@ import { applyDamageTypeModifier } from '../app/engine/crafting';
 import { traitDamageMultiplier } from '../app/engine/enemyTraits';
 import { findEnemyByName } from '../app/engine/encounter';
 
-describe('OTA-715 — combineDamageTypeMatch', () => {
+describe('OTA-698 — combineDamageTypeMatch', () => {
   it('DISCORD: type resists but trait is vulnerable → trait wins (×1.5, weak)', () => {
     expect(combineDamageTypeMatch('resist', 'vulnerable')).toEqual({ multiplier: 1.5, match: 'weak' });
   });
@@ -48,7 +48,7 @@ describe('OTA-715 — combineDamageTypeMatch', () => {
   });
 });
 
-describe('OTA-715 — real Aetheric Banshee resolves cleanly', () => {
+describe('OTA-698 — real Aetheric Banshee resolves cleanly', () => {
   const banshee = findEnemyByName('Aetheric Banshee');
 
   it('exists with the contradictory flags (type resists aetheric, trait says vulnerable)', () => {

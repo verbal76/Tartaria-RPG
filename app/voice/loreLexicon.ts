@@ -30,7 +30,7 @@
 // right answer depends on the canonical Tartaria pronunciation and
 // how espeak's letter-to-sound rules treat specific letter combos.
 
-// ⚠ OTA-1170 — an entry may now supply a FUNCTION instead of a fixed string.
+// ⚠ OTA-1147 — an entry may now supply a FUNCTION instead of a fixed string.
 // Only the Aether catch-all needs it, and only to keep the file's own
 // convention: every other entry replaces the whole word with a lowercase
 // respelling, but a prefix rule leaves the tail exactly as authored — so
@@ -51,7 +51,7 @@ const LEXICON: Array<[RegExp, LexiconReplacement]> = [
   //   Aetherstone  → "ay thur stone"
   //   Aetherborn   → "ay thur born"
   //   Aetherbat    → "ay thur bat"
-  // ⚠ OTA-1170 — "ay thur" → "ayther", AND IT IS A PREFIX RULE NOW.
+  // ⚠ OTA-1147 — "ay thur" → "ayther", AND IT IS A PREFIX RULE NOW.
   // Owner: *"aether should be āther … anything starting with aether should
   // have it start with āther for pronunciation not spelling."*
   //
@@ -155,7 +155,7 @@ const LEXICON: Array<[RegExp, LexiconReplacement]> = [
 // pre-empted by "Aether" matching the first 6 chars (\b boundaries
 // usually prevent this, but the safety belt protects against future
 // authors adding overlapping entries out of order).
-// ⚠ OTA-1170 — and a SECOND key, ahead of length: catch-alls run LAST.
+// ⚠ OTA-1147 — and a SECOND key, ahead of length: catch-alls run LAST.
 // Length alone got this exactly backwards for the Aether family. The prefix
 // rule's source (`\bAether(?=[a-z])`, 17 chars) is LONGER than the named
 // compound it must never pre-empt (`\bAetherstone\b`, 15), so sorting by
@@ -218,7 +218,7 @@ export function applyLoreLexicon(text: string): string {
       ? out.replace(pattern, replacement)
       : out.replace(pattern, replacement);
   }
-  // ⚠ OTA-1169 — LAST, and that ordering is load-bearing. The article's
+  // ⚠ OTA-1146 — LAST, and that ordering is load-bearing. The article's
   // pronunciation depends on the sound of the word AFTER it, and the
   // respellings above CHANGE that sound: "the Aether" becomes "the ay thur",
   // consonant-initial on the page and vowel-initial in the mouth. Running this
@@ -226,7 +226,7 @@ export function applyLoreLexicon(text: string): string {
   return respellTheArticle(out);
 }
 
-// ⚠ OTA-1169 — "THE" IS TWO WORDS, and Kokoro only ever says one of them.
+// ⚠ OTA-1146 — "THE" IS TWO WORDS, and Kokoro only ever says one of them.
 //
 // Owner: *"kokoro pronounces the as thee it should be pronounce thuh or tha."*
 //

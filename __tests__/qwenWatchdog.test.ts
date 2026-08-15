@@ -78,7 +78,7 @@ describe('OTA-223 — Qwen dormancy detection + recovery cycle (watchdog primiti
     expect(engine.isDormant()).toBe(false);
   });
 
-  // OTA-797 regression — the whole-session qwen-not-ready bug (2026-07-13 log).
+  // OTA-777 regression — the whole-session qwen-not-ready bug (2026-07-13 log).
   // A FAILED revival attempt lands the engine in status='failed', where
   // isDormant() returns FALSE — so the OLD watchdog (which only re-kicked when
   // isDormant() was true) short-circuited forever and never retried. The engine

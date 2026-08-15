@@ -90,7 +90,7 @@ export interface InvestigationEntry {
   /** Recorded on first investigate; replayed by callbackLine on
    *  repeat taps so the callback is SPECIFIC, not generic. */
   result: InvestigationResult | null;
-  /** OTA-1126 — set once this discovery has fed a cross-room echo
+  /** OTA-1103 — set once this discovery has fed a cross-room echo
    *  hook (OTA-075). A memory surfaces ONCE: without this flag the
    *  echo scan re-picked the same most-recent entry in every new
    *  scene, planting the same fully-paying thread forever — a
@@ -431,14 +431,13 @@ function pickCreepyVariant(pool: readonly string[], category: NounCategory): str
 // per noun via nounSeed. Same noun always resolves to the same
 // line (player sanity), different nouns get different beats
 // (immersion).
-// OTA-714 — the catch-all pool is now fully POSTURE-NEUTRAL. The FIXED_
-// FEATURE classifier (OTA-711) can only whitelist so many architecture
-// nouns, and the playtest still caught gaps — "investigate floorboards" →
-// "you turn the floorboards in your hands", "investigate ladder" → "you
-// let it go". Since this pool is the fallback for UNCLASSIFIED nouns (which
-// skew toward things you look at, not hold), it must never assume the noun
-// is a small held object. Every line here reads correctly whether the noun
-// is a pebble or a staircase — no "turn in your hands", "weigh", "let it go".
+// OTA-697 — the catch-all pool is now fully POSTURE-NEUTRAL (ports Tartaria
+// OTA-714). The FIXED_FEATURE classifier can only whitelist so many nouns,
+// and the playtest still caught gaps ("investigate floorboards" → "you turn
+// the floorboards in your hands"). Since this pool is the fallback for
+// UNCLASSIFIED nouns (which skew toward things you look at, not hold), it
+// must never assume the noun is a small held object — no "turn in your
+// hands", "weigh", "let it go".
 const GENERIC_VARIANTS: readonly string[] = [
   'You look the {noun} over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.',
   'You study the {noun} and find no answer. The silence here is patient; whatever it knew, it has decided to keep.',
@@ -450,7 +449,7 @@ const GENERIC_VARIANTS: readonly string[] = [
   'The {noun} sits the way ordinary things sit. The Arbiter does not lean in. You move on.',
 ];
 
-// OTA-711 — fixed-feature generic pool. The GENERIC_VARIANTS above lean on
+// OTA-694 — fixed-feature generic pool. The GENERIC_VARIANTS above lean on
 // HANDHELD phrasing ("turn the {noun} in your hands", "weigh the {noun}",
 // "you let it go") which reads as nonsense on architecture the player can't
 // pick up — playtest log: `investigate stair` → "You turn the stair in your
@@ -502,7 +501,7 @@ export function resolveLore(entry: InvestigationEntry): string {
   } else if (entry.category === 'generic') {
     // OTA-125 — generic-category variant pool. Deterministic per
     // noun so the same noun stays consistent across re-reads.
-    // OTA-711 — fixed features (stair, wall, hatch …) draw from the
+    // OTA-694 — fixed features (stair, wall, hatch …) draw from the
     // posture-agnostic pool so we never narrate "you turn the stair in
     // your hands." Portable/unclassified nouns keep the original pool.
     const pool = FIXED_FEATURE_RE.test(entry.noun.toLowerCase())
@@ -773,7 +772,7 @@ export function findReferenceableInvestigation(
     for (const entry of Object.values(room.roomInvestigationTable)) {
       if (!entry.consumed) continue;
       if (!entry.result) continue;
-      // OTA-1126 — a memory surfaces ONCE. The sort below always put the
+      // OTA-1103 — a memory surfaces ONCE. The sort below always put the
       // most-recent discovery first, so without this skip the SAME entry
       // won the scan in every new scene — the same thread re-planted and
       // re-paid forever (Giant Bone Longbow, device log 2026-08-05:

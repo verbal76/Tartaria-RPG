@@ -255,7 +255,7 @@ function onState(state: GameState): void {
       // arbiter-only channel (per OTA 123 player request) — frame
       // strip + speak. The SPOKEN_CHANNELS set is now {'arbiter'}
       // so this is always the arbiter path.
-      // OTA-1065 — meta.supersede: this line REPLACES the pending backlog.
+      // OTA-1042 — meta.supersede: this line REPLACES the pending backlog.
       // The tutorial appends two arbiter lines per beat (an acknowledgement
       // and the next instruction) while on-device Kokoro is still
       // synthesising the previous one, so the queue grows faster than it
@@ -303,7 +303,7 @@ function onState(state: GameState): void {
 /** Bind the controller to the game store + settings observer. Call
  *  once at app boot, AFTER initTTSManager(). */
 export function startTTSController(): void {
-  // ⚠ OTA-1155 — hand the low-level synth layer a way to reach the game log.
+  // ⚠ OTA-1132 — hand the low-level synth layer a way to reach the game log.
   // PiperTTSManager must not import the store itself (it is the native layer,
   // and that dependency would run the wrong way), so this module — which
   // already owns that edge — installs the sink.

@@ -282,7 +282,7 @@ export function repairCost(item: InventoryItem): number {
   if (!item.durability) return 0;
   const missing = item.durability.max - item.durability.current;
   if (missing <= 0) return 0;
-  // OTA-1023 — canonical rarity: a stale-Common instance of a promoted piece
+  // OTA-1000 — canonical rarity: a stale-Common instance of a promoted piece
   // repaired at 1/3 the intended TC sink while fighting with CURRENT stats.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const repairRarity = (require('./crafting') as typeof import('./crafting')).canonicalItemRarity(item);

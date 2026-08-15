@@ -113,7 +113,7 @@ describe('OTA-873 — same-element dual coating sums its DOT', () => {
     const sc2 = useGameStore.getState().currentScene!;
     // Still ONE merged poison DOT — that is OTA-873's actual claim and it holds.
     expect((sc2.enemyStatuses?.[0] ?? []).filter((st: any) => st.kind === 'poison_coat')).toHaveLength(1);
-    // ⚠ Retargeted by OTA-1173, and the SUM half of the claim genuinely changed.
+    // ⚠ Retargeted by OTA-1150, and the SUM half of the claim genuinely changed.
     // This used to be 2× — both slots paying full freight. That batch capped the
     // SECOND slot at SECOND_COAT_EFFECT_MULT, so a same-element dual now ticks
     // for slot 1 plus half of slot 2. The merge behaviour (one status, not two)

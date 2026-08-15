@@ -1,4 +1,4 @@
-// OTA-830 — OTA-828 stamped uniqueStats in the Guardian weapon()/armor() BUILDERS, so
+// OTA-810 — OTA-828 stamped uniqueStats in the Guardian weapon()/armor() BUILDERS, so
 // only NEWLY granted drops became usable. A drop earned BEFORE 828 sits in the save
 // with NO uniqueStats, so it still resolves barehanded / 0-AC — device report:
 // "Atalan's Trident still doesn't work" (while Vaelka's Halberd worked by accident,
@@ -20,7 +20,7 @@ const oldTrident = (): InventoryItem => ({
   durability: { current: 55, max: 55 },
 } as InventoryItem);
 
-describe('OTA-830 — backfill uniqueStats onto pre-828 Guardian drops', () => {
+describe('OTA-810 — backfill uniqueStats onto pre-828 Guardian drops', () => {
   it('re-derives the Trident stats by name (was missing from the old save)', () => {
     const old = oldTrident();
     expect(old.uniqueStats).toBeUndefined();

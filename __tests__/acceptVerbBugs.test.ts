@@ -61,7 +61,7 @@ describe('accept verb — OTA 185 wiring fixes', () => {
     console.error = () => {};
   });
 
-  // ⚠⚠ RETARGETED BY OTA-1216 (PUNCHLIST P12), AND IT WAS ASSERTING THE DEFECT.
+  // ⚠⚠ RETARGETED BY OTA-1193 (PUNCHLIST P12), AND IT WAS ASSERTING THE DEFECT.
   //
   // This used `accept drakova` and expected the Bog Dragon. But "drakova" substring-matches
   // TWO hunts — "The Bog Dragon of Old Drakova" and "The Siren of Drowned Drakova" — so the
@@ -161,7 +161,7 @@ describe('accept verb — OTA 185 wiring fixes', () => {
     await store.getState().startNewGame({ name: 'NoDup', raceId: race.id, factionId: fac.id });
     store.getState().skipTutorial?.();
 
-    // ⚠ OTA-1216 — was `accept drakova`, which is ambiguous between two hunts and now
+    // ⚠ OTA-1193 — was `accept drakova`, which is ambiguous between two hunts and now
     // refuses, so all three calls did nothing and the test passed for the wrong reason
     // in one direction and failed in the other. The de-duplication rule this guards is
     // unrelated to name matching, so it just needs an unambiguous name.

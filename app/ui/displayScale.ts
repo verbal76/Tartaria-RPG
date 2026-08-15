@@ -1,4 +1,4 @@
-// ⚠⚠ OTA-1250 — THE GAME STOPS BEING A PHONE ON A MONITOR.
+// ⚠⚠ OTA-1227 — THE GAME STOPS BEING A PHONE ON A MONITOR.
 //
 // Owner, looking at the PC build: *"on a PC it's a slice down the middle or is
 // it resolution aware, and do we have a resolution picker?"* It was a slice,
@@ -25,8 +25,8 @@ import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// ⚠ OTA-1252 — the two pure layout numbers moved to ./layoutConstants, and are
-// RE-EXPORTED here so the five screens keep the import OTA-1250 gave them.
+// ⚠ OTA-1229 — the two pure layout numbers moved to ./layoutConstants, and are
+// RE-EXPORTED here so the five screens keep the import OTA-1227 gave them.
 // Reason for the move: this module needs AsyncStorage for the scale setting, so
 // a component that wanted nothing but a width paid for a storage dependency —
 // which broke `healthCardTint` on a native-module require for a StatsPanel that

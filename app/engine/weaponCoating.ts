@@ -43,11 +43,11 @@ export function isCoatableWeapon(name: string): boolean {
 }
 
 /** engine_Dev (armor coating) — the damage type a coating's ARMOR resist counts
- *  as, so it matches incoming enemy damage. Tartaria's coatings are all built-in
- *  (poison / acid / corruption / electrical / burn), where the kind already IS the
- *  damage-type string, so this is identity. Kept as a single helper so the armor-
- *  coating path reads the resist type in one place (and a future custom-coating
- *  layer can override the mapping here without touching call sites). */
+ *  as, so it matches incoming enemy damage. golem's coatings are all built-in
+ *  (poison / acid / corruption / electrical / burn), where the kind already IS
+ *  the damage-type string, so this is identity. Kept as a single helper so the
+ *  armor-coating path reads the resist type in one place (and a future custom-
+ *  coating layer can override the mapping here without touching call sites). */
 export function coatingDamageType(kind: string): string {
   return kind.toLowerCase();
 }
@@ -143,7 +143,7 @@ export const COATING_RESIST_LAND_CHANCE = 0.15;
 /** AC reduction an acid coating inflicts per landing hit. */
 export const ACID_SHRED_PER_HIT = 1;
 /** Base cap on accumulated acid armor shred per enemy (normal foes).
- *  ⚠ OTA-1173 (owner tuning) — 5 → 3. See the acid block below for why. */
+ *  ⚠ OTA-1150 (owner tuning) — 5 → 3. See the acid block below for why. */
 export const ACID_SHRED_MAX = 3;
 /** OTA-480 — extra shred headroom against a BOSS, so acid can strip the +6
  *  boss-AC bonus that makes high-tier Core Guardians a "find another way" wall.
@@ -151,8 +151,8 @@ export const ACID_SHRED_MAX = 3;
  *  worn down to 5+6 = 11 over a long fight, restoring the player's hit rate as
  *  the fight goes. This is the late-game lever a coated golem (the armor-breaker)
  *  drives. */
-export // ⚠ OTA-1165 (owner tuning) — 6 → 2. The exploit sweep showed 11 points of
-// boss shred pushing weakness-hit uptime toward ~95%, turning OTA-1160's
+export // ⚠ OTA-1142 (owner tuning) — 6 → 2. The exploit sweep showed 11 points of
+// boss shred pushing weakness-hit uptime toward ~95%, turning OTA-1137's
 // one-round stagger into a near-permanent lock (two systems fine alone,
 // multiplying). At +2 (boss cap 7) acid stays a real boss tool without
 // deleting the to-hit roll that keeps the stagger honest.
@@ -162,7 +162,7 @@ export function acidShredCap(enemy: { boss?: boolean } | null | undefined): numb
   return ACID_SHRED_MAX + (enemy?.boss ? ACID_SHRED_BOSS_BONUS : 0);
 }
 
-// ─── ⚠ OTA-1173 — THE ACID BATCH (owner tuning, three dials) ────────
+// ─── ⚠ OTA-1150 — THE ACID BATCH (owner tuning, three dials) ────────
 //
 // Owner: *"I throw acid on everything and I use the coatings for my weapon and
 // armor for resists and added damage … I'm just mowing through people. I might
@@ -199,11 +199,11 @@ export function acidShredCap(enemy: { boss?: boolean } | null | undefined): numb
 // cancel the +1 per hit exactly and shred would never accumulate at all, which
 // deletes the mechanic instead of tuning it.
 
-/** OTA-1173 — AC the target's guard recovers per round once the acid DOT has
+/** OTA-1150 — AC the target's guard recovers per round once the acid DOT has
  *  lapsed. Zero while a live acid coat keeps burning. */
 export const ACID_SHRED_DECAY_PER_ROUND = 1;
 
-/** OTA-1173 — effect multiplier on the SECOND coating slot of a dual-coated
+/** OTA-1150 — effect multiplier on the SECOND coating slot of a dual-coated
  *  weapon. Scales that proc's rolled value, which is the one number driving both
  *  its immediate bonus damage and its per-turn DOT, so one multiplier covers
  *  both. Slot 1 is untouched. Acid shred and corruption stacks are NOT scaled —
@@ -288,7 +288,7 @@ export function coatingDotPerTurn(
   return rolled;
 }
 
-/** OTA-1020 — THE ONE ANSWER to "is this item a weapon coating?". Reads canonical
+/** OTA-997 — THE ONE ANSWER to "is this item a weapon coating?". Reads canonical
  *  (instance-union-catalog) tags, because inventory instances persist stale tag
  *  snapshots — the owner's pre-tag vials refused to rack on the bandolier while
  *  identical newly-minted ones racked fine. Every consumer (bandolier gate,

@@ -14,7 +14,7 @@ export const QUEST_LOCK_TAGS = ['quest', 'contract', 'broker', 'whisper'] as con
 
 /** True iff the item is a locked objective item (quest / contract / whisper). */
 export function isQuestLockedItem(item: Pick<InventoryItem, 'tags'> & { name?: string }): boolean {
-  // OTA-1022 — CANONICAL tags when the caller passes a real item. The instance
+  // OTA-999 — CANONICAL tags when the caller passes a real item. The instance
   // snapshot alone let a quest key acquired before its catalog 'quest' tag
   // shipped be dropped, sold, scrapped, gifted and FUSED — an unwinnable-run
   // hole. Lazy require: sellPrice/crafting import in both directions.

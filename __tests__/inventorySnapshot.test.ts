@@ -160,9 +160,9 @@ describe('OTA-202 — buildInventorySnapshot', () => {
     const out = buildInventorySnapshot(mkPlayer({ inventory: [plate] }));
     const acts = out.match(/Sentinel Core Plate[^\n]*\n[^\n]*actions:\s*([^\n]+)/)?.[1] ?? '';
     expect(acts).not.toMatch(/equip:chest/);
-    // OTA-1024 — the Plate IS a catalog THROWABLE (materials.json carries the
-    // tag); canonical identity now offers the hand slots + off-hand throw. The
-    // OTA-207 intent (never an ARMOR slot from the 'Plate' name) still holds.
+    // The Plate IS a catalog THROWABLE (materials.json carries the tag);
+    // canonical identity now offers the hand slots + off-hand throw. The
+    // original intent (never an ARMOR slot from the 'Plate' name) still holds.
     expect(acts).toMatch(/equip:main/);
   });
 

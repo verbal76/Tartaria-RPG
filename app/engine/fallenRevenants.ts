@@ -48,7 +48,7 @@ export function cachedFallen(): FallenHero[] {
   return FALLEN_CACHE;
 }
 export function _setFallenCacheForTests(f: FallenHero[] | null): void { FALLEN_CACHE = f; }
-/** OTA-1014 — a death recorded THIS session joins the pool immediately. The cache
+/** OTA-991 — a death recorded THIS session joins the pool immediately. The cache
  *  was primed once per process and only markAvenged wrote to it, so a fallen
  *  predecessor could not rise for a successor until app restart. */
 export function appendFallenToCache(f: FallenHero): void {
@@ -60,7 +60,7 @@ export function markAvenged(ts: number, by: string): void {
   }
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { markFallenAvenged } = require('./saveSystem') as typeof import('./saveSystem');
-  // OTA-1017 — the memorial write RETRIES. Fire-and-forget meant one failed disk
+  // OTA-994 — the memorial write RETRIES. Fire-and-forget meant one failed disk
   // write let a put-to-rest revenant rise again after an app restart.
   void (async () => {
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -204,7 +204,7 @@ export function revenantReclaimWeapon(f: Pick<FallenHero, 'gear'>): FallenGearPi
   return gear.find((g) => g.slot === 'main') ?? gear[0] ?? null;
 }
 
-/** OTA-1017 — pin a SYNTHESIZED (pre-snapshot) kit at first generation: cache now,
+/** OTA-994 — pin a SYNTHESIZED (pre-snapshot) kit at first generation: cache now,
  *  disk best-effort. Without this the kit was only stable per BUILD — a Rare+
  *  catalog edit silently re-dressed every legacy fallen. */
 export function pinSeededKit(f: FallenHero, names: string[]): void {

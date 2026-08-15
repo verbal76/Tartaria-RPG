@@ -32,7 +32,7 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-// OTA-1007 — the fuse honesty batch. OTA-801 made a FAILED gate open the picker
+// OTA-984 — the fuse honesty batch. OTA-801 made a FAILED gate open the picker
 // anyway, to dodge refusal spam. That traded a visible annoyance for an
 // invisible one: a menu the player cannot act in, logging NOTHING. On device,
 // three `fuse` commands each produced exactly one log line — the player's own
@@ -74,7 +74,7 @@ async function bootWith(name: string, extra: any[]) {
   return store;
 }
 
-describe('OTA-1007 — the Crucible refuses out loud', () => {
+describe('OTA-984 — the Crucible refuses out loud', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
   it('TOO FEW pieces: no picker, a notice that names the shortfall, and it closes', async () => {

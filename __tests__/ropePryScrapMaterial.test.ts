@@ -1,4 +1,4 @@
-// OTA-676 — a Climbing Rope repaired with Sticks and Small Rocks. repairCostMaterials
+// OTA-661 — a Climbing Rope repaired with Sticks and Small Rocks. repairCostMaterials
 // is scrapOutputFor × 2, and scrapEngine only recognized metal/stone/cloth/fiber/wood/
 // aether/mud — so a `rope`-tagged (but not fiber-tagged) rope, and the "cold iron" Pry
 // Bar (tool/pry/utility, no metal tag), both fell through to the bare Stick+Small Rock
@@ -15,7 +15,7 @@ function inv(name: string): InventoryItem {
 }
 const names = (list: Array<{ name: string }>) => list.map((g) => g.name);
 
-describe('rope/tool scrap + repair use the right material (OTA-676)', () => {
+describe('rope/tool scrap + repair use the right material (OTA-661)', () => {
   it('a Climbing Rope scraps/repairs into Patched Cloth, not Stick + Small Rock', () => {
     const rope = inv('Climbing Rope');
     const scrap = names(scrapOutputFor(rope).grants);

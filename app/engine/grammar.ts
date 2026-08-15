@@ -54,7 +54,7 @@ export function theLower(noun: Word): string {
 }
 
 // ---------------------------------------------------------------------------
-// OTA-1068 — party composition, in words.
+// OTA-1045 — party composition, in words.
 //
 // The scene-arrival announcer used to read
 //     `${enemies.length} ${enemies[0].name}${'s'} close on you`

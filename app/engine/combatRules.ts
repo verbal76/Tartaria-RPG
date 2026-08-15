@@ -303,7 +303,7 @@ export function getEquippedWeapon(
   // consume-on-hit + auto-unequip is handled in gameStore's
   // attack path (look for the 'throwable' tag branch).
   for (const it of player.inventory) {
-    // OTA-1024 — canonical: a stale Shaped Aetheric Shard swung BARE-HANDED here
+    // OTA-1001 — canonical: a stale Shaped Aetheric Shard swung BARE-HANDED here
     // while the consume-on-throw path spared it (asymmetric snapshot reads).
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     if (!(require('./bandolierEligibility') as typeof import('./bandolierEligibility')).itemIsThrowable(it)) continue;
@@ -375,7 +375,7 @@ function attackStatFor(
   }
 }
 
-/** OTA-1009 — CHARISMA IS NOT A TO-HIT STAT. It is the social stat; nothing you
+/** OTA-986 — CHARISMA IS NOT A TO-HIT STAT. It is the social stat; nothing you
  *  swing, fire or throw rolls it. The weapon catalog once carried `charisma` on
  *  every single_handed row (42 weapons, 7 of them Legendary) — a silent penalty
  *  for any character whose CHA trailed their STR, and invisible because nothing
@@ -481,7 +481,7 @@ export function buildCombatSteps(
   // stat modifiers (Iron Fog −1 DEX etc.) so the world's mood is in every
   // swing.
   const stats = effectiveStats(player, opts?.weatherMod);
-  // OTA-1009 — trust the row only if it names a stat you can actually fight with.
+  // OTA-986 — trust the row only if it names a stat you can actually fight with.
   // See isValidAttackStat: charisma on a weapon is always an authoring error,
   // and obeying it costs the player the fight silently.
   const stat = equipped && isValidAttackStat(equipped.stat)
@@ -691,7 +691,7 @@ export function fleeGraceApplies(intent: string, skillSucceeded: boolean, tilesS
   return intent === 'escape' && !skillSucceeded && tilesSeen <= FLEE_GRACE_STEPS;
 }
 
-/** OTA-1032 — CONTESTED FLEE. The fastest live enemy opposes an in-combat escape:
+/** OTA-1009 — CONTESTED FLEE. The fastest live enemy opposes an in-combat escape:
  *  its d20 + speed sets the bar the player's d20 + DEX must meet. Speed reads
  *  the DATA the bestiary already declares — the AP number, then the movement
  *  traits (quick +2, agile +2, aerial +3, slow -3), clamped 0..14. Only the
@@ -803,7 +803,7 @@ export function buildSkillSteps(
   const statLabel = STAT_LABEL[statKey];
   const dc = SKILL_DC[intent] ?? 12;
   const dcName = DC_NAME[dc] ?? '';
-  // OTA-1032 — contested flee (see escapePursuit above): a live pursuer's rolled
+  // OTA-1009 — contested flee (see escapePursuit above): a live pursuer's rolled
   // d20 + speed replaces the flat DC. Ties go to the runner (success is
   // total >= target), and the first-steps flee grace still nudges a failed
   // roll for brand-new characters exactly as before.
@@ -847,7 +847,7 @@ export function buildSkillSteps(
   }];
 }
 
-/** ⚠ OTA-1159 — WHAT THE ENEMY CARD SHOULD HAVE BEEN SAYING ALL ALONG.
+/** ⚠ OTA-1136 — WHAT THE ENEMY CARD SHOULD HAVE BEEN SAYING ALL ALONG.
  *
  *  The owner walked into Yuldra-Tul at 24/24 HP, typed `approach`, and was dead
  *  before he got a second input. The log reads as an ambush; the arithmetic says
@@ -869,12 +869,12 @@ export function buildSkillSteps(
  *      two of them.
  *
  *  Real envelope: 2 × (1d8+3 + 1d6) = **10 to 34**, against a 24 HP bar. The
- *  card advertised 4 to 11. This is the OTA-1156/1158 family again — a surface
+ *  card advertised 4 to 11. This is the OTA-1133/1158 family again — a surface
  *  that disagrees with the resolver — and it is the one that got him killed,
  *  because he priced the fight off the number he was shown.
  *
  *  Nothing about the fight changes here. The card just stops understating it. */
-/** ⚠ OTA-1164 (owner tuning) — DOES THIS BOSS GET THE SECOND SWING? The
+/** ⚠ OTA-1141 (owner tuning) — DOES THIS BOSS GET THE SECOND SWING? The
  *  pressure-test sim priced the second swing as THE killer: a connected
  *  two-swing round averages 22 with a 36% chance of deleting a full 24-HP bar,
  *  while a single swing can never one-round even a fresh arrival. The owner's
@@ -893,15 +893,15 @@ export function bossSwingsTwice(enemy: { boss?: boolean; traits?: readonly strin
 export function enemyDamageDisplay(enemy: { damage?: unknown; boss?: boolean; traits?: readonly string[] }): string {
   const base = String(enemy.damage ?? '').trim() || '1d6';
   if (!enemy.boss) return `${base} damage on a hit`;
-  // OTA-1164 — the card keeps telling the truth: a gated (tier 1-2) Guardian
-  // swings once, and saying "twice" here would be OTA-1159's lie reborn.
+  // OTA-1141 — the card keeps telling the truth: a gated (tier 1-2) Guardian
+  // swings once, and saying "twice" here would be OTA-1136's lie reborn.
   return bossSwingsTwice(enemy)
     ? `${base}+1d6 damage on a hit, twice per round`
     : `${base}+1d6 damage on a hit`;
 }
 
-/** OTA-1162 (audit) — the same truth in chip width. The 24-hour audit found the
- *  EnemyPanel still printing `e.damage` raw in two places, which is OTA-1159's
+/** OTA-1139 (audit) — the same truth in chip width. The 24-hour audit found the
+ *  EnemyPanel still printing `e.damage` raw in two places, which is OTA-1136's
  *  bug on the surface the player opens specifically to size a fight up: a boss
  *  read `1d8+3` on its own card while the resolver rolled `1d8+3+1d6` twice.
  *  The long form above doesn't fit a stat chip, so the panel gets this. */

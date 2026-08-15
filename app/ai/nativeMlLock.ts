@@ -21,7 +21,7 @@
 // failed op can't wedge the chain. No nested acquisition (an op never triggers
 // another native-ML op from inside its own locked fn), so it can't deadlock.
 
-/** ⚠ OTA-1146 — HOMEWORK IS BELOW EVERYTHING, AND IT CAN BE CUT OFF.
+/** ⚠ OTA-1123 — HOMEWORK IS BELOW EVERYTHING, AND IT CAN BE CUT OFF.
  *
  *  Owner, on whether idle-time generation costs the player anything: *"if done
  *  right, it should cost us [no] time correct?"* Not automatically — and the
@@ -48,7 +48,7 @@
  *  asks the running one to FINISH EARLY, and the chain still waits for it to
  *  settle before pumping. The arb159 crash guarantee is exactly as strong. */
 export const ML_PRIORITY_HOMEWORK = -1;
-/** ⚠ OTA-1153 — THE VOICE NOW OUTRANKS THE LLM, REVERSING OTA-634.
+/** ⚠ OTA-1130 — THE VOICE NOW OUTRANKS THE LLM, REVERSING OTA-634.
  *
  *  This is not a bug fix. It is a design call being overruled by the person who
  *  has to live with it. OTA-634 wrote its trade down plainly — *"LLM narration
@@ -59,7 +59,7 @@ export const ML_PRIORITY_HOMEWORK = -1;
  *    *"do we need to see the text and then hear it? that's what makes the voice
  *     feel late sometimes, you read it then hear it 10 seconds later."*
  *
- *  ⚠ THE ARITHMETIC SETTLES IT. OTA-1151 measured one scene_intro generation at
+ *  ⚠ THE ARITHMETIC SETTLES IT. OTA-1128 measured one scene_intro generation at
  *  19.3 s. Under the old order a line ALREADY ON SCREEN had to wait behind that
  *  entire generation before a single syllable could be synthesised — so the
  *  voice did not merely trail, it trailed by the length of the NEXT narration.
@@ -74,7 +74,7 @@ export const ML_PRIORITY_HOMEWORK = -1;
  *
  *  ⚠ WHAT MAKES THE REVERSAL SAFE, and did not exist in OTA-634's day: the
  *  total queue cap (three whole lines — OTA-634's own mitigation), and
- *  OTA-1153's stale-line drop, which refuses to speak a line the player has
+ *  OTA-1130's stale-line drop, which refuses to speak a line the player has
  *  already read past. Together those bound how long the voice can hold the
  *  lock, which is the failure mode OTA-634 was actually defending against.
  *
@@ -82,10 +82,10 @@ export const ML_PRIORITY_HOMEWORK = -1;
 export const ML_PRIORITY_VOICE = 2;
 export const ML_PRIORITY_LLM = 1;
 
-/** ⚠ OTA-1167 — THE HANDOFF WINDOW: PRIORITY CANNOT RANK WORK THAT HASN'T
+/** ⚠ OTA-1144 — THE HANDOFF WINDOW: PRIORITY CANNOT RANK WORK THAT HASN'T
  *  ARRIVED YET.
  *
- *  OTA-1153 put the voice above the LLM and OTA-1157 made item synthesis
+ *  OTA-1130 put the voice above the LLM and OTA-1134 made item synthesis
  *  interruptible, and the device log still showed this on a save load:
  *
  *    [:25.994] arbiter  "Welcome back, Verbal. …"        ← text on screen
@@ -104,7 +104,7 @@ export const ML_PRIORITY_LLM = 1;
  *     llama.cpp's DECODE loop, and this job never reached decode: all 3565 ms
  *     was PREFILL of a 328-token prompt (~11 ms/token on a Tensor G5). The hook
  *     fired, the outcome is correctly filed as `preempted`, and it saved ~40 ms
- *     of a ~3.6 s wait. OTA-1157's note — "when the voice arrives mid-generation
+ *     of a ~3.6 s wait. OTA-1134's note — "when the voice arrives mid-generation
  *     llama.cpp is asked to stop" — holds only once tokens are being written.
  *     Prefill is uninterruptible, and prefill is where this model spends its
  *     time.
@@ -118,17 +118,17 @@ export const ML_PRIORITY_LLM = 1;
  *  ⚠ BOUNDED BY CONSTRUCTION, because a reservation that leaks would starve the
  *  LLM outright: it carries a deadline (VOICE_RESERVATION_MS), it is released
  *  the moment the line's audio is in hand, and it is only taken when a line
- *  actually needs synthesis — a pre-synthesised (OTA-1153 banked) line plays
+ *  actually needs synthesis — a pre-synthesised (OTA-1130 banked) line plays
  *  without the lock and never reserves it. Exclusivity is untouched; this
  *  schedules starts, it does not overlap them.
  *
- *  ⚠ OTA-1168 — 1200 → 350, ON THE OWNER'S OBJECTION, AND HE IS RIGHT.
+ *  ⚠ OTA-1145 — 1200 → 350, ON THE OWNER'S OBJECTION, AND HE IS RIGHT.
  *  *"now we fixed something until it was broke. we reintroduced a delay on the
  *  js side."* A reservation is a DELAY on LLM work, and 1200 ms of it was the
  *  wrong shape of fix: it arbitrated a collision instead of removing it, and
  *  bought the voice its second by making narration wait.
  *
- *  OTA-1168 removes the collision at the source — the item-synthesis requester
+ *  OTA-1145 removes the collision at the source — the item-synthesis requester
  *  no longer fires during save-load hydration, which is what was taking this
  *  lock 160 ms into a load with nobody waiting on it. With the cause gone this
  *  reservation is a guard rail, not a mechanism, so it is cut to the size of
@@ -143,7 +143,7 @@ interface PendingMl {
   reject: (e: unknown) => void;
   priority: number;
   seq: number;
-  /** OTA-1146 — cut this op short if higher-priority work arrives. Only
+  /** OTA-1123 — cut this op short if higher-priority work arrives. Only
    *  interruptible work (homework) supplies one; everything else is work
    *  someone is waiting for, and finishing it IS the point. */
   onPreempt?: () => void;
@@ -156,7 +156,7 @@ let seqCounter = 0;
  *  Exactly one op runs at a time, so a single slot is the whole registry. */
 let runningPriority = ML_PRIORITY_LLM;
 let runningPreempt: (() => void) | null = null;
-/** OTA-1167 — epoch (ms) until which a queued-but-not-yet-arrived voice line
+/** OTA-1144 — epoch (ms) until which a queued-but-not-yet-arrived voice line
  *  holds the lock open. 0 = no reservation. */
 let voiceReservedUntil = 0;
 /** The single pending re-pump scheduled for when a reservation expires. One
@@ -174,7 +174,7 @@ function pumpMl(): void {
     const b = pending[bestIdx]!;
     if (a.priority > b.priority || (a.priority === b.priority && a.seq < b.seq)) bestIdx = i;
   }
-  // ⚠ OTA-1167 — hold the slot for a voice line that is on its way but has not
+  // ⚠ OTA-1144 — hold the slot for a voice line that is on its way but has not
   // reached the lock yet (see VOICE_RESERVATION_MS). Only work BELOW voice
   // waits: a voice op is the thing being waited for, and homework already
   // yields to everything. The deadline makes this self-clearing, so a line that
@@ -219,7 +219,7 @@ export function runExclusiveNativeMl<T>(
       seq: seqCounter++,
       onPreempt,
     });
-    // ⚠ OTA-1146 — ask the running op to finish early if this one outranks it.
+    // ⚠ OTA-1123 — ask the running op to finish early if this one outranks it.
     // Fired on ENQUEUE, not on pump: the whole point is to shorten a wait that
     // has already started, and by pump time the running op has finished anyway.
     // Idempotent by construction — the hook is cleared when the op settles, and
@@ -233,7 +233,7 @@ export function runExclusiveNativeMl<T>(
   });
 }
 
-/** ⚠ OTA-1167 — a voice line has been accepted for speech and is on its way to
+/** ⚠ OTA-1144 — a voice line has been accepted for speech and is on its way to
  *  this lock. Hold the slot: work below voice defers until the line arrives or
  *  the deadline passes, whichever comes first. Call ONLY for lines that will
  *  actually be synthesised — a banked (pre-synthesised) line never takes the
@@ -242,7 +242,7 @@ export function reserveVoiceSlot(ms: number = VOICE_RESERVATION_MS): void {
   voiceReservedUntil = Math.max(voiceReservedUntil, Date.now() + ms);
 }
 
-/** OTA-1167 — the reserved line has its audio (it acquired the lock, or the
+/** OTA-1144 — the reserved line has its audio (it acquired the lock, or the
  *  bank had it, or it was dropped). Release immediately and pump, so the LLM
  *  waits the real handoff and not the whole deadline. */
 export function releaseVoiceSlot(): void {

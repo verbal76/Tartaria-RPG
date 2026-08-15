@@ -377,7 +377,7 @@ describe('MECHANIC-1b — golem sidekick', () => {
       expect(store.getState().player!.golem!.hp).toBe(4); // 1 + 3
     });
 
-    it('naming popup: confirmGolemName seals the name (OTA-1050)', async () => {
+    it('naming popup: confirmGolemName seals the name (OTA-1027)', async () => {
       const store = await bootstrap();
       const p0 = store.getState().player!;
       // Simulate the post-summon state the summon path sets.
@@ -390,7 +390,7 @@ describe('MECHANIC-1b — golem sidekick', () => {
       expect(after.player!.golem!.name).toBe('Clanker');
     });
 
-    it('naming popup: KEEP ITS MAKING keeps the type label (OTA-1050)', async () => {
+    it('naming popup: KEEP ITS MAKING keeps the type label (OTA-1027)', async () => {
       const store = await bootstrap();
       const p0 = store.getState().player!;
       store.setState({ player: { ...p0, golem: makeCompanion(GOLEM_DEFINITIONS.mud_golem) }, pendingGolemNaming: true });

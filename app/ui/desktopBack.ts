@@ -1,4 +1,4 @@
-// ⚠⚠ OTA-1252 — RIGHT-CLICK IS BACK ON A PC, AND THE GAME HAD NO "BACK" AT ALL.
+// ⚠⚠ OTA-1229 — RIGHT-CLICK IS BACK ON A PC, AND THE GAME HAD NO "BACK" AT ALL.
 //
 // Owner, typed into the game while testing the desktop build: *"right click on
 // the mouse should be the back button."* He is describing the desktop

@@ -1,4 +1,4 @@
-// OTA-825 — exploit close (reverify workflow, CONFIRMED high-severity). Fusion is
+// OTA-805 — exploit close (reverify workflow, CONFIRMED high-severity). Fusion is
 // FREE at an outpost/market Crucible, and applyFusion stamps every fused item
 // `selfCrafted: true`. But scrapEngine's OTA-756 fused branch RETURNED before the
 // OTA-611 selfCrafted strip/halve guard, so a fused (self-crafted) weapon scrapped
@@ -19,7 +19,7 @@ const mk = (p: Partial<InventoryItem> & { name: string }): InventoryItem =>
 // The scarce / high-sell mats a free renewable forge must NEVER mint from itself.
 const PREMIUM = ['Golem Core', 'Aetheric Shard', 'Aetheric Dust', 'Aetheric Cloth', 'Aether Crystal', 'Aether Dust'];
 
-describe('OTA-825 — a SELF-CRAFTED fused piece can no longer be scrapped for premium mats', () => {
+describe('OTA-805 — a SELF-CRAFTED fused piece can no longer be scrapped for premium mats', () => {
   const fusedWeapon = mk({
     name: 'Ghost-Charged Gouge', kind: 'weapon', rarity: 'Legendary',
     tags: ['fused', 'unique', 'aetheric'], uniqueStats: {} as UniqueItemStats, selfCrafted: true,
@@ -51,7 +51,7 @@ describe('OTA-825 — a SELF-CRAFTED fused piece can no longer be scrapped for p
   });
 });
 
-describe('OTA-825 — LEGACY fused items (no selfCrafted flag) keep the old full yield', () => {
+describe('OTA-805 — LEGACY fused items (no selfCrafted flag) keep the old full yield', () => {
   // Non-renewable: a player can no longer mint NEW pre-611 fused items, so this
   // finite set is left untouched — it still scraps to the OTA-756 aether stock.
   const legacyFused = mk({

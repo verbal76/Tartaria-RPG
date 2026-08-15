@@ -1,4 +1,4 @@
-// OTA-1133 — THE DEATH SCENE. Owner: "The second my HP hits 0 for whatever
+// OTA-1110 — THE DEATH SCENE. Owner: "The second my HP hits 0 for whatever
 // reason there should be a crossfade between the game screen and a new screen
 // like the intro screen that gives a brief description of my death lore style
 // and how it ties to my reason for entering the mud world."

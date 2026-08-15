@@ -1,12 +1,12 @@
 // OTA-847 (STEALTH SYSTEM) — the PICKPOCKET picker. Rolls Stealth vs the
 // mark's awareness — pickpocket IS the stealth action, so there's no toggle.
 //
-// OTA-1100 — rebuilt as a BOTTOM SHEET, same slot and skin as the DiceRoller
+// OTA-1077 — rebuilt as a BOTTOM SHEET, same slot and skin as the DiceRoller
 // and the talk sheets ("can we have it do a bottom cover as well" — owner).
 // The feed stays readable while you choose — the Stealth roll line and the
 // outcome land there.
 //
-// OTA-1101 — the sheet shows MARKS, not merchandise. Owner: "only show what
+// OTA-1078 — the sheet shows MARKS, not merchandise. Owner: "only show what
 // you can pickpocket. Stealing is for items, pickpocket is for what would be
 // in their clothing or on them." So no vendor-goods chips, no ambient nouns,
 // no free-typed target: one chip per PERSON in reach, and what's in their

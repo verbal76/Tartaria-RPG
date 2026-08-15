@@ -1,5 +1,5 @@
 {
-  "_comment": "OTA-1086 — stage business for a conversation. One short beat of what somebody DOES while they answer you. See app/engine/flourish.ts for why these are authored rather than generated, and why the model can only ever replace one of these lines rather than delay it. {npc} is substituted with the person's name.",
+  "_comment": "OTA-1063 — stage business for a conversation. One short beat of what somebody DOES while they answer you. See app/engine/flourish.ts for why these are authored rather than generated, and why the model can only ever replace one of these lines rather than delay it. {npc} is substituted with the person's name.",
   "byKind": {
     "forge": [
       "{npc} keeps working while they talk — a rag over a joint, a thumb testing an edge that did not need testing.",

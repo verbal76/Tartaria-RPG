@@ -1,4 +1,4 @@
-// OTA-1118 — TALKING IS ITS OWN SCREEN NOW.
+// OTA-1095 — TALKING IS ITS OWN SCREEN NOW.
 //
 // Owner, from the device: "the talk box is bigger than the exploration window
 // so I don't get to see what he actually says unless I stop talking." Then,
@@ -17,7 +17,7 @@
 // through appendLog exactly as it always has, so the exploration log remains the
 // whole record and closing the conversation leaves the history intact behind it.
 //
-// ⚠ OTA-1121 — the window is keyed on a TIMESTAMP, and it must stay one. The
+// ⚠ OTA-1098 — the window is keyed on a TIMESTAMP, and it must stay one. The
 // first cut used an INDEX (`gameLog.length` at open), which is silently wrong the
 // moment the buffer reaches its cap: gameLog is `.slice(-MAX_LOG_IN_MEMORY)`d on
 // every append, so past 500 entries the array stops growing and every index
@@ -26,13 +26,13 @@
 // behind the sheet, which is precisely the bug this whole view was built to fix.
 // It only showed up in long sessions, which is to say: in real ones.
 //
-// The collapse bar (OTA-1117's approved design, kept as an OPTION rather than a
+// The collapse bar (OTA-1094's approved design, kept as an OPTION rather than a
 // requirement): the sheet drops to a single breadcrumb row showing who you're
 // talking to and how many questions are left, so you can read the world behind
 // it and tap once to come back. Nothing is lost on collapse — same conversation,
 // same scroll, same spent topics.
 //
-// OTA-1119 — the sheet FLOATS. Owner: "let's shrink the width of the talk
+// OTA-1096 — the sheet FLOATS. Owner: "let's shrink the width of the talk
 // screen so it doesn't touch the edges of the screen and let's put the outside
 // edge detail [a brighter] gold color so it pops and you understand a border is
 // there." It was welded to the bottom bezel, which gave it no readable edge —
@@ -91,13 +91,13 @@ export function TalkSheet() {
   // The exchange itself: every feed line since this conversation opened. Sliced,
   // not stored — the log is the record of truth and this is a window on it.
   //
-  // ⚠ OTA-1131 — A WINDOW ON THE FEED MUST HIDE WHAT THE FEED HIDES. Reported
+  // ⚠ OTA-1108 — A WINDOW ON THE FEED MUST HIDE WHAT THE FEED HIDES. Reported
   // by the owner from inside the game, typed at the Arbiter as a command: "you
   // are showing the qwen notes in the talk popup". Correct, and the cause is
   // that this filter only ever tested the timestamp. AdventureFeed drops
   // HIDDEN_LOG_CHANNELS ('cognitive', 'debug') and this did not, so anything
   // on the debug channel landed in the middle of a conversation — which is
-  // every `qwen⏱` telemetry line OTA-1128..1130 added, arriving mid-dialogue
+  // every `qwen⏱` telemetry line OTA-1105..1130 added, arriving mid-dialogue
   // because background generation does not stop while you talk. Same set, one
   // import: adding a hidden channel later can't leak here again.
   const transcript = useMemo(
@@ -107,7 +107,7 @@ export function TalkSheet() {
     [ctx, gameLog],
   );
 
-  // ⚠ OTA-1174 — everything said to this person BEFORE this conversation opened.
+  // ⚠ OTA-1151 — everything said to this person BEFORE this conversation opened.
   // Filtered on startedAtTs so a turn recorded during THIS visit is not drawn
   // twice: recordTalkTurn writes to the store and appendLog writes to the feed
   // on the same tap, so without this the live half would render under EARLIER as
@@ -174,7 +174,7 @@ export function TalkSheet() {
               contentContainerStyle={styles.transcriptInner}
               onContentSizeChange={() => transcriptRef.current?.scrollToEnd({ animated: true })}
             >
-              {/* ⚠ OTA-1174 — EARLIER VISITS, above the live window. The
+              {/* ⚠ OTA-1151 — EARLIER VISITS, above the live window. The
                   transcript below is a slice of the CURRENT session's feed and
                   always was; walk away and it is gone. This block is the durable
                   per-NPC record, so re-opening someone you spoke to yesterday
@@ -232,7 +232,7 @@ export function TalkSheet() {
                 );
               })}
 
-              {/* OTA-1113 — the door the player can see: a COUNT of what's still
+              {/* OTA-1090 — the door the player can see: a COUNT of what's still
                   gated shut, never the labels. Appears only once this person has
                   placed you (lockedCount is 0 below `known` and for the wronged).
                   Tapping it gets an in-voice deflection — the person telling you,
@@ -271,7 +271,7 @@ export function TalkSheet() {
 // House tokens only — the same parchment-on-soot palette the DiceRoller and the
 // old bottom sheet used, so the tall view reads as the same game, just bigger.
 const styles = StyleSheet.create({
-  // OTA-1119 — the sheet is INSET from every edge rather than welded to the
+  // OTA-1096 — the sheet is INSET from every edge rather than welded to the
   // bottom of the screen. Owner: "let's shrink the width of the talk screen so
   // it doesn't touch the edges of the screen and let's put the outside edge
   // detail [a brighter] gold color so it pops and you understand a border is
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   },
   transcriptInner: { paddingVertical: 10, gap: 10 },
   transcriptLine: { color: '#e6d8b3', fontSize: 15, lineHeight: 22 },
-  // ⚠ OTA-1174 — THE OFF-WHITE PLATE, and it is deliberately the only light
+  // ⚠ OTA-1151 — THE OFF-WHITE PLATE, and it is deliberately the only light
   // fill inside the sheet. Owner: *"type the question on an off-white so later
   // we know what we asked."* A parchment ground with dark ink on it inverts the
   // sheet's whole scheme for exactly one kind of line, so scanning back for
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
   topicBtnSpent: { borderColor: '#3a342c' },
   topicText: { color: '#e6d8b3', fontSize: 14 },
   topicTextSpent: { color: '#a2977b' },
-  // OTA-1113 — the teaser row reads as a held door, not a question: dashed
+  // OTA-1090 — the teaser row reads as a held door, not a question: dashed
   // border, muted ink, same tap affordance as the topics above it.
   teaserBtn: {
     borderColor: '#3a342c',

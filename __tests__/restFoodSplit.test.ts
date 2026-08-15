@@ -1,4 +1,4 @@
-// arb37 — food / rest split, as REVISED by OTA-1001 (#120). Eating still heals HP
+// arb37 — food / rest split, as REVISED by OTA-978 (#120). Eating still heals HP
 // and is still the fast, spammable route to full. Rest now also knits a LIGHT
 // share of max HP (~15% for a full sleep) instead of none at all: sleeping off
 // a wound is slow and costs hours, so food markets and food lore stay
@@ -77,7 +77,7 @@ describe('arb37 — food heals HP, rest restores stamina', () => {
     store.getState().submitPlayerAction('rest');
     const after = store.getState().player!;
     expect(after.stamina).toBeGreaterThan(0); // stamina recovered
-    // OTA-1001 — #120: ~15% of max HP per full sleep — real, but light.
+    // OTA-978 — #120: ~15% of max HP per full sleep — real, but light.
     expect(after.hp).toBeGreaterThan(10);
     expect(after.hp).toBeLessThanOrEqual(10 + Math.ceil(30 * 0.15));
   });
@@ -88,7 +88,7 @@ describe('arb37 — food heals HP, rest restores stamina', () => {
     store.setState({ player: { ...p, hp: 5, hpMax: 30, stamina: 10, staminaMax: 10, corruption: 0 } });
     store.getState().submitPlayerAction('rest');
     const after = store.getState().player!;
-    // OTA-1001 — #120: the old refusal ("sleep won't knit wounds") is superseded.
+    // OTA-978 — #120: the old refusal ("sleep won't knit wounds") is superseded.
     expect(after.hp).toBeGreaterThan(5);
     expect(after.stamina).toBe(10); // nothing to restore there
   });

@@ -31,7 +31,7 @@ import { activeFetchItemNames } from '../engine/factionQuests';
 import { isGolemRepairPart, isGolemSubstitutePart, isGolemWeapon, golemRepairHeal, golemSubstituteHeal } from '../engine/golems';
 import { healBatchCount, HEAL_BATCH_NOTE } from '../engine/healBatch';
 import { isQuestLockedItem } from '../engine/questItems';
-import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1250 — one column width, platform-aware
+import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
 
 // 2026-05-27 OTA-087 — Sort axes for inventory. Each axis
 // has a default direction baked in (alphabetical asc, rarity
@@ -79,7 +79,7 @@ function sortInventoryItems(
   items: InventoryItem[],
   sortKey: string,
   direction: SortDirection,
-  // OTA-1117 — worn instance ids. Gear you are actually wearing floats to the top
+  // OTA-1094 — worn instance ids. Gear you are actually wearing floats to the top
   // of its category on EVERY axis. Owner: "whenever a list of armor or weapons
   // pops up sort equipped items to the top."
   worn: ReadonlySet<string> = new Set<string>(),
@@ -136,7 +136,7 @@ function sortInventoryItems(
 
 export function InventoryScreen() {
   const player = useGameStore((s) => s.player);
-  // OTA-1177 — gift mode: who we are giving to while the player browses.
+  // OTA-1154 — gift mode: who we are giving to while the player browses.
   const giftMode = useGameStore((s) => s.giftMode);
   const giveGift = useGameStore((s) => s.giveGift);
   const cancelGiftMode = useGameStore((s) => s.cancelGiftMode);
@@ -148,7 +148,7 @@ export function InventoryScreen() {
   const legendTextColor = useReadableMuted();
   const equipItem = useGameStore((s) => s.equipItem);
   const unequipSlot = useGameStore((s) => s.unequipSlot);
-  // OTA-1137 — is something swinging at you right now? The take-off confirm
+  // OTA-1114 — is something swinging at you right now? The take-off confirm
   // says a different thing mid-fight, because that is the case the owner's
   // death log actually is: AC 16 → 10 with five raiders on the tile.
   const inCombatNow = useGameStore((s) => (s.currentScene?.enemies?.length ?? 0) > 0);
@@ -183,7 +183,7 @@ export function InventoryScreen() {
   useEffect(() => {
     setScrapQty(1);
   }, [pending?.item.id]);
-  // ⚠ OTA-1149 — THE PACK IS A HOMEWORK WINDOW. Owner named it directly:
+  // ⚠ OTA-1126 — THE PACK IS A HOMEWORK WINDOW. Owner named it directly:
   // *"Menu / inventory / map time? You're reading, not waiting on the
   // engine."* While this screen is mounted the model may write item
   // descriptions ahead of the player opening them, so the popup is already
@@ -214,7 +214,7 @@ export function InventoryScreen() {
   const [pouchFilterActive, setPouchFilterActive] = useState(false);
   // arb110 — bandolier fill mode (mutually exclusive with the pouch fill mode).
   const [bandolierFilterActive, setBandolierFilterActive] = useState(false);
-  // OTA-1123 — inventory GROUP mode. Owner, after OTA-1122's group sell: "yes
+  // OTA-1100 — inventory GROUP mode. Owner, after OTA-1099's group sell: "yes
   // wire drop, fusable select and scrap the same way." Same contract as the
   // vendor list, which is the whole point — one gesture, one meaning, wherever
   // you are: HOLD a row to start a group, TAP to add or remove, act on the lot.
@@ -226,7 +226,7 @@ export function InventoryScreen() {
   // category away so the player can skip past Weapons/Armor to reach Materials /
   // Food without scrolling through every row. Keyed by category id; default open.
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
-  // OTA-683 — a deep-link (e.g. "View in inventory" after a Crucible forge) can
+  // OTA-668 — a deep-link (e.g. "View in inventory" after a Crucible forge) can
   // ask for a category section to be EXPANDED on arrival. Sections default
   // collapsed, so without this the player lands on a folded pack and never sees
   // the new piece. Apply it once on entry, unfold that section, then clear it.
@@ -275,7 +275,7 @@ export function InventoryScreen() {
   // the second modal lists the coatable weapons in the pack as
   // pick buttons. Cleared on apply or cancel.
   const [coatTarget, setCoatTarget] = useState<InventoryItem | null>(null);
-  // OTA-944 — a coat that would REPLACE (scrub off) an existing coating is staged here
+  // OTA-921 — a coat that would REPLACE (scrub off) an existing coating is staged here
   // for a second, explicit confirm. Applying a coating to a weapon with no open second
   // slot silently overwrote slot 1 on a single tap — that is how a coating "disappears".
   const [coatReplace, setCoatReplace] = useState<
@@ -284,7 +284,7 @@ export function InventoryScreen() {
   >(null);
   // engine_Dev — armor-coating picker: the vial being worked into a piece of armor.
   const [armorCoatTarget, setArmorCoatTarget] = useState<InventoryItem | null>(null);
-  // OTA-945 — a FULL armor piece (all resist slots used) stages a which-resist-to-replace
+  // OTA-922 — a FULL armor piece (all resist slots used) stages a which-resist-to-replace
   // picker here instead of silently refusing.
   const [armorResistReplace, setArmorResistReplace] = useState<
     { coatId: string; coatName: string; armorId: string; armorName: string; coatType: string; resists: string[] } | null
@@ -323,7 +323,7 @@ export function InventoryScreen() {
   const fusionFiltered = sortKey === 'fusionable'
     ? filtered.filter(isFusionEligible)
     : filtered;
-  // OTA-1120 — the FUSABLE view is a SELECTION surface, not a browsing one: every
+  // OTA-1097 — the FUSABLE view is a SELECTION surface, not a browsing one: every
   // row in it is Crucible stock, and the only question is in or out. In this mode
   // a tap toggles the reserve directly (owner: "if you tap on an item that has
   // been selected it automatically deselects") and category headers carry a
@@ -342,11 +342,11 @@ export function InventoryScreen() {
       allSelected: actionable.length > 0 && actionable.every((i) => i.reservedForFusion === true),
     };
   };
-  // OTA-1117 — one worn-instance set for the whole screen: the sort pre-key AND
+  // OTA-1094 — one worn-instance set for the whole screen: the sort pre-key AND
   // the coating pickers below read it, so what floats to the top and what carries
   // the EQUIPPED tag can never disagree.
   const wornIds = wornInstanceIds(player);
-  // OTA-1123 — THE INVENTORY LEARNS THE SAME GRIP. Owner, after OTA-1122's group
+  // OTA-1100 — THE INVENTORY LEARNS THE SAME GRIP. Owner, after OTA-1099's group
   // sell: "yes wire drop, fusable select and scrap the same way." Same contract
   // as the vendor list, which is the whole point — one gesture, one meaning,
   // wherever you are: HOLD a row to start a group, TAP to add or remove, act on
@@ -383,7 +383,7 @@ export function InventoryScreen() {
   const runGroupAction = () => {
     if (invGroupAction === 'drop') {
       // Snapshot first — each drop mutates the inventory the rows came from.
-      // Instance-exact: OTA-1123 threads the id through, so two rows of the same
+      // Instance-exact: OTA-1100 threads the id through, so two rows of the same
       // name drop the ones you ticked rather than whichever sorts first.
       for (const it of droppable.map((i) => ({ name: i.name, id: i.id, qty: i.quantity ?? 1 }))) {
         for (let n = 0; n < it.qty; n++) dropInventoryItem(it.name, it.id);
@@ -397,7 +397,7 @@ export function InventoryScreen() {
     } else if (invGroupAction === 'release') {
       reserveManyForFusion(releasable.map((i) => i.id), false);
     } else if (invGroupAction === 'equip') {
-      // OTA-1137 — snapshot the plan before the first equip, because each one
+      // OTA-1114 — snapshot the plan before the first equip, because each one
       // rewrites player.equipped and every derived list this render read from.
       // The plan already resolved slot contention, so this is a straight walk:
       // no piece here can displace another piece here.
@@ -472,15 +472,15 @@ export function InventoryScreen() {
     );
     if (owner) equippedItemIds.add(owner.id);
   }
-  // OTA-685 — the dog's vest is worn on the DOG (tracked by name on
+  // OTA-685 - the dog's vest is worn on the DOG (tracked by name on
   // dog.equipped.vest, NOT in the player's equip slots), so it never lit the
   // EQUIPPED badge and you couldn't tell which vest was on him. Mark ONE matching
   // inventory instance equipped so the Dog Armor row reads "EQUIPPED (on <dog>)".
-  // OTA-984 — items an ACCEPTED fetch contract still wants, by exact name.
+  // OTA-961 — items an ACCEPTED fetch contract still wants, by exact name.
   // Drives the context-aware "Save for quest" earmark in the item modal.
   const activeFetchWanted = activeFetchItemNames(player.activeFactionQuests);
   const dogForVest = player.dog;
-  // OTA-979 — one shared resolver (wornDogVestInstanceId): id-first, then a
+  // OTA-956 — one shared resolver (wornDogVestInstanceId): id-first, then a
   // name match that also accepts uniqueStats.kind === 'dog_armor' (fused
   // vests whose stored kind drifted). Owner: "dog vests don't show which one
   // is equipped in the inventory."
@@ -526,7 +526,7 @@ export function InventoryScreen() {
     const labels = [...new Set(slots.map((s) => SLOT_LABEL[s] ?? s))];
     return labels.join(' + ');
   };
-  // OTA-1031 — the coating pickers (weapon vials AND armor vials) tag each candidate
+  // OTA-1008 — the coating pickers (weapon vials AND armor vials) tag each candidate
   // that is CURRENTLY EQUIPPED, via the same resolver as the EQUIPPED badge —
   // one source of truth, no divergent copy. Owner: "when you are applying
   // coatings to weapons or armor, it should show you which one you have
@@ -535,11 +535,11 @@ export function InventoryScreen() {
     const where = equippedSlotLabelFor(item);
     return where ? `${label} · EQUIPPED (${where})` : label;
   };
-  // OTA-1137 — the two GEAR group actions. Owner: "you should be able to pick
+  // OTA-1114 — the two GEAR group actions. Owner: "you should be able to pick
   // your armor hold and select a group and either equip all or unequip all
   // depending on what you selected."
   //
-  // ⚠ WHY THIS IS THE FIX AND NOT A NICETY. The group bar shipped in OTA-1123
+  // ⚠ WHY THIS IS THE FIX AND NOT A NICETY. The group bar shipped in OTA-1100
   // with four actions — drop, scrap, reserve, release — and DROP excludes worn
   // gear while RESERVE needs fusion eligibility. So for a group of ARMOR YOU ARE
   // WEARING, the only button that ever appeared was SCRAP, which is exactly what
@@ -581,7 +581,7 @@ export function InventoryScreen() {
     const worn = (eq as Record<string, unknown>)[slot];
     return typeof worn === 'string' && worn.length > 0;
   };
-  const POUCH_MAX = 3; // mirrors stowInPouch in gameStore (OTA-778: scanner pouch, 3 slots)
+  const POUCH_MAX = 3; // mirrors stowInPouch in gameStore
   const itemSlotTaken = (item: InventoryItem): boolean => {
     if (equippedItemIds.has(item.id)) return false;
     const slots = validSlotsForItem(item);
@@ -603,7 +603,7 @@ export function InventoryScreen() {
   // and left no path to unequip. Modal always opens; player picks Equip
   // (specific slot) or Unequip (if currently worn) or Close.
   const handleItemTap = (item: InventoryItem) => {
-    // OTA-1123 — once a group is open, a tap adds or removes. Checked FIRST so
+    // OTA-1100 — once a group is open, a tap adds or removes. Checked FIRST so
     // it beats every other tap meaning on this screen, including the FUSABLE
     // reserve-toggle below: while you are building a group, that is what taps do.
     if (invSelectMode) { toggleInvSelect(item.id); return; }
@@ -625,7 +625,7 @@ export function InventoryScreen() {
       setBandolierFilterActive(false);
       return;
     }
-    // OTA-1120 — FUSABLE view: a tap IS the selection. Owner: "if you tap on an
+    // OTA-1097 — FUSABLE view: a tap IS the selection. Owner: "if you tap on an
     // item that has been selected it automatically deselects." Deselect-on-tap
     // without select-on-tap would be maddening, so the tap is a straight toggle
     // in both directions — and it moves the WHOLE stack, matching the bulk intent
@@ -641,8 +641,8 @@ export function InventoryScreen() {
     setPending({ item, slots: validSlotsForItem(item) });
   };
 
-  // OTA-1123 — HOLD starts a group, everywhere in the inventory. This replaces
-  // OTA-1120's FUSABLE-only "long-press opens the item sheet" escape hatch: one
+  // OTA-1100 — HOLD starts a group, everywhere in the inventory. This replaces
+  // OTA-1097's FUSABLE-only "long-press opens the item sheet" escape hatch: one
   // gesture has to mean one thing on this screen, and the group is worth more
   // than that hatch was. The single-unit "Save 1 for fusion" it used to reach is
   // still there — switch off the FUSABLE axis and tap the item, which is what
@@ -673,8 +673,6 @@ export function InventoryScreen() {
   }, [scrapResult]);
   const chooseSlot = (slot: EquipSlot) => {
     if (!pending) return;
-    // Pass the selected instance's unique id so equipping picks THIS item (its
-    // durability / instance stats), not the first inventory row of the same name.
     equipItem(pending.item.name, slot, pending.item.id);
     setPending(null);
   };
@@ -710,9 +708,6 @@ export function InventoryScreen() {
     const stack = pending.item.quantity ?? 1;
     const reps = Math.max(1, Math.min(repsOverride ?? scrapQty, stack));
     for (let i = 0; i < reps; i++) {
-      // Scrap THIS exact instance by id (a same-name item with different durability
-      // must not be scrapped in its place). For a true stack (one id, quantity N)
-      // the id is stable as the quantity decrements, so the batch loop still works.
       scrapInventoryItem(pending.item.name, pending.item.id);
     }
     const after = useGameStore.getState().player?.inventory ?? [];
@@ -739,7 +734,7 @@ export function InventoryScreen() {
     if (isQuestLockedItem(pending.item)) {
       return [{ label: 'Close', onPress: closeModal, tone: 'neutral' }];
     }
-    // ⚠ OTA-1177 — IN GIFT MODE, GIVE COMES FIRST AND CROWDS NOTHING OUT.
+    // ⚠ OTA-1154 — IN GIFT MODE, GIVE COMES FIRST AND CROWDS NOTHING OUT.
     // The player entered the pack for exactly one reason, so the action they came
     // for leads. It is drawn only when giftBlockReason says the item may go —
     // the same call the store makes before moving anything — so a blocked item
@@ -825,16 +820,16 @@ export function InventoryScreen() {
     // an off-hand-eligible item that takes a use-style off-hand
     // equip. Pure-armor / pure-weapon (no effect, equippable) gets
     // the dedicated Equip button only.
-    // OTA-765 — a coat-only coating (acid: no player ailment to counter) shows no
+    // OTA-746 — a coat-only coating (acid: no player ailment to counter) shows no
     // Use/Drink button; the "Coat a weapon" / "Coat armor" buttons below still appear.
-    // OTA-991 — the Skyreacher Maps get a dedicated, always-on Use button. The
+    // OTA-968 — the Skyreacher Maps get a dedicated, always-on Use button. The
     // owner bought one on-device and "there's no use button" — the generic gate
     // above resolves the item's effect through three catalog lookups inside the
     // render path, so any resolution hiccup silently eats the button. The maps
     // are too important for that: match on the name and wire Use directly.
     // (Legacy 'Skyreacher Chart' names are renamed on load, but match them too.)
     const isSkyMap = /^Skyreacher (Map|Chart)\b/.test(pending.item.name);
-    // OTA-1228 — a Procedure Text's real action is READING it, and the generic gate
+    // OTA-1205 — a Procedure Text's real action is READING it, and the generic gate
     // can't see that (texts carry no authored `effect`, deliberately — they are not
     // consumables). Same dedicated-button pattern as the Skyreacher Maps above, for
     // the same reason: the found-in-the-world door hands a player this item with no
@@ -858,8 +853,7 @@ export function InventoryScreen() {
         tone: 'primary',
       });
     }
-    // OTA-693 — the item's fixed per-unit HP heal (First Aid Kit 25, Trail Rations
-    // 6, …), for the "Use Max" batch buttons below. 0 for non-heal / variable-heal.
+    // OTA-693 — per-unit fixed HP heal, for the "Use Max" batch buttons below.
     const perItemHP = isConsumable ? (() => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { resolveItemEffect } = require('../engine/itemEffect');
@@ -868,7 +862,7 @@ export function InventoryScreen() {
       const fx = resolveItemEffect(pending.item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { scaledHealHP: shp } = require('../engine/itemEffect') as typeof import('../engine/itemEffect');
-      return fx?.kind === 'consumable' ? shp(fx.healHP ?? 0, player?.hpMax ?? 0) : 0; // OTA-1001 — #120
+      return fx?.kind === 'consumable' ? shp(fx.healHP ?? 0, player?.hpMax ?? 0) : 0; // OTA-978 — #120
     })() : 0;
     const stackQty = pending.item.quantity;
     // Self batch-heal. Two offers:
@@ -921,7 +915,7 @@ export function InventoryScreen() {
       && player.dog.status !== 'dead';
     const pendingIsDogArmor = pending.item.kind === 'dog_armor'
       || pending.item.uniqueStats?.kind === 'dog_armor';
-    // OTA-979 — the details modal now SAYS when this exact vest is the one the
+    // OTA-956 — the details modal now SAYS when this exact vest is the one the
     // dog is wearing, and offers to take it off — before this, every vest
     // read the same "Equip on dog", so you couldn't tell them apart here.
     if (dogActive && pendingIsDogArmor && wornVestId && pending.item.id === wornVestId) {
@@ -986,7 +980,6 @@ export function InventoryScreen() {
         },
         tone: 'primary',
       });
-      // OTA-693 — "Feed Max": the most that fit under the dog's max HP, no overheal.
       if (perItemHP > 0 && dog.hp < dog.hpMax) {
         const n = healBatchCount(perItemHP, dog.hpMax - dog.hp, stackQty);
         if (n >= 2) {
@@ -1026,7 +1019,6 @@ export function InventoryScreen() {
           },
           tone: full ? 'neutral' : 'primary',
         });
-        // OTA-693 — "Heal Max": the most parts that fit under the golem's max HP.
         if (!full) {
           const golemPer = isGolemRepairPart(golem.kind, pending.item.name)
             ? golemRepairHeal(golem.kind)
@@ -1120,14 +1112,15 @@ export function InventoryScreen() {
     if (canScrap(pending.item) && equippedInSlots.length === 0) {
       const stack = pending.item.quantity ?? 1;
       buttons.push({
-        label: stack > 1 ? `Scrap ×${Math.max(1, Math.min(scrapQty, stack))}` : 'Scrap',
+        // ⚠ OTA-1243 — one word for the breakdown verb everywhere: SALVAGE.
+        label: stack > 1 ? `Salvage ×${Math.max(1, Math.min(scrapQty, stack))}` : 'Salvage',
         onPress: () => doScrap(),
         tone: 'destructive',
       });
       // Scrap All — one tap to break down the whole stack (skips the stepper).
       if (stack > 1) {
         buttons.push({
-          label: `Scrap All (${stack})`,
+          label: `Salvage All (${stack})`,
           onPress: () => doScrap(stack),
           tone: 'destructive',
         });
@@ -1149,7 +1142,7 @@ export function InventoryScreen() {
     // CATALYST: reserving one themes the next Crucible output into a
     // unique faction item (it doesn't count toward the 3-scrap gate).
     const isFactionCatalyst = canonicalItemTags(pending.item).includes('faction_gear');
-    // OTA-756 — show the reserve toggle when the item is forge-reservable (2a: no
+    // OTA-737 — show the reserve toggle when the item is forge-reservable (2a: no
     // weapons/armor; 1a: 'loot' reagents included) OR it's already reserved (so a
     // piece stranded by the new rule can still be released) OR it's a faction catalyst.
     const alreadyReserved = pending.item.reservedForFusion === true;
@@ -1169,7 +1162,7 @@ export function InventoryScreen() {
         },
         tone: 'neutral',
       });
-      // OTA-968 — whole-stack reserve in ONE tap. Owner: reserving a x5 stack meant
+      // OTA-945 — whole-stack reserve in ONE tap. Owner: reserving a x5 stack meant
       // reopening this modal five times, one peel per tap. "Save all xN" (and its
       // "Free all" mirror) moves the entire stack across the boundary at once;
       // the single-unit button stays for partial counts. Catalysts stay 1-at-a-time
@@ -1195,7 +1188,7 @@ export function InventoryScreen() {
     // player releases the fusion reserve first, then can save it for a quest.
     if (!pending.item.reservedForFusion) {
       const savedForQuest = pending.item.reservedForQuest === true;
-      // OTA-984 — CONTEXT-AWARE earmark (owner: "I would only like it to say save
+      // OTA-961 — CONTEXT-AWARE earmark (owner: "I would only like it to say save
       // for quest when you actually have an active quest that needs them").
       // The button now shows only when an accepted fetch contract names this
       // exact item — the "gather N, bring them back" case the earmark was
@@ -1239,7 +1232,7 @@ export function InventoryScreen() {
     catch { modalPreview = null; }
   }
   const modalBody = pending && isQuestLockedItem(pending.item)
-    ? 'Reserved for your objective — this stays in your pack until you turn it in. It can\'t be dropped, scrapped, sold, or fused.'
+    ? 'Reserved for your objective — this stays in your pack until you turn it in. It can\'t be dropped, salvaged, sold, or fused.'
     // OTA-872 — a soft "Save for quest" earmark: explain that it's out of the sell
     // tab and filed under Quest Items, but still yours to use or drop.
     : pending && pending.item.reservedForQuest
@@ -1247,7 +1240,7 @@ export function InventoryScreen() {
       : pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
         ? 'This item cannot be equipped, but you can still keep, sell, or use it.'
         : undefined;
-  // OTA-968 — fusion info block: for a fusable/reservable item, name the material it
+  // OTA-945 — fusion info block: for a fusable/reservable item, name the material it
   // contributes and how diversity drives output rarity (a common playtest question:
   // "does what I put in change the quality?" — yes: DIFFERENT materials, not rarity).
   const fusionHint = pending && (isForgeReservableItem(pending.item) || canonicalItemTags(pending.item).includes('faction_gear'))
@@ -1260,8 +1253,6 @@ export function InventoryScreen() {
         return `Fusion material: ${matStr}. At a Crucible, combine 3–5 reserved pieces — 3 DIFFERENT materials \u2192 Rare, 4+ \u2192 Legendary (variety matters, not rarity).`;
       })()
     : null;
-  // OTA-693 — when a heal consumable can be batched, explain the "Use Max" rule so
-  // a count that stops short of the whole stack reads as intentional, not broken.
   const healBatchHint = pending && pending.item.quantity >= 2
     ? (() => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -1302,7 +1293,7 @@ export function InventoryScreen() {
       const coatable = (player.inventory ?? []).filter(
         // OTA-453 — instance-aware so FUSED weapons (catalog-absent) are listed.
         (i: InventoryItem) => isCoatableItem(i),
-      // OTA-1117 — the weapon you are HOLDING is the one you almost always mean
+      // OTA-1094 — the weapon you are HOLDING is the one you almost always mean
       // to coat, so it heads the list instead of sitting wherever pack order put it.
       ).sort(byWornFirst(wornIds));
       if (coatable.length === 0) {
@@ -1323,7 +1314,7 @@ export function InventoryScreen() {
             label: withEquippedTag(label, w),
             onPress: () => {
               if (isReplace) {
-                // OTA-944/945 — never scrub off a coating on one tap. Stage a picker of
+                // OTA-921/922 — never scrub off a coating on one tap. Stage a picker of
                 // the filled slots so the player chooses WHICH coating to replace.
                 const filled: Array<{ slot: 'coating' | 'coating2'; label: string }> = [];
                 if (w.coating) filled.push({ slot: 'coating', label: w.coating.label });
@@ -1371,7 +1362,7 @@ export function InventoryScreen() {
         : (armorCoatTarget.tags ?? []).find((t) => ['poison', 'acid', 'corruption', 'electrical', 'burn'].includes(t))) ?? 'this';
       const armorItems = (player.inventory ?? []).filter(
         (i: InventoryItem) => i.kind === 'armor' || i.uniqueStats?.kind === 'armor' || !!findArmorByName(i.name),
-      // OTA-1117 — worn armor first, same rule as the weapon picker above.
+      // OTA-1094 — worn armor first, same rule as the weapon picker above.
       ).sort(byWornFirst(wornIds));
       if (armorItems.length === 0) {
         armorPickerBody = 'You have no armor to work the vial into. Pick up a piece first.';
@@ -1380,7 +1371,7 @@ export function InventoryScreen() {
         armorPickerButtons = armorItems.map((a: InventoryItem) => {
           const arList = a.addedResists ?? [];
           const alreadyType = arList.map((r) => r.toLowerCase()).includes(coatType.toLowerCase());
-          // OTA-945 — mirror the store's cap: base 3 + the Crucible resistCapBonus.
+          // OTA-922 — mirror the store's cap: base 3 + the Crucible resistCapBonus.
           const arCap = 3 + (a.resistCapBonus ?? 0);
           const atCap = arList.length >= arCap;
           return {
@@ -1394,7 +1385,7 @@ export function InventoryScreen() {
             ),
             onPress: () => {
               if (!alreadyType && atCap) {
-                // OTA-945 — full piece: pick which resist to strip instead of refusing.
+                // OTA-922 — full piece: pick which resist to strip instead of refusing.
                 setArmorResistReplace({
                   coatId: armorCoatTarget.id,
                   coatName: armorCoatTarget.name,
@@ -1448,7 +1439,7 @@ export function InventoryScreen() {
 
   return (
     <View style={styles.container}>
-      {/* ⚠ OTA-1177 — GIFT MODE BANNER. The player arrived here from a GIVE
+      {/* ⚠ OTA-1154 — GIFT MODE BANNER. The player arrived here from a GIVE
           affordance in the world, so the pack has to say why it opened and offer
           a way back out. Without this the inventory looks identical to a normal
           visit and the only clue is an extra button inside a modal you have to
@@ -1473,7 +1464,7 @@ export function InventoryScreen() {
       <FirstTimeHint
         id="inventory_first_open"
         title="Your pack"
-        body="Tap any item to equip, use, scrap, or drop. The green line shows damage; the diamond means engine-named."
+        body="Tap any item to equip, use, salvage, or drop. The green line shows damage; the diamond means engine-named."
       />
       <View style={styles.header}>
         <TouchableOpacity
@@ -1542,10 +1533,10 @@ export function InventoryScreen() {
             </TouchableOpacity>
           </View>
         )}
-        {/* OTA-1120 — say the mode out loud. The FUSABLE view now behaves
+        {/* OTA-1097 — say the mode out loud. The FUSABLE view now behaves
             differently from every other sort (a tap reserves instead of opening
             the item sheet), and a screen that silently changes what a tap means
-            is the same silent-rule problem OTA-1117 was written against. One
+            is the same silent-rule problem OTA-1094 was written against. One
             line, only in this view, naming both the tap and the long-press. */}
         {fusionSelectMode && !invSelectMode && (
           <View style={styles.fusionModeBanner}>
@@ -1554,12 +1545,12 @@ export function InventoryScreen() {
             </Text>
           </View>
         )}
-        {/* OTA-1123 — the group bar. Only present once you've held a row, and it
+        {/* OTA-1100 — the group bar. Only present once you've held a row, and it
             offers exactly the actions the SELECTION can actually take: a button
             that would act on nothing is not shown at all, rather than sitting
             there greyed and unexplained. Counts come from the same predicates
             the action uses, so a button can never claim a number it cannot
-            deliver — the rule the Crucible's SELECT ALL learned in OTA-1120. */}
+            deliver — the rule the Crucible's SELECT ALL learned in OTA-1097. */}
         {invSelectMode && (
           <View style={styles.groupBar}>
             <View style={styles.groupBarHead}>
@@ -1569,7 +1560,7 @@ export function InventoryScreen() {
               </TouchableOpacity>
             </View>
             <View style={styles.groupBarActions}>
-              {/* OTA-1137 — gear first, and DESTRUCTIVE LAST. Before this, a
+              {/* OTA-1114 — gear first, and DESTRUCTIVE LAST. Before this, a
                   group of worn armor showed exactly one button and it was
                   SCRAP; putting EQUIP / UNEQUIP ahead of it means the reversible
                   thing is the one under your thumb. */}
@@ -1589,8 +1580,8 @@ export function InventoryScreen() {
                 </TouchableOpacity>
               )}
               {scrappable.length > 0 && (
-                <TouchableOpacity onPress={() => setInvGroupAction('scrap')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Scrap ${scrappable.length} items`}>
-                  <Text style={styles.groupActText}>SCRAP {scrappable.length}</Text>
+                <TouchableOpacity onPress={() => setInvGroupAction('scrap')} style={styles.groupActBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`Salvage ${scrappable.length} items`}>
+                  <Text style={styles.groupActText}>SALVAGE {scrappable.length}</Text>
                 </TouchableOpacity>
               )}
               {reservable.length > 0 && (
@@ -1609,10 +1600,10 @@ export function InventoryScreen() {
             {droppable.length + scrappable.length + reservable.length + releasable.length
               + equipPlan.equip.length + unequippable.length === 0 && (
               <Text style={styles.groupBarNone}>
-                Nothing here can be worn, dropped, scrapped or reserved — quest-bound items stay with you.
+                Nothing here can be worn, dropped, salvaged or reserved — quest-bound items stay with you.
               </Text>
             )}
-            {/* OTA-1137 — say WHY a piece you ticked isn't in the EQUIP count,
+            {/* OTA-1114 — say WHY a piece you ticked isn't in the EQUIP count,
                 rather than leaving the player to wonder which of their two
                 chestplates the button meant. */}
             {equipPlan.crowdedOut.length > 0 && (
@@ -1652,7 +1643,7 @@ export function InventoryScreen() {
                     {CATEGORY_LABEL[cat].toUpperCase()}
                   </Text>
                 </View>
-                {/* OTA-1120 — SELECT ALL / CLEAR ALL, in the FUSABLE view only.
+                {/* OTA-1097 — SELECT ALL / CLEAR ALL, in the FUSABLE view only.
                     Owner: "we also need a select all button on the category
                     headers in inventory when we select sort by fusable so you
                     can select a whole category." Reserving a category one row at
@@ -1704,7 +1695,7 @@ export function InventoryScreen() {
                   stripeColor={companionStripeColor(item)}
                   onPress={() => handleItemTap(item)}
                   onLongPress={() => handleItemLongPress(item)}
-                  // OTA-1123 — the checkbox affordance now belongs to the GROUP
+                  // OTA-1100 — the checkbox affordance now belongs to the GROUP
                   // mode; the FUSABLE view keeps its own ♥ tick through
                   // item.reservedForFusion, which is a different thing.
                   selectable={fusionSelectMode}
@@ -1764,7 +1755,7 @@ export function InventoryScreen() {
           && canScrap(pending.item)
           && !equippedItemIds.has(pending.item.id)
             ? {
-                label: 'Scrap how many?',
+                label: 'Salvage how many?',
                 value: Math.max(1, Math.min(scrapQty, pending.item.quantity)),
                 min: 1,
                 max: pending.item.quantity,
@@ -1776,7 +1767,7 @@ export function InventoryScreen() {
         onRequestClose={closeModal}
       />
 
-      {/* OTA-1123 — group-action confirmation. Itemises exactly what is going,
+      {/* OTA-1100 — group-action confirmation. Itemises exactly what is going,
           and carries the warnings each single-item path would have raised: SCRAP
           silently AUTO-UNEQUIPS worn gear (OTA-058) and DROP leaves things on
           the ground where you stand. A bulk action's real danger is doing
@@ -1798,7 +1789,7 @@ export function InventoryScreen() {
                 : invGroupAction === 'equip' ? equipPlan.equip.map((e) => e.item)
                   : invGroupAction === 'unequip' ? unequippable.map((r) => r.item)
                     : releasable;
-          // OTA-1137 — the gear rows name their SLOT, because "Put on 4" is
+          // OTA-1114 — the gear rows name their SLOT, because "Put on 4" is
           // only checkable if you can see it is four different slots.
           if (invGroupAction === 'equip' || invGroupAction === 'unequip') {
             const lines = invGroupAction === 'equip'
@@ -1872,7 +1863,7 @@ export function InventoryScreen() {
         buttons={coatPickerButtons}
         onRequestClose={() => setCoatTarget(null)}
       />
-      {/* OTA-944/945 — every coating slot is full. Ask WHICH coating to scrub off and
+      {/* OTA-921/922 — every coating slot is full. Ask WHICH coating to scrub off and
           replace (a picker), so one is never blindly overwritten. A single-slot weapon
           shows exactly one option (its lone coating). */}
       <BrandedModal
@@ -1910,7 +1901,7 @@ export function InventoryScreen() {
         buttons={armorPickerButtons}
         onRequestClose={() => setArmorCoatTarget(null)}
       />
-      {/* OTA-945 — the armor piece is FULL. Ask which worked-in resist to strip so the
+      {/* OTA-922 — the armor piece is FULL. Ask which worked-in resist to strip so the
           new one can take its place, rather than silently refusing. */}
       <BrandedModal
         visible={armorResistReplace !== null}
@@ -2215,16 +2206,16 @@ function ItemRow({
   slotTaken: boolean;
   stripeColor: string | null;
   onPress: () => void;
-  /** OTA-1120 — FUSABLE view only: opens the ordinary item modal, since the tap
+  /** OTA-1097 — FUSABLE view only: opens the ordinary item modal, since the tap
    *  is spent on the reserve toggle there. */
   onLongPress?: () => void;
-  /** OTA-1120 — true in the FUSABLE view, where the row behaves as a checkbox.
+  /** OTA-1097 — true in the FUSABLE view, where the row behaves as a checkbox.
    *  A reserved row gets a lit border so "selected" reads at a glance rather
    *  than resting entirely on the small ♥ at the end of the meta line. */
   selectable?: boolean;
-  /** OTA-1123 — a group is open (hold-to-pick). Rows show a ☐/☑ box. */
+  /** OTA-1100 — a group is open (hold-to-pick). Rows show a ☐/☑ box. */
   grouped?: boolean;
-  /** OTA-1123 — this row is in the group. */
+  /** OTA-1100 — this row is in the group. */
   groupPicked?: boolean;
 }) {
   const canEquip = validSlotsForItem(item).length > 0;
@@ -2247,9 +2238,9 @@ function ItemRow({
       style={[
         styles.row,
         highlight && styles.rowHighlighted,
-        // OTA-1120 — selection state is a lit border, not just the trailing ♥.
+        // OTA-1097 — selection state is a lit border, not just the trailing ♥.
         selectable && item.reservedForFusion === true && styles.rowSelected,
-        // OTA-1123 — group membership outranks it visually: while a group is
+        // OTA-1100 — group membership outranks it visually: while a group is
         // open, that is the question the screen is asking.
         grouped && groupPicked && styles.rowGrouped,
       ]}
@@ -2269,7 +2260,7 @@ function ItemRow({
             : 'Tap to reserve it for fusion. Hold to start a group.')
           : 'Tap for the item menu. Hold to start a group.'}
     >
-      {/* OTA-1123 — the group tick. Sits ahead of the rarity stripe so a picked
+      {/* OTA-1100 — the group tick. Sits ahead of the rarity stripe so a picked
           row reads from its leading edge, the way a checklist does. */}
       {grouped && (
         <View style={styles.groupTickWrap}>
@@ -2305,11 +2296,9 @@ function ItemRow({
               Mutually exclusive: an equipped item isn't "slot-taken by another". */}
           {isEquipped && <Text style={styles.rowEquippedCheck}>✓ </Text>}
           {slotTaken && <Text style={styles.rowSlotTaken}>✗ </Text>}
-          {/* OTA-689 — a Crucible-forged item wears a ❖ (a diamond OF diamonds),
-              rarity-colored. Materials are marked with a single ◆ diamond, so a
-              piece fused from them reads as a cluster of those diamonds. Fused items
-              are catalog-absent but NOT "inferred", so they never showed the ◆ —
-              this is their own mark. */}
+          {/* OTA-688 — a Crucible-forged item wears a magical ❖ star (rarity-colored),
+              distinct from the ◆ inferred diamond. Fused items are catalog-absent but
+              NOT "inferred", so they never showed the ◆ — now they carry their own mark. */}
           {isFusedInventoryItem(item) ? (
             <Text style={[styles.rowFusedMark, { color: rarityHexColor(item.rarity) }]}>❖ </Text>
           ) : isForgeReservableItem(item) ? (
@@ -2333,7 +2322,7 @@ function ItemRow({
               rarity / dog tags. No marker when un-reserved so the row
               isn't noisy for the catalog majority. */}
           {item.reservedForFusion && <Text style={[styles.rowMeta, styles.rowReserved]}>♥</Text>}
-          {/* OTA-1047 — material kind(s) on every forge-reservable row (owner,
+          {/* OTA-1024 — material kind(s) on every forge-reservable row (owner,
               reading his 29 identical-looking ♥ rows: "they are all too
               alike, there isn't 3 different kinds here?"). Building a
               3-kind spread is now a glance, not a refusal-driven lesson.
@@ -2444,7 +2433,7 @@ function rarityHexColor(rarity: string | null | undefined): string {
 
 const styles = StyleSheet.create({
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
-  // OTA-1177 — gift mode banner. Completion-green, matching the COMPLETE button
+  // OTA-1154 — gift mode banner. Completion-green, matching the COMPLETE button
   // and the READY sort, so "this is the thing you came to do" reads the same
   // everywhere in the game.
   giftModeBar: {
@@ -2501,7 +2490,7 @@ const styles = StyleSheet.create({
   sectionChevron: { fontSize: 11, fontWeight: '900', marginRight: 7, width: 11, textAlign: 'center' },
   sectionLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 2 },
   sectionCount: { color: '#9a8e74', fontSize: 11 },
-  // OTA-1120 — the per-category SELECT ALL / CLEAR ALL chip in the FUSABLE view.
+  // OTA-1097 — the per-category SELECT ALL / CLEAR ALL chip in the FUSABLE view.
   // Sits between the label and the count; its own press handler keeps the tap
   // off the collapse toggle it lives inside.
   selectAllBtn: {
@@ -2533,7 +2522,7 @@ const styles = StyleSheet.create({
     borderColor: '#d8b46a',
     borderWidth: 1.5,
   },
-  // OTA-1120 — a RESERVED row in the FUSABLE view. Quieter than rowHighlighted
+  // OTA-1097 — a RESERVED row in the FUSABLE view. Quieter than rowHighlighted
   // (which is a transient "look here" flash) because this is a steady state the
   // player will be looking at a dozen rows of at once, and a dozen loud rows is
   // no signal at all. Reads as "checked" beside the unlit rows around it.
@@ -2557,8 +2546,7 @@ const styles = StyleSheet.create({
   rowHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   rowName: { color: '#e6d8b3', fontSize: 14, fontWeight: '600', flex: 1 },
   rowInferredDiamond: { fontSize: 12, fontWeight: '700' },
-  // OTA-689 — Crucible-forged marker: ❖, a diamond of diamonds (materials wear a
-  // single ◆), rarity-colored, same weight as the inferred diamond.
+  // OTA-688 — Crucible-forged marker: a magical ❖ star, rarity-colored.
   rowFusedMark: { fontSize: 12, fontWeight: '700' },
   rowQty: { color: '#cdbf99', fontSize: 12 },
   rowMetaRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
@@ -2576,7 +2564,7 @@ const styles = StyleSheet.create({
   // OTA-120 Phase 5 — [fits dog] / [treat] tag styling. Amber so they
   // stand out from the grey rarity / durability metadata.
   rowDogTag: { color: '#c9a86a', fontWeight: '700' },
-  // OTA-1047 — material-kind chip tone (teal, quieter than the ♥).
+  // OTA-1024 — material-kind chip tone (teal, quieter than the ♥).
   rowMatKinds: { color: '#8aa0a4' },
   rowReserved: { color: '#d97a7a', fontWeight: '700' },
   rowQuestSaved: { color: '#d9c34a', fontWeight: '700' }, // gold — matches Quest Items section
@@ -2604,7 +2592,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   pouchFilterText: { color: '#cdbf99', fontSize: 12, flexShrink: 1, flexGrow: 1 },
-  // OTA-1120 — the FUSABLE-mode explainer. Same plate as the pouch/bandolier
+  // OTA-1097 — the FUSABLE-mode explainer. Same plate as the pouch/bandolier
   // banners (it is the same class of thing: a mode where a tap means something
   // else), in the Crucible's amber rather than their green.
   fusionModeBanner: {
@@ -2617,7 +2605,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   fusionModeText: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
-  // OTA-1123 — the inventory group bar + row tick. Same amber language as the
+  // OTA-1100 — the inventory group bar + row tick. Same amber language as the
   // Crucible controls, since a group is the same kind of thing: a declaration
   // about several items at once.
   groupBar: {

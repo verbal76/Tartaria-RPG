@@ -1157,18 +1157,6 @@ const CODENAMES: Record<string, string> = {
   '2026-06-12-621': 'Bibiunium Threshold',
   '2026-06-12-622': 'Bibibium Echo',
   '2026-06-12-623': 'Bibitrium Resume',
-  '2026-06-18-624': 'Bibiquadium Amber',
-  '2026-06-18-625': 'Bibipentium Respite',
-  '2026-06-18-626': 'Bibihexium Verdant',
-  '2026-06-18-627': 'Bibiseptium Anchor',
-  '2026-06-18-628': 'Bibioctium Crimson',
-  '2026-06-18-629': 'Bibiennium Tether',
-  '2026-06-18-630': 'Bitrinilium Quench',
-  '2026-06-18-631': 'Bitrinunium Settling',
-  '2026-06-18-632': 'Bitribium Vitals',
-  '2026-06-18-633': 'Bitritrium Pulse',
-  '2026-06-18-634': 'Bitriquadium Cadence',
-  '2026-06-18-635': 'Bitripentium Namesake',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

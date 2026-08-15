@@ -8,11 +8,132 @@
 # Tartaria Realms — Session Handoff
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     CURRENT SESSION STATE — 2026-06-14 (READ THIS FIRST; it supersedes the older
-     "ONE branch HaL2001" guidance in the §P block below for THIS work phase)
+     CURRENT WORK PHASE — 2026-06-15 — READ THIS FIRST. This block is the single
+     source of truth for the current phase and SUPERSEDES every older
+     "CURRENT WORK PHASE" / "Current state" / §P branch-policy block below them.
      ═══════════════════════════════════════════════════════════════════════════ -->
 
-> ## ⟁ CURRENT WORK PHASE — develop on `arbiters-line`, promote to HAL at the end
+> ## ⟁ CURRENT WORK PHASE — 2026-06-15/16 — FOUR LINES; mobile dev on `golem-line`, PC on `steam_Dev`
+>
+> **What changed this phase:** `HaL2001` is the **stable, live** line, mostly frozen
+> to mature/gather feedback — but it still takes **live bug-fix OTAs** when the user
+> calls a "QoL/bug for HAL" (it shipped 621 + 622 this way, each ported to the dev
+> lines). Active **mobile** development is on **`golem-line`** (forked from `HaL2001`
+> at OTA-620). A NEW **`steam_Dev`** line was forked for the **PC/Steam port**
+> (react-native-web + Electron) — see "PC/Steam port" below.
+>
+> ### The four lines (each = its own app id + OTA channel = separate install)
+> | Branch | App id | OTA channel | Status | Develop here? |
+> |---|---|---|---|---|
+> | **`HaL2001`** | `…tartarprim.hal2001` | `hal2001` | LIVE; frozen EXCEPT an explicit "QoL/bug for HAL" (a push publishes to the live APK + IPA) | bug-fixes only |
+> | **`golem-line`** | `…tartarprim.golem` | `golem-line` | **active MOBILE dev line** | **YES (mobile)** |
+> | **`steam_Dev`** | `…tartarprim.steamdev` | `steam-dev` | **PC/Steam dev line** (Electron + web export; `build-steam-exe.yml` → `.exe`) | **YES (PC)** |
+> | `arbiters-line` | `…tartarprim.arbiters` | `arbiters-line` | dormant; 45 own commits (OTA-563→599) not on HAL | NO |
+>
+> A line's identity lives entirely in **`app.json`**: `expo.name`,
+> `ios.bundleIdentifier`, `android.package`, and
+> `updates.requestHeaders.expo-channel-name`. **That channel header is the isolation
+> lever** — a build only receives OTAs published to its own channel. A different
+> app id ⇒ the app installs *side-by-side* on a phone (never overwrites another
+> line). NEVER change another line's identity from this branch.
+>
+> ### Worktree
+> `/tmp/hal2001` is the active worktree, currently checked out on **`golem-line`**
+> (`node_modules` present; `npx tsc` / `npx jest` / patch-package all work).
+> `HaL2001`, `arbiters-line`, `golem-line`, and `steam_Dev` are all branches in this
+> one clone. (HaL bug-fixes are done in a throwaway worktree off `origin/HaL2001`,
+> e.g. `git worktree add --detach /tmp/hal-fix2 origin/HaL2001` + a temp branch, then
+> `git push origin <temp>:HaL2001` — `/tmp/hal-main` was left stale; don't reuse it.)
+>
+> ### Build / OTA state
+> - **Latest OTA = `OTA-622 (Bibibium Echo)`** — `app/buildInfo.ts`
+>   `OTA_BUILD_ID = '2026-06-12-622'`. (Date stem stays `2026-06-12`; only the numeric
+>   suffix advances.) **Next OTA = 623.** All four lines sit at 622 (621/622 shipped
+>   on HaL and were cherry-picked to golem-line + steam_Dev).
+> - **golem-line / steam_Dev have no native build/installs yet.** golem-line: build a
+>   `.golem` APK to sideload, then JS OTAs flow to the `golem-line` channel. steam_Dev:
+>   the `.exe` is built in CI (see PC/Steam port). There is **no PR-triggered test CI**
+>   — run tsc + jest yourself before every push (see "Tests").
+>
+> ### Codename scheme (CORRECTED — §P's "−405 / stop at 118" text is STALE)
+> Codename = the IUPAC **systematic numeric name of `(OTA-NNN − 400)`** + a fresh
+> one-word flavor noun. Digit roots: 0 nil · 1 un · 2 bi · 3 tri · 4 quad · 5 pent ·
+> 6 hex · 7 sept · 8 oct · 9 enn — concatenate the digits of `(NNN−400)` and add
+> `-ium`. Proven against `app/buildCodename.ts`: 618→218 **Biunoctium**, 619→219
+> **Biununennium**, 620→220 **Bibinilium**, 621→221 **Bibiunium**, 622→222
+> **Bibibium**. **Next: OTA-623 → 223 → `Bibitrium <word>`.** Don't reuse the
+> immediately prior flavor word.
+>
+> ### Recent OTA log (611→622 — don't redo)
+> 611 golem-command volley hits the player too + combat-consumable counters (later
+> revised) · 612–617 combat/balance + UI batch · 618 ration heal copy · **619
+> (Biununennium Quaff)** combat healing FREE again (reverted 611's consumable
+> counters; golem-volley + disengage KEPT) · **620 (Bibinilium Glow)** Bioluminescent
+> Fungus heals its +1 / is consumed even hookless (OTA-212 refund was discarding the
+> heal) · **621 (Bibiunium Threshold)** [live bug] ENTER button no longer dangles on a
+> structure tile mid-course — `sceneBuilding` is tracked while travelling + InputBox
+> shows ENTER on the travel row · **622 (Bibibium Echo)** [live bug] Kokoro no longer
+> repeats a line N times — the streaming-TTS buffer re-read the CUMULATIVE
+> partialArbiterText; new `app/voice/streamBundler.ts` processes only new token deltas.
+> Full per-OTA detail tops the comment log in `app/buildInfo.ts`.
+>
+> ### Ship a JS OTA on golem-line
+> 1. Edit `app/`. 2. Bump `OTA_BUILD_ID` in `app/buildInfo.ts` + add a per-OTA
+> comment. 3. Add the codename to `app/buildCodename.ts`. 4. `npx tsc --noEmit` +
+> run the touched `npx jest` suites. 5. Commit (footer rule below) →
+> `git push -u origin golem-line` (retry 2/4/8/16s on network fail) → open/maintain
+> a **draft PR**. NOTE: pushing golem-line does NOT auto-publish yet (no workflow is
+> wired to this channel) — wire one before relying on auto-OTA.
+>
+> ### Fork ANOTHER isolated line (reusable procedure — how golem-line was made)
+> `git checkout -b <new-line> HaL2001` → in `app.json` set a new `bundleIdentifier`
+> + `android.package` (`…tartarprim.<name>`), `expo-channel-name: <new-line>`, and
+> `expo.name` → push + draft PR. Leave the EAS `projectId` / `updates.url` as-is
+> (all channels live inside one EAS project). `TitleScreen` update banners are gated
+> on the `.hal2001` / bare-production app ids, so a new app id shows neither — fine.
+>
+> ### PC/Steam port (`steam_Dev` line)
+> Ports the RN game to desktop via **react-native-web** wrapped in **Electron**, with
+> **Steamworks** for achievements. **Full plan, the native-module web-stub list, and
+> ordered next steps live in `PC-PORT.md` on the `steam_Dev` branch** (NOT on
+> golem-line — check out steam_Dev to read it). What's on steam_Dev:
+> - `desktop/` — Electron wrapper (`main.js` resolution-aware window + F11/Steam-Deck
+>   fullscreen; `preload.js` exposes `window.tartariaDesktop.unlockAchievement`).
+> - `web-stubs/native-noop.js` + a **web-only** Metro `resolveRequest` (metro.config.js)
+>   that stubs the 4 native-only modules (llama.rn, onnxruntime-react-native,
+>   react-native-executorch, expo-speech-recognition) so `expo export --platform web`
+>   compiles. Android/iOS resolution is untouched.
+> - root `package.json` adds web deps (react-dom, react-native-web, @expo/metro-runtime).
+> - `.github/workflows/build-steam-exe.yml` — Windows runner → `expo export web` →
+>   Electron → **portable `.exe`** uploaded as artifact `tartaria-pc-exe`. Fires on
+>   push to `steam_Dev` (+ manual dispatch). The web export COMPILED first try; the
+>   `.exe` is the same web bundle wrapped — also itch.io/HTML5-portable.
+> - **Updates ship via the Steam depot (Steampipe), NOT OTAs.** Qwen + Kokoro are
+>   stubbed on web for now (template narration, silent); desktop runtimes
+>   (node-llama-cpp / ONNX) are a later pass. Code signing deferred (Azure Trusted
+>   Signing) — see PC-PORT.md.
+>
+> ### Git / artifact rules (unchanged)
+> - Develop on the designated branch; never push another line's branch without an
+>   explicit instruction. Always `git push -u origin <branch>`.
+> - Every commit/PR footer ends with the session URL:
+>   `https://claude.ai/code/session_01LrgRsoDADojqEZmcatLScv`.
+> - NEVER put the model ID in any committed artifact (commit, code, buildInfo) —
+>   chat only.
+>
+> ### Tests (no PR CI — run locally)
+> `npx tsc --noEmit`, then `npx jest <suite>` for the suites you touched. Known
+> pre-existing flake: the heavy long-sim suites (`combatBalanceProbe`,
+> `domesticStress`) OOM the jest worker in this sandbox even on clean HEAD — that's
+> environmental, not a regression (confirm by stashing your change and re-running).
+> Lock tests added this arc: `combatHealNoCounter` (619), `fungusFoodReveal` (620).
+
+<!-- ─── SUPERSEDED HISTORY BELOW — the blocks from here down describe EARLIER phases
+     (2026-06-14 arbiters-line phase, and the older single-branch HaL2001 model).
+     Kept for reference; where they conflict with the block above, the block above
+     wins. ─── -->
+
+> ## ⟁ [SUPERSEDED — 2026-06-14 phase, see top block] develop on `arbiters-line`, promote to HAL at the end
 >
 > **Branch policy (per the user, this session):** ALL work happens on
 > **`arbiters-line`**. When the arbiter build is fully perfected it will REPLACE
@@ -390,6 +511,11 @@ codenames for one change, you've reintroduced the bug.)
 | Reaches the phone? | **YES** — see P2 |
 
 #### Codename scheme (current) — `<Element> <Chemical-Process>`
+> ⚠️ **STALE — see the corrected scheme in the top CURRENT WORK PHASE block.** The
+> anchor below (`element# = OTA−405`, stop at 118) no longer matches the live log:
+> the actual offset is **`OTA−400`** and the names continue PAST 118 as systematic
+> IUPAC numeric names (e.g. OTA-620 → 220 "Bibinilium"). Use `OTA−400`.
+
 Set by the user 2026-06-10: march through the **periodic table by atomic number**,
 one element per OTA, until **all 118 are gone**; pair each element with a
 **chemical/metallurgical process word** for flavor.
@@ -4548,7 +4674,7 @@ A batch from a live playthrough (Verbal, Dynasty Border Post). All JS-only → O
 
 ## 1. What this is
 
-**Tartaria Realms** — React Native / Expo SDK 52 procedural narrative RPG. Android + iOS, Hermes engine. Repo: `verbal76/tartaria-rpg`. Distribution: OTAs ship by pushing the **`HaL2001`** release branch, which multi-channel-publishes to `hal2001` + `preview` (Android) and `ios-preview` (iOS) — see §P. The `arbiters-line` dev branch publishes to a dead channel (no players).
+**Tartaria Realms** — React Native / Expo SDK 52 procedural narrative RPG. Android + iOS, Hermes engine. Repo: `verbal76/tartaria-rpg`. Distribution: each line is a separate app id + OTA channel (see the top CURRENT WORK PHASE block). The live line **`HaL2001`** (channel `hal2001` + `preview` Android / `ios-preview` iOS) is currently frozen; **active dev is on `golem-line`** (app id `…golem`, channel `golem-line`, no installs/auto-publish wired yet).
 
 **Setting:** post-Aetherstone-flood Tartaria — player wakes into a buried civilization, picks race + faction + name, plays procedural scenes driven by authored data + light template stitching + on-device LLM narration.
 
@@ -4570,31 +4696,39 @@ When asked which model you are, use the model identifier configured for **your**
 
 ## 3. Branch hierarchy & workflow
 
-**The authoritative operating model is §P (top of file).** This section is the
-condensed cross-reference; if it ever disagrees with §P, §P wins.
+**The authoritative operating model is the CURRENT WORK PHASE block at the very
+top of this file.** This section is the condensed cross-reference; if it ever
+disagrees with the top block, the top block wins. (The older §P "ONE branch" model
+below is from an earlier phase.)
 
-### Branches
+### Branches (current phase — 2026-06-15)
 
-- **`arbiters-line`** — **dev working branch; do all work here** (worktree `/tmp/arbiters-line`). Vault codenames, `arbNNN` ids, dead `arbiters-line` channel (no players).
-- **`HaL2001`** — **the live release branch** (worktree `/tmp/hal2001-rollback`). Pushing it publishes the OTA to Android + iOS (§P2). Anvil codenames, numeric ids, prod `hal2001` channel/package/name.
+- **`golem-line`** — **active dev branch; do all work here** (worktree `/tmp/hal2001`).
+  Forked from `HaL2001` at OTA-620. App id `…tartarprim.golem`, channel `golem-line`.
+  Codenames = systematic-element scheme (`OTA−400`; see top block), numeric `2026-06-12-NNN` ids.
+- **`HaL2001`** — **the live, FROZEN line** (maturing ~1 week). App id `…tartarprim.hal2001`,
+  channel `hal2001`. Do NOT push unless the user explicitly says "QoL for HAL".
+- **`arbiters-line`** — dormant separate line (app id `…tartarprim.arbiters`, channel
+  `arbiters-line`); holds 45 of its own commits (OTA-563→599). Leave alone.
 - **`main`** — base; tagged releases. Do NOT push directly.
-- Other `claude/*` branches — parked/base from prior sessions; leave alone unless asked. (The harness may start you on a `claude/*` branch; the real work happens in the `/tmp/arbiters-line` worktree on `arbiters-line` — see §P.)
+- Other `claude/*` branches — parked/base from prior sessions; leave alone unless asked.
 
-### Per-push workflow (OTA-only, ~95% of pushes) — DEV
+### Per-push workflow (OTA-only, ~95% of pushes) — on `golem-line`
 
 ```
-1. Edit code in app/ (worktree /tmp/arbiters-line)
+1. Edit code in app/ (worktree /tmp/hal2001, branch golem-line)
 2. npx tsc --noEmit                 → 0 errors in app/ source
-3. npx jest <touched suites>        → green (full suite has baseline flakes; §header)
-4. Bump app/buildInfo.ts            → OTA_BUILD_ID = YYYY-MM-DD-arbNNN
-5. Mint the next Vault codename in app/buildCodename.ts + docs/build-codenames.md
-6. Update HANDOFF.md §0.B in the SAME commit
-7. git commit -m "<Vault> — OTA-arbNNN — <desc>"  (codename-first; see §8 + CLAUDE.md)
-8. git push -u origin arbiters-line
+3. npx jest <touched suites>        → green (heavy long-sim suites OOM in-sandbox; see top block)
+4. Bump app/buildInfo.ts            → OTA_BUILD_ID = 2026-06-12-NNN + per-OTA comment
+5. Add the next codename in app/buildCodename.ts  (name = IUPAC of OTA−400; see top block)
+6. git commit -m "OTA-NNN — <desc>"  (footer = session URL; never the model id)
+7. git push -u origin golem-line     (retry 2/4/8/16s on network fail)
+8. Open / maintain a DRAFT PR for the branch.
 ```
 
-This reaches **no players** (dead channel). To put it in front of testers, run
-the **§P4 promotion** onto `HaL2001` when the user says "push" / "promote".
+NOTE: pushing `golem-line` does NOT auto-publish an OTA yet — no `eas-update`
+workflow is wired to the `golem-line` channel. Wire one (or publish manually)
+before relying on auto-OTA. A fresh `.golem` APK must be sideloaded once first.
 
 ### When a NATIVE build is needed
 
@@ -5414,8 +5548,7 @@ That's the lay of the land at v2.4.1 / OTA `2026-05-23-020`. v2.4.1 is fully shi
 # ARCHIVED 2026-08-07 — the 2026-07-13/14 punch lists and exploit-sweep backlog
 
 > Moved out of `HANDOFF.md` verbatim. All reconciled closed; they were kept in the live
-> handoff long enough to start contradicting each other ("PUNCH LIST STATUS" announced B2
-> as NEXT while the block beneath it recorded B2 closed). The one still-open item, combat
+> handoff long enough to start contradicting each other. The one still-open item, combat
 > rebalance pass 2 'matched progression', was carried up into §8 rather than archived.
 
 - **PUNCH LIST (2026-07-14) — 12 items, worked in order, nothing else until it's
@@ -5620,7 +5753,7 @@ That's the lay of the land at v2.4.1 / OTA `2026-05-23-020`. v2.4.1 is fully shi
 
 - **Exploit-sweep backlog (2026-07-13) — RECONCILED 2026-07-28: every group below was
   subsequently closed (economy re-tiering B1 802/782; item dupes A2 800/780; water bounce +
-  small bugs A1 800/780; HUNT turn-in gating 810/790) — and CORRECTION OTA-1035: the earlier claim here that mysteries + storylines
+  small bugs A1 800/780; HUNT turn-in gating 810/790) — and CORRECTION OTA-1012: the earlier claim here that mysteries + storylines
   still turned in remotely was WRONG; a later B2 pass made ALL kinds face-to-face
   (turnInMystery/turnInStoryline require an agent in scene, the UI COMPLETE delegates to
   them, typed couriers refused). Nothing in this backlog remains open. Original record kept
@@ -5660,4 +5793,3 @@ That's the lay of the land at v2.4.1 / OTA `2026-05-23-020`. v2.4.1 is fully shi
     save-loss (`worldMemory.ts` — collapse to a count map or trim). Full
     per-finding detail (file:line, repro, proposed fix) in the 2026-07-13 session
     log / scratchpad `sweep-findings.txt`.
-

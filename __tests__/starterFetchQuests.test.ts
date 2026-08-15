@@ -29,7 +29,7 @@ import { contractJourneyBonusTc } from '../app/engine/contractMarkers';
 // B2 — turn-in pays the base reward PLUS a distance-scaled long-haul bonus
 // (contractJourneyBonusTc). Compute the exact expected pay so the test tracks
 // the reward without hard-coding the location-dependent bonus.
-/** ⚠ OTA-1210 (PUNCHLIST P7) — RETARGETED, AND IT WAS ASSERTING THE DEFECT.
+/** ⚠ OTA-1187 (PUNCHLIST P7) — RETARGETED, AND IT WAS ASSERTING THE DEFECT.
  *
  *  This used to read `base + contractJourneyBonusTc(loc, base)` — the long-haul bonus for
  *  the remoteness of the turn-in tile from the starter hub. That was the P7 defect itself:

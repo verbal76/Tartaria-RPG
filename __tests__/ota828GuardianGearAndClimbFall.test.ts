@@ -1,4 +1,4 @@
-// OTA-828 — two device-log fixes.
+// OTA-808 — two device-log fixes.
 //   (1) Core Guardian reward gear was cosmetic-only: the weapon() helper dropped
 //       the `damage` param and set no damageType/stat, and neither weapon nor armor
 //       carried uniqueStats or a catalog row — so getEquippedWeapon/aggregateArmor
@@ -11,7 +11,7 @@ import { dropsForCapital } from '../app/engine/coreGuardians';
 import { getEquippedWeapon } from '../app/engine/combatRules';
 import type { PlayerCharacter } from '../app/engine/types';
 
-describe('OTA-828 — Core Guardian weapons are real, usable weapons', () => {
+describe('OTA-808 — Core Guardian weapons are real, usable weapons', () => {
   it("Atalan's Trident carries its damage dice + a derived type/stat", () => {
     const drop = dropsForCapital('samarran');
     expect(drop).not.toBeNull();

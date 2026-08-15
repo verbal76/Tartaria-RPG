@@ -1,4 +1,4 @@
-// OTA-722 — every armor SLOT now has a craftable recipe at Rare AND Legendary
+// OTA-705 — every armor SLOT now has a craftable recipe at Rare AND Legendary
 // (the Aetherforged rare set + Titanforged legendary set filled legs/hands/feet/
 // cloak, plus a Legendary chest). They're Rare/Legendary results, so they enter
 // the discovery pool as FOUND recipes (locked until uncovered) — not auto-granted.
@@ -23,7 +23,7 @@ function craftableRaritiesBySlot(): Record<string, Set<string>> {
   return out;
 }
 
-describe('OTA-722 — every armor slot is craftable at Rare + Legendary', () => {
+describe('OTA-705 — every armor slot is craftable at Rare + Legendary', () => {
   const bySlot = craftableRaritiesBySlot();
   for (const slot of ARMOR_SLOTS) {
     it(`${slot}: has a Rare and a Legendary recipe`, () => {
@@ -33,7 +33,7 @@ describe('OTA-722 — every armor slot is craftable at Rare + Legendary', () => 
   }
 });
 
-describe('OTA-722 — the new Aetherforged/Titanforged set', () => {
+describe('OTA-705 — the new Aetherforged/Titanforged set', () => {
   const RARE = ['Aetherforged Greaves', 'Aetherforged Gauntlets', 'Aetherforged Treads', 'Aetherforged Mantle'];
   const LEG = ['Titanforged Cuirass', 'Titanforged Greaves', 'Titanforged Gauntlets', 'Titanforged Treads', 'Titanforged Mantle'];
 

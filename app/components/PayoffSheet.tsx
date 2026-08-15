@@ -1,4 +1,4 @@
-// OTA-1104 — THE SHAKEDOWN. Caught with your hand in a vendor's pocket while
+// OTA-1081 — THE SHAKEDOWN. Caught with your hand in a vendor's pocket while
 // holding enough TC to matter, the vendor names a price for their silence.
 // Owner: "let's do the pay them off option when caught; if you don't have the
 // TC you fight" — a player who can't cover the price never sees this sheet;

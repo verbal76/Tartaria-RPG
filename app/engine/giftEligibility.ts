@@ -3,7 +3,7 @@ import { activeFetchItemNames } from './factionQuests';
 import { wornInstanceIds } from './equipment';
 import type { InventoryItem, PlayerCharacter } from './types';
 
-/** OTA-1177 — ONE ANSWER TO "CAN I GIVE THIS AWAY?", FOR THE UI AND THE STORE.
+/** OTA-1154 — ONE ANSWER TO "CAN I GIVE THIS AWAY?", FOR THE UI AND THE STORE.
  *
  *  Owner: *"the list we pick from to give out must exclude all equipped gear,
  *  armor and anything in the bandolier or tool pouch. also no item that is given
@@ -13,7 +13,7 @@ import type { InventoryItem, PlayerCharacter } from './types';
  *  guard was inside `giveGift`, AFTER the player had already chosen: the old
  *  picker listed worn armour happily and then refused the tap with "you are still
  *  wearing that". That is a choice the game offers and then takes back — and it is
- *  the same shape as the ready-to-hand-in bug from OTA-1175, where one predicate
+ *  the same shape as the ready-to-hand-in bug from OTA-1152, where one predicate
  *  lived in three places and drifted. So the reason lives HERE, the inventory asks
  *  it before drawing the GIVE button, and `giveGift` asks it again before moving
  *  anything. Two callers, one answer; they cannot disagree.
@@ -48,7 +48,7 @@ export function giftBlockReason(item: InventoryItem, player: PlayerCharacter): s
   // perfectly normal loot right up until you accept the contract. Handing your
   // last one to a vendor does not fail the contract loudly; it just quietly makes
   // it uncompletable until you find another. Matched BY NAME because that is what
-  // the contract asks for (a fetch counts held quantity by name, OTA-984), so a
+  // the contract asks for (a fetch counts held quantity by name, OTA-961), so a
   // name match is the right question here rather than an instance match.
   const wanted = activeFetchItemNames(
     player.activeFactionQuests ?? (player.activeFactionQuestIds ?? []).map((id) => ({ id })),

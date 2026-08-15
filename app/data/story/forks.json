@@ -1,5 +1,5 @@
 {
-  "_comment": "OTA-1088 — PHASE 3. Two genuine forks per story motive, asked once, with no correct answer and no take-backs. See app/engine/storyForks.ts for why these are DERIVED from save state rather than queued, and for the three places every answer lands: the feed now, the ending screen forever, and the mouths of the Phase 2 cast. No placeholders — the authoring guard rejects a '{' anywhere in this file.",
+  "_comment": "OTA-1065 — PHASE 3. Two genuine forks per story motive, asked once, with no correct answer and no take-backs. See app/engine/storyForks.ts for why these are DERIVED from save state rather than queued, and for the three places every answer lands: the feed now, the ending screen forever, and the mouths of the Phase 2 cast. No placeholders — the authoring guard rejects a '{' anywhere in this file.",
   "forks": [
     {
       "id": "debt_collector",

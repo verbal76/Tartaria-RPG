@@ -157,7 +157,7 @@ const COMBAT_ONLY_STATUSES: ReadonlySet<StatusEffectKind> = new Set([
   // OTA-835 — the Mud Golem's Elemental Control ward is a per-encounter block;
   // clear any unspent soak when the fight ends so it never carries into the next.
   'stone_ward',
-  // OTA-1112 — the anti-stun-lock window is per-encounter: it protects the
+  // OTA-1089 — the anti-stun-lock window is per-encounter: it protects the
   // recovery rounds of THIS fight and never carries immunity into the next.
   'braced',
 ]);
@@ -212,9 +212,9 @@ export function statusAcAdjustment(current: readonly StatusEffect[] | undefined)
     // OTA 039 — Aethercraft 'shape stone' applies a one-round +4 AC
     // ward from raised Aetherstone.
     if (e.kind === 'shaped_stone_ward') adj += 4;
-    // OTA-936 — successful-dodge group defense: harder for the rest of the volley to land.
+    // OTA-913 — successful-dodge group defense: harder for the rest of the volley to land.
     if (e.kind === 'evasive') adj += 3;
-    // OTA-1218 — Aether Shield (PUNCHLIST P16). Deliberately +3 against
+    // OTA-1195 — Aether Shield (PUNCHLIST P16). Deliberately +3 against
     // shaped_stone_ward's +4: the ward is one round off a discipline that also needs a
     // Small Rock, this is three rounds off a technique. The longer field is the weaker
     // one per round, or there would be no reason to shape stone again.

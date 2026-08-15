@@ -73,7 +73,7 @@ describe('OTA-862 — the 24 in-game-hour deadline', () => {
     expect(bountyExpired({ ...b, acceptedAtHour: undefined }, 9999)).toBe(false);
   });
 
-  // ⚠ RETARGETED BY OTA-1185, NOT WEAKENED. OTA-863's CLAIM — a job budget plus a
+  // ⚠ RETARGETED BY OTA-1162, NOT WEAKENED. OTA-863's CLAIM — a job budget plus a
   // distance term, floored at the base — is unchanged and still asserted below. Only
   // the SIZE of the distance term moved: 1h/tile was priced against walking time and
   // ignored that a tile also costs 2 stamina, which rest repays at 1h per point. The
@@ -107,7 +107,7 @@ describe('OTA-862 — the 24 in-game-hour deadline', () => {
       targetName: 'Mud Monarchs', targetLocationId: 'monarch_waystation', targetLocationName: 'Waystation',
       count: 3, progress: 0, rewardTc: 50, rewardRep: 8,
     };
-    // ⚠ OTA-1188 — accepting now requires a FROZEN BOARD: the contract stamps the
+    // ⚠ OTA-1165 — accepting now requires a FROZEN BOARD: the contract stamps the
     // politics it was signed under, so there must be a snapshot to stamp. The freeze
     // AUTO-RELEASES on accept, which is why it is re-taken before each one.
     useGameStore.getState().toggleBoardFreeze(); useGameStore.getState().acceptBounty(bounty);

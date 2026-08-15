@@ -1,4 +1,4 @@
-// OTA-1012 — "travel to <place>" must find the place the player NAMED, not the place
+// OTA-989 — "travel to <place>" must find the place the player NAMED, not the place
 // they punctuated correctly. Owner: "'travel to the location name' should start
 // an auto route as long as the name matches."
 //
@@ -115,7 +115,7 @@ export function matchLocationByName<T extends MatchableLocation>(
     const partials = locations.filter((l) => tightKey(l.name).includes(q));
     if (partials.length === 1) return partials[0]!;
     if (partials.length > 1) {
-      // OTA-1012 — multiple owners is a REFUSAL here too, same as the alias and typo
+      // OTA-989 — multiple owners is a REFUSAL here too, same as the alias and typo
       // tiers ("camp" names three real places; walking the player to whichever
       // sorted shortest is a wrong multi-day trek). One carve-out: when a single
       // candidate is the BASE NAME the others merely extend — "Nimari" inside

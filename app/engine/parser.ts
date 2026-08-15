@@ -18,7 +18,7 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'shatter', 'break', 'destroy', 'crush', 'bash',
     // From the overwhelm action card — semantically a flavour of attack.
     'overwhelm', 'press the attack',
-    // OTA-770 — rousing a dormant guardian ("wake the knight") IS a hostile act:
+    // OTA-750 — rousing a dormant guardian ("wake the knight") IS a hostile act:
     // route it to attack so an animate scene noun stands up and fights.
     'wake', 'rouse', 'awaken', 'stir', 'provoke', 'disturb',
   ],
@@ -69,7 +69,9 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     // construct" failing to advance the wreck_construct hook because
     // there was no salvage verb. Investigate is hook-eligible, so
     // mapping salvage here advances the hook with the right noun.
-    'salvage', 'strip', 'pry',
+    // ⚠ OTA-1243 — 'scrap' accepted as a synonym: the UI now says SALVAGE
+    // everywhere, but a player who thinks in the old word must not be refused.
+    'salvage', 'scrap', 'strip', 'pry',
     // From the track / translate / learn / gather cards.
     'track', 'translate', 'learn', 'gather',
     // 'open' belongs to the dedicated open intent — it persists
@@ -109,7 +111,7 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'ring', 'pray', 'touch', 'tilt', 'whistle', 'shout', 'chant', 'kneel',
     'hum', 'stroke', 'caress', 'salute', 'beckon', 'sound', 'signal',
     'answer', 'respond', 'feel', 'bang', 'strike a note', 'clap',
-    // ⚠ OTA-1178 — SITTING DOWN, because the game kept ASKING FOR IT and then
+    // ⚠ OTA-1155 — SITTING DOWN, because the game kept ASKING FOR IT and then
     // refusing. Halem's gift line ends *"there's a bowl of something hot for you
     // if you'll sit"* — and `sit` was in no synonym list at all, so the owner typed
     // "sit", then "I'll sit", then "sit with halem", and got the generic
@@ -145,7 +147,13 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   wait: ['wait', 'stay', 'hold', 'pause', 'still', 'linger', 'tarry', 'idle', 'bide', 'remain'],
   // OTA-241 — 'ask' moved here from diplomacy. The verb is
   // informational ("ask about X", "ask the arbiter") not negotiation.
-  ask: ['ask', 'what', 'explain', 'define', 'who', 'how', 'why', 'tell', 'describe', 'clarify', 'mean'],
+  // ⚠⚠ OTA-1264 — 'where' and 'when' were MISSING from this list while
+  // their four siblings were present, so a question that named an action
+  // performed it: "where can I sleep" slept 8 hours, "when does the shop
+  // open" opened the chest. The wh-word sits at index 0 and the verb scan
+  // takes the FIRST minimum-distance hit, so restoring them is enough to
+  // let the question win the race — no new mechanism required.
+  ask: ['ask', 'what', 'explain', 'define', 'who', 'how', 'why', 'where', 'when', 'tell', 'describe', 'clarify', 'mean'],
   craft: [
     // 'construct' removed — playtest caught "salvage the construct"
     // routing to craft because 'construct' matched as a verb here,
@@ -166,7 +174,7 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   // OTA-803 removed the `gift` intent: "Faction standing is earned through
   // mission completions + sigil/pendant turn-ins, not by handing vendors loot;
   // the gift-for-rep side door undercut that."
-  // ⚠ OTA-1083 RESTORES IT, and that note is the reason the restoration looks
+  // ⚠ OTA-1060 RESTORES IT, and that note is the reason the restoration looks
   // the way it does. Faction standing from gifts is now metered against a
   // LIFETIME per-faction budget (GIFT_STANDING_FACTION_CAP, ~one mission's
   // worth, across every member of that faction) so the side door cannot reopen.
@@ -463,7 +471,7 @@ const VERB_SYNONYMS_LOOKUP: Record<Exclude<Intent, 'unknown'>, string[]> =
     return out;
   })();
 
-/** OTA-1178 — "did the player actually ask to hold still?", answered by the ONE
+/** OTA-1155 — "did the player actually ask to hold still?", answered by the ONE
  *  verb table that defines the wait intent.
  *
  *  ⚠ WHY THIS IS EXPORTED. `qwenRephraseRejection` in gameStore guards the LLM
@@ -471,7 +479,7 @@ const VERB_SYNONYMS_LOOKUP: Record<Exclude<Intent, 'unknown'>, string[]> =
  *  hand-typed `/wait|hold|stay|linger|pause|bide/` — a six-word copy of a
  *  ten-word list. `still`, `tarry`, `idle` and `remain` were invisible to it, so a
  *  player who typed one of them and got an honest `wait` repair back had it
- *  rejected as an invention. Same shape as OTA-1175's three ready-predicates: a
+ *  rejected as an invention. Same shape as OTA-1152's three ready-predicates: a
  *  second definition of somebody else's list, drifting quietly. Now there is one.
  *
  *  Matches whole words only, and (via VERB_SYNONYMS_LOOKUP) the collapsed form of
@@ -926,7 +934,7 @@ function resolveItem(
     if (inputNorm === itemNorm) return item;
     if (inputNorm.includes(itemNorm)) return item;
   }
-  // ⚠ OTA-1172 — THE MODIFIER IS EVIDENCE, NOT DECORATION.
+  // ⚠ OTA-1149 — THE MODIFIER IS EVIDENCE, NOT DECORATION.
   //
   // Passes 2 and 3 match on the HEAD NOUN. OTA-093 wrote them that way to stop
   // adjective-only matches ("bone" → Bone Fragment) from winning, and that half
@@ -934,7 +942,7 @@ function resolveItem(
   // an adjective of its OWN, the head-noun passes threw it away and returned
   // whichever same-noun row sat first in the pack.
   //
-  // Device log, OTA-1166: `craft Frost Paste` resolved to **Searing Paste** —
+  // Device log, OTA-1143: `craft Frost Paste` resolved to **Searing Paste** —
   // a Paste the player owned, matched on the shared word "paste" while "frost"
   // was discarded. Craft itself was unharmed (it matches recipes, not
   // inventory), but ~25 gameStore handlers read parsed.resolvedNoun FIRST, so
@@ -1440,6 +1448,10 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
     ambientNouns: context.ambientNouns,
     vendorName: context.vendorName,
     enemyNames: context.enemyNames,
+    // ⚠⚠ OTA-1264 — the negation rule needs the verb's real position.
+    // `matchedVerb` cannot supply it: on a fuzzy hit ("slep" → 'sleep')
+    // the canonical synonym never appears in `normalized` at all.
+    verbTokenIndex: bestMatch.index,
   });
   if (shouldRejectParse(issues)) {
     return {

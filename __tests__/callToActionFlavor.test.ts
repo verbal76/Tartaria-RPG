@@ -1,4 +1,4 @@
-// OTA-710 — every scene "call to action" does something.
+// OTA-693 — every scene "call to action" does something.
 //
 // Playtest design note: "if there's a call to action, the call to action
 // has to actually DO something — even if it's something as minor as you
@@ -82,7 +82,7 @@ function lastWorldLine(): string | undefined {
 // The generic dead-end refusal the old code showed for these verbs.
 const DEAD_END = /Try: look around|I'm not sure what you're trying to tell me|Tell me what you would do with it/i;
 
-describe('OTA-710 — call-to-action pure flavor unit', () => {
+describe('OTA-693 — call-to-action pure flavor unit', () => {
   it('classifies verbs into the right gesture family', () => {
     expect(gestureFamily('knock')).toBe('knock');
     expect(gestureFamily('ring')).toBe('sound');
@@ -105,7 +105,7 @@ describe('OTA-710 — call-to-action pure flavor unit', () => {
   });
 });
 
-describe('OTA-710 — parser routes evocative verbs to gesture', () => {
+describe('OTA-693 — parser routes evocative verbs to gesture', () => {
   it('ring / pray / touch / tilt / answer no longer demote to unknown', () => {
     for (const verb of ['ring', 'pray', 'touch', 'tilt', 'answer']) {
       const parsed = parseInput(`${verb} the thing`, { recentNouns: ['thing'] });
@@ -114,7 +114,7 @@ describe('OTA-710 — parser routes evocative verbs to gesture', () => {
   });
 });
 
-describe('OTA-710 — call to action always does something in-scene', () => {
+describe('OTA-693 — call to action always does something in-scene', () => {
   beforeAll(() => {
     console.log = () => {};
     console.warn = () => {};
@@ -159,7 +159,7 @@ describe('OTA-710 — call to action always does something in-scene', () => {
   }
 });
 
-describe('OTA-710 — a matching hook still wins over the flavor fallback', () => {
+describe('OTA-693 — a matching hook still wins over the flavor fallback', () => {
   beforeAll(() => {
     console.log = () => {};
     console.warn = () => {};

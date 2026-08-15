@@ -1,4 +1,4 @@
-// OTA-675 — craftable throwables. Throwable weapons were loot/vendor-only, so the
+// OTA-660 — craftable throwables. Throwable weapons were loot/vendor-only, so the
 // bandolier had no crafting supply line (a playtester's only throwable was a
 // looted Disease Sample). Five throwable weapons are now craftable. This locks the
 // data contract: each new recipe's output resolves to a real catalog item that is
@@ -25,7 +25,7 @@ function bareInvItem(name: string): InventoryItem {
 }
 const emptyPlayer = { equipped: {}, inventory: [] } as unknown as PlayerCharacter;
 
-describe('craftable throwables feed the bandolier (OTA-675)', () => {
+describe('craftable throwables feed the bandolier (OTA-660)', () => {
   it('each new recipe exists and its output resolves to a throwable catalog item', () => {
     for (const name of NEW_THROWABLE_RECIPES) {
       const recipe = RECIPES.find((r) => r.result === name);

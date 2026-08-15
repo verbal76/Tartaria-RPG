@@ -1,4 +1,4 @@
-// OTA-769 — an INDOOR micro-area (an enclosed structure / the buried underworld:
+// OTA-749 — an INDOOR micro-area (an enclosed structure / the buried underworld:
 // the Giant-Kin Mausoleum, the catacombs) must not be handed to an OUTDOOR surface
 // tile. Playtest: traveling open silt read "You're in Offering Antechamber, in
 // Obsidian Pillars" with "into the Grand Hall" exits. Surface assignment now skips
@@ -6,7 +6,7 @@
 
 import { pickRandomMicroMicroIn } from '../app/engine/worldLadder';
 
-describe('OTA-769 — indoor micro-areas are surface-excluded', () => {
+describe('OTA-749 — indoor micro-areas are surface-excluded', () => {
   it('an all-indoor macro (Aetherstone Deep) yields NO micro-area on the surface', () => {
     // Both of the Deep's micro-areas are indoor, so a surface tile there resolves to
     // no room — it reads as the outdoor location, not a mausoleum antechamber.

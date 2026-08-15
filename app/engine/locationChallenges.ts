@@ -152,7 +152,7 @@ export const FACTION_COVETED_ITEM: Record<string, CovetedItem> = {
 /** Standing at/above which the player counts as "affiliated" with a faction
  *  (mirrors the join threshold). Affiliated factions + the player's own faction
  *  are excluded from brokering. */
-// ⚠ OTA-1179 — DERIVED, not a fourth copy of 20. The comment always said it
+// ⚠ OTA-1156 — DERIVED, not a fourth copy of 20. The comment always said it
 // "mirrors the join threshold"; now it does, so moving JOIN_THRESHOLD moves this
 // with it instead of leaving a silent disagreement about what "allied" means.
 export const AFFILIATED_STANDING = JOIN_THRESHOLD;

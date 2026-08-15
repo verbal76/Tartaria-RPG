@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { withArticle, withArticleCap, anOrA, theCap, theLower, describeEnemyPartyCap } from '../engine/grammar';
 import type {
   PlayerCharacter,
-  FactionStanding, // OTA-1182 — meterSpiteGains rewrites standing rows directly
+  FactionStanding, // OTA-1159 — meterSpiteGains rewrites standing rows directly
   WorldMemory,
   GameLogEntry,
   ScreenName,
@@ -30,54 +30,59 @@ import {
   applyDogPronouns,
   trainDogStat,
   type RescueScenarioId,
+  type RescueScenario,
 } from '../engine/dogCompanion';
+// ⚠ OTA-1236 — ONE rule for "this noun carries a next step", shared by the engine
+// dispatch, the bulk-salvage guard, the loot picker's lead lane and the
+// INVESTIGATE ALL ordering. See engine/storyNouns.ts for why they must agree.
+import { rescueScenarioForNoun } from '../engine/storyNouns';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse } from '../engine/worldMemory';
-// OTA-1072 — Phase 1: the per-person ledger the greeting layer reads.
+// OTA-1049 — Phase 1: the per-person ledger the greeting layer reads.
 import { rememberNpcMeeting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName, vendorLedgerId, pocketLossMumble } from '../engine/npcMemory';
-// OTA-1076 — the relationship reaches the counter.
+// OTA-1053 — the relationship reaches the counter.
 import { npcRegard, regardPriceMult } from '../engine/npcMemory';
-// OTA-1077 — the offscreen war reaches the people who live in it.
+// OTA-1054 — the offscreen war reaches the people who live in it.
 import { raidNewsFor, raidNewsLine, RAID_MEMORY_CAP } from '../engine/npcMemory';
 import type { OutpostRaid } from '../engine/types';
-// OTA-1083 — giving somebody something, and them remembering the object.
+// OTA-1060 — giving somebody something, and them remembering the object.
 import { resolveGift, giftMemoryLine, GIFT_STANDING_FACTION_CAP, tasteDiscoveries, returnGiftFor, type GiftItem } from '../engine/gifting';
 import { giftBlockReason } from '../engine/giftEligibility';
-// OTA-1081 — Phase 2 slice: the topic-based talk exchange.
+// OTA-1058 — Phase 2 slice: the topic-based talk exchange.
 import {
   hasTopicsFor, topicsFor, topicReply, alreadySaidLine, nothingToSayLine,
   lockedTopicCount, teaserDeflectionLine,
   type Topic as TalkTopic,
 } from '../engine/dialogue';
-// OTA-1086 — the flourish: one beat of stage business under an authored reply.
+// OTA-1063 — the flourish: one beat of stage business under an authored reply.
 import {
   flourishFor, flourishKindFor, flourishPrompt, vetModelFlourish,
   FLOURISH_MAX_PER_CONVERSATION, FLOURISH_SYSTEM,
 } from '../engine/flourish';
-// OTA-1087 — talkablePeople needs these at module scope; the in-handler `cg`
+// OTA-1064 — talkablePeople needs these at module scope; the in-handler `cg`
 // alias is function-local.
 import { isCoreGuardian, capitalIdFromGuardian } from '../engine/coreGuardians';
-// OTA-1088 — Phase 3: the story asks questions.
+// OTA-1065 — Phase 3: the story asks questions.
 import {
   dueFork, forkById, optionById, recordChoice, choiceKeys,
   type StoryFork,
 } from '../engine/storyForks';
-// OTA-1089 — Phase 4: the ledger calls, behind the difficulty toggle.
+// OTA-1066 — Phase 4: the ledger calls, behind the difficulty toggle.
 import {
   profileOf, pressureOf, canChangeTo, isPressureTier,
   tideStage, tidePriceMultiplier, tideCrossLine,
-  scaledPackSize, scaledSwingCap, // OTA-1136
+  scaledPackSize, scaledSwingCap, // OTA-1113
   hostileHuntChance, // NB: pressure.worstStandingFaction is deliberately NOT
   // imported — gameStore already has a local one with a different shape.
   scaledCorruptionGain, scaledWeatherBite,
-  dialOf, scaledRegen, // OTA-1194 — the three combat-feel dials
+  dialOf, scaledRegen, // OTA-1171 — the three combat-feel dials
   type PressureTier,
 } from '../engine/pressure';
-// OTA-1090 — Phase 5: the Arbiter becomes someone.
+// OTA-1067 — Phase 5: the Arbiter becomes someone.
 import {
   dueArbiterBeat, recordArbiterBeat, arbiterBrief,
   isNameQuestion, arbiterNameAnswer,
 } from '../engine/arbiterPersona';
-// OTA-1073 — Phase 1 slice 2: turn-in credit, roadside recognition, gossip.
+// OTA-1050 — Phase 1 slice 2: turn-in credit, roadside recognition, gossip.
 import { gossipSubject, gossipLine } from '../engine/npcMemory';
 import {
   seedInvestigationTable,
@@ -97,7 +102,7 @@ import {
   getCrashedSlotIds,
 } from '../diagnostics/saveLoadHealth';
 import { loadLastCrash } from '../diagnostics/lastCrash';
-// OTA-1195 — memory warnings, app-state churn and the two-clock freeze detector.
+// OTA-1172 — memory warnings, app-state churn and the two-clock freeze detector.
 import {
   FREEZE_SAMPLE_MS, APPSTATE_TRAIL_MAX,
   freezeVerdict, freezeVerdictLine, memoryWarningLine, appStateLine,
@@ -119,12 +124,16 @@ import {
   ensureFirstInstallSeed,
   getLastSaveWriteError,
   consumeSaveReclaimedFlag,
+  stampLiveBreadcrumb,          // OTA-1276
+  readLiveBreadcrumb,           // OTA-1276
+  clearLiveBreadcrumb,          // OTA-1276
   type SlotSummary,
 } from '../engine/saveSystem';
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
+import { setLastBootBreadcrumb } from '../diagnostics/runtimePressure'; // OTA-1276
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName, nameWasAltered } from '../engine/playerName';
-import { AppState, Platform } from 'react-native'; // OTA-1055 — foreground hook for the Qwen watchdog; OTA-1251 — desktop guard
+import { AppState, Platform } from 'react-native'; // OTA-1032 — foreground hook for the Qwen watchdog; OTA-1228 — desktop guard
 import { stripForeignWords, repairGluedNarration, looksLikeInstructionEcho, isSecondPersonActionOpener } from '../engine/foreignText';
 import { sentenceNamesOffCanonEntity, buildEntityAllowList, normalizeEntity } from '../engine/entityGuard';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -132,9 +141,9 @@ import { revealedLocationName } from '../engine/hiddenLocations';
 import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
 import { AETHERKIN_REVERING_FACTIONS, isAetherkin, buildAetherkinEncounter, type AetherkinContext } from '../engine/aetherkin';
 import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
-// OTA-1041 — the story spine: motives + the opening crawl.
+// OTA-1018 — the story spine: motives + the opening crawl.
 import { introPagesFor, assignMotive } from '../engine/story';
-// OTA-1133 — the closing scene, built from the same motive as the opening crawl.
+// OTA-1110 — the closing scene, built from the same motive as the opening crawl.
 import { buildDeathScene, daysBelow } from '../engine/deathScene';
 import { generateQuest } from '../engine/questGenerator';
 import {
@@ -147,7 +156,7 @@ import {
   pickEncounterFromLadder,
   findEnemyByName,
   enemyScalePower,
-  // OTA-1182 — the fallback when gear cannot be read; these make gearPowerTerm 0.
+  // OTA-1159 — the fallback when gear cannot be read; these make gearPowerTerm 0.
   AC_POWER_BASELINE,
   DMG_POWER_BASELINE,
   scaleEncounterForContext,
@@ -167,6 +176,10 @@ import {
   getLocationFlavors,
 } from '../engine/narrativeGenerator';
 import { parseInput, splitClauses, mentionsWaitVerb, type ParseContext } from '../engine/parser';
+// ⚠ OTA-1264 — describeIssues has existed since OTA-205 and nothing has
+// ever called it; a demoted parse just fell through to the generic
+// refusal. The negated-command reply is its first real consumer.
+import { describeIssues } from '../engine/parseValidator';
 import { parseInputViaLLM } from '../engine/llmParser';
 import {
   classifyContainer,
@@ -182,9 +195,9 @@ import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGrac
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
-import { setQwenTelemetrySink, setQwenDiscardSink, noteQwenDiscarded, qwenCallCount, qwenTelemetrySummary } from '../ai/generation/qwenTelemetry';
-// OTA-1200 — live llama-context counter. Instrument only; changes no behaviour.
-// OTA-1202 — the ledger is now READ as well as fed: the memory handler compares the
+import { setQwenTelemetrySink, setQwenDiscardSink, noteQwenDiscarded, qwenCallCount, qwenTelemetrySummary, qwenJobStats } from '../ai/generation/qwenTelemetry';
+// OTA-1177 — live llama-context counter. Instrument only; changes no behaviour.
+// OTA-1179 — the ledger is now READ as well as fed: the memory handler compares the
 // release count across a dispose so it can report what it actually freed.
 import { setContextLedgerSink, contextLedger, APPROX_CONTEXT_MB } from '../ai/generation/contextLedger';
 import { buildLlmContext, buildSystemPrompt, type SceneSlice } from '../engine/contextInjector';
@@ -257,8 +270,11 @@ import {
   hubNameForFaction,
   hubSkinFactionFor,
   hubOwnerFaction,
+  findHubRoom,
   resolveHubTravel,
   isLeaveHubCommand,
+  isBareExitCommand,
+  matchHubRoomName,
 } from '../engine/hub';
 import {
   getBuilding,
@@ -281,13 +297,16 @@ import {
 import {
   raiseMenace, decayedMenace, menaceIntimidateDcBonus, menaceEncounterBonus,
 } from '../engine/menace';
+// OTA-1254 — the cudgel beat readies the cudgel through the SAME comparison the
+// loot picker's ★ uses, rather than its own hand-rolled guess. See grantTutorialItem.
+import { isUpgradeOverEquipped, upgradeEquipSlot } from '../engine/gatherSort';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc, standingAc, equippedGearAc } from '../engine/equipment';
-// OTA-1184 — the milestone step lives with the code that EXPLAINS it on the sheet,
+// OTA-1161 — the milestone step lives with the code that EXPLAINS it on the sheet,
 // so the award and the explanation can never quote different numbers.
 import { MILESTONE_KILL_STEP } from '../engine/hpBreakdown';
-// OTA-1185 — one owner for what a tile costs the clock.
+// OTA-1162 — one owner for what a tile costs the clock.
 import { TILE_HOURS, travelHoursFor } from '../engine/travelTime';
-// OTA-1190 — the course banner now quotes travel in the same units the deadline uses.
+// OTA-1167 — the course banner now quotes travel in the same units the deadline uses.
 import { formatWindow } from '../engine/bountyPrimer';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible, itemIsThrowable } from '../engine/bandolierEligibility';
@@ -337,12 +356,12 @@ import {
   getStanding,
   meetsJoinThreshold,
   JOIN_THRESHOLD,
-  BUY_REP_TC_PER_STANDING, // OTA-1181 — was a local const in buyFromVendor
+  BUY_REP_TC_PER_STANDING, // OTA-1158 — was a local const in buyFromVendor
 } from '../engine/factions';
 import {
   findFactionQuestById,
   availableFactionQuests,
-  repLockedFactionQuests, // OTA-1182 — why the board is empty, so the refusal can say
+  repLockedFactionQuests, // OTA-1159 — why the board is empty, so the refusal can say
   fuzzyFindFactionQuest,
   factionQuestReady,
 } from '../engine/factionQuests';
@@ -376,7 +395,7 @@ import { incomingHitCue, soakCueLine, leakCueLine } from '../engine/combatCues';
 import { resolveLootItem } from '../engine/crafting';
 import { canonicalItemKind, canonicalItemRarity, canonicalItemTags } from '../engine/crafting';
 import { rollBossSpoils } from '../engine/bossLoot';
-// OTA-1182 — avgDamageNotation is the SAME damage proxy playerPowerScore uses, so the
+// OTA-1159 — avgDamageNotation is the SAME damage proxy playerPowerScore uses, so the
 // difficulty curve and the Power gauge price a weapon identically.
 import { enemyPowerScore, avgDamageNotation } from '../engine/powerRating';
 import { levenshtein } from '../engine/editDistance';
@@ -426,7 +445,7 @@ import {
   makeStolenDiscs,
   describeWhisperStage,
 } from '../engine/whispers';
-import { TUTORIAL_STEPS, TUTORIAL_SELF_DEFENCE, type TutorialStep } from '../components/tutorialSteps';
+import { TUTORIAL_STEPS, TUTORIAL_SELF_DEFENCE, TUT_LOCK_BEATS, type TutorialStep } from '../components/tutorialSteps';
 import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome, storyCompletedBy, completedStoryCount, assembledStory, CHARACTER_STORIES } from '../engine/collectables';
 
 interface Concept {
@@ -451,7 +470,7 @@ function getAllConcepts(): Concept[] {
 // Match a player's "what is X / explain X / tell me about X" target text
 // against the concepts knowledge base. First substring hit on any keyword
 // wins; returns null if nothing matches so the caller can fall back.
-/** ⚠⚠ OTA-1226 (PUNCHLIST P16, doors 2+3) — THE ONE TEACHER for a held Procedure Text.
+/** ⚠⚠ OTA-1203 (PUNCHLIST P16, doors 2+3) — THE ONE TEACHER for a held Procedure Text.
  *  Reads the text: already-known keeps it (sellable), INT short keeps it (banked, never
  *  wasted — a purchase that ends in nothing is the punch list's founding defect), a clean
  *  read TEACHES and consumes it. Called from BOTH verbs that reach a held object —
@@ -490,7 +509,7 @@ function teachFromProcedureText(
   return true;
 }
 
-/** OTA-1226 — resolve a typed target against the Procedure Texts actually IN THE PACK.
+/** OTA-1203 — resolve a typed target against the Procedure Texts actually IN THE PACK.
  *  Token-subset match; two candidates REFUSE (the P12 rule) rather than guessing which
  *  procedure the player meant to study. */
 function AT_isProcedureTextName(name: string): boolean {
@@ -515,7 +534,7 @@ function findHeldProcedureText(
   return { item: null, ambiguous: [] };
 }
 
-/** OTA-1237 — ONE completion body for a lead, shared by the kill-name path
+/** OTA-1214 — ONE completion body for a lead, shared by the kill-name path
  *  (OTA 011), the at-site verb path, and the at-site kill path — three doors,
  *  one settlement, so reward and state can never drift by entry point. */
 function resolveLeadCompletion(
@@ -544,7 +563,7 @@ function resolveLeadCompletion(
   );
 }
 
-/** ⚠⚠ OTA-1236 — DETERMINISTIC STAGE TRIGGERS. Owner, stuck on the Bog Dragon at
+/** ⚠⚠ OTA-1213 — DETERMINISTIC STAGE TRIGGERS. Owner, stuck on the Bog Dragon at
  *  stage 2/7 with the card reading "You're at Mud Seas": "I investigated
  *  everything in the area, I hit investigate when the area was empty, nothing
  *  is happening... we need to make sure every stage of every mission has a
@@ -571,7 +590,7 @@ function resolveLeadCompletion(
  *  No dice anywhere in it: the stage IS the content, and a die that can only
  *  delay or hide content earns nothing (the OTA-053 auto-advance note already
  *  said stages with no check are narration; now the check is the VERB). */
-/** ⚠⚠ OTA-1238 — THE BURST GUARD. INVESTIGATE ALL fires one submit per chip in
+/** ⚠⚠ OTA-1215 — THE BURST GUARD. INVESTIGATE ALL fires one submit per chip in
  *  a single loop WITHOUT awaiting, so every submit's synchronous prefix — including
  *  advanceStagesOnIntent — runs before the first queued advance lands. On the
  *  owner's device, three chips meant three matches against the SAME stage and a
@@ -606,7 +625,7 @@ function advanceStagesOnIntent(
         (!inCombat && next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
         (next.checkKind === 'escape' && intent === 'escape') ||
         (!inCombat && next.checkKind === 'cast' && intent === 'cast') ||
-        // ⚠⚠ OTA-1240 — the attack rows are OUT-OF-COMBAT DELIBERATE ACTIONS
+        // ⚠⚠ OTA-1217 — the attack rows are OUT-OF-COMBAT DELIBERATE ACTIONS
         // too (escape alone stays in-combat: fleeing IS combat). Without the
         // guard, the frozen apex stage (OTA-796) re-matched on EVERY swing of
         // the boss fight itself — each attack re-ran advanceHunt, which
@@ -688,7 +707,7 @@ function advanceStagesOnIntent(
     }
   }
 
-  // ⚠⚠ OTA-1237 — LEADS. At the lead's own pinned location, the objective's
+  // ⚠⚠ OTA-1214 — LEADS. At the lead's own pinned location, the objective's
   // verb-matched intent completes it. Before this, the only trigger was
   // kill-verb name matching, which not one of the 18 authored objectives could
   // ever satisfy — the whole family accumulated forever.
@@ -706,7 +725,7 @@ function advanceStagesOnIntent(
   }
 }
 
-/** OTA-1229 — what the torchlight flags as worth investigating in the CURRENT
+/** OTA-1206 — what the torchlight flags as worth investigating in the CURRENT
  *  scene, resolved against this room's own memory (read notes and harvested
  *  perches don't glow). One caller shape for both torch paths — the aimed
  *  charge and the no-lead sweep — so the mark can't mean two things. */
@@ -729,7 +748,7 @@ function computeArbiterEye(get: () => GameStore): string[] {
   });
 }
 
-/** ⚠⚠ OTA-1221 (PUNCHLIST P17) — one place that decides a lore answer was EARNED.
+/** ⚠⚠ OTA-1198 (PUNCHLIST P17) — one place that decides a lore answer was EARNED.
  *
  *  Three different paths answer a lore question (keyword concepts, the embedder, and the
  *  offline bank match), and before this only the middle one credited the player. Rather
@@ -750,14 +769,14 @@ function creditLoreRead(get: StoreGet, set: StoreSet, conceptKey: string): void 
   recordTitleProgress(get, set, { loreRead: 1 });
 }
 
-/** ⚠ OTA-1222 (PUNCHLIST P15) — this place's own authored loot rows, for the area-search
+/** ⚠ OTA-1199 (PUNCHLIST P15) — this place's own authored loot rows, for the area-search
  *  substitution. Resolved through `ladderLootPool` so the unique-quest-reward exclusion and
  *  the name resolution are the SAME ones `pickLootFromLadder` uses. Returns [] when the
  *  scene has no ladder micro-micro, which leaves search behaving exactly as before. */
 /** ⚠ EXPORTED for the live wiring test. The unit suite builds a `siteLoot` array by hand,
  *  so it proves the roller and says nothing about whether the STORE hands one over — if
  *  this returned [] on every real scene the feature would ship doing nothing with green
- *  tests behind it (the OTA-1209 lesson). Asserting on a search OUTCOME cannot cover it
+ *  tests behind it (the OTA-1186 lesson). Asserting on a search OUTCOME cannot cover it
  *  either: a noun can only be searched once per room, so a sampling loop is refused after
  *  the first try. This is the seam, so this is what the test reads. */
 export function siteLootForScene(get: StoreGet): { name: string; rarity: import('../engine/types').Rarity }[] {
@@ -811,7 +830,7 @@ function freshInstanceId(prefix: string): string {
  *  carry per-instance identity (a coating, tempered stats, or fused uniqueStats)
  *  that a merge would silently erase. Same rule grantItem uses on pickup.
  *
- *  OTA-1120 — hoisted to module scope. It was defined THREE times as an
+ *  OTA-1097 — hoisted to module scope. It was defined THREE times as an
  *  identical local closure (fusion reserve, quest reserve, and now the bulk
  *  fusion reserve). Three copies of a merge-safety predicate is three chances
  *  for one of them to fall behind when a new per-instance field lands. */
@@ -928,8 +947,8 @@ interface CurrentScene {
   /** Index of the enemy the player is currently targeting. */
   activeEnemyIdx: number;
   vendor: VendorInstance | null;
-  /** OTA-1079 — THE PERSON BEHIND THE ENEMY. A vendor who catches you stealing
-   *  flips hostile, and OTA-1078's review found the conversion threw them away:
+  /** OTA-1056 — THE PERSON BEHIND THE ENEMY. A vendor who catches you stealing
+   *  flips hostile, and OTA-1055's review found the conversion threw them away:
    *  `vendor` was nulled and a generic Enemy installed carrying only a name. So
    *  there was nothing to put back, and nothing to write the consequence
    *  against. VENDORS DO NOT DIE (owner's call — a dead armourer silently
@@ -961,16 +980,16 @@ interface CurrentScene {
    *  re-triggered every round (the ranged sneak→fire loop). Resets with the
    *  scene (a fresh encounter = a fresh drop). */
   stealthOpenerUsed?: boolean;
-  /** OTA-1111 — landed RESISTED hits this fight, keyed `${enemy.name}|${damageType}`.
+  /** OTA-1088 — landed RESISTED hits this fight, keyed `${enemy.name}|${damageType}`.
    *  At GUARD_CRACK_HITS the pair moves to resistCracked and that resist stops
    *  applying. Resets when a fresh enemy lineup replaces the scene's. */
   resistWear?: Record<string, number>;
-  /** OTA-1111 — `${enemy.name}|${damageType}` pairs whose guard has been worn
+  /** OTA-1088 — `${enemy.name}|${damageType}` pairs whose guard has been worn
    *  through this fight: damage, narration, and type-procs treat the pair as a
    *  normal matchup from the next swing on. recordEnemyIntel still banks the
    *  TRUE resist, so the bestiary shows the real matchup. */
   resistCracked?: string[];
-  /** OTA-936 — set once the sneak-odds warning has fired this encounter (throttle: a
+  /** OTA-913 — set once the sneak-odds warning has fired this encounter (throttle: a
    *  failed close-range sneak warns about the free-hit cost only once per scene). */
   sneakOddsWarned?: boolean;
   /** arb168 — set once a spontaneous investigate-ambush has sprung in this
@@ -1012,11 +1031,27 @@ interface CurrentScene {
    *  investigate keeps the same per-noun find chance, the odds of a
    *  given room showing the player SOMETHING actually hold up. */
   displayedAmbientNouns?: string[];
-  /** OTA-973 — Phase A of real heights: optional per-noun elevation placements
+  /** ⚠⚠ OTA-1244 — NOUNS THAT MUST STAY IN THE DISPLAY WINDOW HOWEVER IT IS
+   *  RECOMPUTED. Spawned gear, a water source, a dog-rescue prop: each is placed
+   *  deliberately and each was force-prepended at scene build so the 8-slot cap
+   *  could not crowd it out.
+   *
+   *  ⚠ The cardinal-step re-shuffle (OTA-302, 2026-06-05) then replaced
+   *  `displayedAmbientNouns` with a blind 8-from-pool pick and re-applied NONE of
+   *  them — so gear was guaranteed when you ARRIVED at a location and could vanish
+   *  on the next step inside it. Owner: *"I have not seen armor or weapons in the
+   *  last few tiles."* Not a drop-rate change and not a bad run: the drop happened,
+   *  the display threw it away.
+   *
+   *  Stamped ONCE at scene build and read by every later recompute, so the
+   *  guarantee lives in one place instead of being re-derived (and forgotten) at
+   *  each call site. */
+  pinnedAmbientNouns?: string[];
+  /** OTA-950 — Phase A of real heights: optional per-noun elevation placements
    *  (noun → structure + tier). Absent/empty = everything is on the ground,
    *  which is every scene until the Phase-B seeder ships. */
   nounPlacements?: Record<string, { structure: string; tier: number }>;
-  /** OTA-1229 — nouns the Aetheric Torch has marked as actually worth
+  /** OTA-1206 — nouns the Aetheric Torch has marked as actually worth
    *  investigating in THIS scene (✦ on the investigate chips). Stamped by
    *  torch use, computed by engine/arbiterEye.ts against the real payoff
    *  branches. Absent until a torch is spent here; not persisted across
@@ -1078,7 +1113,7 @@ interface CurrentScene {
    *  reads this via the acReduction opt so subsequent attacks land
    *  more easily. Lazily created on first acid proc. */
   enemyArmorShred?: number[];
-  /** ⚠ OTA-1160 — STAGGER, THE REWARD FOR BRINGING THE RIGHT TOOL. Rounds of
+  /** ⚠ OTA-1137 — STAGGER, THE REWARD FOR BRINGING THE RIGHT TOOL. Rounds of
    *  stagger remaining per enemy (parallel to `enemies`). A hit that lands on an
    *  enemy's declared WEAKNESS sets this to 1; a boss that is staggered forfeits
    *  its second swing. Lazily created on the first weakness hit, and consumed by
@@ -1115,7 +1150,7 @@ interface CurrentScene {
     tier: number;
     totalTiers: number;
   } | null;
-  /** OTA-983 — set by the timed ambush spawner when the party arrives while the
+  /** OTA-960 — set by the timed ambush spawner when the party arrives while the
    *  player is UP a climb: these enemies mass at the BASE, not at your level.
    *  Grounded melee members can't reach you (and you need a weapon that
    *  SHOOTS to reach them); airborne + ranged members fight across the gap.
@@ -1185,7 +1220,7 @@ function collectSceneNouns(scene: CurrentScene): string[] {
   // adding the aliases here lets a player type "search the workroom"
   // and have the engine recognize it.
   //
-  // ⚠ OTA-1178 — AND THEY GO LAST, WHICH IS THE WHOLE POINT OF MOVING THEM.
+  // ⚠ OTA-1155 — AND THEY GO LAST, WHICH IS THE WHOLE POINT OF MOVING THEM.
   // They used to be pushed BEFORE ambientNouns and hooks. `resolveContextNoun`
   // breaks a substring tie by ARRAY ORDER (parser.ts, `return matches[0]`), so a
   // container's alias beat every authored prop in the room. Device log
@@ -1194,7 +1229,7 @@ function collectSceneNouns(scene: CurrentScene): string[] {
   // `river capital`, an ALIAS OF THE CITY THEY WERE STANDING IN, then narrated
   // the city as an object: "The Arbiter glances at the river capital."
   //
-  // ⚠ This is OTA-1172's own bug report, the half it did not fix. That OTA opened
+  // ⚠ This is OTA-1149's own bug report, the half it did not fix. That OTA opened
   // with `craft Blue Cap Draught` → "mountain capital" and then repaired only
   // `resolveItem`; `resolveContextNoun` was never touched, and the same shape came
   // back one OTA later. Fixed HERE rather than in the tiebreak because the comment
@@ -1247,7 +1282,7 @@ const ARBITER_PERSONA_SYSTEM =
   "asked something you cannot know, say it is buried or does not surface. " +
   "Never mention games, rules, or AI, and never break character.";
 
-/** OTA-1090 — `brief` is Phase 5's ONLY touch on the model path: one sentence
+/** OTA-1067 — `brief` is Phase 5's ONLY touch on the model path: one sentence
  *  of where he stands in the arc and what he currently thinks of the player,
  *  appended to the fixed system prompt. Additive by design — an empty brief
  *  leaves the prompt byte-identical to what shipped before, and a failed
@@ -1332,10 +1367,10 @@ function awardNewTitles(getStore: () => GameStore, setStore: (u: Partial<GameSto
   if (toAnnounce.length > 0) {
     setStore((s) => ({ worldMemory: { ...s.worldMemory, earnedTitleAnnounced: [...announced, ...toAnnounce] } }));
   }
-  // ⚠ OTA-1116 — ONE NAME AT A TIME. Two titles landing in the same beat gave
+  // ⚠ OTA-1093 — ONE NAME AT A TIME. Two titles landing in the same beat gave
   // the owner back-to-back "You have earned a name to carry" banners mid-fight
   // (Aetherbound Survivor + Stormcaller, device log 2026-08-04) — the same
-  // pile-up OTA-1059 fixed for reward lines. A title is a moment; two moments
+  // pile-up OTA-1036 fixed for reward lines. A title is a moment; two moments
   // stacked read as one long block of text nobody parses. The first is spoken
   // now with its full honest perk; the rest are folded into one following line
   // that NAMES them, so nothing is hidden — it just stops shouting.
@@ -1377,7 +1412,7 @@ function recordTitleProgress(
 ): void {
   const player = getStore().player;
   if (!player) return;
-  // OTA-1069 — NOTHING IN THE TUTORIAL COUNTS. The tutorial is a scripted
+  // OTA-1046 — NOTHING IN THE TUTORIAL COUNTS. The tutorial is a scripted
   // sandbox: it hands you a cudgel, a rope and a rigged four-tier climb. A
   // legend should not be able to start there. Owner report: two titles landed
   // mid-tutorial off a single line of ambient black rain, before the scripted
@@ -1410,7 +1445,7 @@ export const SKYREACHER_CHARTS: readonly { name: string; climbId: string; price:
 ];
 /** Names of the five charts — used by the buy path to stamp soldMapIds. */
 const SKYREACHER_CHART_NAMES: ReadonlySet<string> = new Set(SKYREACHER_CHARTS.map((c) => c.name));
-// OTA-991 — the maps were named 'Skyreacher Chart (N of 5)' before this build
+// OTA-968 — the maps were named 'Skyreacher Chart (N of 5)' before this build
 // (owner: "it's not a chart. we should call it a map" — and the name should say
 // where it leads). Old saves still carry the chart names in inventories and in
 // the sell-once ledger (soldMapIds stores NAMES): backfillPlayer renames held
@@ -1461,7 +1496,7 @@ function unlockGreatClimbFromChart(
       : `You unroll the ${item.name} and trace the giant-drawn lines. ${theCap(gc.noun)} settles onto your atlas — the great climb is open, and a new charge stands on your board. Travel there, bring the Hardened Climbing Strap and a whole Reclaimer's Rope, and make the ascent.`,
   );
   if (!already) {
-    // OTA-991 — say plainly what just happened (owner: "a text pops up saying that
+    // OTA-968 — say plainly what just happened (owner: "a text pops up saying that
     // you've added the skyreacher location ... to the map and mission logs").
     getStore().appendLog('reward', `✦ Skyreacher location added to your MAP and MISSION LOG — ${theCap(gc.noun)}.`);
     getStore().appendLog(
@@ -1532,7 +1567,7 @@ function assembleBeaconRifle(
   );
   getStore().appendLog('reward', `✦✦ BEACON RIFLE (Legendary) — built from the five collector-arrays. Fires an electrical bolt sheathed in acid, the two elements every Tartarian machine dreads. With it, a cache of legendary materials.`);
   getStore().appendLog('arbiter', `"You climbed into the heart of every tower that drowned the world," the Arbiter says quietly, "and made the thing that drank the sky spit it back out. Nothing built will stand easy in front of that."`);
-  // OTA-1060 — AND IT GETS A CARD. The doubled ✦✦ above was the only thing
+  // OTA-1037 — AND IT GETS A CARD. The doubled ✦✦ above was the only thing
   // marking this as bigger than a Trail Rations pickup, and a feed line is
   // exactly what OTA-1010 was written because the player scrolls past — the
   // owner's words then were "I didn't even realize I completed the mission."
@@ -1567,7 +1602,7 @@ export function withSkyreacherChartOffer(vendor: VendorInstance | null, wm: Worl
   const unlocked = wm.unlockedGreatClimbs ?? [];
   const already = new Set(vendor.offers.map((o) => o.itemName));
   const pick = SKYREACHER_CHARTS.find(
-    // OTA-991 — a pre-rename sale wrote the old 'Skyreacher Chart (N of 5)' name
+    // OTA-968 — a pre-rename sale wrote the old 'Skyreacher Chart (N of 5)' name
     // into the ledger; that map is still sold-once, never offered again.
     (c, i) => !sold.includes(c.name) && !sold.includes(LEGACY_SKYREACHER_CHART_NAMES[i]!)
       && !unlocked.includes(c.climbId) && !already.has(c.name),
@@ -1576,7 +1611,7 @@ export function withSkyreacherChartOffer(vendor: VendorInstance | null, wm: Worl
   return { ...vendor, offers: [...vendor.offers, { itemName: pick.name, price: pick.price, quantity: 1 }] };
 }
 
-/** ⚠ OTA-1218 — THE ONE WAY INTO AETHER TECHNIQUES (PUNCHLIST P16). Owner: *"buy from
+/** ⚠ OTA-1195 — THE ONE WAY INTO AETHER TECHNIQUES (PUNCHLIST P16). Owner: *"buy from
  *  friendly vendors you developed repor with."*
  *
  *  Modelled on `withSkyreacherChartOffer` directly above — same shape, same place in
@@ -1598,7 +1633,7 @@ export function withTechniqueTextOffer(
   const { hasFactionRapport } = require('../engine/factionRapport') as typeof import('../engine/factionRapport');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { effectiveStats } = require('../engine/equipment') as typeof import('../engine/equipment');
-  // ⚠ nativeFaction first: OTA-1209 skins a site to its OWNER, and the Irma path rewrites
+  // ⚠ nativeFaction first: OTA-1186 skins a site to its OWNER, and the Irma path rewrites
   // `faction` to the visitor's. The procedure belongs to whoever the vendor really answers
   // for, or a Mud Monarch would be sold the Architects' text by an Architect wearing his
   // colours.
@@ -1661,7 +1696,7 @@ function handleLabyrinthStep(getStore: StoreGet, setStore: StoreSet, trimmed: st
     const clean = lab.isCleanRun(res.run);
     setStore((s) => (s.player ? { player: { ...s.player, labyrinthRun: undefined } } : s));
 
-    // ⚠⚠ OTA-1213 (PUNCHLIST P13) — THE MAZE HAS AN ENDING NOW.
+    // ⚠⚠ OTA-1190 (PUNCHLIST P13) — THE MAZE HAS AN ENDING NOW.
     //
     // What it was: a clean run printed one line and ticked the Wayfarer counter; **any
     // other run printed two lines and nothing else** — no TC, no item, no progress — and
@@ -1970,7 +2005,7 @@ function handleBroker(getStore: StoreGet, setStore: StoreSet, trimmed: string, s
     return;
   }
 
-  // No mission yet — you STUMBLED onto the parley. OTA-671: don't silently take
+  // No mission yet — you STUMBLED onto the parley. OTA-656: don't silently take
   // the contract. Announce the offer + its demands and wait for ACCEPT / DECLINE.
   if (!mission) {
     const explicit = /\bparley\b/i.test(trimmed);
@@ -2014,7 +2049,7 @@ function handleBroker(getStore: StoreGet, setStore: StoreSet, trimmed: string, s
 // healthy, kicks forceReinitialize() in the background so it warms back up
 // before the next narration/fusion — the player never waits on it.
 //
-// OTA-797 — the watchdog used to only recover the NARROW dormant case
+// OTA-777 — the watchdog used to only recover the NARROW dormant case
 // (isDormant(): status==='ready' but the native runtime OOM-died). But
 // forceReinitialize() resets status to idle→loading→ then EITHER 'ready'
 // (success) or 'failed' (if the reload throws under memory pressure). A
@@ -2030,7 +2065,7 @@ function handleBroker(getStore: StoreGet, setStore: StoreSet, trimmed: string, s
 // re-entry without leaking handles.
 let qwenWatchdogTimer: ReturnType<typeof setTimeout> | null = null;
 
-/** ⚠ OTA-1149 — the homework scheduler, installed at hydrate. Held at module
+/** ⚠ OTA-1126 — the homework scheduler, installed at hydrate. Held at module
  *  scope for the same reason the telemetry sink is: the store is a closure and
  *  the driver below is a plain timer with no access to it. Null until hydrate
  *  runs, and a null tick is simply skipped — homework is the one subsystem that
@@ -2052,7 +2087,21 @@ function setHomeworkTick(fn: (() => void) | null): void {
 export function _homeworkTickForTest(): void { homeworkTickFn?.(); }
 export function _homeworkInstalled(): boolean { return homeworkTickFn !== null; }
 let qwenAppStateSub: { remove: () => void } | null = null;
-// OTA-1055 — ADAPTIVE CADENCE. A flat 60s poll made recovery feel broken: the
+// ⚠⚠ OTA-1278 — the shared settle gate. App.tsx debounces its re-warm; the
+// watchdog must observe the SAME quiet period or it simply re-opens the door
+// App.tsx just closed. Mirrors QWEN_REWARM_DELAY_MS in App.tsx.
+const QWEN_FOREGROUND_SETTLE_MS = 8_000;
+let qwenForegroundSince: number | null = null;
+let qwenUnsettledLogged = false;
+function qwenForegroundSettled(): boolean {
+  // Unknown (tests / headless) reads as settled — the gate must never be the
+  // reason a legitimate recovery cannot happen.
+  if (qwenForegroundSince === null) return true;
+  return Date.now() - qwenForegroundSince >= QWEN_FOREGROUND_SETTLE_MS;
+}
+export function _qwenSetForegroundSince(t: number | null): void { qwenForegroundSince = t; }
+export function _qwenForegroundSettled(): boolean { return qwenForegroundSettled(); }
+// OTA-1032 — ADAPTIVE CADENCE. A flat 60s poll made recovery feel broken: the
 // owner's log spends ~2 minutes on canned templates because every step of the
 // dance waits a full tick (notice at :48, retry at :47, confirm ready at :47).
 // Healthy, 60s is plenty; while recovering, poll fast so a retry and the
@@ -2064,7 +2113,7 @@ const QWEN_WATCHDOG_RECOVERING_MS = 5_000;
 // the GGUF is already cached, so a warm reload is ~5-30s; a legit in-flight
 // load is never interrupted.
 const QWEN_REINIT_HANG_MS = 150_000;
-// OTA-1107 — BOUNDED, FOREGROUND-ONLY REVIVAL. The 11-part log-export
+// OTA-1084 — BOUNDED, FOREGROUND-ONLY REVIVAL. The 11-part log-export
 // session showed the failure mode: exporting chunks means bouncing the app
 // (copy → switch away to paste → return), and every switch-away disposes
 // the ~400MB context ('background' → shutdownQwen → status 'idle') while
@@ -2080,7 +2129,7 @@ const QWEN_REINIT_HANG_MS = 150_000;
 //      so even a pathological state costs one reload a minute, not twelve.
 //      A fresh return to foreground resets the backoff for one fast retry.
 const QWEN_WATCHDOG_FREE_RETRIES = 4;
-// ⚠⚠ OTA-1196 — A LIFETIME CEILING ON RELOADS, BECAUSE QWEN OFF BEATS THE APP DEAD.
+// ⚠⚠ OTA-1173 — A LIFETIME CEILING ON RELOADS, BECAUSE QWEN OFF BEATS THE APP DEAD.
 // The backoff ladder spreads retries out but never stops them, so a device that simply
 // cannot hold the ~400MB context retries forever — each attempt a fresh allocation spike,
 // on the platform whose response to that is to kill the process. The owner's iPhone took
@@ -2091,7 +2140,7 @@ const QWEN_WATCHDOG_FREE_RETRIES = 4;
 const QWEN_MAX_REINITS_PER_STRETCH = 8;
 let qwenReinitInFlightSince = 0;
 let qwenReinitCeilingLogged = false;
-// ⚠ OTA-1196 — 'inactive' IS NOT 'background'. iOS reports `inactive` for a notification
+// ⚠ OTA-1173 — 'inactive' IS NOT 'background'. iOS reports `inactive` for a notification
 // banner, a Control Center pull and a peek at the app switcher; only `background` means
 // the app was genuinely put away and the context genuinely disposed. Tracking the two
 // separately is what stops an incidental twitch from buying a 400MB reload.
@@ -2103,27 +2152,27 @@ function qwenRecoveringDelayMs(): number {
   if (qwenBackoffLevel <= 0) return QWEN_WATCHDOG_RECOVERING_MS;
   return Math.min(QWEN_WATCHDOG_HEALTHY_MS, QWEN_WATCHDOG_RECOVERING_MS * 2 ** qwenBackoffLevel);
 }
-/** OTA-1111 — guard-crack. Landing this many RESISTED hits of one damage type
+/** OTA-1088 — guard-crack. Landing this many RESISTED hits of one damage type
  *  into one enemy wears its guard through: from the next swing on, that resist
  *  stops applying for the rest of the fight. Bounds the wrong-weapon slog — a
  *  resisted fight ends slower, not never — without flattening the damage-type
  *  system the way a global ×0.5 → ×0.75 soften would. The bestiary keeps
  *  recording the TRUE resist, so the knowledge layer never lies. */
 const GUARD_CRACK_HITS = 3;
-/** OTA-1112 — anti-stun-lock. When a stun/paralyze takes hold, the player is
+/** OTA-1089 — anti-stun-lock. When a stun/paralyze takes hold, the player is
  *  `braced` for this many rounds (the incapacitated round plus the recovery
  *  rounds it protects): further incapacitations cannot land while it runs.
  *  One clean lockdown per window is drama; a 5-member concussive pack
  *  re-rolling 20% per landed blow was a slot machine that ate the player's
  *  turns (sim: 844 stuns per 20k-action run, every stalled matchup a pack). */
 const BRACED_ROUNDS = 3;
-/** OTA-1112 — pack action economy. At most this many non-boss MELEE pack
+/** OTA-1089 — pack action economy. At most this many non-boss MELEE pack
  *  members can land swings on the player in one volley; the rest crowd in
  *  behind, waiting for an opening (one narrated line). Ranged enemies and
  *  bosses are exempt. A 5-blade wall was five attack rolls + five stun rolls
  *  a round — more dice than drama, and the sim's whole stall tail. */
 const MELEE_PACK_SWINGS_PER_ROUND = 3;
-/** OTA-1055 — one health check. Returns TRUE when Qwen is healthy, which is what
+/** OTA-1032 — one health check. Returns TRUE when Qwen is healthy, which is what
  *  drives the adaptive poll: healthy → back to the slow cadence, anything else →
  *  keep checking fast until it recovers. */
 function runQwenHealthCheck(
@@ -2155,7 +2204,7 @@ function runQwenHealthCheck(
         if (qwenReinitInFlightSince === 0 || Date.now() - qwenReinitInFlightSince < QWEN_REINIT_HANG_MS) return false;
         get().appendLog('debug', `qwen-watchdog: reinit wedged in '${st}' for >${Math.round(QWEN_REINIT_HANG_MS / 1000)}s — re-kicking.`);
       }
-      // OTA-1107 — rule 1: hold revival while the app isn't foregrounded.
+      // OTA-1084 — rule 1: hold revival while the app isn't foregrounded.
       // Kicking a ~400MB context load from the background is guaranteed
       // wasted work — the background dispose that produced this state kills
       // the reload too. Logged once per background stretch, not per tick.
@@ -2172,9 +2221,9 @@ function runQwenHealthCheck(
         return false;
       }
       qwenHeldWhileBackgroundLogged = false;
-      // ⚠⚠ OTA-1198 — THE MEMORY INTERLOCK, AND IT EXISTS BECAUSE OTA-1196 BUILT A LOOP.
+      // ⚠⚠ OTA-1175 — THE MEMORY INTERLOCK, AND IT EXISTS BECAUSE OTA-1173 BUILT A LOOP.
       //
-      // The owner's device log, 40 seconds of it, caught by the instruments OTA-1195 added:
+      // The owner's device log, 40 seconds of it, caught by the instruments OTA-1172 added:
       //     11:08.99  ⚠⚠ MEMORY WARNING #2 — qwen='loading' · reloads=3
       //     11:09.03  memory: released the Qwen context (~400MB)
       //     11:09.88  ⚠⚠ MEMORY WARNING #3 (0.9s later) — reloads=3
@@ -2183,7 +2232,7 @@ function runQwenHealthCheck(
       //     … through ⚠⚠ MEMORY WARNING #7 · reloads=7 at 11:47
       //
       // ⚠ EVERY reinit settled to 'idle' — `reinit #N settled in 2676ms → status='idle'` —
-      // because the dispose OTA-1196 added marks an in-flight load STALE (OTA-1107's
+      // because the dispose OTA-1173 added marks an in-flight load STALE (OTA-1084's
       // lifecycleGen). So: watchdog loads → OS complains → we free it mid-load → watchdog
       // sees 'idle' → loads again. **Seven ~400MB allocations in forty seconds, and the
       // fix was the engine.** Freeing memory under pressure is still right; doing it with
@@ -2192,7 +2241,7 @@ function runQwenHealthCheck(
       // ⚠ The ceiling below bounded it at 8 and the backoff stretched it to 40s, so it was
       // not unbounded — but bounded thrash is still thrash, and this is what stops it.
       if (rpQwenStoodDownForMemory || Date.now() < rpMemoryPressureUntil) {
-        // ⚠⚠ OTA-1204 — TWO MESSAGES, TWO LIFETIMES, AND THEY WERE SHARING ONE FLAG.
+        // ⚠⚠ OTA-1181 — TWO MESSAGES, TWO LIFETIMES, AND THEY WERE SHARING ONE FLAG.
         // `rpMemoryQuietLogged` is reset by EVERY memory warning, which is correct for the
         // 90-second quiet notice (each warning genuinely opens a new window) and wrong for
         // the permanent stand-down, whose whole claim is that it happens once. The owner's
@@ -2218,7 +2267,7 @@ function runQwenHealthCheck(
         }
         return false;
       }
-      // ⚠⚠ OTA-1196 — THE CEILING. See QWEN_MAX_REINITS_PER_STRETCH: past this many
+      // ⚠⚠ OTA-1173 — THE CEILING. See QWEN_MAX_REINITS_PER_STRETCH: past this many
       // failed reloads we stop allocating and let the game run on templates. Logged once,
       // not per tick, so the log says it plainly and then goes quiet.
       if (qwenReinitAttempts >= QWEN_MAX_REINITS_PER_STRETCH) {
@@ -2231,6 +2280,28 @@ function runQwenHealthCheck(
         }
         return false;
       }
+      // ⚠⚠ OTA-1278 — THE WATCHDOG WAS WALKING THROUGH OTA-1275's DEBOUNCE.
+      // Measured on the owner's 4.29.199 log, and the ORDER is the proof — the
+      // watchdog fired 2ms BEFORE the appstate line it was reacting to:
+      //     14:45:26.813 qwen-watchdog: Qwen not ready (status='idle'); reinitializing
+      //     14:45:26.815 appstate: background → active
+      //     14:45:27.382 ctx: OPENED ≈425MB
+      //     14:45:29.898 qwen: re-warm cancelled (left the foreground first)
+      // The debounce cancelled a re-warm that had ALREADY happened by another
+      // door: three ~425MB loads across three 3-second foreground visits, with
+      // both cancels landing and neither preventing anything. App.tsx owns the
+      // re-warm policy; this owns recovery DURING play. They must agree, and a
+      // rule enforced in one place only is not a rule.
+      if (!qwenForegroundSettled()) {
+        if (!qwenUnsettledLogged) {
+          qwenUnsettledLogged = true;
+          get().appendLog('debug',
+            'qwen-watchdog: holding reinit — foreground has not settled '
+            + `(${QWEN_FOREGROUND_SETTLE_MS}ms). App-switching must not cost a ~425MB load.`);
+        }
+        return false;
+      }
+      qwenUnsettledLogged = false;
       // Not ready and not making progress (idle / failed / dormant ready-but-
       // dead / wedged): kick a fresh reinit. Keeps retrying so a transient
       // memory-pressure failure doesn't strand Qwen for the session — but
@@ -2254,7 +2325,7 @@ function runQwenHealthCheck(
       if (qwenBackoffLevel > 0) {
         get().appendLog('debug', `qwen-watchdog: ${qwenReinitAttempts} attempts without recovery — backing off (next check in ~${Math.round(qwenRecoveringDelayMs() / 1000)}s).`);
       }
-      // ⚠ OTA-1195 — TIME THE RELOAD AND NAME WHAT IT SETTLED INTO. The reported freeze
+      // ⚠ OTA-1172 — TIME THE RELOAD AND NAME WHAT IT SETTLED INTO. The reported freeze
       // showed six attempts that each went idle → idle, i.e. possibly costing a ~400MB
       // allocation and achieving nothing. Whether a reload is expensive-and-working or
       // expensive-and-futile is the difference between tuning the cadence and removing
@@ -2276,7 +2347,7 @@ function runQwenHealthCheck(
     }
 }
 
-// ⚠ OTA-1251 — NOT ON DESKTOP. The watchdog exists to revive a Qwen context that
+// ⚠ OTA-1228 — NOT ON DESKTOP. The watchdog exists to revive a Qwen context that
 // Android's OOM killer reclaimed; on web there is no context to revive, because
 // llama.rn is a native module that does not exist in the bundle. So it re-tried a
 // load that cannot ever succeed, on a timer, forever. From the owner's PC log:
@@ -2288,7 +2359,7 @@ function runQwenHealthCheck(
 // itself, which is the real cost: it buries the report the owner actually sent.
 //
 // ⚠ The guard is ONE LINE inside the function on purpose. Two older suites
-// (ota1196, ota1198) pin the reset block by slicing a fixed 1400/1600 characters
+// (ota1173, ota1175) pin the reset block by slicing a fixed 1400/1600 characters
 // from this function's opening — a long comment at the top of the body pushes
 // what they check out of reach and fails them for no behavioural reason. The
 // explanation lives out here where it costs those slices nothing.
@@ -2296,7 +2367,7 @@ function startQwenWatchdog(
   get: () => GameStore,
   set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
 ): void {
-  if (Platform.OS === 'web') return; // OTA-1251 — see the note above this function
+  if (Platform.OS === 'web') return; // OTA-1228 — see the note above this function
   if (qwenWatchdogTimer !== null) {
     clearTimeout(qwenWatchdogTimer);
     qwenWatchdogTimer = null;
@@ -2309,11 +2380,11 @@ function startQwenWatchdog(
   qwenReinitAttempts = 0;
   qwenBackoffLevel = 0;
   qwenHeldWhileBackgroundLogged = false;
-  // OTA-1196 — the ceiling and the true-background flag reset with everything else, so a
+  // OTA-1173 — the ceiling and the true-background flag reset with everything else, so a
   // re-hydrate starts from a clean slate rather than inheriting the last run's refusals.
   qwenReinitCeilingLogged = false;
   qwenTrulyBackgrounded = false;
-  // OTA-1198 — the memory interlock resets with the rest of the ledger.
+  // OTA-1175 — the memory interlock resets with the rest of the ledger.
   rpMemoryPressureUntil = 0;
   rpQwenStoodDownForMemory = false;
   rpMemoryQuietLogged = false;
@@ -2328,21 +2399,21 @@ function startQwenWatchdog(
     try {
       healthy = runQwenHealthCheck(get, set);
     } catch { /* watchdog should never crash the host */ }
-    // OTA-1107 — recovering cadence honors the backoff ladder.
+    // OTA-1084 — recovering cadence honors the backoff ladder.
     schedule(healthy ? QWEN_WATCHDOG_HEALTHY_MS : qwenRecoveringDelayMs());
   }
 
-  // OTA-1055 — DON'T WAIT FOR THE NEXT TICK. Dormancy is CAUSED by backgrounding
+  // OTA-1032 — DON'T WAIT FOR THE NEXT TICK. Dormancy is CAUSED by backgrounding
   // (App.tsx disposes the ~398MB native context to reclaim memory), so the app
   // knows the exact moment it matters: coming back to the foreground. Checking
   // there removes up to a full poll interval of dead narration before the
   // watchdog has even noticed.
   try {
     qwenAppStateSub = AppState.addEventListener('change', (next) => {
-      // OTA-1107 — a fresh return to foreground clears the backoff ladder:
+      // OTA-1084 — a fresh return to foreground clears the backoff ladder:
       // the player is present again, so the first retry should be fast even
       // if the last background stretch burned through the free attempts.
-      // ⚠⚠ OTA-1196 — BUT ONLY AFTER A REAL BACKGROUND STRETCH, AND THIS IS THE DEFECT
+      // ⚠⚠ OTA-1173 — BUT ONLY AFTER A REAL BACKGROUND STRETCH, AND THIS IS THE DEFECT
       // THE PREVIOUS OTA DELIBERATELY LEFT IN PLACE TO MEASURE. `active` fires on iOS for
       // a notification banner, a Control Center pull, or a peek at the app switcher —
       // iOS bounces active → inactive → active for all of them, and Android does not. The
@@ -2350,11 +2421,19 @@ function startQwenWatchdog(
       //     12:30:19.917  holding revival until foreground
       //     12:30:20.266  reinitializing (attempt #3)
       // Half his reloads that window were incidental twitches, not the player returning,
-      // and OTA-1107's own comment says "kicking a ~400MB context load from the
+      // and OTA-1084's own comment says "kicking a ~400MB context load from the
       // background is guaranteed wasted work". iOS walked straight through that rule.
       // Requiring a genuine `background` first is what closes it.
-      if (next === 'background') { qwenTrulyBackgrounded = true; return; }
+      if (next === 'background') {
+        qwenTrulyBackgrounded = true;
+        qwenForegroundSince = null;   // OTA-1278 — the clock restarts on return
+        return;
+      }
       if (next !== 'active') return; // `inactive` alone is a twitch, not a return.
+      // ⚠ OTA-1278 — stamp the return, then let the gate above decide. The tick
+      // still runs (backoff resets, health is still checked); what it may no
+      // longer do is spend ~425MB on a foreground that has not settled.
+      if (qwenForegroundSince === null) qwenForegroundSince = Date.now();
       if (!qwenTrulyBackgrounded) return;
       qwenTrulyBackgrounded = false;
       qwenBackoffLevel = 0;
@@ -2370,7 +2449,7 @@ function startQwenWatchdog(
   schedule(QWEN_WATCHDOG_HEALTHY_MS);
 }
 
-// ── OTA-1195 — RUNTIME PRESSURE INSTRUMENTS ───────────────────────────────
+// ── OTA-1172 — RUNTIME PRESSURE INSTRUMENTS ───────────────────────────────
 // Owner: "add in memory warning codes to the log so you can track them, whatever debug
 // information you need." Three holes in the freeze report, three instruments. See
 // engine-side reasoning in app/diagnostics/runtimePressure.ts.
@@ -2390,13 +2469,13 @@ let rpSampleTimer: ReturnType<typeof setTimeout> | null = null;
 let rpMemorySub: { remove: () => void } | null = null;
 let rpAppStateSub: { remove: () => void } | null = null;
 let rpLastSaveKb: number | null = null;
-// ⚠⚠ OTA-1198 — MEMORY-PRESSURE QUIET WINDOW. See the block in runQwenHealthCheck: the
-// OTA-1196 dispose and the watchdog formed a loop that fired SEVEN ~400MB loads in 40
+// ⚠⚠ OTA-1175 — MEMORY-PRESSURE QUIET WINDOW. See the block in runQwenHealthCheck: the
+// OTA-1173 dispose and the watchdog formed a loop that fired SEVEN ~400MB loads in 40
 // seconds on the owner's device. This is the interlock between them.
 let rpMemoryPressureUntil = 0;
 let rpQwenStoodDownForMemory = false;
 let rpMemoryQuietLogged = false;
-/** ⚠ OTA-1204 — SEPARATE FROM `rpMemoryQuietLogged`, and that separation is the fix.
+/** ⚠ OTA-1181 — SEPARATE FROM `rpMemoryQuietLogged`, and that separation is the fix.
  *  A memory warning re-arms the quiet notice (a new window really did open) but must NOT
  *  re-arm the permanent one. Only the watchdog restart clears this. */
 let rpStandDownLogged = false;
@@ -2435,10 +2514,22 @@ export function noteSaveKb(kb: number): void { rpLastSaveKb = kb; }
 export function logUiTap(label: string): void {
   try {
     useGameStore.getState().appendLog('debug', `ui: tap "${label}"`);
+    // ⚠⚠ OTA-1276 — AND STAMP IT WHERE A WEDGE CANNOT SWALLOW IT. The line
+    // above goes into the BATCHED disk log, which drains on a promise chain —
+    // and a wedged JS thread never drains it, so the last lines before a freeze
+    // are lost and the log appears to end early. This single tiny write races
+    // ahead of the wedge, so the next boot can name the last control touched.
+    const st = useGameStore.getState();
+    stampLiveBreadcrumb({
+      at: Date.now(),
+      what: `tap "${label}"`,
+      screen: st.currentScreen,
+      room: st.player?.hubRoomId ?? st.player?.currentLocationId ?? undefined,
+    });
   } catch { /* never let instrumentation break a control */ }
 }
 
-/** ⚠ OTA-1199 — the frame clock, hoisted so app-state can pause it. A self-recursing rAF
+/** ⚠ OTA-1176 — the frame clock, hoisted so app-state can pause it. A self-recursing rAF
  *  is the cheapest way to notice frames stopping, but only while anyone is looking. */
 function rpStartFrameClock(): void {
   if (rpFrameRaf !== null) return; // already running — never stack two loops
@@ -2458,7 +2549,7 @@ function rpStopFrameClock(): void {
   rpFrameRaf = null;
 }
 
-/** ⚠⚠ OTA-1199 — THE TEARDOWN OTA-1195 SHIPPED WITHOUT.
+/** ⚠⚠ OTA-1176 — THE TEARDOWN OTA-1172 SHIPPED WITHOUT.
  *  Two AppState subscriptions, a rescheduling timer and an rAF loop, and nothing anywhere
  *  stopped any of them. It is a small leak in bytes — the listeners are two objects and
  *  Hermes reclaims the per-frame closure — but "started forever, stopped never" is the
@@ -2477,7 +2568,7 @@ function startRuntimePressureWatch(
   _set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
 ): void {
   // Idempotent: a re-hydrate must not stack a second set of timers and listeners.
-  // ⚠ OTA-1199 — goes through the SAME teardown a caller would use, so the two can never
+  // ⚠ OTA-1176 — goes through the SAME teardown a caller would use, so the two can never
   // drift. The hand-rolled copy this replaces already differed from what it should clear.
   stopRuntimePressureWatch();
 
@@ -2499,7 +2590,7 @@ function startRuntimePressureWatch(
       rpLastMemoryWarningAt = t;
       let qwenStatus: string | undefined;
       try { qwenStatus = typeof qwen.getStatus === 'function' ? qwen.getStatus() : undefined; } catch { /* best effort */ }
-      // OTA-1202 — the OTHER native model. Read lazily and behind its own guard so the
+      // OTA-1179 — the OTHER native model. Read lazily and behind its own guard so the
       // voice subsystem can never break the memory instrument.
       let kokoroPhase: string | undefined;
       try {
@@ -2515,7 +2606,7 @@ function startRuntimePressureWatch(
           saveKb: rpLastSaveKb ?? undefined,
         }));
       } catch { /* never let instrumentation throw into the host */ }
-      // ⚠⚠ OTA-1196 — AND NOW WE ACTUALLY ANSWER IT. OTA-1195 logged the warning and did
+      // ⚠⚠ OTA-1173 — AND NOW WE ACTUALLY ANSWER IT. OTA-1172 logged the warning and did
       // NOTHING, which is only half a fix: iOS raises this precisely so an app can hand
       // memory back BEFORE the OS takes the process instead. The single largest thing we
       // hold is the ~400MB llama context, we have a `dispose()` for it, and narration
@@ -2526,7 +2617,7 @@ function startRuntimePressureWatch(
       // ⚠ The watchdog is deliberately NOT suppressed here: it reads the real status and
       // will bring Qwen back once there is room, which is the behaviour we want — release
       // under pressure, recover when the pressure lifts.
-      // ⚠⚠ OTA-1198 — AND TELL THE WATCHDOG TO STAND DOWN BEFORE FREEING ANYTHING.
+      // ⚠⚠ OTA-1175 — AND TELL THE WATCHDOG TO STAND DOWN BEFORE FREEING ANYTHING.
       // Setting this BEFORE the dispose is load-bearing: the dispose marks any in-flight
       // load stale, the watchdog's next tick sees 'idle', and without this flag it kicks a
       // fresh ~400MB load straight back into the pressure that just fired the warning.
@@ -2535,12 +2626,12 @@ function startRuntimePressureWatch(
       if (rpMemoryWarnings >= MEMORY_WARNINGS_BEFORE_STANDDOWN) rpQwenStoodDownForMemory = true;
       try {
         if (typeof (qwen as { dispose?: () => Promise<void> }).dispose === 'function') {
-          // ⚠⚠ OTA-1202 — SNAPSHOT BEFORE, COMPARE AFTER. THIS LINE USED TO LIE, AND IT
+          // ⚠⚠ OTA-1179 — SNAPSHOT BEFORE, COMPARE AFTER. THIS LINE USED TO LIE, AND IT
           // LIED TO ME FOR A WEEK.
           //
           // It printed "released the Qwen context (~400MB)" unconditionally once dispose()
           // resolved — whether or not there was anything to release. The owner's 2026-08-09
-          // report on OTA-1200 prints it FIVE TIMES, and every one of those warnings reads
+          // report on OTA-1177 prints it FIVE TIMES, and every one of those warnings reads
           // `qwen='idle'` or `qwen='failed'`, i.e. no model was loaded and the call freed
           // nothing:
           //     02:50:45.915  ⚠⚠ MEMORY WARNING #1 — qwen='failed' · reloads=0
@@ -2548,7 +2639,7 @@ function startRuntimePressureWatch(
           //     02:51:36.232  ⚠⚠ MEMORY WARNING #5 — qwen='idle'  · reloads=0
           //     02:51:36.293  memory: released the Qwen context (~400MB)   ← freed nothing
           //
-          // ⚠ I QUOTED THESE LINES AS EVIDENCE in the OTA-1198 analysis. A diagnostic that
+          // ⚠ I QUOTED THESE LINES AS EVIDENCE in the OTA-1175 analysis. A diagnostic that
           // states an outcome it never checked is worse than no diagnostic, because it is
           // read as measurement — which is the whole failure this week's rule exists to
           // stop, sitting inside the instrumentation itself.
@@ -2590,8 +2681,8 @@ function startRuntimePressureWatch(
       // A fresh foreground restarts both clocks: a backgrounded app legitimately stops
       // painting, and counting that as a render stall would cry wolf every time the
       // player checks a message.
-      // ⚠⚠ OTA-1199 — THE FRAME CLOCK STOPS WHEN THE APP DOES.
-      // OTA-1195 ran this rAF loop for the entire life of the process, backgrounded or
+      // ⚠⚠ OTA-1176 — THE FRAME CLOCK STOPS WHEN THE APP DOES.
+      // OTA-1172 ran this rAF loop for the entire life of the process, backgrounded or
       // not — 60 wakeups a second that the detector then THREW AWAY, because it only
       // judges while foregrounded. Pure waste, and a backgrounded app doing steady work is
       // what iOS reclaims first. On the device we are trying to keep alive, the instrument
@@ -2607,7 +2698,7 @@ function startRuntimePressureWatch(
 
   // Clock A — frames. Driven by the NATIVE frame callback, so it stops when the render
   // side stops even while JS keeps running.
-  // ⚠ OTA-1199 — started and stopped with the app's foreground state; see the AppState
+  // ⚠ OTA-1176 — started and stopped with the app's foreground state; see the AppState
   // handler above and rpStopFrameClock/rpStartFrameClock below.
   rpStartFrameClock();
 
@@ -2706,11 +2797,11 @@ const STAMINA_COSTS = {
 // and withdraw clean) instead of getting caught into a fight. A practiced thief
 // doesn't get grabbed red-handed; a clumsy one does. Tunable design knob.
 const STEALTH_QUIET_FAIL_STE = 14;
-/** OTA-1104 — TC shaken out of a thief caught in their own client's coat
+/** OTA-1081 — TC shaken out of a thief caught in their own client's coat
  *  (clamped to the pouch). On top of the dead mission and the party fight —
  *  the escort takes back wages before the steel comes out. */
 const ESCORT_CAUGHT_FINE = 40;
-/** OTA-1106 — what a fence pays for stolen goods, as a fraction of the honest
+/** OTA-1083 — what a fence pays for stolen goods, as a fraction of the honest
  *  sell-back. Deep by design: they carry the risk of holding hot goods, and
  *  the cut is what keeps steal-and-fence from beating honest selling. */
 const FENCE_STOLEN_CUT = 0.4;
@@ -2736,7 +2827,7 @@ let lastWelcomeBackAt: number | null = null;
 const WELCOME_BACK_LINES = [
   `The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, {name}. The road kept your place."`,
   `The Arbiter looks up as you return. "Welcome back, {name}. I wondered when you'd take up the thread again."`,
-  // ⚠ OTA-1159 — "Good —" removed. Owner: *"remove the Good, it hits weird in
+  // ⚠ OTA-1136 — "Good —" removed. Owner: *"remove the Good, it hits weird in
   // the sentence."* It read as the Arbiter approving of the player's return
   // rather than greeting them, and spoken aloud the dash landed as a stumble
   // between the name and the thought. The sentence says the same thing without
@@ -2746,11 +2837,11 @@ const WELCOME_BACK_LINES = [
   `The Arbiter sets the quiet aside. "Welcome back, {name}. I kept watch while you were gone."`,
 ];
 
-// ⚠ OTA-1166 — WELCOME BACK ALWAYS WINS. When the offline world-recap has
+// ⚠ OTA-1143 — WELCOME BACK ALWAYS WINS. When the offline world-recap has
 // something to say, it rides INSIDE the greeting's quote as a follow-on
 // sentence instead of being its own arbiter line — the Arbiter speaks once at
 // load, and the voice reads one warm hello instead of a stack of three.
-// Exported for the ota1166 suite.
+// Exported for the ota1143 suite.
 export function welcomeBackLine(
   player: PlayerCharacter | null | undefined,
   opts?: { offlineRecap?: boolean },
@@ -2770,7 +2861,7 @@ export function welcomeBackLine(
   return line;
 }
 
-// OTA-668 — persistent "current mission" objective line. Playtester was mid-parley
+// OTA-653 — persistent "current mission" objective line. Playtester was mid-parley
 // with two faction leaders when a fight broke out; after the fight they were unsure
 // what they had been doing or where to go ("how do I get back into the mission").
 // This surfaces the ACTIVE mission's concrete objective — the same demands text the
@@ -2866,7 +2957,7 @@ const BODY_VERB_PART: Record<string, string> = {
  *  surfaced 7868 over 10 in-game days. 50 keeps it a meaningful
  *  gameplay signal (and within the range the narration / Arbiter
  *  remarks were authored to react to). */
-/** OTA-1006 — #122: hub rooms that are OPEN AIR. The hub graph mixes exterior
+/** OTA-983 — #122: hub rooms that are OPEN AIR. The hub graph mixes exterior
  *  spaces (the gate, the square, the culvert descent) with genuinely roofed
  *  ones (armory, mess, workshop, quarters, lab, vault, chapel) and the buried
  *  level below. Only these stay exposed to weather; being anywhere else in a
@@ -2915,7 +3006,7 @@ const ACCEPT_HINT_STOPWORDS = new Set([
   'a', 'an', 'the', 'of', 'in', 'on', 'to', 'for', 'with', 'from',
   'by', 'at', 'and', 'or', 'old', 'new', 'true', 'down', 'up',
 ]);
-// OTA-1109 — COLLISION-AWARE. Irma offered "Kindling for the Vigil" AND the
+// OTA-1086 — COLLISION-AWARE. Irma offered "Kindling for the Vigil" AND the
 // long-form "The Giant-Watch Vigil" in the same breath, and both hints said
 // 'accept vigil' — two contracts, one keyword, and whichever the fuzzy
 // matcher resolved, the player didn't choose it. Callers that emit several
@@ -2952,52 +3043,12 @@ export function acceptKeyword(title: string, taken?: Set<string>): string {
 // to the raw saved player (which still loads — and the persist integrity
 // guard then refuses to write it back if it's missing core identity)
 // instead of failing the load to .bak / a slot-load error.
-// OTA-839 (HAL only) — one-time INTEL BACKFILL for a returning character. The
-// observed-weakness system (OTA-838) only starts recording the day you install it,
-// so a long-time character would open the new bestiary/panel to blank weaknesses on
-// foes they've beaten dozens of times. A player who DEFEATED an enemy did learn its
-// reactions in that fight, so we seed each already-defeated enemy's canonical
-// (type + base-trait) weak/resist set — the SAME reconcile the EnemyPanel's
-// defensesFor uses (trait wins on a discord). Runs once: only when the save carries
-// no enemyIntel yet (post-838 saves keep their real observations untouched).
-export function backfillEnemyIntelFromDefeats(
-  defeatedNames: readonly string[] | undefined,
-): Record<string, { weak: string[]; resist: string[] }> {
-  const out: Record<string, { weak: string[]; resist: string[] }> = {};
-  if (!defeatedNames || defeatedNames.length === 0) return out;
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const enemies = require('../data/enemies/enemies.json') as Array<{ name: string; type?: string; traits?: string[] }>;
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { enemyTypeDefenses } = require('../engine/crafting') as typeof import('../engine/crafting');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { traitDefenses } = require('../engine/enemyTraits') as typeof import('../engine/enemyTraits');
-  const byName = new Map(enemies.map((e) => [e.name.toLowerCase(), e]));
-  for (const rawName of new Set(defeatedNames.map((n) => n.toLowerCase()))) {
-    const e = byName.get(rawName);
-    if (!e) continue;
-    const type = enemyTypeDefenses(e.type);
-    const trait = traitDefenses(e.traits);
-    const all = Array.from(new Set([...type.resist, ...type.weak, ...trait.resists, ...trait.weaknesses]));
-    const weak: string[] = [];
-    const resist: string[] = [];
-    for (const dt of all) {
-      const typeDir = type.weak.includes(dt) ? 1 : type.resist.includes(dt) ? -1 : 0;
-      const traitDir = trait.weaknesses.includes(dt) ? 1 : trait.resists.includes(dt) ? -1 : 0;
-      const dir = traitDir !== 0 ? traitDir : typeDir; // trait wins on a discord (mirrors defensesFor)
-      if (dir > 0) weak.push(dt);
-      else if (dir < 0) resist.push(dt);
-    }
-    if (weak.length || resist.length) out[rawName] = { weak, resist };
-  }
-  return out;
-}
-
 // Exported for the OTA-486 regression test (equipped hands/cloak must survive a
 // load). The save/load round-trip funnels every load through this migration.
-/** OTA-1021 — ONE worldMemory load-migration for every door into a save. It was a
+/** OTA-998 — ONE worldMemory load-migration for every door into a save. It was a
  *  literal inside loadSlotIntoGame only, so resurrectSlot loaded RAW memory:
- *  no canon-location resync, no intel backfill — a whole revived session of
- *  missing atlas pins, dead contract markers and a blank bestiary. */
+ *  no canon-location resync — a whole revived session of missing atlas pins
+ *  and dead contract markers. */
 export function migrateLoadedWorldMemory(wm: WorldMemory): WorldMemory {
   return {
     ...wm,
@@ -3012,11 +3063,10 @@ export function migrateLoadedWorldMemory(wm: WorldMemory): WorldMemory {
     earnedTitleAnnounced: wm.earnedTitleAnnounced ?? [],
     fusionCompensationGranted: wm.fusionCompensationGranted ?? false,
     pendingDogOnboarding: wm.pendingDogOnboarding ?? null,
-    enemyIntel: wm.enemyIntel ?? backfillEnemyIntelFromDefeats(wm.defeatedEnemies),
   };
 }
 
-/** OTA-1052 — the scope a "hide this chip" ✕ applies to: the macro TILE
+/** OTA-1029 — the scope a "hide this chip" ✕ applies to: the macro TILE
  *  (location + map x/y), NOT the room. A capital is a dozen hand-authored rooms
  *  standing on one tile, so a room-keyed dismiss re-showed the chip on every
  *  interior hop. beginScene clears a dismiss whose tile no longer matches, which
@@ -3027,7 +3077,7 @@ export function chipDismissTileKey(p: { currentLocationId?: string; mapX?: numbe
 }
 
 export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
-  // OTA-1021 — retire legacy catalog names FIRST so every later pass (kind/tag
+  // OTA-998 — retire legacy catalog names FIRST so every later pass (kind/tag
   // restamp, durability, equip pointers) works on names the catalog still
   // knows. See itemMigrations.LEGACY_ITEM_RENAMES.
   const pm = applyLegacyItemRenames(p);
@@ -3039,18 +3089,18 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     console.warn('backfillPlayer: save-upgrade migration threw; loading the raw saved player (degraded-safe)', e);
     out = pm;
   }
-  // OTA-1041 — pre-feature saves get a REASON THEY CAME DOWN, dealt
+  // OTA-1018 — pre-feature saves get a REASON THEY CAME DOWN, dealt
   // deterministically from the character's identity so the same save always
   // resolves to the same motive (the phase-2/3 story beats key off it).
   // storyIntroSeen backfills TRUE: the crawl introduces a new character, it
   // must never ambush someone forty days into a run. REPLAY OPENING exists
   // for saves that want to read it.
-  // ⚠ OTA-1179 — EVERY FACTION GETS A ROW, and legacy race ids get healed.
+  // ⚠ OTA-1156 — EVERY FACTION GETS A ROW, and legacy race ids get healed.
   //
   // `applyRepChange` is a pure `.map()` — it can update a row but it can never
   // CREATE one. Rows are minted in exactly one place, character creation. So a
   // faction id absent from the array reads 0 forever AND silently absorbs every
-  // grant aimed at it: the OTA-1178 failure mode with a completely different
+  // grant aimed at it: the OTA-1155 failure mode with a completely different
   // cause. Latent today (nine factions, none added since the array was authored),
   // and it is a one-line landmine — **adding a tenth faction would give every
   // existing save a faction it could never gain standing with.** Backfilled here
@@ -3082,7 +3132,7 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
       ...out,
       storyMotive: assignMotive(`${out.name}|${out.raceId}|${out.factionId}`),
       storyIntroSeen: true,
-      // OTA-1045 — a DEALT motive is a guess, not a choice. The load path
+      // OTA-1022 — a DEALT motive is a guess, not a choice. The load path
       // reads this and owes the player the one-time picker.
       storyMotiveChosen: false,
     };
@@ -3098,7 +3148,7 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     const safeMax = out.hpMax && out.hpMax > 0 ? out.hpMax : 1;
     out = { ...out, hp: safeMax, stamina: out.staminaMax ?? out.stamina ?? 0 };
   }
-  // ⚠⚠ OTA-1242 — heal hunts wedged on a pure-narration stage. The OTA-1236
+  // ⚠⚠ OTA-1219 — heal hunts wedged on a pure-narration stage. The OTA-1213
   // verb matcher can never match a null checkKind, and hunts (unlike mysteries
   // and storylines, OTA-871) never auto-consumed narration stages — so every
   // hunt accepted after 1236 sat at stage 0 with NO verb able to move it.
@@ -3116,7 +3166,7 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
       }),
     };
   }
-  // ⚠ OTA-1243 — same heal for MYSTERIES (the neutral accept door never bumped
+  // ⚠ OTA-1220 — same heal for MYSTERIES (the neutral accept door never bumped
   // past stage 0 the way the vendor door always has — the three faction-neutral
   // mysteries wedged identically) and, belt-and-braces, for storylines.
   if (out.activeMysteries?.some((m) => findMysteryById(m.id)?.stages[m.stage]?.checkKind === null)) {
@@ -3143,7 +3193,7 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
       }),
     };
   }
-  // OTA-991 — 'Skyreacher Chart (N of 5)' became 'Skyreacher Map N of 5 — <tower>'.
+  // OTA-968 — 'Skyreacher Chart (N of 5)' became 'Skyreacher Map N of 5 — <tower>'.
   // Rename legacy charts sitting in old saves so the catalog row — and with it
   // the Use effect that unlocks the great climb — resolves again.
   if (out.inventory?.some((i) => LEGACY_SKYREACHER_CHART_NAMES.includes(i.name))) {
@@ -3155,7 +3205,9 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
       }),
     };
   }
-  // OTA-1024 — instanceStats stat CHANNELS freeze at mint; when the catalog
+  // OTA-998 — the golem's held armament lives OUTSIDE the inventory array and
+  // never met the restamp/durability passes. Heal it like any pack item.
+  // OTA-1001 — instanceStats stat CHANNELS freeze at mint; when the catalog
   // retargeted the 42 charisma-stat weapons, old instances kept granting the
   // dead CHA channel forever. Re-point those bonuses at the catalog's current
   // stat (fused pieces excluded — instance-authoritative).
@@ -3169,12 +3221,10 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
       return fixed.some((b, ix) => b !== sb[ix]) ? { ...i, instanceStats: { ...i.instanceStats, statBonuses: fixed } } : i;
     }) };
   }
-  // OTA-1021 — the golem's held armament lives OUTSIDE the inventory array and
-  // never met the restamp/durability passes. Heal it like any pack item.
   if (out.golem?.weapon) {
     out = { ...out, golem: { ...out.golem, weapon: restampInventoryItem(stampDurability(out.golem.weapon)) } };
   }
-  // OTA-1028 — GHOST EQUIP REFERENCES. bandolierIds / toolPouchIds index inventory
+  // OTA-1005 — GHOST EQUIP REFERENCES. bandolierIds / toolPouchIds index inventory
   // INSTANCES, but only THROW and UNRACK cleaned them — selling, scrapping,
   // drinking, gifting, fusing or fully using a racked item left its id behind
   // forever. A ghost RENDERS as an empty slot yet still counts against the
@@ -3254,7 +3304,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     }
     let item = stampDurability(i);
     const lookup = lookupCraftedItem(item.name);
-    // OTA-1024 — fused pieces are kind-authoritative (mirrors restampInventoryItem's
+    // OTA-1001 — fused pieces are kind-authoritative (mirrors restampInventoryItem's
     // guard): a fused ARMOR sharing a name with a catalog weapon row flipped to
     // 'weapon' on every load.
     if (!item.uniqueStats && !(item.tags ?? []).includes('fused') && lookup.kind !== 'misc' && item.kind !== lookup.kind) {
@@ -3281,7 +3331,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // a 'fused' tag, but pieces forged before the tag existed carry uniqueStats
     // without it. Backfill the tag on load so every crucible item is marked (the
     // inventory ✶ badge + any fused-aware logic keys off it).
-    // OTA-828 — Core Guardian reward gear now ALSO carries uniqueStats (so it's a
+    // OTA-808 — Core Guardian reward gear now ALSO carries uniqueStats (so it's a
     // usable weapon/armor — see coreGuardians.ts), which breaks OTA-688's old
     // "uniqueStats ⇒ fused" assumption. A Guardian drop is NOT a forge: skip the
     // fused-tag backfill AND the fused-name migration below for the tagged set, so
@@ -3302,7 +3352,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     if (item.uniqueStats && !isGuardianReward && !(item.tags ?? []).some((t) => t.toLowerCase() === 'fused')) {
       item = { ...item, tags: [...(item.tags ?? []), 'fused'] };
     }
-    // OTA-978 — reach recheck for already-forged weapons (owner: "have it recheck
+    // OTA-955 — reach recheck for already-forged weapons (owner: "have it recheck
     // and fix old saves as well"). Every fused weapon now carries an explicit
     // reachClass; older forges get it inferred from their name on load — a
     // legacy "Humming Bow" shoots from distance, a "Cairn Spear" reaches to
@@ -3440,9 +3490,9 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { grandfatheredKnownRecipes: _gkr } = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
   const knownRecipes = _gkr(_allRecipes, inventory.map((i) => i.name), p.knownRecipes);
-  // OTA-949 — the OTA-938 one-time dog-revive migration is RETIRED (spent make-good). A dead or
+  // OTA-926 — the OTA-915 one-time dog-revive migration is RETIRED (spent make-good). A dead or
   // abandoned dog is no longer auto-restored on load; the dog loads exactly as saved. The
-  // `dogRevivedOta938` flag on old saves is now inert.
+  // `dogRevivedOta915` flag on old saves is now inert.
   return {
     ...p,
     stats,
@@ -3480,7 +3530,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // Migrate legacy flat-id list into the new staged shape. We don't
     // know the original posting faction; pull it from the FactionQuestDef
     // catalog. Saves that already wrote activeFactionQuests pass through.
-    activeFactionQuests: ((p.activeFactionQuests ?? (p.activeFactionQuestIds ?? []).map((id) => {
+    activeFactionQuests: p.activeFactionQuests ?? (p.activeFactionQuestIds ?? []).map((id) => {
       const def = findFactionQuestById(id);
       return {
         id,
@@ -3488,14 +3538,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
         postedByFaction: def?.factionId ?? 'unknown',
         acceptedAt: Date.now(),
       };
-    })) as { id: string; stage: number; postedByFaction: string; acceptedAt: number; tracked?: boolean }[])
-      // SINGLE-ACTIVE backfill — records written before the `tracked` field
-      // existed have tracked === undefined, so every accepted contract would
-      // read as active until the player taps SET ACTIVE. Establish single-active
-      // on load: the FIRST untracked record becomes the active one, the rest
-      // park. Records that already carry `tracked` (post-feature saves) are left
-      // exactly as the player set them — we never re-pick an explicit choice.
-      .map((q, i) => (q.tracked === undefined ? { ...q, tracked: i === 0 } : q)),
+    }),
     completedFactionQuestIds: p.completedFactionQuestIds ?? [],
     collectables: p.collectables ?? [],
     activeHunts: p.activeHunts ?? [],
@@ -3525,25 +3568,12 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // IIFE below (OTA-735) — at an anchor tile that is the grid center (the old
     // behavior), off-anchor it is the true offset. New characters + location
     // arrivals already use the new center via character.ts / travelTo.
-    // arb47 — the authoritative ABSOLUTE position. Legacy saves are treated as
-    // standing AT their current location (that location's fixed canon cell); a
-    // save that already carries gridX/gridY keeps it (the player may be out in
-    // open ground between locations). From here on it only ever moves ±1 per
-    // step or snaps to a location's canon cell on arrival.
-    //
-    // OTA-735 — the VISUAL coords (mapX/mapY) are RECONSTRUCTED from that
-    // absolute cell via gridToVisual, NOT blindly snapped to center. During live
-    // play every step sets mapX/mapY = gridToVisual(gridX, gridY, currentLoc)
-    // (see stepInDirection handler), so that equality is an invariant. The old
-    // reload snapped mapX/mapY to center while keeping the true gridX/gridY,
-    // BREAKING the invariant — and because makeRoomKey keys on mapX/mapY, every
-    // room the player had cleared got a fresh key on reload and its
-    // searchedAmbientNouns / investigation-table / dog-smell state was orphaned.
-    // Net effect the playtester hit: reload, and a picked-clean site is fully
-    // lootable again. Reconstructing mapX/mapY keeps the key stable so cleared
-    // stays cleared. At an anchor tile gridToVisual returns center, so the
-    // common case is unchanged; only off-anchor tiles (where buildings spawn)
-    // are corrected.
+    // arb47 — the authoritative ABSOLUTE position. Legacy saves (and any save
+    // mid-journey, since mapX/mapY snap to center above) are treated as standing
+    // AT their current location, so the absolute cell is that location's fixed
+    // canon cell. A save that already carries gridX/gridY keeps it (the player
+    // may be out in open ground between locations). From here on it only ever
+    // moves ±1 per step or snaps to a location's canon cell on arrival.
     ...(() => {
       // Base absolute cell: keep an existing one, else the current location's cell.
       let gx: number;
@@ -3555,7 +3585,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
         gx = cell.x; gy = cell.y;
       }
       // (The OTA-784 one-time fresh-market repair — drop a market-parked save 5
-      // tiles east + skip one auto-enter — was REMOVED in OTA-794: it existed to
+      // tiles east + skip one auto-enter — was REMOVED in OTA-774: it existed to
       // reset saves after a failed OTA, and the affected save has been repaired.)
       // OTA-510 — one-shot: drop the player ONE tile west of the Hidden Market so
       // the next auto-route to it reads exactly 1 pace. Flag-guarded so it fires
@@ -3597,7 +3627,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     travelTarget: (() => {
       const t = p.travelTarget;
       if (!t) return undefined;
-      // OTA-953 — re-seed the resumed journey from the player's LIVE absolute cell
+      // OTA-930 — re-seed the resumed journey from the player's LIVE absolute cell
       // (gridX/gridY via playerGridCell), NOT the departure city. The old
       // canonicalDistance(currentLocationId, target) re-seeded the FULL
       // city→target distance every load, so if the OS reclaimed the process
@@ -3630,15 +3660,15 @@ function describeTime(hours: number): string {
   return `Day ${day}, ${part}`;
 }
 
-/** ⚠ OTA-1174 — how many exchanges are kept per NPC. worldMemory is persisted
+/** ⚠ OTA-1151 — how many exchanges are kept per NPC. worldMemory is persisted
  *  on EVERY action (the device log prints `wm=57KB` after an hour), so an
  *  unbounded transcript is a save-size leak that only shows up in the long
  *  sessions this feature exists to serve. Authored topics run 14-16 per NPC
- *  since OTA-1114, so 40 holds every first answer plus a healthy run of
+ *  since OTA-1091, so 40 holds every first answer plus a healthy run of
  *  re-asks; past that the oldest turn falls off the front. */
 const TALK_HISTORY_MAX = 40;
 
-/** OTA-1174 — append one question/answer pair to an NPC's durable transcript.
+/** OTA-1151 — append one question/answer pair to an NPC's durable transcript.
  *  Separate from appendLog on purpose: the feed is the record of the SESSION
  *  and is capped and channel-filtered, while this is the record of the
  *  RELATIONSHIP and has to survive both the conversation closing and the log
@@ -3812,7 +3842,7 @@ function maintainPatrols(
   const tides = get().worldMemory.factionTides ?? {};
   const cur = get().worldMemory.patrols ?? [];
   const idxByFaction = new Map<string, number[]>();
-  // ⚠ OTA-1244 — quarry groups (bounty contracts, OTA-1189) are OUTSIDE the army
+  // ⚠ OTA-1221 — quarry groups (bounty contracts, OTA-1166) are OUTSIDE the army
   // ledger: they neither count toward a faction's patrol target nor get culled as
   // excess. Before this, the trim dropped from the tail — which is exactly where the
   // just-seeded quarry sat — and every bounty's quarry evaporated on the next tick.
@@ -3895,7 +3925,7 @@ function simulatePatrols(
     return WE.stepPatrol(p, tickIndex, target);
   });
   const events: { text: string; kind: string }[] = [];
-  // OTA-1077 — the SAME assault, kept as data rather than only as prose. The
+  // OTA-1054 — the SAME assault, kept as data rather than only as prose. The
   // sim has raided outposts since OTA-844; the events it emitted named only
   // factions and went only to the World board, so the people who actually live
   // at the sacked outpost never mentioned it. Joining the event to its location
@@ -3988,7 +4018,7 @@ function simulatePatrols(
         bumpPower(f.id, -1); bumpPower(p.factionId, 1);
         relations = FR.adjustRelation(relations, p.factionId, f.id, -4);
         events.push({ text: WE.outpostAssaultLine(nameOf(p.factionId), nameOf(f.id), tickIndex * 53 + i * 11 + p.phase), kind: 'outpost_assault' });
-        // OTA-1077 — and the same event as a record someone can talk about.
+        // OTA-1054 — and the same event as a record someone can talk about.
         const raidedLoc = FACTION_STARTING_LOCATION[f.id];
         if (raidedLoc) {
           raidRecords.push({
@@ -3997,7 +4027,7 @@ function simulatePatrols(
             attackerId: p.factionId,
             attackerName: nameOf(p.factionId),
             locationId: raidedLoc,
-            // OTA-1078 — resolve the AUTHORED name here, where the location
+            // OTA-1055 — resolve the AUTHORED name here, where the location
             // catalog is. npcMemory only had the id and de-slugged it, which
             // put "reclaimer stake" and "pilgrim waycamp" in the mouths of the
             // people who live at Reclaimer's Stake and the Tartarian Pilgrim
@@ -4042,16 +4072,16 @@ function simulatePatrols(
       // the exploration feed. You see it when you tap WORLD, not mid-play.
       worldEvents: [...(st.worldMemory.worldEvents ?? []), ...sample.map((e) => ({ ...e, hour }))].slice(-50),
     } : {}),
-    // OTA-1077 — raid RECORDS are kept whole, not sampled. The board's FEED_PER_STEP
+    // OTA-1054 — raid RECORDS are kept whole, not sampled. The board's FEED_PER_STEP
     // sample exists so the World screen reads as a story rather than a wall; a raid
     // that got trimmed out of the display still happened, and the trader whose
     // outpost burned should still be able to say so.
-    // ⚠ OTA-1078 — ONE RAID PER DEFENDER PER IN-GAME HOUR. worldRealtimeTick
+    // ⚠ OTA-1055 — ONE RAID PER DEFENDER PER IN-GAME HOUR. worldRealtimeTick
     // runs simulatePatrols every ~6 REAL seconds whether or not in-game time
     // moves, so a review measured 60 idle ticks — about six minutes of an open
     // app — overflowing the 12-slot buffer outright. A raid on the player's own
     // faction was near-guaranteed to be evicted before they next reached a
-    // vendor, which made OTA-1077 all but inert in exactly the sessions it was
+    // vendor, which made OTA-1054 all but inert in exactly the sessions it was
     // written for. The cap was doing the trimming the sampling comment claims
     // it avoids. Deduping on (defender, hour) makes the buffer measure IN-GAME
     // distance again: an idle player accumulates at most one row per faction
@@ -4108,7 +4138,7 @@ const RAID_TRIGGER_CHANCE = 0.3; // per eligible action, once past the cooldown
 // both field a group of that faction's soldiers, tagged with factionId (so kills shift
 // standing + tick a bounty) and scaled/escalated by the faction's World-Pulse tide.
 // Returns true if a party actually landed. Caller does the gating + the log lines.
-// OTA-985 — ESCORT collateral (engine_Dev model). Every enemy swing that CONNECTS on
+// OTA-962 — ESCORT collateral (engine_Dev model). Every enemy swing that CONNECTS on
 // the player also bleeds the shared escort pool: a fixed fraction of the FINAL
 // post-mitigation damage, EXTRA (never absorbed off the player), so a clean
 // parry that zeroes the hit spares the party too. Pool at 0 = the escort FAILS
@@ -4152,7 +4182,7 @@ function failEscortQuests(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   failedIds: string[],
-  // OTA-1104 — narrate:false lets a caller with its OWN failure story (caught
+  // OTA-1081 — narrate:false lets a caller with its OWN failure story (caught
   // robbing the leader) skip the "cut down" line, which would be a lie there.
   opts?: { narrate?: boolean },
 ): void {
@@ -4179,17 +4209,17 @@ function failEscortQuests(
   }
 }
 
-// OTA-985 — the escort party patches up while the player rests — modest (~10% of
+// OTA-962 — the escort party patches up while the player rests — modest (~10% of
 // pool max) so it can't outpace combat bleed. Only ACTIVE escorts heal; a
 // parked party is safe and doesn't need it. Called from BOTH rest resolvers.
-// OTA-990 — the outpost Crucible now runs like the roadside vendor's: 25 TC a
+// OTA-967 — the outpost Crucible now runs like the roadside vendor's: 25 TC a
 // fire (owner: "make the outpost run the same as a roadside vendor"). A
 // vendor fire or a wild fusion bench arrives with fusionPending already set
 // (paid / granted), and the Hidden Market cauldron keeps its perk — both skip
 // the fee. Called AFTER every gate and BEFORE any consume, so a refusal or a
 // cancelled picker never costs a coin, and the fee can never fire without the
 // fuse. Returns false (and narrates) when the player can't cover it.
-/** OTA-993 — #116: the level-up toast shows the number the CHARACTER SHEET shows
+/** OTA-970 — #116: the level-up toast shows the number the CHARACTER SHEET shows
  *  (owner: "display the appropriate stat"). The sheet displays base + gear;
  *  the toast used to print the bare base — "+1 DEX (now 7)" beside a sheet
  *  reading 11. When no gear rides the stat the two agree and the short form
@@ -4200,7 +4230,7 @@ export function statNowClause(p: PlayerCharacter | null | undefined, stat: strin
   return eff === base ? `now ${base}` : `base ${base}, ${eff} as you stand`;
 }
 
-/** OTA-993 — #114: pure guard for the Qwen parse-fallback (owner: "resolve intent
+/** OTA-970 — #114: pure guard for the Qwen parse-fallback (owner: "resolve intent
  *  cleaner"). Returns a short rejection reason when the rephrase stopped being
  *  about what the player typed, or null when it's usable. Case on record:
  *  "clomb into the warp" (resolved noun `warp`) came back as "wait the
@@ -4215,14 +4245,14 @@ export function qwenRephraseRejection(
   const noun = (resolvedNoun ?? '').trim().toLowerCase();
   const reph = (rephrasing ?? '').toLowerCase();
   if (noun) {
-    // OTA-1016 — word-level, not whole-string: the resolvedNoun is the CATALOG name
+    // OTA-993 — word-level, not whole-string: the resolvedNoun is the CATALOG name
     // ("Aetheric Torch"), and an honest repair like "use the torch" must pass.
     const nounWords = noun.split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
     if (nounWords.length > 0 && !nounWords.some((w) => reph.includes(w))) {
       return `dropped the player's noun "${noun}"`;
     }
   } else {
-    // OTA-1016 — NO resolved noun is the dangerous case (the parser's empty-token /
+    // OTA-993 — NO resolved noun is the dangerous case (the parser's empty-token /
     // rejected-validation exits carry none), and the old guard checked nothing
     // here beyond 'wait' — a fabricated "attack the vendor" from garbled input
     // dispatched clean. A repair must share at least one significant word
@@ -4248,7 +4278,7 @@ export function qwenRephraseRejection(
       return 'invented an action unrelated to what the player typed';
     }
   }
-  // ⚠ OTA-1178 — asks the VERB TABLE, not a hand-typed copy of it. The literal
+  // ⚠ OTA-1155 — asks the VERB TABLE, not a hand-typed copy of it. The literal
   // /wait|hold|stay|linger|pause|bide/ that stood here was six of the wait
   // intent's ten synonyms, so "still", "tarry", "idle" and "remain" were words
   // the guard did not believe anyone could mean — and an honest repair of them
@@ -4259,7 +4289,7 @@ export function qwenRephraseRejection(
   return null;
 }
 
-/** OTA-995 — #118: ONE definition of "already running a contract", across ALL
+/** OTA-972 — #118: ONE definition of "already running a contract", across ALL
  *  FOUR kinds (faction quests, hunts, mysteries, storylines). tracked===false
  *  is parked; anything else counts as live. Root cause of the accept-behavior
  *  split: only acceptFactionQuest had single-active park logic, and it scanned
@@ -4294,7 +4324,7 @@ function healEscortsOnRest(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
 ): void {
   const escActive = get().player?.activeFactionQuests ?? [];
-  // OTA-1104 — an escort leader lifted clean earlier notices the loss as camp
+  // OTA-1081 — an escort leader lifted clean earlier notices the loss as camp
   // settles: the road's version of a later meeting. Never looks your way.
   // BEFORE the heal gate — a full-health party still makes camp.
   for (const q of escActive) {
@@ -4322,11 +4352,11 @@ function healEscortsOnRest(
   if (healedLabel) get().appendLog('world', `Your ${healedLabel} rest too — they look steadier.`);
 }
 
-/** OTA-1058 — one reward line, one entry on the card. Drops exact repeats, so a
+/** OTA-1035 — one reward line, one entry on the card. Drops exact repeats, so a
  *  line that reached the card by both the capture window and an explicit raise
  *  appears once.
  *
- *  OTA-1059 — and one THING, one bullet. The ✦ is the feed's marker and the card
+ *  OTA-1036 — and one THING, one bullet. The ✦ is the feed's marker and the card
  *  draws its own, but a few emitters pack two rewards into a single line with a
  *  ✦ between them — the Core Guardian gear drop is one line for the weapon AND
  *  the armor. Stripping only a LEADING ✦ left that stray marker sitting in the
@@ -4345,7 +4375,7 @@ function mergeRewardLines(existing: readonly string[], incoming: readonly string
   return out;
 }
 
-// OTA-1058 — THE BATTLE FOLLOW-UP IS A CARD, NOT A SCROLLBACK. Owner, after
+// OTA-1035 — THE BATTLE FOLLOW-UP IS A CARD, NOT A SCROLLBACK. Owner, after
 // killing Veilkeeper Inarra: "if the whole giants and vigil thing was the
 // player's reasons flavor text it needs to be last so it will be read, it gets
 // pushed up screen and missed. it should be a pop-up I think. the battle follow
@@ -4382,14 +4412,14 @@ function captureBossVictoryLine(channel: string, text: string): void {
   bucket.push(clean);
 }
 
-/** OTA-1139 — what actually landed. `null` = nothing spawned (callers already
- *  treat that as falsy and bail). `elite` is set only when the OTA-1139 swap
+/** OTA-1116 — what actually landed. `null` = nothing spawned (callers already
+ *  treat that as falsy and bail). `elite` is set only when the OTA-1116 swap
  *  fired, so the announce line can stop claiming a headcount that is no longer
  *  true — a "war party, 4 of them" line over a single body is the kind of small
  *  lie that reads as a bug. */
 type InjectedParty = { elite: Enemy | null } | null;
 
-/** ⚠ OTA-1182 — THE GAIN SIDE OF A HOSTILE CASCADE IS METERED. THE LOSS SIDE IS NOT.
+/** ⚠ OTA-1159 — THE GAIN SIDE OF A HOSTILE CASCADE IS METERED. THE LOSS SIDE IS NOT.
  *
  *  Every standing LOSS cascades through `applyRepChange`: allies take half, and rivals
  *  take the INVERSE — so they gain. A caught theft is −10 to the victim, −5 to their
@@ -4408,7 +4438,7 @@ type InjectedParty = { elite: Enemy | null } | null;
  *
  *  ⚠ The excess is ROLLED BACK off the standing rows, not merely omitted from the log
  *  — an over-budget gain that still moved the number while going unreported would be
- *  the OTA-1179 defect (a log that disagrees with the save) pointing the other way.
+ *  the OTA-1156 defect (a log that disagrees with the save) pointing the other way.
  *  The returned `changed` list is trimmed to match, so the feed shows exactly what
  *  landed. A gain clamped to zero disappears from both. */
 const SPITE_STANDING_FACTION_CAP = 10;
@@ -4450,7 +4480,7 @@ function meterSpiteGains(
   return { standing: rows, changed: out };
 }
 
-/** ⚠ OTA-1182 — ONE ANSWER TO "HOW STRONG IS THIS CHARACTER", ASKED IN ONE PLACE.
+/** ⚠ OTA-1159 — ONE ANSWER TO "HOW STRONG IS THIS CHARACTER", ASKED IN ONE PLACE.
  *
  *  SEVEN call sites each hand-rolled `enemyScalePower(Math.max(str, dex, int),
  *  hpMax)`. That is eight copies of a formula, which is how the AC term went missing
@@ -4461,7 +4491,7 @@ function meterSpiteGains(
  *
  *  ⚠ AC comes from `standingAc`, NOT from a local re-derivation. That is the same
  *  trimmed number the player reads on their sheet and the same one `applyEnemyCounter`
- *  defends at — OTA-1156 exists because two surfaces disagreed about AC, and adding a
+ *  defends at — OTA-1133 exists because two surfaces disagreed about AC, and adding a
  *  third spelling of it here would rebuild that bug inside the difficulty curve.
  *  Scene-conditional racial/title AC is deliberately NOT included: it swings by room,
  *  and an enemy roster that re-scales when you step indoors is worse than one that is
@@ -4481,10 +4511,10 @@ function scalePowerOf(player: PlayerCharacter): number {
   // far worse bug than the one this OTA set out to fix.
   //
   // ⚠ The fallback is the BASELINES, which make `gearPowerTerm` exactly 0 — i.e. the
-  // pre-OTA-1182 number. If we cannot see what the player is carrying, we scale as if
+  // pre-OTA-1159 number. If we cannot see what the player is carrying, we scale as if
   // they carry nothing rather than inventing difficulty from a guess.
   //
-  // ⚠ OTA-1194 — THE TIER'S WEIGHT ON THE GEAR TERMS IS READ HERE, at the one choke
+  // ⚠ OTA-1171 — THE TIER'S WEIGHT ON THE GEAR TERMS IS READ HERE, at the one choke
   // point, for exactly the reason the choke point exists: seven spawners route through
   // this function, and adding a dial at each of them is how the AC term went missing for
   // as long as it did. `dialOf`, not `profileOf`, so a CUSTOM character who left "The
@@ -4513,7 +4543,7 @@ function injectFactionParty(
   const player = s.player;
   const scene = s.currentScene;
   if (!player || !scene || !scene.location) return null;
-  // OTA-1038 — a faction party is made of that faction's PEOPLE. This builder reskins
+  // OTA-1015 — a faction party is made of that faction's PEOPLE. This builder reskins
   // whatever the local wild table rolls (rename + stamp a factionId) and KEEPS
   // every trait, so an Aetherkin roll used to walk in as "<Faction> Patrol 1" —
   // a mud-mummified corpse wearing a soldier's name, resisting piercing and
@@ -4530,7 +4560,7 @@ function injectFactionParty(
   };
   const base = rollEncounter(scene.location).filter((e) => !e.boss && !specialTemplate(e));
   if (base.length === 0) return null;
-  // OTA-1058 — AND THE BODY IS A PERSON. Owner: "let's fix the loot drop issue
+  // OTA-1035 — AND THE BODY IS A PERSON. Owner: "let's fix the loot drop issue
   // where humans drop beast loot." The reskin above kept every trait of the WILD
   // roll, so a "Conspiracy Architects Patrol" could be a Mud Cyclops underneath —
   // dropping Raven Feather and Aether Wing off a man's corpse, burning like
@@ -4559,7 +4589,7 @@ function injectFactionParty(
   const power = scalePowerOf(player) + tide; // escalation: an ascendant faction hits harder
   const packDanger = scene.location.danger + Math.floor(tide / 2);
   let scaled = scaleEncounterForContext(party, packDanger, power);
-  // OTA-1139 — THE ELITE SWAP. The `elite` dial (OTA-1136) finally has a
+  // OTA-1116 — THE ELITE SWAP. The `elite` dial (OTA-1113) finally has a
   // consumer. On a hit, the party that would have crested the rise arrives as
   // ONE named body instead — the survey's CONTENT lever rather than another
   // multiplier, and the only one that makes a fight different instead of
@@ -4597,7 +4627,7 @@ function injectFactionParty(
       range: 'mid',
       enemyAmbushUsed: scaled.map(() => false),
       stealthOpenerUsed: false,
-      // OTA-983 — a party that crests the rise while you're UP a climb masses at
+      // OTA-960 — a party that crests the rise while you're UP a climb masses at
       // the BASE (drives the elevation combat gates); on level ground the
       // flag clears so a stale siege can't linger into the next fight.
       enemiesAtBase: !!st.currentScene.elevatedOn,
@@ -4606,7 +4636,7 @@ function injectFactionParty(
   return { elite: scaled.length === 1 && scaled[0]?.eliteReplaced ? scaled[0] : null };
 }
 
-// OTA-1039 — ARE YOU UNDER A ROOF? The three outdoor world-event spawners below each
+// OTA-1016 — ARE YOU UNDER A ROOF? The three outdoor world-event spawners below each
 // asked `player.hubRoomId` — which is ONLY set inside an OUTPOST room. Explorable
 // building interiors (a flooded house's kitchen, its study, its attic) live on the
 // STORE's activeBuildingId instead, so every one of these read "outdoors" while the
@@ -4615,7 +4645,7 @@ function injectFactionParty(
 // Architects war party "crests the rise" inside the study. Both narrations are
 // explicitly open-ground. One predicate now answers the question for all of them,
 // so a fourth spawner can't quietly get it wrong.
-/** OTA-1056 — who would actually send someone in after you: the faction you've
+/** OTA-1033 — who would actually send someone in after you: the faction you've
  *  wronged most. Excludes your own (your hosts don't raid their own hall) and
  *  ignores anyone you're square with — a break-in wants a motive. Null when no
  *  faction holds a grudge, and the caller uses the creature cast instead. */
@@ -4653,11 +4683,16 @@ function maybeSpawnRaid(
   if (scene.vendor) return;
   if (underRoof(s, player)) return;
   if (player.hpMax > 0 && player.hp / player.hpMax < 0.5) return;
+  // ⚠⚠ OTA-1272 — the doorstep grace holds the war party too. This was the
+  // FIFTH spawner found (a rival-faction raid two steps from the gate killed
+  // the probe run after the first four were gated); it consults the counter
+  // and does not burn it — the burn belongs to the movement paths.
+  if ((player.safeExitMovesLeft ?? 0) > 0) return;
   const hour = player.hoursElapsed ?? 0;
   const last = s.worldMemory.lastRaidHour;
   if (last !== undefined && hour - last < RAID_MIN_HOURS) return;
   if (Math.random() > RAID_TRIGGER_CHANCE) return;
-  // ⚠ OTA-1235 — SACRED GROUND HOLDS THE BLADE. Owner, after a war party killed
+  // ⚠ OTA-1212 — SACRED GROUND HOLDS THE BLADE. Owner, after a war party killed
   // Verbal at the Hidden Market: "sacred tartarian ground... like holy ground on
   // the Highlander and the Continental in John Wick." Checked AFTER the trigger
   // roll on purpose: the line below narrates only when a raid genuinely would
@@ -4686,7 +4721,7 @@ function maybeSpawnRaid(
   });
   if (!landed) return;
   set((st) => ({ worldMemory: { ...st.worldMemory, lastRaidHour: hour } }));
-  // OTA-1139 — if the elite swap fired, the headcount is no longer true. One
+  // OTA-1116 — if the elite swap fired, the headcount is no longer true. One
   // body gets its own arrival: the war party is what did NOT come.
   get().appendLog(
     'world',
@@ -4755,7 +4790,7 @@ function maybeInterceptPatrol(
 // into ANYWHERE, not just near its outpost (that's maybeInterceptPatrol). Checked at
 // the end of every action: if a hostile / bounty-target faction's patrol is within 2
 // tiles of the player, it engages. The patrol that engages is consumed into the fight.
-/** ⚠ OTA-1191 — THE ROAD BUILDS YOU UP, SLOWLY, AND FOREVER.
+/** ⚠ OTA-1168 — THE ROAD BUILDS YOU UP, SLOWLY, AND FOREVER.
  *
  *  Called from the per-action tail rather than hooked into movement, which is why it needs
  *  no changes to any of the five tile-crossing paths: it simply asks "is the cell I am
@@ -4804,7 +4839,7 @@ function tickRoadOdometer(
   );
 }
 
-/** ⚠ OTA-1189 — ARRIVING ON A CONTRACT'S GROUND PUTS THE QUARRY ON IT.
+/** ⚠ OTA-1166 — ARRIVING ON A CONTRACT'S GROUND PUTS THE QUARRY ON IT.
  *
  *  Called from both arrival paths. If the player's cell is a held bounty's target cell and
  *  that contract has not been seeded yet, three groups of the quarry are placed in
@@ -4859,7 +4894,7 @@ function maybeSeedQuarry(
           // a point the engine has no other reason to care about.
           homeX: home.x, homeY: home.y,
           phase: c.phase,
-          quarry: true, // OTA-1244 — exempt from the war-maintenance cull (see Patrol type)
+          quarry: true, // OTA-1221 — exempt from the war-maintenance cull (see Patrol type)
         })),
       ],
     } }));
@@ -4902,7 +4937,7 @@ function maybePatrolAmbush(
     return bountyTargets.has(p.factionId) || standing < 0;
   });
   if (!hostile) return;
-  // ⚠ OTA-1089 — PHASE 4 HOSTILE GROUND. Standing already moved and already
+  // ⚠ OTA-1066 — PHASE 4 HOSTILE GROUND. Standing already moved and already
   // threatened nothing; below HOSTILE_STANDING the people it belongs to start
   // FINDING you. This is a gate on an interception that was already going to
   // happen, not a new spawner: at 'salvage' the chance is 0 and the patrol
@@ -4910,7 +4945,7 @@ function maybePatrolAmbush(
   // so no combination of tier and standing can make a road impassable.
   // A bounty target is exempt — that is a contract the player took on purpose.
   if (!bountyTargets.has(hostile.factionId)) {
-    // ⚠ OTA-1179 — ROLL FOR *THIS* FACTION, NOT FOR YOUR WORST ENEMY ANYWHERE.
+    // ⚠ OTA-1156 — ROLL FOR *THIS* FACTION, NOT FOR YOUR WORST ENEMY ANYWHERE.
     //
     // `hostileHuntChance` reduces the array it is handed to its minimum, and this
     // used to hand it the WHOLE standing table. So the patrol qualified on its own
@@ -4919,7 +4954,7 @@ function maybePatrolAmbush(
     // Mud Monarchs and −1 with the Reclaimers, a Reclaimer patrol hunted you at the
     // Mud Monarchs' rate. The faction identity was dropped on the way in.
     //
-    // Passing the single row keeps the function and its OTA-1089 tests untouched —
+    // Passing the single row keeps the function and its OTA-1066 tests untouched —
     // the reduce over one row IS that faction's standing — and the `depth` ladder
     // now measures how badly THESE people want you, which is what it was written to
     // mean ("being loathed by one faction is worse than being disliked by four").
@@ -4934,7 +4969,7 @@ function maybePatrolAmbush(
   const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
   const name = factions.find((f) => f.id === hostile.factionId)?.name ?? hostile.factionId;
   const tide = Math.max(0, s.worldMemory.factionTides?.[hostile.factionId] ?? 0);
-  // ⚠ OTA-1136 — the tier's `pack` dial, both directions: 'salvage' shrinks a
+  // ⚠ OTA-1113 — the tier's `pack` dial, both directions: 'salvage' shrinks a
   // patrol, 'bury_me' grows it. scaledPackSize floors at 1 so no tier can
   // produce an empty party.
   const partySize = scaledPackSize(
@@ -4955,24 +4990,24 @@ function maybePatrolAmbush(
 // Milestone thresholds. Hit one of these counters and the character gets a
 // permanent stat bump. Numbers are intentionally generous so growth feels
 // earned, not handed out.
-// ⚠ OTA-1165 (owner tuning) — 5 → 3. The sim: one-round-death risk does not
+// ⚠ OTA-1142 (owner tuning) — 5 → 3. The sim: one-round-death risk does not
 // fall under 5% until ~28 max HP, and a fresh arrival has 24. This is the
 // cleanest "arrivals are too thin" lever — it touches zero enemies and pays
 // the player for playing. Travel milestone deliberately stays at 5.
-// ⚠ OTA-1182 — "every 3 enemies defeated" is what this comment used to say, and it
+// ⚠ OTA-1159 — "every 3 enemies defeated" is what this comment used to say, and it
 // is NOT what the code does. arb119 moved the gate to `firstOfType &&
 // checkMilestone(distinctKills, …)` so a respawnable enemy could not be farmed for
 // unbounded hpMax — and left this line describing the retired rule, which is how a
 // session came to tell the owner that grinding the same patrol builds HP. It does
 // not: your tenth Mud Skulker pays nothing. HP comes from VARIETY, not volume.
-// ⚠ OTA-1184 — the value MOVED to engine/hpBreakdown.ts and is imported at the top
+// ⚠ OTA-1161 — the value MOVED to engine/hpBreakdown.ts and is imported at the top
 // of this file. The character sheet now EXPLAINS the number using this constant, and
 // a threshold the sheet quotes while the store awards it must have exactly one home
-// — the same cleanup OTA-1179 #8 did for JOIN_THRESHOLD and OTA-1181 for
+// — the same cleanup OTA-1156 #8 did for JOIN_THRESHOLD and OTA-1158 for
 // BUY_REP_TC_PER_STANDING. // every 3 DISTINCT enemy types beaten → +1 HP max
 const MILESTONE_TRAVEL_STEP = 5;   // every 5 DISTINCT destinations → +1 stamina max
 
-/** ⚠ OTA-1191 — THE ROAD ITSELF BUILDS YOU UP, AND IT NEVER RUNS OUT.
+/** ⚠ OTA-1168 — THE ROAD ITSELF BUILDS YOU UP, AND IT NEVER RUNS OUT.
  *
  *  Owner: *"stamina should be able to be trained up but at a very slow rate… maybe just
  *  generically travel, and then if you run long enough you get in good shape."*
@@ -5012,7 +5047,7 @@ const ODOMETER_MEMORY = 8;   // recent cells that do not re-count; defeats short
  *  a saved "the last step was cardinal" would pay double on the next load. */
 let _lastStepWasCardinal = false;
 
-/** ⚠ OTA-1192 — the cell HP regen last ticked on. Module-scoped and transient: on a fresh
+/** ⚠ OTA-1169 — the cell HP regen last ticked on. Module-scoped and transient: on a fresh
  *  load it is null, and the FIRST action after load deliberately pays nothing (a null is
  *  treated as "no tile crossed"), so reloading can never be used to farm a regen tick. */
 let _lastRegenCell: string | null = null;
@@ -5062,7 +5097,7 @@ function debugLoadout(player: PlayerCharacter): string {
 // match the zone's danger tier?). Routed to `[debug]` (log/bug-report only).
 function debugEnemy(e: Record<string, unknown>): string {
   const g = (k: string) => (e[k] ?? '?');
-  // OTA-758 — AC and 'danger' are NOT stored on enemy records: AC is derived from
+  // OTA-739 — AC and 'danger' are NOT stored on enemy records: AC is derived from
   // `abilityPoint` at combat time (5 + AP, clamped) and 'danger' was never a field,
   // so both printed as a placeholder '?'. Compute the real AC the attack paths use
   // and surface the parsed ability-point (`ap`) as the actual threat number.
@@ -5080,7 +5115,7 @@ function effectiveStaminaMax(player: PlayerCharacter): number {
   // mechanic whose ONLY effect was shrinking this cap; food already tops off HP and
   // water already tops off stamina, so it just added invisible friction. The usable
   // stamina cap is now simply staminaMax.
-  // ⚠ OTA-1141 FINISHED THE JOB. The removal left the mechanic dead but its
+  // ⚠ OTA-1118 FINISHED THE JOB. The removal left the mechanic dead but its
   // carcass in place: three player-facing lines behind `penalty > 0` that could
   // never print again (a rest refusal, a rest result, a drink result), a
   // heartbeat ledger entry and an "eat something soon" warning behind hardcoded
@@ -5168,21 +5203,21 @@ function arbiterAddress(player: PlayerCharacter | null | undefined, fallback: st
   return fallback;
 }
 
-/** OTA-1078 — moved to app/engine/npcMemory.ts (vendorLedgerId); re-exported
+/** OTA-1055 — moved to app/engine/npcMemory.ts (vendorLedgerId); re-exported
  *  here under the store's original name so every call site and the test seam
  *  keep working. Ledger identity is npcMemory's subject, and keeping the rule
  *  private to the store is what let the tests drift onto a copy of it. */
 export const vendorNpcId = vendorLedgerId;
 
-/** OTA-1078 — THE ONE WAY A VENDOR ENTERS THE LEDGER.
+/** OTA-1055 — THE ONE WAY A VENDOR ENTERS THE LEDGER.
  *
  *  ⚠ I FIRST WROTE "three separate places" HERE AND IT WAS WRONG. There are
  *  FIVE, and my first pass wired three of them — publishing a docblock that
  *  claimed the hole was closed while two sites still had it. Counting the
  *  places a thing happens is the whole job in this file; asserting the count
- *  without grepping for it is how OTA-1072, OTA-1075 and this OTA all shipped
+ *  without grepping for it is how OTA-1049, OTA-1052 and this OTA all shipped
  *  the same class of defect. All five now go through here:
- *    - beginScene (the only one OTA-1072 wired).
+ *    - beginScene (the only one OTA-1049 wired).
  *    - patchSceneForBuildingRoom (the four Hidden Market stalls) — and NOTHING
  *      else can mint a `hidden_market_*` id, so those stalls had no relation at
  *      all. Every ledger write against them was a no-op: a caught theft there
@@ -5194,7 +5229,7 @@ export const vendorNpcId = vendorLedgerId;
  *    - the elevated-overlay trader, found on a climbed tier.
  *    - the `spawn_vendor` hook effect (the campfire Reclaimer), which carries a
  *      faction AND takes contracts, so it dropped contractsTaken as well.
- *  Same shape as the OTA-1075 Guardian gap: a pattern applied at some sites out
+ *  Same shape as the OTA-1052 Guardian gap: a pattern applied at some sites out
  *  of several. Funnelled through one helper so the next vendor source cannot
  *  half-copy it — and the test asserts the count against the source, so a sixth
  *  site cannot be added silently. */
@@ -5203,11 +5238,11 @@ function sightVendor(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   vendor: { id?: string; name: string; title?: string; faction?: string | null },
   locationId: string | undefined,
-  /** OTA-1078 — say the greeting too, for callers that have nowhere else to say
+  /** OTA-1055 — say the greeting too, for callers that have nowhere else to say
    *  it. beginScene composes its own (it also owns the first-meeting arrival
    *  narration), but the stall and roadside paths had NO greeting emitter at
    *  all — so wiring the sighting alone made them advance `prevSeenHours`
-   *  SILENTLY, which consumed the absence anchor OTA-1075 exists to protect: a
+   *  SILENTLY, which consumed the absence anchor OTA-1052 exists to protect: a
    *  trader you had not seen in a hundred hours got recorded on a travel step
    *  and then had nothing to say about it at the next real encounter. A
    *  sighting that nobody speaks for is worse than no sighting. */
@@ -5232,7 +5267,7 @@ function sightVendor(
   if (greet) emitVendorGreeting(get, set, vendor);
 }
 
-/** OTA-1084 — hand over whatever a topic promised. Information and coin only:
+/** OTA-1061 — hand over whatever a topic promised. Information and coin only:
  *  see TopicGrant for why standing is deliberately absent. */
 function applyTopicGrant(
   get: () => GameStore,
@@ -5242,7 +5277,7 @@ function applyTopicGrant(
 ): boolean {
   const player = get().player;
   if (!player) return false;
-  // ⚠ OTA-1087 — the return value is "did this land". See the lead branch.
+  // ⚠ OTA-1064 — the return value is "did this land". See the lead branch.
   let deferred = false;
   let deliveredSomething = false;
 
@@ -5251,7 +5286,7 @@ function applyTopicGrant(
     // overwriting an unclaimed one would quietly delete something the player
     // was told. They keep the one they have.
     if (player.pendingLead) {
-      // ⚠ OTA-1087 — AND THE TOPIC IS NOT SPENT, so the tip really does keep.
+      // ⚠ OTA-1064 — AND THE TOPIC IS NOT SPENT, so the tip really does keep.
       // Before this the caller incremented talkedTopics regardless, so the
       // grant was fire-once and this branch threw the lead away while printing
       // a sentence promising it had not. A gated topic behind 'familiar' plus a
@@ -5308,7 +5343,7 @@ function applyTopicGrant(
   return !(deferred && !deliveredSomething);
 }
 
-/** ⚠ OTA-1087 — HOSTILITY COSTS FACTION STANDING ONCE PER PERSON.
+/** ⚠ OTA-1064 — HOSTILITY COSTS FACTION STANDING ONCE PER PERSON.
  *
  *  THE EXPLOIT THIS CLOSES. applyRepChange propagates half of any delta to the
  *  target faction's RIVALS with the sign flipped, so every standing loss is a
@@ -5319,7 +5354,7 @@ function applyTopicGrant(
  *       deliberately NOT consumed, so offering the same bent nail costs nothing
  *       but a tap: -2 to them, +1 to each of their rivals, forever.
  *    2. Beating a vendor into submission. -12 to them, +6 to each rival, and
- *       the vendor is anchored to the room (OTA-1052) — walk back in and again.
+ *       the vendor is anchored to the room (OTA-1029) — walk back in and again.
  *
  *  THE RULE. The largest hit already taken for this person is remembered as a
  *  magnitude. A heavier act tops up the difference; a repeat of the same or a
@@ -5343,7 +5378,7 @@ function dockHostileStanding(
   const already = rel?.standingDocked ?? 0;
   const applied = Math.max(0, magnitude - already);
   if (applied <= 0) return 0;
-  // ⚠ OTA-1179 — RESOLVE, APPLY, CONFIRM, *THEN* STAMP THE LEDGER.
+  // ⚠ OTA-1156 — RESOLVE, APPLY, CONFIRM, *THEN* STAMP THE LEDGER.
   //
   // The order used to be: stamp the one-dock ledger, then apply, then return
   // `applied` as if it had. `applyRepChange` no-ops silently on an id it does not
@@ -5383,7 +5418,7 @@ function dockHostileStanding(
   return applied;
 }
 
-/** OTA-1178 — the screen a gift began on, which is where the GIVE returns you.
+/** OTA-1155 — the screen a gift began on, which is where the GIVE returns you.
  *
  *  ⚠ THE `'inventory'` CLAUSE IS THE WHOLE POINT. Gift mode's one job is to send
  *  you INTO the pack, so if the mode were ever entered while the pack was already
@@ -5395,7 +5430,7 @@ function giftReturnScreen(s: GameStore): ScreenName {
   return s.currentScreen === 'inventory' ? 'exploration' : s.currentScreen;
 }
 
-/** OTA-1083 — a gift's standing effect, applied to the recipient's faction.
+/** OTA-1060 — a gift's standing effect, applied to the recipient's faction.
  *  Factored out because the refused path needs it too and duplicating an
  *  applyRepChange call is how the two drift. */
 function applyGiftStanding(
@@ -5405,7 +5440,7 @@ function applyGiftStanding(
   delta: number,
 ): void {
   const rel = getRelation(get().worldMemory, npcId);
-  // ⚠ OTA-1178 — THE ID HAS TO BE REAL BEFORE WE SPEND ANYTHING AGAINST IT.
+  // ⚠ OTA-1155 — THE ID HAS TO BE REAL BEFORE WE SPEND ANYTHING AGAINST IT.
   // `applyRepChange` returns an untouched array for an id it does not recognise —
   // a SILENT no-op — while everything below it logged "Standing +2" and debited
   // the lifetime gift budget regardless. The owner handed Odar Flameforge a Rare
@@ -5427,7 +5462,7 @@ function applyGiftStanding(
   // Gains are metered against a LIFETIME per-faction budget; losses are not,
   // because an insult should always land and a capped insult would let a player
   // be rude for free once the budget was spent.
-  // ⚠ OTA-1087 — a NEGATIVE gift delta is an insult, and an insult is free to
+  // ⚠ OTA-1064 — a NEGATIVE gift delta is an insult, and an insult is free to
   // repeat (the item is refused, not consumed). Route it through the one-dock
   // rule so it cannot be farmed for rival standing. See dockHostileStanding.
   if (delta < 0) {
@@ -5447,7 +5482,7 @@ function applyGiftStanding(
       },
     }));
   }
-  // ⚠ OTA-1179 — SHOW THE CASCADE. This printed one hand-rolled line for the named
+  // ⚠ OTA-1156 — SHOW THE CASCADE. This printed one hand-rolled line for the named
   // faction and never called logRepChanges, so the ±half that `applyRepChange` sends
   // to every ally and rival was completely invisible: you gifted the Forgotten Order,
   // read "+5 Forgotten Order", and never learned you had just taken −2 with the Mud
@@ -5466,7 +5501,7 @@ function applyGiftStanding(
   logRepChanges(get, giftChanges);
 }
 
-/** OTA-1081 — everything the topic gates need, gathered here so engine/dialogue
+/** OTA-1058 — everything the topic gates need, gathered here so engine/dialogue
  *  stays free of store and save-shape knowledge. This is the first feature that
  *  reads the Phase 1 ledger for something the PLAYER chooses rather than
  *  something that happens at them. */
@@ -5485,22 +5520,22 @@ function talkContextFor(
       : 0,
     titles: player?.earnedTitles ?? [],
     hasRecentRaidNews: !!raidNewsFor(get().worldMemory, rel, player?.hoursElapsed ?? 0),
-    // OTA-1082 — the fifth gate dimension. Defaults to the opening phase for a
+    // OTA-1059 — the fifth gate dimension. Defaults to the opening phase for a
     // character who has not touched the main quest, so a missing mainQuest
     // block reads as "the very beginning" rather than unlocking everything.
     chapter: player?.mainQuest?.phase ?? 'hook',
     cores: player?.mainQuest?.coresRecovered?.length ?? 0,
-    // OTA-1088 — the third place a Phase 3 decision lands: the cast can gate a
+    // OTA-1065 — the third place a Phase 3 decision lands: the cast can gate a
     // topic on what you chose, so the world knows and says so.
     choices: player ? choiceKeys(player) : [],
-    // OTA-1113 — the two new gate roads: gifts they LOVED (honoring who they
+    // OTA-1090 — the two new gate roads: gifts they LOVED (honoring who they
     // are) and pocket-loss mumbles delivered (the thief's-only door).
     lovedGifts: rel?.lovedGifts ?? 0,
     pocketsMumbled: rel?.pocketsMumbled ?? 0,
   };
 }
 
-/** ⚠ OTA-1089 — SAY IT OUT LOUD WHEN THE TIDE TURNS OVER.
+/** ⚠ OTA-1066 — SAY IT OUT LOUD WHEN THE TIDE TURNS OVER.
  *
  *  The plan's warning about Phase 4 is that overtuned pressure punishes. The
  *  quieter half of that failure is pressure the player cannot SEE: prices creep
@@ -5527,7 +5562,7 @@ function announceTide(
   return true;
 }
 
-/** ⚠ OTA-1090 — PHASE 5: SAY THE THING HE OWES YOU, IF HE OWES YOU ONE.
+/** ⚠ OTA-1067 — PHASE 5: SAY THE THING HE OWES YOU, IF HE OWES YOU ONE.
  *
  *  The Arbiter's arc and his opinion are derived (arbiterPersona.ts reads the
  *  save and answers); this is the only place either becomes a LINE, and it is
@@ -5560,7 +5595,7 @@ function announceArbiterBeat(
   });
 }
 
-/** ⚠ OTA-1088 — RAISE THE OPEN QUESTION, IF THERE IS ONE.
+/** ⚠ OTA-1065 — RAISE THE OPEN QUESTION, IF THERE IS ONE.
  *
  *  Called at every point the story could have moved. Idempotent and
  *  cheap: `dueFork` is a pure read of the save, so calling this twice, or
@@ -5614,12 +5649,12 @@ function applyForkEffects(
     get().appendLog('reward', `✦ ${keep.name}`);
   }
   if (fx.standing) {
-    // ⚠ ONE-SHOT BY CONSTRUCTION. OTA-1087 closed two rival-standing farms
+    // ⚠ ONE-SHOT BY CONSTRUCTION. OTA-1064 closed two rival-standing farms
     // built out of repeatable acts; this is safe for the opposite reason
     // rather than by a guard — a fork can only ever be answered once, so this
     // line can only ever run once per character, ever.
-    // ⚠ OTA-1179 — REPORT WHAT LANDED, NOT WHAT WAS AUTHORED. This was the closest
-    // structural twin of the gift bug OTA-1178 fixed: bare `.standing`, `changed`
+    // ⚠ OTA-1156 — REPORT WHAT LANDED, NOT WHAT WAS AUTHORED. This was the closest
+    // structural twin of the gift bug OTA-1155 fixed: bare `.standing`, `changed`
     // thrown away, the log line printed unconditionally, and the RAW UNDERSCORED ID
     // shown to the player. A fork aimed at a faction already pinned at REP_MAX
     // printed a reward that did not exist, and the ally/rival spillover — which for
@@ -5643,10 +5678,10 @@ function applyForkEffects(
   }
 }
 
-/** OTA-1087 — EVERYBODY IN THIS SCENE WORTH TALKING TO, DERIVED ONCE.
+/** OTA-1064 — EVERYBODY IN THIS SCENE WORTH TALKING TO, DERIVED ONCE.
  *
  *  ⚠ THIS EXISTS BECAUSE THE ANSWER WAS BEING COMPUTED THREE DIFFERENT WAYS AND
- *  TWO OF THEM WERE WRONG. OTA-1085 authored 44 topics for the procedural cast
+ *  TWO OF THEM WERE WRONG. OTA-1062 authored 44 topics for the procedural cast
  *  and widened `talkToNpc` to reach them — but the two places that DECIDE
  *  whether to call it (the TALK chip and the `talk to <name>` router) both
  *  asked `hasTopicsFor(vendor.id)` with the RAW spawn id. A roadside trader's
@@ -5665,7 +5700,7 @@ export interface TalkablePerson {
   role?: string | null;
 }
 
-/** OTA-1101 — the caught-red-handed consequences, extracted verbatim from
+/** OTA-1078 — the caught-red-handed consequences, extracted verbatim from
  *  stealFromVendor's CAUGHT branch so pickpocketPerson shares them instead of
  *  duplicating: rep cascade against host + guest factions, the vendor flips
  *  into a real fight (vendorInFight preserved), the memorable event, and the
@@ -5711,7 +5746,7 @@ function vendorCatchesThief(
           currentScene: {
             ...s.currentScene,
             vendor: null,
-            // OTA-1079 — but not gone. See CurrentScene.vendorInFight.
+            // OTA-1056 — but not gone. See CurrentScene.vendorInFight.
             vendorInFight: vendor,
             ...FRESH_ENEMY_ARRAYS,
             enemies: [enemy],
@@ -5739,7 +5774,7 @@ function vendorCatchesThief(
     text: `were caught stealing from ${vendor.name}`,
     factionId: vendorFaction ?? undefined,
   });
-  // OTA-1072 — deliberately on the CAUGHT branch only. A theft they never
+  // OTA-1049 — deliberately on the CAUGHT branch only. A theft they never
   // noticed cannot change how they greet you; the ledger records what the
   // NPC knows, not what the player did. Getting away clean means getting
   // away clean, and getting caught follows you back to that stall forever.
@@ -5761,7 +5796,7 @@ function talkablePeople(get: () => GameStore): TalkablePerson[] {
       people.push({ id: vendorNpcId({ id: `escort_${leader}`, name: leader }), name: leader, role: 'escort leader' });
     }
   }
-  // ⚠ OTA-1087 — A CORE GUARDIAN IS THE ONLY TALKABLE PERSON WHO IS ALSO AN
+  // ⚠ OTA-1064 — A CORE GUARDIAN IS THE ONLY TALKABLE PERSON WHO IS ALSO AN
   // ENEMY, which is exactly why its authored voice sat unreachable: every route
   // into the conversation required an empty scene. It does NOT become
   // parley-able — `isTalkDownBlocked` still refuses, because you cannot
@@ -5795,7 +5830,7 @@ function namesSomeoneElse(get: () => GameStore, input: string, excludeId: string
   return !!hit && hasTopicsFor(hit.id);
 }
 
-// ── OTA-1086 — THE FLOURISH SLOT ───────────────────────────────────────────
+// ── OTA-1063 — THE FLOURISH SLOT ───────────────────────────────────────────
 //
 // ⚠ ONE SLOT, NOT A QUEUE, AND NOTHING EVER AWAITS IT. This is the entire
 // mechanism by which the local narrator gets to contribute to a conversation
@@ -5816,7 +5851,7 @@ let flourishGenStartMs = 0;
  *  free to the exchange but not free to the device. */
 const FLOURISH_GEN_COOLDOWN_MS = 45_000;
 
-/** OTA-1086 test seams. The slot is module state on purpose (it must not
+/** OTA-1063 test seams. The slot is module state on purpose (it must not
  *  persist), which leaves a test no other way to reach it. */
 export function _resetFlourishForTest(): void {
   flourishSlot = null;
@@ -5923,7 +5958,7 @@ async function prefetchFlourish(
   }
 }
 
-/** OTA-1080 — LEDGER COVERAGE FOR PEOPLE WHO ARE NOT BEHIND A COUNTER.
+/** OTA-1057 — LEDGER COVERAGE FOR PEOPLE WHO ARE NOT BEHIND A COUNTER.
  *
  *  Phase 1 built a per-person ledger and then wired it to vendors and Core
  *  Guardians only, so the two populations the player actually TALKS to were
@@ -5953,7 +5988,7 @@ function sightPerson(
   }));
 }
 
-/** OTA-1078 — the greeting block, lifted out of beginScene so the other vendor
+/** OTA-1055 — the greeting block, lifted out of beginScene so the other vendor
  *  paths can say it too. beginScene keeps its own copy because it interleaves
  *  the first-meeting arrival narration; everything here is the returning-face
  *  half, in the same order and with the same gates. */
@@ -5973,7 +6008,7 @@ function emitVendorGreeting(
   const raid = raidNewsFor(get().worldMemory, rel, hours);
   if (raid) {
     get().appendLog('world', raidNewsLine(rel, raid, vendor.name, player.name));
-    // OTA-1109 — told ONCE. Stamp the raid delivered on the relation; the
+    // OTA-1086 — told ONCE. Stamp the raid delivered on the relation; the
     // old "since they last saw you" gate never advanced across quick
     // room-hops, so Tarek re-told the same sacking on four straight visits.
     set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, rel.id, { raidHeardAtHours: raid.atHours }) }));
@@ -5982,8 +6017,7 @@ function emitVendorGreeting(
   if (talkAbout) get().appendLog('world', gossipLine(vendor.name, talkAbout, player.name));
 }
 
-
-/** OTA-1079 — THE VENDOR YIELDS.
+/** OTA-1056 — THE VENDOR YIELDS.
  *
  *  Owner's design call, and it closes the last open piece of Phase 1: vendors
  *  never die. You win the fight or you lose it; either way they are still there
@@ -6003,7 +6037,7 @@ function emitVendorGreeting(
  *      their stock away and goes.
  *    - it goes on their PERSONAL ledger as a wrong, so it shows in the Chronicle,
  *      drops them to `wronged`, and prices everything they sell you at +25%
- *      until you have made it good (OTA-1076's amends: 600 TC per wrong). There
+ *      until you have made it good (OTA-1053's amends: 600 TC per wrong). There
  *      is a road back, which is the point of putting it on the ledger rather
  *      than making it permanent.
  *    - faction standing takes the second hit here, where the kill used to take
@@ -6033,7 +6067,7 @@ function resolveVendorSubmission(
   );
 
   // Standing: the second hit, where the kill used to take it.
-  // ⚠ OTA-1087 — ONCE PER PERSON. The vendor is anchored to the room, so before
+  // ⚠ OTA-1064 — ONCE PER PERSON. The vendor is anchored to the room, so before
   // this the loop was: walk in, put them on their knees, take -12 with their
   // faction and +6 with every rival of it, walk out, walk back in, repeat. The
   // punishment was a reward generator. See dockHostileStanding.
@@ -6054,7 +6088,7 @@ function resolveVendorSubmission(
 
   set((st) => ({
     // The person, on their own ledger. recordNpcDealing no-ops without a
-    // relation, and every install path sights the vendor first (OTA-1078), so
+    // relation, and every install path sights the vendor first (OTA-1055), so
     // by the time anyone can steal from them the row exists.
     worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(vendor), { wrongs: 1 }),
     ...(st.currentScene ? {
@@ -6081,7 +6115,7 @@ function resolveVendorSubmission(
   void get().persist();
 }
 
-/** ⚠⚠ OTA-1210 (PUNCHLIST P8) — WHO CAN TAKE A CONTRACT HERE.
+/** ⚠⚠ OTA-1187 (PUNCHLIST P8) — WHO CAN TAKE A CONTRACT HERE.
  *
  *  `turnInFactionQuest` has accepted a same-faction VENDOR, the OUTPOST MISSION BOARD
  *  (OTA-451) or the faction's own HALL (OTA-617) since those OTAs shipped. The other three
@@ -6101,12 +6135,12 @@ function turnInCounterparty(
 ): { faction: string | null; name: string; vendorPresent: boolean } | null {
   const v = scene?.vendor;
   if (v) {
-    // ⚠⚠ OTA-1224 (PUNCHLIST P9) — AT AN OWNED SITE, THE PEOPLE ANSWER FOR THE HOST.
+    // ⚠⚠ OTA-1201 (PUNCHLIST P9) — AT AN OWNED SITE, THE PEOPLE ANSWER FOR THE HOST.
     // Owner's ruling: *"keep the grab like it is … make handin specific."* The hub anchors
     // used to take work for whatever faction THEY carried — Irma re-pointed to the
     // player's, Tarek a Reclaimer everywhere, Jorah Forgotten Order everywhere — so
     // hand-ins never cared whose ground you stood on. Now the counterparty a hub anchor
-    // answers for is the SITE OWNER (OTA-1209's `hubOwnerFaction`, the map that already
+    // answers for is the SITE OWNER (OTA-1186's `hubOwnerFaction`, the map that already
     // drives the room skins): host work is taken face to face at 100%, and anything else
     // goes through the paid fallbacks (Halem 80% at this very gate, market 90%,
     // courier 75%).
@@ -6148,7 +6182,7 @@ function turnInCounterparty(
   return null;
 }
 
-/** OTA-1073 — credit a finished contract to the person who took it back.
+/** OTA-1050 — credit a finished contract to the person who took it back.
  *
  *  Called from the five announceMissionComplete sites rather than from inside
  *  announceMissionComplete itself, because only the caller knows whether the
@@ -6172,7 +6206,7 @@ function creditTurnIn(
 function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
   const oldHours = player.hoursElapsed ?? 0;
   const newHours = oldHours + hours;
-  // OTA-1141 — the 8-hour hunger bucket is gone with the mechanic. It used to
+  // OTA-1118 — the 8-hour hunger bucket is gone with the mechanic. It used to
   // compute a tick count here and write a penalty onto every player object that
   // passed through; both were dead the moment effectiveStaminaMax stopped
   // reading the field, and advanceTime is called on every action in the game.
@@ -6223,7 +6257,7 @@ function playerGridCell(player: PlayerCharacter): { x: number; y: number } {
   };
 }
 
-/** ⚠ OTA-1210 (PUNCHLIST P7) — stamp WHERE the player stood when they took the contract,
+/** ⚠ OTA-1187 (PUNCHLIST P7) — stamp WHERE the player stood when they took the contract,
  *  so the long-haul bonus can price the trip they actually made instead of the remoteness
  *  of wherever they happened to hand it in.
  *
@@ -6277,7 +6311,11 @@ function restoreStamina(player: PlayerCharacter, amount: number): PlayerCharacte
 // (broken chest plate), and the eventual note that points at the
 // Aetheric Cores. Each entry resolves to a pre-stamped InventoryItem
 // when the tutorial state machine grants it.
-type TutorialPropId = 'cudgel' | 'rope' | 'chestPlate' | 'note';
+// ⚠ OTA-1248 — `vest` added. Owner: *"we should also have them equip a piece of
+// updated armor."* The cudgel AUTO-equips (grantTutorialItem below), so nothing in
+// the tutorial ever taught the equip step — a player finished it having never
+// opened their pack. The vest deliberately does NOT auto-equip.
+type TutorialPropId = 'cudgel' | 'rope' | 'chestPlate' | 'note' | 'vest';
 
 function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
   switch (id) {
@@ -6317,6 +6355,18 @@ function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
         tags: ['armor', 'broken', 'plate', 'metal', 'fiber'],
         description: 'A rusted breastplate, snapped across the shoulder strap. The plate itself is salvageable for the metal.',
       });
+    case 'vest':
+      // ⚠ A REAL catalog piece (armor.json, chest, +1 AC), not a bespoke prop — so
+      // the picker's ★ BETTER mark computes honestly against the empty chest slot
+      // and the beat can point at a mark the player is actually looking at.
+      return stampDurability({
+        id: freshInstanceId('tutorial_vest'),
+        name: "Mud-Warden's Vest",
+        kind: 'armor',
+        rarity: 'Common',
+        quantity: 1,
+        tags: ['armor'],
+      } as InventoryItem);
     case 'note':
       return {
         id: freshInstanceId('tutorial_note'),
@@ -6330,31 +6380,57 @@ function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
   }
 }
 
+// ⚠⚠ OTA-1254 — RETURNS THE SLOT IT READIED, OR NULL, BECAUSE THE CALLER NARRATES
+// THE RESULT. It used to return void and the cudgel beat printed "[equipped]"
+// unconditionally — see the intercept for the measurement.
 function grantTutorialItem(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   id: TutorialPropId,
-): void {
+): EquipSlot | null {
   const player = get().player;
-  if (!player) return;
-  if (get().tutorialPropsConsumed[id]) return;
+  if (!player) return null;
+  if (get().tutorialPropsConsumed[id]) return null;
   const item = makeTutorialItem(id);
-  if (!item) return;
+  if (!item) return null;
+  // ⚠⚠ OTA-1254 — THE OLD GUARD WAS A NAME CHECK ON A TAG CONCEPT, AND IT NEVER
+  // FIRED ONCE. It substring-matched the equipped weapon's NAME against the word
+  // barehand — but the barehanded starter is called "Mud-fist Wraps", and
+  // barehanded is a TAG, not part of any name. Measured against RACE_PRIMARY: not one of the seven starting weapons
+  // (Mud-fist Wraps, Rusted Blade, Tartarian Spear, Pyric Wand) contains that
+  // substring, so the branch was unreachable for EVERY race since it was written —
+  // while the beat announced "[equipped]" to all of them.
+  //
+  // ⚠ AND FIVE OF THE SEVEN SHOULD HAVE GOT IT: the Cudgel is 1d8, against Rusted
+  // Blade 1d6 and Pyric Wand 1d6. Only the Spear (2d6) and the Wraps (1d10) out-hit
+  // it — and since OTA-1252 those two ready it in the EMPTY OFF HAND instead, which
+  // every race starts with, so the beat's promise ("you'll want a weapon") now holds
+  // for all seven without ever downgrading anyone.
+  //
+  // ⚠ ONE COMPARISON, SHARED WITH THE PICKER'S ★. A second opinion about what
+  // counts as better is how the mark and the behaviour drift apart.
+  const readied = id === 'cudgel' && isUpgradeOverEquipped(player, 'Cudgel')
+    ? upgradeEquipSlot(player, 'Cudgel')
+    : null;
   set((s) => {
     if (!s.player) return {};
     // Add to inventory + mark consumed.
     const inventory = [...s.player.inventory, item];
-    let equipped = s.player.equipped;
-    // Auto-equip the cudgel to weapon slot if the player has nothing
-    // better there. Keeps the post-tutorial player combat-ready.
-    if (id === 'cudgel' && (!equipped?.main || equipped.main.includes('barehand'))) {
-      equipped = { ...(equipped ?? {}), main: 'Cudgel' };
-    }
+    const equipped = readied
+      ? {
+        ...(s.player.equipped ?? {}),
+        [readied.slot]: readied.name,
+        // ⚠ The id too — the old line set the NAME alone, so the slot pointed at
+        // "first item called Cudgel" rather than the instance just granted.
+        [SLOT_ID_KEY[readied.slot]]: item.id,
+      }
+      : s.player.equipped;
     return {
       player: { ...s.player, inventory, equipped },
       tutorialPropsConsumed: { ...s.tutorialPropsConsumed, [id]: true },
     };
   });
+  return readied?.slot ?? null;
 }
 
 // arb25 — patch the live scene to reflect a building room: its interactables
@@ -6385,7 +6461,7 @@ function patchSceneForBuildingRoom(
   const stallVendor = room.stallCategory
     ? buildStallVendor(room.stallCategory, room.shortName)
     : null;
-  // OTA-674 — key this building room's consumed-noun state by a STABLE per-room
+  // OTA-659 — key this building room's consumed-noun state by a STABLE per-room
   // identity ("building:<buildingId>:<roomId>") stamped onto the scene's
   // microMicroId, NOT the volatile outdoor micro-micro. The outdoor micro-micro
   // re-rolls whenever the tile's scene rebuilds after a save→exit→reload (building
@@ -6415,6 +6491,12 @@ function patchSceneForBuildingRoom(
         microMicroId: buildingRoomMicroId,
         ambientNouns: nouns,
         displayedAmbientNouns: nouns,
+        // ⚠ OTA-1244 — a building interior replaces the pool wholesale, so the
+        // outdoor tile's pins describe nouns that are not here. They would be
+        // filtered out harmlessly (pins only apply to nouns still in the pool),
+        // but leaving a stale list on the scene is how the next reader gets it
+        // wrong. Indoors shows every interactable anyway — no window to protect.
+        pinnedAmbientNouns: [],
         transitArea: `${b.name} · ${room.shortName}`,
         // Indoors is peaceful — clear any wilderness combat / hooks.
         ...FRESH_ENEMY_ARRAYS,
@@ -6427,7 +6509,7 @@ function patchSceneForBuildingRoom(
       },
     };
   });
-  // OTA-1078 — SIGHT THE STALL REP. This install path never recorded the
+  // OTA-1055 — SIGHT THE STALL REP. This install path never recorded the
   // meeting, and nothing else can mint a `hidden_market_*` id, so these four
   // stalls had NO relation at all — every ledger write against them silently
   // no-opped. A caught theft at the Hidden Market cost nothing, permanently,
@@ -6504,7 +6586,7 @@ function applyAetherkinReverenceDelta(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   delta: number,
-  // OTA-1038 — factions the SAME event already moved. One kill must cost a faction
+  // OTA-1015 — factions the SAME event already moved. One kill must cost a faction
   // once. When an Aetherkin carries a faction (see injectFactionParty), the
   // faction-kill penalty already docked it; without this exclusion the reverence
   // pass docked it a second time — a measured −6 for one kill where every other
@@ -6629,12 +6711,12 @@ interface GameStore {
    *  stretch pulls combat back into the rotation. Persisted alongside
    *  wastelandStepsSinceEncounter for consistency. */
   stepsSinceCombat: number;
-  /** RETIRED OTA-1111 (was OTA-197) — the resist swap-nudge now keys off
+  /** RETIRED OTA-1088 (was OTA-197) — the resist swap-nudge now keys off
    *  CurrentScene.resistWear (the same per-scene counter the guard-crack
    *  reads), so combat no longer writes this field. Kept so legacy saves
    *  and state snapshots that carry it still load cleanly. */
   weaponResistStreak: { enemyName: string; damageType: string; count: number } | null;
-  /** OTA-959 — once-per-encounter latch for the combat legibility cues (soak praise / leak
+  /** OTA-936 — once-per-encounter latch for the combat legibility cues (soak praise / leak
    *  warning — see engine/combatCues). Keyed by the fight's tile so each encounter gets
    *  each cue at most once; a new fight re-arms them. Not persisted. */
   combatCues: { key: string; soak: boolean; leak: boolean } | null;
@@ -6689,6 +6771,8 @@ interface GameStore {
     rope: boolean;
     chestPlate: boolean;
     note: boolean;
+    /** ⚠ OTA-1248 — optional so saves written before this OTA still load. */
+    vest?: boolean;
   };
   /** Tungsten Spire — `maybeAdvanceTutorial(beatId)` advances the
    *  tutorial only if the current beat matches. Used by action
@@ -6730,17 +6814,17 @@ interface GameStore {
   qwenModelId: string;
   partialArbiterText: string | null;
   isGenerating: boolean;
-  /** ⚠ OTA-1149 — WHEN THE PLAYER STOPPED NEEDING THE ENGINE. Stamped by the
+  /** ⚠ OTA-1126 — WHEN THE PLAYER STOPPED NEEDING THE ENGINE. Stamped by the
    *  screens the owner nominated as homework windows — menu, inventory, map —
    *  where "you're reading, not waiting on the engine". Null everywhere else,
    *  and null is the safe value: no stamp, no homework. Cleared the instant an
    *  action is submitted, so a player who taps mid-generation is already out
    *  of the idle window before the next tick looks. */
   uiIdleSince: number | null;
-  /** OTA-1149 — screens call this on focus/blur. Idempotent; passing true
+  /** OTA-1126 — screens call this on focus/blur. Idempotent; passing true
    *  twice keeps the ORIGINAL stamp so the dwell measures real idle time. */
   markUiIdle: (idle: boolean) => void;
-  /** ⚠ OTA-1152 — WHEN THE PLAYER LAST DID ANYTHING. The other idle signal, and
+  /** ⚠ OTA-1129 — WHEN THE PLAYER LAST DID ANYTHING. The other idle signal, and
    *  the one the scene-intro bank needs: `uiIdleSince` only fires on stationary
    *  screens, which is precisely where a scene intro is NOT wanted. Standing in
    *  a room for six seconds without typing is reading time, and reading time is
@@ -6805,22 +6889,23 @@ interface GameStore {
    *  Used by the TAKE quick-action chip modal so the player gets
    *  100% certainty their tap lands the thing in their pack. */
   takeAmbientNoun: (noun: string) => void;
-  /** Stealth variant of takeAmbientNoun — pickpocket / sleight of
-   *  hand. When a vendor is present, routes to stealFromVendor for
-   *  real theft. Otherwise rolls DEX vs DC 10 against the ambient
-   *  noun; success grants the catalog item silently AND marks
-   *  consumed; failure narrates the slip and leaves the noun on
-   *  the board for a normal take or another attempt. */
-  stealthTakeAmbientNoun: (noun: string) => void;
-  /** OTA-1101 — pickpocket a PERSON in the scene (vendor or wanderer) for
+  /** ⚠⚠ OTA-1239 — `stealthTakeAmbientNoun` WAS HERE AND IS GONE. It existed only
+   *  to serve the loot picker's stealth toggle, which the owner asked about twice
+   *  and which is now removed. Its work is covered by two live paths that were
+   *  always the better doors: PICKPOCKET (`pickpocketPerson`) for what is on a
+   *  PERSON, and the `steal` verb — nine synonyms — for things on tables and the
+   *  ground. ⚠ Its day/night cover bonus was NOT dropped with it; it moved onto the
+   *  `steal` case, which had drifted without it. Deleting the dead path blind would
+   *  have quietly removed a modifier from the game. */
+  /** OTA-1078 — pickpocket a PERSON in the scene (vendor or wanderer) for
    *  what's actually in their pockets: TC, a collectable note, rarely a
    *  Legendary material or a tower map (engine/pocketLoot.ts). Stealing
    *  items off the table stays with stealFromVendor / the steal verb; this
    *  is the hand inside the coat. Roll + consequences mirror vendor theft.
-   *  OTA-1104 — escort leaders (with a leaderName) are marks too; caught at
+   *  OTA-1081 — escort leaders (with a leaderName) are marks too; caught at
    *  THEIR coat kills the mission, costs a fine, and the whole party fights. */
   pickpocketPerson: (targetName: string) => void;
-  /** OTA-1104 — caught with a hand in a vendor's pocket while holding enough
+  /** OTA-1081 — caught with a hand in a vendor's pocket while holding enough
    *  TC to settle: the vendor names a price for their silence. PAY buys quiet
    *  (no fight, no faction word — but THEY remember the wrong); REFUSE, or
    *  being too poor to be offered the choice, gets the fight. Null otherwise.
@@ -6854,12 +6939,28 @@ interface GameStore {
    *  keyboard hides. */
   explorationInputActive: boolean;
   setExplorationInputActive: (active: boolean) => void;
+  /** ⚠⚠ OTA-1270 — THE LIVE DRAFT, SHARED. Owner: "I have to hit enter because
+   *  act doesn't see any text." Two text fields existed (the in-flow InputBox
+   *  and the floating KeyboardInputBar), each with a PRIVATE useState copy of
+   *  what the player typed, each with its own ACT button reading only its own
+   *  copy — type in one, tap the other's ACT, and it saw an empty string and
+   *  silently did nothing. One draft now, both fields render it, either ACT
+   *  submits it. (`pendingInputDraft` above is different — a one-shot pre-fill
+   *  queue, not the live keystrokes.) */
+  explorationDraft: string;
+  setExplorationDraft: (text: string) => void;
 
   hydrate: () => Promise<void>;
   setScreen: (screen: ScreenName) => void;
 
   refreshSlots: () => Promise<void>;
   loadSlotIntoGame: (slotId: string) => Promise<void>;
+  /** Import a save exported by COPY SAVE (the "FULL STATE JSON" blob, with or
+   *  without the surrounding === markers). Parses {player, worldMemory}, backfills
+   *  the player, writes it to a NEW slot, and loads it — so a save from another
+   *  install (e.g. the Tartaria build) becomes a playable Golem slot. Returns a
+   *  result so the UI can report success/failure. */
+  importSaveFromText: (text: string) => Promise<{ ok: boolean; error?: string; name?: string }>;
   clearSlotLoadError: () => void;
   /** Tutorial controls — called by the overlay component. */
   startTutorial: () => void;
@@ -6974,7 +7075,7 @@ interface GameStore {
   submitPlayerAction: (text: string, _opts?: { skipPreChecks?: boolean; silent?: boolean }) => void;
   resolveRollStep: (values: number[]) => void;
   cancelPendingRolls: () => void;
-  // OTA-980 — a bandolier throw transiently equips the throwable to the off hand
+  // OTA-957 — a bandolier throw transiently equips the throwable to the off hand
   // while its dice modal is open. This records what to put back (and the
   // spend-exactly-one snapshot) until the roll RESOLVES or CANCELS.
   throwSettlement: { itemId: string; qtyAtThrow: number; prevOff?: string; prevOffId?: string } | null;
@@ -7009,10 +7110,10 @@ interface GameStore {
   resolveEnemyDefeat: () => void;
   rest: () => void;
   buyFromVendor: (itemName: string, qty?: number) => void;
-  /** OTA-727 — `social` (default true) drives whether this sale trains CHA.
+  /** OTA-708 — `social` (default true) drives whether this sale trains CHA.
    *  A BULK sale is one negotiation, so the VendorScreen loop passes social:true
-   *  only on the first unit and false for the rest — otherwise dumping a 300-item
-   *  stack farmed Charisma one level at a time. */
+   *  only on the first unit and false for the rest — otherwise dumping a big stack
+   *  farmed Charisma one level at a time. */
   sellToVendor: (itemName: string, itemId?: string, opts?: { social?: boolean }) => void;
   stealFromVendor: (itemName: string) => void;
   repairWithVendor: (itemName: string) => void;
@@ -7021,7 +7122,7 @@ interface GameStore {
   /** OTA-850 — accept a faction bounty: store it and set course for the quarry's
    *  outpost (routing the player into patrolled ground). */
   acceptBounty: (bounty: import('../engine/factionBounty').FactionBounty) => void;
-  /** ⚠ OTA-1188 — THE FROZEN BOARD. Transient (never persisted): a snapshot of who stood
+  /** ⚠ OTA-1165 — THE FROZEN BOARD. Transient (never persisted): a snapshot of who stood
    *  with whom at the instant the player hit FREEZE, plus the hour it was taken.
    *  Non-null = the board is frozen and a bounty may be accepted.
    *
@@ -7045,7 +7146,7 @@ interface GameStore {
    *  active = between missions). A paused contract stays on the slate and its
    *  stages don't auto-advance until re-activated. `active` omitted → toggle. */
   setFactionQuestActive: (id: string, active?: boolean) => void;
-  /** OTA-670 — uniform activate / DEACTIVATE (pause) toggle for EVERY contract
+  /** OTA-655 — uniform activate / DEACTIVATE (pause) toggle for EVERY contract
    *  kind, so hunts / mysteries / storylines / whispers / leads / the parley get
    *  the same reversible pause faction quests already have. Deactivating parks the
    *  contract on the slate (⏸ PAUSED) and freezes its auto-advance / reminders
@@ -7085,7 +7186,7 @@ interface GameStore {
     kind: 'hunt' | 'mystery' | 'storyline' | 'faction_quest',
     id: string,
   ) => void;
-  /** OTA-1037 — internal body of completeContractFromUI; the public name is a
+  /** OTA-1014 — internal body of completeContractFromUI; the public name is a
    *  wrapper that surfaces refusals to the Contracts screen's strip. UI code
    *  keeps calling completeContractFromUI. */
   completeContractFromUIInner: (
@@ -7136,7 +7237,7 @@ interface GameStore {
    *  they confirm or cancel via the BrandedModal. The screen layer
    *  listens for this and renders a Yes/No prompt. */
   pendingTravelConfirm: { locationId: string; locationName: string } | null;
-  /** OTA-671 — a mission you STUMBLED onto (didn't seek out) offers itself for
+  /** OTA-656 — a mission you STUMBLED onto (didn't seek out) offers itself for
    *  accept/decline instead of silently committing you. Currently the Parley of
    *  Factions: approaching the leaders on the neutral flats now ANNOUNCES the
    *  offer + its demands and waits for a choice — ACCEPT takes the contract,
@@ -7146,33 +7247,33 @@ interface GameStore {
    *  is captured as the golem's name (or 'skip' to keep the type label), like
    *  the dog onboarding. Transient — not persisted. */
   pendingGolemNaming: boolean;
-  /** OTA-1041 — the opening crawl's pages while it is showing, null otherwise.
+  /** OTA-1018 — the opening crawl's pages while it is showing, null otherwise.
    *  Set by startNewGame for a fresh character and by replayStoryIntro; the
    *  StoryIntroOverlay renders whenever this is non-null. Transient — never
    *  persisted, always reset by slot load / new game / delete. */
   storyIntro: string[] | null;
-  /** OTA-1041 — close the crawl (tap-through or SKIP) and remember on the
+  /** OTA-1018 — close the crawl (tap-through or SKIP) and remember on the
    *  CHARACTER that it was seen, so it never re-ambushes this save. */
   dismissStoryIntro: () => void;
-  /** ⚠ OTA-1133 — THE DEATH SCENE. Non-null the instant a character dies;
+  /** ⚠ OTA-1110 — THE DEATH SCENE. Non-null the instant a character dies;
    *  DeathOverlay (mounted globally in App.tsx) crossfades in over whatever
    *  screen you were on and holds. Transient — never persisted; the dead
    *  character is already written to disk by the time this is raised. */
   pendingDeath: import('../engine/deathScene').DeathScene | null;
-  /** OTA-1133 — close the death screen and hand over to the character
+  /** OTA-1110 — close the death screen and hand over to the character
    *  collection. Fired by a tap OR by the overlay's own dwell timer, so a
    *  player who put the phone down still lands somewhere sane. Idempotent:
    *  a tap racing the timer must not run the handover twice. */
   dismissDeath: () => void;
-  /** OTA-1041 — re-run the opening for the current character (About screen).
+  /** OTA-1018 — re-run the opening for the current character (About screen).
    *  No-op without a live character. */
   replayStoryIntro: () => void;
-  /** OTA-1043 — the chapter card raised by the latest main-quest phase
+  /** OTA-1020 — the chapter card raised by the latest main-quest phase
    *  transition, null when none is showing. ChapterCardOverlay (mounted
    *  globally in App.tsx) renders whenever this is non-null. Transient —
    *  never persisted, always reset by slot load / new game / delete. */
   chapterCard: import('../engine/chapters').ChapterCard | null;
-  /** ⚠ OTA-1088 — THE FORK CURRENTLY BEING ASKED, and nothing more.
+  /** ⚠ OTA-1065 — THE FORK CURRENTLY BEING ASKED, and nothing more.
    *
    *  This is a VIEW of `dueFork(player)`, never a queue. It is recomputed by
    *  raiseDueFork at every point the story could have moved, and it is
@@ -7182,26 +7283,26 @@ interface GameStore {
   pendingFork: StoryFork | null;
   /** Answer the open question. One-way — see storyForks.recordChoice. */
   answerFork: (optionId: string) => void;
-  /** OTA-1089 — change the Phase 4 difficulty. ⚠ LOWER ONLY; a request to
+  /** OTA-1066 — change the Phase 4 difficulty. ⚠ LOWER ONLY; a request to
    *  raise is refused with a line rather than silently ignored. */
   setPressure: (tier: PressureTier) => void;
-  /** OTA-1043 — close the chapter card (tap-through). */
+  /** OTA-1020 — close the chapter card (tap-through). */
   dismissChapterCard: () => void;
-  /** OTA-1045 — TRUE while the one-time veteran motive picker is owed: the
+  /** OTA-1022 — TRUE while the one-time veteran motive picker is owed: the
    *  loaded character's motive was DEALT by backfill (storyMotiveChosen !==
    *  true), so the player gets one "why did you come down?" ask. Transient —
    *  never persisted; the durable answer lives on the character. */
   motivePickerPending: boolean;
-  /** OTA-1045 — commit the pick (or the kept guess): sets the motive,
+  /** OTA-1022 — commit the pick (or the kept guess): sets the motive,
    *  marks it CHOSEN on the character (never asked again), persists. */
   confirmMotivePick: (motiveId: string) => void;
-  /** OTA-1050 — dog onboarding popup commit. Breed/name/sex arrive together from
+  /** OTA-1027 — dog onboarding popup commit. Breed/name/sex arrive together from
    *  DogOnboardingModal (the typed three-step takeover is gone — a playtester
    *  couldn't tell the ask from a fight and "rest" became the breed). Applies
    *  the same breed preamble-stripping + caps as the old typed path, then
    *  finalizes the dog exactly as before. */
   confirmDogOnboarding: (breedRaw: string, nameRaw: string, sexRaw: string) => void;
-  /** OTA-1050 — golem naming popup commit. null/empty = keep its making (the old
+  /** OTA-1027 — golem naming popup commit. null/empty = keep its making (the old
    *  "skip"); otherwise seals the name (16 cap) with the same Arbiter acks. */
   confirmGolemName: (name: string | null) => void;
   /** Set the pending destination; the screen renders the modal. */
@@ -7210,17 +7311,17 @@ interface GameStore {
   confirmLeaveAndTravel: () => void;
   /** No path: clears pending. Player stays inside the outpost. */
   cancelTravelConfirm: () => void;
-  /** OTA-671 — ACCEPT a stumbled-onto mission offer: commit the contract (create
+  /** OTA-656 — ACCEPT a stumbled-onto mission offer: commit the contract (create
    *  the broker mission + its grid markers) and clear the offer. */
   acceptMissionOffer: () => void;
-  /** OTA-671 — DECLINE a stumbled-onto mission offer: walk away, don't create it,
+  /** OTA-656 — DECLINE a stumbled-onto mission offer: walk away, don't create it,
    *  and set a soft flag so it doesn't re-prompt on the next ambient action (an
    *  explicit PARLEY re-opens it). */
   declineMissionOffer: () => void;
   setActiveEnemyIdx: (idx: number) => void;
   /** Craft a specific recipe directly (used by the CraftingScreen list). */
   craftRecipe: (recipeName: string) => void;
-  /** OTA-1006 — craft the same recipe COUNT times in one go. Each pass runs the
+  /** OTA-983 — craft the same recipe COUNT times in one go. Each pass runs the
    *  ordinary craft (every gate intact), so a batch can never consume more than
    *  the pack holds; it stops the moment a pass produces nothing — pack full,
    *  a refusal, or the substitution prompt taking over — and reports how many
@@ -7254,27 +7355,24 @@ interface GameStore {
   stowInBandolier: (itemName: string) => void;
   removeFromBandolier: (itemName: string, itemId?: string) => void;
   throwFromBandolier: (itemName: string, itemId?: string) => void;
-  /** OTA-691 — return a found faction SIGIL (a slain member's crest) to that
+  /** OTA-676 — return a found faction SIGIL (a slain member's crest) to that
    *  faction's frontier stake to honor their dead: +1 standing, the sigil is
-   *  spent. Only works while standing on the faction's turn-in tile (the
-   *  Contracts screen routes you there). No-op / refusal otherwise. */
+   *  spent. Only works while standing on the faction's turn-in tile. */
   turnInSigil: (itemId: string) => void;
   /** OTA-693 — batch-heal: apply `count` uses of a fixed-heal consumable to the
-   *  target in ONE action (no more tapping "use" ten times). Heal is clamped to
-   *  the target's missing HP, so no overheal; `count` units are spent. Used by the
-   *  inventory "Use Max" / "Feed Max" / "Heal Max" buttons (which pass the no-waste
-   *  count from healBatchCount). target: 'self' | 'dog' | 'golem'. */
+   *  target in ONE action. Heal clamped to missing HP (no overheal); `count` spent.
+   *  target: 'self' | 'dog' | 'golem'. */
   useHealBatch: (itemName: string, target: 'self' | 'dog' | 'golem', count: number) => void;
   /** Drop one of the named item from the player's inventory onto the
    *  ground of the current room (worldMemory.visitedRooms[key].droppedItems).
    *  Mirrors the typed 'drop X' verb so InventoryScreen taps can
    *  invoke it without going through the parser. Refuses equipped items
    *  with an Arbiter line. */
-  /** OTA-1123 — `itemId` drops that EXACT instance (the drop verb already
+  /** OTA-1100 — `itemId` drops that EXACT instance (the drop verb already
    *  matches on id as well as name), so a group drop takes the rows the player
    *  ticked rather than whichever same-name row sorts first. */
   dropInventoryItem: (itemName: string, itemId?: string) => void;
-  /** OTA-1123 — drop one unit of an EXACT instance. The single implementation of
+  /** OTA-1100 — drop one unit of an EXACT instance. The single implementation of
    *  dropping; the typed `drop <noun>` verb resolves the noun and then calls
    *  this. UI callers use it directly so an instance id never has to survive the
    *  intent parser to be honoured. */
@@ -7292,10 +7390,10 @@ interface GameStore {
    *  tap on `isInferredItem`. Reserved items are excluded from the
    *  OTA-193 auto-substitute drain so they survive for the fusion
    *  bench. Looked up by InventoryItem.id to disambiguate stacks. */
-  /** OTA-968 — `count` moves that many units across the save/free boundary in ONE call
+  /** OTA-945 — `count` moves that many units across the save/free boundary in ONE call
    *  (clamped to the stack). Omitted = 1 (the original tap-peels-one behavior). */
   toggleReserveForFusion: (itemId: string, count?: number) => void;
-  /** OTA-1120 — move MANY rows across the save/free boundary in ONE call, whole
+  /** OTA-1097 — move MANY rows across the save/free boundary in ONE call, whole
    *  stacks at a time. Drives the FUSABLE view's per-category SELECT ALL / CLEAR
    *  ALL (owner: "we also need a select all button on the category headers in
    *  inventory when we select sort by fusable so you can select a whole
@@ -7347,23 +7445,21 @@ interface GameStore {
    *  weapon / armor / dog vest, clamps the response, mints the fused
    *  InventoryItem in place. */
   fuseAtCrucible: () => Promise<void>;
-  /** OTA-953 — fusion picker: choose 3–5 of your reserved (♥) pieces + weapon/armor,
-   *  instead of the Crucible consuming your WHOLE reserved pool on one item. */
-  /** OTA-1006 — set while craftRecipeBatch runs so the per-craft reward line stays
+  /** OTA-983 — set while craftRecipeBatch runs so the per-craft reward line stays
    *  quiet and the batch can emit a single aggregated one instead. */
   craftBatchQuiet: boolean;
   fusionPickerOpen: boolean;
   pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor' | 'dog_armor'; catalystId?: string } | null;
-  /** OTA-1006 — the Crucible refused, and says why. Rendered by FusionBlockedModal,
+  /** OTA-983 — the Crucible refused, and says why. Rendered by FusionBlockedModal,
    *  which HOLDS until dismissed so the player actually reads it (owner's ask).
    *  Set only on the gate-fail path, which also closes the picker outright. */
-  /** OTA-1010 — a job just finished: the modal names it and holds until dismissed.
+  /** OTA-987 — a job just finished: the modal names it and holds until dismissed.
    *  Set ONLY by announceMissionComplete, the single choke point every
    *  completion path funnels through. */
-  /** OTA-1058 — `flavor` (story beats) and `heading` (a kicker that isn't
+  /** OTA-1035 — `flavor` (story beats) and `heading` (a kicker that isn't
    *  "<KIND> COMPLETE") are set by the boss VICTORY card; both are absent on an
    *  ordinary mission notice, which renders exactly as it did before. */
-  /** OTA-1186 — `takeLabel` renames the "THE TAKE" divider (the lines beneath it are
+  /** OTA-1163 — `takeLabel` renames the "THE TAKE" divider (the lines beneath it are
    *  not always a payout); `holdMs` lengthens the auto-close valve and can only ever
    *  raise it. Both absent on every ordinary notice, which renders unchanged. */
   missionCompleteNotice: {
@@ -7372,33 +7468,33 @@ interface GameStore {
     takeLabel?: string; holdMs?: number;
   } | null;
   clearMissionCompleteNotice: () => void;
-  /** OTA-1037 — Contracts-screen refusal strip. A COMPLETE tap that does NOT end in
+  /** OTA-1014 — Contracts-screen refusal strip. A COMPLETE tap that does NOT end in
    *  the completion popup surfaces the Arbiter's refusal line here — the
    *  turn-in guards speak to the world feed, which the Contracts screen never
    *  renders, so a refused tap read as "the button does nothing" (owner tapped
    *  a READY contract ~15× against a wrong-faction hall into silence). */
   contractsNotice: { text: string; ts: number } | null;
   clearContractsNotice: () => void;
-  /** OTA-1010 — the one way a mission/contract/thread ends. Writes the feed line AND
+  /** OTA-987 — the one way a mission/contract/thread ends. Writes the feed line AND
    *  raises the holding notice, so no completion can be silent again. Repeated
    *  calls for the SAME title merge (a thread's finale plus its bonus drop read
    *  as one result, not two popups fighting each other). */
   announceMissionComplete: (kind: string, title: string, body: string) => void;
-  /** OTA-1030 — the notice-only half of announceMissionComplete (no feed line);
+  /** OTA-1007 — the notice-only half of announceMissionComplete (no feed line);
    *  merges into any same-title notice already showing. */
   raiseMissionCompleteNotice: (kind: string, title: string, body: string) => void;
-  /** OTA-1058 — the boss VICTORY card: the fight's story beats and everything it
+  /** OTA-1035 — the boss VICTORY card: the fight's story beats and everything it
    *  paid, in one popup that holds until dismissed. Called once with the whole
    *  capture, then again for anything that lands late (the Resurrection Gem);
    *  repeat calls for the same boss merge instead of replacing. */
   raiseBossVictoryNotice: (name: string, flavor: string[], rewards: string[]) => void;
-  /** OTA-1060 — the same card under any banner. A VICTORY card is one kind of
+  /** OTA-1037 — the same card under any banner. A VICTORY card is one kind of
    *  SPOTLIGHT: a custom kicker, story above the take, gold instead of the
    *  mission green. Use it for a milestone the player would otherwise only learn
    *  about from a feed line that scrolls away. */
   raiseSpotlightNotice: (
     heading: string, title: string, flavor: string[], rewards: string[],
-    /** OTA-1186 — presentation only; see missionCompleteNotice. */
+    /** OTA-1163 — presentation only; see missionCompleteNotice. */
     opts?: { takeLabel?: string; holdMs?: number },
   ) => void;
   fusionBlockedNotice: { title: string; body: string; hint?: string } | null;
@@ -7455,7 +7551,7 @@ interface GameStore {
    *  Held in the STORE, not ExplorationScreen local state, so a dismiss survives
    *  entering a vendor (which UNMOUNTS the exploration screen and would otherwise
    *  lose a useState flag → the chip popped back on return).
-   *  OTA-1052 — the key is now the macro TILE (chipDismissTileKey), not the
+   *  OTA-1029 — the key is now the macro TILE (chipDismissTileKey), not the
    *  room. Owner: "the crucible once dismissed can stay dismissed until we leave
    *  the capital tile and come back" — a capital is a dozen rooms on ONE tile, so
    *  a room-keyed dismiss (arb154) made the chip pop back on every room hop.
@@ -7463,7 +7559,7 @@ interface GameStore {
    *  visit shows the chip again. */
   crucibleChipDismissedKey: string | null;
   setCrucibleChipDismissedKey: (key: string | null) => void;
-  /** OTA-1052 — same tile-scoped dismiss for the VENDOR chip's ✕ (owner: "there
+  /** OTA-1029 — same tile-scoped dismiss for the VENDOR chip's ✕ (owner: "there
    *  should also be an x next to their names like the cruciable has"). Hides the
    *  chip only — the vendor stays anchored to their room, so walking back in (or
    *  typing "trade") still reaches them. */
@@ -7493,16 +7589,7 @@ interface GameStore {
   } | null;
   /** Dismiss the discovery reveal overlay. */
   dismissDiscoveryReveal: () => void;
-  /** OTA-1206 — a collectible character-story just closed; show it whole.
-   *  ⚠ Holds only the id. The screen re-derives the text from the player's OWN
-   *  collectables at render time, so it can never display a fragment that was not
-   *  earned, and a stale reveal left over a reload cannot resurrect one. */
-  storyReveal: { storyId: string } | null;
-  dismissStoryReveal: () => void;
-  /** OTA-1206 — read an already-completed story again from the Collectibles tab.
-   *  Same screen, reached deliberately instead of by finishing. */
-  openStoryReveal: (storyId: string) => void;
-  /** OTA-683 — when a deep-link wants the Inventory screen to open with a
+  /** OTA-668 — when a deep-link wants the Inventory screen to open with a
    *  specific category section EXPANDED (sections default collapsed), this
    *  carries that category id (e.g. a Crucible-forged 'armor' piece). The
    *  Inventory screen reads it on entry, unfolds that section, and clears it. */
@@ -7563,6 +7650,15 @@ interface GameStore {
    *  scene (same pipeline the gate-verb path uses) and switches
    *  to exploration so the fight surfaces. Returns ok / reason so
    *  the UI can disable / hide the button when preconditions fail. */
+  /** OTA-1183 — a collectible character-story just closed; show it whole.
+   *  ⚠ Holds only the id. The screen re-derives the text from the player's OWN
+   *  collectables at render time, so it can never display a fragment that was not
+   *  earned, and a stale reveal left over a reload cannot resurrect one. */
+  storyReveal: { storyId: string } | null;
+  dismissStoryReveal: () => void;
+  /** OTA-1183 — read an already-completed story again from the Collectibles tab.
+   *  Same screen, reached deliberately instead of by finishing. */
+  openStoryReveal: (storyId: string) => void;
   summonCoreGuardian: () => { ok: boolean; reason?: string };
 
   /** OTA-120 Phase 5 — CallDogModal visibility flag. Set by the parser
@@ -7581,12 +7677,12 @@ interface GameStore {
    *  opener (so ParleySheet can render the contextual choices); null otherwise.
    *  A player who types a SPECIFIC verb (intimidate / persuade / calm) skips the
    *  modal and resolves straight through. */
-  /** OTA-1081 — PHASE 2 SLICE. The open talk exchange: who you are talking to
+  /** OTA-1058 — PHASE 2 SLICE. The open talk exchange: who you are talking to
    *  and which topics they will discuss with you right now. Null when no
    *  conversation is open. Mirrors pendingParley deliberately — same modal
    *  shape, same self-mounting component, so the interaction is one the player
    *  has already learned. */
-  /** OTA-1083 — the open gift exchange: who can receive, and what you can offer.
+  /** OTA-1060 — the open gift exchange: who can receive, and what you can offer.
    *  Two steps in one modal rather than two screens — the person is almost
    *  always the one you are standing in front of, so a mandatory person-picker
    *  would be a tap of pure ceremony. It appears only when there IS a choice. */
@@ -7598,7 +7694,7 @@ interface GameStore {
         toName: string | null;
       }
     | null;
-  /** OTA-1177 — GIFT MODE. Owner: *"would it be better to just have the gift
+  /** OTA-1154 — GIFT MODE. Owner: *"would it be better to just have the gift
    *  button open your inventory and then you can pick an item and while you are
    *  in gift mode that button will be added to the pop-up menu when you tap on
    *  the item."* Yes, for two reasons the old modal could not fix: it listed only
@@ -7608,7 +7704,7 @@ interface GameStore {
    *  worn-armour trap got in. The inventory already knows what is equipped,
    *  racked, reserved and contract-bound, so the pick happens there.
    *  Non-null while the player is browsing for something to hand over. */
-  // OTA-1178 — `returnTo` is the screen the GIVE puts you back on. Owner: *"when I
+  // OTA-1155 — `returnTo` is the screen the GIVE puts you back on. Owner: *"when I
   // gift something to somebody it stays in the inventory menu … it should pop back
   // to the main world screen so you can see the response."* The reaction line is
   // written to the world feed, which the pack is covering, so a gift that lands
@@ -7628,38 +7724,38 @@ interface GameStore {
         npcId: string;
         npcName: string;
         topics: TalkTopic[];
-        /** OTA-1086 — their job title, carried so the flourish can tell a smith
+        /** OTA-1063 — their job title, carried so the flourish can tell a smith
          *  from a scholar without re-deriving it off the scene every raise. */
         role?: string | null;
-        /** OTA-1086 — flourish lines already spent in THIS conversation, so a
+        /** OTA-1063 — flourish lines already spent in THIS conversation, so a
          *  gesture the player watched two taps ago is not repeated. */
         flourishesUsed: string[];
-        /** OTA-1086 — beats emitted so far, against FLOURISH_MAX_PER_CONVERSATION. */
+        /** OTA-1063 — beats emitted so far, against FLOURISH_MAX_PER_CONVERSATION. */
         flourishCount: number;
-        /** OTA-1113 — how many topics exist but are gated shut right now (0
+        /** OTA-1090 — how many topics exist but are gated shut right now (0
          *  below `known` and for the wronged — see lockedTopicCount). Drives
          *  the count-only teaser row: the player learns THAT there is more,
          *  never WHAT. */
         lockedCount: number;
-        /** OTA-1113 — the rung this conversation opened at, so the teaser's
+        /** OTA-1090 — the rung this conversation opened at, so the teaser's
          *  wording and its deflections speak to where you actually stand. */
         regard: import('../engine/npcMemory').NpcRegard;
-        /** OTA-1113 — teaser taps THIS conversation; rotates the deflection. */
+        /** OTA-1090 — teaser taps THIS conversation; rotates the deflection. */
         teaserTaps: number;
-        /** OTA-1118 — where this conversation begins in `gameLog`. The
+        /** OTA-1095 — where this conversation begins in `gameLog`. The
          *  conversation view renders `gameLog.filter(e => e.ts >= startedAtTs)`
          *  as its own transcript, so the replies are readable INSIDE the sheet
          *  instead of behind it. The log stays the single record of truth —
          *  nothing is duplicated into a second store of conversation lines.
          *
-         *  ⚠ OTA-1121 — this is a TIMESTAMP, and it must stay one. OTA-1118
+         *  ⚠ OTA-1098 — this is a TIMESTAMP, and it must stay one. OTA-1095
          *  shipped it as an INDEX (`startedAtLogLen = gameLog.length`), which is
          *  wrong the moment the buffer reaches its cap: `gameLog` is
          *  `.slice(-MAX_LOG_IN_MEMORY)`d on every append, so at 500 entries the
          *  array stops growing and every existing index shifts DOWN by one per
          *  line. A mark of 500 then sliced past the end forever and the
          *  transcript rendered empty in exactly the long sessions the feature
-         *  was built for. The OTA-1078 comment on `_playerVisibleLogCount` says
+         *  was built for. The OTA-1055 comment on `_playerVisibleLogCount` says
          *  this in as many words — "gameLog.length cannot measure how much has
          *  happened once the buffer sits at its cap" — and I used it as a mark
          *  anyway. A ts is immune: trimming drops old entries, it never
@@ -7669,7 +7765,7 @@ interface GameStore {
     | null;
   /** Open a conversation with the named person in the current scene. */
   talkToNpc: (nameOrId: string) => void;
-  /** OTA-1102 — does this person have dialogue the player has NOT heard yet?
+  /** OTA-1079 — does this person have dialogue the player has NOT heard yet?
    *  True when at least one currently-GATED-OPEN topic still has unread lines
    *  (the same spent-math the TalkSheet's "(asked)" marks use). Drives the
    *  TALK button's green glow: the light means "there is something new to
@@ -7678,7 +7774,7 @@ interface GameStore {
   hasUnspokenTalk: (nameOrId: string) => boolean;
   /** Raise a topic. The reply goes to the feed, and the exchange stays open. */
   raiseTopic: (topicId: string) => void;
-  /** OTA-1113 — tap the locked-count teaser row: an in-voice deflection lands
+  /** OTA-1090 — tap the locked-count teaser row: an in-voice deflection lands
    *  in the feed (never the locked labels), rotating per tap. */
   tapLockedTeaser: () => void;
   closeTalk: () => void;
@@ -7692,7 +7788,7 @@ interface GameStore {
         wisRevealed: boolean;
         /** For an animal parley, the enemy index whose temperament this is. */
         enemyIdx?: number;
-        /** OTA-1087 — set when this person also has an authored topic set, so
+        /** OTA-1064 — set when this person also has an authored topic set, so
          *  the modal can offer "just talk to them" beside persuade and
          *  intimidate. Absent for animals and for anybody unauthored. */
         topicsNpcId?: string;
@@ -7700,7 +7796,7 @@ interface GameStore {
     | null;
   /** Cancel a pending parley without committing (the player backed out — no cost). */
   closeParley: () => void;
-  /** OTA-1087 — step out of the parley into the authored conversation. Costs
+  /** OTA-1064 — step out of the parley into the authored conversation. Costs
    *  nothing and forfeits nothing: the parley was never committed, so the
    *  player can talk first and still come back and choose. */
   parleyIntoTalk: () => void;
@@ -7749,13 +7845,13 @@ interface GameStore {
 // on-disk log key (readFullLog), not this in-memory buffer.
 const MAX_LOG_IN_MEMORY = 500;
 
-/** OTA-1078 — total player-visible lines emitted this session, never trimmed.
+/** OTA-1055 — total player-visible lines emitted this session, never trimmed.
  *  gameLog is capped at MAX_LOG_IN_MEMORY, so its length cannot measure "how
  *  much has happened"; this can. Debug/cognitive are excluded because they are
  *  developer bookkeeping the player never sees. */
 let _playerVisibleLogCount = 0;
 
-/** Test seam. The counter IS the OTA-1078 staleness fix — gameLog.length
+/** Test seam. The counter IS the OTA-1055 staleness fix — gameLog.length
  *  cannot measure "how much has happened" once the buffer sits at its cap —
  *  so a regression test has to be able to read it past 500 lines. */
 export function _playerVisibleLogTotal(): number {
@@ -7765,6 +7861,13 @@ export function _playerVisibleLogTotal(): number {
 // OTA-801 — post-boss grace window (game-hours). A boss fight is a major beat —
 // often the whole reason you came to an outpost — and being ambushed the instant
 // you step out, still battered and mid-loot, read as punishing rather than tense.
+// ⚠⚠ OTA-1272 — the owner's doorstep rule: "get at least 2 free tile moves,
+// then whatever." 3 = the exit scene itself + the next 2 overland moves; every
+// one of those wilderness beginScenes suppresses the encounter roll and burns
+// one unit. Not hours-based on purpose — he asked for MOVES, and a player who
+// stands still shouldn't have the window rot out from under them.
+const SAFE_EXIT_FREE_SCENES = 3;
+
 // Defeating a boss stamps player.bossDefeatGraceUntilHours = now + this, and
 // beginScene suppresses arrival encounters until it lapses: enough game-time to
 // loot, breathe, and walk out, then the wasteland resumes. Tunable design knob.
@@ -7901,13 +8004,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   fusionPickerOpen: false,
   missionCompleteNotice: null,
   contractsNotice: null,
-  // OTA-1188 — transient by design; a frozen board must never survive a reload.
+  // OTA-1165 — transient by design; a frozen board must never survive a reload.
   frozenBoard: null,
   storyIntro: null,
-  pendingDeath: null, // OTA-1133
-  chapterCard: null, // OTA-1043
-  pendingFork: null, // OTA-1088
-  motivePickerPending: false, // OTA-1045
+  pendingDeath: null, // OTA-1110
+  chapterCard: null, // OTA-1020
+  pendingFork: null, // OTA-1065
+  motivePickerPending: false, // OTA-1022
   fusionBlockedNotice: null,
   pendingFusionSelection: null,
   pendingAetherFoodId: null,
@@ -7923,7 +8026,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   activeBuildingRoomId: null,
   buildingRevealed: [],
   preBuildingScene: null,
-  tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false },
+  tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false, vest: false },
 
   slots: [],
   activeSlotId: null,
@@ -7943,6 +8046,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingInputDraft: null,
   inputModalOpen: false,
   explorationInputActive: false,
+  explorationDraft: '',
   cognitiveModelInfo: null,
 
   qwenStatus: 'idle',
@@ -7953,7 +8057,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   isGenerating: false,
   uiIdleSince: null,
   lastPlayerActionAt: null,
-  // OTA-1149 — idempotent on the way IN: a screen that re-focuses must not
+  // OTA-1126 — idempotent on the way IN: a screen that re-focuses must not
   // restart the dwell clock, or a UI that re-renders every second would keep
   // resetting it and homework would never see an idle window at all.
   markUiIdle(idle: boolean) {
@@ -7973,7 +8077,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  // OTA-1083 — GIFTS. See engine/gifting.ts for the three exploits this shape
+  // OTA-1060 — GIFTS. See engine/gifting.ts for the three exploits this shape
   // exists to close (gift-farm, trash-flood, buy-back loop).
   pendingGift: null,
   giftMode: null,
@@ -7986,8 +8090,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     // Everyone present who is a PERSON on the ledger. A gift needs a recipient
-    // who can remember it, which is exactly the population OTA-1080 finished.
-    // ⚠ OTA-1087 — derived from talkablePeople so the two verbs cannot drift.
+    // who can remember it, which is exactly the population OTA-1057 finished.
+    // ⚠ OTA-1064 — derived from talkablePeople so the two verbs cannot drift.
     // They already had: an escort leader walks beside you for an entire contract
     // and is fully on the ledger (sightPerson, two spawn sites), you could TALK
     // to them, and the gift picker did not list them. Guardians are filtered by
@@ -8000,7 +8104,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     // One person present is not a choice; do not make the player confirm it —
-    // OTA-1177 sends them straight to the pack with the recipient already set.
+    // OTA-1154 sends them straight to the pack with the recipient already set.
     if (candidates.length === 1) {
       set({
         pendingGift: null,
@@ -8015,26 +8119,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const g = get().pendingGift;
     const who = g?.candidates.find((c) => c.id === id);
     if (!g || !who) return;
-    // OTA-1177 — the recipient is settled, so the modal's work is done: hand off
+    // OTA-1154 — the recipient is settled, so the modal's work is done: hand off
     // to the inventory rather than drawing a second, smaller item list.
     set({ pendingGift: null, giftMode: { toId: who.id, toName: who.name, returnTo: giftReturnScreen(get()) } });
     get().setScreen('inventory');
   },
   cancelGiftMode: () => set({ giftMode: null }),
   giveGift: (itemId) => {
-    // OTA-1177 — the recipient now rides on giftMode (the player is in their pack,
+    // OTA-1154 — the recipient now rides on giftMode (the player is in their pack,
     // not in the picker modal). pendingGift is still read as a fallback so a
     // half-finished flow from an older save state cannot strand the action.
     const gm = get().giftMode;
     const pg = get().pendingGift;
     const g = gm ? { toId: gm.toId, toName: gm.toName } : { toId: pg?.toId, toName: pg?.toName };
     const player = get().player;
-    // ⚠ OTA-1178 — EVERY OUTCOME OF A GIVE TAP IS SOMETHING THE PLAYER MUST READ,
+    // ⚠ OTA-1155 — EVERY OUTCOME OF A GIVE TAP IS SOMETHING THE PLAYER MUST READ,
     // and all of them are written to the world feed, which the open pack is
     // covering. Owner: *"it should pop back to the main world screen so you can see
     // the response."* So the tap ends the mode and leaves the pack no matter WHICH
     // way it goes — landed, refused, blocked or a stranger. The old code only ever
-    // cleared `pendingGift`, which by OTA-1177 was no longer the field the flow ran
+    // cleared `pendingGift`, which by OTA-1154 was no longer the field the flow ran
     // on: the player was left standing in their inventory with the vendor's reply
     // scrolling past behind it, and nothing on screen had changed.
     const done = () => {
@@ -8044,7 +8148,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!g?.toId || !g.toName || !player) { done(); return; }
     const item = player.inventory.find((i) => i.id === itemId);
     if (!item) { done(); return; }
-    // ⚠ OTA-1177 — THE SAME PREDICATE THE INVENTORY USED TO DRAW THE BUTTON.
+    // ⚠⚠ OTA-1273 — SAY WHAT THE PLAYER DID. Every outcome below writes the
+    // RECIPIENT'S half of the exchange and nothing wrote the player's: the
+    // owner's log showed "I still could not build anything out of Aetheric
+    // Locket. Get it off the bench." + "Standing -2" arriving out of NOWHERE,
+    // twelve seconds after his last typed line — a designed tastes-system hit
+    // that read as a spontaneous standing dock, to him and to the triage that
+    // chased it as a bug. A GIVE tap is an action like any picker tap, and
+    // picker taps log their player line.
+    get().appendLog('player', `give the ${item.name} to ${g.toName}`);
+    // ⚠ OTA-1154 — THE SAME PREDICATE THE INVENTORY USED TO DRAW THE BUTTON.
     // The UI hides GIVE on anything blocked, so reaching this is either a stale
     // tap or a caller that skipped the UI; either way it refuses with the reason
     // rather than moving the item. One answer, asked twice — see giftEligibility.
@@ -8054,13 +8167,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       done();
       return;
     }
-    // OTA-1177 — the OTA-1116 worn-item guard that stood here is gone: it
+    // OTA-1154 — the OTA-1093 worn-item guard that stood here is gone: it
     // matched by NAME (so a second identical copy was refused too) and knew
     // nothing about the bandolier, the tool pouch, fusion reservations or
     // contract fetches. giftBlockReason above covers all of it, by instance id.
-
     const rel = getRelation(get().worldMemory, g.toId);
-    // ⚠ OTA-1087 — NO ROW, NO GIFT. The accept path writes the memory inside a
+    // ⚠ OTA-1064 — NO ROW, NO GIFT. The accept path writes the memory inside a
     // `prev ? ... : st.worldMemory` branch but decrements the inventory outside
     // it, so a recipient the ledger had never seen ate the item and remembered
     // nothing — the one clause the owner asked for by name, silently skipped.
@@ -8071,7 +8183,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const worth = sellPriceFor(item, get().currentScene?.vendor ?? null, 0);
-    // ⚠ OTA-1176 — CANONICAL TAGS, NOT THE INSTANCE'S. "What KIND of thing is
+    // ⚠ OTA-1153 — CANONICAL TAGS, NOT THE INSTANCE'S. "What KIND of thing is
     // this?" is an IDENTITY question (§3a-F), and identity is answered by the LIVE
     // catalog, never by the tags frozen onto the copy in your pack. Reading
     // `item.tags` meant a months-old save judged a gift on whatever the catalog
@@ -8110,7 +8222,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 [g.toId!]: {
                   ...prev,
                   // THE CLAUSE THAT MATTERS: the object, by name.
-                  // ⚠ OTA-1184 — and HOW THEY TOOK IT, which was computed right here
+                  // ⚠ OTA-1161 — and HOW THEY TOOK IT, which was computed right here
                   // and then discarded. Owner asked the sheet to show "what you gave
                   // to whom and how they received it"; without the reaction a gift
                   // that INSULTED somebody read identically to one they loved.
@@ -8124,7 +8236,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   // A gift that lands counts as business done — it is what lifts
                   // somebody off the 'met' rung without a purchase.
                   trades: prev.trades + (out.countsAsBoon ? 1 : 0),
-                  // OTA-1106 — the reaction is the tell: what this gift just
+                  // OTA-1083 — the reaction is the tell: what this gift just
                   // TAUGHT you about their tastes goes on the ledger (the gift
                   // picker shows it), and a loved gift is counted — it is what
                   // gates the return gift alongside trusted regard.
@@ -8144,13 +8256,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  // OTA-1081 — PHASE 2 SLICE. See engine/dialogue.ts for why none of this is
+  // OTA-1058 — PHASE 2 SLICE. See engine/dialogue.ts for why none of this is
   // generated: a 14-20s model turn cannot be in a conversation's critical path.
   pendingTalk: null,
   closeTalk: () => {
     const t = get().pendingTalk;
     if (t) get().appendLog('world', `You let the conversation go and ${t.npcName} gets back to it.`);
-    // OTA-1086 — the slot's lifetime is the conversation it was fired for. A
+    // OTA-1063 — the slot's lifetime is the conversation it was fired for. A
     // line composed while you were standing at Irma's counter should not be
     // waiting there an hour later; the beat was about this exchange.
     flourishSlot = null;
@@ -8174,17 +8286,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const role = target.role ?? null;
-    // OTA-1113 — count what's behind the door (0 until they place you).
+    // OTA-1090 — count what's behind the door (0 until they place you).
     const lockedCount = lockedTopicCount(npcId, ctx);
     set({ pendingTalk: {
       npcId, npcName: target.name, topics, role,
       flourishesUsed: [], flourishCount: 0,
       lockedCount, regard: ctx.regard, teaserTaps: 0,
-      // OTA-1118 — the high-water mark of the feed at the moment the
+      // OTA-1095 — the high-water mark of the feed at the moment the
       // conversation opens. Everything after it belongs to this exchange.
       startedAtTs: Date.now(),
     } });
-    // OTA-1086 — ONE EXCHANGE AHEAD. Fired at the moment the topic list opens,
+    // OTA-1063 — ONE EXCHANGE AHEAD. Fired at the moment the topic list opens,
     // which is the only place in this feature where there is time to spend: the
     // player is reading a list of questions, and a 14-20s generation started now
     // has a real chance of landing before the second one gets tapped. It cannot
@@ -8192,7 +8304,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // beat (and every beat) is an authored line.
     void prefetchFlourish(get, set, npcId, target.name, role);
   },
-  // OTA-1102 — the TALK glow's question, answered with the SAME machinery the
+  // OTA-1079 — the TALK glow's question, answered with the SAME machinery the
   // conversation itself uses: same person match, same gate context, same
   // spent-counter. Anything else would let the light and the list disagree.
   hasUnspokenTalk: (nameOrId) => {
@@ -8204,7 +8316,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (t) => (talked[`${target.id}:${t.id}`] ?? 0) < t.lines.length,
     );
   },
-  // OTA-1113 — the teaser answers IN VOICE, never in labels. Rotates through
+  // OTA-1090 — the teaser answers IN VOICE, never in labels. Rotates through
   // the rung's deflection pool per tap; the count row itself never changes,
   // because nothing about the relationship changed by asking.
   tapLockedTeaser: () => {
@@ -8221,7 +8333,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const topic = t.topics.find((x) => x.id === topicId);
     if (!topic) return;
     const asked = get().worldMemory.talkedTopics?.[`${t.npcId}:${topic.id}`] ?? 0;
-    // ⚠ OTA-1174 — THE QUESTION GOES IN THE RECORD, and it never used to.
+    // ⚠ OTA-1151 — THE QUESTION GOES IN THE RECORD, and it never used to.
     // Owner: *"type the question on an off-white so later we know what we
     // asked."* Reading that as a styling request undersells it — there was
     // NOTHING TO STYLE. This handler only ever logged the NPC's reply, so both
@@ -8248,19 +8360,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const reply = topicReply(topic, asked);
     get().appendLog('world', reply);
     recordTalkTurn(set, t.npcId, topic.label, reply);
-    // ⚠ OTA-1084 — THE GRANT FIRES ON THE FIRST RAISE ONLY, and `asked === 0`
+    // ⚠ OTA-1061 — THE GRANT FIRES ON THE FIRST RAISE ONLY, and `asked === 0`
     // is that fact rather than a separate flag. The counter below is the same
     // one that drives "I have told you that one", so the payout and the
     // acknowledgement can never disagree about whether this has happened.
     const granted = asked === 0 && topic.grants
       ? applyTopicGrant(get, set, t.npcName, topic.grants)
       : true;
-    // ⚠ OTA-1086 — AFTER the reply has already landed, and only on a first
+    // ⚠ OTA-1063 — AFTER the reply has already landed, and only on a first
     // raise. Same `asked === 0` fact the grant reads: a re-tread gets the words
     // back but not the business, because the business was about hearing it for
     // the first time. Synchronous — see engine/flourish.ts.
     if (asked === 0) emitFlourish(get, set, topic.id);
-    // ⚠ OTA-1087 — a grant that could not be delivered does NOT spend the topic.
+    // ⚠ OTA-1064 — a grant that could not be delivered does NOT spend the topic.
     // The counter is the same one that drives "I have told you that one", so
     // leaving it alone is exactly what lets the player come back and collect.
     if (granted) {
@@ -8274,7 +8386,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  // OTA-1104 — THE SHAKEDOWN. See the interface comments; raised only by
+  // OTA-1081 — THE SHAKEDOWN. See the interface comments; raised only by
   // pickpocketPerson's vendor-caught branch, and only when the player can
   // actually cover the price — an offer you cannot take is just a taunt.
   pendingPayoff: null,
@@ -8330,7 +8442,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   async hydrate() {
-    // OTA-1128 — Qwen telemetry sink. Every generation records at the runtime
+    // ⚠⚠ OTA-1276 — READ THE SURVIVOR FIRST, then clear it. A breadcrumb still
+    // on disk at boot means the LAST session died while it was live: no orderly
+    // background, no clean exit. That is the swipe-kill the owner has had to do
+    // after every hard freeze, and it is the only record of what the app was
+    // doing at the moment the JS thread stopped — the batched disk log cannot
+    // say, because its pending lines never drain through a wedge.
+    try {
+      const crumb = await readLiveBreadcrumb();
+      if (crumb) {
+        setLastBootBreadcrumb(crumb);
+        get().appendLog('debug',
+          `freeze forensics: last boot ended mid-action — ${crumb.what} @ ${crumb.room ?? '?'} (${new Date(crumb.at).toISOString()})`);
+        await clearLiveBreadcrumb();
+      }
+    } catch { /* forensics must never block a boot */ }
+    // OTA-1105 — Qwen telemetry sink. Every generation records at the runtime
     // boundary (qwenTelemetry.ts); this surfaces each call in the debug log —
     // `qwen⏱ <job> <outcome> <total>ms` with the lock-wait share when it is a
     // real share — plus a per-job rollup every tenth call, so a single device
@@ -8339,7 +8466,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // a throwing sink can never break a generation (the recorder swallows).
     setQwenTelemetrySink((r) => {
       const wait = r.waitMs >= 250 ? ` wait ${r.waitMs}ms` : '';
-      // OTA-1130 — the read/write split llama.cpp hands us. `read` is prefill
+      // OTA-1107 — the read/write split llama.cpp hands us. `read` is prefill
       // (ingesting the prompt) and `write` is generation: the single most
       // useful pair of numbers in this log, because they point at completely
       // different fixes (trim the prompt vs cut the token budget).
@@ -8347,30 +8474,64 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? ` read ${r.prefillMs ?? '?'}ms/write ${r.decodeMs ?? '?'}ms`
         : '';
       const sizes = r.promptTokens != null ? ` in ${r.promptTokens}t→out ${r.outTokens ?? '?'}t` : '';
-      // ⚠ OTA-1131 — REUSE, derived, not the raw cache size. OTA-1130 printed
-      // `cachedTokens` and read it as "tokens llama.cpp reused". The first
-      // device log settled it: every row came back as exactly in+out (546+31,
-      // 542+31, 309+179, 127+22 …), i.e. the KV cache grew by what the call
-      // itself did and reused nothing. The honest number is the remainder, and
-      // a measured zero is the finding — it says a stable prompt PREFIX is
-      // still entirely on the table.
-      const reused = r.cachedTokens != null
-        ? Math.max(0, r.cachedTokens - (r.promptTokens ?? 0) - (r.outTokens ?? 0))
-        : null;
-      const cache = reused != null ? ` reuse ${reused}t` : '';
+      // ⚠⚠ OTA-1259 (N4) — THE `reuse Nt` NUMBER WAS STRUCTURALLY ZERO AND IS GONE.
+      //
+      // OTA-1108 derived it as `cachedTokens - promptTokens - outTokens` and read
+      // the resulting zero as a finding: "a stable prompt PREFIX is still entirely
+      // on the table." **That conclusion was built on a wrong premise about the
+      // field.** llama.rn reports `tokens_cached` as `llama->n_past`
+      // (android/src/main/jni.cpp:748), and after a completion `n_past` is the
+      // sequence position — prompt tokens PLUS generated tokens — whether or not
+      // any prefix was reused. Reuse changes what has to be COMPUTED, not what
+      // ends up in the cache. So the subtraction yields ~0 BY CONSTRUCTION and the
+      // metric could never have shown reuse, in any run, ever.
+      //
+      // ⚠⚠ AND THE UNDERLYING WORRY WAS BACKWARDS. llama.rn already does prefix
+      // reuse — `n_past = common_part(embd, prompt_tokens)` in rn-llama.cpp — and
+      // MEASURED, our prompts share 53–85% of their characters with the previous
+      // one (same room 84–85%, two rooms of one tile 53%, ambient-vs-ambient 71%).
+      // The owner's 2026-08-14 log shows two `scene_intro_fill` calls at
+      // 12.2 ms/prompt-token and 3.67 ms/prompt-token on near-identical prompt
+      // sizes: a 3.3× spread that is exactly what a warm prefix looks like.
+      //
+      // ⚠ THE HONEST SIGNAL IS PREFILL PER PROMPT TOKEN, so it rides every line
+      // now instead of only the ten-call rollup (OTA-1127 added it there). A cold
+      // call and a warm one are then two visibly different numbers.
+      // **A metric that cannot move is worse than no metric: it reads as evidence.**
+      // ⚠⚠ OTA-1263 — AND IT OBEYS THE SAME SANITY GUARD THE AGGREGATE DOES.
+      // OTA-1139 already found that llama.rn's native `prompt_ms` is not always
+      // per-call: the range rejects any sample whose prefill exceeds the whole
+      // call, because a 54-second prefill inside a 5-second call is not a
+      // measurement. OTA-1259 added this per-call figure and DID NOT copy that
+      // guard, so the line printed numbers the rollup deliberately refuses.
+      //
+      // ⚠⚠ AND IT COST A WRONG FINDING IMMEDIATELY. OTA-1259 filed
+      // `investigate_lore` at "64.7 ms/prompt-token — where the prefill money
+      // actually is". That row was `ok 6863ms read 8286ms/write 4020ms`: twelve
+      // seconds of reported work inside a seven-second call. **The number was
+      // impossible and I built a finding on it.** The next log settled the real
+      // behaviour — three consecutive `investigate_lore` calls at 59.2 (cold, and
+      // itself impossible), then **2.4 and 2.5 ms/t** — which is prefix reuse
+      // working, exactly as OTA-1259 concluded from the source.
+      const prefillIsPossible = r.prefillMs != null
+        && r.prefillMs <= r.totalMs
+        && (r.promptTokens ?? 0) > 0;
+      const msPerTok = prefillIsPossible
+        ? ` ${(r.prefillMs! / r.promptTokens!).toFixed(1)}ms/t`
+        : '';
       const stop = r.stop === 'limit' ? ' HIT-CAP' : '';
-      get().appendLog('debug', `qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms${wait}${split}${sizes}${cache}${stop} (${r.chars}ch)`);
+      get().appendLog('debug', `qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms${wait}${split}${sizes}${msPerTok}${stop} (${r.chars}ch)`);
       if (qwenCallCount() % 10 === 0) {
         get().appendLog('debug', `qwen⏱ stats — ${qwenTelemetrySummary()}`);
       }
     });
-    // OTA-1130 — wasted work, named as it happens. A discarded line cost the
+    // OTA-1107 — wasted work, named as it happens. A discarded line cost the
     // same CPU as a delivered one; until this existed the stats called it a
     // clean success.
     setQwenDiscardSink((job, reason, ms) => {
       get().appendLog('debug', `qwen⏱ ✂ DISCARDED ${job} after ${ms}ms — ${reason}`);
     });
-    // ⚠⚠ OTA-1200 — MODEL-CONTEXT LEDGER SINK. Installed HERE, beside the other two, and
+    // ⚠⚠ OTA-1177 — MODEL-CONTEXT LEDGER SINK. Installed HERE, beside the other two, and
     // not in startRuntimePressureWatch: this must be live before anything can load a
     // context, and the very first load is the one most likely to race a dispose. A sink
     // armed after the fact would miss the event we built this to catch.
@@ -8451,11 +8612,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const synth = require('../engine/itemSynthesisQwen');
       if (typeof itemDefaults.setQwenSynthRequester === 'function') {
         const pending = new Set<string>();
-        // ⚠ OTA-1132 — A PRIORITY INVERSION, MEASURED. The per-name `pending`
+        // ⚠ OTA-1109 — A PRIORITY INVERSION, MEASURED. The per-name `pending`
         // set stops the same item being synthesised twice, and stops nothing
         // else: a salvage haul of five curios fires five calls, and each one
         // takes the shared native-ML lock for as long as it wants. The
-        // OTA-1131 log is what that costs — `item_synthesis n3 avg13.7s
+        // OTA-1108 log is what that costs — `item_synthesis n3 avg13.7s
         // max19.6s`, and every other job queued behind it:
         //   investigate_lore wait 6.5s · ambient wait 4.0s
         // Ambient's prompt trim landed exactly as predicted (545→361 tokens,
@@ -8473,7 +8634,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         let synthInFlight = false;
         let lastSynthAt = 0;
         const SYNTH_GAP_MS = 20_000;
-        // ⚠ OTA-1149 — THE FIRST HOMEWORK SLOT: ITEM DESCRIPTIONS.
+        // ⚠ OTA-1126 — THE FIRST HOMEWORK SLOT: ITEM DESCRIPTIONS.
         //
         // Owner's governing rule for the whole homework track, and it is the
         // thing that decided which slot goes first: *"our problem is screen
@@ -8493,7 +8654,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // clamps, the cache and the silent-discard-on-bad-row are the existing
         // path untouched — which is the point, because those are five OTAs of
         // hard-won correctness and a second copy would drift from them.
-        // ⚠ OTA-1152 — THE EXPLORATION IDLE SIGNAL, and why it is a different
+        // ⚠ OTA-1129 — THE EXPLORATION IDLE SIGNAL, and why it is a different
         // one. `uiIdleSince` is stamped by STATIONARY SCREENS (the pack, the
         // map) — exactly right for item descriptions, and exactly wrong here,
         // because a scene intro is needed while the player is out walking,
@@ -8503,17 +8664,62 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // and reading time is when the next room should be written.
         //
         // ⚠ THIS DELIBERATELY LETS HOMEWORK RUN DURING NORMAL PLAY, which is
-        // only defensible because OTA-1146 built the harness first: the fill
+        // only defensible because OTA-1123 built the harness first: the fill
         // queues BELOW the voice and is cut short the instant a real
         // generation is enqueued, and `submitPlayerAction` clears the stamp at
         // the one door every action passes through. Without those two, this
-        // would be the item-synthesis mistake of OTA-1146's own commentary —
+        // would be the item-synthesis mistake of OTA-1123's own commentary —
         // background enrichment delaying the line the player is waiting on.
         let lastIntroFillAt = 0;
         /** Six seconds of stillness. Long enough that stepping through a
          *  corridor never triggers it, short enough that a player reading the
          *  room description has already paid for the next one. */
-        const INTRO_IDLE_MS = 6_000;
+        const INTRO_IDLE_FLOOR_MS = 6_000;
+        /** ⚠ A ceiling, so a single pathological sample cannot switch the feature
+         *  off. Twenty seconds of stillness is already a player who has put the
+         *  phone down. */
+        const INTRO_IDLE_CEIL_MS = 20_000;
+        /** ⚠⚠ OTA-1258 (N2) — THE TRIGGER WAS SHORTER THAN THE JOB IT ARMS, SO
+         *  PREEMPTION WAS THE EXPECTED OUTCOME RATHER THAN THE EXCEPTION.
+         *
+         *  The floor is 6s. This job's own telemetry reports ~9s typical — 9009ms
+         *  in the owner's 2026-08-14 log, and an earlier full-session sweep
+         *  measured avg 9.5s / max 11.4s. A fill armed at six seconds of stillness
+         *  is therefore started with a THREE-SECOND HOLE in it: any action in that
+         *  window kills it, and the same log shows exactly that (one intro
+         *  preempted at 5555ms, discarded, zero tokens out).
+         *
+         *  ⚠ READ FROM THE TELEMETRY, NOT HARDCODED. A second constant claiming
+         *  "the job takes about N" is a copy of a number that already exists and
+         *  will drift from it — this session has paid for a rule computed twice
+         *  six times over. `avgMs` is the same figure the debug rollup prints, so
+         *  the threshold and the log can never disagree.
+         *
+         *  ⚠ IT IS A PROXY, NOT A GUARANTEE. Past stillness predicts future
+         *  stillness; it does not promise it. The win is the RATE, and the next
+         *  device log is what says whether it moved — which is why the chosen
+         *  value is printed beside the fill. */
+        // ⚠⚠ OTA-1263 — OTA-1258's VERSION OF THIS NEVER FIRED. It looked up
+        // `j.job === 'scene_intro'`, but the telemetry label for this job is
+        // `narration:scene_intro_fill` (`job: opts?.bankOnly ?
+        // \`narration:${intent}_fill\` : \`narration:${intent}\``). The find never
+        // matched, `st` was always undefined, and every fill fell back to the 6s
+        // floor — the exact behaviour N2 set out to change.
+        //
+        // ⚠⚠ AND THE DEVICE LOG SAID SO PLAINLY, THREE TIMES: `homework: intro-fill
+        // armed after 6000ms idle`, in a session carrying several 6–9s
+        // `scene_intro_fill` samples. **The line I added to prove the change had
+        // worked is the line that proved it had not.** Print the number a change
+        // depends on, then read it.
+        const introIdleMs = (): number => {
+          const st = qwenJobStats().find((j) => j.job === 'narration:scene_intro_fill');
+          // Fewer than three samples is not a measurement — hold the old floor.
+          if (!st || st.count < 3 || st.avgMs <= 0) return INTRO_IDLE_FLOOR_MS;
+          return Math.min(
+            INTRO_IDLE_CEIL_MS,
+            Math.max(INTRO_IDLE_FLOOR_MS, Math.round(st.avgMs * 1.25)),
+          );
+        };
         /** Wider than the item gap: an intro costs a full narration-sized
          *  generation, and two banked lines per room is the whole target. */
         const INTRO_FILL_GAP_MS = 45_000;
@@ -8524,7 +8730,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (introFillInFlight) return false;
           if (Date.now() - lastIntroFillAt < INTRO_FILL_GAP_MS) return false;
           const lastAct = get().lastPlayerActionAt;
-          if (lastAct === null || Date.now() - lastAct < INTRO_IDLE_MS) return false;
+          const idleNeeded = introIdleMs();
+          if (lastAct === null || Date.now() - lastAct < idleNeeded) return false;
           const target = introPrefetchCandidates(get)
             .find((l) => (sceneIntroBank.get(l.id)?.length ?? 0) < INTRO_BANK_PER_LOC);
           if (!target) return false;
@@ -8549,6 +8756,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             { bankOnly: true, forLocation: target },
           ).catch(() => { /* fail closed — the live path still works */ })
             .finally(() => { introFillInFlight = false; });
+          // ⚠ The threshold this fill was armed at, so a device log can tell a
+          // preemption caused by a bad threshold from one caused by a busy player.
+          get().appendLog('debug', `homework: intro-fill armed after ${idleNeeded}ms idle`);
           return true;
         };
         let lastHomeworkAt = 0;
@@ -8583,7 +8793,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (!qwen.isReady() || get().isGenerating) return;
           if ((get().currentScene?.enemies?.length ?? 0) > 0) return;
           if (inScriptedTutorialPhase(get)) return;
-          // ⚠ OTA-1152 — SLOT 2: THE SCENE-INTRO BANK, and it runs BEFORE the
+          // ⚠ OTA-1129 — SLOT 2: THE SCENE-INTRO BANK, and it runs BEFORE the
           // item slot on purpose. An item description is read on the next
           // inventory open, minutes away; a scene intro is spent on the very
           // next step. When both are hungry the one with the nearer deadline
@@ -8619,7 +8829,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         itemDefaults.setQwenSynthRequester((name: string, hintTags: readonly string[]) => {
           const key = name.toLowerCase();
           if (pending.has(key)) return;
-          // OTA-1140 — the `witholdIdentity` RULE dial. A hard run does not get
+          // OTA-1117 — the `witholdIdentity` RULE dial. A hard run does not get
           // its curios worked out for it: the synthesis that writes a curio's
           // description and effect simply does not run, and the item stays what
           // its STATIC row says it is until the player figures the rest out.
@@ -8639,7 +8849,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (!qwen.isReady()) return;
           if (synthInFlight) return;
           if (Date.now() - lastSynthAt < SYNTH_GAP_MS) return;
-          // ⚠ OTA-1168 — ONLY WHILE SOMEONE IS ACTUALLY READING. This is the
+          // ⚠ OTA-1145 — ONLY WHILE SOMEONE IS ACTUALLY READING. This is the
           // defect the owner's load log caught, and it is a JS-side scheduling
           // bug, not a native one: `inferGear` runs over the WHOLE INVENTORY
           // during save-load hydration, so a save with one unclassifiable item
@@ -8651,7 +8861,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // Nobody was waiting on it. This path's own contract is that the
           // result "lands in the cache for the NEXT lookup" (the current render
           // keeps its static row, and OTA-192 restamps later), so it was never
-          // interactive work — OTA-1157's note that "a player who opened an
+          // interactive work — OTA-1134's note that "a player who opened an
           // unknown item IS waiting on it" is true of the POPUP, not of this
           // requester. Gating on `uiIdleSince` — the owner's own homework
           // signal, stamped only by stationary screens (pack / map / menu) —
@@ -8665,7 +8875,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // (a stat resolution inside inventory render) returns first.
           void Promise.resolve().then(async () => {
             try {
-              // ⚠ OTA-1168 — and it runs as HOMEWORK, which is what it always
+              // ⚠ OTA-1145 — and it runs as HOMEWORK, which is what it always
               // was: below voice, and cut short the instant real work arrives.
               // Priority alone never fixed this (a started job cannot be
               // outranked) but it is the honest label, and it stops this path
@@ -8673,7 +8883,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               await synth.synthesizeItemViaQwen(name, hintTags, qwen, { homework: true });
             } catch { /* ignore — fail closed, static row stays */ }
             pending.delete(key);
-            // OTA-1132 — the gap is measured from COMPLETION, not from the
+            // OTA-1109 — the gap is measured from COMPLETION, not from the
             // start: a 19-second call must not be followed instantly by the
             // next one just because the clock ran while it held the lock.
             synthInFlight = false;
@@ -8785,7 +8995,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // alone scrolled past unnoticed — "there should be a pop-up… tap to open
     // collectible screen"). Only the FIRST collectible ever raises the overlay;
     // after that the player knows where they live and the log line carries it.
-    // ⚠⚠ OTA-1206 — SET COMPLETION, WHICH USED TO BE NOTHING. Computed from `owned`, the
+    // ⚠⚠ OTA-1183 — SET COMPLETION, WHICH USED TO BE NOTHING. Computed from `owned`, the
     // list as it stood BEFORE this grant, so it fires exactly once and only for the
     // fragment that actually closed the set. PUNCHLIST P1.
     const finished = storyCompletedBy(fragmentId, owned);
@@ -8866,7 +9076,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', sceneFeatureRefusalLine(ambientHit));
       return;
     }
-    // OTA-981 — a scene noun grants its item ONCE per room, PERIOD. The old
+    // OTA-958 — a scene noun grants its item ONCE per room, PERIOD. The old
     // "self-healing dedup" re-allowed the take whenever the item was no longer
     // in the pack (meant for sold/dropped copies + pre-OTA-173 corrupt
     // markers) — but USING an item also removes it from the pack, so
@@ -8933,7 +9143,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  // OTA-1101 — PICKPOCKET IS FOR PEOPLE. Owner: "stealing is for items,
+  // OTA-1078 — PICKPOCKET IS FOR PEOPLE. Owner: "stealing is for items,
   // pickpocket is for what would be in their clothing or on them." The mark's
   // market goods live on the table — that's what `steal <item>` is for. This
   // action lifts from the POCKET: their walking-around TC, a collectable note
@@ -8951,7 +9161,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!want) return;
     const vendorMark = scene.vendor && scene.vendor.name.toLowerCase().includes(want) ? scene.vendor : null;
     const wandererMark = !vendorMark && scene.wanderer && scene.wanderer.name.toLowerCase().includes(want) ? scene.wanderer : null;
-    // OTA-1104 — YOUR OWN CLIENT'S COAT. Escort leaders with a name are marks
+    // OTA-1081 — YOUR OWN CLIENT'S COAT. Escort leaders with a name are marks
     // while the party walks with you (tracked, pool alive). The payoff is the
     // same pocket table; the CAUGHT branch below is what makes it a different
     // crime — you were paid to keep these people alive.
@@ -9039,7 +9249,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
-      // OTA-1104 — a clean lift is remembered by the LEDGER, not their eyes:
+      // OTA-1081 — a clean lift is remembered by the LEDGER, not their eyes:
       // on a later meeting they mumble about the loss (pocketLossMumble)
       // without ever suspecting you. A caught lift records a wrong instead.
       const markId = vendorMark ? vendorNpcId(vendorMark)
@@ -9056,7 +9266,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('combat', `Pickpocket ${markName} — d20 ${roll} + STE ${stats.stealth}${timeNote} = ${total} vs DC ${dc} — ✗ CAUGHT`);
       if (vendorMark) {
         const trigger = `pickpocketPerson: vendor='${markName}' demeanor=${vendorMark.demeanor} pocket roll=d20(${roll})+STE(${stats.stealth})=${total} vs DC${dc} prevAttempts=${prevAttempts} location=${player.currentLocationId}${player.hubRoomId ? `:${player.hubRoomId}` : ''}`;
-        // OTA-1104 — THE SHAKEDOWN. Owner: "the pay them off option when
+        // OTA-1081 — THE SHAKEDOWN. Owner: "the pay them off option when
         // caught; if you don't have the TC you fight." Tiered to the same
         // demeanor ladder the DC uses — the sketchy fence settles cheap, the
         // hub merchant knows exactly what their silence is worth. The offer
@@ -9077,7 +9287,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           vendorCatchesThief(get, set, trigger);
         }
       } else if (escortMark) {
-        // OTA-1104 — CAUGHT ROBBING YOUR OWN CLIENT. All three consequences
+        // OTA-1081 — CAUGHT ROBBING YOUR OWN CLIENT. All three consequences
         // are the owner's, verbatim: "it should kill the mission if caught,
         // cost you money, and you have to fight the whole party."
         const def = findFactionQuestById(escortMark.id);
@@ -9138,116 +9348,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  stealthTakeAmbientNoun(noun) {
-    const state = get();
-    const player = state.player;
-    const scene = state.currentScene;
-    if (!player || !scene) return;
-    const trimmed = noun.trim();
-    if (!trimmed) return;
-    // Vendor present → real theft from their offer list. Route to
-    // the existing stealFromVendor action which handles rep loss /
-    // getting caught / etc.
-    if (scene.vendor) {
-      get().stealFromVendor(trimmed);
-      return;
-    }
-    // No vendor — opportunistic grab against an ambient noun.
-    const ambientHit = matchAmbientNoun(trimmed, scene.ambientNouns ?? []);
-    if (!ambientHit) {
-      get().appendLog(
-        'arbiter',
-        `The Arbiter looks around. "I don't see ${trimmed} here to lift."`,
-      );
-      return;
-    }
-    const roomKey = makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
-    const room = state.worldMemory.visitedRooms?.[roomKey];
-    const ambientLower = ambientHit.toLowerCase();
-    const alreadyConsumed = nonClimbMarkers(room?.searchedAmbientNouns).some(
-      (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
-    );
-    if (alreadyConsumed) {
-      get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to lift.`);
-      return;
-    }
-    if (isOversized(ambientHit)) {
-      get().appendLog('arbiter', refusalLine(ambientHit), { skipDedup: true });
-      return;
-    }
-    const cat = findCatalogItem(ambientHit);
-    if (!cat) {
-      get().appendLog(
-        'world',
-        `${theCap(ambientHit)} won't come loose silently. Try the SALVAGE button if you mean to break it down.`,
-      );
-      return;
-    }
-    // DEX vs DC 10 sleight-of-hand check, mirroring the existing
-    // steal-intent handler so success / failure feels consistent
-    // whether the player typed `steal X` or tapped TAKE+stealth.
-    // 2026-05-25 — apply day/night stealth modifier (+1 night, -1
-    // day). Per playtester: night = better cover, daytime = exposed.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { stealthTimeBonus } = require('../engine/timeOfDay');
-    const stats = effectiveStats(player, weatherStatModifiers(scene.weather, playerArmorResistKinds(player)));
-    const timeBonus = stealthTimeBonus(player.hoursElapsed);
-    const roll = rollDie(20);
-    // OTA-348 — pickpocket / sleight-of-hand now rolls Stealth (was DEX).
-    const total = roll + stats.stealth + timeBonus;
-    const success = total >= 10;
-    const timeNote = timeBonus !== 0 ? ` ${timeBonus > 0 ? '+' : ''}${timeBonus} (${timeBonus > 0 ? 'night' : 'day'})` : '';
-    set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.skillCheck), 0.25) } : sLive));
-    get().appendLog(
-      'combat',
-      `You — sleight of hand on ${ambientHit} → d20 ${roll} + STE ${stats.stealth}${timeNote} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
-    );
-    if (!success) {
-      // Failure narrates the slip; the noun stays available. Player
-      // can retry stealth OR take it openly.
-      get().appendLog('world', `Your hand slips on the ${ambientHit}. It stays where it was.`);
-      return;
-    }
-    // Success — grant the canonical catalog item AND mark consumed.
-    // Quieter narration than open take ('lifted into your pack with
-    // no one watching') so the stealth attempt reads as intentional.
-    const newItem: InventoryItem = stampDurability({
-      id: `lift_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-      name: cat.name,
-      kind: cat.kind,
-      rarity: cat.rarity,
-      quantity: 1,
-      tags: cat.tags,
-    });
-    const grantResult = grantItem(player.inventory, newItem);
-    set((s) => (s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s));
-    set((s) => {
-      const r = s.worldMemory.visitedRooms?.[roomKey] ?? {
-        firstVisitAt: Date.now(),
-        lastVisitAt: Date.now(),
-        visitCount: 1,
-      };
-      return {
-        worldMemory: {
-          ...s.worldMemory,
-          visitedRooms: {
-            ...(s.worldMemory.visitedRooms ?? {}),
-            [roomKey]: {
-              ...r,
-              searchedAmbientNouns: [...(r.searchedAmbientNouns ?? []), ambientLower],
-            },
-          },
-        },
-      };
-    });
-    if (grantResult.accepted > 0) {
-      get().appendLog('world', `You palm the ${cat.name}. It vanishes into your pack — quiet, clean.`);
-      get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}). [lifted]`);
-    } else {
-      get().appendLog('world', `Your fingers close on ${withArticle(cat.name.toLowerCase())}, but your pack is already full.`);
-    }
-    void get().persist();
-  },
 
   queueInputDraft(text) {
     set({ pendingInputDraft: text });
@@ -9255,6 +9355,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   setInputModalOpen(open) {
     if (get().inputModalOpen !== open) set({ inputModalOpen: open });
+  },
+
+  setExplorationDraft(text) {
+    if (get().explorationDraft !== text) set({ explorationDraft: text });
   },
 
   setExplorationInputActive(active) {
@@ -9531,11 +9635,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         currentScene: restoredScene,
         pendingRolls: null,
   pendingHookContinue: null,
-        // OTA-1041 — a loaded save never reopens the crawl mid-game.
+        // OTA-1018 — a loaded save never reopens the crawl mid-game.
         storyIntro: null,
-        chapterCard: null, // OTA-1043 — nor a stale chapter card
-        pendingFork: null, // OTA-1088 — nor an open question from another run
-        // OTA-1045 — a save whose motive was DEALT (backfill guess, never
+        chapterCard: null, // OTA-1020 — nor a stale chapter card
+        pendingFork: null, // OTA-1065 — nor an open question from another run
+        // OTA-1022 — a save whose motive was DEALT (backfill guess, never
         // chosen) is owed the one-time picker, right here on load.
         motivePickerPending: player.storyMotiveChosen !== true,
 
@@ -9623,7 +9727,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // world cue and the Arbiter welcome. Establishes the rhythm
       // that the world doesn't pause for the player — it has been
       // running while they were gone.
-      // ⚠ OTA-1166 — WELCOME BACK ALWAYS WINS. The load beat used to let three
+      // ⚠ OTA-1143 — WELCOME BACK ALWAYS WINS. The load beat used to let three
       // arbiter lines stack (this beat when it drew an arbiter line, the OTA-849
       // recap, then the greeting) and the voice read the whole pile (owner: "the
       // arbiter fired 3 lines when I started back in the save file"). The Arbiter
@@ -9640,7 +9744,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog(beat.channel, beat.line, { skipDedup: true });
         }
       }
-      // OTA-1166 — set by the offline-recap block below, consumed by the welcome
+      // OTA-1143 — set by the offline-recap block below, consumed by the welcome
       // greeting: the recap rides INSIDE the "Welcome back" quote as a second
       // sentence instead of being its own arbiter line.
       let offlineRecapPending = false;
@@ -9690,7 +9794,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               simulatePatrols(get, set, factions, nowH, seed + i + 1);
             }
             if (rumors.length > 0 || (get().worldMemory.patrols ?? []).length > 0) {
-              // ⚠ OTA-1166 — no standalone recap line anymore. The recap is folded
+              // ⚠ OTA-1143 — no standalone recap line anymore. The recap is folded
               // into the welcome greeting below (welcome back always wins), so the
               // Arbiter's return beat is ONE spoken line, not a stack.
               offlineRecapPending = true;
@@ -9721,7 +9825,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // queue (clears any backlog) instead of waiting behind it.
         get().appendLog(
           'arbiter',
-          // OTA-1166 — the offline recap (when the world moved) is folded into
+          // OTA-1143 — the offline recap (when the world moved) is folded into
           // this one greeting; see welcomeBackLine. Welcome back always wins.
           welcomeBackLine(get().player, { offlineRecap: offlineRecapPending }),
           { skipDedup: true, speakFront: true },
@@ -9791,7 +9895,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       await saveSlot(slotId, { ...saved, player: revived });
       const remainingGems = await addResurrectionGems(-1);
       await setActiveSlot(slotId);
-      // OTA-1021 — resurrection goes through the SAME load migrations as a normal
+      // OTA-998 — resurrection goes through the SAME load migrations as a normal
       // slot load (it read raw memory before; see migrateLoadedWorldMemory).
       const revivedWorldMemory = migrateLoadedWorldMemory(saved.worldMemory);
       setCanonExtraLocations(revivedWorldMemory.canonLocations ?? []);
@@ -9805,7 +9909,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         currentScene: null,
         pendingRolls: null,
         pendingHookContinue: null,
-        // OTA-1045 — resurrection is a load path too: a dealt-motive save
+        // OTA-1022 — resurrection is a load path too: a dealt-motive save
         // gets its one-time picker here as well.
         motivePickerPending: revived.storyMotiveChosen !== true,
         wastelandStepsSinceEncounter: 0,
@@ -9861,8 +9965,76 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
+  async importSaveFromText(text) {
+    // Pull the {player, worldMemory} JSON out of a COPY SAVE export — tolerant of
+    // the === markers + the highlights preamble around it, or just the bare JSON.
+    const extractJson = (raw: string): string | null => {
+      const start = raw.indexOf('{"player"');
+      const from = start >= 0 ? start : raw.indexOf('{');
+      if (from < 0) return null;
+      let depth = 0; let inStr = false; let esc = false;
+      for (let i = from; i < raw.length; i++) {
+        const ch = raw[i];
+        if (inStr) {
+          if (esc) esc = false;
+          else if (ch === '\\') esc = true;
+          else if (ch === '"') inStr = false;
+        } else if (ch === '"') inStr = true;
+        else if (ch === '{') depth++;
+        else if (ch === '}') { depth--; if (depth === 0) return raw.slice(from, i + 1); }
+      }
+      return null;
+    };
+    let parsed: { player?: PlayerCharacter | null; worldMemory?: unknown };
+    try {
+      const jsonStr = extractJson(text ?? '');
+      if (!jsonStr) return { ok: false, error: 'No save data found in the pasted text. Copy a full COPY SAVE export first, then tap Import.' };
+      parsed = JSON.parse(jsonStr) as { player?: PlayerCharacter | null; worldMemory?: unknown };
+    } catch (e) {
+      return { ok: false, error: `Could not parse the save (${e instanceof Error ? e.message : 'invalid JSON'}).` };
+    }
+    if (!parsed.player) return { ok: false, error: 'That save has no character record.' };
+    let player: PlayerCharacter;
+    try { player = backfillPlayer(parsed.player); }
+    catch (e) { return { ok: false, error: `Save couldn't be loaded (${e instanceof Error ? e.message : 'backfill failed'}).` }; }
+    if (player.dead === true) {
+      return { ok: false, error: `${player.name || 'That character'} is dead — revive them on the original install first.` };
+    }
+    const worldMemory = (parsed.worldMemory && typeof parsed.worldMemory === 'object')
+      ? (parsed.worldMemory as WorldMemory)
+      : discoverLocation(emptyMemory(), player.currentLocationId);
+    // Write it to a NEW slot, mirroring the new-character path so it registers in
+    // the slot picker and persists.
+    const slotId = newSlotId();
+    try { await setActiveSlot(slotId); } catch { /* best effort */ }
+    set({
+      player,
+      worldMemory,
+      gameLog: [],
+      currentScreen: 'exploration',
+      currentScene: null,
+      pendingRolls: null,
+      pendingHookContinue: null,
+      pendingGolemNaming: false,
+      activeSlotId: slotId,
+      slotLoadError: null,
+      // Imported mid-game saves have already seen the intro — never re-arm the
+      // tutorial for them.
+      tutorialStep: null,
+      awaitingTutorialName: false,
+      tutorialExploreChosen: false,
+      activeBuildingId: null,
+      activeBuildingRoomId: null,
+      buildingRevealed: [],
+      callDogModalOpen: false,
+    });
+    try { get().beginScene({}); } catch { /* scene paints on the next action if this throws */ }
+    try { await get().persist(); } catch { /* best effort — state is live regardless */ }
+    return { ok: true, name: player.name };
+  },
+
   setScreen(screen) {
-    // ⚠ OTA-1188 — LEAVING THE WORLD SCREEN RELEASES THE FREEZE. Owner's rule for the
+    // ⚠ OTA-1165 — LEAVING THE WORLD SCREEN RELEASES THE FREEZE. Owner's rule for the
     // snapshot was "an automatic wipe and reset and recapture — that way you're never
     // looking at old data." A freeze that survived navigation would break exactly that:
     // hold the board, wander off for three in-game days, come back and accept, and the
@@ -9879,6 +10051,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (screen === 'vendor' && (get().currentScene?.enemies.length ?? 0) > 0) {
       get().appendLog('system', "Not while you're in a fight — deal with the threat first.");
       return;
+    }
+    // ⚠⚠ OTA-1280 — LEAVING THE PACK ENDS GIFT MODE. Owner: he opened "give
+    // Halem a gift", backed out of the inventory with BACK instead of the
+    // banner, played on — and the NEXT time he opened the pack to equip armor
+    // it was still offering everything to Halem. Gift mode's entire UI lives on
+    // the inventory screen; a mode that outlives its screen is invisible state,
+    // and the only tap that ever cleared it was the banner (or a completed
+    // GIVE, which clears before navigating and so never trips this guard).
+    // His rule, verbatim: "if I leave that screen, I'm no longer giving a gift."
+    if (get().giftMode && get().currentScreen === 'inventory' && screen !== 'inventory') {
+      get().appendLog('debug', 'gift: mode ended — left the inventory without giving');
+      set({ giftMode: null });
     }
     set({ currentScreen: screen });
     void get().persist();
@@ -9916,7 +10100,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // character. Old characters loaded via loadSlotIntoGame don't
       // hit this path; their hasSeenIntro stays true and the tutorial
       // never fires.
-      tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false },
+      tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false, vest: false },
       awaitingTutorialName: false,
       tutorialExploreChosen: false,
       activeBuildingId: null,
@@ -9925,19 +10109,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // arb119 — a fresh game must not inherit a stale open call-dog modal
       // (a transient UI flag that otherwise survives from a prior session).
       callDogModalOpen: false,
-      pendingGift: null, // OTA-1083 — and any half-finished gift
-      pendingTalk: null, // OTA-1081 — and any stale conversation
+      pendingGift: null, // OTA-1060 — and any half-finished gift
+      pendingTalk: null, // OTA-1058 — and any stale conversation
       pendingParley: null, // OTA-808 — clear any stale parley on a fresh game
-      pendingPayoff: null, // OTA-1104 — and any stale shakedown
-      // OTA-1041 — THE OPENING CRAWL. A brand-new character opens on the
+      pendingPayoff: null, // OTA-1081 — and any stale shakedown
+      // OTA-1018 — THE OPENING CRAWL. A brand-new character opens on the
       // reason they came down: three universal pages (the flood, the thousand
       // years, the nine hearts), two for their motive, one for the faction
       // that took them in, and the closing hand-off. Assembled per-character;
       // the StoryIntroOverlay shows it over the first scene.
       storyIntro: introPagesFor(player.storyMotive, player.factionId),
-      chapterCard: null, // OTA-1043 — no stale card from a prior character
-      pendingFork: null, // OTA-1088
-      motivePickerPending: false, // OTA-1045 — creation chose; nothing owed
+      chapterCard: null, // OTA-1020 — no stale card from a prior character
+      pendingFork: null, // OTA-1065
+      motivePickerPending: false, // OTA-1022 — creation chose; nothing owed
     });
     try {
       get().appendLog('debug', `APK session start: ${OTA_BUILD_ID}.`);
@@ -9958,12 +10142,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     await get().persist();
     const slots = await listSlots();
     set({ slots });
-    // First-time tutorial — only on brand-new characters. OTA-1042 — THE
+    // First-time tutorial — only on brand-new characters. OTA-1019 — THE
     // ARBITER HOLDS HIS TONGUE. Owner: "the arbiter says his tutorial
     // opening line over top of the new origin text screens — it needs to
     // hold until you are in the tutorial." startTutorial() used to fire
     // HERE, printing "Your name, traveler..." into the feed while the
-    // OTA-1041 crawl was still covering the screen. The tutorial STATE is
+    // OTA-1018 crawl was still covering the screen. The tutorial STATE is
     // already armed above (so the scene-entry hints stay suppressed); the
     // spoken name prompt now waits for dismissStoryIntro() — the moment
     // the crawl closes and the player is actually looking at the feed.
@@ -9988,10 +10172,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentScene: null,
       pendingRolls: null,
   pendingHookContinue: null,
-      storyIntro: null, // OTA-1041
-      chapterCard: null, // OTA-1043
-  pendingFork: null, // OTA-1088
-      motivePickerPending: false, // OTA-1045
+      storyIntro: null, // OTA-1018
+      chapterCard: null, // OTA-1020
+  pendingFork: null, // OTA-1065
+      motivePickerPending: false, // OTA-1022
       currentScreen: 'title',
       activeSlotId: null,
       slots,
@@ -9999,7 +10183,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   appendLog(channel, text, meta) {
-    // OTA-1058 — if a boss is being resolved, this line also goes on the victory
+    // OTA-1035 — if a boss is being resolved, this line also goes on the victory
     // card. No-op otherwise; nothing about the feed changes either way.
     captureBossVictoryLine(channel, text);
     // 2026-05-25 OTA-034 — narration-channel invariant. The authored
@@ -10119,25 +10303,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Don't merge time-passed markers — they're discrete clock beats.
         !text.startsWith('⏳') &&
         !lastEntry.text.startsWith('⏳') &&
-        // OTA-1078 — NEVER merge a story beat, in either direction. The merged
+        // OTA-1055 — NEVER merge a story beat, in either direction. The merged
         // entry is built as `{ ...lastEntry, text }`, so meta comes from the
         // FIRST line: a story beat glued onto a preceding world line inherited
         // that line's meta and lost `storyBeat` entirely — no rule, no STORY
         // chip, no spacing. That is not a corner case. Most authored drip beats
         // are world-channel and advanceStoryDrip runs microseconds after
         // beginScene's own world lines, so the main story turning over rendered
-        // stuck to the end of a radar line. Exactly the complaint OTA-1074 was
+        // stuck to the end of a radar line. Exactly the complaint OTA-1051 was
         // written to fix, reintroduced by a debounce written years earlier.
         (meta as { storyBeat?: boolean } | undefined)?.storyBeat !== true &&
         (lastEntry.meta as { storyBeat?: boolean } | undefined)?.storyBeat !== true &&
-        // OTA-1118 — NEVER weld a conversation line onto an entry that predates
+        // OTA-1095 — NEVER weld a conversation line onto an entry that predates
         // the conversation. The talk view renders the entries at or after
         // `startedAtTs` as its transcript, so a first reply merged backwards
         // into the arrival narration would land OUTSIDE the window and the
         // player would watch their opening question get no answer — the exact
         // failure that OTA exists to end, arriving through the debounce instead
         // of the layout. Merging WITHIN the conversation is still fine.
-        // OTA-1121 — compares TIMESTAMPS, not indices, for the same reason the
+        // OTA-1098 — compares TIMESTAMPS, not indices, for the same reason the
         // transcript does: gameLog is trimmed to MAX_LOG_IN_MEMORY on every
         // append, so an index taken at open time silently slides off.
         !(state.pendingTalk != null && lastEntry.ts < state.pendingTalk.startedAtTs);
@@ -10299,10 +10483,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { player, worldMemory } = get();
     if (!player) return;
     const location = getLocationById(player.currentLocationId);
-    // OTA-1003 — #122: weather is a LOCAL, PERSISTENT condition. Reuse the sky
+    // OTA-980 — #122: weather is a LOCAL, PERSISTENT condition. Reuse the sky
     // rolled for this location within the last ~6 game-hours (scene rebuilds
     // stop re-rolling it); otherwise roll fresh WITH locale bias and store.
-    // OTA-1017 — #122 COMPLETED: the memory is a PER-LOCATION map. The single slot
+    // OTA-994 — #122 COMPLETED: the memory is a PER-LOCATION map. The single slot
     // meant leave-and-return inside the window re-rolled the origin's sky.
     // The legacy slot reads once as migration; entries self-prune when stale.
     const skyHoursNow = player.hoursElapsed ?? 0;
@@ -10325,7 +10509,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return { worldMemory: { ...s.worldMemory, sceneWeatherByLoc: pruned } };
       });
     }
-    // OTA-1052 — chip dismissals (Crucible ✕, vendor ✕) are TILE-scoped. Clear
+    // OTA-1029 — chip dismissals (Crucible ✕, vendor ✕) are TILE-scoped. Clear
     // them the moment the player is standing somewhere else, so walking the rooms
     // of a capital keeps a dismiss but leaving and returning brings the chip back
     // (owner: "stay dismissed until we leave the capital tile and come back").
@@ -10404,7 +10588,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // long ago) repopulate normally — Tartaria doesn't stay quiet
     // forever. Pulls from the visitedRooms MapGraph + player.hoursElapsed.
     const RESPAWN_QUIET_HOURS = 6;
-    // ⚠ OTA-1127 — key on the RESOLVED hub room, not the snapshot. At boot the
+    // ⚠ OTA-1104 — key on the RESOLVED hub room, not the snapshot. At boot the
     // auto-entry above just assigned the gate room to LOCAL `hubRoomId` and
     // wrote it to the store, but the `player` object captured at the top of
     // this build still reads hubRoomId=undefined — so the opening scene filed
@@ -10447,7 +10631,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // any tile — a swamp crab on arrival then SUPPRESSED the market building
     // (below), so the player stood in "The Hidden Market" with no market. A
     // 'market'-tagged location is a safe trade ground; never spawn a fight there.
-    // OTA-1235 — one spelling for the truce (engine/sacredGround.ts).
+    // OTA-1212 — one spelling for the truce (engine/sacredGround.ts).
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const isNeutralMarket = (require('../engine/sacredGround') as typeof import('../engine/sacredGround')).isSacredGround(location);
     // OTA-801 — post-boss grace window. A boss kill stamps player.
@@ -10455,7 +10639,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // encounters are suppressed so stepping out of the outpost you just cleared
     // doesn't drop a fresh ambush on you mid-loot. Lapses on game-time.
     const inBossGrace = (player?.bossDefeatGraceUntilHours ?? 0) > hoursElapsed;
-    const suppressEncounter = enforcePeace || recentlyCleared || !!hubRoom || isNeutralMarket || inBossGrace;
+    // ⚠⚠ OTA-1272 — the doorstep grace. While free-passage units remain, the
+    // encounter roll is skipped and one unit is burned per wilderness scene.
+    const inExitGrace = !hubRoom && (player?.safeExitMovesLeft ?? 0) > 0;
+    if (inExitGrace) {
+      set((s) => (s.player
+        ? { player: { ...s.player, safeExitMovesLeft: Math.max(0, (s.player.safeExitMovesLeft ?? 0) - 1) } }
+        : s));
+    }
+    const suppressEncounter = enforcePeace || recentlyCleared || !!hubRoom || isNeutralMarket || inBossGrace || inExitGrace;
     // Phase 4 §4.3 — biome-curated encounter pools. If the Micro-Micro
     // has a possibleEncounters list, pick rarity-weighted from THAT pool
     // (so the Buried Skyscraper Upper only spawns Aetherbats, Reclaimer
@@ -10480,7 +10672,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const extra = pickEncounterFromLadder(ladderTriple);
         if (extra) encounter = [...encounter, extra];
       }
-      // OTA-817 — MIXED-ROLE PACKS. The curated single-enemy path pre-empted the group
+      // OTA-797 — MIXED-ROLE PACKS. The curated single-enemy path pre-empted the group
       // roll, so laddered areas hadn't spawned more than one foe in weeks (and the
       // target-swipe UI + companions went unused). Add role-diverse pack members
       // (drone + bandit + rat), frequency scaling with danger — a frontier tile stays
@@ -10542,10 +10734,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // without permanently flooding the world with vendors.
     const tilesSeen = player?.recentTileHistory?.length ?? 0;
     const roadsideRate = tilesSeen >= 24 ? 0.25 : 0.5 - (0.25 * tilesSeen) / 24;
-    // ⚠ OTA-1218 — the technique text is appended to whatever this resolves to, OUTSIDE
+    // ⚠ OTA-1195 — the technique text is appended to whatever this resolves to, OUTSIDE
     // the IIFE, because the IIFE has two returns and a stamp at one of them is a row that
     // silently never appears on the other path. (The identical mistake is written up in
-    // OTA-1210's accept-cell stamp: eight sites of nine.)
+    // OTA-1187's accept-cell stamp: eight sites of nine.)
     const vendor: VendorInstance | null = withTechniqueTextOffer(((): VendorInstance | null => {
       let base: VendorInstance | null = opts?.isOpening
         ? null
@@ -10578,7 +10770,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // (Foreign capitals use the separate atCoreCapital vendor path above, so
       // this only ever fires for the player's own home-hub armory anchor.)
       if (base && hubRoom?.anchorNpc === 'Irma Ironhand' && player.factionId) {
-        // ⚠ OTA-1224 (PUNCHLIST P9) — the armory stocks the HOST's line, behind standing.
+        // ⚠ OTA-1201 (PUNCHLIST P9) — the armory stocks the HOST's line, behind standing.
         // Owner: *"host gear depending on faction status."* At an owned site the gear on
         // the racks belongs to whoever owns the ground, and Irma only opens it to someone
         // the host trusts: a MEMBER, or standing at the JOIN threshold. At home you are
@@ -10664,7 +10856,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           stage: 0,
           resolved: false,
         });
-        // OTA-1126 — spend the memory THE MOMENT it is planted, not when the
+        // OTA-1103 — spend the memory THE MOMENT it is planted, not when the
         // thread resolves. Stamping on resolve would let a player who ignores
         // the hook re-roll it room after room; stamping at plant means one
         // discovery seeds exactly one echo thread, ever. Without this the
@@ -10853,7 +11045,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // the room's consumed set (the take handler's searchedAmbientNouns) here
     // makes a taken piece stay gone for that tile, on hub AND wild tiles.
     const gearConsumed = roomConsumedSet(get().worldMemory, candidateKey);
-    // OTA-996 — #119a: cross-tile variety window — exclude the last ~10 rolled
+    // OTA-973 — #119a: cross-tile variety window — exclude the last ~10 rolled
     // gear names so a short walk stops repeating the same items.
     const recentGearNames = new Set((worldMemory.recentTakeableGearNames ?? []).map((n) => n.toLowerCase()));
     const sceneGearNouns: string[] = pickTakeableGearForScene(candidateKey, recentGearNames)
@@ -10887,7 +11079,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const pool = ['rain pool', 'crevice-pool', 'puddle', 'shallow pool', 'standing water', 'cold spring', 'still pond'];
       return [pool[h % pool.length]!];
     })();
-    const ambientNouns = Array.from(new Set([...sceneGearNouns, ...waterSourceNouns, ...baseTakeable, ...allClimbablesPool, ...allSalvageablesPool]));
+    // ⚠⚠ OTA-1243 — THE DOG-RESCUE PROP IS PLACED, NOT HOPED FOR.
+    //
+    // `RESCUE_SCENARIOS` has carried an `archetypes` field since OTA-120 — "scene
+    // archetypes where this hook is eligible to spawn, matched against
+    // location.tags" — and NOTHING EVER CONSUMED IT. The rescue only fired when a
+    // player happened to engage a noun the matcher recognised, and the OTA-1241
+    // census measured what that meant: 13 of the scenarios' 19 hook nouns match
+    // nothing the world places. The cellar rescue was reachable only through
+    // `hatch`, the snare only through `trap` — the quest was riding on vocabulary
+    // accidents. This builds the injection that field always described: on an
+    // archetype-matching tile, while the rescue can still fire, the scenario's OWN
+    // primary prop is seeded into the scene.
+    //
+    // ⚠ Seeded by tile key like the water sources — stable per tile, not farmable
+    // by leave-and-return — and at 22% of eligible tiles so a wasteland walk reads
+    // as occasionally holding a story, not as a prop on every screen. ⚠ GATED on
+    // rescue eligibility (no dog, no onboarding pending), so once the quest is
+    // done the world stops staging it; a prop already locked into a visited tile's
+    // cache just becomes an ordinary noun.
+    const rescuePropNouns: string[] = (() => {
+      if (get().player?.hubRoomId) return []; // indoor outpost rooms — never
+      if (get().player?.dog || get().worldMemory.pendingDogOnboarding) return [];
+      const locTags = (location.tags ?? []).map((t) => String(t).toLowerCase());
+      const eligible = (Object.values(RESCUE_SCENARIOS) as RescueScenario[])
+        .filter((sc) => sc.archetypes.some((a) => locTags.includes(a)));
+      if (eligible.length === 0) return [];
+      let h = 0;
+      const seedStr = `dog-prop:${candidateKey}`;
+      for (let i = 0; i < seedStr.length; i++) h = (h * 31 + seedStr.charCodeAt(i)) >>> 0;
+      if (h % 100 >= 22) return [];
+      const sc = eligible[h % eligible.length]!;
+      // hookNouns[0] is each scenario's primary prop — cage / wagon / cellar
+      // door / snare pit — the noun its intro copy was written around.
+      return sc.hookNouns.length > 0 ? [sc.hookNouns[0]!] : [];
+    })();
+    const ambientNouns = Array.from(new Set([...sceneGearNouns, ...waterSourceNouns, ...rescuePropNouns, ...baseTakeable, ...allClimbablesPool, ...allSalvageablesPool]));
     // Lock the visible subset for THIS tile. Look-around and the chip pool
     // (Search/Approach/Salvage) BOTH read from this same cache — strict
     // match. If a noun isn't in your look-around, it isn't in your chips
@@ -10932,6 +11159,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (waterSourceNouns.length > 0) {
       displayedAmbientNouns = Array.from(new Set([...waterSourceNouns, ...displayedAmbientNouns]));
     }
+    // ⚠ OTA-1243 — same guarantee for the rescue prop: a story hook the display
+    // cap can silently drop is a story hook that does not exist.
+    if (rescuePropNouns.length > 0) {
+      displayedAmbientNouns = Array.from(new Set([...rescuePropNouns, ...displayedAmbientNouns]));
+    }
+    // ⚠⚠ OTA-1244 — AND RECORD THE GUARANTEE, so it survives every later recompute.
+    // Three prepends above; the cardinal-step re-shuffle honoured none of them.
+    const pinnedAmbientNouns = Array.from(new Set([
+      ...sceneGearNouns, ...waterSourceNouns, ...rescuePropNouns,
+    ]));
     // arb39 — persistent-room emptiness for hub interiors (the tutorial
     // outpost rooms, capital halls, etc.). Once an interactable has been
     // taken or salvaged in this room, it stays gone on re-entry — closing
@@ -11048,10 +11285,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // own anchor (it IS the market), so force it here rather than leaving the anchor
     // building-less like other named tiles.
     // OTA-743 — no longer gated on !hasEnemies. The market IS the place; if a
-    // stray ambush fires (OTA-743 suppresses arrival encounters, but a mid-scene
-    // investigate-ambush could still spring), the market must stay visible so the
-    // player can trade the moment the scene clears, instead of being stranded in
-    // a nameless hollow with no way back to the stalls.
+    // stray ambush fires, the market must stay visible so the player can trade the
+    // moment the scene clears, instead of being stranded with no way to the stalls.
     const sceneBuilding: string | null =
       location.id === 'hidden_market'
         ? 'market'
@@ -11119,7 +11354,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         sceneDisplayedNouns = Array.from(new Set([gc.noun, ...sceneDisplayedNouns]));
       }
     }
-    // OTA-974 — Phase B of real heights: seed PERCHES onto taller climbables
+    // OTA-951 — Phase B of real heights: seed PERCHES onto taller climbables
     // (a nest at tier 2 of the tower). Deterministic per room — the hash of
     // (roomKey, structure) decides everything, so leaving and re-entering a
     // scene can never reroll the loot. Already-harvested perches (marked in
@@ -11140,7 +11375,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const perchConsumed = roomConsumedSet(get().worldMemory, perchRoomKey);
       const liveNouns = seeded.nouns.filter((n) => !isConsumedNoun(perchConsumed, n));
       if (liveNouns.length > 0) {
-        // ⚠ OTA-1178 — THE STRUCTURE COMES WITH IT. A perch is only ever reachable
+        // ⚠ OTA-1155 — THE STRUCTURE COMES WITH IT. A perch is only ever reachable
         // by climbing the thing it sits on, so showing the perch while hiding the
         // structure advertises loot behind an invisible door.
         //
@@ -11169,7 +11404,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
-      vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, microMicroId,
+      vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, pinnedAmbientNouns, microMicroId,
       nounPlacements: scenePerchPlacements,
       missionBoard,
       wanderer,
@@ -11302,7 +11537,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-807 — announce a wandering NPC on arrival so the TALK affordance isn't
     // unexplained. Names the person after the archetype's greeting.
     if (scene.wanderer && !opts?.isOpening) {
-      // OTA-1080 — and onto the ledger, where every other person the player
+      // OTA-1057 — and onto the ledger, where every other person the player
       // meets already lives. Keyed by archetype + name, so the same traveller
       // met on two tiles is one person rather than two rows.
       sightPerson(get, set, {
@@ -11314,7 +11549,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const wRel = getRelation(get().worldMemory, vendorNpcId(scene.wanderer));
       if (wRel && wRel.meetings > 1) {
         get().appendLog('world', npcGreeting(wRel, scene.wanderer.name, get().player?.name));
-        // OTA-1104 — a wanderer lifted clean on an earlier road notices the
+        // OTA-1081 — a wanderer lifted clean on an earlier road notices the
         // loss when your paths cross again — and never looks at you.
         const wMumble = pocketLossMumble(wRel, scene.wanderer.name);
         if (wMumble) {
@@ -11404,7 +11639,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // [roomKey] so persistence is automatic via the existing
     // save path.
     if (player) {
-      // OTA-1127 — same resolved-hub key as candidateKey (the snapshot's
+      // OTA-1104 — same resolved-hub key as candidateKey (the snapshot's
       // hubRoomId is stale at boot; see the candidateKey comment).
       const investigateRoomKey = makeRoomKey(
         player.currentLocationId,
@@ -11416,7 +11651,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set((s) => {
         const prev = s.worldMemory.visitedRooms?.[investigateRoomKey];
         if (prev?.roomInvestigationTable) return s; // already seeded
-        // ⚠ OTA-1127 — a freshly-CREATED shell seeds visitCount 0, not 1.
+        // ⚠ OTA-1104 — a freshly-CREATED shell seeds visitCount 0, not 1.
         // This seeder runs BEFORE the visit-record block below in the same
         // build, so a 1 here was a phantom prior visit: the counter found an
         // "existing" record on the player's FIRST entry and greeted every
@@ -11535,7 +11770,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // Append the hidden noun + seed an investigation entry.
               set((s) => {
                 if (!s.currentScene) return s;
-                // OTA-1127 — a created shell seeds visitCount 0: this runs
+                // OTA-1104 — a created shell seeds visitCount 0: this runs
                 // BEFORE the visit-record block in the same build, and a 1
                 // here was a phantom prior visit (see the OTA-071 seeder).
                 const r = s.worldMemory.visitedRooms?.[roomKey] ?? {
@@ -11610,11 +11845,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // re-entering the same vendor's scene won't double-list them. We
     // use the vendor's id when present, otherwise a slug of their name
     // (roadside traders have stable ids; legacy saves may not).
-    // OTA-1078 — through the shared helper, so this site and the two that were
+    // OTA-1055 — through the shared helper, so this site and the two that were
     // missing it can never drift apart again. No prior-vendor argument: an
     // arrival IS the event here, and beginScene has already committed the new
     // scene by this point, so reading currentScene.vendor would always match
-    // itself and suppress every sighting the ledger has taken since OTA-1072.
+    // itself and suppress every sighting the ledger has taken since OTA-1049.
     if (vendor) sightVendor(get, set, vendor, location.id);
     // For narration, use the first enemy as the scene representative.
     // The full group is surfaced via the EnemyPanel + a follow-up line
@@ -11772,7 +12007,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `It's ${timePhrase}. ${presenceLine} ` +
         bearingsLine;
       get().appendLog('world', arrival);
-      // OTA-993 — #112: reference the location before speaking of its rooms.
+      // OTA-970 — #112: reference the location before speaking of its rooms.
       // Arrival at a hub location auto-enters the outpost interior (hubRoomId
       // was set above), but this branch REPLACES the scene text with the
       // OUTDOOR arrival paragraph — so the "Paths:" room line further down
@@ -11789,7 +12024,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else {
       get().appendLog('world', sceneText);
     }
-    // OTA-668 — persistent mission line, printed directly under the scene
+    // OTA-653 — persistent mission line, printed directly under the scene
     // paragraph on every entry so an interrupting fight can't leave the player
     // unsure what they were doing. (Same objective the look-around reminder
     // surfaces; routed to 'world' to sit with the scene text.)
@@ -11890,7 +12125,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const roomKey = candidateKey;
     const prevVisits = get().worldMemory.visitedRooms ?? {};
     const existing = prevVisits[roomKey];
-    // ⚠ OTA-1127 — greet only on a REAL prior visit. Earlier writers in this
+    // ⚠ OTA-1104 — greet only on a REAL prior visit. Earlier writers in this
     // same build (the OTA-071 investigation seeder, the dog smell-find) may
     // have created the record as a visitCount-0 shell to hang their table on;
     // greeting off bare existence read every first entry as a return.
@@ -11919,14 +12154,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...s.worldMemory,
         visitedRooms: {
           ...(s.worldMemory.visitedRooms ?? {}),
-          // ⚠ OTA-1127 — SPREAD, then override. This literal used to rebuild
+          // ⚠ OTA-1104 — SPREAD, then override. This literal used to rebuild
           // the record field-by-field, and the arb107 comment it replaced was
           // its own indictment: "any un-spread field is dropped." Fields kept
           // getting added to VisitedRoom (searchNothingCounts, groundDigCount,
           // firstInvestigateDone, roomInvestigationTable) and every one of
           // them was silently WIPED on re-entry — the investigation table's
           // consumed/echoed state reset each time you walked back in, which
-          // is exactly how the "look again later" dedupe and the OTA-1126
+          // is exactly how the "look again later" dedupe and the OTA-1103
           // echo stamps were being quietly undone. The spread makes the rule
           // structural: a new field survives re-entry by default, and this
           // block overrides only what the visit itself changes.
@@ -11997,8 +12232,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // without modifiers. Suppressed on the opening scene — the weather
     // description is woven into the opening paragraph instead, so a
     // brand-new player isn't greeted with a mechanical line break.
-    // ⚠ OTA-1091 — ...and only when the sky has CHANGED. This fired on every
-    // beginScene, and OTA-1017 made weather persist per location for six game
+    // ⚠ OTA-1068 — ...and only when the sky has CHANGED. This fired on every
+    // beginScene, and OTA-994 made weather persist per location for six game
     // hours, so an unchanged sky re-announced itself at every single arrival —
     // sixteen identical lines in one walk of the playtest harness. The player
     // needs to know what is pressing on them; they do not need to be told the
@@ -12030,7 +12265,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
     if (enemies.length > 1) {
-      // OTA-1068 — say who is ACTUALLY here. This line used to pluralise the
+      // OTA-1045 — say who is ACTUALLY here. This line used to pluralise the
       // first enemy's name across the whole count, which is only correct for a
       // homogeneous party. pickGroupForLocation does spawn clones, but OTA-808
       // (menace) and OTA-817 (mixed-role packs) both append members of a
@@ -12057,7 +12292,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // visits get a quieter "still here" line. Random non-anchor
       // vendors always get the arrival line (they aren't permanent).
       const isAnchor = !!(hubRoom?.anchorNpc && vendor.name === hubRoom.anchorNpc);
-      // OTA-1073 — roadside and other non-anchor traders get recognition too.
+      // OTA-1050 — roadside and other non-anchor traders get recognition too.
       // The anchor rule was a proxy for "someone you come back to", and it was
       // the only proxy available before the ledger existed. Now the ledger says
       // so directly: if THIS person has stood in front of you before, "A figure
@@ -12068,7 +12303,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const seenBefore = (relNow?.meetings ?? 0) >= 2;
       const isReturnVisit = (isAnchor && !!existing && (existing.visitCount ?? 0) >= 1) || seenBefore;
       if (isReturnVisit) {
-        // OTA-1072 — the greeting now reads the ledger with THIS person
+        // OTA-1049 — the greeting now reads the ledger with THIS person
         // (app/engine/npcMemory.ts) rather than the player's standing with
         // their FACTION. Standing is a number shared with hundreds of
         // strangers: it could tell a shopkeeper the Order thinks well of you,
@@ -12084,7 +12319,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('world', npcGreeting(rel, vendor.name, player.name));
         const awayLine = npcAbsenceLine(rel, vendor.name, player.name, player.hoursElapsed ?? 0);
         if (awayLine) get().appendLog('world', awayLine);
-        // OTA-1104 — the delayed mumble: a pocket lifted CLEAN on an earlier
+        // OTA-1081 — the delayed mumble: a pocket lifted CLEAN on an earlier
         // visit surfaces here, on the return, as them noticing the loss out
         // loud without suspecting anyone. One per visit, ledger-counted.
         const mumble = pocketLossMumble(rel ?? undefined, vendor.name);
@@ -12092,7 +12327,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('world', mumble);
           set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(vendor), { pocketsMumbled: 1 }) }));
         }
-        // OTA-1106 — THE RETURN GIFT. Once, ever: reach trusted with someone
+        // OTA-1083 — THE RETURN GIFT. Once, ever: reach trusted with someone
         // whose tastes you have honored (at least one LOVED gift), and on a
         // later arrival they push something back across the counter. Only the
         // authored cast carries one — a return requires tastes to have hit.
@@ -12120,18 +12355,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
             });
           }
         }
-        // OTA-1073 — word travels inside a faction. Fires only when BOTH ends
+        // OTA-1050 — word travels inside a faction. Fires only when BOTH ends
         // are people the player has genuinely built something with, and only
         // every GOSSIP_EVERY-th visit: Phase 0 was spent cutting the noise
         // floor, and a line that fired on every arrival would put it back.
         // Deterministic — the cadence is read off the meeting count.
-        // OTA-1077 — their outpost was sacked while you were away, and they are
+        // OTA-1054 — their outpost was sacked while you were away, and they are
         // the ones who live there. Sits above gossip on purpose: what happened
         // to THEM outranks what they heard about somebody else.
         const raid = raidNewsFor(get().worldMemory, rel, player.hoursElapsed ?? 0);
         if (raid && rel) {
           get().appendLog('world', raidNewsLine(rel, raid, vendor.name, player.name));
-          // OTA-1109 — told once (see emitVendorGreeting).
+          // OTA-1086 — told once (see emitVendorGreeting).
           set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, rel.id, { raidHeardAtHours: raid.atHours }) }));
         }
         const talkAbout = gossipSubject(get().worldMemory, rel);
@@ -12155,19 +12390,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'arbiter',
         `The Arbiter inclines their head toward the newcomer. "${vendor.name}, ${vendor.title}. ${vendor.description}"`,
       );
-      const vendorBlurb = vendorWaresBlurb(get, vendor.name); // OTA-726
+      const vendorBlurb = vendorWaresBlurb(get, vendor.name); // OTA-709
       if (vendorBlurb) get().appendLog('world', vendorBlurb);
       }
       // Faction vendors may offer a contract the player qualifies for.
       if (vendor.faction) {
-        // OTA-1002 — #121: offer budget. Four offer emitters live below (contract,
+        // OTA-979 — #121: offer budget. Four offer emitters live below (contract,
         // bounty board, mystery notice, thick scroll) and each used to fire
         // whenever stocked — an offer firehose. Agents now pitch only TWO
         // rotating categories per macro visit; the rotation walks one step
         // each visit so every category surfaces within two stops. Turn-in
         // hints are exempt — owed work always gets a word.
         const offerCats = ['fq', 'hunt', 'mystery', 'storyline'] as const;
-        // OTA-1016 — pitch-keyed (see worldMemory.offerPitchSeq): travel-count keying
+        // OTA-993 — pitch-keyed (see worldMemory.offerPitchSeq): travel-count keying
         // phase-locked any vendor on a circuit whose hop count was ≡ 0 (mod 4)
         // to the same two categories forever, world-wide. The ×2 step makes
         // consecutive pitches cover all four categories (the old +1 walk
@@ -12188,7 +12423,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           player.activeFactionQuestIds ?? [],
           player.completedFactionQuestIds ?? [],
         );
-        // OTA-1109 — one keyword set per visit: every hint this agent emits
+        // OTA-1086 — one keyword set per visit: every hint this agent emits
         // claims its word here, so two contracts can never share 'accept X'.
         const takenAcceptWords = new Set<string>();
         if (offerAllowed.has('fq') && pool.length > 0) {
@@ -12312,20 +12547,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // (name → investigate) so Qwen stays fully idle there.
     if (!opts?.isOpening && !inScriptedTutorialPhase(get)) {
       if (chance(45)) {
-        // ⚠ OTA-1152 — SPEND BEFORE YOU GENERATE, exactly as the musing bank
+        // ⚠ OTA-1129 — SPEND BEFORE YOU GENERATE, exactly as the musing bank
         // does. A pre-written intro costs zero model time, so it lands in the
         // same millisecond as the scene instead of 19 seconds after it —
-        // which was the whole point of the measurement in OTA-1151.
+        // which was the whole point of the measurement in OTA-1128.
         //
         // Gated on NO ENEMIES for the same reason narrateViaArbiter is: the
         // combat muzzle is about whether model prose is wanted at all, and a
         // free line is still the wrong line mid-fight. It was also written
         // against a scene with no enemies in it, so spending it into an
         // ambush would describe a room that is no longer the situation.
-        const banked = hasEnemies ? null : takeBankedSceneIntro(get, location.id);
+        // ⚠⚠ OTA-1258 (N1) — keyed by the ROOM, so an outpost interior cannot
+        // spend a line written about a different room of the same tile. The
+        // prefetch only ever targets tiles (`introPrefetchCandidates` returns []
+        // in a hub), so hub rooms have no bank and fall through to the live path.
+        const banked = hasEnemies
+          ? null
+          : takeBankedSceneIntro(get, introBankKey(location.id, inHub ? hubRoomId : null));
         if (banked) {
           get().appendLog('arbiter', banked);
-          // OTA-1154 — the arrival beat IS this tile's one aside. Spending the
+          // OTA-1131 — the arrival beat IS this tile's one aside. Spending the
           // budget here is the point: it is the line with something to say
           // about where the player now is, and everything after it waits.
           takeArbiterFlavorBudget(get);
@@ -12381,18 +12622,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
   submitPlayerAction(text, _opts) {
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
-    // ⚠ OTA-1149 — THE PLAYER IS BACK. Clearing the idle stamp here, at the one
+    // ⚠ OTA-1126 — THE PLAYER IS BACK. Clearing the idle stamp here, at the one
     // door every action goes through, is what makes homework honest: from this
     // instant the scheduler sees "not idle" and starts nothing new, and
-    // anything already running is preemptible (OTA-1146). Cheap — a no-op when
+    // anything already running is preemptible (OTA-1123). Cheap — a no-op when
     // the stamp is already null, which is the common case.
     if (get().uiIdleSince !== null) set({ uiIdleSince: null });
-    // ⚠ OTA-1152 — and stamp WHEN. Same door, opposite direction: `uiIdleSince`
+    // ⚠ OTA-1129 — and stamp WHEN. Same door, opposite direction: `uiIdleSince`
     // records that idleness ENDED, this records when it began counting again.
     // The scene-intro bank measures its stillness from here.
     set({ lastPlayerActionAt: Date.now() });
+    // ⚠⚠ OTA-1276 — the unbatched breadcrumb, at the one door every typed and
+    // chip-driven action passes through. See saveSystem.stampLiveBreadcrumb:
+    // the batched disk log cannot survive a JS wedge, this can.
+    try {
+      const bcPlayer = get().player;
+      stampLiveBreadcrumb({
+        at: Date.now(),
+        what: `action "${trimmed.slice(0, 60)}"`,
+        screen: get().currentScreen,
+        room: bcPlayer?.hubRoomId ?? bcPlayer?.currentLocationId ?? undefined,
+      });
+    } catch { /* instrumentation never blocks an action */ }
 
-    // OTA-1099 — the talk/parley sheets don't lock the screen the way the old
+    // OTA-1076 — the talk/parley sheets don't lock the screen the way the old
     // modals did (that was the point: the feed stays readable, and so do the
     // room chips around it). Any REAL action taken while one is open walks
     // away from the conversation first, exactly as tapping STOP TALKING /
@@ -12400,7 +12653,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // whatever the action does next. Silent (LLM-internal) submissions don't
     // count as walking away; the ambient paths already guard on these flags.
     if (!_opts?.silent) {
-      // OTA-1104 — but there is no walking away from a hand already caught.
+      // OTA-1081 — but there is no walking away from a hand already caught.
       // The shakedown blocks everything until the player picks pay or fight.
       if (get().pendingPayoff) {
         get().appendLog('world', `${get().pendingPayoff!.vendorName}'s grip doesn't loosen. Settle it — pay, or fight.`);
@@ -12459,7 +12712,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           player: { ...s.player, name: cleanName },
           awaitingTutorialName: false,
         } : { awaitingTutorialName: false }));
-        // ⚠ OTA-1253 — SAY SO WHEN THE NAME CHANGED. The clean used to be
+        // ⚠ OTA-1230 — SAY SO WHEN THE NAME CHANGED. The clean used to be
         // silent: type "Verbal123" and you were simply Verbal from then on,
         // with nothing anywhere admitting the game had edited your answer. The
         // first place a player found out was the character sheet, and by then
@@ -12472,7 +12725,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
         get().appendLog('arbiter', `"Well met, ${cleanName}. To business."`);
-        // OTA-948 — DEV STARTER GRANT (new-character only). The dev names get their test
+        // OTA-925 — DEV STARTER GRANT (new-character only). The dev names get their test
         // scaffolding at CREATION, not retroactively on every load: a Resurrection Gem up
         // front (Verbal/Sasmooch) + a crash-test supply kit (both dev names). This is the single
         // point a brand-new character is named; an existing save never re-enters it.
@@ -12518,9 +12771,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       //     same verb under the hood.
       if (tStep?.id === 'cudgel' && /\btake\s+.*cudgel\b/i.test(trimmed)) {
         if (!_opts?.silent) get().appendLog('player', trimmed);
-        grantTutorialItem(get, set, 'cudgel');
-        get().appendLog('world', 'You stoop and lift the cudgel. The lashing is loose but the head is solid. You equip it without thinking.');
-        get().appendLog('reward', '✦ Cudgel (Common). [equipped]');
+        // ⚠⚠ OTA-1254 — SAY WHERE IT WENT, BECAUSE IT DID NOT ALWAYS GO ANYWHERE.
+        // From the owner's device log, a Tartarian Giant one line apart:
+        //     [reward] ✦ Cudgel (Common). [equipped]
+        //     [debug] stats: ... worn: main=Mud-fist Wraps chest=Mud-Warden's Vest
+        // The mark said equipped and the hand held the starter. Both lines here
+        // were unconditional, and the auto-equip guard they described never fired
+        // for any race (see grantTutorialItem). Third time this session that a log
+        // line has claimed something the engine did not do — the five-vest reward,
+        // the "open your pack" chore, and now this.
+        const readiedIn = grantTutorialItem(get, set, 'cudgel');
+        get().appendLog('world', readiedIn
+          ? `You stoop and lift the cudgel. The lashing is loose but the head is solid. It settles into your ${readiedIn === 'off' ? 'off hand' : 'grip'} without thinking.`
+          : 'You stoop and lift the cudgel. The lashing is loose but the head is solid. It goes into your pack — what you are already swinging hits harder.');
+        get().appendLog('reward', readiedIn ? '✦ Cudgel (Common). [equipped]' : '✦ Cudgel (Common).');
         // Acknowledge the pickup before the next instruction — a beat of
         // pacing so the Arbiter doesn't snap straight into "now salvage".
         get().appendLog('arbiter', '"Good. Keep it close."');
@@ -12538,6 +12802,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().maybeAdvanceTutorial('rope');
         return;
       }
+      // ⚠⚠ OTA-1248 — (b2) Tutorial TAKE of the vest. Deliberately does NOT advance
+      //     the beat: `armor` advances on the EQUIP, because taking a thing and
+      //     wearing it are the two halves the tutorial had never separated. The
+      //     cudgel auto-equips, which is exactly why nobody learned this step.
+      if (tStep?.id === 'armor' && /\b(take|grab|pick\s*up|get)\s+.*(vest|mud-warden|warden)/i.test(trimmed)) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        // ⚠⚠ OTA-1250 — SAY IT ONLY IF IT HAPPENED. From the owner's device log,
+        // this block printed "✦ Mud-Warden's Vest (Common)." FIVE TIMES in six
+        // seconds. `grantTutorialItem` early-returns once the prop is consumed, so
+        // exactly one of those was a real grant and the other four were reward
+        // lines over nothing. ⚠ This beat is the only one that can hit it: every
+        // other prop intercept ADVANCES the beat, which takes its own branch out
+        // of reach: `armor` deliberately waits for the equip. A log line claiming
+        // an item the engine did not hand over is worse than a dead button — the
+        // player has no way to tell which of the five they actually own.
+        if (get().tutorialPropsConsumed.vest) {
+          get().appendLog('arbiter', '"You have it already — it is on your back."');
+          return;
+        }
+        grantTutorialItem(get, set, 'vest');
+        get().appendLog('world', "You lift the vest. Mud-warden plate, laced onto a hide backing — heavier than it looks, and it has kept someone alive before.");
+        get().appendLog('reward', "✦ Mud-Warden's Vest (Common).");
+        // ⚠⚠ OTA-1251 — NO "OPEN YOUR PACK" LINE. The tap that fires this also
+        // equips (the picker's ★ path), so the old line described a chore the
+        // player no longer has and the beat no longer waits on. equipItem speaks
+        // its own "you put it on" line a beat later.
+        return;
+      }
       // (c) Tutorial scrap of the chest plate. Mirrors the salvage
       //     path's reward structure without running scrapEngine —
       //     we don't need the random roll, just the verb teach. The
@@ -12548,12 +12840,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set((s) => ({
           tutorialPropsConsumed: { ...s.tutorialPropsConsumed, chestPlate: true },
         }));
-        // OTA-1098 — owner, from a device run: "way too much text for the
+        // OTA-1075 — owner, from a device run: "way too much text for the
         // salvage button... shorter lines and less of them." One world
         // sentence, the reward, and straight on — the quip is gone; the
         // reward line already says ruins pay out.
         get().appendLog('world', 'You pop the rusted plate off its strap and it comes apart along old hammer-marks.');
-        get().appendLog('reward', '✦ Plate Fragment x2 (Common). [scrapped]');
+        get().appendLog('reward', '✦ Plate Fragment x2 (Common). [salvaged]');
         get().maybeAdvanceTutorial('scrap');
         return;
       }
@@ -12585,15 +12877,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       //     the right verb for cudgel/rope/scrap/investigate/name; the climb
       //     beat advances via the real climb handler (so climb commands pass
       //     through), and explore_or_leave lets the leave command through.
+      // ⚠⚠ OTA-1249 — READS THE SHARED LIST. This was a THIRD hand-written copy of
+      //     the lock-beat array (InputBox and ExplorationScreen held the other
+      //     two), and it had already drifted: OTA-1248 added 'armor' to the two UI
+      //     copies and not to this one, so typed input ran completely unlocked for
+      //     the whole armor beat. 'look' was missing from all three.
       const lockBeatId = tStep?.id ?? '';
       if (
-        ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'].includes(lockBeatId)
+        TUT_LOCK_BEATS.includes(lockBeatId)
         && !tState.tutorialExploreChosen
       ) {
         const isClimbCmd = /\bclimb\b/i.test(trimmed);
-        const isLeaveCmd = isLeaveHubCommand(trimmed)
-          || /^\s*(exit|outside|step\s+out|get\s+out)\s*$/i.test(trimmed);
-        // OTA-1063 — the lockdown must never outrank a live enemy. A summit
+        // ⚠ The look beat's own verb, and the armor beat's second half. Adding a
+        // beat to the lock list without its allowance would REFUSE the very
+        // command the beat asks for — the typed twin of the greyed-out button.
+        const isLookCmd = /^\s*(look|look\s+around(\s+you)?|examine\s+room|survey)\s*$/i.test(trimmed);
+        const isWearCmd = /\b(equip|wear|put\s+on|don)\b/i.test(trimmed);
+        // ⚠ OTA-1269 — the bare-word half lives in hub.ts now, shared with the
+        // travel gate and the building EXIT; this private copy had already
+        // drifted (it lacked bare 'leave').
+        const isLeaveCmd = isLeaveHubCommand(trimmed) || isBareExitCommand(trimmed);
+        // OTA-1040 — the lockdown must never outrank a live enemy. A summit
         // overlay (or any other spawn) can drop a hostile into a tutorial
         // beat, and before this every verb but the beat's own was refused:
         // the player could not attack, flee, sneak, or use an item while
@@ -12602,12 +12906,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const enemiesLive = (get().currentScene?.enemies.length ?? 0) > 0;
         const isCombatCmd = TUTORIAL_SELF_DEFENCE.test(trimmed);
         const beatAllows =
-          (lockBeatId === 'climb' && isClimbCmd)
+          (lockBeatId === 'look' && isLookCmd)
+          || (lockBeatId === 'armor' && isWearCmd)
+          || (lockBeatId === 'climb' && isClimbCmd)
           || (lockBeatId === 'explore_or_leave' && isLeaveCmd)
           || (enemiesLive && isCombatCmd);
         if (!beatAllows) {
           if (!_opts?.silent) get().appendLog('player', trimmed);
-          // OTA-1063 — restate the pending step. "Do what I've asked of you"
+          // OTA-1040 — restate the pending step. "Do what I've asked of you"
           // is dead text the moment the instruction scrolls away; the player
           // then has no way to recover it short of replaying the tutorial.
           const pending = tStep?.remind ?? null;
@@ -12687,7 +12993,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // mission; SEAL turns in the two relics. Intercept before the world parser.
     {
       const pl = get().player;
-      // OTA-681 — the parley stone is an OUTDOOR feature of the parley_ground tile,
+      // OTA-666 — the parley stone is an OUTDOOR feature of the parley_ground tile,
       // and the parley verb list (approach/examine/meet/…) overlaps combat verbs.
       // broker.parleyInterceptEligible keeps this from hijacking unrelated actions:
       // it fires only outdoors on the tile, out of combat, and out of a labyrinth
@@ -12720,7 +13026,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const inBuilding = get().activeBuildingId;
       if (inBuilding) {
         // EXIT back to the open world.
-        if (isLeaveHubCommand(trimmed) || /^\s*(exit|outside|step\s+out|get\s+out)\s*$/i.test(trimmed)) {
+        if (isLeaveHubCommand(trimmed) || isBareExitCommand(trimmed)) {
           if (!_opts?.silent) get().appendLog('player', trimmed);
           get().exitBuilding();
           return;
@@ -12947,7 +13253,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // dodging 2r → 1r) never persisted their decrement, so counters
     // were frozen until the array changed shape. Now: whenever the
     // player has ANY status going in, write the ticked result back.
-    // OTA-969 — and the write must STAY written: 26 action paths charged time+stamina
+    // OTA-946 — and the write must STAY written: 26 action paths charged time+stamina
     // via set({ player: advanceTime(spendStamina(player, ...)) }) built from the
     // pre-tick snapshot below, silently restoring pre-tick statusEffects/HP. On
     // dice-modal actions (every attack) timed buffs therefore NEVER ticked — a
@@ -13020,21 +13326,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // every action, un-escapable). After any damaging tick we arm a gap so the
     // next WEATHER_TICK_GAP actions are weather-free → at most one hit per
     // (GAP+1) actions. The hazard stays felt, but periodic rather than relentless.
-    // OTA-1003 — #122: gap 2 -> 5 (owner: stop the armor re-spec treadmill) and no
+    // OTA-980 — #122: gap 2 -> 5 (owner: stop the armor re-spec treadmill) and no
     // weather bite at all while INDOORS — a roof is a roof.
     const WEATHER_TICK_GAP = 5;
     const weatherCooldown = get().player?.weatherTickCooldown ?? 0;
     if (weatherCooldown > 0) {
       set((s) => (s.player ? { player: { ...s.player, weatherTickCooldown: weatherCooldown - 1 } } : s));
     }
-    // OTA-1003 — #122: a roof is a roof — weather doesn't bite indoors. But the hub
+    // OTA-980 — #122: a roof is a roof — weather doesn't bite indoors. But the hub
     // graph is not all interior: the gate, the square and the culvert descent
     // are OPEN AIR and stay exposed (standing at the gate in glass hail should
     // still cost you). Everything else in a hub — armory, mess, workshop,
     // quarters, lab, vault, chapel, and the whole buried level — is sheltered,
     // as is any building you've stepped inside.
     const hubRoomNow = get().player?.hubRoomId ?? null;
-    // OTA-1126 — the open-air call is per-FACTION-SKIN, not just per room id.
+    // OTA-1103 — the open-air call is per-FACTION-SKIN, not just per room id.
     // The base graph's gate / square / culvert are Reclaimer courtyards, but a
     // faction variant can move the same room indoors: the Architects' gate is
     // "a clerical office with filing cabinets", and a device log showed
@@ -13075,7 +13381,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       let effHpDelta = wtick.hpDelta;
       let effCorrDelta = wtick.corruptionDelta;
       if (tPerks.corruptionResist && effCorrDelta > 0) effCorrDelta = Math.ceil(effCorrDelta / 2);
-      // ⚠ OTA-1089 — PHASE 4, and note WHERE it sits: after the title perks and
+      // ⚠ OTA-1066 — PHASE 4, and note WHERE it sits: after the title perks and
       // before the race immunity, so a player's earned mitigations still work
       // and a Sentinel is still immune. The dial changes how fast you TAKE
       // corruption and weather damage, never what they do once you have them —
@@ -13150,7 +13456,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // corruption). Records storm-survival (+companion variant for
       // Stormcaller) and the high-water corruption mark for Survivor of
       // Aetherstone. recordTitleProgress also runs the award check.
-      // OTA-1069 — a tick only counts toward the storm titles if the storm
+      // OTA-1046 — a tick only counts toward the storm titles if the storm
       // actually BIT. Standing in decorative weather is not survival, and it
       // was the whole reason a tutorial room could award two titles. Measured
       // on the RAW delta rather than the post-resist one, so owning the
@@ -13173,7 +13479,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // per-action log spam); only fills when there's room. tickPlayerStamina-
     // Statuses re-syncs tired/exhausted as stamina rises. On top of the
     // pieces' AC / stat bonuses.
-    // ⚠ OTA-1192 — HP REGEN IS PER TILE NOW, NOT PER ACTION. Owner: "I feel invincible…
+    // ⚠ OTA-1169 — HP REGEN IS PER TILE NOW, NOT PER ACTION. Owner: "I feel invincible…
     // would +2 regen per tile traveled be better? I'm never low in health except mid
     // battle." Measured from his device log: enemies hit a flat 25% (`needs nat 16+ — AC
     // capped`), and the ~4 damage that lands after `armor −47%, plate −2` averages about
@@ -13193,9 +13499,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const crossedTile = _lastRegenCell !== null && _lastRegenCell !== cellNow;
         _lastRegenCell = cellNow;
         const stamGain = Math.min(regen.stamina, Math.max(0, (live.staminaMax ?? 0) - live.stamina));
-        // ⚠ OTA-1194 — SCALED BY TIER. salvage ×1.5, owed ×1 (identity), let_it_come
+        // ⚠ OTA-1171 — SCALED BY TIER. salvage ×1.5, owed ×1 (identity), let_it_come
         // ×0.75, bury_me ×0.5. Only the HP half moves: `stamGain` above is untouched, for
-        // the same reason OTA-1192 left it per-action — stamina is barely a combat
+        // the same reason OTA-1169 left it per-action — stamina is barely a combat
         // resource and tiles already drain it, so metering it here would be a second
         // punishment billed as one.
         const tierRegenHp = scaledRegen(regen.hp, dialOf(live, 'mend'));
@@ -13344,7 +13650,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
     }
-    // OTA-120 — Dog Companion onboarding. OTA-1050 — the three-step TYPED
+    // OTA-120 — Dog Companion onboarding. OTA-1027 — the three-step TYPED
     // takeover is gone: a playtester mid-rescue typed "rest", couldn't tell
     // the naming moment from a fight, and the takeover silently stored
     // "rest" as the breed. Breed/name/sex now land together in the
@@ -13357,7 +13663,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       void get().persist();
       return;
     }
-    // OTA-466 — golem naming. OTA-1050 — same popup treatment as the dog: the
+    // OTA-466 — golem naming. OTA-1027 — same popup treatment as the dog: the
     // name lands in the GolemNamingModal (confirmGolemName), never in typed
     // feed input. A golem that vanished before naming (dismissed / died)
     // just clears the flag and the input processes normally.
@@ -13371,7 +13677,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
     }
-    const parsed = parseInput(trimmed, parseCtx);
+    let parsed = parseInput(trimmed, parseCtx);
+    // ⚠⚠ OTA-1274 — A BARE ROOM NAME OUTRANKS WHATEVER VERB IT HAPPENS TO BE.
+    // The odd-name audit (owner: "there was a room called break") found the
+    // defect class: hub rooms whose typed names ARE parser verbs. `vault`
+    // jumped, `break` attacked, `forge` opened crafting, `chamber` climbed via
+    // fuzzy 'clamber' — every skin had at least one room you could not walk to
+    // by typing its name. Buildings solved this in arb25 by resolving room
+    // names BEFORE the parser; hubs never got the same door. The matcher is
+    // STRICT (the whole input is the room, articles and go-words aside), so
+    // "break the door" still swings and only "break"/"breakroom" walks.
+    if (player.hubRoomId && parsed.intent !== 'travel') {
+      const named = matchHubRoomName(
+        trimmed,
+        player.hubRoomId,
+        hubSkinFactionFor(player.currentLocationId, player.factionId),
+      );
+      if (named) {
+        parsed = { ...parsed, intent: 'travel', confidence: 1, matchedVerb: 'go', target: trimmed, validationIssues: undefined };
+      }
+    }
     // OTA-128 — silent re-dispatch (drink-of-consumable, etc.) skips
     // the [player] echo so the player doesn't see two input lines
     // for one typed action.
@@ -13395,7 +13720,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // stakes; a SPECIFIC verb (intimidate / persuade / calm) commits straight
     // through. Hard lock-and-key: the wrong approach auto-fails; a high-WIS read is
     // told the temperament, everyone else gets the narrated tell. See parley.ts.
-    // --- OTA-1087: A CORE GUARDIAN WILL ANSWER A QUESTION ---
+    // --- OTA-1064: A CORE GUARDIAN WILL ANSWER A QUESTION ---
     // ⚠ ORDERED BEFORE isTalkDownBlocked ON PURPOSE, and it does NOT weaken it.
     // "You can't sweet-talk a Guardian off its post" (OTA-806) is still true:
     // this cannot end the fight, cannot damage it, cannot heal you, and does not
@@ -13440,18 +13765,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       return;
     }
-    // --- OTA-1081, PHASE 2 SLICE: a real conversation with somebody you know ---
+    // --- OTA-1058, PHASE 2 SLICE: a real conversation with somebody you know ---
     // Ordered BEFORE the wanderer parley on purpose. A vendor with authored
     // topics and a wanderer cannot both be the subject of "talk to <name>", and
     // if a scene ever holds both, the named person you walked up to is the one
     // you meant. A vendor with no topics falls through to everything below
     // unchanged — the slice is three people, and it must not swallow the verb
     // for the rest of the cast.
-    // ⚠ OTA-1087 — vendorNpcId, NOT `vendor.id`. The raw id is the SPAWN id
+    // ⚠ OTA-1064 — vendorNpcId, NOT `vendor.id`. The raw id is the SPAWN id
     // (`roadside_<seed>`, `overlay_<id>_<ms>`); the ledger id is who they ARE
     // (`roadside:grit_maalen`), and that is the namespace the topic sets live
     // in. Asking the question in the wrong namespace returned false for all 24
-    // roadside and 5 overlay traders, so OTA-1085's claim that they "became
+    // roadside and 5 overlay traders, so OTA-1062's claim that they "became
     // talkable with no wiring" was true of the store action and false of every
     // route into it. Named vendors survived only because their raw id happens
     // to equal their ledger id.
@@ -13462,7 +13787,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
     // --- Peaceful parley (a wild NPC / person) ---
-    // ⚠ OTA-1087 — `namesSomeoneElse` guard. Without it, naming the escort
+    // ⚠ OTA-1064 — `namesSomeoneElse` guard. Without it, naming the escort
     // leader walking beside you opened a parley with a wanderer who merely
     // happened to be on the same tile, because this branch only ever checked
     // that a wanderer EXISTED and never that you meant them.
@@ -13471,7 +13796,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const w = currentScene.wanderer;
       const temperament = w.temperament;
       const wisRevealed = revealsTemperament(effectiveStats(player).wisdom);
-      // OTA-1087 — `topicsNpcId` is what makes the seven wanderer archetypes
+      // OTA-1064 — `topicsNpcId` is what makes the seven wanderer archetypes
       // audible at all. They have 28 authored topics between them and NOT ONE
       // was reachable: `talk to <wanderer>` has always landed here, and this
       // branch returns. Rather than stealing the verb from the parley — which
@@ -13497,7 +13822,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       return;
     }
-    // --- OTA-1087: ANYBODY ELSE YOU NAMED ---
+    // --- OTA-1064: ANYBODY ELSE YOU NAMED ---
     // Today that is an escort leader. They walk beside you for a whole contract
     // and had four authored topics that nothing on earth could reach: they are
     // not a vendor, not a wanderer, and not in the scene's cast at all — they
@@ -13542,11 +13867,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
     }
-    // OTA-728 — paid vendor services: `train <stat>`, `heal dog|golem`, `revive dog`.
+    // OTA-710 — paid vendor services: `train <stat>`, `heal dog|golem`, `revive dog`.
     if (tryVendorServiceVerb(get, set, trimmed)) {
       return;
     }
-    // OTA-712 — data-driven encounter provocation. A provocable NPC travel
+    // OTA-695 — data-driven encounter provocation. A provocable NPC travel
     // encounter (the Aetherkin mourner: "reach for a coin and you will not
     // reach it twice") arms `player.pendingProvoke` from the encounter's
     // authored `provoke` block. While it's armed, a PROVOKING verb aimed at
@@ -13642,7 +13967,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const targetText = (parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase();
         const rescueId = matchRescueHookNoun(targetText);
         if (rescueId && currentScene.enemies.length === 0) {
-          tryFireRescueScenario(get, set, rescueId);
+          tryFireRescueScenario(get, set, rescueId, targetText);
           void get().persist();
           return;
         }
@@ -13694,6 +14019,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (noun && noun.trim().length > 0) {
         set({ lastInteractedNoun: noun.trim() });
       }
+    }
+
+    // ⚠⚠ OTA-1264 — A NEGATION IS NOT A MISSED PARSE, SO IT MUST NOT GO
+    // TO THE RESOLVER. Every other demotion below means "I could not
+    // work out what you wanted", and handing those to Qwen is right.
+    // `negated_command` means the opposite: the player was perfectly
+    // clear, and the clear thing they said was DON'T. Sending that to a
+    // resolver whose whole job is to find an actionable verb in the
+    // sentence is how "do not open the chest" comes back as `open` —
+    // the fix would have shipped inert, which is the exact shape of the
+    // N2 mistake earlier this session. Answer it here and stop.
+    if ((parsed.validationIssues ?? []).includes('negated_command')) {
+      get().appendLog(
+        'debug',
+        `parser: negated command refused — "${trimmed}"`,
+      );
+      get().appendLog('arbiter', describeIssues(['negated_command']));
+      return;
     }
 
     if (parsed.intent === 'unknown' || parsed.confidence < 0.5) {
@@ -13759,7 +14102,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'debug',
             `parse-fallback: qwen → intent=${result.intent} target="${result.target}" rephrase="${result.rephrasing}"`,
           );
-          // OTA-993 — #114: before re-dispatching, hold the rephrase to what the
+          // OTA-970 — #114: before re-dispatching, hold the rephrase to what the
           // player actually said. A rejected rephrase gets the same soft
           // refusal + did-you-mean chips as "no usable result" — never an
           // invented action.
@@ -13864,7 +14207,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // and gates on intentList — non-puzzle hooks ignore these
       // intents and fall through to the normal verb dispatch.
       'rotate', 'knock', 'turn', 'twist', 'press', 'push', 'pull',
-      // OTA-710 — call-to-action gestures route through hooks too, so
+      // OTA-693 — call-to-action gestures route through hooks too, so
       // "ring the bells" / "touch the pillar" can advance a matching hook.
       'gesture',
     ];
@@ -13875,7 +14218,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // still "★★ STORY THREAD COMPLETE — you part ways, +25 TC" and then be
     // killed in the same exchange. While a live enemy is in the scene, these
     // verbs fall through to the combat handlers below instead.
-    // ⚠ OTA-1230 — "use <thing I'm carrying>" is NOT hook engagement. Device log
+    // ⚠ OTA-1207 — "use <thing I'm carrying>" is NOT hook engagement. Device log
     // (2026-08-10, Pixel): `use Aetheric Torch` was hijacked by an etheric_storm
     // hook because the ITEM'S adjective ('aetheric') sits in the hook's noun list —
     // the player asked for their torch and got a storm beat instead, and the
@@ -14101,7 +14444,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // (range: close) ★ BOSS") matching what regular
               // encounters get, so the boss surfaces in the same UI
               // affordance as every other enemy.
-              // ⚠ OTA-1159 — AND THE CARD SAID "close" WHILE THE SPAWN SET 'mid'.
+              // ⚠ OTA-1136 — AND THE CARD SAID "close" WHILE THE SPAWN SET 'mid'.
               // Twelve lines up this block writes `range: 'mid'`. The player then
               // typed `approach`, which moved mid → close and cost them the
               // action that a boss answers with two swings. The card was telling
@@ -14122,7 +14465,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               });
               // OTA 454 — record the Guardian as a met NPC so they
               // show up in the NPCs Met milestone list.
-              // OTA-1075 — a Guardian is somebody you MET; before this it was
+              // OTA-1052 — a Guardian is somebody you MET; before this it was
               // listed in the Chronicle with a blank where its regard should be,
               // because only the vendor site recorded a relation.
               set((s) => ({
@@ -14183,7 +14526,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    // OTA-710 — call-to-action fallback. Evocative verbs the scene prose
+    // OTA-693 — call-to-action fallback. Evocative verbs the scene prose
     // invites ("knock on the steeple door", "ring the bells", "touch the
     // pillar", "pray at the altar", "answer the door", "tilt the statue")
     // that DIDN'T land on an active hook above used to dead-end: 'knock'
@@ -14202,7 +14545,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { callToActionLine, gestureFamily } = require('../engine/callToAction') as typeof import('../engine/callToAction');
       const ctaNoun = (parsed.resolvedNoun ?? parsed.target ?? '').trim();
-      // OTA-1178 — is the thing they gestured at a PERSON? The scene already knows
+      // OTA-1155 — is the thing they gestured at a PERSON? The scene already knows
       // (it is the same population the talk and gift verbs draw from), and the
       // flavour line needs the answer to decide whether to write "the" in front of
       // it. Asking matchTalkable rather than guessing from capitalisation, because
@@ -14210,7 +14553,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const ctaPerson = ctaNoun ? matchTalkable(talkablePeople(get), ctaNoun) : null;
       // A small stamina/time cost so the gesture reads as a real beat,
       // matching the hook-engage cost above.
-      // ⚠ OTA-1178 — except SITTING DOWN, which is the one gesture in the family
+      // ⚠ OTA-1155 — except SITTING DOWN, which is the one gesture in the family
       // that is the opposite of exertion. Charging stamina to sit is the kind of
       // small wrongness a tester notices immediately and can never unsee. It still
       // spends the six minutes, so it is a beat and not a free tap.
@@ -14226,7 +14569,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // ⚠ OTA-1236 — deterministic stage triggers fire on the VERB, at the choke
+    // ⚠ OTA-1213 — deterministic stage triggers fire on the VERB, at the choke
     // point every action passes, so no downstream branch (refusal, flavor,
     // hook, empty modal) can eat a mission beat. See advanceStagesOnIntent.
     advanceStagesOnIntent(get, set, parsed.intent);
@@ -14242,7 +14585,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // runEnemyGroupCounters; the attack path passes skipDotTick to its
         // counter calls below so DOTs don't double-tick.
         if (tickEnemyDotsAndMaybeEndFight(get, set)) return;
-        // OTA-980 — the tick can now resolve individual DOT-killed enemies
+        // OTA-957 — the tick can now resolve individual DOT-killed enemies
         // (splicing the scene arrays), so the target must come from the LIVE
         // scene, not the pre-tick snapshot.
         const sceneAfterDots = get().currentScene;
@@ -14270,7 +14613,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const currentMain = player.equipped?.main;
             // Also skip if the named instrument IS the off-hand instance — attacking
             // by an off-hand weapon's name shouldn't yank it into the main slot.
-            // OTA-1033 — id-first, NAME fallback when the off slot carries no id (a
+            // OTA-1010 — id-first, NAME fallback when the off slot carries no id (a
             // hand-built state that never passed backfillPlayer's id stamp): the
             // id-only test fell through and the promotion bound ONE instance to
             // BOTH hands (main=off, the same item), silently evicting the real
@@ -14290,7 +14633,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
           const range = currentScene.range ?? 'close';
-          // OTA-957 — same fix as the damage site (OTA-940), which this reach lookup missed:
+          // OTA-934 — same fix as the damage site (OTA-940), which this reach lookup missed:
           // a swung weapon whose NAME contains a body word ("Mud-FIST Wraps") tripped the
           // bare-hand test and resolved reach as Bare hands. Strip the equipped weapon's
           // name from the text first, and honor the 'barehanded' tag as a real weapon.
@@ -14320,7 +14663,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `attack: target=${targetEnemy.name} range=${range} reach.bands=[${reach.bands.join(',')}] reach.label=${reach.label} bareHand=${barehand}`,
           );
           if (!reach.bands.includes(range)) {
-            // OTA-977 — NO INVOLUNTARY FOOTWORK. OTA-550 auto-converted an
+            // OTA-954 — NO INVOLUNTARY FOOTWORK. OTA-550 auto-converted an
             // out-of-range attack into a MOVE: the player typed "attack", got
             // no attack, was walked into range, and the enemy answered the
             // approach with a free swing. Owner, after his fused Resonant
@@ -14346,7 +14689,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             break;
           }
-          // OTA-983 — ELEVATION, player side: a grounded target massed at the base
+          // OTA-960 — ELEVATION, player side: a grounded target massed at the base
           // needs a weapon that truly SHOOTS (reaches far/distant) to be hit
           // from up a climb; an AIRBORNE foe comes to you — any weapon meets
           // it. Free refusal, mirroring the reach gate above. (Owner: "you
@@ -14387,7 +14730,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // surprise, etc.) so the dice prompt and the final attack
           // total honor every action-card buff/penalty the player
           // earned. Ranged attacks get aim bonus, melee don't.
-          // OTA-980 — read the SWUNG hand. This was main-hand-only, so an off-hand
+          // OTA-957 — read the SWUNG hand. This was main-hand-only, so an off-hand
           // melee swing while a ranged main was holstered still rolled as
           // "ranged": aim mods applied and "+2 (point blank)" landed on a blade
           // (owner's log: the Mud Executioner's Blade at close rolled point-
@@ -14447,7 +14790,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // for scene-side intent, fall back to resolvedNoun only if
           // target is empty.
           const rawTarget = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
-          // OTA-770 — an ANIMATE scene noun (a knight / sentinel / statue-guardian)
+          // OTA-750 — an ANIMATE scene noun (a knight / sentinel / statue-guardian)
           // ROUSES into a fight when attacked or woken, instead of being harvested like
           // scenery ("wake the knight" now routes here). Prefer a catalog enemy by that
           // name; otherwise a generic roused guardian scaled to the tile stands up. Gated
@@ -14529,7 +14872,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // attack-fallback. "break the wagon" should harvest the
           // wagon, not silently miss because 'wagon' isn't in
           // AREA_TOKENS.
-          // OTA-974 — Phase B of real heights: placed (perched) nouns can't be
+          // OTA-951 — Phase B of real heights: placed (perched) nouns can't be
           // attacked from the ground or the wrong tier — same rule as the
           // investigate gate, so attack can't become a reach-anything side
           // door. At the perch itself, harvesting is investigate's job.
@@ -14592,7 +14935,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // 5.01% HP drops below the threshold silently.
               const prevHpBruise = player.hp;
               const hpMaxBruise = player.hpMax ?? 1;
-              // OTA-970 — weapon swings at huge inert scenery now cost 1-2 HP AND
+              // OTA-947 — weapon swings at huge inert scenery now cost 1-2 HP AND
               // say so (the old strike line silently hid the HP tick), with a
               // rotating deadpan so the lesson lands. Owner: "you should get
               // small damage ... 'that wasn't your brightest move'". Bruises
@@ -14807,7 +15150,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               rareLootBias: raceLootBias(player, get().currentScene),
               // OTA-741 — biome-aware forage: mud tiles boost mud materials, etc.
               biomeTags: (get().currentScene?.location?.tags ?? []).map((t) => String(t)),
-              // OTA-1222 — a small chance the find is swapped for something this PLACE
+              // OTA-1199 — a small chance the find is swapped for something this PLACE
               // authored. Replacement, not addition: the drop rate does not move.
               siteLoot: siteLootForScene(get),
             });
@@ -14828,9 +15171,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (outcome.kind === 'hook') {
               get().appendLog('world', `★ STORY THREAD — ${outcome.line}`);
             } else {
-              // OTA-770 — this is the ATTACK fallback, so narrate a STRIKE, not the
-              // shared 'sift/search' template (playtest: "attack the silhouette" printed
-              // "You sift the silhouette and pull out a piece worth keeping").
+              // OTA-750 — this is the ATTACK fallback, so narrate a STRIKE, not the
+              // shared 'sift/search' template ("attack the silhouette" printed "You sift").
               const strikeWord = isBodyVerb ? (BODY_VERB_PAST[matchedVerb] ?? `${matchedVerb}ed`) : 'struck';
               get().appendLog('world', outcome.kind === 'material'
                 ? `You ${strikeWord} the ${targetForNarration} — a piece breaks loose.`
@@ -14916,12 +15258,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           {
-            // OTA-993 — #115: the refusal checks BOTH hands for a weapon with the
+            // OTA-970 — #115: the refusal checks BOTH hands for a weapon with the
             // range the motion implies (owner call). "shoot the warp" with a
             // Bolt-Caster in the main hand used to answer with "arm's reach"
             // and "your blade" — melee words for a ranged swing at scenery.
             const eqHands = player.equipped ?? {};
-            // OTA-1016 — classify by REACH CLASS (the resolver combat itself uses),
+            // OTA-993 — classify by REACH CLASS (the resolver combat itself uses),
             // not one tag: runecasters fire to distant with no 'ranged' tag,
             // throwables reach far, and empty hands are neither shot nor
             // blade. The verb the player TYPED wins when the hands disagree.
@@ -14962,7 +15304,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'investigate': {
-        // ⚠ OTA-1226 — `read` PARSES AS INVESTIGATE, and a held Procedure Text is the one
+        // ⚠ OTA-1203 — `read` PARSES AS INVESTIGATE, and a held Procedure Text is the one
         // thing a player will type `read` at expecting it to matter. Checked before the
         // ambient-noun machinery, or the resolver drags the target to a scene noun (the
         // probe watched it resolve "procedure text" to an Aetheric Storm Burst). Two held
@@ -15037,7 +15379,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           const ambushRoom = get().worldMemory.visitedRooms?.[ambushRoomKey];
           const ambushPrior = ambushRoom?.flavorExhaustedNouns ?? [];
-          // OTA-953 — word-level match (raw substrings cross-hid unrelated nouns).
+          // OTA-930 — word-level match (raw substrings cross-hid unrelated nouns).
           const alreadyClearedNoun = ambushPrior.some((n) => nounTokensMatch(n, investAmbushTarget));
           if (alreadyClearedNoun) {
             // OTA-256 — neutral wording. The prior line "there was
@@ -15070,7 +15412,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // these; this closes the investigate-ambush loophole that let a leech
         // spring on the player mid-trade at The Hidden Market.
         const ambushLoc = currentScene?.location;
-        // OTA-1235 — one spelling for the truce (engine/sacredGround.ts).
+        // OTA-1212 — one spelling for the truce (engine/sacredGround.ts).
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const inSafeZone = isHubLocation(ambushLoc?.id)
           || (require('../engine/sacredGround') as typeof import('../engine/sacredGround')).isSacredGround(ambushLoc);
@@ -15151,7 +15493,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const isGroundNoun = (currentScene.ambientNouns ?? []).some((n) =>
             sameClimbNoun(n.toLowerCase(), tgtLower),
           );
-          // OTA-973 — Phase A of real heights. A PLACED noun (structure + tier)
+          // OTA-950 — Phase A of real heights. A PLACED noun (structure + tier)
           // resolves by where it hangs, not by scene membership: at your grip
           // (your structure, your tier) it falls through to normal handling;
           // wrong tier or wrong structure gets a specific refusal. All
@@ -15170,7 +15512,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 );
                 break;
               }
-              // OTA-974 — Phase B of real heights: at your tier on your structure,
+              // OTA-951 — Phase B of real heights: at your tier on your structure,
               // investigating the perch HARVESTS it — catalog-resolved loot
               // (no invented items), tier-gated pool, once per room.
               {
@@ -15240,7 +15582,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               break;
             }
           } else if (isGroundNoun && !isClimbedNoun) {
-            // OTA-970 — a refusal must ALWAYS answer. Playtest: eight identical
+            // OTA-947 — a refusal must ALWAYS answer. Playtest: eight identical
             // salvage attempts from atop a shelf — the Arbiter answered ONCE,
             // then the arbiter-channel dedup swallowed every repeat ("dedup:
             // suppressed arbiter repeat") and the player retried into dead
@@ -15261,7 +15603,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
         }
-        // OTA-973 — Phase A of real heights, ground side: a noun placed up on a
+        // OTA-950 — Phase A of real heights, ground side: a noun placed up on a
         // structure is visible from below but not touchable. The Arbiter says
         // where it is and how to get it, every time (skipDedup).
         if (!currentScene.elevatedOn && !currentScene.elevatedOverlayMeta && rawTarget) {
@@ -15323,7 +15665,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? harvestVerbs.has(parsed.matchedVerb.toLowerCase())
           : false;
         if (rawTarget && isHarvestVerb) {
-          // OTA-710 — salvage must catch a noun even after it was INVESTIGATED first.
+          // OTA-693 — salvage must catch a noun even after it was INVESTIGATED first.
           // matchAmbientNoun only sees the scene's ambientNouns; once you investigate
           // a thing it resolves via the recency/context path, so a later `salvage X`
           // missed here and fell through to the flavor "already examined" gate — the
@@ -15403,7 +15745,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               rareLootBias: raceLootBias(player, get().currentScene),
               // OTA-741 — biome-aware forage: mud tiles boost mud materials, etc.
               biomeTags: (get().currentScene?.location?.tags ?? []).map((t) => String(t)),
-              // OTA-1222 — a small chance the find is swapped for something this PLACE
+              // OTA-1199 — a small chance the find is swapped for something this PLACE
               // authored. Replacement, not addition: the drop rate does not move.
               siteLoot: siteLootForScene(get),
             });
@@ -15977,7 +16319,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               nonClimbMarkers(searchPrior?.searchedAmbientNouns).some(
                 (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
               ) ||
-              // OTA-953 — flavor half is word-level; the searched half above keeps the
+              // OTA-930 — flavor half is word-level; the searched half above keeps the
               // historical loose substring rule (its catalog self-heal escape depends on it).
               nonClimbMarkers(searchPrior?.flavorExhaustedNouns).some(
                 (n) => nounTokensMatch(n, ambientLower),
@@ -16207,7 +16549,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const previewNoun = (rawTarget || invItem.name).toLowerCase().trim();
             const previewRoom = get().worldMemory.visitedRooms?.[previewRoomKey];
             const previewExhausted = (previewRoom?.flavorExhaustedNouns ?? []).map((n) => n.toLowerCase());
-            // OTA-953 — word-level match (raw substrings cross-hid unrelated nouns).
+            // OTA-930 — word-level match (raw substrings cross-hid unrelated nouns).
             const alreadyPreviewed = previewNoun.length > 0 && previewExhausted.some(
               (n) => nounTokensMatch(n, previewNoun),
             );
@@ -16337,7 +16679,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             rareLootBias: raceLootBias(player, get().currentScene),
             // OTA-741 — biome-aware forage: mud tiles boost mud materials, etc.
             biomeTags: (get().currentScene?.location?.tags ?? []).map((t) => String(t)),
-            // OTA-1222 — same substitution on investigate.
+            // OTA-1199 — same substitution on investigate.
             siteLoot: siteLootForScene(get),
           });
           if (investigateLensActive && outcome.kind === 'hook') {
@@ -16388,9 +16730,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // and do NOT consume the noun.
           let producedInv = false;
           if (outcome.kind === 'material') {
-            // ⚠ OTA-1227 — classify through the KILL path's own resolver, so an
+            // ⚠ OTA-1204 — classify through the KILL path's own resolver, so an
             // uncatalogued part minted by a SEARCH carries the same 'trophy' tag (and
-            // the same OTA-966 half-rate sale) as the identical part minted by a kill.
+            // the same OTA-943 half-rate sale) as the identical part minted by a kill.
             // lookupCraftedItem's uncatalogued fallback is TAGLESS, which quietly paid
             // full rarity base here while the kill path halved — the 2026-08-10 audit's
             // coherence gap. Same swap at every noun-harvest mint (break/search-
@@ -16642,7 +16984,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             runAethercraft(discipline, get, set, player, currentScene, golemKindHint);
             break;
           }
-          // ⚠ OTA-1218 — AETHER TECHNIQUES (PUNCHLIST P16), and the ORDER matters: this
+          // ⚠ OTA-1195 — AETHER TECHNIQUES (PUNCHLIST P16), and the ORDER matters: this
           // runs AFTER the three disciplines, never before. `channel` was already a
           // synonym of `cast` in the parser's verb table, so a technique needed no new
           // intent — but "shape stone", "summon golem" and "mend wounds" have meant those
@@ -16684,7 +17026,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (parsed.resolvedItemId) {
           const used = player.inventory.find((i) => i.id === parsed.resolvedItemId);
           if (used) {
-            // ⚠⚠ OTA-1226 (PUNCHLIST P16, route B/C) — READING A PROCEDURE TEXT TEACHES IT.
+            // ⚠⚠ OTA-1203 (PUNCHLIST P16, route B/C) — READING A PROCEDURE TEXT TEACHES IT.
             // A found or story-earned text is a physical object in the pack; `read`/`use`
             // is the door, and it is the ONE teaching seam both routes share — the vendor
             // buy stays the only path that teaches without an object. ⚠ INT-gated at READ
@@ -16728,7 +17070,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   if (target) {
                     get().applyTorchToHook(target.id);
                   } else if (chargeable.length === 0) {
-                    // ⚠ OTA-1229 — NO LEAD DOESN'T MEAN NO USE ANY MORE. The owner's
+                    // ⚠ OTA-1206 — NO LEAD DOESN'T MEAN NO USE ANY MORE. The owner's
                     // read after 75 hours: the torch rotted in the pack because free
                     // "look around" covered its old reveal. Now a no-lead room gets a
                     // SWEEP: spend the charge, and the light marks (✦, on the
@@ -16766,7 +17108,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               }
               if (fx.healHP) {
                 const room = Math.max(0, p.hpMax - p.hp);
-                const amt = Math.min(room, scaledHealHP(fx.healHP, p.hpMax)); // OTA-1001 — #120
+                const amt = Math.min(room, scaledHealHP(fx.healHP, p.hpMax)); // OTA-978 — #120
                 p = { ...p, hp: p.hp + amt };
                 // OTA-618 — when the gain is capped by your max HP (you were near
                 // full), flag it. A "+5" off a 6-HP ration then reads as "topped
@@ -16845,13 +17187,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 // lands.
               }
               if (fx.coating) {
-                // OTA-765 — a coating is drinkable only if its element has a player-side
-                // counter. Acid (no player 'acid' ailment) is coat-only: refuse without
-                // spending it, and point the player at the weapon/armor coat action.
+                // OTA-746 — drinkable only if its element has a player-side counter.
+                // Acid is coat-only: refuse without spending it.
                 if (!isCoatingDrinkable(fx.coating.kind)) {
                   get().appendLog('arbiter', `The ${used.name} is a coating, not a draught — nothing in you for its ${fx.coating.kind} to counter. Work it into a weapon or a piece of armor instead.`);
                   break;
                 }
+                // OTA-745 — DRINK a weapon coating as a field remedy (see coatingRemedy).
                 const remedy = coatingDrinkRemedy(p, fx.coating.kind, canonicalItemRarity(used));
                 p = remedy.player;
                 messages.push(...remedy.messages);
@@ -16970,7 +17312,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog('reward', `✦ Curious Mind — Tartaria's secrets crack open before you, and something in your head clicks awake. (+2 INT and +2 WIS, from here on.)`),
           );
         }
-        // OTA-1032 — CONTESTED FLEE: with live enemies in the scene, the fastest
+        // OTA-1009 — CONTESTED FLEE: with live enemies in the scene, the fastest
         // pursuer sets the escape bar (its d20 + speed) instead of the flat
         // DC 9 that a grown DEX could never fail against. No pursuer (trap /
         // stage escapes, cleared scenes) keeps the flat DC.
@@ -16987,7 +17329,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'rest': {
-        // ⚠ OTA-1163 (pressure test) — YOU CANNOT CAMP IN FRONT OF SOMETHING
+        // ⚠ OTA-1140 (pressure test) — YOU CANNOT CAMP IN FRONT OF SOMETHING
         // TRYING TO KILL YOU. The exploit sweep typed "camp" mid-boss-fight and
         // got the full 8-hour rest — +15% max HP, stamina to full — while the
         // enemies standing in arm's reach never swung: this path never calls
@@ -16996,7 +17338,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // bonus. Eating a consumable stays a free action (OTA-619's deliberate
         // design, locked by combatHealNoCounter) — the parser routes "eat X"
         // here with resolvedItemId, and that branch below is untouched. It is
-        // the CAMP that ends: same shape as OTA-1039's honest wall-rest
+        // the CAMP that ends: same shape as OTA-1016's honest wall-rest
         // refusal, and the same reason.
         if (!parsed.resolvedItemId
             && (currentScene?.enemies.length ?? 0) > 0
@@ -17025,12 +17367,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
           const fxRaw = resolveItemEffect(consumable.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
-          // OTA-764 — a weapon coating drunk/eaten routes to its counter-medicine (see
-          // applyCoatingDrink) instead of the generic food branch below, which — since
-          // coatings carry no healHP/cure — would swallow it for a blank no-op.
+          // OTA-745 — a weapon coating drunk/eaten routes to its counter-medicine (see
+          // coatingRemedy) instead of the generic food branch, which would swallow it.
           if (fxRaw && fxRaw.kind === 'consumable' && fxRaw.coating) {
-            // OTA-765 — coat-only coatings (acid: no player ailment to counter) refuse
-            // the drink instead of being spent for nothing.
+            // OTA-746 — coat-only coatings (acid) refuse the drink instead of being spent.
             if (!isCoatingDrinkable(fxRaw.coating.kind)) {
               get().appendLog('arbiter', `The ${consumable.name} is a coating, not a draught — nothing in you for its ${fxRaw.coating.kind} to counter. Work it into a weapon or a piece of armor instead.`);
               break;
@@ -17069,7 +17409,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const hpRoom = player.hpMax - player.hp;
           const stamRoom = effectiveStaminaMax(player) - player.stamina;
           const heal = fx
-            ? Math.min(Math.max(0, hpRoom), scaledHealHP(fx.healHP ?? 0, player.hpMax)) // OTA-1001 — #120
+            ? Math.min(Math.max(0, hpRoom), scaledHealHP(fx.healHP ?? 0, player.hpMax)) // OTA-978 — #120
             : Math.min(Math.max(0, hpRoom), rollDie(6) + rollDie(6));
           const stamGain = fx
             ? Math.min(Math.max(0, stamRoom), fx.restoreStamina ?? 0)
@@ -17121,7 +17461,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           // Eating still costs a slice of the day — half an hour to break
           // and chew a ration, so the clock advances too.
-          // OTA-1141 — this used to zero a hunger penalty. Food's role is HP and
+          // OTA-1118 — this used to zero a hunger penalty. Food's role is HP and
           // stamina, full stop; there is no cap for it to heal.
           const prevHpEat = player.hp;
           const hpMaxEat = player.hpMax;
@@ -17208,7 +17548,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const hasReclaimersRopeForRest = player.inventory.some(
               (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
             );
-            // OTA-1039 — HONEST REFUSAL. Climbing accepts a Reclaimer's Rope OR a plain
+            // OTA-1016 — HONEST REFUSAL. Climbing accepts a Reclaimer's Rope OR a plain
             // Climbing Rope (see pickActiveRope), but resting on the wall accepts
             // only the Reclaimer's. A player who just climbed on a Climbing Rope was
             // told to "carry a Reclaimer's Rope" — which reads as "you have no rope"
@@ -17216,7 +17556,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const hasPlainClimbingRope = player.inventory.some(
               (i) => i.name === 'Climbing Rope' && i.quantity > 0,
             );
-            // OTA-1040 — OWNER'S RULE: "no it shouldn't, you need the hardened
+            // OTA-1017 — OWNER'S RULE: "no it shouldn't, you need the hardened
             // climbing strap for that." A rope is a line you climb, not a
             // harness you can hang and sleep in — on ANY climb, not just a
             // great one. The Reclaimer's-Rope allowance on ordinary climbs is
@@ -17225,14 +17565,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // carrying in the refusal.)
             const canRestElevated = wearsClimbStrapForRest;
             if (!canRestElevated) {
-              // OTA-975 — skipDedup: the pillar log showed rest retries 2-4 dedup-
+              // OTA-952 — skipDedup: the pillar log showed rest retries 2-4 dedup-
               // swallowed into silence. A refusal always answers.
               get().appendLog(
                 'arbiter',
                 onGreatClimb
                   ? `The Arbiter cranes to look up the ${currentScene.elevatedOn.noun}. "This high, only a Hardened Climbing Strap will hold you for a rest — a rope won't do it. Climb down, or come back wearing one."`
                   : (hasPlainClimbingRope || hasReclaimersRopeForRest)
-                    // OTA-1040 — they ARE carrying a line; say why it isn't enough.
+                    // OTA-1017 — they ARE carrying a line; say why it isn't enough.
                     ? `The Arbiter looks up. "A line gets you up — it won't hold you asleep. Only a Hardened Climbing Strap will. Climb down, or come back wearing one."`
                     : `The Arbiter looks up. "You can't sleep on a wall. Climb down, or come back wearing a Hardened Climbing Strap — that harness is the only thing that anchors a doze."`,
                 { skipDedup: true },
@@ -17273,16 +17613,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const dogToRecall = player.dog?.status === 'waiting_at_base';
           // OTA-614 — stamRoom <= 0 (not just === 0): rest that can recover
           // nothing is refused rather than burning hours + an ambush roll for
-          // +0. (OTA-1141: the <= was originally for a hunger-shrunk cap that
+          // +0. (OTA-1118: the <= was originally for a hunger-shrunk cap that
           // could drive it negative. Nothing shrinks the cap now, so this only
           // ever reads 0 — kept as a floor rather than tightened to ===, since
           // a defensive comparison costs nothing and a wrong one costs a rest.)
           const nothingToRest =
             stamRoom <= 0 && (player.corruption ?? 0) === 0 && !dogToRecall
-            // OTA-1001 — #120: rest heals now, so open wounds are a reason to sleep.
+            // OTA-978 — #120: rest heals now, so open wounds are a reason to sleep.
             && player.hp >= player.hpMax;
           if (nothingToRest) {
-            // OTA-1141 — the "your wind is choked by hunger" alternative used to
+            // OTA-1118 — the "your wind is choked by hunger" alternative used to
             // live here, behind a penalty that can no longer be non-zero. With
             // hunger gone there is exactly one reason a rest is refused, so
             // there is exactly one line.
@@ -17324,7 +17664,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // "capital" / "buried") so the picker biases toward city-
           // flavor archetypes when the player is in a Capital tile.
           const restInSafeZone = restLoc ? isHubLocation(restLoc.id) : !!player.hubRoomId;
-          // OTA-1235 — sacred ground (the Market truce) rolls ZERO, not the hub's
+          // OTA-1212 — sacred ground (the Market truce) rolls ZERO, not the hub's
           // 8%: a hub is a city with alleys, the Market is the Continental.
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const { isSacredGround: restSacred } = require('../engine/sacredGround') as typeof import('../engine/sacredGround');
@@ -17333,14 +17673,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const restAmbush = Math.random() < restAmbushChance;
           const hours = 8;
           // arb37 — rest grants NO HP. Stamina only: ~1/hr, up to 8.
-          // OTA-1001 — #120: rest heals again, LIGHT — ~15% of max HP for a full sleep,
+          // OTA-978 — #120: rest heals again, LIGHT — ~15% of max HP for a full sleep,
     // mirroring how escorts already mend on rest. The old no-HP rule (arb37 /
     // OTA-187) is superseded by the owner's call.
     const heal = Math.min(Math.max(0, player.hpMax - player.hp), Math.ceil(player.hpMax * 0.15));
           // OTA-614 — clamp to >= 0. The bug this fixed was hunger-specific: a
           // shrunken effective cap drove stamRoom NEGATIVE and Math.min(stamRoom,
           // hours) then DRAINED stamina down to it, reading as "rest took my
-          // stamina away". OTA-1141 removed the mechanic that could do that, but
+          // stamina away". OTA-1118 removed the mechanic that could do that, but
           // ⚠ THE CLAMP STAYS: the invariant it protects is "rest must never
           // reduce stamina", which is true regardless of what made it negative.
           const stamGain = Math.max(0, Math.min(stamRoom, hours));
@@ -17384,7 +17724,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // (this is the parser-routed rest; the store-method rest() is the
           // other). advanceTime sets hoursElapsed and decays dog loyalty;
           // tickPlayerStaminaStatuses syncs Tired/Exhausted off the new stamina.
-          // (OTA-1141: it used to increment a hunger penalty here too. It no
+          // (OTA-1118: it used to increment a hunger penalty here too. It no
           // longer does — and the DOG's feeding clock below is a different
           // system that is still very much alive.)
           const restedPlayer = tickPlayerStaminaStatuses(
@@ -17451,7 +17791,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (heal > 0) parts.push(`+${heal} HP`);
           if (stamGain > 0) parts.push(`+${stamGain} stamina`);
           if (corrDecay > 0) parts.push(`−${corrDecay} corruption`);
-          // OTA-1141 — OTA-614's hunger-cap explanation is retired with the
+          // OTA-1118 — OTA-614's hunger-cap explanation is retired with the
           // mechanic. Nothing can cap the usable stamina below the raw max any
           // more, so a rest that recovers nothing means exactly one thing.
           const tail = parts.length > 0
@@ -17459,7 +17799,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : 'Whole already — the Aetherstone hums steady.';
           get().appendLog('world', `You rest for ${hours} hours. ${tail} (${describeTime(newHours)})`);
           healEscortsOnRest(get, set);
-          // ⚠ OTA-1145 — GENERATE DURING REST, SPEND ON WAKING. This is the
+          // ⚠ OTA-1122 — GENERATE DURING REST, SPEND ON WAKING. This is the
           // window the whole bank was built for: the player has explicitly
           // chosen to pass time, the world is standing still by definition, and
           // the shared native-ML lock is as free as it ever gets. A musing
@@ -17494,7 +17834,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // rests anyway, RNG runs free. Stays a design dial we
             // can re-enable later if playtest insists.
             const rawWildRestEnemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location);
-            // OTA-1055 — UNDER A ROOF, THE CAST CHANGES. The pick above is the
+            // OTA-1032 — UNDER A ROOF, THE CAST CHANGES. The pick above is the
             // wilderness table, which is right out in the mud and absurd in a
             // fortified capital's bunkroom (owner's log: a Rare 202-HP Mud
             // Cyclops in the Builders' crew bunks). Swap in an indoor-plausible
@@ -17508,7 +17848,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // can still walk in off the mud where the outpost opens to the sky,
             // but never into a sealed bunkroom.
             const restUnderRoof = underRoof;
-            // OTA-1056 — and about half the time it's PEOPLE, not a creature (owner:
+            // OTA-1033 — and about half the time it's PEOPLE, not a creature (owner:
             // the indoor list should cover raiders and soldiers). The caller is
             // the faction you've wronged most — a real grudge is why someone
             // walks into a capital after you — dressed on a same-rarity HUMAN
@@ -17550,12 +17890,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     },
                   }
                 : s);
-              // OTA-1055 — indoors both beats are re-voiced: "circled" and "closes
+              // OTA-1032 — indoors both beats are re-voiced: "circled" and "closes
               // the distance" are open-ground images, and the unsettling part of
               // waking up in a sealed room is that it was already in with you.
               // eslint-disable-next-line @typescript-eslint/no-require-imports
               const restAmb = require('../engine/indoorAmbush') as typeof import('../engine/indoorAmbush');
-              // ⚠ OTA-1135 — THE OUTDOOR HALF OF OTA-1055. That OTA gave the
+              // ⚠ OTA-1112 — THE OUTDOOR HALF OF OTA-1032. That OTA gave the
               // INDOOR path three lines for each beat and left the outdoor
               // path on a single hardcoded string for both — so the more
               // common case, resting in the open, was the one with no variety.
@@ -17695,18 +18035,64 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // stamina gate below, so 0 stamina never blocks an interior step.
         // Leaving the outpost (isLeaveHubCommand) is real overland travel
         // and falls through to the gated/charged path.
-        if (player.hubRoomId && !isLeaveHubCommand(trimmed)) {
-          const hubVisited = new Set(get().worldMemory.hubVisited ?? []);
-          const interiorMove = resolveHubTravel(player.hubRoomId, trimmed, hubVisited);
+        // ⚠⚠ OTA-1269 — bare `exit` / `leave` now count as leaving. Before this,
+        // they fell through here into overland travel with NO destination: at
+        // zero stamina that was the stamina refusal, and after resting it was a
+        // wander that narrated a floorboard search and spent an hour — four
+        // typed attempts on the owner's device before the taught phrase landed.
+        if (player.hubRoomId && !isLeaveHubCommand(trimmed) && !isBareExitCommand(trimmed)) {
+          const skin = hubSkinFactionFor(player.currentLocationId, player.factionId);
+          const interiorMove = resolveHubTravel(player.hubRoomId, trimmed,
+            // ⚠ OTA-1274 — match the names the player is actually reading.
+            skin);
+          // ⚠⚠ OTA-1279 — A NAMED ROOM THAT IS NOT ONE STEP AWAY IS A REFUSAL,
+          // NOT A JUMP. The old fast-travel branch teleported the player to any
+          // room they had already seen; the owner's navigation spec forbids it
+          // ("move ONE GRAPH EDGE AT A TIME", "dead ends must behave as dead
+          // ends"). The refusal carries the door that heads that way, because
+          // being told "no" with no direction is what had him cycling fifteen
+          // room names looking for the exit.
+          // ⚠⚠ OTA-1279 — A CARDINAL WITH NO DOOR ON IT NO LONGER EJECTS YOU.
+          // It used to resolve to nothing and fall through to the overland
+          // handler, which walked the player clean out of the building. With
+          // the corrected topology most rooms have one or two doors, so this
+          // would have fired constantly.
+          if (interiorMove && interiorMove.via === 'no_exit_that_way') {
+            const hereRoom = findHubRoom(player.hubRoomId);
+            const ways = (['north', 'south', 'east', 'west'] as const)
+              .filter((d) => hereRoom?.exits[d])
+              .map((d) => `${d} to the ${hubRoomFor(hereRoom!.exits[d]!, skin)?.shortName ?? d}`);
+            get().appendLog(
+              'world',
+              ways.length
+                ? `No way ${interiorMove.dir} from here. You can go ${ways.join(', ')}.`
+                : `No way ${interiorMove.dir} from here.`,
+            );
+            break;
+          }
+          if (interiorMove && interiorMove.via === 'not_adjacent') {
+            const want = hubRoomFor(interiorMove.roomId, skin);
+            const step = interiorMove.firstStep ? hubRoomFor(interiorMove.firstStep, skin) : null;
+            const dir = interiorMove.firstStep
+              ? (['north', 'south', 'east', 'west'] as const).find(
+                  (d) => findHubRoom(player.hubRoomId!)?.exits[d] === interiorMove.firstStep,
+                )
+              : undefined;
+            get().appendLog(
+              'world',
+              step && dir
+                ? `The ${want?.shortName ?? 'room'} isn't off this one. Head ${dir} to the ${step.shortName} to start that way.`
+                : `The ${want?.shortName ?? 'room'} isn't off this one, and there's no way through from here.`,
+            );
+            break;
+          }
           if (interiorMove) {
             set((s) => (s.player ? { player: { ...s.player, hubRoomId: interiorMove.roomId } } : s));
-            const dest = hubRoomFor(interiorMove.roomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
+            const dest = hubRoomFor(interiorMove.roomId, skin);
             if (dest) {
               get().appendLog(
                 'world',
-                interiorMove.via === 'fast_travel'
-                  ? `You cut across the outpost to the ${dest.shortName}.`
-                  : `You head ${interiorMove.via === 'cardinal' ? 'on' : 'over'} to the ${dest.shortName}.`,
+                `You head ${interiorMove.via === 'cardinal' ? 'on' : 'over'} to the ${dest.shortName}.`,
               );
             }
             get().beginScene();
@@ -17738,7 +18124,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // native build — pure-JS OTA can't vibrate.
           get().appendLog(
             'world',
-            // ⚠ OTA-1190 — IT SAID "≈4h" AND REST TAKES 8. The parser-routed rest uses a
+            // ⚠ OTA-1167 — IT SAID "≈4h" AND REST TAKES 8. The parser-routed rest uses a
             // FIXED `hours = 8`; there is no 4-hour rest anywhere in the game. A player
             // budgeting a contract's window off this line under-counts every stop by half
             // — and the owner lost a contract to exactly that arithmetic, resting three
@@ -17769,12 +18155,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // 'go north' meaning the gate→square step instead of a Macro
         // tile shift, and 'go armory' a direct room jump.
         if (player.hubRoomId) {
-          if (isLeaveHubCommand(trimmed)) {
-            set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+          // ⚠ OTA-1269 — same predicate as the free-interior gate above; a bare
+          // `exit` that passed that gate must not fall to the wander here.
+          if (isLeaveHubCommand(trimmed) || isBareExitCommand(trimmed)) {
+            // ⚠ OTA-1271 — say which door. The Workshop carries its own exterior
+            // door now (owner: "all outposts should have at least 1 exit", and
+            // the workshop is his named anchor); leaving from an exterior_door
+            // room must not narrate a walk back through the gate it didn't use.
+            const leavingRoom = hubRoomFor(player.hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
+            const viaSideDoor = !!leavingRoom
+              && Array.isArray(leavingRoom.tags)
+              && leavingRoom.tags.includes('exterior_door')
+              && !leavingRoom.tags.includes('entrance');
+            // ⚠ OTA-1272 — free passage out the door (exit + 2 moves).
+            set((s) => (s.player ? { player: { ...s.player, hubRoomId: null, safeExitMovesLeft: SAFE_EXIT_FREE_SCENES } } : s));
             set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
             get().appendLog(
               'world',
-              `You walk back through the gate and out into the open ground. The outpost falls away behind you.`,
+              viaSideDoor
+                ? `You let yourself out ${leavingRoom!.shortName ? `the ${leavingRoom!.shortName}'s` : 'a'} side door and into the open ground. The outpost falls away behind you.`
+                : `You walk back through the gate and out into the open ground. The outpost falls away behind you.`,
             );
             // skipHubEntry — otherwise beginScene re-enters the gate
             // because the player's currentLocationId is still the
@@ -17799,11 +18199,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (isContinueCommand(trimmed)) {
           const last = player.lastTravelDirection;
           if (last) {
-            // ⚠ OTA-1185 — a tile costs TILE_HOURS however you asked for it. This charged
+            // ⚠ OTA-1162 — a tile costs TILE_HOURS however you asked for it. This charged
             // 1h while the → TARGET button charged 0.25h for the identical move, so
             // typing was 4× more expensive than tapping.
             set({ player: advanceTime(spendTravelStamina(player), TILE_HOURS) });
-            // OTA-1191 — hand-walked, so the road odometer pays double for it.
+            // OTA-1168 — hand-walked, so the road odometer pays double for it.
             _lastStepWasCardinal = true;
             get().stepDirection(last);
           } else {
@@ -17838,7 +18238,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // read "Irma Ironhand is here" after the gate fell away.
             // Same applies to leftover hooks and chip pools. beginScene
             // is the canonical scene-rebuild path; use it.
-            set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+            set((s) => (s.player ? { player: { ...s.player, hubRoomId: null, safeExitMovesLeft: SAFE_EXIT_FREE_SCENES } } : s)); // OTA-1272
             const currentPlayer = get().player ?? player;
             set({ player: advanceTime(spendTravelStamina(currentPlayer), 1) });
             get().appendLog(
@@ -17877,9 +18277,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // player is committed to open ground.
             break;
           }
-          // ⚠ OTA-1185 — same tile, same price, typed or tapped. Was 1h here.
+          // ⚠ OTA-1162 — same tile, same price, typed or tapped. Was 1h here.
           set({ player: advanceTime(spendTravelStamina(player), TILE_HOURS) });
-          // ⚠ OTA-1191 — THE TYPED CARDINAL WALK IS THE ONE WORTH DOUBLE. Autoroute runs a
+          // ⚠ OTA-1168 — THE TYPED CARDINAL WALK IS THE ONE WORTH DOUBLE. Autoroute runs a
           // straight line to a place already on your map; this is the one that finds what
           // is not. Owner: "double the generation rate for cardinal direction travel to get
           // them to explore more."
@@ -17937,9 +18337,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (wantsDown && !currentScene.microMicroId) {
           const macroId = LOCATION_TO_MACRO[currentScene.location.id];
           if (macroId) {
-            // OTA-769 — descending REACHES the indoor / buried micro-areas (which the
-            // surface random-assignment now skips), so 'go down' opens the mausoleum /
-            // catacombs the outdoor tile no longer stamps on you.
+            // OTA-749 — descending REACHES the indoor / buried micro-areas the surface
+            // random-assignment now skips.
             const target = pickRandomMicroMicroIn(macroId, undefined, { includeIndoor: true });
             if (target) {
               set({ player: advanceTime(spendTravelStamina(player), 1) });
@@ -17989,7 +18388,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // a substring hit. We now ONLY accept alias.includes(target),
         // and require target ≥ 3 chars so single-letter typos don't
         // brute-force a hit either.
-        // OTA-1011 — one punctuation-insensitive matcher (app/engine/locationMatch.ts)
+        // OTA-988 — one punctuation-insensitive matcher (app/engine/locationMatch.ts)
         // replaces the raw-string find + word-wise typo pass that used to live
         // here. The old code required the player to reproduce every apostrophe
         // and hyphen an author typed: measured against the live catalog, exact
@@ -18126,7 +18525,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('world', `You're already committed to the dodge — no need to spend another beat on it.`);
           break;
         }
-        // ⚠ OTA-1193 — THE COOLDOWN GATE. Dodge resolves as `d20 + DEX >= the enemy's
+        // ⚠ OTA-1170 — THE COOLDOWN GATE. Dodge resolves as `d20 + DEX >= the enemy's
         // attack total`, so at DEX 19 only a natural 1 fails: the owner's log shows five
         // dodges and five wins (including a nat 2 and a nat 3), each granting a ×2-dice
         // opening that then rolled `slashing ×2.25 for 52`. Alternating dodge→attack put
@@ -18134,7 +18533,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // without touching the dodge maths, so the move stays a read rather than becoming
         // a coin flip.
         // ⚠ The refusal SPEAKS and BUZZES and does NOT spend the turn — a cooldown that
-        // silently eats the action is the OTA-1187 defect wearing armour.
+        // silently eats the action is the OTA-1164 defect wearing armour.
         {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const DC = require('../engine/dodgeCooldown') as typeof import('../engine/dodgeCooldown');
@@ -18162,14 +18561,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? { player: advanceTime(spendStamina({
                 ...s.player,
                 statusEffects: applyEffect(s.player.statusEffects ?? [], dodging),
-                // ⚠ OTA-1193 — armed here, ticked down by the per-action tail. The tail
+                // ⚠ OTA-1170 — armed here, ticked down by the per-action tail. The tail
                 // runs on THIS action too, so setting the full count leaves exactly
                 // DODGE_COOLDOWN_ROUNDS - 1 rounds locked and the stance usable again on
                 // the third action. Off-by-one here is the difference between "every
                 // other round" and the intended cadence.
-                // ⚠ OTA-1194 — the tier decides the count, not the bare constant.
+                // ⚠ OTA-1171 — the tier decides the count, not the bare constant.
                 // salvage resolves to 0, which arms nothing and leaves the stance free —
-                // the pre-OTA-1193 game, deliberately, on the tier whose whole promise is
+                // the pre-OTA-1170 game, deliberately, on the tier whose whole promise is
                 // that the mud lets you work.
                 dodgeCooldown: (require('../engine/dodgeCooldown') as typeof import('../engine/dodgeCooldown'))
                   .dodgeCooldownRounds(dialOf(s.player, 'dodgeLock')),
@@ -18588,7 +18987,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
         }
-        // ⚠ OTA-1090 — HIS NAME, ASKED FOR DIRECTLY. Checked BEFORE every
+        // ⚠ OTA-1067 — HIS NAME, ASKED FOR DIRECTLY. Checked BEFORE every
         // lookup below it, because "what is your name" would otherwise
         // cosine-match some near-miss in the lore bank and the one question
         // Phase 5 exists to answer would be fielded by the glossary.
@@ -18597,7 +18996,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         // Otherwise normal concept lookup.
-        // ⚠⚠ OTA-1221 — MATCH THE TOPIC, NOT THE WHOLE SENTENCE. `lookup` is the raw parsed
+        // ⚠⚠ OTA-1198 — MATCH THE TOPIC, NOT THE WHOLE SENTENCE. `lookup` is the raw parsed
         // target, so for "ask the arbiter about <X>" it still carries the word *arbiter* —
         // and `arbiter` is itself a concept keyword. So ANY ask matched the Arbiter concept
         // whenever nothing longer beat it, which is why "ask the arbiter about zzzzz
@@ -18609,11 +19008,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const concept = findConcept(conceptQuery);
         if (concept) {
           get().appendLog('arbiter', `"${concept.title}," the Arbiter says. "${concept.answer}"`);
-          // ⚠⚠ OTA-1221 (PUNCHLIST P17) — AND IT COUNTS AS READING LORE. This branch has
+          // ⚠⚠ OTA-1198 (PUNCHLIST P17) — AND IT COUNTS AS READING LORE. This branch has
           // answered lore offline, from concepts.json keywords, since OTA-233 — and then
           // `break`s, so it never reached the `loreRead` tick further down. That tick lived
           // ONLY inside the embedder branch, so on a device where the narration model does
-          // not load (the owner's own, OTA-1203 / OTA-1204 / OTA-1205: `Narration engine: failed`) the
+          // not load (the owner's own, OTA-1180 / OTA-1181 / OTA-1182: `Narration engine: failed`) the
           // counter could never move and **Scholar of Forgotten Lore was unearnable** —
           // while the game was answering the player's lore questions perfectly well the
           // whole time. The answer was never the missing part; the credit was.
@@ -18665,8 +19064,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               /* lore lookup failed — the offline path below still gets a turn */
             }
           }
-          // ⚠⚠ OTA-1221 (PUNCHLIST P17) — THE OFFLINE PATH. Everything above needs a model
-          // that loads. On the owner's own device it does not (OTA-1203 / OTA-1204 / OTA-1205 all read
+          // ⚠⚠ OTA-1198 (PUNCHLIST P17) — THE OFFLINE PATH. Everything above needs a model
+          // that loads. On the owner's own device it does not (OTA-1180 / OTA-1181 / OTA-1182 all read
           // `Narration engine: failed`), and `loreRead` was ticked ONLY inside that branch —
           // so 177 authored lore concepts were unreachable and Scholar of Forgotten Lore
           // could not be earned at all. The bank is plain text and never needed the model.
@@ -18682,7 +19081,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             answered = true;
             // arb45 — Scholar of Forgotten Lore: each canon lore answer is a deciphered
             // text (3 needed).
-            // ⚠⚠ OTA-1221 — DISTINCT CONCEPTS, NOT ASKS. This counted every answer, so
+            // ⚠⚠ OTA-1198 — DISTINCT CONCEPTS, NOT ASKS. This counted every answer, so
             // asking the same question three times earned the title. A title called
             // Scholar of Forgotten Lore should mean you read three DIFFERENT things, and
             // this session has already closed two loops that paid out on repetition —
@@ -18690,7 +19089,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             creditLoreRead(get, set, `bank_${hit.concept.id}`);
           }
           if (!answered) {
-            // OTA-1090 — read the brief HERE rather than closing over a stale
+            // OTA-1067 — read the brief HERE rather than closing over a stale
             // player: this runs after an await, and the run may have moved.
             const persona = await arbiterPersonaAnswer(
               trimmed,
@@ -18974,7 +19373,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const nowHours = get().player?.hoursElapsed ?? player.hoursElapsed ?? 0;
             set((s) => ({ worldMemory: recordWaterUse(s.worldMemory ?? emptyMemory(), drinkRoomKey, 'drink', nowHours) }));
           }
-          // OTA-1141 — a 0-gain drink used to have two causes: genuinely full, or
+          // OTA-1118 — a 0-gain drink used to have two causes: genuinely full, or
           // hunger capping the effective max below the real one. effectiveStaminaMax
           // returns the raw max now, so the second can never happen and its line
           // could never print. One cause, one line.
@@ -19068,7 +19467,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // instead of "✓ HIT" followed by "sidesteps". Same fix as the melee path.
           let thrownDodged = false;
           if (hit) {
-            // OTA-935 — same crit / margin-beats-dodge rule as the melee path.
+            // OTA-912 — same crit / margin-beats-dodge rule as the melee path.
             thrownDodged = enemyDodgesHit(enemyHit.traits, total, ac, false);
           }
           get().appendLog(
@@ -19092,7 +19491,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // DOT is still exclusive to the equipped-attack/bandolier path.)
             const throwCoat = itemUsed?.coating;
             let coatBonus = 0;
-            // OTA-1163 (pressure test) — carry the weakness verdict out of the
+            // OTA-1140 (pressure test) — carry the weakness verdict out of the
             // damage math so the throw can STAGGER on it, same as the bandolier
             // path. The exploit sweep found the two hands disagreeing: the same
             // vulnerable:burn boss staggered when the vial came off the rack and
@@ -19115,7 +19514,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             hps[idx] = Math.max(0, (hps[idx] ?? enemyHit.hp) - dmg);
             set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: hps } } : s);
             get().appendLog('combat', `The ${projectile}${wLabel} hits ${enemyHit.name} for ${dmg}${coatBonus > 0 ? ` (+${coatBonus} ${throwCoat!.kind} coating)` : ''}. (${hps[idx]}/${enemyHit.hp} HP)`, { combatOutcome: 'player_dmg' });
-            // OTA-826 [Group-K audit] — coating PARITY on the typed-throw path. Pre-fix
+            // OTA-806 [Group-K audit] — coating PARITY on the typed-throw path. Pre-fix
             // this path folded in the coating's on-hit bonus but DROPPED the lingering
             // DOT (and acid armor-shred / corruption stacks), so a Poisoned/Acid/Corrupted
             // knife thrown by name ("throw knife at X") did ~one 1d4 tick and nothing more,
@@ -19224,7 +19623,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const downFrom = typeof elev === 'string'
             ? elev
             : (elev as { noun?: string }).noun ?? 'the height';
-          // OTA-975 — descending on EMPTY arms is a half-climb, half-fall slide:
+          // OTA-952 — descending on EMPTY arms is a half-climb, half-fall slide:
           // half the scaled fall damage for your tier, then the descent itself
           // proceeds normally. Owner: at zero stamina the wall is done with
           // you — up drops you outright, down at least lets you steer the
@@ -19287,7 +19686,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog(
               'world',
               `You climb down from the ${(() => {
-                // OTA-996 — #119b: place-word per overlay — "climb down from the
+                // OTA-973 — #119b: place-word per overlay — "climb down from the
                 // forgotten scholar" read as climbing down off a PERSON.
                 // eslint-disable-next-line @typescript-eslint/no-require-imports
                 const { overlayDescentNoun } = require('../engine/elevatedOverlay');
@@ -19335,7 +19734,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? matchAmbientNoun(climbRaw, climbSceneNouns)
           : null;
         let climbTarget = climbSceneMatch ?? parsed.resolvedNoun ?? (climbRaw.length > 0 ? climbRaw : '');
-        // ⚠ OTA-1178 — "CLIMB FOR IT" MEANS CLIMB THE THING IT IS ON.
+        // ⚠ OTA-1155 — "CLIMB FOR IT" MEANS CLIMB THE THING IT IS ON.
         // The Arbiter tells you a perch "is up on the stone bridge, tier 2", so the
         // plainest reading of that sentence is `climb the cache` — and isClimbable
         // says no, because a cache is not a wall. Device log 2026-08-06T00:30:15,
@@ -19367,7 +19766,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the top tier rolls the climb-top loot pool (50% chance of
         // an Uncommon-skewed item — chance-based so not every climb
         // pays out).
-        // OTA-972 — bare `climb` while already up continues the climb you're ON.
+        // OTA-949 — bare `climb` while already up continues the climb you're ON.
         const tgt = climbTarget || currentScene.elevatedOn?.noun || 'the surface in front of you';
         // OTA-911 — you can't climb past a fight. When guardians are on you
         // (including a mid-climb ambush), the climb verb is refused: deal with
@@ -19415,11 +19814,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // still showed (1/3). On an active climb the two now agree; the marker scan
         // only governs a fresh climb started from the ground.
         const elev = currentScene.elevatedOn;
-        // OTA-972 — anchored head-noun match (sameClimbNoun) instead of the loose
+        // OTA-949 — anchored head-noun match (sameClimbNoun) instead of the loose
         // bidirectional includes: typing "stone" must not read as being on the
         // "stone pillar"'s climb, and vice versa.
         const onThisClimb = !!elev && sameClimbNoun(elev.noun, tgt);
-        // OTA-972 — ONE CLIMB AT A TIME. Owner: "if there is more climbs than one,
+        // OTA-949 — ONE CLIMB AT A TIME. Owner: "if there is more climbs than one,
         // an elevated event on one climb isn't able to be triggered if the
         // elevation is the same but the player is on a different climb."
         // There was no rule connecting your feet to the thing you climb next:
@@ -19575,7 +19974,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // tier you'd cleared (maxCleared) — you fall from where you stood. A
           // 2-tier wall lands near the old flat ~20%; great climbs punish height.
           const tierFallenFrom = Math.max(1, maxCleared);
-          // OTA-975 — formula lives in climbHeight.computeClimbFallBase now, shared
+          // OTA-952 — formula lives in climbHeight.computeClimbFallBase now, shared
           // with the zero-stamina descent slide (half rate). Same numbers.
           let fallDamage = computeClimbFallBase(player.hpMax, tierFallenFrom);
           // arb-fix — Etherbound Survivor ("survive environmental hazards")
@@ -19594,7 +19993,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const shave = Math.min(fallDamage - 1, tPerksFall.envHazardSaveBonus);
             if (shave > 0) { fallDamage -= shave; fallShaveTag += ` (Aetherbound Survivor absorbs ${shave})`; }
           }
-          // ⚠ OTA-1126 — read HP LIVE, not from the `player` snapshot captured
+          // ⚠ OTA-1103 — read HP LIVE, not from the `player` snapshot captured
           // at the top of the action pipeline. The weather tick runs earlier in
           // this same submit and mutates HP through the store; computing the
           // fall from the stale snapshot and writing the result absolutely
@@ -19716,7 +20115,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             break;
           }
-          // OTA-975 — zero on the wall means GRAVITY, not a parking spot. Owner
+          // OTA-952 — zero on the wall means GRAVITY, not a parking spot. Owner
           // (from the pillar log, 11 held climb presses while a storm chipped
           // him): "you shouldn't be stuck on a climb at zero ... you fall and
           // take damage." The OTA-936 no-unwarned-drops rule survives as ONE
@@ -19773,7 +20172,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the snap path catches the equal case and converts in place
         // before wear is applied.
         const activeRope = pickActiveRope();
-        // OTA-799 — the rope is usable down to its LAST point. The old guard
+        // OTA-779 — the rope is usable down to its LAST point. The old guard
         // snapped/refused at current ≤ ROPE_WEAR_PER_TIER (15), which stranded a
         // whole climb's worth of durability AND dropped the player with no
         // warning ("durability 15 ≤ 15 — YOU FALL", player report: "what's the
@@ -19844,7 +20243,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           set((s) => (s.player ? { player: { ...s.player, inventory: postWearInv } } : s));
           if (wearResult.broken && wearResult.brokenName) {
-            // OTA-799 — the rope gave its last climb, then let go at the top
+            // OTA-779 — the rope gave its last climb, then let go at the top
             // (durability 0). You completed THIS tier; there's just no rope for
             // the next one. Graceful end-of-life, not a fall.
             get().appendLog(
@@ -19855,7 +20254,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               get().appendLog('reward', `✦ ${wearResult.salvageDrop.name} (Common).`);
             }
           } else if (activeRope) {
-            // OTA-799 — fraying warning: the rope survived this climb but is
+            // OTA-779 — fraying warning: the rope survived this climb but is
             // low (≤ one more climb of durability). Heads-up to mend it before
             // it's gone — it breaks gracefully above, but the player should
             // never be surprised by it running out.
@@ -19881,7 +20280,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const tgtLow = tgt.toLowerCase();
           const tgtIsRope = /\b(rope|line|chain|cable|cord)\b/.test(tgtLow);
           const rope = hasReclaimersRope ? "Reclaimer's Rope" : 'climbing rope';
-          // OTA-1093 — the tutorial walk caught "around the the surface in
+          // OTA-1070 — the tutorial walk caught "around the the surface in
           // front of you": some climbable nouns already carry their article.
           // Strip ours when the noun brings its own.
           const tgtArt = /^(the|a|an)\s/i.test(tgt) ? tgt : `the ${tgt}`;
@@ -20045,7 +20444,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : s.currentScene,
             };
           });
-          // OTA-974 — Phase B of real heights: cresting a tier that holds a perch
+          // OTA-951 — Phase B of real heights: cresting a tier that holds a perch
           // announces the find. This is the discovery moment that teaches the
           // player mid-climb stops are worth making.
           {
@@ -20165,7 +20564,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // climbs. Player asked: traders only on "larger
             // locations" so a 1-tier ledge doesn't surface a
             // man-with-a-ledger absurdity.
-            // OTA-1063 — no summit ambush during the tutorial. The scripted
+            // OTA-1040 — no summit ambush during the tutorial. The scripted
             // climb beat says "top out, then climb back down"; dropping a
             // hostile (or a trader, or a lookout hook) on a player who owns
             // one cudgel and is still inside the beat lockdown is a trap,
@@ -20173,7 +20572,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // tutorial is done or skipped.
             const inTutorial =
               get().tutorialStep !== null && !get().tutorialExploreChosen;
-            // ⚠⚠ OTA-1245 — NO RANDOM OVERLAY ON A GREAT CLIMB'S CROWN. The
+            // ⚠⚠ OTA-1222 — NO RANDOM OVERLAY ON A GREAT CLIMB'S CROWN. The
             // summit-boss branch above just spawned the tower's guardian into
             // the scene — and this chance-rolled overlay REPLACED the whole
             // scene (enemies included), DELETING the boss the moment after its
@@ -20224,7 +20623,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   enemyHps: overrides.enemyHps,
                   enemyAmbushUsed: overrides.enemyAmbushUsed,
                   activeEnemyIdx: overrides.activeEnemyIdx,
-                  // OTA-1063 — set the band explicitly. Every other spawn
+                  // OTA-1040 — set the band explicitly. Every other spawn
                   // site opens at 'mid'; this one inherited the base scene's
                   // range, which is null on a peaceful room. Null then got
                   // coalesced to 'close' by the attack gate and to 'mid' by
@@ -20296,7 +20695,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 );
                 get().appendLog('debug', debugEnemy(enemy as unknown as Record<string, unknown>)); // OTA-354
               }
-              // OTA-1078 — SIGHT THE OVERLAY TRADER. The fourth of five vendor
+              // OTA-1055 — SIGHT THE OVERLAY TRADER. The fourth of five vendor
               // install sites, and the docblock on sightVendor claimed there
               // were three. Until now, stealing from the trader you find on a
               // climbed tier cost nothing on the ledger — permanently — because
@@ -20721,7 +21120,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const statLabel = equipped.stat.slice(0, 3).toUpperCase();
         let livingHp = currentScene.enemyHps[currentScene.activeEnemyIdx] ?? targetEnemy.hp;
         let killed = false;
-        let burstFoundWeakness = false; // OTA-1163 — stagger parity for burst fire
+        let burstFoundWeakness = false; // OTA-1140 — stagger parity for burst fire
         for (let i = 0; i < burstCount && livingHp > 0; i++) {
           const penalty = i * 2;
           const roll = rollDie(20);
@@ -20734,7 +21133,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `Shot ${i + 1}/${burstCount} — d20 ${roll} + ${statLabel} ${statVal}${penalty ? ` − ${penalty} (burst)` : ''} = ${total} vs AC ${ac} — ${hit ? '✓ HIT' : '✗ MISS'}`,
           );
           if (hit) {
-            // OTA-826 [Group-K audit] — burst-fire was bypassing the weakness
+            // OTA-806 [Group-K audit] — burst-fire was bypassing the weakness
             // system: a bare rollDie ignored the weapon's damageType, so an
             // electrical bolt-caster did nothing extra to an electrical-weak
             // Automation and a piercing burst wasn't resisted by a pierce-resist
@@ -20750,9 +21149,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const shotTag = shotMod.match === 'weak' ? ' (weak — bites deep!)' : shotMod.match === 'resist' ? ' (resisted)' : '';
             // OTA-838 — record the observed match from ranged fire too.
             recordEnemyIntel(get, set, targetEnemy.name, shotType, shotMod.match);
-            // OTA-1163 (pressure test) — a burst that finds the weakness earns
+            // OTA-1140 (pressure test) — a burst that finds the weakness earns
             // the stagger too (parity with the primary attack, which routes
-            // through the melee path's OTA-1160 hook). Latched here, applied
+            // through the melee path's OTA-1137 hook). Latched here, applied
             // once below when the target survives.
             if (shotMod.match === 'weak') burstFoundWeakness = true;
             livingHp = Math.max(0, livingHp - dmg);
@@ -20771,7 +21170,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             return { currentScene: { ...s.currentScene, enemyHps: hps } };
           });
           get().resolveEnemyDefeat();
-          // OTA-1143 — survivors still answer the volley (see runSurvivorVolley).
+          // OTA-1120 — survivors still answer the volley (see runSurvivorVolley).
           runSurvivorVolley(get, set, player);
         } else {
           set((s) => {
@@ -20884,7 +21283,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('arbiter', `The Arbiter shakes their head. "${target} isn't in your pack."`);
           break;
         }
-        // OTA-1123 — the drop BODY now lives in dropInventoryInstance so the UI
+        // OTA-1100 — the drop BODY now lives in dropInventoryInstance so the UI
         // can drop a specific instance without going through the text parser.
         // The typed verb keeps resolving the noun; only the doing moved.
         get().dropInventoryInstance(item.id);
@@ -20918,7 +21317,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 break;
               }
               const cat = findCatalogItem(ambientHit);
-              // OTA-981 — once per room, PERIOD (see takeAmbientNoun): the
+              // OTA-958 — once per room, PERIOD (see takeAmbientNoun): the
               // owned-check "self-heal" made take -> use -> take an infinite
               // farm for any takeable consumable.
               const alreadyConsumed = nonClimbMarkers(ambientRoom?.searchedAmbientNouns).some(
@@ -20971,7 +21370,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 }
                 break;
               }
-              // OTA-710 — a WEAPON/TOOL-named scene noun that isn't a catalog row
+              // OTA-693 — a WEAPON/TOOL-named scene noun that isn't a catalog row
               // ("axe", "ice axe", "javelin") still reads as a grabbable weapon, but
               // the catalog-only grant above treated it as immovable scenery ("part of
               // the ground — try SALVAGE"), and salvage then dead-ended. If the name
@@ -21107,7 +21506,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         const opened = [...(room.containersOpened ?? []), key];
-        // OTA-760 — opening a container RESOLVES that object: also record the noun as
+        // OTA-741 — opening a container RESOLVES that object: also record the noun as
         // a searched ambient noun so the salvage sweep (and take / investigate) skip
         // it. Without this the same object paid out TWICE — once via 'open' (its
         // contents) and again when a later SALVAGE ALL swept it up ("you work the
@@ -21186,7 +21585,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'reward',
             `✦ Recovered ${rolled.entry.name}${actualQty > 1 ? ` x${actualQty}` : ''} from the ${target}.`,
           );
-          // OTA-724 — a cracked container occasionally hides a recipe among the loot.
+          // OTA-706 — a cracked container occasionally hides a recipe among the loot.
           maybeTeachRecipeReward(get, set, 'LOOT_RECIPE_CHANCE', `Recipe found in the ${target}`);
         } else {
           get().appendLog('world', `Inventory cap reached — the ${rolled.entry.name} stays behind.`);
@@ -21211,14 +21610,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
               player.completedFactionQuestIds ?? [],
             );
             const titles = pool.map((q) => `"${q.title}"`).join(', ');
-            // ⚠ OTA-1182 — AN EMPTY LIST HAS TWO CAUSES AND THEY NEED OPPOSITE ACTIONS.
+            // ⚠ OTA-1159 — AN EMPTY LIST HAS TWO CAUSES AND THEY NEED OPPOSITE ACTIONS.
             //
             // This used to say "Nothing for you right now — check back after I've
             // travelled." There is NO restock: `availableFactionQuests` filters a
             // STATIC authored pool by rep and by what the player already took, so
             // travelling changes nothing, ever. The line promised a mechanic that does
             // not exist and sent the player away to do the one thing that cannot help
-            // — the OTA-1181 defect class, in the one place it costs them time rather
+            // — the OTA-1158 defect class, in the one place it costs them time rather
             // than only misinforming them.
             //   LOCKED  → more work is here, standing is too low. Earn rep, come back.
             //   CLEARED → they have taken everything these people offer. Go elsewhere.
@@ -21275,7 +21674,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         const lower = target.toLowerCase();
-        // ⚠ OTA-1211 (PUNCHLIST P3) — THE COURIER IS BACK, FOR REPORTS ONLY. B2 killed it
+        // ⚠ OTA-1188 (PUNCHLIST P3) — THE COURIER IS BACK, FOR REPORTS ONLY. B2 killed it
         // for every contract type; the P3 audit showed the anti-farming rationale it was
         // remembered for was never the actual one, and cannot apply to one-shot content.
         // A runner now carries a MYSTERY, a STORYLINE or a non-fetch FACTION DEED for a
@@ -21286,7 +21685,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const huntHint = /hunt|bounty|titan|dragon|behemoth|chimera|wyvern|monarch|siren|queen|trophy/.test(lower);
         const mysteryHint = /mystery|fragment|compass|orb|eye|watch|red tower|cradle|leviathan|obsidian|temporal/.test(lower);
         const storyHint = /storyline|story|path|ascension|run|relic run|silence|red tower|tartarian path/.test(lower);
-        // ⚠⚠ OTA-1211 — ROUTE AGAINST WHAT THE PLAYER IS ACTUALLY CARRYING, FIRST.
+        // ⚠⚠ OTA-1188 — ROUTE AGAINST WHAT THE PLAYER IS ACTUALLY CARRYING, FIRST.
         //
         // The keyword hints above plus a fuzzy match over the WHOLE catalog decide which
         // handler gets the command. That is a weak filter, and restoring the courier made
@@ -21327,7 +21726,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // OTA-803 — the `gift` intent + giftToVendor were removed. Faction standing
       // is earned through mission completions + sigil/pendant turn-ins; gifting
       // vendors loot for rep undercut that design, so the mechanic is gone.
-      // OTA-1083 — GIFTS. Opens the picker rather than resolving inline: the
+      // OTA-1060 — GIFTS. Opens the picker rather than resolving inline: the
       // player has to choose an object, and a parser guess at which object
       // would be the worst possible place to be wrong.
       case 'gift': {
@@ -21357,11 +21756,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (ambient) {
           const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)));
           const roll = rollDie(20);
-          const total = roll + stats.stealth; // OTA-348 — sleight-of-hand rolls Stealth
+          // ⚠⚠ OTA-1239 — THE DAY/NIGHT COVER BONUS MOVED HERE, and finding it is
+          // why the retired toggle was CONSOLIDATED rather than just deleted. Two
+          // implementations of "quietly take a scene noun" had drifted: the
+          // picker's stealth path applied `stealthTimeBonus` (+1 at night, -1 by
+          // day — "night = better cover, daytime = exposed") and this typed-verb
+          // path never did. **Deleting the toggle blind would have removed the
+          // night bonus from the game entirely, because that path was the only
+          // place it lived.** The player would have lost a modifier nobody
+          // decided to remove. One path now, and it is the one that keeps it.
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { stealthTimeBonus } = require('../engine/timeOfDay') as typeof import('../engine/timeOfDay');
+          const timeBonus = stealthTimeBonus(player.hoursElapsed);
+          const total = roll + stats.stealth + timeBonus; // OTA-348 — sleight-of-hand rolls Stealth
           const success = total >= 10;
+          const timeNote = timeBonus !== 0 ? ` ${timeBonus > 0 ? '+' : ''}${timeBonus} (${timeBonus > 0 ? 'night' : 'day'})` : '';
           get().appendLog(
             'combat',
-            `You — sleight of hand on ${ambient} → d20 ${roll} + STE ${stats.stealth} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
+            `You — sleight of hand on ${ambient} → d20 ${roll} + STE ${stats.stealth}${timeNote} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
           );
           if (success) {
             // Grant a small generic salvage item — represents whatever
@@ -21573,7 +21985,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set((s) => ({
           player: s.player ? { ...s.player, inventory: craftGrant.inventory } : s.player,
         }));
-        // OTA-1006 — a batch emits ONE summary line at the end instead of N of these.
+        // OTA-983 — a batch emits ONE summary line at the end instead of N of these.
         if (!get().craftBatchQuiet) {
           get().appendLog('reward', `✦ Crafted ${recipe.result}. The Arbiter watches you set the last piece.`);
         }
@@ -21735,16 +22147,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // who's taken a side. No-op unless the cooldown has passed and the scene is a safe
     // outdoor moment.
     maybeSpawnRaid(get, set);
-    // ⚠ OTA-1189 — CATCH-ALL for standing on a contract's ground. The two travel-arrival
+    // ⚠ OTA-1166 — CATCH-ALL for standing on a contract's ground. The two travel-arrival
     // paths call this too, and the redundancy is deliberate: those only cover AUTOROUTED
     // arrivals, and a player who walks the last tiles with typed cardinals would otherwise
     // reach the outpost and find nothing there — which is the exact failure this OTA
     // exists to remove. Idempotent by construction (one-shot flag on the contract), so
     // being called from three places costs nothing but cannot silently miss a route in.
     maybeSeedQuarry(get, set);
-    // OTA-1191 — the road odometer. Self-guards: no movement, no tick.
+    // OTA-1168 — the road odometer. Self-guards: no movement, no tick.
     tickRoadOdometer(get, set);
-    // ⚠ OTA-1193 — the dodge cooldown refills one step per ACTION, which is what makes the
+    // ⚠ OTA-1170 — the dodge cooldown refills one step per ACTION, which is what makes the
     // bar fill because of something the player did rather than because time passed. Ticks
     // on every action, in or out of combat, so walking away recharges it too.
     {
@@ -21851,7 +22263,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else {
       set({ pendingRolls: null, pendingHookContinue: null });
       get().concludeRolls(updatedSteps, state.actionText);
-      // OTA-980 — settle a bandolier throw only after the WHOLE swing resolved, so
+      // OTA-957 — settle a bandolier throw only after the WHOLE swing resolved, so
       // the damage phase read the thrown item, not the restored off hand.
       get().settleThrowRestore('resolved');
     }
@@ -21887,7 +22299,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // state). Just clears the popup state; the hook is already
   // resolved at this point.
   dismissHookContinue() {
-    // OTA-1050 — the post-COMPLETE popup is gone (owner: the thread modal already
+    // OTA-1027 — the post-COMPLETE popup is gone (owner: the thread modal already
     // shows the reward, so a second popup with another close button was
     // redundant). The payout now gets the prominent reward strip inside
     // HookContinueModal's completed state; the feed's green ✦ line remains
@@ -21947,7 +22359,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       };
     });
     get().appendLog('system', refund ? 'Action cancelled. Time and stamina refunded.' : 'Action cancelled.');
-    // OTA-980 — a cancelled bandolier throw unwinds the transient off-hand equip
+    // OTA-957 — a cancelled bandolier throw unwinds the transient off-hand equip
     // and spends nothing (same spirit as the refund above).
     get().settleThrowRestore('cancelled');
   },
@@ -22037,7 +22449,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // check (and every other) fires with the right governing stat + DC.
       {
         const d20 = (skill.total ?? 0) - (skill.bonus ?? 0);
-        // OTA-946 — CONTRADICTION GUARD. A "handler-owned" intent resolves itself below with its
+        // OTA-923 — CONTRADICTION GUARD. A "handler-owned" intent resolves itself below with its
         // own authoritative outcome line. For STEALTH in combat that outcome is a SECOND roll —
         // the break-away initiative race, which can fail — so also stamping a generic "PASS"
         // here produced a self-contradicting log ("stealth … PASS" immediately followed by
@@ -22056,7 +22468,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const live = get().player;
         if (live) get().appendLog('debug', debugLoadout(live));
       }
-      // OTA-936 — SNEAK odds signal. A failed sneak at arm's reach is a quiet trap: it burns
+      // OTA-913 — SNEAK odds signal. A failed sneak at arm's reach is a quiet trap: it burns
       // the turn AND the whole enemy group swings free. When the check is a long shot for this
       // character's STEALTH, say so ONCE per encounter so the player can choose to fight or
       // break to range instead of bleeding HP into a coin-flip.
@@ -22066,7 +22478,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const sc = get().currentScene;
         if (passChance <= 0.55 && !sc?.sneakOddsWarned) {
           set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, sneakOddsWarned: true } } : s));
-          // OTA-1038 — this fired verbatim at MID range too, telling the player about
+          // OTA-1015 — this fired verbatim at MID range too, telling the player about
           // "arm's reach" while they stood well off it. Name the range they're in.
           const atReach = sc?.range === 'close';
           const wherePhrase = atReach ? `a foe at arm's reach` : `a foe who already has your scent`;
@@ -22076,7 +22488,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : `The Arbiter keeps his voice low. "${slipPhrase} is a coin-flip with your stealth — and a miss lets the whole pack swing free. Weigh it against just fighting."`);
         }
       }
-      // OTA-999 — a CLOSE failed stealth check teaches a little while STE is
+      // OTA-976 — a CLOSE failed stealth check teaches a little while STE is
       // still finding its feet (cold-start band only; see trainStatNearMiss).
       if (intent === 'stealth' && !skill.success) {
         const liveNm = get().player;
@@ -22094,7 +22506,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
       if (skill.success) {
-        // ⚠ OTA-1236 — stage advancement MOVED OUT of skill.success entirely, to
+        // ⚠ OTA-1213 — stage advancement MOVED OUT of skill.success entirely, to
         // advanceStagesOnIntent (called once per action at the intent choke
         // point). The dice gate was the owner's Bog Dragon wall: in an exhausted
         // tile no investigate input even REACHES this skill roll, so an
@@ -22159,14 +22571,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 break;
               }
               const enemy = activeEnemy(currentScene);
-              // arb-fix / OTA-1109 — STEALTH reaches this handler through the
+              // arb-fix / OTA-1086 — STEALTH reaches this handler through the
               // gate roll's total (skill.total, raw stat + title bonus folded
               // in by buildSkillSteps); the handler itself no longer computes
               // a stealth bonus because it no longer rolls a player die.
-              // OTA-1038 — Shadow Diver's +1 rode the GATE roll (buildSkillSteps folds
+              // OTA-1015 — Shadow Diver's +1 rode the GATE roll (buildSkillSteps folds
               // titleSkillBonus in, which is why the log reads "STE 1 + 1 (title:
               // Shadow Diver)") but was missing from THIS contest.
-              // OTA-1109 — moot now: the handler no longer rolls its own player
+              // OTA-1086 — moot now: the handler no longer rolls its own player
               // d20 at all. The gate roll (skill.total, STE + title folded in)
               // IS the sneak — see the one-button-one-roll blocks below — so
               // there is no second roll for the bonus to miss.
@@ -22205,7 +22617,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // investigate-ambush stat farm). Set on the success branches below.
               let stealthSucceeded = false;
               if (openerAvailable) {
-                // OTA-1109 — ONE BUTTON, ONE ROLL. This branch used to roll a
+                // OTA-1086 — ONE BUTTON, ONE ROLL. This branch used to roll a
                 // SECOND hidden d20 against its own DC (10 + enemyAware), so
                 // the player could watch their visible skill roll PASS ("14 vs
                 // DC 12") and still read "catches the movement — SPOTTED" a
@@ -22222,7 +22634,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 get().appendLog('debug', `stealth: opener carried by the skill roll (${skill.total} vs ${skill.targetLabel ?? `DC ${skill.target}`}) — UNSEEN`);
                 stealthSucceeded = true;
               } else {
-                // OTA-1109 — the reset stays CONTESTED (the enemy is already on
+                // OTA-1086 — the reset stays CONTESTED (the enemy is already on
                 // you, so they get their own die) but the player's side is the
                 // roll they already SAW: the passed skill check's total, plus
                 // the choose-the-moment edge and the day/night cover. No second
@@ -22283,7 +22695,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           case 'escape': {
-            // OTA-976 — WALL FLEE resolution. A successful flee while elevated is
+            // OTA-953 — WALL FLEE resolution. A successful flee while elevated is
             // a one-tap dive for the base, whatever tier you're on: enemies
             // are left behind (a summit boss resets exactly like a break-off),
             // and the descent costs DOUBLE stamina per tier. If the tank
@@ -22429,9 +22841,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             const investRoom = get().worldMemory.visitedRooms?.[investRoomKey];
             const investPrior = investRoom?.flavorExhaustedNouns ?? [];
-            // OTA-953 — word-level match (was raw bidirectional substrings, which refused
+            // OTA-930 — word-level match (was raw bidirectional substrings, which refused
             // "cracked terminal" after a mere "rack" was flavor-exhausted).
-            // ⚠⚠ OTA-1254 — SALVAGE IS NOT INVESTIGATE, AND THIS GATE COULD NOT TELL
+            // ⚠⚠ OTA-1231 — SALVAGE IS NOT INVESTIGATE, AND THIS GATE COULD NOT TELL
             // THEM APART. Owner: *"investigate kills salvage sometimes."* It did, and
             // the contract it broke is written down one file over, on
             // `flavorExhaustedNouns` itself:
@@ -22452,7 +22864,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // Coin — so this cost him the loot it had just pointed at.
             //
             // ⚠ That yield is named in prose deliberately. Writing the salvage-pool
-            // call out here trips ota1014's exploit guard, which counts occurrences
+            // call out here trips ota991's exploit guard, which counts occurrences
             // of that call in this file to prove every grant site routes through
             // `ledgeredSalvage`. A comment that reads like a second call site would
             // mean weakening a real check in order to decorate this one.
@@ -22579,9 +22991,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // text for the resolved item + target so the narration names
             // what's actually in your hand and what you aimed it at.
             const useParse = parseInput(actionText, { inventory: player.inventory });
-            // OTA-709 — fallback is the BARE noun (no article): the templates below
-            // prepend "The "/"the " themselves, so 'the relic' here doubled to
-            // "The the relic responds…". 'relic' → "The relic responds…".
+            // OTA-930 — fallback is the BARE noun (no article): templates prepend "The "/"the"
+            // themselves, so 'the relic' doubled to "The the relic responds…".
             const itemName = useParse.resolvedNoun ?? 'relic';
             const tgtTokens = (useParse.target ?? '').split(/\s+/).filter(Boolean);
             // Strip the item name's words out of target so "use torch on
@@ -22623,7 +23034,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         switch (intent) {
           case 'stealth':
             get().appendLog('world', 'Your foot scrapes stone. Something stirs in the dark.');
-            // OTA-1038 — CHARGE WHAT THE GAME PROMISES. The sneak-odds warning above
+            // OTA-1015 — CHARGE WHAT THE GAME PROMISES. The sneak-odds warning above
             // tells the player in as many words that a miss "lets the whole pack
             // swing free", and the OTA-936 comment that authored it says a failed
             // sneak "burns the turn AND the whole enemy group swings free" — but
@@ -22789,7 +23200,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : `${enemy.name} moves first. The pressure is immediate.`);
     }
 
-    // OTA-1040 — INITIATIVE NOW DECIDES THE ORDER. Owner: "I thought the initiative
+    // OTA-1017 — INITIATIVE NOW DECIDES THE ORDER. Owner: "I thought the initiative
     // roll was the deciding factor on who went first on any series of attacks."
     // It wasn't — the roll had exactly ONE consumer in the whole codebase, the
     // line printed just above. Whoever won it, the player's swing always
@@ -22830,12 +23241,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // into the single outcome verdict (✗ DODGED). Damage math is unchanged.
     let enemyDodged = false;
     if (attack?.success && typeof attack.total === 'number' && typeof attack.target === 'number') {
-      // OTA-935 — a crit or a crushing margin always lands; only a marginal hit can be
+      // OTA-912 — a crit or a crushing margin always lands; only a marginal hit can be
       // twisted clear (at the reduced trait rate).
       enemyDodged = enemyDodgesHit(enemy.traits, attack.total, attack.target, !!attack.critical);
     }
-    // ⚠ OTA-1225 — A HELD SLIP EATS THE BLOW, the enemy-side mirror of the player's
-    // Temporal Slip at the to-hit verdict (OTA-1218). Same exclusion, same reason: a
+    // ⚠ OTA-1202 — A HELD SLIP EATS THE BLOW, the enemy-side mirror of the player's
+    // Temporal Slip at the to-hit verdict (OTA-1195). Same exclusion, same reason: a
     // NATURAL 20 pierces it — OTA-815's rule that nothing buys literal immunity cuts both
     // ways, or a slip-holding enemy the player cannot crit through would be the wall the
     // rule forbids. Consumed on use; the channel already cost it a whole swing.
@@ -22874,7 +23285,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     if (attack?.success) {
-      // OTA-1225 — the slip resolves exactly like a dodge: the blow finds nothing, the
+      // OTA-1202 — the slip resolves exactly like a dodge: the blow finds nothing, the
       // action is spent, the reaching pack still answers.
       if (enemySlipped) {
         get().appendLog(
@@ -22901,7 +23312,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         // The dodge still costs the player the action — let any reaching
         // enemy counter-attack, same as a miss path.
-        // OTA-1040 — unless they already swung first (lost initiative).
+        // OTA-1017 — unless they already swung first (lost initiative).
         if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player);
         // Surface clock movement before we early-return.
         const hoursAfterDodge = get().player?.hoursElapsed ?? hoursBeforeConclude;
@@ -22914,7 +23325,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
       const rawDmg = damage?.total ?? rollDie(6);
-      // OTA-940 — robust bare-hand detection (mirrors combatRules' OTA-931/932 fix). A weapon
+      // OTA-917 — robust bare-hand detection (mirrors combatRules' OTA-931/932 fix). A weapon
       // whose NAME contains a body word ("Mud-FIST Wraps") tripped isBareHandAttack(actionText)
       // -> barehand=true, which nulled `equipped` and SKIPPED the whole coating block below — so a
       // coated barehanded-tag weapon dealt ZERO coating damage even though combatRules used its
@@ -22948,7 +23359,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'combat',
             `Stonework fist rings off ${enemy.name} — d${spec.sides} rolled ${natural}, needed ${spec.hitGate}.`,
           );
-          if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player); // OTA-1040 — one volley per round
+          if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player); // OTA-1017 — one volley per round
           const hoursAfterGate = get().player?.hoursElapsed ?? hoursBeforeConclude;
           const dt = hoursAfterGate - hoursBeforeConclude;
           if (dt > 0) {
@@ -22976,13 +23387,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Stacks multiplicatively — an Iron Spider with "resist:slashing"
       // halves AGAIN on top of the Construct type's slashing resist.
       const traitMod = traitDamageMultiplier(enemy.traits, weaponType);
-      // OTA-715 — reconcile the type table with the authored trait. They
-      // STACK when they agree (double-resist ×0.25) but on a DISCORD (type
-      // resists, trait says vulnerable, or vice-versa) the per-enemy trait
-      // wins — no more 0.5×1.5=0.75 with contradictory "shrugs off" +
-      // "vulnerable" messaging on the same hit.
+      // OTA-698 — reconcile the type table with the authored trait. STACK when
+      // they agree (double-resist x0.25); on a DISCORD the per-enemy trait wins.
       const combinedMod = combineDamageTypeMatch(mod.match, traitMod.match);
-      // OTA-1111 — guard-crack. Once this enemy has shrugged off this damage
+      // OTA-1088 — guard-crack. Once this enemy has shrugged off this damage
       // type GUARD_CRACK_HITS times this fight, its guard is worn through: the
       // resist stops applying. Damage, narration, and type-procs all read
       // effectiveMod; recordEnemyIntel below keeps banking the TRUE
@@ -23007,7 +23415,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           && /automation|mechanism|construct|sentinel|drone/i.test(`${enemy.name} ${enemy.type ?? ''}`)) {
         for (let i = 0; i < tPerksAtk.mechanicalDamageDice; i++) titleDmgBonus += rollDie(6);
       }
-      // ⚠ OTA-1207 — ELIOR ZALMAR's story: +1 flat when the swing's own damage type is
+      // ⚠ OTA-1184 — ELIOR ZALMAR's story: +1 flat when the swing's own damage type is
       // electrical or aetheric. Gated on the WEAPON's type, not the enemy's — the man
       // built the Aetheric Engine, so what he teaches is how to drive the current, not
       // what to point it at. Sits beside the mechanical die because this is the one place
@@ -23029,7 +23437,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ surgeCombatToken: token });
         }
       }
-      // OTA-1111 — floor 2 (was 1): a landed hit always tells the HP bar
+      // OTA-1088 — floor 2 (was 1): a landed hit always tells the HP bar
       // something, so a resisted chip-fight can't grind out "for 1" forever.
       let dmg = Math.max(2, Math.round(rawDmg * effectiveMod.multiplier) + effectBonus + titleDmgBonus + surgeBonus);
       // OTA-362 — weapon coating on-hit. If the weapon that landed this
@@ -23082,7 +23490,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? Math.max(
                 1,
                 Math.round(
-                  // OTA-715 — reconcile type+trait for the coating element too.
                   rawRolled * combineDamageTypeMatch(
                     applyDamageTypeModifier(rawRolled, coating.kind, enemy.type).match,
                     traitDamageMultiplier(enemy.traits, coating.kind).match,
@@ -23094,7 +23501,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         };
         coatingProc = resolveCoatingProc(coatInst?.coating, 'coating');
         coatingProc2 = resolveCoatingProc(coatInst?.coating2, 'coating2');
-        // ⚠ OTA-1173 (owner tuning) — the SECOND slot lands at half effect.
+        // ⚠ OTA-1150 (owner tuning) — the SECOND slot lands at half effect.
         // Scaling `rolled` HERE — before it is added to `dmg` and before
         // applyCoatingProc reads it to seed the DOT — is what lets one
         // multiplier cover both halves of the proc. The dual-slot Crucible
@@ -23117,9 +23524,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (weaponType) {
         const tp = BUILTIN_DT_COMBAT[canonDT(weaponType)];
         if (tp) {
-          // OTA-715 — use the reconciled type+trait result so the flare
-          // proc agrees with the actual damage (was: weak if EITHER said so).
-          // OTA-1111 — reads effectiveMod so a cracked guard procs at normal odds.
+          // OTA-698 — use the reconciled type+trait result for the flare proc.
+          // OTA-1088 — reads effectiveMod so a cracked guard procs at normal odds.
           const tMatch: 'weak' | 'resist' | 'normal' = effectiveMod.match;
           if (Math.random() < dtProcChance(tp, tMatch)) {
             const roll = rollDie(4);
@@ -23132,7 +23538,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
       const prevHp = currentScene.enemyHps[activeIdx] ?? enemy.hp;
-      // ⚠ OTA-1163 (pressure test) — prevHp must be LIVE, not the function-entry
+      // ⚠ OTA-1140 (pressure test) — prevHp must be LIVE, not the function-entry
       // snapshot: a lost-initiative volley can mutate enemyHps before this line
       // (a fast_regen boss regenerates, logs it, and the stale write here then
       // silently erased the regen the log had just announced).
@@ -23149,11 +23555,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
       // Narrate the resistance/weakness modifier on its own line so the
       // player can see WHY the damage changed.
-      // OTA-715 — ONE reconciled line (was two, which could contradict).
+      // OTA-698 — ONE reconciled line (was two, which could contradict).
       if (effectiveMod.match === 'weak') {
         get().appendLog('combat', `Weakness exposed — ${enemy.name} flinches. (${weaponType} ×${effectiveMod.multiplier} for ${dmg})`);
-        // OTA-1160 — and the flinch is now MECHANICAL, not just a word.
-        // ⚠ OTA-1163 (pressure test) — gated on surviving the blow. The thrown
+        // OTA-1137 — and the flinch is now MECHANICAL, not just a word.
+        // ⚠ OTA-1140 (pressure test) — gated on surviving the blow. The thrown
         // path shipped with this guard; this path did not, so a weakness KILL
         // wrote a stagger onto the dying enemy's index — which the splice bug
         // then left behind for whoever inherited the slot.
@@ -23161,7 +23567,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       } else if (effectiveMod.match === 'resist') {
         get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×${effectiveMod.multiplier} for ${dmg})`);
       }
-      // OTA-1111 — wear bookkeeping. Count this landed resisted hit; at
+      // OTA-1088 — wear bookkeeping. Count this landed resisted hit; at
       // GUARD_CRACK_HITS the pair cracks (the shrug-off line above still
       // printed for THIS hit — the next swing is the one that lands full).
       let resistWearNow = 0;
@@ -23190,7 +23596,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // OTA-197 — resist swap-nudge. Playtester swung a piercing bolt-caster
       // at a piercing-resistant Silt Serpent + Mud Lurker back-to-back and
       // lost the fight largely because they didn't know to swap weapons.
-      // OTA-1111 — rekeyed off the same per-scene wear counter as the
+      // OTA-1088 — rekeyed off the same per-scene wear counter as the
       // guard-crack (the old cross-fight weaponResistStreak made the player
       // eat TWO resisted hits even when the Arbiter could already NAME the
       // swap, and its streak carried across encounters). Fires at most once
@@ -23202,13 +23608,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Build a swap hint — surface the available alternative
         // damage types in the player's pack so the Arbiter's
         // suggestion is grounded.
-        // OTA-715 — only suggest types the enemy does NOT resist
+        // OTA-698 — only suggest types the enemy does NOT resist
         // (checking both the creature-type table and its traits), so
         // we never tell the player to "try slashing" against a
         // slashing-resistant foe. Prefer types it's outright weak to.
         const weakTypes = new Set<string>();
         const neutralTypes = new Set<string>();
-        // OTA-959 — remember a concrete carried weapon per suggested type so the
+        // OTA-936 — remember a concrete carried weapon per suggested type so the
         // nudge can NAME it ("Swap to the Boltcaster") instead of leaving the
         // player to grep their own pack for "something electrical".
         const nameByType = new Map<string, string>();
@@ -23234,7 +23640,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } catch { /* ignore — hint stays generic */ }
         const altTypes = weakTypes.size > 0 ? weakTypes : neutralTypes;
         const altArr = Array.from(altTypes).slice(0, 2);
-        // OTA-959 — name the weapon when we know one; the type-only phrasing stays
+        // OTA-936 — name the weapon when we know one; the type-only phrasing stays
         // as the fallback for a type carried only in odd forms.
         const namedPick = altArr.map((t) => nameByType.get(t)).find(Boolean);
         // First skid speaks only when there's a weapon to point at; the second
@@ -23385,7 +23791,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Splice this enemy out of the scene (loot + scene clear handled
         // in resolveEnemyDefeat which now operates per-active-enemy).
         get().resolveEnemyDefeat();
-        // ⚠ OTA-1143 — AND THE REST OF THE PACK STILL SWINGS. This branch used
+        // ⚠ OTA-1120 — AND THE REST OF THE PACK STILL SWINGS. This branch used
         // to end here, so a killing blow bought the player the whole group's
         // round: the owner's Bog Hound "sat out a fight" because the Silt Thief
         // died on the swing that would otherwise have provoked it. Same round
@@ -23430,7 +23836,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `You crack the ${enemy.name} with the ${weaponName} for ${dmg} — half their fight, gone in one blow. They crumple, out cold. (${newEnemyHp}/${enemyMaxHp} HP) Loot them before they come to.`,
             { combatOutcome: 'player_dmg' },
           );
-          // OTA-1112 — a knockout has to MOVE the fight, not park it. A KO'd
+          // OTA-1089 — a knockout has to MOVE the fight, not park it. A KO'd
           // body leaves the scene only via lootKnockedOutEnemy's splice, so
           // sights stayed parked on a sleeper and a pack fight where every
           // raider got cracked could never end by attrition — the sim's whole
@@ -23574,12 +23980,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // After the player's strike, every still-living enemy that ISN'T
         // knocked out counter-attacks (runEnemyGroupCounters skips KO'd).
         // skipDotTick — the attack path already ticked DOTs at case-top.
-        // OTA-1040 — skipped when initiative already gave them the first swing.
+        // OTA-1017 — skipped when initiative already gave them the first swing.
         if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player, { skipDotTick: true });
       }
     } else {
       get().appendLog('combat', attackMiss(weaponName, enemy.name));
-      // OTA-1040 — one volley per round; skipped if initiative already spent it.
+      // OTA-1017 — one volley per round; skipped if initiative already spent it.
       if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player, { skipDotTick: true });
     }
 
@@ -23693,7 +24099,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // arb46 — Tier-C location-challenge entry hooks: a challenge's entry hook surfaces
     // here on arrival.
     //
-    // ⚠ OTA-1210 (PUNCHLIST P5) — THIS COMMENT USED TO SAY THE LOOP WAS INERT. It read
+    // ⚠ OTA-1187 (PUNCHLIST P5) — THIS COMMENT USED TO SAY THE LOOP WAS INERT. It read
     // "activeChallengesAt() returns [] while the challenges are switched OFF
     // (TIER_C_ENABLED / per-challenge enabled both false), so this loop is inert today."
     // **That has not been true for some time.** `locationChallenges.ts` has
@@ -23824,14 +24230,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (locationId === 'mud_flood_nexus') {
       triggerMainQuest(get, set, { kind: 'reached_nexus' });
     }
-    // OTA-1044 — the motive drip rides travel arrivals (one story event max
+    // OTA-1021 — the motive drip rides travel arrivals (one story event max
     // per arrival; holds during the opening / chapter cards / hostile scenes).
     advanceStoryDrip(get, set, locationId);
     const tideSpoke = announceTide(get, set);
-    // OTA-1090 — and the Arbiter, if his arc or his opinion of you has moved.
+    // OTA-1067 — and the Arbiter, if his arc or his opinion of you has moved.
     // Yields to the tide line rather than stacking on it; see the function.
     if (!tideSpoke) announceArbiterBeat(get, set);
-    // OTA-1088 — and the open question, if the run has reached one. Same
+    // OTA-1065 — and the open question, if the run has reached one. Same
     // moment as the drip and the same reasons: the player has just arrived
     // somewhere, nothing is on fire, and there is room for the story to speak.
     raiseDueFork(get, set);
@@ -23853,7 +24259,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { currentScene, player, worldMemory } = get();
     const enemy = activeEnemy(currentScene);
     if (!currentScene || !enemy || !player) return;
-    // OTA-1079 — A VENDOR YIELDS; THEY DO NOT DIE. Intercepted at the top of the
+    // OTA-1056 — A VENDOR YIELDS; THEY DO NOT DIE. Intercepted at the top of the
     // defeat routine so none of what follows runs for them: no loot roll, no
     // defeatedEnemies row, no kill milestone, no corpse. Killing merchants was
     // never designed — it fell out of the caught-theft flip converting them into
@@ -23863,7 +24269,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       resolveVendorSubmission(get, set, currentScene.vendorInFight);
       return;
     }
-    // OTA-1058 — collect this fight's story + take into one card (bosses only).
+    // OTA-1035 — collect this fight's story + take into one card (bosses only).
     bossVictoryCapture = enemy.boss ? { name: enemy.name, flavor: [], rewards: [] } : null;
     const activeIdx = currentScene.activeEnemyIdx;
     // Whisper-chain hook — Silt Thief death grants Stolen Aetheric
@@ -23982,7 +24388,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         killVerbs.has(q.objective.verb.toLowerCase()) &&
         q.objective.target.toLowerCase().includes(enemy.name.toLowerCase().replace(/ \(hunted\)$/i, '')),
     );
-    // OTA-1237 — kill-shaped verbs ALSO complete on any enemy defeated at the
+    // OTA-1214 — kill-shaped verbs ALSO complete on any enemy defeated at the
     // lead's own site: 'Silence a witness' settles when the fight at the marked
     // place ends, whatever the combatant was called.
     {
@@ -24010,12 +24416,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     //   Legendary → 3-4 items
     // Picks WITH replacement so we can roll dupes (a wagon-driver
     // dropping two patched cloths reads honest).
-    // OTA-960 — an EMPTY loot list on a BOSS is intentional (its rewards are deterministic
+    // OTA-937 — an EMPTY loot list on a BOSS is intentional (its rewards are deterministic
     // overlays: Core + signature gear, Beacon + Skyreacher piece, the stash-side
     // Resurrection Gem) — the dust fallback was minting 3-4 junk items at the game's
     // climax. It now only pads lazily-authored NON-boss lists, and mints the catalog's
     // real, stackable 'Aether Dust' (the old lowercase string could never stack).
-    // OTA-1017 — THE RECLAIM (owner's calls): a Hollowed's died-in WEAPON is granted
+    // OTA-994 — THE RECLAIM (owner's calls): a Hollowed's died-in WEAPON is granted
     // outright at the put-to-rest block below, so it sits out the chance rolls
     // (no dupes); armor pieces stay on the rolls but grant the REAL snapshot
     // item — pristine, fused stats intact — never a look-alike trophy.
@@ -24032,7 +24438,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       : null;
     const basePool = enemy.loot.length > 0 ? enemy.loot : enemy.boss ? [] : ['Aether Dust'];
     const lootPool = revWeaponName ? basePool.filter((n) => n !== revWeaponName) : basePool;
-    // OTA-1139 — ⚠ THE ELITE CARRY, and the one place the swap could have gone
+    // OTA-1116 — ⚠ THE ELITE CARRY, and the one place the swap could have gone
     // wrong. Spoils are rolled PER CORPSE, so a body that arrived instead of a
     // party of four would otherwise pay one corpse's worth for four bodies'
     // fight — being paid LESS for a harder encounter, which is precisely the
@@ -24048,7 +24454,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       : enemy.rarity === 'Uncommon' ? 2 + Math.floor(Math.random() * 2)
       : 1 + Math.floor(Math.random() * 2)) + eliteMod.eliteExtraLootRolls(enemy);
     const lootDrops: string[] = [];
-    // OTA-961 — canonicalize each rolled name (resolveLootItem: case/alias-tolerant catalog
+    // OTA-938 — canonicalize each rolled name (resolveLootItem: case/alias-tolerant catalog
     // match) so the summary line and the granted item agree on the REAL, stackable name.
     for (let i = 0; i < lootRollCount && lootPool.length > 0; i++) {
       const pick = lootPool[Math.floor(Math.random() * lootPool.length)]!;
@@ -24061,8 +24467,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const vestDrop = rollDogVestLootName(enemy);
     if (vestDrop) lootDrops.push(vestDrop);
     // OTA-692 — occasional faction SIGIL off a slain HUMANOID (a member's crest).
-    // A faction-named humanoid drops its own faction's sigil; a plain one drops a
-    // random faction's (looted). Flows through the normal grant + tracker.
     {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { rollSigilDrop } = require('../engine/sigils') as typeof import('../engine/sigils');
@@ -24076,7 +24480,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .map(([n, q]) => (q > 1 ? `${n} ×${q}` : n))
         .join(', ');
     })();
-    // OTA-960 — nothing rolled (boss with an intentionally-empty pool, before its
+    // OTA-937 — nothing rolled (boss with an intentionally-empty pool, before its
     // deterministic reward lines print from their own grants) -> no empty "You recover".
     if (lootDrops.length > 0) {
       get().appendLog('reward', `${enemy.name} defeated. You recover ${lootSummary}.`);
@@ -24109,7 +24513,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const remainingEnemies = currentScene.enemies.filter((_, i) => i !== activeIdx);
     const remainingHps = currentScene.enemyHps.filter((_, i) => i !== activeIdx);
     const nextActiveIdx = remainingEnemies.length > 0 ? Math.min(activeIdx, remainingEnemies.length - 1) : 0;
-    // OTA-1112 — "still fighting" means a LIVE, CONSCIOUS enemy remains. A
+    // OTA-1089 — "still fighting" means a LIVE, CONSCIOUS enemy remains. A
     // KO'd sleeper used to hold the fight open here (remainingEnemies.length
     // counted bodies, not fighters), so killing the last standing raider of a
     // half-subdued pack left the player locked in combat with the unconscious.
@@ -24142,7 +24546,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           enemyArmorShred: dropAt(currentScene.enemyArmorShred),
           enemyCorruptionStacks: dropAt(currentScene.enemyCorruptionStacks),
           enemyAmbushUsed: dropAt(currentScene.enemyAmbushUsed),
-          // ⚠ OTA-1163 (pressure test) — the SEVENTH parallel array. OTA-1160
+          // ⚠ OTA-1140 (pressure test) — the SEVENTH parallel array. OTA-1137
           // shipped enemyStaggered without adding it to this splice, so killing
           // the mook in [mook, boss] slid the boss onto the mook's index while
           // its stagger flag stayed put: a paid stagger silently voided, or a
@@ -24159,7 +24563,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           hpMax: newHpMax,
           inventory: lootDrops.reduce(
             (inv, lootName, i) => {
-              // OTA-961 — resolveLootItem: catalog-canonical when known, TROPHY at the
+              // OTA-938 — resolveLootItem: catalog-canonical when known, TROPHY at the
               // enemy's own rarity when not (never a 2-TC tagless Common again).
               const revPiece = revKit.find((g) => g.name === lootName);
               if (revPiece) {
@@ -24188,7 +24592,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       };
     });
-    // OTA-960 — KILL/KO PARITY. The kit a humanoid VISIBLY fought with (carries: weapons /
+    // OTA-937 — KILL/KO PARITY. The kit a humanoid VISIBLY fought with (carries: weapons /
     // armor / TC) transferred only on the KNOCKOUT loot path — killing IGNORED it, so a
     // lethal run was strictly poorer against humans and KO was the only rational play.
     // A kill now strips the body too, at the WORN floor: the KO path scales looted
@@ -24243,7 +24647,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    // OTA-963 — BOSS SPOILS (owner spec): every boss kill pays out high-end materials on
+    // OTA-940 — BOSS SPOILS (owner spec): every boss kill pays out high-end materials on
     // top of its authored drops — never mud cloth — and a non-apex boss can add one
     // RARE (deliberately not Legendary) weapon or armor. Core Guardians and
     // summit/tower bosses take the materials half only: their Legendary signature
@@ -24276,14 +24680,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    // OTA-716 — hard-won spoils. A long/tough fight occasionally coughs up a
+    // OTA-699 — hard-won spoils. A long/tough fight occasionally coughs up a
     // GOOD material ON TOP of the normal loot (never instead of it) — a
     // Fallout-4-ish sprinkle that rewards the grind without touching the
     // basic-drop flood. isHardWonFight gates on tanky/Rare+/boss enemies.
     {
       const combatBonus = maybeCombatBonus(enemy);
       if (combatBonus) {
-        // OTA-961 — same canonical/trophy resolution as the kill path.
+        // OTA-938 — same canonical/trophy resolution as the kill path.
         const look = resolveLootItem(combatBonus.name, enemy.rarity);
         set((s) => (s.player ? {
           player: {
@@ -24306,7 +24710,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const { isHardWonFight } = require('../engine/bonusDrops') as typeof import('../engine/bonusDrops');
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const rd = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
-      // OTA-963 — bosses are the recipe-bearers (owner spec: "some good recipes"): a boss
+      // OTA-940 — bosses are the recipe-bearers (owner spec: "some good recipes"): a boss
       // kill triples the hard-won recipe chance, capped at 60%.
       const recipeChance = enemy.boss
         ? Math.min(0.6, rd.HARD_WON_RECIPE_CHANCE * 3)
@@ -24335,7 +24739,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // used to fire for each corpse ("2 attackers remain. Mud Wasp now in your sights." ×3)
       // — spam AND factually wrong (those are bodies being looted this same beat). Only
       // announce when a LIVE enemy (hp > 0) actually remains, and count / name the living.
-      // OTA-1112 — a KO'd sleeper is not an attacker: exclude it from the
+      // OTA-1089 — a KO'd sleeper is not an attacker: exclude it from the
       // count and never point the sights line at an unconscious body.
       const liveRemaining = remainingEnemies.filter(
         (_, i) => (remainingHps[i] ?? 0) > 0 && !(remainingKOFlags[i] ?? false),
@@ -24348,7 +24752,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
       }
     } else if (remainingEnemies.length > 0) {
-      // OTA-1112 — the kill that just resolved dropped the last STANDING
+      // OTA-1089 — the kill that just resolved dropped the last STANDING
       // member of a half-subdued pack. The sleepers can't fight and can't be
       // fought — strip them where they lie (same subdual resolution as the
       // knockout path; each strip splices its body out of the scene).
@@ -24405,7 +24809,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // guest, e.g. Irma the True Tartarian) — angered too for the harm to their
     // member. Deltas accumulate so a faction that is both offended AND another
     // victim's rival nets out sensibly.
-    // OTA-1038 — every faction this kill has ALREADY docked, so no later pass can
+    // OTA-1015 — every faction this kill has ALREADY docked, so no later pass can
     // charge the same faction twice for the same corpse.
     const killDockedFactions = new Set<string>();
     const killFactionTargets = [enemy.factionId, enemy.nativeFactionId]
@@ -24440,7 +24844,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (changed.length > 0) {
           set((s) => (s.player ? { player: { ...s.player, factionStanding: nextStanding } } : s));
           logRepChanges(get, changed);
-          // OTA-1038 — only the PENALTIES claim the slot; a rival's +1 must not stop
+          // OTA-1015 — only the PENALTIES claim the slot; a rival's +1 must not stop
           // the reverence pass from reaching that faction.
           for (const c of changed) if (c.delta < 0) killDockedFactions.add(c.factionId);
         }
@@ -24451,7 +24855,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // factions that hold them sacred. They carry no factionId in data, so the
     // faction-kill block above never touches them; this is their own reverence
     // penalty, applied only to revering factions the player already tracks.
-    // OTA-998 — THE HOLLOWED put to rest. Deliberately NOT isAetherkin (no
+    // OTA-975 — THE HOLLOWED put to rest. Deliberately NOT isAetherkin (no
     // 'aetherkin' in name or traits, on purpose) so the reverence penalty
     // below never fires — every faction understands the mercy.
     {
@@ -24463,7 +24867,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const closing = rev998.revenantDefeatLines(fr, get().player?.name ?? 'a wanderer');
           get().appendLog('world', closing.world);
           get().appendLog('reward', closing.reward);
-          // OTA-1017 — the GUARANTEED reclaim (owner's call): a one-time boss must
+          // OTA-994 — the GUARANTEED reclaim (owner's call): a one-time boss must
           // not lose the signature piece to a dice roll that can never rerun.
           {
             const wp = rev998.revenantReclaimWeapon(fr);
@@ -24491,7 +24895,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
     }
-    // OTA-1044 — THE MISSING's third answer, put to rest. The closing beats
+    // OTA-1021 — THE MISSING's third answer, put to rest. The closing beats
     // and the keepsake are GUARANTEED here (never a dice roll), and the
     // thread marks resolved HERE, not at spawn — a fled fight re-offers the
     // walker at the next Lost Capital instead of losing the ending forever.
@@ -24518,7 +24922,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('reward', `✦ ${keep.name} — carried out of the dark, and yours now.`);
       }
     }
-    // OTA-1014 — putting a revenant to rest is a mercy, never a hunt. Guarded by
+    // OTA-991 — putting a revenant to rest is a mercy, never a hunt. Guarded by
     // the fallen_revenant TRAIT (isRevenant), not by name-matching, so a
     // character literally named "Aetherkin" is not punished for avenging
     // themselves when their own Hollowed rises.
@@ -24558,7 +24962,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         for (const b of completed) {
           const payer = get().player;
           if (!payer) break;
-          // ⚠ OTA-1188 — PAY OUT ON THE POLITICS THE CONTRACT WAS SIGNED UNDER, not the
+          // ⚠ OTA-1165 — PAY OUT ON THE POLITICS THE CONTRACT WAS SIGNED UNDER, not the
           // world as it stands now. `b.politics` was frozen from the board the player
           // read at accept; a contract from before this OTA carries none and falls back
           // to the live/static read, which is exactly the old behaviour.
@@ -24572,7 +24976,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             factionStanding: rep.standing,
           } } : s));
           logRepChanges(get, rep.changed);
-          // ⚠ OTA-1188 — REMEMBER WHERE THIS ONE WAS CLOSED. The anti-camp rule reads it:
+          // ⚠ OTA-1165 — REMEMBER WHERE THIS ONE WAS CLOSED. The anti-camp rule reads it:
           // no second contract from the board you just collected on until you have closed
           // one somewhere else. Owner: "otherwise people are just going to keep standing
           // there, collecting bounties." Stored as the location the player is IN at
@@ -24596,7 +25000,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         enemyName: enemy.name,
       });
     }
-    // OTA-1108 — one corpse, one ledger line. Core Guardians are Legendary,
+    // OTA-1085 — one corpse, one ledger line. Core Guardians are Legendary,
     // so this generic writer used to fire ("cut down the Iron Litany Brother
     // Konrad…") AND the guardian block below wrote its own milestone
     // ("defeated Iron Litany Brother Konrad at Nimari") — the owner's sheet
@@ -24839,13 +25243,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? `✦ The buried world relents — a Resurrection Gem at the ${newKills}-kill mark. (${total} held)`
           : `✦ A Resurrection Gem flickers from the dust — gathered to your stash. (${total} held)`;
         get().appendLog('reward', line);
-        // OTA-1058 — the gem lands a tick LATE (the count is read off disk), long
+        // OTA-1035 — the gem lands a tick LATE (the count is read off disk), long
         // after the synchronous window shut. Push it onto the card by name; the
         // merge-by-title path adds it to the one already showing.
         if (enemy.boss) get().raiseBossVictoryNotice(enemy.name, [], [line]);
       });
     }
-    // OTA-1058 — shut the window and show what the fight was worth. Cleared FIRST
+    // OTA-1035 — shut the window and show what the fight was worth. Cleared FIRST
     // so an exception below can never leave a stale capture collecting the rest
     // of the session's narration into a card that opens on the next boss.
     if (bossVictoryCapture) {
@@ -24920,7 +25324,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // The enemy's drop list comes over in FULL (not the partial kill
     // roll) — you're picking the body clean.
-    // OTA-1017 — a knocked-out Hollowed picked clean gives back the REAL died-in
+    // OTA-994 — a knocked-out Hollowed picked clean gives back the REAL died-in
     // kit too, and the stripping COUNTS as put to rest — otherwise the same
     // pristine kit could be farmed off every re-rise.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -24937,7 +25341,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     for (const lootName of enemy.loot ?? []) {
       const koPiece = koKit.find((g) => g.name === lootName);
       if (koPiece) { grants.push(koRev.reconstructFallenPiece(koPiece, `ko_${stamp}_${n++}`)); continue; }
-      // OTA-961 — same canonical/trophy resolution as the kill path.
+      // OTA-938 — same canonical/trophy resolution as the kill path.
       const lk = resolveLootItem(lootName, enemy.rarity);
       grants.push({
         id: `ko_${stamp}_${n++}`,
@@ -24948,7 +25352,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         tags: [...lk.tags, 'loot'],
       });
     }
-    // OTA-967 — MERCY PREMIUM (v2-audit knob 3). After kill/KO parity, a kill collects the
+    // OTA-944 — MERCY PREMIUM (v2-audit knob 3). After kill/KO parity, a kill collects the
     // kit AND its rolled loot, leaving knockout strictly cash-dominated. A live capture
     // now adds a rarity-scaled bounty on top of the carried purse — the pockets come
     // easier when nobody bled on them: 2d6 x tier (Common x1 ... Legendary x4).
@@ -24965,7 +25369,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const remainingKO = ko.filter((_, i) => i !== idx);
     const dropAt = <T>(arr: T[] | undefined): T[] | undefined =>
       arr ? arr.filter((_, i) => i !== idx) : undefined;
-    // OTA-1112 — "still fighting" means a live, CONSCIOUS enemy remains; the
+    // OTA-1089 — "still fighting" means a live, CONSCIOUS enemy remains; the
     // range only stays combat-locked (and the sights line only fires) for
     // someone actually able to swing back.
     const standingAfterLoot = remainingEnemies.filter(
@@ -24987,7 +25391,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           enemyArmorShred: dropAt(s.currentScene.enemyArmorShred),
           enemyCorruptionStacks: dropAt(s.currentScene.enemyCorruptionStacks),
           enemyAmbushUsed: dropAt(s.currentScene.enemyAmbushUsed),
-          enemyStaggered: dropAt(s.currentScene.enemyStaggered), // OTA-1163 — same splice, same reason
+          enemyStaggered: dropAt(s.currentScene.enemyStaggered), // OTA-1140 — same splice, same reason
           activeEnemyIdx: nextActiveIdx,
           range: stillFighting ? s.currentScene.range : null,
         },
@@ -25039,7 +25443,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // ⚠ OTA-1218 — PROCEDURE TEXTS (PUNCHLIST P16). Buying one TEACHES the technique; it
+    // ⚠ OTA-1195 — PROCEDURE TEXTS (PUNCHLIST P16). Buying one TEACHES the technique; it
     // never mints an item. This sits beside the OTA-726 recipe branch and works the same
     // way for the same reason: what you are buying is knowledge, and a physical book would
     // need a catalog row, a `use` handler and a read path before it taught anything —
@@ -25083,7 +25487,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    // OTA-726 — RECIPE offers. A vendor teaches a small, stable slice of the
+    // OTA-709 — RECIPE offers. A vendor teaches a small, stable slice of the
     // rare/legendary recipes you haven't learned yet (a gold sink + a reliable,
     // pricey way to get a working you never stumbled on). `buy <recipe name>`
     // routes here before the normal item lookup. Teaches into knownRecipes —
@@ -25147,11 +25551,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const buyCell = canonicalCellOf(player.currentLocationId);
     const buyHeat = WEbuy.localWarHeat(get().worldMemory.patrols ?? [], buyCell.x, buyCell.y);
     const { buyMult: warBuyMult } = VP.warPriceFactor(buyHeat);
-    // OTA-1076 — and finally the relationship with THIS person. Excluded from
+    // OTA-1053 — and finally the relationship with THIS person. Excluded from
     // strangerBuyPrice by design, so the existing "you saved N TC" line now
     // reports what being a regular is worth alongside the charm.
     const buyRegardMult = regardPriceMult(npcRegard(getRelation(get().worldMemory, vendorNpcId(scene.vendor))));
-    // OTA-1089 — PHASE 4 TIDE: the buried country gets leaner the longer you
+    // OTA-1066 — PHASE 4 TIDE: the buried country gets leaner the longer you
     // stay in it. Flat, capped at TIDE_MAX_STAGES, and exactly 1.0 for a fresh
     // character and for the whole of the 'salvage' tier.
     const pressureTideMult = tidePriceMultiplier(tideStage(player.hoursElapsed ?? 0, profileOf(player)));
@@ -25186,11 +25590,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const cat = weapon ?? armor ?? gear ?? material ?? ring ?? amulet ?? dogVest ?? null;
     // OTA-742 — a bought weapon/armor MUST mint with its real kind. Pre-fix it
     // was stamped 'misc', which broke canScrap (a misc item only scraps if it
-    // carries a raw-material tag, so a Rust Dagger / Bone Shiv / Pocket Knife
-    // bought from a trader could never be scrapped — and its damage die didn't
-    // render). Dug/foraged copies of the same weapon minted 'weapon' correctly,
-    // so the two paths disagreed. Now the buy path matches: weapon→weapon,
-    // armor→armor (rings/amulets→relic as before).
+    // carries a raw-material tag, so a Rust Dagger / Bone Shiv bought from a
+    // trader could never be scrapped). Dug/foraged copies minted 'weapon'
+    // correctly, so the paths disagreed. Now the buy path matches.
     const kind: InventoryItem['kind'] = dogVest
       ? 'dog_armor'
       : weapon
@@ -25253,11 +25655,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // dwarf it (joining needs 20 standing ≈ 10,000 TC spent this way). The pool is
     // faction-agnostic; it banks into whoever you're buying from when it crosses,
     // a benign cross-faction bleed for an afterthought lever.
-    // ⚠ OTA-1181 — the value now lives in engine/factions.ts and is IMPORTED. It was
+    // ⚠ OTA-1158 — the value now lives in engine/factions.ts and is IMPORTED. It was
     // a function-local const, so the character sheet had no way to state the rule and
     // the in-game glossary just said purchases were worth "+1" — off by this whole
     // constant. A number two surfaces have to agree on does not get two homes.
-    // ⚠ OTA-1179 — CANONICALISE, THEN ONLY SPEND THE POOL IF THE GRANT CAN LAND.
+    // ⚠ OTA-1156 — CANONICALISE, THEN ONLY SPEND THE POOL IF THE GRANT CAN LAND.
     //
     // The pool used to be debited unconditionally: `nextBuyRepProgress` was
     // computed from `buyRepGranted` and written whether or not `applyRepChange`
@@ -25326,11 +25728,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           : {}),
       };
     });
-    // OTA-1072 — the trade goes on the ledger with THIS person. A bulk buy is
+    // OTA-1049 — the trade goes on the ledger with THIS person. A bulk buy is
     // one transaction, not `boughtCount` of them: walking out with five of
     // something is one piece of business, and counting units would let a
     // stack purchase vault a stranger to "trusted" in a single tap.
-    // OTA-1076 — restitution. Coin spent with someone you were caught stealing
+    // OTA-1053 — restitution. Coin spent with someone you were caught stealing
     // from is banked as amends; enough of it buys the wrong back. Read the
     // count before and after so the clearing can be announced — a debt settled
     // silently is a debt the player never learns they could settle.
@@ -25339,7 +25741,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(scene.vendor!), {
         trades: 1,
         tcTraded: totalCost,
-        // OTA-1078 — only money the player HANDS OVER can pay a debt.
+        // OTA-1055 — only money the player HANDS OVER can pay a debt.
         spent: totalCost,
       }),
     }));
@@ -25406,20 +25808,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', 'Tour mode — selling is disabled while the tutorial is running.');
       return;
     }
-    // OTA-695 — sell the EXACT instance the shop row points at. The sell list
-    // (VendorScreen) already excludes worn gear by instance id and hands us that
-    // id; resolve it first so a spare sells even when an equipped copy of the same
-    // name exists, and the correct instance's durability/coating/stolen-flag/price
-    // is the one that leaves your pack. Falls back to first-by-name for typed input.
+    // Refuse if the item is equipped — don't quietly strip the player's
+    // loadout. They have to unequip first.
+    // OTA-695 — resolve the exact instance the shop row points at (id-first),
+    // so a spare sells even when an equipped same-named copy exists.
     const item = (itemId ? player.inventory.find((i) => i.id === itemId && i.quantity > 0) : undefined)
       ?? player.inventory.find((i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0);
     if (!item) {
       get().appendLog('system', `You don't have any ${itemName} to sell.`);
       return;
     }
-    // Refuse only if THIS instance is worn (by id) — a spare of the same name is
-    // still sellable. (Was: refused if ANY same-named copy was equipped, which
-    // blocked selling spares.)
     if (equippedInstanceIds(player).has(item.id)) {
       get().appendLog(
         'arbiter',
@@ -25439,7 +25837,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // in the player's pack are fine — only the specific stolen
     // instance is refused. Player can still USE it or SCRAP it
     // (scrap outputs are clean, mintable for resale).
-    // OTA-1106 — EXCEPT AT THE FENCE. A sketchy trader buys hot goods, no
+    // OTA-1083 — EXCEPT AT THE FENCE. A sketchy trader buys hot goods, no
     // questions asked, at FENCE_STOLEN_CUT of the honest price — the deep
     // cut is the whole deal: they carry the risk, you carry the discount.
     // Honest and hub vendors keep the refusal word for word.
@@ -25480,7 +25878,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // war-heat + relic-title multipliers (like rapport) can lift the price toward
     // but never above the cheapest-buy cap. Without this a rapport'd, war-heated
     // relic stall paid ABOVE the floor on unstocked items — a buy-cheap-sell-here loop.
-    // OTA-1106 — the fence's cut, applied LAST so it can never lift a price,
+    // OTA-1083 — the fence's cut, applied LAST so it can never lift a price,
     // only sink one. max(1,…): a fence never pays zero for something they
     // agreed to take — a 1 TC insult is still a completed deal.
     const price = fenced
@@ -25509,7 +25907,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? `Fenced ${item.name} to ${scene.vendor.name} for ${price} TC — no questions asked, and none answered. (${player.tc + price} TC on hand)`
         : `Sold ${item.name} to ${scene.vendor.name} for ${price} TC. (${player.tc + price} TC on hand)`,
     );
-    // OTA-1072 — on the ledger with THIS person. TC accrues per unit, but the
+    // OTA-1049 — on the ledger with THIS person. TC accrues per unit, but the
     // TRADE count rides the same `social` flag the Charisma train already uses
     // to mean "first unit of this negotiation" (OTA-727) — so emptying a stack
     // of twenty is one piece of business, exactly as it is for CHA.
@@ -25523,7 +25921,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (isRelicTrade) recordTitleProgress(get, set, { relicsTraded: 1 });
     // OTA 059 — successful SELL trains CHA. Closing the trade
     // counts as social work.
-    // OTA-727 — but ONE negotiation, not one per unit: a bulk sale passes
+    // OTA-708 — but ONE negotiation, not one per unit: a bulk sale passes
     // social:false for every unit after the first, so dumping a big stack no
     // longer farms Charisma a level at a time.
     if (opts?.social !== false) {
@@ -25704,7 +26102,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       void get().persist();
       return;
     } else {
-      // OTA-1101 — the caught-red-handed consequences are shared with
+      // OTA-1078 — the caught-red-handed consequences are shared with
       // pickpocketPerson now; the machinery lives in vendorCatchesThief.
       vendorCatchesThief(
         get,
@@ -25809,7 +26207,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       };
     });
-    // OTA-1229 — the same spent charge also reads the room: mark (✦) every chip
+    // OTA-1206 — the same spent charge also reads the room: mark (✦) every chip
     // that actually repays an investigate. Computed AFTER the charge lands so the
     // charged hook's own noun glows too.
     {
@@ -25818,7 +26216,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, arbiterEye: eye } } : {}));
       }
     }
-    // OTA-1049 — the mark line repeated VERBATIM per torch use (twice in ten
+    // OTA-1026 — the mark line repeated VERBATIM per torch use (twice in ten
     // minutes in the owner's log) and leaned on "resonance", the same word
     // the owner already flagged as overused. Four variants, one keeper.
     const torchMarkLines = [
@@ -25888,7 +26286,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', `The Crucible costs ${COST} TC to fire; you have ${player.tc}.`);
       return;
     }
-    // OTA-1007 — don't sell a fire that can't light. Pre-fix this charged the fee and
+    // OTA-984 — don't sell a fire that can't light. Pre-fix this charged the fee and
     // THEN discovered the pack couldn't fuse, so the player paid for a dead menu.
     {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -26051,9 +26449,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // SINGLE-ACTIVE — a new contract joins ACTIVE only if you aren't already
     // running one; otherwise it's parked, so batch-accepting from the board
     // doesn't make everything live at once. You activate it when you're ready.
-    const hasActiveOther = anyTrackedContract(player); // OTA-995 — #118: cross-kind
+    const hasActiveOther = anyTrackedContract(player); // OTA-972 — #118: cross-kind
     const newTracked = !hasActiveOther;
-    // OTA-985 — ESCORT contract: accepting spawns the shared-pool party (engine_Dev
+    // OTA-962 — ESCORT contract: accepting spawns the shared-pool party (engine_Dev
     // model). It rides on the quest record; collateral damage + failure live in
     // applyEscortDamage / failEscortQuests.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -26062,7 +26460,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const escort = escortSpec
       ? escortMod.spawnEscortPool(escortSpec.count, player.hpMax ?? 20, escortSpec.label)
       : null;
-    // OTA-1080 — the escort leader goes on the ledger the moment you take them
+    // OTA-1057 — the escort leader goes on the ledger the moment you take them
     // on. `escort_` keys them by name, so the same person walked twice is one
     // relationship, and whether you got them home is recorded against it below.
     if (escort?.leaderName) {
@@ -26097,16 +26495,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
           : `Your ${escort.label} (${escort.hp} HP) ${standsV} by for ${quest.title}. They'll fall in when you ACTIVATE this contract.`,
       );
     }
-    // OTA-1078 — the sixth accept path. The other five credit contractsTaken;
+    // OTA-1055 — the sixth accept path. The other five credit contractsTaken;
     // this one — the most face-to-face of them — never did, so a faction agent
     // could show "1 contract finished" having no record of handing it over, and
-    // never reached the 'known' rung that OTA-1073 added contractsTaken to.
+    // never reached the 'known' rung that OTA-1050 added contractsTaken to.
     if (scene?.vendor) {
       set((st) => ({
         worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(scene.vendor!), { contractsTaken: 1 }),
       }));
     }
-    const factionCompact = acceptIsCompact(); // OTA-1071 — before the bump.
+    const factionCompact = acceptIsCompact(); // OTA-1048 — before the bump.
     bumpQuestsAccepted(get, set);
     // First-quest milestone — Arbiter can reference "the first
     // contract you took" later. Fires only on the first accept of
@@ -26131,7 +26529,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // commentary (first-quest line, burst-start, "stacking", "slow
     // down") instead.
     const stage0 = quest.stages?.[0];
-    // OTA-1071 — mid-burst the opening beat is dropped with the rest of the
+    // OTA-1048 — mid-burst the opening beat is dropped with the rest of the
     // detail; it is replayed in Contracts when the contract is activated.
     if (stage0 && !factionCompact) {
       get().appendLog('world', stage0.narration);
@@ -26170,7 +26568,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...s.player,
         activeFactionQuests: (s.player.activeFactionQuests ?? []).map((q) =>
           q.id === id ? { ...q, tracked: nextActive } : (nextActive ? { ...q, tracked: false } : q)),
-        // OTA-1015 — cross-kind: "the mission you're on" means across ALL routed
+        // OTA-992 — cross-kind: "the mission you're on" means across ALL routed
         // kinds, not just this list. See setContractActive's mirror sweep.
         activeHunts: nextActive ? (s.player.activeHunts ?? []).map((h) => ({ ...h, tracked: false })) : (s.player.activeHunts ?? []),
         activeMysteries: nextActive ? (s.player.activeMysteries ?? []).map((m) => ({ ...m, tracked: false })) : (s.player.activeMysteries ?? []),
@@ -26180,7 +26578,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const def = findFactionQuestById(id);
     const title = def?.title ?? id;
     const pausedNote = othersPaused > 0 ? ` (${othersPaused} other contract${othersPaused > 1 ? 's' : ''} paused.)` : '';
-    // OTA-985 — an escort's party PARKS when its contract is deactivated (off the
+    // OTA-962 — an escort's party PARKS when its contract is deactivated (off the
     // HUD, no combat damage) and falls back in on re-activate.
     const party = rec.escort && rec.escort.hp > 0 ? rec.escort : null;
     const partyFalls = party && party.count === 1 ? 'falls' : 'fall';
@@ -26259,7 +26657,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       changed = true;
     }
     if (!changed) return;
-    // OTA-1015 — SINGLE-ACTIVE, enforced at ACTIVATION. The accept-side parking was
+    // OTA-992 — SINGLE-ACTIVE, enforced at ACTIVATION. The accept-side parking was
     // trivially undone by two taps of SET ACTIVE, leaving several contracts
     // live at once forever after (every later accept then parked "because
     // you're busy" against contracts the player couldn't see were both live).
@@ -26329,7 +26727,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-451 — turn in to a same-faction VENDOR or the OUTPOST MISSION BOARD.
     // OTA-456 — or REMOTELY by courier ("send word <quest>") from anywhere, for a
     // 15% TC cut (full rep). Travel to claim in full stays the optimal play.
-    // OTA-1208 — the trading post brokers ANY faction's contract for a cut (PUNCHLIST P2).
+    // OTA-1185 — the trading post brokers ANY faction's contract for a cut (PUNCHLIST P2).
     // ⚠ Resolved here, before `turnFaction`, because this handler decides who it is
     // dealing with BEFORE it knows which contract is meant — and the broker's whole point
     // is that he does not need to match. Without this the outskirts gate (a hub with no
@@ -26405,7 +26803,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-456 — the agent name shown in the flow. Remote turn-ins have no vendor
     // present, so a "runner" stands in.
     const sourceLabel = turnSourceName ?? 'A runner';
-    // OTA-1025 — the STAGED records are the truth; the legacy id mirror alone
+    // OTA-1002 — the STAGED records are the truth; the legacy id mirror alone
     // refused READY contracts whenever a path wrote only the records.
     const active = Array.from(new Set([
       ...(player.activeFactionQuestIds ?? []),
@@ -26424,7 +26822,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    // OTA-1208 — brokered when the trading post is standing in for a faction that is not
+    // OTA-1185 — brokered when the trading post is standing in for a faction that is not
     // its own. Computed here rather than reused from `atBroker` so a contract the broker
     // could have taken anyway (unaligned, or his own) is NOT charged a cut.
     const questViaBroker = atBroker && candidate.factionId !== turnFaction;
@@ -26462,7 +26860,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    // ⚠⚠ OTA-1208 — THE BROKER DOES TAKE DELIVERIES, and the first version of this did
+    // ⚠⚠ OTA-1185 — THE BROKER DOES TAKE DELIVERIES, and the first version of this did
     // not. Getting that wrong would have opened a NEW unfinishable state while closing
     // P2, so the reasoning is recorded here rather than left to be re-derived.
     //
@@ -26510,7 +26908,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // B2 — full pay in person + a long-haul TC bonus scaled to how far you carried it.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.reward.tc, activeRecord?.acceptedAtCell);
-    // OTA-987 — ESCORT pay model (owner: "go with the scaled party for most
+    // OTA-964 — ESCORT pay model (owner: "go with the scaled party for most
     // escorts, but make the higher tier escorts all or nothing"). Scaled
     // escorts pay the TC fee times the fraction of the party still standing
     // (floored at 10% — you did walk them there); all_or_nothing drop-offs
@@ -26521,7 +26919,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const e = activeRecord.escort;
       if (e.hpMax > 0) escortPayMult = Math.max(0.1, Math.min(1, e.hp / e.hpMax));
     }
-    // OTA-1208 — the broker takes his cut and forfeits the long-haul bonus; the escort
+    // OTA-1185 — the broker takes his cut and forfeits the long-haul bonus; the escort
     // multiplier still applies on top, because that one prices how many of the party you
     // actually walked home and has nothing to do with who paid you.
     const baseAndJourneyTc = CB.contractPayoutTc(candidate.reward.tc, journeyTc, questViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
@@ -26553,7 +26951,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       candidate.title,
       `✦ Faction contract complete — ${candidate.title}. +${payTc} TC${shownJourneyTc > 0 ? ` (incl. +${shownJourneyTc} long-haul)` : ''}${questViaBroker ? ` (broker's cut taken)` : ''}${payRep > 0 ? `, +${payRep} rep with ${fLabel}` : ''}.`,
     );
-    // OTA-1073 — the agent who took it back remembers that you finished it.
+    // OTA-1050 — the agent who took it back remembers that you finished it.
     creditTurnIn(get, set, remote);
     // OTA-805 — RAPPORT unlocked. Turning in a faction's rapport quest opens
     // Charisma-scaled dealing with its vendors (the discount is derived from this
@@ -26566,8 +26964,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `✦ You've earned dealing with the ${fLabel}. From now their vendors cut you the partner's rate — currently ${pct}% off buys and +${pct}% on sell-backs (it grows with your Charisma).`,
       );
     }
-    // OTA-724 — finishing a contract can also turn up a rare/legendary recipe.
-    // OTA-989 — escorts pay in coin and care, not schematics: the recipe roll
+    // OTA-966 — escorts pay in coin and care, not schematics: the recipe roll
     // belongs to salvage-and-spoils contracts. Escort turn-ins instead press
     // HEALTH supplies into your hands (below), so their loot is only TC +
     // healing — the owner's rule for these missions.
@@ -26577,7 +26974,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils');
     }
     logRepChanges(get, repResult.changed);
-    // OTA-985 — delivered the escort party alive (a dead pool fails + drops the
+    // OTA-962 — delivered the escort party alive (a dead pool fails + drops the
     // quest before it can ever reach turn-in), so name them in the win.
     {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -26587,7 +26984,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('reward', escortPayMult < 1
           ? `You delivered your ${dSpec.label} — battered, but breathing. The fee reflects the shape you brought them in (${Math.round(escortPayMult * 100)}% pay).`
           : `You delivered your ${dSpec.label} safely. They peel off with a nod.`);
-        // OTA-1080 — and the person who walked at the front remembers it. This
+        // OTA-1057 — and the person who walked at the front remembers it. This
         // is the payoff of naming the leader: take a second contract with the
         // same party and you are not a stranger to them. Recorded only on
         // DELIVERY -- a wiped party fails the quest long before turn-in, and
@@ -26599,7 +26996,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId({ id: `escort_${leader}`, name: leader }), { contractsTurnedIn: 1 }),
           }));
         }
-        // OTA-989 — the delivered party presses HEALTH supplies on you with the
+        // OTA-966 — the delivered party presses HEALTH supplies on you with the
         // fee (2 kits on an all-or-nothing drop-off, 1 otherwise). This is the
         // whole of an escort's item loot: TC + healing, nothing else.
         const medLook = lookupCraftedItem('First Aid Kit');
@@ -26679,9 +27076,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const alreadyDone = neutralMatch
         && (player.completedHuntIds ?? []).includes(neutralMatch.id);
       if (neutralMatch && !alreadyActive && !alreadyDone) {
-        const neutralTracked = !anyTrackedContract(player); // OTA-995 — #118
+        const neutralTracked = !anyTrackedContract(player); // OTA-972 — #118
         get().appendLog('debug', `accept: neutral ${neutralMatch.id} tracked=${neutralTracked}`);
-      // OTA-1072 — a contract handed over face to face is business with THAT
+      // OTA-1049 — a contract handed over face to face is business with THAT
       // agent, so it goes on their ledger. Guarded on a live vendor because
       // board/remote accepts have no one standing across from you.
       if (scene?.vendor) {
@@ -26698,7 +27095,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ],
           },
         } : s));
-        const neutralCompact = acceptIsCompact(); // OTA-1071 — before the bump.
+        const neutralCompact = acceptIsCompact(); // OTA-1048 — before the bump.
         bumpQuestsAccepted(get, set);
         if (neutralCompact) {
           get().appendLog('reward', `✦ Contract accepted — ${neutralMatch.title}${parkedTag(neutralTracked)}.`);
@@ -26762,12 +27159,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const hunt = matchedHunt;
-    // OTA-995 — #118: same single-active rule as faction quests — accepting while
+    // OTA-972 — #118: same single-active rule as faction quests — accepting while
     // ANY contract (any kind) is live PARKS the new one instead of
     // auto-activating it.
     const huntTracked = !anyTrackedContract(player);
     get().appendLog('debug', `accept: hunt ${hunt.id} tracked=${huntTracked}`);
-      // OTA-1072 — a contract handed over face to face is business with THAT
+      // OTA-1049 — a contract handed over face to face is business with THAT
       // agent, so it goes on their ledger. Guarded on a live vendor because
       // board/remote accepts have no one standing across from you.
       if (scene?.vendor) {
@@ -26788,7 +27185,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
-    // OTA-1071 — read the burst index BEFORE the bump, so this accept is
+    // OTA-1048 — read the burst index BEFORE the bump, so this accept is
     // judged on its own position in the burst rather than the next one's.
     const huntCompact = acceptIsCompact();
     bumpQuestsAccepted(get, set);
@@ -26797,7 +27194,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const stage0 = hunt.stages[0];
     if (stage0) {
       if (huntCompact) {
-        // OTA-1071 — one line. Destination is folded in; poster text, stage
+        // OTA-1048 — one line. Destination is folded in; poster text, stage
         // narration and the danger detail are all in Contracts.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { biomeLabel: bl } = require('../engine/hunts');
@@ -26824,7 +27221,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // both under-HP and under-weapon, the Arbiter calls it out
       // before they walk into the boss. Doesn't block accept — the
       // player can still take the contract and try — but they
-      // can't say nobody warned them. OTA-1071 — full-detail accepts only;
+      // can't say nobody warned them. OTA-1048 — full-detail accepts only;
       // mid-burst the numbers are on the Contracts card.
       if (!huntCompact && hunt.recommendedHp && hunt.recommendedWeaponRarity) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -26906,7 +27303,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const freezeForKill = stageDef.checkKind === 'boss' && record.stage === lastBossIndex;
     if (stageDef.checkKind === 'boss') {
-      // ⚠ OTA-1190 — pass the REAL power measure, so the boss sees stats, weapon and AC
+      // ⚠ OTA-1167 — pass the REAL power measure, so the boss sees stats, weapon and AC
       // rather than max HP alone. `scalePowerOf` carries the guarded gear read.
       const boss = scaleHuntBoss(player, hunt, scalePowerOf(player));
       if (boss) {
@@ -26928,7 +27325,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
     if (!freezeForKill) {
-      // ⚠ OTA-1242 — auto-consume pure-narration (checkKind: null) stages, the
+      // ⚠ OTA-1219 — auto-consume pure-narration (checkKind: null) stages, the
       // OTA-871 loop mysteries and storylines always had and hunts never got.
       // No hunt authors a mid-chain null today, but the day one does, a stage
       // no verb can match must not wedge the chain (that is exactly how every
@@ -26973,7 +27370,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    // OTA-1210 (PUNCHLIST P8) — the posting BOARD and the faction's own HALL take it back
+    // OTA-1187 (PUNCHLIST P8) — the posting BOARD and the faction's own HALL take it back
     // too, exactly as they always have for faction quests. A trophy handed over at the
     // board that posted the bounty is still a face-to-face hand-in.
     const huntParty = turnInCounterparty(get, player, scene);
@@ -27007,7 +27404,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    // OTA-1208 — the trading post brokers another faction's bounty for a cut (PUNCHLIST
+    // OTA-1185 — the trading post brokers another faction's bounty for a cut (PUNCHLIST
     // P2). ⚠ The trophy still changes hands IN PERSON, at an outpost the player walked to
     // — OTA-810's rule ("a bounty is paid face to face, not sent by runner") is intact.
     // What is gone is the requirement that the RIGHT faction's agent happen to be
@@ -27066,7 +27463,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // scaled to how far you carried the trophy.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc, record?.acceptedAtCell);
-    // OTA-1208 — 80% and no long-haul bonus when the trading post carried it.
+    // OTA-1185 — 80% and no long-haul bonus when the trading post carried it.
     const payTc = CB.contractPayoutTc(candidate.rewardTc, journeyTc, huntViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
     if (huntViaBroker) {
       get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
@@ -27090,9 +27487,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       candidate.title,
       `✦ Hunt complete — ${candidate.title}. +${payTc} TC${!huntViaBroker && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${huntViaBroker ? ` (broker's cut taken)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
     );
-    // OTA-1073 — the agent who took it back remembers that you finished it.
+    // OTA-1050 — the agent who took it back remembers that you finished it.
     creditTurnIn(get, set, false);
-    maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-724
+    maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706
     applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
     recordMemorableEvent(get, set, {
@@ -27127,9 +27524,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const alreadyDone = neutralMatch
         && (player.completedMysteryIds ?? []).includes(neutralMatch.id);
       if (neutralMatch && !alreadyActive && !alreadyDone) {
-        const neutralTracked = !anyTrackedContract(player); // OTA-995 — #118
+        const neutralTracked = !anyTrackedContract(player); // OTA-972 — #118
         get().appendLog('debug', `accept: neutral ${neutralMatch.id} tracked=${neutralTracked}`);
-      // OTA-1072 — a contract handed over face to face is business with THAT
+      // OTA-1049 — a contract handed over face to face is business with THAT
       // agent, so it goes on their ledger. Guarded on a live vendor because
       // board/remote accepts have no one standing across from you.
       if (scene?.vendor) {
@@ -27142,17 +27539,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ...s.player,
             activeMysteries: [
               ...(s.player.activeMysteries ?? []),
-              // ⚠ OTA-1243 — start past the leading pure-narration stage. The VENDOR
+              // ⚠ OTA-1220 — start past the leading pure-narration stage. The VENDOR
               // branch has always bumped to stage 1 after playing stage-0's text;
-              // this branch never did, and the OTA-1236 matcher can't match a null
+              // this branch never did, and the OTA-1213 matcher can't match a null
               // checkKind — so every faction-NEUTRAL mystery accepted without a
               // vendor in scene was wedged at stage 0 forever. Same class as the
-              // hunt wedge (OTA-1242); the walker caught this one too.
+              // hunt wedge (OTA-1219); the walker caught this one too.
               { id: neutralMatch.id, stage: firstActionableHuntStage(neutralMatch), postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked, ...acceptCellStamp(get) },
             ],
           },
         } : s));
-        const neutralCompact = acceptIsCompact(); // OTA-1071 — before the bump.
+        const neutralCompact = acceptIsCompact(); // OTA-1048 — before the bump.
         bumpQuestsAccepted(get, set);
         if (neutralCompact) {
           get().appendLog('reward', `✦ Contract accepted — ${neutralMatch.title}${parkedTag(neutralTracked)}.`);
@@ -27213,9 +27610,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const m = matchedMystery;
-    const mysteryTracked = !anyTrackedContract(player); // OTA-995 — #118
+    const mysteryTracked = !anyTrackedContract(player); // OTA-972 — #118
     get().appendLog('debug', `accept: mystery ${m.id} tracked=${mysteryTracked}`);
-      // OTA-1072 — a contract handed over face to face is business with THAT
+      // OTA-1049 — a contract handed over face to face is business with THAT
       // agent, so it goes on their ledger. Guarded on a live vendor because
       // board/remote accepts have no one standing across from you.
       if (scene?.vendor) {
@@ -27236,7 +27633,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
-    const mysteryCompact = acceptIsCompact(); // OTA-1071 — before the bump.
+    const mysteryCompact = acceptIsCompact(); // OTA-1048 — before the bump.
     bumpQuestsAccepted(get, set);
     // Per-mystery stage0.arbiter suppressed (burst-aware line above).
     const stage0 = m.stages[0];
@@ -27326,12 +27723,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
-    // ⚠ OTA-1211 (PUNCHLIST P3) — a mystery is a REPORT, so a runner can carry it. The
+    // ⚠ OTA-1188 (PUNCHLIST P3) — a mystery is a REPORT, so a runner can carry it. The
     // counterparty check below is skipped for a courier hand-in; everything else (the
     // stage gate, the artifact-is-the-proof check) still applies.
     const mystViaCourier = remote;
     // B2 — the artifact is the proof and it changes hands IN PERSON now (no courier).
-    // OTA-1210 (PUNCHLIST P8) — board and hall count, same as for faction quests.
+    // OTA-1187 (PUNCHLIST P8) — board and hall count, same as for faction quests.
     const mystParty = turnInCounterparty(get, player, scene);
     if (!mystViaCourier && !mystParty) {
       get().appendLog('arbiter', `The Arbiter folds their arms. "Need a buyer, in the flesh. Carry the proof to a vendor, a posting board, or the faction's hall — set a course to the ◆ pin in Contracts."`);
@@ -27360,7 +27757,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    // OTA-1208 — the trading post brokers another faction's work for a cut (PUNCHLIST P2).
+    // OTA-1185 — the trading post brokers another faction's work for a cut (PUNCHLIST P2).
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
     const mysteryViaBroker = !mystViaCourier && CB.isContractBroker(scene?.vendor)
@@ -27407,10 +27804,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep)
       : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
     // B2 — full pay + a LONG-HAUL bonus scaled to how far you carried it.
-    // OTA-1208 — unless the trading post brokered it, which pays 80% and no bonus.
+    // OTA-1185 — unless the trading post brokered it, which pays 80% and no bonus.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc, record?.acceptedAtCell);
-    // ⚠ OTA-1211 — a courier hand-in pays the runner's rate and NO long-haul bonus.
+    // ⚠ OTA-1188 — a courier hand-in pays the runner's rate and NO long-haul bonus.
     const payTc = mystViaCourier
       ? CB.courierPayoutTc(candidate.rewardTc)
       : CB.contractPayoutTc(candidate.rewardTc, journeyTc, mysteryViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
@@ -27440,7 +27837,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       candidate.title,
       `✦ Mystery complete — ${candidate.title}. +${payTc} TC${!mysteryViaBroker && !mystViaCourier && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${mysteryViaBroker ? ` (broker's cut taken)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`,
     );
-    // OTA-1073 — the agent who took it back remembers that you finished it.
+    // OTA-1050 — the agent who took it back remembers that you finished it.
     creditTurnIn(get, set, mystViaCourier);
     applyTrainAndLog(get, set, 'wisdom', '✦ A mystery resolved sharpens you. +1 WIS (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
@@ -27505,9 +27902,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const s = matchedStoryline;
-    const storyTracked = !anyTrackedContract(player); // OTA-995 — #118
+    const storyTracked = !anyTrackedContract(player); // OTA-972 — #118
     get().appendLog('debug', `accept: storyline ${s.id} tracked=${storyTracked}`);
-      // OTA-1072 — a contract handed over face to face is business with THAT
+      // OTA-1049 — a contract handed over face to face is business with THAT
       // agent, so it goes on their ledger. Guarded on a live vendor because
       // board/remote accepts have no one standing across from you.
       if (scene?.vendor) {
@@ -27528,7 +27925,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : st,
     );
-    const storyCompact = acceptIsCompact(); // OTA-1071 — before the bump.
+    const storyCompact = acceptIsCompact(); // OTA-1048 — before the bump.
     bumpQuestsAccepted(get, set);
     // Per-storyline stage0.arbiter suppressed (burst-aware line above).
     const stage0 = s.stages[0];
@@ -27615,10 +28012,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
-    // ⚠ OTA-1211 (PUNCHLIST P3) — a storyline closes with a report, so a runner can carry it.
+    // ⚠ OTA-1188 (PUNCHLIST P3) — a storyline closes with a report, so a runner can carry it.
     const storyViaCourier = remote;
     // B2 — a storyline arc is closed FACE TO FACE now (no courier).
-    // OTA-1210 (PUNCHLIST P8) — board and hall count, same as for faction quests.
+    // OTA-1187 (PUNCHLIST P8) — board and hall count, same as for faction quests.
     const storyParty = turnInCounterparty(get, player, scene);
     if (!storyViaCourier && !storyParty) {
       get().appendLog('arbiter', `The Arbiter folds their arms. "Find the agent in person — a vendor, the posting board, or the faction's hall. Open Contracts, set a course to the ◆ pin, and close it there. The trip pays."`);
@@ -27651,7 +28048,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // storyline ever ships with factionId=null (none currently do,
     // but schema allows it) the old bare !== check would reject
     // every vendor; the && short-circuits that.
-    // OTA-1208 — the trading post brokers another faction's work for a cut (PUNCHLIST P2).
+    // OTA-1185 — the trading post brokers another faction's work for a cut (PUNCHLIST P2).
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
     const storyViaBroker = !storyViaCourier && CB.isContractBroker(scene?.vendor)
@@ -27676,8 +28073,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       : [...player.inventory];
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc, record?.acceptedAtCell);
-    // OTA-1208 — 80% and no long-haul bonus when the trading post carried it.
-    // ⚠ OTA-1211 — courier rate, no long-haul bonus.
+    // OTA-1185 — 80% and no long-haul bonus when the trading post carried it.
+    // ⚠ OTA-1188 — courier rate, no long-haul bonus.
     const payTc = storyViaCourier
       ? CB.courierPayoutTc(candidate.rewardTc)
       : CB.contractPayoutTc(candidate.rewardTc, journeyTc, storyViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
@@ -27708,7 +28105,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       candidate.title,
       `✦ Storyline complete — ${candidate.title}. +${payTc} TC${!storyViaBroker && !storyViaCourier && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${storyViaBroker ? ` (broker's cut taken)` : ''}, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
     );
-    // ⚠ OTA-1226 (PUNCHLIST P16, route C) — four storylines ALSO hand over the faction's
+    // ⚠ OTA-1203 (PUNCHLIST P16, route C) — four storylines ALSO hand over the faction's
     // Procedure Text, alongside (never instead of) the authored reward. The text is an
     // OBJECT; the read path teaches and INT-gates, so an arc finished early banks the
     // technique rather than wasting it.
@@ -27736,9 +28133,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('reward', `✦ ${textName} — the written procedure itself, handed over with the rest. Read it when your head is ready for it.`);
       }
     }
-    // OTA-1073 — the agent who took it back remembers that you finished it.
+    // OTA-1050 — the agent who took it back remembers that you finished it.
     creditTurnIn(get, set, storyViaCourier);
-    maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-724
+    maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706
     applyTrainAndLog(get, set, 'wisdom', '✦ A storyline carried through teaches you. +1 WIS (now {to}).');
     applyTrainAndLog(get, set, 'charisma', '✦ Word of the chapter spreads. +1 CHA (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
@@ -27751,7 +28148,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // Player tapped on purpose; no need to walk to a vendor first.
   // Still validates stage / boss-kill criteria, still grants the
   // same reward.
-  // OTA-1037 — WRAPPER: a COMPLETE tap must ANSWER ON THIS SCREEN. The typed
+  // OTA-1014 — WRAPPER: a COMPLETE tap must ANSWER ON THIS SCREEN. The typed
   // turn-ins the body delegates to guard with Arbiter lines (wrong faction, no
   // agent in scene, work not done) spoken to the world feed — which the
   // Contracts screen doesn't render. Owner's report: a READY faction contract's
@@ -27807,14 +28204,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // closed from a safe hub). Now it requires a paying agent present, and the
       // RIGHT faction's agent, exactly like the typed turn-in.
       const scene = get().currentScene;
-      // OTA-1210 (PUNCHLIST P8) — board and hall count here too, so the COMPLETE button
+      // OTA-1187 (PUNCHLIST P8) — board and hall count here too, so the COMPLETE button
       // and the typed turn-in cannot disagree about who may take a bounty back.
       const huntUiParty = turnInCounterparty(get, player, scene);
       if (!huntUiParty) {
         get().appendLog('arbiter', `The Arbiter folds their arms. "A bounty's settled in person — stand in front of a vendor, a posting board, or the faction's own hall and show them the trophy."`);
         return;
       }
-      // OTA-1208 — the trading post brokers it for a cut (PUNCHLIST P2). Same rule as the
+      // OTA-1185 — the trading post brokers it for a cut (PUNCHLIST P2). Same rule as the
       // typed turn-in above, resolved by the same function so the button and the command
       // cannot disagree about who may take a contract.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -27852,10 +28249,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // B2 — long-haul bonus, same as the typed turn-in.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const huntJourneyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, def.rewardTc, rec?.acceptedAtCell);
-      // OTA-1208 — 80% and NO long-haul bonus when the trading post carried it.
+      // OTA-1185 — 80% and NO long-haul bonus when the trading post carried it.
       const huntPayTc = CB.contractPayoutTc(def.rewardTc, huntJourneyTc, huntUiViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
       // ⚠ And the announce line below must not claim a bonus that was not paid — the
-      // OTA-1179 defect (a diagnostic stating an outcome nobody checked) in reward copy.
+      // OTA-1156 defect (a diagnostic stating an outcome nobody checked) in reward copy.
       const huntShownJourneyTc = huntUiViaBroker ? 0 : huntJourneyTc;
       if (huntUiViaBroker) {
         get().appendLog('arbiter', CB.brokerAcceptLine(huntUiParty.name, def.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
@@ -27875,9 +28272,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         def.title,
         `✦ Hunt complete — ${def.title}. From your pack: the ${def.trophyName}. +${huntPayTc} TC${huntShownJourneyTc > 0 ? ` (incl. +${huntShownJourneyTc} long-haul)` : ''}${huntUiViaBroker ? ` (broker's cut taken)` : ''}${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
       );
-      // OTA-1073 — the agent who took it back remembers that you finished it.
+      // OTA-1050 — the agent who took it back remembers that you finished it.
       creditTurnIn(get, set, false);
-      maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-724
+      maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706
       applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
       plantNextContractHint(get, def.factionId ?? null, 'hunt');
@@ -27988,7 +28385,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (kind === 'hunt') {
       const def = findHuntById(id);
       const rec = (player.activeHunts ?? []).find((h) => h.id === id);
-      // OTA-1025 — a record whose def was RETIRED must still be droppable (the
+      // OTA-1002 — a record whose def was RETIRED must still be droppable (the
       // ABANDON button was a silent no-op on an orphan — a permanent slate entry).
       if (!rec) return;
       set((s) => (s.player ? {
@@ -28079,12 +28476,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', `Your bounty slate is full (${MAX_ACTIVE_BOUNTIES}). Finish or abandon one first.`);
       return;
     }
-    // ⚠ OTA-1188 — THE THREE REFUSALS, AND EVERY ONE OF THEM SPEAKS. Standing on the
+    // ⚠ OTA-1165 — THE THREE REFUSALS, AND EVERY ONE OF THEM SPEAKS. Standing on the
     // quarry's own outpost (the 0-tile contract that started this: a 24h window with no
     // travel in it, against a 6h patrol cooldown, needing 3-9 kills); camping one board
     // for repeat work; and the board still running, which means no snapshot exists to
     // lock the politics in. The last one POINTS AT THE FREEZE BUTTON rather than merely
-    // saying no — the whole of OTA-1187 was a control that refused in silence.
+    // saying no — the whole of OTA-1164 was a control that refused in silence.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const BP = require('../engine/bountyPolitics') as typeof import('../engine/bountyPolitics');
     const hereCell = playerGridCell(player);
@@ -28110,7 +28507,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       buzzBlocked();
       return;
     }
-    // ⚠ OTA-1187 — A LIVE COURSE, not merely another contract on the slate. This read
+    // ⚠ OTA-1164 — A LIVE COURSE, not merely another contract on the slate. This read
     // `slate.length > 0`, which conflated "you already hold a bounty" with "you are
     // already walking somewhere" — and `travelTarget` is CLEARED the moment you arrive.
     // So the moment you reached your first contract's outpost, every later contract
@@ -28121,18 +28518,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const hadCourse = !!player.travelTarget || !!player.whisperCourse;
     // OTA-862 — stamp the accept hour so the contract can lapse after its in-game deadline.
     const acceptedAtHour = player.hoursElapsed ?? 0;
-    // OTA-863 — DISTANCE-AWARE deadline. ⚠ OTA-1185 resized the travel term: it is the
+    // OTA-863 — DISTANCE-AWARE deadline. ⚠ OTA-1162 resized the travel term: it is the
     // 24h JOB budget plus 2.5h per tile (the honest all-in cost of crossing one), not the
     // old bare hour. Measured from the player's absolute cell at accept.
     const grid = playerGridCell(player);
     const tiles = canonicalDistanceFromGrid(grid.x, grid.y, bounty.targetLocationId);
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { bountyDeadlineFor } = require('../engine/factionBounty') as typeof import('../engine/factionBounty');
-    // ⚠ OTA-1188 — `count` is passed now, so the window includes the WAITING. The patrol
+    // ⚠ OTA-1165 — `count` is passed now, so the window includes the WAITING. The patrol
     // cooldown puts a hard 6h floor between engagements, so a 9-kill job cannot be done in
     // a 3-kill job's time no matter how well it is played.
     const deadlineHours = bountyDeadlineFor(tiles, bounty.count);
-    // ⚠ OTA-1188 — FREEZE THE POLITICS ONTO THE CONTRACT. Taken from the SNAPSHOT the
+    // ⚠ OTA-1165 — FREEZE THE POLITICS ONTO THE CONTRACT. Taken from the SNAPSHOT the
     // player froze, never from the live matrix: the board they read is the deal they get,
     // even if those two factions are at war by the time the last body drops.
     const frozen = get().frozenBoard;
@@ -28152,7 +28549,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog(
       'arbiter',
       hadCourse
-        // ⚠ OTA-1186 — "around <place>" USED TO READ AS A REQUIREMENT and it never was
+        // ⚠ OTA-1163 — "around <place>" USED TO READ AS A REQUIREMENT and it never was
         // one: killCountsForBounty tests faction only, with no location term anywhere in
         // it. The place is a tip about where they gather. Both lines now say so, because
         // the owner ran a full contract believing he had to do the killing there.
@@ -28162,7 +28559,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Route the player to the quarry's outpost — but only if they weren't already on a
     // bounty course. Stacking a second contract must not yank you off the first one's road.
     if (!hadCourse) get().setTravelCourse(bounty.targetLocationId);
-    // ⚠ OTA-1186 — THE FIRST CONTRACT COMES WITH SOMEONE TO EXPLAIN IT. Owner: "the first
+    // ⚠ OTA-1163 — THE FIRST CONTRACT COMES WITH SOMEONE TO EXPLAIN IT. Owner: "the first
     // time someone accepts a bounty gets a pop-up and it does it in character… since this
     // is your first bounty I'll show you the ropes." Raised LAST so it sits on top of the
     // routing, and gated on a one-shot flag rather than `slate.length === 0` — a player
@@ -28249,7 +28646,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const ev = WE.pickWorldEvent(ctx, rt);
       if (ev) {
         const tides = WE.applyTideDelta(get().worldMemory.factionTides ?? {}, ev.effect.tideDelta);
-        // OTA-981 — NO repDelta here. This copy of worldTideCheck's clause made
+        // OTA-958 — NO repDelta here. This copy of worldTideCheck's clause made
         // player-facing faction STANDING move every ~36 real seconds — roughly
         // 10x the intended in-game 2-hour cadence — including while idle. And
         // since the rep-carrying events (defector / windfall) are only
@@ -28274,7 +28671,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = get().player;
     const scene = get().currentScene;
     if (!player || !scene) return;
-    // OTA-1016 — a course begins OUTSIDE. Two engine callers (routeMission, the
+    // OTA-993 — a course begins OUTSIDE. Two engine callers (routeMission, the
     // bounty board) reach here from indoors with no gate, and a surviving
     // hubRoomId re-attached the DEPARTURE room to the ARRIVAL outpost ("you
     // pass through the gate into <new outpost> — Workshop"). One clear at the
@@ -28283,7 +28680,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set((s2) => (s2.player ? { player: { ...s2.player, hubRoomId: null }, activeBuildingId: null } : s2));
       get().appendLog('world', 'You step out under open sky and take your bearings.');
     }
-    // ⚠ OTA-1187 — RESOLVE THE DESTINATION FIRST. This check used to sit BELOW the
+    // ⚠ OTA-1164 — RESOLVE THE DESTINATION FIRST. This check used to sit BELOW the
     // same-cell guard, and the ordering was the bug: an id the map cannot place
     // collapses to a default cell, which sometimes equals the player's own — so an
     // unresolvable destination took the SILENT return below instead of this
@@ -28304,7 +28701,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const grid0 = playerGridCell(player);
       const tgtCell0 = canonicalCellOf(locationId);
       if (grid0.x === tgtCell0.x && grid0.y === tgtCell0.y) {
-        // ⚠ OTA-1187 — IT USED TO RETURN IN COMPLETE SILENCE, and that is what the
+        // ⚠ OTA-1164 — IT USED TO RETURN IN COMPLETE SILENCE, and that is what the
         // owner reported as "it changes colours but it doesn't actually auto route."
         // The colour was never confirmation — `activeOpacity` fires on any tap, so a
         // no-op and a success looked identical. Standing on your own destination is
@@ -28348,8 +28745,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId, distanceRemaining: tiles }, whisperCourse: null, ...(dropChain ? { routedMission: null } : {}) } } : s));
     get().appendLog(
       'world',
-      // ⚠ OTA-1190 — IT CALLED EVERY TILE "A DAY". A tile costs TILE_HOURS (0.25h) on the
-      // clock and ~2.5h all-in once the stamina is rested back (OTA-1185) — so a 1-tile
+      // ⚠ OTA-1167 — IT CALLED EVERY TILE "A DAY". A tile costs TILE_HOURS (0.25h) on the
+      // clock and ~2.5h all-in once the stamina is rested back (OTA-1162) — so a 1-tile
       // hop announced itself as "1 day of travel" and a 23-tile march as "23 days". The
       // banner was the last surface still quoting the pre-1185 fiction, and a player
       // reading it cannot budget a contract window at all. Now it quotes the SAME number
@@ -28396,7 +28793,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const arrived = !!ag && ag.x === tgtCell.x && ag.y === tgtCell.y;
       if (arrived) {
         set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
-        // OTA-1189 — arriving on a contract's ground puts the quarry on it.
+        // OTA-1166 — arriving on a contract's ground puts the quarry on it.
         maybeSeedQuarry(get, set);
       } else if (after?.travelTarget && ag) {
         const d = canonicalDistanceFromGrid(ag.x, ag.y, locationId);
@@ -28514,7 +28911,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // v2.4.1 (OTA 053) — burn stamina + advance time per step. The
     // cost is wander (1) per tile, matching the cardinal-walk cost.
-    // ⚠ OTA-1185 — the literal 0.25 that used to sit here IS the standard, and now
+    // ⚠ OTA-1162 — the literal 0.25 that used to sit here IS the standard, and now
     // says so. Unchanged in value on purpose: this is the path players actually use,
     // so it is the one every other path was pulled TOWARD, not away from.
     set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), TILE_HOURS) });
@@ -28532,7 +28929,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         player: { ...s.player, travelTarget: undefined },
         currentScene: s.currentScene ? { ...s.currentScene, transitArea: null } : s.currentScene,
       } : s));
-      // OTA-1189 — arriving on a contract's ground puts the quarry on it. Both arrival
+      // OTA-1166 — arriving on a contract's ground puts the quarry on it. Both arrival
       // paths call this; the helper is one-shot per contract, so a player who reaches the
       // same tile through setTravelCourse and then again through continueTravel does not
       // double-seed.
@@ -28558,7 +28955,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // back to currentScene.location.name on the next render. Player
     // tapped STOP TRAVEL; they're now standing where they stopped,
     // not "near X."
-    // OTA-1037 — quit-navigating also stands down mission auto-routing. routedMission
+    // OTA-1014 — quit-navigating also stands down mission auto-routing. routedMission
     // used to survive this, so the Contracts card kept its "Auto-routing" note
     // (which replaces the ROUTE button) with no course left to chain — a wedged
     // card whose only way out was deactivate → reactivate (the owner's
@@ -28637,7 +29034,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Spend stamina + time, then take the cardinal step. stepDirection runs the
     // normal walk — encounters, whisper-beat fires, tile-novelty — so arriving on
     // the objective tile triggers the chain (e.g. fireYulkaFetch spawns the thief).
-    // ⚠ OTA-1185 — through the constant, same value. A whisper course is a tile walk.
+    // ⚠ OTA-1162 — through the constant, same value. A whisper course is a tile walk.
     set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), TILE_HOURS) });
     get().stepDirection(dir);
     const after = get().player;
@@ -28654,7 +29051,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   stopWhisperCourse() {
     const player = get().player;
     if (!player || !player.whisperCourse) return;
-    // OTA-1037 — see stopTravel: cancelling the course cancels the route chain too.
+    // OTA-1014 — see stopTravel: cancelling the course cancels the route chain too.
     set((s) => (s.player ? { player: { ...s.player, whisperCourse: null, routedMission: null } } : s));
     get().appendLog('world', 'You set the course aside. Cardinal direction is yours again.');
   },
@@ -28678,7 +29075,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // spend stamina + advance time, narrate departure, then
     // beginScene with skipHubEntry so we don't re-enter the gate.
     if (player.hubRoomId) {
-      set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+      set((s) => (s.player ? { player: { ...s.player, hubRoomId: null, safeExitMovesLeft: SAFE_EXIT_FREE_SCENES } } : s)); // OTA-1272
       set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
       get().appendLog(
         'world',
@@ -28704,10 +29101,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // arb47 — seed the GRID-EXACT distance now, even though we skip the first
       // step (vendor on the road). Leaving distanceRemaining undefined dropped the
       // travel badge onto the legacy re-centered-visual-map fallback, which
-      // UNDERCOUNTS from the outdoor tile — so the badge read low (e.g. 8) until
-      // the first continue self-healed it up to the true grid distance (16),
-      // looking like the counter "jumped up mid-travel". Seed it from the player's
-      // absolute cell so the badge is honest from the moment the course is set.
+      // UNDERCOUNTS from the outdoor tile — so the badge read low until the first
+      // continue self-healed it up to the true grid distance, looking like the
+      // counter "jumped up mid-travel". Seed it from the player's absolute cell.
       const vendGrid = playerGridCell(player);
       const vendTiles = canonicalDistanceFromGrid(vendGrid.x, vendGrid.y, pending.locationId);
       set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId: pending.locationId, distanceRemaining: vendTiles } } } : s));
@@ -28723,7 +29119,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ pendingTravelConfirm: null });
   },
 
-  // OTA-671 — accept a stumbled-onto mission offer. Commits the contract that
+  // OTA-656 — accept a stumbled-onto mission offer. Commits the contract that
   // handleBroker previously created silently: builds the broker mission, canonizes
   // its two relic-source grid markers, and prints the objective line.
   acceptMissionOffer() {
@@ -28758,7 +29154,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     set({ pendingMissionOffer: null });
   },
-  // OTA-671 — decline a stumbled-onto mission offer. Doesn't create anything; sets
+  // OTA-656 — decline a stumbled-onto mission offer. Doesn't create anything; sets
   // a soft flag so ambient pokes don't re-pop the prompt (explicit PARLEY re-opens).
   declineMissionOffer() {
     const offer = get().pendingMissionOffer;
@@ -28883,11 +29279,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // hit the crash. Fix: use the already-imported pickWeather
         // reference, no require needed.
         const liveWorldMem = get().worldMemory;
-        // OTA-1003 — #122: the open road carries no locale bias (null location) and
+        // OTA-980 — #122: the open road carries no locale bias (null location) and
         // the drift updates the persisted sky so arrival doesn't re-roll it.
         const newWeather = pickWeather(liveWorldMem, null);
         const driftHours = get().player?.hoursElapsed ?? 0;
-        // OTA-1014 — 'open-road' is a sentinel: during transit currentLocationId
+        // OTA-991 — 'open-road' is a sentinel: during transit currentLocationId
         // still names the ORIGIN, and stamping the unbiased road roll under a
         // real location id overwrote + locked out that location's biased sky.
         const driftLocId = 'open-road';
@@ -28969,6 +29365,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (liveAfterStep && tileKey) {
       const nextHistory = [...history, tileKey].slice(-50);
       set((s) => (s.player ? { player: { ...s.player, recentTileHistory: nextHistory } } : s));
+    }
+
+    // ⚠⚠ OTA-1272 — THE DOORSTEP GRACE, STEP HALF. beginScene's suppression
+    // covers the exit tile; every overland step has its OWN spawn machines
+    // (revenant, corruption purifier, Aetherkin rise, wasteland roll), so the
+    // grace is computed once at function scope and each hostile spawner checks
+    // it. One unit burns per step; friendly spawns (stall, trinket, escort)
+    // still roll — the owner asked for safety, not an empty world.
+    const graceUnitsNow = get().player?.safeExitMovesLeft ?? 0;
+    const stepUnderExitGrace = graceUnitsNow > 0;
+    if (stepUnderExitGrace) {
+      set((s) => (s.player ? { player: { ...s.player, safeExitMovesLeft: graceUnitsNow - 1 } } : s));
     }
 
     if (tileIsNovel) {
@@ -29075,7 +29483,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Cantor-pairing-style mix: hashes (x, y) → a single 32-bit
       // seed that distinguishes (-3, 5) from (5, -3) and from (3, 5).
       const seed = (((step.x + 1000) & 0xffff) * 65537) ^ ((step.y + 1000) & 0xffff);
-      const next = shuffleSliceSeeded(pool, AMBIENT_DISPLAY_CAP, seed);
+      // ⚠⚠ OTA-1244 — THE PINS SURVIVE THE RE-SHUFFLE. Owner: *"I have not seen
+      // armor or weapons in the last few tiles. Did anything change on the drop
+      // rates?"* Nothing did — the drops kept happening and this line threw them
+      // away. Scene build force-prepends spawned gear, a water source and the
+      // dog-rescue prop so the 8-slot cap cannot crowd them out; this re-shuffle
+      // (OTA-302) replaced the whole window with a blind pick and re-applied none
+      // of them. So gear was guaranteed on ARRIVAL at a location and could vanish
+      // on the very next step inside it, with no new spawn line in the log to
+      // explain where it went.
+      //
+      // ⚠ Pins take their slots FIRST and the shuffle fills what is left, so the
+      // variety this block exists for is preserved everywhere it does not conflict
+      // with something the scene placed on purpose. Pins are capped defensively:
+      // at most 3 gear + 1 water + 1 prop today, but a future placer must not be
+      // able to fill the window and starve the shuffle entirely.
+      const pins = (s.currentScene.pinnedAmbientNouns ?? []).filter((n) => pool.includes(n));
+      const pinned = pins.slice(0, Math.max(0, AMBIENT_DISPLAY_CAP - 2));
+      const rest = shuffleSliceSeeded(
+        pool.filter((n) => !pinned.includes(n)),
+        Math.max(0, AMBIENT_DISPLAY_CAP - pinned.length),
+        seed,
+      );
+      const next = Array.from(new Set([...pinned, ...rest])).slice(0, AMBIENT_DISPLAY_CAP);
       return { currentScene: { ...s.currentScene, displayedAmbientNouns: next } };
     });
     // Re-entry narration — when a cardinal step lands on a tile the
@@ -29136,7 +29566,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (outdoorPeaceful && !inAnyHubRoom && tileIsNovel && Math.random() < 0.20) {
         const stall = withSkyreacherChartOffer(pickRoadsideTrader(), get().worldMemory)!;
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, vendor: stall } } : s);
-        // OTA-1078 — SIGHT THE TRADER. stepDirection never calls beginScene (its
+        // OTA-1055 — SIGHT THE TRADER. stepDirection never calls beginScene (its
         // own comment says so), so this path — which the code itself calls the
         // dominant one, "a stall every ~5 travel steps" — recorded no meeting.
         // Meetings never accrued, prevSeenHours never advanced, and the whole
@@ -29147,11 +29577,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'world',
           `A stall has been thrown up on the next stretch of ground — ${stall.name}, ${stall.title}. Tap the vendor banner to trade.`,
         );
-        const stallBlurb = vendorWaresBlurb(get, stall.name); // OTA-726
+        const stallBlurb = vendorWaresBlurb(get, stall.name); // OTA-709
         if (stallBlurb) get().appendLog('world', stallBlurb);
       }
     }
-    // OTA-988 — HOOK ESCORT spawner: a stranded traveler on novel wild ground
+    // OTA-965 — HOOK ESCORT spawner: a stranded traveler on novel wild ground
     // offers an escort. Patterned on the roadside-stall roll above; anti-farm
     // mirrors the wanderer bank (one roll per tile, ever, 120-tile window).
     {
@@ -29166,7 +29596,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // on top of a live one.
       const hasLiveEscort = (livePlayer?.activeFactionQuests ?? [])
         .some((q) => q.escort && q.escort.hp > 0);
-      // OTA-998 — THE HOLLOWED (owner feature): a fallen character of this
+      // OTA-975 — THE HOLLOWED (owner feature): a fallen character of this
       // install surfaces as a one-time Aetherkin-revenant BOSS event. Power-
       // gated so a fresh character never stumbles into one; the pool is the
       // install's un-avenged Fallen. Kill = put to rest (resolveEnemyDefeat).
@@ -29174,13 +29604,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       {
         const rvPlayer = get().player;
         const rvScene = get().currentScene;
-        // OTA-1017 — the power gate needs PROVEN PROGRESS beside raw HP (a fresh
+        // OTA-994 — the power gate needs PROVEN PROGRESS beside raw HP (a fresh
         // Giant starts near 60 hpMax — no day-one bosses for any race), and
         // diced ground BANKS so a revisit can't re-arm the door.
         const rvTileKey = rvPlayer ? `${rvPlayer.currentLocationId}:${rvPlayer.mapX}:${rvPlayer.mapY}` : '';
         const rvRolled = get().worldMemory.revenantRolledTiles ?? [];
         const rvProven = ((rvPlayer?.milestones?.enemiesDefeated ?? 0) >= 10) || ((rvPlayer?.hoursElapsed ?? 0) >= 12);
-        if (rvPlayer && rvScene && peacefulWild && tileIsNovel && !hasLiveEscort
+        if (!stepUnderExitGrace && rvPlayer && rvScene && peacefulWild && tileIsNovel && !hasLiveEscort
             && (rvScene.enemies ?? []).length === 0 && (rvPlayer.hpMax ?? 0) >= 60
             && rvProven && !rvRolled.includes(rvTileKey)) {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -29213,7 +29643,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog('combat', `⚔ BOSS EVENT — ${foe.name}. ${beats.character}`);
             get().appendLog('debug', `spawn: revenant ${fr.name}@${fr.ts} pool=${rvPool.length}`);
           } else if (rvPool.length > 0 && Math.random() < 0.05) {
-            // OTA-1004 — the HINT route (owner: "hint missions that can be picked
+            // OTA-981 — the HINT route (owner: "hint missions that can be picked
             // up AND random encounters"). No boss yet — a marker on the verge
             // naming one of the fallen, which the player may follow or leave.
             revenantBeatFired = true;
@@ -29293,7 +29723,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const { corruptionTierOf, corruptionExtraEncounterChance } = require('../engine/corruption');
       const liveScene = get().currentScene;
       const livePlayer = get().player;
-      if (livePlayer && liveScene && (!liveScene.enemies || liveScene.enemies.length === 0) && !livePlayer.hubRoomId) {
+      if (!stepUnderExitGrace && livePlayer && liveScene && (!liveScene.enemies || liveScene.enemies.length === 0) && !livePlayer.hubRoomId) {
         const tier = corruptionTierOf(livePlayer.corruption ?? 0);
         const extraChance = corruptionExtraEncounterChance(tier);
         const stepsSince = (livePlayer.stepsSinceLastPurifier ?? 0) + 1;
@@ -29357,7 +29787,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     {
       const liveScene = get().currentScene;
       const livePlayer = get().player;
-      const openPeaceful = !!liveScene
+      const openPeaceful = !stepUnderExitGrace
+        && !!liveScene
         && (!liveScene.enemies || liveScene.enemies.length === 0)
         && !liveScene.vendor;
       if (openPeaceful && livePlayer && !livePlayer.hubRoomId && !get().activeBuildingId
@@ -29471,7 +29902,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // snapshot is now stale; using it would let wasteland encounters
     // stack on top of a fresh corruption spawn.
     const liveSceneForEncounter = get().currentScene;
-    if (liveSceneForEncounter && liveSceneForEncounter.enemies.length === 0) {
+    if (liveSceneForEncounter && liveSceneForEncounter.enemies.length === 0 && !stepUnderExitGrace) {
       const wasteSteps = (get().wastelandStepsSinceEncounter ?? 0) + 1;
       set(() => ({ wastelandStepsSinceEncounter: wasteSteps }));
       // OTA-218 — also track peaceful travel for the combat-starvation
@@ -29520,13 +29951,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // step: lively action, not constant. Tune down toward "desolate"
       // (~4-8%) from here once the feel is dialed in.
       const baseThreshold = isAutoTravel ? 1 : 2;
-      // OTA-713 — auto-route slightly more eventful (0.55 → 0.58). Small on
+      // OTA-696 — auto-route slightly more eventful (0.55 → 0.58). Small on
       // purpose; the bulk of "more different encounters" comes from the
       // non-combat variety bias passed to the picker below, so the extra
       // events skew toward variety (treasure / npc / fusion bench), not
       // more fights.
       //
-      // ⚠ OTA-1134 — HALVED (0.58 → 0.29 auto-travel, 0.45 → 0.225 manual).
+      // ⚠ OTA-1111 — HALVED (0.58 → 0.29 auto-travel, 0.45 → 0.225 manual).
       // Owner: "there were sections that every move or rest was a fight …
       // let's just 1/2 the chance percentage."
       //
@@ -29558,7 +29989,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // see HANDOFF §OPEN ITEMS for why pressure.ts currently declines to
       // scale encounter rate and what wiring it would mean.
       const baseRollChance = isAutoTravel ? 0.29 : 0.225;
-      // ⚠ OTA-1136 — THE DIFFICULTY TIER REACHES THE ENCOUNTER ROLL. Owner:
+      // ⚠ OTA-1113 — THE DIFFICULTY TIER REACHES THE ENCOUNTER ROLL. Owner:
       // "let's make the difficulty tiers mean something, the effects should be
       // game wide." `spawn` is 1.0 on 'owed', so the halved baseline above is
       // still exactly what the default run plays.
@@ -29601,7 +30032,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // intended wild-tile loot RE-ROLL (theme-park density) is untouched; only
       // the repeatable encounter spawn is gated. `wasteSteps` still accrues on
       // revisits, so resuming genuine forward travel pays out the banked danger.
-      // OTA-712 — a step onward means the player walked past the provocable
+      // OTA-695 — a step onward means the player walked past the provocable
       // encounter without provoking it ("if you pass by without disturbing
       // the Entombed the Aetherkin lets you go"). Clear the temptation
       // before this step can arm a fresh one.
@@ -29613,7 +30044,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         threshold: baseThreshold,
         rollChance: effectiveRollChance,
         depleted,
-        // OTA-1136 — how generous this tier is with vendors, caches and
+        // OTA-1113 — how generous this tier is with vendors, caches and
         // hidden sites. 1.0 on 'owed', so the default run is untouched.
         discoveryMult: pressureProfile.discovery,
         // OTA-198 — Aetheric Vision Lens doubles the chance the
@@ -29623,18 +30054,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // OTA-218 — combat-starvation bias. 3+ peaceful steps → 2×
         // skirmish/mini_dungeon weight. 5+ → 4×.
         stepsSinceCombat: get().stepsSinceCombat,
-        // OTA-713 — on a plotted course, bias the TYPE pick toward non-combat
+        // OTA-696 — on a plotted course, bias the TYPE pick toward non-combat
         // variety (treasure / npc / fusion bench) so a route brings in more
         // different encounters without more fights.
         autoTravel: isAutoTravel,
-        // OTA-1109 — the last few encounters stay off the table so an authored
+        // OTA-1086 — the last few encounters stay off the table so an authored
         // set-piece can't replay back-to-back (Phoenix-Feather vendor, twice
         // in an hour on the owner's device).
         recentArchetypeIds: get().worldMemory.recentEncounterArchetypes ?? [],
       }) : null;
       if (enc) {
         set(() => ({ wastelandStepsSinceEncounter: 0 }));
-        // OTA-1109 — remember what just fired (newest first, capped).
+        // OTA-1086 — remember what just fired (newest first, capped).
         set((s) => ({
           worldMemory: {
             ...s.worldMemory,
@@ -29657,7 +30088,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         if (enc.npcLine) get().appendLog('arbiter', enc.npcLine);
         if (enc.loreNote) get().appendLog('world', enc.loreNote);
-        // OTA-712 — data-driven provocable encounter. When the encounter's
+        // OTA-695 — data-driven provocable encounter. When the encounter's
         // archetype carries a `provoke` block (the Aetherkin mourner's dare,
         // "reach for a coin and you will not reach it twice"), arm the
         // temptation so a provoking verb makes good on the threat instead of
@@ -29799,7 +30230,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         && !liveScene.vendor;
       const inAnyHubRoom = !!livePlayer?.hubRoomId;
       // arb119 — gate on tileIsNovel so pacing a short loop can't farm free trinkets.
-      // ⚠ OTA-1136 — the tier's `loot` dial rides the CHANCE, not the stack
+      // ⚠ OTA-1113 — the tier's `loot` dial rides the CHANCE, not the stack
       // size, so a lean tier makes a find rarer rather than making every find
       // feel insulting. Kept deliberately gentle (0.7 at the hardest): this
       // stacks with TIDE's price drift, and cutting supply while raising
@@ -29851,7 +30282,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let made = 0;
     try {
       for (let i = 0; i < want; i += 1) {
-        // OTA-1012 — count the RESULT, not the whole pack. The old total-quantity
+        // OTA-989 — count the RESULT, not the whole pack. The old total-quantity
         // delta was a proxy that LIES when a recipe consumes as much as it
         // produces (the Club: 1 Stick -> 1 Club, net zero), reading a
         // successful craft as a refusal — one silent club, made === 0, no
@@ -29903,7 +30334,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ tutorialStep: 0, awaitingTutorialName: true });
     const firstStep = TUTORIAL_STEPS[0];
     if (firstStep?.arbiter) {
-      // OTA-1065 — supersede: a beat instruction outranks anything still
+      // OTA-1042 — supersede: a beat instruction outranks anything still
       // queued for the voice. Nothing precedes the first beat, but tagging it
       // keeps every beat's dispatch identical.
       get().appendLog('arbiter', firstStep.arbiter, { supersede: true });
@@ -29935,7 +30366,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
     // Speak the next Arbiter line in the feed.
     if (nextStep.arbiter) {
-      // OTA-1065 — supersede: drop whatever voice backlog has piled up so the
+      // OTA-1042 — supersede: drop whatever voice backlog has piled up so the
       // spoken instruction matches the beat the player is actually on. The
       // tutorial advances faster than on-device TTS synthesises, so without
       // this the audio runs a full beat behind the screen.
@@ -29963,7 +30394,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // the outpost by any means (typed 'leave outpost', the OUT chip, or a
     // cardinal step out the gate) trips finishOutpostTutorial.
     set({ tutorialExploreChosen: true });
-    // OTA-1098 — owner: "he's still talking well into me already exploring."
+    // OTA-1075 — owner: "he's still talking well into me already exploring."
     // One short sentence and then silence; the choice popup already framed it.
     get().appendLog('arbiter', `"Take your time. Tap EXIT when you're ready."`);
   },
@@ -29976,7 +30407,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // path) so the main_quest beat lands them in the open with the MAIN
     // QUEST objective chip in view.
     if (player?.hubRoomId) {
-      set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+      set((s) => (s.player ? { player: { ...s.player, hubRoomId: null, safeExitMovesLeft: SAFE_EXIT_FREE_SCENES } } : s)); // OTA-1272
       set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
       get().appendLog(
         'world',
@@ -29990,6 +30421,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     if (state.tutorialStep === null) return;
     const step = TUTORIAL_STEPS[state.tutorialStep];
+    // LOOK is now the FIRST beat (before the cudgel take, before the door opens),
+    // so it's no longer adjacent to the explore/leave handoff — leaving the
+    // outpost can only finish the arc from the explore_or_leave beat, same as
+    // every other early beat.
     if (step?.id !== 'explore_or_leave') return;
     // Starter note — kept for inventory parity with the skip path. Its
     // main-quest framing is delivered by the main_quest beat's Arbiter
@@ -30007,9 +30442,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const id = TUTORIAL_STEPS[state.tutorialStep]?.id ?? '';
     const hint: Record<string, string> = {
       name: 'type your name in the box, then tap ACT.',
-      cudgel: 'tap the glowing TAKE button and lift the cudgel.',
+      look: 'tap the glowing LOOK AROUND YOU button to get your bearings.',
+      cudgel: 'tap the glowing TAKE / SALVAGE button, then tap the cudgel in the list.',
       rope: "type 'take rope' in the box, then tap ACT.",
-      scrap: 'tap the glowing SALVAGE button and break the chest plate.',
+      armor: 'tap the ★ vest inside TAKE / SALVAGE — one tap puts it on.',
+      scrap: 'tap the glowing TAKE / SALVAGE button, then tap the chest plate under SALVAGE.',
       climb: 'tap the glowing CLIMB button.',
       investigate: 'tap the glowing INVESTIGATE button and look at the door.',
       explore_or_leave: 'answer the prompt — stay and explore, or leave the outpost.',
@@ -30408,12 +30845,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let hoursAdded = 0;
     const consumedNouns: string[] = [];
     const skippedAlready: string[] = [];
-    // ⚠ OTA-1254 — its OWN bucket, not skippedAlready. These nouns were not
+    // ⚠ OTA-1231 — its OWN bucket, not skippedAlready. These nouns were not
     // "already worked over" — they were deliberately left intact because they are
     // things the player can pick up, and saying otherwise would be the exact class
     // of lie this project keeps hunting: a message that describes a state the game
     // is not in. They get their own line, which names the verb that DOES work.
     const skippedTakeable: string[] = [];
+    // ⚠⚠ OTA-1236 — ITS OWN BUCKET AGAIN, for the nouns that carry a next step.
+    // Owner: *"I don't like that salvage all can bury the dog quest."* It could,
+    // and this is measured rather than argued: TEN of the twenty dog-rescue hook
+    // nouns match a salvage pool — chain, wagon, wagon wheel, overturned wagon,
+    // cellar door, trapdoor, buried structure, snare pit, snare, trapper camp,
+    // trap. Salvage writes `searchedAmbientNouns` and every picker reads it, so
+    // one tap pried the chain apart and **the rescue noun left the investigate
+    // list entirely.** The quest stayed typeable and stopped being tappable, which
+    // is the worse failure: nobody types a noun the game has stopped showing them.
+    const skippedLead: string[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isLeadNoun: isBulkLeadNoun } = require('../engine/storyNouns') as typeof import('../engine/storyNouns');
+    const bulkLeadCtx = {
+      hooks: scene.hooks ?? [],
+      // ⚠ The same conditions the engine's own rescue dispatch checks. Once the
+      // player HAS a dog, a snare is just a snare again — protecting it forever
+      // would keep scrap out of their hands for a quest that already happened.
+      rescueEligible: !get().player?.dog && !get().worldMemory.pendingDogOnboarding,
+    };
     // 2026-05-25 OTA-037 — track nouns that the modal surfaced but
     // rollSalvagePool didn't recognize. Previously these were swallowed
     // silently, so a SALVAGE ALL where every chip was unmatched
@@ -30448,7 +30904,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         continue;
       }
 
-      // ⚠⚠ OTA-1254 — SALVAGE ALL NEVER SCRAPS SOMETHING YOU COULD HAVE POCKETED.
+      // ⚠⚠ OTA-1231 — SALVAGE ALL NEVER SCRAPS SOMETHING YOU COULD HAVE POCKETED.
       // Owner: *"salvage can kill items in take."* It could, and the overlap is not
       // theoretical — measured across the catalog and the salvage pools:
       //     Aetheric Torch   takeable ✓  salvage pool ✓
@@ -30466,6 +30922,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // aimed at the room's furniture, and it must not quietly spend the loot.
       if (findCatalogItem(noun) !== null) {
         skippedTakeable.push(noun);
+        continue;
+      }
+
+      // ⚠⚠ OTA-1236 — AND NEVER THE NOUN THE STORY IS ATTACHED TO. A bulk sweep is
+      // aimed at the room's furniture by definition; it is not the place to spend
+      // the one thing here that has a next step on it. A typed `salvage chain` is
+      // still honoured — deliberately breaking the dog's chain is the player's call
+      // to make, one noun at a time — exactly the distinction OTA-1231 drew for
+      // takeables.
+      if (isBulkLeadNoun(noun, bulkLeadCtx)) {
+        skippedLead.push(noun);
         continue;
       }
 
@@ -30626,7 +31093,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const overflow = skippedAlready.length > 4 ? ` and ${skippedAlready.length - 4} more` : '';
       get().appendLog('world', `Already worked over: ${names}${overflow}.`);
     }
-    // ⚠ OTA-1254 — and the honest line for the ones left whole on purpose. It names
+    // ⚠ OTA-1231 — and the honest line for the ones left whole on purpose. It names
     // TAKE, because that is the verb that works on them, and it says they are still
     // there — a player who tapped SALVAGE ALL and saw nothing about these would
     // reasonably assume they were gone.
@@ -30634,6 +31101,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const names = skippedTakeable.slice(0, 4).join(', ');
       const overflow = skippedTakeable.length > 4 ? ` and ${skippedTakeable.length - 4} more` : '';
       get().appendLog('world', `Left whole — worth more in your pack than in pieces: ${names}${overflow}. (TAKE them.)`);
+    }
+    // ⚠⚠ OTA-1236 — and the lead says so LOUDLY, on the arbiter channel, because
+    // this is the one line in a bulk salvage that is a next step rather than a
+    // receipt. Owner: *"the next step is right there to see."*
+    if (skippedLead.length > 0) {
+      const names = skippedLead.slice(0, 3).join(', ');
+      const overflow = skippedLead.length > 3 ? ` and ${skippedLead.length - 3} more` : '';
+      get().appendLog(
+        'arbiter',
+        `✦ Left untouched — there is something here worth understanding first: ${names}${overflow}. (INVESTIGATE.)`,
+      );
     }
     // Emit the aggregated reward summary as the last block.
     if (itemTotals.size > 0 || tcGained > 0) {
@@ -30663,6 +31141,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // owns the nothing-at-all batch.
     const hadOtherOutput =
       narrationLines.length > 0 || skippedAlready.length > 0 || skippedTakeable.length > 0
+      || skippedLead.length > 0   // ⚠ OTA-1236 — a lead line IS output; without this a
+                                  // lead-only batch falls to the "button did nothing" path.
       || itemTotals.size > 0 || tcGained > 0;
     if (unmatchedNouns.length > 0 && hadOtherOutput) {
       get().appendLog(
@@ -30674,6 +31154,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       narrationLines.length === 0
       && skippedAlready.length === 0
       && skippedTakeable.length === 0
+      && skippedLead.length === 0
       && itemTotals.size === 0
       && tcGained === 0
     ) {
@@ -30700,10 +31181,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   equipItem(itemName, slot, itemId) {
+    // ⚠ OTA-1248 — the `armor` beat completes on the EQUIP, not the take. Placed at
+    // the top so it fires for every route into equipping (inventory tap, typed
+    // `equip vest`, the group action) rather than only the one the beat suggested.
+    if (/vest|mud-warden|warden/i.test(itemName)) {
+      setTimeout(() => { try { get().maybeAdvanceTutorial('armor'); } catch { /* never block an equip */ } }, 0);
+    }
     const state = get();
     const player = state.player;
     if (!player) return;
-    // OTA-953 — resolve the EXACT instance the caller picked by its unique id when
+    // OTA-930 — resolve the EXACT instance the caller picked by its unique id when
     // given (the inventory UI passes it), so a stack of same-name items with
     // different durability/instance stats equips the ONE the player selected — not
     // just the first row that happens to share the name. Falls back to name-match
@@ -30946,15 +31433,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     const player = state.player;
     if (!player) return;
-    // OTA-1028 — LIVE ids only (mirrors the bandolier ghost guard): a stowed tool
+    // OTA-1005 — LIVE ids only (mirrors the bandolier ghost guard): a stowed tool
     // that left the pack by sale/scrap/use must never eat a pouch slot.
     const current = (player.equipped?.toolPouchIds ?? []).filter((id) => player.inventory.some((i) => i.id === id));
-    // OTA-695 — pouch the first UN-POUCHED instance of this name (mirrors the
-    // OTA-690 bandolier fix). The old first-by-name find re-grabbed an already-
-    // pouched copy, so isPouchEligible bounced with "already on your belt" and you
-    // could never stow a SECOND same-named tool (two Aetheric Torches, two
-    // scanners). Prefer the exact id the UI hands us; else first un-pouched; else
-    // any match so the eligibility check can still explain the refusal.
+    // OTA-695 — id-first, else first UN-pouched instance (mirrors OTA-690 bandolier
+    // fix) so a SECOND same-named tool can be pouched; else any match for the msg.
     const item = (itemId ? player.inventory.find((i) => i.id === itemId && i.quantity > 0) : undefined)
       ?? player.inventory.find(
         (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0 && !current.includes(i.id),
@@ -31004,9 +31487,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = state.player;
     if (!player) return;
     const current = player.equipped?.toolPouchIds ?? [];
-    // OTA-695 — pull the EXACT pouched instance the UI tapped (the slot carries its
-    // id), so with two same-named tools pouched you remove the one you meant. Falls
-    // back to first pouched-by-name for typed input.
+    // OTA-695 — pull the exact pouched instance the UI tapped (id-first).
     const item = (itemId ? player.inventory.find((i) => i.id === itemId && current.includes(i.id)) : undefined)
       ?? player.inventory.find(
         (i) => i.name.toLowerCase() === itemName.toLowerCase() && current.includes(i.id),
@@ -31036,7 +31517,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const BANDOLIER_MAX = 5;
     const player = get().player;
     if (!player) return;
-    // OTA-1028 — count LIVE ids only: a ghost (racked item that left the pack by a
+    // OTA-1005 — count LIVE ids only: a ghost (racked item that left the pack by a
     // path other than throwing) must never eat a loop.
     const current = (player.equipped?.bandolierIds ?? []).filter((id) => player.inventory.some((i) => i.id === id));
     // OTA-690 — rack the first UN-RACKED instance of this name. The old find
@@ -31082,9 +31563,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = get().player;
     if (!player) return;
     const current = player.equipped?.bandolierIds ?? [];
-    // OTA-695 — pull the EXACT racked instance the UI tapped (the slot carries its
-    // id), so with several same-named throwables racked you unrack the one you
-    // meant. Falls back to first racked-by-name for typed input.
+    // OTA-695 — pull the exact racked instance the UI tapped (id-first).
     const item = (itemId ? player.inventory.find((i) => i.id === itemId && current.includes(i.id)) : undefined)
       ?? player.inventory.find(
         (i) => i.name.toLowerCase() === itemName.toLowerCase() && current.includes(i.id),
@@ -31100,7 +31579,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  // OTA-691 — return a faction sigil to that faction's stake, honoring their dead.
+  // OTA-676 — return a faction sigil to that faction's stake, honoring their dead.
   turnInSigil(itemId) {
     const player = get().player;
     if (!player) return;
@@ -31168,10 +31647,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  // OTA-693 — batch-heal one item onto self / dog / golem. Applies `count` uses in
-  // one shot, clamping the total to the target's missing HP (no overheal), spending
-  // exactly `count` units. Golem heal is per-part (repair/substitute); self + dog
-  // use the item's fixed effect.healHP.
+  // OTA-693 — batch-heal one item onto self / dog / golem in one shot.
   useHealBatch(itemName, target, count) {
     const player = get().player;
     if (!player || count <= 0) return;
@@ -31207,16 +31683,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // self / dog use the item's fixed consumable heal.
     const fx = resolveItemEffect(item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
-    const perHP = fx?.kind === 'consumable' ? scaledHealHP(fx.healHP ?? 0, player.hpMax) : 0; // OTA-1001 — #120
+    const perHP = fx?.kind === 'consumable' ? scaledHealHP(fx.healHP ?? 0, player.hpMax) : 0; // OTA-978 — #120
     if (perHP <= 0) { get().appendLog('arbiter', `The Arbiter studies the ${item.name}. "That won't mend anything in bulk."`); return; }
 
     if (target === 'dog') {
       const dog = player.dog;
       if (!dog || dog.status === 'dead' || dog.status === 'abandoned') { get().appendLog('arbiter', `The Arbiter glances at your side. "No dog to tend."`); return; }
       const gap = Math.max(0, dog.hpMax - dog.hp);
-      // OTA-1016 — the dog's meal scales by the DOG's hpMax, not the player's.
+      // OTA-993 — the dog's meal scales by the DOG's hpMax, not the player's.
       const dogPer = fx?.kind === 'consumable' ? scaledHealHP(fx.healHP ?? 0, dog.hpMax) : 0;
       const heal = Math.min(gap, dogPer * use);
       const isTreat = canonicalItemTags(item).includes('dog_treat');
@@ -31230,7 +31705,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // self
     const perStam = fx?.kind === 'consumable' ? (fx.restoreStamina ?? 0) : 0;
     const hpGap = Math.max(0, player.hpMax - player.hp);
     const stamGap = Math.max(0, effectiveStaminaMax(player) - player.stamina);
@@ -31262,7 +31736,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // a bare name match could throw a DIFFERENT (uncoated) knife, so the coating
     // never procced. The tapped id guarantees the painted knife is the one hurled.
     const racked = player.equipped?.bandolierIds ?? [];
-    // ⚠ OTA-1163 (pressure test) — the any-pack-copy fallback is now
+    // ⚠ OTA-1140 (pressure test) — the any-pack-copy fallback is now
     // OUT-OF-COMBAT ONLY. In a fight it silently bypassed the bandolier: once
     // a racked stack emptied, this kept feeding throws from the pack, so
     // BANDOLIER_MAX capped nothing and the rack was cosmetic. Out of combat
@@ -31327,7 +31801,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           currentScene: { ...s.currentScene, enemyHps: s.currentScene.enemyHps.map((h, i) => (i === idx ? newHp : h)), activeEnemyIdx: idx },
         };
       });
-      // OTA-953 — the leading number is the ACTUAL damage (after the target's type
+      // OTA-930 — the leading number is the ACTUAL damage (after the target's type
       // weakness/resistance + traits). The parenthetical shows the coating's own
       // math (perTurn × turns); when the target scaled it, name the reason so the
       // two numbers reconcile instead of looking like a bug ("5 … (1/turn × 3)").
@@ -31342,7 +31816,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `You hurl the ${item.name}. It bursts across ${target.name} — ${burst} ${dtype} (${perTurn}/turn × ${COATING_DOT_TURNS}${matchNote}). (${newHp} HP left)`,
         { combatOutcome: 'player_dmg' },
       );
-      // ⚠ OTA-1160 — THIS IS THE CASE THE OWNER HIT. A thrown vial on a declared
+      // ⚠ OTA-1137 — THIS IS THE CASE THE OWNER HIT. A thrown vial on a declared
       // weakness staggers exactly as a weapon hit does; the whole complaint was
       // that spending the consumable changed nothing about the round that
       // followed. One check, not two: `combineDamageTypeMatch` already folds the
@@ -31355,7 +31829,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       if (newHp <= 0) {
         get().resolveEnemyDefeat();
-        // OTA-1143 — …and it swings back on a KILL too. The comment below
+        // OTA-1120 — …and it swings back on a KILL too. The comment below
         // already promised "the group still swings back"; the else made that
         // promise conditional on the target surviving, which is the one case a
         // pack most obviously should answer.
@@ -31375,7 +31849,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => s.player
       ? { player: { ...s.player, equipped: { ...(s.player.equipped ?? {}), off: item.name, offId: item.id } } }
       : s);
-    // OTA-980 — the restore (and the spend-exactly-one guarantee) used to run RIGHT
+    // OTA-957 — the restore (and the spend-exactly-one guarantee) used to run RIGHT
     // HERE, synchronously — written when combat resolved in the same tick. With
     // the dice modal the damage phase runs SECONDS later and read the RESTORED
     // weapon: owner's log shows a thrown Sentinel Core Plate rolling as itself
@@ -31393,7 +31867,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   dropInventoryItem(itemName, itemId) {
-    // OTA-1123 — with an INSTANCE ID in hand, drop that exact instance directly.
+    // OTA-1100 — with an INSTANCE ID in hand, drop that exact instance directly.
     // The first attempt threaded the id through `submitPlayerAction('drop <id>')`
     // because the verb also matches on id — and it worked in a probe, then failed
     // on a real id, because the id has to survive the intent PARSER to arrive as
@@ -31409,7 +31883,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().submitPlayerAction(`drop ${itemName}`);
   },
 
-  // OTA-1123 — THE one implementation of DROP. Lifted verbatim out of the
+  // OTA-1100 — THE one implementation of DROP. Lifted verbatim out of the
   // `case 'drop'` handler (equipped refusal, quest-lock refusal, room-pile write,
   // narration, persist) so a caller holding an instance id never has to
   // round-trip through the text parser to reach it.
@@ -31485,7 +31959,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see ${withArticle(itemName)} on you."`);
       return;
     }
-    // ⚠ OTA-1228 — a Procedure Text's tap-action is READING it. It carries no authored
+    // ⚠ OTA-1205 — a Procedure Text's tap-action is READING it. It carries no authored
     // `effect`, so without this branch it fell through the effect router to nothing —
     // the pack's READ button and the typed `read` land on the same teacher.
     if (AT_isProcedureTextName(item.name)) {
@@ -31594,7 +32068,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // output into a unique faction item (see findFactionCatalyst /
     // applyFusion). They still don't count toward the 3-scrap gate.
     const isFactionCatalyst = canonicalItemTags(item).includes('faction_gear');
-    // OTA-756 — forge reservability is now one shared predicate (isForgeReservableItem):
+    // OTA-737 — forge reservability is now one shared predicate (isForgeReservableItem):
     // (2a) a weapon/armor can't be freshly reserved anymore — reserving one used to
     // show a ♥ the Crucible then silently ignored; (1a) a 'loot' reagent with no
     // recipe use now CAN be reserved. An already-reserved item can always be toggled
@@ -31624,7 +32098,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Same "is this the same stackable unit" rule as grantItem (name+kind, no
     // coating / per-instance stats).
     const sameUnit = sameStackUnit;
-    // OTA-968 — move `count` units in one call (the "Save all xN" button); clamped to the
+    // OTA-945 — move `count` units in one call (the "Save all xN" button); clamped to the
     // stack. Moving the WHOLE stack just flips the row's flag (merging into an
     // existing same-state stack if one exists) — no churn through N single peels.
     const moveN = Math.max(1, Math.min(count ?? 1, qty));
@@ -31670,7 +32144,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
-  // OTA-1120 — SELECT ALL / CLEAR ALL for one category in the FUSABLE view.
+  // OTA-1097 — SELECT ALL / CLEAR ALL for one category in the FUSABLE view.
   // Owner: "we also need a select all button on the category headers in
   // inventory when we select sort by fusable so you can select a whole
   // category." Reserving a category one row at a time was the same complaint
@@ -31813,10 +32287,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // (adds a SECOND coating rather than replacing); 'replace' = both usable slots
     // full, so it overwrites slot 1.
     const coatSlot: 'coating' | 'coating2' | 'replace' = nextCoatSlot(weapon);
-    // OTA-945 — when every usable slot is full, the UI sends WHICH slot to overwrite
+    // OTA-922 — when every usable slot is full, the UI sends WHICH slot to overwrite
     // (a picker), so a coating is never blindly scrubbed off slot 1. Default to slot 1
     // for safety / older callers.
-    // OTA-957 — the store validates the caller's slot choice instead of trusting it: a
+    // OTA-934 — the store validates the caller's slot choice instead of trusting it: a
     // programmatic replaceSlot: 'coating2' on a 1-slot weapon would stamp an illegal
     // dual coat that combat honors (the UI can't send it — its picker only offers
     // slots that exist — but "default to slot 1 for safety" must actually be enforced).
@@ -31938,7 +32412,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // coating channel, the armor parallel to a weapon's 2nd coating slot).
     const ADDED_RESIST_CAP = 3;
     const effectiveCap = ADDED_RESIST_CAP + (armor.resistCapBonus ?? 0);
-    // OTA-945 — a FULL piece no longer just refuses. The UI opens a picker and sends
+    // OTA-922 — a FULL piece no longer just refuses. The UI opens a picker and sends
     // which existing resist to strip; honour it here. Without a valid replaceResist
     // (older caller / no pick), keep the refusal.
     const replaceLower = replaceResist?.toLowerCase();
@@ -31951,7 +32425,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (!s.player) return s;
       const target = s.player.inventory.find((i) => i.id === armorId);
       if (!target) return s;
-      // OTA-945 — on a full piece, strip the picked resist first; otherwise just append.
+      // OTA-922 — on a full piece, strip the picked resist first; otherwise just append.
       const withResist = (base: string[]) => {
         const stripped = willReplace && replaceLower ? base.filter((r) => r.toLowerCase() !== replaceLower) : base;
         return [...stripped, type];
@@ -32028,7 +32502,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           return;
         }
       }
-      // OTA-1007 — SUPERSEDES OTA-801. That fix opened the picker on a FAILED gate so
+      // OTA-984 — SUPERSEDES OTA-801. That fix opened the picker on a FAILED gate so
       // the player wouldn't hit a repeated refusal line; the cure was worse than
       // the disease — a menu you cannot act in, emitting NOTHING to the log, read
       // on device as "I'm fusing" for ten minutes. A Crucible that can't fire now
@@ -32062,14 +32536,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('debug', `fuse: refused pieces=${shortInputs.length} mats=[${shortMats.join(',')}] catalyst=${hasCat}`);
       return;
     }
-    // OTA-953 — FUSION PICKER. Unless the player has already chosen which reserved
-    // pieces to spend (3–5) and whether to forge a weapon or armor, open the picker
-    // rather than consuming the ENTIRE reserved pool on one item (the old bug: 11
-    // reserved → all 11 eaten). confirmFusionSelection sets pendingFusionSelection
-    // and calls back here.
     const sel = get().pendingFusionSelection;
     if (!sel) { set({ fusionPickerOpen: true }); return; }
-    // Re-gate against the player's EXACT picks (+ optional separate faction catalyst).
     const selCatalyst = sel.catalystId ? (player.inventory.find((i) => i.id === sel.catalystId) ?? null) : null;
     const selChosen = sel.itemIds
       .map((id) => player.inventory.find((i) => i.id === id && i.reservedForFusion && i.quantity > 0))
@@ -32090,7 +32558,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // synthesizeFusionDeterministic which produces a clamped valid
     // result from the input tag profile. Less varied than Qwen-
     // synthesized but always serviceable.
-    // OTA-990 — outpost fires cost coin now, same as the roadside vendor's rig.
+    // OTA-967 — outpost fires cost coin now, same as the roadside vendor's rig.
     if (!chargeOutpostCrucibleFee(get, set)) { set({ pendingFusionSelection: null }); return; }
     get().appendLog(
       'world',
@@ -32104,9 +32572,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // If Qwen is slow / dormant / unavailable, the deterministic name settles
     // instead. The loot is mechanically identical either way — Qwen only adds
     // bespoke flavor, so nothing of value is lost when it doesn't land.
-    // OTA-739 — pass the recently forged armor slots so the slot picker rotates
-    // instead of returning the same slot every time (playtest: 3 forges → 3 head
-    // pieces). Only meaningful for armor; harmless for weapons.
+    // OTA-739 — pass recently forged armor slots so the slot picker rotates
+    // instead of returning the same slot every time. Armor-only; safe for weapons.
     const det = fusion.synthesizeFusionDeterministic(
       selGate.inputs,
       selGate.tagProfile,
@@ -32124,7 +32591,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const catalyst = selCatalyst;
     let factionTheme: import('../engine/itemFusion').FactionTheme | null = null;
     if (catalyst) {
-      // OTA-1024 — canonical: the item passed the faction_gear gate but a stale
+      // OTA-1001 — canonical: the item passed the faction_gear gate but a stale
       // faction-id tag nulled the theme — the catalyst burned un-themed.
       const fac = FACTIONS.find((f) => canonicalItemTags(catalyst).includes(f.id));
       if (fac) {
@@ -32170,8 +32637,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     recordTitleProgress(get, set, { fusionsCompleted: 1 });
     get().appendLog(
       'reward',
-      // OTA-688 — name the ACTUAL kind the player chose (was hard-coded "weapon",
-      // so a forged piece of armor was announced as a weapon).
+      // OTA-688 — name the ACTUAL kind the player chose (was hard-coded "weapon").
       `✦ The Crucible forges ${anOrA(fused.rarity ?? 'Rare')} ${fused.rarity ?? 'Rare'} ${sel.kind === 'armor' ? 'piece of armor' : sel.kind === 'dog_armor' ? 'piece of dog armor' : det.stats.reachClass === 'ranged' ? 'RANGED weapon' : det.stats.reachClass === 'long' ? 'reach weapon (mid range and closer)' : 'close-quarters weapon'} from your reserved pieces — and it's in your pack, still cooling.`,
     );
     get().appendLog(
@@ -32211,11 +32677,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   clearMissionCompleteNotice() { set({ missionCompleteNotice: null }); },
 
-  // OTA-1041 — close the opening crawl. The SEEN flag lives on the CHARACTER
+  // OTA-1018 — close the opening crawl. The SEEN flag lives on the CHARACTER
   // (persisted), so a save that finished or skipped the crawl never gets
   // re-ambushed by it — while REPLAY OPENING (About) can always re-raise it.
   dismissStoryIntro() {
-    // OTA-1042 — closing the FIRST crawl of a brand-new character is the
+    // OTA-1019 — closing the FIRST crawl of a brand-new character is the
     // hand-off to the Arbiter: startNewGame armed the tutorial but held the
     // spoken name prompt so it couldn't print underneath the crawl. Fire it
     // now, once. storyIntroSeen===false only on that first showing — a
@@ -32231,7 +32697,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  // ⚠ OTA-1133 — THE HANDOVER OUT OF DEATH. Owner: "after a few seconds to
+  // ⚠ OTA-1110 — THE HANDOVER OUT OF DEATH. Owner: "after a few seconds to
   // read it, it should go to the character collection screen." Called by a tap
   // on the overlay OR by its own dwell timer, whichever comes first — so this
   // MUST be idempotent. Clearing pendingDeath first is what makes it so: a tap
@@ -32269,12 +32735,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ storyIntro: introPagesFor(p.storyMotive, p.factionId) });
   },
 
-  // OTA-1043 — close the chapter card. Nothing to remember: the phase
+  // OTA-1020 — close the chapter card. Nothing to remember: the phase
   // transition that raised it is already on the player record (and
   // persisted), and the feed carries the transition's narration.
   dismissChapterCard() {
     set({ chapterCard: null });
-    // OTA-1088 — the card was the thing standing in front of the question.
+    // OTA-1065 — the card was the thing standing in front of the question.
     raiseDueFork(get, set);
   },
   setPressure: (tier) => {
@@ -32319,7 +32785,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     raiseDueFork(get, set);
   },
 
-  // OTA-1045 — the one-time veteran motive picker commits here. The pick
+  // OTA-1022 — the one-time veteran motive picker commits here. The pick
   // (or the kept guess — confirming the dealt motive counts) becomes the
   // character's CHOSEN motive: persisted, never asked again. Beats already
   // seen under the old motive keep their ids (motive-prefixed, no
@@ -32340,7 +32806,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       `The Arbiter marks the ledger without looking up. "${title}. So that is why you came down. The mud had its own guess; yours is the one that counts. Walk on."`,
     );
     void get().persist();
-    // ⚠ OTA-1088 — the motive just changed, and forks belong to motives. A
+    // ⚠ OTA-1065 — the motive just changed, and forks belong to motives. A
     // veteran who picks a different motive here inherits THAT motive's
     // questions from wherever their run has already got to; answers recorded
     // under the old motive stay in the map, harmless and unread. Nothing is
@@ -32348,14 +32814,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     raiseDueFork(get, set);
   },
 
-  // OTA-1050 — the dog onboarding popup commits here; the shared finalization
+  // OTA-1027 — the dog onboarding popup commits here; the shared finalization
   // lives in module-level finalizeDogOnboarding (same caps + feed beats the
   // old typed path produced).
   confirmDogOnboarding(breedRaw, nameRaw, sexRaw) {
     finalizeDogOnboarding(get, set, breedRaw, nameRaw, sexRaw);
   },
 
-  // OTA-1050 — the golem naming popup commits here (replaces the typed
+  // OTA-1027 — the golem naming popup commits here (replaces the typed
   // takeover's two branches: seal a name, or keep its making).
   confirmGolemName(name) {
     if (!get().pendingGolemNaming) return;
@@ -32391,7 +32857,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   raiseMissionCompleteNotice(kind, title, body) {
     const prev = get().missionCompleteNotice;
-    // OTA-1058 — also merge into a VICTORY card that's already up. A boss kill
+    // OTA-1035 — also merge into a VICTORY card that's already up. A boss kill
     // that finishes a hunt used to raise two popups that fought over the screen;
     // one battle should read as one result.
     const mergeInto = prev && (prev.title === title || !!prev.heading);
@@ -32419,7 +32885,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // than dropped — its reward lines were captured too, and mergeRewardLines
         // dedupes the overlap.
         rewards: mergeRewardLines(prev?.rewards ?? [], rewards),
-        // OTA-1186 — presentation carries across a merge, and the LONGER hold wins:
+        // OTA-1163 — presentation carries across a merge, and the LONGER hold wins:
         // absorbing a card that asked to be readable must not shorten its valve.
         takeLabel: opts?.takeLabel ?? (same ? prev?.takeLabel : undefined),
         holdMs: Math.max(opts?.holdMs ?? 0, (same ? prev?.holdMs : 0) ?? 0) || undefined,
@@ -32457,7 +32923,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // `collect_only` tag (on every Skyreacher piece + the Beacon Rifle) is the
     // single lock. They still take coating vials (the 3 open resist slots), just
     // never a Crucible slot-upgrade.
-    // OTA-1022 — canonical: a stale Skyreacher piece fed the slot-upgrade and was
+    // OTA-999 — canonical: a stale Skyreacher piece fed the slot-upgrade and was
     // consumed. Same gate, catalog-aware.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     if ((require('../engine/crafting') as typeof import('../engine/crafting')).canonicalItemTags(piece).includes('collect_only')) {
@@ -32469,7 +32935,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // OTA-873 fix — never upgrade a STACK. Stamping coatingSlots / resistCapBonus on a
     // quantity>1 row would upgrade every copy for one 5-piece cost.
-    // OTA-1117 — that used to REFUSE with "split one off first", which is a dead end:
+    // OTA-1094 — that used to REFUSE with "split one off first", which is a dead end:
     // there is no split action anywhere in the game, so a stacked piece could never be
     // upgraded at all and the picker hid it. Peel one unit into its own instance
     // instead — exactly what OTA-800 does for coating a stack — and upgrade that.
@@ -32507,14 +32973,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Crucible cools. "An upgrade takes five reserved pieces — you set ${chosen.length}."`);
       return;
     }
-    // OTA-990 — the upgrade channel pays the same outpost fee as a fuse.
+    // OTA-967 — the upgrade channel pays the same outpost fee as a fuse.
     if (!chargeOutpostCrucibleFee(get, set)) return;
     // Consume one unit of each chosen input and clear its reservation (mirrors
     // applyFusion's drain), then stamp the upgrade on the chosen piece.
     const chosenIds = new Set(chosen.map((i) => i.id));
     set((s) => {
       if (!s.player) return s;
-      // OTA-1117 — a stacked target is peeled first: one unit leaves the row and
+      // OTA-1094 — a stacked target is peeled first: one unit leaves the row and
       // becomes its own instance, and THAT is what the channel is worked into.
       const peeledId = isStack ? freshInstanceId('upg') : itemId;
       const stampUpgrade = (i: InventoryItem): InventoryItem => (isWeaponTarget
@@ -32564,7 +33030,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // The forging may have been scrapped / sold / consumed before it formed — if
     // it's gone, don't resurrect it; just skip the reveal.
     if (!item) return;
-    // OTA-979 — if the piece being renamed is the vest the DOG is currently
+    // OTA-956 — if the piece being renamed is the vest the DOG is currently
     // wearing (equipped while still cooling), keep dog.equipped.vest in step
     // with the new display name — the vestId already matches, but the stored
     // NAME is what narration and legacy fallbacks read.
@@ -32579,7 +33045,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s));
     }
-    // OTA-978 — reach follows the DISPLAYED name. The Qwen namer only settles the
+    // OTA-955 — reach follows the DISPLAYED name. The Qwen namer only settles the
     // name/description; if the final name clearly reads ranged or long
     // ("...Bow", "...Spear"), re-stamp reachClass so the weapon behaves the
     // way it reads. Reach-neutral names keep the forge-time class.
@@ -32612,12 +33078,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       discoveryReveal: {
         title: 'Your forging has formed',
         body: `The Aether settles, and the Crucible's work takes its name:\n\n${name}\n\n${rarity} · it's in your pack now, fully formed.`,
-        // OTA-683/684 — inventory sections default COLLAPSED, so "View in inventory"
+        // OTA-668 — inventory sections default COLLAPSED, so "View in inventory"
         // used to drop the player onto a folded pack with the new piece hidden.
-        // Carry the fused kind (weapon / armor / dog_armor — same id as the category
-        // section) so the screen unfolds that row on arrival, AND the instance id so
-        // the screen scrolls to + briefly highlights the exact piece (a forged weapon
-        // can sort anywhere in a long list, so expanding the section isn't enough).
+        // Carry the fused kind (weapon / armor / dog_armor — same id as the
+        // category section) so the screen unfolds that row on arrival.
         cta: { label: 'View in inventory', screen: 'inventory', inventoryCategory: categorizeItem(item), inventoryItemId: itemId },
       },
     });
@@ -32716,7 +33180,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // the most beating of anything in the pack (every climb tier), so it was
             // ALWAYS the most-worn item — making this mend an infinite-rope engine:
             // free, eternal climbing. Skip ropes so the mend lands on real gear.
-            // OTA-1024 — canonical: a stale rope re-opened the arb141 free-mend farm.
+            // OTA-1001 — canonical: a stale rope re-opened the arb141 free-mend farm.
             if (canonicalItemTags(it).includes('rope')) return;
             if (d && d.max > 0 && d.current < d.max) {
               const f = d.current / d.max;
@@ -32773,7 +33237,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!liveScene || liveScene.enemies.length === 0) { applied = false; break; }
         const idx = Math.max(0, Math.min(liveScene.activeEnemyIdx ?? 0, liveScene.enemies.length - 1));
         const target = liveScene.enemies[idx]!;
-        // OTA-826 [Group-K audit] — this proc's log says "aetheric" but the damage
+        // OTA-806 [Group-K audit] — this proc's log says "aetheric" but the damage
         // was typeless: full damage against the many aetheric-RESISTANT foes
         // (Aetheric Mutation/Creature, Automation, Mechanism, Aetheric Undead) and
         // no bonus vs a vulnerable:aetheric enemy. Apply the aetheric type modifier
@@ -32909,10 +33373,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   scrapInventoryItem(itemName, itemId) {
     const player = get().player;
     if (!player) return;
-    // OTA-953 — scrap the EXACT instance the caller picked by its unique id when given
-    // (the inventory UI passes it). A player with three same-name items of different
-    // durability who selects the worst one must break down THAT one — not whichever
-    // row happens to sort first by name. Falls back to name-match for typed commands.
+    // OTA-930 — scrap the EXACT instance the caller picked by its unique id when given
+    // (the inventory UI passes it). A player with several same-name items of
+    // different durability who selects the worst must break down THAT one — not
+    // whichever row sorts first by name. Falls back to name-match for typed commands.
     const item =
       (itemId ? player.inventory.find((i) => i.id === itemId && i.quantity > 0) : null)
       ?? player.inventory.find(
@@ -33260,7 +33724,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // and lets the player top HP to full by eating, never by sleeping.
     // Each rest still rolls an ambush + advances the clock, so stamina
     // recovery keeps a real cost.
-    // OTA-1001 — #120: rest heals again, LIGHT — ~15% of max HP for a full sleep,
+    // OTA-978 — #120: rest heals again, LIGHT — ~15% of max HP for a full sleep,
     // mirroring how escorts already mend on rest. The old no-HP rule (arb37 /
     // OTA-187) is superseded by the owner's call.
     const heal = Math.min(Math.max(0, player.hpMax - player.hp), Math.ceil(player.hpMax * 0.15));
@@ -33446,7 +33910,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       } else {
         const why = qwen.getLastError() ?? 'Qwen failed to initialize';
         set({ qwenStatus: 'failed', qwenError: why });
-        // ⚠⚠ OTA-1205 — SAY IT IN THE LOG, NOT ONLY IN STATE. OTA-1204 put this reason in
+        // ⚠⚠ OTA-1182 — SAY IT IN THE LOG, NOT ONLY IN STATE. OTA-1181 put this reason in
         // the bug-report header, which requires the player to get far enough to send one.
         // The owner needs the game working on Apple for TestFlight testers, and a tester
         // who never files a report is the common case — but the log ships with any report,
@@ -33457,7 +33921,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       set({ qwenStatus: 'failed', qwenError: message });
-      // OTA-1205 — the throwing path says so too. `initialize()` mostly swallows, but a
+      // OTA-1182 — the throwing path says so too. `initialize()` mostly swallows, but a
       // missing native module throws outright, and that is the one answer that no OTA can
       // fix: it means llama.rn is not in the installed build.
       try { get().appendLog('debug', `qwen: LOAD THREW — ${message}`); } catch { /* ignore */ }
@@ -33470,7 +33934,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // next time the player triggers narration or fusion. Idempotent —
     // starting twice replaces the timer cleanly.
     startQwenWatchdog(get, set);
-    // OTA-1195 — instruments alongside the watchdog: same lifecycle, same teardown rules.
+    // OTA-1172 — instruments alongside the watchdog: same lifecycle, same teardown rules.
     startRuntimePressureWatch(get, set);
   },
 
@@ -33500,7 +33964,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   chooseEndingMainQuest(ending: 'seal' | 'unleash' | 'preserve' | 'stay') {
     const player = get().player;
     if (!player) return;
-    // ⚠⚠ OTA-1248 — THE ENGINE IS THE RULE, THE UI IS A COURTESY. The fourth
+    // ⚠⚠ OTA-1225 — THE ENGINE IS THE RULE, THE UI IS A COURTESY. The fourth
     // door is re-checked here, at the one place an ending is actually recorded,
     // so a stale screen, a replayed tap or anything reaching this action by
     // another route cannot hand out an ending the run did not earn. The three
@@ -33582,7 +34046,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s
     ));
-    // ⚠ OTA-1163 (pressure test) — OTA-1159 fixed the ambient-spawn copy of this
+    // ⚠ OTA-1140 (pressure test) — OTA-1136 fixed the ambient-spawn copy of this
     // card and missed this one: the SUMMONED Guardian still advertised the
     // notation third of its damage and claimed "close" while the set above
     // writes range: 'mid'. Same lie, second copy — now the same fix.
@@ -33599,7 +34063,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hoursElapsed: player.hoursElapsed ?? 0,
       enemyName: guardian.name,
     });
-    // OTA-1075 — see the sibling site above: both Guardian spawns record the
+    // OTA-1052 — see the sibling site above: both Guardian spawns record the
     // relation as well as the milestone row now.
     set((s) => ({
       worldMemory: rememberNpcMeeting(s.worldMemory, {
@@ -33742,7 +34206,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // OTA-413 — report the ACTUALLY-SAVED (pruned + trimmed) blob, not the raw
       // in-memory builtState, so the heartbeat reflects what landed on disk.
       const rpBreakdown = saveSizeBreakdown(trim.state);
-      // OTA-1195 — bank the size so a memory-warning line can name it without rebuilding
+      // OTA-1172 — bank the size so a memory-warning line can name it without rebuilding
       // the blob; allocating to measure while the OS asks for memory back is exactly the
       // wrong move.
       const rpKb = /total=(\d+)/.exec(rpBreakdown);
@@ -33856,7 +34320,7 @@ function applyHookEffect(
       logRepChanges(get, result.changed);
       return { inlineSummary: null, fatal: false };
     }
-    // OTA-1109 — spawn_enemy_name joins spawn_enemy_tag: when the hook's prose
+    // OTA-1086 — spawn_enemy_name joins spawn_enemy_tag: when the hook's prose
     // names the creature (mud_golem_stir narrates a golem), the spawn honors
     // the name instead of rolling the whole tag pool (which handed the owner
     // an Aetheric Scarab where "The Golem turns toward your scent").
@@ -33884,7 +34348,7 @@ function applyHookEffect(
           ? { currentScene: { ...s.currentScene, ...FRESH_ENEMY_ARRAYS, enemies: [spawn], enemyHps: [spawn.hp], activeEnemyIdx: 0, range: 'mid' } }
           : s,
       );
-      // OTA-1109 — the old line said "close range" while the state above sets
+      // OTA-1086 — the old line said "close range" while the state above sets
       // 'mid', and "emerges from the hook" leaked engine jargon into the feed.
       get().appendLog('combat', `${spawn.name} rises to meet you. Combat begins at mid range.`);
       return { inlineSummary: null, fatal: false };
@@ -33934,7 +34398,7 @@ function applyHookEffect(
           },
         };
       });
-      // OTA-1078 — SIGHT THE HOOK-SPAWNED VENDOR. The fifth site. The campfire
+      // OTA-1055 — SIGHT THE HOOK-SPAWNED VENDOR. The fifth site. The campfire
       // Reclaimer carries a faction and takes contracts, so without this both
       // the theft ledger AND the contractsTaken credit silently vanished.
       // Guarded on the vendor actually landing: the set above refuses when a
@@ -33987,14 +34451,18 @@ function applyHookEffect(
         return { inlineSummary: 'a quiet knowing', fatal: false };
       }
     }
-    // OTA-1004 — THE HOLLOWED, hint route. The rumour marker's second beat calls
+    // OTA-965 — HOOK ESCORT: take a field escort from a stranded traveler. Picks a
+    // rep-0 `_stranded_escort` def the player doesn't hold, spawns the shared
+    // pool, and pushes the record — same shape acceptFactionQuest writes, so
+    // collateral / fail / pay / turn-in all work unchanged.
+    // OTA-981 — THE HOLLOWED, hint route. The rumour marker's second beat calls
     // the revenant out of the mud: same pool, same boss, same put-to-rest as
     // the OTA-998 random-encounter spawn — only the doorway differs. An empty
     // or fully-avenged pool reads as a cold trail rather than a dead end.
     case 'spawn_fallen_revenant': {
       const rp = get().player;
       if (!rp) return { inlineSummary: null, fatal: false };
-      // OTA-1017 — never over a live fight: the spawn replaces the enemies array,
+      // OTA-994 — never over a live fight: the spawn replaces the enemies array,
       // which would erase combatants mid-swing. The tale keeps; the pool
       // keeps; the Hollowed can still rise at a later door.
       if ((get().currentScene?.enemies ?? []).length > 0) {
@@ -34006,7 +34474,7 @@ function applyHookEffect(
       if (pool.length === 0) {
         return { inlineSummary: 'the trail is cold — whatever walked here has been put down already', fatal: false };
       }
-      // OTA-1014 — the rumour NAMED a fallen (chainId carries `fallen:<ts>`); the
+      // OTA-991 — the rumour NAMED a fallen (chainId carries `fallen:<ts>`); the
       // thing that rises must be that fallen, not a random pool draw. Put to
       // rest in the meantime → a cold trail, never a stand-in.
       const namedTs = /^fallen:(\d+)$/.exec(hook?.chainId ?? '')?.[1];
@@ -34037,10 +34505,6 @@ function applyHookEffect(
       get().appendLog('debug', `hook: fallen_whisper answered ${fr.name}@${fr.ts} pool=${pool.length}`);
       return { inlineSummary: `${fr.name} answers the name`, fatal: false };
     }
-    // OTA-988 — HOOK ESCORT: take a field escort from a stranded traveler. Picks a
-    // rep-0 `_stranded_escort` def the player doesn't hold, spawns the shared
-    // pool, and pushes the record — same shape acceptFactionQuest writes, so
-    // collateral / fail / pay / turn-in all work unchanged.
     case 'start_escort_contract': {
       const p = get().player;
       if (!p) return { inlineSummary: null, fatal: false };
@@ -34056,7 +34520,7 @@ function applyHookEffect(
       const escortMod = require('../engine/escort') as typeof import('../engine/escort');
       const spec = escortMod.escortSpecForQuest(def);
       const escort = spec ? escortMod.spawnEscortPool(spec.count, p.hpMax ?? 20, spec.label) : null;
-    // OTA-1080 — the escort leader goes on the ledger the moment you take them
+    // OTA-1057 — the escort leader goes on the ledger the moment you take them
       // on. `escort_` keys them by name, so the same person walked twice is one
       // relationship, and whether you got them home is recorded against it below.
       if (escort?.leaderName) {
@@ -34068,7 +34532,7 @@ function applyHookEffect(
         });
       }
 
-      const hasActiveOther = anyTrackedContract(p); // OTA-995 — #118: cross-kind
+      const hasActiveOther = anyTrackedContract(p); // OTA-972 — #118: cross-kind
       const newTracked = !hasActiveOther;
       set((s2) => (s2.player ? {
         player: {
@@ -34080,7 +34544,7 @@ function applyHookEffect(
           ],
         },
       } : s2));
-      // OTA-1078 — a field grant, not a player accept: see bumpQuestsAccepted.
+      // OTA-1055 — a field grant, not a player accept: see bumpQuestsAccepted.
       bumpQuestsAccepted(get, set, { granted: true });
       get().appendLog('reward', `✦ Contract taken in the field — ${def.title}. ${def.objective}`);
       get().appendLog('arbiter', newTracked
@@ -34166,14 +34630,14 @@ function resolveHookOneStep(
     ? '★★ STORY THREAD COMPLETE'
     : `★ STORY THREAD (step ${hook.stage + 1})`;
   get().appendLog('world', `${stageLabel} — ${outcome.line}`);
-  // OTA-1050 — no completion popup at all anymore (owner: redundant next to the
+  // OTA-1027 — no completion popup at all anymore (owner: redundant next to the
   // thread modal's own reward display). The feed line stays immediate — the
   // log remains a complete record — and the modal's completed state renders
   // the payout in a prominent reward strip.
   if (inlineSummaries.length > 0) {
     get().appendLog('reward', `✦ ${inlineSummaries.join(', ')}.`);
   }
-  // OTA-716 — reward for reading. Completing an easy-to-miss STORY THREAD
+  // OTA-699 — reward for reading. Completing an easy-to-miss STORY THREAD
   // occasionally yields a GOOD material on top of the thread's own payout —
   // a sprinkle for the player who followed the lore instead of walking past.
   if (outcome.done) {
@@ -34333,12 +34797,18 @@ function resolveHookOneStep(
       };
       const newAmbient = replaceIn(s.currentScene.ambientNouns);
       const newDisplayed = replaceIn(s.currentScene.displayedAmbientNouns);
-      if (!newAmbient && !newDisplayed) return {};
+      // ⚠ OTA-1244 — the pins get renamed too. They are gated on membership of
+      // `ambientNouns`, so a pinned noun that was renamed here but not there would
+      // silently stop being pinned — the guarantee would survive the rename in
+      // name only.
+      const newPinned = replaceIn(s.currentScene.pinnedAmbientNouns);
+      if (!newAmbient && !newDisplayed && !newPinned) return {};
       return {
         currentScene: {
           ...s.currentScene,
           ...(newAmbient ? { ambientNouns: newAmbient } : {}),
           ...(newDisplayed ? { displayedAmbientNouns: newDisplayed } : {}),
+          ...(newPinned ? { pinnedAmbientNouns: newPinned } : {}),
         },
       };
     });
@@ -34480,7 +34950,7 @@ function runMoveCombatRange(
 // Venom / Burst attacks (Bog Dragon, Architectural Sentinel, Aetheric
 // Cyclops, …) were classified melee and could NEVER counter at far range —
 // the exploit sweep's "kite the hardest non-boss monsters risk-free" finding.
-// OTA-983 — an AIRBORNE enemy ignores the ground: it reaches an elevated player
+// OTA-960 — an AIRBORNE enemy ignores the ground: it reaches an elevated player
 // (and can be met with ANY weapon) as if you stood level. Matched on name /
 // type / traits, same spirit as isRangedEnemy below.
 const AIRBORNE_RE = /\b(wing|winged|fly|flying|flier|aerial|airborne|drone|wasp|hornet|bat|bird|raptor|harpy|wyvern|drake|moth|swarm|gull|vulture|hawk|owl)\b/i;
@@ -34544,7 +35014,7 @@ function grantQuestHook(
     const active = (player.activeHunts ?? []).some((h) => h.id === def.id);
     const done = (player.completedHuntIds ?? []).includes(def.id);
     if (active || done) return;
-    const grantTracked = !anyTrackedContract(player); // OTA-995 — #118
+    const grantTracked = !anyTrackedContract(player); // OTA-972 — #118
     set((s) =>
       s.player
         ? {
@@ -34558,9 +35028,9 @@ function grantQuestHook(
           }
         : s,
     );
-    // OTA-1078 — a hook grant, not a player accept: see bumpQuestsAccepted.
+    // OTA-1055 — a hook grant, not a player accept: see bumpQuestsAccepted.
     bumpQuestsAccepted(get, set, { granted: true });
-    // OTA-1015 — a parked grant says so (the accept sites and the escort hook
+    // OTA-992 — a parked grant says so (the accept sites and the escort hook
     // already do). Silence here meant a hunt that would not advance and no
     // line explaining why.
     if (!grantTracked) {
@@ -34576,7 +35046,7 @@ function grantQuestHook(
     //   - world: explicit confirmation the slate now carries it
     // Locale + abandonment-affordance language are deliberately
     // direct — no flowery framing; this is a UX moment.
-    // OTA-953 — the hunt TITLE already names the place ("The Sludge Behemoth at the
+    // OTA-930 — the hunt TITLE already names the place ("The Sludge Behemoth at the
     // Cradle of Dusk"), so appending "at <location>" here restated it, reading as
     // a doubled hint ("…at the Cradle of Dusk (target: … at the Cradle of Dusk
     // (feeding pool))"). Name just the target; the Arbiter line below points at
@@ -34597,7 +35067,7 @@ function grantQuestHook(
   const active = (player.activeMysteries ?? []).some((m) => m.id === def.id);
   const done = (player.completedMysteryIds ?? []).includes(def.id);
   if (active || done) return;
-  const grantTracked = !anyTrackedContract(player); // OTA-995 — #118
+  const grantTracked = !anyTrackedContract(player); // OTA-972 — #118
   set((s) =>
     s.player
       ? {
@@ -34611,9 +35081,9 @@ function grantQuestHook(
         }
       : s,
   );
-  // OTA-1078 — a hook grant, not a player accept: see bumpQuestsAccepted.
+  // OTA-1055 — a hook grant, not a player accept: see bumpQuestsAccepted.
   bumpQuestsAccepted(get, set, { granted: true });
-  // OTA-1015 — a parked grant says so; see the hunt branch.
+  // OTA-992 — a parked grant says so; see the hunt branch.
   if (!grantTracked) {
     get().appendLog('world', `Parked — you're already running a contract. Activate it in Contracts → Mysteries when you're ready.`);
   }
@@ -34717,7 +35187,7 @@ function desiredMissionLeg(
 // Re-evaluate the active route chain: (re)course toward the current leg's target,
 // transition objective→turn-in when the work completes, and clear the chain when
 // the contract is gone / paused. Safe to call after any travel arrival or kill.
-// OTA-724 — a discoverable (rare/legendary) recipe can turn up as a reward for
+// OTA-706 — a discoverable (rare/legendary) recipe can turn up as a reward for
 // FINISHING things: completing a contract / mystery / storyline / hunt, or
 // cracking open a container. Rolls `chance`, teaches one unknown discoverable
 // recipe from the live table, logs it. Additive — never replaces the real reward.
@@ -34738,7 +35208,7 @@ function maybeTeachRecipeReward(
   get().appendLog('reward', `✦ ${flavor}: ${learned} (${lookupCraftedItem(learned).rarity})! Open Crafting to forge it.`);
 }
 
-// OTA-726 — one-line "what else this trader offers" blurb for the vendor
+// OTA-709 — one-line "what else this trader offers" blurb for the vendor
 // greeting: the rare/legendary recipes they'll teach for TC (a gold sink) plus a
 // reminder that any vendor mends worn gear. Returns null when there's nothing
 // extra to say (e.g. you've already learned everything they'd sell).
@@ -34938,7 +35408,7 @@ let _burstLastAt = 0;
 let _burstCount = 0;
 const BURST_WINDOW_MS = 5000;
 
-/** OTA-1071 — what burst index the NEXT accept will take, WITHOUT mutating.
+/** OTA-1048 — what burst index the NEXT accept will take, WITHOUT mutating.
  *
  *  bumpQuestsAccepted already knew about accept bursts, but only used that
  *  knowledge to throttle its own meta-nag. The per-contract emission ignored
@@ -34966,7 +35436,7 @@ function acceptIsCompact(): boolean {
 /** " (parked)" when a contract lands inactive. Replaces a full dedicated line
  *  ("X added to your slate (paused -- you're already on another contract).
  *  Activate it in Contracts when you're ready.") that repeated verbatim on
- *  every single accept. OTA-1015 added that notice deliberately so parked
+ *  every single accept. OTA-992 added that notice deliberately so parked
  *  grants say so -- this keeps the information and drops twelve repetitions
  *  of the sentence explaining it. */
 function parkedTag(tracked: boolean): string {
@@ -35004,7 +35474,7 @@ const BURST_SLOW_DOWN_LINES = [
   `"That's a lot of promises," the Arbiter says quietly. "Plan your route, or you'll forget half."`,
 ];
 
-/** OTA-1078 — test seam. The granted-burst opt-out was guarded only by grepping
+/** OTA-1055 — test seam. The granted-burst opt-out was guarded only by grepping
  *  for its own `if (opts?.granted) return;`, while the player-visible symptom it
  *  exists to prevent — your next genuine first accept rendering compact — was
  *  asserted nowhere. */
@@ -35015,13 +35485,13 @@ export function _bumpQuestsAcceptedForTest(opts?: { granted?: boolean }): void {
 function bumpQuestsAccepted(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
-  /** OTA-1078 — the world HANDED this over; the player did not take it.
+  /** OTA-1055 — the world HANDED this over; the player did not take it.
    *
    *  Three sites grant a contract off a hook the player walked into — the
    *  field-escort effect, and the hunt and mystery hook grants. All three ran
    *  the full burst path, so a stretch of road that dropped three hooks could
    *  make the Arbiter tell a player who had accepted nothing that they were
-   *  "stacking promises", and — worse, because OTA-1071 keys the compact accept
+   *  "stacking promises", and — worse, because OTA-1048 keys the compact accept
    *  card off the same counter — could make the player's next genuinely FIRST
    *  manual accept render as the compact repeat form.
    *
@@ -35055,7 +35525,7 @@ function bumpQuestsAccepted(
       'arbiter',
       `The Arbiter watches you take the contract. "First one. The work begins now — not when you finish it, not when you cash it in. Now."`,
     );
-    // OTA-1078 — a granted first contract still earns the one-shot line, but it
+    // OTA-1055 — a granted first contract still earns the one-shot line, but it
     // does not open a burst the player never started.
     if (!opts?.granted) {
       _burstLastAt = Date.now();
@@ -35703,14 +36173,14 @@ function triggerMainQuest(
   if (nextState.phase !== 'choice') {
     const line = mq.narrationForPhase(nextState.phase, player.factionId, context);
     if (line) {
-      // OTA-1074 — the main story turning over is not an aside.
+      // OTA-1051 — the main story turning over is not an aside.
       get().appendLog('arbiter', line, { ...STORY_BEAT_META });
     }
   }
-  // OTA-1043 — CHAPTER CARD on every phase transition (story phase 2).
+  // OTA-1020 — CHAPTER CARD on every phase transition (story phase 2).
   // The feed narration above/below stays — the log remains the complete
   // record — while the card is the full-screen cinematic marker on top,
-  // personalized to the character's OTA-1041 story motive. 'ended' has
+  // personalized to the character's OTA-1018 story motive. 'ended' has
   // no card by design: EndingScreen is the ending's own full-screen
   // presentation (it renders the motive epilogue line instead), and
   // chapterCardFor returns null for it (and for 'hook').
@@ -35719,9 +36189,9 @@ function triggerMainQuest(
     const ch = require('../engine/chapters');
     const card = ch.chapterCardFor(nextState.phase, player.storyMotive);
     if (card) set({ chapterCard: card });
-    // ⚠ OTA-1088 — CHAPTER CARDS BECOME DECISIONS, which is the plan's phrase
+    // ⚠ OTA-1065 — CHAPTER CARDS BECOME DECISIONS, which is the plan's phrase
     // for this. Not by making the card itself a fork — the card is a marker
-    // and holds no state a fast tap could lose (OTA-1043) — but by asking the
+    // and holds no state a fast tap could lose (OTA-1020) — but by asking the
     // question the instant it is dismissed. A phase turn with a fork gated on
     // it now reads: cinematic, then decision. With no card (or with the card
     // already gone) the question comes straight up.
@@ -35760,7 +36230,7 @@ function triggerMainQuest(
   // entries so the feed reads as paragraphs. The choice buttons on
   // ContractsScreen already wire up to chooseEndingMainQuest.
   if (prevState.phase === 'descent' && nextState.phase === 'choice') {
-    // ⚠⚠ OTA-1248 — the walk-up now knows whether the FOURTH door is open, so a
+    // ⚠⚠ OTA-1225 — the walk-up now knows whether the FOURTH door is open, so a
     // character who has not earned STAY is never told it exists (an earned door
     // must not read as a withheld one), and then THE RECKONING plays: the
     // Arbiter reads the run back before the buttons. It gates nothing.
@@ -35775,7 +36245,7 @@ function triggerMainQuest(
   }
 }
 
-// OTA-1044 — THE MOTIVE DRIP (story phase 3). Called on every travel arrival,
+// OTA-1021 — THE MOTIVE DRIP (story phase 3). Called on every travel arrival,
 // AFTER triggerMainQuest: delivers at most ONE story event per arrival —
 // either The Missing's resolution (which outranks everything once due) or the
 // next drip beat for the character's motive. Beats are strict-order,
@@ -35810,7 +36280,7 @@ function advanceStoryDrip(
     const kind = drip.resolutionKindFor(motiveId, seed);
     const res = drip.resolutionBlock(motiveId, kind, person);
     const bossKind = drip.bossKindFor(motiveId);
-    // OTA-1074 — the end of The Missing's trail is the single biggest story
+    // OTA-1051 — the end of The Missing's trail is the single biggest story
     // moment a character reaches; it must not scroll past as scenery.
     for (const line of res.arrival) get().appendLog(line.speaker, line.text, { ...STORY_BEAT_META });
     if (kind === bossKind) {
@@ -35838,7 +36308,7 @@ function advanceStoryDrip(
       set({ player: {
         ...cur,
         motiveResolved: kind,
-        // Mirror the original field for the Missing motive so every pre-OTA-1246
+        // Mirror the original field for the Missing motive so every pre-OTA-1223
         // reader (and its suite) keeps seeing what it always saw.
         ...(motiveId === 'missing' ? { missingResolved: kind } : {}),
         inventory: mergeOrPushItem(cur.inventory, keep),
@@ -35926,7 +36396,7 @@ function enemyBuildScore(enemy: Enemy): number {
   return Math.max(1, Math.min(10, ap + hpTier));
 }
 
-// OTA-1029 — EXPORTED: the weapon quick-button tone (InputBox) and the enemy
+// OTA-1006 — EXPORTED: the weapon quick-button tone (InputBox) and the enemy
 // panel's in-range flag (ExplorationScreen) now read reach from THIS resolver
 // — the same one the attack gate rolls with — instead of keeping local
 // re-derivations. The copies missed the forge stamp (uniqueStats.reachClass),
@@ -35954,7 +36424,7 @@ export function playerWeaponReach(
   }
   const w = findWeaponByName(wpName);
   if (!w) {
-    // OTA-978 — a weapon with no catalog row (Crucible forges) reads reach from
+    // OTA-955 — a weapon with no catalog row (Crucible forges) reads reach from
     // its OWN identity: the forge-stamped uniqueStats.reachClass first, then
     // name/tag classification, then the old melee fallback. This is what let
     // the "Resonant Spike" era happen — every fused weapon silently collapsed
@@ -36002,7 +36472,7 @@ function wearEquippedItem(
   const result = boundId
     ? wearItemById(player.inventory, boundId)
     : wearItemByName(player.inventory, itemName);
-  // OTA-982 — fraying warning. The rope warns before it fails; armor and weapons
+  // OTA-959 — fraying warning. The rope warns before it fails; armor and weapons
   // never did — the first thing the player heard was "shatters from wear. It
   // is gone." When the piece this blow/swing just chipped is down to its last
   // few points, say so (wear is always 1, so current === 3 fires exactly once
@@ -36044,7 +36514,7 @@ function wearEquippedItem(
     // handles stacking with any existing copies of that material.
     let dropMsg = '';
     if (result.salvageDrop) {
-      // OTA-969 — the drop phrase used to be a hardcoded "A length of ..." (rope-flavored)
+      // OTA-946 — the drop phrase used to be a hardcoded "A length of ..." (rope-flavored)
       // for EVERY remnant: "A length of Small Rock comes free in your hand." Pick a
       // noun that fits the material instead.
       const dn = result.salvageDrop.name;
@@ -36102,13 +36572,13 @@ export function playerColdResist(player: PlayerCharacter | null): boolean {
   return aggregateArmor(player).resistances.some((r) => r.toLowerCase() === 'cold');
 }
 
-// OTA-946 — the player's full armour resist kinds (lowercased). tickWeather uses this to
+// OTA-923 — the player's full armour resist kinds (lowercased). tickWeather uses this to
 // cancel a weather whose element the player's coatings resist (cold, electrical, burn …),
 // generalising playerColdResist beyond cold only.
 export function playerArmorResistKinds(player: PlayerCharacter | null): string[] {
   if (!player) return [];
   const kinds = aggregateArmor(player).resistances.map((r) => r.toLowerCase());
-  // ⚠⚠ OTA-1207 — THE GIANT'S WATCH grants cold resistance, and it is injected HERE
+  // ⚠⚠ OTA-1184 — THE GIANT'S WATCH grants cold resistance, and it is injected HERE
   // because this one function feeds ~16 call sites: weather ticks, weather stat
   // modifiers, attack penalties, visibility. Adding the kind at the source means the
   // perk works everywhere resistance already matters, with no new plumbing and no site
@@ -36124,12 +36594,12 @@ export function playerArmorResistKinds(player: PlayerCharacter | null): string[]
   return kinds;
 }
 
-/** OTA-1147 — the AC ledger's memory. Session-scoped and combat-local: it only
+/** OTA-1124 — the AC ledger's memory. Session-scoped and combat-local: it only
  *  ever compares one swing to the previous one, so a fresh session starting
  *  from null simply prints nothing until there is something to compare. */
 let _lastEffectiveAc: number | null = null;
 
-/** OTA-1147 — what is actually worn, slot by slot, for the AC ledger line.
+/** OTA-1124 — what is actually worn, slot by slot, for the AC ledger line.
  *  Names the EMPTY slots too: "AC dropped and the chest slot is empty" is the
  *  finding, and a list that silently omits what is missing cannot show it. */
 function describeWornForAcLedger(player: PlayerCharacter): string {
@@ -36142,7 +36612,7 @@ function describeWornForAcLedger(player: PlayerCharacter): string {
   return parts.join(' ');
 }
 
-/** ⚠ OTA-1163 (pressure test) — EVERY per-enemy parallel array, reset in one
+/** ⚠ OTA-1140 (pressure test) — EVERY per-enemy parallel array, reset in one
  *  place. Three agents independently converged on the same defect class: sites
  *  that replace or clear the `enemies` roster wholesale reset SOME of the
  *  parallel arrays and leave the rest — so a hunt boss spawned into a scene
@@ -36160,7 +36630,7 @@ const FRESH_ENEMY_ARRAYS = {
   enemyAmbushUsed: undefined,
 } as const;
 
-/** ⚠ OTA-1160 — THE WEAKNESS HAS TO BE WORTH BRINGING, and until now it was not.
+/** ⚠ OTA-1137 — THE WEAKNESS HAS TO BE WORTH BRINGING, and until now it was not.
  *
  *  The owner threw a Searing Paste at a Guardian carrying `vulnerable:burn` —
  *  her authored weakness, hit with a crafted consumable he had to spend — and
@@ -36182,7 +36652,7 @@ const FRESH_ENEMY_ARRAYS = {
  *  ANSWER CHANGED NOTHING ABOUT WHAT HAPPENED NEXT.
  *
  *  So a weakness hit STAGGERS. A staggered boss forfeits the second swing that
- *  OTA-1159 measured at half its output. In the owner's own round that is 13
+ *  OTA-1136 measured at half its output. In the owner's own round that is 13
  *  damage he does not take — larger than the 9 the vial dealt, and it arrives
  *  as a thing he can SEE working rather than a multiplier he has to compute.
  *
@@ -36224,7 +36694,7 @@ function takeStagger(
   return true;
 }
 
-// ⚠ OTA-1158 — THE AC HALF OF THIS NOW LIVES IN equipment.ts. What is left here
+// ⚠ OTA-1135 — THE AC HALF OF THIS NOW LIVES IN equipment.ts. What is left here
 // is the RESISTANCE walk, which genuinely belongs to the store: combat weights a
 // resist by the slot it came from, and that per-slot tagging has no other home.
 // The AC sum moved out because it had silently become the second implementation
@@ -36280,7 +36750,7 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
     for (const r of inst?.addedResists ?? []) { resistances.push(r); resistSlots.push({ type: r, slot }); }
   }
   // OTA-730's amulet + three-ring AC moved into `equippedGearAc` with the rest
-  // of the gear stack (OTA-1158). It was the piece the panel could not see.
+  // of the gear stack (OTA-1135). It was the piece the panel could not see.
   return { acBonus, resistances, resistSlots };
 }
 
@@ -36302,7 +36772,7 @@ export function effectiveACBreakdown(
   const base = player.ac ?? 10;
   const racialAC = effectiveAC(player, scene); // base + race-conditional context delta
   const raceCtxDelta = racialAC - base;
-  // ⚠ OTA-1158 — SPLIT, so the card can say WHICH gear. A single "armor +8" chip
+  // ⚠ OTA-1135 — SPLIT, so the card can say WHICH gear. A single "armor +8" chip
   // over a panel reading 15 is what made this take three reports to find; "armor
   // +5 · accessories +3" answers it on sight.
   const gearAc = equippedGearAc(player);
@@ -36324,7 +36794,7 @@ export function effectiveACBreakdown(
   if (accessories !== 0) sources.push({ label: 'accessories', delta: accessories });
   if (titleRuinsAc !== 0) sources.push({ label: 'title (ruins)', delta: titleRuinsAc });
   if (statusAdj !== 0) sources.push({ label: 'stance/cover', delta: statusAdj });
-  // ⚠ OTA-1163 (pressure test) — THE TRIM, WHICH THIS BREAKDOWN SKIPPED. The
+  // ⚠ OTA-1140 (pressure test) — THE TRIM, WHICH THIS BREAKDOWN SKIPPED. The
   // resolver trims the standing subtotal (OTA-947) and adds status mods on top
   // at full value; this function claimed to be "the authority" while omitting
   // the trim entirely, so a raw-27 build read 27 on the expanded DEFENSE card,
@@ -36339,11 +36809,16 @@ export function effectiveACBreakdown(
   return { total, base, sources };
 }
 
+// Arbiter rolls enemy counter-attack — transparent to player per rulebook
+// Run a counter-attack from every living enemy in the current scene. The
+// player's single action provoked the whole group. Bail early if the
+// player dies mid-volley so the rest of the group don't pile damage on a
+// corpse.
 // OTA-685 — per-enemy chance to swing at the DOG instead of the commander on a
 // group volley. arb169 had (correctly) closed the "command the dog to dodge the
-// group's retaliation" exploit by routing the WHOLE volley to the player — but it
+// group's retaliation" exploit by routing the WHOLE volley to the player - but it
 // removed the dog from ALL retaliation, so the dog became invulnerable and the
-// entire downed → benched → bleed-out system (and the vest's acBonus) went dead.
+// entire downed -> benched -> bleed-out system (and the vest's acBonus) went dead.
 // This restores dog vulnerability WITHOUT reopening the exploit: the redirect
 // fires on EVERY volley regardless of what the player did, so commanding the dog
 // gives no defensive edge. ~1-in-4 of each enemy's swings goes to the dog; the
@@ -36402,12 +36877,12 @@ export function applyEnemyCounterToDog(
   const now = player.hoursElapsed ?? 0;
   set((s) => {
     if (!s.player?.dog) return s;
-    const d = s.player.dog;
+    const dd = s.player.dog;
     return {
       player: {
         ...s.player,
         dog: {
-          ...d,
+          ...dd,
           hp: newHp,
           ...(downed ? { status: 'waiting_at_base' as const, downedAtHour: now, bleedWarned: false } : {}),
         },
@@ -36426,11 +36901,6 @@ export function applyEnemyCounterToDog(
   }
 }
 
-// Arbiter rolls enemy counter-attack — transparent to player per rulebook
-// Run a counter-attack from every living enemy in the current scene. The
-// player's single action provoked the whole group. Bail early if the
-// player dies mid-volley so the rest of the group don't pile damage on a
-// corpse.
 // OTA-800 — enemy DOT statuses (infection / poison / acid / corruption /
 // electrical / burn / typed) must tick once per COMBAT ROUND, not only on the
 // player's `attack`. Pre-fix the tick lived inline at the top of case 'attack',
@@ -36494,7 +36964,7 @@ function tickEnemyDotsAndMaybeEndFight(
             if (st.turnsRemaining - 1 > 0) {
               remaining.push({ ...st, turnsRemaining: st.turnsRemaining - 1 });
             } else {
-              // ⚠ OTA-1178 — SAY WHICH COATING. `sourceName` is the WEAPON, and one
+              // ⚠ OTA-1155 — SAY WHICH COATING. `sourceName` is the WEAPON, and one
               // weapon can carry two coatings: the owner's "acid-etched smoldering
               // foundry-born slinger" runs acid AND fire. Both lapsed on the same
               // tick at 2026-08-07T03:23:50 and printed the SAME sentence twice,
@@ -36518,7 +36988,7 @@ function tickEnemyDotsAndMaybeEndFight(
         }
         newStatuses[i] = remaining;
       }
-      // ⚠ OTA-1173 (owner tuning) — ACID SHRED CLOSES BACK UP. It used to be
+      // ⚠ OTA-1150 (owner tuning) — ACID SHRED CLOSES BACK UP. It used to be
       // permanent for the fight: one flask in round one carried you to the last
       // blow, which is most of why acid outclassed every other coating.
       //
@@ -36555,7 +37025,7 @@ function tickEnemyDotsAndMaybeEndFight(
         : s);
     }
   }
-  // OTA-980 — (was: last-enemy-only) a DOT tick that drops ANY enemy to 0 kills it
+  // OTA-957 — (was: last-enemy-only) a DOT tick that drops ANY enemy to 0 kills it
   // NOW. The old sweep only fired when EVERY enemy was dead; in a MIXED fight
   // the corpse was left standing at 0 HP "for the next attack to clean up" —
   // owner's log shows a raider at 0/28 hanging around until a whole extra swing
@@ -36566,7 +37036,7 @@ function tickEnemyDotsAndMaybeEndFight(
   return sweepDeadEnemies(get, set);
 }
 
-/** ⚠ OTA-1218 — EXTRACTED VERBATIM FROM `tickEnemyDotsAndMaybeEndFight`, WHICH IS THE
+/** ⚠ OTA-1195 — EXTRACTED VERBATIM FROM `tickEnemyDotsAndMaybeEndFight`, WHICH IS THE
  *  POINT. Resonance Cascade (PUNCHLIST P16) is the second thing in the game that can drop
  *  several enemies at once, and the DOT tick is the first — so it needed exactly this
  *  block. Copying it would have put two spellings of "who died, in what order, and who is
@@ -36612,7 +37082,7 @@ function sweepDeadEnemies(
   return false;
 }
 
-/** ⚠ OTA-1143 — THE VOLLEY AFTER A KILL. Owner's log: *"Bog Hound sat out a
+/** ⚠ OTA-1120 — THE VOLLEY AFTER A KILL. Owner's log: *"Bog Hound sat out a
  *  fight after the Silt Thief died."* It did, and so does every packmate of
  *  anything you drop.
  *
@@ -36646,7 +37116,7 @@ export function runSurvivorVolley(
   runEnemyGroupCounters(get, set, get().player ?? player, opts);
 }
 
-/** OTA-1225 — swap one trait for another on a live enemy, by index. The technique
+/** OTA-1202 — swap one trait for another on a live enemy, by index. The technique
  *  lifecycle lives entirely in TRAITS (technique: → field:/slip_held/veiled_strike →
  *  technique_spent:) so it persists with the scene and shows in the portrait at every
  *  stage, exactly as the resists do. */
@@ -36667,7 +37137,7 @@ function swapEnemyTrait(
   });
 }
 
-/** OTA-1225 — an enemy with an unspent technique CHANNELS instead of swinging (the cost
+/** OTA-1202 — an enemy with an unspent technique CHANNELS instead of swinging (the cost
  *  mirror, owner: "agree" — exactly the player's turn cost, reflected). Returns true if
  *  the enemy spent its action here. Cascade holders WAIT until cornered (hp < 35%) —
  *  burning the burst on round one would waste the drama and the tactic. */
@@ -36758,7 +37228,7 @@ export function runEnemyGroupCounters(
   // Snapshot the enemies up-front so a death mid-volley (player killing
   // one by reaction, etc) doesn't reshape the iteration.
   const attackers = [...scene.enemies];
-  // OTA-1112 — rotate who leads the volley so the melee swing cap below
+  // OTA-1089 — rotate who leads the volley so the melee swing cap below
   // doesn't bench the same tail members every round; the pack takes turns
   // pressing in.
   const volleyLead = attackers.length > 1 ? Math.floor(Math.random() * attackers.length) : 0;
@@ -36766,7 +37236,7 @@ export function runEnemyGroupCounters(
   const benchedBelow: string[] = [];
   const crowdedOut: string[] = [];
   let meleeSwings = 0;
-  // ⚠ OTA-1163 (pressure test) — THE PACK PURSUES. The exploit sweep rated
+  // ⚠ OTA-1140 (pressure test) — THE PACK PURSUES. The exploit sweep rated
   // step-back kiting CRITICAL: nothing in the codebase ever closed the range
   // toward the player — the only mid-combat writer of scene.range was the
   // player's own advance/retreat, the mid→far retreat drew no counter and cost
@@ -36797,7 +37267,7 @@ export function runEnemyGroupCounters(
     // Bail if the player is dead.
     const livePlayer = get().player;
     if (!livePlayer || livePlayer.hp <= 0 || livePlayer.dead) return;
-    // OTA-685 — chance this enemy swings at the dog instead of the commander.
+    // OTA-685 - chance this enemy swings at the dog instead of the commander.
     // Only when the dog is actually at the player's side and up; the swing is
     // then SPENT on the dog (the player is spared it), so the dog genuinely
     // soaks. Fires on every volley regardless of the player's action, so it
@@ -36806,7 +37276,7 @@ export function runEnemyGroupCounters(
     const dogUp = !!dogNow && dogNow.status === 'with_player' && dogNow.hp > 0;
     // OTA-795 — failed-distract redirect wins over the random soak roll.
     const forcedOnDog = dogUp && opts?.forceDogEnemyIdx === liveIdx;
-    // ⚠ OTA-1165 (owner tuning) — BOSSES FIGHT THE PERSON IN FRONT OF THEM.
+    // ⚠ OTA-1142 (owner tuning) — BOSSES FIGHT THE PERSON IN FRONT OF THEM.
     // The random soak silently collapsed 25% of boss rounds to one under-rolled
     // swing at the dog (the redirect skips the second-swing block AND
     // applyEnemyCounterToDog rolls no boss +1d6) — an invisible difficulty
@@ -36818,7 +37288,7 @@ export function runEnemyGroupCounters(
       applyEnemyCounterToDog(enemy, get, set);
       continue;
     }
-    // OTA-983 — ELEVATION: a grounded melee enemy massed at the BASE cannot swing
+    // OTA-960 — ELEVATION: a grounded melee enemy massed at the BASE cannot swing
     // at a player who is up the climb. Airborne enemies fight you level;
     // grounded RANGED enemies still shoot up from below. (Owner: "you can be
     // attacked by airborn creatures and with shots from below.") Summit/wall
@@ -36828,12 +37298,12 @@ export function runEnemyGroupCounters(
       benchedBelow.push(enemy.name);
       continue;
     }
-    // OTA-1112 — PACK ACTION ECONOMY: only MELEE_PACK_SWINGS_PER_ROUND melee
+    // OTA-1089 — PACK ACTION ECONOMY: only MELEE_PACK_SWINGS_PER_ROUND melee
     // blades fit around one person at a time. A 5-raider wall was five attack
     // rolls and five stun rolls a round — more dice than drama (and the sim's
     // whole stall tail). The overflow presses in behind, one line, dedup-quiet.
     //
-    // ⚠ OTA-1116 — THE EXEMPTION IS NOW RANGE-AWARE. 1112 exempted every ranged
+    // ⚠ OTA-1093 — THE EXEMPTION IS NOW RANGE-AWARE. 1112 exempted every ranged
     // enemy outright, reasoning that "a shooter needs no elbow room". True at
     // far; false in a scrum. The owner's five-raider fight was MIXED — two
     // crossbow bodies, three cudgel — so only the cudgels counted, the cap never
@@ -36844,10 +37314,10 @@ export function runEnemyGroupCounters(
     // which is the case the reasoning was actually about.
     const inTheScrum = (liveScene.range ?? 'close') === 'close';
     const meleeAttacker = !enemy.boss && (inTheScrum || !isRangedEnemy(enemy));
-    // ⚠ OTA-1136 — THE CAP MOVES WITH THE PACK, AND BY LESS. A tier that grows
+    // ⚠ OTA-1113 — THE CAP MOVES WITH THE PACK, AND BY LESS. A tier that grows
     // parties without growing this cap does not make the fight harder, it makes
     // it LONGER: the extra bodies queue behind a cap that never lets them act,
-    // and the combatStress stall tail OTA-1112 was written to kill comes
+    // and the combatStress stall tail OTA-1089 was written to kill comes
     // straight back. scaledSwingCap grows at the square root of `pack` and
     // floors at the shipped value, so 'bury_me' presses harder without becoming
     // a shredder and no tier ever swings less than the game does today.
@@ -36856,8 +37326,8 @@ export function runEnemyGroupCounters(
       crowdedOut.push(enemy.name);
       continue;
     }
-    // ⚠ OTA-1164 (owner tuning) — A STAGGER DENIES ONE SWING, WHICHEVER SWING
-    // THAT IS. OTA-1160's stagger cancelled the SECOND swing; the owner's tier
+    // ⚠ OTA-1141 (owner tuning) — A STAGGER DENIES ONE SWING, WHICHEVER SWING
+    // THAT IS. OTA-1137's stagger cancelled the SECOND swing; the owner's tier
     // gate below removes that swing from tier 1-2 Guardians, which would have
     // made the Searing Paste worthless exactly where he fights. So on a gated
     // single-swing boss the stagger denies the ONLY swing this round. That is
@@ -36869,7 +37339,7 @@ export function runEnemyGroupCounters(
       get().appendLog('combat', `${enemy.name} reels — STAGGERED: no swing this round.`, { combatOutcome: 'enemy_miss' });
       continue;
     }
-    // ⚠ OTA-1225 — an unspent technique is channelled HERE, consuming the swing (the
+    // ⚠ OTA-1202 — an unspent technique is channelled HERE, consuming the swing (the
     // cost mirror). Placed after every skip/bench check so a benched or staggered enemy
     // does not get a free channel the player never saw.
     if (enemyChannelsTechnique(get, set, enemy, liveIdx)) {
@@ -36891,8 +37361,8 @@ export function runEnemyGroupCounters(
         && (sceneAfter.enemyHps[liveIdx] ?? 0) > 0
         && sceneAfter.enemies[liveIdx] === enemy;
       if (enemyStillAlive) {
-        // ⚠ OTA-1160 — AND THIS IS WHAT THE WEAKNESS BUYS. A staggered boss
-        // forfeits the second swing OTA-1159 measured at half its round output.
+        // ⚠ OTA-1137 — AND THIS IS WHAT THE WEAKNESS BUYS. A staggered boss
+        // forfeits the second swing OTA-1136 measured at half its round output.
         // Checked here rather than at the top of the volley on purpose: the
         // FIRST swing always lands, so hitting a weakness never makes a boss
         // harmless — it halves the round and gives the player something they
@@ -36906,7 +37376,7 @@ export function runEnemyGroupCounters(
       }
     }
   }
-  // OTA-1163 — the pursuit itself. One band per round, never past 'close',
+  // OTA-1140 — the pursuit itself. One band per round, never past 'close',
   // and only when someone real was actually benched by distance (elevation
   // benching is its own system and stays out of this).
   if (outOfReach.length > 0 && (get().player?.hp ?? 0) > 0) {
@@ -36924,7 +37394,7 @@ export function runEnemyGroupCounters(
       );
     }
   }
-  // OTA-983 — the grounded melee pack that can't reach an elevated player gets ONE
+  // OTA-960 — the grounded melee pack that can't reach an elevated player gets ONE
   // line, not silence (and not five). Standard dedup keeps repeats quiet.
   if (benchedBelow.length > 0 && (get().player?.hp ?? 0) > 0) {
     const first = benchedBelow[0]!;
@@ -36936,7 +37406,7 @@ export function runEnemyGroupCounters(
         : `Below, ${first} circles the base — it cannot reach you up here.`,
     );
   }
-  // OTA-1112 — the swing-capped overflow gets ONE line, not silence (and not
+  // OTA-1089 — the swing-capped overflow gets ONE line, not silence (and not
   // one line per benched raider). Standard dedup keeps round-over-round
   // repeats quiet.
   if (crowdedOut.length > 0 && (get().player?.hp ?? 0) > 0) {
@@ -37046,7 +37516,7 @@ function applyEnemyCounter(
       }
       // Player lands a hit on enemy as part of trading.
       const equipped = player.equipped?.main ? findWeaponByName(player.equipped.main) : null;
-      // OTA-826 [Group-K audit] — the fight-back trade dealt untyped damage,
+      // OTA-806 [Group-K audit] — the fight-back trade dealt untyped damage,
       // bypassing the weakness system on this counter path. Apply the equipped
       // weapon's type (bare-hand = bludgeoning, matching the primary attack) so a
       // trade against a weak/resistant foe scales like a normal swing.
@@ -37106,7 +37576,7 @@ function applyEnemyCounter(
     }
     return bonus;
   })();
-  // ⚠ OTA-1225 — the VEILED strike lands. The Veil channel spent last round's swing; the
+  // ⚠ OTA-1202 — the VEILED strike lands. The Veil channel spent last round's swing; the
   // payoff is +5 on THIS one — the same +5 the player's `stealthed` grants — consumed on
   // use, exactly like ambush_strike above it.
   const veiledBonus = (() => {
@@ -37171,15 +37641,15 @@ function applyEnemyCounter(
     }
   }
   // racialAC already includes player.ac; add the gear stack on top.
-  // OTA-947 — LIGHT AC TAIL-TRIM (see equipment.trimStandingAc). Trim the standing gear AC
+  // OTA-924 — LIGHT AC TAIL-TRIM (see equipment.trimStandingAc). Trim the standing gear AC
   // so a fully-fused build is strong but not untouchable; tactical status/cover mods (dodge,
   // cover, ward) apply on top of the trimmed base at full value.
   const acFromGear = trimStandingAc(racialAC + armorPieces.acBonus + titleRuinsAc);
   const effectiveAc = Math.max(1, acFromGear + statusAcAdjustment(player.statusEffects));
-  // ⚠ OTA-1147 — THE AC LEDGER. Two device logs in a row show the owner's AC
+  // ⚠ OTA-1124 — THE AC LEDGER. Two device logs in a row show the owner's AC
   // dropping from 16 to 10 with no line saying why — the second time with a
   // ~2m40s inventory gap in the middle, which is enough room for anything. The
-  // suspect is the group unequip bar (OTA-1137), but a suspect is not a cause,
+  // suspect is the group unequip bar (OTA-1114), but a suspect is not a cause,
   // and "AC 16" → "AC 10" four minutes apart is not evidence of anything.
   //
   // Rather than guess a third time, MEASURE. This is the one place the number
@@ -37190,7 +37660,7 @@ function applyEnemyCounter(
   // Threshold 2 because ±1 is ordinary (a status ticking on or off), and this
   // must not become noise in a combat log the owner reads by eye. Debug channel
   // only; no behaviour change, and deliberately no attempt to FIX anything —
-  // OTA-1132 is the precedent: instrument first, and let the log name the
+  // OTA-1109 is the precedent: instrument first, and let the log name the
   // culprit before writing a line of remedy.
   {
     const prev = _lastEffectiveAc;
@@ -37256,15 +37726,15 @@ function applyEnemyCounter(
       },
     } : s));
   }
-  // OTA-936 — a WON dodge negates the hit; a LOST dodge is now just a NORMAL to-hit
+  // OTA-913 — a WON dodge negates the hit; a LOST dodge is now just a NORMAL to-hit
   // (armor counts again, no auto-land) instead of the old AC-bypass. Only the perfect
   // OPENING is at stake on the read, not double damage.
-  // OTA-947 — NOTHING IS UNTOUCHABLE. Cap the natural d20 an enemy needs to land, so an
+  // OTA-924 — NOTHING IS UNTOUCHABLE. Cap the natural d20 an enemy needs to land, so an
   // arbitrarily high AC can never buy literal immunity. Below the cap this is the identical
   // AC math (atkTotal >= effectiveAc); it only bites a maxed-out defensive build, floating
   // its hit chance up to ~P(d20 >= ENEMY_HIT_NEEDED_CAP). AC still matters — it pushes the
   // needed roll UP toward the cap (fewer hits), it just can't push it past. Adjustable knob.
-  // ⚠ OTA-1164 (owner tuning) — 13 → 16. The pressure-test sim showed every
+  // ⚠ OTA-1141 (owner tuning) — 13 → 16. The pressure-test sim showed every
   // point of armor past raw 18 bought NOTHING against an ordinary ATK-5 enemy:
   // the cap floored their hit chance at ~40% long before the knee-22 trim ever
   // engaged, so a Legendary set landed the "I upgraded and nothing changed"
@@ -37273,7 +37743,7 @@ function applyEnemyCounter(
   // raw ~21, and the excess past the cap now converts to plate (below).
   const ENEMY_HIT_NEEDED_CAP = 16; // d20>=16 -> ~25% floor hit chance vs any AC
   const acHitNat = Math.max(2, Math.min(ENEMY_HIT_NEEDED_CAP, effectiveAc - (atkTotal - atkRoll)));
-  // ⚠ OTA-1163 (pressure test) — SAY SO WHEN THE CAP DECIDED. At high AC the
+  // ⚠ OTA-1140 (pressure test) — SAY SO WHEN THE CAP DECIDED. At high AC the
   // resolver needs only a natural ENEMY_HIT_NEEDED_CAP, so the log's
   // "= 17 vs your AC 25 — ✓ HIT" read as a contradiction with no explanation:
   // every tank build saw hits its own log said should have missed.
@@ -37281,7 +37751,7 @@ function applyEnemyCounter(
   const wouldHit = dodgeWin === true
     ? false
     : enemyFumble ? false : enemyCrit ? true : atkRoll >= acHitNat;
-  // ⚠ OTA-1218 — TEMPORAL SLIP (PUNCHLIST P16). A held slip eats one blow that would
+  // ⚠ OTA-1195 — TEMPORAL SLIP (PUNCHLIST P16). A held slip eats one blow that would
   // otherwise have landed, then is spent. It sits HERE, at the to-hit verdict, rather than
   // in the damage stack, because the technique's claim is that the blow did not arrive —
   // not that it arrived softened. Nothing downstream (armor, resists, wards) runs.
@@ -37322,7 +37792,7 @@ function applyEnemyCounter(
     hit ? undefined : { combatOutcome: 'enemy_miss' },
   );
   if (slipped) {
-    // OTA-1218 — say it in the world, not only in the roll line. A blow that connects on
+    // OTA-1195 — say it in the world, not only in the roll line. A blow that connects on
     // the maths and then does not arrive reads as a bug unless something names the reason.
     get().appendLog(
       'world',
@@ -37342,7 +37812,7 @@ function applyEnemyCounter(
   //   (b) A SUCCESSFUL dodge only reads ONE attacker; in a crowd the others still
   //       swing, so "I dodged but took damage" read like a failure. Name it.
   if (dodgeWin === false && !enemyCrit) {
-    // OTA-936 — a misread no longer pitches you INTO the blow for 2×; the read just fails
+    // OTA-913 — a misread no longer pitches you INTO the blow for 2×; the read just fails
     // and the swing resolves normally (it can still miss on its own).
     get().appendLog('world', hit
       ? 'Your read is a beat off — you fail to make the opening, and the swing lands the way it always meant to.'
@@ -37353,7 +37823,7 @@ function applyEnemyCounter(
       (e, i) => e !== enemy && (sc?.enemyHps?.[i] ?? e.hp) > 0,
     ).length;
     if (otherLive >= 1) {
-      // OTA-936 — a good read no longer leaves you flat-footed to the pack: while you're
+      // OTA-913 — a good read no longer leaves you flat-footed to the pack: while you're
       // still moving off the dodge, the OTHER attackers this volley swing at +3 to your AC
       // (evasive, one volley). Fixes "I dodged but got mobbed at full anyway."
       set((s) => (s.player ? {
@@ -37416,7 +37886,7 @@ function applyEnemyCounter(
     // dodge contest resolved this swing: the contest replaced the to-hit roll,
     // and stacking the crit reroll under the failed-dodge ×2 made dodging vs a
     // nat-20 FOUR times as deadly as standing still (exploit-sweep finding).
-    // OTA-936 — a nat-20 that pierces a dodge is a NORMAL crit now (2× dice), the same as
+    // OTA-913 — a nat-20 that pierces a dodge is a NORMAL crit now (2× dice), the same as
     // a nat-20 vs a standing player. (The failed-dodge flat 2× this guard balanced against
     // is retired, so crit-doubling no longer needs suppressing on a pierced dodge.)
     if (enemyCrit && dodgeWin !== true) {
@@ -37497,14 +37967,14 @@ function applyEnemyCounter(
       dmg = Math.max(1, Math.ceil(dmg / 2));
       shieldTag = ' (Defensive Protocols shield)';
     }
-    // OTA-947 — GLOBAL MITIGATION FLOOR. The resist/halving layers (armor <=80%, title 1/2,
+    // OTA-924 — GLOBAL MITIGATION FLOOR. The resist/halving layers (armor <=80%, title 1/2,
     // race 1/2, shield 1/2) multiply with only a per-step floor of 1, so a focused build
     // stacked them to ~1 damage and switched the defensive half of combat off. Clamp the
     // post-stack number so a LANDED hit always delivers at least MITIGATION_FLOOR of its raw
     // roll: resists still soak MOST of a matched hit, but a MISMATCHED one visibly leaks
     // damage. The stone ward below is a spent absorb pool (not a passive resist), so it still
     // runs after this and may legitimately zero a hit. Adjustable knob.
-    // ⚠ OTA-1164 (owner tuning) — PLATE: the armor the cap wasted now soaks.
+    // ⚠ OTA-1141 (owner tuning) — PLATE: the armor the cap wasted now soaks.
     // Past ENEMY_HIT_NEEDED_CAP, extra AC used to buy literally nothing. Now
     // every 2 points of capped-off AC shave 1 damage from a landed hit (max
     // −4), so heavy armor stops making you unhittable and starts making hits
@@ -37516,7 +37986,7 @@ function applyEnemyCounter(
       : 0;
     if (plateDr > 0 && dmg > 1) dmg = Math.max(1, dmg - plateDr);
     const MITIGATION_FLOOR = 0.30;
-    // ⚠ OTA-1163 (pressure test) — when the floor overrides the stack, SAY SO.
+    // ⚠ OTA-1140 (pressure test) — when the floor overrides the stack, SAY SO.
     // The bracket clause printed the layer percentages ("[armor −72%, title ½]")
     // computed pre-clamp, so a player auditing their resist stack against the
     // printed numbers could never reconcile them with the damage taken.
@@ -37543,7 +38013,7 @@ function applyEnemyCounter(
       }
     }
 
-    // OTA-936 — the failed-dodge flat 2× (out-of-position) is retired: a misread dodge is
+    // OTA-913 — the failed-dodge flat 2× (out-of-position) is retired: a misread dodge is
     // now just a normal hit resolved against AC above. Only the perfect OPENING is at stake
     // on the read — so a low-DEX dodger is no longer punished DOUBLE for a bad gamble.
 
@@ -37570,7 +38040,7 @@ function applyEnemyCounter(
     // concussive). Independent of the damage-type roll so a trait can
     // stack with a type-based status.
     const traitHit = traitOnHitStatus(enemy.traits);
-    // OTA-1112 — ANTI-STUN-LOCK. While `braced` runs (granted below when an
+    // OTA-1089 — ANTI-STUN-LOCK. While `braced` runs (granted below when an
     // incapacitation takes hold), further stun/paralyze procs cannot land.
     // Non-incapacitating statuses (bleed, poison, chill…) pass through.
     const isIncapKind = (k: string) => k === 'stun' || k === 'paralyzed';
@@ -37580,7 +38050,7 @@ function applyEnemyCounter(
     const incapSuppressed = (newEffect !== null && landedEffect === null)
       || (traitHit !== null && landedTraitHit === null);
 
-    // OTA-982 — armor wear: a landed blow chips ONE worn piece, not the whole
+    // OTA-959 — armor wear: a landed blow chips ONE worn piece, not the whole
     // set. The old loop wore EVERY slot per hit, so a 5-piece set spent 5
     // durability per blow and a 5-raider pack ate a freshly crafted set inside
     // one fight (owner's log: cap, gloves, trousers, wraps, brow guard all
@@ -37617,8 +38087,8 @@ function applyEnemyCounter(
         raceTag: raceResistTag,
         shield: !!shieldTag,
         wardTag,
-        floorEngaged: mitFloorEngaged, // OTA-1163 — the clause admits the clamp
-        plate: plateDr,                // OTA-1164 — capped-off AC soaks instead
+        floorEngaged: mitFloorEngaged, // OTA-1140 — the clause admits the clamp
+        plate: plateDr,                // OTA-1141 — capped-off AC soaks instead
       });
       const msg = killed
         ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}. You fall.`
@@ -37643,7 +38113,7 @@ function applyEnemyCounter(
           label: landedTraitHit.label,
         });
       }
-      // OTA-1112 — the incapacitation that just took hold opens the braced
+      // OTA-1089 — the incapacitation that just took hold opens the braced
       // window: the stunned round plus the recovery rounds it protects.
       if ((landedEffect && isIncapKind(landedEffect.effect.kind))
           || (landedTraitHit && isIncapKind(landedTraitHit.kind))) {
@@ -37661,12 +38131,12 @@ function applyEnemyCounter(
       return { player: { ...nextPlayer, hp: newHp, statusEffects: effects } };
     });
 
-    // OTA-985 — the same connecting swing can catch the escort party the player is
+    // OTA-962 — the same connecting swing can catch the escort party the player is
     // protecting. Uses the final post-mitigation damage, so a clean parry
     // (dmg 0) shields them too.
     applyEscortDamage(get, set, dmg, enemy.name);
 
-    // OTA-959 — LEGIBILITY CUES (once per encounter, after the damage line). A matched
+    // OTA-936 — LEGIBILITY CUES (once per encounter, after the damage line). A matched
     // resist that soaked >=40% earns one plain-language callout; an elemental hit that
     // NOTHING in the loadout touched earns one "that's a hole" warning. The bracket
     // clause on every hit stays the terse record — these are the legible sentence.
@@ -37708,7 +38178,7 @@ function applyEnemyCounter(
       );
     }
 
-    // OTA-1112 — say when the braced window turned an incapacitation away, so
+    // OTA-1089 — say when the braced window turned an incapacitation away, so
     // the mechanic is legible instead of a silently missing status line.
     if (incapSuppressed && !killed) {
       void Promise.resolve().then(() =>
@@ -37771,12 +38241,12 @@ export function damageModClause(opts: {
   raceTag?: string;       // raceResistLabel output — raw " (…)" or ''
   shield?: boolean;       // Defensive Protocols shield active
   wardTag?: string;       // stone-ward soak — raw " (…)" or ''
-  /** OTA-1163 — the MITIGATION_FLOOR clamp overrode the stack: the layers above
+  /** OTA-1140 — the MITIGATION_FLOOR clamp overrode the stack: the layers above
    *  are printed as authored, but the delivered damage is raw×0.30, not their
    *  product. Without this marker a player auditing the percentages against
    *  the damage taken can never make them reconcile. */
   floorEngaged?: boolean;
-  /** OTA-1164 — flat soak from AC past the hit-floor cap (2 excess AC = −1
+  /** OTA-1141 — flat soak from AC past the hit-floor cap (2 excess AC = −1
    *  damage, max −4). Named so a tank can SEE the wasted armor working. */
   plate?: number;
 }): string {
@@ -37822,7 +38292,7 @@ export function recordEnemyIntel(
   });
 }
 
-/** ⚠ OTA-1133 — THE ONE QUESTION EVERY DAMAGE SITE SHOULD ASK. True when the
+/** ⚠ OTA-1110 — THE ONE QUESTION EVERY DAMAGE SITE SHOULD ASK. True when the
  *  player is at or below zero HP and has NOT yet been resolved as dead — i.e.
  *  the exact window in which the game must stop and nothing else may run.
  *  Deliberately reads LIVE state rather than a snapshot: the whole class of bug
@@ -37832,7 +38302,7 @@ export function playerIsDownNotDead(get: () => GameStore): boolean {
   return !!p && p.hp <= 0 && !p.dead;
 }
 
-/** ⚠ OTA-1133 — HP AFTER AN hpMax CHANGE, WITHOUT RESURRECTING ANYONE.
+/** ⚠ OTA-1110 — HP AFTER AN hpMax CHANGE, WITHOUT RESURRECTING ANYONE.
  *  Equipping or displacing +HP gear re-bakes hpMax and carries current HP with
  *  it. The four sites that do this all read `Math.max(1, …)`, whose floor of 1
  *  exists so a big hpMax cut can never leave a living character on zero — a
@@ -37886,7 +38356,7 @@ function handlePlayerDeath(
       kills: player.milestones?.enemiesDefeated ?? 0,
       corruption: tierLabel(corruptionTierOf(player.corruption ?? 0)),
       hours: Math.floor(player.hoursElapsed ?? 0),
-      // OTA-998 — the kit they died in, for the Hollowed revenant they may yet
+      // OTA-975 — the kit they died in, for the Hollowed revenant they may yet
       // become (slot display names; the *Id fields are instance ids, skipped).
       gearNames: (() => {
         const slotPrio = ['main', 'off', 'chest', 'head', 'legs', 'feet', 'amulet', 'ring', 'ring2', 'ring3'];
@@ -37898,7 +38368,7 @@ function handlePlayerDeath(
           })
           .map(([, v]) => String(v)))).slice(0, 6);
       })(),
-      // OTA-1017 — THE RECLAIM: full item copies too, so the revenant can give the
+      // OTA-994 — THE RECLAIM: full item copies too, so the revenant can give the
       // REAL gear back (fused stats intact), not a look-alike or a trophy.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       gear: (require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants')).buildFallenGearSnapshot(player),
@@ -37972,7 +38442,7 @@ function handlePlayerDeath(
     );
   }
 
-  // ⚠ OTA-1133 — THE DEATH SCREEN, instead of a 3.5-second stare at the feed.
+  // ⚠ OTA-1110 — THE DEATH SCREEN, instead of a 3.5-second stare at the feed.
   // Owner: "there should be a crossfade between the game screen and a new
   // screen like the intro screen that gives a brief description of my death
   // lore style and how it ties to my reason for entering the mud world."
@@ -38683,7 +39153,7 @@ function narrateCasualLook(
   // bearings without re-reading 70 words of mood prose.
   const inHub = isHubLocation(player?.currentLocationId ?? null) && !!player?.hubRoomId;
   const hubRoom = inHub ? hubRoomFor(player!.hubRoomId!, hubSkinFactionFor(player!.currentLocationId, player!.factionId)) : null;
-  // OTA-674 — inside a building the scene's microMicroId is a synthetic
+  // OTA-659 — inside a building the scene's microMicroId is a synthetic
   // "building:<id>:<room>" key (stable per-room anti-farm id), which never
   // resolves to a real micro-micro; use the scene's transitArea ("Outpost ·
   // Great Hall") for orientation instead of an outdoor room name.
@@ -38767,7 +39237,7 @@ function narrateCasualLook(
   // Strip climb markers — a noun that's only been CLIMBED shouldn't
   // get hidden from the "You see:" list.
   const lookSearched = nonClimbMarkers(lookRoom?.searchedAmbientNouns).map((n) => n.toLowerCase());
-  // OTA-950 — a noun INVESTIGATED for flavor ("already worked over — nothing more to find") is
+  // OTA-927 — a noun INVESTIGATED for flavor ("already worked over — nothing more to find") is
   // cleared just like a searched/taken one, so drop it from the "You see:" list too. Playtest:
   // "look around sees things I have already investigated and cleared." The look-around filter only
   // honored searchedAmbientNouns (the take/salvage path); it never consulted flavorExhaustedNouns
@@ -38776,7 +39246,7 @@ function narrateCasualLook(
   const lookFlavor = nonClimbMarkers(lookRoom?.flavorExhaustedNouns).map((n) => n.toLowerCase());
   const isConsumedForLook = (displayNoun: string): boolean => {
     const lower = displayNoun.toLowerCase();
-    // OTA-953 — WORD-level match, not raw substrings (see nounTokensMatch). The substring rule
+    // OTA-930 — WORD-level match, not raw substrings (see nounTokensMatch). The substring rule
     // hid unrelated nouns sharing letters: investigating a "rack" hid "cRACKed terminal";
     // "vat" hid "obserVATion window". Partial phrasing of the SAME prop still hides
     // ("rack" vs "armor rack").
@@ -38785,7 +39255,7 @@ function narrateCasualLook(
     const recorded = lookSearched.some(
       (s) => s === lower || s.includes(lower) || lower.includes(s),
     );
-    // OTA-981 — taken is taken (mirrors the engine's once-per-room rule; the
+    // OTA-958 — taken is taken (mirrors the engine's once-per-room rule; the
     // owned-check un-grey re-opened the take farm). And an UN-taken noun shows
     // regardless of what the pack holds — owning a torch from elsewhere must
     // not hide a fresh one the engine would happily grant.
@@ -38876,7 +39346,7 @@ function narrateCasualLook(
     parts.push(`(Type 'leave outpost' to head into the wilds.)`);
   } else {
     const exitLine: string[] = [];
-    // OTA-768 — the Micro-Micro "Room exits" are INDOOR navigation phrases ("forward
+    // OTA-748 — the Micro-Micro "Room exits" are INDOOR navigation phrases ("forward
     // into the Grand Hall", "through the side passage"). They only make sense when the
     // player is genuinely INSIDE a structure. On the open overworld — where cardinal
     // travel IS the navigation — they contradict "you're outside traveling" (playtest:
@@ -38908,6 +39378,10 @@ function narrateCasualLook(
   // to its SOURCE channel so the color matches the original line: a whisper lead
   // reads in the Arbiter's gold, a dog rescue in the dog-quest purple.
   {
+    // Whispers — the emergent NPC leads. describeWhisperStage carries the exact
+    // step objective (target + action + location), the same source the Contracts
+    // screen uses. Skip the bare "Stage: X" fallback (a chain with no authored
+    // per-stage line) so we never print a useless reminder.
     let threadsShown = 0;
     for (const w of player?.activeWhispers ?? []) {
       if (threadsShown >= 3) break; // don't wall off the feed if many are open
@@ -38918,13 +39392,15 @@ function narrateCasualLook(
         threadsShown += 1;
       }
     }
+    // Dog rescue in progress — captors (factionNeutralFight) are holding a dog in
+    // this scene. Re-surfaced on the dog-quest channel so it stays purple.
     if (scene.enemies.some((e) => e.factionNeutralFight)) {
       get().appendLog('dog_quest', `▸ A dog is held here — put down its captors to free it.`);
     }
-    // OTA-668 — standing mission objective (Parley of Factions), so a fight that
+    // OTA-653 — standing mission objective (Parley of Factions), so a fight that
     // interrupted the parley can't leave the player wondering what to do next.
     const missionReminder = activeMissionReminder(player);
-    if (missionReminder) get().appendLog('world', `▸ Mission — ${missionReminder}`);
+    if (missionReminder) get().appendLog('mission', missionReminder);
   }
 
   // 6. Optional hook plant — 30% chance, only if no hook is already active.
@@ -39156,7 +39632,7 @@ function runAethercraft(
     }
   } else {
     // shape / mend — legacy single-item Aether fuel logic.
-    // OTA-970 — two fuel-picker fixes from a playtest where "shape stone"
+    // OTA-947 — two fuel-picker fixes from a playtest where "shape stone"
     // silently ate the player's EQUIPPED Aetheric Locket:
     //  1) The Aetheric Locket is a wearable amulet (detection relic), not
     //     fuel. It's out of the list entirely — a cast can never consume it.
@@ -39335,7 +39811,7 @@ function runAethercraft(
       'world',
       `Aetherstone lifts out of the ground and folds into a shape that walks. ${golem.name} stands ready beside you.${golemEdgeTag} (HP ${golem.hp}/${golem.hpMax}, ${golem.attackDie} ${golem.damageType})`,
     );
-    // OTA-466 — like the dog, a thing you gave life gets a name. OTA-1050 — the
+    // OTA-466 — like the dog, a thing you gave life gets a name. OTA-1027 — the
     // ask now lands in the GolemNamingModal popup, not the typed feed.
     get().appendLog(
       'arbiter',
@@ -39369,9 +39845,9 @@ function runAethercraft(
   set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 2), 0.5) } : s);
 }
 
-// ─── OTA-1218 — THE CHANNEL RUNNER (PUNCHLIST P16) ──────────────────────────────────────
+// ─── OTA-1195 — THE CHANNEL RUNNER (PUNCHLIST P16) ──────────────────────────────────────
 //
-// `engine/aetherTechniques.ts` shipped in OTA-1214 as rules with no caller, which is the
+// `engine/aetherTechniques.ts` shipped in OTA-1191 as rules with no caller, which is the
 // P4 / P14 defect (authored content wired to nothing) with my own name on it. This is the
 // path that makes a technique reachable: `channel <name>`.
 //
@@ -39422,7 +39898,7 @@ function runAetherTechnique(
     return;
   }
 
-  // ⚠⚠ OTA-1223 (PUNCHLIST P18) — THE VEIL REFUSES AN EMPTY ROOM, before fuel is touched.
+  // ⚠⚠ OTA-1200 (PUNCHLIST P18) — THE VEIL REFUSES AN EMPTY ROOM, before fuel is touched.
   // The Veil grants the existing `stealthed` status, and `stealthed` is combat-only by
   // OTA-358's rule: the first action taken with no enemies present expires it. So an
   // out-of-combat channel succeeded, charged fuel + 4 dose + 10 minutes, printed its
@@ -39541,7 +40017,7 @@ function runAetherTechnique(
   void get().persist();
 }
 
-/** OTA-1218 — the four outcomes. ⚠ Every one of them lands in machinery that already
+/** OTA-1195 — the four outcomes. ⚠ Every one of them lands in machinery that already
  *  shipped, and that was the condition for building them at all: a technique whose effect
  *  needs a new subsystem is a technique that ends in nothing while the subsystem is
  *  written. Shield → statusAcAdjustment. Slip → the to-hit verdict in applyEnemyCounter.
@@ -39633,7 +40109,7 @@ function applyWeaponCoatingProc(
     if (proc.kind === 'corruption') {
       corr = [...(corr ?? s.currentScene.enemies.map(() => 0))];
       while (corr.length < n) corr.push(0);
-      // ⚠ OTA-1163 (pressure test) — the arb118 CAP, which the player path has
+      // ⚠ OTA-1140 (pressure test) — the arb118 CAP, which the player path has
       // and this golem mirror silently dropped: uncapped stacks scale
       // coatingDotPerTurn without limit, the exact "unbounded DOT exploit"
       // arb118 closed — reopened through the golem's hands.
@@ -39746,7 +40222,7 @@ function handleGolemCommand(
     const tp = trainGolemStat(workingGolem, 'power', true);
     workingGolem = tp.golem;
     if (tp.leveled) get().appendLog('reward', `✦ ${workingGolem.name}'s Power rises to ${tp.leveled.to}.`);
-    // OTA-1070 — golem_whisperer's canon is "successfully control an Aether
+    // OTA-1047 — golem_whisperer's canon is "successfully control an Aether
     // Golem". A landed strike is the smallest honest unit of that; merely
     // having one stand beside you (the old `!!player.golem`) was not control.
     // handleGolemCommand's `set` is the narrow function-only form;
@@ -39783,7 +40259,6 @@ function handleGolemCommand(
     {
       const gMod = applyDamageTypeModifier(dmg, dmgType, target.type);
       const gTrait = traitDamageMultiplier(target.traits, dmgType);
-      // OTA-715 — reconcile type+trait (trait wins on a discord).
       const gCombined = combineDamageTypeMatch(gMod.match, gTrait.match);
       dmg = Math.max(1, Math.round(dmg * gCombined.multiplier));
       const gTp = BUILTIN_DT_COMBAT[canonDT(dmgType)];
@@ -39838,7 +40313,7 @@ function handleGolemCommand(
       // reward + progression. resolveEnemyDefeat is a pure resolver (no recursive
       // submitPlayerAction), splices all six per-enemy arrays, awards, and
       // persists; we just point the active index at the golem's target first.
-      // OTA-697 — golem.name is a proper noun ("Bob") everywhere else ("Bob attacks",
+      // OTA-930 — golem.name is a proper noun ("Bob") everywhere else ("Bob attacks",
       // "Bob lands …"), so no leading article — "Bob's assault", not "the Bob's assault".
       get().appendLog('world', `${target.name} crumbles under ${golem.name}'s assault.`);
       // OTA-467 — persist the POWER training the killing strike earned BEFORE the
@@ -40026,18 +40501,16 @@ function pickHiddenSmellNounsForLocation(location: Location): string[] {
 
 /** Returns the rescue-scenario id whose hookNouns contain the given
  *  text, or null when no scenario matches. Case-insensitive
- *  substring; the first match wins. */
+ *  substring; the first match wins.
+ *
+ *  ⚠⚠ OTA-1236 — THE RULE MOVED TO `engine/storyNouns` AND THIS DELEGATES TO IT.
+ *  It is not only the dispatch that needs to know a rescue noun now: the bulk
+ *  salvage guard must refuse to scrap one, the loot picker must show it as a lead
+ *  instead of scrap, and INVESTIGATE ALL must run it last. **A protector using a
+ *  different rule from the firer is the same bug as no protector** — a noun the
+ *  engine treats as the dog hook could still be swept. One rule, one place. */
 function matchRescueHookNoun(text: string): RescueScenarioId | null {
-  const t = text.toLowerCase().trim();
-  if (!t) return null;
-  for (const id of Object.keys(RESCUE_SCENARIOS) as RescueScenarioId[]) {
-    const scenario = RESCUE_SCENARIOS[id];
-    for (const noun of scenario.hookNouns) {
-      const nl = noun.toLowerCase();
-      if (t.includes(nl) || nl.includes(t)) return id;
-    }
-  }
-  return null;
+  return rescueScenarioForNoun(text);
 }
 
 /** Spawn the rescue captor for the given scenario into the current
@@ -40048,17 +40521,43 @@ function tryFireRescueScenario(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   scenarioId: RescueScenarioId,
+  /** ⚠⚠ OTA-1241 — THE NOUN THE PLAYER ACTUALLY ENGAGED. Required, because the
+   *  intro used to name the scenario's OWN prop regardless of what was tapped, and
+   *  the census showed that prop is usually not the thing in the room. */
+  engagedNoun: string,
 ): void {
   const player = get().player;
   const scene = get().currentScene;
   if (!player || !scene) return;
   const scenario = RESCUE_SCENARIOS[scenarioId];
   const captor = spawnRescueCaptor(scenarioId, player.factionId);
+  // ⚠⚠ OTA-1241 — THE INTRO NAMES WHAT THE PLAYER LOOKED AT, NOT WHAT THE SCENARIO
+  // IS CALLED. From the owner's device log:
+  //
+  //     [player]    investigate firepit
+  //     [dog_quest] You crest the snare pit. ...
+  //
+  // He looked at a firepit and the game told him he was cresting a snare pit. The
+  // matcher bug that routed him there is fixed above — but ⚠⚠ THE CENSUS FOUND THE
+  // DEEPER PROBLEM: 13 of the 20 rescue hook nouns match NOTHING in the game's 975
+  // scene nouns. `snare pit`, `snare`, `trapper camp`, `cellar door`, `cellar`,
+  // `trapdoor`, `buried structure`, `smelter`, `forge ruin`, `anvil post` — none of
+  // them are things the world actually places. **The snare rescue fires on
+  // `mud pit` and `lobster trap`; the cellar rescue fires only on `hatch`.** So the
+  // loose matcher was not merely a bug, it was LOAD-BEARING, and an intro naming
+  // the scenario's own prop was always going to describe a room the player was not
+  // standing in.
+  //
+  // ⚠ Each line now leads with the engaged noun and lets the scene resolve OUT of
+  // it, so it reads true whether the player tapped a snare pit, a lobster trap or a
+  // firepit. This is the same rule the rest of the project runs on: never describe
+  // a state the game is not in.
+  const engaged = theLower(engagedNoun.trim() || 'it');
   const introLines: Record<RescueScenarioId, string> = {
-    smelter: `You step into the smelter's ruin. The ${scenario.captorName} is here, working a chain that ends in a dog's collar. ${scenario.captorName} sees you. "Walk on. This one's not yours."`,
-    wagon: `The overturned wagon shifts as you approach. The ${scenario.captorName} steps out from behind it, a leash in one hand, the shepherd lashed to the wheel snarling against the cord. "Walk on, stranger. Or stay, and lose."`,
-    cellar: `The cellar door clatters open under your hand. Up out of the dark comes the ${scenario.captorName}, lantern raised, hound chained at their heel. "Down door's closed to you. The dog stays."`,
-    snare: `You crest the snare pit. The ${scenario.captorName} is checking their lines — and one line holds a half-grown mutt, hung by a paw, growling weak. The poacher turns. "That's my catch. Walk."`,
+    smelter: `You come up on ${engaged}, and past it the slag-floor opens out. The ${scenario.captorName} is there, working a chain that ends in a dog's collar. ${scenario.captorName} sees you. "Walk on. This one's not yours."`,
+    wagon: `${theCap(engagedNoun.trim() || 'it')} shifts as you reach it — and behind it the ${scenario.captorName} steps out, a leash in one hand, a shepherd lashed to a wheel and snarling against the cord. "Walk on, stranger. Or stay, and lose."`,
+    cellar: `${theCap(engagedNoun.trim() || 'it')} gives under your hand, and the dark below gives back the ${scenario.captorName} — lantern raised, hound chained at their heel. "Down there's closed to you. The dog stays."`,
+    snare: `You work your way to ${engaged}, and past it a line of snares runs off into the scrub. The ${scenario.captorName} is checking them, and one holds a half-grown mutt, hung by a paw, growling weak. The poacher turns. "That's my catch. Walk."`,
   };
   set((s) => s.currentScene
     ? {
@@ -40122,14 +40621,14 @@ function completeRescueScenario(
   // OTA-177 — victory + onboarding-intro Arbiter beat on the
   // dog_quest channel (purple) so the rescue arc reads as one
   // visually-grouped sequence.
-  // OTA-1098 — victory line only. The old second line ended on the Arbiter
+  // OTA-1075 — victory line only. The old second line ended on the Arbiter
   // asking "What kind of dog is that?" — the POPUP asks exactly that next,
   // and a player who starts typing an answer into the feed gets cut off by
   // the card. The purple beat sets the scene; the card asks the question.
   get().appendLog('dog_quest', scenario.victoryLine);
 }
 
-/** OTA-1050 — one-shot popup finalization (replaces the typed three-step
+/** OTA-1027 — one-shot popup finalization (replaces the typed three-step
  *  state machine). Breed keeps the OTA-142 smart preamble-stripping so a
  *  role-played answer ("looks like a Pitbull") still reads natural; caps
  *  match the old typed path (breed 24, name 16, sex 8). */
@@ -40300,7 +40799,6 @@ function handleDogCombat(
       // traitDamageMultiplier the player's swing uses), then roll the piercing on-hit typed proc.
       const dMod = applyDamageTypeModifier(dmg, 'piercing', target.type);
       const dTrait = traitDamageMultiplier(target.traits, 'piercing');
-      // OTA-715 — reconcile type+trait (trait wins on a discord).
       const dCombined = combineDamageTypeMatch(dMod.match, dTrait.match);
       dmg = Math.max(1, Math.round(dmg * dCombined.multiplier));
       const dTp = BUILTIN_DT_COMBAT[canonDT('piercing')];
@@ -40341,7 +40839,7 @@ function handleDogCombat(
         get().appendLog('world', `${target.name} falls under ${dog.name}'s jaws.`);
         set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: targetIdx } } : s));
         get().resolveEnemyDefeat();
-        // ⚠ OTA-1143 — NO EARLY RETURN. This used to `return` here, which
+        // ⚠ OTA-1120 — NO EARLY RETURN. This used to `return` here, which
         // jumped clean over the arb169 volley eighty lines below — the one that
         // makes commanding the dog cost the player the group's round. So a dog
         // that KILLED bought the free round that a dog that merely bit did not,
@@ -40583,7 +41081,7 @@ function applyItemToDog(
   const hpRoom = Math.max(0, dog.hpMax - dog.hp);
   const healAmount = (() => {
     if (fx && fx.kind === 'consumable') {
-      // OTA-1016 — scaled by the DOG's own frame, matching the batch path below.
+      // OTA-993 — scaled by the DOG's own frame, matching the batch path below.
       return Math.min(hpRoom, scaledHealHP((fx as { healHP?: number }).healHP ?? 0, dog.hpMax));
     }
     // No structured effect, but it IS food/consumable → default food heal.
@@ -41135,7 +41633,7 @@ function runParleyOutcome(
           currentScene: { ...s.currentScene, wanderer: null },
         };
       });
-      // OTA-1080 — talking a lead out of somebody is a dealing. It is what
+      // OTA-1057 — talking a lead out of somebody is a dealing. It is what
       // moves a wanderer off the 'met' rung, so meeting them again reads as
       // meeting somebody rather than another stranger with the same face.
       if (w) {
@@ -41168,7 +41666,7 @@ function runParleyOutcome(
         }
         p = { ...p, inventory: inv };
         if (faction) {
-          // ⚠ OTA-1182 — metered on the GAIN side only. Extorting a faction pays +3
+          // ⚠ OTA-1159 — metered on the GAIN side only. Extorting a faction pays +3
           // to each of their rivals, and this was the cheaper of the two farms: a
           // successful shakedown costs nothing and can be repeated on every patrol.
           // See meterSpiteGains — the loss stays uncapped on purpose.
@@ -41180,12 +41678,12 @@ function runParleyOutcome(
         }
         return { player: p, currentScene: { ...s.currentScene, wanderer: null } };
       });
-      // ⚠ OTA-1080 — SHAKING SOMEBODY DOWN IS A WRONG, and until now it was the
+      // ⚠ OTA-1057 — SHAKING SOMEBODY DOWN IS A WRONG, and until now it was the
       // only form of robbery in the game that cost you nothing personal. Lifting
-      // an item off a vendor's counter has been a `wrongs` since OTA-1072;
+      // an item off a vendor's counter has been a `wrongs` since OTA-1049;
       // putting a hand on a traveller and taking their coins was free, because
       // wanderers were not on the ledger at all. Now they remember — and, like
-      // every other wrong, it is payable off through OTA-1076's amends.
+      // every other wrong, it is payable off through OTA-1053's amends.
       if (w) {
         set((st) => ({ worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(w), { wrongs: 1 }) }));
       }
@@ -41227,7 +41725,7 @@ function runParleyOutcome(
       );
       get().appendLog('world', failLine);
       get().appendLog('combat', `${targetName} rakes you for ${hit} damage.`);
-      // ⚠ OTA-1133 — THIS SITE HAD NO DEATH CHECK. Every other place that
+      // ⚠ OTA-1110 — THIS SITE HAD NO DEATH CHECK. Every other place that
       // takes HP off the player (status DOTs, weather, falls, enemy counters,
       // effect damage) calls handlePlayerDeath when the result hits zero; this
       // one dealt 3+d6 and moved on. runEnemyGroupCounters below then bails
@@ -41395,7 +41893,7 @@ export function tickDogStatus(
       return;
     }
     const downFor = now - dog.downedAtHour;
-    // OTA-938 — surface the bleed-out HARD. Before, one mid-window line was the only warning
+    // OTA-915 — surface the bleed-out HARD. Before, one mid-window line was the only warning
     // and there was no running clock, so players lost the dog without a fair shot. Now
     // escalating Arbiter beats fire at 1/4, 1/2, 3/4 of the window — each once — and every beat
     // states the hours left (StatsPanel also shows a live "⏳ Nh" countdown by the dog's name).
@@ -41666,7 +42164,7 @@ function swingWeaponNoun(
   );
   if (rNounIsWeapon) return rNoun;
   if (/\boff[- ]?hand\b/i.test(actionText)) return player?.equipped?.off ?? null;
-  // OTA-957 — strip equipped weapon names before the bare-hand test (same class of bug as
+  // OTA-934 — strip equipped weapon names before the bare-hand test (same class of bug as
   // OTA-940): "attack with the mud-fist wraps" is a weapon swing, not a punch.
   let bareNounText = actionText.toLowerCase();
   for (const n of [player?.equipped?.main, player?.equipped?.off]) {
@@ -41831,7 +42329,7 @@ let lastQwenGenStartMs = 0;
 const AMBIENT_GEN_COOLDOWN_MS = 90000;
 let lastAmbientGenStartMs = 0;
 
-// OTA-1074 — ARBITER COOLDOWN DISCIPLINE. Owner: interjections that don't
+// OTA-1051 — ARBITER COOLDOWN DISCIPLINE. Owner: interjections that don't
 // follow from the last action.
 //
 // ROOT CAUSE. Every guard on the ambient path runs at generation START — no
@@ -41850,11 +42348,11 @@ let lastAmbientGenStartMs = 0;
 //
 // The fix is NOT the epoch. Every reactive generation bumps that counter, so
 // reusing it here would discard nearly every ambient line and silently kill a
-// feature that only just started working (OTA-1054). What makes an ambient
+// feature that only just started working (OTA-1031). What makes an ambient
 // musing read wrong is not that time passed — it is unprompted by design — but
 // that the SITUATION changed underneath it. So stamp the situation, and check
 // the stamp before speaking.
-// OTA-1074 — STORY BEATS GET VISUAL SEPARATION. Owner: story beats should not
+// OTA-1051 — STORY BEATS GET VISUAL SEPARATION. Owner: story beats should not
 // read as loot chatter.
 //
 // ROOT CAUSE. There is no notion of "story" in the log at all. A main-quest
@@ -41889,7 +42387,7 @@ function takeAmbientStamp(get: () => GameStore): AmbientStamp {
     roomId: get().player?.hubRoomId,
     microId: scene?.microMicroId,
     inCombat: (scene?.enemies?.length ?? 0) > 0,
-    // OTA-1078 — a MONOTONIC counter, not the log length. This read
+    // OTA-1055 — a MONOTONIC counter, not the log length. This read
     // gameLog.length, and gameLog is `.slice(-500)` on every append — so past
     // ~500 entries (about ten minutes of play) the length is pinned and the
     // difference is permanently zero. `log-moved-on` was dead in every real
@@ -41903,9 +42401,9 @@ function takeAmbientStamp(get: () => GameStore): AmbientStamp {
 
 /** null when the line still belongs to the moment; otherwise WHY it doesn't.
  *  The reason string rides the existing `arbiter: ambient …` debug marker so a
- *  pasted log shows the drop and its cause, the same way OTA-1057 surfaced the
+ *  pasted log shows the drop and its cause, the same way OTA-1034 surfaced the
  *  ∅ reasons. */
-/** OTA-1078 — test seams for the staleness pair.
+/** OTA-1055 — test seams for the staleness pair.
  *
  *  A review found that the OTA's own headline fix — pointing the stamp at the
  *  monotonic counter instead of the capped log — was guarded ONLY by a grep for
@@ -41920,11 +42418,11 @@ export function _ambientStaleReasonForTest(at: AmbientStamp): string | null {
 }
 export const _AMBIENT_STALE_LINES = AMBIENT_STALE_LINES;
 
-/** ⚠ OTA-1145 — THE BANK. Step two of the headroom track.
+/** ⚠ OTA-1122 — THE BANK. Step two of the headroom track.
  *
  *  The economics of an ambient musing were upside down. It is generated ON
  *  DEMAND, takes 8–16 seconds, and is then checked against the world it was
- *  composed for — and the OTA-1130 telemetry says two of three came back
+ *  composed for — and the OTA-1107 telemetry says two of three came back
  *  unusable, ~16.6 seconds of model time for lines nobody read. The single
  *  biggest killer is `stale`: the player kept playing while the model wrote,
  *  so by the time the line existed it no longer belonged to the moment.
@@ -41970,8 +42468,8 @@ export function _takeBankedMusingForTest(): string | null {
 }
 export const _MUSING_BANK_CAP = MUSING_BANK_CAP;
 
-/** ⚠ OTA-1152 — THE SCENE-INTRO BANK. The owner's call, taken with the numbers
- *  in front of them: OTA-1151 measured `scene_intro` at 19.3 s = 3.7 wait +
+/** ⚠ OTA-1129 — THE SCENE-INTRO BANK. The owner's call, taken with the numbers
+ *  in front of them: OTA-1128 measured `scene_intro` at 19.3 s = 3.7 wait +
  *  11.0 read + 3.5 write, and showed that even a ZERO-token prompt leaves ~8 s.
  *  Trimming could not fix it. The only fix is to stop the player waiting.
  *
@@ -42010,11 +42508,35 @@ export function _sceneIntroBankSize(): number {
 export function _bankSceneIntroForTest(locId: string, text: string): void {
   bankSceneIntro(locId, text);
 }
+/** ⚠ OTA-1258 (N1) — exported so the suite exercises the REAL key builder rather
+ *  than re-deriving the `loc#room` format, which is exactly the kind of second
+ *  copy that drifts. */
+export function _introBankKeyForTest(locId: string, hubRoomId: string | null): string {
+  return introBankKey(locId, hubRoomId);
+}
 export function _takeBankedSceneIntroForTest(locId: string): string | null {
   return takeBankedSceneIntro(() => useGameStore.getState(), locId);
 }
 export const _INTRO_BANK_PER_LOC = INTRO_BANK_PER_LOC;
 export const _INTRO_BANK_TOTAL = INTRO_BANK_TOTAL;
+
+/** ⚠⚠ OTA-1258 (N1) — THE BANK KEY CARRIES THE ROOM, NOT JUST THE TILE.
+ *
+ *  Every room inside an outpost shares one location id — the owner's log shows
+ *  the Atrium, the Court, the Arsenal and the Workshop all reporting
+ *  `loc=monarch_waystation`. Keyed by location alone, a line written while the
+ *  player stood in one room was SPENT on arrival in another, which is how
+ *  `"You climb down the arch, feeling the weight of the city's collapse before
+ *  you"` came out of the Arbiter's mouth at the Court of Standards — four rooms
+ *  and forty seconds after the climb, which happened in the Atrium.
+ *
+ *  ⚠ THE PREFETCH WRITES FOR TILES, so hub rooms simply have no bank and fall
+ *  through to the live path. That is the honest outcome: **we never wrote a line
+ *  about the Court, so we should not speak one there.** Losing instant arrival
+ *  inside outposts is the correct price for not describing the wrong room. */
+function introBankKey(locId: string, hubRoomId: string | null | undefined): string {
+  return hubRoomId ? `${locId}#${hubRoomId}` : locId;
+}
 
 function bankSceneIntro(locId: string, text: string): void {
   if (!locId || !text) return;
@@ -42023,7 +42545,7 @@ function bankSceneIntro(locId: string, text: string): void {
   if (rows.length >= INTRO_BANK_PER_LOC) rows.shift();
   rows.push({ text, at: Date.now() });
   sceneIntroBank.set(locId, rows);
-  // ⚠ OTA-1153 — AND WRITE THE AUDIO WHILE WE ARE HERE. OTA-1152 made the text
+  // ⚠ OTA-1130 — AND WRITE THE AUDIO WHILE WE ARE HERE. OTA-1129 made the text
   // free and, in doing so, made the read-then-hear gap MORE visible: the words
   // became instant while the voice still had to be synthesised on arrival. The
   // owner named the symptom exactly — "you read it then hear it 10 seconds
@@ -42038,7 +42560,7 @@ function bankSceneIntro(locId: string, text: string): void {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const piper = require('../voice/PiperTTSManager') as typeof import('../voice/PiperTTSManager');
-    // ⚠ OTA-1162 (audit) — presynthesize what will actually be SPOKEN. The live
+    // ⚠ OTA-1139 (audit) — presynthesize what will actually be SPOKEN. The live
     // path runs every arbiter line through stripArbiterFrame before Kokoro sees
     // it (TTSController), but the bank was pre-synthesizing the RAW text — so
     // for any intro carrying quoted dialogue, the cache key could never match
@@ -42082,7 +42604,7 @@ function takeBankedSceneIntro(get: () => GameStore, locId: string): string | nul
   return null;
 }
 
-/** ⚠ OTA-1152 — WHERE THE PLAYER CAN BE ONE STEP FROM NOW. The current location
+/** ⚠ OTA-1129 — WHERE THE PLAYER CAN BE ONE STEP FROM NOW. The current location
  *  comes FIRST, and not as a formality: a cardinal step onto unnamed ground
  *  rebuilds the scene right where the player stands, and that is the common
  *  case by a wide margin — most tiles carry no named location at all. Then any
@@ -42175,13 +42697,12 @@ function trainAcceptCharismaGated(
 // everything up to and including that character. Falls back to the raw
 // text if nothing terminal is present (rare — would only happen on a
 // single-fragment generation that never landed a punctuation mark).
-// OTA-678 — cached allow-list of every canon entity name the Qwen narrator may
+// OTA-663 — cached allow-list of every canon entity name the Qwen narrator may
 // legitimately say: locations, factions (+ subtitles), races, and lore-concept
-// titles + keywords. Built once from static world data; the per-call set (below)
-// adds the live player name + current scene entities. Feeds the entityGuard so an
-// INVENTED multi-word place/faction name gets dropped from the model's prose (which
-// then falls back to the authored template) — the safety net that enforces the
-// prompt's "never name a place not listed here" rule.
+// titles + keywords. Built once from static world data; the per-call set adds the
+// live player name + current scene entities. Feeds the entityGuard so an INVENTED
+// multi-word place/faction name gets dropped from the model's prose (which then
+// falls back to the authored template).
 let _narrationAllowStatic: Set<string> | null = null;
 function narrationAllowStatic(): Set<string> {
   if (_narrationAllowStatic) return _narrationAllowStatic;
@@ -42203,7 +42724,7 @@ function narrationAllowStatic(): Set<string> {
       for (const k of (c.keywords ?? [])) names.push(k);
     }
   } catch { /* concepts optional */ }
-  // ⚠ OTA-1178 — THE WORLD LADDER NAMES PLACES TOO, and leaving it out meant the
+  // ⚠ OTA-1155 — THE WORLD LADDER NAMES PLACES TOO, and leaving it out meant the
   // narrator could not say the name of the room it was standing in.
   //
   // `allLocations` is locations.json only — 36 entries. Biomes, districts and
@@ -42216,7 +42737,7 @@ function narrationAllowStatic(): Set<string> {
   // The player was in Etheric Engine Chamber at the time — look-around said so.
   // We told the model where it was, then threw away every sentence that repeated
   // it back. That is a large share of the long-running "ambient is always empty"
-  // complaint (OTA-1054/1057/1147), and it cost 6-11s of on-device model time per
+  // complaint (OTA-1031/1057/1147), and it cost 6-11s of on-device model time per
   // discarded line. Built once and cached with the rest of this set.
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -42240,7 +42761,7 @@ function narrationEntityAllow(get: () => GameStore): ReadonlySet<string> {
   const dyn: string[] = [];
   if (p?.name) dyn.push(p.name);
   if (scene?.location?.name) dyn.push(scene.location.name);
-  // ⚠ OTA-1178 — AND THE SUB-ROOM, not just its parent Location. `location.name`
+  // ⚠ OTA-1155 — AND THE SUB-ROOM, not just its parent Location. `location.name`
   // was "Ostragar" while the player stood in "Etheric Engine Chamber" — the name
   // the context injector hands the model, and the name look-around prints. We
   // told it where it was and then binned every sentence that said so.
@@ -42313,7 +42834,7 @@ function clampSentences(raw: string, maxSentences: number): string {
   return s;
 }
 
-/** ⚠ OTA-1154 — THE ARBITER STOPS BEING A CHATTY KATHY.
+/** ⚠ OTA-1131 — THE ARBITER STOPS BEING A CHATTY KATHY.
  *
  *  Straight from the device log. Ten seconds, one tile, five `investigate`
  *  taps, five unrelated lore lines:
@@ -42436,7 +42957,7 @@ async function narrateViaArbiter(
    * intent lets the scene-entry path through.
    */
   intent: string = 'scene_intro',
-  /** ⚠ OTA-1152 — PRE-GENERATION, and it is the same trick OTA-1145 used for
+  /** ⚠ OTA-1129 — PRE-GENERATION, and it is the same trick OTA-1122 used for
    *  ambient. `bankOnly` writes the finished line into the scene-intro bank
    *  instead of speaking it; `forLocation` narrates a place the player is not
    *  standing in yet. Everything between — model readiness, prompt assembly,
@@ -42460,16 +42981,16 @@ async function narrateViaArbiter(
   // arb161 — cooldown: don't grab the native-ML lock again until enough time has
   // passed, so the voice (which shares the lock) isn't starved by back-to-back
   // generations on every investigate.
-  // ⚠ OTA-1152 — THE COOLDOWN IS A RATION ON THE *VOICE LOCK*, so background
+  // ⚠ OTA-1129 — THE COOLDOWN IS A RATION ON THE *VOICE LOCK*, so background
   // fill is not subject to it. A homework generation already sits below voice
   // in the lock queue and is cut short the moment a real call arrives
-  // (OTA-1146), which is a stronger guarantee than a timer. Applying the
+  // (OTA-1123), which is a stronger guarantee than a timer. Applying the
   // cooldown here as well would mean the bank could only ever fill in the gaps
   // between the very generations it exists to eliminate.
   const cooldownActive = !opts?.bankOnly
     && (Date.now() - lastQwenGenStartMs) < QWEN_GEN_COOLDOWN_MS;
   if (!qwen.isReady() || get().isGenerating || inCombat || !intentAllowsQwen || cooldownActive) {
-    // OTA-1152 — a background fill has no line to fall back to and no player
+    // OTA-1129 — a background fill has no line to fall back to and no player
     // waiting on it. It simply does not run this tick, silently, and the next
     // tick asks again.
     if (opts?.bankOnly) return;
@@ -42499,7 +43020,7 @@ async function narrateViaArbiter(
     speakArbiterFlavor(get, trimmed);
     return;
   }
-  // ⚠ OTA-1152 — NARRATING A PLACE THE PLAYER HAS NOT REACHED YET. The slice
+  // ⚠ OTA-1129 — NARRATING A PLACE THE PLAYER HAS NOT REACHED YET. The slice
   // carries the destination's STATIC facts only: its name, its type tags, its
   // authored description. Weather, hazards, enemies and the vendor are rolled
   // at arrival by beginScene and cannot be known now — so they are left out
@@ -42522,7 +43043,7 @@ async function narrateViaArbiter(
   // World-ladder override — when beginScene picked a Micro-Micro for this
   // visit, fold it into the context so the Arbiter narrates at the room
   // tier instead of the flat Location tier.
-  // OTA-1152 — never for a pre-generated destination: the room the ladder
+  // OTA-1129 — never for a pre-generated destination: the room the ladder
   // would pick is chosen fresh on arrival, so borrowing the CURRENT room's
   // ladder would write about the wrong room entirely.
   const ladder = scene.microMicroId && !forLoc
@@ -42535,7 +43056,7 @@ async function narrateViaArbiter(
     ladder,
   });
   const messages = buildSystemPrompt(ctx);
-  // ⚠ OTA-1152 — A BACKGROUND FILL DOES NOT OWN THE EPOCH. The epoch exists so
+  // ⚠ OTA-1129 — A BACKGROUND FILL DOES NOT OWN THE EPOCH. The epoch exists so
   // the player's next action CANCELS an in-flight reaction, because a stale
   // reaction is wrong. A pre-written intro is never stale in that sense — it is
   // about a place, not about a keystroke — so bumping the epoch here would do
@@ -42545,7 +43066,7 @@ async function narrateViaArbiter(
   // changes, which is the weaker claim it is entitled to make.
   const myEpoch = opts?.bankOnly ? arbiterGenerationEpoch : ++arbiterGenerationEpoch;
   const t0 = Date.now(); // arb134 — Qwen generation latency for the debug marker
-  // OTA-1152 — background fill does not arm the voice cooldown either; see the
+  // OTA-1129 — background fill does not arm the voice cooldown either; see the
   // note on `cooldownActive`. It DOES take `isGenerating`, because that is the
   // one-job-at-a-time flag and a fill is a job.
   if (!opts?.bankOnly) lastQwenGenStartMs = t0;
@@ -42566,7 +43087,7 @@ async function narrateViaArbiter(
     //   combat:   1 short sentence ≈ 20 words ≈ 28 tokens → cap 30
     //   peaceful: 1 short sentence ≈ 20 words ≈ 28 tokens → cap 34
     const maxTokens = ctx.in_combat ? 30 : 34;
-    // OTA-1053 — the streaming tail is VETTED now. It used to mirror raw model
+    // OTA-1030 — the streaming tail is VETTED now. It used to mirror raw model
     // tokens straight to the screen, so when the model recited its own brief the
     // player read the prompt under "The Arbiter:" for the whole generation. The
     // post-generation filters below could only ever clean the FINAL line — by
@@ -42581,7 +43102,7 @@ async function narrateViaArbiter(
         // Only update the buffer if we're still the active generation.
         if (myEpoch !== arbiterGenerationEpoch) return;
         streamed += token;
-        // OTA-1152 — a fill accumulates but never mirrors. See above.
+        // OTA-1129 — a fill accumulates but never mirrors. See above.
         if (opts?.bankOnly || previewBlocked) return;
         if (looksLikeInstructionEcho(streamed)) {
           previewBlocked = true;
@@ -42592,18 +43113,26 @@ async function narrateViaArbiter(
       },
       {
         maxNewTokens: maxTokens,
-        // OTA-1152 — the fill is labelled separately so the telemetry can price
+        // OTA-1129 — the fill is labelled separately so the telemetry can price
         // it apart from the narration it is meant to replace, and it rides
-        // OTA-1146's homework priority: below the voice, and cut short the
+        // OTA-1123's homework priority: below the voice, and cut short the
         // instant a real call is enqueued.
         job: opts?.bankOnly ? `narration:${intent}_fill` : `narration:${intent}`,
         homework: opts?.bankOnly === true,
       },
     );
-    if (myEpoch !== arbiterGenerationEpoch) {
-      // OTA-1152 — for a FILL this is the ordinary outcome, not a loss: the
-      // player acted, the harness cut the job short, and nothing was owed.
-      noteQwenDiscarded(opts?.bankOnly ? 'intro-fill:preempted' : 'cancelled:player-acted-again');
+    // ⚠⚠ OTA-1258 (N3) — A PREEMPTED FILL KEEPS ITS TEXT INSTEAD OF BINNING IT.
+    // The runtime has ALWAYS returned the tokens that had already assembled
+    // (`const text = (assembled || result.text || '')` in LlamaRuntime) — this
+    // function then threw them away on the epoch check, before any of the
+    // cleaning below had run. For a LIVE narration that is correct: the player
+    // has moved on and the line must not be spoken. **For a FILL there is nothing
+    // to speak** — it goes into the bank and is re-vetted again at spend time, so
+    // late text is still free text later. That was the entire premise of the bank
+    // (OTA-1129); the preempt path just never got the memo.
+    const preemptedFill = opts?.bankOnly === true && myEpoch !== arbiterGenerationEpoch;
+    if (myEpoch !== arbiterGenerationEpoch && !preemptedFill) {
+      noteQwenDiscarded('cancelled:player-acted-again');
       return;
     }
     // Trim to the last complete sentence so we never display a partial
@@ -42623,16 +43152,15 @@ async function narrateViaArbiter(
     // player paused..." despite the prompt. Drop those sentences and
     // fall back to the template if NOTHING usable survives, so the
     // arbiter feed never reads as a recap about someone else.
-    // OTA-678 — off-canon entity guard: drop any sentence naming a multi-word
-    // place/faction the model INVENTED (not in the world's location/faction/race/
-    // concept set + live scene entities). Nothing survives → the `|| trimmed`
-    // fallback restores the authored template, so the feed never logs a fake place.
+    // OTA-663 — off-canon entity guard: drop any sentence naming a multi-word
+    // place/faction the model INVENTED; nothing survives → `|| trimmed` restores
+    // the authored template, so the feed never logs a fake place.
     const narrationAllow = narrationEntityAllow(get);
     const survivors = capped
       .split(/(?<=[.!?])\s+/)
       .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
       .filter((s) => !/^\s*they\s/i.test(s))
-      // OTA-1053 — drop a sentence that is the brief coming back rather than a
+      // OTA-1030 — drop a sentence that is the brief coming back rather than a
       // line. Nothing survives → the `|| trimmed` fallback restores the template.
       .filter((s) => !looksLikeInstructionEcho(s))
       .filter((s) => !sentenceNamesOffCanonEntity(s, narrationAllow))
@@ -42653,7 +43181,7 @@ async function narrateViaArbiter(
     // a template lands in the same millisecond). `usedFallback` flags the rare
     // case where the cleaned model output was empty and the template carried it.
     const usedFallback = finalText === trimmed;
-    // ⚠ OTA-1152 — THE ONLY LINE THAT DIFFERS. Everything above ran exactly as
+    // ⚠ OTA-1129 — THE ONLY LINE THAT DIFFERS. Everything above ran exactly as
     // it does for a live narration, which is the point: the bank stores VETTED
     // prose, not raw model output, so a spent line has already passed the
     // foreign-word strip, the sentence cap, the third-person filter, the echo
@@ -42661,10 +43189,37 @@ async function narrateViaArbiter(
     if (opts?.bankOnly) {
       // A fill that fell through to the template banked nothing — the template
       // is already free and already available at arrival.
-      if (usedFallback || repDup) {
-        noteQwenDiscarded(repDup ? 'intro-fill:near-dup' : 'intro-fill:∅');
+      // ⚠⚠ OTA-1258 (N1) — A BANKED LINE MUST NOT NARRATE AN ACTION. The bank is
+      // the one channel where TIME PASSES between writing and speaking, so a
+      // sentence about what the player is DOING is true only in the instant it was
+      // generated. `"You climb down the arch…"` was written while the owner was on
+      // the arch and spoken four rooms later. The ambient channel has filtered this
+      // shape since it was built; the intro bank never did. **One checker, both
+      // channels** — a second copy of the rule would drift from the first.
+      const introOpener = finalText.split(/(?<=[.!?])\s+/)[0] ?? '';
+      const narratesAction = isSecondPersonActionOpener(introOpener);
+      // ⚠⚠ OTA-1258 (N3) — A PREEMPTED PARTIAL MUST END IN A WHOLE SENTENCE.
+      // `trimToLastSentence` returns its input UNCHANGED when it finds no terminal
+      // punctuation ("no terminal punctuation found — keep the raw text"), which is
+      // right for a completed generation and wrong for one cut mid-word: banking
+      // that would store `"…a single chair faces"` and speak it later as if it were
+      // finished. Only the preempted path can produce that, so only it pays the
+      // check.
+      const endsWhole = /[.!?]["']?$/.test(finalText);
+      const truncated = preemptedFill && !endsWhole;
+      if (usedFallback || repDup || narratesAction || truncated) {
+        noteQwenDiscarded(
+          truncated ? 'intro-fill:preempted-partial'
+            : narratesAction ? 'intro-fill:action-opener'
+              : repDup ? 'intro-fill:near-dup' : 'intro-fill:∅',
+        );
       } else {
-        bankSceneIntro(forLoc?.id ?? scene.location.id, finalText);
+        bankSceneIntro(
+          forLoc
+            ? introBankKey(forLoc.id, null)
+            : introBankKey(scene.location.id, get().player?.hubRoomId ?? null),
+          finalText,
+        );
       }
       get().appendLog('debug',
         `homework: scene_intro "${forLoc?.name ?? scene.location.name}"`
@@ -42672,14 +43227,14 @@ async function narrateViaArbiter(
       return;
     }
     get().appendLog('arbiter', finalText);
-    // OTA-1154 — a generated line is still the Arbiter talking; it starts the
+    // OTA-1131 — a generated line is still the Arbiter talking; it starts the
     // quiet period the same as an aside does.
     noteArbiterSpoke();
     if (repDup) noteQwenDiscarded('near-duplicate→template');
     else if (usedFallback) noteQwenDiscarded('empty→template');
     get().appendLog('debug', `arbiter: qwen ✓ ${Date.now() - t0}ms (intent=${intent}${repDup ? ', near-dup→template' : usedFallback ? ', empty→template' : ''})`);
   } catch {
-    // OTA-1152 — a failed fill is silent. There is no template to fall back to
+    // OTA-1129 — a failed fill is silent. There is no template to fall back to
     // because nobody asked for a line yet, and a debug line per failure would
     // be noise on a path that runs unattended.
     if (opts?.bankOnly) return;
@@ -42691,7 +43246,7 @@ async function narrateViaArbiter(
   } finally {
     // Only clear flags if we're still the active generation; otherwise the
     // newer generation owns them.
-    // OTA-1152 — a fill never bumped the epoch, so it must release
+    // OTA-1129 — a fill never bumped the epoch, so it must release
     // `isGenerating` on its own terms; leaving it set would wedge every later
     // generation behind a background job that has already finished.
     if (opts?.bankOnly) set({ isGenerating: false });
@@ -42776,7 +43331,7 @@ function generatedLineRepeatsRecent(get: () => GameStore, text: string): boolean
   return isRepetitiveArbiterLine(text, recent);
 }
 
-/** OTA-1145 — the rest-window filler. Deliberately a thin wrapper rather than
+/** OTA-1122 — the rest-window filler. Deliberately a thin wrapper rather than
  *  its own generation path: a second copy of the vetting pipeline would drift
  *  from the live one, and the filters ARE the feature (five OTAs of register,
  *  echo and off-canon work live in them). One extra musing per rest, capped. */
@@ -42791,7 +43346,7 @@ async function fillMusingBank(
 async function maybeGenerateAmbientArbiter(
   get: () => GameStore,
   set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
-  // OTA-1145 — bankOnly: write the musing into the bank instead of speaking it.
+  // OTA-1122 — bankOnly: write the musing into the bank instead of speaking it.
   // Everything upstream (muzzles, model readiness, prompt, vetting) is shared;
   // only the last step differs.
   opts?: { bankOnly?: boolean },
@@ -42807,13 +43362,13 @@ async function maybeGenerateAmbientArbiter(
   // feels between climbing down and the INVESTIGATE prompt. Resumes at the
   // post-investigate explore/leave choice (see inScriptedTutorialPhase).
   if (inScriptedTutorialPhase(get)) return;
-  // ⚠ OTA-1145 — SPEND BEFORE YOU GENERATE. A banked musing is spoken with
+  // ⚠ OTA-1122 — SPEND BEFORE YOU GENERATE. A banked musing is spoken with
   // zero model time, so this sits ABOVE the readiness and cooldown gates: the
   // bank works even while Qwen is reloading, and a line that costs nothing
   // should not be rationed by a cooldown that exists to ration generations.
   // It stays below the combat and tutorial muzzles, which are about whether a
   // musing is WANTED at all.
-  // ⚠ OTA-1154 — AND NOT ON TOP OF SOMETHING HE JUST SAID. In the log that
+  // ⚠ OTA-1131 — AND NOT ON TOP OF SOMETHING HE JUST SAID. In the log that
   // motivated the budget, an ambient musing landed in the middle of five
   // investigate asides. Ambient keeps its own wide cooldown and its own
   // reasons; what it gains here is only the SHARED silence, so two Arbiter
@@ -42854,7 +43409,7 @@ async function maybeGenerateAmbientArbiter(
   });
   const messages = buildSystemPrompt(ctx);
   const t0 = Date.now();
-  // OTA-1074 — the situation this line is being composed FOR. Checked again
+  // OTA-1051 — the situation this line is being composed FOR. Checked again
   // before it speaks; see ambientStaleReason.
   const stamp = takeAmbientStamp(get);
   lastAmbientGenStartMs = t0;
@@ -42863,7 +43418,7 @@ async function maybeGenerateAmbientArbiter(
   lastQwenGenStartMs = t0;
   set({ isGenerating: true, partialArbiterText: '' });
   try {
-    // OTA-1053 — same vetted tail as the reactive path. THIS is the generation the
+    // OTA-1030 — same vetted tail as the reactive path. THIS is the generation the
     // owner caught: the ambient brief came back verbatim, streamed raw to the
     // screen, and was then correctly filtered to nothing — the log shows
     // "arbiter: ambient ∅", a line that never existed as far as the feed knew.
@@ -42881,34 +43436,34 @@ async function maybeGenerateAmbientArbiter(
         }
         set({ partialArbiterText: streamed });
       },
-      // OTA-1146 — THE BANK'S FILLER IS THE FIRST HOMEWORK JOB, and it is the
+      // OTA-1123 — THE BANK'S FILLER IS THE FIRST HOMEWORK JOB, and it is the
       // right one: a rest-window fill is by definition work nobody asked for.
       // As homework it queues below voice and is cut short the instant the
       // player acts, so filling the bank can never be the reason a tap waits.
       // The live ambient path is NOT homework — the player is owed that line.
       { maxNewTokens: 32, job: opts?.bankOnly ? 'ambient_fill' : 'ambient', homework: !!opts?.bankOnly },
     );
-    // OTA-678 — off-canon entity guard (ambient path). A dropped line just stays
-    // silent here (ambient has no template fallback), which is the safe outcome.
+    // OTA-663 — off-canon entity guard (ambient path). A dropped line just stays
+    // silent (ambient has no template fallback), which is the safe outcome.
     const ambientAllow = narrationEntityAllow(get);
     const survivors = clampSentences(repairGluedNarration(stripForeignWords(text)), 1)
       .split(/(?<=[.!?])\s+/)
       .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
       .filter((s) => !/^\s*they\s/i.test(s))
-      // ⚠ OTA-1147 — FIRST-PERSON OPENER. Owner's log: a musing came back about
+      // ⚠ OTA-1124 — FIRST-PERSON OPENER. Owner's log: a musing came back about
       // "my eyes". The Arbiter is a companion and may certainly say "I" inside
       // a line addressed to the player — but a sentence whose SUBJECT is the
       // narrator has stopped being a reflection on the PLAYER and become one
       // about itself, which is not the beat this is.
       //
-      // ⚠ DELIBERATELY NARROW, AND OTA-1054 IS WHY. That OTA's filter dropped
+      // ⚠ DELIBERATELY NARROW, AND OTA-1031 IS WHY. That OTA's filter dropped
       // every sentence starting with "You" — which the voice rules order the
       // model to do — and silently ate the whole feature: every ambient in the
       // owner's logs was ∅ across four builds. So this mirrors the `they`
       // opener directly above and tests the OPENER only. "The road behind is
       // longer than the one ahead" survives; so does "You have come far, and
       // my eyes have seen worse." Only "My eyes have seen worse" is dropped.
-      // ⚠ OTA-1148 — RETARGETED THE MOMENT THE LOG ARRIVED. OTA-1147 shipped
+      // ⚠ OTA-1125 — RETARGETED THE MOMENT THE LOG ARRIVED. OTA-1124 shipped
       // an OPENER test and the very next device log carried the actual line:
       //   "As I walk through the shadows of the Obsidian Pillars, my eyes
       //    follow the ancient trees that seem to whisper secrets to the wind."
@@ -42920,7 +43475,7 @@ async function maybeGenerateAmbientArbiter(
       // The real rule is about WHO THE SENTENCE IS ABOUT: it speaks of the
       // narrator and never of the player. So — first person present AND second
       // person absent. That is still narrow, and it still cannot eat the
-      // feature the way OTA-1054's version did:
+      // feature the way OTA-1031's version did:
       //   · "As I walk … my eyes …"            → I/my, no you  → DROPPED
       //   · "You have come far; my eyes…"       → has "you"     → kept
       //   · "The road behind is longer…"        → neither       → kept
@@ -42935,13 +43490,13 @@ async function maybeGenerateAmbientArbiter(
       // hallucination (log 2026-07-13: alleyways + stone pillars narrated
       // inside a flooded-house kitchen). Drop those sentences; an empty
       // result just stays silent (ambient has no template fallback).
-      // OTA-1054 — this used to drop EVERY "You …" sentence, which silently
+      // OTA-1031 — this used to drop EVERY "You …" sentence, which silently
       // guaranteed the empty result: VOICE_RULES orders the model to start
       // sentences with "You", so the filter ate the whole feature (every
       // ambient in the owner's logs is ∅, never ✓). Now it splits on register —
       // an action opener is still scene text, a reflection is what we asked for.
       .filter((s) => !isSecondPersonActionOpener(s))
-      // OTA-1053 — the brief recited back is not a line. Empty → stays silent.
+      // OTA-1030 — the brief recited back is not a line. Empty → stays silent.
       .filter((s) => !looksLikeInstructionEcho(s))
       .filter((s) => !sentenceNamesOffCanonEntity(s, ambientAllow))
       .join(' ')
@@ -42952,11 +43507,11 @@ async function maybeGenerateAmbientArbiter(
     // just logs and stays silent; there's no template fallback for ambient.
     // OTA-609 — also drop a near-duplicate of a recent Arbiter line (the model
     // rephrasing the same thought on a long journey) so it can't repeat 5-6×.
-    // OTA-1074 — has the world moved on while this was generating? Checked
+    // OTA-1051 — has the world moved on while this was generating? Checked
     // here rather than at the appendLog site so the debug marker can name the
     // reason, and checked BEFORE the dup test because a stale line should read
     // as stale in the log even when it also happens to be a repeat.
-    // OTA-1145 — the fill path never speaks. It banks whatever survived the
+    // OTA-1122 — the fill path never speaks. It banks whatever survived the
     // filters and says so in the debug channel; the stamp it carries is the one
     // taken at generation start, so validity is decided at SPEND time by the
     // same five checks the live path uses.
@@ -42970,7 +43525,7 @@ async function maybeGenerateAmbientArbiter(
     const staleReason = ambientStaleReason(get, stamp);
     const ambientUsable = !staleReason && !!finalText && !generatedLineRepeatsRecent(get, finalText);
     if (ambientUsable) get().appendLog('arbiter', finalText);
-    // ⚠ OTA-1145 — A STALE LINE GOES IN THE BANK, NOT THE BIN. It is stale
+    // ⚠ OTA-1122 — A STALE LINE GOES IN THE BANK, NOT THE BIN. It is stale
     // because the world moved WHILE we wrote it — almost always because the
     // player walked on — and it is still a perfectly good musing for the place
     // it was written about. Banked against its own stamp, walking back into
@@ -42987,8 +43542,8 @@ async function maybeGenerateAmbientArbiter(
     // a generation the player is still going to hear.
     if (!ambientUsable && !(staleReason && finalText)) noteQwenDiscarded(`ambient:${ambientMark}`);
     get().appendLog('debug', `arbiter: ambient ${ambientMark} ${Date.now() - t0}ms`);
-    // ⚠ OTA-1147 — LOG THE RAW TEXT OF LINES THAT PASSED, TOO.
-    // OTA-1057 added raw logging for FAILURES, and it has paid for itself
+    // ⚠ OTA-1124 — LOG THE RAW TEXT OF LINES THAT PASSED, TOO.
+    // OTA-1034 added raw logging for FAILURES, and it has paid for itself
     // repeatedly. But the owner's latest slip was a line that passed every
     // filter and was still wrong twice over: first person ("my eyes") and
     // invented scenery ("ancient trees" in the Obsidian Pillars, which has
@@ -42998,12 +43553,12 @@ async function maybeGenerateAmbientArbiter(
     // ⚠ AND THE SCENERY HALF IS DELIBERATELY NOT "FIXED" HERE. The off-canon
     // guard covers named ENTITIES; policing generic scenery would need a
     // whitelist of what may exist in each biome, which is a content system, not
-    // a filter — and guessing at one is how OTA-1054 ate the feature. Measure
+    // a filter — and guessing at one is how OTA-1031 ate the feature. Measure
     // how often it happens first. This is the line that will tell us.
     if (ambientUsable) {
       get().appendLog('debug', `arbiter: ambient-said "${finalText.slice(0, 160)}"`);
     }
-    // OTA-1057 — WHY it was empty. The owner's logs show ∅ on every ambient
+    // OTA-1034 — WHY it was empty. The owner's logs show ∅ on every ambient
     // attempt across four builds, including one that carries the OTA-1054
     // register fix — so the register filter was NOT the whole story, and the ∅
     // line never said which of the five filters ate the line (or whether the

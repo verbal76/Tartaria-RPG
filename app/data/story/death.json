@@ -1,5 +1,5 @@
 {
-  "_comment": "OTA-1133 — THE DEATH SCREEN. Owner: 'a brief description of my death lore style and how it ties to my reason for entering the mud world.' The opening crawl (intro.json) asks why you came down; this answers it. Every character dies against the motive they chose, so an exile's end reads differently from a scholar's. Three variants per motive so a replayed death is not a rerun. Tokens: {name}, {place}, {days}, {kills}.",
+  "_comment": "OTA-1110 — THE DEATH SCREEN. Owner: 'a brief description of my death lore style and how it ties to my reason for entering the mud world.' The opening crawl (intro.json) asks why you came down; this answers it. Every character dies against the motive they chose, so an exile's end reads differently from a scholar's. Three variants per motive so a replayed death is not a rerun. Tokens: {name}, {place}, {days}, {kills}.",
 
   "opening": [
     "The Aetherstone dims and does not lift.",

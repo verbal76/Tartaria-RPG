@@ -1,4 +1,4 @@
-// OTA-826 [Group-K audit] — player↔enemy damage-type wiring. The audit found
+// OTA-806 [Group-K audit] — player↔enemy damage-type wiring. The audit found
 // three typed attack paths bypassing the weakness system and one thrown-coating
 // parity gap. These tests lock the two most user-visible fixes:
 //   (1) a coated throwable thrown BY NAME now seeds the lingering DOT (parity with
@@ -42,7 +42,7 @@ async function freshGame(name: string) {
   useGameStore.getState().skipTutorial?.();
 }
 
-it('OTA-826 (1) — a coated throwable thrown by name seeds a lingering DOT on the surviving enemy', async () => {
+it('OTA-806 (1) — a coated throwable thrown by name seeds a lingering DOT on the surviving enemy', async () => {
   await freshGame('Coater');
   const p0 = useGameStore.getState().player!;
   // A poison-coated throwing knife + a big-HP enemy (survives the throw → DOT sticks).
@@ -71,7 +71,7 @@ it('OTA-826 (1) — a coated throwable thrown by name seeds a lingering DOT on t
   expect(statuses.some((s) => String((s as { kind: string }).kind).includes('poison'))).toBe(true);
 });
 
-it('OTA-826 (2) — burst fire applies the damage-type weakness (tags a weak hit in the log)', async () => {
+it('OTA-806 (2) — burst fire applies the damage-type weakness (tags a weak hit in the log)', async () => {
   await freshGame('Burster');
   const p0 = useGameStore.getState().player!;
   // An electrical bolt-caster vs an Automation (type-map: weak to electrical).

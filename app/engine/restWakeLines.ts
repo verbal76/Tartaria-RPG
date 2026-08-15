@@ -1,4 +1,4 @@
-// OTA-1135 — THE OUTDOOR HALF OF OTA-1055.
+// OTA-1112 — THE OUTDOOR HALF OF OTA-1032.
 //
 // Owner, from a device log where two consecutive rests were ambushed: both
 // printed the IDENTICAL beat. The rate was measured and is fine (22% wild /
@@ -6,7 +6,7 @@
 // coincidence). The repetition was the real complaint, and it is not a content
 // gap — it is a job left half-done.
 //
-// OTA-1055 re-voiced the rest ambush for INDOOR scenes, because "circled" and
+// OTA-1032 re-voiced the rest ambush for INDOOR scenes, because "circled" and
 // "closes the distance" are open-ground images and the unsettling part of
 // waking in a sealed room is that it was already in with you. It gave the
 // indoor path THREE lines for the wake beat and THREE for the arrival

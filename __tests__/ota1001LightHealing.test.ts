@@ -32,7 +32,7 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-// OTA-1001 — #120: healing, LIGHT. Root cause: heal numbers were flat in a game
+// OTA-978 — #120: healing, LIGHT. Root cause: heal numbers were flat in a game
 // where max HP scales, and rest only restored stamina. Now a full sleep knits
 // ~15% of max HP, kit-grade consumables heal 15%-of-max-or-their-flat, snacks
 // 4%-or-flat — floors keep the early game identical, and the owner's "lighter
@@ -41,7 +41,7 @@ import { scaledHealHP } from '../app/engine/itemEffect';
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 
-describe('OTA-1001 — light healing', () => {
+describe('OTA-978 — light healing', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
   it('scaledHealHP: floors protect the early game, percents carry the late game', () => {

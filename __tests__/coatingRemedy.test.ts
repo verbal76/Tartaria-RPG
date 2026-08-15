@@ -1,4 +1,4 @@
-// OTA-764/765 — coatings are tri-modal (coat weapon / coat armor / drink), but a
+// OTA-745/765 — coatings are tri-modal (coat weapon / coat armor / drink), but a
 // coating is DRINKABLE only when its element has a player-side counter. Corruption
 // cleanses corruption, poison/burn/electrical purge their status; acid has no player
 // ailment so it is coat-only (not drinkable). Pre-764 the drink route swallowed a
@@ -18,7 +18,7 @@ const player = (over: Partial<PlayerCharacter> = {}): PlayerCharacter =>
 const status = (kind: string): StatusEffect =>
   ({ kind, remainingRounds: 3, label: kind } as unknown as StatusEffect);
 
-describe('OTA-765 — which coatings are drinkable', () => {
+describe('OTA-746 — which coatings are drinkable', () => {
   it('corruption / poison / burn / electrical are drinkable; acid is NOT', () => {
     expect(isCoatingDrinkable('corruption')).toBe(true);
     expect(isCoatingDrinkable('poison')).toBe(true);
@@ -48,7 +48,7 @@ describe('OTA-765 — which coatings are drinkable', () => {
   });
 });
 
-describe('OTA-764 — drinkable coating remedies', () => {
+describe('OTA-745 — drinkable coating remedies', () => {
   it('a corruption coating reduces corruption (Rare -6) and clamps at 0', () => {
     expect(coatingDrinkRemedy(player({ corruption: 23 }), 'corruption', 'Rare').corruptionAfter).toBe(17);
     expect(coatingDrinkRemedy(player({ corruption: 2 }), 'corruption', 'Rare').corruptionAfter).toBe(0);

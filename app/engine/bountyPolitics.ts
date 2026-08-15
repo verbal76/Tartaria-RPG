@@ -1,4 +1,4 @@
-// OTA-1188 — THE BOARD YOU FROZE IS THE DEAL YOU GET.
+// OTA-1165 — THE BOARD YOU FROZE IS THE DEAL YOU GET.
 //
 // Owner: "if you see that faction bounty is allied with the faction that you're trying
 // to build rep with and you jump back to the world tab… and accept that bounty then it
@@ -68,7 +68,7 @@ export function politicsOf(
  *      there, collecting bounties."
  *
  *  ⚠ Returns a REASON, never a bare false. Every refusal in this game has to be able to
- *  say why — the whole of OTA-1187 was a control that refused in silence. */
+ *  say why — the whole of OTA-1164 was a control that refused in silence. */
 export type AcceptRefusal =
   | { ok: true }
   | { ok: false; reason: 'standing_on_target'; locationName: string }
@@ -125,7 +125,7 @@ export function refusalLine(r: AcceptRefusal): string | null {
 
 /** ⚠ THE DEADLINE NEEDS A TERM FOR THE JOB, NOT ONLY THE JOURNEY.
  *
- *  Travel is priced by HOURS_PER_TILE_TRUE (OTA-1185). The WAITING is not priced at all,
+ *  Travel is priced by HOURS_PER_TILE_TRUE (OTA-1162). The WAITING is not priced at all,
  *  and it is the real cost of a short contract: `maybePatrolAmbush` will not fire twice
  *  inside PATROL_MIN_HOURS, so a 6-hour floor sits between you and each engagement no
  *  matter what you do. A 3-kill and a 9-kill contract used to get identical time.

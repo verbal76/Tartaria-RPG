@@ -145,7 +145,7 @@ export function computeAllProgress(playerCollectables: readonly string[]): Chara
 }
 
 // ---------------------------------------------------------------------------
-// OTA-1206 — SET COMPLETION. The payoff the owner specified.
+// OTA-1183 — SET COMPLETION. The payoff the owner specified.
 // ---------------------------------------------------------------------------
 //
 // ⚠ Before this, finishing a 5–7 fragment story flipped a pill style and printed a banner
@@ -192,7 +192,7 @@ export function assembledStory(
 }
 
 // ---------------------------------------------------------------------------
-// OTA-1207 — STORY PERKS. Owner's call (2026-08-09): *"see if there are certain stories
+// OTA-1184 — STORY PERKS. Owner's call (2026-08-09): *"see if there are certain stories
 // that lead well into adding an active buff… it doesn't have to be for all of them, but
 // enough to make it worthwhile collecting them."*
 // ---------------------------------------------------------------------------
@@ -232,9 +232,9 @@ export interface StoryPerk {
 
 export const STORY_PERKS: readonly StoryPerk[] = [
   {
-    // ⚠⚠ OTA-1212 (PUNCHLIST P6 CLOSED) — THE SIREN OF ZHARAK'S TEETH, at last.
+    // ⚠⚠ OTA-1189 (PUNCHLIST P6 CLOSED) — THE SIREN OF ZHARAK'S TEETH, at last.
     //
-    // The owner picked this story for a perk in OTA-1207 and it was the one of six that did
+    // The owner picked this story for a perk in OTA-1184 and it was the one of six that did
     // NOT ship: the obvious reading is resistance to the Siren's lure, and **the game has no
     // charm, compulsion or mental-influence mechanic** (verified across statusEffects.ts and
     // combatRules.ts). Inventing a status effect to justify a buff is backwards, so it was

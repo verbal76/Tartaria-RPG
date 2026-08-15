@@ -1,4 +1,4 @@
-// OTA-1208 — THE TRADING POST TAKES ANY FACTION'S CONTRACT, FOR A CUT.
+// OTA-1185 — THE TRADING POST TAKES ANY FACTION'S CONTRACT, FOR A CUT.
 //
 // ⚠⚠ WHAT THIS CLOSES (PUNCHLIST P2). A mystery or storyline can only be handed to a
 // vendor whose faction posted it. Four vendors are anchored in the shared outpost layout
@@ -42,7 +42,7 @@ export const CONTRACT_BROKER_VENDOR_ID = 'halem_trader';
 export const BROKER_PLAYER_SHARE = 0.8;
 
 // ═══════════════════════════════════════════════════════════════════════════════════════
-// OTA-1215 — THE HIDDEN MARKET BROKERS TURN-INS TOO (PUNCHLIST P10).
+// OTA-1192 — THE HIDDEN MARKET BROKERS TURN-INS TOO (PUNCHLIST P10).
 //
 // ⚠⚠ THE DEFECT WAS AN ASYMMETRY. `isBrokerVendorId` has made `hidden_market_*` stalls
 // post EVERY faction's open work since OTA-782 — *"so there's always a board to pick from
@@ -54,7 +54,7 @@ export const BROKER_PLAYER_SHARE = 0.8;
 // not generosity, it is geography. Halem stands at the gate of EVERY outpost in the world;
 // the Hidden Market is ONE location out past the frontier camps in the Sunken Middens that
 // you have to go to. Charging the same rate at both would make the trip pointless, and the
-// long-haul principle this project just spent OTA-1210 fixing says travel should pay.
+// long-haul principle this project just spent OTA-1187 fixing says travel should pay.
 //
 // So the ladder reads, best to worst:
 //   • the posting faction's own agent — 100% + the long-haul bonus (up to 1.5× base)
@@ -90,7 +90,7 @@ interface VendorLike {
 
 /** Does this vendor broker other factions' contracts at all?
  *
- *  ⚠ Derived from `brokerShareFor` rather than listing ids again — OTA-1215 added a second
+ *  ⚠ Derived from `brokerShareFor` rather than listing ids again — OTA-1192 added a second
  *  broker, and two independent lists is how one of them silently stops being honoured. */
 export function isContractBroker(vendor: VendorLike | null | undefined): boolean {
   return brokerShareFor(vendor) !== null;
@@ -124,7 +124,7 @@ export function vendorCanTakeContract(
 export function contractPayoutTc(
   baseTc: number,
   journeyBonusTc: number,
-  /** ⚠ OTA-1215 — the player's SHARE, or `null` for a direct hand-in. This was a boolean
+  /** ⚠ OTA-1192 — the player's SHARE, or `null` for a direct hand-in. This was a boolean
    *  until the Hidden Market arrived at a different rate; a boolean cannot express two
    *  brokers, and adding a second flag beside it would have been the same mistake with
    *  more words. Pass `brokerShareFor(vendor)`. */
@@ -153,7 +153,7 @@ export function brokerAcceptLine(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════
-// OTA-1211 — THE COURIER, RESTORED (PUNCHLIST P3).
+// OTA-1188 — THE COURIER, RESTORED (PUNCHLIST P3).
 //
 // OTA-456 shipped a remote "send word" hand-in; OTA-824 killed it on the owner's call:
 // *"kill all remote hand-ins, make all routable, but make the journey worth the loot — no

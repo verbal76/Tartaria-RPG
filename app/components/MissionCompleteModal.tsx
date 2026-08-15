@@ -16,7 +16,7 @@ import { useGameStore } from '../state/gameStore';
  *  owner asked for it to hang so it can actually be read. This exists so a
  *  notice can never wedge the screen if a dismiss is somehow missed. */
 const AUTO_CLOSE_MS = 12000;
-/** OTA-1058 — a VICTORY card carries the fight's story as well as its take, and
+/** OTA-1035 — a VICTORY card carries the fight's story as well as its take, and
  *  the whole point of moving that story out of the feed was that it was being
  *  read past. Twelve seconds is not enough for several paragraphs, so the valve
  *  opens much later on those. It is still only a valve — dismissal is the way
@@ -28,7 +28,7 @@ export function MissionCompleteModal() {
   const clear = useGameStore((s) => s.clearMissionCompleteNotice);
 
   const hasFlavor = !!notice?.flavor?.length;
-  // ⚠ OTA-1186 — a card may size its OWN valve, never shrink it. The bounty primer is
+  // ⚠ OTA-1163 — a card may size its OWN valve, never shrink it. The bounty primer is
   // four paragraphs of rules a player meets exactly once in a playthrough, and there is
   // no second showing; sixty seconds is a real chance of it closing mid-read. Still only
   // a valve — Math.max keeps it at or above the shared default, and dismissal is still
@@ -45,7 +45,7 @@ export function MissionCompleteModal() {
 
   if (!notice) return null;
 
-  // OTA-1058 — a VICTORY card leads with the STORY and pays out underneath it.
+  // OTA-1035 — a VICTORY card leads with the STORY and pays out underneath it.
   // Owner, on the faction beat that followed a Core Guardian kill: "it needs to
   // be last so it will be read, it gets pushed up screen and missed… the battle
   // follow up should have the flavor text, and the rewards on it."
@@ -64,7 +64,7 @@ export function MissionCompleteModal() {
               <Text key={`f${i}`} style={styles.flavor}>{f}</Text>
             ))}
             {flavor.length > 0 && notice.rewards.length > 0 ? (
-              // ⚠ OTA-1186 — overridable, because the lines under it are not always a
+              // ⚠ OTA-1163 — overridable, because the lines under it are not always a
               // TAKE. The bounty primer's are the rules of the job, and calling four
               // facts about how bounties work "THE TAKE" reads as a payout the player
               // never received.

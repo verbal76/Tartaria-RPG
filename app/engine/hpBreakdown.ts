@@ -1,4 +1,4 @@
-// OTA-1184 — WHERE YOUR MAX HP CAME FROM.
+// OTA-1161 — WHERE YOUR MAX HP CAME FROM.
 //
 // Owner: "for AC it shows your base and your buffs. HP just says HP not what my
 // base number was so I can see the progression, I didn't roll a 29 at start."
@@ -26,7 +26,7 @@ import { gearHpBonus } from './equipment';
 
 /** +1 max HP per this many DISTINCT enemy types beaten.
  *  ⚠ Lives here, not in gameStore, so the sheet can explain the number using the
- *  same constant the store awards it with. OTA-1165 tuned it 5 → 3; a stale
+ *  same constant the store awards it with. OTA-1142 tuned it 5 → 3; a stale
  *  comment claiming "every 3 enemies defeated" (volume, not distinctness) is how
  *  a session came to tell the owner that grinding one patrol builds HP. */
 export const MILESTONE_KILL_STEP = 3;

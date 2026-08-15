@@ -1,4 +1,4 @@
-// OTA-671 — stumbling onto the Parley of Factions no longer silently commits you.
+// OTA-656 — stumbling onto the Parley of Factions no longer silently commits you.
 // handleBroker raises a pendingMissionOffer (announce + demands); ACCEPT commits the
 // broker mission, DECLINE walks away and sets brokerOfferDeclined so ambient pokes
 // don't re-pop the prompt. This exercises the accept/decline store actions directly.
@@ -63,7 +63,7 @@ const OFFER = {
   body: 'demands…',
 };
 
-describe('parley offer — accept / decline (OTA-671)', () => {
+describe('parley offer — accept / decline (OTA-656)', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
   it('ACCEPT commits the broker mission with the offered factions and clears the offer', async () => {

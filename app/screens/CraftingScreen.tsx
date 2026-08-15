@@ -10,7 +10,7 @@ import type { InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import type { InventoryItem, PlayerCharacter } from '../engine/types';
-// OTA-1218 — PUNCHLIST P16. The Aetheric tab is where the disciplines already live, so it
+// OTA-1195 — PUNCHLIST P16. The Aetheric tab is where the disciplines already live, so it
 // is where the techniques belong: same energy, same fuel, same corruption ledger.
 import {
   AETHER_TECHNIQUES, TECHNIQUE_FUEL_PREFERENCE, dcForRank, proficiencyRank, proficiencyLabel,
@@ -117,10 +117,10 @@ function buildGolemConfirm(g: GolemDefinition, inventory: InventoryItem[]): Gole
 // materials in stock) to the top. 'cost' sorts by total
 // material count required.
 //
-// OTA-1119 — owner: "let's add some different sorting options in the craft
+// OTA-1096 — owner: "let's add some different sorting options in the craft
 // repair tab, still prioritize equipped it's on top as default sort." So
 // EQUIPPED becomes a REAL axis and the default one, rather than an invisible
-// pre-key welded onto every other axis (OTA-1117's first cut). Opening the tab
+// pre-key welded onto every other axis (OTA-1094's first cut). Opening the tab
 // still puts what you're wearing on top — that ask is unchanged — but tapping
 // NAME now actually sorts by name instead of sorting by name *within* worn and
 // unworn. A sort you pick should do the thing it says.
@@ -142,7 +142,7 @@ const REPAIR_SORT_OPTIONS = [
   { key: 'cost', label: 'COST' },
 ];
 
-// OTA-1119 — shared ranks for the two new ordering axes. Deliberately the same
+// OTA-1096 — shared ranks for the two new ordering axes. Deliberately the same
 // numbers InventoryScreen uses, so "sorted by slot" means the identical
 // head-to-toe order on both screens.
 const REPAIR_RARITY_RANK: Record<string, number> = {
@@ -173,7 +173,7 @@ interface RepairStatus {
   cost: { name: string; quantity: number }[];
   missing: { name: string; short: number }[];
   available: boolean;
-  // OTA-1117 — is this the piece the player is actually WEARING? Worn gear is what
+  // OTA-1094 — is this the piece the player is actually WEARING? Worn gear is what
   // breaks mid-fight, so it floats above every sort axis and carries a badge.
   worn: boolean;
 }
@@ -194,11 +194,11 @@ function ownedQty(inventory: InventoryItem[], name: string): number {
     .reduce((s, i) => s + i.quantity, 0);
 }
 
-// OTA-1006 — confirm popup for the NON-golem disciplines (shape / mend), mirroring the
+// OTA-983 — confirm popup for the NON-golem disciplines (shape / mend), mirroring the
 // golem summon confirm. Tapping the card no longer copies a phrase to the clipboard
 // for the player to paste back — it opens this confirm, and on Cast it dispatches
 // the action and bounces to exploration so the roll plays out live.
-// OTA-1218 — `technique` distinguishes an AETHER TECHNIQUE from an Aethercraft discipline
+// OTA-1195 — `technique` distinguishes an AETHER TECHNIQUE from an Aethercraft discipline
 // inside the shared confirm popup. They earn the same two-tap flow but not the same words:
 // nothing about a technique is a cast, so the button reads CHANNEL and the body talks about
 // dose. One extra field beat a second, near-identical modal.
@@ -213,7 +213,7 @@ function buildDisciplineConfirm(d: AethercraftDiscipline, inventory: InventoryIt
   return { title: d.title, phrase, body: d.body, fuel, afford };
 }
 
-/** OTA-1218 — the same popup, aimed at a technique. ⚠ It states the DOSE up front: this is
+/** OTA-1195 — the same popup, aimed at a technique. ⚠ It states the DOSE up front: this is
  *  the one action in the game whose price is paid in corruption, and a confirm screen that
  *  hid that would be selling the player something they did not agree to. */
 function buildTechniqueConfirm(
@@ -266,7 +266,7 @@ type Tab = 'craft' | 'repair' | 'recipes' | 'aetheric';
 // install when the player first lands on that tab. Authoring rule:
 // ~25 words / 2 sentences max — longer copy goes in the future
 // Tutorial Replay docs (TUTORIAL_DOCS_FULL).
-// OTA-1228 — exported so the copy can be pinned by test: the aetheric card shipped
+// OTA-1205 — exported so the copy can be pinned by test: the aetheric card shipped
 // stale for a full feature wave (it described only the three disciplines while the
 // tab's headline became the four techniques), and nothing could notice.
 export const TAB_HINTS: Record<Tab, { title: string; body: string; id?: string }> = {
@@ -310,7 +310,7 @@ export function CraftingScreen() {
   // Empty / null delta = craft failed or no-op'd — the world feed
   // narrates the failure; no popup, screen stays on tab.
   const [craftResult, setCraftResult] = useState<InventoryDelta[] | null>(null);
-  // OTA-1006 — the haul banner clears itself; there is no button to hunt for.
+  // OTA-983 — the haul banner clears itself; there is no button to hunt for.
   useEffect(() => {
     if (craftResult === null) return;
     const t = setTimeout(() => setCraftResult(null), 2600);
@@ -325,7 +325,7 @@ export function CraftingScreen() {
   // exploration. Now it opens a confirm → on Summon it dispatches the action and
   // bounces to exploration, where the d20+INT roll plays out live.
   const [golemConfirm, setGolemConfirm] = useState<GolemConfirm | null>(null);
-  // OTA-1006 — confirm popup for shape/mend (Aetherstone Manipulation / Aetheric
+  // OTA-983 — confirm popup for shape/mend (Aetherstone Manipulation / Aetheric
   // Healing). Same UX as the golem summon: tap the card → confirm → cast (no
   // clipboard copy-paste).
   const [disciplineConfirm, setDisciplineConfirm] = useState<DisciplineConfirm | null>(null);
@@ -341,10 +341,10 @@ export function CraftingScreen() {
   const [recipesSortKey, setRecipesSortKey] = useState('ready');
   const [recipesSortDir, setRecipesSortDir] = useState<SortDirection>('asc');
   const [repairQuery, setRepairQuery] = useState('');
-  // OTA-1119 — EQUIPPED is the default axis. Opening the tab still puts what
+  // OTA-1096 — EQUIPPED is the default axis. Opening the tab still puts what
   // you are wearing on top; picking any other axis now genuinely sorts by it.
   const [repairSortKey, setRepairSortKey] = useState('equipped');
-  // OTA-1125 — REPAIR group mode. Owner: "I thought we were going to do the same
+  // OTA-1102 — REPAIR group mode. Owner: "I thought we were going to do the same
   // tap and hold to multiselect for repair too. it will have to take into
   // account the items needed for each item you sent and dim make items in
   // selectable if the items you selected consume the items needed."
@@ -363,7 +363,7 @@ export function CraftingScreen() {
   // (playtester spec). Available when the materials are in stock.
   const repairable = useMemo(() => {
     if (!player) return [] as RepairStatus[];
-    // OTA-1117 — resolve worn instances ONCE per inventory change (it walks every
+    // OTA-1094 — resolve worn instances ONCE per inventory change (it walks every
     // equip slot), then stamp `worn` on each row.
     const worn = wornInstanceIds(player);
     return player.inventory
@@ -383,7 +383,7 @@ export function CraftingScreen() {
     const byName = (x: RepairStatus, y: RepairStatus) => x.item.name.localeCompare(y.item.name) * dir;
     sorted.sort((a, b) => {
       switch (repairSortKey) {
-        // OTA-1117 → OTA-1119. Worn gear used to be an unconditional pre-key on
+        // OTA-1094 → OTA-1096. Worn gear used to be an unconditional pre-key on
         // every axis. Owner: "when you open the repair tab, it should prioritize
         // all of the things that are equipped that can be repaired at the top" —
         // which is about the tab's DEFAULT state, and this axis is now that
@@ -397,7 +397,7 @@ export function CraftingScreen() {
           if (a.available !== b.available) return a.available ? -1 : 1;
           return byName(a, b);
         }
-        // OTA-1119 — head-to-toe body order, so a full kit reads like a paper
+        // OTA-1096 — head-to-toe body order, so a full kit reads like a paper
         // doll. Gear with no equip slot (rope, lantern, tools) sits below it.
         case 'slot': {
           const ar = repairSlotRank(a.item);
@@ -405,14 +405,14 @@ export function CraftingScreen() {
           if (ar !== br) return (ar - br) * dir;
           return byName(a, b);
         }
-        // OTA-1119 — Common → Legendary asc; tap again for your best first.
+        // OTA-1096 — Common → Legendary asc; tap again for your best first.
         case 'rarity': {
           const ar = REPAIR_RARITY_RANK[a.item.rarity ?? 'Common'] ?? 0;
           const br = REPAIR_RARITY_RANK[b.item.rarity ?? 'Common'] ?? 0;
           if (ar !== br) return (ar - br) * dir;
           return byName(a, b);
         }
-        // OTA-1119 — weapons together, armor together, tools together.
+        // OTA-1096 — weapons together, armor together, tools together.
         case 'kind': {
           const ak = a.item.kind ?? '';
           const bk = b.item.kind ?? '';
@@ -450,23 +450,17 @@ export function CraftingScreen() {
   }, [repairable, repairQuery, repairSortKey, repairSortDir]);
 
   // OTA-708 — per-tab "craftable NOW" counts for the tab-bar badges (like REPAIR's).
-  // Counts only what the player can ACTUALLY make/do with materials in hand (the
-  // missing-ingredient list is empty) — matching the green "ready" highlight inside
-  // each list — NOT every blueprint that exists. Same split RecipesView uses:
-  // consumable results → RECIPES tab, everything else → CRAFT tab.
   const craftableCounts = useMemo(() => {
     const inv = player?.inventory ?? [];
     // OTA-718 — exclude locked (undiscovered) cool recipes from the tab badges.
     const { craft, recipes } = craftableRecipeCounts(inv, player?.knownRecipes);
-    // An Aethercraft discipline is fireable when ANY one of its fuels is in the pack.
     const aetheric = AETHERCRAFT_DISCIPLINES.filter(
       (d) => d.fuels.some((f) => ownedQty(inv, f) >= 1),
     ).length;
     return { craft, recipes, aetheric };
   }, [player?.inventory]);
-  // Repair badge = what you can fix RIGHT NOW (materials in hand), not every worn item.
   const repairReady = useMemo(() => repairable.filter((r) => r.available).length, [repairable]);
-  // OTA-1121 — what REPAIR ALL would actually touch: the READY rows in the
+  // OTA-1098 — what REPAIR ALL would actually touch: the READY rows in the
   // CURRENT view, in display order. Reading off repairableView (not repairable)
   // is what lets the search box act as the selection — filter to what you mean,
   // then mend that. Order carries through, so on the default EQUIPPED axis the
@@ -486,7 +480,7 @@ export function CraftingScreen() {
     for (const id of repairReadyInView) repairInventoryItem(id);
   };
 
-  // OTA-1125 — THE RUNNING MATERIAL BUDGET. This is the part that makes a repair
+  // OTA-1102 — THE RUNNING MATERIAL BUDGET. This is the part that makes a repair
   // group different from a sell group: repairs draw from ONE shared pile, so
   // every pick changes what the next pick can afford.
   //
@@ -719,7 +713,7 @@ export function CraftingScreen() {
                   ]}
                   onPress={() => {
                     // OTA-629 — the SUMMON card opens the golem confirm popup.
-                    // OTA-1006 — shape (Aetherstone Manipulation) and mend (Aetheric
+                    // OTA-983 — shape (Aetherstone Manipulation) and mend (Aetheric
                     // Healing) now open their OWN confirm popup too, instead of
                     // copying a phrase to the clipboard for the player to paste
                     // back. No copy-paste anywhere in the aetheric flow.
@@ -789,7 +783,7 @@ export function CraftingScreen() {
                     </View>
                   )}
                   <Text style={styles.aetherCardExamples}>
-                    {/* OTA-1006 — every discipline card opens a confirm popup on tap
+                    {/* OTA-983 — every discipline card opens a confirm popup on tap
                         (golem, shape, mend). No copy-to-input; the phrasings are
                         just the equivalent things you could type. */}
                     <Text style={styles.aetherCardExamplesLabel}>
@@ -801,8 +795,8 @@ export function CraftingScreen() {
               );
             })}
 
-            {/* ⚠ OTA-1218 — AETHER TECHNIQUES (PUNCHLIST P16). The rules shipped in
-                OTA-1214 with no caller and no screen, which is the same defect P4 and P14
+            {/* ⚠ OTA-1195 — AETHER TECHNIQUES (PUNCHLIST P16). The rules shipped in
+                OTA-1191 with no caller and no screen, which is the same defect P4 and P14
                 are filed for. This is the screen.
 
                 ⚠ UNKNOWN TECHNIQUES ARE LISTED, NOT HIDDEN — and that is the design
@@ -863,7 +857,7 @@ export function CraftingScreen() {
       ) : (
         <>
           <Text style={styles.arbiterLine}>
-            The Arbiter takes the damaged piece. "Material cost is double what it'd give if you scrapped it. That's the trade."
+            The Arbiter takes the damaged piece. "Material cost is double what it'd give if you salvaged it. That's the trade."
           </Text>
 
           <SearchSortBar
@@ -876,7 +870,7 @@ export function CraftingScreen() {
             onSortChange={(k, d) => { setRepairSortKey(k); setRepairSortDir(d); }}
           />
 
-          {/* OTA-1121 — REPAIR ALL. Owner: "let's also add a select all to the
+          {/* OTA-1098 — REPAIR ALL. Owner: "let's also add a select all to the
               repair tab." Repair has no deferred step — the action IS the
               repair — so a select-all with nothing to press afterwards would be
               two taps where there is one job. This is the same idea aimed at
@@ -885,7 +879,7 @@ export function CraftingScreen() {
               It acts on the FILTERED view, which is what makes it a selection
               rather than a blunt instrument: search "boot", tap REPAIR ALL, and
               only boots get mended. */}
-          {/* OTA-1125 — while a group is open the bar TAKES REPAIR ALL's place
+          {/* OTA-1102 — while a group is open the bar TAKES REPAIR ALL's place
               and holds it, the same way the sell group took the tab row (1124).
               It sits above the ScrollView, so it cannot scroll away from you
               while you tick rows further down — which is exactly when the
@@ -962,7 +956,7 @@ export function CraftingScreen() {
                 // should show the stats for them. that way you know what
                 // you're crafting so you know which one to pick."
                 const preview = getItemPreview(r.item.name);
-                // OTA-1125 — group state for this row. `groupStarved` is the
+                // OTA-1102 — group state for this row. `groupStarved` is the
                 // owner's dimming rule: not picked, and the picks already made
                 // have claimed the materials it would need. Outside group mode
                 // none of this applies and the row behaves exactly as before.
@@ -984,7 +978,7 @@ export function CraftingScreen() {
                     style={[
                       styles.recipeRow,
                       !r.available && styles.recipeRowMuted,
-                      // OTA-1125 — a picked row is outlined; a row the group has
+                      // OTA-1102 — a picked row is outlined; a row the group has
                       // already spent the materials for is DIMMED. Owner: "dim
                       // make items in selectable if the items you selected
                       // consume the items needed."
@@ -1019,10 +1013,10 @@ export function CraftingScreen() {
                     <View style={styles.recipeBody}>
                       <View style={styles.recipeHead}>
                         <Text style={[styles.recipeName, r.available && styles.recipeNameReady, !r.available && styles.recipeNameMuted]}>
-                          {/* OTA-1125 — the group box leads the row, the way a
+                          {/* OTA-1102 — the group box leads the row, the way a
                               checklist does. */}
                           {repairSelectMode ? (groupPicked ? '☑ ' : '☐ ') : ''}
-                          {/* OTA-1117 — the worn marker rides the NAME so it survives
+                          {/* OTA-1094 — the worn marker rides the NAME so it survives
                               every sort axis and reads at a glance in the top block. */}
                           {r.worn ? '★ ' : ''}{r.item.name}
                         </Text>
@@ -1033,8 +1027,8 @@ export function CraftingScreen() {
                       {r.worn && (
                         <Text style={styles.repairWorn}>EQUIPPED — this is what breaks mid-fight</Text>
                       )}
-                      {/* OTA-1125 — say WHY it is dimmed. "Greyed out" with no
-                          reason is the silent-rule failure OTA-1117 was written
+                      {/* OTA-1102 — say WHY it is dimmed. "Greyed out" with no
+                          reason is the silent-rule failure OTA-1094 was written
                           against; this one has a precise, honest answer. */}
                       {groupStarved && (
                         <Text style={styles.repairStarved}>
@@ -1047,7 +1041,7 @@ export function CraftingScreen() {
                         </Text>
                       )}
                       {r.cost.length === 0 ? (
-                        <Text style={styles.recipeMissing}>No repair recipe — sell or scrap instead.</Text>
+                        <Text style={styles.recipeMissing}>No repair recipe — sell or salvage instead.</Text>
                       ) : r.available ? (
                         <>
                           <Text style={styles.recipeIng}>
@@ -1069,7 +1063,7 @@ export function CraftingScreen() {
         </>
       )}
 
-      {/* OTA-1006 — SUPERSEDES OTA-264's popup. That modal asked "CONTINUE CRAFTING
+      {/* OTA-983 — SUPERSEDES OTA-264's popup. That modal asked "CONTINUE CRAFTING
           or CLOSE MENU" after every single craft — a question whose answer was
           always the same (owner: "assume they always want to continue crafting,
           never close the crafting menu till they hit a back button"). The count
@@ -1148,7 +1142,7 @@ export function CraftingScreen() {
         onRequestClose={() => setGolemConfirm(null)}
       />
 
-      {/* OTA-1006 — shape (Aetherstone Manipulation) + mend (Aetheric Healing) confirm.
+      {/* OTA-983 — shape (Aetherstone Manipulation) + mend (Aetheric Healing) confirm.
           Same UX as the golem summon: confirm dispatches the cast and returns to
           exploration so the roll plays out live. No clipboard copy-paste. */}
       <BrandedModal
@@ -1157,7 +1151,7 @@ export function CraftingScreen() {
         body={disciplineConfirm
           ? `${disciplineConfirm.body}\n\nFuel — ${disciplineConfirm.fuel}\n\n${disciplineConfirm.afford
               ? (disciplineConfirm.technique
-                  // OTA-1218 — a technique's line names the two costs a discipline does not
+                  // OTA-1195 — a technique's line names the two costs a discipline does not
                   // have: the dose lands either way, and in a fight this IS your round.
                   ? 'You have fuel for it. The dose lands whether the field holds or not, and in a fight this spends your turn — watch it play out in the world view.'
                   : 'You have fuel for it. Casting rolls against the discipline’s DC — watch it play out in the world view.')
@@ -1181,7 +1175,7 @@ export function CraftingScreen() {
         onRequestClose={() => setDisciplineConfirm(null)}
       />
 
-      {/* OTA-1125 — the group repair confirm. A repair is not reversible and the
+      {/* OTA-1102 — the group repair confirm. A repair is not reversible and the
           whole group spends from one pile, so the last screen before the hammer
           falls itemises what is being mended AND what it costs. The bar above
           already showed the running bill; this is where it stops being a
@@ -1216,7 +1210,7 @@ export function CraftingScreen() {
 }
 
 const styles = StyleSheet.create({
-  // OTA-1006 — the post-craft haul banner that replaced the "continue crafting?"
+  // OTA-983 — the post-craft haul banner that replaced the "continue crafting?"
   // question. Sits over the list, says what landed, and fades on its own.
   craftBanner: {
     position: 'absolute', top: 8, left: 12, right: 12,
@@ -1290,10 +1284,10 @@ const styles = StyleSheet.create({
   recipeNameMuted: { color: '#a89a7a' },
   recipeRarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   durabilityChip: { color: '#c9a86a', fontSize: 11, fontWeight: '700' },
-  // OTA-1117 — the worn-gear callout on a REPAIR row. Same gold as the EQUIPPED
+  // OTA-1094 — the worn-gear callout on a REPAIR row. Same gold as the EQUIPPED
   // badge in the Crucible upgrade list so "worn" reads identically everywhere.
   repairWorn: { color: '#e6c67a', fontSize: 10, marginTop: 3, letterSpacing: 0.6, fontWeight: '700' },
-  // OTA-1121 — the REPAIR ALL bar. Green like the per-row "tap to repair" cue,
+  // OTA-1098 — the REPAIR ALL bar. Green like the per-row "tap to repair" cue,
   // because it does the same thing at scale; full width so it reads as an
   // action on the list rather than a filter chip on the bar above it.
   repairAllBtn: {
@@ -1306,7 +1300,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   repairAllText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
-  // OTA-1125 — the repair group bar. Same trade-gold frame as the vendor's
+  // OTA-1102 — the repair group bar. Same trade-gold frame as the vendor's
   // group-sell bar (1122/1124) because it is the same gesture doing the same
   // job in a different room; it stacks rather than sits in one row because the
   // running material bill needs a line of its own.
@@ -1373,7 +1367,7 @@ const styles = StyleSheet.create({
   aetherCardFuel: { color: '#a2977b', fontSize: 11, lineHeight: 15, marginBottom: 4 },
   aetherCardFuelLabel: { color: '#9aaab0', fontWeight: '700' },
   fuelHave: { color: '#9ec96a', fontWeight: '700' },
-  // OTA-1218 — technique rows in the Aetheric tab. Locked rows are dimmed rather than
+  // OTA-1195 — technique rows in the Aetheric tab. Locked rows are dimmed rather than
   // hidden (see the block comment at the list) so an untaught procedure reads as a goal.
   techHeader: { color: '#cdbf99', fontSize: 13, fontWeight: '700', letterSpacing: 1.5, marginTop: 18, marginBottom: 4 },
   techIntro: { color: '#a89a7a', fontSize: 12, lineHeight: 17, marginBottom: 10 },

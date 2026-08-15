@@ -107,7 +107,7 @@ export function RecipesView({
   const player = useGameStore((s) => s.player);
   const craftRecipe = useGameStore((s) => s.craftRecipe);
   const craftRecipeBatch = useGameStore((s) => s.craftRecipeBatch);
-  // OTA-1006 — the recipe awaiting a COUNT. Tapping a row no longer crafts; it asks
+  // OTA-983 — the recipe awaiting a COUNT. Tapping a row no longer crafts; it asks
   // how many, then makes them all and leaves the menu open (owner's ask).
   const [qtyFor, setQtyFor] = React.useState<Recipe | null>(null);
 
@@ -128,7 +128,7 @@ export function RecipesView({
       : all;
     // OTA-087 — search filter (substring on the result name,
     // case-insensitive).
-    // OTA-1061 — the ARMOR SLOT is searchable too. Owner: "under the craft tab
+    // OTA-1038 — the ARMOR SLOT is searchable too. Owner: "under the craft tab
     // for armor, it needs to list what slot its for. some of the names don't
     // explain it. it took me a few minutes to find something in the hand slot."
     // Labelling each row fixes reading it; matching the slot here fixes FINDING
@@ -178,7 +178,7 @@ export function RecipesView({
   // craft's outcome. Empty delta means the engine refused / no-op'd
   // — caller keeps the menu open and lets the world feed surface
   // the failure narration.
-  // OTA-1006 — step one: ask how many. The old body (craft + diff + refusal
+  // OTA-983 — step one: ask how many. The old body (craft + diff + refusal
   // surfacing) moves to runCraft below, which the quantity modal calls.
   const handleCraft = (recipe: Recipe) => setQtyFor(recipe);
 
@@ -191,7 +191,7 @@ export function RecipesView({
     const postInv = state.player?.inventory ?? [];
     const delta = computeInventoryDelta(preInv, postInv);
     if (delta.length > 0) {
-      // OTA-1006 — report the haul for the screen's transient banner. It is NOT a
+      // OTA-983 — report the haul for the screen's transient banner. It is NOT a
       // question any more: the crafting menu stays open until BACK.
       onAfterCraft?.(delta);
       return;
@@ -212,7 +212,7 @@ export function RecipesView({
   };
 
   const [collapsed, setCollapsed] = React.useState<Record<string, boolean>>({});
-  // OTA-721 — a weapon COATING is a consumable tagged 'weapon_coating' (Poison
+  // OTA-704 — a weapon COATING is a consumable tagged 'weapon_coating' (Poison
   // Vial, Incendiary Paste, …). Split those out from FOOD & HEALTH so the two
   // don't intermix on the RECIPES tab: food/health first, coatings second.
   const isCoating = (result: string): boolean =>
@@ -226,8 +226,6 @@ export function RecipesView({
     { key: 'coating', label: 'WEAPON COATINGS', match: (e) => e.kind === 'consumable' && isCoating(e.recipe.result) },
     { key: 'misc', label: 'GEAR & MISC', match: (e) => e.kind === 'misc' },
   ];
-  // Group the evaluated recipes by category (preserving the sort), banners only
-  // for non-empty categories — mirrors the collapsible inventory sections.
   const groups = CATEGORY_ORDER
     .map((c) => ({ ...c, items: evaluated.filter(c.match) }))
     .filter((g) => g.items.length > 0);
@@ -255,7 +253,7 @@ export function RecipesView({
                       {cat.rarity ?? 'Common'}
                     </Text>
                   </View>
-                  {/* OTA-1061 — WHICH SLOT. The catalog knew all along (previewArmor
+                  {/* OTA-1038 — WHICH SLOT. The catalog knew all along (previewArmor
                       builds "Hands Armor") but the craft row only ever rendered
                       the stats line, so the player had to guess from the name —
                       and 17 of the 90 nouns armor names end in are ambiguous
@@ -296,7 +294,7 @@ export function RecipesView({
                   ) : (
                     <Text style={styles.recipeIng}>
                       <Text style={styles.recipeIngLabel}>Needs: </Text>
-                      {/* OTA-755 — even for recipes you can't complete yet, color
+                      {/* OTA-736 — even for recipes you can't complete yet, color
                           each ingredient you ALREADY hold green; short ones stay
                           red with the remaining count. Lets the player see how
                           close a blueprint is and decide whether to save toward it
@@ -336,7 +334,7 @@ export function RecipesView({
 
   return (
     <>
-      {/* OTA-1006 — the quantity step. MAX is substitution-aware, so it never
+      {/* OTA-983 — the quantity step. MAX is substitution-aware, so it never
           promises more than the pack can actually pay for. */}
       <CraftQuantityModal
         visible={qtyFor !== null}

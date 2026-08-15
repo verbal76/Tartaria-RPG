@@ -1,0 +1,132 @@
+name: Publish · OTA (golem-line, test phone only)
+
+# Publishes the golem-line JS bundle as an OTA to the 'golem-line' EAS channel
+# ONLY. The Golem test APK is the only build that listens to that channel (its
+# app.json sets expo-channel-name: golem-line), so this reaches the developer's
+# personal Golem install and NOTHING else.
+#
+# This is a SEPARATE workflow from eas-update.yml ON PURPOSE. eas-update.yml is
+# hardcoded to publish to the LIVE playtester channels (hal2001 / preview /
+# ios-preview). This file must NEVER touch those — it only ever knows the string
+# "golem-line". Keeping it isolated in its own file is the firewall: there is no
+# code path here that can reach a live channel.
+#
+# Trigger: a JS-bundle (app/**) push to the golem-line branch. Native / build-
+# config changes are path-ignored here because they need a fresh APK
+# (build-apk.yml via workflow_dispatch), not an OTA.
+
+on:
+  push:
+    branches:
+      - golem-line
+    paths-ignore:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'app.json'
+      - 'eas.json'
+      - 'metro.config.js'
+      - 'babel.config.js'
+      - 'tsconfig.json'
+      - '.github/**'
+      - '**.md'
+      - 'docs/**'
+      - 'scripts/**'
+      - 'android/**'
+      - 'ios/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  ota:
+    name: Publish isolated golem-line OTA (Android, test phone only)
+    runs-on: ubuntu-latest
+    # Belt-and-suspenders — this job only ever runs for the golem-line branch.
+    # If anything ever re-points it, it no-ops instead of leaking.
+    if: github.ref == 'refs/heads/golem-line'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Expo and EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: 18.1.0
+          token: ${{ secrets.TARTARIATWO }}
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Publish OTA to the golem-line channel ONLY
+        env:
+          EXPO_TOKEN: ${{ secrets.TARTARIATWO }}
+        run: |
+          set -euo pipefail
+          CHANNEL="golem-line"
+
+          # ── HARD FENCE ────────────────────────────────────────────────
+          # Refuse to run for any other branch, and refuse to ever name a
+          # live playtester channel. Either condition is a hard failure —
+          # a leak here ships an untested bundle to real testers.
+          if [ "${GITHUB_REF_NAME}" != "golem-line" ]; then
+            echo "::error::Refusing to publish — branch '${GITHUB_REF_NAME}' is not golem-line."
+            exit 1
+          fi
+          case "$CHANNEL" in
+            hal2001|preview|ios-preview|production|development|arbiters-line)
+              echo "::error::Refusing to publish to a non-golem channel ('$CHANNEL')."
+              exit 1 ;;
+          esac
+          # ──────────────────────────────────────────────────────────────
+
+          APP_VERSION=$(node -p "require('./app.json').expo.version")
+          BUNDLE_CHANNEL=$(node -p "require('./app.json').expo.updates.requestHeaders['expo-channel-name'] || ''")
+          if [ "$BUNDLE_CHANNEL" != "golem-line" ]; then
+            echo "::error::app.json expo-channel-name is '$BUNDLE_CHANNEL', not 'golem-line' — the Golem APK would not receive this. Aborting to avoid a stray publish."
+            exit 1
+          fi
+          MSG="Golem OTA (isolated) — golem-line@${GITHUB_SHA::7} (run #${{ github.run_number }})"
+
+          echo "=== Isolated OTA — pre-flight ==="
+          echo "Branch:           ${GITHUB_REF_NAME}"
+          echo "Channel:          $CHANNEL (Golem test phone only — NOT hal2001/preview)"
+          echo "App version (rt): $APP_VERSION"
+          echo "================================="
+
+          set +e
+          eas update \
+            --branch "$CHANNEL" \
+            --message "$MSG" \
+            --platform android \
+            --non-interactive \
+            --json > result.json
+          rc=$?
+          set -e
+          if [ $rc -ne 0 ]; then
+            echo "::error::Publish to '$CHANNEL' failed (exit $rc)."
+            cat result.json 2>/dev/null || true
+            exit $rc
+          fi
+
+          # Map the channel to its same-named branch (idempotent) so the APK's
+          # 'expo-channel-name: golem-line' header resolves here.
+          eas channel:view "$CHANNEL" --non-interactive >/dev/null 2>&1 \
+            || eas channel:create "$CHANNEL" --non-interactive 2>&1 || true
+          eas channel:edit "$CHANNEL" --branch "$CHANNEL" --non-interactive 2>&1 \
+            || echo "::warning::channel:edit failed for '$CHANNEL' — check the EAS dashboard mapping."
+
+          # Runtime guard — the installed Golem APK requests runtimeVersion =
+          # app version; a mismatch silently no-ops.
+          PUB_RT=$(node -e "const r=JSON.parse(require('fs').readFileSync('result.json','utf8'));const a=Array.isArray(r)?r:[r];console.log(a[0]&&a[0].runtimeVersion||'')")
+          if [ "$PUB_RT" != "$APP_VERSION" ]; then
+            echo "::error::Published runtimeVersion '$PUB_RT' != app '$APP_VERSION' — the Golem APK will reject it."
+            exit 1
+          fi
+          echo "✓ Published OTA to '$CHANNEL' (android) at runtimeVersion $PUB_RT — reaches the Golem test install only."

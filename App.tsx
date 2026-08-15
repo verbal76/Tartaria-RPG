@@ -17,8 +17,11 @@ import {
   markMLInitSucceeded,
   clearInFlightBreadcrumbs,
 } from './app/diagnostics/mlHealth';
+import { clearLiveBreadcrumb } from './app/engine/saveSystem'; // OTA-1276
 import { TitleScreen } from './app/screens/TitleScreen';
 import { SplashOverlay } from './app/components/SplashOverlay';
+// PC / Steam Deck controller navigation (steam line only).
+import { GamepadNav } from './app/components/GamepadNav';
 import { CharacterCreationScreen } from './app/screens/CharacterCreationScreen';
 import { ExplorationScreen } from './app/screens/ExplorationScreen';
 import { LogScreen } from './app/screens/LogScreen';
@@ -34,18 +37,17 @@ import { ActionReferenceScreen } from './app/screens/ActionReferenceScreen';
 import { ContractsScreen } from './app/screens/ContractsScreen';
 import { WorldScreen } from './app/screens/WorldScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
-import { GamepadNav } from './app/components/GamepadNav';
 import { CallDogModal } from './app/components/CallDogModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
-import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1043
-import { StoryRevealOverlay } from './app/components/StoryRevealOverlay'; // OTA-1206
-import { StoryForkOverlay } from './app/components/StoryForkOverlay'; // OTA-1088
-import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1045
-import { StoryIntroOverlay } from './app/components/StoryIntroOverlay'; // OTA-1046 — global (was exploration-only)
-import { DeathOverlay } from './app/components/DeathOverlay'; // OTA-1133 — the closing scene, global by necessity
-import { DogOnboardingModal } from './app/components/DogOnboardingModal'; // OTA-1050
-import { GolemNamingModal } from './app/components/GolemNamingModal'; // OTA-1050
+import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1020
+import { StoryRevealOverlay } from './app/components/StoryRevealOverlay'; // OTA-1183
+import { StoryForkOverlay } from './app/components/StoryForkOverlay'; // OTA-1065
+import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1022
+import { StoryIntroOverlay } from './app/components/StoryIntroOverlay'; // OTA-1023 — global (was exploration-only)
+import { DeathOverlay } from './app/components/DeathOverlay'; // OTA-1110 — the closing scene, global by necessity
+import { DogOnboardingModal } from './app/components/DogOnboardingModal'; // OTA-1027
+import { GolemNamingModal } from './app/components/GolemNamingModal'; // OTA-1027
 import { KeyboardInputBar } from './app/components/KeyboardInputBar';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
@@ -53,13 +55,13 @@ import { initTTSManager } from './app/voice/TTSManager';
 import { startTTSController, stopTTSController } from './app/voice/TTSController';
 import { createExpoFileSystemAdapter } from './app/voice/executorchAdapter';
 import { checkAndApplyOTA } from './app/updates/checkAndApplyOTA';
-// OTA-1197 — read what expo thinks it is running, for the boot-check log line.
+// OTA-1174 — read what expo thinks it is running, for the boot-check log line.
 import * as Updates from 'expo-updates';
 import { useUiScale } from './app/ui/uiScale';
 import { loadDisplaySettings, useDisplaySettings, baseColorOf } from './app/ui/displaySettings';
 import { autosaveTick, loadAutosaveDisabled, AUTOSAVE_INTERVAL_MS } from './app/ui/autosave';
-import { loadUiScale } from './app/ui/displayScale'; // OTA-1250
-import { initDesktopBack, useBackAction } from './app/ui/desktopBack'; // OTA-1252 — right-click / Escape = back
+import { loadUiScale } from './app/ui/displayScale'; // OTA-1227
+import { initDesktopBack, useBackAction } from './app/ui/desktopBack'; // OTA-1229 — right-click / Escape = back
 
 // Lazy-load expo-navigation-bar. The package is a native module bridged
 // only in APKs built AFTER it was added to dependencies — older
@@ -169,6 +171,14 @@ try {
   // the dev environment surfaces errors well enough on its own.
 }
 
+// ⚠⚠ OTA-1275 — how long the app must stay in the FOREGROUND before the parked
+// Qwen model is rebuilt. Measured against the owner's own log-copy workflow,
+// whose foreground visits ran 2.3s / 2.5s / 2.4s / 6.9s while he switched out to
+// paste each part: 8s clears all of that churn, and a real play session passes
+// it without noticing. Not a guess at a "nice" number — the number that makes
+// app-switching free.
+const QWEN_REWARM_DELAY_MS = 8_000;
+
 export default function App() {
   const screen = useGameStore((s) => s.currentScreen);
   const hydrated = useGameStore((s) => s.hydrated);
@@ -182,6 +192,10 @@ export default function App() {
   // `active` handler knows to re-warm it. (Manual disable / failed / skipped
   // never set this, so we never fight the user's choice.)
   const qwenParkedRef = useRef(false);
+  // ⚠⚠ OTA-1275 — the re-warm timer. See the app-state handler below: the model
+  // reload is DEBOUNCED on continuous foreground so app-switching cannot thrash
+  // a ~425MB native load/free cycle every couple of seconds.
+  const qwenRewarmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Android immersive mode — hide the navigation bar (3-button bar at
   // the bottom) and let the status bar overlay-swipe back. Same UX as
@@ -260,9 +274,9 @@ export default function App() {
         // offline check (capped at 5s), or any error all fall THROUGH to
         // the normal boot below. The check resolves fast when up to date;
         // it only blocks longer while actually downloading an update.
-        // ⚠⚠ OTA-1197 — THE UPDATE PATH NOW SAYS WHAT IT DID, ON THE DEVICE LOG.
+        // ⚠⚠ OTA-1174 — THE UPDATE PATH NOW SAYS WHAT IT DID, ON THE DEVICE LOG.
         //
-        // Owner, stuck on OTA-1194 while 1195 and 1196 sat published and unreachable:
+        // Owner, stuck on OTA-1171 while 1195 and 1196 sat published and unreachable:
         // *"it hasn't been able to pull an update after that."* Both were verified
         // published to hal2001 AND preview, iOS, runtimeVersion 2.4.1 — the server side
         // was provably fine — and there was NOTHING on the device that could say why they
@@ -361,7 +375,7 @@ export default function App() {
                 void markMLInitAttempted();
                 void bootQwen()
                   .then(() => {
-                    // ⚠⚠ OTA-1203 — CHECK, DON'T ASSUME. `bootQwen()` RESOLVES ON FAILURE.
+                    // ⚠⚠ OTA-1180 — CHECK, DON'T ASSUME. `bootQwen()` RESOLVES ON FAILURE.
                     // See the twin call site below for the measurement and the consequence;
                     // both sites had the identical defect and both are fixed.
                     const ok = useGameStore.getState().qwenStatus === 'ready';
@@ -414,7 +428,7 @@ export default function App() {
               void markMLInitAttempted();
               void bootQwen()
                 .then(() => {
-                  // ⚠⚠ OTA-1203 — `bootQwen()` RESOLVES WHETHER OR NOT THE MODEL LOADED, AND
+                  // ⚠⚠ OTA-1180 — `bootQwen()` RESOLVES WHETHER OR NOT THE MODEL LOADED, AND
                   // THIS TREATED THAT AS SUCCESS. Its own comment says so outright:
                   // "qwen.initialize() swallows errors and sets its own internal status to
                   // 'failed' rather than throwing" — it then sets `qwenStatus: 'failed'` and
@@ -560,6 +574,14 @@ export default function App() {
         // template/reason=qwen-not-ready; the long-travel log showed exactly
         // this — init succeeded at boot, then status=idle for 20 min). Remember
         // that WE parked a ready model so `active` knows to bring it back.
+        // ⚠⚠ OTA-1275 — CANCEL ANY PENDING RE-WARM, on `inactive` too. This is
+        // the half that stops the thrash: a foreground visit shorter than the
+        // debounce never loads the model at all, so leaving again costs nothing.
+        if (qwenRewarmTimer.current) {
+          clearTimeout(qwenRewarmTimer.current);
+          qwenRewarmTimer.current = null;
+          useGameStore.getState().appendLog('debug', 'qwen: re-warm cancelled (left the foreground first)');
+        }
         if (status === 'background') {
           if (useGameStore.getState().qwenStatus === 'ready') qwenParkedRef.current = true;
           void shutdownQwen();
@@ -573,6 +595,10 @@ export default function App() {
         // falsely benching the Arbiter (the user never crashes, yet the guard
         // disabled Qwen + flagged a Kokoro "voice crash" off one benign close).
         void clearInFlightBreadcrumbs();
+        // ⚠⚠ OTA-1276 — an ORDERLY exit clears the live breadcrumb, so one that
+        // SURVIVES to the next boot means the process died while still live —
+        // the swipe-kill after a hard freeze. Same discipline as arb126 above.
+        void clearLiveBreadcrumb();
       } else if (status === 'active') {
         void resumeCognitive();
         // Re-hide the navigation bar — Android sometimes restores it
@@ -589,14 +615,47 @@ export default function App() {
         // in the background. Without this, one transient background killed the
         // Arbiter's LLM voice for the rest of the session. Guarded by the
         // parked flag so a user who manually disabled Qwen stays disabled.
-        if (qwenParkedRef.current) {
-          qwenParkedRef.current = false;
-          void bootQwen();
+        // ⚠⚠ OTA-1275 — DEBOUNCED, because the un-debounced version turned the
+        // owner's own bug-report workflow into a memory grinder. His 4.29.197
+        // log, while he was copying it to me in parts:
+        //
+        //   14:00:22 active   ctx OPENED  ≈425MB
+        //   14:00:25 background ctx RELEASED   (2.5s later)
+        //   14:00:28 active   ctx OPENED  ≈425MB
+        //   14:00:31 background ctx RELEASED   (2.3s later)
+        //   14:00:35 active   ctx OPENED  ≈425MB
+        //   14:00:41 active   ctx OPENED  ≈425MB
+        //
+        // SIX full model loads in four minutes, four of them inside twenty
+        // seconds — every app-switch tore down and rebuilt ~425MB of native
+        // context. arb140 was right that a parked model must come back; it just
+        // brought it back INSTANTLY, so every switch-away paid full price.
+        //
+        // ⚠ And a 2.5s visit is shorter than the load itself ("~1-5s context
+        // reload"), so the release lands DURING an in-flight init — precisely
+        // the orphan shape OTA-1177 filed as its leading unmeasured suspect
+        // (dispose before `this.context` is assigned frees nothing). Waiting for
+        // a settled foreground makes that race structurally unreachable rather
+        // than merely unlikely.
+        //
+        // The dump on `background` stays IMMEDIATE — that is the jetsam fix, and
+        // holding 425MB while backgrounded is what gets us killed. Only the
+        // reload waits.
+        if (qwenParkedRef.current && !qwenRewarmTimer.current) {
+          qwenRewarmTimer.current = setTimeout(() => {
+            qwenRewarmTimer.current = null;
+            qwenParkedRef.current = false;
+            useGameStore.getState().appendLog('debug', `qwen: re-warming after ${QWEN_REWARM_DELAY_MS}ms settled foreground`);
+            void bootQwen();
+          }, QWEN_REWARM_DELAY_MS);
         }
       }
     };
     const sub = AppState.addEventListener('change', onChange);
-    return () => sub.remove();
+    return () => {
+      sub.remove();
+      if (qwenRewarmTimer.current) { clearTimeout(qwenRewarmTimer.current); qwenRewarmTimer.current = null; }
+    };
   }, [shutdownCognitive, resumeCognitive, shutdownQwen, bootQwen]);
 
   // OTA-368 — periodic autosave. persist() fires on every meaningful
@@ -606,16 +665,16 @@ export default function App() {
   // loss to ~90s of idle. The write is atomic + cheap, and persist()
   // self-guards (no slot / no player / invalid record → no-op), so the
   // timer can fire unconditionally even on the title screen.
-  // OTA-1232 — the timer is now TOGGLEABLE (Settings -> RUN, default ON) at
+  // OTA-1209 — the timer is now TOGGLEABLE (Settings -> RUN, default ON) at
   // the owner's ask after a lost session — the protection existed, the
   // control and the visibility didn't. Cadence unchanged: 90s already beats
   // the 2-10 minute industry span, do not loosen it to look "standard".
   useEffect(() => {
     void loadAutosaveDisabled(); // warm the per-install flag before the first beat
-    // OTA-1250 — and re-apply the saved UI scale: Electron does not remember
+    // OTA-1227 — and re-apply the saved UI scale: Electron does not remember
     // the zoom across launches, so without this a 'large' player relaunches small.
     void loadUiScale();
-    // OTA-1252 — attach the desktop back routes (right-click + Escape). No-op
+    // OTA-1229 — attach the desktop back routes (right-click + Escape). No-op
     // on a phone, and idempotent, so a re-run of this effect costs nothing.
     initDesktopBack();
     const timer = setInterval(() => {
@@ -675,11 +734,11 @@ export default function App() {
       <SilentBoundary tag="AetherStatPickerModal">
         <AetherStatPickerModal />
       </SilentBoundary>
-      {/* OTA-1043 — chapter cards mount GLOBALLY (not per-screen) because
+      {/* OTA-1020 — chapter cards mount GLOBALLY (not per-screen) because
           main-quest phase transitions fire from more than one screen: travel
           arrival lands on exploration, but the Nexus choice fires from
           Contracts. Wherever the arc turns, the card shows. */}
-      {/* OTA-1088 — ABOVE the chapter card in the tree so a decision is never
+      {/* OTA-1065 — ABOVE the chapter card in the tree so a decision is never
           drawn under a marker. raiseDueFork already yields to a live card, so
           in practice they never both want the screen; this is the belt to that
           braces. */}
@@ -689,25 +748,25 @@ export default function App() {
       <SilentBoundary tag="ChapterCardOverlay">
         <ChapterCardOverlay />
       </SilentBoundary>
-      {/* OTA-1206 — a completed collectible story, read whole. Mounted beside the
+      {/* OTA-1183 — a completed collectible story, read whole. Mounted beside the
           chapter card because it is the same register of beat, and globally because a
           set can close from any screen that can grant loot. */}
       <SilentBoundary tag="StoryRevealOverlay">
         <StoryRevealOverlay />
       </SilentBoundary>
-      {/* OTA-1045 — one-time veteran motive picker, raised by the load paths
+      {/* OTA-1022 — one-time veteran motive picker, raised by the load paths
           for saves whose motive was dealt by backfill rather than chosen. */}
       <SilentBoundary tag="MotivePickerModal">
         <MotivePickerModal />
       </SilentBoundary>
-      {/* OTA-1046 — the opening crawl mounts GLOBALLY (it lived on the
+      {/* OTA-1023 — the opening crawl mounts GLOBALLY (it lived on the
           exploration screen only, which forced REPLAY OPENING to navigate
           there first). Now REPLAY plays right over whatever screen raised
           it — the CharacterScreen header button included. */}
       <SilentBoundary tag="StoryIntroOverlay">
         <StoryIntroOverlay />
       </SilentBoundary>
-      {/* ⚠ OTA-1133 — THE DEATH SCREEN, and it mounts LAST on purpose. Owner:
+      {/* ⚠ OTA-1110 — THE DEATH SCREEN, and it mounts LAST on purpose. Owner:
           "stop anything else from happening after i hit 0." A character can
           die on the exploration screen, mid-climb, inside a hub room or with
           another modal already up, so this cannot live on one screen — and
@@ -716,7 +775,7 @@ export default function App() {
       <SilentBoundary tag="DeathOverlay">
         <DeathOverlay />
       </SilentBoundary>
-      {/* OTA-1050 — dog onboarding + golem naming moved out of the typed feed
+      {/* OTA-1027 — dog onboarding + golem naming moved out of the typed feed
           into blocking popups (a playtester typed "rest" at the breed ask and
           the old takeover swallowed it as the answer). */}
       <SilentBoundary tag="DogOnboardingModal">
@@ -867,7 +926,7 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
   // scale recomputes. Every screen rendered below inherits the new
   // scale via the wrapper transform — no per-screen changes needed.
   const ui = useUiScale();
-  // ⚠⚠ OTA-1252 — THE BOTTOM OF THE BACK STACK. Owner, on the PC build: *"right
+  // ⚠⚠ OTA-1229 — THE BOTTOM OF THE BACK STACK. Owner, on the PC build: *"right
   // click on the mouse should be the back button."* This is the FIRST handler
   // registered, and the stack runs top-down, so it is the LAST consulted — a
   // right-click inside the TAKE popup closes TAKE, not the screen beneath it.
@@ -933,11 +992,17 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           the bars. Umber base (styles.root) → faint tiled parchment (~5%) →
           radial vignette that darkens the margins but keeps the center clear.
           pointerEvents none so it never eats a touch. */}
-      {/* The parchment grain + vignette give MOBILE its "aged paper" look, but
-          react-native-web mis-renders them: resizeMode="repeat" draws ONE copy in
-          the corner (a hard-edged square) and the stretched vignette reads as a
-          crisp colour split. On web/desktop we drop both and show only the solid
-          base colour the player picked in Settings — clean, no artifacts. */}
+      {/* arb84 — parchment tiles via ImageBackground (a plain <Image> with
+          resizeMode="repeat" does NOT tile — it draws ONE 256px copy in the
+          top-left corner, which read as a hard-edged lighter rectangle / the
+          "color split"). ImageBackground tiles reliably; opacity goes on the
+          CONTAINER style (not imageStyle, which iOS ignored) so it dims
+          reliably AND repeats. */}
+      {/* ⚠ STEAM/PC — the parchment grain + vignette give MOBILE its "aged
+          paper" look, but react-native-web mis-renders them: resizeMode="repeat"
+          draws ONE copy in the corner (a hard-edged square) and the stretched
+          vignette reads as a crisp colour split. On web/desktop we drop both and
+          show only the solid base colour the player picked in Settings. */}
       {Platform.OS !== 'web' && (
         <>
           <ImageBackground

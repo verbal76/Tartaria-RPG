@@ -8,7 +8,7 @@ import { applyLoreLexicon, cleanForSpeech, getLexiconSize } from '../app/voice/l
 
 describe('applyLoreLexicon', () => {
   it('respells Aetheric (case-insensitive)', () => {
-    // ⚠ RETARGETED for OTA-1170: the head is one word ("ayther", the owner's
+    // ⚠ RETARGETED for OTA-1147: the head is one word ("ayther", the owner's
     // "āther") instead of two space-separated beats, and the bare -ic suffix
     // stays attached so the stress lands ay-THER-ik. Case-insensitivity — the
     // property this test exists for — is unchanged.
@@ -18,7 +18,7 @@ describe('applyLoreLexicon', () => {
   });
 
   it('respells Aetherstone / Aether / Aetherborn distinctly', () => {
-    // ⚠ RETARGETED for OTA-1170 ("ay thur" → "ayther"). The compound still
+    // ⚠ RETARGETED for OTA-1147 ("ay thur" → "ayther"). The compound still
     // keeps its space before the real word "stone" — the distinctness this
     // test pins is unchanged.
     expect(applyLoreLexicon('the Aetherstone Flood')).toBe('the ayther stone Flood');
@@ -38,7 +38,7 @@ describe('applyLoreLexicon', () => {
     // The trailing apostrophe in "Reclaimers'" stays in place after
     // substitution — TTS reads "ree clay merz Outpost" naturally
     // because the apostrophe isn't pronounced.
-    // ⚠ RETARGETED for OTA-1169: the article now takes its schwa reading before
+    // ⚠ RETARGETED for OTA-1146: the article now takes its schwa reading before
     // a consonant sound, and the respelling "ree…" is one. The claim this test
     // makes — that the apostrophe survives substitution — is unchanged.
     expect(applyLoreLexicon("the Reclaimers' Outpost")).toBe("thuh ree clay merz' Outpost");
@@ -51,7 +51,7 @@ describe('applyLoreLexicon', () => {
   });
 
   it('leaves non-lore words untouched', () => {
-    // ⚠ RETARGETED for OTA-1169. This test used to read "leaves non-matching
+    // ⚠ RETARGETED for OTA-1146. This test used to read "leaves non-matching
     // text untouched" and prove it with a sentence containing "the" — which the
     // article rule now (correctly) rewrites to its schwa reading before the
     // consonant "gate". The property actually worth pinning is that ordinary

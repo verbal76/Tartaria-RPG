@@ -1,5 +1,5 @@
 {
-  "_comment": "OTA-1067 — the golem card's ROLL pool, the sibling of app/data/dogs/dog-names.json. Different register on purpose: a dog is an animal you name, a golem is a thing you MADE and are sealing a name into the Aetherstone of. These read as titles, works, or epitaphs rather than pet names — one or two words, always sayable, always inside the 16-character cap the name field enforces.",
+  "_comment": "OTA-1044 — the golem card's ROLL pool, the sibling of app/data/dogs/dog-names.json. Different register on purpose: a dog is an animal you name, a golem is a thing you MADE and are sealing a name into the Aetherstone of. These read as titles, works, or epitaphs rather than pet names — one or two words, always sayable, always inside the 16-character cap the name field enforces.",
   "names": [
     "Vessel",
     "Keeper",

@@ -10,7 +10,7 @@
 // call site can either branch on the boolean or surface the reason.
 
 import type { InventoryItem, PlayerCharacter } from './types';
-// OTA-1020 — tag tests read canonical (instance-union-catalog) tags. Instances mint
+// OTA-997 — tag tests read canonical (instance-union-catalog) tags. Instances mint
 // with a tag SNAPSHOT; vials acquired before a catalog tag existed carried a
 // stale set forever and refused to rack while identical new ones racked fine.
 import { canonicalItemTags } from './crafting';

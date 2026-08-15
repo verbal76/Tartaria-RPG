@@ -37,7 +37,7 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-// OTA-940 — a coated BAREHANDED-tag weapon whose name contains a body word ("Mud-fist Wraps")
+// OTA-917 — a coated BAREHANDED-tag weapon whose name contains a body word ("Mud-fist Wraps")
 // must still apply its coating. Before the fix, isBareHandAttack("attack with the mud-fist wraps")
 // matched "fist" -> barehand=true -> the coating block was skipped entirely.
 import { useGameStore } from '../app/state/gameStore';
@@ -102,7 +102,7 @@ async function attackResolvingAll(actionText: string) {
   }
 }
 
-describe('OTA-940 — coated barehanded weapon applies its coating', () => {
+describe('OTA-917 — coated barehanded weapon applies its coating', () => {
   let rngSpy: jest.SpyInstance;
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
   afterEach(() => { if (rngSpy) rngSpy.mockRestore(); });

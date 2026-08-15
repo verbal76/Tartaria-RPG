@@ -76,7 +76,7 @@ const WEAPON_TAGS = ['weapon', 'throwable', 'thrown'] as const;
  *  not explicitly tagged wardrobe, AND either a tool kind (exploration/relic)
  *  or a tool tag (scanner/light/lens/pry/…). */
 export function itemIsTool(item: InventoryItem): boolean {
-  // OTA-1024 — canonical kind + tags: a stale Climbing Rope vanished from TOOLS and
+  // OTA-1001 — canonical kind + tags: a stale Climbing Rope vanished from TOOLS and
   // a stale Shard lost its weapon-signal and mis-filed as a tool.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { canonicalItemKind: pk, canonicalItemTags: pt } = require('./crafting') as typeof import('./crafting');

@@ -66,7 +66,7 @@ interface Props {
    *  measured by ExplorationScreen). The card scrolls vertically past this so a
    *  tall enemy never grows the row — it stays in the corner like the feed. */
   maxHeight?: number;
-  /** OTA-818 — player Wisdom, gates reading a (non-boss) enemy's weaknesses. */
+  /** OTA-798 — player Wisdom, gates reading a (non-boss) enemy's weaknesses. */
   playerWisdom?: number;
   /** OTA-838 — enemy intel learned by fighting (worldMemory.enemyIntel), keyed by
    *  lowercased enemy name. Even below the Wisdom read-threshold, a type you've SEEN
@@ -74,7 +74,7 @@ interface Props {
   enemyIntel?: Record<string, { weak: string[]; resist: string[] }>;
   /** OTA-928 — the player's Power rating, to colour each enemy's Power badge by matchup. */
   playerPower?: number;
-  /** OTA-1140 — the `witholdIntel` difficulty dial. When set, the WIS-granted
+  /** OTA-1117 — the `witholdIntel` difficulty dial. When set, the WIS-granted
    *  free read is switched off: a hard run tells you nothing about a foe that
    *  the bestiary has not EARNED by hitting it. Never touches the `observed`
    *  path below — "strike to learn" is the whole point, and a dial that also
@@ -99,7 +99,7 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** Combine the macro type-resistance map with the enemy's per-instance
  *  resist:/vulnerable: traits into the damage types it resists / is weak to.
- *  OTA-818 — RECONCILE per type the same way combat does (combineDamageTypeMatch):
+ *  OTA-798 — RECONCILE per type the same way combat does (combineDamageTypeMatch):
  *  a trait that DISAGREES with the type-map wins, so a `resist:X` trait cancels a
  *  type-map weakness (and a `vulnerable:X` overrides a type resist). Without this the
  *  panel would still list an enemy's ORIGINAL type weakness even after per-spawn
@@ -121,13 +121,13 @@ function defensesFor(enemy: Enemy): { resists: string[]; weaknesses: string[] } 
   return { resists, weaknesses };
 }
 
-// OTA-818 — a WISDOM ≥ this reads an enemy's (randomized) weaknesses off the portrait
+// OTA-798 — a WISDOM ≥ this reads an enemy's (randomized) weaknesses off the portrait
 // up front; below it you must discover them by landing hits (the combat log's
 // "Weakness exposed" line is the feedback). Matches the parley WIS_REVEAL_THRESHOLD, so
 // Wisdom is the consistent "scout the enemy" stat. Bosses always show (OTA-798).
 const WEAKNESS_READ_WIS = 12;
 
-// OTA-819 — the WIS read is DIEGETIC: instead of a bare "WEAK: burn" label, the detail
+// OTA-799 — the WIS read is DIEGETIC: instead of a bare "WEAK: burn" label, the detail
 // popup narrates what you notice about the creature that gives the weakness/resistance
 // away. Keeps the concrete damage type in parentheses so it's still actionable.
 const WEAK_FLAVOR: Record<string, string> = {
@@ -154,7 +154,7 @@ const RESIST_FLAVOR: Record<string, string> = {
 };
 
 export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, playerWisdom, enemyIntel, playerPower, witholdIntel }: Props) {
-  // OTA-1140 — the RULE dial, and the survey's reason for rating rule changes
+  // OTA-1117 — the RULE dial, and the survey's reason for rating rule changes
   // above multipliers: this costs nothing to compute and changes how the fight
   // is PLAYED rather than how long it takes. A high-WIS character normally
   // reads a foe's resists and weaknesses on sight; under `witholdIntel` that
@@ -239,7 +239,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
       ) : (
         <FlatList
           data={enemies}
-          // OTA-952 — BLANK-PORTRAIT-AFTER-A-KILL fix. A kill removes the fallen enemy from
+          // OTA-929 — BLANK-PORTRAIT-AFTER-A-KILL fix. A kill removes the fallen enemy from
           // currentScene.enemies and REINDEXES it, but this pager keyed cells on the array INDEX
           // and kept its stale scroll offset — so after "you beat one of them" the visible card
           // recycled to a blank/wrong page. Key the pager on the enemy ROSTER (names) so a kill
@@ -302,10 +302,10 @@ function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { weak: s
   }
   lines.push('');
   lines.push(`HP ${view.currentHp}/${e.hp}     AC ${ac}`);
-  // OTA-1162 (audit) — a boss's real per-round output, not the notation third of it.
+  // OTA-1139 (audit) — a boss's real per-round output, not the notation third of it.
   lines.push(`Attack ${atkLabel}     Damage ${enemyDamageCompact(e)}${dealsType ? ` (${cap(dealsType)})` : ''}`);
   // OTA-818/819 — a non-boss enemy's (randomized) defenses are WIS-gated: read them up
-  // front only with enough Wisdom, else discover by hitting. OTA-819 — the read is
+  // front only with enough Wisdom, else discover by hitting. OTA-799 — the read is
   // DIEGETIC: narrate what you notice, with the damage type in parens.
   if (e.boss || canRead) {
     for (const w of defenses.weaknesses) lines.push(`You size it up — ${WEAK_FLAVOR[w] ?? `it looks vulnerable to ${w}`}. (Weak: ${cap(w)})`);
@@ -422,7 +422,7 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
         <Stat label="DMG" value={enemyDamageCompact(view.enemy)} />
       </View>
       <View style={styles.defs}>
-        {/* OTA-818 — a non-boss enemy's randomized RESIST/WEAK are WIS-gated (read
+        {/* OTA-798 — a non-boss enemy's randomized RESIST/WEAK are WIS-gated (read
             required); a boss always shows. Below the threshold you learn by hitting. */}
         {(view.enemy.boss || canRead) ? (
           <>

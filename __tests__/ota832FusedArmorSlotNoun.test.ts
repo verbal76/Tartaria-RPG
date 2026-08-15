@@ -1,4 +1,4 @@
-// OTA-832 — a fused armor piece pulled its NOUN from a flat pool
+// OTA-812 — a fused armor piece pulled its NOUN from a flat pool
 // (Girdle/Harness/Plating/…) while its SLOT was chosen separately, so a "Girdle"
 // (waist) or "Harness" (torso) word could land on the FEET slot (player report:
 // "one of the feet slot armor is a girdle?"). The synth now picks the slot first,
@@ -18,7 +18,7 @@ const SLOT_NOUNS: Record<string, string[]> = {
   feet: ['Boots', 'Sabatons', 'Treads', 'Stompers', 'Warboots', 'Footguards', 'Striders'],
 };
 
-describe('OTA-832 — fused armor noun matches its slot', () => {
+describe('OTA-812 — fused armor noun matches its slot', () => {
   it('across many input sets, the armor noun is always valid for the assigned slot', () => {
     const tagPools = [
       ['metal', 'plate'], ['cloth', 'fiber'], ['aether', 'crystal'],

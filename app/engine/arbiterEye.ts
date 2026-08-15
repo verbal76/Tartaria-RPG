@@ -1,4 +1,4 @@
-// arbiterEye.ts — OTA-1229. THE TORCH MARKS WHAT'S WORTH A CLOSER LOOK.
+// arbiterEye.ts — OTA-1206. THE TORCH MARKS WHAT'S WORTH A CLOSER LOOK.
 //
 // The owner, 75+ hours into his own game: "I tap investigate, tap an item, tap
 // investigate, tap an item... that's becoming a boring part of the game because
@@ -55,7 +55,7 @@ export function arbiterEyeNouns(args: ArbiterEyeArgs): string[] {
     const holdsPerch = !!args.nounPlacements?.[noun] && !searched.has(ln);
     if (holdsHook || holdsNote || holdsPerch) out.push(noun);
   }
-  // ⚠ OTA-1233 — THE LEAD ITSELF IS THE STRONGEST MARK, and it was invisible.
+  // ⚠ OTA-1210 — THE LEAD ITSELF IS THE STRONGEST MARK, and it was invisible.
   // The owner's device log, first real session with the eye: the torch charged
   // the submerged-steeple lead and paid a Rare — but no ✦ ever appeared,
   // because a story lead is usually NOT an ambient chip, and this function

@@ -1,4 +1,4 @@
-// OTA-1186 — THE FIRST CONTRACT COMES WITH SOMEONE TO EXPLAIN IT.
+// OTA-1163 — THE FIRST CONTRACT COMES WITH SOMEONE TO EXPLAIN IT.
 //
 // Owner: "we have first time touch pop-ups all through the game. so how about the
 // first time someone accepts a bounty gets a pop-up and it does it in character…
@@ -46,7 +46,7 @@ export function formatWindow(hours: number): string {
 /** Why THIS contract asks for THIS many. The count is not flavor — it is
  *  `3 + ceil(tide/2) + giverDifficulty(standing)`, so a hall that trusts you asks for
  *  the fewest and a hall that does not asks you to prove it. Quoting the reason back
- *  is the whole OTA-1181/1183/1184 theme: the game knows, so say it. */
+ *  is the whole OTA-1158/1183/1184 theme: the game knows, so say it. */
 function whyThisMany(giverStanding: number | undefined, giverName: string): string {
   switch (giverDifficulty(giverStanding)) {
     case 0:  return `The ${giverName} count you one of theirs, so they asked for the fewest they could.`;

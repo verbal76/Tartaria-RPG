@@ -1,4 +1,4 @@
-// autosave.ts — OTA-1232. THE AUTOSAVE TOGGLE (the autosave itself is OLD).
+// autosave.ts — OTA-1209. THE AUTOSAVE TOGGLE (the autosave itself is OLD).
 //
 // Owner: a 2-hour session lost to a reflex swipe-up-to-close, "I didn't hit
 // save and exit" — asking for periodic autosave with a Settings toggle.

@@ -24,11 +24,11 @@
 import type { InventoryItem, UniqueItemStats } from './types';
 import { canonicalItemTags, isInferredItem, isRecipeIngredientName, findWeaponByName, findArmorByName } from './crafting';
 import { inferGearTagPack } from './itemDefaults';
-// OTA-1109 — the salvage-curio catalog, so the forge can refuse to name its
+// OTA-1086 — the salvage-curio catalog, so the forge can refuse to name its
 // product after stock salvage (see the input-echo rejection in the namer).
 import curiosData from '../data/relics/curios.json';
 
-// OTA-1109 — lowercase curio-name set for the forge-name rejection ladder.
+// OTA-1086 — lowercase curio-name set for the forge-name rejection ladder.
 const CURIO_NAME_SET: ReadonlySet<string> = new Set(
   ((curiosData as { curios: { name: string }[] }).curios ?? []).map((c) => c.name.trim().toLowerCase()),
 );
@@ -95,9 +95,9 @@ export interface FusionGate {
  *  so a reserved material you could SEE (♥) didn't actually count. */
 const FUSION_EQUIP_KINDS = ['weapon', 'armor', 'accessory', 'amulet', 'ring'];
 const FUSION_EDIBLE_TAG = /food|drink|healing|potion|weapon_coating|edible|ration|alcohol|treat|forag/i;
-/** OTA-1022 — the material tag(s) an item contributes to a fusion, for the info block.
+/** OTA-999 — the material tag(s) an item contributes to a fusion, for the info block.
  *  Output RARITY is driven by how many DISTINCT materials the chosen inputs span
- *  (3 different → Rare, 4+ → Legendary), NOT by the inputs' own rarity. */
+ *  (3 different \u2192 Rare, 4+ \u2192 Legendary), NOT by the inputs' own rarity. */
 export function fusionMaterialTags(item: { name: string; tags?: readonly string[] }): string[] {
   const out = new Set<string>();
   for (const t of item.tags ?? []) { const k = t.toLowerCase(); if (MATERIAL_TAG_SET.has(k)) out.add(k); }
@@ -105,7 +105,7 @@ export function fusionMaterialTags(item: { name: string; tags?: readonly string[
   return Array.from(out);
 }
 
-/** OTA-682 — which reserved inputs the Fusing Crucible picker should SHOW given
+/** OTA-667 — which reserved inputs the Fusing Crucible picker should SHOW given
  *  the current selection. Hides same-material duplicates (an input that adds no
  *  material the picked set doesn't already cover) to steer toward diversity — BUT
  *  never hides so much that the player can't reach `minPick` items. A single
@@ -132,7 +132,7 @@ export function visibleFusionInputs(
   return scraps.filter((it) => pickedSet.has(it.id) || addsNew(it) || needFiller);
 }
 
-/** OTA-756 (1a) — an AUTHORED catalog reagent that the forge should accept.
+/** OTA-737 (1a) — an AUTHORED catalog reagent that the forge should accept.
  *  The Crucible was inferred-only, so junk loot with a real catalog row (Rat Fur,
  *  Crystalline Echo, …) could never be reserved even though it's exactly the kind
  *  of throwaway material a player wants to melt. Opt those in — but ONLY 'loot'-
@@ -144,7 +144,7 @@ export function isForgeableLootReagent(item: { name: string; kind?: string; tags
   const tags = (item.tags ?? []).map((t) => t.toLowerCase());
   if (!tags.includes('loot')) return false;
   if (FUSION_EQUIP_KINDS.includes(item.kind ?? '')) return false;
-  // OTA-1022 — the BLOCKLISTS read canonical tags: a stale sigil/vial/quest core
+  // OTA-999 — the BLOCKLISTS read canonical tags: a stale sigil/vial/quest core
   // read as reservable junk and applyFusion CONSUMED it. ('loot' above stays
   // instance-read — it is a provenance stamp on this copy, not identity.)
   if (canonicalItemTags(item).some((t) => FUSION_EDIBLE_TAG.test(t) || FORGE_LOOT_BLOCK_TAGS.test(t))) return false;
@@ -152,7 +152,7 @@ export function isForgeableLootReagent(item: { name: string; kind?: string; tags
   return true;
 }
 
-/** OTA-756 — the single source of truth for "can this item be reserved for and
+/** OTA-737 — the single source of truth for "can this item be reserved for and
  *  consumed by the Fusing Crucible?". Every fusion surface (the reserve toggle,
  *  the ◆ diamond, the save-for-fusion action, eligibleInputs) routes through this
  *  so what the UI advertises and what the bench accepts can never drift apart.
@@ -195,7 +195,7 @@ export function eligibleInputs(inventory: readonly InventoryItem[]): InventoryIt
   return out;
 }
 
-/** OTA-1117 — what the Crucible's UPGRADE channel can do with one piece, and when
+/** OTA-1094 — what the Crucible's UPGRADE channel can do with one piece, and when
  *  it can't, WHY.
  *
  *  Owner, from the device: "went to upgrade at the fuse and it only allowed me to
@@ -245,7 +245,7 @@ export function crucibleUpgradeVerdict(item: InventoryItem): CrucibleUpgradeVerd
   return { kind: null, blocked: 'not a weapon, a piece of armor, or a dog vest' };
 }
 
-/** OTA-1117 — is this inventory row a WEAPON at all (catalog, fused, or tagged)?
+/** OTA-1094 — is this inventory row a WEAPON at all (catalog, fused, or tagged)?
  *  The upgrade list uses it to decide what belongs under the WEAPONS heading —
  *  including the ones it has to explain rather than offer. */
 export function isWeaponRow(item: InventoryItem): boolean {
@@ -266,8 +266,6 @@ export function gateFusion(
   factionCatalyst?: InventoryItem | null,
   explicitInputs?: readonly InventoryItem[],
 ): FusionGate {
-  // When the player has hand-picked a subset in the fusion picker, validate THOSE
-  // exact items (still reserved/eligible) instead of the whole reserved pool.
   const inputs = explicitInputs ? [...explicitInputs] : eligibleInputs(inventory);
   // arb-fix — a reserved faction CATALYST now COUNTS as the third item. Player
   // expectation: "2 inferred items + a faction item should fuse into a faction
@@ -556,24 +554,6 @@ export async function synthesizeFusionViaQwen(
   }
 }
 
-/** OTA-761 — a forged name is "low quality" when it reads like a prompt echo or a
- *  stat dump instead of an evocative 2-4 word name. The small on-device model
- *  sometimes parrots the naming PROMPT back ("A Rare Dog Armor (+3 AC)") or emits a
- *  bare "<theme> Armor". A good name has NO leading article, NO rarity word, NO
- *  generic kind word, and NO digits/parens (a stat echo like "(+3 AC)" or "2d8").
- *  Used to (a) reject such a Qwen name so the deterministic name stands, AND (b)
- *  re-name already-forged items that carry one from before this guard existed. */
-export function isLowQualityForgeName(name: string): boolean {
-  if (!name) return true;
-  const n = name.toLowerCase();
-  return /^(a|an|the)\b/i.test(name)
-    || /\b(common|uncommon|rare|legendary)\b/i.test(name)
-    || /^(common|uncommon|rare|legendary)/.test(n)   // "RareArmor" — no space between the words
-    || /[()\d]/.test(name)
-    || /\b(armou?r|weapon)\b/i.test(name)
-    || /(armou?r|weapon)$/.test(n);                  // "RareArmor" / "…Armor" ending in a kind word
-}
-
 /** OTA-801 — soft / non-weapon head-nouns that read as textile, ethereal, or
  *  botanical rather than something you'd swing or fire. A forged WEAPON named
  *  "Aetheric Thread" / "Resonant Veil" / "Humming Wisp" passed every other gate
@@ -613,6 +593,24 @@ export function fusedWeaponNameReadsSoft(name: string): boolean {
  *  instantly with a placeholder name, and this settles its true name when (if)
  *  it returns. Returns null if Qwen isn't ready / the reply can't be parsed /
  *  validation rejects it; the caller then keeps the deterministic name. */
+/** OTA-742 — a forged name is "low quality" when it reads like a prompt echo or a
+ *  stat dump instead of an evocative 2-4 word name. The small on-device model
+ *  sometimes parrots the naming PROMPT back ("A Rare Dog Armor (+3 AC)") or emits a
+ *  bare "<theme> Armor". A good name has NO leading article, NO rarity word, NO
+ *  generic kind word, and NO digits/parens (a stat echo like "(+3 AC)" or "2d8").
+ *  Used to (a) reject such a Qwen name so the deterministic name stands, AND (b)
+ *  re-name already-forged items that carry one from before this guard existed. */
+export function isLowQualityForgeName(name: string): boolean {
+  if (!name) return true;
+  const n = name.toLowerCase();
+  return /^(a|an|the)\b/i.test(name)
+    || /\b(common|uncommon|rare|legendary)\b/i.test(name)
+    || /^(common|uncommon|rare|legendary)/.test(n)   // "RareArmor" — no space between the words
+    || /[()\d]/.test(name)
+    || /\b(armou?r|weapon)\b/i.test(name)
+    || /(armou?r|weapon)$/.test(n);                  // "RareArmor" / "…Armor" ending in a kind word
+}
+
 export async function synthesizeFusionNameViaQwen(
   stats: UniqueItemStats,
   inputs: readonly InventoryItem[],
@@ -648,13 +646,13 @@ export async function synthesizeFusionNameViaQwen(
     const collidesCrossKind = stats.kind === 'weapon'
       ? !!findArmorByName(name)
       : !!findWeaponByName(name); // armor/dog_armor forge must not be named like a catalog weapon
-    // OTA-761 — also reject an ECHOED / low-quality name (see isLowQualityForgeName)
+    // OTA-742 — also reject an ECHOED / low-quality name (see isLowQualityForgeName)
     // so the evocative deterministic name (theme + kind suffix, e.g. "Humming Vest")
     // stands instead.
     // OTA-801 — and reject a WEAPON name that ends in a soft / non-weapon noun
     // ("Aetheric Thread", "Resonant Veil") so the deterministic weapon pool names it.
     const weaponReadsSoft = stats.kind === 'weapon' && fusedWeaponNameReadsSoft(name);
-    // OTA-1109 — reject an INPUT ECHO / curio-catalog name. The prompt lists
+    // OTA-1086 — reject an INPUT ECHO / curio-catalog name. The prompt lists
     // the reserved pieces by name and the model can hand one straight back:
     // the owner's Legendary chest armor came out named "Hollow Quill Sheaf" —
     // the exact Uncommon curio he fed into the forge. A forged product must
@@ -715,7 +713,7 @@ function buildNamePrompt(
  *  are picked from the dominant material tag; stats scale with input
  *  count and rarity. The result has less narrative variety than
  *  Qwen-generated but is always serviceable. */
-// OTA-978 — read a weapon's reach from its NAME. Used three ways: the Qwen-settle
+// OTA-955 — read a weapon's reach from its NAME. Used three ways: the Qwen-settle
 // path re-stamps reach when the final name clearly reads ranged/long (the
 // displayed name is the truth the player sees), the hydrate sweep back-stamps
 // older forges, and tests validate noun/reach coherence. Returns null for
@@ -731,14 +729,12 @@ export function synthesizeFusionDeterministic(
   inputs: readonly InventoryItem[],
   tagProfile: string[],
   forcedKind?: 'weapon' | 'armor' | 'dog_armor',
-  // OTA-739 — the armor slots forged most recently (newest first). The slot
-  // picker steps past these so the Crucible rotates through slots instead of
-  // handing back the same one twice in a row (playtest: three forges → three
-  // head pieces, because the slot used a fixed cloth?chest:head default).
+  // OTA-739 — armor slots forged most recently (newest first); the slot picker
+  // steps past these so the Crucible rotates slots instead of repeating one.
   recentSlots?: readonly string[],
 ): { name: string; description: string; stats: UniqueItemStats } {
   const tagSet = new Set(tagProfile);
-  // OTA-759 — dominant material by COUNT across the actual inputs, NOT the old
+  // OTA-740 — dominant material by COUNT across the actual inputs, NOT the old
   // fixed aether-first priority. That priority tested `aether`/`crystal` FIRST, so
   // a single aether-tagged input — and Tartaria fusion loot is aether-heavy — made
   // EVERY fusion aether-dominant → always 'aetheric' resist + aether theme/damage
@@ -778,8 +774,7 @@ export function synthesizeFusionDeterministic(
     return best ?? 'improvised';
   })();
   // Kind from the dominant tag — OVERRIDDEN by the player's explicit weapon/armor
-  // choice from the fusion picker when provided (the material still drives theme +
-  // stats, but the SHAPE is the player's call).
+  // choice from the fusion picker when provided.
   const derivedKind: 'weapon' | 'armor' | 'dog_armor' =
     dominantTag === 'metal' || dominantTag === 'wood' || dominantTag === 'stone'
       ? 'weapon'
@@ -885,7 +880,7 @@ export function synthesizeFusionDeterministic(
     }
     armorSlot = VALID_ARMOR_SLOTS[slotIdx]!;
   }
-  // OTA-978 — weapons pick their REACH first, then a form noun that matches it —
+  // OTA-955 — weapons pick their REACH first, then a form noun that matches it —
   // the same pick-the-identity-then-the-noun pattern OTA-832 gave armor slots.
   // Owner (after his fused "Resonant Spike" turned out close-only): "let's
   // have the crucible add the appropriate range to weapons." 60% melee, 20%
@@ -938,7 +933,7 @@ export function synthesizeFusionDeterministic(
     baseStats.damageDice = dice;
     baseStats.damageType = dmgType;
     baseStats.scalesWith = scale;
-    // OTA-978 — the forge-chosen reach identity (form noun above matches it).
+    // OTA-955 — the forge-chosen reach identity (form noun above matches it).
     baseStats.reachClass = weaponReach ?? 'melee';
   } else {
     // OTA-445 — Legendary AC +5 / Rare AC +3 (was 4 / 2).
@@ -1043,11 +1038,10 @@ export function deterministicFusedName(item: NamedFusedRef): string {
 /** OTA-706 — one-time load migration: rename a fused item whose stored name
  *  cross-kind-collides with the catalog. Idempotent (a clean name is returned as-is). */
 export function migrateFusedName(item: InventoryItem): InventoryItem {
-  // OTA-761 — re-mint the name when it cross-kind-collides with a catalog row OR is
+  // OTA-742 — re-mint the name when it cross-kind-collides with a catalog row OR is
   // low-quality (a prompt echo like "A Rare Dog Armor (+3 AC)" or a bare "<theme>
   // Armor" that predates the namer guard). Guarded to fused items via uniqueStats so
-  // deterministicFusedName (which reads uniqueStats) always has real data. Idempotent:
-  // a clean name is left alone next load.
+  // deterministicFusedName always has real data. Idempotent: a clean name is left alone.
   if (!item.uniqueStats) return item;
   // OTA-801 — also re-mint a WEAPON whose stored name ends in a soft / non-weapon
   // noun ("Aetheric Thread") so old saves heal to a proper weapon name.
