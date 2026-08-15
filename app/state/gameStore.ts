@@ -261,6 +261,7 @@ import {
   hubNameForFaction,
   hubSkinFactionFor,
   hubOwnerFaction,
+  findHubRoom,
   resolveHubTravel,
   isLeaveHubCommand,
 } from '../engine/hub';
@@ -9975,6 +9976,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', "Not while you're in a fight — deal with the threat first.");
       return;
     }
+    // ⚠⚠ OTA-1283 (port of golem OTA-1280) — LEAVING THE PACK ENDS GIFT MODE.
+    // Owner, from the device: he backed out of "give Halem a gift" with the
+    // inventory's BACK button, and the NEXT pack visit — to equip armour — was
+    // still a gift picker aimed at Halem. Gift mode's entire UI lives on the
+    // inventory screen; a mode that outlives its screen is invisible state, and
+    // the only tap that ever cleared it was the banner (or a completed GIVE,
+    // which clears before navigating and so never trips this guard). His rule,
+    // verbatim: "if I leave that screen, I'm no longer giving a gift."
+    if (get().giftMode && get().currentScreen === 'inventory' && screen !== 'inventory') {
+      get().appendLog('debug', 'gift: mode ended — left the inventory without giving');
+      set({ giftMode: null });
+    }
     set({ currentScreen: screen });
     void get().persist();
   },
@@ -17834,17 +17847,53 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Leaving the outpost (isLeaveHubCommand) is real overland travel
         // and falls through to the gated/charged path.
         if (player.hubRoomId && !isLeaveHubCommand(trimmed)) {
-          const hubVisited = new Set(get().worldMemory.hubVisited ?? []);
-          const interiorMove = resolveHubTravel(player.hubRoomId, trimmed, hubVisited);
+          const skin = hubSkinFactionFor(player.currentLocationId, player.factionId);
+          const interiorMove = resolveHubTravel(player.hubRoomId, trimmed);
+          // ⚠⚠ OTA-1282 (port of golem OTA-1279) — A CARDINAL WITH NO DOOR ON
+          // IT NO LONGER EJECTS YOU. It used to resolve to nothing and fall
+          // through to the overland handler, which walked the player clean out
+          // of the building. Under the corrected topology 8 of 15 rooms are
+          // dead ends, so a wrong `go north` would have fired constantly.
+          if (interiorMove && interiorMove.via === 'no_exit_that_way') {
+            const hereRoom = findHubRoom(player.hubRoomId);
+            const ways = (['north', 'south', 'east', 'west'] as const)
+              .filter((d) => hereRoom?.exits[d])
+              .map((d) => `${d} to the ${hubRoomFor(hereRoom!.exits[d]!, skin)?.shortName ?? d}`);
+            get().appendLog(
+              'world',
+              ways.length
+                ? `No way ${interiorMove.dir} from here. You can go ${ways.join(', ')}.`
+                : `No way ${interiorMove.dir} from here.`,
+            );
+            break;
+          }
+          // ⚠⚠ A NAMED ROOM THAT IS NOT ONE STEP AWAY IS A REFUSAL, NOT A JUMP.
+          // Fast-travel is deleted per the owner's navigation spec ("move ONE
+          // GRAPH EDGE AT A TIME", "dead ends must behave as dead ends"); the
+          // refusal names the door that heads that way.
+          if (interiorMove && interiorMove.via === 'not_adjacent') {
+            const want = hubRoomFor(interiorMove.roomId, skin);
+            const step = interiorMove.firstStep ? hubRoomFor(interiorMove.firstStep, skin) : null;
+            const dir = interiorMove.firstStep
+              ? (['north', 'south', 'east', 'west'] as const).find(
+                  (d) => findHubRoom(player.hubRoomId!)?.exits[d] === interiorMove.firstStep,
+                )
+              : undefined;
+            get().appendLog(
+              'world',
+              step && dir
+                ? `The ${want?.shortName ?? 'room'} isn't off this one. Head ${dir} to the ${step.shortName} to start that way.`
+                : `The ${want?.shortName ?? 'room'} isn't off this one, and there's no way through from here.`,
+            );
+            break;
+          }
           if (interiorMove) {
             set((s) => (s.player ? { player: { ...s.player, hubRoomId: interiorMove.roomId } } : s));
-            const dest = hubRoomFor(interiorMove.roomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
+            const dest = hubRoomFor(interiorMove.roomId, skin);
             if (dest) {
               get().appendLog(
                 'world',
-                interiorMove.via === 'fast_travel'
-                  ? `You cut across the outpost to the ${dest.shortName}.`
-                  : `You head ${interiorMove.via === 'cardinal' ? 'on' : 'over'} to the ${dest.shortName}.`,
+                `You head ${interiorMove.via === 'cardinal' ? 'on' : 'over'} to the ${dest.shortName}.`,
               );
             }
             get().beginScene();

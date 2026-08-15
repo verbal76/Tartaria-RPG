@@ -1676,8 +1676,37 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ "DO NOT OPEN THE CHEST" WAS OPENING THE CHEST (2026-08-14, latest).
-  HAL — PORTED FROM GOLEM.** HAL OTA-1265, from golem OTA-1264. The parser is
+- **⚠⚠⚠ THE OUTPOST GRAPH + GIFT-MODE DOOR (2026-08-15, latest). HAL — BOTH
+  PORTED FROM GOLEM, OWNER-DIRECTED** (*"the gift and map fix should port to
+  hal"*). HAL OTA-1282 (from golem OTA-1279 + 1281) and OTA-1283 (from golem
+  OTA-1280).
+
+  **THE MAP.** The outpost is ONE 15-node topology in nine faction skins;
+  the owner's spec rules: *"The artwork does not determine movement. The room
+  graph does."* outpostGraph.ts declares each of the 14 connections ONCE and
+  GENERATES the return edge — asymmetry is unrepresentable, which matters
+  because this line shipped the identical rot golem measured: 10 one-way
+  exits, 2 unreachable rooms (Chapel, Culvert). static_hub.json now carries
+  `structuralId` per room and NO exits; hub.ts composes the doors at load and
+  throws at import on a bad layout. Fast-travel DELETED ("move ONE GRAPH EDGE
+  AT A TIME"); far rooms by name refuse WITH directions; doorless cardinals
+  refuse in-hub instead of falling through to overland travel (that
+  fall-through walked the player out of the building — latent until 8 of 15
+  rooms became dead ends). Longest-name-wins matching (Order's "Cells"/"Cell").
+  Exit in the central room per the owner's ruling; the OTA-1274 variant
+  renames rode along because HAL still shipped the DUPLICATE "Plans"/"Vigil"
+  chips (owner ruled "keep the rename"). ⚠ NOT ported: golem's
+  matchHubRoomName bare-name intercept (OTA-1274) — bare `vault`/`forge`
+  still hit parser verbs on this line; only `go to the <room>` phrasing gets
+  the new matching. A candidate for a future port, noted, not smuggled.
+
+  **THE GIFT DOOR.** Backing out of the gift-mode inventory with BACK left
+  `giftMode` armed; the next pack visit was still a gift picker. The guard
+  sits in setScreen — every navigation passes it — so any exit from the pack
+  ends the mode. Completed gives clear before navigating and never trip it.
+
+- **⚠⚠⚠ "DO NOT OPEN THE CHEST" WAS OPENING THE CHEST (2026-08-14). HAL —
+  PORTED FROM GOLEM.** HAL OTA-1265, from golem OTA-1264. The parser is
   shared code; the bug was identical here, and nothing in it moves toward
   golem's picker direction.
 

@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.165';
+export const DISPLAY_VERSION = '4.29.167';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24552,7 +24552,40 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // hands `open` straight back and the fix ships inert.
 // New suite ota1265NegationAndQuestions (34). 794 suites / 7447 tests.
 // DISPLAY_VERSION 4.29.165.
-export const OTA_BUILD_ID = '2026-08-14-1265-negation-and-questions';
+// ⚠⚠ OTA-1282 — THE UNIVERSAL OUTPOST GRAPH (port of golem OTA-1279 + 1281).
+// Owner: "the gift and map fix should port to hal." The outpost is ONE
+// 15-node topology in nine faction skins, and the artwork does not determine
+// movement — the graph does. LAYER 1 app/engine/outpostGraph.ts: 14
+// connections declared ONCE, return edges GENERATED, so an asymmetric exit is
+// unrepresentable. LAYER 2 static_hub.json (+ variants): rooms name the node
+// they occupy (structuralId); hub.ts composes the doors at load and throws at
+// import on a missing/double-claimed node. This line had the same rot golem
+// measured: 10 one-way exits, 2 unreachable rooms (Chapel, Culvert) — gone,
+// 15/15 reachable, every pair symmetric. FAST-TRAVEL DELETED per the owner's
+// navigation spec ("move ONE GRAPH EDGE AT A TIME"); a far room by name is a
+// refusal that names the first step; a doorless cardinal refuses in-hub
+// instead of falling through to overland and walking the player out of the
+// building. Longest-name-wins matching (Order's "Cells"/"Cell" prefix pair).
+// The exit moved to the central room (owner's ruling), gate keeps its door.
+// Variants renames rode along (owner ruled "keep the rename"): Breakroom,
+// Cell Bunks, Shrine, Plan Floor/Plan Room — HAL still shipped the DUPLICATE
+// "Plans"/"Vigil" chips the golem audit fixed, which made typed navigation
+// ambiguous. New suite ota1282UniversalOutpostGraph (34); hub.test re-pointed
+// from the deleted fast-travel rule. 794 suites / 7448 tests.
+// DISPLAY_VERSION 4.29.166.
+// ⚠⚠ OTA-1283 — LEAVING THE PACK ENDS GIFT MODE (port of golem OTA-1280).
+// Owner, from the device: he backed out of "give Halem a gift" with the
+// inventory's BACK button; the next pack visit — to equip armour — was still
+// a gift picker aimed at Halem. Only the banner tap and a completed GIVE ever
+// cleared giftMode; BACK was a plain setScreen('exploration'). The guard sits
+// in setScreen — the one door every navigation passes through — so BACK, tab
+// bar and forced navs all end the mode identically. Completed gives clear
+// BEFORE navigating and never trip it. His rule: "if I leave that screen, I'm
+// no longer giving a gift." New suite ota1283GiftEndsAtTheDoor (5).
+// 795 suites / 7453 tests. DISPLAY_VERSION 4.29.167.
+export const OTA_BUILD_ID = '2026-08-15-1283-gift-ends-at-the-door';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1282-universal-outpost-graph';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1265-negation-and-questions';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1262-js-crash-is-not-an-ml-crash';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-12-1253-name-hygiene';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-11-1252-desktop-controls';

@@ -16,12 +16,27 @@
 
 import staticHubData from '../data/world/static_hub.json';
 import variantsData from '../data/world/hub_faction_variants.json';
+import {
+  DIRECTIONS,
+  OUTPOST_EXITS,
+  outpostFirstStep,
+  type Direction,
+  type StructuralId,
+} from './outpostGraph';
 
 export interface HubRoom {
   id: string;
+  /** ⚠⚠ OTA-1282 (port of golem OTA-1279) — which node of the universal outpost
+   *  graph this room IS. Navigation is decided by this, never by the room's
+   *  name, its faction skin, or where an artist drew it. See outpostGraph.ts. */
+  structuralId: StructuralId;
   name: string;
   shortName: string;
   description: string;
+  /** ⚠⚠ DERIVED, NOT AUTHORED. Composed from OUTPOST_EXITS at module load —
+   *  static_hub.json no longer carries exits, because hand-typed exits are what
+   *  rotted into 10 one-way doors and 2 unreachable rooms (Chapel, Culvert)
+   *  before the golem-line audit that produced the graph. */
   exits: {
     north: string | null;
     south: string | null;
@@ -52,7 +67,48 @@ interface HubData {
   rooms: HubRoom[];
 }
 
-export const HUB: HubData = staticHubData as HubData;
+export const HUB: HubData = staticHubData as unknown as HubData;
+
+// ⚠⚠ OTA-1282 (port of golem OTA-1279) — COMPOSE THE EXIT TABLE FROM THE GRAPH,
+// ONCE, AT LOAD. static_hub.json declares only which structural node each room
+// occupies; the connections come from outpostGraph.ts and are stamped onto the
+// room objects here, so every existing reader (exit chips, resolveHubTravel,
+// beginScene) keeps working against `room.exits` unchanged while there is now
+// exactly one place a connection can be written. The self-check throws at
+// import rather than shipping a map the player can get lost in.
+const ROOM_BY_STRUCTURAL: Map<StructuralId, string> = (() => {
+  const map = new Map<StructuralId, string>();
+  for (const room of HUB.rooms) {
+    if (!room.structuralId) {
+      throw new Error(`hub layout: room '${room.id}' declares no structuralId`);
+    }
+    if (!OUTPOST_EXITS[room.structuralId]) {
+      throw new Error(`hub layout: room '${room.id}' claims unknown node '${room.structuralId}'`);
+    }
+    const taken = map.get(room.structuralId);
+    if (taken) {
+      throw new Error(`hub layout: '${room.id}' and '${taken}' both claim node ${room.structuralId}`);
+    }
+    map.set(room.structuralId, room.id);
+  }
+  return map;
+})();
+
+for (const room of HUB.rooms) {
+  const canon = OUTPOST_EXITS[room.structuralId];
+  const exits = { north: null, south: null, east: null, west: null } as HubRoom['exits'];
+  for (const dir of DIRECTIONS) {
+    const node = canon[dir];
+    exits[dir] = node ? (ROOM_BY_STRUCTURAL.get(node) ?? null) : null;
+  }
+  room.exits = exits;
+}
+
+/** The room occupying a given structural node, or null if this layout omits it. */
+export function hubRoomAtNode(node: StructuralId): HubRoom | null {
+  const id = ROOM_BY_STRUCTURAL.get(node);
+  return id ? (HUB.rooms.find((r) => r.id === id) ?? null) : null;
+}
 
 const HUB_LOCATION_SET: ReadonlySet<string> = new Set(
   HUB.hubLocationIds ?? [HUB.hubLocationId],
@@ -225,7 +281,11 @@ export function hubEntryRoomId(): string {
  *  shortName and description and nothing else — so this holds for every faction's hub,
  *  including under OTA-1209's skin-by-site. */
 export function roomIsExit(room: HubRoom | null | undefined): boolean {
-  return !!room && Array.isArray(room.tags) && room.tags.includes('entrance');
+  // ⚠ OTA-1282 — widened to `exterior_door`: the owner's map ruling puts an
+  // exit in the CENTRAL room ("there's a central room that's where the exit
+  // should be"), carried by that tag in the shared layout.
+  return !!room && Array.isArray(room.tags)
+    && (room.tags.includes('entrance') || room.tags.includes('exterior_door'));
 }
 
 /** True when the hub layout marks an explicit exit/gate room at all.
@@ -235,59 +295,87 @@ export function roomIsExit(room: HubRoom | null | undefined): boolean {
  *  rule whose failure mode is "the player cannot leave the building" would be a far worse
  *  defect than the one it fixes. */
 export function hubDefinesExitRoom(): boolean {
-  return HUB.rooms.some((r) => Array.isArray(r.tags) && r.tags.includes('entrance'));
+  return HUB.rooms.some((r) => roomIsExit(r));
 }
 
-/** Resolve a player input against the current hub room's exits. Returns
- *  the target room id, or null if no exit matches. Supports:
- *    - Cardinal direction in the input ('go north')
- *    - shortName / name / id of an adjacent room ('go armory')
- *    - shortName / name / id of ANY hub room ('go to the workshop') —
- *      jumps directly to that room. Useful for fast-travel within the
- *      hub once the player has visited a room.
- */
+export type HubTravel =
+  | { roomId: string; via: 'cardinal' | 'adjacent' }
+  /** ⚠⚠ The player named a real room that is NOT one step away. A REFUSAL
+   *  carrying directions, not a move: `roomId` is where they asked to go and
+   *  `firstStep` is the adjacent room that heads that way. */
+  | { roomId: string; via: 'not_adjacent'; firstStep: string | null }
+  /** ⚠⚠ The player asked for a cardinal this room has no door on. Refused HERE
+   *  so it cannot fall through to overland travel — pre-port, a wrong
+   *  `go north` inside the outpost walked the player out of the building, and
+   *  under the corrected topology 8 of 15 rooms are dead ends with one door. */
+  | { roomId: null; via: 'no_exit_that_way'; dir: Direction };
+
+/** Resolve a player input against the current hub room's exits. Returns null if
+ *  the input names nothing in the outpost.
+ *
+ *  ⚠⚠ OTA-1282 (port of golem OTA-1279/1281) — FAST-TRAVEL IS GONE, per the
+ *  owner's navigation spec: "move ONE GRAPH EDGE AT A TIME"; "dead ends must
+ *  behave as dead ends." A named room that is out of reach answers with the
+ *  door that leads toward it. Name matching is LONGEST-NAME-WINS in both
+ *  phases: first-substring-found walked Order players typing `cells` (their
+ *  screen's word for the Quarters) into the Chapel ("Cell"). */
 export function resolveHubTravel(
   fromRoomId: string,
   rawInput: string,
-  visitedRoomIds: ReadonlySet<string>,
-): { roomId: string; via: 'cardinal' | 'adjacent' | 'fast_travel' } | null {
+  skinFactionId?: string | null,
+): HubTravel | null {
   const here = findHubRoom(fromRoomId);
   if (!here) return null;
   const text = rawInput.toLowerCase();
+  const namesFor = (roomId: string): string[] => {
+    const base = findHubRoom(roomId);
+    const skinned = hubRoomFor(roomId, skinFactionId ?? null);
+    const out: string[] = [roomId.toLowerCase()];
+    for (const r of [base, skinned]) {
+      if (r) { out.push(r.shortName.toLowerCase(), r.name.toLowerCase()); }
+    }
+    return out;
+  };
   // Cardinal first.
-  for (const dir of ['north', 'south', 'east', 'west'] as const) {
+  let deadCardinal: Direction | null = null;
+  for (const dir of DIRECTIONS) {
     if (new RegExp(`\\b${dir}\\b`).test(text)) {
       const target = here.exits[dir];
       if (target) return { roomId: target, via: 'cardinal' };
+      deadCardinal ??= dir;
     }
   }
+  const bestMatch = (roomIds: string[]): string | null => {
+    let best: { roomId: string; len: number } | null = null;
+    for (const roomId of roomIds) {
+      for (const n of namesFor(roomId)) {
+        if (text.includes(n) && (!best || n.length > best.len)) best = { roomId, len: n.length };
+      }
+    }
+    return best?.roomId ?? null;
+  };
   // Adjacent named room (any exit).
-  for (const dir of ['north', 'south', 'east', 'west'] as const) {
-    const targetId = here.exits[dir];
-    if (!targetId) continue;
-    const room = findHubRoom(targetId);
-    if (!room) continue;
-    if (
-      text.includes(room.shortName.toLowerCase()) ||
-      text.includes(room.name.toLowerCase()) ||
-      text.includes(room.id.toLowerCase())
-    ) {
-      return { roomId: targetId, via: 'adjacent' };
-    }
+  const adjacent = bestMatch(
+    DIRECTIONS.map((d) => here.exits[d]).filter((x): x is string => !!x),
+  );
+  if (adjacent) return { roomId: adjacent, via: 'adjacent' };
+  // A real room, further off. Refused — with the first step named.
+  const far = bestMatch(HUB.rooms.map((r) => r.id).filter((id) => id !== fromRoomId));
+  if (far) {
+    return { roomId: far, via: 'not_adjacent', firstStep: hubFirstStepToward(fromRoomId, far) };
   }
-  // Fast-travel — any room the player has already visited.
-  for (const room of HUB.rooms) {
-    if (room.id === fromRoomId) continue;
-    if (!visitedRoomIds.has(room.id)) continue;
-    if (
-      text.includes(room.shortName.toLowerCase()) ||
-      text.includes(room.name.toLowerCase()) ||
-      text.includes(room.id.toLowerCase())
-    ) {
-      return { roomId: room.id, via: 'fast_travel' };
-    }
-  }
+  if (deadCardinal) return { roomId: null, via: 'no_exit_that_way', dir: deadCardinal };
   return null;
+}
+
+/** ⚠ The adjacent room that starts the shortest walk from one room to another —
+ *  a signpost, never a shortcut. */
+export function hubFirstStepToward(fromRoomId: string, toRoomId: string): string | null {
+  const from = findHubRoom(fromRoomId);
+  const to = findHubRoom(toRoomId);
+  if (!from || !to) return null;
+  const node = outpostFirstStep(from.structuralId, to.structuralId);
+  return node ? (hubRoomAtNode(node)?.id ?? null) : null;
 }
 
 /** True when the input is asking to leave the hub entirely. */

@@ -1,5 +1,5 @@
 {
-  "description": "HANDOFF #16 — hand-authored starting hub. Lays out 15 rooms with hardcoded directional pointers and fixed NPC anchors so the player has a recognizable home base before they hit the procedural world. v2.4.1 (OTA 030): the same room layout is now reused across all 9 factions; only the displayed minimap title (hubName) varies per faction. factionHubNames + hubLocationIds drive the per-faction skin.",
+  "description": "HANDOFF #16 — hand-authored starting hub, reused across all 9 factions. ⚠⚠ OTA-1279: this file no longer carries room-to-room `exits`. The topology is now declared exactly once, in app/engine/outpostGraph.ts, and each room here names the structural node it occupies via `structuralId` (R01…R15). hub.ts composes the exit table from that graph at load. The layered model the owner specified: LAYER 1 = the universal graph (which rooms connect); LAYER 2 = this file plus hub_faction_variants.json (what each node is called, what is in it, who stands there). The artwork does not determine movement — the graph does. Before OTA-1279 the hand-typed exits had rotted into 10 one-way pairs and 2 rooms (Chapel, Culvert Descent) that nothing pointed at; the generated reverse edges make that class of rot unrepresentable. v2.4.1 (OTA 030): factionHubNames + hubLocationIds drive the per-faction skin.",
   "hubId": "reclaimers_outpost",
   "hubName": "Reclaimers' Outpost",
   "hubLocationId": "tartarian_outskirts",
@@ -33,15 +33,10 @@
   "rooms": [
     {
       "id": "outpost_gate",
+      "structuralId": "R10",
       "name": "The Gate",
       "shortName": "Gate",
-      "description": "A salvaged checkpoint of mud-bricks and pre-flood signage. A burned-iron arch frames the entry. The Reclaimer at the table waves you through without looking up.",
-      "exits": {
-        "north": "outpost_central",
-        "south": null,
-        "east": "outpost_armory",
-        "west": "outpost_messhall"
-      },
+      "description": "A salvaged checkpoint of mud-bricks and pre-flood signage. A burned-iron arch frames the entry. The Reclaimer at the table waves you through without looking up. North is the square; a stairwell behind the table drops south into the buried levels; the arch itself opens on the wild.",
       "anchorNpc": "Halem the Trader",
       "tags": [
         "entrance",
@@ -55,46 +50,39 @@
         "gate",
         "brick",
         "rope",
-        "lantern"
+        "lantern",
+        "stairwell"
       ]
     },
     {
       "id": "outpost_central",
+      "structuralId": "R01",
       "name": "The Central Square",
       "shortName": "Square",
-      "description": "A small open square strung with Aetheric lanterns. A worn map-stone sits in the center, the Cradle of Dusk drawn in three different hands. Six paths spoke off in every direction.",
-      "exits": {
-        "north": "outpost_workshop",
-        "south": "outpost_gate",
-        "east": "outpost_armory",
-        "west": "outpost_messhall"
-      },
+      "description": "A small open square strung with Aetheric lanterns. A worn map-stone sits in the center, the Cradle of Dusk drawn in three different hands. Four paths spoke off it — north to the vault block, west to the mess, east to the armory, south to the gate — and a side door in the wall lets you straight out.",
       "anchorNpc": null,
       "tags": [
         "hub",
         "central",
         "safe",
-        "outpost"
+        "outpost",
+        "exterior_door"
       ],
       "interactables": [
         "map-stone",
         "lantern",
         "square",
         "path",
-        "bench"
+        "bench",
+        "door"
       ]
     },
     {
       "id": "outpost_armory",
+      "structuralId": "R06",
       "name": "The Armory",
       "shortName": "Armory",
-      "description": "Racks of mud-iron blades, bolt-casters in various states of repair, a wall of buckler shields. Irma's anvil rings from the back. She nods if you don't waste her time.",
-      "exits": {
-        "north": "outpost_workshop",
-        "south": null,
-        "east": null,
-        "west": "outpost_central"
-      },
+      "description": "Racks of mud-iron blades, bolt-casters in various states of repair, a wall of buckler shields. Irma's anvil rings from the back. She nods if you don't waste her time. A stair at the rear goes down to the storage cellar.",
       "anchorNpc": "Irma Ironhand",
       "tags": [
         "armory",
@@ -114,15 +102,10 @@
     },
     {
       "id": "outpost_messhall",
+      "structuralId": "R05",
       "name": "The Mess Hall",
       "shortName": "Mess",
-      "description": "Long benches under low-hanging Aetheric bulbs. The food is mud-stewed tubers and dried bog-fish, and there's always a pot on. Halem keeps the kettle warm and the gossip warmer.",
-      "exits": {
-        "north": "outpost_quarters",
-        "south": null,
-        "east": "outpost_central",
-        "west": null
-      },
+      "description": "Long benches under low-hanging Aetheric bulbs. The food is mud-stewed tubers and dried bog-fish, and there's always a pot on. Halem keeps the kettle warm and the gossip warmer. Doors lead west to the bunks and south to the chapel.",
       "anchorNpc": "Halem the Trader",
       "tags": [
         "mess",
@@ -143,15 +126,10 @@
     },
     {
       "id": "outpost_workshop",
+      "structuralId": "R04",
       "name": "The Workshop",
       "shortName": "Workshop",
-      "description": "Tarek the Tinkerer's domain — half-disassembled drones on every bench, sparking conduits, and a runecaster being calibrated in a vise. Smell of ozone and burnt mud.",
-      "exits": {
-        "north": "outpost_relic_vault",
-        "south": "outpost_central",
-        "east": "outpost_armory",
-        "west": "outpost_lab"
-      },
+      "description": "Tarek the Tinkerer's domain — half-disassembled drones on every bench, sparking conduits, and a runecaster being calibrated in a vise. Smell of ozone and burnt mud. The only way back is the door you came in by.",
       "anchorNpc": "Tarek the Tinkerer",
       "tags": [
         "workshop",
@@ -173,15 +151,10 @@
     },
     {
       "id": "outpost_quarters",
+      "structuralId": "R07",
       "name": "Sleeping Quarters",
       "shortName": "Quarters",
-      "description": "Bunk shelves cut into the wall, with rough wool curtains for privacy. Reclaimer kit on most of the racks. A free bunk in the corner is yours when you need it.",
-      "exits": {
-        "north": null,
-        "south": "outpost_messhall",
-        "east": null,
-        "west": null
-      },
+      "description": "Bunk shelves cut into the wall, with rough wool curtains for privacy. Reclaimer kit on most of the racks. A free bunk in the corner is yours when you need it. One door, back east to the mess.",
       "anchorNpc": null,
       "tags": [
         "rest",
@@ -199,15 +172,10 @@
     },
     {
       "id": "outpost_lab",
+      "structuralId": "R03",
       "name": "The Aether Lab",
       "shortName": "Lab",
-      "description": "A small room of glass jars, Aether-charged crystals, and chalkboards covered in cramped handwriting. Jorah looks up from a tome when you enter — unhurried, curious.",
-      "exits": {
-        "north": "outpost_relic_vault",
-        "south": null,
-        "east": "outpost_workshop",
-        "west": null
-      },
+      "description": "A small room of glass jars, Aether-charged crystals, and chalkboards covered in cramped handwriting. Jorah looks up from a tome when you enter — unhurried, curious. The lab is a cul-de-sac off the vault block; you leave the way you came.",
       "anchorNpc": "Jorah the Scholar",
       "tags": [
         "lab",
@@ -228,15 +196,10 @@
     },
     {
       "id": "outpost_relic_vault",
+      "structuralId": "R02",
       "name": "The Relic Vault",
       "shortName": "Vault",
-      "description": "Aether-shielded shelves behind a quiet door. Tagged crates of un-identified relics waiting on their assessor. The door's lock is mechanical — Reclaimer trust over Reclaimer tech.",
-      "exits": {
-        "north": null,
-        "south": "outpost_workshop",
-        "east": null,
-        "west": "outpost_lab"
-      },
+      "description": "Aether-shielded shelves under a high ceiling, the tagged crates of un-identified relics waiting on their assessor. The vault block is the outpost's north junction: the square lies south, the lab west, the workshop east. The strongroom door at the back is mechanical — Reclaimer trust over Reclaimer tech.",
       "anchorNpc": null,
       "tags": [
         "vault",
@@ -255,15 +218,10 @@
     },
     {
       "id": "outpost_chapel",
+      "structuralId": "R08",
       "name": "The Chapel",
       "shortName": "Chapel",
-      "description": "An unaffiliated room of soft Aetheric light. Anyone who needs to sit and think comes here. The walls are blank, the silence intentional.",
-      "exits": {
-        "north": null,
-        "south": "outpost_central",
-        "east": null,
-        "west": "outpost_quarters"
-      },
+      "description": "An unaffiliated room of soft Aetheric light. Anyone who needs to sit and think comes here. The walls are blank, the silence intentional. The single door goes back north to the mess.",
       "anchorNpc": null,
       "tags": [
         "rest",
@@ -280,19 +238,14 @@
     },
     {
       "id": "outpost_culvert_descent",
-      "name": "The Culvert Descent",
-      "shortName": "Culvert",
-      "description": "A wide drainage stairwell leading down into the buried levels. The air below is heavier, the lights fewer. The Reclaimers' map ends at the second landing.",
-      "exits": {
-        "north": null,
-        "south": "outpost_central",
-        "east": null,
-        "west": null
-      },
+      "structuralId": "R09",
+      "name": "The Storage Cellar",
+      "shortName": "Cellar",
+      "description": "A short flight of drainage steps down to a vaulted store-room under the armory. Barrels, spare shielding, coils of rope. The old culvert at the back was bricked up long ago; the only way out is the stair you came down.",
       "anchorNpc": null,
       "tags": [
+        "storage",
         "descent",
-        "to_buried",
         "outpost"
       ],
       "interactables": [
@@ -300,20 +253,17 @@
         "lantern",
         "rail",
         "step",
-        "wall"
+        "wall",
+        "barrel",
+        "rope"
       ]
     },
     {
       "id": "buried_landing_one",
+      "structuralId": "R11",
       "name": "First Landing",
       "shortName": "Landing 1",
-      "description": "A wide platform of cracked Tartarian stone. Two corridors open off — one east into the storage halls, one west into the pump room.",
-      "exits": {
-        "north": "outpost_culvert_descent",
-        "south": "buried_landing_two",
-        "east": "buried_storage",
-        "west": "buried_pumps"
-      },
+      "description": "A wide platform of cracked Tartarian stone, halfway down. The stair behind you climbs north to the gate; ahead it keeps dropping south into the dark.",
       "anchorNpc": null,
       "tags": [
         "buried",
@@ -329,15 +279,10 @@
     },
     {
       "id": "buried_storage",
+      "structuralId": "R14",
       "name": "Storage Halls",
       "shortName": "Storage",
-      "description": "Tartarian crates, most rotted through, some intact. The mud-glass containers in the back row are old enough to count as artifacts.",
-      "exits": {
-        "north": null,
-        "south": null,
-        "east": null,
-        "west": "buried_landing_one"
-      },
+      "description": "Tartarian crates, most rotted through, some intact. The mud-glass containers in the back row are old enough to count as artifacts. One corridor, back west to the second landing.",
       "anchorNpc": null,
       "tags": [
         "buried",
@@ -354,15 +299,10 @@
     },
     {
       "id": "buried_pumps",
+      "structuralId": "R13",
       "name": "The Pump Room",
       "shortName": "Pumps",
-      "description": "Old Aetheric pumps churn the silt-water out of the lower levels. They've been running for centuries. Nobody knows who maintains them.",
-      "exits": {
-        "north": null,
-        "south": null,
-        "east": "buried_landing_one",
-        "west": null
-      },
+      "description": "Old Aetheric pumps churn the silt-water out of the lower levels. They've been running for centuries. Nobody knows who maintains them. The only corridor runs back east to the second landing.",
       "anchorNpc": null,
       "tags": [
         "buried",
@@ -380,15 +320,10 @@
     },
     {
       "id": "buried_landing_two",
+      "structuralId": "R12",
       "name": "Second Landing",
       "shortName": "Landing 2",
-      "description": "Where the Reclaimer map ends. The corridor south is unmapped — what little anyone knows ends in 'we lost two teams down there.'",
-      "exits": {
-        "north": "buried_landing_one",
-        "south": "buried_shallow_digs",
-        "east": null,
-        "west": null
-      },
+      "description": "Where the Reclaimer map ends, and the junction the whole buried level hangs off: pumps west, storage halls east, the digs south, the stair back north. What little anyone knows of the south corridor ends in 'we lost two teams down there.'",
       "anchorNpc": null,
       "tags": [
         "buried",
@@ -405,15 +340,10 @@
     },
     {
       "id": "buried_shallow_digs",
+      "structuralId": "R15",
       "name": "The Shallow Digs",
       "shortName": "Shallow Digs",
-      "description": "Active Reclaimer excavation. Tarpaulins, rope ladders, lit braziers. The deepest cuts open into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth.",
-      "exits": {
-        "north": "buried_landing_two",
-        "south": null,
-        "east": null,
-        "west": null
-      },
+      "description": "Active Reclaimer excavation, and the deepest room anyone has mapped. Tarpaulins, rope ladders, lit braziers. The cuts open into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth. The way out is north, the way you came.",
       "anchorNpc": null,
       "tags": [
         "buried",
