@@ -248,18 +248,35 @@ describe('OTA-1178 — import writes a new slot and never overwrites', () => {
     expect(result.slotId).not.toBe('slot_existing');
   });
 
-  test('importing the SAME backup twice yields two characters, not a clobber', async () => {
+  // ⚠⚠ OTA-1315 SUPERSEDES THIS TEST'S OLD CLAIM, ON PURPOSE.
+  //
+  // It used to assert that importing the same backup twice yields TWO
+  // characters. That was the honest reading of OTA-1178 at the time — "an import
+  // never overwrites" — but it is exactly the behaviour that made the infinite
+  // life glitch: back up while alive, die, restore, and a full-health copy
+  // appears beside the corpse. Owner: *"gate restore character behind having an
+  // alive one and behind having one on the role of the fallen. it should only be
+  // for when a character 'disappears'."*
+  //
+  // ⚠ The SAFETY property the old test was really protecting — an import must
+  // never clobber an existing character — is untouched, and is pinned by its own
+  // test above ("existing characters are untouched by an import"). What changes
+  // is that a second import of a character who is ALREADY THERE is now refused
+  // rather than duplicated: nothing disappeared, so there is nothing to restore.
+  test('importing the SAME backup twice is REFUSED — the first one is still there', async () => {
     const text = encodeSaveExport(makeState('Verbal'), META);
     const a = decodeSaveExport(text);
     const b = decodeSaveExport(text);
     expect(a.ok && b.ok).toBe(true);
     if (!a.ok || !b.ok) return;
     const r1 = await importSaveAsNewSlot(a.state);
+    expect(r1.ok).toBe(true);
     const r2 = await importSaveAsNewSlot(b.state);
-    expect(r1.ok && r2.ok).toBe(true);
-    if (!r1.ok || !r2.ok) return;
-    expect(r1.slotId).not.toBe(r2.slotId);
-    expect(await listSlots()).toHaveLength(2);
+    expect(r2.ok).toBe(false);
+    if (r2.ok) return;
+    expect(r2.reason).toContain('already among your characters');
+    // ⚠ And the refusal changed nothing: the character imported first survives.
+    expect(await listSlots()).toHaveLength(1);
   });
 
   test('the restored character actually reads back', async () => {

@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.162';
+export const DISPLAY_VERSION = '4.29.167';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23769,7 +23769,40 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // cardinal directions." Gated on being indoors (hub room OR building); the
 // radar returns the moment you step out. New suite ota1300NoCompassIndoors (3).
 // 823 suites / 7702 tests. DISPLAY_VERSION 4.29.162 (steam line).
-export const OTA_BUILD_ID = '2026-08-15-1300-no-compass-indoors';
+// ⚠⚠ OTA-1303 — FIVE CONTRADICTIONS FROM ONE OVERLAND WALK (port of golem OTA-1301). The overland
+// compass printed inside buildings (the LOOK path OTA-1298 never reached, whose
+// one guard was dead code); `leave outpost` outdoors cost an hour for nothing;
+// pinned arrival-tile gear followed the player across tiles and re-granted on
+// each one — an unbounded item farm; the flee line named a chamber on open mud;
+// and every step printed two departure sentences. New suite ota1303 (11).
+// 823 suites / 7713 tests. DISPLAY_VERSION 4.29.163.
+// ⚠⚠ OTA-1306 — THE FIVE BEACON TOWERS ROUTE LIKE EVERY OTHER MISSION (port of golem OTA-1304).
+// CONTRACTS rendered the towers as read-only cards (OTA-912) with no route
+// affordance, though every GreatClimb carries its own locationId. They now offer
+// SET COURSE through the same confirm modal, and routing one makes it the mission
+// you're on — every other routed kind pauses. ⚠ No walker could have caught it:
+// every climb suite reaches its tower by assigning currentLocationId, so none ever
+// travelled. New suite ota1306 (6) walks the journey. 825 suites / 7722 tests.
+// DISPLAY_VERSION 4.29.164.
+// ⚠⚠ OTA-1309 — SELL ALL COMMON GEAR HAD NO CONFIRM BUTTON (port of golem OTA-1307). The buttons
+// chain answered every mode except bulkSellCommonGear, so it fell to the terminal
+// fallback: one neutral-tone OK wired to cancel. Owner spotted the dullness, which
+// was the diagnosis. The selling logic was never missing — confirmAction has had a
+// complete branch since OTA-1232; nothing could reach it. New suite ota1309 (4).
+// 826 suites / 7726 tests. DISPLAY_VERSION 4.29.165.
+// ⚠⚠ OTA-1316 — SALVAGE POPUP GOES AMBER; rarity moves to a left edge in the
+// shared palette (which existed in four copies and now exists in one).
+// ⚠⚠ OTA-1315 — THE INFINITE LIFE GLITCH. Restore minted a live copy of a DEAD
+// character, bypassing the Resurrection Gem. Restore is now gated on the
+// character having actually disappeared: not on the roster, and not on the roll
+// of the Fallen (an uncapped seed register, so an old death cannot be waited
+// out and deleting the corpse does not help). New suites ota1315 (10) + ota1316 (7).
+// 828 suites / 7743 tests. DISPLAY_VERSION 4.29.167.
+export const OTA_BUILD_ID = '2026-08-15-1316-amber-salvage-and-restore-gate';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1309-sell-all-actually-sells';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1306-towers-route-like-missions';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1303-world-stops-contradicting-itself';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1300-no-compass-indoors';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1297-steam-resync-to-golem';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1294-title-list-tells-the-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1292-lore-back-stays-in-game';

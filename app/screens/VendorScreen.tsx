@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { rarityHexColor } from '../components/InventoryCategorize';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore, vendorNpcId } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -31,14 +32,8 @@ import {
   type InventoryCategory,
 } from '../components/InventoryCategorize';
 
-function rarityColor(rarity: string | null | undefined): string {
-  switch (rarity) {
-    case 'Legendary': return '#e07a5f';
-    case 'Rare': return '#b88ce0';
-    case 'Uncommon': return '#9ec96a';
-    default: return '#c9a86a';
-  }
-}
+// ⚠ OTA-1312 — one palette, shared with the pack and the salvage modal.
+const rarityColor = rarityHexColor;
 
 type Mode = 'buy' | 'sell' | 'contracts';
 type Pending =
@@ -1006,7 +1001,34 @@ export function VendorScreen() {
                     : undefined
         }
         buttons={
-          pending?.mode === 'dismiss'
+          // ⚠⚠ OTA-1309 — THE CONFIRM HAD NO CONFIRM BUTTON.
+          //
+          // Owner: *"the sell all common items… takes me to the warning and
+          // explanation screen. I hit OK which okay should have a highlighted
+          // outline not the dull one that it has. but even when I hit it it just
+          // takes me back to the same menu. doesn't sell anything."*
+          //
+          // Every other mode has a branch in this chain — dismiss, sell, steal,
+          // accept, buy — and `bulkSellCommonGear` had none, so it fell all the
+          // way through to the terminal fallback: a single neutral-tone **OK**
+          // wired to `cancel`. That is exactly what he described, down to the
+          // dullness: `tone: 'neutral'` IS the dull one, and `cancel` closes the
+          // modal without selling a thing.
+          //
+          // ⚠ The work itself was never missing. `confirmAction` has carried a
+          // complete, careful bulkSellCommonGear branch since OTA-1232 — it
+          // re-plans at fire time against the live list and sells row by row
+          // through sellToVendor so every piece takes the same price, log line
+          // and standing effect. It was simply unreachable: nothing on the
+          // screen could call it. A title and a body were written for this mode
+          // and a button was not, so the sweep looked implemented from every
+          // angle except the one that does the work.
+          pending?.mode === 'bulkSellCommonGear'
+            ? [
+                { label: 'Cancel', onPress: cancel, tone: 'neutral' as const },
+                { label: `Sell ${pending.count} for ${pending.total} TC`, onPress: confirmAction, tone: 'primary' as const },
+              ]
+          : pending?.mode === 'dismiss'
             ? [
                 { label: 'Cancel', onPress: cancel, tone: 'neutral' },
                 { label: 'Dismiss', onPress: confirmAction, tone: 'destructive' },

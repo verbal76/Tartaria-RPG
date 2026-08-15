@@ -121,6 +121,8 @@ import {
   loadGlobalStash,
   addResurrectionGems,
   recordFallen,
+  recordFallenSeed,
+  characterSeedOf,
   ensureFirstInstallSeed,
   getLastSaveWriteError,
   consumeSaveReclaimedFlag,
@@ -283,6 +285,7 @@ import {
   buildingForTile,
   resolveBuildingRoom,
   secretRoomRevealedBy,
+  visibleBuildingRooms,
 } from '../engine/buildings';
 import { sellPriceFor, isUnsellable, applySellCaps } from '../engine/sellPrice';
 import { vendorPriceMod, rapportQuestId, chaPriceDiscount } from '../engine/factionRapport';
@@ -1047,6 +1050,21 @@ interface CurrentScene {
    *  guarantee lives in one place instead of being re-derived (and forgotten) at
    *  each call site. */
   pinnedAmbientNouns?: string[];
+  /** ⚠⚠ OTA-1303 — WHICH of the pins are this tile's spawned GEAR.
+   *
+   *  `pinnedAmbientNouns` merges three unrelated guarantees (spawned gear, the
+   *  water source, the dog-rescue prop) into one flat list, and a reader that
+   *  needs only one of them has no way to tell them apart. The cardinal-step
+   *  path needs exactly that: gear belongs to the TILE and must be left behind
+   *  when the player walks off it, while the water source and rescue prop are
+   *  location-scoped and must not be. Guessing which is which (e.g. "does the
+   *  name resolve to a catalog item?") is the kind of test that passes today and
+   *  silently mis-sorts the first time a prop gets a catalog entry — so the
+   *  producer records it instead of the consumer inferring it.
+   *
+   *  Optional: a save written before this OTA has no record, so the first step
+   *  after loading drops nothing and the step after that is correct. */
+  tileGearNouns?: string[];
   /** OTA-950 — Phase A of real heights: optional per-noun elevation placements
    *  (noun → structure + tier). Absent/empty = everything is on the ground,
    *  which is every scene until the Phase-B seeder ships. */
@@ -6497,6 +6515,10 @@ function patchSceneForBuildingRoom(
         // but leaving a stale list on the scene is how the next reader gets it
         // wrong. Indoors shows every interactable anyway — no window to protect.
         pinnedAmbientNouns: [],
+        // ⚠ OTA-1303 — same reasoning, same line: the outdoor tile's gear is not
+        // in this room either, and a stale record is how the EXIT path would
+        // later drop the wrong nouns from the restored outdoor scene.
+        tileGearNouns: [],
         transitArea: `${b.name} · ${room.shortName}`,
         // Indoors is peaceful — clear any wilderness combat / hooks.
         ...FRESH_ENEMY_ARRAYS,
@@ -7163,6 +7185,10 @@ interface GameStore {
    *  then auto-course to the turn-in once the work is done. Stops on turn-in,
    *  abandon, deactivate, or a manual divert. */
   routeMission: (id: string) => void;
+  /** ⚠⚠ OTA-1306 — set course to a Great Climb, and make it the mission you're on.
+   *  The five towers were listed in CONTRACTS as read-only cards with no route
+   *  affordance at all, even though each one carries a known `locationId`. */
+  routeGreatClimb: (climbId: string) => void;
   /** OTA-451 — read the outpost Mission Board: list the player faction's open
    *  postings in the feed with accept instructions. Fired by the board chip. */
   readMissionBoard: () => void;
@@ -10571,7 +10597,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (!microMicroId) {
         const macroId = LOCATION_TO_MACRO[location.id];
         if (macroId) {
-          const triple = pickRandomMicroMicroIn(macroId);
+          // ⚠⚠ OTA-1303 — THE SITE IS A PROPERTY OF THE TILE, NOT OF THE ROLL.
+          //
+          // This was `Math.random()`, and it produced two separate faults.
+          //
+          // (a) The name FROZE while the player walked. A cardinal step inside a
+          //     location does not rebuild the scene, so whatever site this rolled
+          //     on ARRIVAL was reported for every tile of that location. Owner's
+          //     log: six norths across the mud-flats, and all six looks said
+          //     "You're in Reclaimer Dispatch Board, in Dynasty Border Post" —
+          //     an indoor cork-board room belonging to a Reclaimer market in a
+          //     different region, pinned to a Dynasty tile it has nothing to do
+          //     with, unchanged no matter how far he walked.
+          //
+          // (b) ⚠ And the ROOM KEY is built from this id, so re-entering a
+          //     location re-rolled the site and therefore re-keyed every tile in
+          //     it — orphaning the consumed-noun records and refilling the take /
+          //     salvage / investigate pools. OTA-659 found this exact failure for
+          //     BUILDING rooms ("a save→exit→rehydrate material farm") and fixed
+          //     it there with a stable synthetic id; outdoor tiles were left on
+          //     the volatile random pick and kept the farm.
+          //
+          // Seeding on the tile's own coordinates fixes both at once: each tile
+          // has its own site, the site is the same every time you stand on it,
+          // and the room key it feeds is finally stable across visits.
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { hashSeed: mmHash, mulberry32: mmRng } = require('../engine/takeableGearSpawns');
+          const triple = pickRandomMicroMicroIn(
+            macroId,
+            mmRng(mmHash(`micro-micro:${location.id}:${player.mapX},${player.mapY}`)),
+          );
           if (triple) microMicroId = triple.microMicro.id;
         }
       }
@@ -11035,8 +11090,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // → stable per tile, so leave-and-return can't farm fresh gear (the take
     // handler's per-room consumed-dedup then blocks re-taking). Added additively
     // to the displayed set below so investigate's flavor nouns keep their slots.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { pickTakeableGearForScene } = require('../engine/takeableGearSpawns');
     // arb64 — drop gear already taken from THIS tile so it can't be farmed by
     // leave-and-return. The spawn is seeded per room key (same gear each visit),
     // and on wild tiles beginScene doesn't run the hub consumed-filter, so a
@@ -11044,21 +11097,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // self-heal (consumed-but-not-owned) would re-grant it. Filtering against
     // the room's consumed set (the take handler's searchedAmbientNouns) here
     // makes a taken piece stay gone for that tile, on hub AND wild tiles.
-    const gearConsumed = roomConsumedSet(get().worldMemory, candidateKey);
     // OTA-973 — #119a: cross-tile variety window — exclude the last ~10 rolled
     // gear names so a short walk stops repeating the same items.
-    const recentGearNames = new Set((worldMemory.recentTakeableGearNames ?? []).map((n) => n.toLowerCase()));
-    const sceneGearNouns: string[] = pickTakeableGearForScene(candidateKey, recentGearNames)
-      .filter((n: string) => !isConsumedNoun(gearConsumed, n));
-    if (sceneGearNouns.length > 0) {
-      get().appendLog('debug', `spawn: gear=[${sceneGearNouns.join(', ')}] window=${recentGearNames.size}`);
-      set((s2) => ({
-        worldMemory: {
-          ...s2.worldMemory,
-          recentTakeableGearNames: [...(s2.worldMemory.recentTakeableGearNames ?? []), ...sceneGearNouns].slice(-10),
-        },
-      }));
-    }
+    // ⚠ OTA-1303 — seed, window and consumed-filter now live in rollTileGear, so
+    // the cardinal-step path rolls a tile's gear by exactly the same rule.
+    const sceneGearNouns: string[] = rollTileGear(get, set, candidateKey);
     // OTA-375 — water sources for refilling the Water Bottle. Outdoor
     // tiles get a stable, per-room water source surfaced in look-around so
     // 'fill bottle' has somewhere to draw. Seeded off the room key (stable
@@ -11404,7 +11447,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
-      vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, pinnedAmbientNouns, microMicroId,
+      vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, pinnedAmbientNouns, tileGearNouns: sceneGearNouns, microMicroId,
       nounPlacements: scenePerchPlacements,
       missionBoard,
       wanderer,
@@ -18021,6 +18064,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'travel': {
+        // ⚠⚠ OTA-1303 — "LEAVE OUTPOST" WHEN THERE IS NO OUTPOST TO LEAVE.
+        // Owner's 4.29.206 log, standing on open mud-flats two tiles outside
+        // the gate: he typed `leave outpost` and the game answered "You walk.
+        // Tartaria walks beside you." and charged him AN HOUR. Reproduced here:
+        // hoursElapsed 1.75 → 2.75 for a command with no referent.
+        //
+        // ⚠ This is OTA-1269's bug wearing the other face. There, the phrase was
+        // unrecognised and fell through to a targetless wander (+1h, floorboard
+        // search). Here the phrase is the TAUGHT one — the outpost itself prints
+        // "(Type 'leave outpost' to head into the wilds.)" — and it still falls
+        // through to a targetless wander, because the leave-hub predicates are
+        // only ever consulted to decide whether to SKIP the interior handler.
+        // Nothing ever asked whether the player was in a hub at all.
+        //
+        // A door you are already through is not a door. Refuse, and cost nothing.
+        if (!player.hubRoomId && !get().activeBuildingId &&
+            (isLeaveHubCommand(trimmed) || isBareExitCommand(trimmed))) {
+          get().appendLog(
+            'world',
+            `You're already out in the open — there's nothing here to step out of. Pick a direction and walk.`,
+          );
+          break;
+        }
         // arb-fix (player: "I used follow because resonance is a sound") — a torch-CHARGED
         // lead answers with a resonance, and the natural verb for a sound is "follow". If
         // the travel target matches a torch-charged hook (its noun OR the sound-synonyms
@@ -22795,7 +22861,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 });
               }
             } else {
-              get().appendLog('world', 'You break for the entrance. Behind you the chamber settles back into silence.');
+              // ⚠ OTA-1303 — one hardcoded line described a room the player was
+              // very often not standing in. Owner's log: he fled a Drowned
+              // Aetherkin on open mud-flats and was told he broke for "the
+              // entrance" while "the chamber" settled behind him. There was no
+              // entrance and no chamber. Indoors the original line is right, so
+              // it stays where it is true and the open world gets its own.
+              const fleeIndoors = !!get().activeBuildingId || !!get().player?.hubRoomId;
+              get().appendLog('world', fleeIndoors
+                ? 'You break for the entrance. Behind you the chamber settles back into silence.'
+                : 'You break away across the open ground. Behind you the thing you ran from gives up the chase.');
             }
             if (currentScene.enemies.length > 0) {
               set((s) => (s.currentScene
@@ -26694,6 +26769,47 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
+  routeGreatClimb(climbId) {
+    const player = get().player;
+    if (!player) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const gc = require('../engine/greatClimbs');
+    const climb = (gc.GREAT_CLIMBS as { id: string; locationId: string; noun: string }[])
+      .find((c) => c.id === climbId);
+    if (!climb) return;
+    if (!(get().worldMemory.unlockedGreatClimbs ?? []).includes(climbId)) {
+      get().appendLog('arbiter', "You haven't read that tower's chart yet.");
+      return;
+    }
+    // ⚠ SINGLE-ACTIVE, the same rule setFactionQuestActive documents: "the
+    // mission you're on" is one mission, across every kind. Routing to a tower
+    // is choosing to run it, so everything else pauses — it stays on the slate.
+    const paused =
+      (player.activeFactionQuests ?? []).filter((q) => q.tracked !== false).length
+      + (player.activeHunts ?? []).filter((h) => h.tracked !== false).length
+      + (player.activeMysteries ?? []).filter((m) => m.tracked !== false).length
+      + (player.activeStorylines ?? []).filter((st) => st.tracked !== false).length;
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        activeFactionQuests: (s.player.activeFactionQuests ?? []).map((q) => ({ ...q, tracked: false })),
+        activeHunts: (s.player.activeHunts ?? []).map((h) => ({ ...h, tracked: false })),
+        activeMysteries: (s.player.activeMysteries ?? []).map((m) => ({ ...m, tracked: false })),
+        activeStorylines: (s.player.activeStorylines ?? []).map((st) => ({ ...st, tracked: false })),
+        routedClimbId: climbId,
+      },
+    } : s));
+    const pausedNote = paused > 0 ? ` (${paused} other mission${paused > 1 ? 's' : ''} paused.)` : '';
+    if (get().player?.currentLocationId === climb.locationId) {
+      get().appendLog('world', `You're already at ${climb.noun}. Start the climb.${pausedNote}`);
+      void get().persist();
+      return;
+    }
+    get().setTravelCourse(climb.locationId);
+    get().appendLog('world', `✦ Course set — ${climb.noun}.${pausedNote}`);
+    void get().persist();
+  },
+
   routeMission(id) {
     const player = get().player;
     if (!player) return;
@@ -29472,6 +29588,73 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().travelTo(step.landedOn.locationId);
       return;
     }
+    // ⚠⚠ OTA-1303 — THE GEAR STAYS ON THE TILE YOU LEFT.
+    //
+    // A cardinal step inside a location does not rebuild the scene, so the
+    // spawned gear from the ARRIVAL tile rode along on `pinnedAmbientNouns` and
+    // OTA-1244's pin logic below force-fed it back into the window on every
+    // single tile. The take handler's consumed-set is keyed per tile, so each
+    // tile happily granted another copy. Owner's log has him taking three armor
+    // pieces and still being shown all three two tiles later; measured here as
+    // five steps north for five identical pairs of greaves — an unbounded farm,
+    // and the reason the same three item names papered every look-around.
+    //
+    // ⚠ The previous tile's gear is dropped from the pool, the window AND the
+    // pins (POLISH-4 already does exactly this for the vendor a step above —
+    // things that belong to the tile you left do not follow you), and the new
+    // tile rolls its own by the shared rule. Gear on every tile is what OTA-1244
+    // was actually asking for; the pin was a way of faking it that duplicated
+    // items instead. Water-source and rescue-prop pins are untouched: they are
+    // location-scoped props, not tile loot.
+    {
+      const live = get().player;
+      const scene = get().currentScene;
+      if (live && scene) {
+        const stale = new Set((scene.tileGearNouns ?? []).map((n) => n.toLowerCase()));
+        // ⚠⚠ OTA-1303 — and the SITE is re-read for the new tile, by the same
+        // tile-seeded rule beginScene uses. Without this the arrival tile's site
+        // name rode along for the whole location — six steps north, six looks,
+        // one unchanging room name. Resolved BEFORE the room key below, because
+        // the key is built from it.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { hashSeed: mmHash, mulberry32: mmRng } = require('../engine/takeableGearSpawns');
+        //
+        // ⚠⚠ AND ONLY ON A GENUINELY WILD TILE. Indoors the scene's microMicroId
+        // is NOT a wild site at all — a building interior carries the synthetic
+        // `building:<id>:<room>` key OTA-659 introduced precisely so the room's
+        // consumed-noun state survives a reload. Stamping a wild site over it
+        // would re-key the room and refill every take / salvage / investigate
+        // tab: the exact save→exit→rehydrate farm OTA-659 closed. beginScene
+        // guards its own pick with `if (!hubRoom)`; this reader needs the same
+        // guard, and needs the building case too.
+        const wildTile = !live.hubRoomId && !get().activeBuildingId;
+        const macroId = wildTile ? LOCATION_TO_MACRO[live.currentLocationId] : null;
+        const tileSite = macroId
+          ? pickRandomMicroMicroIn(
+              macroId,
+              mmRng(mmHash(`micro-micro:${live.currentLocationId}:${live.mapX},${live.mapY}`)),
+            )
+          : null;
+        const siteId = tileSite?.microMicro.id ?? scene.microMicroId;
+        const newKey = makeRoomKey(live.currentLocationId, siteId, live.mapX, live.mapY, live.hubRoomId);
+        const fresh = rollTileGear(get, set, newKey);
+        set((s) => {
+          if (!s.currentScene) return s;
+          const drop = (list: string[] | undefined): string[] =>
+            (list ?? []).filter((n) => !stale.has(n.toLowerCase()));
+          return {
+            currentScene: {
+              ...s.currentScene,
+              microMicroId: siteId,
+              ambientNouns: Array.from(new Set([...fresh, ...drop(s.currentScene.ambientNouns)])),
+              displayedAmbientNouns: Array.from(new Set([...fresh, ...drop(s.currentScene.displayedAmbientNouns)])),
+              pinnedAmbientNouns: Array.from(new Set([...fresh, ...drop(s.currentScene.pinnedAmbientNouns)])),
+              tileGearNouns: fresh,
+            },
+          };
+        });
+      }
+    }
     // Re-shuffle the displayed ambient subset based on the new tile's
     // coordinates. The macro location's full ambientNouns pool can be
     // 30-100+ entries (e.g. Tartarian Outskirts has 36, Buried Cities
@@ -30269,7 +30452,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     // Plant a hook on the wander (same as narrateWanderingJourney does).
-    narrateWanderingJourney(get, set, scene);
+    // ⚠ OTA-1303 — the hook is ALL this call ever wanted; the step above already
+    // narrated the move, and with a direction on it.
+    narrateWanderingJourney(get, set, scene, true);
   },
 
   // Set the enemy the player is currently targeting. Bound to taps and
@@ -36091,6 +36276,48 @@ function isConsumedNoun(consumed: Set<string>, noun: string): boolean {
   return false;
 }
 
+/** ⚠⚠ OTA-1303 — THE TILE'S GEAR SPAWN, IN ONE PLACE.
+ *
+ *  This ran inline in beginScene only, which meant gear was placed on the tile
+ *  the player ARRIVED at and nowhere else — a cardinal step inside a location
+ *  reuses the scene (it only re-shuffles the displayed noun window), so it never
+ *  rolled any. OTA-1244 answered the resulting complaint ("I have not seen armor
+ *  in the last few tiles") by PINNING the arrival tile's gear so the re-shuffle
+ *  could not drop it. That pin lives on the scene, and the scene spans every tile
+ *  of the location — so the arrival tile's gear followed the player forever, and
+ *  the take handler's consumed-set is keyed per tile, so every tile granted a
+ *  fresh copy. Measured: five steps north, five pairs of the same greaves.
+ *
+ *  ⚠ The pin protected the MECHANISM (keep these nouns in the window) instead of
+ *  the RULE (this gear lies on THIS tile). Rolling per tile is the rule, and it
+ *  is now one function with two callers instead of one caller and a workaround.
+ *
+ *  Seeding, the cross-tile variety window and the consumed filter are unchanged —
+ *  a given tile still offers the same gear every visit, so leave-and-return
+ *  cannot farm it. */
+function rollTileGear(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  roomKey: string,
+): string[] {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { pickTakeableGearForScene } = require('../engine/takeableGearSpawns');
+  const consumed = roomConsumedSet(get().worldMemory, roomKey);
+  const recent = new Set((get().worldMemory.recentTakeableGearNames ?? []).map((n) => n.toLowerCase()));
+  const picks: string[] = pickTakeableGearForScene(roomKey, recent)
+    .filter((n: string) => !isConsumedNoun(consumed, n));
+  if (picks.length > 0) {
+    get().appendLog('debug', `spawn: gear=[${picks.join(', ')}] window=${recent.size}`);
+    set((s) => ({
+      worldMemory: {
+        ...s.worldMemory,
+        recentTakeableGearNames: [...(s.worldMemory.recentTakeableGearNames ?? []), ...picks].slice(-10),
+      },
+    }));
+  }
+  return picks;
+}
+
 // v2.4.1 (OTA 049) — next cardinal step toward a procedural-grid
 // target. Picks the larger axis first (Manhattan-correct path), so a
 // destination 12 tiles east + 3 south plays as eight east-steps,
@@ -38387,6 +38614,13 @@ function handlePlayerDeath(
       const revCache = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
       revCache.appendFallenToCache(hero);
     }
+    // ⚠⚠ OTA-1311 — and the SEED goes on the permanent register, which is what
+    // the restore gate actually reads. `recordFallen` above writes the memorial,
+    // and that list is capped at 25 — a permission check cannot live on a list
+    // that forgets. Awaited by nothing, like the memorial, but it is the record
+    // that stops a backup from undoing a death.
+    void recordFallenSeed(characterSeedOf(player))
+      .catch(() => { /* best-effort; the roster gate below still catches the common case */ });
     void recordFallen(hero).then((total) => {
       if (total > 1) {
         get().appendLog('system', `You join the Fallen of Tartaria — ${total} names the buried world keeps now. Read the roll from the Lore Codex.`);
@@ -39361,10 +39595,31 @@ function narrateCasualLook(
     // "I'm not in a structure, I can't be headed toward a hall"). Show them only inside
     // an entered building; on a travel tile the look reads as the overworld it is. The
     // sibling-room navigation still works if the player types an exit phrase.
-    if (inBuilding && ladder?.microMicro.exits && ladder.microMicro.exits.length > 0) {
-      exitLine.push(`Room exits: ${ladder.microMicro.exits.join(' · ')}.`);
+    //
+    // ⚠⚠ OTA-1303 — AND THAT BRANCH COULD NEVER RUN. `ladder` is built above as
+    // `!hubRoom && !inBuilding && …` — null whenever `inBuilding` is true — so
+    // `inBuilding && ladder` was dead the day it was written. The visible result
+    // was that a building interior printed NO way out at all, only the line
+    // below it: the overland compass. Owner's 4.29.206 log, standing in a shack:
+    //
+    //   You're in Shack · Den (Dynasty Border Post). You see: stove, rug, board.
+    //   Cardinal travel: north, east, south, west.
+    //
+    // ⚠ Buildings are FLAT ACCESS BY DESIGN — engine/buildings.ts, in as many
+    // words: "FLAT access, not a cardinal graph… the nav row shows every
+    // (visible) room". So the compass indoors is not merely the wrong compass,
+    // it advertises a navigation model the building deliberately does not have.
+    // Same rule as OTA-1298 (which gated the arrival radar), second reader: the
+    // overland compass describes the overland, and indoors is not it.
+    if (inBuilding) {
+      const rooms = visibleBuildingRooms(get().activeBuildingId!, new Set(get().buildingRevealed))
+        .filter((r) => !r.navHidden)
+        .map((r) => r.shortName);
+      if (rooms.length > 0) exitLine.push(`Rooms here: ${rooms.join(' · ')}.`);
+      exitLine.push(`(Tap EXIT, or type 'exit', to step back outside.)`);
+    } else {
+      exitLine.push(`Cardinal travel: north, east, south, west.`);
     }
-    exitLine.push(`Cardinal travel: north, east, south, west.`);
     parts.push(exitLine.join(' '));
   }
 
@@ -39454,6 +39709,23 @@ function narrateWanderingJourney(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   scene: CurrentScene,
+  /** ⚠⚠ OTA-1303 — TWO DEPARTURE SENTENCES FOR ONE STEP.
+   *
+   *  A cardinal step already narrates itself from the 16-line directional pool
+   *  ("You push north. The silt is heavy underfoot…") and THEN called this for
+   *  the hook — its call site says so in as many words: *"Plant a hook on the
+   *  wander (same as narrateWanderingJourney does)."* But this function opens
+   *  with a WANDERING_LEADS line, which is a departure sentence of its own, so
+   *  every step printed both. Owner's log, one tap of NORTH:
+   *
+   *    You set out north. Your boots sink half an inch into the mud-flats…
+   *    You set out on foot. The weather closes around you.
+   *
+   *  The second is not only redundant, it is worse than redundant: it drops the
+   *  direction the first one just established. The lead belongs to a
+   *  DESTINATIONLESS wander, which is the other caller. A caller that has
+   *  already said how the player moved passes true and gets only the hook. */
+  leadAlreadyNarrated?: boolean,
 ): void {
   // OTA-417/418 — the WANDERING_LEADS lead-ins are all OUTDOOR sightings; indoors
   // (a hub room / building interior) we reframe "wandering" as moving room to room
@@ -39470,17 +39742,18 @@ function narrateWanderingJourney(
     get().appendLog('world', `You move from room to room, looking closer. ${indoorHook.plantedLine}`);
     return;
   }
-  const lead = rotatingPick(WANDERING_LEADS, 'wander.lead');
+  const lead = leadAlreadyNarrated ? null : rotatingPick(WANDERING_LEADS, 'wander.lead');
+  const opener = lead ? `${lead}  ` : '';
   // Wandering always plants a hook — it's the player asking the world to
   // show them something. Skip if one is already active so we don't pile up.
   const activeUnresolved = (scene.hooks ?? []).some((h) => !h.resolved);
   if (activeUnresolved) {
-    get().appendLog('world', `${lead}  The thread you were following waits where you left it.`);
+    get().appendLog('world', `${opener}The thread you were following waits where you left it.`);
     return;
   }
   const hook = plantHookByKind(pickRandomHookKind());
   set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
-  get().appendLog('world', `${lead}  ${hook.plantedLine}`);
+  get().appendLog('world', `${opener}${hook.plantedLine}`);
 }
 
 function narratePossibleDirections(

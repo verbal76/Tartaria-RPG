@@ -16,6 +16,7 @@ import { useGameStore } from '../state/gameStore';
 import type { InventoryItem } from '../engine/types';
 import { computeInventoryDelta, type InventoryDelta } from './inventoryDelta';
 import type { InteractableChip } from './InteractableChip';
+import { rarityHexColor } from './InventoryCategorize';
 
 interface Props {
   visible: boolean;
@@ -252,7 +253,10 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
                       <Text style={styles.resultsLead}>Added to your pack:</Text>
                       <View style={styles.resultList}>
                         {results.map((r) => (
-                          <View key={r.name} style={styles.resultRow}>
+                          <View
+                            key={r.name}
+                            style={[styles.resultRow, { borderLeftColor: rarityHexColor(r.rarity) }]}
+                          >
                             <Text style={styles.resultName}>
                               ✦ {r.name}{r.quantity > 1 ? ` × ${r.quantity}` : ''}
                             </Text>
@@ -438,15 +442,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#1a1714',
-    borderColor: '#9ec96a',
+    borderColor: '#c9a86a',
     borderWidth: 1,
     borderRadius: 3,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  chipFullScene: { borderColor: '#9ec96a' },
+  // ⚠ OTA-1312 — chips are PRE-salvage nouns (a cart, rubble, a marker). They
+  // have no rarity and no category yet — the item does not exist until the thing
+  // is worked over — so there is nothing here to colour-code BY. Amber, like the
+  // rest of the frame.
+  chipFullScene: { borderColor: '#c9a86a' },
   chipFullText: { color: '#e6d8b3', fontSize: 14, fontWeight: '600' },
-  chipFullArrow: { color: '#9ec96a', fontSize: 11, letterSpacing: 1 },
+  chipFullArrow: { color: '#c9a86a', fontSize: 11, letterSpacing: 1 },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: {
     paddingHorizontal: 14,
@@ -465,17 +473,35 @@ const styles = StyleSheet.create({
   // Result-phase rows. ✦ marker + rarity badge on the right.
   resultsLead: { color: '#cdbf99', fontSize: 13, lineHeight: 18, marginBottom: 10 },
   resultList: { gap: 6, marginBottom: 8 },
+  // ⚠⚠ OTA-1312 — AMBER EVERYWHERE, AND THE RARITY MOVES TO THE EDGE.
+  //
+  // Owner: *"the colors are the only thing i dont like… just make all of the
+  // colors amber and leave it sorted like it is, add the rarity color line on
+  // the left edge like if you were buying it."*
+  //
+  // What was here was not colour-CODING at all — `#9ec96a` was hardcoded on the
+  // rarity badge, and that hex is specifically the UNCOMMON colour. So a
+  // Legendary payout and a Common one both printed their rarity word in
+  // Uncommon-green: a colour making a claim, and getting it wrong on three
+  // rarities out of four. It read as decoration because it carried no
+  // information.
+  //
+  // ⚠ Now the accent is the house amber, and rarity is said ONCE, by a 4pt left
+  // edge in the same `rarityHexColor` the pack and the shop use — the same
+  // borderLeftWidth: 4 the vendor's section headers use, so a salvage payout
+  // reads the way the item will read everywhere else you meet it.
   resultRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#1a1714',
-    borderColor: '#9ec96a',
+    borderColor: '#3a342c',
     borderWidth: 1,
+    borderLeftWidth: 4,
     borderRadius: 3,
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
   resultName: { color: '#e6d8b3', fontSize: 14, fontWeight: '600' },
-  resultRarity: { color: '#9ec96a', fontSize: 10, letterSpacing: 1.5 },
+  resultRarity: { color: '#c9a86a', fontSize: 10, letterSpacing: 1.5 },
 });

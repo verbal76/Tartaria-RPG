@@ -29,6 +29,12 @@ export interface SlotSummary {
   slotId: string;
   playerName: string;
   raceId: string;
+  /** ⚠⚠ OTA-1311 — the character's stable identity (`player.mapSeed`), minted
+   *  once at creation as `name|raceId|factionId|<created-at>`. Carried in the
+   *  index so the roster can be checked WITHOUT loading every slot, and carried
+   *  inside the save itself so it survives a backup round-trip. Absent on slots
+   *  written before this OTA; readers fall back to name+race. */
+  characterSeed?: string;
   locationId: string;
   hp: number;
   hpMax: number;
@@ -87,6 +93,10 @@ export interface GlobalStash {
   // in future, to encounter in the world). "Losing is fun" — the run ends, the
   // legend persists.
   fallen?: FallenHero[];
+  /** ⚠⚠ OTA-1311 — every character seed that has ever died on this install.
+   *  Uncapped on purpose: `fallen` above is a capped memorial, and a permission
+   *  check that forgets is a permission check that can be waited out. */
+  fallenSeeds?: string[];
 }
 
 /** OTA-845 — a character who died. Persisted install-wide in the GlobalStash. */
@@ -118,6 +128,39 @@ export interface FallenHero {
 }
 
 const FALLEN_CAP = 25;
+
+/** ⚠⚠ OTA-1311 — A CHARACTER'S STABLE IDENTITY, in one place.
+ *
+ *  `mapSeed` is minted once at creation (`name|raceId|factionId|<timestamp>`)
+ *  and never changes, which makes it the only field that can tell "this is the
+ *  same Francis" from "this is another character called Francis". The legacy
+ *  fallback matches the one the world-map readers already use, so a save written
+ *  before mapSeed existed still resolves to a consistent key. */
+export function characterSeedOf(
+  p: { mapSeed?: string; name: string; raceId: string; factionId: string },
+): string {
+  return p.mapSeed ?? `${p.name}|${p.raceId}|${p.factionId}|legacy`;
+}
+
+/** ⚠⚠ OTA-1311 — THE ROLL OF THE FALLEN, THE PART THAT MUST NEVER FORGET.
+ *
+ *  `stash.fallen` is the memorial and it is CAPPED at 25 — by design, it is a
+ *  graveyard to read, and old names age out of it. That makes it useless as a
+ *  permission check: a character who died twenty-six deaths ago would quietly
+ *  fall off the list and become restorable again. So the seeds get their own
+ *  uncapped record. They are short strings; a lifetime of them costs nothing
+ *  next to one save. */
+export async function recordFallenSeed(seed: string): Promise<void> {
+  const stash = await loadGlobalStash();
+  const have = stash.fallenSeeds ?? [];
+  if (have.includes(seed)) return;
+  await saveGlobalStash({ ...stash, fallenSeeds: [...have, seed] });
+}
+
+/** True when this exact character has died on this install — ever. */
+export async function hasFallenSeed(seed: string): Promise<boolean> {
+  return ((await loadGlobalStash()).fallenSeeds ?? []).includes(seed);
+}
 
 /** OTA-845 — append a fallen character to the install-wide roll (capped). Returns the
  *  new total number of fallen ever recorded within the cap window. */
@@ -162,6 +205,7 @@ export async function loadGlobalStash(): Promise<GlobalStash> {
       devGemGrantedSlots: parsed.devGemGrantedSlots ?? [],
       testGiftGrantedSlots: parsed.testGiftGrantedSlots ?? [],
       fallen: parsed.fallen ?? [],
+      fallenSeeds: parsed.fallenSeeds ?? [],
     };
   } catch {
     return { resurrectionGems: 0, endingBadges: [], installSeeded: false, devGemGrantedSlots: [], testGiftGrantedSlots: [] };
@@ -454,6 +498,7 @@ export async function saveSlot(slotId: string, state: SaveState): Promise<void> 
       slotId,
       playerName: state.player.name,
       raceId: state.player.raceId,
+      characterSeed: characterSeedOf(state.player),
       locationId: state.player.currentLocationId,
       hp: state.player.hp,
       hpMax: state.player.hpMax,
@@ -504,6 +549,49 @@ async function readCreatedAt(slotId: string): Promise<number | null> {
 export async function importSaveAsNewSlot(
   state: SaveState,
 ): Promise<{ ok: true; slotId: string; trimmed: boolean } | { ok: false; reason: string }> {
+  // ⚠⚠ OTA-1311 — RESTORE IS FOR A CHARACTER THAT DISAPPEARED. NOTHING ELSE.
+  //
+  // Owner, after a mis-tap: *"I accidentally hit restore character when Francis
+  // died, and it gave me an alive full health copy of Francis underneath dead
+  // Francis. so it's an infinite life glitch."* Exactly so. This function mints
+  // a NEW slot and never overwrites — deliberate, OTA-1178, because a player
+  // restoring a backup has already lost a character once and a mis-tap must not
+  // cost them a second. But nothing ever asked whether the character was LOST or
+  // merely DEAD, so a backup taken while alive was a free, repeatable revival —
+  // and it bypassed the Resurrection Gem entirely, which is the one sanctioned
+  // way back and is scarce on purpose.
+  //
+  // Owner's rule: *"we should gate restore character behind having an alive one
+  // and behind having one on the role of the fallen. it should only be for when
+  // a character 'disappears'."* Both gates, in that order:
+  //
+  //   (1) ALREADY ON THE ROSTER — alive or dead, they are right there. Nothing
+  //       disappeared, so there is nothing to restore. This also catches a death
+  //       recorded before the seed register existed.
+  //   (2) ON THE ROLL OF THE FALLEN — they died here. The way back is a
+  //       Resurrection Gem, and a clipboard is not one.
+  //
+  // ⚠ Checked against the SEED, not the name, so "another character I also
+  // called Francis" is unaffected — and checked against the uncapped register
+  // rather than the 25-entry memorial, so an old death cannot be waited out.
+  const incoming = state.player;
+  if (incoming) {
+    const seed = characterSeedOf(incoming);
+    const roster = await listSlots();
+    const onRoster = roster.some((slot) => (
+      slot.characterSeed
+        ? slot.characterSeed === seed
+        // Legacy slots predate the seed; fall back to the pair that identified a
+        // character before it existed.
+        : slot.playerName === incoming.name && slot.raceId === incoming.raceId
+    ));
+    if (onRoster) {
+      return { ok: false, reason: `${incoming.name} is already among your characters. Restore is for a character that has disappeared — nothing was changed.` };
+    }
+    if (await hasFallenSeed(seed)) {
+      return { ok: false, reason: `${incoming.name} has fallen. A Resurrection Gem brings a fallen Tartarian back; a backup does not. Nothing was changed.` };
+    }
+  }
   const slotId = newSlotId();
   clearLastSaveWriteError();
 
