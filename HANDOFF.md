@@ -1839,7 +1839,25 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM — THE LOG CANNOT SHOW THE FREEZE (2026-08-15, latest).** Golem
+- **⚠⚠ GOLEM — VISITED ROOMS + GEAR RANKING (2026-08-15, latest).** Golem
+  OTA-1277, both asks typed into the game mid-run.
+
+  **(1)** Room chips show `✓` when visited (his log: Memorial visit 5, Workshop
+  4, Hearth 3 in seven minutes). Reads `worldMemory.hubVisited` — the same set
+  fast-travel earns from, so the mark cannot disagree with the game.
+  **(2)** Gear to his spec: weapons cover TWO ranges before maximising damage,
+  and a melee piece may never displace the only ranged one; armour ranked
+  AC×100 + resists×10 + stat points, with his own example as the test. A worse
+  piece no longer claims a slot just for being catalog armour.
+
+  ⚠ **CLEAN FREEZE RUN** — no freeze, no `LAST BOOT DIED` breadcrumb; 1275's
+  debounce fired twice. ⚠⚠ **NEW, UNFIXED:** the **qwen-watchdog re-inits on its
+  own timer and bypasses the re-warm debounce** (3 × ctx OPENED during
+  app-switching despite both cancels). Recorded, not guessed — next OTA.
+  ⚠ Still open from his note: the outpost MAPS (he has uploaded per-outpost maps
+  with a central-hub structure and wants the layout to match them). Not started.
+
+- **⚠⚠⚠ GOLEM — THE LOG CANNOT SHOW THE FREEZE (2026-08-15).** Golem
   OTA-1276. **The owner's correction is the diagnosis.** He freezes MID-GAME
   cycling outpost rooms scavenging — not while copying logs (that was the
   after-action report, which is all OTA-1275's thrash was).

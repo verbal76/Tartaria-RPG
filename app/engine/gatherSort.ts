@@ -24,6 +24,8 @@
 import type { PlayerCharacter, InventoryItem, EquipSlot } from './types';
 import { WEAPONS, ARMOR, findCatalogItem } from './crafting';
 import { resolveEquippedItem } from './equipment';
+import { reachBandsFor } from './types';                 // OTA-1277
+import { reachClassFor } from './combatRules';           // OTA-1277
 
 export type GatherKind = 'weapon' | 'armor' | 'other' | 'scenery' | 'inert' | 'lead';
 
@@ -173,6 +175,22 @@ const ARMOR_SLOT_TO_EQUIP: Readonly<Record<string, EquipSlot>> = {
  *  exact name. Equipping by the noun the player tapped would fail on every loose
  *  match with "I don't see a blade on you", which is a refusal for a take that
  *  just succeeded. One lookup, both answers. */
+/** ⚠⚠ OTA-1277 — ARMOUR IS RANKED, NOT JUST SLOTTED. Owner's spec, verbatim:
+ *  *"if we have multiple pieces for one slot, go towards the one that has the
+ *  most resists the highest AC and any other values. so if I have a two AC
+ *  resist poisons legging and I have a two AC resist poisons slashing and
+ *  burning plus two dexterity leggings pick the latter."*
+ *  His example is the whole rule: equal AC, so the tiebreak is resist COUNT,
+ *  then the stat bonuses. AC leads because it is the thing that stops a hit. */
+export function armorScore(a: { acBonus: number; resistances?: readonly string[]; statBonus?: { amount: number }; statBonuses?: readonly { amount: number }[] }): number {
+  const resists = a.resistances?.length ?? 0;
+  const stats = (a.statBonuses?.length ? a.statBonuses : a.statBonus ? [a.statBonus] : [])
+    .reduce((n, b) => n + Math.abs(b.amount ?? 0), 0);
+  // AC dominates, resists break ties, stat points break those. Weighted rather
+  // than lexicographic so a piece two AC better still wins over one extra resist.
+  return a.acBonus * 100 + resists * 10 + stats;
+}
+
 export function upgradeEquipSlot(
   player: PlayerCharacter | null,
   noun: string,
@@ -180,7 +198,16 @@ export function upgradeEquipSlot(
   const armor = armorByName(noun);
   if (armor) {
     const slot = ARMOR_SLOT_TO_EQUIP[armor.slot];
-    return slot ? { name: armor.name, slot } : null;
+    if (!slot) return null;
+    // ⚠ OTA-1277 — only claim the slot if it actually BEATS what is worn, by the
+    // owner's ranking. Previously any catalog armour took the slot on sight,
+    // which could downgrade a better piece already on your back.
+    if (player) {
+      const worn = resolveEquippedItem(player, slot);
+      const wornArmor = worn ? armorByName(worn.name) : null;
+      if (wornArmor && armorScore(armor) <= armorScore(wornArmor)) return null;
+    }
+    return { name: armor.name, slot };
   }
   const weapon = weaponByName(noun);
   if (!weapon) return null;
@@ -198,11 +225,49 @@ export function upgradeEquipSlot(
   const main = resolveEquippedItem(player, 'main');
   if (!main) return { name: weapon.name, slot: 'main' };
   const heldWeapon = weaponByName(main.name);
+  // ⚠⚠ OTA-1277 — COVER TWO RANGES, THEN MAXIMISE DAMAGE. Owner's spec:
+  // *"you should always recommend two different ranged weapons. try to get one
+  // long range like a bolt caster or a bow or a crossbow and try to make the
+  // other one a melee weapon... and go for the highest roll value. so a 1d6 bolt
+  // caster is going to get beat by a 2d8 bolt caster."*
+  // His own log is the case for it: he had a Bolt-Caster and a Tartarian Spear
+  // and ended up swinging the RANGED one from the off hand at mid range while a
+  // spear sat in main — the pair was right by accident, not by rule.
+  const off = resolveEquippedItem(player, 'off');
+  const offWeapon = off ? weaponByName(off.name) : null;
+  const isFar = (w: { name: string; kind?: string; tags?: readonly string[] } | null): boolean => {
+    if (!w) return false;
+    const bands = reachBandsFor(reachClassFor({
+      weaponKind: w.kind === 'ranged' || w.kind === 'runecaster' ? w.kind : 'melee',
+      name: w.name,
+      tags: w.tags,
+    }));
+    return bands.length > 1;   // anything that reaches past `close`
+  };
+  const newIsFar = isFar(weapon);
+  const mainIsFar = isFar(heldWeapon);
+  const offIsFar = isFar(offWeapon);
+  // If the pair currently covers only ONE band and this weapon covers the other,
+  // it fills the gap — that outranks a raw damage comparison, because a player
+  // with two melee weapons cannot answer a ranged enemy at all.
+  const pairCoversBoth = mainIsFar !== offIsFar && !!offWeapon;
+  if (!pairCoversBoth) {
+    if (newIsFar && !mainIsFar && !offIsFar) return { name: weapon.name, slot: off ? 'off' : 'main' };
+    if (!newIsFar && mainIsFar && (!offWeapon || offIsFar)) return { name: weapon.name, slot: off ? 'off' : 'off' };
+  }
   const beatsMain = heldWeapon
     ? averageDamage(weapon.damageDice) > averageDamage(heldWeapon.damageDice)
     : false;
+  // ⚠ Only displace a same-range weapon on damage. Swapping a better melee into
+  // main when main is the only ranged piece would COST the pair its coverage.
+  if (beatsMain && newIsFar === mainIsFar) return { name: weapon.name, slot: 'main' };
+  if (!off) return { name: weapon.name, slot: 'off' };
+  // Same band as the off hand and better than it — take that slot.
+  if (offWeapon && newIsFar === offIsFar
+      && averageDamage(weapon.damageDice) > averageDamage(offWeapon.damageDice)) {
+    return { name: weapon.name, slot: 'off' };
+  }
   if (beatsMain) return { name: weapon.name, slot: 'main' };
-  if (!resolveEquippedItem(player, 'off')) return { name: weapon.name, slot: 'off' };
   // Both hands full and it beats neither — the mark would not have fired, but a
   // caller that asks anyway gets the honest answer rather than a silent swap.
   return null;

@@ -294,18 +294,31 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // its existing thing; only the chip LABEL changes. Outside a hub
   // the row renders cardinals as before.
   const hubRoom = useMemo(() => (hubRoomId ? hubRoomFor(hubRoomId, skinFactionId) : null), [hubRoomId, skinFactionId]);
+  // ⚠⚠ OTA-1277 — MARK THE ROOMS YOU HAVE ALREADY WALKED. Owner, typed into the
+  // game mid-session: *"I don't know if I've been to a room yet or not. maybe we
+  // should put a little symbol in the room button if it's already been explored.
+  // just so we know cuz I'm tapping the same things over and over again cuz I'm
+  // cycling through like 15 names."* His own log shows exactly that — Memorial
+  // visit 5, Workshop visit 4, Hearth visit 3, all inside seven minutes.
+  // The visited set is the SAME one hub fast-travel already earns off
+  // (worldMemory.hubVisited), so the dot can never disagree with what the game
+  // thinks you have seen.
+  const hubVisited = useGameStore((st) => st.worldMemory.hubVisited);
   const hubExitChips: Array<{ label: string; submit: string }> = useMemo(() => {
     if (!hubRoom) return [];
+    const seen = new Set(hubVisited ?? []);
     const out: Array<{ label: string; submit: string }> = [];
     for (const dir of ['north', 'south', 'east', 'west'] as const) {
       const targetId = hubRoom.exits[dir];
       if (!targetId) continue;
       const targetRoom = hubRoomFor(targetId, skinFactionId);
-      const label = targetRoom?.shortName?.toUpperCase() ?? dir.toUpperCase();
-      out.push({ label, submit: `go ${dir}` });
+      const name = targetRoom?.shortName?.toUpperCase() ?? dir.toUpperCase();
+      // ✓ = already walked. Prefixed rather than suffixed so the marks line up
+      // in a row of four chips and read as a column at a glance.
+      out.push({ label: seen.has(targetId) ? `✓ ${name}` : name, submit: `go ${dir}` });
     }
     return out;
-  }, [hubRoom, skinFactionId]);
+  }, [hubRoom, skinFactionId, hubVisited]);
 
   // ⚠ OTA-1194 (PUNCHLIST P11) — the EXIT chip belongs only in rooms that HAVE a door out.
   // Showing it in every room let the player leave through the armory or the mess, which is

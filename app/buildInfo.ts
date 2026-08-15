@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.199';
+export const DISPLAY_VERSION = '4.29.200';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23601,7 +23601,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // up clean.
 // New suite ota1276FreezeForensics (10). 815 suites / 7621 tests.
 // DISPLAY_VERSION 4.29.199. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-15-1276-freeze-forensics';
+// ⚠⚠ OTA-1277 — TWO ASKS TYPED INTO THE GAME MID-RUN, PLUS A CLEAN FREEZE RUN.
+// (1) VISITED-ROOM MARKS. Owner: "I don't know if I've been to a room yet or
+// not... put a little symbol in the room button if it's already been explored...
+// I'm cycling through like 15 names." His log proves it — Memorial visit 5,
+// Workshop visit 4, Hearth visit 3, in seven minutes. Room chips now show ✓ when
+// visited, read off worldMemory.hubVisited (the SAME set hub fast-travel earns
+// from, so the mark can never disagree with the game).
+// (2) GEAR PICKING, TO HIS SPEC. Weapons: cover TWO ranges first (one that
+// reaches past `close`, one melee) — a pair of clubs cannot answer anything at
+// distance — then maximise average damage, and never displace the only ranged
+// piece with a melee one. Armour: ranked AC×100 + resists×10 + stat points, his
+// own example as the test (equal AC → more resists + DEX wins), and a WORSE
+// piece no longer claims a slot just for being catalog armour.
+// ⚠ NO FREEZE THIS SESSION and no LAST BOOT DIED breadcrumb — 1276's forensics
+// stayed quiet because there was nothing to report. The 1275 debounce fired
+// twice ("re-warm cancelled").
+// ⚠ NEW, UNFIXED: the qwen-watchdog re-inits on its own timer and BYPASSES the
+// re-warm debounce — 3 ctx OPENs during app-switching despite both cancels.
+// Recorded, not guessed at; next OTA.
+// New suite ota1277RoomsAndGear (10). 816 suites / 7631 tests.
+// DISPLAY_VERSION 4.29.200. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-15-1277-rooms-and-gear';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1276-freeze-forensics';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1275-rewarm-debounce';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1274-room-names-walk';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1273-the-gift-says-who';
