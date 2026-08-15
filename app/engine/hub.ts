@@ -373,20 +373,30 @@ export function resolveHubTravel(
       deadCardinal ??= dir;
     }
   }
+  // ⚠⚠ OTA-1280 — LONGEST NAME WINS, in both phases. First-substring-found was
+  // wrong whenever one room's name is a prefix of another's, and the Order skin
+  // ships exactly that pair: Quarters reads "Cells", the Chapel reads "Cell".
+  // Typing `cells` — the word on the player's screen — matched the Chapel's
+  // 'cell' first (direction order) and walked them into the wrong room. Found
+  // by the nine-skin crawl, not by play.
+  const bestMatch = (roomIds: string[]): string | null => {
+    let best: { roomId: string; len: number } | null = null;
+    for (const roomId of roomIds) {
+      for (const n of namesFor(roomId)) {
+        if (text.includes(n) && (!best || n.length > best.len)) best = { roomId, len: n.length };
+      }
+    }
+    return best?.roomId ?? null;
+  };
   // Adjacent named room (any exit).
-  for (const dir of DIRECTIONS) {
-    const targetId = here.exits[dir];
-    if (!targetId) continue;
-    if (namesFor(targetId).some((n) => text.includes(n))) {
-      return { roomId: targetId, via: 'adjacent' };
-    }
-  }
+  const adjacent = bestMatch(
+    DIRECTIONS.map((d) => here.exits[d]).filter((x): x is string => !!x),
+  );
+  if (adjacent) return { roomId: adjacent, via: 'adjacent' };
   // A real room, further off. Refused — with the first step named.
-  for (const room of HUB.rooms) {
-    if (room.id === fromRoomId) continue;
-    if (namesFor(room.id).some((n) => text.includes(n))) {
-      return { roomId: room.id, via: 'not_adjacent', firstStep: hubFirstStepToward(fromRoomId, room.id) };
-    }
+  const far = bestMatch(HUB.rooms.map((r) => r.id).filter((id) => id !== fromRoomId));
+  if (far) {
+    return { roomId: far, via: 'not_adjacent', firstStep: hubFirstStepToward(fromRoomId, far) };
   }
   // A cardinal with no door on it. Refused HERE so it cannot fall through to
   // overland travel and carry the player out of the outpost.
@@ -436,21 +446,31 @@ export function matchHubRoomName(
     .replace(/^the\s+/, '')
     .trim();
   if (!text) return null;
-  const isMatch = (roomId: string): boolean => {
-    for (const r of [findHubRoom(roomId), hubRoomFor(roomId, skinFactionId ?? null)]) {
-      if (!r) continue;
-      const name = r.name.toLowerCase().replace(/^the\s+/, '');
-      if (text === r.shortName.toLowerCase() || text === name || text === roomId.toLowerCase()) return true;
+  // ⚠ OTA-1280 — the SKIN pass outranks the BASE pass. One faction can label a
+  // room with another room's base name (conspiracy: the Workshop reads "Lab",
+  // while outpost_lab's base shortName is also "Lab"). The player types what is
+  // on their screen, so the screen name must win the tie — previously it won by
+  // array-index luck, which is not a rule.
+  const isMatch = (roomId: string, layer: 'skin' | 'base'): boolean => {
+    const r = layer === 'skin'
+      ? (skinFactionId ? VARIANTS.factions?.[skinFactionId]?.[roomId] : undefined)
+      : findHubRoom(roomId);
+    if (!r || typeof r.shortName !== 'string' || typeof r.name !== 'string') {
+      return layer === 'base' && text === roomId.toLowerCase();
     }
-    return false;
+    const name = r.name.toLowerCase().replace(/^the\s+/, '');
+    return text === r.shortName.toLowerCase() || text === name
+      || (layer === 'base' && text === roomId.toLowerCase());
   };
-  for (const dir of DIRECTIONS) {
-    const targetId = here.exits[dir];
-    if (targetId && isMatch(targetId)) return targetId;
-  }
-  for (const room of HUB.rooms) {
-    if (room.id === fromRoomId) continue;
-    if (isMatch(room.id)) return room.id;
+  for (const layer of ['skin', 'base'] as const) {
+    for (const dir of DIRECTIONS) {
+      const targetId = here.exits[dir];
+      if (targetId && isMatch(targetId, layer)) return targetId;
+    }
+    for (const room of HUB.rooms) {
+      if (room.id === fromRoomId) continue;
+      if (isMatch(room.id, layer)) return room.id;
+    }
   }
   return null;
 }

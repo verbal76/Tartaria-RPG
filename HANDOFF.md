@@ -1839,7 +1839,29 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ GOLEM — LEAVING THE PACK ENDS GIFT MODE (2026-08-15, latest).** Golem
+- **⚠⚠⚠ GOLEM — ALL NINE OUTPOSTS WALKED; TWO NAME-MATCH DEFECTS FIXED
+  (2026-08-15, latest).** Golem OTA-1281, answering the owner's acceptance
+  question for the graph: "is the room remapping error free and fully
+  functional? crawl all 9 maps."
+
+  **THE CRAWL: green at both layers.** ENGINE — 9 skins × 28 directed edges,
+  each resolved by cardinal, by the SKINNED name on the player's screen, and
+  back, plus every doorless cardinal refusing; exhaustive, no sampling.
+  PLAYED — a fresh character of every faction walks all 28 edges of their own
+  outpost through submitPlayerAction, then the refusal paths, then leaves.
+
+  **FOUND BEFORE IT RAN — the crawl paid for itself while being planned:**
+  · resolveHubTravel took the FIRST substring hit in direction order. The
+    Order skin ships a prefix pair (Quarters "Cells" / Chapel "Cell"), so
+    typing `cells` — the word on the player's screen — walked into the
+    CHAPEL. Longest name wins now, both phases.
+  · matchHubRoomName settled a screen-name vs base-name tie by ARRAY INDEX
+    (conspiracy's Workshop reads "Lab"; base outpost_lab is also "Lab"). The
+    skin pass now outranks the base pass: the player types what they can see.
+  ⚠ The lesson is the same one this file keeps writing down: a rule decided
+  by iteration order is not a rule, it is a coin that has not flipped yet.
+
+- **⚠⚠ GOLEM — LEAVING THE PACK ENDS GIFT MODE (2026-08-15).** Golem
   OTA-1280, from the owner's device. He backed out of "give Halem a gift" via
   the inventory's BACK button; the next pack visit — to equip armour — was
   still a gift picker aimed at Halem. Only the banner tap and a COMPLETED give

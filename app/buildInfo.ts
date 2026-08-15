@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.203';
+export const DISPLAY_VERSION = '4.29.204';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23685,7 +23685,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // BEFORE navigating and never trips the guard; the banner cancel still stays
 // in the pack. New suite ota1280GiftEndsAtTheDoor (5). 819 suites / 7673 tests.
 // DISPLAY_VERSION 4.29.203. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-15-1280-gift-ends-at-the-door';
+// ⚠⚠ OTA-1281 — ALL NINE OUTPOSTS, WALKED. Owner's acceptance question for the
+// graph: "is the room remapping error free and fully functional? crawl all 9
+// maps." Two layers: ENGINE — 9 skins × 28 directed edges, each resolved by
+// cardinal, by the SKINNED name on the player's screen, and back, plus every
+// doorless cardinal refusing (exhaustive, no sampling); PLAYED — a fresh
+// character of each faction walks all 28 edges of their own outpost through
+// submitPlayerAction, then the refusal paths, then leaves. All green.
+// ⚠⚠ THE CRAWL FOUND TWO NAME-MATCH DEFECTS BEFORE IT RAN (fixed here):
+// (1) resolveHubTravel took the FIRST substring hit in direction order; the
+// Order skin ships a prefix pair (Quarters "Cells" / Chapel "Cell"), so typing
+// `cells` — the word on the screen — walked you into the CHAPEL. Longest name
+// wins now, both phases. (2) matchHubRoomName settled a screen-name/base-name
+// tie by array index (conspiracy Workshop reads "Lab"; base outpost_lab is
+// also "Lab"). The skin pass now outranks the base pass — the player types
+// what they can see. New suite ota1281NineOutpostsWalked (20).
+// 820 suites / 7693 tests. DISPLAY_VERSION 4.29.204. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-15-1281-nine-outposts-walked';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1280-gift-ends-at-the-door';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1279-universal-outpost-graph';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1278-watchdog-respects-debounce';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1277-rooms-and-gear';
