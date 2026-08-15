@@ -152,10 +152,16 @@ describe('OTA-1263 (C) — the button and the card read the same array', () => {
 
 describe('OTA-1263 (D) — INVESTIGATE ALL resolves one at a time', () => {
   it('⚠⚠ the sweep is PACED, not a loop that lands in one frame', () => {
+    // ⚠⚠ OTA-1268 CAVEAT, LEARNED THE EXPENSIVE WAY: this source pin passed for
+    // three days over a sweep that resolved exactly ONE noun — the pacing
+    // existed and the self-abort killed it. A pin like this proves the
+    // MECHANISM is present, never that it runs. ota1268 owns the behavioural
+    // claim now (it presses the button and counts); this stays only as a cheap
+    // tripwire against re-introducing the synchronous wall.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('onInvestigateAll={(nouns) => {');
     expect(i).toBeGreaterThan(-1);
-    const block = screen.slice(i, i + 1200);
+    const block = screen.slice(i, i + 1800);
     expect(block).toContain('setTimeout(step, INVESTIGATE_ALL_GAP_MS)');
     // The old shape — every submit inside one synchronous for-loop — is gone.
     expect(block).not.toContain('for (const n of ordered) {');
@@ -176,11 +182,16 @@ describe('OTA-1263 (D) — INVESTIGATE ALL resolves one at a time', () => {
     // Enemies: OTA-1236's rule — firing commands into a fight the player has not
     // seen yet is how a sweep eats half the room. And a paced sweep must never
     // talk over a player who has started doing something else.
+    // ⚠⚠ OTA-1268 — the player-action abort now compares against a WATERMARK
+    // re-read after each of the sweep's own submits, not the pre-sweep stamp.
+    // The old pin (`!== startedAt`) was asserting the exact line that made the
+    // sweep abort on its own footsteps.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('onInvestigateAll={(nouns) => {');
-    const block = screen.slice(i, i + 1200);
+    const block = screen.slice(i, i + 1800);
     expect(block).toContain("(s.currentScene?.enemies ?? []).length > 0) return;");
-    expect(block).toContain('s.lastPlayerActionAt !== startedAt');
+    expect(block).toContain('s.lastPlayerActionAt !== watermark');
+    expect(block).toContain('watermark = useGameStore.getState().lastPlayerActionAt;');
   });
 
   it('⚠ the story-tier ordering is untouched — the dog quest still goes last', () => {

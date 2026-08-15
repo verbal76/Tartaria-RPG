@@ -2034,7 +2034,16 @@ export function ExplorationScreen() {
         onInvestigateAll={(nouns) => {
           setSearchOpen(false);
           const ordered = orderByStoryTier(nouns, (n) => n, leadCtx);
-          const startedAt = useGameStore.getState().lastPlayerActionAt;
+          // ⚠⚠ OTA-1268 — THE SWEEP WAS ABORTING ON ITS OWN FOOTSTEPS. The 1263
+          // abort compared against the stamp from BEFORE the sweep started — but
+          // `submitPlayerAction` stamps `lastPlayerActionAt` on EVERY submit,
+          // including the sweep's own. Step one ran, moved the stamp, and step two
+          // read "the player acted" and quit: INVESTIGATE ALL resolved exactly ONE
+          // noun on device and silently dropped the rest (owner, next log: "the
+          // investigations... were supposed to show on the screen one at a time").
+          // The watermark is now re-read AFTER each of the sweep's own submits, so
+          // the only thing that can move it between steps is a real player action.
+          let watermark = useGameStore.getState().lastPlayerActionAt;
           let i = 0;
           const step = (): void => {
             if (i >= ordered.length) return;
@@ -2042,8 +2051,9 @@ export function ExplorationScreen() {
             if ((s.currentScene?.enemies ?? []).length > 0) return;
             // ⚠ The player did something of their own — stop rather than queue
             // lines behind whatever they just asked for.
-            if (s.lastPlayerActionAt !== startedAt && i > 0) return;
+            if (s.lastPlayerActionAt !== watermark) return;
             submit(`investigate ${ordered[i]!}`);
+            watermark = useGameStore.getState().lastPlayerActionAt;
             i += 1;
             if (i < ordered.length) setTimeout(step, INVESTIGATE_ALL_GAP_MS);
           };

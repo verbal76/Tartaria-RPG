@@ -1839,8 +1839,53 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ GOLEM — THE FIRST REAL DEVICE SESSION: A FREEZE, A ONE-NOUN SWEEP, AND
+  FOUR WAYS TO NOT LEAVE AN OUTPOST (2026-08-15, latest).** Golem OTA-1268/1269/
+  1270, from the owner's 4.29.190 playtest (referred by *"it froze on me"* + a
+  follow-up log carrying three typed complaints).
+
+  ⚠⚠ **OTA-1268 — INVESTIGATE ALL RESOLVED EXACTLY ONE NOUN.** The 1263 pacing
+  shipped with a self-abort: its player-interruption guard compared
+  `lastPlayerActionAt` against the pre-sweep stamp, but `submitPlayerAction`
+  stamps that field on EVERY submit — including the sweep's own. Step one moved
+  the stamp; step two read "the player acted" and quit. Fixed with a watermark
+  re-read after each of the sweep's own submits. **Third shipped-inert fix of
+  the session, same shape every time: the covering test pinned SOURCE, not
+  BEHAVIOUR.** ota1268 mounts the real screen, presses the button under fake
+  timers, and counts — mutation-verified.
+
+  ⚠⚠ **OTA-1269 — BARE `exit`/`leave` NOW LEAVE THE OUTPOST.** He typed `exit`
+  (stamina refusal), rested 16 game hours, typed `exit` (a floorboard SEARCH
+  story for a TRAVEL intent, +1h), typed `leave` (hook-thread refusal), and only
+  `leave outpost` worked. The bare-word rule existed in the tutorial gate and
+  the building EXIT — each its own drifted regex — and NOT in the hub travel
+  gate. `isBareExitCommand` (hub.ts) is the one source now, four callers.
+  **Ninth rule-computed-twice.** ⚠ The "why is there no EXIT button in every
+  room" half is a DESIGN call left to the owner; typing works from anywhere now.
+
+  ⚠⚠ **OTA-1270 — "ACT DOESN'T SEE ANY TEXT."** Two text fields (in-flow
+  InputBox + floating KeyboardInputBar), each a PRIVATE useState draft, each
+  ACT reading only its own copy — type in one, tap the other's ACT, silence.
+  One store-backed `explorationDraft` now: both fields render it, either ACT
+  submits it, and retracting the bar no longer wipes the text. ⚠ The report's
+  other two clauses (bar not lifting; second tap to focus) are native keyboard
+  behaviour — NOT claimed fixed, device verification needed.
+
+  ⚠⚠ **THE FREEZE IS OPEN, AND DELIBERATELY NOT GUESSED AT.** The first log
+  ends seconds after re-entering the fully-looted Imperial Vault, with no
+  further tap breadcrumbs — but the paste lost its tail (no END marker), and
+  the second log shows the app relaunched (fresh 1KB log, Qwen reloading).
+  The exact route replays CLEAN in Jest, store-level and with the real screen
+  mounted, under a hard watchdog — so it is not a deterministic JS loop on that
+  path. The only root-caused freeze on record (OTA-1177's jetsam analysis) was
+  MEMORY. **The freeze report written at the relaunch boot is the evidence;
+  the owner has been asked for it plus one question (whole phone sluggish, or
+  just the app?).** Also noted from that session, unfixed by design: he died to
+  a 4-wasp night ambush straight out of the tutorial after the Arbiter told him
+  to flee — the warning fired; whether the spawn is fair is the owner's call.
+
 - **⚠⚠⚠ GOLEM — THE BUTTON CRAWL, AND THE SUITE THAT WAS NEVER IN THE GATE
-  (2026-08-14, latest).** Golem OTA-1267. Owner: *"are we able to crawl the new
+  (2026-08-14).** Golem OTA-1267. Owner: *"are we able to crawl the new
   options and the tutorial"*.
 
   ⚠⚠ **FIRST FINDING, BEFORE ANY NEW CODE:** OTA-1263's suite was named

@@ -259,7 +259,10 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('onInvestigateAll={(nouns) => {');
     expect(i).toBeGreaterThan(-1);
-    const block = screen.slice(i, i + 600);
+    // ⚠ OTA-1268 — window widened past the self-abort fix's incident note; the
+    // enemy-abort rule this pins is unchanged (ota1268 now also proves it
+    // BEHAVIOURALLY, by staging an enemy mid-sweep and counting).
+    const block = screen.slice(i, i + 2400);
     expect(block).toContain('orderByStoryTier(nouns');
     expect(block).toContain('currentScene?.enemies ?? []).length > 0');
     // ⚠ OTA-1263 paced the sweep, so the abort is an early `return` out of the

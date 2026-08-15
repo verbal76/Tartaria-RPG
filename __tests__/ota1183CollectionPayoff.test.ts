@@ -254,7 +254,9 @@ describe('OTA-1183 — INVESTIGATE ALL', () => {
     // block grew past the old 600-char window. **The rule this guards is unchanged
     // and is what is asserted:** it drives the REAL investigate path, one submit
     // per noun, with no second resolver anywhere.
-    const block = src.slice(i, i + 1200);
+    // ⚠ OTA-1268 grew it again (the self-abort fix carries its incident note in
+    // the source). Window widened once more; the pinned RULE has not moved.
+    const block = src.slice(i, i + 2400);
     expect(block).toContain('submit(`investigate ${ordered[i]!}`)');
     // Still one submit per noun, walked in order, and still no bulk resolver.
     expect(block).toContain('const ordered = orderByStoryTier(');

@@ -72,7 +72,10 @@ export function KeyboardInputBar() {
   const active = useGameStore((s) => s.explorationInputActive);
   const setActive = useGameStore((s) => s.setExplorationInputActive);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
-  const [text, setText] = useState('');
+  // ⚠⚠ OTA-1270 — shared draft (see gameStore.explorationDraft). This bar and
+  // the in-flow InputBox render the SAME text; either ACT submits it.
+  const text = useGameStore((s) => s.explorationDraft);
+  const setText = useGameStore((s) => s.setExplorationDraft);
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
@@ -247,7 +250,10 @@ export function KeyboardInputBar() {
       : Math.round(Dimensions.get('window').height * 0.36);
 
   const retract = () => {
-    setText('');
+    // ⚠ OTA-1270 — retract no longer WIPES the draft. Closing the keyboard
+    // without sending used to eat what was typed here while the in-flow box
+    // kept its own copy; with one shared draft, backing out keeps the text
+    // sitting in the in-flow box, ready for its ACT. Submit clears explicitly.
     useGameStore.getState().setExplorationInputActive(false);
   };
 
@@ -255,6 +261,7 @@ export function KeyboardInputBar() {
     const trimmed = text.trim();
     if (!trimmed) return;
     submit(trimmed);
+    setText('');
     inputRef.current?.clear();
     retract();
     Keyboard.dismiss();

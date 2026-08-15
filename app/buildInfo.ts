@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.190';
+export const DISPLAY_VERSION = '4.29.193';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23448,7 +23448,35 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // delay is advanced past explicitly, and is asserted by pressing THROUGH it.
 // New suite playtestTutorialButtonCrawl (6 assertions over an 8-beat run,
 // ~9s). 807 suites / 7574 tests. DISPLAY_VERSION 4.29.190. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-14-1267-the-button-crawl';
+// ⚠⚠ OTA-1268 / 1269 / 1270 — THREE FIXES FROM ONE DEVICE SESSION (4.29.190).
+// ⚠⚠ 1268 — INVESTIGATE ALL RESOLVED EXACTLY ONE NOUN. The 1263 pacing shipped
+// with a self-abort: its player-interruption guard compared lastPlayerActionAt
+// against the pre-sweep stamp, but submitPlayerAction stamps that field on
+// EVERY submit — including the sweep's own. Step one ran, moved the stamp,
+// step two read "the player acted" and quit. Fixed with a watermark re-read
+// after each of the sweep's own submits. ⚠ THIRD SHIPPED-INERT FIX OF THE
+// SESSION, same shape every time: the covering test pinned SOURCE, not
+// BEHAVIOUR. ota1268 presses the real button under fake timers and counts.
+// ⚠⚠ 1269 — BARE `exit` / `leave` NOW LEAVE THE OUTPOST. He typed exit, rested
+// 16 game hours (stamina refusal), typed exit again (a floorboard SEARCH story
+// +1h), typed leave (refused by the wander path's hook block) — only 'leave
+// outpost' worked. The bare-word rule already existed in the tutorial gate and
+// the building EXIT, each with its own drifted regex; isBareExitCommand
+// (hub.ts) is now the one source, four callers. Ninth rule-computed-twice.
+// ⚠⚠ 1270 — "ACT DOESN'T SEE ANY TEXT." Two text fields (in-flow InputBox +
+// floating KeyboardInputBar), each with a PRIVATE useState draft, each with
+// its own ACT reading only its own copy. One store-backed draft now; both
+// fields render it; either ACT submits it; backing the bar out keeps the text.
+// ⚠ The other two clauses of that report (bar not lifting, second tap to
+// focus) are native keyboard behaviour — DEVICE verification still needed.
+// ⚠ THE FREEZE ITSELF REMAINS OPEN: not reproducible in JS (store and screen
+// replays of the exact route are clean); the next-boot freeze report from the
+// relaunch holds the verdict and has been requested.
+// New suites: ota1268InvestigateAllActuallySweeps (4, behavioural, mutation-
+// verified), ota1269BareExit (5), ota1270SharedDraft (5). 809 suites / 7584 tests.
+// DISPLAY_VERSION 4.29.193. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-15-1270-sweep-exit-and-the-shared-draft';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1267-the-button-crawl';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1266-dead-salvage-predicates';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1264-negation-and-questions';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-14-1263-green-light-and-paced-sweep';

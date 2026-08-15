@@ -268,6 +268,7 @@ import {
   hubOwnerFaction,
   resolveHubTravel,
   isLeaveHubCommand,
+  isBareExitCommand,
 } from '../engine/hub';
 import {
   getBuilding,
@@ -6871,6 +6872,16 @@ interface GameStore {
    *  keyboard hides. */
   explorationInputActive: boolean;
   setExplorationInputActive: (active: boolean) => void;
+  /** ⚠⚠ OTA-1270 — THE LIVE DRAFT, SHARED. Owner: "I have to hit enter because
+   *  act doesn't see any text." Two text fields existed (the in-flow InputBox
+   *  and the floating KeyboardInputBar), each with a PRIVATE useState copy of
+   *  what the player typed, each with its own ACT button reading only its own
+   *  copy — type in one, tap the other's ACT, and it saw an empty string and
+   *  silently did nothing. One draft now, both fields render it, either ACT
+   *  submits it. (`pendingInputDraft` above is different — a one-shot pre-fill
+   *  queue, not the live keystrokes.) */
+  explorationDraft: string;
+  setExplorationDraft: (text: string) => void;
 
   hydrate: () => Promise<void>;
   setScreen: (screen: ScreenName) => void;
@@ -7961,6 +7972,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingInputDraft: null,
   inputModalOpen: false,
   explorationInputActive: false,
+  explorationDraft: '',
   cognitiveModelInfo: null,
 
   qwenStatus: 'idle',
@@ -9245,6 +9257,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   setInputModalOpen(open) {
     if (get().inputModalOpen !== open) set({ inputModalOpen: open });
+  },
+
+  setExplorationDraft(text) {
+    if (get().explorationDraft !== text) set({ explorationDraft: text });
   },
 
   setExplorationInputActive(active) {
@@ -12747,8 +12763,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // command the beat asks for — the typed twin of the greyed-out button.
         const isLookCmd = /^\s*(look|look\s+around(\s+you)?|examine\s+room|survey)\s*$/i.test(trimmed);
         const isWearCmd = /\b(equip|wear|put\s+on|don)\b/i.test(trimmed);
-        const isLeaveCmd = isLeaveHubCommand(trimmed)
-          || /^\s*(exit|outside|step\s+out|get\s+out)\s*$/i.test(trimmed);
+        // ⚠ OTA-1269 — the bare-word half lives in hub.ts now, shared with the
+        // travel gate and the building EXIT; this private copy had already
+        // drifted (it lacked bare 'leave').
+        const isLeaveCmd = isLeaveHubCommand(trimmed) || isBareExitCommand(trimmed);
         // OTA-1040 — the lockdown must never outrank a live enemy. A summit
         // overlay (or any other spawn) can drop a hostile into a tutorial
         // beat, and before this every verb but the beat's own was refused:
@@ -12878,7 +12896,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const inBuilding = get().activeBuildingId;
       if (inBuilding) {
         // EXIT back to the open world.
-        if (isLeaveHubCommand(trimmed) || /^\s*(exit|outside|step\s+out|get\s+out)\s*$/i.test(trimmed)) {
+        if (isLeaveHubCommand(trimmed) || isBareExitCommand(trimmed)) {
           if (!_opts?.silent) get().appendLog('player', trimmed);
           get().exitBuilding();
           return;
@@ -17868,7 +17886,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // stamina gate below, so 0 stamina never blocks an interior step.
         // Leaving the outpost (isLeaveHubCommand) is real overland travel
         // and falls through to the gated/charged path.
-        if (player.hubRoomId && !isLeaveHubCommand(trimmed)) {
+        // ⚠⚠ OTA-1269 — bare `exit` / `leave` now count as leaving. Before this,
+        // they fell through here into overland travel with NO destination: at
+        // zero stamina that was the stamina refusal, and after resting it was a
+        // wander that narrated a floorboard search and spent an hour — four
+        // typed attempts on the owner's device before the taught phrase landed.
+        if (player.hubRoomId && !isLeaveHubCommand(trimmed) && !isBareExitCommand(trimmed)) {
           const hubVisited = new Set(get().worldMemory.hubVisited ?? []);
           const interiorMove = resolveHubTravel(player.hubRoomId, trimmed, hubVisited);
           if (interiorMove) {
@@ -17942,7 +17965,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // 'go north' meaning the gate→square step instead of a Macro
         // tile shift, and 'go armory' a direct room jump.
         if (player.hubRoomId) {
-          if (isLeaveHubCommand(trimmed)) {
+          // ⚠ OTA-1269 — same predicate as the free-interior gate above; a bare
+          // `exit` that passed that gate must not fall to the wander here.
+          if (isLeaveHubCommand(trimmed) || isBareExitCommand(trimmed)) {
             set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
             set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
             get().appendLog(

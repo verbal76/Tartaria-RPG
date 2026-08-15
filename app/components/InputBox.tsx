@@ -171,7 +171,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const bandolierItems = bandolierIds
     .map((id) => inventory.find((it) => it.id === id))
     .filter((it): it is InventoryItem => !!it && it.quantity > 0);
-  const [text, setText] = useState('');
+  // ⚠⚠ OTA-1270 — the draft lives in the STORE, shared with the floating
+  // KeyboardInputBar. Two private useState copies were how "act doesn't see
+  // any text" happened: the player typed into one field and tapped the other
+  // field's ACT, which read its own empty copy and silently returned.
+  const text = useGameStore((s) => s.explorationDraft);
+  const setText = useGameStore((s) => s.setExplorationDraft);
   const inputRef = useRef<TextInput>(null);
 
   const consumeDraft = useGameStore((s) => s.consumeInputDraft);
