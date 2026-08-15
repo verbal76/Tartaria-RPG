@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.200';
+export const DISPLAY_VERSION = '4.29.201';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23622,7 +23622,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Recorded, not guessed at; next OTA.
 // New suite ota1277RoomsAndGear (10). 816 suites / 7631 tests.
 // DISPLAY_VERSION 4.29.200. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-15-1277-rooms-and-gear';
+// ⚠⚠ OTA-1278 — THE WATCHDOG WALKED THROUGH THE DEBOUNCE, AND THE OUTPOST MAP
+// IS MEASURABLY BROKEN.
+// (1) FIXED: OTA-1275 debounced App.tsx's re-warm; the qwen-watchdog has its OWN
+// AppState listener and reinitialised anyway. The owner's 4.29.199 log proves it
+// by ORDER — the watchdog fired 2ms BEFORE the appstate line it reacted to, and
+// three ~425MB loads landed across three 3-second visits with BOTH debounce
+// cancels logging. One settle window now gates both doors (8s, pinned equal by
+// test); the tick still runs, it just may not spend 425MB too early.
+// (2) MEASURED, NOT FIXED — THE OWNER WAS RIGHT AND I WAS WRONG. I said I did
+// not have his outpost maps; they are in static_hub.json and I had been reading
+// them all session. Audited: **10 ASYMMETRIC EXITS** (Gate--east-->Armory, but
+// Armory--west-->Square, so walking back does not return you) and **2 of 10
+// outpost rooms UNREACHABLE from the spawn** (Chapel, Culvert). That is exactly
+// his "no rhyme or reason to these rooms and I'm getting lost in them."
+// ⚠ NOT repaired here: which side of each broken pair is authoritative is HIS
+// map to read, not mine to invent. Reported with the full table instead.
+// New suite ota1278WatchdogRespectsDebounce (6). 817 suites / 7637 tests.
+// DISPLAY_VERSION 4.29.201. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-15-1278-watchdog-respects-debounce';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1277-rooms-and-gear';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1276-freeze-forensics';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1275-rewarm-debounce';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1274-room-names-walk';

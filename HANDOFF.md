@@ -1839,7 +1839,24 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠ GOLEM — VISITED ROOMS + GEAR RANKING (2026-08-15, latest).** Golem
+- **⚠⚠⚠ GOLEM — WATCHDOG BYPASS FIXED; THE OUTPOST MAP IS BROKEN (2026-08-15,
+  latest).** Golem OTA-1278.
+
+  **(1) FIXED.** OTA-1275 debounced App.tsx's re-warm; the qwen-watchdog has its
+  OWN AppState listener and reinitialised anyway. The log proves it by ORDER —
+  the watchdog fired **2ms before** the appstate line it reacted to; three
+  ~425MB loads across three 3-second visits with BOTH cancels logging. One 8s
+  settle window now gates both doors, pinned equal by test.
+
+  **(2) MEASURED, NOT FIXED — AND I WAS WRONG.** I claimed I did not have his
+  outpost maps. They are in `static_hub.json` and I had read them all session.
+  Audit: **10 asymmetric exits** (Gate→east→Armory, but Armory→west→Square) and
+  **2 of 10 outpost rooms unreachable from spawn** (Chapel, Culvert Descent).
+  Exactly his "no rhyme or reason... I'm getting lost." ⚠ Which side of each
+  pair is authoritative is HIS map to read — handed him the table rather than
+  inventing a layout. **Next session's first job if he rules on it.**
+
+- **⚠⚠ GOLEM — VISITED ROOMS + GEAR RANKING (2026-08-15).** Golem
   OTA-1277, both asks typed into the game mid-run.
 
   **(1)** Room chips show `✓` when visited (his log: Memorial visit 5, Workshop

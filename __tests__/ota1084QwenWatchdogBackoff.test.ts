@@ -164,7 +164,7 @@ describe('OTA-1084 — SOURCE LOCKS (watchdog rules)', () => {
     // banner, a Control Center pull and a peek at the app switcher, so the old spelling
     // reset the ladder — and bought a ~400MB reload — on incidental twitches. The owner's
     // freeze log caught three, each ~350ms after a "holding revival" line.
-    expect(store).toMatch(/if \(next === 'background'\) \{ qwenTrulyBackgrounded = true; return; \}/);
+    expect(store).toMatch(/if \(next === 'background'\) \{[\s\S]{0,200}?qwenTrulyBackgrounded = true;/);
     expect(store).toMatch(/if \(!qwenTrulyBackgrounded\) return;/);
     // The reset itself is intact behind that gate — this is a narrower trigger, not a
     // removed behaviour.

@@ -2086,6 +2086,20 @@ function setHomeworkTick(fn: (() => void) | null): void {
 export function _homeworkTickForTest(): void { homeworkTickFn?.(); }
 export function _homeworkInstalled(): boolean { return homeworkTickFn !== null; }
 let qwenAppStateSub: { remove: () => void } | null = null;
+// ⚠⚠ OTA-1278 — the shared settle gate. App.tsx debounces its re-warm; the
+// watchdog must observe the SAME quiet period or it simply re-opens the door
+// App.tsx just closed. Mirrors QWEN_REWARM_DELAY_MS in App.tsx.
+const QWEN_FOREGROUND_SETTLE_MS = 8_000;
+let qwenForegroundSince: number | null = null;
+let qwenUnsettledLogged = false;
+function qwenForegroundSettled(): boolean {
+  // Unknown (tests / headless) reads as settled — the gate must never be the
+  // reason a legitimate recovery cannot happen.
+  if (qwenForegroundSince === null) return true;
+  return Date.now() - qwenForegroundSince >= QWEN_FOREGROUND_SETTLE_MS;
+}
+export function _qwenSetForegroundSince(t: number | null): void { qwenForegroundSince = t; }
+export function _qwenForegroundSettled(): boolean { return qwenForegroundSettled(); }
 // OTA-1032 — ADAPTIVE CADENCE. A flat 60s poll made recovery feel broken: the
 // owner's log spends ~2 minutes on canned templates because every step of the
 // dance waits a full tick (notice at :48, retry at :47, confirm ready at :47).
@@ -2265,6 +2279,28 @@ function runQwenHealthCheck(
         }
         return false;
       }
+      // ⚠⚠ OTA-1278 — THE WATCHDOG WAS WALKING THROUGH OTA-1275's DEBOUNCE.
+      // Measured on the owner's 4.29.199 log, and the ORDER is the proof — the
+      // watchdog fired 2ms BEFORE the appstate line it was reacting to:
+      //     14:45:26.813 qwen-watchdog: Qwen not ready (status='idle'); reinitializing
+      //     14:45:26.815 appstate: background → active
+      //     14:45:27.382 ctx: OPENED ≈425MB
+      //     14:45:29.898 qwen: re-warm cancelled (left the foreground first)
+      // The debounce cancelled a re-warm that had ALREADY happened by another
+      // door: three ~425MB loads across three 3-second foreground visits, with
+      // both cancels landing and neither preventing anything. App.tsx owns the
+      // re-warm policy; this owns recovery DURING play. They must agree, and a
+      // rule enforced in one place only is not a rule.
+      if (!qwenForegroundSettled()) {
+        if (!qwenUnsettledLogged) {
+          qwenUnsettledLogged = true;
+          get().appendLog('debug',
+            'qwen-watchdog: holding reinit — foreground has not settled '
+            + `(${QWEN_FOREGROUND_SETTLE_MS}ms). App-switching must not cost a ~425MB load.`);
+        }
+        return false;
+      }
+      qwenUnsettledLogged = false;
       // Not ready and not making progress (idle / failed / dormant ready-but-
       // dead / wedged): kick a fresh reinit. Keeps retrying so a transient
       // memory-pressure failure doesn't strand Qwen for the session — but
@@ -2387,8 +2423,16 @@ function startQwenWatchdog(
       // and OTA-1084's own comment says "kicking a ~400MB context load from the
       // background is guaranteed wasted work". iOS walked straight through that rule.
       // Requiring a genuine `background` first is what closes it.
-      if (next === 'background') { qwenTrulyBackgrounded = true; return; }
+      if (next === 'background') {
+        qwenTrulyBackgrounded = true;
+        qwenForegroundSince = null;   // OTA-1278 — the clock restarts on return
+        return;
+      }
       if (next !== 'active') return; // `inactive` alone is a twitch, not a return.
+      // ⚠ OTA-1278 — stamp the return, then let the gate above decide. The tick
+      // still runs (backoff resets, health is still checked); what it may no
+      // longer do is spend ~425MB on a foreground that has not settled.
+      if (qwenForegroundSince === null) qwenForegroundSince = Date.now();
       if (!qwenTrulyBackgrounded) return;
       qwenTrulyBackgrounded = false;
       qwenBackoffLevel = 0;
