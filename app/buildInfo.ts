@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.175';
+export const DISPLAY_VERSION = '4.29.176';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24661,7 +24661,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ota1291DoorstepGrace (4). ota1206's pin re-pointed from the instant loop to
 // the paced one (rule unchanged: real submit path, no second resolver).
 // 803 suites / 7500 tests. DISPLAY_VERSION 4.29.175.
-export const OTA_BUILD_ID = '2026-08-15-1291-doorstep-grace';
+// ⚠⚠ OTA-1293 — LORE'S BACK BUTTON WAS A TRAPDOOR (port of golem OTA-1292,
+// same sitting as the owner's report). LoreScreen was a title-menu destination
+// with BACK hard-wired setScreen('title'); the exploration crest nav (◈ LORE)
+// linked here mid-game, so reading the bestiary dumped the player onto the
+// character select with a live session behind it. BACK is now conditional:
+// live character → exploration, none → title. The wipe half of the owner's
+// report (on golem) did not reproduce and is under investigation via his
+// device log; this line carries the same navigation fix and the same pinned
+// wipe-protection guards. New suite ota1293LoreBackStaysInGame (4).
+// 804 suites / 7504 tests. DISPLAY_VERSION 4.29.176.
+export const OTA_BUILD_ID = '2026-08-15-1293-lore-back-stays-in-game';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1291-doorstep-grace';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1290-investigate-all-actually-sweeps';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1289-visited-marks';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1288-freeze-forensics';

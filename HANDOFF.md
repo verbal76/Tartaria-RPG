@@ -1676,8 +1676,16 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ THE CAMOUFLAGE AUDIT — TWO MORE FOUND, BOTH PORTED (2026-08-15,
-  latest). HAL OTA-1290 + 1291.** The owner asked the right question: *"is
+- **⚠⚠⚠ LORE'S BACK TRAPDOOR (2026-08-15, latest). HAL OTA-1293, port of
+  golem OTA-1292.** BACK on the lore screen was hard-wired to the title while
+  the exploration crest nav linked to it mid-game — reading the bestiary
+  dumped a live session onto the character select. Conditional now. The
+  owner's golem report also said "that character was wiped" — the wipe did
+  NOT reproduce in the store and is under investigation via his device log
+  (see golem HANDOFF for the evidence list and the recovery note).
+
+- **⚠⚠⚠ THE CAMOUFLAGE AUDIT — TWO MORE FOUND, BOTH PORTED (2026-08-15).
+  HAL OTA-1290 + 1291.** The owner asked the right question: *"is
   there anything else like the ✓ fix that was camouflaged by a partial OTA
   push that was golem gated?"* A buildInfo diff of every trial-range OTA
   against this line found exactly two, both his own features/rulings that
