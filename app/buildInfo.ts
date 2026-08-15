@@ -23666,9 +23666,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ⚠ THE EXIT MOVED TO THE MIDDLE, his ruling ("there's a central room that's
 // where the exit should be"). OTA-1271 had put the spare door on the Workshop,
 // which under the corrected graph is R04 — a dead end in the far north corner.
-// ⚠ ONE KNOWN MISMATCH, owner's call: the artwork labels R07 "THE CRASH ROOM";
+// ⚠ ONE KNOWN MISMATCH, NOW SETTLED: the artwork labels R07 "THE CRASH ROOM";
 // in game it reads "The Cell Bunks" (renamed at OTA-1274 to kill a parser
-// collision on the chip `crash`). Same node, one stale label on the image.
+// collision on the chip `crash`). Owner ruled: "keep the rename, 99% of players
+// won't even recognize it." The GAME NAME WINS; the map art is the stale side.
+// Closed — do not re-open, and do not re-render toward the artwork.
 // New suite ota1279UniversalOutpostGraph (25). 818 suites / 7668 tests.
 // DISPLAY_VERSION 4.29.202. ⚠ GOLEM-ONLY.
 export const OTA_BUILD_ID = '2026-08-15-1279-universal-outpost-graph';

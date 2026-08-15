@@ -1884,10 +1884,13 @@ rediscovering them.
   Workshop, which under the corrected graph is R04 — a dead end in the far north
   corner, the worst room in the outpost to hide the way out in.
 
-  **⚠ ONE OPEN ITEM, HIS CALL.** The artwork labels R07 *THE CRASH ROOM*; in
-  game it reads *The Cell Bunks*, renamed at OTA-1274 to kill the parser
-  collision on the chip `crash`. Same node, one stale label on the image —
-  re-render the art or keep the rename.
+  **⚠ THE ONE ART/GAME MISMATCH — RULED, CLOSED.** The artwork labels R07 *THE
+  CRASH ROOM*; in game it reads *The Cell Bunks*, renamed at OTA-1274 to kill
+  the parser collision on the chip `crash`. Owner, same day: **"keep the rename
+  99% of players won't even recognize it."** The GAME NAME IS AUTHORITATIVE and
+  the map image is the stale side. ⚠ Do not re-open this, and do not "correct"
+  the crosswalk test back toward the artwork — the divergence is deliberate and
+  the test says so at the line.
 
 - **⚠⚠ GOLEM — WATCHDOG BYPASS FIXED; THE OUTPOST MAP IS BROKEN (2026-08-15).**
   Golem OTA-1278.

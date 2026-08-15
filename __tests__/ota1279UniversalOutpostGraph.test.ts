@@ -210,10 +210,13 @@ describe('OTA-1279 — the layout wears the graph', () => {
       expect({ roomId, name: hubRoomFor(roomId, 'tartarian_revivalists')?.name })
         .toEqual({ roomId, name: revivalistName });
     }
-    // ⚠ R07 is deliberately absent above. The artwork labels it THE CRASH ROOM;
-    // in game it reads "The Cell Bunks" — renamed at OTA-1274 because the chip
-    // `crash` collided with a parser verb. Same node, one label out of date on
-    // the art. Owner's call whether to re-render the image or keep the rename.
+    // ⚠ R07 is deliberately absent above — the ONE place the artwork and the
+    // game disagree. The map image labels it THE CRASH ROOM; in game it reads
+    // "The Cell Bunks", renamed at OTA-1274 because the chip `crash` collided
+    // with a parser verb. ⚠⚠ OWNER RULED (2026-08-15): *"keep the rename, 99%
+    // of players won't even recognize it."* SETTLED — the game name is
+    // authoritative and the map art is the stale side. Do not re-open it, and
+    // do not "fix" this expectation back toward the artwork.
     expect(hubRoomAtNode('R07')?.id).toBe('outpost_quarters');
     expect(hubRoomFor('outpost_quarters', 'tartarian_revivalists')?.name).toBe('The Cell Bunks');
   });
