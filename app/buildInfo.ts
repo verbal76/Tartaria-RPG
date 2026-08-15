@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.202';
+export const DISPLAY_VERSION = '4.29.203';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23673,7 +23673,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Closed — do not re-open, and do not re-render toward the artwork.
 // New suite ota1279UniversalOutpostGraph (25). 818 suites / 7668 tests.
 // DISPLAY_VERSION 4.29.202. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-15-1279-universal-outpost-graph';
+// ⚠⚠ OTA-1280 — LEAVING THE PACK ENDS GIFT MODE. Owner, from the device: he
+// backed out of "give Halem a gift" via the inventory's BACK button, played on,
+// and the NEXT pack visit — about equipping armour — was still a gift picker
+// aimed at Halem. The mode's entire UI lives on the inventory screen, but the
+// only exits that cleared it were the banner tap and a completed GIVE; plain
+// setScreen('exploration') (BACK, tab bar, any forced nav) left it armed.
+// His rule, verbatim: "if I leave that screen, I'm no longer giving a gift."
+// The guard sits in setScreen — the one door every navigation passes through —
+// so no button needs to remember the rule. A completed GIVE clears the mode
+// BEFORE navigating and never trips the guard; the banner cancel still stays
+// in the pack. New suite ota1280GiftEndsAtTheDoor (5). 819 suites / 7673 tests.
+// DISPLAY_VERSION 4.29.203. ⚠ GOLEM-ONLY.
+export const OTA_BUILD_ID = '2026-08-15-1280-gift-ends-at-the-door';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1279-universal-outpost-graph';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1278-watchdog-respects-debounce';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1277-rooms-and-gear';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1276-freeze-forensics';

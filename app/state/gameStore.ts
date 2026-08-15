@@ -10052,6 +10052,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', "Not while you're in a fight — deal with the threat first.");
       return;
     }
+    // ⚠⚠ OTA-1280 — LEAVING THE PACK ENDS GIFT MODE. Owner: he opened "give
+    // Halem a gift", backed out of the inventory with BACK instead of the
+    // banner, played on — and the NEXT time he opened the pack to equip armor
+    // it was still offering everything to Halem. Gift mode's entire UI lives on
+    // the inventory screen; a mode that outlives its screen is invisible state,
+    // and the only tap that ever cleared it was the banner (or a completed
+    // GIVE, which clears before navigating and so never trips this guard).
+    // His rule, verbatim: "if I leave that screen, I'm no longer giving a gift."
+    if (get().giftMode && get().currentScreen === 'inventory' && screen !== 'inventory') {
+      get().appendLog('debug', 'gift: mode ended — left the inventory without giving');
+      set({ giftMode: null });
+    }
     set({ currentScreen: screen });
     void get().persist();
   },

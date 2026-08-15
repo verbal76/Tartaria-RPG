@@ -1839,8 +1839,22 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM — THE OUTPOST IS ONE GRAPH IN NINE SETS OF CLOTHES (2026-08-15,
-  latest).** Golem OTA-1279. The owner answered OTA-1278's audit with the
+- **⚠⚠ GOLEM — LEAVING THE PACK ENDS GIFT MODE (2026-08-15, latest).** Golem
+  OTA-1280, from the owner's device. He backed out of "give Halem a gift" via
+  the inventory's BACK button; the next pack visit — to equip armour — was
+  still a gift picker aimed at Halem. Only the banner tap and a COMPLETED give
+  ever cleared `giftMode`; BACK was a plain `setScreen('exploration')`. The
+  guard now sits in `setScreen` itself (leaving 'inventory' with giftMode set
+  clears it, with a debug line), so BACK, the tab bar and forced navigations
+  all end the mode identically and no button carries the rule. Completed gives
+  clear BEFORE navigating and never trip it. Owner's rule verbatim in the
+  suite: "if I leave that screen, I'm no longer giving a gift."
+  ⚠ HAL PARITY UNCHECKED: gift mode predates the picker trial (OTA-1154), so
+  HAL likely has the same hole — check `giftMode`/`setScreen` on HAL next HAL
+  sitting; the guard ports clean if so.
+
+- **⚠⚠⚠ GOLEM — THE OUTPOST IS ONE GRAPH IN NINE SETS OF CLOTHES (2026-08-15).**
+  Golem OTA-1279. The owner answered OTA-1278's audit with the
   Revivalist Camp artwork and a written navigation specification. Its governing
   line: **"The artwork does not determine movement. The room graph does."**
 
