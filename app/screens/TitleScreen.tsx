@@ -174,6 +174,17 @@ export function TitleScreen() {
   const cognitiveStatus = useGameStore((s) => s.cognitiveStatus);
   const [kokoroPhase, setKokoroPhase] = useState<KokoroState>(() => getKokoroState());
   useEffect(() => onKokoroStateChange(setKokoroPhase), []);
+  // ⚠⚠ OTA-1294 — THE SLOT LIST REFRESHES EVERY TIME THIS SCREEN APPEARS. It
+  // used to be a BOOT-TIME SNAPSHOT: filled at hydrate, re-read only on
+  // pull-to-refresh, restore, or delete. A character created THIS session was
+  // not in it — so when the lore trapdoor (OTA-1292) threw the owner onto the
+  // title mid-game, the select showed no character at all and read as a wipe.
+  // His own diagnosis, verbatim: "my character selection screen really wasn't
+  // a character selection screen. it was a hallucination and it hadn't saved
+  // and updated in that aspect so it didn't see the character which was still
+  // live." The character was on disk the whole time (the relaunch proved it:
+  // "Welcome back, Francis"); the screen just never re-looked. Now it does.
+  useEffect(() => { void refreshSlots(); }, [refreshSlots]);
   // OTA-471 — the opening splash now lives in <SplashOverlay/> at the AppShell
   // root (full-bleed). The title screen just renders the menu + a compact loading
   // bar (below) if a first-install download is still running.

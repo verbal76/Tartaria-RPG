@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.205';
+export const DISPLAY_VERSION = '4.29.206';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23716,7 +23716,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The suite pins the wipe-protection guards so a regression names itself.
 // New suite ota1292LoreBackStaysInGame (4). 821 suites / 7697 tests.
 // DISPLAY_VERSION 4.29.205. ⚠ GOLEM-ONLY (HAL port 1293 same sitting).
-export const OTA_BUILD_ID = '2026-08-15-1292-lore-back-stays-in-game';
+// ⚠⚠ OTA-1294 — THE CHARACTER SELECT WAS A BOOT-TIME SNAPSHOT. The owner's
+// own diagnosis of his "wipe": "my character selection screen really wasn't a
+// character selection screen. it was a hallucination and it hadn't saved and
+// updated in that aspect so it didn't see the character which was still live."
+// Correct. `slots` filled at hydrate and re-read only on pull-to-refresh,
+// restore, or delete — a character created THIS session was not in it, so the
+// lore trapdoor (1292) landed him on a title showing NO characters. His log
+// proves the disk record was intact throughout (persists through the dog
+// fight; relaunch says "Welcome back, Francis" — the re-entry he saw was a
+// staged OTA applying on foreground and boot resuming the active slot, not
+// the backup modal navigating). TitleScreen now refreshes the slot list on
+// every mount, so the screen tells the truth from any door. BACK-BUTTON AUDIT
+// (owner-ordered, all three lines): every other back is correct — in-game
+// screens → exploration (in-game-only), creation/ending → title (title
+// flows), Settings + Lore conditional. Steam had the lore trapdoor + this
+// snapshot (ports 1296); HAL port 1295. New suite
+// ota1294TitleListTellsTheTruth (2). 822 suites / 7699 tests.
+// DISPLAY_VERSION 4.29.206. ⚠ GOLEM-ONLY (ports same sitting).
+export const OTA_BUILD_ID = '2026-08-15-1294-title-list-tells-the-truth';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1292-lore-back-stays-in-game';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1281-nine-outposts-walked';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1280-gift-ends-at-the-door';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1279-universal-outpost-graph';

@@ -1839,8 +1839,22 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ GOLEM — CHARACTER-WIPE REPORT: TRAPDOOR FIXED, WIPE UNRESOLVED
-  (2026-08-15, latest). Golem OTA-1292 / HAL OTA-1293.** Owner, after clearing
+- **⚠⚠⚠ THE "WIPE" IS FULLY SOLVED — IT WAS TWO BUGS AND ZERO DATA LOSS
+  (2026-08-15, latest). Golem OTA-1292+1294 / HAL 1293+1295 / steam 1296.**
+  The owner's log closed the case. (1) Lore's BACK was hard-wired to the
+  title (1292, fixed). (2) The character select was a BOOT-TIME SNAPSHOT —
+  `slots` re-read only on pull-to-refresh/restore/delete, so a character
+  created this session was missing and the select read as a wipe (1294:
+  refresh on every mount). The disk record was intact throughout — persists
+  fire through the whole session and the relaunch says "Welcome back,
+  Francis". The "closing the backup error dropped me back in" moment was a
+  staged OTA applying on foreground + boot resuming the still-active slot.
+  ⚠ OWNER-ORDERED BACK-BUTTON AUDIT, all three lines, complete: everything
+  else correct (in-game screens → exploration, creation/ending → title,
+  Settings/Lore conditional). Steam carried both defects; both ported.
+
+- **⚠⚠⚠ GOLEM — CHARACTER-WIPE REPORT: TRAPDOOR FIXED, WIPE ROOT-CAUSED
+  ABOVE (2026-08-15). Golem OTA-1292 / HAL OTA-1293.** Owner, after clearing
   the beginner outpost and getting his dog: "I went into lore went into beasts
   read all that I hit the back button and it dropped me to the character
   selection screen and that character was wiped."
