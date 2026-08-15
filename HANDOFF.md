@@ -1839,8 +1839,30 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ PRECEDENCE RULING — PORT-WHAT-BENEFITS-HAL BEATS TRIAL-RANGE HOLDING
+  (2026-08-15, latest). OWNER-SETTLED, twice in one sitting.** The bare-name
+  intercept (golem OTA-1274) was left unported during the owner-directed
+  gift+map port because it carried a trial-range OTA number; the owner asked
+  why, and the answer was two rules colliding:
+  · His standing rule: *"if a fix happens to benefit Hal without giving it
+    any movement towards the golem changes port it."*
+  · The session default: trial-numbered OTAs (1232+) stay golem-only until
+    ruled; never smuggle unordered changes into a directed port.
+  ⚠⚠ THE RULING: **the standing rule wins.** A directed port list ("port the
+  gift and map fix") is a FLOOR, not a ceiling. Trial numbering alone never
+  holds back a fix — only actual movement toward the picker-trial direction
+  does. His words when the held fix surfaced: *"I don't want open errors."*
+  ⚠ CONSEQUENCE — REMAINING UNPORTED NON-DIRECTIONAL FIXES, flagged to the
+  owner as the recommended next-HAL batch (await his go; he is near token
+  limit): OTA-1269 (bare `exit`/`leave` — on HAL these still fall into
+  overland wander, same open-error class), OTA-1273 (gift says what you did),
+  OTA-1275+1278 (qwen re-warm debounce + watchdog settle gate — HAL still
+  thrashes 425MB loads on app-switch), OTA-1276 (freeze breadcrumb
+  instrument). Ported so far under this ruling: 1279/1281→HAL-1282,
+  1280→HAL-1283, 1274→HAL-1284.
+
 - **⚠⚠⚠ GOLEM — ALL NINE OUTPOSTS WALKED; TWO NAME-MATCH DEFECTS FIXED
-  (2026-08-15, latest).** Golem OTA-1281, answering the owner's acceptance
+  (2026-08-15).** Golem OTA-1281, answering the owner's acceptance
   question for the graph: "is the room remapping error free and fully
   functional? crawl all 9 maps."
 
