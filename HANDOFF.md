@@ -1839,8 +1839,31 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ GOLEM — CHARACTER-WIPE REPORT: TRAPDOOR FIXED, WIPE UNRESOLVED
+  (2026-08-15, latest). Golem OTA-1292 / HAL OTA-1293.** Owner, after clearing
+  the beginner outpost and getting his dog: "I went into lore went into beasts
+  read all that I hit the back button and it dropped me to the character
+  selection screen and that character was wiped."
+
+  **FIXED — the trapdoor.** LoreScreen was a title-menu destination with BACK
+  hard-wired setScreen('title'); the exploration crest nav (◈ LORE) later
+  linked to it mid-game. BACK is now conditional: live character →
+  exploration, no character → title. Both lines.
+
+  **⚠⚠ UNRESOLVED — the wipe itself.** Did NOT reproduce in the store: the
+  full walk (fresh character → lore → title → refreshSlots → resume) round-
+  trips the save intact; persist() refuses null/stub players (pinned);
+  loadSlotIntoGame's catch rolls activeSlotId back before anything can
+  persist over the record (pinned). The wipe therefore took a second
+  ingredient visible only on the device. **NEXT: his device log** — look for
+  `persist: skipped`, `saveSlot: atomic write failed`, `Failed to restore
+  character`, `No save data found`, `emergency-purge`, or an arb38 crash-flag
+  line. ⚠ RECOVERY: saveSlot writes a BACKUP alongside the live record
+  ("live save + backup left intact") — do NOT let the slot be deleted before
+  reading the device; the character may be recoverable.
+
 - **⚠⚠⚠ PRECEDENCE RULING — PORT-WHAT-BENEFITS-HAL BEATS TRIAL-RANGE HOLDING
-  (2026-08-15, latest). OWNER-SETTLED, twice in one sitting.** The bare-name
+  (2026-08-15). OWNER-SETTLED, twice in one sitting.** The bare-name
   intercept (golem OTA-1274) was left unported during the owner-directed
   gift+map port because it carried a trial-range OTA number; the owner asked
   why, and the answer was two rules colliding:

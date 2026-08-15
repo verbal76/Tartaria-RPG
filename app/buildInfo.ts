@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.204';
+export const DISPLAY_VERSION = '4.29.205';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23701,7 +23701,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // also "Lab"). The skin pass now outranks the base pass — the player types
 // what they can see. New suite ota1281NineOutpostsWalked (20).
 // 820 suites / 7693 tests. DISPLAY_VERSION 4.29.204. ⚠ GOLEM-ONLY.
-export const OTA_BUILD_ID = '2026-08-15-1281-nine-outposts-walked';
+// ⚠⚠ OTA-1292 — LORE'S BACK BUTTON WAS A TRAPDOOR OUT OF THE GAME. Owner,
+// right after clearing the beginner outpost and getting his dog: "I went into
+// lore went into beasts read all that I hit the back button and it dropped me
+// to the character selection screen and that character was wiped." The
+// LoreScreen was built as a TITLE-MENU destination (OTA 046) with BACK
+// hard-wired setScreen('title'); the exploration crest nav (◈ LORE) later
+// linked here MID-GAME. With a live character, BACK now returns to
+// exploration; the title-menu path still returns to title.
+// ⚠⚠ THE WIPE HALF DID NOT REPRODUCE: fresh character → lore → title →
+// refreshSlots → resume round-trips the save intact in the store, and
+// persist() refuses null/stub players. The navigation trapdoor is fixed here;
+// the device wipe needs his log (persist/saveSlot/load lines will name it).
+// The suite pins the wipe-protection guards so a regression names itself.
+// New suite ota1292LoreBackStaysInGame (4). 821 suites / 7697 tests.
+// DISPLAY_VERSION 4.29.205. ⚠ GOLEM-ONLY (HAL port 1293 same sitting).
+export const OTA_BUILD_ID = '2026-08-15-1292-lore-back-stays-in-game';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1281-nine-outposts-walked';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1280-gift-ends-at-the-door';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1279-universal-outpost-graph';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1278-watchdog-respects-debounce';
