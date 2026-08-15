@@ -174,6 +174,13 @@ export function TitleScreen() {
   const cognitiveStatus = useGameStore((s) => s.cognitiveStatus);
   const [kokoroPhase, setKokoroPhase] = useState<KokoroState>(() => getKokoroState());
   useEffect(() => onKokoroStateChange(setKokoroPhase), []);
+  // ⚠⚠ OTA-1295 (port of golem OTA-1294) — THE SLOT LIST REFRESHES EVERY TIME
+  // THIS SCREEN APPEARS. It used to be a boot-time snapshot (filled at hydrate,
+  // re-read only on pull-to-refresh, restore, or delete), so a character
+  // created THIS session was missing from it — on the owner's device the
+  // title showed no character at all mid-session and read as a wipe, while the
+  // disk record was intact the whole time. The screen must tell the truth.
+  useEffect(() => { void refreshSlots(); }, [refreshSlots]);
   // OTA-471 — the opening splash now lives in <SplashOverlay/> at the AppShell
   // root (full-bleed). The title screen just renders the menu + a compact loading
   // bar (below) if a first-install download is still running.

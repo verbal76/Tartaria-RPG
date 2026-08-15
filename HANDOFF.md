@@ -1676,7 +1676,13 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ LORE'S BACK TRAPDOOR (2026-08-15, latest). HAL OTA-1293, port of
+- **⚠⚠⚠ TITLE LIST TELLS THE TRUTH (2026-08-15, latest). HAL OTA-1295, port
+  of golem OTA-1294.** The character select was a boot-time snapshot — a
+  character created this session was missing from it, which is what made the
+  owner's golem "wipe" look real. Refresh on every mount now. Owner-ordered
+  back-button audit complete on this line: everything else correct.
+
+- **⚠⚠⚠ LORE'S BACK TRAPDOOR (2026-08-15). HAL OTA-1293, port of
   golem OTA-1292.** BACK on the lore screen was hard-wired to the title while
   the exploration crest nav linked to it mid-game — reading the bestiary
   dumped a live session onto the character select. Conditional now. The
