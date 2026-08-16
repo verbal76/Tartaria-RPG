@@ -1839,8 +1839,79 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ THE LOCATION AUDIT, THE TWO WAVES, AND THE STAGE LAYER
+  (2026-08-16, latest). Golem OTA-1322→1328.**
+  Began with two device-report fixes and became a map-wide audit the owner
+  ordered outright: *"do a full audit of all the missions. whispers hooks
+  anything that can be triggered the guardian runs the whole nine yards. I want
+  to find out the location of every event and I want to find out which ones have
+  overlapping locations."* Newest first:
+  - **OTA-1328 — THE STAGE LAYER (P19).** Owner, playing a hunt: *"I needed to
+    'investigate the area' so I typed exactly that, it closed the stage, but the
+    next stage spoke about giving the book to his sister. who's sister? and what
+    book? … there's nothing in my inventory under mission items and there's no
+    way to auto route to anything."* ⚠⚠ **He was right and the measurement is
+    worse than the report:** before this OTA a stage carried exactly four fields
+    — `stageType` · `narration` · `arbiter` · `checkKind`. No item to grant, no
+    item to require, no location, no person. And `huntAnchorId` takes the
+    contract DEF rather than the stage, so ONE anchor served every stage and
+    there was nothing to route BETWEEN. **57 stages across 50 contracts name an
+    object or a person that could not exist.** The stage closed because the VERB
+    matched and nothing else was ever checked — completable by accident, which
+    is why it is on the ALPHA punch list as **P19** rather than in polish
+    (owner: *"put it on the alpha punch list and my choice is build the
+    layer"*). `app/engine/questStage.ts` is the layer: `StageBinding` (`grants` /
+    `requires` / `locationName` / `npcName`) mixed into `HuntStageDef`,
+    `MysteryStageDef` and `StorylineStageDef`, plus `countInPack`,
+    `stageRequirementMet`, `stageRequirementLine`, `stageLocationId`,
+    `nextStageDirection`. The **hunt** path is wired end to end — per-stage
+    ground, a requirement gate that NAMES the missing thing instead of refusing
+    in silence, an explanation for the in-combat block, a once-only grant
+    guarded on pack count so a re-entered boss stage cannot duplicate, and a
+    direction line after every advance. ⚠ **Every field is optional and silence
+    is the OLD behaviour** — 281 stages exist and they get filled by a content
+    pass, not by this commit, so nothing regresses while that pass is half-done.
+    `hunt_silt_serpent_cathedral` is filled from its OWN prose as the proof
+    (Wren's Cut Line → sister → Wren's Body → Logbook); nothing invented.
+    ⚠ **STILL OPEN:** the other 56 stages, and the mystery/storyline advance
+    paths, which have the TYPE but not the wiring. New suite ota1328 (10),
+    including a generalised guard that no hunt stage may require an item no
+    earlier stage granted.
+  - **OTA-1327 — WAVE TWO: the contract board points at the whole map.** 97 side
+    missions pinned to 10 tiles while 26 of 36 named locations were never pinned
+    by anything. 31 of 32 mysteries/storylines already NAMED a place in their own
+    prose, so `targetLocationName` was read off the text rather than invented
+    (16 mysteries + 13 storylines + 1 faction quest). Coverage 10 → 33 of 36.
+    ⚠ Not applied blindly: 18 faction quests mention a place but nearly all are
+    escorts/turn-ins that END AT AN AGENT, where the faction home IS the
+    destination — routing those would send the player the wrong way.
+  - **OTA-1326 — WAVE ONE: the Sentinel Ward, and dogs stay at outposts.** Owner:
+    *"leave dog events at outposts."* All four rescue scenarios pinned to the
+    `outpost` archetype; `etheric_chamber` gained the aliases the prose already
+    used; `tartarian_outskirts` gained the `outpost` tag.
+  - **OTA-1325 — GUARDIAN BY BUTTON, TORCH BY CRAFT.** Owner: *"guardians should
+    only come from the summon button, because there are other quests in some of
+    the capital cities that need to examine the area and the examine summon will
+    eat the other events."* The verb-gated summon is DELETED, not narrowed —
+    EXAMINE at a capital now nudges toward ★ SUMMON. And the free-torch flood:
+    the `lantern` alias family put ~5 torches an hour in the pack; measured 3000
+    lantern salvages yielded ZERO torches through the materials filter. Aliases
+    removed; a new `rareFind` valve on the `light` salvage pool gives an
+    Aetheric Torch at 4.5%.
+  - **OTA-1322–1324** — routed tower contracts, the crucible chip's gate, and the
+    empty-picker close (owner: *"the minute the last item is gone from the
+    screen that pop-up should close"*).
+  - ⚠ **METHOD NOTE, four self-corrections in one session.** Every one came from
+    measuring shipped code after asserting from memory: "12 things fire at
+    Asgardar" (the true figure is 6 — I had projected the biomeTag myself); "three of four tiles
+    are empty" (only one is); "hunts don't require you to go where they say"
+    (they DO gate on `player.currentLocationId === anchor`); and counting the
+    labyrinth as crowding Iskan-Veil, which the OWNER corrected — it is a 25×25
+    instanced maze with its own space. Docs produced: `EVENT-MAP.md`,
+    `LOCATION-CHANGES.md`.
+
 - **⚠⚠⚠ THE DEVICE-REPORT MARATHON + THE AUDIT OF ITS OWN WORK
-  (2026-08-16, latest). Golem OTA-1298→1321 / HAL 1299→1318 / steam 1300→1319.**
+  (2026-08-16). Golem OTA-1298→1321 / HAL 1299→1318 / steam 1300→1319.**
   One session, five owner device reports, and a closing self-audit that found
   four more holes in the session's own fixes. Highlights, newest first:
   - **OTA-1321 (golem; unpushed)** — the first fight explains itself, once.

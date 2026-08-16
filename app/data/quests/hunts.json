@@ -447,31 +447,50 @@
           "stageType": "first_friction",
           "narration": "The nave takes a hand of water an hour. In the shallows you find Wren's cut line and, tangled in it, a shed length of Silt Serpent skin the width of a door. It is bigger than the boss admitted. It knows the water is being read.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Wren's Cut Line"
+          }
         },
         {
           "stageType": "toll",
           "narration": "Wren's sister will trade the logbook for a promise: recover Wren's body from the flooded transept so she can be burned properly. \"I can't bury a line and a boot,\" she says. \"Bring her up.\"",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "diplomacy",
+          "npcName": "Wren's sister",
+          "requires": {
+            "item": "Wren's Cut Line"
+          }
         },
         {
           "stageType": "favor",
           "narration": "You dive the transept and find Wren where the Serpent left her, and a Bog Wraith risen from the drowned to guard the drowned. You put it back down and bring Wren up into the light.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "Wren's Body"
+          }
         },
         {
           "stageType": "revelation",
           "narration": "The logbook maps the Serpent's runs like a tide-chart. As you push toward the deep nave, the water around you thickens — the Serpent's silt-brood, a boil of young things sent to blind and slow you before the mother strikes.",
           "arbiter": null,
-          "checkKind": "attack_provoke"
+          "checkKind": "attack_provoke",
+          "requires": {
+            "item": "Wren's Body"
+          },
+          "grants": {
+            "item": "Wren's Logbook"
+          }
         },
         {
           "stageType": "catalyst",
           "narration": "Wren's last page holds the trick: the Serpent hunts by the pulse of Aether, and the Cathedral's old font still hums with it. Foul the font and the beast goes deaf and blind — for one dive's length, no more.",
           "arbiter": "\"Take its senses and it is only length and hunger,\" the Arbiter says. \"That is still a great deal of both.\"",
-          "checkKind": "cast"
+          "checkKind": "cast",
+          "requires": {
+            "item": "Wren's Logbook"
+          }
         },
         {
           "stageType": "apex",

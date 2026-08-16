@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.221';
+export const DISPLAY_VERSION = '4.29.222';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23920,7 +23920,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // faction home IS the destination — routing those would send the player the wrong
 // way. Exactly one names a destination in its objective, and only it moved.
 // New suite ota1327 (6). DISPLAY_VERSION 4.29.221.
-export const OTA_BUILD_ID = '2026-08-16-1327-wave-two-board-points-at-the-map';
+// ⚠⚠ OTA-1328 — THE STAGE LAYER: a staged contract can finally say what it means.
+// Owner, playing 4.29.x: *"I needed to 'investigate the area' so I typed exactly that,
+// it closed the stage, but the next stage spoke about giving the book to his sister.
+// who's sister? and what book? … there's nothing in my inventory under mission items
+// and there's no way to auto route to anything."* He was describing a structural hole,
+// and the measurement backed him: before this, a stage carried exactly four fields —
+// stageType · narration · arbiter · checkKind. No item to grant, no item to require, no
+// location, no person; and huntAnchorId takes the contract DEF, not the stage, so ONE
+// anchor served every stage and there was nothing to route BETWEEN. 57 stages across 50
+// contracts name an object or a person that could not exist. The stage closed because
+// the VERB matched and nothing else was ever checked — completable by accident. Filed on
+// the ALPHA punch list as P19 (owner: "put it on the alpha punch list and my choice is
+// build the layer"), not as polish. New app/engine/questStage.ts adds StageBinding
+// (grants / requires / locationName / npcName) mixed into HuntStageDef, MysteryStageDef
+// and StorylineStageDef, plus countInPack, stageRequirementMet, stageRequirementLine,
+// stageLocationId and nextStageDirection. The hunt path is wired end to end: per-stage
+// ground, a requirement gate that NAMES the missing thing rather than refusing in
+// silence, an explanation for the in-combat block, a once-only grant guarded on pack
+// count so a re-entered boss stage cannot duplicate, and a direction line after every
+// advance. ⚠ EVERY FIELD IS OPTIONAL AND SILENCE IS THE OLD BEHAVIOUR — 281 stages exist
+// and they get filled by a content pass, not by this commit, so nothing regresses while
+// that pass is half-done. hunt_silt_serpent_cathedral is filled from its OWN prose as the
+// proof (Wren's Cut Line → sister → Wren's Body → Logbook), nothing invented.
+// New suite ota1328 (10), including a generalised guard that no hunt stage may require an
+// item no earlier stage granted. DISPLAY_VERSION 4.29.222.
+export const OTA_BUILD_ID = '2026-08-16-1328-stages-mean-what-they-say';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1327-wave-two-board-points-at-the-map';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1326-wave-one-sentinel-ward-and-dogs';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1325-guardian-by-button-torch-by-craft';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1324-crucible-chip-obeys-its-gate';
