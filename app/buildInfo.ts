@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.185';
+export const DISPLAY_VERSION = '4.29.186';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24757,7 +24757,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // confirm fell through to plain travel, so a tower got a course and never became
 // the mission you were on. New suite halOnlySaveMigrationsSurvive (5); 12 golem
 // suites brought in, 21 re-pointed. DISPLAY_VERSION 4.29.185.
-export const OTA_BUILD_ID = '2026-08-16-1319-current-with-golem';
+// ⚠⚠ OTA-1320 — THE EMPTY PICKER CLOSES ON THE FRAME IT EMPTIES. Owner, device
+// run: *"whenever I hit the three all buttons and there's nothing left in the
+// screen, it still says ignore all, that red button, for about 2 and 1/2 seconds
+// ... the minute the last item is gone from the screen that pop-up should
+// close."* The picker already auto-closed when emptied, but behind an 800ms hold
+// borrowed from the investigate picker on the theory that closing on the same
+// frame as the tap reads as a crash. That does not survive the SWEEP buttons: the
+// player taps TAKE ALL GEAR and WATCHES the lane empty, so the tap has already
+// confirmed itself — and across three sweeps the hold stacks on the re-renders
+// into the ~2.5s he measured. Hold removed; the opened-empty case still explains
+// and still waits. DISPLAY_VERSION 4.29.186.
+export const OTA_BUILD_ID = '2026-08-16-1320-empty-picker-closes-now';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1319-current-with-golem';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1318-hal-keeps-its-picker';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1314-amber-salvage-and-restore-gate';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1310-sell-all-common-gear';

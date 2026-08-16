@@ -397,13 +397,14 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
       let tree!: { toJSON(): unknown; update(e: React.ReactElement): void };
       renderer.act(() => { tree = renderer.create(el([{ noun: 'bench' }])); });
       renderer.act(() => { tree.update(el([])); });
-      // ⚠ THE HOLD IS REAL AND IS ASSERTED AS SUCH — the same 800ms beat the
-      // investigate picker has used since OTA-257. The player taps the last row,
-      // and the card must still be there long enough for the tap to have visibly
-      // landed; snapping shut on the same frame reads as a crash, not as done.
-      renderer.act(() => { jest.advanceTimersByTime(400); });
-      expect(closed).toBe(0);
-      renderer.act(() => { jest.advanceTimersByTime(500); });
+      // ⚠⚠ NO HOLD. The owner watched the red IGNORE button sit on an empty card
+      // for ~2.5s after three sweeps and asked for it gone: *"the minute the last
+      // item is gone from the screen that pop-up should close."* The close must
+      // therefore have already happened by the time the list renders empty — no
+      // timer advance at all. Advancing the clock afterwards must not close it a
+      // SECOND time, which is what a leftover timer would do.
+      expect(closed).toBe(1);
+      renderer.act(() => { jest.advanceTimersByTime(5000); });
       expect(closed).toBe(1);
     } finally {
       jest.useRealTimers();
@@ -439,7 +440,10 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
     // down and restart the 800ms timer and the picker would never close.
     const mod = src('app', 'components', 'GatherModal.tsx');
     expect(mod).toContain('const cancelRef = useRef(onCancel)');
-    expect(mod).toContain('setTimeout(() => cancelRef.current(), 800)');
+    // ⚠ The close is now immediate, so what has to be pinned is that no timer
+    // crept back in — a re-introduced hold is exactly the ~2.5s the owner saw.
+    expect(mod).toContain('cancelRef.current();');
+    expect(mod).not.toContain('cancelRef.current(), 800');
     expect(mod).toContain('}, [visible, rowCount]);');
   });
 
