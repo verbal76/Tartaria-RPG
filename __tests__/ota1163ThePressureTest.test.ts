@@ -199,7 +199,11 @@ describe('OTA-1140 — three more surfaces stop lying', () => {
   it('⚠ the SUMMONED Guardian card routes through the helper and says mid', () => {
     const from = STORE.indexOf('const guardian = cg.spawnGuardianForCapital(player, capitalId);', STORE.indexOf('summonCoreGuardian') > 0 ? STORE.indexOf('summonCoreGuardian') : 0);
     expect(STORE).not.toContain('${guardian.damage} damage on a hit. (range: close)');
-    expect((STORE.match(/\(range: mid\) ★ CORE GUARDIAN/g) ?? []).length).toBe(2);
+        // ⚠ ONE FEWER SITE since the Core Guardian's duplicate spawn path was removed:
+    // the verb-gated summon inside submitPlayerAction is gone, so `summonCoreGuardian`
+    // is the only place a Guardian is raised. The count dropping is the fix landing,
+    // not coverage lost — a second copy is what this guard exists to prevent.
+expect((STORE.match(/\(range: mid\) ★ CORE GUARDIAN/g) ?? []).length).toBe(1);
   });
 
   it('the to-hit log admits the cap when the cap decided', () => {

@@ -604,7 +604,9 @@ export function ContractsScreen() {
               if (!LOST_CAPITAL_LOCATIONS.includes(here)) return null;
               if (mq.coresRecovered.includes(here)) return null;
               const next = coreGateNextAction(player.factionId);
-              return <Text style={styles.mainQuestNextAction}>→ At this Capital: {next}.</Text>;
+              // ⚠ Flavour, not an instruction — the verb no longer raises the
+              // Guardian. ★ SUMMON, directly below, is the only door.
+              return <Text style={styles.mainQuestNextAction}>→ At this Capital: {next}. Then tap ★ SUMMON.</Text>;
             })()}
             {atCapitalForSummon && (
               <TouchableOpacity
