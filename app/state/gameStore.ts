@@ -35749,6 +35749,36 @@ function advanceActiveFactionQuests(
     const gate = currentStage?.advanceOn ?? 'any';
     if (gate !== 'any' && gate !== trigger) return rec;
     const nextStage = rec.stage + 1;
+    // ⚠⚠ P19, ONE LAST INSTANCE — A QUEST THAT NAMES A DESTINATION HAS TO CHECK IT.
+    // Measured across all 65 faction quests when the owner asked whether this family also
+    // needed auditing (it did — I had waved it through by analogy with bounties). 17 of the
+    // 18 staged ones are honest counters and their objective line SAYS so: "Defeat 3
+    // enemies", "Travel 5 times", "Discover 2 locations". The narration is flavour over a
+    // tally and promises the player nothing it cannot pay.
+    //
+    // Exactly ONE is not: `fq_servants_tribute` — *"Travel to the Giant Vault and leave
+    // tribute"*, whose own stage says *"Carry it to the Vault. Set it on the threshold."*
+    // Every stage is `advanceOn: 'travel'`, and this function counted ANY travel, so three
+    // steps in the OPPOSITE direction reported that you had set the tribute down at a place
+    // you never went. The same hole P19 closed in the other three families, hiding in the
+    // one family whose shape made it look exempt.
+    //
+    // ⚠ The gate is deliberately on the FINAL stage only. The middle stages are the walk
+    // ("the road has narrowed"), and those genuinely are paid by travelling anywhere; it is
+    // the ARRIVAL beat that has to happen at the named place. And it applies only when the
+    // quest actually names a resolvable destination — the other 17 carry none, so this
+    // costs them nothing.
+    if (trigger === 'travel' && nextStage >= def.stages.length) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { missionObjectiveLocationId } = require('../engine/missionRouting') as typeof import('../engine/missionRouting');
+      const dest = missionObjectiveLocationId(def);
+      if (dest && player.currentLocationId !== dest) {
+        const line = `The Arbiter shakes their head. "${def.title} finishes at ${safeLocName(dest)}. Not from here."`;
+        const recent = get().gameLog.slice(-30).some((e) => e.text === line);
+        if (!recent) get().appendLog('arbiter', line);
+        return rec;
+      }
+    }
     mutated = true;
     // We just BUMPED to stage `nextStage`. If a stage exists at the new
     // index (nextStage), narrate it. Otherwise the quest is now ready

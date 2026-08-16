@@ -68,6 +68,7 @@ const _origErr = console.error;
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { FACTION_QUESTS } from '../app/engine/factionQuests';
+import { missionObjectiveLocationId } from '../app/engine/missionRouting';
 import { HUNTS } from '../app/engine/hunts';
 import { MYSTERIES } from '../app/engine/mysteries';
 import { STORYLINES } from '../app/engine/factionStorylines';
@@ -355,6 +356,17 @@ describe('Quest progression audit', () => {
           const cur = store.getState().player?.currentLocationId;
           let targetLoc = TRAVEL_RING[i % TRAVEL_RING.length]!;
           if (targetLoc === cur) targetLoc = TRAVEL_RING[(i + 1) % TRAVEL_RING.length]!;
+          // ⚠⚠ OTA-1332 — THE ARRIVAL BEAT HAPPENS AT THE PLACE THE QUEST NAMES. A
+          // travel-gated FINAL stage of a quest that names a destination no longer counts
+          // any old road: `fq_servants_tribute` says "Carry it to the Vault. Set it on the
+          // threshold", and it used to complete three steps in the opposite direction.
+          // This audit rotated a ring of convenient tiles and so walked straight into the
+          // new gate — which is the harness standing still again, not a regression. Where
+          // the quest names somewhere, go THERE for the last hop.
+          if (i === stages.length - 1) {
+            const dest = missionObjectiveLocationId(q);
+            if (dest) targetLoc = dest;
+          }
           store.getState().travelTo(targetLoc);
         } else if (trigger === 'kill' || trigger === 'any') {
           // Inject a 0-HP enemy on the scene and call resolveEnemyDefeat,
