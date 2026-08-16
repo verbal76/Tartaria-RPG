@@ -518,7 +518,18 @@ export function VendorScreen() {
             is redundant. Mirror the exploration chip's own gate so the two never
             both show. Roadside / wild stalls (no hub, not market) keep it — it's
             the only Crucible there. */}
-        {!(player?.fusionPending
+        {/* ⚠⚠ AND NOT BEFORE YOU HAVE EVER LEFT. `useVendorCrucible` refuses outright
+            while `macroVisitSeq < 1` — "the Crucible's not for first-timers" — but that
+            check lived ONLY inside the handler, so the chip rendered lit, took the tap,
+            and answered with a wall. Owner's device log, at a roadside stall mid-first-
+            journey: four taps, four identical refusals in seventy seconds. ⚠ The comment
+            twelve lines below cites OTA-1024, which exists because he hit exactly this
+            shape on the FEE — "a lit button that doesn't fire". Same defect, different
+            gate, so it gets the same answer: the requirement is known at render time,
+            so consult it at render time. The handler's refusal stays as the backstop for
+            any other path in. */}
+        {(player?.macroVisitSeq ?? 0) >= 1
+          && !(player?.fusionPending
           || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1)
           || activeBuildingId === 'market') && (
           <TouchableOpacity
