@@ -39696,6 +39696,41 @@ function narrateCasualLook(
     parts.push(exitLine.join(' '));
   }
 
+  // ⚠⚠ PUNCHLIST B7 — YOU ROUTED TO A TOWER AND THE TOWER ISN'T THERE. Measured on
+  // a routed arrival at all five great climbs: the landmark prop is injected into
+  // the scene only when the chart is unlocked AND you are not in a hub room AND the
+  // tile has no live enemies. Two of those five arrivals came up empty on the first
+  // frame — `asgardar` puts you at `outpost_gate` (the Buried Spire stands outside
+  // the wall), and `obsidian_pillars` rolled a hostile, which suppresses the prop
+  // outright.
+  //
+  // ⚠ NEITHER IS PERMANENT — leaving the gate or clearing the fight brings the
+  // climb back, and the height lookup then resolves correctly to its real 11–15
+  // tiers. The defect is that the player is told NOTHING. They set a course to the
+  // Great Obsidian Monolith, arrive, look around, and read a list containing
+  // `pillar` and no monolith. Climbing that pillar gives a generic 3-tier ascent
+  // ending in "Tier 3/3 cleared" — which is exactly the symptom that opened this
+  // item, and it reads as the chart having lied. A landmark you were routed to is
+  // the one noun whose ABSENCE has to explain itself.
+  if (!get().activeBuildingId) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const GCL = require('../engine/greatClimbs') as typeof import('../engine/greatClimbs');
+    const here = GCL.greatClimbForLocation(player?.currentLocationId);
+    const chartUsed = !!here && (get().worldMemory.unlockedGreatClimbs ?? []).includes(here.id);
+    const onScene = (scene.displayedAmbientNouns ?? scene.ambientNouns ?? [])
+      .some((n) => n.toLowerCase() === here?.noun.toLowerCase());
+    if (here && chartUsed && !onScene) {
+      const liveHostiles = (scene.enemies ?? []).some((_, i) => (scene.enemyHps?.[i] ?? 0) > 0);
+      parts.push(
+        player?.hubRoomId
+          ? `${here.noun} stands outside the walls — you won't see the ascent from in here. Leave the outpost and look up.`
+          : liveHostiles
+            ? `${here.noun} is here, but you're not climbing anything with something on you. Deal with this first, then look up.`
+            : `${here.noun} should be here. Nothing in reach answers to it right now.`,
+      );
+    }
+  }
+
   // v2.4.1 — surface an ENTERABLE structure on this tile in EVERY look-around, not
   // just the first-arrival buildingApproachLine. Playtester walked up to a building
   // (its ENTER button live on screen), did other things, then `look`ed and saw only
