@@ -1045,7 +1045,10 @@ export function ExplorationScreen() {
             && !mq.coresRecovered.includes(player.currentLocationId)
             && (mq.phase === 'revelation' || mq.phase === 'cores');
           mainLine = atUnrecovered
-            ? `${coreGateNextAction(player.factionId)}.`
+            // ⚠ The faction next-action is FLAVOUR now, not an instruction: the verb
+            // path that used to summon is gone, so the line ends at the control that
+            // actually raises the Guardian — the ★ SUMMON chip beside this text.
+            ? `${coreGateNextAction(player.factionId)} — then ★ SUMMON.`
             : phaseHint(mq.phase, cores);
         }
         return (

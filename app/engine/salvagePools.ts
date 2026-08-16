@@ -50,6 +50,21 @@ interface SalvagePool {
   /** Weighted item pool. Weights need not sum to 100; the picker
    *  normalises. min/max set the quantity range (inclusive). */
   items: PoolEntry[];
+  /** ⚠⚠ THE ONE ESCAPE FROM THE MATERIALS FILTER, AND IT IS DELIBERATELY NARROW.
+   *
+   *  `arb61` filters every pool roll down to TRUE materials, which is right: pools
+   *  had drifted into handing out gear, food and clues. But it also silently killed
+   *  the entries that were gear ON PURPOSE — the `light` pool's Aetheric Torch has
+   *  been unreachable since that filter landed, so the comment above it ("a broken
+   *  lantern only occasionally yields a still-working one") described a thing that
+   *  could not happen.
+   *
+   *  A rare find is rolled BEFORE the material pick and REPLACES it, so the take per
+   *  salvage is unchanged — only its nature, exactly like the curio valve. Keep
+   *  `chance` small: this is the only door in the whole salvage system that can
+   *  produce a real item, and it exists so a scarce tool stays findable, not
+   *  farmable. */
+  rareFind?: { name: string; rarity: Rarity; chance: number };
 }
 
 // Pool definitions, ordered most-specific → most-general. The
@@ -140,10 +155,18 @@ const POOLS: SalvagePool[] = [
       { name: 'Aether Dust', rarity: 'Common', weight: 40, min: 1, max: 3 },
       { name: 'Aether Crystal', rarity: 'Common', weight: 25, min: 1, max: 1 },
       { name: 'Scrap Metal', rarity: 'Common', weight: 20, min: 1, max: 2 },
-      // OTA-752 — trimmed 15 → 4: torches are a managed resource; a broken
-      // lantern only occasionally yields a still-working one.
-      { name: 'Aetheric Torch', rarity: 'Common', weight: 4, min: 1, max: 1 },
+      // ⚠⚠ THE TORCH USED TO SIT HERE AS A WEIGHT-4 ENTRY AND COULD NEVER COME OUT.
+      // OTA-752 trimmed it 15 → 4 because "torches are a managed resource; a broken
+      // lantern only occasionally yields a still-working one" — and then arb61's
+      // materials filter removed it from every roll, because a torch is gear and not
+      // a material. Measured: 3000 lantern salvages, 2488 reaching this pool, ZERO
+      // torches. The rationing comment outlived the thing it rationed.
+      //
+      // Owner: *"reduce the free lantern spawn rate, they should be a rare find,
+      // mostly crafted."* A rare find is what this now is — declared below where the
+      // filter cannot eat it, at the rate OTA-752 was reaching for.
     ],
+    rareFind: { name: 'Aetheric Torch', rarity: 'Common', chance: 0.045 },
   },
   {
     id: 'tomb',
@@ -660,6 +683,19 @@ export function rollSalvagePool(noun: string, rng: () => number = Math.random): 
       rarity: (curio.rarity as Rarity) ?? 'Common',
       quantity: 1,
       line: format(CURIO_LINES, noun, rng),
+    };
+  }
+  // ⚠ The rare find, rolled where the curio valve is and for the same reason: it
+  // REPLACES the material rather than adding to it, so a salvage still yields
+  // exactly one thing. See SalvagePool.rareFind for why this escape exists at all.
+  if (pool.rareFind && rng() < pool.rareFind.chance) {
+    return {
+      kind: 'material',
+      poolId: pool.id,
+      itemName: pool.rareFind.name,
+      rarity: pool.rareFind.rarity,
+      quantity: 1,
+      line: format(MATERIAL_LINES, noun, rng),
     };
   }
   // arb61 — restrict to true materials; fall back to the all-material junk

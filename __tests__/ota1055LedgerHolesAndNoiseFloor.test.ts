@@ -185,7 +185,11 @@ describe('OTA-1055 — every vendor install records the meeting', () => {
     expect((inSightVendor.match(/rememberNpcMeeting\(/g) ?? []).length).toBe(1);
     // OTA-1057 — 4: sightVendor, sightPerson (wanderers + escort leaders), and
     // the two Core Guardian spawns.
-    expect((SRC.match(/rememberNpcMeeting\(/g) ?? []).length).toBe(4);
+        // ⚠ ONE FEWER SITE since the Core Guardian's duplicate spawn path was removed:
+    // the verb-gated summon inside submitPlayerAction is gone, so `summonCoreGuardian`
+    // is the only place a Guardian is raised. The count dropping is the fix landing,
+    // not coverage lost — a second copy is what this guard exists to prevent.
+expect((SRC.match(/rememberNpcMeeting\(/g) ?? []).length).toBe(3);
   });
 
   it('THE DEAD GUARD IS GONE — no per-site same-vendor check survives', () => {

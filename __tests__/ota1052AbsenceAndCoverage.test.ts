@@ -176,6 +176,10 @@ describe('OTA-1052 — everyone you meet is on the ledger', () => {
     // wanderers and escort leaders. The count is the point of the test — it is
     // what stops a sixth site being added without going through a helper.
     const calls = src.match(/rememberNpcMeeting\(/g) ?? [];
-    expect(calls.length).toBe(4);
+        // ⚠ ONE FEWER SITE since the Core Guardian's duplicate spawn path was removed:
+    // the verb-gated summon inside submitPlayerAction is gone, so `summonCoreGuardian`
+    // is the only place a Guardian is raised. The count dropping is the fix landing,
+    // not coverage lost — a second copy is what this guard exists to prevent.
+expect(calls.length).toBe(3);
   });
 });
