@@ -136,28 +136,38 @@ describe('OTA-1235 — three lanes, three colours, all visible at once', () => {
     expect(renderRoom([]).join('|')).toContain('IGNORE THE REST');
   });
 
-  it('⚠⚠ THE HUES ARE ONE-PER-LANE, and each is used on block, heading AND button', () => {
-    // The whole redesign is that you never have to work out which button owns
-    // which block. That only holds while each colour means exactly one thing.
+  it('⚠⚠ EVERY LANE STILL OWNS A BLOCK, A HEADING AND ITS OWN BUTTON', () => {
+    // ⚠⚠ OTA-1319 — THIS TEST USED TO REQUIRE FOUR DISTINCT HUES, and the owner
+    // overruled that: *"just make all of the colors amber and leave it sorted
+    // like it is."* Re-pointed rather than deleted, because the RULE it was
+    // written for is untouched — "you never have to work out which button owns
+    // which block". Hue was one way to carry that; the block grouping, the
+    // heading over each block and a button that NAMES ITS LANE IN WORDS carry it
+    // just as well, and they are what the card actually relies on. What the old
+    // assertion really pinned was the mechanism.
     const mod = src('app', 'components', 'GatherModal.tsx');
-    const hue = (name: string): string => {
-      const m = new RegExp(`^const ${name} = '(#[0-9a-f]{6})';`, 'm').exec(mod);
-      expect(m).not.toBeNull();
-      return m![1]!;
-    };
-    const gear = hue('GEAR'); const items = hue('ITEMS');
-    const scrap = hue('SCRAP'); const ignore = hue('IGNORE');
-    expect(new Set([gear, items, scrap, ignore]).size).toBe(4);
-    // Each lane hue is bound to a block border, a text colour and a button face.
+    // One accent, deliberately shared — the lanes are no longer told apart by it.
+    expect(mod).toMatch(/^const LANE = '#c9a86a';/m);
+    for (const lane of ['GEAR', 'ITEMS', 'SCRAP']) {
+      expect(mod).toMatch(new RegExp(`^const ${lane} = LANE;`, 'm'));
+    }
+    // Each lane still renders its own row block, its own heading and its own
+    // sweep face — the structure that answers "which button clears this?".
     expect(mod).toContain('rowGear: { borderColor: GEAR');
     expect(mod).toContain('rowItems: { borderColor: ITEMS');
     expect(mod).toContain('rowScrap: { borderColor: SCRAP');
     expect(mod).toContain('sweepGear: { borderColor: GEAR');
     expect(mod).toContain('sweepItems: { borderColor: ITEMS');
     expect(mod).toContain('sweepScrap: { borderColor: SCRAP');
-    expect(mod).toContain('textGear: { color: GEAR }');
-    expect(mod).toContain('textItems: { color: ITEMS }');
-    expect(mod).toContain('textScrap: { color: SCRAP }');
+    // ...and the button says which lane it owns, which is now the load-bearing
+    // part. A rendered check, not a source one.
+    const shown = renderRoom(ROOM).join('|');
+    expect(shown).toContain('TAKE ALL GEAR');
+    expect(shown).toContain('TAKE ALL ITEMS');
+    expect(shown).toContain('SALVAGE ALL');
+    // ⚠ IGNORE keeps its own colour: it is not a lane, it is the one control
+    // that walks away from loot, and OTA-1236 chose red for exactly that.
+    expect(mod).toMatch(/^const IGNORE = '#94533f';/m);
     expect(mod).toContain('ignoreText: { color: IGNORE');
   });
 

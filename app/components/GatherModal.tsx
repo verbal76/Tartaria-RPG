@@ -71,6 +71,24 @@ import {
   type GatherRow, type GatherLane,
 } from '../engine/gatherSort';
 import type { PlayerCharacter } from '../engine/types';
+import { findCatalogItem } from '../engine/crafting';
+import { rarityHexColor } from './InventoryCategorize';
+
+/** ⚠⚠ OTA-1319 — the row's rarity edge, or nothing.
+ *
+ *  A row here is an ambient NOUN, not an inventory item — "cart", "rubble", a
+ *  lead. Only the ones that resolve to a catalog entry have a rarity at all, and
+ *  those are exactly the rows a TAKE turns into a real item. Anything else keeps
+ *  the neutral edge: the lane hues were colour without a fact behind it, and
+ *  replacing them with a different colour-without-a-fact would miss the point.
+ *
+ *  ⚠ Aliases on, because the picker shows the noun the room wrote ("rope coil")
+ *  while the catalog knows the canonical name — the shop resolves the same way. */
+function rowRarityEdge(noun: string): { borderLeftColor: string; borderLeftWidth: number } | null {
+  const cat = findCatalogItem(noun, { aliases: true });
+  if (!cat) return null;
+  return { borderLeftColor: rarityHexColor(cat.rarity), borderLeftWidth: 4 };
+}
 
 export interface GatherChip {
   noun: string;
@@ -270,6 +288,11 @@ export function GatherModal({
         key={noun}
         style={({ pressed }) => [
           styles.row,
+          // ⚠⚠ OTA-1319 — RARITY LIVES ON THE LEFT EDGE, like the shop's rows.
+          // Only a row that resolves to a real catalog item has a rarity to
+          // show; scenery and leads keep the neutral edge, because inventing a
+          // colour for a thing with no rarity is what the lane hues were doing.
+          rowRarityEdge(noun),
           lane === 'gear' && styles.rowGear,
           lane === 'items' && styles.rowItems,
           lane === 'scrap' && styles.rowScrap,
@@ -468,14 +491,30 @@ export function GatherModal({
 // Each hue drops roughly a fifth of its lightness AND some saturation; the second
 // half is what actually kills the bloom. The lane is still readable at a glance,
 // which is the only job the colour has.
-const GEAR = '#b5773f';
-const ITEMS = '#6f9c58';
-const SCRAP = '#b0a04f';
+// ⚠⚠ OTA-1319 — THE LANES GO AMBER. Owner: *"the colors are the only thing i
+// dont like… just make all of the colors amber and leave it sorted like it is,
+// add the rarity color line on the left edge like if you were buying it."*
+//
+// The four lanes were four hues doing one job — telling you which BUTTON clears
+// this block — while the row order already says the same thing, and the buttons
+// name their own lane in words. So the hue was a third copy of a fact the card
+// states twice. It goes house amber; the grouping and the sort are untouched,
+// and the sweep buttons still read TAKE ALL GEAR / TAKE ALL ITEMS / SALVAGE ALL.
+//
+// ⚠ What colour DOES carry now is rarity, on the left edge, in the same palette
+// the pack and the shop use — see `rowRarityEdge` below.
+const LANE = '#c9a86a';
+const GEAR = LANE;
+const ITEMS = LANE;
+const SCRAP = LANE;
+// ⚠ IGNORE STAYS RED. It is not a lane — it is the one control here that walks
+// away from loot, and OTA-1236 chose red for exactly that. Amber would file it
+// with the three buttons that take things.
 const IGNORE = '#94533f';
 // ⚠ The lead's hue is the ONE cool colour in a warm card, so it does not read as
 // a fourth thing you can sweep — and it is the same pale violet the Aetheric
 // Torch's ✦ already uses for "worth a look", so the player has met it before.
-const LEAD = '#9a8cbb';
+const LEAD = LANE;
 
 const styles = StyleSheet.create({
   scrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.72)', justifyContent: 'center', padding: 18 },
