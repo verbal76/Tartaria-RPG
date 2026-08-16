@@ -2,6 +2,7 @@
   "storylines": [
     {
       "id": "story_order_red_tower",
+      "targetLocationName": "Red Tower of Nimari",
       "title": "The Red Tower's Mouth",
       "posterText": "Vesryn of Varakush wants you to gather every Fragment of the Red Tower you can find and bring them to the Order. Multi-step contract. 1500 TC and faction standing on completion.",
       "factionId": "forgotten_order",
@@ -59,6 +60,7 @@
     },
     {
       "id": "story_tartarian_ascension",
+      "targetLocationName": "The Sunken Enclave",
       "title": "The Path of the True Tartarian",
       "posterText": "Korash of the Deep offers a full True Tartarian ascension trial. Seven steps. Pass them all and the enclave will treat you as one of their own. 1200 TC and major rep.",
       "factionId": "true_tartarians",
@@ -111,6 +113,7 @@
     },
     {
       "id": "story_reclaimer_relic_run",
+      "targetLocationName": "The Buried Cities",
       "title": "The Reclaimer Relic Run",
       "posterText": "Reclaimers Guild Speaker offers a five-stop relic run — five hidden caches, five takes, no questions. 1400 TC, Guild standing, and a permanent slot on the haul board.",
       "factionId": "reclaimers_guild",
@@ -210,6 +213,7 @@
     },
     {
       "id": "story_monarch_ledger_of_silence",
+      "targetLocationName": "Ostragar",
       "title": "The Ledger of Silence",
       "posterText": "A Mud Monarch factor at the Waystation needs a witness unmade before the Forgotten Order can copy what it saw. Discreet work. 1400 TC and standing.",
       "factionId": "mud_monarchs",
@@ -252,6 +256,7 @@
     },
     {
       "id": "story_truetart_descent_karoksa",
+      "targetLocationName": "Karok-Sa",
       "title": "The Descent to Karok-Sa",
       "posterText": "The True Tartarians will pay a surface-walker to escort a reconsecration party down into buried Karok-Sa and see it done. 1600 TC and deep standing.",
       "factionId": "true_tartarians",
@@ -299,6 +304,7 @@
     },
     {
       "id": "story_dynasty_blood_aetherborn",
+      "targetLocationName": "Sinking Cathedral",
       "title": "Blood of the Aetherborn",
       "posterText": "A Dynasty proctor at the Border Post seeks proof of a claimant's Aetherborn bloodline — a relic only the pure may touch and live. 1800 TC and standing for a clean result.",
       "factionId": "eternal_dynasty",
@@ -341,6 +347,7 @@
     },
     {
       "id": "story_servants_giant_watch_vigil",
+      "targetLocationName": "The Giant Vault",
       "title": "The Giant-Watch Vigil",
       "posterText": "The Servants of the Giants have felt the ground breathe at the Giant Vault. They will pay a steady hand to stand the vigil and read what stirs. 1500 TC and standing.",
       "factionId": "servants_of_giants",
@@ -383,6 +390,7 @@
     },
     {
       "id": "story_builders_scripture_in_stone",
+      "targetLocationName": "Grand Spire of Etheria",
       "title": "Scripture in Stone",
       "posterText": "A Stone Builder lodge-master at the Survey Camp needs the Architectural Sorcery of the Grand Spire read before his lodge cracks apart under it. 1500 TC and standing.",
       "factionId": "stone_builders",
@@ -425,6 +433,7 @@
     },
     {
       "id": "story_revivalist_sashas_gambit",
+      "targetLocationName": "Aetheric Chamber",
       "title": "Sasha's Gambit",
       "posterText": "Sasha Ironheart of the Revivalists wants a core-line at the Aetheric Chamber brought back to life — and she needs a blade willing to risk a Second Flood to do it. 2000 TC and standing.",
       "factionId": "tartarian_revivalists",
@@ -467,6 +476,7 @@
     },
     {
       "id": "story_reclaimer_highest_bidder",
+      "targetLocationName": "The Hidden Market",
       "title": "The Highest Bidder",
       "posterText": "A Reclaimer broker at the Hidden Market needs a neutral blade to run a relic auction that three factions all mean to win by force. 1700 TC and standing.",
       "factionId": "reclaimers_guild",
@@ -509,6 +519,7 @@
     },
     {
       "id": "story_architect_silence_protocol",
+      "targetLocationName": "Voronov",
       "title": "The Silence Protocol",
       "posterText": "A Conspiracy Architect handler needs a leak at Voronov closed before the Unknowing Masses learn what sleeps under their city. Total discretion. 1600 TC and standing.",
       "factionId": "conspiracy_architects",
@@ -551,6 +562,7 @@
     },
     {
       "id": "story_order_drowned_library",
+      "targetLocationName": "The Sunken Enclave",
       "title": "The Drowned Library",
       "posterText": "Vesryn of the Forgotten Order seeks a scholar to recover the Aetheric treatises lost in the flooding of the Sunken Enclave — the Order's deepest archive. 1800 TC and standing.",
       "factionId": "forgotten_order",
@@ -593,6 +605,7 @@
     },
     {
       "id": "story_dynasty_purge_asgardar",
+      "targetLocationName": "Asgardar",
       "title": "The Purge at Asgardar",
       "posterText": "A Dynasty enforcer at Asgardar needs a discreet hand to help \"reconcile\" a bloodline that has grown impure — quietly, before the court notices. 1900 TC and standing.",
       "factionId": "eternal_dynasty",

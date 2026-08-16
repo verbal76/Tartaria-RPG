@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.190';
+export const DISPLAY_VERSION = '4.29.191';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24848,7 +24848,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // — all 30 tags carried by hub locations were checked, and every other one leaks. The
 // starter region gained the tag so a first dog stays reachable. New suite ota1326 (9).
 // DISPLAY_VERSION 4.29.190.
-export const OTA_BUILD_ID = '2026-08-16-1324-wave-one-sentinel-ward-and-dogs';
+// ⚠⚠ OTA-1325 — LOCATION ROADMAP, WAVE TWO: THE CONTRACT BOARD POINTS AT THE MAP.
+// Owner: *"anything that isn't the 9 cores mission is a side mission"* — which makes
+// this the whole side-mission distribution problem. MEASURED BEFORE: 97 side missions
+// (65 faction quests, 18 mysteries, 14 storylines) had no location of their own and
+// pinned on the posting faction's HOME OUTPOST, so the entire board resolved to 10
+// tiles and 26 of 36 locations never received a single pin. ⚠ The prose was already
+// doing the work — 31 of 32 mysteries and storylines NAME a resolvable location in
+// their own text; they had no field to carry it. They get the field hunts have had
+// since OTA-1218, read by the same resolver, so "where does this happen" has ONE
+// spelling. Coverage: 10 tiles → 33 of 36. ⚠⚠ NOT applied blindly: 18 faction quests
+// mention a place but nearly all are escorts/turn-ins that END AT AN AGENT, where the
+// faction home IS the destination — routing those would send the player the wrong
+// way. Exactly one names a destination in its objective, and only it moved.
+// New suite ota1327 (6). DISPLAY_VERSION 4.29.191.
+export const OTA_BUILD_ID = '2026-08-16-1325-wave-two-board-points-at-the-map';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1324-wave-one-sentinel-ward-and-dogs';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1323-guardian-by-button-torch-by-craft';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1322-crucible-chip-obeys-its-gate';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1321-routed-tower-explains-itself';

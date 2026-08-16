@@ -1,6 +1,23 @@
 # Tartaria Realms — Location Changes Roadmap
 
-**Status: WAVE 1 SHIPPED (L1, L2, L3 — OTA-1326). Everything else is still a proposal.**
+**Status: WAVE 1 SHIPPED (L1–L3, OTA-1326). WAVE 2 SHIPPED (L4, L5, L6, L16 — OTA-1327).**
+**Waves 3 and 4 are still proposals.**
+
+⚠ **L7 is CLOSED as already-satisfied.** Wave 2 took contract coverage from 10 tiles to
+33 of 36. The three that remain unpinned need nothing: `iskan_veil` carries a capital, a
+Core Guardian and the labyrinth; `parley_ground` carries a location challenge; and
+`mud_flood_nexus` is the main quest's terminal, which a side mission must never send an
+unprepared player to.
+
+⚠ **OWNER RULING RECORDED FOR WAVE 3:** *"we can make a named file for the Grand Spire
+1-2 spaces East of Asgardar, it can be known to be at Asgardar and be just outside the
+city."* This settles L8 — the ladder is right that the Grand Spire belongs to Asgardar,
+and the fix is geographic, not textual: give it its own tile 1–2 cells east, lore'd as
+Asgardar's spire standing outside the walls. ⚠ One thing to decide when L9 is built:
+Asgardar currently hosts the **Buried Spire** (14 tiers, Draugveil) while the **Grand
+Spire of Etheria** (15 tiers, Aurenthal) is the separate tile. Placing the Grand Spire
+next to Asgardar means saying which of the two is the city's own spire, or whether both
+stand there. That is a lore call, not a code one.
 
 Owner: *"if we go with those choices then you need to map out all of the text, description,
 and lore, story beat, and mission instruction changes as well that need to be done to make

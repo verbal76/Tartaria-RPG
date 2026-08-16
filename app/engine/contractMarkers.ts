@@ -55,7 +55,7 @@ export interface ContractMarker {
   number: number;
 }
 
-/** ⚠⚠ OTA-1241 — THE POSTER STOPS LYING ABOUT THE MAP. 15 of 18 hunts NAME a
+/** ⚠⚠ OTA-1218 — THE POSTER STOPS LYING ABOUT THE MAP. 15 of 18 hunts NAME a
  *  real, walkable location on their poster ("Drakova", "Yuldra-Tul", "the
  *  Obsidian Pillars"...) while the anchor sat at the generic BIOME cell — a
  *  player who read the poster and walked to the named place got the "Not here"
@@ -91,10 +91,30 @@ export function resolvePosterLocation(targetLocationName: string | null | undefi
   return idx.get(cleaned) ?? idx.get(cleaned.replace(/^the\s+/, '')) ?? idx.get(`the ${cleaned}`);
 }
 
-/** OTA-1236 — THE hunt's anchor, exported: the same tile the card's "You're at",
+/** OTA-1213 — THE hunt's anchor, exported: the same tile the card's "You're at",
  *  the atlas pin, and the stage-advancement gate all read. One spelling of
  *  "where this hunt happens" — the gate and the pin can never disagree.
- *  OTA-1241 — and that one spelling now honors the place the POSTER names. */
+ *  OTA-1218 — and that one spelling now honors the place the POSTER names. */
+/** ⚠⚠ THE SAME RULE, FOR THE FAMILIES THAT NEVER HAD IT. Hunts have honored the
+ *  place their poster names since OTA-1218; mysteries, storylines and faction quests
+ *  pinned on the posting faction's HOME OUTPOST instead — so 97 of the game's side
+ *  missions resolved to just 10 tiles, and 26 of 36 locations never received a single
+ *  contract pin. Measured before the change; the map could not develop because the
+ *  contract board only ever pointed at ten places.
+ *
+ *  The prose was already doing the work: 31 of 32 mysteries and storylines NAME a
+ *  real, resolvable location in their own poster or stage text. They simply had no
+ *  field to carry it. Reading it here takes side-mission coverage from 10 tiles to 27.
+ *
+ *  ⚠ The faction home stays as the fallback, because some contracts genuinely have no
+ *  place — a six-name silencing run happens wherever the names are. */
+export function contractAnchorId(def: {
+  factionId?: string | null;
+  targetLocationName?: string | null;
+}): string {
+  return resolvePosterLocation(def.targetLocationName) ?? anchorForFaction(def.factionId);
+}
+
 export function huntAnchorId(def: {
   biomeTag?: string;
   factionId?: string | null;
@@ -137,17 +157,17 @@ export function openContractMarkers(player: PlayerCharacter | null | undefined):
   for (const m of player.activeMysteries ?? []) {
     const def = findMysteryById(m.id);
     if (!def) continue;
-    add('mystery', m.id, def.title, anchorForFaction(def.factionId));
+    add('mystery', m.id, def.title, contractAnchorId(def));
   }
   for (const s of player.activeStorylines ?? []) {
     const def = findStorylineById(s.id);
     if (!def) continue;
-    add('storyline', s.id, def.title, anchorForFaction(def.factionId));
+    add('storyline', s.id, def.title, contractAnchorId(def));
   }
   for (const fq of player.activeFactionQuests ?? []) {
     const def = findFactionQuestById(fq.id);
     if (!def) continue;
-    add('faction', fq.id, def.title, anchorForFaction(def.factionId));
+    add('faction', fq.id, def.title, contractAnchorId(def));
   }
   for (const q of player.activeQuests ?? []) {
     if (q.state !== 'open' && q.state !== 'in_progress') continue;
@@ -185,7 +205,7 @@ export function contractTurnInRemoteness(anchorId: string): number {
   return Math.abs(a.x - hub.x) + Math.abs(a.y - hub.y);
 }
 
-/** ⚠⚠ OTA-1210 (PUNCHLIST P7) — THE BONUS NOW MEASURES THE TRIP THE PLAYER MADE.
+/** ⚠⚠ OTA-1187 (PUNCHLIST P7) — THE BONUS NOW MEASURES THE TRIP THE PLAYER MADE.
  *
  *  The requirement is in OTA-824's own commit body: *"make the journey worth the loot — no
  *  32-time trip worth 20 TC."* What shipped measured `contractTurnInRemoteness` — how far
