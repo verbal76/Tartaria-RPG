@@ -604,6 +604,77 @@ function resolveLeadCompletion(
  *  and the next real action re-reads the fresh stage. */
 const stageAdvancesInFlight = new Set<string>();
 
+/** ⚠⚠ P19 — HAND OVER WHAT THE STAGES IN [from, to) PROMISED. Two callers need this and
+ *  they need it to behave identically:
+ *
+ *   • `advanceHunt`, for the stage that just closed;
+ *   • ACCEPT, for the null `inciting_hook` stages it skips past.
+ *
+ *  ⚠⚠ The second one is a real bug the honest walker caught. `firstActionableHuntStage`
+ *  starts the record PAST every leading null stage (OTA-1219 — hunts had no auto-consume
+ *  loop and wedged forever without it), so a stage-0 grant was never awarded by anything.
+ *  Every hunt opens with the giver handing you a token; the token simply never arrived,
+ *  and stage 1 then refused for the rest of time. A silent skip, exactly the class of
+ *  failure this whole item exists to end.
+ *
+ *  ⚠ Granted ONCE, guarded on what is already in the pack — a boss stage freezes for the
+ *  kill and re-runs this path, and a quest item that duplicates per visit is a currency
+ *  press wearing a story hat. */
+function grantStageItems(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  title: string,
+  stages: ReadonlyArray<{ grants?: { item: string; quantity?: number } }>,
+  from: number,
+  to: number,
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const QS = require('../engine/questStage') as typeof import('../engine/questStage');
+  for (let i = Math.max(0, from); i < Math.min(to, stages.length); i++) {
+    const g = stages[i]?.grants;
+    if (!g) continue;
+    const qty = g.quantity ?? 1;
+    const live = get().player;
+    if (!live || QS.countInPack(live.inventory, g.item) >= qty) continue;
+    const res = grantItem(live.inventory, {
+      id: freshInstanceId(g.item.toLowerCase().replace(/[^a-z0-9]+/g, '_')),
+      name: g.item, kind: 'misc', quantity: qty, tags: ['quest', 'mission'],
+      description: `Carried for ${title}.`,
+    });
+    set((st) => (st.player ? { player: { ...st.player, inventory: res.inventory } } : st));
+    get().appendLog('reward', `✦ ${qty > 1 ? `${qty}× ` : ''}${g.item} — mission item.`);
+  }
+}
+
+/** ⚠⚠ P19 — DOES A TRACKED HUNT WANT THIS EXACT VERB, ON THIS EXACT GROUND, RIGHT NOW?
+ *
+ *  Found by the honest walker: a wandering trader rolled onto a hunt's `diplomacy` stage
+ *  tile, and TALK went to the trader. `advanceStagesOnIntent` runs near the END of
+ *  submitPlayerAction, long after the vendor and wanderer parley branches, and those
+ *  branches return early — so the player stood in exactly the right place, typed exactly
+ *  the right word, and got "you let the conversation go" forever. Nothing in the game
+ *  could tell them why, because nothing was wrong.
+ *
+ *  ⚠ It is the STAGE that gets priority, not the merchant: the stall is ambient and will
+ *  still be there afterwards; the stage is the reason the player walked here. Deliberately
+ *  narrow — same ground, same verb, tracked hunt, not in combat. Anything less specific
+ *  would start eating ordinary conversations. */
+function huntStageAwaitsHere(get: () => GameStore, intent: Intent): boolean {
+  const player = get().player;
+  if (!player) return false;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const QS = require('../engine/questStage') as typeof import('../engine/questStage');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
+  return (player.activeHunts ?? []).some((rec) => {
+    if (rec.tracked === false) return false;
+    const def = findHuntById(rec.id);
+    const stage = def?.stages[rec.stage];
+    if (!def || !stage || stage.checkKind !== intent) return false;
+    return QS.stageLocationId(stage, CM.huntAnchorId(def), CM.resolvePosterLocation) === player.currentLocationId;
+  });
+}
+
 function advanceStagesOnIntent(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -657,6 +728,27 @@ function advanceStagesOnIntent(
       // asks for a thing now REFUSES until you hold it, and the refusal names the thing —
       // silence here is what made the prose read as broken.
       if (!QS.stageRequirementMet(stageDefNow, player.inventory)) {
+        // ⚠⚠ P19 — HEAL BEFORE YOU REFUSE. A record can legitimately be standing on a
+        // stage whose prerequisite was never handed over: a save accepted before this OTA,
+        // or the faction accept door, which writes the record directly. Refusing those
+        // forever would turn a fixed hunt into a bricked one — the softlock is worse than
+        // the bug it replaces. So: award anything an EARLIER stage of this hunt promised
+        // and the pack has never held, then re-check. Idempotent (guarded on pack count),
+        // so on the happy path it does nothing at all.
+        // ⚠ It re-checks rather than assuming: if the item is still missing after the
+        // catch-up, the refusal below is the honest answer and the player still gets told
+        // exactly what they need.
+        grantStageItems(get, set, huntMatch.def.title, huntMatch.def.stages, 0, huntMatch.rec.stage);
+        if (QS.stageRequirementMet(stageDefNow, get().player?.inventory)) {
+          const flightKeyHealed = `hunt:${huntMatch.rec.id}`;
+          if (!stageAdvancesInFlight.has(flightKeyHealed)) {
+            stageAdvancesInFlight.add(flightKeyHealed);
+            void Promise.resolve().then(() => {
+              try { get().advanceHunt(huntMatch.rec.id); } finally { stageAdvancesInFlight.delete(flightKeyHealed); }
+            });
+          }
+          return;
+        }
         const line = QS.stageRequirementLine(stageDefNow!, huntMatch.def.title);
         const seen = get().gameLog.slice(-30).some((e) => e.text === line);
         if (!seen) get().appendLog('arbiter', line);
@@ -10773,7 +10865,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? { player: { ...s.player, safeExitMovesLeft: Math.max(0, (s.player.safeExitMovesLeft ?? 0) - 1) } }
         : s));
     }
-    const suppressEncounter = enforcePeace || recentlyCleared || !!hubRoom || isNeutralMarket || inBossGrace || inExitGrace;
+    // ⚠⚠ P19 — THE HUNT'S OWN GROUND IS QUIET UNTIL THE BEAST. Owner: *"there should be
+    // no attacks on the stage roles unless it's the actual hunt tile and it's the
+    // beast."* Every non-boss stage verb is gated on `!inCombat` (OTA-1217, and correct
+    // — you cannot study a room while it is trying to kill you), so a wandering spawn on
+    // a danger-4 stage tile does not just add a fight, it BLOCKS the stage: the player
+    // arrives, is jumped, wins, and the arrival roll can hand them another one. On deep
+    // ground that is a stage you cannot reach.
+    // ⚠ Narrow on purpose — only the tile the tracked hunt owes RIGHT NOW, and only when
+    // that stage is not the boss. The apex still bites, the rest of the map is untouched,
+    // and a hunt you have paused (`tracked: false`) buys no peace anywhere.
+    const onQuietHuntGround = (() => {
+      if (!player) return false;
+      const here = player.currentLocationId;
+      if (!here || here !== location.id) return false;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const QS = require('../engine/questStage') as typeof import('../engine/questStage');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
+      return (player.activeHunts ?? []).some((rec) => {
+        if (rec.tracked === false) return false;
+        const def = findHuntById(rec.id);
+        const stage = def?.stages[rec.stage];
+        if (!def || !stage) return false;
+        if (stage.checkKind === 'boss') return false; // the apex is the fight
+        return QS.stageLocationId(stage, CM.huntAnchorId(def), CM.resolvePosterLocation) === here;
+      });
+    })();
+    const suppressEncounter = enforcePeace || recentlyCleared || !!hubRoom || isNeutralMarket || inBossGrace || inExitGrace || onQuietHuntGround;
     // Phase 4 §4.3 — biome-curated encounter pools. If the Micro-Micro
     // has a possibleEncounters list, pick rarity-weighted from THAT pool
     // (so the Buried Skyscraper Upper only spawns Aetherbats, Reclaimer
@@ -13916,7 +14035,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // talkable with no wiring" was true of the store action and false of every
     // route into it. Named vendors survived only because their raw id happens
     // to equal their ledger id.
-    if (parsed.intent === 'diplomacy' && currentScene.enemies.length === 0 && currentScene.vendor) {
+    // ⚠ P19 — the hunt stage outranks the stall. See huntStageAwaitsHere.
+    if (parsed.intent === 'diplomacy' && currentScene.enemies.length === 0 && currentScene.vendor
+        && !huntStageAwaitsHere(get, 'diplomacy')) {
       if (hasTopicsFor(vendorNpcId(currentScene.vendor))) {
         get().talkToNpc(parsed.resolvedNoun ?? parsed.target ?? '');
         if (get().pendingTalk) return;
@@ -13928,6 +14049,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // happened to be on the same tile, because this branch only ever checked
     // that a wanderer EXISTED and never that you meant them.
     if (parsed.intent === 'diplomacy' && currentScene.enemies.length === 0 && currentScene.wanderer
+        && !huntStageAwaitsHere(get, 'diplomacy') // ⚠ P19 — the stage outranks a passer-by too.
         && !namesSomeoneElse(get, parsed.resolvedNoun ?? parsed.target ?? '', vendorNpcId(currentScene.wanderer))) {
       const w = currentScene.wanderer;
       const temperament = w.temperament;
@@ -27215,6 +27337,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ],
           },
         } : s));
+        // ⚠⚠ P19 — the opening beat HANDS YOU SOMETHING, and accept skips past it.
+        // `firstActionableHuntStage` starts the record after every leading null stage, so
+        // the inciting_hook's `grants` was never awarded by anything and the next stage
+        // refused forever. Award the skipped prefix here, once, guarded on the pack.
+        grantStageItems(get, set, neutralMatch.title, neutralMatch.stages, 0, firstActionableHuntStage(neutralMatch));
         const neutralCompact = acceptIsCompact(); // OTA-1048 — before the bump.
         bumpQuestsAccepted(get, set);
         if (neutralCompact) {
@@ -27305,6 +27432,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
+    // ⚠⚠ P19 — same skipped-prefix grant as the neutral accept door above. The faction
+    // door had the identical hole; two doors, one silence.
+    grantStageItems(get, set, hunt.title, hunt.stages, 0, firstActionableHuntStage(hunt));
     // OTA-1048 — read the burst index BEFORE the bump, so this accept is
     // judged on its own position in the burst rather than the next one's.
     const huntCompact = acceptIsCompact();
@@ -27418,23 +27548,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const QS = require('../engine/questStage') as typeof import('../engine/questStage');
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
-      if (stageDef.grants) {
-        const g = stageDef.grants;
-        const qty = g.quantity ?? 1;
-        const live = get().player;
-        // ⚠ Granted ONCE. A boss stage freezes for the kill and re-runs this path, and a
-        // quest item that duplicates on every visit is a currency press — the same class
-        // as the tile-gear dupe.
-        if (live && QS.countInPack(live.inventory, g.item) < qty) {
-          const res = grantItem(live.inventory, {
-            id: freshInstanceId(g.item.toLowerCase().replace(/[^a-z0-9]+/g, '_')),
-            name: g.item, kind: 'misc', quantity: qty, tags: ['quest', 'mission'],
-            description: `Carried for ${hunt.title}.`,
-          });
-          set((st) => (st.player ? { player: { ...st.player, inventory: res.inventory } } : st));
-          get().appendLog('reward', `✦ ${qty > 1 ? `${qty}× ` : ''}${g.item} — mission item.`);
-        }
-      }
+      grantStageItems(get, set, hunt.title, hunt.stages, record.stage, record.stage + 1);
       // ⚠ AND IT SAYS WHERE THE NEXT ONE IS. *"each stage has to direct you to the next
       // stage. otherwise you have no idea where you're going."* Speaks only when there is
       // something to say — new ground, a person to find, or a thing to bring.
@@ -27442,8 +27556,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (nextDef) {
         const hereId = QS.stageLocationId(stageDef, CM.huntAnchorId(hunt), CM.resolvePosterLocation);
         const nextId = QS.stageLocationId(nextDef, CM.huntAnchorId(hunt), CM.resolvePosterLocation);
-        const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, nextId !== hereId);
+        const movedGround = nextId !== hereId;
+        const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, movedGround);
         if (dir) get().appendLog('system', dir);
+        // ⚠⚠ P19 — AND IT ACTUALLY SETS THE COURSE. Owner: *"it didn't auto route me to
+        // the next stage."* He was not exaggerating — `advanceMissionRoute` reads
+        // `activeFactionQuests` and NOTHING ELSE, so hunts have never had a route chain
+        // of any kind. A stage that moves the player now points the road at the new
+        // ground the moment the old stage closes, exactly as the faction-quest chain
+        // does on a leg transition.
+        // ⚠ Only when the ground actually MOVED and the player isn't already walking
+        // there — re-issuing a course you're already on resets the tile countdown, and
+        // hijacking a course the player set for themselves is the "yank them back"
+        // failure the chain guard exists to prevent.
+        const liveNow = get().player;
+        if (movedGround && liveNow && liveNow.currentLocationId !== nextId
+            && liveNow.travelTarget?.locationId !== nextId) {
+          _chainRouting = true;
+          try { get().setTravelCourse(nextId); } finally { _chainRouting = false; }
+          // ⚠⚠ ONLY CLAIM IT IF IT HAPPENED. `setTravelCourse` has six refusals of its own
+          // (unplaceable destination, already standing on the target's cell, no scene…) and
+          // every one of them returns without setting a course. Announcing the auto-route
+          // unconditionally is the "lit button that doesn't fire" failure in log form — the
+          // player reads "Auto-routing to X" and no road appears. Check the state, then speak.
+          if (get().player?.travelTarget?.locationId === nextId) {
+            get().appendLog('world', `Auto-routing to the next stage of ${hunt.title}: ${safeLocName(nextId)}.`);
+          }
+        }
       }
     }
     // Boss stage spawns the scaled enemy. OTA-796 — the FINAL boss stage FREEZES
@@ -27707,6 +27846,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ],
           },
         } : s));
+        // ⚠⚠ P19 — the opening beat HANDS YOU SOMETHING, and accept skips past it.
+        // `firstActionableHuntStage` starts the record after every leading null stage, so
+        // the inciting_hook's `grants` was never awarded by anything and the next stage
+        // refused forever. Award the skipped prefix here, once, guarded on the pack.
+        grantStageItems(get, set, neutralMatch.title, neutralMatch.stages, 0, firstActionableHuntStage(neutralMatch));
         const neutralCompact = acceptIsCompact(); // OTA-1048 — before the bump.
         bumpQuestsAccepted(get, set);
         if (neutralCompact) {

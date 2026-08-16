@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.222';
+export const DISPLAY_VERSION = '4.29.223';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23945,7 +23945,40 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // proof (Wren's Cut Line → sister → Wren's Body → Logbook), nothing invented.
 // New suite ota1328 (10), including a generalised guard that no hunt stage may require an
 // item no earlier stage granted. DISPLAY_VERSION 4.29.222.
-export const OTA_BUILD_ID = '2026-08-16-1328-stages-mean-what-they-say';
+// ⚠⚠ OTA-1329 — EVERY HUNT, EVERY STAGE, MADE DOABLE. Owner, after OTA-1328 shipped the
+// layer: *"so let's make every stage of every hunt doable... let's do a complete revamp of
+// all of the hunts right now, including text clues, directions, auto-route to every
+// location and every location has no combat unless it is part of the hunt... we already had
+// a walker go through all of these and you reported back to me that all of these were
+// finishable they're not."*
+//
+// ⚠⚠ HE WAS RIGHT ABOUT THE WALKER, AND THE REASON MATTERS. ota1219 seeded the player at
+// `huntAnchorId(def)` ONCE, gave them 500 HP and 20 STR, and typed the right verb at each
+// stage without ever moving, reading, or holding anything. It proved the verb machinery
+// worked and NOTHING about whether a player could find the stage or carry what it asked
+// for. "18 hunts finishable" was true of the harness and false of the game.
+//
+// THREE ENGINE HOLES no content could close:
+//   (1) Hunts had NO auto-route chain AT ALL — `advanceMissionRoute` reads
+//       `activeFactionQuests` and nothing else. A stage that moves you now sets the course
+//       itself, and only claims to when `travelTarget` actually landed.
+//   (2) The atlas pin and ROUTE TO called `huntAnchorId(def)` with no stage, so a chase
+//       across the map routed you back to stage one's tile forever. New `huntStageAnchorId`.
+//   (3) Ambient spawns on a non-boss stage tile BLOCK the stage (exploration verbs are
+//       `!inCombat`-gated), so a deep-ground stage could be unreachable. The tile a tracked
+//       hunt owes right now is quiet; the apex still bites.
+// Plus two found BY the honest walker: a null `inciting_hook`'s grant was never awarded
+// (accept skips leading nulls, so the opening token never arrived and stage 1 refused
+// forever — healed for old saves too), and a roadside trader on a `diplomacy` stage tile
+// ATE the verb, because the vendor branch returns before the stage matcher ever runs.
+//
+// CONTENT: all 18 hunts, all 116 stages, rewritten to one grammar the engine can enact —
+// go to a named place · one verb the button bar has · a named person · walk out holding
+// something · carry it to the next place. 116/116 now name their own ground (was 5).
+// New `npm run check:huntstages` is a hard ratchet: a stage with no location, or a
+// `requires` no earlier stage grants, fails the build. DISPLAY_VERSION 4.29.223.
+export const OTA_BUILD_ID = '2026-08-16-1329-every-hunt-doable';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1328-stages-mean-what-they-say';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1327-wave-two-board-points-at-the-map';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1326-wave-one-sentinel-ward-and-dogs';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1325-guardian-by-button-torch-by-craft';

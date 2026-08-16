@@ -127,6 +127,30 @@ export function huntAnchorId(def: {
   );
 }
 
+/** ⚠⚠ P19 — WHERE THE HUNT IS RIGHT NOW, not where it was posted. `huntAnchorId` reads
+ *  the contract DEF, so the atlas pin and the ROUTE TO button pointed at the poster's
+ *  ground for the whole hunt — a seven-stage chase that crosses the map still routed you
+ *  back to stage one's tile every single time. Owner: *"there's no way to auto route to
+ *  anything or at least even guess where it's supposed to be."*
+ *
+ *  ⚠ The contract anchor stays the fallback, so a hunt whose stages name no ground of
+ *  their own points exactly where it always did. */
+export function huntStageAnchorId(
+  def: {
+    biomeTag?: string;
+    factionId?: string | null;
+    targetLocationName?: string | null;
+    stages?: ReadonlyArray<{ locationName?: string }>;
+  },
+  stageIndex: number,
+): string {
+  const stage = def.stages?.[stageIndex];
+  return (
+    (stage?.locationName ? resolvePosterLocation(stage.locationName) : undefined) ??
+    huntAnchorId(def)
+  );
+}
+
 function anchorForFaction(factionId: string | null | undefined): string {
   if (!factionId) return NEUTRAL_ANCHOR;
   try {
@@ -152,7 +176,8 @@ export function openContractMarkers(player: PlayerCharacter | null | undefined):
   for (const h of player.activeHunts ?? []) {
     const def = findHuntById(h.id);
     if (!def) continue;
-    add('hunt', h.id, def.title, huntAnchorId(def));
+    // ⚠ P19 — the pin walks WITH the hunt. `h.stage` is the stage the player owes next.
+    add('hunt', h.id, def.title, huntStageAnchorId(def, h.stage));
   }
   for (const m of player.activeMysteries ?? []) {
     const def = findMysteryById(m.id);
