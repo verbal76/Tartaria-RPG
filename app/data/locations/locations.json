@@ -1358,7 +1358,10 @@
       "chamber",
       "the chamber",
       "aetheric core",
-      "power chamber"
+      "power chamber",
+      "sentinel ward",
+      "the sentinel ward",
+      "inner archive"
     ],
     "interactables": [
       "chamber",
@@ -1408,7 +1411,8 @@
       "outskirts",
       "borderlands",
       "mud",
-      "open"
+      "open",
+      "outpost"
     ],
     "discoverable": true,
     "aliases": [

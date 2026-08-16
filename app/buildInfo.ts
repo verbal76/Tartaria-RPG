@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.173';
+export const DISPLAY_VERSION = '4.29.174';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23905,7 +23905,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // comment outlived the thing it rationed. A narrow `rareFind` escape restores it at
 // ~3% end-to-end. Aether Crystal (a recipe ingredient) comes out ~7× more often.
 // New suite ota1325 (11). DISPLAY_VERSION 4.29.173.
-export const OTA_BUILD_ID = '2026-08-16-1324-guardian-by-button-torch-by-craft';
+// ⚠⚠ OTA-1325 — LOCATION ROADMAP, WAVE ONE (L1 + L2/L3). Data-only, no save risk.
+//
+// L1 — THE SENTINEL WARD IS A REAL PLACE. `hunt_iron_titan`'s poster names "the
+// Sentinel Ward (inner archive)", which was not a location, making it the ONE hunt
+// of eighteen whose poster could not resolve — it fell to the biome anchor and
+// pinned on obsidian_pillars. Meanwhile `etheric_chamber` (vault/core/guarded,
+// danger 5) was the only genuinely DEAD location in the game: nothing pointed at it
+// at all. One alias joins them, and now every hunt in the table anchors on the place
+// its own poster names. The fallback code stays for any future flavour-only poster.
+//
+// L2/L3 — DOG EVENTS ONLY AT OUTPOSTS. Owner: *"leave dog events at outposts."* All
+// four rescue scenarios matched on world-shape tags (ruin, buried, lost_capital,
+// wasteland, open), which put a chained shepherd inside six Lost Capitals, the
+// Endless Stair, the Sinking Cathedral and Iskan-Veil; `cellar` alone was eligible at
+// 13 locations, only 3 of them outposts. ⚠ `outpost` is the ONE outpost-exclusive tag
+// — all 30 tags carried by hub locations were checked, and every other one leaks. The
+// starter region gained the tag so a first dog stays reachable. New suite ota1326 (9).
+// DISPLAY_VERSION 4.29.174.
+export const OTA_BUILD_ID = '2026-08-16-1325-wave-one-sentinel-ward-and-dogs';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1324-guardian-by-button-torch-by-craft';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1323-crucible-chip-obeys-its-gate';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1322-routed-tower-explains-itself';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1321-current-with-golem';
