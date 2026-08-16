@@ -43,7 +43,7 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { findHuntById } from '../app/engine/hunts';
-import { huntAnchorId } from '../app/engine/contractMarkers';
+import { huntStageAnchorId } from '../app/engine/contractMarkers';
 
 jest.setTimeout(180000);
 
@@ -57,7 +57,7 @@ async function settle(pred: () => boolean, deadlineMs = 5000) {
 describe('OTA-1240 — Bog Dragon back half, in order, each stage on its own verb', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
-  it('⚠⚠ stage 5 (attack) → stage 6 (cast) → stage 7 (apex spawn, freeze, kill, complete)', async () => {
+  it('⚠⚠ the two stages before the apex, each on its own ground and its own verb → apex spawn, freeze, kill, complete', async () => {
     const store = useGameStore;
     await store.getState().hydrate();
     await store.getState().startNewGame({ name: 'Verbal', raceId: getRaces()[0]!.id, factionId: getFactions()[0]!.id });
@@ -92,59 +92,79 @@ describe('OTA-1240 — Bog Dragon back half, in order, each stage on its own ver
       }
     };
 
-    // His device state: at the anchor, rec.stage 4 ("Stage 5/7 — attack to
-    // provoke"), tracked. Strong stats so the apex fight resolves decisively.
+    // ⚠⚠ DERIVED, NOT HARD-CODED. This suite used to name the back half's verbs and its
+    // one anchor in prose — stage 5 attack, stage 6 cast, all on the biome cell. P19 gave
+    // every stage its own ground and the content pass re-cut the verbs, and a test that
+    // spells out a MECHANISM instead of the RULE goes red on a content edit while proving
+    // nothing about the rule. The rule is: each stage advances on ITS OWN verb, on ITS OWN
+    // ground, wrong verbs pay nothing, and the apex spawns frozen. All four read off the def.
+    const VERB: Record<string, string> = {
+      investigate: 'investigate the area', stealth: 'sneak', diplomacy: 'negotiate',
+      cast: 'cast stone shaping', attack_provoke: 'attack', boss: 'attack',
+    };
+    const WRONG: Record<string, string> = {
+      investigate: 'negotiate', stealth: 'negotiate', diplomacy: 'investigate the area',
+      cast: 'negotiate', attack_provoke: 'investigate the area', boss: 'negotiate',
+    };
+    let apexIdx0 = -1;
+    for (let i = 0; i < def.stages.length; i++) if (def.stages[i]!.checkKind === 'boss') apexIdx0 = i;
+    const backHalfStart = apexIdx0 - 2; // the owner's position: two stages out from the apex
+
     const p = store.getState().player!;
     useGameStore.setState({
       player: {
         ...p,
-        currentLocationId: huntAnchorId(def),
+        currentLocationId: huntStageAnchorId(def, backHalfStart),
+        gridX: undefined, gridY: undefined, mapX: undefined, mapY: undefined,
         hubRoomId: null,
         hp: 500, hpMax: 500, stamina: 50, staminaMax: 50,
         stats: { ...p.stats, strength: 20, dexterity: 20 },
-        activeHunts: [{ id: 'hunt_bog_dragon', stage: 4, tracked: true, postedByFaction: null, acceptedAt: 0 }],
+        activeHunts: [{ id: 'hunt_bog_dragon', stage: backHalfStart, tracked: true, postedByFaction: null, acceptedAt: 0 }],
       },
     });
     const scene = store.getState().currentScene!;
     useGameStore.setState({ currentScene: { ...scene, enemies: [], enemyHps: [], hooks: [], range: null } });
+    expect(store.getState().player!.currentLocationId).toBe(huntStageAnchorId(def, backHalfStart));
 
-    // Re-assert the seeded ground truth held (the quiesce should guarantee it).
-    expect(store.getState().player!.currentLocationId).toBe(huntAnchorId(def));
+    // Walk the two prep stages before the apex, each on its own ground and its own verb.
+    for (let sIdx = backHalfStart; sIdx < apexIdx0; sIdx++) {
+      const kind = def.stages[sIdx]!.checkKind!;
+      const here = huntStageAnchorId(def, sIdx);
+      useGameStore.setState({
+        player: {
+          ...store.getState().player!, currentLocationId: here, travelTarget: undefined, hubRoomId: null,
+          gridX: undefined, gridY: undefined, mapX: undefined, mapY: undefined,
+        },
+        currentScene: { ...store.getState().currentScene!, enemies: [], enemyHps: [], hooks: [], range: null },
+      });
 
-    // ⚠ ORDER, negative half: the WRONG verb pays nothing at stage 5.
-    await store.getState().submitPlayerAction('investigate the area');
-    await new Promise((r) => setTimeout(r, 300));
-    drainRolls();
-    expect(stage()).toBe(4);
+      // ⚠ ORDER, negative half: the WRONG verb pays nothing.
+      await store.getState().submitPlayerAction(WRONG[kind]!);
+      await new Promise((r) => setTimeout(r, 300));
+      drainRolls();
+      expect({ stage: sIdx, afterWrongVerb: stage() }).toEqual({ stage: sIdx, afterWrongVerb: sIdx });
 
-    // Stage 5 — "attack to provoke": an ATTACK is what advances it.
-    await store.getState().submitPlayerAction('attack');
-    await settle(() => stage() === 5);
-    drainRolls();
-    expect(stage()).toBe(5);
+      // The right verb advances it. (Clear first — the exploration rows hold in combat.)
+      useGameStore.setState({
+        currentScene: { ...store.getState().currentScene!, enemies: [], enemyHps: [], hooks: [], range: null },
+      });
+      await store.getState().submitPlayerAction(VERB[kind]!);
+      await settle(() => stage() > sIdx);
+      drainRolls();
+      await new Promise((r) => setTimeout(r, 150));
+      drainRolls();
+      expect({ stage: sIdx, kind, advanced: stage() > sIdx }).toEqual({ stage: sIdx, kind, advanced: true });
+    }
+    expect(stage()).toBe(apexIdx0);
 
-    // ⚠ ORDER again: a second attack cannot pay for the CAST stage.
-    // (Clear any provoked enemies first — the cast row holds in combat.)
+    // Stand on the apex's ground for the kill.
     useGameStore.setState({
-      currentScene: { ...store.getState().currentScene!, enemies: [], enemyHps: [], hooks: [], range: null },
+      player: {
+        ...store.getState().player!, currentLocationId: huntStageAnchorId(def, apexIdx0),
+        travelTarget: undefined, hubRoomId: null,
+        gridX: undefined, gridY: undefined, mapX: undefined, mapY: undefined,
+      },
     });
-    await store.getState().submitPlayerAction('attack');
-    await new Promise((r) => setTimeout(r, 300));
-    drainRolls();
-    expect(stage()).toBe(5);
-
-    // Stage 6 — "use Aethercraft": the CAST binds the name. The cast opens the
-    // dice modal — this is the step that proved the drain necessary (the run
-    // before it, the modal stayed open and the apex attack was swallowed).
-    useGameStore.setState({
-      currentScene: { ...store.getState().currentScene!, enemies: [], enemyHps: [], hooks: [], range: null },
-    });
-    await store.getState().submitPlayerAction('cast stone shaping');
-    await settle(() => stage() === 6);
-    drainRolls();
-    await new Promise((r) => setTimeout(r, 200));
-    drainRolls();
-    expect(stage()).toBe(6);
 
     // Stage 7 — the apex: the ATTACK advance SPAWNS the scaled dragon and the
     // stage FREEZES (OTA-796 — the bounty needs the body, not the spawn).
@@ -161,7 +181,7 @@ describe('OTA-1240 — Bog Dragon back half, in order, each stage on its own ver
     const apexIdx = store.getState().currentScene!.enemies.findIndex((e) => /bog dragon/i.test(e.name));
     expect(apexIdx).toBeGreaterThan(-1);
     const apex = store.getState().currentScene!.enemies[apexIdx]!;
-    expect(stage()).toBe(6); // frozen — spawning is not completing
+    expect(stage()).toBe(apexIdx0); // frozen — spawning is not completing
 
     // The kill: wound the apex to a sliver, then swing through the real dice
     // modal (the ota976 step-through) until it falls.

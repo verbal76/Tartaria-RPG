@@ -69,7 +69,7 @@ import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { HUNTS, firstActionableHuntStage } from '../app/engine/hunts';
 import type { HuntDef } from '../app/engine/hunts';
-import { huntAnchorId } from '../app/engine/contractMarkers';
+import { huntAnchorId, huntStageAnchorId } from '../app/engine/contractMarkers';
 
 jest.setTimeout(600000);
 
@@ -146,7 +146,12 @@ describe('OTA-1242 — the hunt walker: every hunt in the catalog completes, in 
     useGameStore.setState({
       player: {
         ...p,
-        currentLocationId: huntAnchorId(def),
+        currentLocationId: huntStageAnchorId(def, start),
+        // ⚠ Trap #6 — the boot leaves gridX/gridY on the STARTING outpost. Seeding
+        // currentLocationId alone leaves the player's grid cell somewhere else, and
+        // setTravelCourse's same-cell guard then refuses every route as "you're
+        // already on it". Clear the stamp whenever the walker relocates.
+        gridX: undefined, gridY: undefined, mapX: undefined, mapY: undefined,
         hubRoomId: null,
         hp: 500, hpMax: 500, stamina: 50, staminaMax: 50,
         stats: { ...p.stats, strength: 20, dexterity: 20 },
@@ -197,6 +202,36 @@ describe('OTA-1242 — the hunt walker: every hunt in the catalog completes, in 
       if (kind === null) throw new Error(`${def.id}: walker landed ON a null stage (${s}) — the auto-consume failed`);
       const verb = VERB_FOR[kind];
       if (!verb) throw new Error(`${def.id}: stage ${s} has unhandled checkKind '${kind}' — extend VERB_FOR + the matcher`);
+
+      // ⚠⚠ P19 — THE WALKER NO LONGER TELEPORTS PAST THE PROBLEM. The old version seeded
+      // `huntAnchorId(def)` ONCE and stood there for the whole hunt, so it proved the verb
+      // machinery worked and nothing at all about whether a player could FIND the stage.
+      // That is exactly why it reported 18 finishable hunts the owner could not finish.
+      // Now: every stage must stand on its OWN ground, and the walker only moves to ground
+      // the GAME pointed it at — either by auto-routing there when the last stage closed, or
+      // because the stage sits where the player already is.
+      const want = huntStageAnchorId(def, s);
+      const at = store.getState().player!.currentLocationId;
+      if (at !== want) {
+        const course = store.getState().player!.travelTarget?.locationId;
+        expect({ hunt: def.id, stage: s, routedTo: course, needs: want })
+          .toEqual({ hunt: def.id, stage: s, routedTo: want, needs: want });
+        // Arrival — the course was proven above, so completing it is not a cheat.
+        useGameStore.setState({
+          player: {
+            ...store.getState().player!, currentLocationId: want, travelTarget: undefined, hubRoomId: null,
+            gridX: undefined, gridY: undefined, mapX: undefined, mapY: undefined,
+          },
+        });
+      }
+      // ⚠ AND THE PACK MUST HOLD WHAT THE STAGE ASKS FOR. A `requires` no earlier stage
+      // ever handed over is the owner's "who's sister? what book?" in test form — it
+      // refuses forever and no amount of typing the right verb helps. Asserted AFTER the
+      // action rather than before, because a record can arrive on a stage without its
+      // prerequisite (an old save, or the faction accept door) and the engine heals that
+      // on the attempt. Either way the pack must hold the item by the time the stage
+      // closes — the gate does not open otherwise.
+      const need = def.stages[s]!.requires;
       clearScene();
       await store.getState().submitPlayerAction(verb);
       drainRolls();
@@ -229,8 +264,27 @@ describe('OTA-1242 — the hunt walker: every hunt in the catalog completes, in 
       } else {
         await settle(() => stage() > s);
         drainRolls();
+        // ⚠ Trap #7 — THE PHOTOBOMB LANDS MID-SETTLE. The exploration verbs are gated on
+        // !inCombat (OTA-1217, and correct), and the auto-route's first step can drop a
+        // wandering spawn into the scene AFTER clearScene() and BEFORE the verb resolves.
+        // A player just wins the fight and acts again; the walker clears and retries once.
+        // Two failures in a row is a real stall, not weather.
+        if (stage() <= s) {
+          clearScene();
+          await store.getState().submitPlayerAction(verb);
+          drainRolls();
+          await settle(() => stage() > s);
+          drainRolls();
+        }
         expect({ hunt: def.id, at: s, kind, advanced: stage() > s })
           .toEqual({ hunt: def.id, at: s, kind, advanced: true });
+        if (need) {
+          const held = (store.getState().player!.inventory ?? [])
+            .filter((i) => i.name === need.item)
+            .reduce((n, i) => n + (i.quantity ?? 1), 0);
+          expect({ hunt: def.id, stage: s, item: need.item, held: held >= (need.quantity ?? 1) })
+            .toEqual({ hunt: def.id, stage: s, item: need.item, held: true });
+        }
       }
     }
 

@@ -1676,8 +1676,55 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ EVERY HUNT MADE DOABLE — AND THE WALKER THAT HAD BEEN LYING TO ME
+  (2026-08-16, latest). HAL OTA-1327.**
+  Owner, on the hunts: *"let's make every stage of every hunt doable... a complete revamp
+  of all of the hunts right now, including text clues, directions, auto-route to every
+  location and every location has no combat unless it is part of the hunt... we already
+  had a walker go through all of these and you reported back to me that all of these were
+  finishable they're not."*
+  - ⚠⚠⚠ **READ THIS BEFORE TRUSTING ANY WALKER IN THIS REPO.** The hunt walker seeded the
+    player at `huntAnchorId(def)` **once**, handed them 500 HP and 20 STR, and typed the
+    right verb at each stage — **never moving, never reading, never holding anything.** It
+    proved the verb machinery worked and nothing at all about whether a player could FIND
+    a stage or CARRY what it asked for. "18 hunts finishable" was true of the harness and
+    false of the game, and it was reported as a fact about the game. A harness that seeds
+    the answer tests the seeding. The walker now (a) stands on each stage's OWN ground,
+    (b) may only move to ground the GAME routed it to — it asserts `travelTarget` before
+    it relocates — and (c) must hold every `requires` by the time the stage closes.
+  - **Three engine holes no content edit could close.** (1) ⚠⚠ Hunts had **no auto-route
+    chain at all**: `advanceMissionRoute` reads `activeFactionQuests` and nothing else, so
+    *"it didn't auto route me to the next stage"* was literal — there was no chain. (2) The
+    atlas pin and ROUTE TO called `huntAnchorId(def)` with no stage, so a seven-stage chase
+    routed back to stage one's tile forever; `huntStageAnchorId` walks the pin with the
+    hunt. (3) An ambient spawn on a non-boss stage tile **blocks** the stage — every
+    exploration verb is `!inCombat`-gated — so the tile a tracked hunt owes right now is
+    quiet, and only that tile, and only while it is not the apex.
+  - ⚠ **And a new bug caught the same hour:** the auto-route logged *"Auto-routing to X"*
+    unconditionally, past `setTravelCourse`'s six silent refusals — the lit-button failure
+    (OTA-1024 on golem) in log form. It checks the state before it speaks now.
+  - **Two more the honest walker found, both silent-forever:** a null `inciting_hook`'s
+    `grants` was **never awarded by anything** — accept skips leading null stages, so the
+    opening token never arrived and the next stage refused for the life of the save (now
+    granted at accept, and healed on the attempt for records already in flight, covering
+    every save taken before this OTA); and a **roadside trader standing on a `diplomacy`
+    stage tile ate the verb**, because the vendor branch returns early, long before the
+    stage matcher runs. Right place, right word, *"you let the conversation go"* forever.
+  - **The content.** All 18 hunts, all 116 stages, rewritten to ONE grammar the engine can
+    enact: go to a named place · one verb the button bar has · a named person · walk out
+    holding something · carry it to the next place. **116 of 116 stages name their own
+    ground (was 5).** `npm run check:huntstages` is a hard ratchet — a placeless stage, or
+    one demanding an item no earlier stage grants, fails the build.
+  - ⚠ **Four suites pinned the one-anchor-per-hunt MECHANISM and went red on a content
+    edit.** Each was rewritten to assert the RULE: the Bog Dragon back-half suite now
+    derives its verbs and grounds from the def instead of spelling them out, and the
+    accept-burst suite's magic line-count is split so a mission-item receipt is not
+    mistaken for the Arbiter repeating himself.
+  - ⚠ **STILL OPEN:** mysteries and storylines carry the `StageBinding` type but not the
+    wiring, and none of their stages are bound. Same hole, one family over.
+
 - **⚠⚠⚠ THE LOCATION AUDIT, THE TWO WAVES, AND THE STAGE LAYER
-  (2026-08-16, latest). HAL OTA-1320→1326.**
+  (2026-08-16). HAL OTA-1320→1326.**
   Ported from golem OTA-1322→1328, which the owner's location audit produced in
   one run: *"do a full audit of all the missions. whispers hooks anything that
   can be triggered the guardian runs the whole nine yards. I want to find out the

@@ -40,7 +40,7 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { findHuntById } from '../app/engine/hunts';
-import { huntAnchorId } from '../app/engine/contractMarkers';
+import { huntStageAnchorId } from '../app/engine/contractMarkers';
 
 jest.setTimeout(120000);
 
@@ -65,7 +65,10 @@ describe("OTA-1238 — the owner's three-chip burst advances exactly ONE stage",
     useGameStore.setState({
       player: {
         ...p,
-        currentLocationId: huntAnchorId(def),
+        // ⚠ P19 — the stage's OWN ground, not the contract's. Every hunt stage now names
+        // a place; seeding the poster anchor lands the walker on the wrong tile.
+        currentLocationId: huntStageAnchorId(def, 1),
+        gridX: undefined, gridY: undefined, mapX: undefined, mapY: undefined,
         hubRoomId: null,
         activeHunts: [{ id: 'hunt_bog_dragon', stage: 1, tracked: true, postedByFaction: null, acceptedAt: 0 }],
       },
