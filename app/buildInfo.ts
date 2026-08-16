@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.212';
+export const DISPLAY_VERSION = '4.29.213';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23781,7 +23781,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // of the Fallen (an uncapped seed register, so an old death cannot be waited
 // out and deleting the corpse does not help). New suites ota1311 (10) + ota1312 (7).
 // 828 suites / 7743 tests. DISPLAY_VERSION 4.29.212.
-export const OTA_BUILD_ID = '2026-08-15-1312-amber-salvage-and-restore-gate';
+// ⚠⚠ OTA-1317 — THE AMBER LANDED ON A DEAD FILE. OTA-1312 recoloured
+// SalvageModal.tsx, which has had zero importers since OTA-1233 merged the two
+// modals into one picker (GatherModal) — so it changed a component the game does
+// not render. The live picker's four lane hues collapse to one amber (the rows
+// are already grouped and the buttons name their lanes in words), and rarity now
+// rides a 4pt LEFT EDGE, only on rows that resolve to a real catalog item.
+// IGNORE stays red — it is the one control that walks away from loot.
+// New suite ota1317 (6). 829 suites / 7749 tests. DISPLAY_VERSION 4.29.213.
+export const OTA_BUILD_ID = '2026-08-16-1317-amber-on-the-live-picker';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1312-amber-salvage-and-restore-gate';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1307-sell-all-actually-sells';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1304-towers-route-like-missions';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1301-world-stops-contradicting-itself';

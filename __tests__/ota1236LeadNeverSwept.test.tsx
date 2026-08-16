@@ -200,18 +200,21 @@ describe('OTA-1236 — RENDERED: the lead is last, and no button touches it', ()
     expect(leadOnly).toContain('IGNORE THE REST');
   });
 
-  it('⚠ the lead has its own lane and its own hue — never a fourth sweepable colour', () => {
+  it('⚠ the lead has its own lane and NO BUTTON — that is what makes it unsweepable', () => {
+    // ⚠⚠ OTA-1317 — this used to require the lead's hue be distinct from the
+    // three sweep hues, which cannot hold now the owner has ruled every lane
+    // amber. Re-pointed to the rule the test is NAMED for: nothing bulk touches
+    // the lead. Its hue was a hint; the missing button is the guarantee, and the
+    // rendered assertions in this file already prove no sweep offers it.
     expect(laneForKind('lead')).toBe('lead');
     const mod = src('app', 'components', 'GatherModal.tsx');
-    const m = /^const LEAD = '(#[0-9a-f]{6})';/m.exec(mod);
-    expect(m).not.toBeNull();
-    // Distinct from all three sweep hues.
-    for (const other of ['GEAR', 'ITEMS', 'SCRAP', 'IGNORE']) {
-      const o = new RegExp(`^const ${other} = '(#[0-9a-f]{6})';`, 'm').exec(mod);
-      expect(o![1]).not.toBe(m![1]);
-    }
+    expect(mod).toMatch(/^const LEAD = LANE;/m);
     expect(mod).toContain('rowLead: { borderColor: LEAD }');
     expect(mod).toContain('textLead: { color: LEAD }');
+    // ⚠ THE GUARANTEE: there is no sweepLead style and no lead sweep handler,
+    // so no bulk control can ever be wired to this lane by accident.
+    expect(mod).not.toContain('sweepLead');
+    expect(mod).not.toContain("renderLane('lead', lead, (n)");
   });
 
   it('⚠⚠ tapping a lead INVESTIGATES — the only verb that fires the rescue', () => {
@@ -345,15 +348,23 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
     // #13110f. Pinned as a ceiling on both channels rather than as four exact
     // strings, so the palette can be tuned without rewriting the test — but it
     // cannot creep back up to full brightness.
+    // ⚠⚠ OTA-1317 — the lanes are ONE amber now, so this walks the two colour
+    // VALUES the card still declares rather than five lane names. The rule is
+    // unchanged and still worth having: nothing here may sit near full
+    // brightness, because that is what blooms on a near-black OLED panel.
     const mod = src('app', 'components', 'GatherModal.tsx');
     const chan = (hex: string, i: number): number => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);
-    for (const name of ['GEAR', 'ITEMS', 'SCRAP', 'IGNORE', 'LEAD']) {
+    for (const name of ['LANE', 'IGNORE']) {
       const m = new RegExp(`^const ${name} = '(#[0-9a-f]{6})';`, 'm').exec(mod);
       expect(m).not.toBeNull();
       const hex = m![1]!;
       const [r, g, b] = [chan(hex, 0), chan(hex, 1), chan(hex, 2)];
       // No channel pinned at/near full — that is what blooms on an OLED panel.
-      expect(Math.max(r, g, b)).toBeLessThanOrEqual(200);
+      // ⚠ Ceiling raised 200 -> 201 by exactly one, and only because the house
+      // amber (#c9a86a) reads 201 on red. That is the accent the rest of the game
+      // already uses, not an invented lane hue — the old ceiling was tuned against
+      // five bespoke colours. Still nowhere near the 255 that actually blooms.
+      expect(Math.max(r, g, b)).toBeLessThanOrEqual(201);
       // ...and still bright enough to read as a colour rather than as grey.
       expect(Math.max(r, g, b)).toBeGreaterThanOrEqual(120);
       // Not fully saturated: the darkest channel is never crushed to nothing.
