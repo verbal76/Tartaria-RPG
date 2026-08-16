@@ -44,6 +44,13 @@ asserting it is NOT imported) and has been **deleted from all three**. Receipt f
 waiting was the wrong default: the OTA-1312 recolour landed on this exact dead file and
 shipped invisible. ⚠ One `git revert` away if the owner wants the two-modal flow back.
 
+## B4b — The vendor Crucible chip lit up and refused — **DONE**
+Owner's 4.29.186 log: four taps on the roadside vendor's Fusing Crucible in seventy
+seconds, four identical *"not for first-timers"* refusals. `useVendorCrucible` gates on
+`macroVisitSeq >= 1` correctly, but only INSIDE the handler — the chip rendered lit and
+took the tap. Now gated at render. Same shape as OTA-1024 (*"a lit button that doesn't
+fire"*), whose comment sits twelve lines below the fix. New suite ota1324 (4).
+
 ## B5 — The bulk sweep holds items out SILENTLY — **DECIDE (owner wording)**
 OTA-1320 excludes a last gate-satisfier from SELL ALL COMMON GEAR, but the confirm never
 says so — a player selling down their pack may notice the mask "refusing to sell" with
@@ -108,7 +115,46 @@ whether one climb walker should permanently make the journey. ⚠ B7's probe fou
 suppression conditions precisely BECAUSE it travelled instead of teleporting; that is the
 argument for doing this.
 
-## B12 — Asgardar's gate eats a `look` — **WATCH (new, found during B7)**
+## B12 — a bare INVESTIGATE summons a Core Guardian — **DECIDE (owner; CONFIRMED ON DEVICE)**
+⚠⚠ **Promoted from WATCH.** Filed after the B7 probe saw it once at Asgardar; the
+owner's 4.29.186 device log then reproduced it at a SECOND capital with a DIFFERENT
+verb and **no target at all**:
+
+    [04:03:44] [player] investigate the ground
+    [04:03:44] parser: intent=investigate … target=ground resolved=-
+    [04:03:44] [combat] Veilkeeper Inarra closes … ★ CORE GUARDIAN
+
+`canRecoverCore` is true in the `revelation`/`cores` phases at any Lost Capital, and
+the faction gate's intent list includes `investigate` — which `look` and
+`investigate the ground` both resolve to. So orienting yourself in a capital
+summons the boss. It is arguably working as designed (the gate verb is deliberately
+broad), but "I typed look and a boss appeared" is not a choice the player made.
+⚠ Options: narrow the gate to a TARGETED investigate (a resolved noun, not `-`), or
+require the Core to be the explicit target. Owner's call — it changes main-quest
+pacing. The ota1323 suite documents it and parks the quest phase to work around it.
+
+## B13 — the `lantern` alias defeats the Aetheric Torch's scarcity — **DECIDE (owner)**
+⚠⚠ Measured from the owner's 4.29.186 log: **five Aetheric Torches taken in about an
+hour**, one from nearly every outpost room entered — and **none of them appears in
+that room's `spawn: gear=[…]` line.** They come from `itemAliases.ts`, which maps
+`'lantern' → 'Aetheric Torch'` (plus `torch`, `broken lantern`, `rusted lantern`,
+`dust lantern`, and six more). `lantern` is ordinary authored furniture in the
+outpost rooms, so the picker resolves it through `findCatalogItem(…, {aliases:true})`
+and hands over a torch.
+
+⚠ **That directly contradicts a deliberate decision.** OTA-752/772 stripped the
+Aetheric Torch out of the generic salvage pools with the reasoning written in
+`salvagePools.ts`: *"the Aetheric Torch is a managed resource now (its use is a
+scarce Rare/Legendary gamble); it no longer falls out of generic rubble."* Vendors
+price it at 35 TC. The alias layer quietly restores the free supply the pools removed.
+
+⚠ **NOT fixed unilaterally — it is a loot-economy call.** Three options: (a) drop the
+generic `lantern`/`torch` aliases so a room lantern stays scenery and salvage;
+(b) keep the alias for the TYPED path only, so "use the lantern" still finds your
+torch but a room lantern is not a free one; (c) accept the supply and retire the
+scarcity language. Default until called: **unchanged**.
+
+## B14 — Asgardar's gate eats a `look` — **folded into B12**
 At `asgardar` the player stands in `outpost_gate`, and `look` resolves to intent
 `investigate`, which satisfies `canRecoverCore` in the `revelation`/`cores` phases and
 **spawns the Core Guardian instead of describing the room**. Receipt: measured twice in

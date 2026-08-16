@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.217';
+export const DISPLAY_VERSION = '4.29.218';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23853,7 +23853,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ZERO real importers anywhere and is DELETED from all three. It is the file the
 // OTA-1312 recolour landed on and shipped invisible. New suite ota1323 (6).
 // DISPLAY_VERSION 4.29.217.
-export const OTA_BUILD_ID = '2026-08-16-1323-routed-tower-explains-itself';
+// ⚠⚠ OTA-1324 — THE CRUCIBLE CHIP OBEYS THE GATE ITS OWN HANDLER ENFORCES.
+// Owner's device log (roadside stall, mid-first-journey): FOUR taps on the vendor's
+// Fusing Crucible in seventy seconds, four identical refusals — "The Crucible's not
+// for first-timers." `useVendorCrucible` refuses while macroVisitSeq < 1, correctly;
+// the defect is that the check lived ONLY in the handler, so the chip rendered lit,
+// took the tap and answered with a wall. The requirement is known at RENDER time and
+// is now read there. ⚠ Same shape as OTA-1024 — whose comment sits twelve lines below
+// the fix — where he spent to 11 TC, tapped, and learned the fee from a buried system
+// line: "a lit button that doesn't fire." The handler's refusal STAYS as the backstop;
+// hiding a control is not securing it. New suite ota1324 (4). DISPLAY_VERSION 4.29.218.
+export const OTA_BUILD_ID = '2026-08-16-1324-crucible-chip-obeys-its-gate';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1323-routed-tower-explains-itself';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1322-empty-picker-closes-now';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1321-first-fight-explains-itself';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1320-audit-of-the-audit';
