@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.168';
+export const DISPLAY_VERSION = '4.29.169';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23806,7 +23806,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // rides a 4pt LEFT EDGE, only on rows that resolve to a real catalog item.
 // IGNORE stays red — it is the one control that walks away from loot.
 // New suite ota1319 (6). 829 suites / 7749 tests. DISPLAY_VERSION 4.29.168.
-export const OTA_BUILD_ID = '2026-08-16-1319-amber-on-the-live-picker';
+// ⚠⚠ OTA-1320 — THE EMPTY PICKER CLOSES ON THE FRAME IT EMPTIES. Owner, device
+// run: *"whenever I hit the three all buttons and there's nothing left in the
+// screen, it still says ignore all, that red button, for about 2 and 1/2 seconds
+// ... the minute the last item is gone from the screen that pop-up should
+// close."* The picker already auto-closed when emptied, but behind an 800ms hold
+// borrowed from the investigate picker on the theory that closing on the same
+// frame as the tap reads as a crash. That does not survive the SWEEP buttons: the
+// player taps TAKE ALL GEAR and WATCHES the lane empty, so the tap has already
+// confirmed itself — and across three sweeps the hold stacks on the re-renders
+// into the ~2.5s he measured. Hold removed; the opened-empty case still explains
+// and still waits. DISPLAY_VERSION 4.29.169.
+export const OTA_BUILD_ID = '2026-08-16-1320-empty-picker-closes-now';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1319-amber-on-the-live-picker';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1316-amber-salvage-and-restore-gate';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1309-sell-all-actually-sells';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1306-towers-route-like-missions';
