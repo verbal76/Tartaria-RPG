@@ -656,33 +656,64 @@ function grantStageItems(
   }
 }
 
-/** ⚠⚠ P19 — DOES A TRACKED HUNT WANT THIS EXACT VERB, ON THIS EXACT GROUND, RIGHT NOW?
+/** ⚠⚠ P19 — DOES A TRACKED CONTRACT WANT THIS EXACT VERB, ON THIS EXACT GROUND, RIGHT NOW?
  *
- *  Found by the honest walker: a wandering trader rolled onto a hunt's `diplomacy` stage
- *  tile, and TALK went to the trader. `advanceStagesOnIntent` runs near the END of
- *  submitPlayerAction, long after the vendor and wanderer parley branches, and those
- *  branches return early — so the player stood in exactly the right place, typed exactly
- *  the right word, and got "you let the conversation go" forever. Nothing in the game
- *  could tell them why, because nothing was wrong.
+ *  Found by the honest walker, twice. A wandering trader rolled onto a hunt's `diplomacy`
+ *  stage tile and TALK went to the trader; then two storyline turn-ins — both `boss`
+ *  stages, and a storyline `boss` is matched by DIPLOMACY — landed at an outpost where a
+ *  named vendor stands permanently, and the same branch ate the verb every time.
+ *  `advanceStagesOnIntent` runs near the END of submitPlayerAction, long after the vendor
+ *  and wanderer parley branches, and those branches return early. So the player stood in
+ *  exactly the right place, typed exactly the right word, and got "you let the conversation
+ *  go" forever, with nothing in the game able to say why.
  *
  *  ⚠ It is the STAGE that gets priority, not the merchant: the stall is ambient and will
  *  still be there afterwards; the stage is the reason the player walked here. Deliberately
- *  narrow — same ground, same verb, tracked hunt, not in combat. Anything less specific
- *  would start eating ordinary conversations. */
-function huntStageAwaitsHere(get: () => GameStore, intent: Intent): boolean {
+ *  narrow — same ground, same verb, tracked contract, not in combat.
+ *
+ *  ⚠ THE checkKind→intent MAP MUST MIRROR EACH FAMILY'S MATCHER, quirks included: a
+ *  MYSTERY's `boss` is paid by INVESTIGATE and a STORYLINE's by DIPLOMACY (neither spawns
+ *  anything — they are the "confirm what you have" beat). Getting it wrong here does not
+ *  break the gate; it just fails to yield, so the symptom is the silent swallow coming
+ *  back. */
+function stageAwaitsIntentHere(get: () => GameStore, intent: Intent): boolean {
   const player = get().player;
   if (!player) return false;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const QS = require('../engine/questStage') as typeof import('../engine/questStage');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
-  return (player.activeHunts ?? []).some((rec) => {
-    if (rec.tracked === false) return false;
+  const here = player.currentLocationId;
+
+  const wants = (stage: { checkKind: string | null } | undefined, bossIntent: Intent): boolean => {
+    if (!stage || stage.checkKind === null) return false;
+    if (stage.checkKind === 'boss') return intent === bossIntent;
+    if (stage.checkKind === 'attack_provoke') return intent === 'attack';
+    return stage.checkKind === intent;
+  };
+
+  for (const rec of player.activeHunts ?? []) {
+    if (rec.tracked === false) continue;
     const def = findHuntById(rec.id);
     const stage = def?.stages[rec.stage];
-    if (!def || !stage || stage.checkKind !== intent) return false;
-    return QS.stageLocationId(stage, CM.huntAnchorId(def), CM.resolvePosterLocation) === player.currentLocationId;
-  });
+    if (!def || !wants(stage, 'attack')) continue;
+    if (QS.stageLocationId(stage, CM.huntAnchorId(def), CM.resolvePosterLocation) === here) return true;
+  }
+  for (const rec of player.activeMysteries ?? []) {
+    if (rec.tracked === false) continue;
+    const def = findMysteryById(rec.id);
+    const stage = def?.stages[rec.stage];
+    if (!def || !wants(stage, 'investigate')) continue;
+    if (QS.stageLocationId(stage, CM.contractAnchorId(def), CM.resolvePosterLocation) === here) return true;
+  }
+  for (const rec of player.activeStorylines ?? []) {
+    if (rec.tracked === false) continue;
+    const def = findStorylineById(rec.id);
+    const stage = def?.stages[rec.stage];
+    if (!def || !wants(stage, 'diplomacy')) continue;
+    if (QS.stageLocationId(stage, CM.contractAnchorId(def), CM.resolvePosterLocation) === here) return true;
+  }
+  return false;
 }
 
 function advanceStagesOnIntent(
@@ -879,7 +910,37 @@ function advanceStagesOnIntent(
         (next.checkKind === 'boss' && intent === 'diplomacy')
       );
     });
-  if (storyMatch && !inCombat) {
+  if (storyMatch && storyMatch.def && !inCombat) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const QS = require('../engine/questStage') as typeof import('../engine/questStage');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
+    // ⚠⚠ P19 — THE LAST FAMILY GETS ITS GROUND. Storylines had the same hole mysteries
+    // did: the matcher checked the VERB and nothing else, so a nine-chapter faction arc
+    // could be walked start to finish standing on one tile. These are the LONGEST chains
+    // in the game (6-9 stages, 93 in total) and the ones most obviously written as a
+    // journey — which made the gap the widest here of anywhere.
+    const stageNow = storyMatch.def.stages[storyMatch.rec.stage];
+    const ground = QS.stageLocationId(stageNow, CM.contractAnchorId(storyMatch.def), CM.resolvePosterLocation);
+    if (player.currentLocationId !== ground) {
+      const line = `The Arbiter taps the slate. "Not here. ${storyMatch.def.title} points elsewhere — set a course from Contracts and do it there."`;
+      const recent = get().gameLog.slice(-30).some((e) => e.text === line);
+      if (!recent) get().appendLog('arbiter', line);
+      return;
+    }
+    // ⚠ Heal-then-refuse, and the heal HANDS OVER AND STOPS — granting mid-action races
+    // the caller's own inventory write and loses what it just gave. See the hunt branch.
+    if (!QS.stageRequirementMet(stageNow, player.inventory)) {
+      grantStageItems(get, set, storyMatch.def.title, storyMatch.def.stages, 0, storyMatch.rec.stage);
+      if (QS.stageRequirementMet(stageNow, get().player?.inventory)) {
+        get().appendLog('arbiter', `The Arbiter checks your pack and finds what ${storyMatch.def.title} wants. "You had it after all. Go again."`);
+        return;
+      }
+      const line = QS.stageRequirementLine(stageNow!, storyMatch.def.title);
+      const seen = get().gameLog.slice(-30).some((e) => e.text === line);
+      if (!seen) get().appendLog('arbiter', line);
+      return;
+    }
     const flightKey = `storyline:${storyMatch.rec.id}`;
     if (!stageAdvancesInFlight.has(flightKey)) {
       stageAdvancesInFlight.add(flightKey);
@@ -14068,9 +14129,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // talkable with no wiring" was true of the store action and false of every
     // route into it. Named vendors survived only because their raw id happens
     // to equal their ledger id.
-    // ⚠ P19 — the hunt stage outranks the stall. See huntStageAwaitsHere.
+    // ⚠ P19 — the contract stage outranks the stall. See stageAwaitsIntentHere.
     if (parsed.intent === 'diplomacy' && currentScene.enemies.length === 0 && currentScene.vendor
-        && !huntStageAwaitsHere(get, 'diplomacy')) {
+        && !stageAwaitsIntentHere(get, 'diplomacy')) {
       if (hasTopicsFor(vendorNpcId(currentScene.vendor))) {
         get().talkToNpc(parsed.resolvedNoun ?? parsed.target ?? '');
         if (get().pendingTalk) return;
@@ -14082,7 +14143,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // happened to be on the same tile, because this branch only ever checked
     // that a wanderer EXISTED and never that you meant them.
     if (parsed.intent === 'diplomacy' && currentScene.enemies.length === 0 && currentScene.wanderer
-        && !huntStageAwaitsHere(get, 'diplomacy') // ⚠ P19 — the stage outranks a passer-by too.
+        && !stageAwaitsIntentHere(get, 'diplomacy') // ⚠ P19 — the stage outranks a passer-by too.
         && !namesSomeoneElse(get, parsed.resolvedNoun ?? parsed.target ?? '', vendorNpcId(currentScene.wanderer))) {
       const w = currentScene.wanderer;
       const temperament = w.temperament;
@@ -28343,6 +28404,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!stageDef) return;
     get().appendLog('world', stageDef.narration);
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
+    // ⚠⚠ P19 — hand over what the stage promised, say where the next one is, set the course.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const QS = require('../engine/questStage') as typeof import('../engine/questStage');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
+      grantStageItems(get, set, def.title, def.stages, record.stage, record.stage + 1);
+      const nextDef = def.stages[record.stage + 1];
+      if (nextDef) {
+        const anchor = CM.contractAnchorId(def);
+        const hereId = QS.stageLocationId(stageDef, anchor, CM.resolvePosterLocation);
+        const nextId = QS.stageLocationId(nextDef, anchor, CM.resolvePosterLocation);
+        const moved = nextId !== hereId;
+        const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, moved);
+        if (dir) get().appendLog('system', dir);
+        const liveNow = get().player;
+        if (moved && liveNow && liveNow.currentLocationId !== nextId
+            && liveNow.travelTarget?.locationId !== nextId) {
+          _chainRouting = true;
+          try { get().setTravelCourse(nextId); } finally { _chainRouting = false; }
+          // ⚠ Only claim it if it happened — setTravelCourse has six silent refusals.
+          if (get().player?.travelTarget?.locationId === nextId) {
+            get().appendLog('world', `Auto-routing to the next chapter of ${def.title}: ${safeLocName(nextId)}.`);
+          }
+        }
+      }
+    }
     let nextStage = record.stage + 1;
     // OTA-871 — auto-consume trailing pure-narration (checkKind: null) epilogue stages so a
     // storyline authored with a denouement after its final action doesn't hang one stage
@@ -28351,6 +28439,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const epi = def.stages[nextStage]!;
       get().appendLog('world', epi.narration);
       if (epi.arbiter) get().appendLog('arbiter', epi.arbiter);
+      // ⚠ P19 — a consumed null stage still hands over what it promised.
+      grantStageItems(get, set, def.title, def.stages, nextStage, nextStage + 1);
       nextStage++;
     }
     set((s) =>

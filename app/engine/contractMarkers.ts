@@ -207,7 +207,8 @@ export function openContractMarkers(player: PlayerCharacter | null | undefined):
   for (const s of player.activeStorylines ?? []) {
     const def = findStorylineById(s.id);
     if (!def) continue;
-    add('storyline', s.id, def.title, contractAnchorId(def));
+    // ⚠ P19 — the pin walks with the storyline.
+    add('storyline', s.id, def.title, contractStageAnchorId(def, s.stage));
   }
   for (const fq of player.activeFactionQuests ?? []) {
     const def = findFactionQuestById(fq.id);

@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.178';
+export const DISPLAY_VERSION = '4.29.179';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24023,7 +24023,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //       the call, so a mission item granted mid-flight was clobbered one line later. The
 //       heal now hands over and STOPS.
 // Twin of golem OTA-1330. DISPLAY_VERSION 4.29.178.
-export const OTA_BUILD_ID = '2026-08-16-1329-mysteries-the-same-way';
+// ⚠⚠ THE STORYLINES, AND P19 IS CLOSED. Owner: *"go with storylines."*
+//
+// The last family with the hole, and it had it worst. The storyline matcher checked the
+// VERB AND NOTHING ELSE — no location test of any kind — so a NINE-CHAPTER faction arc
+// could be walked start to finish standing on a single tile. These are the longest chains
+// in the game and the ones most obviously written as a journey, which made the gap widest
+// here of anywhere. All 14 storylines / 93 stages rewritten to the same grammar, and the
+// matcher now gates on ground, checks the pack, grants, directs and auto-routes exactly as
+// hunts and mysteries do. The atlas pin walks with the chapter.
+//
+// ⚠⚠ 281 OF 281 STAGES ACROSS ALL THREE FAMILIES NOW NAME THEIR OWN GROUND — the exact
+// figure P19 was filed against. `npm run check:huntstages` covers all three and is a hard
+// build gate: a placeless stage, a `requires` nothing grants, or a `requires` on an
+// auto-consumed null stage fails the build.
+//
+// ⚠ One more found by the honest walker, the SAME bug as the hunts' roadside trader one
+// family over: two storyline turn-ins are `boss` stages — and a storyline `boss` is paid by
+// DIPLOMACY — sited at outposts where a named vendor stands permanently. The vendor parley
+// branch returns long before the stage matcher runs, so it ate the verb every time. The
+// stage-priority guard is now `stageAwaitsIntentHere` and covers all three families,
+// mirroring each matcher's boss→intent quirk (hunt: attack, mystery: investigate,
+// storyline: diplomacy). Twin of golem OTA-1331. DISPLAY_VERSION 4.29.179.
+export const OTA_BUILD_ID = '2026-08-16-1330-storylines-and-p19-closed';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1329-mysteries-the-same-way';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1328-every-hunt-doable';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1327-stages-mean-what-they-say';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1326-wave-two-board-points-at-the-map';

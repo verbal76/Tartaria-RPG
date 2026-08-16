@@ -176,10 +176,10 @@ describe('OTA-1220 — Texas Ranger on mysteries and storylines: every one compl
       });
     }
 
-    // ⚠ P19 — stand on the OPENING stage's ground before anything is typed. A mystery is
-    // gated on location now; running the negative half from the wrong tile would "pass" for
-    // the wrong reason (refused for being elsewhere, not for the wrong verb).
-    if (family === 'mystery') {
+    // ⚠ P19 — stand on the OPENING stage's ground before anything is typed. Both families
+    // are gated on location now; running the negative half from the wrong tile would "pass"
+    // for the wrong reason (refused for being elsewhere, not for the wrong verb).
+    {
       useGameStore.setState({
         player: {
           ...store.getState().player!, currentLocationId: contractStageAnchorId(def as never, start),
@@ -211,13 +211,14 @@ describe('OTA-1220 — Texas Ranger on mysteries and storylines: every one compl
       if (!verb) throw new Error(`${def.id}: stage ${s} has unhandled checkKind '${kind}' — extend the verb map + the matcher`);
 
       // ⚠⚠ P19 — THE WALKER NO LONGER STANDS STILL. It used to run "wherever the walker
-      // stands", which was honest about the engine at the time: the mystery matcher checked
-      // the VERB AND NOTHING ELSE — no location test of any kind — so all 18 mysteries could
-      // be finished from one tile without travelling. That is the mirror image of the hunt
-      // failure and it is why this walker passed while the family was unplayable as written.
-      // Now each stage must be performed on ITS OWN ground, and the walker may only move to
-      // ground the GAME routed it to.
-      if (family === 'mystery') {
+      // stands", which was honest about the engine at the time: BOTH matchers checked the
+      // VERB AND NOTHING ELSE — no location test of any kind — so all 18 mysteries and all
+      // 14 storylines could be finished from one tile without travelling. A nine-chapter
+      // faction arc, start to finish, without moving. That is the mirror image of the hunt
+      // failure and it is why this walker passed while both families were unplayable as
+      // written. Now each stage must be performed on ITS OWN ground, and the walker may only
+      // move to ground the GAME routed it to.
+      {
         const want = contractStageAnchorId(def as never, s);
         const at = store.getState().player!.currentLocationId;
         if (at !== want) {
