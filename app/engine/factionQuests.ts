@@ -29,6 +29,14 @@ export interface FactionQuestStageDef {
 export interface FactionQuestDef {
   id: string;
   factionId: string;
+  /** ⚠ The place the quest SENDS you, when it sends you anywhere. Same field and
+   *  same resolver as a hunt's. Deliberately RARE on this family: 18 of the 65
+   *  mention a location, but almost all of them are escorts and turn-ins that end
+   *  at a faction AGENT ("escort the pilgrims to a Forgotten Order agent") — for
+   *  those, the faction home IS the destination and routing them elsewhere would
+   *  send the player the wrong way. Only set this where the objective itself names
+   *  a place to travel to. */
+  targetLocationName?: string;
   title: string;
   description: string;
   objective: string;

@@ -2,6 +2,7 @@
   "mysteries": [
     {
       "id": "mystery_red_tower",
+      "targetLocationName": "Red Tower of Nimari",
       "title": "Fragment of the Red Tower",
       "posterText": "A Forgotten Order scholar will pay handsomely for a confirmed Fragment of the Red Tower — the cursed Aetheric core's outer casing, never recovered intact. 400 TC.",
       "trophyName": "Fragment of the Red Tower",
@@ -35,6 +36,7 @@
     },
     {
       "id": "mystery_cradle_compass",
+      "targetLocationName": "Cradle of Dusk",
       "title": "Cradle of Dusk Compass",
       "posterText": "Halem the Trader offers 300 TC for a working Cradle of Dusk Compass — one of the few instruments that holds steady in Aetheric storms.",
       "trophyName": "Cradle of Dusk Compass",
@@ -63,6 +65,7 @@
     },
     {
       "id": "mystery_leviathan_eye",
+      "targetLocationName": "Mud Seas",
       "title": "The Leviathan's Eye",
       "posterText": "True Tartarian agents will pay 500 TC and faith-favor for the preserved eye of a Mud Seas Leviathan — said to see through Aetheric storms.",
       "trophyName": "Preserved Leviathan Eye",
@@ -96,6 +99,7 @@
     },
     {
       "id": "mystery_temporal_watch",
+      "targetLocationName": "The Buried Cities",
       "title": "Temporal Distortion Watch",
       "posterText": "Reclaimers Guild Speaker pays 600 TC and will move you up the haul board for a working Temporal Distortion Watch — Tartarian-make, useful in deep ruins.",
       "trophyName": "Temporal Distortion Watch",
@@ -129,6 +133,7 @@
     },
     {
       "id": "mystery_obsidian_orb",
+      "targetLocationName": "Obsidian Pillars",
       "title": "Shifting Obsidian Orb",
       "posterText": "Mud Monarch courier offers 700 TC for a Shifting Obsidian Orb — an Obsidian Pillar fragment fused with Aetherstone. Reshapes itself.",
       "trophyName": "Shifting Obsidian Orb",
@@ -162,6 +167,7 @@
     },
     {
       "id": "mystery_servants_hum",
+      "targetLocationName": "Tartarian Outskirts",
       "title": "The Hum Beneath Ural",
       "posterText": "The Servants of the Giants hear a hum from the Urals that does not match any prayer in the canon. They will pay any pilgrim willing to walk the Outskirts and listen — three places, three readings, one answer. 300 TC posted at any Servants shrine.",
       "trophyName": "Listening Stone Cluster",
@@ -200,6 +206,7 @@
     },
     {
       "id": "mystery_weeping_core",
+      "targetLocationName": "The Buried Cities",
       "title": "The Weeping Core",
       "posterText": "A Forgotten Order savant seeks a \"Weeping Core\" — an Aetheric core that leaks a slow tear of live Aether, thought lost in the Buried Cities. 500 TC.",
       "trophyName": "Weeping Core",
@@ -233,6 +240,7 @@
     },
     {
       "id": "mystery_aetherborn_foundling",
+      "targetLocationName": "Samarran",
       "title": "The Aetherborn Foundling",
       "posterText": "A Dynasty agent quietly seeks a foundling child whose blood may run Aetherborn — hidden from the bloodline by a mother who fled. 600 TC, no questions.",
       "trophyName": "Bloodline Token",
@@ -266,6 +274,7 @@
     },
     {
       "id": "mystery_drowned_bell_samarran",
+      "targetLocationName": "Samarran",
       "title": "The Drowned Bell of Samarran",
       "posterText": "A Samarran bell-founder will pay for the \"Drowned Bell\" — a Tartarian resonance-bell that tolls underwater and stills troubled Aether. 450 TC.",
       "trophyName": "Drowned Bell",
@@ -299,6 +308,7 @@
     },
     {
       "id": "mystery_singing_stone_ostragar",
+      "targetLocationName": "Ostragar",
       "title": "The Singing Stone of Ostragar",
       "posterText": "The Stone Builders seek a \"Singing Stone\" from Ostragar — a keystone that hums the load of a whole vault, the last of its kind unbroken. 550 TC.",
       "trophyName": "Singing Keystone",
@@ -332,6 +342,7 @@
     },
     {
       "id": "mystery_monarch_redaction",
+      "targetLocationName": "The Hidden Market",
       "title": "The Monarch's Redaction",
       "posterText": "A Conspiracy Architect handler seeks a leaked Mud Monarch ledger before its redactions can be read — a page that names what the Monarchs buried. 650 TC, utter discretion.",
       "trophyName": "Redacted Ledger",
@@ -365,6 +376,7 @@
     },
     {
       "id": "mystery_second_flood_cipher",
+      "targetLocationName": "Aetheric Chamber",
       "title": "The Second Flood Cipher",
       "posterText": "The Revivalists seek a recovered Tartarian cipher-plate said to hold the empire's own warning about the Flood — how it started, and how to start it again. 700 TC.",
       "trophyName": "Cipher-Plate",
@@ -398,6 +410,7 @@
     },
     {
       "id": "mystery_cartographers_last_map",
+      "targetLocationName": "The Giant Vault",
       "title": "The Cartographer's Last Map",
       "posterText": "A Reclaimer broker seeks the last map of a dead cartographer — said to chart a sealed Tartarian vault no one else has found. 550 TC.",
       "trophyName": "Cartographer's Map",
@@ -431,6 +444,7 @@
     },
     {
       "id": "mystery_giants_tooth",
+      "targetLocationName": "Mud Seas",
       "title": "The Giant's Tooth",
       "posterText": "The Servants of the Giants seek a relic tooth of a true Tartarian Giant, torn loose in the Flood and lost in the Mud Seas. A holy find. 500 TC.",
       "trophyName": "Giant's Tooth",
@@ -497,6 +511,7 @@
     },
     {
       "id": "mystery_ashen_codex",
+      "targetLocationName": "Nimari",
       "title": "The Ashen Codex",
       "posterText": "The Forgotten Order seeks the Ashen Codex — a treatise burned in a Monarch purge, its words readable still in the char if handled with care. 600 TC.",
       "trophyName": "Ashen Codex",
@@ -530,6 +545,7 @@
     },
     {
       "id": "mystery_tuning_fork_asgardar",
+      "targetLocationName": "Asgardar",
       "title": "The Tuning Fork of Asgardar",
       "posterText": "The Stone Builders seek a Tartarian resonance-tool from Asgardar — a \"tuning fork\" that reads the true note of any stone, key to their whole craft. 550 TC.",
       "trophyName": "Resonance Fork",
