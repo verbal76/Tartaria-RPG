@@ -1676,7 +1676,44 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ TITLE LIST TELLS THE TRUTH (2026-08-15, latest). HAL OTA-1295, port
+- **⚠⚠⚠ CURRENT WITH THE GOLEM LINE (2026-08-16, latest). HAL OTA-1319.**
+  Owner: *"after the gameplay, we decided to bring Hal current to golem. golem
+  is the model moving forward."* This **reverses OTA-1318**, which held this
+  line's two-button picker and original colours back on his earlier
+  instruction; the newer ruling is explicit and supersedes it.
+  - ⚠ **Measured before anything moved.** 190 files differed between the lines,
+    but **161 differed only in the OTA numbers written inside their comments** —
+    each line numbers the same fix differently, so a raw file count wildly
+    overstates the gap. The real divergence was **29 files**, and that is what
+    was ported. Anyone sizing a future parity pass should run the same
+    comment-stripped comparison before believing a diff stat.
+  - **What arrived:** the ONE PICKER (`GatherModal` + `gatherSort` + the census
+    salvage pools; `TakeModal` and the whole two-modal wiring retire), the amber
+    lanes with rarity on the left edge, rescue-scenario story nouns, the vest
+    tutorial beat, the draft-preserving input bar, IMPORT SAVE on the About
+    screen, the legacy-save gear-dupe backfill, a Resurrection Gem clearing its
+    fallen-seed entry, the bulk sweep holding back your last gate tool, and the
+    first-fight combat primer.
+  - ⚠⚠ **TWO THINGS THIS LINE KEEPS THAT GOLEM HAS NEVER HAD.** `gameStore.ts`
+    was taken from golem **wholesale**, which would have silently deleted the
+    **enemy-intel backfill** and the **faction-quest `tracked` backfill** — two
+    legacy-save migrations that exist because this is the line with real saves
+    on real devices. Both were re-grafted by hand and are now held by
+    `halOnlySaveMigrationsSurvive` (5), a suite whose only job is to fail the
+    NEXT parity pass that forgets them. If you run another wholesale copy, read
+    that suite first.
+  - ⚠ **A persisted field name carries an OTA number.** `dogRevivedOta938` is
+    save data on this line; golem spells the same field `dogRevivedOta915`. A
+    wholesale copy of `types.ts` would have renamed a live field, so that file
+    was edited surgically instead. Check for this class before any bulk copy.
+  - ⚠ **Found while porting, and fixed:** the GREAT CLIMB `SET COURSE` button
+    and `routeGreatClimb` both shipped on this line, but nothing joined them —
+    the confirm handler fell through to plain travel, so a tower got a course
+    and never became the mission you were on. Half a feature, live.
+  - 12 golem suites brought in, 21 re-pointed, 2 retired. 821 suites / 7654
+    tests, all gates green. **Unpushed** — owner's standing hold.
+
+- **⚠⚠⚠ TITLE LIST TELLS THE TRUTH (2026-08-15). HAL OTA-1295, port
   of golem OTA-1294.** The character select was a boot-time snapshot — a
   character created this session was missing from it, which is what made the
   owner's golem "wipe" look real. Refresh on every mount now. Owner-ordered
@@ -2357,7 +2394,7 @@ rediscovering them.
   (see the entry above).**
 
 - **⚠⚠ PUNCHLIST P9 CLOSED — AT AN OWNED SITE, THE PEOPLE ANSWER FOR THE HOST (2026-08-10,
-  latest). HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1224. **steam NOT included —
+  HAL + GOLEM (batch ran 2026-08-11).** HAL OTA-1224. **steam NOT included —
   batched (§2).**
 
   The last of the three P2 jobs (broker OTA-1208, site skins OTA-1209, this). The world
@@ -4660,7 +4697,7 @@ rediscovering them.
   honestly for the first time — but +20 is the join threshold. If it reads badly the
   answer is a per-purchase grant cap, which is a design call and was not made.
 
-- **⚠⚠ FROM THE DEVICE LOG (2026-08-07, latest). ALL THREE LINES.** HAL
+- **⚠⚠ FROM THE DEVICE LOG (2026-08-07). ALL THREE LINES.** HAL
   OTA-1178 / golem OTA-1155 / steam merged. A 16-part log off the owner's Pixel
   10 Pro XL plus two things he typed out by hand. **Eight fixes; the two loudest
   are #3 and #7.**
@@ -4715,7 +4752,7 @@ rediscovering them.
   checked that the game accepts the verbs its new prose asks for. **When you
   author content that suggests an action, grep the verb table for it.**
 
-- **⚠⚠ GIFT MODE (2026-08-07, latest). ALL THREE LINES.** HAL OTA-1177 /
+- **⚠⚠ GIFT MODE (2026-08-07). ALL THREE LINES.** HAL OTA-1177 /
   golem OTA-1154 / steam merged. Owner, two asks in one message: *"the list we
   pick from to give out must exclude all equipped gear, armor and anything in the
   bandolier or tool pouch. also no item that is given away would break a mission

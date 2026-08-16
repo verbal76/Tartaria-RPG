@@ -1,4 +1,8 @@
-// OTA-1213 — PUNCHLIST P13 CLOSED. The Labyrinth of Shadows has an ending.
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
+// OTA-1190 — PUNCHLIST P13 CLOSED. The Labyrinth of Shadows has an ending.
 //
 // ⚠ WHAT IT WAS. Reaching the maze's heart on a CLEAN run printed one line and ticked the
 // Wayfarer counter. **Any other run printed two lines and nothing else** — no TC, no item,
@@ -23,12 +27,12 @@ const STORE = SRC('app/state/gameStore.ts');
 
 // The ending block, bounded by its own landmarks rather than a fixed slice.
 const ENDING = (() => {
-  const i = STORE.indexOf('OTA-1213 (PUNCHLIST P13) — THE MAZE HAS AN ENDING NOW');
+  const i = STORE.indexOf('OTA-1190 (PUNCHLIST P13) — THE MAZE HAS AN ENDING NOW');
   const j = STORE.indexOf('if (res.deadEnd)', i);
   return STORE.slice(i, j);
 })();
 
-describe('OTA-1213 — the ending exists and fires for EVERY finish', () => {
+describe('OTA-1190 — the ending exists and fires for EVERY finish', () => {
   test('the block is present and bounded', () => {
     expect(ENDING.length).toBeGreaterThan(500);
   });
@@ -57,7 +61,7 @@ describe('OTA-1213 — the ending exists and fires for EVERY finish', () => {
   });
 });
 
-describe('⚠⚠ OTA-1213 — ONCE per character. A repeatable maze must not be a farm.', () => {
+describe('⚠⚠ OTA-1190 — ONCE per character. A repeatable maze must not be a farm.', () => {
   test('the maze really is re-enterable — the premise for the gate', () => {
     // If an attempt gate ever appears on enterLabyrinth this test should fail and the
     // once-only flag revisited, rather than silently guarding nothing.
@@ -87,7 +91,7 @@ describe('⚠⚠ OTA-1213 — ONCE per character. A repeatable maze must not be 
   });
 });
 
-describe('OTA-1213 — the keepsake', () => {
+describe('OTA-1190 — the keepsake', () => {
   test('it is quest-tagged, so it can never be sold, gifted, scrapped or fused', () => {
     expect(ENDING).toContain("tags: ['quest', 'story', 'keepsake', 'lore']");
   });
@@ -105,7 +109,7 @@ describe('OTA-1213 — the keepsake', () => {
   });
 });
 
-describe('⚠ OTA-1213 — the lore matches the data it came from', () => {
+describe('⚠ OTA-1190 — the lore matches the data it came from', () => {
   test('Iskan-Veil really is the Architects’ masking capital', () => {
     // The reveal asserts two facts about the world. If the source data ever changes, this
     // fails and the narration gets revisited rather than quietly becoming wrong.

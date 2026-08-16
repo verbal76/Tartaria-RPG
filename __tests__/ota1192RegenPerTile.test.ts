@@ -1,4 +1,8 @@
-// OTA-1192 — HP REGEN IS PER TILE, NOT PER ACTION.
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
+// OTA-1169 — HP REGEN IS PER TILE, NOT PER ACTION.
 //
 // Owner: "I feel invincible in this playthrough — is it all the +5 AC armor stacking or
 // the +2 regen on every action? would +2 regen per tile traveled be better? I'm never low
@@ -55,12 +59,12 @@ const STORE = read('app', 'state', 'gameStore.ts');
 
 /** The regen block, sliced from its own comment banner to the end of its set(). */
 const regenBlock = (): string => {
-  const i = STORE.indexOf('OTA-1192 — HP REGEN IS PER TILE NOW');
+  const i = STORE.indexOf('OTA-1169 — HP REGEN IS PER TILE NOW');
   expect(i).toBeGreaterThan(-1);
   return STORE.slice(i, i + 2600);
 };
 
-describe('OTA-1192 — regen no longer ticks on every action', () => {
+describe('OTA-1169 — regen no longer ticks on every action', () => {
   it('⚠ HP GAIN IS GATED ON CROSSING A TILE', () => {
     const b = regenBlock();
     expect(b).toContain('const crossedTile =');
@@ -92,7 +96,7 @@ describe('OTA-1192 — regen no longer ticks on every action', () => {
   });
 
   it('the cap itself is untouched — this changes CADENCE, not amount', () => {
-    // A tile still pays the full worn-gear regen, capped as before. OTA-1183 established
+    // A tile still pays the full worn-gear regen, capped as before. OTA-1160 established
     // that 2 is the entire HP_REGEN_CAP; that is unchanged.
     expect(HP_REGEN_CAP).toBe(2);
     expect(regenBlock()).toContain('aggregateEquippedRegen(live)');

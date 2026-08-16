@@ -1,3 +1,7 @@
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
@@ -33,7 +37,7 @@ jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
 /**
- * OTA-1078 — the holes the OTA-1077 review found, closed.
+ * OTA-1055 — the holes the OTA-1054 review found, closed.
  *
  * Six defects, five of them mine from the Phase 0/1 run. Every one is a case of
  * a rule applied at one site out of several, or a rule keyed off something that
@@ -42,7 +46,7 @@ jest.mock('expo-updates', () => ({}));
  * following the code that already existed instead of the set of places that
  * needed it.
  *
- *  1. ROADSIDE TRADERS COLLAPSED INTO TWO PEOPLE. OTA-1076 correctly stopped
+ *  1. ROADSIDE TRADERS COLLAPSED INTO TWO PEOPLE. OTA-1053 correctly stopped
  *     keying the ledger off `roadside_<demeanor>_<Date.now()>` — that split one
  *     trader into unbounded strangers — but keyed it off the archetype NAME
  *     instead, and roadside_traders.json holds exactly two archetypes whose
@@ -58,7 +62,7 @@ jest.mock('expo-updates', () => ({}));
  *     for tab-flicking was also dead code (it compared a vendor against itself
  *     at beginScene, and could not fire at the stalls either). Both found by
  *     review, after the first version of this very suite passed.
- *  4. STORY BEATS WERE BEING MERGED AWAY. OTA-1074 gave them a rule and a chip;
+ *  4. STORY BEATS WERE BEING MERGED AWAY. OTA-1051 gave them a rule and a chip;
  *     appendLog's world/system debounce rebuilds the merged entry as
  *     `{ ...lastEntry, text }`, so a beat glued onto a preceding line inherited
  *     the FIRST line's meta and lost `storyBeat` entirely.
@@ -109,7 +113,7 @@ async function boot(name: string) {
 
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
-describe('OTA-1078 — a roadside trader is a person, not a stall type', () => {
+describe('OTA-1055 — a roadside trader is a person, not a stall type', () => {
   it('the cast is big enough that two strangers are not the same ledger row', () => {
     const ids = new Set<string>();
     for (let i = 0; i < 400; i++) ids.add(vendorNpcId(pickRoadsideTrader()));
@@ -126,7 +130,7 @@ describe('OTA-1078 — a roadside trader is a person, not a stall type', () => {
     }
   });
 
-  it('the same person keeps ONE row across spawns — the OTA-1076 leak stays closed', () => {
+  it('the same person keeps ONE row across spawns — the OTA-1053 leak stays closed', () => {
     // The runtime id still carries Date.now() (nothing reads past the prefix),
     // so this is the property that actually matters: two spawns of the same
     // trader must be the same ledger person.
@@ -156,7 +160,7 @@ describe('OTA-1078 — a roadside trader is a person, not a stall type', () => {
   });
 });
 
-describe('OTA-1078 — every vendor install records the meeting', () => {
+describe('OTA-1055 — every vendor install records the meeting', () => {
   it('all FIVE install sites go through the one helper', () => {
     // ⚠ The first version of this asserted THREE, because the docblock said
     // three. It was wrong: the elevated-overlay trader and the `spawn_vendor`
@@ -180,10 +184,10 @@ describe('OTA-1078 — every vendor install records the meeting', () => {
     // are the Core Guardian spawns, so adding a fourth vendor write while
     // dropping a Guardian site left it green. Count what the name claims.
     expect(SRC).not.toMatch(/worldMemory: rememberNpcMeeting\(s\.worldMemory, npcRecord/);
-    // OTA-1080 — the slice ends at sightPerson, which now sits between the two.
+    // OTA-1057 — the slice ends at sightPerson, which now sits between the two.
     const inSightVendor = SRC.slice(SRC.indexOf('function sightVendor('), SRC.indexOf('function sightPerson('));
     expect((inSightVendor.match(/rememberNpcMeeting\(/g) ?? []).length).toBe(1);
-    // OTA-1080 — 4: sightVendor, sightPerson (wanderers + escort leaders), and
+    // OTA-1057 — 4: sightVendor, sightPerson (wanderers + escort leaders), and
     // the two Core Guardian spawns.
     expect((SRC.match(/rememberNpcMeeting\(/g) ?? []).length).toBe(4);
   });
@@ -198,7 +202,7 @@ describe('OTA-1078 — every vendor install records the meeting', () => {
     // it prevented. The rule moved into recordNpcSighting, where it is one rule
     // for every caller instead of a guard each new site can forget.
     expect(SRC).not.toContain('priorVendor');
-    // ⚠ OTA-1087 — bound the slice to sightVendor's OWN body. It used to run to
+    // ⚠ OTA-1064 — bound the slice to sightVendor's OWN body. It used to run to
     // `function emitVendorGreeting(`, which is not adjacent — anything added
     // between the two failed this test for standing in the wrong place rather
     // than for doing the wrong thing. `talkablePeople` reads the live scene
@@ -210,7 +214,7 @@ describe('OTA-1078 — every vendor install records the meeting', () => {
   });
 
   it('a Hidden Market stall now HAS a ledger identity to write against', () => {
-    // Nothing but the stall path mints a `hidden_market_*` id, and OTA-1076's
+    // Nothing but the stall path mints a `hidden_market_*` id, and OTA-1053's
     // rule left those ids intact — so before the sighting was wired, every
     // recordNpcDealing against one of these was a no-op forever.
     const stall = { id: 'hidden_market_weapons', name: 'Ash-Sleeve' };
@@ -222,7 +226,7 @@ describe('OTA-1078 — every vendor install records the meeting', () => {
   });
 });
 
-describe('OTA-1078 — a story beat is never merged away', () => {
+describe('OTA-1055 — a story beat is never merged away', () => {
   it('THE BUG: a beat appended right after a world line keeps its marker', async () => {
     const store = await boot('Beat');
     store.getState().appendLog('world', 'The radar sweeps the flats and finds nothing.');
@@ -262,7 +266,7 @@ describe('OTA-1078 — a story beat is never merged away', () => {
   });
 });
 
-describe('OTA-1078 — "the log moved on" can actually be detected', () => {
+describe('OTA-1055 — "the log moved on" can actually be detected', () => {
   it('THE BUG: the visible-line total keeps climbing past the buffer cap', async () => {
     const store = await boot('Counter');
     // Fill well past MAX_LOG_IN_MEMORY (500). gameLog pins at the cap; the
@@ -292,7 +296,7 @@ describe('OTA-1078 — "the log moved on" can actually be detected', () => {
   });
 });
 
-describe('OTA-1078 — the Arbiter only counts what the PLAYER took', () => {
+describe('OTA-1055 — the Arbiter only counts what the PLAYER took', () => {
   it('the three world-grant sites are marked as grants', () => {
     expect((SRC.match(/bumpQuestsAccepted\(get, set, \{ granted: true \}\)/g) ?? []).length).toBe(3);
   });
@@ -321,7 +325,7 @@ describe('OTA-1078 — the Arbiter only counts what the PLAYER took', () => {
   });
 });
 
-describe('OTA-1078 — the face-to-face accept path finally credits the person', () => {
+describe('OTA-1055 — the face-to-face accept path finally credits the person', () => {
   it('acceptFactionQuest records contractsTaken against the agent', async () => {
     const store = await boot('Signer');
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -360,7 +364,7 @@ describe('OTA-1078 — the face-to-face accept path finally credits the person',
   });
 });
 
-describe('OTA-1078 — they call the place by its name', () => {
+describe('OTA-1055 — they call the place by its name', () => {
   const IRMA: NpcMet = { id: 'v_irma', name: 'Irma', role: 'armorer', factionId: 'forgotten_order' };
   const relAt = (dealings: Record<string, number>) => {
     let m = recordNpcSighting(emptyMemory(), IRMA, { nowMs: 1, hoursElapsed: 10 });
@@ -401,15 +405,15 @@ describe('OTA-1078 — they call the place by its name', () => {
   });
 });
 
-describe('OTA-1078 — only money that changes hands settles a debt', () => {
+describe('OTA-1055 — only money that changes hands settles a debt', () => {
   it('the buy path passes `spent`, so amends measure what was paid', () => {
     // tcTraded is lifetime volume across BOTH directions; paying a debt off by
     // selling loot to the person you robbed is not making amends.
-    expect(SRC).toMatch(/tcTraded: totalCost,\n\s+\/\/ OTA-1078[\s\S]{0,120}spent: totalCost,/);
+    expect(SRC).toMatch(/tcTraded: totalCost,\n\s+\/\/ OTA-1055[\s\S]{0,120}spent: totalCost,/);
   });
 });
 
-describe('OTA-1078 — a visit, not a re-render', () => {
+describe('OTA-1055 — a visit, not a re-render', () => {
   // ⚠ The rule that replaced the dead per-site guard. A review drove the real
   // store and measured a Hidden Market rep at SIX meetings after six tab taps —
   // past MEETINGS_FOR_NAME, so a shopkeeper used the player's name and reached
@@ -454,7 +458,7 @@ describe('OTA-1078 — a visit, not a re-render', () => {
   });
 });
 
-describe('OTA-1078 — the ambient stamp really consumes the counter', () => {
+describe('OTA-1055 — the ambient stamp really consumes the counter', () => {
   it('THE BUG: log-moved-on fires past the buffer cap', async () => {
     // ⚠ This is the test that was missing. The old coverage checked the counter
     // in isolation and grepped for the source line; pointing the stamp back at
@@ -476,9 +480,9 @@ describe('OTA-1078 — the ambient stamp really consumes the counter', () => {
   });
 });
 
-describe('OTA-1078 — a granted contract does not nag the player', () => {
+describe('OTA-1055 — a granted contract does not nag the player', () => {
   it("THE SYMPTOM: a grant does not make your next FIRST accept render compact", async () => {
-    // The player-visible consequence, asserted nowhere before: OTA-1071 keys the
+    // The player-visible consequence, asserted nowhere before: OTA-1048 keys the
     // compact accept card off the same counter the burst uses.
     const store = await boot('Granted');
     const neutral = HUNTS.filter((h) => h.factionId === null);
@@ -517,7 +521,7 @@ describe('OTA-1078 — a granted contract does not nag the player', () => {
   });
 });
 
-describe('OTA-1078 — restitution has to cost something, end to end', () => {
+describe('OTA-1055 — restitution has to cost something, end to end', () => {
   const AMENDS = 600;
   it('buying from someone you robbed clears the debt through the STORE', async () => {
     // ⚠ Replaces a regex over gameStore.ts. The engine rule was tested and the

@@ -1,11 +1,15 @@
-// OTA-1179 — THE FACTION STANDING WIRING, from a full read+write audit of the system.
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
+// OTA-1156 — THE FACTION STANDING WIRING, from a full read+write audit of the system.
 //
 // Owner: *"track all of the math and all of the wires for the faction standings. I
 // want to make sure that the entire system everything that it touches is working
 // correctly… search every part of this code for where the faction standings have
 // any kind of application and how they're wired and make sure nothing's broken."*
 //
-// ⚠ THE THEME. OTA-1178 fixed ONE caller that announced a standing grant it never
+// ⚠ THE THEME. OTA-1155 fixed ONE caller that announced a standing grant it never
 // verified. The audit found the same shape in five more places and, worse, the
 // mirror image on the READ side — where the failure is quieter still, because an
 // unknown id reads as `0`, which is indistinguishable from genuinely neutral.
@@ -73,9 +77,9 @@ const LEGACY = {
   mud_golems: 'mud_monarchs',
 } as const;
 
-describe('OTA-1179 — the READ side heals ids too, not just the write side', () => {
+describe('OTA-1156 — the READ side heals ids too, not just the write side', () => {
   it('⚠ getStanding used to read a legacy id as neutral — indistinguishable from unknown', () => {
-    // The quiet half of the OTA-1178 bug. A player who ground a faction to +30
+    // The quiet half of the OTA-1155 bug. A player who ground a faction to +30
     // through a vendor recorded under a bad id read as a STRANGER to every
     // consumer at once: pricing, contracts, hostility, brokering, titles, the sheet.
     const standing = [{ factionId: 'stone_builders', standing: 30 }];
@@ -107,7 +111,7 @@ describe('OTA-1179 — the READ side heals ids too, not just the write side', ()
   });
 });
 
-describe('OTA-1179 — every faction has a row, forever', () => {
+describe('OTA-1156 — every faction has a row, forever', () => {
   const bare = (over: Partial<PlayerCharacter> = {}): PlayerCharacter =>
     ({
       name: 'Verbal', stats: { strength: 5, dexterity: 5, intelligence: 5, wisdom: 5, charisma: 5, stealth: 5 },
@@ -160,7 +164,7 @@ describe('OTA-1179 — every faction has a row, forever', () => {
   });
 });
 
-describe('OTA-1179 — the hunt roll is about the faction that is actually hunting you', () => {
+describe('OTA-1156 — the hunt roll is about the faction that is actually hunting you', () => {
   it('⚠ the function reduces to the MINIMUM of whatever array it is handed', () => {
     // This is the mechanism. Handing it the whole table means the roll for a
     // Reclaimers patrol is computed from your worst standing with anybody.
@@ -184,7 +188,7 @@ describe('OTA-1179 — the hunt roll is about the faction that is actually hunti
   });
 });
 
-describe('OTA-1179 — the join threshold is one number', () => {
+describe('OTA-1156 — the join threshold is one number', () => {
   it('every consumer derives from JOIN_THRESHOLD instead of copying 20', () => {
     expect(AFFILIATED_STANDING).toBe(JOIN_THRESHOLD);
     const bounty = read('app', 'engine', 'factionBounty.ts');
@@ -204,9 +208,9 @@ describe('OTA-1179 — the join threshold is one number', () => {
   });
 });
 
-describe('OTA-1179 — writers report what landed, not what was authored', () => {
+describe('OTA-1156 — writers report what landed, not what was authored', () => {
   it('⚠ the story fork stopped printing a raw id and an unverified delta', () => {
-    // The closest structural twin of the OTA-1178 gift bug: bare `.standing`,
+    // The closest structural twin of the OTA-1155 gift bug: bare `.standing`,
     // `changed` discarded, log unconditional, and the underscored id shown raw.
     const i = STORE.indexOf('function applyForkEffects');
     const fn = STORE.slice(i, STORE.indexOf('\n}\n', i));
@@ -243,14 +247,14 @@ describe('OTA-1179 — writers report what landed, not what was authored', () =>
   });
 });
 
-describe('OTA-1179 — honest custom is not confiscated', () => {
+describe('OTA-1156 — honest custom is not confiscated', () => {
   it('⚠ the buy pool is only spent when the grant actually lands', () => {
     // Every roadside trader has `faction: null`, so crossing 500 TC at one used to
     // burn 500 TC of accumulated credit and grant nothing — permanently, because
     // the pool does not refund. Same loss at REP_MAX.
-    // ⚠ OTA-1181 RETARGET, NOT A REGRESSION. This used to anchor its slice on
+    // ⚠ OTA-1158 RETARGET, NOT A REGRESSION. This used to anchor its slice on
     // `const BUY_REP_TC_PER_STANDING = 500;` — a function-local declaration that
-    // OTA-1181 promoted to engine/factions.ts so the character sheet could state
+    // OTA-1158 promoted to engine/factions.ts so the character sheet could state
     // the rule instead of printing a second copy of the number. The claim being
     // asserted (the pool is debited only when the grant lands) is unchanged and is
     // still asserted in full; only the anchor moved, onto the pool arithmetic
@@ -265,7 +269,7 @@ describe('OTA-1179 — honest custom is not confiscated', () => {
     // and the constant still exists, at its new single home
     expect(read('app', 'engine', 'factions.ts'))
       .toContain('export const BUY_REP_TC_PER_STANDING = 500;');
-    expect(STORE).toContain('BUY_REP_TC_PER_STANDING, // OTA-1181');
+    expect(STORE).toContain('BUY_REP_TC_PER_STANDING, // OTA-1158');
   });
 
   it('the roadside vendors this protects really do have no faction', () => {
@@ -275,9 +279,9 @@ describe('OTA-1179 — honest custom is not confiscated', () => {
   });
 });
 
-describe('OTA-1179 — the vendor screen charges what it shows', () => {
+describe('OTA-1156 — the vendor screen charges what it shows', () => {
   it('⚠ the display passes all SIX price factors, like the purchase does', () => {
-    // It passed four. Missing: OTA-1076 per-person regard and OTA-1089's Phase-4
+    // It passed four. Missing: OTA-1053 per-person regard and OTA-1066's Phase-4
     // pressure tide — so shown and charged silently disagreed for any vendor who
     // liked or disliked you, inside the very file written to prevent that drift.
     const shown = VENDOR_SCREEN.match(/finalBuyPrice\(o\.price, \{([^}]*)\}/)?.[1] ?? '';
@@ -295,7 +299,7 @@ describe('OTA-1179 — the vendor screen charges what it shows', () => {
   });
 });
 
-describe('OTA-1179 — text that described the wrong rule', () => {
+describe('OTA-1156 — text that described the wrong rule', () => {
   it('the scion title finally mentions the standing it requires', () => {
     const titles = read('app', 'data', 'lore', 'arbiter-titles.json');
     const scion = JSON.parse(titles).find?.((t: { id: string }) => t.id === 'scion_of_the_giants')
@@ -309,31 +313,31 @@ describe('OTA-1179 — text that described the wrong rule', () => {
   });
 });
 
-describe('OTA-1179 — the held decisions are untouched', () => {
+describe('OTA-1156 — the held decisions are untouched', () => {
   // ⚠ These assertions exist so a future session cannot quietly implement the
   // owner's pending design calls as "cleanup". He is deciding on them.
   //
   // ⚠ THE AMBIENT-RATCHET ASSERTION THAT LIVED HERE IS GONE ON PURPOSE. The owner
   // DECIDED that one on 2026-08-07 ("you should work to get standing, not earn it
-  // by breathing") and OTA-1180 shipped it. Its replacement lives in
-  // ota1180AmbientStandingOff and asserts the OPPOSITE — that the catalogue's
+  // by breathing") and OTA-1157 shipped it. Its replacement lives in
+  // ota1157AmbientStandingOff and asserts the OPPOSITE — that the catalogue's
   // repDelta count is ZERO. Deciding a held item does not retire its lock; it
   // inverts it, so the decision is as hard to undo as the hold was.
 
   // ⚠ THE DIFFICULTY-SCALER ASSERTION THAT LIVED HERE IS ALSO GONE ON PURPOSE, and
   // for the same reason as the ratchet above: the owner DECIDED it (2026-08-07,
-  // "do your suggestion with number 3") and OTA-1182 shipped it. Its replacement is
-  // ota1182ScalerKnowsGear, which asserts the opposite — that AC and weapon damage
+  // "do your suggestion with number 3") and OTA-1159 shipped it. Its replacement is
+  // ota1159ScalerKnowsGear, which asserts the opposite — that AC and weapon damage
   // DO reach the curve, that a fresh arrival is untouched to the decimal, and that
   // nothing saturates overLevelT.
 
   // ⚠ ALL FOUR HOLDS ARE NOW DISCHARGED, AND THIS BLOCK IS THE RECORD OF THAT.
   // Each was asserted UNCHANGED here while the owner decided, and each assertion was
   // INVERTED — not deleted — into the suite that shipped the decision:
-  //   1. the ambient standing ratchet   → OTA-1180, ota1180AmbientStandingOff
-  //   2. the in-game explainer text     → OTA-1181, ota1181StandingTextTruth
-  //   3. the difficulty scaler          → OTA-1182, ota1182ScalerKnowsGear
-  //   4. the contract-refusal wording   → OTA-1182, ota1182RefusalTellsTruth
+  //   1. the ambient standing ratchet   → OTA-1157, ota1157AmbientStandingOff
+  //   2. the in-game explainer text     → OTA-1158, ota1158StandingTextTruth
+  //   3. the difficulty scaler          → OTA-1159, ota1159ScalerKnowsGear
+  //   4. the contract-refusal wording   → OTA-1159, ota1159RefusalTellsTruth
   // The fifth item, the theft/extort spillover, was DECIDED TOO — see below.
 
   it('⚠ DECIDED — the spillover is capped on the GAIN side and only there', () => {
@@ -344,7 +348,7 @@ describe('OTA-1179 — the held decisions are untouched', () => {
     // down a faction's enemies was an unbounded climb with them.
     //
     // The owner's call, in two steps and the second supersedes the first: "leave it",
-    // then "just nerf it a bit like you suggested" (2026-08-07). OTA-1182 meters the
+    // then "just nerf it a bit like you suggested" (2026-08-07). OTA-1159 meters the
     // GAINS against a lifetime per-faction budget and leaves the LOSSES uncapped.
     // ⚠ Do not "finish the job" by capping the losses too. The asymmetry is the
     // design: being hated must have no ceiling, or a player can spend past their own

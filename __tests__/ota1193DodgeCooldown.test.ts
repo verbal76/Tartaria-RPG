@@ -1,4 +1,8 @@
-// OTA-1193 — DODGE GETS A COOLDOWN, AND THE BUTTON SHOWS IT.
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
+// OTA-1170 — DODGE GETS A COOLDOWN, AND THE BUTTON SHOWS IT.
 //
 // Owner: "put a cooldown timer on dodge. once it's used have it turn red and slowly fill
 // back to blue; when it's full blue it can be used again. make the color fill left to
@@ -59,7 +63,7 @@ const read = (...p: string[]): string => fs.readFileSync(path.join(__dirname, '.
 const STORE = read('app', 'state', 'gameStore.ts');
 const INPUT = read('app', 'components', 'InputBox.tsx');
 
-describe('OTA-1193 — the cooldown is counted in rounds', () => {
+describe('OTA-1170 — the cooldown is counted in rounds', () => {
   it('⚠ THREE ROUNDS — dodge, two locked, ready on the third', () => {
     expect(DODGE_COOLDOWN_ROUNDS).toBe(3);
   });
@@ -86,7 +90,7 @@ describe('OTA-1193 — the cooldown is counted in rounds', () => {
   });
 
   it('⚠ THE REFUSAL NAMES THE UNIT — beats, not seconds', () => {
-    // A cooldown that refuses without saying how long is the OTA-1187 defect again; and
+    // A cooldown that refuses without saying how long is the OTA-1164 defect again; and
     // saying "seconds" would teach a unit the bar is not counting in.
     expect(dodgeCooldownLine(2)).toMatch(/2 more beats/);
     expect(dodgeCooldownLine(1)).toMatch(/1 more beat/);
@@ -94,7 +98,7 @@ describe('OTA-1193 — the cooldown is counted in rounds', () => {
   });
 });
 
-describe('OTA-1193 — the store arms and ticks it', () => {
+describe('OTA-1170 — the store arms and ticks it', () => {
   beforeEach(async () => {
     await useGameStore.getState().hydrate();
     await useGameStore.getState().startNewGame({ name: 'Dodge', raceId: 'reclaimer', factionId: 'reclaimers_guild' });
@@ -130,7 +134,7 @@ describe('OTA-1193 — the store arms and ticks it', () => {
 
   it('⚠ THE REFUSAL BUZZES AND DOES NOT SPEND THE TURN', () => {
     // A cooldown that silently eats the action is worse than no cooldown.
-    const i = STORE.indexOf('OTA-1193 — THE COOLDOWN GATE');
+    const i = STORE.indexOf('OTA-1170 — THE COOLDOWN GATE');
     expect(i).toBeGreaterThan(-1);
     // ⚠ Wide enough to clear the comment banner. The first draft sliced 900 chars and
     // read only prose — the code it meant to assert on started after that.
@@ -147,7 +151,7 @@ describe('OTA-1193 — the store arms and ticks it', () => {
   });
 });
 
-describe('OTA-1193 — the button shows it', () => {
+describe('OTA-1170 — the button shows it', () => {
   it('⚠ TWO FLAT LAYERS, NO GRADIENT AND NO ANIMATION', () => {
     // Owner: "turn red and slowly fill back to blue… fill left to right with no fade."
     expect(INPUT).toContain('cooldownTrack');
@@ -161,7 +165,7 @@ describe('OTA-1193 — the button shows it', () => {
     // continuation lines carry no marker at all, so a per-line filter leaves most of the
     // banner in — which is how the second draft still flagged the sentence "no Animated
     // value anywhere" as an Animated usage.
-    const i = INPUT.indexOf('OTA-1193 — THE RECHARGE BAR');
+    const i = INPUT.indexOf('OTA-1170 — THE RECHARGE BAR');
     const codeOnly = INPUT.slice(i - 10, i + 1400)
       .replace(/\{\/\*[\s\S]*?\*\/\}/g, '')
       .replace(/\/\*[\s\S]*?\*\//g, '')
@@ -178,11 +182,11 @@ describe('OTA-1193 — the button shows it', () => {
   });
 
   it('⚠ THE CHIP STAYS TAPPABLE WHILE RED — the engine answers, the UI does not swallow', () => {
-    // Disabling it in the UI would refuse in silence, which is the bug OTA-1187 existed to
+    // Disabling it in the UI would refuse in silence, which is the bug OTA-1164 existed to
     // remove. The tap goes through and the store buzzes + explains.
-    const i = INPUT.indexOf('OTA-1193 — DODGE carries a recharge bar');
+    const i = INPUT.indexOf('OTA-1170 — DODGE carries a recharge bar');
     const block = INPUT.slice(i, i + 400);
-    // ⚠ OTA-1194 RETARGETED, NOT RELAXED — the bar's DENOMINATOR is now the character's
+    // ⚠ OTA-1171 RETARGETED, NOT RELAXED — the bar's DENOMINATOR is now the character's
     // difficulty tier. Divide bury_me's 5-round lock by the bare constant 3 and the chip
     // paints full blue with two beats still locked, inviting a tap it will then refuse.
     expect(block).toContain('cooldownFill={dodgeFill(dodgeCooldown, dodgeMax)}');

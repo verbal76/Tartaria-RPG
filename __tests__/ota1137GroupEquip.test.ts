@@ -1,9 +1,13 @@
-// OTA-1137 — GROUP EQUIP / UNEQUIP.
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
+// OTA-1114 — GROUP EQUIP / UNEQUIP.
 //
 // Owner: "you should be able to pick your armor hold and select a group and
 // either equip all or unequip all depending on what you selected."
 //
-// The bug underneath the request: OTA-1123's group bar had four actions, and
+// The bug underneath the request: OTA-1100's group bar had four actions, and
 // for a group of WORN ARMOR the only one that ever appeared was SCRAP — DROP
 // excludes worn gear, RESERVE needs fusion eligibility. Scrap auto-unequips and
 // then destroys. So the sole thing the screen let you do to your armor was
@@ -30,7 +34,7 @@ const item = (name: string, id = name.toLowerCase().replace(/\s+/g, '_')): Inven
 
 const NONE = new Set<string>();
 
-describe('OTA-1137 — planGroupEquip resolves slot contention before the button lies', () => {
+describe('OTA-1114 — planGroupEquip resolves slot contention before the button lies', () => {
   it('a full set of armor all goes on — one piece per slot, in list order', () => {
     const set = [
       item('Iron Helm'), item('Iron Cuirass'), item('Iron Gauntlets'),
@@ -102,7 +106,7 @@ describe('OTA-1137 — planGroupEquip resolves slot contention before the button
   });
 });
 
-describe('OTA-1137 — two-handed weapons eat both hands', () => {
+describe('OTA-1114 — two-handed weapons eat both hands', () => {
   it('a two-hander is planned once and blocks a second weapon from the off hand', () => {
     // Catalog lookup drives this, so use a real two-handed weapon name if the
     // catalog has one; otherwise the pair simply fills main then off, which is
@@ -115,7 +119,7 @@ describe('OTA-1137 — two-handed weapons eat both hands', () => {
   });
 });
 
-describe('OTA-1137 — the screen wires both actions, and the destructive one is no longer alone', () => {
+describe('OTA-1114 — the screen wires both actions, and the destructive one is no longer alone', () => {
   const screen: string = fs.readFileSync(
     path.join(__dirname, '../app/screens/InventoryScreen.tsx'), 'utf8');
 
@@ -173,11 +177,12 @@ describe('OTA-1137 — the screen wires both actions, and the destructive one is
 
   it('the "nothing here can be done" line now accounts for the gear actions too', () => {
     expect(screen).toContain('+ equipPlan.equip.length + unequippable.length === 0');
-    expect(screen).toContain('Nothing here can be worn, dropped, scrapped or reserved');
+    // ⚠ OTA-1243 — the breakdown verb is SALVAGE in all player copy now.
+    expect(screen).toContain('Nothing here can be worn, dropped, salvaged or reserved');
   });
 });
 
-describe('OTA-1137 — the planner is documented as a planner, not a loop', () => {
+describe('OTA-1114 — the planner is documented as a planner, not a loop', () => {
   const eqSrc: string = fs.readFileSync(
     path.join(__dirname, '../app/engine/equipment.ts'), 'utf8');
 

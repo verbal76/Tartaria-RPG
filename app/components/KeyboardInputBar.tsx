@@ -72,7 +72,10 @@ export function KeyboardInputBar() {
   const active = useGameStore((s) => s.explorationInputActive);
   const setActive = useGameStore((s) => s.setExplorationInputActive);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
-  const [text, setText] = useState('');
+  // ⚠⚠ OTA-1270 — shared draft (see gameStore.explorationDraft). This bar and
+  // the in-flow InputBox render the SAME text; either ACT submits it.
+  const text = useGameStore((s) => s.explorationDraft);
+  const setText = useGameStore((s) => s.setExplorationDraft);
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
@@ -165,7 +168,7 @@ export function KeyboardInputBar() {
     };
   }, []);
 
-  // OTA-956 — RELIABILITY POLL, reworked from the first cut (which armed it once on MOUNT, so
+  // OTA-933 — RELIABILITY POLL, reworked from the first cut (which armed it once on MOUNT, so
   // a keyboard opened any later never got the net — "still doesn't always get pushed up").
   // Android-only: Fabric drops the height events ~half the time there, while iOS events
   // are reliable AND iOS metrics() reports a stale non-zero height during the dismiss
@@ -201,7 +204,7 @@ export function KeyboardInputBar() {
     return () => clearInterval(pollTimer);
   }, [active]);
 
-  // ⚠⚠ OTA-1251 — NEVER ON DESKTOP. This whole component solves ONE problem:
+  // ⚠⚠ OTA-1228 — NEVER ON DESKTOP. This whole component solves ONE problem:
   // a soft keyboard covering the input field. A PC has no soft keyboard, so on
   // the desktop build it mounted for no reason and rendered as a stray bar
   // stretched edge-to-edge across the middle of a 2259px window, floating over
@@ -247,7 +250,10 @@ export function KeyboardInputBar() {
       : Math.round(Dimensions.get('window').height * 0.36);
 
   const retract = () => {
-    setText('');
+    // ⚠ OTA-1270 — retract no longer WIPES the draft. Closing the keyboard
+    // without sending used to eat what was typed here while the in-flow box
+    // kept its own copy; with one shared draft, backing out keeps the text
+    // sitting in the in-flow box, ready for its ACT. Submit clears explicitly.
     useGameStore.getState().setExplorationInputActive(false);
   };
 
@@ -255,6 +261,7 @@ export function KeyboardInputBar() {
     const trimmed = text.trim();
     if (!trimmed) return;
     submit(trimmed);
+    setText('');
     inputRef.current?.clear();
     retract();
     Keyboard.dismiss();

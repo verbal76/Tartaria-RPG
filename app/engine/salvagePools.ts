@@ -81,7 +81,7 @@ const POOLS: SalvagePool[] = [
       { name: 'Scrap Metal', rarity: 'Common', weight: 25, min: 1, max: 3 },
       { name: 'Climbing Rope', rarity: 'Common', weight: 20, min: 1, max: 1 },
       { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 20, min: 3, max: 8 },
-      // OTA-772 — the Aetheric Torch is a managed resource now (its use is a
+      // OTA-752 — the Aetheric Torch is a managed resource now (its use is a
       // scarce Rare/Legendary gamble); it no longer falls out of generic
       // rubble. It stays craftable + purchasable, plus a low-rate thematic
       // find in the 'light' salvage pool below.
@@ -93,6 +93,7 @@ const POOLS: SalvagePool[] = [
       'blade', 'sword', 'axe', 'pike', 'rifle', 'spear', 'rod',
       'knife', 'cleaver', 'maul', 'hammer', 'gun', 'gauntlet',
       'staff', 'bow', 'harpoon',
+      'dagger',   // ⚠ OTA-1242 — the census caught `ritual dagger` sitting homeless.
     ],
     items: [
       { name: 'Scrap Metal', rarity: 'Common', weight: 40, min: 1, max: 2 },
@@ -139,7 +140,7 @@ const POOLS: SalvagePool[] = [
       { name: 'Aether Dust', rarity: 'Common', weight: 40, min: 1, max: 3 },
       { name: 'Aether Crystal', rarity: 'Common', weight: 25, min: 1, max: 1 },
       { name: 'Scrap Metal', rarity: 'Common', weight: 20, min: 1, max: 2 },
-      // OTA-772 — trimmed 15 → 4: torches are a managed resource; a broken
+      // OTA-752 — trimmed 15 → 4: torches are a managed resource; a broken
       // lantern only occasionally yields a still-working one.
       { name: 'Aetheric Torch', rarity: 'Common', weight: 4, min: 1, max: 1 },
     ],
@@ -302,6 +303,163 @@ const POOLS: SalvagePool[] = [
       { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 10, min: 1, max: 2 },
     ],
   },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ⚠⚠ OTA-1242 — THE CENSUS POOLS. Owner, working out the model out loud:
+  // *"take is for carryable items that might be scrapped later... all the rest
+  // are just smaller items that can be salvaged."*
+  //
+  // ⚠⚠ THAT RULE WAS NOT TRUE, AND THE CENSUS IS HOW WE FOUND OUT BY HOW MUCH.
+  // Measured across every noun the world can place — 975 of them from
+  // locations.json — the split was:
+  //
+  //     take (a real catalog item)   69
+  //     salvage (a pool matched)    453
+  //     climb                        44
+  //     water source                 15
+  //     NO HOME AT ALL              394     ← 40% of the vocabulary
+  //
+  // Those 394 were silently DROPPED from the loot picker by OTA-1234, which was
+  // the right call at the time (the SALVAGE button was promising to break them and
+  // finding nothing) but papered over the real problem: an anvil is a lump of iron
+  // and the game pretended it was not there.
+  //
+  // ⚠ THESE POOLS SIT LAST ON PURPOSE. `pickPool` walks top-down and stops at the
+  // first hit, so every pool above still wins its own nouns — these only catch what
+  // nothing else claimed. They are broad by design: patterns, not enumerations, so
+  // a noun added to the world next year lands somewhere instead of vanishing.
+  //
+  // ⚠⚠ WHAT IS DELIBERATELY *NOT* GIVEN A POOL, because the owner's rule has a real
+  // boundary: you cannot strip a stain, a footprint, an echo, a fog bank, a
+  // corridor or a vent. Those are places and traces, not objects, and handing them
+  // a material would be the "button that lies" all over again in the other
+  // direction. They stay out of the picker, and INVESTIGATE remains their verb.
+  {
+    id: 'fixture_metal',
+    // Ironmongery and instruments: the anvil that started this, plus everything
+    // bolted to a wall that is fundamentally a lump of worked metal.
+    patterns: [
+      'anvil', 'bell', 'bellows', 'chisel', 'grate', 'lever', 'lock', 'keyway',
+      'hinge', 'clamp', 'ring', 'hook', 'chandelier', 'sconce', 'kettle',
+      'pot', 'pan', 'gauge', 'meter', 'dial', 'siren', 'horn', 'drum',
+      'vane', 'tripod', 'clip', 'buckle', 'nail', 'bolt', 'screw', 'spring',
+      'sphere', 'weight', 'clock', 'compass', 'stabilizer', 'emitter',
+      'detector', 'sensor', 'scanner', 'filter', 'portcullis', 'harness',
+      // ⚠ SECOND PASS. The first census pass left 218 nouns homeless and the
+      // remainder was read by hand rather than declared finished — these are the
+      // obvious metal objects it had missed.
+      'armor', 'greaves', 'shield', 'glove', 'gauntlet', 'knuckles', 'plate',
+      'crown', 'necklace', 'pendant', 'insignia', 'badge', 'seal', 'coin',
+      'key', 'tank', 'vat', 'wheel', 'crampon', 'piton', 'stake', 'mask',
+      'knight', 'scale', 'grenade', 'elevator', 'platform', 'monitor',
+      'slide rule', 'shaft', 'spark', 'signal',
+      'cage',     // ⚠ OTA-1243 — the rescue prop; after the dog quest it is iron bars.
+    ],
+    items: [
+      { name: 'Scrap Metal', rarity: 'Common', weight: 40, min: 1, max: 3 },
+      { name: 'Bent Nail', rarity: 'Common', weight: 25, min: 1, max: 3 },
+      { name: 'Aether Dust', rarity: 'Common', weight: 15, min: 1, max: 2 },
+      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 12, min: 1, max: 3 },
+      { name: 'Aether Crystal', rarity: 'Common', weight: 8, min: 1, max: 1 },
+    ],
+  },
+  {
+    id: 'stonework',
+    // Masonry and monuments. ⚠ These are the ones the portability rules already
+    // refuse to let you TAKE ("centuries-old stonework doesn't fit in any pack
+    // ever made") — so a refusal pointed at SALVAGE finally has somewhere to land.
+    patterns: [
+      'statue', 'idol', 'font', 'dais', 'plinth', 'pedestal', 'tile', 'mosaic',
+      'pavement', 'cairn', 'post', 'marker', 'step', 'fence', 'archway',
+      'barricade', 'fountain', 'stalactite', 'pebble', 'carving', 'engraving',
+      'plaque', 'throne', 'pew', 'kneeler', 'lectern', 'pulpit', 'stand',
+      'counter', 'masonry', 'obelisk', 'monument', 'waypoint',
+      // ⚠ Second pass — hearths, wells and the shaped-ground family.
+      'firepit', 'fire pit', 'hearth', 'well', 'cistern', 'reef', 'ridge',
+      'hatch',    // ⚠ a metal lid in a stone floor — `drain hatch` was homeless.
+      'circle', 'perch', 'sign', 'pier', 'seat', 'header', 'stall',
+    ],
+    items: [
+      { name: 'Smooth Stone', rarity: 'Common', weight: 35, min: 1, max: 3 },
+      { name: 'Mud Fragment', rarity: 'Common', weight: 25, min: 1, max: 3 },
+      { name: 'Scrap Metal', rarity: 'Common', weight: 15, min: 1, max: 2 },
+      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 15, min: 1, max: 2 },
+      { name: 'Aether Crystal', rarity: 'Common', weight: 10, min: 1, max: 1 },
+    ],
+  },
+  {
+    id: 'textile',
+    // Cloth, cord and leather. Broader than the existing `fabric` pool, which
+    // only claims a handful of specific nouns.
+    patterns: [
+      'pack', 'bedroll', 'canvas', 'cord', 'line', 'net', 'tapestry', 'flag',
+      'cushion', 'vestment', 'leather', 'strap', 'sail', 'awning', 'tarp',
+      'blanket', 'wrapping', 'bandage', 'satchel', 'pouch', 'basket',
+      // ⚠ Second pass — sacks, tents and the paper family (paper is a fibre).
+      'sack', 'tent', 'toy', 'kit', 'papyrus', 'wares', 'cargo', 'flotsam',
+      'blackboard', 'loft', 'trellis', 'desk', 'skiff',
+    ],
+    items: [
+      { name: 'Cloth Scrap', rarity: 'Common', weight: 40, min: 1, max: 3 },
+      { name: 'Spider Silk', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Climbing Rope', rarity: 'Common', weight: 15, min: 1, max: 1 },
+      { name: 'Stick', rarity: 'Common', weight: 15, min: 1, max: 2 },
+      { name: 'Aetheric Cloth', rarity: 'Uncommon', weight: 10, min: 1, max: 1 },
+    ],
+  },
+  {
+    id: 'glassware',
+    patterns: [
+      'glass', 'mirror', 'prism', 'vial', 'chalice', 'cup', 'basin', 'bowl',
+      'flask', 'lens', 'pane', 'bottle', 'jar', 'decanter', 'monstrance',
+      'censer', 'crucible',
+      // ⚠ Second pass — raw crystal is glassware's nearest family.
+      'crystal', 'rune glass', 'instrument',
+    ],
+    items: [
+      { name: 'Aether Crystal', rarity: 'Common', weight: 30, min: 1, max: 2 },
+      { name: 'Aether Dust', rarity: 'Common', weight: 25, min: 1, max: 3 },
+      { name: 'Smooth Stone', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Scrap Metal', rarity: 'Common', weight: 15, min: 1, max: 2 },
+      { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 10, min: 1, max: 1 },
+    ],
+  },
+  {
+    id: 'growth',
+    // Living matter — the one family whose yield is deliberately NOT metal.
+    patterns: [
+      'moss', 'fungus', 'fungal', 'mushroom', 'spore', 'root', 'bloom',
+      'blossom', 'kelp', 'seaweed', 'coral', 'tendril', 'bramble', 'vine',
+      'overgrowth', 'nest', 'shell', 'claw', 'tooth', 'anemone', 'lichen',
+      'weed', 'thicket', 'creeper', 'egg',
+      // ⚠ Second pass.
+      'crab', 'oyster', 'shedding', 'patch', 'bed',
+    ],
+    items: [
+      { name: 'Stick', rarity: 'Common', weight: 30, min: 1, max: 3 },
+      { name: 'Spider Silk', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Bone Sliver', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Mud Fragment', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Aether Crystal', rarity: 'Common', weight: 10, min: 1, max: 1 },
+    ],
+  },
+  {
+    id: 'devotional',
+    // Shrine goods. ⚠ Kept as its own pool rather than folded into stonework so
+    // the yields can read as offerings — wax, coin, a little worked metal — which
+    // is what a vigil-shrine actually leaves behind.
+    patterns: [
+      'candle', 'offering', 'beads', 'cross', 'reliquary', 'shrine ',
+      'prayer', 'votive', 'vigil', 'hymnal', 'missal', 'incense',
+    ],
+    items: [
+      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 30, min: 1, max: 4 },
+      { name: 'Cloth Scrap', rarity: 'Common', weight: 25, min: 1, max: 2 },
+      { name: 'Stick', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Scrap Metal', rarity: 'Common', weight: 15, min: 1, max: 2 },
+      { name: 'Aether Dust', rarity: 'Common', weight: 10, min: 1, max: 2 },
+    ],
+  },
 ];
 
 // 2026-05-25 — NOTHING_LINES removed. POLISH-2 (OTA-003) repurposed
@@ -312,7 +470,7 @@ const POOLS: SalvagePool[] = [
 // still return that kind, and the gameStore salvage handler at
 // :3878 unions both outcomes via the shared kind discriminator.
 
-// OTA-1005 — CURIOS: the Fusing Crucible's fuel. Catalog-ABSENT names (that absence
+// OTA-982 — CURIOS: the Fusing Crucible's fuel. Catalog-ABSENT names (that absence
 // is what makes them inferred, and inferred is the only thing the Crucible
 // accepts). Salvage rolls one instead of a catalog material CURIO_CHANCE of the
 // time. Because the bulk `salvage all` path calls rollSalvagePool ONCE PER NOUN,
@@ -425,13 +583,35 @@ function pickWeighted(items: PoolEntry[], rng: () => number): PoolEntry {
  *  2026-05-25 [POLISH-2] — the "nothing" branch now rolls from
  *  JUNK_POOL so the player always walks away with at least one
  *  item; the empty outcome is gone from this path. */
+/** ⚠⚠ OTA-1232 — DOES THIS NOUN HAVE A SALVAGE YIELD AT ALL? Pure, deterministic,
+ *  and rolls nothing — the question a REFUSAL LINE has to answer before it tells
+ *  the player to go and salvage something.
+ *
+ *  Owner, after the take/salvage audit: the eight scene-feature refusals all ended
+ *  with "(Try SALVAGE.)" unconditionally (OTA-137 made it universal so a hoarder
+ *  would learn the verb). Measured against the shipped pools, `sign` and `arch`
+ *  match NO pool — so on those nouns the advice sent the player somewhere empty,
+ *  which is the same defect class as the contract refusal that used to blame
+ *  travel: a message that costs the player a turn doing the one thing that
+ *  provably cannot help.
+ *
+ *  ⚠ It mirrors `rollSalvagePool`'s FIRST TWO decisions and nothing after them —
+ *  the sigil head-noun gate, then `pickPool`. Everything past that point is the
+ *  random half (nothing-chance, curio valve, weighted pick), which changes WHAT
+ *  you get, never WHETHER there is anything. Reproducing more of it here would
+ *  make the two drift; reproducing less would make this lie. */
+export function hasSalvageYield(noun: string): boolean {
+  if (/(?:^|[\s-])(sigil|crest)s?\s*$/i.test(noun.trim())) return true;
+  return pickPool(noun) !== null;
+}
+
 export function rollSalvagePool(noun: string, rng: () => number = Math.random): SalvageOutcome | null {
-  // OTA-1000 — a SIGIL/CREST noun is a faction's mark, not scrap (owner: "a pried
+  // OTA-977 — a SIGIL/CREST noun is a faction's mark, not scrap (owner: "a pried
   // sigil awards coin? it should give me a faction sigil"). Faction inferred
   // from the noun's own words (the sigils.ts keyword map — "architect sigil"
   // → Architect Sigil), otherwise rolled across the nine. The turn-in economy
   // (sigils.ts, +1 standing at that faction's agent) takes it from there.
-  // OTA-1014 — HEAD-NOUN gate: the thing being salvaged must BE the sigil/crest
+  // OTA-991 — HEAD-NOUN gate: the thing being salvaged must BE the sigil/crest
   // ("seal sigil", "mud crest"), not merely mention one ("sigil floor",
   // "sigil-etched door"). Prying a floor should yield floor scrap.
   if (/(?:^|[\s-])(sigil|crest)s?\s*$/i.test(noun.trim())) {
@@ -463,7 +643,7 @@ export function rollSalvagePool(noun: string, rng: () => number = Math.random): 
       line,
     };
   }
-  // OTA-1005 — the CURIO VALVE (see CURIO_CHANCE). Rolled AFTER the nothing-branch
+  // OTA-982 — the CURIO VALVE (see CURIO_CHANCE). Rolled AFTER the nothing-branch
   // (that one is the failure path) and BEFORE the ordinary material pick, so a
   // curio REPLACES the material you would otherwise have got — the take per
   // salvage is unchanged, only its nature. Effective rate is CURIO_CHANCE of

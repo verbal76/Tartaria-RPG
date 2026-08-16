@@ -1,3 +1,7 @@
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
@@ -12,12 +16,10 @@ jest.mock('llama.rn', () => ({
   releaseAllLlama: jest.fn(),
 }));
 
-// ⚠⚠ OTA-1260 — NARRATION N1–N3, PORTED FROM GOLEM.
+// ⚠⚠ OTA-1258 — NARRATION TRACK N1–N3, WORKED IN ORDER.
 //
-// Owner: *"measure first, then port n1-n3 to hal."* All three are line-agnostic —
-// the bank, the idle trigger and the preempt path predate every picker change, so
-// HAL carried all three bugs unchanged. The golem evidence is quoted below because
-// that is where the device logs came from; the code paths are identical.
+// Owner: *"let's work on n1-6 in order."* The plan lives in HANDOFF; these are the
+// first three, each with the measurement that says whether it worked.
 //
 // ⚠⚠ N1 — A BANKED INTRO NARRATED THE PAST. From the owner's 2026-08-14 log:
 // `"You climb down the arch, feeling the weight of the city's collapse before
@@ -53,7 +55,7 @@ const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p)
 
 beforeEach(() => { _resetSceneIntroBank(); });
 
-describe('OTA-1260 N1 — a banked line belongs to the room it was written in', () => {
+describe('OTA-1258 N1 — a banked line belongs to the room it was written in', () => {
   it('⚠⚠ THE OWNER\'S BUG: two rooms of one outpost no longer share a bank', () => {
     // The Atrium and the Court both report loc=monarch_waystation. Before this,
     // both read the same key and a line written in one was spent in the other.
@@ -108,7 +110,7 @@ describe('OTA-1260 N1 — a banked line belongs to the room it was written in', 
   });
 });
 
-describe('OTA-1260 N2 — the trigger is no longer shorter than the job', () => {
+describe('OTA-1258 N2 — the trigger is no longer shorter than the job', () => {
   /** Mirrors the shipped arithmetic. The POINT is the relationship between the
    *  threshold and the measured job time, which is what was wrong. */
   const idleFor = (avgMs: number, count: number): number => {
@@ -144,7 +146,12 @@ describe('OTA-1260 N2 — the trigger is no longer shorter than the job', () => 
     const i = store.indexOf('const introIdleMs = (): number => {');
     expect(i).toBeGreaterThan(-1);
     const block = store.slice(i, i + 500);
-    expect(block).toContain("qwenJobStats().find((j) => j.job === 'scene_intro')");
+    // ⚠⚠ OTA-1263 CORRECTED THIS PIN AND THE CODE UNDER IT. The lookup used the
+    // bare intent `'scene_intro'`, but the telemetry label is
+    // `narration:scene_intro_fill` — so it never matched and the threshold never
+    // moved off its floor. **The pin asserted the mechanism I wrote, not that the
+    // mechanism finds anything**, which is why it passed over a dead fix.
+    expect(block).toContain("qwenJobStats().find((j) => j.job === 'narration:scene_intro_fill')");
     expect(block).toContain('st.avgMs');
     expect(block).toContain('st.count < 3');
     // The old fixed constant is gone as a trigger.
@@ -154,17 +161,14 @@ describe('OTA-1260 N2 — the trigger is no longer shorter than the job', () => 
   });
 });
 
-describe('OTA-1260 N3 — preempted text is kept, not binned', () => {
+describe('OTA-1258 N3 — preempted text is kept, not binned', () => {
   it('⚠⚠ a FILL no longer returns early on the epoch check', () => {
     // ⚠ The live path still must: the player has moved on and the line must not
     // be spoken. Only the fill falls through, because a fill has nothing to say.
     const store = src('app', 'state', 'gameStore.ts');
     const i = store.indexOf('const preemptedFill = opts?.bankOnly === true');
     expect(i).toBeGreaterThan(-1);
-    // ⚠ The window runs to the branch's close rather than a char count: this line
-    // carries a longer comment on HAL than on golem, and anchoring on a byte
-    // budget is how a test starts failing on prose.
-    const block = store.slice(i, store.indexOf('return;', i));
+    const block = store.slice(i, i + 320);
     expect(block).toContain('if (myEpoch !== arbiterGenerationEpoch && !preemptedFill) {');
     expect(block).toContain("noteQwenDiscarded('cancelled:player-acted-again');");
   });
@@ -200,7 +204,7 @@ describe('OTA-1260 N3 — preempted text is kept, not binned', () => {
   });
 });
 
-describe('OTA-1260 — the bank still behaves like a bank', () => {
+describe('OTA-1258 — the bank still behaves like a bank', () => {
   it('⚠ one-shot, deduped, and capped — the OTA-1129 contract survives the rekey', () => {
     const k = _introBankKeyForTest('test_loc', null);
     _bankSceneIntroForTest(k, 'A line.');

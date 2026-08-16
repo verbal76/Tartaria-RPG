@@ -20,7 +20,7 @@ import {
 import { LoreCodexBody } from '../components/LoreCodexBody';
 import { useHintsDisabled, setHintsDisabled, resetAllFirstTimeHints } from '../components/useFirstTimeHint';
 import { useAutosaveDisabled, setAutosaveDisabled } from '../ui/autosave';
-import { useUiScale, setUiScale, UI_SCALES, displayScaleSupported, type UiScale } from '../ui/displayScale'; // OTA-1250
+import { useUiScale, setUiScale, UI_SCALES, displayScaleSupported, type UiScale } from '../ui/displayScale'; // OTA-1227
 import { useAccessibility } from '../state/accessibility';
 import { THIRD_PARTY_NOTICES, NOTICES_PREAMBLE, NOTICES_VERIFIED_AT } from '../data/thirdPartyNotices';
 import {
@@ -60,7 +60,7 @@ import {
 } from '../voice/PiperTTSManager';
 import type * as Speech from 'expo-speech';
 import { resetMLHealth, mlHealthSummary } from '../diagnostics/mlHealth';
-import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1250 — one column width, platform-aware
+import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
 
 export function AboutScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -105,7 +105,7 @@ export function AboutScreen() {
   // OTA-860 — global first-time-tips kill-switch (per-install, reactive).
   const hintsDisabled = useHintsDisabled();
   const autosaveDisabled = useAutosaveDisabled();
-  const uiScale = useUiScale(); // OTA-1250 — desktop only; the row hides itself elsewhere
+  const uiScale = useUiScale(); // OTA-1227 — desktop only; the row hides itself elsewhere
   const scaleSupported = displayScaleSupported();
   // OTA-898 (SA-6) — device reduce-motion preference (reactive).
   const reduceMotion = useAccessibility((s) => s.reduceMotion);
@@ -124,7 +124,7 @@ export function AboutScreen() {
   // Manual SAVE button feedback. 'saving' while the write runs, then a 'saved'
   // / 'failed' flash reflecting whether the atomic write actually landed.
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'failed'>('idle');
-  // OTA-1231 — the RUN card's BACK UP CHARACTER button (moved from the title rows).
+  // OTA-1208 — the RUN card's BACK UP CHARACTER button (moved from the title rows).
   const [backupState, setBackupState] = useState<'idle' | 'busy' | 'done' | 'failed'>('idle');
   // OTA-203 — dedicated COPY INVENTORY button. Separate from the log
   // export so the player can choose which one to paste back.
@@ -137,6 +137,10 @@ export function AboutScreen() {
   // OTA-341 — COPY SAVE: export the loadable save state for brick repro.
   const [saveCopied, setSaveCopied] = useState(false);
   const [saveCharCount, setSaveCharCount] = useState(0);
+  // IMPORT SAVE: paste a COPY SAVE export (from this or another install — e.g. a
+  // Golem-line save into this build) and load it as a new playable slot.
+  const [importBusy, setImportBusy] = useState(false);
+  const [importMsg, setImportMsg] = useState<string | null>(null);
   // v2.4.1 (OTA 053) — chunked-copy cursor for the session log so
   // long sessions (>~25 KB, the silent paste cap on most chat
   // clients) can be sent in parts the way the dead-character log
@@ -165,11 +169,11 @@ export function AboutScreen() {
     setTimeout(() => setSaveState('idle'), 3000);
   };
 
-  // ⚠ OTA-1231 — BACK UP moved HERE from every title-screen character row
+  // ⚠ OTA-1208 — BACK UP moved HERE from every title-screen character row
   // (owner: the per-row buttons "make the game look broken to testers"; dead
   // rows keep theirs — a dead save has no other door). SAVES FIRST, always:
   // a backup of a stale slot silently loses the session the player is
-  // standing in, which is the OTA-1201 wound in a new place.
+  // standing in, which is the OTA-1178 wound in a new place.
   const handleBackUp = async () => {
     const p = useGameStore.getState().player;
     const slotId = useGameStore.getState().activeSlotId;
@@ -283,6 +287,33 @@ export function AboutScreen() {
       setSaveCopied(true);
       setTimeout(() => setSaveCopied(false), 2500);
     } catch { /* clipboard rarely fails on Android */ }
+  }
+  // IMPORT SAVE — read the clipboard (the user copies a COPY SAVE export first),
+  // parse it, write it to a new slot, and drop into the game. Lets a save from
+  // another install (e.g. a Golem-line build) be played here.
+  async function handleImportSave() {
+    if (importBusy) return;
+    setImportBusy(true);
+    setImportMsg('Reading clipboard…');
+    try {
+      const text = await Clipboard.getStringAsync();
+      if (!text || text.trim().length === 0) {
+        setImportMsg('Clipboard is empty — copy a COPY SAVE export first, then tap Import.');
+        return;
+      }
+      const res = await useGameStore.getState().importSaveFromText(text);
+      if (res.ok) {
+        setImportMsg(`Imported ${res.name || 'character'} — loading…`);
+        useGameStore.getState().setScreen('exploration');
+      } else {
+        setImportMsg(res.error ?? 'Import failed.');
+      }
+    } catch (e) {
+      setImportMsg(`Import failed (${e instanceof Error ? e.message : 'unknown error'}).`);
+    } finally {
+      setImportBusy(false);
+      setTimeout(() => setImportMsg(null), 6000);
+    }
   }
   async function handleClearLog() {
     useGameStore.getState().clearGameLog();
@@ -703,7 +734,7 @@ export function AboutScreen() {
             </Text>
           </TouchableOpacity>
 
-          {/* OTA-1231 — the living character's backup door (title rows carry it
+          {/* OTA-1208 — the living character's backup door (title rows carry it
               only for the dead now). Saves first, then opens the share sheet
               with the fresh export; clipboard gets a copy either way. */}
           {player && (
@@ -733,7 +764,7 @@ export function AboutScreen() {
             <Text style={styles.sessionBtnPrimaryText}>SAVE &amp; EXIT TO TITLE</Text>
           </TouchableOpacity>
 
-          {/* OTA-1232 — the 90-second autosave's toggle (the autosave itself is
+          {/* OTA-1209 — the 90-second autosave's toggle (the autosave itself is
               OTA-368 and ships ON). Here beside SAVE so the player who lost a
               session to a swipe-close can SEE the net exists. */}
           <View style={styles.musicRow}>
@@ -757,7 +788,7 @@ export function AboutScreen() {
             background — this timer just bounds what an idle stretch could lose.
           </Text>
 
-          {/* ⚠ OTA-1250 — UI SCALE (desktop/Steam only). Deliberately NOT a
+          {/* ⚠ OTA-1227 — UI SCALE (desktop/Steam only). Deliberately NOT a
               resolution picker: inside a maximized window the OS owns the
               resolution, and a dropdown fighting it is a mobile-porting
               anti-pattern. This is the desktop convention — scale the whole
@@ -790,7 +821,7 @@ export function AboutScreen() {
             </>
           )}
 
-          {/* OTA-1046 — REPLAY OPENING moved to the CharacterScreen header
+          {/* OTA-1023 — REPLAY OPENING moved to the CharacterScreen header
               (owner: "I went to settings and about and there was no replay
               opening"). About's normal entry is the TITLE screen, where no
               character is loaded, so the player-gated button here was
@@ -872,9 +903,22 @@ export function AboutScreen() {
                 accessibilityRole="button"
               >
                 <Text style={styles.sessionBtnSecondaryText}>
-                  {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE (brick repro)'}
+                  {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE (download / export)'}
                 </Text>
               </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+                onPress={() => { void handleImportSave(); }}
+                activeOpacity={0.7}
+                disabled={importBusy}
+              >
+                <Text style={styles.sessionBtnSecondaryText}>
+                  {importBusy ? 'IMPORTING…' : 'IMPORT SAVE (upload / paste)'}
+                </Text>
+              </TouchableOpacity>
+              {importMsg ? (
+                <Text style={styles.sessionFootnote}>{importMsg}</Text>
+              ) : null}
               <TouchableOpacity
                 style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
                 onPress={() => { void handleCopyInventory(); }}

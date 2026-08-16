@@ -1,4 +1,8 @@
-// OTA-1206 — PUNCHLIST P1 CLOSED. A completed collectible set now pays out.
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
+// OTA-1183 — PUNCHLIST P1 CLOSED. A completed collectible set now pays out.
 //
 // ⚠ WHAT IT WAS. 57 fragments across 10 character stories — the largest gather loop in the
 // game — and finishing one flipped a pill style and printed a banner on a screen the
@@ -30,7 +34,7 @@ const SRC = (rel: string) => fs.readFileSync(path.join(__dirname, '..', rel), 'u
 const firstStory = CHARACTER_STORIES[0]!;
 const allFragmentIds = CHARACTER_STORIES.flatMap((s) => s.fragments.map((f) => f.id));
 
-describe('OTA-1206 — set completion is detected exactly once', () => {
+describe('OTA-1183 — set completion is detected exactly once', () => {
   test('the closing fragment reports the story it closed', () => {
     const ids = firstStory.fragments.map((f) => f.id);
     const before = ids.slice(0, -1);
@@ -66,7 +70,7 @@ describe('OTA-1206 — set completion is detected exactly once', () => {
   });
 });
 
-describe('OTA-1206 — the Historian title', () => {
+describe('OTA-1183 — the Historian title', () => {
   test('the counter tracks STORIES, not fragments', () => {
     expect(EMPTY_TITLE_PROGRESS.collectableStoriesCompleted).toBe(0);
     // ⚠ The 57 fragments are spread 5–7 per story. A fragment threshold would let the
@@ -124,7 +128,7 @@ describe('OTA-1206 — the Historian title', () => {
   });
 });
 
-describe('OTA-1206 — the story screen shows only what was earned', () => {
+describe('OTA-1183 — the story screen shows only what was earned', () => {
   test('it assembles the fragments in author order', () => {
     const built = assembledStory(firstStory.id, firstStory.fragments.map((f) => f.id));
     expect(built).not.toBeNull();
@@ -176,7 +180,7 @@ describe('OTA-1206 — the story screen shows only what was earned', () => {
   });
 });
 
-describe('OTA-1206 — completion is announced where the player is looking', () => {
+describe('OTA-1183 — completion is announced where the player is looking', () => {
   const src = SRC('app/state/gameStore.ts');
 
   test('it fires through announceMissionComplete, not a quiet log line', () => {
@@ -212,7 +216,7 @@ describe('OTA-1206 — completion is announced where the player is looking', () 
   });
 });
 
-describe('OTA-1206 — INVESTIGATE ALL', () => {
+describe('OTA-1183 — INVESTIGATE ALL', () => {
   test('the button exists and mirrors the SALVAGE ALL threshold', () => {
     const src = SRC('app/components/SearchModal.tsx');
     expect(src).toContain('INVESTIGATE ALL ({actionableChips.length})');
@@ -237,12 +241,30 @@ describe('OTA-1206 — INVESTIGATE ALL', () => {
     // Investigate resolves through hooks, ambient nouns, items, puzzles and elevation
     // gates. A bulk re-implementation would be a new set of failure modes; looping the
     // real submit cannot resolve differently from the manual taps it replaces.
-    // ⚠ OTA-1290 re-pointed this pin: the instant `for` loop became the PACED
-    // sweep (one noun per beat, stops on enemies / player action). The rule
-    // guarded here is unchanged — each step still fires the REAL submit path,
-    // no second resolver — the sweep just breathes between steps now.
+    //
+    // ⚠⚠ OTA-1236 — THE RULE IS UNCHANGED; THE LINE IT WAS PINNED TO MOVED. The loop
+    // still calls the same `submit(\`investigate <noun>\`)` a manual tap makes — that
+    // is the property this test exists to protect, and it still holds. What was added
+    // around it is ORDER (ordinary nouns, then story hooks, then the dog rescue) and a
+    // BREAK when an enemy appears, because the rescue spawns a captor and every
+    // investigate queued behind it would land during combat and be refused. Neither
+    // resolves anything; both decide what gets submitted and when to stop.
     const src = SRC('app/screens/ExplorationScreen.tsx');
-    expect(src).toContain('submit(`investigate ${nouns[i]!}`);');
-    expect(src).toContain('setTimeout(step, INVESTIGATE_ALL_GAP_MS);');
+    const i = src.indexOf('onInvestigateAll={(nouns) => {');
+    expect(i).toBeGreaterThan(-1);
+    // ⚠ OTA-1263 PACED the sweep at the owner's request ("resolve them one at a
+    // time... maybe 2+3 seconds to see a result"), so the synchronous for-loop
+    // became a self-scheduling step, the loop variable became an index, and the
+    // block grew past the old 600-char window. **The rule this guards is unchanged
+    // and is what is asserted:** it drives the REAL investigate path, one submit
+    // per noun, with no second resolver anywhere.
+    // ⚠ OTA-1268 grew it again (the self-abort fix carries its incident note in
+    // the source). Window widened once more; the pinned RULE has not moved.
+    const block = src.slice(i, i + 2400);
+    expect(block).toContain('submit(`investigate ${ordered[i]!}`)');
+    // Still one submit per noun, walked in order, and still no bulk resolver.
+    expect(block).toContain('const ordered = orderByStoryTier(');
+    expect(block).toContain('i += 1;');
+    expect(src).not.toContain('investigateAllAmbient');
   });
 });

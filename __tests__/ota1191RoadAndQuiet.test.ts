@@ -1,4 +1,8 @@
-// OTA-1191 — THE ARBITER STOPS TYPING IN FRONT OF YOU, AND THE ROAD BUILDS YOU UP.
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
+// OTA-1168 — THE ARBITER STOPS TYPING IN FRONT OF YOU, AND THE ROAD BUILDS YOU UP.
 //
 // Owner, two asks in one message:
 //  1. "while the arbiter is typing live, can we keep that hidden and just see the end
@@ -54,7 +58,7 @@ const read = (...p: string[]): string => fs.readFileSync(path.join(__dirname, '.
 const STORE = read('app', 'state', 'gameStore.ts');
 const EXPLORE = read('app', 'screens', 'ExplorationScreen.tsx');
 
-describe('OTA-1191 — the Arbiter no longer types in front of you', () => {
+describe('OTA-1168 — the Arbiter no longer types in front of you', () => {
   it('⚠ THE PARTIAL TEXT IS NOT RENDERED ANY MORE', () => {
     // It used to tail-render token by token with a ▍ cursor, so a generated line was read
     // TWICE — once as it was written, once filed into the feed.
@@ -77,7 +81,7 @@ describe('OTA-1191 — the Arbiter no longer types in front of you', () => {
   });
 });
 
-describe('OTA-1191 — the road odometer', () => {
+describe('OTA-1168 — the road odometer', () => {
   const cellOf = () => {
     const p = useGameStore.getState().player!;
     return { x: (p as unknown as { gridX: number }).gridX, y: (p as unknown as { gridY: number }).gridY };
@@ -147,7 +151,7 @@ describe('OTA-1191 — the road odometer', () => {
     // distinct-destination milestone. The odometer has no cap at all, and nothing in its
     // award path clamps `staminaMax`.
     const i = STORE.indexOf('function tickRoadOdometer');
-    const body = STORE.slice(i, STORE.indexOf('OTA-1189 — ARRIVING ON', i));
+    const body = STORE.slice(i, STORE.indexOf('OTA-1166 — ARRIVING ON', i));
     expect(body).not.toMatch(/Math\.min\([^)]*staminaMax/);
     expect(body).toContain('staminaMax: st.player.staminaMax + earned');
   });
@@ -161,7 +165,7 @@ describe('OTA-1191 — the road odometer', () => {
 
   it('⚠ THE FLAG IS CONSUMED EVERY TICK, so it cannot pay double for an autorouted step', () => {
     const i = STORE.indexOf('function tickRoadOdometer');
-    const body = STORE.slice(i, STORE.indexOf('OTA-1189 — ARRIVING ON', i));
+    const body = STORE.slice(i, STORE.indexOf('OTA-1166 — ARRIVING ON', i));
     // Reset happens BEFORE the early return, or a non-counting action would leave it armed.
     const reset = body.indexOf('_lastStepWasCardinal = false;');
     const earlyReturn = body.indexOf('if (recent.includes(key)) return;');
@@ -173,7 +177,7 @@ describe('OTA-1191 — the road odometer', () => {
     // A cardinal step is worth 2, so an exact-modulo check can step 39 → 41 and skip the
     // award entirely — silently failing exactly the players doing the encouraged thing.
     const i = STORE.indexOf('function tickRoadOdometer');
-    const body = STORE.slice(i, STORE.indexOf('OTA-1189 — ARRIVING ON', i));
+    const body = STORE.slice(i, STORE.indexOf('OTA-1166 — ARRIVING ON', i));
     expect(body).toContain('Math.floor(nextOdo / ODOMETER_STEP) - Math.floor(prevOdo / ODOMETER_STEP)');
     expect(body).not.toContain('% ODOMETER_STEP !== 0');
   });
@@ -186,7 +190,7 @@ describe('OTA-1191 — the road odometer', () => {
 
   it('awards max stamina AND the usable point, so the reward is felt now', () => {
     const i = STORE.indexOf('function tickRoadOdometer');
-    const body = STORE.slice(i, STORE.indexOf('OTA-1189 — ARRIVING ON', i));
+    const body = STORE.slice(i, STORE.indexOf('OTA-1166 — ARRIVING ON', i));
     // `earned`, not a literal 1 — a cardinal step can cross more than one threshold.
     expect(body).toContain('staminaMax: st.player.staminaMax + earned');
     expect(body).toContain('stamina: st.player.stamina + earned');

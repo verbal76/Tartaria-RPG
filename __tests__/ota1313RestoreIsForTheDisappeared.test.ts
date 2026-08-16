@@ -58,7 +58,10 @@ import {
   importSaveAsNewSlot, listSlots, deleteSlot, saveSlot,
   recordFallenSeed, hasFallenSeed, characterSeedOf, loadGlobalStash, saveGlobalStash,
 } from '../app/engine/saveSystem';
-import type { SaveState } from '../app/engine/saveSystem';
+// ⚠ audit — SaveState lives in engine/types and was never re-exported by
+// saveSystem; the old import passed Jest only because babel strips types, and
+// it was the one error the typecheck:tests ratchet caught on golem (203 > 202).
+import type { SaveState } from '../app/engine/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 jest.setTimeout(120_000);

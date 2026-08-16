@@ -1,8 +1,12 @@
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
-// ⚠⚠ OTA-1252 — THE THREE THINGS THE OWNER FOUND WITH A MOUSE IN HIS HAND, plus
+// ⚠⚠ OTA-1229 — THE THREE THINGS THE OWNER FOUND WITH A MOUSE IN HIS HAND, plus
 // the ratchet that had been quietly slipping while nobody read it.
 //
 // All three came out of one PC session, two of them typed straight into the
@@ -17,7 +21,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 // ⚠ MOBILE MUST NOT MOVE. jest-expo runs the NATIVE platform, so every desktop
 // guard below is inert here — which is exactly the regression this suite exists
 // to hold. The desktop work may not cost the phone one pixel or one tap.
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { STAT_ROW_MAX_WIDTH } from '../app/ui/layoutConstants';
 import {
@@ -26,7 +30,7 @@ import {
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
-describe('OTA-1252 — the back stack', () => {
+describe('OTA-1229 — the back stack', () => {
   it('⚠⚠ LIFO: the newest handler answers first — a popup closes before the screen', () => {
     const calls: string[] = [];
     const offScreen = pushBackHandler(() => { calls.push('screen'); return true; });
@@ -117,62 +121,91 @@ describe('OTA-1252 — the back stack', () => {
   });
 });
 
-describe('OTA-1252 — the take popup stops offering a roll against nobody', () => {
-  it('⚠⚠ the stealth toggle renders only when a vendor is standing there', () => {
-    const modal = src('app', 'components', 'TakeModal.tsx');
-    expect(modal).toContain('{stealthMeaningful && (');
-    const expl = src('app', 'screens', 'ExplorationScreen.tsx');
-    // ...and "meaningful" is exactly the condition the STORE uses to route the
-    // tap to stealFromVendor. The button and the behaviour must agree.
-    expect(expl).toContain('stealthMeaningful={!!currentScene?.vendor}');
-    const store = src('app', 'state', 'gameStore.ts');
-    const fn = store.slice(store.indexOf('stealthTakeAmbientNoun(noun) {'));
-    expect(fn.slice(0, 900)).toContain('if (scene.vendor) {');
+describe('OTA-1239 — the take popup has no stealth toggle at all', () => {
+  // ⚠⚠ THIS BLOCK USED TO PIN THE TOGGLE'S EXISTENCE, AND IT WAS WATCHING A CORPSE.
+  //
+  // The owner asked about this in OTA-1229, typed into the game: *"why do we still
+  // have use stealth in the take popup? thats not how stealth works anymore."* I
+  // narrowed it to vendor-only and relabelled it STE-not-DEX instead of removing
+  // it, and wrote these tests to lock that in. Then OTA-1233 merged TakeModal into
+  // GatherModal and carried the toggle across — **and these assertions kept
+  // reading `TakeModal.tsx`, a file nothing has rendered since.** They passed for
+  // six OTAs while guarding a component that was not on screen.
+  //
+  // ⚠ Then he asked again: *"why did you add a stealth option to it, that's not
+  // how the stealth is used anymore."* **Asking twice is the answer.** The first
+  // reply negotiated with the request instead of doing it.
+  //
+  // ⚠⚠ AND THE RULE WAS ALREADY WRITTEN DOWN, in PickpocketSheet's own header
+  // (OTA-847): *"pickpocket IS the stealth action, so there's no toggle."*
+
+  it('⚠⚠ the retired component is GONE from disk, not left as a corpse to pin', () => {
+    expect(existsSync(join(__dirname, '..', 'app', 'components', 'TakeModal.tsx'))).toBe(false);
   });
 
-  it('⚠⚠ the label names STEALTH, the stat the handler has rolled since OTA-348', () => {
-    // This is the literal "that's not how stealth works anymore": the button
-    // advertised a DEX roll long after the roll moved to STE, so a player
-    // reading it would build the wrong character for it.
-    const modal = src('app', 'components', 'TakeModal.tsx');
-    // Only the RENDERED label is pinned — the surrounding comments still say
-    // "DEX roll" on purpose, because they are the record of what was wrong.
-    const labels = modal.split('\n').filter((l) => /\{useStealth \?/.test(l)).join('\n');
-    expect(labels).not.toBe('');
-    expect(labels).not.toContain('DEX');
-    expect(labels).toContain('STE roll');
-    const store = src('app', 'state', 'gameStore.ts');
-    const fn = store.slice(store.indexOf('stealthTakeAmbientNoun(noun) {'));
-    // The handler's actual roll — Stealth, not DEX.
-    expect(fn.slice(0, 3000)).toContain('roll + stats.stealth');
-  });
-});
-
-describe('OTA-1252 — the stat header stops stretching on a monitor', () => {
-  it('⚠⚠ MOBILE IS UNTOUCHED IN FACT, not merely in effect: the cap is undefined on native', () => {
-    // An undefined style key is absent from the object. A large sentinel number
-    // would also never bind today — and would silently start binding the day
-    // somebody put the game on a tablet in landscape.
-    expect(STAT_ROW_MAX_WIDTH).toBeUndefined();
+  it('⚠⚠ the live picker has NO stealth toggle, no toggle state, no stealth props', () => {
+    const modal = src('app/components/GatherModal.tsx');
+    expect(modal).not.toContain('stealthMeaningful');
+    expect(modal).not.toContain('onStealthTake');
+    expect(modal).not.toContain('useStealth');
+    expect(modal).not.toContain('POCKET IT QUIETLY');
+    const expl = src('app/screens/ExplorationScreen.tsx');
+    expect(expl).not.toContain('stealthMeaningful={');
+    expect(expl).not.toContain('onStealthTake={');
   });
 
-  it('⚠ on desktop the cap is the phone measure the 9px labels were drawn against', () => {
-    const ds = src('app', 'ui', 'layoutConstants.ts');
-    const m = /STAT_ROW_MAX_WIDTH: number \| undefined = Platform\.OS === 'web' \? (\d+) : undefined/.exec(ds);
-    expect(m).not.toBeNull();
-    const web = Number(m![1]);
-    // Five columns wide enough for "35/109", and never as wide as the column
-    // itself — past that it would not be capping anything.
-    expect(web).toBeGreaterThanOrEqual(360);
-    expect(web).toBeLessThan(1024);
+  it('⚠⚠ the dead store action went with it — a second door nothing opens is still a door', () => {
+    const store = src('app/state/gameStore.ts');
+    // The implementation and its interface entry are both gone...
+    expect(store).not.toContain('stealthTakeAmbientNoun(noun) {');
+    expect(store).not.toContain('stealthTakeAmbientNoun: (noun: string) => void;');
+    // ...and the two paths that always were the better doors are still live.
+    expect(store).toContain('pickpocketPerson');
+    expect(store).toContain("case 'steal': {");
   });
 
-  it('⚠⚠ the stat row consumes the cap, and no bare number was left behind', () => {
-    const panel = src('app', 'components', 'StatsPanel.tsx');
-    expect(panel).toContain('maxWidth: STAT_ROW_MAX_WIDTH');
-    expect(panel).toContain("from '../ui/layoutConstants'");
-    // The flex:1 cells stay — they are correct INSIDE a bounded row, and they
-    // are what makes the columns read as evenly distributed (OTA-747).
-    expect(panel).toContain('stat: { flex: 1');
+  it('⚠⚠ REMOVED, NOT JUST DELETED: the day/night cover bonus survived the cut', () => {
+    // ⚠ THE REASON THIS OTA CONSOLIDATED INSTEAD OF DELETING. The two
+    // implementations of "quietly take a scene noun" had drifted: the toggle's
+    // path applied `stealthTimeBonus` (+1 night, -1 day) and the typed `steal`
+    // verb never did. **The dead path was the ONLY place that modifier lived**, so
+    // a blind delete would have removed it from the game and nobody would have
+    // decided to. It now rides the surviving path.
+    const store = src('app/state/gameStore.ts');
+    const i = store.indexOf("case 'steal': {");
+    expect(i).toBeGreaterThan(-1);
+    const block = store.slice(i, i + 3000);
+    expect(block).toContain('stealthTimeBonus');
+    expect(block).toContain('roll + stats.stealth + timeBonus');
+    // ⚠ NOT a "one caller" check — that was my first draft of this assertion and
+    // it was simply wrong. Day/night cover is meant to apply to EVERY stealth
+    // check, per the playtest note on the combat opener: *"does stealth scale up
+    // at night, down in the day?"* Three live sites carry it — vendor theft, this
+    // ambient grab, and the in-combat opener — and that is the intent, not drift.
+    // What IS pinned: the removed action's copy is gone, and the ambient path that
+    // inherited its job kept the modifier.
+    // ⚠ The identifier survives ONLY in the tombstone comment that explains where
+    // its job went — so this forbids the CALL shape, not the word. A test that
+    // banned the word outright would force the explanation out of the file, which
+    // is how the reason for a removal gets lost.
+    expect(store).not.toContain('stealthTakeAmbientNoun(');
+    // ⚠ MEASURED, not assumed — my first two drafts of this assertion guessed the
+    // call sites and both were wrong. The three live carriers are
+    // `pickpocketPerson` (people), the `steal` verb's ambient branch (things), and
+    // `concludeRolls` (the in-combat opener). `stealFromVendor` does NOT carry it
+    // and never did — its DC already escalates on `stealAttempts` / `stealHeat`,
+    // which is its own pressure model.
+    expect(store.indexOf('stealthTimeBonus')).toBeGreaterThan(store.indexOf('pickpocketPerson('));
+    expect(store.split('stealthTimeBonus').length - 1).toBeGreaterThanOrEqual(3);
+  });
+
+  it('⚠ the surviving path still rolls STEALTH, the stat OTA-348 moved it to', () => {
+    // The original OTA-1229 finding, preserved: the old label advertised DEX long
+    // after the roll moved to STE, so a player reading it built the wrong
+    // character. The label is gone; the rule it was wrong about is still checked.
+    const store = src('app/state/gameStore.ts');
+    const block = store.slice(store.indexOf("case 'steal': {"), store.indexOf("case 'steal': {") + 3000);
+    expect(block).toContain('stats.stealth');
+    expect(block).not.toMatch(/roll \+ stats\.dexterity/);
   });
 });

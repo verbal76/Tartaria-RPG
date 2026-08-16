@@ -1,3 +1,7 @@
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
@@ -30,7 +34,7 @@ jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn(async () => {}) }))
 jest.mock('expo-constants', () => ({ default: { expoConfig: {} } }));
 jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
-// OTA-1163 — THE PRESSURE TEST, and the fourteen things four agents caught.
+// OTA-1140 — THE PRESSURE TEST, and the fourteen things four agents caught.
 //
 // The owner: *"spin up agents and pressure test the game and fully the combat
 // system."* Four ran in parallel — a combat-math contradiction hunter, a
@@ -69,7 +73,7 @@ jest.mock('expo-speech-recognition', () => ({}));
 //     fought). Trimmed now, with the trim NAMED as a chip so sources sum.
 //   · enemyPowerScore priced a boss at its bare notation while the resolver
 //     rolls +1d6 twice — the matchup badge painted "even" on 3× fights.
-//   · the SUMMONED Guardian card was a second copy of the card OTA-1159
+//   · the SUMMONED Guardian card was a second copy of the card OTA-1136
 //     fixed, still carrying both lies. Routed.
 //   · the enemy to-hit log now says "(needs nat N+ — AC capped)" when
 //     ENEMY_HIT_NEEDED_CAP decided, and the damage clause admits "floor 30%"
@@ -96,7 +100,7 @@ const read = (p: string): string => require('fs').readFileSync(
 const STORE = read('app/state/gameStore.ts');
 const VOICE = read('app/voice/PiperTTSManager.ts');
 
-describe('OTA-1163 — the stagger family is sealed', () => {
+describe('OTA-1140 — the stagger family is sealed', () => {
   it('⚠ enemyStaggered is spliced at BOTH removal sites', () => {
     expect((STORE.match(/enemyStaggered: dropAt\(/g) ?? []).length).toBe(2);
   });
@@ -130,7 +134,7 @@ describe('OTA-1163 — the stagger family is sealed', () => {
   });
 });
 
-describe('OTA-1163 — the exploits are closed', () => {
+describe('OTA-1140 — the exploits are closed', () => {
   it('⚠ THE PACK PURSUES — a benched melee enemy closes one band at volley end', () => {
     expect(STORE).toContain('const outOfReach: string[] = [];');
     expect(STORE).toContain("{ outOfReach.push(enemy.name); continue; }");
@@ -139,7 +143,7 @@ describe('OTA-1163 — the exploits are closed', () => {
   });
 
   it('⚠ pursuit never passes close, and only fires when someone was actually benched', () => {
-    const from = STORE.indexOf('// OTA-1163 — the pursuit itself.');
+    const from = STORE.indexOf('// OTA-1140 — the pursuit itself.');
     const block = STORE.slice(from, from + 1200);
     expect(block).toContain('if (outOfReach.length > 0 && (get().player?.hp ?? 0) > 0)');
     expect(block).toContain("cur === 'mid' ? 'close' : null");
@@ -173,7 +177,7 @@ describe('OTA-1163 — the exploits are closed', () => {
   });
 });
 
-describe('OTA-1163 — three more surfaces stop lying', () => {
+describe('OTA-1140 — three more surfaces stop lying', () => {
   it('⚠ effectiveACBreakdown applies the trim and NAMES it as a chip', () => {
     const from = STORE.indexOf('export function effectiveACBreakdown(');
     const body = STORE.slice(from, from + 4200);
@@ -213,7 +217,7 @@ describe('OTA-1163 — three more surfaces stop lying', () => {
   });
 });
 
-describe('OTA-1163 — plumbing', () => {
+describe('OTA-1140 — plumbing', () => {
   it('⚠ the melee damage write reads LIVE enemy HP, not the entry snapshot', () => {
     expect(STORE).toContain('const livePrevHp = get().currentScene?.enemyHps[activeIdx] ?? prevHp;');
     expect(STORE).toContain('let newEnemyHp = livePrevHp - dmg;');

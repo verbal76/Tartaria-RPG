@@ -268,7 +268,7 @@ export function VendorScreen() {
       // piece takes the same price, log line and standing effect it would have
       // taken sold individually — this is a shortcut for the taps, not for the
       // rules.
-      for (const row of planCommonGearSale(sellable).rows) {
+      for (const row of planCommonGearSale(bulkSellable).rows) {
         const reps = Math.max(1, row.item.quantity ?? 1);
         for (let i = 0; i < reps; i++) sellToVendor(row.item.name, row.item.id, { social: i === 0 });
       }
@@ -381,6 +381,16 @@ export function VendorScreen() {
   // rather than stored, so a selected row that stops being sellable (sold,
   // dropped, equipped, or the vendor dismissed) simply falls out of the group
   // instead of lingering as a stale id the SELL button would silently skip.
+  // ⚠⚠ THE BULK SWEEP NEVER TAKES YOUR LAST GATE TOOL. The single-item sell stops
+  // on a red warning when the piece is your ONLY way to satisfy a gate (OTA-178,
+  // the climbing-strap case). `planCommonGearSale` predates a reachable bulk
+  // confirm — its button was dead until the sell-all fix — so the sweep inherited
+  // no such stop, and one tap could silently sell the last Hardened Climbing
+  // Strap the single-item path would have made you confirm in red. Measured
+  // target: Aether-Breath Mask, a Common armor carrying gate `breathe_toxic`,
+  // was in the sweep. A SPARE copy still sells (gateLossFor is null when quantity
+  // > 1 or another gate-satisfier exists); only the last one is held out.
+  const bulkSellable = sellable.filter(({ item }) => !gateLossFor(item.name));
   const sellableById = new Map(sellable.map((row) => [row.item.id, row]));
   const selectedRows = sellSelected
     .map((id) => sellableById.get(id))
@@ -829,7 +839,7 @@ export function VendorScreen() {
                 rather than shown disabled: a dead button on a screen full of live
                 ones reads as a bug. */}
             {(() => {
-              const plan = planCommonGearSale(sellable);
+              const plan = planCommonGearSale(bulkSellable);
               if (plan.count === 0) return null;
               return (
                 <TouchableOpacity

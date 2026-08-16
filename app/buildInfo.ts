@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.184';
+export const DISPLAY_VERSION = '4.29.185';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24726,7 +24726,39 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SalvageModal separately. Reverted byte-for-byte; TakeModal was never touched.
 // The shared rarity palette STAYS (a de-duplication, zero pixels changed).
 // New suite ota1318 (4). 812 suites / 7550 tests. DISPLAY_VERSION 4.29.184.
-export const OTA_BUILD_ID = '2026-08-16-1318-hal-keeps-its-picker';
+// ⚠⚠ OTA-1319 — THIS LINE COMES CURRENT WITH THE GOLEM LINE. Owner: *"after the
+// gameplay, we decided to bring Hal current to golem. golem is the model moving
+// forward."* That REVERSES OTA-1318, which held this line's two-button picker and
+// original colours back on his earlier instruction; the newer ruling is explicit
+// and supersedes it.
+//
+// Measured before anything moved: 190 files differed between the lines, but 161
+// of them differed ONLY in the OTA numbers written inside their comments — each
+// line numbers the same fix differently. The real gap was 29 files.
+//
+// What arrives: the ONE PICKER (GatherModal + gatherSort + the census salvage
+// pools; TakeModal and the two-modal wiring retire), the amber lanes with rarity
+// on the left edge, the rescue-scenario story nouns, the vest tutorial beat, the
+// draft-preserving input bar, IMPORT SAVE on the About screen, the legacy-save
+// gear-dupe backfill, the Gem clearing its fallen-seed entry, the bulk sweep
+// holding back your last gate tool, and the first-fight combat primer.
+//
+// ⚠⚠ WHAT DID **NOT** GO OUT WITH IT: this line carries two legacy-save
+// migrations golem has never needed — the enemy-intel backfill and the
+// faction-quest `tracked` backfill — because this is the line with real saves on
+// real devices. gameStore.ts was taken from golem wholesale, so both were
+// re-grafted by hand afterwards and are now held by a dedicated tripwire suite.
+// ⚠ Also caught and NOT copied: `dogRevivedOta938` is a PERSISTED field whose
+// name carries this line's OTA number; golem spells it `dogRevivedOta915`, and a
+// wholesale copy would have renamed a live save field.
+//
+// ⚠ Found while porting, and fixed: the GREAT CLIMB "SET COURSE" button and
+// `routeGreatClimb` both shipped on this line, but nothing joined them — the
+// confirm fell through to plain travel, so a tower got a course and never became
+// the mission you were on. New suite halOnlySaveMigrationsSurvive (5); 12 golem
+// suites brought in, 21 re-pointed. DISPLAY_VERSION 4.29.185.
+export const OTA_BUILD_ID = '2026-08-16-1319-current-with-golem';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1318-hal-keeps-its-picker';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1314-amber-salvage-and-restore-gate';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1310-sell-all-common-gear';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1305-towers-route-like-missions';

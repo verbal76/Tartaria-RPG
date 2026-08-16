@@ -1,3 +1,7 @@
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
@@ -30,7 +34,7 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-// OTA-1229 — THE TORCH MARKS WHAT'S WORTH A CLOSER LOOK. Owner, after 75 hours
+// OTA-1206 — THE TORCH MARKS WHAT'S WORTH A CLOSER LOOK. Owner, after 75 hours
 // as his own main tester: investigate had become "tap investigate, tap an item"
 // eight times per room to find the one payoff, and the Aetheric Torch rotted in
 // the pack because free "look around" covered its old reveal. One fix for both:
@@ -53,7 +57,7 @@ async function settle(pred: () => boolean, deadlineMs = 4000) {
   }
 }
 
-describe('OTA-1229 — the marking rule mirrors the real payoff branches', () => {
+describe('OTA-1206 — the marking rule mirrors the real payoff branches', () => {
   const hook = (nouns: string[], resolved = false): Hook => ({
     id: 'h1', kind: 'strange_smoke' as Hook['kind'], nouns, plantedLine: '', stage: 0, resolved,
   });
@@ -97,7 +101,7 @@ describe('OTA-1229 — the marking rule mirrors the real payoff branches', () =>
   });
 });
 
-describe('OTA-1229 — LIVE: the torch sweep in a no-lead room', () => {
+describe('OTA-1206 — LIVE: the torch sweep in a no-lead room', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
   async function boot() {
@@ -176,12 +180,19 @@ describe('OTA-1229 — LIVE: the torch sweep in a no-lead room', () => {
   });
 });
 
-describe('OTA-1229 — the mark actually renders', () => {
+describe('OTA-1206 — the mark actually renders', () => {
   // ⚠ Narrow source pin, silent-no-op class: a stamped scene.arbiterEye with no
   // renderer ships the whole feature dead behind green engine tests.
   it('SearchModal draws ✦ for marked chips; ExplorationScreen feeds the flag', () => {
     const modal = readFileSync(join(__dirname, '..', 'app', 'components', 'SearchModal.tsx'), 'utf8');
-    expect(modal).toContain("c.marked && !c.consumed ? '✦ ' : ''");
+    // ⚠⚠ OTA-1236 — the RULE is unchanged and asserted in both halves; the exact
+    // expression grew a second source. A ✦ now also marks a LEAD (a story hook or a
+    // live dog-rescue noun), which is the same claim the torch's mark makes — "this
+    // one is actually worth the look" — so it earns the same glyph. What must not
+    // change: a marked chip draws it, and a CONSUMED chip never does (a spent noun's
+    // mark is history, not signal).
+    expect(modal).toContain('c.marked');
+    expect(modal).toMatch(/c\.marked[^\n]*&& !c\.consumed \? '✦ ' : ''/);
     const screen = readFileSync(join(__dirname, '..', 'app', 'screens', 'ExplorationScreen.tsx'), 'utf8');
     expect(screen).toContain('currentScene?.arbiterEye ?? []');
   });

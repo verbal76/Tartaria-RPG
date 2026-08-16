@@ -69,7 +69,7 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     // construct" failing to advance the wreck_construct hook because
     // there was no salvage verb. Investigate is hook-eligible, so
     // mapping salvage here advances the hook with the right noun.
-    'salvage', 'strip', 'pry',
+    'salvage', 'scrap', 'strip', 'pry',
     // From the track / translate / learn / gather cards.
     'track', 'translate', 'learn', 'gather',
     // 'open' belongs to the dedicated open intent — it persists
