@@ -41,8 +41,14 @@ describe('OTA-1241 — the place the poster names is the place the hunt pays', (
     expect(huntAnchorId(byId('hunt_mud_siren_drakova'))).toBe('drakova');
     // A real name with parenthetical flavor still resolves through the flavor.
     expect(huntAnchorId(byId('hunt_bog_dragon'))).toBe('mud_seas');
-    // A pure-flavor name falls back to the biome anchor, not to garbage.
-    expect(huntAnchorId(byId('hunt_iron_titan'))).toBe('obsidian_pillars');
+    // ⚠⚠ THIS ONE USED TO BE THE FALLBACK CASE. "the Sentinel Ward (inner archive)"
+    // named a place that did not exist, so it was the ONE hunt in eighteen that
+    // could not resolve its poster and dropped to the biome anchor
+    // (obsidian_pillars). Roadmap L1 gave `etheric_chamber` — the only genuinely
+    // dead location in the game — the alias, so the poster now names something
+    // real and the fallback is unused across the whole table. The fallback CODE
+    // stays; it is still correct for any future poster that names pure flavour.
+    expect(huntAnchorId(byId('hunt_iron_titan'))).toBe('etheric_chamber');
     // An alias resolves too ("the Sunken Enclave" is tartarian_enclave's alias).
     expect(huntAnchorId(byId('hunt_plague_moth_enclave'))).toBe('tartarian_enclave');
   });
