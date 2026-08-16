@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.179';
+export const DISPLAY_VERSION = '4.29.180';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24045,7 +24045,36 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stage-priority guard is now `stageAwaitsIntentHere` and covers all three families,
 // mirroring each matcher's boss→intent quirk (hunt: attack, mystery: investigate,
 // storyline: diplomacy). Twin of golem OTA-1331. DISPLAY_VERSION 4.29.179.
-export const OTA_BUILD_ID = '2026-08-16-1330-storylines-and-p19-closed';
+// ⚠⚠ THE LAST P19 INSTANCE, IN THE FAMILY THAT LOOKED EXEMPT. Owner, after being handed a
+// table with five green checks and one hedge: *"don't we have to check the faction quests?
+// since they don't have a green check mark from you."* He was right to push — the family
+// had been waved through BY ANALOGY with bounties instead of measured, the same habit that
+// produced "all 18 hunts are finishable."
+//
+// The measurement, all 65: 47 are fetch ("Gather N"). Of the 18 STAGED, 17 are honest
+// counters whose own objective line says so — "Defeat 3 enemies", "Travel 5 times",
+// "Discover 2 locations" — flavour over a tally, correct as written, and they must NOT be
+// gated on a place because they were never journeys.
+//
+// ⚠⚠ Exactly ONE is not: `fq_servants_tribute` — *"Travel to the Giant Vault and leave
+// tribute"*, stage text *"Carry it to the Vault. Set it on the threshold"*, every stage
+// `advanceOn: 'travel'` — and the advance counted ANY travel with no location check
+// anywhere in the function, so three steps in the OPPOSITE direction reported that you had
+// laid the tribute down at a place you never went.
+//
+// Fixed with the narrowest gate that closes it: a travel-gated FINAL stage of a quest that
+// names a resolvable destination advances only when the player stands there. Middle stages
+// are the walk and still count anywhere.
+//
+// ⚠ The new suite caught a FALSE POSITIVE on its first run, recorded rather than hidden:
+// `missionObjectiveLocationId` also resolves a destination for `fq_order_relic`, because
+// its text opens "Varakush has heard of…" and Varakush is both a stronghold and, there, a
+// person's name. That quest is unharmed only because it is `advanceOn: 'kill'` and the gate
+// fires on TRAVEL alone — ota1332 pins that construction. ⚠ questProgressionAudit walked
+// this quest around a ring of convenient tiles and hit the new gate: the harness standing
+// still again, not a regression. Twin of golem OTA-1332. DISPLAY_VERSION 4.29.180.
+export const OTA_BUILD_ID = '2026-08-16-1331-tribute-happens-at-the-vault';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1330-storylines-and-p19-closed';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1329-mysteries-the-same-way';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1328-every-hunt-doable';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1327-stages-mean-what-they-say';
