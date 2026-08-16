@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.183';
+export const DISPLAY_VERSION = '4.29.184';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24719,7 +24719,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // of the Fallen (an uncapped seed register, so an old death cannot be waited
 // out and deleting the corpse does not help). New suites ota1313 (10) + ota1314 (7).
 // 811 suites / 7550 tests. DISPLAY_VERSION 4.29.183.
-export const OTA_BUILD_ID = '2026-08-15-1314-amber-salvage-and-restore-gate';
+// ⚠⚠ OTA-1318 — HAL KEEPS ITS OWN PICKER AND ITS OWN COLOURS. The amber recolour
+// reached this line in the OTA-1314 batch because golem's SalvageModal change was
+// ported without noticing that on THIS line SalvageModal is a LIVE screen — HAL
+// never took the OTA-1233 one-picker merge and still mounts TakeModal and
+// SalvageModal separately. Reverted byte-for-byte; TakeModal was never touched.
+// The shared rarity palette STAYS (a de-duplication, zero pixels changed).
+// New suite ota1318 (4). 812 suites / 7550 tests. DISPLAY_VERSION 4.29.184.
+export const OTA_BUILD_ID = '2026-08-16-1318-hal-keeps-its-picker';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1314-amber-salvage-and-restore-gate';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1310-sell-all-common-gear';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1305-towers-route-like-missions';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1302-world-stops-contradicting-itself';
