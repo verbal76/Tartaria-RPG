@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.170';
+export const DISPLAY_VERSION = '4.29.171';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23843,7 +23843,35 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Also: the Arbiter's stealth nudge named an APPROACH toggle retired when the
 // sneak opener moved onto the STEALTH button. 2 golem suites brought in (17).
 // DISPLAY_VERSION 4.29.170.
-export const OTA_BUILD_ID = '2026-08-16-1321-current-with-golem';
+// ⚠⚠ OTA-1322 (PUNCHLIST B7 + B4) — A ROUTED TOWER EXPLAINS ITS OWN ABSENCE, AND
+// THE DEAD PICKER IS GONE.
+//
+// B7 asked whether a ROUTED arrival at a great climb runs the GREAT climb or a
+// generic one — a walker had seen "Tier 4/4 cleared" at a 15-tier spire. Measured
+// on a real travelTo arrival at all five landmarks: grand_spire, thametan_tower
+// and zharak_fang arrive with the prop present and resolve to 15/12/11 tiers;
+// asgardar_spire arrives INTO THE HUB (outpost_gate) and obsidian_monolith arrived
+// INTO A FIGHT, and beginScene suppresses the prop for both (`!hubRoomId`,
+// `!hasEnemies`).
+//
+// ⚠ THE FEARED OUTCOME DID NOT REPRODUCE. Both conditions RECOVER — leave the gate
+// or clear the fight and the climb returns at its real height. The Skyreacher loop
+// is not unfinishable, so B7 is NOT promoted to Alpha.
+//
+// ⚠⚠ WHAT IS REAL: the player was told nothing. Route to the Great Obsidian
+// Monolith, arrive into a fight, look around, and the list holds `pillar` and no
+// monolith — and that pillar is a generic 3-tier climb ending in "Tier 3/3
+// cleared", the exact symptom that opened the item. It reads as the chart lying. A
+// landmark you were ROUTED to is the one noun whose ABSENCE has to explain itself,
+// so the look now names which of the two reasons applies. A landmark whose chart is
+// unused stays silent — explaining an unpromised absence would leak the set.
+//
+// ⚠ B4 RESOLVED (MERGE): with the picker merged on every line, SalvageModal.tsx had
+// ZERO real importers anywhere and is DELETED from all three. It is the file the
+// OTA-1312 recolour landed on and shipped invisible. New suite ota1323 (6).
+// DISPLAY_VERSION 4.29.171.
+export const OTA_BUILD_ID = '2026-08-16-1322-routed-tower-explains-itself';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1321-current-with-golem';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1320-empty-picker-closes-now';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1319-amber-on-the-live-picker';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1316-amber-salvage-and-restore-gate';
