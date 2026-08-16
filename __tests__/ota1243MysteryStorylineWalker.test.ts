@@ -60,6 +60,7 @@ import { getRaces, getFactions } from '../app/engine/character';
 import { MYSTERIES } from '../app/engine/mysteries';
 import { STORYLINES } from '../app/engine/factionStorylines';
 import { firstActionableHuntStage } from '../app/engine/hunts';
+import { contractStageAnchorId } from '../app/engine/contractMarkers';
 
 jest.setTimeout(600000);
 
@@ -175,6 +176,19 @@ describe('OTA-1243 — Texas Ranger on mysteries and storylines: every one compl
       });
     }
 
+    // ⚠ P19 — stand on the OPENING stage's ground before anything is typed. A mystery is
+    // gated on location now; running the negative half from the wrong tile would "pass" for
+    // the wrong reason (refused for being elsewhere, not for the wrong verb).
+    if (family === 'mystery') {
+      useGameStore.setState({
+        player: {
+          ...store.getState().player!, currentLocationId: contractStageAnchorId(def as never, start),
+          travelTarget: undefined, hubRoomId: null,
+          gridX: undefined, gridY: undefined, mapX: undefined, mapY: undefined,
+        } as never,
+      });
+    }
+
     // ⚠ ORDER, negative half: the wrong verb pays nothing at the first stage.
     clearScene();
     const firstKind = def.stages[start]!.checkKind!;
@@ -195,13 +209,61 @@ describe('OTA-1243 — Texas Ranger on mysteries and storylines: every one compl
       if (kind === null) throw new Error(`${def.id}: walker landed ON a null stage (${s}) — the auto-consume failed`);
       const verb = verbs[kind];
       if (!verb) throw new Error(`${def.id}: stage ${s} has unhandled checkKind '${kind}' — extend the verb map + the matcher`);
+
+      // ⚠⚠ P19 — THE WALKER NO LONGER STANDS STILL. It used to run "wherever the walker
+      // stands", which was honest about the engine at the time: the mystery matcher checked
+      // the VERB AND NOTHING ELSE — no location test of any kind — so all 18 mysteries could
+      // be finished from one tile without travelling. That is the mirror image of the hunt
+      // failure and it is why this walker passed while the family was unplayable as written.
+      // Now each stage must be performed on ITS OWN ground, and the walker may only move to
+      // ground the GAME routed it to.
+      if (family === 'mystery') {
+        const want = contractStageAnchorId(def as never, s);
+        const at = store.getState().player!.currentLocationId;
+        if (at !== want) {
+          const course = store.getState().player!.travelTarget?.locationId;
+          // The very first stage has nothing before it to set a course, so the walker is
+          // allowed to START on the opening ground; every later move must be routed.
+          if (s !== start) {
+            expect({ id: def.id, stage: s, routedTo: course, needs: want })
+              .toEqual({ id: def.id, stage: s, routedTo: want, needs: want });
+          }
+          useGameStore.setState({
+            player: {
+              ...store.getState().player!, currentLocationId: want, travelTarget: undefined, hubRoomId: null,
+              gridX: undefined, gridY: undefined, mapX: undefined, mapY: undefined,
+            } as never,
+          });
+        }
+      }
+      const need = (def.stages[s] as { requires?: { item: string; quantity?: number } }).requires;
+
       clearScene();
       await store.getState().submitPlayerAction(verb);
       drainRolls();
       await settle(() => stage() > s);
       drainRolls();
+      // ⚠ Trap — an ambient spawn can land mid-settle and the exploration verbs are
+      // !inCombat-gated. A player wins the fight and acts again; so does the walker, once.
+      if (stage() <= s) {
+        clearScene();
+        await store.getState().submitPlayerAction(verb);
+        drainRolls();
+        await settle(() => stage() > s);
+        drainRolls();
+      }
       expect({ id: def.id, at: s, kind, advanced: stage() > s })
         .toEqual({ id: def.id, at: s, kind, advanced: true });
+      // ⚠ And the pack must hold what the stage demanded by the time it closed — the gate
+      // does not open otherwise. Checked after, because a record already in flight is
+      // healed on the attempt rather than refused forever.
+      if (need) {
+        const held = (store.getState().player!.inventory ?? [])
+          .filter((i) => i.name === need.item)
+          .reduce((n, i) => n + (i.quantity ?? 1), 0);
+        expect({ id: def.id, stage: s, item: need.item, held: held >= (need.quantity ?? 1) })
+          .toEqual({ id: def.id, stage: s, item: need.item, held: true });
+      }
     }
 
     expect({ id: def.id, done: stage() }).toEqual({ id: def.id, done: def.stages.length });

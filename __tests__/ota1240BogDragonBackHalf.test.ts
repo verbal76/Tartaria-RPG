@@ -153,6 +153,21 @@ describe('OTA-1240 — Bog Dragon back half, in order, each stage on its own ver
       drainRolls();
       await new Promise((r) => setTimeout(r, 150));
       drainRolls();
+      // ⚠ A record seeded straight onto the back half never received the earlier stages'
+      // mission items, so the first attempt spends itself on the catch-up grant and
+      // REFUSES by design — the heal hands over and stops rather than advancing mid-action,
+      // where the caller's own inventory write would clobber what it just granted. One
+      // extra attempt is exactly what a player would do after reading the Arbiter's line.
+      if (stage() <= sIdx) {
+        useGameStore.setState({
+          currentScene: { ...store.getState().currentScene!, enemies: [], enemyHps: [], hooks: [], range: null },
+        });
+        await store.getState().submitPlayerAction(VERB[kind]!);
+        await settle(() => stage() > sIdx);
+        drainRolls();
+        await new Promise((r) => setTimeout(r, 150));
+        drainRolls();
+      }
       expect({ stage: sIdx, kind, advanced: stage() > sIdx }).toEqual({ stage: sIdx, kind, advanced: true });
     }
     expect(stage()).toBe(apexIdx0);

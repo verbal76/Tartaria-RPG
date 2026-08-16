@@ -20,6 +20,7 @@
 import { readFileSync } from 'node:fs';
 
 const hunts = JSON.parse(readFileSync('app/data/quests/hunts.json', 'utf8')).hunts;
+const mysteries = JSON.parse(readFileSync('app/data/quests/mysteries.json', 'utf8')).mysteries;
 const rawLoc = JSON.parse(readFileSync('app/data/locations/locations.json', 'utf8'));
 const locs = Array.isArray(rawLoc) ? rawLoc : rawLoc.locations;
 
@@ -40,11 +41,19 @@ const VERBS = new Set([null, 'investigate', 'stealth', 'diplomacy', 'escape', 'c
 const errors = [];
 let bound = 0, total = 0, routed = 0;
 
-for (const h of hunts) {
+// ⚠ Both families, one rule. Mysteries had it WORSE than the hunts: their matcher checked
+// the verb and nothing else — no location test at all — so all 18 could be walked end to
+// end from a single tile. Same validator, same ratchet, so neither family can drift back.
+for (const h of [...hunts, ...mysteries]) {
   const granted = new Set();
+  // ⚠ A null stage is auto-consumed by the engine, so a `requires` on one is a gate nothing
+  // ever evaluates. It may GRANT (the consume loop hands it over); it may not DEMAND.
   h.stages.forEach((s, i) => {
     total++;
     const at = `${h.id} stage ${i}`;
+    if ((s.checkKind ?? null) === null && s.requires) {
+      errors.push(`${at}: a null (auto-consumed) stage cannot carry \`requires\` — nothing evaluates it`);
+    }
     if (!VERBS.has(s.checkKind ?? null)) errors.push(`${at}: unknown checkKind ${JSON.stringify(s.checkKind)}`);
     if (!s.locationName) {
       errors.push(`${at}: no locationName — the stage has no ground, so it cannot be routed to or refused from`);
@@ -70,7 +79,7 @@ if (errors.length) {
   for (const e of errors) console.error('  ✗ ' + e);
   process.exit(1);
 }
-console.log(`[check-hunt-stages] OK — ${hunts.length} hunts, ${total} stages, ${bound} bound, ${routed} carry their own ground.`);
+console.log(`[check-hunt-stages] OK — ${hunts.length} hunts + ${mysteries.length} mysteries, ${total} stages, ${bound} bound, ${routed} carry their own ground.`);
 console.log('  ⚠ Data only. It proves every stage names real ground and every `requires` has an');
 console.log('    earlier `grants`. It CANNOT prove the ground is reachable from where the player');
 console.log('    stands — the walker suite does that.');

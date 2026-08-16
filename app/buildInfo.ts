@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.193';
+export const DISPLAY_VERSION = '4.29.194';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24920,7 +24920,36 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New `npm run check:huntstages` is a hard ratchet: a stage with no location, or a
 // `requires` no earlier stage grants, fails the build. Twin of golem OTA-1329.
 // DISPLAY_VERSION 4.29.193.
-export const OTA_BUILD_ID = '2026-08-16-1327-every-hunt-doable';
+// ⚠⚠ THE MYSTERIES, THE SAME WAY. Owner: *"do the mysteries the same way next."*
+//
+// ⚠⚠ MEASURED FIRST, AND IT WAS WORSE THAN THE HUNTS. The mystery matcher checked the VERB
+// AND NOTHING ELSE — no location test of any kind, where the hunt branch has gated on
+// `currentLocationId === anchor` for hundreds of builds. All 18 mysteries could be finished
+// end to end WITHOUT EVER TRAVELLING: stand on one tile, type investigate / sneak /
+// investigate, done. The prose named a place every time; the engine never once asked you to
+// go there. Mirror image of the hunt failure, and why 26 of 36 named locations went
+// unvisited.
+//
+// Mysteries now get everything the hunts got: a per-stage location gate with the "not here"
+// refusal, a pack requirement that NAMES what is missing, a grant when the stage closes, a
+// direction line, and a real auto-route. The atlas pin walks with the chapter
+// (`contractStageAnchorId`). All 18 mysteries / 72 stages rewritten to the same grammar.
+// 188 of 188 hunt+mystery stages now name their own ground, enforced by
+// `npm run check:huntstages`, which also refuses a `requires` on an auto-consumed null
+// stage (a gate nothing evaluates).
+//
+// ⚠⚠ TWO BUGS OF MINE, CAUGHT BY THE WALKER, BOTH IN CODE SHIPPED THE DAY BEFORE:
+//   (1) The stage grant logged "✦ … mission item." WITHOUT CHECKING `grantItem`'s
+//       `accepted`. At a per-name cap it accepts zero and returns the pack unchanged, so
+//       the player read a receipt for an item they did not have and the next stage refused
+//       them for not having it.
+//   (2) The catch-up heal granted AND advanced on the same action. The rest of
+//       `submitPlayerAction` writes the inventory back from a snapshot taken at the top of
+//       the call, so a mission item granted mid-flight was clobbered one line later. The
+//       heal now hands over and STOPS.
+// Twin of golem OTA-1330. DISPLAY_VERSION 4.29.194.
+export const OTA_BUILD_ID = '2026-08-16-1328-mysteries-the-same-way';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1327-every-hunt-doable';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1326-stages-mean-what-they-say';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1325-wave-two-board-points-at-the-map';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1324-wave-one-sentinel-ward-and-dogs';
