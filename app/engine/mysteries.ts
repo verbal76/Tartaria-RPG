@@ -14,6 +14,12 @@ export interface MysteryStageDef {
 }
 
 export interface MysteryDef {
+  /** ⚠ The place the poster SENDS you — resolved against locations.json names and
+   *  aliases by `resolvePosterLocation`. Optional: a contract with no place of its
+   *  own still falls back to the posting faction's home. Same field, same resolver
+   *  and same spelling as a hunt's, so "where does this contract happen" has ONE
+   *  answer across every family. */
+  targetLocationName?: string;
   id: string;
   title: string;
   posterText: string;

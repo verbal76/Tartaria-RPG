@@ -361,6 +361,7 @@
     },
     {
       "id": "fq_servants_tribute",
+      "targetLocationName": "The Giant Vault",
       "factionId": "servants_of_giants",
       "title": "Tribute at the Vault",
       "description": "Walk the road to the Giant Vault and leave an offering at its threshold. The Giants are sleeping — the Servants ask only that we keep the path warm.",
