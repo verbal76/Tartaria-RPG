@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.213';
+export const DISPLAY_VERSION = '4.29.214';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23789,7 +23789,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // rides a 4pt LEFT EDGE, only on rows that resolve to a real catalog item.
 // IGNORE stays red — it is the one control that walks away from loot.
 // New suite ota1317 (6). 829 suites / 7749 tests. DISPLAY_VERSION 4.29.213.
-export const OTA_BUILD_ID = '2026-08-16-1317-amber-on-the-live-picker';
+// ⚠⚠ OTA-1320 — THE AUDIT OF THE AUDIT. Owner: "verify all the work that was
+// just done to Golem… check for glitches, bugs, bad code, degenerative
+// exploits." Four holes in the session's own fixes: (1) ⚠⚠ the gear dupe
+// SURVIVED for legacy saves (pre-1301 scenes carry pinned gear and no
+// tileGearNouns record — measured 4 copies in 4 steps on the fixed build);
+// backfilled once at the loadSlotIntoGame seam. (2) a Resurrection Gem now
+// clears the fallen-seed register it paid for. (3) ⚠⚠ the bulk sweep could
+// sell your LAST gate tool (Aether-Breath Mask: Common armor, breathe_toxic)
+// with no OTA-178 warning — bulkSellable filters gateLossFor. (4)
+// routedClimbId was write-only; cleared on activation + summit. Plus the
+// typecheck:tests ratchet's 203rd error (ota1311's type-only SaveState
+// import) and the missing HANDOFF session entry. New suite ota1320 (5).
+// 830 suites / 7754 tests. DISPLAY_VERSION 4.29.214.
+export const OTA_BUILD_ID = '2026-08-16-1320-audit-of-the-audit';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1317-amber-on-the-live-picker';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1312-amber-salvage-and-restore-gate';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1307-sell-all-actually-sells';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1304-towers-route-like-missions';

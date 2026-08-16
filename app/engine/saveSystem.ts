@@ -162,6 +162,19 @@ export async function hasFallenSeed(seed: string): Promise<boolean> {
   return ((await loadGlobalStash()).fallenSeeds ?? []).includes(seed);
 }
 
+/** ⚠ OTA-1320 — A RESURRECTION GEM PAYS THE REGISTER OFF. The seed register
+ *  exists so a backup cannot undo a death for free; a Gem is the sanctioned,
+ *  scarce way to undo one. Leaving the seed registered after a Gem revival
+ *  meant a resurrected character who LATER genuinely disappeared could never
+ *  be restored — the register still called them fallen. The Gem clears its
+ *  entry: that death has been paid for. A later death re-registers it. */
+export async function clearFallenSeed(seed: string): Promise<void> {
+  const stash = await loadGlobalStash();
+  const have = stash.fallenSeeds ?? [];
+  if (!have.includes(seed)) return;
+  await saveGlobalStash({ ...stash, fallenSeeds: have.filter((x) => x !== seed) });
+}
+
 /** OTA-845 — append a fallen character to the install-wide roll (capped). Returns the
  *  new total number of fallen ever recorded within the cap window. */
 export async function recordFallen(hero: FallenHero): Promise<number> {

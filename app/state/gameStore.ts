@@ -122,6 +122,7 @@ import {
   addResurrectionGems,
   recordFallen,
   recordFallenSeed,
+  clearFallenSeed,
   characterSeedOf,
   ensureFirstInstallSeed,
   getLastSaveWriteError,
@@ -9564,6 +9565,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // here is the interrupted-death state.)
       const wasInterruptedDeath = (saved.player.hp ?? 0) <= 0;
       if (wasInterruptedDeath) restoredScene = null;
+      // ⚠⚠ OTA-1320 — BACKFILL tileGearNouns ON LEGACY SCENES, OR THE DUPE
+      // SURVIVES THE FIX. OTA-1301 makes the cardinal step drop the tile's gear
+      // by reading the scene's OWN record — and a save written before that OTA
+      // has gear sitting in pinnedAmbientNouns with NO record at all, so the
+      // drop filters nothing and the legacy pin rides every step, granting a
+      // copy per tile exactly as before. Measured in audit: a pre-1301 save
+      // minted 4 copies in 4 steps ON the fixed build. The owner's own live
+      // save was in this state when the fix shipped.
+      //
+      // The step path stays record-driven (its comment forbids catalog-guessing
+      // for good reason — a prop that later gains a catalog entry would be
+      // mis-sorted forever). HERE the record is genuinely absent and this runs
+      // ONCE per legacy save, so deriving it is the only honest option: a pin
+      // that resolves to a catalog item is tile gear; water sources and rescue
+      // props do not resolve, and keep their pins.
+      if (restoredScene && (restoredScene as { tileGearNouns?: string[] }).tileGearNouns === undefined) {
+        const pins = restoredScene.pinnedAmbientNouns ?? [];
+        (restoredScene as { tileGearNouns?: string[] }).tileGearNouns =
+          pins.filter((n) => !!findCatalogItem(n, { aliases: true }));
+      }
       // Refresh ambientNouns from the canonical source. Prefer the
       // authored location.interactables list when present; fall back
       // to extractAmbientNouns(description) otherwise. Older saves
@@ -9920,6 +9941,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // was decremented first, so a save failure burned the gem AND the run.)
       await saveSlot(slotId, { ...saved, player: revived });
       const remainingGems = await addResurrectionGems(-1);
+      // ⚠ OTA-1320 — the Gem also clears this character's entry on the fallen-seed
+      // register (see clearFallenSeed). Without this, a Gem-revived character who
+      // later genuinely vanished could never be restored from a backup: the
+      // OTA-1311 gate would still call them fallen. Ordered after the gem spend so
+      // a failed save (which returns above) never touches the register.
+      try { await clearFallenSeed(characterSeedOf(revived)); } catch { /* best-effort */ }
       await setActiveSlot(slotId);
       // OTA-998 — resurrection goes through the SAME load migrations as a normal
       // slot load (it read raw memory before; see migrateLoadedWorldMemory).
@@ -25244,7 +25271,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (climb && !alreadyDown) {
           const nextDefeated = [...(wm912.summitBossesDefeated ?? []), summitClimbId];
           const nextCrested = Array.from(new Set([...(wm912.greatClimbsCrested ?? []), summitClimbId]));
-          set((s) => ({ worldMemory: { ...s.worldMemory, summitBossesDefeated: nextDefeated, greatClimbsCrested: nextCrested } }));
+          set((s) => ({
+            worldMemory: { ...s.worldMemory, summitBossesDefeated: nextDefeated, greatClimbsCrested: nextCrested },
+            // ⚠ OTA-1320 — the tower is DONE; if it was the routed mission, the
+            // route is over. Only clears when THIS tower was the one routed —
+            // beating tower A while routed to tower B leaves B's route standing.
+            ...(s.player && s.player.routedClimbId === summitClimbId
+              ? { player: { ...s.player, routedClimbId: null } }
+              : {}),
+          }));
           if (bossDef) get().appendLog('arbiter', bossDef.defeatLine);
           // (1) guaranteed Aether Collection Beacon
           const beacon: InventoryItem = {
@@ -26657,6 +26692,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => (s.player ? {
       player: {
         ...s.player,
+        // ⚠ OTA-1320 — activating any contract also clears a routed tower.
+        // routedClimbId was write-only and never cleared, so after routing a
+        // tower and then a contract, the field still named the tower as "the
+        // mission you're on" — stale state waiting to lie to its first reader.
+        routedClimbId: nextActive ? null : s.player.routedClimbId,
         activeFactionQuests: (s.player.activeFactionQuests ?? []).map((q) =>
           q.id === id ? { ...q, tracked: nextActive } : (nextActive ? { ...q, tracked: false } : q)),
         // OTA-992 — cross-kind: "the mission you're on" means across ALL routed

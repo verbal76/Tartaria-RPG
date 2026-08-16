@@ -1839,8 +1839,49 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ THE DEVICE-REPORT MARATHON + THE AUDIT OF ITS OWN WORK
+  (2026-08-16, latest). Golem OTA-1298→1320 / HAL 1299→1318 / steam 1300→1319.**
+  One session, five owner device reports, and a closing self-audit that found
+  four more holes in the session's own fixes. Highlights, newest first:
+  - **OTA-1320 (golem; ports staged, unpushed)** — the audit batch. (1) ⚠⚠ the
+    OTA-1301 gear-dupe fix did NOT cover legacy saves: a pre-1301 save carries
+    pinned gear and no `tileGearNouns` record, so the per-step drop filtered
+    nothing and the dupe survived the fix (measured: 4 copies in 4 steps on the
+    fixed build — the owner's live save was in this state). Backfilled ONCE at
+    the `loadSlotIntoGame` seam by catalog-resolving the pins; the step path
+    stays record-driven. (2) a Resurrection Gem now clears the character's
+    fallen-seed entry — else a Gem-revived character who later genuinely
+    vanished could never be restored. (3) ⚠⚠ the bulk sweep held out no
+    gate tools: OTA-1307 made a dead confirm reachable, and with it a sweep
+    that could silently sell the LAST Aether-Breath Mask (Common armor, gate
+    breathe_toxic) without OTA-178's red warning. `bulkSellable` now filters
+    `gateLossFor`. (4) `routedClimbId` was write-only; cleared on contract
+    activation and summit victory. Plus: ota1311's `SaveState` import was the
+    typecheck:tests ratchet's 203rd error (type-only, babel hid it from jest).
+  - **OTA-1311/1313/1315 — the infinite life glitch.** Restore-from-backup
+    revived the dead for free. Gated on "actually disappeared": not on the
+    roster AND not on the roll of the fallen (an UNCAPPED seed register —
+    `stash.fallen` is a 25-cap memorial and forgets).
+  - **OTA-1301/1302/1303 — five contradictions from one overland walk** (dead
+    compass branch indoors, leave-outpost outdoors, per-tile gear + site
+    seeding, flee text, doubled opener). ⚠ the walker lesson: every climb
+    suite TELEPORTS to its tower, so no walker could ever see a missing road.
+  - **OTA-1304/1305/1306 — towers route like missions; OTA-1307/1309/1310 —
+    the bulk-sell confirm had no confirm button (golem/steam fix; HAL got the
+    feature whole, owner-approved).**
+  - **OTA-1312→1319 — the amber recolour saga.** First landed on a file with
+    ZERO importers (SalvageModal — dead on golem since the OTA-1233 one-picker
+    merge), then got ported to HAL where that same filename IS live and had to
+    be reverted (owner: strictly-golem move; HAL keeps two buttons + original
+    colours, pinned by ota1318). The live golem/steam picker (GatherModal) is
+    now one amber with rarity as a 4pt left edge, catalog-resolved rows only.
+  ⚠ Session lesson, twice-paid: **a filename is not a mount point** — check
+  what ExplorationScreen renders before changing "the take/salvage screen",
+  and check per-line, because the same file is dead on one line and live on
+  another.
+
 - **⚠⚠⚠ THE "WIPE" IS FULLY SOLVED — IT WAS TWO BUGS AND ZERO DATA LOSS
-  (2026-08-15, latest). Golem OTA-1292+1294 / HAL 1293+1295 / steam 1296.**
+  (2026-08-15). Golem OTA-1292+1294 / HAL 1293+1295 / steam 1296.**
   The owner's log closed the case. (1) Lore's BACK was hard-wired to the
   title (1292, fixed). (2) The character select was a BOOT-TIME SNAPSHOT —
   `slots` re-read only on pull-to-refresh/restore/delete, so a character
@@ -5816,7 +5857,7 @@ rediscovering them.
   because the pool carries instead of evaporating. That is the stated design paid
   honestly for the first time — but +20 is the join threshold. If it reads badly the
   answer is a per-purchase grant cap, which is a design call and was not made.
-- **⚠⚠ FROM THE DEVICE LOG (2026-08-07, latest). ALL THREE LINES.** golem
+- **⚠⚠ FROM THE DEVICE LOG (2026-08-07). ALL THREE LINES.** golem
   OTA-1155 / HAL OTA-1178 / steam merged. A 16-part log off the owner's Pixel
   10 Pro XL plus two things he typed out by hand. **Eight fixes; the two loudest
   are #3 and #7.**
@@ -5871,7 +5912,7 @@ rediscovering them.
   checked that the game accepts the verbs its new prose asks for. **When you
   author content that suggests an action, grep the verb table for it.**
 
-- **⚠⚠ GIFT MODE (2026-08-07, latest). ALL THREE LINES.** golem OTA-1154 /
+- **⚠⚠ GIFT MODE (2026-08-07). ALL THREE LINES.** golem OTA-1154 /
   HAL OTA-1177 / steam merged. Owner, two asks in one message: *"the list we
   pick from to give out must exclude all equipped gear, armor and anything in the
   bandolier or tool pouch. also no item that is given away would break a mission
