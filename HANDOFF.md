@@ -1839,8 +1839,42 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ THE STORYLINES — AND P19 IS CLOSED
+  (2026-08-16, latest). Golem OTA-1331.**
+  Owner: *"go with storylines."* The last of the three staged families.
+  - ⚠⚠ **It had the hole worst.** The storyline matcher checked the VERB and nothing else —
+    no location test of any kind — so a **nine-chapter faction arc could be walked start to
+    finish standing on a single tile.** These are the longest chains in the game (6–9
+    stages, 93 in total) and the ones most obviously written as a journey, which made the
+    gap widest here of anywhere.
+  - All 14 storylines / 93 stages rewritten to the same grammar the hunts and mysteries
+    got. The matcher gates on ground, checks the pack, grants, directs and auto-routes; the
+    atlas pin walks with the chapter.
+  - ⚠⚠ **281 OF 281 STAGES ACROSS ALL THREE FAMILIES NOW NAME THEIR OWN GROUND.** That is
+    the exact figure P19 was filed against — *"281 stages exist and they are filled in a
+    content pass, not in this commit."* The content pass is done.
+    `npm run check:huntstages` covers all three families and is a hard build gate: a
+    placeless stage, a `requires` nothing grants, or a `requires` on an auto-consumed null
+    stage fails the build.
+  - ⚠ **One more found by the honest walker, and it is the SAME bug as the hunts' roadside
+    trader, one family over.** Two storyline turn-ins are `boss` stages — and a storyline
+    `boss` is paid by DIPLOMACY — sited at outposts where a NAMED vendor stands
+    permanently. The vendor parley branch returns long before the stage matcher runs, so it
+    ate the verb every single time. The guard added for hunts is now
+    `stageAwaitsIntentHere` and covers all three families, mirroring each matcher's
+    boss→intent quirk (hunt: attack, mystery: investigate, storyline: diplomacy). ⚠ Get
+    that map wrong and nothing breaks loudly — it just stops yielding, and the silent
+    swallow comes back.
+  - ⚠ **`escape` stages were measured, not assumed.** Five storyline stages use `escape`,
+    which only makes sense in combat — except gameStore's own comment says otherwise
+    (*"No pursuer (trap / stage escapes, cleared scenes) keeps the flat DC"*). They are
+    reachable out of combat by design, so they stayed; the prose was rewritten as endurance
+    or a run from collapsing ground rather than fleeing a fight that never arrives.
+  - **P19 is closed.** Hunts (OTA-1329), mysteries (1330), storylines (1331). What remains
+    is ordinary content work, not a structural hole.
+
 - **⚠⚠⚠ THE MYSTERIES, THE SAME WAY — AND TWO BUGS ONE DAY OLD
-  (2026-08-16, latest). Golem OTA-1330.**
+  (2026-08-16). Golem OTA-1330.**
   Owner: *"do the mysteries the same way next."*
   - ⚠⚠ **Measured first, and it was worse than the hunts.** The mystery matcher checked
     the VERB **and nothing else** — no location test of any kind, where the hunt branch
