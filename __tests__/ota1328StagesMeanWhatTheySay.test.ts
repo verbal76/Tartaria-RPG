@@ -166,9 +166,23 @@ describe("OTA-1328 — the owner's own hunt, made real", () => {
     }
   });
 
-  it('⚠ the hunt still anchors where its poster says — the layer added, it did not move', () => {
+  it('⚠ the hunt still anchors where its poster says, and an UNBOUND stage falls back to it', () => {
+    // The DEF-level anchor is untouched by the layer — the poster still means what it said.
     expect(huntAnchorId(hunt)).toBe('sinking_cathedral');
-    expect(stageLocationId(hunt.stages[2], huntAnchorId(hunt), resolvePosterLocation))
-      .toBe('sinking_cathedral');
+    // ⚠ And the fallback is the whole reason the field is optional. Asserted on a stage
+    // with NO `locationName` rather than on a real one, because every authored stage now
+    // carries its own ground (P19 Phase B) — pinning the fallback to a stage that happens
+    // to be unbound today is how this assertion silently stops testing anything.
+    expect(stageLocationId({}, huntAnchorId(hunt), resolvePosterLocation)).toBe('sinking_cathedral');
+    expect(stageLocationId(undefined, huntAnchorId(hunt), resolvePosterLocation)).toBe('sinking_cathedral');
+  });
+
+  it('⚠ every stage of this hunt now stands somewhere real, and the chase MOVES', () => {
+    const grounds = hunt.stages.map((st) =>
+      stageLocationId(st, huntAnchorId(hunt), resolvePosterLocation));
+    expect(grounds.every(Boolean)).toBe(true);
+    // More than one tile — a seven-stage hunt that never leaves one square is the
+    // "nothing to route BETWEEN" hole this item exists to close.
+    expect(new Set(grounds).size).toBeGreaterThan(1);
   });
 });

@@ -191,8 +191,17 @@ describe('OTA-1048 — the reported case: thirteen contracts at one board', () =
 
     // Twelve of the thirteen are one line each; the first keeps its detail and
     // the Arbiter keeps his first-contract / stacking / slow-down beats. That is
-    // 16 lines on this input. Old behaviour was north of forty.
-    expect(out.length).toBe(16);
+    // 16 lines of NARRATION on this input. Old behaviour was north of forty.
+    //
+    // ⚠ P19 — one line per accept is added on top, and it is not chatter: every hunt
+    // now opens by having the giver hand you something, and an item entering the pack
+    // has always been announced (`✦ … — mission item.`). Counted SEPARATELY rather than
+    // rolled into a bigger magic number, because the rule OTA-1048 defends is about the
+    // Arbiter repeating himself, and a grant receipt is not the Arbiter talking. If the
+    // compaction ever regresses, the narration count below still catches it.
+    const grantReceipts = out.filter((t) => t.endsWith('— mission item.'));
+    expect(grantReceipts.length).toBe(take.length);
+    expect(out.length - grantReceipts.length).toBe(16);
 
     // ...and the twelve really are the compact form, not merely fewer lines.
     const compact = out.filter((t) => t.startsWith('✦ Contract accepted —'));

@@ -44,7 +44,7 @@ import { getRaces, getFactions } from '../app/engine/character';
 import { HUNTS, findHuntById } from '../app/engine/hunts';
 import { MYSTERIES } from '../app/engine/mysteries';
 import { STORYLINES } from '../app/engine/factionStorylines';
-import { huntAnchorId } from '../app/engine/contractMarkers';
+import { huntAnchorId, huntStageAnchorId } from '../app/engine/contractMarkers';
 import { canonicalCellOf } from '../app/engine/worldMap';
 
 jest.setTimeout(120000);
@@ -113,12 +113,16 @@ describe("OTA-1213 — LIVE: the owner's exact wall, torn down", () => {
     await settle(() => !!store.getState().currentScene);
     const def = findHuntById('hunt_bog_dragon')!;
     expect(def).toBeTruthy();
-    const anchor = huntAnchorId(def);
+    // ⚠ P19 — stage 1's OWN ground, not the contract's. Every hunt stage names a place
+    // now, and the gate compares against the STAGE's tile; seeding the poster anchor puts
+    // the player somewhere the stage will (correctly) refuse.
+    const anchor = huntStageAnchorId(def, 1);
     const p = store.getState().player!;
     useGameStore.setState({
       player: {
         ...p,
         currentLocationId: atAnchor ? anchor : 'tartarian_outskirts',
+        gridX: undefined, gridY: undefined, mapX: undefined, mapY: undefined,
         hubRoomId: null,
         // Stage index 1 = the card's "Stage 2/7 — The First Friction", the
         // owner's exact position. Tracked (activated), like his screenshot.
