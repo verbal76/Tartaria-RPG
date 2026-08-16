@@ -209,12 +209,19 @@ export function GatherModal({
   // nothing. IGNORE means *leave the rest*; when there is no rest, there is
   // nothing to decide.
   //
-  // ⚠ THE 800ms HOLD IS NOT A DELAY FOR ITS OWN SAKE — it is the same beat the
-  // investigate picker has used since OTA-257, for the same reason: the player
-  // taps the last row, and the card has to still be there long enough for that tap
-  // to have visibly landed. Snapping shut on the same frame reads as the popup
-  // crashing rather than as the room being finished. Matching the number keeps the
-  // two pickers feeling like one thing.
+  // ⚠⚠ AND IT CLOSES ON THE FRAME THE LIST EMPTIES — THE 800ms HOLD IS GONE.
+  // Owner, from a device run: *"whenever I hit the three all buttons and there's
+  // nothing left in the screen, it still says ignore all, that red button, for
+  // about 2 and 1/2 seconds... the minute the last item is gone from the screen
+  // that pop-up should close."*
+  //
+  // ⚠ The hold was borrowed from the investigate picker on the theory that a card
+  // vanishing on the same frame as the tap reads as a crash. That reasoning does
+  // not survive contact with the SWEEP buttons: the player taps TAKE ALL GEAR and
+  // WATCHES a whole lane empty, so there is no ambiguity left about whether the
+  // tap landed — and after three sweeps in a row the hold stacks on top of the
+  // re-renders and reads as the popup being stuck. The tap that emptied the room
+  // is its own confirmation.
   //
   // ⚠⚠ AND IT ONLY FIRES IF THE PICKER HAD SOMETHING TO BEGIN WITH. Opening onto
   // an empty list and closing instantly is indistinguishable from a button that
@@ -235,8 +242,8 @@ export function GatherModal({
     if (rowCount > 0) { hadRowsThisOpen.current = true; return undefined; }
     // Opened onto an empty room: explain, do not dismiss.
     if (!hadRowsThisOpen.current) return undefined;
-    const t = setTimeout(() => cancelRef.current(), 800);
-    return () => clearTimeout(t);
+    cancelRef.current();
+    return undefined;
   }, [visible, rowCount]);
   // Reading the ref during render is fine — it was last written by the PREVIOUS
   // render's effect, so by the time the count reaches zero it already knows

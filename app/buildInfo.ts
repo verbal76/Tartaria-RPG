@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.215';
+export const DISPLAY_VERSION = '4.29.216';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23814,7 +23814,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and an out-of-reach weapon BUZZES silently rather than greying out. Also fixes
 // the Arbiter's stealth nudge, which had named an APPROACH toggle retired at
 // OTA-847. New suite ota1321 (12). 831 suites / 7766 tests. DISPLAY_VERSION 4.29.215.
-export const OTA_BUILD_ID = '2026-08-16-1321-first-fight-explains-itself';
+// ⚠⚠ OTA-1322 — THE EMPTY PICKER CLOSES ON THE FRAME IT EMPTIES. Owner, device
+// run: *"whenever I hit the three all buttons and there's nothing left in the
+// screen, it still says ignore all, that red button, for about 2 and 1/2 seconds
+// ... the minute the last item is gone from the screen that pop-up should
+// close."* OTA-1240 already auto-closed an emptied picker, but behind an 800ms
+// hold borrowed from the investigate picker on the theory that closing on the
+// same frame as the tap reads as a crash. That reasoning does not survive the
+// SWEEP buttons: the player taps TAKE ALL GEAR and WATCHES the lane empty, so the
+// tap has already confirmed itself — and across three sweeps the hold stacks on
+// the re-renders into the ~2.5s he measured. Hold removed; the opened-empty case
+// still explains and still waits, which is a different player with a different
+// problem. DISPLAY_VERSION 4.29.216.
+export const OTA_BUILD_ID = '2026-08-16-1322-empty-picker-closes-now';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1321-first-fight-explains-itself';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1320-audit-of-the-audit';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1317-amber-on-the-live-picker';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1312-amber-salvage-and-restore-gate';
