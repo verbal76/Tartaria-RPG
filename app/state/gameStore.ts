@@ -122,6 +122,7 @@ import {
   addResurrectionGems,
   recordFallen,
   recordFallenSeed,
+  clearFallenSeed,
   characterSeedOf,
   ensureFirstInstallSeed,
   getLastSaveWriteError,
@@ -6807,6 +6808,8 @@ interface GameStore {
    *  reach the main_quest beat via finishOutpostTutorial, which also fires
    *  when the player leaves the outpost by any means during this beat. */
   chooseTutorialExplore: () => void;
+  /** ⚠ Latch the first-fight primer as seen. Idempotent. */
+  markCombatPrimerSeen: () => void;
   chooseTutorialLeave: () => void;
   finishOutpostTutorial: () => void;
   /** arb109 — feedback when a tutorial-locked control is tapped: the buzz
@@ -9564,6 +9567,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // here is the interrupted-death state.)
       const wasInterruptedDeath = (saved.player.hp ?? 0) <= 0;
       if (wasInterruptedDeath) restoredScene = null;
+      // ⚠⚠ OTA-1320 — BACKFILL tileGearNouns ON LEGACY SCENES, OR THE DUPE
+      // SURVIVES THE FIX. The per-step gear drop is record-driven: it removes the
+      // nouns listed in `tileGearNouns`. A save written before that record existed
+      // has gear sitting in pinnedAmbientNouns with NO record at all, so the drop
+      // filters nothing and the legacy pin rides every step, granting a copy per
+      // tile exactly as before — measured at 4 copies in 4 steps ON the fixed
+      // build. (The banner keeps golem's OTA number: that is where this was
+      // written, and the shared suite anchors on this phrase across all lines.)
+      //
+      // The step path stays record-driven (guessing from the catalog there would
+      // mis-sort a prop that later gains an entry). HERE the record is genuinely
+      // absent and this runs ONCE per legacy save, so deriving it is the only
+      // honest option: a pin that resolves to a catalog item is tile gear; water
+      // sources and rescue props do not resolve, and keep their pins.
+      if (restoredScene && (restoredScene as { tileGearNouns?: string[] }).tileGearNouns === undefined) {
+        const pins = restoredScene.pinnedAmbientNouns ?? [];
+        (restoredScene as { tileGearNouns?: string[] }).tileGearNouns =
+          pins.filter((n) => !!findCatalogItem(n, { aliases: true }));
+      }
       // Refresh ambientNouns from the canonical source. Prefer the
       // authored location.interactables list when present; fall back
       // to extractAmbientNouns(description) otherwise. Older saves
@@ -9920,6 +9942,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // was decremented first, so a save failure burned the gem AND the run.)
       await saveSlot(slotId, { ...saved, player: revived });
       const remainingGems = await addResurrectionGems(-1);
+      // ⚠ The Gem also clears this character's entry on the fallen-seed register.
+      // Without this, a Gem-revived character who later genuinely vanished could
+      // never be restored from a backup: the restore gate would still call them
+      // fallen. Ordered after the gem spend so a failed save never touches it.
+      try { await clearFallenSeed(characterSeedOf(revived)); } catch { /* best-effort */ }
       await setActiveSlot(slotId);
       // OTA-998 — resurrection goes through the SAME load migrations as a normal
       // slot load (it read raw memory before; see migrateLoadedWorldMemory).
@@ -12145,9 +12172,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           && (!lastStealthHintAt || now - lastStealthHintAt > STEALTH_HINT_MIN_MS)
         ) {
           lastStealthHintAt = now;
+          // ⚠ NAMES A BUTTON THAT EXISTS. Both lines used to read "Tap APPROACH,
+          // flip 'use stealth'" — a toggle retired when the sneak opener moved onto
+          // the in-combat STEALTH button (ApproachModal.tsx says so in its own props
+          // comment). The Arbiter was coaching a control that had been gone for
+          // hundreds of builds.
           const line = steGear > 0
-            ? `The Arbiter lowers their voice. "You're carrying shadow with you — use it. Tap APPROACH, flip 'use stealth', and you can be on them before they know it. A clean opening strike, or slip past entirely."`
-            : `The Arbiter lowers their voice. "You move quiet when you choose to. Tap APPROACH, flip 'use stealth', and take them on your terms — strike unseen, or thread past without a fight."`;
+            ? `The Arbiter lowers their voice. "You're carrying shadow with you — use it. Tap STEALTH before they close, and you can be on them before they know it. A clean opening strike, or slip past entirely."`
+            : `The Arbiter lowers their voice. "You move quiet when you choose to. Tap STEALTH before they close and take them on your terms — strike unseen, or thread past without a fight."`;
           get().appendLog('arbiter', line);
         }
       }
@@ -25236,7 +25268,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (climb && !alreadyDown) {
           const nextDefeated = [...(wm912.summitBossesDefeated ?? []), summitClimbId];
           const nextCrested = Array.from(new Set([...(wm912.greatClimbsCrested ?? []), summitClimbId]));
-          set((s) => ({ worldMemory: { ...s.worldMemory, summitBossesDefeated: nextDefeated, greatClimbsCrested: nextCrested } }));
+          set((s) => ({
+      worldMemory: { ...s.worldMemory, summitBossesDefeated: nextDefeated, greatClimbsCrested: nextCrested },
+      // ⚠ Cresting the tower you routed to ENDS that route. `routedClimbId` was
+      // write-only: nothing ever cleared it, so after a summit it still named a
+      // finished climb as "the mission you're on".
+      ...(s.player && s.player.routedClimbId === summitClimbId
+        ? { player: { ...s.player, routedClimbId: null } }
+        : {}),
+    }));
           if (bossDef) get().appendLog('arbiter', bossDef.defeatLine);
           // (1) guaranteed Aether Collection Beacon
           const beacon: InventoryItem = {
@@ -26651,6 +26691,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...s.player,
         activeFactionQuests: (s.player.activeFactionQuests ?? []).map((q) =>
           q.id === id ? { ...q, tracked: nextActive } : (nextActive ? { ...q, tracked: false } : q)),
+        // ⚠ Activating any contract also clears a routed tower. `routedClimbId` was
+        // write-only and never cleared, so after routing a tower and then a
+        // contract the field still named the tower as "the mission you're on" —
+        // stale state waiting to lie to its first reader.
+        routedClimbId: nextActive ? null : s.player.routedClimbId,
         // OTA-992 — cross-kind: "the mission you're on" means across ALL routed
         // kinds, not just this list. See setContractActive's mirror sweep.
         activeHunts: nextActive ? (s.player.activeHunts ?? []).map((h) => ({ ...h, tracked: false })) : (s.player.activeHunts ?? []),
@@ -30579,6 +30624,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().advanceTutorial();
     }
   },
+  markCombatPrimerSeen() {
+    const p = get().player;
+    if (!p || p.milestones?.firstCombatPrimerShown) return;
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        // ⚠ Milestones carries three REQUIRED counters; an empty-object default
+        // drops them. Same base the firstSiltCrossed latch uses.
+        milestones: {
+          ...(s.player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 }),
+          firstCombatPrimerShown: true,
+        },
+      },
+    } : s));
+    void get().persist();
+  },
+
   chooseTutorialExplore() {
     const state = get();
     const step = state.tutorialStep !== null ? TUTORIAL_STEPS[state.tutorialStep] : null;

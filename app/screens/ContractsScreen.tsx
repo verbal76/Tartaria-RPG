@@ -1909,6 +1909,17 @@ export function ContractsScreen() {
                     setScreen('exploration');
                     return;
                   }
+                  // ⚠⚠ THIS BRANCH WAS MISSING ON THIS LINE. The SET COURSE button on a
+                  // GREAT CLIMB card and `routeGreatClimb` in the store both shipped, but
+                  // nothing joined them: the confirm fell straight through to the plain
+                  // travel path, so the tower got a course and never became the mission
+                  // you were on — everything else stayed active. A tower routes like a
+                  // contract, which is what "like the rest of them" means here.
+                  if (pendingRoute.climbId) {
+                    routeGreatClimb(pendingRoute.climbId);
+                    setScreen('exploration');
+                    return;
+                  }
 
                   // 2026-05-25 OTA-035 — outpost-aware confirmation.
                   // Was a hard refusal ("leave the outpost first, then

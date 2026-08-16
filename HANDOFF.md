@@ -1839,7 +1839,40 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
-- **⚠⚠⚠ STEAM IS RESYNCED TO GOLEM (2026-08-15, latest). STEAM OTA-1297.**
+- **⚠⚠⚠ CURRENT WITH GOLEM — THE AUDIT BATCH AND THE FIRST-FIGHT PRIMER
+  (2026-08-16, latest). STEAM OTA-1321.**
+  - ⚠ **Measured before anything moved, and the measurement changed the method.**
+    Only **9 files** carried real code divergence from golem — and this line's
+    OWN files are among them: `GamepadNav`, `GamepadNav.web`, `kokoroWeb`,
+    `kokoroWeb.web`, plus the Steam-build `TTSManager` and `SplashOverlay`. So
+    every change here was made **surgically**; nothing was copied wholesale.
+    That is the opposite call from the Tartaria line the same night, where the
+    shared files were close enough to replace outright. Same instruction, two
+    different correct methods — decided by measuring, not by habit.
+  - **The audit batch.** (1) legacy saves get `tileGearNouns` backfilled ONCE at
+    the `loadSlotIntoGame` seam, or the gear dupe survives its own fix (measured:
+    4 copies in 4 steps on the FIXED build). (2) A Resurrection Gem now clears
+    the character's fallen-seed entry, so a Gem-revived character who LATER
+    genuinely vanishes can still be restored from a backup. (3) The bulk sweep
+    filters `gateLossFor` and can never sell your **last** gate tool — real
+    target: **Aether-Breath Mask**, Common armor carrying gate `breathe_toxic`.
+    (4) `routedClimbId` was write-only; cleared now on contract activation and
+    on summit victory.
+  - **The primer.** `CombatPrimerModal`, raised from ONE derived condition in
+    `ExplorationScreen` (live enemy + milestone unlatched + zero lifetime kills)
+    rather than from the three enemy-spawn sites, retiring the
+    `combat_first_fight` hint it duplicated.
+  - ⚠ **Found while porting, and fixed:** the GREAT CLIMB `SET COURSE` button and
+    `routeGreatClimb` both shipped on this line, but nothing joined them — the
+    confirm handler fell through to plain travel, so a tower got a course and
+    never became the mission you were on. The Tartaria line carried the exact
+    same half-wired feature; both are fixed.
+  - ⚠ The Arbiter's stealth nudge named an APPROACH "use stealth" toggle retired
+    when the sneak opener moved onto the in-combat STEALTH button.
+  - 2 golem suites brought in (17 tests). 831 suites / 7766 tests — the same
+    counts golem carries. All gates green.
+
+- **⚠⚠⚠ STEAM IS RESYNCED TO GOLEM (2026-08-15). STEAM OTA-1297.**
   Owner: "bring steam up to date with Golem." This branch is now GOLEM'S TREE
   EXACTLY plus the PC layer. A textual merge was the wrong tool — 303
   conflicts, because the three lines number the same fixes differently and
@@ -5837,7 +5870,7 @@ rediscovering them.
   because the pool carries instead of evaporating. That is the stated design paid
   honestly for the first time — but +20 is the join threshold. If it reads badly the
   answer is a per-purchase grant cap, which is a design call and was not made.
-- **⚠⚠ FROM THE DEVICE LOG (2026-08-07, latest). ALL THREE LINES.** golem
+- **⚠⚠ FROM THE DEVICE LOG (2026-08-07). ALL THREE LINES.** golem
   OTA-1155 / HAL OTA-1178 / steam merged. A 16-part log off the owner's Pixel
   10 Pro XL plus two things he typed out by hand. **Eight fixes; the two loudest
   are #3 and #7.**
@@ -5892,7 +5925,7 @@ rediscovering them.
   checked that the game accepts the verbs its new prose asks for. **When you
   author content that suggests an action, grep the verb table for it.**
 
-- **⚠⚠ GIFT MODE (2026-08-07, latest). ALL THREE LINES.** golem OTA-1154 /
+- **⚠⚠ GIFT MODE (2026-08-07). ALL THREE LINES.** golem OTA-1154 /
   HAL OTA-1177 / steam merged. Owner, two asks in one message: *"the list we
   pick from to give out must exclude all equipped gear, armor and anything in the
   bandolier or tool pouch. also no item that is given away would break a mission

@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.169';
+export const DISPLAY_VERSION = '4.29.170';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23817,7 +23817,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // confirmed itself — and across three sweeps the hold stacks on the re-renders
 // into the ~2.5s he measured. Hold removed; the opened-empty case still explains
 // and still waits. DISPLAY_VERSION 4.29.169.
-export const OTA_BUILD_ID = '2026-08-16-1320-empty-picker-closes-now';
+// ⚠⚠ OTA-1321 — THIS LINE COMES CURRENT WITH GOLEM: THE AUDIT BATCH + THE FIRST-
+// FIGHT PRIMER. Measured first — only 9 files carried real code divergence from
+// golem, and four of the differing files are this line's OWN (GamepadNav,
+// GamepadNav.web, kokoroWeb, kokoroWeb.web) plus its Steam-build TTSManager and
+// SplashOverlay, so every change here is SURGICAL. Nothing was copied wholesale.
+//
+// The audit batch: (1) legacy saves get tileGearNouns backfilled once at the
+// loadSlotIntoGame seam, or the gear dupe survives its own fix (4 copies in 4
+// steps, measured); (2) a Resurrection Gem clears the character's fallen-seed
+// entry, so a Gem-revived character who LATER vanishes can still be restored;
+// (3) the bulk sweep filters gateLossFor, so it can never sell your last gate
+// tool (real target: Aether-Breath Mask, Common armor, gate breathe_toxic);
+// (4) routedClimbId was write-only — now cleared on contract activation and on
+// summit victory.
+//
+// The primer: CombatPrimerModal, raised from ONE derived condition in
+// ExplorationScreen (live enemy + milestone unlatched + zero kills), retiring the
+// `combat_first_fight` hint it duplicated.
+//
+// ⚠ Found while porting, and fixed: the GREAT CLIMB "SET COURSE" button and
+// routeGreatClimb both shipped here, but nothing joined them — the confirm fell
+// through to plain travel, so a tower got a course and never became the mission
+// you were on. Same half-wired feature the Tartaria line carried.
+// Also: the Arbiter's stealth nudge named an APPROACH toggle retired when the
+// sneak opener moved onto the STEALTH button. 2 golem suites brought in (17).
+// DISPLAY_VERSION 4.29.170.
+export const OTA_BUILD_ID = '2026-08-16-1321-current-with-golem';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1320-empty-picker-closes-now';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1319-amber-on-the-live-picker';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1316-amber-salvage-and-restore-gate';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1309-sell-all-actually-sells';
