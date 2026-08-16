@@ -1007,6 +1007,20 @@ export const FACTION_CORE_GATES: Record<string, CoreGate> = {
 
 /** True when the player's current state + this action's intent
  *  satisfies the faction-specific gate for the Capital they're at. */
+/** ⚠⚠ THIS NO LONGER GATES THE SUMMON, AND MUST NOT BE RE-WIRED TO.
+ *
+ *  Owner's ruling: *"guardians should only come from the summon button, because
+ *  there are other quests in some of the capital cities that need to examine the
+ *  area and the examine summon will eat the other events."* The Core Guardian is
+ *  raised by `summonCoreGuardian()` and by nothing else; the verb path that used
+ *  to consult this predicate is gone, because for the Reclaimer and Architect
+ *  routes it made `investigate` — the verb every other Capital thread is examined
+ *  into being with — indistinguishable from working the Core housing, and it
+ *  RETURNED before those threads could run.
+ *
+ *  It is kept because the faction ROUTE is still real colour (each discipline
+ *  reaches the Core its own way, and coreGateHint says so), and because the suite
+ *  pins the table. Read it for flavour; do not make it decide anything. */
 export function canRecoverCore(player: PlayerCharacter, parsedIntent: Intent): boolean {
   const mq = ensureMainQuest(player.mainQuest);
   if (mq.phase !== 'revelation' && mq.phase !== 'cores') return false;

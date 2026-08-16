@@ -6810,6 +6810,7 @@ interface GameStore {
   chooseTutorialExplore: () => void;
   /** ⚠ OTA-1321 — latch the first-fight primer as seen. Idempotent. */
   markCombatPrimerSeen: () => void;
+
   chooseTutorialLeave: () => void;
   finishOutpostTutorial: () => void;
   /** arb109 — feedback when a tutorial-locked control is tapped: the buzz
@@ -14474,149 +14475,47 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    // v2.4.1 (OTA 035 — Phase 2) — Main quest Core-gate check.
-    // Fires BEFORE the action's normal handler runs so the Core
-    // grant + faction-flavored narration lands first; the action
-    // itself (salvage / ask / steal / etc.) then continues normally
-    // through its switch case below. The check is no-op when the
-    // player isn't at a Lost Capital, isn't in revelation/cores
-    // phase, has already recovered this Capital's Core, or didn't
-    // submit an action matching the faction's gate intents.
+    // ⚠⚠ THE CORE GUARDIAN IS SUMMONED BY A BUTTON, AND BY NOTHING ELSE.
     //
-    // OTA 052 — the gate verb now SUMMONS the Core Guardian
-    // instead of immediately granting the Core. The Core is only
-    // granted when the Guardian falls (see resolveEnemyDefeat).
+    // Owner's ruling: *"guardians should only come from the summon button, because
+    // there are other quests in some of the capital cities that need to examine the
+    // area and the examine summon will eat the other events."*
+    //
+    // This block used to fire the Guardian off the player's FACTION GATE INTENT
+    // alone — `investigate` for Reclaimers and Architects, `ask` for the Order and
+    // the Dynasty, `rest` for True Tartarians. That made ordinary play inside a
+    // Capital indistinguishable from working the Core housing. Measured twice: a
+    // bare `look` at Asgardar produced only Sentinel-Priest Vaelka's combat lines
+    // and no look text at all, and `investigate the ground` at Iskan-Veil — target
+    // `ground`, resolved to nothing — summoned Veilkeeper Inarra.
+    //
+    // ⚠ AND THE REAL COST IS THE ONE THE OWNER NAMED, not the surprise itself:
+    // a Capital hosts other threads, and several of them are examined into being.
+    // An intent-keyed summon EATS them — it returns before their handlers run, so
+    // whichever beat the player was actually reaching for never happens. Narrowing
+    // the gate to "aimed at a resolved noun" would have fixed the bare `look` and
+    // left that collision fully intact, which is why that is not what this does.
+    //
+    // The summon now lives in `summonCoreGuardian()`, reachable only from the
+    // Capital's own control. The nudge below stays: it is what tells a player who
+    // grabs at the Core with the wrong verb where the real door is.
     {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const mqMod = require('../engine/mainQuest');
-      // isStationedAtNamedLocation gate: currentLocationId lingers as the
-      // departure capital all through travel (and while wandering off its
-      // anchor), so without this a faction gate-intent action — e.g. a
-      // Monarch's `attack` on a wilderness Mudling — would summon that
-      // capital's Core Guardian miles from the city. Only let the Core
-      // gate fire when the player is actually standing IN the capital.
-      if (mqMod.canRecoverCore(player, parsed.intent) && isStationedAtNamedLocation(player)) {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const cg = require('../engine/coreGuardians');
-        const capitalId = player.currentLocationId;
-        const alreadyDefeated = (player.mainQuest?.guardiansDefeated ?? []).includes(capitalId);
-        // Guardian already beaten in a prior session (or legacy
-        // save) — fall through to the normal Core grant path.
-        if (alreadyDefeated) {
-          triggerMainQuest(get, set, { kind: 'core_recovered', locationId: capitalId });
-        } else {
-          // No live Guardian in the current scene? Spawn one.
-          // (If the player already triggered a spawn this visit
-          // and the Guardian is still alive in the scene, the
-          // gate verb just doubles as a "re-engage" — the existing
-          // boss simply receives the action.)
-          const livingGuardian = currentScene.enemies.find((e) => cg.isCoreGuardian(e));
-          if (!livingGuardian) {
-            const guardian = cg.spawnGuardianForCapital(player, capitalId);
-            if (guardian) {
-              set((s) => (
-                s.currentScene
-                  ? {
-                      currentScene: {
-                        ...s.currentScene,
-                        enemies: [...s.currentScene.enemies, guardian],
-                        enemyHps: [...s.currentScene.enemyHps, guardian.hp],
-                        activeEnemyIdx: s.currentScene.enemies.length,
-                        range: 'mid',
-                      },
-                    }
-                  : s
-              ));
-              // OTA-146 — parallel enemy-card beat. Pre-fix the
-              // Guardian's approachLine only emitted to 'arbiter' so
-              // the player read it as scene narration, missed the
-              // BOSS arrival entirely, and got crit for 25 with no
-              // warning. Playtester: "was that a guardian? he spawned
-              // with another character? I never even saw his tag."
-              // Now: ALSO emit the canonical `[combat]` enemy-card
-              // line ("X closes — Attack ready, NdN damage on a hit.
-              // (range: close) ★ BOSS") matching what regular
-              // encounters get, so the boss surfaces in the same UI
-              // affordance as every other enemy.
-              // ⚠ OTA-1136 — AND THE CARD SAID "close" WHILE THE SPAWN SET 'mid'.
-              // Twelve lines up this block writes `range: 'mid'`. The player then
-              // typed `approach`, which moved mid → close and cost them the
-              // action that a boss answers with two swings. The card was telling
-              // them they were already there.
-              get().appendLog(
-                'combat',
-                `${guardian.name} closes — ${guardian.attack} ready, ${enemyDamageDisplay(guardian)}. (range: mid) ★ CORE GUARDIAN`,
-              );
-              get().appendLog('arbiter', cg.GUARDIANS_BY_CAPITAL[capitalId].approachLine);
-              // Record the spawn for the Milestones tab.
-              recordMemorableEvent(get, set, {
-                kind: 'mq_guardian_spawned',
-                text: `summoned ${guardian.name} at ${cg.GUARDIANS_BY_CAPITAL[capitalId].capitalName}`,
-                locationId: capitalId,
-                locationName: cg.GUARDIANS_BY_CAPITAL[capitalId].capitalName,
-                hoursElapsed: player.hoursElapsed ?? 0,
-                enemyName: guardian.name,
-              });
-              // OTA 454 — record the Guardian as a met NPC so they
-              // show up in the NPCs Met milestone list.
-              // OTA-1052 — a Guardian is somebody you MET; before this it was
-              // listed in the Chronicle with a blank where its regard should be,
-              // because only the vendor site recorded a relation.
-              set((s) => ({
-                worldMemory: rememberNpcMeeting(s.worldMemory, {
-                  id: `guardian:${capitalId}`,
-                  name: guardian.name,
-                  role: 'Core Guardian',
-                  factionId: 'aether_born_order',
-                  locationId: capitalId,
-                  hoursElapsed: player.hoursElapsed ?? 0,
-                  firstMetAt: Date.now(),
-                }, { nowMs: Date.now(), hoursElapsed: player.hoursElapsed ?? 0 }),
-              }));
-              // Don't run the normal gate verb's effect this turn —
-              // the Guardian is now the scene's focus. Skip the
-              // rest of the action handler.
-              return;
-            }
-          }
-        }
-      } else {
-        // v2.4.1 (OTA 050) — nudge when the player targets a "core"
-        // ambient noun with the wrong verb for their faction's gate.
-        // Without this, salvaging the room's "core" noun reads as
-        // success ("Automaton Circuit recovered") even though the
-        // Main Quest Core hasn't been touched. Refuse the action and
-        // surface the faction's actual recovery verb so the player
-        // can correct course.
-        // v2.4.1 (OTA 053) — also check resolvedNoun. Some verbs
-        // (salvage) route through investigate intent but the parser
-        // routes the matched ambient noun into `resolvedNoun`, not
-        // `target`. Without checking both, "salvage core" slipped
-        // past the nudge and gave the player an ambient-noun
-        // Automaton Circuit instead of the Tartarian Core gate
-        // refusal (playtest 2026-05-23 at Nimari).
-        const targetText = (parsed.target ?? '').toLowerCase();
-        const resolvedText = (parsed.resolvedNoun ?? '').toLowerCase();
-        const wantsCore = /\bcore\b/.test(targetText) || /\bcore\b/.test(resolvedText);
-        const atUnrecoveredCapital =
-          mqMod.LOST_CAPITAL_LOCATIONS.includes(player.currentLocationId)
-          && !(player.mainQuest?.coresRecovered ?? []).includes(player.currentLocationId)
-          && (player.mainQuest?.phase === 'revelation' || player.mainQuest?.phase === 'cores');
-        if (wantsCore && atUnrecoveredCapital) {
-          const nextAction = mqMod.coreGateNextAction(player.factionId);
-          get().appendLog(
-            'arbiter',
-            `The Arbiter holds out a hand. "That is the Tartarian Core. It does not come out with that hand. Your discipline asks you to ${nextAction} — try again with the right approach."`,
-          );
-          // v2.4.1 — surface the faction's CONCRETE recovery instructions, not just
-          // the terse next-action. Playtester (Eternal Dynasty, whose gate is
-          // diplomacy/ask) spammed `salvage core` a dozen times and was never shown
-          // the actual verb — a guidance dead-end. coreGateHint names the route's
-          // real commands (SALVAGE / ASK / READ / ATTACK / address the keepers / …).
-          const hint = mqMod.coreGateHint(player.factionId, player.currentLocationId);
-          if (hint) get().appendLog('system', hint);
-          return;
-        }
+      const targetText = (parsed.target ?? '').toLowerCase();
+      const resolvedText = (parsed.resolvedNoun ?? '').toLowerCase();
+      const wantsCore = /\bcore\b/.test(targetText) || /\bcore\b/.test(resolvedText);
+      const atUnrecoveredCapital =
+        mqMod.LOST_CAPITAL_LOCATIONS.includes(player.currentLocationId)
+        && !(player.mainQuest?.coresRecovered ?? []).includes(player.currentLocationId)
+        && (player.mainQuest?.phase === 'revelation' || player.mainQuest?.phase === 'cores');
+      if (wantsCore && atUnrecoveredCapital && isStationedAtNamedLocation(player)) {
+        get().appendLog(
+          'arbiter',
+          `The Arbiter holds out a hand. "That is the Tartarian Core. It does not come out with that hand — and what keeps it will not be taken by surprise. When you mean to take it, say so."`,
+        );
+        get().appendLog('system', `(Tap ★ SUMMON on the MAIN QUEST chip to face what guards it.)`);
+        return;
       }
     }
 

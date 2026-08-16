@@ -9,12 +9,17 @@ describe('item alias layer', () => {
     expect(resolveItemAlias('')).toBeNull();
   });
 
-  it('collapses lantern variants to Aetheric Torch', () => {
-    expect(resolveItemAlias('lantern')).toBe('Aetheric Torch');
-    expect(resolveItemAlias('dust lantern')).toBe('Aetheric Torch');
-    expect(resolveItemAlias('frost lantern')).toBe('Aetheric Torch');
-    expect(resolveItemAlias('broken lantern')).toBe('Aetheric Torch');
-    expect(resolveItemAlias('torch')).toBe('Aetheric Torch');
+  it('⚠⚠ the LANTERN family is NOT an alias — a room lantern is not a free torch', () => {
+    // Owner: *"reduce the free lantern spawn rate, they should be a rare find,
+    // mostly crafted."* This family used to collapse to Aetheric Torch, and since
+    // `lantern` is ordinary authored furniture that handed one over in every room
+    // holding one — measured at five torches in about an hour of play. It also
+    // undid OTA-752, which had already rationed the torch out of the salvage pools
+    // as "a managed resource". A lantern is scenery now: SALVAGE it, and ~3% of the
+    // time you get a working torch (salvagePools `light`, rareFind).
+    for (const n of ['lantern', 'dust lantern', 'frost lantern', 'broken lantern', 'torch']) {
+      expect(resolveItemAlias(n)).toBeNull();
+    }
   });
 
   it('collapses rope variants to Climbing Rope', () => {
@@ -31,16 +36,16 @@ describe('item alias layer', () => {
   });
 
   it('case-insensitive', () => {
-    expect(resolveItemAlias('LANTERN')).toBe('Aetheric Torch');
     expect(resolveItemAlias('Rope Coil')).toBe('Climbing Rope');
+    expect(resolveItemAlias('Broken Compass')).toBe('Aetheric Compass');
   });
 });
 
 describe('findCatalogItem with alias layer', () => {
   it('resolves ambient nouns to real catalog entries via aliases', () => {
-    const lantern = findCatalogItem('frost lantern');
-    expect(lantern).not.toBeNull();
-    expect(lantern!.name).toBe('Aetheric Torch');
+    // ⚠ 'frost lantern' USED to resolve here; see the lantern test above for why
+    // the whole light family left. It stays in this suite as the negative case.
+    expect(findCatalogItem('frost lantern')).toBeNull();
 
     const rope = findCatalogItem('rope coil');
     expect(rope).not.toBeNull();

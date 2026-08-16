@@ -132,18 +132,41 @@ describe('Core Guardian — stationing gate (no spawns mid-travel)', () => {
     expect(guardianInScene()).toBe(false);
   });
 
-  it('DOES summon the Guardian when actually standing in the capital', async () => {
+  // ⚠⚠ THE VERB NO LONGER SUMMONS — THE BUTTON DOES. Owner: *"guardians should
+  // only come from the summon button, because there are other quests in some of
+  // the capital cities that need to examine the area and the examine summon will
+  // eat the other events."* So the pair below is the whole rule: investigating
+  // inside a capital is just investigating, and the summon action still works and
+  // still respects the stationing gate this suite was written for.
+  it('⚠⚠ investigating in the capital does NOT summon — that door is closed', async () => {
     const store = await bootAtCapital();
     const p = store.getState().player!;
     store.setState({
-      player: {
-        ...p,
-        travelTarget: undefined,
-        mapX: WORLD_MAP_CENTER_X,
-        mapY: WORLD_MAP_CENTER_Y,
-      },
+      player: { ...p, travelTarget: undefined, mapX: WORLD_MAP_CENTER_X, mapY: WORLD_MAP_CENTER_Y },
     });
     store.getState().submitPlayerAction('investigate the rubble');
+    expect(guardianInScene()).toBe(false);
+  });
+
+  it('⚠⚠ ...and the SUMMON action does, when actually standing in the capital', async () => {
+    const store = await bootAtCapital();
+    const p = store.getState().player!;
+    store.setState({
+      player: { ...p, travelTarget: undefined, mapX: WORLD_MAP_CENTER_X, mapY: WORLD_MAP_CENTER_Y },
+    });
+    const res = store.getState().summonCoreGuardian();
+    expect(res.ok).toBe(true);
     expect(guardianInScene()).toBe(true);
+  });
+
+  it('⚠ the stationing gate this suite exists for still holds on the button', async () => {
+    // Mid-journey, currentLocationId still reads as the departure capital.
+    const store = await bootAtCapital();
+    const p = store.getState().player!;
+    store.setState({ player: { ...p, travelTarget: { locationId: 'somewhere_else' }, mapX: 3, mapY: 3 } });
+    const res = store.getState().summonCoreGuardian();
+    expect(res.ok).toBe(false);
+    expect(res.reason).toBe('not_at_capital');
+    expect(guardianInScene()).toBe(false);
   });
 });

@@ -115,7 +115,7 @@ whether one climb walker should permanently make the journey. ⚠ B7's probe fou
 suppression conditions precisely BECAUSE it travelled instead of teleporting; that is the
 argument for doing this.
 
-## B12 — a bare INVESTIGATE summons a Core Guardian — **DECIDE (owner; CONFIRMED ON DEVICE)**
+## B12 — a bare INVESTIGATE summoned a Core Guardian — **DONE (owner ruled)**
 ⚠⚠ **Promoted from WATCH.** Filed after the B7 probe saw it once at Asgardar; the
 owner's 4.29.186 device log then reproduced it at a SECOND capital with a DIFFERENT
 verb and **no target at all**:
@@ -129,11 +129,16 @@ the faction gate's intent list includes `investigate` — which `look` and
 `investigate the ground` both resolve to. So orienting yourself in a capital
 summons the boss. It is arguably working as designed (the gate verb is deliberately
 broad), but "I typed look and a boss appeared" is not a choice the player made.
-⚠ Options: narrow the gate to a TARGETED investigate (a resolved noun, not `-`), or
-require the Core to be the explicit target. Owner's call — it changes main-quest
-pacing. The ota1323 suite documents it and parks the quest phase to work around it.
+⚠⚠ **OWNER RULED, and ruled harder than the options offered:** *"guardians should
+only come from the summon button, because there are other quests in some of the
+capital cities that need to examine the area and the examine summon will eat the
+other events."* Narrowing the gate to a resolved noun would have fixed the bare
+`look` and left the real collision intact — the block RETURNED before the action's
+own handler ran, so any other Capital thread the player was reaching for was eaten.
+The verb path is deleted; `summonCoreGuardian` (already wired to ★ SUMMON on both
+screens) is the only door. Shipped in ota1325.
 
-## B13 — the `lantern` alias defeats the Aetheric Torch's scarcity — **DECIDE (owner)**
+## B13 — the `lantern` alias defeated the Aetheric Torch's scarcity — **DONE (owner ruled)**
 ⚠⚠ Measured from the owner's 4.29.186 log: **five Aetheric Torches taken in about an
 hour**, one from nearly every outpost room entered — and **none of them appears in
 that room's `spawn: gear=[…]` line.** They come from `itemAliases.ts`, which maps
@@ -148,11 +153,15 @@ Aetheric Torch out of the generic salvage pools with the reasoning written in
 scarce Rare/Legendary gamble); it no longer falls out of generic rubble."* Vendors
 price it at 35 TC. The alias layer quietly restores the free supply the pools removed.
 
-⚠ **NOT fixed unilaterally — it is a loot-economy call.** Three options: (a) drop the
-generic `lantern`/`torch` aliases so a room lantern stays scenery and salvage;
-(b) keep the alias for the TYPED path only, so "use the lantern" still finds your
-torch but a room lantern is not a free one; (c) accept the supply and retire the
-scarcity language. Default until called: **unchanged**.
+⚠⚠ **OWNER RULED:** *"reduce the free lantern spawn rate, they should be a rare
+find, mostly crafted."* Option (a) — the light family is gone from the alias map, so
+a room lantern is scenery that SALVAGES.
+⚠ **And the fix uncovered a second, older hole:** the `light` pool's weight-4 torch
+had been unreachable since arb61's materials filter, which excludes gear — measured
+at 3000 lantern salvages, ZERO torches. So before this the alias was the ONLY world
+source, and removing it alone would have left none at all. A narrow `rareFind`
+escape restores it at ~3% end-to-end, with Aether Crystal (a recipe ingredient)
+~7× more common. Shipped in ota1325.
 
 ## B14 — Asgardar's gate eats a `look` — **folded into B12**
 At `asgardar` the player stands in `outpost_gate`, and `look` resolves to intent

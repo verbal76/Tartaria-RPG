@@ -171,11 +171,15 @@ describe('OTA-1052 — everyone you meet is on the ledger', () => {
       require('path').join(__dirname, '../app/state/gameStore.ts'),
       'utf8',
     );
-    // OTA-1057 — FOUR now: sightVendor (all five vendor-install paths funnel
-    // through it), the two Core Guardian spawns, and sightPerson, which carries
-    // wanderers and escort leaders. The count is the point of the test — it is
-    // what stops a sixth site being added without going through a helper.
+    // OTA-1057 — sightVendor (all five vendor-install paths funnel through it),
+    // the Core Guardian spawn, and sightPerson, which carries wanderers and escort
+    // leaders. The count is the point of the test — it is what stops another site
+    // being added without going through a helper.
+    // ⚠ THREE now, not four: there used to be TWO Core Guardian spawns, and the
+    // second one — the verb-gated summon inside submitPlayerAction — is gone.
+    // Owner: *"guardians should only come from the summon button."* The count
+    // dropping IS that fix; a second copy is precisely what this guard prevents.
     const calls = src.match(/rememberNpcMeeting\(/g) ?? [];
-    expect(calls.length).toBe(4);
+    expect(calls.length).toBe(3);
   });
 });

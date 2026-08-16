@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.218';
+export const DISPLAY_VERSION = '4.29.219';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23863,7 +23863,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the fix — where he spent to 11 TC, tapped, and learned the fee from a buried system
 // line: "a lit button that doesn't fire." The handler's refusal STAYS as the backstop;
 // hiding a control is not securing it. New suite ota1324 (4). DISPLAY_VERSION 4.29.218.
-export const OTA_BUILD_ID = '2026-08-16-1324-crucible-chip-obeys-its-gate';
+// ⚠⚠ OTA-1325 — TWO OWNER RULINGS FROM THE 4.29.186 LOG.
+//
+// (1) *"guardians should only come from the summon button, because there are other
+// quests in some of the capital cities that need to examine the area and the examine
+// summon will eat the other events."* The Guardian used to be raised off the FACTION
+// GATE INTENT inside submitPlayerAction — `investigate` for Reclaimers and
+// Architects, `ask` for the Order and Dynasty, `rest` for True Tartarians. Measured
+// twice: a bare `look` at Asgardar produced only combat lines and no look text, and
+// `investigate the ground` at Iskan-Veil (resolved to nothing) summoned Veilkeeper
+// Inarra. ⚠ The real cost is the owner's point, not the surprise: that block RETURNED
+// before the action's own handler ran, so whichever Capital thread the player was
+// reaching for never happened. The path is DELETED; `summonCoreGuardian` — already
+// wired to the ★ SUMMON chip on both screens — is now the only door. The faction
+// route survives as flavour and `canRecoverCore` carries a header saying it decides
+// nothing.
+//
+// (2) *"reduce the free lantern spawn rate, they should be a rare find, mostly
+// crafted."* Five torches in an hour, one per room, none in any gear spawn — they came
+// from itemAliases mapping `lantern` (ordinary furniture) to Aetheric Torch, undoing
+// OTA-752's rationing. The light family is removed, so a lantern is scenery that
+// SALVAGES. ⚠ AND THE POOL'S TORCH HAD BEEN DEAD SINCE arb61: its materials filter ate
+// the weight-4 entry, so 3000 lantern salvages yielded ZERO torches — the rationing
+// comment outlived the thing it rationed. A narrow `rareFind` escape restores it at
+// ~3% end-to-end. Aether Crystal (a recipe ingredient) comes out ~7× more often.
+// New suite ota1325 (11). DISPLAY_VERSION 4.29.219.
+export const OTA_BUILD_ID = '2026-08-16-1325-guardian-by-button-torch-by-craft';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1324-crucible-chip-obeys-its-gate';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1323-routed-tower-explains-itself';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1322-empty-picker-closes-now';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1321-first-fight-explains-itself';
