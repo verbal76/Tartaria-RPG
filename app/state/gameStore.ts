@@ -640,8 +640,28 @@ function advanceStagesOnIntent(
       );
     });
   if (huntMatch && huntMatch.def) {
-    const anchor = huntAnchorId(huntMatch.def);
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const QS = require('../engine/questStage') as typeof import('../engine/questStage');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { resolvePosterLocation } = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
+    // ⚠⚠ P19 — A STAGE CAN NOW STAND SOMEWHERE OF ITS OWN. `huntAnchorId` reads the
+    // contract DEF, so every stage of a seven-stage hunt shared one tile and there was
+    // nothing to route BETWEEN — the owner's *"it didn't auto route me to the next
+    // stage"*. A stage that names its own ground gets it; one that doesn't keeps the
+    // contract anchor, which is the old behaviour and the default.
+    const stageDefNow = huntMatch.def.stages[huntMatch.rec.stage];
+    const anchor = QS.stageLocationId(stageDefNow, huntAnchorId(huntMatch.def), resolvePosterLocation);
     if (player.currentLocationId === anchor) {
+      // ⚠⚠ AND THE PACK IS CHECKED BEFORE THE VERB COUNTS. Owner: *"the next stage spoke
+      // about giving the book to his sister. who's sister? and what book?"* A stage that
+      // asks for a thing now REFUSES until you hold it, and the refusal names the thing —
+      // silence here is what made the prose read as broken.
+      if (!QS.stageRequirementMet(stageDefNow, player.inventory)) {
+        const line = QS.stageRequirementLine(stageDefNow!, huntMatch.def.title);
+        const seen = get().gameLog.slice(-30).some((e) => e.text === line);
+        if (!seen) get().appendLog('arbiter', line);
+        return;
+      }
       const flightKey = `hunt:${huntMatch.rec.id}`;
       if (!stageAdvancesInFlight.has(flightKey)) {
         stageAdvancesInFlight.add(flightKey);
@@ -653,6 +673,27 @@ function advanceStagesOnIntent(
       // The verb matched, the ground didn't — say so instead of the old silence.
       // Throttled: skip if the same line is already in the recent log.
       const line = `The Arbiter taps the slate. "Not here. ${huntMatch.def.title} points elsewhere — set a course from Contracts and do it there."`;
+      const recent = get().gameLog.slice(-30).some((e) => e.text === line);
+      if (!recent) get().appendLog('arbiter', line);
+    }
+  } else if (inCombat) {
+    // ⚠⚠ P19 — AND THE COMBAT GATE STOPS BEING SILENT. Owner: *"there should be no
+    // attacks on the stage roles unless it's the actual hunt tile and it's the beast."*
+    // Every non-boss stage verb is gated on `!inCombat` in the matcher above, so at a
+    // danger-4/5 anchor the player performs the RIGHT action, something is mid-swing at
+    // them, and nothing happens with no explanation at all. It is the correct rule — you
+    // cannot study a room while it is trying to kill you — but it has to say so.
+    const stalled = (player.activeHunts ?? [])
+      .map((rec) => ({ rec, def: findHuntById(rec.id) }))
+      .find(({ rec, def }) => {
+        if (!def || rec.tracked === false) return false;
+        const next = def.stages[rec.stage];
+        if (!next || next.checkKind === null || next.checkKind === 'boss') return false;
+        if (next.checkKind === 'escape') return false; // fleeing IS combat
+        return next.checkKind === intent || (next.checkKind === 'attack_provoke' && intent === 'attack');
+      });
+    if (stalled?.def) {
+      const line = `The Arbiter keeps one eye on the fight. "That is the right move for ${stalled.def.title} — but not with something on you. Put this down first."`;
       const recent = get().gameLog.slice(-30).some((e) => e.text === line);
       if (!recent) get().appendLog('arbiter', line);
     }
@@ -27434,6 +27475,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!stageDef) return;
     get().appendLog('world', stageDef.narration);
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
+    // ⚠⚠ P19 — THE STAGE ACTUALLY HANDS YOU THE THING NOW. Owner: *"if it's calling for
+    // you to investigate an area, find a certain object and take that object to the next
+    // area, well then it has to give you the damn object."* The narration has always
+    // described the find; nothing ever put it in the pack, so the next stage talked about
+    // a logbook the player had never seen and the inventory's mission section was empty.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const QS = require('../engine/questStage') as typeof import('../engine/questStage');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
+      if (stageDef.grants) {
+        const g = stageDef.grants;
+        const qty = g.quantity ?? 1;
+        const live = get().player;
+        // ⚠ Granted ONCE. A boss stage freezes for the kill and re-runs this path, and a
+        // quest item that duplicates on every visit is a currency press — the same class
+        // as the tile-gear dupe.
+        if (live && QS.countInPack(live.inventory, g.item) < qty) {
+          const res = grantItem(live.inventory, {
+            id: freshInstanceId(g.item.toLowerCase().replace(/[^a-z0-9]+/g, '_')),
+            name: g.item, kind: 'misc', quantity: qty, tags: ['quest', 'mission'],
+            description: `Carried for ${hunt.title}.`,
+          });
+          set((st) => (st.player ? { player: { ...st.player, inventory: res.inventory } } : st));
+          get().appendLog('reward', `✦ ${qty > 1 ? `${qty}× ` : ''}${g.item} — mission item.`);
+        }
+      }
+      // ⚠ AND IT SAYS WHERE THE NEXT ONE IS. *"each stage has to direct you to the next
+      // stage. otherwise you have no idea where you're going."* Speaks only when there is
+      // something to say — new ground, a person to find, or a thing to bring.
+      const nextDef = hunt.stages[record.stage + 1];
+      if (nextDef) {
+        const hereId = QS.stageLocationId(stageDef, CM.huntAnchorId(hunt), CM.resolvePosterLocation);
+        const nextId = QS.stageLocationId(nextDef, CM.huntAnchorId(hunt), CM.resolvePosterLocation);
+        const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, nextId !== hereId);
+        if (dir) get().appendLog('system', dir);
+      }
+    }
     // Boss stage spawns the scaled enemy. OTA-796 — the FINAL boss stage FREEZES
     // the hunt here (no stage increment): the boss must actually be KILLED to
     // complete it (resolveEnemyDefeat does the final advance). Previously every

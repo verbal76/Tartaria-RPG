@@ -6,8 +6,9 @@ import { findByTitle } from './titleMatch';
 
 import mysteriesData from '../data/quests/mysteries.json';
 import type { HuntCheckKind } from './hunts';
+import type { StageBinding } from './questStage';
 
-export interface MysteryStageDef {
+export interface MysteryStageDef extends StageBinding {
   narration: string;
   arbiter: string | null;
   checkKind: HuntCheckKind;

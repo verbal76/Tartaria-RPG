@@ -1,4 +1,5 @@
 import { findByTitle } from './titleMatch';
+import type { StageBinding } from './questStage';
 // Hunt engine — long-form, multi-stage monster hunts (5-9 prep stages + a
 // final boss combat). Hunts are accepted from vendors or from beast-sign
 // hooks, scale the target enemy to the player's current power level, and
@@ -47,7 +48,7 @@ export type HuntStageType =
   | 'investigation'
   | 'gauntlet';
 
-export interface HuntStageDef {
+export interface HuntStageDef extends StageBinding {
   narration: string;
   arbiter: string | null;
   checkKind: HuntCheckKind;

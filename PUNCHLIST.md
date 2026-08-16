@@ -27,6 +27,63 @@ accumulates guesses is a punch list nobody trusts by item twenty.
 
 ---
 
+## ⚠⚠ P19 — STAGED CONTRACTS DESCRIBE A QUEST THE ENGINE CANNOT ENACT — **UNFINISHABLE (by intent; completable only by accident)** — OPEN, 2026-08-16
+
+**Owner, playing 4.29.x:** *"I have one I needed to 'investigate the area' so I typed exactly
+that, it closed the stage, but the next stage spoke about giving the book to his sister.
+who's sister? and what book? … there's nothing in my inventory under mission items and
+there's no way to auto route to anything or at least even guess where it's supposed to be."*
+
+**THE PROOF — a stage can carry exactly four fields.** Measured across every staged
+contract in the game (`hunts.json`, `mysteries.json`, `faction-storylines.json`):
+
+    stageType · narration · arbiter · checkKind
+
+There is **no field** for an item to grant, an item to require, a location, an NPC, or a
+route target. `huntAnchorId()` takes the DEF, not the stage — so **one anchor serves all
+stages** and there is nothing to route *to* between them.
+
+**The owner's own case, verbatim from the data** — `hunt_silt_serpent_cathedral`, all seven
+stages at `sinking_cathedral`:
+
+| stage | checkKind | what the prose says | what the engine does |
+|---|---|---|---|
+| 1 | `investigate` | *"you find Wren's cut line and a shed length of Silt Serpent skin"* | grants nothing |
+| 2 | `diplomacy` | *"Wren's sister will trade the logbook for a promise…"* | **no sister exists, no logbook exists** |
+| 3 | `boss` | recover Wren's body | no body exists |
+| 4 | `attack_provoke` | *"The logbook maps the Serpent's runs"* | you never had it |
+| 5 | `cast` | *"Wren's last page holds the trick"* | no page exists |
+
+The stage closed because the VERB matched. Nothing else was ever checked.
+
+**SCALE — 57 stages promise an object or a person that cannot exist:**
+
+| family | quests | stages | stages promising an object/person |
+|---|---|---|---|
+| hunts | 18 | 116 | 26 |
+| mysteries | 18 | 72 | 16 |
+| storylines | 14 | 93 | 15 |
+| **total** | **50** | **281** | **57** |
+
+**WHY THIS IS A COMPLETABILITY ITEM AND NOT POLISH.** The loops do technically close — but
+only by typing a verb the player has no way to derive from prose that describes fetching an
+object they were never given, from a person who does not exist, at a place the game never
+names. That is "completable by accident", which fails the charter's bar: *"every mechanical
+aspect of the game has to be able to be finished."*
+
+**A SECOND, COMPOUNDING DEFECT.** Most stage verbs (`investigate`, `diplomacy`, `stealth`,
+`cast`, and even `attack_provoke`) are gated on `!inCombat` in the stage matcher. At a
+danger-4/5 anchor the tile usually has hostiles, so the correct verb silently does nothing
+and the player is told nothing. Owner: *"there should be no attacks on the stage roles
+unless it's the actual hunt tile and it's the beast."*
+
+⚠ **OWNER RULING — BUILD THE LAYER.** Offered the choice between narrowing 57 stages of
+prose to what the engine can do, or building the missing fields, the owner chose to build.
+Catalogue-not-invent still applies to the CONTENT: this entry records that the fields are
+missing, not what any individual stage should grant.
+
+---
+
 ## STILL OPEN — the whole list, 2026-08-10
 
 ⚠ Seventeen items have been filed. **Sixteen are closed and two were reclassified as

@@ -5,8 +5,9 @@ import { findByTitle } from './titleMatch';
 
 import storylineData from '../data/quests/faction-storylines.json';
 import type { HuntCheckKind } from './hunts';
+import type { StageBinding } from './questStage';
 
-export interface StorylineStageDef {
+export interface StorylineStageDef extends StageBinding {
   narration: string;
   arbiter: string | null;
   checkKind: HuntCheckKind;
