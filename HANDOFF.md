@@ -1839,8 +1839,42 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ THE LAST P19 INSTANCE — IN THE FAMILY THAT LOOKED EXEMPT
+  (2026-08-16, latest). Golem OTA-1332.**
+  Owner, after I handed him a table with five green checks and one hedge: *"don't we have
+  to check the faction quests? since they don't have a green check mark from you."*
+  - ⚠⚠⚠ **HE WAS RIGHT TO PUSH, AND THE REASON IS THE LESSON.** I had waved the family
+    through **by analogy** with bounties — "same shape, search-and-destroy" — instead of
+    measuring it. That is the identical habit that produced "all 18 hunts are finishable."
+    An unmeasured claim sitting in a table of measured ones reads as measured.
+  - **The measurement, all 65 faction quests.** 47 are fetch ("Gather N"). Of the 18
+    STAGED: **17 are honest counters** and their own objective line says so — "Defeat 3
+    enemies", "Travel 5 times", "Discover 2 locations". The narration is flavour over a
+    tally and promises nothing the engine cannot pay. ⚠ Those must NOT be gated on a
+    location; they were never written as journeys, and gating them would break them.
+  - ⚠⚠ **Exactly one was broken, and it is the P19 bug.** `fq_servants_tribute` — *"Travel
+    to the Giant Vault and leave tribute"*, stage text *"Carry it to the Vault. Set it on
+    the threshold."* Every stage is `advanceOn: 'travel'`, and `advanceActiveFactionQuests`
+    counted ANY travel with **no location check anywhere in the function** — so three steps
+    in the opposite direction reported that you had laid the tribute down at a place you
+    never went.
+  - **The fix is the narrowest that closes it:** a travel-gated FINAL stage of a quest that
+    names a resolvable destination advances only when the player stands there. Middle
+    stages are the walk and still count anywhere.
+  - ⚠ **The new suite caught a FALSE POSITIVE on its first run, recorded rather than
+    hidden.** `missionObjectiveLocationId` also resolves a destination for
+    `fq_order_relic`, because its text opens *"Varakush has heard of…"* and Varakush is
+    BOTH a stronghold on the atlas and, there, a person's name — the resolver scans prose
+    and cannot tell them apart. That quest is unharmed only because it is
+    `advanceOn: 'kill'` and the gate fires on TRAVEL alone. ota1332 pins that construction,
+    so anyone who later widens the gate to 'kill' fails loudly instead of silently
+    demanding the player stand in Varakush to punch an Aetheric creature.
+  - ⚠ `questProgressionAudit` walked this quest around a ring of convenient tiles and hit
+    the new gate — **the harness standing still again, not a regression.** Its last hop now
+    goes where the quest says.
+
 - **⚠⚠⚠ THE STORYLINES — AND P19 IS CLOSED
-  (2026-08-16, latest). Golem OTA-1331.**
+  (2026-08-16). Golem OTA-1331.**
   Owner: *"go with storylines."* The last of the three staged families.
   - ⚠⚠ **It had the hole worst.** The storyline matcher checked the VERB and nothing else —
     no location test of any kind — so a **nine-chapter faction arc could be walked start to

@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.225';
+export const DISPLAY_VERSION = '4.29.226';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24032,7 +24032,39 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stage-priority guard added for hunts is now `stageAwaitsIntentHere` and covers all three
 // families, mirroring each matcher's boss→intent quirk (hunt: attack, mystery: investigate,
 // storyline: diplomacy). DISPLAY_VERSION 4.29.225.
-export const OTA_BUILD_ID = '2026-08-16-1331-storylines-and-p19-closed';
+// ⚠⚠ OTA-1332 — THE LAST P19 INSTANCE, IN THE FAMILY THAT LOOKED EXEMPT. Owner, after I
+// gave five families a green check and faction quests a hedge: *"don't we have to check the
+// faction quests? since they don't have a green check mark from you."* He was right to
+// push: I had waved the family through BY ANALOGY with bounties instead of measuring it,
+// which is the same habit that produced "all 18 hunts are finishable."
+//
+// The measurement, all 65: 47 are fetch ("Gather N"). Of the 18 STAGED ones, 17 are honest
+// counters whose own objective line says so — "Defeat 3 enemies", "Travel 5 times",
+// "Discover 2 locations" — and their narration is flavour over a tally that promises the
+// player nothing the engine cannot pay. Those are correct as written and must NOT be
+// gated; they were never journeys.
+//
+// ⚠⚠ Exactly ONE is not: `fq_servants_tribute` — *"Travel to the Giant Vault and leave
+// tribute"*, whose own stage reads *"Carry it to the Vault. Set it on the threshold."*
+// Every stage is `advanceOn: 'travel'` and the advance counted ANY travel, so three steps
+// in the OPPOSITE direction reported that you had laid the tribute down at a place you
+// never went. The same hole P19 closed in the other three families, hiding in the one
+// family whose shape made it look exempt.
+//
+// The fix is deliberately the narrowest that closes it: a travel-gated FINAL stage of a
+// quest that names a resolvable destination only advances when the player is standing
+// there. Middle stages are the walk and still count anywhere.
+//
+// ⚠ The new suite caught a FALSE POSITIVE on its first run and it is recorded rather than
+// hidden: `missionObjectiveLocationId` also resolves a destination for `fq_order_relic`,
+// because its text opens "Varakush has heard of…" and Varakush is both a stronghold and,
+// there, a person's name. That quest is unharmed only because it is `advanceOn: 'kill'` and
+// the gate fires on TRAVEL alone — safe by construction, and ota1332 pins the construction.
+// ⚠ The existing questProgressionAudit walked this quest around a ring of convenient tiles
+// and so hit the new gate — the harness standing still again, not a regression. It now
+// makes its last hop to the place the quest names. DISPLAY_VERSION 4.29.226.
+export const OTA_BUILD_ID = '2026-08-16-1332-tribute-happens-at-the-vault';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1331-storylines-and-p19-closed';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1330-mysteries-the-same-way';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1329-every-hunt-doable';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1328-stages-mean-what-they-say';
