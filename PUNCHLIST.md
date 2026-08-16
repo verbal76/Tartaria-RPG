@@ -27,7 +27,20 @@ accumulates guesses is a punch list nobody trusts by item twenty.
 
 ---
 
-## ⚠⚠ P19 — STAGED CONTRACTS DESCRIBE A QUEST THE ENGINE CANNOT ENACT — **UNFINISHABLE (by intent; completable only by accident)** — OPEN, 2026-08-16
+## ⚠⚠ P19 — STAGED CONTRACTS DESCRIBE A QUEST THE ENGINE CANNOT ENACT — **CLOSED, 2026-08-16** (golem OTA-1328 the layer · 1329 hunts · 1330 mysteries · 1331 storylines)
+
+> **CLOSED.** All **281 of 281** stages across hunts, mysteries and storylines now name their own
+> ground, and every `requires` is granted by an earlier stage of the same contract — the exact
+> figure this item was filed against. The engine gates on location, checks the pack and names what
+> is missing, hands the item over, says where the next stage is, and sets the course. Enforced by
+> `npm run check:huntstages` as a hard build gate, and by two walkers that now MOVE rather than
+> teleporting to the answer.
+>
+> ⚠ Reading this later: the original text below is left intact because the MEASUREMENTS in it are
+> the reason the item existed, and two of them (a stage carries four fields; 57 stages name an
+> object that cannot exist) are the clearest statement of what "completable by accident" meant.
+
+### Original entry, as filed
 
 **Owner, playing 4.29.x:** *"I have one I needed to 'investigate the area' so I typed exactly
 that, it closed the stage, but the next stage spoke about giving the book to his sister.
