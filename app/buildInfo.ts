@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.214';
+export const DISPLAY_VERSION = '4.29.215';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -23802,7 +23802,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // typecheck:tests ratchet's 203rd error (ota1311's type-only SaveState
 // import) and the missing HANDOFF session entry. New suite ota1320 (5).
 // 830 suites / 7754 tests. DISPLAY_VERSION 4.29.214.
-export const OTA_BUILD_ID = '2026-08-16-1320-audit-of-the-audit';
+// ⚠⚠ OTA-1321 — THE FIRST FIGHT EXPLAINS ITSELF, ONCE. Owner: *"add a first time
+// pop-up for the first fight explaining briefly, how to heal, what Dodge and
+// stealth do, and where to go to change armor and weapons and the approach
+// button."* CombatPrimerModal, raised from ONE derived condition in
+// ExplorationScreen (live enemy + milestone unlatched + zero kills) rather than
+// from the three enemy-spawn sites, so it fires on whichever fight is genuinely
+// first — the rest-ambush included. Retires the OTA-860 `combat_first_fight`
+// hint it duplicated. ⚠ Two drafts of the card were factually wrong and were
+// corrected against the handlers: healing is FREE mid-fight (combatHealNoCounter),
+// and an out-of-reach weapon BUZZES silently rather than greying out. Also fixes
+// the Arbiter's stealth nudge, which had named an APPROACH toggle retired at
+// OTA-847. New suite ota1321 (12). 831 suites / 7766 tests. DISPLAY_VERSION 4.29.215.
+export const OTA_BUILD_ID = '2026-08-16-1321-first-fight-explains-itself';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1320-audit-of-the-audit';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1317-amber-on-the-live-picker';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1312-amber-salvage-and-restore-gate';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-15-1307-sell-all-actually-sells';

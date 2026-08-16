@@ -1840,9 +1840,30 @@ rediscovering them.
   usually can.
 
 - **⚠⚠⚠ THE DEVICE-REPORT MARATHON + THE AUDIT OF ITS OWN WORK
-  (2026-08-16, latest). Golem OTA-1298→1320 / HAL 1299→1318 / steam 1300→1319.**
+  (2026-08-16, latest). Golem OTA-1298→1321 / HAL 1299→1318 / steam 1300→1319.**
   One session, five owner device reports, and a closing self-audit that found
   four more holes in the session's own fixes. Highlights, newest first:
+  - **OTA-1321 (golem; unpushed)** — the first fight explains itself, once.
+    Owner: *"add a first time pop-up for the first fight explaining briefly, how
+    to heal, what Dodge and stealth do, and where to go to change armor and
+    weapons and the approach button."* `CombatPrimerModal`, raised from ONE
+    derived condition in ExplorationScreen (live enemy + milestone unlatched +
+    zero lifetime kills) rather than from the three enemy-spawn sites — the
+    wilderness roll, the OTA-1032 indoor rest-ambush, the OTA-089 climb-top
+    overlay — because a latch wired into each is how the third gets forgotten.
+    The zero-kills clause keeps a card headed YOUR FIRST FIGHT off a veteran's
+    screen, since the milestone is new and every save in the wild reads it
+    `undefined`. ⚠⚠ **Two drafts of the card were factually wrong** and were
+    corrected by re-reading the handlers: healing mid-fight is FREE (OTA-619,
+    locked by `combatHealNoCounter`), and an out-of-reach weapon does not grey
+    out — QuickBtn's `outOfRange` path buzzes and silently returns, which is
+    exactly the "button did nothing" complaint the card now heads off. Retires
+    the OTA-860 `combat_first_fight` hint it duplicated (same trigger, subset of
+    the content; two cards on one beat is how tips get switched off). ⚠ Also
+    fixed on the way: the Arbiter's stealth nudge named an APPROACH "use
+    stealth" toggle **retired at OTA-847**, recorded in ApproachModal's own
+    props comment — coaching a control that had not existed for hundreds of
+    builds. New suite ota1321 (12). 831 suites / 7766 tests.
   - **OTA-1320 (golem; ports staged, unpushed)** — the audit batch. (1) ⚠⚠ the
     OTA-1301 gear-dupe fix did NOT cover legacy saves: a pre-1301 save carries
     pinned gear and no `tileGearNouns` record, so the per-step drop filtered

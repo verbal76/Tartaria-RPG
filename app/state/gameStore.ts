@@ -6808,6 +6808,8 @@ interface GameStore {
    *  reach the main_quest beat via finishOutpostTutorial, which also fires
    *  when the player leaves the outpost by any means during this beat. */
   chooseTutorialExplore: () => void;
+  /** ⚠ OTA-1321 — latch the first-fight primer as seen. Idempotent. */
+  markCombatPrimerSeen: () => void;
   chooseTutorialLeave: () => void;
   finishOutpostTutorial: () => void;
   /** arb109 — feedback when a tutorial-locked control is tapped: the buzz
@@ -12172,9 +12174,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           && (!lastStealthHintAt || now - lastStealthHintAt > STEALTH_HINT_MIN_MS)
         ) {
           lastStealthHintAt = now;
+          // ⚠ OTA-1321 — NAMES A BUTTON THAT EXISTS. Both lines used to read "Tap
+          // APPROACH, flip 'use stealth'" — a toggle OTA-847 retired when the sneak
+          // opener moved onto the in-combat STEALTH button (ApproachModal.tsx says so
+          // in its own props comment). The Arbiter was coaching a control that had been
+          // gone for hundreds of builds, which is exactly the defect the first-fight
+          // primer exists to prevent: advice the UI cannot honour.
           const line = steGear > 0
-            ? `The Arbiter lowers their voice. "You're carrying shadow with you — use it. Tap APPROACH, flip 'use stealth', and you can be on them before they know it. A clean opening strike, or slip past entirely."`
-            : `The Arbiter lowers their voice. "You move quiet when you choose to. Tap APPROACH, flip 'use stealth', and take them on your terms — strike unseen, or thread past without a fight."`;
+            ? `The Arbiter lowers their voice. "You're carrying shadow with you — use it. Tap STEALTH before they close, and you can be on them before they know it. A clean opening strike, or slip past entirely."`
+            : `The Arbiter lowers their voice. "You move quiet when you choose to. Tap STEALTH before they close and take them on your terms — strike unseen, or thread past without a fight."`;
           get().appendLog('arbiter', line);
         }
       }
@@ -30627,6 +30635,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().advanceTutorial();
     }
   },
+  markCombatPrimerSeen() {
+    const p = get().player;
+    if (!p || p.milestones?.firstCombatPrimerShown) return;
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        // ⚠ Milestones carries three REQUIRED counters; the empty-object default
+        // drops them. Same base the firstSiltCrossed latch above uses.
+        milestones: {
+          ...(s.player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 }),
+          firstCombatPrimerShown: true,
+        },
+      },
+    } : s));
+    void get().persist();
+  },
+
   chooseTutorialExplore() {
     const state = get();
     const step = state.tutorialStep !== null ? TUTORIAL_STEPS[state.tutorialStep] : null;

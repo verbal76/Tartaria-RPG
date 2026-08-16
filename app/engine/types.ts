@@ -754,6 +754,11 @@ export interface PlayerMilestones {
    *  affordance. Opens the door to the 158-entry concepts.json layer
    *  for players who would never otherwise discover the Q&A path. */
   firstQAHintShown?: boolean;
+  /** ⚠⚠ OTA-1321 — latched the first time the player is in a scene with a live
+   *  enemy, when the combat primer card is shown. Owner: a first-time popup for
+   *  the first fight explaining how to heal, what Dodge and Stealth do, where to
+   *  change armor and weapons, and the Approach button. One character, one card. */
+  firstCombatPrimerShown?: boolean;
   /** Latched once when the player sees the "you're inside an outpost,
    *  leave it before traveling to another city" Arbiter hint. Fires
    *  on first hub entry so a new player understands the inside-building

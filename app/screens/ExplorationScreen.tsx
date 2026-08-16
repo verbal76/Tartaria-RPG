@@ -25,6 +25,7 @@ import { SearchModal } from '../components/SearchModal';
 // once that is decided.
 import { BrandedModal } from '../components/BrandedModal';
 import { GatherModal } from '../components/GatherModal'; // OTA-1233 — one picker, both verbs
+import { CombatPrimerModal } from '../components/CombatPrimerModal'; // OTA-1321 — the first fight explains itself
 
 /** ⚠ OTA-1263 — the beat between INVESTIGATE ALL's results. The owner asked for
  *  "maybe 2+3 seconds"; 2.2s is the low end of that, because the sweep can be six
@@ -266,6 +267,25 @@ export function ExplorationScreen() {
   useEffect(() => {
     if (takeOpen && liveEnemyCount > 0) setTakeOpen(false);
   }, [takeOpen, liveEnemyCount]);
+  // ⚠⚠ OTA-1321 — THE FIRST FIGHT EXPLAINS ITSELF, ONCE. Owner: *"let's add a first
+  // time pop-up for the first fight explaining briefly, how to heal, what Dodge and
+  // stealth do, and where to go to change armor and weapons and the approach button."*
+  //
+  // ⚠ ONE DERIVED CONDITION, NOT A LATCH AT EACH SPAWN SITE. An enemy enters a scene
+  // from at least three places — the wilderness roll, the OTA-1032 indoor rest-ambush,
+  // and the OTA-089 climb-top overlay — and hanging a "first fight" flag on each is how
+  // the third one gets forgotten. The screen asks the question instead: is something
+  // live in front of me, and has this character been told? So it fires on whichever
+  // fight is genuinely first, including an ambush the player never chose to start.
+  //
+  // ⚠ `enemiesDefeated === 0` KEEPS IT OFF A VETERAN'S SCREEN. The milestone is new, so
+  // every existing save reads `firstCombatPrimerShown: undefined` — without this second
+  // clause a character 200 kills deep would be handed a card headed YOUR FIRST FIGHT on
+  // their next encounter. A veteran who genuinely has no kills yet still gets it.
+  const markCombatPrimerSeen = useGameStore((s) => s.markCombatPrimerSeen);
+  const combatPrimerSeen = useGameStore((s) => !!s.player?.milestones?.firstCombatPrimerShown);
+  const enemiesDefeatedEver = useGameStore((s) => s.player?.milestones?.enemiesDefeated ?? 0);
+  const combatPrimerOpen = liveEnemyCount > 0 && !combatPrimerSeen && enemiesDefeatedEver === 0;
   // OTA 031 — climb-target picker. Opens to a chip list of every
   // climbable noun in the current scene; tapping one fires `climb
   // <noun>` which resolves one tier in the climb handler.
@@ -292,13 +312,13 @@ export function ExplorationScreen() {
   useEffect(() => {
     const anyPopupOpen =
       searchOpen || approachOpen || askArbiterOpen || salvageOpen
-      || climbOpen || takeOpen || doorBeatOpen;
+      || climbOpen || takeOpen || doorBeatOpen || combatPrimerOpen;
     setInputModalOpen(anyPopupOpen);
     // iOS: a native <Modal> won't present over a live keyboard / focused
     // input, and the floating bar's autoFocus keeps re-grabbing it — so
     // explicitly drop the keyboard the moment any popup/beat opens.
     if (anyPopupOpen) Keyboard.dismiss();
-  }, [searchOpen, approachOpen, askArbiterOpen, salvageOpen, climbOpen, takeOpen, doorBeatOpen, setInputModalOpen]);
+  }, [searchOpen, approachOpen, askArbiterOpen, salvageOpen, climbOpen, takeOpen, doorBeatOpen, combatPrimerOpen, setInputModalOpen]);
   useEffect(() => () => setInputModalOpen(false), [setInputModalOpen]);
   // ⚠⚠ OTA-1229 — RIGHT-CLICK / ESCAPE CLOSES THE POPUP ON TOP. Owner, on the
   // PC build: *"right click on the mouse should be the back button."* On a
@@ -316,6 +336,12 @@ export function ExplorationScreen() {
   // picker open the click closes the picker, and only once nothing is open does
   // the click fall through to "leave this sub-screen".
   useBackAction(true, () => {
+    // OTA-1321 — the primer sits on top of everything when it is up, so it answers
+    // first. Unlike the door beat it is safe to dismiss: closing it IS having seen
+    // it, and the fight underneath is fully playable. It must latch the milestone
+    // on the way out, though — visibility is derived, so a close that didn't latch
+    // would put the card straight back up on the next render.
+    if (combatPrimerOpen) { markCombatPrimerSeen(); return true; }
     if (torchChooserOpen) { setTorchChooserOpen(false); return true; }
     if (takeOpen) { setTakeOpen(false); return true; }
     if (salvageOpen) { setSalvageOpen(false); return true; }
@@ -343,6 +369,19 @@ export function ExplorationScreen() {
     const t = setTimeout(() => setDoorModalVisible(true), 450);
     return () => clearTimeout(t);
   }, [doorBeatOpen]);
+  // OTA-1321 — the combat primer takes the SAME deferred present as the door beat,
+  // and for the same reason: it raises itself off a store change (an enemy landing
+  // in the scene) rather than off a tap, which is exactly the frame iOS refuses to
+  // present a <Modal> over while the floating input bar still holds focus. The
+  // Take/Climb pickers get away without this because the player taps them on an
+  // already-settled frame; a card that appears when something attacks you does not.
+  const [combatPrimerVisible, setCombatPrimerVisible] = useState(false);
+  useEffect(() => {
+    if (!combatPrimerOpen) { setCombatPrimerVisible(false); return; }
+    Keyboard.dismiss();
+    const t = setTimeout(() => setCombatPrimerVisible(true), 450);
+    return () => clearTimeout(t);
+  }, [combatPrimerOpen]);
   // OTA-1029 — the vendor-leave prompt (POLISH-4, 2026-05-25) is GONE. It gated
   // every cardinal move while a vendor stood in the scene — and a capital's room
   // hops ARE cardinal moves, so walking Workshop → Armory asked "leave Tarek
@@ -815,16 +854,13 @@ export function ExplorationScreen() {
           body="TAKE / SALVAGE opens the whole room grouped by colour — orange gear, green items, yellow salvage. Sweep a colour with its button, or tap one line."
         />
       )}
-      {/* OTA-860 — combat is where most of the un-tutorialized systems live (stealth,
-          backstab, talking a foe down, parley). Fire this the first time a fight is
-          actually on-screen, not on first exploration. */}
-      {(currentScene?.enemies?.length ?? 0) > 0 && (
-        <FirstTimeHint
-          id="combat_first_fight"
-          title="In a fight"
-          body="Type what you do — strike, aim, or use a skill. You can also STEALTH for a sneak hit, or try to talk a foe down or scare them off."
-        />
-      )}
+      {/* ⚠ OTA-1321 — the OTA-860 `combat_first_fight` hint WAS HERE AND IS GONE. It
+          fired on this exact condition (a fight is on-screen) and taught a strict
+          subset of what CombatPrimerModal now teaches; its one unique idea — you can
+          talk a foe down or run — moved into the primer's NOT EVERY FIGHT line. Two
+          cards on the same beat is how a player learns to reach for "turn off tips".
+          The id is retired, not reused: a player who already dismissed the old hint
+          still gets the primer, which is new material. */}
       {/* OTA-1205 — the first Procedure Text in the pack. The vendor-buy door teaches
           instantly and the storyline door says "read it" in its reward line, but the
           FOUND door (site loot) drops the text with no instruction at all — and it is
@@ -2061,6 +2097,16 @@ export function ExplorationScreen() {
         }}
         leadNouns={leadNouns}
         onCancel={() => setSearchOpen(false)}
+      />
+
+      {/* OTA-1321 — first-fight primer. `enemyName` is read straight off the live
+          scene so the card names the thing actually in front of the player; FIGHT
+          (and Android back, and the PC right-click above) all land on the same
+          latch, so there is exactly one way for this to be marked seen. */}
+      <CombatPrimerModal
+        visible={combatPrimerVisible}
+        enemyName={currentScene?.enemies?.[0]?.name ?? null}
+        onClose={markCombatPrimerSeen}
       />
 
       {/* ⚠⚠ OTA-1233 — ONE PICKER. TakeModal + SalvageModal were two modals over the
