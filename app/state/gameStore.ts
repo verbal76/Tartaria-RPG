@@ -641,6 +641,16 @@ function grantStageItems(
       name: g.item, kind: 'misc', quantity: qty, tags: ['quest', 'mission'],
       description: `Carried for ${title}.`,
     });
+    // ⚠⚠ CHECK BEFORE YOU CLAIM. `grantItem` clamps to a per-name cap and can accept ZERO,
+    // returning the pack unchanged — and the first version of this logged "✦ … mission
+    // item." regardless. A receipt for an item that never arrived is worse than silence:
+    // the player reads that they have it and the next stage refuses them for not having it,
+    // with the log insisting otherwise. Same class as the auto-route line that announced a
+    // course `setTravelCourse` had already refused.
+    if (res.accepted <= 0) {
+      get().appendLog('arbiter', `The Arbiter frowns at your pack. "No room for ${g.item}. Make some — ${title} does not move without it."`);
+      continue;
+    }
     set((st) => (st.player ? { player: { ...st.player, inventory: res.inventory } } : st));
     get().appendLog('reward', `✦ ${qty > 1 ? `${qty}× ` : ''}${g.item} — mission item.`);
   }
@@ -739,14 +749,15 @@ function advanceStagesOnIntent(
         // catch-up, the refusal below is the honest answer and the player still gets told
         // exactly what they need.
         grantStageItems(get, set, huntMatch.def.title, huntMatch.def.stages, 0, huntMatch.rec.stage);
+        // ⚠⚠ THE HEAL HANDS OVER AND STOPS — it does NOT also advance on this action.
+        // Advancing here raced the rest of `submitPlayerAction`: the action's own loot
+        // write captures `player` at the top of the call and writes the inventory back
+        // whole, so a mission item granted mid-flight was silently clobbered by the next
+        // handler's stale snapshot. Measured on the walker — the receipt printed and the
+        // item was gone one line later. Repairing a save is not the hot path; costing it
+        // one extra tap buys a write that cannot be lost.
         if (QS.stageRequirementMet(stageDefNow, get().player?.inventory)) {
-          const flightKeyHealed = `hunt:${huntMatch.rec.id}`;
-          if (!stageAdvancesInFlight.has(flightKeyHealed)) {
-            stageAdvancesInFlight.add(flightKeyHealed);
-            void Promise.resolve().then(() => {
-              try { get().advanceHunt(huntMatch.rec.id); } finally { stageAdvancesInFlight.delete(flightKeyHealed); }
-            });
-          }
+          get().appendLog('arbiter', `The Arbiter checks your pack and finds what ${huntMatch.def.title} wants. "You had it after all. Go again."`);
           return;
         }
         const line = QS.stageRequirementLine(stageDefNow!, huntMatch.def.title);
@@ -807,7 +818,41 @@ function advanceStagesOnIntent(
         (next.checkKind === 'boss' && intent === 'investigate')
       );
     });
-  if (mysteryMatch && !inCombat) {
+  if (mysteryMatch && mysteryMatch.def && !inCombat) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const QS = require('../engine/questStage') as typeof import('../engine/questStage');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
+    // ⚠⚠ P19 — A MYSTERY NOW HAPPENS SOMEWHERE. Measured before touching it: the mystery
+    // matcher checked the VERB and NOTHING ELSE — no location test of any kind, where the
+    // hunt branch has gated on `currentLocationId === anchor` since OTA-1213. So all 18
+    // mysteries could be walked end to end from one tile without ever travelling, which is
+    // the opposite failure from the hunts and just as bad: the prose names a place, the
+    // engine never asked you to go there, and 26 of 36 named locations went unvisited.
+    const stageNow = mysteryMatch.def.stages[mysteryMatch.rec.stage];
+    const ground = QS.stageLocationId(stageNow, CM.contractAnchorId(mysteryMatch.def), CM.resolvePosterLocation);
+    if (player.currentLocationId !== ground) {
+      const line = `The Arbiter taps the slate. "Not here. ${mysteryMatch.def.title} points elsewhere — set a course from Contracts and do it there."`;
+      const recent = get().gameLog.slice(-30).some((e) => e.text === line);
+      if (!recent) get().appendLog('arbiter', line);
+      return;
+    }
+    // ⚠ Same heal-then-refuse the hunts got: a record already in flight when this shipped
+    // never received the earlier stages' grants, and refusing it forever would brick a
+    // mystery that used to work. Award the missing prefix, re-check, and only then refuse.
+    if (!QS.stageRequirementMet(stageNow, player.inventory)) {
+      grantStageItems(get, set, mysteryMatch.def.title, mysteryMatch.def.stages, 0, mysteryMatch.rec.stage);
+      // ⚠⚠ Hands over and STOPS — see the hunt branch. Advancing on the same action races
+      // the caller's own inventory write and loses the item that was just granted.
+      if (QS.stageRequirementMet(stageNow, get().player?.inventory)) {
+        get().appendLog('arbiter', `The Arbiter checks your pack and finds what ${mysteryMatch.def.title} wants. "You had it after all. Go again."`);
+        return;
+      }
+      const line = QS.stageRequirementLine(stageNow!, mysteryMatch.def.title);
+      const seen = get().gameLog.slice(-30).some((e) => e.text === line);
+      if (!seen) get().appendLog('arbiter', line);
+      return;
+    }
     const flightKey = `mystery:${mysteryMatch.rec.id}`;
     if (!stageAdvancesInFlight.has(flightKey)) {
       stageAdvancesInFlight.add(flightKey);
@@ -27986,6 +28031,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!stageDef) return;
     get().appendLog('world', stageDef.narration);
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
+    // ⚠⚠ P19 — the same three things the hunts got: hand over what the stage promised,
+    // say where the next one is, and actually set the course.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const QS = require('../engine/questStage') as typeof import('../engine/questStage');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
+      grantStageItems(get, set, mystery.title, mystery.stages, record.stage, record.stage + 1);
+      const nextDef = mystery.stages[record.stage + 1];
+      if (nextDef) {
+        const anchor = CM.contractAnchorId(mystery);
+        const hereId = QS.stageLocationId(stageDef, anchor, CM.resolvePosterLocation);
+        const nextId = QS.stageLocationId(nextDef, anchor, CM.resolvePosterLocation);
+        const moved = nextId !== hereId;
+        const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, moved);
+        if (dir) get().appendLog('system', dir);
+        const liveNow = get().player;
+        if (moved && liveNow && liveNow.currentLocationId !== nextId
+            && liveNow.travelTarget?.locationId !== nextId) {
+          _chainRouting = true;
+          try { get().setTravelCourse(nextId); } finally { _chainRouting = false; }
+          // ⚠ Only claim it if it happened — setTravelCourse has six silent refusals.
+          if (get().player?.travelTarget?.locationId === nextId) {
+            get().appendLog('world', `Auto-routing to the next stage of ${mystery.title}: ${safeLocName(nextId)}.`);
+          }
+        }
+      }
+    }
     // Final stage is the "synthesis" — the player has the trophy in hand
     // (narratively); advance the stage past the end so turn-in unlocks.
     let nextStage = record.stage + 1;
@@ -27997,6 +28070,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const epi = mystery.stages[nextStage]!;
       get().appendLog('world', epi.narration);
       if (epi.arbiter) get().appendLog('arbiter', epi.arbiter);
+      // ⚠ P19 — a consumed null stage still hands over what it promised. Without this the
+      // auto-consume loop reads the prose and silently drops the item, which is the same
+      // silence that made a stage-0 grant vanish on the hunts.
+      grantStageItems(get, set, mystery.title, mystery.stages, nextStage, nextStage + 1);
       nextStage++;
     }
     set((s) =>

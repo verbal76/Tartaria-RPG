@@ -127,6 +127,25 @@ export function huntAnchorId(def: {
   );
 }
 
+/** ⚠⚠ P19 — the same walking pin for the CONTRACT families (mysteries, storylines,
+ *  faction quests). `contractAnchorId` reads the def, so the marker sat on the poster's
+ *  ground for the whole chapter; a mystery that sends you three places still routed you
+ *  back to the first one. */
+export function contractStageAnchorId(
+  def: {
+    factionId?: string | null;
+    targetLocationName?: string | null;
+    stages?: ReadonlyArray<{ locationName?: string }>;
+  },
+  stageIndex: number,
+): string {
+  const stage = def.stages?.[stageIndex];
+  return (
+    (stage?.locationName ? resolvePosterLocation(stage.locationName) : undefined) ??
+    contractAnchorId(def)
+  );
+}
+
 /** ⚠⚠ P19 — WHERE THE HUNT IS RIGHT NOW, not where it was posted. `huntAnchorId` reads
  *  the contract DEF, so the atlas pin and the ROUTE TO button pointed at the poster's
  *  ground for the whole hunt — a seven-stage chase that crosses the map still routed you
@@ -182,7 +201,8 @@ export function openContractMarkers(player: PlayerCharacter | null | undefined):
   for (const m of player.activeMysteries ?? []) {
     const def = findMysteryById(m.id);
     if (!def) continue;
-    add('mystery', m.id, def.title, contractAnchorId(def));
+    // ⚠ P19 — the pin walks with the mystery.
+    add('mystery', m.id, def.title, contractStageAnchorId(def, m.stage));
   }
   for (const s of player.activeStorylines ?? []) {
     const def = findStorylineById(s.id);

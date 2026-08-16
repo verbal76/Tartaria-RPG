@@ -1839,8 +1839,51 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ THE MYSTERIES, THE SAME WAY — AND TWO BUGS ONE DAY OLD
+  (2026-08-16, latest). Golem OTA-1330.**
+  Owner: *"do the mysteries the same way next."*
+  - ⚠⚠ **Measured first, and it was worse than the hunts.** The mystery matcher checked
+    the VERB **and nothing else** — no location test of any kind, where the hunt branch
+    has gated on `currentLocationId === anchor` since OTA-1213. **All 18 mysteries could
+    be finished end to end without ever travelling.** Stand on one tile, type investigate
+    / sneak / investigate, collect the trophy. The prose named a place every single time;
+    the engine never once asked you to go there. That is the mirror image of the hunt
+    failure — stuck vs. free — and a direct cause of 26 of 36 named locations going
+    unvisited.
+  - **Mysteries now get everything the hunts got:** a per-stage location gate with the
+    "not here" refusal, a pack requirement that NAMES what is missing, a grant when the
+    stage closes, a direction line, a real auto-route, and an atlas pin that walks with
+    the chapter (`contractStageAnchorId`). All 18 mysteries / 72 stages rewritten to the
+    same grammar. **188 of 188 hunt+mystery stages name their own ground**, enforced by
+    `check:huntstages` — which also now refuses a `requires` on an auto-consumed null
+    stage, because a gate nothing evaluates is a lie in data form.
+  - ⚠ **Mysteries stay COMBAT-FREE by design.** Their `boss` checkKind is matched by
+    INVESTIGATE and spawns nothing — it is the "confirm what you have" beat, not a fight.
+    The rewritten prose says so rather than implying a battle that never comes.
+  - ⚠⚠⚠ **TWO BUGS OF MINE, CAUGHT BY THE WALKER, BOTH IN CODE SHIPPED THE DAY BEFORE.**
+    Worth reading as a pair, because both are the same failure wearing different clothes:
+    1. The stage grant logged `✦ … — mission item.` **without checking `grantItem`'s
+       `accepted`**. At a per-name cap it accepts ZERO and returns the pack unchanged, so
+       the player read a receipt for an item they did not have, and the next stage refused
+       them for not having it while the log insisted otherwise. Same class as the
+       auto-route line that announced a course `setTravelCourse` had already refused —
+       **claiming success without checking state.**
+    2. The catch-up heal granted AND advanced on the same action. The rest of
+       `submitPlayerAction` writes the inventory back from a snapshot taken at the TOP of
+       the call, so a mission item granted mid-flight was clobbered one line later. Seen
+       live in the walker log: receipt printed, item gone on the next line. The heal now
+       **hands over and STOPS** — one extra tap, and a write that cannot be lost. ⚠ Any
+       future code that mutates inventory from inside `advanceStagesOnIntent` has this
+       hazard; do not grant mid-action.
+  - ⚠ **The mystery walker was as dishonest as the hunt one, for the same reason.** It ran
+    "wherever the walker stands" — faithful to an engine that never checked, and therefore
+    proof of nothing. It now stands on each stage's own ground and may only move where the
+    game routed it.
+  - ⚠ **STILL OPEN:** storylines. 13 of them, ~85 stages, still verb-only with no location
+    gate and no bindings — the last family with this hole.
+
 - **⚠⚠⚠ EVERY HUNT MADE DOABLE — AND THE WALKER THAT HAD BEEN LYING TO ME
-  (2026-08-16, latest). Golem OTA-1329.**
+  (2026-08-16). Golem OTA-1329.**
   Owner, on the hunts, after the layer shipped: *"let's make every stage of every hunt
   doable... a complete revamp of all of the hunts right now, including text clues,
   directions, auto-route to every location and every location has no combat unless it is
