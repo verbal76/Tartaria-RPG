@@ -1839,8 +1839,55 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ THE REDRAWN ATLAS GOES IN, AND THE GAME STARTS DRAWING ITS OWN NAMES
+  (2026-08-17, latest). Golem OTA-1335.**
+  Owner on the new render: *"I think this is as close as it's going to get me. can we work
+  with this and make minor adjustments?"* Accepted as final art.
+  - ⚠⚠⚠ **AN ASSET SWAP IS NOT A ONE-LINE CHANGE, AND BOTH TRAPS WERE SILENT.**
+    `ATLAS_W`/`ATLAS_H` were typed-out literals under a comment saying they MUST match the
+    live asset — a rule with nothing enforcing it. `ATLAS_LEGEND_FRAC = 10/92` was a
+    correction for a title cartouche the NEW art does not have, and leaving it in would have
+    moved every marker on the map 10.9% of the map width east (176 px, ~4 tiles). Neither
+    throws. Both put every pin in the wrong place on the one screen that exists to say where
+    things are. **When artwork is replaced, hunt for every constant that was calibrated to
+    the OLD picture** — not just the dimensions.
+  - ⚠⚠ **THE FIX FOR A HAND-TYPED CONSTANT IS A DERIVED ONE.** Dimensions now live in
+    `atlasCoords` as `ATLAS_PIXEL_W/H`, and the suite parses the shipped PNG's IHDR header
+    and compares. A comment saying "these must match" is not a mechanism; a test that reads
+    the actual file is.
+  - ⚠⚠⚠ **I GAVE THE ARTIST AN INSTRUCTION BASED ON AN ASSUMPTION I NEVER CHECKED.** I said
+    "no lettering of any kind" believing the game drew location names. It draws the player
+    marker, the ?/✕ glyphs, the ◆ pins and exactly ONE name (the Hidden Market) — every
+    other name was PAINTED INTO THE ART. The owner caught it: *"when you said there was no
+    names on the map, did you remove all of the names even for the named locations that we
+    are putting on the map from that file?"* Had he not, the new art would have shipped as
+    an anonymous ruin-field. **Before telling anyone to remove something, measure who was
+    providing it.**
+  - **The overlay.** New `app/engine/atlasLabels.ts` — pure, no React, solves all 37 plotted
+    landmarks in atlas-pixel space and returns fractions, so one layout holds at every zoom.
+    ⚠ The first version offered four positions and left SEVEN collisions, all in the
+    north-west cluster; eight compass positions across three distance rings resolve every one
+    (27 below, 7 above, 2 right, 1 left — the owner asked for above/below and that is what
+    the map overwhelmingly gets). `atlasLabelConflicts()` exists so the failure is COUNTABLE
+    rather than something you find by squinting at a screenshot.
+  - ⚠⚠ **OLD SAVES NEEDED NO MIGRATION, AND THE REASON IS WORTH KNOWING.** Owner asked
+    directly: *"what will we do with old save files? discovered locations, and with quest
+    locations discovered when we go to the map screen?"* Grid cells are DERIVED from the
+    atlas table at runtime and never persisted; saves store ids, and OTA-1334 renamed none.
+    So discoveries survive, moved places keep their flag, and every map pin recomputes on
+    render. The one place I expected to break — `travelTarget.distanceRemaining`, a STORED
+    countdown — turned out to be recomputed from the player's live cell by `backfillPlayer`
+    on every load, inherited from OTA-143/930. **Ask the save-shape question before shipping
+    a world change, not after; the answer here was good, and it was good by design rather
+    than by luck.**
+  - **841 suites / 7,842 green.** ⚠ STILL OPEN: a legacy save that charted the Asgardar
+    spire keeps the unlock (`unlockedGreatClimbs` holds CLIMB ids) but finds the ★ CLIMB
+    button gone from the capital with nothing explaining why — the "reads as the chart having
+    lied" feeling the seam exists to prevent, reintroduced for legacy saves only. Needs a
+    one-time load notice.
+
 - **⚠⚠⚠ THE BLACK REACH, AND THE TWO GRAND SPIRES FINALLY STANDING APART
-  (2026-08-17, latest). Golem OTA-1334.**
+  (2026-08-17). Golem OTA-1334.**
   Owner, across three messages: *"a. I agree, move it to it's own location. move asgardars
   tower to the outskirts as discussed. let's move the etheria spire 2 tiles west of the the
   black reach"*; *"The black reach is the most southern point on the map. it's at the 6:00

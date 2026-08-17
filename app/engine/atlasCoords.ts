@@ -5,8 +5,15 @@
 // every one of the 21 named locations resolves to a canonical icon
 // position.
 //
-// Image: assets/world-atlas.png — 1408 × 768 pixels, landscape.
-// Fractional coordinates measured against that pixel canvas.
+// Image: assets/world-atlas.png. ⚠ THE PIXEL SIZE OF THAT FILE IS EXPORTED FROM HERE
+// (`ATLAS_PIXEL_W` / `ATLAS_PIXEL_H`, just below) because THREE separate things need it and
+// must never disagree: the letterbox maths that turns a fraction into a screen position, the
+// overlay-label scale, and the name-label solver in `atlasLabels.ts`. It used to be typed
+// out again inside MapScreen.tsx, where the comment said in as many words that the two
+// copies MUST match — a rule with no mechanism behind it. Now there is one number.
+//
+// Fractional coordinates are measured against that pixel canvas. They are aspect-agnostic:
+// a landmark at fx 0.5 is half way across whatever the art's real dimensions turn out to be.
 //
 // The new map is geographic (locations placed by lore canon) rather
 // than concentric (the old map's danger rings around a central
@@ -16,6 +23,15 @@
 // offsets — east-of-Outpost moves the dot right, south moves it
 // down, etc. The dot is clamped to the visible image area so it
 // can never drift into the insets or off-screen.
+
+// ⚠⚠ THE LIVE ASSET'S REAL PIXEL DIMENSIONS. If the artwork is replaced, these change with
+// it in the same commit. The dot maths is aspect-driven — a wrong ratio here does not throw,
+// it silently slides every marker off the landmark it is supposed to be standing on.
+//
+// History: 1408×768 (hand-drawn) → 1774×887 / 2.0:1 (first commission) → 1619×971 / 1.6674:1
+// (the redrawn atlas, which is 5:3 to within 0.04% — the map spec asked for exactly 5:3).
+export const ATLAS_PIXEL_W = 1619;
+export const ATLAS_PIXEL_H = 971;
 
 export interface AtlasCoord {
   /** X position as a fraction of image width (0..1). */
