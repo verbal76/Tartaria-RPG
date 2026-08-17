@@ -1908,6 +1908,15 @@ export function ContractsScreen() {
                   // A mission route starts the auto-chain (objective → turn-in)
                   // and makes that contract the single active mission.
                   if (missionId) {
+                    // ⚠ OTA-1350 — B6: inside an outpost, a mission route asks the
+                    // same leave-the-outpost Yes/No the plain course always has;
+                    // the confirm carries the missionId so accepting still routes
+                    // the contract, not a bare course.
+                    if (player.hubRoomId) {
+                      requestTravelConfirm(id, name, { missionId });
+                      setScreen('exploration');
+                      return;
+                    }
                     routeMission(missionId);
                     setScreen('exploration');
                     return;
@@ -1916,6 +1925,12 @@ export function ContractsScreen() {
                   // set AND it becomes the mission you're on, everything else
                   // paused. That is what "like the rest of them" means here.
                   if (pendingRoute.climbId) {
+                    // ⚠ OTA-1350 — B6: same rule for a tower's SET COURSE.
+                    if (player.hubRoomId) {
+                      requestTravelConfirm(id, name, { climbId: pendingRoute.climbId });
+                      setScreen('exploration');
+                      return;
+                    }
                     routeGreatClimb(pendingRoute.climbId);
                     setScreen('exploration');
                     return;
