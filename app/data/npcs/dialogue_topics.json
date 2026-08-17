@@ -311,6 +311,13 @@
      "lines": [
       "Halem is still friendly. That is somehow the problem. \"Now, I am not going to make a thing of it,\" he says pleasantly, and does not move away from the strongbox. \"You will notice my prices. That is the whole of it. When you have noticed them long enough, we will be square.\""
      ]
+    },
+    {
+     "id": "halem_acid",
+     "label": "Ask about the acid trade",
+     "lines": [
+      "\"Careful with that shelf.\" Halem slides a wax-sealed flask an inch further from your elbow. \"Battery bile. The old world kept its lightning in acid — jar-batteries taller than a house, vault floors full of them. The flood shorted the lightning out and left the bile leaking for a thousand years. Scavengers milk the jars that held; I cut it with aether dust so it eats armor instead of hands.\" He taps the wax. \"Sells to people who plan on winning slowly.\""
+     ]
     }
    ]
   },
