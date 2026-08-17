@@ -1676,8 +1676,42 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ THE ★ CLIMB BUTTON, AND THE SPIRE LOSES "BURIED"
+  (2026-08-17, latest). HAL OTA-1331.**
+  Owner: *"when you land on the tile, beginning the climb should be a button like summon the
+  guardian. and it should only be visible if you have that particular map and used it to
+  mark the location. change all names to grand spire not buried."*
+  - **The button.** Before this the only way into a 14- or 15-tier great climb was to type
+    the tower's full canonical name. ⚠ Measured: `asgardar`'s own interactable list **leads
+    with the bare noun `spire`**, and "climb the spire" there matched NEITHER great climb —
+    it fell through to a generic 3-tier scramble at a 14-tier landmark, which is verbatim
+    the symptom the OTA-1304 seam already calls *"reads as the chart having lied"*.
+  - ★ CLIMB follows the ★ SUMMON rule: an affordance that appears exactly when the action
+    behind it would succeed. ⚠ It **submits the canonical noun** rather than calling a
+    private entry point, so it walks the same parser → climb path a typed name walks and
+    cannot skip the strap gate, the height rules, or the guaranteed Skyreacher drop.
+  - ⚠ **The gate is the chart**, as asked and as OTA-912 already defined it:
+    `worldMemory.unlockedGreatClimbs` only carries a climb id once its Skyreacher Chart has
+    been USED from the pack. Owning the map is not enough. Plus outdoors / nothing hostile /
+    on the climb's tile, mirroring beginScene's own prop gate so the button and the
+    climbable noun can never disagree.
+  - **The rename.** The tower at the capital is the **Grand Spire of Asgardar**. "Buried" is
+    gone from the climb noun, the summit flavour, the Draugveil approach line, Skyreacher
+    Chart 2 and the Cuirass description. ⚠ Only the historical OTA notes keep the old name —
+    rewriting a shipped ledger entry would make the ledger lie about what players received.
+  - ⚠⚠ **It deliberately did NOT merge the two spires.** The cheap reading of "make it all
+    the Grand Spire" folds Asgardar's tower into the Grand Spire of Etheria — which deletes a
+    great climb and one of five Skyreacher pieces. The instruction was about NAMES, not
+    content. Both stand (Asgardar 14 tiers/Cuirass, Etheria 15/Crown) and `ota1333` pins
+    5 climbs / 5 pieces against an accidental merge.
+  - ⚠ **A porting trap worth knowing:** `git apply --3way` prints *"Applied patch to 'X'
+    cleanly."* for each file it merges and then **aborts the whole patch** if any other file
+    fails (here: a doc that exists only on golem, plus the expected buildInfo conflict). The
+    chatter looks like success. This line's gate ran green on a patch that had landed
+    NOTHING. Verify a port by grepping the ported content, never by reading the apply output.
+
 - **⚠⚠⚠ THE LAST P19 INSTANCE — IN THE FAMILY THAT LOOKED EXEMPT
-  (2026-08-16, latest). HAL OTA-1330.**
+  (2026-08-16). HAL OTA-1330.**
   Owner, after being handed a table with five green checks and one hedge: *"don't we have
   to check the faction quests? since they don't have a green check mark from you."*
   - ⚠⚠⚠ **HE WAS RIGHT TO PUSH, AND THE REASON IS THE LESSON.** The family had been waved
