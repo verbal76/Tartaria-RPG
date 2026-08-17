@@ -13142,6 +13142,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           player: { ...s.player, name: cleanName },
           awaitingTutorialName: false,
         } : { awaitingTutorialName: false }));
+        // The first words are for her. The moment this name is written down —
+        // before the well-met beat, before any grant, before the card is
+        // raised — the Arbiter looks up and asks. Untagged on purpose, same
+        // as the card below: a letter, not a feature.
+        if (devStartName === 'sasmooch') {
+          get().appendLog('arbiter', `The Arbiter looks up from the ledger. "How long are you going to stand there and sit at me?"`, { skipDedup: true });
+        }
         // ⚠ OTA-1230 — SAY SO WHEN THE NAME CHANGED. The clean used to be
         // silent: type "Verbal123" and you were simply Verbal from then on,
         // with nothing anywhere admitting the game had edited your answer. The
