@@ -266,23 +266,27 @@ describe('travel + scene-bar truthfulness chaos (OTA-126 / OTA-127)', () => {
     expect(store.getState().gameLog.length).toBeGreaterThanOrEqual(beforeLog);
   });
 
-  it('transitArea is null/falsy when the player is NOT in transit (idle scene)', async () => {
+  it('⚠ OTA-1342 — a free step RECOMPUTES the area label; it is never stale', async () => {
+    // This used to pin the old contract (not-in-transit → clear the label), which
+    // is the exact branch OTA-1342 removed: the owner walked six free tiles east
+    // and the bar kept naming the origin. The truthfulness rule this suite exists
+    // for still holds, in its new form: after a free step the label is a FRESHLY
+    // computed "near X" for the tile actually under your boots — the planted
+    // garbage below must be gone, never echoed.
     const store = await bootClean('Idler');
-    // Force-clear travel target + transit label, take a manual cardinal
-    // step using stepDirection; the no-transit branch should clear
-    // transitArea.
     const p = store.getState().player!;
     store.setState({
       player: { ...p, travelTarget: undefined, stamina: 50 },
     });
     const scene = store.getState().currentScene;
     if (scene) {
-      store.setState({ currentScene: { ...scene, transitArea: 'near Somewhere' } });
+      store.setState({ currentScene: { ...scene, transitArea: 'near Somewhere Stale' } });
     }
     try {
       store.getState().stepDirection('north');
     } catch { /* unrelated weather bug — already captured */ }
-    const sceneAfter = store.getState().currentScene;
-    expect(sceneAfter?.transitArea).toBeFalsy();
+    const label = store.getState().currentScene?.transitArea ?? null;
+    expect(label).not.toBe('near Somewhere Stale');
+    if (label != null) expect(String(label)).toMatch(/^near /);
   });
 });
