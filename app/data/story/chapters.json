@@ -15,26 +15,28 @@
     "cores": {
       "kicker": "CHAPTER III",
       "title": "THE FIRST HEART",
-      "body": "The Core rides your pack like a second pulse, warm through the canvas, faintly out of time with your own. One of nine. The buried country knows what you are carrying — you feel it in the way the dark leans a little closer now, the way the mud holds your boot a half-beat longer.\n\nEight hearts left. The road has stopped being a rumor and started being a count.",
+      "body": "The Guardian is down. Your kill — clean, earned, and final; the chamber is yours and nothing in it is getting back up.\n\nThe Core rides your pack like a second pulse, warm through the canvas, faintly out of time with your own. One of nine. The buried country knows what you are carrying — you feel it in the way the dark leans a little closer now, the way the mud holds your boot a half-beat longer.\n\nEight hearts left. The road has stopped being a rumor and started being a count.",
       "motives": {
         "debt": "Season by season, the arithmetic works: this one Core is worth more than they ever claimed you owed — and you are not stopping at one. When you finally pay them, you want them to understand what it cost the world to be paid.",
         "missing": "You catch yourself talking to the Core at night, low, the way you used to read the letters aloud. If they got this far — if they ever carried one of these — you would know it. You would feel it. Keep walking.",
         "exile": "Let the surface post its warrants. You are carrying a thing no magistrate up there could lift, and eight cities are waiting to see whether you can hold more. A name is what you can hold at the end of your arm.",
         "calling": "The hum has changed since you lifted it. It is not calling you down anymore — it is singing along, one voice of nine, and your blood carries the harmony like it was born knowing it.",
         "record": "You have written eleven pages about the housing alone. The Core is realer than every book above ground put together — and it is in YOUR pack, and the page it fills is yours."
-      }
+      },
+      "banner": "★ VICTORY — THE GUARDIAN IS SLAIN ★"
     },
     "descent": {
       "kicker": "CHAPTER IV",
       "title": "THE ENDLESS STAIR",
-      "body": "Nine. The word has weight now — nine hearts in one pack, pulling each other into a single slow rhythm that your own heart keeps trying to join.\n\nThe Endless Stair, shut for a thousand years, stands open ahead: flight after flight falling away into a dark the flood never reached. Everything you told yourself at the rope-head comes down the Stair with you.",
+      "body": "The last Guardian lies where you dropped it. Nine fights, nine kills, none of them cheap.\n\nNine. The word has weight now — nine hearts in one pack, pulling each other into a single slow rhythm that your own heart keeps trying to join.\n\nThe Endless Stair, shut for a thousand years, stands open ahead: flight after flight falling away into a dark the flood never reached. Everything you told yourself at the rope-head comes down the Stair with you.",
       "motives": {
         "debt": "You could climb out right now and buy the debt nine times over, and both of you know why you don't. Somewhere on the way down, this stopped being about what you owe them. It became about what the world owes you back.",
         "missing": "If they made it anywhere, they made it here — and no one has carried the full set in a thousand years. Whatever waits at the bottom of the Stair, it is the end of the trail. The last letter is still sewn into your coat.",
         "exile": "The Stair does not check warrants. Below this step there is no surface law, no posted name, no struck record — only what you are about to do, and the title it will carry. They exiled a person. What climbs back out is up to you.",
         "calling": "The hum is not below you anymore. It is around you — in the stone of every tread, in your teeth, in your blood — nine hearts and yours making ten. You are not following the call now. You are part of it.",
         "record": "No account of the Stair exists past the third flight. Every step below that line is a page no one has ever written. You go down with a straight spine and a full inkwell — history's one witness, exactly where a witness is needed."
-      }
+      },
+      "banner": "★ VICTORY — THE LAST GUARDIAN IS SLAIN ★"
     },
     "choice": {
       "kicker": "CHAPTER V",

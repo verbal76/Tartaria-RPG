@@ -2038,6 +2038,13 @@ export interface WorldMemory {
    *  the player is elevated). Cleared when the dog rejoins on descent,
    *  so each climb gets the joke once; taps still buzz. */
   dogClimbNoticeShown?: boolean;
+  /** OTA-1334 — one-time "the Spire moved" notice. The Grand Spire of Asgardar
+   *  became its own atlas tile on the city's outskirts (the map makeover); a
+   *  LEGACY save that already charted that climb learns this once, at load,
+   *  from the Arbiter. Fresh characters chart the tower where it now stands and
+   *  never need telling — emptyMemory() stamps this true so only migrated saves
+   *  (where the ?? false default leaves it unset→false) ever see the line. */
+  spireMoveNoticeShown?: boolean;
   /** OTA-877 — one-time faction-standing explainer. Set true after the first time
    *  any standing change is logged, so the brief "what is faction standing" note
    *  (appended by logRepChanges) fires exactly once per save. */

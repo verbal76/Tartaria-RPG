@@ -41,6 +41,11 @@ export function ChapterCardOverlay() {
           ]}
         >
           <ScrollView contentContainerStyle={styles.cardPad} showsVerticalScrollIndicator={false}>
+            {/* ⚠ OTA-1334 — the win, before anything else. This card covers the screen at
+                the exact moment a lethal fight ends; without an explicit verdict the player
+                has to GUESS whether they won, died, or hit a glitch — the owner guessed
+                "died" and nearly put the phone down. Gold, loud, and first. */}
+            {card.banner ? <Text style={styles.victoryBanner}>{card.banner}</Text> : null}
             <Text style={styles.kicker}>{card.kicker}</Text>
             <Text style={styles.title} accessibilityRole="header">{card.title}</Text>
             <View style={styles.rule} />
@@ -67,6 +72,17 @@ const styles = StyleSheet.create({
   },
   cardWrap: { maxHeight: '78%' },
   cardPad: { paddingHorizontal: 28, paddingVertical: 12 },
+  victoryBanner: {
+    color: '#e8c766',
+    fontSize: 17,
+    letterSpacing: 2,
+    fontWeight: '900',
+    textAlign: 'center',
+    marginBottom: 14,
+    textShadowColor: 'rgba(232, 199, 102, 0.45)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 12,
+  },
   kicker: {
     color: '#8aa0a4',
     fontSize: 12,

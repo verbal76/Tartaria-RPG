@@ -1676,8 +1676,55 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ THE FIGHT WAS WON AND THE GAME SAID "HEARTBEAT" — LIVE-TEST TRIAGE
+  (2026-08-17, latest). HAL OTA-1334.**
+  Owner, from the device, after killing his first Core Guardian: *"I honestly thought I had
+  just died."* The log says he won clean — never below 18 HP, her last three swings
+  miss/fumble/miss — and the game answered the kill with three death-shaped signals at
+  once: a full-screen CHAPTER card opening on his own heartbeat, a RESURRECTION Gem
+  "pulsing in the wreckage", and the guardian's ellipsed dying speech in the Arbiter's
+  voice. He was reaching to put the phone down.
+  - ⚠⚠⚠ **A CINEMATIC THAT INTERRUPTS AN OUTCOME MUST STATE THE OUTCOME FIRST.** The
+    chapter card is good writing in the wrong second. Cores + descent cards (the two that
+    always fire over a fresh guardian kill) now carry a gold ★ VICTORY banner above
+    everything, and their bodies open with the win. ⚠ The cards that follow ARRIVALS
+    (revelation, choice) must NOT carry it — the test asserts the absence too, because a
+    victory banner over no victory is the same lie in the other direction.
+  - ⚠⚠ **LOOT THAT SHARES A NAME WITH A DEATH MECHANIC NEEDS A LOOT-SHAPED SENTENCE.** A
+    Resurrection Gem announcing itself at fight's end reads as the death path firing.
+    "Boss spoils:" leads the line now. When an item's NAME encodes the death system,
+    every surface line about it must disambiguate on the first word.
+  - **The full board for both dev names** (owner order, widened same-day: *"any benefit
+    Verbal gets when creating a character, Sasmooch gets as well"*): all 115 side quests +
+    5 tower maps + 5 charted climbs at character creation, keyed on DEV_REVIVE_NAMES.
+    Seeded like the real accept doors write records — first ACTIONABLE stage, nothing
+    tracked, no item pre-flood (the heal hands prerequisites over on first attempt,
+    exercising the OTA-1333 fix on every quest he tests).
+  - **Breed-named dog armor**: crafted dog-armor mints as `<Breed> <Catalog Name>` — the
+    breed being honest free text is the FEATURE (his dog is a "Skinwalker"; a parakeet
+    works too). Name only; kind survives so the vest still equips.
+  - **One living character per ordinary name** (owner order): the tutorial name beat is
+    the single door where a brand-new character is named, so the guard lives there — a
+    name already carried by a LIVING character in another slot is refused and re-asked;
+    a dead slot frees its name; the two dev names never collide. ⚠ Test note: the guard
+    reads `get().slots`, and startNewGame REFRESHES that list from disk — a test that
+    fakes a dead slot must patch state AFTER startNewGame, before submitting the name.
+  - **The Sasmooch dedication**: creating a character named Sasmooch raises a full-screen
+    dedication card (new DedicationOverlay, mounted globally beside the chapter card).
+    The card text carries no OTA tag anywhere on purpose — it is a letter, not a feature;
+    same rule as the Settings→About dedication.
+  - **The Asgardar spire notice** — the last open map-transition item, now closed. Legacy
+    saves that charted the Asgardar climb before the tower moved to its own outskirts
+    tile get ONE Arbiter-load-beat world line saying where it went and that the chart
+    still holds. `emptyMemory()` stamps `spireMoveNoticeShown: true` (fresh characters
+    never see it); the load migration defaults it false (legacy saves eligible); the flag
+    flips the moment the line shows.
+  - ⚠⚠ **Tree-mutation-under-test burned a THIRD full-gate run today** (mid-run edit left a
+    transient syntax error; 275 suites poisoned). The rule is now written down here: while
+    a gate runs on a worktree, NOTHING touches that worktree — no edits, no stash, no pop.
+
 - **⚠⚠⚠ THE MAP-MAKEOVER AUDIT — HAL LEADS, AND THE WALKERS PAID FOR THEMSELVES
-  (2026-08-17, latest). HAL OTA-1333.**
+  (2026-08-17). HAL OTA-1333.**
   Owner, changing the process AND ordering the audit: *"from here on out until we make a
   significant gameplay change HAL is the primary game again. it gets done first and then we
   port to golem and steam."* Then: align all points to the new map, update all text/lore,
