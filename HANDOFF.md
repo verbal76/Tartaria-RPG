@@ -830,6 +830,12 @@ Key invariants worth knowing:
 
 ### ⚠⚠ THE COMPLETABILITY PUNCH LIST — `PUNCHLIST.md` (owner directive, 2026-08-09)
 
+**`PUNCHLIST-BRAVO.md` also lives on THIS branch now** (moved from golem 2026-08-17 —
+it was born there because golem was mainline at the time). Alpha = completability only;
+Bravo = live follow-ons, staged work, and open owner decisions. Open on the move date:
+B5 + B6 (owner rulings), B11 (road-arriving climb walker, ready on request), B9 + B10
+(watch items).
+
 **The bar, verbatim:** *"When I say fully functional I mean every mechanical aspect of the
 game has to be able to be finished."* And: *"When you find a loop that ends in nothing, you
 need to mark it as a part of our punch list. I want everything completable before we expand
