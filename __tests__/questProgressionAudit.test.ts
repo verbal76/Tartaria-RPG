@@ -337,6 +337,28 @@ describe('Quest progression audit', () => {
         continue;
       }
 
+      // ⚠⚠ SNAPSHOT AT ACCEPT, NOT AT TURN-IN. The reward check below used to measure the
+      // TC/rep delta across the `turnInFactionQuest` call alone, which quietly assumed the
+      // payment always happens INSIDE that call. It doesn't: a travel-gated quest whose
+      // last stage advance completes it is paid right there, and the later turn-in is
+      // correctly a no-op — so the narrow window reads 0/60 and the audit calls a healthy
+      // quest broken.
+      //
+      // That is the mechanism-vs-rule trap. The RULE is "accepting and finishing this
+      // quest pays the player its reward, once." Where in the flow the credit lands is an
+      // implementation detail the audit has no business pinning. Measuring accept→end
+      // states the rule directly and stops the assertion from being seed-fragile.
+      //
+      // ⚠ It surfaced when two locations were added to the atlas: the seeded LCG stream
+      // shifted, the pilgrimage's final hop landed on a different tile, and it began
+      // self-completing. This suite's own header already names `fq_tartarians_pilgrimage`
+      // as historically seed-fragile — this is that same fragility, fixed at the root
+      // rather than re-seeded around.
+      const pAtAccept = store.getState().player!;
+      const tcAtAccept = pAtAccept.tc;
+      const repAtAccept = pAtAccept.factionStanding
+        .find((r) => r.factionId === q.factionId)?.standing ?? 0;
+
       // Walk every stage. The current stage's advanceOn defines what
       // trigger pushes to the next. Stages with advanceOn=any take a
       // 'kill' for convenience.
@@ -458,22 +480,23 @@ describe('Quest progression audit', () => {
         },
       } : s));
 
-      // Turn-in — record pre-state to verify TC + rep deltas.
+      // Turn-in. Calling it is still right for every quest that waits to be handed in;
+      // for one already completed by its final stage advance it is a harmless no-op.
       const pBefore = store.getState().player!;
-      const tcBefore = pBefore.tc;
-      const repBefore = pBefore.factionStanding.find((r) => r.factionId === q.factionId)?.standing ?? 0;
       store.getState().turnInFactionQuest(q.id);
       const pAfter = store.getState().player!;
       const inCompleted = (pAfter.completedFactionQuestIds ?? []).includes(q.id);
       const stillActive = (pAfter.activeFactionQuestIds ?? []).includes(q.id);
-      const tcDelta = pAfter.tc - tcBefore;
+      // ⚠ Deltas measured from ACCEPT, so the reward counts wherever in the flow it was
+      // credited. See the note at the accept-time snapshot above for why.
+      const tcDelta = pAfter.tc - tcAtAccept;
       const repAfter = pAfter.factionStanding.find((r) => r.factionId === q.factionId)?.standing ?? 0;
-      const repDelta = repAfter - repBefore;
+      const repDelta = repAfter - repAtAccept;
       if (!inCompleted || stillActive || tcDelta < q.reward.tc || repDelta < q.reward.rep) {
         const recAtTurnIn = (pBefore.activeFactionQuests ?? []).find((r) => r.id === q.id);
         turnInFailures.push({
           id: q.id, title: q.title, kind: 'fq',
-          reason: `turn-in failed: completed=${inCompleted}, stillActive=${stillActive}, tcDelta=${tcDelta}/${q.reward.tc}, repDelta=${repDelta}/${q.reward.rep}, stage=${recAtTurnIn?.stage ?? '?'}/${(q.stages ?? []).length}`,
+          reason: `turn-in failed: completed=${inCompleted}, stillActive=${stillActive}, tcDelta=${tcDelta}/${q.reward.tc} (from accept), repDelta=${repDelta}/${q.reward.rep} (from accept), stage=${recAtTurnIn?.stage ?? '?'}/${(q.stages ?? []).length}`,
         });
       }
     }

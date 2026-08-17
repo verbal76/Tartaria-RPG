@@ -116,33 +116,51 @@ describe('OTA-1323 — a routed tower explains its own absence', () => {
     }
   });
 
-  it('⚠⚠ ARRIVING IN THE HUB: the look says the spire is outside the walls', () => {
+  // ⚠⚠ OTA-1334 SUPERSEDED THE ASGARDAR HALF OF THIS SUITE — AND THAT IS THE GOOD OUTCOME.
+  //
+  // These two cases used to read "ARRIVING IN THE HUB: the look says the spire is outside
+  // the walls" and "…and leaving the outpost actually produces the climb it promised". Both
+  // existed because the Asgardar climb was anchored on the CITY, and the city is an outpost:
+  // you set a course for a 14-tier tower, arrived inside a hub room, and the narration had
+  // to apologise for the landmark not being where it had just sent you. OTA-1323 built that
+  // apology, and it was the right answer to the arrangement that existed.
+  //
+  // The tower has its own tile now. There is no hub to arrive into and nothing to apologise
+  // for. So the honest move is not to keep the workaround green — it is to assert the
+  // arrangement that made the workaround unnecessary, and to keep a guard pointed at the
+  // failure it protected against, so nobody quietly re-creates it.
+  it('⚠⚠ OTA-1334: routing to the spire lands you AT the spire — no hub, no apology', () => {
     unlockAll();
     const asg = GREAT_CLIMBS.find((c) => c.id === 'asgardar_spire')!;
+    expect(asg.locationId).toBe('grand_spire_of_asgardar');
     useGameStore.getState().travelTo(asg.locationId);
     parkMainQuest();
     clearHostiles();
     const p = useGameStore.getState().player!;
-    // The measured arrival state: a hub room, hence no prop.
-    expect(p.hubRoomId).toBeTruthy();
-    const txt = lookText();
-    expect(txt).toContain(asg.noun);
-    expect(txt.toLowerCase()).toContain('outside the walls');
-  });
-
-  it('⚠⚠ ...and leaving the outpost actually produces the climb it promised', () => {
-    const asg = GREAT_CLIMBS.find((c) => c.id === 'asgardar_spire')!;
-    parkMainQuest();
-    clearHostiles();
-    useGameStore.getState().submitPlayerAction('leave outpost');
-    clearHostiles();
-    const p = useGameStore.getState().player!;
+    // Open ground, not an outpost interior. That is the whole difference.
     expect(p.hubRoomId).toBeFalsy();
     const sc = useGameStore.getState().currentScene!;
     const nouns = sc.displayedAmbientNouns ?? sc.ambientNouns ?? [];
     expect(nouns.some((n) => n.toLowerCase() === asg.noun.toLowerCase())).toBe(true);
-    // ⚠ The line must NOT still be claiming the spire is elsewhere.
-    expect(lookText().toLowerCase()).not.toContain('outside the walls');
+    const txt = lookText();
+    expect(txt).toContain(asg.noun);
+    // ⚠ The apology must be GONE, not merely unread. If this string ever comes back it
+    // means something re-anchored the climb onto a hub tile.
+    expect(txt.toLowerCase()).not.toContain('outside the walls');
+  });
+
+  it('⚠ the capital no longer advertises a climb it cannot deliver', () => {
+    // The other half of the move. Asgardar is still an outpost and still a Lost Capital; it
+    // simply is not a climbing landmark any more. Were the anchor ever dragged back onto the
+    // city, the spire would start appearing as a prop two tiles from any tower — which is
+    // exactly the "reads as the chart having lied" symptom this whole seam exists to stop.
+    unlockAll();
+    useGameStore.getState().travelTo('asgardar');
+    parkMainQuest();
+    clearHostiles();
+    const sc = useGameStore.getState().currentScene!;
+    const nouns = (sc.displayedAmbientNouns ?? sc.ambientNouns ?? []).map((n) => n.toLowerCase());
+    expect(nouns).not.toContain('the grand spire of asgardar');
   });
 
   it('⚠⚠ ARRIVING INTO A FIGHT: the look says the climb is here but not while something is on you', () => {

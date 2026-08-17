@@ -50,7 +50,13 @@ import {
   hubRoomMinimapCoord,
   OUTPOST_ATLAS_COORD,
   LOCATION_ATLAS_COORDS,
+  ATLAS_PIXEL_W,
+  ATLAS_PIXEL_H,
 } from '../engine/atlasCoords';
+import {
+  atlasLabelLayout, atlasVisualFraction,
+  LABEL_FONT_PX, LABEL_LINE_PX, LABEL_BOX_SAFETY,
+} from '../engine/atlasLabels';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation, HIDDEN_LOCATIONS } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { openContractMarkers, type ContractFamily } from '../engine/contractMarkers';
@@ -123,21 +129,63 @@ function describeWhereabouts(locId: string, locs: Location[]): string {
   return (regionPart + nearPart).trim();
 }
 
-// Atlas asset's pixel dimensions — used to compute the letterboxed
-// image rect inside the flex-filled imageBox.
-// arb97 — new commissioned atlas art (assets/world-atlas.png) is 1774×887
-// (2.0:1), replacing the old 1408×768 (1.83:1) hand-drawn map. The dot math
-// is aspect-driven, so these MUST match the live asset's real dimensions.
-const ATLAS_W = 1774;
-const ATLAS_H = 887;
-// arb102 — the atlas art reserves its leftmost stripe for the title/legend
-// cartouche ("TARTARIA") — there's no ground there. Treat the horizontal as a
-// 92-column field whose left 10 columns are that legend, and squeeze overlay
-// marker fractions into the remaining ground band so a pin never lands on it.
-// Visual-only (the gameplay grid + distances are untouched); the right edge is
-// anchored so correctly-placed right-side pins barely move.
-const ATLAS_LEGEND_FRAC = 10 / 92;
-const insetGroundFx = (fx: number): number => ATLAS_LEGEND_FRAC + fx * (1 - ATLAS_LEGEND_FRAC);
+// Atlas asset's pixel dimensions — used to compute the letterboxed image rect inside the
+// flex-filled imageBox.
+//
+// ⚠⚠ OTA-1335 — THESE ARE NO LONGER TYPED OUT HERE. They used to be two local literals with
+// a comment saying they "MUST match the live asset's real dimensions" — a rule with nothing
+// enforcing it, on an asset that has now been replaced twice (1408×768 → 1774×887 →
+// 1619×971). A stale ratio does not throw; it silently slides every marker off the landmark
+// it is meant to be standing on. One exported number now, owned by the module that owns the
+// coordinate system.
+const ATLAS_W = ATLAS_PIXEL_W;
+const ATLAS_H = ATLAS_PIXEL_H;
+
+// Solved once at module load — the catalogue cannot change at runtime, so re-running the
+// placement solver on every render would be pure waste.
+const ATLAS_LABELS = atlasLabelLayout();
+
+// ⚠⚠ PINS MUST MOVE WITH THE NAMES. The overlay nudges a place's DRAWN position onto its
+// painted silhouette (see atlasLabels.ts for why the artwork and the data disagree). If the
+// "?" and "◆" markers kept using the raw grid position, a contract pin would sit up to a
+// tile away from the very name it belongs to — two marks for one place, in two places.
+//
+// Event and contract markers are keyed by CELL, not by location id, so this reverses the
+// mapping once at module load: canonical cell → the location that owns it. A cell with no
+// owner (a whisper target born at an arbitrary spot) simply falls through to the grid
+// position, which is correct — there is no silhouette for it to sit on.
+const CELL_TO_LOCATION: Record<string, string> = (() => {
+  const m: Record<string, string> = {};
+  for (const id of Object.keys(LOCATION_ATLAS_COORDS)) {
+    const c = canonicalCellFor(id);
+    m[`${c.x},${c.y}`] = id;
+  }
+  return m;
+})();
+
+/** Where a marker at this cell should be DRAWN. Never used for distance or routing. */
+function markerFraction(x: number, y: number): { fx: number; fy: number } {
+  const id = CELL_TO_LOCATION[`${x},${y}`];
+  if (id) {
+    const a = LOCATION_ATLAS_COORDS[id]!;
+    return atlasVisualFraction(id, a.fx, a.fy);
+  }
+  return cellToAtlasFraction(x, y);
+}
+
+// ⚠⚠ THE LEGEND INSET IS GONE, AND DELETING IT WAS MANDATORY — NOT A TIDY-UP.
+//
+// arb102 added `ATLAS_LEGEND_FRAC = 10/92`, which squeezed every overlay marker rightwards
+// so no pin landed on the "TARTARIA" title cartouche painted down the left edge of the
+// previous artwork. Correct then. The redrawn atlas has no cartouche — the spec that
+// commissioned it says so in as many words: no legend, no title, no text of any kind
+// anywhere in the image. Leaving the inset in would have shifted every marker on the map
+// EAST by 10.9% of the map width — 176 px on a 1619-wide canvas, roughly four grid tiles.
+//
+// Nothing would have thrown. Every pin would simply have been in the wrong place, on the one
+// screen whose entire job is telling the player where things are: the kind of defect that
+// ships, gets reported as "the map feels off", and takes a week to trace. Marker fractions
+// are now used raw, exactly as `cellToAtlasFraction` computes them.
 
 // arb99 — the world atlas, plus per-faction outpost INTERIOR maps. When the
 // player is inside their outpost the Map screen shows that faction's interior;
@@ -536,6 +584,8 @@ export function MapScreen() {
   // shows its number ("3◆"). Keeps the map uncluttered — the per-contract numbers
   // live on the Contracts cards.
   const contractMarkerStyles: { key: string; label: string; left: number; top: number }[] = [];
+  // OTA-1335 — resolved place-name labels for the new (lettering-free) atlas art.
+  const nameLabelStyles: { id: string; lines: string[]; left: number; top: number; width: number }[] = [];
   // arb101 — overlay-label scale. The atlas's own painted labels shrink with the
   // contain-fit; a constant-size overlay would dwarf them. labelScale = rendered
   // width ÷ atlas natural width keeps overlay text proportional to the art at the
@@ -587,17 +637,45 @@ export function MapScreen() {
         top: offsetY + renderedH * hm.fy - HM_LABEL_H / 2,
       };
     }
+    // ⚠⚠ OTA-1335 — THE NAME OVERLAY. The redrawn atlas carries NO lettering: every place
+    // name a player used to read on this screen was painted into the previous artwork, and
+    // the only name the game itself has ever drawn is the Hidden Market's, just above. So
+    // without this loop the new map is a beautiful anonymous ruin-field.
+    //
+    // ⚠ Positions come from `atlasLabelLayout()`, which solves all 37 at once in atlas-pixel
+    // space and returns fractions — so a name never lands on another name or on another
+    // landmark's pin, and the same layout holds at every zoom on every screen. The Hidden
+    // Market is deliberately NOT in that set: it keeps its own reveal-gated "?" → name
+    // behaviour, which is a different rule (you have to find it first).
+    if (!showingOutpost) {
+      for (const l of ATLAS_LABELS) {
+        nameLabelStyles.push({
+          id: l.id,
+          lines: l.lines,
+          // ⚠⚠ THE BOX IS DRAWN WIDER THAN THE SOLVED TEXT WIDTH ON PURPOSE. It was drawn at
+          // exactly the solved width in the first cut, and because that width came from an
+          // UNDER-estimate of the font's real advance, React Native re-wrapped the
+          // already-wrapped lines to fit — snapping words in half ("Giant-Wat / ch /
+          // Shrine") and turning two-line names into three, which then collided with
+          // neighbours the solver believed it had cleared. The slack is transparent and
+          // non-interactive; only the solved width governs spacing.
+          left: offsetX + renderedW * l.lx - (l.wFrac * LABEL_BOX_SAFETY * renderedW) / 2,
+          top: offsetY + renderedH * l.ly - (l.hFrac * renderedH) / 2,
+          width: l.wFrac * LABEL_BOX_SAFETY * renderedW,
+        });
+      }
+    }
     if (!showingOutpost) {
       for (const ev of canonLocations ?? []) {
         if (ev.marker !== 'pending' && ev.marker !== 'done') continue;
         const cell = (typeof ev.gx === 'number' && typeof ev.gy === 'number')
           ? { x: ev.gx, y: ev.gy }
           : canonicalCellFor(ev.id);
-        const f = cellToAtlasFraction(cell.x, cell.y);
+        const f = markerFraction(cell.x, cell.y);
         eventMarkerStyles.push({
           id: ev.id,
           kind: ev.marker,
-          left: offsetX + renderedW * insetGroundFx(f.fx) - HM_LABEL_W / 2,
+          left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
           top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
         });
       }
@@ -611,11 +689,11 @@ export function MapScreen() {
         else byCell[cellKey] = { x: cm.x, y: cm.y, count: 1, sole: cm.number };
       }
       for (const [cellKey, v] of Object.entries(byCell)) {
-        const f = cellToAtlasFraction(v.x, v.y);
+        const f = markerFraction(v.x, v.y);
         contractMarkerStyles.push({
           key: cellKey,
           label: v.count > 1 ? `◆×${v.count}` : `${v.sole}◆`,
-          left: offsetX + renderedW * insetGroundFx(f.fx) - HM_LABEL_W / 2,
+          left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
           top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
         });
       }
@@ -707,6 +785,28 @@ export function MapScreen() {
             accessibilityRole="image"
             accessibilityLabel={showingOutpost ? 'Outpost interior map' : 'World atlas map'}
           />
+          {/* ⚠⚠ OTA-1335 — PLACE NAMES. Drawn UNDER every pin and glyph below, on purpose:
+              a name is context, a marker is information, and when the two land close
+              together the marker has to win. Positions are solved in atlasLabels.ts. */}
+          {nameLabelStyles.map((l) => (
+            <View
+              key={`name_${l.id}`}
+              pointerEvents="none"
+              style={[styles.nameLabelWrap, { left: l.left, top: l.top, width: l.width }]}
+            >
+              <Text
+                style={[
+                  styles.nameLabel,
+                  {
+                    fontSize: Math.max(3, LABEL_FONT_PX * labelScale),
+                    lineHeight: Math.max(3.5, LABEL_LINE_PX * labelScale),
+                  },
+                ]}
+              >
+                {l.lines.join('\n')}
+              </Text>
+            </View>
+          ))}
           {/* OTA-498 — the Hidden Market. It has no icon painted into the atlas
               art, so this overlay both marks it and explains the blank: a
               stylized "?" pinned to its fixed coord (right of the frontier camps,
@@ -721,8 +821,12 @@ export function MapScreen() {
                 <Text
                   style={[
                     styles.hiddenMarketName,
-                    // arb104 — shrunk a further 15% on player request (30→25.5).
-                    { fontSize: Math.max(4.25, 25.5 * labelScale), lineHeight: Math.max(5.1, 28 * labelScale) },
+                    // arb104 shrank this to 25.5 on player request, back when it was the ONLY
+                    // name the game drew and every other name was painted into the art.
+                    // ⚠ OTA-1335 — it now sits among 37 sibling labels, so keeping it at its
+                    // old size would leave one name towering over every other place on the
+                    // map. It takes the shared type size; only its reveal behaviour is special.
+                    { fontSize: Math.max(3, LABEL_FONT_PX * labelScale), lineHeight: Math.max(3.5, LABEL_LINE_PX * labelScale) },
                   ]}
                 >
                   The Hidden{'\n'}Market
@@ -1035,6 +1139,27 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: MARKER_W,
     height: MARKER_H,
+  },
+  // OTA-1335 — place-name label. Height is intentionally unset: the box is sized by its own
+  // text so a two-line name is not clipped, and the solver already reserved room for it.
+  nameLabelWrap: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  nameLabel: {
+    // ⚠ Matches the Hidden Market label's palette and weight exactly. That label's size was
+    // tuned twice by the owner on the old art, so it is the settled house style for text on
+    // this screen — the overlay should read as one set of names, not two.
+    color: '#f0d27a',
+    fontWeight: '700',
+    letterSpacing: 0.3,
+    textAlign: 'center',
+    // The art beneath runs from pale silt to near-black, so the shadow is doing real work
+    // here: it is what keeps a name legible over both the green north and the molten south.
+    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
   // OTA-498 — Hidden Market "?" / name overlay (pinned to its atlas coord).
   hiddenMarketWrap: {
