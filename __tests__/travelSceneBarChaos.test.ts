@@ -287,6 +287,10 @@ describe('travel + scene-bar truthfulness chaos (OTA-126 / OTA-127)', () => {
     } catch { /* unrelated weather bug — already captured */ }
     const label = store.getState().currentScene?.transitArea ?? null;
     expect(label).not.toBe('near Somewhere Stale');
-    if (label != null) expect(String(label)).toMatch(/^near /);
+    // OTA-1344 — the fresh label is tiered now: an Outskirts ring, a road name,
+    // or one of the five lore wilds names — never the old flat "near X".
+    if (label != null) {
+      expect(String(label)).toMatch(/( Outskirts$)|(^The road to )|(^The (Frontier Silt|Drowned Reaches|Eastern Mud|Southern Badlands|Deep Wastes)$)/);
+    }
   });
 });
