@@ -33183,6 +33183,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? `You scrape off the old ${replaced.label.toLowerCase()} layer and work the ${coatItem.name.toLowerCase()} into the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`
           : `You work the ${coatItem.name.toLowerCase()} along the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`,
     );
+    // ⚠ OTA-1338 — ACID JOINS THE LORE. Owner: *"we could work acid somehow into
+    // the lore"* — the sketch he liked was a vendor topic + an Arbiter line + the
+    // flask description. This is the Arbiter line: the FIRST time a character
+    // paints an acid coat, the Arbiter says where the bile comes from. Once per
+    // save (worldMemory.acidLoreIntroShown), same one-shot pattern as OTA-877.
+    if (spec.kind === 'acid' && !get().worldMemory?.acidLoreIntroShown) {
+      get().appendLog(
+        'arbiter',
+        `"Battery bile," the Arbiter says, watching the edge darken. "The old world stored its lightning in acid — jar-batteries taller than a house, vault floors full of them. The flood shorted the lightning out and left the bile keeping for a thousand years. Down here everything is either preserved by the mud or eaten by what leaked into it. Now your blade gets a say in which."`,
+      );
+      set((s2) => ({ worldMemory: { ...s2.worldMemory, acidLoreIntroShown: true } }));
+    }
     // OTA-707 — persist the freshly-painted coating; the action had no explicit save,
     // so a hard-quit before the next auto-persist lost the coating.
     void get().persist();

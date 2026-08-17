@@ -2049,6 +2049,11 @@ export interface WorldMemory {
    *  any standing change is logged, so the brief "what is faction standing" note
    *  (appended by logRepChanges) fires exactly once per save. */
   factionRepIntroShown?: boolean;
+  /** OTA-1338 — one-time acid-lore beat: the first acid coat a character paints,
+   *  the Arbiter says where battery bile comes from (owner: "we could work acid
+   *  somehow into the lore"). Absent = not yet told — legacy and fresh saves are
+   *  both eligible exactly once, so no migrate default is needed. */
+  acidLoreIntroShown?: boolean;
   /** arb-fix — announce-once ledger for earned titles. Storm titles are awarded
    *  mid-action (weather tick); later stale-`player` writebacks in the same
    *  action revert earnedTitles, so the "You have earned a name to carry" banner

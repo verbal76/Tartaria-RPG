@@ -1075,6 +1075,9 @@ it and states what was checked to rule out a consumer elsewhere.
     line — *"many people view you differently now"* — plus threshold-only lines when a tier is actually
     crossed. He agreed to drop the "just organize the wall better" alternative (*"we still get a wall of
     text, it's just more organized"*). Gated behind the ladder above.
+  - **✅ SHIPPED — OTA-1338 (2026-08-17, same greenlight).** Battery bile from the drowned jar-batteries:
+    Halem topic + one-shot Arbiter line at the first acid coat (worldMemory.acidLoreIntroShown) + flask
+    description rewrite, mechanics sentence untouched. Original entry:
   - **Acid lore.** Owner: *"we could work acid somehow into the lore."* Sketch he liked: a vendor topic +
     an Arbiter line + an Acid Flask description rewrite. Not scheduled.
   - **Mud monster memory.** Owner tried to preempt a mud fight from a remembered beat — *"you examine the
