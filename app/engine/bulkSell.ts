@@ -77,3 +77,22 @@ export function planCommonGearSale(sellable: readonly BulkSellCandidate[]): Bulk
   const total = rows.reduce((n, r) => n + r.price * Math.max(1, r.item.quantity ?? 1), 0);
   return { rows, count, total };
 }
+
+/** ⚠ OTA-1344 — PUNCHLIST-BRAVO B5: THE SWEEP'S HOLD-BACKS ARE SAID OUT LOUD.
+ *  OTA-1320 excludes a last gate-satisfier (your only breathing mask, your only
+ *  climbing kit) from SELL ALL COMMON GEAR — correctly — but the confirm never
+ *  said so, and a hold-out nobody explains reads as the button refusing to work.
+ *  This builds the one line the confirm appends (shape per the owner's proposed
+ *  wording: "1 piece held back — your only way to breathe toxic air."). Pure;
+ *  returns null when nothing was held. */
+export function bulkSellHeldBackNote(
+  held: readonly { name: string; label: string }[],
+): string | null {
+  if (held.length === 0) return null;
+  if (held.length === 1) {
+    const h = held[0]!;
+    return `1 piece held back — the ${h.name} is your only way to ${h.label}.`;
+  }
+  const parts = held.map((h) => `the ${h.name} (your only way to ${h.label})`);
+  return `${held.length} pieces held back — ${parts.join(', ')}.`;
+}

@@ -9,7 +9,7 @@ import { getItemPreview, getItemPreviewForInstance } from '../components/itemPre
 import { validSlotsForItem, SLOT_LABEL, equippedInstanceIds, effectiveStats } from '../engine/equipment';
 import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
-import { planCommonGearSale } from '../engine/bulkSell'; // OTA-1310 — one-tap Common gear clear-out
+import { planCommonGearSale, bulkSellHeldBackNote } from '../engine/bulkSell'; // OTA-1310 — one-tap Common gear clear-out
 import { vendorPriceMod } from '../engine/factionRapport';
 import { getStanding } from '../engine/factions'; // OTA-1336 — the ladder reaches the display too
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
@@ -395,6 +395,12 @@ export function VendorScreen() {
   // was in the sweep. A SPARE copy still sells (gateLossFor is null when quantity
   // > 1 or another gate-satisfier exists); only the last one is held out.
   const bulkSellable = sellable.filter(({ item }) => !gateLossFor(item.name));
+  // ⚠ OTA-1344 — B5: what that filter just held out of the sweep, NAMED, so the
+  // confirm can say it instead of letting a held-out mask read as a broken
+  // button. Narrowed to rows the plan would otherwise have sold (Common gear).
+  const bulkHeldBack = planCommonGearSale(
+    sellable.filter(({ item }) => !!gateLossFor(item.name)),
+  ).rows.map((r) => ({ name: r.item.name, label: gateLossFor(r.item.name)!.label }));
   const sellableById = new Map(sellable.map((row) => [row.item.id, row]));
   const selectedRows = sellSelected
     .map((id) => sellableById.get(id))
@@ -1015,7 +1021,7 @@ export function VendorScreen() {
               // NOT in the sweep, because a player who cannot see the boundary
               // has to take it on trust — and Common covers rations, scrap and
               // Aether Dust, which this must never touch.
-              ? `+${pending.total} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.total} TC\n\nWeapons and armor only, unequipped, Common rarity. Consumables, crafting materials and anything you forged at the Crucible are left alone.`
+              ? `+${pending.total} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.total} TC\n\nWeapons and armor only, unequipped, Common rarity. Consumables, crafting materials and anything you forged at the Crucible are left alone.${bulkSellHeldBackNote(bulkHeldBack) ? `\n\n⚠ ${bulkSellHeldBackNote(bulkHeldBack)}` : ''}`
             : pending?.mode === 'sell'
               ? (pendingGateLoss
                   ? `Price: +${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.price} TC\n\n⚠ This is your ONLY way to ${pendingGateLoss.label}. Selling it leaves you with no other tool that satisfies the gate — actions that need it will refuse until you find or craft a replacement.`
