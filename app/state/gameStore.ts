@@ -17849,7 +17849,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!parsed.resolvedItemId
             && (currentScene?.enemies.length ?? 0) > 0
             && (currentScene?.enemyHps ?? []).some((h, i) => h > 0 && !(currentScene?.enemyKnockedOut?.[i]))) {
-          get().appendLog('arbiter', `The Arbiter does not look away from the fight. "Rest? Nothing here has agreed to that. Deal with what's in front of you, or put real ground between you first."`);
+          // ⚠ OTA-1347 — REFUSALS ALWAYS SPEAK. Without skipDedup, the arbiter
+          // repeat-dedup (OTA-610) swallowed this line from the SECOND identical
+          // refusal on: a player mashing REST mid-fight got one answer and then
+          // dead silence — the exact "dead button" read the hold-back note
+          // (OTA-1344) exists to prevent. Found via B15: the movement sim wedged
+          // on this refusal and could not even SEE it refusing. A refusal is a
+          // direct answer to a player action, not ambient chatter — it must
+          // reach the player every single time.
+          get().appendLog('arbiter', `The Arbiter does not look away from the fight. "Rest? Nothing here has agreed to that. Deal with what's in front of you, or put real ground between you first."`, { skipDedup: true });
           break;
         }
         // If the player resolved a consumable inventory item (e.g. "eat ration"),
