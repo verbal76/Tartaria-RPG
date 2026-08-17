@@ -45,9 +45,15 @@ describe('OTA-922 — Uncommon/Rare armor clears the old scrap floor', () => {
   });
 });
 
-describe('OTA-922 — weapons and unresolved armor keep the flat floor', () => {
-  it('a Common weapon still caps at the flat RARITY_BUY_FLOOR (5)', () => {
-    expect(sellPriceFor(inv('Cudgel', 'Common', 'weapon'), null, 0)).toBeLessThanOrEqual(5);
+describe('OTA-922/1335 — weapons price against their own catalog tc; unresolved gear keeps the flat floor', () => {
+  it('⚠ OTA-1340 — a Common weapon caps at 0.8 × its OWN tc, not the flat 5', () => {
+    // This used to assert the flat 5 TC clamp — the exact defect the owner
+    // reported ("I sold 11 items. I got 81 TC"). A Cudgel lists at tc 25, so its
+    // cheapest realistic buy is 20, and its resale caps there rather than at the
+    // bonus-less floor. The no-arbitrage invariant is asserted per-piece above.
+    const price = sellPriceFor(inv('Cudgel', 'Common', 'weapon'), null, 0);
+    expect(price).toBeGreaterThan(5);
+    expect(price).toBeLessThanOrEqual(20); // 0.8 × tc 25
   });
 
   it('a fused/renamed armor not in the catalog falls back to the flat floor', () => {

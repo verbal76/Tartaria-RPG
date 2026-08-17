@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.233';
+export const DISPLAY_VERSION = '4.29.234';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24097,7 +24097,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // not content, so both towers stand: Grand Spire of Asgardar (14 tiers, Cuirass) and Grand
 // Spire of Etheria (15, Crown). ota1333 pins 5 climbs / 5 pieces so nobody merges them by
 // accident. New suite ota1333 (6). DISPLAY_VERSION 4.29.227.
-export const OTA_BUILD_ID = '2026-08-17-1339-the-live-testing-six-port';
+export const OTA_BUILD_ID = '2026-08-17-1340-commons-sell-for-what-they-are';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-17-1339-the-live-testing-six-port';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-17-1338-map-makeover-audit-port';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1332-tribute-happens-at-the-vault';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1331-storylines-and-p19-closed';
