@@ -40007,7 +40007,7 @@ function narrateCasualLook(
   // a routed arrival at all five great climbs: the landmark prop is injected into
   // the scene only when the chart is unlocked AND you are not in a hub room AND the
   // tile has no live enemies. Two of those five arrivals came up empty on the first
-  // frame — `asgardar` puts you at `outpost_gate` (the Buried Spire stands outside
+  // frame — `asgardar` puts you at `outpost_gate` (the Grand Spire of Asgardar stands outside
   // the wall), and `obsidian_pillars` rolled a hostile, which suppresses the prop
   // outright.
   //

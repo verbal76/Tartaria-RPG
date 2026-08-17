@@ -57,12 +57,23 @@ export const GREAT_CLIMBS: readonly GreatClimb[] = [
   {
     id: 'asgardar_spire',
     locationId: 'asgardar',
-    noun: 'the Buried Spire of Asgardar',
-    tokens: ['asgardar'],
+    // ⚠ OWNER, 2026-08-17: *"change all names to grand spire not buried."* The tower at
+    // the capital is the GRAND Spire of Asgardar. "Buried" is gone from every player-facing
+    // string; only the historical OTA notes in buildInfo keep the old name, because those
+    // are a record of what shipped and rewriting them would make the ledger lie.
+    noun: 'the Grand Spire of Asgardar',
+    // ⚠⚠ TOKENS NAME THE SPIRE, NOT THE CITY. The old token list was `['asgardar']` alone,
+    // which under-matched in the one way that mattered: `asgardar`'s own interactable list
+    // LEADS with the bare noun `spire`, so a player standing in the capital who typed
+    // "climb the spire" matched neither great climb and fell through to a generic 3-tier
+    // ascent at a 14-tier landmark — the symptom the OTA-1304 seam already describes as
+    // "reads as the chart having lied". `greatClimbFor` also takes a locationId and refuses
+    // a cross-tile match, so spire-shaped tokens cannot leak to the Grand Spire of Etheria.
+    tokens: ['grand spire of asgardar', 'spire of asgardar', 'asgardar'],
     tiers: 14,
     rewardArmor: 'Skyreacher Cuirass',
     summitFlavor:
-      'You haul over the last lip of the buried capital\'s crown-spire. A giant-forged cuirass hangs from a broken standard here, sized down by some old hand for a climber — plate that has watched Asgardar sink for a very long time.',
+      'You haul over the last lip of the Grand Spire of Asgardar. A giant-forged cuirass hangs from a broken standard here, sized down by some old hand for a climber — plate that has watched Asgardar sink for a very long time.',
   },
   {
     id: 'obsidian_monolith',
@@ -215,7 +226,7 @@ export const SUMMIT_BOSSES: readonly SummitBoss[] = [
     climbId: 'asgardar_spire',
     base: {
       name: 'Draugveil, the Drowned Warden',
-      flavor: "The warden of Asgardar's buried spire, caked in a thousand years of mud, its collector-heart still turning behind its ribs.",
+      flavor: "The warden of the Grand Spire of Asgardar, caked in a thousand years of mud, its collector-heart still turning behind its ribs.",
       type: 'Automation',
       abilityPoint: 'Strength 9',
       attack: 'Silt-Hammer',
@@ -227,7 +238,7 @@ export const SUMMIT_BOSSES: readonly SummitBoss[] = [
       aliases: ['draugveil', 'drowned warden', 'warden'],
       traits: ['armored', 'slow', 'savage', 'fast_regen', 'resist:slashing', 'resist:piercing', 'vulnerable:acid'],
     },
-    approachLine: 'The buried spire\'s crown breaks the silt-line, and something rises with it — DRAUGVEIL, the Drowned Warden, caked in a thousand years of Asgardar\'s mud, its collector-heart still turning behind its ribs.',
+    approachLine: 'The Grand Spire of Asgardar\'s crown breaks the silt-line, and something rises with it — DRAUGVEIL, the Drowned Warden, caked in a thousand years of Asgardar\'s mud, its collector-heart still turning behind its ribs.',
     defeatLine: 'Draugveil sinks back into the silt it climbed out of, its heart going dark at last.',
   },
   {
