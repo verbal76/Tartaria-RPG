@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.226';
+export const DISPLAY_VERSION = '4.29.227';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24063,7 +24063,42 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ⚠ The existing questProgressionAudit walked this quest around a ring of convenient tiles
 // and so hit the new gate — the harness standing still again, not a regression. It now
 // makes its last hop to the place the quest names. DISPLAY_VERSION 4.29.226.
-export const OTA_BUILD_ID = '2026-08-16-1332-tribute-happens-at-the-vault';
+// ⚠⚠ OTA-1333 — THE ★ CLIMB BUTTON, AND THE SPIRE LOSES THE WORD "BURIED". Owner: *"when
+// you land on the tile, beginning the climb should be a button like summon the guardian.
+// and it should only be visible if you have that particular map and used it to mark the
+// location. change all names to grand spire not buried."*
+//
+// (1) THE BUTTON. Before this, the ONLY way into a 14- or 15-tier great climb was to type
+// the tower's full canonical name. Measured while staging Wave Three: `asgardar`'s own
+// interactable list LEADS with the bare noun `spire`, and "climb the spire" there matched
+// NEITHER great climb — it fell through to a generic 3-tier scramble at a 14-tier landmark,
+// which is verbatim the symptom the OTA-1304 seam already describes as "reads as the chart
+// having lied". ★ CLIMB is built to the ★ SUMMON rule: an affordance that appears exactly
+// when the action behind it would succeed, and is absent otherwise. It submits the CANONICAL
+// NOUN rather than calling a private entry point, so it walks the same parser → climb path
+// a typed name walks and cannot skip the strap gate, the height rules, or the guaranteed
+// Skyreacher drop.
+//
+// ⚠ THE GATE IS THE CHART, as asked and as OTA-912 already defines it:
+// `worldMemory.unlockedGreatClimbs` only carries a climb id once its Skyreacher Chart has
+// been USED from the pack. Owning the map is not enough — it has to have been read. Plus the
+// three conditions that mirror beginScene's own prop gate (outdoors, nothing hostile, on the
+// climb's tile), so the button and the climbable noun can never disagree.
+//
+// (2) THE RENAME settles W3-A of WAVE-THREE.md: the tower at the capital is the GRAND Spire
+// of Asgardar. "Buried" is gone from the climb noun, the summit flavour, the Draugveil
+// approach line, Skyreacher Chart 2 and the Skyreacher Cuirass description. ⚠ Only the
+// historical OTA notes in this file keep the old name — rewriting a shipped ledger entry
+// would make the ledger lie about what players received.
+//
+// ⚠⚠ THE RENAME DELIBERATELY DID NOT MERGE THE TWO SPIRES. The cheap reading of "make it
+// all the Grand Spire" is to fold Asgardar's tower into the Grand Spire of Etheria — which
+// would delete a great climb and one of five Skyreacher pieces. The owner asked about NAMES,
+// not content, so both towers stand: Grand Spire of Asgardar (14 tiers, Cuirass) and Grand
+// Spire of Etheria (15, Crown). ota1333 pins 5 climbs / 5 pieces so nobody merges them by
+// accident. New suite ota1333 (6). DISPLAY_VERSION 4.29.227.
+export const OTA_BUILD_ID = '2026-08-17-1333-climb-button-and-grand-spire';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1332-tribute-happens-at-the-vault';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1331-storylines-and-p19-closed';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1330-mysteries-the-same-way';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1329-every-hunt-doable';

@@ -1093,6 +1093,64 @@ export function ExplorationScreen() {
         );
       })()}
 
+      {/* ⚠⚠ OWNER, 2026-08-17: *"when you land on the tile, beginning the climb should be a
+          button like summon the guardian. and it should only be visible if you have that
+          particular map and used it to mark the location."*
+
+          The ★ CLIMB chip, built to the same rule as ★ SUMMON: an affordance that appears
+          exactly when the action behind it would succeed, and is absent otherwise. Before
+          this, the ONLY way into a 14-tier ascent was to type the tower's full canonical
+          name — and the capital's own object list leads with the bare noun "spire", which
+          matched neither climb and dropped the player into a generic 3-tier scramble.
+
+          ⚠ THE GATE IS THE CHART, exactly as the owner asked and exactly as OTA-912 already
+          defines it: `worldMemory.unlockedGreatClimbs` only contains a climb id once its
+          Skyreacher Chart has been USED from the pack. Owning the map is not enough; the
+          map has to have been read. Until then the landmark reads as an ordinary place and
+          no button appears — the discovery is still the reward.
+
+          ⚠ The other three conditions mirror the scene-prop gate in beginScene, so the
+          button and the climbable noun can never disagree: outdoors (no hubRoomId), nothing
+          hostile in the scene, and standing on the climb's own tile. */}
+      {(() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const GCL = require('../engine/greatClimbs') as typeof import('../engine/greatClimbs');
+        const climb = GCL.greatClimbForLocation(player?.currentLocationId);
+        if (!climb) return null;
+        const charted = (useGameStore.getState().worldMemory.unlockedGreatClimbs ?? []).includes(climb.id);
+        if (!charted) return null;
+        if (player?.hubRoomId) return null;
+        const hostile = (currentScene?.enemies ?? []).some(
+          (_e, i) => (currentScene?.enemyHps?.[i] ?? 0) > 0,
+        );
+        if (hostile) return null;
+        return (
+          <View style={styles.objectiveChip}>
+            <View style={styles.objectiveChipRow}>
+              <Text style={[styles.objectiveChipTitle, styles.objectiveChipBody]} numberOfLines={1}>
+                <Text style={styles.objectiveChipStar}>★ </Text>
+                <Text style={styles.objectiveChipLabel}>GREAT CLIMB · </Text>
+                {`${climb.noun} — ${climb.tiers} tiers`}
+              </Text>
+              <TouchableOpacity
+                style={styles.objectiveChipSummon}
+                // ⚠ Submits the canonical noun rather than calling a private climb entry
+                // point. That is deliberate: it walks the SAME parser → climb path a
+                // player typing the name walks, so the button cannot drift away from the
+                // typed route or skip the strap gate, the height rules, or the guaranteed
+                // Skyreacher drop.
+                onPress={() => { void useGameStore.getState().submitPlayerAction(`climb ${climb.noun}`); }}
+                activeOpacity={0.7}
+                hitSlop={8}
+                accessibilityRole="button"
+              >
+                <Text style={styles.objectiveChipSummonText}>★ CLIMB</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      })()}
+
       {/* arb166 — no trading mid-fight. The vendor stays in the scene (the
           banner returns once the enemies are down), but while a hostile is
           present the banner is hidden so the player can't step into the stall

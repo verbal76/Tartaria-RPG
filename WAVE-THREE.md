@@ -1,9 +1,11 @@
 # Wave Three — the Asgardar spires
 
-**Status: STAGED, NOT STARTED.** Owner: *"stage the next thing in the wave to work on,
+**Status: W3-A ANSWERED · W3-B + the button SHIPPED (OTA-1333) · W3-C/D/E open.** Owner: *"stage the next thing in the wave to work on,
 don't do it yet, but lay out the framework and explain what we are doing and why."*
 
-Nothing in this document has been applied. It is the plan and the measurements behind it.
+⚠ Originally staged as a plan-only document. W3-A and W3-B have since landed (OTA-1333) and
+are marked inline; the original framing is kept beneath each so the reasoning that produced
+the decision stays readable.
 
 ---
 
@@ -102,7 +104,22 @@ the city's name".
 Re-cut against the measurements. **Ordered so every step is shippable on its own** and the
 cheap, high-value work lands before anything risky.
 
-### W3-A — Decide the naming ⚠⚠ OWNER CALL, blocks everything else
+### W3-A — Decide the naming ✅ **ANSWERED, OTA-1333**
+> Owner, 2026-08-17: *"change all names to grand spire not buried."*
+
+Resolved as reading **(a)**, with one clarification the instruction did not cover and which
+was therefore NOT assumed: *"all names"* was read as a change to NAMES, not to content. The
+two towers still stand — **the Grand Spire of Asgardar** (14 tiers, Skyreacher Cuirass) and
+**the Grand Spire of Etheria** (15, Crown). Folding them into one would have deleted a great
+climb and a fifth of the Skyreacher set; `ota1333` pins 5 climbs / 5 pieces against it.
+
+⚠ **STILL OPEN, and the owner should look at it:** both towers are now "the Grand Spire
+of …", differing only in the final word, and both are associated with Asgardar (Etheria's
+spire carries `parent: asgardar` and sits two cells south). That is coherent — Etheria is the
+empire, Asgardar the city — but it may read as one tower named twice. If it does, the fix is
+a rename of the SECOND one, not a merge.
+
+### W3-A (original framing, kept for the record) — ⚠⚠ OWNER CALL, blocks everything else
 The only real question in this wave, and it is a lore question, not a code one:
 
 > **Asgardar's own great climb is "the Buried Spire of Asgardar". Its interior room and its
@@ -120,7 +137,15 @@ Two coherent answers, and they lead to different work:
 
 **No code until this is answered.** Everything below assumes (a).
 
-### W3-B — Make the natural noun work ⚠ the only actual bug here
+### W3-B — Make the natural noun work ✅ **SHIPPED, OTA-1333**
+Tokens now name the spire (`grand spire of asgardar`, `spire of asgardar`) alongside the
+original city token. ⚠ The bare noun `spire` was deliberately NOT added: it also appears in
+the interactables of `obsidian_pillars` and `zharaks_teeth`, and `greatClimbFor`'s own
+comment warns that a short generic token hijacks ordinary climbs. **The ★ CLIMB button is
+the discoverability answer instead** — it removes the need to guess a noun at all, which is
+what the owner asked for.
+
+### W3-B (original) — ⚠ the only actual bug here
 - **File:** `app/engine/greatClimbs.ts` (tokens only).
 - **What:** give `asgardar_spire` tokens that name the *spire* (`buried spire`, `crown-spire`,
   `buried spire of asgardar`) and keep `asgardar` for the chart-injected canonical noun.
@@ -144,7 +169,12 @@ Two coherent answers, and they lead to different work:
 - **Test:** no location, ladder room, or lore entry names the Grand Spire as being *inside*
   Asgardar.
 
-### W3-D — Skyreacher Chart 2 wording
+### W3-D — Skyreacher Chart 2 wording ✅ **DONE as part of the rename (OTA-1333)**
+It read *"the buried spire of Asgardar"*; it now reads *"the Grand Spire of Asgardar"*.
+(The staged note below predicted this would need no edit under reading (a) — the owner's
+rename instruction changed that.)
+
+### W3-D (original)
 - **File:** `app/data/items/gear.json` line ~1300. Current text: *"plots the route to the
   buried spire of Asgardar and opens its great climb."*
 - ⚠ Measured: **this is already correct** under reading (a). It says *buried* spire, and it
