@@ -53,7 +53,10 @@ import {
   ATLAS_PIXEL_W,
   ATLAS_PIXEL_H,
 } from '../engine/atlasCoords';
-import { atlasLabelLayout, LABEL_FONT_PX, LABEL_LINE_PX, LABEL_BOX_SAFETY } from '../engine/atlasLabels';
+import {
+  atlasLabelLayout, atlasVisualFraction,
+  LABEL_FONT_PX, LABEL_LINE_PX, LABEL_BOX_SAFETY,
+} from '../engine/atlasLabels';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation, HIDDEN_LOCATIONS } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { openContractMarkers, type ContractFamily } from '../engine/contractMarkers';
@@ -141,6 +144,34 @@ const ATLAS_H = ATLAS_PIXEL_H;
 // Solved once at module load — the catalogue cannot change at runtime, so re-running the
 // placement solver on every render would be pure waste.
 const ATLAS_LABELS = atlasLabelLayout();
+
+// ⚠⚠ PINS MUST MOVE WITH THE NAMES. The overlay nudges a place's DRAWN position onto its
+// painted silhouette (see atlasLabels.ts for why the artwork and the data disagree). If the
+// "?" and "◆" markers kept using the raw grid position, a contract pin would sit up to a
+// tile away from the very name it belongs to — two marks for one place, in two places.
+//
+// Event and contract markers are keyed by CELL, not by location id, so this reverses the
+// mapping once at module load: canonical cell → the location that owns it. A cell with no
+// owner (a whisper target born at an arbitrary spot) simply falls through to the grid
+// position, which is correct — there is no silhouette for it to sit on.
+const CELL_TO_LOCATION: Record<string, string> = (() => {
+  const m: Record<string, string> = {};
+  for (const id of Object.keys(LOCATION_ATLAS_COORDS)) {
+    const c = canonicalCellFor(id);
+    m[`${c.x},${c.y}`] = id;
+  }
+  return m;
+})();
+
+/** Where a marker at this cell should be DRAWN. Never used for distance or routing. */
+function markerFraction(x: number, y: number): { fx: number; fy: number } {
+  const id = CELL_TO_LOCATION[`${x},${y}`];
+  if (id) {
+    const a = LOCATION_ATLAS_COORDS[id]!;
+    return atlasVisualFraction(id, a.fx, a.fy);
+  }
+  return cellToAtlasFraction(x, y);
+}
 
 // ⚠⚠ THE LEGEND INSET IS GONE, AND DELETING IT WAS MANDATORY — NOT A TIDY-UP.
 //
@@ -640,7 +671,7 @@ export function MapScreen() {
         const cell = (typeof ev.gx === 'number' && typeof ev.gy === 'number')
           ? { x: ev.gx, y: ev.gy }
           : canonicalCellFor(ev.id);
-        const f = cellToAtlasFraction(cell.x, cell.y);
+        const f = markerFraction(cell.x, cell.y);
         eventMarkerStyles.push({
           id: ev.id,
           kind: ev.marker,
@@ -658,7 +689,7 @@ export function MapScreen() {
         else byCell[cellKey] = { x: cm.x, y: cm.y, count: 1, sole: cm.number };
       }
       for (const [cellKey, v] of Object.entries(byCell)) {
-        const f = cellToAtlasFraction(v.x, v.y);
+        const f = markerFraction(v.x, v.y);
         contractMarkerStyles.push({
           key: cellKey,
           label: v.count > 1 ? `◆×${v.count}` : `${v.sole}◆`,

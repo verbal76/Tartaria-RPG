@@ -1839,8 +1839,46 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ THE NAMES DID NOT SIT ON THE BUILDINGS, AND THE HAND-OFF DOCUMENT WAS WHY
+  (2026-08-17, latest). Golem OTA-1337.**
+  Owner, testing on device: *"the text size is good, but the locations shifted a bit."*
+  - ⚠⚠⚠ **THE ERROR WAS UPSTREAM OF ALL THE CODE — IT WAS IN THE SPEC I WROTE.** The pixel
+    table handed to the artist was SNAPPED TO A 60-PX LATTICE when I generated it. The game
+    pins at the true fractions. The two disagree by 0–2 grid rows, and the snap error
+    accumulates southward, so the north lines up and the south drifts. **A rounding
+    convenience in a document became a visible defect in a shipped screen.** When generating
+    coordinates for anyone else to build against, round-trip them back and diff before
+    sending — I had actually measured this drift earlier in the session and judged it
+    cosmetically irrelevant. It was not.
+  - **Measured, not guessed.** No image library is available, so the shipped PNG was decoded
+    in pure Python (zlib + PNG unfiltering) and an 8-px lattice scored for local darkness
+    plus edge energy — the silhouettes are dark high-contrast shapes on lighter ground.
+    Distance from each pin to the nearest painted structure: median 18 px, but 35–122 px
+    across the southern half.
+  - ⚠⚠ **THE FIX HAD TO BE DRAWING-ONLY.** `canonicalCellFor` derives a location's grid cell
+    — and therefore every travel distance — FROM its atlas fraction. One number doing two
+    jobs is precisely why this could not be fixed by editing the fractions: sliding a
+    landmark 30 px onto its silhouette would silently reprice the journey to it. New
+    `LABEL_ANCHOR_NUDGE` / `atlasVisualFraction()` are consulted when DRAWING and never when
+    computing distance, routing or cells.
+  - ⚠ **Capped and refused where it could not be honest.** 36 px cap (under one grid tile on
+    both axes) and no two landmarks may claim the same silhouette. 26 of 37 qualified;
+    **eleven are deliberately left alone** rather than forced onto a building belonging to
+    something else. Most are in the molten south where the art has few structures — and the
+    Black Reach is a hole in the world, with nothing built there to sit on. **A partial fix
+    that refuses the ambiguous cases beats a total one that invents them.**
+  - ⚠⚠ **PINS HAD TO MOVE WITH THE NAMES.** "?" and "◆" markers are keyed by CELL, not by
+    location id, so a reverse map (canonical cell → owning location) applies the same nudge;
+    unowned cells fall through to the grid position. Miss this and a contract pin sits up to
+    a tile from the name it belongs to — two marks for one place, in two places.
+  - ⚠ `atlasLabelConflicts` was measuring the TRUE anchors while the solver avoided the
+    VISUAL ones — **the checker and the solver were testing two different maps, and the
+    checker was testing the one nobody sees.** Both read the visual anchor now. Clearance
+    tightened 16 → 9 px; candidate rings 3 → 5 after the nudge boxed in Reclaimer's Stake
+    against the western edge. 37 labels, zero collisions. 841 suites / 7,845 green.
+
 - **⚠⚠⚠ THE MAP LABELS WERE BROKEN ON DEVICE WHILE THE SUITE WAS GREEN
-  (2026-08-17, latest). Golem OTA-1336.**
+  (2026-08-17). Golem OTA-1336.**
   Owner sent a screenshot of the Atlas screen: names snapped mid-word — *"Giant-Wat / ch /
   Shrine"* — and sprawling across a third of the map. All ten OTA-1335 tests passed on that
   exact build.
