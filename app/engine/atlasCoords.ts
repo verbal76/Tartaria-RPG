@@ -85,7 +85,13 @@ export const LOCATION_ATLAS_COORDS: Record<string, AtlasCoord> = {
 
   // Lost Capitals band — left of compass
   asgardar: { fx: 0.16, fy: 0.47 },
-  grand_spire_of_etheria: { fx: 0.16, fy: 0.53 },
+  // ⚠ OWNER, 2026-08-17: *"move asgardars tower to the outskirts as discussed."* The
+  // collector-tower is now its OWN tile rather than a landmark inside the capital, and it
+  // INHERITS the cell the Etheria spire used to hold (27,21) — two tiles south of Asgardar
+  // itself, which is the "technically on the outskirts of the city" he asked for. The two
+  // towers were never one place; they were only ever adjacent on the atlas, and this pass
+  // is what finally separates them on the ground.
+  grand_spire_of_asgardar: { fx: 0.16, fy: 0.53 },
   samarran: { fx: 0.28, fy: 0.48 },
   thametans_tower: { fx: 0.33, fy: 0.57 },
 
@@ -115,7 +121,27 @@ export const LOCATION_ATLAS_COORDS: Record<string, AtlasCoord> = {
   // The Deep — Aetherstone-tier sites at the map's bottom
   giant_vault: { fx: 0.78, fy: 0.86 },
   etheric_chamber: { fx: 0.88, fy: 0.87 },
-  mud_flood_nexus: { fx: 0.84, fy: 0.94 },
+  // ⚠ NUDGED NORTH ONE ROW (was fy 0.94 → cell (55,30)). Nothing was wrong with the old
+  // spot; it was simply the southernmost row a pin can occupy and still sit inside the
+  // painted area, and the Black Reach has to be BELOW it. See the note directly below.
+  mud_flood_nexus: { fx: 0.84, fy: 0.905 },
+  // ⚠⚠ OWNER, 2026-08-17: *"The black reach is the most southern point on the map. it's at
+  // the 6:00 position directly under the mud flood Nexus"* — and *"let's move the etheria
+  // spire 2 tiles west of the the black reach."* Both hold literally on the grid, which is
+  // why they are recorded here as coordinates rather than described in prose: the Nexus sits
+  // at (55,29), the Reach at (55,30) — same column, one row further south, and no static
+  // location is south of it. The spire lands at (53,30): same row, exactly two columns west.
+  //
+  // ⚠⚠ THE FIRST ATTEMPT PUT THESE AT fy 0.98 AND THE ATLAS SUITE WAS RIGHT TO REJECT IT.
+  // `atlasCoords.test.ts` holds every overworld pin inside fx 0.05–0.95 / fy 0.05–0.97, so a
+  // marker always lands on real image rather than hanging off an edge — a glyph is drawn
+  // centred on its point, so at 0.98 half of it is simply not on the canvas. Since row 30
+  // was the last row inside that band and the Nexus already held it, the honest fix was to
+  // move the Nexus up one and put the Reach beneath it, NOT to loosen the guard. Cost: one
+  // tile of travel distance to the Nexus. That is the whole price, and it is worth paying to
+  // keep every pin drawable.
+  black_reach: { fx: 0.85, fy: 0.955 },
+  grand_spire_of_etheria: { fx: 0.80, fy: 0.955 },
   // NOTE: the Hidden Market is deliberately NOT here — its "?" overlay coord lives
   // on the hidden-location record (engine/hiddenLocations.ts) so it doesn't perturb
   // the IDW player-dot interpolation that uses every entry in this table as an anchor.

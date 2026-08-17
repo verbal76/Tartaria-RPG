@@ -1839,8 +1839,67 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ THE BLACK REACH, AND THE TWO GRAND SPIRES FINALLY STANDING APART
+  (2026-08-17, latest). Golem OTA-1334.**
+  Owner, across three messages: *"a. I agree, move it to it's own location. move asgardars
+  tower to the outskirts as discussed. let's move the etheria spire 2 tiles west of the the
+  black reach"*; *"The black reach is the most southern point on the map. it's at the 6:00
+  position directly under the mud flood Nexus"*; *"it's another access point to the deep
+  below."* Sequenced world-first on his instruction: *"yes, world first art second."*
+  - **Three placements.** Black Reach new at (55,30); Grand Spire of Etheria (27,21) →
+    (53,30) and re-macro'd `lost_capitals` → `aetherstone_deep`; Grand Spire of Asgardar new
+    at (27,21), inheriting the cell Etheria vacated. Locations 36 → 38.
+  - ⚠⚠⚠ **EVERY ONE OF THOSE IS A CLAIM ABOUT GROUND, SO ASSERT IT ARITHMETICALLY.** The
+    last time the two spires came up it took the owner asking *"are you saying we merged two
+    Tower climbs by accident?"* to establish they were still separate — because nothing in
+    the repo said so. `ota1334WorldPlacements` now derives the cells and checks the
+    RELATIONS: the Reach is the southernmost cell and one row directly below the Nexus; the
+    Etheria spire is two columns west of it on the same row; the Asgardar spire is 1–2 tiles
+    from the capital and >20 from its namesake. Relational assertions also survived the
+    coordinate change described below without edits, which is the point of writing them that
+    way.
+  - ⚠⚠⚠ **THE MANDATORY-REGISTRY LIST IS NOT THE WHOLE JOB.** Three registries make a tile
+    render (`locations.json`, `atlasCoords.ts`, `worldLadder.ts`). A fourth decided whether
+    the feature WORKED: `greatClimbs.asgardar_spire.locationId` still pointed at the city.
+    Nothing throws — the ★ CLIMB chip just draws in the middle of Asgardar, two tiles from
+    any tower, while the tower's own tile offers nothing to climb. **When a thing moves, ask
+    what was ANCHORED to it, not just what LISTS it.**
+  - ⚠⚠ **GREP FOR THE OLD FACT, NOT THE OLD ID.** The move falsified six shipped strings, none
+    of which live in any registry: the `mainQuest` capital-arrival beat named the *Etheria*
+    spire on Asgardar's skyline (fires once per character, exists to stamp the city in
+    memory); Asgardar's description; the world-ladder micro description and micro-micro room
+    NAME; two glossary entries; a concepts card; a loot source. ⚠ The room **id**
+    `grand_spire_etheria` was left alone deliberately — live saves reference it, and renaming
+    an id to tidy a label is how saves get stranded.
+  - ⚠⚠⚠ **ONE TEST FIXED RATHER THAN OBEYED — AND ANOTHER OBEYED RATHER THAN LOOSENED.**
+    `questProgressionAudit` failed `fq_tartarians_pilgrimage` at `tcDelta=0/60`. A throwaway
+    probe showed the player IS paid in full (150 TC, exactly 10 rep): the quest completes on
+    its last travel stage, so the later `turnInFactionQuest` is correctly a no-op and the
+    audit's turn-in-only window read zero. It pinned the MECHANISM (payment happens inside
+    the turn-in call) rather than the RULE (finishing pays the reward, once); it now measures
+    accept → end. **Do not accept a red test as a regression, and do not accept it as noise
+    — probe it and find out which.** Conversely `atlasCoords.test.ts` was RIGHT to reject the
+    first placement at fy 0.98: every overworld pin must sit inside fx 0.05–0.95 /
+    fy 0.05–0.97 so a glyph drawn centred on its point lands on real image. Row 30 was the
+    last row in band and the Nexus held it, so the **Nexus moved north one row** — the guard
+    was not loosened. One tile of travel distance, paid knowingly.
+  - ⚠⚠ **A FAILING TEST CAN MEAN YOU FIXED SOMETHING.** OTA-1323 exists because routing to
+    the Asgardar tower dumped the player into the city's outpost hub, and the narration had
+    to apologise that the spire was *"outside the walls"*. With the tower on its own tile
+    there is no hub and nothing to apologise for. Those cases now assert the better
+    arrangement and keep a guard on the old failure. Two further suites pinned ACCIDENTS
+    rather than rules and were rewritten to COMPUTE: the direction-finder's `"spire"` query
+    (its own comment documents nearest-wins; that is now derived from the map, so any number
+    of spires is fine) and the atlas city/tower adjacency pair, which had been pairing
+    Asgardar with the wrong tower — the original confusion, written into a test.
+  - **840 suites / 7,832 green.** ⚠ STILL OPEN: `assets/world-atlas-r2.png` (1619×971, 5:3 to
+    within 0.04%) is staged but NOT wired — `ATLAS_W`/`ATLAS_H` still say 1774×887, and
+    `ATLAS_LEGEND_FRAC = 10/92` must be DELETED or every marker sits 10.9% of the map width
+    (176 px, ~4 tiles) east, dodging a title cartouche the new art does not have. The
+    38-label name overlay is unbuilt and the new art carries no lettering at all.
+
 - **⚠⚠⚠ THE LAST P19 INSTANCE — IN THE FAMILY THAT LOOKED EXEMPT
-  (2026-08-16, latest). Golem OTA-1332.**
+  (2026-08-16). Golem OTA-1332.**
   Owner, after I handed him a table with five green checks and one hedge: *"don't we have
   to check the faction quests? since they don't have a green check mark from you."*
   - ⚠⚠⚠ **HE WAS RIGHT TO PUSH, AND THE REASON IS THE LESSON.** I had waved the family

@@ -191,11 +191,20 @@ rename instruction changed that.)
 
 ## 3. What is NOT in this wave
 
-- **L9 — build `asgardar_crown_spire`.** ⚠ **Dropped.** The tile exists
-  (`grand_spire_of_etheria`, parent `asgardar`, two cells south). Building a third spire
-  would create the very duplication this wave exists to remove.
-- **L10 — move the climb onto the new tile.** ⚠ **Dropped with L9.** Both climbs are already
-  on the tiles they belong to.
+- **L9 — build `grand_spire_of_asgardar`.** ⚠⚠ **UN-DROPPED AND SHIPPED (OTA-1334).** This
+  entry used to read "Dropped — the tile exists (`grand_spire_of_etheria`, parent `asgardar`,
+  two cells south)." The measurement was right; the conclusion was wrong. The tile that
+  existed was the *other* tower. Owner: *"a. I agree, move it to it's own location. move
+  asgardars tower to the outskirts as discussed."* The Asgardar spire now has its own tile at
+  (27,21) — the cell the Etheria spire vacated — and the Etheria spire moved to the floor of
+  the Black Reach at (53,31).
+- **L10 — move the climb onto the new tile.** ⚠⚠ **UN-DROPPED AND SHIPPED (OTA-1334).**
+  `greatClimbs.asgardar_spire.locationId` went `asgardar` → `grand_spire_of_asgardar`. This
+  was the one change in the whole pass that would have shipped silently broken: leave the
+  anchor on the city and the ★ CLIMB chip draws itself in the middle of Asgardar, two tiles
+  from any tower, while the tower's own tile offers nothing to climb. Nothing throws.
+  `ota1334WorldPlacements` now pins both halves — the climb is at the tower, and the city
+  is not climbable.
 - **L13 — capitals stop being outposts / the Reclaimer camp gets its own tile.** Separate
   wave. It carries **the highest save risk in the whole roadmap**: `static_hub.json`
   `hubLocationIds` currently includes `asgardar` and `drakova`, and removing them strands any
@@ -231,3 +240,71 @@ independent of what anyone decides to call the tower.
   cross-landmark leak.
 - No file describes the Grand Spire of Etheria as being *inside* Asgardar.
 - Both Skyreacher pieces remain reachable; the five-piece set is untouched.
+
+
+---
+
+## ⚠⚠ OTA-1334 — WHAT ACTUALLY LANDED (2026-08-17)
+
+Three placements, world-first, per the owner's *"yes, world first art second."*
+
+| Place | Cell | Was | Owner's words |
+|---|---|---|---|
+| **The Black Reach** 🆕 | (55,30) | did not exist | *"the most southern point on the map… at the 6:00 position directly under the mud flood Nexus"* |
+| **Grand Spire of Etheria** ➡️ | (27,21) → (53,30) | landmark of Asgardar | *"move the etheria spire 2 tiles west of the the black reach"* |
+| **Grand Spire of Asgardar** 🆕 | (27,21) | climb anchored on the city itself | *"move asgardars tower to the outskirts as discussed"* |
+
+Every one of those is a claim about ground, so every one is asserted arithmetically in
+`__tests__/ota1334WorldPlacements.test.ts` rather than described in prose: the Reach is the
+southernmost cell and sits one row directly below the Nexus; the Etheria spire is exactly two
+columns west of it on the same row; the Asgardar spire is one to two tiles from the capital
+and more than twenty from its namesake.
+
+**⚠ One coordinate lesson, paid for by a test that was right.** The first placement put the
+Reach and the Etheria spire at fy 0.98. `atlasCoords.test.ts` rejected it: every overworld pin
+must sit inside fx 0.05–0.95 / fy 0.05–0.97 so a marker lands on real image instead of hanging
+half off an edge. Row 30 was the last row inside that band and the Mud Flood Nexus already held
+it, so the fix was to move the **Nexus** north one row and put the Reach beneath it — not to
+loosen the guard. Cost: one tile of travel distance to the Nexus. Worth it to keep every pin
+drawable.
+
+**Registries touched:** `locations.json` (36 → 38 — which is also exactly the landmark count
+the map spec hands the artist), `atlasCoords.ts`, `worldLadder.ts` (macro), `greatClimbs.ts`
+(climb anchor).
+
+**Stale prose the move falsified, all corrected in the same pass** — the move made six shipped
+strings lie, and they were only found by grepping for the old fact rather than trusting the
+registry list:
+
+- `mainQuest.ts` capital-arrival beat for Asgardar named the *Etheria* spire on the skyline.
+  ⚠ Worst possible place for it: fires once per character, and exists precisely to stamp the
+  city in memory.
+- `locations.json` — Asgardar's own description ("Home of the Grand Spire of Etheria").
+- `data/world/worldLadder.json` — the Asgardar micro description, and the micro-micro room
+  NAME. ⚠ The room **id** `grand_spire_etheria` was deliberately left alone; live saves
+  reference it, and renaming an id to tidy a label is how saves get stranded.
+- `lore/concepts.json`, `lore/glossary.json` (two entries), `lore/canon-loot-treasure.json`.
+- New glossary entries added for the Black Reach and the Grand Spire of Asgardar.
+
+**⚠ One test was fixed rather than obeyed.** `questProgressionAudit` began failing
+`fq_tartarians_pilgrimage` with `tcDelta=0/60`. It was not a regression: a focused probe
+showed the player is paid in full (150 TC, exactly 10 rep) — the quest completes on its final
+travel stage and the later `turnInFactionQuest` is correctly a no-op, so the audit's
+turn-in-only measurement window read zero. The audit had pinned the MECHANISM (payment
+happens inside the turn-in call) instead of the RULE (finishing the quest pays its reward,
+once). It now measures accept → end. Adding two locations shifted the seeded LCG stream and
+exposed it; this suite's own header already named this quest as historically seed-fragile.
+
+### Still open after this
+- **The art swap.** `assets/world-atlas-r2.png` (1619×971, 5:3 — the spec's aspect to within
+  0.04%) is staged in the repo but NOT wired. Two things must land with it: `ATLAS_W`/`ATLAS_H`
+  in `MapScreen.tsx` still say 1774×887, and ⚠⚠ `ATLAS_LEGEND_FRAC = 10/92` must be DELETED —
+  it shifts every marker 10.9% of the map width (176 px, ~4 tiles) east to dodge a "TARTARIA"
+  cartouche the new art does not have.
+- **The 38-name overlay**, built on the existing `labelScale` machinery. The new art carries
+  no lettering at all, so until this ships the map is anonymous. ⚠ The Black Reach and the
+  Etheria spire sit at fy 0.98 — their labels must be placed ABOVE their markers; there is no
+  canvas below them.
+- ~~`location-flavors.json` has no entries for either new tile.~~ Done in the same pass —
+  10 ambient lines each. ⚠ The Etheria spire's existing 10 lines were checked and left
+  alone: none of them name Asgardar, so they survive the move intact.

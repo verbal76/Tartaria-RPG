@@ -35,8 +35,13 @@ describe('OTA-1333 — the Grand Spire of Asgardar', () => {
     // by accident later.
     expect(GREAT_CLIMBS.length).toBe(5);
     expect(new Set(SKYREACHER_SET).size).toBe(5);
-    expect(asgardar.locationId).toBe('asgardar');
+    // ⚠ OTA-1334 moved this anchor off the capital and onto the tower's own tile. It read
+    // `'asgardar'` while the spire was still a landmark inside the city; the climb now
+    // lives where the tower does. The property that actually matters — the two spires are
+    // DISTINCT places — is asserted directly below rather than left implied.
+    expect(asgardar.locationId).toBe('grand_spire_of_asgardar');
     expect(etheria.locationId).toBe('grand_spire_of_etheria');
+    expect(asgardar.locationId).not.toBe(etheria.locationId);
     expect(asgardar.tiers).toBe(14);
     expect(etheria.tiers).toBe(15);
   });
@@ -44,11 +49,17 @@ describe('OTA-1333 — the Grand Spire of Asgardar', () => {
   it('⚠⚠ the two Grand Spires cannot be confused for one another', () => {
     // Both are now "Grand Spire of …", so the resolver has to keep them apart on the
     // suffix AND on the tile. Either alone would be enough; both is the guarantee.
-    expect(greatClimbFor('the grand spire of asgardar', 'asgardar')?.id).toBe('asgardar_spire');
+    expect(greatClimbFor('the grand spire of asgardar', 'grand_spire_of_asgardar')?.id).toBe('asgardar_spire');
     expect(greatClimbFor('the grand spire of etheria', 'grand_spire_of_etheria')?.id).toBe('grand_spire');
     // Cross-tile: the right words at the wrong tower resolve to nothing.
-    expect(greatClimbFor('the grand spire of etheria', 'asgardar')).toBeNull();
+    expect(greatClimbFor('the grand spire of etheria', 'grand_spire_of_asgardar')).toBeNull();
     expect(greatClimbFor('the grand spire of asgardar', 'grand_spire_of_etheria')).toBeNull();
+    // ⚠⚠ OTA-1334 — and the CITY is no longer a climbable tile at all. This is the
+    // assertion that would have caught the half-done move: leave `locationId` pointing at
+    // `asgardar` and the button draws itself in the middle of the capital, two tiles from
+    // any tower. Standing in Asgardar and naming the spire now resolves to nothing.
+    expect(greatClimbFor('the grand spire of asgardar', 'asgardar')).toBeNull();
+    expect(greatClimbForLocation('asgardar')).toBeNull();
   });
 
   it('⚠ every climb still resolves from the canonical noun the button submits', () => {

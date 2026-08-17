@@ -226,12 +226,22 @@
     {
       "id": "asgardar",
       "term": "Asgardar",
-      "definition": "The ancient capital city of Tartaria, home to the Grand Spire of Etheria, a towering structure that once channeled Aetheric Power from cosmic sources into the city's energy grid."
+      "definition": "The ancient capital city of Tartaria, home to the Grand Spire of Asgardar, a towering structure on the city's outskirts that once channeled Aetheric Power from cosmic sources into the city's energy grid."
+    },
+    {
+      "id": "black_reach",
+      "term": "The Black Reach",
+      "definition": "The southernmost wound in the world, lying directly beneath the Mud Flood Nexus \u2014 a chasm system that simply keeps going down. Unlike every other way into the Aetherstone Deep it is neither vault nor seal nor guarded chamber; it is a floor that ends. Heat and a faint grid-hum come up out of it, and the Grand Spire of Etheria stands on its floor two miles west of the descent."
+    },
+    {
+      "id": "grand_spire_of_asgardar",
+      "term": "Grand Spire of Asgardar",
+      "definition": "The collector-tower of the drowned capital, standing alone on the outskirts where Asgardar's last ring of streets gives out. Fourteen tiers of it remain above the silt. Not to be confused with the Grand Spire of Etheria, a separate and taller tower now lying at the bottom of the Black Reach."
     },
     {
       "id": "grand_spire_of_etheria",
       "term": "Grand Spire of Etheria",
-      "definition": "A monumental tower in Asgardar, known for drawing Aetheric energy from the celestial realms; considered one of Tartaria's most powerful Aetheric structures."
+      "definition": "A monumental tower standing on the floor of the Black Reach, two miles west of the descent, known for drawing Aetheric energy from the celestial realms; considered one of Tartaria's most powerful Aetheric structures. The chasm took it whole and it is still standing."
     },
     {
       "id": "samarran",

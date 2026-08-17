@@ -62,7 +62,7 @@ was mostly answering a problem that does not exist, and is dropped from this pla
 
 | # | Move | Asgardar | Other effect |
 |---|---|---|---|
-| **M1** | Buried Spire + Draugveil → new tile `asgardar_crown_spire` | 6 → 4 | great climbs become consistent |
+| **M1** | Buried Spire + Draugveil → new tile `grand_spire_of_asgardar` | 6 → 4 | great climbs become consistent |
 | **M2** | Outpost hub off `asgardar` and `drakova` | 4 → 3 | Drakova 3 → 2 |
 | **M3** | Dog `cellar` rescue restricted to outposts | 3 → 2 | dogs leave all 9 capitals + ruins |
 | **M4** | Labyrinth of Shadows `iskan_veil` → `cradle_of_dusk` | — | Iskan-Veil 3 → 2 |
@@ -112,7 +112,7 @@ Measured from `thametans_tower`, the closest existing analogue:
 | `app/data/world/worldLadder.json` | ladder node + micro/micro-micro locations |
 | `app/data/lore/location-flavors.json` | ambient flavour lines (Asgardar has 2; this needs its own) |
 | `app/data/lore/glossary.json` | glossary entry, if the name is player-facing lore |
-| `app/engine/greatClimbs.ts` | `locationId` changes from `asgardar` → `asgardar_crown_spire` |
+| `app/engine/greatClimbs.ts` | `locationId` changes from `asgardar` → `grand_spire_of_asgardar` |
 
 ### Text that must change
 | File | Line(s) | Current | Change needed |
@@ -334,6 +334,23 @@ own faction's work, so they are fine).
 by giving those 18 a target field (see L16) before writing anything new.
 **Risk:** none if it is retargeting; this becomes authoring work only if new missions are wanted.
 
+> **⚠⚠ SHIPPED, 2026-08-17 (OTA-1334) — this section is now history, not a proposal.**
+> L8 / L9 / L10 all landed, under the owner's direction and with one change of name: the new
+> tile is **`grand_spire_of_asgardar`**, not `asgardar_crown_spire`, and the word "buried" is
+> gone from every player-facing string (OTA-1333). Every `asgardar_crown_spire` below has
+> been rewritten to the shipped id so the document cannot mislead anyone reading it later.
+>
+> L9 also turned out to need **three** mandatory registries, not the seven this document
+> predicted — `locations.json`, `atlasCoords.ts` and `worldLadder.ts`. The other four
+> (`data/world/worldLadder.json`, `location-flavors.json`, `glossary.json`,
+> `worldDirections.ts`) improve the tile but do not gate it rendering.
+>
+> ⚠ WAVE-THREE.md had recorded L9/L10 as **dropped**, on the measurement that the tile
+> already existed as `grand_spire_of_etheria`. That measurement was correct and the
+> conclusion was still wrong: the existing tile was the *other* tower. The owner's call —
+> *"a. I agree, move it to it's own location"* — un-dropped both, and the Etheria spire moved
+> to the Black Reach instead.
+
 ### L8 — Settle the Grand Spire contradiction *(lore only, no mechanics)*
 **Why:** `worldLadder.json` places `grand_spire_etheria` INSIDE Asgardar — *"still throws light
 at full power"* — while `grand_spire_of_etheria` is a separate top-level location with its own
@@ -344,7 +361,7 @@ settled before L9**, which adds a third spire to the same city.
 "a monumental tower in Asgardar" without saying which).
 **Risk:** none mechanically. **Done when:** each spire name maps to exactly one tile.
 
-### L9 — Create `asgardar_crown_spire`
+### L9 — Create `grand_spire_of_asgardar`
 **Why:** the Buried Spire needs its own tile, following the `nimari` / `red_tower_of_nimari`
 precedent the game already uses.
 **Files (all seven are required or the tile renders mute):** `locations.json`,
@@ -355,7 +372,7 @@ precedent the game already uses.
 **Test:** the tile is reachable, routable, has flavour lines, and appears on the atlas.
 
 ### L10 — Move the great climb and Draugveil onto it
-**Files:** `app/engine/greatClimbs.ts` — `locationId: 'asgardar'` → `asgardar_crown_spire`.
+**Files:** `app/engine/greatClimbs.ts` — `locationId: 'asgardar'` → `grand_spire_of_asgardar`.
 **Depends on:** L9. **Test:** `ota1323RoutedTowerExplainsItself` — its measured table of five
 climbs and their tier counts moves with this; routing to the tower must still produce the
 14-tier climb, not a generic one.

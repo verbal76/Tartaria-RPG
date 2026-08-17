@@ -329,8 +329,13 @@ export const LOST_CAPITAL_NAMES: Record<string, string> = {
 // — stamps the place in the player's memory so the set never feels samey. Fires
 // once per Capital per character (gated by worldMemory.capitalArrivalSeen).
 const CAPITAL_ARRIVAL_SIGNATURES: Record<string, string> = {
+  // ⚠ OTA-1334 — this beat used to name the Grand Spire of ETHERIA, which now stands most
+  // of a world away on the floor of the Black Reach. The tower on Asgardar's own skyline is
+  // the Grand Spire of Asgardar. A first-arrival line is the worst possible place to name
+  // the wrong landmark: it is the one sentence meant to stamp the city in the player's
+  // memory, and it fires exactly once per character.
   asgardar:
-    'Asgardar announces itself before you crest the rise: the Grand Spire of Etheria, snapped a third of the way up, still hums a single sub-audible note that you feel in your teeth more than hear. Aether-light crawls the old channel-grooves like slow lightning that forgot how to strike.',
+    'Asgardar announces itself before you crest the rise: the Grand Spire of Asgardar out past the last streets, snapped a third of the way up, still humming a single sub-audible note that you feel in your teeth more than hear. Aether-light crawls the old channel-grooves like slow lightning that forgot how to strike.',
   samarran:
     'Samarran is all broken glass and cold arithmetic. Thametan\'s Tower leans over a plaza of shattered lenses, and the dead Aetheric Engine at its heart still ticks — one wrong, patient click every few seconds, like a clock counting down to something that already happened.',
   nimari:
