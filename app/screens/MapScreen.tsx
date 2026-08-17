@@ -27,7 +27,7 @@ import {
   ScrollView,
   type GestureResponderEvent,
 } from 'react-native';
-import { useGameStore } from '../state/gameStore';
+import { useGameStore, playerGridCell } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 // OTA-171 — Location + locationsData are already imported below for
 // the existing LOCATIONS const; reused here for the Places list
@@ -650,12 +650,16 @@ export function MapScreen() {
         });
       }
       // ⚠ OTA-1344 — the player marker, LAST so it draws over every other glyph.
-      // Anchored to the current location's canonical cell → markerFraction, which
-      // is exactly where that location's pin and label sit — the accuracy problem
-      // that killed the OTA-182 dot cannot recur, because there is nothing left to
-      // disagree: one coordinate system serves label, pin, and marker alike.
+      // ⚠ OTA-1347 — anchored to the player's AUTHORITATIVE absolute cell
+      // (playerGridCell: gridX/gridY, the cell every movement and distance path
+      // funnels through), not the current location's cell. Owner's device log
+      // caught the difference on day one: six taps east from Iskan-Veil and the
+      // marker never moved, because free wandering changes the grid cell while
+      // currentLocationId still names the origin. markerFraction keeps the rest
+      // honest: a named cell snaps to its nudged silhouette, a wild cell falls
+      // back to the plain cell→fraction map — one coordinate system throughout.
       if (player?.currentLocationId) {
-        const cell = canonicalCellFor(player.currentLocationId);
+        const cell = playerGridCell(player);
         const f = markerFraction(cell.x, cell.y);
         const size = Math.max(9, 40 * labelScale);
         playerFrac = f;

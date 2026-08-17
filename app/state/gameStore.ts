@@ -6535,7 +6535,10 @@ function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
 // before backfill) to the current location's canon cell plus the re-centered
 // in-transit offset so old behaviour still resolves. Every movement/distance path
 // funnels through this so there is ONE source of truth for "where the player is".
-function playerGridCell(player: PlayerCharacter): { x: number; y: number } {
+// OTA-1347 — exported: the map marker anchors to THIS read now (owner log: walked
+// six tiles east and the marker stayed on Iskan-Veil — it was anchored to the
+// LOCATION's cell, not the player's).
+export function playerGridCell(player: PlayerCharacter): { x: number; y: number } {
   if (typeof player.gridX === 'number' && typeof player.gridY === 'number') {
     return { x: player.gridX, y: player.gridY };
   }
@@ -29892,9 +29895,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // wanted the bar to reflect the area they're actually crossing so
     // STOP TRAVEL + next cardinal feels intuitive.
     const inTransit = !!get().player?.travelTarget;
-    if (inTransit) {
+    // ⚠ OTA-1347 — THE MAP WALKS WITH YOU, COURSE OR NO COURSE. This whole block
+    // (area label, discovery-in-passing, weather drift) used to run ONLY while a
+    // travel course was set, and the else-branch actively CLEARED the label — so
+    // a FREE cardinal walk kept the scene bar claiming the origin and the sky
+    // frozen. Owner's device log: six taps east from Iskan-Veil, "my location/
+    // weather line didn't update my location". The transit gate stays only on
+    // the plotted-distance re-plot, which needs a course to re-plot to.
+    {
       // (a) Pick the nearest named location to the new tile and surface
-      //     its name as the transit-area label. Skip when we're landing
+      //     its name as the area label. Skip when we're landing
       //     on a named tile (the discrete-location switch below handles
       //     that). 8-tile-radius search keeps it cheap.
       if (!step.landedOn) {
@@ -29972,7 +29982,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // it climbs as you walk away and drops as you head back, instead of a
       // blind countdown. Arrival on a named location is handled by the
       // discrete-location switch below.
-      if (!step.landedOn) {
+      if (inTransit && !step.landedOn) {
         const tgtId = get().player?.travelTarget?.locationId;
         if (tgtId) {
           // arb47 — EXACT distance from the player's new ABSOLUTE cell to the
@@ -29985,9 +29995,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           } : s));
         }
       }
-    } else {
-      // Not in transit — clear any lingering transit label so a
-      // manual cardinal step doesn't show "near X" forever.
+    }
+    // OTA-1347 — landing ON a named tile clears the proximity label: the real
+    // location name takes over (this replaces the old not-in-transit clear,
+    // which erased the label on every free step and froze the bar).
+    if (step.landedOn) {
       const live = get().currentScene;
       if (live?.transitArea) {
         set((s) => s.currentScene
