@@ -88,7 +88,8 @@ describe('OTA-1342 — the marker and the bar follow a free walk', () => {
     store.getState().stepDirection('east');
     const label = store.getState().currentScene?.transitArea ?? null;
     expect(label).not.toBeNull();
-    expect(String(label)).toMatch(/^near /);
+    // OTA-1343 — one step out is inside the ring of influence: "<Name> Outskirts".
+    expect(String(label)).toBe('Iskan-Veil Outskirts');
   });
 
   it('⚠ the label tracks the walk instead of being cleared per step (the old else-branch)', async () => {
