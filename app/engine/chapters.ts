@@ -28,6 +28,13 @@ import type { MainQuestPhase, MainQuestEnding } from './types';
 export interface ChapterCard {
   /** The phase this card marks (also used as a dedupe key by the caller). */
   phase: MainQuestPhase;
+  /** ⚠ OTA-1339 — the VICTORY BANNER, above everything else on the card. Owner, after his
+   *  first Core Guardian kill was answered by a full-screen card about his own heartbeat:
+   *  *"let's make sure it's very bold right in the very beginning that you won somehow. I
+   *  don't want to have to guess if I just won or if there was a glitch… honestly I was
+   *  putting the phone down."* Only the cards that fire OVER a fresh guardian kill carry
+   *  one (cores, descent) — a banner on a card that follows no fight would be a lie. */
+  banner?: string;
   /** Small over-title, e.g. "CHAPTER II". */
   kicker: string;
   /** Large display title, e.g. "NINE HEARTS". */
@@ -42,6 +49,7 @@ export interface ChapterCard {
 
 interface ChaptersData {
   chapters: Record<string, {
+    banner?: string;
     kicker: string;
     title: string;
     body: string;
@@ -75,6 +83,7 @@ export function chapterCardFor(
   if (!motiveLine) throw new Error(`story/chapters.json chapter '${phase}' is missing motive '${motive.id}'`);
   return {
     phase,
+    ...(chapter.banner ? { banner: chapter.banner } : {}),
     kicker: chapter.kicker,
     title: chapter.title,
     body: chapter.body,

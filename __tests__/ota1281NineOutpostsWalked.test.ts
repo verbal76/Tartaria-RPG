@@ -88,6 +88,14 @@ const short = (roomId: string, skin: string): string =>
 /** Every directed edge, as a walk: a DFS that goes down each branch and back
  *  up it — 28 moves on a 15-node tree, ending where it began. This is the
  *  route a completionist player actually has to take. */
+// ⚠ OTA-1339 — ONE LIVING CHARACTER PER NAME now holds at the tutorial name beat,
+// and every fresh character this file creates lives on in its slot. A fixed name
+// here would be refused from the second creation onward, wedging the helper at the
+// name ask — so each birth types a unique letter suffix (digits would be sanitized
+// away by the name cleaner, so letters it is).
+let bornSerial = 0;
+const bornTag = (): string =>
+  String.fromCharCode(97 + Math.floor(bornSerial / 26)) + String.fromCharCode(97 + (bornSerial++ % 26));
 function fullTour(startId: string): Array<{ from: string; dir: Direction; to: string }> {
   const moves: Array<{ from: string; dir: Direction; to: string }> = [];
   const seen = new Set([startId]);
@@ -174,7 +182,7 @@ describe('OTA-1281 — PLAYED: a character of every faction walks their outpost'
       motiveId: 'debt', pressure: 'owed',
     } as never);
     if (useGameStore.getState().storyIntro) useGameStore.getState().dismissStoryIntro();
-    sub('Greg'); sub('look around'); sub('take the cudgel');
+    sub('Greg' + bornTag()); sub('look around'); sub('take the cudgel');
     sub("take the Mud-Warden's Vest");
     useGameStore.getState().equipItem("Mud-Warden's Vest", 'chest');
     await new Promise((r) => setTimeout(r, 0));

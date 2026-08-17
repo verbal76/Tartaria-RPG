@@ -66,6 +66,14 @@ const beat = (): string | null => {
   return i === null ? null : TUTORIAL_STEPS[i]?.id ?? null;
 };
 
+// ⚠ OTA-1339 — ONE LIVING CHARACTER PER NAME now holds at the tutorial name beat,
+// and every fresh character this file creates lives on in its slot. A fixed name
+// here would be refused from the second creation onward, wedging the helper at the
+// name ask — so each birth types a unique letter suffix (digits would be sanitized
+// away by the name cleaner, so letters it is).
+let bornSerial = 0;
+const bornTag = (): string =>
+  String.fromCharCode(97 + Math.floor(bornSerial / 26)) + String.fromCharCode(97 + (bornSerial++ % 26));
 async function freshGameAtExplore(): Promise<void> {
   await useGameStore.getState().startNewGame({
     name: '', raceId: 'aetherborn', factionId: 'eternal_dynasty',
@@ -73,7 +81,7 @@ async function freshGameAtExplore(): Promise<void> {
   } as never);
   if (useGameStore.getState().storyIntro) useGameStore.getState().dismissStoryIntro();
   const sub = (c: string): void => useGameStore.getState().submitPlayerAction(c);
-  sub('Frank'); sub('look around'); sub('take the cudgel');
+  sub('Frank' + bornTag()); sub('look around'); sub('take the cudgel');
   sub("take the Mud-Warden's Vest");
   useGameStore.getState().equipItem("Mud-Warden's Vest", 'chest');
   await new Promise((r) => setTimeout(r, 0));

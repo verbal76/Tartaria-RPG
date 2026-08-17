@@ -53,6 +53,23 @@ const ENDINGS = ['seal', 'unleash', 'preserve'] as const;
 describe('OTA-1020 — the authored chapter content is complete', () => {
   it('all four chapter cards exist for every motive, with kicker/title/body', () => {
     expect(CHAPTER_PHASES).toEqual(['revelation', 'cores', 'descent', 'choice']);
+  });
+
+  it('⚠⚠ OTA-1339 — the cards that fire over a guardian kill open with VICTORY; the others must not', () => {
+    // Owner, after his first Core Guardian kill was answered by a full-screen card about
+    // his own heartbeat: *"let's make sure it's very bold right in the very beginning that
+    // you won somehow. I don't want to have to guess if I just won or if there was a
+    // glitch… honestly I was putting the phone down."* The cores card (first Core) and the
+    // descent card (ninth Core) always follow a fresh guardian kill — they carry the
+    // banner. Revelation and choice follow ARRIVALS, not fights; a victory banner there
+    // would be a lie, which is why the absence is asserted too.
+    expect(chapterCardFor('cores', undefined)?.banner).toMatch(/VICTORY/);
+    expect(chapterCardFor('descent', undefined)?.banner).toMatch(/VICTORY/);
+    expect(chapterCardFor('revelation', undefined)?.banner).toBeUndefined();
+    expect(chapterCardFor('choice', undefined)?.banner).toBeUndefined();
+    // And the body backs the banner up in prose before any heartbeat poetry.
+    expect(chapterCardFor('cores', undefined)?.body).toMatch(/^The Guardian is down/);
+    expect(chapterCardFor('descent', undefined)?.body).toMatch(/^The last Guardian lies where you dropped it/);
     for (const phase of CHAPTER_PHASES) {
       for (const motive of STORY_MOTIVE_IDS) {
         const card = chapterCardFor(phase, motive)!;
