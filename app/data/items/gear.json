@@ -719,7 +719,7 @@
         "acid",
         "crafted"
       ],
-      "description": "Caustic distillate in a wax-sealed flask — aether dust dissolved in scavenged battery bile. Coats an edge so each hit both burns (1d4 a turn) AND eats the target's armor, shaving their guard thinner with every wound. Survives a repair; lost only when the weapon breaks.",
+      "description": "Battery bile in a wax-sealed flask — milked from the old world's drowned jar-batteries, where the flood shorted out the lightning and left the acid keeping for a thousand years, then cut with aether dust so it eats armor instead of hands. Coats an edge so each hit both burns (1d4 a turn) AND eats the target's armor, shaving their guard thinner with every wound. Survives a repair; lost only when the weapon breaks.",
       "effect": {
         "kind": "consumable",
         "coating": {
