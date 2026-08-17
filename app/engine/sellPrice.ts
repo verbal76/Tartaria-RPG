@@ -116,8 +116,12 @@ export function sellPriceFor(
   // exempt (they stay crafting-only). Callers pass vendorPriceMod(...); default 0.
   rapportBonus = 0,
 ): number {
+  // ⚠ OTA-1336 — the modifier can be NEGATIVE now (the standing ladder's hostile
+  // markup: a vendor who hates you pays less for your goods). A markup applies
+  // where a bonus does; only exactly-zero passes through untouched. Negative is
+  // always safe against the B1 caps — they clamp from above.
   const withRapport = (price: number) =>
-    rapportBonus > 0 ? Math.max(1, Math.round(price * (1 + rapportBonus))) : price;
+    rapportBonus !== 0 ? Math.max(1, Math.round(price * (1 + rapportBonus))) : price;
   // OTA-910 — collect-only gear (the Skyreacher set) can't be crafted, bought,
   // OR sold: it's only ever earned atop a great climb, and a merchant can't put
   // a price on something that can't be replaced. Nominal 1 TC so the sell UI

@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.201';
+export const DISPLAY_VERSION = '4.29.202';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -25029,7 +25029,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The instruction was about NAMES, not content, so both stand (Asgardar 14 tiers/Cuirass,
 // Etheria 15/Crown) and ota1333 pins 5 climbs / 5 pieces against an accidental merge.
 // Twin of golem OTA-1333. DISPLAY_VERSION 4.29.197.
-export const OTA_BUILD_ID = '2026-08-17-1335-commons-sell-for-what-they-are';
+export const OTA_BUILD_ID = '2026-08-17-1336-standing-reaches-the-counter';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-17-1335-commons-sell-for-what-they-are';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-17-1334-the-live-testing-six';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1330-tribute-happens-at-the-vault';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-16-1329-storylines-and-p19-closed';

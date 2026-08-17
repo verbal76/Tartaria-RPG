@@ -61,7 +61,15 @@ function setVendor(store: ReturnType<typeof useGameStore>, price: number, stock 
       enemies: [],
       vendor: { name: 'Halem', faction: 'reclaimers_guild', offers: [{ itemName: 'Small Rock', price, quantity: stock }] } as any,
     },
-    player: { ...s.player!, tc: 100000 },
+    // OTA-1336 — ZERO the ladder (don't wipe the row: the grind writer updates
+    // an existing row) so the rep-grind pool maths stay exact — the fresh
+    // character's own-guild Known +10 now discounts 5%, which would shift every
+    // TC-spent figure this suite banks on.
+    player: {
+      ...s.player!, tc: 100000,
+      factionStanding: s.player!.factionStanding.map((r) =>
+        r.factionId === 'reclaimers_guild' ? { ...r, standing: 0 } : r),
+    },
   }));
 }
 const standingOf = (store: ReturnType<typeof useGameStore>) =>

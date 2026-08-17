@@ -1057,6 +1057,10 @@ it and states what was checked to rule out a consumer elsewhere.
     `durability.ts:179-200` a single `temper` roll drives durability max UP and the perk budget DOWN, so
     pricing on durability alone systematically UNDERPRICES glass cannons — lerp 5→11 off durability max
     **plus** `instanceStats`. Files: `engine/sellPrice.ts`, `engine/durability.ts`.
+  - **✅ SHIPPED — OTA-1336 (2026-08-17, same greenlight).** The ladder: Known +10 / Trusted +25 (also
+    vouches past the rapport-quest gate) / Honored +50 → 5/10/15% off; Hostile/Hated → +15/+25% markup.
+    Combined positive discount capped at 0.20 (the no-arbitrage cap); hostility overrides charm. All three
+    vendorPriceMod call sites pass the standing read; the sheet names the tiers. Original entry:
   - **Faction standing has no positive ladder.** Owner: *"what the hell do I actually do at faction
     standing? I've traded with the vendor that I had a negative 90 on … there's no real benefit to have
     good standing. I could be a giant asshole to everybody."* ⚠ **He is right, and it is verifiable:**

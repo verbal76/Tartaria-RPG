@@ -104,6 +104,11 @@ function armVendor(store: ReturnType<typeof useGameStore>, opts: { cha: number; 
       corruption: 0,
       stats: { ...s.player!.stats, charisma: opts.cha },
       completedFactionQuestIds: opts.unlocked ? ['fq_reclaimers_guild_rapport'] : [],
+      // OTA-1336 — zero the ladder so this suite keeps testing the CHA/rapport
+      // gate in ISOLATION. A fresh character starts Known (+10) with their own
+      // guild, which now honestly knocks 5% off at that guild's counter — the
+      // ladder has its own suite (ota1336StandingLadder).
+      factionStanding: [],
     },
   }));
 }
