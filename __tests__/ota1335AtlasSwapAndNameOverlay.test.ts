@@ -20,7 +20,7 @@
 // numbers the code uses match the numbers the art actually has, and that the correction
 // factor is gone.
 import { LOCATION_ATLAS_COORDS, ATLAS_PIXEL_W, ATLAS_PIXEL_H } from '../app/engine/atlasCoords';
-import { atlasLabelLayout, atlasLabelConflicts, wrapLabel } from '../app/engine/atlasLabels';
+import { atlasLabelLayout, atlasLabelConflicts, wrapLabel, LABEL_BOX_SAFETY } from '../app/engine/atlasLabels';
 import locationsData from '../app/data/locations/locations.json';
 import { readFileSync } from 'node:fs';
 
@@ -121,8 +121,73 @@ describe('OTA-1335 — the name overlay', () => {
     expect(atlasLabelLayout()).toEqual(labels);
   });
 
+  // ⚠⚠⚠ THE THREE ASSERTIONS BELOW EXIST BECAUSE THIS SUITE PASSED ON A BROKEN LAYOUT.
+  //
+  // The overlay shipped, and the owner's screenshot showed names snapped in half
+  // ("Giant-Wat / ch / Shrine") and sprawling across a third of the map. Every test above
+  // was green at the time. The reason is worth stating plainly: the solver estimated each
+  // label's width, and the tests checked those estimates against each other. Nothing in the
+  // loop ever touched the real font, so the suite could only ever confirm that the solver
+  // agreed with itself — the same failure as the hunt walker that never moved.
+  //
+  // A unit test cannot measure a typeface. What it CAN do is pin the two properties that
+  // make the estimate safe to be wrong in only one direction, and pin the density the
+  // estimate has to live within. That is what these three do.
+  it('⚠⚠ the character-width estimate is an OVER-estimate, which is the only safe direction', () => {
+    // Under-estimating is what broke it: too narrow a box makes React Native re-wrap the
+    // pre-wrapped lines, snapping words and adding lines the solver never reserved room for.
+    // Over-estimating merely costs a little spacing. 0.54em was under; a heavy serif needs
+    // ~0.6em or more, so the floor is set above that and this fails if anyone trims it.
+    const src = readFileSync('app/engine/atlasLabels.ts', 'utf8');
+    const m = src.match(/CHAR_W_PX\s*=\s*FONT_PX\s*\*\s*([\d.]+)/);
+    expect(m).toBeTruthy();
+    expect(Number(m![1])).toBeGreaterThanOrEqual(0.62);
+  });
+
+  it('⚠⚠ the rendered box is wider than the solved box, so real glyphs cannot force a re-wrap', () => {
+    expect(LABEL_BOX_SAFETY).toBeGreaterThan(1.15);
+    // ⚠ And MapScreen must actually APPLY it, and must take its type size from this module
+    // rather than re-typing the numbers — re-typed constants are what put the atlas
+    // dimensions out of step with the artwork twice already.
+    const screen = readFileSync('app/screens/MapScreen.tsx', 'utf8');
+    expect(screen).toMatch(/LABEL_BOX_SAFETY/);
+    expect(screen).toMatch(/LABEL_FONT_PX \* labelScale/);
+    expect(screen).toMatch(/LABEL_LINE_PX \* labelScale/);
+    expect(screen).not.toMatch(/25\.5 \* labelScale/);
+  });
+
+  it('⚠⚠ a label fits the space between landmarks — the size is checked against DENSITY', () => {
+    // The real defect behind the screenshot: 25.5 px type was inherited from a label tuned
+    // as ONE name among painted names, and never checked against how close the landmarks
+    // actually are. Measured, the median nearest-neighbour gap is ~102 px, and a long line
+    // at 25.5 px ran ~237 px — over twice the room. The map read as text with art behind it.
+    const pts = Object.values(LOCATION_ATLAS_COORDS)
+      .map((c) => [c.fx * ATLAS_PIXEL_W, c.fy * ATLAS_PIXEL_H] as const);
+    const nn = pts.map((a, i) => Math.min(
+      ...pts.filter((_, j) => j !== i).map((b) => Math.hypot(a[0] - b[0], a[1] - b[1])),
+    )).sort((x, y) => x - y);
+    const medianGap = nn[Math.floor(nn.length / 2)]!;
+    const widest = Math.max(...labels.map((l) => l.wFrac * ATLAS_PIXEL_W));
+    // The widest name may not exceed the typical gap between neighbouring places. This is
+    // the assertion the first cut would have failed, and the one that keeps the type honest
+    // if the catalogue ever gets denser.
+    expect(widest).toBeLessThanOrEqual(medianGap);
+  });
+
   it('⚠ wrapping keeps long names to readable lines without dropping words', () => {
-    expect(wrapLabel('The Monarch\'s Waystation')).toEqual(['The Monarch\'s', 'Waystation']);
+    // ⚠ This used to assert a literal example — `['The Monarch\'s', 'Waystation']` — which
+    // broke the moment the wrap width was retuned from 13 characters to 11, even though the
+    // wrapper was behaving perfectly. That is pinning an ACCIDENT of one setting instead of
+    // the rule. The rule is: never exceed the width unless a single word is itself longer,
+    // never split a word, never lose one.
+    for (const name of ['The Monarch\'s Waystation', 'Asgardar', 'The Architect\'s Blind']) {
+      const lines = wrapLabel(name, 11);
+      expect(lines.join(' ')).toBe(name);
+      for (const line of lines) {
+        // A line may only exceed the budget when it is one unbreakable word.
+        if (line.length > 11) expect(line.split(' ').length).toBe(1);
+      }
+    }
     expect(wrapLabel('Asgardar')).toEqual(['Asgardar']);
     // Nothing is ever truncated — a clipped place name is worse than a wide one.
     for (const l of labels) {

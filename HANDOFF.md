@@ -1839,8 +1839,45 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ THE MAP LABELS WERE BROKEN ON DEVICE WHILE THE SUITE WAS GREEN
+  (2026-08-17, latest). Golem OTA-1336.**
+  Owner sent a screenshot of the Atlas screen: names snapped mid-word — *"Giant-Wat / ch /
+  Shrine"* — and sprawling across a third of the map. All ten OTA-1335 tests passed on that
+  exact build.
+  - ⚠⚠⚠ **THE SUITE COULD ONLY EVER AGREE WITH ITSELF, AND THAT IS THE THIRD TIME.** The
+    layout solver ESTIMATES each label's width; the tests compared those estimates to one
+    another. Nothing in the loop ever touched the real typeface. Same shape as the hunt
+    walker that teleported once and reported 18 finishable hunts, and as the harness that
+    seeded the answer it then asserted. **A component that measures its own model, checked
+    against that same model, proves nothing.** When the output is visual, look at it.
+  - **Two wrong constants.** `CHAR_W_PX = FONT_PX * 0.54` — my own comment called it "a
+    slight OVER-estimate"; it is an under-estimate for a heavy serif, and too narrow a box
+    makes React Native re-wrap already-wrapped lines, snapping words and adding lines the
+    solver never reserved room for. And `FONT_PX = 25.5`, inherited from the Hidden Market
+    label — a size the owner tuned for ONE name among names PAINTED INTO THE OLD ART.
+  - ⚠⚠ **THE MEASUREMENT THAT SHOULD HAVE COME FIRST.** Median nearest-neighbour gap between
+    landmarks: **102 px**. A long line at 25.5 px: **237 px**. The type was more than twice
+    the space available and nobody had ever compared the two numbers. Swept font 12–15
+    against wrap 10–13; **font 14 / wrap 11** is the largest type that fits (101.6 px).
+    **Size a label against the density of what it labels, not against a sibling component.**
+  - **The fixes.** 0.66em advance; rendered box drawn 1.4× wider than the solved box so real
+    glyphs cannot force a re-wrap (solved width alone still governs spacing); type metrics
+    EXPORTED from `atlasLabels.ts` and consumed by MapScreen rather than re-typed — the same
+    duplicated-constant trap that put the atlas dimensions out of step with the art twice.
+    The Hidden Market label, still at 25.5, would have towered over its 37 new siblings; it
+    now shares the type size and keeps only its reveal behaviour.
+  - ⚠ **Three assertions that cannot agree with themselves:** the width estimate must be
+    conservative in the only safe direction (≥0.62em); the rendered box must exceed the
+    solved box AND MapScreen must consume the exported metrics; and the widest label must fit
+    the MEASURED landmark spacing — the one the first cut would have failed. A fourth test
+    was rewritten after the retune broke it, because it pinned a literal wrap EXAMPLE rather
+    than the wrapping rule.
+  - ⚠ **Stated, not papered over:** font 14 is ~3.3 pt at 1× on a phone — decorative, legible
+    around 3× zoom. Inherent to 37 names on a 1619-px map at ~390 pt; more type cannot fix
+    it. The real answer is culling labels by zoom level, and it is NOT built.
+
 - **⚠⚠⚠ THE REDRAWN ATLAS GOES IN, AND THE GAME STARTS DRAWING ITS OWN NAMES
-  (2026-08-17, latest). Golem OTA-1335.**
+  (2026-08-17). Golem OTA-1335.**
   Owner on the new render: *"I think this is as close as it's going to get me. can we work
   with this and make minor adjustments?"* Accepted as final art.
   - ⚠⚠⚠ **AN ASSET SWAP IS NOT A ONE-LINE CHANGE, AND BOTH TRAPS WERE SILENT.**

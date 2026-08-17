@@ -43,16 +43,45 @@ export interface AtlasLabel {
   hFrac: number;
 }
 
-// Type size in ATLAS pixels. 25.5 is the figure the Hidden Market label already uses — the
-// owner shrank it to that himself over two passes ("the ? was too big", then a further 15%),
-// so it is a settled number and the rest of the overlay should match it rather than invent
-// a second scale.
-const FONT_PX = 25.5;
-const LINE_PX = 28;
-// Condensed-ish average glyph advance. Deliberately a slight OVER-estimate: a box measured
-// too wide costs a little spacing, a box measured too narrow lets two names touch.
-const CHAR_W_PX = FONT_PX * 0.54;
-const MAX_LINE_CHARS = 15;
+// ⚠⚠ THESE THREE NUMBERS WERE ALL WRONG IN THE FIRST CUT, AND A SCREENSHOT IS WHAT PROVED
+// IT — not the suite, which agreed with itself and passed.
+//
+// FONT_PX was 25.5, inherited from the Hidden Market label. That label was tuned by the
+// owner as ONE name sitting among names PAINTED INTO THE OLD ART, where its job was to blend
+// in. As the source of all 37 names it is far too big: measured, the median gap between
+// neighbouring landmarks is 102 px, and a 15-character line at 25.5 px is ~237 px wide —
+// more than twice the room available. The map read as names with some art behind them.
+//
+// CHAR_W_PX was FONT_PX * 0.54, described in the old comment as "a slight OVER-estimate". It
+// is not: the shipped face is a heavy serif and 0.54em is comfortably UNDER its real advance.
+// That single wrong constant caused the visible defect — React Native re-wrapped the
+// already-wrapped lines inside a box too narrow to hold them, breaking words mid-syllable
+// ("Giant-Wat / ch / Shrine") and silently adding a third line to two-line names, which then
+// overlapped neighbours the solver believed it had cleared.
+//
+// ⚠ The lesson worth keeping: a layout solver that measures its own ESTIMATE and then tests
+// that estimate against itself will always pass. The only honest checks are an over-estimate
+// wide enough that reality cannot exceed it, and a render you actually look at.
+// ⚠ EXPORTED so MapScreen renders at exactly the size the solver reserved room for. They
+// were separate literals in the first cut — the same duplicated-constant trap that put the
+// atlas dimensions out of step with the artwork twice. One number, one owner.
+export const LABEL_FONT_PX = 14;
+export const LABEL_LINE_PX = 16;
+const FONT_PX = LABEL_FONT_PX;
+const LINE_PX = LABEL_LINE_PX;
+// Honest over-estimate for a bold serif. Over-estimating costs a little spacing; under-
+// estimating breaks words in half, which is what happened.
+const CHAR_W_PX = FONT_PX * 0.66;
+// ⚠ 11, not 13, and the number was MEASURED rather than chosen. The widest rendered line
+// must fit the typical gap between neighbouring landmarks (~102 px); at 14 px type an
+// 11-character line runs 101.6 px and a 13-character one runs 120 px. Swept every
+// combination of font 12–15 against wrap 10–13: font 14 / wrap 11 is the LARGEST type that
+// still fits the density. Bigger looks better in isolation and worse on the actual map.
+const MAX_LINE_CHARS = 11;
+// ⚠ The rendered box is deliberately WIDER than the solved text box. The solver's width is
+// what governs collisions; this margin exists purely so the real glyphs cannot overflow the
+// container and trigger a re-wrap. Transparent and non-interactive, so the slack is invisible.
+export const LABEL_BOX_SAFETY = 1.4;
 // Clearance between the landmark's own point and the near edge of its name.
 const GAP_PX = 16;
 // A landmark's own footprint, so a name is never laid across a different landmark's pin.

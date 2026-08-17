@@ -53,7 +53,7 @@ import {
   ATLAS_PIXEL_W,
   ATLAS_PIXEL_H,
 } from '../engine/atlasCoords';
-import { atlasLabelLayout } from '../engine/atlasLabels';
+import { atlasLabelLayout, LABEL_FONT_PX, LABEL_LINE_PX, LABEL_BOX_SAFETY } from '../engine/atlasLabels';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation, HIDDEN_LOCATIONS } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { openContractMarkers, type ContractFamily } from '../engine/contractMarkers';
@@ -621,9 +621,16 @@ export function MapScreen() {
         nameLabelStyles.push({
           id: l.id,
           lines: l.lines,
-          left: offsetX + renderedW * l.lx - (l.wFrac * renderedW) / 2,
+          // ⚠⚠ THE BOX IS DRAWN WIDER THAN THE SOLVED TEXT WIDTH ON PURPOSE. It was drawn at
+          // exactly the solved width in the first cut, and because that width came from an
+          // UNDER-estimate of the font's real advance, React Native re-wrapped the
+          // already-wrapped lines to fit — snapping words in half ("Giant-Wat / ch /
+          // Shrine") and turning two-line names into three, which then collided with
+          // neighbours the solver believed it had cleared. The slack is transparent and
+          // non-interactive; only the solved width governs spacing.
+          left: offsetX + renderedW * l.lx - (l.wFrac * LABEL_BOX_SAFETY * renderedW) / 2,
           top: offsetY + renderedH * l.ly - (l.hFrac * renderedH) / 2,
-          width: l.wFrac * renderedW,
+          width: l.wFrac * LABEL_BOX_SAFETY * renderedW,
         });
       }
     }
@@ -760,8 +767,8 @@ export function MapScreen() {
                 style={[
                   styles.nameLabel,
                   {
-                    fontSize: Math.max(4.25, 25.5 * labelScale),
-                    lineHeight: Math.max(5.1, 28 * labelScale),
+                    fontSize: Math.max(3, LABEL_FONT_PX * labelScale),
+                    lineHeight: Math.max(3.5, LABEL_LINE_PX * labelScale),
                   },
                 ]}
               >
@@ -783,8 +790,12 @@ export function MapScreen() {
                 <Text
                   style={[
                     styles.hiddenMarketName,
-                    // arb104 — shrunk a further 15% on player request (30→25.5).
-                    { fontSize: Math.max(4.25, 25.5 * labelScale), lineHeight: Math.max(5.1, 28 * labelScale) },
+                    // arb104 shrank this to 25.5 on player request, back when it was the ONLY
+                    // name the game drew and every other name was painted into the art.
+                    // ⚠ OTA-1335 — it now sits among 37 sibling labels, so keeping it at its
+                    // old size would leave one name towering over every other place on the
+                    // map. It takes the shared type size; only its reveal behaviour is special.
+                    { fontSize: Math.max(3, LABEL_FONT_PX * labelScale), lineHeight: Math.max(3.5, LABEL_LINE_PX * labelScale) },
                   ]}
                 >
                   The Hidden{'\n'}Market
