@@ -203,19 +203,31 @@ look text at all. That is arguably correct (the gate verb is deliberately broad)
 player typing `look` to orient themselves and getting a boss is worth an owner ruling.
 The ota1323 suite documents it and parks the quest phase to work around it.
 
-## B15 — movementStress is WEDGED: 3,100 actions, 4 travel steps, Day 1 — **OPEN (filed 2026-08-17)**
+## B15 — movementStress is WEDGED: 3,100 actions, 4 travel steps, Day 1 — **CLOSED (root-caused + fixed 2026-08-17, HAL OTA-1347/OTA-1348)**
 ⚠⚠ Found while re-validating the owed movementStress verdict on 4.29.209+. The sim ends
 at `max_actions` having burned 3,100 actions in 2.3 in-game hours with FOUR cardinal
-travel attempts counted, one approach, zero refusal lines, zero crashes — the actions
-are being swallowed somewhere the sim's own refusal-regex cannot see. Receipts:
-`/tmp/tartaria-movement-stress-report.txt` from two runs (identical numbers), and the
-wedge reproduces with today's working tree stashed, so it is NOT the 2026-08-17 batch;
-it entered somewhere after the last healthy run (2026-08-07, hundreds of attempts,
-approach-rate 0.714). ⚠ The old red assertion ("≥8 distinct travel variants", got 3) is
-a SYMPTOM — with 4 travels there is nothing to collect — so do not patch the assertion.
-Needs: instrument the sim loop to log what each swallowed submit actually returned, then
-bisect 2026-08-07 → now. The gates are unaffected (this suite is excluded by pattern);
-the in-gate walkers all pass, so players see none of this.
+travel attempts counted, one approach, zero refusal lines, zero crashes.
+**ROOT CAUSE (instrumented live — the probe run wedged at action 73 the same way):** a
+three-part deadlock in the SIM's own decision tree, armed by the 2026-08-06 combat
+batch (`1c8b5fbb`, which made escape a contested roll that can FAIL and added the
+OTA-1140 rest-in-combat refusal — both wedge ingredients in one commit, which is why
+the last healthy run is stamped 2026-08-07):
+1. an encounter lands while stamina is low (travel costs 2/step); a failed escape roll
+   drains stamina to ≤ 3 with enemies still standing;
+2. the sim checked **stamina before enemies**, so it submitted `rest` INTO the fight —
+   refused by OTA-1140 at zero time and zero stamina cost;
+3. from the second identical refusal on, the arbiter repeat-dedup (OTA-610) swallowed
+   the line entirely — no response at all — and the first line matched none of the
+   sim's refusal regexes. 3,096 of 3,100 actions burned on that one spot, invisibly.
+**FIXES (both shipped standalone):** HAL **OTA-1347** (game) — the rest-in-combat
+refusal passes `skipDedup`: a refusal is a direct answer to a player action, not
+ambient chatter, and must speak on EVERY tap (a real player mashing REST mid-fight got
+one answer then dead silence — the B5 "dead button" read again). Suite
+ota1347RestRefusalSpeaks (3) locks it and locks the ambient dedup as untouched. HAL
+**OTA-1348** (sim) — movementStress checks enemies BEFORE stamina (flee first, rest
+only on peaceful ground), counts the rest-refusal line as a bail, and grows an
+anti-wedge tripwire: 200 consecutive silent no-op submits now FAIL FAST naming the
+stuck action instead of reporting "zero refusals" after 3,000 invisible ones.
 
 ## VERDICTS DELIVERED (2026-08-17) — the two owed from HANDOFF §8
 - **encounterStress:276 ("stepDirection spawns a skirmish")** — verdict: FLAKE. A random
