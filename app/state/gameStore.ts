@@ -7608,7 +7608,9 @@ interface GameStore {
    *  inside an outpost, this field holds the pending destination until
    *  they confirm or cancel via the BrandedModal. The screen layer
    *  listens for this and renders a Yes/No prompt. */
-  pendingTravelConfirm: { locationId: string; locationName: string } | null;
+  /** ⚠ OTA-1345 — B6: the confirm can carry the mission/climb it was asked FOR,
+   *  so accepting routes the contract instead of a bare course. */
+  pendingTravelConfirm: { locationId: string; locationName: string; missionId?: string; climbId?: string } | null;
   /** OTA-656 — a mission you STUMBLED onto (didn't seek out) offers itself for
    *  accept/decline instead of silently committing you. Currently the Parley of
    *  Factions: approaching the leaders on the neutral flats now ANNOUNCES the
@@ -7685,7 +7687,7 @@ interface GameStore {
    *  "skip"); otherwise seals the name (16 cap) with the same Arbiter acks. */
   confirmGolemName: (name: string | null) => void;
   /** Set the pending destination; the screen renders the modal. */
-  requestTravelConfirm: (locationId: string, locationName: string) => void;
+  requestTravelConfirm: (locationId: string, locationName: string, opts?: { missionId?: string; climbId?: string }) => void;
   /** Yes path: leave outpost, then set course. Clears pending. */
   confirmLeaveAndTravel: () => void;
   /** No path: clears pending. Player stays inside the outpost. */
@@ -29798,8 +29800,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // and Set Course paths route here instead of calling setTravelCourse
   // directly. The screen layer renders a BrandedModal with two
   // buttons: confirm (leave + travel) or cancel (stay).
-  requestTravelConfirm(locationId, locationName) {
-    set({ pendingTravelConfirm: { locationId, locationName } });
+  requestTravelConfirm(locationId, locationName, opts) {
+    set({ pendingTravelConfirm: { locationId, locationName, ...(opts ?? {}) } });
   },
   confirmLeaveAndTravel() {
     const pending = get().pendingTravelConfirm;
@@ -29821,6 +29823,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().beginScene({ skipHubEntry: true });
     }
     set({ pendingTravelConfirm: null });
+    // ⚠ OTA-1345 — PUNCHLIST-BRAVO B6, decided: THE GATE ASKS EVERY TIME. A
+    // mission's or a tower's SET COURSE used to walk you out of the outpost with
+    // no Yes/No (their branches returned before the hub check), while the plain
+    // SET COURSE asked — two precedents in one dialog. Unified on ASKING: the
+    // ContractsScreen now sends mission/climb routes through this same confirm,
+    // and an accepted confirm routes the CONTRACT (single-active rules and all),
+    // not a bare course. The OTA-041 vendor-on-the-road pause below stays a
+    // plain-course nicety, exactly as it always was for these routes.
+    if (pending.missionId) {
+      get().routeMission(pending.missionId);
+      return;
+    }
+    if (pending.climbId) {
+      get().routeGreatClimb(pending.climbId);
+      return;
+    }
     // 2026-05-25 OTA-041 — playtester report: a roadside vendor was
     // announced ("Road Hawker is already here when you arrive") when
     // the outpost step landed at the outdoor Asgardar tile, but
