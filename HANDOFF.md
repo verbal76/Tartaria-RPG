@@ -1068,6 +1068,9 @@ it and states what was checked to rule out a consumer elsewhere.
     read standing at all**, and `pressure.ts` only uses it to punish (`HOSTILE_STANDING = -25`, hunt
     chance 0.05→0.22). Standing is punishment-only. **Recommendation was to build the ladder BEFORE the
     atmospheric line** — a vague line about a number that does nothing just advertises the hole.
+  - **✅ SHIPPED — OTA-1337 (2026-08-17, same greenlight, after the ladder as gated).** One precise line
+    for single-faction changes, the vague line for bursts, named lines on every ladder-tier crossing;
+    the OTA-877 explainer teaches the real thresholds now. Original entry:
   - **The faction-shift line itself.** Owner wants the six-shift wall replaced with one vague Tartarian
     line — *"many people view you differently now"* — plus threshold-only lines when a tier is actually
     crossed. He agreed to drop the "just organize the wall better" alternative (*"we still get a wall of

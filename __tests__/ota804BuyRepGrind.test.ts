@@ -67,7 +67,7 @@ function setVendor(store: ReturnType<typeof useGameStore>, price: number, stock 
     // TC-spent figure this suite banks on.
     player: {
       ...s.player!, tc: 100000,
-      factionStanding: s.player!.factionStanding.map((r) =>
+      factionStanding: s.player!.factionStanding.map((r: { factionId: string; standing: number }) =>
         r.factionId === 'reclaimers_guild' ? { ...r, standing: 0 } : r),
     },
   }));

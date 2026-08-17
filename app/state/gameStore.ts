@@ -289,7 +289,7 @@ import {
   visibleBuildingRooms,
 } from '../engine/buildings';
 import { sellPriceFor, isUnsellable, applySellCaps } from '../engine/sellPrice';
-import { vendorPriceMod, rapportQuestId, chaPriceDiscount } from '../engine/factionRapport';
+import { vendorPriceMod, rapportQuestId, chaPriceDiscount, standingTier, standingTierLabel, standingPriceDiscount } from '../engine/factionRapport';
 import { isTalkDownBlocked } from '../engine/talkDown';
 import { makeWanderer, wandererCagey, type Wanderer } from '../engine/wanderers';
 import {
@@ -43231,15 +43231,48 @@ function attackKill(weapon: string | null, enemyName: string, dmg: number): stri
 // can see propagation (e.g. gifting the Forgotten Order also nudges
 // the Reclaimers Guild via the situational alliance, and dings the
 // Mud Monarchs as their rival).
-function logRepChanges(
+// ⚠ OTA-1337 — THE WALL IS GONE. Owner, on the six-line standing dump every
+// rival-spillover write produced: replace it with *"one vague Tartarian line —
+// 'many people view you differently now'"* plus *"threshold-only lines when a
+// tier is actually crossed"* — and he explicitly dropped the "just organize the
+// wall better" alternative (*"we still get a wall of text, it's just more
+// organized"*). So: a SINGLE-faction change keeps its one precise line (one line
+// was never a wall, and the tutorial's first standing beat still teaches); a
+// multi-faction burst collapses to the one vague line; and a LADDER-TIER
+// crossing (OTA-1336's tiers) is always named, in either direction, because
+// those are the moments the number changes what the world does to you. The
+// exact figures stay one tap away on the character sheet.
+export function logRepChanges(
   get: () => GameStore,
   changes: { factionId: string; delta: number; newStanding: number }[],
 ): void {
-  for (const c of changes) {
+  if (changes.length === 1) {
+    const c = changes[0]!;
     const faction = FACTIONS.find((f) => f.id === c.factionId);
     const name = faction?.name ?? c.factionId;
     const sign = c.delta > 0 ? '+' : '';
     get().appendLog('system', `${name} standing ${sign}${c.delta} (now ${c.newStanding})`);
+  } else if (changes.length > 1) {
+    get().appendLog('system', 'Word moves through the buried world — many people view you differently now.');
+  }
+  for (const c of changes) {
+    const oldTier = standingTier(c.newStanding - c.delta);
+    const newTier = standingTier(c.newStanding);
+    if (oldTier === newTier) continue;
+    const faction = FACTIONS.find((f) => f.id === c.factionId);
+    const name = faction?.name ?? c.factionId;
+    if (newTier === 'hated') {
+      get().appendLog('system', `▼ ${name} marks you HATED — their counters charge you +25%, and no charm changes it.`);
+    } else if (newTier === 'hostile') {
+      get().appendLog('system', `▼ ${name} turns HOSTILE — their patrols hunt you on their own ground now, and their counters mark you up.`);
+    } else if ((oldTier === 'hostile' || oldTier === 'hated') && c.delta > 0) {
+      get().appendLog('system', `▲ The blades come down — ${name} no longer hunts you.`);
+    } else if (c.delta > 0) {
+      const pct = Math.round(standingPriceDiscount(c.newStanding) * 100);
+      get().appendLog('system', `▲ ${name} now counts you ${standingTierLabel(c.newStanding).toUpperCase()}${pct > 0 ? ` — their counters take ${pct}% off` : ''}.`);
+    } else {
+      get().appendLog('system', `▼ ${name} no longer counts you ${standingTierLabel(c.newStanding - c.delta).toUpperCase()}.`);
+    }
   }
   // OTA-877 — the FIRST time any standing moves, drop a one-time note explaining what
   // faction standing is (playtest: the tutorial's first standing burst pops up with no
@@ -43247,9 +43280,12 @@ function logRepChanges(
   // to your OWN faction isn't confusing; but even that's a fine teaching moment, so any
   // first change triggers it.
   if (changes.length > 0 && !get().worldMemory?.factionRepIntroShown) {
+    // OTA-1337 — the explainer teaches the REAL ladder now (OTA-1336): the old
+    // text said "−20 turns hostile / +20 ally", neither of which was the number
+    // the engine used.
     get().appendLog(
       'system',
-      'Faction standing is how a faction sees you: at −20 or below they turn hostile, at +20 or above they treat you as an ally, neutral in between. It shifts as you act — and as their own rivalries play out — and it shapes vendor prices, the work they will offer you, and who fights beside you when blades come out.',
+      'Faction standing is how a faction sees you, and their counters price by it: Known (+10) takes 5% off, Trusted (+25) 10%, Honored (+50) 15% — while at −25 they turn hostile (patrols hunt you, prices mark up) and at −50 you are hated. It shifts as you act, and as their own rivalries play out; the full list lives on your character sheet.',
     );
     useGameStore.setState((s) => ({ worldMemory: { ...s.worldMemory, factionRepIntroShown: true } }));
   }
