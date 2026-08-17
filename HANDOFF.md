@@ -1080,6 +1080,9 @@ it and states what was checked to rule out a consumer elsewhere.
     description rewrite, mechanics sentence untouched. Original entry:
   - **Acid lore.** Owner: *"we could work acid somehow into the lore."* Sketch he liked: a vendor topic +
     an Arbiter line + an Acid Flask description rewrite. Not scheduled.
+  - **✅ SHIPPED — OTA-1340 (2026-08-17, same greenlight).** On the bulging-mud omen's ground, DIG with an
+    edged tool raises the golem through the hook's own stage-1 outcome ("The mud changes shape."); dig
+    stays the safe loot loop everywhere else. Original entry:
   - **Mud monster memory.** Owner tried to preempt a mud fight from a remembered beat — *"you examine the
     mud. the mud changes shape"* — and from the original design where **any edged metal item scrapes the
     ground**. `engine/hooks.ts:151,591` has `mud_golem_stir` (weight 4). The scrape-with-an-edge affordance

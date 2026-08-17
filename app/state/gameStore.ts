@@ -31480,6 +31480,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    // ⚠ OTA-1340 — THE SCRAPE WAKES THE MUD. Owner, reaching for the original
+    // design (*"any edged metal item scrapes the ground"*) after trying to
+    // preempt a mud fight from the remembered beat — *"you examine the mud. the
+    // mud changes shape."* When THIS ground is the omen's ground — the scene
+    // carries an unresolved mud_golem_stir hook (the "mud is bulging" sight) —
+    // dragging an edge through it is not a loot roll, it is an announcement, and
+    // the golem answers. Deterministic HERE and only here: the omen is the
+    // telegraph, so digging stays a safe core loop on ordinary ground. Fires the
+    // hook's own stage-1 outcome (spawn + narration) through resolveHookOneStep,
+    // so the chip greys and the encounter is the same one investigating raises.
+    const stirHook = (get().currentScene?.hooks ?? []).find(
+      (h) => h.kind === 'mud_golem_stir' && !h.resolved,
+    );
+    if (stirHook) {
+      set((s) => (s.player ? { player: advanceTime(spendStamina(s.player, 1), 0.2) } : s));
+      get().appendLog(
+        'world',
+        `You drag the edge of the ${item.name.toLowerCase()} through the mud. The mud changes shape.`,
+      );
+      resolveHookOneStep({ ...stirHook, stage: 1 }, get, set, 'mud');
+      void get().persist();
+      return;
+    }
     // arb119 — wild-tile dig farm guard. Stackable commodities re-roll
     // freely here (by design, so the player can gather crafting stock in
     // place), but with no ceiling the loop minted 100+ items — including
