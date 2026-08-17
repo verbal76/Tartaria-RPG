@@ -351,7 +351,7 @@ const CAPITAL_ARRIVAL_SIGNATURES: Record<string, string> = {
   ostragar:
     'Ostragar moves. The Eternal Dynasty\'s river city sits half-drowned in a slow brown current that runs the wrong way past your shins, threading between sunken colonnades. Something in the water keeps pace with you just under the surface, and the reeds bow as you pass, then straighten behind you.',
   iskan_veil:
-    'Iskan-Veil refuses to hold still in your head. The Conspiracy Architects built a maze of false doors and lying corridors, and the far-northern light comes in flat and grey through windows that open onto walls. Twice you are sure you\'ve been here already. Twice you are wrong. Or right.',
+    'Iskan-Veil refuses to hold still in your head. The Conspiracy Architects built a maze of false doors and lying corridors, and the far-northwestern light comes in flat and grey through windows that open onto walls. Twice you are sure you\'ve been here already. Twice you are wrong. Or right.',
 };
 
 /** OTA-442 — the one-time arrival signature for a Lost Capital, or null. */

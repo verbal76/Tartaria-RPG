@@ -545,7 +545,7 @@
         },
         {
           "stageType": "investigation",
-          "narration": "You search the camp's debris. A boot-track heading due north, fresh. A Reaver's spiral-mark scratched into a flat stone — his next staging ground, named in raider sign, out on the Tartarian Outskirts ridge. You put the stone in your pack. He wanted the right kind of hunter to follow.",
+          "narration": "You search the camp's debris. A boot-track heading due west, fresh. A Reaver's spiral-mark scratched into a flat stone — his next staging ground, named in raider sign, out on the Tartarian Outskirts ridge. You put the stone in your pack. He wanted the right kind of hunter to follow.",
           "arbiter": null,
           "checkKind": "investigate",
           "grants": {

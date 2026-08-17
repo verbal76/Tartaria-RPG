@@ -108,37 +108,37 @@ export function wrapLabel(name: string, maxChars: number = MAX_LINE_CHARS): stri
 
 // ⚠⚠ VISUAL NUDGE — WHY THE NAMES DID NOT SIT ON THE BUILDINGS.
 //
-// Owner, testing on device: *"the text size is good, but the locations shifted a bit."*
-// He was right, and the cause is mine and traceable. The pixel table in the artwork hand-off
-// was SNAPPED TO A 60-PX LATTICE when I generated it; the game pins at the true fractions.
-// The two disagree by 0–2 grid rows, and because the snap error accumulates southward, the
-// northern half of the map lines up well (median 18 px out) while the south drifts badly
-// (35–122 px). The artist painted where the document said; the game points where the data
+// Owner, testing on device: *"the text size is good, but the locations shifted a bit"* —
+// and then, making it a standing requirement: *"make sure all points are aligned as close
+// as can be to the new map."* The cause is traceable: the pixel table in the artwork
+// hand-off was SNAPPED TO A 60-PX LATTICE when generated; the game pins at the true
+// fractions. The artist painted where the document said; the game points where the data
 // says; nobody was wrong except the document.
 //
 // ⚠⚠ THIS TABLE IS DRAWING-ONLY AND MUST STAY THAT WAY. `canonicalCellFor` derives a
 // location's GRID CELL — and therefore every travel distance in the game — from its atlas
-// fraction. One number doing two jobs is why this cannot be fixed by editing the fractions:
-// sliding a landmark 30 px to sit on its silhouette would silently reprice the journey to
-// it. So the nudge is applied when DRAWING a name or a pin, and never when computing where
-// a place is or how far away it lies. Precedent: `ATLAS_LEGEND_FRAC` was exactly this kind
-// of visual-only correction, and said so.
+// fraction. That is why this cannot be fixed by editing the fractions: sliding a landmark
+// to sit on its silhouette would silently reprice the journey to it. The nudge applies when
+// DRAWING a name or a pin, never when computing where a place is or how far away it lies.
 //
-// Derived by decoding the shipped PNG and scoring an 8-px lattice for local darkness plus
-// edge energy — the silhouettes in this art are dark, high-contrast shapes on lighter
-// ground. Each landmark takes the nearest strong structure, subject to two rules that keep
-// it honest:
+// TIER 1 (26 entries): machine-derived. The shipped PNG was decoded and an 8-px lattice
+// scored for local darkness + edge energy; each landmark took the nearest strong structure,
+// capped at 36 px, no silhouette claimed twice.
 //
-//   • a hard cap of 36 px, which is under one grid tile on both axes (x ≈ 40 px, y ≈ 44 px),
-//     so a name can never drift a full tile from the place it names; and
-//   • no two landmarks may claim the same silhouette.
+// ⚠⚠ TIER 2 (7 entries, marked "by eye"): the scorer is BLIND IN THE MOLTEN SOUTH — dark
+// silhouettes on near-black ground score nothing, which is exactly where the biggest drift
+// was. Each of these was verified by cropping the artwork and looking: Varakush takes the
+// big spired citadel east of its anchor; the Red Tower takes the ruin with the red-lit
+// windows; the Endless Stair takes the tall gothic tower to its south-west; Reclaimer's
+// Stake takes the painted tent camp above it. Distances up to 93 px — still drawing-only,
+// so the only thing that moves is ink.
 //
-// ⚠ 26 of 37 qualified (median 13 px, max 35 px). The other ELEVEN ARE DELIBERATELY LEFT
-// ALONE rather than forced: most are in the molten south, where the art has few distinct
-// structures and the nearest candidate was either beyond the cap or already claimed. Forcing
-// those would move a name a long way onto a building belonging to something else, which is
-// worse than a name on open ground. The Black Reach is the clearest case — it is a hole in
-// the world, and there is nothing built there to sit on.
+// ⚠ FOUR LANDMARKS ARE DELIBERATELY LEFT ALONE, each for a stated reason rather than a
+// threshold: `mud_flood_nexus` — its anchor already sits ON the machinery (verified by
+// crop, the scorer simply could not see it); `black_reach` — a chasm, correctly on
+// fissured open ground; `giant_vault` — a sealed door in the ground, nothing built there;
+// `grand_spire_of_etheria` — the art painted no tower near its spot, so its name and pin
+// mark the location honestly rather than being forced onto some other place's building.
 export const LABEL_ANCHOR_NUDGE: Record<string, readonly [number, number]> = {
   architect_blind: [-0.00859, 0.00185],
   asgardar: [0.00059, -0.01274],
@@ -166,6 +166,14 @@ export const LABEL_ANCHOR_NUDGE: Record<string, readonly [number, number]> = {
   voronov: [-0.02151, -0.00387],
   yuldra_tul: [-0.00786, -0.00286],
   zharaks_teeth: [-0.00869, 0.00248],
+  // ── Tier 2 — placed by eye from crops of the artwork (see note above) ──
+  reclaimer_stake: [0.01729, -0.0793],
+  thametans_tower: [0.01482, -0.03605],
+  red_tower_of_nimari: [0.04138, -0.0206],
+  varakush: [0.05683, 0.01442],
+  karok_sa: [0.00185, 0.03192],
+  endless_stair: [-0.01421, 0.05973],
+  etheric_chamber: [0.01606, -0.04531],
 };
 
 /** Where a place should be DRAWN, as image fractions. Never where it IS — see the note

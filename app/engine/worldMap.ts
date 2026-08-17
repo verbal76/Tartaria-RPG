@@ -119,7 +119,8 @@ export interface WorldMap {
 // Generate a deterministic world map for a character. Starting location
 // goes at the center; other locations scatter outward, with rarer/danger
 // locations weighted to the edges.
-// Atlas → grid spread. The atlas is 1408×768 (≈1.83:1); SPREAD_X/SPREAD_Y
+// Atlas → grid spread. Fractions are canvas-agnostic (the artwork has been replaced
+// twice since these were tuned); SPREAD_X/SPREAD_Y
 // keep that aspect (40/22 ≈ 1.82) so a step east on the grid matches east on
 // the atlas, and size the longest canonical journey to ~35-38 tiles on the
 // 82-wide grid — a real haul without running off the edge from any center.
