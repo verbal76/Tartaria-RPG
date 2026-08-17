@@ -1,5 +1,9 @@
 # Tartaria Realms — Punch List BRAVO
 
+**⚠⚠ FROZEN — THIS COPY MOVED TO THE HAL BRANCH (`HaL2001`), 2026-08-17.** HAL is the
+primary line under the standing order, so the LIVE list is HAL's `PUNCHLIST-BRAVO.md`;
+edit and read status there. This copy is kept for history and receives no updates.
+
 **Charter (owner, 2026-08-16): actionable items.** Alpha (`PUNCHLIST.md`) tracks
 completability and nothing else, by its own charter — so the session's live follow-ons,
 staged work and open decisions get their own list rather than diluting it.
