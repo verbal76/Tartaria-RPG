@@ -61,14 +61,27 @@ seconds, four identical *"not for first-timers"* refusals. `useVendorCrucible` g
 took the tap. Now gated at render. Same shape as OTA-1024 (*"a lit button that doesn't
 fire"*), whose comment sits twelve lines below the fix. New suite ota1324 (4).
 
-## B5 — The bulk sweep holds items out SILENTLY — **DECIDE (owner wording)**
+## B5 — The bulk sweep holds items out SILENTLY — **DONE (HAL OTA-1344, 2026-08-17)**
+✅ Owner greenlit the batch ("let's start ticking them off"); shipped to the proposed
+shape. `bulkSellHeldBackNote` (bulkSell.ts) builds the line from the SAME gate filter
+that does the holding — "1 piece held back — the Aether-Breath Mask is your only way to
+breathe in toxic zones." — and the SELL ALL confirm appends it. Suite ota1344 (4).
+### Original entry
+
 OTA-1320 excludes a last gate-satisfier from SELL ALL COMMON GEAR, but the confirm never
 says so — a player selling down their pack may notice the mask "refusing to sell" with
 no explanation, which is how held-out reads as broken. Proposed: one line in the confirm
 body ("1 piece held back — your only way to breathe toxic air."). Catalogue-not-invent:
 wording is the owner's.
 
-## B6 — Climb SET COURSE skips the leave-outpost confirm — **DECIDE**
+## B6 — Climb SET COURSE skips the leave-outpost confirm — **DONE (HAL OTA-1345, 2026-08-17)**
+✅ Ruled with the tick-off greenlight: THE GATE ASKS EVERY TIME. Mission and climb SET
+COURSE now route through the same leave-the-outpost Yes/No the plain course always had
+(OTA-035), and the confirm CARRIES the contract (missionId/climbId) so accepting routes
+the mission/climb — single-active rules and all — not a bare course. Cancelling stays
+inside and routes nothing. Suite ota1345 (3).
+### Original entry
+
 `routeGreatClimb` (like `routeMission` before it) relies on `setTravelCourse`'s OTA-993
 hub self-heal, so tapping a tower's SET COURSE inside an outpost walks you out with no
 Yes/No — while the plain SET COURSE path asks (OTA-035). Two precedents disagree; either
@@ -117,7 +130,15 @@ yet. Nothing to chase until a device produces one.
 ## B10 — N5: off-canon place-name filter — **WATCH (carry-over)**
 Held for a second sighting per the standing rule; one sighting on record.
 
-## B11 — A walker that arrives by road — **READY (B7 no longer blocks it)**
+## B11 — A walker that arrives by road — **DONE (HAL OTA-1346, 2026-08-17)**
+✅ `ota1346RoadClimbWalker`: starts inside the outpost, routes Thametan's Tower through
+the new B6 confirm, walks every tile with the real travel loop (fights cleared by fiat —
+the road is the subject), arrives, takes an honest look, and proves the GREAT 12-tier
+climb is standing there — not the generic 3-tier ascent that opened B7. First run paid
+for itself already: it caught a war party spawning between look and climb, which is the
+exact class of thing a teleporting suite can never see.
+### Original entry
+
 Every climb suite still TELEPORTS (`currentLocationId: climb.locationId`), which is how
 the missing tower route shipped invisible. B7 has now settled what a routed arrival
 resolves to — the great climb, once the prop is on screen — so the open question is only
@@ -181,3 +202,28 @@ the B7 probe — a bare `look` produced only the Sentinel-Priest Vaelka combat l
 look text at all. That is arguably correct (the gate verb is deliberately broad), but a
 player typing `look` to orient themselves and getting a boss is worth an owner ruling.
 The ota1323 suite documents it and parks the quest phase to work around it.
+
+## B15 — movementStress is WEDGED: 3,100 actions, 4 travel steps, Day 1 — **OPEN (filed 2026-08-17)**
+⚠⚠ Found while re-validating the owed movementStress verdict on 4.29.209+. The sim ends
+at `max_actions` having burned 3,100 actions in 2.3 in-game hours with FOUR cardinal
+travel attempts counted, one approach, zero refusal lines, zero crashes — the actions
+are being swallowed somewhere the sim's own refusal-regex cannot see. Receipts:
+`/tmp/tartaria-movement-stress-report.txt` from two runs (identical numbers), and the
+wedge reproduces with today's working tree stashed, so it is NOT the 2026-08-17 batch;
+it entered somewhere after the last healthy run (2026-08-07, hundreds of attempts,
+approach-rate 0.714). ⚠ The old red assertion ("≥8 distinct travel variants", got 3) is
+a SYMPTOM — with 4 travels there is nothing to collect — so do not patch the assertion.
+Needs: instrument the sim loop to log what each swallowed submit actually returned, then
+bisect 2026-08-07 → now. The gates are unaffected (this suite is excluded by pattern);
+the in-gate walkers all pass, so players see none of this.
+
+## VERDICTS DELIVERED (2026-08-17) — the two owed from HANDOFF §8
+- **encounterStress:276 ("stepDirection spawns a skirmish")** — verdict: FLAKE. A random
+  spawn asserted as certain. Passing on 4.29.209 across repeated runs (receipts in the
+  session log); it was already failing IDENTICALLY on the pre-change baseline when it
+  failed at all. No regression; the assertion is probabilistic by construction.
+- **playerInputChaosSim head-noun 0.03** — RETARGETED (HAL OTA-1346) to the OTA-1172
+  contract with the split the original analysis recommended: honest inputs must resolve
+  ≥95% AND invented-adjective inputs must be REFUSED ≥95% (a confident wrong answer
+  spends an item). Both halves pass at 4.29.209+ — the parser was healthy the whole
+  time; the test was asserting the contract OTA-1172 deliberately replaced.

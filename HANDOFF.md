@@ -1094,6 +1094,11 @@ it and states what was checked to rule out a consumer elsewhere.
     ground**. `engine/hooks.ts:151,591` has `mud_golem_stir` (weight 4). The scrape-with-an-edge affordance
     is what he was reaching for and it is not wired.
 
+- **✅ DELIVERED (2026-08-17) — both verdicts below are settled; receipts in PUNCHLIST-BRAVO.md
+  ("VERDICTS DELIVERED"). encounterStress: flake (3 consecutive green runs on 4.29.209+).
+  movementStress: superseded by a NEW finding — the sim is WEDGED (B15, open). The chaos
+  fuzzer was retargeted to the OTA-1172 contract in HAL OTA-1346 and passes both halves.
+  Original entry:**
 - **⚠ TEST VERDICTS OWED (promised unprompted — deliver without being asked again).**
   - **`encounterStress.test.ts:276`** — still failing. **Confirmed NOT caused by the acid batch:** it was
     already failing on `78c75a8` before OTA-1173 and is unchanged after. Verdict flake-vs-real-regression
