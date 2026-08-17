@@ -1676,8 +1676,49 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠⚠ THE MAP-MAKEOVER AUDIT — HAL LEADS, AND THE WALKERS PAID FOR THEMSELVES
+  (2026-08-17, latest). HAL OTA-1333.**
+  Owner, changing the process AND ordering the audit: *"from here on out until we make a
+  significant gameplay change HAL is the primary game again. it gets done first and then we
+  port to golem and steam."* Then: align all points to the new map, update all text/lore,
+  scrub all legacy old-map code, run every walker, full jest.
+  - ⚠⚠⚠ **STANDING ORDER: HAL FIRST.** Until a significant gameplay change says otherwise,
+    work lands on HaL2001 first and PORTS to golem-line and steam_Dev. The port discipline
+    that used to run golem→HAL now runs the other way, including the per-line OTA-number
+    comment care.
+  - ⚠⚠ **THE SCORER WAS BLIND EXACTLY WHERE THE DRIFT WAS WORST.** The silhouette detector
+    scores dark-on-light; the molten south is dark-on-dark, so it returned nothing there —
+    and "nothing" was previously read as "no structure to snap to". Cropping the shipped
+    PNG and LOOKING settled all 11 leftovers in minutes: 7 real silhouettes (up to 93 px
+    out), 4 genuinely structure-less. **When a detector returns nothing, distinguish "empty"
+    from "can't see" before acting on it** — the Nexus anchor was sitting ON its machinery
+    the whole time.
+  - ⚠⚠⚠ **DEAD CODE IS NOT NEUTRAL.** The player-dot pipeline (removed at OTA-182) was
+    still computed every render, and its OFF_LIMITS_RECTS — traced from the ORIGINAL art's
+    legend boxes — sat exactly over Yuldra-Tul on the current art. Dead code with stale
+    geometry is a loaded trap for whoever revives the feature. ~400 lines cut,
+    consumer-verified; the tests embalming them deleted.
+  - ⚠⚠⚠ **THE WALKERS FOUND A REAL WEDGE, AND THE TRIGGER WAS THE AUDIT ITSELF.** Adding
+    flavour data shifted the seeded RNG stream and a long-standing race stopped hiding:
+    the catch-up heal grants a mission item, the SAME action falls through to the generic
+    search beat, whose loot write (from a pre-heal snapshot) destroys the grant and burns
+    the tile's once-only search — second attempt meets "already searched" and the stage is
+    unwinnable on its own ground. The mysteries pass stopped the heal from ADVANCING
+    mid-action; it never stopped the ACTION. **When you fix a stale-snapshot race, ask what
+    ELSE the same action writes.** `advanceStagesOnIntent` is boolean now; a heal that lands
+    anything consumes the action. Pinned by ota1333HealConsumesTheAction.
+  - ⚠⚠ **TWO OF MY OWN RUNS WERE DISHONEST AND THE MACHINERY CAUGHT BOTH.** A full-jest
+    green was discarded because a git stash swapped the tree UNDER the running suite —
+    never mutate a worktree while its gate runs (and `git stash` without -u leaves
+    untracked files behind, which also poisoned a baseline diff). And the typecheck ratchet
+    refused my new test's +2 errors: the fix is fixing your files, not the baseline.
+  - ⚠ The uniquenessAudit rejected the first lore fill (6-line pools repeat within 20
+    visits). Its ~10-line standard is the shipped norm; all 15 new pools extended. 15 of 38
+    locations had NO codex entry and NO flavour before this pass; `loreCoverage` now fails
+    the build on a mute location. **832 suites / 7,677 green, ratchet at 200.**
+
 - **⚠⚠⚠ THE ★ CLIMB BUTTON, AND THE SPIRE LOSES "BURIED"
-  (2026-08-17, latest). HAL OTA-1331.**
+  (2026-08-17). HAL OTA-1331.**
   Owner: *"when you land on the tile, beginning the climb should be a button like summon the
   guardian. and it should only be visible if you have that particular map and used it to
   mark the location. change all names to grand spire not buried."*
