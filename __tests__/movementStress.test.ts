@@ -112,6 +112,9 @@ const REFUSAL_PATTERNS: RegExp[] = [
   /\b(?:too tired|exhausted|out of stamina)\b/i,
   /there is no/i,
   /not enough stamina/i,
+  // OTA-1349 — the rest-in-combat refusal (OTA-1140/OTA-1348). B15's wedge
+  // spun on this exact line and the sim couldn't count it as a bail.
+  /has agreed to that/i,
 ];
 
 // Successful cardinal-travel narration usually opens with one of
@@ -202,6 +205,13 @@ describe('movementStress — cardinal travel + approach quick-action', () => {
     let totalAttempts = 0;
     let totalBails = 0;
     const bailLineSamples: string[] = [];
+
+    // OTA-1349 — B15's blind spot, instrumented. A submit that yields NO
+    // engine response and moves NO state is invisible to every heuristic
+    // in this file; the wedge burned 3,096 actions exactly there.
+    let silentSubmits = 0;
+    let consecutiveSilent = 0;
+    const silentSubmitSamples: string[] = [];
 
     // Pending rolls
     let pendingResolves = 0;
@@ -344,6 +354,30 @@ describe('movementStress — cardinal travel + approach quick-action', () => {
         if (bailLineSamples.length < 20) {
           bailLineSamples.push(`[${kind}] "${text}" → ${respText.slice(0, 100)}`);
         }
+      }
+
+      // OTA-1349 — the anti-wedge tripwire. No response line AND no state
+      // motion = the engine silently no-opped this submit. Count it, and
+      // fail FAST on a long consecutive streak with a diagnostic naming
+      // the stuck action, instead of reporting "zero refusals" after
+      // 3,000 invisible ones (B15's exact failure mode).
+      const movedAnyState = locAfter !== locBefore || mxAfter !== mxBefore || myAfter !== myBefore
+        || hubAfter !== hubBefore || enemiesAfter !== enemiesBefore
+        || (pAfter?.hoursElapsed ?? 0) !== (pBefore?.hoursElapsed ?? 0)
+        || (pAfter?.stamina ?? 0) !== (pBefore?.stamina ?? 0);
+      if (!response && !movedAnyState) {
+        silentSubmits++;
+        consecutiveSilent++;
+        if (silentSubmitSamples.length < 8) {
+          silentSubmitSamples.push(`[${kind}] "${text}" (enemies=${enemiesAfter}, stam=${pAfter?.stamina}, hub=${hubAfter})`);
+        }
+        if (consecutiveSilent >= 200) {
+          throw new Error(
+            `WEDGED (B15 tripwire): ${consecutiveSilent} consecutive silent no-op submits — `
+            + `stuck on [${kind}] "${text}" with enemies=${enemiesAfter}, stamina=${pAfter?.stamina}, hub=${hubAfter}`);
+        }
+      } else {
+        consecutiveSilent = 0;
       }
 
       // ─── Cardinal travel: success = location/coords changed OR
@@ -518,6 +552,20 @@ describe('movementStress — cardinal travel + approach quick-action', () => {
       if (day >= TARGET_DAY) { endReason = `reached_${TARGET_DAY}_days`; break; }
       lastDayLogged = day;
 
+      // ⚠ OTA-1349 — B15 CLOSED: ENEMIES BEFORE STAMINA. The old order
+      // (rest-when-low first, flee second) deadlocked: a failed escape
+      // roll at low stamina left enemies standing with stamina <= 3, and
+      // the sim then submitted `rest` INTO the fight forever — refused by
+      // OTA-1140 at zero time and zero stamina cost, invisible to the
+      // refusal regex, and (pre-OTA-1348) swallowed by the arbiter dedup
+      // from the second tap on. Two receipted runs burned 3,096 of 3,100
+      // actions on that one spot. Flee works at any stamina (costs 1);
+      // disengage FIRST, rest only on peaceful ground.
+      if ((s.currentScene?.enemies?.length ?? 0) > 0) {
+        submit('flee', 'other');
+        continue;
+      }
+
       // Stamina management — `go <dir>` and `approach` both need
       // stamina. Force a rest when low so cardinal-travel success
       // isn't sandbagged by "too tired" refusals (those would be
@@ -525,13 +573,6 @@ describe('movementStress — cardinal travel + approach quick-action', () => {
       // happy-path movement system, not stamina policy).
       if (p.stamina <= 3) {
         submit('rest', 'rest');
-        continue;
-      }
-
-      // If a combat scene materialized, disengage so cardinal travel
-      // stays the focus. flee → world resets to peaceful in ~1-2 turns.
-      if ((s.currentScene?.enemies?.length ?? 0) > 0) {
-        submit('flee', 'other');
         continue;
       }
 
@@ -629,6 +670,7 @@ Hazard encounters:      ${hazardEncounters}    (rate ${totalAttempts ? ((hazardE
 
 ─── Overall bail / refusal ───────────────────────────────
 Refusal lines / total:  ${totalBails} / ${totalAttempts}  (${(bailRate * 100).toFixed(2)}%)
+Silent no-op submits:   ${silentSubmits}${silentSubmitSamples.length ? `\n${silentSubmitSamples.map((s, i) => `  ${i + 1}. ${s}`).join('\n')}` : ''}
 Sample bail lines (up to 8):
 ${bailLineSamples.slice(0, 8).map((s, i) => `  ${i + 1}. ${s}`).join('\n') || '  (none)'}
 
