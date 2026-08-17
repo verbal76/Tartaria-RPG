@@ -421,6 +421,8 @@ import {
   clampGridCell,
   gridToVisual,
   canonicalCellFor,
+  overlandAreaLabel,
+  nearestNamedLocation,
   setCanonExtraLocations,
   WORLD_MAP_CENTER_X,
   WORLD_MAP_CENTER_Y,
@@ -29903,41 +29905,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // weather line didn't update my location". The transit gate stays only on
     // the plotted-distance re-plot, which needs a course to re-plot to.
     {
-      // (a) Pick the nearest named location to the new tile and surface
-      //     its name as the area label. Skip when we're landing
-      //     on a named tile (the discrete-location switch below handles
-      //     that). 8-tile-radius search keeps it cheap.
+      // (a) ⚠ OTA-1348 — the TIERED area label replaces the flat "near X". Owner:
+      //     *"do locations have a radius … maybe a 2 tile radius around it that's
+      //     still considered that area? outside of any area's ring of influence
+      //     wouldn't I be on the road, or in the wilds or … badlands?"* Exactly:
+      //     "<Name> Outskirts" inside the ring, "The road to <target>" under a
+      //     plotted course, else the atlas band's own lore name (Frontier Silt /
+      //     Drowned Reaches / Eastern Mud / Southern Badlands / Deep Wastes) —
+      //     computed from the AUTHORITATIVE absolute cell, not the visual frame.
       if (!step.landedOn) {
-        let bestId: string | null = null;
-        let bestDist = Number.POSITIVE_INFINITY;
-        for (const [locId, pos] of Object.entries(map.positions)) {
-          const d = Math.abs(pos.x - step.x) + Math.abs(pos.y - step.y);
-          if (d < bestDist) { bestDist = d; bestId = locId; }
-        }
-        if (bestId && bestDist > 0) {
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
-          const nearestName = locs.find((l) => l.id === bestId)?.name ?? null;
-          if (nearestName) {
-            // Phrase it as "near X" so the player knows it's a
-            // proximity label, not "you are at X". Same field name
-            // either way.
-            const label = `near ${nearestName}`;
-            set((s) => s.currentScene
-              ? { currentScene: { ...s.currentScene, transitArea: label } }
-              : s);
-          }
-          // OTA-162 — discover named locations the player passes within
-          // sight. Stress sweep (cartographer) found 500 cardinal-walk
-          // turns produced only 1 discoveredLocationId because
-          // discoverLocation only fired at terminal `travelTo` arrivals.
-          // A player who walks past a Capital at 2 tiles away has
-          // CLEARLY seen it. Threshold ≤ 2 tiles = "passed close enough
-          // to count as discovered" without making distant landmarks
-          // visible from across the map.
-          if (bestDist <= 2) {
-            set((s) => ({ worldMemory: discoverLocation(s.worldMemory, bestId!) }));
-          }
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
+        const roadTgtId = get().player?.travelTarget?.locationId ?? null;
+        const roadToName = roadTgtId ? (locs.find((l) => l.id === roadTgtId)?.name ?? null) : null;
+        const areaLabel = overlandAreaLabel(newGrid.x, newGrid.y, roadToName);
+        set((s) => s.currentScene
+          ? { currentScene: { ...s.currentScene, transitArea: areaLabel } }
+          : s);
+        // OTA-162 — discover named locations the player passes within
+        // sight. Stress sweep (cartographer) found 500 cardinal-walk
+        // turns produced only 1 discoveredLocationId because
+        // discoverLocation only fired at terminal `travelTo` arrivals.
+        // A player who walks past a Capital at 2 tiles away has
+        // CLEARLY seen it. Threshold ≤ 2 tiles = "passed close enough
+        // to count as discovered" without making distant landmarks
+        // visible from across the map.
+        const near = nearestNamedLocation(newGrid.x, newGrid.y);
+        if (near && near.dist > 0 && near.dist <= 2) {
+          set((s) => ({ worldMemory: discoverLocation(s.worldMemory, near.id) }));
         }
       }
       // (b) ~12% chance per cardinal step during travel to roll a
