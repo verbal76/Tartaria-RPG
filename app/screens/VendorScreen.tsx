@@ -11,6 +11,7 @@ import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { planCommonGearSale } from '../engine/bulkSell'; // OTA-1232 — one-tap Common gear clear-out
 import { vendorPriceMod } from '../engine/factionRapport';
+import { getStanding } from '../engine/factions'; // OTA-1337 — the ladder reaches the display too
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
 import { findGearByName, findMaterialByName, findExplorationItemByName, findCatalogItem, RECIPES } from '../engine/crafting';
 import { vendorRecipeOffers, vendorSeed } from '../engine/recipeDiscovery';
@@ -306,6 +307,9 @@ export function VendorScreen() {
     effectiveStats(player).charisma,
     player.completedFactionQuestIds,
     vendor?.faction,
+    // OTA-1337 — the standing ladder: same fourth argument the store passes, so
+    // the shown price and the charged price keep agreeing (vendorPricing's rule).
+    vendor?.faction ? getStanding(player.factionStanding ?? [], vendor.faction) : 0,
   );
   const rapportPct = Math.round(rapportMod * 100);
   // OTA-849/865 — the two modifiers that also move the REAL transaction price but the
@@ -505,10 +509,17 @@ export function VendorScreen() {
         <Text style={styles.vendorTitle}>{vendor.title}</Text>
         <Text style={styles.vendorDesc}>{vendor.description}</Text>
         {/* OTA-805 — rapport price break. Shown once the player has earned dealing
-            with this faction (done its rapport quest); the % scales with Charisma. */}
+            with this faction (rapport quest, Charisma) — and, OTA-1337, once the
+            STANDING LADDER moves the price either way: loyalty earns the break on
+            its own, hostility shows up as an honest markup instead of a silent one. */}
         {rapportMod > 0 && (
           <Text style={styles.rapportBanner}>
-            ✦ Trusted partner — {rapportPct}% off buys, +{rapportPct}% on sell-backs (Charisma)
+            ✦ Trusted partner — {rapportPct}% off buys, +{rapportPct}% on sell-backs (standing & charm)
+          </Text>
+        )}
+        {rapportMod < 0 && (
+          <Text style={styles.rapportBanner}>
+            ✦ Bad blood — they deal, but at +{Math.abs(rapportPct)}% on buys and {rapportPct}% on your sell-backs (faction standing)
           </Text>
         )}
         {/* arb103 — every vendor will fire a portable Fusing Crucible for 25 TC.

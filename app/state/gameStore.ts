@@ -26013,6 +26013,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       effectiveStats(player).charisma,
       player.completedFactionQuestIds,
       scene.vendor.faction,
+      // OTA-1337 — the standing ladder reaches the counter: loyalty discounts,
+      // hostility marks up. Same read the VendorScreen display makes.
+      scene.vendor.faction ? getStanding(player.factionStanding ?? [], scene.vendor.faction) : 0,
     );
     // OTA-849 [tides get teeth] — the vendor's faction fortunes move prices. An
     // ascendant faction's traders charge a confidence premium; a waning faction's
@@ -26335,6 +26338,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       effectiveStats(player).charisma,
       player.completedFactionQuestIds,
       scene.vendor.faction,
+      // OTA-1337 — mirror of the buy side: the ladder moves the sell-back too
+      // (a hostile vendor pays less for your goods; the B1 caps clamp above).
+      scene.vendor.faction ? getStanding(player.factionStanding ?? [], scene.vendor.faction) : 0,
     );
     // OTA-865 [war micro-economy] — in a contested area the trader pays a little more:
     // they can turn your goods over to soldiers who need them. Bounded (+8% at full heat),

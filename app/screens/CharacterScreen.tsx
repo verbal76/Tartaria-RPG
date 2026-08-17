@@ -11,6 +11,9 @@ import { FirstTimeHint } from '../components/FirstTimeHint';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import { JOIN_THRESHOLD, BUY_REP_TC_PER_STANDING } from '../engine/factions';
+// OTA-1337 — the standing ladder: tier names + thresholds shown here are the SAME
+// symbols the vendor counter prices by, so the sheet can never drift from the rule.
+import { standingTierLabel, STANDING_KNOWN, STANDING_TRUSTED, STANDING_HONORED } from '../engine/factionRapport';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
 // OTA-1066 — Phase 4 difficulty, and the only place it can be eased.
@@ -527,6 +530,10 @@ export function CharacterScreen() {
                     {tide ? <Text style={tide.word === 'rising' || tide.word === 'ascendant' ? styles.tideRising : styles.tideWaning}>{`  ${tide.glyph} ${tide.word}`}</Text> : null}
                   </Text>
                   <Text style={[styles.kvValue, { color }]}>
+                    {/* OTA-1337 — the ladder tier, named. A number alone never told the
+                        player it DOES something; the word is the same one the vendor
+                        counter prices by (factionRapport.standingTierLabel). */}
+                    {standingTierLabel(standing) !== 'Neutral' ? `${standingTierLabel(standing)} · ` : ''}
                     {standing >= 0 ? '+' : ''}{standing}{qualifies && !isOwn ? ' ✓' : ''}
                     {hunted ? <Text style={styles.huntedTag}>{'  ☠ hunted'}</Text> : null}
                     {nearHunted ? <Text style={styles.nearHuntedTag}>{'  ⚠ close'}</Text> : null}
@@ -541,6 +548,10 @@ export function CharacterScreen() {
             every point you earn with one faction costs their enemies half as much the other way.
             +{JOIN_THRESHOLD} unlocks joining, and high standing surfaces more of their contracts
             (hunts, mysteries, storylines) when you meet their vendors.
+            {' '}Their counters price by the ladder: Known (+{STANDING_KNOWN}) takes 5% off,
+            Trusted (+{STANDING_TRUSTED}) takes 10% and vouches for you like the rapport quest,
+            Honored (+{STANDING_HONORED}) takes 15% — while Hostile and Hated pay MORE at the
+            same counters.
           </Text>
           {/* ⚠ OTA-1158 — SEPARATE LINE, AND IT IS THE ONE THAT MATTERS. The rule
               nothing in the game stated: standing is not only an unlock ladder, it is
