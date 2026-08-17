@@ -173,25 +173,64 @@ export function sellPriceFor(
   // halving every new correctly-minted copy).
   const trophyMult = (item.tags ?? []).includes('trophy')
     && !findCatalogItem(item.name, { aliases: false }) ? 0.5 : 1;
-  raw = Math.max(1, Math.round(base * SELL_FRACTION * dur * trophyMult));
+  // ⚠ OTA-1335 — gear sells in a QUALITY BAND (0.35–0.5 of base) instead of the
+  // flat 0.4: the temper extremes (sturdy workhorse / fragile glass-cannon) clear
+  // the owner's "11 or 12" for a Common piece, a middling roll lands ~11, and the
+  // per-piece buy floor above still guarantees nothing clears its own buy price.
+  // Non-gear (materials, relics, tiered consumables) keeps the flat fraction.
+  const quality = GEAR_KINDS.has(sellKind) ? instanceQuality(item) : null;
+  const sellFraction = quality != null ? 0.35 + (0.5 - 0.35) * quality : SELL_FRACTION;
+  raw = Math.max(1, Math.round(base * sellFraction * dur * trophyMult));
   return applySellCaps(item, withRapport(raw));
 }
 
-/** OTA-922 — per-item arbitrage floor for ARMOR. RARITY_BUY_FLOOR is the cheapest
- *  buy of a BONUS-LESS item, so it undervalues stat/AC-carrying armor — it clamped
+/** OTA-922 — per-item arbitrage floor for gear. RARITY_BUY_FLOOR is the cheapest
+ *  buy of a BONUS-LESS item, so it undervalues stat/AC-carrying gear — it clamped
  *  every Uncommon+ piece to the same scrap price as raw materials, making the
- *  intended GEAR_RARITY_BASE resale (→ 11/26/60/128) dead code. A specific armor
- *  piece's cheapest realistic buy is 0.8 × its own catalog tcBuy (same 0.8 haggle
- *  factor RARITY_BUY_FLOOR uses); cap there instead, so a piece sells for its worth
- *  while never clearing its own buy price — no cross-stall arbitrage. Returns
- *  undefined for weapons, fused/renamed armor not in the catalog, and collect-only
- *  pieces (tcBuy 0), which all keep the flat floor. */
-function armorBuyFloor(item: InventoryItem): number | undefined {
-  if (canonicalItemKind(item) !== 'armor') return undefined;
-  const cat = findArmorByName(item.name);
-  const tcBuy = cat ? (cat as unknown as { tcBuy?: number }).tcBuy : undefined;
-  if (typeof tcBuy !== 'number' || tcBuy <= 0) return undefined;
-  return Math.round(tcBuy * 0.8);
+ *  intended GEAR_RARITY_BASE resale (→ 11/26/60/128) dead code. A specific piece's
+ *  cheapest realistic buy is 0.8 × its own catalog price (same 0.8 haggle factor
+ *  RARITY_BUY_FLOOR uses); cap there instead, so a piece sells for its worth while
+ *  never clearing its own buy price — no cross-stall arbitrage.
+ *  ⚠ OTA-1335 — WEAPONS TOO, VIA THE FIELD THE STALL ACTUALLY READS. The owner:
+ *  *"I sold the other day like 11 items. I got 81 TC … I think our floor is too
+ *  low on selling Commons."* Root cause: this hatch read `tcBuy` and armor only.
+ *  Weapons author their price as `tc` (265 of 276 carry it; Commons list at
+ *  15–55), and the stall lists a weapon at `tc || tcBuy || rarityPrice` — so the
+ *  cheapest realistic buy of a Common weapon was never 5 TC, and clamping its
+ *  resale there was pricing against a stall that does not exist. Read
+ *  `tcBuy ?? tc` for BOTH kinds; anything unpriced in the catalog (fused/renamed
+ *  pieces, the Golem line) keeps the flat floor. */
+function gearBuyFloor(item: InventoryItem): number | undefined {
+  const kind = canonicalItemKind(item);
+  if (kind !== 'armor' && kind !== 'weapon') return undefined;
+  const cat = kind === 'armor' ? findArmorByName(item.name) : findWeaponByName(item.name);
+  const priced = cat as unknown as { tcBuy?: number; tc?: number } | undefined;
+  const catalogBuy = priced?.tcBuy ?? priced?.tc;
+  if (typeof catalogBuy !== 'number' || catalogBuy <= 0) return undefined;
+  return Math.round(catalogBuy * 0.8);
+}
+
+/** ⚠ OTA-1335 — WHOLE-INSTANCE quality, folded into gear resale. The owner's own
+ *  example: *"two bone compound bows, one 10/10, one 32/32 … one sells for 11 or
+ *  12."* The current/max ratio already scales for WEAR, but two pristine copies
+ *  of one catalog piece priced identically no matter what the temper roll gave
+ *  them. A single `temper` drives durability max UP while driving the perk budget
+ *  DOWN (durability.ts), so pricing off durability max alone would systematically
+ *  underprice glass cannons — the whole-instance read is that BOTH band edges are
+ *  specialist pieces: quality = max(t, 1 - t) over the temper estimate, so a
+ *  sturdy workhorse and a fragile perk-heavy roll both price high and a middling
+ *  roll prices lowest. Returns 0.5..1, or null when the instance carries no
+ *  readable temper (no durability record, catalog-less pieces) — the caller then
+ *  keeps the flat SELL_FRACTION, so ungraded items price exactly as before. */
+function instanceQuality(item: InventoryItem): number | null {
+  const d = item.durability;
+  if (!d || d.max <= 0) return null;
+  const cat = findWeaponByName(item.name) ?? findArmorByName(item.name);
+  const base = (cat as unknown as { baseDurability?: number } | undefined)?.baseDurability ?? 25;
+  if (base <= 0) return null;
+  // stampDurability mints max = base × lerp(0.4, 1.8, temper); invert it.
+  const t = Math.max(0, Math.min(1, (d.max / base - 0.4) / 1.4));
+  return Math.max(t, 1 - t);
 }
 
 /** OTA-802 — apply the B1 sell caps to a computed base sell price:
@@ -209,7 +248,7 @@ export function applySellCaps(item: InventoryItem, raw: number): number {
   }
   const capRarity = canonicalItemRarity(item);
   if (capRarity) {
-    const floor = armorBuyFloor(item) ?? RARITY_BUY_FLOOR[capRarity] ?? price;
+    const floor = gearBuyFloor(item) ?? RARITY_BUY_FLOOR[capRarity] ?? price;
     price = Math.min(price, floor);
   }
   return Math.max(1, price);

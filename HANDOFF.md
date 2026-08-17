@@ -1041,6 +1041,12 @@ it and states what was checked to rule out a consumer elsewhere.
   is the refusal strip's wording, not the gate.
 
 - **⚠ OPEN OWNER CALLS — analysed and presented, NOT decided. Do not implement unprompted.**
+  - **✅ SHIPPED — OTA-1335 (2026-08-17, owner greenlit the whole block: "review items 1-5 and push each
+    as a standalone OTA").** The diagnosis below had aged: weapons DO author a price — as `tc`, not
+    `tcBuy` (265 of 276) — so the fix needed no authoring pass: `gearBuyFloor` reads `tcBuy ?? tc` for
+    both kinds, and gear sells in a 0.35–0.5 quality band per the whole-instance recommendation
+    (quality = max(t, 1−t) over the temper estimate; ungraded instances keep the flat 0.4). Original
+    entry kept for the reasoning:
   - **Sell value for Commons is too low.** Owner: *"I sold the other day like 11 items. I got 81 TC … I
     think our floor is too low on selling Commons."* ⚠ **ROOT CAUSE FOUND, and it is dead code:** the
     intended ~11 TC for Common gear can never be paid, because `RARITY_BUY_FLOOR.Common = 5` clamps it,
