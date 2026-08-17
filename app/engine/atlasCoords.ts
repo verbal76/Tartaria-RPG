@@ -43,34 +43,18 @@ export interface AtlasCoord {
 // The Outpost icon — also the anchor for the grid-offset fallback.
 export const OUTPOST_ATLAS_COORD: AtlasCoord = { fx: 0.10, fy: 0.13 };
 
-// Per-tile marker drift on the atlas. Atlas is 1408×768 (1.83:1
-// landscape), so a single DOT_TILE_FRAC applied to both axes would
-// make 1 east tile cover 1.83× more pixels than 1 south tile. We
-// split the constants and aspect-correct so 1 east step and 1 south
-// step drift the marker the same pixel distance.
-//
-// v2.4.1 (OTA 028) — halved from the OTA 019 calibration. The 0.06
-// was too aggressive in play: 17 south tiles crossed the entire
-// atlas height and the marker overshot canonical anchors quickly.
-//
-// STEP_FRAC_Y = 0.03 — height fraction. 28 tiles (max D5 radius)
-//   covers ~84% of atlas height, which feels proportional to "across
-//   2-3 states" without overshooting destinations.
-// STEP_FRAC_X = STEP_FRAC_Y × (ATLAS_H/ATLAS_W) = 0.03 × 0.5455
-//   ≈ 0.0164 — width fraction picked so 1 east tile = 1 south tile
-//   in pixels (~23 px each).
-export const STEP_FRAC_Y = 0.03;
-export const STEP_FRAC_X = 0.0164;
-// Back-compat alias for tests that still reference the old name.
-// Equal to STEP_FRAC_Y because the prior axis-uniform constant was
-// effectively the height fraction.
-export const DOT_TILE_FRAC = STEP_FRAC_Y;
+// ⚠⚠ OTA-1334 SCRUB — the per-tile marker-drift constants (STEP_FRAC_X/Y, DOT_TILE_FRAC)
+// lived here from OTA 019 to OTA-1332. They fed the "you are here" dot the map has not
+// drawn since OTA-182 removed it, and their anisotropy maths was computed for artwork two
+// generations old (1408×768 / 1.83:1 — the live art is 1619×971 / 5:3). Deleted with the
+// rest of the dead marker pipeline rather than recalibrated for a dot nobody draws.
 
 // Locations the new atlas depicts as labeled icons. Coordinates
 // are measured against each icon's visual center.
 //
-// v2.4.1 (OTA 029) — recalibrated against the 140×78 grid overlay
-// (10-px cells on the 1408×768 canvas). Largest shifts: asgardar +
+// v2.4.1 (OTA 029) — historical note: first calibrated against a 140×78 grid overlay on
+// the ORIGINAL 1408×768 hand-drawn art. Fractions are canvas-agnostic, which is why they
+// survived two artwork replacements. Largest shifts back then: asgardar +
 // drakova + giant_vault + etheric_chamber + mud_flood_nexus all
 // nudged south/east a few percent to match the actual icon centers.
 // Smaller (~1-2%) adjustments to the upper band as well.
@@ -180,257 +164,23 @@ export function depictedLocationIds(): string[] {
   return Object.keys(LOCATION_ATLAS_COORDS);
 }
 
-// Cardinal-direction-preserving dot offset from an arbitrary anchor.
-// East increases fx (dot moves right), south increases fy (down) —
-// matches keyboard intuition. Anisotropy fixed: separate X/Y step
-// fractions so 1 east tile and 1 south tile cover the same pixel
-// distance on a 1.83:1 landscape atlas.
+// ⚠⚠ OTA-1334 SCRUB — EVERYTHING BELOW THIS LINE IN THE OLD FILE IS GONE, AND WHY MATTERS.
 //
-// The earlier `cardinalOffsetFromOutpost` hardcoded the Outpost as
-// the base. With per-character procedural maps that regenerate on
-// every travelTo (worldMap.ts:7221), mapX/mapY is local to the
-// CURRENT location — not the Outpost — so the base anchor must be
-// the current location's canonical atlas position. Pass it in.
-export function cardinalOffsetFromAnchor(
-  anchor: AtlasCoord,
-  mapX: number,
-  mapY: number,
-  gridCenter: { x: number; y: number },
-): AtlasCoord {
-  return clampToMapArea({
-    fx: anchor.fx + (mapX - gridCenter.x) * STEP_FRAC_X,
-    fy: anchor.fy + (mapY - gridCenter.y) * STEP_FRAC_Y,
-  });
-}
-
-// Back-compat shim. Old callers (cardinalOffset.test.ts) anchored at
-// the Outpost; the new helper takes any anchor.
-export function cardinalOffsetFromOutpost(
-  mapX: number,
-  mapY: number,
-  gridCenter: { x: number; y: number },
-): AtlasCoord {
-  return cardinalOffsetFromAnchor(OUTPOST_ATLAS_COORD, mapX, mapY, gridCenter);
-}
-
-// v2.4.1 (OTA 029) — landmass / no-go zones on the atlas.
+// From here down this module used to carry an entire positioning pipeline for the player
+// marker: cardinalOffsetFromAnchor / cardinalOffsetFromOutpost (per-tile drift), the
+// OFF_LIMITS_RECTS no-go rectangles with pushOutOfRect and clampToMapArea, the
+// HUB_ROOM_MINIMAP_COORDS inset table with hubRoomMinimapCoord, and the OTA-054 IDW
+// interpolator. Four hundred-odd lines, all of it feeding a "you are here" dot that
+// OTA-182 removed at the owner's request ("we were never able to make it accurate so
+// let's let the map just be a map") — MapScreen was still COMPUTING a dotStyle from this
+// chain on every render and then never drawing it.
 //
-// Player request: "you cannot head to the edges of the map you can
-// only travel on the big landmass." The atlas image has three big
-// chrome regions that aren't landmass — the legend boxes top-right,
-// the Outpost interior minimap bottom-left, and the historical
-// timeline ribbon at the very bottom. Plus the corner blanks. The
-// marker should stay on the painted continent.
+// Worse than dead: the no-go rectangles were traced from the ORIGINAL hand-drawn art's
+// legend boxes and inset minimap. On the redrawn atlas those rectangles cover plain
+// terrain — the top-right one sat exactly over Yuldra-Tul — so any future caller would
+// have inherited a clamp that pushes markers off a mountain to dodge a legend that no
+// longer exists. The insets themselves (outpost minimap, timeline ribbon) are not on the
+// new art at all; hub interiors have had their own full-screen maps since arb106.
 //
-// Approach: define the OFF-LIMITS zones as fractional-coord
-// rectangles. After the basic outer clamp, if a point falls inside
-// any of these rects, push it out to the nearest edge of that rect.
-// This keeps the math cheap (no polygon test) while still keeping
-// the marker on real landmass for normal play.
-//
-// Coordinates measured from the 140×78 grid overlay (10-px cells
-// on 1408×768). Slightly generous bounds so the marker doesn't sit
-// right on a legend's edge.
-interface OffLimitsRect {
-  fxMin: number; fyMin: number; fxMax: number; fyMax: number;
-}
-
-const OFF_LIMITS_RECTS: readonly OffLimitsRect[] = [
-  // Top-right legend block (start-icon key + scale ladder)
-  { fxMin: 0.84, fyMin: 0.00, fxMax: 1.00, fyMax: 0.30 },
-  // Bottom-left Reclaimers' Outpost interior minimap
-  { fxMin: 0.00, fyMin: 0.75, fxMax: 0.22, fyMax: 1.00 },
-  // Bottom historical-timeline ribbon (whole bottom strip)
-  { fxMin: 0.00, fyMin: 0.96, fxMax: 1.00, fyMax: 1.00 },
-];
-
-function pushOutOfRect(c: AtlasCoord, r: OffLimitsRect): AtlasCoord {
-  // Only push if the point is actually inside the rect.
-  if (c.fx < r.fxMin || c.fx > r.fxMax || c.fy < r.fyMin || c.fy > r.fyMax) {
-    return c;
-  }
-  // Distance to each of the four rect edges.
-  const dWest = c.fx - r.fxMin;
-  const dEast = r.fxMax - c.fx;
-  const dNorth = c.fy - r.fyMin;
-  const dSouth = r.fyMax - c.fy;
-  const minD = Math.min(dWest, dEast, dNorth, dSouth);
-  // Push out toward the closest edge with a tiny epsilon so we're
-  // outside the rect (not exactly on the boundary).
-  const eps = 0.001;
-  if (minD === dWest)  return { fx: r.fxMin - eps, fy: c.fy };
-  if (minD === dEast)  return { fx: r.fxMax + eps, fy: c.fy };
-  if (minD === dNorth) return { fx: c.fx, fy: r.fyMin - eps };
-  return { fx: c.fx, fy: r.fyMax + eps };
-}
-
-// v2.4.1 (OTA 032) — bottom-left Outpost-interior minimap coords.
-//
-// When the player is in the hub (any faction's variant of the shared
-// Outpost layout), the marker renders on the inset minimap in the
-// bottom-left of the atlas rather than on the main landmass. Each
-// of the 15 hub rooms gets a fixed position inside the minimap zone
-// (fx ~0.02-0.22, fy ~0.79-0.98 on the 1408×768 canvas).
-//
-// Discrete per-room positioning — the hub uses room-graph travel,
-// not cardinal stepping, so each room change makes the marker JUMP
-// to its room's position (large, visible movement; satisfies the
-// "4× movement spacing" intent without an actual per-tile drift
-// multiplier). Player enters at outpost_gate which sits roughly
-// dead-center along the bottom of the minimap.
-//
-// Layout follows the world-atlas doc's 3×3+descent diagram:
-//   row 1 (north):  [ . | Quarters | . ]
-//   row 2 (mid):    [ Workshop | Central | Mess ]
-//   row 3 (south):  [ Lab | Gate | Armory ]
-//   row 4 (deeper): [ . | Relic Vault | Chapel ]
-//   row 5 (down):   [ . | Culvert Descent | . ]
-// Below the Culvert: First Landing → Storage / Pumps → Second
-// Landing → Shallow Digs. These deeper rooms get coords too so
-// the marker keeps moving when the player descends.
-export const HUB_ROOM_MINIMAP_COORDS: Record<string, AtlasCoord> = {
-  outpost_quarters:        { fx: 0.10, fy: 0.81 },
-  outpost_workshop:        { fx: 0.04, fy: 0.85 },
-  outpost_central:         { fx: 0.10, fy: 0.85 },
-  outpost_messhall:        { fx: 0.16, fy: 0.85 },
-  outpost_lab:             { fx: 0.04, fy: 0.89 },
-  outpost_gate:            { fx: 0.10, fy: 0.89 },
-  outpost_armory:          { fx: 0.16, fy: 0.89 },
-  outpost_relic_vault:     { fx: 0.10, fy: 0.93 },
-  outpost_chapel:          { fx: 0.16, fy: 0.93 },
-  outpost_culvert_descent: { fx: 0.10, fy: 0.96 },
-  // Buried sub-levels — clustered just below the Outpost minimap
-  // so the marker descends visibly as the player goes deeper.
-  buried_landing_one:      { fx: 0.10, fy: 0.985 },
-  buried_storage:          { fx: 0.16, fy: 0.985 },
-  buried_pumps:            { fx: 0.04, fy: 0.985 },
-  buried_landing_two:      { fx: 0.10, fy: 1.005 },
-  buried_shallow_digs:     { fx: 0.10, fy: 1.025 },
-};
-
-export function hubRoomMinimapCoord(roomId: string | null | undefined): AtlasCoord | null {
-  if (!roomId) return null;
-  return HUB_ROOM_MINIMAP_COORDS[roomId] ?? null;
-}
-
-/**
- * Clamp a fractional coordinate to the visible map area, away from
- * the insets at the corners and the timeline ribbon at the bottom.
- * After the outer rectangle clamp, push the point out of any of
- * the off-limits rects so the marker stays on real landmass.
- */
-export function clampToMapArea(c: AtlasCoord): AtlasCoord {
-  let pt: AtlasCoord = {
-    fx: Math.max(0.06, Math.min(0.96, c.fx)),
-    fy: Math.max(0.04, Math.min(0.95, c.fy)),
-  };
-  for (const rect of OFF_LIMITS_RECTS) {
-    pt = pushOutOfRect(pt, rect);
-  }
-  return pt;
-}
-
-// ─────────────────────────────────────────────────────────────────
-// OTA 054 — Inverse-distance-weighted (IDW) dot plotting.
-//
-// Solves the user's "the dot must always be plotted accurately even
-// when I wander off-path" requirement. The engine's world map is
-// procedurally generated per character — Asgardar might sit 14 tiles
-// SE on one save and 11 tiles NW on another — so the OLD model
-// (grid-offset from the Outpost using a single global tile-fraction
-// scale) drifts the dot away from canonical reality the further the
-// player walks from the Outpost.
-//
-// The IDW model fixes that:
-//   1. Every named location has a known procedural grid position
-//      (worldMap.positions[id]) AND a known canonical atlas position
-//      (LOCATION_ATLAS_COORDS[id]).
-//   2. For the player at procedural grid (X, Y), compute weight per
-//      location i as w_i = 1 / (gridDist_i² + epsilon).
-//   3. Player's atlas position = Σ(atlas_i × w_i) / Σ(w_i).
-//
-// Properties this gets us for free:
-//   - Snap-to-anchor: if the player is AT a named tile, that
-//     location's weight dominates (1/epsilon² → huge) and the dot
-//     lands exactly on its canonical drawing.
-//   - Per-pair scaling: if A and B are 26 tiles apart procedurally
-//     and 2 inches apart visually, a player halfway between them
-//     procedurally lands halfway between them visually — the
-//     "divide visual by grid distance" math the player asked for
-//     falls out of the linear interpolation naturally.
-//   - Always plotted: there's no fallback branch; every grid
-//     position resolves to an atlas position.
-//   - Smooth: as the player walks one tile at a time, the dot
-//     glides between anchors rather than jumping when crossing
-//     into a named tile.
-
-// Tight epsilon so the snap-to-anchor weight (1/0.01 = 100) outguns
-// 20 distant anchors at average weight ~0.018 by a clean ~5000× —
-// the dot lands on the canonical icon, not the centroid of a
-// scattered procedural cluster.
-const IDW_EPSILON = 0.1;
-const IDW_POWER = 2;
-
-export interface GridPos {
-  x: number;
-  y: number;
-}
-
-/**
- * Compute the player's atlas-fraction position by IDW interpolation
- * over all named-location anchors. Each anchor contributes weight
- * inverse to the Manhattan grid distance from the player to that
- * anchor's procedural tile.
- *
- * worldMapPositions: locationId → { x, y } as stored in the live
- *   character's worldMap.positions (this is procedural per save).
- *
- * Locations that have a worldMap position but no atlas coord (and
- * vice versa) are simply skipped — they don't contribute to the
- * weighted average.
- *
- * If no anchors are usable (empty worldMapPositions or the lookup
- * table is unbuilt), falls back to the Outpost coord — a safe
- * degenerate case.
- */
-export function interpolateAtlasPosition(
-  playerX: number,
-  playerY: number,
-  worldMapPositions: Record<string, GridPos>,
-): AtlasCoord {
-  let weightedFx = 0;
-  let weightedFy = 0;
-  let totalWeight = 0;
-
-  for (const [locId, atlasCoord] of Object.entries(LOCATION_ATLAS_COORDS)) {
-    const gridPos = worldMapPositions[locId];
-    if (!gridPos) continue;
-    const dx = gridPos.x - playerX;
-    const dy = gridPos.y - playerY;
-    const manhattan = Math.abs(dx) + Math.abs(dy);
-    // arb119 — HARD SNAP. Standing EXACTLY on a location's tile should put the
-    // dot precisely on that location's icon. The old epsilon-floored inverse-
-    // square only gave the on-tile anchor ~96% of the weight, so a close
-    // neighbour could still drag the dot a few percent off its icon (measured
-    // 0.041 for yuldra_tul, which sits beside another capital on some seeds).
-    // A zero-distance anchor wins outright — and snaps to the location's RAW
-    // icon coord (MapScreen draws icons from the raw table, unclamped), so the
-    // dot sits exactly on the icon even for edge/inset-adjacent capitals. The
-    // off-limits clamp below still governs INTERPOLATED (between-location) dots.
-    if (manhattan === 0) {
-      return { fx: atlasCoord.fx, fy: atlasCoord.fy };
-    }
-    const w = 1 / Math.pow(manhattan + IDW_EPSILON, IDW_POWER);
-    weightedFx += atlasCoord.fx * w;
-    weightedFy += atlasCoord.fy * w;
-    totalWeight += w;
-  }
-
-  if (totalWeight === 0) {
-    return OUTPOST_ATLAS_COORD;
-  }
-  return clampToMapArea({
-    fx: weightedFx / totalWeight,
-    fy: weightedFy / totalWeight,
-  });
-}
+// If a player marker ever comes back, it should be drawn from canonicalCellFor /
+// cellToAtlasFraction like every other overlay — one coordinate system, not two.

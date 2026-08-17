@@ -337,6 +337,81 @@
       "id": "buried_cities",
       "term": "The Buried Cities",
       "definition": "Formerly vibrant Tartarian cities now sealed beneath Aetherstone mud. These cities hold Tartaria's most powerful secrets, preserved by impenetrable mud that resists excavation, where Aetheric energy creates time distortions and magnetic anomalies."
+    },
+    {
+      "id": "yuldra_tul",
+      "term": "Yuldra-Tul",
+      "definition": "The northeastern mountain capital, frost-wreathed where every other Lost Capital drowned warm — the gate-city to the Giants' tombs. The Servants of the Giants kept the long vigil here before the Flood, and its Core sleeps under a cold-stone in the deep keep."
+    },
+    {
+      "id": "ostragar",
+      "term": "Ostragar",
+      "definition": "The Eternal Dynasty's river capital in the far-eastern wetlands, half-submerged in slow current. Its Core seat is ringed by a still pool the Riverbinder bound to the housing with a cantor's chord; the water has not moved since the Flood."
+    },
+    {
+      "id": "iskan_veil",
+      "term": "Iskan-Veil",
+      "definition": "The Conspiracy Architects' hidden capital in the far northwest — a maze of false doors and overlaid corridors where every map is wrong by design. The true Core seat is said to stand behind the door you didn't see."
+    },
+    {
+      "id": "karok_sa",
+      "term": "Karok-Sa",
+      "definition": "The Forgotten Order's ritual seat in the southern band — halls of binding-sigils carved into black basalt. Its Core is kept under a chain of seals only a Sealwarden can read, which is why the Order guards its reading jealously."
+    },
+    {
+      "id": "tartarian_enclave",
+      "term": "The Sunken Enclave",
+      "definition": "A deep, self-sufficient True Tartarian enclave hollowed beneath the Buried Cities — Aethercraft-shaped mud walls and ancestor-shrines to the fallen Giants. Its Seekers walk the labyrinthine tunnels for relics, and outsiders find it only when the Enclave decides to be found."
+    },
+    {
+      "id": "parley_ground",
+      "term": "The Parley Ground",
+      "definition": "A weathered ring of standing stones on the contested eastern flats where rival factions meet under truce. No faction holds it; the banners change with the season, and the stones have outlasted every agreement sworn between them."
+    },
+    {
+      "id": "monarch_waystation",
+      "term": "The Monarch's Waystation",
+      "definition": "The Mud Monarchs' frontier toll-court — the last ordered ground before the buried capitals. A seneschal logs every traveler who passes toward the deeper cities, and the ledgers go back further than the Monarchs like to admit."
+    },
+    {
+      "id": "dynasty_border_post",
+      "term": "Dynasty Border Post",
+      "definition": "An old garrison of the Eternal Dynasty kept lit at the edge of the ruins. The oath-stones are still standing, and the road past them runs down into the flooded capitals — every Dynasty soldier walks it once, going, and once more if they are lucky."
+    },
+    {
+      "id": "pilgrim_waycamp",
+      "term": "Tartarian Pilgrim Camp",
+      "definition": "A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities. The fires are kept low and the songs lower; the road they rest for does not forgive noise."
+    },
+    {
+      "id": "builders_survey_camp",
+      "term": "Builders' Survey Camp",
+      "definition": "A Stone Builders' staging post at the safe edge of the ruin-field — theodolite stakes, chalked plans, stacked shoring timber. The Builders measure twice here because past this camp the ground stops honoring measurements."
+    },
+    {
+      "id": "giant_watch_shrine",
+      "term": "Giant-Watch Shrine",
+      "definition": "A roadside vigil-shrine of the Servants of the Giants on the frontier, where keepers wait and watch before the long road down to the giant vaults. The watch has not been broken since the Flood; the keepers do not say what they are watching for."
+    },
+    {
+      "id": "revivalist_field_camp",
+      "term": "Revivalist Field Camp",
+      "definition": "A Tartarian Revivalist dig-and-press camp at the lip of the wastes — crates of equipment, a printing trestle, and a map-board marking the capitals they mean to make headlines of. The truth gets dug up here, and typeset shortly after."
+    },
+    {
+      "id": "reclaimer_stake",
+      "term": "Reclaimer's Stake",
+      "definition": "A Reclaimers' Guild salvage-stake driven into the frontier mud on the western edge — claim-posts, a tally-board of marked ruins, and a winch rig for hauling up whatever the wastes give. Every Guild expedition into the deep country launches from here."
+    },
+    {
+      "id": "architect_blind",
+      "term": "The Architect's Blind",
+      "definition": "A Conspiracy of Architects observation-blind disguised as a collapsed waystation on the western frontier. Behind the false rubble: a map-wall of routes the public must never connect, and a quiet door onto the road."
+    },
+    {
+      "id": "hidden_market",
+      "term": "The Hidden Market",
+      "definition": "A neutral-ground bazaar that does not advertise itself — four canvas stalls in a wind-scoured hollow of the Sunken Middens. Agents of every faction trade under an unspoken truce; the market keeps no ledger, asks no questions, and moves if it is ever written down on a map."
     }
   ],
   "timeline_events": [

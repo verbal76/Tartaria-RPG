@@ -627,7 +627,12 @@ function grantStageItems(
   stages: ReadonlyArray<{ grants?: { item: string; quantity?: number } }>,
   from: number,
   to: number,
-): void {
+  // ⚠⚠ Returns how many grants actually LANDED (accepted > 0). The caller must know,
+  // because a landed grant is state the REST OF THIS ACTION can destroy: the generic verb
+  // handlers write inventory back from snapshots taken before the heal ran. A heal that
+  // handed something over has to consume the whole action — see advanceStagesOnIntent.
+): number {
+  let landed = 0;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const QS = require('../engine/questStage') as typeof import('../engine/questStage');
   for (let i = Math.max(0, from); i < Math.min(to, stages.length); i++) {
@@ -653,7 +658,9 @@ function grantStageItems(
     }
     set((st) => (st.player ? { player: { ...st.player, inventory: res.inventory } } : st));
     get().appendLog('reward', `✦ ${qty > 1 ? `${qty}× ` : ''}${g.item} — mission item.`);
+    landed += 1;
   }
+  return landed;
 }
 
 /** ⚠⚠ P19 — DOES A TRACKED CONTRACT WANT THIS EXACT VERB, ON THIS EXACT GROUND, RIGHT NOW?
@@ -716,14 +723,29 @@ function stageAwaitsIntentHere(get: () => GameStore, intent: Intent): boolean {
   return false;
 }
 
+// ⚠⚠ RETURNS TRUE WHEN THE ACTION IS CONSUMED AND MUST NOT FALL THROUGH.
+//
+// Found by the storyline walker during the HAL map audit, and it is a REAL wedge a player
+// can hit, not a harness artifact. The chain, verbatim from the probe log: the catch-up
+// heal grants a missing mission item and says "Go again" — but this function was `void`,
+// so submitPlayerAction fell through to the generic verb handler. The generic INVESTIGATE
+// beat rolled loot and wrote the inventory back from a snapshot taken BEFORE the heal —
+// the healed item vanished — and it also consumed the tile's once-only area search. Second
+// attempt: item missing again, heal re-fires, and "You already searched the area" eats the
+// verb. The stage is now unwinnable on its own ground.
+//
+// The mysteries pass (2026-08-16-1329) stopped the heal from ADVANCING in the same action, for exactly this stale-
+// snapshot race. It did not stop the ACTION. Same hole, one layer out. The rule now: a
+// heal that landed anything consumes the whole action — "Go again" costs one tap and the
+// repeat runs on clean state through the normal path.
 function advanceStagesOnIntent(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   intent: Intent,
-): void {
+): boolean {
   const player = get().player;
   const currentScene = get().currentScene;
-  if (!player || !currentScene) return;
+  if (!player || !currentScene) return false;
   const inCombat = (currentScene.enemies?.length ?? 0) > 0;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { huntAnchorId } = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
@@ -779,7 +801,7 @@ function advanceStagesOnIntent(
         // ⚠ It re-checks rather than assuming: if the item is still missing after the
         // catch-up, the refusal below is the honest answer and the player still gets told
         // exactly what they need.
-        grantStageItems(get, set, huntMatch.def.title, huntMatch.def.stages, 0, huntMatch.rec.stage);
+        const landed = grantStageItems(get, set, huntMatch.def.title, huntMatch.def.stages, 0, huntMatch.rec.stage);
         // ⚠⚠ THE HEAL HANDS OVER AND STOPS — it does NOT also advance on this action.
         // Advancing here raced the rest of `submitPlayerAction`: the action's own loot
         // write captures `player` at the top of the call and writes the inventory back
@@ -789,12 +811,16 @@ function advanceStagesOnIntent(
         // one extra tap buys a write that cannot be lost.
         if (QS.stageRequirementMet(stageDefNow, get().player?.inventory)) {
           get().appendLog('arbiter', `The Arbiter checks your pack and finds what ${huntMatch.def.title} wants. "You had it after all. Go again."`);
-          return;
+          // ⚠⚠ The heal LANDED something — the action ends here, or the generic verb
+          // handler's stale-snapshot loot write destroys what was just granted.
+          return true;
         }
         const line = QS.stageRequirementLine(stageDefNow!, huntMatch.def.title);
         const seen = get().gameLog.slice(-30).some((e) => e.text === line);
         if (!seen) get().appendLog('arbiter', line);
-        return;
+        // ⚠ A PARTIAL heal (granted A, still missing B) is state worth protecting too —
+        // fall through only when nothing landed at all.
+        return landed > 0;
       }
       const flightKey = `hunt:${huntMatch.rec.id}`;
       if (!stageAdvancesInFlight.has(flightKey)) {
@@ -866,23 +892,23 @@ function advanceStagesOnIntent(
       const line = `The Arbiter taps the slate. "Not here. ${mysteryMatch.def.title} points elsewhere — set a course from Contracts and do it there."`;
       const recent = get().gameLog.slice(-30).some((e) => e.text === line);
       if (!recent) get().appendLog('arbiter', line);
-      return;
+      return false; // nothing granted — the generic beat may still play
     }
     // ⚠ Same heal-then-refuse the hunts got: a record already in flight when this shipped
     // never received the earlier stages' grants, and refusing it forever would brick a
     // mystery that used to work. Award the missing prefix, re-check, and only then refuse.
     if (!QS.stageRequirementMet(stageNow, player.inventory)) {
-      grantStageItems(get, set, mysteryMatch.def.title, mysteryMatch.def.stages, 0, mysteryMatch.rec.stage);
+      const landed = grantStageItems(get, set, mysteryMatch.def.title, mysteryMatch.def.stages, 0, mysteryMatch.rec.stage);
       // ⚠⚠ Hands over and STOPS — see the hunt branch. Advancing on the same action races
       // the caller's own inventory write and loses the item that was just granted.
       if (QS.stageRequirementMet(stageNow, get().player?.inventory)) {
         get().appendLog('arbiter', `The Arbiter checks your pack and finds what ${mysteryMatch.def.title} wants. "You had it after all. Go again."`);
-        return;
+        return true; // heal landed — consume the action (see the function note)
       }
       const line = QS.stageRequirementLine(stageNow!, mysteryMatch.def.title);
       const seen = get().gameLog.slice(-30).some((e) => e.text === line);
       if (!seen) get().appendLog('arbiter', line);
-      return;
+      return landed > 0; // a PARTIAL heal is state worth protecting
     }
     const flightKey = `mystery:${mysteryMatch.rec.id}`;
     if (!stageAdvancesInFlight.has(flightKey)) {
@@ -926,20 +952,20 @@ function advanceStagesOnIntent(
       const line = `The Arbiter taps the slate. "Not here. ${storyMatch.def.title} points elsewhere — set a course from Contracts and do it there."`;
       const recent = get().gameLog.slice(-30).some((e) => e.text === line);
       if (!recent) get().appendLog('arbiter', line);
-      return;
+      return false; // nothing granted — the generic beat may still play
     }
     // ⚠ Heal-then-refuse, and the heal HANDS OVER AND STOPS — granting mid-action races
     // the caller's own inventory write and loses what it just gave. See the hunt branch.
     if (!QS.stageRequirementMet(stageNow, player.inventory)) {
-      grantStageItems(get, set, storyMatch.def.title, storyMatch.def.stages, 0, storyMatch.rec.stage);
+      const landed = grantStageItems(get, set, storyMatch.def.title, storyMatch.def.stages, 0, storyMatch.rec.stage);
       if (QS.stageRequirementMet(stageNow, get().player?.inventory)) {
         get().appendLog('arbiter', `The Arbiter checks your pack and finds what ${storyMatch.def.title} wants. "You had it after all. Go again."`);
-        return;
+        return true; // heal landed — consume the action (see the function note)
       }
       const line = QS.stageRequirementLine(stageNow!, storyMatch.def.title);
       const seen = get().gameLog.slice(-30).some((e) => e.text === line);
       if (!seen) get().appendLog('arbiter', line);
-      return;
+      return landed > 0; // a PARTIAL heal is state worth protecting
     }
     const flightKey = `storyline:${storyMatch.rec.id}`;
     if (!stageAdvancesInFlight.has(flightKey)) {
@@ -966,6 +992,7 @@ function advanceStagesOnIntent(
     );
     for (const lead of readyLeads) resolveLeadCompletion(get, set, lead);
   }
+  return false;
 }
 
 /** OTA-1206 — what the torchlight flags as worth investigating in the CURRENT
@@ -14822,7 +14849,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ⚠ OTA-1213 — deterministic stage triggers fire on the VERB, at the choke
     // point every action passes, so no downstream branch (refusal, flavor,
     // hook, empty modal) can eat a mission beat. See advanceStagesOnIntent.
-    advanceStagesOnIntent(get, set, parsed.intent);
+    //
+    // ⚠⚠ And when it returns true, the action ENDS HERE. That is the catch-up heal saying
+    // it just placed a mission item in the pack: every generic handler below this line
+    // writes inventory from a snapshot older than that grant, so falling through is how a
+    // healed item used to vanish one log line after its receipt printed — and how the
+    // generic INVESTIGATE beat burned the tile's once-only search on an action whose
+    // meaning was already spent. "Go again" costs the player one tap, on clean state.
+    if (advanceStagesOnIntent(get, set, parsed.intent)) {
+      set((sLive) => (sLive.player ? { player: advanceTime(sLive.player, 0.1) } : sLive));
+      void get().persist();
+      return;
+    }
 
     switch (parsed.intent) {
       case 'attack': {
