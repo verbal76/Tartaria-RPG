@@ -105,6 +105,16 @@ describe('OTA-1339 — the pulsing marker and the ⌖ ME button', () => {
     expect(cell).toEqual(canonicalCellFor('iskan_veil'));
   });
 
+  it('⚠ OTA-1341 — ⌖ ME glides (timed easing), and the ring stroke is the thin weight', () => {
+    // Owner: slower center "so they can track the position and path", thinner
+    // icon lines. Source locks: a spring here would bring the jump cut back.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const src = require('fs').readFileSync(require('path').join(__dirname, '..', 'app', 'screens', 'MapScreen.tsx'), 'utf8') as string;
+    expect(src).toContain('const CENTER_GLIDE_MS = 1400;');
+    expect(src).toContain('duration: CENTER_GLIDE_MS, easing: Easing.inOut(Easing.cubic)');
+    expect(src).toContain('borderWidth: Math.max(1, m.size * 0.055)');
+  });
+
   it('⚠ pressing ⌖ ME never throws, wherever the view was left', async () => {
     const tree = await mountAtlasAt('iskan_veil');
     const btn = tree.root.findAll((n) => n.props.testID === 'center-on-player')[0]!;

@@ -22,6 +22,7 @@ import {
   TouchableOpacity,
   Image,
   Animated,
+  Easing,
   PanResponder,
   ScrollView,
   type GestureResponderEvent,
@@ -148,6 +149,12 @@ const CELL_TO_LOCATION: Record<string, string> = (() => {
   }
   return m;
 })();
+
+// ⚠ OTA-1341 — how long ⌖ ME takes to carry the view to the marker. Tuned SLOW on
+// purpose (owner: the jump cut lost the "path to the location"); the terrain must
+// stay trackable for the whole ride. If this ever feels sluggish, shorten it here —
+// do not swap back to a spring, which reads as a teleport.
+const CENTER_GLIDE_MS = 1400;
 
 /** Where a marker at this cell should be DRAWN. Never used for distance or routing. */
 function markerFraction(x: number, y: number): { fx: number; fy: number } {
@@ -406,10 +413,16 @@ export function MapScreen() {
       s,
       imgBox,
     );
+    // ⚠ OTA-1341 — GLIDE, DON'T CUT. Owner: *"center and zoom in on it a little
+    // slower so they can track the position and path to the location, instead of
+    // a jump cut in case they are trying to figure out relative locations."* The
+    // spring here read as a teleport; a ~1.4 s eased glide keeps the terrain
+    // sliding under the eye the whole way, so the route TO the marker stays
+    // legible. RESET keeps its quick spring — nothing to track on the way out.
     Animated.parallel([
-      Animated.spring(scale, { toValue: s, useNativeDriver: true, friction: 7, tension: 80 }),
-      Animated.spring(translateX, { toValue: target.tx, useNativeDriver: true, friction: 7, tension: 80 }),
-      Animated.spring(translateY, { toValue: target.ty, useNativeDriver: true, friction: 7, tension: 80 }),
+      Animated.timing(scale, { toValue: s, duration: CENTER_GLIDE_MS, easing: Easing.inOut(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(translateX, { toValue: target.tx, duration: CENTER_GLIDE_MS, easing: Easing.inOut(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(translateY, { toValue: target.ty, duration: CENTER_GLIDE_MS, easing: Easing.inOut(Easing.cubic), useNativeDriver: true }),
     ]).start(() => {
       scaleRef.current = s;
       txRef.current = target.tx;
@@ -840,7 +853,9 @@ export function MapScreen() {
             const m = playerMarkerBox;
             const ring = {
               position: 'absolute' as const, left: 0, top: 0, width: m.size, height: m.size,
-              borderRadius: m.size / 2, borderWidth: Math.max(1.5, m.size * 0.11),
+              // OTA-1341 — thinner stroke by owner request ("thin the lines on the
+              // icon"): half the OTA-1339 weight, floored where it stays visible.
+              borderRadius: m.size / 2, borderWidth: Math.max(1, m.size * 0.055),
             };
             const core = {
               position: 'absolute' as const,
