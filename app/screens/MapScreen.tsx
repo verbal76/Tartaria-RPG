@@ -49,6 +49,7 @@ import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { openContractMarkers, type ContractFamily } from '../engine/contractMarkers';
 import { LOCATION_TO_MACRO } from '../engine/worldLadder';
 import { isHubLocation, hubRoomFor, hubNameForFaction, hubSkinFactionFor } from '../engine/hub';
+import { outpostRoomMark } from '../engine/outpostRoomMarks'; // OTA-1350 — the marker walks the outpost too
 import { FACTION_STARTING_LOCATION } from '../engine/character';
 // OTA 051 — locations.json carries the human-readable name we want
 // to surface in the "You are here: <name>" chip when the player is
@@ -235,6 +236,9 @@ export function MapScreen() {
   // OTA-502 — dynamically-canonized places (whisper/contract/mission mentions) are
   // routable too: fold them into the travel list as ordinary rows.
   const canonLocations = useGameStore((s) => s.worldMemory?.canonLocations);
+  // ⚠ OTA-1350 — rooms already walked, for the outpost map's ✓ marks. The SAME
+  // set the travel chips' ✓ reads (OTA-1277), so map and chips can never disagree.
+  const hubVisited = useGameStore((s) => s.worldMemory?.hubVisited);
   // OTA-171 — Places list sorted with the current location pinned at
   // the top so the player can see where they are at a glance, then
   // by danger ascending (safer trips first) so the easiest
@@ -430,6 +434,22 @@ export function MapScreen() {
     });
   };
 
+  // ⚠ OTA-1350 — opening the map INSIDE an outpost glides to your room on its
+  // own, the same slow eased zoom ⌖ ME does (owner: "do the slow zoom effect as
+  // well? like when you first start?"). Once per open — after the first glide
+  // the view belongs to the player's fingers, so a re-render can never yank it.
+  const autoGlided = useRef(false);
+  useEffect(() => {
+    if (autoGlided.current || !showingOutpost || !imgBox || !player?.hubRoomId) return;
+    const room = hubRoomFor(player.hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
+    if (!room?.structuralId) return;
+    autoGlided.current = true;
+    centerOnPlayer(outpostRoomMark(player.factionId, room.structuralId));
+    // centerOnPlayer/hub lookups are render-stable helpers; the deps that matter
+    // are the ones that decide WHETHER the glide can run yet.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showingOutpost, imgBox, player?.hubRoomId]);
+
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
@@ -546,6 +566,10 @@ export function MapScreen() {
   // SAME markerFraction every pin uses, so it stands on the nudged silhouette.
   let playerMarkerBox: { left: number; top: number; size: number } | null = null;
   let playerFrac: { fx: number; fy: number } | null = null;
+  // OTA-1350 — ✓ marks for outpost rooms already walked (hubVisited), drawn on
+  // the interior art. The CURRENT room is deliberately absent from this list:
+  // it wears the pulsing marker instead of its checkmark.
+  const visitedRoomMarkStyles: { id: string; left: number; top: number }[] = [];
   // arb101 — overlay-label scale. The atlas's own painted labels shrink with the
   // contain-fit; a constant-size overlay would dwarf them. labelScale = rendered
   // width ÷ atlas natural width keeps overlay text proportional to the art at the
@@ -670,6 +694,45 @@ export function MapScreen() {
         };
       }
     }
+    // ⚠⚠ OTA-1350 — THE MARKER WALKS THE OUTPOST TOO. Owner: *"when a player is
+    // on an outpost can we have the you are here icon show you what room you are
+    // in? … and can we also show the checkmark on the map for rooms you have
+    // explored? and if you go back in the room you explored have it show the
+    // icon, not the checkmark while you are in it."* The same pulsing glyph the
+    // world atlas earned in OTA-1339 now stands on the CURRENT room of the
+    // interior art (per-skin label coordinates — outpostRoomMarks.ts explains
+    // why the nine skins each need their own), and every OTHER room in
+    // hubVisited wears a ✓. Room identity flows through structuralId
+    // (hubRoomFor), never through drawn names — the OTA-1279 rule.
+    if (showingOutpost && player?.hubRoomId) {
+      // labelScale was computed against the world atlas' natural width; the
+      // outpost art is 1254px square, so overlay glyph sizes rescale to it here
+      // (world overlays are all empty in outpost mode, so nothing else reads it).
+      labelScale = renderedW / 1254;
+      const artFactionId = player.factionId; // the art shown is OUTPOST_MAPS[factionId] — same key
+      const hereRoom = hubRoomFor(player.hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
+      if (hereRoom?.structuralId) {
+        const f = outpostRoomMark(artFactionId, hereRoom.structuralId);
+        const size = Math.max(12, 46 * (renderedW / 1254));
+        playerFrac = f;
+        playerMarkerBox = {
+          left: offsetX + renderedW * f.fx - size / 2,
+          top: offsetY + renderedH * f.fy - size / 2,
+          size,
+        };
+      }
+      for (const roomId of hubVisited ?? []) {
+        if (roomId === player.hubRoomId) continue; // the room you are IN shows the icon, not the ✓
+        const room = hubRoomFor(roomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
+        if (!room?.structuralId) continue;
+        const f = outpostRoomMark(artFactionId, room.structuralId);
+        visitedRoomMarkStyles.push({
+          id: room.structuralId,
+          left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
+          top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
+        });
+      }
+    }
   }
   // arb102 — every overlay glyph (the "?"/"✕" events, the "◆" contract pins) now
   // scales to the atlas art exactly like the Hidden Market name, so they all read
@@ -725,21 +788,20 @@ export function MapScreen() {
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title} accessibilityRole="header">ATLAS</Text>
-        {/* OTA-1339 — jump the view to the pulsing "you are here" marker. Only on
-            the world atlas: outpost interiors are single-screen and have no marker. */}
-        {!showingOutpost && (
-          <TouchableOpacity
-            onPress={() => centerOnPlayer(playerFrac)}
-            style={styles.resetBtn}
-            hitSlop={8}
-            activeOpacity={0.7}
-            accessibilityRole="button"
-            accessibilityLabel="Center the map on your position"
-            testID="center-on-player"
-          >
-            <Text style={styles.resetText}>⌖ ME</Text>
-          </TouchableOpacity>
-        )}
+        {/* OTA-1339 — jump the view to the pulsing "you are here" marker.
+            OTA-1350 — the outpost interior has a marker now too (the current
+            room), so the button rides along inside. */}
+        <TouchableOpacity
+          onPress={() => centerOnPlayer(playerFrac)}
+          style={styles.resetBtn}
+          hitSlop={8}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Center the map on your position"
+          testID="center-on-player"
+        >
+          <Text style={styles.resetText}>⌖ ME</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={resetTransform}
           style={styles.resetBtn}
@@ -842,6 +904,15 @@ export function MapScreen() {
           {contractMarkerStyles.map((m) => (
             <View key={m.key} pointerEvents="none" style={[styles.hiddenMarketWrap, { left: m.left, top: m.top }]}>
               <Text style={[styles.contractPin, markerFont]}>{m.label}</Text>
+            </View>
+          ))}
+          {/* ⚠ OTA-1350 — outpost rooms already walked wear a ✓ on the interior
+              art (the same hubVisited set the travel chips' ✓ reads). The room
+              the player is STANDING in is excluded above — it wears the pulsing
+              marker instead, drawn after these so it wins the overlap. */}
+          {visitedRoomMarkStyles.map((m) => (
+            <View key={m.id} testID={`room-visited-${m.id}`} pointerEvents="none" style={[styles.hiddenMarketWrap, { left: m.left, top: m.top }]}>
+              <Text style={[styles.roomVisitedMark, { fontSize: Math.max(7, 34 * labelScale), lineHeight: Math.max(8, 37 * labelScale) }]}>✓</Text>
             </View>
           ))}
           {/* ⚠⚠ OTA-1339 — THE "YOU ARE HERE" MARKER, BACK BY OWNER ORDER. OTA-182
@@ -1111,6 +1182,16 @@ const styles = StyleSheet.create({
   playerMarkerWhiteCore: { backgroundColor: '#f2f5ee' },
   playerMarkerGreenRing: { borderColor: '#6fd680' },
   playerMarkerGreenCore: { backgroundColor: '#6fd680' },
+  // OTA-1350 — the outpost map's explored-room ✓: the marker's green, the same
+  // shadow treatment every overlay glyph wears so it reads on the busy art.
+  roomVisitedMark: {
+    color: '#6fd680',
+    fontWeight: '900',
+    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
   resetBtn: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',
