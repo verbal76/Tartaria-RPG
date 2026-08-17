@@ -56,7 +56,17 @@ export const GREAT_CLIMBS: readonly GreatClimb[] = [
   },
   {
     id: 'asgardar_spire',
-    locationId: 'asgardar',
+    // ⚠⚠ THE CLIMB MOVED WITH THE TOWER. Owner: *"move asgardars tower to the outskirts as
+    // discussed"* / *"I agree, move it to it's own location."* The spire is now its own
+    // tile, `grand_spire_of_asgardar`, and the climb has to be anchored there — this line
+    // is the whole difference between the ★ CLIMB button appearing at the tower and it
+    // appearing in the middle of the capital, two tiles from anything to climb.
+    //
+    // ⚠ Consequence worth stating plainly: standing in Asgardar city and typing "climb the
+    // spire" no longer starts this ascent, and that is correct now. The tower is somewhere
+    // you travel to. `greatClimbForLocation` drives the chip off this same id, so the
+    // button and the verb move together and cannot disagree.
+    locationId: 'grand_spire_of_asgardar',
     // ⚠ OWNER, 2026-08-17: *"change all names to grand spire not buried."* The tower at
     // the capital is the GRAND Spire of Asgardar. "Buried" is gone from every player-facing
     // string; only the historical OTA notes in buildInfo keep the old name, because those

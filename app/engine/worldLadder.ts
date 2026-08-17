@@ -79,7 +79,11 @@ export const MACRO_LOCATIONS: MacroLocation[] = WORLD_LADDER.macroLocations;
 export const LOCATION_TO_MACRO: Record<string, string> = {
   // Capital cities + landmarks → Lost Capitals
   asgardar: 'lost_capitals',
-  grand_spire_of_etheria: 'lost_capitals',
+  // ⚠ The ASGARDAR spire is a capital landmark and belongs here. The ETHERIA spire does
+  // NOT any more — it moved into the Black Reach and re-macro'd to aetherstone_deep
+  // (below). These two lines used to sit adjacent in this table under near-identical
+  // names, which is a fair part of why the two towers kept getting discussed as one place.
+  grand_spire_of_asgardar: 'lost_capitals',
   samarran: 'lost_capitals',
   thametans_tower: 'lost_capitals',
   nimari: 'lost_capitals',
@@ -104,6 +108,12 @@ export const LOCATION_TO_MACRO: Record<string, string> = {
   giant_vault: 'aetherstone_deep',
   etheric_chamber: 'aetherstone_deep',
   mud_flood_nexus: 'aetherstone_deep',
+  // ⚠⚠ The Black Reach is the Deep's OPEN door — owner: *"it's another access point to the
+  // deep below."* Every other way in is a vault, a seal or a guarded chamber; this one is
+  // just a floor that ends. The Etheria spire rides down with it: the chasm took the tower
+  // whole, so the tower is Deep terrain now, not a capital landmark.
+  black_reach: 'aetherstone_deep',
+  grand_spire_of_etheria: 'aetherstone_deep',
   // Surface mud wastes → Silt Wastes
   great_tartary_plains: 'silt_wastes',
   mud_seas: 'silt_wastes',

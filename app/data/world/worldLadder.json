@@ -562,11 +562,11 @@
         {
           "id": "asgardar",
           "name": "Asgardar",
-          "description": "The capital city, buried with its court intact. The Grand Spire of Etheria still throws light at full power five centuries after the flood.",
+          "description": "The capital city, buried with its court intact. The Grand Spire of Asgardar still throws light at full power five centuries after the flood.",
           "microMicroLocations": [
             {
               "id": "grand_spire_etheria",
-              "name": "Grand Spire of Etheria",
+              "name": "Grand Spire of Asgardar",
               "environmental_description": "A tower of seamless white stone wider at the crown than the base. The interior staircase ascends past floors that no longer have boundaries — they fade into Aetheric haze.",
               "exits": [
                 "down the spiral",
