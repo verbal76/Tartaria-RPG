@@ -41,6 +41,7 @@ import { CallDogModal } from './app/components/CallDogModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
 import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1020
+import { DedicationOverlay } from './app/components/DedicationOverlay';
 import { StoryRevealOverlay } from './app/components/StoryRevealOverlay'; // OTA-1183
 import { StoryForkOverlay } from './app/components/StoryForkOverlay'; // OTA-1065
 import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1022
@@ -747,6 +748,12 @@ export default function App() {
       </SilentBoundary>
       <SilentBoundary tag="ChapterCardOverlay">
         <ChapterCardOverlay />
+      </SilentBoundary>
+      {/* The dedication card — raised only by the name beat, for the one name it
+          is written for. Mounted globally like the chapter card so it lands over
+          whatever the opening is doing at that moment. */}
+      <SilentBoundary tag="DedicationOverlay">
+        <DedicationOverlay />
       </SilentBoundary>
       {/* OTA-1183 — a completed collectible story, read whole. Mounted beside the
           chapter card because it is the same register of beat, and globally because a

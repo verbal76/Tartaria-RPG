@@ -7,7 +7,26 @@ export function emptyMemory(): WorldMemory {
     canonLocations: [],
     defeatedEnemies: [],
     completedQuestIds: [],
+    // OTA-1335 — fresh characters chart the Grand Spire of Asgardar where it now
+    // stands (its own tile on the city's outskirts) and never need the relocation
+    // notice; only legacy saves, where the load-migration defaults this to false,
+    // are eligible. See spireMoveNoticeLine below.
+    spireMoveNoticeShown: true,
   };
+}
+
+// ⚠ OTA-1335 — the map makeover moved the Grand Spire of Asgardar out of the capital
+// onto its own atlas tile on the city's outskirts (owner: "move asgardars tower to the
+// outskirts as discussed"). A LEGACY save that already bought the Skyreacher chart for
+// that climb learned the tower as "inside Asgardar" — this is the one-time Arbiter line
+// that updates them at load. Pure: returns the line when it should fire, null otherwise;
+// the caller flips spireMoveNoticeShown after showing it.
+export function spireMoveNoticeLine(memory: WorldMemory): string | null {
+  if (memory.spireMoveNoticeShown) return null;
+  if (!(memory.unlockedGreatClimbs ?? []).includes('asgardar_spire')) return null;
+  return 'Word travels from the capital: the Grand Spire of Asgardar stands out past the '
+    + 'last streets now — its own mark on the atlas, on the city’s outskirts. Your chart '
+    + 'still holds. Set a course from the TRAVEL list when you’re ready to climb.';
 }
 
 // OTA-500 — register a dynamically-mentioned place as install-canon. Idempotent by

@@ -36,7 +36,7 @@ import {
 // dispatch, the bulk-salvage guard, the loot picker's lead lane and the
 // INVESTIGATE ALL ordering. See engine/storyNouns.ts for why they must agree.
 import { rescueScenarioForNoun } from '../engine/storyNouns';
-import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse } from '../engine/worldMemory';
+import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse, spireMoveNoticeLine } from '../engine/worldMemory';
 // OTA-1049 — Phase 1: the per-person ledger the greeting layer reads.
 import { rememberNpcMeeting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName, vendorLedgerId, pocketLossMumble } from '../engine/npcMemory';
 // OTA-1053 — the relationship reaches the counter.
@@ -3344,6 +3344,10 @@ export function migrateLoadedWorldMemory(wm: WorldMemory): WorldMemory {
     dogGolemCoActivated: wm.dogGolemCoActivated ?? false,
     dogAerialNoticeShown: wm.dogAerialNoticeShown ?? [],
     dogClimbNoticeShown: wm.dogClimbNoticeShown ?? false,
+    // OTA-1335 — legacy saves default false (eligible for the one-time "the Spire
+    // moved" notice at load, IF they charted that climb); emptyMemory() stamps new
+    // characters true so they never see it. See spireMoveNoticeLine in worldMemory.
+    spireMoveNoticeShown: wm.spireMoveNoticeShown ?? false,
     factionRepIntroShown: wm.factionRepIntroShown ?? false,
     earnedTitleAnnounced: wm.earnedTitleAnnounced ?? [],
     fusionCompensationGranted: wm.fusionCompensationGranted ?? false,
@@ -7583,6 +7587,13 @@ interface GameStore {
   setPressure: (tier: PressureTier) => void;
   /** OTA-1020 — close the chapter card (tap-through). */
   dismissChapterCard: () => void;
+  /** A personal dedication, raised as a full-screen card the moment a character
+   *  is created with the name it was written for. Transient — never persisted;
+   *  DedicationOverlay (mounted globally in App.tsx) renders whenever this is
+   *  non-null, and one tap closes it. */
+  dedicationCard: { kicker: string; body: string; signoff: string } | null;
+  /** Close the dedication card (tap-through). */
+  dismissDedication: () => void;
   /** OTA-1022 — TRUE while the one-time veteran motive picker is owed: the
    *  loaded character's motive was DEALT by backfill (storyMotiveChosen !==
    *  true), so the player gets one "why did you come down?" ask. Transient —
@@ -8304,6 +8315,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   storyIntro: null,
   pendingDeath: null, // OTA-1110
   chapterCard: null, // OTA-1020
+  dedicationCard: null,
   pendingFork: null, // OTA-1065
   motivePickerPending: false, // OTA-1022
   fusionBlockedNotice: null,
@@ -9952,6 +9964,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // OTA-1018 — a loaded save never reopens the crawl mid-game.
         storyIntro: null,
         chapterCard: null, // OTA-1020 — nor a stale chapter card
+        dedicationCard: null,
         pendingFork: null, // OTA-1065 — nor an open question from another run
         // OTA-1022 — a save whose motive was DEALT (backfill guess, never
         // chosen) is owed the one-time picker, right here on load.
@@ -10145,6 +10158,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
           { skipDedup: true, speakFront: true },
         );
         lastWelcomeBackAt = now;
+        // ⚠ OTA-1335 — the one-time "the Spire moved" notice for LEGACY saves that
+        // charted the Asgardar climb before the map makeover gave the tower its own
+        // outskirts tile. Rides the same load beat as the greeting (OTA-1143: the
+        // Arbiter speaks at load, once) on the world channel, and flips its flag
+        // immediately so it can never fire twice.
+        const spireNotice = spireMoveNoticeLine(get().worldMemory);
+        if (spireNotice) {
+          get().appendLog('world', spireNotice, { skipDedup: true });
+          set((s2) => ({ worldMemory: { ...s2.worldMemory, spireMoveNoticeShown: true } }));
+        }
       }
       // arb38 — hydration completed cleanly. Clear the in-progress
       // breadcrumb so this load isn't mistaken for a crash, and clear
@@ -10279,7 +10302,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       crashedSlotIds,
       // If we just deleted the currently-loaded character, drop player state too.
       ...(get().activeSlotId === slotId
-        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null, storyIntro: null, chapterCard: null, pendingFork: null, motivePickerPending: false }
+        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null, storyIntro: null, chapterCard: null, dedicationCard: null, pendingFork: null, motivePickerPending: false }
         : {}),
     });
   },
@@ -10439,6 +10462,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // the StoryIntroOverlay shows it over the first scene.
       storyIntro: introPagesFor(player.storyMotive, player.factionId),
       chapterCard: null, // OTA-1020 — no stale card from a prior character
+      dedicationCard: null,
       pendingFork: null, // OTA-1065
       motivePickerPending: false, // OTA-1022 — creation chose; nothing owed
     });
@@ -10493,6 +10517,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingHookContinue: null,
       storyIntro: null, // OTA-1018
       chapterCard: null, // OTA-1020
+      dedicationCard: null,
   pendingFork: null, // OTA-1065
       motivePickerPending: false, // OTA-1022
       currentScreen: 'title',
@@ -13084,6 +13109,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           return;
         }
+        const devStartName = cleanName.trim().toLowerCase();
+        // ⚠⚠ ONE LIVING CHARACTER PER NAME. Owner: *"ensure that everyone else except
+        // for Verbal and Sasmooch can only have 1 active character of the same name at
+        // the same time."* Checked here because this is the single door where a
+        // brand-new character is named: if another slot already holds a LIVING
+        // character with this name, the beat refuses and re-asks. A dead slot does
+        // not block — its name is free to carry again — and the two dev names are
+        // exempt (they are shared test identities, re-made constantly). The current
+        // slot is excluded by id: it is this very character, mid-naming.
+        if (!DEV_REVIVE_NAMES.includes(devStartName)) {
+          const nameTaken = get().slots.some((sl) =>
+            sl.slotId !== get().activeSlotId
+            && sl.dead !== true
+            && sl.playerName.trim().toLowerCase() === devStartName);
+          if (nameTaken) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter shakes the ledger. "A ${cleanName} already walks these ruins — one name, one soul at a time. Give me another."`,
+            );
+            return;
+          }
+        }
         set((s) => (s.player ? {
           player: { ...s.player, name: cleanName },
           awaitingTutorialName: false,
@@ -13105,7 +13152,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // scaffolding at CREATION, not retroactively on every load: a Resurrection Gem up
         // front (Verbal/Sasmooch) + a crash-test supply kit (both dev names). This is the single
         // point a brand-new character is named; an existing save never re-enters it.
-        const devStartName = cleanName.trim().toLowerCase();
         if (DEV_REVIVE_NAMES.includes(devStartName)) {
           void addResurrectionGems(1).then((total) => {
             set({ resurrectionGems: total });
@@ -13134,6 +13180,92 @@ export const useGameStore = create<GameStore>((set, get) => ({
             return { player: { ...s.player, inventory: inv } };
           });
           get().appendLog('reward', `✦ A crash-test kit lands in ${cleanName}'s pack: 10 First Aid Kits, 20 Trail Rations, 20 Smoke-Cured Jerky Strips, 20 Bioluminescent Fungus, 1 Water Bottle. Test freely.`);
+        }
+        // ⚠⚠ OTA-1335 — THE FULL MISSION BOARD, FOR BOTH DEV NAMES. Owner: *"I want you to
+        // put every single side quest mission Tower map everything into the missions. that
+        // way I don't have to find them… my missions board should be completely filled with
+        // everything that would ever go there."* Originally keyed on Verbal alone; the
+        // follow-up order widened it the same day: *"any benefit Verbal gets when creating
+        // a character, Sasmooch gets as well."* So the fill keys on DEV_REVIVE_NAMES —
+        // whatever Verbal is born with at this beat, Sasmooch is born with too.
+        //
+        // ⚠ Seeded the way the REAL accept doors write records, deliberately:
+        //   - stage starts at firstActionableHuntStage(def) — records parked on a leading
+        //     null stage are the exact wedge OTA-1220/1219 closed; never re-seed it.
+        //   - tracked: false on every one. Tracking drives the atlas pin AND the
+        //     quiet-ground encounter suppression; 115 tracked contracts would silence
+        //     combat across half the map and pin every cell at once. He tracks what he
+        //     tests, one at a time, from the Contracts screen.
+        //   - opening-stage item grants are NOT pre-flooded into the pack — 115 quests'
+        //     openers would bury the inventory. The catch-up heal hands each quest's
+        //     prerequisites over on the first attempt at its ground ("You had it after
+        //     all. Go again."), which is the same path a directly-written faction record
+        //     has always taken.
+        if (DEV_REVIVE_NAMES.includes(devStartName)) {
+          const bornAt = Date.now();
+          const cell = acceptCellStamp(get);
+          const openAll = <D extends { id: string; factionId?: string | null; stages: readonly unknown[] }>(
+            defs: readonly D[],
+          ) => defs.map((d) => ({
+            id: d.id,
+            stage: firstActionableHuntStage(d as never),
+            postedByFaction: (d.factionId ?? null) as string | null,
+            acceptedAt: bornAt,
+            tracked: false,
+            ...cell,
+          }));
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { FACTION_QUESTS } = require('../engine/factionQuests') as typeof import('../engine/factionQuests');
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { GREAT_CLIMBS } = require('../engine/greatClimbs') as typeof import('../engine/greatClimbs');
+          set((s2) => {
+            if (!s2.player) return s2;
+            let inv = s2.player.inventory;
+            // The five tower maps, by their exact use-path names — and the climbs unlocked
+            // outright, so the ★ CLIMB chip is live without a single trader visit. The
+            // held maps let the chart-USE flow itself be tested; soldMapIds is stamped so
+            // roadside traders do not offer duplicates of maps he already holds.
+            for (const c of SKYREACHER_CHARTS) {
+              inv = grantItem(inv, {
+                id: `verbalgift_${bornAt}_${c.climbId}`,
+                name: c.name, kind: 'misc', rarity: 'Uncommon', quantity: 1,
+                tags: ['gift', 'map', 'skyreacher'],
+              }).inventory;
+            }
+            return {
+              player: {
+                ...s2.player,
+                inventory: inv,
+                activeHunts: openAll(HUNTS),
+                activeMysteries: openAll(MYSTERIES),
+                activeStorylines: openAll(STORYLINES),
+                activeFactionQuestIds: FACTION_QUESTS.map((q) => q.id),
+                activeFactionQuests: FACTION_QUESTS.map((q) => ({
+                  id: q.id, stage: 0, postedByFaction: q.factionId, acceptedAt: bornAt, tracked: false, ...cell,
+                })),
+              },
+              worldMemory: {
+                ...s2.worldMemory,
+                unlockedGreatClimbs: GREAT_CLIMBS.map((c) => c.id),
+                soldMapIds: Array.from(new Set([
+                  ...(s2.worldMemory.soldMapIds ?? []),
+                  ...SKYREACHER_CHARTS.map((c) => c.name),
+                ])),
+              },
+            };
+          });
+          get().appendLog('reward', `✦ The Arbiter unrolls the whole ledger for ${cleanName}: every hunt, mystery, storyline and faction quest is open on the board — ${HUNTS.length + MYSTERIES.length + STORYLINES.length} contracts and ${FACTION_QUESTS.length} faction quests — plus all five Skyreacher Maps, every great climb already charted. Test freely.`);
+        }
+        // Not a dev tool — a dedication. The one popup in the game written for one
+        // person, raised the moment the name is written down.
+        if (devStartName === 'sasmooch') {
+          set({
+            dedicationCard: {
+              kicker: 'TO MY WIFE',
+              body: 'I don’t know when you are creating this character, but Happy 50th Birthday and 15th Anniversary!',
+              signoff: '— Love, Verbal',
+            },
+          });
         }
         void get().persist();
         get().maybeAdvanceTutorial('name');
@@ -22269,9 +22401,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         const remaining = consumeIngredients(player.inventory, recipe);
         const catEntry = lookupCraftedItem(recipe.result);
+        // ⚠ OTA-1335 — DOG ARMOR IS BUILT FOR *YOUR* DOG, AND THE NAME SAYS SO. Owner, after
+        // typing "Skinwalker" as his dog's breed: *"when we make the dog armor how about we
+        // put the breed name in front of it? … if I have a pitbull it's Pitbull studded
+        // leather vest. if I have a parakeet it's parakeet metal plated armor."* The breed is
+        // free text the player typed at the rescue, so this works for any animal they can
+        // imagine — no stat changes, no special cases, purely the name. Only CRAFTED pieces
+        // ("built") take the prefix; looted vests stay catalog-named. No dog at the bench →
+        // no prefix, because there is nothing to tailor it to.
+        const dogBreed = catEntry.kind === 'dog_armor' ? get().player?.dog?.breed?.trim() : undefined;
+        const craftedName = dogBreed
+          ? `${dogBreed.charAt(0).toUpperCase()}${dogBreed.slice(1)} ${recipe.result}`
+          : recipe.result;
         const crafted: InventoryItem = stampDurability({
           id: freshInstanceId('crafted'),
-          name: recipe.result,
+          name: craftedName,
           kind: catEntry.kind === 'weapon' ? 'weapon' : catEntry.kind === 'armor' ? 'armor' : catEntry.kind,
           rarity: catEntry.rarity,
           quantity: 1,
@@ -22298,7 +22442,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }));
         // OTA-983 — a batch emits ONE summary line at the end instead of N of these.
         if (!get().craftBatchQuiet) {
-          get().appendLog('reward', `✦ Crafted ${recipe.result}. The Arbiter watches you set the last piece.`);
+          get().appendLog('reward', `✦ Crafted ${craftedName}. The Arbiter watches you set the last piece.`);
         }
         break;
       }
@@ -25566,7 +25710,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       void addResurrectionGems(1).then((total) => {
         set({ resurrectionGems: total });
         const line = enemy.boss
-          ? `✦ A Resurrection Gem pulses in the wreckage where ${enemy.name} fell — yours, and the buried world is one boss lighter. (${total} held)`
+          // ⚠ OTA-1335 — LEAD WITH "SPOILS". Owner, after killing his first Core Guardian: *"I
+          // thought I had died… did I die and suddenly get some weird health bonus… the pop-up
+          // didn't say that I defeated somebody."* Three things stacked into that misread, and
+          // this line was one of them: a RESURRECTION Gem — the revival item — announcing
+          // itself with "pulses in the wreckage" at the exact moment a brutal fight ends reads
+          // as the death path firing, not as loot. The word "Spoils" up front closes that
+          // reading before it opens. (The other two: the CHAPTER III card opens on the victory
+          // now, and the guardian's dying speech stays hers — see chapters.json.)
+          ? `✦ Boss spoils: a Resurrection Gem, prised from the wreckage where ${enemy.name} fell. Yours — the buried world is one boss lighter. (${total} held)`
           : pityHit
           ? `✦ The buried world relents — a Resurrection Gem at the ${newKills}-kill mark. (${total} held)`
           : `✦ A Resurrection Gem flickers from the dust — gathered to your stash. (${total} held)`;
@@ -33303,6 +33455,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // this OTA is closing.
       storyIntro: null,
       chapterCard: null,
+      dedicationCard: null,
       pendingFork: null,
       pendingTalk: null,
       missionCompleteNotice: null,
@@ -33323,6 +33476,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ chapterCard: null });
     // OTA-1065 — the card was the thing standing in front of the question.
     raiseDueFork(get, set);
+  },
+
+  dismissDedication() {
+    set({ dedicationCard: null });
   },
   setPressure: (tier) => {
     const player = get().player;

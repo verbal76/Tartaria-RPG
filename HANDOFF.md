@@ -1839,8 +1839,31 @@ rediscovering them.
   test** — a player-reported behaviour that names two actors and an ordering
   usually can.
 
+- **⚠⚠ SIX OWNER ASKS FROM LIVE TESTING — PORT OF HAL OTA-1334
+  (2026-08-17, latest). STEAM OTA-1335 (following the OTA-1334 map-audit port).**
+  Authored and gated on HAL under the HAL-first order; this line takes the port whole.
+  - **The full board for both dev names**: Verbal OR Sasmooch at the name beat (owner:
+    *"any benefit Verbal gets when creating a character, Sasmooch gets as well"*) is born
+    with all 115 side quests, five tower maps, five charted climbs — first ACTIONABLE
+    stage, nothing tracked, no item pre-flood.
+  - **Victory is unmissable**: cores + descent chapter cards carry a gold ★ VICTORY
+    banner above everything and open with the win; revelation/choice (arrival cards)
+    assert the banner's ABSENCE; the boss gem line leads with "Boss spoils:".
+  - **Breed-named dog armor**: crafted dog-armor mints as `<Breed> <Catalog Name>`;
+    name only, kind survives so the vest still equips.
+  - **One living character per ordinary name**: the name beat refuses a name a LIVING
+    character in another slot already carries; dead slots free the name; dev names never
+    collide. ⚠ Test note: the guard reads `get().slots`, and startNewGame REFRESHES that
+    list from disk — a test faking a dead slot must patch state AFTER startNewGame.
+  - **The Sasmooch dedication**: a full-screen dedication card the moment the name is
+    written down (DedicationOverlay, global mount). No OTA tag near the card text on
+    purpose — it is a letter, not a feature.
+  - **The Asgardar spire notice**: legacy saves that charted the Asgardar climb get ONE
+    load-beat world line saying the tower now stands on the city's outskirts;
+    `emptyMemory()` stamps the flag true, the load migration defaults it false.
+
 - **⚠⚠⚠ THE ★ CLIMB BUTTON, AND THE SPIRE LOSES "BURIED"
-  (2026-08-17, latest). STEAM OTA-1332.**
+  (2026-08-17). STEAM OTA-1332.**
   Owner: *"when you land on the tile, beginning the climb should be a button like summon the
   guardian. and it should only be visible if you have that particular map and used it to
   mark the location. change all names to grand spire not buried."*
