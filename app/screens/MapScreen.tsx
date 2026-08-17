@@ -357,6 +357,66 @@ export function MapScreen() {
     });
   };
 
+  // ⚠⚠ OTA-1339 — THE PLAYER MARKER RETURNS, AND THE REASON IT CAN. OTA-182 removed
+  // the old dot at the owner's request ("we were never able to make it accurate so
+  // let's let the map just be a map") — that dot walked a per-tile drift model that
+  // disagreed with the hand-painted art. The map makeover ended the disagreement:
+  // there is ONE coordinate system now (canonicalCellFor derives cells FROM the
+  // atlas fractions, and markerFraction re-applies the by-eye visual nudges), so
+  // the marker lands on the same silhouette the label and the pins do. Owner, from
+  // live testing at Iskan-Veil: *"where is the you are here explorer icon? it
+  // should be pulsating between white and green. there should also be a center on
+  // character button next to reset."* Both here.
+  const pulse = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(pulse, { toValue: 1, duration: 900, useNativeDriver: true }),
+      Animated.timing(pulse, { toValue: 0, duration: 900, useNativeDriver: true }),
+    ]));
+    loop.start();
+    return () => loop.stop();
+  }, [pulse]);
+  const pulseInv = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
+
+  /** The rendered (letterboxed) image rect inside the box — same contain-fit math
+   *  the overlay block uses; shared so CENTER and the marker can never disagree. */
+  const renderedRectFor = (box: { width: number; height: number }) => {
+    const boxAspect = box.width / box.height;
+    if (boxAspect > mapAspect) {
+      const h = box.height; const w = box.height * mapAspect;
+      return { renderedW: w, renderedH: h, offsetX: (box.width - w) / 2, offsetY: 0 };
+    }
+    const w = box.width; const h = box.width / mapAspect;
+    return { renderedW: w, renderedH: h, offsetX: 0, offsetY: (box.height - h) / 2 };
+  };
+
+  const centerOnPlayer = (frac: { fx: number; fy: number } | null) => {
+    if (!imgBox || !frac) return;
+    const r = renderedRectFor(imgBox);
+    // Keep the player's zoom if they are already in close; from the full view,
+    // come in far enough that "centered" visibly means something.
+    const s = Math.max(scaleRef.current, baselineScale.current * 2.2);
+    // The scaled layer transforms about the box center: screen = center + t + s·(p − center),
+    // so putting the marker AT the center solves to t = −s·(p − center).
+    const mx = r.offsetX + r.renderedW * frac.fx;
+    const my = r.offsetY + r.renderedH * frac.fy;
+    const target = clampTranslate(
+      -s * (mx - imgBox.width / 2),
+      -s * (my - imgBox.height / 2),
+      s,
+      imgBox,
+    );
+    Animated.parallel([
+      Animated.spring(scale, { toValue: s, useNativeDriver: true, friction: 7, tension: 80 }),
+      Animated.spring(translateX, { toValue: target.tx, useNativeDriver: true, friction: 7, tension: 80 }),
+      Animated.spring(translateY, { toValue: target.ty, useNativeDriver: true, friction: 7, tension: 80 }),
+    ]).start(() => {
+      scaleRef.current = s;
+      txRef.current = target.tx;
+      tyRef.current = target.ty;
+    });
+  };
+
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
@@ -469,6 +529,10 @@ export function MapScreen() {
   const contractMarkerStyles: { key: string; label: string; left: number; top: number }[] = [];
   // OTA-1335 — resolved place-name labels for the new (lettering-free) atlas art.
   const nameLabelStyles: { id: string; lines: string[]; left: number; top: number; width: number }[] = [];
+  // OTA-1339 — the "you are here" marker: the current location's cell through the
+  // SAME markerFraction every pin uses, so it stands on the nudged silhouette.
+  let playerMarkerBox: { left: number; top: number; size: number } | null = null;
+  let playerFrac: { fx: number; fy: number } | null = null;
   // arb101 — overlay-label scale. The atlas's own painted labels shrink with the
   // contain-fit; a constant-size overlay would dwarf them. labelScale = rendered
   // width ÷ atlas natural width keeps overlay text proportional to the art at the
@@ -572,6 +636,22 @@ export function MapScreen() {
           top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
         });
       }
+      // ⚠ OTA-1339 — the player marker, LAST so it draws over every other glyph.
+      // Anchored to the current location's canonical cell → markerFraction, which
+      // is exactly where that location's pin and label sit — the accuracy problem
+      // that killed the OTA-182 dot cannot recur, because there is nothing left to
+      // disagree: one coordinate system serves label, pin, and marker alike.
+      if (player?.currentLocationId) {
+        const cell = canonicalCellFor(player.currentLocationId);
+        const f = markerFraction(cell.x, cell.y);
+        const size = Math.max(9, 40 * labelScale);
+        playerFrac = f;
+        playerMarkerBox = {
+          left: offsetX + renderedW * f.fx - size / 2,
+          top: offsetY + renderedH * f.fy - size / 2,
+          size,
+        };
+      }
     }
   }
   // arb102 — every overlay glyph (the "?"/"✕" events, the "◆" contract pins) now
@@ -602,9 +682,10 @@ export function MapScreen() {
         ? `${Math.abs(dx)} tile${Math.abs(dx) === 1 ? '' : 's'} ${dx >= 0 ? 'east' : 'west'} of ${fromName}`
         : `${Math.abs(dy)} tile${Math.abs(dy) === 1 ? '' : 's'} ${dy >= 0 ? 'south' : 'north'} of ${fromName}`);
 
-  // arb98 — verbal whereabouts (no marker on the art; this is the player's
-  // orientation cue). Inside a hub we just name the outpost; out in the world
-  // we describe the region + the nearest drawn landmarks.
+  // arb98 — verbal whereabouts. Written when the art carried no marker (OTA-182 →
+  // OTA-1339); it stays now the marker is back, because a sentence that names the
+  // neighbours is orientation the pulsing dot cannot give. Inside a hub we just
+  // name the outpost; out in the world we describe the region + nearest landmarks.
   const whereaboutsLine = inHub
     ? `Inside the ${hubNameForFaction(hubSkinFactionFor(player?.currentLocationId, player?.factionId))} — a fixed outpost interior.`
     : describeWhereabouts(player.currentLocationId, LOCATIONS);
@@ -627,6 +708,21 @@ export function MapScreen() {
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title} accessibilityRole="header">ATLAS</Text>
+        {/* OTA-1339 — jump the view to the pulsing "you are here" marker. Only on
+            the world atlas: outpost interiors are single-screen and have no marker. */}
+        {!showingOutpost && (
+          <TouchableOpacity
+            onPress={() => centerOnPlayer(playerFrac)}
+            style={styles.resetBtn}
+            hitSlop={8}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Center the map on your position"
+            testID="center-on-player"
+          >
+            <Text style={styles.resetText}>⌖ ME</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           onPress={resetTransform}
           style={styles.resetBtn}
@@ -731,15 +827,43 @@ export function MapScreen() {
               <Text style={[styles.contractPin, markerFont]}>{m.label}</Text>
             </View>
           ))}
-          {/* OTA-182 — player marker (silhouette + halo) removed.
-              Player ask: "let's take the player marker off of the
-              map, we were never able to make it accurate so let's
-              let the map just be a map." Procedural marker
-              placement drifted from the atlas's hand-painted city
-              positions enough that the player wasn't a reliable
-              cue. Map now renders as art-only. The "you are here"
-              text + bearings still live in the footer below for
-              location context. */}
+          {/* ⚠⚠ OTA-1339 — THE "YOU ARE HERE" MARKER, BACK BY OWNER ORDER. OTA-182
+              removed the old dot ("we were never able to make it accurate so let's
+              let the map just be a map") because its drift model disagreed with the
+              painted art. The disagreement is structurally gone — one coordinate
+              system serves labels, pins, and this marker (see playerMarkerBox above)
+              — and the owner asked for it back from live testing at Iskan-Veil:
+              "pulsating between white and green." Two stacked ring-and-dot glyphs
+              cross-fade on counterphased opacity (native-driver-safe; RN cannot
+              animate borderColor natively). Drawn LAST so it wins every overlap. */}
+          {playerMarkerBox && (() => {
+            const m = playerMarkerBox;
+            const ring = {
+              position: 'absolute' as const, left: 0, top: 0, width: m.size, height: m.size,
+              borderRadius: m.size / 2, borderWidth: Math.max(1.5, m.size * 0.11),
+            };
+            const core = {
+              position: 'absolute' as const,
+              left: m.size * 0.33, top: m.size * 0.33,
+              width: m.size * 0.34, height: m.size * 0.34, borderRadius: m.size * 0.17,
+            };
+            return (
+              <View
+                pointerEvents="none"
+                testID="player-marker"
+                style={{ position: 'absolute', left: m.left, top: m.top, width: m.size, height: m.size }}
+              >
+                <Animated.View style={{ position: 'absolute', left: 0, top: 0, width: m.size, height: m.size, opacity: pulseInv }}>
+                  <View style={[ring, styles.playerMarkerWhiteRing]} />
+                  <View style={[core, styles.playerMarkerWhiteCore]} />
+                </Animated.View>
+                <Animated.View style={{ position: 'absolute', left: 0, top: 0, width: m.size, height: m.size, opacity: pulse }}>
+                  <View style={[ring, styles.playerMarkerGreenRing]} />
+                  <View style={[core, styles.playerMarkerGreenCore]} />
+                </Animated.View>
+              </View>
+            );
+          })()}
         </Animated.View>
       </View>
 
@@ -962,6 +1086,12 @@ const styles = StyleSheet.create({
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
+  // OTA-1339 — the marker's two cross-fading liveries. Colors only — geometry is
+  // computed inline from the zoom-scaled marker size.
+  playerMarkerWhiteRing: { borderColor: '#f2f5ee' },
+  playerMarkerWhiteCore: { backgroundColor: '#f2f5ee' },
+  playerMarkerGreenRing: { borderColor: '#6fd680' },
+  playerMarkerGreenCore: { backgroundColor: '#6fd680' },
   resetBtn: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',
