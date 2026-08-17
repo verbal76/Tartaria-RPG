@@ -93,7 +93,11 @@ describe('OTA 043 — corruption price markup', () => {
           greeting: '"Wares."',
         } as any,
       },
-      player: { ...p0, tc: 1000, corruption },
+      // OTA-1341 — zero the standing ladder so this suite keeps testing its own
+      // multiplier in isolation (a fresh character is Known +10 with their own
+      // guild, which now takes 5% off at that guild's counter — the ladder has
+      // its own suite, ota1341StandingLadder).
+      player: { ...p0, tc: 1000, corruption, factionStanding: [] },
     });
     return store;
   }
