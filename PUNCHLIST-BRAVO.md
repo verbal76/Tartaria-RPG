@@ -157,6 +157,22 @@ died on that handler's own log line), `ctx-open`/`ctx-open-done` and
 incriminates that exact native call. Pattern across all three freezes: app-lifecycle
 churn around the model context (the OTA-1195 report's own suspect, instrumented and
 still unfixed by design — instrument first, then fix).
+**FOURTH FREEZE, 2026-08-18 ~11:37:37, same device, OTA-1352 (lifecycle stamps live),
+deliberate speedrun test.** Died mid `take / salvage` tap; the next boot's context
+counters reset (opened=1), proving a fresh process. ⚠ The owner's app-switch torture
+test in the NEW session — a dozen 2–6s background/active cycles — ALL SURVIVED, so
+lifecycle churn alone is exonerated as the sole trigger. The receipt that stands out is
+the session's own qwen stats line: **14 generations wasted / 191s of native compute in
+~4.5 minutes** (9 of 10 scene intros discarded `cancelled:player-acted-again`), with
+per-token cost degrading 1.8→31.1ms right up to death. Unified shape across freezes
+2–4: sustained generate-and-discard churn degrades the native model layer until the
+process dies at whatever comes next (a travel, an app-switch, a salvage sweep).
+**HAL OTA-1353 removes the churn:** the sprint gate (3+ actions in 4s → no live
+narration and no bank fill STARTS; `reason=sprinting` in the log proves it working)
+plus classifier parity (inference AND session create through the native-ML lock; its
+foreground resume debounced like the Qwen re-warm). ⚠ The freeze-#4 dying-breath
+crumb (`Last checkpoint reached:`) was cut off the owner's paste — still owed; it names
+the exact dying call and stays wanted even with the mitigation shipped.
 
 ## B10 — N5: off-canon place-name filter — **WATCH (carry-over)**
 Held for a second sighting per the standing rule; one sighting on record.
