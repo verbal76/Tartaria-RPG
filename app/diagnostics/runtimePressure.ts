@@ -159,7 +159,11 @@ export interface PressureSnapshot {
 // the setTimeout sampler and requestAnimationFrame alike (both are JS timers in RN), so
 // "no stalls seen" prints straight through a hard freeze. The breadcrumb is written
 // ahead of the wedge instead of measured after it.
-let rpLastBreadcrumb: { at: number; what: string; screen?: string; room?: string } | null = null;
+let rpLastBreadcrumb: {
+  at: number; what: string; screen?: string; room?: string;
+  // OTA-1356 — the phase checkpoints (see saveSystem.stampBreadcrumbPhase).
+  phase?: string; phaseAt?: number; phaseDetail?: string;
+} | null = null;
 export function setLastBootBreadcrumb(c: typeof rpLastBreadcrumb): void { rpLastBreadcrumb = c; }
 
 export function runtimePressureSummary(s: PressureSnapshot): string {
@@ -171,6 +175,18 @@ export function runtimePressureSummary(s: PressureSnapshot): string {
     out.push(`     Last thing the app did: ${rpLastBreadcrumb.what}`);
     out.push(`     Where: ${rpLastBreadcrumb.room ?? '(unknown)'} on ${rpLastBreadcrumb.screen ?? '(unknown)'} screen`);
     out.push(`     When: ${new Date(rpLastBreadcrumb.at).toISOString()} (${mins} min before this boot)`);
+    // OTA-1356 — the phase names WHERE in that activity's life the app died:
+    // `engine-done` but never `rendered` → render side; stuck at `parsed:` →
+    // the engine; `homework:` → the background writer, not the player at all.
+    if (rpLastBreadcrumb.phase) {
+      const dt = rpLastBreadcrumb.phaseAt != null
+        ? ` (+${Math.max(0, rpLastBreadcrumb.phaseAt - rpLastBreadcrumb.at)}ms after it)`
+        : '';
+      out.push(`     Last checkpoint reached: ${rpLastBreadcrumb.phase}`
+        + (rpLastBreadcrumb.phaseDetail ? ` [${rpLastBreadcrumb.phaseDetail}]` : '') + dt);
+    } else {
+      out.push(`     Last checkpoint reached: (none — the action never cleared its first phase)`);
+    }
     out.push(`     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines`);
     out.push(`       die in memory when the JS thread wedges. Trust this line over it.`);
   }

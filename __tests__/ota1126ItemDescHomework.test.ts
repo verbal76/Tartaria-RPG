@@ -106,7 +106,11 @@ describe('OTA-1126 — the idle gate, and every muzzle it inherits', () => {
 describe('OTA-1126 — ⚠ the player coming back always wins', () => {
   it('submitPlayerAction clears the idle stamp at the one door every action uses', () => {
     const head = SRC.slice(SRC.indexOf('submitPlayerAction(text, _opts) {'));
-    expect(head.slice(0, 900)).toContain('if (get().uiIdleSince !== null) set({ uiIdleSince: null });');
+    // OTA-1356 widened this window (900 -> 1600): the dying-breath try/finally
+    // wrap and its comment now sit between the door and the idle-clear. The
+    // lock's claim is unchanged -- the clear happens at the TOP of the door,
+    // before any action dispatch -- the top is just a few lines deeper now.
+    expect(head.slice(0, 1600)).toContain('if (get().uiIdleSince !== null) set({ uiIdleSince: null });');
   });
 
   it('⚠ marking idle is idempotent — a re-render must not restart the dwell', () => {

@@ -3,7 +3,7 @@ import { canonicalItemTags } from '../engine/crafting';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { playerWeaponReach, useGameStore, makeRoomKey, chipDismissTileKey } from '../state/gameStore';
-import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
+import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError, stampBreadcrumbPhase } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { AdventureFeed } from '../components/AdventureFeed';
@@ -117,6 +117,11 @@ function timeOfDayTint(hours: number): string {
 export function ExplorationScreen() {
   const player = useGameStore((s) => s.player);
   const gameLog = useGameStore((s) => s.gameLog);
+  // ⚠ OTA-1356 — the dying breath's RENDER checkpoint. Runs after every React
+  // commit of this screen (no dep array, throttled inside the stamp), so a
+  // freeze crumb that reached `engine-done` but never `rendered` indicts the
+  // render side — the exact question the 2026-08-17 receipt could not answer.
+  useEffect(() => { stampBreadcrumbPhase('rendered'); });
   const partialArbiterText = useGameStore((s) => s.partialArbiterText);
   const isGenerating = useGameStore((s) => s.isGenerating);
   const submit = useGameStore((s) => s.submitPlayerAction);
