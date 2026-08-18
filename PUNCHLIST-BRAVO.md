@@ -122,10 +122,27 @@ pixels changed; unwinding re-scatters the copies. Owner has been offered the unw
 and not taken it — default stands until overruled. ⚠ Now moot in practice: HAL took the
 amber picker in OTA-1319, so the module is load-bearing on all three lines.
 
-## B9 — The JS-wedge freeze — **WATCH**
+## B9 — The JS-wedge freeze — **WATCH (second occurrence receipted 2026-08-17; phase forensics shipped, HAL OTA-1351)**
 Forensics shipped (OTA-1276 breadcrumb: `freeze forensics: last boot ended mid-action`).
-Every device snapshot so far has been a healthy boot; the wedge has not left a breadcrumb
-yet. Nothing to chase until a device produces one.
+**SECOND FREEZE, 2026-08-17 ~23:47, Pixel 10 Pro XL (Tensor G5), OTA-1350, player Verbal
+(full board), Architect outpost.** The OTA-1276 breadcrumb did its job — receipts:
+- Died with NO orderly exit; last action `go west` from outpost_central at 23:47:25.954
+  (into the Break Room, the session's one unvisited room). The disk log's tail ended
+  mid-write 3.6s EARLIER (23:47:22.357) — the batched tail is confirmed unreliable,
+  exactly as the boot report warns.
+- **Hypotheses REFUTED by receipt:** (1) native completion crash — `Qwen completion
+  guard: clean` on the next boot, so the model call finished and marked done; the
+  classifier-collision theory died with it. (2) pure store-logic wedge — the exact
+  route (Verbal full board, full-loot every room, then `go west` into the Break Room)
+  replays CLEAN in JS, second time a B9 route has.
+- **Open ambiguity the old crumb cannot close:** "died processing `go west`" vs "died
+  later in background work" — the crumb records only the action's arrival.
+**HAL OTA-1351 closes that ambiguity for the NEXT occurrence:** the crumb now records
+the last CHECKPOINT reached (`received → parsed:<intent> → engine-done → rendered`,
+plus `homework:<job>`/`homework-done` for background model work) and the boot report
+prints it. A survivor at `engine-done` without `rendered` indicts the render side;
+stuck at `parsed:` indicts the engine; `homework:` indicts the background writer.
+Nothing further to chase until a device produces a phase-stamped breadcrumb.
 
 ## B10 — N5: off-canon place-name filter — **WATCH (carry-over)**
 Held for a second sighting per the standing rule; one sighting on record.

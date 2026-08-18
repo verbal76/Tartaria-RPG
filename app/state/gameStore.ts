@@ -128,6 +128,7 @@ import {
   getLastSaveWriteError,
   consumeSaveReclaimedFlag,
   stampLiveBreadcrumb,          // OTA-1276
+  stampBreadcrumbPhase,         // OTA-1351 — the dying breath learns phases
   readLiveBreadcrumb,           // OTA-1276
   clearLiveBreadcrumb,          // OTA-1276
   type SlotSummary,
@@ -9122,6 +9123,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (!scene || !pl) return false;
           introFillInFlight = true;
           lastIntroFillAt = Date.now();
+          // OTA-1351 — background model work stamps the dying breath too: a
+          // crumb frozen at this phase indicts the homework path, not the
+          // player's action.
+          stampBreadcrumbPhase('homework:intro-fill', target.id);
           void narrateViaArbiter(
             get,
             set,
@@ -9137,7 +9142,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'scene_intro',
             { bankOnly: true, forLocation: target },
           ).catch(() => { /* fail closed — the live path still works */ })
-            .finally(() => { introFillInFlight = false; });
+            .finally(() => {
+              introFillInFlight = false;
+              stampBreadcrumbPhase('homework-done'); // OTA-1351
+            });
           // ⚠ The threshold this fill was armed at, so a device log can tell a
           // preemption caused by a bad threshold from one caused by a busy player.
           get().appendLog('debug', `homework: intro-fill armed after ${idleNeeded}ms idle`);
@@ -9194,6 +9202,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           synthInFlight = true;
           lastHomeworkAt = Date.now();
           pending.add(key);
+          stampBreadcrumbPhase('homework:item-desc', key); // OTA-1351
           void Promise.resolve().then(async () => {
             const t0 = Date.now();
             let got: unknown = null;
@@ -9202,6 +9211,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             } catch { /* fail closed — the static row is already in hand */ }
             pending.delete(key);
             synthInFlight = false;
+            stampBreadcrumbPhase('homework-done'); // OTA-1351
             lastSynthAt = Date.now();
             get().appendLog('debug',
               `homework: item_desc "${target.name}" ${got ? '✓' : '∅'} ${Date.now() - t0}ms`);
@@ -13109,6 +13119,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   submitPlayerAction(text, _opts) {
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
+    // ⚠ OTA-1351 — the whole action body runs under one try/finally so EVERY
+    // exit path (dozens of early returns) stamps `engine-done` on the dying-
+    // breath crumb. A crumb that survives a freeze WITHOUT this phase says the
+    // engine never finished the action; one WITH it moves suspicion to the
+    // render or background layers. Indentation of the body is untouched on
+    // purpose — this wrap must stay diff-invisible to every other change.
+    try {
     // ⚠ OTA-1126 — THE PLAYER IS BACK. Clearing the idle stamp here, at the one
     // door every action goes through, is what makes homework honest: from this
     // instant the scheduler sees "not idle" and starts nothing new, and
@@ -14612,6 +14629,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'debug',
       `parser: intent=${parsed.intent} conf=${parsed.confidence.toFixed(2)} verb=${parsed.matchedVerb ?? '-'} target=${parsed.target ?? '-'} resolved=${parsed.resolvedNoun ?? '-'} range=${currentScene.range ?? '-'} enemies=${currentScene.enemies.length} hooks=${currentScene.hooks?.length ?? 0}`,
     );
+    // OTA-1351 — phase checkpoint: parsing survived, the engine switch is next.
+    stampBreadcrumbPhase(`parsed:${parsed.intent}`);
 
     // Track the noun the player just named so the soft Arbiter
     // fallback can ground follow-up questions ("is there anything
@@ -22722,6 +22741,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-851 — a roaming faction patrol can cross your path in the open, anywhere.
     if ((get().currentScene?.enemies?.length ?? 0) === 0) maybePatrolAmbush(get, set);
     void get().persist();
+    } finally {
+      // OTA-1351 — see the matching `try` at the top of this function.
+      stampBreadcrumbPhase('engine-done', get().isGenerating ? 'gen-in-flight' : undefined);
+    }
   },
 
   resolveRollStep(values: number[]) {

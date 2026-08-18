@@ -736,13 +736,48 @@ export interface LiveBreadcrumb {
   what: string;
   screen?: string;
   room?: string;
+  /** ⚠ OTA-1351 — the last checkpoint this activity reached (see
+   *  stampBreadcrumbPhase). Absent on crumbs written before the phase system. */
+  phase?: string;
+  phaseAt?: number;
+  phaseDetail?: string;
 }
 
 /** Fire-and-forget. Never awaited by callers — a breadcrumb that could block an
  *  action would be a worse bug than the one it documents. */
 export function stampLiveBreadcrumb(crumb: LiveBreadcrumb): void {
   try {
+    _lastLiveCrumb = crumb;
     void AsyncStorage.setItem(LAST_BREADCRUMB_KEY, JSON.stringify(crumb)).catch(() => { /* ignore */ });
+  } catch { /* never let instrumentation break the game */ }
+}
+
+// ⚠⚠ OTA-1351 — THE DYING BREATH LEARNS PHASES. The 2026-08-17 freeze receipt
+// proved this crumb's limit: it said `action "go west"` and nothing more, which
+// cannot tell "died processing that action" from "died half a minute later in
+// background work" — the disk log's tail was already dead either way. Each
+// checkpoint an action (or a background model job) passes now overwrites the
+// SAME crumb with a phase, so the survivor names the last checkpoint reached:
+//   received → parsed:<intent> → engine-done → rendered    (an action's life)
+//   homework:<job> → homework-done                         (background model work)
+// A crumb that survives at `engine-done` but never `rendered` indicts the
+// render side; one stuck at `homework:<job>` indicts the background writer; one
+// at `parsed` indicts the engine — three different halves of the codebase the
+// old crumb could not tell apart. Kept in a module mirror so a phase stamp
+// never needs an async read, written through the same unbatched key the boot
+// report already trusts.
+let _lastLiveCrumb: LiveBreadcrumb | null = null;
+let _lastPhaseWriteAt = 0;
+export function stampBreadcrumbPhase(phase: string, detail?: string): void {
+  try {
+    const base: LiveBreadcrumb = _lastLiveCrumb ?? { at: Date.now(), what: '(no action yet)' };
+    const now = Date.now();
+    // The render phase fires once per React commit; collapse bursts so the
+    // instrumentation costs at most a couple of tiny writes per second.
+    if (phase === 'rendered' && base.phase === 'rendered' && now - _lastPhaseWriteAt < 500) return;
+    _lastLiveCrumb = { ...base, phase, phaseAt: now, phaseDetail: detail };
+    _lastPhaseWriteAt = now;
+    void AsyncStorage.setItem(LAST_BREADCRUMB_KEY, JSON.stringify(_lastLiveCrumb)).catch(() => { /* ignore */ });
   } catch { /* never let instrumentation break the game */ }
 }
 
