@@ -7526,6 +7526,14 @@ interface GameStore {
    *  The five towers were listed in CONTRACTS as read-only cards with no route
    *  affordance at all, even though each one carries a known `locationId`. */
   routeGreatClimb: (climbId: string) => void;
+  /** ⚠ OTA-1361 — activate / deactivate a Great Climb, the same toggle every other
+   *  contract carries. `routedClimbId` has always BEEN the "tower you're running"
+   *  flag, but the only way to raise it was to set a course, and nothing could ever
+   *  lower it by hand — so a tower you'd abandoned in spirit stayed the mission you
+   *  were on. Activating pauses every other contract (single-active, across kinds);
+   *  deactivating clears the flag and leaves the tower on the slate. Omit `active`
+   *  to toggle. */
+  setGreatClimbActive: (climbId: string, active?: boolean) => void;
   /** OTA-451 — read the outpost Mission Board: list the player faction's open
    *  postings in the feed with accept instructions. Fired by the board chip. */
   readMissionBoard: () => void;
@@ -27305,6 +27313,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           activeMysteries: (s2.player.activeMysteries ?? []).map((m) => (kind === 'mystery' && m.id === id ? m : { ...m, tracked: false })),
           activeStorylines: (s2.player.activeStorylines ?? []).map((st) => (kind === 'storyline' && st.id === id ? st : { ...st, tracked: false })),
           activeFactionQuests: (s2.player.activeFactionQuests ?? []).map((q) => ({ ...q, tracked: false })),
+          // ⚠ OTA-1361 — the tower belongs in this sweep. setFactionQuestActive has
+          // cleared `routedClimbId` since OTA-1320, but THIS sweep never did, so
+          // activating a hunt/mystery/storyline left the routed tower still flagged
+          // as the mission you're on. Invisible while nothing read the flag; the
+          // moment the climb cards grew an ACTIVE toggle it would show two live
+          // missions at once.
+          routedClimbId: null,
         },
       } : s2));
     }
@@ -27357,6 +27372,57 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     get().setTravelCourse(climb.locationId);
     get().appendLog('world', `✦ Course set — ${climb.noun}.${pausedNote}`);
+    void get().persist();
+  },
+
+  setGreatClimbActive(climbId, active) {
+    const player = get().player;
+    if (!player) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const gc = require('../engine/greatClimbs');
+    const climb = (gc.GREAT_CLIMBS as { id: string; locationId: string; noun: string }[])
+      .find((c) => c.id === climbId);
+    if (!climb) return;
+    if (!(get().worldMemory.unlockedGreatClimbs ?? []).includes(climbId)) {
+      get().appendLog('arbiter', "You haven't read that tower's chart yet.");
+      return;
+    }
+    // A crowned tower is finished work — it can't be the mission you're on.
+    if ((get().worldMemory.summitBossesDefeated ?? []).includes(climbId)) return;
+    const nextActive = active != null ? active : player.routedClimbId !== climbId;
+    if (!nextActive) {
+      // Deactivating only ever clears THIS tower's flag. A course already laid to
+      // it survives, exactly as a deactivated contract's travelTarget does — you
+      // keep walking, the tower just stops being the mission you're running.
+      if (player.routedClimbId !== climbId) return;
+      set((s) => (s.player ? { player: { ...s.player, routedClimbId: null } } : s));
+      get().appendLog('world', `Stood down from ${climb.noun}. The tower stays on your slate — re-activate it when you want the climb back.`);
+      void get().persist();
+      return;
+    }
+    // ⚠ SINGLE-ACTIVE, the rule routeGreatClimb and setFactionQuestActive share:
+    // "the mission you're on" is ONE mission, across every routed kind.
+    const paused =
+      (player.activeFactionQuests ?? []).filter((q) => q.tracked !== false).length
+      + (player.activeHunts ?? []).filter((h) => h.tracked !== false).length
+      + (player.activeMysteries ?? []).filter((m) => m.tracked !== false).length
+      + (player.activeStorylines ?? []).filter((st) => st.tracked !== false).length;
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        activeFactionQuests: (s.player.activeFactionQuests ?? []).map((q) => ({ ...q, tracked: false })),
+        activeHunts: (s.player.activeHunts ?? []).map((h) => ({ ...h, tracked: false })),
+        activeMysteries: (s.player.activeMysteries ?? []).map((m) => ({ ...m, tracked: false })),
+        activeStorylines: (s.player.activeStorylines ?? []).map((st) => ({ ...st, tracked: false })),
+        // Switching towers drops a route chain aimed at the contract you just paused.
+        routedMission: null,
+        routedClimbId: climbId,
+      },
+    } : s));
+    const pausedNote = paused > 0 ? ` (${paused} other mission${paused > 1 ? 's' : ''} paused.)` : '';
+    get().appendLog('world', get().player?.currentLocationId === climb.locationId
+      ? `Now running ${climb.noun}. You're at its foot — start the climb.${pausedNote}`
+      : `Now running ${climb.noun}.${pausedNote}`);
     void get().persist();
   },
 
