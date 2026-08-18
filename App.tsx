@@ -195,6 +195,12 @@ export default function App() {
   // reload is DEBOUNCED on continuous foreground so app-switching cannot thrash
   // a ~425MB native load/free cycle every couple of seconds.
   const qwenRewarmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // ⚠ OTA-1358 — the classifier resume gets the same settled-foreground debounce
+  // the Qwen re-warm earned. resumeCognitive() used to fire a native ONNX
+  // session create on EVERY `active` twitch — the third freeze died 1ms into
+  // one of those transitions — and a 2-second app-switch does not need the
+  // classifier back at all.
+  const cognitiveResumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Android immersive mode — hide the navigation bar (3-button bar at
   // the bottom) and let the status bar overlay-swipe back. Same UX as
@@ -581,6 +587,12 @@ export default function App() {
           qwenRewarmTimer.current = null;
           useGameStore.getState().appendLog('debug', 'qwen: re-warm cancelled (left the foreground first)');
         }
+        // OTA-1358 — a foreground visit shorter than the debounce never
+        // recreates the classifier session either.
+        if (cognitiveResumeTimer.current) {
+          clearTimeout(cognitiveResumeTimer.current);
+          cognitiveResumeTimer.current = null;
+        }
         if (status === 'background') {
           if (useGameStore.getState().qwenStatus === 'ready') qwenParkedRef.current = true;
           void shutdownQwen();
@@ -599,7 +611,15 @@ export default function App() {
         // the swipe-kill after a hard freeze. Same discipline as arb126 above.
         void clearLiveBreadcrumb();
       } else if (status === 'active') {
-        void resumeCognitive();
+        // OTA-1358 — debounced, mirroring the Qwen re-warm below. The classifier
+        // is enrichment: nothing the player is waiting on breaks while it waits
+        // for a settled foreground.
+        if (!cognitiveResumeTimer.current) {
+          cognitiveResumeTimer.current = setTimeout(() => {
+            cognitiveResumeTimer.current = null;
+            void resumeCognitive();
+          }, QWEN_REWARM_DELAY_MS);
+        }
         // Re-hide the navigation bar — Android sometimes restores it
         // after the app comes back from background (system dialogs,
         // keyboard close events). Idempotent and cheap.
@@ -654,6 +674,7 @@ export default function App() {
     return () => {
       sub.remove();
       if (qwenRewarmTimer.current) { clearTimeout(qwenRewarmTimer.current); qwenRewarmTimer.current = null; }
+      if (cognitiveResumeTimer.current) { clearTimeout(cognitiveResumeTimer.current); cognitiveResumeTimer.current = null; } // OTA-1358
     };
   }, [shutdownCognitive, resumeCognitive, shutdownQwen, bootQwen]);
 

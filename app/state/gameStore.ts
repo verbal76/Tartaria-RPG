@@ -2360,6 +2360,27 @@ let qwenWatchdogTimer: ReturnType<typeof setTimeout> | null = null;
  *  must never be load-bearing. */
 let homeworkTickFn: (() => void) | null = null;
 let homeworkTimer: ReturnType<typeof setInterval> | null = null;
+
+// ⚠⚠ OTA-1358 — THE SPRINT DETECTOR. Owner: "people will turn this into a speed
+// run clicker" — and his own fourth-freeze receipt showed what that costs today:
+// 14 generations wasted, 191 seconds of native model compute in four and a half
+// minutes of fast play, ~93% of scene intros thrown away as
+// `cancelled:player-acted-again`, per-token cost degrading 1.8→31.1ms right up
+// to the process death. A player landing 3+ actions inside 4 seconds is
+// SPRINTING: they will not read a 15-second generation, so none should START.
+// Template lines carry fast play; the model waits for a reader. The window is
+// deliberately short — one thoughtful pause (>4s) and the Arbiter is back.
+const SPRINT_WINDOW_MS = 4_000;
+const SPRINT_ACTIONS = 3;
+let sprintActionTimes: number[] = [];
+export function notePlayerActionForSprint(now: number = Date.now()): void {
+  sprintActionTimes = sprintActionTimes.filter((t) => now - t < SPRINT_WINDOW_MS);
+  sprintActionTimes.push(now);
+}
+export function playerIsSprinting(now: number = Date.now()): boolean {
+  return sprintActionTimes.filter((t) => now - t < SPRINT_WINDOW_MS).length >= SPRINT_ACTIONS;
+}
+export function _resetSprintForTest(): void { sprintActionTimes = []; }
 function setHomeworkTick(fn: (() => void) | null): void {
   homeworkTickFn = fn;
   if (homeworkTimer !== null) { clearInterval(homeworkTimer); homeworkTimer = null; }
@@ -13076,6 +13097,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // records that idleness ENDED, this records when it began counting again.
     // The scene-intro bank measures its stillness from here.
     set({ lastPlayerActionAt: Date.now() });
+    // ⚠ OTA-1358 — and feed the sprint detector at the same door.
+    notePlayerActionForSprint();
     // ⚠⚠ OTA-1276 — the unbatched breadcrumb, at the one door every typed and
     // chip-driven action passes through. See saveSystem.stampLiveBreadcrumb:
     // the batched disk log cannot survive a JS wedge, this can.
@@ -44039,7 +44062,15 @@ async function narrateViaArbiter(
   // between the very generations it exists to eliminate.
   const cooldownActive = !opts?.bankOnly
     && (Date.now() - lastQwenGenStartMs) < QWEN_GEN_COOLDOWN_MS;
-  if (!qwen.isReady() || get().isGenerating || inCombat || !intentAllowsQwen || cooldownActive) {
+  // ⚠⚠ OTA-1358 — THE SPRINT GATE. A player landing 3+ actions in 4 seconds
+  // will not read a 15-second generation — the fourth-freeze receipt showed 9
+  // of 10 scene intros discarded and the native layer degrading under the
+  // churn. While sprinting, nothing STARTS: live lines take the template path
+  // and bank fills simply wait for a pause. Applies to bankOnly too, on
+  // purpose — homework riding a 4-second lull mid-sprint is the exact
+  // generation that gets thrown away.
+  const sprinting = playerIsSprinting();
+  if (!qwen.isReady() || get().isGenerating || inCombat || !intentAllowsQwen || cooldownActive || sprinting) {
     // OTA-1129 — a background fill has no line to fall back to and no player
     // waiting on it. It simply does not run this tick, silently, and the next
     // tick asks again.
@@ -44052,7 +44083,8 @@ async function narrateViaArbiter(
       : get().isGenerating ? 'busy'
       : inCombat ? 'combat'
       : !intentAllowsQwen ? `intent-not-allowed:${intent}`
-      : 'cooldown';
+      : cooldownActive ? 'cooldown'
+      : 'sprinting'; // OTA-1358 — the device log's proof the gate is working
     get().appendLog('debug', `arbiter: template (reason=${reason})`);
     // arb166 — CANNED flavor line: voiced ~30% of the time. (Was 60% — but once
     // arb164 tripled the pools the 30s repeat-guard stopped suppressing dupes,
