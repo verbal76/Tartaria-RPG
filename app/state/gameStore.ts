@@ -22689,10 +22689,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (chance(35)) void maybeGenerateAmbientArbiter(get, set);
     }
 
+    // ⚠ OTA-1354 — freeze #5's crumb died between `parsed:travel` and
+    // `engine-done`, a window that includes THIS shared pipeline, not just the
+    // intent switch. Stamp the boundary so the next crumb says which side.
+    stampBreadcrumbPhase('engine-switch-done');
     // Fire-and-forget cognitive enrichment — runs in parallel with the
     // deterministic resolution above, never blocks gameplay. Skipped during
     // the scripted tutorial prefix (nothing should run the model there).
     if (!scriptedTutorial && get().cognitiveStatus === 'ready') {
+      // ⚠ OTA-1354 — the classifier's SYNCHRONOUS prefix (tokenize + native
+      // tensor construction) runs inline on the JS thread before its first
+      // await — real onnxruntime on device, a harmless mock in jest, which
+      // would explain five freezes no JS replay reproduces. A crumb frozen at
+      // `cognitive-dispatch` convicts that prefix outright.
+      stampBreadcrumbPhase('cognitive-dispatch');
       const worldCtx: WorldContext = {
         hp: player.hp,
         maxHp: player.hpMax,
@@ -22718,6 +22728,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .catch(() => {
           // swallow — cognitive failures must never affect gameplay
         });
+      // OTA-1354 — the synchronous prefix returned; the crumb moves past it.
+      stampBreadcrumbPhase('cognitive-dispatched');
     }
 
     // Surface the time the action consumed so the player can feel the day

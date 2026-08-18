@@ -173,6 +173,25 @@ plus classifier parity (inference AND session create through the native-ML lock;
 foreground resume debounced like the Qwen re-warm). ⚠ The freeze-#4 dying-breath
 crumb (`Last checkpoint reached:`) was cut off the owner's paste — still owed; it names
 the exact dying call and stays wanted even with the mitigation shipped.
+**FIFTH FREEZE, 2026-08-18 15:11:08.127, same device, OTA-1353 — AND THE CRUMB FINALLY
+SPOKE:** `action "go west"` at `outpost_central`, `Last checkpoint reached:
+parsed:travel (+32ms after it)` — engine-done never reached. Identical fingerprint to
+freeze #2 (`go west` at outpost_central; both were the session's first entry into the
+R05 messhall room). And the session REFUTES the churn theory for this death: Qwen was
+auto-disabled the whole session (the #4 death left a completion-crash breadcrumb →
+`Boot stage: qwen:skipped`), zero contexts opened, zero generations — the freeze needs
+NO model activity. Fresh non-dev character ("Me") — the Verbal board is exonerated too.
+A 400-iteration JS re-roll of the exact transition (messhall stripped back to
+never-visited each pass, stamina 0, monarchs) survives — the killer needs something
+only the device has. ⚠ Prime remaining suspect: the parsed→engine-done window also
+covers the SHARED post-action pipeline, including the classifier dispatch whose
+synchronous prefix (tokenize + native tensor construction) runs inline on the JS
+thread against REAL onnxruntime on device and a mock under jest. **HAL OTA-1354 splits
+the window:** `engine-switch-done → cognitive-dispatch → cognitive-dispatched` — the
+next crumb lands in exactly one gap. Also owed from the owner: (a) what a freeze LOOKS
+like on the device — screen locks up vs app vanishes — and (b) `adb logcat -b crash -d`
+from the phone, which holds the native tombstone if the process is dying in native
+code.
 
 ## B10 — N5: off-canon place-name filter — **WATCH (carry-over)**
 Held for a second sighting per the standing rule; one sighting on record.
