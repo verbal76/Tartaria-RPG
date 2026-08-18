@@ -249,6 +249,14 @@ export class LlamaRuntime {
     // true for exactly the window in which `this.context` is still null but a ~400MB
     // allocation is already under way. That window is the one dispose() cannot free.
     this.loadInFlight = true;
+    // ⚠ OTA-1352 — bracket the ~425MB native open on the dying-breath crumb. A
+    // crumb that survives at `ctx-open` says the process died INSIDE initLlama —
+    // the one statement no JS log line can otherwise incriminate. Lazily
+    // required, same pattern as the mlHealth breadcrumb elsewhere in this file.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      (require('../../engine/saveSystem') as typeof import('../../engine/saveSystem')).stampBreadcrumbPhase('ctx-open');
+    } catch { /* instrumentation never blocks a load */ }
     this.context = await runExclusiveNativeMl(() => mod.initLlama({
       model: opts.modelPath,
       n_ctx: opts.contextSize ?? 2048,
@@ -269,6 +277,10 @@ export class LlamaRuntime {
     // before `initLlama` resolves there is nothing allocated we could account for, and a
     // load that throws must not inflate the count.
     noteContextOpened();
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      (require('../../engine/saveSystem') as typeof import('../../engine/saveSystem')).stampBreadcrumbPhase('ctx-open-done'); // OTA-1352
+    } catch { /* ignore */ }
     this.modelPath = opts.modelPath;
     // arb129 — record which native kernel variant llama.rn selected + the CPU/SoC
     // signature (forwarded by the patched llama.rn) into mlHealth, so the copyable
@@ -465,6 +477,12 @@ export class LlamaRuntime {
       if (this.loadInFlight) noteDisposeFoundNothing('load-in-flight');
       return;
     }
+    // ⚠ OTA-1352 — bracket the native free too: the third B9 freeze died 10s
+    // after a background release, 1ms into the return-to-foreground transition.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      (require('../../engine/saveSystem') as typeof import('../../engine/saveSystem')).stampBreadcrumbPhase('ctx-release');
+    } catch { /* ignore */ }
     try {
       await (ctx as unknown as { stopCompletion?: () => unknown }).stopCompletion?.();
     } catch {
@@ -476,6 +494,10 @@ export class LlamaRuntime {
       // below leaves the context unaccounted for, which is exactly the honest reading:
       // we do not know that it was freed.
       noteContextReleased();
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        (require('../../engine/saveSystem') as typeof import('../../engine/saveSystem')).stampBreadcrumbPhase('ctx-release-done'); // OTA-1352
+      } catch { /* ignore */ }
     } catch {
       // best effort — native side may already be torn down
     }

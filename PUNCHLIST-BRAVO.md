@@ -143,6 +143,20 @@ plus `homework:<job>`/`homework-done` for background model work) and the boot re
 prints it. A survivor at `engine-done` without `rendered` indicts the render side;
 stuck at `parsed:` indicts the engine; `homework:` indicts the background writer.
 Nothing further to chase until a device produces a phase-stamped breadcrumb.
+**THIRD FREEZE, 2026-08-18 10:56:15.639, same device, OTA-1351 (phase stamps live).**
+The disk log caught the death almost exactly: last player action 10:55:42 (`go west`,
+Court, then nothing) — the death came 33s later, mid-write of the appStateLine, within
+1ms of a background→active transition, 10s after the native context was RELEASED on
+backgrounding (`ctx: RELEASED — live=0`), with the reinit watchdog holding
+("foreground has not settled"). No action, no homework in flight — the OTA-1351 stamps
+cover neither of the paths this death walked. **HAL OTA-1352 stamps the lifecycle
+path:** `appstate:<prev>→<next>` first thing in the pressure handler (the third freeze
+died on that handler's own log line), `ctx-open`/`ctx-open-done` and
+`ctx-release`/`ctx-release-done` bracketing the ~425MB native model calls, and
+`qwen-reinit [attempt#N]` at the watchdog's reload. A crumb surviving INSIDE a bracket
+incriminates that exact native call. Pattern across all three freezes: app-lifecycle
+churn around the model context (the OTA-1195 report's own suspect, instrumented and
+still unfixed by design — instrument first, then fix).
 
 ## B10 — N5: off-canon place-name filter — **WATCH (carry-over)**
 Held for a second sighting per the standing rule; one sighting on record.
