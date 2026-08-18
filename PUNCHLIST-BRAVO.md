@@ -122,7 +122,7 @@ pixels changed; unwinding re-scatters the copies. Owner has been offered the unw
 and not taken it — default stands until overruled. ⚠ Now moot in practice: HAL took the
 amber picker in OTA-1319, so the module is load-bearing on all three lines.
 
-## B9 — The JS-wedge freeze — **WATCH (second occurrence receipted 2026-08-17; phase forensics shipped, HAL OTA-1351)**
+## B9 — The JS-wedge freeze — **ROOT CAUSE NAMED + FIXED (Kokoro voice load, HAL OTA-1355) — WATCH for the repro test**
 Forensics shipped (OTA-1276 breadcrumb: `freeze forensics: last boot ended mid-action`).
 **SECOND FREEZE, 2026-08-17 ~23:47, Pixel 10 Pro XL (Tensor G5), OTA-1350, player Verbal
 (full board), Architect outpost.** The OTA-1276 breadcrumb did its job — receipts:
@@ -192,6 +192,43 @@ next crumb lands in exactly one gap. Also owed from the owner: (a) what a freeze
 like on the device — screen locks up vs app vanishes — and (b) `adb logcat -b crash -d`
 from the phone, which holds the native tombstone if the process is dying in native
 code.
+**THE BUG REPORT, 2026-08-18 — CASE CLOSED BY TOMBSTONE.** The owner pulled a full
+Android bug report; it holds the native crash records the whole ladder was climbing
+toward:
+- **tombstone_12 @ 07:37:38.020 (uptime 2504s) = freeze #4's exact crash-to-home.**
+  SIGABRT on thread `RN_ET_Worker1` (react-native-executorch's own worker pool),
+  `std::terminate` thrown out of `phonemis::phonemizer::Lexicon::Lexicon` inside
+  `rnexecutorch::…::RnExecutorchInstaller::loadModel<Kokoro>` — the bundled voice's
+  MODEL LOAD, dying while building the phonemizer's pronunciation dictionary.
+- **tombstone_13 @ 09:05:21.190 (uptime 211s) — an unreported same-morning crash,
+  SAME STACK**, abort message `Scudo ERROR: internal map failure (error desc=Out of
+  memory)`; logcat adds `shadow stack mprotect failed: Out of memory` — the process
+  could no longer map even a thread stack. Native memory exhaustion, no ambiguity.
+- **Freeze #5 (11:11) left NO tombstone** — logcat shows only `am_kill … remove task`
+  at 11:11:21: the owner swiping away the wedged app. That IS the "input dead, scroll
+  works" variant: the same allocation storm first stalls the process (old frames still
+  scroll on the render thread; no new JS runs), and either aborts it later (freeze #4)
+  or holds until the player kills it (#5).
+- **The fingerprint decodes:** freezes #2 and #5 were both the session's FIRST entry
+  into R05 messhall — a `vendor` room (Halem the Trader). `beginScene` fired
+  `warmVoice(vendor)` synchronously inside the action pipeline; that starts
+  `TextToSpeechModule.fromModelName` → native Kokoro ctor → phonemizer dictionary
+  build, a hundreds-of-MB allocation storm on the executorch worker — while the crumb
+  still read `parsed:travel`. Under jest executorch is `{}`, which is why 400 replays
+  of the exact transition could never die. It also explains freeze #5 needing NO Qwen:
+  the voice engine defaults to `bundled`, and the load alone kills a memory-tight
+  device.
+**HAL OTA-1355 — the fix, three defenses:** (1) the Kokoro LOAD joins the native-ML
+lock (create AND run — the OTA-1353 parity rule, applied to the third and last native
+engine); (2) the vendor warm SETTLES: one 2.5s timer, latest scene wins, cancelled at
+fire time by a sprint, an open memory-pressure window, or the player having moved on —
+a pass-through room now loads nothing, and the speak path still loads on demand; (3) a
+120s vendor-load cooldown opens on any load failure AND on every OS `memoryWarning`
+(the warning is now OBEYED by the voice subsystem, not just logged). Sticky Arbiter
+voice exempt — one resident instance with its own retry UX. Suite ota1355VoiceLoadKiller
+(5). **Remaining WATCH:** the owner's next speedrun repro on this build; a recurrence
+now must land a crumb in one of the OTA-1354 gaps AND produce a non-Kokoro tombstone to
+reopen the hunt.
 
 ## B10 — N5: off-canon place-name filter — **WATCH (carry-over)**
 Held for a second sighting per the standing rule; one sighting on record.
