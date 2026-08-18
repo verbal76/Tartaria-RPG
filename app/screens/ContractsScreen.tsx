@@ -100,6 +100,7 @@ export function ContractsScreen() {
   const setContractActive = useGameStore((s) => s.setContractActive);
   const routeMission = useGameStore((s) => s.routeMission);
   const routeGreatClimb = useGameStore((s) => s.routeGreatClimb);
+  const setGreatClimbActive = useGameStore((s) => s.setGreatClimbActive);
   const discardLead = useGameStore((s) => s.discardLead);
   // OTA-1037 — the refusal strip answers THIS visit's taps; don't let a stale line
   // greet the next visit to the screen.
@@ -289,12 +290,12 @@ export function ContractsScreen() {
     tracked: boolean,
   ) => (
     <Pressable
-      style={({ pressed }) => [styles.trackBtn, !tracked && styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+      style={({ pressed }) => [styles.trackBtn, tracked ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
       onPress={() => setContractActive(kind, id, !tracked)}
       accessibilityRole="button"
       accessibilityState={{ selected: tracked }}
     >
-      <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
+      <Text style={[styles.trackBtnText, tracked ? styles.trackBtnTextOn : styles.trackBtnTextOff]}>
         {tracked ? '▮▮ DEACTIVATE' : '▶ SET ACTIVE'}
       </Text>
     </Pressable>
@@ -892,18 +893,29 @@ export function ContractsScreen() {
           const climbMissions = GREAT_CLIMBS.filter((c) => unlocked.includes(c.id));
           if (climbMissions.length === 0) return null;
           const doneCount = climbMissions.filter((c) => bossesDown.includes(c.id)).length;
+          // ⚠ OTA-1356 — the towers join the distance sort. Owner: "they should get
+          // sorted by distance as well." Every other section has obeyed the sort bar
+          // since OTA-1175; the climbs alone rendered in fixed catalog order, so a
+          // sort the player had switched on quietly skipped five cards. Crowned
+          // towers pass a null location, which the shared comparator already sorts
+          // last — finished work sinks under the climbs still standing.
+          const climbsInOrder = byMoves(climbMissions, (c) => (bossesDown.includes(c.id) ? null : c.locationId));
           return (
             <View style={styles.section}>
               <Text style={styles.sectionTitle} accessibilityRole="header">
                 THE GREAT CLIMBS  ·  {doneCount}/5 towers taken
               </Text>
-              {climbMissions.map((c) => {
+              {climbsInOrder.map((c) => {
                 const done = bossesDown.includes(c.id);
+                const climbActive = player?.routedClimbId === c.id;
                 return (
                   <View key={c.id} style={styles.card}>
-                    <Text style={styles.cardTitle}>
-                      {done ? '✓ ' : '⚑ '}{c.noun} — {c.tiers} tiers
-                    </Text>
+                    <View style={styles.cardHead}>
+                      <Text style={styles.cardTitle}>
+                        {done ? '✓ ' : '⚑ '}{c.noun} — {c.tiers} tiers
+                      </Text>
+                      {!done && climbActive && <Text style={styles.stagePill}>ACTIVE</Text>}
+                    </View>
                     <Text style={styles.routeBody}>
                       {done
                         ? 'Crown taken — its Skyreacher piece is claimed.'
@@ -932,7 +944,29 @@ export function ContractsScreen() {
                     )}
                     {!done && player?.currentLocationId === c.locationId && (
                       <Text style={styles.routeHereNote}>▸ You're here — start the climb.</Text>
-                    )}                  </View>
+                    )}
+                    {/* ⚠ OTA-1356 — THE TOWERS TOGGLE LIKE EVERY OTHER MISSION.
+                        Owner: "the great climbs should be able to be activated and
+                        deactivated." `routedClimbId` was always the "tower you're
+                        running" flag, but SET COURSE was the only thing that could
+                        raise it and NOTHING could lower it by hand — so a tower you'd
+                        walked away from stayed the mission you were on until you
+                        activated some other contract. Activating here pauses every
+                        other contract (single-active, across kinds); deactivating
+                        leaves the tower on the slate and any laid course intact. */}
+                    {!done && (
+                      <Pressable
+                        style={({ pressed }) => [styles.trackBtn, climbActive ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+                        onPress={() => setGreatClimbActive(c.id, !climbActive)}
+                        accessibilityRole="button"
+                        accessibilityState={{ selected: climbActive }}
+                      >
+                        <Text style={[styles.trackBtnText, climbActive ? styles.trackBtnTextOn : styles.trackBtnTextOff]}>
+                          {climbActive ? '▮▮ DEACTIVATE' : '▶ SET ACTIVE'}
+                        </Text>
+                      </Pressable>
+                    )}
+                  </View>
                 );
               })}
               <Text style={styles.mainQuestHint}>
@@ -1534,12 +1568,12 @@ export function ContractsScreen() {
                         contract: stays on the slate but stops auto-advancing until
                         re-activated. Activating it pauses every other contract. */}
                     <Pressable
-                      style={({ pressed }) => [styles.trackBtn, !tracked && styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+                      style={({ pressed }) => [styles.trackBtn, tracked ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
                       onPress={() => setFactionQuestActive(def.id, !tracked)}
                       accessibilityRole="button"
                       accessibilityState={{ selected: tracked }}
                     >
-                      <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
+                      <Text style={[styles.trackBtnText, tracked ? styles.trackBtnTextOn : styles.trackBtnTextOff]}>
                         {/* OTA-986 — name the party the toggle stands down / recalls. */}
                         {escortToggleLabel(tracked, rec.escort && rec.escort.hp > 0 ? rec.escort : null)}
                       </Text>
@@ -2430,9 +2464,29 @@ const styles = StyleSheet.create({
     marginTop: 8, backgroundColor: 'transparent', borderColor: '#54d6c4',
     borderWidth: 1, borderRadius: 3, paddingVertical: 8, alignItems: 'center',
   },
+  // ⚠ OTA-1356 — THE ACTIVE ONE GLOWS. Owner: "the set active buttons should glow
+  // on missions." Teal-on-dark vs grey-on-dark is a hue difference you have to
+  // hunt for down a long slate; a lit button you find at a glance. Four layers so
+  // it survives both platforms: a tinted FILL (Android draws no elevation shadow
+  // behind a transparent view), a brighter border, the box glow, and a text halo
+  // (textShadow is the one glow that renders identically on iOS and Android).
+  trackBtnOn: {
+    backgroundColor: '#123a3a',
+    borderColor: '#7ef0dd',
+    borderWidth: 2,
+    shadowColor: '#54d6c4',
+    shadowOpacity: 0.9,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 10,
+  },
   trackBtnOff: { borderColor: '#5a6a6e' },
   trackBtnPressed: { opacity: 0.7 },
   trackBtnText: { color: '#54d6c4', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
+  trackBtnTextOn: {
+    color: '#c7fff4', fontWeight: '800',
+    textShadowColor: '#54d6c4', textShadowRadius: 8, textShadowOffset: { width: 0, height: 0 },
+  },
   trackBtnTextOff: { color: '#8aa0a4' },
   // A paused contract's card is dimmed so it reads as stood-down at a glance.
   cardPaused: { opacity: 0.6, borderColor: '#3a4a4e' },
