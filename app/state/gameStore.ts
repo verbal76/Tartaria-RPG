@@ -2620,6 +2620,8 @@ function runQwenHealthCheck(
       // the call, and the old log could not tell them apart.
       const rpAttemptNo = qwenReinitAttempts;
       const rpReinitStarted = Date.now();
+      // OTA-1353 — the ~425MB reload is a lifecycle suspect in its own right.
+      stampBreadcrumbPhase('qwen-reinit', `attempt#${rpAttemptNo}`);
       void q.forceReinitialize()
         .then(() => {
           qwenReinitInFlightSince = 0;
@@ -2962,6 +2964,11 @@ function startRuntimePressureWatch(
       const prev = rpAppState;
       const nextStr = String(next);
       if (nextStr === prev) return;
+      // ⚠ OTA-1353 — LIFECYCLE PHASE STAMP, FIRST THING IN THE HANDLER. The third
+      // B9 freeze died mid-write of the very appStateLine below — within 1ms of a
+      // background→active transition, on a path no action/homework stamp covers.
+      // Stamped before any other work so the crumb survives whatever follows.
+      stampBreadcrumbPhase(`appstate:${prev}→${nextStr}`);
       try { get().appendLog('debug', appStateLine(prev, nextStr, t - rpAppStateSince)); } catch { /* ignore */ }
       rpAppStateTrail = [...rpAppStateTrail, nextStr].slice(-APPSTATE_TRAIL_MAX);
       rpAppState = nextStr;
