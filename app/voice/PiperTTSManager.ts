@@ -189,6 +189,32 @@ const VOICE_POOL: Map<string, LoadedVoice> = new Map();
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const LOADING: Map<string, Promise<any | null>> = new Map();
 
+// ⚠⚠ OTA-1360 — THE VENDOR-LOAD COOLDOWN, born from two tombstones. Freeze #4's
+// crash record (tombstone_12, 07:37:38) and the 09:05:21 one both die SIGABRT on
+// an RN_ET_Worker thread INSIDE the Kokoro model load — fromModelName → native
+// Kokoro ctor → phonemis Lexicon build — the second with the abort message
+// 'Scudo ERROR: internal map failure (error desc=Out of memory)'. The load is a
+// hundreds-of-MB native allocation storm, and when the device is already tight
+// it first wedges the whole process (the owner's "input dead, scroll works"
+// freeze) and then aborts it (the crash to home). A device that just refused
+// this allocation must NOT be asked again in two seconds — vendor loads stand
+// down for a cooldown after any load failure, and gameStore's memoryWarning
+// listener calls noteMemoryPressureForVoiceLoads so an OS memory warning opens
+// the same quiet window. The STICKY Arbiter voice is exempt: its load drives
+// the visible state machine and its own retry UX, and it is one resident
+// instance, not churn.
+const VENDOR_LOAD_COOLDOWN_MS = 120_000;
+let vendorLoadCooldownUntil = 0;
+/** Called by gameStore's memoryWarning listener (lazy require — no import
+ *  cycle): the OS is asking for memory back, so do not START a vendor-voice
+ *  load for `quietMs`. Extends, never shortens, an existing window. */
+export function noteMemoryPressureForVoiceLoads(quietMs: number): void {
+  vendorLoadCooldownUntil = Math.max(vendorLoadCooldownUntil, Date.now() + quietMs);
+}
+/** Tests only. */
+export function _vendorLoadCooldownForTest(): number { return vendorLoadCooldownUntil; }
+export function _resetVendorLoadCooldownForTest(): void { vendorLoadCooldownUntil = 0; }
+
 let nextId = 1;
 const queue: QueuedUtterance[] = [];
 // arb15 — inference serializer. Kokoro's native module isn't reentrant:
@@ -674,6 +700,10 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
   if (Platform.OS === 'web') return null;
   if (!exec?.TextToSpeechModule?.fromModelName) return null;
   const sticky = voiceId === arbiterVoiceId();
+  // ⚠ OTA-1360 — the cooldown gate (see the block above VENDOR_LOAD_COOLDOWN_MS).
+  // A vendor load is refused while the window is open; the line falls back to
+  // silence (drain's existing null-model path) and the process stays alive.
+  if (!sticky && Date.now() < vendorLoadCooldownUntil) return null;
   // Evict BEFORE registering the new in-flight load so two concurrent
   // ensureLoaded calls don't both pass the capacity gate. Audit caught
   // a race where two vendor swaps in the same tick both saw size=1 +
@@ -706,7 +736,17 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
       if (sticky) setKokoroState({ phase: 'loading' });
       const loadStartedAt = Date.now();
       let downloadEscalated = false;
-      const m = await exec.TextToSpeechModule.fromModelName(
+      // ⚠⚠ OTA-1360 — THE LOAD JOINS THE NATIVE-ML LOCK. arb159 put every
+      // forward() under runExclusiveNativeMl because Qwen + Kokoro running
+      // concurrently crashed the Tensor G5 — but the LOAD stayed outside, and
+      // the load is the single heaviest native-ML op in the app: model mmap +
+      // graph compile + the phonemizer's dictionary build, on executorch's own
+      // worker pool. Both Aug-18 tombstones die exactly there, mid-load, while
+      // other native work could still be in flight. Same rule for every native
+      // ML engine now: create AND run go through the one lock. Post-first-boot
+      // loads are cache hits (the ~100MB model downloads once, at prewarm), so
+      // holding the lock here costs the compile time, not a download.
+      const m = await runExclusiveNativeMl(() => exec.TextToSpeechModule.fromModelName(
         { model: exec.KOKORO_MEDIUM, voice: voiceRefFor(voiceId) },
         (p: number) => {
           if (sticky) {
@@ -731,7 +771,7 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
             }
           }
         },
-      );
+      ), ML_PRIORITY_VOICE);
       step = 'load';
       if (sticky) setKokoroState({ phase: 'loading' });
       step = 'warmup';
@@ -767,6 +807,11 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
       return m;
     } catch (err) {
       const msg = describeErr(err);
+      // ⚠ OTA-1360 — a failed load, whatever the step, means the device just
+      // refused (or choked on) the allocation. Open the cooldown so the next
+      // vendor scene doesn't immediately re-attempt the exact operation that
+      // failed — on a memory-tight device the retry is the one that kills.
+      vendorLoadCooldownUntil = Math.max(vendorLoadCooldownUntil, Date.now() + VENDOR_LOAD_COOLDOWN_MS);
       // Avoid double-recording: warmup catch already wrote a
       // detailed record. For everything else, capture here.
       if (step !== 'warmup') {

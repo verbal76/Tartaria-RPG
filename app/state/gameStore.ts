@@ -2381,6 +2381,28 @@ export function playerIsSprinting(now: number = Date.now()): boolean {
   return sprintActionTimes.filter((t) => now - t < SPRINT_WINDOW_MS).length >= SPRINT_ACTIONS;
 }
 export function _resetSprintForTest(): void { sprintActionTimes = []; }
+
+// ⚠⚠ OTA-1360 — THE VENDOR-VOICE WARM SETTLES BEFORE IT LOADS. B9's answer, at
+// last: freeze #4's tombstone (and a second one at 09:05 the same morning) both
+// die SIGABRT inside the Kokoro voice LOAD on an executorch worker —
+// fromModelName → native Kokoro ctor → phonemizer dictionary build, the second
+// with 'Scudo ERROR: internal map failure (Out of memory)'. Freezes #2 and #5
+// share the fingerprint that predicts it: FIRST entry into the messhall (R05, a
+// vendor room) — beginScene fired warmVoice for Halem's voice synchronously
+// inside the action pipeline, kicking off a hundreds-of-MB native allocation
+// while the crumb still read `parsed:travel`. 400 jest replays could never see
+// it: executorch is a mock here, and the killer only exists on the device.
+//
+// So the warm WAITS. A single timer (latest scene wins) fires after the player
+// has actually stayed in the room a moment, and only then when three things
+// hold: the room's vendor is still the current scene's vendor, the player is
+// not sprinting (a sprinter's lines are dropped as stale anyway — a load per
+// scene-flip is pure churn), and no memory-pressure cooldown is open. A skipped
+// warm costs nothing but latency on the vendor's FIRST line — the speak path
+// loads on demand — and a pass-through room now costs NOTHING at all.
+const VENDOR_WARM_SETTLE_MS = 2_500;
+let vendorWarmSettleTimer: ReturnType<typeof setTimeout> | null = null;
+
 function setHomeworkTick(fn: (() => void) | null): void {
   homeworkTickFn = fn;
   if (homeworkTimer !== null) { clearInterval(homeworkTimer); homeworkTimer = null; }
@@ -2907,6 +2929,13 @@ function startRuntimePressureWatch(
       try {
         const p = require('../voice/PiperTTSManager') as typeof import('../voice/PiperTTSManager');
         kokoroPhase = p.getKokoroState().phase;
+        // ⚠ OTA-1360 — the warning doesn't just get LOGGED by the voice
+        // subsystem, it gets OBEYED: no vendor-voice load may start during the
+        // quiet window. The Aug-18 tombstones die inside exactly that load,
+        // out of memory — this is the OS telling us, in advance, not to.
+        if (typeof p.noteMemoryPressureForVoiceLoads === 'function') {
+          p.noteMemoryPressureForVoiceLoads(MEMORY_PRESSURE_QUIET_MS);
+        }
       } catch { /* best effort */ }
       try {
         get().appendLog('debug', memoryWarningLine(rpMemoryWarnings, since, {
@@ -11935,12 +11964,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (typeof piper.disposeVoice === 'function') piper.disposeVoice(prevVendorVoice);
           } catch { /* PiperTTSManager may not be loaded in tests */ }
         }
+        // ⚠⚠ OTA-1360 — the warm is DEFERRED, not fired here. This callsite
+        // used to start the Kokoro load synchronously inside the action
+        // pipeline, and freeze #4's tombstone dies inside exactly that load
+        // (see the block above VENDOR_WARM_SETTLE_MS). Latest scene wins the
+        // single timer; the fire-time checks re-read live state so a player
+        // who moved on, a sprint in progress, or an open memory-pressure
+        // cooldown each quietly cancel the load.
+        if (vendorWarmSettleTimer !== null) { clearTimeout(vendorWarmSettleTimer); vendorWarmSettleTimer = null; }
         if (nextVendorVoice) {
-          try {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const piper = require('../voice/PiperTTSManager');
-            if (typeof piper.warmVoice === 'function') void piper.warmVoice(nextVendorVoice);
-          } catch { /* same */ }
+          vendorWarmSettleTimer = setTimeout(() => {
+            vendorWarmSettleTimer = null;
+            try {
+              if (playerIsSprinting()) return;
+              if (Date.now() < rpMemoryPressureUntil) return;
+              if (get().currentScene?.vendor?.voiceId !== nextVendorVoice) return;
+              // eslint-disable-next-line @typescript-eslint/no-var-requires
+              const piper = require('../voice/PiperTTSManager');
+              if (typeof piper.warmVoice === 'function') void piper.warmVoice(nextVendorVoice);
+            } catch { /* same */ }
+          }, VENDOR_WARM_SETTLE_MS);
         }
       }
     } catch { /* voice modules not present in tests */ }
