@@ -317,12 +317,32 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
   {
     screen: 'exploration',
     area: 'top-right-enemy',
-    title: 'Enemy panel / Crest',
+    title: 'Enemy panel / Mini-map',
     body:
-      'Out of combat this shows the Tartaria crest. In combat the panel becomes one card per enemy ' +
+      'Out of combat this corner is your MINI-MAP. In combat the panel becomes one card per enemy ' +
       '(swipe or tap to cycle targets) with their HP, AC, attack bonus, damage dice, and whether ' +
       'they\'re in range of your equipped weapon. ' +
       '\n\nThe ⚙ gear in the bottom-right corner is your settings/lore/session hub — we\'ll see it.',
+  },
+  // ⚠⚠ OTA-1376 — THE MINI-MAP GETS ITS OWN BEAT. Owner: *"also add the minimap
+  // to the tutorial."* It has to be taught, for two reasons that both arrived
+  // with it: it is a live readout the crest never was, and — since OTA-1375
+  // deleted the scene bar's MAP button — it is now the ONLY way into the Atlas.
+  // A player who does not know the corner is tappable has no route to the map
+  // at all, which is a much worse failure than not knowing about a crest.
+  {
+    screen: 'exploration',
+    area: 'top-right-enemy',
+    title: 'The mini-map',
+    body:
+      'That corner is a live map centred on you. Inside an outpost it shows that outpost\'s own ' +
+      'floor plan with your room in the middle; out in the wilds it shows the world atlas around ' +
+      'wherever you are standing. It moves as you move. ' +
+      '\n\nThe pale dot IS you. When you are at the edge of a map the picture stops sliding and the ' +
+      'dot moves instead — so the dot is always on your real position, never a guess. ' +
+      '\n\nTAP IT to open the full Atlas: pinch to zoom about the centre of the screen, drag with ' +
+      'one finger to pan, ⌖ ME to jump back to yourself. That tap is the only way in, so it is ' +
+      'worth remembering.',
   },
   {
     screen: 'exploration',
@@ -333,7 +353,8 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
       'Four tabs inside: ' +
       '\n\n• SESSION — save & exit, copy / clear the log, slot management. ' +
       '\n• SFX — music + voice toggles. ' +
-      '\n• LORE — the full codex (races, factions, places, timeline). Tap any Place to plan ' +
+      '\n• LORE — the full codex. It opens on BEASTS (everything you have fought), with FALLEN ' +
+      'next to it; PLACES, FACTIONS, RACES, LORE and TIMELINE follow. Tap any Place to plan ' +
       'a travel route straight there. ' +
       '\n• ABOUT — build info, diagnostics, build identifier.',
   },

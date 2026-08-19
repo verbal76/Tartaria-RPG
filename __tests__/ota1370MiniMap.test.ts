@@ -383,3 +383,46 @@ describe('OTA-1375 — one control for the Atlas, not two', () => {
     expect(exp).not.toContain('onOpenMap');
   });
 });
+
+describe('OTA-1376 — the codex opens on BEASTS, and the tutorial teaches the corner', () => {
+  const codex = src('app', 'components', 'LoreCodexBody.tsx');
+  const steps = src('app', 'components', 'tutorialSteps.ts');
+
+  it('⚠⚠ the codex lands on the first tab in the row, not on RACES', () => {
+    // Owner: "when we reorganized the lore tabs we need it to open when you hit
+    // the lore button and have the beasts tab the one that opens." It was still
+    // opening on RACES — the tab that happened to ship first, and the reason
+    // the row was reordered at all.
+    expect(codex).toContain('useState<Section>(TAB_ORDER[0]!)');
+    expect(codex).not.toContain("useState<Section>('races')");
+  });
+
+  it('…and the first tab in the row is BEASTS, so those are the same fact', () => {
+    // Read from TAB_ORDER rather than hard-coded, so reordering the row moves
+    // the landing with it and the two can never disagree.
+    const order = /const TAB_ORDER: Section\[\] = \[([^\]]+)\]/.exec(codex)?.[1] ?? '';
+    expect(order.split(',')[0]!.trim()).toBe("'bestiary'");
+  });
+
+  it('the tutorial names the corner as the mini-map, not the crest', () => {
+    expect(steps).toContain('Out of combat this corner is your MINI-MAP.');
+    expect(steps).not.toContain('Out of combat this shows the Tartaria crest.');
+  });
+
+  it('⚠⚠ and it gets its own beat, because it is now the ONLY way into the Atlas', () => {
+    // OTA-1375 deleted the scene bar's MAP button. A player who does not know
+    // the corner is tappable has no route to the map at all — a much worse
+    // failure than not knowing about a decorative crest.
+    expect(steps).toContain("title: 'The mini-map',");
+    const beat = steps.slice(steps.indexOf("title: 'The mini-map',"));
+    expect(beat).toContain('TAP IT to open the full Atlas');
+    expect(beat).toContain('the only way in');
+    // it teaches the clamp too, which is the one behaviour that looks like a bug
+    expect(beat).toContain('the picture stops sliding and the');
+  });
+
+  it('the gear-corner beat lists the codex tabs in the order they render', () => {
+    expect(steps).toContain('It opens on BEASTS');
+    expect(steps).not.toContain('(races, factions, places, timeline)');
+  });
+});
