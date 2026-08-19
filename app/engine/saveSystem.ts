@@ -99,6 +99,36 @@ export interface GlobalStash {
   fallenSeeds?: string[];
 }
 
+/** ⚠⚠ OTA-1358 — THE CLONE (port of golem OTA-1366). Owner: *"what I want is
+ *  the exact same in every detail dead I send someone to have everything
+ *  exactly as it was when they died, same gear, same stats, same coatings,
+ *  everything I want a clone sent."*
+ *
+ *  ⚠ THE HOLLOWED WAS NEVER A CLONE. `revenantFromFallen` hard-coded
+ *  `abilityPoint: 'Strength 6'`, derived damage from KILL COUNT alone, and
+ *  sized HP off the LIVING player. The dead character's own strength,
+ *  dexterity, hpMax and AC were never recorded anywhere — so the Hollowed has
+ *  always been a scaled boss wearing a name and a kit, not the person.
+ *
+ *  ⚠ HAL TAKES THE CLONE, NOT THE SHARING. The shared roll of the fallen
+ *  (ledger, pairing, seal, mailbox) stays golem-only pending the owner's
+ *  two-phone test; this is the half that makes YOUR OWN dead rise as
+ *  themselves, which stands on its own and needs no transport.
+ *
+ *  Absent on every record written before this OTA; readers fall back to the old
+ *  kill-count build, so an existing roll of the fallen keeps working. */
+export interface FallenSnapshot {
+  /** The six attributes as they stood at death. */
+  stats: { strength: number; dexterity: number; intelligence: number; wisdom: number; charisma: number; stealth: number };
+  /** Their real maximum health — what the clone fights with. */
+  hpMax: number;
+  /** Armour class as worn. */
+  ac: number;
+  /** Race and faction ids, so a revenant reads right. */
+  raceId?: string;
+  factionId?: string;
+}
+
 /** OTA-845 — a character who died. Persisted install-wide in the GlobalStash. */
 export interface FallenHero {
   name: string;
@@ -122,6 +152,8 @@ export interface FallenHero {
   /** OTA-1017 — full copies of the died-in kit (instance stats and all), so the
    *  revenant hands back the REAL gear. Absent on records that predate it. */
   gear?: FallenGearPiece[];
+  /** ⚠⚠ OTA-1358 — the character themself, so the Hollowed fights as they did. */
+  snapshot?: FallenSnapshot;
   /** OTA-998 — set once their Hollowed revenant is put to rest. */
   avengedBy?: string;
   avengedTs?: number;

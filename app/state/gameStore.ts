@@ -39510,8 +39510,26 @@ function handlePlayerDeath(
             const ia = slotPrio.indexOf(a); const ib = slotPrio.indexOf(b);
             return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
           })
-          .map(([, v]) => String(v)))).slice(0, 6);
+          .map(([, v]) => String(v)))).slice(0, 10);
       })(),
+      // ⚠⚠ OTA-1358 — THE CLONE. The character themself, recorded so the
+      // Hollowed can fight as they fought instead of as a kill-count formula.
+      // Ten slots, not six: rings and an amulet are part of a kit, and the old
+      // slice quietly dropped them.
+      snapshot: {
+        stats: {
+          strength: Math.round(player.stats?.strength ?? 0),
+          dexterity: Math.round(player.stats?.dexterity ?? 0),
+          intelligence: Math.round(player.stats?.intelligence ?? 0),
+          wisdom: Math.round(player.stats?.wisdom ?? 0),
+          charisma: Math.round(player.stats?.charisma ?? 0),
+          stealth: Math.round(player.stats?.stealth ?? 0),
+        },
+        hpMax: Math.round(player.hpMax ?? 0),
+        ac: Math.round(player.ac ?? 0),
+        raceId: player.raceId,
+        factionId: player.factionId,
+      },
       // OTA-994 — THE RECLAIM: full item copies too, so the revenant can give the
       // REAL gear back (fused stats intact), not a look-alike or a trophy.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
