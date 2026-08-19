@@ -54,6 +54,30 @@ export function _setFallenCacheForTests(f: FallenHero[] | null): void { FALLEN_C
 export function appendFallenToCache(f: FallenHero): void {
   if (FALLEN_CACHE) FALLEN_CACHE = [...FALLEN_CACHE, f];
 }
+/** ⚠⚠ OTA-1362 — THE POOL THE SPAWNER DRAWS FROM, local dead AND imported.
+ *  This is the single join between the shared ledger and the existing Hollowed
+ *  machinery: everything downstream — the scaling, the intro beats, the reclaim,
+ *  the defeat lines — already works on a FallenHero and never asks where it came
+ *  from. A foreign corpse is just one more name on the roll.
+ *
+ *  Kept lazy-required so the pure revenant module never hard-depends on storage,
+ *  and so a ledger that fails to load costs the extra pool and nothing else. */
+/** Did this corpse come from another house? */
+export function isForeignFallen(f: FallenHero): boolean {
+  return !!(f as { origin?: { installId?: string } }).origin?.installId;
+}
+
+export function revenantPool(): FallenHero[] {
+  const local = cachedFallen().filter((f) => !f.avengedTs);
+  let foreign: FallenHero[] = [];
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const store = require('./fallenLedgerStore') as typeof import('./fallenLedgerStore');
+    foreign = store.foreignPool();
+  } catch { foreign = []; }
+  return [...local, ...foreign];
+}
+
 export function markAvenged(ts: number, by: string): void {
   if (FALLEN_CACHE) {
     FALLEN_CACHE = FALLEN_CACHE.map((f) => (f.ts === ts ? { ...f, avengedBy: by, avengedTs: Date.now() } : f));
@@ -160,10 +184,18 @@ export function revenantFromFallen(f: FallenHero, playerHpMax: number): Enemy {
     damage,
     hp,
     rarity: 'Legendary',
-    loot: gear.slice(0, 4),
+    // ⚠⚠ OTA-1362 — THE GEAR FAUCET. A foreign corpse yields its WEAPON only:
+    // the guaranteed reclaim still fires (the blade is the emotional point and
+    // you can swing exactly one), but the armour drop pool is empty. Armour is
+    // where the volume lives — four slots per corpse times five houses — and
+    // that inflow comes from saves this player does not control. Rarity is
+    // untouched on purpose: degrading a foreign Legendary would lie about what
+    // that specific character actually carried. Cut the volume, keep the truth.
+    // Your own dead are unchanged.
+    loot: isForeignFallen(f) ? [] : gear.slice(0, 4),
     boss: true,
     traits: [REVENANT_TRAIT, 'boss'],
-    flavor: `${f.raceName}, once. ${kills} foes to the name before ${f.locationName} took them. The mud gave back the hunger and kept the fear.`,
+    flavor: `${f.raceName}, once. ${kills} foes to the name before ${f.locationName} took them. No stone ever closed over this one — the work was still burning when they went down, and the mud gave back the task and kept the fear.`,
   };
 }
 
@@ -175,14 +207,14 @@ export function revenantIntroBeats(f: FallenHero, wearsYourFace: boolean): {
     identification: wearsYourFace
       ? `The Arbiter goes very quiet. "Steady. It wears your face. ${f.name} died at ${f.locationName} — and the mud remembers everything you taught it."`
       : `"${f.name}," the Arbiter says, barely above the wind. "Fell at ${f.locationName}, ${f.hours} hours into the walk. The roll remembers them. The mud kept them."`,
-    identity: `${f.epitaph} Where the other Aetherkin cower and clutch at what they were, this one remembers the WORK — ${f.kills} foes bested — and it hungers for the fight it never finished.`,
-    character: 'It cannot be talked down and it will not stop. Put them to rest. Nothing else is mercy.',
+    identity: `${f.epitaph} Where the sleeping Aetherkin were received by the Aether and let go of everything, this one was never taken in — the errand was too heavy to set down, so no stone ever formed. ${f.kills} foes to the name, and the task still moving on its lips like a man counting steps in the dark.`,
+    character: 'It cannot be talked down, because there is nothing left in there to talk to — only the last order it was given, worn down to a groove. It will not stop. Put them to rest. Nothing else is mercy.',
   };
 }
 
 export function revenantDefeatLines(f: FallenHero, by: string): { world: string; reward: string } {
   return {
-    world: `The hunger goes out of them first. Then the light. For one clear breath the mud lets go, and it is only ${f.name} again — ${f.raceName}, ${f.kills} foes to the name, the warrior the roll remembers. They rest now. The Aether does not get this one back.`,
+    world: `The task goes out of them first — you watch it leave the mouth mid-word, an errand four hundred years old finally set down. Then the light. For one clear breath the mud lets go, and it is only ${f.name} again — ${f.raceName}, ${f.kills} foes to the name, the warrior the roll remembers. The stone closes over them the way it should have the first time. They rest now — received at last, and the Aether does not give this one back.`,
     reward: `✦ ${f.name} is at rest. The Fallen roll marks them: put to rest by ${by}.`,
   };
 }
