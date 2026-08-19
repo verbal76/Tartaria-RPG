@@ -58,10 +58,19 @@ describe('OTA-1368 — the buried level is not generic any more', () => {
     }
   });
 
-  it('each buried room reads differently in every faction', () => {
+  it('each buried room READS differently in every faction (prose, not names)', () => {
     // The bug was nine outposts sharing one Reclaimer description. A skin that
     // merely copies the base text would satisfy the coverage check above and
-    // still ship the defect, so names and prose must actually diverge.
+    // still ship the defect, so the prose must actually diverge.
+    //
+    // ⚠⚠ NAMES ARE NOT PART OF THAT, AND THIS TEST USED TO SAY THEY WERE.
+    // It asserted every faction must rename the buried rooms, and OTA-1369
+    // overturned that on evidence: all nine outpost PNGs paint the lower level
+    // with the SAME labels — First Landing, Second Landing, The Pump Room,
+    // Storage Halls, The Shallow Digs — so renaming them put the game at odds
+    // with the picture on eight skins at once. Names and chips are now locked
+    // against the artwork in ota1369MapNames; what belongs here is the prose,
+    // which the art does not carry and which really was faction bleed.
     for (const roomId of BURIED) {
       const base = BASE.find((r) => r.id === roomId)!;
       const names = new Set<string>();
@@ -69,27 +78,15 @@ describe('OTA-1368 — the buried level is not generic any more', () => {
       for (const [factionId, rooms] of Object.entries(FACTIONS)) {
         const v = rooms[roomId]!;
         expect(`${factionId}.${roomId}.name`).toBeTruthy();
-        // ⚠⚠ THE REVIVALISTS KEEP THE BASE NAMES, AND THIS IS NOT AN OVERSIGHT.
-        // The OTA-1279 crosswalk is read straight off the map image the owner
-        // supplied, and for R11–R15 that artwork says First Landing / Second
-        // Landing / The Pump Room / Storage Halls / The Shallow Digs — i.e. the
-        // "generic" base text WAS the Revivalist skin all along, which is why
-        // it reads like a working dig. Renaming them would put the game at odds
-        // with the picture, the exact failure ota1279 exists to prevent. They
-        // still get their own prose, and their chips lose the id-shaped ones
-        // ("Landing 1" → "First Landing"), which the structural-id test above
-        // enforces for every faction including this one. What they do NOT have
-        // to do is differ from the base for the sake of differing.
-        if (factionId !== 'tartarian_revivalists') {
-          expect(v.name).not.toBe(base.name);
-          expect(v.shortName).not.toBe(base.shortName);
-        }
         expect((v.description ?? '').length).toBeGreaterThan(80);
         expect(v.description).not.toBe(base.description);
         names.add(v.name ?? '');
         descs.add(v.description ?? '');
       }
-      expect(names.size).toBe(Object.keys(FACTIONS).length);
+      // The name is the map's, so it is the SAME on all eight — one entry.
+      expect(names.size).toBe(1);
+      expect([...names][0]).toBe(base.name);
+      // The prose is the faction's, so it is different on all eight.
       expect(descs.size).toBe(Object.keys(FACTIONS).length);
     }
   });
