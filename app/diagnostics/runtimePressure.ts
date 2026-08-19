@@ -145,6 +145,16 @@ export interface PressureSnapshot {
   memoryWarnings: number;
   lastMemoryWarningAt: number | null;
   appStateTrail: readonly string[];
+  /** ⚠ OTA-1361 — the native-ML queue, which is the half of "is the app
+   *  wedged?" the two clocks below structurally cannot answer. Optional so an
+   *  older caller (and every existing test) still type-checks. */
+  native?: {
+    worstWaitMs: number;
+    slowJobs: number;
+    worstMsPerPromptTok: number;
+    wastedCalls: number;
+    wastedMs: number;
+  };
   lastVerdict: FreezeVerdict;
   worstFrameGapMs: number;
   worstJsGapMs: number;
@@ -194,11 +204,40 @@ export function runtimePressureSummary(s: PressureSnapshot): string {
     ? `  Memory warnings: none this session`
     : `  ⚠ Memory warnings: ${s.memoryWarnings} this session`);
   out.push(s.uiStalls === 0
-    ? `  Freeze watch: no stalls seen`
+    ? `  Freeze watch: no stalls seen (JS clocks only — see the native queue below)`
     : `  ⚠ Freeze watch: ${s.uiStalls} render stall${s.uiStalls === 1 ? '' : 's'} `
       + `(worst: frames quiet ${Math.round(s.worstFrameGapMs)}ms while logic ran)`);
   if (s.worstJsGapMs >= JS_STALL_MS) {
     out.push(`  ⚠ Worst logic stall: ${Math.round(s.worstJsGapMs)}ms`);
+  }
+  // ⚠⚠ OTA-1361 — THE LINE THAT EXPLAINS A NEAR-FREEZE THE WATCH CANNOT SEE.
+  // The owner reported the app "hung a few Ms then came back"; the report said
+  // `Freeze watch: no stalls seen`, and BOTH were true. The watch compares a
+  // setTimeout clock against a requestAnimationFrame clock — two JS-side
+  // measurements. The 4.29.260 log's stall was on the NATIVE side: the cognitive
+  // embedder went 70ms → 12,619ms, prompt reads degraded 2.7 → 18.5ms/token, and
+  // four jobs queued 5.6–8.7s behind one another. JS kept ticking and frames kept
+  // coming the whole time, so neither clock moved and nothing was "stalled" —
+  // everything was merely QUEUED, which feels identical from the player's side of
+  // the screen and reads as an all-clear from this one. The numbers existed in
+  // qwenTelemetry all along; this is the missing consumer.
+  const nat = s.native;
+  if (nat) {
+    const bad = nat.worstWaitMs >= 3_000 || nat.worstMsPerPromptTok >= 10;
+    const bits = [
+      `worst wait ${(nat.worstWaitMs / 1000).toFixed(1)}s`,
+      `${nat.slowJobs} job kind${nat.slowJobs === 1 ? '' : 's'} queued >3s`,
+      `worst ${nat.worstMsPerPromptTok.toFixed(1)}ms/prompt-token`,
+    ];
+    if (nat.wastedCalls > 0) {
+      bits.push(`${nat.wastedCalls} generation${nat.wastedCalls === 1 ? '' : 's'} `
+        + `thrown away (${(nat.wastedMs / 1000).toFixed(1)}s)`);
+    }
+    out.push(`  ${bad ? '⚠ ' : ''}Native queue: ${bits.join(' · ')}`);
+    if (bad) {
+      out.push(`     The JS thread was healthy and the native model queue was not.`
+        + ` A stall the freeze watch above is structurally blind to.`);
+    }
   }
   const trail = s.appStateTrail.slice(-6);
   out.push(`  App state trail: ${trail.length ? trail.join(' → ') : '(none recorded)'}`);

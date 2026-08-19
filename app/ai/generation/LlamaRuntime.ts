@@ -188,6 +188,41 @@ export interface LlamaGenerateOptions {
    *  Narration deliberately does NOT set this. It has no fallback once it has
    *  started, and a half-written sentence is worse than a late one. */
   interruptible?: boolean;
+  /** ⚠⚠ OTA-1361 — THE DOOR CHECK. "Is this output still wanted?", asked
+   *  by the CONSUMER, at the two moments the answer can still save work.
+   *
+   *  The 4.29.260 device log priced the gap. A scene narration dispatched at
+   *  19:28:01.47; the player tapped again 0.66s later, so the line could never
+   *  be shown; the job then ran to completion anyway —
+   *
+   *    qwen⏱ narration:scene_intro ok 16201ms read 13402ms/write 2771ms 18.5ms/t
+   *    qwen⏱ ✂ DISCARDED narration:scene_intro after 16201ms — cancelled:player-acted-again
+   *
+   *  — holding the one native-ML lock for sixteen seconds to produce a string
+   *  that was thrown away on the line after. Every other job in that window
+   *  (`wait 8721ms`, `wait 7599ms`, `wait 7225ms`, `wait 5623ms`) was queued
+   *  behind dead work. The epoch check that discards the result already existed;
+   *  it just ran LAST, when the only thing left to save was the reader's time.
+   *
+   *  ⚠ THIS IS NOT `interruptible`, AND THE DISTINCTION IS THE WHOLE POINT.
+   *  `interruptible` means "someone more important arrived, cut this short" —
+   *  which narration deliberately refuses, because a half-written sentence is
+   *  worse than a late one (see above). `shouldAbort` means "the consumer
+   *  already knows this output will be discarded", so there is no sentence to
+   *  ruin: the alternative to a half-written line is not a whole line, it is
+   *  the same discard several seconds later. Narration may safely set this and
+   *  still refuse `interruptible`.
+   *
+   *  Checked twice, and it is worth being exact about what each one buys:
+   *    · AT THE DOOR, after the lock is won and before the native call — the
+   *      big one. A job that waited seconds in the queue while the player moved
+   *      on never starts, and the queue behind it drains immediately.
+   *    · PER TOKEN, once writing starts — ends a live generation that went
+   *      stale mid-flight, saving the remaining decode.
+   *  ⚠ It CANNOT interrupt a prompt read already in flight: those 13.4 seconds
+   *  are inside one native call with no token callbacks to ride. Aborting at
+   *  the door is what prevents that read from ever being entered. */
+  shouldAbort?: () => boolean;
 }
 
 export class LlamaRuntime {
@@ -341,8 +376,44 @@ export class LlamaRuntime {
       // tokens had already assembled. `stopCompletion` is the same call the
       // dispose path uses, and it is safe when nothing is running.
       let preempted = false;
+      let stopAsked = false;
+      // OTA-1361 — see `shouldAbort`. A throwing predicate must never cost a
+      // generation, so it is treated as "still wanted" on error.
+      const wantsAbort = (): boolean => {
+        try { return opts.shouldAbort?.() === true; } catch { return false; }
+      };
+      const onTokenEvt = (opts.onToken || opts.shouldAbort)
+        ? (evt: LlamaTokenEvent) => {
+            if (typeof evt.token === 'string') {
+              assembled += evt.token;
+              try { opts.onToken?.(evt.token); } catch { /* swallow user errors */ }
+            }
+            // OTA-1361 — the SECOND door check: this generation went stale
+            // while it was writing. Ask llama.cpp to stop once and let the call
+            // settle normally; the lock chain is untouched (exclusivity holds —
+            // we are ending the running op early, never overlapping it).
+            if (!stopAsked && wantsAbort()) {
+              stopAsked = true;
+              preempted = true;
+              try {
+                void (ctx as unknown as { stopCompletion?: () => unknown }).stopCompletion?.();
+              } catch { /* unsupported / nothing running — it just finishes */ }
+            }
+          }
+        : undefined;
       const result = await runExclusiveNativeMl(() => {
         telLockAt = Date.now();
+        // ⚠⚠ OTA-1361 — THE DOOR. The lock is ours and the native call has
+        // NOT started; if the consumer has already written this output off,
+        // this is the last free moment to not do the work at all. Returning a
+        // settled empty result keeps every downstream contract intact: the
+        // chain still pumps, the telemetry still records the call (as
+        // `preempted`, which is what it is), and the caller gets '' — which the
+        // epoch check it already has was going to turn into a discard anyway.
+        if (wantsAbort()) {
+          preempted = true;
+          return Promise.resolve({ text: '', tokens_predicted: 0 } as LlamaCompletionResult);
+        }
         return ctx.completion(
           {
             prompt,
@@ -352,14 +423,7 @@ export class LlamaRuntime {
             top_k: opts.topK ?? 40,
             stop: [...QWEN_STOP_TOKENS],
           },
-          opts.onToken
-            ? (evt) => {
-                if (typeof evt.token === 'string') {
-                  assembled += evt.token;
-                  try { opts.onToken?.(evt.token); } catch { /* swallow user errors */ }
-                }
-              }
-            : undefined,
+          onTokenEvt,
         );
       },
       opts.homework ? ML_PRIORITY_HOMEWORK : ML_PRIORITY_LLM,

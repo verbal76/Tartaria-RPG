@@ -258,6 +258,50 @@ export function qwenWasteTotals(): { calls: number; ms: number } {
   return { calls, ms };
 }
 
+/** ⚠ OTA-1361 — HOW BADLY THE NATIVE QUEUE IS BACKED UP, in four numbers.
+ *  Every one of these was already being aggregated; nothing new is measured.
+ *  What was missing is a CONSUMER — the runtime-pressure block that people
+ *  actually read at triage never asked, so a session in which the on-device
+ *  model queue was seconds deep still printed "Freeze watch: no stalls seen".
+ *  See runtimePressure.ts for why that line is true and useless together. */
+export interface NativePressure {
+  /** Longest any single call sat waiting on the shared native-ML lock. */
+  worstWaitMs: number;
+  /** How many jobs have a worst-wait past NATIVE_WAIT_WARN_MS. Depth, roughly:
+   *  distinct job kinds that have each been made to wait a long time. */
+  slowJobs: number;
+  /** Worst prompt-read cost per token seen this session. The honest
+   *  contention signal — it climbs when the big cores are busy. */
+  worstMsPerPromptTok: number;
+  /** Generations that finished and were then thrown away, and their cost. */
+  wastedCalls: number;
+  wastedMs: number;
+}
+
+/** A wait past this is not queueing, it is the player waiting. */
+export const NATIVE_WAIT_WARN_MS = 3_000;
+
+export function nativePressure(): NativePressure {
+  let worstWaitMs = 0;
+  let slowJobs = 0;
+  let worstMsPerPromptTok = 0;
+  for (const a of jobs.values()) {
+    worstWaitMs = Math.max(worstWaitMs, a.maxWaitMs);
+    if (a.maxWaitMs >= NATIVE_WAIT_WARN_MS) slowJobs += 1;
+    if (a.prefillSamples > 0 && Number.isFinite(a.worstMsPerPromptTok)) {
+      worstMsPerPromptTok = Math.max(worstMsPerPromptTok, a.worstMsPerPromptTok);
+    }
+  }
+  const waste = qwenWasteTotals();
+  return {
+    worstWaitMs: Math.round(worstWaitMs),
+    slowJobs,
+    worstMsPerPromptTok: Math.round(worstMsPerPromptTok * 10) / 10,
+    wastedCalls: waste.calls,
+    wastedMs: Math.round(waste.ms),
+  };
+}
+
 export interface QwenJobStats {
   job: string;
   count: number;
