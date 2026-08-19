@@ -262,7 +262,11 @@ describe("OTA-1370 — the owner's two conditions", () => {
   });
 
   it('tapping it opens the Atlas', () => {
-    expect(exp).toContain("<MiniMap onPress={() => setScreen('map')} />");
+    // ⚠ the tap grew a tutorial-lock guard when OTA-1375 deleted the MAP
+    // button and moved its responsibilities here, so this checks the wiring
+    // rather than one exact line.
+    expect(exp).toContain('<MiniMap');
+    expect(exp.slice(exp.indexOf('<MiniMap'))).toContain("setScreen('map')");
   });
 });
 
@@ -337,5 +341,45 @@ describe('OTA-1374 — the Atlas gestures do what the owner specified', () => {
       'startMidY.current', 'midOf(']) {
       expect({ dead, present: map.includes(dead) }).toEqual({ dead, present: false });
     }
+  });
+});
+
+describe('OTA-1375 — one control for the Atlas, not two', () => {
+  const exp = src('app', 'screens', 'ExplorationScreen.tsx');
+  const box = src('app', 'components', 'InputBox.tsx');
+
+  // Owner: *"since tapping on the minimap opens the atlas, I don't think we
+  // need the map button anymore."*
+
+  it('the scene-bar MAP button is gone', () => {
+    expect(exp).not.toContain('styles.sceneBarBtnText}>MAP<');
+    // the bar itself stays — the settings gear still lives there
+    expect(exp).toContain('styles.sceneBarBtns');
+  });
+
+  it('the mini-map is now the only way in, and it still goes to the Atlas', () => {
+    const opens = exp.match(/setScreen\('map'\)/g) ?? [];
+    expect(opens).toHaveLength(1);
+    expect(exp.slice(exp.indexOf('<MiniMap'), exp.indexOf('setScreen(\'map\')') + 20))
+      .toContain('setScreen(\'map\')');
+  });
+
+  it('⚠⚠ and it inherits the tutorial lock the MAP button was carrying', () => {
+    // The lockdown is only as tight as its loosest affordance. The deleted
+    // button refused during the tutorial with a double-pulse buzz and an
+    // Arbiter nudge (arb109 — a silent no-op reads as a broken button); the
+    // tap that replaces it has to do the same or the corner becomes an
+    // unguarded way out of the scripted crawl.
+    const tap = exp.slice(exp.indexOf('<MiniMap'), exp.indexOf('</>', exp.indexOf('<MiniMap')));
+    expect(tap).toContain('if (tutLock) {');
+    expect(tap).toContain('Vibration.vibrate([0, 32, 45, 32])');
+    expect(tap).toContain('nudgeTutorialBlocked()');
+  });
+
+  it('the now-dead onOpenMap prop is removed rather than left dangling', () => {
+    // It was still being declared, passed and destructured, and used by
+    // nothing — the travel row dropped its MAP chip long ago.
+    expect(box).not.toContain('onOpenMap');
+    expect(exp).not.toContain('onOpenMap');
   });
 });
