@@ -74,7 +74,7 @@ export function markAvenged(ts: number, by: string): void {
  *  SEEDED custom loadout (Rare-or-better) so the same fallen always wears —
  *  and can drop — the same gear. */
 export function revenantGearNames(f: FallenHero): string[] {
-  if (f.gearNames && f.gearNames.length > 0) return f.gearNames.slice(0, 6);
+  if (f.gearNames && f.gearNames.length > 0) return f.gearNames.slice(0, 10);
   type GearRow = { name: string; rarity: string };
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const wj = require('../data/items/weapons.json') as unknown;
@@ -100,16 +100,62 @@ export function revenantGearNames(f: FallenHero): string[] {
 /** Boss-band revenant: their lifetime record feeds the monster — your best
  *  dead make the worst Hollowed. Standard defeat-path loot rolls draw from
  *  the died-in kit (the "chance to drop what they wore"). */
+/** ⚠⚠ OTA-1359 — THE CLONE'S OWN NUMBERS.
+ *
+ *  When a record carries a snapshot, the Hollowed fights as that character
+ *  fought: their real hpMax, their strongest attribute, and the damage of the
+ *  weapon actually in their hand — a fused blade's own dice, else the catalog
+ *  or inference resolution of its name. No kill-count formula, no scaling off
+ *  the living player.
+ *
+ *  ⚠ THE BALANCE CONSEQUENCE, STATED PLAINLY: the old build capped HP at the
+ *  LIVING player's hpMax × 2.5, which quietly guaranteed every Hollowed was
+ *  fightable. A clone has no such courtesy — a veteran predecessor's corpse is
+ *  a wall for the character who follows them, and a rookie's is a pushover.
+ *  That is what "exactly as it was when they died" means, and it is the owner's
+ *  call. `CLONE_HP_CAP_MULTIPLIER` is the one line that puts a ceiling back. */
+export const CLONE_HP_CAP_MULTIPLIER: number | null = null;
+
+/** The damage the weapon in their hand actually deals. */
+function cloneWeaponDamage(f: FallenHero): string | null {
+  const piece = (f.gear ?? []).find((g) => g.slot === 'main') ?? (f.gear ?? [])[0];
+  if (!piece) return null;
+  // A fused one-of-a-kind carries its own dice — the truest number there is.
+  const fused = (piece as { uniqueStats?: { damageDice?: string } }).uniqueStats?.damageDice;
+  if (typeof fused === 'string' && /^\d{1,2}d\d{1,3}$/.test(fused)) return fused;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findWeaponByName } = require('./crafting') as typeof import('./crafting');
+    const w = findWeaponByName(piece.name);
+    if (w?.damageDice) return w.damageDice;
+  } catch { /* fall through to the kill-count band */ }
+  return null;
+}
+
 export function revenantFromFallen(f: FallenHero, playerHpMax: number): Enemy {
   const gear = revenantGearNames(f);
   pinSeededKit(f, gear);
   const kills = Math.max(0, Math.floor(f.kills || 0));
-  const hp = Math.max(60, Math.min(Math.round(Math.max(40, playerHpMax) * 2.5), 90 + kills * 2));
-  const damage = kills >= 150 ? '3d8' : kills >= 60 ? '2d8' : '2d6';
+  const snap = f.snapshot;
+  // The clone's own health, or the legacy kill-count band for records written
+  // before a character was ever recorded.
+  const hp = snap && snap.hpMax > 0
+    ? (CLONE_HP_CAP_MULTIPLIER
+      ? Math.max(20, Math.min(Math.round(Math.max(40, playerHpMax) * CLONE_HP_CAP_MULTIPLIER), Math.round(snap.hpMax)))
+      : Math.max(20, Math.round(snap.hpMax)))
+    : Math.max(60, Math.min(Math.round(Math.max(40, playerHpMax) * 2.5), 90 + kills * 2));
+  const damage = cloneWeaponDamage(f)
+    ?? (kills >= 150 ? '3d8' : kills >= 60 ? '2d8' : '2d6');
   return {
     name: revenantName(f),
     type: 'Hollowed Revenant',
-    abilityPoint: 'Strength 6',
+    // Their strongest attribute, as it stood — not a hard-coded 'Strength 6'.
+    abilityPoint: (() => {
+      if (!snap?.stats) return 'Strength 6';
+      const entries = Object.entries(snap.stats) as [string, number][];
+      const best = entries.reduce((a, b) => (b[1] > a[1] ? b : a), entries[0]!);
+      return `${best[0].charAt(0).toUpperCase()}${best[0].slice(1)} ${Math.round(best[1])}`;
+    })(),
     attack: `${gear[0] ?? 'Mud-Fused Blade'} (remembered)`,
     damage,
     hp,
@@ -164,7 +210,9 @@ export function buildFallenGearSnapshot(p: {
       const ia = slotPrio.indexOf(a); const ib = slotPrio.indexOf(b);
       return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
     });
-  for (const slot of slots.slice(0, 6)) {
+  // ⚠ OTA-1359 — ten slots, not six. Rings and an amulet are part of the kit
+  // they died in, and the old cap silently dropped them from the clone.
+  for (const slot of slots.slice(0, 10)) {
     const name = String(eq[slot]);
     const instId = eq[`${slot}Id`];
     const item = (instId ? inv.find((i) => i.id === instId) : undefined) ?? inv.find((i) => i.name === name);
