@@ -224,6 +224,78 @@ export function sanitizeForeignGearPiece(raw: unknown): FallenGearPiece | null {
 }
 
 // ---- the fallen ------------------------------------------------------------
+// ---- pairing ---------------------------------------------------------------
+/** ⚠⚠ THE HANDSHAKE. Owner: *"so you send a fallen request, the other player
+ *  accepts it, then it's open to an OTA from the other player?"* — yes, and the
+ *  accept is the part that matters. The validator makes a stranger's payload
+ *  SAFE (it cannot inject gear or wedge a save); it does not make it WANTED.
+ *  Without a pairing list, any payload that parses gets in, and "who am I
+ *  playing with" is answered by whoever pastes hardest.
+ *
+ *  ⚠ A pairing is a LOCAL decision, not a negotiated session. Each side stores
+ *  the other's house card once and can revoke it forever after. There is no
+ *  server to agree with, no session to expire, and nothing to re-do when the
+ *  automatic mailbox lands — the mailbox will simply deliver payloads that this
+ *  list already decides to accept or ignore. */
+export interface PairedHouse {
+  player: string;
+  installId: string;
+  /** When this house was accepted here. */
+  addedTs: number;
+  /** ⚠ Their sending key, carried inside their house card. Verifies that a
+   *  payload claiming to be theirs actually is. Absent on a card from before
+   *  seals existed — such a house is still paired, just unsealed, and the
+   *  import path says so out loud rather than pretending. */
+  key?: string;
+}
+
+/** A house card: everything another player needs to accept you, in one line
+ *  they can text. Checksummed so a truncated or mangled paste is REFUSED rather
+ *  than silently pairing you with a house whose id lost a character. */
+export function makeHouseCode(house: string, installId: string, sendingKey?: string): string {
+  const h = (house || 'an unnamed house').slice(0, 32);
+  // TAR2 carries the sending key; TAR1 (no key) still parses, so a card written
+  // before seals existed pairs fine — unsealed, and labelled as such.
+  const body = sendingKey ? `${h}|${installId}|${sendingKey}` : `${h}|${installId}`;
+  const tag = sendingKey ? 'TAR2' : 'TAR1';
+  return `${tag}.${encodeURIComponent(body)}.${checksum(body)}`;
+}
+
+export function parseHouseCode(code: unknown): { player: string; installId: string; key?: string } | null {
+  const raw = typeof code === 'string' ? code.trim() : '';
+  // Tolerate a paste that dragged along surrounding chat text.
+  const m = /TAR([12])\.([^.\s]+)\.([0-9a-z]+)/i.exec(raw);
+  if (!m) return null;
+  let body: string;
+  try { body = decodeURIComponent(m[2]!); } catch { return null; }
+  if (checksum(body) !== m[3]!.toLowerCase()) return null;
+  const parts = body.split('|');
+  // A house name may not contain '|' — the id and key are the trailing fields.
+  const withKey = m[1] === '2' && parts.length >= 3;
+  const key = withKey ? (parts.pop() ?? '').trim().slice(0, 64) : undefined;
+  const installId = (parts.pop() ?? '').trim().slice(0, 40);
+  const player = parts.join('|').trim().slice(0, 32);
+  if (!player || !installId) return null;
+  if (withKey && !key) return null;
+  return key ? { player, installId, key } : { player, installId };
+}
+
+/** Small, fast, and not a security boundary — this catches TRUNCATION, not
+ *  forgery. Forgery is what the pairing list and the validator are for. */
+function checksum(s: string): string {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i += 1) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(36);
+}
+
+/** Is this house one we agreed to ride with? */
+export function isPairedHouse(installId: string, paired: readonly PairedHouse[]): boolean {
+  return paired.some((p) => p.installId === installId);
+}
+
 /** ⚠⚠ THE LINEAGE NAME. Owner: *"how about keeping it medieval so the fallen is
  *  'Francis child of Sasmooch'"* — and it is the right frame, because it says
  *  the true thing: a character belongs to the player who raised them, and when
@@ -448,6 +520,29 @@ export function mergeRests(
     rests.splice(0, evicted);
   }
   return { rests, added, skippedDuplicate, evicted };
+}
+
+/** ⚠⚠ THE GEAR FAUCET. The open question I kept flagging, decided rather than
+ *  left hanging: a Hollowed hands back the REAL kit its character died in, and
+ *  with five houses feeding the pool that is a new inflow of Rare and Legendary
+ *  gear from saves this player does not control.
+ *
+ *  The call: a FOREIGN corpse yields its WEAPON only. Armour rolls are skipped.
+ *  Reasoning — the weapon is the whole emotional point ("you carry their blade
+ *  now"), it is one piece and you can only swing one, and it is already the
+ *  guaranteed reclaim. Armour is where the volume lives: four slots per corpse,
+ *  times five houses, and the economy drowns quietly.
+ *
+ *  ⚠ AND THE RARITY IS NOT TOUCHED. Degrading a foreign Legendary to Rare was
+ *  the obvious alternative and it is the wrong one: it lies about a specific
+ *  character's gear. "Francis died carrying this" should mean the thing Francis
+ *  carried. Cut the volume, keep the truth.
+ *
+ *  Your OWN dead are unchanged — full kit, full rolls, exactly as before. */
+export const FOREIGN_RECLAIM_WEAPON_ONLY = true;
+
+export function foreignReclaimAllowsArmor(): boolean {
+  return !FOREIGN_RECLAIM_WEAPON_ONLY;
 }
 
 /** ⚠⚠ THE DIFFICULTY DIAL. Owner: *"it makes the game harder as the fallen

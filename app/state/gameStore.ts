@@ -25530,6 +25530,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 whereRested,
                 ts: Date.now(),
                 description: closing.world,
+              }).then(() => {
+                // ⚠ A rest is the news the other houses actually want, so it is
+                // the one moment worth nudging the mailbox. Declines quietly
+                // unless auto-sync is on and the interval has passed.
+                try {
+                  // eslint-disable-next-line @typescript-eslint/no-require-imports
+                  (require('../engine/fallenMailbox') as typeof import('../engine/fallenMailbox')).maybeAutoSync();
+                } catch { /* no mailbox configured */ }
               }).catch(() => { /* the kill still stands; the receipt retries next export */ });
               get().appendLog('world', `The roll of the Hollowed closes on ${ledgerMod.fallenTitle({ name: fr.name, origin: frOrigin })}. Word of it will find their house.`);
             } else {

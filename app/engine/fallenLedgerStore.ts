@@ -16,19 +16,26 @@
 // a gameplay problem, and the seam belongs here.
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { FallenHero } from './saveSystem';
+import { seal, sealMatches, mintSendingKey } from './fallenSeal';
 import {
   fallenKey,
+  isPairedHouse,
+  makeHouseCode,
   mergeFallen,
   mergeRests,
+  parseHouseCode,
   parseLedgerPayload,
   unrestedFallen,
   type ForeignFallen,
+  type PairedHouse,
   type RestRecord,
 } from './fallenLedger';
 
 const LEDGER_KEY = 'tartaria.fallenLedger.v1';
 const INSTALL_KEY = 'tartaria.fallen.installId.v1';
 const HOUSE_KEY = 'tartaria.fallen.house.v1';
+const PAIRED_KEY = 'tartaria.fallen.paired.v1';
+const SENDKEY_KEY = 'tartaria.fallen.sendkey.v1';
 /** Bumped if the envelope shape ever changes; readers tolerate an older one. */
 export const LEDGER_FORMAT = 1;
 
@@ -60,6 +67,25 @@ export async function ensureInstallId(): Promise<string> {
   return minted;
 }
 
+/** ⚠ This install's sending key: minted once, handed out INSIDE the house card,
+ *  and used to seal everything this house sends. Whoever holds the card can
+ *  verify our payloads — and, being symmetric, could also forge them. That is
+ *  the same trust as the pairing itself (you texted the card to one person),
+ *  and the honest level for a handful of friends. */
+let SEND_KEY: string | null = null;
+export async function ensureSendingKey(): Promise<string> {
+  if (SEND_KEY) return SEND_KEY;
+  try {
+    const held = await AsyncStorage.getItem(SENDKEY_KEY);
+    if (held && held.length > 0) { SEND_KEY = held; return held; }
+  } catch { /* fall through and mint */ }
+  const minted = mintSendingKey();
+  SEND_KEY = minted;
+  try { await AsyncStorage.setItem(SENDKEY_KEY, minted); } catch { /* memory-only this run */ }
+  return minted;
+}
+export function _setSendingKeyForTests(k: string | null): void { SEND_KEY = k; }
+
 /** Sync accessor for the spawner, which cannot await. '' until primed. */
 export function cachedInstallId(): string {
   if (INSTALL_ID === null) { INSTALL_ID = ''; void ensureInstallId(); }
@@ -83,6 +109,79 @@ export async function setHouseName(name: string): Promise<void> {
   const clean = name.replace(/[\u0000-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 32);
   HOUSE = clean;
   try { await AsyncStorage.setItem(HOUSE_KEY, clean); } catch { /* memory-only this run */ }
+}
+
+// ---- pairing ---------------------------------------------------------------
+let PAIRED: PairedHouse[] | null = null;
+
+export async function loadPaired(): Promise<PairedHouse[]> {
+  if (PAIRED) return PAIRED;
+  try {
+    const raw = await AsyncStorage.getItem(PAIRED_KEY);
+    const doc: unknown = raw ? JSON.parse(raw) : [];
+    PAIRED = Array.isArray(doc)
+      ? doc.flatMap((d) => {
+        if (typeof d !== 'object' || d === null) return [];
+        const r = d as Record<string, unknown>;
+        const player = typeof r.player === 'string' ? r.player.slice(0, 32) : '';
+        const installId = typeof r.installId === 'string' ? r.installId.slice(0, 40) : '';
+        if (!player || !installId) return [];
+        return [{ player, installId, addedTs: typeof r.addedTs === 'number' ? r.addedTs : 0 }];
+      })
+      : [];
+  } catch { PAIRED = []; }
+  return PAIRED;
+}
+
+export function cachedPaired(): PairedHouse[] {
+  if (PAIRED === null) { PAIRED = []; void loadPaired(); }
+  return PAIRED;
+}
+
+async function persistPaired(list: PairedHouse[]): Promise<void> {
+  PAIRED = list;
+  try { await AsyncStorage.setItem(PAIRED_KEY, JSON.stringify(list)); } catch { /* memory-only this run */ }
+}
+
+export function _setPairedForTests(l: PairedHouse[] | null): void { PAIRED = l; }
+
+/** ⚠⚠ THE REQUEST. This is what the player sends — their own house card. There
+ *  is nothing to "receive" it yet, so it travels the way everything else does:
+ *  they text it. When the mailbox lands, it carries this exact string. */
+export async function myHouseCode(): Promise<string> {
+  const installId = await ensureInstallId();
+  const house = (await loadHouseName()) || 'an unnamed house';
+  return makeHouseCode(house, installId, await ensureSendingKey());
+}
+
+export type AcceptOutcome =
+  | { ok: true; house: PairedHouse; already: boolean }
+  | { ok: false; reason: 'unreadable' | 'self' };
+
+/** ⚠⚠ THE ACCEPT. Storing a house here is the whole authorization decision:
+ *  from this moment their dead may walk here, and until it, they may not —
+ *  no matter how well-formed their payload is or how it arrives. */
+export async function acceptHouseCode(code: string): Promise<AcceptOutcome> {
+  const parsed = parseHouseCode(code);
+  if (!parsed) return { ok: false, reason: 'unreadable' };
+  const mine = await ensureInstallId();
+  // Pairing with yourself would put your own dead in your own wastes, which the
+  // merge refuses anyway — refuse it here too, where the message can be honest.
+  if (parsed.installId === mine) return { ok: false, reason: 'self' };
+  const list = await loadPaired();
+  const held = list.find((p) => p.installId === parsed.installId);
+  if (held) return { ok: true, house: held, already: true };
+  const house: PairedHouse = { ...parsed, addedTs: Date.now() };
+  await persistPaired([...list, house]);
+  return { ok: true, house, already: false };
+}
+
+/** Cut a house off. Their dead already standing in your wastes stay — you agreed
+ *  to those, and a corpse mid-errand does not evaporate because the houses fell
+ *  out — but nothing further of theirs is admitted. */
+export async function revokeHouse(installId: string): Promise<void> {
+  const list = await loadPaired();
+  await persistPaired(list.filter((p) => p.installId !== installId));
 }
 
 // ---- disk ------------------------------------------------------------------
@@ -134,6 +233,51 @@ async function persist(l: Ledger): Promise<void> {
   }
 }
 
+type AuthResult =
+  | { kind: 'sealed'; installId: string }
+  | { kind: 'unsealed' }
+  | { kind: 'forged' };
+
+/** Which paired house, if any, actually wrote this? Tries every held key rather
+ *  than trusting the envelope's own `from` field — a claim about identity is not
+ *  evidence of it, and with a handful of houses the extra work is nothing. */
+function authenticate(text: string, paired: readonly PairedHouse[]): AuthResult {
+  let env: unknown;
+  try { env = JSON.parse(text); } catch { return { kind: 'unsealed' }; }
+  if (typeof env !== 'object' || env === null) return { kind: 'unsealed' };
+  const e = env as Record<string, unknown>;
+  const body = typeof e.body === 'string' ? e.body : null;
+  const claimed = e.seal;
+  if (!body || typeof claimed !== 'string') return { kind: 'unsealed' };
+  let holdAnyKey = false;
+  for (const h of paired) {
+    if (!h.key) continue;
+    holdAnyKey = true;
+    if (sealMatches(h.key, body, claimed)) return { kind: 'sealed', installId: h.installId };
+  }
+  // ⚠ "I cannot verify this" is NOT "this is a forgery", and conflating them was
+  // a real bug: senders always seal now, so a house paired before seals existed
+  // — whose card carried no key — would have had every honest payload refused.
+  // With no key on file there is nothing to check against, so fall through to
+  // the pairing gate, which still decides whether the house is wanted at all.
+  if (!holdAnyKey) return { kind: 'unsealed' };
+  return { kind: 'forged' };
+}
+
+/** Unwrap a sealed envelope down to the payload the validator reads. Anything
+ *  that is not an envelope passes through untouched, so a hand-pasted plain
+ *  ledger still works. */
+export function unwrapEnvelope(text: string): string {
+  try {
+    const env: unknown = JSON.parse(text);
+    if (typeof env === 'object' && env !== null) {
+      const b = (env as Record<string, unknown>).body;
+      if (typeof b === 'string') return b;
+    }
+  } catch { /* not an envelope */ }
+  return text;
+}
+
 // ---- the exchange ----------------------------------------------------------
 /** What this install sends out: its OWN dead, stamped with its house, plus the
  *  rests it has performed (so the players whose corpses they were learn how
@@ -148,7 +292,11 @@ export async function buildExportPayload(): Promise<string> {
   try { mine = await loadFallen(); } catch { mine = []; }
   const ledger = await loadLedger();
   const stamped = mine.map((f) => ({ ...f, origin: { player: house, installId } }));
-  return JSON.stringify({ v: LEDGER_FORMAT, house, installId, fallen: stamped, rests: ledger.rests });
+  const body = JSON.stringify({ v: LEDGER_FORMAT, house, installId, fallen: stamped, rests: ledger.rests });
+  // ⚠ The seal covers the body STRING, and the reader verifies before parsing —
+  // so a tampered payload never reaches the parser at all.
+  const sealed = seal(await ensureSendingKey(), body);
+  return JSON.stringify({ v: 2, from: installId, seal: sealed.seal, body });
 }
 
 export interface ImportOutcome {
@@ -159,6 +307,12 @@ export interface ImportOutcome {
   skippedDuplicate: number;
   rejected: number;
   evicted: number;
+  /** Turned away because their house is not one you ride with. */
+  unpaired: number;
+  /** Admitted from a house we hold no verifying key for (a pre-seal pairing). */
+  unsealed: number;
+  /** The payload carried a seal that no paired house's key verifies. */
+  forged: boolean;
   /** Names of the newly-arrived, already titled for display. */
   arrivals: string[];
 }
@@ -169,10 +323,55 @@ export interface ImportOutcome {
 export async function importPayloadText(text: string): Promise<ImportOutcome> {
   const myInstallId = await ensureInstallId();
   const ledger = await loadLedger();
-  const batch = parseLedgerPayload(text);
+  const paired = await loadPaired();
+  const batch = parseLedgerPayload(unwrapEnvelope(text));
 
-  const restsMerged = mergeRests(ledger.rests, batch.rests);
-  const fallenMerged = mergeFallen(ledger.foreign, batch.fallen, {
+  // ⚠⚠ THE GATE. Validation says a record is SAFE; pairing says it is WANTED,
+  // and they are not the same question. Before this existed, any payload that
+  // parsed got in, so "who am I playing with" was answered by whoever pasted.
+  // Unpaired dead are refused here — after the validator, so a hostile stranger
+  // is both sanitised AND turned away, never one or the other.
+  // ⚠⚠ THE SEAL. Once the dead arrive from a shared mailbox instead of a text,
+  // "this claims to be from a house you ride with" stops being worth anything on
+  // its own — anyone who can write to the mailbox can claim it. So: unwrap the
+  // envelope, and find which paired house's key actually verifies the body.
+  // Verification happens over the raw STRING, before parsing, so tampered bytes
+  // never reach the parser.
+  const auth = authenticate(text, paired);
+  if (auth.kind === 'forged') {
+    // Sealed, but by nobody we hold a key for. Refuse the whole payload — a
+    // partial accept here would be the worst of both answers.
+    return {
+      added: 0, rests: 0, skippedOwn: 0, skippedRested: 0, skippedDuplicate: 0,
+      rejected: 0, evicted: 0, unpaired: batch.fallen.length, unsealed: 0, forged: true, arrivals: [],
+    };
+  }
+
+  const wanted = batch.fallen.filter((f) => {
+    if (!isPairedHouse(f.origin.installId, paired)) return false;
+    // A house speaks only for its own dead. If the payload was sealed, the
+    // records must belong to the house that sealed it — otherwise a paired
+    // house could launder another house's corpses through its own signature.
+    if (auth.kind === 'sealed' && f.origin.installId !== auth.installId) return false;
+    // Unsealed payloads are admitted only for houses we hold NO key for — a
+    // house that gave us a key and then sends unsealed is a downgrade attempt.
+    if (auth.kind === 'unsealed') {
+      const h = paired.find((pp) => pp.installId === f.origin.installId);
+      if (h?.key) return false;
+    }
+    return true;
+  });
+  const unpairedFallen = batch.fallen.length - wanted.length;
+  // Rests are receipts about corpses, not corpses. One from an unpaired house
+  // can only ever say "someone put down a corpse you never held" — worthless
+  // rather than dangerous — but it is still noise, so it is held to the same rule.
+  const wantedRests = batch.rests.filter((r) => {
+    const owner = r.fallenKey.split(':')[0] ?? '';
+    return owner === myInstallId || isPairedHouse(owner, paired) || isPairedHouse(r.byInstallId, paired);
+  });
+
+  const restsMerged = mergeRests(ledger.rests, wantedRests);
+  const fallenMerged = mergeFallen(ledger.foreign, wanted, {
     myInstallId,
     rests: restsMerged.rests,
   });
@@ -189,6 +388,9 @@ export async function importPayloadText(text: string): Promise<ImportOutcome> {
     skippedDuplicate: fallenMerged.skippedDuplicate,
     rejected: fallenMerged.rejected,
     evicted: fallenMerged.evicted,
+    unpaired: unpairedFallen,
+    unsealed: auth.kind === 'unsealed' ? wanted.length : 0,
+    forged: false,
     arrivals: fallenMerged.added.map((f) => fallenTitle(f)),
   };
 }

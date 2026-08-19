@@ -62,6 +62,11 @@ export function appendFallenToCache(f: FallenHero): void {
  *
  *  Kept lazy-required so the pure revenant module never hard-depends on storage,
  *  and so a ledger that fails to load costs the extra pool and nothing else. */
+/** Did this corpse come from another house? */
+export function isForeignFallen(f: FallenHero): boolean {
+  return !!(f as { origin?: { installId?: string } }).origin?.installId;
+}
+
 export function revenantPool(): FallenHero[] {
   const local = cachedFallen().filter((f) => !f.avengedTs);
   let foreign: FallenHero[] = [];
@@ -133,7 +138,15 @@ export function revenantFromFallen(f: FallenHero, playerHpMax: number): Enemy {
     damage,
     hp,
     rarity: 'Legendary',
-    loot: gear.slice(0, 4),
+    // ⚠⚠ OTA-1362 — THE GEAR FAUCET. A foreign corpse yields its WEAPON only:
+    // the guaranteed reclaim still fires (the blade is the emotional point and
+    // you can swing exactly one), but the armour drop pool is empty. Armour is
+    // where the volume lives — four slots per corpse times five houses — and
+    // that inflow comes from saves this player does not control. Rarity is
+    // untouched on purpose: degrading a foreign Legendary would lie about what
+    // that specific character actually carried. Cut the volume, keep the truth.
+    // Your own dead are unchanged.
+    loot: isForeignFallen(f) ? [] : gear.slice(0, 4),
     boss: true,
     traits: [REVENANT_TRAIT, 'boss'],
     flavor: `${f.raceName}, once. ${kills} foes to the name before ${f.locationName} took them. No stone ever closed over this one — the work was still burning when they went down, and the mud gave back the task and kept the fear.`,

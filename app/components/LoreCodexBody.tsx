@@ -35,10 +35,12 @@ import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../e
 import { isGreatClimbLocationLocked, SUMMIT_BOSS_BASES } from '../engine/greatClimbs';
 import { loadFallen, type FallenHero } from '../engine/saveSystem';
 import * as Clipboard from 'expo-clipboard';
-import { fallenTitle, restRollLine, type ForeignFallen, type RestRecord } from '../engine/fallenLedger';
+import { fallenTitle, restRollLine, type ForeignFallen, type RestRecord, type PairedHouse } from '../engine/fallenLedger';
 import {
   loadLedger, loadHouseName, setHouseName, buildExportPayload, importPayloadText,
+  myHouseCode, acceptHouseCode, revokeHouse, loadPaired,
 } from '../engine/fallenLedgerStore';
+import { loadMailboxConfig, setMailboxConfig, syncNow } from '../engine/fallenMailbox';
 
 // OTA-837 — Tier-1 QoL #2: the codex now includes a discovery-gated BESTIARY (fills
 // in as you defeat enemy types) and a LORE tab that finally surfaces the 172-entry
@@ -109,11 +111,103 @@ export function LoreCodexBody() {
   const [house, setHouse] = useState('');
   const [exchangeNote, setExchangeNote] = useState('');
   const [busy, setBusy] = useState(false);
+  const [paired, setPaired] = useState<PairedHouse[]>([]);
+  const [codeIn, setCodeIn] = useState('');
+  const [boxUrl, setBoxUrl] = useState('');
+  const [boxToken, setBoxToken] = useState('');
+  const [boxAuto, setBoxAuto] = useState(false);
   const refreshLedger = React.useCallback(async () => {
     const l = await loadLedger();
     setHollowed([...l.foreign].reverse());
     setRests([...l.rests].reverse());
+    setPaired(await loadPaired());
+    const cfg = await loadMailboxConfig();
+    setBoxUrl(cfg.url); setBoxToken(cfg.token); setBoxAuto(cfg.auto);
   }, []);
+
+  /** ⚠ Deliver now, by hand. The same round the heartbeat runs: push our dead,
+   *  read every house we ride with, and fold in whatever came back. */
+  const syncMailbox = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await setMailboxConfig({ url: boxUrl, token: boxToken, auto: boxAuto });
+      const out = await syncNow({ force: true });
+      if (!out.ran) {
+        setExchangeNote(out.reason === 'bad-url'
+          ? 'That mailbox address does not look like a web address.'
+          : out.reason === 'off'
+            ? 'No mailbox address set — the dead travel by hand until there is one.'
+            : 'Nothing to do yet.');
+        return;
+      }
+      await refreshLedger();
+      const added = out.imported.reduce((n, i) => n + i.added, 0);
+      const rests = out.imported.reduce((n, i) => n + i.rests, 0);
+      const forged = out.imported.filter((i) => i.forged).length;
+      const bits: string[] = [];
+      bits.push(out.pushed ? 'your dead are in the box' : 'could not leave your dead');
+      bits.push(`${out.pulled} ${out.pulled === 1 ? 'house' : 'houses'} read`);
+      if (added > 0) bits.push(`${added} joined your wastes`);
+      if (rests > 0) bits.push(`${rests} put to rest elsewhere`);
+      if (forged > 0) bits.push(`${forged} refused — the seal did not match their house`);
+      if (out.failed > 0) bits.push(`${out.failed} could not be reached`);
+      setExchangeNote(`${bits.join(' · ')}.`);
+    } catch {
+      setExchangeNote('The mailbox could not be reached.');
+    } finally { setBusy(false); }
+  };
+
+  /** ⚠⚠ THE REQUEST. Your house card — everything another player needs to
+   *  accept you, checksummed so a mangled paste is refused rather than pairing
+   *  them with a broken id. They text it back and you accept theirs. */
+  const sendRequest = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await setHouseName(house);
+      const code = await myHouseCode();
+      await Clipboard.setStringAsync(code);
+      setExchangeNote('Your house card is copied. Send it to them — when they accept, have them send theirs back so you can accept too.');
+    } catch {
+      setExchangeNote('Could not copy your house card.');
+    } finally { setBusy(false); }
+  };
+
+  /** ⚠⚠ THE ACCEPT. This is the authorization decision, and nothing else is:
+   *  from here their dead may walk in your wastes, and until here they may not,
+   *  however well-formed their payload is. */
+  const acceptRequest = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const text = codeIn.trim() || (await Clipboard.getStringAsync());
+      const out = await acceptHouseCode(text ?? '');
+      if (!out.ok) {
+        setExchangeNote(out.reason === 'self'
+          ? 'That is your own house card.'
+          : 'That is not a house card — check it came across whole.');
+        return;
+      }
+      setCodeIn('');
+      await refreshLedger();
+      setExchangeNote(out.already
+        ? `You already ride with ${out.house.player}.`
+        : `You ride with ${out.house.player}. Their dead may walk here now — send them your dead when you are ready.`);
+    } catch {
+      setExchangeNote('Could not read that house card.');
+    } finally { setBusy(false); }
+  };
+
+  const cutOff = async (h: PairedHouse) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await revokeHouse(h.installId);
+      await refreshLedger();
+      setExchangeNote(`You no longer ride with ${h.player}. Their Hollowed already here still walk — you agreed to those.`);
+    } finally { setBusy(false); }
+  };
   useEffect(() => {
     let live = true;
     void loadFallen().then((f) => { if (live) setFallen([...f].reverse()); });
@@ -150,6 +244,7 @@ export function LoreCodexBody() {
       if (out.rests > 0) bits.push(`${out.rests} put to rest elsewhere`);
       if (out.skippedDuplicate > 0) bits.push(`${out.skippedDuplicate} already known`);
       if (out.skippedRested > 0) bits.push(`${out.skippedRested} you already put down`);
+      if (out.unpaired > 0) bits.push(`${out.unpaired} turned away — no house you ride with`);
       if (out.rejected > 0) bits.push(`${out.rejected} refused`);
       setExchangeNote(out.added === 0 && out.rests === 0
         ? `Nothing new. ${bits.join(' · ')}`
@@ -432,6 +527,49 @@ export function LoreCodexBody() {
             maxLength={32}
             accessibilityLabel="Your house name"
           />
+          {/* ⚠⚠ THE HANDSHAKE, before any dead move. Validation says a payload
+              is SAFE; pairing says it is WANTED. Unpaired dead are turned away
+              at import even when they parse perfectly. */}
+          <Text style={styles.meta}>
+            {paired.length === 0
+              ? 'YOU RIDE ALONE. Send your house card, accept theirs, and your dead can cross.'
+              : `YOU RIDE WITH ${paired.length} ${paired.length === 1 ? 'HOUSE' : 'HOUSES'}`}
+          </Text>
+          {paired.map((h) => (
+            <View key={h.installId} style={styles.pairedRow}>
+              <Text style={styles.pairedName}>⚔ {h.player}</Text>
+              <TouchableOpacity onPress={() => { void cutOff(h); }} accessibilityRole="button" disabled={busy}>
+                <Text style={styles.pairedCut}>CUT OFF</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+          <View style={styles.exchangeRow}>
+            <TouchableOpacity
+              style={styles.exchangeBtn}
+              onPress={() => { void sendRequest(); }}
+              accessibilityRole="button"
+              disabled={busy}
+            >
+              <Text style={styles.exchangeBtnText}>SEND REQUEST</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.exchangeBtn}
+              onPress={() => { void acceptRequest(); }}
+              accessibilityRole="button"
+              disabled={busy}
+            >
+              <Text style={styles.exchangeBtnText}>ACCEPT REQUEST</Text>
+            </TouchableOpacity>
+          </View>
+          <TextInput
+            style={styles.houseInput}
+            value={codeIn}
+            onChangeText={setCodeIn}
+            placeholder="paste their house card (or leave blank to read the clipboard)"
+            placeholderTextColor="#7a705c"
+            maxLength={200}
+            accessibilityLabel="Their house card"
+          />
           <View style={styles.exchangeRow}>
             <TouchableOpacity
               style={styles.exchangeBtn}
@@ -451,6 +589,58 @@ export function LoreCodexBody() {
             </TouchableOpacity>
           </View>
           {!!exchangeNote && <Text style={styles.exchangeNote}>{exchangeNote}</Text>}
+
+          {/* ⚠⚠ THE MAILBOX. Two phones cannot reach each other directly —
+              carrier NAT, no stable address — so automatic delivery needs a
+              place to leave a file. It is not a game server and holds no rules:
+              a GET to read, a PUT to write. OFF until an address is typed in;
+              no default endpoint and no traffic on a build that never opted in. */}
+          <Text style={styles.sectionHeading}>THE MAILBOX</Text>
+          <Text style={styles.desc}>
+            Leave the dead somewhere both of you can reach and they cross on their own.
+            Until you set this, they travel by hand — which works fine.
+          </Text>
+          <TextInput
+            style={styles.houseInput}
+            value={boxUrl}
+            onChangeText={setBoxUrl}
+            placeholder="https://… (leave blank to keep the mailbox off)"
+            placeholderTextColor="#7a705c"
+            autoCapitalize="none"
+            maxLength={300}
+            accessibilityLabel="Mailbox address"
+          />
+          <TextInput
+            style={styles.houseInput}
+            value={boxToken}
+            onChangeText={setBoxToken}
+            placeholder="write token, if the mailbox needs one"
+            placeholderTextColor="#7a705c"
+            autoCapitalize="none"
+            maxLength={200}
+            accessibilityLabel="Mailbox write token"
+          />
+          <View style={styles.exchangeRow}>
+            <TouchableOpacity
+              style={[styles.exchangeBtn, boxAuto && styles.exchangeBtnOn]}
+              onPress={() => { const next = !boxAuto; setBoxAuto(next); void setMailboxConfig({ url: boxUrl, token: boxToken, auto: next }); }}
+              accessibilityRole="button"
+              accessibilityState={{ selected: boxAuto }}
+              disabled={busy}
+            >
+              <Text style={[styles.exchangeBtnText, boxAuto && styles.exchangeBtnTextOn]}>
+                {boxAuto ? '◈ CROSSING ON ITS OWN' : '◈ CROSS ON ITS OWN'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.exchangeBtn}
+              onPress={() => { void syncMailbox(); }}
+              accessibilityRole="button"
+              disabled={busy}
+            >
+              <Text style={styles.exchangeBtnText}>DELIVER NOW</Text>
+            </TouchableOpacity>
+          </View>
           </>
         )}
       </ScrollView>
@@ -549,7 +739,12 @@ const styles = StyleSheet.create({
     paddingVertical: 9, alignItems: 'center',
   },
   exchangeBtnText: { color: '#9ec0ef', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
+  exchangeBtnOn: { backgroundColor: '#123a3a', borderColor: '#7ef0dd' },
+  exchangeBtnTextOn: { color: '#c7fff4' },
   exchangeNote: { marginTop: 8, color: '#9ec96a', fontSize: 12, fontStyle: 'italic' },
+  pairedRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 },
+  pairedName: { color: '#e8dcc0', fontSize: 13 },
+  pairedCut: { color: '#e07a5f', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   fallenEmpty: { color: '#a2977b', fontSize: 12, fontStyle: 'italic', marginTop: 8 },
   // OTA-995 — un-avenged entries carry a live warning, amber against the memorial browns.
   fallenWalking: { color: '#d9a441', fontSize: 12, fontStyle: 'italic', marginTop: 2 },
