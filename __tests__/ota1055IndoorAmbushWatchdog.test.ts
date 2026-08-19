@@ -97,7 +97,13 @@ describe('OTA-1055 — SOURCE LOCKS', () => {
     expect(store).toMatch(/schedule\(healthy \? QWEN_WATCHDOG_HEALTHY_MS : qwenRecoveringDelayMs\(\)\)/);
     // Dormancy is caused by backgrounding, so the return to foreground checks.
     expect(store).toMatch(/AppState\.addEventListener\('change'/);
-    expect(store).toMatch(/if \(next === 'active'\) \{ qwenBackoffLevel = 0; tick\(\); \}/);
+    // ⚠ RETARGETED BY OTA-1196. The claim — "the return to foreground checks" — is
+    // unchanged and still asserted below; what moved is that a bare iOS `active` no longer
+    // qualifies. `active` fires there for a notification banner or a Control Center pull,
+    // so the old spelling kicked a ~400MB context load on incidental twitches.
+    expect(store).toMatch(/if \(!qwenTrulyBackgrounded\) return;/);
+    const fg = store.indexOf('if (!qwenTrulyBackgrounded) return;');
+    expect(store.slice(fg, fg + 700)).toMatch(/tick\(\);/);
   });
 
   it('the health check reports health rather than just returning', () => {

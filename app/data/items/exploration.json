@@ -1742,5 +1742,58 @@
       "disabled_challenge"
     ],
     "description": "A water-stained fragment of a map to Iskan-Veil's shifting halls. Half the corridors are crossed out; the rest are wrong."
+  },
+  {
+    "name": "Procedure Text: Aether Shield",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "tcBuy": 250,
+    "tags": [
+      "exploration",
+      "text",
+      "procedure",
+      "aether"
+    ],
+    "description": "A field-copied Tartarian procedure: how to thicken the air into a standing barrier. Reading it teaches the Aether Shield (INT 9)."
+  },
+  {
+    "name": "Procedure Text: Temporal Slip",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "tcBuy": 600,
+    "tags": [
+      "exploration",
+      "text",
+      "procedure",
+      "aether"
+    ],
+    "description": "A Revivalist transcription, margins full of corrections: stepping a half-second out of a blow. Reading it teaches the Temporal Slip (INT 14)."
+  },
+  {
+    "name": "Procedure Text: Veil of Ether",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "tcBuy": 1400,
+    "tags": [
+      "exploration",
+      "text",
+      "procedure",
+      "aether"
+    ],
+    "description": "An Architect cipher, deciphered by someone who paid for it: bending light so it declines to leave. Reading it teaches the Veil of Ether (INT 16)."
+  },
+  {
+    "name": "Procedure Text: Resonance Cascade",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "tcBuy": 1400,
+    "tags": [
+      "exploration",
+      "text",
+      "procedure",
+      "aether",
+      "forbidden"
+    ],
+    "description": "Stamped FORBIDDEN in three scripts and copied anyway. The overload procedure, kickback warnings underlined twice. Reading it teaches the Resonance Cascade (INT 18)."
   }
 ]

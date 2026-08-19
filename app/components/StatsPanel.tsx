@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import type { PlayerCharacter } from '../engine/types';
+import { STAT_ROW_MAX_WIDTH } from '../ui/layoutConstants'; // OTA-1252 — pure constant: no storage in a render path
 import racesData from '../data/races/races.json';
 import { resolveDisplayArmorByName } from '../engine/itemResolution';
 import { coatedDisplayName } from '../engine/weaponCoating';
@@ -436,7 +437,24 @@ const styles = StyleSheet.create({
   tapHint: { color: '#a2977b', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
   companion: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5, fontWeight: '700' },
   contracts: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
-  row: { flexDirection: 'row', gap: 4, marginTop: 3 },
+  // ⚠⚠ OTA-1252 — THE STAT ROW STOPS SPREADING ON A MONITOR. Owner, on the PC
+  // build: *"the character portrait text and spacing didn't scale it
+  // stretched."* Exactly what happened, and the cause is the line directly
+  // below this one: `stat: { flex: 1 }` gives every column an EQUAL SHARE OF
+  // WHATEVER WIDTH IT IS GIVEN. That is right on a phone, where the panel is
+  // ~360px and five columns land at ~70px each — the measure these 9px labels
+  // and 12px values were drawn against. OTA-1250 widened the desktop column to
+  // 1024, the panel went to ~500, and the same five cells stretched to ~100
+  // each. Nothing got bigger; the gaps did. Stretched, precisely.
+  //
+  // STAT_ROW_MAX_WIDTH caps the row at the phone measure it was designed for,
+  // so the numbers stay grouped and the card's extra width becomes margin
+  // instead of gaps between columns.
+  //
+  // ⚠ MOBILE IS UNTOUCHED, and not by luck: the constant is `undefined` on
+  // native, so this key is absent from the style object entirely — not a large
+  // number that merely happens never to bind.
+  row: { flexDirection: 'row', gap: 4, marginTop: 3, maxWidth: STAT_ROW_MAX_WIDTH },
   // OTA-747 — each stat CENTERS its label+value in its equal-width cell, so the
   // columns read as evenly distributed regardless of how wide the value is
   // (a wide "35/109" no longer crowds the left while "20"/"34" leave big gaps).

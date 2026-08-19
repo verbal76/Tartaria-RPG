@@ -87,6 +87,22 @@ jobs:
       # there was no flat config, so the job errored out and was non-blocking).
       - name: Lint (blocking)
         run: npm run lint
+      # HANDOFF prohibition ratchet. HANDOFF.md is a one-way write channel between
+      # sessions with no review step, so a confident WRONG sentence propagates with
+      # the same authority as a measured one. The dangerous shape is a prohibition
+      # ("you cannot gate spin-offs locally") — a wrong instruction fails loudly the
+      # first time someone follows it, a wrong prohibition fails silently forever
+      # because nobody attempts the thing. This fails the build when a new one is
+      # added without a receipt saying how and when it was established. Grandfathered
+      # at a baseline; the debt can only ratchet DOWN.
+      - name: HANDOFF claims ratchet (blocking)
+        run: npm run check:handoff
+
+      # Content reachability — authored content the player can never get to is the same
+      # defect as content never written, and harder to notice. Data references only; see
+      # PUNCHLIST.md for what this cannot see.
+      - name: Content reachability (blocking)
+        run: npm run check:reachability
 
   test:
     name: jest (fast · required)

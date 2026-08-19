@@ -12,6 +12,13 @@ import { LoreCodexBody } from '../components/LoreCodexBody';
 
 export function LoreScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
+  // ⚠⚠ OTA-1293 (port of golem OTA-1292) — BACK GOES WHERE YOU CAME FROM. This
+  // screen was built as a title-menu destination and its BACK was hard-wired
+  // setScreen('title') — then the exploration crest nav (◈ LORE) started
+  // linking here MID-GAME, and reading the bestiary ended with the player
+  // dumped onto the character select. With a live character, BACK returns to
+  // the game; only the true title-menu path leaves.
+  const inSession = useGameStore((s) => s.player !== null);
 
   return (
     <View style={styles.container}>
@@ -22,7 +29,7 @@ export function LoreScreen() {
       />
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => setScreen('title')}
+          onPress={() => setScreen(inSession ? 'exploration' : 'title')}
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}

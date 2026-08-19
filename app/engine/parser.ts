@@ -69,7 +69,7 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     // construct" failing to advance the wreck_construct hook because
     // there was no salvage verb. Investigate is hook-eligible, so
     // mapping salvage here advances the hook with the right noun.
-    'salvage', 'strip', 'pry',
+    'salvage', 'scrap', 'strip', 'pry',
     // From the track / translate / learn / gather cards.
     'track', 'translate', 'learn', 'gather',
     // 'open' belongs to the dedicated open intent — it persists
@@ -109,6 +109,19 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'ring', 'pray', 'touch', 'tilt', 'whistle', 'shout', 'chant', 'kneel',
     'hum', 'stroke', 'caress', 'salute', 'beckon', 'sound', 'signal',
     'answer', 'respond', 'feel', 'bang', 'strike a note', 'clap',
+    // ⚠ OTA-1178 — SITTING DOWN, because the game kept ASKING FOR IT and then
+    // refusing. Halem's gift line ends *"there's a bowl of something hot for you
+    // if you'll sit"* — and `sit` was in no synonym list at all, so the owner typed
+    // "sit", then "I'll sit", then "sit with halem", and got the generic
+    // "Try: look around · search · rest" three times running. That is the
+    // OTA-710 lesson exactly ("if there's a call to action, it has to actually DO
+    // something"), and it landed on a line THIS project wrote one OTA earlier.
+    // Home is `gesture` and not `wait`/`rest`: sitting is a posture you take
+    // toward something, so it should reach a hook if one wants it and otherwise
+    // draw a flavour beat — not silently burn eight hours of sleep.
+    // 'sit down' / 'take a seat' are multi-word so they collapse to one token and
+    // leave the target EMPTY, which is what selects the bare (no-noun) lines.
+    'sit', 'sit down', 'take a seat',
   ],
   inventory: [
     // 'bag' removed — too greedy: "bag the goblin" / "tea bag" / "sandbag"
@@ -132,7 +145,13 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   wait: ['wait', 'stay', 'hold', 'pause', 'still', 'linger', 'tarry', 'idle', 'bide', 'remain'],
   // OTA-241 — 'ask' moved here from diplomacy. The verb is
   // informational ("ask about X", "ask the arbiter") not negotiation.
-  ask: ['ask', 'what', 'explain', 'define', 'who', 'how', 'why', 'tell', 'describe', 'clarify', 'mean'],
+  // ⚠⚠ OTA-1265 — 'where' and 'when' were MISSING from this list while
+  // their four siblings were present, so a question that named an action
+  // performed it: "where can I sleep" slept 8 hours, "when does the shop
+  // open" opened the chest. The wh-word sits at index 0 and the verb scan
+  // takes the FIRST minimum-distance hit, so restoring them is enough to
+  // let the question win the race — no new mechanism required.
+  ask: ['ask', 'what', 'explain', 'define', 'who', 'how', 'why', 'where', 'when', 'tell', 'describe', 'clarify', 'mean'],
   craft: [
     // 'construct' removed — playtest caught "salvage the construct"
     // routing to craft because 'construct' matched as a verb here,
@@ -449,6 +468,24 @@ const VERB_SYNONYMS_LOOKUP: Record<Exclude<Intent, 'unknown'>, string[]> =
     }
     return out;
   })();
+
+/** OTA-1178 — "did the player actually ask to hold still?", answered by the ONE
+ *  verb table that defines the wait intent.
+ *
+ *  ⚠ WHY THIS IS EXPORTED. `qwenRephraseRejection` in gameStore guards the LLM
+ *  parse-repair against inventing a do-nothing wait, and it did that against a
+ *  hand-typed `/wait|hold|stay|linger|pause|bide/` — a six-word copy of a
+ *  ten-word list. `still`, `tarry`, `idle` and `remain` were invisible to it, so a
+ *  player who typed one of them and got an honest `wait` repair back had it
+ *  rejected as an invention. Same shape as OTA-1175's three ready-predicates: a
+ *  second definition of somebody else's list, drifting quietly. Now there is one.
+ *
+ *  Matches whole words only, and (via VERB_SYNONYMS_LOOKUP) the collapsed form of
+ *  any multi-word wait synonym a future OTA adds. */
+export function mentionsWaitVerb(text: string): boolean {
+  const t = ` ${(text ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ')} `;
+  return VERB_SYNONYMS.wait.some((v) => t.includes(` ${v.toLowerCase()} `));
+}
 
 function fuzzyEqual(word: string, candidate: string): boolean {
   if (word === candidate) return true;
@@ -1409,6 +1446,10 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
     ambientNouns: context.ambientNouns,
     vendorName: context.vendorName,
     enemyNames: context.enemyNames,
+    // ⚠⚠ OTA-1265 — the negation rule needs the verb's real position.
+    // `matchedVerb` cannot supply it: on a fuzzy hit ("attck" → 'attack')
+    // the canonical synonym never appears in `normalized` at all.
+    verbTokenIndex: bestMatch.index,
   });
   if (shouldRejectParse(issues)) {
     return {

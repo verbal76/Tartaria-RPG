@@ -1,72 +1,566 @@
 {
   "beats": {
     "debt": [
-      { "id": "debt_1", "minHours": 6, "minCores": 0, "speaker": "world", "text": "A rope-head runner finds you at the fire and hands you a folded slip with nothing spoken. The figure inside is your debt, recalculated with interest, in a clerk's hand that never hurries. They know you went below. The ledger has simply moved its chair closer to the rope." },
-      { "id": "debt_2", "minHours": 16, "minCores": 0, "speaker": "arbiter", "text": "The Arbiter watches you sort the night's salvage into two piles without being asked. \"Theirs and yours,\" the voice says. \"You count like a man paying ransom. One day the piles will be one pile. I would like to see what you count like then.\"" },
-      { "id": "debt_3", "minHours": 30, "minCores": 1, "speaker": "world", "text": "Word filters down the rope-head with the week's freight: your debt has been sold. The new holder is worse — patient, and fond of salvage manifests. Somewhere above, a finger is moving down a list of everything you have pried out of the mud. Let it move. The list is about to get heavy." },
-      { "id": "debt_4", "minHours": 48, "minCores": 2, "speaker": "world", "text": "A stranger in a clean coat is waiting at the outpost, and he quotes your remaining balance to the disc — then offers to clear it, whole, for what rides in your pack. He has done the sums too. You decline without a word, and watch him understand, slowly, that the debt is no longer the biggest number in your life." },
-      { "id": "debt_5", "minHours": 70, "minCores": 3, "speaker": "arbiter", "text": "\"You have stopped counting in seasons,\" the Arbiter says. \"You count in Cores now. I keep every ledger under the mud, so believe me when I tell you: somewhere above, a clerk has started checking his arithmetic twice. The ledger is afraid of you. Ledgers are wise that way.\"" }
+      {
+        "id": "debt_1",
+        "minHours": 6,
+        "minCores": 0,
+        "speaker": "world",
+        "text": "A rope-head runner finds you at the fire and hands you a folded slip with nothing spoken. The figure inside is your debt, recalculated with interest, in a clerk's hand that never hurries. They know you went below. The ledger has simply moved its chair closer to the rope."
+      },
+      {
+        "id": "debt_2",
+        "minHours": 16,
+        "minCores": 0,
+        "speaker": "arbiter",
+        "text": "The Arbiter watches you sort the night's salvage into two piles without being asked. \"Theirs and yours,\" the voice says. \"You count like a man paying ransom. One day the piles will be one pile. I would like to see what you count like then.\""
+      },
+      {
+        "id": "debt_3",
+        "minHours": 30,
+        "minCores": 1,
+        "speaker": "world",
+        "text": "Word filters down the rope-head with the week's freight: your debt has been sold. The new holder is worse — patient, and fond of salvage manifests. Somewhere above, a finger is moving down a list of everything you have pried out of the mud. Let it move. The list is about to get heavy."
+      },
+      {
+        "id": "debt_4",
+        "minHours": 48,
+        "minCores": 2,
+        "speaker": "world",
+        "text": "A stranger in a clean coat is waiting at the outpost, and he quotes your remaining balance to the disc — then offers to clear it, whole, for what rides in your pack. He has done the sums too. You decline without a word, and watch him understand, slowly, that the debt is no longer the biggest number in your life."
+      },
+      {
+        "id": "debt_5",
+        "minHours": 70,
+        "minCores": 3,
+        "speaker": "arbiter",
+        "text": "\"You have stopped counting in seasons,\" the Arbiter says. \"You count in Cores now. I keep every ledger under the mud, so believe me when I tell you: somewhere above, a clerk has started checking his arithmetic twice. The ledger is afraid of you. Ledgers are wise that way.\""
+      }
     ],
     "missing": [
-      { "id": "missing_1", "minHours": 6, "minCores": 0, "speaker": "world", "text": "In the rope-head's water-swollen registry, between names nobody came back for, you find the mark you were looking for: {name}, signed down three years ago. The ink is steady. Whatever they felt at the top of the rope, their hand didn't shake. You sign the same page and keep the pen a moment too long." },
-      { "id": "missing_2", "minHours": 16, "minCores": 0, "speaker": "world", "text": "An old salvager at the fire remembers {name} — paid for a meal in stories, asked after the deep capitals, laughed easily. \"Headed down and east,\" she says, then looks at you the way people look when they recognize a face they've seen once before, younger. She doesn't say good luck. Down here that means she means it." },
-      { "id": "missing_3", "minHours": 30, "minCores": 1, "speaker": "world", "text": "Behind a collapsed lintel you find a dry cache, packed with a traveler's neatness: rations gone to dust, a coil of rope, and a date scratched into the tin — a date AFTER the letters stopped. {name} lived past the last letter. The silence wasn't the end of the story. You repack the cache the way you found it, minus the ache." },
-      { "id": "missing_4", "minHours": 48, "minCores": 2, "speaker": "arbiter", "text": "\"I keep the roll of everyone who walks below,\" the Arbiter says, gently, for once. \"I am not permitted to read it to you. I will say this: the trail you are following is real, and it bends toward the Lost Capitals — and the mud is not always careful about what it keeps whole. Prepare for every answer. There are three.\"" },
-      { "id": "missing_5", "minHours": 70, "minCores": 3, "speaker": "world", "text": "A fight happened here — Hollowed, by the drag-marks, but one set of prints moves like drilled muscle, feet set the way a living fighter sets them. On the wall above, scratched fresh through a thousand years of silt: {name}'s mark. Your blood goes loud. The next Capital will answer, one way, or the other, or the third way." }
+      {
+        "id": "missing_1",
+        "minHours": 6,
+        "minCores": 0,
+        "speaker": "world",
+        "text": "In the rope-head's water-swollen registry, between names nobody came back for, you find the mark you were looking for: {name}, signed down three years ago. The ink is steady. Whatever they felt at the top of the rope, their hand didn't shake. You sign the same page and keep the pen a moment too long."
+      },
+      {
+        "id": "missing_2",
+        "minHours": 16,
+        "minCores": 0,
+        "speaker": "world",
+        "text": "An old salvager at the fire remembers {name} — paid for a meal in stories, asked after the deep capitals, laughed easily. \"Headed down and east,\" she says, then looks at you the way people look when they recognize a face they've seen once before, younger. She doesn't say good luck. Down here that means she means it."
+      },
+      {
+        "id": "missing_3",
+        "minHours": 30,
+        "minCores": 1,
+        "speaker": "world",
+        "text": "Behind a collapsed lintel you find a dry cache, packed with a traveler's neatness: rations gone to dust, a coil of rope, and a date scratched into the tin — a date AFTER the letters stopped. {name} lived past the last letter. The silence wasn't the end of the story. You repack the cache the way you found it, minus the ache."
+      },
+      {
+        "id": "missing_4",
+        "minHours": 48,
+        "minCores": 2,
+        "speaker": "arbiter",
+        "text": "\"I keep the roll of everyone who walks below,\" the Arbiter says, gently, for once. \"I am not permitted to read it to you. I will say this: the trail you are following is real, and it bends toward the Lost Capitals — and the mud is not always careful about what it keeps whole. Prepare for every answer. There are three.\""
+      },
+      {
+        "id": "missing_5",
+        "minHours": 70,
+        "minCores": 3,
+        "speaker": "world",
+        "text": "A fight happened here — Hollowed, by the drag-marks, but one set of prints moves like drilled muscle, feet set the way a living fighter sets them. On the wall above, scratched fresh through a thousand years of silt: {name}'s mark. Your blood goes loud. The next Capital will answer, one way, or the other, or the third way."
+      }
     ],
     "exile": [
-      { "id": "exile_1", "minHours": 6, "minCores": 0, "speaker": "world", "text": "Tacked to the rope-head board, under fresher paper, you find a surface warrant gone soft with mud-damp — the seal legible, the name washed to a gray ghost. It might be yours. It might be anyone's. Down here even paper forgets, and it only took a season. You leave it where it hangs, retiring." },
-      { "id": "exile_2", "minHours": 16, "minCores": 0, "speaker": "arbiter", "text": "\"You keep waiting for me to ask what you did,\" the Arbiter says. \"I keep the ledger of what you do. Above ground a name is a verdict. Down here it is a running total, and yours is still being written. I find the second arrangement more honest, and I notice you are starting to.\"" },
-      { "id": "exile_3", "minHours": 30, "minCores": 1, "speaker": "world", "text": "At the fire you hear yourself described by a stranger who doesn't know you're listening: the one who lifted a heart out of a drowned capital and carried it up whole. The title they hang on you is clumsy, invented, and wrong in the details — and it is the first name you have carried that you didn't inherit, buy, or flee. You let them keep telling it wrong." },
-      { "id": "exile_4", "minHours": 48, "minCores": 2, "speaker": "world", "text": "News from above filters down with the freight: they have stopped telling your story up there. Someone else is the season's villain; your chair at the trial has been given away. You wait for the relief and get something stranger — grief, small and specific, for the person whose ending they wrote. That person is not who is standing in this mud." },
-      { "id": "exile_5", "minHours": 70, "minCores": 3, "speaker": "arbiter", "text": "\"The warrant above has lapsed,\" the Arbiter says. \"Filed, unrenewed, forgotten — you could go up tomorrow and reclaim the smaller life they left you. I note, for the ledger, that you did not turn for the rope-head when I said it. The buried country does not forgive, exactly. It just keeps better books.\"" }
+      {
+        "id": "exile_1",
+        "minHours": 6,
+        "minCores": 0,
+        "speaker": "world",
+        "text": "Tacked to the rope-head board, under fresher paper, you find a surface warrant gone soft with mud-damp — the seal legible, the name washed to a gray ghost. It might be yours. It might be anyone's. Down here even paper forgets, and it only took a season. You leave it where it hangs, retiring."
+      },
+      {
+        "id": "exile_2",
+        "minHours": 16,
+        "minCores": 0,
+        "speaker": "arbiter",
+        "text": "\"You keep waiting for me to ask what you did,\" the Arbiter says. \"I keep the ledger of what you do. Above ground a name is a verdict. Down here it is a running total, and yours is still being written. I find the second arrangement more honest, and I notice you are starting to.\""
+      },
+      {
+        "id": "exile_3",
+        "minHours": 30,
+        "minCores": 1,
+        "speaker": "world",
+        "text": "At the fire you hear yourself described by a stranger who doesn't know you're listening: the one who lifted a heart out of a drowned capital and carried it up whole. The title they hang on you is clumsy, invented, and wrong in the details — and it is the first name you have carried that you didn't inherit, buy, or flee. You let them keep telling it wrong."
+      },
+      {
+        "id": "exile_4",
+        "minHours": 48,
+        "minCores": 2,
+        "speaker": "world",
+        "text": "News from above filters down with the freight: they have stopped telling your story up there. Someone else is the season's villain; your chair at the trial has been given away. You wait for the relief and get something stranger — grief, small and specific, for the person whose ending they wrote. That person is not who is standing in this mud."
+      },
+      {
+        "id": "exile_5",
+        "minHours": 70,
+        "minCores": 3,
+        "speaker": "arbiter",
+        "text": "\"The warrant above has lapsed,\" the Arbiter says. \"Filed, unrenewed, forgotten — you could go up tomorrow and reclaim the smaller life they left you. I note, for the ledger, that you did not turn for the rope-head when I said it. The buried country does not forgive, exactly. It just keeps better books.\""
+      }
     ],
     "calling": [
-      { "id": "calling_1", "minHours": 6, "minCores": 0, "speaker": "world", "text": "You wake facing down-slope again — third night running, bedroll dragged a hand's width in your sleep, your palm flat against the ground like an ear. The hum is quieter than it was above. Not weaker. Quieter, the way a voice goes quiet when it no longer has to shout across a distance." },
-      { "id": "calling_2", "minHours": 16, "minCores": 0, "speaker": "arbiter", "text": "\"Every walker checks their gear at first light,\" the Arbiter says. \"You check the hum first — pitch, direction, mood — and your gear after. I have kept the ledger a long time. The ones who hear it either learn its grammar or are unmade by its grammar. You appear to be learning. Continue.\"" },
-      { "id": "calling_3", "minHours": 30, "minCores": 1, "speaker": "world", "text": "The Core in your pack has changed the hum — harmonized it, one true chord where the old ache used to be. At the outpost an old woman stops you with a hand on your sleeve. \"You hear it too,\" she says. Not a question. Hers is faint, she says, always was; she weeps, without ceremony, when your pack passes her. \"Louder,\" she calls after you. \"It likes you better.\"" },
-      { "id": "calling_4", "minHours": 48, "minCores": 2, "speaker": "world", "text": "Tonight, for the first time, the hum answered you. You hummed the walking-note you've carried since childhood and the ground gave it back a third lower, patient, corrective — the way a teacher returns an almost-right sum. The direction has stopped being DOWN. It is specific now. It knows where you both are going." },
-      { "id": "calling_5", "minHours": 70, "minCores": 3, "speaker": "arbiter", "text": "\"I have watched the Aether take an interest in walkers before,\" the Arbiter says. \"It hunts some. It haunts some. Yours is neither — I have listened, and what it does with you is closer to teaching. It is walking you home the long way, and correcting your pronunciation as you go. Which home, you will learn at the bottom.\"" }
+      {
+        "id": "calling_1",
+        "minHours": 6,
+        "minCores": 0,
+        "speaker": "world",
+        "text": "You wake facing down-slope again — third night running, bedroll dragged a hand's width in your sleep, your palm flat against the ground like an ear. The hum is quieter than it was above. Not weaker. Quieter, the way a voice goes quiet when it no longer has to shout across a distance."
+      },
+      {
+        "id": "calling_2",
+        "minHours": 16,
+        "minCores": 0,
+        "speaker": "arbiter",
+        "text": "\"Every walker checks their gear at first light,\" the Arbiter says. \"You check the hum first — pitch, direction, mood — and your gear after. I have kept the ledger a long time. The ones who hear it either learn its grammar or are unmade by its grammar. You appear to be learning. Continue.\""
+      },
+      {
+        "id": "calling_3",
+        "minHours": 30,
+        "minCores": 1,
+        "speaker": "world",
+        "text": "The Core in your pack has changed the hum — harmonized it, one true chord where the old ache used to be. At the outpost an old woman stops you with a hand on your sleeve. \"You hear it too,\" she says. Not a question. Hers is faint, she says, always was; she weeps, without ceremony, when your pack passes her. \"Louder,\" she calls after you. \"It likes you better.\""
+      },
+      {
+        "id": "calling_4",
+        "minHours": 48,
+        "minCores": 2,
+        "speaker": "world",
+        "text": "Tonight, for the first time, the hum answered you. You hummed the walking-note you've carried since childhood and the ground gave it back a third lower, patient, corrective — the way a teacher returns an almost-right sum. The direction has stopped being DOWN. It is specific now. It knows where you both are going."
+      },
+      {
+        "id": "calling_5",
+        "minHours": 70,
+        "minCores": 3,
+        "speaker": "arbiter",
+        "text": "\"I have watched the Aether take an interest in walkers before,\" the Arbiter says. \"It hunts some. It haunts some. Yours is neither — I have listened, and what it does with you is closer to teaching. It is walking you home the long way, and correcting your pronunciation as you go. Which home, you will learn at the bottom.\""
+      }
     ],
     "record": [
-      { "id": "record_1", "minHours": 6, "minCores": 0, "speaker": "world", "text": "Your notes have outgrown the first book — margins full, endpapers full, your own shorthand invading the flyleaf. The outpost vendor sells you a second, waterproofed, and asks what a salvager needs two books for. You realize, counting back, that no one above ground ever asked you that. They asked when you would stop." },
-      { "id": "record_2", "minHours": 16, "minCores": 0, "speaker": "arbiter", "text": "\"Everyone down here takes,\" the Arbiter says. \"Salvage, standing, revenge. You take dictation. I keep the only other honest ledger under the mud, so understand that I mean this professionally: you write down what the others melt for coin. One of us should. Two of us, now.\"" },
-      { "id": "record_3", "minHours": 30, "minCores": 1, "speaker": "world", "text": "You spend an hour with a surface history in one hand and a drowned wall in the other, and the wall wins. The standard account is wrong by a century and a kingdom — a date copied wrong four hundred years ago and repeated by every scholar since, none of whom could touch the stone. You correct it in your margin. One line. It feels like moving a mountain one inch." },
-      { "id": "record_4", "minHours": 48, "minCores": 2, "speaker": "world", "text": "An Order scribe offers to buy your notebook at the fire — sight unseen, the price of a good blade, coin on the table. \"Whatever is in it,\" he says, \"the Cloister wants it whole.\" You refuse before you decide to, hand already flat on the cover. He nods like a man whose theory just confirmed itself. The refusal teaches you the book's real price." },
-      { "id": "record_5", "minHours": 70, "minCores": 3, "speaker": "arbiter", "text": "\"Histories are written by the ones who go back up,\" the Arbiter says. \"I have watched a thousand walkers see what you have seen, and the mud has their notes now. Every page you fill is a survivor's obligation — the buried country talking through the one hand still moving. Fill them all. Then climb.\"" }
+      {
+        "id": "record_1",
+        "minHours": 6,
+        "minCores": 0,
+        "speaker": "world",
+        "text": "Your notes have outgrown the first book — margins full, endpapers full, your own shorthand invading the flyleaf. The outpost vendor sells you a second, waterproofed, and asks what a salvager needs two books for. You realize, counting back, that no one above ground ever asked you that. They asked when you would stop."
+      },
+      {
+        "id": "record_2",
+        "minHours": 16,
+        "minCores": 0,
+        "speaker": "arbiter",
+        "text": "\"Everyone down here takes,\" the Arbiter says. \"Salvage, standing, revenge. You take dictation. I keep the only other honest ledger under the mud, so understand that I mean this professionally: you write down what the others melt for coin. One of us should. Two of us, now.\""
+      },
+      {
+        "id": "record_3",
+        "minHours": 30,
+        "minCores": 1,
+        "speaker": "world",
+        "text": "You spend an hour with a surface history in one hand and a drowned wall in the other, and the wall wins. The standard account is wrong by a century and a kingdom — a date copied wrong four hundred years ago and repeated by every scholar since, none of whom could touch the stone. You correct it in your margin. One line. It feels like moving a mountain one inch."
+      },
+      {
+        "id": "record_4",
+        "minHours": 48,
+        "minCores": 2,
+        "speaker": "world",
+        "text": "An Order scribe offers to buy your notebook at the fire — sight unseen, the price of a good blade, coin on the table. \"Whatever is in it,\" he says, \"the Cloister wants it whole.\" You refuse before you decide to, hand already flat on the cover. He nods like a man whose theory just confirmed itself. The refusal teaches you the book's real price."
+      },
+      {
+        "id": "record_5",
+        "minHours": 70,
+        "minCores": 3,
+        "speaker": "arbiter",
+        "text": "\"Histories are written by the ones who go back up,\" the Arbiter says. \"I have watched a thousand walkers see what you have seen, and the mud has their notes now. Every page you fill is a survivor's obligation — the buried country talking through the one hand still moving. Fill them all. Then climb.\""
+      }
     ]
   },
-  "missingResolution": {
-    "grave": {
-      "arrival": [
-        { "speaker": "world", "text": "In a dry gallery above the flood-line you find a bivouac gone still — a season's careful camp: bedroll squared, lamp trimmed and cold, a pack strapped shut against weather that never came inside. You know the knot on the pack strap. You know it because {name} could never tie it right, and this one is tied right, the way you finally taught them." },
-        { "speaker": "world", "text": "The cairn is behind the camp, built the surface way, stone by carried stone — weeks of work, done by the only hands here. The marker is scratched deep and re-scratched deeper, meant to outlast damp and years and you name it: {name}'s mark. And beneath it, in letters gone brown: IT WAS REAL. I FOUND IT. TELL THEM." },
-        { "speaker": "arbiter", "text": "The Arbiter is quiet a long time before the voice comes, and when it comes it is soft. \"The mud did not take this one. They lay themselves down whole, in a dry room, with the work finished. Grave — not lie, and nothing walks. The roll marks them found. Carry them home in the telling, walker. That is what the message is for.\"" }
-      ],
-      "keepsake": { "name": "Weathered Locket", "description": "Their locket, kept dry through three winters below the flood, set square on the cairn where a searcher would find it. The clasp still works. It is heavier than it looks." },
-      "epilogue": "You found the grave, and the message it was built to keep: IT WAS REAL. I FOUND IT. TELL THEM. And you will — for the rest of your life, in every telling. The letters can stop asking now. The last one rides in your coat unsewn: read, answered, at rest."
+  "resolutions": {
+    "missing": {
+      "grave": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "In a dry gallery above the flood-line you find a bivouac gone still — a season's careful camp: bedroll squared, lamp trimmed and cold, a pack strapped shut against weather that never came inside. You know the knot on the pack strap. You know it because {name} could never tie it right, and this one is tied right, the way you finally taught them."
+          },
+          {
+            "speaker": "world",
+            "text": "The cairn is behind the camp, built the surface way, stone by carried stone — weeks of work, done by the only hands here. The marker is scratched deep and re-scratched deeper, meant to outlast damp and years and you name it: {name}'s mark. And beneath it, in letters gone brown: IT WAS REAL. I FOUND IT. TELL THEM."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "The Arbiter is quiet a long time before the voice comes, and when it comes it is soft. \"The mud did not take this one. They lay themselves down whole, in a dry room, with the work finished. Grave — not lie, and nothing walks. The roll marks them found. Carry them home in the telling, walker. That is what the message is for.\""
+          }
+        ],
+        "keepsake": {
+          "name": "Weathered Locket",
+          "description": "Their locket, kept dry through three winters below the flood, set square on the cairn where a searcher would find it. The clasp still works. It is heavier than it looks."
+        },
+        "epilogue": "You found the grave, and the message it was built to keep: IT WAS REAL. I FOUND IT. TELL THEM. And you will — for the rest of your life, in every telling. The letters can stop asking now. The last one rides in your coat unsewn: read, answered, at rest."
+      },
+      "lie": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "You hear the laughter before you see the camp — a working salvage crew bunked above the flood-line, live and loud. And at the edge of the firelight, straightening up with a crate in both arms, is {name}. Alive. Older. Whole. Their eyes find yours and go through shock, joy, and shame in a single breath, and the crate hits the mud."
+          },
+          {
+            "speaker": "world",
+            "text": "The story comes out crooked and half-swallowed. They never went as deep as the letters said. The ninth capital, the light under the mud — embroidery, written to keep you proud of them. The money was real; the plan was real; but sending it home meant facing the door, and season stacked on season until the lie was taller than the rope. \"I read your name in the registry last month,\" they say. \"I've been rehearsing this since.\""
+          },
+          {
+            "speaker": "arbiter",
+            "text": "\"Not a grave,\" the Arbiter says, with something that is almost wonder. \"Not a walker. A lie — and a living liar to answer for it. That is the rarest ending under the mud; the roll has marked three in a hundred years. What you do with a found liar is not mine to weigh. The ledger only notes: FOUND. ALIVE.\""
+          }
+        ],
+        "keepsake": {
+          "name": "Unsent Letter",
+          "description": "Every letter they wrote and never sent, bundled in oilcloth, the last one half-finished mid-sentence. All of them are addressed to you."
+        },
+        "epilogue": "You came down for the dead and found the living, and learned the living are harder. You did not forgive them at the camp; you forgave them somewhere on the long walk after — or you are still walking toward it. Either way: found, alive, and the question is over. The answer talks too much at dinner now, and you would not trade it for any relic in the mud."
+      },
+      "walker": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "The gallery ahead is wrong. The silt is swept — swept, in drag-lines, into tidy banks against the walls — and the shelves of a drowned home have been re-set with salvage, piece by piece, in a parody of housekeeping. Someone has been maintaining a dead room. For a long time."
+          },
+          {
+            "speaker": "world",
+            "text": "It stands at the far wall wearing {name}'s coat and {name}'s shoulders, setting a cup on a shelf with terrible care, the homecoming rehearsed ten thousand times by something that only remembers the shape of it. It turns. The face is theirs, mud-kept and patient. It says your name — correctly — the way a door says a name: hinge and habit, and no one home."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "The Arbiter's voice drops to almost nothing. \"Steady, walker. This is the third answer — the thing that walks. The mud kept the body and the Aether kept the habits, and between them there is nothing left that can be brought home. It remembers the shape of loving you and nothing else. Put it to rest. That is the only letter left to write.\""
+          }
+        ],
+        "defeat": [
+          {
+            "speaker": "world",
+            "text": "It folds down slowly, like three years of tiredness arriving all at once. The Aether-light goes out of the joints first, then the hands, then the face — and for one clear breath the mud lets go, and it is only {name}: who looks at you, and knows you, all the way through, and is finally allowed to stop."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "\"It is done,\" the Arbiter says. \"The roll marks {name}: found, and carried home the only way left. No walker under the mud has done a harder thing today. The trail ends here. Rest is yours to give, and you gave it.\""
+          }
+        ],
+        "keepsake": {
+          "name": "Mud-Kept Locket",
+          "description": "It was around their neck the whole time, under the coat, under three years of silt. Beneath the tarnish the clasp still works."
+        },
+        "epilogue": "You got the worst answer, and gave the only mercy left in the world to give. The thing that walked was not them — putting it to rest WAS. You carried the truth up the Stair: the mud keeps, the Aether moves, and love is the one thing it cannot counterfeit well enough. They rest. You carry the locket. The quiet is earned."
+      }
     },
-    "lie": {
-      "arrival": [
-        { "speaker": "world", "text": "You hear the laughter before you see the camp — a working salvage crew bunked above the flood-line, live and loud. And at the edge of the firelight, straightening up with a crate in both arms, is {name}. Alive. Older. Whole. Their eyes find yours and go through shock, joy, and shame in a single breath, and the crate hits the mud." },
-        { "speaker": "world", "text": "The story comes out crooked and half-swallowed. They never went as deep as the letters said. The ninth capital, the light under the mud — embroidery, written to keep you proud of them. The money was real; the plan was real; but sending it home meant facing the door, and season stacked on season until the lie was taller than the rope. \"I read your name in the registry last month,\" they say. \"I've been rehearsing this since.\"" },
-        { "speaker": "arbiter", "text": "\"Not a grave,\" the Arbiter says, with something that is almost wonder. \"Not a walker. A lie — and a living liar to answer for it. That is the rarest ending under the mud; the roll has marked three in a hundred years. What you do with a found liar is not mine to weigh. The ledger only notes: FOUND. ALIVE.\"" }
-      ],
-      "keepsake": { "name": "Unsent Letter", "description": "Every letter they wrote and never sent, bundled in oilcloth, the last one half-finished mid-sentence. All of them are addressed to you." },
-      "epilogue": "You came down for the dead and found the living, and learned the living are harder. You did not forgive them at the camp; you forgave them somewhere on the long walk after — or you are still walking toward it. Either way: found, alive, and the question is over. The answer talks too much at dinner now, and you would not trade it for any relic in the mud."
+    "debt": {
+      "settled": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "You find the collection route the way you find everything down here: by tripping over what it left behind. A courier's satchel, oilcloth, wedged in a root-mass above the flood-line — and inside it the {name} house's field ledger, water-stained and perfectly legible. Your name is in it. Your name is in it twice."
+          },
+          {
+            "speaker": "world",
+            "text": "The second entry is a closing entry. Somebody settled the account eleven months ago — cash, in full, no name recorded against the payment, the clerk's hand visibly annoyed about it. The figure that has been sitting under your ribs since the day you came down is written there with a line drawn through it, and the line is a year old. You have been paying off a debt that was already paid, in a place nobody sent you to."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "The Arbiter lets that sit a while. \"Someone up there closed it and did not tell you. That is either the kindest thing anyone has ever done for you or the last word in a very long argument, and you will not settle which one tonight.\" A pause. \"The roll marks the account: CLOSED. What you owe now you owe to yourself, and that ledger was never mine to hold.\""
+          }
+        ],
+        "keepsake": {
+          "name": "Struck Ledger-Leaf",
+          "description": "The page torn clean out of the {name} house's field ledger: your name, the figure, and a line drawn through it in a hand that is not theirs."
+        },
+        "epilogue": "The debt was paid before you ever reached the ninth capital, by someone up there who would not sign the payment. You spent a year underground settling an account that was already closed, and you would do it again, because you did not know. What you carried up the Stair was the torn page and a harder question: who, and why, and whether you can stand to go and ask."
+      },
+      "bought": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "The lamp is the wrong colour for down here — clean oil, steady, hung deliberately where a person expects to be found. Under it, at a folding desk that must have been carried a very long way, a woman is doing sums. She does not look up. \"The {name} house sold you,\" she says. \"Eight months ago, in a bundle of forty-one names. I bought the bundle. You are the only one who came down.\""
+          },
+          {
+            "speaker": "world",
+            "text": "She turns the book so you can read it. The figure is unchanged; the letterhead is not. \"I do not want coin,\" she says. \"Coin I have. I want somebody who can walk the Deep and come back, and I want them owing me. That is what I paid for.\" She rests the pen. \"The account stays open. You will not hear from me again until you are back up top with whatever you came down for. Then we talk, once, and it closes for good — one way or the other.\""
+          },
+          {
+            "speaker": "arbiter",
+            "text": "The Arbiter is careful. \"That is not a threat and it is not a kindness. She has priced you correctly, which is worse.\" A beat. \"The roll marks the account: SOLD, HELD, and honest about it. Every debt down here is somebody's investment, walker. It is rare that they come and say so to your face.\""
+          }
+        ],
+        "keepsake": {
+          "name": "Bill of Transfer",
+          "description": "Forty-one names bundled and sold, yours ninth on the list. Countersigned, dated, and pressed on you on purpose, so you would carry proof of who owns the account."
+        },
+        "epilogue": "Your debt was sold in a bundle of forty-one names and the buyer came down the Stair to look you in the face. You are not free, exactly. You are held, by somebody who thinks you are worth holding — which is the closest thing to being valued you have had in years, and you have decided not to examine why that steadied you."
+      },
+      "collector": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "You hear the ledger before you see him: the flat rhythm of a page turned, and turned, and turned, in a gallery with no lamp in it. The coat was good once. The satchel is still strapped correctly. He has been walking the collection route for a very long time and he has not missed a day."
+          },
+          {
+            "speaker": "world",
+            "text": "The Aether kept the habit and threw the man away. He lifts the book toward a light that is not there, finds a line by feel, and reads your name off it in a voice like a door moving in wind — the account, the figure, the compounding, every part of it exactly right. Then he closes the book, and puts it away carefully, and comes to collect the only thing he can still take."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "\"The {name} house sent him down and never sent for him back,\" the Arbiter says quietly. \"Three years on a route with no end and nobody to report to. There is no coin in your purse that settles this — the part of him that could take payment is gone, and the part that collects is all there is.\" A beat. \"Put him down, walker. It is the only receipt left.\""
+          }
+        ],
+        "defeat": [
+          {
+            "speaker": "world",
+            "text": "He goes down mid-step, the way a man does when the road finally ends, and the satchel spills: forty pages of route notes in a small careful hand, every one of them dated, the last one three years old and stopping mid-word. Underneath them, folded flat and pressed smooth a hundred times, a letter of resignation he wrote and never sent up."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "\"The roll marks it closed,\" the Arbiter says. \"Not paid — closed. He was somebody's employee and they left him out on the route, and you are the only one who will ever know he kept walking it.\" A pause. \"Take the resignation. Somebody ought to carry it up.\""
+          }
+        ],
+        "keepsake": {
+          "name": "Unsent Resignation",
+          "description": "Written in a good hand on the road, folded flat, addressed to the {name} house and never delivered. He was quitting. He had been quitting for three years."
+        },
+        "epilogue": "The debt sent a man down after you and forgot to send for him back, and by the time you met he was only the walking part of the job. You put him down and carried up his resignation — the one thing in the whole affair that anybody actually meant. The figure you owed stopped mattering somewhere in that gallery. You never told the house what became of their collector, and you never will."
+      }
     },
-    "walker": {
-      "arrival": [
-        { "speaker": "world", "text": "The gallery ahead is wrong. The silt is swept — swept, in drag-lines, into tidy banks against the walls — and the shelves of a drowned home have been re-set with salvage, piece by piece, in a parody of housekeeping. Someone has been maintaining a dead room. For a long time." },
-        { "speaker": "world", "text": "It stands at the far wall wearing {name}'s coat and {name}'s shoulders, setting a cup on a shelf with terrible care, the homecoming rehearsed ten thousand times by something that only remembers the shape of it. It turns. The face is theirs, mud-kept and patient. It says your name — correctly — the way a door says a name: hinge and habit, and no one home." },
-        { "speaker": "arbiter", "text": "The Arbiter's voice drops to almost nothing. \"Steady, walker. This is the third answer — the thing that walks. The mud kept the body and the Aether kept the habits, and between them there is nothing left that can be brought home. It remembers the shape of loving you and nothing else. Put it to rest. That is the only letter left to write.\"" }
-      ],
-      "defeat": [
-        { "speaker": "world", "text": "It folds down slowly, like three years of tiredness arriving all at once. The Aether-light goes out of the joints first, then the hands, then the face — and for one clear breath the mud lets go, and it is only {name}: who looks at you, and knows you, all the way through, and is finally allowed to stop." },
-        { "speaker": "arbiter", "text": "\"It is done,\" the Arbiter says. \"The roll marks {name}: found, and carried home the only way left. No walker under the mud has done a harder thing today. The trail ends here. Rest is yours to give, and you gave it.\"" }
-      ],
-      "keepsake": { "name": "Mud-Kept Locket", "description": "It was around their neck the whole time, under the coat, under three years of silt. Beneath the tarnish the clasp still works." },
-      "epilogue": "You got the worst answer, and gave the only mercy left in the world to give. The thing that walked was not them — putting it to rest WAS. You carried the truth up the Stair: the mud keeps, the Aether moves, and love is the one thing it cannot counterfeit well enough. They rest. You carry the locket. The quiet is earned."
+    "exile": {
+      "pardon": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "The courier did not make it past the second gallery. Nine months, by the state of the boots. The satchel is intact because the mud is kind to oilcloth and unkind to everything else, and the seal on the packet inside is one you have not seen since the morning they put you on the road: the magistrate's own, {name}'s mark, pressed into green wax."
+          },
+          {
+            "speaker": "world",
+            "text": "It is a pardon. Full, unconditional, dated four months after you came down — the wording flat and administrative, as though it had never been anything but paperwork. Somebody argued for you. It took them a season. They won. Then they handed it to a man in bad boots and told him where you had gone, and the mud took care of the rest."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "The Arbiter reads over your shoulder, which it never does. \"You have been carrying a sentence that ended before your first Core,\" it says. \"Every hard thing you have done down here, you did as a free citizen who had not been told.\" A long pause. \"The roll marks it: PARDONED, and nine months late. Go up whenever you like, walker. The door was never locked. That is not the same as it standing open, and I will not pretend otherwise.\""
+          }
+        ],
+        "keepsake": {
+          "name": "Sealed Pardon",
+          "description": "Green wax, {name}'s mark unbroken, the wording flat and final. Nine months in the mud did not touch it. The courier's hand was still on the strap."
+        },
+        "epilogue": "Your exile ended four months after it started and there was nobody who could find you to say so. You did every hard thing under the mud as a free citizen who had not been told — which is either the cruellest joke in the ledger or proof you never needed the paper at all. You went up with the seal unbroken in your coat. You still have not decided whether to show it to anyone."
+      },
+      "forgotten": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "The registry above the flood-line was a real office once — the Order kept surface records down here where the damp could not reach them, which tells you most of what there is to know about the Order. The exile rolls are intact. They are alphabetical. They are complete."
+          },
+          {
+            "speaker": "world",
+            "text": "You are not in them. Not struck out, not annotated, not misfiled — absent, in a hand that never once wrote you. The magistrate {name} spoke the sentence in a room full of people and then, apparently, did not write it down. Whatever put you on the road that morning, it was never law. It was a man in a chair who wanted you gone and understood that saying so would be enough."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "The Arbiter is silent for an uncomfortable length of time. \"There is no sentence,\" it says at last. \"There never was one. You have served a thing that did not exist, thoroughly, for years, because you are the kind of person who serves things.\" A beat. \"The roll marks it: NO RECORD. You could go home tonight, walker. Nobody up there is looking for you and nobody up there ever was. I am sorry. That is worse than a pardon and we both know it.\""
+          }
+        ],
+        "keepsake": {
+          "name": "Blank Roll-Page",
+          "description": "The page where your name should sit, torn from the exile rolls as evidence of the gap. The names above and below are strangers. Between them, dry paper."
+        },
+        "epilogue": "There was no sentence. A man in a chair told you to go, and you went, and you served an exile that existed nowhere but in you — and got very good at it. You carry the blank page up the Stair as proof, mostly for yourself, on the nights it stops being believable. Home was open the whole time. You went back anyway, eventually, on your own schedule, which is the only part of the whole business that was ever actually yours."
+      },
+      "magistrate": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "The chamber has been arranged like a court. Benches dragged into rows, a bar of salvaged rail, a chair set higher than the rest on a plinth of stacked crates — the entire apparatus of judgment rebuilt in the dark by somebody who could not stop being what they were."
+          },
+          {
+            "speaker": "world",
+            "text": "{name} is in the chair. Older, mud-kept, the collar of office still worn over three years of silt. The Aether kept the posture and the certainty and let the rest go. As you come in, the court rises — for an audience of nobody, on a docket of one — and the magistrate who put you on the road stands to pass sentence on you a second time."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "\"They came down after the fall,\" the Arbiter says. \"Whatever happened up there went badly enough that the man who exiled you chose the mud.\" A hard pause. \"There is no arguing with what is left. It cannot hear a defence — there is no part of it that could. Whatever you meant to say to {name} one day, walker, say it afterwards.\""
+          }
+        ],
+        "defeat": [
+          {
+            "speaker": "world",
+            "text": "The chair goes over and the collar of office lands in the silt, and it is finally just a man on a floor: older than the one in your memory, smaller, and — for the length of one breath, while the Aether lets go — awake. He looks at the court he built, and then at you, and something crosses his face that in a living man would be shame."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "\"It is finished,\" the Arbiter says. \"Not the argument — that one you carry. Just him.\" A beat. \"The roll marks the bench: VACANT. You were the last case it ever heard, and you did not plead. I would have advised the same.\""
+          }
+        ],
+        "keepsake": {
+          "name": "Magistrate's Collar",
+          "description": "The collar of office {name} kept wearing through three years of mud, when there was nothing else left worth keeping. Heavier than cloth has any right to be."
+        },
+        "epilogue": "The man who put you on the road came down the same stair a year later and lost everything except the habit of judging. You met him in a court he had built for an audience of nobody, and you did not plead, and you ended it. You never got your argument. You got the collar, and the strange unwanted knowledge that the world which threw you out had thrown him out too."
+      }
+    },
+    "calling": {
+      "machine": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "The hum has a room. You always knew it would — it is the one thing you have been certain of since the day you turned south — and the room is smaller than a life spent walking toward it deserves. A cabinet of Aetherstone about the size of a wardrobe, three cables run into the rock, and a slow amber pulse keeping perfect time."
+          },
+          {
+            "speaker": "world",
+            "text": "A plate on the housing gives an inventory number, a fabrication date fifteen hundred years old, and the words CIVIC BEACON — CONTINUOUS. It has been calling since the Flood because nobody was left to come and switch it off. It called the same to everyone. It called the same to nobody. It is not aware, it is not for you, and it is still, undeniably, the thing you heard."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "The Arbiter gives it a long moment. \"A machine doing its job with nobody left to do it for,\" it says. \"That is not nothing, walker. It kept a promise fifteen hundred years past the death of everyone it was promising.\" A beat. \"The roll marks the source: FOUND, and mechanical. You were not chosen. You were reached. There are worse things to be called by than something that never stopped.\""
+          }
+        ],
+        "keepsake": {
+          "name": "Beacon Plate",
+          "description": "The maker's plate off a civic beacon that has been calling since 1530: an inventory number, a fabrication date, and the single word CONTINUOUS."
+        },
+        "epilogue": "What called you was a machine keeping a promise fifteen hundred years after the last person who could hear it died. Not chosen — reached. You have made a sort of peace with that: it never stopped, and neither did you, and of the two of you only one ever had a choice in the matter."
+      },
+      "choir": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "There are lamps ahead where the maps promise nothing, and under the lamps there are people — nine of them, in a chamber they have swept and shored and made very nearly warm. They stand when they see you. Not startled. The way a household stands when somebody expected finally arrives."
+          },
+          {
+            "speaker": "world",
+            "text": "They came for the hum. Every one of them, from nine different directions, across eleven years. {name} does the talking because {name} has been here longest: they have never agreed on what it is, they gave up trying some time ago, and the vigil they keep is mostly just company for whoever walks in next. \"We do not know,\" {name} says, without a scrap of apology. \"We know it is real, and we know it is not only you, and after a while it turns out that second part is the one that helps.\""
+          },
+          {
+            "speaker": "arbiter",
+            "text": "The Arbiter says nothing for a moment. \"I have carried a great many people who believed the hum meant they were singular,\" it says. \"You are the first I have ever brought into a room full of them.\" A pause. \"The roll marks the calling: SHARED. That is a demotion and a homecoming in the same breath, walker. Take whichever half you need tonight.\""
+          }
+        ],
+        "keepsake": {
+          "name": "Vigil Token",
+          "description": "A blank disc of Aetherstone, ground smooth by eleven years of thumbs. Everybody in that chamber carries one. Now so do you."
+        },
+        "epilogue": "You went down certain the hum had picked you, and found nine other people who had been every bit as sure. You were not special. You were expected — which, on the long walk back, turned out to be the better of the two. Somewhere below, the vigil is still keeping a lamp lit for whoever walks in next, and one of them is holding a token exactly like yours."
+      },
+      "answering": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "The hum stops. Not fades — stops, the way a voice stops when the person it belongs to notices you have come into the room. In the silence you can hear silt falling somewhere very far below, and then, deliberately, the sound of something enormous adjusting itself to be nearer to you."
+          },
+          {
+            "speaker": "world",
+            "text": "What comes up the gallery wears salvage the way a wasp nest wears a wall: plate, cable and bone-white Aetherstone knitted into a shape that is walking toward the idea of a body and has not got there yet. It has been calling for a long time. It called until something came. It is very glad you came."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "\"Whatever answered you has been waiting for a frame,\" the Arbiter says, fast and flat. \"It does not want worship and it does not want conversation. It wants the part of you that could hear it in the first place.\" A hard beat. \"You do not get to be the exception here, walker. Kill it. That is the whole of my counsel.\""
+          }
+        ],
+        "defeat": [
+          {
+            "speaker": "world",
+            "text": "It comes apart in layers — salvage first, then cable, then the bone-white knitting — and the last thing to go is the pitch itself, dropping down through the floor of hearing into nothing at all. The silence it leaves behind is total, and it is the first silence you have known in a year."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "\"It is out,\" the Arbiter says. \"The roll marks the calling: ANSWERED, and ended by the one it called.\" A pause, almost gentle. \"You will find the quiet strange for a while. Some who have done this never quite stop reaching for the hum, the way a tongue reaches for a pulled tooth. It passes. Mostly.\""
+          }
+        ],
+        "keepsake": {
+          "name": "Silenced Core-Shard",
+          "description": "A palm of bone-white Aetherstone, still faintly warm and entirely inert. Hold it to your ear and there is nothing there at all. That is the point."
+        },
+        "epilogue": "The thing that called you was aware, and patient, and building itself a body out of the dark — and what it wanted was the part of you that could hear it. You ended it, and the hum went out of the world, and the quiet afterwards was the loudest thing you have ever survived. You carry a dead shard that used to sing. Some nights you still hold it up to your ear."
+      }
+    },
+    "record": {
+      "predecessor": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "The reading room is dry, which is the first miracle, and occupied, which is the second: a chair, a desk, a lamp long burned out, and at the desk a body sitting forward over the work with the pen still in its hand. The hand is bone. The work is finished."
+          },
+          {
+            "speaker": "world",
+            "text": "{name}'s chronicle runs to four hundred pages and it is better than yours. Not in places — throughout. Where your notes take three careful sentences it takes one that is exact. It has the Capitals, the Cores, the Guardians, the whole shape of the thing, set down by somebody who got here first and stayed until it was complete and then did not get up again. The final line is dated and steady. There is no signature anywhere in it. They did not think it mattered."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "The Arbiter takes its time. \"Every chronicler comes down believing they are the first,\" it says. \"Most are wrong and never find out. You have been shown.\" A pause. \"The roll marks the account: ALREADY WRITTEN — and finished, which yours is not. Do what you like with that, walker. But the work is complete and the worker is dead, and only one of you can still carry it out of here.\""
+          }
+        ],
+        "keepsake": {
+          "name": "The Finished Chronicle",
+          "description": "Four hundred pages in a stranger's hand, complete to the last dated line, unsigned. The best account of Tartaria anybody has written. {name} never got up from the desk."
+        },
+        "epilogue": "You came down to write the first true account and found it already written, finished, and better — by somebody who died at the desk without signing it. You carried all four hundred pages up the Stair on your own back. The name on the spine of the thing they eventually printed is {name}'s, because you put it there, and every scholar who cites it cites a stranger. That was the whole of your contribution. It is more than most chroniclers manage."
+      },
+      "reader": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "The camp is three days deeper than you have ever been, and the woman at the fire is reading. She does not stop when you come in. She turns a page, marks something in the margin, and only then looks up — and the page she has just turned is in your handwriting."
+          },
+          {
+            "speaker": "world",
+            "text": "Copies. Not your originals: copies, made carefully by hand, of notes you left in a Reclaimer hall eleven months ago and never thought about again. They have been passed along four times to reach her. {name} has been down here half a year on the strength of your account, correcting it as she goes, and she is annoyed about your northern galleries and says so at some length before she remembers to ask your name."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "The Arbiter sounds, for once, entirely uncomplicated. \"Your work got out ahead of you,\" it says. \"It went places you have not been, in the hands of people you will never meet, and it was accurate enough to keep them alive. That is not fame, walker. That is the other thing — the one that actually matters.\" A beat. \"The roll marks the account: IN CIRCULATION.\""
+          }
+        ],
+        "keepsake": {
+          "name": "Annotated Copy",
+          "description": "Your own notes in a stranger's careful hand, four copyings removed from your original, the margins thick with corrections. Some of them are right."
+        },
+        "epilogue": "Your account got out ahead of you and kept strangers alive in galleries you have never walked. You met one of them and she corrected your northern survey to your face before she thought to ask your name, which is the highest compliment your profession has to offer. You did not come down for that. You will take it."
+      },
+      "censor": {
+        "arrival": [
+          {
+            "speaker": "world",
+            "text": "The gallery is full of paper and none of it says anything. Ledgers, rolls, letters, survey sheets — a century of writing stacked dry in the alcoves, and every page blank. Not faded. Not washed. Emptied, the ink gone out of the fibre as though it had been argued out of it."
+          },
+          {
+            "speaker": "world",
+            "text": "It is standing among the shelves with its back to you, working. Something that was an archivist once and is now mostly just the function: hands moving over a page, taking the words off it, setting the blank sheet neatly on the finished stack. Your satchel is against your hip and it is full of writing. It turns, and it is looking at the satchel, and it is nothing at all but interested."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "\"That is not a hunger for you,\" the Arbiter says, very quietly. \"It is a hunger for the account. It will go through you to reach the pages and it will not hurry.\" A hard pause. \"Everything you have written down since the day you came down is in that bag, walker. It is the only copy. Do not lose this fight, and do not put the bag down.\""
+          }
+        ],
+        "defeat": [
+          {
+            "speaker": "world",
+            "text": "It comes apart quietly, and the blank pages go with it — a century of emptied paper turning to silt in the alcoves all at once, as though the room had only been holding them out of courtesy. Your satchel is intact. Your pages are still your pages. In the silt where it stood, one sheet stayed written: a name, a date, and a line of duty from before the Flood."
+          },
+          {
+            "speaker": "arbiter",
+            "text": "\"The roll marks the archive: DEFENDED,\" the Arbiter says. \"It unmade a hundred years of other people's accounts and it stopped at yours.\" A beat. \"That sheet is the last thing it ever wrote as a man. Carry it out as well. Somebody has to be the one who keeps things.\""
+          }
+        ],
+        "keepsake": {
+          "name": "Last Written Sheet",
+          "description": "One page out of a hundred years of emptied paper: a name, a date, and a line of duty from before the Flood. The only thing it never unwrote."
+        },
+        "epilogue": "Something down there had been taking the words off a century of other people's paper, and it came for yours, and you stopped it with the satchel still on your hip. Every line you wrote survives because you won a fight in a room full of blank pages. The account exists. It exists specifically because you did not put the bag down."
+      }
     }
   }
 }

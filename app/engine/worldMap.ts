@@ -119,7 +119,8 @@ export interface WorldMap {
 // Generate a deterministic world map for a character. Starting location
 // goes at the center; other locations scatter outward, with rarer/danger
 // locations weighted to the edges.
-// Atlas → grid spread. The atlas is 1408×768 (≈1.83:1); SPREAD_X/SPREAD_Y
+// Atlas → grid spread. Fractions are canvas-agnostic (the artwork has been replaced
+// twice since these were tuned); SPREAD_X/SPREAD_Y
 // keep that aspect (40/22 ≈ 1.82) so a step east on the grid matches east on
 // the atlas, and size the longest canonical journey to ~35-38 tiles on the
 // 82-wide grid — a real haul without running off the edge from any center.
@@ -268,6 +269,61 @@ export function cellToAtlasFraction(x: number, y: number): { fx: number; fy: num
   const fx = CANON_REF_FX + (x - CENTER_X) / SPREAD_X;
   const fy = CANON_REF_FY + (y - CENTER_Y) / SPREAD_Y;
   return { fx: Math.max(0, Math.min(1, fx)), fy: Math.max(0, Math.min(1, fy)) };
+}
+
+// ⚠ OTA-1343 — THE WILDS HAVE NAMES. Owner, walking free of Iskan-Veil with the
+// bar still claiming the city: *"do locations have a radius other than the tile —
+// maybe a 2 tile radius around it that's still considered that area? but outside
+// of any area's ring of influence wouldn't I be on the road, or in the wilds or
+// on the outskirts or badlands or some lore specific unnamed area?"* Yes — now
+// exactly that, in tiers:
+//   d = 0        → null (you are AT the place; the scene bar shows its real name)
+//   d ≤ 2        → "<Name> Outskirts" — the ring of influence he described
+//   in transit   → "The road to <target>" — a plotted course names the road
+//   otherwise    → a lore region name from the atlas geography itself, by band:
+//                  the safe frontier strip up top, the drowned capital reaches
+//                  across the middle, the southern badlands arc, the Deep at the
+//                  bottom — with the eastern mud given its own name where the
+//                  painting drowns everything in silt.
+export const OUTSKIRTS_RADIUS = 2;
+
+const chebyshev = (ax: number, ay: number, bx: number, by: number): number =>
+  Math.max(Math.abs(ax - bx), Math.abs(ay - by));
+
+/** Nearest STATIC named location to a cell, by chebyshev distance on the canon
+ *  grid (hidden locations excluded — an unfound place must not name the ground). */
+export function nearestNamedLocation(x: number, y: number): { id: string; name: string; dist: number } | null {
+  let best: { id: string; name: string; dist: number } | null = null;
+  for (const loc of ALL_LOCATIONS) {
+    if (HIDDEN_LOCATIONS[loc.id]) continue;
+    const c = canonicalCellFor(loc.id);
+    const d = chebyshev(x, y, c.x, c.y);
+    if (!best || d < best.dist) best = { id: loc.id, name: loc.name, dist: d };
+  }
+  return best;
+}
+
+/** The lore name for open ground at a cell, from the atlas band it sits in. */
+export function wildsNameFor(x: number, y: number): string {
+  const { fx, fy } = cellToAtlasFraction(x, y);
+  if (fy >= 0.8) return 'The Deep Wastes';
+  if (fy >= 0.62) return 'The Southern Badlands';
+  if (fy >= 0.25) return fx >= 0.62 ? 'The Eastern Mud' : 'The Drowned Reaches';
+  return 'The Frontier Silt';
+}
+
+/** The tiered overland area label — see the OTA-1343 note above. Returns null
+ *  when the cell IS a named location's own tile (caller shows the real name). */
+export function overlandAreaLabel(
+  x: number,
+  y: number,
+  roadToName?: string | null,
+): string | null {
+  const near = nearestNamedLocation(x, y);
+  if (near && near.dist === 0) return null;
+  if (near && near.dist <= OUTSKIRTS_RADIUS) return `${near.name} Outskirts`;
+  if (roadToName) return `The road to ${roadToName}`;
+  return wildsNameFor(x, y);
 }
 
 /** The install-canon position table for every static location, collision-resolved

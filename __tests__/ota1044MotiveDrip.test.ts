@@ -243,12 +243,21 @@ describe('OTA-1044 — SOURCE LOCKS (category: the drip reaches the game)', () =
     expect(storeSrc).toMatch(/advanceStoryDrip\(get, set, locationId\);/);
   });
 
-  it('the kill path closes the walker thread: guaranteed beats + keepsake + resolved mark', () => {
-    expect(storeSrc).toMatch(/dripMod\.isMissingWalker\(enemy\)/);
-    expect(storeSrc).toMatch(/missingResolved: 'walker'/);
+  // ⚠ OTA-1246 RETARGET — these two pinned the MISSING-ONLY spellings. That path
+  // is now the general one (every motive resolves on the same machine), so the
+  // pins follow it rather than pinning a call that no longer exists. What they
+  // were protecting is unchanged and is now covered LIVE for all five motives by
+  // ota1246EveryMotiveEnds: the kill grants the keepsake and marks the thread,
+  // and the resolved epilogue outranks the open-question one.
+  it('the kill path closes the resolved thread: guaranteed beats + keepsake + resolved mark', () => {
+    expect(storeSrc).toMatch(/dripMod\.motiveBossFromEnemy\(enemy\)/);
+    expect(storeSrc).toMatch(/motiveResolved: bossTag\.kind/);
+    // The Missing keeps its original field written alongside, so a save that
+    // finished that trail before OTA-1246 still reads exactly as it did.
+    expect(storeSrc).toMatch(/bossTag\.motive === 'missing' \? \{ missingResolved: bossTag\.kind \}/);
   });
 
   it("EndingScreen prefers the resolved thread's epilogue over the open-question one", () => {
-    expect(endingSrc).toMatch(/missingResolvedEpilogue\(player\) \?\? epilogueMotiveLine\(ending, player\.storyMotive\)/);
+    expect(endingSrc).toMatch(/resolvedEpilogue\(player\) \?\? epilogueMotiveLine\(ending, player\.storyMotive\)/);
   });
 });

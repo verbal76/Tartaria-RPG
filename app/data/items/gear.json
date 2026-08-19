@@ -506,7 +506,7 @@
         "light",
         "relic"
       ],
-      "description": "A hand-held aether-light that resonates with the buried. USE it in a room that still holds an unexplored lead — its flame reaches for what the mud swallowed, and on a lucky pull shakes loose a rare or legendary find (higher Wisdom, better odds and better tier). A miss burns the charge for nothing. Scarce and hard to come by — spend it where a lead remains.",
+      "description": "A hand-held aether-light that resonates with the buried. USE it on a room's open lead — its flame charges the lead, and working it can shake loose a rare or legendary find (higher Wisdom, better odds and better tier). In a room with no lead, a sweep of the light instead marks ✦ what actually repays a closer look under INVESTIGATE — the one thing a free look around will never tell you. A room holding neither keeps the charge unspent. Scarce and hard to come by.",
       "effect": {
         "kind": "consumable",
         "revealScene": true
@@ -719,7 +719,7 @@
         "acid",
         "crafted"
       ],
-      "description": "Caustic distillate in a wax-sealed flask — aether dust dissolved in scavenged battery bile. Coats an edge so each hit both burns (1d4 a turn) AND eats the target's armor, shaving their guard thinner with every wound. Survives a repair; lost only when the weapon breaks.",
+      "description": "Battery bile in a wax-sealed flask — milked from the old world's drowned jar-batteries, where the flood shorted out the lightning and left the acid keeping for a thousand years, then cut with aether dust so it eats armor instead of hands. Coats an edge so each hit both burns (1d4 a turn) AND eats the target's armor, shaving their guard thinner with every wound. Survives a repair; lost only when the weapon breaks.",
       "effect": {
         "kind": "consumable",
         "coating": {
@@ -1297,7 +1297,7 @@
         "index": 2,
         "total": 5
       },
-      "description": "One of five giant-drawn maps to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to the buried spire of Asgardar and opens its great climb. Use it from your pack to fix the way and unlock the ascent (2 of 5). Four more maps are out there, sold by roadside traders who don't know what they're holding."
+      "description": "One of five giant-drawn maps to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to the Grand Spire of Asgardar and opens its great climb. Use it from your pack to fix the way and unlock the ascent (2 of 5). Four more maps are out there, sold by roadside traders who don't know what they're holding."
     },
     {
       "name": "Skyreacher Map 3 of 5 — Obsidian Monolith",

@@ -73,6 +73,14 @@ describe('OTA-810 — hunts are a face-to-face turn-in', () => {
   it('the Contracts-UI COMPLETE is refused with NO agent present (closes the B2 remote-close)', async () => {
     const store = await boot();
     const def = armReadyHunt(store, null); // no vendor in scene
+    // ⚠ OTA-1210 (PUNCHLIST P8) — RETARGETED. `boot()` leaves the player standing in their
+    // own faction's hub, and the hall now takes a hand-in the way it always has for faction
+    // quests, so "no vendor" stopped meaning "no counterparty" — HUNTS[0] is unaligned and
+    // any hall will settle it. The B2 protection this test exists for is about closing a
+    // bounty FROM ANYWHERE, so the player is moved somewhere there is genuinely nobody.
+    store.setState((st) => ({
+      player: { ...st.player!, currentLocationId: 'asgardar', hubRoomId: undefined },
+    }));
     const tcBefore = store.getState().player!.tc;
     store.getState().completeContractFromUI('hunt', def.id);
     // Still on the slate, nothing paid.

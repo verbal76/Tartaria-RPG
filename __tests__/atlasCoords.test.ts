@@ -14,10 +14,8 @@
 import {
   LOCATION_ATLAS_COORDS,
   OUTPOST_ATLAS_COORD,
-  DOT_TILE_FRAC,
   atlasCoordForLocation,
   depictedLocationIds,
-  clampToMapArea,
 } from '../app/engine/atlasCoords';
 import locationsData from '../app/data/locations/locations.json';
 import type { Location } from '../app/engine/types';
@@ -70,13 +68,6 @@ describe('OTA 051 — atlas coordinate calibration', () => {
       expect(outskirts.fy).toBe(OUTPOST_ATLAS_COORD.fy);
     });
 
-    it('DOT_TILE_FRAC is positive and modest (a tile is a small but visible fraction of image height)', () => {
-      // v2.4.1 — bumped to 0.06 (was 0.04) for visible per-tile
-      // marker drift on the larger 41×41 grid. Should still be a
-      // small fraction, not a leap.
-      expect(DOT_TILE_FRAC).toBeGreaterThan(0);
-      expect(DOT_TILE_FRAC).toBeLessThan(0.1);
-    });
   });
 
   describe('lore-region adjacency', () => {
@@ -90,10 +81,27 @@ describe('OTA 051 — atlas coordinate calibration', () => {
     const within = (a: { fx: number; fy: number }, b: { fx: number; fy: number }, max: number) =>
       Math.abs(a.fx - b.fx) < max && Math.abs(a.fy - b.fy) < max;
 
-    it('Asgardar and Grand Spire of Etheria are drawn within 10% of each other', () => {
+    // ⚠⚠ OTA-1334 — this used to pair Asgardar with the Grand Spire of ETHERIA, on the
+    // "tower inside city" reading. That reading was the whole confusion: the tower standing
+    // on Asgardar's skyline is the Grand Spire of ASGARDAR, and the Etheria spire is a
+    // different structure that now lies on the floor of the Black Reach, most of a world
+    // south-east. The city/tower adjacency rule is unchanged and still worth pinning — it is
+    // simply pinned to the right pair of places now.
+    it('Asgardar and Grand Spire of Asgardar are drawn within 10% of each other', () => {
       const a = LOCATION_ATLAS_COORDS.asgardar!;
-      const s = LOCATION_ATLAS_COORDS.grand_spire_of_etheria!;
+      const s = LOCATION_ATLAS_COORDS.grand_spire_of_asgardar!;
       expect(within(a, s, 0.10)).toBe(true);
+    });
+
+    it('the Grand Spire of Etheria is drawn beside the Black Reach, NOT beside Asgardar', () => {
+      // The negative half matters as much as the positive one: if someone ever "restores"
+      // the old adjacency, this is the assertion that says the two spires have been folded
+      // back together.
+      const etheria = LOCATION_ATLAS_COORDS.grand_spire_of_etheria!;
+      const reach = LOCATION_ATLAS_COORDS.black_reach!;
+      const asgardar = LOCATION_ATLAS_COORDS.asgardar!;
+      expect(within(etheria, reach, 0.10)).toBe(true);
+      expect(within(etheria, asgardar, 0.10)).toBe(false);
     });
 
     it('Samarran and Thametan\'s Tower are drawn within 10% of each other', () => {
@@ -186,29 +194,9 @@ describe('OTA 051 — atlas coordinate calibration', () => {
     });
   });
 
-  describe('clampToMapArea (grid-offset fallback safety)', () => {
-    it('passes through coords already inside the map area', () => {
-      expect(clampToMapArea({ fx: 0.5, fy: 0.5 })).toEqual({ fx: 0.5, fy: 0.5 });
-    });
-    it('clamps far-east coords back inside the visible map', () => {
-      // v2.4.1 (OTA 029) — bound bumped to 0.96 to capture
-      // canonically-east anchors right against the right edge.
-      const out = clampToMapArea({ fx: 1.5, fy: 0.5 });
-      expect(out.fx).toBeLessThanOrEqual(0.96);
-      expect(out.fx).toBeGreaterThan(0.5);
-    });
-    it('clamps far-south coords back above the timeline ribbon', () => {
-      const out = clampToMapArea({ fx: 0.5, fy: 1.2 });
-      expect(out.fy).toBeLessThanOrEqual(0.95);
-    });
-    it('clamps negative coords back into the visible map', () => {
-      // v2.4.1 (OTA 029) — fy floor lowered to 0.04 (was 0.06) so
-      // the upper-band locations (Sinking Cathedral fy=0.12,
-      // Outpost fy=0.13) keep clearance above them on the chrome
-      // band at the top.
-      const out = clampToMapArea({ fx: -0.3, fy: -0.2 });
-      expect(out.fx).toBeGreaterThanOrEqual(0.06);
-      expect(out.fy).toBeGreaterThanOrEqual(0.04);
-    });
-  });
+  // ⚠ OTA-1333 SCRUB — the DOT_TILE_FRAC and clampToMapArea suites died with the code they
+  // pinned: the per-tile drift constants and the off-limits clamp existed for a player
+  // marker removed at OTA-182, and the clamp's rectangles were traced from the ORIGINAL
+  // art's legend boxes — on the current atlas they covered plain terrain (one sat exactly
+  // over Yuldra-Tul). A test pinning dead code is not protection, it is embalming.
 });

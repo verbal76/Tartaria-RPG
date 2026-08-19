@@ -11,8 +11,11 @@ import { useGameStore } from '../state/gameStore';
 import factionsData from '../data/factions/factions.json';
 import type { Faction } from '../engine/types';
 import { tideLabel } from '../engine/worldPulse';
+import { JOIN_THRESHOLD } from '../engine/factions';
 import { listBounties, bountyKey, bountyHoursLeft, giverDifficulty, bountyDeadlineFor, BOUNTY_DEADLINE_HOURS } from '../engine/factionBounty';
 import { canonicalCellOf, canonicalDistanceFromGrid } from '../engine/worldMap';
+import { bountyCourseState, bountyCourseLabel, bountyCourseIsButton } from '../engine/bountyCourse';
+import { formatWindow } from '../engine/bountyPrimer';
 import { FACTION_STARTING_LOCATION } from '../engine/character';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { getLocationById } from '../engine/encounter';
@@ -22,6 +25,8 @@ export function WorldScreen() {
   const player = useGameStore((s) => s.player);
   const worldMemory = useGameStore((s) => s.worldMemory);
   const setScreen = useGameStore((s) => s.setScreen);
+  // OTA-1188 — non-null means a snapshot is held and a contract may be signed on it.
+  const frozen = !!useGameStore((s) => s.frozenBoard);
   // OTA-855 — collapsible standings so the WAR FEED gets the room. Power + grudges start
   // collapsed (the feed is the point); tap a header to fold/unfold, like the inventory.
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({ power: true, grudges: true });
@@ -72,11 +77,31 @@ export function WorldScreen() {
   };
   // OTA-863 — the deadline is DISTANCE-AWARE. Estimate an offer's window from the player's
   // current cell so the board can say how long you'll really have before you accept.
-  const estDeadline = (targetLocationId: string): number => {
-    if (!player) return BOUNTY_DEADLINE_HOURS;
+  // ⚠ OTA-1188 — MUST PASS `count`, or the board quotes a window it will not stamp.
+  // The deadline gained a per-required-kill term, and this preview did not: the card
+  // would advertise 49 hours and the accepted contract would carry 73. That is the same
+  // defect class as OTA-1179 #8 (a vendor showing a price it does not charge), and the
+  // reason the estimate takes the whole offer now instead of just its location.
+  const estDeadline = (offer: { targetLocationId: string; count: number }): string => {
+    if (!player) return formatWindow(BOUNTY_DEADLINE_HOURS);
     const cell = canonicalCellOf(player.currentLocationId);
-    return bountyDeadlineFor(canonicalDistanceFromGrid(cell.x, cell.y, targetLocationId));
+    const tiles = canonicalDistanceFromGrid(cell.x, cell.y, offer.targetLocationId);
+    return formatWindow(bountyDeadlineFor(tiles, offer.count));
   };
+  // ⚠ OTA-1187 — "am I standing on it" is a GRID-CELL question, not a string compare on
+  // currentLocationId: you can be paces off a place in open ground and still read its id.
+  // Same frame setTravelCourse itself uses, so the card and the store always agree about
+  // whether there is a road to set.
+  const atTile = (targetLocationId: string): boolean => {
+    if (!player) return false;
+    const here = canonicalCellOf(player.currentLocationId);
+    const there = canonicalCellOf(targetLocationId);
+    return here.x === there.x && here.y === there.y;
+  };
+  const courseStateFor = (b: { targetLocationId: string; targetLocationName: string }) =>
+    bountyCourseState(player, b.targetLocationId, b.targetLocationName,
+      (id) => { try { return getLocationById(id).name ?? id; } catch { return id; } },
+      atTile(b.targetLocationId));
   // OTA-862 — a faction that dislikes you still offers work, just a harder job. Frame it.
   const difficultyNote = (giverId: string): string | null => {
     const s = player?.factionStanding.find((r) => r.factionId === giverId)?.standing ?? 0;
@@ -135,14 +160,27 @@ export function WorldScreen() {
             <Text style={styles.bountyProgress}>
               {b.progress}/{b.count} put down · reward {b.rewardTc} TC · {timeLabel(b)}
             </Text>
-            <TouchableOpacity
-              style={styles.bountySecondaryBtn}
-              activeOpacity={0.8}
-              onPress={() => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
-              accessibilityRole="button"
-            >
-              <Text style={styles.bountySecondaryText}>SET COURSE TO {b.targetLocationName.toUpperCase()} ›</Text>
-            </TouchableOpacity>
+            {/* ⚠ OTA-1187 — FOUR STATES, ONE OF WHICH IS A BUTTON. This was
+                unconditionally a button that called setTravelCourse and navigated away,
+                so standing on the quarry's own outpost rendered an inviting control that
+                did nothing and said nothing — the owner's report. `activeOpacity` dims on
+                any tap, so the colour change was never confirmation of anything. */}
+            {(() => {
+              const cs = courseStateFor(b);
+              if (!bountyCourseIsButton(cs)) {
+                return <Text style={styles.bountyCourseNote}>{bountyCourseLabel(cs)}</Text>;
+              }
+              return (
+                <TouchableOpacity
+                  style={styles.bountySecondaryBtn}
+                  activeOpacity={0.8}
+                  onPress={() => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.bountySecondaryText}>{bountyCourseLabel(cs)}</Text>
+                </TouchableOpacity>
+              );
+            })()}
           </View>
         ))}
 
@@ -153,7 +191,7 @@ export function WorldScreen() {
               <Text style={styles.bountyHead}>{offer.giverName} have work for you</Text>
               <Text style={styles.bountyBody}>
                 Put down {offer.count} of the {offer.targetName} at {offer.targetLocationName}. Pays {offer.rewardTc} TC
-                and {offer.giverName} standing. Expires in {estDeadline(offer.targetLocationId)} in-game hours.
+                and {offer.giverName} standing. You'd have {estDeadline(offer)} of in-game time.
               </Text>
               {difficultyNote(offer.giverFactionId) ? (
                 <Text style={styles.bountyWarn}>⚠ {difficultyNote(offer.giverFactionId)}</Text>
@@ -163,14 +201,30 @@ export function WorldScreen() {
                   ? `↳ Adds to your slate — your current course holds.`
                   : `↳ Accepting sets your course to ${offer.targetLocationName} — patrolled ground.`}
               </Text>
+              {/* ⚠ OTA-1188 — NOT DEAD WHEN THE BOARD IS RUNNING. Owner: "it shouldn't be
+                  dead… you should get the buzz like when you have no stamina and you try to
+                  move, because otherwise you don't know that something is stopping you, and
+                  then a pop-up that guides you down to that pause button." So the button
+                  stays live and TELLS you — acceptBounty buzzes and raises the notice. A
+                  disabled control that explains nothing is the OTA-1187 defect again. */}
               <TouchableOpacity
-                style={styles.bountyBtn}
+                style={[styles.bountyBtn, !frozen && styles.bountyBtnLocked]}
                 activeOpacity={0.8}
-                onPress={() => { useGameStore.getState().acceptBounty(offer); setScreen('exploration'); }}
+                onPress={() => {
+                  const before = (useGameStore.getState().player?.activeBounties ?? []).length;
+                  useGameStore.getState().acceptBounty(offer);
+                  const after = (useGameStore.getState().player?.activeBounties ?? []).length;
+                  // Only leave the screen if the contract was actually taken. A refusal
+                  // has to leave the player looking at the board it is telling them to read.
+                  if (after > before) setScreen('exploration');
+                }}
                 accessibilityRole="button"
+                accessibilityHint={frozen ? undefined : 'The board must be frozen before a contract can be signed.'}
               >
-                <Text style={styles.bountyBtnText}>
-                  {activeBounties.length > 0 ? 'ACCEPT (STACK) ›' : 'ACCEPT & SET COURSE ›'}
+                <Text style={[styles.bountyBtnText, !frozen && styles.bountyBtnTextLocked]}>
+                  {!frozen
+                    ? '❄ FREEZE THE BOARD TO ACCEPT'
+                    : activeBounties.length > 0 ? 'ACCEPT (STACK) ›' : 'ACCEPT & SET COURSE ›'}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -196,7 +250,8 @@ export function WorldScreen() {
             const tag = tideLabel(m);
             const standing = standingOf(f.id);
             const tagColor = m > 0 ? '#9ec96a' : m < 0 ? '#c98a6a' : '#a2977b';
-            const standColor = standing >= 20 ? '#9ec96a' : standing >= 0 ? '#cdbf99' : standing >= -10 ? '#c9a86a' : '#e07a5f';
+            // OTA-1179 — same ladder as the character sheet, same constant as the rule.
+            const standColor = standing >= JOIN_THRESHOLD ? '#9ec96a' : standing >= 0 ? '#cdbf99' : standing >= -10 ? '#c9a86a' : '#e07a5f';
             // A little momentum meter: −5…+5 mapped to a 11-cell bar with the center marked.
             const cells = Array.from({ length: 11 }, (_, i) => i - 5);
             return (
@@ -244,6 +299,32 @@ export function WorldScreen() {
             {sectionHeader('grudges', 'GRUDGES & ALLIANCES')}
             {!collapsed.grudges && (
             <View style={styles.card}>
+              {/* ⚠ OTA-1188 — THE FREEZE, AND IT IS THE GATE ON TAKING A CONTRACT AT ALL.
+                  One press runs the whole cycle: discard any previous snapshot, take a
+                  fresh one, unlock ACCEPT — and accepting releases it automatically. The
+                  button is HERE, on the panel it snapshots, because the point is that the
+                  player reads these rows before signing: fight for one faction and you are
+                  not only building standing with them, you are making their enemies yours.
+                  ⚠ It freezes the VIEW, never the simulation — the same heartbeat roams the
+                  patrols that bring a bounty's quarry to you. */}
+              <TouchableOpacity
+                style={[styles.freezeBtn, frozen && styles.freezeBtnOn]}
+                activeOpacity={0.8}
+                onPress={() => useGameStore.getState().toggleBoardFreeze()}
+                accessibilityRole="button"
+                accessibilityLabel={frozen
+                  ? 'Board frozen. Tap to let the war run again.'
+                  : 'Freeze the board to read it and accept a contract.'}
+              >
+                <Text style={[styles.freezeBtnText, frozen && styles.freezeBtnTextOn]}>
+                  {frozen ? '▮▮ BOARD HELD — TAP TO RUN' : '❄ FREEZE THE BOARD'}
+                </Text>
+              </TouchableOpacity>
+              <Text style={styles.freezeNote}>
+                {frozen
+                  ? 'Held. These are the terms a contract will lock in — accepting releases it.'
+                  : 'The war moves while you read. Freeze it to take a contract on what you see.'}
+              </Text>
               {grudges.length > 0 && <Text style={styles.relHead} accessibilityRole="header">⚔ GRUDGES</Text>}
               {grudges.map((g, i) => {
                 const lab = relationLabel(g.relation);
@@ -360,7 +441,21 @@ const styles = StyleSheet.create({
   bountyWarn: { color: '#c98a6a', fontSize: 11, fontWeight: '700', marginTop: 5 },
   bountyBtn: { marginTop: 10, backgroundColor: '#c9a86a', borderRadius: 3, paddingVertical: 9, alignItems: 'center' },
   bountyBtnText: { color: '#13110f', fontSize: 12, fontWeight: '800', letterSpacing: 1.5 },
+  // OTA-1188 — LOCKED, not disabled: still tappable, visibly not-yet-armed, and the tap
+  // buzzes + explains. Muted fill so it reads as "do something first", not "broken".
+  bountyBtnLocked: { backgroundColor: 'transparent', borderWidth: 1, borderColor: '#6b6152' },
+  bountyBtnTextLocked: { color: '#a2977b', fontWeight: '700' },
+  // The freeze control itself. Cold blue when held, so "the war is stopped" reads at a
+  // glance against the gold everything else uses.
+  freezeBtn: { marginBottom: 10, borderWidth: 1, borderColor: '#6b6152', borderRadius: 3, paddingVertical: 9, alignItems: 'center' },
+  freezeBtnOn: { borderColor: '#7fb3d5', backgroundColor: '#16222b' },
+  freezeBtnText: { color: '#a2977b', fontSize: 11, fontWeight: '800', letterSpacing: 1.5 },
+  freezeBtnTextOn: { color: '#9ecbe8' },
+  freezeNote: { color: '#8b8271', fontSize: 11, fontStyle: 'italic', lineHeight: 16, marginBottom: 10 },
   // OTA-859 — re-route to a held bounty (outline button, secondary to the gold ACCEPT).
   bountySecondaryBtn: { marginTop: 9, borderColor: '#c9a86a', borderWidth: 1, borderRadius: 3, paddingVertical: 8, alignItems: 'center' },
   bountySecondaryText: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
+  // OTA-1187 — the non-tappable states. Deliberately NOT button-shaped: no border, no
+  // chevron, so it never invites a tap it will not answer.
+  bountyCourseNote: { marginTop: 9, color: '#a2977b', fontSize: 12, lineHeight: 18, fontStyle: 'italic' },
 });

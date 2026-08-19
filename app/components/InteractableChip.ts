@@ -37,4 +37,8 @@ export interface InteractableChip {
    *  the player equips the right tool, the chip is no longer
    *  marked unmetRequirement and renders normally green. */
   unmetRequirement?: string;
+  /** OTA-1229 — search-only. The Aetheric Torch has flagged this noun as
+   *  actually worth investigating (scene.arbiterEye). Renders a ✦ prefix so
+   *  the player can stop clearing rooms noun by noun. */
+  marked?: boolean;
 }

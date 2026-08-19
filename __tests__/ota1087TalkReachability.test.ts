@@ -326,7 +326,11 @@ describe('OTA-1087 audit — hostility cannot be farmed for rival standing', () 
   });
 
   it('a beaten vendor is metered — they are anchored to the room and come back', () => {
-    const fn = store.slice(store.indexOf('function resolveVendorSubmission('), store.indexOf('void get().persist();'));
+    // ⚠ The end marker must be searched FROM the function start — `void get().persist();`
+    // also appears in earlier functions (OTA-1226's text-teaching seam added one), and an
+    // end index before the start index slices to '' and the assertion reads an empty file.
+    const start = store.indexOf('function resolveVendorSubmission(');
+    const fn = store.slice(start, store.indexOf('void get().persist();', start));
     expect(fn).toContain('dockHostileStanding(');
     // ...and the old unmetered call is gone.
     expect(fn).not.toContain('applyRepChange(standing, vendor.faction, -12)');
