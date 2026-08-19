@@ -45,6 +45,36 @@ import { loadFallen, type FallenHero } from '../engine/saveSystem';
 // wipe — later characters (and the title screen, between runs) can read who came before.
 type Section = 'races' | 'factions' | 'places' | 'timeline' | 'bestiary' | 'lore' | 'fallen';
 
+/** ⚠⚠ OTA-1358 — TAB ORDER IS A GAMEPLAY DECISION, NOT AN ALPHABET.
+ *  Owner: *"they are not organized in a fashion where the most used one for
+ *  gameplay are top left. I imagine beasts and fallen would be the 2 most used
+ *  and in that order."* Right on both counts — the old order was simply the
+ *  sequence the tabs were built in (races first because it shipped first), and
+ *  the two you actually reach for mid-run sat fifth and last.
+ *
+ *  BEASTS and FALLEN are the owner's call. The rest follow the same rule —
+ *  how often it is opened WHILE PLAYING, not how interesting it is to read:
+ *    · PLACES    — tap-to-route lives here; it is a travel tool, not a reader.
+ *    · FACTIONS  — standing and politics, checked before committing to work.
+ *    · RACES     — mostly a character-creation reference once you are running.
+ *    · LORE      — the concepts bank: browsed, rarely consulted under pressure.
+ *    · TIMELINE  — history. The one nobody opens mid-fight.
+ *  The row WRAPS, so first in this array really is top-left. */
+const TAB_ORDER: Section[] = ['bestiary', 'fallen', 'places', 'factions', 'races', 'lore', 'timeline'];
+
+/** Capitalised, because a tab row in lower case reads as unfinished next to
+ *  every other heading on the screen. `bestiary` shows as BEASTS — the word the
+ *  owner uses for it, and shorter in a row that has to fit seven. */
+const TAB_LABEL: Record<Section, string> = {
+  bestiary: 'BEASTS',
+  fallen: 'FALLEN',
+  places: 'PLACES',
+  factions: 'FACTIONS',
+  races: 'RACES',
+  lore: 'LORE',
+  timeline: 'TIMELINE',
+};
+
 interface CodexEnemy {
   name: string;
   type?: string;
@@ -134,7 +164,7 @@ export function LoreCodexBody() {
           no cue) cut FALLEN and LORE off past the right edge on the owner's device;
           a tab that exists must be visible. */}
       <View style={styles.tabs}>
-        {(['races', 'factions', 'places', 'timeline', 'bestiary', 'lore', 'fallen'] as Section[]).map((s) => (
+        {TAB_ORDER.map((s) => (
           <TouchableOpacity
             key={s}
             onPress={() => setSection(s)}
@@ -143,7 +173,7 @@ export function LoreCodexBody() {
             accessibilityState={{ selected: section === s }}
           >
             <Text style={[styles.tabText, section === s && styles.tabTextActive]} numberOfLines={1}>
-              {s === 'bestiary' ? 'beasts' : s}
+              {TAB_LABEL[s]}
             </Text>
           </TouchableOpacity>
         ))}
