@@ -40,7 +40,6 @@ import {
   loadLedger, loadHouseName, setHouseName, buildExportPayload, importPayloadText,
   myHouseCode, acceptHouseCode, revokeHouse, loadPaired,
 } from '../engine/fallenLedgerStore';
-import { loadMailboxConfig, setMailboxConfig, syncNow } from '../engine/fallenMailbox';
 
 // OTA-837 — Tier-1 QoL #2: the codex now includes a discovery-gated BESTIARY (fills
 // in as you defeat enemy types) and a LORE tab that finally surfaces the 172-entry
@@ -113,50 +112,12 @@ export function LoreCodexBody() {
   const [busy, setBusy] = useState(false);
   const [paired, setPaired] = useState<PairedHouse[]>([]);
   const [codeIn, setCodeIn] = useState('');
-  const [boxUrl, setBoxUrl] = useState('');
-  const [boxToken, setBoxToken] = useState('');
-  const [boxAuto, setBoxAuto] = useState(false);
   const refreshLedger = React.useCallback(async () => {
     const l = await loadLedger();
     setHollowed([...l.foreign].reverse());
     setRests([...l.rests].reverse());
     setPaired(await loadPaired());
-    const cfg = await loadMailboxConfig();
-    setBoxUrl(cfg.url); setBoxToken(cfg.token); setBoxAuto(cfg.auto);
   }, []);
-
-  /** ⚠ Deliver now, by hand. The same round the heartbeat runs: push our dead,
-   *  read every house we ride with, and fold in whatever came back. */
-  const syncMailbox = async () => {
-    if (busy) return;
-    setBusy(true);
-    try {
-      await setMailboxConfig({ url: boxUrl, token: boxToken, auto: boxAuto });
-      const out = await syncNow({ force: true });
-      if (!out.ran) {
-        setExchangeNote(out.reason === 'bad-url'
-          ? 'That mailbox address does not look like a web address.'
-          : out.reason === 'off'
-            ? 'No mailbox address set — the dead travel by hand until there is one.'
-            : 'Nothing to do yet.');
-        return;
-      }
-      await refreshLedger();
-      const added = out.imported.reduce((n, i) => n + i.added, 0);
-      const rests = out.imported.reduce((n, i) => n + i.rests, 0);
-      const forged = out.imported.filter((i) => i.forged).length;
-      const bits: string[] = [];
-      bits.push(out.pushed ? 'your dead are in the box' : 'could not leave your dead');
-      bits.push(`${out.pulled} ${out.pulled === 1 ? 'house' : 'houses'} read`);
-      if (added > 0) bits.push(`${added} joined your wastes`);
-      if (rests > 0) bits.push(`${rests} put to rest elsewhere`);
-      if (forged > 0) bits.push(`${forged} refused — the seal did not match their house`);
-      if (out.failed > 0) bits.push(`${out.failed} could not be reached`);
-      setExchangeNote(`${bits.join(' · ')}.`);
-    } catch {
-      setExchangeNote('The mailbox could not be reached.');
-    } finally { setBusy(false); }
-  };
 
   /** ⚠⚠ THE REQUEST. Your house card — everything another player needs to
    *  accept you, checksummed so a mangled paste is refused rather than pairing
@@ -590,57 +551,17 @@ export function LoreCodexBody() {
           </View>
           {!!exchangeNote && <Text style={styles.exchangeNote}>{exchangeNote}</Text>}
 
-          {/* ⚠⚠ THE MAILBOX. Two phones cannot reach each other directly —
-              carrier NAT, no stable address — so automatic delivery needs a
-              place to leave a file. It is not a game server and holds no rules:
-              a GET to read, a PUT to write. OFF until an address is typed in;
-              no default endpoint and no traffic on a build that never opted in. */}
-          <Text style={styles.sectionHeading}>THE MAILBOX</Text>
+          {/* ⚠⚠ THE MAILBOX — COMING SOON, and shown as such rather than hidden.
+              The delivery machinery is built and tested (fallenMailbox.ts); what
+              it lacks is somewhere to live. An address field that silently never
+              works is worse than no field, so the panel says what it will do and
+              stays out of the way until there is a box to point it at. */}
+          <Text style={styles.sectionHeading}>THE MAILBOX  ·  COMING SOON</Text>
           <Text style={styles.desc}>
-            Leave the dead somewhere both of you can reach and they cross on their own.
-            Until you set this, they travel by hand — which works fine.
+            One day the dead will cross on their own: your phone leaves them somewhere
+            you both can reach, picks up theirs, and neither of you touches a thing.
+            That day is not today — for now they travel by hand, which works perfectly well.
           </Text>
-          <TextInput
-            style={styles.houseInput}
-            value={boxUrl}
-            onChangeText={setBoxUrl}
-            placeholder="https://… (leave blank to keep the mailbox off)"
-            placeholderTextColor="#7a705c"
-            autoCapitalize="none"
-            maxLength={300}
-            accessibilityLabel="Mailbox address"
-          />
-          <TextInput
-            style={styles.houseInput}
-            value={boxToken}
-            onChangeText={setBoxToken}
-            placeholder="write token, if the mailbox needs one"
-            placeholderTextColor="#7a705c"
-            autoCapitalize="none"
-            maxLength={200}
-            accessibilityLabel="Mailbox write token"
-          />
-          <View style={styles.exchangeRow}>
-            <TouchableOpacity
-              style={[styles.exchangeBtn, boxAuto && styles.exchangeBtnOn]}
-              onPress={() => { const next = !boxAuto; setBoxAuto(next); void setMailboxConfig({ url: boxUrl, token: boxToken, auto: next }); }}
-              accessibilityRole="button"
-              accessibilityState={{ selected: boxAuto }}
-              disabled={busy}
-            >
-              <Text style={[styles.exchangeBtnText, boxAuto && styles.exchangeBtnTextOn]}>
-                {boxAuto ? '◈ CROSSING ON ITS OWN' : '◈ CROSS ON ITS OWN'}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.exchangeBtn}
-              onPress={() => { void syncMailbox(); }}
-              accessibilityRole="button"
-              disabled={busy}
-            >
-              <Text style={styles.exchangeBtnText}>DELIVER NOW</Text>
-            </TouchableOpacity>
-          </View>
           </>
         )}
       </ScrollView>

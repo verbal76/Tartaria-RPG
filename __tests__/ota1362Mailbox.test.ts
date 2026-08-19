@@ -36,6 +36,8 @@ import {
   setMailboxConfig,
   loadMailboxConfig,
   _setMailboxForTests,
+  _setMailboxEnabledForTests,
+  MAILBOX_ENABLED,
   SYNC_MIN_INTERVAL_MS,
 } from '../app/engine/fallenMailbox';
 
@@ -165,7 +167,27 @@ describe('OTA-1362 — the gear faucet', () => {
 
 describe('OTA-1362 — the mailbox', () => {
   const realFetch = global.fetch;
-  afterEach(() => { global.fetch = realFetch; _setMailboxForTests(null); });
+  // ⚠ Shipped dark (MAILBOX_ENABLED = false) until it has somewhere to live.
+  // The machinery is complete, so the suite lifts the flag to exercise it and
+  // drops it again — and the first test below pins the shipped state itself.
+  beforeEach(() => { _setMailboxEnabledForTests(true); });
+  afterEach(() => { global.fetch = realFetch; _setMailboxForTests(null); _setMailboxEnabledForTests(null); });
+
+  it('⚠⚠ SHIPPED DARK: with the flag as it ships, nothing is contacted at all', async () => {
+    // An address field that silently never works is worse than no field. Until
+    // the box exists, the whole path is inert — not merely unconfigured.
+    expect(MAILBOX_ENABLED).toBe(false);
+    _setMailboxEnabledForTests(null);
+    await asPhone('inst-A', 'Sasmooch', 'key-A', [{ installId: 'inst-B', key: 'key-B' }]);
+    _setMailboxForTests({ url: 'https://box.example/fallen', token: 't', auto: true });
+    const spy = jest.fn();
+    global.fetch = spy as unknown as typeof fetch;
+    const out = await syncNow({ force: true });
+    expect(out.ran).toBe(false);
+    expect(out.reason).toBe('coming-soon');
+    maybeAutoSync();
+    expect(spy).not.toHaveBeenCalled();
+  });
 
   it('⚠⚠ OFF until an address is set — a build that never opted in sends nothing', async () => {
     await asPhone('inst-A', 'Sasmooch', 'key-A', [{ installId: 'inst-B', key: 'key-B' }]);

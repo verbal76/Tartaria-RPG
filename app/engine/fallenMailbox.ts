@@ -32,6 +32,24 @@ import {
   type ImportOutcome,
 } from './fallenLedgerStore';
 
+/** ⚠⚠ COMING SOON — owner's call, and the right one. The transport is built and
+ *  tested, but it has no home yet: it wants a plain GET-to-read / PUT-to-write
+ *  address, and the obvious candidate (a GitHub repo) cannot do the write half
+ *  that way — reads come from raw.githubusercontent, writes go through the API
+ *  with base64 content and the previous file's hash. Until that is settled,
+ *  shipping the field would invite a player to type an address that silently
+ *  never works, which is worse than not offering it.
+ *
+ *  Flipping this to true is the whole switch: the machinery below is complete
+ *  and its suite runs against it either way. */
+export const MAILBOX_ENABLED = false;
+let ENABLED_OVERRIDE: boolean | null = null;
+function mailboxEnabled(): boolean {
+  return ENABLED_OVERRIDE ?? MAILBOX_ENABLED;
+}
+/** Lets the suite exercise the delivery machinery while the feature is dark. */
+export function _setMailboxEnabledForTests(v: boolean | null): void { ENABLED_OVERRIDE = v; }
+
 const CONFIG_KEY = 'tartaria.fallen.mailbox.v1';
 /** The floor between automatic syncs. A death or a rest can ask for one sooner
  *  than this, but the heartbeat never beats faster. */
@@ -124,7 +142,7 @@ async function fetchWithTimeout(url: string, init: RequestInit): Promise<Respons
 
 export interface SyncOutcome {
   ran: boolean;
-  reason?: 'off' | 'bad-url' | 'too-soon' | 'no-houses';
+  reason?: 'coming-soon' | 'off' | 'bad-url' | 'too-soon' | 'no-houses';
   pushed: boolean;
   pulled: number;
   failed: number;
@@ -140,6 +158,8 @@ const IDLE: SyncOutcome = { ran: false, pushed: false, pulled: 0, failed: 0, imp
 export async function syncNow(opts: { force?: boolean } = {}): Promise<SyncOutcome> {
   if (inFlight) return inFlight;
   const run = (async (): Promise<SyncOutcome> => {
+    // Dark until it has somewhere to live. Nothing is contacted, nothing leaks.
+    if (!mailboxEnabled()) return { ...IDLE, reason: 'coming-soon' };
     const cfg = await loadMailboxConfig();
     if (!cfg.url) return { ...IDLE, reason: 'off' };
     if (!validUrl(cfg.url)) return { ...IDLE, reason: 'bad-url' };
@@ -193,6 +213,7 @@ export async function syncNow(opts: { force?: boolean } = {}): Promise<SyncOutco
  *  a screen opening. It declines quietly unless auto is on and the floor has
  *  passed. */
 export function maybeAutoSync(): void {
+  if (!mailboxEnabled()) return;
   const cfg = cachedMailboxConfig();
   if (!cfg.auto || !cfg.url) return;
   if (Date.now() - lastSyncAt < SYNC_MIN_INTERVAL_MS) return;
