@@ -46,7 +46,12 @@ export interface FusionSynthEngine {
 /** Hard ceilings on every numeric Qwen returns. Same defense-in-depth
  *  pattern as the basic item synth — the model is well-behaved at
  *  temperature 0.1 but should never be trusted to balance loot. */
-const FUSION_CLAMPS = {
+/** ⚠ EXPORTED for OTA-1360: the shared-fallen importer validates a foreign
+ *  fused item against THIS constant, so an imported Crucible piece is held to
+ *  exactly the ceiling a locally forged one is — no tighter (which would nerf
+ *  real work) and no looser (which would be a cheat lane). One source of truth;
+ *  the two can never drift. */
+export const FUSION_CLAMPS = {
   /** Max weapon damage. "2d8" is the cap; we accept 1d4–2d8 across
    *  the standard die set. */
   damageDieCounts: [1, 2] as const,
