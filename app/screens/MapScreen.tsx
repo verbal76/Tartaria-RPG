@@ -34,6 +34,7 @@ import { FirstTimeHint } from '../components/FirstTimeHint';
 // panel so a player can tap any known location and start travel
 // without digging through Lore.
 import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y, cellToAtlasFraction, canonicalCellFor } from '../engine/worldMap';
+import { worldMarkerFraction } from '../engine/mapFraction';
 import {
   atlasCoordForLocation,
   LOCATION_ATLAS_COORDS,
@@ -157,15 +158,11 @@ const CELL_TO_LOCATION: Record<string, string> = (() => {
 // do not swap back to a spring, which reads as a teleport.
 const CENTER_GLIDE_MS = 1400;
 
-/** Where a marker at this cell should be DRAWN. Never used for distance or routing. */
-function markerFraction(x: number, y: number): { fx: number; fy: number } {
-  const id = CELL_TO_LOCATION[`${x},${y}`];
-  if (id) {
-    const a = LOCATION_ATLAS_COORDS[id]!;
-    return atlasVisualFraction(id, a.fx, a.fy);
-  }
-  return cellToAtlasFraction(x, y);
-}
+/** ⚠ WEB-004 — MOVED TO app/engine/mapFraction.ts, AND THAT MOVE IS THE POINT.
+ *  The corner mini-map draws the same marker, and two implementations of "where
+ *  is the player on the picture" would be free to drift — the exact class of
+ *  defect this codebase has spent OTAs unpicking. One copy, both callers. */
+const markerFraction = worldMarkerFraction;
 
 // ⚠⚠ THE LEGEND INSET IS GONE, AND DELETING IT WAS MANDATORY — NOT A TIDY-UP.
 //
@@ -290,6 +287,29 @@ export function MapScreen() {
   const startTy = useRef(0);
   const startPinchDist = useRef(0);
   const lastTapAt = useRef(0);
+  // ⚠⚠ WEB-004 — WHAT A PINCH HAS TO REMEMBER, AND WHAT IT USED TO FORGET.
+  //   · startMid  — the screen point BETWEEN the fingers when the pinch began.
+  //     Zoom is anchored there, so whatever the player put between their
+  //     fingers is what stays still. Without it the view scales about the box
+  //     centre and everything else slides away from it.
+  //   · startDx/Dy — `gestureState.dx` accumulates from the FIRST touch of the
+  //     whole gesture and is never rebased. Every place below that re-captures
+  //     startTx/startTy (second finger lands, or a finger lifts) was folding the
+  //     pan-so-far into the baseline and then adding it a second time out of dx.
+  //     Recording dx at the same instant makes the delta relative.
+  const startMidX = useRef(0);
+  const startMidY = useRef(0);
+  const startDx = useRef(0);
+  const startDy = useRef(0);
+  // Page position of the image box, so a pinch midpoint (which arrives in page
+  // coordinates) can be expressed relative to the box centre the transform
+  // scales about. Measured on layout; re-measured whenever the box does.
+  const boxRef = useRef<View>(null);
+  const boxPage = useRef({ x: 0, y: 0 });
+  const midOf = (ts: Array<{ x: number; y: number }>) => ({
+    x: (ts[0]!.x + ts[1]!.x) / 2,
+    y: (ts[0]!.y + ts[1]!.y) / 2,
+  });
 
   const clampTranslate = (tx: number, ty: number, currentScale: number, box: { width: number; height: number } | null) => {
     if (!box) return { tx, ty };
@@ -459,8 +479,13 @@ export function MapScreen() {
         startScale.current = scaleRef.current;
         startTx.current = txRef.current;
         startTy.current = tyRef.current;
+        startDx.current = 0;
+        startDy.current = 0;
         if (ts.length >= 2) {
           startPinchDist.current = distance(ts[0]!, ts[1]!);
+          const m = midOf(ts);
+          startMidX.current = m.x;
+          startMidY.current = m.y;
         } else {
           // Double-tap reset.
           const now = Date.now();
@@ -485,6 +510,14 @@ export function MapScreen() {
           startScale.current = scaleRef.current;
           startTx.current = txRef.current;
           startTy.current = tyRef.current;
+          const m = midOf(ts);
+          startMidX.current = m.x;
+          startMidY.current = m.y;
+          // ⚠ WEB-004 — rebase dx with the rest of the baseline. This line is
+          // the second half of the drift: the pan travelled so far is now IN
+          // startTx, and without this it was still in gestureState.dx too.
+          startDx.current = gestureState.dx;
+          startDy.current = gestureState.dy;
           return;
         }
         // Conversely, if we drop from 2 touches back to 1, re-capture
@@ -495,23 +528,57 @@ export function MapScreen() {
           startScale.current = scaleRef.current;
           startTx.current = txRef.current;
           startTy.current = tyRef.current;
+          startDx.current = gestureState.dx;
+          startDy.current = gestureState.dy;
           return;
         }
         if (ts.length >= 2 && startPinchDist.current > 0) {
-          // Pinch — scale ratio drives zoom, midpoint drives pan.
+          // ⚠⚠ WEB-004 — PINCH ANCHORED ON THE FINGERS, NOT ON THE BOX CENTRE.
+          //
+          // Owner: *"when I use the two-finger gesture on the Atlas map to zoom
+          // in it doesn't stay centered on whatever was in the center of the
+          // screen — if I'm centered on the player, as I spread my fingers the
+          // player starts shooting down and to the left and I lose them off
+          // screen and have to find them again."*
+          //
+          // The old line raised the scale and left the translate to the raw pan
+          // delta. This layer transforms about the BOX CENTRE —
+          //     screen = C + t + s·(p − C)
+          // — so with `t` unchanged, every content point p flies away from C at
+          // a rate of (s₁ − s₀)·(p − C). Anything not exactly on the centre
+          // pixel drifts, and it drifts FASTER the further out it already was,
+          // which is precisely the "shoots off and I lose them" the owner
+          // describes. Centering on the player first does not save you: the ⌖ ME
+          // glide leaves him at the centre of the BOX, and the pinch midpoint is
+          // wherever the hands happen to be.
+          //
+          // Solve for the translate that keeps the content point under the
+          // fingers under the fingers. With u* = (F₀ − K − t₀)/s₀ the content
+          // offset that was beneath the initial midpoint (K = the box centre in
+          // page coordinates, since touches arrive as page points):
+          //     t₁ = F₁ − K − (s₁/s₀)·(F₀ − K − t₀)
+          // Pan falls out of the same expression — F₁ moving IS the pan — so the
+          // pinch branch no longer reads gestureState at all, and cannot
+          // double-count it.
           const newDist = distance(ts[0]!, ts[1]!);
           const ratio = newDist / startPinchDist.current;
           // OTA 060 — no upper bound. Pinch in as far as the player
           // wants. MIN_SCALE preserved so they can't shrink to zero.
           const nextScale = Math.max(MIN_SCALE, startScale.current * ratio);
-          const tx = startTx.current + gestureState.dx;
-          const ty = startTy.current + gestureState.dy;
+          const mid = midOf(ts);
+          const kx = boxPage.current.x + (imgBox?.width ?? 0) / 2;
+          const ky = boxPage.current.y + (imgBox?.height ?? 0) / 2;
+          const grow = nextScale / startScale.current;
+          const tx = mid.x - kx - grow * (startMidX.current - kx - startTx.current);
+          const ty = mid.y - ky - grow * (startMidY.current - ky - startTy.current);
           const clamped = clampTranslate(tx, ty, nextScale, imgBox);
           applyTransform(nextScale, clamped.tx, clamped.ty);
         } else {
-          // Single-finger pan.
-          const tx = startTx.current + gestureState.dx;
-          const ty = startTy.current + gestureState.dy;
+          // Single-finger pan. ⚠ WEB-004 — the delta is measured from the
+          // last baseline capture, not from the first touch of the gesture;
+          // see startDx.
+          const tx = startTx.current + (gestureState.dx - startDx.current);
+          const ty = startTy.current + (gestureState.dy - startDy.current);
           const clamped = clampTranslate(tx, ty, scaleRef.current, imgBox);
           applyTransform(scaleRef.current, clamped.tx, clamped.ty);
         }
@@ -815,10 +882,15 @@ export function MapScreen() {
       </View>
 
       <View
+        ref={boxRef}
         style={styles.imageBox}
         onLayout={(e) => {
           const { width, height } = e.nativeEvent.layout;
           setImgBox({ width, height });
+          // WEB-004 — the pinch anchor needs the box's PAGE origin, because
+          // touch points arrive in page coordinates. onLayout only reports a
+          // position relative to the parent, so measure explicitly.
+          boxRef.current?.measureInWindow((x, y) => { boxPage.current = { x, y }; });
         }}
         {...panResponder.panHandlers}
       >
