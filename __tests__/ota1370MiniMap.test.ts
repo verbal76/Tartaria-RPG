@@ -335,3 +335,58 @@ describe('OTA-1372 — the Atlas pinch stays where your fingers are', () => {
     expect(map).toContain('boxPage.current.x + (imgBox?.width ?? 0) / 2');
   });
 });
+
+describe('OTA-1373 — the anchor knows where the box actually is', () => {
+  const map = src('app', 'screens', 'MapScreen.tsx');
+
+  it('⚠⚠ a wrong box origin slides EXACTLY the way the owner described', () => {
+    // OTA-1372's formula was right and it still slid, because it was fed a bad
+    // K. This is the arithmetic that says so, and why the symptom looked like a
+    // formula bug: the error is zero at rest and grows with the zoom.
+    //
+    //   t₁  = F₁ − K − g·(F₀ − K − t₀)
+    //   t₁' = F₁ − (K+ε) − g·(F₀ − (K+ε) − t₀)   =  t₁ + ε·(g − 1)
+    const err = (eps: number, grow: number) => eps * (grow - 1);
+    expect(err(300, 1)).toBe(0);      // at rest: nothing wrong, nothing visible
+    expect(err(300, 2)).toBe(300);    // start spreading and it walks
+    expect(err(300, 5)).toBe(1200);   // "shoots off and I lose them"
+    // …and with the origin correct the error is zero at every zoom.
+    for (const g of [1, 2, 5, 10]) expect(err(0, g)).toBe(0);
+  });
+
+  it('the origin comes from the touch, not from an async measure', () => {
+    expect(map).toContain('src.pageX - src.locationX');
+    expect(map).toContain('src.pageY - src.locationY');
+    // …re-derived on every gesture, so it cannot go stale behind a header.
+    const grant = map.slice(map.indexOf('onPanResponderGrant'), map.indexOf('onPanResponderMove'));
+    expect(grant).toContain('refreshBoxOrigin(e);');
+    const move = map.slice(map.indexOf('onPanResponderMove'), map.indexOf('onPanResponderRelease'));
+    expect(move).toContain('refreshBoxOrigin(e);');
+  });
+
+  it('⚠ and the measured value survives as the fallback, not as the source', () => {
+    expect(map).toContain('boxRef.current?.measureInWindow(');
+    expect(map).toContain('if (o) boxPage.current = o;');
+  });
+
+  it('⚠⚠ the map layer is transparent to touches, which is what makes it the BOX origin', () => {
+    // `pageX − locationX` is the origin of whatever view the touch TARGETED.
+    // If the transformed map layer could take touches, that would be its own
+    // moving origin and the anchor would be nonsense. Nothing inside is
+    // tappable — asserted here so adding something tappable trips this test
+    // rather than quietly breaking the pinch.
+    const boxStart = map.indexOf('ref={boxRef}');
+    const boxEnd = map.indexOf('</Animated.View>', boxStart);
+    expect(boxStart).toBeGreaterThan(0);
+    expect(boxEnd).toBeGreaterThan(boxStart);
+    const inside = map.slice(boxStart, boxEnd);
+    // the transformed layer itself is transparent…
+    expect(inside).toContain('pointerEvents="none"\n          style={[\n            styles.imageInner,');
+    // …and nothing drawn on the map is tappable.
+    // ⚠ the JSX prop form, so the explanatory comment above the layer (which
+    // says the words "zero onPress in the subtree") does not trip this.
+    expect(inside).not.toContain('onPress=');
+    expect(inside).not.toContain('<TouchableOpacity');
+    expect(inside).not.toContain('<Pressable');
+  });
+});

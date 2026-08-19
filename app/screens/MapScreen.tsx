@@ -310,6 +310,43 @@ export function MapScreen() {
     x: (ts[0]!.x + ts[1]!.x) / 2,
     y: (ts[0]!.y + ts[1]!.y) / 2,
   });
+  /** ⚠⚠ OTA-1373 — THE BOX ORIGIN, TAKEN FROM THE TOUCH ITSELF.
+   *
+   *  OTA-1372 anchored the pinch correctly and it still slid, because the
+   *  anchor needs the box's PAGE origin and that was coming from an async
+   *  `measureInWindow` fired inside `onLayout`. When that callback lands late,
+   *  never fires, or goes stale behind a header whose height changed, the
+   *  origin reads (0, 0) — and the error is not cosmetic. Work it through: if
+   *  K is wrong by ε then
+   *      t₁' = t₁ + ε·(grow − 1)
+   *  which is ZERO at rest and grows with the zoom. That is exactly the
+   *  reported symptom — fine until you start spreading, then it slides away,
+   *  worse the harder you pinch. A correct formula fed a wrong origin.
+   *
+   *  Every touch carries both `pageX` (screen space) and `locationX` (relative
+   *  to the view it hit), so their DIFFERENCE is that view's page origin —
+   *  exact, synchronous, and re-derived on every gesture so it cannot go stale.
+   *  ⚠ This is only the box's origin because the map layer below is
+   *  `pointerEvents="none"`, which makes the box itself the target of every
+   *  touch. Nothing inside it is tappable, so that costs nothing — but if a
+   *  tappable overlay is ever added in there, this reads that overlay's origin
+   *  instead and the anchor breaks. The measured value stays as the fallback
+   *  for any platform that does not report `locationX`. */
+  const originFromTouch = (e: GestureResponderEvent): { x: number; y: number } | null => {
+    const t = (e.nativeEvent.touches ?? [])[0] as
+      { pageX?: number; pageY?: number; locationX?: number; locationY?: number } | undefined;
+    const src = t ?? (e.nativeEvent as unknown as
+      { pageX?: number; pageY?: number; locationX?: number; locationY?: number });
+    if (typeof src?.pageX === 'number' && typeof src?.locationX === 'number'
+      && typeof src?.pageY === 'number' && typeof src?.locationY === 'number') {
+      return { x: src.pageX - src.locationX, y: src.pageY - src.locationY };
+    }
+    return null;
+  };
+  const refreshBoxOrigin = (e: GestureResponderEvent) => {
+    const o = originFromTouch(e);
+    if (o) boxPage.current = o;
+  };
 
   const clampTranslate = (tx: number, ty: number, currentScale: number, box: { width: number; height: number } | null) => {
     if (!box) return { tx, ty };
@@ -476,6 +513,7 @@ export function MapScreen() {
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (e) => {
         const ts = touchesOf(e);
+        refreshBoxOrigin(e);
         startScale.current = scaleRef.current;
         startTx.current = txRef.current;
         startTy.current = tyRef.current;
@@ -506,6 +544,7 @@ export function MapScreen() {
         // player got pan-only behavior. Now we re-capture the
         // baseline as soon as we see two touches.
         if (ts.length >= 2 && startPinchDist.current === 0) {
+          refreshBoxOrigin(e);
           startPinchDist.current = distance(ts[0]!, ts[1]!);
           startScale.current = scaleRef.current;
           startTx.current = txRef.current;
@@ -895,6 +934,12 @@ export function MapScreen() {
         {...panResponder.panHandlers}
       >
         <Animated.View
+          // ⚠⚠ OTA-1373 — REQUIRED, not decoration. With the map layer
+          // transparent to touches, the imageBox itself is the target of every
+          // touch, which is what makes `pageX − locationX` the BOX's origin
+          // rather than some transformed child's. Nothing in here is tappable
+          // (verified: zero onPress in the subtree), so it costs nothing.
+          pointerEvents="none"
           style={[
             styles.imageInner,
             { transform: [{ translateX }, { translateY }, { scale }] },
