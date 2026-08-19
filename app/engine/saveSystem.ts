@@ -99,6 +99,31 @@ export interface GlobalStash {
   fallenSeeds?: string[];
 }
 
+/** ⚠⚠ OTA-1366 — THE CLONE. Owner: *"what I want is the exact same in every
+ *  detail dead I send someone to have everything exactly as it was when they
+ *  died, same gear, same stats, same coatings, everything I want a clone sent."*
+ *
+ *  ⚠ THE HOLLOWED WAS NEVER A CLONE — not even locally. `revenantFromFallen`
+ *  hard-coded `abilityPoint: 'Strength 6'`, derived damage from KILL COUNT
+ *  alone, and sized HP off the LIVING player. The dead character's own
+ *  strength, dexterity, hpMax and AC were never recorded anywhere, so no
+ *  transport could have carried them — the file format was never the problem.
+ *  This block is what makes a record a person instead of a name with a kit.
+ *
+ *  Absent on every record written before this OTA; readers fall back to the old
+ *  kill-count build, so an existing roll of the fallen keeps working untouched. */
+export interface FallenSnapshot {
+  /** The six attributes as they stood at death. */
+  stats: { strength: number; dexterity: number; intelligence: number; wisdom: number; charisma: number; stealth: number };
+  /** Their real maximum health — what the clone fights with. */
+  hpMax: number;
+  /** Armour class as worn. */
+  ac: number;
+  /** Race and faction ids, so a revenant reads right abroad. */
+  raceId?: string;
+  factionId?: string;
+}
+
 /** OTA-845 — a character who died. Persisted install-wide in the GlobalStash. */
 export interface FallenHero {
   name: string;
@@ -122,6 +147,8 @@ export interface FallenHero {
   /** OTA-994 — full copies of the died-in kit (instance stats and all), so the
    *  revenant hands back the REAL gear. Absent on records that predate it. */
   gear?: FallenGearPiece[];
+  /** ⚠⚠ OTA-1366 — the character themself, so the Hollowed fights as they did. */
+  snapshot?: FallenSnapshot;
   /** OTA-975 — set once their Hollowed revenant is put to rest. */
   avengedBy?: string;
   avengedTs?: number;

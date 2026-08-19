@@ -161,12 +161,22 @@ describe('OTA-1362 — the gear allowlist', () => {
     expect(piece.name).toBe('Godblade of Free Levels');
     expect(piece.kind).toBe('weapon');
 
-    // Every injected field is GONE — checked on the object itself, so a field
-    // that is merely undefined-but-present still fails this.
-    for (const banned of ['golemCore', 'uniqueStats', 'stolen', 'selfCrafted',
-                          'reservedForQuest', 'materializing', 'coating', 'coatingSlots']) {
+    // ⚠ OTA-1366 — coatings and fused stats now CROSS (the owner's call: the
+    // player's own upgrade work is most of what makes an inferred weapon
+    // theirs). What must never cross is unchanged, and the things that do cross
+    // are clamped to the game's own ceilings — asserted just below.
+    for (const banned of ['golemCore', 'stolen', 'selfCrafted',
+                          'reservedForQuest', 'materializing']) {
       expect(Object.prototype.hasOwnProperty.call(piece, banned)).toBe(false);
     }
+    // The hostile 99d99 fused weapon comes through as a legal one, or not at all.
+    // The hostile 99d99 fused weapon is refused outright — the Crucible's own
+    // standard die set is the gate, so an invented roll never becomes a legal one.
+    const fused = (piece as { uniqueStats?: { damageDice?: string; acBonus?: number } }).uniqueStats;
+    expect(fused?.damageDice).toBeUndefined();
+    expect(fused?.acBonus ?? 0).toBeLessThanOrEqual(6);
+    // The 9d9 poison coating matches no vial in the game, so it does not land.
+    expect((piece as { coating?: unknown }).coating).toBeUndefined();
     // The quest LOCK tags are stripped; the honest tag stays.
     expect(piece.tags).toContain('weapon');
     expect(piece.tags).not.toContain('quest');
@@ -424,5 +434,188 @@ describe('OTA-1362 — the lore of the Hollowed', () => {
     const close = revenantDefeatLines(f, 'Halla');
     expect(close.world.toLowerCase()).toContain('rest');
     expect(close.world.toLowerCase()).toContain('received at last');
+  });
+});
+
+// ⚠⚠ OTA-1366 — THE UPGRADES TRAVEL, AND ARRIVE LEGAL.
+//
+// Owner: *"most of the dead will have inferred weapons. since lost inferred
+// weapons are better stats than lore weapons it seems and can be upgraded as
+// well. we want them to carry these effects over."*
+//
+// The base stats never needed sending — weapon inference is a pure function of
+// the NAME, so the receiving phone infers the identical weapon from the
+// identical string. What was being thrown away was the work done AFTERWARDS:
+// coatings, the second slot, worked-in resists, a Crucible fusion. Those cross
+// now, and every ceiling is the game's own: fusion tops out at 2d8 / acBonus 6,
+// catalog armour at acBonus 5, coatings in play are 1d4 and 2d6, ADDED_RESIST_CAP
+// is 3 (+1 upgraded). A foreign piece can never beat one you could forge.
+describe('OTA-1366 — a dead player\'s upgrade work crosses, clamped', () => {
+  const upgraded = {
+    name: 'Whisper Marrow', kind: 'weapon', rarity: 'Rare', slot: 'main',
+    tags: ['weapon'],
+    coating: { kind: 'poison', dice: '1d6', label: 'Envenomed' },
+    coating2: { kind: 'cold', dice: '1d4', label: 'Frosted' },
+    coatingSlots: 2,
+    instanceStats: { statBonuses: [{ stat: 'stealth', amount: 2 }] },
+  };
+
+  it("⚠⚠ THE OWNER'S ASK: a coated, upgraded weapon keeps its work", () => {
+    const p = sanitizeForeignGearPiece(upgraded)!;
+    expect(p).not.toBeNull();
+    const piece = p as unknown as {
+      coating?: { kind: string; dice: string; label: string };
+      coating2?: { kind: string };
+      coatingSlots?: number;
+      instanceStats?: { statBonuses?: { stat: string; amount: number }[] };
+    };
+    expect(piece.coating?.kind).toBe('poison');
+    expect(piece.coating?.dice).toBe('1d6');
+    expect(piece.coating?.label).toBe('Envenomed');
+    // The Crucible's second slot survives with it.
+    expect(piece.coating2?.kind).toBe('cold');
+    expect(piece.coatingSlots).toBe(2);
+    // And the stealth roll that made it worth carrying.
+    expect(piece.instanceStats?.statBonuses?.[0]).toEqual({ stat: 'stealth', amount: 2 });
+  });
+
+  it('⚠⚠ a cheat coating is REFUSED, not trimmed into a legal one', () => {
+    // Trimming would hand the cheater a working coating for free. The vials
+    // that exist top out at 1d6, so 2d8 is not "close enough" — it is invented.
+    const p = sanitizeForeignGearPiece({
+      ...upgraded,
+      coating: { kind: 'poison', dice: '99d99', label: 'X'.repeat(200) },
+      coating2: { kind: 'antimatter', dice: '1d4', label: 'Fake' },
+    })!;
+    const piece = p as unknown as { coating?: unknown; coating2?: unknown; coatingSlots?: number };
+    expect(piece.coating).toBeUndefined();
+    expect(piece.coating2).toBeUndefined();
+    expect(piece.coatingSlots).toBeUndefined();
+    // A coating stronger than any real vial is refused too, not rounded down.
+    const q = sanitizeForeignGearPiece({ ...upgraded, coating: { kind: 'poison', dice: '2d8', label: 'Overcooked' } })!;
+    expect((q as unknown as { coating?: unknown }).coating).toBeUndefined();
+  });
+
+  it("⚠⚠ THE OWNER'S POINT: a real 2d10 Crucible weapon is NOT nerfed on import", () => {
+    // "fuse crucible weapons and armor are very important aspect of the game,
+    // and nerfing them on import kind of defeats the purpose." The first cut
+    // capped fused dice at 2d8 and would have downgraded this silently.
+    const p = sanitizeForeignGearPiece({
+      name: 'Marrowsong Cleaver', kind: 'weapon', rarity: 'Legendary', slot: 'main',
+      uniqueStats: {
+        kind: 'weapon', rarity: 'Legendary', durability: { current: 30, max: 30 },
+        damageDice: '2d10', damageType: 'slashing', scalesWith: 'strength',
+        resistance: 'aetheric', special: 'It sings on the backswing.',
+      },
+    })!;
+    const fused = (p as unknown as { uniqueStats?: Record<string, unknown> }).uniqueStats!;
+    expect(fused.damageDice).toBe('2d10');
+    expect(fused.rarity).toBe('Legendary');
+    expect(fused.damageType).toBe('slashing');
+    expect(fused.scalesWith).toBe('strength');
+    expect(fused.special).toContain('backswing');
+    expect((fused.durability as { max: number }).max).toBe(30);
+  });
+
+  it('⚠⚠ ...but dice the Crucible itself refuses are refused here too', () => {
+    // 2d7 and 1d9 are not in the standard set, and 3d10 exceeds the count.
+    // Rejecting the fused block leaves an ordinary piece, never a super one.
+    for (const bad of ['2d7', '1d9', '3d10', '2d20', '9d9']) {
+      const p = sanitizeForeignGearPiece({
+        name: 'Forgery', kind: 'weapon', slot: 'main',
+        uniqueStats: { kind: 'weapon', rarity: 'Legendary', durability: { current: 30, max: 30 }, damageDice: bad, damageType: 'slashing', scalesWith: 'strength' },
+      })!;
+      const fused = (p as unknown as { uniqueStats?: { damageDice?: string } }).uniqueStats;
+      expect(fused?.damageDice).toBeUndefined();
+    }
+  });
+
+  it('⚠ worked-in armour resists cross, capped at the upgraded cap', () => {
+    const p = sanitizeForeignGearPiece({
+      name: 'Mud-Warden Vest', kind: 'armor', slot: 'chest',
+      addedResists: ['burn', 'cold', 'poison', 'aetheric', 'electrical', 'nonsense', 'burn'],
+    })!;
+    const piece = p as unknown as { addedResists?: string[]; resistCapBonus?: number };
+    // ADDED_RESIST_CAP is 3, +1 with the Crucible upgrade — never six.
+    expect(piece.addedResists!.length).toBeLessThanOrEqual(4);
+    expect(piece.addedResists).not.toContain('nonsense');
+    // No duplicates smuggled in to eat the cap twice.
+    expect(new Set(piece.addedResists).size).toBe(piece.addedResists!.length);
+  });
+
+  it('⚠ a per-instance armour roll is capped at what the game itself grants', () => {
+    const p = sanitizeForeignGearPiece({
+      name: 'Plated Vest', kind: 'armor', slot: 'chest',
+      instanceStats: { acBonus: 9999, statBonuses: [{ stat: 'strength', amount: 99 }] },
+    })!;
+    const st = (p as unknown as { instanceStats?: { acBonus?: number; statBonuses?: { amount: number }[] } }).instanceStats!;
+    expect(st.acBonus).toBe(6);
+    expect(st.statBonuses![0]!.amount).toBeLessThanOrEqual(5);
+  });
+});
+
+// ⚠⚠ OTA-1366 — THE CLONE. Owner: *"what I want is the exact same in every
+// detail dead I send someone to have everything exactly as it was when they
+// died, same gear, same stats, same coatings, everything I want a clone sent."*
+//
+// ⚠ THE HOLLOWED WAS NEVER A CLONE, and not because of the file format. It
+// hard-coded `abilityPoint: 'Strength 6'`, took its damage from KILL COUNT, and
+// sized its HP off the LIVING player. The dead character's own strength, hpMax
+// and AC were never recorded at all — so no transport could have carried them.
+// The snapshot is what turns a name-with-a-kit into a person.
+describe('OTA-1366 — the clone crosses whole', () => {
+  const SNAP = {
+    stats: { strength: 18, dexterity: 14, intelligence: 9, wisdom: 11, charisma: 7, stealth: 4 },
+    hpMax: 240, ac: 17, raceId: 'aetherborn', factionId: 'eternal_dynasty',
+  };
+
+  it("⚠⚠ THE OWNER'S ASK: stats, health and AC arrive exactly as they died", () => {
+    const f = sanitizeForeignFallen(goodFallen({ snapshot: SNAP }), NOW)!;
+    expect(f.snapshot).toEqual(SNAP);
+  });
+
+  it('⚠⚠ and the Hollowed FIGHTS as they did — not as a kill-count formula', () => {
+    const f = sanitizeForeignFallen(goodFallen({
+      snapshot: SNAP,
+      kills: 3, // a low kill count must NOT shrink a strong character's clone
+      gear: [{
+        name: 'Marrowsong Cleaver', kind: 'weapon', rarity: 'Legendary', slot: 'main', tags: ['weapon'],
+        uniqueStats: { kind: 'weapon', rarity: 'Legendary', durability: { current: 30, max: 30 }, damageDice: '2d10', damageType: 'slashing', scalesWith: 'strength' },
+      }],
+    }), NOW)!;
+    // The living player is frail; the clone does NOT scale down to meet them.
+    const foe = revenantFromFallen(f, 60);
+    expect(foe.hp).toBe(240);
+    // Their real blade's dice, not the 2d6 a 3-kill record would have given.
+    expect(foe.damage).toBe('2d10');
+    // Their strongest attribute, not a hard-coded Strength 6.
+    expect(foe.abilityPoint).toBe('Strength 18');
+  });
+
+  it('⚠ a record with no snapshot still builds the old way — nothing regresses', () => {
+    const f = sanitizeForeignFallen(goodFallen({ kills: 200 }), NOW)!;
+    expect(f.snapshot).toBeUndefined();
+    const foe = revenantFromFallen(f, 100);
+    expect(foe.hp).toBeGreaterThan(0);
+    expect(foe.abilityPoint).toBe('Strength 6');
+  });
+
+  it('⚠ a forged god-clone is bounded — a hard fight, never an immortal one', () => {
+    const f = sanitizeForeignFallen(goodFallen({
+      snapshot: { stats: { strength: 9_999_999, dexterity: -5, intelligence: 0, wisdom: 0, charisma: 0, stealth: 0 }, hpMax: 9_999_999, ac: 9_999_999 },
+    }), NOW)!;
+    expect(f.snapshot!.hpMax).toBeLessThanOrEqual(5_000);
+    expect(f.snapshot!.stats.strength).toBeLessThanOrEqual(200);
+    expect(f.snapshot!.stats.dexterity).toBe(0);
+    expect(f.snapshot!.ac).toBeLessThanOrEqual(60);
+  });
+
+  it('⚠⚠ the FULL kit crosses — ten slots, so rings and an amulet are not dropped', () => {
+    const kit = ['main', 'off', 'chest', 'head', 'legs', 'feet', 'amulet', 'ring', 'ring2', 'ring3']
+      .map((slot, i) => ({ name: `Piece ${i}`, kind: slot === 'main' || slot === 'off' ? 'weapon' : 'armor', slot, tags: [] }));
+    const f = sanitizeForeignFallen(goodFallen({ gear: kit }), NOW)!;
+    expect(f.gear).toHaveLength(10);
+    expect(f.gear!.map((g) => g.slot)).toContain('ring3');
+    expect(f.gear!.map((g) => g.slot)).toContain('amulet');
   });
 });

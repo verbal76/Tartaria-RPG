@@ -40,6 +40,8 @@
 // that is a cheap price for deleting a whole validation surface.
 import type { FallenHero } from './saveSystem';
 import type { FallenGearPiece, Rarity } from './types';
+import { FUSION_CLAMPS } from './itemFusion';
+import gearData from '../data/items/gear.json';
 
 // ---- caps ------------------------------------------------------------------
 /** Foreign dead held at once. The pool is the difficulty dial: five players
@@ -47,8 +49,8 @@ import type { FallenGearPiece, Rarity } from './types';
 export const FOREIGN_FALLEN_CAP = 40;
 /** Rest records kept. These are trophies — they outlive the corpse. */
 export const REST_RECORD_CAP = 120;
-/** Gear pieces carried per fallen (the local snapshot never exceeds a full kit). */
-export const MAX_GEAR_PIECES = 8;
+/** Gear pieces per fallen — a full loadout is ten slots (OTA-1366). */
+export const MAX_GEAR_PIECES = 10;
 /** A record dated further ahead than this is a broken or forged clock. */
 export const MAX_CLOCK_SKEW_MS = 24 * 60 * 60 * 1000;
 
@@ -134,7 +136,7 @@ const RARITIES: readonly Rarity[] = ['Common', 'Uncommon', 'Rare', 'Legendary'];
 const KINDS = ['weapon', 'armor', 'relic', 'consumable', 'misc', 'runecaster', 'dog_armor'] as const;
 type ItemKind = (typeof KINDS)[number];
 const BASE_STATS = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'stealth'] as const;
-const GEAR_SLOTS = ['main', 'off', 'head', 'chest', 'legs', 'feet', 'dog', 'relic', ''] as const;
+const GEAR_SLOTS = ['main', 'off', 'head', 'chest', 'legs', 'feet', 'amulet', 'ring', 'ring2', 'ring3', 'dog', 'relic', ''] as const;
 
 /** ⚠ Tags that grant a LOCK, not a look. A foreign piece arriving tagged
  *  `quest` would land in the save as view-only — unsellable, undroppable, and
@@ -173,6 +175,158 @@ function statBonuses(v: unknown): { stat: string; amount: number }[] | undefined
   return out.length > 0 ? out : undefined;
 }
 
+// ---- per-instance upgrade carriers -----------------------------------------
+// ⚠⚠ OTA-1366 — THE UPGRADES TRAVEL. Owner: *"most of the dead will have
+// inferred weapons. since lost inferred weapons are better stats than lore
+// weapons it seems and can be upgraded as well. we want them to carry these
+// effects over."*
+//
+// ⚠ THE BASE STATS ALREADY CROSSED, and nothing had to be sent for it: weapon
+// inference is a pure function of the NAME, so the receiving phone infers the
+// identical weapon from the identical string. What did NOT cross was the work
+// the player put IN afterwards — coatings, the second coating slot, worked-in
+// armour resists, and a Crucible fusion's one-of-a-kind stats. Those were
+// dropped in the first cut to delete a validation surface, and dropping them
+// threw away the part that made the kit theirs.
+//
+// So they cross now, and every ceiling below is taken from WHAT THE GAME CAN
+// ITSELF PRODUCE rather than a number invented for the occasion:
+//   · fusion damage tops out at 2d8 and acBonus at 6 (itemFusion)
+//   · catalog armour tops out at acBonus 5
+//   · coatings in play are 1d4 and 2d6
+//   · ADDED_RESIST_CAP is 3, +1 with the Crucible upgrade
+// A foreign piece therefore can never be better than a piece the receiving
+// player could have forged themselves — which is the only cap that cannot be
+// argued with.
+const COATING_KINDS = ['poison', 'acid', 'corruption', 'electrical', 'burn', 'cold'] as const;
+const DAMAGE_TYPES = ['slashing', 'piercing', 'bludgeoning', 'aetheric', 'burn', 'electrical', 'poison', 'cold', 'degradation'] as const;
+const FUSED_KINDS = ['weapon', 'armor', 'dog_armor'] as const;
+const FUSED_RARITIES = ['Rare', 'Legendary'] as const;
+const ARMOR_SLOTS = ['head', 'chest', 'legs', 'feet'] as const;
+/** ⚠⚠ THE CEILINGS ARE THE GAME'S OWN, READ FROM THE GAME.
+ *  Owner: *"fuse crucible weapons and armor are very important aspect of the
+ *  game, and nerfing them on import kind of defeats the purpose."* Exactly so,
+ *  and the first cut DID nerf them: it capped fused dice at 2d8 while
+ *  `FUSION_CLAMPS` allows sides [4, 6, 8, 10], so a legitimately forged 1d10 or
+ *  2d10 arrived quietly downgraded. It was simultaneously too LOOSE the other
+ *  way — accepting 2d7 and 1d9 that the Crucible itself refuses, and passing a
+ *  coating at 2d8 when the strongest vial in the game is 1d6.
+ *
+ *  So nothing below is a number of my choosing. Fused items are checked against
+ *  the same exported `FUSION_CLAMPS` the Crucible validates its own output
+ *  with, and coatings against the vials that actually exist in gear.json — so a
+ *  vial added in a later OTA widens the import automatically and cannot be
+ *  forgotten. An imported piece is held to exactly what a local one is. */
+const FUSED_DIE_COUNTS: readonly number[] = FUSION_CLAMPS.damageDieCounts;
+const FUSED_DIE_SIDES: readonly number[] = FUSION_CLAMPS.damageDieSides;
+const MAX_AC_BONUS: number = FUSION_CLAMPS.acBonus;
+const MAX_FUSED_DURABILITY: number = FUSION_CLAMPS.durabilityMax;
+
+function oneOf<T extends string>(v: unknown, set: readonly T[]): T | undefined {
+  const t = str(v, 24).toLowerCase();
+  return (set as readonly string[]).includes(t) ? (t as T) : undefined;
+}
+
+/** Every coating the game can actually paint on, harvested from the vials
+ *  themselves so the allowed set is never a copy that can rot. */
+const CATALOG_COATINGS: { kinds: Set<string>; dice: Set<string> } = (() => {
+  const kinds = new Set<string>();
+  const dice = new Set<string>();
+  try {
+    const rows = (gearData as { gear?: unknown[] }).gear ?? [];
+    for (const row of rows) {
+      const c = (row as { effect?: { coating?: { kind?: unknown; dice?: unknown } } }).effect?.coating;
+      if (!c) continue;
+      if (typeof c.kind === 'string') kinds.add(c.kind.toLowerCase());
+      if (typeof c.dice === 'string') dice.add(c.dice.toLowerCase());
+    }
+  } catch { /* fall back below */ }
+  // A build that somehow ships no vials must not become a free-for-all.
+  if (kinds.size === 0) for (const k of COATING_KINDS) kinds.add(k);
+  if (dice.size === 0) dice.add('1d4');
+  return { kinds, dice };
+})();
+
+/** Fused dice: the Crucible accepts only its own standard set, and so do we.
+ *  REJECTED rather than trimmed — trimming a cheat value down to a legal one
+ *  hands the cheater a legal weapon for free, and a genuine piece never arrives
+ *  malformed (the seal catches mangling in transit). */
+function fusedDice(v: unknown): string | undefined {
+  const raw = str(v, 8).toLowerCase();
+  const m = /^(\d{1,2})d(\d{1,3})$/.exec(raw);
+  if (!m) return undefined;
+  const count = Number(m[1]);
+  const sides = Number(m[2]);
+  if (!FUSED_DIE_COUNTS.includes(count)) return undefined;
+  if (!FUSED_DIE_SIDES.includes(sides)) return undefined;
+  return `${count}d${sides}`;
+}
+
+/** A weapon coating: the work a player painted on. Held to the vials that
+ *  exist — kind AND dice must both be something the game can actually apply. */
+function coating(v: unknown): WeaponCoatingLike | undefined {
+  if (!isObj(v)) return undefined;
+  const kind = oneOf(v.kind, COATING_KINDS);
+  const d = str(v.dice, 8).toLowerCase();
+  if (!kind || !CATALOG_COATINGS.kinds.has(kind) || !CATALOG_COATINGS.dice.has(d)) return undefined;
+  const sb = statBonuses(v.statBonus ? [v.statBonus] : undefined);
+  return {
+    kind,
+    dice: d,
+    label: str(v.label, 24) || kind,
+    ...(sb && sb[0] ? { statBonus: { stat: sb[0].stat, amount: Math.min(2, Math.max(-2, sb[0].amount)) } } : {}),
+  };
+}
+
+interface WeaponCoatingLike {
+  kind: string;
+  dice: string;
+  label: string;
+  statBonus?: { stat: string; amount: number };
+}
+
+/** A Crucible fusion's one-of-a-kind stats, rebuilt field by field. */
+function uniqueStats(v: unknown): Record<string, unknown> | undefined {
+  if (!isObj(v)) return undefined;
+  const kind = oneOf(v.kind, FUSED_KINDS);
+  if (!kind) return undefined;
+  const rarityRaw = str(v.rarity, 16);
+  const rarity = (FUSED_RARITIES as readonly string[]).includes(rarityRaw) ? rarityRaw : 'Rare';
+  const durRaw = durability(v.durability) ?? { current: MAX_FUSED_DURABILITY, max: MAX_FUSED_DURABILITY };
+  const durMax = Math.min(MAX_FUSED_DURABILITY, durRaw.max);
+  const dur = { max: durMax, current: Math.min(durMax, durRaw.current) };
+  const dd = fusedDice(v.damageDice);
+  const dt = oneOf(v.damageType, DAMAGE_TYPES);
+  const scales = oneOf(v.scalesWith, ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma'] as const);
+  const slot = oneOf(v.armorSlot, ARMOR_SLOTS);
+  const resist = oneOf(v.resistance, DAMAGE_TYPES);
+  const ac = v.acBonus != null ? int(v.acBonus, 0, MAX_AC_BONUS, 0) : undefined;
+  const sb = statBonuses(v.statBonuses);
+  return {
+    kind, rarity, durability: dur,
+    ...(dd ? { damageDice: dd } : {}),
+    ...(dt ? { damageType: dt } : {}),
+    ...(scales ? { scalesWith: scales } : {}),
+    ...(slot ? { armorSlot: slot } : {}),
+    ...(resist ? { resistance: resist } : {}),
+    ...(ac != null && ac > 0 ? { acBonus: ac } : {}),
+    ...(sb ? { statBonuses: sb } : {}),
+    ...(str(v.special, 160) ? { special: str(v.special, 160) } : {}),
+  };
+}
+
+/** Worked-in armour resists: ADDED_RESIST_CAP is 3, +1 with the upgrade. */
+function addedResists(v: unknown): string[] | undefined {
+  if (!Array.isArray(v)) return undefined;
+  const out: string[] = [];
+  for (const raw of v) {
+    const t = oneOf(raw, DAMAGE_TYPES);
+    if (t && !out.includes(t)) out.push(t);
+    if (out.length >= 4) break;
+  }
+  return out.length > 0 ? out : undefined;
+}
+
 // ---- gear ------------------------------------------------------------------
 /** ⚠⚠ ALLOWLIST RECONSTRUCTION. Every field is named here or it does not
  *  survive. Note what is deliberately ABSENT and can never cross the wire:
@@ -202,13 +356,21 @@ export function sanitizeForeignGearPiece(raw: unknown): FallenGearPiece | null {
   let instanceStats: { acBonus?: number; statBonuses?: { stat: string; amount: number }[] } | undefined;
   if (isObj(raw.instanceStats)) {
     const ac = isObj(raw.instanceStats) && raw.instanceStats.acBonus != null
-      ? int(raw.instanceStats.acBonus, 0, 20, 0)
+      ? int(raw.instanceStats.acBonus, 0, MAX_AC_BONUS, 0)
       : undefined;
     const sb = statBonuses(raw.instanceStats.statBonuses);
     if ((ac != null && ac > 0) || sb) {
       instanceStats = { ...(ac != null && ac > 0 ? { acBonus: ac } : {}), ...(sb ? { statBonuses: sb } : {}) };
     }
   }
+
+  // ⚠ The player's own work on this piece, carried across under the ceilings
+  // above. Still an ALLOWLIST — each field is named and clamped, nothing is
+  // spread — so widening what travels did not widen what can be injected.
+  const c1 = coating(raw.coating);
+  const c2 = coating(raw.coating2);
+  const fused = uniqueStats(raw.uniqueStats);
+  const resists = addedResists(raw.addedResists);
 
   const piece: FallenGearPiece = {
     name,
@@ -219,6 +381,13 @@ export function sanitizeForeignGearPiece(raw: unknown): FallenGearPiece | null {
     ...(desc ? { description: desc } : {}),
     ...(dur ? { durability: dur } : {}),
     ...(instanceStats ? { instanceStats } : {}),
+    ...(c1 ? { coating: c1 } : {}),
+    // A second coating only exists on a Crucible-upgraded weapon, and only
+    // alongside a first one.
+    ...(c1 && c2 ? { coating2: c2, coatingSlots: 2 } : {}),
+    ...(fused ? { uniqueStats: fused } : {}),
+    ...(resists ? { addedResists: resists } : {}),
+    ...(resists && resists.length > 3 ? { resistCapBonus: 1 } : {}),
   } as FallenGearPiece;
   return piece;
 }
@@ -325,6 +494,43 @@ export function fallenKey(f: { origin?: FallenOrigin; ts: number }): string {
   return `${f.origin?.installId ?? 'local'}:${Math.round(f.ts)}`;
 }
 
+/** ⚠⚠ OTA-1366 — THE CLONE CROSSES. Owner: *"I want a clone sent."*
+ *
+ *  Numbers a character genuinely reached, so the ceilings are generous — this
+ *  is not the place to second-guess someone's build. They are bounded only
+ *  enough that a hand-edited file cannot mint an immortal: no legitimate
+ *  character approaches these, and a cheater who sets 9,999,999 gets a hard
+ *  fight rather than an unkillable one. */
+const MAX_CLONE_STAT = 200;
+const MAX_CLONE_HP = 5_000;
+const MAX_CLONE_AC = 60;
+
+function cloneSnapshot(raw: unknown): FallenSnapshotLike | undefined {
+  if (!isObj(raw)) return undefined;
+  const st = isObj(raw.stats) ? raw.stats : {};
+  const stat = (k: string) => int((st as Record<string, unknown>)[k], 0, MAX_CLONE_STAT, 0);
+  const hpMax = int(raw.hpMax, 0, MAX_CLONE_HP, 0);
+  if (hpMax <= 0) return undefined;
+  return {
+    stats: {
+      strength: stat('strength'), dexterity: stat('dexterity'), intelligence: stat('intelligence'),
+      wisdom: stat('wisdom'), charisma: stat('charisma'), stealth: stat('stealth'),
+    },
+    hpMax,
+    ac: int(raw.ac, 0, MAX_CLONE_AC, 0),
+    ...(str(raw.raceId, 40) ? { raceId: str(raw.raceId, 40) } : {}),
+    ...(str(raw.factionId, 40) ? { factionId: str(raw.factionId, 40) } : {}),
+  };
+}
+
+interface FallenSnapshotLike {
+  stats: { strength: number; dexterity: number; intelligence: number; wisdom: number; charisma: number; stealth: number };
+  hpMax: number;
+  ac: number;
+  raceId?: string;
+  factionId?: string;
+}
+
 /** ⚠⚠ THE DOOR. Anything from another phone comes through here or not at all.
  *  `now` is injectable so the clock-skew rule is testable. */
 export function sanitizeForeignFallen(raw: unknown, now: number = Date.now()): ForeignFallen | null {
@@ -373,6 +579,7 @@ export function sanitizeForeignFallen(raw: unknown, now: number = Date.now()): F
     ts,
     ...(gearNames.length > 0 ? { gearNames } : {}),
     ...(gear.length > 0 ? { gear } : {}),
+    ...(cloneSnapshot(raw.snapshot) ? { snapshot: cloneSnapshot(raw.snapshot) } : {}),
     origin: { player, installId },
   };
   return out;
