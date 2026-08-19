@@ -12,6 +12,7 @@ import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { playerPowerScore, enemyPowerScore } from '../engine/powerRating';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
+import { MiniMap } from '../components/MiniMap';
 import { SearchModal } from '../components/SearchModal';
 // ⚠⚠ OTA-1266 — THE SALVAGEMODAL IMPORT IS GONE, AND THE COMMENT THAT STOOD HERE
 // WAS MINE AND HAD GONE FALSE. It read: *"its `isSalvageable` predicate is still
@@ -924,7 +925,18 @@ export function ExplorationScreen() {
               <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('world')} accessibilityRole="button">
                 <Text style={styles.crestNavText}>⚑ WORLD</Text>
               </TouchableOpacity>
-              <CrestPlaceholder />
+              {/* ⚠⚠ OTA-1363 — the crest tile is now a live, player-centred
+                  mini-map: the outpost interior while you are inside one, the
+                  world atlas otherwise. Owner's ask, and his two conditions
+                  are both kept — ⚑ WORLD and ◈ LORE still bracket it above and
+                  below, and the whole column still flips to the EnemyPanel the
+                  instant an enemy is staged, so the portrait is untouched.
+                  Tapping it opens the Atlas, which is where you go anyway once
+                  the corner tells you something is worth a closer look.
+                  CrestPlaceholder is kept, not deleted: it is the fallback for
+                  a player with no position to draw yet (character creation, the
+                  title screen's preview) and the art is still referenced. */}
+              <MiniMap onPress={() => setScreen('map')} />
               <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('lore')} accessibilityRole="button">
                 <Text style={styles.crestNavText}>◈ LORE</Text>
               </TouchableOpacity>
