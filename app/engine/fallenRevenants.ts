@@ -98,7 +98,7 @@ export function markAvenged(ts: number, by: string): void {
  *  SEEDED custom loadout (Rare-or-better) so the same fallen always wears —
  *  and can drop — the same gear. */
 export function revenantGearNames(f: FallenHero): string[] {
-  if (f.gearNames && f.gearNames.length > 0) return f.gearNames.slice(0, 6);
+  if (f.gearNames && f.gearNames.length > 0) return f.gearNames.slice(0, 10);
   type GearRow = { name: string; rarity: string };
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const wj = require('../data/items/weapons.json') as unknown;
