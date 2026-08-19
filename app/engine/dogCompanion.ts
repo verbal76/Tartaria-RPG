@@ -33,6 +33,17 @@ export interface RescueScenario {
   /** The investigation hook noun the player must engage to fire the
    *  rescue. The hook nouns are added to roomInvestigationTable on
    *  matching scene archetypes. */
+  /** ⚠⚠ OTA-1241 — CENSUSED, AND MOSTLY ASPIRATIONAL. Measured against the 975
+   *  scene nouns the world can actually place, THIRTEEN of these twenty match
+   *  nothing: `snare pit`, `snare`, `trapper camp`, `cellar door`, `cellar`,
+   *  `trapdoor`, `buried structure`, `smelter`, `forge ruin`, `anvil post`,
+   *  `wagon wheel`, `roadside camp`, `overturned wagon`. The cellar rescue is
+   *  reachable ONLY through `hatch`; the snare rescue only through `trap`.
+   *  ⚠ So do not tighten these further without re-running that census — two of the
+   *  four scenarios are one noun away from being unreachable. The real repair is
+   *  to put these props into the location vocabulary; until then the intro copy
+   *  names the noun the player engaged rather than the prop this list wishes was
+   *  there. */
   hookNouns: string[];
   /** Captor faction template id when the player IS NOT this faction.
    *  Resolves to the unaligned poacher captor when the player IS
@@ -44,8 +55,19 @@ export interface RescueScenario {
   defaultBreed: string;
   /** Starting profile drives stat baselines. */
   startingProfile: DogStartingProfile;
-  /** Scene archetypes where this hook is eligible to spawn. Matched
-   *  against location.tags. */
+  /** ⚠⚠ Scene archetypes where this hook is eligible to spawn, matched against
+   *  `location.tags`. ALL FOUR SCENARIOS ARE OUTPOST-ONLY. Owner: *"leave dog
+   *  events at outposts."*
+   *
+   *  Before this they matched on world-shape tags — `ruin`, `buried`,
+   *  `lost_capital`, `wasteland`, `open` — which put a chained shepherd inside six
+   *  Lost Capitals, the Endless Stair, the Sinking Cathedral and Iskan-Veil.
+   *  Measured: `cellar` was eligible at 13 locations and only 3 of them were
+   *  outposts. A dog with an owner belongs where people are.
+   *
+   *  ⚠ `outpost` is the ONE tag that is outpost-exclusive — every other tag the
+   *  hubs carry (`open`, `borderlands`, `mud`, `region`, `buried`, `lost_capital`)
+   *  leaks somewhere else. Checked all 30 tags on hub locations to find it. */
   archetypes: string[];
   /** Arbiter beat shown to the player when the captor falls. */
   victoryLine: string;
@@ -60,7 +82,13 @@ export const RESCUE_SCENARIOS: Record<RescueScenarioId, RescueScenario> = {
     captorFactionId: 'reclaimers',
     defaultBreed: 'mongrel',
     startingProfile: 'mongrel',
-    archetypes: ['ruin', 'forge', 'industrial', 'wasteland'],
+    // ⚠⚠ OTA-1243 — CENSUSED AGAINST THE REAL TAG VOCABULARY. The original four
+    // words gave this scenario 3 eligible locations; `wagon` and `snare` had ZERO,
+    // because 'road', 'camp' and 'wilderness' are not tags any location carries.
+    // The field was written against an imagined world. The real vocabulary is
+    // open/mud/borderlands/buried/lost_capital/ruin — additions below are drawn
+    // from that list, originals kept in case the tags ever appear.
+    archetypes: ['outpost'],
     captorName: 'Reclaimer Deserter',
     victoryLine:
       'The Reclaimer deserter falls into the slag. The dog is still chained, watching you with the wary level look of an animal that has read its odds. They were keeping the dog illegally. No faction reckoning falls on you for this.',
@@ -71,7 +99,7 @@ export const RESCUE_SCENARIOS: Record<RescueScenarioId, RescueScenario> = {
     captorFactionId: 'mud_monarchs',
     defaultBreed: 'shepherd',
     startingProfile: 'shepherd',
-    archetypes: ['road', 'wasteland', 'camp'],
+    archetypes: ['outpost'],
     captorName: 'Mud Monarch Enforcer',
     victoryLine:
       'The enforcer breathes wet, then not at all. The shepherd lashed to the wheel finally stops growling at you — starts watching you instead. They were keeping the dog illegally. No faction reckoning falls on you for this.',
@@ -82,18 +110,23 @@ export const RESCUE_SCENARIOS: Record<RescueScenarioId, RescueScenario> = {
     captorFactionId: 'aetherborn',
     defaultBreed: 'hound',
     startingProfile: 'hound',
-    archetypes: ['ruin', 'dungeon', 'buried', 'wasteland'],
+    archetypes: ['outpost'],
     captorName: 'Aetherborn Scavenger',
     victoryLine:
       'The scavenger crumples into the dark below. Up through the cellar floor comes a hound, lean and quiet, that pauses to look you over before it commits. They were keeping the dog illegally. No faction reckoning falls on you for this.',
   },
   snare: {
     id: 'snare',
-    hookNouns: ['snare pit', 'snare', 'pit', 'trapper camp', 'trap'],
+    // ⚠ OTA-1241 — bare `pit` dropped. Censused against the game's 975 scene
+    // nouns it matched exactly one thing — `mud pit` — while costing `firepit`,
+    // `pulpit` and `climbing piton` under the old substring rule. `trap` still
+    // covers `lobster trap` and `trap`, which is what actually keeps this
+    // scenario reachable.
+    hookNouns: ['snare pit', 'snare', 'trapper camp', 'trap'],
     captorFactionId: null, // unaligned — always available as fallback
     defaultBreed: 'mutt',
     startingProfile: 'mutt',
-    archetypes: ['wilderness', 'wasteland', 'camp'],
+    archetypes: ['outpost'],
     captorName: 'Unaligned Poacher',
     victoryLine:
       'The poacher folds over the line of their own snare. The mutt in the pit stops snarling, settles. They were keeping the dog illegally. No faction reckoning falls on you for this.',
@@ -280,7 +313,7 @@ export function createDogCompanion(args: {
   };
 }
 
-// OTA-979 — the ONE way to answer "which inventory instance is the vest the dog
+// OTA-956 — the ONE way to answer "which inventory instance is the vest the dog
 // is wearing?". Owner: "dog vests don't show which one is equipped in the
 // inventory." The screen used to re-derive this ad hoc: the badge required
 // item.kind === 'dog_armor' exactly (fused/odd-kind vests fell through the
@@ -308,7 +341,7 @@ export function wornDogVestInstanceId(player: {
   return byName?.id ?? null;
 }
 
-// OTA-1066 — the ROLL button's name pool. This used to be three hardcoded
+// OTA-1043 — the ROLL button's name pool. This used to be three hardcoded
 // names drawn WITH REPLACEMENT, so the owner tapping ROLL fifteen times saw
 // the same two names come back: with a pool of 3 the chance of a repeat on
 // any given tap is 1 in 3, and there was nothing else it could ever show.

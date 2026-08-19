@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { rarityHexColor } from '../components/InventoryCategorize';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useGameStore } from '../state/gameStore';
+import { useGameStore, vendorNpcId } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { BrandedModal } from '../components/BrandedModal';
 import { VendorContractsModal } from '../components/VendorContractsModal';
@@ -8,7 +9,9 @@ import { getItemPreview, getItemPreviewForInstance } from '../components/itemPre
 import { validSlotsForItem, SLOT_LABEL, equippedInstanceIds, effectiveStats } from '../engine/equipment';
 import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
+import { planCommonGearSale, bulkSellHeldBackNote } from '../engine/bulkSell'; // OTA-1310 — one-tap Common gear clear-out
 import { vendorPriceMod } from '../engine/factionRapport';
+import { getStanding } from '../engine/factions'; // OTA-1336 — the ladder reaches the display too
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
 import { findGearByName, findMaterialByName, findExplorationItemByName, findCatalogItem, RECIPES } from '../engine/crafting';
 import { vendorRecipeOffers, vendorSeed } from '../engine/recipeDiscovery';
@@ -16,8 +19,12 @@ import { corruptionTierOf, corruptionPriceMultiplier } from '../engine/corruptio
 import { warPriceFactor, finalBuyPrice, priceArrow } from '../engine/vendorPricing';
 import { localWarHeat, contestedFactions } from '../engine/worldEvents';
 import { tideVendorPriceMult } from '../engine/worldPulse';
+// OTA-1179 — the two price factors the display was missing; see `priceParts` below.
+import { npcRegard, regardPriceMult, getRelation } from '../engine/npcMemory';
+import { profileOf, tideStage, tidePriceMultiplier } from '../engine/pressure';
 import { canonicalCellOf } from '../engine/worldMap';
 import factionsData from '../data/factions/factions.json';
+import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1250 — one column width, platform-aware
 import {
   CATEGORY_ORDER,
   CATEGORY_LABEL,
@@ -26,14 +33,8 @@ import {
   type InventoryCategory,
 } from '../components/InventoryCategorize';
 
-function rarityColor(rarity: string | null | undefined): string {
-  switch (rarity) {
-    case 'Legendary': return '#e07a5f';
-    case 'Rare': return '#b88ce0';
-    case 'Uncommon': return '#9ec96a';
-    default: return '#c9a86a';
-  }
-}
+// ⚠ OTA-1312 — one palette, shared with the pack and the salvage modal.
+const rarityColor = rarityHexColor;
 
 type Mode = 'buy' | 'sell' | 'contracts';
 type Pending =
@@ -41,6 +42,7 @@ type Pending =
   | { mode: 'sell'; itemName: string; price: number; itemId?: string }
   | { mode: 'steal'; itemName: string; dc: number }
   | { mode: 'dismiss' }
+  | { mode: 'bulkSellCommonGear'; count: number; total: number }
   | { mode: 'accept'; kind: 'faction' | 'hunt' | 'mystery' | 'storyline'; title: string; reward: string }
   | null;
 
@@ -259,6 +261,19 @@ export function VendorScreen() {
     else if (pending.mode === 'sell') sellToVendor(pending.itemName, pending.itemId);
     else if (pending.mode === 'steal') stealFromVendor(pending.itemName);
     else if (pending.mode === 'dismiss') dismissVendor();
+    else if (pending.mode === 'bulkSellCommonGear') {
+      // ⚠ Re-plan at fire time against the CURRENT list. The confirm showed a
+      // snapshot; between the tap and the yes the player may have sold a row by
+      // hand, and selling from a stale plan would try to sell what is gone.
+      // Each row still goes through sellToVendor one call at a time, so every
+      // piece takes the same price, log line and standing effect it would have
+      // taken sold individually — this is a shortcut for the taps, not for the
+      // rules.
+      for (const row of planCommonGearSale(bulkSellable).rows) {
+        const reps = Math.max(1, row.item.quantity ?? 1);
+        for (let i = 0; i < reps; i++) sellToVendor(row.item.name, row.item.id, { social: i === 0 });
+      }
+    }
     else if (pending.mode === 'accept') {
       if (pending.kind === 'faction') acceptFactionQuest(pending.title);
       else if (pending.kind === 'hunt') acceptHunt(pending.title);
@@ -290,12 +305,28 @@ export function VendorScreen() {
     effectiveStats(player).charisma,
     player.completedFactionQuestIds,
     vendor?.faction,
+    // OTA-1336 — the standing ladder: same fourth argument the store passes, so
+    // the shown price and the charged price keep agreeing (vendorPricing's rule).
+    vendor?.faction ? getStanding(player.factionStanding ?? [], vendor.faction) : 0,
   );
   const rapportPct = Math.round(rapportMod * 100);
   // OTA-849/865 — the two modifiers that also move the REAL transaction price but the
   // display used to omit: the vendor faction's fortunes (tide teeth) and LOCAL WAR HEAT.
   // Computed here so the screen shows exactly what buyFromVendor / sellToVendor charge.
   const vendorTideMult = vendor?.faction ? tideVendorPriceMult(worldMemory?.factionTides?.[vendor.faction]) : 1;
+  // ⚠ OTA-1179 — THE TWO THIS SCREEN STILL DROPPED, and the comment above has been
+  // wrong since they landed. `buyFromVendor` multiplies in SIX factors; this screen
+  // passed FOUR. Missing: OTA-1076's per-person regard (a vendor who likes or
+  // dislikes you moves the price) and OTA-1089's Phase-4 pressure tide. So the shown
+  // price and the charged price silently disagreed for any non-neutral vendor —
+  // inside `vendorPricing.ts`, whose entire stated purpose is that these two can
+  // never drift. Computed from the same helpers the store uses, not re-derived.
+  const vendorRegardMult = vendor && worldMemory
+    ? regardPriceMult(npcRegard(getRelation(worldMemory, vendorNpcId(vendor))))
+    : 1;
+  const pressureTideMult = player
+    ? tidePriceMultiplier(tideStage(player.hoursElapsed ?? 0, profileOf(player)))
+    : 1;
   const warCell = player ? canonicalCellOf(player.currentLocationId) : { x: 0, y: 0 };
   const warHeat = localWarHeat(worldMemory?.patrols ?? [], warCell.x, warCell.y);
   const { buyMult: warBuyMult, sellMult: warSellMult } = warPriceFactor(warHeat);
@@ -354,6 +385,22 @@ export function VendorScreen() {
   // rather than stored, so a selected row that stops being sellable (sold,
   // dropped, equipped, or the vendor dismissed) simply falls out of the group
   // instead of lingering as a stale id the SELL button would silently skip.
+  // ⚠⚠ THE BULK SWEEP NEVER TAKES YOUR LAST GATE TOOL. The single-item sell stops
+  // on a red warning when the piece is your ONLY way to satisfy a gate (OTA-178,
+  // the climbing-strap case). `planCommonGearSale` predates a reachable bulk
+  // confirm — its button was dead until the sell-all fix — so the sweep inherited
+  // no such stop, and one tap could silently sell the last Hardened Climbing
+  // Strap the single-item path would have made you confirm in red. Measured
+  // target: Aether-Breath Mask, a Common armor carrying gate `breathe_toxic`,
+  // was in the sweep. A SPARE copy still sells (gateLossFor is null when quantity
+  // > 1 or another gate-satisfier exists); only the last one is held out.
+  const bulkSellable = sellable.filter(({ item }) => !gateLossFor(item.name));
+  // ⚠ OTA-1344 — B5: what that filter just held out of the sweep, NAMED, so the
+  // confirm can say it instead of letting a held-out mask read as a broken
+  // button. Narrowed to rows the plan would otherwise have sold (Common gear).
+  const bulkHeldBack = planCommonGearSale(
+    sellable.filter(({ item }) => !!gateLossFor(item.name)),
+  ).rows.map((r) => ({ name: r.item.name, label: gateLossFor(r.item.name)!.label }));
   const sellableById = new Map(sellable.map((row) => [row.item.id, row]));
   const selectedRows = sellSelected
     .map((id) => sellableById.get(id))
@@ -432,10 +479,12 @@ export function VendorScreen() {
 
   return (
     <View style={styles.container}>
+      {/* OTA-1228 — v2 id: the body gained the host-gear rule (OTA-1224) and dismissals
+          are per-install, so the old id would hide the new line from existing testers. */}
       <FirstTimeHint
-        id="vendor_first_open"
+        id="vendor_first_open_v2"
         title="The trader"
-        body="Buy and sell here. Prices swing with the seller's faction power and your standing — a favored trader deals kinder."
+        body="Buy and sell here. Prices swing with the seller's faction power and your standing — a favored trader deals kinder. At a faction's own site, the armory only racks faction gear for people the host trusts."
       />
       <View style={styles.header}>
         <TouchableOpacity
@@ -464,10 +513,17 @@ export function VendorScreen() {
         <Text style={styles.vendorTitle}>{vendor.title}</Text>
         <Text style={styles.vendorDesc}>{vendor.description}</Text>
         {/* OTA-805 — rapport price break. Shown once the player has earned dealing
-            with this faction (done its rapport quest); the % scales with Charisma. */}
+            with this faction (rapport quest, Charisma) — and, OTA-1336, once the
+            STANDING LADDER moves the price either way: loyalty earns the break on
+            its own, hostility shows up as an honest markup instead of a silent one. */}
         {rapportMod > 0 && (
           <Text style={styles.rapportBanner}>
-            ✦ Trusted partner — {rapportPct}% off buys, +{rapportPct}% on sell-backs (Charisma)
+            ✦ Trusted partner — {rapportPct}% off buys, +{rapportPct}% on sell-backs (standing & charm)
+          </Text>
+        )}
+        {rapportMod < 0 && (
+          <Text style={styles.rapportBanner}>
+            ✦ Bad blood — they deal, but at +{Math.abs(rapportPct)}% on buys and {rapportPct}% on your sell-backs (faction standing)
           </Text>
         )}
         {/* arb103 — every vendor will fire a portable Fusing Crucible for 25 TC.
@@ -477,7 +533,18 @@ export function VendorScreen() {
             is redundant. Mirror the exploration chip's own gate so the two never
             both show. Roadside / wild stalls (no hub, not market) keep it — it's
             the only Crucible there. */}
-        {!(player?.fusionPending
+        {/* ⚠⚠ AND NOT BEFORE YOU HAVE EVER LEFT. `useVendorCrucible` refuses outright
+            while `macroVisitSeq < 1` — "the Crucible's not for first-timers" — but that
+            check lived ONLY inside the handler, so the chip rendered lit, took the tap,
+            and answered with a wall. Owner's device log, at a roadside stall mid-first-
+            journey: four taps, four identical refusals in seventy seconds. ⚠ The comment
+            twelve lines below cites OTA-1024, which exists because he hit exactly this
+            shape on the FEE — "a lit button that doesn't fire". Same defect, different
+            gate, so it gets the same answer: the requirement is known at render time,
+            so consult it at render time. The handler's refusal stays as the backstop for
+            any other path in. */}
+        {(player?.macroVisitSeq ?? 0) >= 1
+          && !(player?.fusionPending
           || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1)
           || activeBuildingId === 'market') && (
           <TouchableOpacity
@@ -637,7 +704,7 @@ export function VendorScreen() {
               // OTA-865 — the FULL buy price (now including faction-tide + war heat, which
               // the display used to drop), from the same helper buyFromVendor uses so the
               // shown price is exactly what transacts. The ▲/▼ ticker compares it to base.
-              const effPrice = finalBuyPrice(o.price, { corruptionMult, buyDiscount: rapportMod, tideMult: vendorTideMult, warBuyMult });
+              const effPrice = finalBuyPrice(o.price, { corruptionMult, buyDiscount: rapportMod, tideMult: vendorTideMult, warBuyMult, regardMult: vendorRegardMult, pressureTideMult });
               const buyTick = priceArrow(effPrice, o.price, 'buy');
               const canAfford = player.tc >= effPrice;
               const itemPreview = getItemPreview(o.itemName);
@@ -650,8 +717,8 @@ export function VendorScreen() {
                 // was applied here, which dimmed everything inside the row
                 // including the STEAL button on the right — backwards
                 // affordance, since stealing is what a broke player would
-                // want to reach for. Steal has its own gates (DC roll, faction
-                // standing, witness checks in `stealFromVendor`) and never
+                // want to reach for. Steal has its own gates (DC roll, witness
+                // checks in `stealFromVendor`) and never
                 // touched TC affordability anyway. Now: BUY body dims when
                 // unaffordable, STEAL stays full bright.
                 <View
@@ -787,6 +854,35 @@ export function VendorScreen() {
                 ))}
               </View>
             )}
+            {/* ⚠⚠ OTA-1310 — SELL ALL COMMON GEAR. Owner: *"some games have a sell
+                all scrap button when you're in a shop... that seems to be my most
+                sold items."* One button, not the two he first sketched
+                (weapons/armor), because splitting means two taps for one
+                intention and two more things to read on a phone — the per-item
+                rows below are right there for the exceptions.
+
+                ⚠ The count and the total go in the BUTTON, not just the confirm.
+                A bulk action whose size you only learn after committing to look
+                is a bulk action people stop trusting. Hidden entirely at zero
+                rather than shown disabled: a dead button on a screen full of live
+                ones reads as a bug. */}
+            {(() => {
+              const plan = planCommonGearSale(bulkSellable);
+              if (plan.count === 0) return null;
+              return (
+                <TouchableOpacity
+                  onPress={() => setPending({ mode: 'bulkSellCommonGear', count: plan.count, total: plan.total })}
+                  style={styles.bulkSellBtn}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Sell all ${plan.count} Common gear pieces for ${plan.total} coin`}
+                >
+                  <Text style={styles.bulkSellText}>
+                    SELL ALL COMMON GEAR — {plan.count} for {plan.total} TC
+                  </Text>
+                </TouchableOpacity>
+              );
+            })()}
             {/* OTA-1124 — the group bar moved OUT of this scrolling list and up
                 into the tab row's slot, where it stays anchored. It used to sit
                 here and scroll away the moment you started ticking rows further
@@ -884,6 +980,8 @@ export function VendorScreen() {
         title={
           pending?.mode === 'dismiss'
             ? `Dismiss ${vendor.name}?`
+            : pending?.mode === 'bulkSellCommonGear'
+              ? `Sell ${pending.count} Common ${pending.count === 1 ? 'piece' : 'pieces'}?`
             : pending?.mode === 'sell'
               ? `Sell to ${vendor.name}`
               : pending?.mode === 'steal'
@@ -917,6 +1015,13 @@ export function VendorScreen() {
         contextLine={
           pending?.mode === 'dismiss'
             ? 'They leave the scene. New offers will come from the next vendor who shows up.'
+            : pending?.mode === 'bulkSellCommonGear'
+              // ⚠ OTA-1310 — the COUNT and the TOTAL are the safety on a one-tap
+              // sweep, so they lead. The second line names what is deliberately
+              // NOT in the sweep, because a player who cannot see the boundary
+              // has to take it on trust — and Common covers rations, scrap and
+              // Aether Dust, which this must never touch.
+              ? `+${pending.total} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.total} TC\n\nWeapons and armor only, unequipped, Common rarity. Consumables, crafting materials and anything you forged at the Crucible are left alone.${bulkSellHeldBackNote(bulkHeldBack) ? `\n\n⚠ ${bulkSellHeldBackNote(bulkHeldBack)}` : ''}`
             : pending?.mode === 'sell'
               ? (pendingGateLoss
                   ? `Price: +${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.price} TC\n\n⚠ This is your ONLY way to ${pendingGateLoss.label}. Selling it leaves you with no other tool that satisfies the gate — actions that need it will refuse until you find or craft a replacement.`
@@ -932,7 +1037,20 @@ export function VendorScreen() {
                     : undefined
         }
         buttons={
-          pending?.mode === 'dismiss'
+          // ⚠⚠ OTA-1310 — THE CONFIRM GETS ITS CONFIRM BUTTON HERE, NOT LATER.
+          //
+          // On the golem line this mode shipped (OTA-1232) with a title, a body
+          // and NO entry in this chain, so it fell through to the terminal
+          // `OK / cancel` fallback: the owner tapped a dull neutral button that
+          // closed the modal and sold nothing, and it took a device report to
+          // find (golem OTA-1307). The feature arrives on this line with the
+          // button already wired, so the same hole is not dug twice.
+          pending?.mode === 'bulkSellCommonGear'
+            ? [
+                { label: 'Cancel', onPress: cancel, tone: 'neutral' as const },
+                { label: `Sell ${pending.count} for ${pending.total} TC`, onPress: confirmAction, tone: 'primary' as const },
+              ]
+          : pending?.mode === 'dismiss'
             ? [
                 { label: 'Cancel', onPress: cancel, tone: 'neutral' },
                 { label: 'Dismiss', onPress: confirmAction, tone: 'destructive' },
@@ -1040,7 +1158,7 @@ export function VendorScreen() {
 
 const styles = StyleSheet.create({
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
-  container: { flex: 1, backgroundColor: 'transparent', padding: 12, width: '100%', maxWidth: 600, alignSelf: 'center' },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 12, width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1091,6 +1209,19 @@ const styles = StyleSheet.create({
   tabText: { color: '#a2977b', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
   tabTextActive: { color: '#c9a86a' },
   sellPrice: { color: '#9ec96a', fontSize: 12, fontWeight: '700' },
+  // one-tap sweep should read as a convenience the player reaches for, not as the
+  // obvious thing to press on arrival.
+  bulkSellBtn: {
+    borderWidth: 1,
+    borderColor: '#5a4a32',
+    backgroundColor: '#1a1611',
+    borderRadius: 3,
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+    marginBottom: 8,
+    alignItems: 'center',
+  },
+  bulkSellText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
   sortRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6, paddingHorizontal: 2 },
   sortLabel: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginRight: 4 },
   sortTab: { paddingHorizontal: 8, paddingVertical: 3, borderColor: '#3a342c', borderWidth: 1, borderRadius: 2 },

@@ -68,6 +68,7 @@ const _origErr = console.error;
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { FACTION_QUESTS } from '../app/engine/factionQuests';
+import { missionObjectiveLocationId } from '../app/engine/missionRouting';
 import { HUNTS } from '../app/engine/hunts';
 import { MYSTERIES } from '../app/engine/mysteries';
 import { STORYLINES } from '../app/engine/factionStorylines';
@@ -336,6 +337,28 @@ describe('Quest progression audit', () => {
         continue;
       }
 
+      // ⚠⚠ SNAPSHOT AT ACCEPT, NOT AT TURN-IN. The reward check below used to measure the
+      // TC/rep delta across the `turnInFactionQuest` call alone, which quietly assumed the
+      // payment always happens INSIDE that call. It doesn't: a travel-gated quest whose
+      // last stage advance completes it is paid right there, and the later turn-in is
+      // correctly a no-op — so the narrow window reads 0/60 and the audit calls a healthy
+      // quest broken.
+      //
+      // That is the mechanism-vs-rule trap. The RULE is "accepting and finishing this
+      // quest pays the player its reward, once." Where in the flow the credit lands is an
+      // implementation detail the audit has no business pinning. Measuring accept→end
+      // states the rule directly and stops the assertion from being seed-fragile.
+      //
+      // ⚠ It surfaced when two locations were added to the atlas: the seeded LCG stream
+      // shifted, the pilgrimage's final hop landed on a different tile, and it began
+      // self-completing. This suite's own header already names `fq_tartarians_pilgrimage`
+      // as historically seed-fragile — this is that same fragility, fixed at the root
+      // rather than re-seeded around.
+      const pAtAccept = store.getState().player!;
+      const tcAtAccept = pAtAccept.tc;
+      const repAtAccept = pAtAccept.factionStanding
+        .find((r) => r.factionId === q.factionId)?.standing ?? 0;
+
       // Walk every stage. The current stage's advanceOn defines what
       // trigger pushes to the next. Stages with advanceOn=any take a
       // 'kill' for convenience.
@@ -355,6 +378,17 @@ describe('Quest progression audit', () => {
           const cur = store.getState().player?.currentLocationId;
           let targetLoc = TRAVEL_RING[i % TRAVEL_RING.length]!;
           if (targetLoc === cur) targetLoc = TRAVEL_RING[(i + 1) % TRAVEL_RING.length]!;
+          // ⚠⚠ OTA-1332 — THE ARRIVAL BEAT HAPPENS AT THE PLACE THE QUEST NAMES. A
+          // travel-gated FINAL stage of a quest that names a destination no longer counts
+          // any old road: `fq_servants_tribute` says "Carry it to the Vault. Set it on the
+          // threshold", and it used to complete three steps in the opposite direction.
+          // This audit rotated a ring of convenient tiles and so walked straight into the
+          // new gate — which is the harness standing still again, not a regression. Where
+          // the quest names somewhere, go THERE for the last hop.
+          if (i === stages.length - 1) {
+            const dest = missionObjectiveLocationId(q);
+            if (dest) targetLoc = dest;
+          }
           store.getState().travelTo(targetLoc);
         } else if (trigger === 'kill' || trigger === 'any') {
           // Inject a 0-HP enemy on the scene and call resolveEnemyDefeat,
@@ -446,22 +480,23 @@ describe('Quest progression audit', () => {
         },
       } : s));
 
-      // Turn-in — record pre-state to verify TC + rep deltas.
+      // Turn-in. Calling it is still right for every quest that waits to be handed in;
+      // for one already completed by its final stage advance it is a harmless no-op.
       const pBefore = store.getState().player!;
-      const tcBefore = pBefore.tc;
-      const repBefore = pBefore.factionStanding.find((r) => r.factionId === q.factionId)?.standing ?? 0;
       store.getState().turnInFactionQuest(q.id);
       const pAfter = store.getState().player!;
       const inCompleted = (pAfter.completedFactionQuestIds ?? []).includes(q.id);
       const stillActive = (pAfter.activeFactionQuestIds ?? []).includes(q.id);
-      const tcDelta = pAfter.tc - tcBefore;
+      // ⚠ Deltas measured from ACCEPT, so the reward counts wherever in the flow it was
+      // credited. See the note at the accept-time snapshot above for why.
+      const tcDelta = pAfter.tc - tcAtAccept;
       const repAfter = pAfter.factionStanding.find((r) => r.factionId === q.factionId)?.standing ?? 0;
-      const repDelta = repAfter - repBefore;
+      const repDelta = repAfter - repAtAccept;
       if (!inCompleted || stillActive || tcDelta < q.reward.tc || repDelta < q.reward.rep) {
         const recAtTurnIn = (pBefore.activeFactionQuests ?? []).find((r) => r.id === q.id);
         turnInFailures.push({
           id: q.id, title: q.title, kind: 'fq',
-          reason: `turn-in failed: completed=${inCompleted}, stillActive=${stillActive}, tcDelta=${tcDelta}/${q.reward.tc}, repDelta=${repDelta}/${q.reward.rep}, stage=${recAtTurnIn?.stage ?? '?'}/${(q.stages ?? []).length}`,
+          reason: `turn-in failed: completed=${inCompleted}, stillActive=${stillActive}, tcDelta=${tcDelta}/${q.reward.tc} (from accept), repDelta=${repDelta}/${q.reward.rep} (from accept), stage=${recAtTurnIn?.stage ?? '?'}/${(q.stages ?? []).length}`,
         });
       }
     }

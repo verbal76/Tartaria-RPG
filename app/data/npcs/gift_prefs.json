@@ -1,174 +1,3218 @@
 {
- "fallback": {
-  "lovedLine": "{npc} turns the {item} over once and then puts it somewhere safe rather than somewhere convenient. \"Thank you. Genuinely.\"",
-  "likedLine": "{npc} weighs the {item} and nods slowly. \"That is a good thing to be given. I will not forget who gave it.\"",
-  "politeLine": "{npc} takes the {item} with good grace. It goes under the counter, and you suspect it stays there.",
-  "insultLine": "{npc} looks at the {item}, and then at you, for slightly too long. \"No. You keep that.\""
- },
- "npcs": {
-  "irma_ironhand": {
-   "lovesTags": [
-    "metal",
-    "ore",
-    "ingot",
-    "armor"
-   ],
-   "lovesItems": [
-    "Aether Mud",
-    "Sentinel Core Plate"
-   ],
-   "coldTags": [
-    "food",
-    "trinket"
-   ],
-   "lovedLine": "Irma stops mid-swing. She takes the {item}, turns it to the light, and makes a small sound she would deny making. \"Where. Where did you get this.\" She does not wait for an answer. \"No. Do not tell me. Thank you.\"",
-   "likedLine": "Irma takes the {item} without ceremony and puts it in the good rack — the one at the back. From her, that is a speech.",
-   "politeLine": "Irma accepts the {item}, looks at it, and sets it down on the bench where things go to be forgotten. \"Kind of you.\"",
-   "insultLine": "Irma does not take her hand off the hammer. \"I have a forge, a rack of plate, and forty years. And you have brought me that.\"",
-   "returnGift": "Sentinel Core Plate",
-   "returnGiftLine": "Irma stops you at the counter and pushes a wrapped weight across it. \"This batch came out better than the last. First one goes to you.\""
+  "npcs": {
+    "scrap_broker": {
+      "lovesTags": [
+        "broker",
+        "coveted",
+        "loot",
+        "reclaimers"
+      ],
+      "lovesItems": [
+        "Relic Seeker's Lens",
+        "Salvage Pouch",
+        "Etheric Stabilizer",
+        "Arcane Lockbox",
+        "True Tartarian Relic",
+        "Aetherstone Pendant"
+      ],
+      "likesTags": [
+        "relic",
+        "tool",
+        "exploration",
+        "uncommon",
+        "rare",
+        "gear"
+      ],
+      "likesItems": [
+        "Reclaimer's Rope",
+        "Aetheric Compass",
+        "Scrap Metal",
+        "Etheric Battery"
+      ],
+      "dislikesTags": [
+        "junk",
+        "improvised",
+        "foraged"
+      ],
+      "dislikesItems": [
+        "Broken Rope",
+        "Cloth Scrap",
+        "Big Rock"
+      ],
+      "lovedLine": "Now that — that has a buyer waiting, and he does not know it yet. {item} comes off your hands and onto my ledger, and we are both richer for it.",
+      "likedLine": "A fair piece, {item}. I'll not insult you with a low number for it.",
+      "dislikeLine": "I can move {item}, but I'd be holding it a season and paying to store it. That's not a gift, that's a lodger.",
+      "politeLine": "I'll take {item} off you and thank you for the thought. Every ledger has a line for kindness.",
+      "insultLine": "You carried {item} all this way to hand me? I price everything, friend, and that prices at nothing.",
+      "returnGift": "Shaped Aetheric Shard",
+      "returnGiftLine": "Tellin slides something across without looking up. \"Came through the pile. Thought of you. Don't make it strange.\""
+    },
+    "order_scholar": {
+      "lovesTags": [
+        "runecaster",
+        "rune_power",
+        "forgotten_order",
+        "sigil"
+      ],
+      "lovesItems": [
+        "Ring of Forgotten Lore",
+        "Forgotten Scroll",
+        "Leatherbound Tome",
+        "Tartarian Writing Tablet",
+        "Runecaster-Reader Tablet",
+        "Whispering Cipher"
+      ],
+      "likesTags": [
+        "relic",
+        "spell",
+        "aetheric",
+        "detection",
+        "quest",
+        "uncommon"
+      ],
+      "likesItems": [
+        "Aetheric Compass",
+        "Rune Engraving Kit",
+        "Arcane Cipherstone",
+        "Glyph-Sealed Scroll"
+      ],
+      "dislikesTags": [
+        "junk",
+        "improvised",
+        "food",
+        "mushroom"
+      ],
+      "dislikesItems": [
+        "Marrow Bone",
+        "Cudgel"
+      ],
+      "lovedLine": "You will forgive me if I sit down. {item} is the sort of thing the Order has written letters about for three generations without once holding, and I find my hands are not entirely steady.",
+      "likedLine": "A useful instrument, {item}, and one I shall put to work before the week is out. My thanks, sincerely given.",
+      "dislikeLine": "I do not doubt {item} has its uses. I doubt only that any of them occur inside a reading room.",
+      "politeLine": "I accept {item} in the spirit it was offered, which is, I think, the larger part of any gift.",
+      "insultLine": "I have catalogued the refuse of four ruined cities, and I would not have catalogued {item}. Take it back before I write it down.",
+      "returnGift": "Aetheric Compass",
+      "returnGiftLine": "Vesryn wraps it carefully before handing it over. \"An instrument deserves hands that go somewhere. Yours do.\""
+    },
+    "tartarian_quartermaster": {
+      "lovesTags": [
+        "two_handed",
+        "true_tartarians",
+        "plate",
+        "spear"
+      ],
+      "lovesItems": [
+        "Tartarian Spear",
+        "Ancestor Bone Cleaver",
+        "Tartarian Oath-Band",
+        "Ancestor Bone Vest",
+        "Titanforged Cuirass",
+        "Mud-glass Scales"
+      ],
+      "likesTags": [
+        "giants",
+        "melee",
+        "armor",
+        "chest",
+        "crafted"
+      ],
+      "likesItems": [
+        "Bone Maul",
+        "Titan Warhammer",
+        "Giant Bone Shield",
+        "Hardened Titan's Chestplate"
+      ],
+      "dislikesTags": [
+        "junk",
+        "foraged",
+        "improvised",
+        "fiber"
+      ],
+      "dislikesItems": [
+        "Cloth Scrap",
+        "Patched Cloth"
+      ],
+      "lovedLine": "Hm. {item}. Deep-work. You keep your hands where I can see them and I will keep this.",
+      "likedLine": "{item} will hold. Good.",
+      "dislikeLine": "{item} is not for the dark. Down there it breaks, and then you break.",
+      "politeLine": "Taken. {item} goes on the shelf.",
+      "insultLine": "No. {item} is weight and nothing else. Carry your own weight."
+    },
+    "wandering_drifter": {
+      "lovesTags": [
+        "food",
+        "exploration",
+        "healing",
+        "foraged"
+      ],
+      "lovesItems": [
+        "Hearty Stew",
+        "Forager's Stew",
+        "Aether-Woven Tent",
+        "First Aid Kit",
+        "Nano-Med Kit",
+        "Aetheric Flare"
+      ],
+      "likesTags": [
+        "gear",
+        "common",
+        "tool",
+        "map",
+        "potion",
+        "rope"
+      ],
+      "likesItems": [
+        "Climbing Rope",
+        "Reclaimer's Rope",
+        "Traveler's Cloak",
+        "Wanderer's Footwraps"
+      ],
+      "dislikesTags": [
+        "boss",
+        "legendary",
+        "undead",
+        "corruption"
+      ],
+      "dislikesItems": [
+        "Lich Phylactery",
+        "Plague Tonic"
+      ],
+      "lovedLine": "Oh, that's a good day then. {item} is worth three nights of not being cold, and I have had my fill of being cold.",
+      "likedLine": "{item}. That'll ride in the pack easy enough. My thanks.",
+      "dislikeLine": "I walk everywhere I go, and {item} is somebody else's problem to carry.",
+      "politeLine": "I'll find a use for {item} or I'll find someone who has one. Either way it doesn't go to waste.",
+      "insultLine": "Depends on the day whether I take a thing like {item}. Today it doesn't. Today it doesn't at all."
+    },
+    "thalan_wanderer": {
+      "lovesTags": [
+        "common",
+        "tool",
+        "exploration",
+        "food"
+      ],
+      "lovesItems": [
+        "Climbing Rope",
+        "Aetheric Torch",
+        "Hearty Stew",
+        "Traveler's Cloak",
+        "Lost Echo Compass",
+        "Field Crafter's Kit"
+      ],
+      "likesTags": [
+        "gear",
+        "melee",
+        "uncommon",
+        "loot",
+        "map",
+        "boots"
+      ],
+      "likesItems": [
+        "Rusted Blade",
+        "Mud-Lurker Boots",
+        "Dust Compass",
+        "Tartarian Battle Horn"
+      ],
+      "dislikesTags": [
+        "poison",
+        "corruption",
+        "undead",
+        "junk"
+      ],
+      "dislikesItems": [
+        "Poison Vial",
+        "Disease Sample",
+        "Bent Nail"
+      ],
+      "lovedLine": "Well now, {item}! I'll tell you plain, friend, that's the sort of honest thing that keeps a man on the road and out of the ditch. You've made my whole week.",
+      "likedLine": "{item}, is it? Aye, that'll do nicely. The horse thanks you too, though she'll not say so.",
+      "dislikeLine": "I'll be honest with you, since honesty's cheaper than haggling — I've no earthly use for {item} out here on the roadside.",
+      "politeLine": "Kind of you. {item} goes in the pack, and I'll think well of you at the next outpost.",
+      "insultLine": "Friend. Friend. I have advised men on coin for twenty years and I am advising you now: {item} is worth nothing to anybody."
+    },
+    "irma_ironhand": {
+      "lovesTags": [
+        "plate",
+        "tartarian_giants",
+        "titanforged",
+        "chest"
+      ],
+      "lovesItems": [
+        "Hardened Titan's Chestplate",
+        "Titanforged Cuirass",
+        "Rough-Hewn Chestplate",
+        "Sentinel's Warplate",
+        "Behemoth Plate",
+        "Titan's Iron Band"
+      ],
+      "likesTags": [
+        "armor",
+        "gauntlets",
+        "helmet",
+        "metal",
+        "crafted",
+        "giants"
+      ],
+      "likesItems": [
+        "Titan's Gauntlets",
+        "Aetheric Helm of Command",
+        "Iron Core",
+        "Builder's Aethercraft Hammer"
+      ],
+      "dislikesTags": [
+        "mushroom",
+        "stealth",
+        "cloth",
+        "foraged"
+      ],
+      "dislikesItems": [
+        "Blue Cap Mushroom",
+        "Stealth Hood",
+        "Patched Cloth"
+      ],
+      "lovedLine": "Hah! Look at the seam on {item} — whoever hammered that knew what a blow feels like from the inside. Give it here before you dent it.",
+      "likedLine": "{item}. Sound enough. I'll not sneer at sound work.",
+      "dislikeLine": "You bring {item} to a forge? What am I to do with it, season the coals?",
+      "politeLine": "Aye, I'll have {item}. Not everything a smith keeps has to be struck.",
+      "insultLine": "I put my mark on armor that outlives the man inside it. {item} would not outlive the walk home. Out.",
+      "returnGift": "Sentinel Core Plate",
+      "returnGiftLine": "Irma stops you at the counter and pushes a wrapped weight across it. \"This batch came out better than the last. First one goes to you.\""
+    },
+    "velar_shadowblade": {
+      "lovesTags": [
+        "stealth",
+        "knife",
+        "mask",
+        "boots"
+      ],
+      "lovesItems": [
+        "Mask of the Shadow Lord",
+        "Echoing Steps Boots",
+        "Whisperer's Charm",
+        "Tartarian Claw Knife",
+        "Stealth Hood",
+        "Architect's Silent Dagger"
+      ],
+      "likesTags": [
+        "cloak",
+        "dual_wield",
+        "mud_dwellers",
+        "uncommon",
+        "poison",
+        "feet"
+      ],
+      "likesItems": [
+        "Mud-Stalker Leggings",
+        "Ring of Shadows",
+        "Throwing Knife",
+        "Poison Vial"
+      ],
+      "dislikesTags": [
+        "two_handed",
+        "plate",
+        "hammer",
+        "firearm"
+      ],
+      "dislikesItems": [
+        "Titan Warhammer",
+        "Plasma Artillery Cannon",
+        "Tartarian Battle Horn"
+      ],
+      "lovedLine": "Quiet. Don't hold {item} up like that. ...Where did you come by it? No — don't answer. That is exactly the right answer.",
+      "likedLine": "{item}. Serviceable. It will not get you seen, which is more than most gear can promise.",
+      "dislikeLine": "{item} announces you. I sell the opposite of announcing you.",
+      "politeLine": "I'll keep {item}. Not for the stall. For me. That is not an invitation to ask why.",
+      "insultLine": "You come into a market that isn't on any map and you offer me {item}? Go stand in the light where you belong."
+    },
+    "jorah_scholar": {
+      "lovesTags": [
+        "runecaster",
+        "rune_power",
+        "detection",
+        "map"
+      ],
+      "lovesItems": [
+        "Leatherbound Tome",
+        "Forgotten Scroll",
+        "Scholar's Headband of Knowledge",
+        "Rusted Band of Knowledge",
+        "Memory Prism",
+        "Aetheric Helm of Insight"
+      ],
+      "likesTags": [
+        "relic",
+        "spell",
+        "aether",
+        "uncommon",
+        "chart",
+        "amulet"
+      ],
+      "likesItems": [
+        "Whisperer's Charm",
+        "Aetheric Compass",
+        "Crown of Lost Knowledge",
+        "Tartarian Writing Tablet"
+      ],
+      "dislikesTags": [
+        "poison",
+        "boss",
+        "corruption",
+        "improvised"
+      ],
+      "dislikesItems": [
+        "Viper Venom Vial",
+        "Cudgel"
+      ],
+      "lovedLine": "Oh, my dear friend. {item} — sit, sit, you must let me read it before the light goes. There are students upstairs who will weep over this, and I shall let them.",
+      "likedLine": "{item}! Yes, that has a place on my shelf and a place in the lending book. Thank you kindly.",
+      "dislikeLine": "I teach children in this stall some mornings. I would rather not keep {item} where their hands can reach.",
+      "politeLine": "A gift is a gift, and {item} shall be treated as one. You are welcome at my table whenever you pass.",
+      "insultLine": "I have found wisdom in some very poor scraps, but there is none in {item}. Take it away, gently, and think no more of it."
+    },
+    "elara_lightfinger": {
+      "lovesTags": [
+        "ring",
+        "amulet",
+        "stealth",
+        "tool"
+      ],
+      "lovesItems": [
+        "Reclaimer's Quick Band",
+        "Light-Finger Guild Band",
+        "Whisperer's Charm",
+        "Ring of Shadows",
+        "Aetheric Locket",
+        "Glowstone Pendant"
+      ],
+      "likesTags": [
+        "knife",
+        "loot",
+        "common",
+        "uncommon",
+        "relic",
+        "exploration"
+      ],
+      "likesItems": [
+        "Throwing Knife",
+        "Climbing Rope",
+        "Etheric Talisman",
+        "Arcane Lockbox"
+      ],
+      "dislikesTags": [
+        "two_handed",
+        "plate",
+        "hammer",
+        "junk"
+      ],
+      "dislikesItems": [
+        "Mud Sledge",
+        "Bone Fragment"
+      ],
+      "lovedLine": "Ooh. Oh, you clever thing. {item} — small, quiet, and worth four times what the fellow two stalls down would guess. I like you enormously, and that is rare.",
+      "likedLine": "{item}, lovely. Goes in the tray at the front where the light catches it. It'll be gone by noon.",
+      "dislikeLine": "Darling, look at my stall. Look at my hands. Where in either of those does {item} fit?",
+      "politeLine": "That's sweet of you. {item} stays with me, and I'll say something nice about you to three people before supper.",
+      "insultLine": "I have picked better than {item} out of a gutter, and I say that with the gutter's full respect. Away with it."
+    },
+    "halem_trader": {
+      "lovesTags": [
+        "food",
+        "potion",
+        "common",
+        "healing"
+      ],
+      "lovesItems": [
+        "Hearty Stew",
+        "Forager's Stew",
+        "First Aid Kit",
+        "Trauma Kit",
+        "Aether-Salve Kit",
+        "Water Purifier"
+      ],
+      "likesTags": [
+        "cooked",
+        "exploration",
+        "tool",
+        "alchemy",
+        "gear",
+        "foraged"
+      ],
+      "likesItems": [
+        "Climbing Rope",
+        "Aetheric Torch",
+        "Field Dressing",
+        "Basic Tent"
+      ],
+      "dislikesTags": [
+        "poison",
+        "corruption",
+        "boss",
+        "legendary"
+      ],
+      "dislikesItems": [
+        "Plague Vial",
+        "Disease Sample",
+        "Corruption Tonic"
+      ],
+      "lovedLine": "Bless you for that. {item} is exactly what folk come asking for the morning after a bad night, and I hate turning them away empty.",
+      "likedLine": "{item}, good. Somebody'll be glad of that before the month's out. My thanks.",
+      "dislikeLine": "I'll not pretend, {item} isn't the sort of thing I keep. Village post, this. Bread and bandages.",
+      "politeLine": "That's neighbourly of you. {item} goes behind the counter, and there's a bowl of something hot for you if you'll sit.",
+      "insultLine": "I've sold to this village thirty years on an honest word, and my honest word is that {item} isn't worth the shelf it'd sit on.",
+      "returnGift": "Hearty Stew",
+      "returnGiftLine": "Halem presses a warm crock into your hands before you can speak. \"You feed my curiosity often enough. Eat.\""
+    },
+    "tarek_tinkerer": {
+      "lovesTags": [
+        "core",
+        "machine",
+        "construct",
+        "golem_weapon"
+      ],
+      "lovesItems": [
+        "Golem Core",
+        "Clockwork Core",
+        "Steam Core",
+        "Spider Mechanism",
+        "Iron-Worm Engine",
+        "Golem Controller Ring"
+      ],
+      "likesTags": [
+        "tool",
+        "electrical",
+        "crafted",
+        "scrap",
+        "gear",
+        "reclaimers"
+      ],
+      "likesItems": [
+        "Automaton Circuit",
+        "Aetheric Circuit Repair Kit",
+        "Etheric Battery",
+        "Golemstone Stabilizer"
+      ],
+      "dislikesTags": [
+        "food",
+        "organic",
+        "mushroom",
+        "foraged"
+      ],
+      "dislikesItems": [
+        "Marrow Bone",
+        "Mushroom Stew"
+      ],
+      "lovedLine": "No. NO. Is that — it is! {item}, and the housing's intact! Move the kettle, move the kettle, I need the whole bench for this.",
+      "likedLine": "{item}! Good, good, that goes in the third crate, the one that hums. Don't ask about the humming.",
+      "dislikeLine": "It has no moving parts, friend. {item} does nothing. I cannot take apart a thing that does nothing.",
+      "politeLine": "I'll take {item}. Everything's a component if you're patient and slightly reckless, and I am both.",
+      "insultLine": "I have built three things out of rubbish this week and I still could not build anything out of {item}. Get it off the bench.",
+      "returnGift": "Iron-Worm Engine",
+      "returnGiftLine": "Tarek shoves it at you, already talking. \"Doesn't work. Well — doesn't work YET. You'll figure it out, that's why I'm giving it to you.\""
+    },
+    "felra_swiftfoot": {
+      "lovesTags": [
+        "boots",
+        "feet",
+        "stealth",
+        "greaves"
+      ],
+      "lovesItems": [
+        "Echoing Steps Boots",
+        "Mud-Stalker's Footwraps",
+        "Aether-Runner Boots",
+        "Titan's Swiftstep Boots",
+        "Aether Grip Pads",
+        "Stone-Strider Boots"
+      ],
+      "likesTags": [
+        "legs",
+        "mud_dwellers",
+        "cloak",
+        "uncommon",
+        "gear",
+        "fiber"
+      ],
+      "likesItems": [
+        "Mud-Lurker Boots",
+        "Mud-Stalker Leggings",
+        "Hardened Climbing Strap",
+        "Aetheric Treads"
+      ],
+      "dislikesTags": [
+        "two_handed",
+        "plate",
+        "hammer",
+        "firearm"
+      ],
+      "dislikesItems": [
+        "Titanforged Cuirass",
+        "Mud Mauler"
+      ],
+      "lovedLine": "Oh, feel that sole! {item} — I could cross a gallery of sleeping guards in these and none of them would roll over. You've a good eye, and I'll not forget it.",
+      "likedLine": "{item}. That's honest footwear. Half of staying alive is where you put your feet, you know.",
+      "dislikeLine": "Bless you, but {item} is all noise and burden. You'd hear yourself coming from the far end of the camp.",
+      "politeLine": "I'll take {item} kindly. Come back when your soles wear thin and I'll see you right.",
+      "insultLine": "I've stitched boots from worse than {item}, but I've never been paid in it. Off with you, quietly."
+    },
+    "korr_stonefoot": {
+      "lovesTags": [
+        "two_handed",
+        "hammer",
+        "mud_golems",
+        "golem_weapon"
+      ],
+      "lovesItems": [
+        "Golem Sledge",
+        "Elder Golem Sledge",
+        "Titan Warhammer",
+        "Mudstone Bulwark",
+        "Stone-Forged War Armor",
+        "Mud Sledge"
+      ],
+      "likesTags": [
+        "plate",
+        "stone",
+        "axe",
+        "melee",
+        "mud_golem",
+        "chest"
+      ],
+      "likesItems": [
+        "Rough-Hewn Chestplate",
+        "Hardened Mudstone",
+        "Stone Guardian's Headpiece",
+        "Golem Greatsword"
+      ],
+      "dislikesTags": [
+        "stealth",
+        "ranged",
+        "knife",
+        "cloth"
+      ],
+      "dislikesItems": [
+        "Throwing Knife",
+        "Stealth Hood"
+      ],
+      "lovedLine": "You bring me {item}. Both hands to hold it. That is a thing worth holding. I will remember your face now, and that takes most men a year.",
+      "likedLine": "{item}. Heavy in the right places. Set it down there.",
+      "dislikeLine": "{item} is for a man who wants the fight over before it starts. I do not trust that man, and I do not trust his tools.",
+      "politeLine": "Kept. {item} will sit by the wall. I do not throw away what was given.",
+      "insultLine": "I lift stone for a living. I am not lifting {item}. Take it and go slow."
+    },
+    "cassia_nightwind": {
+      "lovesTags": [
+        "bow",
+        "crossbow",
+        "ranged",
+        "thrown"
+      ],
+      "lovesItems": [
+        "Aetheric Longbow",
+        "Tartarian Longbow",
+        "Bone Crossbow",
+        "Aetheric Sniper Bow",
+        "Bone Bolt",
+        "Voidspawn Bolt"
+      ],
+      "likesTags": [
+        "firearm",
+        "aetherborn",
+        "throwable",
+        "two_handed",
+        "aetheric",
+        "uncommon"
+      ],
+      "likesItems": [
+        "Salvaged Bow",
+        "Laser Crossbow",
+        "Aetheric Throwing Disk",
+        "Phoenix Feather"
+      ],
+      "dislikesTags": [
+        "hammer",
+        "plate",
+        "barehanded",
+        "junk"
+      ],
+      "dislikesItems": [
+        "Bonebreaker Mace",
+        "Mud Mauler"
+      ],
+      "lovedLine": "Draw it. Go on — feel where it stacks. {item} was made by someone who has actually missed a shot and minded about it. I'll take good care of it. Better than you would.",
+      "likedLine": "{item}. That will fly true enough. Thank you — I do mean it, I simply say it quietly.",
+      "dislikeLine": "You'd have to be close enough to smell them to use {item}. I prefer the distance. I always have.",
+      "politeLine": "I'll keep {item}. Not everything I keep is for shooting with.",
+      "insultLine": "I have loosed arrows at things I could barely see, and I would not waste one on whatever {item} is. No."
+    },
+    "odar_flameforge": {
+      "lovesTags": [
+        "burn",
+        "fire",
+        "metal",
+        "crafted"
+      ],
+      "lovesItems": [
+        "Incendiary Paste",
+        "Searing Paste",
+        "Smoldering Paste",
+        "Solar Firestone",
+        "Heat-Shield Gloves",
+        "Aetheric Flame Kit"
+      ],
+      "likesTags": [
+        "architectural_sentinels",
+        "hammer",
+        "weapon_coating",
+        "plate",
+        "melee",
+        "alchemy"
+      ],
+      "likesItems": [
+        "Compact Aetheric Forge",
+        "Builder's Aethercraft Hammer",
+        "Sentinel's Warplate",
+        "Flame of Aether"
+      ],
+      "dislikesTags": [
+        "cold",
+        "frost",
+        "stealth",
+        "foraged"
+      ],
+      "dislikesItems": [
+        "Frost Paste",
+        "Rime Draught",
+        "Frost Maul"
+      ],
+      "lovedLine": "HAH! Everyone, hands down, look here — {item}, in my forge, on this day! I have wanted this since I was an apprentice with singed eyebrows. You are a friend of the flame and I will say so loudly!",
+      "likedLine": "{item}! Good stuff, good stuff. It will see the fire before the week's out, and it will come out better.",
+      "dislikeLine": "You bring cold to a fire-forge? {item} would crack the moment my coals looked at it.",
+      "politeLine": "I'll have {item}, and I'll shout your name across the yard for it. That is how I say thank you and you'll not talk me out of it.",
+      "insultLine": "I have burned better than {item} for kindling and been ashamed of the kindling! Away!",
+      "returnGift": "Incendiary Paste",
+      "returnGiftLine": "Odar sets a sealed pot in front of you. \"Burns hotter than what I sell. You've earned the good batch.\""
+    },
+    "silvan_the_quiet": {
+      "lovesTags": [
+        "boss",
+        "coveted",
+        "crystal",
+        "core"
+      ],
+      "lovesItems": [
+        "Aether Pearl",
+        "Aetherstone Heart",
+        "Siren Crystal",
+        "Heart of the Aetherstorm",
+        "Aetheric Gem",
+        "Whispering Aether Crystal"
+      ],
+      "likesTags": [
+        "relic",
+        "aether",
+        "legendary",
+        "rare",
+        "amulet",
+        "aetheric"
+      ],
+      "likesItems": [
+        "Aetheric Locket",
+        "Etherium Crystal",
+        "Shifting Obsidian Orb",
+        "Aetheric Song"
+      ],
+      "dislikesTags": [
+        "junk",
+        "improvised",
+        "common",
+        "scrap"
+      ],
+      "dislikesItems": [
+        "Cudgel",
+        "Rusted Blade",
+        "Scrap Metal"
+      ],
+      "lovedLine": "...Yes. Do you hear it? {item} is still singing. Very few things still sing. I will not thank you loudly, but I will thank you for a long time.",
+      "likedLine": "{item}. It has a little light left in it. That is enough.",
+      "dislikeLine": "{item} is silent. Not quiet — silent. There is a difference, and I deal only in the one.",
+      "politeLine": "I accept {item}. Set it there, by the lamp. I keep more than I sell.",
+      "insultLine": "No. {item} has nothing in it and never did. Please take it out of the room."
+    },
+    "bran_the_beastmaster": {
+      "lovesTags": [
+        "dog_treat",
+        "dog_armor",
+        "organic",
+        "food"
+      ],
+      "lovesItems": [
+        "Honey-Glazed Knuckle",
+        "Riveted Leather Vest",
+        "Aetheric Padded Vest",
+        "Reclaimer Pattern Vest",
+        "Dragon Scale",
+        "Wyvern Scale"
+      ],
+      "likesTags": [
+        "fang",
+        "scale",
+        "foraged",
+        "potion",
+        "healing",
+        "cooked"
+      ],
+      "likesItems": [
+        "Rat Fur",
+        "Beast Fang",
+        "Drake Scale",
+        "Hearty Stew"
+      ],
+      "dislikesTags": [
+        "poison",
+        "corruption",
+        "firearm",
+        "undead"
+      ],
+      "dislikesItems": [
+        "Poison Vial",
+        "Disease Sample",
+        "Viper Venom"
+      ],
+      "lovedLine": "Ha! Look at her ears go up — she knew before I did! {item} is the finest thing anyone's put in my hands all season, and she'll be insufferable about it for a week.",
+      "likedLine": "{item}, aye, that's a good bit of kit. There's a beast on this road that'll be warmer for it tonight.",
+      "dislikeLine": "I'll not have {item} near the pens. Whatever's in it, they can smell it, and they don't like it.",
+      "politeLine": "Kind of you! {item} goes in the wagon. Come see the hounds before you head off, they've decided they like you.",
+      "insultLine": "I've fed my dogs things I'd not name in company, and even they'd turn their nose from {item}. Take it off, please.",
+      "returnGift": "Honey-Glazed Knuckle",
+      "returnGiftLine": "Bran tosses it to you underhand. \"For the dog. Or for you — I don't judge either way.\""
+    },
+    "vela_ironheart": {
+      "lovesTags": [
+        "blade",
+        "shield",
+        "axe",
+        "true_tartarians"
+      ],
+      "lovesItems": [
+        "Tartarian Warblade",
+        "Tartarian Crown Sword",
+        "Titan Shield",
+        "Ancestor Bone Cleaver",
+        "Giant Warblade",
+        "Iron Buckler"
+      ],
+      "likesTags": [
+        "melee",
+        "single_handed",
+        "dual_wield",
+        "giants",
+        "plate",
+        "crafted"
+      ],
+      "likesItems": [
+        "Tartarian Oath-Band",
+        "Bone Round Shield",
+        "Tartarian Great Knife",
+        "Sentinel's Chestplate"
+      ],
+      "dislikesTags": [
+        "firearm",
+        "stealth",
+        "poison",
+        "junk"
+      ],
+      "dislikesItems": [
+        "Plasma Pistol",
+        "Poison Vial",
+        "Mask of the Shadow Lord"
+      ],
+      "lovedLine": "Stand still. Let me see the edge properly. ...{item} was made by a disciplined hand, and a disciplined hand deserves a straight word: this is excellent, and I am in your debt.",
+      "likedLine": "{item}. Well kept. That tells me more about you than anything you've said.",
+      "dislikeLine": "{item} kills a man without ever meeting him. I have no discipline to teach with a thing like that.",
+      "politeLine": "I accept {item}, and I will not pretend to more enthusiasm than I have. The courtesy is noted regardless.",
+      "insultLine": "You would carry {item} into a fight and expect to walk out. That is not courage, it is arithmetic you have not done. Take it back."
+    },
+    "mara_stoneskin": {
+      "lovesTags": [
+        "stone",
+        "mud_golems",
+        "mud",
+        "golem_weapon"
+      ],
+      "lovesItems": [
+        "Mudstone Bulwark",
+        "Hardened Mudstone",
+        "Tartarian Stoneband",
+        "Stone-Warden's Cape",
+        "Golemstone Charm",
+        "Stonebound Boots"
+      ],
+      "likesTags": [
+        "mud_golem",
+        "plate",
+        "armor",
+        "crafted",
+        "construct",
+        "greaves"
+      ],
+      "likesItems": [
+        "Rough-Hewn Chestplate",
+        "Golem Core",
+        "Stone Seeker's Brow Guard",
+        "Architect's Rest Stone"
+      ],
+      "dislikesTags": [
+        "firearm",
+        "legendary",
+        "stealth",
+        "poison"
+      ],
+      "dislikesItems": [
+        "Plasma Rifle",
+        "Mask of the Forgotten Gaze"
+      ],
+      "lovedLine": "Come nearer to the fire, you've earned it. {item} — stone that remembers being under the world. I do not warm to people quickly, and you have just made it quick.",
+      "likedLine": "{item}. Solid. I'll set it where the damp won't reach. Sit a while if you like.",
+      "dislikeLine": "{item} won't stand against a rockfall or a golem's fist, and out here it's one or the other by Tuesday.",
+      "politeLine": "I'll take {item}, and thank you for it, though I'll not pretend I know what I'll do with it yet.",
+      "insultLine": "I was warm with you and you brought me {item}. That is how a person learns not to be warm. Go on."
+    },
+    "yara_windcaller": {
+      "lovesTags": [
+        "aetherborn",
+        "boots",
+        "aetherforged",
+        "feet"
+      ],
+      "lovesItems": [
+        "Aether-Runner Boots",
+        "Arcane Sprinter's Boots",
+        "Aetherforged Treads",
+        "King's Speed Boots",
+        "Gale Binder",
+        "Aether Wing"
+      ],
+      "likesTags": [
+        "greaves",
+        "cloak",
+        "aether",
+        "runecaster",
+        "gauntlets",
+        "rare"
+      ],
+      "likesItems": [
+        "Aether-Walker's Cape",
+        "Aether-Wing Cloak",
+        "Lightfoot Dash",
+        "Harpy Feather"
+      ],
+      "dislikesTags": [
+        "two_handed",
+        "plate",
+        "hammer",
+        "heavy"
+      ],
+      "dislikesItems": [
+        "Titanforged Cuirass",
+        "Gravity Hammer"
+      ],
+      "lovedLine": "Hold it loosely. There — do you feel how it wants to move? {item} was made for someone who understands that going quickly is a kind of stillness. Thank you. Truly.",
+      "likedLine": "{item}. Light in the hand. That is most of what I ask of anything.",
+      "dislikeLine": "{item} would hold me to the ground, and I have spent a great deal of my life learning not to be held.",
+      "politeLine": "I will keep {item}, and I will not hurry to decide what for. Some things take their own time.",
+      "insultLine": "I am patient with most things. Not with {item}. Carry it back the way you came, slowly.",
+      "returnGift": "Harpy Feather",
+      "returnGiftLine": "Yara holds it out on an open palm, like something the wind left. \"It wanted to go to you. Who am I to argue.\""
+    },
+    "zorin_nightblade": {
+      "lovesTags": [
+        "legendary",
+        "boss",
+        "unknowing_masses",
+        "coveted"
+      ],
+      "lovesItems": [
+        "Aetheric Deathblade",
+        "Reaver's Greatsword",
+        "Tartarian Blood Dagger",
+        "Obsidian Knife",
+        "Void Edge",
+        "Energy Blade (Legendary)"
+      ],
+      "likesTags": [
+        "dual_wield",
+        "knife",
+        "blade",
+        "rare",
+        "undead",
+        "firearm"
+      ],
+      "likesItems": [
+        "Plasma Cutter Knife",
+        "Wyrm-Fang Blade",
+        "Lich Phylactery",
+        "Architect's Silent Dagger"
+      ],
+      "dislikesTags": [
+        "common",
+        "food",
+        "improvised",
+        "junk"
+      ],
+      "dislikesItems": [
+        "Rusted Blade",
+        "Club"
+      ],
+      "lovedLine": "...Ah. Someone died badly to make {item}, and someone else died badly carrying it. Both of them would be furious to see it in my hands. Good.",
+      "likedLine": "{item}. It has been used. I prefer things that have been used.",
+      "dislikeLine": "Everyone owns {item}. I do not sell what everyone owns.",
+      "politeLine": "It stays with me. I will not say I wanted {item}, but I will say nothing against it either.",
+      "insultLine": "You have brought {item} to a man who trades in the last thing people ever hold. Reconsider your errand."
+    },
+    "kirin_spellweaver": {
+      "lovesTags": [
+        "runecaster",
+        "rune_power",
+        "spell",
+        "aetherborn"
+      ],
+      "lovesItems": [
+        "Storm Rod",
+        "Pyric Wand",
+        "Mire Stave",
+        "Vaultbreaker Staff",
+        "Etheric Wand",
+        "Aetheric Rod"
+      ],
+      "likesTags": [
+        "aetheric",
+        "aether",
+        "amulet",
+        "helmet",
+        "rare",
+        "ring"
+      ],
+      "likesItems": [
+        "Minor Aetheric Amulet",
+        "Aetheric Helm of Insight",
+        "Aetherborn Signet",
+        "Arcane Cipherstone"
+      ],
+      "dislikesTags": [
+        "improvised",
+        "junk",
+        "firearm",
+        "food"
+      ],
+      "dislikesItems": [
+        "Cudgel",
+        "Big Rock"
+      ],
+      "lovedLine": "Ah. Set {item} down and step back a pace — not from danger, from courtesy. A shaped thing should be allowed to settle. This is a considerable gift, and I will not waste it.",
+      "likedLine": "{item}. Well made, and made with intent. Those are not the same, and I value the second more.",
+      "dislikeLine": "There is no thought in {item}. It does what it does and never asks why. I find I cannot love such things.",
+      "politeLine": "I accept {item}. Every object teaches something, even if only patience.",
+      "insultLine": "You offer {item} to a weaver of runes. There is nothing in it to weave. Take it, and think a little longer next time."
+    },
+    "drakos_mercenary": {
+      "lovesTags": [
+        "two_handed",
+        "hammer",
+        "axe",
+        "spear"
+      ],
+      "lovesItems": [
+        "Reaver's Greatsword",
+        "Titan Warhammer",
+        "Heavy Rail Axe",
+        "Mud-Iron Greatblade",
+        "Titan Bone Axe",
+        "Aetheric Greatsword"
+      ],
+      "likesTags": [
+        "melee",
+        "blade",
+        "giants",
+        "legendary",
+        "polearm",
+        "true_tartarians"
+      ],
+      "likesItems": [
+        "Giant-Watch Greatspear",
+        "Bone Maul",
+        "Mud Claymore",
+        "Fusion Greatsword"
+      ],
+      "dislikesTags": [
+        "stealth",
+        "tool",
+        "foraged",
+        "potion"
+      ],
+      "dislikesItems": [
+        "Stealth Hood",
+        "Pocket Knife",
+        "Whisperer's Charm"
+      ],
+      "lovedLine": "Ha! Both hands, look — both hands and it still wants more! {item} was forged for a man who intends to end things. Drink with me, you have excellent taste.",
+      "likedLine": "{item}. It swings. That is the whole of my requirement and it meets it.",
+      "dislikeLine": "What am I to do with {item}, tickle them? I am paid by the finished job, not the clever one.",
+      "politeLine": "Fine, fine, I'll take {item}. I'll not use it, but I'll take it, and I'll say you dealt fair.",
+      "insultLine": "I have broken shields with my knee. I will not be handed {item} and told it is a gift. Take it out of my sight."
+    },
+    "nalren_frostgrip": {
+      "lovesTags": [
+        "cold",
+        "frost",
+        "alchemy",
+        "crafted"
+      ],
+      "lovesItems": [
+        "Frost Maul",
+        "Frost Paste",
+        "Rime Draught",
+        "Frostbind",
+        "Ice Vein",
+        "Frostbite"
+      ],
+      "likesTags": [
+        "weapon_coating",
+        "potion",
+        "reclaimers",
+        "runecaster",
+        "crystal",
+        "rare"
+      ],
+      "likesItems": [
+        "Frost Shock",
+        "Frostbound",
+        "Aether Crystal",
+        "Reclaimer's Cloak"
+      ],
+      "dislikesTags": [
+        "burn",
+        "fire",
+        "food",
+        "improvised"
+      ],
+      "dislikesItems": [
+        "Incendiary Paste",
+        "Solar Firestone",
+        "Searing Paste"
+      ],
+      "lovedLine": "Do not breathe on it. {item} holds its cold better than most men hold their nerve. You have done well. I will not say it twice.",
+      "likedLine": "{item}. It will keep. Everything worth having keeps.",
+      "dislikeLine": "Heat is a short argument, and {item} makes it badly. Cold outlasts. Cold always outlasts.",
+      "politeLine": "It is taken. {item} will go in the back, with the rest of what I do not need.",
+      "insultLine": "You have walked a cold road to hand me {item}. That was the only cold thing about this transaction. No."
+    },
+    "monarch_agent": {
+      "lovesTags": [
+        "mud_monarchs",
+        "stealth",
+        "sigil",
+        "mask"
+      ],
+      "lovesItems": [
+        "Mud Monarch Sigil",
+        "Monarch's Drowned Signet",
+        "Mud Monarch's Pendant",
+        "Mask of the Forgotten Gaze",
+        "Whisperer's Charm",
+        "Mud Monarch Seal"
+      ],
+      "likesTags": [
+        "knife",
+        "keepsake",
+        "cloak",
+        "thrown",
+        "loot",
+        "face"
+      ],
+      "likesItems": [
+        "Throwing Knife",
+        "Echoing Steps Boots",
+        "Stealth Hood",
+        "Mud Monarch Badge"
+      ],
+      "dislikesTags": [
+        "two_handed",
+        "firearm",
+        "hammer",
+        "junk"
+      ],
+      "dislikesItems": [
+        "Tartarian Battle Horn",
+        "Signal Flare",
+        "Aetheric Beacon"
+      ],
+      "lovedLine": "Hood up. Walk with me. {item} does not exist, you never held it, and there are tokens in your hand with no marks on them. We understand each other.",
+      "likedLine": "{item}. Useful. It goes in the coat, not the ledger.",
+      "dislikeLine": "{item} is loud, and loud is a debt somebody eventually collects. Not from me.",
+      "politeLine": "Taken. You were never here, and {item} was never given.",
+      "insultLine": "You are being remembered right now, and for {item}. That is the worst trade you will make today."
+    },
+    "servants_quartermaster": {
+      "lovesTags": [
+        "servants_of_giants",
+        "giants",
+        "tartarian_giants",
+        "sigil"
+      ],
+      "lovesItems": [
+        "Giants' Servant Sigil",
+        "The Entombed's Prayer Tablet",
+        "Titanhold Ring",
+        "Tomb-Warden Plate",
+        "Etheric Tome of the Giants",
+        "Giant-Watch Greatspear"
+      ],
+      "likesTags": [
+        "keepsake",
+        "stone",
+        "tartarian_giant",
+        "purification",
+        "detection",
+        "relic"
+      ],
+      "likesItems": [
+        "Aetheric Locket",
+        "Aetheric Compass",
+        "Titan Core",
+        "Cavern Sound Stones"
+      ],
+      "dislikesTags": [
+        "boss",
+        "loot",
+        "poison",
+        "corruption"
+      ],
+      "dislikesItems": [
+        "Lich Phylactery",
+        "Corruption Tonic",
+        "Tyrant's Crown"
+      ],
+      "lovedLine": "The stone at my throat has not gone quiet since you came up the road. {item}. Kneel or don't, but be still a moment — this was theirs, and it is only lent to us.",
+      "likedLine": "{item}. A small mercy, honestly come by. I will say a word over it before it goes on the shelf.",
+      "dislikeLine": "{item} was pried off the sleeping, and the pryer said no prayer. I will not put it beside things that were given.",
+      "politeLine": "It is received, and blessed, such as my blessing is worth. {item} will not be wasted here.",
+      "insultLine": "I sell nothing without a prayer first, and I can find no prayer for {item}. Look at me. Take it away."
+    },
+    "dynasty_factor": {
+      "lovesTags": [
+        "eternal_dynasty",
+        "sigil",
+        "keepsake",
+        "ring"
+      ],
+      "lovesItems": [
+        "Eternal Dynasty Sigil",
+        "Eternal Dynasty's Blood-Signet",
+        "Aetherborn Signet",
+        "Heir's Dynastic Plate",
+        "Dynasty Oathspear",
+        "Aetherstone Signet"
+      ],
+      "likesTags": [
+        "faction_gear",
+        "amulet",
+        "rare",
+        "relic",
+        "outer",
+        "one_handed"
+      ],
+      "likesItems": [
+        "Ceremonial Robes",
+        "Runic Mantle",
+        "Aetheric Locket",
+        "Forgotten Heir's Crown"
+      ],
+      "dislikesTags": [
+        "junk",
+        "improvised",
+        "scrap",
+        "mud"
+      ],
+      "dislikesItems": [
+        "Aether Mud",
+        "Cudgel",
+        "Patched Cloth"
+      ],
+      "lovedLine": "You may consider this audience extended. {item} belongs to a line that does not end, and you have returned it to that line. The Dynasty notices such things, and the Dynasty's memory is long past your reckoning.",
+      "likedLine": "Acceptable. {item} has the look of proper workmanship, which is rarer each year among the brief-lived.",
+      "dislikeLine": "One does not present {item} at court, and this stall is a court, whatever the roof over it looks like.",
+      "politeLine": "It is received. {item} shall be recorded, filed, and, in all likelihood, outlast you.",
+      "insultLine": "You have offered {item} to the house that predates your grandmother's grandmother. The audience is concluded."
+    },
+    "architects_keeper": {
+      "lovesTags": [
+        "map",
+        "chart",
+        "conspiracy_architects",
+        "stealth"
+      ],
+      "lovesItems": [
+        "Torn Labyrinth Chart",
+        "Architect's Master Blueprint",
+        "Tartarian Navigator's Map",
+        "Ring of Shadows",
+        "Architect's Silent Dagger",
+        "Whispering Cipher"
+      ],
+      "likesTags": [
+        "boots",
+        "detection",
+        "knife",
+        "keepsake",
+        "face",
+        "cloak"
+      ],
+      "likesItems": [
+        "Echoing Steps Boots",
+        "Whisperer's Charm",
+        "Aetheric Compass",
+        "Architect's Shadow Coat"
+      ],
+      "dislikesTags": [
+        "firearm",
+        "hammer",
+        "two_handed",
+        "junk"
+      ],
+      "dislikesItems": [
+        "Signal Flare",
+        "Tartarian Battle Horn",
+        "Aetheric Beacon"
+      ],
+      "lovedLine": "...Two doors on this that I have only heard rumoured. Somebody drew {item} who was not supposed to be in the room. I would very much like to know if they are still alive, and I would very much like you not to tell me.",
+      "likedLine": "{item}. Quiet, and it does not draw an eye. Both of those are the whole job.",
+      "dislikeLine": "{item} makes a noise, and a noise is a witness. I do not keep witnesses.",
+      "politeLine": "A nod, then. {item} goes where things go. You'll not see it again, and that is the point.",
+      "insultLine": "There are three exits in this room and you have spent your only visit offering me {item}. Use the nearest one."
+    },
+    "builders_foreman": {
+      "lovesTags": [
+        "stone",
+        "stone_builders",
+        "plate",
+        "hammer"
+      ],
+      "lovesItems": [
+        "Builder's Aethercraft Hammer",
+        "Builder's Shoring Plate",
+        "Stone Builder Sigil",
+        "Architect's Insight Ring",
+        "Mudstone Bulwark",
+        "Tartarian Stoneband"
+      ],
+      "likesTags": [
+        "tool",
+        "metal",
+        "mud_golems",
+        "crafted",
+        "chest",
+        "exploration"
+      ],
+      "likesItems": [
+        "Pry Bar",
+        "Hardened Mudstone",
+        "Rough-Hewn Chestplate",
+        "Climbing Rope"
+      ],
+      "dislikesTags": [
+        "cloth",
+        "stealth",
+        "junk",
+        "mushroom"
+      ],
+      "dislikesItems": [
+        "Patched Cloth",
+        "Cloth Scrap",
+        "Stealth Hood"
+      ],
+      "lovedLine": "Now that will hold weight. {item} — you could hang a course of stone off that and go home to your supper without a thought. I'll tell you plain, lad, that's the best thing anyone's handed me this year.",
+      "likedLine": "{item}. Sound. Not clever, mind, but sound, and sound builds walls.",
+      "dislikeLine": "Put a load on {item} and it folds. I've buried men who trusted things that fold.",
+      "politeLine": "I'll take it, and I'll say thank you, and I'll not pretend {item} will ever see a work site.",
+      "insultLine": "I sell gear built to outlast its owner. {item} wouldn't outlast the walk to the gate. Take it and don't do that again."
+    },
+    "revivalists_quartermaster": {
+      "lovesTags": [
+        "tartarian_revivalists",
+        "aether",
+        "core",
+        "electrical"
+      ],
+      "lovesItems": [
+        "Revivalist Sigil",
+        "Revivalist's Aether-Coil",
+        "Aetheric Crystal Blade",
+        "Aether Core",
+        "Etheric Battery",
+        "Whispering Aether Crystal"
+      ],
+      "likesTags": [
+        "aetheric",
+        "crystal",
+        "relic",
+        "runecaster",
+        "rare",
+        "quest"
+      ],
+      "likesItems": [
+        "Minor Aetheric Amulet",
+        "Aetheric Vest",
+        "Aetherstone Fragment",
+        "Aether Crystal"
+      ],
+      "dislikesTags": [
+        "junk",
+        "improvised",
+        "food",
+        "scrap"
+      ],
+      "dislikesItems": [
+        "Cudgel",
+        "Rat Fur",
+        "Bent Nail"
+      ],
+      "lovedLine": "Do you feel it? Put your hand here, on the coil — it answers {item}! The buried world is not dead, friend, it is only sleeping, and you have just made it turn over in its sleep.",
+      "likedLine": "{item}! Every piece we gather is a piece the world gets back. Believer's discount for you, and gladly.",
+      "dislikeLine": "There is no current in {item}. It cannot wake anything, least of all a world.",
+      "politeLine": "I'll take {item} and I'll thank you, though I'd thank you more if you'd stay and hear the creed.",
+      "insultLine": "The world beneath us is stirring and you have brought me {item}. Hear the creed, or go — but take that with you.",
+      "returnGift": "Trauma Kit",
+      "returnGiftLine": "The quartermaster sets the kit down between you, official as a requisition. \"Logged as damaged stock. It isn't. Take it.\""
+    },
+    "roadside:grit_maalen": {
+      "lovesTags": [
+        "food",
+        "tool",
+        "gear"
+      ],
+      "lovesItems": [
+        "Hearty Stew",
+        "Forager's Stew",
+        "First Aid Kit",
+        "Pry Bar",
+        "Field Crafter's Kit"
+      ],
+      "likesTags": [
+        "cooked",
+        "crafted",
+        "healing",
+        "exploration",
+        "utility"
+      ],
+      "likesItems": [
+        "Mushroom Stew",
+        "Wild Chicken",
+        "Field Dressing",
+        "Climbing Rope"
+      ],
+      "dislikesTags": [
+        "poison",
+        "weapon_coating",
+        "alchemy"
+      ],
+      "dislikesItems": [
+        "Poison Vial",
+        "Disease Sample"
+      ],
+      "lovedLine": "Now that's a proper {item}. You'll sit and eat with me before you go, and I'll not hear otherwise.",
+      "likedLine": "A {item}. Honest thing, honestly given. My thanks.",
+      "dislikeLine": "I'll take the {item} off your hands, but I've no use for it and I'll not pretend I do.",
+      "politeLine": "That's a {item}, right enough. Kind of you.",
+      "insultLine": "You carried a {item} all this way to hand me? Keep it. Keep your breath too."
+    },
+    "roadside:sena_ropewalk": {
+      "lovesTags": [
+        "tool",
+        "exploration",
+        "utility"
+      ],
+      "lovesItems": [
+        "Climbing Rope",
+        "Reclaimer's Rope",
+        "Hardened Climbing Strap",
+        "Alloy Grappler",
+        "Aether Grip Pads"
+      ],
+      "likesTags": [
+        "rope",
+        "gear",
+        "crafted",
+        "fiber",
+        "common"
+      ],
+      "likesItems": [
+        "Etheric Rope",
+        "Pry Bar",
+        "Mag-Climb Kit",
+        "Sky-Walker Harness"
+      ],
+      "dislikesTags": [
+        "junk",
+        "poison",
+        "improvised"
+      ],
+      "dislikesItems": [
+        "Broken Rope",
+        "Bent Nail"
+      ],
+      "lovedLine": "Good line, this {item}. Braided true, no rot in the core. That's a gift that holds a body over a drop.",
+      "likedLine": "A {item}. I'll find work for it before the week's out.",
+      "dislikeLine": "The {item}? It won't take a knot and it won't take weight. Still, thank you.",
+      "politeLine": "A {item}. I'll stow it careful.",
+      "insultLine": "I've spliced rope with more worth than that {item}. Don't waste my hands with it."
+    },
+    "roadside:ovik_the_patient": {
+      "lovesTags": [
+        "food",
+        "cooked",
+        "healing"
+      ],
+      "lovesItems": [
+        "Mushroom Stew",
+        "Hearty Stew",
+        "Forager's Stew",
+        "Trauma Kit",
+        "First Aid Kit"
+      ],
+      "likesTags": [
+        "foraged",
+        "mushroom",
+        "crafted",
+        "potion",
+        "common"
+      ],
+      "likesItems": [
+        "Field Dressing",
+        "Wild Chicken",
+        "Water Bottle",
+        "Cleansing Tonic"
+      ],
+      "dislikesTags": [
+        "weapon_coating",
+        "poison",
+        "throwable"
+      ],
+      "dislikesItems": [
+        "Plague Vial",
+        "Acid Flask"
+      ],
+      "lovedLine": "A {item}. Sit. It keeps better warm and it keeps better shared, and I have all evening.",
+      "likedLine": "The {item} is welcome. Slow things are the good things.",
+      "dislikeLine": "I'll set the {item} at the back of the cart. Everything finds its hour, I suppose.",
+      "politeLine": "A {item}. I thank you for the thought, traveller.",
+      "insultLine": "I have waited out three winters at this stall. I will not spend a moment of the fourth on a {item}."
+    },
+    "roadside:talla_mudfoot": {
+      "lovesTags": [
+        "feet",
+        "boots",
+        "mud"
+      ],
+      "lovesItems": [
+        "Mudwalker Boots",
+        "Mudwalker's Treads",
+        "Mud-Lurker Boots",
+        "Salvager's Worn Boots",
+        "Stone-Warden's Footwraps"
+      ],
+      "likesTags": [
+        "legs",
+        "armor",
+        "exploration",
+        "gear",
+        "cloth"
+      ],
+      "likesItems": [
+        "Wanderer's Footwraps",
+        "Lost Traveler's Boots",
+        "Mud-Stalker's Footwraps",
+        "Reclaimer's Trousers"
+      ],
+      "dislikesTags": [
+        "legendary",
+        "keepsake",
+        "amulet"
+      ],
+      "dislikesItems": [
+        "Bog-Heart Pearl",
+        "Lich Phylactery"
+      ],
+      "lovedLine": "Look at the sole on that {item}. Twenty leagues of wet clay in it and not a complaint. You've done me a kindness.",
+      "likedLine": "A {item}. My feet have been the whole of my fortune, and they thank you.",
+      "dislikeLine": "Fine thing, the {item}, but it won't carry me anywhere. I walk. That's all I do.",
+      "politeLine": "A {item}, is it. Good of you.",
+      "insultLine": "I've scraped better than that {item} off my heel at a ford crossing."
+    },
+    "roadside:bersk_cartwright": {
+      "lovesTags": [
+        "tool",
+        "crafted",
+        "metal"
+      ],
+      "lovesItems": [
+        "Pry Bar",
+        "Pry-Breaker Tool",
+        "Field Crafter's Kit",
+        "Aetheric Circuit Repair Kit",
+        "Compact Aetheric Forge"
+      ],
+      "likesTags": [
+        "wood",
+        "gear",
+        "scrap",
+        "exploration",
+        "common"
+      ],
+      "likesItems": [
+        "Ancient Tools",
+        "Scrap Metal",
+        "Rune Engraving Kit",
+        "Etheric Engineer's Toolkit"
+      ],
+      "dislikesTags": [
+        "potion",
+        "spell",
+        "mushroom"
+      ],
+      "dislikesItems": [
+        "Many-Colored Tonic",
+        "Blue Cap Draught"
+      ],
+      "lovedLine": "A {item} with a true edge and a true weight. My axle's been groaning since Thametan road. This mends it.",
+      "likedLine": "The {item} will earn its place in the box. I don't keep what doesn't work.",
+      "dislikeLine": "I've no hands for a {item}. I fix wheels, not weather.",
+      "politeLine": "A {item}. I'll take it, and thank you.",
+      "insultLine": "Bring me a {item} again and I'll charge you for the time it took to look at it."
+    },
+    "roadside:nell_of_the_long_road": {
+      "lovesTags": [
+        "map",
+        "exploration",
+        "outer"
+      ],
+      "lovesItems": [
+        "Torn Labyrinth Chart",
+        "Tartarian Navigator's Map",
+        "Traveler's Cloak",
+        "Wanderer's Outercoat",
+        "Dust Compass"
+      ],
+      "likesTags": [
+        "chart",
+        "cloak",
+        "gear",
+        "detection",
+        "common"
+      ],
+      "likesItems": [
+        "Skyreacher Map 1 of 5 — Grand Spire",
+        "Aetheric Compass",
+        "Wanderer's Tattered Overcoat",
+        "Mapping Device"
+      ],
+      "dislikesTags": [
+        "two_handed",
+        "plate",
+        "giants"
+      ],
+      "dislikesItems": [
+        "Titan Warhammer",
+        "Behemoth Plate"
+      ],
+      "lovedLine": "A {item}. I have walked every road on it but two, and now I'll walk those. That is the best thing anyone has handed me this season.",
+      "likedLine": "The {item} suits a long walker. I'll carry it as far as it wants to go.",
+      "dislikeLine": "The {item} is heavy and the road is long. One of those I can change.",
+      "politeLine": "A {item}. Thank you kindly, traveller.",
+      "insultLine": "I've come from the far spires on foot. Do not meet me at the end of it with a {item}."
+    },
+    "roadside:duvo_saltbeard": {
+      "lovesTags": [
+        "food",
+        "treat",
+        "dog_treat"
+      ],
+      "lovesItems": [
+        "Smoke-Cured Jerky Strip",
+        "Ash-Cured Tongue",
+        "Honey-Glazed Knuckle",
+        "Marrow Bone",
+        "Wild Chicken"
+      ],
+      "likesTags": [
+        "cooked",
+        "stew",
+        "foraged",
+        "crafted",
+        "organic"
+      ],
+      "likesItems": [
+        "Hearty Stew",
+        "Forager's Stew",
+        "Speckled Egg",
+        "Water Bottle"
+      ],
+      "dislikesTags": [
+        "mushroom",
+        "poison",
+        "alchemy"
+      ],
+      "dislikesItems": [
+        "Violet Cap Mushroom",
+        "Corruption Tonic"
+      ],
+      "lovedLine": "Salt, smoke and time — that's all a {item} is, and all a man needs. You know your keeping, friend.",
+      "likedLine": "A {item}. It'll go in the barrel and come out better for the waiting.",
+      "dislikeLine": "The {item} will spoil before the next crossroads. I deal in what lasts.",
+      "politeLine": "A {item}. Salt in your beard and luck on your road.",
+      "insultLine": "I've cured meat older than that {item} and better company besides."
+    },
+    "roadside:riska_panhandle": {
+      "lovesTags": [
+        "foraged",
+        "mushroom",
+        "food"
+      ],
+      "lovesItems": [
+        "Mushroom Stew",
+        "Blue Aetheric Fungus",
+        "Violet Mushroom",
+        "Orange Sporecap Brew",
+        "Many-Colored Tonic"
+      ],
+      "likesTags": [
+        "fruit",
+        "cooked",
+        "potion",
+        "organic",
+        "distillable"
+      ],
+      "likesItems": [
+        "Forager's Stew",
+        "Wild Grapes",
+        "Blueberries",
+        "Violet Cap Distillate"
+      ],
+      "dislikesTags": [
+        "metal",
+        "firearm",
+        "plate"
+      ],
+      "dislikesItems": [
+        "Rust Rifle",
+        "Scrap-Forged Breastplate"
+      ],
+      "lovedLine": "A {item}! Do you know what a body walks to find one of these? Ditches, mostly. You've saved me the ditches.",
+      "likedLine": "The {item} is a good find. The ground gives up little and asks a lot.",
+      "dislikeLine": "The {item} never grew anywhere. I don't know what to do with a thing that never grew.",
+      "politeLine": "A {item}. That's kind, and I'll say so plain.",
+      "insultLine": "I could have panhandled a better gift out of a wet ditch than that {item}."
+    },
+    "roadside:ymer_tinpot": {
+      "lovesTags": [
+        "scrap",
+        "metal",
+        "crafted"
+      ],
+      "lovesItems": [
+        "Scrap Metal",
+        "Etheric Scrap",
+        "Broken Sentinel Part",
+        "Sentinel Core Plate",
+        "Compact Aetheric Forge"
+      ],
+      "likesTags": [
+        "tool",
+        "relic",
+        "core",
+        "common",
+        "machine"
+      ],
+      "likesItems": [
+        "Pry Bar",
+        "Empty Water Bottle",
+        "Clockwork Core",
+        "Ancient Tools"
+      ],
+      "dislikesTags": [
+        "cloth",
+        "outer",
+        "keepsake"
+      ],
+      "dislikesItems": [
+        "Ceremonial Robes",
+        "Patched Cloth"
+      ],
+      "lovedLine": "Hear that? Struck the {item} and it rang true. Metal that rings is metal that mends, and I've three pots waiting.",
+      "likedLine": "A {item}. Into the tin box with it. Everything goes in the tin box.",
+      "dislikeLine": "The {item} won't take a rivet nor a solder. Soft goods are somebody else's trade.",
+      "politeLine": "A {item}, then. Obliged to you.",
+      "insultLine": "I hammer scrap for my supper and even I would not stoop for that {item}."
+    },
+    "roadside:halda_roadsworn": {
+      "lovesTags": [
+        "keepsake",
+        "sigil",
+        "amulet"
+      ],
+      "lovesItems": [
+        "Reclaimer Sigil",
+        "Stone Builder Sigil",
+        "True Tartarian Sigil",
+        "Whisperer's Charm",
+        "Lightstone Amulet"
+      ],
+      "likesTags": [
+        "ring",
+        "faction_gear",
+        "relic",
+        "crafted",
+        "loot"
+      ],
+      "likesItems": [
+        "Tartarian Oath-Band",
+        "Mud Monarch Sigil",
+        "Minor Aetheric Amulet",
+        "Etheric Talisman"
+      ],
+      "dislikesTags": [
+        "poison",
+        "alchemy",
+        "stealth"
+      ],
+      "dislikesItems": [
+        "Plague Tonic",
+        "Stealth Hood"
+      ],
+      "lovedLine": "An oath in metal, this {item}. I gave my word to this road when I was young, and I keep such things. It will hang where I can see it.",
+      "likedLine": "A {item}. Kept things are kept promises. I'll not lose it.",
+      "dislikeLine": "The {item} carries no name and swears to nothing. I'd rather a thing that means something.",
+      "politeLine": "A {item}. My thanks, and my word you'll get honest weight from me.",
+      "insultLine": "I am roadsworn, not roadsold. Take your {item} and your poor opinion elsewhere."
+    },
+    "roadside:pell_the_slow": {
+      "lovesTags": [
+        "hands",
+        "gauntlets",
+        "cloth"
+      ],
+      "lovesItems": [
+        "Golem Leather Gloves",
+        "Wanderer's Worn Gauntlets",
+        "Salvager's Worn Gloves",
+        "Heat-Shield Gloves",
+        "Reclaimer's Gloves"
+      ],
+      "likesTags": [
+        "armor",
+        "head",
+        "outer",
+        "crafted",
+        "common"
+      ],
+      "likesItems": [
+        "Lost Seeker's Gloves",
+        "Explorer's Worn Headgear",
+        "Patched Cloth",
+        "Rough-Hewn Gauntlets"
+      ],
+      "dislikesTags": [
+        "ranged",
+        "firearm",
+        "throwable"
+      ],
+      "dislikesItems": [
+        "Compact Blaster",
+        "Throwing Knife"
+      ],
+      "lovedLine": "Ah. Give me a moment with this {item}. Good stitching wants looking at. My hands crack in the cold and these will see me to spring.",
+      "likedLine": "A {item}. That's... yes. That's good. Thank you.",
+      "dislikeLine": "The {item} moves faster than I care to. I've never been quick and I've never needed to be.",
+      "politeLine": "A {item}. Slow thanks, but true ones.",
+      "insultLine": "I am slow, friend, not simple. Take the {item} back before I find my temper."
+    },
+    "roadside:vosk_barrowman": {
+      "lovesTags": [
+        "stone",
+        "tool",
+        "hammer"
+      ],
+      "lovesItems": [
+        "Reclaimer's Trowel",
+        "Giant's Bone Pickaxe",
+        "Hardened Mudstone",
+        "Pry Bar",
+        "Mudstone"
+      ],
+      "likesTags": [
+        "metal",
+        "mud",
+        "two_handed",
+        "scrap",
+        "crafted"
+      ],
+      "likesItems": [
+        "Mud Sledge",
+        "Big Rock",
+        "Scrap Metal",
+        "Mud Fragment"
+      ],
+      "dislikesTags": [
+        "spell",
+        "runecaster",
+        "aetheric"
+      ],
+      "dislikesItems": [
+        "Whispering Flame",
+        "Aetheric Torch"
+      ],
+      "lovedLine": "Heft on that {item}. I've hauled this barrow from the low fields since I could walk, and a good weight is an honest friend.",
+      "likedLine": "The {item} goes in the barrow. Barrow's never yet complained.",
+      "dislikeLine": "The {item} does nothing you can put your back into. I don't trust what I can't lift.",
+      "politeLine": "A {item}. Good, that. Thanks to you.",
+      "insultLine": "I push a barrow uphill for a living and that {item} is still the heaviest thing you've handed me."
+    },
+    "roadside:skiv": {
+      "lovesTags": [
+        "knife",
+        "stealth",
+        "throwable"
+      ],
+      "lovesItems": [
+        "Bone Shiv (Stealth)",
+        "Tartarian Claw Knife",
+        "Throwing Knife",
+        "Obsidian Knife",
+        "Pocket Knife"
+      ],
+      "likesTags": [
+        "dual_wield",
+        "blade",
+        "loot",
+        "uncommon",
+        "melee"
+      ],
+      "likesItems": [
+        "Rust Dagger",
+        "Etheric Dagger",
+        "Mud Throwing Knife",
+        "Bone Shiv"
+      ],
+      "dislikesTags": [
+        "two_handed",
+        "food",
+        "plate"
+      ],
+      "dislikesItems": [
+        "Titan Warhammer",
+        "Wild Carrot"
+      ],
+      "lovedLine": "Short. Quiet. Goes in a boot. A {item} like that never has to be explained to anyone.",
+      "likedLine": "The {item}. Fine. It'll move.",
+      "dislikeLine": "Can't hide a {item}. Can't run with it. No.",
+      "politeLine": "The {item}. Right. Under the cloth it goes.",
+      "insultLine": "Don't stand at my cart holding a {item} like it's worth words."
+    },
+    "roadside:marlow_quicksleeve": {
+      "lovesTags": [
+        "ring",
+        "stealth",
+        "loot"
+      ],
+      "lovesItems": [
+        "Light-Finger Guild Band",
+        "Reclaimer's Quick Band",
+        "Aetheric Locket",
+        "Aether-Shard Ring",
+        "Aetherstone Signet"
+      ],
+      "likesTags": [
+        "amulet",
+        "rare",
+        "uncommon",
+        "keepsake",
+        "crafted"
+      ],
+      "likesItems": [
+        "Tarnished Ether Necklace",
+        "Glowstone Pendant",
+        "Aetherstone Pendant",
+        "Whisperer's Charm"
+      ],
+      "dislikesTags": [
+        "two_handed",
+        "plate",
+        "food"
+      ],
+      "dislikesItems": [
+        "Bone Maul",
+        "Firewood"
+      ],
+      "lovedLine": "Small. Round. Fits a sleeve without a shape showing. A {item} is the whole of my trade in one hand.",
+      "likedLine": "A {item}. That'll go quiet enough. No questions from either of us.",
+      "dislikeLine": "A {item} doesn't fit anywhere it needs to fit. I'd be carrying it in the open like a fool.",
+      "politeLine": "The {item}. Gone. Where? Don't ask, and I'll say thank you.",
+      "insultLine": "Nobody has ever pinched a {item}, and now I understand why."
+    },
+    "roadside:ret_the_ash": {
+      "lovesTags": [
+        "weapon_coating",
+        "alchemy",
+        "potion"
+      ],
+      "lovesItems": [
+        "Incendiary Paste",
+        "Searing Paste",
+        "Smoldering Paste",
+        "Ash-Cured Tongue",
+        "Static Paste"
+      ],
+      "likesTags": [
+        "burn",
+        "crafted",
+        "throwable",
+        "loot",
+        "aetheric"
+      ],
+      "likesItems": [
+        "Frost Paste",
+        "Acid Flask",
+        "Shaped Aetheric Shard",
+        "Solar Firestone"
+      ],
+      "dislikesTags": [
+        "healing",
+        "purification",
+        "keepsake"
+      ],
+      "dislikesItems": [
+        "Inoculant Draught",
+        "Cleansing Tonic"
+      ],
+      "lovedLine": "Burns clean, a {item}. No stall left, no ledger left, no one left asking where the stall went.",
+      "likedLine": "A {item}. It'll take to a blade well enough.",
+      "dislikeLine": "The {item} puts things back together. That is not the direction I work in.",
+      "politeLine": "The {item}. Set it down. Don't set it down hard.",
+      "insultLine": "I have burned better than that {item} for warmth, and I did not stay warm."
+    },
+    "roadside:onda_blackpalm": {
+      "lovesTags": [
+        "poison",
+        "alchemy",
+        "organic"
+      ],
+      "lovesItems": [
+        "Poison Vial",
+        "Viper Venom Vial",
+        "Plague Vial",
+        "Viper Venom",
+        "Disease Sample"
+      ],
+      "likesTags": [
+        "weapon_coating",
+        "potion",
+        "mushroom",
+        "crafted",
+        "distillable"
+      ],
+      "likesItems": [
+        "Antivenom",
+        "Corruption Tonic",
+        "Violet Mushroom",
+        "Rat Fur"
+      ],
+      "dislikesTags": [
+        "food",
+        "healing",
+        "cooked"
+      ],
+      "dislikesItems": [
+        "Hearty Stew",
+        "First Aid Kit"
+      ],
+      "lovedLine": "See how it sits still in the glass? A {item} does not shout. Nothing I sell shouts.",
+      "likedLine": "A {item}. It'll thin down into three vials, maybe four.",
+      "dislikeLine": "The {item} keeps people upright. I have no customers for that.",
+      "politeLine": "The {item}. Don't touch the palm when you hand it over.",
+      "insultLine": "I have milked worse things than you out of nastier holes than this. Take the {item} with you."
+    },
+    "roadside:wysh_coincatcher": {
+      "lovesTags": [
+        "coveted",
+        "broker",
+        "crystal"
+      ],
+      "lovesItems": [
+        "Obsidian Siphon",
+        "Eternal Dynasty's Blood-Signet",
+        "Etherium Crystal",
+        "Aether Pearl",
+        "Aetheric Gem"
+      ],
+      "likesTags": [
+        "loot",
+        "rare",
+        "ring",
+        "amulet",
+        "legendary"
+      ],
+      "likesItems": [
+        "Worn Tartarian Coin",
+        "Aether Crystal",
+        "Aetheric Shard",
+        "Monarch's Drowned Signet"
+      ],
+      "dislikesTags": [
+        "junk",
+        "food",
+        "improvised"
+      ],
+      "dislikesItems": [
+        "Bent Nail",
+        "Cloth Scrap",
+        "Stick"
+      ],
+      "lovedLine": "Ah. Now that has a price with a comma in it. A {item} pays for the cart, the road, and the silence after.",
+      "likedLine": "A {item}. I can move that in two towns. Three, if the weather turns.",
+      "dislikeLine": "The {item} won't fetch coin and I don't deal in what won't fetch coin.",
+      "politeLine": "The {item}. Weighed, noted, taken. We're square.",
+      "insultLine": "You could not buy a cup of ditchwater with that {item}. Nor my patience."
+    },
+    "roadside:dral_hollowpocket": {
+      "lovesTags": [
+        "loot",
+        "gear",
+        "stealth"
+      ],
+      "lovesItems": [
+        "Salvage Pouch",
+        "Dimensional Pouch",
+        "Arcane Lockbox",
+        "Aetheric Field Kit",
+        "Whispering Vault Key"
+      ],
+      "likesTags": [
+        "exploration",
+        "common",
+        "uncommon",
+        "relic",
+        "cloak"
+      ],
+      "likesItems": [
+        "Old Relic Key",
+        "Mechanical Self-Locker",
+        "Rusty Ether Lock",
+        "Salvager's Trench Coat"
+      ],
+      "dislikesTags": [
+        "two_handed",
+        "food",
+        "giants"
+      ],
+      "dislikesItems": [
+        "Golem Sledge",
+        "Hearty Stew"
+      ],
+      "lovedLine": "There's a false bottom in everything if you know where to press. A {item} is a hole you can carry, and I like holes.",
+      "likedLine": "A {item}. It'll disappear into the lining nicely.",
+      "dislikeLine": "The {item} won't go in a pocket, hollow or otherwise. That's the whole of my objection.",
+      "politeLine": "The {item}. It's already gone. Don't look for it.",
+      "insultLine": "My pockets are hollow, friend, not hungry. That {item} stays with you."
+    },
+    "roadside:teska_nightweigh": {
+      "lovesTags": [
+        "crystal",
+        "core",
+        "mud"
+      ],
+      "lovesItems": [
+        "Aether Crystal",
+        "Aetheric Shard",
+        "Aether Shard",
+        "Mud Gem",
+        "Crystal Core"
+      ],
+      "likesTags": [
+        "loot",
+        "stone",
+        "metal",
+        "uncommon",
+        "relic"
+      ],
+      "likesItems": [
+        "Aetherstone Fragment",
+        "Mud-Iron Heart",
+        "Aetherstone Pebble",
+        "Hardened Mudstone"
+      ],
+      "dislikesTags": [
+        "cloth",
+        "food",
+        "spell"
+      ],
+      "dislikesItems": [
+        "Patched Cloth",
+        "Wild Oats"
+      ],
+      "lovedLine": "On the pan it goes. There — see the needle settle? A {item} weighs whatever I say it weighs, and tonight I am generous.",
+      "likedLine": "A {item}. Two ounces. Call it two ounces.",
+      "dislikeLine": "The {item} won't sit right on a pan. I only trade in what I can weigh, and weigh twice.",
+      "politeLine": "The {item}. Noted at the night rate. That's the rate I have.",
+      "insultLine": "I keep a crooked scale and even a crooked scale will not lie for that {item}."
+    },
+    "roadside:grum_the_fence": {
+      "lovesTags": [
+        "loot",
+        "uncommon",
+        "rare"
+      ],
+      "lovesItems": [
+        "True Tartarian Gauntlet",
+        "Mud Monarch's Pendant",
+        "Relic Seeker's Lens",
+        "Etheric Cloak",
+        "Arcane Cipherstone"
+      ],
+      "likesTags": [
+        "relic",
+        "legendary",
+        "armor",
+        "weapon",
+        "faction_gear"
+      ],
+      "likesItems": [
+        "Etheric Gauntlet",
+        "Etheric Chain",
+        "Etheric Battery",
+        "Forgotten Scroll"
+      ],
+      "dislikesTags": [
+        "quest",
+        "collect_only",
+        "keepsake"
+      ],
+      "dislikesItems": [
+        "Aether Collection Beacon",
+        "Reclaimer Sigil"
+      ],
+      "lovedLine": "Somebody wants a {item} back. Somebody always wants a {item} back. That's why it pays.",
+      "likedLine": "A {item}. I know three doors it fits behind. Say no more than that.",
+      "dislikeLine": "Nobody's looking for a {item}, so nobody's paying for one. Simple trade, that.",
+      "politeLine": "The {item}. Off the road, under the cart, out of the county by morning.",
+      "insultLine": "I move stolen crowns. I do not move a {item}. Nobody moves a {item}."
+    },
+    "roadside:ilva_sidelong": {
+      "lovesTags": [
+        "mask",
+        "stealth",
+        "cloak"
+      ],
+      "lovesItems": [
+        "Salvager's Mask of Secrets",
+        "Mask of the Forgotten Gaze",
+        "Stealth Hood",
+        "Shaman's Veil of Secrets",
+        "Wanderer's Face of Shadows"
+      ],
+      "likesTags": [
+        "head",
+        "outer",
+        "armor",
+        "uncommon",
+        "loot"
+      ],
+      "likesItems": [
+        "Aether Cloak of Shadows",
+        "Reclaimer's Mask",
+        "Mud-Bound Cloak",
+        "Forgotten Faceshroud"
+      ],
+      "dislikesTags": [
+        "light",
+        "detection",
+        "food"
+      ],
+      "dislikesItems": [
+        "Aetheric Torch",
+        "Lightstone Amulet"
+      ],
+      "lovedLine": "A face that isn't mine. Do you know the price of that? A {item} lets me stand in a market I've been chased out of twice.",
+      "likedLine": "A {item}. Good. Nobody looks twice at what they can't see.",
+      "dislikeLine": "The {item} throws light. I have made a life of not being in any.",
+      "politeLine": "The {item}. Fine. I'll not be looking at you when I take it.",
+      "insultLine": "You watched me sidelong for an hour to hand over a {item}. Watch the road instead."
+    },
+    "roadside:norrick_pryce": {
+      "lovesTags": [
+        "uncommon",
+        "detection",
+        "map"
+      ],
+      "lovesItems": [
+        "Relic Seeker's Lens",
+        "Etheric Lens",
+        "Aetheric Vision Lens",
+        "Aetheric Compass",
+        "Tartarian Navigator's Map"
+      ],
+      "likesTags": [
+        "relic",
+        "chart",
+        "rare",
+        "loot",
+        "scholarly"
+      ],
+      "likesItems": [
+        "Cracked Ether Lens",
+        "Etheric Spyglass",
+        "Torn Labyrinth Chart",
+        "Leatherbound Tome"
+      ],
+      "dislikesTags": [
+        "junk",
+        "improvised",
+        "food"
+      ],
+      "dislikesItems": [
+        "Bone Sliver",
+        "Small Rock"
+      ],
+      "lovedLine": "Hold still. Through the glass a {item} shows its true make, and its true make is worth four times what the last fool told you.",
+      "likedLine": "A {item}. I'll price it properly, which is to say low, and you'll thank me for it.",
+      "dislikeLine": "I've priced a {item} before. The price was nothing. It has not moved since.",
+      "politeLine": "The {item}. Marked down in the book. My book, my figure.",
+      "insultLine": "Every article has a price. A {item} has an insult, and you have just delivered it."
+    },
+    "roadside:bek_whisperlot": {
+      "lovesTags": [
+        "sigil",
+        "keepsake",
+        "loot"
+      ],
+      "lovesItems": [
+        "Whispering Cipher",
+        "Arcane Cipherstone",
+        "Whisperer's Charm",
+        "Whispering Vault Key",
+        "Forgotten Scroll"
+      ],
+      "likesTags": [
+        "relic",
+        "uncommon",
+        "amulet",
+        "ring",
+        "common"
+      ],
+      "likesItems": [
+        "Architect Sigil",
+        "Glyph-Sealed Scroll",
+        "Sentinel Activation Code",
+        "Memory Prism"
+      ],
+      "dislikesTags": [
+        "hammer",
+        "two_handed",
+        "food"
+      ],
+      "dislikesItems": [
+        "Bonebreaker Mace",
+        "Marrow Bone"
+      ],
+      "lovedLine": "Lean in. A {item} says a name, and a name is the only stock worth the cart. Don't repeat what you heard.",
+      "likedLine": "A {item}. Someone's secret in it somewhere. There always is.",
+      "dislikeLine": "The {item} makes noise and says nothing. I trade the opposite.",
+      "politeLine": "The {item}. Quietly. Everything here goes quietly.",
+      "insultLine": "Whisper it or don't, a {item} is worthless in any voice."
+    },
+    "roadside:zann_of_no_fixed_stall": {
+      "lovesTags": [
+        "throwable",
+        "scrap",
+        "common"
+      ],
+      "lovesItems": [
+        "Throwing Knife",
+        "Mud Throwing Knife",
+        "Bone Throwing Axe",
+        "Sentinel Core Plate",
+        "Shaped Aetheric Shard"
+      ],
+      "likesTags": [
+        "knife",
+        "stealth",
+        "loot",
+        "improvised",
+        "thrown"
+      ],
+      "likesItems": [
+        "Scrap Metal",
+        "Etheric Scrap",
+        "Pocket Knife",
+        "Signal Flare"
+      ],
+      "dislikesTags": [
+        "two_handed",
+        "plate",
+        "firearm",
+        "legs"
+      ],
+      "dislikesItems": [
+        "Plasma Artillery Cannon",
+        "Titanforged Cuirass"
+      ],
+      "lovedLine": "Light enough to run with. That's the only question I ask of anything, and a {item} answers it right.",
+      "likedLine": "A {item}. Small. Good. I'm three streets from here by dusk.",
+      "dislikeLine": "I'd have to leave the {item} behind the first time somebody shouted. So I'll not pick it up.",
+      "politeLine": "The {item}. Taken. This stall was never here.",
+      "insultLine": "I own nothing and go nowhere twice, and I still would not carry a {item} one street."
+    },
+    "roadside_honest": {
+      "lovesTags": [
+        "food",
+        "tool",
+        "gear"
+      ],
+      "lovesItems": [
+        "Hearty Stew",
+        "Forager's Stew",
+        "First Aid Kit",
+        "Pry Bar",
+        "Climbing Rope"
+      ],
+      "likesTags": [
+        "foraged",
+        "cooked",
+        "healing",
+        "exploration",
+        "crafted"
+      ],
+      "likesItems": [
+        "Mushroom Stew",
+        "Wild Chicken",
+        "Field Dressing",
+        "Reclaimer's Rope"
+      ],
+      "dislikesTags": [
+        "poison",
+        "weapon_coating",
+        "alchemy",
+        "junk"
+      ],
+      "dislikesItems": [
+        "Poison Vial",
+        "Disease Sample",
+        "Bent Nail"
+      ],
+      "lovedLine": "A {item}, and freely given. That's rarer on this road than you'd think. You'll get honest weight from me forever.",
+      "likedLine": "The {item} is welcome. Plain thanks, plainly meant.",
+      "dislikeLine": "I'll take the {item}, but I'd not have picked it up myself.",
+      "politeLine": "A {item}. Kind of you, traveller.",
+      "insultLine": "I trade fair and I speak fair, so hear it fair: that {item} is an insult."
+    },
+    "roadside_sketchy": {
+      "lovesTags": [
+        "loot",
+        "stealth",
+        "knife"
+      ],
+      "lovesItems": [
+        "Aetheric Locket",
+        "Throwing Knife",
+        "Salvage Pouch",
+        "Obsidian Knife",
+        "Arcane Lockbox"
+      ],
+      "likesTags": [
+        "relic",
+        "uncommon",
+        "ring",
+        "amulet",
+        "crystal"
+      ],
+      "likesItems": [
+        "Aether Crystal",
+        "Etherium Crystal",
+        "Light-Finger Guild Band",
+        "Stealth Hood"
+      ],
+      "dislikesTags": [
+        "foraged",
+        "food",
+        "junk",
+        "keepsake"
+      ],
+      "dislikesItems": [
+        "Wild Carrot",
+        "Firewood",
+        "Cloth Scrap"
+      ],
+      "lovedLine": "That's a {item} nobody will come asking after. Under the cloth. We never spoke.",
+      "likedLine": "A {item}. It'll move. Don't stand about while it does.",
+      "dislikeLine": "Nobody buys a {item} and nobody steals one. Says everything.",
+      "politeLine": "The {item}. Fine. Step back from the cart.",
+      "insultLine": "I fence stolen crowns and drowned relics. Take your {item} and take the road."
+    },
+    "hidden_market_weapons": {
+      "lovesTags": [
+        "blade",
+        "firearm",
+        "two_handed",
+        "spear"
+      ],
+      "lovesItems": [
+        "Aetheric Greatsword",
+        "Tartarian Warblade",
+        "Aetheric Longbow",
+        "Plasma Rifle",
+        "Founder's Edge",
+        "Reaver's Greatsword"
+      ],
+      "likesTags": [
+        "weapon",
+        "melee",
+        "ranged",
+        "knife",
+        "axe",
+        "hammer"
+      ],
+      "likesItems": [
+        "Iron Spear",
+        "Bone Cleaver",
+        "Throwing Knife",
+        "Rusted Blade",
+        "Aetheric Dagger"
+      ],
+      "dislikesTags": [
+        "food",
+        "junk",
+        "improvised",
+        "foraged"
+      ],
+      "dislikesItems": [
+        "Wild Onion",
+        "Cloth Scrap",
+        "Firewood"
+      ],
+      "lovedLine": "Let me see the edge on it. A {item} like this does not come down the stair twice in a season — name your favour, it is owed.",
+      "likedLine": "A {item}. Serviceable. There is always a hand looking for one of those.",
+      "dislikeLine": "This is an arms stall. A {item} will not cut, throw, or fire, and so it is nothing to me.",
+      "politeLine": "A {item}. It goes under the counter with the odd stock. Obliged.",
+      "insultLine": "A {item}? I trade in killing gear. Take that up the stair and do not come back down with it."
+    },
+    "hidden_market_armor": {
+      "lovesTags": [
+        "plate",
+        "helmet",
+        "shield",
+        "greaves"
+      ],
+      "lovesItems": [
+        "Aetheric Chainmail",
+        "Sentinel's Warplate",
+        "Titan Shield",
+        "Titanforged Cuirass",
+        "Skyreacher Cuirass",
+        "Aether-Reinforced Armor"
+      ],
+      "likesTags": [
+        "armor",
+        "chest",
+        "gauntlets",
+        "boots",
+        "cloak",
+        "vest"
+      ],
+      "likesItems": [
+        "Reclaimer's Salvage Vest",
+        "Aetheric Gauntlets",
+        "Mud Heater Shield",
+        "Riveted Leather Vest",
+        "Sentinel's Greaves"
+      ],
+      "dislikesTags": [
+        "junk",
+        "food",
+        "improvised",
+        "foraged"
+      ],
+      "dislikesItems": [
+        "Cloth Scrap",
+        "Broken Rope"
+      ],
+      "lovedLine": "Look at the seating on those plates. A {item} of this make keeps a body whole, and whole bodies are what I sell.",
+      "likedLine": "A {item}. It will turn a blow, and turning one blow is a whole life sometimes.",
+      "dislikeLine": "A {item} covers nothing. I fit people against the world; that will not fit against anything.",
+      "politeLine": "A {item}. Hang it on the rail there. My thanks.",
+      "insultLine": "I plate the living, and you hand me a {item}. Go and be someone else's custom."
+    },
+    "hidden_market_food": {
+      "lovesTags": [
+        "food",
+        "foraged",
+        "mushroom",
+        "stew"
+      ],
+      "lovesItems": [
+        "Hearty Stew",
+        "Mushroom Stew",
+        "Wild Chicken",
+        "Violet Mushroom",
+        "Ash-Cured Tongue",
+        "Blue Aetheric Fungus"
+      ],
+      "likesTags": [
+        "organic",
+        "potion",
+        "treat",
+        "purification",
+        "fruit"
+      ],
+      "likesItems": [
+        "Marrow Bone",
+        "Many-Colored Tonic",
+        "Cleansing Tonic",
+        "Antivenom",
+        "Water Purifier"
+      ],
+      "dislikesTags": [
+        "poison",
+        "junk",
+        "weapon",
+        "undead"
+      ],
+      "dislikesItems": [
+        "Plague Vial",
+        "Disease Sample",
+        "Viper Venom"
+      ],
+      "lovedLine": "A {item}. There is no daylight down here and no fields either — you have brought something living into a hole in the ground.",
+      "likedLine": "A {item} will keep. Anything that keeps has a place on my board.",
+      "dislikeLine": "I feed people from this table. A {item} does not go near it.",
+      "politeLine": "A {item}. I'll find a shelf for it. Eat something before you go.",
+      "insultLine": "You hand a {item} across a victualler's counter. Get out of my stall before I remember your face."
+    },
+    "hidden_market_materials": {
+      "lovesTags": [
+        "core",
+        "crystal",
+        "organic",
+        "mud"
+      ],
+      "lovesItems": [
+        "Aether Core",
+        "Aetheric Shard",
+        "Aetherstone Heart",
+        "Dragon Scale",
+        "Golem Core",
+        "Silt Heart"
+      ],
+      "likesTags": [
+        "relic",
+        "scrap",
+        "metal",
+        "loot",
+        "stone",
+        "fang"
+      ],
+      "likesItems": [
+        "Aetheric Sludge",
+        "Mud Gem",
+        "Spider Silk",
+        "Sentinel Core Plate",
+        "Etherium Crystal"
+      ],
+      "dislikesTags": [
+        "junk",
+        "food",
+        "improvised",
+        "foraged"
+      ],
+      "dislikesItems": [
+        "Bent Nail",
+        "Wild Lettuce"
+      ],
+      "lovedLine": "Set it down gently. A {item} of that grade goes into three trades before it stops moving, and every one of them profits.",
+      "likedLine": "A {item}. Raw stock, but honest stock. I can work with honest stock.",
+      "dislikeLine": "A {item} is not a material. It is a thing that has already finished being useful.",
+      "politeLine": "A {item}. In the crate. I'll sort the crate on a slow day.",
+      "insultLine": "A {item}, offered seriously, to a materials broker. You have wasted a walk down a very long stair."
+    },
+    "overlay:olek_the_ledger_keeper": {
+      "lovesTags": [
+        "ring",
+        "sigil",
+        "keepsake",
+        "loot"
+      ],
+      "lovesItems": [
+        "Mud Monarch Seal",
+        "Monarch's Drowned Signet",
+        "Arcane Lockbox",
+        "Tartarian Writing Tablet",
+        "Aetherstone Pendant",
+        "Etheric Insignia"
+      ],
+      "likesTags": [
+        "relic",
+        "uncommon",
+        "scholarly",
+        "common",
+        "amulet"
+      ],
+      "likesItems": [
+        "Leatherbound Tome",
+        "Mud Monarch Badge",
+        "Etheric Talisman",
+        "Whispering Cipher",
+        "Rusted Band of Knowledge"
+      ],
+      "dislikesTags": [
+        "mud_monarchs",
+        "weapon",
+        "junk",
+        "improvised"
+      ],
+      "dislikesItems": [
+        "Mud Monarch Sigil",
+        "Monarch's Court Blade"
+      ],
+      "lovedLine": "A {item} — sealed, countable, and belonging to nobody at present. That is the finest condition an object can be in. I shall enter it twice, for the pleasure.",
+      "likedLine": "A {item}. I can put a figure to that, and a figure is a kind of company up here.",
+      "dislikeLine": "Take the {item} back. I balance columns, not brawls, and I would rather not be found holding it.",
+      "politeLine": "A {item}. Received. Recorded. I keep everything recorded; it is how the trouble started.",
+      "insultLine": "A {item}. I have audited barns with more in them than this. Down the ladder with you."
+    },
+    "overlay:sister_yelena_of_the_tall_air": {
+      "lovesTags": [
+        "giants",
+        "skyreacher",
+        "aether",
+        "exploration"
+      ],
+      "lovesItems": [
+        "Giants' Servant Sigil",
+        "Skyreacher Mantle",
+        "Resonant Echo Horn",
+        "Aetheric Sextant",
+        "Cavern Sound Stones",
+        "Aether Collection Beacon"
+      ],
+      "likesTags": [
+        "tartarian_giants",
+        "cloak",
+        "detection",
+        "stone",
+        "keepsake"
+      ],
+      "likesItems": [
+        "Titanhold Ring",
+        "Resonance Lantern",
+        "Aether-Wing Cloak",
+        "Aetheric Harmonics Tuner",
+        "Tomb-Warden Plate"
+      ],
+      "dislikesTags": [
+        "firearm",
+        "unknowing_masses",
+        "junk",
+        "poison"
+      ],
+      "dislikesItems": [
+        "Plasma Repeater Rifle",
+        "Bent Nail"
+      ],
+      "lovedLine": "A {item}. Three years of wind and it has said nothing I could act upon — but this hums, brother, this hums. Perhaps I have been listening at the wrong height.",
+      "likedLine": "A {item} is welcome. There is little enough up here that was made by hands.",
+      "dislikeLine": "A {item} would drown the air. I did not climb a spire to be shouted at.",
+      "politeLine": "A {item}. I shall lash it to the rail with the rest. Everything must be lashed to the rail.",
+      "insultLine": "I gave up the ground for the Giants' voices, and you hand up a {item}. Go down. Mind the third bracket, it is loose."
+    },
+    "overlay:adept_ireneus_of_the_catalogue": {
+      "lovesTags": [
+        "skyreacher",
+        "chart",
+        "uncommon",
+        "rare"
+      ],
+      "lovesItems": [
+        "Skyreacher Crown",
+        "Skyreacher Map 1 of 5 — Grand Spire",
+        "Runecaster-Reader Tablet",
+        "Forgotten Scroll",
+        "Leatherbound Tome",
+        "Tartarian Writing Tablet"
+      ],
+      "likesTags": [
+        "relic",
+        "loot",
+        "scholarly",
+        "forgotten_order",
+        "detection",
+        "common"
+      ],
+      "likesItems": [
+        "Forgotten Order Sigil",
+        "Order Vellum Mantle",
+        "Ring of Forgotten Lore",
+        "Etheric Spyglass",
+        "Tartarian Navigator's Map"
+      ],
+      "dislikesTags": [
+        "food",
+        "junk",
+        "improvised",
+        "poison"
+      ],
+      "dislikesItems": [
+        "Wild Onion",
+        "Cloth Scrap"
+      ],
+      "lovedLine": "A {item} — and observe, if you will, that it is entry nine hundred and something in a work of fifty years, of which I have completed three, which is to say I am precisely on schedule. Extraordinary. Extraordinary.",
+      "likedLine": "A {item}. I shall want a full description of where it was standing when you found it, but yes, this is admissible.",
+      "dislikeLine": "A {item} cannot be catalogued. It has no provenance, no measure, and no top from which to survey it.",
+      "politeLine": "A {item}. It will be given a number. Everything is given a number eventually.",
+      "insultLine": "You have carried a {item} up nine hundred feet of spire to a scholar of the Forgotten Order. I shall record that too, under follies."
+    },
+    "overlay:mikola_the_lost_on_purpose": {
+      "lovesTags": [
+        "exploration",
+        "gear",
+        "potion",
+        "foraged"
+      ],
+      "lovesItems": [
+        "Aetheric Dome Tent",
+        "Aether-Woven Tent",
+        "Many-Colored Tonic",
+        "Hover Harness",
+        "Aetheric Torch",
+        "Sky-Walker Harness"
+      ],
+      "likesTags": [
+        "food",
+        "mushroom",
+        "rope",
+        "tool",
+        "stew",
+        "loot"
+      ],
+      "likesItems": [
+        "Climbing Rope",
+        "Hearty Stew",
+        "Reclaimer's Rope",
+        "Mag-Climb Kit",
+        "Violet Cap Distillate"
+      ],
+      "dislikesTags": [
+        "map",
+        "chart",
+        "firearm",
+        "junk"
+      ],
+      "dislikesItems": [
+        "Torn Labyrinth Chart",
+        "Aetheric Compass",
+        "Auto-Mapper"
+      ],
+      "lovedLine": "A {item}! Now that is a thing a man can be nowhere in particular with, comfortably. I will trade you anything on this ledge and I will not remember the price.",
+      "likedLine": "A {item}, is it? Good. Useful. I like a thing that does not ask me where I am going.",
+      "dislikeLine": "No, no — a {item} would tell me where I am. That is the one thing I have managed to avoid up here.",
+      "politeLine": "A {item}. Lovely. It goes in the pile. The pile is also lovely.",
+      "insultLine": "I climbed up here on a bet I cannot recall, and even I know a {item} is not worth the carrying. Off you go — down is that way, probably."
+    },
+    "wanderer:traveler": {
+      "lovesTags": [
+        "exploration",
+        "gear",
+        "boots",
+        "food"
+      ],
+      "lovesItems": [
+        "Traveler's Cloak",
+        "Basic Tent",
+        "Lost Traveler's Boots",
+        "Hearty Stew",
+        "Water Purifier",
+        "Aetheric Torch"
+      ],
+      "likesTags": [
+        "cloak",
+        "foraged",
+        "rope",
+        "stew",
+        "common",
+        "potion"
+      ],
+      "likesItems": [
+        "Climbing Rope",
+        "Wanderer's Footwraps",
+        "First Aid Kit",
+        "Field Dressing",
+        "Mudwalker Boots"
+      ],
+      "dislikesTags": [
+        "junk",
+        "poison",
+        "undead",
+        "boss"
+      ],
+      "dislikesItems": [
+        "Broken Rope",
+        "Cloth Scrap"
+      ],
+      "lovedLine": "A {item}. Friend, I have counted every mile behind me and I will count this one differently. That is no small gift to give a walking man.",
+      "likedLine": "A {item} rides well on a pack. Take my word for it, I have thrown out everything that didn't.",
+      "dislikeLine": "A {item} is weight and nothing else, and weight is what the road takes out of your knees.",
+      "politeLine": "A {item}. Well. Thank you kindly. It will come as far as the next town at least.",
+      "insultLine": "I have walked from the far side of the flood-line, and you offer a {item}. Keep it. Keep the road too."
+    },
+    "wanderer:refugee": {
+      "lovesTags": [
+        "food",
+        "cloth",
+        "foraged",
+        "healing"
+      ],
+      "lovesItems": [
+        "Hearty Stew",
+        "First Aid Kit",
+        "Trauma Kit",
+        "Wanderer's Tattered Overcoat",
+        "Riveted Leather Vest",
+        "Mushroom Stew"
+      ],
+      "likesTags": [
+        "boots",
+        "vest",
+        "potion",
+        "outer",
+        "common",
+        "purification"
+      ],
+      "likesItems": [
+        "Lost Traveler's Boots",
+        "Basic Tent",
+        "Water Purifier",
+        "Cleansing Tonic",
+        "Aetheric Torch"
+      ],
+      "dislikesTags": [
+        "legendary",
+        "coveted",
+        "boss",
+        "weapon"
+      ],
+      "dislikesItems": [
+        "Tyrant's Crown",
+        "Plague Vial",
+        "Mud Monarch Sigil"
+      ],
+      "lovedLine": "A {item} — truly? For me? We left with what was on our backs and it was not this. I will not forget the face, I promise you that.",
+      "likedLine": "A {item}. Yes. Yes, that helps. Small things help more than people think.",
+      "dislikeLine": "Please, no. A {item} draws eyes, and eyes are how the rest of my family was taken.",
+      "politeLine": "A {item}. That is kind. I have nothing to give back but I will remember it was given.",
+      "insultLine": "I have lost a house, a village and two brothers, and you hand me a {item}. Go on. Go and find someone with less."
+    },
+    "wanderer:tinker": {
+      "lovesTags": [
+        "tool",
+        "core",
+        "machine",
+        "crafted"
+      ],
+      "lovesItems": [
+        "Field Crafter's Kit",
+        "Aetheric Circuit Repair Kit",
+        "Clockwork Core",
+        "Compact Aetheric Forge",
+        "Spider Mechanism",
+        "Aether-Binder Tool"
+      ],
+      "likesTags": [
+        "metal",
+        "scrap",
+        "construct",
+        "electrical",
+        "gear",
+        "relic"
+      ],
+      "likesItems": [
+        "Automaton Circuit",
+        "Etheric Engineer's Toolkit",
+        "Sentinel Core Plate",
+        "Pry Bar",
+        "Iron-Worm Engine"
+      ],
+      "dislikesTags": [
+        "poison",
+        "undead",
+        "food",
+        "improvised"
+      ],
+      "dislikesItems": [
+        "Bent Nail",
+        "Wild Lettuce"
+      ],
+      "lovedLine": "Hold — hold, let me — yes. A {item}. Do you know what I can put back into service with this? Three carts and a pump, and that is before supper.",
+      "likedLine": "A {item}. Good. Into the roll it goes, third pocket. Everything has a pocket.",
+      "dislikeLine": "A {item} has no parts in it. If a thing cannot be opened, I have no conversation with it.",
+      "politeLine": "A {item}. Aye, thank you, set it by the wheel there. I'll get to it.",
+      "insultLine": "Twenty years mending other people's ruin, and the payment is a {item}. Away with you, I am busy."
+    },
+    "wanderer:scout": {
+      "lovesTags": [
+        "stealth",
+        "exploration",
+        "ranged",
+        "boots"
+      ],
+      "lovesItems": [
+        "Nightvision Goggles",
+        "Thermal Goggles",
+        "Aetheric Sextant",
+        "Short Hunting Bow",
+        "Reclaimer's Cloak",
+        "Aetheric Longbow"
+      ],
+      "likesTags": [
+        "bow",
+        "knife",
+        "cloak",
+        "gear",
+        "map",
+        "feet"
+      ],
+      "likesItems": [
+        "Throwing Knife",
+        "Aetheric Compass",
+        "Mudwalker's Treads",
+        "Auto-Mapper",
+        "Traveler's Cloak"
+      ],
+      "dislikesTags": [
+        "two_handed",
+        "plate",
+        "junk",
+        "legendary"
+      ],
+      "dislikesItems": [
+        "Titan Warhammer",
+        "Signal Flare"
+      ],
+      "lovedLine": "A {item}. That is the difference between seeing them first and being seen first. I will not thank you loudly, but I am thanking you.",
+      "likedLine": "A {item}. Quiet, light, no shine on it. That's the whole list.",
+      "dislikeLine": "A {item} is loud, or heavy, or bright. I work alone and I intend to keep coming back.",
+      "politeLine": "A {item}. Right. It goes in the cache with the rest and I'll pick it up if I ever need it.",
+      "insultLine": "I range three days ahead of anyone who would help me, and you offer a {item}. Get behind me and stay there."
+    },
+    "wanderer:pilgrim": {
+      "lovesTags": [
+        "sigil",
+        "keepsake",
+        "purification",
+        "food"
+      ],
+      "lovesItems": [
+        "Revivalist Sigil",
+        "Giants' Servant Sigil",
+        "Cleansing Tonic",
+        "Purification Vial",
+        "Hearty Stew",
+        "The Entombed's Prayer Tablet"
+      ],
+      "likesTags": [
+        "boots",
+        "cloth",
+        "foraged",
+        "stew",
+        "potion",
+        "giants"
+      ],
+      "likesItems": [
+        "Wanderer's Footwraps",
+        "Ceremonial Robes",
+        "Aetheric Torch",
+        "Hollow-Cleanse Decoction",
+        "Tartarian Obelisk"
+      ],
+      "dislikesTags": [
+        "loot",
+        "undead",
+        "poison",
+        "junk"
+      ],
+      "dislikesItems": [
+        "Lich Phylactery",
+        "Mask of Tartaria's Last King",
+        "Hollow Crown"
+      ],
+      "lovedLine": "A {item}. Bless you — I have walked barefoot past four shrines to be worthy of a thing like this, and here it is, handed over at a roadside.",
+      "likedLine": "A {item} will see me to the next waystone, and the next waystone is all any of us are promised.",
+      "dislikeLine": "That came out of a tomb. I will not carry a {item} that was taken off the dead; the road is hard enough without owing them.",
+      "politeLine": "A {item}. My thanks. I shall set it down at the shrine and let it choose its own keeper.",
+      "insultLine": "My feet are split to the bone in the service of the walk, and you hand me a {item}. May you find your own road short."
+    },
+    "wanderer:drifter": {
+      "lovesTags": [
+        "potion",
+        "gear",
+        "knife",
+        "exploration"
+      ],
+      "lovesItems": [
+        "Trauma Kit",
+        "Aetheric Torch",
+        "Rusted Blade",
+        "Aether-Woven Tent",
+        "Pry Bar",
+        "Aetheric Locket"
+      ],
+      "likesTags": [
+        "food",
+        "tool",
+        "stealth",
+        "common",
+        "loot",
+        "rope"
+      ],
+      "likesItems": [
+        "Reclaimer's Rope",
+        "Salvage Pouch",
+        "Hearty Stew",
+        "Wanderer's Outercoat",
+        "First Aid Kit"
+      ],
+      "dislikesTags": [
+        "sigil",
+        "keepsake",
+        "faction_gear",
+        "junk"
+      ],
+      "dislikesItems": [
+        "Ceremonial Robes",
+        "Forgotten Order Sigil"
+      ],
+      "lovedLine": "A {item}. That's the first straight dealing I've had in a month of towns. I'll not pretend it isn't worth something to me.",
+      "likedLine": "A {item}. Fine. It works or it doesn't, and that one works.",
+      "dislikeLine": "A {item} means somebody owns you. I've been owned. Keep it.",
+      "politeLine": "A {item}. Right. Obliged.",
+      "insultLine": "I've slept in worse ditches than you've walked past, and a {item} is still an insult. Move along."
+    },
+    "wanderer:scavenger": {
+      "lovesTags": [
+        "loot",
+        "core",
+        "scrap",
+        "crystal"
+      ],
+      "lovesItems": [
+        "Scrap Metal",
+        "Automaton Circuit",
+        "Broken Sentinel Part",
+        "Etheric Battery",
+        "Aetheric Shard",
+        "Sentinel Core Plate"
+      ],
+      "likesTags": [
+        "relic",
+        "mud",
+        "improvised",
+        "common",
+        "reclaimers",
+        "machine"
+      ],
+      "likesItems": [
+        "Salvage Pouch",
+        "Etheric Scrap",
+        "Aetherstone Fragment",
+        "Mud Gem",
+        "Pry Bar"
+      ],
+      "dislikesTags": [
+        "faction_gear",
+        "sigil",
+        "keepsake",
+        "cloak"
+      ],
+      "dislikesItems": [
+        "Ceremonial Robes",
+        "Runic Mantle",
+        "Order Vellum Mantle"
+      ],
+      "lovedLine": "A {item} — that's whole, that is, that's not even cracked. Give it here, give it here before somebody sees us doing this.",
+      "likedLine": "A {item}. There's a man two valleys over who buys those and doesn't ask. That'll do me.",
+      "dislikeLine": "What am I to do with a {item}? Can't eat it, can't sell it, and wearing it gets a body noticed.",
+      "politeLine": "A {item}. Aye. In the sack. It all goes in the sack.",
+      "insultLine": "I pull my living out of dead machines with my hands, and you give me a {item}. Don't follow me."
+    },
+    "overlay:pavel_allegedly_": {
+      "lovesTags": [
+        "loot",
+        "core",
+        "crystal",
+        "aether"
+      ],
+      "lovesItems": [
+        "Aetheric Locket",
+        "Aether Core",
+        "Etheric Battery",
+        "Etherium Crystal",
+        "Aetheric Shard",
+        "Aether Pearl"
+      ],
+      "likesTags": [
+        "relic",
+        "reclaimers",
+        "metal",
+        "uncommon",
+        "tool",
+        "common"
+      ],
+      "likesItems": [
+        "Salvage Pouch",
+        "Reclaimer's Rope",
+        "Scrap Metal",
+        "Automaton Circuit",
+        "Broken Sentinel Part"
+      ],
+      "dislikesTags": [
+        "reclaimers_guild",
+        "junk",
+        "food",
+        "improvised"
+      ],
+      "dislikesItems": [
+        "Reclaimer Sigil",
+        "Light-Finger Guild Band"
+      ],
+      "lovedLine": "A {item}. Do you know what a woman named Hass would forgive for one of these? Do not answer. Do not say her name up here either.",
+      "likedLine": "A {item}, fine, good, I'll take it — half price on anything you want, and you never saw which way I went.",
+      "dislikeLine": "No. Not a {item}. Every one of those has a stamp on it somewhere and stamps are how they find people.",
+      "politeLine": "A {item}. Yes. Thank you. Put it behind the crate, would you, not on top of it.",
+      "insultLine": "A {item}? I am a hunted man, not a beggar — and if I were a beggar I would still say no. Pavel is not even my name."
+    }
   },
-  "halem_trader": {
-   "lovesTags": [
-    "food",
-    "ration",
-    "curio",
-    "map"
-   ],
-   "coldTags": [
-    "metal",
-    "ore"
-   ],
-   "lovedLine": "Halem's whole face changes. \"Oh, now that is lovely.\" He turns the {item} over twice. \"I am not going to sell this. I want you to know that I thought about it and I am not going to.\"",
-   "likedLine": "\"Well now.\" Halem takes the {item} and finds it a spot on the shelf where he can see it from the counter. \"That was not necessary. Which is rather the point of it.\"",
-   "politeLine": "Halem takes the {item} with the professional warmth of a man who has been given a great many things. \"Very good. Very good.\"",
-   "insultLine": "Halem's cheer holds, barely. \"I trade in a lot of poor goods, friend. I do not accept them as presents.\"",
-   "returnGift": "Hearty Stew",
-   "returnGiftLine": "Halem presses a warm crock into your hands before you can speak. \"You feed my curiosity often enough. Eat.\""
+  "aliases": {
+    "halem_the_trader": "halem_trader",
+    "tarek_the_tinkerer": "tarek_tinkerer",
+    "thalan_the_wanderer": "thalan_wanderer",
+    "drakos_the_mercenary": "drakos_mercenary",
+    "tellin_mak": "scrap_broker",
+    "sister_yune_ashfall": "revivalists_quartermaster",
+    "vael_of_the_listening_stone": "servants_quartermaster",
+    "magister_caul_veyre": "dynasty_factor",
+    "the_cartographer": "architects_keeper",
+    "foreman_drest_holloway": "builders_foreman",
+    "naha": "wandering_drifter",
+    "korash_of_the_deep": "tartarian_quartermaster"
   },
-  "scrap_broker": {
-   "lovesTags": [
-    "mechanism",
-    "component",
-    "salvage",
-    "relic"
-   ],
-   "coldTags": [
-    "food"
-   ],
-   "lovedLine": "Tellin goes quiet. He turns the {item} slowly, finds the join, and stops. \"This is not from here.\" A long pause. \"I will not ask. But I will remember that it was you who put it in my hand.\"",
-   "likedLine": "Tellin weighs the {item} and writes something down, which from him is the highest form of respect. \"Onto the short shelf.\"",
-   "politeLine": "Tellin takes the {item} and prices it out of habit before catching himself. \"Sorry. Force of the trade. Thank you.\"",
-   "insultLine": "\"I know what that is worth,\" Tellin says. \"To the quarter-weight. Do not do that to me.\"",
-   "returnGift": "Shaped Aetheric Shard",
-   "returnGiftLine": "Tellin slides something across without looking up. \"Came through the pile. Thought of you. Don't make it strange.\""
-  },
-  "odar_flameforge": {
-   "lovesTags": [
-    "fire",
-    "fuel",
-    "ember",
-    "ore"
-   ],
-   "coldTags": [
-    "cloth",
-    "food"
-   ],
-   "lovedLine": "Odar feeds the {item} nothing, holds it near the flame, and watches the light move on it. \"It answers,\" he says, and that is apparently the highest praise available.",
-   "likedLine": "Odar takes the {item} and sets it by the forge, which is where he puts things he intends to keep.",
-   "politeLine": "Odar accepts the {item}. It does not go near the fire, which tells you what he thinks of it.",
-   "insultLine": "Odar looks at the {item}, then at the forge, then back. \"That would not even burn well.\"",
-   "returnGift": "Incendiary Paste",
-   "returnGiftLine": "Odar sets a sealed pot in front of you. \"Burns hotter than what I sell. You've earned the good batch.\""
-  },
-  "yara_windcaller": {
-   "lovesTags": [
-    "cloth",
-    "light",
-    "wind",
-    "mask"
-   ],
-   "coldTags": [
-    "metal",
-    "heavy"
-   ],
-   "lovedLine": "Yara holds the {item} up and lets the air take it, and listens to what it does. \"It does not fight,\" she says, delighted. \"Do you know how rare that is?\"",
-   "likedLine": "Yara folds the {item} into the cloth pile and touches it once more than she needs to.",
-   "politeLine": "Yara takes the {item} and finds it a hook. \"It will be useful to somebody.\"",
-   "insultLine": "\"It will not move,\" Yara says of the {item}, as though that settles it. It does.",
-   "returnGift": "Harpy Feather",
-   "returnGiftLine": "Yara holds it out on an open palm, like something the wind left. \"It wanted to go to you. Who am I to argue.\""
-  },
-  "bran_the_beastmaster": {
-   "lovesTags": [
-    "food",
-    "ration",
-    "pelt",
-    "bone"
-   ],
-   "coldTags": [
-    "relic",
-    "trinket"
-   ],
-   "lovedLine": "Bran takes the {item} and immediately gives half of it to the dog, which he clearly considers the correct handling of a gift. \"She thanks you. I thank you.\"",
-   "likedLine": "Bran turns the {item} over. \"Good. That will go a long way out where I am.\"",
-   "politeLine": "Bran accepts the {item} and puts it in the pile of things that will eventually be traded to somebody who wants them.",
-   "insultLine": "Bran looks at the {item} and then at the dog, who has more sense. \"No, lad. No.\"",
-   "returnGift": "Honey-Glazed Knuckle",
-   "returnGiftLine": "Bran tosses it to you underhand. \"For the dog. Or for you — I don't judge either way.\""
-  },
-  "order_scholar": {
-   "lovesTags": [
-    "book",
-    "record",
-    "map",
-    "relic"
-   ],
-   "coldTags": [
-    "weapon",
-    "food"
-   ],
-   "lovedLine": "Vesryn does not touch the {item} immediately. They clear a space first, and lay a cloth, and only then take it. \"Do you understand what you have handed me? No. That is all right. I do.\"",
-   "likedLine": "Vesryn accepts the {item} and, unusually, does not begin cataloguing it in front of you. \"Later. When I can give it attention.\"",
-   "politeLine": "Vesryn takes the {item} with the courtesy of somebody who receives a great deal of well-meant rubbish. \"Thank you.\"",
-   "insultLine": "\"I am an archivist,\" Vesryn says, not unkindly. \"You have brought me an object with no provenance, no age and no interest. Take it back.\"",
-   "returnGift": "Aetheric Compass",
-   "returnGiftLine": "Vesryn wraps it carefully before handing it over. \"An instrument deserves hands that go somewhere. Yours do.\""
-  },
-  "tarek_tinkerer": {
-   "lovesTags": [
-    "mechanism",
-    "component",
-    "gear",
-    "spring"
-   ],
-   "coldTags": [
-    "food",
-    "cloth"
-   ],
-   "lovedLine": "Tarek makes a noise like a man who has been handed his own childhood. \"Where — no. NO. Do you know how long I have —\" He stops, composes himself, fails. \"Thank you. Go away. I need to look at this.\"",
-   "likedLine": "Tarek takes the {item} apart before he has finished thanking you, which is his way of accepting it.",
-   "politeLine": "Tarek accepts the {item} and sets it on the bench with the other things that are not urgent.",
-   "insultLine": "Tarek turns the {item} once. \"There is nothing inside it,\" he says, sadly. \"Not everything has to be a mechanism, but I would rather you kept it.\"",
-   "returnGift": "Iron-Worm Engine",
-   "returnGiftLine": "Tarek shoves it at you, already talking. \"Doesn't work. Well — doesn't work YET. You'll figure it out, that's why I'm giving it to you.\""
-  },
-  "revivalists_quartermaster": {
-   "lovesTags": [
-    "food",
-    "ration",
-    "medicine",
-    "cloth"
-   ],
-   "coldTags": [
-    "weapon"
-   ],
-   "lovedLine": "Sister Yune takes the {item} in both hands. \"Do you know what this is, in a store like ours? It is four days. Four days of somebody not being frightened.\" She looks up. \"Thank you.\"",
-   "likedLine": "Yune adds the {item} to the store and marks it in the book. \"It goes where it is needed, not where it is asked for. I hope that is all right.\"",
-   "politeLine": "Yune accepts the {item} warmly and finds it a shelf. \"Everything has a use eventually.\"",
-   "insultLine": "Yune's kindness does not falter, which makes it worse. \"We would rather have nothing than be given nothing dressed up as something.\"",
-   "returnGift": "Trauma Kit",
-   "returnGiftLine": "The quartermaster sets the kit down between you, official as a requisition. \"Logged as damaged stock. It isn't. Take it.\""
+  "fallback": {
+    "lovedLine": "{npc} turns the {item} over once and then puts it somewhere safe rather than somewhere convenient. \"Thank you. Genuinely.\"",
+    "likedLine": "{npc} weighs the {item} and nods slowly. \"That is a good thing to be given. I will not forget who gave it.\"",
+    "politeLine": "{npc} takes the {item} with good grace. It goes under the counter, and you suspect it stays there.",
+    "insultLine": "{npc} looks at the {item}, and then at you, for slightly too long. \"No. You keep that.\""
   }
- }
 }

@@ -24,7 +24,7 @@ import { endingLine, LOST_CAPITAL_LOCATIONS, LOST_CAPITAL_NAMES } from '../engin
 import { epilogueMotiveLine } from '../engine/chapters'; // OTA-1043
 import { epilogueChoiceLines } from '../engine/storyForks'; // OTA-1088
 import { motiveById } from '../engine/story'; // OTA-1043
-import { missingResolvedEpilogue } from '../engine/storyDrip'; // OTA-1044
+import { resolvedEpilogue } from '../engine/storyDrip'; // OTA-1246 — every motive, not just The Missing // OTA-1044
 import { arbiterVerdict, arbiterNameBeat } from '../engine/arbiterPersona'; // OTA-1090
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
@@ -115,14 +115,14 @@ export function EndingScreen() {
   const allCoresInOrder = LOST_CAPITAL_LOCATIONS.filter((c) => coresInOrder.includes(c));
 
   const endingLabel = ending.toUpperCase();
-  const endingColor = ending === 'seal' ? '#5a6b8a' : ending === 'unleash' ? '#a85a3a' : '#7a8a5a';
+  const endingColor = ending === 'seal' ? '#5a6b8a' : ending === 'unleash' ? '#a85a3a' : ending === 'stay' ? '#8a7a5a' : '#7a8a5a';
   // OTA-1043 — the per-motive epilogue: how THIS ending answers the reason
   // this character came down (the OTA-1041 story motive). Rendered under the
   // faction ending prose so the run closes on the personal thread, not just
   // the political one. OTA-1044 — if The Missing side-thread RESOLVED in-run
   // (grave / lie / walker), its own closing replaces the standard 'missing'
   // epilogue, which assumes the question is still open.
-  const motiveLine = missingResolvedEpilogue(player) ?? epilogueMotiveLine(ending, player.storyMotive);
+  const motiveLine = resolvedEpilogue(player) ?? epilogueMotiveLine(ending, player.storyMotive);
   const motiveTitle = motiveById(player.storyMotive).title;
   // ⚠ OTA-1088 — THE SECOND PLACE A PHASE 3 DECISION LANDS, and the permanent
   // one. The motive epilogue above still closes the arc — that is what the

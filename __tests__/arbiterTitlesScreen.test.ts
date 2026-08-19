@@ -22,7 +22,8 @@ const TITLES = (arbiterTitlesData as { titles: ArbiterTitle[] }).titles;
 
 describe('OTA-236 — Arbiter Titles render contract', () => {
   it('arbiter-titles.json has 21 entries', () => {
-    expect(TITLES.length).toBe(21);
+    // ⚠ OTA-1206 — see canonFacts: 21 is the docx floor, not a ceiling.
+    expect(TITLES.length).toBeGreaterThanOrEqual(21);
   });
 
   it('every title has the fields the CharacterScreen section reads', () => {
@@ -56,7 +57,9 @@ describe('OTA-236 — Arbiter Titles render contract', () => {
     const earnedCount = TITLES.filter((t) => earned.has(t.id)).length;
     const lockedCount = TITLES.filter((t) => !earned.has(t.id)).length;
     expect(earnedCount).toBe(1);
-    expect(lockedCount).toBe(20);
+    // ⚠ Derived, not hardcoded — one earned means all the rest are locked, whatever the
+    // catalogue size is. OTA-1206 added a 22nd title and broke the old literal.
+    expect(lockedCount).toBe(TITLES.length - 1);
   });
 
   it('sort puts earned titles first then alphabetical (mirrors render path)', () => {

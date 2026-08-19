@@ -19,6 +19,8 @@ import {
 } from '../ui/displaySettings';
 import { LoreCodexBody } from '../components/LoreCodexBody';
 import { useHintsDisabled, setHintsDisabled, resetAllFirstTimeHints } from '../components/useFirstTimeHint';
+import { useAutosaveDisabled, setAutosaveDisabled } from '../ui/autosave';
+import { useUiScale, setUiScale, UI_SCALES, displayScaleSupported, type UiScale } from '../ui/displayScale'; // OTA-1227
 import { useAccessibility } from '../state/accessibility';
 import { THIRD_PARTY_NOTICES, NOTICES_PREAMBLE, NOTICES_VERIFIED_AT } from '../data/thirdPartyNotices';
 import {
@@ -58,6 +60,7 @@ import {
 } from '../voice/PiperTTSManager';
 import type * as Speech from 'expo-speech';
 import { resetMLHealth, mlHealthSummary } from '../diagnostics/mlHealth';
+import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
 
 export function AboutScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -101,6 +104,9 @@ export function AboutScreen() {
   const [tab, setTab] = useState<'session' | 'sfx' | 'display' | 'lore' | 'about' | 'notices'>('session');
   // OTA-860 — global first-time-tips kill-switch (per-install, reactive).
   const hintsDisabled = useHintsDisabled();
+  const autosaveDisabled = useAutosaveDisabled();
+  const uiScale = useUiScale(); // OTA-1227 — desktop only; the row hides itself elsewhere
+  const scaleSupported = displayScaleSupported();
   // OTA-898 (SA-6) — device reduce-motion preference (reactive).
   const reduceMotion = useAccessibility((s) => s.reduceMotion);
   const setReduceMotion = useAccessibility((s) => s.setReduceMotion);
@@ -118,6 +124,8 @@ export function AboutScreen() {
   // Manual SAVE button feedback. 'saving' while the write runs, then a 'saved'
   // / 'failed' flash reflecting whether the atomic write actually landed.
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'failed'>('idle');
+  // OTA-1208 — the RUN card's BACK UP CHARACTER button (moved from the title rows).
+  const [backupState, setBackupState] = useState<'idle' | 'busy' | 'done' | 'failed'>('idle');
   // OTA-203 — dedicated COPY INVENTORY button. Separate from the log
   // export so the player can choose which one to paste back.
   const [invCopied, setInvCopied] = useState(false);
@@ -129,6 +137,10 @@ export function AboutScreen() {
   // OTA-341 — COPY SAVE: export the loadable save state for brick repro.
   const [saveCopied, setSaveCopied] = useState(false);
   const [saveCharCount, setSaveCharCount] = useState(0);
+  // IMPORT SAVE: paste a COPY SAVE export (from this or another install — e.g. a
+  // Golem-line save into this build) and load it as a new playable slot.
+  const [importBusy, setImportBusy] = useState(false);
+  const [importMsg, setImportMsg] = useState<string | null>(null);
   // v2.4.1 (OTA 053) — chunked-copy cursor for the session log so
   // long sessions (>~25 KB, the silent paste cap on most chat
   // clients) can be sent in parts the way the dead-character log
@@ -155,6 +167,39 @@ export function AboutScreen() {
     }
     setSaveState(ok ? 'saved' : 'failed');
     setTimeout(() => setSaveState('idle'), 3000);
+  };
+
+  // ⚠ OTA-1208 — BACK UP moved HERE from every title-screen character row
+  // (owner: the per-row buttons "make the game look broken to testers"; dead
+  // rows keep theirs — a dead save has no other door). SAVES FIRST, always:
+  // a backup of a stale slot silently loses the session the player is
+  // standing in, which is the OTA-1178 wound in a new place.
+  const handleBackUp = async () => {
+    const p = useGameStore.getState().player;
+    const slotId = useGameStore.getState().activeSlotId;
+    if (!p || !slotId) return;
+    setBackupState('busy');
+    let ok = false;
+    try {
+      ok = await persist();
+    } catch {
+      ok = false;
+    }
+    if (!ok) {
+      setBackupState('failed');
+      setTimeout(() => setBackupState('idle'), 3000);
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { backUpCharacterSlot } = require('../ui/backupCharacter') as typeof import('../ui/backupCharacter');
+    const result = await backUpCharacterSlot({
+      slotId,
+      playerName: p.name,
+      raceId: p.raceId,
+      locationId: p.currentLocationId,
+    });
+    setBackupState(result === 'ok' ? 'done' : 'failed');
+    setTimeout(() => setBackupState('idle'), 3000);
   };
   async function handleCopyLog() {
     try {
@@ -242,6 +287,33 @@ export function AboutScreen() {
       setSaveCopied(true);
       setTimeout(() => setSaveCopied(false), 2500);
     } catch { /* clipboard rarely fails on Android */ }
+  }
+  // IMPORT SAVE — read the clipboard (the user copies a COPY SAVE export first),
+  // parse it, write it to a new slot, and drop into the game. Lets a save from
+  // another install (e.g. a Golem-line build) be played here.
+  async function handleImportSave() {
+    if (importBusy) return;
+    setImportBusy(true);
+    setImportMsg('Reading clipboard…');
+    try {
+      const text = await Clipboard.getStringAsync();
+      if (!text || text.trim().length === 0) {
+        setImportMsg('Clipboard is empty — copy a COPY SAVE export first, then tap Import.');
+        return;
+      }
+      const res = await useGameStore.getState().importSaveFromText(text);
+      if (res.ok) {
+        setImportMsg(`Imported ${res.name || 'character'} — loading…`);
+        useGameStore.getState().setScreen('exploration');
+      } else {
+        setImportMsg(res.error ?? 'Import failed.');
+      }
+    } catch (e) {
+      setImportMsg(`Import failed (${e instanceof Error ? e.message : 'unknown error'}).`);
+    } finally {
+      setImportBusy(false);
+      setTimeout(() => setImportMsg(null), 6000);
+    }
   }
   async function handleClearLog() {
     useGameStore.getState().clearGameLog();
@@ -662,6 +734,27 @@ export function AboutScreen() {
             </Text>
           </TouchableOpacity>
 
+          {/* OTA-1208 — the living character's backup door (title rows carry it
+              only for the dead now). Saves first, then opens the share sheet
+              with the fresh export; clipboard gets a copy either way. */}
+          {player && (
+            <TouchableOpacity
+              style={[styles.sessionBtn, styles.sessionBtnSecondary, backupState === 'failed' && styles.sessionBtnDanger]}
+              onPress={() => { void handleBackUp(); }}
+              activeOpacity={0.7}
+              disabled={backupState === 'busy'}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: backupState === 'busy' }}
+            >
+              <Text style={styles.sessionBtnSecondaryText}>
+                {backupState === 'busy' ? 'BACKING UP…'
+                  : backupState === 'done' ? '✓ BACKED UP (share or paste it somewhere safe)'
+                  : backupState === 'failed' ? '✗ BACKUP FAILED'
+                  : 'BACK UP CHARACTER'}
+              </Text>
+            </TouchableOpacity>
+          )}
+
           <TouchableOpacity
             style={[styles.sessionBtn, styles.sessionBtnPrimary]}
             onPress={() => { void saveAndExitToTitle(); }}
@@ -671,7 +764,64 @@ export function AboutScreen() {
             <Text style={styles.sessionBtnPrimaryText}>SAVE &amp; EXIT TO TITLE</Text>
           </TouchableOpacity>
 
-          {/* OTA-1046 — REPLAY OPENING moved to the CharacterScreen header
+          {/* OTA-1209 — the 90-second autosave's toggle (the autosave itself is
+              OTA-368 and ships ON). Here beside SAVE so the player who lost a
+              session to a swipe-close can SEE the net exists. */}
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>Autosave (every 90s)</Text>
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity
+              onPress={() => { void setAutosaveDisabled(!autosaveDisabled); }}
+              style={[styles.musicToggle, !autosaveDisabled && styles.musicToggleOn]}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="Autosave"
+              accessibilityState={{ selected: !autosaveDisabled }}
+            >
+              <Text style={[styles.musicToggleText, !autosaveDisabled && styles.musicToggleTextOn]}>
+                {autosaveDisabled ? 'OFF' : 'ON'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.sessionHint}>
+            The game also saves after every action and when the app goes to the
+            background — this timer just bounds what an idle stretch could lose.
+          </Text>
+
+          {/* ⚠ OTA-1227 — UI SCALE (desktop/Steam only). Deliberately NOT a
+              resolution picker: inside a maximized window the OS owns the
+              resolution, and a dropdown fighting it is a mobile-porting
+              anti-pattern. This is the desktop convention — scale the whole
+              interface, text and controls together, via the Electron zoom.
+              The row is absent entirely off-desktop rather than shown inert. */}
+          {scaleSupported && (
+            <>
+              <View style={styles.musicRow}>
+                <Text style={styles.musicLabel}>Display size</Text>
+                <View style={{ flex: 1 }} />
+                {UI_SCALES.map((s2: UiScale) => (
+                  <TouchableOpacity
+                    key={s2}
+                    onPress={() => { void setUiScale(s2); }}
+                    style={[styles.musicToggle, uiScale === s2 && styles.musicToggleOn, { marginLeft: 6 }]}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Display size ${s2}`}
+                    accessibilityState={{ selected: uiScale === s2 }}
+                  >
+                    <Text style={[styles.musicToggleText, uiScale === s2 && styles.musicToggleTextOn]}>
+                      {s2 === 'small' ? 'S' : s2 === 'medium' ? 'M' : 'L'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <Text style={styles.sessionHint}>
+                Scales the whole interface for your monitor. F11 toggles fullscreen.
+              </Text>
+            </>
+          )}
+
+          {/* OTA-1023 — REPLAY OPENING moved to the CharacterScreen header
               (owner: "I went to settings and about and there was no replay
               opening"). About's normal entry is the TITLE screen, where no
               character is loaded, so the player-gated button here was
@@ -753,9 +903,22 @@ export function AboutScreen() {
                 accessibilityRole="button"
               >
                 <Text style={styles.sessionBtnSecondaryText}>
-                  {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE (brick repro)'}
+                  {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE (download / export)'}
                 </Text>
               </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+                onPress={() => { void handleImportSave(); }}
+                activeOpacity={0.7}
+                disabled={importBusy}
+              >
+                <Text style={styles.sessionBtnSecondaryText}>
+                  {importBusy ? 'IMPORTING…' : 'IMPORT SAVE (upload / paste)'}
+                </Text>
+              </TouchableOpacity>
+              {importMsg ? (
+                <Text style={styles.sessionFootnote}>{importMsg}</Text>
+              ) : null}
               <TouchableOpacity
                 style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
                 onPress={() => { void handleCopyInventory(); }}
@@ -1294,7 +1457,18 @@ export function AboutScreen() {
         )}
 
         {tab === 'about' && (
-        <Text style={styles.mono}>{info}</Text>
+        <>
+          <Text style={styles.mono}>{info}</Text>
+          <View style={styles.dedication}>
+            <Text style={styles.dedicationRule}>· · ·</Text>
+            <Text style={styles.dedicationBody}>
+              For my wife and my children — who put up with a man who was always on his
+              phone, building this. You were the reason I kept going, and the reason I
+              should have looked up more. Thank you for the patience I did not earn.
+            </Text>
+            <Text style={styles.dedicationSign}>— Verbal</Text>
+          </View>
+        </>
         )}
 
         {tab === 'notices' && (
@@ -1376,7 +1550,7 @@ function safeUpdates<T>(fn: () => T): string {
 
 const styles = StyleSheet.create({
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
-  container: { flex: 1, backgroundColor: 'transparent', padding: 12, width: '100%', maxWidth: 600, alignSelf: 'center' },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 12, width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1445,6 +1619,32 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 14,
     backgroundColor: '#1a1714',
+  },
+  dedication: {
+    marginTop: 28,
+    marginBottom: 12,
+    paddingHorizontal: 6,
+  },
+  dedicationRule: {
+    color: '#3a4348',
+    fontSize: 13,
+    letterSpacing: 6,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  dedicationBody: {
+    color: '#8aa0a4',
+    fontSize: 13,
+    fontStyle: 'italic',
+    lineHeight: 21,
+    textAlign: 'center',
+  },
+  dedicationSign: {
+    color: '#cdbf99',
+    fontSize: 13,
+    textAlign: 'center',
+    marginTop: 12,
+    letterSpacing: 1,
   },
   // v2.4.1 (OTA 047) — SESSION tab styles. Primary button (save &
   // exit) is warm gold + filled, the two secondaries (copy / clear

@@ -50,7 +50,7 @@ const RULES: PortabilityRule[] = [
       `The {target} is staying right where it is. Centuries-old stonework doesn't fit in any pack ever made.`,
       `The Arbiter raises an eyebrow. "The {target}? With what — a second {target} to carry it in?"`,
       `You eye the {target}. Whatever you'd need to move it, you do not have.`,
-      `The {target} is part of the building, not a thing you take. Try the SALVAGE button if you want pieces of it.`,
+      `The {target} is part of the building, not a thing you take. Open TAKE / SALVAGE and tap it under SALVAGE if you want pieces of it.`,
     ],
   },
   {
@@ -75,7 +75,7 @@ const RULES: PortabilityRule[] = [
       'siege', 'experiment table', 'observation chair',
     ],
     refusals: [
-      `The {target} weighs more than you, by a wide margin. Strip parts off it instead — SALVAGE button.`,
+      `The {target} weighs more than you, by a wide margin. Strip parts off it instead — TAKE / SALVAGE, under SALVAGE.`,
       `You set hands on the {target}. The {target} does not move. You let go before it notices.`,
     ],
   },
@@ -152,7 +152,7 @@ function isExactCatalogItem(lower: string): boolean {
       if (row && String(row.name).toLowerCase() === lower) return true;
     } catch { /* catalog unavailable — fall through to the rules */ }
   }
-  // OTA-1013 — the CURIO roster is a catalog too, just deliberately absent from the
+  // OTA-990 — the CURIO roster is a catalog too, just deliberately absent from the
   // quartermaster's lists (that absence is what makes it Crucible fuel). Without
   // this, a curio whose name carries a substance word fell through to the word
   // ban: the Mud-Frosted Bead could be salvaged into the pack but never picked
@@ -218,12 +218,28 @@ export const __TEST_ONLY__ = { RULES };
 // refusal that reads as world-flavor rather than an engine error.
 // Used at the two pickup paths in gameStore.ts where a noun resolves
 // in the scene but not in the item catalog.
-// OTA-160 — stress sweep (collectAll) flagged: a hoarder who types
+// OTA-137 — stress sweep (collectAll) flagged: a hoarder who types
 // `take rubble` repeatedly only sees SALVAGE-redirect copy on 3 of
 // 8 refusal lines. Across a long hoarding stretch the player never
-// learns the verb they should be using. All 8 refusals now end with
-// an explicit "(Try SALVAGE.)" or equivalent so any single tap on a
-// scene-feature noun teaches the salvage path.
+// learns the verb they should be using. All 8 refusals therefore ended
+// with an explicit "(Try SALVAGE.)".
+//
+// ⚠⚠ OTA-1232 — AND THAT WAS TRUE ADVICE ONLY WHEN THERE WAS SOMETHING TO SALVAGE.
+// Measured against the shipped pools: `sign` and `arch` match NO salvage pool, so
+// on those nouns the universal pointer sent the player off to do the one thing
+// that provably cannot help — the same defect the contract refusal used to commit
+// when it blamed travel for an empty board.
+//
+// The lines are now TWO sets, chosen by `hasSalvageYield`:
+//   · SCENE_FEATURE_REFUSALS — the noun is fixed in place but WILL give up parts.
+//     Keeps the (Try SALVAGE.) pointer, because here it is a real offer.
+//   · SCENERY_ONLY_REFUSALS — the noun is scenery, full stop. No pointer, because
+//     there is nowhere to point. These say what IS true instead: it is part of the
+//     room, and the thing it can still give you is a reading, not a resource.
+//
+// ⚠ Both sets stay eight lines deep. The variety is the reason a hoarder does not
+// read the same sentence forty times, and halving it to make room for a new case
+// would trade one player-facing problem for another.
 const SCENE_FEATURE_REFUSALS: string[] = [
   `You reach for the {target}, but a bolt of Aetheric energy snaps across the ground beside you. You decide that's not the best idea. (Try SALVAGE.)`,
   `Your fingers close on the {target} — and pass through where you thought a handhold was. It's part of the world here, not a thing to take. (Try SALVAGE.)`,
@@ -232,9 +248,33 @@ const SCENE_FEATURE_REFUSALS: string[] = [
   `An Aetheric hum rises from the {target} the moment you touch it. You step back, breathing. The world's keeping that one for itself. (Try SALVAGE.)`,
   `The {target} weighs more than you do. The Arbiter watches you try anyway, then mercifully looks away. (Try SALVAGE.)`,
   `You wrap your hands around the {target} and your shoulders argue. It's part of the bones of this place. Whatever it gives up, it'll give to a pry, not a lift. (Try SALVAGE.)`,
-  `Dust rises off the {target} when you touch it — and settles right back. Whatever it is, it's been here longer than your race. Leave it. Or salvage it.`,
+  `Dust rises off the {target} when you touch it — and settles right back. It's been here longer than your race, but it'll come apart for a pry. (Try SALVAGE.)`,
 ];
 
+/** ⚠ OTA-1232 — for nouns with NO salvage pool. These deliberately promise
+ *  nothing. Each one closes on what the noun still IS — part of the room, worth a
+ *  look, not worth a pocket — rather than sending the player to a verb that will
+ *  turn them away. INVESTIGATE is named where it fits, because that one does work
+ *  on scenery and returns lore. */
+const SCENERY_ONLY_REFUSALS: string[] = [
+  `The {target} doesn't move, and wouldn't be worth much if it did. It's part of the room. (INVESTIGATE reads it; your hands won't.)`,
+  `You get a grip on the {target} and then think better of it. Nothing in it wants to come away, and nothing in it is scrap.`,
+  `The {target} is built into this place. You could look at it a long while — you can't take it anywhere.`,
+  `Your hand finds the {target} and finds nothing loose. Some of Tartaria is scenery, and it stays scenery.`,
+  `You test the {target}. It holds. Whatever story it has is the only thing it's giving up. (Try INVESTIGATE.)`,
+  `The {target} is where it has always been, and where it will be after you. Not a thing to carry, and not a thing to break down.`,
+  `You give the {target} an honest pull. The buried world declines. It isn't loot and it isn't scrap — it's just here.`,
+  `The {target} belongs to the room the way the floor does. Look at it if you like; there's nothing in it for your pack.`,
+];
+
+/** ⚠⚠ OTA-1232 — the refusal now tells the truth about what comes next.
+ *  `hasSalvageYield` is deterministic and rolls nothing, so this is a fact about
+ *  the noun rather than a guess about a future dice throw. */
 export function sceneFeatureRefusalLine(noun: string): string {
-  return pickLine(SCENE_FEATURE_REFUSALS).replace(/\{target\}/g, noun);
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { hasSalvageYield } = require('./salvagePools') as typeof import('./salvagePools');
+  let salvageable = false;
+  try { salvageable = hasSalvageYield(noun); } catch { salvageable = false; }
+  const pool = salvageable ? SCENE_FEATURE_REFUSALS : SCENERY_ONLY_REFUSALS;
+  return pickLine(pool).replace(/\{target\}/g, noun);
 }

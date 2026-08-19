@@ -139,7 +139,11 @@ describe('OTA-1159 — ⚠ the enemy card tells the truth about a boss', () => {
     // RETARGETED BY OTA-1163 — the pressure test found a SECOND Core-Guardian
     // card (the manual summon path) still carrying the raw notation and the
     // wrong range; it now routes through the helper too. Four sites, one truth.
-    expect((STORE.match(/enemyDamageDisplay\(/g) ?? []).length).toBe(4);
+        // ⚠ ONE FEWER SITE since the Core Guardian's duplicate spawn path was removed:
+    // the verb-gated summon inside submitPlayerAction is gone, so `summonCoreGuardian`
+    // is the only place a Guardian is raised. The count dropping is the fix landing,
+    // not coverage lost — a second copy is what this guard exists to prevent.
+expect((STORE.match(/enemyDamageDisplay\(/g) ?? []).length).toBe(3);
   });
 });
 

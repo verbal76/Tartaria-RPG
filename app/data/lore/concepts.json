@@ -241,19 +241,19 @@
       "id": "gifting",
       "keywords": ["gift", "gifting", "give", "offer"],
       "title": "Gifting",
-      "answer": "Type 'gift <item>' while a vendor is in the scene. The item leaves your pack and the vendor's faction gains 5 standing — with half that propagating to their allies and the inverse to their rivals. Honest currency for politics."
+      "answer": "Type 'gift <item>' while a vendor is in the scene. The item leaves your pack and their faction gains standing by how well the gift lands: +4 if they love it, +2 if they merely like it, and −2 if it insults them. Half of that carries to their allies, and the inverse to their rivals — so a gift is never free of consequence elsewhere. Gifts are a status bump, not a road: across a whole run they can only move any one faction 10 in total. The personal warmth you buy with the person themselves is uncapped."
     },
     {
       "id": "stealing",
       "keywords": ["steal", "stealing", "thief", "pilfer", "pocket"],
       "title": "Stealing",
-      "answer": "Type 'steal <item>' to attempt a theft from the current vendor. A d20 + STEALTH check resolves immediately, against a DC the vendor's wariness sets — and it climbs every time you try, so serial pilfering gets steeply harder. Success: the item is yours, free. Failure: the vendor catches you, faction standing drops 10, and they pack up and leave."
+      "answer": "Type 'steal <item>' to attempt a theft from the current vendor. A d20 + STEALTH check resolves immediately, against a DC the vendor's wariness sets — and it climbs every time you try, so serial pilfering gets steeply harder. Success: the item is yours, free. Failure: the vendor catches you, their faction drops 10 standing — and if you are standing on ground another faction holds, that faction docks you 10 as well — and the vendor packs up and leaves."
     },
     {
       "id": "factions_join",
       "keywords": ["join", "joining", "enlist", "pledge"],
       "title": "Joining a faction",
-      "answer": "Type 'join <faction name>'. Requires at least 20 standing with that faction. Faction standing rises through purchases (+1), gifts (+5), and certain quests; it falls through theft (-10) and aligned actions against them."
+      "answer": "Type 'join <faction name>'. Requires at least 20 standing with that faction. Standing rises through finished contracts, hunts and mysteries, gifts, returned sigils, and trade — every 500 TC you spend with a faction's traders is worth 1 standing. It falls through theft (−10), extortion, and work done for their rivals: every point you earn with one faction costs their enemies half as much in the other direction. ⚠ Fall to −25 with anyone and their patrols stop passing you by and start hunting you on their ground."
     },
 
     {
@@ -284,7 +284,7 @@
       "id": "faction_points",
       "keywords": ["faction points", "fp", "faction standing", "standing", "reputation"],
       "title": "Faction Points (FP)",
-      "answer": "Represented in-game as faction standing. Earn FP by completing faction tasks, making purchases (+1), gifting items (+5), and turning in quests. Spend it to unlock exclusive gear, restricted areas, and faction abilities. Different factions start at different standings with you."
+      "answer": "Represented in-game as faction standing. Earn it by finishing that faction's contracts, hunts and mysteries, by gifts, by returning their sigils, and by trade — 1 standing per 500 TC spent with their traders. ⚠ You never SPEND standing. It is not a purse; it is a line you stand above. Hold enough and their work, their gear and their doors open to you and stay open — 20 lets you join them. Hold too little and it cuts the other way: below zero their patrols turn on you, and at −25 they hunt you on their own ground. Different factions start at different standings with you, and some start already against you."
     },
     {
       "id": "blinded",
@@ -1020,7 +1020,7 @@
       "id": "cap_asgardar",
       "keywords": ["asgardar", "asgard", "asgardar core", "spire capital", "grand spire"],
       "title": "Asgardar",
-      "answer": "Western Lost Capital, ancient seat of Tartarian power. Home of the Grand Spire of Etheria. The Asgardar Core regulates the spire-channel. Guardian: Sentinel-Priest Vaelka."
+      "answer": "Western Lost Capital, ancient seat of Tartarian power. Home of the Grand Spire of Asgardar, its collector-tower, standing out past the last streets. The Asgardar Core regulates the spire-channel. Guardian: Sentinel-Priest Vaelka."
     },
     {
       "id": "cap_samarran",

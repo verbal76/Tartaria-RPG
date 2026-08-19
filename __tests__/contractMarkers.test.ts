@@ -17,7 +17,11 @@ describe('openContractMarkers', () => {
     expect(contractMarkerNumbers(player({}))).toEqual({});
   });
 
-  it('a hunt anchors on its biome cell; a faction quest on its faction home', () => {
+  // ⚠⚠ P19 — A HUNT'S PIN FOLLOWS ITS CURRENT STAGE, not its poster. Before the stage
+  // layer the pin sat on the contract's one anchor for the whole hunt, so a chase that
+  // crosses the map still routed you back to stage one's tile every time. The record's
+  // `stage` is now part of the answer — which is why this test names it explicitly.
+  it('a hunt anchors on its CURRENT STAGE; a faction quest on its faction home', () => {
     const markers = openContractMarkers(player({
       activeHunts: [{ id: 'hunt_bog_dragon', stage: 0, postedByFaction: null, acceptedAt: 0 }],
       activeFactionQuests: [{ id: 'fq_reclaimers_starter', stage: 0, postedByFaction: 'reclaimers_guild', acceptedAt: 0 }],
@@ -26,11 +30,22 @@ describe('openContractMarkers', () => {
     // hunt comes first (list order), faction quest second.
     expect(markers[0].family).toBe('hunt');
     expect(markers[0].number).toBe(1);
-    expect(markers[0].anchorId).toBe('mud_seas');
-    expect(markers[0]).toMatchObject(canonicalCellOf('mud_seas'));
+    // Stage 0 of the Bog Dragon opens with the Drakovan reeve, in Drakova.
+    expect(markers[0].anchorId).toBe('drakova');
+    expect(markers[0]).toMatchObject(canonicalCellOf('drakova'));
     expect(markers[1].family).toBe('faction');
     expect(markers[1].number).toBe(2);
     expect(markers[1].anchorId).toBe('reclaimer_stake');
+  });
+
+  it('the same hunt, later, pins somewhere else — the pin walks with the player', () => {
+    const at = (stage: number) => openContractMarkers(player({
+      activeHunts: [{ id: 'hunt_bog_dragon', stage, postedByFaction: null, acceptedAt: 0 }],
+    }))[0]!.anchorId;
+    // Stage 0 the reeve (Drakova) → stage 2 Old Mira (the Waystation) → apex the Mud Seas.
+    expect(at(0)).toBe('drakova');
+    expect(at(2)).toBe('monarch_waystation');
+    expect(at(6)).toBe('mud_seas');
   });
 
   it('numbers follow the Contracts-screen order: hunts → faction quests → leads', () => {

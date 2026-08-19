@@ -79,6 +79,11 @@ export interface TitleProgress {
   /** Distinct great climbs crested (of 5). At 5 the Skyreacher title lands
    *  and the Skyreacher armor set is complete. */
   greatClimbsCompleted: number;
+  /** OTA-1206 — collectible character-stories fully assembled (of 10). At 10 the
+   *  Historian title lands. ⚠ Counts COMPLETED STORIES, not fragments: 57 fragments
+   *  spread unevenly across 10 stories (5–7 each), so a fragment count would make the
+   *  last story worth the same as the first and the title would land early. */
+  collectableStoriesCompleted: number;
 }
 
 export const EMPTY_TITLE_PROGRESS: TitleProgress = {
@@ -99,6 +104,7 @@ export const EMPTY_TITLE_PROGRESS: TitleProgress = {
   relicsPreserved: 0,
   alliancesBrokered: 0,
   greatClimbsCompleted: 0,
+  collectableStoriesCompleted: 0,
 };
 
 export function withTitleProgress(p?: Partial<TitleProgress>): TitleProgress {
@@ -133,9 +139,20 @@ export interface TitlePerks {
   // ── Skyreacher (OTA-910) ──────────────────────────────────────────────
   climbFallHalved: boolean;     // Skyreacher — halves climb-fall damage
   dexterityBonus: number;       // Skyreacher — passive +DEX (folds into effectiveStats)
+  /** OTA-1207 — flat damage added when the swing's type is electrical or aetheric.
+   *  Granted by the Elior Zalmar collectible story. ⚠ Consumed in the store's attack
+   *  path beside the mechanical-damage die; a perk with no consumer is a new
+   *  "ends in nothing" and this one is wired. */
+  electricalDamageBonus: number;
+  /** ⚠ OTA-1212 — passive +CHA from the Siren of Zharak's Teeth story. Folds into
+   *  `effectiveStats` the same way OTA-910's Skyreacher DEX does, so the two live
+   *  consumers — diplomacy checks and the CHA vendor discount — pick it up with no
+   *  new plumbing and no call site able to miss it. */
+  charismaBonus: number;
 }
 
 export const EMPTY_TITLE_PERKS: TitlePerks = {
+  electricalDamageBonus: 0, charismaBonus: 0,
   investigationBonus: 0, loreBonus: 0, tradeBonus: 0, repairBonus: 0,
   socialBonus: 0, leadershipBonus: 0, mechanicalDamageDice: 0,
   golemEdge: false, ethericDamageResist: false, envHazardSaveBonus: 0,
@@ -268,6 +285,20 @@ export const WIRED_TITLES: TitleDef[] = [
     earned: (_pl, p) => p.labyrinthCleanRuns >= 1,
     // OTA-350 — one who reads the unseen paths also moves along them unseen.
     perk: (a) => { a.pathfinder = true; a.stealthBonus += 1; },
+  },
+  // ⚠ OTA-1206 — THE 22nd TITLE, AND THE FIRST NOT FROM THE OWNER'S CANON DOCX.
+  // `data/lore/arbiter-titles.json` was ingested verbatim from
+  // Arbiter_Assigned_Titles_for_Players.docx and held exactly 21, all of them wired.
+  // This one is new, added on the owner's instruction (2026-08-09): *"you should get a
+  // title for completing all of them, some types of historian title."* Named from the
+  // game's own established phrase — "the buried world" runs through the narration — but
+  // the NAME IS THE OWNER'S TO CHANGE; only the id is load-bearing.
+  {
+    id: 'historian_of_the_buried_world',
+    earned: (_pl, p) => p.collectableStoriesCompleted >= 10,
+    // Ten lives read end to end. The perk matches what the doing of it teaches: you know
+    // where people leave things, and you know what you are looking at when you find it.
+    perk: (a) => { a.loreBonus += 2; a.investigationBonus += 1; },
   },
   {
     id: 'guild_broker',
@@ -429,12 +460,30 @@ export function newlyEarnedTitles(player: PlayerCharacter): string[] {
   return evaluateEarnedTitles(player).filter((id) => !already.has(id));
 }
 
-/** Aggregate passive perks from the player's earned titles. */
+/** Aggregate passive perks from the player's earned titles AND completed collectible
+ *  stories.
+ *
+ *  ⚠⚠ OTA-1207 — STORY PERKS MERGE HERE, INTO THE ONE ACCUMULATOR, ON PURPOSE. Every
+ *  existing consumer already calls this function (`equipment.ts:779`,
+ *  `combatRules.ts:828`, the sell-price path, the ruins-AC path), so folding the story
+ *  perks in at the source means `tradeBonus`, `ruinsDefenseBonus` and
+ *  `mechanicalDamageDice` start working for collectibles with ZERO new consumption code.
+ *  A parallel `collectionPerkModifiers` would have meant finding and updating every one
+ *  of those sites — and missing one silently is exactly how a buff ends up aggregated
+ *  and never read. */
 export function titlePerkModifiers(player: PlayerCharacter): TitlePerks {
   const acc: TitlePerks = { ...EMPTY_TITLE_PERKS };
   const earned = new Set(player.earnedTitles ?? []);
   for (const t of WIRED_TITLES) {
     if (earned.has(t.id)) t.perk(acc);
   }
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { storyPerkModifiers } = require('./collectables') as typeof import('./collectables');
+  const sp = storyPerkModifiers(player.collectables ?? []);
+  acc.tradeBonus += sp.tradeBonus;
+  acc.ruinsDefenseBonus += sp.ruinsDefenseBonus;
+  acc.mechanicalDamageDice += sp.mechanicalDamageDice;
+  acc.electricalDamageBonus += sp.electricalDamageBonus;
+  acc.charismaBonus += sp.charismaBonus;
   return acc;
 }

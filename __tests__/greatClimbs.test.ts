@@ -53,7 +53,11 @@ describe('OTA-910 — great climb registry', () => {
   });
 
   it('location gate: a token only counts at its own landmark when a location is supplied', () => {
-    expect(greatClimbFor('asgardar', 'asgardar')?.id).toBe('asgardar_spire');
+    // ⚠ OTA-1334 — the Asgardar climb's landmark is the TOWER's own tile now, not the city.
+    // The token is still `asgardar`; what changed is the ground it counts on. The city
+    // itself is deliberately not climbable any more — the tower is a place you travel to.
+    expect(greatClimbFor('asgardar', 'grand_spire_of_asgardar')?.id).toBe('asgardar_spire');
+    expect(greatClimbFor('asgardar', 'asgardar')).toBeNull();
     expect(greatClimbFor('asgardar', 'grand_spire_of_etheria')).toBeNull();
     expect(greatClimbForLocation('zharaks_teeth')?.id).toBe('zharak_fang');
     expect(greatClimbForLocation('nowhere')).toBeNull();

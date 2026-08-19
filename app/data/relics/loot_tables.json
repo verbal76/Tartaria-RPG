@@ -1354,5 +1354,53 @@
       "relic",
       "legendary"
     ]
+  },
+  {
+    "name": "Procedure Text: Aether Shield",
+    "rarity": "Uncommon",
+    "description": "A field-copied barrier procedure.",
+    "tcValue": 250,
+    "faction": "Stone Builders",
+    "tags": [
+      "loot",
+      "text",
+      "procedure"
+    ]
+  },
+  {
+    "name": "Procedure Text: Temporal Slip",
+    "rarity": "Rare",
+    "description": "A Revivalist transcription of the slip.",
+    "tcValue": 600,
+    "faction": "Tartarian Revivalists",
+    "tags": [
+      "loot",
+      "text",
+      "procedure"
+    ]
+  },
+  {
+    "name": "Procedure Text: Veil of Ether",
+    "rarity": "Legendary",
+    "description": "A deciphered Architect concealment cipher.",
+    "tcValue": 1400,
+    "faction": "Conspiracy Architects",
+    "tags": [
+      "loot",
+      "text",
+      "procedure"
+    ]
+  },
+  {
+    "name": "Procedure Text: Resonance Cascade",
+    "rarity": "Legendary",
+    "description": "The forbidden overload, copied anyway.",
+    "tcValue": 1400,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "text",
+      "procedure"
+    ]
   }
 ]

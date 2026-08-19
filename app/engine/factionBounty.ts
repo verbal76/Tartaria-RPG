@@ -5,6 +5,8 @@
 // exposure. Pure + testable; the store handles offer / accept / route / turn-in.
 
 import type { FactionMeta } from './worldPulse';
+import { JOIN_THRESHOLD } from './factions';
+import { travelHoursFor } from './travelTime';
 
 export interface FactionBounty {
   /** The favored faction paying the bounty. */
@@ -30,18 +32,66 @@ export interface FactionBounty {
    *  accept to 24 + the tiles between the player and the quarry's outpost, so a far job
    *  isn't impossible to reach in time. Falls back to the 24h base when absent. */
   deadlineHours?: number;
+  /** ⚠ OTA-1188 — THE POLITICS THIS CONTRACT WAS SIGNED UNDER, frozen at accept.
+   *  The GRUDGES & ALLIANCES board is a LIVE matrix that patrols move as they gut each
+   *  other, so who the giver stands with can change between accepting a job and finishing
+   *  it. The payout reads THIS, not the world as it is at completion: the board you froze
+   *  is the deal you get. Absent on a legacy contract, which falls back to a live read. */
+  politics?: import('./bountyPolitics').BountyPolitics;
+  /** ⚠ OTA-1189 — the quarry has been placed on this contract's ground. One-shot: set the
+   *  first time the player stands on `targetLocationId`, so walking in and out cannot
+   *  re-arm it. Flagged on the CONTRACT, not the location, so a second contract at the same
+   *  outpost still gets its own groups. */
+  quarrySeeded?: boolean;
 }
 
-/** OTA-862 — the BASE window a bounty gives you, before distance is added. In-game time
- *  only advances when you act, so this is a real "get moving" pressure, not a wall-clock
- *  countdown that drains while the app is closed. */
+/** OTA-862 — the JOB BUDGET: how long the contract gives you to actually land the kills,
+ *  before any travel is priced in. In-game time only advances when you act, so this is a
+ *  real "get moving" pressure, not a wall-clock countdown that drains while the app is
+ *  closed.
+ *
+ *  ⚠ OTA-1185 — THIS IS ALSO THE FLOOR, AND THAT IS THE POINT. A contract on the outpost
+ *  you are standing next to is still 3-9 kills; the JOB does not shrink just because the
+ *  WALK did. Keep this term additive. A first pass at OTA-1185 replaced the whole formula
+ *  with a pure per-tile multiplier, which fixed the long contract by breaking every short
+ *  one (6 tiles → 15h for up to 9 kills; 0 tiles → 0h). The original OTA-863 shape was
+ *  right — job budget PLUS travel budget — and only its travel term was mis-sized.
+ *  Still the fallback for a legacy contract with no stored `deadlineHours`. */
 export const BOUNTY_DEADLINE_HOURS = 24;
 
-/** OTA-863 — a bounty's full deadline: 24h base + one hour per tile you must cross to
- *  reach the quarry's outpost (travel is ~0.25h/tile, but the buffer also covers the
- *  fights the route runs you through, the kills at the far end, and the odd rest). */
-export function bountyDeadlineFor(distanceTiles: number): number {
-  return BOUNTY_DEADLINE_HOURS + Math.max(0, Math.round(distanceTiles));
+/** ⚠ OTA-1185 — JOB BUDGET + AN HONESTLY PRICED JOURNEY.
+ *
+ *  Was `24 + 1h per tile`. The 24 was right. The per-tile hour was not: it was sized
+ *  against WALKING time (~0.25h), which is real and irrelevant, because a tile ALSO costs
+ *  2 stamina (`STAMINA_COSTS.travel`) and the only thing that repays stamina is rest — a
+ *  flat 8 points per 8 hours, i.e. one hour per point. The true all-in cost of a tile is
+ *  ~2.25h, nine times what the old term budgeted for it.
+ *
+ *  Measured against a real device log: a 23-tile contract was given 47h, of which
+ *  arriving consumed ~39h — leaving ~8 hours to hunt down three raiders after a four-day
+ *  march. Owner: "9 hours would never happen."
+ *
+ *  Now: the 24h job budget, PLUS honest travel (HOURS_PER_TILE_TRUE, 2.5h/tile — the
+ *  ~2.25h real cost rounded UP, the rounding being slack for fights, wrong turns, and
+ *  waiting on a quarry that comes hunting you on its own schedule). The same 23 tiles now
+ *  budget 81.5h, of which the walk is ~52h — leaving the job its full window.
+ *
+ *  ⚠ The three terms measure DIFFERENT things and must not be collapsed. If the map gets
+ *  more expensive to cross, HOURS_PER_TILE_TRUE moves. If the WAITING gets slower (the
+ *  patrol cooldown), HOURS_PER_REQUIRED_KILL moves. The 24 is the fixed overhead of taking
+ *  a job at all. Never retune one by editing another.
+ *
+ *  ⚠ OTA-1188 ADDED THE THIRD TERM, AND IT IS THE ONE THAT WAS MISSING ALL ALONG. Travel
+ *  was priced; WAITING never was. `maybePatrolAmbush` refuses to fire twice inside
+ *  PATROL_MIN_HOURS (6), so a hard 6-hour floor sits between you and each engagement no
+ *  matter what you do — which meant a 3-kill and a 9-kill contract at the same distance
+ *  got IDENTICAL time. `count` is passed optionally so every legacy caller still
+ *  compiles and simply gets the old two-term number. */
+export function bountyDeadlineFor(distanceTiles: number, count?: number): number {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { killWindowHours } = require('./bountyPolitics') as typeof import('./bountyPolitics');
+  const job = count === undefined ? 0 : killWindowHours(count);
+  return BOUNTY_DEADLINE_HOURS + travelHoursFor(Math.max(0, Math.round(distanceTiles))) + job;
 }
 
 /** Hours of in-game time left on a bounty (Infinity for a legacy one with no stamp). */
@@ -62,7 +112,7 @@ export function bountyExpired(bounty: FactionBounty, nowHour: number): boolean {
  *  MORE standing, so bounties are the road back into any faction's good graces. */
 export function giverDifficulty(giverStanding: number | undefined): number {
   const s = giverStanding ?? 0;
-  if (s >= 20) return 0;   // favored — the easy, trusting job
+  if (s >= JOIN_THRESHOLD) return 0;   // favored — the easy, trusting job
   if (s >= 0) return 1;    // neutral/acquainted
   if (s >= -20) return 2;  // disliked
   return 3;                // hostile — prove yourself
@@ -110,7 +160,8 @@ export function bountyKey(b: Pick<FactionBounty, 'giverFactionId' | 'targetFacti
  *  with a known outpost), most ASCENDANT first. Shared by pickBounty + listBounties. */
 // OTA-862 — a faction won't hire you to hunt someone you're genuinely allied with. At or
 // above this standing with the QUARRY, that contract is withheld (you'd never take it).
-const FRIENDLY_QUARRY = 20;
+// OTA-1179 — same number as joining, and now the same constant.
+const FRIENDLY_QUARRY = JOIN_THRESHOLD;
 
 function bountyCandidates(
   factions: readonly FactionMeta[],

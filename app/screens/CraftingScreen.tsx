@@ -9,7 +9,13 @@ import { BrandedModal } from '../components/BrandedModal';
 import type { InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
-import type { InventoryItem } from '../engine/types';
+import type { InventoryItem, PlayerCharacter } from '../engine/types';
+// OTA-1218 — PUNCHLIST P16. The Aetheric tab is where the disciplines already live, so it
+// is where the techniques belong: same energy, same fuel, same corruption ledger.
+import {
+  AETHER_TECHNIQUES, TECHNIQUE_FUEL_PREFERENCE, dcForRank, proficiencyRank, proficiencyLabel,
+  usesOf, type AetherTechnique,
+} from '../engine/aetherTechniques';
 import { getItemPreview } from '../components/itemPreview';
 import { GOLEM_DEFINITIONS, type GolemDefinition } from '../engine/golems';
 import { wornInstanceIds, validSlotsForItem } from '../engine/equipment';
@@ -192,13 +198,39 @@ function ownedQty(inventory: InventoryItem[], name: string): number {
 // golem summon confirm. Tapping the card no longer copies a phrase to the clipboard
 // for the player to paste back — it opens this confirm, and on Cast it dispatches
 // the action and bounces to exploration so the roll plays out live.
-type DisciplineConfirm = { title: string; phrase: string; body: string; fuel: string; afford: boolean };
+// OTA-1218 — `technique` distinguishes an AETHER TECHNIQUE from an Aethercraft discipline
+// inside the shared confirm popup. They earn the same two-tap flow but not the same words:
+// nothing about a technique is a cast, so the button reads CHANNEL and the body talks about
+// dose. One extra field beat a second, near-identical modal.
+type DisciplineConfirm = {
+  title: string; phrase: string; body: string; fuel: string; afford: boolean; technique?: boolean;
+};
 function buildDisciplineConfirm(d: AethercraftDiscipline, inventory: InventoryItem[]): DisciplineConfirm {
   const phrase = d.examples[0] ?? d.id;
   // Aethercraft fuels are an "any ONE of" list — affordable if the player holds ≥1.
   const afford = d.fuels.some((f) => ownedQty(inventory, f) >= 1);
   const fuel = `any one of: ${d.fuels.join(', ')}`;
   return { title: d.title, phrase, body: d.body, fuel, afford };
+}
+
+/** OTA-1218 — the same popup, aimed at a technique. ⚠ It states the DOSE up front: this is
+ *  the one action in the game whose price is paid in corruption, and a confirm screen that
+ *  hid that would be selling the player something they did not agree to. */
+function buildTechniqueConfirm(
+  tech: AetherTechnique,
+  player: PlayerCharacter,
+): DisciplineConfirm {
+  const afford = TECHNIQUE_FUEL_PREFERENCE.some((f) => ownedQty(player.inventory, f) >= 1);
+  const rank = proficiencyRank(usesOf(player, tech.id));
+  return {
+    title: tech.name,
+    phrase: `channel ${tech.name.toLowerCase()}`,
+    body: `${tech.effect}\n\nDC ${dcForRank(tech.baseDc, rank)} on d20 + INT (your race ladder still applies).`
+      + ` Dose ${tech.baseDose} corruption on a clean run, half of that when it slips.`,
+    fuel: `any one of: ${TECHNIQUE_FUEL_PREFERENCE.join(', ')}`,
+    afford,
+    technique: true,
+  };
 }
 
 function evaluateRepair(
@@ -234,7 +266,10 @@ type Tab = 'craft' | 'repair' | 'recipes' | 'aetheric';
 // install when the player first lands on that tab. Authoring rule:
 // ~25 words / 2 sentences max — longer copy goes in the future
 // Tutorial Replay docs (TUTORIAL_DOCS_FULL).
-const TAB_HINTS: Record<Tab, { title: string; body: string }> = {
+// OTA-1228 — exported so the copy can be pinned by test: the aetheric card shipped
+// stale for a full feature wave (it described only the three disciplines while the
+// tab's headline became the four techniques), and nothing could notice.
+export const TAB_HINTS: Record<Tab, { title: string; body: string; id?: string }> = {
   craft: {
     title: 'Craft tab',
     body: 'Every gear / relic blueprint. Ready-to-craft ones are highlighted; the rest list what you\'re missing.',
@@ -248,8 +283,12 @@ const TAB_HINTS: Record<Tab, { title: string; body: string }> = {
     body: 'Food, tonics, elixirs. Tap a recipe with materials in hand to fire it. Same craftable-highlight rule as Craft.',
   },
   aetheric: {
+    // ⚠ v2 id, deliberately: hint dismissals are per-install, so an edited body under
+    // the old id would never be seen by a tester who dismissed the pre-technique card.
+    // Bump the id again if this card is ever rewritten again.
+    id: 'crafting_tab_aetheric_v2',
     title: 'Aetheric tab',
-    body: 'Aethercraft disciplines — shape stone, summon golem, mend wounds. Per-race DC + stat bonuses apply.',
+    body: 'Your aether techniques live here — tap Channel to raise one; each channel costs a dose, and practice raises your rank. Techniques are learned from Procedure Texts: bought from a faction that trusts you, found at aether-heavy ruins, or earned in stories. Below them, the three disciplines — shape stone, summon golem, mend wounds.',
   },
 };
 
@@ -538,7 +577,7 @@ export function CraftingScreen() {
   return (
     <View style={styles.container}>
       <FirstTimeHint
-        id={`crafting_tab_${tab}`}
+        id={hint.id ?? `crafting_tab_${tab}`}
         title={hint.title}
         body={hint.body}
       />
@@ -761,12 +800,70 @@ export function CraftingScreen() {
                 </Pressable>
               );
             })}
+
+            {/* ⚠ OTA-1218 — AETHER TECHNIQUES (PUNCHLIST P16). The rules shipped in
+                OTA-1214 with no caller and no screen, which is the same defect P4 and P14
+                are filed for. This is the screen.
+
+                ⚠ UNKNOWN TECHNIQUES ARE LISTED, NOT HIDDEN — and that is the design
+                decision on this block. A hidden list means a player who has never met a
+                rapport vendor has no way to learn the feature exists, so the only route in
+                depends on stumbling across it. Shown-but-locked turns each row into a
+                goal: it names the INT it wants and says where the procedure is sold. */}
+            <Text style={styles.techHeader}>AETHER TECHNIQUES</Text>
+            <Text style={styles.techIntro}>
+              Not casting — procedures, run on a hazard. Each one burns the same Aetheric fuel the
+              disciplines do and costs you a dose of corruption whether it holds or not. Practice
+              makes them easier, never stronger, and only counts when something was actually
+              trying to kill you.
+            </Text>
+            {AETHER_TECHNIQUES.map((t) => {
+              const known = (player.knownTechniques ?? []).includes(t.id);
+              const rank = proficiencyRank(usesOf(player, t.id));
+              const intOk = player.stats.intelligence >= t.intRequired;
+              return (
+                <Pressable
+                  key={t.id}
+                  accessibilityRole="button"
+                  disabled={!known}
+                  style={({ pressed }) => [
+                    styles.aetherCard,
+                    !known && styles.techCardLocked,
+                    known && pressed && styles.aetherCardPressed,
+                  ]}
+                  onPress={() => { if (known) setDisciplineConfirm(buildTechniqueConfirm(t, player)); }}
+                >
+                  <Text style={styles.aetherCardTitle}>
+                    {t.name} <Text style={styles.techTier}>· {t.tier}</Text>
+                    {known ? <Text style={styles.techRank}>  {proficiencyLabel(rank)}</Text> : null}
+                  </Text>
+                  <Text style={styles.aetherCardBody}>{t.effect}</Text>
+                  <Text style={styles.aetherCardFuel}>
+                    <Text style={styles.aetherCardFuelLabel}>Needs: </Text>
+                    <Text style={intOk ? styles.fuelHave : undefined}>INT {t.intRequired}</Text>
+                    <Text> · DC {dcForRank(t.baseDc, rank)} · dose {t.baseDose} corruption</Text>
+                  </Text>
+                  <Text style={styles.aetherCardExamples}>
+                    {known
+                      ? <Text style={styles.aetherCardExamplesLabel}>Tap to channel · or type: </Text>
+                      : <Text style={styles.aetherCardExamplesLabel}>Not yet taught — </Text>}
+                    {known
+                      ? `"channel ${t.name.toLowerCase()}"`
+                      : 'a faction whose rapport you have earned sells this procedure.'}
+                  </Text>
+                </Pressable>
+              );
+            })}
+            <Text style={styles.techFootnote}>
+              Channelling in a fight costs you the round — the enemy answers. Outside one it costs
+              minutes and stamina. Aetherborn take half the dose; everyone else pays it in full.
+            </Text>
           </ScrollView>
         </>
       ) : (
         <>
           <Text style={styles.arbiterLine}>
-            The Arbiter takes the damaged piece. "Material cost is double what it'd give if you scrapped it. That's the trade."
+            The Arbiter takes the damaged piece. "Material cost is double what it'd give if you salvaged it. That's the trade."
           </Text>
 
           <SearchSortBar
@@ -950,7 +1047,7 @@ export function CraftingScreen() {
                         </Text>
                       )}
                       {r.cost.length === 0 ? (
-                        <Text style={styles.recipeMissing}>No repair recipe — sell or scrap instead.</Text>
+                        <Text style={styles.recipeMissing}>No repair recipe — sell or salvage instead.</Text>
                       ) : r.available ? (
                         <>
                           <Text style={styles.recipeIng}>
@@ -1059,12 +1156,16 @@ export function CraftingScreen() {
         title={disciplineConfirm?.title ?? 'Aethercraft'}
         body={disciplineConfirm
           ? `${disciplineConfirm.body}\n\nFuel — ${disciplineConfirm.fuel}\n\n${disciplineConfirm.afford
-              ? 'You have fuel for it. Casting rolls against the discipline’s DC — watch it play out in the world view.'
+              ? (disciplineConfirm.technique
+                  // OTA-1218 — a technique's line names the two costs a discipline does not
+                  // have: the dose lands either way, and in a fight this IS your round.
+                  ? 'You have fuel for it. The dose lands whether the field holds or not, and in a fight this spends your turn — watch it play out in the world view.'
+                  : 'You have fuel for it. Casting rolls against the discipline’s DC — watch it play out in the world view.')
               : 'You’re short on fuel — the attempt will name exactly what’s missing.'}`
           : undefined}
         buttons={[
           {
-            label: 'Cast',
+            label: disciplineConfirm?.technique ? 'Channel' : 'Cast',
             tone: 'primary',
             onPress: () => {
               const phrase = disciplineConfirm?.phrase;
@@ -1272,6 +1373,14 @@ const styles = StyleSheet.create({
   aetherCardFuel: { color: '#a2977b', fontSize: 11, lineHeight: 15, marginBottom: 4 },
   aetherCardFuelLabel: { color: '#9aaab0', fontWeight: '700' },
   fuelHave: { color: '#9ec96a', fontWeight: '700' },
+  // OTA-1218 — technique rows in the Aetheric tab. Locked rows are dimmed rather than
+  // hidden (see the block comment at the list) so an untaught procedure reads as a goal.
+  techHeader: { color: '#cdbf99', fontSize: 13, fontWeight: '700', letterSpacing: 1.5, marginTop: 18, marginBottom: 4 },
+  techIntro: { color: '#a89a7a', fontSize: 12, lineHeight: 17, marginBottom: 10 },
+  techCardLocked: { opacity: 0.55 },
+  techTier: { color: '#a2977b', fontSize: 12, fontWeight: '400' },
+  techRank: { color: '#9ec96a', fontSize: 11, fontWeight: '700' },
+  techFootnote: { color: '#8b7f66', fontSize: 11, lineHeight: 16, marginTop: 10, marginBottom: 4 },
   aetherCardExamples: { color: '#a2977b', fontSize: 11, lineHeight: 15 },
   aetherCardExamplesLabel: { color: '#9aaab0', fontWeight: '700' },
   aetherCardQueuedHint: { color: '#9ec96a', fontSize: 11, marginTop: 4, fontStyle: 'italic' },

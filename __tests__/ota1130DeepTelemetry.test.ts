@@ -1,7 +1,11 @@
-// OTA-1130 — THE NUMBERS THE NATIVE LAYER WAS ALREADY COMPUTING, AND THE
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
+// OTA-1107 — THE NUMBERS THE NATIVE LAYER WAS ALREADY COMPUTING, AND THE
 // WORK NOBODY EVER SAW.
 //
-// OTA-1129 proved prefill dominates by INFERRING it from wall-clock: ambient
+// OTA-1106 proved prefill dominates by INFERRING it from wall-clock: ambient
 // took 14.5s to write 139 characters while investigate_lore wrote 132 in
 // 1.1s, so the difference had to be reading, not writing. That inference was
 // right — and it was also unnecessary, because llama.cpp returns a `timings`
@@ -47,7 +51,7 @@ const call = (job: string, over: Partial<QwenCallRecord> = {}): void =>
     job, totalMs: 1000, waitMs: 0, chars: 100, outcome: 'ok', at: 0, ...over,
   });
 
-describe('OTA-1130 — read vs write, measured', () => {
+describe('OTA-1107 — read vs write, measured', () => {
   beforeEach(() => resetQwenTelemetry());
 
   it('⚠ the split separates a prompt problem from a token-budget problem', () => {
@@ -69,13 +73,19 @@ describe('OTA-1130 — read vs write, measured', () => {
     expect(line).toContain('cap1');
   });
 
-  // RETARGETED BY OTA-1131. This asserted `cache812t` on the assumption that
+  // RETARGETED BY OTA-1108. This asserted `cache812t` on the assumption that
   // llama.cpp's `tokens_cached` counts REUSED tokens. The first device log
   // disproved it — every row reported exactly promptTokens + outTokens — so
   // the rollup now prints the derived remainder and calls it `reuse`. The
   // no-data case still stays quiet; a measured zero no longer does, because
   // "nothing was reused" is the finding.
-  it('prefix reuse is derived from the cache size, and a measured zero shows', () => {
+  // ⚠⚠ RETARGETED BY OTA-1259 (N4). This asserted that the derived `reuse` number
+  // reaches the rollup. It did — but the number is ~0 BY CONSTRUCTION: llama.rn
+  // reports `tokens_cached` as `n_past`, which after a completion is prompt +
+  // generated whether or not a prefix was reused (jni.cpp:748). A metric that
+  // cannot move is worse than no metric, so it is retired and the per-token
+  // prefill rate — which CAN move — carries the signal. See ota1108.
+  it.skip('SUPERSEDED BY OTA-1259 — the reuse number was structurally zero', () => {
     call('narration:travel', { cachedTokens: 1012, promptTokens: 180, outTokens: 20 });
     expect(qwenTelemetrySummary()).toContain('reuse812t');
     resetQwenTelemetry();
@@ -95,7 +105,7 @@ describe('OTA-1130 — read vs write, measured', () => {
   });
 });
 
-describe('OTA-1130 — wasted work is counted honestly', () => {
+describe('OTA-1107 — wasted work is counted honestly', () => {
   beforeEach(() => resetQwenTelemetry());
 
   it('⚠ a discarded line costs what a delivered one costs, and now says so', () => {
@@ -140,11 +150,11 @@ describe('OTA-1130 — wasted work is counted honestly', () => {
   });
 });
 
-describe('OTA-1130 — the four waste sites are wired', () => {
+describe('OTA-1107 — the four waste sites are wired', () => {
   const store = src('app/state/gameStore.ts');
 
   it('⚠ narration cancelled mid-flight is reported, not silently swallowed', () => {
-    // ⚠ RETARGETED BY OTA-1152 — the recurring lesson, again: an assertion that
+    // ⚠ RETARGETED BY OTA-1129 — the recurring lesson, again: an assertion that
     // spans a line break fails on REFLOW rather than on meaning. The reason
     // string became a ternary (a background fill reports `intro-fill:preempted`
     // instead, because being cut short is its ordinary outcome and not a loss),
@@ -160,7 +170,7 @@ describe('OTA-1130 — the four waste sites are wired', () => {
   });
 
   it('⚠ filtered ambient is reported — the job that most often pays for nothing', () => {
-    // RETARGETED BY OTA-1145. The condition gained one exclusion: a STALE line
+    // RETARGETED BY OTA-1122. The condition gained one exclusion: a STALE line
     // with usable text is now BANKED rather than binned, and a generation the
     // player is still going to hear is deferred work, not wasted work.
     // Counting it here would make the bank look like the problem it was built

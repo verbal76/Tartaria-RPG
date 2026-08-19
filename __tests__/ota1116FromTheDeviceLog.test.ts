@@ -98,12 +98,22 @@ describe('OTA-1116 — source locks for the store-side fixes', () => {
     expect(src).toMatch(/const meleeAttacker = !enemy\.boss && \(inTheScrum \|\| !isRangedEnemy\(enemy\)\);/);
   });
 
-  it('#4 gifting refuses a piece you are still wearing, and names the slot', () => {
-    expect(src).toMatch(/You are still wearing the \$\{item\.name\} \(\$\{wornSlot\}\)/);
-    // The refusal must come BEFORE the inventory decrement.
-    const guardAt = src.indexOf('You are still wearing the');
+  it('#4 gifting still refuses a piece you are still wearing, before spending it', () => {
+    // ⚠ RETARGETED BY OTA-1177 — the CLAIM is unchanged and still enforced; the
+    // implementation moved and got stricter. This used to pin the literal string
+    // "You are still wearing the ${item.name} (${wornSlot})", which came from a
+    // guard that compared the equipped slot's NAME to the item's name. That guard
+    // is gone: it refused a SECOND identical copy because the FIRST was worn, and
+    // it knew nothing about the bandolier, the tool pouch, fusion reservations or
+    // accepted fetch contracts. `giftBlockReason` (engine/giftEligibility.ts)
+    // answers all of it by instance id, and ota1177GiftMode tests the behaviour
+    // directly. What this lock still owns is the ORDERING, which is what OTA-1116
+    // was actually about: the refusal must land before the inventory decrement.
+    expect(src).toMatch(/const blocked = giftBlockReason\(item, player\);/);
+    const guardAt = src.indexOf('const blocked = giftBlockReason(item, player);');
     const spendAt = src.indexOf('i.id === itemId ? { ...i, quantity: i.quantity - 1 }');
     expect(guardAt).toBeGreaterThan(0);
+    expect(spendAt).toBeGreaterThan(0);
     expect(guardAt).toBeLessThan(spendAt);
   });
 

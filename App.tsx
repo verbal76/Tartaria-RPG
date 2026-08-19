@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { clearLiveBreadcrumb } from './app/engine/saveSystem'; // OTA-1288
 import { View, Text, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, Keyboard, Image, ImageBackground, type AppStateStatus } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 // expo-navigation-bar is a NATIVE module — only present in APKs built
@@ -39,6 +40,8 @@ import { CallDogModal } from './app/components/CallDogModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
 import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1043
+import { DedicationOverlay } from './app/components/DedicationOverlay';
+import { StoryRevealOverlay } from './app/components/StoryRevealOverlay'; // OTA-1206
 import { StoryForkOverlay } from './app/components/StoryForkOverlay'; // OTA-1088
 import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1045
 import { StoryIntroOverlay } from './app/components/StoryIntroOverlay'; // OTA-1046 — global (was exploration-only)
@@ -52,8 +55,13 @@ import { initTTSManager } from './app/voice/TTSManager';
 import { startTTSController, stopTTSController } from './app/voice/TTSController';
 import { createExpoFileSystemAdapter } from './app/voice/executorchAdapter';
 import { checkAndApplyOTA } from './app/updates/checkAndApplyOTA';
+// OTA-1197 — read what expo thinks it is running, for the boot-check log line.
+import * as Updates from 'expo-updates';
 import { useUiScale } from './app/ui/uiScale';
 import { loadDisplaySettings, useDisplaySettings, baseColorOf } from './app/ui/displaySettings';
+import { autosaveTick, loadAutosaveDisabled, AUTOSAVE_INTERVAL_MS } from './app/ui/autosave';
+import { loadUiScale } from './app/ui/displayScale'; // OTA-1250
+import { initDesktopBack, useBackAction } from './app/ui/desktopBack'; // OTA-1252 — right-click / Escape = back
 
 // Lazy-load expo-navigation-bar. The package is a native module bridged
 // only in APKs built AFTER it was added to dependencies — older
@@ -163,6 +171,13 @@ try {
   // the dev environment surfaces errors well enough on its own.
 }
 
+// ⚠⚠ OTA-1287 (port of golem OTA-1275) — how long the app must stay in the
+// FOREGROUND before the parked Qwen model is rebuilt. Measured against the
+// owner's log-copy workflow (foreground visits of 2.3s / 2.5s / 2.4s / 6.9s
+// while pasting log parts): 8s clears all of that churn, and a real play
+// session passes it without noticing. Mirrors the watchdog's settle gate.
+const QWEN_REWARM_DELAY_MS = 8_000;
+
 export default function App() {
   const screen = useGameStore((s) => s.currentScreen);
   const hydrated = useGameStore((s) => s.hydrated);
@@ -176,6 +191,16 @@ export default function App() {
   // `active` handler knows to re-warm it. (Manual disable / failed / skipped
   // never set this, so we never fight the user's choice.)
   const qwenParkedRef = useRef(false);
+  // ⚠⚠ OTA-1287 (port of golem OTA-1275) — the re-warm timer. The model reload
+  // is DEBOUNCED on continuous foreground so app-switching cannot thrash a
+  // ~425MB native load/free cycle every couple of seconds.
+  const qwenRewarmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // ⚠ OTA-1353 — the classifier resume gets the same settled-foreground debounce
+  // the Qwen re-warm earned in OTA-1287. resumeCognitive() used to fire a native
+  // ONNX session create on EVERY `active` twitch — the third freeze died 1ms
+  // into one of those transitions — and a 2-second app-switch does not need the
+  // classifier back at all.
+  const cognitiveResumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Android immersive mode — hide the navigation bar (3-button bar at
   // the bottom) and let the status bar overlay-swipe back. Same UX as
@@ -254,9 +279,43 @@ export default function App() {
         // offline check (capped at 5s), or any error all fall THROUGH to
         // the normal boot below. The check resolves fast when up to date;
         // it only blocks longer while actually downloading an update.
+        // ⚠⚠ OTA-1197 — THE UPDATE PATH NOW SAYS WHAT IT DID, ON THE DEVICE LOG.
+        //
+        // Owner, stuck on OTA-1194 while 1195 and 1196 sat published and unreachable:
+        // *"it hasn't been able to pull an update after that."* Both were verified
+        // published to hal2001 AND preview, iOS, runtimeVersion 2.4.1 — the server side
+        // was provably fine — and there was NOTHING on the device that could say why they
+        // were not landing. This block swallowed every failure into a `console.warn`,
+        // which no bug report has ever carried, and `silent: true` threw away the status
+        // and error callbacks entirely. An update path with no telemetry is one you can
+        // only debug by guessing, which is exactly the afternoon that produced this.
+        //
+        // ⚠ ADDITIVE ONLY, AND DELIBERATELY SO. Not one line of control flow changes
+        // here: same call, same options, same branches, same fall-through. This is the
+        // one code path where a clever fix that goes wrong leaves the player with no way
+        // to receive the correction — so it gets logging and nothing else.
+        const otaLog = (m: string): void => {
+          try { useGameStore.getState().appendLog('debug', m); } catch { /* never block boot */ }
+        };
         try {
           setStage('ota:check');
-          const otaResult = await checkAndApplyOTA({ silent: true, checkTimeoutMs: 5000, skipTeardown: true });
+          // What expo thinks it is running RIGHT NOW, before we ask for anything. If this
+          // disagrees with OTA_BUILD_ID the device is running a bundle it did not expect.
+          try {
+            const U = Updates as unknown as { isEnabled?: boolean; updateId?: string | null; channel?: string | null; runtimeVersion?: string | null };
+            otaLog(`ota: boot check — enabled=${U.isEnabled} channel=${U.channel ?? '?'} rt=${U.runtimeVersion ?? '?'} updateId=${U.updateId ?? '(embedded)'}`);
+          } catch { /* diagnostics must never gate the check */ }
+          const otaResult = await checkAndApplyOTA({
+            silent: true,
+            checkTimeoutMs: 5000,
+            skipTeardown: true,
+            // ⚠ `silent` only suppresses UI. These now land in the device log, so a
+            // report shows 'Checking…' → 'Downloading…' → what happened, or where it
+            // stopped. A stall between two of these lines names its own step.
+            onStatus: (m) => otaLog(`ota: ${m}`),
+            onError: (m) => otaLog(`⚠ ota error: ${m}`),
+          });
+          otaLog(`ota: boot check result = ${otaResult}`);
           if (otaResult === 'applied') {
             // reloadAsync fired — the JS bridge is restarting onto the new
             // bundle. Do NOT boot the native models; this context is dead.
@@ -268,6 +327,10 @@ export default function App() {
         } catch (otaErr) {
           // eslint-disable-next-line no-console
           console.warn('boot-front OTA check failed (proceeding to load):', otaErr);
+          // ⚠ AND ON THE DEVICE LOG TOO. A console.warn reaches a developer with a cable
+          // attached; it has never once reached a pasted bug report, which is the only
+          // channel that actually exists between this app and the person fixing it.
+          otaLog(`⚠ ota: boot check FAILED — ${otaErr instanceof Error ? otaErr.message : String(otaErr)} (staying on this bundle)`);
         }
         // OTA-405 — GATE A: the boot OTA check is done and we are staying on
         // THIS bundle this launch (the 'applied' path returned above). Open
@@ -317,8 +380,12 @@ export default function App() {
                 void markMLInitAttempted();
                 void bootQwen()
                   .then(() => {
-                    setStage('qwen:done');
-                    void markMLInitSucceeded();
+                    // ⚠⚠ OTA-1203 — CHECK, DON'T ASSUME. `bootQwen()` RESOLVES ON FAILURE.
+                    // See the twin call site below for the measurement and the consequence;
+                    // both sites had the identical defect and both are fixed.
+                    const ok = useGameStore.getState().qwenStatus === 'ready';
+                    setStage(ok ? 'qwen:done' : 'qwen:failed');
+                    if (ok) void markMLInitSucceeded();
                   })
                   .catch((e) => {
                     // eslint-disable-next-line no-console
@@ -366,8 +433,32 @@ export default function App() {
               void markMLInitAttempted();
               void bootQwen()
                 .then(() => {
-                  setStage('qwen:done');
-                  void markMLInitSucceeded();
+                  // ⚠⚠ OTA-1203 — `bootQwen()` RESOLVES WHETHER OR NOT THE MODEL LOADED, AND
+                  // THIS TREATED THAT AS SUCCESS. Its own comment says so outright:
+                  // "qwen.initialize() swallows errors and sets its own internal status to
+                  // 'failed' rather than throwing" — it then sets `qwenStatus: 'failed'` and
+                  // returns normally. So a failed load reached `.then()` and was recorded as
+                  // an init success.
+                  //
+                  // ⚠⚠ MEASURED — owner's report, 2026-08-09, build 1202. The header claims
+                  // a healthy init while every other signal says the model never loaded:
+                  //     Boot stage: qwen:done
+                  //     Last init success: 2026-08-09T03:28:28.017Z
+                  //     Status: active (no crashes detected) · Crash count: 0
+                  //     Model contexts — Opened: 0 · Live now: 0     ← never loaded
+                  //     ⚠⚠ MEMORY WARNING #1 — qwen='failed'          ← never loaded
+                  //     arbiter: template (reason=qwen-not-ready)     ← never loaded
+                  //
+                  // ⚠⚠ AND IT IS NOT COSMETIC. `markMLInitSucceeded()` deliberately WIPES
+                  // `KEY_CRASH_COUNT` and `KEY_DISABLED` (arb124: a real success proves the
+                  // device can load the model). Calling it after a FAILED load resets the
+                  // guard that exists to bench Qwen after repeated failures — so the counter
+                  // can never reach its threshold of 2, and the protection is permanently
+                  // defeated. `Crash count: 0` in that report is the guard being wiped, not
+                  // a healthy device.
+                  const ok = useGameStore.getState().qwenStatus === 'ready';
+                  setStage(ok ? 'qwen:done' : 'qwen:failed');
+                  if (ok) void markMLInitSucceeded();
                 })
                 .catch((e) => {
                   // eslint-disable-next-line no-console
@@ -488,6 +579,20 @@ export default function App() {
         // template/reason=qwen-not-ready; the long-travel log showed exactly
         // this — init succeeded at boot, then status=idle for 20 min). Remember
         // that WE parked a ready model so `active` knows to bring it back.
+        // ⚠⚠ OTA-1287 — CANCEL ANY PENDING RE-WARM, on `inactive` too. This is
+        // the half that stops the thrash: a foreground visit shorter than the
+        // debounce never loads the model at all, so leaving again costs nothing.
+        if (qwenRewarmTimer.current) {
+          clearTimeout(qwenRewarmTimer.current);
+          qwenRewarmTimer.current = null;
+          useGameStore.getState().appendLog('debug', 'qwen: re-warm cancelled (left the foreground first)');
+        }
+        // OTA-1353 — a foreground visit shorter than the debounce never
+        // recreates the classifier session either.
+        if (cognitiveResumeTimer.current) {
+          clearTimeout(cognitiveResumeTimer.current);
+          cognitiveResumeTimer.current = null;
+        }
         if (status === 'background') {
           if (useGameStore.getState().qwenStatus === 'ready') qwenParkedRef.current = true;
           void shutdownQwen();
@@ -501,8 +606,20 @@ export default function App() {
         // falsely benching the Arbiter (the user never crashes, yet the guard
         // disabled Qwen + flagged a Kokoro "voice crash" off one benign close).
         void clearInFlightBreadcrumbs();
+        // ⚠⚠ OTA-1288 (port of golem OTA-1276) — an ORDERLY exit clears the
+        // live breadcrumb, so one that SURVIVES to the next boot means the
+        // process died while still live — the swipe-kill after a hard freeze.
+        void clearLiveBreadcrumb();
       } else if (status === 'active') {
-        void resumeCognitive();
+        // OTA-1353 — debounced, mirroring the Qwen re-warm below. The classifier
+        // is enrichment: nothing the player is waiting on breaks while it waits
+        // for a settled foreground.
+        if (!cognitiveResumeTimer.current) {
+          cognitiveResumeTimer.current = setTimeout(() => {
+            cognitiveResumeTimer.current = null;
+            void resumeCognitive();
+          }, QWEN_REWARM_DELAY_MS);
+        }
         // Re-hide the navigation bar — Android sometimes restores it
         // after the app comes back from background (system dialogs,
         // keyboard close events). Idempotent and cheap.
@@ -517,14 +634,30 @@ export default function App() {
         // in the background. Without this, one transient background killed the
         // Arbiter's LLM voice for the rest of the session. Guarded by the
         // parked flag so a user who manually disabled Qwen stays disabled.
-        if (qwenParkedRef.current) {
-          qwenParkedRef.current = false;
-          void bootQwen();
+        // ⚠⚠ OTA-1287 (port of golem OTA-1275) — DEBOUNCED, because the instant
+        // version turned the owner's own bug-report workflow into a memory
+        // grinder: SIX full ~425MB model loads in four minutes, four of them
+        // inside twenty seconds, one per app-switch. A 2.5s visit is also
+        // shorter than the load itself, so the release could land DURING an
+        // in-flight init — the orphan shape OTA-1200 filed as its leading
+        // unmeasured suspect. The dump on `background` stays IMMEDIATE (that is
+        // the jetsam fix); only the reload waits for a settled foreground.
+        if (qwenParkedRef.current && !qwenRewarmTimer.current) {
+          qwenRewarmTimer.current = setTimeout(() => {
+            qwenRewarmTimer.current = null;
+            qwenParkedRef.current = false;
+            useGameStore.getState().appendLog('debug', `qwen: re-warming after ${QWEN_REWARM_DELAY_MS}ms settled foreground`);
+            void bootQwen();
+          }, QWEN_REWARM_DELAY_MS);
         }
       }
     };
     const sub = AppState.addEventListener('change', onChange);
-    return () => sub.remove();
+    return () => {
+      sub.remove();
+      if (qwenRewarmTimer.current) { clearTimeout(qwenRewarmTimer.current); qwenRewarmTimer.current = null; }
+      if (cognitiveResumeTimer.current) { clearTimeout(cognitiveResumeTimer.current); cognitiveResumeTimer.current = null; } // OTA-1353
+    };
   }, [shutdownCognitive, resumeCognitive, shutdownQwen, bootQwen]);
 
   // OTA-368 — periodic autosave. persist() fires on every meaningful
@@ -534,11 +667,22 @@ export default function App() {
   // loss to ~90s of idle. The write is atomic + cheap, and persist()
   // self-guards (no slot / no player / invalid record → no-op), so the
   // timer can fire unconditionally even on the title screen.
+  // OTA-1232 — the timer is now TOGGLEABLE (Settings -> RUN, default ON) at
+  // the owner's ask after a lost session — the protection existed, the
+  // control and the visibility didn't. Cadence unchanged: 90s already beats
+  // the 2-10 minute industry span, do not loosen it to look "standard".
   useEffect(() => {
-    const AUTOSAVE_MS = 90_000;
+    void loadAutosaveDisabled(); // warm the per-install flag before the first beat
+    // OTA-1250 — and re-apply the saved UI scale: Electron does not remember
+    // the zoom across launches, so without this a 'large' player relaunches small.
+    void loadUiScale();
+    // OTA-1252 — attach the desktop back routes (right-click + Escape). No-op
+    // on a phone, and idempotent, so a re-run of this effect costs nothing.
+    initDesktopBack();
     const timer = setInterval(() => {
-      void useGameStore.getState().persist();
-    }, AUTOSAVE_MS);
+      const s = useGameStore.getState();
+      void autosaveTick({ persist: s.persist, player: s.player, activeSlotId: s.activeSlotId });
+    }, AUTOSAVE_INTERVAL_MS);
     return () => clearInterval(timer);
   }, []);
 
@@ -605,6 +749,18 @@ export default function App() {
       </SilentBoundary>
       <SilentBoundary tag="ChapterCardOverlay">
         <ChapterCardOverlay />
+      </SilentBoundary>
+      {/* The dedication card — raised only by the name beat, for the one name it
+          is written for. Mounted globally like the chapter card so it lands over
+          whatever the opening is doing at that moment. */}
+      <SilentBoundary tag="DedicationOverlay">
+        <DedicationOverlay />
+      </SilentBoundary>
+      {/* OTA-1206 — a completed collectible story, read whole. Mounted beside the
+          chapter card because it is the same register of beat, and globally because a
+          set can close from any screen that can grant loot. */}
+      <SilentBoundary tag="StoryRevealOverlay">
+        <StoryRevealOverlay />
       </SilentBoundary>
       {/* OTA-1045 — one-time veteran motive picker, raised by the load paths
           for saves whose motive was dealt by backfill rather than chosen. */}
@@ -778,6 +934,25 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
   // scale recomputes. Every screen rendered below inherits the new
   // scale via the wrapper transform — no per-screen changes needed.
   const ui = useUiScale();
+  // ⚠⚠ OTA-1252 — THE BOTTOM OF THE BACK STACK. Owner, on the PC build: *"right
+  // click on the mouse should be the back button."* This is the FIRST handler
+  // registered, and the stack runs top-down, so it is the LAST consulted — a
+  // right-click inside the TAKE popup closes TAKE, not the screen beneath it.
+  //
+  // ⚠ AND AT THE GAME ITSELF, BACK DOES NOTHING. 'exploration', 'title',
+  // 'character_creation' and 'ending' all fall through deliberately: a
+  // right-click that dumped the player out of a fight, or off the ending they
+  // just earned, is the worst possible reading of the convention. Back only
+  // ever means "leave this sub-screen" — which is what a PC player expects, and
+  // the only thing it can safely do here.
+  useBackAction(true, () => {
+    if (screen === 'exploration' || screen === 'title' || screen === 'character_creation' || screen === 'ending') {
+      return false;
+    }
+    const st = useGameStore.getState();
+    st.setScreen(st.player ? 'exploration' : 'title');
+    return true;
+  });
   // arb78 — player-tunable background. Re-renders live as sliders change.
   const display = useDisplaySettings();
   // OTA-182 — keyboard-aware interior height. The wrapper View has

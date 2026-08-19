@@ -23,7 +23,11 @@ describe('OTA-156 — drunk-run collapse catches doubled-letter typos', () => {
       ['eatttt', 'rest'],          // 4+ trailing also collapses
       ['useee', 'use_relic'],      // useee → use (use_relic synonym)
       ['useeee', 'use_relic'],
-      ['scrappp', 'dig'],          // scrappp → scrap (dig synonym)
+      // ⚠ OTA-1243 — `scrap` is a salvage synonym now (the owner unified the
+      // word), so the collapsed typo routes to investigate — the intent that
+      // owns salvage. Its old landing on `dig` was an accident of prefix-
+      // matching 'scrape', never a decision.
+      ['scrappp', 'investigate'],  // scrappp → scrap (salvage synonym)
       ['drinkkk', 'drink'],        // drinkkk → drink (3+ run → drink)
       ['drinkk', 'drink'],         // trailing-2 consonant → drink
       ['lookkk', 'investigate'],   // lookkk → look (investigate synonym)
@@ -39,7 +43,7 @@ describe('OTA-156 — drunk-run collapse catches doubled-letter typos', () => {
     it.each([
       ['eat', 'rest'],
       ['use', 'use_relic'],
-      ['scrap', 'dig'],
+      ['scrap', 'investigate'],    // OTA-1243 — the breakdown verb
       ['drink', 'drink'],
       ['look', 'investigate'],
       ['rest', 'rest'],
