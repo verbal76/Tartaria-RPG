@@ -59,6 +59,12 @@ export interface GenerateOptions {
    *  work arrives. Item synthesis sets this; narration does not. See
    *  LlamaGenerateOptions.interruptible for the full reasoning. */
   interruptible?: boolean;
+  /** ⚠ WEB-002 — "is this output still wanted?", asked by the CONSUMER
+   *  at the door (lock won, native call not yet started) and again per token.
+   *  Distinct from `interruptible`: that one cuts short work someone still
+   *  wants; this one declines work already known to be discarded. Narration
+   *  sets this and still refuses `interruptible`. See LlamaGenerateOptions. */
+  shouldAbort?: () => boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -269,6 +275,7 @@ export class QwenGenerativeEngine {
       job: opts.job,
       homework: opts.homework,
       interruptible: opts.interruptible,
+      shouldAbort: opts.shouldAbort,
     });
   }
 
@@ -294,6 +301,7 @@ export class QwenGenerativeEngine {
       job: opts.job,
       homework: opts.homework,
       interruptible: opts.interruptible,
+      shouldAbort: opts.shouldAbort,
     });
   }
 
