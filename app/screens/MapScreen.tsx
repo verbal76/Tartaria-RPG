@@ -34,6 +34,7 @@ import { FirstTimeHint } from '../components/FirstTimeHint';
 // panel so a player can tap any known location and start travel
 // without digging through Lore.
 import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y, cellToAtlasFraction, canonicalCellFor } from '../engine/worldMap';
+import { worldMarkerFraction } from '../engine/mapFraction';
 import {
   atlasCoordForLocation,
   LOCATION_ATLAS_COORDS,
@@ -157,15 +158,11 @@ const CELL_TO_LOCATION: Record<string, string> = (() => {
 // do not swap back to a spring, which reads as a teleport.
 const CENTER_GLIDE_MS = 1400;
 
-/** Where a marker at this cell should be DRAWN. Never used for distance or routing. */
-function markerFraction(x: number, y: number): { fx: number; fy: number } {
-  const id = CELL_TO_LOCATION[`${x},${y}`];
-  if (id) {
-    const a = LOCATION_ATLAS_COORDS[id]!;
-    return atlasVisualFraction(id, a.fx, a.fy);
-  }
-  return cellToAtlasFraction(x, y);
-}
+/** ⚠ OTA-1370 — MOVED TO app/engine/mapFraction.ts, AND THAT MOVE IS THE POINT.
+ *  The corner mini-map draws the same marker, and two implementations of "where
+ *  is the player on the picture" would be free to drift — the exact class of
+ *  defect this codebase has spent OTAs unpicking. One copy, both callers. */
+const markerFraction = worldMarkerFraction;
 
 // ⚠⚠ THE LEGEND INSET IS GONE, AND DELETING IT WAS MANDATORY — NOT A TIDY-UP.
 //
