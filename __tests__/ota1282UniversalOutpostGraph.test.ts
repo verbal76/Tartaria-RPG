@@ -316,12 +316,20 @@ describe('OTA-1282 — every edge of every skin, exhaustively (golem OTA-1281 la
     });
   }
 
-  it("⚠⚠ LONGEST NAME WINS: Order's `cells` walks to the QUARTERS, not the Chapel", () => {
-    // The collision golem's crawl found (OTA-1281), ported with the fix: the
-    // Order skin ships a prefix pair — Quarters "Cells", Chapel "Cell" — and
-    // first-substring-in-direction-order walked `cells` into the Chapel.
-    expect(resolveHubTravel('outpost_messhall', 'go to the cells', 'forgotten_order'))
+  it("⚠⚠ THE COLLISION THE CRAWL FOUND — now closed at its SOURCE, not by longest-wins", () => {
+    // ⚠⚠ WHAT THIS TEST USED TO SAY, AND WHY IT CHANGED. The Order skin shipped
+    // a prefix pair — Quarters "Cells", Chapel "Cell" — and
+    // first-substring-in-direction-order walked `cells` into the Chapel, so
+    // longest-wins was added to send it to the Quarters. That rule is still
+    // here and still correct, but the collision it was arbitrating should never
+    // have existed: OTA-1360 checked the Order Cloister artwork and the west room
+    // is painted THE SCRIPTORIUM DORMITORY. Nothing on that map says "cells".
+    // The chip reads DORMITORY now, so `cells` and `cell` both belong to the
+    // one room the art actually calls a cell.
+    expect(resolveHubTravel('outpost_messhall', 'go to the dormitory', 'forgotten_order'))
       .toEqual({ roomId: 'outpost_quarters', via: 'adjacent' });
+    expect(resolveHubTravel('outpost_messhall', 'go to the cells', 'forgotten_order'))
+      .toEqual({ roomId: 'outpost_chapel', via: 'adjacent' });
     expect(resolveHubTravel('outpost_messhall', 'go to the cell', 'forgotten_order'))
       .toEqual({ roomId: 'outpost_chapel', via: 'adjacent' });
   });

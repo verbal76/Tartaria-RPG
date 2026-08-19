@@ -304,18 +304,36 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // (worldMemory.hubVisited), so the dot can never disagree with what the game
   // thinks you have seen.
   const hubVisited = useGameStore((st) => st.worldMemory.hubVisited);
-  const hubExitChips: Array<{ label: string; submit: string }> = useMemo(() => {
+  const hubExitChips: Array<{ label: string; submit: string; a11y: string }> = useMemo(() => {
     if (!hubRoom) return [];
     const seen = new Set(hubVisited ?? []);
-    const out: Array<{ label: string; submit: string }> = [];
+    const out: Array<{ label: string; submit: string; a11y: string }> = [];
     for (const dir of ['north', 'south', 'east', 'west'] as const) {
       const targetId = hubRoom.exits[dir];
       if (!targetId) continue;
       const targetRoom = hubRoomFor(targetId, skinFactionId);
       const name = targetRoom?.shortName?.toUpperCase() ?? dir.toUpperCase();
-      // ✓ = already walked. Prefixed rather than suffixed so the marks line up
-      // in a row of four chips and read as a column at a glance.
-      out.push({ label: seen.has(targetId) ? `✓ ${name}` : name, submit: `go ${dir}` });
+      // ⚠⚠ OTA-1360 — THE ARROW LEADS, AND IT IS THE HALF THAT CANNOT BE WRONG.
+      // Owner: *"let's also get a directional arrow in front of that name in the
+      // box only so even if the name is wrong directional[ly] you can figure it
+      // out on the map."* Exactly right, and it is the correct division of
+      // trust: the chip's WORD is an abbreviation of a painted label and can
+      // drift from the artwork (this same OTA fixed seven that had), but the
+      // DIRECTION is composed from outpostGraph and is the same thing the map's
+      // corridors draw. A player holding the picture can always resolve the
+      // room from the arrow, whatever the button says.
+      //
+      // Arrow FIRST, because it is the one element that is always present — the
+      // four arrows line up as a stable left column the way OTA-1277 wanted the
+      // ✓ marks to. The check keeps its place immediately before the name.
+      const arrow = DIR_ARROW[dir];
+      const walked = seen.has(targetId);
+      out.push({
+        label: `${arrow} ${walked ? `✓ ${name}` : name}`,
+        submit: `go ${dir}`,
+        // Screen readers get the word, not the glyph.
+        a11y: `${dir}, ${targetRoom?.shortName ?? dir}${walked ? ', already explored' : ''}`,
+      });
     }
     return out;
   }, [hubRoom, skinFactionId, hubVisited]);
@@ -476,7 +494,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               {sceneBuilding ? (
                 <TravelBtn label="ENTER" onPress={() => enterBuilding(sceneBuilding)} />
               ) : null}
-              <TravelBtn label={`→ ${travelTargetName.toUpperCase()}`} onPress={onContinueTravel ?? (() => {})} />
+              <TravelBtn label={`→ ${travelTargetName.toUpperCase()}`} destination onPress={onContinueTravel ?? (() => {})} />
               <TravelBtn label="STOP TRAVEL" onPress={onStopTravel ?? (() => {})} />
               {typeof movesLeft === 'number' && movesLeft >= 0 ? (
                 <View style={styles.movesBadge}>
@@ -495,7 +513,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 // arb108 — room hops are locked during the tutorial so the
                 // beats stay in the spawn room; EXIT unlocks at the stay/leave
                 // choice (the player's way out of the outpost + the tutorial).
-                <TravelBtn key={c.submit} label={c.label} onPress={() => onSubmit(c.submit)} blocked={tutLock} />
+                <TravelBtn key={c.submit} label={c.label} a11yLabel={c.a11y} destination={false} onPress={() => onSubmit(c.submit)} blocked={tutLock} />
               ))}
               {showExitChip ? (
                 <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} blocked={tutLock && currentBeatId !== 'explore_or_leave'} />
@@ -919,8 +937,19 @@ function QuickBtn({
   );
 }
 
-function TravelBtn({ label, onPress, blocked, active }: { label: string; onPress: () => void; blocked?: boolean; active?: boolean }) {
-  const isDestination = label.startsWith('→');
+/** ⚠ OTA-1360 — the four compass glyphs, declared once. `→` is deliberately the
+ *  EAST arrow AND the destination marker below; `destination` is now an explicit
+ *  prop rather than a string sniff, so an east-facing room chip can never be
+ *  mistaken for a travel destination and pick up its styling. */
+const DIR_ARROW: Record<'north' | 'south' | 'east' | 'west', string> = {
+  north: '↑', south: '↓', east: '→', west: '←',
+};
+
+function TravelBtn({ label, onPress, blocked, active, destination, a11yLabel }: {
+  label: string; onPress: () => void; blocked?: boolean; active?: boolean;
+  destination?: boolean; a11yLabel?: string;
+}) {
+  const isDestination = destination ?? label.startsWith('→');
   // arb108/arb109 — during the outpost tutorial lockdown, travel/room buttons
   // buzz (double-pulse) + drop an Arbiter nudge instead of moving, so the
   // player can't wander off-script and gets clear "wrong" feedback.
@@ -935,7 +964,7 @@ function TravelBtn({ label, onPress, blocked, active }: { label: string; onPress
       onPress={handlePress}
       activeOpacity={blocked ? 1 : 0.7}
       accessibilityRole="button"
-      accessibilityLabel={`${isDestination ? 'Travel to ' : ''}${label.replace(/^→\s*/, '')}${active ? ', current course' : ''}`}
+      accessibilityLabel={a11yLabel ?? `${isDestination ? 'Travel to ' : ''}${label.replace(/^→\s*/, '')}${active ? ', current course' : ''}`}
       accessibilityState={{ disabled: !!blocked, selected: !!active }}
     >
       <Text

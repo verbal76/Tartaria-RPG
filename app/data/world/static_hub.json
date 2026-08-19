@@ -239,8 +239,8 @@
     {
       "id": "outpost_culvert_descent",
       "structuralId": "R09",
-      "name": "The Storage Cellar",
-      "shortName": "Cellar",
+      "name": "The Culvert Descent",
+      "shortName": "Descent",
       "description": "A short flight of drainage steps down to a vaulted store-room under the armory. Barrels, spare shielding, coils of rope. The old culvert at the back was bricked up long ago; the only way out is the stair you came down.",
       "anchorNpc": null,
       "tags": [
@@ -262,7 +262,7 @@
       "id": "buried_landing_one",
       "structuralId": "R11",
       "name": "First Landing",
-      "shortName": "Landing 1",
+      "shortName": "First Landing",
       "description": "A wide platform of cracked Tartarian stone, halfway down. The stair behind you climbs north to the gate; ahead it keeps dropping south into the dark.",
       "anchorNpc": null,
       "tags": [
@@ -281,7 +281,7 @@
       "id": "buried_storage",
       "structuralId": "R14",
       "name": "Storage Halls",
-      "shortName": "Storage",
+      "shortName": "Storage Halls",
       "description": "Tartarian crates, most rotted through, some intact. The mud-glass containers in the back row are old enough to count as artifacts. One corridor, back west to the second landing.",
       "anchorNpc": null,
       "tags": [
@@ -301,7 +301,7 @@
       "id": "buried_pumps",
       "structuralId": "R13",
       "name": "The Pump Room",
-      "shortName": "Pumps",
+      "shortName": "Pump Room",
       "description": "Old Aetheric pumps churn the silt-water out of the lower levels. They've been running for centuries. Nobody knows who maintains them. The only corridor runs back east to the second landing.",
       "anchorNpc": null,
       "tags": [
@@ -322,7 +322,7 @@
       "id": "buried_landing_two",
       "structuralId": "R12",
       "name": "Second Landing",
-      "shortName": "Landing 2",
+      "shortName": "Second Landing",
       "description": "Where the Reclaimer map ends, and the junction the whole buried level hangs off: pumps west, storage halls east, the digs south, the stair back north. What little anyone knows of the south corridor ends in 'we lost two teams down there.'",
       "anchorNpc": null,
       "tags": [
