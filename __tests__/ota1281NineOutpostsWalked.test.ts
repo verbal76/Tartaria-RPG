@@ -143,16 +143,26 @@ describe('OTA-1281 — ENGINE: every edge of every skin, exhaustively', () => {
     });
   }
 
-  it("⚠⚠ THE COLLISION THE CRAWL FOUND: Order's `cells` walks to the QUARTERS, not the Chapel", () => {
-    // From the Mess both are adjacent: Quarters west ("Cells"), Chapel south
-    // ("Cell"). First-substring-in-direction-order picked south. Longest wins.
-    expect(resolveHubTravel('outpost_messhall', 'go to the cells', 'forgotten_order'))
+  it("⚠⚠ THE COLLISION THE CRAWL FOUND — now closed at its SOURCE, not by longest-wins", () => {
+    // ⚠⚠ WHAT THIS TEST USED TO SAY, AND WHY IT CHANGED. From the Order's Mess
+    // both were adjacent: Quarters west chipped "Cells", Chapel south chipped
+    // "Cell". First-substring-in-direction-order picked south, so longest-wins
+    // was added to send `cells` to the Quarters. That rule is still here and
+    // still correct — but the collision it was resolving should never have
+    // existed: OTA-1362 checked the Order Cloister artwork and the west room is
+    // painted THE SCRIPTORIUM DORMITORY. Nothing on that map says "cells". The
+    // chip now reads DORMITORY, so `cells` and `cell` both belong to the one
+    // room the art actually calls a cell, and the ambiguity is gone rather than
+    // arbitrated.
+    expect(resolveHubTravel('outpost_messhall', 'go to the dormitory', 'forgotten_order'))
       .toEqual({ roomId: 'outpost_quarters', via: 'adjacent' });
+    expect(resolveHubTravel('outpost_messhall', 'go to the cells', 'forgotten_order'))
+      .toEqual({ roomId: 'outpost_chapel', via: 'adjacent' });
     expect(resolveHubTravel('outpost_messhall', 'go to the cell', 'forgotten_order'))
       .toEqual({ roomId: 'outpost_chapel', via: 'adjacent' });
     // The bare-name intercept obeys the same rule (it is strict, so it never
     // had the substring hole — pinned so it stays that way).
-    expect(matchHubRoomName('cells', 'outpost_messhall', 'forgotten_order')).toBe('outpost_quarters');
+    expect(matchHubRoomName('dormitory', 'outpost_messhall', 'forgotten_order')).toBe('outpost_quarters');
     expect(matchHubRoomName('cell', 'outpost_messhall', 'forgotten_order')).toBe('outpost_chapel');
   });
 
