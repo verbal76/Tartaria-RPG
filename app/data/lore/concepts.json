@@ -303,7 +303,13 @@
       "id": "aetherkin",
       "keywords": ["aetherkin", "aetheric undead", "undead tartarian", "buried undead"],
       "title": "Aetherkin",
-      "answer": "Aether-infused undead buried by the Great Mud Flood, trapped in an ethereal peace. Disturb the Aetherstone encasing them and they reawaken with powerful Aetheric abilities — hostile to anything that threatens their rest."
+      "answer": "Aether-infused undead buried by the Great Mud Flood, trapped in an ethereal peace. Disturb the Aetherstone encasing them and they reawaken with powerful Aetheric abilities — hostile to anything that threatens their rest. Not all of them found that peace: those who died mid-task, with the work still burning, were never encased at all — they walk as the Hollowed."
+    },
+    {
+      "id": "hollowed",
+      "keywords": ["hollowed", "the hollowed", "hollowed one", "hollowed revenant", "revenant", "warrior aetherkin", "unrested", "the unrested", "fallen warrior", "risen fallen"],
+      "title": "The Hollowed (warrior-class Aetherkin)",
+      "answer": "The Aetherkin of the flood went down into the mud and found peace there — the stone closed over them, the work stopped, and they slept. The Hollowed are the ones it never closed over. They are Aetherkin of a warrior class: fighters who died mid-task, carrying something too heavy to set down. Aetherstone cannot encase a purpose that is still burning, so no stone ever formed, and there was no peace to be trapped in. They simply stood back up.\n\nWhat remains is not memory the way the living hold it. It is the last errand, worn down to a groove — the task still on their lips and in their minds, the name of a place they never reached, an oath sworn to someone four hundred years dead. They move like drilled muscle because the drill is what survived. They carry the kit they died in because the tools of the work never left their hands. And they come at the living because every traveller on the road looks, for one moment, like the thing they were meant to finish.\n\nThe faiths that revere the Aetherkin revere the SLEEPERS — the kin the Aether received. A Hollowed is the opposite of a sleeper: kin the Aether failed to take in. No reverence is owed them and no offence is taken at their ending; every reading of the doctrine agrees a Hollowed is owed release and nothing else. That is why no faction counts one against you, and why the Arbiter names the killing a mercy rather than a hunt. You are not putting down an Aetherkin. You are finishing an errand so old the one who set it has no name left."
     },
     {
       "id": "ancient_mud_golems",

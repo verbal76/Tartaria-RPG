@@ -123,7 +123,13 @@ describe('OTA-981 — the Hollowed leave a trail', () => {
     expect(src).toContain("plantFallenHook('fallen_whisper', `fallen:${fr.ts}`)");
     expect(src).toContain("spawn: fallen_whisper rumor");
     expect(src).toContain("case 'spawn_fallen_revenant': {");
-    // both routes draw from the same un-avenged pool
-    expect(src.match(/filter\(\(f\) => !f\.avengedTs\)/g)?.length).toBeGreaterThanOrEqual(2);
+    // ⚠ Both routes draw from the SAME pool — the intent this lock has always
+    // guarded, and it earned its keep at OTA-1362: the shared-fallen wiring
+    // joined the wild spawner to the imported dead and left the rumour route
+    // behind, so a tale could never name a corpse from another house. The pool
+    // is now `revenantPool()` (local un-avenged + imported un-rested), which
+    // does the avengedTs filtering internally, so the shared draw is asserted
+    // on that call instead of the raw filter it replaced.
+    expect(src.match(/rev\.revenantPool\(\)/g)?.length).toBeGreaterThanOrEqual(2);
   });
 });
