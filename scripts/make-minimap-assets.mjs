@@ -9,6 +9,15 @@
 // signature freeze (B9) was an out-of-memory kill, adding six permanent
 // megabytes to the screen the player sits on is not a rounding error.
 //
+// ⚠ OTA-1372 — 512 → 768. Owner, on the shipped tile: *"it's a little grainy, we
+// might need to bump the resolution up a little bit."* He is right, and the
+// arithmetic says by how much: the box is ~130pt and the outpost view is drawn
+// at 2.5×, so the tile occupies ~325pt — which on the Pixel's 2.4375× density
+// is ~792 PHYSICAL pixels. 512 was being stretched half again beyond its own
+// resolution, which is exactly the grain. 768 lands at native and no further:
+// ~2.25MB decoded, still under half the ~6.0MB the real art would cost, and the
+// next step up buys nothing a phone screen can resolve.
+//
 // ⚠ SIZED FOR THE VIEWPORT, NOT FOR THE WHOLE MAP. The corner tile is a WINDOW:
 // the art is drawn LARGER than the box and translated so the player sits at the
 // centre, so only the visible slice of it does any work. That is what sets the
@@ -45,7 +54,7 @@ const OUT_DIR = join(ROOT, 'assets', 'minimap');
  *  world atlas is 1619×971, and squashing it to a square would put the player
  *  marker in the wrong place, because every position in this game is stored as
  *  a FRACTION of the art and the fraction assumes the original proportions. */
-const MAX_EDGE = 512;
+const MAX_EDGE = 768;
 
 /** Every source that can appear in the corner, and the tile it becomes. */
 const SOURCES = [

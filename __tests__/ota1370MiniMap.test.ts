@@ -164,35 +164,44 @@ describe('OTA-1370 — the downscaled tiles', () => {
     // however little of it shows), so the saving has to come from the source.
     for (const t of TILES) {
       const png = pngSize('assets', 'minimap', `${t}.png`);
-      expect({ t, maxEdge: Math.max(png.width, png.height) }).toEqual({ t, maxEdge: 512 });
+      expect({ t, maxEdge: Math.max(png.width, png.height) }).toEqual({ t, maxEdge: 768 });
       const decodedMb = (png.width * png.height * 4) / 1024 / 1024;
-      expect(decodedMb).toBeLessThan(1.1);
+      // ⚠ OTA-1372 raised the tile 512 → 768 for sharpness (see the generator).
+      // The ceiling moves with it, but it is still less than HALF the ~6.0MB the
+      // real art would cost, which is the whole point of the tile existing.
+      expect(decodedMb).toBeLessThan(2.5);
+      expect(decodedMb).toBeLessThan(6.0 / 2);
     }
   });
 
   it('⚠ the world tile keeps the atlas aspect — squashing it moves every marker', () => {
     const png = pngSize('assets', 'minimap', 'world.png');
-    expect(png.width).toBe(512);
-    // 1619×971 → 512×307. A square tile would slide the marker vertically by up
+    expect(png.width).toBe(768);
+    // 1619×971 → 768×460. A square tile would slide the marker vertically by up
     // to 40% of the map, because positions are stored as fractions of the art.
-    expect(png.height).toBe(Math.round((971 / 1619) * 512));
+    expect(png.height).toBe(Math.round((971 / 1619) * 768));
     for (const t of TILES.filter((x) => x !== 'world')) {
       const o = pngSize('assets', 'minimap', `${t}.png`);
       expect({ t, square: o.width === o.height }).toEqual({ t, square: true });
     }
   });
 
-  it('the tiles are a fraction of the art they came from', () => {
+  it('the tiles are smaller on disk than the art they came from', () => {
+    // ⚠ Disk is the lesser number and this test is the lesser check — a PNG's
+    // file size depends on how compressible the picture is, not on what it
+    // costs once decoded. The number that actually decides this feature is the
+    // DECODED footprint asserted above; this one only catches someone quietly
+    // pointing the generator at the full-size art.
     for (const t of TILES.filter((x) => x !== 'world')) {
       const small = statSync(root('assets', 'minimap', `${t}.png`)).size;
       const full = statSync(root('assets', 'outposts', `${t}.png`)).size;
-      expect(small).toBeLessThan(full / 3);
+      expect({ t, smaller: small < full / 2 }).toEqual({ t, smaller: true });
     }
   });
 
   it('the generator is committed, so the tiles can be rebuilt from the art', () => {
     const gen = src('scripts', 'make-minimap-assets.mjs');
-    expect(gen).toContain('const MAX_EDGE = 512;');
+    expect(gen).toContain('const MAX_EDGE = 768;');
     for (const t of TILES.filter((x) => x !== 'world')) {
       expect(gen).toContain(`assets/outposts/${t}.png`);
     }
@@ -254,5 +263,75 @@ describe("OTA-1370 — the owner's two conditions", () => {
 
   it('tapping it opens the Atlas', () => {
     expect(exp).toContain("<MiniMap onPress={() => setScreen('map')} />");
+  });
+});
+
+describe('OTA-1372 — the Atlas pinch stays where your fingers are', () => {
+  const map = src('app', 'screens', 'MapScreen.tsx');
+
+  /** The solve the handler ships, in isolation:
+   *      t₁ = F₁ − K − (s₁/s₀)·(F₀ − K − t₀)
+   *  K is the box centre in page coordinates, F the pinch midpoint. */
+  const pinch = (
+    s0: number, s1: number, t0: number, f0: number, f1: number, k: number,
+  ) => f1 - k - (s1 / s0) * (f0 - k - t0);
+
+  it('⚠⚠ the point between the fingers does not move as the scale changes', () => {
+    // The property, stated as the player experiences it: put two fingers on the
+    // thing you care about, spread them, and that thing is still under them.
+    const K = 200, T0 = 0, S0 = 1, F = 260;   // fingers 60px right of centre
+    for (const s1 of [1.2, 2, 3.5, 8]) {
+      const t1 = pinch(S0, s1, T0, F, F, K);
+      // screen position of the content point that was under F, after the zoom
+      const u = (F - K - T0) / S0;
+      expect(Math.round(K + t1 + s1 * u)).toBe(F);
+    }
+  });
+
+  it('⚠ and the OLD behaviour provably did not — this is the drift he saw', () => {
+    // The previous line raised the scale and left the translate alone, so the
+    // layer scaled about the BOX CENTRE and everything else flew away from it,
+    // faster the further out it started.
+    const K = 200, T0 = 0, S0 = 1, F = 260;
+    const u = (F - K - T0) / S0;
+    const oldScreenAt = (s1: number) => K + T0 + s1 * u;
+    expect(Math.round(oldScreenAt(1))).toBe(F);
+    expect(Math.round(oldScreenAt(3))).toBe(380);   // 120px off, and climbing
+    expect(Math.round(oldScreenAt(8))).toBe(680);   // clean off the screen
+  });
+
+  it('a finger moving during the pinch pans, from the same expression', () => {
+    // F₁ moving IS the pan, so the pinch branch never reads gestureState and
+    // therefore cannot double-count it.
+    const K = 200, T0 = 0, S0 = 2;
+    const still = pinch(S0, S0, T0, 260, 260, K);
+    const moved = pinch(S0, S0, T0, 260, 300, K);
+    expect(moved - still).toBe(40);
+  });
+
+  it('the handler computes it that way and stops reading the pan delta', () => {
+    const branch = map.slice(map.indexOf('PINCH ANCHORED ON THE FINGERS'),
+      map.indexOf('// Single-finger pan.'));
+    expect(branch).toContain('const grow = nextScale / startScale.current;');
+    expect(branch).toContain('mid.x - kx - grow * (startMidX.current - kx - startTx.current)');
+    expect(branch).toContain('mid.y - ky - grow * (startMidY.current - ky - startTy.current)');
+    expect(branch).not.toContain('gestureState.dx');
+    expect(branch).not.toContain('gestureState.dy');
+  });
+
+  it('⚠ every baseline re-capture rebases the pan delta too', () => {
+    // The second half of the drift: `gestureState.dx` accumulates from the
+    // first touch of the whole gesture. Each place that re-captures startTx was
+    // folding the travel-so-far into the baseline and then adding it again out
+    // of dx. There are three capture points and all three must rebase.
+    expect(map.match(/startDx\.current = gestureState\.dx;/g)?.length).toBe(2);
+    expect(map).toContain('startDx.current = 0;');
+    expect(map).toContain('(gestureState.dx - startDx.current)');
+    expect(map).toContain('(gestureState.dy - startDy.current)');
+  });
+
+  it('the box is measured in page space, because touches arrive in page space', () => {
+    expect(map).toContain('boxRef.current?.measureInWindow(');
+    expect(map).toContain('boxPage.current.x + (imgBox?.width ?? 0) / 2');
   });
 });
