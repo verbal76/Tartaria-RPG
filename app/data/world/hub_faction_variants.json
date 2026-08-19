@@ -1,5 +1,5 @@
 {
-  "description": "v2.4.1 (OTA 031) - per-faction overrides for the shared hub-room layout in static_hub.json. Same room ids, same exits, same anchorNpcs (faction-neutral characters who serve all comers); only `name`, `shortName`, and `description` vary per faction. Lookup via hubRoomFor(roomId, factionId) in hub.ts - falls back to the base static_hub.json entry when a faction has no override for the given room. *** WEB-002 - ALL 15 ROOMS ARE NOW COVERED, INCLUDING THE BURIED LEVEL. *** This file used to say, as a deliberate decision, that 'only the 10 outpost rooms are covered; the 5 buried-level rooms stay generic'. Play disproved it. outpostGraph connects R10 (the gate) south to R11, so the buried level hangs off EVERY faction outpost - and unskinned it served the base Reclaimer text to all of them, so a Monarch palace, a Giant shrine and an Architect office each opened onto the same 'active Reclaimer excavation'. Worse, the fallback shortNames are structural ids: the owner's device log shows the Atrium's exits reading 'north to Court - south to Landing 1' on the first screen of the game. Every faction now owns its own undercroft, with the topology and the room's function unchanged - only whose place it is. Locked by web002OutpostSkins.",
+  "description": "v2.4.1 (OTA 031) - per-faction overrides for the shared hub-room layout in static_hub.json. Same room ids, same exits, same anchorNpcs (faction-neutral characters who serve all comers); only `name`, `shortName`, and `description` vary per faction. Lookup via hubRoomFor(roomId, factionId) in hub.ts - falls back to the base static_hub.json entry when a faction has no override. *** WEB-003 - THE MAP IS THE AUTHORITY FOR NAMES; THE SKIN IS THE AUTHORITY FOR PROSE. *** All fifteen rooms carry a per-faction `description` (the buried level used to serve the Reclaimers' text to a Monarch palace and a Giant shrine alike), but the buried level's NAMES are the same on every one of the nine outpost PNGs - First Landing, Second Landing, The Pump Room, Storage Halls, The Shallow Digs - so they are the same here too. Chips are the map label's own distinctive word: never a structural id ('Landing 1'), never a word absent from the label ('Cells' for The Scriptorium Dormitory), and never the generic half a sibling room shares ('Imperial' for both the Imperial Hall and the Imperial Vault). Locked by web003MapNames.",
   "factions": {
     "forgotten_order": {
       "outpost_gate": {
@@ -31,17 +31,17 @@
       },
       "outpost_quarters": {
         "name": "The Scriptorium Dormitory",
-        "shortName": "Cells",
+        "shortName": "Dormitory",
         "description": "Narrow cells off a shared corridor, each with a desk and a candle. The Order sleeps in shifts so the reading-rooms are never empty."
       },
       "outpost_lab": {
         "name": "The High Reading Room",
-        "shortName": "Reading",
+        "shortName": "High Reading",
         "description": "Where the Order's senior scholars work. Glass cabinets of pre-flood manuscripts, an Aether-stabilized desk, and Jorah at the heart of it with a footnote in hand."
       },
       "outpost_relic_vault": {
         "name": "The Sealed Archive",
-        "shortName": "Archive",
+        "shortName": "Sealed Archive",
         "description": "Mechanical locks behind a sigil-marked door. The Order's most sensitive recovered texts wait inside, untranslated by deliberate policy."
       },
       "outpost_chapel": {
@@ -55,28 +55,28 @@
         "description": "Stone stairs to the deeper archive levels. The Order's oldest texts live below; the air is dry by Aetheric design and the light is rationed."
       },
       "buried_landing_one": {
-        "name": "The Under-Stair",
-        "shortName": "Under-Stair",
+        "name": "First Landing",
+        "shortName": "First Landing",
         "description": "A wide platform of cracked Tartarian stone, and the point where the Order stops replacing the lamps. The stair behind you climbs north to the threshold; ahead it keeps dropping south, and the brothers' ledger has no entry for what is down there."
       },
       "buried_landing_two": {
-        "name": "The Unwritten Junction",
-        "shortName": "Junction",
+        "name": "Second Landing",
+        "shortName": "Second Landing",
         "description": "Where the Order's own maps end, and are honest about it. Pumps west, the sealed stores east, the cuts south, the stair back north. A brother has chalked a question mark on the south wall and initialled it; nobody has rubbed it out."
       },
       "buried_pumps": {
-        "name": "The Water Office",
-        "shortName": "Water Office",
+        "name": "The Pump Room",
+        "shortName": "Pump Room",
         "description": "Old Aetheric pumps churn the silt-water out of the lower levels, and have run since before the Order kept records of them. A reading-desk has been dragged in and bolted down: someone takes their measure every week and files it where you will not see. The only corridor runs back east to the junction."
       },
       "buried_storage": {
-        "name": "The Sealed Stores",
-        "shortName": "Stores",
+        "name": "Storage Halls",
+        "shortName": "Storage Halls",
         "description": "Tartarian crates the Order has catalogued and not opened, each with a brass tag and a date. The mud-glass containers in the back row are old enough to be their own field of study. One corridor, back west to the junction."
       },
       "buried_shallow_digs": {
-        "name": "The Reading Cut",
-        "shortName": "Reading Cut",
+        "name": "The Shallow Digs",
+        "shortName": "Shallow Digs",
         "description": "The Order does not dig for salvage; it digs for text. Tarpaulins, rationed lamps, a cut opened into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth. Two brothers sit at it in shifts, writing down what they hear. The way out is north, the way you came."
       }
     },
@@ -89,7 +89,7 @@
       },
       "outpost_central": {
         "name": "The Court of Standards",
-        "shortName": "Court",
+        "shortName": "Standards",
         "description": "A flagstone court ringed with the standards of every Lost Capital. A Monarch banner hangs over the central plinth where a cracked map-stone has been re-carved twice.",
         "open_air": true
       },
@@ -115,7 +115,7 @@
       },
       "outpost_lab": {
         "name": "The Cabinet of Curiosities",
-        "shortName": "Cabinet",
+        "shortName": "Curiosities",
         "description": "The Monarchs' private collection of suppressed Tartarian artifacts. Jorah catalogs each piece for the family that owns it; nothing leaves these shelves."
       },
       "outpost_relic_vault": {
@@ -134,28 +134,28 @@
         "description": "Polished mud-glass stairs to the family's private levels. Only Monarchs and their named retainers descend; the door at the bottom is keyed to dynastic blood."
       },
       "buried_landing_one": {
-        "name": "The Undercourt Landing",
-        "shortName": "Undercourt",
+        "name": "First Landing",
+        "shortName": "First Landing",
         "description": "A wide platform of cracked Tartarian stone with its mud-glass facing stripped off long ago and never replaced — the Monarchs finish what guests can see. The stair behind you climbs north to the Atrium; ahead it keeps dropping south into the dark."
       },
       "buried_landing_two": {
-        "name": "The Lower Junction",
-        "shortName": "Junction",
+        "name": "Second Landing",
+        "shortName": "Second Landing",
         "description": "Where the household's writ stops. Pumps west, the disused cellars east, the cuts south, the stair back north. A seneschal's notice is nailed to the wall declaring the south corridor no concern of the family, dated the year two retainers went down it."
       },
       "buried_pumps": {
-        "name": "The Silt Works",
-        "shortName": "Silt Works",
+        "name": "The Pump Room",
+        "shortName": "Pump Room",
         "description": "Old Aetheric pumps churn the silt-water out from under the Court. They have run for centuries and no Monarch ever ordered it — a household that would notice the day they stopped and cannot say who keeps them running. The only corridor runs back east to the junction."
       },
       "buried_storage": {
-        "name": "The Disused Cellars",
-        "shortName": "Cellars",
+        "name": "Storage Halls",
+        "shortName": "Storage Halls",
         "description": "Tartarian crates under a Monarch seal that predates the current line, most rotted through, some intact. The mud-glass containers in the back row are old enough to count as artifacts, which is exactly why they are down here and not on display upstairs. One corridor, back west to the junction."
       },
       "buried_shallow_digs": {
-        "name": "The Undercut",
-        "shortName": "Undercut",
+        "name": "The Shallow Digs",
+        "shortName": "Shallow Digs",
         "description": "The deepest ground beneath the Court that anyone has bothered to map, and the family does not put it in writing. Tarpaulins, rope ladders, braziers somebody keeps lit. The cuts open into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth. The way out is north, the way you came."
       }
     },
@@ -194,7 +194,7 @@
       },
       "outpost_lab": {
         "name": "The Glyph Chamber",
-        "shortName": "Glyphs",
+        "shortName": "Glyph",
         "description": "A room of Aetheric mud-glass tablets propped on stone easels. Jorah translates the older glyphs in candlelight — the Aether is what reads the text, not her eyes."
       },
       "outpost_relic_vault": {
@@ -213,28 +213,28 @@
         "description": "Worn stone stairs into the True Tartarian Catacombs themselves. Each step has been touched by a thousand bare feet; the air below smells of mud-glass and ancestor."
       },
       "buried_landing_one": {
-        "name": "The First Rest",
-        "shortName": "First Rest",
+        "name": "First Landing",
+        "shortName": "First Landing",
         "description": "A wide platform of cracked Tartarian stone, worn to a shine down the middle by bare feet. The stair behind you climbs north to the threshold; ahead it keeps dropping south. The keepers pause here out of habit, though none of them remembers being told to."
       },
       "buried_landing_two": {
-        "name": "The Turning",
-        "shortName": "Turning",
+        "name": "Second Landing",
+        "shortName": "Second Landing",
         "description": "Where the walked ground ends. Pumps west, the kept halls east, the cuts south, the stair back north. The keepers have a name for every stone down to this point and no name at all for the south corridor, which is their way of saying it."
       },
       "buried_pumps": {
-        "name": "The Breathing Room",
-        "shortName": "Breathing",
+        "name": "The Pump Room",
+        "shortName": "Pump Room",
         "description": "Old Aetheric pumps draw the silt-water out from under the catacombs so that the dead stay dry. They have run for centuries. The keepers speak of them the way you speak of a lung — not maintained, simply going. The only corridor runs back east to the turning."
       },
       "buried_storage": {
-        "name": "The Kept Halls",
-        "shortName": "Kept Halls",
+        "name": "Storage Halls",
+        "shortName": "Storage Halls",
         "description": "Tartarian crates the keepers have never sold and never opened, stacked the way the last hands left them. The mud-glass containers in the back row are older than the oldest name on the shelves upstairs. One corridor, back west to the turning."
       },
       "buried_shallow_digs": {
-        "name": "The Deep Cut",
-        "shortName": "Deep Cut",
+        "name": "The Shallow Digs",
+        "shortName": "Shallow Digs",
         "description": "The furthest the True Tartarians have gone beneath their own dead, and they went carefully. Rope ladders, low braziers, cloth laid over the raw stone. The cuts open into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth; the keepers call that sound an ancestor clearing their throat. The way out is north, the way you came."
       }
     },
@@ -258,7 +258,7 @@
       },
       "outpost_messhall": {
         "name": "The Imperial Hall",
-        "shortName": "Imperial",
+        "shortName": "Imperial Hall",
         "description": "A long table laid with twelve covers for one diner. Halem still serves to dynastic protocol; the empty chairs are a discipline, not a sadness."
       },
       "outpost_workshop": {
@@ -268,7 +268,7 @@
       },
       "outpost_quarters": {
         "name": "The Royal Quarters",
-        "shortName": "Royal",
+        "shortName": "Quarters",
         "description": "Curtained beds with embroidered dynastic standards. Even the empty bunks are made up; the Dynasty maintains the appearance of fullness as a discipline."
       },
       "outpost_lab": {
@@ -283,7 +283,7 @@
       },
       "outpost_chapel": {
         "name": "The Coronation Chamber",
-        "shortName": "Chamber",
+        "shortName": "Coronation",
         "description": "A small room reserved for the dynasty's private rites. The throne in the corner is a working chair, not a relic; it is sat in only by those of the line."
       },
       "outpost_culvert_descent": {
@@ -292,28 +292,28 @@
         "description": "Carved stairs to the dynasty's lower chambers — burial vaults, archive crypts, the council room of the empty thrones."
       },
       "buried_landing_one": {
-        "name": "The Lower Crown Landing",
-        "shortName": "Crown Landing",
+        "name": "First Landing",
+        "shortName": "First Landing",
         "description": "A wide platform of cracked Tartarian stone, the sockets of stripped standards still set in the wall. The stair behind you climbs north to the Crown Gate; ahead it keeps dropping south, past everything the empire never got around to finishing."
       },
       "buried_landing_two": {
-        "name": "The Abdicated Junction",
-        "shortName": "Junction",
+        "name": "Second Landing",
+        "shortName": "Second Landing",
         "description": "Where the imperial survey simply stops. Pumps west, the tribute stores east, the cuts south, the stair back north. The last herald to inventory this level wrote 'pending' beside the south corridor, in a hand three hundred years dead."
       },
       "buried_pumps": {
-        "name": "The Tribute Pumps",
-        "shortName": "Tribute Pumps",
+        "name": "The Pump Room",
+        "shortName": "Pump Room",
         "description": "Old Aetheric pumps churn the silt-water out of the lower chambers — imperial work still doing imperial duty with nobody left to bill for it. They have run for centuries. The only corridor runs back east to the junction."
       },
       "buried_storage": {
-        "name": "The Tribute Stores",
-        "shortName": "Tribute",
+        "name": "Storage Halls",
+        "shortName": "Storage Halls",
         "description": "Tartarian crates stamped with the marks of districts that no longer exist, most rotted through, some intact. The mud-glass containers in the back row were somebody's taxes once. One corridor, back west to the junction."
       },
       "buried_shallow_digs": {
-        "name": "The Unfinished Works",
-        "shortName": "Works",
+        "name": "The Shallow Digs",
+        "shortName": "Shallow Digs",
         "description": "An imperial excavation that ran out of empire. Tarpaulins, rope ladders, braziers relit by whoever is posted here now. The cuts open into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth, and every survey peg still standing carries a crown. The way out is north, the way you came."
       }
     },
@@ -332,7 +332,7 @@
       },
       "outpost_armory": {
         "name": "The Secured Storage",
-        "shortName": "Storage",
+        "shortName": "Secured",
         "description": "Concealed-carry holsters, suppressed bolt-casters, and a small but immaculate Tartarian relic in a glass case 'for reference.' Irma signs each piece out as 'recovered property.'"
       },
       "outpost_messhall": {
@@ -371,35 +371,35 @@
         "description": "An unmarked stairwell behind a key-card door. The lower floors hold the Architects' operational records — anything sensitive enough to never be filed by name."
       },
       "buried_landing_one": {
-        "name": "Sublevel One",
-        "shortName": "Sublevel 1",
+        "name": "First Landing",
+        "shortName": "First Landing",
         "description": "A wide platform of cracked Tartarian stone with a modern handrail bolted through it and a camera that may or may not be wired to anything. The stair behind you climbs north to reception; ahead it keeps dropping south, and the floor plan on the wall stops at this level."
       },
       "buried_landing_two": {
-        "name": "The Access Junction",
-        "shortName": "Access",
+        "name": "Second Landing",
+        "shortName": "Second Landing",
         "description": "Pumps west, records east, the cuts south, the stair back north. A laminated sign gives every direction a status code. The south corridor's code is not in the legend, and asking after it is itself a flag."
       },
       "buried_pumps": {
-        "name": "Plant",
-        "shortName": "Plant",
+        "name": "The Pump Room",
+        "shortName": "Pump Room",
         "description": "Old Aetheric pumps churn the silt-water out of the lower floors, wired into a modern panel with a maintenance log nobody has signed since the handover. They have run for centuries. The only corridor runs back east to the junction."
       },
       "buried_storage": {
-        "name": "Records",
-        "shortName": "Records",
+        "name": "Storage Halls",
+        "shortName": "Storage Halls",
         "description": "Tartarian crates re-labelled with barcodes, most rotted through, some intact — inventory the Architects took possession of rather than bought. The mud-glass containers in the back row are shelved under a category with no name on it. One corridor, back west to the junction."
       },
       "buried_shallow_digs": {
-        "name": "The Site",
-        "shortName": "Site",
+        "name": "The Shallow Digs",
+        "shortName": "Shallow Digs",
         "description": "An active excavation the Architects run and do not describe. Tarpaulins, rope ladders, work lights on a generator. The cuts open into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth, which appears on the paperwork as an environmental factor. The way out is north, the way you came."
       }
     },
     "servants_of_giants": {
       "outpost_gate": {
         "name": "The Vigil Door",
-        "shortName": "Vigil",
+        "shortName": "Vigil Door",
         "description": "A stone arch wreathed in chains and lit by a single Giant-burnished lantern. The keeper inclines their head as you pass; speech is for the inner halls.",
         "open_air": true
       },
@@ -441,7 +441,7 @@
       },
       "outpost_chapel": {
         "name": "The Vigil Chamber",
-        "shortName": "Shrine",
+        "shortName": "Chamber",
         "description": "A meditation room facing the Vault. The Servants come here to keep the silent watch — eight hours, no speaking, no light but the tomb-lantern."
       },
       "outpost_culvert_descent": {
@@ -450,28 +450,28 @@
         "description": "Stairs to the lower vigil-cells. The Servants who sit the deepest watch live below; you do not interrupt their silence without permission."
       },
       "buried_landing_one": {
-        "name": "The First Vigil Step",
-        "shortName": "First Step",
+        "name": "First Landing",
+        "shortName": "First Landing",
         "description": "A wide platform of cracked Tartarian stone under a single chain-hung lantern. The stair behind you climbs north to the Vigil Door; ahead it keeps dropping south. The Servants stop here to listen before going on, and so should you."
       },
       "buried_landing_two": {
-        "name": "The Listening Junction",
-        "shortName": "Listening",
+        "name": "Second Landing",
+        "shortName": "Second Landing",
         "description": "Pumps west, the offering stores east, the cuts south, the stair back north. The Servants hold that the south corridor runs toward something sleeping — which they take as a reason to go quietly, not as a reason not to go."
       },
       "buried_pumps": {
-        "name": "The Deep Breath",
-        "shortName": "Deep Breath",
+        "name": "The Pump Room",
+        "shortName": "Pump Room",
         "description": "Old Aetheric pumps draw the silt-water out of the lower vigil-cells. They have run for centuries, and the Servants have a name for their rhythm that they will not say aloud to a visitor. The only corridor runs back east to the junction."
       },
       "buried_storage": {
-        "name": "The Offering Stores",
-        "shortName": "Offerings",
+        "name": "Storage Halls",
+        "shortName": "Storage Halls",
         "description": "Tartarian crates left as offerings and never opened, most rotted through, some intact. The mud-glass containers in the back row are old enough that leaving them sealed has become the whole of the point. One corridor, back west to the junction."
       },
       "buried_shallow_digs": {
-        "name": "The Waking Cut",
-        "shortName": "Waking Cut",
+        "name": "The Shallow Digs",
+        "shortName": "Shallow Digs",
         "description": "The deepest ground the Servants have opened, and they opened it slowly. Tarpaulins, rope ladders, tomb-lanterns in place of braziers. The cuts run into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth — which is precisely why the digging stopped here. The way out is north, the way you came."
       }
     },
@@ -529,28 +529,28 @@
         "description": "Stairs to the structural cellars — load-bearing test pieces, the older Aethercraft cores still in service, the foundry pits."
       },
       "buried_landing_one": {
-        "name": "The Load Landing",
-        "shortName": "Load Landing",
+        "name": "First Landing",
+        "shortName": "First Landing",
         "description": "A wide platform of cracked Tartarian stone, chalked with arrows and a load rating in a foreman's hand. The stair behind you climbs north to the threshold; ahead it keeps dropping south, and the chalk stops where the surveys do."
       },
       "buried_landing_two": {
-        "name": "The Junction Bay",
-        "shortName": "Junction",
+        "name": "Second Landing",
+        "shortName": "Second Landing",
         "description": "Pumps west, materials east, the cuts south, the stair back north. Every direction carries a chalked figure beside it except south, which has a figure crossed out twice and re-chalked as a question mark."
       },
       "buried_pumps": {
-        "name": "The Pump Gallery",
-        "shortName": "Pump Gallery",
+        "name": "The Pump Room",
+        "shortName": "Pump Room",
         "description": "Old Aetheric pumps churn the silt-water out of the lower levels — pre-flood Aethercraft the Builders study and cannot reproduce. They have run for centuries. Two stand opened up with their panels laid out in order on a cloth. The only corridor runs back east to the junction."
       },
       "buried_storage": {
-        "name": "The Under-Store",
-        "shortName": "Under-Store",
+        "name": "Storage Halls",
+        "shortName": "Storage Halls",
         "description": "Tartarian crates stacked by weight rather than by contents, most rotted through, some intact. The mud-glass containers in the back row are test pieces nobody is willing to cut into. One corridor, back west to the junction."
       },
       "buried_shallow_digs": {
-        "name": "The Survey Cut",
-        "shortName": "Survey Cut",
+        "name": "The Shallow Digs",
+        "shortName": "Shallow Digs",
         "description": "A working excavation, shored properly and lit properly, which is how you tell it from everyone else's. Tarpaulins, rope ladders, braziers set well back from the timbering. The cuts open into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth, and the shoring is doubled there. The way out is north, the way you came."
       }
     },
@@ -624,7 +624,7 @@
       },
       "buried_storage": {
         "name": "Storage Halls",
-        "shortName": "Stock Halls",
+        "shortName": "Storage Halls",
         "description": "Tartarian crates shoved aside to make room for banner rolls, film cans and printed stacks. Most of the originals have rotted through; some are intact. The mud-glass containers in the back row get photographed monthly from the same angle. One corridor, back west to the second landing."
       },
       "buried_shallow_digs": {

@@ -17,7 +17,12 @@ const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p)
 describe('OTA-1289 (port of golem OTA-1277 part 1) — the room buttons say where you have been', () => {
   it('⚠⚠ visited rooms carry a mark, unvisited do not', () => {
     const box = src('app', 'components', 'InputBox.tsx');
-    expect(box).toContain('seen.has(targetId) ? `✓ ${name}` : name');
+    // ⚠ WEB-003 put a compass glyph ahead of the check, so the template moved.
+    // The RULE this test guards is unchanged and is asserted in both halves:
+    // a walked room carries the ✓, an unwalked one does not, and the mark still
+    // sits immediately before the name rather than after it.
+    expect(box).toContain('const walked = seen.has(targetId);');
+    expect(box).toContain('label: `${arrow} ${walked ? `✓ ${name}` : name}`,');
   });
 
   it('⚠⚠ it reads the SAME set beginScene earns — the mark cannot lie', () => {
