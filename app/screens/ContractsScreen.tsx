@@ -7,7 +7,8 @@ import { findHuntById, HUNTS, checkKindLabel, biomeLabel, stageTypeLabel, weapon
 import { getItemPreview } from '../components/itemPreview';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
 import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
-import { findFactionQuestById, FACTION_QUESTS, factionQuestReady } from '../engine/factionQuests';
+import { findFactionQuestById, FACTION_QUESTS, type FactionQuestDef } from '../engine/factionQuests';
+import { missionTurnInReady } from '../engine/missionReady';
 import { escortToggleLabel } from '../engine/escort';
 import { FACTIONS } from '../engine/factions';
 // OTA-1073 — Phase 1 slice 2: the Chronicle's people column.
@@ -17,19 +18,21 @@ import { missionObjectiveLocationId } from '../engine/missionRouting';
 import { getLocationById } from '../engine/encounter';
 import { GREAT_CLIMBS } from '../engine/greatClimbs';
 import { theLower } from '../engine/grammar';
-import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
+import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS, storyPerkLabel } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
 import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
 import { openContractMarkers } from '../engine/contractMarkers';
 import { missionLegs } from '../engine/broker';
 import { carriedSigils } from '../engine/sigils';
-import { canonicalDistanceFromGrid, canonicalDistanceFromPlayer, canonicalDistance } from '../engine/worldMap';
+import { canonicalDistanceFromGrid, canonicalDistanceFromPlayer, canonicalDistance, canonicalCellOf } from '../engine/worldMap';
+import { bountyCourseState, bountyCourseLabel, bountyCourseIsButton } from '../engine/bountyCourse';
 import {
   ensureMainQuest,
   phaseLabel,
   phaseHint,
   LOST_CAPITAL_LOCATIONS,
   coreGateNextAction,
+  canStayAtTheNexus, // OTA-1248 — the earned fourth door
 } from '../engine/mainQuest';
 import { GUARDIANS_BY_CAPITAL } from '../engine/coreGuardians';
 
@@ -96,6 +99,8 @@ export function ContractsScreen() {
   const setFactionQuestActive = useGameStore((s) => s.setFactionQuestActive);
   const setContractActive = useGameStore((s) => s.setContractActive);
   const routeMission = useGameStore((s) => s.routeMission);
+  const routeGreatClimb = useGameStore((s) => s.routeGreatClimb);
+  const setGreatClimbActive = useGameStore((s) => s.setGreatClimbActive);
   const discardLead = useGameStore((s) => s.discardLead);
   // OTA-1037 — the refusal strip answers THIS visit's taps; don't let a stale line
   // greet the next visit to the screen.
@@ -107,7 +112,7 @@ export function ContractsScreen() {
   const requestTravelConfirm = useGameStore((s) => s.requestTravelConfirm);
   const setWhisperCourse = useGameStore((s) => s.setWhisperCourse);
   const appendLog = useGameStore((s) => s.appendLog);
-  const [pendingRoute, setPendingRoute] = useState<{ id: string; name: string; missionId?: string } | null>(null);
+  const [pendingRoute, setPendingRoute] = useState<{ id: string; name: string; missionId?: string; climbId?: string } | null>(null);
   // 2026-05-25 — branded refusal modal for hub-room gate. Same
   // palette as the rest of the game; replaces native Alert.alert.
   const [tab, setTab] = useState<Tab>('contracts');
@@ -117,7 +122,20 @@ export function ContractsScreen() {
   // list, never merge them). One flag drives both the main screen toggle and the
   // toggle inside the expanded Primary Objective box. Local state (view option),
   // matching the screen's other toggles; not persisted.
-  const [sortByDistance, setSortByDistance] = useState(false);
+  //
+  // OTA-1175 — the boolean became a THREE-WAY MODE when READY TO HAND IN joined
+  // it. Two independent toggles would have allowed four states, two of them
+  // nonsense ("ready first, but don't sort by distance" — ready contracts sort by
+  // distance BY DEFINITION here). One mode, two buttons, each tap clearing the
+  // other, keeps the impossible states unrepresentable.
+  type SortMode = 'default' | 'distance' | 'ready';
+  const [sortMode, setSortMode] = useState<SortMode>('default');
+  // Tapping an active mode returns to the default order — same as the old toggle.
+  const pickSort = (m: Exclude<SortMode, 'default'>) =>
+    setSortMode((cur) => (cur === m ? 'default' : m));
+  // Both non-default modes order by distance, so everything that only cares
+  // "is a distance sort running" reads this and is unchanged by the new mode.
+  const sortByDistance = sortMode !== 'default';
   // OTA-606 — honor a deep-link tab request (e.g. the first-collectible popup
   // wants the Collectibles tab, not the default Contracts tab). Apply it once
   // on entry, then clear it so a later normal open lands on the default.
@@ -179,10 +197,24 @@ export function ContractsScreen() {
     const info = ck ? contractMarkerByKey[ck] : undefined;
     return info ? <Text style={styles.contractBadge}>{info.number}◆ </Text> : null;
   };
-  const contractRoute = (toggleKey: string) => {
+  // ⚠ OTA-1190 — `tracked` GATES THE ROUTE. This offered ROUTE on a PAUSED contract, so
+  // a player could walk the whole way to an objective for a run that is not advancing,
+  // arrive, meet nothing to do with the contract, and reasonably conclude the hunt was
+  // broken. (Reported: routed to a hunt anchor, fought a Core Guardian, no hunt beat —
+  // because the run had never been activated.) The card already SAID "⏸ PAUSED" two rows
+  // up; the button beneath it disagreed. Same defect family as OTA-1187: a control that
+  // acts without the state that gives it meaning.
+  const contractRoute = (toggleKey: string, tracked = true) => {
     const ck = toContractKey(toggleKey);
     const info = ck ? contractMarkerByKey[ck] : undefined;
     if (!info) return null;
+    if (!tracked) {
+      return (
+        <Text style={styles.routeHereNote}>
+          ▸ Paused — activate it below before setting a course, or you'll walk to {info.anchorName} for a contract that isn't running.
+        </Text>
+      );
+    }
     if (player?.currentLocationId === info.anchorId) {
       return <Text style={styles.routeHereNote}>▸ {info.number}◆ You're at {info.anchorName}.</Text>;
     }
@@ -230,13 +262,23 @@ export function ContractsScreen() {
   // Sort a section's list by distance (nearest first) WHEN sortByDistance is on,
   // else leave the order untouched. Placeless entries (null) sort last. Sections
   // are never merged — this only reorders within one type, keeping the grouping.
-  const byMoves = <T,>(arr: readonly T[], locOf: (t: T) => string | null | undefined): T[] => {
+  //
+  // OTA-1175 — in READY mode the ready-to-hand-in entries rise to the top of
+  // their section first, THEN distance breaks the tie inside each half. Sections
+  // that pass no `readyOf` (nothing in them can be handed in) simply sort by
+  // distance in both modes, which is what they did before.
+  const byMoves = <T,>(
+    arr: readonly T[],
+    locOf: (t: T) => string | null | undefined,
+    readyOf?: (t: T) => boolean,
+  ): T[] => {
     if (!sortByDistance) return arr as T[];
-    const key = (t: T) => {
+    const dist = (t: T) => {
       const m = movesTo(locOf(t));
       return m === null ? Number.POSITIVE_INFINITY : m;
     };
-    return [...arr].sort((a, b) => key(a) - key(b));
+    const rank = (t: T) => (sortMode === 'ready' && readyOf?.(t) ? 0 : 1);
+    return [...arr].sort((a, b) => rank(a) - rank(b) || dist(a) - dist(b));
   };
 
   // Uniform ACTIVATE / DEACTIVATE (pause) toggle for any contract kind, mirroring
@@ -248,12 +290,12 @@ export function ContractsScreen() {
     tracked: boolean,
   ) => (
     <Pressable
-      style={({ pressed }) => [styles.trackBtn, !tracked && styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+      style={({ pressed }) => [styles.trackBtn, tracked ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
       onPress={() => setContractActive(kind, id, !tracked)}
       accessibilityRole="button"
       accessibilityState={{ selected: tracked }}
     >
-      <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
+      <Text style={[styles.trackBtnText, tracked ? styles.trackBtnTextOn : styles.trackBtnTextOff]}>
         {tracked ? '▮▮ DEACTIVATE' : '▶ SET ACTIVE'}
       </Text>
     </Pressable>
@@ -337,7 +379,121 @@ export function ContractsScreen() {
   const brokerLegs = brokerMission ? (missionLegs(brokerMission) ?? []) : [];
   const hasRelic = (name: string) =>
     (player.inventory ?? []).some((i) => i.name === name && (i.quantity ?? 1) > 0);
-  const brokerReady = brokerLegs.length > 0 && brokerLegs.every((l) => hasRelic(l.itemName));
+
+  // OTA-1175 — READINESS, ONCE, FOR EVERY KIND. These three wrappers are the only
+  // places this screen asks "can it be handed in?", and all three go through
+  // engine/missionReady. The card pills, the COMPLETE gates and the READY TO HAND
+  // IN sort therefore cannot disagree — which they could before, when each section
+  // computed its own answer inline.
+  //
+  // ⚠ A record whose DEF no longer resolves is never ready: the cards already
+  // filter orphans out (`if (!def) return null`), and a sort that floated a card
+  // that does not render would leave a gap the player cannot act on.
+  const countItem = (name: string) =>
+    (player?.inventory ?? [])
+      .filter((it) => it.name.toLowerCase() === name.toLowerCase())
+      .reduce((n, it) => n + (it.quantity ?? 1), 0);
+  const stageRunReady = (
+    kind: 'hunt' | 'mystery' | 'storyline',
+    run: { stage: number },
+    def: { stages: readonly unknown[] } | null | undefined,
+  ): boolean => !!def && missionTurnInReady({ kind, stage: run.stage, stageCount: def.stages.length });
+  const factionRecReady = (
+    rec: { stage: number },
+    def: FactionQuestDef | null | undefined,
+  ): boolean =>
+    !!def && missionTurnInReady({ kind: 'faction_quest', def, stage: rec.stage, countItem });
+  const brokerReady = missionTurnInReady({
+    kind: 'broker',
+    legs: brokerLegs,
+    hasItem: hasRelic,
+  });
+
+  // OTA-1175 — a faction contract's card swaps the distance it shows once the work
+  // is done: en route it points at the OBJECTIVE, ready it points at the faction
+  // HOME you hand it in at. The distance SORT was still keying off the objective,
+  // so a ready contract sorted by a number its own card was not displaying. One
+  // helper now feeds both, and they agree in every mode.
+  const factionSortLocId = (fq: { rec: { stage: number }; def: FactionQuestDef | null }) => {
+    if (!fq.def) return null;
+    const home = startingLocationForFaction(fq.def.factionId);
+    return factionRecReady(fq.rec, fq.def) ? home : (missionObjectiveLocationId(fq.def) ?? home);
+  };
+
+  // OTA-1175 — THE READY TO HAND IN ROLL-UP. The owner asked for the ready ones
+  // "right to the top", pulled FROM the groups — floating them inside their own
+  // section would not have done that: a ready faction contract sits below Hunts,
+  // Mysteries and Storylines, so "top of its group" can still be most of a screen
+  // down. This gathers them across every kind into one list above everything else,
+  // nearest first, while the full cards stay where they were.
+  //
+  // ⚠ Each row's COMPLETE calls the SAME completeContractFromUI the card's button
+  // calls — it is not a second turn-in path. Anything that store refuses (the
+  // face-to-face gate on hunts, for one) is refused identically here and surfaces
+  // on the same refusal strip.
+  type ReadyRow = {
+    key: string;
+    tag: string;
+    title: string;
+    locId: string | null;
+    onComplete: (() => void) | null;
+    note: string;
+  };
+  const readyRows: ReadyRow[] = [];
+  for (const h of hunts) {
+    const d = h.def;
+    if (d && stageRunReady('hunt', h.run, d))
+      readyRows.push({
+        key: `rh_${h.run.id}`, tag: 'HUNT', title: d.title,
+        locId: markerLocId(`h_${h.run.id}`),
+        note: 'paid face to face — the posting faction’s agent, or the trading post for 80%',
+        onComplete: () => completeContractFromUI('hunt', d.id),
+      });
+  }
+  for (const m of mysteries) {
+    const d = m.def;
+    if (d && stageRunReady('mystery', m.run, d))
+      readyRows.push({
+        key: `rm_${m.run.id}`, tag: 'MYSTERY', title: d.title,
+        locId: markerLocId(`m_${m.run.id}`),
+        note: 'hand to the posting faction’s agent, or the trading post for 80%',
+        onComplete: () => completeContractFromUI('mystery', d.id),
+      });
+  }
+  for (const sl of storylines) {
+    const d = sl.def;
+    if (d && stageRunReady('storyline', sl.run, d))
+      readyRows.push({
+        key: `rs_${sl.run.id}`, tag: 'STORYLINE', title: d.title,
+        locId: markerLocId(`s_${sl.run.id}`),
+        note: 'hand to the posting faction’s agent, or the trading post for 80%',
+        onComplete: () => completeContractFromUI('storyline', d.id),
+      });
+  }
+  for (const fq of factionQuests) {
+    const d = fq.def;
+    if (d && factionRecReady(fq.rec, d))
+      readyRows.push({
+        key: `rf_${d.id}`, tag: 'FACTION', title: d.title,
+        locId: factionSortLocId(fq),
+        note: 'same-faction agent pays FULL; the trading post brokers it for 80%',
+        onComplete: () => completeContractFromUI('faction_quest', d.id),
+      });
+  }
+  // The alliance seals at the Parley Ground rather than through a COMPLETE tap,
+  // so it lists (it IS ready to hand in) with a route note and no button.
+  if (brokerReady) {
+    readyRows.push({
+      key: 'rb_broker', tag: 'ALLIANCE', title: 'Parley of Factions',
+      locId: 'parley_ground', note: 'seal the alliance at the Parley Ground',
+      onComplete: null,
+    });
+  }
+  readyRows.sort(
+    (a, b) =>
+      (movesTo(a.locId) ?? Number.POSITIVE_INFINITY) -
+      (movesTo(b.locId) ?? Number.POSITIVE_INFINITY),
+  );
 
   // OTA-1025 — count only records whose DEF still resolves: the cards filter
   // orphans out, and the header must agree (never "6 ACTIVE" over 5 cards).
@@ -361,10 +517,12 @@ export function ContractsScreen() {
 
   return (
     <View style={styles.container}>
+      {/* OTA-1228 — v2 id: the body gained the host hand-in rule (OTA-1224) and dismissals
+          are per-install, so the old id would hide the new line from existing testers. */}
       <FirstTimeHint
-        id="contracts_first_open"
+        id="contracts_first_open_v2"
         title="Your missions"
-        body="Everything you've taken on lives here — hunts, faction work, and bounties. Tap one to set a course or check your progress."
+        body="Everything you've taken on lives here — hunts, faction work, and bounties. Tap one to set a course or check your progress. Hand-ins answer to whoever owns the ground you stand on — if they won't take your work, a broker, courier, or the Hidden Market will, for a cut."
       />
       <View style={styles.header}>
         <TouchableOpacity
@@ -393,6 +551,8 @@ export function ContractsScreen() {
         // they've attempted, and which Capitals are still untouched.
         if (!player) return null;
         const mq = ensureMainQuest(player.mainQuest);
+        // OTA-1248 — asked once per render, at the same place the phase is read.
+        const canStay = canStayAtTheNexus(player, worldMemory);
         const recoveredCount = mq.coresRecovered.length;
         const fledByCapital = (worldMemory.memorableEvents ?? []).reduce<Record<string, number>>(
           (acc, e) => {
@@ -445,7 +605,9 @@ export function ContractsScreen() {
               if (!LOST_CAPITAL_LOCATIONS.includes(here)) return null;
               if (mq.coresRecovered.includes(here)) return null;
               const next = coreGateNextAction(player.factionId);
-              return <Text style={styles.mainQuestNextAction}>→ At this Capital: {next}.</Text>;
+              // ⚠ Flavour, not an instruction — the verb no longer raises the
+              // Guardian. ★ SUMMON, directly below, is the only door.
+              return <Text style={styles.mainQuestNextAction}>→ At this Capital: {next}. Then tap ★ SUMMON.</Text>;
             })()}
             {atCapitalForSummon && (
               <TouchableOpacity
@@ -464,9 +626,13 @@ export function ContractsScreen() {
                 <View style={styles.mqTrackerHeadRow}>
                   <Text style={styles.mqTrackerHead}>9 CAPITALS · {recoveredCount}/9 CORES</Text>
                   {/* arb-fix — same SORT BY DISTANCE toggle, here for the Capital list.
-                      Reorders the 9 Capitals nearest-first (finished ones sink). */}
+                      Reorders the 9 Capitals nearest-first (finished ones sink).
+                      OTA-1175 — deliberately NOT given the READY mode: a Capital is a
+                      boss objective, not a contract, so it has nothing to hand in. It
+                      still lights while READY mode runs, because that mode orders the
+                      Capitals by distance too — the button is telling the truth. */}
                   <Pressable
-                    onPress={() => setSortByDistance((v) => !v)}
+                    onPress={() => pickSort('distance')}
                     hitSlop={6}
                     style={({ pressed }) => [styles.mqSortBtn, sortByDistance && styles.mqSortBtnOn, pressed && styles.sortBarPressed]}
                     accessibilityRole="button"
@@ -581,6 +747,20 @@ export function ContractsScreen() {
                 >
                   <Text style={styles.mainQuestChoiceText}>PRESERVE</Text>
                 </TouchableOpacity>
+                {/* ⚠⚠ OTA-1248 — THE EARNED FOURTH. Rendered only when the run
+                    earned it, and NEVER as a disabled or greyed row: a player
+                    who has not earned STAY must not be shown a door they cannot
+                    open. The three above are unconditional and always will be. */}
+                {canStay && (
+                  <TouchableOpacity
+                    style={[styles.mainQuestChoiceBtn, { borderColor: '#8a7a5a' }]}
+                    onPress={() => useGameStore.getState().chooseEndingMainQuest('stay')}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                  >
+                    <Text style={styles.mainQuestChoiceText}>STAY</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             )}
             {mq.phase === 'ended' && mq.ending && (
@@ -637,20 +817,73 @@ export function ContractsScreen() {
       ) : (
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         {/* arb-fix — SORT BY DISTANCE toggle. Reorders every mission section by
-            moves-to-target (nearest first) while keeping each type grouped. */}
-        <Pressable
-          onPress={() => setSortByDistance((v) => !v)}
-          style={({ pressed }) => [styles.sortBar, sortByDistance && styles.sortBarOn, pressed && styles.sortBarPressed]}
-          accessibilityRole="button"
-          accessibilityState={{ selected: sortByDistance }}
-        >
-          <Text style={[styles.sortBarText, sortByDistance && styles.sortBarTextOn]}>
-            {sortByDistance ? '◈ SORTED BY DISTANCE (grouped by type)' : '◈ SORT BY DISTANCE'}
-          </Text>
-          <Text style={[styles.sortBarHint, sortByDistance && styles.sortBarTextOn]}>
-            {sortByDistance ? 'tap for default order' : 'nearest first, within each type'}
-          </Text>
-        </Pressable>
+            moves-to-target (nearest first) while keeping each type grouped.
+            OTA-1175 — READY TO HAND IN joins it on the right, same style. The two
+            share one mode, so lighting either one clears the other. */}
+        <View style={styles.sortRow}>
+          <Pressable
+            onPress={() => pickSort('distance')}
+            style={({ pressed }) => [styles.sortBar, styles.sortBarHalf, sortMode === 'distance' && styles.sortBarOn, pressed && styles.sortBarPressed]}
+            accessibilityRole="button"
+            accessibilityState={{ selected: sortMode === 'distance' }}
+          >
+            <Text style={[styles.sortBarText, sortMode === 'distance' && styles.sortBarTextOn]}>
+              {sortMode === 'distance' ? '◈ SORTED BY DISTANCE' : '◈ SORT BY DISTANCE'}
+            </Text>
+            <Text style={[styles.sortBarHint, sortMode === 'distance' && styles.sortBarTextOn]}>
+              {sortMode === 'distance' ? 'tap for default order' : 'nearest first, within each type'}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => pickSort('ready')}
+            style={({ pressed }) => [styles.sortBar, styles.sortBarHalf, sortMode === 'ready' && styles.sortBarReadyOn, pressed && styles.sortBarPressed]}
+            accessibilityRole="button"
+            accessibilityState={{ selected: sortMode === 'ready' }}
+          >
+            <Text style={[styles.sortBarText, sortMode === 'ready' && styles.sortBarReadyText]}>
+              {sortMode === 'ready' ? `✦ READY TO HAND IN · ${readyRows.length}` : '✦ SORT BY READY TO HAND IN'}
+            </Text>
+            <Text style={[styles.sortBarHint, sortMode === 'ready' && styles.sortBarReadyText]}>
+              {sortMode === 'ready' ? 'tap for default order' : 'finished work first, nearest first'}
+            </Text>
+          </Pressable>
+        </View>
+        {/* OTA-1175 — the roll-up itself: every ready contract, pulled from its
+            group to the top, nearest first. Only in READY mode; the full cards
+            stay in their sections below either way. */}
+        {sortMode === 'ready' && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle} accessibilityRole="header">
+              ✦ READY TO HAND IN {readyRows.length > 0 ? `· ${readyRows.length}` : ''}
+            </Text>
+            {readyRows.length === 0 ? (
+              <Text style={styles.readyEmpty}>
+                Nothing is ready to hand in yet — finish a contract’s work and it appears here.
+              </Text>
+            ) : (
+              readyRows.map((r) => (
+                <View key={r.key} style={[styles.card, styles.readyCard]}>
+                  <View style={styles.cardHead}>
+                    <Text style={styles.cardTitle}>{r.title}</Text>
+                    <Text style={styles.readyTag}>{r.tag}</Text>
+                  </View>
+                  {movesLine(r.locId)}
+                  <Text style={styles.cardHint}>{r.note}</Text>
+                  {r.onComplete && (
+                    <Pressable
+                      style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
+                      onPress={r.onComplete}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Complete ${r.title}`}
+                    >
+                      <Text style={styles.completeBtnText}>COMPLETE — CLAIM REWARD</Text>
+                    </Pressable>
+                  )}
+                </View>
+              ))
+            )}
+          </View>
+        )}
         {(() => {
           // OTA-912 — great-climb missions. A climb becomes a listed mission once
           // its Skyreacher Chart is used (id in unlockedGreatClimbs); it clears
@@ -660,23 +893,79 @@ export function ContractsScreen() {
           const climbMissions = GREAT_CLIMBS.filter((c) => unlocked.includes(c.id));
           if (climbMissions.length === 0) return null;
           const doneCount = climbMissions.filter((c) => bossesDown.includes(c.id)).length;
+          // ⚠ OTA-1356 — the towers join the distance sort. Owner: "they should get
+          // sorted by distance as well." Every other section has obeyed the sort bar
+          // since OTA-1175; the climbs alone rendered in fixed catalog order, so a
+          // sort the player had switched on quietly skipped five cards. Crowned
+          // towers pass a null location, which the shared comparator already sorts
+          // last — finished work sinks under the climbs still standing.
+          const climbsInOrder = byMoves(climbMissions, (c) => (bossesDown.includes(c.id) ? null : c.locationId));
           return (
             <View style={styles.section}>
               <Text style={styles.sectionTitle} accessibilityRole="header">
                 THE GREAT CLIMBS  ·  {doneCount}/5 towers taken
               </Text>
-              {climbMissions.map((c) => {
+              {climbsInOrder.map((c) => {
                 const done = bossesDown.includes(c.id);
+                const climbActive = player?.routedClimbId === c.id;
                 return (
                   <View key={c.id} style={styles.card}>
-                    <Text style={styles.cardTitle}>
-                      {done ? '✓ ' : '⚑ '}{c.noun} — {c.tiers} tiers
-                    </Text>
+                    <View style={styles.cardHead}>
+                      <Text style={styles.cardTitle}>
+                        {done ? '✓ ' : '⚑ '}{c.noun} — {c.tiers} tiers
+                      </Text>
+                      {!done && climbActive && <Text style={styles.stagePill}>ACTIVE</Text>}
+                    </View>
                     <Text style={styles.routeBody}>
                       {done
                         ? 'Crown taken — its Skyreacher piece is claimed.'
                         : 'Climb it (Hardened Climbing Strap + a whole Reclaimer\'s Rope) and beat the summit guardian for its Skyreacher piece and an Aether Collection Beacon.'}
                     </Text>
+                    {/* ⚠⚠ OTA-1305 — THE FIVE TOWERS WERE THE ONLY MISSIONS YOU
+                        COULD NOT ROUTE TO. Owner, after reading the chart: "all
+                        five beacon towers are known grid locations so I should
+                        be able to autoroute to it… it should ask me if I want to
+                        set an auto route like the rest of the missions."
+                        He was right, and the destination was never in doubt —
+                        every GreatClimb carries its own `locationId`. This
+                        section (OTA-912) simply rendered read-only cards, and no
+                        walker ever caught it because every climb test TELEPORTS
+                        (`currentLocationId: climb.locationId`) instead of
+                        travelling, so the route was never once exercised. */}
+                    {!done && movesLine(c.locationId)}
+                    {!done && player?.currentLocationId !== c.locationId && (
+                      <Pressable
+                        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                        onPress={() => setPendingRoute({ id: c.locationId, name: safeLocName(c.locationId), climbId: c.id })}
+                        accessibilityRole="button"
+                      >
+                        <Text style={styles.routeBtnText}>▸ SET COURSE TO {safeLocName(c.locationId).toUpperCase()}</Text>
+                      </Pressable>
+                    )}
+                    {!done && player?.currentLocationId === c.locationId && (
+                      <Text style={styles.routeHereNote}>▸ You're here — start the climb.</Text>
+                    )}
+                    {/* ⚠ OTA-1356 — THE TOWERS TOGGLE LIKE EVERY OTHER MISSION.
+                        Owner: "the great climbs should be able to be activated and
+                        deactivated." `routedClimbId` was always the "tower you're
+                        running" flag, but SET COURSE was the only thing that could
+                        raise it and NOTHING could lower it by hand — so a tower you'd
+                        walked away from stayed the mission you were on until you
+                        activated some other contract. Activating here pauses every
+                        other contract (single-active, across kinds); deactivating
+                        leaves the tower on the slate and any laid course intact. */}
+                    {!done && (
+                      <Pressable
+                        style={({ pressed }) => [styles.trackBtn, climbActive ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+                        onPress={() => setGreatClimbActive(c.id, !climbActive)}
+                        accessibilityRole="button"
+                        accessibilityState={{ selected: climbActive }}
+                      >
+                        <Text style={[styles.trackBtnText, climbActive ? styles.trackBtnTextOn : styles.trackBtnTextOff]}>
+                          {climbActive ? '▮▮ DEACTIVATE' : '▶ SET ACTIVE'}
+                        </Text>
+                      </Pressable>
+                    )}
                   </View>
                 );
               })}
@@ -853,12 +1142,30 @@ export function ContractsScreen() {
                 const timerLabel = !hasClock ? 'no deadline'
                   : lapsed ? '⏳ LAPSED'
                   : `⏳ ${Math.ceil(left)}h left`;
+                // ⚠ OTA-1187 — THE WHOLE CARD WAS A SET-COURSE BUTTON, and it stayed one
+                // even when there was no course to set. Standing on the quarry's outpost,
+                // a tap did nothing and said nothing while the card still read "tap to set
+                // course". Same four-state machine the World screen uses, from the same
+                // engine module, so the two screens cannot drift apart.
+                const cs = bountyCourseState(
+                  player, b.targetLocationId, b.targetLocationName, safeLocName,
+                  (() => {
+                    if (!player) return false;
+                    const here = canonicalCellOf(player.currentLocationId);
+                    const there = canonicalCellOf(b.targetLocationId);
+                    return here.x === there.x && here.y === there.y;
+                  })(),
+                );
+                const canRoute = bountyCourseIsButton(cs);
                 return (
                   <Pressable
                     key={`b_${bountyKey(b)}`}
-                    onPress={() => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
+                    onPress={canRoute
+                      ? () => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }
+                      : undefined}
+                    disabled={!canRoute}
                     style={styles.card}
-                    accessibilityRole="button"
+                    accessibilityRole={canRoute ? 'button' : 'text'}
                   >
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{b.giverName} bounty</Text>
@@ -874,7 +1181,13 @@ export function ContractsScreen() {
                     <Text style={styles.cardLocation}>📍 {b.targetLocationName}</Text>
                     {movesLine(b.targetLocationId)}
                     <Text style={styles.cardHint}>
-                      {b.progress}/{b.count} put down · pays {b.rewardTc} TC + {b.giverName} standing · tap to set course
+                      {b.progress}/{b.count} put down · pays {b.rewardTc} TC + {b.giverName} standing
+                    </Text>
+                    {/* ⚠ OTA-1187 — this line used to be a flat "· tap to set course" that
+                        was a lie in three of the four states. It now says what tapping will
+                        actually do, or why there is nothing to tap. */}
+                    <Text style={canRoute ? styles.cardHint : styles.bountyCourseNote}>
+                      {canRoute ? 'Tap to set course' : bountyCourseLabel(cs)}
                     </Text>
                   </Pressable>
                 );
@@ -885,11 +1198,11 @@ export function ContractsScreen() {
         {hunts.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle} accessibilityRole="header">HUNTS</Text>
-              {byMoves(hunts, (h) => markerLocId(`h_${h.run.id}`)).map(({ run, def }) => {
+              {byMoves(hunts, (h) => markerLocId(`h_${h.run.id}`), (h) => stageRunReady('hunt', h.run, h.def)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `h_${run.id}`;
                 const open = !!expanded[key];
-                const ready = run.stage >= def.stages.length;
+                const ready = stageRunReady('hunt', run, def);
                 const tracked = run.tracked !== false;
                 return (
                   <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityRole="button" accessibilityState={{ expanded: open }}>
@@ -899,7 +1212,7 @@ export function ContractsScreen() {
                         {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
-                    {contractRoute(key)}
+                    {contractRoute(key, tracked)}
                     {trackToggle('hunt', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {/* 2026-05-26 OTA-053 — playtester ask: hunt card
@@ -1035,11 +1348,11 @@ export function ContractsScreen() {
           {mysteries.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle} accessibilityRole="header">MYSTERIES</Text>
-              {byMoves(mysteries, (m) => markerLocId(`m_${m.run.id}`)).map(({ run, def }) => {
+              {byMoves(mysteries, (m) => markerLocId(`m_${m.run.id}`), (m) => stageRunReady('mystery', m.run, m.def)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `m_${run.id}`;
                 const open = !!expanded[key];
-                const ready = run.stage >= def.stages.length;
+                const ready = stageRunReady('mystery', run, def);
                 const tracked = run.tracked !== false;
                 return (
                   <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityRole="button" accessibilityState={{ expanded: open }}>
@@ -1049,7 +1362,7 @@ export function ContractsScreen() {
                         {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
-                    {contractRoute(key)}
+                    {contractRoute(key, tracked)}
                     {movesLine(markerLocId(key))}
                     {trackToggle('mystery', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
@@ -1105,11 +1418,11 @@ export function ContractsScreen() {
           {storylines.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle} accessibilityRole="header">STORYLINES</Text>
-              {byMoves(storylines, (sl) => markerLocId(`s_${sl.run.id}`)).map(({ run, def }) => {
+              {byMoves(storylines, (sl) => markerLocId(`s_${sl.run.id}`), (sl) => stageRunReady('storyline', sl.run, sl.def)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `s_${run.id}`;
                 const open = !!expanded[key];
-                const ready = run.stage >= def.stages.length;
+                const ready = stageRunReady('storyline', run, def);
                 const tracked = run.tracked !== false;
                 return (
                   <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]} accessibilityRole="button" accessibilityState={{ expanded: open }}>
@@ -1119,7 +1432,7 @@ export function ContractsScreen() {
                         {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
-                    {contractRoute(key)}
+                    {contractRoute(key, tracked)}
                     {movesLine(markerLocId(key))}
                     {trackToggle('storyline', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
@@ -1175,7 +1488,7 @@ export function ContractsScreen() {
           {factionQuests.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle} accessibilityRole="header">FACTION QUESTS</Text>
-              {byMoves(factionQuests, (fq) => fq.def ? (missionObjectiveLocationId(fq.def) ?? startingLocationForFaction(fq.def.factionId)) : null).map(({ rec, def }, i) => {
+              {byMoves(factionQuests, (fq) => factionSortLocId(fq), (fq) => factionRecReady(fq.rec, fq.def)).map(({ rec, def }, i) => {
                 if (!def) return null;
                 const key = `q_${def.id}_${i}`;
                 const open = !!expanded[key];
@@ -1184,11 +1497,7 @@ export function ContractsScreen() {
                 // stages played; FETCH → the items are in hand; legacy → always.
                 // (The old code hard-coded fetch/legacy as ready and the pill as
                 // "OPEN" forever, so a gather quest read "open" even when done.)
-                const countItem = (name: string) =>
-                  (player?.inventory ?? [])
-                    .filter((it) => it.name.toLowerCase() === name.toLowerCase())
-                    .reduce((n, it) => n + (it.quantity ?? 1), 0);
-                const readyToTurnIn = factionQuestReady(def, rec.stage, countItem);
+                const readyToTurnIn = factionRecReady(rec, def);
                 const staged = !!(def.stages && def.stages.length > 0);
                 const fetchHeld = def.fetch ? countItem(def.fetch.itemName) : 0;
                 // SINGLE-ACTIVE — tracked absent/true = active (the one you're on);
@@ -1259,12 +1568,12 @@ export function ContractsScreen() {
                         contract: stays on the slate but stops auto-advancing until
                         re-activated. Activating it pauses every other contract. */}
                     <Pressable
-                      style={({ pressed }) => [styles.trackBtn, !tracked && styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+                      style={({ pressed }) => [styles.trackBtn, tracked ? styles.trackBtnOn : styles.trackBtnOff, pressed && styles.trackBtnPressed]}
                       onPress={() => setFactionQuestActive(def.id, !tracked)}
                       accessibilityRole="button"
                       accessibilityState={{ selected: tracked }}
                     >
-                      <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
+                      <Text style={[styles.trackBtnText, tracked ? styles.trackBtnTextOn : styles.trackBtnTextOff]}>
                         {/* OTA-986 — name the party the toggle stands down / recalls. */}
                         {escortToggleLabel(tracked, rec.escort && rec.escort.hp > 0 ? rec.escort : null)}
                       </Text>
@@ -1502,7 +1811,7 @@ export function ContractsScreen() {
                     </View>
                     <Text style={styles.cardFaction}>Lead · {q.location.name}</Text>
                     {movesLine(q.location?.id)}
-                    {contractRoute(key)}
+                    {contractRoute(key, tracked)}
                     {trackToggle('lead', q.id, tracked)}
                     {!open && (
                       <>
@@ -1632,10 +1941,37 @@ export function ContractsScreen() {
                   // A mission route starts the auto-chain (objective → turn-in)
                   // and makes that contract the single active mission.
                   if (missionId) {
+                    // ⚠ OTA-1345 — B6: inside an outpost, a mission route asks the
+                    // same leave-the-outpost Yes/No the plain course always has;
+                    // the confirm carries the missionId so accepting still routes
+                    // the contract, not a bare course.
+                    if (player.hubRoomId) {
+                      requestTravelConfirm(id, name, { missionId });
+                      setScreen('exploration');
+                      return;
+                    }
                     routeMission(missionId);
                     setScreen('exploration');
                     return;
                   }
+                  // ⚠⚠ THIS BRANCH WAS MISSING ON THIS LINE. The SET COURSE button on a
+                  // GREAT CLIMB card and `routeGreatClimb` in the store both shipped, but
+                  // nothing joined them: the confirm fell straight through to the plain
+                  // travel path, so the tower got a course and never became the mission
+                  // you were on — everything else stayed active. A tower routes like a
+                  // contract, which is what "like the rest of them" means here.
+                  if (pendingRoute.climbId) {
+                    // ⚠ OTA-1345 — B6: same rule for a tower's SET COURSE.
+                    if (player.hubRoomId) {
+                      requestTravelConfirm(id, name, { climbId: pendingRoute.climbId });
+                      setScreen('exploration');
+                      return;
+                    }
+                    routeGreatClimb(pendingRoute.climbId);
+                    setScreen('exploration');
+                    return;
+                  }
+
                   // 2026-05-25 OTA-035 — outpost-aware confirmation.
                   // Was a hard refusal ("leave the outpost first, then
                   // come back"); now a Yes/No prompt: confirm to leave
@@ -1675,6 +2011,9 @@ function cap(s: string): string {
 // Found fragments show their full body; undiscovered fragments show
 // the discovery hint as a teaser.
 function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllProgress> }) {
+  // OTA-1206 — opens the full-story overlay. The store action re-checks completeness, so
+  // this button cannot show a story the player has not actually finished.
+  const openStoryReveal = useGameStore((s) => s.openStoryReveal);
   const [openId, setOpenId] = useState<string | null>(null);
   if (CHARACTER_STORIES.length === 0) {
     return (
@@ -1732,9 +2071,31 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
                   );
                 })}
                 {missing.length === 0 && (
-                  <Text style={styles.completeBanner}>
-                    ✦ Story complete — every fragment recovered.
-                  </Text>
+                  <>
+                    <Text style={styles.completeBanner}>
+                      ✦ {story.characterName}&apos;s story is complete — every fragment recovered.
+                    </Text>
+                    {/* OTA-1207 — the standing buff this story pays, if it pays one.
+                        ⚠ Not every story does, by the owner's design, so the absence of a
+                        line here is correct rather than a missing feature. */}
+                    {storyPerkLabel(story.id) && (
+                      <Text style={styles.perkLine}>✦ {storyPerkLabel(story.id)}</Text>
+                    )}
+                    {/* ⚠ OTA-1206 — READ IT WHOLE, ON DEMAND. The completion screen raises
+                        itself once, at the moment the set closes. Without this button that
+                        is the ONLY time the assembled story is ever readable end to end,
+                        which is the same "ends in nothing" defect one step further along
+                        (PUNCHLIST P1). */}
+                    <TouchableOpacity
+                      style={styles.readStoryBtn}
+                      onPress={() => openStoryReveal(story.id)}
+                      activeOpacity={0.7}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Read ${story.characterName}'s story`}
+                    >
+                      <Text style={styles.readStoryText}>READ THE WHOLE STORY</Text>
+                    </TouchableOpacity>
+                  </>
                 )}
               </View>
             )}
@@ -1746,6 +2107,14 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
 }
 
 const styles = StyleSheet.create({
+  // OTA-1206 — READ THE WHOLE STORY, on a completed set.
+  readStoryBtn: {
+    alignSelf: 'flex-start', marginTop: 10, paddingVertical: 8, paddingHorizontal: 16,
+    borderWidth: 1, borderColor: '#3a4348', backgroundColor: '#141a1d',
+  },
+  readStoryText: { color: '#cdbf99', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
+  // OTA-1207 — the permanent buff a completed story grants.
+  perkLine: { color: '#8fbf9f', fontSize: 12, marginTop: 6, fontStyle: 'italic', lineHeight: 18 },
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
   // v2.4.1 (OTA 033) — Primary Objective card. Sits at the top of
   // the Contracts screen above the tab row. Warm-gold border to
@@ -1999,6 +2368,16 @@ const styles = StyleSheet.create({
   },
   sortBarOn: { borderColor: '#7fb0a8', backgroundColor: '#141d1c' },
   sortBarPressed: { opacity: 0.7 },
+  // OTA-1175 — the two sort buttons share the row; READY sits to the right of
+  // BY DISTANCE, same shape, and lights the completion-green the COMPLETE button
+  // uses so "ready" reads as the same idea in both places.
+  sortRow: { flexDirection: 'row', gap: 6 },
+  sortBarHalf: { flex: 1 },
+  sortBarReadyOn: { borderColor: '#9ec96a', backgroundColor: '#161c12' },
+  sortBarReadyText: { color: '#9ec96a' },
+  readyCard: { borderColor: '#9ec96a' },
+  readyTag: { color: '#9ec96a', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
+  readyEmpty: { color: '#a2977b', fontSize: 11, fontStyle: 'italic', letterSpacing: 0.5 },
   sortBarText: { color: '#cdbf99', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
   sortBarTextOn: { color: '#7fb0a8' },
   sortBarHint: { color: '#a2977b', fontSize: 9, letterSpacing: 0.5, marginTop: 2 },
@@ -2023,6 +2402,9 @@ const styles = StyleSheet.create({
   difficultyChipDangerous: { color: '#e07a5f' },
   cardBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
   cardHint: { color: '#c9a86a', fontSize: 11, fontStyle: 'italic', marginTop: 4, letterSpacing: 0.5 },
+  // OTA-1187 — the non-tappable course states. Muted, not the gold call-to-action
+  // colour, so a status line never reads as something to press.
+  bountyCourseNote: { color: '#a2977b', fontSize: 11, fontStyle: 'italic', marginTop: 4, letterSpacing: 0.5 },
   // OTA-866 — bounty countdown: a bordered time pill + a draining bar.
   bountyTimerPill: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, borderWidth: 1, borderRadius: 3, paddingHorizontal: 6, paddingVertical: 2, overflow: 'hidden' },
   bountyTimerTrack: { height: 4, borderRadius: 2, backgroundColor: 'rgba(122,112,92,0.25)', marginTop: 6, marginBottom: 2, overflow: 'hidden' },
@@ -2082,9 +2464,29 @@ const styles = StyleSheet.create({
     marginTop: 8, backgroundColor: 'transparent', borderColor: '#54d6c4',
     borderWidth: 1, borderRadius: 3, paddingVertical: 8, alignItems: 'center',
   },
+  // ⚠ OTA-1356 — THE ACTIVE ONE GLOWS. Owner: "the set active buttons should glow
+  // on missions." Teal-on-dark vs grey-on-dark is a hue difference you have to
+  // hunt for down a long slate; a lit button you find at a glance. Four layers so
+  // it survives both platforms: a tinted FILL (Android draws no elevation shadow
+  // behind a transparent view), a brighter border, the box glow, and a text halo
+  // (textShadow is the one glow that renders identically on iOS and Android).
+  trackBtnOn: {
+    backgroundColor: '#123a3a',
+    borderColor: '#7ef0dd',
+    borderWidth: 2,
+    shadowColor: '#54d6c4',
+    shadowOpacity: 0.9,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 10,
+  },
   trackBtnOff: { borderColor: '#5a6a6e' },
   trackBtnPressed: { opacity: 0.7 },
   trackBtnText: { color: '#54d6c4', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
+  trackBtnTextOn: {
+    color: '#c7fff4', fontWeight: '800',
+    textShadowColor: '#54d6c4', textShadowRadius: 8, textShadowOffset: { width: 0, height: 0 },
+  },
   trackBtnTextOff: { color: '#8aa0a4' },
   // A paused contract's card is dimmed so it reads as stood-down at a glance.
   cardPaused: { opacity: 0.6, borderColor: '#3a4a4e' },

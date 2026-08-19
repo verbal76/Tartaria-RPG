@@ -36,7 +36,10 @@ describe('OTA-232 — canon data files load with the expected shapes', () => {
   });
 
   it('arbiter-titles.json has all 21 titles', () => {
-    expect(ARBITER_TITLES.length).toBe(21);
+    // ⚠ OTA-1206 — was `.toBe(21)`. The docx shipped 21; the Historian title is a 22nd,
+    // added on owner instruction. A hardcoded count makes every future title a failure,
+    // so this pins the floor and the per-row shape checks below carry the real weight.
+    expect(ARBITER_TITLES.length).toBeGreaterThanOrEqual(21);
     for (const t of ARBITER_TITLES) {
       expect(t.id).toMatch(/^[a-z0-9_]+$/);
       expect(t.requirement.length).toBeGreaterThan(5);

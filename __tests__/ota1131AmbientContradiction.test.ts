@@ -1,6 +1,10 @@
-// OTA-1131 — WHAT THE FIRST DEEP-TELEMETRY LOG ACTUALLY SAID.
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
+// OTA-1108 — WHAT THE FIRST DEEP-TELEMETRY LOG ACTUALLY SAID.
 //
-// OTA-1130 shipped the read/write split, prompt sizes, stop reasons, cache
+// OTA-1107 shipped the read/write split, prompt sizes, stop reasons, cache
 // numbers and wasted-work accounting. The first device log carrying it:
 //
 //   item_synthesis ok 9528ms  read 3539ms/write 5844ms in 309t→out 179t cache 488t HIT-CAP (813ch)
@@ -11,7 +15,7 @@
 //   ambient        ok  8554ms read 5812ms/write 1142ms in 545t→out  31t cache 576t HIT-CAP (185ch)
 //   ✂ DISCARDED ambient after 8554ms — ambient:∅   (reason=action-opener)
 //
-// OTA-1129 worked: ambient fell from ~1,145 prompt tokens and 16.8s to ~545
+// OTA-1106 worked: ambient fell from ~1,145 prompt tokens and 16.8s to ~545
 // and 8–11.8s. Four things it also exposed, all fixed here:
 //
 //   1. ⚠ THE CACHE NUMBER WAS BEING READ BACKWARDS. In every row `cache`
@@ -19,7 +23,7 @@
 //      124+20=144). That is the KV cache SIZE after the call, not reuse.
 //      Reuse is the remainder, and the remainder is zero — every generation
 //      re-reads its whole prompt. The rollup now says so.
-//   2. ⚠ THE AMBIENT PROMPT CONTRADICTS ITSELF. OTA-1129 removed the SYSTEM
+//   2. ⚠ THE AMBIENT PROMPT CONTRADICTS ITSELF. OTA-1106 removed the SYSTEM
 //      FACTS block from the ambient prompt but left the shared VOICE_RULES,
 //      which orders "Only narrate the player's last action" and twice cites a
 //      section that is no longer there — while AMBIENT_INSTRUCTION says DO NOT
@@ -76,45 +80,78 @@ const ambientCtx = (): Parameters<typeof buildSystemPrompt>[0] => ({
 
 const ambientSystem = (): string => buildSystemPrompt(ambientCtx())[0]!.content;
 
-describe('OTA-1131 — the cache number was being read backwards', () => {
+describe('OTA-1108 — the cache number was being read backwards', () => {
   beforeEach(() => resetQwenTelemetry());
 
-  it('⚠ the device-log shape (cache === in + out) reports as ZERO reuse', () => {
-    // Every single row in the log had this shape. Read as "reuse", it says the
-    // model reused more tokens than the prompt even had.
+  // ⚠⚠ OTA-1259 (N4) OVERTURNED THIS WHOLE BLOCK'S PREMISE, AND THE ORIGINAL
+  // FINDING WAS HALF RIGHT. OTA-1108 was correct that OTA-1107 read the raw cache
+  // size as "tokens reused" and that this was backwards. It then derived
+  // `cachedTokens - promptTokens - outTokens` and read the resulting zero as a
+  // REAL measurement — "a stable prompt prefix is still entirely on the table".
+  //
+  // ⚠⚠ THAT NUMBER CANNOT MOVE. llama.rn reports `tokens_cached` as
+  // `llama->n_past` (android/src/main/jni.cpp:748), which after a completion is
+  // the sequence position — prompt tokens PLUS generated tokens — whether or not
+  // any prefix was reused. **Reuse changes what has to be COMPUTED, not what ends
+  // up in the cache.** So the subtraction yields ~0 by construction in every run.
+  //
+  // ⚠ AND THE WORRY WAS BACKWARDS TOO: llama.rn already does prefix reuse
+  // (`n_past = common_part(embd, prompt_tokens)`), and measured, our prompts share
+  // 53–85% of their text with the previous one. The 2026-08-14 device log shows
+  // two `scene_intro_fill` calls at 12.2 and 3.67 ms/prompt-token on near-identical
+  // prompt sizes — a 3.3× spread, which is what a warm prefix looks like.
+  //
+  // **A METRIC THAT CANNOT MOVE IS WORSE THAN NO METRIC: IT READS AS EVIDENCE.**
+  // The tests below now pin the retirement so the number cannot come back.
+
+  it('⚠⚠ the derived remainder is ZERO for the shape the device ACTUALLY reports', () => {
+    // cache === in + out is not "a cold cache" — it is the only shape this field
+    // can ever have. Both rows are verbatim from the OTA-1107 log.
     call('ambient', { promptTokens: 546, outTokens: 31, cachedTokens: 577 });
     call('flourish', { promptTokens: 127, outTokens: 22, cachedTokens: 149 });
     const byJob = Object.fromEntries(qwenJobStats().map((j) => [j.job, j]));
     expect(byJob.ambient!.reusedTokens).toBe(0);
     expect(byJob.flourish!.reusedTokens).toBe(0);
-    expect(qwenTelemetrySummary()).toContain('reuse0t');
   });
 
-  it('real reuse — a cache larger than this call\'s own contribution — is counted', () => {
-    call('narration:travel', { promptTokens: 300, outTokens: 40, cachedTokens: 1000 });
-    expect(qwenJobStats()[0]!.reusedTokens).toBe(660);
-    expect(qwenTelemetrySummary()).toContain('reuse660t');
-  });
-
-  it('a build that reports the field differently can never show a negative saving', () => {
-    call('ambient', { promptTokens: 546, outTokens: 31, cachedTokens: 12 });
-    expect(qwenJobStats()[0]!.reusedTokens).toBe(0);
-  });
-
-  it('no cache field at all stays quiet — absent data is not a measured zero', () => {
-    call('ambient', { promptTokens: 546, outTokens: 31 });
-    expect(qwenJobStats()[0]!.cacheSamples).toBe(0);
+  it('⚠⚠ ...and it is NO LONGER PRINTED, in the rollup or the per-call line', () => {
+    call('ambient', { promptTokens: 546, outTokens: 31, cachedTokens: 577 });
     expect(qwenTelemetrySummary()).not.toContain('reuse');
+    const store = src('app/state/gameStore.ts');
+    expect(store).not.toContain('reuse ${reused}t');
+    expect(store).not.toContain('r.cachedTokens - (r.promptTokens ?? 0) - (r.outTokens ?? 0)');
   });
 
-  it('the store logs the derived remainder, not the raw cache size', () => {
+  it('⚠⚠ the per-call line carries PREFILL PER PROMPT TOKEN instead — the real signal', () => {
+    // A cold call and a warm one are two visibly different numbers here, which is
+    // the whole point: this one CAN move.
     const store = src('app/state/gameStore.ts');
-    expect(store).toContain('reuse ${reused}t');
-    expect(store).toContain('r.cachedTokens - (r.promptTokens ?? 0) - (r.outTokens ?? 0)');
+    // ⚠ OTA-1263 added OTA-1139's sanity guard to this line (a prefill longer than
+    // its own call is not a measurement), so the expression is non-null-asserted.
+    expect(store).toContain('(r.prefillMs! / r.promptTokens!).toFixed(1)');
+    expect(store).toContain('const prefillIsPossible = r.prefillMs != null');
+    expect(store).toContain('${msPerTok}');
+  });
+
+  it('⚠ the tombstone explains itself, so nobody re-derives it', () => {
+    const tel = src('app/ai/generation/qwenTelemetry.ts');
+    expect(tel).toContain('jni.cpp:748');
+    expect(tel).toContain('bestMsPerPromptTok');
+  });
+
+  it('⚠ the best/worst per-token range still rides the rollup', () => {
+    // ⚠ prefill must be <= totalMs or OTA-1139's sanity guard rejects the sample
+    // — a physically impossible prefill must never move the range. Both rows here
+    // are shaped like real calls.
+    call('ambient', { totalMs: 8000, promptTokens: 500, outTokens: 30, prefillMs: 6000 });
+    call('ambient', { totalMs: 2500, promptTokens: 500, outTokens: 30, prefillMs: 1500 });
+    expect(qwenTelemetrySummary()).toContain('ms/tok');
+    const j = qwenJobStats()[0]!;
+    expect(j.bestMsPerPromptTok).toBeLessThan(j.worstMsPerPromptTok);
   });
 });
 
-describe('OTA-1131 — the ambient prompt stops arguing with itself', () => {
+describe('OTA-1108 — the ambient prompt stops arguing with itself', () => {
   it('⚠ ambient is no longer told to narrate the last action it is forbidden to narrate', () => {
     const p = ambientSystem();
     expect(p).toContain('DO NOT narrate or react to their last action');
@@ -132,7 +169,7 @@ describe('OTA-1131 — the ambient prompt stops arguing with itself', () => {
 
   it('the action-verb catalog is gone — ambient resolves no actions', () => {
     const p = ambientSystem();
-    // ⚠ RETARGETED BY OTA-1151. The header "AVAILABLE PLAYER ACTIONS" and the
+    // ⚠ RETARGETED BY OTA-1128. The header "AVAILABLE PLAYER ACTIONS" and the
     // slash-alternate "dash / sprint" were both padding and both went; the
     // catalog itself stayed, because teaching the player the engine's verbs
     // through narration is a real feature. Anchored on the VERBS now — they
@@ -152,10 +189,10 @@ describe('OTA-1131 — the ambient prompt stops arguing with itself', () => {
     expect(p).toContain("NEVER write 'The player'");
     // The location anchor and its no-invented-places rule.
     expect(p).toContain("The Architect's Blind");
-    // RETARGETED BY OTA-1144 — "above" → "below". The rules now PRECEDE the
+    // RETARGETED BY OTA-1121 — "above" → "below". The rules now PRECEDE the
     // scene anchor so they can sit in the cached prefix, so this pointer had
     // to follow the move. The guard is unchanged; where it points is.
-    // ⚠ RETARGETED AGAIN BY OTA-1151: this clause was one of FOUR copies of
+    // ⚠ RETARGETED AGAIN BY OTA-1128: this clause was one of FOUR copies of
     // the same rule, and the four collapsed into one statement carried by
     // NO_INVENTED_PLACES. The guard ambient needs is unchanged and still
     // present — asserted here in its surviving form, plus the escape hatch
@@ -174,17 +211,17 @@ describe('OTA-1131 — the ambient prompt stops arguing with itself', () => {
     // 545 → ~360 tokens, roughly two seconds of prefill per ambient line at
     // the ~11ms/token this device measures.
     // ⚠ THE ABSOLUTE FIGURE IS THE REAL MEASURE, and it is untouched: this is
-    // what OTA-1129 bought, and prefill is paid in tokens, not in ratios.
+    // what OTA-1106 bought, and prefill is paid in tokens, not in ratios.
     expect(p.length).toBeLessThan(1500);
-    // RETARGETED BY OTA-1151, and the direction matters. The ratio was 0.56;
-    // it is now ~0.63 — but NOT because ambient grew. It is because OTA-1151
+    // RETARGETED BY OTA-1128, and the direction matters. The ratio was 0.56;
+    // it is now ~0.63 — but NOT because ambient grew. It is because OTA-1128
     // cut the REACTION prompt by deleting three duplicate statements of the
     // no-invented-places rule, so the gap closed from the other side. A
     // tighter ratio here would mean the reaction prompt got fatter again,
     // which is the thing worth catching, so the bound is loosened only as far
     // as the measured value and no further.
     expect(p.length).toBeLessThan(reaction.length * 0.68);
-    // RETARGETED BY OTA-1144. This used to slice both prompts from
+    // RETARGETED BY OTA-1121. This used to slice both prompts from
     // '**SECOND PERSON ONLY.**' to the end and compare the remainders. That
     // marker now lives in the SHARED preamble at the very top, so the slice
     // became "almost the whole prompt" for both and stopped measuring what it
@@ -195,18 +232,18 @@ describe('OTA-1131 — the ambient prompt stops arguing with itself', () => {
     expect(reaction).toContain('brawl');
     // ⚠ THE RATIO ASSERTION IS GONE, AND NOT BECAUSE IT WAS INCONVENIENT.
     // It compared the two RULES blocks and required ambient's to be under 60%
-    // of the reaction one. OTA-1151 halved the REACTION block by deleting
+    // of the reaction one. OTA-1128 halved the REACTION block by deleting
     // three duplicated rules, while ambient's block is mostly the companion
-    // brief — irreducible, and not what OTA-1131 was cutting. So the ratio
+    // brief — irreducible, and not what OTA-1108 was cutting. So the ratio
     // now reads ~0.9 and asserting 0.6 would be asserting something FALSE
-    // about the code. What OTA-1131 actually secured is the line below and
+    // about the code. What OTA-1108 actually secured is the line below and
     // the two size assertions above: ambient does not read the verb catalog.
   });
 
   it('the scene-reaction voice block still says what it said — the split did not rewrite it', () => {
     const reaction = buildSystemPrompt({ ...ambientCtx(), ambient: false })[0]!.content;
     expect(reaction).toContain("Only narrate the player's last action");
-    // RETARGETED BY OTA-1151 — 'Aetheric verbs: cast…' became '— and the
+    // RETARGETED BY OTA-1128 — 'Aetheric verbs: cast…' became '— and the
     // Aetheric verbs cast…' when the catalog's padding was stripped. The four
     // verbs are the assertion; the punctuation around them never was.
     expect(reaction).toContain('cast, channel, weave, incant');
@@ -217,7 +254,7 @@ describe('OTA-1131 — the ambient prompt stops arguing with itself', () => {
   });
 });
 
-describe('OTA-1131 — item synthesis stops failing silently at full price', () => {
+describe('OTA-1108 — item synthesis stops failing silently at full price', () => {
   const engine = (reply: string) => ({
     isReady: () => true,
     generate: () => Promise.resolve(reply),
@@ -260,20 +297,20 @@ describe('OTA-1131 — item synthesis stops failing silently at full price', () 
     const reply = '{"kind":"weapon","description":"A long-hafted maul of scavenged rail steel that';
     const out = await synthesizeItemViaQwen('Rail Maul', ['metal'], engine(reply));
     expect(out).toBeNull();
-    // The waste is attributable now — this is the whole point of OTA-1130's
+    // The waste is attributable now — this is the whole point of OTA-1107's
     // accounting, and this call site was missing from it.
-    // RETARGETED BY OTA-1132: the unparseable reason now carries the raw text
+    // RETARGETED BY OTA-1109: the unparseable reason now carries the raw text
     // and its length, because the next log showed this failing three times out
     // of three without ever saying WHY. The reporting itself is what this test
     // guards, so it asserts the call, not the exact string it now builds.
-    // RETARGETED AGAIN BY OTA-1138: the parse failure now picks between two
+    // RETARGETED AGAIN BY OTA-1115: the parse failure now picks between two
     // NAMES — the pipe loop earned its own — so the reason is built above the
     // call instead of inlined into it. What this test guards is that the parse
     // failure is REPORTED at all, which is still true.
     const src2 = src('app/engine/itemSynthesisQwen.ts');
     expect(src2).toContain("'item_synth:unparseable'");
     expect(src2).toContain('noteQwenDiscarded(`${reason}');
-    // RETARGETED BY OTA-1157 — the reason is a template literal now, because
+    // RETARGETED BY OTA-1134 — the reason is a template literal now, because
     // the clamp finally NAMES which of its two rejections fired
     // (`bad-kind="…"` or `no-content`). Four device logs said
     // `rejected-by-clamp` and none said which, so the cause had to be
@@ -282,7 +319,7 @@ describe('OTA-1131 — item synthesis stops failing silently at full price', () 
     expect(src2).toContain('item_synth:rejected-by-clamp ${why}');
     expect(src2).toContain("? `bad-kind=");
     expect(src2).toContain("'no-content'");
-    // RETARGETED BY OTA-1161 — empty is still its own reason; it just yields
+    // RETARGETED BY OTA-1138 — empty is still its own reason; it just yields
     // to 'preempted' when the runtime was told to stop (a different fact).
     expect(src2).toContain("'item_synth:empty'");
     expect(src2).toContain("'item_synth:preempted'");
@@ -301,7 +338,7 @@ describe('OTA-1131 — item synthesis stops failing silently at full price', () 
   });
 });
 
-describe('OTA-1131 — the talk popup hides what the feed hides', () => {
+describe('OTA-1108 — the talk popup hides what the feed hides', () => {
   it('⚠ the transcript filters hidden channels, not just the timestamp', () => {
     const sheet = src('app/components/TalkSheet.tsx');
     expect(sheet).toContain("import { HIDDEN_LOG_CHANNELS } from '../engine/gameLog'");
@@ -316,7 +353,7 @@ describe('OTA-1131 — the talk popup hides what the feed hides', () => {
     expect(src('app/engine/gameLog.ts')).toContain("new Set(['cognitive', 'debug'])");
   });
 
-  it('the timestamp window itself is unchanged — OTA-1121 must not regress', () => {
+  it('the timestamp window itself is unchanged — OTA-1098 must not regress', () => {
     const sheet = src('app/components/TalkSheet.tsx');
     expect(sheet).toContain('e.ts >= ctx.startedAtTs');
     // Not an INDEX. gameLog is sliced to MAX_LOG_IN_MEMORY on every append, so

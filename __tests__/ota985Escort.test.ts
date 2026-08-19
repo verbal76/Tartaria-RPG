@@ -77,12 +77,36 @@ describe('OTA-985 — escort engine: spec, pool, HUD filter', () => {
   });
 });
 
+/** Poll until pred() holds or the deadline passes. The assertion AFTER the poll still
+ *  does the real judging — this only replaces the fixed sleeps that made the suite
+ *  flake on a loaded parallel run (it passed 17/17 isolated; a 10ms window raced the
+ *  store's own async work and lost only when the box was busy). */
+async function settle(pred: () => boolean, deadlineMs = 4000) {
+  const t0 = Date.now();
+  while (!pred() && Date.now() - t0 < deadlineMs) {
+    await new Promise((r) => setTimeout(r, 15));
+  }
+}
+
+/** Wait for trailing fire-and-forget writes to drain: the log length must hold still
+ *  across two samples, or a late write can clobber an injected scene / miss a read. */
+async function quiesce(store: typeof useGameStore) {
+  let last = -1;
+  await settle(() => {
+    const n = store.getState().gameLog.length;
+    const stable = n === last;
+    last = n;
+    return stable;
+  });
+}
+
 async function bootEscortFight(escortHp: number) {
   const store = useGameStore;
   await store.getState().hydrate();
   await store.getState().startNewGame({ name: 'Warden', raceId: getRaces()[0]!.id, factionId: getFactions()[0]!.id });
   store.getState().skipTutorial?.();
-  await new Promise((r) => setTimeout(r, 25));
+  await settle(() => !!store.getState().currentScene);
+  await quiesce(store);
   const proto = findEnemyByName('Mud Spider') ?? findEnemyByName('Gutter Rat');
   const foe = JSON.parse(JSON.stringify(proto));
   foe.hp = 9999;
@@ -119,7 +143,7 @@ async function attackRound(store: typeof useGameStore) {
     const step = pr.steps[pr.currentStep]!;
     store.getState().resolveRollStep(Array.from({ length: step.count ?? 1 }, () => 15));
   }
-  await new Promise((r) => setTimeout(r, 10));
+  await quiesce(store);
 }
 
 describe('OTA-985 — collateral bleeds the party when the player is hit', () => {
@@ -165,7 +189,7 @@ describe('OTA-985 — rest patches the party up, modestly', () => {
       const step = pr.steps[pr.currentStep]!;
       store.getState().resolveRollStep(Array.from({ length: step.count ?? 1 }, () => 10));
     }
-    await new Promise((r) => setTimeout(r, 10));
+    await settle(() => store.getState().gameLog.some((e) => /Surveyors rest too/.test(e.text)));
     const q = store.getState().player!.activeFactionQuests?.[0];
     expect(q?.escort?.hp).toBe(36); // 30 + round(60 * 0.10)
     const log = store.getState().gameLog.map((e) => e.text).join('\n');

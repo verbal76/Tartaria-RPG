@@ -1,6 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { FallenGearPiece, SaveState } from './types';
 import { capDiskLog } from './diskLogCap';
+// OTA-1201 — import path trims like the store's persist path does; saveSlot does not.
+import { trimSaveStateToFit } from './saveTrim';
 
 // v2 schema: multi-slot. Each character is its own keyed save with its
 // own log; an index file lists summaries for the title screen.
@@ -27,6 +29,12 @@ export interface SlotSummary {
   slotId: string;
   playerName: string;
   raceId: string;
+  /** ⚠⚠ OTA-1311 — the character's stable identity (`player.mapSeed`), minted
+   *  once at creation as `name|raceId|factionId|<created-at>`. Carried in the
+   *  index so the roster can be checked WITHOUT loading every slot, and carried
+   *  inside the save itself so it survives a backup round-trip. Absent on slots
+   *  written before this OTA; readers fall back to name+race. */
+  characterSeed?: string;
   locationId: string;
   hp: number;
   hpMax: number;
@@ -85,6 +93,40 @@ export interface GlobalStash {
   // in future, to encounter in the world). "Losing is fun" — the run ends, the
   // legend persists.
   fallen?: FallenHero[];
+  /** ⚠⚠ OTA-1311 — every character seed that has ever died on this install.
+   *  Uncapped on purpose: `fallen` above is a capped memorial, and a permission
+   *  check that forgets is a permission check that can be waited out. */
+  fallenSeeds?: string[];
+}
+
+/** ⚠⚠ OTA-1358 — THE CLONE (port of golem OTA-1366). Owner: *"what I want is
+ *  the exact same in every detail dead I send someone to have everything
+ *  exactly as it was when they died, same gear, same stats, same coatings,
+ *  everything I want a clone sent."*
+ *
+ *  ⚠ THE HOLLOWED WAS NEVER A CLONE. `revenantFromFallen` hard-coded
+ *  `abilityPoint: 'Strength 6'`, derived damage from KILL COUNT alone, and
+ *  sized HP off the LIVING player. The dead character's own strength,
+ *  dexterity, hpMax and AC were never recorded anywhere — so the Hollowed has
+ *  always been a scaled boss wearing a name and a kit, not the person.
+ *
+ *  ⚠ HAL TAKES THE CLONE, NOT THE SHARING. The shared roll of the fallen
+ *  (ledger, pairing, seal, mailbox) stays golem-only pending the owner's
+ *  two-phone test; this is the half that makes YOUR OWN dead rise as
+ *  themselves, which stands on its own and needs no transport.
+ *
+ *  Absent on every record written before this OTA; readers fall back to the old
+ *  kill-count build, so an existing roll of the fallen keeps working. */
+export interface FallenSnapshot {
+  /** The six attributes as they stood at death. */
+  stats: { strength: number; dexterity: number; intelligence: number; wisdom: number; charisma: number; stealth: number };
+  /** Their real maximum health — what the clone fights with. */
+  hpMax: number;
+  /** Armour class as worn. */
+  ac: number;
+  /** Race and faction ids, so a revenant reads right. */
+  raceId?: string;
+  factionId?: string;
 }
 
 /** OTA-845 — a character who died. Persisted install-wide in the GlobalStash. */
@@ -110,12 +152,60 @@ export interface FallenHero {
   /** OTA-1017 — full copies of the died-in kit (instance stats and all), so the
    *  revenant hands back the REAL gear. Absent on records that predate it. */
   gear?: FallenGearPiece[];
+  /** ⚠⚠ OTA-1358 — the character themself, so the Hollowed fights as they did. */
+  snapshot?: FallenSnapshot;
   /** OTA-998 — set once their Hollowed revenant is put to rest. */
   avengedBy?: string;
   avengedTs?: number;
 }
 
 const FALLEN_CAP = 25;
+
+/** ⚠⚠ OTA-1311 — A CHARACTER'S STABLE IDENTITY, in one place.
+ *
+ *  `mapSeed` is minted once at creation (`name|raceId|factionId|<timestamp>`)
+ *  and never changes, which makes it the only field that can tell "this is the
+ *  same Francis" from "this is another character called Francis". The legacy
+ *  fallback matches the one the world-map readers already use, so a save written
+ *  before mapSeed existed still resolves to a consistent key. */
+export function characterSeedOf(
+  p: { mapSeed?: string; name: string; raceId: string; factionId: string },
+): string {
+  return p.mapSeed ?? `${p.name}|${p.raceId}|${p.factionId}|legacy`;
+}
+
+/** ⚠⚠ OTA-1311 — THE ROLL OF THE FALLEN, THE PART THAT MUST NEVER FORGET.
+ *
+ *  `stash.fallen` is the memorial and it is CAPPED at 25 — by design, it is a
+ *  graveyard to read, and old names age out of it. That makes it useless as a
+ *  permission check: a character who died twenty-six deaths ago would quietly
+ *  fall off the list and become restorable again. So the seeds get their own
+ *  uncapped record. They are short strings; a lifetime of them costs nothing
+ *  next to one save. */
+export async function recordFallenSeed(seed: string): Promise<void> {
+  const stash = await loadGlobalStash();
+  const have = stash.fallenSeeds ?? [];
+  if (have.includes(seed)) return;
+  await saveGlobalStash({ ...stash, fallenSeeds: [...have, seed] });
+}
+
+/** True when this exact character has died on this install — ever. */
+export async function hasFallenSeed(seed: string): Promise<boolean> {
+  return ((await loadGlobalStash()).fallenSeeds ?? []).includes(seed);
+}
+
+/** ⚠ A RESURRECTION GEM PAYS THE REGISTER OFF. The seed register exists so a
+ *  backup cannot undo a death for free; a Gem is the sanctioned, scarce way to
+ *  undo one. Leaving the seed registered after a Gem revival meant a resurrected
+ *  character who LATER genuinely disappeared could never be restored — the
+ *  register still called them fallen. The Gem clears its entry: that death has
+ *  been paid for. A later death re-registers it. */
+export async function clearFallenSeed(seed: string): Promise<void> {
+  const stash = await loadGlobalStash();
+  const have = stash.fallenSeeds ?? [];
+  if (!have.includes(seed)) return;
+  await saveGlobalStash({ ...stash, fallenSeeds: have.filter((x) => x !== seed) });
+}
 
 /** OTA-845 — append a fallen character to the install-wide roll (capped). Returns the
  *  new total number of fallen ever recorded within the cap window. */
@@ -160,6 +250,7 @@ export async function loadGlobalStash(): Promise<GlobalStash> {
       devGemGrantedSlots: parsed.devGemGrantedSlots ?? [],
       testGiftGrantedSlots: parsed.testGiftGrantedSlots ?? [],
       fallen: parsed.fallen ?? [],
+      fallenSeeds: parsed.fallenSeeds ?? [],
     };
   } catch {
     return { resurrectionGems: 0, endingBadges: [], installSeeded: false, devGemGrantedSlots: [], testGiftGrantedSlots: [] };
@@ -452,6 +543,7 @@ export async function saveSlot(slotId: string, state: SaveState): Promise<void> 
       slotId,
       playerName: state.player.name,
       raceId: state.player.raceId,
+      characterSeed: characterSeedOf(state.player),
       locationId: state.player.currentLocationId,
       hp: state.player.hp,
       hpMax: state.player.hpMax,
@@ -485,6 +577,98 @@ async function readCreatedAt(slotId: string): Promise<number | null> {
   const all = await listSlots();
   const found = all.find((s) => s.slotId === slotId);
   return found?.createdAt ?? null;
+}
+
+/** OTA-1201 — restore an exported character. ⚠⚠ ALWAYS A NEW SLOT, NEVER AN
+ *  OVERWRITE, and this is the property the whole feature is built around: a
+ *  player restoring a backup has already lost something once, and no confirm
+ *  dialog is a good enough guard against a mis-tap that would cost them a second
+ *  character. There is no overwrite path here, not even opt-in.
+ *
+ *  ⚠ AND IT VERIFIES INSTEAD OF ASSUMING. `saveSlot` deliberately NEVER THROWS —
+ *  its callers `void persist()` fire-and-forget, so it stamps `lastSaveWriteError`
+ *  and returns quietly on a failed write. An importer that just awaited it would
+ *  report "restored!" over a slot that does not exist, which is precisely the
+ *  class of bug this codebase has hunted before: a writer claiming success
+ *  without checking. So this reads the character back off disk before it says a
+ *  word. */
+export async function importSaveAsNewSlot(
+  state: SaveState,
+): Promise<{ ok: true; slotId: string; trimmed: boolean } | { ok: false; reason: string }> {
+  // ⚠⚠ OTA-1311 — RESTORE IS FOR A CHARACTER THAT DISAPPEARED. NOTHING ELSE.
+  //
+  // Owner, after a mis-tap: *"I accidentally hit restore character when Francis
+  // died, and it gave me an alive full health copy of Francis underneath dead
+  // Francis. so it's an infinite life glitch."* Exactly so. This function mints
+  // a NEW slot and never overwrites — deliberate, OTA-1178, because a player
+  // restoring a backup has already lost a character once and a mis-tap must not
+  // cost them a second. But nothing ever asked whether the character was LOST or
+  // merely DEAD, so a backup taken while alive was a free, repeatable revival —
+  // and it bypassed the Resurrection Gem entirely, which is the one sanctioned
+  // way back and is scarce on purpose.
+  //
+  // Owner's rule: *"we should gate restore character behind having an alive one
+  // and behind having one on the role of the fallen. it should only be for when
+  // a character 'disappears'."* Both gates, in that order:
+  //
+  //   (1) ALREADY ON THE ROSTER — alive or dead, they are right there. Nothing
+  //       disappeared, so there is nothing to restore. This also catches a death
+  //       recorded before the seed register existed.
+  //   (2) ON THE ROLL OF THE FALLEN — they died here. The way back is a
+  //       Resurrection Gem, and a clipboard is not one.
+  //
+  // ⚠ Checked against the SEED, not the name, so "another character I also
+  // called Francis" is unaffected — and checked against the uncapped register
+  // rather than the 25-entry memorial, so an old death cannot be waited out.
+  const incoming = state.player;
+  if (incoming) {
+    const seed = characterSeedOf(incoming);
+    const roster = await listSlots();
+    const onRoster = roster.some((slot) => (
+      slot.characterSeed
+        ? slot.characterSeed === seed
+        // Legacy slots predate the seed; fall back to the pair that identified a
+        // character before it existed.
+        : slot.playerName === incoming.name && slot.raceId === incoming.raceId
+    ));
+    if (onRoster) {
+      return { ok: false, reason: `${incoming.name} is already among your characters. Restore is for a character that has disappeared — nothing was changed.` };
+    }
+    if (await hasFallenSeed(seed)) {
+      return { ok: false, reason: `${incoming.name} has fallen. A Resurrection Gem brings a fallen Tartarian back; a backup does not. Nothing was changed.` };
+    }
+  }
+  const slotId = newSlotId();
+  clearLastSaveWriteError();
+
+  // ⚠ Trim on the way in. `saveSlot` does NOT trim — the store's persist path
+  // does (OTA-395/396), so a save arriving through this door would skip it
+  // entirely and fail the readback verify on an oversized blob. An import from a
+  // device with a bigger storage window is exactly how that happens.
+  const trim = trimSaveStateToFit({ ...state, version: 1, savedAt: Date.now() });
+
+  await saveSlot(slotId, trim.state);
+
+  const writeErr = getLastSaveWriteError();
+  if (writeErr) {
+    clearLastSaveWriteError();
+    return { ok: false, reason: `The restored character could not be written to storage — ${writeErr}` };
+  }
+
+  // Read it back. Cheap, and it is the difference between reporting what we did
+  // and reporting what we hoped.
+  const back = await loadSlot(slotId);
+  if (!back || !back.player) {
+    return { ok: false, reason: 'The restored character did not survive the write. Nothing was changed.' };
+  }
+  const listed = (await listSlots()).some((s) => s.slotId === slotId);
+  if (!listed) {
+    // The save landed but the title screen would never show it — worse than a
+    // clean failure, because the player would think it worked.
+    return { ok: false, reason: 'The character was saved but did not appear in the character list. Nothing was changed.' };
+  }
+
+  return { ok: true, slotId, trimmed: trim.trimmed };
 }
 
 export async function deleteSlot(slotId: string): Promise<void> {
@@ -557,6 +741,95 @@ export function appendLogToDisk(line: string): Promise<void> {
   });
   return logWriteChain;
 }
+
+// ⚠⚠ OTA-1288 (port of golem OTA-1276) — THE LIVE BREADCRUMB, AND WHY IT CANNOT USE THE CHAIN ABOVE.
+//
+// The owner froze mid-game twice and both times the disk log simply STOPPED —
+// and I read those cutoffs as the freeze point. They are not. `appendLogToDisk`
+// batches into `pendingLogLines` and drains on a PROMISE CHAIN, and promises are
+// serviced by the JS thread. **A wedged JS thread never drains the buffer**, so
+// the final lines before a freeze die in memory and never reach disk. The log
+// ends at the last successful FLUSH, which can be many actions earlier.
+//
+// His freeze #2 is what proved the wedge: buttons dead, feed still scrollable.
+// In React Native scrolling is native and survives; onPress needs JS. So the JS
+// thread is stuck in a loop — which also stops the batch drain, the setTimeout
+// freeze sampler AND requestAnimationFrame (a JS timer in RN, JSTimers.js:257),
+// which is why "Freeze watch: no stalls seen" printed straight through a freeze.
+//
+// So this breadcrumb is deliberately NOT batched and NOT chained: one tiny
+// single-key write, issued the moment an action starts, with no read-modify-write
+// of the 400KB log. It races ahead of the wedge instead of queueing behind it.
+// Next boot reads it and can say what the app was ACTUALLY doing last.
+const LAST_BREADCRUMB_KEY = '@tartaria/lastBreadcrumb';
+
+export interface LiveBreadcrumb {
+  at: number;
+  what: string;
+  screen?: string;
+  room?: string;
+  /** ⚠ OTA-1351 — the last checkpoint this activity reached (see
+   *  stampBreadcrumbPhase). Absent on crumbs written before the phase system. */
+  phase?: string;
+  phaseAt?: number;
+  phaseDetail?: string;
+}
+
+/** Fire-and-forget. Never awaited by callers — a breadcrumb that could block an
+ *  action would be a worse bug than the one it documents. */
+export function stampLiveBreadcrumb(crumb: LiveBreadcrumb): void {
+  try {
+    _lastLiveCrumb = crumb;
+    void AsyncStorage.setItem(LAST_BREADCRUMB_KEY, JSON.stringify(crumb)).catch(() => { /* ignore */ });
+  } catch { /* never let instrumentation break the game */ }
+}
+
+// ⚠⚠ OTA-1351 — THE DYING BREATH LEARNS PHASES. The 2026-08-17 freeze receipt
+// proved this crumb's limit: it said `action "go west"` and nothing more, which
+// cannot tell "died processing that action" from "died half a minute later in
+// background work" — the disk log's tail was already dead either way. Each
+// checkpoint an action (or a background model job) passes now overwrites the
+// SAME crumb with a phase, so the survivor names the last checkpoint reached:
+//   received → parsed:<intent> → engine-done → rendered    (an action's life)
+//   homework:<job> → homework-done                         (background model work)
+// A crumb that survives at `engine-done` but never `rendered` indicts the
+// render side; one stuck at `homework:<job>` indicts the background writer; one
+// at `parsed` indicts the engine — three different halves of the codebase the
+// old crumb could not tell apart. Kept in a module mirror so a phase stamp
+// never needs an async read, written through the same unbatched key the boot
+// report already trusts.
+let _lastLiveCrumb: LiveBreadcrumb | null = null;
+let _lastPhaseWriteAt = 0;
+export function stampBreadcrumbPhase(phase: string, detail?: string): void {
+  try {
+    const base: LiveBreadcrumb = _lastLiveCrumb ?? { at: Date.now(), what: '(no action yet)' };
+    const now = Date.now();
+    // The render phase fires once per React commit; collapse bursts so the
+    // instrumentation costs at most a couple of tiny writes per second.
+    if (phase === 'rendered' && base.phase === 'rendered' && now - _lastPhaseWriteAt < 500) return;
+    _lastLiveCrumb = { ...base, phase, phaseAt: now, phaseDetail: detail };
+    _lastPhaseWriteAt = now;
+    void AsyncStorage.setItem(LAST_BREADCRUMB_KEY, JSON.stringify(_lastLiveCrumb)).catch(() => { /* ignore */ });
+  } catch { /* never let instrumentation break the game */ }
+}
+
+export async function readLiveBreadcrumb(): Promise<LiveBreadcrumb | null> {
+  try {
+    const raw = await AsyncStorage.getItem(LAST_BREADCRUMB_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw) as LiveBreadcrumb;
+    return typeof p?.at === 'number' && typeof p?.what === 'string' ? p : null;
+  } catch { return null; }
+}
+
+/** Cleared on an ORDERLY exit (background / save-and-quit). A breadcrumb that
+ *  SURVIVES to the next boot therefore means the process died while it was
+ *  still live — the signature of the hard freeze + swipe-kill the owner keeps
+ *  having to do. Same discipline as arb126's in-flight crash breadcrumbs. */
+export async function clearLiveBreadcrumb(): Promise<void> {
+  try { await AsyncStorage.removeItem(LAST_BREADCRUMB_KEY); } catch { /* ignore */ }
+}
+
 
 // Block until every queued log write has flushed to disk. Called by
 // LogScreen before reading so COPY ALL captures the entire history,

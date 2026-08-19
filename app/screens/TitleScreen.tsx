@@ -40,7 +40,9 @@ import { composeAndSendBugReport } from '../diagnostics/bugReport';
 import { loadCrashSave, clearCrashSave, buildCrashSaveExport, type CrashSaveCapture } from '../diagnostics/crashSave';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
-import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
+import { readSlotLog, loadSlot, importSaveAsNewSlot, type SlotSummary } from '../engine/saveSystem';
+// OTA-1201 — character backup / restore.
+import { encodeSaveExport, decodeSaveExport } from '../engine/saveExport';
 import { OTA_BUILD_ID, MINIMUM_RECOMMENDED_APK_BUILD } from '../buildInfo';
 import { getBuildCodename, getBuildCodenameOrNull, getApkCodename } from '../buildCodename';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -54,6 +56,8 @@ import { speak as ttsSpeak } from '../voice/TTSManager';
 import type { MainQuestPhase } from '../engine/types';
 import { checkAndApplyOTA } from '../updates/checkAndApplyOTA';
 import { useReadableMuted } from '../ui/displaySettings';
+import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1250 — one column width, platform-aware
+import { modelBootPercent, modelsStillLoading } from '../ui/modelBootProgress'; // OTA-1251 — the 51% bar, made testable
 
 const races = racesData as { id: string; name: string }[];
 const locations = locationsData as { id: string; name: string }[];
@@ -117,6 +121,12 @@ export function TitleScreen() {
     | { kind: 'resurrect'; slot: SlotSummary }
     | { kind: 'fallen'; slot: SlotSummary }
     | { kind: 'exit' }
+    // OTA-1201 — restore result. One modal for both outcomes: a restore that
+    // failed has to say WHY in words the player can act on (almost always
+    // "something truncated your paste"), and a restore that worked has to name
+    // the character so they know the right one came back.
+    | { kind: 'restored'; playerName: string; trimmed: boolean }
+    | { kind: 'restoreFailed'; reason: string }
     | null
   >(null);
 
@@ -164,12 +174,17 @@ export function TitleScreen() {
   const cognitiveStatus = useGameStore((s) => s.cognitiveStatus);
   const [kokoroPhase, setKokoroPhase] = useState<KokoroState>(() => getKokoroState());
   useEffect(() => onKokoroStateChange(setKokoroPhase), []);
+  // ⚠⚠ OTA-1295 (port of golem OTA-1294) — THE SLOT LIST REFRESHES EVERY TIME
+  // THIS SCREEN APPEARS. It used to be a boot-time snapshot (filled at hydrate,
+  // re-read only on pull-to-refresh, restore, or delete), so a character
+  // created THIS session was missing from it — on the owner's device the
+  // title showed no character at all mid-session and read as a wipe, while the
+  // disk record was intact the whole time. The screen must tell the truth.
+  useEffect(() => { void refreshSlots(); }, [refreshSlots]);
   // OTA-471 — the opening splash now lives in <SplashOverlay/> at the AppShell
   // root (full-bleed). The title screen just renders the menu + a compact loading
   // bar (below) if a first-install download is still running.
-  const modelsLoading =
-    qwenStatus === 'downloading' || qwenStatus === 'loading'
-    || kokoroPhase.phase === 'downloading' || kokoroPhase.phase === 'loading';
+  const modelsLoading = modelsStillLoading(qwenStatus, kokoroPhase);
   // OTA-468 — the verbose per-engine MIND/VOICE labels were retired with the old
   // loading banner; the splash + compact bar now carry progress as a single fill.
   useEffect(() => {
@@ -258,6 +273,8 @@ export function TitleScreen() {
   // OTA 006 — separate latch for the SHARE action so the COPIED
   // and SHARED flashes don't fight each other on the same row.
   const [sharedSlotId, setSharedSlotId] = useState<string | null>(null);
+  // OTA-1201 — per-row "✓ BACKED UP" flash, same cadence as COPIED / SHARED.
+  const [backedUpSlotId, setBackedUpSlotId] = useState<string | null>(null);
   // OTA-063 — bug-report modal state. Open via the REPORT BUG button
   // on the bottom bar. On send, build the full report (description +
   // device summary + slot log), stage it on the clipboard, then open
@@ -452,6 +469,59 @@ export function TitleScreen() {
       setTimeout(() => setSharedSlotId((cur) => (cur === slot.slotId ? null : cur)), 1500);
     } catch {
       // User-cancelled or unsupported — no-op.
+    }
+  };
+
+  // ⚠⚠ OTA-1201 — BACK UP A CHARACTER. The owner reinstalled to clear a memory
+  // kill on 2026-08-08 and the character was gone for good: every save lives in
+  // AsyncStorage, which iOS deletes with the app, and nothing anywhere held a
+  // copy. OTA-344's atomic writes and OTA-395's trimming protect a save from
+  // processes; neither protects it from the phone.
+  //
+  // ⚠ SHARE FIRST, CLIPBOARD SECOND, and that order is from this app's own scar
+  // tissue. A save runs far past the 25,000 characters at which TitleScreen
+  // already chunks dead-character logs because "most chat clients silently
+  // truncate larger pastes" (OTA-023), and Share exists here precisely to bypass
+  // that (OTA-006/215). The clipboard copy still happens so a short save can be
+  // pasted straight into a note, but the share sheet is what opens.
+  // OTA-1231 — the encode/share body moved to app/ui/backupCharacter.ts so
+  // Settings → RUN (the living character's door now) and this screen (the dead
+  // rows' only door) cannot drift apart.
+  const backUpSlot = async (slot: SlotSummary) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { backUpCharacterSlot } = require('../ui/backupCharacter') as typeof import('../ui/backupCharacter');
+    const result = await backUpCharacterSlot(slot);
+    if (result === 'ok') {
+      setBackedUpSlotId(slot.slotId);
+      setTimeout(() => setBackedUpSlotId((cur) => (cur === slot.slotId ? null : cur)), 2000);
+    } else if (result === 'unreadable') {
+      setPendingAction({ kind: 'restoreFailed', reason: `${slot.playerName}'s save could not be read from storage.` });
+    } else {
+      setPendingAction({ kind: 'restoreFailed', reason: 'The backup could not be created.' });
+    }
+  };
+
+  // ⚠⚠ OTA-1201 — RESTORE. Reads the clipboard, and NEVER overwrites: an import
+  // always mints a new slot (importSaveAsNewSlot). A player restoring a backup
+  // has already lost a character once, and no confirm dialog is a good enough
+  // guard against a mis-tap costing them a second one.
+  const restoreFromClipboard = async () => {
+    try {
+      const text = await Clipboard.getStringAsync();
+      const decoded = decodeSaveExport(text ?? '');
+      if (!decoded.ok) {
+        setPendingAction({ kind: 'restoreFailed', reason: decoded.reason });
+        return;
+      }
+      const written = await importSaveAsNewSlot(decoded.state);
+      if (!written.ok) {
+        setPendingAction({ kind: 'restoreFailed', reason: written.reason });
+        return;
+      }
+      await refreshSlots();
+      setPendingAction({ kind: 'restored', playerName: decoded.playerName, trimmed: written.trimmed });
+    } catch {
+      setPendingAction({ kind: 'restoreFailed', reason: 'The clipboard could not be read.' });
     }
   };
 
@@ -726,6 +796,32 @@ export function TitleScreen() {
             )}
           </Text>
         )}
+        {/* ⚠ OTA-1231 — BACK UP on DEAD rows only (owner: the button on every
+            living row "makes the game look broken to testers"). A dead
+            character can never be loaded into a session, so this row is its
+            ONLY door — the button stays. A LIVING character backs up from
+            Settings → RUN, beside SAVE, where the thought actually occurs.
+            OTA-1201's rule ("a backup you can only take after the character
+            dies is not a backup") still holds — the capability moved rooms,
+            it did not narrow. */}
+        {item.dead && (
+          <View style={styles.deadActions}>
+            <TouchableOpacity
+              style={styles.shareLogBtn}
+              onPress={(e) => {
+                e.stopPropagation?.();
+                void backUpSlot(item);
+              }}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel={`Back up ${item.playerName}`}
+            >
+              <Text style={styles.shareLogText}>
+                {backedUpSlotId === item.slotId ? '✓ BACKED UP' : 'BACK UP'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
         {item.dead && (
           // Dead characters can't be loaded into a live session, so the
           // LogScreen path is closed to the player. Two row-local
@@ -801,15 +897,25 @@ export function TitleScreen() {
         // .golem → GOLEM, .engine → ENGINE, base (.tartarprim) → TARTARIA.
         // (Previously everything that wasn't .arbiters fell through to "GOLEM",
         // so the HaL / Tartaria build mislabeled itself as GOLEM.)
+        // ⚠ OTA-1251 — THE DESKTOP LINE NEEDS ITS OWN NAME. Owner, on the PC
+        // build: *"this says Tartaria Build, that's HAL — this should be Steam
+        // Beta Build."* Right, and the reason it said TARTARIA is that the
+        // mapping above reads `Application.applicationId`, which on desktop is
+        // the empty string (the owner's copied diagnostic: `App ID: (unknown)`).
+        // Every unrecognised id fell through to the base label, so the PC build
+        // claimed to be the phone build. Platform is checked FIRST because it is
+        // the one fact desktop actually knows about itself.
         const appId = Application.applicationId ?? '';
-        const isArb = appId.endsWith('.arbiters');
-        const isGolem = appId.endsWith('.golem');
-        const isEngine = appId.endsWith('.engine');
-        const buildLine = isArb ? '⟁ ARBITER BUILD'
+        const isSteam = Platform.OS === 'web';
+        const isArb = !isSteam && appId.endsWith('.arbiters');
+        const isGolem = !isSteam && appId.endsWith('.golem');
+        const isEngine = !isSteam && appId.endsWith('.engine');
+        const buildLine = isSteam ? '⟁ STEAM BETA BUILD'
+          : isArb ? '⟁ ARBITER BUILD'
           : isGolem ? '⟁ GOLEM BUILD'
           : isEngine ? '⟁ ENGINE BUILD'
           : '⟁ TARTARIA BUILD';
-        const buildColor = isArb ? '#7ec8e3' : isEngine ? '#9ec96a' : '#c9a86a';
+        const buildColor = isSteam ? '#d08bd0' : isArb ? '#7ec8e3' : isEngine ? '#9ec96a' : '#c9a86a';
         return (
           <Text style={[styles.buildMarker, { color: buildColor }]}>
             {buildLine}
@@ -838,13 +944,11 @@ export function TitleScreen() {
           is still running after the splash, this thin bar carries the progress +
           a short keep-open hint instead of the old wall of text. */}
       {modelsLoading && (() => {
-        const q = qwenStatus === 'ready' ? 1
-          : qwenStatus === 'downloading' ? qwenFraction
-          : qwenStatus === 'loading' ? 0.92 : 0.1;
-        const k = (kokoroPhase.phase === 'ready' || kokoroPhase.phase === 'error') ? 1
-          : kokoroPhase.phase === 'downloading' ? kokoroPhase.fraction
-          : kokoroPhase.phase === 'loading' ? 0.92 : 0.1;
-        const pct = Math.round(((q + k) / 2) * 100);
+        // ⚠ OTA-1251 — the arithmetic moved to app/ui/modelBootProgress.ts, where a
+        // test can reach it. It had a real defect while it lived inline here (Qwen's
+        // 'failed'/'skipped' scored 0.1 instead of 1) and that defect was half of the
+        // owner's frozen 51%. Inline JSX math is untestable math.
+        const pct = modelBootPercent(qwenStatus, qwenFraction, kokoroPhase);
         return (
           <View style={styles.compactLoadWrap}>
             <View style={styles.splashBarTrack}>
@@ -1055,6 +1159,20 @@ export function TitleScreen() {
                 {bootGateOpen ? 'New Tartarian' : `${bootGateReason}`}
               </Text>
             </TouchableOpacity>
+            {/* OTA-1201 — restore a backed-up character from the clipboard.
+                Sits under New Tartarian because that is where a player goes when
+                they have no character and want one. It never overwrites: a
+                restore always arrives as an additional character. */}
+            <TouchableOpacity
+              style={[styles.secondaryBtn, !bootGateOpen && styles.btnDisabled]}
+              onPress={() => { void restoreFromClipboard(); }}
+              activeOpacity={0.7}
+              disabled={!bootGateOpen}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !bootGateOpen }}
+            >
+              <Text style={styles.secondaryBtnText}>Restore from backup</Text>
+            </TouchableOpacity>
             {/* 2026-05-25 — manual CHECK FOR OTA UPDATE button restored.
                 Removed in v2.4.1 (OTA 051) on the theory that the auto-
                 check in useEffect was sufficient. Playtester report:
@@ -1252,6 +1370,8 @@ export function TitleScreen() {
           : pendingAction?.kind === 'resurrect' ? 'Resurrect Tartarian'
           : pendingAction?.kind === 'fallen' ? 'Fallen'
           : pendingAction?.kind === 'exit' ? 'Exit Game'
+          : pendingAction?.kind === 'restored' ? 'Character restored'
+          : pendingAction?.kind === 'restoreFailed' ? 'Restore failed'
           : ''
         }
         body={
@@ -1263,6 +1383,17 @@ export function TitleScreen() {
             ? `${pendingAction.slot.playerName} has fallen and you hold no Resurrection Gems. The buried world keeps them for now.`
           : pendingAction?.kind === 'exit'
             ? 'Close Tartaria Realms? Any unsaved progress will be lost — use SAVE & EXIT from in-game to keep it.'
+          : pendingAction?.kind === 'restored'
+            // ⚠ Says "added" rather than "restored over", because that is what
+            // happened — the restore never replaces an existing character, and
+            // the player should not go looking for one that vanished.
+            ? `${pendingAction.playerName} has been added to your characters.${
+                pendingAction.trimmed
+                  ? ' The save was large, so some regenerable world detail was trimmed to fit. Your character, gear and progress are intact.'
+                  : ''
+              }`
+          : pendingAction?.kind === 'restoreFailed'
+            ? pendingAction.reason
           : undefined
         }
         buttons={
@@ -1346,7 +1477,7 @@ const styles = StyleSheet.create({
   // OTA-275 — width cap for tablets. Phones (<600pt wide) render
   // unchanged. iPad portrait (744-1024pt) + landscape (1024-1366pt)
   // get the layout centered at 600pt instead of edge-to-edge buttons.
-  container: { flex: 1, backgroundColor: 'transparent', padding: 16, paddingTop: 24, width: '100%', maxWidth: 600, alignSelf: 'center' },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 16, paddingTop: 24, width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' },
   crest: { width: 180, height: 180, alignSelf: 'center', marginBottom: 8 },
   title: { fontSize: 36, color: '#e6d8b3', letterSpacing: 8, fontWeight: '800', textAlign: 'center' },
   subtitle: { fontSize: 14, color: '#c9a86a', letterSpacing: 14, marginTop: -4, textAlign: 'center' },

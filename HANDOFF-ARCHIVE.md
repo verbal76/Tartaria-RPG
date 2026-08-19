@@ -5541,3 +5541,257 @@ The session started as routine OTA pipeline work but pivoted on a playtest log m
 That's the lay of the land at v2.4.1 / OTA `2026-05-23-020`. v2.4.1 is fully shipped, OTA 23-020 is live on the device (user-verified), and the v2.4.1 milestone now includes a full map system overhaul. The post-baseline OTAs broke into three phases: 23-013 → 23-018 polished the playtest stack (Reclaimer's Rope, salvage rolls + 10 failure variants, look-around filter, Kokoro recovery); 23-019 ran a 6-agent codebase review, traced and fixed the map marker disconnect (grid 21×21 → 41×41, canonical-bearing procedural placement, anchor-relative drift, aspect-corrected steps), authored 4 missing items, and bundled 8 smaller fixes; 23-020 followed with sim-suite timeout bumps so CI stays green on the bigger grid.
 
 **Immediate next-session priorities**: (1) verify the map marker behavior on-device once the user starts a new character — should see the marker drift on cardinal steps and snap to canonical anchors on arrival; (2) wife's Kokoro recovery after she installs APK 207 (or 210 — same JS bundle) — paste-back from new diagnostic will tell us the actual failure; (3) player creation approval screen once the 14 race portraits land in `assets/portraits/`; (4) PR #1 description refresh covering the v2.4.1 baseline + map overhaul + bundled fixes before any merge request; (5) optional: update `docs/world-atlas-for-notebook-lm.md` §3 to document the new 41×41 grid + doubled distance bands (currently still describes the 21×21 model).
+
+
+---
+
+# ARCHIVED 2026-08-07 — the 2026-07-13/14 punch lists and exploit-sweep backlog
+
+> Moved out of `HANDOFF.md` verbatim. All reconciled closed; they were kept in the live
+> handoff long enough to start contradicting each other ("PUNCH LIST STATUS" announced B2
+> as NEXT while the block beneath it recorded B2 closed). The one still-open item, combat
+> rebalance pass 2 'matched progression', was carried up into §8 rather than archived.
+
+- **PUNCH LIST (2026-07-14) — 12 items, worked in order, nothing else until it's
+  clear.** From the multi-agent exploit sweep + the 2026-07-13 device-log
+  analysis. Status: **#5 DONE (797/777/1083), #7 DONE (798/778), #9 DONE
+  (799/779/1084).** The three the user pulled to the front are shipped. Remaining
+  9 reorganized into a new working list below (grouped, no longer strict-order).
+  1. Economy re-tiering (self-crafted sale price grounded on ingredients;
+     fused-scrap Golem-Core/aether mint; Common-armor sell arbitrage; gift
+     value-gate). *Needs number sign-off.*
+  2. Contract location-gating + remote-pay cut for hunts/mysteries/storylines
+     (stage-def schema add; broker stalls should also accept turn-ins).
+  3. Name-keyed item dupes (drop/pickup merge, coating a stack, throwable-by-name).
+  4. Outdoor water-bounce flag persistence + misc small bugs (enemy DOT ticks
+     only on `attack`; no hard stat cap; `jump at <any text>` trains DEX;
+     `defeatedEnemies` array grows unbounded → save bloat).
+  5. ~~Qwen dormancy watchdog only revived the narrow dormant case; one failed
+     reinit stranded status='failed' for the whole session.~~ **FIXED 797/777/1083.**
+  6. ~~Dodge strictly dominant at high DEX (100% win in the log) — could beat even
+     an enemy nat-20 → literal invulnerability.~~ **FIXED 815/795/1100** — a NATURAL
+     20 lands through a dodge (hard 5% hit floor, matching the AC path); 2× out-of-
+     position, crit-doubling still suppressed (OTA-796). Never invulnerable; a high
+     miss rate is fine (player's design call).
+  7. ~~Core Guardians show no weakness/resistance in combat (player asked
+     twice).~~ **FIXED 798/778 (HAL+golem only — no Guardians on engine_Dev).**
+  8. ~~Rework the fused-weapon naming pool.~~ **FIXED 801/781/1086 (C2 below).**
+  9. ~~Climbing rope: warn at durability 4, fail only at 0 (stop stranding 15
+     pts).~~ **FIXED 799/779/1084** (usable to last point; graceful break at 0,
+     no fall; fraying warning while low; climbReadiness button mirrors ≤ 0).
+  10. ~~Post-boss ambush grace window on outpost exit.~~ **FIXED 801/781/1086 (C3 below).**
+  11. ~~Fusion material-type UX.~~ **FIXED 801/781/1086 (C1 below).**
+  12. ~~MiniLM cognitive-label noise.~~ **FIXED 801/781/1086 (C4 below).**
+
+- **REMAINING WORK LIST (2026-07-14) — reorganized; A1+A2 now DONE (800/780/1085).**
+  The user's three front-loaded picks (#5 Qwen, #7 Guardians, #9 rope) plus the
+  A-group correctness/dupe closes are done; what's left is the B (economy/balance,
+  needs your number calls) and C (UX/polish) groups. Old punch-list numbers in
+  [brackets].
+  - **A. Correctness / bugs — ~~DONE 800/780/1085~~.**
+    - ~~A1 [#4] Outdoor water-bounce + misc small bugs.~~ **FIXED:** DOT tick
+      hoisted into runEnemyGroupCounters (ticks every combat round, not just
+      attack); hard stat ceiling MAX_TRAINED_STAT=30 (player + dog + golem;
+      engine has no golem); `jump at` needs a resolved scene noun; defeatedEnemies
+      de-duplicated distinct-name set (self-heals legacy saves); wild-water re-arm
+      moved to worldMemory.waterUsedAt, keyed per source on game-hours
+      (WATER_REARM_HOURS=6).
+    - ~~A2 [#3] Name-keyed item dupes.~~ **FIXED:** dropped-item pickup routes
+      through grantItem + decrements the exact instance by id (no worn/coated/
+      rolled laundering); applyCoating (+armor) peels one unit off a stack instead
+      of coating all N for one vial; equipped throwable consumed by the equipped
+      instance id (mainId/offId), closing infinite coated-throw + bandolier
+      double-spend.
+  - **B. Economy / balance (design calls from the user):**
+    - ~~B1 [#1] Economy re-tiering.~~ **FIXED 802/782/1087** (per the user's calls):
+      (a) self-crafted items never sell above their recipe INGREDIENT value
+      (break-even; Legendary +25% bump) — sellPrice.selfCraftedSellCap; (b) fused
+      items stay SCRAPPABLE (the intended crafting-materials market), but the fuel
+      mats they yield (Golem Core, Aetheric Shard/Dust, Aether Crystal, Aetheric
+      Cloth, Mudstone) now price near-worthless AT VENDORS (flat 3 TC,
+      BOTTLENECK_CRAFTING_MATS) — crafting-only value, no fuse→scrap→sell pump;
+      (c) nothing sells above the cheapest realistic buy for its rarity
+      (RARITY_BUY_FLOOR: 5/14/40/112), closing cross-stall arbitrage;
+      (d) ~~giftToVendor value-gated~~ **— SUPERSEDED: GIFTING REMOVED ENTIRELY
+      in 803/783/1088** (user call). Faction standing is earned through mission
+      completions + sigil/pendant turn-ins; gifting-for-rep undercut that + was
+      undiscoverable, so the whole mechanic (intent, verb, action, handler) is
+      gone. Tunable knobs still live for (a)–(c): RARITY_BUY_FLOOR,
+      BOTTLENECK_CRAFTING_SELL, the Legendary craft bump. The buy-from-vendor rep
+      side door was **greatly reduced (not removed) in 804/784/1089** per the user:
+      standing now accrues by TC spent (+1 per 500 TC, banked in buyRepProgress) as
+      an afterthought contributor. Knob: BUY_REP_TC_PER_STANDING.
+    - **CHA-scaled vendor discounts — SHIPPED 805/785/1090** (grew out of the B1/
+      gifting talk; "does Charisma even affect pricing?" — it didn't). Charisma now
+      drives pricing: 2%/pt above 10, capped 20% (chaPriceDiscount), applied to BOTH
+      buys (cheaper) and sell-backs (richer, on top of the B1 caps as an earned
+      merchant perk). GATED per faction behind a RAPPORT quest — a vendor fetch
+      contract `fq_<faction>_rapport` (9 authored on HAL/golem in faction-quests.json,
+      fetch a Golem Core; NOT ported to engine — it keys off completedFactionQuestIds
+      so it lights up wherever a rapport quest exists). Until earned, pricing is
+      unchanged. New module app/engine/factionRapport.ts (chaPriceDiscount /
+      hasFactionRapport / vendorPriceMod / rapportQuestId); buy/sellToVendor +
+      VendorScreen honor the mod (partner-rate banner); turn-in flourish announces
+      the unlock. Knobs: CHA_PRICE_DISCOUNT_PER_POINT (0.02), CHA_PRICE_DISCOUNT_CAP
+      (0.20). Diplomacy IS already wired (INTENT_TO_STAT.diplomacy='charisma';
+      resolves hunt/mystery/storyline diplomacy checks; "convince"/"persuade" in the
+      CHA word list). Content follow-up: the 9 FACTION_COVETED_ITEM relics aren't
+      placed in the world (7/9 are broker-only) — rapport quests fetch a Golem Core
+      as a stand-in; swap to the lore relics once they're placed.
+    - **CHA payoff reachability (user Q: "what can I persuade them to do? all I meet
+      are un-typeable vendors and animal enemies").** Real gap: diplomacy only fired
+      inside scripted quest social stages (hunt toll-givers, faction-storyline
+      social gates, main-quest "address the keepers"), so CHA felt invisible in
+      everyday play. Built out as a SOCIAL REWORK (talk-down + wanderers were the
+      first pass; the parley below supersedes their flat rolls):
+      - **Talk down wild enemies — SHIPPED 806/786/1091, then RESHAPED by 808.**
+        Original single-roll in-combat disengage. Now the animal side of the parley.
+      - **Wandering NPCs — SHIPPED 807/787/1092, then RESHAPED by 808.** Original
+        single-roll wanderer talk. Now the person side of the parley. (Spawn +
+        farm-proof window + banner are unchanged; only the talk RESOLUTION changed.)
+      - **Parley + Menace (social rework) — Phase 1 SHIPPED 808/788/1093.** Two-button
+        choice (Calm/Persuade vs Intimidate) with hard lock-and-key (wrong key
+        auto-fails; WIS reveals the temperament), asymmetric downsides (safe fail =
+        forfeit the hook; intimidate fail = harm + forfeit), reward split (persuade →
+        lead, intimidate → goods), and the full Menace loop (visible on the portrait,
+        self-blunting DC, encounter scaling, decay, −6 extortion standing cost). See
+        §9. Modules parley.ts + menace.ts; ParleyModal; store pendingParley/
+        resolveParley + runParleyOutcome.
+        - **Phase 2 — SHIPPED 809/789/1094 (social rework COMPLETE).** Wanderers
+          carry a seeded payload (goods + a location lead). INTIMIDATE grants their
+          actual CARRIED GOODS (coins + salvage items) into the pack; PERSUADE plants
+          a real player.pendingLead that pays out (the cache) the next time you reach
+          fresh peaceful ground — "talk for secrets" is now a go-find-it. New "cagey"
+          beat (wandererCagey) names their price before you choose. See §9. Helpers
+          makeWandererGoods / makeWandererLead / wandererCagey; Wanderer.goods+lead;
+          PlayerCharacter.pendingLead; miscLootItem; beginScene payout. Lore-neutral.
+          Possible future polish (not scoped): wire leads into the real whisper/hook
+          chains + reveal actual map locations (Phase-2 uses a self-contained cache);
+          intimidation-scaled enemy difficulty is menace-driven (809 keeps that).
+    - **B2 [#2] Contract turn-in gating — HUNTS DONE 810/790/1095** (user call:
+      "hunts are a face to face turn in"). Closed the real hole: the Contracts-UI
+      COMPLETE for a hunt used to pay FULL from ANY tile (whole bounty from a safe
+      hub) — now requires a paying agent IN SCENE + the RIGHT posting faction's agent,
+      and the remote "send word" courier close is removed for hunts (full pay only,
+      no cut). See §9. **STILL OPEN (not requested):** mysteries + storylines keep
+      their remote courier cut and still ADVANCE their stages on any matching
+      check/kill/travel anywhere — if the user wants those tightened too, add optional
+      locationId/biomeTag/enemyName to stage defs + extend the face-to-face turn-in to
+      those kinds. Only hunts were called out this pass.
+    - **B3 [#6] Dodge strictly dominant at high DEX** — RETEST DATA IN (2026-07-15
+      device log, Heir Atalan-Drowned Core Guardian fight): it's really an AC/defense
+      dominance more than a dodge-loop exploit now. The player at **AC 31, DEX 20** made
+      the boss (d20+5 to hit) need a **26+ — i.e. only a natural 20** lands, so across
+      the whole fight the boss connected exactly ONCE (a crit for 14); every other swing
+      of its two-per-round missed. Dodge on top gives a free "PERFECT OPENING (next
+      strike ×2 dice)" every time. BUT the fight was NOT trivial: the Guardian RESISTS
+      piercing (the player's Giant Bone Longbow + Phoenix Rebirth both piercing → ×0.5,
+      3–6 dmg/hit), so offense was slow and the golem (Fat Ass) actually landed the
+      kill — the OTA-798 weakness/resist system + the Arbiter's "try burn" hint were
+      doing their job. So the open question for the USER's design call is narrower than
+      "dodge is broken": **high AC makes late-game characters near-unhittable except on
+      crits.** Options if they want to tune — (a) let bosses' bonus scale so they hit a
+      31-AC target more than 5%; (b) cap/curve AC contribution; (c) leave it (defense IS
+      the reward for stacking AC, and offense is already gated by resistances). Do NOT
+      change anything until the user picks a direction — this is a balance/feel call.
+      **UPDATE 2026-07-22 — DIRECTION PICKED, PASS 1 SHIPPED (HAL OTA-947 / golem 924).** The user chose
+      (b)+(a-lite) but REFRAMED the intent: the fast fusion loop is SACRED (keep the dramatic early scaling
+      + the "I got something" hit) — the real problem is raw AC dominating ONE uncounterable axis, which
+      switches the DEFENSIVE half of combat off. Three named, tunable levers ('defense de-runaway'), all in
+      `gameStore.applyEnemyCounter` + a shared `equipment.trimStandingAc` (used by BOTH combat and the
+      StatsPanel, so shown AC = fought AC):
+        · **LIGHT AC TAIL-TRIM** — standing AC climbs untouched to `AC_TRIM_KNEE`=22, then ×`AC_TRIM_RATE`=0.4
+          per point (raw ~37 → ~28). Every piece still adds AC; only the runaway tail bends.
+        · **ENEMY HIT FLOOR** — cap the natural d20 an enemy needs at `ENEMY_HIT_NEEDED_CAP`=13 (~40% floor),
+          so NO AC buys literal immunity. Below the cap it is the IDENTICAL old AC math → low-AC / early
+          fights are unchanged (that's why the full suite stayed green).
+        · **GLOBAL MITIGATION FLOOR** — a landed hit always deals ≥ `MITIGATION_FLOOR`=0.30 of its RAW roll,
+          so stacked resists soak MOST of a matched hit but never ALL — a MISMATCHED resist visibly leaks.
+          (The shaped-stone WARD is a spent absorb pool, not a passive resist, so it still runs after this
+          and may legitimately zero a hit.)
+      **KNOBS for adjusting fire downrange (all named constants):** `ENEMY_HIT_NEEDED_CAP` (lower = hit more;
+      11 ≈ 50%), `MITIGATION_FLOOR`, and the trim `knee`/`rate`. A design artifact (charts + full model) was
+      produced this session; the user signed off on light-tail-trim + the legibility layer.
+      **STILL OPEN — passes 2 & 3 (planned, NOT yet shipped):**
+        · **OTA-948 'matched progression'** — fold worn armour into the enemy POWER metric. `enemyScalePower`
+          (encounter.ts) and `guardianPlayerPower` (coreGuardians.ts) today read only `bestStat + HP/10` and
+          are BLIND to armour, so a tank reads as LOW power and the world scales DOWN (Guardian tiers 1–2 even
+          SUBTRACT to-hit). Fix: add the armour AC term so as you gear up, enemy HP + damage climb to match
+          ("the world climbs with you"). One-directional (spawn-time read of the player, never re-fed → NO
+          feedback loop). Invasive: threads armour through ~8 `enemyScalePower` call sites → do in isolation.
+        · **OTA-949 'legibility layer'** — make gear/resists VISIBLE: resist/weakness call-out on the hit
+          (strengthen the OTA-838 tags + OTA-197 swap-nudge to NAME a type the player carries); coating-soak
+          feedback (extend the OTA-946 weather-resist "0 damage" line to combat hits); a "hit leaked — missing
+          resist" cue. Once-per-encounter, no spam.
+      Recommendation on record: playtest pass 1 BEFORE stacking pass 2 (combat changes compound).
+  - **C. UX / polish — ~~DONE 801/781/1086~~.**
+    - ~~C1 [#11] Fusion material-type UX.~~ **FIXED:** firing the Crucible with
+      reserved-but-insufficient pieces opens the PICKER (which already surfaces
+      each piece's material bucket + a live diversity readout, OTA-679) instead of
+      dead-ending on a repeated refusal. (Identical-repeat refusals were already
+      deduped on the arbiter channel.)
+    - ~~C2 [#8] Fused-weapon naming pool.~~ **FIXED:** a forged WEAPON with a soft
+      / non-weapon Qwen name ("Aetheric Thread", "Resonant Veil") is rejected so
+      the deterministic weapon pool (Cleaver / Edge / Reaver / …) names it;
+      migrateFusedName heals such names on load. Armor keeps soft names.
+    - ~~C3 [#10] Post-boss ambush grace window.~~ **FIXED:** a boss kill stamps
+      player.bossDefeatGraceUntilHours = now + POST_BOSS_GRACE_HOURS (3);
+      beginScene suppresses arrival encounters while it holds, so stepping out of a
+      just-cleared outpost doesn't drop a fresh ambush mid-loot.
+    - ~~C4 [#12] MiniLM cognitive-label noise.~~ **FIXED:** reworded the 6
+      EMOTION_ANCHORS to short, distinct, LORE-NEUTRAL sentences (no shared
+      "ruins/Aetheric" boilerplate) so cosine similarity discriminates instead of
+      smearing across labels; the neutral wording made the anchors identical on
+      engine_Dev too. INTENT_ANCHORS left as-is (scope was EMOTION_ANCHORS only).
+
+- **PUNCH LIST STATUS — B1 done, CHA-discount feature shipped; only B2 + B3
+  remain, each needing a design/number call before it can be worked.** A (bugs +
+  dupes), C (polish), and B1 (economy re-tiering + gifting removal + buy-rep grind)
+  are shipped; the CHA-scaled vendor-discount/rapport feature shipped 805/785/1090;
+  #5/#7/#9 shipped earlier. B2 (contract location-gating + remote-pay cut) is NEXT
+  and needs the strictness call; B3 (dodge at high DEX) needs a 796+ retest first.
+
+
+- **Exploit-sweep backlog (2026-07-13) — RECONCILED 2026-07-28: every group below was
+  subsequently closed (economy re-tiering B1 802/782; item dupes A2 800/780; water bounce +
+  small bugs A1 800/780; HUNT turn-in gating 810/790) — and CORRECTION OTA-1035: the earlier claim here that mysteries + storylines
+  still turned in remotely was WRONG; a later B2 pass made ALL kinds face-to-face
+  (turnInMystery/turnInStoryline require an agent in scene, the UI COMPLETE delegates to
+  them, typed couriers refused). Nothing in this backlog remains open. Original record kept
+  below for the audit trail.**
+  A multi-agent audit surfaced ~33 findings; the confirmed criticals/highs with
+  contained fixes shipped this OTA. Still open, grouped by why they were deferred:
+  - **Economy re-tiering (needs a design call on numbers):** (a) self-crafted
+    rarity items sell far above ingredient value — Mudstone/Corruption Tonic from
+    free forage sell 36 TC (`sellPrice.ts`, `scrapEngine.ts` fused-scrap bypass of
+    the `selfCrafted` trim); (b) fused-item SCRAP re-mints Golem Cores + sellable
+    aether stock from free junk (`scrapEngine.ts:104`); (c) Common armor sell
+    floor 11 TC > authored stall price 8 TC → cross-stall arbitrage
+    (`sellPrice.ts:37`); (d) `giftToVendor` trains CHA + gives +5 rep per junk
+    item, no value floor/cooldown (`gameStore` ~16528). Fix direction: ground
+    self-crafted sale price on ingredient value; value-gate gifts.
+  - **Contract location-gating (needs stage-def schema add):** hunt/mystery/
+    storyline stages advance on ANY matching skill-check/kill/travel anywhere, and
+    the Contracts-UI COMPLETE pays 100% from any tile (only faction_quest has the
+    remote-pay cut). Whole storylines farmable from a safe hub. Also: broker stalls
+    accept every faction's contracts but refuse to take them back (one-way). Fix:
+    add optional `locationId`/`biomeTag`/`enemyName` to stage defs + mirror the
+    faction_quest remote-pay cut to the other three kinds.
+  - **Item-dupe via name-keyed merges (medium, needs careful stacking audit):**
+    dropped-item pickup merges by name (durability laundering + coating dupe,
+    `gameStore` ~13301); `applyCoating` stamps a whole qty-N stack for one vial;
+    throwable consumption resolves by name not equipped id (infinite coated throw
+    + bandolier double-spend). Fix: route through `grantItem`/id-resolution.
+  - **Water bounce residual (medium):** the one-per-visit water flags still live on
+    `currentScene`, so bouncing two adjacent OUTDOOR water tiles resets them (the
+    substring fix already killed the free-hub version). Fix: persist in
+    `worldMemory.visitedRooms` with a game-hours re-arm.
+  - **Small bugs:** enemy DOTs only tick on the player's `attack` action (frozen
+    during dodge/move/companion turns, `gameStore` ~7560 — hoist out of `case
+    'attack'`); no hard stat cap anywhere in the training stack (`statTraining.ts`
+    +dog/golem twins — add a design ceiling); `jump at <any text>` trains DEX on
+    unresolved targets; `defeatedEnemies` array grows unbounded → eventual
+    save-loss (`worldMemory.ts` — collapse to a count map or trim). Full
+    per-finding detail (file:line, repro, proposed fix) in the 2026-07-13 session
+    log / scratchpad `sweep-findings.txt`.
+

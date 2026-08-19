@@ -47,6 +47,14 @@ export interface ValidationContext {
   ambientNouns?: string[];
   vendorName?: string;
   enemyNames?: string[];
+  /** ⚠ OTA-1265 — index of the matched verb in the normalized token
+   *  stream. parseInput knows it (`bestMatch.index`); the validator
+   *  cannot recover it, because on a FUZZY match ("slep" → 'sleep')
+   *  `matchedVerb` is not a token that appears in `normalized` at all.
+   *  The negation rule is entirely about what sits BEFORE the verb, so
+   *  it needs the real index. Omitted → the rule is skipped rather
+   *  than guessed. */
+  verbTokenIndex?: number;
 }
 
 export type ValidationIssue =
@@ -60,7 +68,9 @@ export type ValidationIssue =
   // OTA 205 — selectional restrictions (Sleator & Temperley §7.3)
   | 'instrument_not_a_tool'      // instrument slot resolved to consumable
   | 'recipient_not_an_npc'       // recipient slot resolved to a wall / ambient
-  | 'destination_not_a_place';   // destination slot resolved to an item
+  | 'destination_not_a_place'    // destination slot resolved to an item
+  // ⚠⚠ OTA-1265 — negation scoping over the matched verb
+  | 'negated_command';           // "do not open the chest" was opening the chest
 
 /** Meta-talk markers — sentences starting with these patterns are
  *  feedback / commentary / questions, not commands. Anchored at the
@@ -92,6 +102,46 @@ function contentTokenCount(normalized: string): number {
   return tokens.filter((t) => !fillerRegex.test(t)).length;
 }
 
+/** ⚠⚠ OTA-1265 — negation markers. Apostrophes are already dissolved
+ *  by normalizeInput ("don't" → "dont"), so the contracted forms are
+ *  listed in their post-normalization shape — matching on "don't"
+ *  here would never fire. */
+const NEGATION_TOKENS = new Set([
+  'no', 'not', 'never', 'nothing', 'none', 'nor', 'neither',
+  'dont', 'doesnt', 'didnt', 'wont', 'cant', 'cannot', 'shouldnt',
+  'wouldnt', 'couldnt', 'isnt', 'arent', 'wasnt', 'werent', 'aint',
+]);
+
+/** ⚠ Negation does not scope across a coordinating conjunction. "I have
+ *  nothing SO I will attack" is an attack; "I will not attack" is not.
+ *  Without this boundary the backward scan would read the `nothing` and
+ *  refuse a command the player really did give. */
+const NEGATION_BOUNDARY_TOKENS = new Set([
+  'and', 'then', 'but', 'so', 'because', 'or', 'however', 'though', 'although',
+]);
+
+/** ⚠ How far back to look. MEASURED, not picked: the longest real
+ *  distance across the probed phrasings is 3 ("I do not want to sleep",
+ *  "I never want to camp here"), so 4 covers them with one token of
+ *  headroom. An unbounded scan would let a negation at the head of a
+ *  long sentence veto a verb ten words later that it has nothing to do
+ *  with. */
+const NEGATION_LOOKBACK = 4;
+
+/** True iff a negation scopes over the verb at `verbTokenIndex`.
+ *  Walks BACKWARD from the verb, stopping at a clause boundary. */
+function verbIsNegated(normalized: string, verbTokenIndex: number): boolean {
+  const tokens = normalized.split(/\s+/).filter(Boolean);
+  if (verbTokenIndex < 0 || verbTokenIndex >= tokens.length) return false;
+  const stopAt = Math.max(0, verbTokenIndex - NEGATION_LOOKBACK);
+  for (let i = verbTokenIndex - 1; i >= stopAt; i--) {
+    const t = tokens[i]!;
+    if (NEGATION_BOUNDARY_TOKENS.has(t)) return false;
+    if (NEGATION_TOKENS.has(t)) return true;
+  }
+  return false;
+}
+
 /** Returns the list of validation issues found. Empty list = parse
  *  is clean. Caller decides whether to act on the issues.
  *  Optional ValidationContext enables the selectional-restriction
@@ -104,6 +154,15 @@ export function validateParse(parsed: ParsedInput, ctx?: ValidationContext): Val
   //   "it is supposed to remove a noun item from the popup..."
   if (META_REGEX.test(parsed.normalized)) {
     issues.push('meta_talk');
+  }
+
+  // ⚠⚠ OTA-1265 Rule 1b: NEGATION. "do not open the chest" was opening
+  // the chest, at confidence 1.00 — the verb scan took the exact `open`
+  // hit and nothing in the parser or this validator had ever looked at
+  // the word in front of it. Measured before the fix: 10 of 10 negated
+  // phrasings executed the negated action.
+  if (ctx?.verbTokenIndex != null && verbIsNegated(parsed.normalized, ctx.verbTokenIndex)) {
+    issues.push('negated_command');
   }
 
   // Rule 2: too-long input. Catches commentary that slipped past
@@ -213,6 +272,13 @@ export function shouldRejectParse(issues: ValidationIssue[]): boolean {
  *  engine to surface "did you mean..." prompts after a junk parse.
  *  Returns a single short string suitable for the Arbiter channel.*/
 export function describeIssues(issues: ValidationIssue[]): string {
+  // ⚠⚠ OTA-1265 — first, because it is the only issue where the player
+  // said something perfectly clear and the parser did the OPPOSITE of
+  // it. "That is a lot of words for one action" would be an insulting
+  // reply to "do not open the chest".
+  if (issues.includes('negated_command')) {
+    return 'You decide against it. (Say what you DO want to do — "look around", "attack the drone".)';
+  }
   if (issues.includes('meta_talk')) {
     return "That reads like a note about the game rather than something your character would do. Use the 📝 button to leave a note; try a short action like 'look around' or 'attack the drone' otherwise.";
   }

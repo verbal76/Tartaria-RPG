@@ -10,14 +10,25 @@ import { useGameStore, effectiveACBreakdown, playerArmorResistKinds } from '../s
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
+import { JOIN_THRESHOLD, BUY_REP_TC_PER_STANDING } from '../engine/factions';
+// OTA-1336 — the standing ladder: tier names + thresholds shown here are the SAME
+// symbols the vendor counter prices by, so the sheet can never drift from the rule.
+import { standingTierLabel, STANDING_KNOWN, STANDING_TRUSTED, STANDING_HONORED } from '../engine/factionRapport';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
 // OTA-1089 — Phase 4 difficulty, and the only place it can be eased.
 import {
   PRESET_TIERS, PRESSURE_PROFILES, pressureOf, canChangeTo,
+  // ⚠ OTA-1181 — the REAL hunting line, not a copy of it. This screen has form
+  // for hardcoding a threshold next to a comment citing the constant (see the
+  // OTA-1179 note below); the whole point of the new warning is that it agrees
+  // with the code that acts on it.
+  HOSTILE_STANDING,
 } from '../engine/pressure';
 // OTA-1090 — Phase 5: where the Arbiter stands, and what he thinks of you.
 import { arbiterSheetLines } from '../engine/arbiterPersona';
+import { hpBreakdown, hpBreakdownLine } from '../engine/hpBreakdown';
+import { giftLedger, giftLedgerLine } from '../engine/giftLedger';
 import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { barehandDamageFor } from '../engine/raceMechanics';
@@ -67,6 +78,8 @@ export function CharacterScreen() {
   // OTA-848 — tap-to-expand: the AC breakdown, and which title's provenance is open.
   const [acOpen, setAcOpen] = useState(false);
   const [openTitle, setOpenTitle] = useState<string | null>(null);
+  // OTA-1184 — the gift ledger drills into the Arbiter's "N gifts given" row.
+  const [giftsOpen, setGiftsOpen] = useState(false);
 
   if (!player) {
     return (
@@ -98,6 +111,10 @@ export function CharacterScreen() {
   // OTA-1090 [Phase 5] — where the Arbiter stands in the arc, what he thinks
   // of this character, and the itemised reasons for it.
   const arbiter = arbiterSheetLines(player, worldMemory);
+  // OTA-1184 — the two read models this sheet gained: where hpMax came from, and
+  // what was given to whom. Both derive from state already saved; neither writes.
+  const hpParts = hpBreakdown(player, worldMemory);
+  const ledger = giftLedger(worldMemory);
 
   // OTA-843 [Chronicle] — assemble the character's legend from accreted state
   // (memorable beats + milestones + titles + corruption + main-quest progress).
@@ -177,6 +194,21 @@ export function CharacterScreen() {
             </View>
             <Text style={styles.barValue}>{player.hp}/{player.hpMax}</Text>
           </View>
+          {/* ⚠ OTA-1184 — WHERE THE MAX CAME FROM. Owner: "for AC it shows your base
+              and your buffs. HP just says HP not what my base number was so I can see
+              the progression, I didn't roll a 29 at start." hpMax is a BAKED total —
+              creation roll + distinct-kill milestones + gear — and nothing recorded
+              which was which. The base is recovered by subtraction (see
+              engine/hpBreakdown), so this needs no new save field and works on every
+              existing character. */}
+          {hpParts && (
+            <Text style={styles.hpBreakdown}>
+              {hpBreakdownLine(hpParts)}
+              {hpParts.distinctKills > 0
+                ? `  ·  ${hpParts.distinctKills} kinds beaten, ${hpParts.toNextMilestone} to the next +1`
+                : ''}
+            </Text>
+          )}
           <View style={styles.barRow}>
             <Text style={styles.barLabel}>STA</Text>
             <View style={styles.barBg}>
@@ -241,14 +273,50 @@ export function CharacterScreen() {
               <Text style={styles.kvValue}>{arbiter.regard}</Text>
               {arbiter.parts.length > 0 && (
                 <View style={{ marginTop: 10 }}>
-                  {arbiter.parts.map((part, i) => (
-                    <View key={i} style={styles.kvRow}>
-                      <Text style={styles.kvValue}>{part.label}</Text>
-                      <Text style={[styles.kvValue, { color: part.value >= 0 ? '#7a8a5a' : '#a85a3a' }]}>
-                        {part.value >= 0 ? '+' : ''}{part.value}
-                      </Text>
-                    </View>
-                  ))}
+                  {arbiter.parts.map((part, i) => {
+                    const row = (
+                      <View style={styles.kvRow}>
+                        <Text style={styles.kvValue}>
+                          {part.label}
+                          {/* ⚠ OTA-1184 — the affordance. A tappable row that looks
+                              identical to a flat one is a feature nobody finds. */}
+                          {part.kind === 'gifts' ? <Text style={styles.tapHint}>{giftsOpen ? '  ▾' : '  ›'}</Text> : null}
+                        </Text>
+                        <Text style={[styles.kvValue, { color: part.value >= 0 ? '#7a8a5a' : '#a85a3a' }]}>
+                          {part.value >= 0 ? '+' : ''}{part.value}
+                        </Text>
+                      </View>
+                    );
+                    if (part.kind !== 'gifts') return <View key={i}>{row}</View>;
+                    return (
+                      <View key={i}>
+                        <TouchableOpacity activeOpacity={0.7} onPress={() => setGiftsOpen((v) => !v)} accessibilityRole="button">
+                          {row}
+                        </TouchableOpacity>
+                        {giftsOpen && (
+                          <View style={styles.giftLedger}>
+                            {ledger.length === 0
+                              ? <Text style={styles.kvSub}>Nothing recorded yet.</Text>
+                              : ledger.map((e, j) => (
+                                <View key={j} style={styles.giftRow}>
+                                  <Text style={styles.giftLine}>{giftLedgerLine(e)}</Text>
+                                  <Text style={styles.giftMeta}>
+                                    day {e.day}
+                                    {/* ⚠ Only shown when it was actually recorded — a
+                                        gift given before OTA-1184 has no reaction on
+                                        file, and inventing one would be worse than a
+                                        blank: OTA-1176 rewrote the taste table under
+                                        those older entries. */}
+                                    {e.standingDelta ? ` · standing ${e.standingDelta > 0 ? '+' : ''}${e.standingDelta}` : ''}
+                                    {!e.reaction ? ' · reaction not recorded' : ''}
+                                  </Text>
+                                </View>
+                              ))}
+                          </View>
+                        )}
+                      </View>
+                    );
+                  })}
                 </View>
               )}
             </View>
@@ -403,11 +471,17 @@ export function CharacterScreen() {
             saw rep changes log in the world feed and asked "shouldn't
             I see that on my character page?" Lists every faction the
             player has any standing in, sorted highest first. The join
-            threshold is +20 (per JOIN_THRESHOLD in engine/factions.ts);
-            shows a checkmark on factions the player qualifies to join.
+            threshold is JOIN_THRESHOLD (engine/factions.ts) — read, not
+            copied, since OTA-1179; shows a checkmark on factions the
+            player qualifies to join.
             Each faction's standing gates quest / hunt / mystery /
             storyline visibility via minRep; high standing means more
-            contracts surface from that faction's vendors. */}
+            contracts surface from that faction's vendors.
+            ⚠ OTA-1181 — and it runs the OTHER way too, which this panel
+            never said. Below 0 a faction's patrols engage; at
+            HOSTILE_STANDING they hunt you on their ground. That end now
+            gets a ☠/⚠ tag per row and a warning line under the list,
+            both off the real constants. */}
         {sectionHeader('factions', 'FACTION STANDINGS')}
         {!collapsed.factions && (
         <View style={styles.card}>
@@ -425,9 +499,24 @@ export function CharacterScreen() {
             }
             return rows.map(({ row, meta }) => {
               const standing = row.standing;
-              const qualifies = standing >= 20;
+              // OTA-1179 — the constant, not a copy of it. The comment above this
+              // block already cited "per JOIN_THRESHOLD in engine/factions.ts" while
+              // hardcoding 20 twice, so the ✓ and the colour could disagree with the
+              // rule they claim to show if the threshold ever moved.
+              const qualifies = standing >= JOIN_THRESHOLD;
               const isOwn = row.factionId === player.factionId;
-              const color = standing >= 20 ? '#9ec96a'
+              // ⚠ OTA-1181 — THE DANGEROUS END OF THIS NUMBER GETS A WORD, NOT JUST A
+              // COLOUR. The sheet has always marked the good end (✓ at JOIN_THRESHOLD)
+              // and left the bad end to a shade of orange nothing explains. Standing at
+              // or below HOSTILE_STANDING is the single most consequential state in the
+              // system — those patrols stop passing you by and start hunting you on
+              // their ground — and NOTHING anywhere in the game said so. Two marks, both
+              // read off the real constants: 'hunted' once you are past the line, and
+              // 'close' inside the last 10 before it, which is the warning that is
+              // actually worth having, since one contract for their rival moves you 4.
+              const hunted = standing <= HOSTILE_STANDING;
+              const nearHunted = !hunted && standing <= HOSTILE_STANDING + 10;
+              const color = standing >= JOIN_THRESHOLD ? '#9ec96a'
                 : standing >= 0 ? '#cdbf99'
                 : standing >= -10 ? '#c9a86a'
                 : '#e07a5f';
@@ -441,17 +530,39 @@ export function CharacterScreen() {
                     {tide ? <Text style={tide.word === 'rising' || tide.word === 'ascendant' ? styles.tideRising : styles.tideWaning}>{`  ${tide.glyph} ${tide.word}`}</Text> : null}
                   </Text>
                   <Text style={[styles.kvValue, { color }]}>
+                    {/* OTA-1336 — the ladder tier, named. A number alone never told the
+                        player it DOES something; the word is the same one the vendor
+                        counter prices by (factionRapport.standingTierLabel). */}
+                    {standingTierLabel(standing) !== 'Neutral' ? `${standingTierLabel(standing)} · ` : ''}
                     {standing >= 0 ? '+' : ''}{standing}{qualifies && !isOwn ? ' ✓' : ''}
+                    {hunted ? <Text style={styles.huntedTag}>{'  ☠ hunted'}</Text> : null}
+                    {nearHunted ? <Text style={styles.nearHuntedTag}>{'  ⚠ close'}</Text> : null}
                   </Text>
                 </View>
               );
             });
           })()}
           <Text style={styles.kvSub}>
-            ↳ Standing rises with trades, gifts, and finished contracts; falls with theft, killing
-            faction members, and rival favors. +20 unlocks joining the faction; high standing
-            with a faction surfaces more of their contracts (hunts, mysteries, storylines) when
-            you meet their vendors.
+            ↳ Standing rises with trades ({BUY_REP_TC_PER_STANDING} TC spent is worth 1), gifts, and finished
+            contracts; falls with theft, killing faction members, and work done for their rivals —
+            every point you earn with one faction costs their enemies half as much the other way.
+            +{JOIN_THRESHOLD} unlocks joining, and high standing surfaces more of their contracts
+            (hunts, mysteries, storylines) when you meet their vendors.
+            {' '}Their counters price by the ladder: Known (+{STANDING_KNOWN}) takes 5% off,
+            Trusted (+{STANDING_TRUSTED}) takes 10% and vouches for you like the rapport quest,
+            Honored (+{STANDING_HONORED}) takes 15% — while Hostile and Hated pay MORE at the
+            same counters.
+          </Text>
+          {/* ⚠ OTA-1181 — SEPARATE LINE, AND IT IS THE ONE THAT MATTERS. The rule
+              nothing in the game stated: standing is not only an unlock ladder, it is
+              a threat gauge. Kept out of the paragraph above so it cannot be skimmed
+              past, and it names both thresholds because they are DIFFERENT numbers
+              doing different jobs — below 0 a patrol may engage, at HOSTILE_STANDING
+              it goes looking for you. */}
+          <Text style={styles.kvWarn}>
+            ⚠ Below 0, a faction&apos;s patrols will engage you on sight. At {HOSTILE_STANDING} they
+            hunt you on their own ground — marked ☠ above. One contract for their rival moves
+            you about 4, so the drop is faster than it looks.
           </Text>
           {/* OTA-849 — jump to the WORLD view: the full balance of power + rumours. */}
           <TouchableOpacity style={styles.worldLink} activeOpacity={0.7} onPress={() => setScreen('world')} accessibilityRole="button">
@@ -1075,6 +1186,17 @@ const styles = StyleSheet.create({
   tideWaning: { color: '#c98a6a', fontSize: 10, fontWeight: '400' },
   kvValue: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   kvSub: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', marginTop: -2, marginBottom: 4 },
+  // OTA-1184 — the HP provenance line and the gift ledger.
+  hpBreakdown: { color: '#8a7a5a', fontSize: 10, marginTop: -2, marginBottom: 2, marginLeft: 46 },
+  giftLedger: { marginTop: 6, marginBottom: 4, paddingLeft: 10, borderLeftWidth: 2, borderLeftColor: '#3a3226' },
+  giftRow: { marginBottom: 6 },
+  giftLine: { color: '#e6d8b3', fontSize: 12 },
+  giftMeta: { color: '#8a7a5a', fontSize: 10, fontStyle: 'italic' },
+  // OTA-1181 — the threat end of a standing row, and the rule under the list.
+  // Deliberately NOT italic like kvSub: this one is a warning, not a footnote.
+  huntedTag: { color: '#e07a5f', fontSize: 10, fontWeight: '700' },
+  nearHuntedTag: { color: '#c98a6a', fontSize: 10, fontWeight: '400' },
+  kvWarn: { color: '#e07a5f', fontSize: 10, marginTop: 2, marginBottom: 4 },
   warning: { color: '#c9a86a' },
   danger: { color: '#e07a5f' },
 

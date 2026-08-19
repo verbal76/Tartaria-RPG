@@ -1,29 +1,18 @@
-// OTA 050 — Atlas map screen with pinch-zoom + pan gestures. Renders
-// the hand-illustrated world atlas (assets/world-atlas.png) with a
-// "you are here" dot anchored to the player's procedural grid position
-// relative to the Reclaimers' Outpost ring at the image's center.
+// The Atlas screen. Renders the commissioned world artwork (assets/world-atlas.png,
+// 1619×971 — dimensions owned by engine/atlasCoords) with pinch-zoom + pan gestures, and
+// draws every overlay the map has: 37 solved place-name labels (engine/atlasLabels), the
+// Hidden Market's reveal-gated "?", the "?"/"✕" grid-event glyphs, and the "◆" contract
+// pins. Below the art: a verbal "where you are" footer (the map deliberately has NO player
+// marker — OTA-182, owner: "let the map just be a map") and the tap-to-travel places list.
 //
-// Gesture model (built on RN's Animated + PanResponder so no extra
-// native dependency):
-//   - 1 finger drag    → pan the map
-//   - 2 finger pinch   → zoom in/out (anchored to the pinch midpoint)
-//   - double-tap       → reset to 1× scale + centered
-//   - scale clamped to [0.8, 5]; translate clamped so the image
-//     doesn't slide entirely off the visible area
+// Gesture model (RN Animated + PanResponder, no extra native dependency):
+//   - 1 finger drag → pan · 2 finger pinch → zoom · double-tap → reset
+//   - MIN_SCALE floors shrink; no zoom-in cap (player request, OTA 060)
 //
-// The dot lives inside the same transformed Animated.View as the
-// image, so it scales + translates with the map — its anchor at
-// the Outpost ring stays correct at any zoom level.
-//
-// Marker model (v2.4.1 overhaul):
-//   Procedural map regenerates on every travelTo, with the new
-//   location at grid center. So mapX/mapY is local to the current
-//   location, not Outpost-relative. Marker snaps to the current
-//   location's canonical atlas anchor on arrival, then drifts in
-//   the player's direction of travel as they wander. Procedural
-//   placement now respects canonical bearing (see worldMap.ts), so
-//   walking east on the map moves the marker east and you'll
-//   eventually reach the canonically-east named location.
+// ⚠ OTA-1333 SCRUB — this file used to carry the player-dot positioning chain
+// (cardinalOffsetFromAnchor drift, hub-minimap inset coords, a dotStyle computed every
+// render). The dot was removed at OTA-182; the chain kept computing into nothing for
+// fifty more OTAs and died with the old-map scrub. See engine/atlasCoords for the note.
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -33,11 +22,12 @@ import {
   TouchableOpacity,
   Image,
   Animated,
+  Easing,
   PanResponder,
   ScrollView,
   type GestureResponderEvent,
 } from 'react-native';
-import { useGameStore } from '../state/gameStore';
+import { useGameStore, playerGridCell } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 // OTA-171 — Location + locationsData are already imported below for
 // the existing LOCATIONS const; reused here for the Places list
@@ -46,16 +36,20 @@ import { FirstTimeHint } from '../components/FirstTimeHint';
 import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y, cellToAtlasFraction, canonicalCellFor } from '../engine/worldMap';
 import {
   atlasCoordForLocation,
-  cardinalOffsetFromAnchor,
-  hubRoomMinimapCoord,
-  OUTPOST_ATLAS_COORD,
   LOCATION_ATLAS_COORDS,
+  ATLAS_PIXEL_W,
+  ATLAS_PIXEL_H,
 } from '../engine/atlasCoords';
+import {
+  atlasLabelLayout, atlasVisualFraction,
+  LABEL_FONT_PX, LABEL_LINE_PX, LABEL_BOX_SAFETY,
+} from '../engine/atlasLabels';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation, HIDDEN_LOCATIONS } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { openContractMarkers, type ContractFamily } from '../engine/contractMarkers';
 import { LOCATION_TO_MACRO } from '../engine/worldLadder';
-import { isHubLocation, hubRoomFor, hubNameForFaction } from '../engine/hub';
+import { isHubLocation, hubRoomFor, hubNameForFaction, hubSkinFactionFor } from '../engine/hub';
+import { outpostRoomMark } from '../engine/outpostRoomMarks'; // OTA-1350 — the marker walks the outpost too
 import { FACTION_STARTING_LOCATION } from '../engine/character';
 // OTA 051 — locations.json carries the human-readable name we want
 // to surface in the "You are here: <name>" chip when the player is
@@ -123,21 +117,69 @@ function describeWhereabouts(locId: string, locs: Location[]): string {
   return (regionPart + nearPart).trim();
 }
 
-// Atlas asset's pixel dimensions — used to compute the letterboxed
-// image rect inside the flex-filled imageBox.
-// arb97 — new commissioned atlas art (assets/world-atlas.png) is 1774×887
-// (2.0:1), replacing the old 1408×768 (1.83:1) hand-drawn map. The dot math
-// is aspect-driven, so these MUST match the live asset's real dimensions.
-const ATLAS_W = 1774;
-const ATLAS_H = 887;
-// arb102 — the atlas art reserves its leftmost stripe for the title/legend
-// cartouche ("TARTARIA") — there's no ground there. Treat the horizontal as a
-// 92-column field whose left 10 columns are that legend, and squeeze overlay
-// marker fractions into the remaining ground band so a pin never lands on it.
-// Visual-only (the gameplay grid + distances are untouched); the right edge is
-// anchored so correctly-placed right-side pins barely move.
-const ATLAS_LEGEND_FRAC = 10 / 92;
-const insetGroundFx = (fx: number): number => ATLAS_LEGEND_FRAC + fx * (1 - ATLAS_LEGEND_FRAC);
+// Atlas asset's pixel dimensions — used to compute the letterboxed image rect inside the
+// flex-filled imageBox.
+//
+// ⚠⚠ OTA-1335 — THESE ARE NO LONGER TYPED OUT HERE. They used to be two local literals with
+// a comment saying they "MUST match the live asset's real dimensions" — a rule with nothing
+// enforcing it, on an asset that has now been replaced twice (1408×768 → 1774×887 →
+// 1619×971). A stale ratio does not throw; it silently slides every marker off the landmark
+// it is meant to be standing on. One exported number now, owned by the module that owns the
+// coordinate system.
+const ATLAS_W = ATLAS_PIXEL_W;
+const ATLAS_H = ATLAS_PIXEL_H;
+
+// Solved once at module load — the catalogue cannot change at runtime, so re-running the
+// placement solver on every render would be pure waste.
+const ATLAS_LABELS = atlasLabelLayout();
+
+// ⚠⚠ PINS MUST MOVE WITH THE NAMES. The overlay nudges a place's DRAWN position onto its
+// painted silhouette (see atlasLabels.ts for why the artwork and the data disagree). If the
+// "?" and "◆" markers kept using the raw grid position, a contract pin would sit up to a
+// tile away from the very name it belongs to — two marks for one place, in two places.
+//
+// Event and contract markers are keyed by CELL, not by location id, so this reverses the
+// mapping once at module load: canonical cell → the location that owns it. A cell with no
+// owner (a whisper target born at an arbitrary spot) simply falls through to the grid
+// position, which is correct — there is no silhouette for it to sit on.
+const CELL_TO_LOCATION: Record<string, string> = (() => {
+  const m: Record<string, string> = {};
+  for (const id of Object.keys(LOCATION_ATLAS_COORDS)) {
+    const c = canonicalCellFor(id);
+    m[`${c.x},${c.y}`] = id;
+  }
+  return m;
+})();
+
+// ⚠ OTA-1341 — how long ⌖ ME takes to carry the view to the marker. Tuned SLOW on
+// purpose (owner: the jump cut lost the "path to the location"); the terrain must
+// stay trackable for the whole ride. If this ever feels sluggish, shorten it here —
+// do not swap back to a spring, which reads as a teleport.
+const CENTER_GLIDE_MS = 1400;
+
+/** Where a marker at this cell should be DRAWN. Never used for distance or routing. */
+function markerFraction(x: number, y: number): { fx: number; fy: number } {
+  const id = CELL_TO_LOCATION[`${x},${y}`];
+  if (id) {
+    const a = LOCATION_ATLAS_COORDS[id]!;
+    return atlasVisualFraction(id, a.fx, a.fy);
+  }
+  return cellToAtlasFraction(x, y);
+}
+
+// ⚠⚠ THE LEGEND INSET IS GONE, AND DELETING IT WAS MANDATORY — NOT A TIDY-UP.
+//
+// arb102 added `ATLAS_LEGEND_FRAC = 10/92`, which squeezed every overlay marker rightwards
+// so no pin landed on the "TARTARIA" title cartouche painted down the left edge of the
+// previous artwork. Correct then. The redrawn atlas has no cartouche — the spec that
+// commissioned it says so in as many words: no legend, no title, no text of any kind
+// anywhere in the image. Leaving the inset in would have shifted every marker on the map
+// EAST by 10.9% of the map width — 176 px on a 1619-wide canvas, roughly four grid tiles.
+//
+// Nothing would have thrown. Every pin would simply have been in the wrong place, on the one
+// screen whose entire job is telling the player where things are: the kind of defect that
+// ships, gets reported as "the map feels off", and takes a week to trace. Marker fractions
+// are now used raw, exactly as `cellToAtlasFraction` computes them.
 
 // arb99 — the world atlas, plus per-faction outpost INTERIOR maps. When the
 // player is inside their outpost the Map screen shows that faction's interior;
@@ -194,6 +236,9 @@ export function MapScreen() {
   // OTA-502 — dynamically-canonized places (whisper/contract/mission mentions) are
   // routable too: fold them into the travel list as ordinary rows.
   const canonLocations = useGameStore((s) => s.worldMemory?.canonLocations);
+  // ⚠ OTA-1350 — rooms already walked, for the outpost map's ✓ marks. The SAME
+  // set the travel chips' ✓ reads (OTA-1277), so map and chips can never disagree.
+  const hubVisited = useGameStore((s) => s.worldMemory?.hubVisited);
   // OTA-171 — Places list sorted with the current location pinned at
   // the top so the player can see where they are at a glance, then
   // by danger ascending (safer trips first) so the easiest
@@ -267,87 +312,32 @@ export function MapScreen() {
     translateY.setValue(ty);
   };
 
-  // OTA 056/060 — fill-height-by-default + auto-center on the
-  // marker. The atlas asset is landscape (1408 × 768) but the
-  // available window is portrait on phones. resizeMode='contain'
-  // alone leaves half the box empty above/below; the baseline
-  // scale fills the height. Then OTA 060 also auto-pans so the
-  // marker (the player's current location) sits in the box
-  // center on open — without it, a player anywhere except the
-  // image's geometric center would have their marker pushed
-  // off-screen by the baseline scale.
+  // OTA 056/060 — fill-height-by-default. The atlas art is landscape but the available
+  // window is portrait on phones; resizeMode='contain' alone leaves half the box empty
+  // above/below, so the baseline scale fills the height. (This comment used to also
+  // describe auto-centering on the player marker — the marker is gone, OTA-182.)
   const baselineScale = useRef(1);
 
-  // Marker positioning — v2.4.1 overhaul (OTA 2026-05-23-019).
-  //
-  // The procedural map regenerates on every travelTo with the
-  // destination at grid center (worldMap.ts:7221). So mapX/mapY is
-  // LOCAL to the current named location, not Outpost-relative.
-  //
-  // Two cases:
-  //   1) Player just arrived (mapX/mapY === center): snap to the
-  //      current location's canonical atlas anchor. No drift yet.
-  //   2) Player has stepped off the named tile (mapX/mapY !== center):
-  //      drift from the current anchor by aspect-corrected per-tile
-  //      fractions. East steps push fx right, south push fy down.
-  //      The marker flows in the direction of travel on the canonical
-  //      atlas — even if the procedural map placed the destination
-  //      elsewhere, walking east on the map still moves the marker
-  //      east. Procedural placement now respects canonical bearing
-  //      (worldMap.ts), so the marker generally heads toward the
-  //      next canonical anchor in the direction of travel.
-  //
-  // The prior code snapped to the named anchor whenever
-  // currentLocationId matched an atlas-depicted location — but
-  // currentLocationId only changes on travelTo (crossing into a NEW
-  // named tile), so the marker stayed glued to the last anchor
-  // through unlimited cardinal stepping. That was the visible bug.
+  // The footer's "N tiles east of X" line needs the player's local grid offset; that is
+  // ALL mapX/mapY feeds on this screen since the marker's removal (OTA-182).
   const safeMapX = typeof player?.mapX === 'number' ? player.mapX : WORLD_MAP_CENTER_X;
   const safeMapY = typeof player?.mapY === 'number' ? player.mapY : WORLD_MAP_CENTER_Y;
-  // v2.4.1 (OTA 032) — hub-aware marker positioning.
-  // When the player is inside any faction's hub (shared Outpost
-  // layout), the marker renders on the bottom-left minimap inset
-  // at per-room coords from HUB_ROOM_MINIMAP_COORDS — discrete
-  // per-room positions (no cardinal drift inside the hub since
-  // travel is room-graph, not tile-step). Outside the hub, falls
-  // through to the world-map cardinal-offset logic.
   const inHub = isHubLocation(player?.currentLocationId) && !!player?.hubRoomId;
-  const hubMinimapPos = inHub ? hubRoomMinimapCoord(player?.hubRoomId) : null;
   // arb99 — pick the map for where you are. Inside an outpost whose interior
-  // art exists → that faction's outpost map (square); otherwise the world
-  // atlas (2:1). mapAspect drives the fill/letterbox math below.
+  // art exists → that faction's outpost map (square); otherwise the world atlas.
+  // mapAspect drives the fill/letterbox math below.
   const outpostMapSource = inHub && player?.factionId ? OUTPOST_MAPS[player.factionId] : undefined;
   const showingOutpost = !!outpostMapSource;
   const mapSource = outpostMapSource ?? WORLD_ATLAS;
   const mapAspect = showingOutpost ? 1 : ATLAS_W / ATLAS_H;
-  const currentAnchor =
-    atlasCoordForLocation(player?.currentLocationId) ?? OUTPOST_ATLAS_COORD;
   const atCenter =
     safeMapX === WORLD_MAP_CENTER_X && safeMapY === WORLD_MAP_CENTER_Y;
-  const safeAtlasPos = hubMinimapPos ?? (atCenter
-    ? currentAnchor
-    : cardinalOffsetFromAnchor(currentAnchor, safeMapX, safeMapY, {
-        x: WORLD_MAP_CENTER_X,
-        y: WORLD_MAP_CENTER_Y,
-      }));
 
-  // OTA 23-003 — auto-centering on the player marker removed at
-  // playtest request: it interfered with the zoom-in/zoom-out
-  // gesture (the centering useEffect re-fired on imgBox changes
-  // and yanked the user's pinch back). The marker stays visible
-  // wherever the player is via the OTA 23-002 visual upgrade
-  // (warm-gold halo + larger 56x40 silhouette). Player pans
-  // manually to find their marker if they wander far from it.
-  //
-  // 2026-05-25 OTA-035 — exception: when the player is INSIDE an
-  // outpost, the bottom-left minimap inset is far from the screen
-  // center and the marker would otherwise sit off-screen at the
-  // default fill-scale. Auto-focus the outpost section on first
-  // layout so opening the map shows the player's room without
-  // panning. didAutoFocusHub guards against re-firing on subsequent
-  // imgBox layouts so user-driven pinch/pan isn't yanked back —
-  // matches the pattern the original auto-center was missing.
-  const didAutoFocusHub = useRef(false);
+  // ⚠ OTA-1333 SCRUB — two blocks died here: the OTA 23-003/035 auto-focus-the-hub-inset
+  // effect (it panned to a bottom-left minimap inset that exists only on the ORIGINAL
+  // hand-drawn art; every faction has had a full-screen interior map since arb106, so its
+  // guard could only pass for a hub player with no factionId — and then it would zoom into
+  // blank terrain), and the dotStyle the removed player marker used to need.
   useEffect(() => {
     if (!imgBox) return;
     const imgAspect = mapAspect;
@@ -364,49 +354,6 @@ export function MapScreen() {
     }
   }, [imgBox, scale]);
 
-  useEffect(() => {
-    // arb99 — when showing the actual outpost interior map, skip the old
-    // world-map "center on the hub inset" focus; the interior fills the screen.
-    if (!imgBox || !inHub || showingOutpost || didAutoFocusHub.current) return;
-    if (!hubMinimapPos) return;
-    // Compute the marker's position in unscaled imgBox coordinates
-    // using the same letterbox-aware math as the dotStyle below.
-    const imgAspect = mapAspect;
-    const boxAspect = imgBox.width / imgBox.height;
-    let renderedW: number;
-    let renderedH: number;
-    let offsetX: number;
-    let offsetY: number;
-    if (boxAspect > imgAspect) {
-      renderedH = imgBox.height;
-      renderedW = imgBox.height * imgAspect;
-      offsetX = (imgBox.width - renderedW) / 2;
-      offsetY = 0;
-    } else {
-      renderedW = imgBox.width;
-      renderedH = imgBox.width / imgAspect;
-      offsetX = 0;
-      offsetY = (imgBox.height - renderedH) / 2;
-    }
-    const markerX = offsetX + renderedW * hubMinimapPos.fx;
-    const markerY = offsetY + renderedH * hubMinimapPos.fy;
-    // Zoom in beyond baseline so the room is readable, then pan
-    // so the marker lands at the center of the visible window.
-    const target = Math.max(baselineScale.current * 2.5, 2.5);
-    const tx = (imgBox.width / 2 - markerX) * target;
-    const ty = (imgBox.height / 2 - markerY) * target;
-    const clamped = clampTranslate(tx, ty, target, imgBox);
-    didAutoFocusHub.current = true;
-    Animated.parallel([
-      Animated.spring(scale, { toValue: target, useNativeDriver: true, friction: 8, tension: 60 }),
-      Animated.spring(translateX, { toValue: clamped.tx, useNativeDriver: true, friction: 8, tension: 60 }),
-      Animated.spring(translateY, { toValue: clamped.ty, useNativeDriver: true, friction: 8, tension: 60 }),
-    ]).start(() => {
-      scaleRef.current = target;
-      txRef.current = clamped.tx;
-      tyRef.current = clamped.ty;
-    });
-  }, [imgBox, inHub, showingOutpost, hubMinimapPos, scale, translateX, translateY]);
 
   const resetTransform = () => {
     const target = baselineScale.current;
@@ -420,6 +367,88 @@ export function MapScreen() {
       tyRef.current = 0;
     });
   };
+
+  // ⚠⚠ OTA-1339 — THE PLAYER MARKER RETURNS, AND THE REASON IT CAN. OTA-182 removed
+  // the old dot at the owner's request ("we were never able to make it accurate so
+  // let's let the map just be a map") — that dot walked a per-tile drift model that
+  // disagreed with the hand-painted art. The map makeover ended the disagreement:
+  // there is ONE coordinate system now (canonicalCellFor derives cells FROM the
+  // atlas fractions, and markerFraction re-applies the by-eye visual nudges), so
+  // the marker lands on the same silhouette the label and the pins do. Owner, from
+  // live testing at Iskan-Veil: *"where is the you are here explorer icon? it
+  // should be pulsating between white and green. there should also be a center on
+  // character button next to reset."* Both here.
+  const pulse = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(pulse, { toValue: 1, duration: 900, useNativeDriver: true }),
+      Animated.timing(pulse, { toValue: 0, duration: 900, useNativeDriver: true }),
+    ]));
+    loop.start();
+    return () => loop.stop();
+  }, [pulse]);
+  const pulseInv = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
+
+  /** The rendered (letterboxed) image rect inside the box — same contain-fit math
+   *  the overlay block uses; shared so CENTER and the marker can never disagree. */
+  const renderedRectFor = (box: { width: number; height: number }) => {
+    const boxAspect = box.width / box.height;
+    if (boxAspect > mapAspect) {
+      const h = box.height; const w = box.height * mapAspect;
+      return { renderedW: w, renderedH: h, offsetX: (box.width - w) / 2, offsetY: 0 };
+    }
+    const w = box.width; const h = box.width / mapAspect;
+    return { renderedW: w, renderedH: h, offsetX: 0, offsetY: (box.height - h) / 2 };
+  };
+
+  const centerOnPlayer = (frac: { fx: number; fy: number } | null) => {
+    if (!imgBox || !frac) return;
+    const r = renderedRectFor(imgBox);
+    // Keep the player's zoom if they are already in close; from the full view,
+    // come in far enough that "centered" visibly means something.
+    const s = Math.max(scaleRef.current, baselineScale.current * 2.2);
+    // The scaled layer transforms about the box center: screen = center + t + s·(p − center),
+    // so putting the marker AT the center solves to t = −s·(p − center).
+    const mx = r.offsetX + r.renderedW * frac.fx;
+    const my = r.offsetY + r.renderedH * frac.fy;
+    const target = clampTranslate(
+      -s * (mx - imgBox.width / 2),
+      -s * (my - imgBox.height / 2),
+      s,
+      imgBox,
+    );
+    // ⚠ OTA-1341 — GLIDE, DON'T CUT. Owner: *"center and zoom in on it a little
+    // slower so they can track the position and path to the location, instead of
+    // a jump cut in case they are trying to figure out relative locations."* The
+    // spring here read as a teleport; a ~1.4 s eased glide keeps the terrain
+    // sliding under the eye the whole way, so the route TO the marker stays
+    // legible. RESET keeps its quick spring — nothing to track on the way out.
+    Animated.parallel([
+      Animated.timing(scale, { toValue: s, duration: CENTER_GLIDE_MS, easing: Easing.inOut(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(translateX, { toValue: target.tx, duration: CENTER_GLIDE_MS, easing: Easing.inOut(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(translateY, { toValue: target.ty, duration: CENTER_GLIDE_MS, easing: Easing.inOut(Easing.cubic), useNativeDriver: true }),
+    ]).start(() => {
+      scaleRef.current = s;
+      txRef.current = target.tx;
+      tyRef.current = target.ty;
+    });
+  };
+
+  // ⚠ OTA-1350 — opening the map INSIDE an outpost glides to your room on its
+  // own, the same slow eased zoom ⌖ ME does (owner: "do the slow zoom effect as
+  // well? like when you first start?"). Once per open — after the first glide
+  // the view belongs to the player's fingers, so a re-render can never yank it.
+  const autoGlided = useRef(false);
+  useEffect(() => {
+    if (autoGlided.current || !showingOutpost || !imgBox || !player?.hubRoomId) return;
+    const room = hubRoomFor(player.hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
+    if (!room?.structuralId) return;
+    autoGlided.current = true;
+    centerOnPlayer(outpostRoomMark(player.factionId, room.structuralId));
+    // centerOnPlayer/hub lookups are render-stable helpers; the deps that matter
+    // are the ones that decide WHETHER the glide can run yet.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showingOutpost, imgBox, player?.hubRoomId]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -514,14 +543,9 @@ export function MapScreen() {
   const dy = mapY - WORLD_MAP_CENTER_Y;
   const tiles = Math.abs(dx) + Math.abs(dy);
 
-  // 'player' is non-null past the early-return guard above, so the
-  // hoisted safe* values are stable.
-  const atlasPos = safeAtlasPos;
-
   const currentLocation = LOCATIONS.find((l) => l.id === player.currentLocationId) ?? null;
   const onDepictedTile = !!atlasCoordForLocation(player.currentLocationId);
 
-  let dotStyle: { left: number; top: number } | null = null;
   // OTA-498 — Hidden Market overlay position (a static "?" / name pinned to its
   // fixed atlas coord; unlike the removed player marker this never drifts).
   let hiddenMarketStyle: { left: number; top: number } | null = null;
@@ -536,6 +560,16 @@ export function MapScreen() {
   // shows its number ("3◆"). Keeps the map uncluttered — the per-contract numbers
   // live on the Contracts cards.
   const contractMarkerStyles: { key: string; label: string; left: number; top: number }[] = [];
+  // OTA-1335 — resolved place-name labels for the new (lettering-free) atlas art.
+  const nameLabelStyles: { id: string; lines: string[]; left: number; top: number; width: number }[] = [];
+  // OTA-1339 — the "you are here" marker: the current location's cell through the
+  // SAME markerFraction every pin uses, so it stands on the nudged silhouette.
+  let playerMarkerBox: { left: number; top: number; size: number } | null = null;
+  let playerFrac: { fx: number; fy: number } | null = null;
+  // OTA-1350 — ✓ marks for outpost rooms already walked (hubVisited), drawn on
+  // the interior art. The CURRENT room is deliberately absent from this list:
+  // it wears the pulsing marker instead of its checkmark.
+  const visitedRoomMarkStyles: { id: string; left: number; top: number }[] = [];
   // arb101 — overlay-label scale. The atlas's own painted labels shrink with the
   // contain-fit; a constant-size overlay would dwarf them. labelScale = rendered
   // width ÷ atlas natural width keeps overlay text proportional to the art at the
@@ -570,14 +604,6 @@ export function MapScreen() {
     // arb101 — how much the atlas art was shrunk to fit; overlay labels multiply
     // their base size by this so they read at the same scale as the painted text.
     labelScale = renderedW / ATLAS_W;
-    // OTA 057 — marker is offset by HALF its constant screen-size
-    // (not its scaled size — the inverse-scale on markerWrapper
-    // cancels the parent's transform). Anchoring on the marker's
-    // center keeps the figure visually 'standing on' the location.
-    dotStyle = {
-      left: offsetX + renderedW * atlasPos.fx - MARKER_W / 2,
-      top: offsetY + renderedH * atlasPos.fy - MARKER_H / 2,
-    };
     // OTA-498 — pin the Hidden Market overlay to its fixed atlas fraction (world
     // atlas only). Centered on the point via the fixed wrap size.
     const hm = showingOutpost ? null : HIDDEN_LOCATIONS.hidden_market;
@@ -587,17 +613,45 @@ export function MapScreen() {
         top: offsetY + renderedH * hm.fy - HM_LABEL_H / 2,
       };
     }
+    // ⚠⚠ OTA-1335 — THE NAME OVERLAY. The redrawn atlas carries NO lettering: every place
+    // name a player used to read on this screen was painted into the previous artwork, and
+    // the only name the game itself has ever drawn is the Hidden Market's, just above. So
+    // without this loop the new map is a beautiful anonymous ruin-field.
+    //
+    // ⚠ Positions come from `atlasLabelLayout()`, which solves all 37 at once in atlas-pixel
+    // space and returns fractions — so a name never lands on another name or on another
+    // landmark's pin, and the same layout holds at every zoom on every screen. The Hidden
+    // Market is deliberately NOT in that set: it keeps its own reveal-gated "?" → name
+    // behaviour, which is a different rule (you have to find it first).
+    if (!showingOutpost) {
+      for (const l of ATLAS_LABELS) {
+        nameLabelStyles.push({
+          id: l.id,
+          lines: l.lines,
+          // ⚠⚠ THE BOX IS DRAWN WIDER THAN THE SOLVED TEXT WIDTH ON PURPOSE. It was drawn at
+          // exactly the solved width in the first cut, and because that width came from an
+          // UNDER-estimate of the font's real advance, React Native re-wrapped the
+          // already-wrapped lines to fit — snapping words in half ("Giant-Wat / ch /
+          // Shrine") and turning two-line names into three, which then collided with
+          // neighbours the solver believed it had cleared. The slack is transparent and
+          // non-interactive; only the solved width governs spacing.
+          left: offsetX + renderedW * l.lx - (l.wFrac * LABEL_BOX_SAFETY * renderedW) / 2,
+          top: offsetY + renderedH * l.ly - (l.hFrac * renderedH) / 2,
+          width: l.wFrac * LABEL_BOX_SAFETY * renderedW,
+        });
+      }
+    }
     if (!showingOutpost) {
       for (const ev of canonLocations ?? []) {
         if (ev.marker !== 'pending' && ev.marker !== 'done') continue;
         const cell = (typeof ev.gx === 'number' && typeof ev.gy === 'number')
           ? { x: ev.gx, y: ev.gy }
           : canonicalCellFor(ev.id);
-        const f = cellToAtlasFraction(cell.x, cell.y);
+        const f = markerFraction(cell.x, cell.y);
         eventMarkerStyles.push({
           id: ev.id,
           kind: ev.marker,
-          left: offsetX + renderedW * insetGroundFx(f.fx) - HM_LABEL_W / 2,
+          left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
           top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
         });
       }
@@ -611,11 +665,70 @@ export function MapScreen() {
         else byCell[cellKey] = { x: cm.x, y: cm.y, count: 1, sole: cm.number };
       }
       for (const [cellKey, v] of Object.entries(byCell)) {
-        const f = cellToAtlasFraction(v.x, v.y);
+        const f = markerFraction(v.x, v.y);
         contractMarkerStyles.push({
           key: cellKey,
           label: v.count > 1 ? `◆×${v.count}` : `${v.sole}◆`,
-          left: offsetX + renderedW * insetGroundFx(f.fx) - HM_LABEL_W / 2,
+          left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
+          top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
+        });
+      }
+      // ⚠ OTA-1339 — the player marker, LAST so it draws over every other glyph.
+      // ⚠ OTA-1342 — anchored to the player's AUTHORITATIVE absolute cell
+      // (playerGridCell: gridX/gridY, the cell every movement and distance path
+      // funnels through), not the current location's cell. Owner's device log
+      // caught the difference on day one: six taps east from Iskan-Veil and the
+      // marker never moved, because free wandering changes the grid cell while
+      // currentLocationId still names the origin. markerFraction keeps the rest
+      // honest: a named cell snaps to its nudged silhouette, a wild cell falls
+      // back to the plain cell→fraction map — one coordinate system throughout.
+      if (player?.currentLocationId) {
+        const cell = playerGridCell(player);
+        const f = markerFraction(cell.x, cell.y);
+        const size = Math.max(9, 40 * labelScale);
+        playerFrac = f;
+        playerMarkerBox = {
+          left: offsetX + renderedW * f.fx - size / 2,
+          top: offsetY + renderedH * f.fy - size / 2,
+          size,
+        };
+      }
+    }
+    // ⚠⚠ OTA-1350 — THE MARKER WALKS THE OUTPOST TOO. Owner: *"when a player is
+    // on an outpost can we have the you are here icon show you what room you are
+    // in? … and can we also show the checkmark on the map for rooms you have
+    // explored? and if you go back in the room you explored have it show the
+    // icon, not the checkmark while you are in it."* The same pulsing glyph the
+    // world atlas earned in OTA-1339 now stands on the CURRENT room of the
+    // interior art (per-skin label coordinates — outpostRoomMarks.ts explains
+    // why the nine skins each need their own), and every OTHER room in
+    // hubVisited wears a ✓. Room identity flows through structuralId
+    // (hubRoomFor), never through drawn names — the OTA-1279 rule.
+    if (showingOutpost && player?.hubRoomId) {
+      // labelScale was computed against the world atlas' natural width; the
+      // outpost art is 1254px square, so overlay glyph sizes rescale to it here
+      // (world overlays are all empty in outpost mode, so nothing else reads it).
+      labelScale = renderedW / 1254;
+      const artFactionId = player.factionId; // the art shown is OUTPOST_MAPS[factionId] — same key
+      const hereRoom = hubRoomFor(player.hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
+      if (hereRoom?.structuralId) {
+        const f = outpostRoomMark(artFactionId, hereRoom.structuralId);
+        const size = Math.max(12, 46 * (renderedW / 1254));
+        playerFrac = f;
+        playerMarkerBox = {
+          left: offsetX + renderedW * f.fx - size / 2,
+          top: offsetY + renderedH * f.fy - size / 2,
+          size,
+        };
+      }
+      for (const roomId of hubVisited ?? []) {
+        if (roomId === player.hubRoomId) continue; // the room you are IN shows the icon, not the ✓
+        const room = hubRoomFor(roomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
+        if (!room?.structuralId) continue;
+        const f = outpostRoomMark(artFactionId, room.structuralId);
+        visitedRoomMarkStyles.push({
+          id: room.structuralId,
+          left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
           top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
         });
       }
@@ -637,10 +750,10 @@ export function MapScreen() {
   // variant overlay (so a Forgotten Order character reads
   // "Order Cloister — The Threshold" instead of "Tartarian Outskirts").
   const hubRoomDisplay = inHub
-    ? hubRoomFor(player?.hubRoomId, player?.factionId)
+    ? hubRoomFor(player?.hubRoomId, hubSkinFactionFor(player?.currentLocationId, player?.factionId))
     : null;
   const hubLabel = inHub
-    ? `${hubNameForFaction(player?.factionId)} — ${hubRoomDisplay?.name ?? 'Hub'}`
+    ? `${hubNameForFaction(hubSkinFactionFor(player?.currentLocationId, player?.factionId))} — ${hubRoomDisplay?.name ?? 'Hub'}`
     : null;
   const whereLine = hubLabel
     ?? (atCenter && currentLocation
@@ -649,11 +762,12 @@ export function MapScreen() {
         ? `${Math.abs(dx)} tile${Math.abs(dx) === 1 ? '' : 's'} ${dx >= 0 ? 'east' : 'west'} of ${fromName}`
         : `${Math.abs(dy)} tile${Math.abs(dy) === 1 ? '' : 's'} ${dy >= 0 ? 'south' : 'north'} of ${fromName}`);
 
-  // arb98 — verbal whereabouts (no marker on the art; this is the player's
-  // orientation cue). Inside a hub we just name the outpost; out in the world
-  // we describe the region + the nearest drawn landmarks.
+  // arb98 — verbal whereabouts. Written when the art carried no marker (OTA-182 →
+  // OTA-1339); it stays now the marker is back, because a sentence that names the
+  // neighbours is orientation the pulsing dot cannot give. Inside a hub we just
+  // name the outpost; out in the world we describe the region + nearest landmarks.
   const whereaboutsLine = inHub
-    ? `Inside the ${hubNameForFaction(player?.factionId)} — a fixed outpost interior.`
+    ? `Inside the ${hubNameForFaction(hubSkinFactionFor(player?.currentLocationId, player?.factionId))} — a fixed outpost interior.`
     : describeWhereabouts(player.currentLocationId, LOCATIONS);
 
   return (
@@ -674,6 +788,20 @@ export function MapScreen() {
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title} accessibilityRole="header">ATLAS</Text>
+        {/* OTA-1339 — jump the view to the pulsing "you are here" marker.
+            OTA-1350 — the outpost interior has a marker now too (the current
+            room), so the button rides along inside. */}
+        <TouchableOpacity
+          onPress={() => centerOnPlayer(playerFrac)}
+          style={styles.resetBtn}
+          hitSlop={8}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Center the map on your position"
+          testID="center-on-player"
+        >
+          <Text style={styles.resetText}>⌖ ME</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={resetTransform}
           style={styles.resetBtn}
@@ -707,6 +835,28 @@ export function MapScreen() {
             accessibilityRole="image"
             accessibilityLabel={showingOutpost ? 'Outpost interior map' : 'World atlas map'}
           />
+          {/* ⚠⚠ OTA-1335 — PLACE NAMES. Drawn UNDER every pin and glyph below, on purpose:
+              a name is context, a marker is information, and when the two land close
+              together the marker has to win. Positions are solved in atlasLabels.ts. */}
+          {nameLabelStyles.map((l) => (
+            <View
+              key={`name_${l.id}`}
+              pointerEvents="none"
+              style={[styles.nameLabelWrap, { left: l.left, top: l.top, width: l.width }]}
+            >
+              <Text
+                style={[
+                  styles.nameLabel,
+                  {
+                    fontSize: Math.max(3, LABEL_FONT_PX * labelScale),
+                    lineHeight: Math.max(3.5, LABEL_LINE_PX * labelScale),
+                  },
+                ]}
+              >
+                {l.lines.join('\n')}
+              </Text>
+            </View>
+          ))}
           {/* OTA-498 — the Hidden Market. It has no icon painted into the atlas
               art, so this overlay both marks it and explains the blank: a
               stylized "?" pinned to its fixed coord (right of the frontier camps,
@@ -721,8 +871,12 @@ export function MapScreen() {
                 <Text
                   style={[
                     styles.hiddenMarketName,
-                    // arb104 — shrunk a further 15% on player request (30→25.5).
-                    { fontSize: Math.max(4.25, 25.5 * labelScale), lineHeight: Math.max(5.1, 28 * labelScale) },
+                    // arb104 shrank this to 25.5 on player request, back when it was the ONLY
+                    // name the game drew and every other name was painted into the art.
+                    // ⚠ OTA-1335 — it now sits among 37 sibling labels, so keeping it at its
+                    // old size would leave one name towering over every other place on the
+                    // map. It takes the shared type size; only its reveal behaviour is special.
+                    { fontSize: Math.max(3, LABEL_FONT_PX * labelScale), lineHeight: Math.max(3.5, LABEL_LINE_PX * labelScale) },
                   ]}
                 >
                   The Hidden{'\n'}Market
@@ -752,15 +906,54 @@ export function MapScreen() {
               <Text style={[styles.contractPin, markerFont]}>{m.label}</Text>
             </View>
           ))}
-          {/* OTA-182 — player marker (silhouette + halo) removed.
-              Player ask: "let's take the player marker off of the
-              map, we were never able to make it accurate so let's
-              let the map just be a map." Procedural marker
-              placement drifted from the atlas's hand-painted city
-              positions enough that the player wasn't a reliable
-              cue. Map now renders as art-only. The "you are here"
-              text + bearings still live in the footer below for
-              location context. */}
+          {/* ⚠ OTA-1350 — outpost rooms already walked wear a ✓ on the interior
+              art (the same hubVisited set the travel chips' ✓ reads). The room
+              the player is STANDING in is excluded above — it wears the pulsing
+              marker instead, drawn after these so it wins the overlap. */}
+          {visitedRoomMarkStyles.map((m) => (
+            <View key={m.id} testID={`room-visited-${m.id}`} pointerEvents="none" style={[styles.hiddenMarketWrap, { left: m.left, top: m.top }]}>
+              <Text style={[styles.roomVisitedMark, { fontSize: Math.max(7, 34 * labelScale), lineHeight: Math.max(8, 37 * labelScale) }]}>✓</Text>
+            </View>
+          ))}
+          {/* ⚠⚠ OTA-1339 — THE "YOU ARE HERE" MARKER, BACK BY OWNER ORDER. OTA-182
+              removed the old dot ("we were never able to make it accurate so let's
+              let the map just be a map") because its drift model disagreed with the
+              painted art. The disagreement is structurally gone — one coordinate
+              system serves labels, pins, and this marker (see playerMarkerBox above)
+              — and the owner asked for it back from live testing at Iskan-Veil:
+              "pulsating between white and green." Two stacked ring-and-dot glyphs
+              cross-fade on counterphased opacity (native-driver-safe; RN cannot
+              animate borderColor natively). Drawn LAST so it wins every overlap. */}
+          {playerMarkerBox && (() => {
+            const m = playerMarkerBox;
+            const ring = {
+              position: 'absolute' as const, left: 0, top: 0, width: m.size, height: m.size,
+              // OTA-1341 — thinner stroke by owner request ("thin the lines on the
+              // icon"): half the OTA-1339 weight, floored where it stays visible.
+              borderRadius: m.size / 2, borderWidth: Math.max(1, m.size * 0.055),
+            };
+            const core = {
+              position: 'absolute' as const,
+              left: m.size * 0.33, top: m.size * 0.33,
+              width: m.size * 0.34, height: m.size * 0.34, borderRadius: m.size * 0.17,
+            };
+            return (
+              <View
+                pointerEvents="none"
+                testID="player-marker"
+                style={{ position: 'absolute', left: m.left, top: m.top, width: m.size, height: m.size }}
+              >
+                <Animated.View style={{ position: 'absolute', left: 0, top: 0, width: m.size, height: m.size, opacity: pulseInv }}>
+                  <View style={[ring, styles.playerMarkerWhiteRing]} />
+                  <View style={[core, styles.playerMarkerWhiteCore]} />
+                </Animated.View>
+                <Animated.View style={{ position: 'absolute', left: 0, top: 0, width: m.size, height: m.size, opacity: pulse }}>
+                  <View style={[ring, styles.playerMarkerGreenRing]} />
+                  <View style={[core, styles.playerMarkerGreenCore]} />
+                </Animated.View>
+              </View>
+            );
+          })()}
         </Animated.View>
       </View>
 
@@ -772,7 +965,7 @@ export function MapScreen() {
         ) : null}
         <Text style={styles.footerDist}>
           {inHub
-            ? `Inside the ${hubNameForFaction(player?.factionId)}.`
+            ? `Inside the ${hubNameForFaction(hubSkinFactionFor(player?.currentLocationId, player?.factionId))}.`
             : tiles === 0
               ? `At ${fromName}.`
               : `${tiles} day${tiles === 1 ? '' : 's'} of travel from ${fromName}.`}
@@ -958,14 +1151,6 @@ export function MapScreen() {
   );
 }
 
-// OTA 23-002 — bumped from 32×22 to 56×40 so the silhouette is
-// readable on a phone screen at any zoom. Pair'd with a warm-gold
-// halo backdrop (see markerHalo style) so the figure pops against
-// any region of the atlas — including the dark deep-frontier band
-// where the OTA 057 silhouette could blend into the background.
-const MARKER_W = 56;
-const MARKER_H = 40;
-const HALO_SIZE = 48;
 // OTA-498 — Hidden Market overlay wrap size (centers the "?" / name on the coord).
 const HM_LABEL_W = 96;
 const HM_LABEL_H = 34;
@@ -991,6 +1176,22 @@ const styles = StyleSheet.create({
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
+  // OTA-1339 — the marker's two cross-fading liveries. Colors only — geometry is
+  // computed inline from the zoom-scaled marker size.
+  playerMarkerWhiteRing: { borderColor: '#f2f5ee' },
+  playerMarkerWhiteCore: { backgroundColor: '#f2f5ee' },
+  playerMarkerGreenRing: { borderColor: '#6fd680' },
+  playerMarkerGreenCore: { backgroundColor: '#6fd680' },
+  // OTA-1350 — the outpost map's explored-room ✓: the marker's green, the same
+  // shadow treatment every overlay glyph wears so it reads on the busy art.
+  roomVisitedMark: {
+    color: '#6fd680',
+    fontWeight: '900',
+    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
   resetBtn: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',
@@ -1028,13 +1229,26 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  // OTA 057 — silhouette player marker. The wrapper handles the
-  // inverse-scale; the image inside fills the wrapper. Marker size
-  // is its screen footprint (constant regardless of map zoom).
-  markerWrapper: {
+  // OTA-1335 — place-name label. Height is intentionally unset: the box is sized by its own
+  // text so a two-line name is not clipped, and the solver already reserved room for it.
+  nameLabelWrap: {
     position: 'absolute',
-    width: MARKER_W,
-    height: MARKER_H,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  nameLabel: {
+    // ⚠ Matches the Hidden Market label's palette and weight exactly. That label's size was
+    // tuned twice by the owner on the old art, so it is the settled house style for text on
+    // this screen — the overlay should read as one set of names, not two.
+    color: '#f0d27a',
+    fontWeight: '700',
+    letterSpacing: 0.3,
+    textAlign: 'center',
+    // The art beneath runs from pale silt to near-black, so the shadow is doing real work
+    // here: it is what keeps a name legible over both the green north and the molten south.
+    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
   // OTA-498 — Hidden Market "?" / name overlay (pinned to its atlas coord).
   hiddenMarketWrap: {
@@ -1098,20 +1312,6 @@ const styles = StyleSheet.create({
   markerImage: {
     width: '100%',
     height: '100%',
-  },
-  // OTA 23-002 — circular halo behind the silhouette so it stays
-  // visible against any atlas region. Warm gold with soft alpha
-  // matches the atlas's parchment palette.
-  markerHalo: {
-    position: 'absolute',
-    left: (MARKER_W - HALO_SIZE) / 2,
-    top: (MARKER_H - HALO_SIZE) / 2,
-    width: HALO_SIZE,
-    height: HALO_SIZE,
-    borderRadius: HALO_SIZE / 2,
-    backgroundColor: 'rgba(224, 122, 95, 0.55)', // warm orange-red, 55% opacity
-    borderColor: '#fff7e0',
-    borderWidth: 2,
   },
 
   footer: {

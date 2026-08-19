@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { rarityHexColor } from './InventoryCategorize';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { CraftQuantityModal } from './CraftQuantityModal';
@@ -38,14 +39,8 @@ function evaluateRecipe(recipe: Recipe, inventory: { name: string; quantity: num
   return { recipe, kind: cat.kind, missing, available: missing.length === 0 };
 }
 
-function rarityColor(rarity: string | undefined): string {
-  switch (rarity) {
-    case 'Legendary': return '#e07a5f';
-    case 'Rare': return '#b88ce0';
-    case 'Uncommon': return '#9ec96a';
-    default: return '#c9a86a';
-  }
-}
+// ⚠ OTA-1312 — one palette, shared.
+const rarityColor = rarityHexColor;
 
 export type RecipeKindFilter = 'consumable' | 'non-consumable';
 

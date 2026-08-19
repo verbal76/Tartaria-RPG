@@ -18,6 +18,53 @@ import { Platform, Dimensions, PixelRatio } from 'react-native';
 import { OTA_BUILD_ID, DISPLAY_VERSION } from '../buildInfo';
 import { getBuildCodename, getApkCodename } from '../buildCodename';
 import { mlHealthSummary } from './mlHealth';
+// OTA-1195 — memory warnings / freeze watch / app-state trail.
+import { runtimePressureSummary } from './runtimePressure';
+import { runtimePressureSnapshot, useGameStore } from '../state/gameStore';
+// OTA-1200 — how many ~400MB model contexts are live, and how many disposes freed nothing.
+import { contextLedgerSummary } from '../ai/generation/contextLedger';
+
+/** ⚠ Isolated behind a try/catch and a lazy read: the bug-report exporter must NEVER be
+ *  the thing that fails when the app is already in trouble, and this block is at its most
+ *  valuable in exactly the sessions where something is going wrong. */
+function runtimePressureBlock(): string {
+  try {
+    return runtimePressureSummary(runtimePressureSnapshot());
+  } catch {
+    return 'Runtime pressure\n  (unavailable this session)';
+  }
+}
+
+/** OTA-1200 — live llama-context count. Same isolation as the block above, and for the
+ *  same reason: this is worth the most in the report from the session that died. */
+function contextLedgerBlock(): string {
+  try {
+    // ⚠ OTA-1203 — the ENGINE STATUS belongs next to the context count, because the two
+    // together are the whole reading and either alone misleads. The owner's 2026-08-09
+    // report showed `Opened: 0` beside a header claiming a healthy init; a reader had to
+    // cross-reference a memory-warning line 40 entries down the log to learn the model had
+    // never loaded. Now the block says it in place.
+    let status = '';
+    let err = '';
+    try {
+      const st = useGameStore.getState();
+      status = String(st.qwenStatus ?? '');
+      err = String(st.qwenError ?? '');
+    } catch { /* best effort */ }
+    const ledger = contextLedgerSummary();
+    if (!status) return ledger;
+    // ⚠⚠ OTA-1204 — THE REASON, NOT JUST THE VERDICT. `qwenError` has existed in the store
+    // since the engine was written and was surfaced NOWHERE — not here, not in mlHealth.
+    // The owner's 2026-08-09 report on build 1203 reads `Narration engine: failed` with no
+    // hint of why, and the answer was sitting in state the whole time. Three reports in a
+    // row have now said the model does not load; none could say what it said on the way
+    // down, so every theory about it has been inference.
+    const why = status === 'failed' && err ? `\n  Why: ${err}` : '';
+    return `${ledger}\n  Narration engine: ${status}${why}`;
+  } catch {
+    return 'Model contexts\n  (unavailable this session)';
+  }
+}
 import { saveLoadHealthSummary } from './saveLoadHealth';
 import { lastCrashSummary } from './lastCrash';
 
@@ -123,6 +170,18 @@ export function buildBasicDeviceSummary(): string {
     // global ErrorUtils handler captures non-ML, non-load crashes here; without
     // this line they never reached the pasted report and we'd be guessing.
     lastCrashSummary(),
+    // ⚠ OTA-1195 — RUNTIME PRESSURE. Memory warnings, render stalls and the app-state
+    // trail. This block exists because a hard-lock report arrived with no way to answer
+    // "did the OS ask for memory back" or "did the screen stop painting" — the two
+    // questions that decide which half of the codebase to look in. The counts belong in
+    // the HEADER, not only reconstructable from 146 log lines.
+    runtimePressureBlock(),
+    // ⚠⚠ OTA-1200 — LIVE MODEL CONTEXTS. Three JetsamEvent reports put this process at
+    // ~1.9GB on a 3GB phone with reason `per-process-limit`; the model is ~400MB of that
+    // and the rest was never accounted for. One number in the header — how many contexts
+    // are live right now — separates "we are holding four of them" from "look elsewhere",
+    // and no amount of reading the code answers it.
+    contextLedgerBlock(),
   ];
   return lines.join('\n');
 }

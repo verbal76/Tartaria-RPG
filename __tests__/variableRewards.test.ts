@@ -251,6 +251,20 @@ describe('OTA-050 — parser-routed rest also rolls the OTA-043 pull', () => {
       // (full HP + full stamina would trip the OTA-238 "already fully rested"
       // refusal before the while-you-slept pull rolls).
       store.setState((s) => (s.player ? { player: { ...s.player, hp: s.player.hpMax, stamina: 1 } } : s));
+      // ⚠ OTA-1225 hardening — CLEAR ANY AMBUSH, exactly as the sibling encounter test
+      // above already does. This loop had no enemy cleanup, so the first war-party or
+      // rest-ambush spawn STUCK: every later `rest` was refused mid-combat ("Nothing here
+      // has agreed to that") and the pull never rolled again — 0 hits out of 100 at a
+      // claimed p≈30%. It passed for months only because the file's fixed rng stream
+      // happened to dodge an early spawn; OTA-1225's technique roll draws from the same
+      // stream, shifted it, and the latent deadlock surfaced. The test is about the PULL,
+      // not about spawn luck — so the fight is cleared the way its sibling clears it.
+      const liveSceneRest = useGameStore.getState().currentScene;
+      if (liveSceneRest?.enemies && liveSceneRest.enemies.length > 0) {
+        store.setState((s) => (s.currentScene ? {
+          currentScene: { ...s.currentScene, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: 'far' },
+        } : s));
+      }
     }
     // 30% per rest → expected ~30 hits over 100, P(0 hits) negligible.
     expect(pullHits).toBeGreaterThan(0);

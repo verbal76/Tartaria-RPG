@@ -71,9 +71,28 @@ describe('findNamedByQuery', () => {
     expect(found?.locationId).toBe('asgardar');
   });
 
-  it('finds via substring match', () => {
+  it('finds via substring match — and picks the NEAREST of the matches', () => {
+    // ⚠ OTA-1334 — there are two Grand Spires now (Asgardar's, out on the capital's
+    // outskirts, and Etheria's, down on the floor of the Black Reach), so a bare "spire" is
+    // genuinely ambiguous. This assertion used to name `grand_spire_of_etheria`, which was
+    // only ever true because it was the single spire anywhere near the start tile — it
+    // pinned an ACCIDENT of the catalogue, not a rule, and adding a second spire broke it.
+    //
+    // `findNamedByQuery` states its own tie-break in a comment: "prefer the closer match if
+    // multiple names share a substring". That is the rule, so that is what gets asserted —
+    // computed from the map rather than hard-coded, so it survives any number of spires
+    // being added, moved or renamed later.
     const found = findNamedByQuery(map, fromX, fromY, 'spire');
-    expect(found?.locationId).toBe('grand_spire_of_etheria');
+    expect(found).not.toBeNull();
+    expect(found!.locationId).toMatch(/spire/);
+
+    const spires = Object.keys(map.positions).filter((id) => id.includes('spire'));
+    expect(spires.length).toBeGreaterThan(1);
+    const dist = (id: string): number => {
+      const p = map.positions[id]!;
+      return Math.abs(p.x - fromX) + Math.abs(p.y - fromY);
+    };
+    expect(dist(found!.locationId)).toBe(Math.min(...spires.map(dist)));
   });
 
   it('returns null for nonsense queries', () => {

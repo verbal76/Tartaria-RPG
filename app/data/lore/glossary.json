@@ -28,7 +28,7 @@
     {
       "id": "faction_points",
       "term": "Faction Points (FP)",
-      "definition": "A game mechanic representing loyalty to specific factions, earned by completing faction-specific tasks. FP can be exchanged for exclusive gear, access to restricted areas, or new abilities within that faction. Tracked in-game as faction standing."
+      "definition": "A game mechanic representing where a faction holds you, earned by completing their contracts, hunts and mysteries, by gifts, by returning their sigils, and by trade. It is never exchanged or spent — it is a threshold you stand above, and it stays where you left it. High enough and their gear, their restricted holdings and their deeper work open to you; 20 lets you join. Low enough and it turns: below zero their patrols will engage you, and at −25 they hunt you on their own ground. Tracked in-game as faction standing."
     },
     {
       "id": "blinded",
@@ -226,12 +226,22 @@
     {
       "id": "asgardar",
       "term": "Asgardar",
-      "definition": "The ancient capital city of Tartaria, home to the Grand Spire of Etheria, a towering structure that once channeled Aetheric Power from cosmic sources into the city's energy grid."
+      "definition": "The ancient capital city of Tartaria, home to the Grand Spire of Asgardar, a towering structure on the city's outskirts that once channeled Aetheric Power from cosmic sources into the city's energy grid."
+    },
+    {
+      "id": "black_reach",
+      "term": "The Black Reach",
+      "definition": "The southernmost wound in the world, lying directly beneath the Mud Flood Nexus \u2014 a chasm system that simply keeps going down. Unlike every other way into the Aetherstone Deep it is neither vault nor seal nor guarded chamber; it is a floor that ends. Heat and a faint grid-hum come up out of it, and the Grand Spire of Etheria stands on its floor two miles west of the descent."
+    },
+    {
+      "id": "grand_spire_of_asgardar",
+      "term": "Grand Spire of Asgardar",
+      "definition": "The collector-tower of the drowned capital, standing alone on the outskirts where Asgardar's last ring of streets gives out. Fourteen tiers of it remain above the silt. Not to be confused with the Grand Spire of Etheria, a separate and taller tower now lying at the bottom of the Black Reach."
     },
     {
       "id": "grand_spire_of_etheria",
       "term": "Grand Spire of Etheria",
-      "definition": "A monumental tower in Asgardar, known for drawing Aetheric energy from the celestial realms; considered one of Tartaria's most powerful Aetheric structures."
+      "definition": "A monumental tower standing on the floor of the Black Reach, two miles west of the descent, known for drawing Aetheric energy from the celestial realms; considered one of Tartaria's most powerful Aetheric structures. The chasm took it whole and it is still standing."
     },
     {
       "id": "samarran",
@@ -327,6 +337,81 @@
       "id": "buried_cities",
       "term": "The Buried Cities",
       "definition": "Formerly vibrant Tartarian cities now sealed beneath Aetherstone mud. These cities hold Tartaria's most powerful secrets, preserved by impenetrable mud that resists excavation, where Aetheric energy creates time distortions and magnetic anomalies."
+    },
+    {
+      "id": "yuldra_tul",
+      "term": "Yuldra-Tul",
+      "definition": "The northeastern mountain capital, frost-wreathed where every other Lost Capital drowned warm — the gate-city to the Giants' tombs. The Servants of the Giants kept the long vigil here before the Flood, and its Core sleeps under a cold-stone in the deep keep."
+    },
+    {
+      "id": "ostragar",
+      "term": "Ostragar",
+      "definition": "The Eternal Dynasty's river capital in the far-eastern wetlands, half-submerged in slow current. Its Core seat is ringed by a still pool the Riverbinder bound to the housing with a cantor's chord; the water has not moved since the Flood."
+    },
+    {
+      "id": "iskan_veil",
+      "term": "Iskan-Veil",
+      "definition": "The Conspiracy Architects' hidden capital in the far northwest — a maze of false doors and overlaid corridors where every map is wrong by design. The true Core seat is said to stand behind the door you didn't see."
+    },
+    {
+      "id": "karok_sa",
+      "term": "Karok-Sa",
+      "definition": "The Forgotten Order's ritual seat in the southern band — halls of binding-sigils carved into black basalt. Its Core is kept under a chain of seals only a Sealwarden can read, which is why the Order guards its reading jealously."
+    },
+    {
+      "id": "tartarian_enclave",
+      "term": "The Sunken Enclave",
+      "definition": "A deep, self-sufficient True Tartarian enclave hollowed beneath the Buried Cities — Aethercraft-shaped mud walls and ancestor-shrines to the fallen Giants. Its Seekers walk the labyrinthine tunnels for relics, and outsiders find it only when the Enclave decides to be found."
+    },
+    {
+      "id": "parley_ground",
+      "term": "The Parley Ground",
+      "definition": "A weathered ring of standing stones on the contested eastern flats where rival factions meet under truce. No faction holds it; the banners change with the season, and the stones have outlasted every agreement sworn between them."
+    },
+    {
+      "id": "monarch_waystation",
+      "term": "The Monarch's Waystation",
+      "definition": "The Mud Monarchs' frontier toll-court — the last ordered ground before the buried capitals. A seneschal logs every traveler who passes toward the deeper cities, and the ledgers go back further than the Monarchs like to admit."
+    },
+    {
+      "id": "dynasty_border_post",
+      "term": "Dynasty Border Post",
+      "definition": "An old garrison of the Eternal Dynasty kept lit at the edge of the ruins. The oath-stones are still standing, and the road past them runs down into the flooded capitals — every Dynasty soldier walks it once, going, and once more if they are lucky."
+    },
+    {
+      "id": "pilgrim_waycamp",
+      "term": "Tartarian Pilgrim Camp",
+      "definition": "A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities. The fires are kept low and the songs lower; the road they rest for does not forgive noise."
+    },
+    {
+      "id": "builders_survey_camp",
+      "term": "Builders' Survey Camp",
+      "definition": "A Stone Builders' staging post at the safe edge of the ruin-field — theodolite stakes, chalked plans, stacked shoring timber. The Builders measure twice here because past this camp the ground stops honoring measurements."
+    },
+    {
+      "id": "giant_watch_shrine",
+      "term": "Giant-Watch Shrine",
+      "definition": "A roadside vigil-shrine of the Servants of the Giants on the frontier, where keepers wait and watch before the long road down to the giant vaults. The watch has not been broken since the Flood; the keepers do not say what they are watching for."
+    },
+    {
+      "id": "revivalist_field_camp",
+      "term": "Revivalist Field Camp",
+      "definition": "A Tartarian Revivalist dig-and-press camp at the lip of the wastes — crates of equipment, a printing trestle, and a map-board marking the capitals they mean to make headlines of. The truth gets dug up here, and typeset shortly after."
+    },
+    {
+      "id": "reclaimer_stake",
+      "term": "Reclaimer's Stake",
+      "definition": "A Reclaimers' Guild salvage-stake driven into the frontier mud on the western edge — claim-posts, a tally-board of marked ruins, and a winch rig for hauling up whatever the wastes give. Every Guild expedition into the deep country launches from here."
+    },
+    {
+      "id": "architect_blind",
+      "term": "The Architect's Blind",
+      "definition": "A Conspiracy of Architects observation-blind disguised as a collapsed waystation on the western frontier. Behind the false rubble: a map-wall of routes the public must never connect, and a quiet door onto the road."
+    },
+    {
+      "id": "hidden_market",
+      "term": "The Hidden Market",
+      "definition": "A neutral-ground bazaar that does not advertise itself — four canvas stalls in a wind-scoured hollow of the Sunken Middens. Agents of every faction trade under an unspoken truce; the market keeps no ledger, asks no questions, and moves if it is ever written down on a map."
     }
   ],
   "timeline_events": [

@@ -754,6 +754,8 @@ export interface PlayerMilestones {
    *  affordance. Opens the door to the 158-entry concepts.json layer
    *  for players who would never otherwise discover the Q&A path. */
   firstQAHintShown?: boolean;
+  /** OTA-1319 — the first-fight combat primer has been shown to this character. */
+  firstCombatPrimerShown?: boolean;
   /** Latched once when the player sees the "you're inside an outpost,
    *  leave it before traveling to another city" Arbiter hint. Fires
    *  on first hub entry so a new player understands the inside-building
@@ -930,7 +932,17 @@ export type StatusEffectKind =
   | 'perfect_opening'
   // OTA-936 — successful-dodge GROUP defense: while you're still moving off a read, the
   // OTHER attackers this volley swing at +3 to your AC. Lasts one volley, then clears.
-  | 'evasive';
+  | 'evasive'
+  // OTA-1218 — AETHER TECHNIQUES (PUNCHLIST P16). Two of the four techniques need a
+  // status to live in; the other two ride machinery that already exists (Veil of Ether
+  // applies 'stealthed', Resonance Cascade is ordinary damage).
+  //
+  // ⚠ Both are deliberately shaped like statuses the game already carries, not new
+  // subsystems: aether_shield is read by statusAcAdjustment exactly as
+  // shaped_stone_ward is, and temporal_slip is consumed at the damage site exactly as
+  // 'shielded' (the Sentinel's Defensive Protocols) is.
+  | 'aether_shield'  // +3 AC while the field is held (3 rounds)
+  | 'temporal_slip'; // negates ONE incoming blow entirely, then is consumed
 
 export interface StatusEffect {
   kind: StatusEffectKind;
@@ -974,7 +986,12 @@ export type MainQuestPhase =
   | 'choice'
   | 'ended';
 
-export type MainQuestEnding = 'seal' | 'unleash' | 'preserve';
+/** ⚠⚠ OTA-1248 — 'stay' is the EARNED fourth ending. It is never offered by
+ *  default and it never replaces one of the three: the base doors stay open to
+ *  every character forever, so nothing is ever taken away from a player who
+ *  cannot see why. See `canStayAtTheNexus` — the gate is the Arbiter's regard
+ *  at its top band, which is conduct-earned and impossible to grind. */
+export type MainQuestEnding = 'seal' | 'unleash' | 'preserve' | 'stay';
 
 export interface MainQuestState {
   phase: MainQuestPhase;
@@ -1015,6 +1032,22 @@ export interface PlayerCharacter {
   /** OTA-1044 — motive-drip beat ids already delivered to the feed (strict
    *  order, one-shot each; see engine/storyDrip.ts). Absent = none yet. */
   storyBeatsSeen?: string[];
+  /** OTA-1186 — Jakar Nine-Halls has already explained how bounties work. One-shot,
+   *  set on the first accepted contract.
+   *  ⚠ DELIBERATELY NOT BACKFILLED TO TRUE ON OLD SAVES, which is the opposite of what
+   *  `storyIntroSeen` does. That flag hides a cutscene an existing character has already
+   *  effectively lived through; this one gates RULES THAT HAVE NEVER BEEN SHOWN TO
+   *  ANYBODY — that kills count anywhere, that there is no turn-in, that accepting makes
+   *  the quarry hunt you. A veteran save needs them MORE than a fresh one, not less: the
+   *  owner ran a 23-tile contract on the wrong model of all three. Absent reads as false,
+   *  so every existing character gets it once on their next accept. */
+  bountyPrimerSeen?: boolean;
+  /** ⚠ OTA-1193 — rounds until DODGE can be set again. Counts DOWN by one per action
+   *  taken; 0/absent = ready. Absent on every existing save, which reads as READY — a
+   *  migration must never lock a player out of a move they had yesterday.
+   *  Rounds, not seconds: see engine/dodgeCooldown for why the owner's "10-15 seconds"
+   *  was deliberately translated into turns. */
+  dodgeCooldown?: number;
   /** ⚠ OTA-1089 — PHASE 4 DIFFICULTY, chosen on the last step of character
    *  creation and LOWERABLE MID-RUN BUT NEVER RAISABLE (engine/pressure.ts
    *  canChangeTo). Absent = DEFAULT_PRESSURE ('owed'), which is what every
@@ -1084,6 +1117,13 @@ export interface PlayerCharacter {
    *  ('grave' | 'lie' | 'walker'), set when the resolution fires. Also keys
    *  the EndingScreen epilogue override. Absent = trail still open. */
   missingResolved?: string;
+  /** ⚠ OTA-1246 — how THIS character's motive answered itself, for all five
+   *  reasons ('settled'/'collector'/'pardon'/'choir'/'censor'/…). Set when the
+   *  resolution fires; keys the EndingScreen epilogue override. Absent = the
+   *  question is still open, and the open-question epilogue still reads true.
+   *  `missingResolved` above stays authoritative for the Missing motive so a
+   *  save that finished that trail before this OTA needs no migration. */
+  motiveResolved?: string;
   stats: Stats;
   hp: number;
   hpMax: number;
@@ -1112,6 +1152,15 @@ export interface PlayerCharacter {
    *  current clock, so stepping out of a just-cleared outpost doesn't drop a fresh
    *  ambush mid-loot. Absent for legacy saves → treated as 0 (no grace). */
   bossDefeatGraceUntilHours?: number;
+  /** ⚠⚠ OTA-1291 (port of golem OTA-1272) — free-passage counter after walking
+   *  out of an outpost. Owner, after 4 Mud Wasps killed a fresh character ON
+   *  the exit tile: "a pack of enemies right outside the door is rough get at
+   *  least 2 free tile moves, then whatever." Set to SAFE_EXIT_FREE_SCENES
+   *  (3 = the exit scene + 2 tile moves) at the outpost-exit path; each
+   *  wilderness beginScene under grace suppresses the encounter roll and
+   *  decrements, and each overland step's hostile spawners consult it.
+   *  Absent → 0 (no grace). */
+  safeExitMovesLeft?: number;
   /** OTA-804 — unbanked "honest custom" credit toward faction standing from
    *  BUYING. Buying accrues standing as a slow afterthought: TC spent banks here
    *  and grants +1 standing per BUY_REP_TC_PER_STANDING TC, remainder carried.
@@ -1325,18 +1374,21 @@ export interface PlayerCharacter {
   /** Active faction quests with per-stage progress. Mirrors activeHunts
    *  / activeMysteries / activeStorylines so all four contract types
    *  share the same accept / advance / turn-in flow. */
-  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; escort?: EscortPool; tracked?: boolean }[];
+  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; escort?: EscortPool; tracked?: boolean }[];
   /** Mission ROUTE CHAIN in progress (set by ROUTE TO on a contract). The engine
    *  courses to the objective, then auto-courses to the turn-in once the work is
    *  done. Cleared on turn-in, abandon, deactivate, or a manual divert. */
   routedMission?: { id: string; phase: 'to_objective' | 'to_turnin' } | null;
+  /** ⚠ OTA-1305 — the Great Climb the player has set course for, so the tower
+   *  reads as "the mission you're on" the way every other routed kind does. */
+  routedClimbId?: string | null;
   /** IDs of faction quests the player has turned in. */
   completedFactionQuestIds?: string[];
   /** Active monster hunts with per-stage progress. `tracked === false` = the
    *  player has DEACTIVATED (paused) this hunt: it stays on the slate but its
    *  stages don't auto-advance until re-activated (per-contract, independent of
    *  other hunts). Absent/true = active. */
-  activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
+  activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; tracked?: boolean }[];
   /** IDs of hunts that have been turned in. */
   completedHuntIds?: string[];
   /** OTA-850 [faction bounty] — LEGACY single active kill-bounty. Superseded by
@@ -1350,11 +1402,11 @@ export interface PlayerCharacter {
    *  and drops off the slate. Holding several lets the player grind faction standing. */
   activeBounties?: import('./factionBounty').FactionBounty[];
   /** Active mystery-object quests. `tracked === false` = paused (see activeHunts). */
-  activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
+  activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; tracked?: boolean }[];
   /** IDs of mystery quests turned in. */
   completedMysteryIds?: string[];
   /** Active long-form faction storylines (5-10 step). `tracked === false` = paused. */
-  activeStorylines?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
+  activeStorylines?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; acceptedAtCell?: { x: number; y: number }; tracked?: boolean }[];
   /** IDs of storylines completed. */
   completedStorylineIds?: string[];
   /** Active Whispers — informal NPC-to-NPC tips the player has
@@ -1369,6 +1421,27 @@ export interface PlayerCharacter {
    *  completed, expired, declined). Prevents re-planting the same
    *  whisper twice on the same character. */
   completedWhisperIds?: string[];
+  /** ⚠ OTA-1213 (PUNCHLIST P13) — the heart of the Labyrinth has been reached ONCE.
+   *  The maze is fully re-enterable (`enterLabyrinth` carries no attempt gate), so the
+   *  lore ending and its keepsake are gated on this rather than paid per run — a
+   *  repeatable loop with a repeatable reward is a farm, which is the one thing the
+   *  fix for an ends-in-nothing must not become. Absent on an old save reads as
+   *  "not yet seen", so a character who already walked it gets the ending next time. */
+  labyrinthHeartSeen?: boolean;
+
+  /** ⚠ OTA-1214 — AETHER TECHNIQUES the character has learned. Ids from
+   *  `engine/aetherTechniques.ts`. Absent on an old save reads as "knows none", which is
+   *  correct: they are acquired, never granted at creation. */
+  /** ⚠ OTA-1221 (PUNCHLIST P17) — the lore concepts this character has actually had
+   *  answered, by id. `titleProgress.loreRead` counts DISTINCT entries here rather than
+   *  every ask, so Scholar of Forgotten Lore means three different things read, not one
+   *  thing read three times. Absent on older saves; `?? []` covers them. */
+  loreConceptsRead?: string[];
+  knownTechniques?: string[];
+  /** ⚠ OTA-1214 — per-technique practice count, keyed by technique id (owner: growth is
+   *  per-technique, not one global aether skill, so a character specialises into what they
+   *  actually practise). Only MEANINGFUL uses increment it — see `practiceCounts`. */
+  techniqueProficiency?: Record<string, number>;
   /** Deterministic seed used to generate this character's procedural world map. */
   mapSeed?: string;
   /** Last spot key the player dug at (`locationId:x:y`). Must move away
@@ -1670,6 +1743,17 @@ export interface GameLogEntry {
   meta?: Record<string, unknown>;
 }
 
+/** OTA-1174 — one exchange with one NPC: what you asked and what they said.
+ *  Stored rather than derived, because the log window that used to carry it
+ *  closes with the conversation and the log itself is capped. */
+export interface TalkTurn {
+  /** The topic's authored label — the words on the button the player tapped. */
+  q: string;
+  /** Their reply, exactly as it went to the feed. */
+  a: string;
+  ts: number;
+}
+
 export interface MemorableEvent {
   id: string;
   kind:
@@ -1694,7 +1778,12 @@ export interface MemorableEvent {
     // OTA-843 [Chronicle] — the character first crossed INTO a worse corruption tier
     // (Tainted / Corrupted / Hollowed). Records the aether's arc on the soul so the
     // Chronicle can show how far they've fallen, not just the current number.
-    | 'corruption_tier';
+    | 'corruption_tier'
+    // ⚠ OTA-1213 (PUNCHLIST P13) — the player stood at the heart of the Labyrinth of
+    // Shadows and learned what Iskan-Veil's masking Core actually does. Recorded so
+    // the Arbiter can reference it and the Chronicle can show it; a lore beat this
+    // size should leave a mark on the character, not just scroll past in the feed.
+    | 'labyrinth_heart';
   text: string;
   timestamp: number;
   factionId?: string;
@@ -1760,6 +1849,23 @@ export interface WorldMemory {
    *  concept the player has with factions. Seeded from lore, then earned through actual
    *  patrol clashes; decides who fights whom. Two neutrals can grudge into war from zero. */
   factionRelations?: import('./factionRelations').RelationsMatrix;
+  /** ⚠ OTA-1188 — where the player last CLOSED a bounty. The anti-camp rule refuses a new
+   *  contract from that same board until one has been cleared somewhere else, so a player
+   *  cannot park at one outpost farming its board forever. Absent on every existing save,
+   *  which reads as "no camp in progress" — the permissive direction, deliberately: a
+   *  migration must never retroactively lock a player out of work they could take
+   *  yesterday. */
+  lastBountyClearedOutpostId?: string;
+  /** ⚠ OTA-1191 — THE ROAD ODOMETER. Tiles walked that were not already in the recent-cell
+   *  ring below; every `ODOMETER_STEP` of them is +1 max stamina, forever. Distinct from
+   *  the `MILESTONE_TRAVEL_STEP` track, which counts DISTINCT DESTINATIONS and therefore
+   *  stops paying out once the 36 locations are seen. Absent = 0 on every existing save,
+   *  so nobody is retroactively granted stamina they never walked for. */
+  travelOdometer?: number;
+  /** ⚠ The last few grid cells walked, newest last. A step only advances the odometer if
+   *  its cell is NOT in here — which is what stops a player pacing east-west from farming
+   *  permanent max stamina, the exact hole arb118 had to close on the other track. */
+  recentCells?: string[];
   /** In-game hour of the last world pulse (gates the next one). */
   lastWorldTickHour?: number;
   /** Recent world rumours (newest last), capped. The world moving, in the player's ear. */
@@ -1864,10 +1970,35 @@ export interface WorldMemory {
    *  replaying a line as though neither of you remembers the last two minutes.
    *  Bounded by the authored topic count, so it cannot grow with play. */
   talkedTopics?: Record<string, number>;
+  /** ⚠ OTA-1174 — THE CONVERSATION REMEMBERS. Owner: *"I would like the talk
+   *  screens to remember the conversations and type the question on an
+   *  off-white so later we know what we asked. with so many conversations it
+   *  will get confusing without a history."*
+   *
+   *  Keyed by npcId, oldest turn first. TalkSheet's live transcript is a WINDOW
+   *  on gameLog (see its header) and that window closes when the conversation
+   *  does — so before this, walking away from a vendor erased any record of
+   *  what you had asked them. gameLog is also `.slice(-MAX_LOG_IN_MEMORY)`d, so
+   *  even the exploration feed forgets it in a long session. This is the only
+   *  durable record of an exchange, which is why it is a STORE rather than
+   *  another view.
+   *
+   *  ⚠ BOUNDED, because worldMemory is persisted on every action. Authored
+   *  topics per NPC are finite (14-16 since OTA-1114), so the natural ceiling
+   *  is low — but re-asks and secondary cast pools are not, hence the hard cap
+   *  in recordTalkTurn. */
+  npcTranscripts?: Record<string, TalkTurn[]>;
   /** OTA-1083 — LIFETIME standing each faction has been granted via gifts.
    *  Metered against GIFT_STANDING_FACTION_CAP so the verb OTA-803 deleted
    *  cannot come back as the side door it was deleted for. */
   giftStandingGranted?: Record<string, number>;
+  /** ⚠ OTA-1182 — LIFETIME standing each faction has been granted as SPILLOVER from
+   *  a hostile act against one of their rivals. Any standing loss cascades the
+   *  inverse to rivals, so a caught theft pays +5 and an extortion +3 to everyone
+   *  who hates the victim — uncapped, where a GIFT has been budgeted since OTA-803.
+   *  Metered against SPITE_STANDING_FACTION_CAP. ⚠ Gains only: being hated stays
+   *  uncapped, because a capped consequence is a consequence you can spend past. */
+  spiteStandingGranted?: Record<string, number>;
   /** OTA-120 — dog acquisition state machine, lives on world memory
    *  so it survives across screens. ALL player input routes through
    *  the onboarding handler when this is non-null. Cleared on
@@ -1907,10 +2038,22 @@ export interface WorldMemory {
    *  the player is elevated). Cleared when the dog rejoins on descent,
    *  so each climb gets the joke once; taps still buzz. */
   dogClimbNoticeShown?: boolean;
+  /** OTA-1334 — one-time "the Spire moved" notice. The Grand Spire of Asgardar
+   *  became its own atlas tile on the city's outskirts (the map makeover); a
+   *  LEGACY save that already charted that climb learns this once, at load,
+   *  from the Arbiter. Fresh characters chart the tower where it now stands and
+   *  never need telling — emptyMemory() stamps this true so only migrated saves
+   *  (where the ?? false default leaves it unset→false) ever see the line. */
+  spireMoveNoticeShown?: boolean;
   /** OTA-877 — one-time faction-standing explainer. Set true after the first time
    *  any standing change is logged, so the brief "what is faction standing" note
    *  (appended by logRepChanges) fires exactly once per save. */
   factionRepIntroShown?: boolean;
+  /** OTA-1338 — one-time acid-lore beat: the first acid coat a character paints,
+   *  the Arbiter says where battery bile comes from (owner: "we could work acid
+   *  somehow into the lore"). Absent = not yet told — legacy and fresh saves are
+   *  both eligible exactly once, so no migrate default is needed. */
+  acidLoreIntroShown?: boolean;
   /** arb-fix — announce-once ledger for earned titles. Storm titles are awarded
    *  mid-action (weather tick); later stale-`player` writebacks in the same
    *  action revert earnedTitles, so the "You have earned a name to carry" banner
@@ -2056,7 +2199,22 @@ export interface NpcRelation {
    *  number would not have been this; the object is the point. Bounded in
    *  practice by GIFT_BOONS_PER_PERSON plus the repeat decay — there is no
    *  reason to keep gifting past the cap, and nothing rewards it. */
-  gifts?: { name: string; atHours: number }[];
+  gifts?: {
+    name: string;
+    atHours: number;
+    /** ⚠ OTA-1184 — HOW THEY TOOK IT. Owner: the ledger should show "what you gave
+     *  to whom and how they received it." The reaction was computed by `resolveGift`
+     *  at the moment of giving and then thrown away, so a gift that INSULTED
+     *  somebody looked identical on the record to one they loved.
+     *  ⚠ Optional, and it stays optional: every gift on an existing save predates
+     *  this field, and the ledger must render those as "reaction not recorded"
+     *  rather than inventing one. Do not backfill it — a guessed reaction on a
+     *  historical gift is worse than an honest blank, because tastes have changed
+     *  since (OTA-1176 rewrote the whole preference table). */
+    reaction?: 'loved' | 'liked' | 'polite' | 'disliked' | 'insulted';
+    /** The standing that actually moved, as reported at the time. */
+    standingDelta?: number;
+  }[];
   /** ⚠ OTA-1087 — THE LARGEST FACTION-STANDING HIT ALREADY TAKEN FOR BEING
    *  HOSTILE TO THIS PERSON, as a magnitude. Load-bearing anti-exploit state.
    *

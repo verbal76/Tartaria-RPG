@@ -70,7 +70,7 @@
     "id": "asgardar",
     "name": "Asgardar",
     "type": "buried_capital",
-    "description": "The ancient capital of Tartaria. Home of the Grand Spire of Etheria, which once channeled cosmic Aether into the city grid.",
+    "description": "The ancient capital of Tartaria. Its collector-tower, the Grand Spire of Asgardar, still stands out past the last streets and once channeled cosmic Aether into the city grid.",
     "danger": 5,
     "tags": [
       "capital",
@@ -182,8 +182,8 @@
     "id": "grand_spire_of_etheria",
     "name": "Grand Spire of Etheria",
     "type": "tower",
-    "parent": "asgardar",
-    "description": "A monumental tower in Asgardar that drew Aether from celestial realms — harvesting the sun and the cold night sky at once, venting its waste heat through vacuum-sealed radiators into the black between the stars. Said to be one of the most powerful Aetheric structures ever built.",
+    "parent": "black_reach",
+    "description": "A monumental tower rising out of the floor of the Black Reach, two miles west of the descent, that drew Aether from celestial realms — harvesting the sun and the cold night sky at once, venting its waste heat through vacuum-sealed radiators into the black between the stars. The chasm swallowed it whole and it is still standing. Said to be one of the most powerful Aetheric structures ever built.",
     "danger": 5,
     "tags": [
       "tower",
@@ -1358,7 +1358,10 @@
       "chamber",
       "the chamber",
       "aetheric core",
-      "power chamber"
+      "power chamber",
+      "sentinel ward",
+      "the sentinel ward",
+      "inner archive"
     ],
     "interactables": [
       "chamber",
@@ -1408,7 +1411,8 @@
       "outskirts",
       "borderlands",
       "mud",
-      "open"
+      "open",
+      "outpost"
     ],
     "discoverable": true,
     "aliases": [
@@ -2205,5 +2209,92 @@
     "aliases": ["hidden market", "the hidden market", "market", "bazaar", "the middens market", "secret market", "question mark"],
     "tags": ["settlement", "market", "neutral", "sunken_middens", "middens", "borderlands", "mud", "starter_friendly", "hidden"],
     "interactables": ["stall", "canvas", "trader", "wares", "counter", "crate", "barrel", "lantern", "rope", "scale", "coin", "tarp", "mud", "silt"]
+  },
+  {
+    "id": "grand_spire_of_asgardar",
+    "name": "Grand Spire of Asgardar",
+    "type": "tower",
+    "parent": "asgardar",
+    "description": "The collector-tower of the drowned capital, standing alone on the outskirts where the city's last ring of streets gives out. Fourteen tiers of it are still above the silt. Its warden has never left the stair.",
+    "danger": 5,
+    "tags": [
+      "tower",
+      "aetheric_node",
+      "spire"
+    ],
+    "discoverable": true,
+    "aliases": [
+      "grand spire of asgardar",
+      "spire of asgardar",
+      "asgardar spire",
+      "the collector tower",
+      "collector tower"
+    ],
+    "interactables": [
+      "spire",
+      "tower",
+      "staircase",
+      "collector ring",
+      "conduit",
+      "dust stair",
+      "cracked rail",
+      "hanging banner",
+      "broken ladder",
+      "stone balcony",
+      "gear housing",
+      "observation lens",
+      "ash drift",
+      "flood crack",
+      "rubble mound",
+      "cooling vent",
+      "relay crystal",
+      "lantern hook",
+      "sentinel debris",
+      "burn mark"
+    ]
+  },
+  {
+    "id": "black_reach",
+    "name": "The Black Reach",
+    "type": "chasm",
+    "description": "The southernmost wound in the world, directly beneath the Mud Flood Nexus — a chasm system that simply keeps going down. It is the open door to the Aetherstone Deep: no vault, no seal, no guardian, just a floor that ends. Heat and a faint grid-hum come up out of it.",
+    "danger": 5,
+    "tags": [
+      "chasm",
+      "descent",
+      "aetherstone",
+      "objective",
+      "high_stakes"
+    ],
+    "discoverable": true,
+    "aliases": [
+      "black reach",
+      "the reach",
+      "the black reach",
+      "reach",
+      "the descent"
+    ],
+    "interactables": [
+      "fissure",
+      "ledge",
+      "chasm",
+      "rope",
+      "scree",
+      "updraft",
+      "heat vent",
+      "cracked floor",
+      "hanging cable",
+      "broken stair",
+      "lava seam",
+      "ash drift",
+      "stone bridge",
+      "anchor spike",
+      "dropped pack",
+      "bone scatter",
+      "glow seam",
+      "loose shale",
+      "rusted piton",
+      "echo shaft"
+    ]
   }
 ]

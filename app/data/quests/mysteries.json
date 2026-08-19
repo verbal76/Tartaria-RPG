@@ -2,6 +2,7 @@
   "mysteries": [
     {
       "id": "mystery_red_tower",
+      "targetLocationName": "Red Tower of Nimari",
       "title": "Fragment of the Red Tower",
       "posterText": "A Forgotten Order scholar will pay handsomely for a confirmed Fragment of the Red Tower — the cursed Aetheric core's outer casing, never recovered intact. 400 TC.",
       "trophyName": "Fragment of the Red Tower",
@@ -12,29 +13,53 @@
       "rewardRep": 8,
       "stages": [
         {
-          "narration": "The scholar slides a sketch across the table — a hexagonal Tartarian ironwork, the seal of Nimari embossed into one face. \"The Red Tower's outer ring shed pieces when it cooled. They turn up. Find one.\"",
+          "narration": "The scholar slides a sketch across the table — hexagonal Tartarian ironwork, the seal of Nimari embossed into one face — and pins a survey chit to it. \"The Red Tower's outer ring shed pieces when it cooled. They roll downhill and end up wherever mud collects. Walk the Cradle of Dusk with this and read the mudstone. Then bring what you find to the Tower itself so I can match it against the ring.\"",
           "arbiter": null,
-          "checkKind": null
+          "checkKind": null,
+          "grants": {
+            "item": "Scholar's Survey Chit"
+          },
+          "locationName": "Varakush",
+          "npcName": "the Order scholar"
         },
         {
-          "narration": "You think back through old salvage notes. Nimari, Red Tower, Aetheric core. Reclaimers say the fragments roll downhill — anywhere mud collects, eventually one ends up. Mudstone-rich ground is the place to look.",
-          "arbiter": "\"You know the where,\" the Arbiter says. \"Now do the work.\"",
-          "checkKind": "investigate"
-        },
-        {
-          "narration": "You dig along a Mudstone vein where the silt has built up a lip. After an hour, a piece of the casing catches your blade — hexagonal, faintly warm to the touch.",
+          "narration": "You work the mudstone veins along the Cradle's lip where the silt has built up. After an hour your blade catches on an edge that is not stone — a hexagonal plate, faintly warm, the Nimari seal still legible under a century of mud.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Warm Hexagonal Plate"
+          },
+          "requires": {
+            "item": "Scholar's Survey Chit"
+          },
+          "locationName": "Cradle of Dusk"
         },
         {
-          "narration": "You wipe the casing clean. The seal of Nimari is intact. This will satisfy the scholar.",
-          "arbiter": "\"That fragment is centuries old,\" the Arbiter says. \"It remembers the Tower. Carry it carefully.\"",
-          "checkKind": "boss"
+          "narration": "You climb to the Red Tower's outer ring and hold the plate against the gap it came out of. It seats. The scoring lines up. This is not a lookalike off a scrapper's bench — it is the casing, and the Tower is willing to say so.",
+          "arbiter": null,
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Fragment of the Red Tower"
+          },
+          "requires": {
+            "item": "Warm Hexagonal Plate"
+          },
+          "locationName": "the Red Tower of Nimari"
+        },
+        {
+          "narration": "You wipe the casing clean. The seal of Nimari is intact and the fit is proven. This will satisfy the scholar — and it is the first piece of that ring anyone has brought back whole.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Fragment of the Red Tower"
+          },
+          "locationName": "the Red Tower of Nimari"
         }
       ]
     },
     {
       "id": "mystery_cradle_compass",
+      "targetLocationName": "Cradle of Dusk",
       "title": "Cradle of Dusk Compass",
       "posterText": "Halem the Trader offers 300 TC for a working Cradle of Dusk Compass — one of the few instruments that holds steady in Aetheric storms.",
       "trophyName": "Cradle of Dusk Compass",
@@ -45,24 +70,41 @@
       "rewardRep": null,
       "stages": [
         {
-          "narration": "Halem unrolls a worn map of the Mud Seas, taps the Cradle of Dusk. \"Old Tartarian surveying instrument. Brass face, three needles. Anyone who sails the Mud Seas wants one. Bring me a working piece.\"",
+          "narration": "Halem unrolls a worn map of the Mud Seas and taps the Cradle of Dusk. \"Old Tartarian surveying instrument. Brass face, three needles. Anyone who sails the Mud Seas wants one.\" He hands you his own broken one. \"Take mine for the pattern. There's a surveying wreck out at the Cradle — match the bracket and you'll find the good one.\"",
           "arbiter": null,
-          "checkKind": null
+          "checkKind": null,
+          "grants": {
+            "item": "Halem's Broken Compass"
+          },
+          "locationName": "The Hidden Market",
+          "npcName": "Halem the Trader"
         },
         {
-          "narration": "You make your way to the Cradle's edge. The wreckage of an old surveying vessel sits half-glassed in the haze. Inside, a Tartarian instrument console — and one of the compasses still intact in its bracket.",
-          "arbiter": "\"They never abandoned this place willingly,\" the Arbiter says. \"Take what is still here to take.\"",
-          "checkKind": "stealth"
+          "narration": "The wreck of the surveying vessel sits half-glassed in the Cradle's haze. You go quiet through the listing hull — the instrument console is intact, and one compass still sits in a bracket that matches Halem's exactly. You work it free without bringing the deck down.",
+          "arbiter": null,
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Cradle of Dusk Compass"
+          },
+          "requires": {
+            "item": "Halem's Broken Compass"
+          },
+          "locationName": "Cradle of Dusk"
         },
         {
-          "narration": "You pry the compass free. The three needles snap to attention immediately, aligned with currents you cannot feel. Halem will pay for this without bargaining.",
+          "narration": "Out in the open you let the three needles settle. They snap to attention at once, aligned with currents you cannot feel, and hold steady while the haze churns. Halem will pay for this without bargaining.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "requires": {
+            "item": "Cradle of Dusk Compass"
+          },
+          "locationName": "Cradle of Dusk"
         }
       ]
     },
     {
       "id": "mystery_leviathan_eye",
+      "targetLocationName": "Mud Seas",
       "title": "The Leviathan's Eye",
       "posterText": "True Tartarian agents will pay 500 TC and faith-favor for the preserved eye of a Mud Seas Leviathan — said to see through Aetheric storms.",
       "trophyName": "Preserved Leviathan Eye",
@@ -73,29 +115,54 @@
       "rewardRep": 12,
       "stages": [
         {
-          "narration": "The True Tartarian agent meets you in the dark. \"Leviathan, Mud Seas. Old beast. It died long ago, but its eye does not rot in Aetherstone — find the carcass, take the eye, bring it here.\"",
-          "arbiter": "\"Bones of leviathans show up in the most unflattering places,\" the Arbiter says. \"Look where the Seas have receded.\"",
-          "checkKind": null
-        },
-        {
-          "narration": "You walk the receding edge of the Mud Seas. The Leviathan's spine breaks the surface like a ridge of ribbed stone — long dead, every scale fossilised.",
+          "narration": "The True Tartarian agent meets you in the dark and gives you a jar of Aetherstone packing. \"Leviathan, Mud Seas. Old beast, long dead, but its eye does not rot in Aetherstone. Find the carcass, take the eye, pack it in this before the air gets at it. Bring it back to the Enclave.\"",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": null,
+          "grants": {
+            "item": "Jar of Aetherstone Packing"
+          },
+          "locationName": "The Sunken Enclave",
+          "npcName": "the True Tartarian agent"
         },
         {
-          "narration": "You climb the spine to where the skull lies submerged. The eye-socket is the size of a window. You reach in — the eye is still there, fossilised but intact, the size of a melon.",
-          "arbiter": "\"The leviathans were watching the storms before there were Tartarians,\" the Arbiter says.",
-          "checkKind": "stealth"
-        },
-        {
-          "narration": "You wrap the eye in your pack and back away from the carcass. The Mud Seas resettle behind you — the only witness is the haze.",
+          "narration": "You walk the receding edge of the Mud Seas until the Leviathan's spine breaks the surface like a ridge of ribbed stone — long dead, every scale fossilised. You cut a scale free to prove the find and follow the ridge toward the skull.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Fossilised Leviathan Scale"
+          },
+          "requires": {
+            "item": "Jar of Aetherstone Packing"
+          },
+          "locationName": "Mud Seas"
+        },
+        {
+          "narration": "You climb the spine to where the skull lies half-submerged and pick your footing carefully — the bone shifts. The eye-socket is the size of a window. You reach in, and the eye is still there: fossilised, intact, the size of a melon. It goes into the packing jar.",
+          "arbiter": null,
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Preserved Leviathan Eye"
+          },
+          "requires": {
+            "item": "Fossilised Leviathan Scale"
+          },
+          "locationName": "Mud Seas"
+        },
+        {
+          "narration": "Back at the Enclave you open the jar under lamplight. The eye has held — no clouding, no crumble. The agent will not have to take your word for anything.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Preserved Leviathan Eye"
+          },
+          "locationName": "The Sunken Enclave",
+          "npcName": "the True Tartarian agent"
         }
       ]
     },
     {
       "id": "mystery_temporal_watch",
+      "targetLocationName": "The Buried Cities",
       "title": "Temporal Distortion Watch",
       "posterText": "Reclaimers Guild Speaker pays 600 TC and will move you up the haul board for a working Temporal Distortion Watch — Tartarian-make, useful in deep ruins.",
       "trophyName": "Temporal Distortion Watch",
@@ -106,29 +173,54 @@
       "rewardRep": 10,
       "stages": [
         {
-          "narration": "The Speaker spreads the contract. \"Watch — Tartarian make, hexagonal face, three dials. Counts the way the local Aetheric time bends. Reclaimers used to wear them. Find a working one.\"",
+          "narration": "The Speaker spreads the contract and lends you a Guild eddy-gauge. \"Watch — Tartarian make, hexagonal face, three dials. Counts the way local Aetheric time bends. They turn up on the dead: anyone caught in an eddy got theirs fossilised with them. Read the Buried Cities with the gauge and find a body worth unstrapping.\"",
           "arbiter": null,
-          "checkKind": null
+          "checkKind": null,
+          "grants": {
+            "item": "Guild Eddy-Gauge"
+          },
+          "locationName": "Reclaimer's Stake",
+          "npcName": "the Reclaimers Guild Speaker"
         },
         {
-          "narration": "Old Reclaimer wisdom: the watches turn up in preserved corpses — anyone who died in a temporal eddy got their watch fossilised with them. You head into the eddies.",
-          "arbiter": "\"Time bent backward for these people,\" the Arbiter says. \"Their gear bent with them.\"",
-          "checkKind": "investigate"
+          "narration": "You walk the Buried Cities with the gauge and it starts to stutter — a temporal eddy, and the gauge draws you a map of its edge. You mark the reading down. Somewhere inside that line, everything that died is still dying slowly.",
+          "arbiter": null,
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Eddy-Zone Reading"
+          },
+          "requires": {
+            "item": "Guild Eddy-Gauge"
+          },
+          "locationName": "The Buried Cities"
         },
         {
-          "narration": "You find a Reclaimer body in an eddy zone — perfectly preserved, the watch still on the wrist, ticking in slow waves.",
+          "narration": "You go into the eddy on the reading's line, moving slow because everything here does. A Reclaimer body lies perfectly preserved, the watch still on the wrist, ticking in long waves. You unstrap it and back out along your own footprints.",
           "arbiter": null,
-          "checkKind": "stealth"
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Temporal Distortion Watch"
+          },
+          "requires": {
+            "item": "Eddy-Zone Reading"
+          },
+          "locationName": "The Buried Cities"
         },
         {
-          "narration": "You unstrap the watch. The dials settle into normal time as you leave the eddy. The Speaker will pay without question.",
+          "narration": "Clear of the eddy, the dials settle into normal time and stay there — three hands, honest and steady. It works. The Speaker will pay without question.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "requires": {
+            "item": "Temporal Distortion Watch"
+          },
+          "locationName": "Reclaimer's Stake",
+          "npcName": "the Reclaimers Guild Speaker"
         }
       ]
     },
     {
       "id": "mystery_obsidian_orb",
+      "targetLocationName": "Obsidian Pillars",
       "title": "Shifting Obsidian Orb",
       "posterText": "Mud Monarch courier offers 700 TC for a Shifting Obsidian Orb — an Obsidian Pillar fragment fused with Aetherstone. Reshapes itself.",
       "trophyName": "Shifting Obsidian Orb",
@@ -139,29 +231,53 @@
       "rewardRep": 8,
       "stages": [
         {
-          "narration": "The courier is well-dressed and brief. \"Obsidian Pillars. The Orbs only form where one of the pillars cracks under an Aetheric storm. Find a recently-storm-struck pillar. Recover the Orb.\"",
-          "arbiter": "\"Mud Monarchs do not pay seven hundred TC for nothing,\" the Arbiter says. \"Make sure you know what you carry.\"",
-          "checkKind": null
-        },
-        {
-          "narration": "You find a pillar with fresh damage — Aetheric scoring along one face. The Orb has rolled into the silt at its base. Black as obsidian, but it does not hold a single shape.",
+          "narration": "The courier is well-dressed and brief, and leaves a sealed writ on the table. \"Obsidian Pillars. The Orbs only form where a pillar cracks under an Aetheric storm. Find a recently-struck pillar, recover the Orb, and bring it to the Blind — not to me, and not anywhere anyone can watch you carry it.\"",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": null,
+          "grants": {
+            "item": "Monarch Courier Writ"
+          },
+          "locationName": "The Monarch's Waystation",
+          "npcName": "the Mud Monarch courier"
         },
         {
-          "narration": "You pick the Orb out of the silt. It is heavy in a way that changes — sometimes a stone's weight, sometimes a feather's.",
+          "narration": "You quarter the Pillars until you find one with fresh damage — Aetheric scoring bright along a face that was whole a week ago. You chip a shard of the scored obsidian for the record. The Orb has rolled into the silt at the base, black, and not holding a shape.",
           "arbiter": null,
-          "checkKind": "stealth"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Storm-Scored Shard"
+          },
+          "requires": {
+            "item": "Monarch Courier Writ"
+          },
+          "locationName": "Obsidian Pillars"
         },
         {
-          "narration": "You secure the Orb. The courier's coin is good. Whatever the Monarchs want it for is their concern, not yours — yet.",
-          "arbiter": "\"You may meet this Orb again,\" the Arbiter says. \"In other hands.\"",
-          "checkKind": "boss"
+          "narration": "You take the Orb out of the silt without straightening up. It is heavy in a way that keeps changing — a stone's weight, then a feather's — and you leave the Pillars by the long way, because the courier was clear about being watched.",
+          "arbiter": null,
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Shifting Obsidian Orb"
+          },
+          "requires": {
+            "item": "Storm-Scored Shard"
+          },
+          "locationName": "Obsidian Pillars"
+        },
+        {
+          "narration": "In the quiet of the Architect's Blind you set the Orb down and let it settle. It never quite does. The courier's coin is good. Whatever the Monarchs want it for is their concern, not yours — yet.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Shifting Obsidian Orb"
+          },
+          "locationName": "The Architect's Blind"
         }
       ]
     },
     {
       "id": "mystery_servants_hum",
+      "targetLocationName": "Tartarian Outskirts",
       "title": "The Hum Beneath Ural",
       "posterText": "The Servants of the Giants hear a hum from the Urals that does not match any prayer in the canon. They will pay any pilgrim willing to walk the Outskirts and listen — three places, three readings, one answer. 300 TC posted at any Servants shrine.",
       "trophyName": "Listening Stone Cluster",
@@ -172,34 +288,66 @@
       "rewardRep": 10,
       "stages": [
         {
-          "narration": "Vael presses three small carved stones into your palm. 'One at the obsidian pillars. One at the endless stair. One at the sinking cathedral. They will know which note is which when you bring them back.'",
-          "arbiter": "\"The Giants are sleeping,\" the Arbiter says. \"The Servants want to be sure they still are.\"",
-          "checkKind": null
+          "narration": "Vael presses three small carved stones into your palm. \"One at the Obsidian Pillars. One at the Endless Stair. One at the Sinking Cathedral. Press each to the rock and let it listen. They will know which note is which when you bring them back to the shrine.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Vael's Three Listening Stones"
+          },
+          "locationName": "Giant-Watch Shrine",
+          "npcName": "Vael"
         },
         {
-          "narration": "You stand at the obsidian pillars and press the first stone to the rock. The hum that answers is not the empty hum of weather — it has shape.",
+          "narration": "You stand at the Obsidian Pillars and press the first stone to the rock. The hum that answers is not the empty hum of weather — it has shape. The stone takes the note and holds it, warm in your hand long after you lift it away.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "First Note — the Pillars"
+          },
+          "requires": {
+            "item": "Vael's Three Listening Stones"
+          },
+          "locationName": "Obsidian Pillars"
         },
         {
-          "narration": "Endless Stair. The second stone hums lower. You hold it longer than you mean to. The stair, you remember, descends past where any explorer has come back.",
+          "narration": "Endless Stair. The second stone hums lower, and you hold it against the step longer than you mean to. The stair, you remember, descends past where any explorer has come back from.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Second Note — the Stair"
+          },
+          "requires": {
+            "item": "First Note — the Pillars"
+          },
+          "locationName": "Endless Stair"
         },
         {
-          "narration": "Sinking Cathedral. You stand on the spit of mud above where the steeple breaks the water. The third stone hums almost not at all. The Servants will want to know that, too.",
+          "narration": "Sinking Cathedral. You stand on the spit of mud above where the steeple breaks the water and press the third stone down. It hums almost not at all. The Servants will want to know that too — a silence in the right place is still a reading.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Third Note — the Cathedral"
+          },
+          "requires": {
+            "item": "Second Note — the Stair"
+          },
+          "locationName": "the Sinking Cathedral"
         },
         {
-          "narration": "Three readings, three notes. Return them to a Servants shrine — Vael will know what the chord means.",
+          "narration": "Back at the shrine you lay the three stones out in the order you took them. Three readings, three notes, one chord. Vael will know what it means — and from her face, she already half does.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "requires": {
+            "item": "Third Note — the Cathedral"
+          },
+          "locationName": "Giant-Watch Shrine",
+          "npcName": "Vael"
         }
       ]
     },
     {
       "id": "mystery_weeping_core",
+      "targetLocationName": "The Buried Cities",
       "title": "The Weeping Core",
       "posterText": "A Forgotten Order savant seeks a \"Weeping Core\" — an Aetheric core that leaks a slow tear of live Aether, thought lost in the Buried Cities. 500 TC.",
       "trophyName": "Weeping Core",
@@ -210,29 +358,54 @@
       "rewardRep": 8,
       "stages": [
         {
-          "narration": "The savant blots a bead of blue light off her workbench. \"One core in a hundred cracks without dying — it weeps. The tears are worth more than the core. One was seen in the Buried Cities before the seller vanished. Find it before it runs dry.\"",
-          "arbiter": "\"A thing that bleeds treasure will not be lonely long,\" the Arbiter says. \"Move before the crowd does.\"",
-          "checkKind": null
-        },
-        {
-          "narration": "You trace the seller to a collapsed gallery in the Buried Cities, buried with his find when the roof took him. The Core weeps on in the dark, a slow blue drip counting out the months since anyone came.",
+          "narration": "The savant blots a bead of blue light off her workbench and gives you a sealed catch-vial. \"One core in a hundred cracks without dying — it weeps, and the tears are worth more than the core. One was seen in the Buried Cities before the seller vanished. Find it before it runs dry, and catch what it sheds on the way out.\"",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": null,
+          "grants": {
+            "item": "Sealed Catch-Vial"
+          },
+          "locationName": "Varakush",
+          "npcName": "the Order savant"
         },
         {
-          "narration": "The gallery is snared with old Tartarian ward-wire, live and singing. You read the safe path through the wards by the pattern of the Core's own dripping light, and lift it free without waking the trap.",
+          "narration": "You trace the seller to a collapsed gallery in the Buried Cities — buried with his find when the roof took him. The Core weeps on in the dark, a slow blue drip counting out the months since anyone came. You catch a tear in the vial and it does not stop crying.",
           "arbiter": null,
-          "checkKind": "stealth"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "A Single Core-Tear"
+          },
+          "requires": {
+            "item": "Sealed Catch-Vial"
+          },
+          "locationName": "The Buried Cities"
         },
         {
-          "narration": "You cradle the Weeping Core out into the light. The savant weighs one tear on a scale finer than a hair and goes pale with joy. \"It is still crying,\" she breathes. \"Do you understand what we can learn from a wound that will not close?\"",
-          "arbiter": "\"She is delighted by a thing in pain,\" the Arbiter says. \"Study the delight as closely as the Core.\"",
-          "checkKind": "boss"
+          "narration": "The gallery is snared with old Tartarian ward-wire, live and singing. You read the safe path through by the pattern of the Core's own dripping light, and lift it free without waking the trap.",
+          "arbiter": null,
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Weeping Core"
+          },
+          "requires": {
+            "item": "A Single Core-Tear"
+          },
+          "locationName": "The Buried Cities"
+        },
+        {
+          "narration": "You cradle the Weeping Core out into the light at Varakush and the savant weighs one tear on a scale finer than a hair. She goes pale with joy. \"It is still crying,\" she breathes. \"Do you understand what we can learn from a wound that will not close?\"",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Weeping Core"
+          },
+          "locationName": "Varakush",
+          "npcName": "the Order savant"
         }
       ]
     },
     {
       "id": "mystery_aetherborn_foundling",
+      "targetLocationName": "Samarran",
       "title": "The Aetherborn Foundling",
       "posterText": "A Dynasty agent quietly seeks a foundling child whose blood may run Aetherborn — hidden from the bloodline by a mother who fled. 600 TC, no questions.",
       "trophyName": "Bloodline Token",
@@ -243,29 +416,55 @@
       "rewardRep": 10,
       "stages": [
         {
-          "narration": "The agent keeps his voice low. \"A mother ran from the Dynasty with an infant who might be pure-blooded. She left a token — a bloodline-marked locket — with someone she trusted. Find the token. The Dynasty will handle the rest.\" He does not say what \"the rest\" means.",
-          "arbiter": "\"He is hunting a child and calling it a token,\" the Arbiter says. \"Hold that in mind when you decide how hard to look.\"",
-          "checkKind": null
-        },
-        {
-          "narration": "You follow the mother's trail cold through Samarran to a widow who took her in. The widow is dead a year, but her effects were sold to a Reclaimer broker who logs everything. The token is in someone's inventory now.",
+          "narration": "The agent keeps his voice low and gives you a Dynasty seal to open doors with. \"A mother ran from us with an infant who might be pure-blooded. She left a token — a bloodline-marked locket — with someone she trusted in Samarran. Find the token. The Dynasty will handle the rest.\" He does not say what \"the rest\" means.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": null,
+          "grants": {
+            "item": "Dynasty Seal"
+          },
+          "locationName": "Dynasty Border Post",
+          "npcName": "the Dynasty agent"
         },
         {
-          "narration": "The broker will part with the locket for coin and a story straight. As you leave, you understand the shape of it — the token is not proof the child is pure. It is proof the child exists, which for the Dynasty is the same as a sentence.",
-          "arbiter": "\"Now you know what you are carrying,\" the Arbiter says. \"A name the Dynasty wants to close. Carry it accordingly.\"",
-          "checkKind": "diplomacy"
+          "narration": "The seal opens the right doors and the mother's trail runs cold in Samarran, at a widow who took her in. The widow is a year dead, but her effects went to a Reclaimer broker who logs everything — and the log is still on the shelf. The token is in someone's inventory now.",
+          "arbiter": null,
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Broker's Effects Log"
+          },
+          "requires": {
+            "item": "Dynasty Seal"
+          },
+          "locationName": "Samarran"
         },
         {
-          "narration": "You bring the agent the bloodline token. He turns it in the light, satisfied. What you tell him about the child — where, whether, at all — is the part of this errand the poster did not price. That part was always yours to set.",
-          "arbiter": "\"The coin was for the locket,\" the Arbiter says. \"The child was never on the ledger. Some things you decide off the books.\"",
-          "checkKind": "boss"
+          "narration": "The broker reads her own log, names a price, and parts with the locket for coin and a story told straight. As you leave the Hidden Market you understand the shape of it: the token is not proof the child is pure. It is proof the child exists — which for the Dynasty is the same as a sentence.",
+          "arbiter": null,
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Bloodline Token"
+          },
+          "requires": {
+            "item": "Broker's Effects Log"
+          },
+          "locationName": "The Hidden Market",
+          "npcName": "the Reclaimer broker"
+        },
+        {
+          "narration": "You bring the agent the bloodline token and he turns it in the light, satisfied. What you tell him about the child — where, whether, at all — is the part of this errand the poster did not price. That part was always yours to set.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Bloodline Token"
+          },
+          "locationName": "Dynasty Border Post",
+          "npcName": "the Dynasty agent"
         }
       ]
     },
     {
       "id": "mystery_drowned_bell_samarran",
+      "targetLocationName": "Samarran",
       "title": "The Drowned Bell of Samarran",
       "posterText": "A Samarran bell-founder will pay for the \"Drowned Bell\" — a Tartarian resonance-bell that tolls underwater and stills troubled Aether. 450 TC.",
       "trophyName": "Drowned Bell",
@@ -276,29 +475,51 @@
       "rewardRep": 6,
       "stages": [
         {
-          "narration": "The founder taps a cracked bell that will not ring true. \"The old empire cast bells that tuned the Aether itself. One sank with a Samarran barge in the shallows and still tolls down there when the field runs high. I need it to fix what my craft cannot.\"",
-          "arbiter": "\"A bell that rings underwater,\" the Arbiter muses. \"Tartaria made instruments to play the world. Fetch one, gently.\"",
-          "checkKind": null
-        },
-        {
-          "narration": "You find the barge-wreck in the Samarran shallows by ear — a low bronze note rising through the water each time the Aether swells. The Bell is snared under a century of silt and a barge-rib the size of a mast.",
+          "narration": "The founder taps a cracked bell that will not ring true and hands you his tuning-rod. \"The old empire cast bells that tuned the Aether itself. One sank with a Samarran barge in the shallows and still tolls down there when the field runs high. Take the rod — you'll find the wreck by ear before you find it by eye.\"",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": null,
+          "grants": {
+            "item": "Founder's Tuning-Rod"
+          },
+          "locationName": "Ostragar",
+          "npcName": "the bell-founder"
         },
         {
-          "narration": "Raising the Bell wakes what the note kept quiet: an Aetheric Ooze bloom that fed on the still field around it, roused the moment the tolling stops. You clear the wreck and free the Bell from the silt.",
+          "narration": "You find the barge-wreck in the Samarran shallows exactly the way he said — the rod picking up a low bronze note rising through the water each time the Aether swells. The Bell is snared under a century of silt and a barge-rib the size of a mast. You mark the bearing.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Wreck Bearing"
+          },
+          "requires": {
+            "item": "Founder's Tuning-Rod"
+          },
+          "locationName": "Samarran"
         },
         {
-          "narration": "You bring the Drowned Bell dripping to the founder, and he strikes it once. The note lands in your chest and every jangled thing in the shop goes calm at once. \"It is not a bell,\" he whispers. \"It is a truce. The empire could ring the world quiet.\"",
-          "arbiter": "\"They could still the very Aether with a chime,\" the Arbiter says. \"And still they drowned. Power was never their problem.\"",
-          "checkKind": null
+          "narration": "You clear the rib and work the Bell out of the silt. The tolling stops as it comes free, and the still field around it — an Aetheric Ooze bloom that had fed on that quiet for a century — sours and drifts apart without it. You carry the Bell up dripping.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "grants": {
+            "item": "Drowned Bell"
+          },
+          "requires": {
+            "item": "Wreck Bearing"
+          },
+          "locationName": "Samarran"
+        },
+        {
+          "narration": "You bring the Drowned Bell to the founder and he strikes it once. The note lands in your chest and every jangled thing in the shop goes calm at once. \"It is not a bell,\" he whispers. \"It is a truce. The empire could ring the world quiet.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "locationName": "Ostragar",
+          "npcName": "the bell-founder"
         }
       ]
     },
     {
       "id": "mystery_singing_stone_ostragar",
+      "targetLocationName": "Ostragar",
       "title": "The Singing Stone of Ostragar",
       "posterText": "The Stone Builders seek a \"Singing Stone\" from Ostragar — a keystone that hums the load of a whole vault, the last of its kind unbroken. 550 TC.",
       "trophyName": "Singing Keystone",
@@ -309,29 +530,51 @@
       "rewardRep": 9,
       "stages": [
         {
-          "narration": "The lodge-scribe hums a note and a nearby wall answers faintly. \"The Tartarians cut keystones that sing the load they carry — you can hear a building's health. Ostragar's great vault still holds one, unbroken. We must study it before the vault fails and takes it.\"",
-          "arbiter": "\"A stone that sings when it is well,\" the Arbiter says. \"Then it will scream before it falls. Listen on your way in.\"",
-          "checkKind": null
+          "narration": "The lodge-scribe hums a note and a nearby wall answers faintly. She gives you a lodge brace-kit. \"The Tartarians cut keystones that sing the load they carry. Ostragar's great vault still holds one, unbroken — and the vault is failing. Brace it the old way or you will be the one who brought the roof down.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Lodge Brace-Kit"
+          },
+          "locationName": "Builders' Survey Camp",
+          "npcName": "the lodge-scribe"
         },
         {
-          "narration": "In Ostragar's failing vault you find the keystone by its hum — high and thin now, a note under strain. The whole vault leans on it. Prise it wrong and you are the one who brought the roof down.",
+          "narration": "In Ostragar's failing vault you find the keystone by its hum — high and thin now, a note under strain, the whole vault leaning on it. You read the load off it and chalk the brace points where the kit will hold.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Vault Load-Reading"
+          },
+          "requires": {
+            "item": "Lodge Brace-Kit"
+          },
+          "locationName": "Ostragar"
         },
         {
-          "narration": "You brace the vault the old way, matching the keystone's song with your own working long enough to ease it free and slip a rough stone in its place. The vault groans, settles, and holds — for now.",
+          "narration": "You brace the vault on your own chalk marks and match the keystone's song with a working, long enough to ease it free and slip a rough stone into the gap. The vault groans, settles, and holds — for now.",
           "arbiter": null,
-          "checkKind": "cast"
+          "checkKind": "cast",
+          "grants": {
+            "item": "Singing Keystone"
+          },
+          "requires": {
+            "item": "Vault Load-Reading"
+          },
+          "locationName": "Ostragar"
         },
         {
           "narration": "You lay the Singing Keystone on the lodge bench and it hums, content, off its long strain at last. The scribe presses an ear to it and weeps. \"It is well again,\" she says. \"We can finally learn what 'well' sounds like. Everything we build after this will be truer.\"",
-          "arbiter": "\"You did not steal a stone,\" the Arbiter says. \"You gave a trade back its tuning fork. Quietly enormous work.\"",
-          "checkKind": null
+          "arbiter": null,
+          "checkKind": null,
+          "locationName": "Builders' Survey Camp",
+          "npcName": "the lodge-scribe"
         }
       ]
     },
     {
       "id": "mystery_monarch_redaction",
+      "targetLocationName": "The Hidden Market",
       "title": "The Monarch's Redaction",
       "posterText": "A Conspiracy Architect handler seeks a leaked Mud Monarch ledger before its redactions can be read — a page that names what the Monarchs buried. 650 TC, utter discretion.",
       "trophyName": "Redacted Ledger",
@@ -342,29 +585,54 @@
       "rewardRep": 10,
       "stages": [
         {
-          "narration": "The handler slides you a scrap — half a sentence, the rest inked black. \"A Monarch ledger leaked. One page names a Guardian site they mean kept secret forever. It is loose in the market. Recover it before anyone reads under the redaction. The silence is a kindness.\"",
-          "arbiter": "\"The lie is a kindness. The silence is a service,\" the Arbiter recites. \"They believe that. Decide, before the end, whether you do.\"",
-          "checkKind": null
+          "narration": "The handler slides you a scrap — half a sentence, the rest inked black — and a market letter of credit. \"A Monarch ledger leaked. One page names a Guardian site they mean kept secret forever, and it is loose in the Hidden Market. Recover it before anyone reads under the redaction. The silence is a kindness.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Market Letter of Credit"
+          },
+          "locationName": "The Architect's Blind",
+          "npcName": "the Architect handler"
         },
         {
-          "narration": "You trace the leaked page through three market hands to a Reclaimer fence who has already tried to read it — and failed. The redaction is Tartarian ink; it eats light. But the fence noticed the page is warm where the buried thing is named.",
+          "narration": "You trace the page through three market hands to a Reclaimer fence who has already tried to read it and failed — the redaction is Tartarian ink and it eats light. But she noticed the page runs warm where the buried thing is named, and she writes you out the hand-off.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Fence's Hand-Off Note"
+          },
+          "requires": {
+            "item": "Market Letter of Credit"
+          },
+          "locationName": "The Hidden Market"
         },
         {
-          "narration": "The fence will sell, but wants out of the whole affair alive — the Monarchs are hunting the page too. You get her clear of the market ahead of a Monarch cutter and take the ledger unopened.",
+          "narration": "The fence will sell, but she wants out of the whole affair alive — the Monarchs are hunting the page too. You get her clear of the stalls ahead of a Monarch cutter and take the ledger unopened, which is the only way it is worth anything.",
           "arbiter": null,
-          "checkKind": "stealth"
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Redacted Ledger"
+          },
+          "requires": {
+            "item": "Fence's Hand-Off Note"
+          },
+          "locationName": "The Hidden Market"
         },
         {
           "narration": "You hand the redacted ledger to the handler. He does not open it either — that is the point. \"Now no one has read it,\" he says, filing it into a dark you will never see the bottom of. Whether that is mercy or a grave for the truth, he has made you part of it.",
-          "arbiter": "\"You just helped bury a fact so it could not hurt anyone,\" the Arbiter says. \"Or so it could not help anyone. From out here the two graves look identical.\"",
-          "checkKind": "boss"
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Redacted Ledger"
+          },
+          "locationName": "The Architect's Blind",
+          "npcName": "the Architect handler"
         }
       ]
     },
     {
       "id": "mystery_second_flood_cipher",
+      "targetLocationName": "Aetheric Chamber",
       "title": "The Second Flood Cipher",
       "posterText": "The Revivalists seek a recovered Tartarian cipher-plate said to hold the empire's own warning about the Flood — how it started, and how to start it again. 700 TC.",
       "trophyName": "Cipher-Plate",
@@ -375,29 +643,51 @@
       "rewardRep": 11,
       "stages": [
         {
-          "narration": "The Revivalist cell-leader is hungry-eyed. \"The Tartarians wrote down how the Flood began — a cipher-plate, buried at the Aetheric Chamber's threshold. Sasha wants it read. It is a warning. A warning is only a set of instructions read backward.\"",
-          "arbiter": "\"They want the recipe for the end of the world,\" the Arbiter says. \"To prevent it, they will tell you. To repeat it, they will not. Watch which.\"",
-          "checkKind": null
-        },
-        {
-          "narration": "At the Chamber threshold you find the cipher-plate half-buried, its glyphs live and shifting — the Aether still running the warning on a loop a thousand years after the last reader died of it.",
+          "narration": "The Revivalist cell-leader is hungry-eyed and hands you a glyph-frame. \"The Tartarians wrote down how the Flood began — a cipher-plate, buried at the Aetheric Chamber's threshold. Sasha wants it read. It is a warning. A warning is only a set of instructions read backward.\"",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": null,
+          "grants": {
+            "item": "Glyph-Frame"
+          },
+          "locationName": "Revivalist Field Camp",
+          "npcName": "the Revivalist cell-leader"
         },
         {
-          "narration": "Reading the plate at all courts what it warns of. As you match the working to hold the glyphs still, the threshold field surges — an Aetheric Ooze of raw overload rising exactly as the plate says it did the first time.",
+          "narration": "At the Chamber threshold you find the cipher-plate half-buried, its glyphs live and shifting — the Aether still running the warning on a loop a thousand years after the last reader died of it. You set the frame over them and take a rubbing of one full cycle.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "One Full Glyph-Cycle"
+          },
+          "requires": {
+            "item": "Glyph-Frame"
+          },
+          "locationName": "the Sentinel Ward"
         },
         {
-          "narration": "You carry the cipher-plate to the cell-leader and watch her read the Flood's own account of itself. \"It was not a disaster,\" she says, wondering. \"It was a switch, thrown too far. We only have to throw it gentler.\" You have handed the Revivalists the world's most dangerous instruction, and called it a warning.",
-          "arbiter": "\"A warning and a blueprint are the same page,\" the Arbiter says. \"You chose who reads it. Live with the reader.\"",
-          "checkKind": null
+          "narration": "Reading the plate at all courts what it warns of. You match the working to hold the glyphs still, and the threshold field surges — an Aetheric overload rising exactly as the plate says it did the first time. It sinks back. You lift the plate out of the socket.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "grants": {
+            "item": "Cipher-Plate"
+          },
+          "requires": {
+            "item": "One Full Glyph-Cycle"
+          },
+          "locationName": "the Sentinel Ward"
+        },
+        {
+          "narration": "You carry the cipher-plate back to the cell-leader and watch her read the Flood's own account of itself. \"It was not a disaster,\" she says, wondering. \"It was a switch, thrown too far. We only have to throw it gentler.\" You have handed the Revivalists the world's most dangerous instruction, and called it a warning.",
+          "arbiter": null,
+          "checkKind": null,
+          "locationName": "Revivalist Field Camp",
+          "npcName": "the Revivalist cell-leader"
         }
       ]
     },
     {
       "id": "mystery_cartographers_last_map",
+      "targetLocationName": "The Giant Vault",
       "title": "The Cartographer's Last Map",
       "posterText": "A Reclaimer broker seeks the last map of a dead cartographer — said to chart a sealed Tartarian vault no one else has found. 550 TC.",
       "trophyName": "Cartographer's Map",
@@ -408,29 +698,54 @@
       "rewardRep": 9,
       "stages": [
         {
-          "narration": "The broker unrolls a blank scrap. \"Old Merik mapped every vault worth robbing, then found one he wouldn't sell the map to — sealed, Tartarian, unopened. He died with it on him. The map surfaced, then sank into the market. Find it before a rival does.\"",
-          "arbiter": "\"A map to a door no one has opened,\" the Arbiter says. \"Doors stay closed for reasons. Fetch the map. Think hard before you fetch the key.\"",
-          "checkKind": null
+          "narration": "The broker unrolls a blank scrap and writes you a claim-chit against Merik's estate. \"Old Merik mapped every vault worth robbing, then found one he wouldn't sell the map to — sealed, Tartarian, unopened. He died with it on him. His effects went out through the Market. Find the map before a rival does.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Merik's Estate Claim-Chit"
+          },
+          "locationName": "Reclaimer's Stake",
+          "npcName": "the Reclaimer broker"
         },
         {
-          "narration": "You trace Merik's effects through three fences to a Reclaimer who bought the lot unread. Among the junk, the map — and Merik's last note in the margin: I DID NOT SEAL IT. IT SEALED ITSELF. WITH SOMETHING INSIDE.",
+          "narration": "The chit walks you through three fences at the Hidden Market to a Reclaimer who bought the lot unread. Among the junk you find Merik's field-ledger, and his last note in the margin: I DID NOT SEAL IT. IT SEALED ITSELF. WITH SOMETHING INSIDE.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Merik's Field-Ledger"
+          },
+          "requires": {
+            "item": "Merik's Estate Claim-Chit"
+          },
+          "locationName": "The Hidden Market"
         },
         {
-          "narration": "The fence will trade the map, but she's spooked — a Monarch buyer has been asking after it too, and asking is the Monarchs' polite step. You get the map clear of the stall before the impolite step arrives.",
+          "narration": "The fence will trade the map for the ledger, but she is spooked — a Monarch buyer has been asking after it, and asking is the Monarchs' polite step. You get the map clear of the stall before the impolite step arrives.",
           "arbiter": null,
-          "checkKind": "stealth"
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Cartographer's Map"
+          },
+          "requires": {
+            "item": "Merik's Field-Ledger"
+          },
+          "locationName": "The Hidden Market"
         },
         {
           "narration": "You lay Merik's map on the broker's table. He traces the route to the sealed vault and grins — then reads the margin note and stops grinning. \"It sealed itself,\" he repeats. \"With something inside.\" He pays you and does not, you notice, ask you to open it.",
-          "arbiter": "\"You found the door,\" the Arbiter says. \"The market can argue over who dares knock. That is a different, more expensive kind of courage.\"",
-          "checkKind": "boss"
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Cartographer's Map"
+          },
+          "locationName": "Reclaimer's Stake",
+          "npcName": "the Reclaimer broker"
         }
       ]
     },
     {
       "id": "mystery_giants_tooth",
+      "targetLocationName": "Mud Seas",
       "title": "The Giant's Tooth",
       "posterText": "The Servants of the Giants seek a relic tooth of a true Tartarian Giant, torn loose in the Flood and lost in the Mud Seas. A holy find. 500 TC.",
       "trophyName": "Giant's Tooth",
@@ -441,24 +756,45 @@
       "rewardRep": 8,
       "stages": [
         {
-          "narration": "The pilgrim-elder speaks of it like a saint's bone. \"When the Flood took the Giants, one lost a tooth — a relic the length of a man, humming with the old Aether still. It sank in the Mud Seas. To hold it is to touch the divine. Bring it to us.\"",
-          "arbiter": "\"A tooth the length of a man,\" the Arbiter says. \"Whatever the Giants were, they were not small. Mind what else in the Mud Seas might want a relic that hums.\"",
-          "checkKind": null
+          "narration": "The pilgrim-elder speaks of it like a saint's bone, and ties a listening-cord around your wrist. \"When the Flood took the Giants, one lost a tooth — a relic the length of a man, humming with the old Aether still. It sank in the Mud Seas. The cord will shiver when you are near it. To hold it is to touch the divine.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Listening-Cord"
+          },
+          "locationName": "Tartarian Pilgrim Camp",
+          "npcName": "the pilgrim-elder"
         },
         {
-          "narration": "You find the tooth by its hum — a low note rising through the silt where a shelf of Mud-Sea floor drops into black. It is snared in the ribs of a drowned barge, humming to itself in the dark, exactly as the elder said.",
+          "narration": "The cord starts to shiver where a shelf of Mud-Sea floor drops into black. You find the tooth by its hum, snared in the ribs of a drowned barge and singing to itself in the dark, exactly as the elder said. You mark the shelf.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Marked Shelf-Bearing"
+          },
+          "requires": {
+            "item": "Listening-Cord"
+          },
+          "locationName": "Mud Seas"
         },
         {
-          "narration": "Freeing the tooth disturbs its long guardian — a Mud Spirit coiled around the relic, grown strange on a century of its hum. You clear the Spirit and work the tooth loose from the drowned ribs.",
+          "narration": "Freeing the tooth disturbs its long guardian — a Mud Spirit coiled around the relic, grown strange on a century of that hum. You break its hold and work the tooth loose from the drowned ribs.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "Giant's Tooth"
+          },
+          "requires": {
+            "item": "Marked Shelf-Bearing"
+          },
+          "locationName": "Mud Seas"
         },
         {
           "narration": "You lay the Giant's Tooth before the pilgrim-elder and the whole camp kneels. She presses her brow to it and weeps at its hum. \"It still sings,\" she breathes. \"The Giant is dead a thousand years and its tooth still sings. They are not gone. They are only sleeping deeper than the Sea.\"",
-          "arbiter": "\"Whether it is a god's relic or a very large fossil that hums,\" the Arbiter says, \"their faith is real, and you put it in their hands. That is its own kind of true.\"",
-          "checkKind": null
+          "arbiter": null,
+          "checkKind": null,
+          "locationName": "Tartarian Pilgrim Camp",
+          "npcName": "the pilgrim-elder"
         }
       ]
     },
@@ -474,29 +810,54 @@
       "rewardRep": 10,
       "stages": [
         {
-          "narration": "The factor keeps his voice even, but his hand tightens. \"The Hollow Crown is proof — the Monarchs descend from Tartaria's last true rulers. A Reclaimer hoard holds it, unknowing, filed as scrap. We want it back before someone learns to read it. Discreetly.\"",
-          "arbiter": "\"They want a crown to prove a right to rule,\" the Arbiter says. \"The crown is hollow. Notice that the poster is, too. Fetch it and keep your own counsel.\"",
-          "checkKind": null
+          "narration": "The factor keeps his voice even, but his hand tightens on the hoard-manifest he gives you. \"The Hollow Crown is proof the Monarchs descend from Tartaria's last true rulers. A Reclaimer hoard at the Giant Vault holds it, unknowing, filed as scrap. We want it back before someone learns to read it. Discreetly.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Hoard Manifest"
+          },
+          "locationName": "The Monarch's Waystation",
+          "npcName": "the Monarch factor"
         },
         {
-          "narration": "You find the hoard and the Crown in it, mislabeled among genuine scrap. It IS old — but the metal is common, the jewels glass. Whatever the Hollow Crown proves, it does not prove a bloodline. The Monarchs' inheritance is a prop. You wonder if they know.",
+          "narration": "The manifest walks you to the Crown, mislabelled among genuine scrap. It IS old — but the metal is common and the jewels are glass. You copy the assay down. Whatever the Hollow Crown proves, it does not prove a bloodline. The Monarchs' inheritance is a prop, and you wonder if they know.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Assayer's Note"
+          },
+          "requires": {
+            "item": "Hoard Manifest"
+          },
+          "locationName": "The Giant Vault"
         },
         {
-          "narration": "The hoard's Reclaimer keeper won't miss one filed scrap, but a Monarch cutter is also here to make the recovery \"clean\" of witnesses. You lift the Crown and clear the keeper out of the cutter's path both.",
+          "narration": "The hoard's Reclaimer keeper won't miss one filed scrap — but a Monarch cutter is here too, to make the recovery \"clean\" of witnesses. You lift the Crown and steer the keeper out of the cutter's path in the same quiet minute.",
           "arbiter": null,
-          "checkKind": "stealth"
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Hollow Crown"
+          },
+          "requires": {
+            "item": "Assayer's Note"
+          },
+          "locationName": "The Giant Vault"
         },
         {
           "narration": "You return the Hollow Crown to the factor. He handles it like a holy thing, this common circle of old tin. \"The proof of our line,\" he murmurs. You know what it is worth and he does not — or he does, and needs the others not to. Either way, the secret leaves with your silence.",
-          "arbiter": "\"An empire of shadows, ruling on a crown of glass,\" the Arbiter says. \"You could break their spell with one word. You could also start a war with it. Choose the word, or the silence, deliberately.\"",
-          "checkKind": "boss"
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Hollow Crown"
+          },
+          "locationName": "The Monarch's Waystation",
+          "npcName": "the Monarch factor"
         }
       ]
     },
     {
       "id": "mystery_ashen_codex",
+      "targetLocationName": "Nimari",
       "title": "The Ashen Codex",
       "posterText": "The Forgotten Order seeks the Ashen Codex — a treatise burned in a Monarch purge, its words readable still in the char if handled with care. 600 TC.",
       "trophyName": "Ashen Codex",
@@ -507,29 +868,51 @@
       "rewardRep": 9,
       "stages": [
         {
-          "narration": "The archivist shows you a single charred page under glass. \"The Monarchs burned the Aphelion treatise a generation ago — but Tartarian ink does not truly burn, it only chars. The words are still in the ash if the Codex survived whole. It was last seen at the purge-site, Nimari.\"",
-          "arbiter": "\"They burned it and it refused to die,\" the Arbiter says. \"Knowledge is stubborn that way. Handle the ash gently — it is still a book.\"",
-          "checkKind": null
+          "narration": "The archivist shows you a single charred page under glass and gives you an ash-frame to carry the rest in. \"The Monarchs burned the Aphelion treatise a generation ago — but Tartarian ink does not truly burn, it only chars. The words are still in the ash. It was last seen at the purge-site, Nimari.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Ash-Frame"
+          },
+          "locationName": "Varakush",
+          "npcName": "the Order archivist"
         },
         {
-          "narration": "At the Nimari purge-site you dig the old fire-pit and find the Codex where it fell, charred black but whole — the Monarchs' torch could not finish what the ink would not allow. The char holds its words like a shadow of the fire.",
+          "narration": "At the Nimari purge-site you dig out the old fire-pit and find the Codex where it fell — charred black but whole, the Monarchs' torch unable to finish what the ink would not allow. You slide the ash-frame under it before it can break its own back.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Framed Char-Block"
+          },
+          "requires": {
+            "item": "Ash-Frame"
+          },
+          "locationName": "Nimari"
         },
         {
-          "narration": "Reading the Ashen Codex without crumbling it takes a careful working — you hold the char together with Aether while the shadow-words rise. A Rust Lurker, drawn to the disturbed site, tests you mid-reading. You end it and keep the pages whole.",
+          "narration": "Reading the Ashen Codex without crumbling it takes a careful working — you hold the char together with Aether while the shadow-words rise off it. Something drawn by the disturbed site tests you mid-reading. You see it off and keep the pages whole.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "Ashen Codex"
+          },
+          "requires": {
+            "item": "Framed Char-Block"
+          },
+          "locationName": "Nimari"
         },
         {
           "narration": "You bring the Ashen Codex to the archivist, who receives it like a rescued prisoner. She reads the shadow-words the Monarchs died to erase and looks up, shaken. \"This is why they burned it,\" she says. \"Not what it teaches. What it proves about them. Some fires are confessions.\"",
-          "arbiter": "\"They told the world a lie by burning the truth,\" the Arbiter says. \"The ash kept the truth anyway. Ash usually does. You carried a confession home.\"",
-          "checkKind": null
+          "arbiter": null,
+          "checkKind": null,
+          "locationName": "Varakush",
+          "npcName": "the Order archivist"
         }
       ]
     },
     {
       "id": "mystery_tuning_fork_asgardar",
+      "targetLocationName": "Asgardar",
       "title": "The Tuning Fork of Asgardar",
       "posterText": "The Stone Builders seek a Tartarian resonance-tool from Asgardar — a \"tuning fork\" that reads the true note of any stone, key to their whole craft. 550 TC.",
       "trophyName": "Resonance Fork",
@@ -540,24 +923,45 @@
       "rewardRep": 9,
       "stages": [
         {
-          "narration": "The lodge-master rings a common fork and frowns. \"Ours are guesses. The Tartarians had a true one — strike it to a wall and it sings back the stone's real health, its real load. One lies in the Asgardar ruins. With it, we stop guessing. Without it, we keep burying apprentices.\"",
-          "arbiter": "\"A tool to hear whether a building is lying to you,\" the Arbiter says. \"Their whole craft turns on it. Fetch it carefully; it is more precious than any weapon.\"",
-          "checkKind": null
+          "narration": "The lodge-master rings a common fork and frowns, then gives it to you. \"Ours are guesses. The Tartarians had a true one — strike it to a wall and it sings back the stone's real health. One lies in the Asgardar ruins. Take mine to tell them apart. With the true one we stop guessing; without it we keep burying apprentices.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Lodge-Master's Common Fork"
+          },
+          "locationName": "Builders' Survey Camp",
+          "npcName": "the lodge-master"
         },
         {
-          "narration": "In the Asgardar ruins you find the Resonance Fork in a collapsed workshop, and prove its worth at once — struck to the leaning wall beside you, it sings a cracked, dying note. You step back a breath before the wall answers the note by falling.",
+          "narration": "In the Asgardar ruins you find the Resonance Fork in a collapsed workshop, and prove it against the common one at once — struck to the leaning wall beside you, the true fork sings a cracked, dying note where yours says nothing at all. You step back a breath before the wall answers the note by falling.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Proven Fork-Reading"
+          },
+          "requires": {
+            "item": "Lodge-Master's Common Fork"
+          },
+          "locationName": "Asgardar"
         },
         {
-          "narration": "The ruin does not want to give up its tool — the collapse the Fork warned of spreads, and an Aetheric Scarab swarm boils out of the opening stone. You clear them and take the Fork out ahead of the failing gallery.",
+          "narration": "The ruin does not want to give up its tool. The collapse the Fork warned of spreads, the gallery starts coming down in slabs, and something boils out of the opening stone. You clear your way and carry the Fork out ahead of the failing roof.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "Resonance Fork"
+          },
+          "requires": {
+            "item": "Proven Fork-Reading"
+          },
+          "locationName": "Asgardar"
         },
         {
           "narration": "You lay the Resonance Fork on the lodge bench and the lodge-master strikes it to the wall. It sings back true and clear, and every mason in the room leans in to hear a building tell the truth for the first time. \"We have been deaf,\" he says. \"You gave us ears. Nothing we raise now will be a guess.\"",
-          "arbiter": "\"A craft that could not hear its own work, handed a listening tool,\" the Arbiter says. \"Quietly, you may have saved every soul who lives under a Builder roof from here on. Quietly enormous.\"",
-          "checkKind": null
+          "arbiter": null,
+          "checkKind": null,
+          "locationName": "Builders' Survey Camp",
+          "npcName": "the lodge-master"
         }
       ]
     },
@@ -573,24 +977,48 @@
       "rewardRep": 10,
       "stages": [
         {
-          "narration": "The buyer keeps their hood up. \"Something at the Mud Flood Nexus is pulsing — faint, patient, on a beat. Not weather. Not a beast. A signal. It has repeated for months and no faction will admit to hearing it. Bring me its source. I only want to know what is calling, and to whom.\"",
-          "arbiter": "\"A patient, repeating pulse from the place the world drowned,\" the Arbiter says. \"Someone, or something, is still transmitting from the wound. Find the mouth. Do not answer it.\"",
-          "checkKind": null
-        },
-        {
-          "narration": "You track the Pale Signal into the Nexus' outer galleries. It strengthens as you descend, and resolves from noise into pattern — a sequence, deliberate, old. It is not decaying like a broken machine. It is being kept up. On purpose.",
+          "narration": "The buyer keeps their hood up and pushes a beat-counter across the table. \"Something at the Mud Flood Nexus is pulsing — faint, patient, on a beat. Not weather. Not a beast. A signal. It has repeated for months and no faction will admit to hearing it. Count it, then bring me its source. I only want to know what is calling, and to whom.\"",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": null,
+          "grants": {
+            "item": "Beat-Counter"
+          },
+          "locationName": "The Parley Ground",
+          "npcName": "the hooded buyer"
         },
         {
-          "narration": "The signal's source is warded behind a live Aether-field that reads intruders. You read the pulse's own rhythm and slip through on its beat — the ward keyed, you realize, to let the signal out but nothing in. Someone built this to be heard and never found.",
+          "narration": "You track the Pale Signal into the Nexus' outer galleries and it strengthens as you descend, resolving out of noise into pattern — a sequence, deliberate, old. The counter writes it down. It is not decaying like a broken machine. It is being kept up. On purpose.",
           "arbiter": null,
-          "checkKind": "stealth"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "The Counted Sequence"
+          },
+          "requires": {
+            "item": "Beat-Counter"
+          },
+          "locationName": "Mud Flood Nexus"
         },
         {
-          "narration": "You reach the source: a single Tartarian core, alone in the dark, pulsing its patient sequence into a world that forgot how to listen. You lift the Signal-Core still transmitting. The buyer takes it, holds it to the light, and goes very quiet. \"It was still calling,\" they say. \"After everything. It never stopped calling home.\" They do not tell you whose home. You are not sure they know.",
-          "arbiter": "\"You found a voice that outlasted its civilization, still saying the same word into the dark,\" the Arbiter says. \"Some questions you carry home unanswered. This is one. Let it weigh what it weighs.\"",
-          "checkKind": "boss"
+          "narration": "The source is warded behind a live Aether-field that reads intruders. You slip through on the pulse's own rhythm, off the counted sequence — the ward keyed, you realise, to let the signal OUT and nothing in. Someone built this to be heard and never found. In the dark at the end of it, a single Tartarian core, still transmitting. You lift it.",
+          "arbiter": null,
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Signal-Core"
+          },
+          "requires": {
+            "item": "The Counted Sequence"
+          },
+          "locationName": "Mud Flood Nexus"
+        },
+        {
+          "narration": "The buyer takes the Signal-Core, holds it to the light, and goes very quiet. \"It was still calling,\" they say. \"After everything. It never stopped calling home.\" They do not tell you whose home. You are not sure they know.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Signal-Core"
+          },
+          "locationName": "The Parley Ground",
+          "npcName": "the hooded buyer"
         }
       ]
     }

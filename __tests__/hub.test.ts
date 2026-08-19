@@ -61,10 +61,9 @@ describe('findHubRoom', () => {
 
 describe('resolveHubTravel', () => {
   const gate = hubEntryRoomId();
-  const visited = new Set<string>();
 
   it('resolves cardinal directions through the exits map', () => {
-    const r = resolveHubTravel(gate, 'go north', visited);
+    const r = resolveHubTravel(gate, 'go north');
     expect(r).not.toBeNull();
     expect(r!.via).toBe('cardinal');
     // Whatever the gate's north neighbour is, it must be a real room.
@@ -77,7 +76,7 @@ describe('resolveHubTravel', () => {
       (d) => gateRoom.exits[d],
     )!;
     const neighbour = findHubRoom(gateRoom.exits[exitDir])!;
-    const r = resolveHubTravel(gate, `go to the ${neighbour.shortName.toLowerCase()}`, visited);
+    const r = resolveHubTravel(gate, `go to the ${neighbour.shortName.toLowerCase()}`);
     expect(r).not.toBeNull();
     expect(r!.roomId).toBe(neighbour.id);
     // Either cardinal (if the input also contains a cardinal keyword) or
@@ -85,7 +84,12 @@ describe('resolveHubTravel', () => {
     expect(['cardinal', 'adjacent']).toContain(r!.via);
   });
 
-  it('fast-travels to a previously visited non-adjacent room', () => {
+  // ⚠⚠ OTA-1282 (port of golem OTA-1279) — THIS TEST USED TO ASSERT THE OPPOSITE. A non-adjacent room
+  // the player had already visited was teleported to (`via: 'fast_travel'`).
+  // The owner's navigation spec deletes that: *"Normal room navigation should
+  // move ONE GRAPH EDGE AT A TIME."* The same input is now a refusal carrying
+  // directions. Full rule in ota1279UniversalOutpostGraph.
+  it('refuses a non-adjacent room and names the door that heads toward it', () => {
     // Pick a room that is NOT a cardinal neighbour of the gate.
     const gateRoom = findHubRoom(gate)!;
     const neighbours = new Set(
@@ -93,16 +97,31 @@ describe('resolveHubTravel', () => {
     );
     const far = HUB.rooms.find((r) => r.id !== gate && !neighbours.has(r.id));
     expect(far).toBeTruthy();
-    const seen = new Set([far!.id]);
-    const r = resolveHubTravel(gate, `head to the ${far!.shortName.toLowerCase()}`, seen);
+    const r = resolveHubTravel(gate, `head to the ${far!.shortName.toLowerCase()}`);
     expect(r).not.toBeNull();
     expect(r!.roomId).toBe(far!.id);
-    expect(r!.via).toBe('fast_travel');
+    expect(r!.via).toBe('not_adjacent');
+    // The step it names must itself be one legal move away — a signpost is
+    // useless if it points at a room you also cannot reach.
+    const step = r && 'firstStep' in r ? r.firstStep : null;
+    expect(step).not.toBeNull();
+    expect(neighbours.has(step!)).toBe(true);
   });
 
   it('returns null when no exit / room matches', () => {
-    const r = resolveHubTravel(gate, 'go to nowhere flavoured', visited);
+    const r = resolveHubTravel(gate, 'go to nowhere flavoured');
     expect(r).toBeNull();
+  });
+
+  // ⚠⚠ OTA-1282 (port of golem OTA-1279) — a cardinal this room has no door on is REFUSED here, not
+  // passed down to overland travel. Before this it fell through and the player
+  // walked out of the outpost by typing a wrong direction.
+  it('refuses a cardinal with no door rather than resolving to nothing', () => {
+    const room = HUB.rooms.find((r) => !r.exits.north)!;
+    const r = resolveHubTravel(room.id, 'go north');
+    expect(r).not.toBeNull();
+    expect(r!.via).toBe('no_exit_that_way');
+    expect(r!.roomId).toBeNull();
   });
 });
 

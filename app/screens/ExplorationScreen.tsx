@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { canonicalItemTags } from '../engine/crafting';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { playerWeaponReach, useGameStore, makeRoomKey, chipDismissTileKey } from '../state/gameStore';
-import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
+import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError, stampBreadcrumbPhase } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { AdventureFeed } from '../components/AdventureFeed';
@@ -13,16 +13,37 @@ import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { playerPowerScore, enemyPowerScore } from '../engine/powerRating';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
-import { SalvageModal, isSalvageable as isSalvageableForModal } from '../components/SalvageModal';
+// ⚠⚠ OTA-1266 — THE SALVAGEMODAL IMPORT IS GONE, AND THE COMMENT THAT STOOD HERE
+// WAS MINE AND HAD GONE FALSE. It read: *"its `isSalvageable` predicate is still
+// the source of truth for the action-button count, so the module stays."* That
+// stopped being true at OTA-1263, when I deleted the `salvageableCount` predicate
+// that was its only caller and left the import behind — so a retired file was
+// being kept alive by a claim about a consumer that no longer existed.
+// ⚠ `app/components/SalvageModal.tsx` now has ZERO importers in app/, __tests__/
+// or scripts/. It is left on disk rather than deleted while the picker trial's
+// merge-or-revert is the owner's open call; git makes the deletion a one-liner
+// once that is decided.
 import { BrandedModal } from '../components/BrandedModal';
-import { TakeModal } from '../components/TakeModal';
+import { GatherModal } from '../components/GatherModal'; // OTA-1233 — one picker, both verbs
+import { CombatPrimerModal } from '../components/CombatPrimerModal'; // OTA-1321 — the first fight explains itself
+
+/** ⚠ OTA-1263 — the beat between INVESTIGATE ALL's results. The owner asked for
+ *  "maybe 2+3 seconds"; 2.2s is the low end of that, because the sweep can be six
+ *  nouns long and the whole point is that it stays readable, not that it stalls. */
+const INVESTIGATE_ALL_GAP_MS = 2_200;
+// OTA-1251 — the ★ takes AND wears; both read from the same catalog lookups.
+import { isUpgradeOverEquipped, upgradeEquipSlot } from '../engine/gatherSort';
 import { ClimbModal } from '../components/ClimbModal';
 import { TorchProbeModal } from '../components/TorchProbeModal';
 import { HookContinueModal } from '../components/HookContinueModal';
 import { WhisperCompleteModal } from '../components/WhisperCompleteModal';
 // OTA-180 — FeedbackModal import dropped along with the 📝 button.
 // The component file stays on disk for potential re-introduction.
-import { isClimbable, isSalvageable } from '../engine/interactionTags';
+// ⚠ OTA-1266 — `isSalvageable` dropped from this import too: it was the OTHER
+// dead salvage predicate in this file, unused since the pickers merged. Two
+// competing "is this salvageable?" answers lived here; the picker's own
+// `classifyGatherNoun` / `laneForKind` is the surviving one.
+import { isClimbable } from '../engine/interactionTags';
 import { climbBlockReason } from '../engine/climbReadiness';
 import { isNounConsumed, isNounFlavorExhausted } from '../engine/ambientNounMatch';
 import { getLocationById } from '../engine/encounter';
@@ -46,16 +67,21 @@ import { PayoffSheet } from '../components/PayoffSheet';
 import { TalkSheet } from '../components/TalkSheet';
 import { GiftModal } from '../components/GiftModal';
 import { hasTopicsFor } from '../engine/dialogue';
-// OTA-1087 — the SAME identity function the store and the ledger use. See the
+// OTA-1064 — the SAME identity function the store and the ledger use. See the
 // TALK chip below for what asking in the wrong namespace cost.
 import { npcLedgerId } from '../engine/npcMemory';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
 import { profileOf } from '../engine/pressure';
 import { TutorialTarget } from '../components/TutorialTarget';
-import { TUTORIAL_STEPS } from '../components/tutorialSteps';
+import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from '../components/tutorialSteps';
 import { reachBandsFor, RANGE_LABELS } from '../engine/types';
 import type { CombatRange } from '../engine/types';
+import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
+import { useBackAction } from '../ui/desktopBack'; // OTA-1229 — right-click / Escape closes the top popup
+// ⚠⚠ OTA-1236 — the ONE rule for "this noun carries a next step", shared with the
+// engine's rescue dispatch and the bulk-salvage guard. See engine/storyNouns.ts.
+import { isLeadNoun, orderByStoryTier } from '../engine/storyNouns';
 
 function describeTime(hours: number): string {
   const day = Math.floor(hours / 24) + 1;
@@ -91,12 +117,17 @@ function timeOfDayTint(hours: number): string {
 export function ExplorationScreen() {
   const player = useGameStore((s) => s.player);
   const gameLog = useGameStore((s) => s.gameLog);
+  // ⚠ OTA-1351 — the dying breath's RENDER checkpoint. Runs after every React
+  // commit of this screen (no dep array, throttled inside the stamp), so a
+  // freeze crumb that reached `engine-done` but never `rendered` indicts the
+  // render side — the exact question the 2026-08-17 receipt could not answer.
+  useEffect(() => { stampBreadcrumbPhase('rendered'); });
   const partialArbiterText = useGameStore((s) => s.partialArbiterText);
   const isGenerating = useGameStore((s) => s.isGenerating);
   const submit = useGameStore((s) => s.submitPlayerAction);
   const setInputModalOpen = useGameStore((s) => s.setInputModalOpen);
   const setScreen = useGameStore((s) => s.setScreen);
-  // OTA-1082 — the Phase 2 talk exchange, reachable by tap rather than only by typing.
+  // OTA-1059 — the Phase 2 talk exchange, reachable by tap rather than only by typing.
   const talkToNpc = useGameStore((s) => s.talkToNpc);
   const currentScene = useGameStore((s) => s.currentScene);
   // OTA-507 — drives the hidden-location "?" so the travel row doesn't leak the
@@ -122,21 +153,23 @@ export function ExplorationScreen() {
   const chooseTutorialExplore = useGameStore((s) => s.chooseTutorialExplore);
   // arb108 — outpost tutorial lockdown (mirrors InputBox): MAP + other
   // out-of-band controls buzz until the player makes the stay/leave choice.
+  // ⚠ OTA-1249 — reads the SAME exported list InputBox does. This was an
+  // identical literal array in both files, and 'look' was missing from both.
   const tutLock =
     tutBeat !== null
-    && ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'].includes(tutBeat)
+    && TUT_LOCK_BEATS.includes(tutBeat)
     && !tutorialExploreChosen;
   const chooseTutorialLeave = useGameStore((s) => s.chooseTutorialLeave);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
-  // OTA-1099 — the talk/parley sheets share the DiceRoller's controls slot;
+  // OTA-1076 — the talk/parley sheets share the DiceRoller's controls slot;
   // these drive which occupant renders. Rolls win: a parley choice that starts
   // a roll hands the slot straight to the dice.
   const pendingTalk = useGameStore((s) => s.pendingTalk);
   const pendingParley = useGameStore((s) => s.pendingParley);
-  // OTA-1104 — the shakedown outranks every other sheet: your wrist is in
+  // OTA-1081 — the shakedown outranks every other sheet: your wrist is in
   // their grip, and the store refuses all actions until you pay or fight.
   const pendingPayoff = useGameStore((s) => s.pendingPayoff);
-  // OTA-1104 — escort leaders walking with you are pickpocket marks too.
+  // OTA-1081 — escort leaders walking with you are pickpocket marks too.
   // Select the stable quests reference; derive the names in a memo so the
   // selector never mints a fresh array (which would re-render on every tick).
   const activeQuestsForMarks = useGameStore((s) => s.player?.activeFactionQuests);
@@ -146,7 +179,7 @@ export function ExplorationScreen() {
       .map((q) => q.escort!.leaderName!),
     [activeQuestsForMarks],
   );
-  // OTA-1102 — the TALK glow. Subscribing to talkedTopics is what keeps the
+  // OTA-1079 — the TALK glow. Subscribing to talkedTopics is what keeps the
   // light honest: it goes out the moment the last unread line is heard, and
   // comes back when a warmth/story gate opens a new topic on this vendor.
   const talkedTopics = useGameStore((s) => s.worldMemory.talkedTopics);
@@ -204,12 +237,12 @@ export function ExplorationScreen() {
       player.completedFactionQuestIds ?? [],
     ).length > 0;
   }, [currentScene?.missionBoard, player]);
-  // arb152 — a dismiss (✕) for the Fusing Crucible chip, and OTA-1052 the same for
+  // arb152 — a dismiss (✕) for the Fusing Crucible chip, and OTA-1029 the same for
   // the vendor chip. arb-fix — the dismiss lives in the STORE, NOT local useState:
   // entering a vendor UNMOUNTS this screen (App.tsx renders exploration vs vendor by
   // a flag), so a local flag was lost on the round-trip and the chip popped back on
   // return.
-  // OTA-1052 — the scope is the macro TILE, not the room (reversing arb154's
+  // OTA-1029 — the scope is the macro TILE, not the room (reversing arb154's
   // room-keyed shape). Owner: "the crucible once dismissed can stay dismissed until
   // we leave the capital tile and come back" — a capital is a dozen rooms on ONE
   // tile, so a room-keyed dismiss re-showed the chip on every interior hop. Leaving
@@ -222,6 +255,42 @@ export function ExplorationScreen() {
   const setVendorChipDismissedKey = useGameStore((s) => s.setVendorChipDismissedKey);
   const vendorChipDismissed = !!vendorDismissedKey && vendorDismissedKey === chipViewKey;
   const [takeOpen, setTakeOpen] = useState(false);
+  // ⚠⚠ OTA-1238 — THE ONE THING THAT CLOSES IT WITHOUT THE PLAYER ASKING.
+  //
+  // Now that the picker survives a selection (owner: *"the top hat should stay
+  // open ... until you hit the ignore button"*), it can outlive the room being
+  // safe. `salvage <noun>` routes through the investigate verb, which carries a
+  // 6% ambush roll, and a lead tap spawns a rescue captor outright. A loot list
+  // floating over a fight is not a choice the player made — every action behind
+  // it would be refused with "Not while X is on you", which is the "button did
+  // nothing" complaint wearing a different hat.
+  //
+  // ⚠ It closes on the ARRIVAL of an enemy, not on their presence: the picker is
+  // never openable mid-fight in the first place, so this fires exactly once, on
+  // the transition, and cannot fight the player for control of the screen.
+  const liveEnemyCount = currentScene?.enemies?.length ?? 0;
+  useEffect(() => {
+    if (takeOpen && liveEnemyCount > 0) setTakeOpen(false);
+  }, [takeOpen, liveEnemyCount]);
+  // ⚠⚠ OTA-1321 — THE FIRST FIGHT EXPLAINS ITSELF, ONCE. Owner: *"let's add a first
+  // time pop-up for the first fight explaining briefly, how to heal, what Dodge and
+  // stealth do, and where to go to change armor and weapons and the approach button."*
+  //
+  // ⚠ ONE DERIVED CONDITION, NOT A LATCH AT EACH SPAWN SITE. An enemy enters a scene
+  // from at least three places — the wilderness roll, the OTA-1032 indoor rest-ambush,
+  // and the OTA-089 climb-top overlay — and hanging a "first fight" flag on each is how
+  // the third one gets forgotten. The screen asks the question instead: is something
+  // live in front of me, and has this character been told? So it fires on whichever
+  // fight is genuinely first, including an ambush the player never chose to start.
+  //
+  // ⚠ `enemiesDefeated === 0` KEEPS IT OFF A VETERAN'S SCREEN. The milestone is new, so
+  // every existing save reads `firstCombatPrimerShown: undefined` — without this second
+  // clause a character 200 kills deep would be handed a card headed YOUR FIRST FIGHT on
+  // their next encounter. A veteran who genuinely has no kills yet still gets it.
+  const markCombatPrimerSeen = useGameStore((s) => s.markCombatPrimerSeen);
+  const combatPrimerSeen = useGameStore((s) => !!s.player?.milestones?.firstCombatPrimerShown);
+  const enemiesDefeatedEver = useGameStore((s) => s.player?.milestones?.enemiesDefeated ?? 0);
+  const combatPrimerOpen = liveEnemyCount > 0 && !combatPrimerSeen && enemiesDefeatedEver === 0;
   // OTA 031 — climb-target picker. Opens to a chip list of every
   // climbable noun in the current scene; tapping one fires `climb
   // <noun>` which resolves one tier in the climb handler.
@@ -248,14 +317,47 @@ export function ExplorationScreen() {
   useEffect(() => {
     const anyPopupOpen =
       searchOpen || approachOpen || askArbiterOpen || salvageOpen
-      || climbOpen || takeOpen || doorBeatOpen;
+      || climbOpen || takeOpen || doorBeatOpen || combatPrimerOpen;
     setInputModalOpen(anyPopupOpen);
     // iOS: a native <Modal> won't present over a live keyboard / focused
     // input, and the floating bar's autoFocus keeps re-grabbing it — so
     // explicitly drop the keyboard the moment any popup/beat opens.
     if (anyPopupOpen) Keyboard.dismiss();
-  }, [searchOpen, approachOpen, askArbiterOpen, salvageOpen, climbOpen, takeOpen, doorBeatOpen, setInputModalOpen]);
+  }, [searchOpen, approachOpen, askArbiterOpen, salvageOpen, climbOpen, takeOpen, doorBeatOpen, combatPrimerOpen, setInputModalOpen]);
   useEffect(() => () => setInputModalOpen(false), [setInputModalOpen]);
+  // ⚠⚠ OTA-1229 — RIGHT-CLICK / ESCAPE CLOSES THE POPUP ON TOP. Owner, on the
+  // PC build: *"right click on the mouse should be the back button."* On a
+  // phone each of these <Modal>s already answers Android's hardware back
+  // through `onRequestClose`; a PC has no such button, so every picker had
+  // exactly one exit — finding and hitting its small CANCEL.
+  //
+  // ⚠ THE DOOR BEAT IS DELIBERATELY ABSENT from this list. It is a TUTORIAL
+  // GATE, not a convenience popup — the run cannot continue until the player
+  // chooses, so a back action that dismissed it would strand them on a screen
+  // with nothing to press. Everything here is a picker the player opened and
+  // may simply not want.
+  //
+  // Registered AFTER the AppShell handler, so it is consulted BEFORE it: with a
+  // picker open the click closes the picker, and only once nothing is open does
+  // the click fall through to "leave this sub-screen".
+  useBackAction(true, () => {
+    // OTA-1321 — the primer sits on top of everything when it is up, so it answers
+    // first. Unlike the door beat it is safe to dismiss: closing it IS having seen
+    // it, and the fight underneath is fully playable. It must latch the milestone
+    // on the way out, though — visibility is derived, so a close that didn't latch
+    // would put the card straight back up on the next render.
+    if (combatPrimerOpen) { markCombatPrimerSeen(); return true; }
+    if (torchChooserOpen) { setTorchChooserOpen(false); return true; }
+    if (takeOpen) { setTakeOpen(false); return true; }
+    if (salvageOpen) { setSalvageOpen(false); return true; }
+    if (climbOpen) { setClimbOpen(false); return true; }
+    if (searchOpen) { setSearchOpen(false); return true; }
+    if (approachOpen) { setApproachOpen(false); return true; }
+    if (pickpocketOpen) { setPickpocketOpen(false); return true; }
+    if (askArbiterOpen) { setAskArbiterOpen(false); return true; }
+    if (missionBoardOpen) { setMissionBoardOpen(false); return true; }
+    return false;
+  });
   // arb72 (iOS door-popup fix) — the leave/stay popup is a native <Modal>, and
   // its `visible` used to flip true the instant the explore_or_leave beat
   // advanced (mid store-driven re-render, with the keyboard still dismissing
@@ -272,7 +374,20 @@ export function ExplorationScreen() {
     const t = setTimeout(() => setDoorModalVisible(true), 450);
     return () => clearTimeout(t);
   }, [doorBeatOpen]);
-  // OTA-1052 — the vendor-leave prompt (POLISH-4, 2026-05-25) is GONE. It gated
+  // OTA-1321 — the combat primer takes the SAME deferred present as the door beat,
+  // and for the same reason: it raises itself off a store change (an enemy landing
+  // in the scene) rather than off a tap, which is exactly the frame iOS refuses to
+  // present a <Modal> over while the floating input bar still holds focus. The
+  // Take/Climb pickers get away without this because the player taps them on an
+  // already-settled frame; a card that appears when something attacks you does not.
+  const [combatPrimerVisible, setCombatPrimerVisible] = useState(false);
+  useEffect(() => {
+    if (!combatPrimerOpen) { setCombatPrimerVisible(false); return; }
+    Keyboard.dismiss();
+    const t = setTimeout(() => setCombatPrimerVisible(true), 450);
+    return () => clearTimeout(t);
+  }, [combatPrimerOpen]);
+  // OTA-1029 — the vendor-leave prompt (POLISH-4, 2026-05-25) is GONE. It gated
   // every cardinal move while a vendor stood in the scene — and a capital's room
   // hops ARE cardinal moves, so walking Workshop → Armory asked "leave Tarek
   // behind?" every single time (owner: "it just feels disorganized... we don't
@@ -297,10 +412,9 @@ export function ExplorationScreen() {
   // OTA-180 — appendFeedback selector dropped; store action still
   // exists for any non-UI emit site.
   const takeAmbientNoun = useGameStore((s) => s.takeAmbientNoun);
-  const stealthTakeAmbientNoun = useGameStore((s) => s.stealthTakeAmbientNoun);
   const worldMemory = useGameStore((s) => s.worldMemory);
 
-  // OTA-953 — the old merged consumedAmbientNouns memo (searched + flavor in ONE set) is gone:
+  // OTA-930 — the old merged consumedAmbientNouns memo (searched + flavor in ONE set) is gone:
   // the two pools now match differently (searched keeps the historical loose substring rule;
   // flavor-exhausted matches whole WORDS via isNounFlavorExhausted, so an investigated "rack"
   // no longer greys an unrelated "cracked terminal"), so every consumer reads the split sets
@@ -351,6 +465,49 @@ export function ExplorationScreen() {
     currentScene?.microMicroId,
     worldMemory.visitedRooms,
   ]);
+  // OTA-1211 — a RESOLVED hook's noun must grey like any spent chip. The
+  // engine's investigate handler hard-refuses these (step 4.6 — "You already
+  // searched the eddy") but nothing writes the noun into searchedAmbientNouns,
+  // so the chip stayed bright and tappable forever. The owner filed this from
+  // INSIDE the game: "on investigate it should be consumed." Same matcher the
+  // engine's refusal uses, so the chip and the engine cannot disagree again.
+  const isExhaustedHookNoun = (n: string): boolean => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { matchAnyHookNoun } = require('../engine/hooks') as typeof import('../engine/hooks');
+    return matchAnyHookNoun(n, currentScene?.hooks ?? [])?.resolved === true;
+  };
+  // ⚠⚠ OTA-1236 — WHICH NOUNS IN THIS ROOM CARRY A NEXT STEP.
+  //
+  // Owner: *"I don't like that salvage all can bury the dog quest."* It could, and
+  // the overlap is measured, not guessed: TEN of the twenty dog-rescue hook nouns
+  // match a salvage pool (chain, wagon, overturned wagon, cellar door, trapdoor,
+  // snare pit, snare, trap...). The OTA-1235 yellow SCRAP lane put the chain the
+  // dog is on one tap from being pried apart, with a bulk button over it — and
+  // salvage writes `searchedAmbientNouns`, which every picker reads, so the rescue
+  // noun then LEFT the investigate list entirely.
+  //
+  // ⚠ THE ELIGIBILITY CHECK IS THE SAME ONE THE ENGINE'S DISPATCH MAKES. Once the
+  // player has a dog, a snare is a snare again: protecting it forever would keep
+  // scrap out of their hands for a quest that already happened.
+  const leadCtx = useMemo(
+    () => ({
+      hooks: currentScene?.hooks ?? [],
+      rescueEligible: !player?.dog && !worldMemory.pendingDogOnboarding,
+    }),
+    [currentScene?.hooks, player?.dog, worldMemory.pendingDogOnboarding],
+  );
+  const leadNouns = useMemo(
+    () =>
+      (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
+        .filter((n) => isLeadNoun(n, leadCtx))
+        // ⚠ A SPENT lead is not a lead. A resolved hook still matches the noun
+        // list, and pinning it in the un-sweepable lane forever would protect
+        // scrap the player is entitled to and keep pointing at a step that is
+        // already behind them.
+        .filter((n) => !isExhaustedHookNoun(n)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentScene?.displayedAmbientNouns, currentScene?.ambientNouns, leadCtx],
+  );
   const flavorExhaustedSet = useMemo(() => {
     if (!player || !currentScene) return new Set<string>();
     // OTA-164 — see productivelyConsumedSet above. Same hub-key bug.
@@ -385,17 +542,31 @@ export function ExplorationScreen() {
     // too. Self-heal logic below stays intact (only treat as
     // consumed if the catalog item is in inventory, otherwise
     // ungrey so the player isn't stuck on a sold/lost item).
-    // OTA-953 — split pools: searched keeps the loose fuzzy rule, flavor is word-level.
-    if (
-      !isFuzzyConsumed(noun, productivelyConsumedSet)
-      && !isNounFlavorExhausted(noun, flavorExhaustedSet)
-    ) return false;
-    // OTA-981 — taken is taken. The ownership tail un-greyed the chip the moment
+    // ⚠⚠ OTA-1231 — THE FLAVOR LIST IS NOT A CONSUMPTION LIST, AND READING IT HERE
+    // GREYED CHIPS THE ENGINE WOULD HAVE ACCEPTED. Owner: *"investigate kills
+    // salvage sometimes, salvage can kill items in take."* This helper is used for
+    // BOTH the take and salvage pickers, and it OR-ed in `flavorExhaustedSet` —
+    // so investigating a noun for lore greyed its TAKE chip.
+    //
+    // ⚠ MEASURED: `takeAmbientNoun` reads ONLY `searchedAmbientNouns`. It has never
+    // consulted the flavor list, which means the engine would happily have taken
+    // the item — the UI was refusing on its own authority, and the player had no
+    // way to tell the difference from a genuinely spent noun. The type declaring
+    // `flavorExhaustedNouns` says so outright: *"only the investigate verb consults
+    // this list"*, and this was one of three places that broke it.
+    //
+    // ⚠ The comment below about a lit chip never earning a refusal still holds —
+    // it now holds in the honest direction: the chip is lit exactly when the
+    // engine would say yes.
+    // OTA-930 — searched keeps the loose fuzzy rule.
+    if (!isFuzzyConsumed(noun, productivelyConsumedSet)) return false;
+    // OTA-958 — taken is taken. The ownership tail un-greyed the chip the moment
     // the item left the pack — but USING it also empties the pack, so the chip
     // re-lit and take -> use -> take farmed forever. Mirrors the engine's
     // once-per-room rule exactly (a lit chip must never earn a refusal).
     return true;
   };
+
 
   // 2026-05-26 OTA-070 — substring-fuzzy consumed check. Mirrors
   // the engine's alreadySearched logic at gameStore.ts:4189 so the
@@ -426,6 +597,153 @@ export function ExplorationScreen() {
   const isFuzzyConsumed = (chipNoun: string, pool: Set<string>): boolean =>
     isNounConsumed(chipNoun, pool);
 
+  // ⚠⚠ OTA-1246 — THIS BLOCK LIVES *BELOW* `isAmbientConsumed` AND MUST STAY THERE.
+  // OTA-1245 hoisted it out of the JSX to give the colour-lane hint the same array
+  // the picker renders — correct idea, placed 82 lines too early. A `useMemo`
+  // FACTORY RUNS DURING RENDER, so the memo called `isAmbientConsumed` while that
+  // const was still in its temporal dead zone. Under Hermes that reads as
+  // `undefined`, and the app died on the owner’s device with
+  // `undefined is not a function` in ExplorationScreen before a single frame drew.
+  // ⚠ Moving a computation earlier moves its DEPENDENCIES earlier too. Any new
+  // reader added between here and the JSX has to come after this, not before it.
+  // ⚠⚠ OTA-1245 — THE PICKER'S CHIP LIST, HOISTED. It used to be an inline JSX
+  // expression, which was fine while the picker was its only reader. The
+  // colour-lane teaching hint needs to know whether THIS room actually shows more
+  // than one lane — and computing that from a second copy of this filter chain is
+  // the exact drift this session has now paid for three times (OTA-1236's guard vs
+  // its firer, OTA-1241's matcher vs its census, OTA-1244's display guarantee vs
+  // its recompute). One list, two readers.
+  // ⚠⚠ OTA-1248 — THE TUTORIAL PICKER SHOWS THE WHOLE ROOM. Owner: *"even though
+  // we are doing just the cudgel for take, the take/salvage popup should be fully
+  // populated so they understand it shows all."*
+  //
+  // ⚠ THIS REVERSES OTA-1233's NARROWING, AND THE REASON THAT RULE EXISTED HAS
+  // EXPIRED. It was written after a playtest where a guided beat offered the room's
+  // real nouns beside the demo one — *"neither of those are the cudgel"* — back
+  // when a wrong tap CLOSED the picker and cost a reopen. Since OTA-1238 the picker
+  // STAYS OPEN, so a wrong tap now just takes something else and leaves the beat's
+  // target sitting right there. The cost that justified narrowing is gone; the cost
+  // of narrowing (OTA-1245: the layout is unteachable) is not.
+  //
+  // ⚠⚠ THE PROPS ARE MERGED IN, NOT SWAPPED FOR THE ROOM. The tutorial props are
+  // NOT scene nouns — they never appear in `displayedAmbientNouns`, which is why
+  // the owner's log shows LOOK listing the room without the cudgel in it. Dropping
+  // the override would have deleted the demo prop from the picker entirely and
+  // stalled the beat.
+  // ⚠⚠ OTA-1250 — HOISTED, BECAUSE IT NOW DRIVES TWO THINGS. The demo prop the
+  // beat is about is both the chip that gets merged in AND the ONE noun the picker
+  // will act on. Computing it twice is the drift this session has paid for six
+  // times over; the picker's lock and the picker's contents read the same value.
+  const tutorialProp: string | null =
+    tutBeat === 'cudgel' ? 'cudgel'
+      : tutBeat === 'armor' ? "Mud-Warden's Vest"
+        : tutBeat === 'scrap' ? 'broken chest plate'
+          : null;
+  // ⚠⚠ ...AND THE PROP GOES SPENT WHEN IT IS TAKEN. From the owner's log, the vest
+  // row paid out FIVE TIMES: `consumed` was hardcoded false, so the armor beat —
+  // the one beat that deliberately does NOT advance on the take (it advances on
+  // the equip) — left a row that could be tapped forever. `grantTutorialItem`
+  // early-returns once the prop is consumed, so only the FIRST tap was a real
+  // grant; the four after it printed the reward line over nothing. A log line
+  // claiming an item the engine did not hand over is worse than a dead button.
+  const propConsumed = useGameStore((s) =>
+    tutorialProp === null ? false
+      : tutBeat === 'cudgel' ? !!s.tutorialPropsConsumed.cudgel
+        : tutBeat === 'armor' ? !!s.tutorialPropsConsumed.vest
+          : !!s.tutorialPropsConsumed.chestPlate);
+  const gatherChips = useMemo(
+    () => {
+      const room =
+          // ⚠ ONE list, unfiltered by kind — the merge is the point. The
+          // elevation filter still applies: while up a climb the picker lists
+          // only what is actually reachable (OTA-948), rather than ground
+          // nouns every tap would be refused on.
+          reachableWhileElevated(
+              currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
+              currentScene?.elevatedOn?.noun ?? null,
+              !!currentScene?.elevatedOverlayMeta,
+              currentScene?.nounPlacements ?? null,
+              currentScene?.elevatedOn?.tier ?? 0,
+            )
+              .filter((n) => !isOversized(n) || findCatalogItem(n) === null)
+              // ⚠⚠ OTA-1233 — `isExhaustedHookNoun` IS PART OF THE CONSUMED
+              // TEST, and it nearly went missing in the merge. The old salvage
+              // picker consulted it (OTA-1211: a spent hook noun must grey, or
+              // the chip stays lit forever and every tap earns a refusal), and
+              // retiring that picker took its call site with it. ota1211's
+              // suite counts these call sites for exactly this reason and
+              // failed the moment it dropped — the pin worked.
+              .map((n) => ({
+                noun: n,
+                consumed: isAmbientConsumed(n) || isExhaustedHookNoun(n),
+              }));
+      // ⚠ The prop goes FIRST so the beat's target is the top line of its lane —
+      // the room is fully populated, and the thing the Arbiter just named is still
+      // the easiest row to find.
+      return tutorialProp
+        ? [{ noun: tutorialProp, consumed: propConsumed }, ...room.filter((c) => c.noun !== tutorialProp)]
+        : room;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tutorialProp, propConsumed, currentScene, productivelyConsumedSet],
+  );
+
+  // ⚠⚠ OTA-1245 — HOW MANY COLOUR LANES THIS ROOM WOULD ACTUALLY SHOW. Derived
+  // from `gatherChips` — the same array the picker renders — so the teaching hint
+  // cannot fire over a room that turns out to have one lane, or stay silent over
+  // one that has three.
+  // ⚠⚠ OTA-1263 — AND HOW MANY ROWS, WHICH IS WHAT LIGHTS THE BUTTON. Owner, typed
+  // into the game: *"take /salvage is still green but the popup has nothing in it
+  // to claim."* The button's green came from `takeableCount` + `salvageableCount`,
+  // two predicates written in 2026-05 to mirror TakeModal's and SalvageModal's
+  // filter chains — **two modals that have not existed since OTA-1233.** They were
+  // never updated to match GatherModal, so the light and the card had drifted into
+  // different opinions about what the room holds.
+  //
+  // ⚠ THE SEVENTH TIME THIS SESSION FOR A RULE COMPUTED TWICE. The picker renders
+  // `gatherChips`; so does the lane count; so does this now. One array, one answer.
+  const gatherCounts = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { classifyGatherNoun: cls, laneForKind: lane } =
+      require('../engine/gatherSort') as typeof import('../engine/gatherSort');
+    const lanes = new Set<string>();
+    let rows = 0;
+    for (const c of gatherChips) {
+      if (c.consumed) continue;
+      const l = lane(cls(c.noun));
+      if (l) { lanes.add(l); rows += 1; }
+    }
+    return { lanes: lanes.size, rows };
+  }, [gatherChips]);
+  const gatherLaneCount = gatherCounts.lanes;
+  /** ⚠ Rows the picker would actually draw. Zero = an empty card, so the button
+   *  must not promise one. */
+  const gatherRowCount = gatherCounts.rows;
+
+  // ⚠⚠ OTA-1249 — THE CARD WAITS FOR THE PICKER TO CLOSE. Owner: *"when you hit
+  // the button, the new popup should jump in, then when you close it it should
+  // show the new card."* OTA-1245 fired it on ARRIVAL instead, one beat before the
+  // player pressed anything, on the reasoning that FirstTimeHint is an absolute
+  // overlay that renders BELOW an RN Modal (OTA-234) and so could not be raised
+  // over the open picker. That solved the wrong half: it explained a layout the
+  // player had not seen yet, and by the time they opened the picker the card was
+  // already dismissed and gone.
+  //
+  // ⚠ THE LANE COUNT IS SNAPSHOT WHILE OPEN, NOT READ AT CLOSE. Taking or
+  // sweeping empties lanes, so a player who cleared the room down to one lane —
+  // or to none, which auto-closes (OTA-1240) — would read zero at close and never
+  // be taught. The high-water mark is what they actually saw.
+  const [pickerLanesTaught, setPickerLanesTaught] = useState(false);
+  const lanesWhileOpen = useRef(0);
+  useEffect(() => {
+    if (takeOpen) {
+      lanesWhileOpen.current = Math.max(lanesWhileOpen.current, gatherLaneCount);
+      return;
+    }
+    if (lanesWhileOpen.current >= 2) setPickerLanesTaught(true);
+    lanesWhileOpen.current = 0;
+  }, [takeOpen, gatherLaneCount]);
+
   // Build one view per enemy in the scene. Tap-to-cycle is wired through
   // the store's setActiveEnemyIdx so combat handlers always target the
   // enemy the player is currently looking at.
@@ -433,7 +751,7 @@ export function ExplorationScreen() {
     if (!currentScene || currentScene.enemies.length === 0) return [];
     const range: CombatRange = currentScene.range ?? 'mid';
     const rangeLabel = RANGE_LABELS[range];
-    // OTA-1029 — in-range comes from the SAME resolver the attack gate rolls with
+    // OTA-1006 — in-range comes from the SAME resolver the attack gate rolls with
     // (playerWeaponReach: throwable instance → catalog row → forge-stamped
     // uniqueStats.reachClass on fused weapons → runecaster INT gate). The
     // local copy this replaces missed the forge stamp, so a close-only fused
@@ -511,14 +829,52 @@ export function ExplorationScreen() {
       // text line we are typing into?"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      {/* OTA-860 — combat is where most of the un-tutorialized systems live (stealth,
-          backstab, talking a foe down, parley). Fire this the first time a fight is
-          actually on-screen, not on first exploration. */}
-      {(currentScene?.enemies?.length ?? 0) > 0 && (
+      {/* ⚠⚠ OTA-1245 — THE COLOUR SYSTEM, TAUGHT WHERE IT IS ACTUALLY VISIBLE.
+          Owner: *"have we addressed the tutorial yet where we need to go over this
+          new style of picker?"* No — and two copy passes had hidden that. The
+          tutorial's two picker beats each narrow the list to ONE prop (OTA-1233,
+          so a guided beat cannot offer the room's real nouns beside the demo one —
+          playtest: "neither of those are the cudgel"), so a first-timer sees a
+          single lane twice and never meets the layout at all. Rendered, the cudgel
+          beat is `GEAR | ⚔ cudgel | TAKE ALL GEAR (1)`. The redesign's whole idea —
+          here is everything, grouped by colour — is invisible.
+
+          ⚠ AND IT CANNOT BE TAUGHT INSIDE THE TUTORIAL WITHOUT LYING: there are
+          exactly four tutorial props (cudgel, rope, chest plate, note) and all are
+          spent or unavailable by the time the scrap beat runs. Faking a second lane
+          means inventing a prop that is not in the room, which is the class of
+          defect this whole run has been closing.
+
+          ⚠⚠ SO IT FIRES THE FIRST TIME THE PLAYER CLOSES A REAL MULTI-LANE PICKER
+          — `pickerLanesTaught`, latched from the SAME chip array the picker
+          renders, so the card cannot describe a layout the player was not just
+          shown. It lands AFTER the modal, not during: FirstTimeHint is an absolute
+          overlay that renders BELOW an RN Modal (OTA-234), so a card raised over
+          the open picker would be invisible. Naming the colours right after the
+          player has seen them is the whole point. */}
+      {pickerLanesTaught && (
         <FirstTimeHint
-          id="combat_first_fight"
-          title="In a fight"
-          body="Type what you do — strike, aim, or use a skill. You can also STEALTH for a sneak hit, or try to talk a foe down or scare them off."
+          id="picker_colour_lanes"
+          title="The room, by colour"
+          body="TAKE / SALVAGE opens the whole room grouped by colour — orange gear, green items, yellow salvage. Sweep a colour with its button, or tap one line."
+        />
+      )}
+      {/* ⚠ OTA-1321 — the OTA-860 `combat_first_fight` hint WAS HERE AND IS GONE. It
+          fired on this exact condition (a fight is on-screen) and taught a strict
+          subset of what CombatPrimerModal now teaches; its one unique idea — you can
+          talk a foe down or run — moved into the primer's NOT EVERY FIGHT line. Two
+          cards on the same beat is how a player learns to reach for "turn off tips".
+          The id is retired, not reused: a player who already dismissed the old hint
+          still gets the primer, which is new material. */}
+      {/* OTA-1205 — the first Procedure Text in the pack. The vendor-buy door teaches
+          instantly and the storyline door says "read it" in its reward line, but the
+          FOUND door (site loot) drops the text with no instruction at all — and it is
+          the one door open at zero standing, so for many players it comes first. */}
+      {(player?.inventory ?? []).some((i) => i.name.startsWith('Procedure Text:') && i.quantity > 0) && (
+        <FirstTimeHint
+          id="procedure_text_first"
+          title="A procedure text"
+          body="You're carrying a Procedure Text — an aether technique, written down. READ it to learn the technique: tap it in your pack, or type read and its name. If it's beyond you today, it keeps — nothing is wasted."
         />
       )}
       {/* OTA-928 — introduce the Power rating the first time a fight is on-screen, when
@@ -575,10 +931,19 @@ export function ExplorationScreen() {
               </TouchableOpacity>
             </>
           )}
-          {/* OTA-748 — the settings gear moved OUT of the enemy card. Overlaid
-              bottom-right, it sat on top of the enemy's trait tags ("Vuln Burn"
-              etc.). It now lives in the top scene bar next to MAP — the
-              navigation row — where it covers no game content. */}
+          {/* v2.4.1 (OTA 048) — gear icon overlaid in the right column.
+              Replaces the bottom-row gear, which was the only thing
+              left there after the session controls moved into the gear
+              screen. The gear floats over whichever right-col content
+              is showing (EnemyPanel or CrestPlaceholder).
+              OTA-174 — moved from top-right to BOTTOM-right per
+              playtest ask: "I wanted the settings gear moved from the
+              top right of the enemy box to the bottom right of the
+              enemy box." Bottom-right keeps the enemy name + range tag
+              at top fully visible (no more truncation around the gear)
+              and groups the secondary navigation in one corner. */}
+          {/* OTA-748 — settings gear moved OUT of the enemy card (it covered the
+              trait tags) into the top scene bar next to MAP. */}
         </TutorialTarget>
       </View>
 
@@ -619,8 +984,7 @@ export function ExplorationScreen() {
           >
             <Text style={styles.sceneBarBtnText}>MAP</Text>
           </TouchableOpacity>
-          {/* OTA-748 — settings gear, relocated here from the enemy card (where
-              it covered the trait tags). Sits beside MAP in the nav row. */}
+          {/* OTA-748 — settings gear, relocated here from the enemy card. */}
           <TouchableOpacity
             onPress={() => setScreen('about')}
             hitSlop={8}
@@ -630,6 +994,11 @@ export function ExplorationScreen() {
           >
             <Text style={styles.sceneBarGear}>⚙</Text>
           </TouchableOpacity>
+          {/* v2.4.1 (OTA 045) — QUESTS button removed per player
+              direction. The main-quest objective chip below the
+              scene bar is now the single entry to Contracts (which
+              holds the main quest + all side quests + collectibles).
+              The chip's relabeling makes that dual role explicit. */}
         </View>
       </TutorialTarget>
 
@@ -682,7 +1051,10 @@ export function ExplorationScreen() {
             && !mq.coresRecovered.includes(player.currentLocationId)
             && (mq.phase === 'revelation' || mq.phase === 'cores');
           mainLine = atUnrecovered
-            ? `${coreGateNextAction(player.factionId)}.`
+            // ⚠ The faction next-action is FLAVOUR now, not an instruction: the verb
+            // path that used to summon is gone, so the line ends at the control that
+            // actually raises the Guardian — the ★ SUMMON chip beside this text.
+            ? `${coreGateNextAction(player.factionId)} — then ★ SUMMON.`
             : phaseHint(mq.phase, cores);
         }
         return (
@@ -726,6 +1098,64 @@ export function ExplorationScreen() {
         );
       })()}
 
+      {/* ⚠⚠ OWNER, 2026-08-17: *"when you land on the tile, beginning the climb should be a
+          button like summon the guardian. and it should only be visible if you have that
+          particular map and used it to mark the location."*
+
+          The ★ CLIMB chip, built to the same rule as ★ SUMMON: an affordance that appears
+          exactly when the action behind it would succeed, and is absent otherwise. Before
+          this, the ONLY way into a 14-tier ascent was to type the tower's full canonical
+          name — and the capital's own object list leads with the bare noun "spire", which
+          matched neither climb and dropped the player into a generic 3-tier scramble.
+
+          ⚠ THE GATE IS THE CHART, exactly as the owner asked and exactly as OTA-912 already
+          defines it: `worldMemory.unlockedGreatClimbs` only contains a climb id once its
+          Skyreacher Chart has been USED from the pack. Owning the map is not enough; the
+          map has to have been read. Until then the landmark reads as an ordinary place and
+          no button appears — the discovery is still the reward.
+
+          ⚠ The other three conditions mirror the scene-prop gate in beginScene, so the
+          button and the climbable noun can never disagree: outdoors (no hubRoomId), nothing
+          hostile in the scene, and standing on the climb's own tile. */}
+      {(() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const GCL = require('../engine/greatClimbs') as typeof import('../engine/greatClimbs');
+        const climb = GCL.greatClimbForLocation(player?.currentLocationId);
+        if (!climb) return null;
+        const charted = (useGameStore.getState().worldMemory.unlockedGreatClimbs ?? []).includes(climb.id);
+        if (!charted) return null;
+        if (player?.hubRoomId) return null;
+        const hostile = (currentScene?.enemies ?? []).some(
+          (_e, i) => (currentScene?.enemyHps?.[i] ?? 0) > 0,
+        );
+        if (hostile) return null;
+        return (
+          <View style={styles.objectiveChip}>
+            <View style={styles.objectiveChipRow}>
+              <Text style={[styles.objectiveChipTitle, styles.objectiveChipBody]} numberOfLines={1}>
+                <Text style={styles.objectiveChipStar}>★ </Text>
+                <Text style={styles.objectiveChipLabel}>GREAT CLIMB · </Text>
+                {`${climb.noun} — ${climb.tiers} tiers`}
+              </Text>
+              <TouchableOpacity
+                style={styles.objectiveChipSummon}
+                // ⚠ Submits the canonical noun rather than calling a private climb entry
+                // point. That is deliberate: it walks the SAME parser → climb path a
+                // player typing the name walks, so the button cannot drift away from the
+                // typed route or skip the strap gate, the height rules, or the guaranteed
+                // Skyreacher drop.
+                onPress={() => { void useGameStore.getState().submitPlayerAction(`climb ${climb.noun}`); }}
+                activeOpacity={0.7}
+                hitSlop={8}
+                accessibilityRole="button"
+              >
+                <Text style={styles.objectiveChipSummonText}>★ CLIMB</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      })()}
+
       {/* arb166 — no trading mid-fight. The vendor stays in the scene (the
           banner returns once the enemies are down), but while a hostile is
           present the banner is hidden so the player can't step into the stall
@@ -737,14 +1167,19 @@ export function ExplorationScreen() {
           top is redundant and breaks the walked-into-a-building feel. Suppress
           it while inside a building; the stall's own Trade + Crucible actions
           render inside the room instead (block just below). */}
-      {/* OTA-1052 — ONE compact row for everything standing in this place: the
+      {/* OTA-1029 — ONE compact row for everything standing in this place: the
           trader, the board, a wanderer, the Crucible. Owner (at Asgardar): "having
           the map line, the weather line, the vendor line and the fuse line takes up
           a lot of screen real estate at a capital." Each was a full-width two-line
           banner; they now sit two-across as short chips, so four stacked banners
           become one row and the feed keeps the height. */}
       <View style={styles.placeChipRow}>
-      {currentScene?.vendor && !inCombat && !activeBuildingId && !vendorChipDismissed && currentScene?.location?.id !== 'hidden_market' && (
+      {/* ⚠ OTA-1154 — the Hidden Market exclusion is GONE from this chip's gate.
+          It hid the whole vendor chip there, and the GIFT button lives inside it,
+          so every Market face was ungiftable by button — including the twelve
+          shopkeepers who work a Market stall and had tastes written for them.
+          Typing "gift" always reached them; the affordance never did. */}
+      {currentScene?.vendor && !inCombat && !activeBuildingId && !vendorChipDismissed && (
         <TouchableOpacity
           style={[styles.placeChip, styles.vendorChip]}
           onPress={() => setScreen('vendor')}
@@ -756,12 +1191,12 @@ export function ExplorationScreen() {
             <Text style={styles.vendorBannerName} numberOfLines={1}>{currentScene.vendor.name}</Text>
             <Text style={styles.placeChipHint} numberOfLines={1}>{currentScene.vendor.offers.length} offers · tap to trade</Text>
           </View>
-          {/* OTA-1082 — TALK. The Phase 2 exchange shipped in OTA-1081 with no
+          {/* OTA-1059 — TALK. The Phase 2 exchange shipped in OTA-1058 with no
               way to reach it but typing `talk to <name>`, which is a feature
               nobody finds. Shown ONLY for the authored cast — a TALK button on
               somebody with nothing to say is a worse lie than no button. Nested
               touchable, so it does not open the stall.
-              ⚠ OTA-1087 — npcLedgerId, NOT `vendor.id`. The raw id is the SPAWN
+              ⚠ OTA-1064 — npcLedgerId, NOT `vendor.id`. The raw id is the SPAWN
               id (`roadside_<seed>`, `overlay_<id>_<ms>`); the topic sets are
               keyed on who the person IS (`roadside:grit_maalen`). Asking in the
               wrong namespace answered `false` for all 24 roadside and 5 overlay
@@ -769,7 +1204,7 @@ export function ExplorationScreen() {
               whose raw id happens to equal their ledger id — and it was the only
               route into their conversation that a player would ever find. */}
           {hasTopicsFor(npcLedgerId(currentScene.vendor)) ? (
-            // OTA-1102 — the glow means "something NEW to hear": green while
+            // OTA-1079 — the glow means "something NEW to hear": green while
             // any gate-open topic still has unread lines, back to gold once
             // the player has heard them all. Same spent-math as the sheet's
             // "(asked)" marks, via hasUnspokenTalk.
@@ -788,9 +1223,9 @@ export function ExplorationScreen() {
               <Text style={[styles.placeChipTalkText, vendorTalkGlow && styles.placeChipTalkTextUnspoken]}>TALK</Text>
             </TouchableOpacity>
           ) : null}
-          {/* OTA-1106 — GIFT beside TALK. The verb existed since OTA-1083 but
+          {/* OTA-1083 — GIFT beside TALK. The verb existed since OTA-1060 but
               only as typed input ("I didn't see a gift button" — owner). Same
-              quiet affordance as TALK; opens the OTA-1083 picker. */}
+              quiet affordance as TALK; opens the OTA-1060 picker. */}
           <TouchableOpacity
             style={styles.placeChipTalk}
             onPress={() => useGameStore.getState().openGift()}
@@ -801,14 +1236,14 @@ export function ExplorationScreen() {
           >
             <Text style={styles.placeChipTalkText}>GIFT</Text>
           </TouchableOpacity>
-          {/* OTA-1052 — ✕ on the trader, matching the Crucible's. Nested touchable
+          {/* OTA-1029 — ✕ on the trader, matching the Crucible's. Nested touchable
               handles its own tap (doesn't open the stall). Hides the chip for this
               tile only: the vendor stays anchored to the room, so walking back in
               — or typing "trade" — still reaches them. */}
           <TouchableOpacity
             style={styles.placeChipX}
             onPress={() => {
-              // OTA-1105 — the ✕ doesn't route through submitPlayerAction, so
+              // OTA-1082 — the ✕ doesn't route through submitPlayerAction, so
               // it was the one exit the talk sheet's walk-away guard didn't
               // cover: owner hit ✕ mid-conversation and the vendor left while
               // the sheet stayed open. Dismissing the person you're talking
@@ -875,6 +1310,22 @@ export function ExplorationScreen() {
             <Text style={styles.wandererName} numberOfLines={1}>☺ {currentScene.wanderer.name}</Text>
             <Text style={styles.placeChipHint} numberOfLines={1}>{currentScene.wanderer.role} · tap to speak</Text>
           </View>
+          {/* ⚠ OTA-1154 — GIFT reaches the wanderer now. They were always a valid
+              recipient (openGift reads talkablePeople, which includes them) and
+              all seven archetypes have authored tastes, but the only GIFT button
+              in the game sat on the VENDOR chip — so the affordance existed for
+              shopkeepers and nobody else. Stops propagation so the chip's own
+              tap-to-speak does not also fire. */}
+          <TouchableOpacity
+            style={styles.placeChipTalk}
+            onPress={(e) => { e.stopPropagation(); useGameStore.getState().openGift(); }}
+            hitSlop={8}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Give a gift to ${currentScene.wanderer.name}`}
+          >
+            <Text style={styles.placeChipTalkText}>GIFT</Text>
+          </TouchableOpacity>
           <Text style={styles.placeChipArrow}>›</Text>
         </TouchableOpacity>
       )}
@@ -910,7 +1361,7 @@ export function ExplorationScreen() {
           || (player.hubRoomId && (player.macroVisitSeq ?? 0) >= 1)
           || activeBuildingId === 'market');
         // arb-fix (player) — a VENDOR's portable Crucible is offered from INSIDE the
-        // vendor screen (its own fuse chip). On a roadside-vendor tile the old OTA-758
+        // vendor screen (its own fuse chip). On a roadside-vendor tile the old OTA-739
         // exploration chip DUPLICATED that offer (chip on the tile + fuse chip in the
         // vendor). So the tile chip now shows ONLY for a location's OWN Crucible; a
         // vendor-carried Crucible lives solely in the vendor screen. No Crucible is
@@ -944,7 +1395,7 @@ export function ExplorationScreen() {
             <Text style={styles.fusionBannerName} numberOfLines={1}>
               {gate.ok ? readyName : '★★ Crucible · needs prep'}
             </Text>
-            {/* OTA-220's reason line survives the OTA-1052 squeeze: the READY case
+            {/* OTA-220's reason line survives the OTA-1029 squeeze: the READY case
                 is a one-liner, but a BLOCKED Crucible still spells out what's
                 missing (a player once tapped fuse 5× not knowing). */}
             <Text style={styles.placeChipHint} numberOfLines={gate.ok ? 1 : 2}>
@@ -955,7 +1406,7 @@ export function ExplorationScreen() {
           </View>
           {/* arb152 — dismiss the Crucible chip if you don't need it. Nested
               touchable handles its own tap (doesn't fire the fuse); 'fuse' can
-              still be typed, and OTA-1052 leaving the tile re-shows the chip. */}
+              still be typed, and OTA-1029 leaving the tile re-shows the chip. */}
           <TouchableOpacity
             style={styles.placeChipX}
             onPress={() => setCrucibleChipDismissedKey(chipViewKey)}
@@ -976,13 +1427,21 @@ export function ExplorationScreen() {
 
       <TutorialTarget area="feed" style={styles.feed}>
         <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
+        {/* ⚠ OTA-1168 — THE LIVE TEXT IS NO LONGER SHOWN. Owner: "while the arbiter is
+            typing live, can we keep that hidden and just see the end result on the screen
+            like the rest of the text."
+            It used to tail-render `partialArbiterText` token by token with a ▍ cursor, so
+            a generated line got read TWICE — once as it was written, once filed into the
+            feed. Worse: a line that was later DISCARDED had already been read in full
+            before a template replaced it, and the device log shows ~3 wasted generations a
+            session (`cancelled:player-acted-again`, `empty→template`).
+            ⚠ THE INDICATOR STAYS, DELIBERATELY. This was the ONLY signal the engine is
+            working, and measured on-device generations run 6.6-10.9 SECONDS. Dropping it
+            entirely buys silence at the price of looking frozen. No words, no cursor —
+            just a sign that someone is composing. */}
         {isGenerating && (partialArbiterText || partialArbiterText === '') && (
           <View style={styles.streamingTail}>
-            <Text style={styles.streamingPrefix}>The Arbiter:</Text>
-            <Text style={styles.streamingText}>
-              {partialArbiterText}
-              <Text style={styles.streamingCursor}>▍</Text>
-            </Text>
+            <Text style={styles.streamingPrefix}>The Arbiter is choosing their words…</Text>
           </View>
         )}
       </TutorialTarget>
@@ -995,19 +1454,19 @@ export function ExplorationScreen() {
             onCancel={cancelPendingRolls}
           />
         ) : pendingPayoff ? (
-          // OTA-1104 — the shakedown. No cancel: pay, or fight.
+          // OTA-1081 — the shakedown. No cancel: pay, or fight.
           <PayoffSheet />
         ) : pendingTalk ? (
-          // OTA-1099 — an open conversation takes the input's place, dice-
+          // OTA-1076 — an open conversation takes the input's place, dice-
           // roller style: topic list at the bottom, replies in the feed,
           // STOP TALKING to hand the slot back.
           <TalkSheet />
         ) : pendingParley ? (
           <ParleySheet />
         ) : pickpocketOpen ? (
-          // OTA-1100 — the pickpocket picker joins the slot: choose the mark
+          // OTA-1077 — the pickpocket picker joins the slot: choose the mark
           // at the bottom, the Stealth roll and outcome land in the feed.
-          // OTA-1101 — marks are PEOPLE (vendor / wanderer), and the payout
+          // OTA-1078 — marks are PEOPLE (vendor / wanderer), and the payout
           // is what's in their pockets, not their table (pickpocketPerson →
           // engine/pocketLoot.ts). Items stay with the steal/take verbs.
           <PickpocketSheet
@@ -1041,7 +1500,7 @@ export function ExplorationScreen() {
           )}
           <InputBox
             onSubmit={(text) => {
-              // OTA-1052 — no vendor-leave gate. Every cardinal move used to be
+              // OTA-1029 — no vendor-leave gate. Every cardinal move used to be
               // intercepted while a vendor stood in the scene, which meant every
               // capital ROOM hop (the room chips submit "go <dir>") asked whether
               // to leave the trader behind. Vendors stay anchored to their rooms;
@@ -1071,15 +1530,36 @@ export function ExplorationScreen() {
             // OTA-847 (STEALTH SYSTEM) — peaceful PICKPOCKET. Greyed when there's
             // no vendor and nothing liftable in the scene.
             onOpenPickpocket={() => { Keyboard.dismiss(); setPickpocketOpen(true); }}
-            // OTA-1103 — marks are PEOPLE now (OTA-1101), so both the block
-            // and the glow key on presence of someone with pockets. OTA-1104
+            // OTA-1080 — marks are PEOPLE now (OTA-1078), so both the block
+            // and the glow key on presence of someone with pockets. OTA-1081
             // adds escort leaders walking with you to that set.
             pickpocketBlocked={!currentScene?.vendor && !currentScene?.wanderer && escortLeaderMarks.length === 0}
             pickpocketPossible={!!(currentScene?.vendor || currentScene?.wanderer) || escortLeaderMarks.length > 0}
             onOpenAskArbiter={() => setAskArbiterOpen(true)}
             onOpenMissions={() => { useGameStore.getState().maybeAdvanceTutorial('main_quest'); setScreen('contracts'); }}
             onOpenSalvage={() => { Keyboard.dismiss(); setSalvageOpen(true); }}
-            onOpenTake={() => { Keyboard.dismiss(); setTakeOpen(true); }}
+            // ⚠⚠ OTA-1263 — AN EMPTY ROOM ANSWERS IN THE FEED, NOT IN A CARD YOU
+            // HAVE TO DISMISS. Owner: *"and I have to hit ignore rest to close
+            // it."* OTA-1240 taught the picker to auto-close when the PLAYER
+            // empties it, but deliberately made an already-empty open explain
+            // itself and wait — *"a player who needs an explanation, not a
+            // dismissal."* The explanation was right; the modal was the wrong
+            // place for it. One line in the feed says the same thing, costs no
+            // tap, and can be read at the player's own pace.
+            //
+            // ⚠ The button still WORKS when dark — it is not blocked. Refusing the
+            // tap outright would be the silent-control bug (OTA-1164); this answers.
+            onOpenTake={() => {
+              Keyboard.dismiss();
+              if (gatherRowCount === 0) {
+                useGameStore.getState().appendLog(
+                  'world',
+                  'Nothing here to take or pry apart. The room is picked clean.',
+                );
+                return;
+              }
+              setTakeOpen(true);
+            }}
             onOpenClimb={() => setClimbOpen(true)}
             onFuse={activeBuildingId === 'market' ? () => useGameStore.getState().submitPlayerAction('fuse') : undefined}
             hasTorch={!!(player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && canonicalItemTags(i).includes('light') && i.quantity > 0)}
@@ -1117,54 +1597,14 @@ export function ExplorationScreen() {
             inventory={player?.inventory ?? []}
             range={currentScene?.range ?? null}
             knockedOutPresent={(currentScene?.enemyKnockedOut ?? []).some(Boolean)}
-            takeableCount={(() => {
-              // 2026-05-25 [UI-2] — green tone fires only when the
-              // count of nouns the TakeModal will ACTUALLY render is
-              // > 0. Mirror TakeModal's filter chain exactly:
-              //   1. Scene noun has a catalog item (findCatalogItem
-              //      !== null) — otherwise the take verb refuses.
-              //   2. Not oversized (small enough to carry).
-              //   3. Not already consumed (consumed chips are
-              //      filtered out inside TakeModal:150-152).
-              // First version of this count was too lenient (just
-              // "not climbable AND not salvageable") and lit the
-              // button green when the modal would open empty.
-              const sceneNouns = currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [];
-              return sceneNouns.filter(
-                (n) => findCatalogItem(n) !== null
-                  && !isOversized(n)
-                  && !isAmbientConsumed(n),
-              ).length + (tutBeat === 'cudgel' ? 1 : 0); // tutorial cudgel prop
-            })()}
-            salvageableCount={(() => {
-              // 2026-05-25 — count predicate now uses SalvageModal's
-              // exported isSalvageable (= SALVAGE_PATTERN regex OR
-              // isCuratedSalvageable). Previously used
-              // interactionTags.isSalvageable, which diverged in both
-              // directions and lit SALVAGE green when modal was empty
-              // (and vice versa).
-              // OTA-753 — read displayedAmbientNouns directly (like TAKE),
-              // NOT buildChipPool. buildChipPool re-slices to 5 for the
-              // investigate row, which dropped reserved salvage nouns off
-              // the end and left this count (and the SALVAGE modal) empty.
-              // OTA-971 — the button glowed green from the top of a pillar while
-              // the engine refused every ground salvage ("The shelf is down
-              // there. Climb down to reach it."). Filter to nouns actually
-              // REACHABLE at this elevation first — the same rule as the
-              // engine's elevated-investigate gate, via one shared helper.
-              const salvSource = reachableWhileElevated(
-                currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
-                currentScene?.elevatedOn?.noun ?? null,
-                !!currentScene?.elevatedOverlayMeta,
-                // OTA-973 — Phase A of real heights: placed nouns count only at
-                // their own structure + tier (and never from the ground).
-                currentScene?.nounPlacements ?? null,
-                currentScene?.elevatedOn?.tier ?? 0,
-              );
-              return salvSource.filter(
-                (n) => !isAmbientConsumed(n) && isSalvageableForModal(n),
-              ).length + (tutBeat === 'scrap' ? 1 : 0); // tutorial chest-plate prop
-            })()}
+            // ⚠⚠ OTA-1263 — ONE ARRAY LIGHTS THE BUTTON AND FILLS THE CARD. Owner:
+            // *"take /salvage is still green but the popup has nothing in it to
+            // claim."* Both counts below mirrored TakeModal / SalvageModal, retired
+            // at OTA-1233, and had drifted from what GatherModal actually renders.
+            // `gatherRowCount` is derived from `gatherChips` — the exact array the
+            // picker draws — so the light cannot disagree with the card again.
+            takeableCount={gatherRowCount}
+            salvageableCount={0}
             climbableCount={(() => {
               // 2026-05-25 — green tone for CLIMB when the scene has at
               // least one climbable noun the modal will render AND it's
@@ -1229,12 +1669,13 @@ export function ExplorationScreen() {
                   // pools, mirroring the engine's accept/refuse
                   // decision. Was exact set.has(n.toLowerCase()).
                   if (isFuzzyConsumed(n, productivelyConsumedSet)) return false;
+                  if (isExhaustedHookNoun(n)) return false;
                   if (isNounFlavorExhausted(n, flavorExhaustedSet)) return false;
                   const req = searchRequirementFor(n);
                   if (req && player && !playerHasScannerEquipped(player, req.scannerBias)) {
                     return false;
                   }
-                  // OTA-953 — elevation gate, mirroring the SearchModal chip logic
+                  // OTA-930 — elevation gate, mirroring the SearchModal chip logic
                   // (see the chips map ~"climb down to reach"). While the player is
                   // climbed onto a feature with no elevated overlay, every GROUND
                   // noun except the climbed one refuses with "climb down to reach"
@@ -1265,7 +1706,7 @@ export function ExplorationScreen() {
                   const surfaceReq = searchRequirementFor(surfaceNoun);
                   const surfaceUnlocked = !surfaceReq
                     || (player && playerHasScannerEquipped(player, surfaceReq.scannerBias));
-                  // OTA-1147 — and the SAME elevation gate the scene nouns get
+                  // OTA-1124 — and the SAME elevation gate the scene nouns get
                   // above. This is the half that made the badge read active
                   // while the modal was entirely greyed; the chip and the count
                   // have to agree or the player is told to open a menu that has
@@ -1277,7 +1718,16 @@ export function ExplorationScreen() {
                   if (surfaceUnlocked && !groundOutOfReach) groundCount = 1;
                 }
               }
-              return sceneCount + groundCount + (tutBeat === 'investigate' ? 1 : 0); // tutorial door prop
+              // OTA-1210 — eye-only chips (a marked story lead that is not an
+              // ambient noun) are actionable too; the count and the modal must
+              // agree, per the OTA-1124 rule.
+              const eyeOnlyCount = (currentScene?.arbiterEye ?? []).filter(
+                (m) => !buildChipPool(currentScene).some((n) => n.toLowerCase() === m.toLowerCase())
+                  && !isFuzzyConsumed(m, productivelyConsumedSet)
+                  && !isNounFlavorExhausted(m, flavorExhaustedSet)
+                  && !isExhaustedHookNoun(m),
+              ).length;
+              return sceneCount + groundCount + eyeOnlyCount + (tutBeat === 'investigate' ? 1 : 0); // tutorial door prop
             })()}
             // OTA-188 — drives the CLIMB button's red/amber/green
             // ladder. inventoryHasGate checks every inventory item's
@@ -1349,7 +1799,7 @@ export function ExplorationScreen() {
               const d = player?.dog;
               if (!d || d.hp <= 0) return null;
               // Benched at the base of a climb — can't follow you up.
-              // OTA-940 — 'waiting_at_base' covers BOTH a climb-benched dog (player elevated)
+              // OTA-917 — 'waiting_at_base' covers BOTH a climb-benched dog (player elevated)
               // AND a combat-downed dog (recovering on the ground). Only the former should read
               // as "come down to fight" — a downed dog gets its own message.
               if (d.status === 'waiting_at_base') return currentScene?.elevatedOn ? 'elevated' : 'downed';
@@ -1406,9 +1856,7 @@ export function ExplorationScreen() {
               // stored counter). The OLD fallback measured Manhattan on the
               // re-centered VISUAL map, which UNDERCOUNTS from an outdoor tile and
               // warps when you cross a location boundary — the "8 → 16" jump. Now it
-              // measures the same install-fixed canon grid the step loop uses, from
-              // the player's absolute cell (gridX/gridY, or the location cell +
-              // in-transit offset for legacy saves). Never warps, never undercounts.
+              // measures the same install-fixed canon grid the step loop uses.
               // eslint-disable-next-line @typescript-eslint/no-require-imports
               const { canonicalDistanceFromGrid, canonicalCellOf, WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } = require('../engine/worldMap');
               const gx = typeof player.gridX === 'number'
@@ -1443,8 +1891,8 @@ export function ExplorationScreen() {
           stage's text in-place (stageHistory) so the player sees the
           full thread arc without fighting the scrim; LATER replaced
           with ABANDON (which marks the hook resolved — explicit
-          walk-away). OTA-1030 — the terminal stage shows COMPLETE
-          alone (dismissHookContinue). OTA-1050 — no follow-up popup;
+          walk-away). OTA-1007 — the terminal stage shows COMPLETE
+          alone (dismissHookContinue). OTA-1027 — no follow-up popup;
           the modal's own reward strip shows the payout. */}
       <HookContinueModal
         visible={pendingHookContinue !== null}
@@ -1526,7 +1974,7 @@ export function ExplorationScreen() {
               ? playerHasScannerEquipped(player, req.scannerBias)
               : false;
             let unmetRequirement = req && !hasScannerForReq ? req.shortLabel : undefined;
-            // ⚠ OTA-1147 — THE PINNED CHIP NEVER GOT THE ELEVATION GATE, and it
+            // ⚠ OTA-1124 — THE PINNED CHIP NEVER GOT THE ELEVATION GATE, and it
             // is the last chip in the app that lies.
             //
             // OTA-166 greyed scene nouns while the player is climbed; OTA-953
@@ -1617,10 +2065,31 @@ export function ExplorationScreen() {
                 // bench" vs chip "bench") per OTA-070's pattern.
                 consumed:
                   isFuzzyConsumed(n, productivelyConsumedSet) ||
-                  isNounFlavorExhausted(n, flavorExhaustedSet),
+                  isNounFlavorExhausted(n, flavorExhaustedSet) ||
+                  isExhaustedHookNoun(n),
                 unmetRequirement,
+                // OTA-1206 — ✦ when the Aetheric Torch has flagged this noun as
+                // actually worth the look (scene.arbiterEye, stamped on torch use).
+                marked: (currentScene?.arbiterEye ?? []).some(
+                  (m) => m.toLowerCase() === n.toLowerCase(),
+                ),
               };
             }),
+          // ⚠ OTA-1210 — eye nouns that are NOT ambient chips (a charged story
+          // lead, most often) render as their own ✦ chips, or the torch's mark
+          // is invisible in exactly the rooms that hold a lead — the owner's
+          // first live session with the eye showed precisely that. Tapping one
+          // fires the same `investigate <noun>` a typed engagement would.
+          ...(currentScene?.arbiterEye ?? [])
+            .filter((m) => !buildChipPool(currentScene).some((n) => n.toLowerCase() === m.toLowerCase()))
+            .map((m) => ({
+              noun: m,
+              consumed:
+                isFuzzyConsumed(m, productivelyConsumedSet) ||
+                isNounFlavorExhausted(m, flavorExhaustedSet) ||
+                isExhaustedHookNoun(m),
+              marked: true,
+            })),
         ]}
         onSubmit={(target) => {
           setSearchOpen(false);
@@ -1632,106 +2101,204 @@ export function ExplorationScreen() {
           // change.
           submit(`investigate ${target}`);
         }}
+        // ⚠ OTA-1183 — INVESTIGATE ALL. Deliberately loops the SAME submit path a player
+        // tapping each chip would take, rather than adding a bulk resolver.
+        // `salvageAllAmbient` is a ~270-line aggregator built to fix SALVAGE ALL's
+        // interleaved output; investigate resolves through hooks, ambient nouns, items,
+        // puzzles and elevation gates, and re-implementing that ordering in bulk would be
+        // a new set of failure modes for a cosmetic gain. Looping the real path cannot
+        // resolve anything differently from the manual taps it replaces — which is the
+        // property that matters for a completability fix.
+        // ⚠⚠ OTA-1236 — THE SWEEP RUNS IN THE OWNER'S ORDER, AND IT STOPS IF A
+        // FIGHT STARTS. His sentence, in order: *"investigate all skips the dead
+        // ends, shows what was found on investigate or does a story hook pop-up,
+        // then does the dog quest."*
+        //
+        // ⚠ ORDERING IS NOT COSMETIC HERE. The dog rescue SPAWNS A CAPTOR. Reached
+        // mid-sweep, every remaining `investigate` lands during combat and is
+        // refused — *"Not while the Reclaimer Deserter is on you."* So the loop
+        // both runs the lead LAST and breaks the moment an enemy is on the board:
+        // firing commands into a fight the player has not seen yet is how a sweep
+        // silently eats half the room. A story hook is the milder case of the same
+        // thing — it opens a popup the queued lines push out of sight.
+        // ⚠⚠ OTA-1263 — ONE AT A TIME, WITH A BEAT BETWEEN. Owner, typed into the
+        // game: *"I don't think investigate all should be instant, resolve them one
+        // at a time when you hit it giving each maybe 2+3 seconds to see a
+        // result?"* Measured from the same log, five investigates landed inside
+        // FIFTY MILLISECONDS and three more inside forty — the whole sweep arrived
+        // as one wall of text with no way to tell which line answered which noun.
+        //
+        // ⚠ THE ABORTS ARE UNCHANGED AND NOW MATTER MORE, because the sweep is
+        // live for seconds instead of a single frame: it still stops the instant an
+        // enemy is on the board (OTA-1236 — firing commands into a fight the player
+        // has not seen yet is how a sweep eats half the room), and it now also
+        // stops if the player acts, since a paced sweep must never talk over them.
+        onInvestigateAll={(nouns) => {
+          setSearchOpen(false);
+          const ordered = orderByStoryTier(nouns, (n) => n, leadCtx);
+          // ⚠⚠ OTA-1268 — THE SWEEP WAS ABORTING ON ITS OWN FOOTSTEPS. The 1263
+          // abort compared against the stamp from BEFORE the sweep started — but
+          // `submitPlayerAction` stamps `lastPlayerActionAt` on EVERY submit,
+          // including the sweep's own. Step one ran, moved the stamp, and step two
+          // read "the player acted" and quit: INVESTIGATE ALL resolved exactly ONE
+          // noun on device and silently dropped the rest (owner, next log: "the
+          // investigations... were supposed to show on the screen one at a time").
+          // The watermark is now re-read AFTER each of the sweep's own submits, so
+          // the only thing that can move it between steps is a real player action.
+          let watermark = useGameStore.getState().lastPlayerActionAt;
+          let i = 0;
+          const step = (): void => {
+            if (i >= ordered.length) return;
+            const s = useGameStore.getState();
+            if ((s.currentScene?.enemies ?? []).length > 0) return;
+            // ⚠ The player did something of their own — stop rather than queue
+            // lines behind whatever they just asked for.
+            if (s.lastPlayerActionAt !== watermark) return;
+            submit(`investigate ${ordered[i]!}`);
+            watermark = useGameStore.getState().lastPlayerActionAt;
+            i += 1;
+            if (i < ordered.length) setTimeout(step, INVESTIGATE_ALL_GAP_MS);
+          };
+          step();
+        }}
+        leadNouns={leadNouns}
         onCancel={() => setSearchOpen(false)}
       />
 
-      <TakeModal
+      {/* OTA-1321 — first-fight primer. `enemyName` is read straight off the live
+          scene so the card names the thing actually in front of the player; FIGHT
+          (and Android back, and the PC right-click above) all land on the same
+          latch, so there is exactly one way for this to be marked seen. */}
+      <CombatPrimerModal
+        visible={combatPrimerVisible}
+        enemyName={currentScene?.enemies?.[0]?.name ?? null}
+        onClose={markCombatPrimerSeen}
+      />
+
+      {/* ⚠⚠ OTA-1233 — ONE PICKER. TakeModal + SalvageModal were two modals over the
+          SAME `displayedAmbientNouns`, each with its own consumed-predicate — the
+          seam OTA-1231's bugs lived in. GatherModal shows the room once and picks
+          the verb per row: catalog items TAKE, everything else SALVAGES.
+
+          ⚠⚠ OTA-1250 — THE OUTPOST LOCKDOWN REACHES INSIDE THE MODAL. Owner, from
+          a device run: *"I broke it by just grabbing stuff, you should only be able
+          to do what it says, the other button touches should buzz."* OTA-1248 filled
+          the tutorial picker with the whole room so the layout could be TAUGHT, and
+          the lockdown that dims the quick row stopped at the modal's edge — so the
+          beat that says "tap the cudgel" opened a board where every row and all
+          three sweep buttons were live. He took an axe, a bow, a torch and a second
+          vest, then swept six nouns of scenery, in about four taps.
+
+          ⚠ SHOW EVERYTHING, ALLOW ONE. Hiding the rest would teach the layout by
+          deleting it, which is the state OTA-1248 exists to end. `lockedNoun` dims
+          the rest and buzzes on tap, exactly like the quick row. */}
+      <GatherModal
         visible={takeOpen}
-        // During the cudgel beat, show ONLY the demo prop. Playtest: the
-        // cudgel was appended after the room's real takeable nouns, so the
-        // picker offered actual items first and the player took the wrong
-        // things ("neither of those are the cudgel"). The guided beat must
-        // present the prop alone; the normal scene nouns return after.
-        takeable={
-          tutBeat === 'cudgel'
-            ? [{ noun: 'cudgel', consumed: false }]
-            : (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
-                .filter((n) => findCatalogItem(n) !== null && !isOversized(n))
-                .map((n) => ({ noun: n, consumed: isAmbientConsumed(n) }))
-        }
+        player={player}
+        chips={gatherChips}
+        lockedNoun={tutLock ? tutorialProp : null}
+        onBlocked={() => {
+          try { Vibration.vibrate([0, 32, 45, 32]); } catch { /* ignore */ }
+          useGameStore.getState().nudgeTutorialBlocked();
+        }}
+        // ⚠⚠ OTA-1238 — THE PICKER STAYS OPEN ACROSS SELECTIONS. Owner: *"the top
+        // hat should stay open during all of the selections until you hit the
+        // ignore button so you don't have to keep reopening it."* Every handler
+        // used to close it, so clearing a five-noun room was ten taps: act, reopen,
+        // act, reopen. The list is already reactive — the acted-on noun drops out
+        // of `chips` on the next store tick — so the popup just had to stop
+        // dismissing itself.
+        //
+        // ⚠ A TUTORIAL BEAT STILL CLOSES IT, and that is not an inconsistency: the
+        // next beat's target is the input row or a quick button, both of which sit
+        // BEHIND this modal. Leaving it open would put the pulse under the scrim
+        // and stall the tutorial on turn one — the exact failure the OTA-1237 copy
+        // pass was cleaning up after.
         onTake={(noun) => {
-          // Dismiss the keyboard as the modal closes so RN can't restore
-          // focus to the underlying command field and re-raise it.
           Keyboard.dismiss();
-          setTakeOpen(false);
           if (tutBeat === 'cudgel' && noun.toLowerCase() === 'cudgel') {
+            setTakeOpen(false);
             submit('take cudgel');
             return;
           }
+          // ⚠⚠ OTA-1251 — THE ARMOR BEAT IS ONE TAP, IN THIS CARD. Owner: *"why are
+          // we doing inventory stuff? it was supposed to highlight the fact you can
+          // select and equip the vest from the popup, not from inventory."* OTA-1248
+          // built the beat as take-here-then-equip-in-the-pack, which sent the
+          // player out of the card the beat was teaching — and OTA-1250's lock then
+          // made that dead end visible: his log shows fourteen refusals in ninety
+          // seconds, the Arbiter repeating "take the vest from TAKE / SALVAGE" at a
+          // player who had already taken it. The tap grants AND wears.
+          if (tutBeat === 'armor' && /vest|warden/i.test(noun)) {
+            setTakeOpen(false);
+            submit(`take ${noun}`);
+            // ⚠ The grant is a synchronous `set`, so the vest is in the pack by the
+            // time this reads it — and it is checked rather than assumed, because
+            // `grantTutorialItem` refuses a second grant and a full pack refuses the
+            // first. equipItem advances the beat from its own top.
+            if ((useGameStore.getState().player?.inventory ?? []).some((i) => /vest/i.test(i.name))) {
+              useGameStore.getState().equipItem("Mud-Warden's Vest", 'chest');
+            }
+            return;
+          }
+          // ⚠⚠ AND THE SAME RULE OUTSIDE THE TUTORIAL — the ★ is not a label you go
+          // and act on somewhere else. It has meant "picked and equipped at the same
+          // time" since the owner first asked about the mark (OTA-1237); it just had
+          // never done it. The slot comes from the same catalog lookups the mark
+          // does, so a row cannot show ★ and then have nowhere to go.
+          const wear = isUpgradeOverEquipped(player, noun) ? upgradeEquipSlot(player, noun) : null;
           takeAmbientNoun(noun);
+          // ⚠ ONLY IF IT ACTUALLY LANDED. The take can refuse — a full pack, an
+          // already-worked-over noun — and both refuse by logging rather than
+          // throwing. Equipping regardless would answer the refusal with a second
+          // one ("I don't see it on you") for a player who did nothing wrong.
+          if (wear) {
+            const held = useGameStore.getState().player?.inventory ?? [];
+            if (held.some((i) => i.name.toLowerCase() === wear.name.toLowerCase() && i.quantity > 0)) {
+              useGameStore.getState().equipItem(wear.name, wear.slot);
+            }
+          }
         }}
-        onStealthTake={(noun) => {
+        onSalvage={(noun) => {
+          Keyboard.dismiss();
+          if (tutBeat === 'scrap') setTakeOpen(false);
+          // Routed through the parser exactly as the old salvage picker did, so
+          // the hook system and scene-noun matcher see the same input they always
+          // have (OTA-117 made 'salvage' an investigate verb synonym for that).
+          submit(`salvage ${noun}`);
+        }}
+        // ⚠⚠ OTA-1236 — the lead lane's single tap INVESTIGATES. It is the only
+        // verb that fires the dog rescue or opens a story hook; taking or salvaging
+        // the noun spends it and takes the next step with it.
+        // ⚠⚠ THE LEAD IS THE ONE TAP THAT STILL CLOSES, ALWAYS. Investigating a
+        // lead is what fires the dog rescue (a captor spawns and a fight starts) or
+        // opens a story-hook popup. Neither is something to leave a loot list
+        // floating over — and the OTA-1236 sweep breaks on the same condition for
+        // the same reason.
+        onInvestigate={(noun) => {
           Keyboard.dismiss();
           setTakeOpen(false);
-          stealthTakeAmbientNoun(noun);
+          submit(`investigate ${noun}`);
         }}
+        leadNouns={leadNouns}
+        // ⚠⚠ OTA-1239 — NO STEALTH TOGGLE HERE ANY MORE. Owner, for the second
+        // time: *"why did you add a stealth option to it, that's not how the
+        // stealth is used anymore."* PICKPOCKET owns people, the `steal` verb owns
+        // things on tables and the ground, and this picker owns the open take. See
+        // GatherModal's header for the full history.
         onTakeAll={(nouns) => {
-          // OTA 222 — fire each take in sequence then close. Each
-          // takeAmbientNoun call runs through the same gating
-          // (already-taken dedup, inventory cap, etc.) that an
-          // individual chip tap would, so partial success is
-          // handled per-item by the store.
           Keyboard.dismiss();
-          setTakeOpen(false);
           for (const n of nouns) takeAmbientNoun(n);
+        }}
+        onSalvageAll={(nouns) => {
+          Keyboard.dismiss();
+          // The store's bulk path — which since OTA-1231 skips catalog items, so
+          // this can never scrap something the player could have pocketed.
+          useGameStore.getState().salvageAllAmbient(nouns);
         }}
         onCancel={() => { Keyboard.dismiss(); setTakeOpen(false); }}
       />
 
-      <SalvageModal
-        visible={salvageOpen}
-        // During the scrap beat, show ONLY the demo prop (the broken chest
-        // plate) so the picker can't surface the room's real salvageables —
-        // same confusion fix as the TAKE picker above.
-        chips={
-          tutBeat === 'scrap'
-            ? [{ noun: 'broken chest plate', consumed: false }]
-            // OTA-971 — same elevation filter as the button count above: while up
-            // on a climb the picker lists only what you can actually reach,
-            // instead of ground nouns every tap would get refused on.
-            : reachableWhileElevated(
-                currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [],
-                currentScene?.elevatedOn?.noun ?? null,
-                !!currentScene?.elevatedOverlayMeta,
-                currentScene?.nounPlacements ?? null,
-                currentScene?.elevatedOn?.tier ?? 0,
-              ).map((n) => ({
-                noun: n,
-                // OTA-167 — salvage chip greys on the engine's per-room
-                // consumed state directly (searched + flavor-exhausted),
-                // NOT isAmbientConsumed's self-heal, which fuzzy-matched
-                // catalog items the player didn't own and kept chips lit.
-                consumed:
-                  isFuzzyConsumed(n, productivelyConsumedSet) ||
-                  isNounFlavorExhausted(n, flavorExhaustedSet),
-              }))
-        }
-        onSubmit={(target) => {
-          setSalvageOpen(false);
-          // Submit raw target — the modal's chip text already includes
-          // a definite article when appropriate ("the construct"), and
-          // typed text is passed through verbatim. The investigate
-          // intent picks up 'salvage' as a verb synonym (OTA 140) and
-          // routes through the hook system + scene-noun matcher.
-          submit(`salvage ${target}`);
-        }}
-        onSalvageAll={(nouns) => {
-          // 2026-05-25 — route through the bulk salvageAllAmbient
-          // action so all narration lines fire FIRST (one per noun
-          // in tap order) and the aggregated haul prints as the
-          // last block. Per playtester: "hit salvage all, it shows
-          // the text for every salvage task and then what was
-          // recovered if anything, and then shows the next ... it
-          // should print all the item.salvage text in a row, and
-          // then everything you found together after all of the
-          // texts print." Previously this loop submit()'d each
-          // noun individually, which interleaved text + reward
-          // pairs.
-          setSalvageOpen(false);
-          useGameStore.getState().salvageAllAmbient(nouns);
-        }}
-        onCancel={() => setSalvageOpen(false)}
-      />
 
       {/* arb135 — Mission Board screen: open postings with tappable ACCEPT. */}
       <MissionBoardModal
@@ -1742,14 +2309,14 @@ export function ExplorationScreen() {
       <FusionPickerModal />
       <FusionBlockedModal />
       <MissionCompleteModal />
-      {/* OTA-1046 — the opening crawl moved to App.tsx's GLOBAL overlay
+      {/* OTA-1023 — the opening crawl moved to App.tsx's GLOBAL overlay
           stack so REPLAY OPENING plays over any screen. */}
 
-      {/* OTA-1099 — the parley chooser and the topic exchange moved out of the
+      {/* OTA-1076 — the parley chooser and the topic exchange moved out of the
           overlay stack into the controls slot below (bottom sheets, dice-
           roller pattern) at the owner's direction: the feed must stay
           readable while talking. */}
-      {/* OTA-1083 — the gift picker, self-mounting off pendingGift. */}
+      {/* OTA-1060 — the gift picker, self-mounting off pendingGift. */}
       <GiftModal />
 
       {/* OTA-180 — FeedbackModal render removed alongside the 📝
@@ -1771,11 +2338,12 @@ export function ExplorationScreen() {
         onCancel={() => setApproachOpen(false)}
       />
 
-      {/* OTA-1100 — the PICKPOCKET picker moved out of the overlay stack into
-          the controls slot above (bottom sheet, dice-roller pattern). It
-          routes to stealthTakeAmbientNoun, which dispatches vendor theft
-          (Stealth vs the vendor's DC, high-STE quiet-fail) or a
-          sleight-of-hand grab. */}
+      {/* OTA-1077 — the PICKPOCKET picker moved out of the overlay stack into
+          the controls slot above (bottom sheet, dice-roller pattern).
+          ⚠ OTA-1239 — this comment used to say it routes to
+          `stealthTakeAmbientNoun`. It does not and never did: it calls
+          `pickpocketPerson`. The stale line is worth naming because it is part of
+          how a duplicate stealth path stayed invisible for six OTAs. */}
 
       {/* OTA 046 — CLIMB picker. Pull climbables from the same scene
           noun pool the other modals read (displayedAmbientNouns →
@@ -1997,7 +2565,7 @@ export function ExplorationScreen() {
         onRequestClose={() => cancelTravelConfirm()}
       />
 
-      {/* OTA-671 — stumbled-onto mission offer (Parley of Factions). Approaching
+      {/* OTA-656 — stumbled-onto mission offer (Parley of Factions). Approaching
           the leaders no longer silently takes the contract; it announces the
           demands and asks. Accept commits it; Decline walks away. */}
       <BrandedModal
@@ -2029,7 +2597,7 @@ const styles = StyleSheet.create({
   didYouMeanChip: { backgroundColor: '#1a1714', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, paddingHorizontal: 10, paddingVertical: 6 },
   didYouMeanChipText: { color: '#e6d8b3', fontSize: 12, letterSpacing: 0.5 },
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
-  container: { flex: 1, backgroundColor: 'transparent', padding: 8, gap: 6, width: '100%', maxWidth: 600, alignSelf: 'center' },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 8, gap: 6, width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' },
   // minHeight (not fixed height) — characters with multiple active
   // contracts / effects / a companion overflow 165px; the fixed height
   // clipped the bottom rows behind the scene bar. Letting the row grow
@@ -2048,8 +2616,7 @@ const styles = StyleSheet.create({
   // ask. EnemyCard's `head` style no longer needs paddingRight
   // reservation since the gear no longer overlaps the enemy name
   // / range tag area.
-  // OTA-748 — settings gear now lives in the scene bar next to MAP (see
-  // sceneBarGear). The old absolute-positioned cornerGear overlay is gone.
+  // OTA-748 — settings gear now lives in the scene bar next to MAP (sceneBarGear).
   sceneBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingHorizontal: 8, paddingVertical: 6, backgroundColor: '#13110f',
@@ -2058,7 +2625,7 @@ const styles = StyleSheet.create({
   },
   sceneText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1 },
   timeText: { color: '#a2977b', fontSize: 9, letterSpacing: 1, marginTop: 1 },
-  // OTA-937 — weather pops on the day line: the location line's bright gold + a bold weight,
+  // OTA-914 — weather pops on the day line: the location line's bright gold + a bold weight,
   // instead of inheriting the faded day-counter color.
   weatherText: { color: '#c9a86a', fontWeight: '700' },
   sceneBarBtns: { flexDirection: 'row', gap: 4, flexShrink: 0 },
@@ -2171,7 +2738,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1.5,
   },
-  // OTA-1052 — the "what's standing here" chip system. Was four full-width,
+  // OTA-1029 — the "what's standing here" chip system. Was four full-width,
   // two-line, 44px-tall banners stacked down the screen (trader / board /
   // wanderer / Crucible); at a capital that ate the feed. They now share one
   // wrapping row two-across: same information, ~a third of the height. Each keeps
@@ -2199,14 +2766,14 @@ const styles = StyleSheet.create({
   fusionChip: { borderColor: '#b88ce0' },
   vendorChipX: { color: '#8a7448', fontSize: 15, fontWeight: '800' },
   vendorBannerStripe: { width: 4, backgroundColor: '#c9a86a', alignSelf: 'stretch' },
-  // OTA-1082 — the TALK affordance on the vendor chip. Deliberately quieter
+  // OTA-1059 — the TALK affordance on the vendor chip. Deliberately quieter
   // than the chip itself: trading is still the primary action at a counter.
   placeChipTalk: {
     paddingHorizontal: 8, paddingVertical: 4, marginRight: 4,
     borderWidth: 1, borderColor: '#7a6640', borderRadius: 4,
   },
   placeChipTalkText: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
-  // OTA-1102 — unspoken-dialogue glow: the house green (#9ec96a, the wanderer/
+  // OTA-1079 — unspoken-dialogue glow: the house green (#9ec96a, the wanderer/
   // social accent) on border + text while this person still has unread lines.
   placeChipTalkUnspoken: { borderColor: '#9ec96a' },
   placeChipTalkTextUnspoken: { color: '#9ec96a' },

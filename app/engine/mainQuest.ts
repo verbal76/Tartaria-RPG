@@ -329,8 +329,13 @@ export const LOST_CAPITAL_NAMES: Record<string, string> = {
 // — stamps the place in the player's memory so the set never feels samey. Fires
 // once per Capital per character (gated by worldMemory.capitalArrivalSeen).
 const CAPITAL_ARRIVAL_SIGNATURES: Record<string, string> = {
+  // ⚠ OTA-1334 — this beat used to name the Grand Spire of ETHERIA, which now stands most
+  // of a world away on the floor of the Black Reach. The tower on Asgardar's own skyline is
+  // the Grand Spire of Asgardar. A first-arrival line is the worst possible place to name
+  // the wrong landmark: it is the one sentence meant to stamp the city in the player's
+  // memory, and it fires exactly once per character.
   asgardar:
-    'Asgardar announces itself before you crest the rise: the Grand Spire of Etheria, snapped a third of the way up, still hums a single sub-audible note that you feel in your teeth more than hear. Aether-light crawls the old channel-grooves like slow lightning that forgot how to strike.',
+    'Asgardar announces itself before you crest the rise: the Grand Spire of Asgardar out past the last streets, snapped a third of the way up, still humming a single sub-audible note that you feel in your teeth more than hear. Aether-light crawls the old channel-grooves like slow lightning that forgot how to strike.',
   samarran:
     'Samarran is all broken glass and cold arithmetic. Thametan\'s Tower leans over a plaza of shattered lenses, and the dead Aetheric Engine at its heart still ticks — one wrong, patient click every few seconds, like a clock counting down to something that already happened.',
   nimari:
@@ -346,7 +351,7 @@ const CAPITAL_ARRIVAL_SIGNATURES: Record<string, string> = {
   ostragar:
     'Ostragar moves. The Eternal Dynasty\'s river city sits half-drowned in a slow brown current that runs the wrong way past your shins, threading between sunken colonnades. Something in the water keeps pace with you just under the surface, and the reeds bow as you pass, then straighten behind you.',
   iskan_veil:
-    'Iskan-Veil refuses to hold still in your head. The Conspiracy Architects built a maze of false doors and lying corridors, and the far-northern light comes in flat and grey through windows that open onto walls. Twice you are sure you\'ve been here already. Twice you are wrong. Or right.',
+    'Iskan-Veil refuses to hold still in your head. The Conspiracy Architects built a maze of false doors and lying corridors, and the far-northwestern light comes in flat and grey through windows that open onto walls. Twice you are sure you\'ve been here already. Twice you are wrong. Or right.',
 };
 
 /** OTA-442 — the one-time arrival signature for a Lost Capital, or null. */
@@ -447,15 +452,142 @@ export const NEXUS_SLOT_BEATS: readonly NexusSlotBeat[] = [
   },
 ];
 
+/** ⚠⚠ OTA-1225 — THE GATE ON THE FOURTH DOOR, AND WHY IT IS THIS ONE.
+ *
+ *  The owner's worry about gating an ending, stated plainly: *"unless this is
+ *  advertised everywhere and the Arbiter narrates the consequences constantly,
+ *  it will look like they were cheated out of an outcome."* Exactly right — and
+ *  the answer is that this gate is ADDITIVE, never subtractive. SEAL, UNLEASH
+ *  and PRESERVE remain open to every character who reaches the Nexus, forever.
+ *  Nothing is ever removed, greyed out, or hinted at and withheld. A player who
+ *  does not earn STAY never learns it existed; a player who does, earned it by
+ *  playing, not by looking it up.
+ *
+ *  The bar is the Arbiter's TOP regard band ('kin'). It is the right bar
+ *  because `regardParts` is already built to resist exactly the thing that
+ *  would make this unfair: every input is clamped and the total is clamped
+ *  again, reading lore saturates, gifts saturate — what moves regard late in a
+ *  run is conduct that costs something (debts made good, relics left where they
+ *  stood, the answers given at the story forks). It cannot be ground out in an
+ *  afternoon, and the negative side is clamped too, so a bad first hour never
+ *  locks anybody out. It is also already ITEMISED on the character sheet, so
+ *  the one number this door turns on is a number the player can read all run.
+ *
+ *  ⚠ The store re-checks this before recording the ending. The UI hiding a
+ *  button is a courtesy; the engine refusing the ending is the rule. */
+export function canStayAtTheNexus(
+  player: PlayerCharacter | null | undefined,
+  worldMemory: unknown,
+): boolean {
+  if (!player) return false;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const persona = require('./arbiterPersona') as typeof import('./arbiterPersona');
+    return persona.regardOf(player as never, worldMemory as never) === 'kin';
+  } catch {
+    // A regard read that throws must never hand out the earned ending.
+    return false;
+  }
+}
+
+/** ⚠⚠ OTA-1225 — THE RECKONING. Before the doors, the Arbiter reads the run
+ *  BACK to the player: where they stand with the people who have to live with
+ *  what happens next, what they are called now, and how their own reason for
+ *  coming down turned out. It gates NOTHING. It is the difference between a
+ *  choice that is weighted and a choice that is three buttons — and it is the
+ *  half of "choices have consequences" that costs a player nothing to receive.
+ *
+ *  Every line is assembled from state the game already maintains; nothing here
+ *  is a new tracker. Sections are omitted when the run has nothing to say
+ *  rather than padded with filler, so a quiet run reads short and honest. */
+export function theReckoning(
+  player: PlayerCharacter | null | undefined,
+  worldMemory: unknown,
+): string[] {
+  if (!player) return [];
+  const out: string[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const persona = require('./arbiterPersona') as typeof import('./arbiterPersona');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factions = require('./factions') as typeof import('./factions');
+
+  out.push('The mantle is live and waiting and in no hurry. The Arbiter does not tell you what to do. Instead — once, and only here — it tells you what you have done.');
+
+  // WHO HAS TO LIVE WITH IT. The standing table, read as people rather than numbers.
+  const rows = (player.factionStanding ?? []).filter((r) => r && r.factionId);
+  const named = (id: string): string => {
+    try { return factions.FACTIONS.find((f: { id: string; name: string }) => f.id === id)?.name ?? id; } catch { return id; }
+  };
+  const friends = rows.filter((r) => r.standing >= 20).map((r) => named(r.factionId));
+  const enemies = rows.filter((r) => r.standing <= -25).map((r) => named(r.factionId));
+  if (friends.length > 0 && enemies.length > 0) {
+    out.push(`"Whatever you do in the next minute, it lands on people. ${friends.join(', ')} will hear it as something you did FOR them. ${enemies.join(', ')} will hear it as the last thing you ever did TO them. Both readings will be fair."`);
+  } else if (friends.length > 0) {
+    out.push(`"Whatever you do in the next minute lands on people who trust you: ${friends.join(', ')}. You did that. It is worth knowing you are spending it here."`);
+  } else if (enemies.length > 0) {
+    out.push(`"You have made enemies of ${enemies.join(', ')}, and they are about to live in whatever world you leave. I do not say that to move your hand. I say it because someone should say it out loud before you touch that mantle."`);
+  } else {
+    out.push('"You walked a long way without making this anyone else\'s business. Very few manage it. Nobody up there is owed an explanation from you, which means the next minute is yours alone and always was."');
+  }
+
+  // WHAT YOU ARE CALLED NOW.
+  const titles = player.earnedTitles ?? [];
+  if (titles.length > 0) {
+    const shown = titles.slice(-3).join(', ');
+    out.push(`"They have names for you now — ${shown}${titles.length > 3 ? `, and ${titles.length - 3} more you have stopped counting` : ''}. You did not ask for one of them. That is generally how the real ones arrive."`);
+  }
+
+  // THE ANSWERS YOU GAVE. The fork choices, in the Arbiter's memory.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const forks = require('./storyForks') as typeof import('./storyForks');
+    const lines = forks.epilogueChoiceLines(player);
+    if (lines.length > 0) {
+      out.push(`"And you were asked things down here that had no right answer. You answered anyway. I remember every one, and so, I suspect, do you."`);
+    }
+  } catch { /* the reckoning must never break the ending */ }
+
+  // HOW YOUR OWN REASON TURNED OUT.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const drip = require('./storyDrip') as typeof import('./storyDrip');
+    if (drip.resolvedKindOf(player)) {
+      out.push('"The thing you came down for is settled. Whatever you decide here, you are not deciding it to get an answer — you already have yours. That makes you rarer in this chamber than the Cores did."');
+    } else {
+      out.push('"The thing you came down for is not settled, and it is not going to be settled by that mantle. Do not let it stand in for the answer. It is a machine. It does not know your name."');
+    }
+  } catch { /* same */ }
+
+  // AND THE REGARD ITSELF — said plainly, because it is about to matter.
+  let band: string | null = null;
+  try { band = persona.regardOf(player as never, worldMemory as never); } catch { band = null; }
+  if (band === 'kin') {
+    out.push('The Arbiter stops. When the voice comes back it is not the voice that has been guiding you — it is smaller, and closer, and it is asking rather than telling. "Before you choose. I have walked this stair with a great many people, and I have watched all of them leave. You are the first I would have followed."');
+  } else if (band === 'warm') {
+    out.push('"I have been at your shoulder since the Stair," the Arbiter says. "I will not pretend I have no preference. I will not tell you what it is, either. Choose."');
+  } else if (band === 'cold' || band === 'wary') {
+    out.push('"I have carried you this far and I have not enjoyed all of it," the Arbiter says. "That changes nothing about your right to stand here. The nine are yours. Choose."');
+  } else {
+    out.push('"That is the record," the Arbiter says. "No thumb on the scale from me. Choose."');
+  }
+  return out;
+}
+
 /** The pre-Choice walk-up narration. Called by gameStore when the
  *  player has all 9 Cores and steps into mud_flood_nexus. Returns
  *  an ordered list of lines: arrival + 5 slot beats + the prompt to
  *  decide. AdventureFeed appends each as a paragraph. */
-export function nexusArrivalCinematic(): string[] {
+export function nexusArrivalCinematic(stayOpen = false): string[] {
   const lines: string[] = [NEXUS_ARRIVAL_LINE];
   for (const beat of NEXUS_SLOT_BEATS) lines.push(beat.line);
+  // ⚠⚠ OTA-1225 — the prompt names FOUR actions only when the fourth is
+  // actually open. A player who has not earned STAY is never told it exists,
+  // which is the whole reason an earned door does not read as a withheld one.
+  const three = 'SEAL — collapse the Aether back into stillness, lock Tartaria where it was buried, and walk out under a quiet sky. UNLEASH — open the chamber\'s old throat and let the Aether climb back up into the world; what comes next is not yours to manage. PRESERVE — leave the mantle live but unsigned, walk out with the 9 Cores still in your pack, and carry the keys to a cataclysm only you can choose to use.';
   lines.push(
-    'Three actions remain. SEAL — collapse the Aether back into stillness, lock Tartaria where it was buried, and walk out under a quiet sky. UNLEASH — open the chamber\'s old throat and let the Aether climb back up into the world; what comes next is not yours to manage. PRESERVE — leave the mantle live but unsigned, walk out with the 9 Cores still in your pack, and carry the keys to a cataclysm only you can choose to use. Decide from the Contracts screen.',
+    stayOpen
+      ? `Four actions remain. ${three} And one more, which the Arbiter names quietly and does not repeat: STAY — sign nothing, leave nothing, and sit down at the Engine's side to mind it, because somebody has to and you are the one who is here. Decide from the Contracts screen.`
+      : `Three actions remain. ${three} Decide from the Contracts screen.`,
   );
   return lines;
 }
@@ -534,6 +666,12 @@ const CHOICE_LINE_BY_ENDING: Record<MainQuestEnding, string> = {
   seal: 'You SEAL the Nexus. The cataclysm is locked away — Tartaria stays buried, the surface world stays innocent. The Cores fuse into the mantle as you set the last one. The chamber dims. You can walk out, or stay until the dim takes you. Either is a kind of ending.',
   unleash: 'You UNLEASH the Nexus. The cataclysm cycles back — Aetheric pressure rises, the surface tremors, every buried Tartaria stirs at once. What comes next is no longer in any one person\'s hands. Your faction will write the aftermath. You walk out under sky that has changed color.',
   preserve: 'You PRESERVE. The Cores stay in your pack; the Nexus stays mute; the world stays in equilibrium. You leave the chamber unsigned. Tartaria, the buried country, remains buried — but you carry the keys. Each Capital remembers you brought one back. They will remember.',
+  // ⚠⚠ OTA-1225 — THE EARNED FOURTH. Every other door is a decision made ALONE
+  // about a world that does not know you are down here. This one is the only
+  // one that is about the person who has been in your ear since the first
+  // minute, and the only one where the decision stops being yours to make
+  // twice. It is offered ONLY at the Arbiter's top regard band.
+  stay: 'You STAY. You do not sign the mantle and you do not walk out — you sit down at the Engine\'s side, where somebody has to, and let the long work of understanding it begin. The Arbiter is quiet for a long moment. Then, for the first time since the Stair: "Thank you." The voice goes out of the air, and does not come back, and the chamber is not empty — because you are in it.',
 };
 
 /** Return the faction-flavored ending line (Phase 3), falling back
@@ -542,25 +680,59 @@ const CHOICE_LINE_BY_ENDING: Record<MainQuestEnding, string> = {
 export function endingLine(ending: MainQuestEnding, factionId: string | undefined): string {
   const map = ending === 'seal' ? SEAL_BY_FACTION
     : ending === 'unleash' ? UNLEASH_BY_FACTION
+    : ending === 'stay' ? STAY_BY_FACTION
     : PRESERVE_BY_FACTION;
   if (factionId && map[factionId]) return map[factionId]!;
   return CHOICE_LINE_BY_ENDING[ending];
 }
 
-const FACTION_ROUTE_PLACEHOLDER = (factionId: string): string => {
-  const name: Record<string, string> = {
-    reclaimers_guild: "the Reclaimers' salvage route",
-    forgotten_order: "the Forgotten Order's scholarship route",
-    mud_monarchs: "the Mud Monarchs' claim-by-blood route",
-    true_tartarians: "the True Tartarians' reverent route",
-    eternal_dynasty: "the Eternal Dynasty's lineage route",
-    conspiracy_architects: "the Conspiracy Architects' infiltration route",
-    servants_of_giants: "the Servants' vigil route",
-    stone_builders: "the Stone Builders' Aethercraft route",
-    tartarian_revivalists: "the Revivalists' public-recovery route",
+/** ⚠⚠ OTA-1224 — WAS A DEV NOTE IN THE ARBITER'S VOICE, AND IT WAS WRONG.
+ *  This fallback used to read *"the Reclaimers' salvage route for the Cores is
+ *  being authored in a coming OTA… other factions will get their authored
+ *  variants soon"* — a note-to-self from the week the main quest was first
+ *  built, written in the player-facing register and left in a live switch.
+ *  Two things were true about it by the time it was found: it was UNREACHABLE
+ *  (proved by exhaustion — see ota1224, and the reasoning below), and it had
+ *  become FACTUALLY FALSE, because all nine factions have carried real authored
+ *  Core routes in FACTION_CORE_GATES for a long time. It promised work that was
+ *  already done, in a voice the player trusts, from inside the main story.
+ *
+ *  ⚠ WHY IT COULD NOT FIRE, and why that is not a guarantee: `phase: 'cores'`
+ *  is produced by exactly ONE branch of advanceMainQuest — `core_recovered` —
+ *  and the store's only general caller sets the core context on precisely that
+ *  trigger, so the `if` above this always takes the real line. That is a
+ *  property of today's state machine, not a law. Any future path that lands
+ *  'cores' without a recovery (a save-repair, a debug jump) arms this fallback.
+ *  So it is now an honest in-world line: the worst case is harmless flavour,
+ *  and ota1224 fails the build the day the branch becomes reachable at all. */
+/** ⚠⚠ OTA-1225 — STAY, told nine ways. What the character's own people make of
+ *  someone who went down for a Core and never came back up. */
+const STAY_BY_FACTION: Record<string, string> = {
+  reclaimers_guild: 'The Guild files you under LOST IN THE FIELD because there is no box on the form for what you actually did. Your salvage tags keep turning up in other people\'s hauls for years — passed hand to hand as luck. The Reclaimers who knew you say you finally found a piece too big to carry out, and that you did the correct thing with it, which in their language is the highest praise there is.',
+  forgotten_order: 'The Order does not mourn you. The Order ENTERS you: a new line in the register of Keepers, the first added in eleven hundred years, and the scriptorium argues for a decade about whether the entry is history or scripture. Both parties are wrong in the same direction. They send a scholar down every spring. Sometimes the lamp is lit.',
+  mud_monarchs: 'The Monarchs call it abdication and mean it as an insult for about a season. Then the Court quietly stops filling your seat, and the empty chair becomes a thing the young ones are told about — the one who held the whole flood in one hand and chose to sit down with it instead of on it. Mud Monarch children are still named for you.',
+  true_tartarians: 'The Entombed have a word for this and it is not a sad one. You did not die and you did not leave: you took a post. The True Tartarians revise their reckoning of the buried country to include one living warden, and every pilgrim who goes down after you carries food they know will not be needed, because leaving it is the point.',
+  eternal_dynasty: 'The Dynasty, which measures everything in lineage, finds it has no instrument for a line that ends on purpose. The genealogists mark you with a symbol they invent for the occasion — a name with a door drawn after it. It comes into common use. Within two generations, Dynasty families use it for anyone who chose duty over inheritance, and none of them remember why.',
+  conspiracy_architects: 'The Architects, who assume every disappearance is a cover, spend forty years looking for the angle. They never find one, because there is not one, and this unsettles them more than treachery would have. Their file on you is closed with a single annotation in the founder\'s hand: SHE MEANT IT. It is the only unqualified statement in the whole archive.',
+  servants_of_giants: 'The Servants understand instantly and completely, because a vigil is the only thing they have ever done. They add a name to the watch-roll and a lamp to the hall and they do not discuss it further; discussion is not what the vigil is for. Somewhere below, they say, one of ours is sitting the longest watch anybody has ever sat. It is said with envy.',
+  stone_builders: 'The Builders do the only thing they know how to do about a thing that matters: they build it. A shaft, then a stair, then — over sixty years — a road, running down to a door nobody opens, maintained by masons who will never meet you. The Stone Builders call it the Warden\'s Road. It is the finest work they have done since the Flood, and its entire purpose is that someone could come if you ever called.',
+  tartarian_revivalists: 'The Revivalists publish. Of course they publish — it is what they are for — and the account of the walker who reached the Engine and stayed to mind it does more for the cause than any relic they ever paraded. Cells that had gone quiet come back. The movement outlives its founders on the strength of one story, and the story is true, which none of them can quite believe.',
+};
+
+const FACTION_ROUTE_LINE = (factionId: string): string => {
+  const route: Record<string, string> = {
+    reclaimers_guild: 'a trowel and a salvager\'s patience',
+    forgotten_order: 'the binding text, read through',
+    mud_monarchs: 'force or a Monarch\'s address',
+    true_tartarians: 'the asking, and the vigil that follows it',
+    eternal_dynasty: 'the old voice and a proven lineage',
+    conspiracy_architects: 'a back door and nobody watching it',
+    servants_of_giants: 'the silent hour, sat out in full',
+    stone_builders: 'Aethercraft worked against the seat',
+    tartarian_revivalists: 'the recovery, documented for the cell',
   };
-  const route = name[factionId] ?? 'your faction route';
-  return `${route} for the Cores is being authored in a coming OTA. For now, recover each Core however the world lets you — visit each Lost Capital and the engine will register the Core when you carry one back to your hub. The reference route (Reclaimers' salvage) is fully live; other factions will get their authored variants soon.`;
+  const how = route[factionId] ?? 'whatever your own road allows';
+  return `Nine Cores, nine Lost Capitals, and each one comes free by ${how}. Open CONTRACTS and read the Primary Objective — it names the Capital you are owed next, and the act that lifts its Core.`;
 };
 
 /** Pick a variant from a per-faction pool deterministically by a
@@ -601,7 +773,7 @@ export function narrationForPhase(
       if (context?.coreRecovered && context?.coresCount != null) {
         return CORE_RECOVERED_LINE(factionId, context.coreRecovered, context.coresCount);
       }
-      return FACTION_ROUTE_PLACEHOLDER(factionId);
+      return FACTION_ROUTE_LINE(factionId);
     case 'descent':
       return pickFactionVariant(DESCENT_VARIANTS_BY_FACTION, DESCENT_LINE_BY_FACTION, factionId, seed, 'descent');
     case 'nexus':
@@ -738,7 +910,7 @@ export function shouldFireFourCoreForge(state: MainQuestState): boolean {
 }
 
 /** The narrative beat that unlocks golem-armament crafting at the 4th Core.
- *  OTA-720 — the moment the craft opens, the player is handed the CRUDE (basic)
+ *  OTA-703 — the moment the craft opens, the player is handed the CRUDE (basic)
  *  working for every armament type; the stronger Rare/Legendary schematics are
  *  left out in the world to be uncovered. */
 export function fourCoreForgeLine(): string {
@@ -840,6 +1012,20 @@ export const FACTION_CORE_GATES: Record<string, CoreGate> = {
 
 /** True when the player's current state + this action's intent
  *  satisfies the faction-specific gate for the Capital they're at. */
+/** ⚠⚠ THIS NO LONGER GATES THE SUMMON, AND MUST NOT BE RE-WIRED TO.
+ *
+ *  Owner's ruling: *"guardians should only come from the summon button, because
+ *  there are other quests in some of the capital cities that need to examine the
+ *  area and the examine summon will eat the other events."* The Core Guardian is
+ *  raised by `summonCoreGuardian()` and by nothing else; the verb path that used
+ *  to consult this predicate is gone, because for the Reclaimer and Architect
+ *  routes it made `investigate` — the verb every other Capital thread is examined
+ *  into being with — indistinguishable from working the Core housing, and it
+ *  RETURNED before those threads could run.
+ *
+ *  It is kept because the faction ROUTE is still real colour (each discipline
+ *  reaches the Core its own way, and coreGateHint says so), and because the suite
+ *  pins the table. Read it for flavour; do not make it decide anything. */
 export function canRecoverCore(player: PlayerCharacter, parsedIntent: Intent): boolean {
   const mq = ensureMainQuest(player.mainQuest);
   if (mq.phase !== 'revelation' && mq.phase !== 'cores') return false;

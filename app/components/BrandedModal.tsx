@@ -1,4 +1,5 @@
 import React from 'react';
+import { rarityHexColor } from './InventoryCategorize';
 import {
   Modal,
   View,
@@ -195,13 +196,10 @@ export function BrandedModal({
   );
 }
 
+// ⚠ OTA-1312 — the style wrapper stays (callers pass it straight to a Text),
+// but the hexes come from the one palette.
 function rarityColor(rarity: string) {
-  switch (rarity) {
-    case 'Legendary': return { color: '#e07a5f' };
-    case 'Rare': return { color: '#b88ce0' };
-    case 'Uncommon': return { color: '#9ec96a' };
-    default: return { color: '#c9a86a' };
-  }
+  return { color: rarityHexColor(rarity) };
 }
 
 function toneStyle(tone: BrandedModalButton['tone']) {

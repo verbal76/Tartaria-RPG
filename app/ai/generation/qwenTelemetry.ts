@@ -1,5 +1,5 @@
-// OTA-1128 — QWEN CALL TELEMETRY. The measurement the 29-second mystery has
-// been waiting on (OTA-1116 deliberately deferred any budget cut "rather than
+// OTA-1105 — QWEN CALL TELEMETRY. The measurement the 29-second mystery has
+// been waiting on (OTA-1093 deliberately deferred any budget cut "rather than
 // a blind budget cut — it gets per-intent timing first").
 //
 // One choke point instead of nine hand-rolled timers: every generation —
@@ -19,14 +19,14 @@
 // in the debug channel (the device log is the delivery vehicle — same as
 // every diagnosis this project has shipped).
 
-/** ⚠ OTA-1142 — 'dormant' is an EMPTY WITH A KNOWN CAUSE, and it exists
+/** ⚠ OTA-1119 — 'dormant' is an EMPTY WITH A KNOWN CAUSE, and it exists
  *  because 'empty' was hiding two completely different failures. A model that
  *  genuinely produced nothing is a PROMPT problem; a call that ran against a
  *  detached native context is a LIFECYCLE problem, and the two get investigated
  *  in opposite directions. The device log had one of each and no way to tell
  *  them apart — the second read `empty 8809ms read 0ms/write 0ms in 309t→out
  *  0t`, which is 8.8 seconds of wall time doing literally no native work. */
-/** ⚠ OTA-1146 — 'preempted' is HOMEWORK CUT SHORT, and it is a SUCCESS, not a
+/** ⚠ OTA-1123 — 'preempted' is HOMEWORK CUT SHORT, and it is a SUCCESS, not a
  *  failure. Idle-time work is interruptible on purpose: the moment the player
  *  acts, llama.cpp is told to stop so their call runs now. A preempted job
  *  losing its tokens is the system working exactly as designed, so it must not
@@ -35,7 +35,7 @@
  *  and burning battery for nothing. */
 export type QwenCallOutcome = 'ok' | 'empty' | 'error' | 'dormant' | 'preempted';
 
-/** OTA-1130 — how generation ended, straight from llama.cpp. `limit` means it
+/** OTA-1107 — how generation ended, straight from llama.cpp. `limit` means it
  *  ran into the token cap mid-thought (we are paying full price AND cutting a
  *  sentence off); `eos` means it finished naturally and the cap has headroom. */
 export type QwenStopReason = 'eos' | 'limit' | 'word' | 'unknown';
@@ -51,9 +51,9 @@ export interface QwenCallRecord {
   chars: number;
   outcome: QwenCallOutcome;
   at: number;
-  // ── OTA-1130 — the numbers llama.cpp was already computing and we discarded ──
+  // ── OTA-1107 — the numbers llama.cpp was already computing and we discarded ──
   /** READ time: how long the model spent ingesting the prompt before writing a
-   *  token. OTA-1129 inferred this from wall-clock and it carried the whole
+   *  token. OTA-1106 inferred this from wall-clock and it carried the whole
    *  diagnosis; now it is measured. */
   prefillMs?: number;
   /** WRITE time: generation proper. */
@@ -62,9 +62,9 @@ export interface QwenCallRecord {
   promptTokens?: number;
   /** Tokens emitted. */
   outTokens?: number;
-  /** ⚠ OTA-1131 — NOT reuse. This is llama.cpp's KV cache SIZE after the call,
+  /** ⚠ OTA-1108 — NOT reuse. This is llama.cpp's KV cache SIZE after the call,
    *  which is `reused prefix + prompt tokens evaluated + tokens predicted`.
-   *  OTA-1130 read it as "tokens reused" and the first device log disproved
+   *  OTA-1107 read it as "tokens reused" and the first device log disproved
    *  that outright: every single row came back as exactly promptTokens +
    *  outTokens (546+31=577, 542+31=573, 309+179=488, 127+22=149 …), which is
    *  the signature of a cache that grew by what this call did and reused
@@ -83,29 +83,29 @@ interface JobAggregate {
   waitMs: number;
   maxWaitMs: number;
   empty: number;
-  /** OTA-1142 — calls swallowed because the native context was already gone. */
+  /** OTA-1119 — calls swallowed because the native context was already gone. */
   dormant: number;
-  /** OTA-1146 — homework cut short so the player's call could run. */
+  /** OTA-1123 — homework cut short so the player's call could run. */
   preempted: number;
   error: number;
-  // OTA-1130
+  // OTA-1107
   prefillMs: number;
   decodeMs: number;
   promptTokens: number;
   outTokens: number;
   cachedTokens: number;
-  /** OTA-1131 — prefix tokens llama.cpp did NOT have to re-read, derived
+  /** OTA-1108 — prefix tokens llama.cpp did NOT have to re-read, derived
    *  honestly as `cachedTokens - promptTokens - outTokens`. */
   reusedTokens: number;
   /** Calls that reported a cache size at all, so a zero can be shown as a
    *  measured zero rather than as "no data". */
   cacheSamples: number;
-  /** ⚠ OTA-1150 — MS PER PROMPT TOKEN, BEST AND WORST. The owner: "fix the
+  /** ⚠ OTA-1127 — MS PER PROMPT TOKEN, BEST AND WORST. The owner: "fix the
    *  tracking information in the log so that we can see more clearly what is
    *  affecting number one."
    *
    *  `reuse` has read 0t in every row of every log, before AND after the
-   *  OTA-1144 prefix reorder — which tells us nothing, because a cache that is
+   *  OTA-1121 prefix reorder — which tells us nothing, because a cache that is
    *  working and a `cachedTokens` field that is not reported look identical
    *  through it. The number that CANNOT lie is how long the model took per
    *  prompt token: a cold read on this device measures ~10-13ms/token, and a
@@ -130,11 +130,11 @@ interface JobAggregate {
 const jobs = new Map<string, JobAggregate>();
 let callCount = 0;
 let sink: ((r: QwenCallRecord) => void) | null = null;
-/** OTA-1130 — the most recent recorded call. Every completion is serialized
+/** OTA-1107 — the most recent recorded call. Every completion is serialized
  *  behind the shared native-ML lock (arb159), so exactly one generation is in
  *  flight at a time and "the last call" is unambiguous — which is what lets a
  *  consumer report a discard without threading an id back through the runtime. */
-// OTA-1161 — `preempted` rides along so a discard filed against this call can
+// OTA-1138 — `preempted` rides along so a discard filed against this call can
 // tell "the model returned nothing" apart from "we told it to stop". The owner's
 // log had `item_synthesis preempted 3535ms` followed by `DISCARDED —
 // item_synth:empty` — the second line contradicting the first, because the
@@ -175,7 +175,7 @@ export function recordQwenCall(r: QwenCallRecord): void {
   agg.promptTokens += r.promptTokens ?? 0;
   agg.outTokens += r.outTokens ?? 0;
   agg.cachedTokens += r.cachedTokens ?? 0;
-  // OTA-1131 — the reuse number, derived rather than assumed. llama.cpp
+  // OTA-1108 — the reuse number, derived rather than assumed. llama.cpp
   // reports the cache SIZE after the call; the part it did not have to
   // re-read is whatever that size exceeds this call's own contribution.
   // Floored at zero: a build that reports the field differently must show a
@@ -184,10 +184,10 @@ export function recordQwenCall(r: QwenCallRecord): void {
     agg.cacheSamples += 1;
     agg.reusedTokens += Math.max(0, r.cachedTokens - (r.promptTokens ?? 0) - (r.outTokens ?? 0));
   }
-  // OTA-1150 — the per-token read cost, kept as a range rather than a mean.
+  // OTA-1127 — the per-token read cost, kept as a range rather than a mean.
   // Guarded on a real prefill AND a real prompt size: a preempted call or a
   // zero-token prompt has no honest number and must not move the range.
-  // ⚠ OTA-1162 (audit) — AND ONLY WHEN THE NUMBER IS POSSIBLE. The device log
+  // ⚠ OTA-1139 (audit) — AND ONLY WHEN THE NUMBER IS POSSIBLE. The device log
   // carried `investigate_lore ok 5353ms read 54112ms` — a 54-second prefill
   // inside a 5-second call. llama.rn's `prompt_ms` is native-reported and
   // evidently not always per-call; a physically impossible sample fed straight
@@ -209,10 +209,10 @@ export function qwenCallCount(): number {
   return callCount;
 }
 
-/** ⚠ OTA-1161 — was the call a discard is about to be filed against CUT SHORT
+/** ⚠ OTA-1138 — was the call a discard is about to be filed against CUT SHORT
  *  rather than genuinely empty? An interrupted job returning '' is the
  *  preemption feature working; a model returning '' unprompted is the dormancy
- *  bug OTA-1142 chased for a week. Filing both under one name is exactly how
+ *  bug OTA-1119 chased for a week. Filing both under one name is exactly how
  *  that hunt got long, so callers without their own epoch (item synthesis)
  *  read this before classifying. Valid until noteQwenDiscarded consumes the
  *  call; false when nothing is in flight. */
@@ -220,12 +220,12 @@ export function lastQwenCallPreempted(): boolean {
   return lastCall?.preempted === true;
 }
 
-/** OTA-1130 — the store registers this to log discards as they happen. */
+/** OTA-1107 — the store registers this to log discards as they happen. */
 export function setQwenDiscardSink(fn: ((job: string, reason: string, ms: number) => void) | null): void {
   discardSink = fn;
 }
 
-/** ⚠ OTA-1130 — WASTED WORK. Report that the text from the generation that
+/** ⚠ OTA-1107 — WASTED WORK. Report that the text from the generation that
  *  just finished never reached the player: the narration was cancelled because
  *  you acted again, an ambient line was filtered as a near-duplicate or a
  *  wrong-shaped opener, a flourish came back after you had walked away.
@@ -266,23 +266,30 @@ export interface QwenJobStats {
   avgWaitMs: number;
   maxWaitMs: number;
   empty: number;
-  /** OTA-1142 — swallowed by a dead context, not by a silent model. */
+  /** OTA-1119 — swallowed by a dead context, not by a silent model. */
   dormant: number;
-  /** OTA-1146 — yielded to the player. A success, not a failure. */
+  /** OTA-1123 — yielded to the player. A success, not a failure. */
   preempted: number;
   error: number;
-  // OTA-1130
+  // OTA-1107
   avgPrefillMs: number;
   avgDecodeMs: number;
   avgPromptTokens: number;
   avgOutTokens: number;
   cachedTokens: number;
-  /** OTA-1131 — measured prefix reuse. Zero across a session means every call
-   *  re-reads its whole prompt, which is what makes a stable prompt PREFIX the
-   *  next prefill win rather than a guess. */
+  /** ⚠⚠ OTA-1259 (N4) — ALWAYS ZERO, AND NOT BECAUSE THE CACHE IS COLD. Kept as
+   *  a tombstone so nobody re-derives it: llama.rn reports `tokens_cached` as
+   *  `llama->n_past` (android/src/main/jni.cpp:748), which after a completion is
+   *  prompt tokens + generated tokens WHETHER OR NOT a prefix was reused — reuse
+   *  changes what must be computed, not what ends up in the cache. Subtracting
+   *  those two therefore yields ~0 by construction. **OTA-1108 read that zero as
+   *  "a stable prompt prefix is still on the table"; the premise was wrong.**
+   *  Prefix reuse is already ON (`common_part` in rn-llama.cpp) and our prompts
+   *  already share 53–85% of their text with the previous one. Read
+   *  `bestMsPerPromptTok` / `worstMsPerPromptTok` instead — that is the signal. */
   reusedTokens: number;
   cacheSamples: number;
-  /** OTA-1150 — ms per prompt token, best and worst. The honest cache signal. */
+  /** OTA-1127 — ms per prompt token, best and worst. The honest cache signal. */
   bestMsPerPromptTok: number;
   worstMsPerPromptTok: number;
   prefillSamples: number;
@@ -328,31 +335,34 @@ export function qwenTelemetrySummary(): string {
   const s = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
   const parts = qwenJobStats().map((j) => {
     const wait = j.avgWaitMs >= 500 ? ` wait${s(j.avgWaitMs)}` : '';
-    // OTA-1142 — a swallowed call gets its own mark. ∅ still means "the model
+    // OTA-1119 — a swallowed call gets its own mark. ∅ still means "the model
     // said nothing"; 💀 means "there was no model to say it".
     const bad = (j.empty > 0 ? ` ∅${j.empty}` : '')
       + (j.dormant > 0 ? ` 💀${j.dormant}` : '')
       + (j.error > 0 ? ` err${j.error}` : '');
-    // OTA-1130 — read/write split + prompt size. This is the shape that made
-    // OTA-1129 obvious; now it rides every rollup instead of needing a
+    // OTA-1107 — read/write split + prompt size. This is the shape that made
+    // OTA-1106 obvious; now it rides every rollup instead of needing a
     // code-reading session to reconstruct.
     const split = j.avgPrefillMs > 0 || j.avgDecodeMs > 0
       ? ` read${s(j.avgPrefillMs)}/write${s(j.avgDecodeMs)}`
       : '';
     const sizes = j.avgPromptTokens > 0 ? ` in${j.avgPromptTokens}t→out${j.avgOutTokens}t` : '';
-    // OTA-1131 — reuse, shown as a MEASURED zero when the field was reported.
-    // "no cache line" and "the cache saved us nothing" are different findings
-    // and the OTA-1130 rollup could not tell them apart.
-    // ⚠ OTA-1150 — `reuse` is kept but demoted, and the per-token RANGE is
-    // what the next log gets read for. Shown as best/worst so a warm call and
-    // a cold one stay visible as two different things instead of averaging
-    // into one number that describes neither.
-    const cached = j.cacheSamples > 0 ? ` reuse${j.reusedTokens}t` : '';
+    // ⚠⚠ OTA-1259 (N4) — `reuse` IS NO LONGER PRINTED. It was derived as
+    // `cachedTokens - promptTokens - outTokens`, and llama.rn reports
+    // `tokens_cached` as `n_past` — the sequence position after the call, i.e.
+    // prompt + generated, reuse or no reuse (jni.cpp:748). The subtraction is ~0
+    // BY CONSTRUCTION, so the number could never move and every log that showed
+    // `reuse 0t` was reporting arithmetic, not a cache miss. See `reusedTokens`.
+    // ⚠ OTA-1127's per-token RANGE is the real signal and now stands alone:
+    // best/worst rather than an average, so a warm call and a cold one stay
+    // visible as two different things instead of averaging into one number that
+    // describes neither.
+    const cached = '';
     const perTok = j.prefillSamples > 0
       ? ` ms/tok ${j.bestMsPerPromptTok.toFixed(1)}-${j.worstMsPerPromptTok.toFixed(1)}`
       : '';
     const capped = j.hitLimit > 0 ? ` cap${j.hitLimit}` : '';
-    // OTA-1146 — its own mark, deliberately NOT inside `bad`: yielding to the
+    // OTA-1123 — its own mark, deliberately NOT inside `bad`: yielding to the
     // player is the feature. ⏸ reads as "paused for you", not as a fault.
     const yielded = j.preempted > 0 ? ` ⏸${j.preempted}` : '';
     const waste = j.discarded > 0 ? ` ✂${j.discarded}/${s(j.discardedMs)}` : '';
