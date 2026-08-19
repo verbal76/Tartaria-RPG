@@ -1,5 +1,5 @@
 /**
- * OTA-1363 — the corner mini-map.
+ * OTA-1364 — the corner mini-map.
  *
  * Owner: *"while we are in one of the outposts, how hard would it be to replace
  * the tartarian emblem in the top right corner with a map view that is like the
@@ -32,7 +32,7 @@ const TILES = ['world', 'reclaimers_guild', 'mud_monarchs', 'forgotten_order',
   'true_tartarians', 'eternal_dynasty', 'conspiracy_architects',
   'servants_of_giants', 'stone_builders', 'tartarian_revivalists'];
 
-describe('OTA-1363 — the viewport maths', () => {
+describe('OTA-1364 — the viewport maths', () => {
   it('puts the player dead centre when there is room on every side', () => {
     // 1000×1000 of art in a 100×100 window, player at the middle: the art
     // slides -450 on both axes so its centre lands on the window's centre.
@@ -74,7 +74,7 @@ describe('OTA-1363 — the viewport maths', () => {
     }
   });
 
-  it('⚠⚠ OTA-1363 — THE MARKER SITS ON THE ROOM, EVEN WHERE THE VIEW CLAMPS', () => {
+  it('⚠⚠ OTA-1364 — THE MARKER SITS ON THE ROOM, EVEN WHERE THE VIEW CLAMPS', () => {
     // Owner, comparing the two: *"when you look at it on the regular map you're
     // centered on the room; when you look in the mini map you're not centered
     // under the room all the time."* The clamp is correct — a rim room must not
@@ -149,7 +149,7 @@ describe('OTA-1363 — the viewport maths', () => {
   });
 });
 
-describe('OTA-1363 — the downscaled tiles', () => {
+describe('OTA-1364 — the downscaled tiles', () => {
   it('every tile the component can ask for exists', () => {
     for (const t of TILES) {
       expect({ tile: t, there: existsSync(root('assets', 'minimap', `${t}.png`)) })
@@ -166,7 +166,7 @@ describe('OTA-1363 — the downscaled tiles', () => {
       const png = pngSize('assets', 'minimap', `${t}.png`);
       expect({ t, maxEdge: Math.max(png.width, png.height) }).toEqual({ t, maxEdge: 768 });
       const decodedMb = (png.width * png.height * 4) / 1024 / 1024;
-      // ⚠ OTA-1363 raised the tile 512 → 768 for sharpness (see the generator).
+      // ⚠ OTA-1364 raised the tile 512 → 768 for sharpness (see the generator).
       // The ceiling moves with it, but it is still less than HALF the ~6.0MB the
       // real art would cost, which is the whole point of the tile existing.
       expect(decodedMb).toBeLessThan(2.5);
@@ -222,7 +222,7 @@ describe('OTA-1363 — the downscaled tiles', () => {
   });
 });
 
-describe("OTA-1363 — the owner's two conditions", () => {
+describe("OTA-1364 — the owner's two conditions", () => {
   const exp = src('app', 'screens', 'ExplorationScreen.tsx');
 
   it('⚑ WORLD and ◈ LORE still bracket the tile', () => {
@@ -266,72 +266,76 @@ describe("OTA-1363 — the owner's two conditions", () => {
   });
 });
 
-describe('OTA-1363 — the Atlas pinch stays where your fingers are', () => {
+describe('OTA-1364 — the Atlas gestures do what the owner specified', () => {
   const map = src('app', 'screens', 'MapScreen.tsx');
 
-  /** The solve the handler ships, in isolation:
-   *      t₁ = F₁ − K − (s₁/s₀)·(F₀ − K − t₀)
-   *  K is the box centre in page coordinates, F the pinch midpoint. */
-  const pinch = (
-    s0: number, s1: number, t0: number, f0: number, f1: number, k: number,
-  ) => f1 - k - (s1 / s0) * (f0 - k - t0);
+  // Owner: *"One finger should drag from the point of contact in the direction
+  // of drag. 2 fingers moving apart should zoom in on what the center of the
+  // screen was, together should zoom [out]."*
 
-  it('⚠⚠ the point between the fingers does not move as the scale changes', () => {
-    // The property, stated as the player experiences it: put two fingers on the
-    // thing you care about, spread them, and that thing is still under them.
-    const K = 200, T0 = 0, S0 = 1, F = 260;   // fingers 60px right of centre
-    for (const s1 of [1.2, 2, 3.5, 8]) {
-      const t1 = pinch(S0, s1, T0, F, F, K);
-      // screen position of the content point that was under F, after the zoom
-      const u = (F - K - T0) / S0;
-      expect(Math.round(K + t1 + s1 * u)).toBe(F);
+  /** The whole of a centre-anchored zoom: t₁ = (s₁/s₀)·t₀. */
+  const zoom = (s0: number, s1: number, t0: number) => (s1 / s0) * t0;
+
+  it('⚠⚠ whatever is at the centre of the screen STAYS at the centre', () => {
+    // The layer transforms about its own centre: screen = C + t + s·(p − C).
+    // Take the content point currently at C — (p* − C) = −t₀/s₀ — and check it
+    // is still at C after the zoom, at any scale, from any starting pan.
+    const C = 0; // work in offsets from the centre; C cancels out
+    for (const t0 of [0, 120, -340, 1000]) {
+      for (const [s0, s1] of [[1, 2], [1, 8], [3, 1.5], [2, 2]] as const) {
+        const u = -t0 / s0;                     // content offset at the centre
+        const t1 = zoom(s0, s1, t0);
+        expect(Math.round(C + t1 + s1 * u)).toBe(C);
+      }
     }
   });
 
-  it('⚠ and the OLD behaviour provably did not — this is the drift he saw', () => {
-    // The previous line raised the scale and left the translate alone, so the
-    // layer scaled about the BOX CENTRE and everything else flew away from it,
-    // faster the further out it started.
-    const K = 200, T0 = 0, S0 = 1, F = 260;
-    const u = (F - K - T0) / S0;
-    const oldScreenAt = (s1: number) => K + T0 + s1 * u;
-    expect(Math.round(oldScreenAt(1))).toBe(F);
-    expect(Math.round(oldScreenAt(3))).toBe(380);   // 120px off, and climbing
-    expect(Math.round(oldScreenAt(8))).toBe(680);   // clean off the screen
+  it('apart zooms in, together zooms out', () => {
+    expect(zoom(1, 2, 100)).toBeGreaterThan(100);   // fingers apart
+    expect(zoom(2, 1, 100)).toBeLessThan(100);      // fingers together
   });
 
-  it('a finger moving during the pinch pans, from the same expression', () => {
-    // F₁ moving IS the pan, so the pinch branch never reads gestureState and
-    // therefore cannot double-count it.
-    const K = 200, T0 = 0, S0 = 2;
-    const still = pinch(S0, S0, T0, 260, 260, K);
-    const moved = pinch(S0, S0, T0, 260, 300, K);
-    expect(moved - still).toBe(40);
-  });
-
-  it('the handler computes it that way and stops reading the pan delta', () => {
-    const branch = map.slice(map.indexOf('PINCH ANCHORED ON THE FINGERS'),
+  it('⚠ the pinch does not pan — two fingers set the scale and nothing else', () => {
+    // The centre is the fixed point, so sliding the pair around must not drag
+    // the map underneath it. Panning is the one-finger gesture.
+    const branch = map.slice(map.indexOf('ZOOM ABOUT THE CENTRE OF THE SCREEN'),
       map.indexOf('// Single-finger pan.'));
     expect(branch).toContain('const grow = nextScale / startScale.current;');
-    expect(branch).toContain('mid.x - kx - grow * (startMidX.current - kx - startTx.current)');
-    expect(branch).toContain('mid.y - ky - grow * (startMidY.current - ky - startTy.current)');
+    expect(branch).toContain('const tx = startTx.current * grow;');
+    expect(branch).toContain('const ty = startTy.current * grow;');
     expect(branch).not.toContain('gestureState.dx');
-    expect(branch).not.toContain('gestureState.dy');
+    expect(branch).not.toContain('mid');
+  });
+
+  it('one finger drags 1:1 from the point of contact', () => {
+    const branch = map.slice(map.indexOf('// Single-finger pan.'),
+      map.indexOf('onPanResponderRelease'));
+    expect(branch).toContain('startTx.current + (gestureState.dx - startDx.current)');
+    expect(branch).toContain('startTy.current + (gestureState.dy - startDy.current)');
   });
 
   it('⚠ every baseline re-capture rebases the pan delta too', () => {
-    // The second half of the drift: `gestureState.dx` accumulates from the
-    // first touch of the whole gesture. Each place that re-captures startTx was
-    // folding the travel-so-far into the baseline and then adding it again out
-    // of dx. There are three capture points and all three must rebase.
+    // `gestureState.dx` accumulates from the first touch of the whole gesture.
+    // Each place that re-captures startTx was folding the travel-so-far into
+    // the baseline and then adding it again out of dx, jumping the map on every
+    // change in touch count.
     expect(map.match(/startDx\.current = gestureState\.dx;/g)?.length).toBe(2);
     expect(map).toContain('startDx.current = 0;');
-    expect(map).toContain('(gestureState.dx - startDx.current)');
-    expect(map).toContain('(gestureState.dy - startDy.current)');
   });
 
-  it('the box is measured in page space, because touches arrive in page space', () => {
-    expect(map).toContain('boxRef.current?.measureInWindow(');
-    expect(map).toContain('boxPage.current.x + (imgBox?.width ?? 0) / 2');
+  it('⚠⚠ and none of the page-origin machinery survives, because none is needed', () => {
+    // OTA-1364/1373 anchored on the FINGERS, which needs the box's page origin:
+    // a measureInWindow, a touch-derived fallback, and pointerEvents="none" on
+    // the map layer so the origin could be read off the touch at all. A
+    // centre-anchored zoom asks nothing about where the fingers are, so all of
+    // it is gone. Asserted, because leaving dead coordinate machinery around a
+    // gesture handler is how the next drift gets introduced.
+    // ⚠ the CALL forms, so the comment above the pinch — which explains what
+    // was removed and why, and therefore names all of it — does not trip this.
+    for (const dead of ['boxPage.current', 'ref={boxRef}', '.measureInWindow(',
+      'originFromTouch(', 'refreshBoxOrigin(', 'startMidX.current',
+      'startMidY.current', 'midOf(']) {
+      expect({ dead, present: map.includes(dead) }).toEqual({ dead, present: false });
+    }
   });
 });
