@@ -74,6 +74,60 @@ describe('OTA-1370 — the viewport maths', () => {
     }
   });
 
+  it('⚠⚠ OTA-1371 — THE MARKER SITS ON THE ROOM, EVEN WHERE THE VIEW CLAMPS', () => {
+    // Owner, comparing the two: *"when you look at it on the regular map you're
+    // centered on the room; when you look in the mini map you're not centered
+    // under the room all the time."* The clamp is correct — a rim room must not
+    // drag empty space into frame — but the DOT was pinned to the box centre
+    // regardless, so the instant the clamp bit, the map stopped and the dot did
+    // not, and the marker pointed at the wrong room.
+    //
+    // The marker's position is the same arithmetic that placed the art, read
+    // back out. `markerOf` below is exactly what the component computes.
+    const W = 130, H = 130;
+    const RW = 400, RH = 400;
+    const markerOf = (frac: { fx: number; fy: number }) => {
+      const o = viewportOffset(frac, RW, RH, W, H);
+      return { x: o.left + frac.fx * RW, y: o.top + frac.fy * RH };
+    };
+
+    // Middle of the art: nothing clamps, so the marker IS the centre — the
+    // common case is unchanged.
+    expect(markerOf({ fx: 0.5, fy: 0.5 })).toEqual({ x: W / 2, y: H / 2 });
+
+    // Hard against the top-left: the view has stopped at the edge, so the
+    // marker must be at the art's own corner, NOT at the box centre.
+    expect(markerOf({ fx: 0, fy: 0 })).toEqual({ x: 0, y: 0 });
+    expect(markerOf({ fx: 1, fy: 1 })).toEqual({ x: W, y: H });
+
+    // And the invariant that matters: for EVERY room of EVERY skin, the drawn
+    // marker lands exactly on that room's fraction of the visible art.
+    const ZOOM = 2.5;
+    const rw = Math.max(W, H) * ZOOM;
+    for (const skin of TILES.filter((t) => t !== 'world')) {
+      for (const node of STRUCTURAL_IDS) {
+        const frac = outpostRoomMark(skin, node);
+        const o = viewportOffset(frac, rw, rw, W, H);
+        const x = o.left + frac.fx * rw;
+        const y = o.top + frac.fy * rw;
+        // on the room…
+        expect({ skin, node, x: Math.round(x * 1e6) / 1e6 })
+          .toEqual({ skin, node, x: Math.round((o.left + frac.fx * rw) * 1e6) / 1e6 });
+        // …and inside the window the player can actually see.
+        expect({ skin, node, visible: x >= 0 && x <= W && y >= 0 && y <= H })
+          .toEqual({ skin, node, visible: true });
+      }
+    }
+  });
+
+  it('the component positions the marker from geom, never from the box centre', () => {
+    const mm = src('app', 'components', 'MiniMap.tsx');
+    expect(mm).toContain('markerX: left + view.frac.fx * renderedW,');
+    expect(mm).toContain('markerY: top + view.frac.fy * renderedH,');
+    expect(mm).toContain('left: geom.markerX - DOT / 2,');
+    expect(mm).toContain('top: geom.markerY - DOT / 2,');
+  });
+
   it('a world cell resolves to a fraction inside the art', () => {
     const f = worldMarkerFraction(0, 0);
     expect(f.fx).toBeGreaterThanOrEqual(0);

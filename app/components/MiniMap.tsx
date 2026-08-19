@@ -115,7 +115,30 @@ export function MiniMap({ onPress }: { onPress?: () => void }) {
     const renderedW = coverW * view.zoom;
     const renderedH = renderedW / view.aspect;
     const { left, top } = viewportOffset(view.frac, renderedW, renderedH, box.w, box.h);
-    return { renderedW, renderedH, left, top };
+    // ⚠⚠ OTA-1371 — THE MARKER FOLLOWS THE MAP, IT DOES NOT SIT AT THE CENTRE.
+    // Owner: *"the mini map doesn't quite line up — when you look at it on the
+    // regular map you're centered on the room; when you look in the mini map
+    // you're not centered under the room all the time."* Exactly right, and it
+    // was mine. The viewport CLAMPS at the edges of the art so a room near the
+    // rim does not drag empty space into frame — that part is correct and
+    // deliberate — but the dot was drawn at the box centre unconditionally, so
+    // the moment the clamp bit, the map stopped moving and the dot stayed put
+    // and the two came apart. A marker that is not on your room is worse than
+    // no marker: it is a confident wrong answer.
+    //
+    // The dot's position is the SAME arithmetic that placed the art, read back
+    // out: wherever the room's fraction actually landed after clamping. When
+    // nothing is clamped this is the exact centre, so the common case is
+    // unchanged; at the edges the dot walks off-centre and stays on the room,
+    // which is what the Atlas does and what the owner is comparing against.
+    return {
+      renderedW,
+      renderedH,
+      left,
+      top,
+      markerX: left + view.frac.fx * renderedW,
+      markerY: top + view.frac.fy * renderedH,
+    };
   }, [box, view]);
 
   const body = (
@@ -150,9 +173,22 @@ export function MiniMap({ onPress }: { onPress?: () => void }) {
           {/* ⚠ The marker is DRAWN, not an image. assets/player-marker.png is
               2MB, and at 9pt across a bordered dot is indistinguishable from it
               — the same reasoning that downscaled the maps, applied to the one
-              thing small enough to skip an asset for entirely. */}
-          <View style={styles.markerRing} pointerEvents="none" />
-          <View style={styles.markerDot} pointerEvents="none" />
+              thing small enough to skip an asset for entirely.
+              ⚠⚠ Positioned from geom, NOT centred — see the note above geom. */}
+          <View
+            style={[styles.markerRing, {
+              left: geom.markerX - RING / 2,
+              top: geom.markerY - RING / 2,
+            }]}
+            pointerEvents="none"
+          />
+          <View
+            style={[styles.markerDot, {
+              left: geom.markerX - DOT / 2,
+              top: geom.markerY - DOT / 2,
+            }]}
+            pointerEvents="none"
+          />
         </>
       ) : (
         <Text style={styles.blank}>◈</Text>
