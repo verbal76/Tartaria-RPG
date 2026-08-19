@@ -199,7 +199,7 @@ import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGrac
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
-import { setQwenTelemetrySink, setQwenDiscardSink, noteQwenDiscarded, qwenCallCount, qwenTelemetrySummary, qwenJobStats } from '../ai/generation/qwenTelemetry';
+import { setQwenTelemetrySink, setQwenDiscardSink, noteQwenDiscarded, qwenCallCount, qwenTelemetrySummary, qwenJobStats, nativePressure } from '../ai/generation/qwenTelemetry';
 // OTA-1177 — live llama-context counter. Instrument only; changes no behaviour.
 // OTA-1179 — the ledger is now READ as well as fed: the memory handler compares the
 // release count across a dispose so it can report what it actually freed.
@@ -2827,6 +2827,9 @@ export function runtimePressureSnapshot(): PressureSnapshot {
     memoryWarnings: rpMemoryWarnings,
     lastMemoryWarningAt: rpLastMemoryWarningAt,
     appStateTrail: rpAppStateTrail,
+    // OTA-1359 — the native-ML queue, so the report can say why a session
+    // felt wedged while both JS clocks read clean.
+    native: (() => { try { return nativePressure(); } catch { return undefined; } })(),
     lastVerdict: rpLastVerdict,
     worstFrameGapMs: rpWorstFrameGapMs,
     worstJsGapMs: rpWorstJsGapMs,
@@ -44407,6 +44410,20 @@ async function narrateViaArbiter(
         // instant a real call is enqueued.
         job: opts?.bankOnly ? `narration:${intent}_fill` : `narration:${intent}`,
         homework: opts?.bankOnly === true,
+        // ⚠⚠ OTA-1359 — DECLINE WORK THAT IS ALREADY DEAD. The epoch check
+        // below has always discarded a superseded narration; until now it ran
+        // AFTER the generation, so a line the player had already walked away
+        // from still held the one native-ML lock for its full read+write. The
+        // predicate is the same comparison, asked early enough to matter: at
+        // the door (nothing starts) and per token (writing ends).
+        //
+        // ⚠ FILLS ARE EXEMPT, on purpose. OTA-1258 established that a preempted
+        // fill KEEPS its text — it goes to the bank and is re-vetted at spend
+        // time, so late text is still free text later. Aborting one would throw
+        // away the only kind of output that survives being late.
+        shouldAbort: opts?.bankOnly === true
+          ? undefined
+          : () => myEpoch !== arbiterGenerationEpoch,
       },
     );
     // ⚠⚠ OTA-1258 (N3) — A PREEMPTED FILL KEEPS ITS TEXT INSTEAD OF BINNING IT.

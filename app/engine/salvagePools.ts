@@ -567,7 +567,7 @@ const JUNK_POOL: PoolEntry[] = [
  *  the salvage failed. */
 const JUNK_LINES: string[] = [
   'You strip {target} down. Mostly debris — but a {item} comes loose at the bottom of the pile.',
-  'The {target} yields little of value, though a {item} ends up in your pack.',
+  '{target} yields little of value, though a {item} ends up in your pack.',
   'Slim pickings on {target}. You pocket a {item} on the way out.',
   'You scavenge {target} thoroughly. One {item} survives the sorting.',
 ];
@@ -582,12 +582,26 @@ function pickPool(noun: string): SalvagePool | null {
   return null;
 }
 
+/** ⚠⚠ OTA-1368 — THE ARTICLE IS ADDED HERE, SO NO TEMPLATE MAY ADD ITS OWN.
+ *  The owner's 4.29.260 log caught both halves of the same slip:
+ *
+ *    "The the lantern yields little of value…"     ← template also said "The"
+ *    "the desk gives up something irregular."      ← template starts on {target}
+ *
+ *  `display` always carries an article, so a template that opens with one
+ *  doubles it, and a template that opens with {target} starts the sentence in
+ *  lower case. The templates are the wrong place to fix that — there are twelve
+ *  of them and the next one written will get it wrong again. Instead: this
+ *  function owns the article (as it always did) AND owns the capital, so a
+ *  template may now begin however it likes and read correctly either way. The
+ *  one line that carried its own "The" has had it removed. */
 function format(lines: string[], noun: string, rng: () => number): string {
   const t = noun.trim();
   const hasLeadingArticle = /^(the|a|an|some|my|your|this|that)\s/i.test(t);
   const display = hasLeadingArticle ? t : `the ${t}`;
   const line = lines[Math.floor(rng() * lines.length)] ?? lines[0]!;
-  return line.replace(/\{target\}/g, display);
+  const filled = line.replace(/\{target\}/g, display);
+  return filled.charAt(0).toUpperCase() + filled.slice(1);
 }
 
 function pickWeighted(items: PoolEntry[], rng: () => number): PoolEntry {
