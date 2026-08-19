@@ -108,12 +108,25 @@ describe('OTA-1106 — the fence buys stolen goods', () => {
 
 describe('OTA-1106 — reactions teach tastes', () => {
   it('tasteDiscoveries reveals exactly what the reaction proved', () => {
-    const metal = { name: 'Iron Bar', tags: ['metal'], worth: 50 };
-    expect(tasteDiscoveries('irma_ironhand', metal, 'loved')).toEqual(['loves:metal']);
-    const exact = { name: 'Aether Mud', tags: [], worth: 50 };
-    expect(tasteDiscoveries('irma_ironhand', exact, 'loved')).toEqual(['loves:Aether Mud']);
-    const food = { name: 'Hearty Stew', tags: ['food'], worth: 50 };
-    expect(tasteDiscoveries('irma_ironhand', food, 'polite')).toEqual(['cold:food']);
+    // ⚠ OTA-1176 — was `Iron Bar` / `loves:metal`. `Iron Bar` is not a real item,
+    // and `metal` is no longer one of Irma's loves: it covers Bent Nails and Pry
+    // Bars, so loving it made a heavy armorer indiscriminate. Real item, real tag,
+    // real love.
+    const metal = { name: 'Titanforged Cuirass', tags: ['armor', 'chest', 'titanforged', 'crafted'], worth: 200 };
+    expect(tasteDiscoveries('irma_ironhand', metal, 'loved')).toEqual(
+      expect.arrayContaining(['loves:titanforged', 'loves:chest']),
+    );
+    const exact = { name: 'Behemoth Plate', tags: [], worth: 50 };
+    expect(tasteDiscoveries('irma_ironhand', exact, 'loved')).toEqual(['loves:Behemoth Plate']);
+    // ⚠ OTA-1176 — a matched dislike now reports on the 'disliked' reaction under a
+    // `dislikes:` prefix. It used to ride the 'polite' reaction as `cold:`, which
+    // could not distinguish "they have no use for this" from "they have no opinion".
+    const shroom = { name: 'Blue Cap Mushroom', tags: ['mushroom'], worth: 50 };
+    // Both are learned, and that is right: she dislikes the mushroom BY NAME and
+    // the whole `mushroom` tag, so one gift teaches the specific and the general.
+    expect(tasteDiscoveries('irma_ironhand', shroom, 'disliked')).toEqual(
+      expect.arrayContaining(['dislikes:Blue Cap Mushroom', 'dislikes:mushroom']),
+    );
     // A liked-for-value gift proves nothing about WHO they are.
     expect(tasteDiscoveries('irma_ironhand', { name: 'Gem', tags: ['gem'], worth: 500 }, 'liked')).toEqual([]);
   });
@@ -123,7 +136,7 @@ describe('OTA-1106 — reactions teach tastes', () => {
     useGameStore.setState({
       player: {
         ...p,
-        inventory: [...p.inventory, { id: 'gift_1', name: 'Sentinel Core Plate', kind: 'material', rarity: 'Uncommon', quantity: 1, tags: ['metal'] } as never],
+        inventory: [...p.inventory, { id: 'gift_1', name: 'Behemoth Plate', kind: 'armor', rarity: 'Uncommon', quantity: 1, tags: [] } as never],
       },
       worldMemory: {
         ...useGameStore.getState().worldMemory,
@@ -135,11 +148,15 @@ describe('OTA-1106 — reactions teach tastes', () => {
       pendingGift: { candidates: [{ id: 'irma_ironhand', name: 'Irma Ironhand' }], toId: 'irma_ironhand', toName: 'Irma Ironhand' } as never,
     });
     // Sanity: this is a loved gift by authored prefs, whatever its exact worth.
-    expect(reactionFor('irma_ironhand', { name: 'Sentinel Core Plate', tags: ['metal'], worth: GIFT_FLOOR_TC })).toBe('loved');
+    // ⚠ OTA-1176 — `Sentinel Core Plate` is a real item but its real tags are
+    // ['automation','tech','salvage','scrap','throwable'] — nothing like the
+    // ['metal'] this fixture invented for it, and it is no longer one of Irma's
+    // loves. Use an item she is actually written to want, with its own real tags.
+    expect(reactionFor('irma_ironhand', { name: 'Behemoth Plate', tags: [], worth: GIFT_FLOOR_TC })).toBe('loved');
     useGameStore.getState().giveGift('gift_1');
     const rel = getRelation(useGameStore.getState().worldMemory, 'irma_ironhand');
     expect(rel?.lovedGifts).toBe(1);
-    expect(rel?.giftTastes ?? []).toEqual(expect.arrayContaining(['loves:Sentinel Core Plate']));
+    expect(rel?.giftTastes ?? []).toEqual(expect.arrayContaining(['loves:Behemoth Plate']));
   });
 });
 

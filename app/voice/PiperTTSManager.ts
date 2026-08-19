@@ -21,6 +21,7 @@
 // All errors are swallowed → if the model fails to load, the caller
 // (TTSManager) falls back to expo-speech transparently.
 
+import { Platform } from 'react-native';
 import { Audio } from 'expo-av';
 import { getVoiceSettings } from './voiceSettings';
 import { applyLoreLexicon, cleanForSpeech } from './loreLexicon';
@@ -187,6 +188,32 @@ const VOICE_POOL: Map<string, LoadedVoice> = new Map();
 // once) share one fromModelName promise instead of double-loading.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const LOADING: Map<string, Promise<any | null>> = new Map();
+
+// ⚠⚠ OTA-1355 — THE VENDOR-LOAD COOLDOWN, born from two tombstones. Freeze #4's
+// crash record (tombstone_12, 07:37:38) and the 09:05:21 one both die SIGABRT on
+// an RN_ET_Worker thread INSIDE the Kokoro model load — fromModelName → native
+// Kokoro ctor → phonemis Lexicon build — the second with the abort message
+// 'Scudo ERROR: internal map failure (error desc=Out of memory)'. The load is a
+// hundreds-of-MB native allocation storm, and when the device is already tight
+// it first wedges the whole process (the owner's "input dead, scroll works"
+// freeze) and then aborts it (the crash to home). A device that just refused
+// this allocation must NOT be asked again in two seconds — vendor loads stand
+// down for a cooldown after any load failure, and gameStore's memoryWarning
+// listener calls noteMemoryPressureForVoiceLoads so an OS memory warning opens
+// the same quiet window. The STICKY Arbiter voice is exempt: its load drives
+// the visible state machine and its own retry UX, and it is one resident
+// instance, not churn.
+const VENDOR_LOAD_COOLDOWN_MS = 120_000;
+let vendorLoadCooldownUntil = 0;
+/** Called by gameStore's memoryWarning listener (lazy require — no import
+ *  cycle): the OS is asking for memory back, so do not START a vendor-voice
+ *  load for `quietMs`. Extends, never shortens, an existing window. */
+export function noteMemoryPressureForVoiceLoads(quietMs: number): void {
+  vendorLoadCooldownUntil = Math.max(vendorLoadCooldownUntil, Date.now() + quietMs);
+}
+/** Tests only. */
+export function _vendorLoadCooldownForTest(): number { return vendorLoadCooldownUntil; }
+export function _resetVendorLoadCooldownForTest(): void { vendorLoadCooldownUntil = 0; }
 
 let nextId = 1;
 const queue: QueuedUtterance[] = [];
@@ -563,6 +590,40 @@ let prewarmStarted = false;
  *  to call when the model is already ready (returns immediately). */
 export async function prewarmKokoro(): Promise<void> {
   if (prewarmStarted) return;
+  // ⚠⚠ OTA-1251 — NOT ON DESKTOP. THIS IS THE 51% FREEZE.
+  //
+  // Owner, on the PC build: *"I think the arbiter first time setup has frozen,
+  // it did this before on my Steam Deck. it's been a few minutes and it's
+  // hanging at 51%."* It had not frozen for a few minutes; it was never going
+  // to finish.
+  //
+  // MEASURED, not reasoned about — the web bundle run headless against the same
+  // export the owner installed:
+  //     BOOT_STAGE = qwen:failed
+  //     kokoro     = {"phase":"loading"}      ← still, at t=8s, 20s and 35s
+  //     exec.TextToSpeechModule.fromModelName exists → true
+  // and the owner's own copied diagnostic from the desktop build agrees:
+  //     Platform: web · Boot stage: qwen:failed
+  //
+  // That is the whole bug, and 51% is its arithmetic. The title bar averages the
+  // two engines: Qwen fails fast on desktop (0.10, correct — llama.rn is a native
+  // module and the Arbiter narrates from templates there) and Kokoro sits on
+  // 'loading' (0.92) forever. (0.10 + 0.92) / 2 = 51%, to the digit, permanently.
+  //
+  // WHY IT HANGS: react-native-executorch's JS resolves in a web bundle, so the
+  // `fromModelName` guard below passes — but the call behind it reaches for a
+  // native runtime that isn't there and neither resolves NOR rejects. A promise
+  // that never settles cannot be caught, so no error state was ever reached.
+  //
+  // WHY IT IS PURE WASTE ANYWAY: on web, TTSManager.speak() does not use this
+  // pool at all — it routes to the ONNX kokoro-js engine. So the desktop voice
+  // never needed this prewarm; it only ever needed it not to run.
+  //
+  // ⚠ MOBILE IS UNTOUCHED: Platform.OS is 'ios'/'android' on the HAL line, so
+  // this returns false and the prewarm runs exactly as it always has. Leaving
+  // the state on 'idle' (rather than faking 'ready') is deliberate — speak()
+  // gates on `phase !== 'error'`, so the desktop voice route stays open.
+  if (Platform.OS === 'web') return;
   prewarmStarted = true;
   try {
     // Load the Arbiter voice — sticky, drives the public state machine
@@ -630,8 +691,19 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
   }
   const inFlight = LOADING.get(voiceId);
   if (inFlight) return inFlight;
+  // ⚠ OTA-1251 — the second half of the desktop guard, and the load-bearing one.
+  // The prewarm is the only caller at boot, but a vendor voice swap reaches here
+  // too, and one un-awaited executorch call is all it takes to re-wedge the state
+  // machine at 'loading'. The existing `fromModelName` check below does NOT cover
+  // it: that symbol EXISTS in a web bundle (measured: true) — it just never
+  // settles when called.
+  if (Platform.OS === 'web') return null;
   if (!exec?.TextToSpeechModule?.fromModelName) return null;
   const sticky = voiceId === arbiterVoiceId();
+  // ⚠ OTA-1355 — the cooldown gate (see the block above VENDOR_LOAD_COOLDOWN_MS).
+  // A vendor load is refused while the window is open; the line falls back to
+  // silence (drain's existing null-model path) and the process stays alive.
+  if (!sticky && Date.now() < vendorLoadCooldownUntil) return null;
   // Evict BEFORE registering the new in-flight load so two concurrent
   // ensureLoaded calls don't both pass the capacity gate. Audit caught
   // a race where two vendor swaps in the same tick both saw size=1 +
@@ -664,7 +736,17 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
       if (sticky) setKokoroState({ phase: 'loading' });
       const loadStartedAt = Date.now();
       let downloadEscalated = false;
-      const m = await exec.TextToSpeechModule.fromModelName(
+      // ⚠⚠ OTA-1355 — THE LOAD JOINS THE NATIVE-ML LOCK. arb159 put every
+      // forward() under runExclusiveNativeMl because Qwen + Kokoro running
+      // concurrently crashed the Tensor G5 — but the LOAD stayed outside, and
+      // the load is the single heaviest native-ML op in the app: model mmap +
+      // graph compile + the phonemizer's dictionary build, on executorch's own
+      // worker pool. Both Aug-18 tombstones die exactly there, mid-load, while
+      // other native work could still be in flight. Same rule for every native
+      // ML engine now: create AND run go through the one lock. Post-first-boot
+      // loads are cache hits (the ~100MB model downloads once, at prewarm), so
+      // holding the lock here costs the compile time, not a download.
+      const m = await runExclusiveNativeMl(() => exec.TextToSpeechModule.fromModelName(
         { model: exec.KOKORO_MEDIUM, voice: voiceRefFor(voiceId) },
         (p: number) => {
           if (sticky) {
@@ -689,7 +771,7 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
             }
           }
         },
-      );
+      ), ML_PRIORITY_VOICE);
       step = 'load';
       if (sticky) setKokoroState({ phase: 'loading' });
       step = 'warmup';
@@ -725,6 +807,11 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
       return m;
     } catch (err) {
       const msg = describeErr(err);
+      // ⚠ OTA-1355 — a failed load, whatever the step, means the device just
+      // refused (or choked on) the allocation. Open the cooldown so the next
+      // vendor scene doesn't immediately re-attempt the exact operation that
+      // failed — on a memory-tight device the retry is the one that kills.
+      vendorLoadCooldownUntil = Math.max(vendorLoadCooldownUntil, Date.now() + VENDOR_LOAD_COOLDOWN_MS);
       // Avoid double-recording: warmup catch already wrote a
       // detailed record. For everything else, capture here.
       if (step !== 'warmup') {

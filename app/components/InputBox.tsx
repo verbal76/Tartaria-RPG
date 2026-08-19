@@ -14,15 +14,19 @@ import {
 import { TutorialTarget } from './TutorialTarget';
 import { visibleBuildingRooms } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
-import { TUTORIAL_STEPS } from './tutorialSteps';
-import { playerWeaponReach, useGameStore } from '../state/gameStore';
+import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from './tutorialSteps';
+import { playerWeaponReach, useGameStore, logUiTap } from '../state/gameStore';
 import { useReduceMotion } from '../state/accessibility';
-import { hubRoomFor, isLeaveHubCommand } from '../engine/hub';
+import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 import { reachBandsFor } from '../engine/types';
+// OTA-1170 — the dodge recharge bar reads its fill from one place.
+import { dodgeFill, dodgeCooldownRounds } from '../engine/dodgeCooldown';
+// OTA-1171 — the dodge lock is per difficulty tier; dialOf resolves CUSTOM per system.
+import { dialOf } from '../engine/pressure';
 import type { InventoryItem, CombatRange, PlayerCharacter } from '../engine/types';
 
-/** OTA-1029 — the quick-button highlight reads reach from the SAME resolver the
+/** OTA-1006 — the quick-button highlight reads reach from the SAME resolver the
  *  attack gate rolls with (playerWeaponReach: throwable instance → catalog
  *  row → forge-stamped uniqueStats.reachClass on fused weapons → runecaster
  *  INT gate). The local copy this replaces re-derived reach from the display
@@ -53,7 +57,7 @@ interface Props {
   /** True when there's nothing to lift here (no vendor, no liftable target) —
    *  greys the PICKPOCKET button so it's never a dead tap. */
   pickpocketBlocked?: boolean;
-  /** OTA-1103 — true when a MARK (a person with pockets) is in reach. Lights
+  /** OTA-1080 — true when a MARK (a person with pockets) is in reach. Lights
    *  the PICKPOCKET button the same ready-green the torch uses: the glow
    *  means "this is a live possibility right now", matching the TALK glow's
    *  language one row up. */
@@ -127,13 +131,6 @@ const PEACE_QUICK_DIRECT: Array<{ label: string; submit: string }> = [
   { label: 'rest', submit: 'rest' },
 ];
 
-// arb108 — beats that hold the player in the OUTPOST tutorial lockdown:
-// from the name beat through the stay/leave choice. While locked, only the
-// current beat's instructed control works; everything else buzzes. The lock
-// lifts once the player chooses (tutorialExploreChosen) or the beat advances
-// past explore_or_leave (main_quest / pick_city are post-choice).
-const TUT_LOCK_BEATS = ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'];
-
 // arb132 — STABLE empty-array sentinel for the bandolier selector. A NEW character
 // has no `player.equipped.bandolierIds` yet, so `?? []` returned a FRESH array on
 // every selector run; Zustand's Object.is equality then saw it as "changed" every
@@ -174,7 +171,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const bandolierItems = bandolierIds
     .map((id) => inventory.find((it) => it.id === id))
     .filter((it): it is InventoryItem => !!it && it.quantity > 0);
-  const [text, setText] = useState('');
+  // ⚠⚠ OTA-1270 — the draft lives in the STORE, shared with the floating
+  // KeyboardInputBar. Two private useState copies were how "act doesn't see
+  // any text" happened: the player typed into one field and tapped the other
+  // field's ACT, which read its own empty copy and silently returned.
+  const text = useGameStore((s) => s.explorationDraft);
+  const setText = useGameStore((s) => s.setExplorationDraft);
   const inputRef = useRef<TextInput>(null);
 
   const consumeDraft = useGameStore((s) => s.consumeInputDraft);
@@ -184,14 +186,25 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // the bar used to mount on is dropped ~half the time on Android's New
   // Architecture, which left the bar absent and this field covered.
   const setExplorationInputActive = useGameStore((s) => s.setExplorationInputActive);
-  // OTA-1029 — the whole player, for the shared reach resolver behind the weapon
+  // OTA-1006 — the whole player, for the shared reach resolver behind the weapon
   // quick-button tones (replaces the old intelligence-only read).
   const reachPlayer = useGameStore((s) => s.player ?? null);
+  // OTA-1170 — rounds left on the dodge lockout; 0/absent = ready (full blue).
+  const dodgeCooldown = useGameStore((s) => s.player?.dodgeCooldown ?? 0);
+  // ⚠ OTA-1171 — the bar's DENOMINATOR is this character's difficulty tier, not the bare
+  // constant. Divide bury_me's 5-round lock by 3 and the chip reads full blue with two
+  // beats still locked — a control that visibly invites a tap it will then refuse, which
+  // is the whole defect class OTA-1164 exists to prevent.
+  const dodgeMax = useGameStore((s) => dodgeCooldownRounds(dialOf(s.player, 'dodgeLock')));
   const tutorialStep = useGameStore((s) => s.tutorialStep);
   const awaitingTutorialName = useGameStore((s) => s.awaitingTutorialName);
   const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
   const hubRoomId = useGameStore((s) => s.player?.hubRoomId ?? null);
   const factionId = useGameStore((s) => s.player?.factionId ?? null);
+  // OTA-1186 — the room chips must read the SITE's names, not the player's, or the
+  // exit labels disagree with the room the player is standing in.
+  const hubLocationId = useGameStore((s) => s.player?.currentLocationId ?? null);
+  const skinFactionId = hubSkinFactionFor(hubLocationId, factionId);
   // arb25 — enterable buildings: when inside one, the travel row shows the
   // building's rooms + EXIT instead of cardinals / faction-hub exits.
   const activeBuildingId = useGameStore((s) => s.activeBuildingId);
@@ -280,19 +293,50 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // onPress still submits 'go <direction>' so resolveHubTravel does
   // its existing thing; only the chip LABEL changes. Outside a hub
   // the row renders cardinals as before.
-  const hubRoom = useMemo(() => (hubRoomId ? hubRoomFor(hubRoomId, factionId) : null), [hubRoomId, factionId]);
+  const hubRoom = useMemo(() => (hubRoomId ? hubRoomFor(hubRoomId, skinFactionId) : null), [hubRoomId, skinFactionId]);
+  // ⚠⚠ OTA-1277 — MARK THE ROOMS YOU HAVE ALREADY WALKED. Owner, typed into the
+  // game mid-session: *"I don't know if I've been to a room yet or not. maybe we
+  // should put a little symbol in the room button if it's already been explored.
+  // just so we know cuz I'm tapping the same things over and over again cuz I'm
+  // cycling through like 15 names."* His own log shows exactly that — Memorial
+  // visit 5, Workshop visit 4, Hearth visit 3, all inside seven minutes.
+  // The visited set is the SAME one hub fast-travel already earns off
+  // (worldMemory.hubVisited), so the dot can never disagree with what the game
+  // thinks you have seen.
+  const hubVisited = useGameStore((st) => st.worldMemory.hubVisited);
   const hubExitChips: Array<{ label: string; submit: string }> = useMemo(() => {
     if (!hubRoom) return [];
+    const seen = new Set(hubVisited ?? []);
     const out: Array<{ label: string; submit: string }> = [];
     for (const dir of ['north', 'south', 'east', 'west'] as const) {
       const targetId = hubRoom.exits[dir];
       if (!targetId) continue;
-      const targetRoom = hubRoomFor(targetId, factionId);
-      const label = targetRoom?.shortName?.toUpperCase() ?? dir.toUpperCase();
-      out.push({ label, submit: `go ${dir}` });
+      const targetRoom = hubRoomFor(targetId, skinFactionId);
+      const name = targetRoom?.shortName?.toUpperCase() ?? dir.toUpperCase();
+      // ✓ = already walked. Prefixed rather than suffixed so the marks line up
+      // in a row of four chips and read as a column at a glance.
+      out.push({ label: seen.has(targetId) ? `✓ ${name}` : name, submit: `go ${dir}` });
     }
     return out;
-  }, [hubRoom, factionId]);
+  }, [hubRoom, skinFactionId, hubVisited]);
+
+  // ⚠ OTA-1194 (PUNCHLIST P11) — the EXIT chip belongs only in rooms that HAVE a door out.
+  // Showing it in every room let the player leave through the armory or the mess, which is
+  // not how the outpost is laid out.
+  //
+  // ⚠⚠ OTA-1271 — the owner overruled gate-ONLY from his own playtest ("why is there no
+  // exit button", stranded in the workshop cluster): rooms tagged `exterior_door` in the
+  // layout now carry the chip too (the Workshop's service door is the first). The rule
+  // stays data-driven through roomIsExit — this component decides nothing about WHICH
+  // rooms have doors.
+  //
+  // ⚠ The Gate is also the spawn room, so EXIT is still present where the tutorial's
+  // `explore_or_leave` beat needs it — the beat is unaffected.
+  const showExitChip = useMemo(() => {
+    if (!hubRoom) return false;
+    if (hubDefinesExitRoom()) return roomIsExit(hubRoom);
+    return true;   // no gate tagged anywhere → never strand the player
+  }, [hubRoom]);
 
   // TAKE / SALVAGE / INVESTIGATE during their tutorial beats now OPEN the
   // real picker menu so the player learns the actual interaction — the demo
@@ -319,12 +363,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // had real nouns), and SALVAGE stayed green into the investigate beat.
   // green = the one thing to do now; the completed buttons drop to amber.
   const tutActionBeat =
-    currentBeatId === 'cudgel' || currentBeatId === 'rope'
+    currentBeatId === 'cudgel' || currentBeatId === 'armor' || currentBeatId === 'rope'
       || currentBeatId === 'scrap' || currentBeatId === 'climb'
       || currentBeatId === 'investigate'
       ? currentBeatId : null;
   const takeTone: 'ready' | undefined = tutActionBeat
-    ? (tutActionBeat === 'cudgel' || tutActionBeat === 'rope' ? 'ready' : undefined)
+    ? (tutActionBeat === 'cudgel' || tutActionBeat === 'armor' || tutActionBeat === 'rope' ? 'ready' : undefined)
     : (takeOverride || (takeableCount && takeableCount > 0) ? 'ready' : undefined);
   const salvageTone: 'ready' | undefined = tutActionBeat
     ? (tutActionBeat === 'scrap' ? 'ready' : undefined)
@@ -380,8 +424,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     && TUT_LOCK_BEATS.includes(currentBeatId)
     && !tutorialExploreChosen;
   // The single button the current beat permits (null = none; type/choose).
-  const tutInstructed: 'take' | 'salvage' | 'investigate' | 'climb' | null =
-    currentBeatId === 'cudgel' ? 'take'
+  const tutInstructed: 'look' | 'take' | 'salvage' | 'investigate' | 'climb' | null =
+    // ⚠ OTA-1248 — 'armor' permits the same button as 'cudgel': the vest is TAKEN
+    // from the picker, and the beat then completes on the equip in the pack.
+    currentBeatId === 'look' ? 'look'
+    : currentBeatId === 'cudgel' || currentBeatId === 'armor' ? 'take'
     : currentBeatId === 'scrap' ? 'salvage'
     : currentBeatId === 'investigate' ? 'investigate'
     : currentBeatId === 'climb' ? 'climb'
@@ -391,6 +438,13 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const investigateBlocked = tutLock && tutInstructed !== 'investigate';
   const climbBlocked = tutLock && tutInstructed !== 'climb';
   const approachBlocked = tutLock;
+  // ⚠⚠ OTA-1249 — the look beat's OWN button must survive its own lockdown.
+  // `blocked` beats `tone` inside QuickBtn, so a button that is both instructed
+  // and locked renders GREY: the beat would tell the player to tap the one
+  // control it had just dimmed. REST is the other direct quick button and stays
+  // blocked, which is the whole point — one lit button, nothing else live.
+  const lookBlocked = (submit: string): boolean =>
+    tutLock && !(tutInstructed === 'look' && submit === 'look');
 
   return (
     <View style={styles.container}>
@@ -443,24 +497,31 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 // choice (the player's way out of the outpost + the tutorial).
                 <TravelBtn key={c.submit} label={c.label} onPress={() => onSubmit(c.submit)} blocked={tutLock} />
               ))}
-              <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} blocked={tutLock && currentBeatId !== 'explore_or_leave'} />
+              {showExitChip ? (
+                <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} blocked={tutLock && currentBeatId !== 'explore_or_leave'} />
+              ) : null}
             </>
           ) : sceneBuilding ? (
             // arb36 — a structure stands on this tile: offer ENTER alongside
             // the cardinals so the player can step inside what they found.
+            // ⚠ OTA-1249 — the cardinals carry the lock too. The outpost beats run
+            // in a hub, so today this branch never renders under a live lock; that
+            // is an assumption about spawn, not a guarantee, and it left the one
+            // row that can walk the player out of the tutorial unblocked. Outside
+            // the outpost `tutLock` is false and this costs nothing.
             <>
-              <TravelBtn label="ENTER" onPress={() => enterBuilding(sceneBuilding)} />
-              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} />
-              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} />
-              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} />
-              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} />
+              <TravelBtn label="ENTER" onPress={() => enterBuilding(sceneBuilding)} blocked={tutLock} />
+              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} blocked={tutLock} />
+              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} blocked={tutLock} />
+              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} blocked={tutLock} />
+              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} blocked={tutLock} />
             </>
           ) : (
             <>
-              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} />
-              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} />
-              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} />
-              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} />            </>
+              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} blocked={tutLock} />
+              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} blocked={tutLock} />
+              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} blocked={tutLock} />
+              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} blocked={tutLock} />            </>
           )}
         </TutorialTarget>
       )}
@@ -499,7 +560,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             </View>
 
             <View style={styles.quickRowLine}>
-              {/* OTA-935 — while ELEVATED (fighting atop a climb) dodge, flee, and the golem
+              {/* OTA-912 — while ELEVATED (fighting atop a climb) dodge, flee, and the golem
                   are unavailable and companions are benched below. Say so, so the missing
                   buttons read as a rule, not a bug. */}
               {elevatedOn ? (
@@ -546,7 +607,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               {/* OTA-911 — dodge and flee are off while you're on a climb: no
                   footing to weave a parry, nowhere to flee but straight down.
                   Hidden here (the engine also refuses them defensively). */}
-              {!elevatedOn ? <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} /> : null}
+              {/* OTA-1170 — DODGE carries a recharge bar. Still tappable while red: the
+                  engine buzzes and names the beats left rather than refusing in silence. */}
+              {!elevatedOn ? <QuickBtn label="dodge" defensive cooldownFill={dodgeFill(dodgeCooldown, dodgeMax)} onPress={() => onSubmit('dodge')} /> : null}
               {/* OTA-847 (STEALTH SYSTEM) — in-combat STEALTH. First action of the
                   fight = SNEAK ATTACK (free STE check for the drop); mid-combat =
                   BACKSTAB attempt (costs your turn, STE initiative race). The
@@ -588,7 +651,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 // a static, unlit button with nothing drawing the player to
                 // it (playtest: "nothing's drawing you to that button").
                 tone={currentBeatId === 'look' && qa.submit === 'look' ? 'ready' : undefined}
-                blocked={tutLock}
+                blocked={lookBlocked(qa.submit)}
               />
             ))}
             {raceAbilityReady && onOpenRaceAbilities && !tutLock ? (
@@ -600,17 +663,26 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               tone={investigateTone}
               blocked={investigateBlocked}
             />
+            {/* ⚠⚠ OTA-1233 — ONE BUTTON. TAKE and SALVAGE were two buttons over the
+                same list of scene nouns, and the seam between them is where
+                OTA-1231's bugs lived. The merged picker (GatherModal) shows the
+                room once and chooses the verb per row.
+
+                ⚠ The TUTORIAL OVERRIDES ARE BOTH HONOURED HERE. Its 'cudgel' beat
+                drives `takeOverride` and its 'scrap' beat drives
+                `salvageOverride`, and each beat force-shows its own prop. With one
+                button, whichever override is armed wins — take first, because the
+                cudgel beat comes first and a beat that cannot be tapped is a
+                stalled tutorial, which is the one failure this merge must not
+                introduce.
+
+                ⚠ Tone and blocked-state OR the two, so the button lights when
+                EITHER kind of thing is present and only greys when neither is. */}
             <QuickBtn
-              label="take"
-              onPress={takeOverride ?? onOpenTake}
-              tone={takeTone}
-              blocked={takeBlocked}
-            />
-            <QuickBtn
-              label="salvage"
-              onPress={salvageOverride ?? onOpenSalvage}
-              tone={salvageTone}
-              blocked={salvageBlocked}
+              label="take / salvage"
+              onPress={takeOverride ?? salvageOverride ?? onOpenTake}
+              tone={takeTone ?? salvageTone}
+              blocked={takeBlocked && salvageBlocked}
             />
             {!elevatedOn ? (
               <QuickBtn
@@ -641,7 +713,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             )}
             {(moreOpen || tutLock) && (
               <>
-                {/* OTA-1103 — ready-green while a mark is in reach, matching
+                {/* OTA-1080 — ready-green while a mark is in reach, matching
                     the TALK glow's "live possibility" language. Blocked still
                     wins (tone resolves to none). */}
                 <QuickBtn label="pickpocket" onPress={onOpenPickpocket} blocked={approachBlocked || !!pickpocketBlocked} tone={pickpocketPossible ? 'ready' : undefined} />
@@ -703,7 +775,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             style={styles.input}
             value={text}
             onChangeText={setText}
-            // OTA-1098 — owner, at the rope beat: "the text bar didn't pop up
+            // OTA-1075 — owner, at the rope beat: "the text bar didn't pop up
             // with the keyboard, i had to back up and hit it again." Android
             // intermittently drops the native tap→focus→keyboard chain
             // (worst while a JS-driven pulse animation is saturating the
@@ -754,6 +826,7 @@ function QuickBtn({
   tone,
   blocked,
   outOfRange,
+  cooldownFill,
 }: {
   label: string;
   onPress: () => void;
@@ -769,6 +842,11 @@ function QuickBtn({
    *  used to treat an out-of-range attack as a free approach, which let
    *  PUNCH double as APPROACH. Now you must hit APPROACH yourself. */
   outOfRange?: boolean;
+  /** ⚠ OTA-1170 — COOLDOWN FILL, 0…1. Undefined on every chip without a cooldown, which
+   *  is all of them but DODGE. 0 renders full red (just used), 1 renders full blue (ready).
+   *  ⚠ The chip stays TAPPABLE while red: the engine answers with a buzz and a line naming
+   *  the beats remaining, because a control that refuses in silence is the OTA-1164 bug. */
+  cooldownFill?: number;
 }) {
   const resolvedTone: QuickBtnTone | undefined = blocked
     ? undefined
@@ -792,6 +870,11 @@ function QuickBtn({
     blocked && styles.quickDisabledText,
   ];
   const handlePress = () => {
+    // ⚠ OTA-1172 — THE BREADCRUMB, AND IT IS FIRST ON PURPOSE. The freeze report had no
+    // record of a tap between the last salvage and 90 seconds of silence, so there was no
+    // way to tell "the tap never arrived" (screen frozen) from "the tap arrived and the
+    // work hung" (engine frozen). Moving this below any handler destroys that signal.
+    logUiTap(label);
     if (blocked) {
       // arb109 — wrong control for this tutorial beat. A stronger double-pulse
       // (clearly an "error" buzz, not a tap) PLUS an on-screen Arbiter nudge,
@@ -814,9 +897,23 @@ function QuickBtn({
       style={containerStyle}
       onPress={handlePress}
       accessibilityRole="button"
-      accessibilityLabel={label}
+      accessibilityLabel={cooldownFill !== undefined && cooldownFill < 1
+        ? `${label}, recharging, ${Math.round(cooldownFill * 100)} percent`
+        : label}
       accessibilityState={{ disabled: !!blocked }}
     >
+      {/* ⚠ OTA-1170 — THE RECHARGE BAR, behind the label. Owner: "have it turn red and
+          slowly fill back to blue… make the color fill left to right with no fade."
+          Two absolute layers: red across the whole chip, then blue laid over it from the
+          left to `cooldownFill`. No gradient and no Animated value anywhere — the fill is
+          a hard edge that JUMPS one step per action, because the cooldown counts ROUNDS,
+          not seconds, and a smooth tween would imply time is what refills it. */}
+      {cooldownFill !== undefined && cooldownFill < 1 ? (
+        <>
+          <View style={styles.cooldownTrack} pointerEvents="none" />
+          <View style={[styles.cooldownFill, { width: `${Math.max(0, Math.min(1, cooldownFill)) * 100}%` }]} pointerEvents="none" />
+        </>
+      ) : null}
       <Text style={textStyle}>{label.toUpperCase()}</Text>
     </TouchableOpacity>
   );
@@ -828,6 +925,7 @@ function TravelBtn({ label, onPress, blocked, active }: { label: string; onPress
   // buzz (double-pulse) + drop an Arbiter nudge instead of moving, so the
   // player can't wander off-script and gets clear "wrong" feedback.
   const handlePress = () => {
+    logUiTap(label); // OTA-1172 — before any handler; see the note in QuickBtn.
     if (blocked) { buzzWrong(); useGameStore.getState().nudgeTutorialBlocked(); return; }
     onPress();
   };
@@ -845,7 +943,7 @@ function TravelBtn({ label, onPress, blocked, active }: { label: string; onPress
         numberOfLines={isDestination ? 2 : 1}
         ellipsizeMode="tail"
         adjustsFontSizeToFit={!isDestination}
-        minimumFontScale={0.8} // OTA-1048 — was 0.55; below ~80% room names stop being readable
+        minimumFontScale={0.8} // OTA-1025 — was 0.55; below ~80% room names stop being readable
       >
         {active ? `▸ ${label}` : label}
       </Text>
@@ -858,7 +956,7 @@ const styles = StyleSheet.create({
   quickRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
   quickRowColumn: { flexDirection: 'column', gap: 6 },
   quickRowLine: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
-  // OTA-935 — elevated-fight notice chip (why dodge/flee/companions are gone).
+  // OTA-912 — elevated-fight notice chip (why dodge/flee/companions are gone).
   elevatedNote: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 0.3, paddingVertical: 4, paddingHorizontal: 2 },
   dogPicker: { flexDirection: 'row', gap: 8, marginTop: 6 },
   dogPickerBtn: {
@@ -893,14 +991,14 @@ const styles = StyleSheet.create({
   bandolierInRange: { borderColor: '#4f7a3a' },
   bandolierOutOfRange: { borderColor: '#7a2f2f', backgroundColor: '#241211' },
   bandolierOutOfRangeLabel: { color: '#c45b4a' },
-  // OTA-1048 — WRAP, don't shrink. Five equal-width slots on a phone left
+  // OTA-1025 — WRAP, don't shrink. Five equal-width slots on a phone left
   // ~80pt per button and adjustsFontSizeToFit took "MATERIALS" down to
   // 55% font — unreadable (owner, in Asgardar: "the text is too small to
   // read"). The row now wraps onto a second line once buttons would drop
   // under ~92pt, and the shrink floor is raised so text stays legible.
   travelRow: { flexDirection: 'row', gap: 6, marginBottom: 6, flexWrap: 'wrap' },
   travelBtn: {
-    flexGrow: 1, // OTA-1048 — grow to fill, but never below minWidth (wrap instead)
+    flexGrow: 1, // OTA-1025 — grow to fill, but never below minWidth (wrap instead)
     flexBasis: '22%',
     minWidth: 92,
     backgroundColor: '#1a1714',
@@ -940,8 +1038,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 4,
+    // OTA-1170 — clips the cooldown fill to the chip's rounded corners.
+    overflow: 'hidden',
   },
   quickDefensive: { borderColor: '#6a9bbf' },
+  // ⚠ OTA-1170 — the dodge recharge bar. Two absolute layers INSIDE the chip and behind
+  // the label, clipped by the chip's own radius. `overflow: 'hidden'` on `quick` is what
+  // keeps the fill from spilling past the rounded corners.
+  // ⚠ NO GRADIENT, NO ANIMATION. Owner: "fill left to right with no fade." The blue is a
+  // flat block whose WIDTH jumps one step per action; the red is simply what shows where
+  // the blue has not reached yet. Blue matches `quickDefensive`'s border, so a full bar
+  // reads as the chip's ordinary ready state rather than as a new colour.
+  cooldownTrack: { position: 'absolute', left: 0, top: 0, bottom: 0, right: 0, backgroundColor: '#4a1f1a' },
+  cooldownFill: { position: 'absolute', left: 0, top: 0, bottom: 0, backgroundColor: '#24455c' },
   // arb86 — was backgroundColor '#1a201410' (alpha ~6% → near-transparent).
   // Against the old near-black bg it read as a faint green tint, but with the
   // player-tunable background a bright hue FLOODED through the chip ("weird

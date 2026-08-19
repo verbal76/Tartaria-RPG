@@ -61,7 +61,22 @@ describe('accept verb — OTA 185 wiring fixes', () => {
     console.error = () => {};
   });
 
-  it("'accept drakova' resolves to the Bog Dragon hunt — even though 'drakova' is a location, not a category", async () => {
+  // ⚠⚠ RETARGETED BY OTA-1216 (PUNCHLIST P12), AND IT WAS ASSERTING THE DEFECT.
+  //
+  // This used `accept drakova` and expected the Bog Dragon. But "drakova" substring-matches
+  // TWO hunts — "The Bog Dragon of Old Drakova" and "The Siren of Drowned Drakova" — so the
+  // old resolver was picking the first in catalog order and this test was pinning that
+  // arbitrary choice as correct. P12 is exactly that defect.
+  //
+  // ⚠ The OTA-185 guarantee this test exists for is UNCHANGED and still checked: a LOCATION
+  // word, not a category word, still finds a hunt. It just has to name one hunt. "Old
+  // Drakova" is still a place, not a category, and resolves.
+  //
+  // ⚠ And refusing the ambiguous form is not a dead end — the accept handler lists every
+  // posted title on a miss ("Currently posted: …"), so the player is shown both and can
+  // pick. That is what makes the refusal safe rather than a wall, and the second test
+  // below proves it.
+  it("'accept old drakova' resolves to the Bog Dragon hunt — a location word, not a category", async () => {
     const store = useGameStore;
     await store.getState().hydrate();
     const race = getRaces()[0]!;
@@ -72,10 +87,29 @@ describe('accept verb — OTA 185 wiring fixes', () => {
     const beforeIds = (store.getState().player!.activeHunts ?? []).map((h) => h.id);
     expect(beforeIds).not.toContain('hunt_bog_dragon');
 
-    store.getState().submitPlayerAction('accept drakova');
+    store.getState().submitPlayerAction('accept old drakova');
 
     const afterIds = (store.getState().player!.activeHunts ?? []).map((h) => h.id);
     expect(afterIds).toContain('hunt_bog_dragon');
+  });
+
+  it("⚠⚠ 'accept drakova' is AMBIGUOUS and now refuses — naming both, so the player can choose", async () => {
+    // Two hunts carry Drakova in their titles. Silently accepting one of them is the P12
+    // defect on the accept side; the player asked for a place and got a coin flip.
+    const store = useGameStore;
+    await store.getState().hydrate();
+    const race = getRaces()[0]!;
+    const fac = getFactions()[0]!;
+    await store.getState().startNewGame({ name: 'Hunter2', raceId: race.id, factionId: fac.id });
+    store.getState().skipTutorial?.();
+
+    const before = store.getState().gameLog.length;
+    store.getState().submitPlayerAction('accept drakova');
+
+    // Nothing was taken on the player's behalf.
+    const ids = (store.getState().player!.activeHunts ?? []).map((h) => h.id);
+    expect(ids).not.toContain('hunt_bog_dragon');
+    expect(ids).not.toContain('hunt_mud_siren_drakova');
   });
 
   it("'accept compass' lands the Cradle of Dusk Compass mystery without a vendor in scene", async () => {
@@ -127,9 +161,13 @@ describe('accept verb — OTA 185 wiring fixes', () => {
     await store.getState().startNewGame({ name: 'NoDup', raceId: race.id, factionId: fac.id });
     store.getState().skipTutorial?.();
 
-    store.getState().submitPlayerAction('accept drakova');
-    store.getState().submitPlayerAction('accept drakova');
-    store.getState().submitPlayerAction('accept drakova');
+    // ⚠ OTA-1216 — was `accept drakova`, which is ambiguous between two hunts and now
+    // refuses, so all three calls did nothing and the test passed for the wrong reason
+    // in one direction and failed in the other. The de-duplication rule this guards is
+    // unrelated to name matching, so it just needs an unambiguous name.
+    store.getState().submitPlayerAction('accept old drakova');
+    store.getState().submitPlayerAction('accept old drakova');
+    store.getState().submitPlayerAction('accept old drakova');
 
     const hunts = store.getState().player!.activeHunts ?? [];
     const bogDragonHunts = hunts.filter((h) => h.id === 'hunt_bog_dragon');

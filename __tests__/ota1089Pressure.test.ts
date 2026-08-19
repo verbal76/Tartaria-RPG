@@ -286,9 +286,22 @@ describe('OTA-1089 — in the real store', () => {
   });
 
   it('the hostile-ground gate exempts a bounty you took on purpose', () => {
-    const fn = store.slice(store.indexOf('PHASE 4 HOSTILE GROUND'), store.indexOf('PHASE 4 HOSTILE GROUND') + 1400);
+    const fn = store.slice(store.indexOf('PHASE 4 HOSTILE GROUND'), store.indexOf('PHASE 4 HOSTILE GROUND') + 2400);
     expect(fn).toContain('if (!bountyTargets.has(hostile.factionId))');
-    expect(fn).toContain('hostileHuntChance(player.factionStanding, profileOf(player))');
+    // ⚠ OTA-1179 RETARGET, NOT A REGRESSION. This used to pin the literal
+    // `hostileHuntChance(player.factionStanding, profileOf(player))`. The claim it
+    // was making — the ambush is gated by hostileHuntChance, on the pressure
+    // profile — is unchanged and is still asserted. Only the first ARGUMENT moved:
+    // the whole standing table reduced to your worst standing with anybody, so a
+    // patrol qualified on its own faction and then rolled at another faction's
+    // rate. It now passes the single hostile row, which is what `depth` was always
+    // documented to mean. Pinned in the new shape so the fix cannot be undone.
+    expect(fn).toContain('hostileHuntChance(');
+    expect(fn).toContain('profileOf(player)');
+    expect(fn).toContain("player.factionStanding.find((r) => r.factionId === hostile.factionId)");
+    expect(fn).toContain('hostileStanding ? [hostileStanding] : []');
+    // ...and it is NOT handed the whole table any more.
+    expect(fn).not.toContain('hostileHuntChance(player.factionStanding');
   });
 
   it('the tide reaches the price through the shared price parts', () => {

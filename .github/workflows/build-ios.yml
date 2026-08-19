@@ -115,6 +115,24 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
+      # ⚠⚠ OTA-1205 — THE PREVIEW PROFILE HAS NEVER BEEN ABLE TO BUILD, AND IT IS THE
+      # DEFAULT. `preview` is `distribution: internal` (eas.json), which needs ad-hoc
+      # provisioning credentials this project does not hold — see the notes at the bottom
+      # of this file recording the same failure twice already (arb172, OTA-302: "the
+      # preview profile (no internal-distribution creds) failed").
+      #
+      # ⚠ So EVERY ordinary push that reaches this workflow ends in a red iOS X for a
+      # reason that has nothing to do with iOS. Two consequences, and the second is the
+      # dangerous one:
+      #   1. It trained me to read the failure as expected noise — I reported it to the
+      #      owner on 2026-08-09 as "pre-existing, not from these changes", which was true
+      #      and also exactly what someone would say about a real regression.
+      #   2. A GENUINE iOS build failure would look identical. The signal is unusable.
+      #
+      # This skips cleanly instead of failing. A red iOS check now means something.
+      # ⚠ NOTHING ABOUT CREDENTIALS IS TOUCHED — this only stops attempting a build that
+      # cannot succeed. To make a real (TestFlight-ready) IPA, lead the commit title with
+      # [build-ios], push a v*-ios tag, or dispatch with profile=production.
       - name: Determine build profile
         id: meta
         env:
@@ -203,7 +221,24 @@ jobs:
           fi
           echo "✓ EXPO_TOKEN is set."
 
+      - name: Skip — preview profile has no internal-distribution credentials
+        if: steps.meta.outputs.profile != 'production'
+        run: |
+          echo "::notice::iOS build SKIPPED — profile '${{ steps.meta.outputs.profile }}'"
+          echo ""
+          echo "The 'preview' profile is distribution:internal and needs ad-hoc"
+          echo "provisioning credentials this project does not hold, so it has never"
+          echo "produced a build. Skipping rather than failing, so that a RED iOS check"
+          echo "means a real problem."
+          echo ""
+          echo "To build a TestFlight-ready IPA, do ONE of:"
+          echo "  * title the commit:  [build-ios] OTA-XXX — description"
+          echo "    (add [submit-ios] too, to auto-submit to TestFlight)"
+          echo "  * push a tag matching v*-ios"
+          echo "  * run this workflow manually with profile=production"
+
       - name: EAS Build (iOS, non-interactive) — with optional auto-submit
+        if: steps.meta.outputs.profile == 'production'
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           # Auth + credentials state (as of 2026-05-31):

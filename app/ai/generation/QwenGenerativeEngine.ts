@@ -3,6 +3,7 @@ import {
   LlamaRuntime,
   type QwenChatMessage,
 } from './LlamaRuntime';
+import { noteStragglerTornDown } from './contextLedger';
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -228,6 +229,13 @@ export class QwenGenerativeEngine {
         // OTA-1107 — dispose() landed while the context was loading. The app
         // wanted the memory back; a straggler load must not resurrect a
         // ~400MB context in the background. Tear the fresh one down.
+        //
+        // ⚠ OTA-1200 — COUNTED, BECAUSE READING THIS CODE IS NOT THE SAME AS WATCHING IT
+        // RUN. This guard looks correct on the page, and it was still the leading orphan
+        // suspect after the 1.9GB jetsam reports — precisely because nothing proved it
+        // executes. If the device log shows orphans climbing while this counter sits at
+        // 0, the guard is not running and the read was wrong.
+        noteStragglerTornDown();
         try { await runtime.dispose(); } catch { /* best effort */ }
         this.status = 'idle';
         this.runtime = null;

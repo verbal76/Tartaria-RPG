@@ -28,11 +28,20 @@ export function MissionCompleteModal() {
   const clear = useGameStore((s) => s.clearMissionCompleteNotice);
 
   const hasFlavor = !!notice?.flavor?.length;
+  // ⚠ OTA-1186 — a card may size its OWN valve, never shrink it. The bounty primer is
+  // four paragraphs of rules a player meets exactly once in a playthrough, and there is
+  // no second showing; sixty seconds is a real chance of it closing mid-read. Still only
+  // a valve — Math.max keeps it at or above the shared default, and dismissal is still
+  // the way out.
+  const holdMs = Math.max(
+    notice?.holdMs ?? 0,
+    hasFlavor ? AUTO_CLOSE_FLAVOR_MS : AUTO_CLOSE_MS,
+  );
   useEffect(() => {
     if (!notice) return;
-    const t = setTimeout(() => clear(), hasFlavor ? AUTO_CLOSE_FLAVOR_MS : AUTO_CLOSE_MS);
+    const t = setTimeout(() => clear(), holdMs);
     return () => clearTimeout(t);
-  }, [notice, clear, hasFlavor]);
+  }, [notice, clear, holdMs]);
 
   if (!notice) return null;
 
@@ -55,7 +64,11 @@ export function MissionCompleteModal() {
               <Text key={`f${i}`} style={styles.flavor}>{f}</Text>
             ))}
             {flavor.length > 0 && notice.rewards.length > 0 ? (
-              <Text style={styles.takeLabel}>THE TAKE</Text>
+              // ⚠ OTA-1186 — overridable, because the lines under it are not always a
+              // TAKE. The bounty primer's are the rules of the job, and calling four
+              // facts about how bounties work "THE TAKE" reads as a payout the player
+              // never received.
+              <Text style={styles.takeLabel}>{notice.takeLabel ?? 'THE TAKE'}</Text>
             ) : null}
             {notice.rewards.map((r, i) => (
               <Text key={`r${i}`} style={styles.reward}>✦ {r}</Text>

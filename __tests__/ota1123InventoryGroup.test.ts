@@ -1,6 +1,10 @@
-// OTA-1123 — THE INVENTORY LEARNS THE SAME GRIP.
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
+// OTA-1100 — THE INVENTORY LEARNS THE SAME GRIP.
 //
-// Owner, after OTA-1122's group sell: "yes wire drop, fusable select and scrap
+// Owner, after OTA-1099's group sell: "yes wire drop, fusable select and scrap
 // the same way."
 //
 // The point is the sameness. One gesture, one meaning, wherever you are: HOLD a
@@ -58,7 +62,7 @@ import { join } from 'path';
 const src = (p: string): string => readFileSync(join(__dirname, '..', p), 'utf8');
 const view = src('app/screens/InventoryScreen.tsx');
 
-describe('OTA-1123 — DROP is instance-exact', () => {
+describe('OTA-1100 — DROP is instance-exact', () => {
   beforeEach(async () => {
     await useGameStore.getState().hydrate();
     await useGameStore.getState().startNewGame({ name: 'Holder', raceId: 'reclaimer', factionId: 'reclaimers_guild' });
@@ -93,7 +97,7 @@ describe('OTA-1123 — DROP is instance-exact', () => {
   });
 });
 
-describe('OTA-1123 — one gesture, one meaning', () => {
+describe('OTA-1100 — one gesture, one meaning', () => {
   it('HOLD starts a group anywhere in the inventory; TAP adds once one is open', () => {
     expect(view).toContain('const beginInvSelect = (id: string) => { setInvSelectMode(true); setInvSelected([id]); };');
     // Checked FIRST in the tap handler so it beats every other tap meaning on
@@ -117,7 +121,7 @@ describe('OTA-1123 — one gesture, one meaning', () => {
   });
 });
 
-describe('OTA-1123 — the group can only do what one tap could', () => {
+describe('OTA-1100 — the group can only do what one tap could', () => {
   it('DROP skips worn and quest-bound rows, exactly as the drop verb does', () => {
     expect(view).toContain('const droppable = selectedItems.filter((i) => !isQuestLockedItem(i) && !wornIds.has(i.id));');
   });
@@ -129,7 +133,7 @@ describe('OTA-1123 — the group can only do what one tap could', () => {
     expect(view).toContain('const scrappable = selectedItems.filter((i) => !isQuestLockedItem(i) && canScrap(i));');
   });
 
-  it('RESERVE / RELEASE route through the OTA-1120 bulk action, not a second path', () => {
+  it('RESERVE / RELEASE route through the OTA-1097 bulk action, not a second path', () => {
     expect(view).toContain('reserveManyForFusion(reservable.map((i) => i.id), true);');
     expect(view).toContain('reserveManyForFusion(releasable.map((i) => i.id), false);');
     expect(view).toContain('const reservable = selectedItems.filter((i) => !isQuestLockedItem(i) && !i.reservedForFusion && isFusionEligible(i));');
@@ -139,7 +143,9 @@ describe('OTA-1123 — the group can only do what one tap could', () => {
     expect(view).toContain('{droppable.length > 0 && (');
     expect(view).toContain('{scrappable.length > 0 && (');
     expect(view).toContain('DROP {droppable.length}');
-    expect(view).toContain('SCRAP {scrappable.length}');
+    // ⚠ OTA-1243 — the label reads SALVAGE now; the predicate names are code,
+    // not copy, and stay as they were.
+    expect(view).toContain('SALVAGE {scrappable.length}');
     // …and when NOTHING can act, the bar says why rather than going blank.
     expect(view).toContain('quest-bound items stay with you');
   });
@@ -170,7 +176,7 @@ describe('OTA-1123 — the group can only do what one tap could', () => {
   });
 
   it('the FUSABLE banner now names the hold, and points at where per-unit lives', () => {
-    // OTA-1120's long-press-opens-the-sheet hatch is gone (the hold is the group
+    // OTA-1097's long-press-opens-the-sheet hatch is gone (the hold is the group
     // now), so the banner has to say where the single-unit control went.
     expect(view).toContain('hold a row to build a group');
     expect(view).toContain('switch sort and tap the item');

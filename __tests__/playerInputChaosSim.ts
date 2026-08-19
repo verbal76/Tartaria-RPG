@@ -268,45 +268,49 @@ describe('OTA-110-CHAOS — playerInputChaosSim', () => {
       expect(errors.length).toBe(0);
     });
 
-    it('head-noun match resolves the right item ≥95% of the time (single-name inventory)', () => {
-      // For each item in the catalog, put ONLY that item into the
-      // inventory, ask the parser with a random adjective + the
-      // item's head noun, and check resolvedItemId points back.
-      // Single-name inventory means there's no ambiguity from
-      // collision with another item — this isolates the head-noun
-      // pass itself.
+    it('⚠ OTA-1346 — honest inputs resolve ≥95%; INVENTED adjectives refuse ≥95% (the OTA-1172 contract)', () => {
+      // ⚠ RETARGETED (owner greenlight, 2026-08-17). This test spent months red at
+      // 0.03 asserting the contract OTA-1172 deliberately REPLACED: it fed a WRONG
+      // adjective against a single-item inventory ("use the monarch blade" vs a
+      // Rusted Blade) and demanded a match — but OTA-1172's own words are that
+      // when "the input DID carry a token no candidate accounts for — return
+      // undefined, because a miss is recoverable and a confident wrong answer
+      // spends an item." So the sweep now asserts BOTH halves, which is the
+      // version that would have caught OTA-1172's own bug in the first place:
+      //   honest inputs (the item's real words) resolve ≥95%;
+      //   invented-adjective inputs are REFUSED ≥95%.
       const rand = mulberry32(0xDEADBEEF);
-      let hits = 0;
-      let misses = 0;
+      let honestHits = 0; let honestTotal = 0;
+      let inventedRefusals = 0; let inventedTotal = 0;
       const sampleMisses: string[] = [];
-      // Cap the sweep at 400 items for runtime; the catalog is 600+
-      // but 400 samples is enough to detect a regression.
       const sample = allItemNames.slice(0, 400);
       for (const name of sample) {
         const inv = [nameToInventoryItem(name, 0)];
-        const adj = ADJECTIVES[Math.floor(rand() * ADJECTIVES.length)]!;
         const head = headNounOf(name);
-        // 1-character head nouns can't fuzzy-match safely; the
-        // parser's STOPWORDS / FILLER lists may also swallow some
-        // (e.g. 'one', 'all'). Skip these so the metric reflects the
-        // actual head-noun matcher.
         if (head.length < 3) continue;
-        const input = `use the ${adj} ${head}`;
-        const parsed = parseInput(input, { inventory: inv });
-        if (parsed.resolvedItemId === inv[0]!.id) {
-          hits++;
-        } else {
-          misses++;
-          if (sampleMisses.length < 8) sampleMisses.push(`${name} ← "${input}"`);
-        }
+        // Half 1 — HONEST: the bare head noun, which the item fully accounts for.
+        honestTotal++;
+        const honest = parseInput(`use the ${head}`, { inventory: inv });
+        if (honest.resolvedItemId === inv[0]!.id) honestHits++;
+        else if (sampleMisses.length < 8) sampleMisses.push(`HONEST ${name} ← "use the ${head}"`);
+        // Half 2 — INVENTED: a random adjective the item's own name does not
+        // carry. Skip coincidental overlaps (adj 'iron' vs an Iron Spear IS
+        // honest) so the metric measures pure invention.
+        const adj = ADJECTIVES[Math.floor(rand() * ADJECTIVES.length)]!;
+        if (name.toLowerCase().includes(adj.toLowerCase())) continue;
+        inventedTotal++;
+        const invented = parseInput(`use the ${adj} ${head}`, { inventory: inv });
+        if (invented.resolvedItemId !== inv[0]!.id) inventedRefusals++;
+        else if (sampleMisses.length < 8) sampleMisses.push(`INVENTED ${name} ← "use the ${adj} ${head}" (confidently WRONG)`);
       }
-      const total = hits + misses;
-      const rate = hits / total;
-      if (rate < 0.95) {
-        process.stderr.write(`HEAD_NOUN_HIT_RATE ${(rate * 100).toFixed(1)}% (${hits}/${total})\n`);
-        for (const m of sampleMisses) process.stderr.write(`  MISS: ${m}\n`);
+      const honestRate = honestHits / Math.max(1, honestTotal);
+      const refusalRate = inventedRefusals / Math.max(1, inventedTotal);
+      if (honestRate < 0.95 || refusalRate < 0.95) {
+        process.stderr.write(`HEAD_NOUN honest=${(honestRate * 100).toFixed(1)}% refusal=${(refusalRate * 100).toFixed(1)}%\n`);
+        for (const m of sampleMisses) process.stderr.write(`  ${m}\n`);
       }
-      expect(rate).toBeGreaterThanOrEqual(0.95);
+      expect(honestRate).toBeGreaterThanOrEqual(0.95);
+      expect(refusalRate).toBeGreaterThanOrEqual(0.95);
     });
 
     it('false-positive sweep: random scene noun does not resolve to a real item by adjective overlap', () => {

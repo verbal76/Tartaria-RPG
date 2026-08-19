@@ -22,45 +22,85 @@
       "stages": [
         {
           "stageType": "inciting_hook",
-          "narration": "The Drakovan reeve closes the bounty book. \"I don't know where it roosts. Old Mira does — out on the marsh edge. She lost half her cattle to it. Bring her this token, she'll talk.\"",
+          "narration": "The Drakovan reeve closes the bounty book and pushes a stamped brass token across it. \"I don't know where it roosts. Old Mira does — she keeps a holding out at the Monarch's Waystation, and she lost half her cattle to it. Show her this token and she'll talk. Go by way of the Cradle of Dusk; that's where the last wing-shadow was called in.\"",
           "arbiter": "\"Posters in this country mean someone is desperate or someone has died,\" the Arbiter says. \"Read the room before you sign.\"",
-          "checkKind": null
+          "checkKind": null,
+          "grants": {
+            "item": "Reeve's Brass Token"
+          },
+          "locationName": "Drakova",
+          "npcName": "the Drakovan reeve"
         },
         {
           "stageType": "first_friction",
-          "narration": "Half a day toward Mira's holding, a wing-shadow crosses you. You crest the next rise and find what it left — a goat torn open, three obsidian-edged scales steaming in the silt. The Dragon knows there are eyes here now.",
+          "narration": "Out in the Cradle of Dusk a wing-shadow crosses you, and over the next rise you find what it left: a goat torn open, three obsidian-edged scales steaming in the silt. You work one free. It is heavier than it looks and still warm. The Dragon knows there are eyes here now.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Obsidian-Edged Scale"
+          },
+          "locationName": "Cradle of Dusk"
         },
         {
           "stageType": "toll",
-          "narration": "Mira reads the reeve's token and waves you to sit. \"I'll mark his roost,\" she says. \"But my boy went into the flooded shrine after the first attack. He's in there. Bring me back his locket. Then we talk.\"",
+          "narration": "Old Mira turns the reeve's token over twice before she waves you to sit. \"I'll mark his roost,\" she says. \"But my boy went into the flooded shrine at the Mud Flood Nexus after the first attack, and he's still in there. Bring me back his locket. Then we talk.\" She draws you the way down on a scrap of hide and presses it into your hand.",
           "arbiter": "\"She has been carrying that wait for a season,\" the Arbiter says quietly. \"Make it count.\"",
-          "checkKind": "diplomacy"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Mira's Shrine-Map"
+          },
+          "requires": {
+            "item": "Reeve's Brass Token"
+          },
+          "locationName": "The Monarch's Waystation",
+          "npcName": "Old Mira"
         },
         {
           "stageType": "favor",
-          "narration": "The flooded shrine is silt-glass and old prayer. You find the boy where he fell, a Bog Wraith feeding on what's left. You drive it off and free the locket from his hand. It's still warm to the touch.",
+          "narration": "Mira's map takes you down through the Nexus to where the flood-works pool. The shrine is silt-glass and old prayer. You find the boy where he fell, a Bog Wraith feeding on what's left. You drive it off and free the locket from his hand. It is still warm to the touch.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "The Boy's Locket"
+          },
+          "requires": {
+            "item": "Mira's Shrine-Map"
+          },
+          "locationName": "Mud Flood Nexus"
         },
         {
           "stageType": "revelation",
-          "narration": "Mira reads the locket without crying. \"Cathedral steeple. Deeper marsh. Go now.\" As you push out, a flock of lesser Wing-Things rises from the reeds — the Dragon's brood, sent to thin you.",
-          "arbiter": null,
-          "checkKind": "attack_provoke"
+          "narration": "Mira reads the locket without crying. On the inside lid, scratched in a child's hand, is a name: ESHREN. \"He named it,\" she says. \"He thought naming it would make it leave us alone.\" She scratches the name onto a slip of tin and folds your fingers around it. \"Cathedral steeple. Out in the Mud Seas. Go now.\"",
+          "arbiter": "\"A true name binds a thing for one breath,\" the Arbiter says. \"One word, one moment. Don't waste either.\"",
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Eshren's Name-Token"
+          },
+          "requires": {
+            "item": "The Boy's Locket"
+          },
+          "locationName": "The Monarch's Waystation",
+          "npcName": "Old Mira"
         },
         {
           "stageType": "catalyst",
-          "narration": "On the locket's inside lid, scratched in a child's hand: a name. ESHREN. Mira's voice behind you: \"He named it. He thought naming it would make it leave us alone.\" Speaking a Dragon's true name binds it for one breath. That is the breath you will use.",
-          "arbiter": "\"One word, one moment,\" the Arbiter says. \"Don't waste either.\"",
-          "checkKind": "cast"
+          "narration": "You push out into the Mud Seas with the name in your fist. Before the steeple is even in sight a flock of lesser Wing-Things rises off the reeds — the Dragon's brood, sent to thin you before you arrive. Cut through them. The steeple is not going anywhere.",
+          "arbiter": null,
+          "checkKind": "attack_provoke",
+          "requires": {
+            "item": "Eshren's Name-Token"
+          },
+          "locationName": "Mud Seas"
         },
         {
           "stageType": "apex",
-          "narration": "You wade out to the cathedral steeple. The Dragon uncoils. You speak its name — ESHREN — and it stalls, for one long breath, eyes wide. Now or never.",
+          "narration": "The cathedral steeple stands out of the Mud Seas like a broken tooth, and the Dragon uncoils from it. You read the tin — ESHREN — and it stalls, for one long breath, eyes wide. Now or never.",
           "arbiter": "\"Whatever you do, do not let it get airborne again,\" the Arbiter says.",
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "requires": {
+            "item": "Eshren's Name-Token"
+          },
+          "locationName": "Mud Seas"
         }
       ]
     },
@@ -85,45 +125,88 @@
       "stages": [
         {
           "stageType": "inciting_hook",
-          "narration": "The True Tartarian agent doesn't sit. \"We can't go down there ourselves — every shake brings the Stair down on whoever's mid-descent. Find Master Karin in the upper concourse. She was the lead engineer when the Stair was still a stair. She'll know where it's resting.\"",
-          "arbiter": "\"They never ask quietly,\" the Arbiter says. \"They ask only when it is bad.\"",
-          "checkKind": null
+          "narration": "The True Tartarian agent doesn't sit. \"We can't go down there ourselves — every shake brings the Stair down on whoever's mid-descent.\" She seals a writ and hands it over. \"Master Karin holds the upper concourse at Asgardar. She was lead engineer when the Stair was still a stair. Cut through the Buried Cities on your way — one of our gantries went down there this morning and nobody has reported back.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Enclave Writ"
+          },
+          "locationName": "The Sunken Enclave",
+          "npcName": "the True Tartarian agent"
         },
         {
           "stageType": "first_friction",
-          "narration": "Half a day from Karin's office, the ground hammers under you. Two Reclaimers and a True Tartarian engineer are pinned under a collapsed gantry, calling for help. The Titan, far below, has woken something else. You dig fast.",
-          "arbiter": "\"Other people's catastrophe is part of yours now,\" the Arbiter says. \"This is the work.\"",
-          "checkKind": "investigate"
+          "narration": "In the Buried Cities the ground hammers under you. Two Reclaimers and a True Tartarian engineer are pinned beneath a collapsed gantry, calling out. You dig them free. The engineer presses her survey log on you before she can stand — every reading in it runs off the page in the same direction, straight down.",
+          "arbiter": null,
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Collapsed Gantry Log"
+          },
+          "locationName": "The Buried Cities"
         },
         {
           "stageType": "toll",
-          "narration": "Karin hears you out, then folds her arms. \"I'll mark its patrol — I designed those landings, I know where it'll plant itself. But my old blueprints are sealed in the second-level archive. The lock's me-and-only-me. Bring them up. Then we plan.\"",
+          "narration": "Karin reads the writ, then the gantry log, then folds her arms. \"I'll mark its patrol — I designed those landings, I know where it'll plant itself. But my old blueprints are sealed in the Giant Vault and the lock is me-and-only-me.\" She thumbs a seal-plate warm and gives it to you. \"Bring them up. Then we plan.\"",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Karin's Archive Seal"
+          },
+          "requires": {
+            "item": "Enclave Writ"
+          },
+          "locationName": "Asgardar",
+          "npcName": "Master Karin"
         },
         {
           "stageType": "favor",
-          "narration": "You drop two levels into the buried archive. The seals open to your hand at Karin's word. As you pull the blueprint tube, a clutch of Mud Wraiths peels off the wall behind you — the Titan's vibration woke them weeks ago. You clear them.",
+          "narration": "The Vault's seals open to Karin's plate at the touch. As you pull the blueprint tube from its cradle a clutch of Mud Wraiths peels off the wall behind you — the Titan's vibration woke them weeks ago and nothing has come down here since to put them back to sleep. You clear them and take the tube out under your arm.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "Karin's Blueprint Tube"
+          },
+          "requires": {
+            "item": "Karin's Archive Seal"
+          },
+          "locationName": "The Giant Vault"
         },
         {
           "stageType": "revelation",
-          "narration": "Karin spreads the blueprints flat and circles a niche on the sixth landing. \"There. It rests where the old core-conduit pools heat. Go now — every hour you wait, more Stair falls.\" Halfway down, a pre-flood Sentinel husk lurches awake on a landing — its loyalty programming hasn't decided whose side you're on yet.",
-          "arbiter": null,
-          "checkKind": "stealth"
+          "narration": "Karin spreads the blueprints flat and circles a niche on the sixth landing of the Endless Stair. \"There. It rests where the old core-conduit pools heat.\" She copies the landing and the approach onto a card and hands it over. \"Go now. Every hour you wait, more Stair falls.\"",
+          "arbiter": "\"She has given you the one thing nobody else has,\" the Arbiter says. \"A floor plan of the thing's house.\"",
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Sixth-Landing Mark"
+          },
+          "requires": {
+            "item": "Karin's Blueprint Tube"
+          },
+          "locationName": "Asgardar",
+          "npcName": "Master Karin"
         },
         {
           "stageType": "catalyst",
-          "narration": "On the fifth landing, a Sentinel power core sits in its cradle, still hot. Karin's blueprints show a chokepoint two flights down where a rigged core, dropped from the rail, will blast a wall onto the Titan's head. Wire it. Set it. Don't drop it.",
-          "arbiter": "\"That core's a one-shot,\" the Arbiter says. \"Place it where the Titan has to come.\"",
-          "checkKind": "cast"
+          "narration": "Karin's card walks you down to the fifth landing, where a Sentinel power core sits in its cradle, still hot after two thousand years. The blueprints show a chokepoint one flight below: a rigged core dropped from the rail will bring a wall down on the Titan's head. Wire it. Set it. Don't drop it.",
+          "arbiter": null,
+          "checkKind": "cast",
+          "grants": {
+            "item": "Rigged Sentinel Core"
+          },
+          "requires": {
+            "item": "Sixth-Landing Mark"
+          },
+          "locationName": "Endless Stair"
         },
         {
           "stageType": "apex",
-          "narration": "You bait the Titan onto the chokepoint. The core drops. Half the wall comes with it. The Titan lives — mostly — and turns to you. Now finish.",
-          "arbiter": "\"That bought you one limb of it,\" the Arbiter says. \"The rest is yours.\"",
-          "checkKind": "boss"
+          "narration": "You bait the Titan onto the chokepoint and let the rigged core go from the rail. Half the wall comes down with it. The Titan lives — mostly — and turns to you through the dust. Now finish it.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Rigged Sentinel Core"
+          },
+          "locationName": "Endless Stair"
         }
       ]
     },
@@ -148,45 +231,91 @@
       "stages": [
         {
           "stageType": "inciting_hook",
-          "narration": "The Reclaimers Guild Speaker pushes a sealed tube across the table. \"Coordinates to Jarn. Old dive-master. He survived the last attack — only one who did. He'll tell you where the Behemoth feeds. Or he won't. Either way, he's the only mouth open on this.\"",
-          "arbiter": "\"Survivors talk on their own terms,\" the Arbiter says. \"Bring patience.\"",
-          "checkKind": null
+          "narration": "The Reclaimers Guild Speaker pushes a sealed tube across the table. \"Coordinates. Jarn, old dive-master, keeps his rope at the Builders' Survey Camp — he survived the last attack and he's the only mouth open on this. The road runs through the Mud Seas and it is not a quiet road. Take the tube. He won't say a word without it.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Sealed Coordinate Tube"
+          },
+          "locationName": "Reclaimer's Stake",
+          "npcName": "the Reclaimers Guild Speaker"
         },
         {
           "stageType": "first_friction",
-          "narration": "On the road to Jarn you cross a half-drowned camp. Three dive-tubes torn open. One man still breathing, ribs broken, calling for water. A Mud Crab the size of a pony hesitates at the edge of the camp, deciding between you and him. You decide first.",
-          "arbiter": "\"Patch him before you ask anything,\" the Arbiter says. \"Then ask.\"",
-          "checkKind": "boss"
+          "narration": "Out on the Mud Seas you cross a half-drowned dive-camp. Three tubes torn open. One man still breathing, ribs broken, calling for water. A Mud Crab the size of a pony hesitates at the edge of the camp, deciding between you and him. You decide first. The camp's tally-board comes away in your hand — four crews, all struck at slack tide.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "grants": {
+            "item": "Dive-Camp Tally"
+          },
+          "requires": {
+            "item": "Sealed Coordinate Tube"
+          },
+          "locationName": "Mud Seas"
         },
         {
           "stageType": "toll",
-          "narration": "Jarn won't look up from the rope he's mending. \"I lost my harpoon-rig with the crew. Down in the wreck of the Marlin, half a league east. Bring it up and I'll mark your map. Otherwise we have nothing to talk about.\"",
+          "narration": "Jarn won't look up from the rope he's mending until he sees the tally. Then he does. \"I lost my harpoon-rig with the crew — down in the wreck of the Marlin, out under Zharak's Teeth.\" He scratches the bearing on the back of the tally-board. \"Bring it up and I'll mark your map. Otherwise we have nothing to talk about.\"",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Jarn's Wreck-Bearing"
+          },
+          "requires": {
+            "item": "Dive-Camp Tally"
+          },
+          "locationName": "Builders' Survey Camp",
+          "npcName": "Jarn the dive-master"
         },
         {
           "stageType": "favor",
-          "narration": "You dive into the Marlin's half-sunk hull. The harpoon-rig is wedged under the rib of the ship, where Jarn's crew went down with it. They didn't all stay dead — three Drowned Reclaimers turn at the sound of your tank. You clear them and recover the rig.",
+          "narration": "Jarn's bearing puts you over the Marlin's half-sunk hull. The harpoon-rig is wedged under the ship's rib, where his crew went down with it. They didn't all stay dead — three Drowned Reclaimers turn at the sound of your tank. You clear them and bring the rig up.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "Jarn's Harpoon-Rig"
+          },
+          "requires": {
+            "item": "Jarn's Wreck-Bearing"
+          },
+          "locationName": "Zharak's Teeth"
         },
         {
           "stageType": "revelation",
-          "narration": "Jarn marks a pool on the chart with a black thumb. \"There. It comes up to feed at the slack tide.\" Heading out, a chorus of Mud Sirens — drawn by the Behemoth's resonance — converges on your skiff. They sing. You commit.",
+          "narration": "Jarn takes the rig back, checks it the way a man checks a returned child, and hands it straight to you again. Then he marks a pool on the chart with a black thumb. \"Cradle of Dusk. It comes up to feed at the slack tide, and slack tide is the only hour it's slow.\"",
           "arbiter": null,
-          "checkKind": "attack_provoke"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Slack-Tide Chart"
+          },
+          "requires": {
+            "item": "Jarn's Harpoon-Rig"
+          },
+          "locationName": "Builders' Survey Camp",
+          "npcName": "Jarn the dive-master"
         },
         {
           "stageType": "catalyst",
-          "narration": "Jarn shows you how to charge the harpoon-rig with an Aether Crystal. \"This is the only thing that punches the silt-hide. Don't waste the shot — you get one before the rig burns out.\" You load the crystal. The rig hums in your hands.",
-          "arbiter": "\"One shot to root it,\" the Arbiter says. \"Then it's a knife fight underwater.\"",
-          "checkKind": "cast"
+          "narration": "At the feeding pool you do what Jarn showed you: seat an Aether Crystal in the rig's throat and let it draw. \"This is the only thing that punches silt-hide,\" he said. \"You get one shot before the rig burns out.\" The crystal takes. The rig hums in your hands.",
+          "arbiter": null,
+          "checkKind": "cast",
+          "grants": {
+            "item": "Charged Harpoon-Rig"
+          },
+          "requires": {
+            "item": "Slack-Tide Chart"
+          },
+          "locationName": "Cradle of Dusk"
         },
         {
           "stageType": "apex",
-          "narration": "You wait at the slack tide. The Behemoth breaches. You fire the harpoon-rig. The crystal punches through silt-hide and the Behemoth screams — rooted in place, furious. Get in the water and finish it.",
-          "arbiter": "\"The rig will burn out before it dies,\" the Arbiter says. \"Don't be on the wrong end when it does.\"",
-          "checkKind": "boss"
+          "narration": "You wait out the slack tide. The Behemoth breaches. You fire, and the crystal punches through silt-hide — the Behemoth screams, rooted in place and furious. Get in the water and finish it.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Charged Harpoon-Rig"
+          },
+          "locationName": "Cradle of Dusk"
         }
       ]
     },
@@ -211,45 +340,91 @@
       "stages": [
         {
           "stageType": "inciting_hook",
-          "narration": "The Order envoy taps a sealed reliquary box twice and slides it across. \"Brother Ammon. Cloister of the Closed Hand. He keeps the old Sentinel Ward maps. He'll give them to you when he sees this. Do not open the box.\"",
-          "arbiter": "\"The Order's couriers do not say more than they have to,\" the Arbiter says. \"Take the silence as instruction.\"",
-          "checkKind": null
+          "narration": "The Order envoy taps a sealed reliquary box twice and slides it across. \"Brother Ammon keeps the old Ward maps at the cloister in Karok-Sa. He'll give them to you when he sees this. Do not open the box.\" A pause. \"Take the Obsidian Pillars road. The Sentinels there still walk their loop, and I would rather you learned that from the road than from the archive.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Sealed Reliquary Box"
+          },
+          "locationName": "Varakush",
+          "npcName": "the Order envoy"
         },
         {
           "stageType": "first_friction",
-          "narration": "You cross a Sentinel patrol on the road — three units, lesser, still on a thousand-year-old loyalty loop. The truce between the Order and the Sentinels is paper. They challenge you. Fight or fade past.",
-          "arbiter": "\"They will not pursue past their patrol arc,\" the Arbiter says. \"Either disengage or end them quickly.\"",
-          "checkKind": "stealth"
+          "narration": "Three lesser Sentinels hold the road between the Pillars, still running a loyalty loop a thousand years past anyone who could cancel it. The truce between the Order and the Sentinels is paper. You go quiet, take the long way around their arc, and lift a patrol sigil off a cold unit as you pass. They never break step.",
+          "arbiter": null,
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Sentinel Patrol Sigil"
+          },
+          "requires": {
+            "item": "Sealed Reliquary Box"
+          },
+          "locationName": "Obsidian Pillars"
         },
         {
           "stageType": "toll",
-          "narration": "Brother Ammon opens the reliquary. Whatever's in it changes his face. \"I'll give you the bypass codes. But the Ward's patrol log is in a half-buried relay tower a day east of here. Bring it. The codes are no use if the Titan has gone dormant.\"",
+          "narration": "Brother Ammon opens the reliquary. Whatever is in it changes his face. He turns the patrol sigil over once and sets it down. \"I'll give you the bypass codes. But the Ward's patrol log sits in the relay at the Grand Spire of Etheria, and the codes are no use to you if the Titan has gone dormant.\" He writes you a warrant for the relay room.",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Ammon's Relay Warrant"
+          },
+          "requires": {
+            "item": "Sentinel Patrol Sigil"
+          },
+          "locationName": "Karok-Sa",
+          "npcName": "Brother Ammon"
         },
         {
           "stageType": "favor",
-          "narration": "The relay tower leans hard west, half-buried in silt. You climb to the operations room. An Order Apostate is in the doorway — left his faith and stayed for the relics. He won't let you pass with the log. You take it from him.",
+          "narration": "The Spire's relay room is half-buried and leaning hard. An Order Apostate is standing in the doorway — left his faith and stayed for the relics. He reads the warrant, laughs at it, and won't let you pass with the log. You take it from him.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "The Ward Patrol Log"
+          },
+          "requires": {
+            "item": "Ammon's Relay Warrant"
+          },
+          "locationName": "Grand Spire of Etheria"
         },
         {
           "stageType": "revelation",
-          "narration": "Ammon reads the log and his hand goes flat on the table. \"It is still walking. Inner archive, third gallery. Go now.\" As you approach the Ward, drones lift from concealed cradles — automated defenses, two thousand years patient.",
+          "narration": "Ammon reads the log and his hand goes flat on the table. \"It is still walking. Inner archive, third gallery.\" He works his signet ring off and presses it into your palm. \"The door is keyed to Order blood. It knows me; let it know you through this. Go now.\"",
           "arbiter": null,
-          "checkKind": "attack_provoke"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Ammon's Signet Ring"
+          },
+          "requires": {
+            "item": "The Ward Patrol Log"
+          },
+          "locationName": "Karok-Sa",
+          "npcName": "Brother Ammon"
         },
         {
           "stageType": "catalyst",
-          "narration": "The inner door is keyed to Order blood. Ammon pressed his signet ring into your palm before you left — \"the door knows me; let it know you through this.\" Lift the ring to the seal. The Ward opens.",
-          "arbiter": "\"He gave you the only one he had,\" the Arbiter says. \"That ring is the only key into the Order's inner rite.\"",
-          "checkKind": "cast"
+          "narration": "You lift the ring to the seal and the Ward opens for you. It also wakes: drones rise from concealed cradles across the approach, two thousand years patient and done waiting. Put them down. Ammon's codes come out of the ring only once the approach is clear.",
+          "arbiter": null,
+          "checkKind": "attack_provoke",
+          "grants": {
+            "item": "Ward Bypass Codes"
+          },
+          "requires": {
+            "item": "Ammon's Signet Ring"
+          },
+          "locationName": "the Sentinel Ward"
         },
         {
           "stageType": "apex",
-          "narration": "The inner archive is colder than the Ward outside. The Iron Titan is at the far wall, head bowed in some ancient liturgy. It hears you enter. It rises. It is taller than the chamber meant for it.",
-          "arbiter": "\"It does not tire,\" the Arbiter says. \"Make every hit matter.\"",
-          "checkKind": "boss"
+          "narration": "The inner archive is colder than the Ward outside. The Iron Titan stands at the far wall, head bowed in some ancient liturgy. It hears you enter. It rises. It is taller than the chamber was meant for.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Ward Bypass Codes"
+          },
+          "locationName": "the Sentinel Ward"
         }
       ]
     },
@@ -274,33 +449,57 @@
       "stages": [
         {
           "stageType": "urgent_dispatch",
-          "narration": "The drifter presses the poster into your hand and points east. \"Her chorus just took another crew — pinned them between the south spires this morning. She'll move at dusk. Go now or there's no point going at all.\"",
-          "arbiter": "\"That's a real bounty in your hand,\" the Arbiter says. \"And no time to read it twice. Move.\"",
-          "checkKind": null
+          "narration": "The drifter presses the poster into your hand and points out past the stalls. \"Her chorus took another crew this morning — pinned them in the south spires, out in the Mud Seas. She'll move at dusk. Go now or there's no point going at all.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Drifter's South-Spire Poster"
+          },
+          "locationName": "The Hidden Market",
+          "npcName": "the wandering drifter"
         },
         {
           "stageType": "false_summit",
-          "narration": "Zharak's Teeth crest the water exactly as you were told. You wade in between the south spires expecting the Queen. The Queen is gone. Three lesser Sirens uncoil from the wreckage instead, calm and ready. The crew the drifter mentioned were the bait, not the prize. So are you.",
-          "arbiter": "\"The Queen knew you were coming,\" the Arbiter says. \"She prefers her hunts begun by her, not by you.\"",
-          "checkKind": "boss"
+          "narration": "The south spires stand out of the Mud Seas exactly where the poster said. You wade in expecting the Queen. The Queen is gone. Three lesser Sirens uncoil from the wreckage instead, calm and ready. The crew the drifter mentioned were the bait, not the prize. So are you.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Drifter's South-Spire Poster"
+          },
+          "locationName": "Mud Seas"
         },
         {
           "stageType": "investigation",
-          "narration": "You sift the wreckage after the Sirens go quiet. A Reclaimer's broken survey-pen — the Queen's true spire is marked on it, three pillars north of where you stood. She moved the moment she heard your skiff.",
+          "narration": "You sift the wreckage after the Sirens go quiet. A Reclaimer's survey-pen, snapped but readable — the Queen's true spire is marked on it, out at Zharak's Teeth, three pillars north of open water. She moved the moment she heard your skiff.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Reclaimer's Survey-Pen"
+          },
+          "locationName": "Mud Seas"
         },
         {
           "stageType": "gauntlet",
-          "narration": "You wade north spire-by-spire. Every pillar carries another Siren in waiting. The chorus rises around you — half song, half scream. You hold your line and push through, blade or breath, whatever it takes.",
-          "arbiter": "\"If you stop moving, the song takes you,\" the Arbiter says. \"Do not stop moving.\"",
-          "checkKind": "attack_provoke"
+          "narration": "You wade the Teeth spire by spire on the pen's line. Every pillar carries another Siren in waiting. The chorus rises around you, half song and half scream. You hold your line and put them down until the water goes quiet, and the last one dies pointing north.",
+          "arbiter": null,
+          "checkKind": "attack_provoke",
+          "grants": {
+            "item": "North-Pillar Bearing"
+          },
+          "requires": {
+            "item": "Reclaimer's Survey-Pen"
+          },
+          "locationName": "Zharak's Teeth"
         },
         {
           "stageType": "apex",
-          "narration": "You break into the central pillar's clearing. The Queen sits on her mud-glass throne, calm and almost amused. \"You should not have come,\" she says, low and warm. \"But since you have — sing, or die quiet.\" The standing Sirens turn now, all of them, all toward you.",
-          "arbiter": "\"She means it,\" the Arbiter says. \"Neither option works in your favour.\"",
-          "checkKind": "boss"
+          "narration": "You break into the central pillar's clearing. The Queen sits her mud-glass throne, calm and almost amused. \"You should not have come,\" she says, low and warm. \"But since you have — sing, or die quiet.\" The standing Sirens turn now, all of them, all toward you.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "North-Pillar Bearing"
+          },
+          "locationName": "Zharak's Teeth"
         }
       ]
     },
@@ -325,33 +524,57 @@
       "stages": [
         {
           "stageType": "urgent_dispatch",
-          "narration": "The Servants priest bows just enough. \"His last camp is two days west of the shrine. He moves at dawn — if you start now, you take him before he does. We do not raise our hand against him; you raise yours, and we will remember.\"",
-          "arbiter": "\"They give you a clean path and clean hands,\" the Arbiter says. \"Their preferred shape of the work.\"",
-          "checkKind": null
+          "narration": "The Servants priest bows just enough and marks a strip of bone with the shrine's sanction. \"His last camp is out on the Great Tartary Plains. He moves at dawn — if you start now, you take him before he does. We do not raise our hand against him. You raise yours, and we will remember. Carry the mark so his people know who sent you.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Servants' Mark of Sanction"
+          },
+          "locationName": "Giant-Watch Shrine",
+          "npcName": "the Servants priest"
         },
         {
           "stageType": "false_summit",
-          "narration": "You make the camp by dusk. Embers still warm. Reaver gone. Three of his sworn followers — Tartarian raiders, jaw-marked — rise from positions they'd set hours ago. He left them for you, the way another man leaves a note.",
-          "arbiter": "\"He saw you coming a day off,\" the Arbiter says. \"Cut through these and move.\"",
-          "checkKind": "boss"
+          "narration": "You make the camp on the Plains by dusk. Embers still warm. Reaver gone. Three of his sworn followers rise from positions they'd set hours ago — jaw-marked Tartarian raiders, waiting on exactly the kind of hunter a shrine sends. He left them for you the way another man leaves a note.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Servants' Mark of Sanction"
+          },
+          "locationName": "Great Tartary Plains"
         },
         {
           "stageType": "investigation",
-          "narration": "You search the camp's debris. A boot-track heading due north, fresh. A Reaver's spiral-mark scratched into a stone — his next staging-ground, named in raider sign. He wanted the right kind of hunter to follow.",
+          "narration": "You search the camp's debris. A boot-track heading due west, fresh. A Reaver's spiral-mark scratched into a flat stone — his next staging ground, named in raider sign, out on the Tartarian Outskirts ridge. You put the stone in your pack. He wanted the right kind of hunter to follow.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Reaver's Spiral-Mark Stone"
+          },
+          "locationName": "Great Tartary Plains"
         },
         {
           "stageType": "gauntlet",
-          "narration": "North through scrub and broken stone. Two more raiders strike from cover at the half-mile mark — they're not trying to stop you, only slow you. By the time you put them down, the Reaver has had another hour to set the meeting.",
-          "arbiter": "\"He chose the ground,\" the Arbiter says. \"Now you decide what to do with it.\"",
-          "checkKind": "attack_provoke"
+          "narration": "North through scrub and broken stone, reading the spiral-marks off the rocks as you go. Two more raiders strike from cover at the half-mile mark. They aren't trying to stop you, only slow you — and one of them dies holding the sign for where the meeting is set.",
+          "arbiter": null,
+          "checkKind": "attack_provoke",
+          "grants": {
+            "item": "Raider's Ridge-Sign"
+          },
+          "requires": {
+            "item": "Reaver's Spiral-Mark Stone"
+          },
+          "locationName": "Tartarian Outskirts"
         },
         {
           "stageType": "apex",
-          "narration": "The Reaver is on the ridge, alone, watching you climb. He doesn't draw until you crest it. \"The Giants will rise,\" he says, almost gentle. \"You are a small thing to send against that.\" Then his blade comes up.",
-          "arbiter": "\"He has done this before,\" the Arbiter says. \"So have you. Show him which of you means it.\"",
-          "checkKind": "boss"
+          "narration": "The Reaver is on the ridge the sign named, alone, watching you climb. He doesn't draw until you crest it. \"The Giants will rise,\" he says, almost gentle. \"You are a small thing to send against that.\" Then his blade comes up.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Raider's Ridge-Sign"
+          },
+          "locationName": "Tartarian Outskirts"
         }
       ]
     },
@@ -376,45 +599,91 @@
       "stages": [
         {
           "stageType": "inciting_hook",
-          "narration": "The caravan-master jabs the pass on his map. \"Something old woke in the rocks and now it boils anyone who tries the Teeth. My drovers won't go. A wheelwright named Ost saw it — find him at the low camp, he'll point you up.\"",
-          "arbiter": "\"A machine that has forgotten it is a machine is the most dangerous thing in this country,\" the Arbiter says. \"It does not hate you. It simply does its old work on your body.\"",
-          "checkKind": null
+          "narration": "The caravan-master jabs the pass on his map and stamps you a pass-chit. \"Something old woke in the rocks at Zharak's Teeth and now it boils anyone who tries them. My drovers won't go. A wheelwright named Ost saw it and came down alive — he's wintering at the Pilgrim Camp. Walk the Teeth first if you want to believe me, then go and find him.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Caravan-Master's Pass-Chit"
+          },
+          "locationName": "Dynasty Border Post",
+          "npcName": "the caravan-master"
         },
         {
           "stageType": "first_friction",
-          "narration": "Half a day up the Teeth you find the pass fused — sand turned to glass in a long scalded stripe, and at the end of it a drover cooked in his boots. The Steam Walker knows the pass is watched now. It is waiting further up.",
+          "narration": "Half a day into the Teeth you find the pass fused — sand turned to glass in one long scalded stripe, and at the end of it a drover cooked in his boots. You break off a shard of the glass; it is still too warm to hold bare. The Walker knows the pass is watched now.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Scalded Glass Shard"
+          },
+          "requires": {
+            "item": "Caravan-Master's Pass-Chit"
+          },
+          "locationName": "Zharak's Teeth"
         },
         {
           "stageType": "toll",
-          "narration": "Ost the wheelwright will talk, for a price: his apprentice ran up the Teeth after the beast and hasn't come down. \"Bring me the boy, or what's left,\" he says, \"and I'll draw you the vent it roosts in.\"",
+          "narration": "Ost turns the glass shard over once and stops pretending he doesn't know. He'll talk, for a price: his apprentice ran up into the Yuldra-Tul scree after the beast and hasn't come down. \"Bring me the boy, or what's left,\" he says, sketching the scree-line on the back of a wheel-tally, \"and I'll draw you the vent it roosts in.\"",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Ost's Scree-Line Sketch"
+          },
+          "requires": {
+            "item": "Scalded Glass Shard"
+          },
+          "locationName": "Tartarian Pilgrim Camp",
+          "npcName": "Ost the wheelwright"
         },
         {
           "stageType": "favor",
-          "narration": "You find the apprentice pinned in a scree-slip, leg broken, alive by luck the Walker passed him for dead. A Rust Lurker has come to finish what the mountain started. You drive it off and carry the boy down.",
+          "narration": "The sketch puts you on the frost side of Yuldra-Tul, where the apprentice is pinned in a scree-slip with a broken leg — alive by the luck of the Walker passing him for dead. A Rust Lurker has come to finish what the mountain started. You drive it off, splint the leg, and carry the boy and his toolroll down.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "The Apprentice's Toolroll"
+          },
+          "requires": {
+            "item": "Ost's Scree-Line Sketch"
+          },
+          "locationName": "Yuldra-Tul"
         },
         {
           "stageType": "revelation",
-          "narration": "Ost keeps his word and marks the vent. As you climb, the pass itself turns on you — the Walker vents a scalding cloud down the chute, and lesser steam-things stir in the rocks, roused by the heat.",
+          "narration": "Ost takes the toolroll, opens it, closes it, and keeps his word. He marks the vent on the wheel-tally — high in the Teeth, where the rock runs hot. \"It doesn't roost there because it likes it,\" he says. \"It roosts there because it can't stop venting.\"",
           "arbiter": null,
-          "checkKind": "attack_provoke"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Ost's Vent-Map"
+          },
+          "requires": {
+            "item": "The Apprentice's Toolroll"
+          },
+          "locationName": "Tartarian Pilgrim Camp",
+          "npcName": "Ost the wheelwright"
         },
         {
           "stageType": "catalyst",
-          "narration": "At the vent you understand it: the Walker is bleeding a cracked core, venting to keep from bursting. It cannot stop. Kill the venting and you kill the machine — but the moment you close the valve it will have one last, total breath to spend.",
-          "arbiter": "\"It is dying and does not know it,\" the Arbiter says. \"That makes it neither safe nor merciful. Mind the last breath.\"",
-          "checkKind": "cast"
+          "narration": "At the vent you finally understand the machine: the Walker is bleeding a cracked core and venting to keep from bursting, and it cannot stop. Kill the venting and you kill the machine. You cut a valve-key to fit the vent housing — but the moment it seats, the Walker will have one last, total breath to spend.",
+          "arbiter": null,
+          "checkKind": "cast",
+          "grants": {
+            "item": "Walker's Valve-Key"
+          },
+          "requires": {
+            "item": "Ost's Vent-Map"
+          },
+          "locationName": "Zharak's Teeth"
         },
         {
           "stageType": "apex",
-          "narration": "You reach the roost as the Walker turns, core screaming, and vents everything it has left in one white blast. Close the valve and end it — or be the next stripe of glass in the pass.",
-          "arbiter": "\"One breath,\" the Arbiter says. \"Do not be standing in it.\"",
-          "checkKind": "boss"
+          "narration": "You reach the roost as the Walker turns, core screaming, and vents everything it has left in one white blast. Drive the key home and end it — or be the next stripe of glass in the pass.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Walker's Valve-Key"
+          },
+          "locationName": "Zharak's Teeth"
         }
       ]
     },
@@ -439,45 +708,91 @@
       "stages": [
         {
           "stageType": "inciting_hook",
-          "narration": "The dive-boss counts three lost this season. \"It nests where the Cathedral's nave floods deepest. My last diver, Wren, mapped its runs before it took her line. Her sister keeps the logbook — get it, and you'll know where it sleeps.\"",
-          "arbiter": "\"The drowned keep their secrets in ledgers here,\" the Arbiter says. \"Read the dead's careful notes. They paid for them.\"",
-          "checkKind": null
+          "narration": "The dive-boss counts three lost this season and cuts you a chit for the Cathedral moorings. \"It nests where the nave floods deepest. My last diver, Wren, mapped its runs before it took her line — and her sister keeps the logbook out at the Revivalist camp. Get down there first and see what's left of Wren's rig. You'll need something to show the sister.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Dive-Boss's Mooring Chit"
+          },
+          "locationName": "Ostragar",
+          "npcName": "the dive-boss"
         },
         {
           "stageType": "first_friction",
-          "narration": "The nave takes a hand of water an hour. In the shallows you find Wren's cut line and, tangled in it, a shed length of Silt Serpent skin the width of a door. It is bigger than the boss admitted. It knows the water is being read.",
+          "narration": "The nave takes a hand of water an hour. In the shallows you find Wren's cut line and, tangled in it, a shed length of Silt Serpent skin the width of a door. You coil the line and take it. It is bigger than the boss admitted, and it knows the water is being read.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Wren's Cut Line"
+          },
+          "requires": {
+            "item": "Dive-Boss's Mooring Chit"
+          },
+          "locationName": "the Sinking Cathedral"
         },
         {
           "stageType": "toll",
-          "narration": "Wren's sister will trade the logbook for a promise: recover Wren's body from the flooded transept so she can be burned properly. \"I can't bury a line and a boot,\" she says. \"Bring her up.\"",
-          "arbiter": null,
-          "checkKind": "diplomacy"
+          "narration": "Wren's sister takes the cut line in both hands and does not let go of it while she talks. She'll trade the logbook for a promise: recover Wren's body from the flooded transept so she can be burned properly. \"I can't bury a line and a boot,\" she says, and draws you the transept from memory. \"Bring her up.\"",
+          "arbiter": "\"She has been carrying that wait for a season,\" the Arbiter says quietly. \"Make it count.\"",
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Wren's Transept Sketch"
+          },
+          "requires": {
+            "item": "Wren's Cut Line"
+          },
+          "locationName": "Revivalist Field Camp",
+          "npcName": "Wren's sister"
         },
         {
           "stageType": "favor",
-          "narration": "You dive the transept and find Wren where the Serpent left her, and a Bog Wraith risen from the drowned to guard the drowned. You put it back down and bring Wren up into the light.",
+          "narration": "The sketch takes you down through the flooded transept, and you find Wren where the Serpent left her — and a Bog Wraith risen from the drowned to guard the drowned. You put it back down and bring Wren up into the light.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "Wren's Body"
+          },
+          "requires": {
+            "item": "Wren's Transept Sketch"
+          },
+          "locationName": "the Sinking Cathedral"
         },
         {
           "stageType": "revelation",
-          "narration": "The logbook maps the Serpent's runs like a tide-chart. As you push toward the deep nave, the water around you thickens — the Serpent's silt-brood, a boil of young things sent to blind and slow you before the mother strikes.",
+          "narration": "The sister does the burning herself and does not ask you to stay for it. Afterward she puts the logbook in your hands without a word. Every page is a tide-chart of the Serpent's runs, in a hand that clearly expected to use it again.",
           "arbiter": null,
-          "checkKind": "attack_provoke"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Wren's Logbook"
+          },
+          "requires": {
+            "item": "Wren's Body"
+          },
+          "locationName": "Revivalist Field Camp",
+          "npcName": "Wren's sister"
         },
         {
           "stageType": "catalyst",
-          "narration": "Wren's last page holds the trick: the Serpent hunts by the pulse of Aether, and the Cathedral's old font still hums with it. Foul the font and the beast goes deaf and blind — for one dive's length, no more.",
-          "arbiter": "\"Take its senses and it is only length and hunger,\" the Arbiter says. \"That is still a great deal of both.\"",
-          "checkKind": "cast"
+          "narration": "Wren's last page holds the trick: the Serpent hunts by the pulse of Aether, and the Cathedral's old font still hums with it. You work a charm into the font's throat that will foul the pulse and leave the beast deaf and blind — for one dive's length, no more.",
+          "arbiter": "\"One dive,\" the Arbiter says. \"Not one dive and a think about it.\"",
+          "checkKind": "cast",
+          "grants": {
+            "item": "Fouled Font-Charm"
+          },
+          "requires": {
+            "item": "Wren's Logbook"
+          },
+          "locationName": "the Sinking Cathedral"
         },
         {
           "stageType": "apex",
-          "narration": "You foul the font and the deep nave goes silent. The Silt Serpent comes anyway, blind and furious, threshing the flooded dark. Now — while it cannot find you — or never.",
-          "arbiter": "\"It is deaf, not gone,\" the Arbiter says. \"Strike sure and strike once.\"",
-          "checkKind": "boss"
+          "narration": "You set the charm and the deep nave goes silent. The Silt Serpent comes anyway, blind and furious, threshing the flooded dark. Now — while it cannot find you — or never.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Fouled Font-Charm"
+          },
+          "locationName": "the Sinking Cathedral"
         }
       ]
     },
@@ -502,45 +817,88 @@
       "stages": [
         {
           "stageType": "inciting_hook",
-          "narration": "The stair-warden has stopped counting the missing. \"They go up whole and come down never. A Shade lives in the turns where the light can't reach. An old climber, Bael, survived it once — he keeps the shrine at the third landing. He'll know the pattern.\"",
-          "arbiter": "\"A thing that lives where the light bends,\" the Arbiter says. \"Then bring your own light, and doubt every shadow that is your own.\"",
-          "checkKind": null
+          "narration": "The stair-warden has stopped counting the missing and hands you the tally instead. \"They go up whole and come down never. A Shade lives in the turns where the light can't reach. An old climber, Bael, survived it once — he keeps a vigil at Thametan's Tower now, and he won't talk to anyone who hasn't been up the Stair themselves.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Warden's Tally of the Missing"
+          },
+          "locationName": "Tartarian Pilgrim Camp",
+          "npcName": "the stair-warden"
         },
         {
           "stageType": "first_friction",
-          "narration": "On the ascent you find a pilgrim's lantern still burning on an empty landing, its owner gone without a mark. The Shade takes cleanly. It has already noticed the lantern you carry.",
+          "narration": "On the ascent you find a pilgrim's lantern still burning on an empty landing, its owner gone without a mark on the stone. You take the lantern down with you. The Shade takes cleanly, and it has already noticed the light you carry.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Pilgrim's Still-Burning Lantern"
+          },
+          "requires": {
+            "item": "Warden's Tally of the Missing"
+          },
+          "locationName": "Endless Stair"
         },
         {
           "stageType": "toll",
-          "narration": "Bael will share what he learned, but the Shade left him blind in one eye and afraid of the dark. \"Sit the night vigil with me at the shrine,\" he asks. \"I can't face the turning of the light alone. Do that, and I'll teach you to walk the Stair.\"",
+          "narration": "Bael looks at the lantern a long time before he looks at you. He'll share what he learned, but the Shade left him blind in one eye and afraid of the dark. \"Sit the night vigil with me here,\" he asks, pressing a candle into your hand. \"I can't face the turning of the light alone. Do that, and I'll teach you to walk the Stair.\"",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Bael's Vigil-Candle"
+          },
+          "requires": {
+            "item": "Pilgrim's Still-Burning Lantern"
+          },
+          "locationName": "Thametan's Tower",
+          "npcName": "Bael the old climber"
         },
         {
           "stageType": "favor",
-          "narration": "In the small hours a lesser dark tests the shrine — an Aetheric Apparition drawn by Bael's fear. You hold the vigil and put it down, and Bael sleeps through the dawn for the first time in a year.",
+          "narration": "In the small hours a lesser dark tests the Tower — an Aetheric Apparition drawn straight to Bael's fear. You hold the candle and put the thing down, and Bael sleeps through the dawn for the first time in a year. In the morning he gives you the charcoal rubbing he took off the high turn, the one he has never shown anyone.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "Bael's High-Turn Rubbing"
+          },
+          "requires": {
+            "item": "Bael's Vigil-Candle"
+          },
+          "locationName": "Thametan's Tower"
         },
         {
           "stageType": "revelation",
-          "narration": "Bael teaches you the Shade's law: it cannot cross its own cast shadow. As you climb to bait it, the Stair itself seems to lengthen — the Shade folding the light, throwing false landings and forked dark to lose you in the turns.",
-          "arbiter": null,
-          "checkKind": "attack_provoke"
+          "narration": "Bael reads his own rubbing aloud and teaches you the Shade's law: it cannot cross its own cast shadow. Then he tells you the rest — the Shade is a person the buried city swallowed and unmade into moving dark — and writes down the name he heard it whisper. KESSA.",
+          "arbiter": "\"A name is a handle,\" the Arbiter says. \"It does not make the thing safe. It makes it holdable.\"",
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Kessa's Written Name"
+          },
+          "requires": {
+            "item": "Bael's High-Turn Rubbing"
+          },
+          "locationName": "Thametan's Tower",
+          "npcName": "Bael the old climber"
         },
         {
           "stageType": "catalyst",
-          "narration": "You understand it now. The Shade is a person the buried city swallowed, unmade into moving dark. Name it back for one breath and its edges hold still enough to strike. Bael gives you the name he heard it whisper: KESSA.",
-          "arbiter": "\"It was someone,\" the Arbiter says. \"Kessa. Say it kindly if you can. Then end it, kindly or not.\"",
-          "checkKind": "cast"
+          "narration": "You climb to bait it with the name folded in your fist, and the Stair itself seems to lengthen — the Shade folding the light, throwing false landings and forked dark to lose you in the turns. Cut through the false dark until the real turn is the only one left.",
+          "arbiter": null,
+          "checkKind": "attack_provoke",
+          "requires": {
+            "item": "Kessa's Written Name"
+          },
+          "locationName": "Endless Stair"
         },
         {
           "stageType": "apex",
           "narration": "On the high turn where no light reaches, the Shade unfolds. You speak — KESSA — and for one breath the dark holds a woman's shape, still and startled. That breath is the only one you get.",
-          "arbiter": "\"Now,\" the Arbiter says. \"Before it forgets its name again.\"",
-          "checkKind": "boss"
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Kessa's Written Name"
+          },
+          "locationName": "Endless Stair"
         }
       ]
     },
@@ -565,45 +923,91 @@
       "stages": [
         {
           "stageType": "inciting_hook",
-          "narration": "The head ferryman won't meet your eye. \"It sings my brother's voice some nights. My wife's, others. Whoever it takes, it learns. A netter named Halla plugged her ears with wax and lived to see it — she's on the far quay, if she'll speak.\"",
-          "arbiter": "\"It does not lure you with a monster's voice,\" the Arbiter says. \"It lures you with a loved one's. Decide now, in the quiet, that you will not answer.\"",
-          "checkKind": null
+          "narration": "The head ferryman won't meet your eye, but he cuts you a crossing-token anyway. \"It sings my brother's voice some nights. My wife's, others. Whoever it takes, it learns. Go out on the water at dusk and see for yourself — then find Halla. She's a netter, works the far quay at Ostragar. She plugged her ears with wax and lived.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Ferryman's Crossing-Token"
+          },
+          "locationName": "Drakova",
+          "npcName": "the head ferryman"
         },
         {
           "stageType": "first_friction",
-          "narration": "At the dusk crossing you find a fresh trail of boots walking straight off the quay into the silt, unhurried, glad. The Siren sang someone home an hour ago. It hears your oar and goes quiet — learning your sound.",
+          "narration": "At the dusk crossing out in the Mud Seas you find a fresh trail of boots walking straight off a quay-stone into the silt — unhurried, glad. You take a cast of the last print before the tide has it. The Siren sang someone home an hour ago, and it hears your oar now, and goes quiet, learning your sound.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Boot-Trail Cast"
+          },
+          "requires": {
+            "item": "Ferryman's Crossing-Token"
+          },
+          "locationName": "Mud Seas"
         },
         {
           "stageType": "toll",
-          "narration": "Halla trades the wax-trick for a burial: her brother answered the song last spring and lies out in the shallows unclaimed. \"Bring him to dry ground,\" she says. \"I'll not have him be part of its choir.\"",
+          "narration": "Halla looks at the cast and says the name of the man who made it without being told. She will trade the wax-trick for a burial: her brother answered the song last spring and lies out in the shallows unclaimed. \"Bring him to dry ground,\" she says, marking the bearing on your palm. \"I'll not have him be part of its choir.\"",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Halla's Shallows-Bearing"
+          },
+          "requires": {
+            "item": "Boot-Trail Cast"
+          },
+          "locationName": "Ostragar",
+          "npcName": "Halla the netter"
         },
         {
           "stageType": "favor",
-          "narration": "You wade the shallows for Halla's brother and find a Bog Creeper has claimed the body for its own larder. You drive it off and carry the man to dry ground, out of the Siren's reach at last.",
+          "narration": "You wade Halla's bearing out into the shallows and find her brother — and a Bog Creeper that has claimed the body for its own larder. You drive it off and carry the man up onto dry ground, out of the Siren's reach at last.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "The Netter's Brother"
+          },
+          "requires": {
+            "item": "Halla's Shallows-Bearing"
+          },
+          "locationName": "Mud Seas"
         },
         {
           "stageType": "revelation",
-          "narration": "Halla seals your ears with netter's wax and the song goes flat and far. As you pole toward the roost, the Mud Seas churn — the Siren, unable to sing you down, sends the drowned it has already taken to pull you under by hand.",
+          "narration": "Halla buries her brother above the tideline and comes back with her hands still dirty. She seals your ears with netter's wax, working it in with her thumbs. \"Now it can shout,\" she says, and you only know she said it because you watched her mouth.",
           "arbiter": null,
-          "checkKind": "attack_provoke"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Netter's Ear-Wax Seal"
+          },
+          "requires": {
+            "item": "The Netter's Brother"
+          },
+          "locationName": "Ostragar",
+          "npcName": "Halla the netter"
         },
         {
           "stageType": "catalyst",
-          "narration": "Deaf to the song, you can see the trick of it: the Siren has no voice of its own. It steals throats. Its own reed-throat is the one thing it cannot replace — foul it and the choir falls silent for good.",
-          "arbiter": "\"Silence is the only mercy it will accept,\" the Arbiter says. \"Give it. And give the coast its nights back.\"",
-          "checkKind": "cast"
+          "narration": "You pole into the drowned quarter of Drakova with the song gone flat and far. Unable to sing you down, the Siren sends the drowned it has already taken to pull you under by hand. You break them off the hull one at a time, and the last one goes down clutching a reed-mark cut from the roost itself.",
+          "arbiter": null,
+          "checkKind": "attack_provoke",
+          "grants": {
+            "item": "Reed-Throat Mark"
+          },
+          "requires": {
+            "item": "Netter's Ear-Wax Seal"
+          },
+          "locationName": "Drakova"
         },
         {
           "stageType": "apex",
-          "narration": "You reach the reed-choked roost and the Siren opens a hundred stolen throats at once — soundless to your waxed ears, a gaping, furious quiet. Foul the reed and end the song. It has sung its last name.",
-          "arbiter": "\"You cannot hear it,\" the Arbiter says. \"Good. Do not learn to.\"",
-          "checkKind": "boss"
+          "narration": "The reed-mark takes you to the roost. Deaf to the song, you can see the trick of it at last — the Siren has no voice of its own, it steals throats, and its own reed-throat is the one thing it cannot replace. It opens a hundred stolen mouths at once, a gaping furious quiet. Foul the reed and end the song.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Reed-Throat Mark"
+          },
+          "locationName": "Drakova"
         }
       ]
     },
@@ -628,45 +1032,91 @@
       "stages": [
         {
           "stageType": "inciting_hook",
-          "narration": "The salvage-boss shows you a coil of wire fine as hair and strong as cable. \"It spins the old Tartarian filament into webs and my crews walk into them in the dark. A scavenger called Pike mapped the Pillars before it took his legs. Talk to Pike.\"",
-          "arbiter": "\"It builds with the empire's own thread,\" the Arbiter says. \"An honest thief. Do not admire it long enough to join the web.\"",
-          "checkKind": null
+          "narration": "The salvage-boss cuts you a length of wire fine as hair and strong as cable. \"It spins old Tartarian filament into webs and my crews walk into them in the dark. Go up to the Pillars and see what it does to a crew. Then take that coil to a scavenger called Pike, out at the Architect's Blind — he mapped the Pillars before it took his legs.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Coil of Tartarian Filament"
+          },
+          "locationName": "Reclaimer's Stake",
+          "npcName": "the salvage-boss"
         },
         {
           "stageType": "first_friction",
-          "narration": "Among the Pillars you find a crew's worth of tools scattered under a canopy of iron web, their owners gone but for the wire-marks. The Spider watches from a high pillar. It has already measured you for a strand.",
+          "narration": "Among the Pillars you find a crew's worth of tools scattered under a canopy of iron web, their owners gone but for the wire-marks on the stone. You gather the toolkit — every handle scored by the same filament in your coil. The Spider watches from a high pillar. It has already measured you for a strand.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Wire-Marked Toolkit"
+          },
+          "requires": {
+            "item": "Coil of Tartarian Filament"
+          },
+          "locationName": "Obsidian Pillars"
         },
         {
           "stageType": "toll",
-          "narration": "Pike, legless and bitter, will draw the web-map for a bottle and a promise: his partner is cocooned somewhere in the Pillars and may yet live. \"Cut him down,\" Pike says. \"I can't climb to him. You can.\"",
+          "narration": "Pike goes through the toolkit handle by handle, naming the dead as he goes. He'll draw the web-map for a bottle and a promise: his partner is cocooned somewhere in the Pillars and may yet live. \"Cut him down,\" Pike says, sketching the high lines. \"I can't climb to him. You can.\"",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Pike's Web-Map"
+          },
+          "requires": {
+            "item": "Wire-Marked Toolkit"
+          },
+          "locationName": "The Architect's Blind",
+          "npcName": "Pike the scavenger"
         },
         {
           "stageType": "favor",
-          "narration": "You find Pike's partner wound in iron silk, alive and half-mad, and an Aetheric Spider brood already feeding at the cocoon's edge. You clear them and cut the man free into the light.",
+          "narration": "Pike's lines take you up to where his partner hangs wound in iron silk — alive, half-mad, and with an Aetheric Spider brood already feeding at the cocoon's edge. You clear them and cut the man free into the light.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "The Cocooned Salvager"
+          },
+          "requires": {
+            "item": "Pike's Web-Map"
+          },
+          "locationName": "Obsidian Pillars"
         },
         {
           "stageType": "revelation",
-          "narration": "Pike's map shows the Spider's core-web strung between the three tallest Pillars. As you climb to it, the ruins sing with tension — the Weaver plucking its own strands to shake you loose from a hundred feet up.",
+          "narration": "Pike doesn't thank you and doesn't have to. He turns the web-map over and draws the part he was holding back: the Spider's core-web, strung between the three tallest Pillars, and the one master-strand every other line hangs off.",
           "arbiter": null,
-          "checkKind": "attack_provoke"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Pike's Core-Web Line"
+          },
+          "requires": {
+            "item": "The Cocooned Salvager"
+          },
+          "locationName": "The Architect's Blind",
+          "npcName": "Pike the scavenger"
         },
         {
           "stageType": "catalyst",
-          "narration": "At the core-web you see the flaw: the Spider anchors everything to one master-strand humming with stolen Aether. Cut that and the whole cathedral of wire — and the Weaver on it — comes down at once.",
-          "arbiter": "\"One thread holds the whole design,\" the Arbiter says. \"Find it. Then do not be under the rest when it falls.\"",
-          "checkKind": "cast"
+          "narration": "At the core-web you see the flaw Pike drew: everything anchors to one master-strand humming with stolen Aether. You charge a cutter against that hum until the edge sings back at it. Cut the master-strand and the whole cathedral of wire — and the Weaver on it — comes down at once.",
+          "arbiter": null,
+          "checkKind": "cast",
+          "grants": {
+            "item": "Master-Strand Cutter"
+          },
+          "requires": {
+            "item": "Pike's Core-Web Line"
+          },
+          "locationName": "Obsidian Pillars"
         },
         {
           "stageType": "apex",
           "narration": "You reach the master-strand as the Iron Spider rushes down its own web toward you, fast as a dropped stone. Cut the thread and take it — or ride the collapse into the Pillars' teeth.",
-          "arbiter": "\"Now, and then move,\" the Arbiter says.",
-          "checkKind": "boss"
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Master-Strand Cutter"
+          },
+          "locationName": "Obsidian Pillars"
         }
       ]
     },
@@ -691,45 +1141,91 @@
       "stages": [
         {
           "stageType": "inciting_hook",
-          "narration": "The Order archivist is grey with grief. \"We sent scholars into the Red Tower to read the cursed core's casing. They did not come back — and now something up there wears their faces and calls in their voices. Vesryn kept their field-notes. Start there.\"",
-          "arbiter": "\"It will speak with the voices of people you might have saved,\" the Arbiter says. \"It did not save them. Neither could you. Do not let it argue otherwise.\"",
-          "checkKind": null
+          "narration": "The Order archivist is grey with grief and signs the requisition without reading it. \"We sent scholars into the Red Tower to read the cursed core's casing. They did not come back — and now something up there wears their faces and calls in their voices. Go and see it. Then take what you find to Vesryn, down in Nimari. He kept their field-notes and he will not part with them for asking.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Archivist's Requisition"
+          },
+          "locationName": "Varakush",
+          "npcName": "the Order archivist"
         },
         {
           "stageType": "first_friction",
-          "narration": "In the Tower's lower archive you find the scholars' abandoned notes and, pressed in a ledger, a rubbing of the core-casing that should not exist intact. The Apparition drifts a floor above, trying on a dead woman's laugh.",
+          "narration": "In the Tower's lower archive you find the scholars' abandoned notes and, pressed flat in a ledger, a charcoal rubbing of the core-casing — a casing that should not still be intact. You take the rubbing. The Apparition drifts a floor above, trying on a dead woman's laugh.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Core-Casing Rubbing"
+          },
+          "requires": {
+            "item": "Archivist's Requisition"
+          },
+          "locationName": "the Red Tower of Nimari"
         },
         {
           "stageType": "toll",
-          "narration": "Vesryn will surrender the field-notes on one condition: recover the body of the lead scholar, his student, so she can be named and mourned. \"I sent her in,\" he says. \"Let me at least bring her home.\"",
+          "narration": "Vesryn recognises the rubbing and the hand that made it. He will surrender the field-notes on one condition: recover the body of the lead scholar, his own student, so she can be named and mourned. \"I sent her in,\" he says, drawing the gallery plan from memory. \"Let me at least bring her home.\"",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Vesryn's Gallery Plan"
+          },
+          "requires": {
+            "item": "Core-Casing Rubbing"
+          },
+          "locationName": "Nimari",
+          "npcName": "Vesryn the tutor"
         },
         {
           "stageType": "favor",
-          "narration": "You find the student where the Tower's cursed Aether caught her, and a Shifting Shade circling what remains. You put the Shade down and carry her out, and Vesryn covers his face.",
+          "narration": "The plan takes you up to the third gallery, where the Tower's cursed Aether caught the student — and a Shifting Shade is circling what remains. You put the Shade down and carry her out, and Vesryn covers his face when he sees what you are carrying.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "The Lead Scholar's Remains"
+          },
+          "requires": {
+            "item": "Vesryn's Gallery Plan"
+          },
+          "locationName": "the Red Tower of Nimari"
         },
         {
           "stageType": "revelation",
-          "narration": "The notes reveal it: the Apparition is the cursed core's spillover, a wound in the Aether wearing whatever grief it finds. As you climb to the casing, the Tower turns hostile — the dead scholars' faces surrounding you, all speaking your failures at once.",
+          "narration": "Vesryn names her properly, in front of witnesses, which is all he ever wanted. Then he gives you the field-notes. They say the thing plainly: the Apparition is the cursed core's spillover, a wound in the Aether wearing whatever grief it finds nearest.",
           "arbiter": null,
-          "checkKind": "attack_provoke"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "The Scholars' Field-Notes"
+          },
+          "requires": {
+            "item": "The Lead Scholar's Remains"
+          },
+          "locationName": "Nimari",
+          "npcName": "Vesryn the tutor"
         },
         {
           "stageType": "catalyst",
-          "narration": "At the casing you understand the binding: the Apparition is anchored to the intact core-shell the scholars died reading. Break the shell's seal and the wound closes — but every face it wears will scream at once as it goes.",
-          "arbiter": "\"They are not really in there,\" the Arbiter says. \"But it will sound exactly as if they are. Break it anyway.\"",
-          "checkKind": "cast"
+          "narration": "You climb to the casing with the notes open in one hand, and the Tower turns hostile — the dead scholars' faces surrounding you on every landing, all speaking your failures at once. You cut through them to the casing, and pry the seal-breaker the scholars died machining out of the wall where they left it.",
+          "arbiter": null,
+          "checkKind": "attack_provoke",
+          "grants": {
+            "item": "Core-Shell Seal-Breaker"
+          },
+          "requires": {
+            "item": "The Scholars' Field-Notes"
+          },
+          "locationName": "the Red Tower of Nimari"
         },
         {
           "stageType": "apex",
-          "narration": "You reach the core-casing and the Apparition wears every lost face at once, a chorus of the Order's dead pleading in one voice. Break the seal and lay them to rest — or add your own face to its collection.",
-          "arbiter": "\"Do not answer them,\" the Arbiter says. \"Only end it.\"",
-          "checkKind": "boss"
+          "narration": "At the core-casing the Apparition wears every lost face at once, a chorus of the Order's dead pleading in one voice. Break the seal and lay them to rest — or add your own face to its collection.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Core-Shell Seal-Breaker"
+          },
+          "locationName": "the Red Tower of Nimari"
         }
       ]
     },
@@ -754,45 +1250,91 @@
       "stages": [
         {
           "stageType": "inciting_hook",
-          "narration": "The road-warden points at the sky. \"It takes them at dusk — that hour when the eye can't tell bird from shadow. A trapper named Ferel lost his daughter to it and lived. He hunts it still, out past the dead spires. Find him.\"",
-          "arbiter": "\"It hunts the one hour you cannot see it,\" the Arbiter says. \"Then do not trust your eyes at dusk. Trust the wind and the weight of the air.\"",
-          "checkKind": null
+          "narration": "The road-warden points at the sky and stamps you a dusk-warrant for the Cradle road. \"It takes them at dusk — that hour when the eye can't tell bird from shadow. Walk the road and bring me back something off it. Then take that to a trapper named Ferel; he keeps a line out on the Great Tartary Plains past the dead spires. It took his daughter and he lived.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Warden's Dusk-Warrant"
+          },
+          "locationName": "The Monarch's Waystation",
+          "npcName": "the road-warden"
         },
         {
           "stageType": "first_friction",
-          "narration": "At the road's edge you find a snatched traveler's pack, dropped from a height, and three grey pinions the length of your arm. The Harpy circled back to watch you find them. It is curious now, which is worse.",
+          "narration": "At the road's edge in the Cradle you find a snatched traveller's pack, dropped from a height, and three grey pinions the length of your arm. You bundle them. The Harpy circled back to watch you find them — it is curious now, which is worse.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Three Grey Pinions"
+          },
+          "requires": {
+            "item": "Warden's Dusk-Warrant"
+          },
+          "locationName": "Cradle of Dusk"
         },
         {
           "stageType": "toll",
-          "narration": "Ferel will guide you to the nest for one thing: his daughter's body, taken to the high spire two seasons past. \"I can't make the climb,\" he says. \"You can. Bring her down. Then I'll take you to the roost.\"",
+          "narration": "Ferel measures the pinions against his own arm and knows the bird by them. He'll guide you to the nest for one thing: his daughter's body, taken to the high spire two seasons past. \"I can't make the climb,\" he says, drawing you the line up it. \"You can. Bring her down. Then I'll take you to the roost.\"",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Ferel's High-Spire Line"
+          },
+          "requires": {
+            "item": "Three Grey Pinions"
+          },
+          "locationName": "Great Tartary Plains",
+          "npcName": "Ferel the trapper"
         },
         {
           "stageType": "favor",
-          "narration": "You climb to where the Harpy caches its kills and find Ferel's daughter among older bones, an Aetheric Raven flock already picking the site. You scatter them and bring her down to her father's arms.",
+          "narration": "Ferel's line takes you up to where the Harpy caches its kills. You find his daughter among older bones with an Aetheric Raven flock already picking the site. You scatter them and bring her down.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "Ferel's Daughter"
+          },
+          "requires": {
+            "item": "Ferel's High-Spire Line"
+          },
+          "locationName": "Cradle of Dusk"
         },
         {
           "stageType": "revelation",
-          "narration": "Ferel leads you to the roost at last. As you close, the dusk erupts — the Harpy's brood, half-grown and screaming, flung at you to blind and slow you before the mother folds her wings and drops.",
-          "arbiter": null,
-          "checkKind": "attack_provoke"
+          "narration": "Ferel buries her himself, out where he can see the spires, and then gives you the trick that saved him: the Harpy is deaf in a dive — all eyes, wholly committed to the fall. Stand where the last light throws your shadow long and it will misjudge the strike by a hand. He cuts the mark for that stance into a strip of hide for you.",
+          "arbiter": "\"A hand's width,\" the Arbiter says. \"That is the whole of your advantage. Use it early.\"",
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Ferel's Dusk-Trick"
+          },
+          "requires": {
+            "item": "Ferel's Daughter"
+          },
+          "locationName": "Great Tartary Plains",
+          "npcName": "Ferel the trapper"
         },
         {
           "stageType": "catalyst",
-          "narration": "Ferel gives you the trick that saved him: the Harpy is deaf in a dive, all eyes, committed to the fall. Stand where the last light throws your shadow long and it will misjudge the strike by a hand — the only hand you get.",
-          "arbiter": "\"It cannot pull up once it commits,\" the Arbiter says. \"Be a foot to the left of where it aims. One foot.\"",
-          "checkKind": "cast"
+          "narration": "Ferel walks you in as far as he can stand to and points out the roost. As you close, the dusk erupts — the Harpy's brood, half-grown and screaming, flung at you to blind and slow you before the mother folds her wings. You put them down and pace out the long-shadow ground while the light is still worth anything.",
+          "arbiter": null,
+          "checkKind": "attack_provoke",
+          "grants": {
+            "item": "Long-Shadow Mark"
+          },
+          "requires": {
+            "item": "Ferel's Dusk-Trick"
+          },
+          "locationName": "Cradle of Dusk"
         },
         {
           "stageType": "apex",
-          "narration": "At full dark the Harpy climbs, then folds and drops — a stone with talons. You hold your ground in the last light, let it commit, and step. Now, in the half-beat it cannot correct, end it.",
-          "arbiter": "\"Do not flinch early,\" the Arbiter says. \"The flinch is what it hunts.\"",
-          "checkKind": "boss"
+          "narration": "At full dark the Harpy climbs, then folds and drops — a stone with talons. You hold the ground you marked, let it commit, and step. Now, in the half-beat it cannot correct, end it.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Long-Shadow Mark"
+          },
+          "locationName": "Cradle of Dusk"
         }
       ]
     },
@@ -817,45 +1359,91 @@
       "stages": [
         {
           "stageType": "inciting_hook",
-          "narration": "The caravan-mother spits grit. \"It comes in the wall of dust and leaves the wind its plate. My outriders won't cross the deep plains now. A storm-reader called Yenna knows when it walks — she keeps the last well. Ask her.\"",
-          "arbiter": "\"It hides inside the weather,\" the Arbiter says. \"So learn the weather. On the plains the sky is the only warning you will get.\"",
-          "checkKind": null
+          "narration": "The caravan-mother spits grit and presses her house-token into your hand. \"It comes in the wall of dust and leaves the wind its plate. My outriders won't cross the deep plains now. Go and look at what's left of the last crossing, then take the token to a storm-reader called Yenna — she keeps the last well down in Samarran and she does nothing for free.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Caravan-Mother's Grit-Token"
+          },
+          "locationName": "The Parley Ground",
+          "npcName": "the caravan-mother"
         },
         {
           "stageType": "first_friction",
-          "narration": "You find a scoured caravan half-buried — meat gone, metal frosted to glass where the Fiend passed. In the lee of a wheel, one survivor's scratched warning: IT TURNS WITH THE WIND. The Fiend rides the storm's own edge.",
+          "narration": "You find the scoured caravan half-buried on the deep plains — meat gone, metal frosted to glass where the Fiend passed. In the lee of a wheel, one survivor scratched a warning before the wind took them: IT TURNS WITH THE WIND. You lever the board free and carry it.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Scoured Wheel-Warning"
+          },
+          "requires": {
+            "item": "Caravan-Mother's Grit-Token"
+          },
+          "locationName": "Great Tartary Plains"
         },
         {
           "stageType": "toll",
-          "narration": "Yenna reads storms for the last well's water-price. She'll read this one for you if you clear the drowned pump-works below her well — something has fouled it, and a dry well on the plains is a slow grave. \"Fix my water,\" she says, \"and I'll give you the sky.\"",
+          "narration": "Yenna reads the scratched board twice and the token once. She'll read the sky for you on one condition: clear the drowned pump-works below her well. Something has fouled it, and a dry well on the plains is a slow grave. \"Fix my water,\" she says, handing down the hatch-key, \"and I'll give you the sky.\"",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Yenna's Pump-Works Key"
+          },
+          "requires": {
+            "item": "Scoured Wheel-Warning"
+          },
+          "locationName": "Samarran",
+          "npcName": "Yenna the storm-reader"
         },
         {
           "stageType": "favor",
-          "narration": "You descend Yenna's pump-works and find the foulness: a Bog Creeper denned in the cistern, breeding in the dark. You clear it and the well runs clean, and Yenna's hard face softens by a degree.",
+          "narration": "You unlock the pump-works and go down into the cistern, and find the foulness breeding in the dark: a Bog Creeper denned in the intake. You clear it out. The well runs clean above you, and you bring up the fouling-plate as proof.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "Cistern Fouling-Plate"
+          },
+          "requires": {
+            "item": "Yenna's Pump-Works Key"
+          },
+          "locationName": "Samarran"
         },
         {
           "stageType": "revelation",
-          "narration": "Yenna reads the coming storm and names the hour. As the dust-wall rises you ride out to meet it — and the Fiend, sensing a hunter in its weather, throws the whole plain's grit at you at once, a scouring dark that flays and blinds.",
+          "narration": "Yenna's hard face softens by exactly one degree. She takes three days of sky, folds them into one reading, and names the hour the next wall of dust will rise. Then she tells you the Fiend's law for nothing: it is only whole inside the storm. On still air it comes apart.",
           "arbiter": null,
-          "checkKind": "attack_provoke"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Yenna's Storm-Hour Reading"
+          },
+          "requires": {
+            "item": "Cistern Fouling-Plate"
+          },
+          "locationName": "Samarran",
+          "npcName": "Yenna the storm-reader"
         },
         {
           "stageType": "catalyst",
-          "narration": "Yenna's last gift is the Fiend's law: it is only whole inside the storm; on still air it comes apart. Read the storm's eye — the one pocket of calm it cannot enter — and fight it from there, where it must hold together to reach you.",
-          "arbiter": "\"Stand in the quiet at the heart of the storm,\" the Arbiter says. \"It cannot follow you into the calm without falling to pieces. Make it try.\"",
-          "checkKind": "cast"
+          "narration": "You ride out to meet the wall at Yenna's hour, and the Fiend — sensing a hunter in its own weather — throws the whole plain's grit at you at once, a scouring dark that flays and blinds. You cut through it to the one pocket of calm the storm turns around, and take its bearing while you can still see.",
+          "arbiter": null,
+          "checkKind": "attack_provoke",
+          "grants": {
+            "item": "Storm-Eye Bearing"
+          },
+          "requires": {
+            "item": "Yenna's Storm-Hour Reading"
+          },
+          "locationName": "Great Tartary Plains"
         },
         {
           "stageType": "apex",
-          "narration": "You reach the storm's eye and hold the calm. The Dust Fiend rages at the edge, unable to enter without unmaking, forced to lunge through the still air in a shape it can barely keep. That lunge is the whole fight. Take it.",
-          "arbiter": "\"In the calm it is mortal,\" the Arbiter says. \"Do not step back into the wind.\"",
-          "checkKind": "boss"
+          "narration": "You hold the storm's eye. The Dust Fiend rages at the edge of the calm, unable to enter without unmaking, forced to lunge through still air in a shape it can barely keep. That lunge is the whole fight. Take it.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Storm-Eye Bearing"
+          },
+          "locationName": "Great Tartary Plains"
         }
       ]
     },
@@ -880,45 +1468,91 @@
       "stages": [
         {
           "stageType": "inciting_hook",
-          "narration": "The lodge-surveyor nurses a broken arm. \"We only wanted to read the Tower. Something in the footing stood up — a Golem, old as the stone, and it will not let us past the second floor. My apprentice Del stayed behind, trapped above it. Get to him.\"",
-          "arbiter": "\"It is not angry,\" the Arbiter says. \"It is doing its last order, a thousand years late. That makes it no less able to break you across a wall.\"",
-          "checkKind": null
+          "narration": "The lodge-surveyor nurses a broken arm and signs the warrant left-handed. \"We only wanted to read the Tower. Something in the footing stood up — a Golem, old as the stone — and it will not let us past the second floor. My apprentice Del stayed behind, trapped above it. Get up there and find him.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Lodge Survey Warrant"
+          },
+          "locationName": "Builders' Survey Camp",
+          "npcName": "the lodge-surveyor"
         },
         {
           "stageType": "first_friction",
-          "narration": "You reach the Tower's second floor and find the Golem's work: a stair collapsed to deny the climb, and Builder tools scattered where men ran. High above, a voice — Del, alive, walled in by rubble the Golem itself placed to keep him from the top.",
+          "narration": "You reach the Tower's second floor and find the Golem's work: a stair collapsed to deny the climb, and Builder tools scattered where men ran. You gather what's usable. High above, a voice — Del, alive, walled in by rubble the Golem itself placed to keep him from the top.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Builders' Scattered Tools"
+          },
+          "requires": {
+            "item": "Lodge Survey Warrant"
+          },
+          "locationName": "Thametan's Tower"
         },
         {
           "stageType": "toll",
-          "narration": "Del calls down the deal through the stone: the Tower's upper chamber holds the treatise the Builders came for, but the Golem guards it. \"Bring the reading down and I'll show you the Golem's seam,\" he says. \"I watched it move for a day. I know where it's soft.\"",
+          "narration": "You pass the tools up through the gap and Del calls the deal down through the stone: the upper chamber holds the treatise the Builders came for, and the Golem guards it. \"Bring the reading down and I'll show you the Golem's seam,\" he says. \"I watched it move for a day. I know where it's soft.\" He shouts you the way around the collapsed flight.",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Del's Upper-Chamber Route"
+          },
+          "requires": {
+            "item": "Builders' Scattered Tools"
+          },
+          "locationName": "Thametan's Tower",
+          "npcName": "Del the apprentice"
         },
         {
           "stageType": "favor",
-          "narration": "You climb past the Golem to the upper chamber and find the treatise — and an Iron Spider nesting in the Builders' abandoned gear, guarding it by accident. You clear the nest and take the reading down to Del.",
+          "narration": "Del's route takes you past the Golem to the upper chamber, where the treatise sits exactly where the Builders dropped it — and an Iron Spider has nested in their abandoned gear, guarding it entirely by accident. You clear the nest and take the reading.",
           "arbiter": null,
-          "checkKind": "boss"
+          "checkKind": "boss",
+          "grants": {
+            "item": "The Builders' Treatise"
+          },
+          "requires": {
+            "item": "Del's Upper-Chamber Route"
+          },
+          "locationName": "Thametan's Tower"
         },
         {
           "stageType": "revelation",
-          "narration": "Del reads you the Golem's seam in exchange for the treatise. As you descend to face it, the Tower answers — the Golem tearing its own stair apart to bury you, flinging the Tower at you a block at a time.",
-          "arbiter": null,
-          "checkKind": "attack_provoke"
+          "narration": "Del reads the treatise by lamplight with his hands shaking, and pays for it in full: the Golem's core-heart sits behind a plate that opens only when it winds up a full swing. Bait the swing and for one beat the seam is bare. He draws the timing on the flagstone in chalk and makes you say it back.",
+          "arbiter": "\"One beat,\" the Arbiter says. \"Miss it and the swing that opened the seam is the last thing you feel.\"",
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Del's Seam-Reading"
+          },
+          "requires": {
+            "item": "The Builders' Treatise"
+          },
+          "locationName": "Thametan's Tower",
+          "npcName": "Del the apprentice"
         },
         {
           "stageType": "catalyst",
-          "narration": "Del's watching pays out: the Golem's core-heart sits behind a plate that opens only when it winds up a full swing. Bait the swing, and for one beat the seam is bare. Miss the beat and the swing is the last thing you feel.",
-          "arbiter": "\"It opens itself only to strike,\" the Arbiter says. \"Its attack is its one weakness. Trade the risk for the opening.\"",
-          "checkKind": "cast"
+          "narration": "You go down to face it and the Tower answers — the Golem tearing its own stair apart to bury you, flinging the building at you a block at a time. You wear the barrage down to open floor and count its swings until the rhythm Del chalked out is the one you can feel in your teeth.",
+          "arbiter": null,
+          "checkKind": "attack_provoke",
+          "grants": {
+            "item": "Core-Plate Timing"
+          },
+          "requires": {
+            "item": "Del's Seam-Reading"
+          },
+          "locationName": "Thametan's Tower"
         },
         {
           "stageType": "apex",
-          "narration": "You goad the Golem into a full overhead swing and the core-plate yawns. The Tower holds its breath. Drive into the seam now — or wear the blow that opened it.",
-          "arbiter": "\"On the wind-up,\" the Arbiter says. \"Not before. Not after.\"",
-          "checkKind": "boss"
+          "narration": "You goad the Golem into a full overhead swing and the core-plate yawns exactly on Del's count. The Tower holds its breath. Drive into the seam now — or wear the blow that opened it.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Core-Plate Timing"
+          },
+          "locationName": "Thametan's Tower"
         }
       ]
     },
@@ -943,33 +1577,63 @@
       "stages": [
         {
           "stageType": "urgent_dispatch",
-          "narration": "A physician grabs your sleeve. \"There's no time for the usual dance. Whole quarters near the Sunken Enclave are wasting — a Moth in the upper vaults, dusting the air with rot. Every hour it lives, another street coughs. Go NOW. Kill it at the source.\"",
-          "arbiter": "\"No informant, no favor, no ritual,\" the Arbiter says. \"Only speed. Some monsters you do not study. You outrun their spread and end them. Move.\"",
-          "checkKind": null
+          "narration": "A physician grabs your sleeve and pushes a soaked rot-ward mask at you. \"There's no time for the usual dance. Whole quarters are wasting — a Moth in the upper vaults, dusting the air with rot. Start at the Giant Vault, that's where the first cases walked in from. Every hour it lives, another street coughs. Wear this and go NOW.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Physician's Rot-Ward Mask"
+          },
+          "locationName": "Tartarian Outskirts",
+          "npcName": "the physician"
         },
         {
           "stageType": "false_summit",
-          "narration": "You reach the vault you were sent to and the Moth is already dead — someone got here first, a salvager who cracked it open and is dying of the dust for their trouble. But the vault is a hatchery. This was one of many. The real brood is deeper.",
+          "narration": "You reach the vault you were sent to and the Moth is already dead — someone got here first, a salvager who cracked it open and is dying of the dust for the trouble. You get their testimony out of them a word at a time. The vault is a hatchery. This was one of many.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Salvager's Dying Testimony"
+          },
+          "requires": {
+            "item": "Physician's Rot-Ward Mask"
+          },
+          "locationName": "The Giant Vault"
         },
         {
           "stageType": "investigation",
-          "narration": "The dying salvager gasps the truth: the Moth you were sent for was a drone. The queen roosts in the flooded reliquary below, and every drone she throws off doubles the sickness. You read her descent by the trail of rot-dust settling on the water.",
+          "narration": "The testimony holds the truth the poster didn't: the Moth you were sent for was a drone. The queen roosts in the flooded reliquary under the Sunken Enclave, and every drone she throws off doubles the sickness. You read her descent by the rot-dust settling on the water and take the line down.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Rot-Dust Trail Reading"
+          },
+          "requires": {
+            "item": "Salvager's Dying Testimony"
+          },
+          "locationName": "The Giant Vault"
         },
         {
           "stageType": "gauntlet",
-          "narration": "The reliquary approach is a gauntlet of her drones, throwing themselves into your torch to blind it, dusting your every breath with rot as you push toward the queen's roost. You hold your air and cut through the swarm.",
+          "narration": "The reliquary approach is a gauntlet of her drones, throwing themselves into your torch to blind it and dusting every breath you take with rot. You hold your air and cut through the swarm until the roost door is the only thing left standing between you.",
           "arbiter": null,
-          "checkKind": "attack_provoke"
+          "checkKind": "attack_provoke",
+          "grants": {
+            "item": "Reliquary Approach Mark"
+          },
+          "requires": {
+            "item": "Rot-Dust Trail Reading"
+          },
+          "locationName": "The Sunken Enclave"
         },
         {
           "stageType": "apex",
           "narration": "The Plague Queen fills the flooded reliquary, wings the width of the vault, the whole city's wasting breeding under her. Every second she lives is a street. End her, and end the plague at its throat.",
-          "arbiter": "\"Everything she has thrown off dies when she does,\" the Arbiter says. \"This is the source. There is no second chance and no time to be clever. Kill her.\"",
-          "checkKind": "boss"
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Reliquary Approach Mark"
+          },
+          "locationName": "The Sunken Enclave"
         }
       ]
     },
@@ -994,33 +1658,63 @@
       "stages": [
         {
           "stageType": "urgent_dispatch",
-          "narration": "The Yuldra-Tul reeve is out of patience. \"No time for tracking. The pack owns the road and the Alpha's clever — it fakes a lone lame hound to draw folk in, then the pack takes them. Cut the head off and the rest scatter. Ride out and do it.\"",
-          "arbiter": "\"A clever predator is only a predator that has learned your habits,\" the Arbiter says. \"So do not have habits today. Go, and do the thing it will not expect.\"",
-          "checkKind": null
+          "narration": "The Yuldra-Tul reeve is out of patience and writes the road-writ standing up. \"No time for tracking. The pack owns the road out on the plains and the Alpha's clever — it fakes a lone lame hound to draw folk in, then the pack takes them. Cut the head off and the rest scatter. Ride out and do it.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Reeve's Road-Writ"
+          },
+          "locationName": "Yuldra-Tul",
+          "npcName": "the Yuldra-Tul reeve"
         },
         {
           "stageType": "false_summit",
-          "narration": "You take the road and find the bait exactly as warned — a lone hound feigning a broken leg. But when you close, the pack does not spring. The Alpha is testing whether you know the trick. It watches from the ridge, reconsidering you.",
+          "narration": "You take the road and find the bait exactly as warned — a lone hound feigning a broken leg in the open. But when you close, the pack does not spring. The Alpha is testing whether you know the trick. It watches from the ridge, reconsidering you, and you mark the sign it leaves behind.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Lame-Hound Bait Sign"
+          },
+          "requires": {
+            "item": "Reeve's Road-Writ"
+          },
+          "locationName": "Great Tartary Plains"
         },
         {
           "stageType": "investigation",
-          "narration": "You read the Alpha's real game in the sign: it does not lead the pack, it herds prey toward a box canyon where the pack waits. It has been funneling the whole road into one killing ground. You find the canyon mouth by the bones.",
+          "narration": "You read the Alpha's real game in the sign: it does not lead the pack, it HERDS — funnelling the whole road toward a box canyon on the Yuldra-Tul approach where the pack lies waiting. You find the canyon mouth by the bones and cut a mark for it.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Box-Canyon Bone-Mark"
+          },
+          "requires": {
+            "item": "Lame-Hound Bait Sign"
+          },
+          "locationName": "Great Tartary Plains"
         },
         {
           "stageType": "gauntlet",
-          "narration": "You turn the trap — walk the canyon on your terms and the pack commits, pouring in expecting easy meat and finding a hunter. The Alpha throws the whole pack at you at once to overwhelm what its cleverness could not fool.",
+          "narration": "You turn the trap — walk the canyon on your own terms — and the pack commits, pouring in expecting easy meat and finding a hunter. The Alpha throws everything it has at you at once to overwhelm what its cleverness could not fool. When it goes quiet, the pack is half what it was.",
           "arbiter": null,
-          "checkKind": "attack_provoke"
+          "checkKind": "attack_provoke",
+          "grants": {
+            "item": "Thinned-Pack Tally"
+          },
+          "requires": {
+            "item": "Box-Canyon Bone-Mark"
+          },
+          "locationName": "Yuldra-Tul"
         },
         {
           "stageType": "apex",
           "narration": "With the pack thinned the Alpha finally enters the fight itself — no more games, all teeth and grim intelligence, knowing that when it falls the rest run. Take its head and give the road back to the living.",
-          "arbiter": "\"Kill the mind and the mouths scatter,\" the Arbiter says. \"It knows that too. That is why it stayed on the ridge until now. It is out of ridge. Finish it.\"",
-          "checkKind": "boss"
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Thinned-Pack Tally"
+          },
+          "locationName": "Yuldra-Tul"
         }
       ]
     },
@@ -1045,33 +1739,63 @@
       "stages": [
         {
           "stageType": "urgent_dispatch",
-          "narration": "A Voronov engineer wipes soot and sweat. \"No time to be thorough — the underworks are climbing past what the stone can hold. A Salamander's denned in a live conduit and it's feeding on the flow, getting hotter. If it doesn't stop, the quarter above bakes. Get down there.\"",
-          "arbiter": "\"It is not just a beast, it is a rising temperature,\" the Arbiter says. \"Every minute you spend planning, the ceiling of a city gets warmer. Go.\"",
-          "checkKind": null
+          "narration": "A Voronov engineer wipes soot and sweat and shoves a conduit chit at you. \"No time to be thorough — the underworks are climbing past what the stone can hold. A Salamander's denned in a live conduit out under the Buried Cities and it's feeding on the flow, getting hotter. If it doesn't stop, the quarter above bakes. Get down there.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "grants": {
+            "item": "Engineer's Conduit Chit"
+          },
+          "locationName": "Voronov",
+          "npcName": "the Voronov engineer"
         },
         {
           "stageType": "false_summit",
-          "narration": "You reach the conduit the engineer marked and the Salamander is gone — moved deeper, chasing hotter flow, leaving the first conduit cracked and venting. It is not defending a den. It is following the heat toward the main line. So must you.",
+          "narration": "You reach the conduit the engineer marked and the Salamander is gone — moved deeper, chasing hotter flow, leaving the first line cracked and venting behind it. You take the reading off the crack. It is not defending a den. It is following the heat toward the main line, and so must you.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Cracked Conduit Reading"
+          },
+          "requires": {
+            "item": "Engineer's Conduit Chit"
+          },
+          "locationName": "The Buried Cities"
         },
         {
           "stageType": "investigation",
-          "narration": "You trace it by the glowing conduit-scars to the main junction under Voronov's heart. Here it means to nest for good, wrapped around the quarter's primary Aether-line — the one that, if it bursts, takes the district with it.",
+          "narration": "You trace it by the glowing conduit-scars back under Voronov's heart, to the main junction. Here it means to nest for good, wrapped around the quarter's primary Aether-line — the one that, if it bursts, takes the district with it.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Junction Scar-Trace"
+          },
+          "requires": {
+            "item": "Cracked Conduit Reading"
+          },
+          "locationName": "Voronov"
         },
         {
           "stageType": "gauntlet",
-          "narration": "The junction is a furnace of the Salamander's making, the air itself scalding, lesser fire-things spawned from the overheating flow lunging from every vent as you push to the main line.",
+          "narration": "The junction is a furnace of the Salamander's making, the air itself scalding, lesser fire-things spawned out of the overheating flow lunging from every vent as you push to the main line. You burn your way through to the line and take its bearing off the housing.",
           "arbiter": null,
-          "checkKind": "attack_provoke"
+          "checkKind": "attack_provoke",
+          "grants": {
+            "item": "Main-Line Bearing"
+          },
+          "requires": {
+            "item": "Junction Scar-Trace"
+          },
+          "locationName": "Voronov"
         },
         {
           "stageType": "apex",
           "narration": "The Aetheric Salamander coils the main conduit, glowing white, the whole quarter's heat cycling through its body. Kill it here, at the line, before it nests — or read Voronov's obituary in the rising glow.",
-          "arbiter": "\"It is one conduit away from cooking a district,\" the Arbiter says. \"There is no clever finish. Put it out at the main line, now, and let the city cool.\"",
-          "checkKind": "boss"
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Main-Line Bearing"
+          },
+          "locationName": "Voronov"
         }
       ]
     }

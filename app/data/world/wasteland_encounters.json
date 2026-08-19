@@ -181,7 +181,7 @@
       { "name": "Climbing Rope", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["tool"] },
       { "name": "Aether Crystal", "weight": 10, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] }
     ],
-    "lore_note": "On the central desk: a logbook in three different hands. The final entry, written calmly: 'The Compass keeps pointing at the Cradle. None of us have argued with it for weeks. Tomorrow we walk.' The compass on the desk is the one in your pack now.",
+    "lore_note": "On the central desk: a logbook in three different hands. The final entry, written calmly: 'It keeps pointing at the Cradle. None of us have argued with it for weeks. Tomorrow we walk.'",
     "quest_hook": { "kind": "mystery", "id": "mystery_cradle_compass" }
   },
 
@@ -267,7 +267,7 @@
       { "name": "Aether Dust", "weight": 25, "min": 1, "max": 4, "kind": "misc", "tags": ["aether","dust","distillable"] },
       { "name": "Tartarian Map Fragment", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["ancient","map","fragment"] }
     ],
-    "lore_note": "The map fragment is in old Tartarian and shows a stretch of coastline that does not exist on any current map. The cartographer's mark in the corner is a single Aetheric eye, open."
+    "lore_note": "Among the papers, old Tartarian charts of a stretch of coastline that exists on no current map. The cartographer's mark in every corner is a single Aetheric eye, open."
   },
 
   "failing_automaton": {
@@ -325,7 +325,7 @@
       { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
       { "name": "Aetheric Shard", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","shard"] }
     ],
-    "lore_note": "The locket is warm and engraved on the back with a name in old Tartarian. You will not know what it says, but you will not be able to forget that you cannot read it."
+    "lore_note": "Whatever the fold left behind is warm — a heat that is not the sun's — and worked with old Tartarian marks. You will not know what they say, but you will not be able to forget that you cannot read them."
   },
 
   "aetherkin_mourner": {
@@ -551,7 +551,7 @@
       { "name": "Aether Dust", "weight": 15, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","dust","distillable"] },
       { "name": "Sealed Tartarian Letter", "weight": 10, "min": 1, "max": 2, "kind": "misc", "tags": ["letter","ancient","story"] }
     ],
-    "lore_note": "One letter on top of the pile is addressed to a name you have heard on a quest poster: a Reclaimer who is alive today, more or less. The seal is one you do not recognise. You can deliver it. You can keep it. You can leave it."
+    "lore_note": "The pile of letters is addressed in a dozen hands, and one name near the top you have heard on a quest poster — a Reclaimer who is alive today, more or less. Someone meant these to arrive. Nobody has carried them in a hundred years."
   },
 
   "fallen_sentinel_husk": {
@@ -566,7 +566,7 @@
       { "name": "Aetheric Shard", "weight": 15, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","shard"] },
       { "name": "Sentinel Core Plate", "weight": 10, "min": 1, "max": 1, "kind": "misc", "tags": ["automaton","plate","rare"] }
     ],
-    "lore_note": "Engraved on the inside of the chest plate, in the original Tartarian: 'If you find me intact, I will defend you. If you find me broken, I am sorry. I served as long as I could.'"
+    "lore_note": "Engraved inside a shattered sentinel's chest housing, in the original Tartarian: 'If you find me intact, I will defend you. If you find me broken, I am sorry. I served as long as I could.'"
   },
 
   "reclaimer_excavation_pit": {
@@ -581,7 +581,7 @@
       { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] },
       { "name": "Reclaimer Survey Journal", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["journal","story","reclaimers"] }
     ],
-    "lore_note": "The last journal entry, in a Reclaimer's careful hand: 'The stone is warm. The stone is breathing. We are going back down. If we do not return, please tell the Guild that we found it, and that it is awake.'"
+    "lore_note": "A last entry in a Reclaimer's careful hand, on a page pinned under a rock: 'The stone is warm. The stone is breathing. We are going back down. If we do not return, please tell the Guild that we found it, and that it is awake.'"
   },
 
   "tartarian_mausoleum": {

@@ -27,10 +27,13 @@ describe('OTA-1023 — stale and fresh copies of the same item price identically
     const src = fs.readFileSync(path.join(__dirname, '..', 'app', 'engine', 'sellPrice.ts'), 'utf8');
     expect(src).toContain("!findCatalogItem(item.name, { aliases: false }) ? 0.5 : 1");
   });
-  it('the arbitrage floor and armor-floor gate read canonical values (source lock)', () => {
+  it('the arbitrage floor and gear-floor gate read canonical values (source lock)', () => {
     const src = fs.readFileSync(path.join(__dirname, '..', 'app', 'engine', 'sellPrice.ts'), 'utf8');
     expect(src).toContain('const capRarity = canonicalItemRarity(item);');
-    expect(src).toContain("if (canonicalItemKind(item) !== 'armor') return undefined;");
+    // OTA-1335 — the per-piece floor covers weapons too now (tcBuy ?? tc), but the
+    // gate must still read the CANONICAL kind, which is what this lock protects.
+    expect(src).toContain("if (kind !== 'armor' && kind !== 'weapon') return undefined;");
+    expect(src).toContain('const kind = canonicalItemKind(item);');
     expect(src).toContain('const sellKind = canonicalItemKind(item);');
   });
 });

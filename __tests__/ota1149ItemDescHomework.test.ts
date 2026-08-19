@@ -1,4 +1,8 @@
-// OTA-1149 — THE FIRST HOMEWORK SLOT: ITEM DESCRIPTIONS.
+// ⚠ PORTED FROM THE GOLEM LINE during the golem-parity pass. Golem is the model
+// line, so its version of this suite is authoritative; the OTA numbers in the
+// commentary below are GOLEM's, which is the honest provenance for where the
+// behaviour being pinned was actually written.
+// OTA-1126 — THE FIRST HOMEWORK SLOT: ITEM DESCRIPTIONS.
 //
 // Owner's governing rule for the whole homework track, and the thing that
 // decided which slot ships first:
@@ -20,7 +24,7 @@
 // is the whole point, because those are five OTAs of hard-won correctness and
 // a second copy would drift from them invisibly.
 //
-// It rides OTA-1146's harness, so it queues below voice and is cut short the
+// It rides OTA-1123's harness, so it queues below voice and is cut short the
 // moment the player acts. Owner's requirement was that idle work cost the
 // player nothing; the harness is what delivers that, and this is its first
 // real consumer beyond the bank's own filler.
@@ -45,11 +49,11 @@ const INV: string = require('fs').readFileSync(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('path').join(__dirname, '../app/screens/InventoryScreen.tsx'), 'utf8');
 
-describe('OTA-1149 — the slot reuses the live path rather than copying it', () => {
+describe('OTA-1126 — the slot reuses the live path rather than copying it', () => {
   it('⚠ synthesis takes a homework flag and changes NOTHING else', () => {
     // Same prompt, same clamps, same cache, same discard. If a future edit
     // forks a second synthesis path for homework, the two will drift and only
-    // one of them will have the OTA-1132 pipe-loop fix in it.
+    // one of them will have the OTA-1109 pipe-loop fix in it.
     expect(SYNTH).toContain('opts?: { homework?: boolean },');
     expect(SYNTH).toContain('homework: opts?.homework,');
   });
@@ -65,7 +69,7 @@ describe('OTA-1149 — the slot reuses the live path rather than copying it', ()
   });
 });
 
-describe('OTA-1149 — the idle gate, and every muzzle it inherits', () => {
+describe('OTA-1126 — the idle gate, and every muzzle it inherits', () => {
   const tick = SRC.slice(SRC.indexOf('const homeworkTick = (): void => {'),
     SRC.indexOf('setHomeworkTick(homeworkTick);'));
 
@@ -82,7 +86,7 @@ describe('OTA-1149 — the idle gate, and every muzzle it inherits', () => {
   });
 
   it('⚠ the difficulty dial still wins — a hard run gets no free identification', () => {
-    // OTA-1140's witholdIdentity says the enrichment does not run. Homework
+    // OTA-1117's witholdIdentity says the enrichment does not run. Homework
     // must not become a back door around a rule the player chose.
     expect(tick).toContain('if (profileOf(get().player).witholdIdentity) return;');
   });
@@ -103,10 +107,14 @@ describe('OTA-1149 — the idle gate, and every muzzle it inherits', () => {
   });
 });
 
-describe('OTA-1149 — ⚠ the player coming back always wins', () => {
+describe('OTA-1126 — ⚠ the player coming back always wins', () => {
   it('submitPlayerAction clears the idle stamp at the one door every action uses', () => {
     const head = SRC.slice(SRC.indexOf('submitPlayerAction(text, _opts) {'));
-    expect(head.slice(0, 900)).toContain('if (get().uiIdleSince !== null) set({ uiIdleSince: null });');
+    // OTA-1351 widened this window (900 -> 1600): the dying-breath try/finally
+    // wrap and its comment now sit between the door and the idle-clear. The
+    // lock's claim is unchanged -- the clear happens at the TOP of the door,
+    // before any action dispatch -- the top is just a few lines deeper now.
+    expect(head.slice(0, 1600)).toContain('if (get().uiIdleSince !== null) set({ uiIdleSince: null });');
   });
 
   it('⚠ marking idle is idempotent — a re-render must not restart the dwell', () => {
@@ -129,7 +137,7 @@ describe('OTA-1149 — ⚠ the player coming back always wins', () => {
   });
 });
 
-describe('OTA-1150 — ⚠ the tracking that can answer the caching question', () => {
+describe('OTA-1127 — ⚠ the tracking that can answer the caching question', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const TEL: string = require('fs').readFileSync(
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -160,11 +168,22 @@ describe('OTA-1150 — ⚠ the tracking that can answer the caching question', (
     expect(TEL).toContain('${cached}${perTok}');
   });
 
-  it('⚠ reuse is KEPT, not deleted — it is a fact about the field, not noise', () => {
-    // If cachedTokens ever starts reporting properly, the reuse figure becomes
-    // meaningful again. Removing it would destroy the only evidence that it
-    // was ever zero.
-    expect(TEL).toContain('reuse${j.reusedTokens}t');
+  it('⚠⚠ reuse is RETIRED from the display, and the reason is recorded in its place', () => {
+    // ⚠⚠ OTA-1259 (N4) REVERSED THIS ONE. OTA-1127 kept the figure on the reasoning
+    // that "if cachedTokens ever starts reporting properly, reuse becomes
+    // meaningful again" — which assumed the field was misreporting. **It is not.**
+    // llama.rn reports `tokens_cached` as `llama->n_past` (jni.cpp:748), the
+    // sequence position after the call: prompt + generated, reuse or no reuse.
+    // The derived remainder is ~0 BY CONSTRUCTION and there is no future build in
+    // which it starts to move.
+    //
+    // ⚠ The evidence is not destroyed by removing the display — it is PRESERVED,
+    // in the tombstone on the field itself, which is the place someone tempted to
+    // re-derive it will actually look. **A metric that cannot move is worse than
+    // no metric: it reads as evidence.**
+    expect(TEL).not.toContain('reuse${j.reusedTokens}t');
+    expect(TEL).toContain('jni.cpp:748');
+    expect(TEL).toContain('reusedTokens: number;');   // the field survives as a tombstone
   });
 
   it('a job with no measured prefill shows no range rather than a fake zero', () => {

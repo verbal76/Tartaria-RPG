@@ -158,7 +158,23 @@ describe('OTA-1107 — SOURCE LOCKS (watchdog rules)', () => {
   });
 
   it('the backoff resets on recovery AND on a fresh return to foreground', () => {
-    expect(store).toMatch(/if \(next === 'active'\) \{ qwenBackoffLevel = 0; tick\(\); \}/);
+    // ⚠ RETARGETED BY OTA-1196, NOT WEAKENED — and the CLAIM in this test's own name is
+    // what survives. "A fresh return to foreground" still resets the ladder; OTA-1196 only
+    // made "fresh return" mean an actual one. iOS fires `active` for a notification
+    // banner, a Control Center pull and a peek at the app switcher, so the old spelling
+    // reset the ladder — and bought a ~400MB reload — on incidental twitches. The owner's
+    // freeze log caught three, each ~350ms after a "holding revival" line.
+    // ⚠ OTA-1287 widened this handler (it now also restarts the foreground-
+    // settle clock so the watchdog cannot bypass the re-warm debounce). The
+    // RULE pinned here is unchanged: only a genuine `background` sets the flag.
+    expect(store).toMatch(/if \(next === 'background'\) \{[\s\S]{0,300}?qwenTrulyBackgrounded = true;/);
+    expect(store).toMatch(/if \(!qwenTrulyBackgrounded\) return;/);
+    // The reset itself is intact behind that gate — this is a narrower trigger, not a
+    // removed behaviour.
+    const fg = store.indexOf('if (!qwenTrulyBackgrounded) return;');
+    const gated = store.slice(fg, fg + 700);
+    expect(gated).toMatch(/qwenBackoffLevel = 0;/);
+    expect(gated).toMatch(/tick\(\);/);
     // Recovery path zeroes the whole ledger.
     const start = store.indexOf('function runQwenHealthCheck(');
     const body = store.slice(start, start + 2500);

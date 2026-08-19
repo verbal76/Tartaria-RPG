@@ -237,7 +237,7 @@
       },
       "outpost_messhall": {
         "name": "The Break Room",
-        "shortName": "Break",
+        "shortName": "Breakroom",
         "description": "A drop-ceiling room with a microwave, a coffee maker, and a kettle. Halem keeps the small talk small; the gossip that matters happens elsewhere."
       },
       "outpost_workshop": {
@@ -316,7 +316,7 @@
       },
       "outpost_chapel": {
         "name": "The Vigil Chamber",
-        "shortName": "Vigil",
+        "shortName": "Shrine",
         "description": "A meditation room facing the Vault. The Servants come here to keep the silent watch — eight hours, no speaking, no light but the tomb-lantern."
       },
       "outpost_culvert_descent": {
@@ -334,7 +334,7 @@
       },
       "outpost_central": {
         "name": "The Plan Floor",
-        "shortName": "Plans",
+        "shortName": "Plan Floor",
         "description": "A workshop floor of laid blueprints and stacked stone. The center stone has the Buried Cities' load-bearing tunnels chalked across it in three layers.",
         "open_air": false
       },
@@ -370,7 +370,7 @@
       },
       "outpost_chapel": {
         "name": "The Plan Room",
-        "shortName": "Plans",
+        "shortName": "Plan Room",
         "description": "A room with one drafting table and a single Aether-lamp. The Builders sit here when a structural problem refuses to yield on the workshop floor."
       },
       "outpost_culvert_descent": {
@@ -408,8 +408,8 @@
         "description": "Tools laid out for the next public dig. Tarek rebuilds donated equipment overnight so the cells can hand a working drone to a documentary crew at dawn."
       },
       "outpost_quarters": {
-        "name": "The Crash Room",
-        "shortName": "Crash",
+        "name": "The Cell Bunks",
+        "shortName": "Bunks",
         "description": "Mismatched mattresses on the floor, a curtain for privacy that nobody really uses. Cells sleep where they can; the work doesn't wait."
       },
       "outpost_lab": {

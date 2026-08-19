@@ -2,6 +2,7 @@
   "storylines": [
     {
       "id": "story_order_red_tower",
+      "targetLocationName": "Red Tower of Nimari",
       "title": "The Red Tower's Mouth",
       "posterText": "Vesryn of Varakush wants you to gather every Fragment of the Red Tower you can find and bring them to the Order. Multi-step contract. 1500 TC and faction standing on completion.",
       "factionId": "forgotten_order",
@@ -11,54 +12,115 @@
       "rewardRep": 25,
       "stages": [
         {
-          "narration": "Vesryn spreads a map of the south plains. \"We need every Fragment of the Red Tower we can put hands on. There are at least seven scattered across the silt belt. Find them. Bring them. We pay for each.\"",
-          "arbiter": "\"The Order doesn't ask for this lightly,\" the Arbiter says. \"They're rebuilding something.\"",
-          "checkKind": null
-        },
-        {
-          "narration": "You head south. The first Fragment shows up where Vesryn promised — a hexagonal piece of cooled Tartarian iron, still warm. You pocket it.",
+          "narration": "Vesryn spreads a map of the south plains and marks seven crosses on it. \"We need every Fragment of the Red Tower we can put hands on — there are at least seven scattered across the silt belt. Work the map in order. Bring them here as you go or bring them all at once, but bring them.\"",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": null,
+          "grants": {
+            "item": "Vesryn's Fragment Map"
+          },
+          "locationName": "Varakush",
+          "npcName": "Vesryn"
         },
         {
-          "narration": "A second Fragment turns up in an old Reclaimer caravan-wreck. You haggle with the survivor over the price of letting you take it.",
+          "narration": "The first cross puts you out on the Great Tartary Plains, and the Fragment is where Vesryn promised — a hexagonal piece of cooled Tartarian iron, still warm to the hand. You pocket it and read the next cross off the map.",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "First Fragment"
+          },
+          "requires": {
+            "item": "Vesryn's Fragment Map"
+          },
+          "locationName": "Great Tartary Plains"
         },
         {
-          "narration": "A Mud Monarch courier is also looking for the Fragments — they pass you on the road and you stay clear of their notice.",
-          "arbiter": "\"Whoever assembles all seven first wins something we do not yet understand,\" the Arbiter says.",
-          "checkKind": "stealth"
-        },
-        {
-          "narration": "Third Fragment is in a Sentinel patrol zone. You time the loop.",
+          "narration": "The second sits in an old Reclaimer caravan-wreck out in the Cradle, and the wreck has a survivor who considers it hers. You haggle over the price of taking it, and settle it without anyone reaching for anything.",
           "arbiter": null,
-          "checkKind": "stealth"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Second Fragment"
+          },
+          "requires": {
+            "item": "First Fragment"
+          },
+          "locationName": "Cradle of Dusk",
+          "npcName": "the caravan survivor"
         },
         {
-          "narration": "Fourth and fifth come from a single buried vault. The locking glyphs nearly take your hand off.",
+          "narration": "A Mud Monarch courier is working the same map from the other end. You go still among the Pillars and let them pass within twenty feet, and when they are gone you lift the route-slip they dropped changing horses. Now you know which crosses they have already taken.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Courier's Route-Slip"
+          },
+          "requires": {
+            "item": "Second Fragment"
+          },
+          "locationName": "Obsidian Pillars"
         },
         {
-          "narration": "Sixth is under an Aether Golem. You don't fight it — you wait until it wanders off and dig where it had been standing.",
+          "narration": "The third Fragment lies inside a Sentinel patrol zone, and the route-slip tells you the courier turned back rather than try it. You time the loop instead — three passes to learn it, one to walk it — and come out with the piece and all your fingers.",
           "arbiter": null,
-          "checkKind": "stealth"
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Third Fragment"
+          },
+          "requires": {
+            "item": "Courier's Route-Slip"
+          },
+          "locationName": "the Sentinel Ward"
         },
         {
-          "narration": "Seventh is buried in a Mud Spirit's nesting ground. You convince the lesser spirits to let you through.",
+          "narration": "Fourth and fifth come out of a single buried vault under the Giant Vault's floor, packed together the way a smith stacks offcuts. The locking glyphs nearly take your hand off on the way in. You leave with both.",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Fourth and Fifth Fragments"
+          },
+          "requires": {
+            "item": "Third Fragment"
+          },
+          "locationName": "The Giant Vault"
         },
         {
-          "narration": "You assemble all seven and study them. They fit together — partially. Vesryn was right: something is being rebuilt. You carry the bundle back to Varakush.",
-          "arbiter": "\"The Order will not tell you what comes next,\" the Arbiter says. \"But you have done what they could not.\"",
-          "checkKind": "boss"
+          "narration": "The sixth is under an Aether Golem on the Endless Stair's lower landing. You do not fight it — you sit in the dark for two hours until it wanders off its patch, then dig where it had been standing and are gone before it comes back.",
+          "arbiter": null,
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Sixth Fragment"
+          },
+          "requires": {
+            "item": "Fourth and Fifth Fragments"
+          },
+          "locationName": "Endless Stair"
+        },
+        {
+          "narration": "The seventh is buried in a Mud Spirit's nesting ground out in the Seas. You do not dig first and apologise after — you talk the lesser spirits into a passage, and they open one grudgingly, and you take only the iron.",
+          "arbiter": null,
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Seventh Fragment"
+          },
+          "requires": {
+            "item": "Sixth Fragment"
+          },
+          "locationName": "Mud Seas"
+        },
+        {
+          "narration": "You lay all seven on Vesryn's table and the two of you fit them together. They join — partially, along edges that were machined to join. Vesryn was right, and worse than right: something is being rebuilt, and someone else is collecting the same pieces.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Seventh Fragment"
+          },
+          "locationName": "Varakush",
+          "npcName": "Vesryn"
         }
       ]
     },
     {
       "id": "story_tartarian_ascension",
+      "targetLocationName": "The Sunken Enclave",
       "title": "The Path of the True Tartarian",
       "posterText": "Korash of the Deep offers a full True Tartarian ascension trial. Seven steps. Pass them all and the enclave will treat you as one of their own. 1200 TC and major rep.",
       "factionId": "true_tartarians",
@@ -68,49 +130,102 @@
       "rewardRep": 30,
       "stages": [
         {
-          "narration": "Korash motions you to sit. \"You have shown enough. The trial is seven steps. Refuse any, walk away. Complete them all and the enclave will know you as kin.\"",
-          "arbiter": "\"This is not a gift the True Tartarians give twice,\" the Arbiter says.",
-          "checkKind": null
-        },
-        {
-          "narration": "Step one — the silent pilgrimage. You walk a buried road without speaking, without resting, for the better part of a day.",
+          "narration": "Korash motions you to sit and puts a trial-token in your hand. \"You have shown enough. The trial is seven steps and they are not all here — the pilgrimage, the rune, the dive. Refuse any and walk away. Complete them all and the enclave will know you as kin.\"",
           "arbiter": null,
-          "checkKind": "escape"
+          "checkKind": null,
+          "grants": {
+            "item": "Korash's Trial-Token"
+          },
+          "locationName": "The Sunken Enclave",
+          "npcName": "Korash of the Deep"
         },
         {
-          "narration": "Step two — the rune trial. A Tartarian glyph is set into a wall. You must read it and trace your name beneath in Aetheric chalk.",
+          "narration": "Step one — the silent pilgrimage. You walk a buried road under the Cities without speaking and without resting, for the better part of a day, and you come up the far end with your mouth dry and the token still in your fist.",
           "arbiter": null,
-          "checkKind": "cast"
+          "checkKind": "escape",
+          "grants": {
+            "item": "Pilgrimage Mark"
+          },
+          "requires": {
+            "item": "Korash's Trial-Token"
+          },
+          "locationName": "The Buried Cities"
         },
         {
-          "narration": "Step three — the dive. A flooded antechamber. You swim into the dark with a single torch and bring back what the elders left there.",
-          "arbiter": "\"Most fail here,\" the Arbiter says. \"Do not breathe in.\"",
-          "checkKind": "investigate"
-        },
-        {
-          "narration": "Step four — the standing watch. You hold the night-shift at the enclave's mouth, alone. Whatever comes by, you do not call for help.",
+          "narration": "Step two — the rune trial, at the old ritual seat. A Tartarian glyph is set into the wall at Karok-Sa. You must read it and trace your own name beneath it in Aetheric chalk, in a hand steady enough that the wall accepts it.",
           "arbiter": null,
-          "checkKind": "stealth"
+          "checkKind": "cast",
+          "grants": {
+            "item": "Chalked Name"
+          },
+          "requires": {
+            "item": "Pilgrimage Mark"
+          },
+          "locationName": "Karok-Sa"
         },
         {
-          "narration": "Step five — the fast. You go a full day without rations. The hunger sharpens you. Korash brings you water once.",
+          "narration": "Step three — the dive. The Cathedral's flooded antechamber, one torch, and the dark. You swim down to where the elders left their charge a generation ago and bring it back up without opening it.",
           "arbiter": null,
-          "checkKind": "escape"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Elders' Sunken Charge"
+          },
+          "requires": {
+            "item": "Chalked Name"
+          },
+          "locationName": "the Sinking Cathedral"
         },
         {
-          "narration": "Step six — the duel. A young Tartarian challenges you to a non-lethal sparring match. You win or lose with honour.",
+          "narration": "Step four — the standing watch. You hold the night-shift at the enclave's mouth, alone and unlit. Twice something comes near enough to hear. You do not call for help either time, and in the morning you hand over a tally of what passed.",
           "arbiter": null,
-          "checkKind": "attack_provoke"
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Night-Watch Tally"
+          },
+          "requires": {
+            "item": "Elders' Sunken Charge"
+          },
+          "locationName": "The Sunken Enclave"
         },
         {
-          "narration": "Step seven — the oath. Korash and three elders stand witness. You say the words. They repeat them back. It is done.",
-          "arbiter": "\"You belong to them now, in part,\" the Arbiter says. \"It will count when it counts.\"",
-          "checkKind": "boss"
+          "narration": "Step five — the fast. A full day out on the Outskirts with no rations and no shelter to sit in. The hunger sharpens you rather than emptying you, which is the whole point of it. Korash rides out once, gives you water, and says nothing.",
+          "arbiter": null,
+          "checkKind": "escape",
+          "grants": {
+            "item": "Fast-Keeper's Token"
+          },
+          "requires": {
+            "item": "Night-Watch Tally"
+          },
+          "locationName": "Tartarian Outskirts"
+        },
+        {
+          "narration": "Step six — the duel. A young Tartarian calls you out for a non-lethal match in front of the whole enclave. You take it seriously, which is the courtesy owed, and you both walk away with honours and a great deal of bruising.",
+          "arbiter": null,
+          "checkKind": "attack_provoke",
+          "grants": {
+            "item": "Sparring Honours"
+          },
+          "requires": {
+            "item": "Fast-Keeper's Token"
+          },
+          "locationName": "The Sunken Enclave"
+        },
+        {
+          "narration": "Step seven — the oath. Korash and three elders stand witness. You say the words. They repeat them back to you, which is the part nobody warns you about. It is done, and you are kin.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Sparring Honours"
+          },
+          "locationName": "The Sunken Enclave",
+          "npcName": "Korash of the Deep"
         }
       ]
     },
     {
       "id": "story_reclaimer_relic_run",
+      "targetLocationName": "The Buried Cities",
       "title": "The Reclaimer Relic Run",
       "posterText": "Reclaimers Guild Speaker offers a five-stop relic run — five hidden caches, five takes, no questions. 1400 TC, Guild standing, and a permanent slot on the haul board.",
       "factionId": "reclaimers_guild",
@@ -120,39 +235,84 @@
       "rewardRep": 24,
       "stages": [
         {
-          "narration": "The Speaker hands you a sealed map with five marks. \"Each is a relic cache. Hit them in order. You keep nothing of the haul beyond a finder's cut — but you walk out a name in the Guild.\"",
+          "narration": "The Speaker hands you a sealed map with five marks on it. \"Each is a relic cache. Hit them in the order they're numbered — they're spread wide on purpose. You keep nothing of the haul beyond a finder's cut, but you walk out a name in the Guild.\"",
           "arbiter": null,
-          "checkKind": null
+          "checkKind": null,
+          "grants": {
+            "item": "Sealed Five-Mark Map"
+          },
+          "locationName": "Reclaimer's Stake",
+          "npcName": "the Reclaimers Guild Speaker"
         },
         {
-          "narration": "First mark — a half-buried Tartarian utility room. You crack the lock-glyph and pull the haul.",
+          "narration": "First mark — a half-buried Tartarian utility room under the Buried Cities. You crack the lock-glyph the slow way, because the fast way is how Reclaimers lose hands, and pull the haul out whole.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "First Haul"
+          },
+          "requires": {
+            "item": "Sealed Five-Mark Map"
+          },
+          "locationName": "The Buried Cities"
         },
         {
-          "narration": "Second mark — a Reclaimer rival has been here recently. You read their tracks, decide they will not be back for hours, and finish the work.",
-          "arbiter": "\"The Guild rewards the quiet ones,\" the Arbiter says.",
-          "checkKind": "stealth"
-        },
-        {
-          "narration": "Third mark — a Sentinel guards the approach. You time the patrol again and slip past.",
+          "narration": "Second mark, down in Voronov — and a Guild rival has been here inside the week. You read their tracks, judge they will not be back before dark, and work quietly enough that they will not know anyone was.",
           "arbiter": null,
-          "checkKind": "stealth"
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Second Haul"
+          },
+          "requires": {
+            "item": "First Haul"
+          },
+          "locationName": "Voronov"
         },
         {
-          "narration": "Fourth mark — a Mud Spirit nests on top of the cache. You talk it down to a small offering of rations and it lets you in.",
+          "narration": "Third mark — a Sentinel holds the approach among the Pillars, still walking a loop nobody has cancelled. You time it again, the way you did the first one, and slip the cache out between passes.",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Third Haul"
+          },
+          "requires": {
+            "item": "Second Haul"
+          },
+          "locationName": "Obsidian Pillars"
         },
         {
-          "narration": "Fifth mark — the Speaker did not mention this one is mid-collapse. You dig fast.",
+          "narration": "Fourth mark — a Mud Spirit has nested directly on top of the cache out in the Seas. You talk it down to a small offering of rations, which costs you a day's food and no blood at all, and it lets you in.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "Fourth Haul"
+          },
+          "requires": {
+            "item": "Third Haul"
+          },
+          "locationName": "Mud Seas"
         },
         {
-          "narration": "You return all five hauls to the Speaker. They count them once, look at you once, and nod.",
-          "arbiter": "\"You are on the board now,\" the Arbiter says. \"That carries weight here.\"",
-          "checkKind": "boss"
+          "narration": "Fifth mark, at Samarran — and the Speaker did not mention this one is mid-collapse. You dig fast, with the ceiling talking the whole time, and you are out with the haul before it finishes the sentence.",
+          "arbiter": null,
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Fifth Haul"
+          },
+          "requires": {
+            "item": "Fourth Haul"
+          },
+          "locationName": "Samarran"
+        },
+        {
+          "narration": "You put all five hauls on the Speaker's table. They count them once, look at you once, and nod — which from a Guild Speaker is a paragraph.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "Fifth Haul"
+          },
+          "locationName": "Reclaimer's Stake",
+          "npcName": "the Reclaimers Guild Speaker"
         }
       ]
     },
@@ -167,49 +327,103 @@
       "rewardRep": 25,
       "stages": [
         {
-          "narration": "Kincaid passes you a list of six names across a polished table. \"All of these have been writing about Tartaria where they should not. We do not require them dead. We require them quiet. Means are your business.\"",
-          "arbiter": "\"The Monarchs deal in silence,\" the Arbiter says quietly. \"Not in mercy.\"",
-          "checkKind": null
-        },
-        {
-          "narration": "First name — a Reclaimer who has been talking to Order scholars. You make a compelling case for them to keep their finds to themselves.",
+          "narration": "Kincaid slides a list of six names across a polished table. \"All of these have been writing about Tartaria where they should not. We do not require them dead. We require them quiet. They are scattered — the list has where. Means are your business.\"",
           "arbiter": null,
-          "checkKind": "diplomacy"
+          "checkKind": null,
+          "grants": {
+            "item": "Kincaid's List of Six"
+          },
+          "locationName": "The Monarch's Waystation",
+          "npcName": "Dr. Lucius Kincaid"
         },
         {
-          "narration": "Second name — an Unknowing Masses journalist with a draft article. You take the draft.",
+          "narration": "First name — a Reclaimer at the Stake who has been talking to Order scholars over drink. You make a compelling case for keeping his finds to himself, and he takes it, and writes you a note saying so because he wants it on record that he was reasonable.",
           "arbiter": null,
-          "checkKind": "stealth"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "A Reasonable Man's Note"
+          },
+          "requires": {
+            "item": "Kincaid's List of Six"
+          },
+          "locationName": "Reclaimer's Stake",
+          "npcName": "the talkative Reclaimer"
         },
         {
-          "narration": "Third name — a Forgotten Order scholar's apprentice. You don't approach them directly; you make sure their next field expedition turns up nothing.",
+          "narration": "Second name — an Unknowing Masses journalist working the Market with a finished draft in her satchel. You take the draft and leave the satchel, which buys a week before she is certain rather than an hour.",
           "arbiter": null,
-          "checkKind": "investigate"
+          "checkKind": "stealth",
+          "grants": {
+            "item": "The Journalist's Draft"
+          },
+          "requires": {
+            "item": "A Reasonable Man's Note"
+          },
+          "locationName": "The Hidden Market"
         },
         {
-          "narration": "Fourth name — a True Tartarian sympathiser in the surface enclave. You convince them you are also a sympathiser.",
-          "arbiter": "\"Lies cost something in this country,\" the Arbiter says. \"Make sure you can pay it.\"",
-          "checkKind": "diplomacy"
-        },
-        {
-          "narration": "Fifth name — a Reclaimer's Guild middleman selling photographs of buried sites. You intercept their next courier.",
+          "narration": "Third name — a Forgotten Order scholar's apprentice at Varakush. You never approach him. You get at his next expedition's survey notes instead and salt them so gently that the site will simply read as barren, and he will believe it, and stop.",
           "arbiter": null,
-          "checkKind": "stealth"
+          "checkKind": "investigate",
+          "grants": {
+            "item": "Salted Expedition Notes"
+          },
+          "requires": {
+            "item": "The Journalist's Draft"
+          },
+          "locationName": "Varakush"
         },
         {
-          "narration": "Sixth and last — Kincaid's own former assistant, gone rogue. They expect you. They are not happy.",
+          "narration": "Fourth name — a True Tartarian sympathiser down in the Enclave. You convince her you are one too, and she tells you things she should not, and gives you her confidence to carry, which is exactly what Kincaid wanted taken from her.",
           "arbiter": null,
-          "checkKind": "attack_provoke"
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "A Sympathiser's Confidence"
+          },
+          "requires": {
+            "item": "Salted Expedition Notes"
+          },
+          "locationName": "The Sunken Enclave"
         },
         {
-          "narration": "You return to Kincaid. He counts the items you brought back, looks at you once, and slides a heavy purse across the table.",
-          "arbiter": "\"The Monarchs remember you now,\" the Arbiter says. \"This is not always a gift.\"",
-          "checkKind": "boss"
+          "narration": "Fifth name — a Guild middleman at Ostragar selling photographs of buried sites by the dozen. You intercept his next courier on the river road and the photographs never arrive, and no one is hurt, and that is the whole trick of this work.",
+          "arbiter": null,
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Intercepted Photographs"
+          },
+          "requires": {
+            "item": "A Sympathiser's Confidence"
+          },
+          "locationName": "Ostragar"
+        },
+        {
+          "narration": "Sixth and last — Kincaid's own former assistant, gone rogue and waiting for you at the Parley Ground. He expects you. He is not happy. It is the only name on the list that ends with anyone raising a hand.",
+          "arbiter": null,
+          "checkKind": "attack_provoke",
+          "grants": {
+            "item": "The Assistant's Effects"
+          },
+          "requires": {
+            "item": "Intercepted Photographs"
+          },
+          "locationName": "The Parley Ground"
+        },
+        {
+          "narration": "You return to Kincaid and lay out what you carried back from each name. He counts the items, looks at you once, and slides a heavy purse across the table. Six people are quiet. Five of them are also alive, which he does not remark on.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "The Assistant's Effects"
+          },
+          "locationName": "The Monarch's Waystation",
+          "npcName": "Dr. Lucius Kincaid"
         }
       ]
     },
     {
       "id": "story_monarch_ledger_of_silence",
+      "targetLocationName": "Ostragar",
       "title": "The Ledger of Silence",
       "posterText": "A Mud Monarch factor at the Waystation needs a witness unmade before the Forgotten Order can copy what it saw. Discreet work. 1400 TC and standing.",
       "factionId": "mud_monarchs",
@@ -219,39 +433,79 @@
       "rewardRep": 22,
       "stages": [
         {
+          "narration": "The factor does not look up from his ledger. \"A Guardian stirred at Ostragar. A surveyor of the Order saw it wake and lived. His notes cannot reach Varakush. Nor can he.\" He slides you a name and a route. \"Start at the relay-hut on the Ostragar road.\"",
+          "arbiter": null,
           "checkKind": null,
-          "narration": "The factor does not look up from his ledger. \"A Guardian stirred at Ostragar. A surveyor of the Order saw it wake and lived. His notes cannot reach Varakush. Nor can he.\" He slides you a name and a route.",
-          "arbiter": "\"They are not asking you to kill a man,\" the Arbiter says. \"They are asking you to decide the man is a thing. Notice the difference before you agree.\""
+          "grants": {
+            "item": "Factor's Name and Route"
+          },
+          "locationName": "The Monarch's Waystation",
+          "npcName": "the Monarch factor"
         },
         {
+          "narration": "You trace the surveyor to the relay-hut and find his field-book gone — copied already, into three fair hands riding for the Order. Only the empty case is left, and the copyist's ink still wet on the sill. The factor lied about the count, or did not know it.",
+          "arbiter": null,
           "checkKind": "investigate",
-          "narration": "You trace the surveyor to a relay-hut on the Ostragar road. His field-book is gone — copied already, into three fair hands riding for the Order. The factor lied about the count, or did not know it.",
-          "arbiter": null
+          "grants": {
+            "item": "Empty Field-Book Case"
+          },
+          "requires": {
+            "item": "Factor's Name and Route"
+          },
+          "locationName": "Ostragar"
         },
         {
+          "narration": "You run the first courier down before the Obsidian Pillars and lift the copy off his saddle without waking him. One page is torn out — he kept a leaf back, insurance against his own masters. Careful man. Not careful enough.",
+          "arbiter": null,
           "checkKind": "stealth",
-          "narration": "You run down the first courier before the Obsidian Pillars and lift the copy from his saddle. He never sees you. One page is torn out — he kept a leaf back, insurance against his own masters.",
-          "arbiter": null
+          "grants": {
+            "item": "First Courier's Copy"
+          },
+          "requires": {
+            "item": "Empty Field-Book Case"
+          },
+          "locationName": "Obsidian Pillars"
         },
         {
+          "narration": "The second courier turns out to be Guild, not Order — a Reclaimer who bought the pages to resell at the Market. Coin turns her without argument, and she throws in the thing you actually needed: the third rider is the surveyor himself, carrying the last leaf to Varakush in person.",
+          "arbiter": null,
           "checkKind": "diplomacy",
-          "narration": "The second courier is Guild, not Order — a Reclaimer who bought the pages to resell. Coin turns her; she hands them over and tells you the third rider is the surveyor himself, carrying the last leaf to Varakush in person.",
-          "arbiter": "\"Everyone in this errand is selling something,\" the Arbiter murmurs. \"Ask yourself what you are selling, and to whom.\""
+          "grants": {
+            "item": "Second Courier's Pages"
+          },
+          "requires": {
+            "item": "First Courier's Copy"
+          },
+          "locationName": "The Hidden Market"
         },
         {
+          "narration": "You catch the surveyor on the Varakush approach and he does not run. \"I saw it open its eyes,\" he says. \"You can take my book. You cannot take that I saw it.\" He offers you the last leaf himself — and a choice the factor never mentioned.",
+          "arbiter": null,
           "checkKind": "diplomacy",
-          "narration": "You catch the surveyor on the Varakush approach. He does not run. \"I saw it open its eyes,\" he says. \"You can take my book. You cannot take that I saw it.\" He offers you the last leaf — and a choice the factor never mentioned.",
-          "arbiter": null
+          "grants": {
+            "item": "The Last Leaf"
+          },
+          "requires": {
+            "item": "Second Courier's Pages"
+          },
+          "locationName": "Varakush",
+          "npcName": "the Order surveyor"
         },
         {
-          "checkKind": "boss",
           "narration": "You return to the Waystation with every copy. The factor burns them one page at a time and pays you in silence. \"The world sleeps a little longer,\" he says. Whether that is mercy or a leash, he does not say, and you do not ask.",
-          "arbiter": "\"You bought the world quiet,\" the Arbiter says. \"Quiet is not the same as safe. Remember who profits from the difference.\""
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "The Last Leaf"
+          },
+          "locationName": "The Monarch's Waystation",
+          "npcName": "the Monarch factor"
         }
       ]
     },
     {
       "id": "story_truetart_descent_karoksa",
+      "targetLocationName": "Karok-Sa",
       "title": "The Descent to Karok-Sa",
       "posterText": "The True Tartarians will pay a surface-walker to escort a reconsecration party down into buried Karok-Sa and see it done. 1600 TC and deep standing.",
       "factionId": "true_tartarians",
@@ -261,44 +515,85 @@
       "rewardRep": 26,
       "stages": [
         {
-          "checkKind": null,
           "narration": "The enclave-mother marks a shaft on your palm in ash. \"Karok-Sa held a Giant-shrine before the Flood took it. The Aether there has gone sour and the way is fouled. Walk our pilgrims down, keep them breathing, and light the shrine again.\"",
-          "arbiter": "\"They are trusting you with their faithful, not their coin,\" the Arbiter says. \"That is the harder thing to be given. Do not spend it cheaply.\""
-        },
-        {
-          "checkKind": "investigate",
-          "narration": "The upper stair of Karok-Sa is choked with silt-glass and old flood-wrack. You read the safe line the way the pilgrims read prayer — one wrong slab is a drop into black water. You find the seam that holds.",
-          "arbiter": null
-        },
-        {
-          "checkKind": "cast",
-          "narration": "Halfway down the air turns to poison — Aether gone rancid, a haze that stops breath. The pilgrims falter. You draw the bad Aether off with a working, buying the party a corridor of clean air one lungful wide.",
-          "arbiter": null
-        },
-        {
-          "checkKind": "attack_provoke",
-          "narration": "Something in the drowned nave has been alone a very long time. A Shifting Shade, born of the soured field, walks out of a wall between you and the shrine and will not let the faithful pass.",
-          "arbiter": "\"It was a person once, or it was never anything,\" the Arbiter says. \"Down here the two look the same. Put it down and move on.\""
-        },
-        {
-          "checkKind": "diplomacy",
-          "narration": "At the shrine the eldest pilgrim breaks — this was her birth-city, drowned when she was a child. She will not leave. You talk her back from the edge of the black water, and she gives you the relighting-word her mother taught her.",
-          "arbiter": null
-        },
-        {
-          "checkKind": "boss",
-          "narration": "You speak the word and the shrine takes light — and beneath it, a Mud Golem the size of the nave opens one eye, a Giant-Watch construct that has waited in the dark for someone to wake it. The pilgrims kneel. You do not have that luxury.",
-          "arbiter": "\"They call it a guardian,\" the Arbiter says quietly. \"It has forgotten what it guards. That makes it no gentler. Finish this.\""
-        },
-        {
+          "arbiter": null,
           "checkKind": null,
-          "narration": "The construct stills, judged you not an enemy, and folds back into the dark. The shrine burns steady behind you as the pilgrims climb home singing. The enclave-mother washes the ash from your palm herself. \"You are one of the deep now,\" she says.",
-          "arbiter": null
+          "grants": {
+            "item": "Enclave-Mother's Ash Mark"
+          },
+          "locationName": "The Sunken Enclave",
+          "npcName": "the enclave-mother"
+        },
+        {
+          "narration": "The upper stair of Karok-Sa is choked with silt-glass and old flood-wrack. You read the safe line the way the pilgrims read prayer — one wrong slab is a drop into black water — and you find the seam that holds and chalk it for the ones behind you.",
+          "arbiter": null,
+          "checkKind": "investigate",
+          "grants": {
+            "item": "The Holding Seam"
+          },
+          "requires": {
+            "item": "Enclave-Mother's Ash Mark"
+          },
+          "locationName": "Karok-Sa"
+        },
+        {
+          "narration": "Halfway down the air turns to poison — Aether gone rancid, a haze that stops breath. The pilgrims falter on your chalked line. You draw the bad Aether off with a working and hold open a corridor of clean air one lungful wide, and walk them through it.",
+          "arbiter": null,
+          "checkKind": "cast",
+          "grants": {
+            "item": "A Corridor of Clean Air"
+          },
+          "requires": {
+            "item": "The Holding Seam"
+          },
+          "locationName": "Karok-Sa"
+        },
+        {
+          "narration": "Something in the drowned nave has been alone a very long time. A Shifting Shade, born of the soured field, walks out of a wall between you and the shrine and will not let the faithful pass. You make it let them.",
+          "arbiter": null,
+          "checkKind": "attack_provoke",
+          "grants": {
+            "item": "The Nave, Cleared"
+          },
+          "requires": {
+            "item": "A Corridor of Clean Air"
+          },
+          "locationName": "Karok-Sa"
+        },
+        {
+          "narration": "At the shrine the eldest pilgrim breaks — this was her birth-city, drowned when she was a child. She will not leave the water's edge. You talk her back from it, and she gives you the relighting-word her mother taught her, which she has carried sixty years to say here.",
+          "arbiter": null,
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "The Relighting-Word"
+          },
+          "requires": {
+            "item": "The Nave, Cleared"
+          },
+          "locationName": "Karok-Sa",
+          "npcName": "the eldest pilgrim"
+        },
+        {
+          "narration": "You speak the word and the shrine takes light — and beneath it a Mud Golem the size of the nave opens one eye, a Giant-Watch construct that has waited in the dark for someone to wake it. The pilgrims kneel. You do not have that luxury.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "The Relighting-Word"
+          },
+          "locationName": "Karok-Sa"
+        },
+        {
+          "narration": "The construct stills, judged you not an enemy, and folds back into the dark. The shrine burns steady behind you as the pilgrims climb home singing. Back at the Enclave the enclave-mother washes the ash from your palm herself. \"You are one of the deep now.\"",
+          "arbiter": null,
+          "checkKind": null,
+          "locationName": "The Sunken Enclave",
+          "npcName": "the enclave-mother"
         }
       ]
     },
     {
       "id": "story_dynasty_blood_aetherborn",
+      "targetLocationName": "Sinking Cathedral",
       "title": "Blood of the Aetherborn",
       "posterText": "A Dynasty proctor at the Border Post seeks proof of a claimant's Aetherborn bloodline — a relic only the pure may touch and live. 1800 TC and standing for a clean result.",
       "factionId": "eternal_dynasty",
@@ -308,39 +603,73 @@
       "rewardRep": 28,
       "stages": [
         {
-          "checkKind": null,
           "narration": "The proctor speaks of bloodlines the way a butcher speaks of cuts. \"A claimant petitions the Dynasty. Before he is raised or discarded, his blood must be tested against the Vein-Reliquary in the Sinking Cathedral. Fetch it. The relic decides; we merely watch.\"",
-          "arbiter": "\"Only the pure deserve to inherit,\" the Arbiter recites flatly. \"Every empire that has said those words has meant: only the useful. Watch which one they mean here.\""
-        },
-        {
-          "checkKind": "investigate",
-          "narration": "The Sinking Cathedral takes on a hand-span of water an hour. You find the reliquary vault by following the Aether — the relic sings to the flooded stone. The last party to seek it is here too, drowned at the vault door, Dynasty seals on their coats.",
-          "arbiter": null
-        },
-        {
-          "checkKind": "escape",
-          "narration": "The vault seal breaks and the Cathedral answers by dropping a floor. You take the Vein-Reliquary and run the falling stair ahead of the flood, water at your heels the whole black length of it.",
-          "arbiter": null
-        },
-        {
-          "checkKind": "diplomacy",
-          "narration": "Above ground the claimant finds you first — a frightened young man who has read what the relic does to the impure. \"It burns the false to ash,\" he says. \"I do not know what I am. Test me here, away from them, and tell me the truth before they make it a spectacle.\"",
-          "arbiter": "\"He is asking you for mercy the Dynasty does not stock,\" the Arbiter says. \"Whatever the relic says, remember you were the one he asked.\""
-        },
-        {
-          "checkKind": "boss",
-          "narration": "At the Border Post the proctor lays the claimant's hand to the Vein-Reliquary before the assembled court — and the relic wakes wrong, an Aetheric Apparition tearing loose from the old blood inside it, judging every soul in the room impure at once.",
-          "arbiter": "\"The relic does not care about bloodlines,\" the Arbiter says. \"It cares about hunger. They woke it hungry. Now everyone here is on the menu, purity be damned.\""
-        },
-        {
+          "arbiter": null,
           "checkKind": null,
+          "grants": {
+            "item": "Proctor's Fetch-Order"
+          },
+          "locationName": "Dynasty Border Post",
+          "npcName": "the Dynasty proctor"
+        },
+        {
+          "narration": "The Sinking Cathedral takes a hand-span of water an hour. You find the reliquary vault by following the Aether — the relic sings to the flooded stone. The last party sent for it is here too, drowned at the vault door with Dynasty seals still on their coats. You take one.",
+          "arbiter": null,
+          "checkKind": "investigate",
+          "grants": {
+            "item": "The Drowned Party's Seal"
+          },
+          "requires": {
+            "item": "Proctor's Fetch-Order"
+          },
+          "locationName": "the Sinking Cathedral"
+        },
+        {
+          "narration": "The vault seal breaks and the Cathedral answers by dropping a floor. You take the Vein-Reliquary and run the falling stair ahead of the flood, water at your heels the whole black length of it, and come out into the air with the relic dry.",
+          "arbiter": null,
+          "checkKind": "escape",
+          "grants": {
+            "item": "Vein-Reliquary"
+          },
+          "requires": {
+            "item": "The Drowned Party's Seal"
+          },
+          "locationName": "the Sinking Cathedral"
+        },
+        {
+          "narration": "The claimant finds you at the Parley Ground before the Dynasty does — a frightened young man who has read what the relic does to the impure. \"It burns the false to ash,\" he says. \"I do not know what I am. Test me here, away from them, and tell me the truth before they make it a spectacle.\"",
+          "arbiter": null,
+          "checkKind": "diplomacy",
+          "grants": {
+            "item": "The Claimant's Trust"
+          },
+          "requires": {
+            "item": "Vein-Reliquary"
+          },
+          "locationName": "The Parley Ground",
+          "npcName": "the claimant"
+        },
+        {
+          "narration": "At the Border Post the proctor lays the claimant's hand to the Vein-Reliquary before the assembled court — and the relic wakes wrong, an Aetheric Apparition tearing loose from the old blood inside it, judging every soul in the room impure at once.",
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "The Claimant's Trust"
+          },
+          "locationName": "Dynasty Border Post"
+        },
+        {
           "narration": "You put the Apparition down before it can render its verdict on the court. The proctor pays you and records the claimant as \"inconclusive\" — a word that will follow the young man to his grave, but leaves him with one. It is the most mercy the Dynasty knows how to file.",
-          "arbiter": null
+          "arbiter": null,
+          "checkKind": null,
+          "locationName": "Dynasty Border Post",
+          "npcName": "the Dynasty proctor"
         }
       ]
     },
     {
       "id": "story_servants_giant_watch_vigil",
+      "targetLocationName": "The Giant Vault",
       "title": "The Giant-Watch Vigil",
       "posterText": "The Servants of the Giants have felt the ground breathe at the Giant Vault. They will pay a steady hand to stand the vigil and read what stirs. 1500 TC and standing.",
       "factionId": "servants_of_giants",
@@ -350,39 +679,73 @@
       "rewardRep": 24,
       "stages": [
         {
+          "narration": "The vigil-keeper presses your ear to the shrine stone. Far below, a slow tremor, like breath. \"A Giant turns in its sleep beneath the Vault,\" she says. \"The order splits over it — wake it, or let it dream. Go down and read the truth of it, and bring the reading back to me.\" She gives you her own ear-stone to read it with.",
+          "arbiter": null,
           "checkKind": null,
-          "narration": "The vigil-keeper at the Giant-Watch Shrine presses your ear to the stone. Far below, a slow tremor, like breath. \"A Giant turns in its sleep beneath the Vault,\" she says. \"The order splits over it — wake it, or let it dream. Stand the vigil with me and help us read the truth of it.\"",
-          "arbiter": "\"Faith and geology feel the same tremor differently,\" the Arbiter observes. \"One of them is easier to be wrong about. Keep both eyes open.\""
+          "grants": {
+            "item": "Vigil-Keeper's Ear-Stone"
+          },
+          "locationName": "Giant-Watch Shrine",
+          "npcName": "the vigil-keeper"
         },
         {
+          "narration": "You descend to the Vault door and read the tremor at its source. It is no Giant — it is the Aetheric field feeding a dormant Guardian below, cycling toward a wake it was never meant to reach. The faithful have mistaken a machine's hunger for a god's breath. You write it down exactly as the stone gives it.",
+          "arbiter": null,
           "checkKind": "investigate",
-          "narration": "You descend to the Vault door and read the tremor at its source. It is no Giant — it is the Aetheric field feeding a dormant Guardian below, cycling toward a wake it was never meant to reach. The faithful have mistaken a machine's hunger for a god's breath.",
-          "arbiter": null
+          "grants": {
+            "item": "The Tremor Reading"
+          },
+          "requires": {
+            "item": "Vigil-Keeper's Ear-Stone"
+          },
+          "locationName": "The Giant Vault"
         },
         {
+          "narration": "You climb back into a schism. The zealots want the Vault flung open to greet their god; the elders want it sealed forever. You read them the tremor and half of them call you a liar sent by the Order — but you talk the vigil-keeper into hearing the rest, and she gives you her seal to move inside the Vault.",
+          "arbiter": null,
           "checkKind": "diplomacy",
-          "narration": "You climb back to a schism. The zealots want to fling the Vault open and greet their god; the elders want it sealed forever. You tell them what you found. Half call you a liar sent by the Order. You talk the vigil-keeper into hearing the rest.",
-          "arbiter": "\"You have just told the devout their god is a boiler,\" the Arbiter says. \"Do not expect thanks. Expect a knife, and hope for a hearing.\""
+          "grants": {
+            "item": "The Keeper's Seal"
+          },
+          "requires": {
+            "item": "The Tremor Reading"
+          },
+          "locationName": "Giant-Watch Shrine",
+          "npcName": "the vigil-keeper"
         },
         {
+          "narration": "The zealots move to break the outer seal that night regardless. You go down ahead of their torches to reach the Guardian's core-cycle first — one closing valve between the faithful and a waking machine, and you have to have your hand on it before they arrive.",
+          "arbiter": null,
           "checkKind": "stealth",
-          "narration": "The zealots move to break the seal that night regardless. You slip into the Vault ahead of them to reach the Guardian's core-cycle before their torches do — one closing valve between the faithful and a waking machine.",
-          "arbiter": null
+          "grants": {
+            "item": "Hand on the Core-Cycle Valve"
+          },
+          "requires": {
+            "item": "The Keeper's Seal"
+          },
+          "locationName": "The Giant Vault"
         },
         {
+          "narration": "You reach the valve as the seal gives. The dormant Guardian — a Steam Walker grown vast on a century of stray Aether — hauls upright in the dark, and the zealots pour in singing to meet it, mistaking its rise for rapture.",
+          "arbiter": null,
           "checkKind": "boss",
-          "narration": "You reach the core-cycle as the seal gives. The dormant Guardian — a Steam Walker grown vast on a century of stray Aether — hauls upright in the dark, and the zealots pour in singing to meet it, mistaking its rise for rapture.",
-          "arbiter": "\"They will call it a miracle right up until it kills them,\" the Arbiter says. \"Give them a chance to be wrong and alive. Bring it down.\""
+          "requires": {
+            "item": "Hand on the Core-Cycle Valve"
+          },
+          "locationName": "The Giant Vault"
         },
         {
+          "narration": "You still the Guardian and the singing stops. The vigil-keeper seals the Vault with her own hands and names you Watch-Kin at the shrine that evening. \"It was not our god,\" she tells the shaken faithful. \"But something down there kept our god's house. That is worth a vigil still.\"",
+          "arbiter": null,
           "checkKind": null,
-          "narration": "You still the Guardian and the singing stops. The vigil-keeper seals the Vault with her own hands and names you Watch-Kin. \"It was not our god,\" she tells the shaken faithful. \"But something down there kept our god's house. That is worth a vigil still.\"",
-          "arbiter": null
+          "locationName": "Giant-Watch Shrine",
+          "npcName": "the vigil-keeper"
         }
       ]
     },
     {
       "id": "story_builders_scripture_in_stone",
+      "targetLocationName": "Grand Spire of Etheria",
       "title": "Scripture in Stone",
       "posterText": "A Stone Builder lodge-master at the Survey Camp needs the Architectural Sorcery of the Grand Spire read before his lodge cracks apart under it. 1500 TC and standing.",
       "factionId": "stone_builders",
@@ -392,39 +755,72 @@
       "rewardRep": 22,
       "stages": [
         {
+          "narration": "The lodge-master unrolls a rubbing taken from the Grand Spire of Etheria. \"The Tartarians wrote their engineering into their stone — load, Aether and prayer in one script. We copied this passage into our lodge wall and now the lodge groans at night. Take the rubbing back to the original and read it properly before it comes down on us.\"",
+          "arbiter": null,
           "checkKind": null,
-          "narration": "The lodge-master unrolls a rubbing of a wall from the Grand Spire of Etheria. \"The Tartarians wrote their engineering into their stone — load, Aether, and prayer in one script. We copied a passage into our lodge and now the lodge groans at night. Read the original before it comes down on us.\"",
-          "arbiter": "\"They built a thing they did not understand and are surprised it does not love them,\" the Arbiter says. \"An old story. Read carefully; the stone will not repeat itself.\""
+          "grants": {
+            "item": "The Lodge's Faulty Rubbing"
+          },
+          "locationName": "Builders' Survey Camp",
+          "npcName": "the lodge-master"
         },
         {
+          "narration": "At the Spire you find the source passage and hold the rubbing against it. The Builders' copy is wrong by exactly one glyph — a load-line read as a prayer-line. The Spire's version routes the Aether down and out. The lodge's routes it in, and up, into a room full of people.",
+          "arbiter": null,
           "checkKind": "investigate",
-          "narration": "At the Grand Spire you find the source passage — and the Builders' copy was wrong by one glyph, a load-line read as a prayer-line. The Spire's own version routes the Aether down and out. The lodge's routes it in, and up, into a room full of people.",
-          "arbiter": null
+          "grants": {
+            "item": "The Miscopied Glyph"
+          },
+          "requires": {
+            "item": "The Lodge's Faulty Rubbing"
+          },
+          "locationName": "Grand Spire of Etheria"
         },
         {
+          "narration": "The Spire will not simply hand over its reading. The passage is live — Architectural Sorcery still flowing through it after a thousand years. You match the working, hold the flow steady, and copy the true glyph while the wall hums under your palm.",
+          "arbiter": null,
           "checkKind": "cast",
-          "narration": "The Spire will not simply give up its reading. The passage is live — Architectural Sorcery still flowing through it after a thousand years. You match the working, hold the flow steady, and copy the true glyph while the wall hums under your hand.",
-          "arbiter": null
+          "grants": {
+            "item": "The True Glyph"
+          },
+          "requires": {
+            "item": "The Miscopied Glyph"
+          },
+          "locationName": "Grand Spire of Etheria"
         },
         {
+          "narration": "The correction destabilises the ancient course. A pillar that has leaned since before the Flood finally chooses to fall, and the gallery goes with it. You take the true reading and clear the collapse a half-step ahead of the stone, which is the only margin the Spire offers anyone.",
+          "arbiter": null,
           "checkKind": "escape",
-          "narration": "The correction destabilizes the ancient course. A pillar leaning \"precariously\" since before the Flood finally chooses to fall. You take the true reading and clear the collapsing gallery a half-step ahead of the stone.",
-          "arbiter": "\"Knowledge, then the ceiling,\" the Arbiter says. \"Tartaria charges for both in the same coin. Run.\""
+          "grants": {
+            "item": "The True Reading, Carried Clear"
+          },
+          "requires": {
+            "item": "The True Glyph"
+          },
+          "locationName": "Grand Spire of Etheria"
         },
         {
-          "checkKind": "boss",
           "narration": "You reach the lodge as the miswritten wall reaches its limit — the trapped Aether tearing loose as an Aetheric Salamander, all the stored heat of a bad translation given teeth, loose among the apprentices.",
-          "arbiter": "\"Their scripture caught fire,\" the Arbiter says. \"Put it out before it takes the congregation. Then teach them to read.\""
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "The True Reading, Carried Clear"
+          },
+          "locationName": "Builders' Survey Camp"
         },
         {
+          "narration": "You cut the true glyph into the lodge wall and the groaning stops. The lodge-master carves your name small among the founders. \"Tartaria's buildings were scripture,\" he says, humbled. \"We were reciting it wrong. You taught us to read a single verse. It was almost the end of us.\"",
+          "arbiter": null,
           "checkKind": null,
-          "narration": "You correct the lodge-wall with the true glyph and the groaning stops. The lodge-master carves your name small among the founders. \"Tartaria's buildings were scripture,\" he says, humbled. \"We were reciting it wrong. You taught us to read a single verse. It was almost the end of us.\"",
-          "arbiter": null
+          "locationName": "Builders' Survey Camp",
+          "npcName": "the lodge-master"
         }
       ]
     },
     {
       "id": "story_revivalist_sashas_gambit",
+      "targetLocationName": "Aetheric Chamber",
       "title": "Sasha's Gambit",
       "posterText": "Sasha Ironheart of the Revivalists wants a core-line at the Aetheric Chamber brought back to life — and she needs a blade willing to risk a Second Flood to do it. 2000 TC and standing.",
       "factionId": "tartarian_revivalists",
@@ -434,39 +830,72 @@
       "rewardRep": 30,
       "stages": [
         {
+          "narration": "Sasha Ironheart does not soften it. \"Every other faction tinkers at the edges. I mean to switch Tartaria back on — one core-line at the Aetheric Chamber, reactivated. Yes, it could flood the world again. Doing nothing floods it slower.\" She signs the order and holds it out. \"Are you a blade or a bystander?\"",
+          "arbiter": null,
           "checkKind": null,
-          "narration": "Sasha Ironheart does not soften it. \"Every other faction tinkers at the edges. I mean to switch Tartaria back on. One core-line at the Aetheric Chamber, reactivated. Yes, it could flood the world again. Doing nothing floods it slower. Are you a blade or a bystander?\"",
-          "arbiter": "\"She is the only one honest enough to name the risk,\" the Arbiter says. \"That does not make her right. It makes her dangerous with the lights on. Decide how far you will follow.\""
+          "grants": {
+            "item": "Sasha's Core-Line Order"
+          },
+          "locationName": "Revivalist Field Camp",
+          "npcName": "Sasha Ironheart"
         },
         {
+          "narration": "You survey the Chamber's dead core-line. Three of Sasha's cells got here first and left notes in the dust — one warns the line will overload, one swears it will hold, one is simply a name and a date. You gather all three. The cells share a goal and not a method, and it shows.",
+          "arbiter": null,
           "checkKind": "investigate",
-          "narration": "You survey the Aetheric Chamber's dead core-line. Three of Sasha's cells got here first and left notes in the dust — one warns the line will overload, one says it will hold, one is simply a name and a date. The cells share a goal and not a method, and it shows.",
-          "arbiter": null
+          "grants": {
+            "item": "Three Cells' Conflicting Notes"
+          },
+          "requires": {
+            "item": "Sasha's Core-Line Order"
+          },
+          "locationName": "the Sentinel Ward"
         },
         {
-          "checkKind": "stealth",
           "narration": "A Forgotten Order team has come to sabotage the reactivation before it starts — moderates who think Sasha will drown them all. You slip past them to the core housing without a shot fired. Whether that was loyalty or doubt, you keep to yourself.",
-          "arbiter": "\"You just chose Sasha over the people trying to stop a flood,\" the Arbiter says. \"Sit with that. The story is not done choosing you back.\""
+          "arbiter": null,
+          "checkKind": "stealth",
+          "grants": {
+            "item": "Unshot Passage to the Housing"
+          },
+          "requires": {
+            "item": "Three Cells' Conflicting Notes"
+          },
+          "locationName": "the Sentinel Ward"
         },
         {
+          "narration": "The core-line wakes under your working, Aether roaring back into a channel dry for a century. It surges past every safe mark — the optimistic cell was wrong. You wrestle the flow toward the overload cell's cutoff, the one everybody else ignored, and get a hand on it.",
+          "arbiter": null,
           "checkKind": "cast",
-          "narration": "The core-line wakes under your working, Aether roaring back into a channel dry for a century. It surges past every safe mark — Sasha's optimistic cell was wrong. You wrestle the flow toward the overload cell's cutoff, the one everyone else ignored.",
-          "arbiter": null
+          "grants": {
+            "item": "A Hand on the Cutoff"
+          },
+          "requires": {
+            "item": "Unshot Passage to the Housing"
+          },
+          "locationName": "the Sentinel Ward"
         },
         {
-          "checkKind": "boss",
           "narration": "The overloading line births a Guardian meant to bleed off exactly this — an Aetheric Apparition of pure surplus power, loosed to protect Tartaria from its own revival by killing whoever caused it. It comes for you and Sasha both.",
-          "arbiter": "\"The empire built a failsafe against people like her,\" the Arbiter says. \"It is doing its job. Survive it, and decide afterward whether it was right.\""
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "A Hand on the Cutoff"
+          },
+          "locationName": "the Sentinel Ward"
         },
         {
+          "narration": "You bring the Apparition down and hold the line a hair below flood. One core-line lives — a single lit window in a drowned house. Back at the camp Sasha looks at the reading and, for once, is quiet. \"Not the world,\" she says. \"Yet. But now they know it can be done. So do you.\"",
+          "arbiter": null,
           "checkKind": null,
-          "narration": "You bring the Apparition down and hold the line at a hair below flood. One core-line lives — a single lit window in a drowned house. Sasha looks at it and, for once, is quiet. \"Not the world,\" she says. \"Yet. But now they know it can be done. So do you.\"",
-          "arbiter": "\"You left a light on in a house that drowned a civilization,\" the Arbiter says. \"History will decide if that was hope or the first drop. So, eventually, will you.\""
+          "locationName": "Revivalist Field Camp",
+          "npcName": "Sasha Ironheart"
         }
       ]
     },
     {
       "id": "story_reclaimer_highest_bidder",
+      "targetLocationName": "The Hidden Market",
       "title": "The Highest Bidder",
       "posterText": "A Reclaimer broker at the Hidden Market needs a neutral blade to run a relic auction that three factions all mean to win by force. 1700 TC and standing.",
       "factionId": "reclaimers_guild",
@@ -476,39 +905,78 @@
       "rewardRep": 24,
       "stages": [
         {
+          "narration": "The broker taps a strongbox and writes you a floor-warrant. \"One relic. A Guardian control-key — points a dormant construct at whatever you like. The Order, the Dynasty and the Monarchs all bid, at the Market, tomorrow. I need someone who owes none of them to run the floor and keep me breathing when the loser draws steel.\"",
+          "arbiter": null,
           "checkKind": null,
-          "narration": "The broker taps a strongbox. \"One relic. A Guardian control-key — points a dormant construct at whatever you like. The Order, the Dynasty, and the Monarchs all bid. I need someone who owes none of them to run the floor and keep me breathing when the loser draws steel.\"",
-          "arbiter": "\"You are not selling a relic,\" the Arbiter says. \"You are selling the right to aim a god. Whoever wins, someone dies later. Keep that in your ledger.\""
+          "grants": {
+            "item": "Auction Floor-Warrant"
+          },
+          "locationName": "Reclaimer's Stake",
+          "npcName": "the Reclaimer broker"
         },
         {
+          "narration": "You case the Market floor before the bell. All three bidders came heavy — Order sappers by the east stalls, a Dynasty duelist working the shadows, a Monarch factor with coin enough to buy the building. You count exits and note who stands where. None of them plans to lose an auction.",
+          "arbiter": null,
           "checkKind": "investigate",
-          "narration": "You case the Market floor before the bell. All three bidders came heavy — Order sappers by the east stalls, a Dynasty duelist working the shadows, a Monarch factor with coin enough to buy the building. None of them plans to lose an auction.",
-          "arbiter": null
+          "grants": {
+            "item": "The Bidders' Measure"
+          },
+          "requires": {
+            "item": "Auction Floor-Warrant"
+          },
+          "locationName": "The Hidden Market"
         },
         {
+          "narration": "You open the floor and hold it with your voice alone, letting the bids climb while the room decides whether to be civilised. The Dynasty duelist tests you once, quietly. You cool it without a blade. The price triples and the broker starts breathing again.",
+          "arbiter": null,
           "checkKind": "diplomacy",
-          "narration": "You open the floor and hold it with your voice alone, letting the bids climb while the room decides whether to be civilized. The Dynasty duelist tests you once, quietly. You cool it without a blade. The price triples.",
-          "arbiter": "\"You are conducting a room full of loaded guns,\" the Arbiter says. \"The music is the only thing keeping them holstered. Do not stop playing.\""
+          "grants": {
+            "item": "The Tripled Bid"
+          },
+          "requires": {
+            "item": "The Bidders' Measure"
+          },
+          "locationName": "The Hidden Market"
         },
         {
+          "narration": "The Monarch factor moves to end the auction his way — a signal to torch the strongbox rather than let a rival hold the key. You have the box out from under his fire and into the broker's hands before the flames find the lock.",
+          "arbiter": null,
           "checkKind": "stealth",
-          "narration": "The Monarch factor moves to end the auction his way — a signal to torch the strongbox rather than let a rival have the key. You slip the box out from under his fire and into the broker's hands before the flames find it.",
-          "arbiter": null
+          "grants": {
+            "item": "The Strongbox"
+          },
+          "requires": {
+            "item": "The Tripled Bid"
+          },
+          "locationName": "The Hidden Market"
         },
         {
+          "narration": "With coin no longer able to settle it, the losers settle it the old way — the Order sappers and the Dynasty duelist turning on each other and on you across the burning floor. The broker cowers behind the box while you make a path to the door.",
+          "arbiter": null,
           "checkKind": "attack_provoke",
-          "narration": "With coin no longer able to settle it, the losers settle it the old way — the Order sappers and the Dynasty duelist turning on each other and on you across the burning floor. The broker cowers behind the box.",
-          "arbiter": "\"The auction is over,\" the Arbiter says. \"The war it started is not. Cut your way to the door.\""
+          "grants": {
+            "item": "The Floor, Broken Clear"
+          },
+          "requires": {
+            "item": "The Strongbox"
+          },
+          "locationName": "The Hidden Market"
         },
         {
+          "narration": "You break out with the broker and the box both intact. He pays you in the quiet after, hands shaking. \"The winner gets the key tomorrow,\" he says. \"You could take it tonight.\" The strongbox sits between you, and for one breath the aim of a Guardian is yours to set.",
+          "arbiter": null,
           "checkKind": "boss",
-          "narration": "You break clear with the broker and the box both intact. He pays you in the quiet after, hands shaking. \"The winner gets the key tomorrow,\" he says. \"You could take it tonight.\" The strongbox sits between you, and for one breath the aim of a Guardian is yours to set.",
-          "arbiter": "\"Every faction wanted this and you are the one holding it,\" the Arbiter says. \"That is not luck. That is a test. Answer it as yourself.\""
+          "requires": {
+            "item": "The Floor, Broken Clear"
+          },
+          "locationName": "The Hidden Market",
+          "npcName": "the Reclaimer broker"
         }
       ]
     },
     {
       "id": "story_architect_silence_protocol",
+      "targetLocationName": "Voronov",
       "title": "The Silence Protocol",
       "posterText": "A Conspiracy Architect handler needs a leak at Voronov closed before the Unknowing Masses learn what sleeps under their city. Total discretion. 1600 TC and standing.",
       "factionId": "conspiracy_architects",
@@ -518,39 +986,73 @@
       "rewardRep": 24,
       "stages": [
         {
+          "narration": "The handler speaks in the flat voice of someone who has done this before, and gives you the order in writing, which they never do. \"A Voronov schoolmaster found a Tartarian relay under his town and started teaching from it. Children are drawing Aether-glyphs in their primers. The Protocol is simple: the lesson stops. How, we leave to you.\"",
+          "arbiter": null,
           "checkKind": null,
-          "narration": "The handler speaks in the flat voice of someone who has done this before. \"A Voronov schoolmaster found a Tartarian relay under his town and started teaching from it. Children are drawing Aether-glyphs in their primers. The Protocol is simple: the lesson stops. How, we leave to you.\"",
-          "arbiter": "\"The lie is a kindness. The silence is a service,\" the Arbiter says. \"They will keep telling you that until you believe it. Notice the moment you do.\""
+          "grants": {
+            "item": "The Protocol Order"
+          },
+          "locationName": "The Architect's Blind",
+          "npcName": "the Architect handler"
         },
         {
+          "narration": "In Voronov you find the relay exactly as reported — and the schoolmaster is no zealot, just a curious man who found a wonder and could not keep it to himself. You lift a primer off a desk. The glyphs a nine-year-old has drawn in it are, God help you, correct.",
+          "arbiter": null,
           "checkKind": "investigate",
-          "narration": "In Voronov you find the relay exactly as reported — and the schoolmaster is no zealot, just a curious man who found a wonder and could not keep it to himself. The glyphs in the children's primers are, God help you, correct.",
-          "arbiter": null
+          "grants": {
+            "item": "A Child's Correct Primer"
+          },
+          "requires": {
+            "item": "The Protocol Order"
+          },
+          "locationName": "Voronov"
         },
         {
+          "narration": "You could burn the relay and the man with it — the Protocol's usual reading. Instead you sit with the schoolmaster and learn what he actually knows. Less than the handler fears. Enough to matter. He is not afraid of you, and that is the hardest part of the evening.",
+          "arbiter": null,
           "checkKind": "diplomacy",
-          "narration": "You could burn the relay and the man with it — the Protocol's usual reading. Instead you sit with the schoolmaster and learn what he actually knows. Less than the handler fears. Enough to matter. He is not afraid of you. That is the hardest part.",
-          "arbiter": "\"He thinks you came to learn,\" the Arbiter says. \"You came to close a mouth. The distance between those is the whole of your character. Mind it.\""
+          "grants": {
+            "item": "What the Schoolmaster Knows"
+          },
+          "requires": {
+            "item": "A Child's Correct Primer"
+          },
+          "locationName": "Voronov",
+          "npcName": "the schoolmaster"
         },
         {
+          "narration": "A Monarch cutter has also come for the leak — the Architects' patrons prefer their silences permanent. You reach the relay ahead of the knife and pull its core, leaving the schoolmaster a dead machine and a live pulse, which is the difference between a Protocol and a murder.",
+          "arbiter": null,
           "checkKind": "stealth",
-          "narration": "A Monarch cutter has also come for the leak — the Architects' patrons prefer their silences permanent. You reach the relay ahead of the knife and pull its core, leaving the schoolmaster a dead machine and a live pulse.",
-          "arbiter": null
+          "grants": {
+            "item": "The Relay Core"
+          },
+          "requires": {
+            "item": "What the Schoolmaster Knows"
+          },
+          "locationName": "Voronov"
         },
         {
-          "checkKind": "boss",
           "narration": "The pulled core does not want to die quiet — it discharges its stored century of Aether as a Shifting Shade in the empty schoolhouse, and the children are still filing out. You put yourself between them and it.",
-          "arbiter": "\"The relay would rather scream than be silenced too,\" the Arbiter says. \"So would the man. So, one day, might you. End this without ending them.\""
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "The Relay Core"
+          },
+          "locationName": "Voronov"
         },
         {
-          "checkKind": null,
           "narration": "You bring the handler a dead relay and a report that reads \"contained.\" What you left in Voronov — a frightened schoolmaster, a town of children who saw a wonder and were told to forget it — is the part of the Protocol that has no line on the form. You wrote that line yourself.",
-          "arbiter": "\"You served the silence,\" the Arbiter says. \"Or you served the man. The Architects will only read one of those in your report. You will carry the other.\""
+          "arbiter": null,
+          "checkKind": null,
+          "locationName": "The Architect's Blind",
+          "npcName": "the Architect handler"
         }
       ]
     },
     {
       "id": "story_order_drowned_library",
+      "targetLocationName": "The Sunken Enclave",
       "title": "The Drowned Library",
       "posterText": "Vesryn of the Forgotten Order seeks a scholar to recover the Aetheric treatises lost in the flooding of the Sunken Enclave — the Order's deepest archive. 1800 TC and standing.",
       "factionId": "forgotten_order",
@@ -560,39 +1062,72 @@
       "rewardRep": 26,
       "stages": [
         {
+          "narration": "Vesryn lays a hand on an empty shelf and gives you a set of case-straps. \"The Sunken Enclave held every treatise we ever recovered. When it flooded we saved the readers, not the reading. Aether-proof cases keep the pages down there yet. Bring back what you can — and choose well, because you cannot carry it all.\"",
+          "arbiter": null,
           "checkKind": null,
-          "narration": "Vesryn lays a hand on an empty shelf. \"The Sunken Enclave held every treatise we ever recovered. When it flooded we saved the readers, not the reading. Aether-proof cases keep the pages down there yet. Bring back what you can. Choose well — you cannot carry it all.\"",
-          "arbiter": "\"Knowledge that drowned once will drown you gladly,\" the Arbiter says. \"Take what you can bear, and forgive yourself the rest.\""
+          "grants": {
+            "item": "Vesryn's Case-Straps"
+          },
+          "locationName": "Varakush",
+          "npcName": "Vesryn"
         },
         {
-          "checkKind": "investigate",
           "narration": "You dive the Enclave and find the stacks by lamplight, cases glinting in the silt. The catalogue is intact — you can read what each case holds before you spend your air lifting it. Some are cures. Some are weapons. Some are only beautiful.",
-          "arbiter": null
+          "arbiter": null,
+          "checkKind": "investigate",
+          "grants": {
+            "item": "The Intact Catalogue"
+          },
+          "requires": {
+            "item": "Vesryn's Case-Straps"
+          },
+          "locationName": "The Sunken Enclave"
         },
         {
+          "narration": "The deepest stack is warded — Tartarian ink that eats light and lungs both. You hold a working over your own breath and read past the ward to a case marked in the Enclave founder's own hand: the treatise on the cores themselves.",
+          "arbiter": null,
           "checkKind": "cast",
-          "narration": "The deepest stack is warded — Tartarian ink that eats light and lungs both. You hold a working over your own breath and read past the ward to a case marked in the Enclave's founder's own hand: the treatise on the cores themselves.",
-          "arbiter": null
+          "grants": {
+            "item": "The Founder's Case"
+          },
+          "requires": {
+            "item": "The Intact Catalogue"
+          },
+          "locationName": "The Sunken Enclave"
         },
         {
+          "narration": "Lifting the founder's case wakes the Enclave's failsafe — the flood meant to keep exactly this from leaving. The water rises to reclaim its library. You run the drowning stacks with your chosen cases, air and archive both running out together.",
+          "arbiter": null,
           "checkKind": "escape",
-          "narration": "Lifting the founder's case wakes the Enclave's failsafe — the flood meant to keep exactly this from leaving. The water rises to reclaim its library. You run the drowning stacks with your chosen cases, air and archive both running out.",
-          "arbiter": "\"The Order built a tomb to protect its own knowledge from itself,\" the Arbiter says. \"It is working. Get out before it works on you.\""
+          "grants": {
+            "item": "The Chosen Salvage"
+          },
+          "requires": {
+            "item": "The Founder's Case"
+          },
+          "locationName": "The Sunken Enclave"
         },
         {
-          "checkKind": "boss",
           "narration": "At the Enclave mouth an Aetheric Ooze — grown fat on a century of dissolved ink and lost thought — bars the only stair. It has read, in its way, everything that dissolved into it. You cut through the sum of the Order's losses to reach the light.",
-          "arbiter": "\"Everything the Order forgot ended up in that thing,\" the Arbiter says. \"It is very well read. Kill it anyway.\""
+          "arbiter": null,
+          "checkKind": "boss",
+          "requires": {
+            "item": "The Chosen Salvage"
+          },
+          "locationName": "The Sunken Enclave"
         },
         {
-          "checkKind": null,
           "narration": "You lay your salvage on Vesryn's table — a handful of what once filled a hall. He reads the founder's treatise on the cores and goes very still. \"This changes what we thought we knew about the Flood,\" he says. \"You chose these pages. You should be here when we learn what they mean.\"",
-          "arbiter": null
+          "arbiter": null,
+          "checkKind": null,
+          "locationName": "Varakush",
+          "npcName": "Vesryn"
         }
       ]
     },
     {
       "id": "story_dynasty_purge_asgardar",
+      "targetLocationName": "Asgardar",
       "title": "The Purge at Asgardar",
       "posterText": "A Dynasty enforcer at Asgardar needs a discreet hand to help \"reconcile\" a bloodline that has grown impure — quietly, before the court notices. 1900 TC and standing.",
       "factionId": "eternal_dynasty",
@@ -602,34 +1137,67 @@
       "rewardRep": 28,
       "stages": [
         {
+          "narration": "The enforcer will not say the word \"kill,\" and signs the order without reading it back. \"A cadet branch at Asgardar has thinned. Their blood no longer reads pure. The court would spend them in the machines. I would rather retire them quietly, with their dignity. Help me do the merciful thing.\" He believes it.",
+          "arbiter": null,
           "checkKind": null,
-          "narration": "The enforcer will not say the word \"kill.\" \"A cadet branch at Asgardar has thinned. Their blood no longer reads pure. The court would spend them in the machines. I would rather retire them quietly, with their dignity. Help me do the merciful thing.\" He believes it.",
-          "arbiter": "\"He calls a purge a mercy and means it,\" the Arbiter says. \"That is worse than a man who lies. Watch where his mercy runs out.\""
+          "grants": {
+            "item": "The Enforcer's Retirement Order"
+          },
+          "locationName": "Dynasty Border Post",
+          "npcName": "the Dynasty enforcer"
         },
         {
+          "narration": "At Asgardar you find the cadet branch — an old woman and her grandchildren, tending a border-shrine and harming no one. You run the assay yourself. Their blood is \"impure\" by a fraction the machines would never notice. Someone at court wants their estate, and purity is the lever.",
+          "arbiter": null,
           "checkKind": "investigate",
-          "narration": "At Asgardar you find the cadet branch — an old woman and her grandchildren, tending a border-shrine, harming no one. Their blood is \"impure\" by a fraction the machines would never notice. Someone at court wants their estate, and purity is the lever.",
-          "arbiter": null
+          "grants": {
+            "item": "The Cadet Branch's Assay"
+          },
+          "requires": {
+            "item": "The Enforcer's Retirement Order"
+          },
+          "locationName": "Asgardar"
         },
         {
+          "narration": "The matriarch knows exactly why you have come. \"The Dynasty eats its own to prove it is still hungry,\" she says, unafraid. \"You could carry back that we are already dead. Or you could carry the truth, and be spent for it.\" She hands you the estate's true bloodline record and lets you decide which.",
+          "arbiter": null,
           "checkKind": "diplomacy",
-          "narration": "The matriarch knows exactly why you have come. \"The Dynasty eats its own to prove it is still hungry,\" she says, unafraid. \"You could carry back that we are already dead. Or you could carry the truth, and be spent for it.\" She hands you the estate's true bloodline record.",
-          "arbiter": "\"She is asking you to risk the machines in her place,\" the Arbiter says. \"That is a great deal to ask a stranger. It is also fair. Decide which you weigh heavier.\""
+          "grants": {
+            "item": "The True Bloodline Record"
+          },
+          "requires": {
+            "item": "The Cadet Branch's Assay"
+          },
+          "locationName": "Asgardar",
+          "npcName": "the cadet matriarch"
         },
         {
+          "narration": "The court's real agent — the one who wants the estate — moves to make the purge permanent before you can report otherwise. You reach the border-shrine ahead of his blades and put the cadet family behind you without a sound.",
+          "arbiter": null,
           "checkKind": "stealth",
-          "narration": "The court's real agent — the one who wants the estate — moves to make the purge permanent before you can report otherwise. You reach the shrine ahead of his blades and put the cadet family behind you.",
-          "arbiter": null
+          "grants": {
+            "item": "Ground Between Them"
+          },
+          "requires": {
+            "item": "The True Bloodline Record"
+          },
+          "locationName": "Asgardar"
         },
         {
+          "narration": "Cornered, the court's agent throws the shrine's own defence at you — a Vein-Reliquary Apparition roused to \"test\" the impure, aimed at the family it was built to protect. You stand between the Dynasty's cruelty and its excuse.",
+          "arbiter": null,
           "checkKind": "boss",
-          "narration": "Cornered, the court's agent throws the shrine's own defense at you — a Vein-Reliquary Apparition roused to \"test\" the impure, aimed at the family it was built to protect. You stand between the Dynasty's cruelty and its excuse.",
-          "arbiter": "\"They built the relic to purge the impure,\" the Arbiter says. \"Now it cannot tell the family from the assassin. Neither, it seems, could the Dynasty. End it.\""
+          "requires": {
+            "item": "Ground Between Them"
+          },
+          "locationName": "Asgardar"
         },
         {
-          "checkKind": null,
           "narration": "You bring the enforcer the estate's true record and the court agent's severed scheme. He reads it, and for the first time his certainty cracks. \"Retired quietly,\" he writes, and lets the cadet branch live. Whether you saved a family or just delayed a machine, you made the Dynasty blink. It is not nothing.",
-          "arbiter": "\"You did not fix the Dynasty,\" the Arbiter says. \"You made one of its knives hesitate. In an empire of the certain, a hesitation is a revolution. Small. Real.\""
+          "arbiter": null,
+          "checkKind": null,
+          "locationName": "Dynasty Border Post",
+          "npcName": "the Dynasty enforcer"
         }
       ]
     }
