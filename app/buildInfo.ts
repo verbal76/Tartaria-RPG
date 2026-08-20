@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.272';
+export const DISPLAY_VERSION = '4.29.273';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24107,7 +24107,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // names also carry the salvageable tag. The room's post-window list is now
 // stamped as its roster on the first roll and read back on every later visit, so
 // the mask is permanent and the window is only ever consulted on first sight.
-export const OTA_BUILD_ID = '2026-08-20-1378-a-cleared-room-stays-cleared';
+// ⚠⚠ OTA-1379 — THE MORE TRAY STAYS OPEN UNTIL THE PLAYER CLOSES IT. Owner:
+// *"when I hit the more button it should stay expanded until hit less."* Nothing
+// was closing it — `setMoreOpen` has exactly ONE caller, the toggle itself. The
+// tray collapsed because the COMPONENT was destroyed and `useState(false)` ran
+// again on the way back: InputBox is the last branch of ExplorationScreen's
+// action-slot ternary (a dice roll, payoff, conversation, parley or pickpocket
+// picker replaces it outright), and the whole screen unmounts on every trip to
+// inventory, missions, the map, the codex or the character sheet. A module-scope
+// latch outside the component holds the choice for the session.
+export const OTA_BUILD_ID = '2026-08-20-1379-the-more-tray-holds';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1378-a-cleared-room-stays-cleared';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1377-the-orderly-exit-is-marked';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-19-1376-beasts-first-and-the-corner-taught';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-19-1375-one-way-into-the-atlas';
