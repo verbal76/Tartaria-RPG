@@ -67,6 +67,8 @@ function contextLedgerBlock(): string {
 }
 import { saveLoadHealthSummary } from './saveLoadHealth';
 import { lastCrashSummary } from './lastCrash';
+import { crashLedgerSummary } from './crashLedger';
+import { reportingStatusLine } from './crashReporter';
 
 export function buildBasicDeviceSummary(): string {
   const apkBuild = Application.nativeBuildVersion ?? '(unknown)';
@@ -170,6 +172,16 @@ export function buildBasicDeviceSummary(): string {
     // global ErrorUtils handler captures non-ML, non-load crashes here; without
     // this line they never reached the pasted report and we'd be guessing.
     lastCrashSummary(),
+    // ⚠⚠ OTA-1380 — THE CRASH LEDGER. lastCrashSummary() above is a SINGLE SLOT,
+    // so a crash loop reports as one crash and the first (most informative) one
+    // is gone. This is the last ten — and it is the only place a NATIVE death
+    // appears at all, because a process killed by the OS runs no JS and so
+    // never reaches the handler that writes lastCrash. That was B9.
+    crashLedgerSummary(),
+    // And whether any of it is being DELIVERED anywhere, which is a different
+    // question from whether it was captured, and one a reader of this report
+    // should never have to guess at.
+    reportingStatusLine(),
     // ⚠ OTA-1172 — RUNTIME PRESSURE. Memory warnings, render stalls and the app-state
     // trail. This block exists because a hard-lock report arrived with no way to answer
     // "did the OS ask for memory back" or "did the screen stop painting" — the two

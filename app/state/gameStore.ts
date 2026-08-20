@@ -3915,7 +3915,18 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // Migrate legacy flat-id list into the new staged shape. We don't
     // know the original posting faction; pull it from the FactionQuestDef
     // catalog. Saves that already wrote activeFactionQuests pass through.
-    activeFactionQuests: p.activeFactionQuests ?? (p.activeFactionQuestIds ?? []).map((id) => {
+    // ⚠⚠ OTA-1381 [DIVERGENCE E1] — SINGLE-ACTIVE BACKFILL, and it was missing here.
+    // The census found this migration on HAL and html and NOT on this line, a
+    // 2-of-4 split with no rationale recorded anywhere. It is not cosmetic: all
+    // four lines read tracked-ness through `q.tracked !== false`, which treats
+    // `undefined` as TRACKED — so a save written before the `tracked` field
+    // existed showed EVERY accepted faction quest as active here, and exactly
+    // one on the other two lines. Same save, same predicate, different game.
+    //
+    // ⚠ Records that already carry `tracked` are left exactly as the player set
+    // them. This only fills the hole legacy saves have; it never re-picks an
+    // explicit choice.
+    activeFactionQuests: ((p.activeFactionQuests ?? (p.activeFactionQuestIds ?? []).map((id) => {
       const def = findFactionQuestById(id);
       return {
         id,
@@ -3923,7 +3934,8 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
         postedByFaction: def?.factionId ?? 'unknown',
         acceptedAt: Date.now(),
       };
-    }),
+    })) as { id: string; stage: number; postedByFaction: string; acceptedAt: number; tracked?: boolean }[])
+      .map((q, i) => (q.tracked === undefined ? { ...q, tracked: i === 0 } : q)),
     completedFactionQuestIds: p.completedFactionQuestIds ?? [],
     collectables: p.collectables ?? [],
     activeHunts: p.activeHunts ?? [],
@@ -8871,6 +8883,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
         setLastBootBreadcrumb(crumb);
         get().appendLog('debug',
           `freeze forensics: last boot ended mid-action — ${crumb.what} @ ${crumb.room ?? '?'} (${new Date(crumb.at).toISOString()})`);
+        // ⚠⚠ OTA-1380 — AND IT IS PROMOTED TO A CRASH, which is the whole point.
+        // This crumb was ALREADY the evidence of a B9-class death: the process
+        // was killed while an action was live, so no JS handler ran, nothing
+        // wrote `@tartaria/lastCrash`, and the crash existed only as one debug
+        // line that scrolled away. Recording it means a native kill finally
+        // shows up where every other crash does — in the ledger, in About, and
+        // in the bug report — instead of needing the owner to read a log at
+        // exactly the right moment.
+        //
+        // ⚠ Recorded BEFORE the clear, so a failure to clear cannot cost the
+        // record. Deduped on id (`ts_kind`), so a second hydrate in the same
+        // session cannot invent a second crash from one crumb.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        (require('../diagnostics/crashLedger') as typeof import('../diagnostics/crashLedger')).recordCrash({
+          kind: 'native-death',
+          ts: crumb.at,
+          stage: crumb.phase ?? 'mid-action',
+          message: `Process died with no orderly exit while: ${crumb.what}`,
+          isFatal: true,
+          breadcrumb: crumb,
+        });
         await clearLiveBreadcrumb();
       }
     } catch { /* forensics must never block a boot */ }

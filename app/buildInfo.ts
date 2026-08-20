@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.273';
+export const DISPLAY_VERSION = '4.29.275';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24116,7 +24116,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // picker replaces it outright), and the whole screen unmounts on every trip to
 // inventory, missions, the map, the codex or the character sheet. A module-scope
 // latch outside the component holds the choice for the session.
-export const OTA_BUILD_ID = '2026-08-20-1379-the-more-tray-holds';
+// ⚠⚠ OTA-1380 — CRASH REPORTING, STAGED. Owner: *"add crash reporting."* ⚠ The
+// project already HAD extensive crash CAPTURE (lastCrash, crashSave,
+// ScreenErrorBoundary, the breadcrumb, mlHealth, bugReport) — my "no crash
+// reporting" claim in the weekly assessment was wrong, and wrong because it was
+// asserted without reading. Two gaps were real: `lastCrash` is a SINGLE SLOT, so
+// a crash loop reports as one crash and loses the first; and a NATIVE death (the
+// B9 OOM kill) ran no JS, so it produced no crash record at all. crashLedger.ts
+// is a ring of the last ten and hydrate() now promotes a surviving breadcrumb to
+// a `native-death` record. crashReporter.ts is the delivery seam, inert behind
+// TWO switches — a transport+DSN must exist (neither does yet; Sentry is native
+// and needs a store build) AND the player must opt in (default OFF, owner's
+// ruling). PRIVACY.md updated to on-device-only.
+//
+// ⚠⚠ OTA-1381 — STEP 2 OF THE FOUR-LINE COLLAPSE: the three real drifts the
+// DIVERGENCE.md census found, closed. E1 the `tracked` single-active backfill
+// (was on HAL+html only, while all four read `tracked !== false` — so a legacy
+// save showed EVERY faction quest active on two lines and one on the other two);
+// E2 steam's duplicated voice-queue clear; E3 the clipboard fallback (was on
+// steam+html only — a failed clipboard write left the player's ledger nowhere).
+// Census: 1,053 differing paths between golem and HAL collapse to 14 real code
+// differences. scripts/divergence.py makes it repeatable.
+export const OTA_BUILD_ID = '2026-08-20-1381-the-drift-closed';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1380-the-crash-ledger';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1379-the-more-tray-holds';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1378-a-cleared-room-stays-cleared';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1377-the-orderly-exit-is-marked';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-19-1376-beasts-first-and-the-corner-taught';

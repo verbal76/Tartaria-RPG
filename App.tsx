@@ -148,6 +148,25 @@ try {
         const stage = (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE ?? 'unknown';
         void cs.captureActiveCrashSave(`fatal:${stage}`);
       } catch { /* ignore — module/AS not ready */ }
+      // ⚠⚠ OTA-1380 — AND THE LEDGER, which is the durable copy. The
+      // `@tartaria/lastCrash` write above is a SINGLE SLOT: crash twice and the
+      // first is overwritten, so a crash loop and a one-off read identically
+      // and the most informative crash — the first, before the app was already
+      // sick — is the one lost. The ledger keeps the last ten. Separate try so
+      // it can never cost the two writes above.
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const cl = require('./app/diagnostics/crashLedger');
+        const stage = (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE ?? 'unknown';
+        cl.recordCrash({
+          kind: 'js-fatal',
+          stage,
+          message: err?.message ?? String(err),
+          stack: err?.stack ?? '',
+          isFatal: !!isFatal,
+          sinceBoot: Date.now() - bootTime,
+        });
+      } catch { /* ignore — module/AS not ready */ }
       const sinceBoot = Date.now() - bootTime;
       // OTA-237 — was sinceBoot > 5000. Cut to 800ms because the
       // current player crash repros within 1 second of title screen
@@ -251,6 +270,28 @@ export default function App() {
     // arb78 — load the player's saved background settings (notifies the
     // AppShell's useDisplaySettings hook once storage resolves).
     void loadDisplaySettings();
+    // ⚠⚠ OTA-1380 — hydrate the crash ledger and the delivery preference at
+    // boot. Both are read SYNCHRONOUSLY later (crashLedgerSummary and
+    // reportingStatusLine serve the About screen and the bug report, neither of
+    // which can grow a loading state), so the read has to have happened by then
+    // or those blocks report "(not loaded yet)" on the one screen a player
+    // opens when something has gone wrong.
+    //
+    // ⚠ The flush is deliberately AFTER both loads and is itself a no-op unless
+    // a transport is installed AND the player opted in — neither is true in this
+    // build, so today this costs one boolean and returns 0. It is wired now so
+    // that adding the Sentry transport later needs no boot change.
+    void (async () => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const cl = require('./app/diagnostics/crashLedger');
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const cr = require('./app/diagnostics/crashReporter');
+        await cl.loadCrashLedger();
+        await cr.loadReportingPref();
+        await cr.flushCrashReports();
+      } catch { /* diagnostics must never block a boot */ }
+    })();
     // OTA-405 — GATE A safety cap. otaBootResolved opens the character-entry
     // gate; it's normally set the moment the boot OTA check resolves below.
     // But if hydrate() rejects (or any boot step throws before that line),
@@ -893,6 +934,21 @@ class ScreenErrorBoundary extends React.Component<
       void cs.captureActiveCrashSave('screen-render', {
         error: (error?.message ?? String(error)).slice(0, 300),
         componentStack: (errorInfo?.componentStack ?? '').slice(0, 1800),
+      });
+    } catch { /* ignore */ }
+    // ⚠ OTA-1380 — a recovered screen crash is still a crash, and it is the one
+    // the player is LEAST likely to report: the recovery card makes it look
+    // handled, so nobody files it. Recorded at a distinct kind so a boundary
+    // catch is never mistaken for a process death when reading the ledger.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const cl = require('./app/diagnostics/crashLedger');
+      cl.recordCrash({
+        kind: 'js-boundary',
+        stage: 'screen-render',
+        message: error?.message ?? String(error),
+        stack: errorInfo?.componentStack ?? error?.stack ?? '',
+        isFatal: false,
       });
     } catch { /* ignore */ }
   }

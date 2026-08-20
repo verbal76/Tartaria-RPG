@@ -25,6 +25,29 @@ There is no:
 - social-media SDK
 - in-app purchase or payment system
 
+### Crash records (on-device only)
+
+When the app crashes, it writes a record of the crash — the error
+message, the code location, what the game was doing, and which build
+you were on — into its own private storage on your device, keeping the
+ten most recent. This is how the LAST CRASH notice on the title screen
+works, and it is what REPORT A BUG copies to your clipboard.
+
+**These records never leave your device on their own.** They are sent
+only when *you* choose to send them, by using REPORT A BUG and pasting
+the result somewhere yourself.
+
+Settings contains an AUTOMATIC CRASH REPORTS switch. It is **off by
+default**, and in this version it is not available at all — no crash
+reporting service is built into the app, so there is nothing for it to
+send to. If a future version adds one, this policy will be updated to
+name the service and say exactly what it receives, before the switch
+can do anything. Turning that switch on would always be your decision,
+never a default.
+
+Crash records contain no personal information, no account identifier,
+and no contents of your saves.
+
 Your save files, character history, settings, and game log are
 stored only on your device, inside the app's private storage area.
 Uninstalling the app permanently deletes all of it.
