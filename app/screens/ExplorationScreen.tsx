@@ -12,6 +12,7 @@ import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { playerPowerScore, enemyPowerScore } from '../engine/powerRating';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
+import { MiniMap } from '../components/MiniMap';
 import { SearchModal } from '../components/SearchModal';
 // ⚠⚠ OTA-1266 — THE SALVAGEMODAL IMPORT IS GONE, AND THE COMMENT THAT STOOD HERE
 // WAS MINE AND HAD GONE FALSE. It read: *"its `isSalvageable` predicate is still
@@ -925,7 +926,23 @@ export function ExplorationScreen() {
               <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('world')} accessibilityRole="button">
                 <Text style={styles.crestNavText}>⚑ WORLD</Text>
               </TouchableOpacity>
-              <CrestPlaceholder />
+              <MiniMap
+                onPress={() => {
+                  // ⚠⚠ OTA-1361 — THE LOCK COMES ACROSS WITH THE TAP. The MAP
+                  // button this replaces refused during the tutorial lockdown
+                  // (arb109: double-pulse buzz + an Arbiter nudge, because a
+                  // silent no-op reads as a broken button). Deleting that button
+                  // without carrying its guard would have left the corner as an
+                  // unguarded way out of the scripted crawl — the lockdown is
+                  // only as tight as its loosest affordance.
+                  if (tutLock) {
+                    try { Vibration.vibrate([0, 32, 45, 32]); } catch { /* ignore */ }
+                    useGameStore.getState().nudgeTutorialBlocked();
+                    return;
+                  }
+                  setScreen('map');
+                }}
+              />
               <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('lore')} accessibilityRole="button">
                 <Text style={styles.crestNavText}>◈ LORE</Text>
               </TouchableOpacity>
@@ -962,28 +979,16 @@ export function ExplorationScreen() {
           </Text>
         </View>
         <View style={styles.sceneBarBtns}>
-          {/* arb99 — ACTIONS removed (player never used it) and MAP moved
-              here so the map is always one tap away. Inside an outpost the
-              Map screen shows your outpost interior; out in the world it
-              shows the world atlas. */}
-          <TouchableOpacity
-            onPress={() => {
-              if (tutLock) {
-                // arb109 — double-pulse "wrong" buzz + Arbiter nudge (the old
-                // single 30ms tap was easy to miss and said nothing).
-                try { Vibration.vibrate([0, 32, 45, 32]); } catch { /* ignore */ }
-                useGameStore.getState().nudgeTutorialBlocked();
-                return;
-              }
-              setScreen('map');
-            }}
-            hitSlop={8}
-            style={[styles.sceneBarBtn, tutLock && styles.sceneBarBtnBlocked]}
-            accessibilityRole="button"
-            accessibilityState={{ disabled: tutLock }}
-          >
-            <Text style={styles.sceneBarBtnText}>MAP</Text>
-          </TouchableOpacity>
+          {/* ⚠⚠ OTA-1361 — THE MAP BUTTON IS GONE. Owner: *"since tapping on
+              the minimap opens the atlas, I don't think we need the map button
+              anymore."* arb99 put MAP here so the map was always one tap away,
+              and the corner mini-map is now that one tap AND shows you where you
+              are without spending it.
+
+              ⚠ ONE THING IT COST, STATED RATHER THAN SMUGGLED: this bar renders
+              in combat and the mini-map does not — the right column flips to the
+              EnemyPanel — so the Atlas is no longer reachable mid-fight. That
+              reads correct, but it IS a change. */}
           {/* OTA-748 — settings gear, relocated here from the enemy card. */}
           <TouchableOpacity
             onPress={() => setScreen('about')}
@@ -1588,7 +1593,6 @@ export function ExplorationScreen() {
               if (typeof elev === 'string') return { noun: elev, tier: 1, totalTiers: 1 };
               return elev as { noun: string; tier: number; totalTiers: number };
             })()}
-            onOpenMap={() => setScreen('map')}
             inCombat={inCombat}
             equippedMain={equippedMain}
             equippedOff={equippedOff}

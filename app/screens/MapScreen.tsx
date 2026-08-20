@@ -34,6 +34,7 @@ import { FirstTimeHint } from '../components/FirstTimeHint';
 // panel so a player can tap any known location and start travel
 // without digging through Lore.
 import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y, cellToAtlasFraction, canonicalCellFor } from '../engine/worldMap';
+import { worldMarkerFraction } from '../engine/mapFraction';
 import {
   atlasCoordForLocation,
   LOCATION_ATLAS_COORDS,
@@ -157,15 +158,11 @@ const CELL_TO_LOCATION: Record<string, string> = (() => {
 // do not swap back to a spring, which reads as a teleport.
 const CENTER_GLIDE_MS = 1400;
 
-/** Where a marker at this cell should be DRAWN. Never used for distance or routing. */
-function markerFraction(x: number, y: number): { fx: number; fy: number } {
-  const id = CELL_TO_LOCATION[`${x},${y}`];
-  if (id) {
-    const a = LOCATION_ATLAS_COORDS[id]!;
-    return atlasVisualFraction(id, a.fx, a.fy);
-  }
-  return cellToAtlasFraction(x, y);
-}
+/** ⚠ OTA-1361 — MOVED TO app/engine/mapFraction.ts, AND THAT MOVE IS THE POINT.
+ *  The corner mini-map draws the same marker, and two implementations of "where
+ *  is the player on the picture" would be free to drift — the exact class of
+ *  defect this codebase has spent OTAs unpicking. One copy, both callers. */
+const markerFraction = worldMarkerFraction;
 
 // ⚠⚠ THE LEGEND INSET IS GONE, AND DELETING IT WAS MANDATORY — NOT A TIDY-UP.
 //
@@ -290,7 +287,20 @@ export function MapScreen() {
   const startTy = useRef(0);
   const startPinchDist = useRef(0);
   const lastTapAt = useRef(0);
-
+  // ⚠⚠ OTA-1361 — WHAT A PINCH HAS TO REMEMBER, NOW THAT IT ANCHORS ON THE
+  // CENTRE. Only the scale baseline and the pan baseline. The midpoint refs,
+  // the box's page origin, the measureInWindow and the touch-origin derivation
+  // that OTA-1372/1373 needed are all GONE — a centre-anchored zoom is
+  // (s₁/s₀)·t₀ and asks nothing about where the fingers are.
+  //
+  // ⚠ startDx/Dy EARNED THEIR KEEP AND STAY. `gestureState.dx` accumulates
+  // from the FIRST touch of the whole gesture and is never rebased, so every
+  // place below that re-captures startTx/startTy — the second finger landing,
+  // or a finger lifting — was folding the pan-so-far into the baseline and then
+  // adding it a second time out of dx, jumping the map on every change in touch
+  // count. Recording dx at the same instant makes the delta relative.
+  const startDx = useRef(0);
+  const startDy = useRef(0);
   const clampTranslate = (tx: number, ty: number, currentScale: number, box: { width: number; height: number } | null) => {
     if (!box) return { tx, ty };
     // Allow the image to be panned up to half its scaled bounds out
@@ -459,6 +469,8 @@ export function MapScreen() {
         startScale.current = scaleRef.current;
         startTx.current = txRef.current;
         startTy.current = tyRef.current;
+        startDx.current = 0;
+        startDy.current = 0;
         if (ts.length >= 2) {
           startPinchDist.current = distance(ts[0]!, ts[1]!);
         } else {
@@ -485,6 +497,11 @@ export function MapScreen() {
           startScale.current = scaleRef.current;
           startTx.current = txRef.current;
           startTy.current = tyRef.current;
+          // ⚠ OTA-1372 — rebase dx with the rest of the baseline. This line is
+          // the second half of the drift: the pan travelled so far is now IN
+          // startTx, and without this it was still in gestureState.dx too.
+          startDx.current = gestureState.dx;
+          startDy.current = gestureState.dy;
           return;
         }
         // Conversely, if we drop from 2 touches back to 1, re-capture
@@ -495,23 +512,55 @@ export function MapScreen() {
           startScale.current = scaleRef.current;
           startTx.current = txRef.current;
           startTy.current = tyRef.current;
+          startDx.current = gestureState.dx;
+          startDy.current = gestureState.dy;
           return;
         }
         if (ts.length >= 2 && startPinchDist.current > 0) {
-          // Pinch — scale ratio drives zoom, midpoint drives pan.
+          // ⚠⚠ OTA-1361 — ZOOM ABOUT THE CENTRE OF THE SCREEN. The owner's
+          // spec, in his words: *"One finger should drag from the point of
+          // contact in the direction of drag. 2 fingers moving apart should
+          // zoom in on what the center of the screen was, together should
+          // zoom [out]."*
+          //
+          // That is a different anchor from the one OTA-1372/1373 built, and a
+          // far better one for this screen. Anchoring on the FINGERS is the
+          // photo-viewer convention, and it is why those two OTAs needed the
+          // box's page origin — which meant measuring the box, trusting an
+          // async callback, and making the map layer transparent to touches so
+          // the origin could be read off the touch. All of that machinery
+          // existed to answer "where are the fingers, relative to the box?"
+          //
+          // Anchor on the box CENTRE and the question disappears. The layer
+          // already transforms about its own centre:
+          //     screen = C + t + s·(p − C)
+          // The content point currently AT the centre satisfies
+          //     C = C + t₀ + s₀·(p* − C)   ⇒   (p* − C) = −t₀/s₀
+          // and holding it there through the zoom gives
+          //     t₁ = −s₁·(p* − C) = (s₁/s₀)·t₀.
+          // One multiply. No page coordinates, no measurement, nothing to go
+          // stale, and it cannot drift because there is no origin to get wrong.
+          //
+          // ⚠ The pinch deliberately does NOT pan. Two fingers set the scale
+          // and nothing else; the centre of the screen is the fixed point, so
+          // moving the pair around must not slide the map underneath it. Pan
+          // is the one-finger gesture, below, and it tracks 1:1.
           const newDist = distance(ts[0]!, ts[1]!);
           const ratio = newDist / startPinchDist.current;
           // OTA 060 — no upper bound. Pinch in as far as the player
           // wants. MIN_SCALE preserved so they can't shrink to zero.
           const nextScale = Math.max(MIN_SCALE, startScale.current * ratio);
-          const tx = startTx.current + gestureState.dx;
-          const ty = startTy.current + gestureState.dy;
+          const grow = nextScale / startScale.current;
+          const tx = startTx.current * grow;
+          const ty = startTy.current * grow;
           const clamped = clampTranslate(tx, ty, nextScale, imgBox);
           applyTransform(nextScale, clamped.tx, clamped.ty);
         } else {
-          // Single-finger pan.
-          const tx = startTx.current + gestureState.dx;
-          const ty = startTy.current + gestureState.dy;
+          // Single-finger pan. ⚠ OTA-1372 — the delta is measured from the
+          // last baseline capture, not from the first touch of the gesture;
+          // see startDx.
+          const tx = startTx.current + (gestureState.dx - startDx.current);
+          const ty = startTy.current + (gestureState.dy - startDy.current);
           const clamped = clampTranslate(tx, ty, scaleRef.current, imgBox);
           applyTransform(scaleRef.current, clamped.tx, clamped.ty);
         }

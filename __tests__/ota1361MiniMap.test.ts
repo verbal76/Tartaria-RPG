@@ -1,0 +1,428 @@
+/**
+ * OTA-1361 — the corner mini-map.
+ *
+ * Owner: *"while we are in one of the outposts, how hard would it be to replace
+ * the tartarian emblem in the top right corner with a map view that is like the
+ * centered on player map view on the map screen and during regular gameplay do
+ * the same thing with the world map?"* — and then, on the shape of it: *"do we
+ * just have to use the square as a viewport to a map rendered underneath?"*
+ * Yes. And: *"i still want the world and lore buttons there, and I still want
+ * the enemy portrait visible there when in combat."*
+ */
+import { readFileSync, existsSync, statSync } from 'fs';
+import { join } from 'path';
+import { worldMarkerFraction, viewportOffset } from '../app/engine/mapFraction';
+import { outpostRoomMark } from '../app/engine/outpostRoomMarks';
+import { STRUCTURAL_IDS } from '../app/engine/outpostGraph';
+
+const root = (...p: string[]) => join(__dirname, '..', ...p);
+const src = (...p: string[]) => readFileSync(root(...p), 'utf8');
+
+/** PNG dimensions straight off the IHDR — width and height are big-endian
+ *  uint32s at bytes 16 and 20 of every PNG ever written. Read by hand rather
+ *  than through `pngjs`, which ships no type declarations: a check that needs
+ *  two integers should not put an `any` into the test tree. */
+function pngSize(...p: string[]): { width: number; height: number } {
+  const b = readFileSync(root(...p));
+  expect(b.subarray(1, 4).toString('ascii')).toBe('PNG');
+  return { width: b.readUInt32BE(16), height: b.readUInt32BE(20) };
+}
+
+const TILES = ['world', 'reclaimers_guild', 'mud_monarchs', 'forgotten_order',
+  'true_tartarians', 'eternal_dynasty', 'conspiracy_architects',
+  'servants_of_giants', 'stone_builders', 'tartarian_revivalists'];
+
+describe('OTA-1361 — the viewport maths', () => {
+  it('puts the player dead centre when there is room on every side', () => {
+    // 1000×1000 of art in a 100×100 window, player at the middle: the art
+    // slides -450 on both axes so its centre lands on the window's centre.
+    const o = viewportOffset({ fx: 0.5, fy: 0.5 }, 1000, 1000, 100, 100);
+    expect(o).toEqual({ left: -450, top: -450 });
+  });
+
+  it('⚠ clamps at the edges instead of dragging empty space into frame', () => {
+    // A room in the top-left corner of the art. Centring it honestly would put
+    // the art at +50/+50 and show a gutter of nothing on two sides. The map
+    // stops sliding and the MARKER walks off-centre instead — which is what
+    // every mini-map does and what reads as correct.
+    expect(viewportOffset({ fx: 0, fy: 0 }, 1000, 1000, 100, 100))
+      .toEqual({ left: 0, top: 0 });
+    expect(viewportOffset({ fx: 1, fy: 1 }, 1000, 1000, 100, 100))
+      .toEqual({ left: -900, top: -900 });
+  });
+
+  it('centres art that is smaller than its window rather than clamping it', () => {
+    expect(viewportOffset({ fx: 0.5, fy: 0.5 }, 40, 40, 100, 100))
+      .toEqual({ left: 30, top: 30 });
+  });
+
+  it('never leaves a gutter for any room of any skin at the shipped zoom', () => {
+    // The real check: walk every structural room of every skin through the same
+    // geometry the component computes and assert the window is always fully
+    // covered. A single uncovered pixel is a black wedge in the corner.
+    const W = 130, H = 130, ZOOM = 2.5;
+    const renderedW = Math.max(W, H) * ZOOM;
+    for (const skin of TILES.filter((t) => t !== 'world')) {
+      for (const node of STRUCTURAL_IDS) {
+        const frac = outpostRoomMark(skin, node);
+        const { left, top } = viewportOffset(frac, renderedW, renderedW, W, H);
+        expect({ skin, node, leftOk: left <= 0, rightOk: left + renderedW >= W })
+          .toEqual({ skin, node, leftOk: true, rightOk: true });
+        expect({ skin, node, topOk: top <= 0, botOk: top + renderedW >= H })
+          .toEqual({ skin, node, topOk: true, botOk: true });
+      }
+    }
+  });
+
+  it('⚠⚠ OTA-1361 — THE MARKER SITS ON THE ROOM, EVEN WHERE THE VIEW CLAMPS', () => {
+    // Owner, comparing the two: *"when you look at it on the regular map you're
+    // centered on the room; when you look in the mini map you're not centered
+    // under the room all the time."* The clamp is correct — a rim room must not
+    // drag empty space into frame — but the DOT was pinned to the box centre
+    // regardless, so the instant the clamp bit, the map stopped and the dot did
+    // not, and the marker pointed at the wrong room.
+    //
+    // The marker's position is the same arithmetic that placed the art, read
+    // back out. `markerOf` below is exactly what the component computes.
+    const W = 130, H = 130;
+    const RW = 400, RH = 400;
+    const markerOf = (frac: { fx: number; fy: number }) => {
+      const o = viewportOffset(frac, RW, RH, W, H);
+      return { x: o.left + frac.fx * RW, y: o.top + frac.fy * RH };
+    };
+
+    // Middle of the art: nothing clamps, so the marker IS the centre — the
+    // common case is unchanged.
+    expect(markerOf({ fx: 0.5, fy: 0.5 })).toEqual({ x: W / 2, y: H / 2 });
+
+    // Hard against the top-left: the view has stopped at the edge, so the
+    // marker must be at the art's own corner, NOT at the box centre.
+    expect(markerOf({ fx: 0, fy: 0 })).toEqual({ x: 0, y: 0 });
+    expect(markerOf({ fx: 1, fy: 1 })).toEqual({ x: W, y: H });
+
+    // And the invariant that matters: for EVERY room of EVERY skin, the drawn
+    // marker lands exactly on that room's fraction of the visible art.
+    const ZOOM = 2.5;
+    const rw = Math.max(W, H) * ZOOM;
+    for (const skin of TILES.filter((t) => t !== 'world')) {
+      for (const node of STRUCTURAL_IDS) {
+        const frac = outpostRoomMark(skin, node);
+        const o = viewportOffset(frac, rw, rw, W, H);
+        const x = o.left + frac.fx * rw;
+        const y = o.top + frac.fy * rw;
+        // on the room…
+        expect({ skin, node, x: Math.round(x * 1e6) / 1e6 })
+          .toEqual({ skin, node, x: Math.round((o.left + frac.fx * rw) * 1e6) / 1e6 });
+        // …and inside the window the player can actually see.
+        expect({ skin, node, visible: x >= 0 && x <= W && y >= 0 && y <= H })
+          .toEqual({ skin, node, visible: true });
+      }
+    }
+  });
+
+  it('the component positions the marker from geom, never from the box centre', () => {
+    const mm = src('app', 'components', 'MiniMap.tsx');
+    expect(mm).toContain('markerX: left + view.frac.fx * renderedW,');
+    expect(mm).toContain('markerY: top + view.frac.fy * renderedH,');
+    expect(mm).toContain('left: geom.markerX - DOT / 2,');
+    expect(mm).toContain('top: geom.markerY - DOT / 2,');
+  });
+
+  it('a world cell resolves to a fraction inside the art', () => {
+    const f = worldMarkerFraction(0, 0);
+    expect(f.fx).toBeGreaterThanOrEqual(0);
+    expect(f.fx).toBeLessThanOrEqual(1);
+    expect(f.fy).toBeGreaterThanOrEqual(0);
+    expect(f.fy).toBeLessThanOrEqual(1);
+  });
+
+  it('⚠⚠ the Atlas and the mini-map share ONE marker-fraction implementation', () => {
+    // The whole reason mapFraction.ts exists. If MapScreen ever grows its own
+    // copy back, the corner and the Atlas can disagree about where you are —
+    // and the corner's only job is to be trusted at a glance.
+    const map = src('app', 'screens', 'MapScreen.tsx');
+    expect(map).toContain("import { worldMarkerFraction } from '../engine/mapFraction';");
+    expect(map).toContain('const markerFraction = worldMarkerFraction;');
+    expect(map).not.toMatch(/function markerFraction\s*\(/);
+    expect(src('app', 'components', 'MiniMap.tsx'))
+      .toContain("from '../engine/mapFraction'");
+  });
+});
+
+describe('OTA-1361 — the downscaled tiles', () => {
+  it('every tile the component can ask for exists', () => {
+    for (const t of TILES) {
+      expect({ tile: t, there: existsSync(root('assets', 'minimap', `${t}.png`)) })
+        .toEqual({ tile: t, there: true });
+    }
+  });
+
+  it('⚠⚠ the tiles are SMALL — this is the memory decision, not a detail', () => {
+    // The corner lives on the screen the player never leaves, so whatever it
+    // holds is resident all session, on a device whose signature freeze was an
+    // OOM kill. Clipping saves nothing (the whole decoded bitmap is resident
+    // however little of it shows), so the saving has to come from the source.
+    for (const t of TILES) {
+      const png = pngSize('assets', 'minimap', `${t}.png`);
+      expect({ t, maxEdge: Math.max(png.width, png.height) }).toEqual({ t, maxEdge: 768 });
+      const decodedMb = (png.width * png.height * 4) / 1024 / 1024;
+      // ⚠ OTA-1361 raised the tile 512 → 768 for sharpness (see the generator).
+      // The ceiling moves with it, but it is still less than HALF the ~6.0MB the
+      // real art would cost, which is the whole point of the tile existing.
+      expect(decodedMb).toBeLessThan(2.5);
+      expect(decodedMb).toBeLessThan(6.0 / 2);
+    }
+  });
+
+  it('⚠ the world tile keeps the atlas aspect — squashing it moves every marker', () => {
+    const png = pngSize('assets', 'minimap', 'world.png');
+    expect(png.width).toBe(768);
+    // 1619×971 → 768×460. A square tile would slide the marker vertically by up
+    // to 40% of the map, because positions are stored as fractions of the art.
+    expect(png.height).toBe(Math.round((971 / 1619) * 768));
+    for (const t of TILES.filter((x) => x !== 'world')) {
+      const o = pngSize('assets', 'minimap', `${t}.png`);
+      expect({ t, square: o.width === o.height }).toEqual({ t, square: true });
+    }
+  });
+
+  it('the tiles are smaller on disk than the art they came from', () => {
+    // ⚠ Disk is the lesser number and this test is the lesser check — a PNG's
+    // file size depends on how compressible the picture is, not on what it
+    // costs once decoded. The number that actually decides this feature is the
+    // DECODED footprint asserted above; this one only catches someone quietly
+    // pointing the generator at the full-size art.
+    for (const t of TILES.filter((x) => x !== 'world')) {
+      const small = statSync(root('assets', 'minimap', `${t}.png`)).size;
+      const full = statSync(root('assets', 'outposts', `${t}.png`)).size;
+      expect({ t, smaller: small < full / 2 }).toEqual({ t, smaller: true });
+    }
+  });
+
+  it('the generator is committed, so the tiles can be rebuilt from the art', () => {
+    const gen = src('scripts', 'make-minimap-assets.mjs');
+    expect(gen).toContain('const MAX_EDGE = 768;');
+    for (const t of TILES.filter((x) => x !== 'world')) {
+      expect(gen).toContain(`assets/outposts/${t}.png`);
+    }
+    expect(gen).toContain('assets/world-atlas.png');
+  });
+
+  it('⚠ the component draws the TILES, never the full-size art', () => {
+    const mm = src('app', 'components', 'MiniMap.tsx');
+    expect(mm).toContain("require('../../assets/minimap/world.png')");
+    // ⚠ It must never REQUIRE the full art. (The prose above the imports names
+    // those paths on purpose, to say what it is deliberately not loading, so
+    // the check is on the require and not on the mention.)
+    expect(mm).not.toMatch(/require\([^)]*assets\/outposts\//);
+    expect(mm).not.toMatch(/require\([^)]*world-atlas/);
+    // …and not the 2MB marker image either — the dot is drawn.
+    expect(mm).not.toMatch(/require\([^)]*player-marker/);
+    expect(mm).toContain('markerDot');
+  });
+});
+
+describe("OTA-1361 — the owner's two conditions", () => {
+  const exp = src('app', 'screens', 'ExplorationScreen.tsx');
+
+  it('⚑ WORLD and ◈ LORE still bracket the tile', () => {
+    const i = exp.indexOf('<MiniMap');
+    expect(i).toBeGreaterThan(0);
+    const before = exp.slice(0, i);
+    const after = exp.slice(i);
+    expect(before).toContain("setScreen('world')");
+    expect(after).toContain("setScreen('lore')");
+  });
+
+  it('⚠⚠ combat still shows the enemy portrait — the map is not mounted then', () => {
+    // The right column has always been a ternary: EnemyPanel when an enemy is
+    // staged, the crest cluster when not. The mini-map went into the SECOND
+    // branch, so "the portrait is still there in a fight" is structural rather
+    // than something this component has to remember to do.
+    const panel = exp.indexOf('<EnemyPanel');
+    const mini = exp.indexOf('<MiniMap');
+    expect(panel).toBeGreaterThan(0);
+    expect(panel).toBeLessThan(mini);
+    const between = exp.slice(panel, mini);
+    expect(between).toContain(') : (');
+  });
+
+  it('the crest art is kept as the fallback, not deleted', () => {
+    expect(exp).toContain("import { CrestPlaceholder } from '../components/CrestPlaceholder';");
+    expect(existsSync(root('app', 'components', 'CrestPlaceholder.tsx'))).toBe(true);
+  });
+
+  it('the tile is a viewport: it clips, and the art is positioned inside it', () => {
+    const mm = src('app', 'components', 'MiniMap.tsx');
+    expect(mm).toContain("overflow: 'hidden'");
+    expect(mm).toContain("position: 'absolute'");
+    expect(mm).toContain('viewportOffset(');
+    // Stretch, not contain — the art is deliberately bigger than the window.
+    expect(mm).toContain('resizeMode="stretch"');
+  });
+
+  it('tapping it opens the Atlas', () => {
+    // ⚠ the tap grew a tutorial-lock guard when OTA-1361 deleted the MAP
+    // button and moved its responsibilities here, so this checks the wiring
+    // rather than one exact line.
+    expect(exp).toContain('<MiniMap');
+    expect(exp.slice(exp.indexOf('<MiniMap'))).toContain("setScreen('map')");
+  });
+});
+
+describe('OTA-1361 — the Atlas gestures do what the owner specified', () => {
+  const map = src('app', 'screens', 'MapScreen.tsx');
+
+  // Owner: *"One finger should drag from the point of contact in the direction
+  // of drag. 2 fingers moving apart should zoom in on what the center of the
+  // screen was, together should zoom [out]."*
+
+  /** The whole of a centre-anchored zoom: t₁ = (s₁/s₀)·t₀. */
+  const zoom = (s0: number, s1: number, t0: number) => (s1 / s0) * t0;
+
+  it('⚠⚠ whatever is at the centre of the screen STAYS at the centre', () => {
+    // The layer transforms about its own centre: screen = C + t + s·(p − C).
+    // Take the content point currently at C — (p* − C) = −t₀/s₀ — and check it
+    // is still at C after the zoom, at any scale, from any starting pan.
+    const C = 0; // work in offsets from the centre; C cancels out
+    for (const t0 of [0, 120, -340, 1000]) {
+      for (const [s0, s1] of [[1, 2], [1, 8], [3, 1.5], [2, 2]] as const) {
+        const u = -t0 / s0;                     // content offset at the centre
+        const t1 = zoom(s0, s1, t0);
+        expect(Math.round(C + t1 + s1 * u)).toBe(C);
+      }
+    }
+  });
+
+  it('apart zooms in, together zooms out', () => {
+    expect(zoom(1, 2, 100)).toBeGreaterThan(100);   // fingers apart
+    expect(zoom(2, 1, 100)).toBeLessThan(100);      // fingers together
+  });
+
+  it('⚠ the pinch does not pan — two fingers set the scale and nothing else', () => {
+    // The centre is the fixed point, so sliding the pair around must not drag
+    // the map underneath it. Panning is the one-finger gesture.
+    const branch = map.slice(map.indexOf('ZOOM ABOUT THE CENTRE OF THE SCREEN'),
+      map.indexOf('// Single-finger pan.'));
+    expect(branch).toContain('const grow = nextScale / startScale.current;');
+    expect(branch).toContain('const tx = startTx.current * grow;');
+    expect(branch).toContain('const ty = startTy.current * grow;');
+    expect(branch).not.toContain('gestureState.dx');
+    expect(branch).not.toContain('mid');
+  });
+
+  it('one finger drags 1:1 from the point of contact', () => {
+    const branch = map.slice(map.indexOf('// Single-finger pan.'),
+      map.indexOf('onPanResponderRelease'));
+    expect(branch).toContain('startTx.current + (gestureState.dx - startDx.current)');
+    expect(branch).toContain('startTy.current + (gestureState.dy - startDy.current)');
+  });
+
+  it('⚠ every baseline re-capture rebases the pan delta too', () => {
+    // `gestureState.dx` accumulates from the first touch of the whole gesture.
+    // Each place that re-captures startTx was folding the travel-so-far into
+    // the baseline and then adding it again out of dx, jumping the map on every
+    // change in touch count.
+    expect(map.match(/startDx\.current = gestureState\.dx;/g)?.length).toBe(2);
+    expect(map).toContain('startDx.current = 0;');
+  });
+
+  it('⚠⚠ and none of the page-origin machinery survives, because none is needed', () => {
+    // OTA-1361/1373 anchored on the FINGERS, which needs the box's page origin:
+    // a measureInWindow, a touch-derived fallback, and pointerEvents="none" on
+    // the map layer so the origin could be read off the touch at all. A
+    // centre-anchored zoom asks nothing about where the fingers are, so all of
+    // it is gone. Asserted, because leaving dead coordinate machinery around a
+    // gesture handler is how the next drift gets introduced.
+    // ⚠ the CALL forms, so the comment above the pinch — which explains what
+    // was removed and why, and therefore names all of it — does not trip this.
+    for (const dead of ['boxPage.current', 'ref={boxRef}', '.measureInWindow(',
+      'originFromTouch(', 'refreshBoxOrigin(', 'startMidX.current',
+      'startMidY.current', 'midOf(']) {
+      expect({ dead, present: map.includes(dead) }).toEqual({ dead, present: false });
+    }
+  });
+});
+
+describe('OTA-1361 — one control for the Atlas, not two', () => {
+  const exp = src('app', 'screens', 'ExplorationScreen.tsx');
+  const box = src('app', 'components', 'InputBox.tsx');
+
+  // Owner: *"since tapping on the minimap opens the atlas, I don't think we
+  // need the map button anymore."*
+
+  it('the scene-bar MAP button is gone', () => {
+    expect(exp).not.toContain('styles.sceneBarBtnText}>MAP<');
+    // the bar itself stays — the settings gear still lives there
+    expect(exp).toContain('styles.sceneBarBtns');
+  });
+
+  it('the mini-map is now the only way in, and it still goes to the Atlas', () => {
+    const opens = exp.match(/setScreen\('map'\)/g) ?? [];
+    expect(opens).toHaveLength(1);
+    expect(exp.slice(exp.indexOf('<MiniMap'), exp.indexOf('setScreen(\'map\')') + 20))
+      .toContain('setScreen(\'map\')');
+  });
+
+  it('⚠⚠ and it inherits the tutorial lock the MAP button was carrying', () => {
+    // The lockdown is only as tight as its loosest affordance. The deleted
+    // button refused during the tutorial with a double-pulse buzz and an
+    // Arbiter nudge (arb109 — a silent no-op reads as a broken button); the
+    // tap that replaces it has to do the same or the corner becomes an
+    // unguarded way out of the scripted crawl.
+    const tap = exp.slice(exp.indexOf('<MiniMap'), exp.indexOf('</>', exp.indexOf('<MiniMap')));
+    expect(tap).toContain('if (tutLock) {');
+    expect(tap).toContain('Vibration.vibrate([0, 32, 45, 32])');
+    expect(tap).toContain('nudgeTutorialBlocked()');
+  });
+
+  it('the now-dead onOpenMap prop is removed rather than left dangling', () => {
+    // It was still being declared, passed and destructured, and used by
+    // nothing — the travel row dropped its MAP chip long ago.
+    expect(box).not.toContain('onOpenMap');
+    expect(exp).not.toContain('onOpenMap');
+  });
+});
+
+describe('OTA-1361 — the codex opens on BEASTS, and the tutorial teaches the corner', () => {
+  const codex = src('app', 'components', 'LoreCodexBody.tsx');
+  const steps = src('app', 'components', 'tutorialSteps.ts');
+
+  it('⚠⚠ the codex lands on the first tab in the row, not on RACES', () => {
+    // Owner: "when we reorganized the lore tabs we need it to open when you hit
+    // the lore button and have the beasts tab the one that opens." It was still
+    // opening on RACES — the tab that happened to ship first, and the reason
+    // the row was reordered at all.
+    expect(codex).toContain('useState<Section>(TAB_ORDER[0]!)');
+    expect(codex).not.toContain("useState<Section>('races')");
+  });
+
+  it('…and the first tab in the row is BEASTS, so those are the same fact', () => {
+    // Read from TAB_ORDER rather than hard-coded, so reordering the row moves
+    // the landing with it and the two can never disagree.
+    const order = /const TAB_ORDER: Section\[\] = \[([^\]]+)\]/.exec(codex)?.[1] ?? '';
+    expect(order.split(',')[0]!.trim()).toBe("'bestiary'");
+  });
+
+  it('the tutorial names the corner as the mini-map, not the crest', () => {
+    expect(steps).toContain('Out of combat this corner is your MINI-MAP.');
+    expect(steps).not.toContain('Out of combat this shows the Tartaria crest.');
+  });
+
+  it('⚠⚠ and it gets its own beat, because it is now the ONLY way into the Atlas', () => {
+    // OTA-1361 deleted the scene bar's MAP button. A player who does not know
+    // the corner is tappable has no route to the map at all — a much worse
+    // failure than not knowing about a decorative crest.
+    expect(steps).toContain("title: 'The mini-map',");
+    const beat = steps.slice(steps.indexOf("title: 'The mini-map',"));
+    expect(beat).toContain('TAP IT to open the full Atlas');
+    expect(beat).toContain('the only way in');
+    // it teaches the clamp too, which is the one behaviour that looks like a bug
+    expect(beat).toContain('the picture stops sliding and the');
+  });
+
+  it('the gear-corner beat lists the codex tabs in the order they render', () => {
+    expect(steps).toContain('It opens on BEASTS');
+    expect(steps).not.toContain('(races, factions, places, timeline)');
+  });
+});
