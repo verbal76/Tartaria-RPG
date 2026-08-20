@@ -169,40 +169,47 @@ describe('OTA-1392 — the shared constant moved DOWN, not sideways', () => {
 
 describe('OTA-1392 — source pins follow the code they pin', () => {
   /**
-   * ⚠⚠ THE MOVE BROKE A TEST, AND THAT WAS THE SYSTEM WORKING.
+   * ⚠⚠ THE MOVE BROKE TESTS, AND THAT WAS THE SYSTEM WORKING.
    *
-   * `ota1292LoreBackStaysInGame` pins persist's null-player and stub-player
-   * guards by reading `gameStore.ts` as text — those two lines are what stops a
-   * navigation bug overwriting a real save with an empty record. When persist
-   * moved, the pin pointed at a file that no longer contained it and went red.
+   * Slice 1 broke `ota1292LoreBackStaysInGame`, which pins persist's
+   * null-player and stub-player guards by reading `gameStore.ts` as TEXT — the
+   * two lines that stop a navigation bug overwriting a real save with an empty
+   * record. Slice 2 broke `ota1180QwenSuccessIsChecked` and
+   * `ota1182AppleSignal` the same way.
    *
-   * The tempting fix is to relax the assertion. That would leave a test that
-   * passes and pins nothing. The right fix is to re-point it, which is what
-   * happened — and this check makes the same mistake loud for every later slice.
+   * The tempting fix each time is to relax the assertion. That leaves a test
+   * that passes and pins nothing. The right fix is to re-point it at the file
+   * the code now lives in — which is what happened, three times.
+   *
+   * ⚠ SO THIS CHECK IS GENERIC, not a list. It reads every suite that loads
+   * `gameStore.ts` as source, collects the literals it asserts against, and
+   * fails on any literal that is NOT in gameStore but IS in a slice. That is
+   * exactly the stale-pin condition, and it catches the next slice without
+   * anyone remembering to extend a list.
    */
-  const persistInternals = [
-    'if (!player) return false;',
-    'if (!player.name || !player.raceId || !player.stats) {',
-    'while (persistTrailingQueued && drained < 64)',
-  ];
+  const sliceBodies = sliceFiles.map((f) => src('app', 'state', 'slices', f));
 
-  it('⚠⚠ no suite still pins a persist internal against gameStore.ts', () => {
-    const offenders: string[] = [];
+  it('⚠⚠ no suite pins a slice internal against gameStore.ts', () => {
+    const stale: string[] = [];
     for (const f of readdirSync(path('__tests__'))) {
       if (!/\.tsx?$/.test(f)) continue;
       const body = src('__tests__', f);
-      // only suites that read gameStore's source can be wrong in this way
-      if (!/['"]gameStore\.ts['"]/.test(body)) continue;
-      for (const needle of persistInternals) {
-        // the assertion and the gameStore read have to be about each other; a
-        // suite that reads BOTH files and asserts the needle against the slice
-        // is fine, so require the needle to appear without persistSlice nearby
-        if (body.includes(needle) && !/persistSlice\.ts/.test(body)) {
-          offenders.push(`${f}: ${needle}`);
-        }
+      if (!/['"]app\/state\/gameStore\.ts['"]|['"]gameStore\.ts['"]/.test(body)) continue;
+      // Only look at suites that read gameStore and NOT a slice; one that reads
+      // both has already been re-pointed and knows what it is doing.
+      // ⚠ Matched on the bare word, because a test may build the path as
+      // segments — src('app', 'state', 'slices', 'x.ts') — rather than as a
+      // slash-joined string. Requiring a slash here produced five false
+      // positives against the suite that documents the slices themselves.
+      if (/\bslices\b/.test(body)) continue;
+      for (const m of body.matchAll(/toContain\(\s*(['"`])((?:\\.|(?!\1)[^\\])*)\1\s*\)/g)) {
+        const needle = m[2];
+        if (!needle || needle.length < 25) continue;   // short strings match everywhere
+        if (store.includes(needle)) continue;          // still in gameStore — fine
+        if (sliceBodies.some((b) => b.includes(needle))) stale.push(`${f}: ${needle.slice(0, 70)}`);
       }
     }
-    expect(offenders).toEqual([]);
+    expect(stale).toEqual([]);
   });
 });
 

@@ -33,6 +33,13 @@ import path from 'path';
 const WF = fs.readFileSync(path.join(__dirname, '..', '.github/workflows/build-ios.yml'), 'utf8');
 const EAS = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'eas.json'), 'utf8'));
 const STORE = fs.readFileSync(path.join(__dirname, '..', 'app/state/gameStore.ts'), 'utf8');
+/** ⚠ OTA-1393 — `bootQwen` LEFT gameStore.ts for
+ *  `app/state/slices/aiLifecycleSlice.ts` when the store split began. The block
+ *  below reads it there. Re-pointed rather than relaxed: what these four tests
+ *  hold down is the only line that tells an Apple tester whether the narration
+ *  engine is missing, out of memory, or out of disk — and a source pin loosened
+ *  after a refactor pins nothing. The bodies are unchanged; only the file is. */
+const AI_LIFECYCLE = fs.readFileSync(path.join(__dirname, '..', 'app/state/slices/aiLifecycleSlice.ts'), 'utf8');
 
 function codeOnly(src: string): string {
   return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
@@ -83,7 +90,7 @@ describe('OTA-1182 — a red iOS check now means something', () => {
 });
 
 describe('OTA-1182 — the narration engine says why it failed, in the log', () => {
-  const code = codeOnly(STORE);
+  const code = codeOnly(AI_LIFECYCLE);
 
   test('the swallowed-failure path logs the reason', () => {
     expect(code).toContain('qwen: LOAD FAILED — ${why}');

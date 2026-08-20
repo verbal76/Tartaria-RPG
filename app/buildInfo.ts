@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.32.0';
+export const DISPLAY_VERSION = '4.32.1';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24204,7 +24204,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ⚠ THE RETIRED SEQUENCES ARE NOT DELETED. HAL's, steam's and html's ledgers
 // stay whole on their own branches and in RESTORE-POINTS.md. What ends is their
 // FUTURE numbering, not their history.
-export const OTA_BUILD_ID = '2026-08-20-1392-slice-one-the-save-write-path';
+export const OTA_BUILD_ID = '2026-08-20-1393-slice-two-the-engines-move-down';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1392-slice-one-the-save-write-path';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1391-the-trunk-is-in-the-list';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1390-the-workflows-audit';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1389-the-web-bundle-builds';

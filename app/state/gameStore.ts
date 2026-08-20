@@ -136,6 +136,8 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { MAX_LOG_IN_MEMORY } from './saveLimits';
 import { createPersistSlice } from './slices/persistSlice';
+import { cognitive, qwen } from '../ai/engines';
+import { createAiLifecycleSlice } from './slices/aiLifecycleSlice';
 import { setLastBootBreadcrumb } from '../diagnostics/runtimePressure'; // OTA-1276
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName, nameWasAltered } from '../engine/playerName';
@@ -1541,15 +1543,18 @@ function collectSceneNouns(scene: CurrentScene): string[] {
 
 export type CognitiveStatus = 'idle' | BootStage | 'failed' | 'skipped';
 
-// Module-level singleton — class instances don't belong in zustand state.
-const cognitive = new CognitiveOrchestrator();
+// ⚠ OTA-1393 — the `cognitive` singleton MOVED to app/ai/engines.ts, a leaf both
+// this file and the slices can import. It is referenced 28 times below and could
+// not be reached from a slice while it lived here; see engines.ts for why the
+// value had to move down rather than be exported sideways.
 
 // Second AI engine — the generative Arbiter narrator. Loaded lazily on demand;
 // initialization is slow (~hundreds of MB download on first launch) so we keep
 // it on a separate boot path from the MiniLM classifier above. Until it
 // reports ready, the narrative pipeline keeps using the existing template
 // pools — there is no degraded mode.
-const qwen = new QwenGenerativeEngine();
+// ⚠ OTA-1393 — the `qwen` singleton MOVED to app/ai/engines.ts alongside
+// `cognitive`. 73 references below; same reason.
 
 // arb43 — Qwen-backed Arbiter persona answer. When an `ask` isn't a map
 // query, a canned introspection line, a structured world-knowledge lookup,
@@ -35011,100 +35016,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     lastWelcomeBackAt = null;
   },
 
-  async bootCognitive() {
-    const current = get().cognitiveStatus;
-    if (current !== 'idle' && current !== 'failed') return;
-    set({ cognitiveStatus: 'downloading', cognitiveFraction: 0, cognitiveError: null });
-    try {
-      await cognitive.boot({
-        onProgress: (stage, fraction) => {
-          set({ cognitiveStatus: stage, cognitiveFraction: fraction });
-        },
-      });
-      const info = await cognitive.getModelInfo();
-      set({ cognitiveStatus: 'ready', cognitiveFraction: 1, cognitiveModelInfo: info });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      set({ cognitiveStatus: 'failed', cognitiveError: message });
-    }
-  },
-
-  async shutdownCognitive() {
-    try {
-      await cognitive.shutdown();
-    } catch {
-      // ignore — best effort
-    }
-  },
-
-  async resumeCognitive() {
-    if (get().cognitiveStatus !== 'ready') return;
-    try {
-      await cognitive.resume();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      set({ cognitiveStatus: 'failed', cognitiveError: message });
-    }
-  },
-
-  async bootQwen() {
-    const current = get().qwenStatus;
-    if (current !== 'idle' && current !== 'failed') return;
-    set({ qwenStatus: 'downloading', qwenFraction: 0, qwenError: null });
-    try {
-      await qwen.initialize({
-        onProgress: (status, fraction) => {
-          set({ qwenStatus: status, qwenFraction: fraction });
-        },
-      });
-      // qwen.initialize() swallows errors and sets its own internal status to
-      // 'failed' rather than throwing — mirror that onto the store.
-      if (qwen.isReady()) {
-        set({
-          qwenStatus: 'ready',
-          qwenFraction: 1,
-          qwenError: null,
-          qwenModelId: qwen.getModelId(),
-        });
-      } else {
-        const why = qwen.getLastError() ?? 'Qwen failed to initialize';
-        set({ qwenStatus: 'failed', qwenError: why });
-        // ⚠⚠ OTA-1182 — SAY IT IN THE LOG, NOT ONLY IN STATE. OTA-1181 put this reason in
-        // the bug-report header, which requires the player to get far enough to send one.
-        // The owner needs the game working on Apple for TestFlight testers, and a tester
-        // who never files a report is the common case — but the log ships with any report,
-        // including one about something else entirely. This is the single line that says
-        // whether the narration engine is missing, out of memory, or out of disk.
-        try { get().appendLog('debug', `qwen: LOAD FAILED — ${why}`); } catch { /* ignore */ }
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      set({ qwenStatus: 'failed', qwenError: message });
-      // OTA-1182 — the throwing path says so too. `initialize()` mostly swallows, but a
-      // missing native module throws outright, and that is the one answer that no OTA can
-      // fix: it means llama.rn is not in the installed build.
-      try { get().appendLog('debug', `qwen: LOAD THREW — ${message}`); } catch { /* ignore */ }
-    }
-    // OTA-223 — start the background dormancy watchdog after the
-    // first successful boot. The watchdog polls every 60s; if Qwen
-    // is dormant (status==='ready' but the native runtime is gone,
-    // typically because Android OOM-killed it), it kicks
-    // forceReinitialize() in the background so Qwen is warm by the
-    // next time the player triggers narration or fusion. Idempotent —
-    // starting twice replaces the timer cleanly.
-    startQwenWatchdog(get, set);
-    // OTA-1172 — instruments alongside the watchdog: same lifecycle, same teardown rules.
-    startRuntimePressureWatch(get, set);
-  },
-
-  async shutdownQwen() {
-    try {
-      await qwen.dispose();
-    } catch {
-      // best effort
-    }
-    set({ qwenStatus: 'idle', qwenFraction: 0, partialArbiterText: null, isGenerating: false });
-  },
+  // ⚠⚠ OTA-1393 — SLICE 2. The five AI-engine lifecycle actions (bootCognitive,
+  // shutdownCognitive, resumeCognitive, bootQwen, shutdownQwen) now live in
+  // `slices/aiLifecycleSlice.ts`. They could not move until the `cognitive` and
+  // `qwen` singletons went DOWN to `app/ai/engines.ts` first — a slice cannot
+  // import a value from this file.
+  //
+  // ⚠ `startQwenWatchdog` / `startRuntimePressureWatch` are defined here and
+  // handed in, for the same reason `makeRoomKey` was in slice 1: the dependency
+  // stays one-way, gameStore → slice, never back.
+  //
+  // ⚠ `cancelGeneration` stays below on purpose — it mutates
+  // `arbiterGenerationEpoch`, a `let` shared with the narration path, and moving
+  // it would strand that variable or steal it. It travels with the narration slice.
+  ...createAiLifecycleSlice(set, get, { startQwenWatchdog, startRuntimePressureWatch }),
 
   cancelGeneration() {
     // Drops the streaming buffer + flag. The in-flight inference call keeps

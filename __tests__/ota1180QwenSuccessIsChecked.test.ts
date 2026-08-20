@@ -37,7 +37,13 @@ import fs from 'fs';
 import path from 'path';
 
 const APP = fs.readFileSync(path.join(__dirname, '..', 'App.tsx'), 'utf8');
-const STORE = fs.readFileSync(path.join(__dirname, '..', 'app/state/gameStore.ts'), 'utf8');
+/** ⚠ OTA-1393 — `bootQwen` MOVED OUT OF gameStore.ts, into
+ *  `app/state/slices/aiLifecycleSlice.ts`, when the store split began. This pin
+ *  follows it rather than being relaxed: a source pin loosened after a refactor
+ *  stops pinning anything, and what this one holds down is that a failed model
+ *  load resolves INTO STATE instead of throwing past App.tsx's guard. The body
+ *  is character-for-character what it was; only its address changed. */
+const STORE = fs.readFileSync(path.join(__dirname, '..', 'app/state/slices/aiLifecycleSlice.ts'), 'utf8');
 const ABOUT = fs.readFileSync(path.join(__dirname, '..', 'app/diagnostics/aboutSummary.ts'), 'utf8');
 
 /** Strips comment blocks and whole-line `//`. ⚠ Trailing `//` is deliberately NOT stripped
