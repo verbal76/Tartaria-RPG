@@ -64,14 +64,20 @@ on:
       - 'release/**'
       - 'claude/**'
       # ⚠ OTA-1386 — 'HaL2001' REMOVED. It was archived by the branch collapse;
-      # the trunk (golem-line) now produces HAL's build too, selected by the
-      # `line` input below rather than by which branch was pushed. Leaving the
-      # trigger would mean a push to an archived branch quietly building a
-      # months-stale HAL.
-      # golem-line is intentionally NOT auto-built — it ships JS via the isolated
-      # eas-update-golem.yml OTA. APKs (native / version changes) are built
-      # manually via workflow_dispatch, so we stop burning build minutes on every
-      # JS tweak.
+      # the trunk now produces HAL's build too, selected by the `line` input
+      # below rather than by which branch was pushed. Leaving the trigger would
+      # mean a push to an archived branch quietly building a months-stale HAL.
+      #
+      # ⚠⚠ OTA-1391 — 'golem-line' ADDED, and its absence was a real hole.
+      # golem-line was deliberately left off this list back when it was one dev
+      # line that shipped JS over the air; APKs were "built manually via
+      # workflow_dispatch". The collapse made it THE TRUNK for all four products
+      # and nobody revisited the list, so from OTA-1384 until now **Android could
+      # not be built from the trunk by a push at all** — a `[build-aab]` marker
+      # was read by nothing, because the workflow never started. Found by pushing
+      # a trial build with every marker set and watching four of six targets fire.
+      # The job-level gate below is what keeps the cost behaviour intact.
+      - 'golem-line'
     tags:
       - 'v*'
     paths-ignore:
@@ -125,6 +131,19 @@ jobs:
     # arb155 — bound the job so a hung/disconnected runner fails fast with a red
     # X instead of spinning until GitHub's 6-hour default.
     timeout-minutes: 60
+    # ⚠⚠ OTA-1391 — THE OPT-IN GATE, which is what makes adding golem-line above
+    # safe. An Android build is 30-60 minutes; the trunk now takes every commit
+    # for all four products, so "fires on any non-JS push" would be a standing
+    # charge. A push from a branch other than the trunk keeps the old behaviour
+    # (those are release/CI branches where a build IS the point); a push to the
+    # trunk builds only when asked. Same shape as the three desktop workflows.
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || startsWith(github.ref, 'refs/tags/')
+      || github.ref != 'refs/heads/golem-line'
+      || contains(github.event.head_commit.message, '[build-apk]')
+      || contains(github.event.head_commit.message, '[build-aab]')
+      || contains(github.event.head_commit.message, '[golem-apk]')
     env:
       # ⚠ Job-wide, so EVERY step that shells out to Expo sees it — prebuild, the
       # config reads, gradle's bundling step. Setting it on one step would give a

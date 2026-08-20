@@ -150,6 +150,76 @@ describe('OTA-1390 — the live OTA path exists on the trunk', () => {
   });
 });
 
+describe('OTA-1391 — the trunk is actually IN the mobile workflows\' trigger list', () => {
+  /**
+   * ⚠⚠ FOUND BY PUSHING THE TRIAL BUILD AND COUNTING. The OTA-1390 commit
+   * carried every marker and touched `.github/build-trigger.txt`, and **four**
+   * of six targets fired. Android and iOS did not — not because of the path
+   * filter or the marker, but because `golem-line` was never in their `push:`
+   * branch list at all.
+   *
+   * It was left off deliberately, back when golem was one dev line that shipped
+   * JS over the air and built APKs "manually via workflow_dispatch". The collapse
+   * made it THE TRUNK for all four products and nobody revisited the list. So
+   * from OTA-1384 until now, **Android and iOS could not be built from the trunk
+   * by a push at all** — a `[build-aab]` or `[build-ios]` marker was read by
+   * nothing, because the workflow never started.
+   *
+   * ⚠ And `build-ios-native.yml` was worse: `paths-ignore: ['**']` excludes every
+   * path, so no push has ever passed its filter on any branch — while its own
+   * header documented a `[build-ios-native]` push marker. The doc had been false
+   * for as long as the filter existed.
+   */
+  const MOBILE = ['build-apk.yml', 'build-ios.yml', 'build-ios-native.yml'];
+
+  it.each(MOBILE)('%s lists the trunk as a push branch', (f) => {
+    const y = wf(f);
+    const on = y.slice(y.indexOf('on:'), y.indexOf('permissions:'));
+    expect(on).toContain("      - 'golem-line'");
+  });
+
+  it('⚠⚠ build-ios-native no longer excludes every path from its own trigger', () => {
+    const y = wf('build-ios-native.yml');
+    const on = y.slice(y.indexOf('on:'), y.indexOf('permissions:'));
+    expect(on).not.toMatch(/paths-ignore:\s*\n\s*- '\*\*'/);
+  });
+
+  it.each(MOBILE)('%s still refuses to build on an UNASKED push to the trunk', (f) => {
+    // Adding the trunk to the branch list is only safe because the job gate
+    // exists. An Android build is 30-60 minutes and the trunk takes every commit
+    // for all four products; "fires on any non-JS push" would be a standing tax.
+    const y = wf(f);
+    expect(y).toContain('    if: >-');
+    const gate = y.slice(y.indexOf('    if: >-'), y.indexOf('    env:'));
+    expect(gate).toContain("github.event_name == 'workflow_dispatch'");
+    expect(gate).toContain('head_commit.message');
+  });
+
+  it('⚠ …but a push to a NON-trunk branch keeps the old always-build behaviour', () => {
+    // main / release/** / claude/** are branches where a build is the point.
+    // Only the trunk needed the new restraint.
+    for (const f of ['build-apk.yml', 'build-ios.yml']) {
+      expect(wf(f)).toContain("|| github.ref != 'refs/heads/golem-line'");
+    }
+  });
+
+  it('⚠ a version tag still forces a build regardless', () => {
+    for (const f of ['build-apk.yml', 'build-ios.yml']) {
+      expect(wf(f)).toContain("|| startsWith(github.ref, 'refs/tags/')");
+    }
+  });
+
+  it('⚠⚠ the 10x runner is gated so it is never even allocated', () => {
+    // macOS bills at 10x — the one place where "starts and exits cleanly" is
+    // still too expensive. The step-level should_run check stays as a second
+    // line of defence, but the job-level `if` is what saves the money.
+    const y = wf('build-ios-native.yml');
+    expect(y).toContain("startsWith(github.event.head_commit.message, '[build-ios-native]')");
+    expect(y).toContain('never allocated');
+    expect(y).toContain("steps.meta.outputs.should_run != 'true'");
+  });
+});
+
 describe('OTA-1390 — the audit document', () => {
   const doc = src('docs', 'WORKFLOWS.md');
 

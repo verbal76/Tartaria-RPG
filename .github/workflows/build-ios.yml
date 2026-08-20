@@ -68,6 +68,11 @@ on:
       - 'claude/**'
       # ⚠ OTA-1386 — 'HaL2001' REMOVED, archived by the branch collapse. The
       # trunk builds HAL now, selected by the `line` input below.
+      # ⚠⚠ OTA-1391 — 'golem-line' ADDED. Same hole as build-apk.yml: the trunk
+      # was never added to this list, so from OTA-1384 until now a `[build-ios]`
+      # marker was read by nothing — the workflow never started. See the longer
+      # note there.
+      - 'golem-line'
     tags:
       - 'v*-ios'
     paths-ignore:
@@ -115,6 +120,15 @@ jobs:
   build:
     name: Build Tartaria Realms iOS via EAS
     runs-on: ubuntu-latest
+    # ⚠ OTA-1391 — opt-in on the trunk, same reasoning as build-apk.yml. Without
+    # it every `.github/**` or `package.json` commit would spin up a runner, do a
+    # full `npm ci`, and then skip the build because the profile is preview —
+    # minutes spent to reach a no-op.
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || startsWith(github.ref, 'refs/tags/')
+      || github.ref != 'refs/heads/golem-line'
+      || startsWith(github.event.head_commit.message, '[build-ios]')
     env:
       # Job-wide so every Expo invocation agrees. A push carries no input and
       # falls to golem — the dev line, never someone else's shipping product.

@@ -57,12 +57,16 @@ on:
       - main
       - 'release/**'
       - 'claude/**'
-      # ⚠ OTA-1386 — 'HaL2001' REMOVED, archived by the branch collapse. The
-      # trunk builds HAL now, selected by the `line` input below.
-    # Skip every path-driven push so this never auto-fires; the
-    # commit-message check below is what gates intentional runs.
-    paths-ignore:
-      - '**'
+      # ⚠ OTA-1386 — 'HaL2001' REMOVED, archived by the branch collapse.
+      # ⚠⚠ OTA-1391 — 'golem-line' ADDED; see build-apk.yml.
+      - 'golem-line'
+    # ⚠⚠ OTA-1391 — `paths-ignore: ['**']` REMOVED, and it had made this file's
+    # own documentation false. The header says this runs "by a push whose commit
+    # contains [build-ios-native]" — but a paths-ignore of `**` excludes every
+    # path, so no push event ever passed the filter and the marker could never be
+    # read. The intent (never auto-fire) is right and is now enforced where it
+    # belongs: the job-level `if` below, which costs no macOS minutes at all
+    # rather than starting a 10x runner just to exit.
   workflow_dispatch:
     inputs:
       submit:
@@ -90,6 +94,13 @@ jobs:
     name: Build iOS .ipa on GitHub macOS runner
     runs-on: macos-15
     timeout-minutes: 60
+    # ⚠⚠ OTA-1391 — the real never-auto-fire gate. macOS runners bill at 10x, so
+    # this is the one place where "starts and exits cleanly" is still too
+    # expensive; the `if` means the runner is never allocated. The step-level
+    # `should_run` check below stays as a second line of defence.
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || startsWith(github.event.head_commit.message, '[build-ios-native]')
     env:
       # ⚠ This job compiles ON THIS RUNNER (xcodebuild, not EAS), so the job env
       # is in scope when `expo prebuild` evaluates app.config.js. That is not true

@@ -45,3 +45,5 @@ unless that build is genuinely intended.
 LOG
 ---
 2026-08-20  OTA-1390  first trial build of all six targets from the one trunk.
+
+2026-08-20  OTA-1391  Android + iOS trial build — the two targets that could not fire.

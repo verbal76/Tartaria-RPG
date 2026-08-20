@@ -60,9 +60,9 @@ them. The others match anywhere in the message.
 
 | target | workflow | runner | output | trigger |
 |---|---|---|---|---|
-| **Android** | `build-apk.yml` | ubuntu | APK (preview) / AAB (production) + GitHub Release | dispatch · `[build-aab]` + touch · tag `v*` |
+| **Android** | `build-apk.yml` | ubuntu | APK (preview) / AAB (production) + GitHub Release | dispatch · `[build-apk]` / `[build-aab]` + touch · tag `v*` |
 | **iOS** | `build-ios.yml` | EAS servers | TestFlight-ready IPA | dispatch · `[build-ios]` + touch · tag `v*-ios` |
-| **iOS (fallback)** | `build-ios-native.yml` | macOS | `.ipa` artifact | dispatch · `[build-ios-native]` |
+| **iOS (fallback)** | `build-ios-native.yml` | macOS (**10x cost**) | `.ipa` artifact | dispatch · `[build-ios-native]` |
 | **Web** | `build-web.yml` | ubuntu | static site artifact | dispatch · auto on web-relevant paths |
 | **Windows (.exe)** | `build-steam-exe.yml` | windows (**2x cost**) | portable `.exe` + public Release | dispatch · `[build-exe]` / `[build-desktop]` |
 | **Linux / Steam Deck** | `build-linux.yml` | ubuntu | AppImage artifact | dispatch · `[build-linux]` / `[build-desktop]` |
@@ -188,6 +188,18 @@ pattern is visible, because it is one pattern.
 | 4 | Windows / Linux / macOS packaging never came onto the trunk | three of six targets unbuildable |
 | 5 | `metro.config.js` was missing the web-only native-module stubs | web export fails — and four targets depend on it |
 | 6 | the live OTA publisher never came onto the trunk | HAL testers quietly stop receiving updates |
+| 7 | `golem-line` was never added to the Android/iOS `push:` branch lists | markers read by nothing — the workflow never starts |
+
+⚠⚠ **#7 was found by running #1–6's fix.** A trial-build commit carrying every
+marker fired **four** of six targets. Android and iOS were absent, and not
+because of a path filter or a marker: the trunk simply was not in their trigger
+list. It had been left off deliberately, back when golem was one dev line that
+shipped JS over the air; the collapse made it the trunk for all four products and
+nobody revisited the list. Same class again — a capability stopped existing and
+nothing said so. `build-ios-native.yml` was worse: `paths-ignore: ['**']` excludes
+every path, so no push had ever passed its filter on any branch, while its own
+header documented a push marker. Fixed in OTA-1391, with a job-level gate on each
+so adding the trunk does not turn every commit into a 30–60 minute build.
 
 **Every one of them was silent.** Nothing went red; a capability just stopped
 existing. That is what a census cannot catch — a census is a reading, and a
