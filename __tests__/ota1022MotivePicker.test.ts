@@ -129,10 +129,15 @@ describe('OTA-1022 — the load path owes exactly one ask', () => {
 describe('OTA-1022 — SOURCE LOCKS (category: the ask reaches the screen)', () => {
   const storeSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
   const appSrc = fs.readFileSync(path.join(__dirname, '..', 'App.tsx'), 'utf8');
+  const slotSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'slices', 'slotSlice.ts'), 'utf8');
 
   it('both load paths raise the picker for un-chosen motives', () => {
-    expect(storeSrc).toMatch(/motivePickerPending: player\.storyMotiveChosen !== true/);
-    expect(storeSrc).toMatch(/motivePickerPending: revived\.storyMotiveChosen !== true/);
+    // ⚠ OTA-1394 — BOTH load doors moved to `app/state/slices/slotSlice.ts` with
+    // slice 3, so both pins read it. "Both load paths" is exactly what this test
+    // is about, and after the split they are two branches in one slice rather
+    // than two branches in the store — the claim is unchanged, its address is not.
+    expect(slotSrc).toMatch(/motivePickerPending: player\.storyMotiveChosen !== true/);
+    expect(slotSrc).toMatch(/motivePickerPending: revived\.storyMotiveChosen !== true/);
   });
 
   it('the modal mounts globally in App.tsx', () => {

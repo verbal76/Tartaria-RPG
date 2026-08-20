@@ -127,14 +127,23 @@ describe('OTA-1320 — the audit of the audit', () => {
   });
 
   it('⚠ (1b) the backfill guesses by catalog ONLY at the legacy seam — the step path stays record-driven', () => {
-    const store = read('state', 'gameStore.ts');
+    // ⚠ OTA-1394 — the legacy-scene backfill runs inside loadSlotIntoGame, which
+    // moved to `app/state/slices/slotSlice.ts` with slice 3. Re-pointed, not
+    // relaxed: this pin is what keeps the catalog guess confined to the legacy
+    // seam instead of leaking into the record-driven step path.
+    const store = read('state', 'slices', 'slotSlice.ts');
     const i = store.indexOf('OTA-1320 — BACKFILL tileGearNouns ON LEGACY SCENES');
     expect(i).toBeGreaterThan(-1);
     const block = store.slice(i, i + 2200);
     expect(block).toContain('tileGearNouns === undefined');
     expect(block).toContain('findCatalogItem(n, { aliases: true })');
     // The cardinal-step consumer still reads the record, never the catalog.
-    const step = store.slice(store.indexOf('THE GEAR STAYS ON THE TILE YOU LEFT'));
+    // ⚠ OTA-1394 — and it is now in a DIFFERENT FILE from the backfill above:
+    // the legacy seam went to the slot slice, the step path stayed in the store.
+    // That separation is the point of this test, and it is now structural rather
+    // than a matter of which lines happen to sit near which.
+    const storeFile = read('state', 'gameStore.ts');
+    const step = storeFile.slice(storeFile.indexOf('THE GEAR STAYS ON THE TILE YOU LEFT'));
     expect(step.slice(0, 1600)).toContain('scene.tileGearNouns ?? []');
   });
 
@@ -148,7 +157,10 @@ describe('OTA-1320 — the audit of the audit', () => {
     expect(await hasFallenSeed(SEED)).toBe(true);
     // And the clear is wired into the ONE sanctioned revival, after the gem
     // spend (a failed save returns before either).
-    const store = read('state', 'gameStore.ts');
+    // ⚠ OTA-1394 — resurrectSlot moved to `app/state/slices/slotSlice.ts`. The
+    // ordering this pins — spend the gem BEFORE clearing the fallen seed — is the
+    // difference between a paid revival and a free one, so it follows the code.
+    const store = read('state', 'slices', 'slotSlice.ts');
     const r = store.indexOf('async resurrectSlot(');
     const body = store.slice(r, r + 4000);
     expect(body).toContain('clearFallenSeed(characterSeedOf(revived))');

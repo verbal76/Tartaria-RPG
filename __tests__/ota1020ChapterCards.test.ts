@@ -164,11 +164,21 @@ describe('OTA-1020 — the arc raises cards through the store', () => {
 describe('OTA-1020 — SOURCE LOCKS (category: the cards reach the screen)', () => {
   const storeSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
   const appSrc = fs.readFileSync(path.join(__dirname, '..', 'App.tsx'), 'utf8');
+  /** ⚠ OTA-1394 — THE LOAD/RESET PATHS NOW LIVE IN TWO FILES. Slice 3 moved
+   *  loadSlotIntoGame, resurrectSlot, deleteSlotById, abandonGame and
+   *  saveAndExitToTitle into `app/state/slices/slotSlice.ts`; startNewGame,
+   *  hydrate and the initial state stayed in gameStore. The invariant these
+   *  locks hold — EVERY path that loads or resets clears this overlay — is
+   *  unchanged and is now checked across both modules. Counting one file would
+   *  have quietly stopped covering half the paths, which is the failure mode a
+   *  count-based lock is most prone to. */
+  const slotSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'slices', 'slotSlice.ts'), 'utf8');
+  const loadPathsSrc = storeSrc + slotSrc;
   const endingSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'screens', 'EndingScreen.tsx'), 'utf8');
 
   it('triggerMainQuest raises the card on phase change and every load/reset path clears it', () => {
     expect(storeSrc).toMatch(/chapterCardFor\(nextState\.phase, player\.storyMotive\)/);
-    const clears = storeSrc.match(/chapterCard: null/g) ?? [];
+    const clears = loadPathsSrc.match(/chapterCard: null/g) ?? [];
     // initial state + slot load + delete-slot + hard reset + new game
     expect(clears.length).toBeGreaterThanOrEqual(5);
   });

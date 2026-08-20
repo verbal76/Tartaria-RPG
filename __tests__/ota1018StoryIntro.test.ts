@@ -170,12 +170,22 @@ describe('OTA-1018 — old saves are dealt a motive, never ambushed', () => {
 describe('OTA-1018 — SOURCE LOCKS (category: the story reaches the screen)', () => {
   const storeSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
   const appSrc = fs.readFileSync(path.join(__dirname, '..', 'App.tsx'), 'utf8');
+  /** ⚠ OTA-1394 — THE LOAD/RESET PATHS NOW LIVE IN TWO FILES. Slice 3 moved
+   *  loadSlotIntoGame, resurrectSlot, deleteSlotById, abandonGame and
+   *  saveAndExitToTitle into `app/state/slices/slotSlice.ts`; startNewGame,
+   *  hydrate and the initial state stayed in gameStore. The invariant these
+   *  locks hold — EVERY path that loads or resets clears this overlay — is
+   *  unchanged and is now checked across both modules. Counting one file would
+   *  have quietly stopped covering half the paths, which is the failure mode a
+   *  count-based lock is most prone to. */
+  const slotSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'slices', 'slotSlice.ts'), 'utf8');
+  const loadPathsSrc = storeSrc + slotSrc;
   const createSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'screens', 'CharacterCreationScreen.tsx'), 'utf8');
   const charSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'screens', 'CharacterScreen.tsx'), 'utf8');
 
   it('startNewGame raises the crawl and every load/reset path clears it', () => {
     expect(storeSrc).toMatch(/storyIntro: introPagesFor\(player\.storyMotive, player\.factionId\)/);
-    const clears = storeSrc.match(/storyIntro: null/g) ?? [];
+    const clears = loadPathsSrc.match(/storyIntro: null/g) ?? [];
     // initial state + slot load + delete-slot + hard reset
     expect(clears.length).toBeGreaterThanOrEqual(4);
   });

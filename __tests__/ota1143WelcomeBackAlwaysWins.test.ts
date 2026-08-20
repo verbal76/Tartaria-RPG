@@ -53,9 +53,15 @@ import { welcomeBackLine } from '../app/state/gameStore';
 import type { PlayerCharacter } from '../app/engine/types';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
+// ⚠ OTA-1394 — THE WELCOME-BACK CALL SITE MOVED. `welcomeBackLine` itself is
+// still composed in gameStore, but everything that DECIDES when to say it —
+// loadSlotIntoGame, the offline-recap flag, the WHILE_AWAY_LINES pool and the
+// 60s debounce — went to `app/state/slices/slotSlice.ts` with slice 3. These
+// pins follow it rather than being relaxed: what they hold down is that the
+// greeting always names the player, which the owner asked for by name.
 const STORE: string = require('fs').readFileSync(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('path').join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+  require('path').join(__dirname, '..', 'app', 'state', 'slices', 'slotSlice.ts'), 'utf8');
 
 const player = { name: 'Verbal Kint' } as unknown as PlayerCharacter;
 

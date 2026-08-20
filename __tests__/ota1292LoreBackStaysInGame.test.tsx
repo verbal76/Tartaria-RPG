@@ -154,9 +154,14 @@ describe("OTA-1292 — lore's BACK stays in the game", () => {
     expect(persistSrc).toContain('if (!player) return false;');
     expect(persistSrc).toContain('if (!player.name || !player.raceId || !player.stats) {');
     // ...and a failed load rolls the active slot back BEFORE anything can
-    // persist over it. This half is still in gameStore — loadSlotIntoGame has
-    // not been sliced out.
-    const store = src('app', 'state', 'gameStore.ts');
-    expect(store).toContain('try { await setActiveSlot(null); } catch { /* ignore */ }');
+    // persist over it.
+    // ⚠ OTA-1394 — THIS HALF MOVED TOO. The note here used to read "still in
+    // gameStore — loadSlotIntoGame has not been sliced out", and slice 3 sliced
+    // it out. Both guards now live in `app/state/slices/`, one file each:
+    // persistSlice owns the refusal to write a stub, slotSlice owns the
+    // roll-back on a failed load. Re-pointed, not relaxed — together they are
+    // what makes a navigation bug unable to cost somebody their character.
+    const slotSrc = src('app', 'state', 'slices', 'slotSlice.ts');
+    expect(slotSrc).toContain('try { await setActiveSlot(null); } catch { /* ignore */ }');
   });
 });

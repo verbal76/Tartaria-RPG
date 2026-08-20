@@ -5,6 +5,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { LEGACY_ITEM_RENAMES, applyLegacyItemRenames, migrateLegacyName } from '../app/engine/itemMigrations';
 const STORE = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+/** ⚠ OTA-1394 — the two LOAD DOORS (loadSlotIntoGame, resurrectSlot) moved to
+ *  `app/state/slices/slotSlice.ts` with slice 3. `backfillPlayer` stayed in the
+ *  store. So this suite now reads both files, one per door, and the calls it
+ *  pins are `deps.`-prefixed because the slice takes those helpers as injected
+ *  dependencies rather than importing them (a value import back into gameStore
+ *  would be a module cycle). Re-pointed, not relaxed: what these hold down is
+ *  that BOTH doors run the same migration instead of one reading raw. */
+const SLOT = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'slices', 'slotSlice.ts'), 'utf8');
 // The finders INFER on a miss (that is the very degradation this batch fixes),
 // so catalog membership must be checked against the raw data files.
 const CATALOG_NAMES = new Set<string>();
@@ -70,10 +78,10 @@ describe('OTA-998 — the load paths are wired', () => {
     expect(STORE).toContain('weapon: restampInventoryItem(stampDurability(out.golem.weapon))');
   });
   it('resurrection loads MIGRATED world memory + resyncs canon locations (raw read gone)', () => {
-    expect(STORE).toContain('const revivedWorldMemory = migrateLoadedWorldMemory(saved.worldMemory);');
-    expect(STORE).toContain('setCanonExtraLocations(revivedWorldMemory.canonLocations ?? []);');
-    expect(STORE).not.toContain('worldMemory: saved.worldMemory,');
+    expect(SLOT).toContain('const revivedWorldMemory = deps.migrateLoadedWorldMemory(saved.worldMemory);');
+    expect(SLOT).toContain('setCanonExtraLocations(revivedWorldMemory.canonLocations ?? []);');
+    expect(SLOT).not.toContain('worldMemory: saved.worldMemory,');
     // Both load doors share ONE migration helper.
-    expect(STORE).toContain('const migratedWorldMemory = migrateLoadedWorldMemory(saved.worldMemory);');
+    expect(SLOT).toContain('const migratedWorldMemory = deps.migrateLoadedWorldMemory(saved.worldMemory);');
   });
 });
