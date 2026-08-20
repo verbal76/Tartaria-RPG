@@ -6,6 +6,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Image, Text, StyleSheet, Dimensions } from 'react-native';
+// ⚠ OTA-1382 — the art and its fit come from a PLATFORM-RESOLVED module, not
+// from a branch and not from a Platform.OS ternary. Metro resolves `require()`
+// statically, so a ternary would pull the 2.4MB PC asset into the phone bundle.
+import { SPLASH_SOURCE, splashImageStyle } from '../ui/splashArt';
 import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/PiperTTSManager';
 
 // Splash art native dimensions (assets/splash-art.jpg).
@@ -58,8 +62,8 @@ export function SplashOverlay() {
   return (
     <View style={styles.overlay} pointerEvents="auto" accessibilityViewIsModal={true}>
       <Image
-        source={require('../../assets/splash-art.jpg')}
-        style={{ position: 'absolute', top: 0, left: 0, width: imgW, height: imgH }}
+        source={SPLASH_SOURCE}
+        style={splashImageStyle(imgW, imgH)}
         resizeMode="cover"
         accessibilityElementsHidden={true}
         importantForAccessibility="no-hide-descendants"

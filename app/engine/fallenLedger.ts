@@ -476,6 +476,42 @@ export function isPairedHouse(installId: string, paired: readonly PairedHouse[])
  *  line prints that name, and a lineage in all of them reads as clutter by the
  *  third round. It belongs where it lands with weight: the Arbiter naming what
  *  just stood up, the roll of the fallen, and the trophy line after the kill. */
+/** ⚠⚠ OTA-1382 — THE NAME GATE, now shared code behind a product flag. Owner: *"port the feature to Hal, but make it
+ *  only visible if the characters name is Verbal or Sasmooch."*
+ *
+ *  ⚠ THIS FUNCTION SHIPS ON ALL FOUR LINES. Whether it is CONSULTED is decided
+ *  by `FEATURES.fallenSharing` (app/config/features.ts): `'open'` short-circuits
+ *  before it is called, `'gated'` calls it. Keeping the function shared and the
+ *  CONSTANT per-product is the whole point of step 3 — the alternative is the
+ *  hand-ported branch difference this replaces, which was indistinguishable
+ *  from drift.
+ *
+ *  HAL is the live channel — the build other people are actually playing — and
+ *  the shared roll of the fallen has never been tested with two real houses.
+ *  This is the soft flag that lets it ride along on the owner's own phone
+ *  without appearing for anyone else: the whole EXCHANGE panel is absent unless
+ *  the character carries one of these names, and the panel is the ONLY entry
+ *  point to import or export, so nothing can cross for a locked player.
+ *
+ *  ⚠ It gates VISIBILITY, not the engine. Everything downstream — the revenant
+ *  pool join, the rest records, the gear faucet — stays wired for everyone,
+ *  because a locked player's ledger is empty and an empty ledger costs exactly
+ *  nothing. That is deliberate: gating the engine too would mean a player who
+ *  is later unlocked finds their own machinery in a different state from the
+ *  one it was tested in. One switch, one thing switched.
+ *
+ *  Matched on letters and digits only, case-insensitively, and by PREFIX, so
+ *  "Verbal", "verbal76" and "Sasmooch" all pass while a stray "Verbalist" is
+ *  the worst it can do — show a panel to somebody who then has nobody paired.
+ *  Trivially widened: add a name to the array. */
+export const SHARING_UNLOCK_NAMES: readonly string[] = ['verbal', 'sasmooch'];
+
+export function sharingUnlockedFor(name: string | null | undefined): boolean {
+  const n = String(name ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (!n) return false;
+  return SHARING_UNLOCK_NAMES.some((allowed) => n.startsWith(allowed));
+}
+
 export function fallenTitle(f: { name: string; origin?: FallenOrigin }): string {
   const house = f.origin?.player ?? '';
   return house ? `${f.name} child of ${house}` : f.name;

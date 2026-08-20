@@ -3413,6 +3413,56 @@ export function acceptKeyword(title: string, taken?: Set<string>): string {
   return picked;
 }
 
+// ⚠⚠ OTA-1382 — UNIVERSALISED, NOT FLAGGED. This was HAL-only, and the reason
+// recorded there was sound at the time: HAL is the line with real tester saves
+// written before OTA-838's observed-weakness system existed, and golem had no
+// such saves to strand.
+//
+// It is shared now because that reasoning stopped being the whole story. The
+// About screen's IMPORT SAVE accepts an export "from this or another install",
+// so a pre-838 save can walk from HAL onto any other line — and on the lines
+// without this backfill it stays blank forever, which is precisely the defect
+// the backfill exists to prevent.
+//
+// ⚠ It is NOT a feature flag, because it does not need to be: the call site is
+// `wm.enemyIntel ?? backfill(...)`, so it fires only when a save carries no
+// intel at all, and the function returns `{}` before requiring anything when
+// there are no defeats. On a line with no legacy saves it is a no-op costing one
+// nullish check. A migration that self-gates is safe to run everywhere — and a
+// flag here would be a second code path only one product ever executes, which is
+// the shape step 3 exists to remove.
+export function backfillEnemyIntelFromDefeats(
+  defeatedNames: readonly string[] | undefined,
+): Record<string, { weak: string[]; resist: string[] }> {
+  const out: Record<string, { weak: string[]; resist: string[] }> = {};
+  if (!defeatedNames || defeatedNames.length === 0) return out;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const enemies = require('../data/enemies/enemies.json') as Array<{ name: string; type?: string; traits?: string[] }>;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { enemyTypeDefenses } = require('../engine/crafting') as typeof import('../engine/crafting');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { traitDefenses } = require('../engine/enemyTraits') as typeof import('../engine/enemyTraits');
+  const byName = new Map(enemies.map((e) => [e.name.toLowerCase(), e]));
+  for (const rawName of new Set(defeatedNames.map((n) => n.toLowerCase()))) {
+    const e = byName.get(rawName);
+    if (!e) continue;
+    const type = enemyTypeDefenses(e.type);
+    const trait = traitDefenses(e.traits);
+    const all = Array.from(new Set([...type.resist, ...type.weak, ...trait.resists, ...trait.weaknesses]));
+    const weak: string[] = [];
+    const resist: string[] = [];
+    for (const dt of all) {
+      const typeDir = type.weak.includes(dt) ? 1 : type.resist.includes(dt) ? -1 : 0;
+      const traitDir = trait.weaknesses.includes(dt) ? 1 : trait.resists.includes(dt) ? -1 : 0;
+      const dir = traitDir !== 0 ? traitDir : typeDir; // trait wins on a discord (mirrors defensesFor)
+      if (dir > 0) weak.push(dt);
+      else if (dir < 0) resist.push(dt);
+    }
+    if (weak.length || resist.length) out[rawName] = { weak, resist };
+  }
+  return out;
+}
+
 // OTA-368 — THE SAVE-UPGRADE STEP. Scans a loaded save and brings it up
 // to the current game's spec: fills new fields with defaults and migrates
 // renamed / reshaped ones (staminaMax formula, single→multi-slot equipped,
@@ -3448,6 +3498,7 @@ export function migrateLoadedWorldMemory(wm: WorldMemory): WorldMemory {
     earnedTitleAnnounced: wm.earnedTitleAnnounced ?? [],
     fusionCompensationGranted: wm.fusionCompensationGranted ?? false,
     pendingDogOnboarding: wm.pendingDogOnboarding ?? null,
+    enemyIntel: wm.enemyIntel ?? backfillEnemyIntelFromDefeats(wm.defeatedEnemies),
   };
 }
 

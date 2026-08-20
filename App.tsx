@@ -20,6 +20,11 @@ import {
 import { clearLiveBreadcrumb } from './app/engine/saveSystem'; // OTA-1276
 import { TitleScreen } from './app/screens/TitleScreen';
 import { SplashOverlay } from './app/components/SplashOverlay';
+// ⚠ OTA-1382 — controller navigation. GamepadNav.tsx is an 8-line native stub
+// that renders null; GamepadNav.web.tsx is the real PC implementation. Metro
+// picks by platform, so mounting it here is inert on phones and makes App.tsx
+// identical across all four lines.
+import { GamepadNav } from './app/components/GamepadNav';
 import { CharacterCreationScreen } from './app/screens/CharacterCreationScreen';
 import { ExplorationScreen } from './app/screens/ExplorationScreen';
 import { LogScreen } from './app/screens/LogScreen';
@@ -1121,6 +1126,9 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           padding + scale transform), so it's full-bleed with no parchment
           margins. Self-dismisses after ~2s on first launch. */}
       <SplashOverlay />
+      {/* PC / Steam Deck controller navigation. Renders nothing on phones
+          (native stub); on web it drives the on-screen-button highlight. */}
+      <GamepadNav />
     </View>
   );
 }

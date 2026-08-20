@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.275';
+export const DISPLAY_VERSION = '4.29.276';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24137,7 +24137,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // steam+html only — a failed clipboard write left the player's ledger nowhere).
 // Census: 1,053 differing paths between golem and HAL collapse to 14 real code
 // differences. scripts/divergence.py makes it repeatable.
-export const OTA_BUILD_ID = '2026-08-20-1381-the-drift-closed';
+// ⚠⚠ OTA-1382 — STEP 3 OF THE FOUR-LINE COLLAPSE: the intentional differences
+// become ONE config file. app/config/features.ts holds the single product flag
+// (`fallenSharing: 'open' | 'gated'` — HAL is the gated one); platform
+// capability moves to Platform.OS and Metro's `.web` resolution (GamepadNav,
+// kokoroWeb, and a new splashArt module pair); and the HAL-only enemy-intel
+// backfill is UNIVERSALISED rather than flagged, because it self-gates on
+// `wm.enemyIntel ??` and IMPORT SAVE lets a pre-838 save walk between installs.
+// ⚠ splashArt is a module PAIR, not a Platform.OS ternary: Metro resolves
+// require() statically and assetBundlePatterns is "assets/**/*", so a ternary
+// would ship the 2.4MB PC key art into the phone build.
+export const OTA_BUILD_ID = '2026-08-20-1382-one-file-of-difference';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1381-the-drift-closed';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1380-the-crash-ledger';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1379-the-more-tray-holds';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1378-a-cleared-room-stays-cleared';
