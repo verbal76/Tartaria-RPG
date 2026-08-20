@@ -799,8 +799,22 @@ export function ContractsScreen() {
 
       {/* OTA-1014 — refusal strip: when a COMPLETE tap is refused (wrong faction, no
           agent in scene, work not done), the Arbiter's line lands HERE, where
-          the player is looking — not only in the world feed behind this screen. */}
-      {contractsNotice ? (
+          the player is looking — not only in the world feed behind this screen.
+
+          ⚠⚠ OTA-1402 — AND "HERE" WAS NOT WHERE HE WAS LOOKING. This strip sits
+          ABOVE the ScrollView below it. On a short list that is the top of the
+          screen; on a long one the player has scrolled the rows into view and
+          the strip out of it, so a refused COMPLETE writes its explanation to a
+          part of the screen that is no longer on the screen. The owner tapped
+          ten contracts against a wrong-faction hall and reported "all did
+          nothing" — then concluded the cause was faction STANDING, which it
+          never was. A message nobody sees does not merely fail to inform; it
+          lets a wrong theory form and stand.
+
+          So a notice carrying a `body` renders as a CARD OVER the list, which
+          cannot be scrolled away from. A notice with only `text` (older callers)
+          keeps the strip. */}
+      {contractsNotice && !contractsNotice.body ? (
         <Pressable
           style={({ pressed }) => [styles.contractsNotice, pressed && styles.contractsNoticePressed]}
           onPress={clearContractsNotice}
@@ -1992,6 +2006,34 @@ export function ContractsScreen() {
         </View>
       </Modal>
 
+      {/* ⚠⚠ OTA-1402 — THE REFUSAL CARD. Absolute overlay, deliberately NOT a
+          native <Modal>: this screen is itself presented inside one, and arb73
+          recorded that iPad/iOS can present a nested native Modal INVISIBLY —
+          rendering nothing while its backdrop still eats touches. That failure
+          would turn "the button does nothing" into "the whole screen does
+          nothing", which is strictly worse than the bug being fixed. */}
+      {contractsNotice?.body ? (
+        <View style={styles.refusalOverlay} pointerEvents="box-none">
+          <Pressable
+            style={styles.refusalBackdrop}
+            onPress={clearContractsNotice}
+            accessibilityRole="button"
+            accessibilityLabel="Dismiss"
+          />
+          <View style={styles.refusalCard} accessibilityViewIsModal>
+            <Text style={styles.refusalTitle}>{contractsNotice.title ?? 'CANNOT HAND THIS IN HERE'}</Text>
+            <Text style={styles.refusalBody}>{contractsNotice.body}</Text>
+            <TouchableOpacity
+              style={styles.refusalButton}
+              onPress={clearContractsNotice}
+              accessibilityRole="button"
+              accessibilityLabel="Got it"
+            >
+              <Text style={styles.refusalButtonText}>GOT IT</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -2455,6 +2497,34 @@ const styles = StyleSheet.create({
   contractsNoticePressed: { opacity: 0.7 },
   contractsNoticeText: { color: '#e8c894', fontSize: 12, lineHeight: 17 },
   contractsNoticeDismiss: { marginTop: 5, color: '#a98a5e', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
+  // ⚠ OTA-1402 — the refusal card. Centred over the list, with a backdrop that
+  // also dismisses, so the explanation cannot be scrolled away from.
+  refusalOverlay: {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+    alignItems: 'center', justifyContent: 'center', padding: 22,
+  },
+  refusalBackdrop: {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.72)',
+  },
+  refusalCard: {
+    width: '100%', maxWidth: 420,
+    backgroundColor: '#191410',
+    borderColor: '#e0a75f', borderWidth: 1, borderRadius: 4,
+    paddingVertical: 18, paddingHorizontal: 18,
+  },
+  refusalTitle: {
+    color: '#e0a75f', fontSize: 12, fontWeight: '700', letterSpacing: 1.4,
+    marginBottom: 12, textAlign: 'center',
+  },
+  refusalBody: { color: '#e8dcc8', fontSize: 13, lineHeight: 20 },
+  refusalButton: {
+    marginTop: 18, alignSelf: 'center',
+    paddingVertical: 10, paddingHorizontal: 30,
+    borderColor: '#e0a75f', borderWidth: 1, borderRadius: 3,
+    backgroundColor: '#2a2118',
+  },
+  refusalButtonText: { color: '#e8c894', fontSize: 12, fontWeight: '700', letterSpacing: 1.4 },
   // Activate / deactivate toggle (single-active). Active = teal; paused = grey.
   trackBtn: {
     marginTop: 8, backgroundColor: 'transparent', borderColor: '#54d6c4',

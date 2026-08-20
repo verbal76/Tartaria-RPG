@@ -67,6 +67,15 @@ import { rapportQuestId, chaPriceDiscount } from '../../engine/factionRapport';
 import { effectiveStats } from '../../engine/equipment';
 import { stampDurability } from '../../engine/durability';
 import { FACTIONS, applyRepChange, getStanding } from '../../engine/factions';
+// ⚠ OTA-1402 — ONE phrasing of the wrong-counterparty refusal. Four sites had
+// four, and they had already drifted: two said "Wrong agent", one "wrong
+// faction", one "waves you off". See app/engine/contractRefusal.ts.
+import {
+  WRONG_COUNTERPARTY_TITLE,
+  factionDisplayName,
+  wrongCounterpartyBody,
+  wrongCounterpartyLine,
+} from '../../engine/contractRefusal';
 import { findFactionQuestById, availableFactionQuests } from '../../engine/factionQuests';
 import { HUNTS, findHuntById, availableHunts, fuzzyFindHunt, scaleHuntBoss, firstActionableHuntStage } from '../../engine/hunts';
 import { MYSTERIES, findMysteryById, availableMysteries, fuzzyFindMystery } from '../../engine/mysteries';
@@ -162,6 +171,52 @@ export const createQuestSlice = (
   get: () => GameStore,
   deps: QuestSliceDeps,
 ): QuestSlice => {
+  // ⚠ OTA-1402 — feed rate-limit for the refusal. Ten taps down a contract list
+  // is one mistake, not ten; `appendLog`'s dedup only catches EXACT repeats, and
+  // the faction name varies per contract, so twenty near-identical lines walked
+  // straight through it in the owner's log.
+  let lastRefusalLine = '';
+  let lastRefusalAt = 0;
+  const REFUSAL_FEED_QUIET_MS = 20_000;
+
+  /**
+   * ⚠⚠ OTA-1402 — THE REFUSAL, SAID ONCE, IN A PLACE THE PLAYER IS LOOKING.
+   *
+   * Four sites used to write their own feed line and stop. That produced the
+   * owner's 2026-08-20 report — ten taps, twenty feed lines behind a modal, and
+   * "all did nothing" — plus a wrong diagnosis (he read it as faction STANDING;
+   * it never was). This writes the short line to the feed AND raises the notice
+   * carrying the full explanation, which the Contracts screen now renders as a
+   * card rather than a strip that scrolls out of view.
+   *
+   * ⚠ The feed line is RATE-LIMITED and the popup is not. A player working down
+   * a list of ten hits this ten times; the feed does not need to say it ten
+   * times, but the popup must always reflect the tap that just happened — a
+   * suppressed popup is how "the button does nothing" comes back.
+   */
+  function refuseWrongCounterparty(
+    sourceLabel: string,
+    contractFactionId: string | null | undefined,
+    title?: string | null,
+  ): void {
+    const input = { sourceLabel, contractFactionId, title };
+    const line = wrongCounterpartyLine(input);
+    const now = Date.now();
+    if (line !== lastRefusalLine || now - lastRefusalAt > REFUSAL_FEED_QUIET_MS) {
+      get().appendLog('arbiter', line);
+      lastRefusalLine = line;
+      lastRefusalAt = now;
+    }
+    set({
+      contractsNotice: {
+        text: line,
+        ts: now,
+        title: WRONG_COUNTERPARTY_TITLE,
+        body: wrongCounterpartyBody(input),
+      },
+    });
+  }
+
   // ⚠⚠ THE PRIVATE HELPERS LIVE INSIDE THE FACTORY, NOT AT MODULE SCOPE, and the
   // reason is worth writing down. They reference injected deps; at module scope
   // they would have no `deps` in scope, and the alternatives were both worse —
@@ -359,7 +414,32 @@ export const createQuestSlice = (
       const home = FACTIONS.find((f) => {
         try { return startingLocationForFaction(f.id) === player.currentLocationId; } catch { return false; }
       });
-      if (home) return { faction: home.id, name: `the ${home.name} hall`, vendorPresent: false };
+      if (home) {
+        // ⚠⚠ OTA-1402 — NAME WHERE THE PLAYER ACTUALLY IS. This branch has always
+        // been gated on `isHubLocation(currentLocationId)` — the LOCATION — while
+        // the comment above it says "inside a faction's own hub". Those are not
+        // the same test, and the vendor branch twenty lines up gets it right
+        // (`isHubLocation(...) && player.hubRoomId`). So a player who has walked
+        // OUT of the outpost onto the open tile is still answered by the hall.
+        //
+        // Owner, 2026-08-20: *"I wasn't in an outpost. I was in the wide open
+        // area outside of one."* — and the refusal he got said "the Conspiracy
+        // Architects hall won't take it", naming a building he was not standing
+        // in. That is why the message read as nonsense on top of being invisible.
+        //
+        // ⚠ THE GAMEPLAY RULE IS LEFT ALONE HERE, DELIBERATELY. Requiring
+        // `hubRoomId` would also stop the hand-in that WORKED for him from open
+        // ground (The Stranded Watcher, +55 TC), and quietly taking away
+        // something a player just used is not a fix to make on my own reading of
+        // an old comment. What is fixed is the LIE: the label now says whether
+        // he is inside the hall or on the faction's ground outside it.
+        const inside = !!player.hubRoomId;
+        return {
+          faction: home.id,
+          name: inside ? `the ${home.name} hall` : `${home.name}'s people here`,
+          vendorPresent: false,
+        };
+      }
     }
     return null;
   }
@@ -521,7 +601,7 @@ export const createQuestSlice = (
     }
     get().appendLog(
       'reward',
-      `New faction contract — ${quest.title}${parkedTag(newTracked)}. ${quest.objective} (${factionId.replace(/_/g, ' ')})`,
+      `New faction contract — ${quest.title}${parkedTag(newTracked)}. ${quest.objective} (${factionDisplayName(factionId)})`,
     );
     // Play the first stage immediately so the player has narrative
     // momentum, mirroring how hunts / mysteries / storylines open.
@@ -701,7 +781,7 @@ export const createQuestSlice = (
           new Map(
             active.map((q) => {
               const f = FACTIONS.find((x) => x.id === q.factionId);
-              return [q.factionId, f?.name ?? q.factionId.replace(/_/g, ' ')];
+              return [q.factionId, f?.name ?? factionDisplayName(q.factionId)];
             }),
           ).entries(),
         );
@@ -752,10 +832,7 @@ export const createQuestSlice = (
     // could have taken anyway (unaligned, or his own) is NOT charged a cut.
     const questViaBroker = atBroker && candidate.factionId !== turnFaction;
     if (!questViaBroker && candidate.factionId !== turnFaction) {
-      get().appendLog(
-        'arbiter',
-        `${sourceLabel} won't take it — wrong faction. Bring it to ${candidate.factionId.replace(/_/g, ' ')}, or to the trading post at any outpost gate.`,
-      );
+      refuseWrongCounterparty(sourceLabel, candidate.factionId, candidate.title);
       return;
     }
     // Stage gate — quests with authored stages require the player to
@@ -778,7 +855,7 @@ export const createQuestSlice = (
     // contract; it has to change hands in person. (Non-fetch contracts may still
     // be couriered for a reduced cut — handled by their own turn-in paths.)
     if (remote && candidate.fetch) {
-      const fLabel = candidate.factionId.replace(/_/g, ' ');
+      const fLabel = factionDisplayName(candidate.factionId);
       get().appendLog(
         'arbiter',
         `The Arbiter shakes their head. "${candidate.title} is a delivery — the ${candidate.fetch.itemName} has to change hands in person. Carry it to ${fLabel} yourself."`,
@@ -852,7 +929,7 @@ export const createQuestSlice = (
     // ⚠ The announce line must not claim a long-haul bonus the broker did not pay.
     const shownJourneyTc = questViaBroker ? 0 : journeyTc;
     if (questViaBroker) {
-      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, factionDisplayName(candidate.factionId), CB.brokerShareFor(scene?.vendor) ?? undefined));
     }
     const payRep = candidate.reward.rep;
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, payRep);
@@ -870,7 +947,7 @@ export const createQuestSlice = (
           }
         : s,
     );
-    const fLabel = candidate.factionId.replace(/_/g, ' ');
+    const fLabel = factionDisplayName(candidate.factionId);
     get().announceMissionComplete(
       'Contract',
       candidate.title,
@@ -1360,10 +1437,7 @@ export const createQuestSlice = (
     const huntViaBroker = CB.isContractBroker(scene?.vendor)
       && !!candidate.factionId && candidate.factionId !== huntParty.faction;
     if (!remote && !CB.vendorCanTakeContract({ id: scene?.vendor?.id, faction: huntParty.faction }, candidate.factionId)) {
-      get().appendLog(
-        'arbiter',
-        `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId!.replace(/_/g, ' ')} posted that one — them, or the trading post at any outpost gate."`,
-      );
+      refuseWrongCounterparty(sourceLabel, candidate.factionId, candidate.title);
       return;
     }
     // Pay out: TC + optional item + optional rep + always the trophy.
@@ -1412,7 +1486,7 @@ export const createQuestSlice = (
     // OTA-1185 — 80% and no long-haul bonus when the trading post carried it.
     const payTc = CB.contractPayoutTc(candidate.rewardTc, journeyTc, huntViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
     if (huntViaBroker) {
-      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, factionDisplayName(candidate.factionId), CB.brokerShareFor(scene?.vendor) ?? undefined));
     }
     set((s) =>
       s.player
@@ -1746,10 +1820,7 @@ export const createQuestSlice = (
     const mysteryViaBroker = !mystViaCourier && CB.isContractBroker(scene?.vendor)
       && !!candidate.factionId && candidate.factionId !== mystParty?.faction;
     if (!mystViaCourier && !CB.vendorCanTakeContract({ id: scene?.vendor?.id, faction: mystParty!.faction }, candidate.factionId)) {
-      get().appendLog(
-        'arbiter',
-        `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId!.replace(/_/g, ' ')} posted that — take it to them, or to the trading post at any outpost gate."`,
-      );
+      refuseWrongCounterparty(sourceLabel, candidate.factionId, candidate.title);
       return;
     }
     const trophy: InventoryItem = stampDurability({
@@ -1799,7 +1870,7 @@ export const createQuestSlice = (
       set((st) => (st.player ? { player: deps.advanceTime(st.player, CB.COURIER_DELAY_HOURS) } : st));
     }
     if (mysteryViaBroker) {
-      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, factionDisplayName(candidate.factionId), CB.brokerShareFor(scene?.vendor) ?? undefined));
     }
     set((s) =>
       s.player
@@ -2068,7 +2139,7 @@ export const createQuestSlice = (
     if (!storyViaCourier && !CB.vendorCanTakeContract({ id: scene?.vendor?.id, faction: storyParty!.faction }, candidate.factionId)) {
       get().appendLog(
         'arbiter',
-        `${sourceLabel} shakes their head. "Wrong faction. ${candidate.factionId!.replace(/_/g, ' ')} posted that one — them, or the trading post at any outpost gate."`,
+        `${sourceLabel} shakes their head. "Wrong faction. ${factionDisplayName(candidate.factionId)} posted that one — them, or the trading post at any outpost gate."`,
       );
       return;
     }
@@ -2095,7 +2166,7 @@ export const createQuestSlice = (
       set((st) => (st.player ? { player: deps.advanceTime(st.player, CB.COURIER_DELAY_HOURS) } : st));
     }
     if (storyViaBroker) {
-      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
+      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, factionDisplayName(candidate.factionId), CB.brokerShareFor(scene?.vendor) ?? undefined));
     }
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep);
     set((s) =>
@@ -2115,7 +2186,7 @@ export const createQuestSlice = (
     get().announceMissionComplete(
       'Storyline',
       candidate.title,
-      `✦ Storyline complete — ${candidate.title}. +${payTc} TC${!storyViaBroker && !storyViaCourier && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${storyViaBroker ? ` (broker's cut taken)` : ''}, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
+      `✦ Storyline complete — ${candidate.title}. +${payTc} TC${!storyViaBroker && !storyViaCourier && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${storyViaBroker ? ` (broker's cut taken)` : ''}, +${candidate.rewardRep} rep with ${factionDisplayName(candidate.factionId)}.`,
     );
     // ⚠ OTA-1203 (PUNCHLIST P16, route C) — four storylines ALSO hand over the faction's
     // Procedure Text, alongside (never instead of) the authored reward. The text is an
@@ -2249,12 +2320,21 @@ export const createQuestSlice = (
     const logBefore = get().gameLog;
     const lastIdBefore = logBefore[logBefore.length - 1]?.id ?? null;
     const noticeBefore = get().missionCompleteNotice;
+    // ⚠⚠ OTA-1402 — remember the notice we started with, so a RICH refusal raised
+    // inside the call is not clobbered by the scraped one below. The scrape was
+    // built when every refusal was a bare feed line; `refuseWrongCounterparty`
+    // now raises a notice with a `body` (the card the player actually reads),
+    // and overwriting it with the one-line feed text would silently downgrade
+    // the popup back into the strip this OTA exists to replace.
+    const contractsNoticeBefore = get().contractsNotice;
     get().completeContractFromUIInner(kind, id);
+    const raisedRich = get().contractsNotice !== contractsNoticeBefore && !!get().contractsNotice?.body;
     if (get().missionCompleteNotice !== noticeBefore) {
       // Completed — the popup tells the story; drop any stale refusal.
       if (get().contractsNotice) set({ contractsNotice: null });
       return;
     }
+    if (raisedRich) return;   // the refusal already said it properly
     const logAfter = get().gameLog;
     let refusal: string | null = null;
     for (let i = logAfter.length - 1; i >= 0; i--) {
@@ -2265,6 +2345,11 @@ export const createQuestSlice = (
     if (!refusal) {
       // No fresh line and no popup: the arbiter dedup ate a repeat refusal.
       // Surface the newest arbiter line — on a repeat tap that IS the refusal.
+      //
+      // ⚠ OTA-1402 — this fallback is now the LAST resort rather than the usual
+      // path for a repeat. The wrong-counterparty refusal raises its own notice
+      // every time (only its FEED line is rate-limited), precisely so a second
+      // tap is never answered with whatever happened to be on the feed.
       for (let i = logAfter.length - 1; i >= 0; i--) {
         const e = logAfter[i];
         if (e?.channel === 'arbiter') { refusal = e.text; break; }
@@ -2307,7 +2392,7 @@ export const createQuestSlice = (
       const huntUiViaBroker = CB.isContractBroker(scene?.vendor)
         && !!def.factionId && def.factionId !== huntUiParty.faction;
       if (!CB.vendorCanTakeContract({ id: scene?.vendor?.id, faction: huntUiParty.faction }, def.factionId)) {
-        get().appendLog('arbiter', `${huntUiParty.name} waves you off. "Wrong agent. ${def.factionId!.replace(/_/g, ' ')} posted that bounty — take it to their people, or to the trading post at any outpost gate."`);
+        refuseWrongCounterparty(huntUiParty.name, def.factionId, def.title);
         return;
       }
       const trophy: InventoryItem = stampDurability({
@@ -2343,7 +2428,7 @@ export const createQuestSlice = (
       // OTA-1156 defect (a diagnostic stating an outcome nobody checked) in reward copy.
       const huntShownJourneyTc = huntUiViaBroker ? 0 : huntJourneyTc;
       if (huntUiViaBroker) {
-        get().appendLog('arbiter', CB.brokerAcceptLine(huntUiParty.name, def.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
+        get().appendLog('arbiter', CB.brokerAcceptLine(huntUiParty.name, factionDisplayName(def.factionId), CB.brokerShareFor(scene?.vendor) ?? undefined));
       }
       set((s) => (s.player ? {
         player: {

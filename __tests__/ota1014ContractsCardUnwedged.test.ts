@@ -124,19 +124,39 @@ describe('OTA-1014 — a refused COMPLETE tap answers on the Contracts screen', 
     store.getState().completeContractFromUI('faction_quest', def.id);
     const first = store.getState().contractsNotice;
     expect(first).not.toBeNull();
-    expect(first!.text).toMatch(/wrong faction/i);
+    // ⚠ OTA-1402 — RE-POINTED, AND THE TEST DOING ITS JOB IS THE GOOD NEWS HERE.
+    // It went red because the notice CHANGED WORDING, not because it stopped
+    // being raised — proving the mechanism this suite protects still works. The
+    // phrase is now "that contract is <Faction>'s", because "wrong faction" was
+    // the exact wording that let the owner conclude his STANDING was the
+    // problem. Matched on the enduring claim: the notice names the faction that
+    // posted it, and does not blame the player.
+    expect(first!.text).toMatch(/that contract is .+'s/i);
+    expect(first!.text).not.toMatch(/standing/i);
+    // ⚠ AND IT NOW CARRIES THE POPUP BODY. A refusal that only reaches the strip
+    // renders above the ScrollView, where a player scrolled into a long list
+    // never sees it — the defect OTA-1402 exists to close.
+    expect(first!.body).toBeTruthy();
+    expect(first!.body).toMatch(/not about your standing/i);
     // Nothing completed — the contract is still on the slate.
     expect((store.getState().player!.activeFactionQuests ?? []).map((q) => q.id)).toContain(def.id);
 
     // Dismiss, then tap again — the arbiter dedup swallows the repeated line
     // (this was the owner's 15-taps-into-silence). The wrapper's fallback
     // surfaces the suppressed line anyway.
+    //
+    // ⚠⚠ OTA-1402 — AND THE SECOND TAP IS NOW STRICTLY STRONGER. The refusal
+    // rate-limits its FEED line but raises its notice unconditionally, so the
+    // repeat no longer depends on the wrapper scraping whatever happened to be
+    // on the feed. A player working down a list of ten gets a real answer on
+    // every one — which is the whole of the owner's report.
     store.getState().clearContractsNotice();
     expect(store.getState().contractsNotice).toBeNull();
     store.getState().completeContractFromUI('faction_quest', def.id);
     const second = store.getState().contractsNotice;
     expect(second).not.toBeNull();
-    expect(second!.text).toMatch(/wrong faction/i);
+    expect(second!.text).toMatch(/that contract is .+'s/i);
+    expect(second!.body).toBeTruthy();
   });
 
   it('clearContractsNotice empties the strip', () => {
@@ -168,8 +188,12 @@ describe('OTA-1014 — SOURCE LOCKS (category: course-cancel clears routing; ref
     expect(screenSrc).not.toMatch(/const routed = player\?\.routedMission\?\.id === def\.id;/);
   });
 
-  it('the Contracts screen renders the strip and clears it on unmount', () => {
-    expect(screenSrc).toMatch(/contractsNotice \? \(/);
+  it('the Contracts screen renders the notice and clears it on unmount', () => {
+    // ⚠ OTA-1402 — a notice with a BODY renders as a card OVER the list; one with
+    // only `text` keeps the old strip. Both paths asserted, because the strip is
+    // still the right treatment for a bare informational line.
+    expect(screenSrc).toMatch(/contractsNotice && !contractsNotice\.body \? \(/);
+    expect(screenSrc).toMatch(/contractsNotice\?\.body \? \(/);
     expect(screenSrc).toMatch(/clearContractsNotice\(\); \}, \[\]\);/);
   });
 });

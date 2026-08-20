@@ -7321,7 +7321,14 @@ export interface GameStore {
    *  turn-in guards speak to the world feed, which the Contracts screen never
    *  renders, so a refused tap read as "the button does nothing" (owner tapped
    *  a READY contract ~15× against a wrong-faction hall into silence). */
-  contractsNotice: { text: string; ts: number } | null;
+  /** ⚠⚠ OTA-1402 — `title` + `body` turn this from a STRIP into a POPUP, and that
+   *  is the whole fix. OTA-1014 put the strip "where the player is looking" — true
+   *  for a short list, false the moment the list scrolls: it renders ABOVE the
+   *  ScrollView, so a player scrolled to the seventh row taps COMPLETE and the
+   *  explanation appears off-screen. The owner tapped ten and reported "all did
+   *  nothing". `text` stays for the feed line; a notice carrying `body` is
+   *  rendered as a card the player has to dismiss. */
+  contractsNotice: { text: string; ts: number; title?: string; body?: string } | null;
   clearContractsNotice: () => void;
   /** OTA-987 — the one way a mission/contract/thread ends. Writes the feed line AND
    *  raises the holding notice, so no completion can be silent again. Repeated

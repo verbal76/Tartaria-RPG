@@ -21,6 +21,8 @@
 // ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
 // `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
 // every slice — what a pin on THE STORE has meant since slice 4.
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { storeSource } from '../test-utils/storeSource';
 import {
   isContractBroker,
@@ -219,8 +221,21 @@ describe('⚠⚠ OTA-1185 — every turn-in path routes through the ONE resolver
   });
 
   test('the refusals now point at the trading post', () => {
-    const pointers = STORE.match(/trading post at any outpost gate/g) ?? [];
-    expect(pointers.length).toBeGreaterThanOrEqual(4);
+    // ⚠⚠ OTA-1402 — THE COUNT WENT FROM FOUR TO ONE, AND THAT IS THE FIX, NOT A
+    // REGRESSION. This counted the pointer once per refusal site, which is the
+    // shape that let four hand-written phrasings of one rule drift apart — two
+    // said "Wrong agent", one "wrong faction", one "waves you off". All four now
+    // route through `app/engine/contractRefusal.ts`, so the pointer is written
+    // once and cannot disagree with itself.
+    //
+    // What this test protects is that a refusal TELLS THE PLAYER WHERE TO GO, so
+    // that is what it checks now: the shared refusal carries the pointer, and
+    // every call site reaches it.
+    const refusalSrc = readFileSync(
+      join(__dirname, '..', 'app', 'engine', 'contractRefusal.ts'), 'utf8',
+    );
+    expect(refusalSrc).toMatch(/trading post at any outpost gate/);
+    expect((STORE.match(/refuseWrongCounterparty\(/g) ?? []).length).toBeGreaterThanOrEqual(5);
   });
 
   test('the Contracts screen says what the broker pays', () => {
