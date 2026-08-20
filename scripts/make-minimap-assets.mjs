@@ -9,7 +9,7 @@
 // signature freeze (B9) was an out-of-memory kill, adding six permanent
 // megabytes to the screen the player sits on is not a rounding error.
 //
-// ⚠ OTA-1363 — 512 → 768. Owner, on the shipped tile: *"it's a little grainy, we
+// ⚠ OTA-1365 — 512 → 768. Owner, on the shipped tile: *"it's a little grainy, we
 // might need to bump the resolution up a little bit."* He is right, and the
 // arithmetic says by how much: the box is ~130pt and the outpost view is drawn
 // at 2.5×, so the tile occupies ~325pt — which on the Pixel's 2.4375× density

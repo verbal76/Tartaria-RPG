@@ -1,4 +1,4 @@
-// ⚠⚠ OTA-1363 — THE CORNER MINI-MAP. Owner: *"while we are in one of the
+// ⚠⚠ OTA-1365 — THE CORNER MINI-MAP. Owner: *"while we are in one of the
 // outposts, how hard would it be to replace the tartarian emblem in the top
 // right corner with a map view that is like the centered on player map view on
 // the map screen, and during regular gameplay do the same thing with the world
@@ -115,7 +115,7 @@ export function MiniMap({ onPress }: { onPress?: () => void }) {
     const renderedW = coverW * view.zoom;
     const renderedH = renderedW / view.aspect;
     const { left, top } = viewportOffset(view.frac, renderedW, renderedH, box.w, box.h);
-    // ⚠⚠ OTA-1363 — THE MARKER FOLLOWS THE MAP, IT DOES NOT SIT AT THE CENTRE.
+    // ⚠⚠ OTA-1365 — THE MARKER FOLLOWS THE MAP, IT DOES NOT SIT AT THE CENTRE.
     // Owner: *"the mini map doesn't quite line up — when you look at it on the
     // regular map you're centered on the room; when you look in the mini map
     // you're not centered under the room all the time."* Exactly right, and it

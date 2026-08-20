@@ -1,5 +1,5 @@
 /**
- * OTA-1364 — the corner mini-map.
+ * OTA-1365 — the corner mini-map.
  *
  * Owner: *"while we are in one of the outposts, how hard would it be to replace
  * the tartarian emblem in the top right corner with a map view that is like the
@@ -32,7 +32,7 @@ const TILES = ['world', 'reclaimers_guild', 'mud_monarchs', 'forgotten_order',
   'true_tartarians', 'eternal_dynasty', 'conspiracy_architects',
   'servants_of_giants', 'stone_builders', 'tartarian_revivalists'];
 
-describe('OTA-1364 — the viewport maths', () => {
+describe('OTA-1365 — the viewport maths', () => {
   it('puts the player dead centre when there is room on every side', () => {
     // 1000×1000 of art in a 100×100 window, player at the middle: the art
     // slides -450 on both axes so its centre lands on the window's centre.
@@ -74,7 +74,7 @@ describe('OTA-1364 — the viewport maths', () => {
     }
   });
 
-  it('⚠⚠ OTA-1364 — THE MARKER SITS ON THE ROOM, EVEN WHERE THE VIEW CLAMPS', () => {
+  it('⚠⚠ OTA-1365 — THE MARKER SITS ON THE ROOM, EVEN WHERE THE VIEW CLAMPS', () => {
     // Owner, comparing the two: *"when you look at it on the regular map you're
     // centered on the room; when you look in the mini map you're not centered
     // under the room all the time."* The clamp is correct — a rim room must not
@@ -149,7 +149,7 @@ describe('OTA-1364 — the viewport maths', () => {
   });
 });
 
-describe('OTA-1364 — the downscaled tiles', () => {
+describe('OTA-1365 — the downscaled tiles', () => {
   it('every tile the component can ask for exists', () => {
     for (const t of TILES) {
       expect({ tile: t, there: existsSync(root('assets', 'minimap', `${t}.png`)) })
@@ -166,7 +166,7 @@ describe('OTA-1364 — the downscaled tiles', () => {
       const png = pngSize('assets', 'minimap', `${t}.png`);
       expect({ t, maxEdge: Math.max(png.width, png.height) }).toEqual({ t, maxEdge: 768 });
       const decodedMb = (png.width * png.height * 4) / 1024 / 1024;
-      // ⚠ OTA-1364 raised the tile 512 → 768 for sharpness (see the generator).
+      // ⚠ OTA-1365 raised the tile 512 → 768 for sharpness (see the generator).
       // The ceiling moves with it, but it is still less than HALF the ~6.0MB the
       // real art would cost, which is the whole point of the tile existing.
       expect(decodedMb).toBeLessThan(2.5);
@@ -222,7 +222,7 @@ describe('OTA-1364 — the downscaled tiles', () => {
   });
 });
 
-describe("OTA-1364 — the owner's two conditions", () => {
+describe("OTA-1365 — the owner's two conditions", () => {
   const exp = src('app', 'screens', 'ExplorationScreen.tsx');
 
   it('⚑ WORLD and ◈ LORE still bracket the tile', () => {
@@ -262,11 +262,15 @@ describe("OTA-1364 — the owner's two conditions", () => {
   });
 
   it('tapping it opens the Atlas', () => {
-    expect(exp).toContain("<MiniMap onPress={() => setScreen('map')} />");
+    // ⚠ the tap grew a tutorial-lock guard when OTA-1365 deleted the MAP
+    // button and moved its responsibilities here, so this checks the wiring
+    // rather than one exact line.
+    expect(exp).toContain('<MiniMap');
+    expect(exp.slice(exp.indexOf('<MiniMap'))).toContain("setScreen('map')");
   });
 });
 
-describe('OTA-1364 — the Atlas gestures do what the owner specified', () => {
+describe('OTA-1365 — the Atlas gestures do what the owner specified', () => {
   const map = src('app', 'screens', 'MapScreen.tsx');
 
   // Owner: *"One finger should drag from the point of contact in the direction
@@ -324,7 +328,7 @@ describe('OTA-1364 — the Atlas gestures do what the owner specified', () => {
   });
 
   it('⚠⚠ and none of the page-origin machinery survives, because none is needed', () => {
-    // OTA-1364/1373 anchored on the FINGERS, which needs the box's page origin:
+    // OTA-1365/1373 anchored on the FINGERS, which needs the box's page origin:
     // a measureInWindow, a touch-derived fallback, and pointerEvents="none" on
     // the map layer so the origin could be read off the touch at all. A
     // centre-anchored zoom asks nothing about where the fingers are, so all of
@@ -337,5 +341,88 @@ describe('OTA-1364 — the Atlas gestures do what the owner specified', () => {
       'startMidY.current', 'midOf(']) {
       expect({ dead, present: map.includes(dead) }).toEqual({ dead, present: false });
     }
+  });
+});
+
+describe('OTA-1365 — one control for the Atlas, not two', () => {
+  const exp = src('app', 'screens', 'ExplorationScreen.tsx');
+  const box = src('app', 'components', 'InputBox.tsx');
+
+  // Owner: *"since tapping on the minimap opens the atlas, I don't think we
+  // need the map button anymore."*
+
+  it('the scene-bar MAP button is gone', () => {
+    expect(exp).not.toContain('styles.sceneBarBtnText}>MAP<');
+    // the bar itself stays — the settings gear still lives there
+    expect(exp).toContain('styles.sceneBarBtns');
+  });
+
+  it('the mini-map is now the only way in, and it still goes to the Atlas', () => {
+    const opens = exp.match(/setScreen\('map'\)/g) ?? [];
+    expect(opens).toHaveLength(1);
+    expect(exp.slice(exp.indexOf('<MiniMap'), exp.indexOf('setScreen(\'map\')') + 20))
+      .toContain('setScreen(\'map\')');
+  });
+
+  it('⚠⚠ and it inherits the tutorial lock the MAP button was carrying', () => {
+    // The lockdown is only as tight as its loosest affordance. The deleted
+    // button refused during the tutorial with a double-pulse buzz and an
+    // Arbiter nudge (arb109 — a silent no-op reads as a broken button); the
+    // tap that replaces it has to do the same or the corner becomes an
+    // unguarded way out of the scripted crawl.
+    const tap = exp.slice(exp.indexOf('<MiniMap'), exp.indexOf('</>', exp.indexOf('<MiniMap')));
+    expect(tap).toContain('if (tutLock) {');
+    expect(tap).toContain('Vibration.vibrate([0, 32, 45, 32])');
+    expect(tap).toContain('nudgeTutorialBlocked()');
+  });
+
+  it('the now-dead onOpenMap prop is removed rather than left dangling', () => {
+    // It was still being declared, passed and destructured, and used by
+    // nothing — the travel row dropped its MAP chip long ago.
+    expect(box).not.toContain('onOpenMap');
+    expect(exp).not.toContain('onOpenMap');
+  });
+});
+
+describe('OTA-1365 — the codex opens on BEASTS, and the tutorial teaches the corner', () => {
+  const codex = src('app', 'components', 'LoreCodexBody.tsx');
+  const steps = src('app', 'components', 'tutorialSteps.ts');
+
+  it('⚠⚠ the codex lands on the first tab in the row, not on RACES', () => {
+    // Owner: "when we reorganized the lore tabs we need it to open when you hit
+    // the lore button and have the beasts tab the one that opens." It was still
+    // opening on RACES — the tab that happened to ship first, and the reason
+    // the row was reordered at all.
+    expect(codex).toContain('useState<Section>(TAB_ORDER[0]!)');
+    expect(codex).not.toContain("useState<Section>('races')");
+  });
+
+  it('…and the first tab in the row is BEASTS, so those are the same fact', () => {
+    // Read from TAB_ORDER rather than hard-coded, so reordering the row moves
+    // the landing with it and the two can never disagree.
+    const order = /const TAB_ORDER: Section\[\] = \[([^\]]+)\]/.exec(codex)?.[1] ?? '';
+    expect(order.split(',')[0]!.trim()).toBe("'bestiary'");
+  });
+
+  it('the tutorial names the corner as the mini-map, not the crest', () => {
+    expect(steps).toContain('Out of combat this corner is your MINI-MAP.');
+    expect(steps).not.toContain('Out of combat this shows the Tartaria crest.');
+  });
+
+  it('⚠⚠ and it gets its own beat, because it is now the ONLY way into the Atlas', () => {
+    // OTA-1365 deleted the scene bar's MAP button. A player who does not know
+    // the corner is tappable has no route to the map at all — a much worse
+    // failure than not knowing about a decorative crest.
+    expect(steps).toContain("title: 'The mini-map',");
+    const beat = steps.slice(steps.indexOf("title: 'The mini-map',"));
+    expect(beat).toContain('TAP IT to open the full Atlas');
+    expect(beat).toContain('the only way in');
+    // it teaches the clamp too, which is the one behaviour that looks like a bug
+    expect(beat).toContain('the picture stops sliding and the');
+  });
+
+  it('the gear-corner beat lists the codex tabs in the order they render', () => {
+    expect(steps).toContain('It opens on BEASTS');
+    expect(steps).not.toContain('(races, factions, places, timeline)');
   });
 });
