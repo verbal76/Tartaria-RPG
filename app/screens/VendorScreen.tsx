@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { rarityHexColor } from '../components/InventoryCategorize';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore, vendorNpcId } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -10,6 +9,7 @@ import { validSlotsForItem, SLOT_LABEL, equippedInstanceIds, effectiveStats } fr
 import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { planCommonGearSale, bulkSellHeldBackNote } from '../engine/bulkSell'; // OTA-1232 — one-tap Common gear clear-out
+import { rarityHexColor } from '../components/InventoryCategorize';
 import { vendorPriceMod } from '../engine/factionRapport';
 import { getStanding } from '../engine/factions'; // OTA-1337 — the ladder reaches the display too
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';

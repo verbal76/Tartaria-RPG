@@ -774,7 +774,7 @@ const styles = StyleSheet.create({
   exchangeNote: { marginTop: 8, color: '#9ec96a', fontSize: 12, fontStyle: 'italic' },
   payloadBox: {
     marginTop: 8, borderWidth: 1, borderColor: '#6a5a4a', borderRadius: 3,
-    paddingHorizontal: 8, paddingVertical: 6, color: '#cbbf9f', fontSize: 10,
+    paddingHorizontal: 8, paddingVertical: 6, color: '#c9bda0', fontSize: 10,
     minHeight: 64, maxHeight: 120, textAlignVertical: 'top',
   },
   pairedRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 },
