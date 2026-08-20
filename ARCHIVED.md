@@ -44,13 +44,29 @@ shipped the 2.4 MB PC key art into every phone build. The PC art now lives in
 The trunk, with the line named explicitly. In GitHub Actions, dispatch and set
 **line = `steam`**:
 
-* **Web / desktop bundle** — *Web Build (Tartaria Realms)* → `line: steam`
+* **Windows .exe** — *Build · Windows (.exe)* → `line: steam`
+* **Linux / Steam Deck AppImage** — *Build · Linux / Steam Deck (AppImage)*
+* **macOS .dmg** — *Build · macOS (.dmg)*
+* **Web bundle** — *Web Build (Tartaria Realms)* → `line: steam`
 * **OTA** — *Publish · OTA* → `line: steam`
 
-⚠ **There is still no desktop packaging.** No Electron, no Tauri, no installer
-job — there never was, on this branch either. The web export is the input such a
-shell would wrap, and building it in CI is the first piece of that work. Saying
-Steam/Linux/macOS "exist" today would be untrue.
+### ⚠ Correction — this section said the opposite when it was first written
+
+The first version of this file claimed *"there is still no desktop packaging …
+there never was, on this branch either."* **That was wrong, and it was wrong
+about this very branch.** `build-steam-exe.yml` — Expo web export → Electron →
+portable Windows `.exe`, plus a public GitHub Release — has been here the whole
+time, along with the `desktop/` wrapper and `scripts/harden-web-bundle.sh`.
+Sibling branches `linux_dev` and `mac_dev` carried the AppImage and `.dmg` jobs.
+
+The mistake was reading `.github/workflows/` on the trunk and describing the
+repository from it. That is the exact error one trunk exists to make impossible,
+and the census that drove the collapse could not have caught it either: it
+measured `app/` only, so `.github/workflows/` and `desktop/` were never in it.
+
+**OTA-1387 on the trunk brings all of it over**, so the trunk can now produce all
+six targets — android, iOS, web, Windows, Linux, macOS. `DIVERGENCE.md` on the
+trunk carries a *WHAT THIS CENSUS COULD NOT SEE* section recording the gap.
 
 ## ⚠ What NOT to do with this branch
 
