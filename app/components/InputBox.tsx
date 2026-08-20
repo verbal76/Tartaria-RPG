@@ -85,7 +85,6 @@ interface Props {
   onClimbUp: () => void;
   onClimbDown: () => void;
   elevatedOn?: { noun: string; tier: number; totalTiers: number } | null;
-  onOpenMap: () => void;
   inCombat: boolean;
   equippedMain: string | null;
   equippedOff: string | null;
@@ -153,7 +152,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, pickpocketPossible, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, pickpocketPossible, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   // arb-fix (OTA — adaptive quick row) — the out-of-combat quick row shows the
   // world-interaction verbs (look / rest / investigate / take / salvage / climb /

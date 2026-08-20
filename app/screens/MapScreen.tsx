@@ -287,7 +287,7 @@ export function MapScreen() {
   const startTy = useRef(0);
   const startPinchDist = useRef(0);
   const lastTapAt = useRef(0);
-  // ⚠⚠ WEB-005 — WHAT A PINCH HAS TO REMEMBER, NOW THAT IT ANCHORS ON THE
+  // ⚠⚠ WEB-006 — WHAT A PINCH HAS TO REMEMBER, NOW THAT IT ANCHORS ON THE
   // CENTRE. Only the scale baseline and the pan baseline. The midpoint refs,
   // the box's page origin, the measureInWindow and the touch-origin derivation
   // that OTA-1372/1373 needed are all GONE — a centre-anchored zoom is
@@ -517,7 +517,7 @@ export function MapScreen() {
           return;
         }
         if (ts.length >= 2 && startPinchDist.current > 0) {
-          // ⚠⚠ WEB-005 — ZOOM ABOUT THE CENTRE OF THE SCREEN. The owner's
+          // ⚠⚠ WEB-006 — ZOOM ABOUT THE CENTRE OF THE SCREEN. The owner's
           // spec, in his words: *"One finger should drag from the point of
           // contact in the direction of drag. 2 fingers moving apart should
           // zoom in on what the center of the screen was, together should

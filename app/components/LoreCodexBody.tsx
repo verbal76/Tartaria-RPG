@@ -95,7 +95,15 @@ interface CodexEnemy {
 interface LoreConcept { id: string; title: string; answer: string }
 
 export function LoreCodexBody() {
-  const [section, setSection] = useState<Section>('races');
+  // ⚠⚠ WEB-006 — THE CODEX OPENS ON THE TAB YOU CAME FOR. Owner: *"when we
+  // reorganized the lore tabs we need it to open when you hit the lore button
+  // and have the beasts tab the one that opens."* It was still opening on
+  // RACES — the tab that happened to ship first, and the reason the row was
+  // reordered in the first place.
+  //
+  // ⚠ Read from TAB_ORDER rather than hard-coded, so the opening tab and the
+  // top-left tab are the same fact and cannot drift apart.
+  const [section, setSection] = useState<Section>(TAB_ORDER[0]!);
   const [pendingRoute, setPendingRoute] = useState<Location | null>(null);
   // 2026-05-25 — branded refusal modal for the hub-room gate.
   // Replaces the native Alert.alert that was breaking the dark
