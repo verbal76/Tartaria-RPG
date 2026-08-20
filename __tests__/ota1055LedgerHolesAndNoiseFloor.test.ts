@@ -434,7 +434,12 @@ describe('OTA-1055 — only money that changes hands settles a debt', () => {
   it('the buy path passes `spent`, so amends measure what was paid', () => {
     // tcTraded is lifetime volume across BOTH directions; paying a debt off by
     // selling loot to the person you robbed is not making amends.
-    expect(SRC).toMatch(/tcTraded: totalCost,\n\s+\/\/ OTA-1055[\s\S]{0,120}spent: totalCost,/);
+    // ⚠ OTA-1399 — the buy path moved to `app/state/slices/vendorSlice.ts`
+    // (slice 8). Re-pointed at the file that now owns it; the regex is unchanged.
+    const vendor = require('fs').readFileSync(
+      require('path').join(__dirname, '../app/state/slices/vendorSlice.ts'), 'utf8',
+    ) as string;
+    expect(vendor).toMatch(/tcTraded: totalCost,\n\s+\/\/ OTA-1055[\s\S]{0,120}spent: totalCost,/);
   });
 });
 

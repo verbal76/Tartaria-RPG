@@ -19,6 +19,13 @@
 // Shipping it would have meant inventing a status effect to justify a buff. It is on the
 // punch list as an open design question instead of being quietly dropped.
 
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import {
   STORY_PERKS,
   storyPerkModifiers,
@@ -117,7 +124,7 @@ describe('OTA-1184 — only a COMPLETED set pays', () => {
 });
 
 describe('⚠⚠ OTA-1184 — EVERY PERK HAS A CONSUMER. This is the whole rule.', () => {
-  const STORE = SRC('app/state/gameStore.ts');
+  const STORE = storeSource();
   const TITLES = SRC('app/engine/titles.ts');
 
   test('story perks merge into the ONE accumulator every consumer already calls', () => {

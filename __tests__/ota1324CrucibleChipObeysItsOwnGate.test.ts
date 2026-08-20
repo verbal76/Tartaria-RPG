@@ -59,12 +59,19 @@ jest.mock('expo-updates', () => ({}));
 //
 // ⚠ THE HANDLER'S REFUSAL STAYS. Hiding a control is not the same as securing it,
 // and there are other doors into the crucible; the refusal is the backstop.
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
 const read = (...p: string[]): string => readFileSync(join(__dirname, '..', 'app', ...p), 'utf8');
 const VENDOR = read('screens', 'VendorScreen.tsx');
-const STORE = read('state', 'gameStore.ts');
+const STORE = storeSource();
 const codeOnly = (src: string): string =>
   src.replace(/\/\*[\s\S]*?\*\//g, '').split('\n').filter((l) => !l.trim().startsWith('//')).join('\n');
 

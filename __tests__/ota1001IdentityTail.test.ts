@@ -1,5 +1,12 @@
 // OTA-1001 — the identity tail (snapshot-audit batch D): the remaining ~25
 // sites that answered "what is this item?" from the mint-frozen snapshot.
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import * as fs from 'fs';
 import * as path from 'path';
 import { categorizeItem, categoriesForItem } from '../app/components/InventoryCategorize';
@@ -39,7 +46,7 @@ describe('OTA-1001 — sections and slots read canonical identity', () => {
 });
 
 describe('OTA-1001 — the store-side cluster is canonical (source locks)', () => {
-  const STORE = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+  const STORE = storeSource();
   it('rope mend guard, dog treat, torch, faction catalysts, barehanded, dog food, ancient repair', () => {
     expect(STORE).toContain("canonicalItemTags(it).includes('rope')");
     expect(STORE).toContain("canonicalItemTags(item).includes('dog_treat')");

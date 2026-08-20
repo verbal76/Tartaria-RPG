@@ -23,6 +23,13 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 // ⚠⚠ (2) THE EQUIP STEP HAD NEVER BEEN TAUGHT. The cudgel AUTO-equips on grant, so
 // a player could finish the entire tutorial having never opened their pack, and
 // then walk into the wastes wearing nothing.
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { TUTORIAL_STEPS } from '../app/components/tutorialSteps';
@@ -92,7 +99,7 @@ describe('OTA-1248 — the armor beat', () => {
     // ⚠ OTA-1254 rewrote how the cudgel half decides (a shared upgrade comparison
     // instead of a name check that never fired) and grew the function past the old
     // 1400-char window. The RULE asserted is unchanged: cudgel yes, vest no.
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     const i = store.indexOf('function grantTutorialItem(');
     const fn = store.slice(i, store.indexOf('\n}', i));
     expect(fn).toContain("id === 'cudgel'");
@@ -102,7 +109,7 @@ describe('OTA-1248 — the armor beat', () => {
   });
 
   it('⚠⚠ the beat completes on the EQUIP, not the take', () => {
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     // The take branch grants and explicitly does NOT advance...
     const takeAt = store.indexOf("tStep?.id === 'armor'");
     expect(takeAt).toBeGreaterThan(-1);
@@ -142,7 +149,7 @@ describe('OTA-1248 — the armor beat', () => {
     const { TUT_LOCK_BEATS } = require('../app/components/tutorialSteps');
     expect(TUT_LOCK_BEATS).toContain('armor');
     const input = src('app', 'components', 'InputBox.tsx');
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     // The beat still permits the TAKE button — that part is genuinely per-beat.
     expect(input).toContain("currentBeatId === 'cudgel' || currentBeatId === 'armor' ? 'take'");
     expect(input).toContain("'cudgel' || tutActionBeat === 'armor'");

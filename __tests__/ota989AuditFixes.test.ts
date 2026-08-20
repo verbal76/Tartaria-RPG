@@ -41,6 +41,13 @@ jest.mock('expo-updates', () => ({}));
 //      no summary, per-craft line suppressed.
 //   2. travel-by-name still guessed on ambiguous PARTIALS ("camp" names three
 //      places, silently walked you to one) while claiming ambiguity refuses.
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import * as fs from 'fs';
 import * as path from 'path';
 import { useGameStore } from '../app/state/gameStore';
@@ -153,7 +160,7 @@ describe('OTA-989 — audit findings stay fixed', () => {
   });
 
   it('SOURCE LOCK: the batch counts its result, not the whole pack', () => {
-    const src = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+    const src = storeSource();
     expect(src).toContain('.filter((it) => it.name === recipeName)');
     // The lying proxy must not creep back into the batch loop.
     expect(src).not.toMatch(/const before = \(get\(\)\.player\?\.inventory \?\? \[\]\)\.reduce/);

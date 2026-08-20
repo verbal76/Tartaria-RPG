@@ -50,6 +50,13 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import * as fs from 'fs';
 import * as path from 'path';
 import {
@@ -62,7 +69,7 @@ import { backfillPlayer } from '../app/state/gameStore';
 import type { PlayerCharacter } from '../app/engine/types';
 
 const read = (...p: string[]) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
-const STORE = read('app', 'state', 'gameStore.ts');
+const STORE = storeSource();
 const VENDOR_SCREEN = read('app', 'screens', 'VendorScreen.tsx');
 
 // The four race ids OTA-834 remapped in the stall roster and never migrated in saves.
@@ -349,7 +356,7 @@ describe('OTA-1156 — the held decisions are untouched', () => {
     // ⚠ Do not "finish the job" by capping the losses too. The asymmetry is the
     // design: being hated must have no ceiling, or a player can spend past their own
     // consequences; being loved by proxy is the part nobody aimed at you.
-    const store = read('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     expect(store).toContain('const SPITE_STANDING_FACTION_CAP = 10;');
     // both hostile paths route through the meter
     expect(store).toContain('const repResult = meterSpiteGains(get, set, {');

@@ -214,8 +214,11 @@ describe('OTA-1397 — six slices in', () => {
     expect(sliceNames()).toEqual([
       'aiLifecycleSlice.ts',
       'bootSlice.ts',
+      'craftingSlice.ts',
+      'inventorySlice.ts',
       'persistSlice.ts',
       'slotSlice.ts',
+      'vendorSlice.ts',
     ]);
   });
 });

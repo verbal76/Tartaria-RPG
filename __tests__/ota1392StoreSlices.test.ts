@@ -206,8 +206,16 @@ describe('OTA-1392 — source pins follow the code they pin', () => {
       // AND its slices on purpose. Those pins are claims about the STORE, not
       // about a file, and the helper says so at length.
       if (/storeSource/.test(body)) continue;
-      for (const m of body.matchAll(/toContain\(\s*(['"`])((?:\\.|(?!\1)[^\\])*)\1\s*\)/g)) {
-        const needle = m[2];
+      // ⚠ OTA-1399 — NEGATIVE ASSERTIONS ARE EXEMPT, and slice 8 is what found it.
+      // `expect(x).not.toContain(lit)` means "this literal must NOT be here", so a
+      // literal that is absent from gameStore and present in a slice is the test
+      // PASSING, not a stale pin. ota1005 pins that the bandolier cap site does not
+      // do a raw read; slice 8 moved a legitimately different use of that same line
+      // into inventorySlice and the guard read it as rot. Skipping `.not.` keeps the
+      // guard sharp instead of teaching people to ignore it.
+      for (const m of body.matchAll(/(\.not)?\.toContain\(\s*(['"`])((?:\\.|(?!\2)[^\\])*)\2\s*\)/g)) {
+        if (m[1]) continue;
+        const needle = m[3];
         if (!needle || needle.length < 25) continue;   // short strings match everywhere
         if (store.includes(needle)) continue;          // still in gameStore — fine
         if (sliceBodies.some((b) => b.includes(needle))) stale.push(`${f}: ${needle.slice(0, 70)}`);

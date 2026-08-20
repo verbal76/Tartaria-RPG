@@ -22,6 +22,13 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 // AND STARTS A FIGHT. Reached mid-sweep, every remaining `investigate` in the loop
 // lands during combat and is refused. "Then does the dog quest" is not decoration:
 // anywhere but last breaks the rest of the sweep.
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import React from 'react';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const renderer = require('react-test-renderer') as {
@@ -94,7 +101,7 @@ describe('OTA-1236 — the exposure, measured from the shipped data', () => {
   it('⚠⚠ the guard uses the SAME rule the engine dispatch fires on — one place, not two', () => {
     // A protector matching a different set from the firer is the same bug as no
     // protector: a noun the engine treats as the dog hook could still be swept.
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     expect(store).toContain("import { rescueScenarioForNoun } from '../engine/storyNouns'");
     const i = store.indexOf('function matchRescueHookNoun(');
     expect(i).toBeGreaterThan(-1);
@@ -105,7 +112,7 @@ describe('OTA-1236 — the exposure, measured from the shipped data', () => {
 
 describe('OTA-1236 — SALVAGE ALL leaves the lead alone, and says so', () => {
   it('⚠⚠ the bulk loop SKIPS a lead noun, in its own bucket', () => {
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     const i = store.indexOf('salvageAllAmbient(nouns) {');
     expect(i).toBeGreaterThan(-1);
     const fn = store.slice(i, i + 14000);
@@ -119,7 +126,7 @@ describe('OTA-1236 — SALVAGE ALL leaves the lead alone, and says so', () => {
   });
 
   it('⚠⚠ ...and the player is TOLD, on the arbiter channel, with the verb that works', () => {
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     const i = store.indexOf('if (skippedLead.length > 0)');
     expect(i).toBeGreaterThan(-1);
     const block = store.slice(i, i + 500);
@@ -130,7 +137,7 @@ describe('OTA-1236 — SALVAGE ALL leaves the lead alone, and says so', () => {
   it('⚠ a lead-only batch is NOT the "button did nothing" case', () => {
     // Both empty-output guards have to count the lead line as output, or a room
     // whose only scrap-shaped noun is the dog chain reports the sweep as broken.
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     const i = store.indexOf('const hadOtherOutput =');
     expect(store.slice(i, i + 400)).toContain('skippedLead.length > 0');
     const j = store.indexOf('&& skippedTakeable.length === 0');
@@ -142,7 +149,7 @@ describe('OTA-1236 — SALVAGE ALL leaves the lead alone, and says so', () => {
     // quest that already happened.
     expect(isLeadNoun('snare pit', { rescueEligible: true })).toBe(true);
     expect(isLeadNoun('snare pit', { rescueEligible: false })).toBe(false);
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     const i = store.indexOf('const bulkLeadCtx =');
     const block = store.slice(i, i + 400);
     expect(block).toContain('rescueEligible');

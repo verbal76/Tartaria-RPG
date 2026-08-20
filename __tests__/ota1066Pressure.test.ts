@@ -49,6 +49,13 @@ jest.mock('expo-updates', () => ({}));
  */
 jest.setTimeout(60_000);
 
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import {
   PRESSURE_ORDER, PRESSURE_PROFILES, DEFAULT_PRESSURE, pressureOf, profileOf,
   canChangeTo, isPressureTier, tideStage, tidePriceMultiplier, tideCrossLine,
@@ -204,7 +211,7 @@ describe('OTA-1066 — the tide is legible', () => {
 describe('OTA-1066 — in the real store', () => {
   /* eslint-disable @typescript-eslint/no-require-imports */
   const store: string = require('fs').readFileSync(
-    require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+    require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8') + '\n' + storeSource();
   const creation: string = require('fs').readFileSync(
     require('path').join(__dirname, '../app/screens/CharacterCreationScreen.tsx'), 'utf8');
   /* eslint-enable @typescript-eslint/no-require-imports */

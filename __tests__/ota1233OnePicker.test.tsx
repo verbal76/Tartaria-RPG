@@ -16,6 +16,13 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 // them. Source pins prove a line exists. They cannot prove a player can see it.
 // So: assertions below read the RENDERED OUTPUT, and the mark sizes are pinned
 // as numbers with the reason attached.
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import React from 'react';
 // ⚠ `react-test-renderer` ships no bundled types in this tree, and adding
 // @types just to satisfy one import would put a dependency in package.json for a
@@ -272,7 +279,7 @@ describe('OTA-1233 — the merge did not cost anything that was already working'
     // rather than rolling its own loop, or that fix quietly stops applying.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     expect(screen).toContain('salvageAllAmbient(nouns)');
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     const bulk = store.slice(store.indexOf('salvageAllAmbient(nouns) {'));
     expect(bulk.slice(0, 4000)).toContain('skippedTakeable');
   });
@@ -309,7 +316,7 @@ describe('OTA-1233 — the merge did not cost anything that was already working'
     }
     // ...and the same for the blocked-tutorial nudges, which are what a stuck
     // player actually reads.
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     const hints = store.slice(store.indexOf('nudgeTutorialBlocked()'), store.indexOf('nudgeTutorialBlocked()') + 1400);
     expect(hints).not.toContain('glowing TAKE button');
     expect(hints).not.toContain('glowing SALVAGE button');
@@ -320,7 +327,7 @@ describe('OTA-1233 — the merge did not cost anything that was already working'
     // A refusal that names the wrong button is the same failure as the tutorial's,
     // and these fire far more often than the tutorial does.
     const port = src('app', 'engine', 'portability.ts');
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     for (const text of [port, store]) {
       expect(text).not.toContain('Try the SALVAGE button');
       expect(text).not.toContain('SALVAGE button.`');

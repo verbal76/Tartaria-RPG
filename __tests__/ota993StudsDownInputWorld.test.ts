@@ -33,6 +33,13 @@ jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
 // OTA-993 — studs-down corrections, batch 3: input + world.
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import * as fs from 'fs';
 import * as path from 'path';
 import { qwenRephraseRejection } from '../app/state/gameStore';
@@ -42,7 +49,7 @@ import { isClimbable } from '../app/engine/interactionTags';
 const realEncounter = jest.requireActual('../app/engine/encounter') as typeof import('../app/engine/encounter');
 const pickWeather = realEncounter.pickWeather;
 
-const STORE = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+const STORE = storeSource();
 
 describe('OTA-993 — the qwen guard guards (and stops false-rejecting)', () => {
   it('a fabricated action with NO resolved noun is rejected (the inert case)', () => {

@@ -27,6 +27,13 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 // writes `searchedAmbientNouns` and TAKE reads it, so bulk SALVAGE ALL scrapped
 // items the player could have pocketed. The overlap is real, not hypothetical —
 // this suite measures it from the shipped data rather than asserting it.
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import { rollSalvagePool } from '../app/engine/salvagePools';
 import { findCatalogItem } from '../app/engine/crafting';
 import { readFileSync } from 'fs';
@@ -47,7 +54,7 @@ describe('OTA-1231 — the marker contract', () => {
   });
 
   it('⚠⚠ INVESTIGATE → SALVAGE: the engine gate stands down for the salvage verb', () => {
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     // The gate that produced "You've already examined the brick."
     const i = store.indexOf('const alreadyExamined =');
     expect(i).toBeGreaterThan(-1);
@@ -68,7 +75,7 @@ describe('OTA-1231 — the marker contract', () => {
     expect(code).toContain('isFuzzyConsumed(noun, productivelyConsumedSet)');
     expect(code).not.toContain('flavorExhaustedSet');
     // And the engine half of that claim, pinned so it stays true.
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     const take = store.slice(store.indexOf('  takeAmbientNoun(noun) {'));
     // ⚠ OTA-1239 — this used to slice up to `stealthTakeAmbientNoun`, the function
     // that happened to follow. That function is now deleted, so the delimiter
@@ -106,7 +113,7 @@ describe('OTA-1231 — the marker contract', () => {
   });
 
   it('⚠⚠ bulk SALVAGE ALL leaves takeable items whole, and says so honestly', () => {
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     const bulk = store.slice(store.indexOf('salvageAllAmbient(nouns) {'));
     const loop = bulk.slice(0, bulk.indexOf('// Emit the aggregated reward summary'));
     // The guard itself...
@@ -124,7 +131,7 @@ describe('OTA-1231 — the marker contract', () => {
     // Breaking down something you can see is a legitimate deliberate choice. The
     // guard exists because a batch fired at the room's furniture is not that
     // choice. If it ever moves into the single-noun path, this fails.
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     // ⚠ OTA-1239 — was anchored on `stealthTakeAmbientNoun`, now deleted. The real
     // single-noun path is `takeAmbientNoun`, which is what this always meant.
     const single = store.indexOf('takeAmbientNoun(noun) {');

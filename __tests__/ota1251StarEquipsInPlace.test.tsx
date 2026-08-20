@@ -26,6 +26,13 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 // `BETTER`, which describes the ITEM, and it is now the one row whose tap does
 // something different from its neighbours. That is precisely the deduction the
 // colour layout exists to delete.
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import React from 'react';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const renderer = require('react-test-renderer') as {
@@ -154,7 +161,7 @@ describe('OTA-1251 — the tap takes AND wears', () => {
     expect(block).toContain(`equipItem("Mud-Warden's Vest", 'chest')`);
     // ...and equipItem is still what advances the beat, from its own top, so a
     // player who equips from the pack instead is not punished for it.
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     const eq = store.indexOf('  equipItem(itemName, slot, itemId) {');
     expect(store.slice(eq, eq + 600)).toContain("maybeAdvanceTutorial('armor')");
   });
@@ -176,7 +183,7 @@ describe('OTA-1251 — the copy stopped sending him to inventory', () => {
     expect(beat.body).toContain('★');
     expect(copy).toContain('take / salvage');
 
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     const i = store.indexOf('const hint: Record<string, string> = {');
     const hints = store.slice(i, store.indexOf('};', i));
     expect(hints).toContain('armor:');
@@ -186,7 +193,7 @@ describe('OTA-1251 — the copy stopped sending him to inventory', () => {
   it('⚠⚠ the take no longer narrates a chore the player does not have', () => {
     // "In your pack. It does you no good in there — open the pack and put it on."
     // fired on the same tap that now equips, so it described a step already done.
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     expect(store).not.toContain('It does you no good in there');
     // And the already-have branch stopped pointing at the pack too.
     expect(store).not.toContain('"You have it already. Open your pack and put it on."');

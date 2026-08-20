@@ -39,6 +39,13 @@ jest.mock('expo-updates', () => ({}));
 // echo — and ten minutes of a dead FUSE button ("I honestly thought I was
 // fusing all those things"). The picker now opens ONLY when a fusion is really
 // possible; otherwise the Crucible names the shortfall, holds it, and closes.
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import * as fs from 'fs';
 import * as path from 'path';
 import { useGameStore } from '../app/state/gameStore';
@@ -141,7 +148,7 @@ describe('OTA-984 — the Crucible refuses out loud', () => {
   });
 
   it('category lock: the OTA-801 consolation-picker is GONE, all four doors covered', () => {
-    const src = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+    const src = storeSource();
     // The band-aid this OTA removes must not creep back.
     expect(src).not.toContain('const anyReserved = fusion.eligibleInputs');
     expect(src).toContain('fusionBlockedNotice: {');

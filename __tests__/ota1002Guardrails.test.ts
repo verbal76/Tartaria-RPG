@@ -2,6 +2,13 @@
 // whole stale-snapshot category. THE RATCHET: a catalog name that disappears
 // without a LEGACY_ITEM_RENAMES migration fails this suite — the Boltcaster
 // class of silent loss can never ship again.
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import * as fs from 'fs';
 import * as path from 'path';
 import { LEGACY_ITEM_RENAMES } from '../app/engine/itemMigrations';
@@ -39,7 +46,7 @@ describe('OTA-1002 — THE CATALOG-NAME RATCHET', () => {
 });
 
 describe('OTA-1002 — orphan-safe contract handling', () => {
-  const STORE = fs.readFileSync(path.join(ROOT, 'app', 'state', 'gameStore.ts'), 'utf8');
+  const STORE = storeSource();
   it('ABANDON drops a record even when its def was retired (all four def-gated kinds)', () => {
     expect(STORE.match(/if \(!rec\) return;/g)?.length ?? 0).toBeGreaterThanOrEqual(5);
     expect(STORE).not.toContain('if (!def || !rec) return;');
@@ -56,7 +63,7 @@ describe('OTA-1002 — orphan-safe contract handling', () => {
 });
 
 describe('OTA-1002 — the last routing reads are canonical, and the fallback is loud', () => {
-  const STORE = fs.readFileSync(path.join(ROOT, 'app', 'state', 'gameStore.ts'), 'utf8');
+  const STORE = storeSource();
   it('deep-link files by categorizeItem; relic-trade + trade-away read canonical', () => {
     expect(STORE).toContain('inventoryCategory: categorizeItem(item)');
     expect(STORE).toContain("const isRelicTrade = canonicalItemKind(item) === 'relic';");

@@ -11,6 +11,7 @@
 // actually matters: every play-loop beat must have an advancement trigger
 // so the tutorial can't stall.
 
+import { storeSource } from '../test-utils/storeSource';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -42,10 +43,12 @@ const EXPECTED_BEAT_IDS = [
 ] as const;
 
 function readGameStoreSource(): string {
-  return fs.readFileSync(
-    path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'),
-    'utf-8',
-  );
+  // ⚠ OTA-1399 — SLICE 8. `equipItem` advances the armor beat and now lives in
+  // `app/state/slices/inventorySlice.ts`. `storeSource()` reads gameStore AND
+  // every slice, which is what "the store" has meant since slice 4 — same
+  // object, same keys, same 473 importers. The no-stall guard below is a claim
+  // about the STORE, not about a file.
+  return storeSource();
 }
 function readCraftingScreenSource(): string {
   return fs.readFileSync(

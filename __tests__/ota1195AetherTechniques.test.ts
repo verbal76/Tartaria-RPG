@@ -5,6 +5,13 @@
 // ⚠ The behavioural proof is in ota1195ChannelLive, which drives the real store. Nothing
 // here should be read as evidence that a player can channel anything — that was exactly
 // the gap OTA-1191 shipped with.
+// ⚠ OTA-1399 — SLICE 8 sent vendor / inventory / crafting into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — that is what a pin on THE STORE has meant since slice 4, and this
+// is the case the helper was built for: a slice IS the store, same object, same
+// keys, same 473 importers. (Slices 5-7 moved code DOWN to leaves instead, which
+// storeSource deliberately does NOT see; those suites name their leaf directly.)
+import { storeSource } from '../test-utils/storeSource';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import {
@@ -14,7 +21,7 @@ import {
 } from '../app/engine/aetherTechniques';
 import { statusAcAdjustment } from '../app/engine/statusEffects';
 
-const STORE = readFileSync(join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+const STORE = storeSource();
 
 /** Landmark-anchored slice. ⚠ Deliberately NOT a fixed number of lines: this session has
  *  retargeted seven fixed-size source windows that aged, and every one of them was a test

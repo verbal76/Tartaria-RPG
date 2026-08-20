@@ -1,4 +1,4 @@
-import type { InventoryItem, EquipSlot, PlayerCharacter, Stats } from './types';
+import type { InventoryItem, EquipSlot, PlayerCharacter, PlayerEquipped, Stats } from './types';
 import { canonicalItemKind, canonicalItemTags, findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName } from './crafting';
 import { isWeaponCoatingItem } from './weaponCoating';
 import { itemIsThrowable } from './bandolierEligibility';
@@ -859,4 +859,26 @@ export function effectiveStatsBreakdown(
     charisma: build('charisma'),
     stealth: build('stealth'), // OTA-348
   };
+}
+
+// ⚠ OTA-1399 — MOVED HERE FROM gameStore (slice 8). It is a pure lookup over
+// SLOT_ID_KEY, declared right above, and after slice 8 its only callers are the
+// vendor and crafting slices — two owners and nothing else, which is the case the
+// split rule sends DOWN rather than injecting twice. Beside the table it indexes
+// is where it should always have been.
+// arb-fix — which equip slot currently holds a given inventory-item id. Used
+// by the equipped-faction-catalyst fusion prompt to know which slot to free.
+// Returns null when the id isn't worn (ring2/ring3 fall through — rare for a
+// faction catalyst, and they collapse to the primary 'ring' handling).
+export function slotOfEquippedId(
+  equipped: PlayerEquipped | undefined,
+  id: string,
+): EquipSlot | null {
+  if (!equipped) return null;
+  const slots: EquipSlot[] = ['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring'];
+  for (const slot of slots) {
+    const idKey = SLOT_ID_KEY[slot];
+    if (idKey && (equipped as Record<string, unknown>)[idKey] === id) return slot;
+  }
+  return null;
 }
