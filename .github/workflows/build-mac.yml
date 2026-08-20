@@ -1,0 +1,93 @@
+name: Build · macOS (.dmg)
+
+# ⚠⚠ OTA-1387 — THIS WORKFLOW CAME BACK FROM mac_dev. See build-steam-exe.yml
+# for the full note: the desktop builds were never part of the four-line
+# collapse, the census only read `app/`, and after OTA-1384 the trunk could not
+# build Windows, Linux or macOS at all.
+#
+# Same Expo web export + Electron wrapper as Windows/Linux, packaged as an
+# UNSIGNED .dmg on a macOS runner. Artifact only — no EAS channel, no store.
+#
+# ⚠ UNSIGNED. `CSC_IDENTITY_AUTO_DISCOVERY=false` tells electron-builder to skip
+# code-signing, so no Apple Developer certificate is needed to BUILD. To RUN it
+# on a Mac the first time: open the .dmg, drag to Applications, then right-click
+# the app → Open (that is the Gatekeeper bypass; double-clicking will refuse).
+# Notarisation is what removes that step, and it is not set up.
+#
+# ⚠ DISPATCH ONLY on the trunk. macOS runners bill Actions minutes at 10x — by
+# far the most expensive job in this repo — and the trunk takes every commit for
+# all four products now.
+
+on:
+  workflow_dispatch:
+    inputs:
+      line:
+        description: 'Product line (steam = the PC product; the others are for comparison)'
+        required: false
+        default: 'steam'
+        type: choice
+        options:
+          - steam
+          - html
+          - golem
+          - hal
+
+jobs:
+  build-mac:
+    name: Unsigned macOS .dmg
+    runs-on: macos-latest
+    timeout-minutes: 45
+    env:
+      TARTARIA_LINE: ${{ github.event.inputs.line || 'steam' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install app deps (root)
+        # See build-steam-exe.yml — `npm ci` replaced `npm install
+        # --legacy-peer-deps` once OTA-1384 put the web deps in the trunk's
+        # lockfile, so this resolves exactly what CI tested.
+        run: npm ci --no-audit --no-fund
+
+      - name: Show the resolved identity actually being built
+        run: |
+          npx expo config --type public --json \
+            | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const c=JSON.parse(s);console.log('line:    '+(c.extra&&c.extra.tartariaLine));console.log('name:    '+c.name);console.log('channel: '+(c.updates&&c.updates.requestHeaders&&c.updates.requestHeaders['expo-channel-name']));console.log('sharing: '+(c.extra&&c.extra.fallenSharing));})"
+
+      - name: Export web bundle (react-native-web)
+        run: npx expo export --platform web --output-dir dist
+
+      # ⚠⚠ OTA-1387 — NEW ON macOS, and deliberate. Only the Windows build
+      # hardened its bundle; the .dmg shipped the same game with source maps
+      # intact, which undoes the protection on the .exe for anyone who downloads
+      # the other file. Same game, same treatment.
+      - name: Harden web bundle (strip source maps + level-2 obfuscate)
+        run: bash scripts/harden-web-bundle.sh dist
+
+      - name: Stage web bundle into the Electron wrapper
+        run: |
+          mkdir -p desktop/web-build
+          cp -r dist/* desktop/web-build/
+
+      - name: Install desktop (Electron) deps
+        working-directory: desktop
+        run: npm install --no-audit --no-fund
+
+      - name: Package macOS .dmg (unsigned)
+        working-directory: desktop
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npx electron-builder --mac dmg --publish never
+
+      - name: Upload .dmg artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tartaria-mac-dmg-${{ github.event.inputs.line || 'steam' }}
+          path: desktop/release/*.dmg
+          if-no-files-found: error

@@ -1,0 +1,86 @@
+name: Build · Linux / Steam Deck (AppImage)
+
+# ⚠⚠ OTA-1387 — THIS WORKFLOW CAME BACK FROM linux_dev. See build-steam-exe.yml
+# for the full note: the desktop builds were never part of the four-line
+# collapse, the census only read `app/`, and after OTA-1384 the trunk could not
+# build Windows, Linux or macOS at all.
+#
+# Same Expo web export + Electron wrapper as the Windows build, packaged as a
+# single portable AppImage that runs on SteamOS (Steam Deck Desktop Mode) and
+# most distros. Artifact only — it touches no EAS channel and no store listing.
+#
+# ⚠ DISPATCH ONLY on the trunk. The old version fired on every push to
+# linux_dev; the trunk takes every commit for all four products now.
+
+on:
+  workflow_dispatch:
+    inputs:
+      line:
+        description: 'Product line (steam = the PC product; the others are for comparison)'
+        required: false
+        default: 'steam'
+        type: choice
+        options:
+          - steam
+          - html
+          - golem
+          - hal
+
+jobs:
+  build-appimage:
+    name: Portable Linux AppImage
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      TARTARIA_LINE: ${{ github.event.inputs.line || 'steam' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install app deps (root)
+        # See build-steam-exe.yml — `npm ci` replaced `npm install
+        # --legacy-peer-deps` once OTA-1384 put the web deps in the trunk's
+        # lockfile, so this resolves exactly what CI tested.
+        run: npm ci --no-audit --no-fund
+
+      - name: Show the resolved identity actually being built
+        run: |
+          npx expo config --type public --json \
+            | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const c=JSON.parse(s);console.log('line:    '+(c.extra&&c.extra.tartariaLine));console.log('name:    '+c.name);console.log('channel: '+(c.updates&&c.updates.requestHeaders&&c.updates.requestHeaders['expo-channel-name']));console.log('sharing: '+(c.extra&&c.extra.fallenSharing));})"
+
+      - name: Export web bundle (react-native-web)
+        run: npx expo export --platform web --output-dir dist
+
+      # ⚠⚠ OTA-1387 — THIS STEP IS NEW ON LINUX, AND IT IS A DELIBERATE CHANGE.
+      # Only the Windows build hardened its bundle. The Linux AppImage and the
+      # macOS .dmg shipped the same game with source maps intact and the JS
+      # unobfuscated — so the protection on the .exe was undone by downloading a
+      # different file for the same game. Same game, same treatment.
+      - name: Harden web bundle (strip source maps + level-2 obfuscate)
+        run: bash scripts/harden-web-bundle.sh dist
+
+      - name: Stage web bundle into the Electron wrapper
+        run: |
+          mkdir -p desktop/web-build
+          cp -r dist/* desktop/web-build/
+
+      - name: Install desktop (Electron) deps
+        working-directory: desktop
+        run: npm install --no-audit --no-fund
+
+      - name: Package Linux AppImage (electron-builder)
+        working-directory: desktop
+        run: npx electron-builder --linux AppImage --publish never
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tartaria-linux-appimage-${{ github.event.inputs.line || 'steam' }}
+          path: desktop/release/*.AppImage
+          if-no-files-found: error

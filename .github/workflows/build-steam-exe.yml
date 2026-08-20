@@ -1,0 +1,151 @@
+name: Build · Windows (.exe)
+
+# ⚠⚠ OTA-1387 — THIS WORKFLOW CAME BACK FROM steam_Dev.
+#
+# The desktop builds were never part of the four-line collapse, and the census
+# that drove it (`scripts/divergence.py`) only ever read `app/` — so the fact
+# that `.github/workflows/` and `desktop/` differed between branches was
+# invisible to it. The result: after OTA-1384 the trunk could build Android, iOS
+# and web, and could NOT build Windows, Linux or macOS, because the Electron
+# wrapper and these three workflows lived only on steam_Dev / linux_dev /
+# mac_dev. Three of the six shipping targets had quietly fallen off the trunk.
+#
+# What it does: exports the game to a web bundle (react-native-web), hardens it,
+# wraps it in Electron, and packages a single portable Windows .exe.
+#
+# ⚠ DISPATCH ONLY on the trunk. The old version fired on every push to
+# steam_Dev; Windows runners bill Actions minutes at 2x, and the trunk takes
+# every commit for all four products now, so an automatic build here would be a
+# standing tax. Ask for it when you want it.
+
+on:
+  workflow_dispatch:
+    inputs:
+      line:
+        description: 'Product line (steam = the PC product; the others are for comparison)'
+        required: false
+        default: 'steam'
+        type: choice
+        options:
+          - steam
+          - html
+          - golem
+          - hal
+      release:
+        description: 'Also publish a public GitHub Release (a link testers can use signed-out)'
+        required: false
+        default: true
+        type: boolean
+
+# The Release step needs write access to publish; the default token is
+# read-only on this repo.
+permissions:
+  contents: write
+
+jobs:
+  build-exe:
+    name: Portable Windows .exe
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      TARTARIA_LINE: ${{ github.event.inputs.line || 'steam' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install app deps (root)
+        # ⚠ OTA-1387 changed this from `npm install --legacy-peer-deps`. That was
+        # correct on steam_Dev, whose lockfile predated the web deps. OTA-1384
+        # brought react-dom / react-native-web / @expo/metro-runtime onto the
+        # trunk WITH a matching lockfile, and ci.yml runs `npm ci` against it on
+        # every commit — so the reproducible install is available here now, and a
+        # desktop build that resolved different versions than CI tested would be
+        # a build nobody had checked.
+        run: npm ci --no-audit --no-fund
+
+      - name: Show the resolved identity actually being built
+        shell: bash
+        run: |
+          npx expo config --type public --json \
+            | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const c=JSON.parse(s);console.log('line:    '+(c.extra&&c.extra.tartariaLine));console.log('name:    '+c.name);console.log('channel: '+(c.updates&&c.updates.requestHeaders&&c.updates.requestHeaders['expo-channel-name']));console.log('sharing: '+(c.extra&&c.extra.fallenSharing));})"
+
+      - name: Export web bundle (react-native-web)
+        run: npx expo export --platform web --output-dir dist
+
+      - name: Harden web bundle (strip source maps + level-2 obfuscate)
+        # Strips *.map (no decoder ring ships) and lightly obfuscates the JS so
+        # casual readers / "edit-a-number" tinkerers can't easily modify it.
+        # Native builds skip this — Hermes already ships bytecode. Runs under Git
+        # Bash on the Windows runner (find + bash both available on PATH).
+        shell: bash
+        run: bash scripts/harden-web-bundle.sh dist
+
+      - name: Stage web bundle into the Electron wrapper
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path desktop/web-build | Out-Null
+          Copy-Item -Recurse -Force dist/* desktop/web-build/
+
+      - name: Install desktop (Electron) deps
+        working-directory: desktop
+        run: npm install --no-audit --no-fund
+
+      - name: Package portable Windows .exe (electron-builder)
+        working-directory: desktop
+        run: npx electron-builder --win portable --publish never
+
+      - name: Upload .exe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tartaria-pc-exe-${{ github.event.inputs.line || 'steam' }}
+          path: desktop/release/*.exe
+          if-no-files-found: error
+
+      # ⚠ THE ARTIFACT ABOVE IS FOR THE MAINTAINER; THE RELEASE BELOW IS FOR
+      # TESTERS. A workflow artifact can ONLY be downloaded by someone signed
+      # in to GitHub (it 404s otherwise, even on a public repo) and it
+      # self-deletes after 90 days — so it is useless for "here, try this on
+      # your computer". A Release is a plain public URL that works signed-out,
+      # on any machine, and does not expire.
+      - name: Read the build version
+        id: ver
+        shell: bash
+        run: |
+          V=$(grep -oE "DISPLAY_VERSION = '[^']+'" app/buildInfo.ts | head -1 | grep -oE "[0-9]+\.[0-9]+\.[0-9]+")
+          echo "version=${V:-0.0.0}" >> "$GITHUB_OUTPUT"
+          echo "Building release for $V"
+
+      - name: Publish the PC build as a Release
+        # ⚠ Only for the PC product, and only when asked. A Release is public and
+        # permanent; one published from a line nobody ships on PC would be a
+        # download with no owner.
+        if: >-
+          (github.event.inputs.release == 'true' || github.event.inputs.release == null)
+          && (github.event.inputs.line == 'steam' || github.event.inputs.line == null)
+        uses: softprops/action-gh-release@v2
+        with:
+          # One rolling tag per version, so a re-run of the same version
+          # replaces its build rather than piling up half-tested downloads.
+          tag_name: pc-v${{ steps.ver.outputs.version }}
+          name: Tartaria Realms — PC ${{ steps.ver.outputs.version }}
+          body: |
+            **Windows portable build — no installer, just run the .exe.**
+
+            Version ${{ steps.ver.outputs.version }} · commit ${{ github.sha }}
+
+            Mouse, keyboard and controller are all supported. If the window
+            looks too big or too small, open **Settings → Display size (S/M/L)**.
+            **F11** toggles fullscreen.
+
+            _If you hit a bug, the in-game bug reporter copies a log to your
+            clipboard — send that along with what you were doing._
+          files: desktop/release/*.exe
+          draft: false
+          prerelease: true
+          fail_on_unmatched_files: true

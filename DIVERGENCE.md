@@ -20,6 +20,35 @@ rather than quietly dropped, so the next person does not re-investigate it.
 
 ---
 
+## ⚠⚠ WHAT THIS CENSUS COULD NOT SEE
+
+*Added OTA-1387, after it bit.*
+
+The census walks **`app/` and the shared source files** — that is where the game
+lives, and it is why the report is trustworthy about game behaviour. It is also
+the whole of what it looked at. Three parts of the tree were never in it:
+
+| not measured | what was actually different | found how |
+|---|---|---|
+| `package.json` / `package-lock.json` | `react-dom`, `react-native-web`, `@expo/metro-runtime` were on steam + html only | by accident, during OTA-1384 |
+| `.github/workflows/` | Windows, Linux and macOS packaging existed **only** on `steam_Dev`, `linux_dev`, `mac_dev` | OTA-1387, after the trunk was already live |
+| `desktop/` | the entire Electron wrapper — three of six shipping targets depend on it | same |
+
+⚠ **The second and third are the serious ones.** A clean census read as "the
+lines are 98% identical", and that was true of the game code and false of the
+repository. After the collapse the trunk could build Android, iOS and web, and
+could not build Windows, Linux or macOS at all — while `app/ui/displayScale.ts`
+sat on the trunk calling into a preload bridge (`window.tartariaDesktop`) that
+had no way to be built there.
+
+**The lesson is not "the script was buggy."** It answered the question it was
+asked. The lesson is that *"how far apart are these branches"* and *"what does
+each branch let you do"* are different questions, and a report on the first
+reads exactly like a report on the second. If a census is ever run again, point
+it at the whole tree, or say in the report what it skipped.
+
+---
+
 ## The headline
 
 | pair | raw paths differing | **real code differences** |

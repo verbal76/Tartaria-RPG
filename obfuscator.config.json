@@ -1,0 +1,20 @@
+{
+  "compact": true,
+  "identifierNamesGenerator": "hexadecimal",
+  "renameGlobals": false,
+  "stringArray": true,
+  "stringArrayThreshold": 0.5,
+  "stringArrayEncoding": [],
+  "stringArrayRotate": false,
+  "stringArrayShuffle": false,
+  "splitStrings": false,
+  "numbersToExpressions": false,
+  "simplify": true,
+  "transformObjectKeys": false,
+  "controlFlowFlattening": false,
+  "deadCodeInjection": false,
+  "debugProtection": false,
+  "selfDefending": false,
+  "disableConsoleOutput": false,
+  "unicodeEscapeSequence": false
+}
