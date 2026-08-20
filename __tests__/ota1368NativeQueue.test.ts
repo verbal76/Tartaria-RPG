@@ -116,7 +116,7 @@ describe('OTA-1368 — the door check', () => {
   const engine = readFileSync(
     join(__dirname, '..', 'app', 'ai', 'generation', 'QwenGenerativeEngine.ts'), 'utf8');
   const store = readFileSync(
-    join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+    join(__dirname, '..', 'app', 'ai', 'narration.ts'), 'utf8');
 
   it('the abort is asked BEFORE the native call, not after it', () => {
     // The bug was ordering, not absence: the epoch check existed, it just ran

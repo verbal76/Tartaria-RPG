@@ -98,20 +98,34 @@ describe('OTA-1393 — the five lifecycle actions moved, and one deliberately di
     expect(store).toContain('startRuntimePressureWatch: startPressureWatchWithHooks,');
   });
 
-  it('⚠⚠ cancelGeneration STAYED, and the reason is written down', () => {
+  it('⚠⚠ cancelGeneration STAYED — and slice 7 proved it should stay for good', () => {
     // It reads as part of this family and is not. It mutates
     // `arbiterGenerationEpoch`, a `let` shared with the narration path — moving
-    // it would strand that variable here (assigning to an imported binding is a
-    // compile error) or steal it from narration. It travels with the narration
-    // slice, where the epoch counter can move as one piece.
+    // it into THIS slice would strand that variable or steal it from narration.
+    //
+    // ⚠⚠ OTA-1398 — AND THE PREDICTION IN THIS TEST WAS WRONG, SO IT WAS
+    // REWRITTEN RATHER THAN QUIETLY DROPPED. The original wording said
+    // cancelGeneration "travels with the narration slice, where the epoch
+    // counter can move as one piece". Slice 7 arrived and narration turned out
+    // to be a LEAF (`app/ai/narration.ts`), not a store slice — it takes no deps
+    // and holds no actions — and a leaf cannot hold a store action. The epoch has
+    // TWO writers (a fresh narration bumps it; cancelGeneration bumps it to
+    // discard one in flight), so the shared `let` moved DOWN with narration and
+    // both writers reach it through `bumpArbiterGeneration()`. The action stays
+    // an action. Same rule slice 5 wrote for the memory latches.
     expect(store).toMatch(/^  cancelGeneration\(\) \{/m);
     // ⚠ Checked as an IMPLEMENTATION, not as a word: the slice's header names
     // cancelGeneration precisely to say why it was left behind, and a blanket
     // not.toContain would forbid explaining the decision.
     expect(slice).not.toMatch(/^  cancelGeneration\(\)/m);
     expect(slice).toContain('WHY THESE FIVE AND NOT SIX');
-    expect(store).toMatch(/^let arbiterGenerationEpoch/m);
-    expect(store).toContain('it would strand that variable or steal it');
+    // The epoch is declared exactly once, in the leaf, and reached by accessor.
+    const narr = src('app', 'ai', 'narration.ts');
+    expect(narr).toMatch(/^let arbiterGenerationEpoch/m);
+    expect(store).not.toMatch(/^let arbiterGenerationEpoch/m);
+    expect(narr).toContain('export function bumpArbiterGeneration(): void {');
+    expect(store).toContain('bumpArbiterGeneration();');
+    expect(store).not.toContain('arbiterGenerationEpoch++');
   });
 });
 

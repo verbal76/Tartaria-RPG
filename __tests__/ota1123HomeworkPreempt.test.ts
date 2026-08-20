@@ -229,7 +229,8 @@ describe('OTA-1123 — the wiring, and the first homework job', () => {
     expect(rt).toContain('(opts.homework || opts.interruptible)');
     expect(rt).toContain('        : undefined,');
     // The narration call sites must not opt in.
-    const store = src('app/state/gameStore.ts');
+    const store = src('app/state/gameStore.ts') + '\n' + src('app/ai/narration.ts')
+      + '\n' + src('app/state/slices/bootSlice.ts');
     const nar = store.slice(
       store.indexOf('async function narrateViaArbiter'),
       store.indexOf('async function maybeGenerateAmbientArbiter'),
@@ -263,14 +264,16 @@ describe('OTA-1123 — the wiring, and the first homework job', () => {
     // A priority tier and a flag with no caller would be exactly the dead code
     // OTA-1117/1141 spent two OTAs deleting. The bank's rest-filler is idle
     // work nobody asked for, so it IS homework.
-    const store = src('app/state/gameStore.ts');
+    const store = src('app/state/gameStore.ts') + '\n' + src('app/ai/narration.ts')
+      + '\n' + src('app/state/slices/bootSlice.ts');
     expect(store).toContain("job: opts?.bankOnly ? 'ambient_fill' : 'ambient', homework: !!opts?.bankOnly },");
   });
 
   it('⚠ the LIVE ambient path is not homework — the player is owed that line', () => {
     // The distinction is the whole safety property: a line the player is
     // waiting on must never be interruptible.
-    const store = src('app/state/gameStore.ts');
+    const store = src('app/state/gameStore.ts') + '\n' + src('app/ai/narration.ts')
+      + '\n' + src('app/state/slices/bootSlice.ts');
     expect(store).toContain('homework: !!opts?.bankOnly');
     // RETARGETED BY OTA-1126 — `{ homework: true }` now legitimately appears in
     // the store: the item-description slot passes it explicitly. The property

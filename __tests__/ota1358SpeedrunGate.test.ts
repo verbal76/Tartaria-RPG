@@ -43,7 +43,12 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-import { notePlayerActionForSprint, playerIsSprinting, _resetSprintForTest } from '../app/state/gameStore';
+// ⚠⚠ OTA-1398 — THE DETECTOR MOVED DOWN, AND THAT IS THE POINT OF THE MOVE. It is
+// read by gameStore (the vendor-voice warm, the action pipeline) AND by the
+// narration leaf (the sprint gate below), and it carries a mutable `let`, so it
+// could not travel with either owner — assigning to an imported binding is a
+// compile error. It went to `app/state/sprint.ts`, which neither owns.
+import { notePlayerActionForSprint, playerIsSprinting, _resetSprintForTest } from '../app/state/sprint';
 
 describe('OTA-1358 — the sprint gate and classifier parity', () => {
   beforeEach(() => _resetSprintForTest());
@@ -66,7 +71,8 @@ describe('OTA-1358 — the sprint gate and classifier parity', () => {
   });
 
   it('⚠⚠ source lock: the narrator gate exists, covers bank fills, and names itself in the log', () => {
-    const src = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+    const src = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8')
+      + '\n' + readFileSync(join(__dirname, '..', 'app', 'ai', 'narration.ts'), 'utf8');
     expect(src).toContain('const sprinting = playerIsSprinting();');
     expect(src).toContain('|| cooldownActive || sprinting)');
     expect(src).toContain(": 'sprinting'");

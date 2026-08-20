@@ -85,7 +85,7 @@ describe('OTA-1258 N1 — a banked line belongs to the room it was written in', 
     // prefetch already refuses to target hub rooms (`introPrefetchCandidates`
     // returns [] indoors), so hub rooms have no bank and fall through to the live
     // path — which is the honest outcome: we never wrote a line about the Court.
-    const store = storeSource();
+    const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
     expect(store).toContain('takeBankedSceneIntro(get, introBankKey(location.id, inHub ? hubRoomId : null))');
     expect(store).toContain('introBankKey(forLoc.id, null)');
     expect(store).toContain("if (get().player?.hubRoomId) return []; // indoor outpost rooms");
@@ -95,7 +95,7 @@ describe('OTA-1258 N1 — a banked line belongs to the room it was written in', 
     // ⚠ ONE CHECKER, BOTH CHANNELS. The ambient path has filtered these since it
     // was built; the intro bank never did. A second copy of the rule would drift —
     // this session has paid for that six times.
-    const store = storeSource();
+    const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
     const i = store.indexOf('const narratesAction = isSecondPersonActionOpener(introOpener);');
     expect(i).toBeGreaterThan(-1);
     // ⚠ The window reaches past N3's comment block, which landed between the
@@ -143,7 +143,7 @@ describe('OTA-1258 N2 — the trigger is no longer shorter than the job', () => 
     // ⚠ A second constant claiming "the job takes about N" is a copy of a number
     // that already exists and drifts from it. `avgMs` is the same figure the debug
     // rollup prints, so the threshold and the log cannot disagree.
-    const store = storeSource();
+    const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
     const i = store.indexOf('const introIdleMs = (): number => {');
     expect(i).toBeGreaterThan(-1);
     const block = store.slice(i, i + 500);
@@ -166,7 +166,7 @@ describe('OTA-1258 N3 — preempted text is kept, not binned', () => {
   it('⚠⚠ a FILL no longer returns early on the epoch check', () => {
     // ⚠ The live path still must: the player has moved on and the line must not
     // be spoken. Only the fill falls through, because a fill has nothing to say.
-    const store = storeSource();
+    const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
     const i = store.indexOf('const preemptedFill = opts?.bankOnly === true');
     expect(i).toBeGreaterThan(-1);
     const block = store.slice(i, i + 320);
@@ -179,7 +179,7 @@ describe('OTA-1258 N3 — preempted text is kept, not binned', () => {
     // no terminal punctuation — correct for a finished generation, wrong for one
     // cut mid-word. Without this the bank would store a fragment and speak it
     // later as if it were finished.
-    const store = storeSource();
+    const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
     const i = store.indexOf('const endsWhole = /[.!?]["\']?$/.test(finalText);');
     expect(i).toBeGreaterThan(-1);
     const block = store.slice(i, i + 500);
@@ -196,7 +196,7 @@ describe('OTA-1258 N3 — preempted text is kept, not binned', () => {
   it('⚠ a preempted fill still passes every filter a live line passes', () => {
     // The bank stores VETTED prose (OTA-1129). Falling through the epoch check
     // must not skip the cleaning — it deliberately re-joins the SAME path.
-    const store = storeSource();
+    const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
     const fall = store.indexOf('const preemptedFill = opts?.bankOnly === true');
     const clean = store.indexOf('const deforeigned = repairGluedNarration(stripForeignWords(text));');
     const bank = store.indexOf('if (opts?.bankOnly) {');

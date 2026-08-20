@@ -152,7 +152,7 @@ describe('OTA-1107 — wasted work is counted honestly', () => {
 });
 
 describe('OTA-1107 — the four waste sites are wired', () => {
-  const store = storeSource();
+  const store = storeSource() + '\n' + src('app/ai/narration.ts');
 
   it('⚠ narration cancelled mid-flight is reported, not silently swallowed', () => {
     // ⚠ RETARGETED BY OTA-1129 — the recurring lesson, again: an assertion that

@@ -93,7 +93,16 @@ import { storeSource } from '../test-utils/storeSource';
 jest.setTimeout(60_000);
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const STORE: string = storeSource();
+// ⚠⚠ OTA-1398 — SLICE 7, AND `storeSource()` HIT ITS LIMIT FOR THE SECOND TIME.
+// It returns the store AND its slices, on purpose: a slice IS the store, same
+// object, same keys. Slices 5, 6 and 7 moved code DOWN instead — out of the
+// store's neighbourhood entirely — and it cannot see any of that. Widening it to
+// "wherever the code went" is still the wrong fix and still one line long; a
+// helper that reads everything makes every pin in this repo unfalsifiable, which
+// is what its own header warns about. So the narration leaf is named HERE, at
+// the call site, where a reader can see which two things are being joined.
+const STORE: string = storeSource() + '\n' + require('fs').readFileSync(
+  require('path').join(__dirname, '../app/ai/narration.ts'), 'utf8');
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const INJ: string = require('fs').readFileSync(
   // eslint-disable-next-line @typescript-eslint/no-require-imports

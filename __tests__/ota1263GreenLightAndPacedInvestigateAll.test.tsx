@@ -55,7 +55,7 @@ const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p)
 
 describe('OTA-1263 (A) — the adaptive idle threshold actually finds its job', () => {
   it('⚠⚠ it looks up the label the telemetry ACTUALLY records', () => {
-    const store = storeSource();
+    const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
     // The label is built here, and it is the only place it is built.
     expect(store).toContain('job: opts?.bankOnly ? `narration:${intent}_fill` : `narration:${intent}`,');
     // ...so the lookup must use the assembled form, not the bare intent.
@@ -79,7 +79,7 @@ describe('OTA-1263 (A) — the adaptive idle threshold actually finds its job', 
   });
 
   it('⚠ the armed-at line survives — it is how the NEXT log grades this', () => {
-    const store = storeSource();
+    const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
     expect(store).toContain('intro-fill armed after ${idleNeeded}ms idle');
   });
 });
@@ -106,7 +106,7 @@ describe('OTA-1263 (B) — the per-call ms/t obeys the same guard the aggregate 
   });
 
   it('⚠⚠ the source carries the guard, not just this mirror', () => {
-    const store = storeSource();
+    const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
     const i = store.indexOf('const prefillIsPossible = r.prefillMs != null');
     expect(i).toBeGreaterThan(-1);
     const block = store.slice(i, i + 200);

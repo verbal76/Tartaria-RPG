@@ -151,7 +151,11 @@ describe('OTA-1051 — the story sites are actually wired', () => {
 describe('OTA-1051 — ambient staleness', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const src: string = require('fs').readFileSync(
-    require('path').join(__dirname, '../app/state/gameStore.ts'),
+    // ⚠ OTA-1398 — SLICE 7. The ambient path — the stamp, the staleness check and
+    // every drop reason below — moved to `app/ai/narration.ts`. The story-beat
+    // sites pinned in the describe above did NOT, so that read is unchanged and
+    // this one is re-pointed: two claims, two files, neither relaxed.
+    require('path').join(__dirname, '../app/ai/narration.ts'),
     'utf8',
   );
 

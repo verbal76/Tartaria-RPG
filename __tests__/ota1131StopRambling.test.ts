@@ -97,7 +97,15 @@ jest.setTimeout(60_000);
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const STORE: string = require('fs').readFileSync(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+  // ⚠ OTA-1398 — BOTH FILES, AND THE ORDER MATTERS. The flavour budget itself
+  // moved to `app/ai/narration.ts` (slice 7), but the ARRIVAL-INTRO spend site
+  // that this suite pins an ordering against — the banked line speaks, then the
+  // budget is taken — is in gameStore's scene path. gameStore is concatenated
+  // FIRST so the two indexOf anchors below resolve inside that one call site
+  // rather than straddling the join.
+  require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8')
+  + '\n' + require('fs').readFileSync(
+    require('path').join(__dirname, '../app/ai/narration.ts'), 'utf8');
 
 describe('OTA-1131 — ⚠ the exact line from the log is caught now', () => {
   it('the leaked ambient prompt is recognised as an echo', () => {

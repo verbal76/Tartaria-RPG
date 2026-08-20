@@ -222,7 +222,8 @@ describe('OTA-1134 — interruptible is a SEPARATE axis from priority', () => {
   it('⚠ NARRATION IS NOT INTERRUPTIBLE — the property this OTA must not break', () => {
     // Cutting a narration line short leaves the player reading half a sentence,
     // and unlike an item description it has nothing to fall back to.
-    const store = src('app/state/gameStore.ts');
+    const store = src('app/state/gameStore.ts') + '\n' + src('app/ai/narration.ts')
+      + '\n' + src('app/state/slices/bootSlice.ts');
     const nar = store.slice(
       store.indexOf('async function narrateViaArbiter'),
       store.indexOf('async function maybeGenerateAmbientArbiter'),

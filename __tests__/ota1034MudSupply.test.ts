@@ -129,7 +129,8 @@ describe('OTA-1034 — SOURCE LOCKS', () => {
   });
 
   it('the ambient ∅ now names which filter ate the line', () => {
-    const store = read('app', 'state', 'gameStore.ts');
+    // ⚠ OTA-1398 — the ambient ∅ instrumentation moved to app/ai/narration.ts.
+    const store = read('app', 'state', 'gameStore.ts') + '\n' + read('app', 'ai', 'narration.ts');
     expect(store).toMatch(/ambient-empty reason=model-returned-nothing/);
     expect(store).toMatch(/ambient-empty reason=\$\{why\} raw=/);
     for (const reason of [
@@ -142,7 +143,8 @@ describe('OTA-1034 — SOURCE LOCKS', () => {
   });
 
   it('the instrumentation is debug-only — it cannot put a line in the feed', () => {
-    const store = read('app', 'state', 'gameStore.ts');
+    // ⚠ OTA-1398 — the ambient ∅ instrumentation moved to app/ai/narration.ts.
+    const store = read('app', 'state', 'gameStore.ts') + '\n' + read('app', 'ai', 'narration.ts');
     const start = store.indexOf("if (!ambientUsable) {");
     expect(start).toBeGreaterThan(0);
     const block = store.slice(start, start + 1600);

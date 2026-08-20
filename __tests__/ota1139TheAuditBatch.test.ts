@@ -149,7 +149,8 @@ describe('OTA-1139 audit №2 — the enemy panel tells the boss truth in chip w
 
 describe('OTA-1139 audit №3 — the bank pre-synthesizes what will be SPOKEN', () => {
   it('⚠ the bank strips the arbiter frame before presynthesize', () => {
-    const store = read('app/state/gameStore.ts');
+    const store = read('app/state/gameStore.ts') + '\n' + read('app/ai/narration.ts')
+      + '\n' + read('app/state/slices/bootSlice.ts');
     const at = store.indexOf('void piper.presynthesize(');
     expect(at).toBeGreaterThan(0);
     expect(store).toContain('void piper.presynthesize(safStrip(text))');

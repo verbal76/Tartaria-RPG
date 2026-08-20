@@ -93,7 +93,15 @@ import type { NpcMet, OutpostRaid } from '../app/engine/types';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const SRC: string = require('fs').readFileSync(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
+  // ⚠ OTA-1398 — the ambient stamp that READS the counter moved to the narration
+  // leaf; the counter itself moved to `app/state/visibleLogCount.ts`, which is the
+  // point of that move — two owners, so it went DOWN behind accessors.
   require('path').join(__dirname, '../app/state/gameStore.ts'),
+  'utf8',
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+) + '\n' + require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '../app/ai/narration.ts'),
   'utf8',
 );
 
@@ -291,8 +299,25 @@ describe('OTA-1055 — "the log moved on" can actually be detected', () => {
   });
 
   it('the ambient stamp reads the counter, not the capped buffer', () => {
-    expect(SRC).toMatch(/logLen: _playerVisibleLogCount,/);
+    // ⚠⚠ OTA-1398 — RE-POINTED, AND THE HEADLINE OF THIS TEST SURVIVED THE MOVE
+    // INTACT. Slice 7 split the two halves of this claim into different files
+    // and that is exactly what the OTA-1055 fix was about: the counter has TWO
+    // owners — `appendLog` writes it, the ambient stamp reads it — so it moved
+    // DOWN to `app/state/visibleLogCount.ts` behind accessors, and the stamp
+    // that reads it went to `app/ai/narration.ts`. The claim is unchanged: the
+    // stamp reads the never-trimmed counter, never the capped buffer.
+    expect(SRC).toMatch(/logLen: visibleLogTotal\(\),/);
     expect(SRC).not.toMatch(/logLen: get\(\)\.gameLog\.length/);
+    // ⚠ …and the counter it reads still excludes developer bookkeeping, which is
+    // the other half of "what the PLAYER took". That gate stayed at the CALL
+    // SITE in gameStore, because the caller is the only thing that knows the
+    // channel — pushing it down would have made a counter import the log types.
+    expect(SRC).toContain("if (channel !== 'debug' && channel !== 'cognitive') noteVisibleLogLine();");
+    const counter = require('fs').readFileSync(
+      require('path').join(__dirname, '../app/state/visibleLogCount.ts'), 'utf8',
+    ) as string;
+    expect(counter).toContain('export function noteVisibleLogLine(): void {');
+    expect(counter).toContain('export function visibleLogTotal(): number {');
   });
 });
 

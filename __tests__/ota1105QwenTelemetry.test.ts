@@ -114,7 +114,7 @@ describe('OTA-1105 — every consumer is labeled', () => {
   });
 
   it('⚠ all nine call sites name their job', () => {
-    const store = storeSource();
+    const store = storeSource() + '\n' + src('app/ai/narration.ts');
     const fusion = src('app/engine/itemFusion.ts');
     // Narration is labeled PER-INTENT — the exact grain OTA-1093 asked for.
     // ⚠ RETARGETED BY OTA-1129, same reflow lesson as the ambient label two
@@ -142,7 +142,7 @@ describe('OTA-1105 — every consumer is labeled', () => {
   });
 
   it('the store surfaces calls in the debug log, rollup every tenth', () => {
-    const store = storeSource();
+    const store = storeSource() + '\n' + src('app/ai/narration.ts');
     expect(store).toContain('setQwenTelemetrySink((r) => {');
     expect(store).toContain('qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms');
     expect(store).toContain('qwenCallCount() % 10 === 0');

@@ -107,11 +107,19 @@ describe('OTA-1395 — seven private helpers handed in', () => {
   });
 
   it('⚠ sceneIntroBank is passed BY REFERENCE, because both sides write to it', () => {
-    // It is a Map mutated in place, shared with the narration path still in the
-    // store. Copying it would give the two halves separate banks and the bug
-    // would look like "the intro sometimes repeats".
+    // It is a Map mutated in place, shared with the narration path. Copying it
+    // would give the two halves separate banks and the bug would look like
+    // "the intro sometimes repeats".
+    //
+    // ⚠ OTA-1398 — RE-POINTED. The narration path left gameStore for
+    // `app/ai/narration.ts`, and the Map went with it: narration is the side
+    // that FILLS the bank, so it is the owner. gameStore re-exports the name so
+    // every existing importer is untouched, and the slice still receives the one
+    // live Map rather than a copy — which is the whole claim here.
     expect(slice).toContain('shared Map mutated in place');
-    expect(store).toMatch(/^export const sceneIntroBank/m);
+    expect(src('app', 'ai', 'narration.ts')).toMatch(/^export const sceneIntroBank/m);
+    expect(store).not.toMatch(/^export const sceneIntroBank/m);
+    expect(store).toContain("} from '../ai/narration';");
   });
 });
 

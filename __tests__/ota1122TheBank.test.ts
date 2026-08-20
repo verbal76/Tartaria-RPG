@@ -73,7 +73,9 @@ import { getRaces, getFactions } from '../app/engine/character';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const SRC: string = require('fs').readFileSync(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+  require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8')
+  + '\n' + require('fs').readFileSync(
+    require('path').join(__dirname, '../app/ai/narration.ts'), 'utf8');
 
 const store = useGameStore;
 

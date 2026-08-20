@@ -199,7 +199,7 @@ describe('OTA-1128 — ⚠ the combat branch is unreachable, and that is recorde
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const STORE: string = require('fs').readFileSync(
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+    require('path').join(__dirname, '../app/ai/narration.ts'), 'utf8');
 
   it('narrateViaArbiter returns the template BEFORE building a prompt when enemies are up', () => {
     const fn = STORE.slice(STORE.indexOf('async function narrateViaArbiter'));

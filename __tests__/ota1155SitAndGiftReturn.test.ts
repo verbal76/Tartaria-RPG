@@ -68,7 +68,8 @@ import { bossSwingsTwice } from '../app/engine/combatRules';
 import type { Enemy } from '../app/engine/types';
 
 const read = (...p: string[]) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
-const STORE = read('app', 'state', 'gameStore.ts');
+// ⚠ OTA-1398 — the scene-intro path this suite pins moved to app/ai/narration.ts.
+const STORE = read('app', 'state', 'gameStore.ts') + '\n' + read('app', 'ai', 'narration.ts');
 
 // Minimal parse context — these inputs name nothing in the world, which is the
 // point: bare "sit" has to work with an empty scene behind it.

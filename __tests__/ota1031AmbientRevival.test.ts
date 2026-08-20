@@ -54,7 +54,11 @@ describe('OTA-1031 — reflections live, scene narration still dies', () => {
 
 describe('OTA-1031 — SOURCE LOCKS', () => {
   const read = (...p: string[]) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
-  const store = read('app', 'state', 'gameStore.ts');
+  // ⚠ OTA-1398 — SLICE 7 re-pointed this, and did not relax it. The narration
+  // path left gameStore for `app/ai/narration.ts`; the pins below read the file
+  // that now owns them, plus gameStore for anything that stayed. Concatenating
+  // the two is how ota1173/ota1175 already handle a subsystem that spans a seam.
+  const store = read('app', 'state', 'gameStore.ts') + '\n' + read('app', 'ai', 'narration.ts');
   const injector = read('app', 'engine', 'contextInjector.ts');
 
   it('the ambient path filters on REGISTER, not on the pronoun', () => {

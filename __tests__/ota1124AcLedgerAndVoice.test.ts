@@ -56,7 +56,9 @@ jest.setTimeout(60_000);
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const SRC: string = require('fs').readFileSync(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+  require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8')
+  + '\n' + require('fs').readFileSync(
+    require('path').join(__dirname, '../app/ai/narration.ts'), 'utf8');
 
 /** The ambient first-person opener filter, lifted verbatim from the store so
  *  the cases below test the REAL predicate rather than a paraphrase of it. */
