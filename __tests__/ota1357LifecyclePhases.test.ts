@@ -33,7 +33,10 @@ describe('OTA-1357 — lifecycle phase stamps', () => {
     expect(stampAt).toBeGreaterThan(-1);
     const logAt = watch.indexOf('appendLog(\'debug\', appStateLine(prev, nextStr,', stampAt - 2000);
     expect(logAt).toBeGreaterThan(stampAt); // stamp first, log second
-    const src = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+    // ⚠ OTA-1397 — and the reinit stamp moved too, one slice later, to
+    // `app/ai/qwenWatchdog.ts`. Both stamps now sit in leaves; gameStore holds
+    // neither. Two files, two claims, each read where it lives.
+    const src = readFileSync(join(__dirname, '..', 'app', 'ai', 'qwenWatchdog.ts'), 'utf8');
     expect(src).toContain("stampBreadcrumbPhase('qwen-reinit', `attempt#${rpAttemptNo}`);");
   });
 

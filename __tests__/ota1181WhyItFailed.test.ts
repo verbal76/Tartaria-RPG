@@ -45,6 +45,14 @@ const STORE = fs.readFileSync(path.join(__dirname, '..', 'app/state/gameStore.ts
 const WATCH = fs.readFileSync(
   path.join(__dirname, '..', 'app/diagnostics/runtimePressureWatch.ts'), 'utf8',
 );
+// ⚠⚠ OTA-1397 — SLICE 6 MOVED THE OTHER OWNER, and the seam this OTA is about no
+// longer touches gameStore at all. The watchdog — which reads the latches and
+// prints both messages — is now `app/ai/qwenWatchdog.ts`. What OTA-1181 fixed was
+// two messages with different lifetimes sharing one flag; that claim is now a
+// claim about two leaves, and neither of them is the store.
+const WATCHDOG = fs.readFileSync(
+  path.join(__dirname, '..', 'app/ai/qwenWatchdog.ts'), 'utf8',
+);
 const ABOUT = fs.readFileSync(path.join(__dirname, '..', 'app/diagnostics/aboutSummary.ts'), 'utf8');
 
 function codeOnly(src: string): string {
@@ -87,7 +95,9 @@ describe('OTA-1181 — the report says WHY the model failed', () => {
 });
 
 describe('OTA-1181 — "for good" is said once', () => {
-  const code = codeOnly(STORE);
+  // ⚠ OTA-1397 — `code` was gameStore; it is the watchdog now. The variable name
+  // is left alone so the assertions read unchanged from the OTA that wrote them.
+  const code = codeOnly(WATCHDOG);
   const watch = codeOnly(WATCH);
 
   test('the permanent message has its own flag', () => {

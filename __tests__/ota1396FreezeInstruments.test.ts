@@ -37,6 +37,12 @@ const src = (...p: string[]) => readFileSync(path(...p), 'utf8');
 
 const store = src('app', 'state', 'gameStore.ts');
 const watch = src('app', 'diagnostics', 'runtimePressureWatch.ts');
+// ⚠ OTA-1397 — SLICE 6 moved the OTHER owner of the five shared latches out of
+// gameStore, to `app/ai/qwenWatchdog.ts`. Three assertions here named gameStore
+// as "the watchdog side" and now name the watchdog itself. Nothing about the
+// accessor pattern changed — if anything this is the pattern paying off again,
+// since the latches did not have to move a second time to let the watchdog go.
+const watchdog = src('app', 'ai', 'qwenWatchdog.ts');
 
 describe('OTA-1396 — the instruments live in diagnostics now', () => {
   it('⚠⚠ every runtime-pressure variable left gameStore', () => {
@@ -104,7 +110,7 @@ describe('OTA-1396 — the five shared latches, and how both owners reach them',
       'standDownAlreadyLogged()',
       'noteStandDownLogged()',
     ]) {
-      expect(store).toContain(fn);
+      expect(watchdog).toContain(fn);
     }
   });
 
@@ -112,7 +118,7 @@ describe('OTA-1396 — the five shared latches, and how both owners reach them',
     // Clearing three of four was always the bug waiting to happen — the reset
     // lived in the watchdog and the variables lived elsewhere. One owner now.
     expect(watch).toContain('export function clearMemoryPressureLatches(): void {');
-    expect(store).toContain('clearMemoryPressureLatches();');
+    expect(watchdog).toContain('clearMemoryPressureLatches();');
   });
 
   it('⚠ the accessor surface is deliberately small, and says so', () => {
@@ -162,7 +168,12 @@ describe('OTA-1396 — what stayed, and what the move simplified', () => {
   it('⚠ …and the hook is a GETTER, because the count changes while it runs', () => {
     // A value captured at start-up would always read zero.
     expect(watch).toContain('qwenReinitAttempts: () => number;');
-    expect(store).toContain('{ qwenReinitAttempts: () => qwenReinitAttempts }');
+    // ⚠ OTA-1397 — the counter moved to the watchdog, so the getter gameStore
+    // injects is now that module's accessor rather than an inline arrow over a
+    // local `let`. Passing the function ITSELF is the same guarantee: read at
+    // call time, not at start-up, where it would always be zero.
+    expect(store).toContain('{ qwenReinitAttempts: qwenReinitAttemptCount }');
+    expect(watchdog).toContain('export function qwenReinitAttemptCount(): number {');
   });
 });
 

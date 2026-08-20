@@ -140,7 +140,11 @@ describe('OTA-1084 — dispose() mid-load wins', () => {
 
 describe('OTA-1084 — SOURCE LOCKS (watchdog rules)', () => {
   const read = (...p: string[]) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
-  const store = read('app', 'state', 'gameStore.ts');
+  // ⚠ OTA-1397 — SLICE 6 re-pointed this, not relaxed it. Every rule below is a
+  // rule about the WATCHDOG, which left gameStore for `app/ai/qwenWatchdog.ts`
+  // with its ten mutable `let`s. The name stays `store` so the 20-odd assertions
+  // read unchanged; what it reads is the file that now holds them.
+  const store = read('app', 'ai', 'qwenWatchdog.ts');
   const engine = read('app', 'ai', 'generation', 'QwenGenerativeEngine.ts');
 
   it('rule 1 — no revival kicks while the app is backgrounded, logged once per stretch', () => {

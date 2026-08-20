@@ -67,11 +67,17 @@ const read = (...p: string[]): string => fs.readFileSync(path.join(__dirname, '.
  *  reads BOTH on purpose. The instruments (the memory-warning handler, the
  *  dispose, the quiet-window latch) moved to
  *  `app/diagnostics/runtimePressureWatch.ts`; the Qwen watchdog that CONSULTS
- *  them stayed in gameStore and now reads them through accessors. The interlock
- *  this suite pins is precisely the seam between the two, so a claim about it is
- *  a claim about both files. Concatenating them keeps every assertion honest
- *  without pretending the code is still in one place. */
-const STORE = read('app', 'state', 'gameStore.ts')
+ *  them reads them through accessors. The interlock this suite pins is precisely
+ *  the seam between the two, so a claim about it is a claim about both files.
+ *  Concatenating them keeps every assertion honest without pretending the code
+ *  is still in one place.
+ *
+ *  ⚠⚠ OTA-1397 — SLICE 6 MOVED THE OTHER HALF, AND gameStore IS NO LONGER PART
+ *  OF THIS SEAM AT ALL. The watchdog left for `app/ai/qwenWatchdog.ts`, so what
+ *  used to be "the store and a leaf it consults" is now two leaves, neither of
+ *  which the store contributes a line to. The concatenation names them both;
+ *  the assertions below did not change, which is the point. */
+const STORE = read('app', 'ai', 'qwenWatchdog.ts')
   + '\n' + read('app', 'diagnostics', 'runtimePressureWatch.ts');
 
 describe('OTA-1175 — a memory warning now silences the watchdog', () => {

@@ -112,8 +112,13 @@ describe('OTA-1228 — the desktop first run settles instead of hanging at 51%',
   });
 
   it('⚠⚠ the Qwen watchdog does not chase a native module that cannot exist on desktop', () => {
-    const store = src('app', 'state', 'gameStore.ts');
-    const wd = store.slice(store.indexOf('function startQwenWatchdog'));
+    // ⚠ OTA-1397 — the watchdog moved to `app/ai/qwenWatchdog.ts` (slice 6). The
+    // desktop guard is the FIRST line of its body and still is; what changed is
+    // which file to open. The Platform import check below reads the same file,
+    // because "a real top-level import, not a lazy require" is a claim about the
+    // module that does the guarding.
+    const store = src('app', 'ai', 'qwenWatchdog.ts');
+    const wd = store.slice(store.indexOf('export function startQwenWatchdog'));
     const guard = wd.indexOf("Platform.OS === 'web'");
     const firstWork = wd.indexOf('qwenWatchdogTimer !== null');
     expect(guard).toBeGreaterThan(-1);

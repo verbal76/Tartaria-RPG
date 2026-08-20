@@ -125,19 +125,38 @@ describe('OTA-1393 — the watchdogs are handed in, not imported', () => {
     expect(slice).toContain('deps.startRuntimePressureWatch(get, set);');
   });
 
-  it('⚠ and they are still defined in gameStore', () => {
+  it('⚠⚠ …and NEITHER is defined in gameStore any more — it only wires them', () => {
     // ⚠ OTA-1395 — `startRuntimePressureWatch` picked up an `export` when slice 4
-    // needed its TYPE (`typeof Store.fn`). The word matters here: it is exported
-    // so a slice can be TYPED against it, not so a slice can IMPORT it — that is
-    // still forbidden, and ota1392 enforces it directory-wide.
-    expect(store).toMatch(/^(export )?function startQwenWatchdog\(/m);
-    // ⚠ OTA-1396 — `startRuntimePressureWatch` is no longer defined here at all:
-    // it moved to app/diagnostics/runtimePressureWatch.ts with the instruments it
-    // starts. gameStore keeps a differently-named wrapper that supplies the one
-    // hook the watcher needs back.
-    expect(store).toMatch(/^function startPressureWatchWithHooks\(/m);
+    // needed its TYPE (`typeof Store.fn`). The word matters: it is exported so a
+    // slice can be TYPED against it, not so a slice can IMPORT it — that is still
+    // forbidden, and ota1392 enforces it directory-wide.
+    //
+    // ⚠⚠ OTA-1396 + OTA-1397 — THIS ASSERTION USED TO READ "…are still defined in
+    // gameStore", AND BOTH HAVE NOW LEFT, one slice apart. That is a change in
+    // what the test is FOR, so it was rewritten rather than trimmed: the claim
+    // this suite actually protects is that `aiLifecycleSlice` receives these two
+    // by INJECTION and never by import, which is exactly as load-bearing when the
+    // definitions live in leaves as it was when they lived in the store. The
+    // definitions are pinned at their new addresses so "handed in, not imported"
+    // cannot quietly become "handed in from nowhere".
+    expect(src('app', 'ai', 'qwenWatchdog.ts'))
+      .toMatch(/^export function startQwenWatchdog\(/m);
     expect(src('app', 'diagnostics', 'runtimePressureWatch.ts'))
       .toMatch(/^export function startRuntimePressureWatch\(/m);
+    // gameStore holds neither body — only the wrapper that joins the two leaves.
+    expect(store).not.toMatch(/^(export )?function startQwenWatchdog\(/m);
+    expect(store).not.toMatch(/^(export )?function runQwenHealthCheck\(/m);
+    expect(store).toMatch(/^function startPressureWatchWithHooks\(/m);
+    // ⚠ AND THE EDGE BETWEEN THE TWO LEAVES RUNS ONE WAY, which is the whole
+    // reason the wrapper still exists. The watchdog imports the memory latches
+    // from the pressure watch; the pressure watch does NOT import the reload
+    // counter back — gameStore injects it as a getter. Reverse that and the two
+    // leaves import each other, and a cycle between leaves is worse than one
+    // through the store: neither file looks guilty when a binding is `undefined`.
+    expect(src('app', 'diagnostics', 'runtimePressureWatch.ts'))
+      .not.toMatch(/from\s+['"]\.\.\/ai\/qwenWatchdog['"]/);
+    expect(src('app', 'ai', 'qwenWatchdog.ts'))
+      .toMatch(/from\s+['"]\.\.\/diagnostics\/runtimePressureWatch['"]/);
   });
 
   it('⚠⚠ the slice imports NO value from gameStore', () => {

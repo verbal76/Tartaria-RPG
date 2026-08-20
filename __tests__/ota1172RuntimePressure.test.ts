@@ -71,6 +71,13 @@ const ABOUT = read('app', 'diagnostics', 'aboutSummary.ts');
 // lives. A pin that reads "the store or its slices, whichever has it" would have gone on
 // passing if a listener had been dropped and re-added somewhere else entirely.
 const WATCH = read('app', 'diagnostics', 'runtimePressureWatch.ts');
+// ⚠ OTA-1397 — SLICE 6, AND THIS SUITE NOW READS THREE FILES. The Qwen watchdog
+// left too, for `app/ai/qwenWatchdog.ts`. It is worth naming what that means for
+// a suite like this one: OTA-1172 shipped as one OTA touching one file, and its
+// subject is now three modules with one-way edges between them. Every assertion
+// below still reads whichever file owns its claim, which is what has kept the
+// claims falsifiable through six moves.
+const WATCHDOG = read('app', 'ai', 'qwenWatchdog.ts');
 
 const BASE: PressureSnapshot = {
   memoryWarnings: 0, lastMemoryWarningAt: null, appStateTrail: [],
@@ -257,19 +264,19 @@ describe('OTA-1172 — the reload is timed and its outcome named', () => {
   it('⚠ SIX ATTEMPTS WENT idle → idle AND WE COULD NOT TELL IF THEY DID ANYTHING', () => {
     // Expensive-and-working vs expensive-and-futile is the difference between tuning the
     // cadence and deleting the call. The old log recorded neither cost nor outcome.
-    expect(STORE).toContain("settled in ${Date.now() - rpReinitStarted}ms → status='${after}'");
+    expect(WATCHDOG).toContain("settled in ${Date.now() - rpReinitStarted}ms → status='${after}'");
   });
 
   it('a throw reports its cost too, not just its message', () => {
-    expect(STORE).toContain('threw after ${Date.now() - rpReinitStarted}ms');
+    expect(WATCHDOG).toContain('threw after ${Date.now() - rpReinitStarted}ms');
   });
 
   it('⚠ THE ATTEMPT NUMBER IS CAPTURED AT KICK TIME, not read at settle time', () => {
     // The counter keeps climbing while a reload is in flight, so reading it in the
     // callback would attribute the timing to whichever attempt happened to be current —
     // exactly the kind of quietly-wrong number that sends a triage down the wrong path.
-    expect(STORE).toContain('const rpAttemptNo = qwenReinitAttempts;');
-    expect(STORE).toContain('reinit #${rpAttemptNo} settled');
+    expect(WATCHDOG).toContain('const rpAttemptNo = qwenReinitAttempts;');
+    expect(WATCHDOG).toContain('reinit #${rpAttemptNo} settled');
   });
 });
 
@@ -336,8 +343,8 @@ describe('OTA-1172 — this OTA changes no behaviour, deliberately', () => {
     // symptom from a freeze to a CRASH TO THE HOME SCREEN with "Last JS crash: none
     // recorded" — a native death — so the fix shipped rather than waiting for a cleaner
     // measurement. The bare reset is gone; `inactive` alone no longer counts as a return.
-    expect(STORE).not.toContain("if (next === 'active') { qwenBackoffLevel = 0; tick(); }");
-    expect(STORE).toContain("if (!qwenTrulyBackgrounded) return;");
+    expect(WATCHDOG).not.toContain("if (next === 'active') { qwenBackoffLevel = 0; tick(); }");
+    expect(WATCHDOG).toContain("if (!qwenTrulyBackgrounded) return;");
   });
 
   it('the instruments are idempotent — a re-hydrate must not stack timers', () => {

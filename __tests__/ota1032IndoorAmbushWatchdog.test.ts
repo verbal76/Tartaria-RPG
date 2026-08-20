@@ -74,6 +74,11 @@ describe('OTA-1032 — the indoor cast is real, and believable', () => {
 describe('OTA-1032 — SOURCE LOCKS', () => {
   const read = (...p: string[]) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
   const store = read('app', 'state', 'gameStore.ts');
+  // ⚠ OTA-1397 — SLICE 6. This describe covers two unrelated subsystems that
+  // happened to ship in one OTA: the indoor rest-ambush (still in gameStore) and
+  // the Qwen watchdog, which moved to `app/ai/qwenWatchdog.ts`. Each block now
+  // reads the file that owns its claim rather than one file that owns both.
+  const watchdog = read('app', 'ai', 'qwenWatchdog.ts');
 
   it('the rest ambush swaps the cast under a roof, at the same rarity', () => {
     expect(store).toMatch(/pickIndoorAmbusher\(rawWildRestEnemy\.rarity\)/);
@@ -89,28 +94,28 @@ describe('OTA-1032 — SOURCE LOCKS', () => {
   });
 
   it('the watchdog polls adaptively and wakes on foreground', () => {
-    expect(store).toMatch(/QWEN_WATCHDOG_HEALTHY_MS = 60_000/);
-    expect(store).toMatch(/QWEN_WATCHDOG_RECOVERING_MS = 5_000/);
+    expect(watchdog).toMatch(/QWEN_WATCHDOG_HEALTHY_MS = 60_000/);
+    expect(watchdog).toMatch(/QWEN_WATCHDOG_RECOVERING_MS = 5_000/);
     // The fixed-interval loop is gone; health drives the next delay.
-    expect(store).not.toMatch(/QWEN_WATCHDOG_INTERVAL_MS/);
+    expect(watchdog).not.toMatch(/QWEN_WATCHDOG_INTERVAL_MS/);
     // OTA-1084 — the recovering delay now runs through the backoff ladder.
-    expect(store).toMatch(/schedule\(healthy \? QWEN_WATCHDOG_HEALTHY_MS : qwenRecoveringDelayMs\(\)\)/);
+    expect(watchdog).toMatch(/schedule\(healthy \? QWEN_WATCHDOG_HEALTHY_MS : qwenRecoveringDelayMs\(\)\)/);
     // Dormancy is caused by backgrounding, so the return to foreground checks.
-    expect(store).toMatch(/AppState\.addEventListener\('change'/);
+    expect(watchdog).toMatch(/AppState\.addEventListener\('change'/);
     // ⚠ RETARGETED BY OTA-1173. The claim — "the return to foreground checks" — is
     // unchanged and still asserted below; what moved is that a bare iOS `active` no longer
     // qualifies. `active` fires there for a notification banner or a Control Center pull,
     // so the old spelling kicked a ~400MB context load on incidental twitches.
-    expect(store).toMatch(/if \(!qwenTrulyBackgrounded\) return;/);
-    const fg = store.indexOf('if (!qwenTrulyBackgrounded) return;');
-    expect(store.slice(fg, fg + 700)).toMatch(/tick\(\);/);
+    expect(watchdog).toMatch(/if \(!qwenTrulyBackgrounded\) return;/);
+    const fg = watchdog.indexOf('if (!qwenTrulyBackgrounded) return;');
+    expect(watchdog.slice(fg, fg + 700)).toMatch(/tick\(\);/);
   });
 
   it('the health check reports health rather than just returning', () => {
-    expect(store).toMatch(/function runQwenHealthCheck\(/);
+    expect(watchdog).toMatch(/function runQwenHealthCheck\(/);
     // Healthy path returns true, recovering paths return false.
-    const start = store.indexOf('function runQwenHealthCheck(');
-    const body = store.slice(start, start + 4000);
+    const start = watchdog.indexOf('function runQwenHealthCheck(');
+    const body = watchdog.slice(start, start + 4000);
     expect(body).toMatch(/return true;/);
     expect(body).toMatch(/return false;/);
   });

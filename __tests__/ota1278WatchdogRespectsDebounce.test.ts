@@ -42,11 +42,18 @@ jest.mock('expo-updates', () => ({}));
 // watchdog owns recovery during play — and a rule enforced in one place only is
 // not a rule. This is the ninth-plus time this project has paid for one
 // decision living in two houses.
-import { _qwenSetForegroundSince, _qwenForegroundSettled } from '../app/state/gameStore';
+// ⚠ OTA-1397 — SLICE 6 MOVED BOTH HALVES OF THIS SUITE'S SUBJECT, and re-pointing
+// them was not optional: the two test helpers below are the settle gate's only
+// handles, and they had to travel with the `let` they read and write, or the
+// module they left would have been assigning to an imported binding — a compile
+// error, which is the property that makes this segmentation safe to keep doing.
+// The watchdog now lives in `app/ai/qwenWatchdog.ts`; nothing about the gate or
+// the 8s window changed.
+import { _qwenSetForegroundSince, _qwenForegroundSettled } from '../app/ai/qwenWatchdog';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-const STORE = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+const STORE = readFileSync(join(__dirname, '..', 'app', 'ai', 'qwenWatchdog.ts'), 'utf8');
 const APP = readFileSync(join(__dirname, '..', 'App.tsx'), 'utf8');
 
 const SETTLE = Number(/const QWEN_FOREGROUND_SETTLE_MS = ([\d_]+);/.exec(STORE)![1]!.replace(/_/g, ''));
