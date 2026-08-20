@@ -31,9 +31,12 @@ const EXPECTED = {
   html: { name: 'Tartaria Realms (Web)', channel: 'html-dev', id: 'com.hotatticgames.tartarprim.htmldev', fallenSharing: 'open' },
 };
 
-function resolve(line) {
+// ⚠ OTA-1386 — the bare id the Play / App Store listings are registered under.
+const STORE_ID = 'com.hotatticgames.tartarprim';
+
+function resolve(line, extraEnv = {}) {
   const out = execFileSync('npx', ['expo', 'config', '--type', 'public', '--json'], {
-    env: { ...process.env, TARTARIA_LINE: line },
+    env: { ...process.env, TARTARIA_LINE: line, ...extraEnv },
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'ignore'],
     maxBuffer: 32 * 1024 * 1024,
@@ -85,6 +88,41 @@ try {
 } catch {
   console.log('  unknown line correctly refused');
 }
+
+// ⚠⚠ OTA-1386 — THE STORE BUILD. Play and App Store Connect know the app by the
+// BARE id; every line wears a suffix so sideloads stay a separate install. A
+// production build has to resolve back to the bare id or Play refuses the upload.
+//
+// This check exists because that strip used to be a workflow step that rewrote
+// app.json, and app.config.js — which loads after it — put the suffix straight
+// back. Nothing went red; the step simply stopped working. A resolved-config
+// check is the only kind that would have caught that.
+for (const line of Object.keys(EXPECTED)) {
+  let cfg;
+  try {
+    cfg = resolve(line, { TARTARIA_STORE_BUILD: '1' });
+  } catch (e) {
+    fail(`${line} (store build): config failed to resolve — ${String(e).slice(0, 160)}`);
+    continue;
+  }
+  if (cfg?.android?.package !== STORE_ID) {
+    fail(`${line} (store build).android.package: expected ${STORE_ID}, got ${JSON.stringify(cfg?.android?.package)}`);
+  }
+  if (cfg?.ios?.bundleIdentifier !== STORE_ID) {
+    fail(`${line} (store build).ios.bundleIdentifier: expected ${STORE_ID}, got ${JSON.stringify(cfg?.ios?.bundleIdentifier)}`);
+  }
+  // ⚠ …and it must change NOTHING ELSE. A store build is still one of the four
+  // products; it only wears the listing's id. If the channel moved too, a store
+  // release would start pulling another product's OTAs.
+  const chan = cfg?.updates?.requestHeaders?.['expo-channel-name'];
+  if (chan !== EXPECTED[line].channel) {
+    fail(`${line} (store build).channel: a store build must not move the channel — expected ${EXPECTED[line].channel}, got ${JSON.stringify(chan)}`);
+  }
+  if (cfg?.extra?.fallenSharing !== EXPECTED[line].fallenSharing) {
+    fail(`${line} (store build).fallenSharing: a store build must not change the product flag`);
+  }
+}
+if (failures === 0) console.log(`  store build resolves all 4 lines to ${STORE_ID}, channels unmoved`);
 
 if (failures > 0) {
   console.error(`\n[verify-lines] FAILED — ${failures} problem${failures === 1 ? '' : 's'}.`);

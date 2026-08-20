@@ -66,7 +66,8 @@ on:
       - main
       - 'release/**'
       - 'claude/**'
-      - 'HaL2001'
+      # ⚠ OTA-1386 — 'HaL2001' REMOVED, archived by the branch collapse. The
+      # trunk builds HAL now, selected by the `line` input below.
     tags:
       - 'v*-ios'
     paths-ignore:
@@ -94,6 +95,18 @@ on:
         required: false
         default: false
         type: boolean
+      # ⚠⚠ OTA-1386 — see build-apk.yml for the full note. The branch used to
+      # answer "which product"; the collapse removed that answer, this restores it.
+      line:
+        description: 'Product line (golem = dev phone, hal = live testers, steam = PC, html = web)'
+        required: false
+        default: 'golem'
+        type: choice
+        options:
+          - golem
+          - hal
+          - steam
+          - html
 
 permissions:
   contents: write
@@ -102,6 +115,10 @@ jobs:
   build:
     name: Build Tartaria Realms iOS via EAS
     runs-on: ubuntu-latest
+    env:
+      # Job-wide so every Expo invocation agrees. A push carries no input and
+      # falls to golem — the dev line, never someone else's shipping product.
+      TARTARIA_LINE: ${{ github.event.inputs.line || 'golem' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -169,26 +186,22 @@ jobs:
           fi
           echo "profile=$PROFILE" >> "$GITHUB_OUTPUT"
           echo "submit=$SHOULD_SUBMIT" >> "$GITHUB_OUTPUT"
-          echo "Building Tartaria Realms iOS — profile: $PROFILE, submit: $SHOULD_SUBMIT"
+          echo "Building Tartaria Realms iOS — line: $TARTARIA_LINE, profile: $PROFILE, submit: $SHOULD_SUBMIT"
 
-      - name: Strip .hal2001 suffix for production iOS build
+      # ⚠⚠ OTA-1386 — THE STORE BUNDLE ID, AND WHY THIS STEP SHRANK.
+      # Production iOS builds use the bare bundle identifier to match the App
+      # Store Connect listing; preview/sideload builds keep the line's suffix so
+      # test installs stay a separate app. That is unchanged.
+      # What changed: this step used to rewrite app.json, and since OTA-1384
+      # app.config.js overrides `ios.bundleIdentifier` afterwards — so the rewrite
+      # stopped reaching the build while still printing a convincing before/after.
+      # The flip now lives in app.config.js, and this only asks for it.
+      # Same silent break as build-apk.yml; see the longer note there.
+      - name: Select the store bundle id for a production iOS build
         if: steps.meta.outputs.profile == 'production'
         run: |
-          # Mirror the Android workflow's package strip. Production iOS
-          # builds use the bare bundle identifier to match the App Store
-          # Connect listing; preview/sideload builds keep .hal2001 so
-          # HaL test installs stay separate.
-          node -e "
-            const fs = require('fs');
-            const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
-            const before = app.expo?.ios?.bundleIdentifier;
-            if (app.expo?.ios?.bundleIdentifier?.endsWith('.hal2001')) {
-              app.expo.ios.bundleIdentifier = app.expo.ios.bundleIdentifier.slice(0, -'.hal2001'.length);
-            }
-            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
-            console.log('Production iOS bundle id:', before, '->', app.expo.ios.bundleIdentifier);
-          "
-          grep '"bundleIdentifier"' app.json | head -3
+          echo "TARTARIA_STORE_BUILD=1" >> "$GITHUB_ENV"
+          echo "Production iOS — bundle id will resolve to the bare store id."
 
       - name: Stamp unique iOS buildNumber = GitHub run_number
         run: |
@@ -208,6 +221,45 @@ jobs:
             fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
             console.log('iOS buildNumber stamped =', app.expo.ios.buildNumber);
           "
+
+      # ⚠⚠ OTA-1386 — THE ONE PLACE A JOB-LEVEL ENV VAR IS NOT ENOUGH.
+      #
+      # build-apk.yml and build-ios-native.yml compile ON THIS RUNNER, so the job's
+      # TARTARIA_LINE is in scope when Expo evaluates app.config.js. `eas build`
+      # does not: it uploads the project and runs `expo prebuild` on an EAS worker,
+      # in a fresh environment that has never heard of this workflow's env block.
+      # An unset var there resolves to golem — so dispatching line=hal would have
+      # queued a build wearing golem's name, id and channel, and the run would have
+      # gone green.
+      #
+      # eas.json travels WITH the project, and EAS applies `build.<profile>.env` to
+      # the worker. Writing it here is the only channel this value has into that
+      # environment. The file is edited on the runner only — never committed.
+      - name: Carry TARTARIA_LINE into the EAS worker (via eas.json profile env)
+        if: steps.meta.outputs.profile == 'production'
+        run: |
+          set -euo pipefail
+          node -e "
+            const fs = require('fs');
+            const j = JSON.parse(fs.readFileSync('eas.json', 'utf8'));
+            const p = '${{ steps.meta.outputs.profile }}';
+            if (!j.build || !j.build[p]) {
+              console.error('::error::eas.json has no build profile ' + p);
+              process.exit(1);
+            }
+            j.build[p].env = { ...(j.build[p].env || {}), TARTARIA_LINE: process.env.TARTARIA_LINE };
+            if (process.env.TARTARIA_STORE_BUILD === '1') j.build[p].env.TARTARIA_STORE_BUILD = '1';
+            fs.writeFileSync('eas.json', JSON.stringify(j, null, 2));
+            console.log('eas.json build.' + p + '.env =', JSON.stringify(j.build[p].env));
+          "
+
+      - name: Show the resolved identity actually being built
+        run: |
+          # ⚠ Read it back through EXPO'S resolver rather than from a file. The
+          # package strip broke unnoticed precisely because the file on disk and
+          # the resolved config had stopped agreeing.
+          npx expo config --type public --json \
+            | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const c=JSON.parse(s);console.log('line:      '+(c.extra&&c.extra.tartariaLine));console.log('name:      '+c.name);console.log('bundle id: '+(c.ios&&c.ios.bundleIdentifier));console.log('channel:   '+(c.updates&&c.updates.requestHeaders&&c.updates.requestHeaders['expo-channel-name']));console.log('sharing:   '+(c.extra&&c.extra.fallenSharing));})"
 
       - name: Verify EXPO_TOKEN secret is set
         env:

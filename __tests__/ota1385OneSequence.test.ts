@@ -60,10 +60,15 @@ describe('OTA-1385 — no product moves backwards', () => {
     expect(cmp('4.31.0', '4.31.0')).toBe(0);
   });
 
-  it('a MINOR bump resets PATCH, per the scheme this file documents', () => {
-    const [, minor, patch] = DISPLAY_VERSION.split('.').map(Number);
-    expect(minor).toBe(31);
-    expect(patch).toBe(0);
+  it('the unification was a MINOR bump, and nothing since has walked it back', () => {
+    // ⚠ Written as a FLOOR, not an equality. OTA-1386 stamped 4.31.1 the day
+    // after this suite landed and turned the original `patch === 0` assertion
+    // red — a test that fails on the next ordinary OTA is measuring the calendar,
+    // not the decision. What has to stay true is that the minor line never drops
+    // back below the jump that cleared html.
+    const [major, minor] = DISPLAY_VERSION.split('.').map(Number);
+    expect(major).toBe(4);
+    expect(minor).toBeGreaterThanOrEqual(31);
   });
 });
 
@@ -71,9 +76,16 @@ describe('OTA-1385 — the sequence itself', () => {
   it('⚠ golem\'s number continued, because it was the highest of the four', () => {
     // 1384 vs HAL 1367, steam 1371, html web11 — so no OTA number goes
     // backwards either.
-    expect(OTA_BUILD_ID).toContain('1385');
-    expect(src('app', 'buildInfo.ts')).toContain(
+    // ⚠ Read as a FLOOR, not as "the current OTA is 1385". Pinning the live id
+    // here made the suite fail on the very next OTA, which is a test that
+    // measures how recently it was written rather than what it claims.
+    const n = Number(/^\d{4}-\d{2}-\d{2}-(\d+)-/.exec(OTA_BUILD_ID)?.[1] ?? 0);
+    expect(n).toBeGreaterThanOrEqual(1385);
+    const b = src('app', 'buildInfo.ts');
+    expect(b).toContain(
       "// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1384-one-trunk-four-products';");
+    // and 1385 itself is in the chain, whether it is live or superseded
+    expect(b).toContain("OTA_BUILD_ID = '2026-08-20-1385-one-sequence';");
   });
 
   it('⚠⚠ the ledger says every row from here covers ALL FOUR products', () => {

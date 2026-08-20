@@ -100,6 +100,21 @@ jobs:
       - name: Content reachability (blocking)
         run: npm run check:reachability
 
+      # ⚠⚠ OTA-1386 — THE FOUR PRODUCTS, CHECKED IN CI.
+      #
+      # This existed since OTA-1384 and only ever ran on a developer's machine,
+      # which is the same as not existing. It renders all four configs through
+      # Expo's own resolver and fails if any two share a name, package or
+      # channel — a collision means one product's binary can be published to
+      # another's channel, which is the worst thing one trunk can do.
+      #
+      # It is also the check that would have caught the package strip going
+      # silently dead when app.config.js took over from app.json: the workflow
+      # step kept succeeding, the file kept changing, and the RESOLVED config
+      # stopped listening. Only a resolved-config check sees that.
+      - name: Four product lines resolve distinctly (blocking)
+        run: npm run check:lines
+
   test:
     name: jest (fast · required)
     runs-on: ubuntu-latest

@@ -63,12 +63,15 @@ on:
       - main
       - 'release/**'
       - 'claude/**'
-      - 'HaL2001'
-      # golem-line is intentionally NOT auto-built anymore — it now ships JS via
-      # the isolated eas-update-golem.yml OTA (golem-line channel only). APKs for
-      # golem (native / version changes) are built manually via workflow_dispatch
-      # against the golem-line ref, so we stop burning build minutes on every JS
-      # tweak.
+      # ⚠ OTA-1386 — 'HaL2001' REMOVED. It was archived by the branch collapse;
+      # the trunk (golem-line) now produces HAL's build too, selected by the
+      # `line` input below rather than by which branch was pushed. Leaving the
+      # trigger would mean a push to an archived branch quietly building a
+      # months-stale HAL.
+      # golem-line is intentionally NOT auto-built — it ships JS via the isolated
+      # eas-update-golem.yml OTA. APKs (native / version changes) are built
+      # manually via workflow_dispatch, so we stop burning build minutes on every
+      # JS tweak.
     tags:
       - 'v*'
     paths-ignore:
@@ -96,6 +99,21 @@ on:
         options:
           - preview
           - production
+      # ⚠⚠ OTA-1386 — WHICH PRODUCT TO BUILD. Until OTA-1384 the BRANCH answered
+      # this: a push to HaL2001 checked out HAL's app.json and built HAL. The
+      # collapse onto one trunk removed that answer and did not replace it, so
+      # every workflow in this repo was, for two commits, silently building golem.
+      # This input is the replacement. See app.config.js.
+      line:
+        description: 'Product line (golem = dev phone, hal = live testers, steam = PC, html = web)'
+        required: false
+        default: 'golem'
+        type: choice
+        options:
+          - golem
+          - hal
+          - steam
+          - html
 
 permissions:
   contents: write
@@ -107,6 +125,14 @@ jobs:
     # arb155 — bound the job so a hung/disconnected runner fails fast with a red
     # X instead of spinning until GitHub's 6-hour default.
     timeout-minutes: 60
+    env:
+      # ⚠ Job-wide, so EVERY step that shells out to Expo sees it — prebuild, the
+      # config reads, gradle's bundling step. Setting it on one step would give a
+      # build whose config disagreed with itself halfway through.
+      # ⚠ A push (not a dispatch) carries no input, so it falls to golem — the dev
+      # line. A forgotten selection builds the developer's own product, never
+      # somebody else's shipping one.
+      TARTARIA_LINE: ${{ github.event.inputs.line || 'golem' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -231,13 +257,14 @@ jobs:
           # Resolution order:
           #   1. refs/tags/v* → production AAB (Play Store tag push)
           #   2. commit message contains [build-aab] → production AAB.
-          #      OTA-245: this now wins OVER the HaL2001 default, so
-          #      the user can stamp an AAB from HaL2001 when they need
-          #      to push to the Play Console for playtesters. Previously
-          #      the HaL2001 check fired first and forced preview/APK,
-          #      so [build-aab] had no effect on this branch.
-          #   3. HaL2001 branch (no AAB marker) → sideload APK
-          #      (Hal2001-N tag).
+          #      OTA-245: this wins OVER the hal default, so an AAB can
+          #      be stamped for the Play Console for playtesters.
+          #      Previously the HaL2001 check fired first and forced
+          #      preview/APK, so [build-aab] had no effect there.
+          #   3. line = hal (no AAB marker) → sideload APK (Hal2001-N tag).
+          #      ⚠ OTA-1386: this used to read the BRANCH NAME. HaL2001 is
+          #      archived and the trunk builds every product, so the same
+          #      question is now answered by TARTARIA_LINE.
           #   4. workflow_dispatch input or default → preview APK.
           if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
             PROFILE="production"
@@ -247,53 +274,54 @@ jobs:
             PROFILE="production"
             IS_TAG="false"
             TAG="aab-build-${{ github.run_number }}"
-          elif [[ "${GITHUB_REF_NAME}" == "HaL2001" ]]; then
+          elif [[ "${TARTARIA_LINE}" == "hal" ]]; then
             PROFILE="preview"
             IS_TAG="false"
             TAG="Hal2001-${{ github.run_number }}"
           else
             PROFILE="${{ github.event.inputs.profile || 'preview' }}"
             IS_TAG="false"
-            TAG="apk-build-${{ github.run_number }}"
+            TAG="${TARTARIA_LINE}-apk-${{ github.run_number }}"
           fi
           VERSION=$(node -p "require('./package.json').version")
           echo "profile=$PROFILE" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "is_tag=$IS_TAG" >> "$GITHUB_OUTPUT"
-          echo "Building Tartaria Realms — profile: $PROFILE, tag: $TAG, version: $VERSION"
+          echo "Building Tartaria Realms — line: $TARTARIA_LINE, profile: $PROFILE, tag: $TAG, version: $VERSION"
 
-      # Strip the .hal2001 suffix from android.package + ios.bundleIdentifier
-      # when building a production AAB. Reason: Play Console screenshot
-      # (OTA-247-era retry) rejected the AAB with "Your APK or Android App
-      # Bundle needs to have the package name com.hotatticgames.tartarprim."
-      # The HaL2001 branch suffixes the package to keep its sideload APKs
-      # as a separate app from the main production track; AABs heading to
-      # Play Store need the bare package to match the existing listing.
-      # Preview / APK builds keep the .hal2001 suffix untouched so HaL
-      # sideloads stay separate from the production install.
-      - name: Strip .hal2001 suffix for production AAB
+      # ⚠⚠ OTA-1386 — THE STORE PACKAGE FLIP, AND WHY IT MOVED.
+      #
+      # Play Console refuses an AAB whose package is not the listing's:
+      # "Your APK or Android App Bundle needs to have the package name
+      # com.hotatticgames.tartarprim." Every product line wears a suffix so its
+      # sideloads stay a separate install, so a production AAB has to resolve
+      # back to the bare id.
+      #
+      # This step used to do that by rewriting app.json. That worked while
+      # app.json WAS the config. OTA-1384 made app.config.js the entry point and
+      # it overrides android.package from the line table — AFTER this step ran.
+      # So the strip kept succeeding, kept printing its before/after, and had no
+      # effect on the built binary. Nothing went red; the next production AAB
+      # would simply have been refused at upload.
+      #
+      # The flip now lives in app.config.js, which has the last word, and this
+      # step just asks for it. `scripts/verify-lines.mjs` checks the RESOLVED
+      # config for all four lines, which is the only kind of check that would
+      # have caught the silent break.
+      - name: Select the store package for a production AAB
         if: steps.meta.outputs.profile == 'production'
         run: |
-          node -e "
-            const fs = require('fs');
-            const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
-            const before = {
-              package: app.expo?.android?.package,
-              bundle: app.expo?.ios?.bundleIdentifier,
-            };
-            if (app.expo?.android?.package?.endsWith('.hal2001')) {
-              app.expo.android.package = app.expo.android.package.slice(0, -'.hal2001'.length);
-            }
-            if (app.expo?.ios?.bundleIdentifier?.endsWith('.hal2001')) {
-              app.expo.ios.bundleIdentifier = app.expo.ios.bundleIdentifier.slice(0, -'.hal2001'.length);
-            }
-            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
-            console.log('Production package flip:');
-            console.log('  android.package:', before.package, '→', app.expo.android.package);
-            console.log('  ios.bundleIdentifier:', before.bundle, '→', app.expo.ios.bundleIdentifier);
-          "
-          grep -E '"package"|"bundleIdentifier"' app.json | head -5
+          echo "TARTARIA_STORE_BUILD=1" >> "$GITHUB_ENV"
+          echo "Production AAB — package/bundle id will resolve to the bare store id."
+
+      - name: Show the resolved identity actually being built
+        run: |
+          # ⚠ Read it back through EXPO'S resolver, not from a file. The whole
+          # reason the strip broke unnoticed is that the file and the resolved
+          # config had stopped agreeing. This line is what the binary gets.
+          npx expo config --type public --json \
+            | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const c=JSON.parse(s);console.log('line:    '+(c.extra&&c.extra.tartariaLine));console.log('name:    '+c.name);console.log('package: '+(c.android&&c.android.package));console.log('channel: '+(c.updates&&c.updates.requestHeaders&&c.updates.requestHeaders['expo-channel-name']));console.log('sharing: '+(c.extra&&c.extra.fallenSharing));})"
 
       - name: Generate native Android project
         run: npx expo prebuild --platform android --no-install

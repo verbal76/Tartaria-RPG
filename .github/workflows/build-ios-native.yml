@@ -57,7 +57,8 @@ on:
       - main
       - 'release/**'
       - 'claude/**'
-      - 'HaL2001'
+      # ⚠ OTA-1386 — 'HaL2001' REMOVED, archived by the branch collapse. The
+      # trunk builds HAL now, selected by the `line` input below.
     # Skip every path-driven push so this never auto-fires; the
     # commit-message check below is what gates intentional runs.
     paths-ignore:
@@ -69,6 +70,17 @@ on:
         required: false
         default: false
         type: boolean
+      # ⚠⚠ OTA-1386 — see build-apk.yml for the full note.
+      line:
+        description: 'Product line (golem = dev phone, hal = live testers, steam = PC, html = web)'
+        required: false
+        default: 'golem'
+        type: choice
+        options:
+          - golem
+          - hal
+          - steam
+          - html
 
 permissions:
   contents: read
@@ -78,6 +90,12 @@ jobs:
     name: Build iOS .ipa on GitHub macOS runner
     runs-on: macos-15
     timeout-minutes: 60
+    env:
+      # ⚠ This job compiles ON THIS RUNNER (xcodebuild, not EAS), so the job env
+      # is in scope when `expo prebuild` evaluates app.config.js. That is not true
+      # of build-ios.yml, which hands the work to an EAS worker — see the eas.json
+      # note there.
+      TARTARIA_LINE: ${{ github.event.inputs.line || 'golem' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -182,22 +200,26 @@ jobs:
         if: steps.meta.outputs.should_run == 'true'
         run: npm ci --no-audit --no-fund
 
-      - name: Strip .hal2001 suffix from bundle id (production-only build)
+      # ⚠⚠ OTA-1386 — the same strip, moved to the layer that has the last word.
+      # This workflow only ever produces a signed distribution .ipa, so it is
+      # always a store build; it stripped unconditionally before and still does.
+      # What changed: it used to rewrite app.json, and since OTA-1384
+      # app.config.js overrides `ios.bundleIdentifier` afterwards — so the rewrite
+      # stopped reaching the build while still printing a convincing before/after.
+      # See build-apk.yml for the longer note.
+      - name: Select the store bundle id
         if: steps.meta.outputs.should_run == 'true'
         run: |
-          # Same strip the EAS build-ios.yml does — production builds
-          # use the bare bundle id `com.hotatticgames.tartarprim` to
-          # match the App Store Connect listing.
-          node -e "
-            const fs = require('fs');
-            const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
-            const before = app.expo?.ios?.bundleIdentifier;
-            if (app.expo?.ios?.bundleIdentifier?.endsWith('.hal2001')) {
-              app.expo.ios.bundleIdentifier = app.expo.ios.bundleIdentifier.slice(0, -'.hal2001'.length);
-            }
-            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
-            console.log('iOS bundle id:', before, '->', app.expo.ios.bundleIdentifier);
-          "
+          echo "TARTARIA_STORE_BUILD=1" >> "$GITHUB_ENV"
+          echo "Signed distribution build — bundle id will resolve to the bare store id."
+
+      - name: Show the resolved identity actually being built
+        if: steps.meta.outputs.should_run == 'true'
+        run: |
+          # ⚠ Through Expo's resolver, not from a file — the file and the resolved
+          # config disagreeing is exactly how the old strip broke unnoticed.
+          npx expo config --type public --json \
+            | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const c=JSON.parse(s);console.log('line:      '+(c.extra&&c.extra.tartariaLine));console.log('name:      '+c.name);console.log('bundle id: '+(c.ios&&c.ios.bundleIdentifier));console.log('channel:   '+(c.updates&&c.updates.requestHeaders&&c.updates.requestHeaders['expo-channel-name']));})"
 
       - name: Verify required GitHub Secrets are present
         if: steps.meta.outputs.should_run == 'true'

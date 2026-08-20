@@ -1,0 +1,119 @@
+name: Web Build (Tartaria Realms)
+
+# ⚠⚠ OTA-1386 — THE PRODUCT THAT HAD NO BUILD.
+#
+# There were four product lines and three build workflows. `html` — the web
+# product — has never had one. `npm run export:web` existed in package.json and
+# was only ever run by hand on a developer's machine, which means the web build
+# was never verified by anything, and no artifact of it exists anywhere.
+#
+# That was survivable while html was its own branch that somebody exported
+# manually. Under one trunk it is not: every commit now goes into the web product
+# too, and a change that breaks the web bundle would sit unnoticed until the next
+# time a human happened to try it.
+#
+# This produces the static site as a downloadable artifact. It is also the input
+# a desktop shell (Steam / Linux / macOS) would wrap — those targets do not exist
+# yet, and this is the first thing they will need.
+#
+# ⚠ WHAT THIS IS NOT: it does not deploy anywhere. It builds and uploads. Where
+# the site gets hosted is a decision nobody has made yet, and a workflow that
+# quietly published one would be making it.
+
+on:
+  workflow_dispatch:
+    inputs:
+      line:
+        description: 'Product line (html = the web product; steam = the PC shell input)'
+        required: false
+        default: 'html'
+        type: choice
+        options:
+          - html
+          - steam
+          - golem
+          - hal
+  push:
+    branches:
+      - golem-line
+    paths:
+      # ⚠ NARROW ON PURPOSE. A full web export on every app/** push would burn
+      # minutes on a product nobody is watching hour to hour. These are the files
+      # that break a web bundle without breaking anything else: the bundler
+      # config, the dependency set, and the .web module halves that only the web
+      # graph resolves.
+      - 'package.json'
+      - 'package-lock.json'
+      - 'app.config.js'
+      - 'app.json'
+      - 'metro.config.js'
+      - 'babel.config.js'
+      - '**/*.web.ts'
+      - '**/*.web.tsx'
+      - '.github/workflows/build-web.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    name: Export static web bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # ⚠ Unlike the native workflows, the default here is `html` rather than
+      # `golem` — this workflow only exists to build the web product, and a run
+      # that quietly produced golem's web export would be answering a question
+      # nobody asked. The other lines stay selectable for comparison.
+      TARTARIA_LINE: ${{ github.event.inputs.line || 'html' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Show the resolved identity actually being built
+        run: |
+          npx expo config --type public --json \
+            | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const c=JSON.parse(s);console.log('line:    '+(c.extra&&c.extra.tartariaLine));console.log('name:    '+c.name);console.log('channel: '+(c.updates&&c.updates.requestHeaders&&c.updates.requestHeaders['expo-channel-name']));console.log('sharing: '+(c.extra&&c.extra.fallenSharing));})"
+
+      - name: Export web bundle
+        run: |
+          set -euo pipefail
+          # Metro's web graph resolves the .web halves of every module pair
+          # (splashArt, GamepadNav, kokoroWeb), so this is the only build that
+          # exercises them. A failure here is usually one of those.
+          npm run export:web
+
+      - name: Report what came out
+        run: |
+          set -euo pipefail
+          if [ ! -d dist ]; then
+            echo "::error::expo export produced no dist/ directory."
+            exit 1
+          fi
+          echo "=== dist total ==="
+          du -sh dist
+          echo "=== 12 largest files ==="
+          find dist -type f -printf '%s\t%p\n' | sort -rn | head -12 \
+            | awk '{printf "%8.2f MB  %s\n", $1/1048576, $2}'
+          if [ ! -f dist/index.html ]; then
+            echo "::error::dist/index.html is missing — the export is not a loadable site."
+            exit 1
+          fi
+          echo "✓ dist/index.html present."
+
+      - name: Upload the site as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tartaria-web-${{ github.event.inputs.line || 'html' }}-${{ github.run_number }}
+          path: dist
+          retention-days: 30
+          if-no-files-found: error

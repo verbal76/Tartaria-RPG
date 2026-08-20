@@ -60,6 +60,39 @@ const LINES = {
   },
 };
 
+/** ⚠⚠ THE STORE LISTING IDENTITY — OTA-1386.
+ *
+ * The Play Console listing and the App Store Connect record are both registered
+ * under the BARE id. Every line above is that id plus a suffix, which is how the
+ * sideload installs stay separate apps from the store install.
+ *
+ * A build heading for a store has to resolve back to the bare id, or Play
+ * refuses it at upload: *"Your APK or Android App Bundle needs to have the
+ * package name com.hotatticgames.tartarprim."*
+ *
+ * ⚠ THIS USED TO LIVE IN THE WORKFLOWS, AND OTA-1384 SILENTLY KILLED IT. Both
+ * build workflows had a "Strip .hal2001 suffix" step that rewrote `app.json`
+ * before `expo prebuild`. That worked while app.json WAS the config. It stopped
+ * working the moment this file started overriding `android.package` from the line
+ * table — the step still edits app.json, and this file then overwrites the edit.
+ * Nothing went red. The step just stopped mattering, and the next production AAB
+ * would have been refused at upload with no obvious cause.
+ *
+ * So it lives here now, at the layer that has the last word. */
+const STORE_ID = 'com.hotatticgames.tartarprim';
+
+// ⚠ Every line id must live UNDER the store id, or a store build has nothing
+// sensible to resolve to. Checked rather than assumed: the table above invites
+// edits, and this relationship is not visible from looking at it.
+for (const [k, v] of Object.entries(LINES)) {
+  if (!v.id.startsWith(`${STORE_ID}.`)) {
+    throw new Error(
+      `Line "${k}" has id "${v.id}", which is not under the store id "${STORE_ID}". ` +
+      `A store build resolves to the bare id, so every line must be a suffix of it.`,
+    );
+  }
+}
+
 const requested = process.env.TARTARIA_LINE || 'golem';
 const line = LINES[requested];
 if (!line) {
@@ -70,6 +103,14 @@ if (!line) {
   );
 }
 
+// ⚠ TARTARIA_STORE_BUILD=1 is set only by the production paths in build-apk.yml,
+// build-ios.yml and build-ios-native.yml. It changes the package / bundle id and
+// NOTHING else — name, channel and product flag stay whatever the line says,
+// because a store install is still one of the four products; it just wears the
+// listing's id.
+const storeBuild = process.env.TARTARIA_STORE_BUILD === '1';
+const appId = storeBuild ? STORE_ID : line.id;
+
 module.exports = ({ config }) => {
   // `config` is app.json's expo block, already loaded by Expo. Spread it so any
   // key added to app.json later is inherited here with no edit to this file.
@@ -77,8 +118,8 @@ module.exports = ({ config }) => {
   return {
     ...expo,
     name: line.name,
-    android: { ...expo.android, package: line.id },
-    ios: { ...expo.ios, bundleIdentifier: line.id },
+    android: { ...expo.android, package: appId },
+    ios: { ...expo.ios, bundleIdentifier: appId },
     updates: {
       ...expo.updates,
       requestHeaders: { ...(expo.updates && expo.updates.requestHeaders), 'expo-channel-name': line.channel },
@@ -98,3 +139,4 @@ module.exports = ({ config }) => {
 };
 
 module.exports.LINES = LINES;
+module.exports.STORE_ID = STORE_ID;
