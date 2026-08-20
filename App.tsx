@@ -283,15 +283,27 @@ export default function App() {
     // opens when something has gone wrong.
     //
     // ⚠ The flush is deliberately AFTER both loads and is itself a no-op unless
-    // a transport is installed AND the player opted in — neither is true in this
-    // build, so today this costs one boolean and returns 0. It is wired now so
-    // that adding the Sentry transport later needs no boot change.
+    // a transport is installed AND the player opted in. It was wired at OTA-1380
+    // so that adding a transport later would need no boot change — and OTA-1401
+    // added one, with exactly the boot change that predicted: none. The only new
+    // line is the install below it.
     void (async () => {
       try {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const cl = require('./app/diagnostics/crashLedger');
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const cr = require('./app/diagnostics/crashReporter');
+        // ⚠⚠ OTA-1401 — LAZY require, AND THAT IS LOAD-BEARING, NOT STYLE.
+        // `@sentry/react-native` is a NATIVE module. This OTA reaches devices
+        // running an APK compiled before it existed, and a bundle that imports
+        // it at module scope fails to load on every one of them — whereupon
+        // expo-updates abandons the update and reverts, silently, looking
+        // exactly like "the update never arrived" (the OTA-1174 symptom). The
+        // installer itself require()s the SDK lazily too; this require only
+        // reaches our own file, which is pure JS.
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const st = require('./app/diagnostics/sentryTransport');
+        st.installSentryIfAvailable();
         await cl.loadCrashLedger();
         await cr.loadReportingPref();
         await cr.flushCrashReports();

@@ -27,6 +27,29 @@
 
 const base = require('./app.json');
 
+// ⚠⚠ OTA-1401 — THE CRASH-REPORT DESTINATION, AND WHY IT IS IN PLAIN SOURCE.
+//
+// A Sentry DSN is not a credential. It is a write-only address: it authorises
+// SENDING an event and nothing else — it cannot read an issue, list a project,
+// or reach the account. Every client that ships Sentry embeds its DSN in the
+// bundle, because the bundle is what has to know where to post. Anyone with an
+// APK can read it either way, so hiding it in a repo secret would buy nothing
+// and cost the one thing that matters here: a build that silently has no
+// destination is indistinguishable from a build that is working.
+//
+// ⚠ THAT FAILURE ALREADY HAPPENED ONCE IN THIS FILE. The comment beside `extra`
+// claimed this key was already wired when it was not (see the correction there).
+// Keeping the DSN visible, in the same table as the four product strings, is
+// what makes the next such gap obvious rather than deniable.
+//
+// ⚠ ONE DESTINATION FOR ALL FOUR PRODUCTS, deliberately. The line is on every
+// event as a tag (see App.tsx), so golem / hal / steam / html are separable
+// inside Sentry without four projects to keep in step — the same argument that
+// collapsed four branches into one trunk.
+const CRASH_REPORT_DSN =
+  'https://f8526ef7b70c49aba68c3808933ca0a8@o4511945086926848.ingest.us.sentry.io/4511945117532160';
+
+
 /** The complete set of per-product differences. Four strings each; if this table
  *  ever needs a fifth field, that is worth a second look — it means a product
  *  difference has appeared that is not a name, an id or a channel. */
@@ -127,13 +150,21 @@ module.exports = ({ config }) => {
     extra: {
       ...expo.extra,
       // ⚠ The product flag reaches the RUNNING APP through `extra`, which is the
-      // only channel a build-time value has into React Native. `crashReportDsn`
-      // already uses this path, so the pattern is proven in-tree.
+      // only channel a build-time value has into React Native.
       // app/config/features.ts reads it and falls back to 'open' if absent, so a
       // config that fails to load degrades to the ordinary product rather than
       // to a broken one.
+      //
+      // ⚠ OTA-1401 — CORRECTION. This comment used to end "`crashReportDsn`
+      // already uses this path, so the pattern is proven in-tree" — and it did
+      // not. `crashReporter.ts` READ `extra.crashReportDsn`, nothing ever WROTE
+      // it, and the reader's `?? null` meant the missing half was invisible: the
+      // About screen said "not built into this version" and everyone agreed.
+      // A comment citing a wiring that does not exist is worse than no comment,
+      // because it is what stops the next person checking. It is true now.
       tartariaLine: requested,
       fallenSharing: line.fallenSharing,
+      crashReportDsn: CRASH_REPORT_DSN,
     },
   };
 };

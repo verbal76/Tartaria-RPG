@@ -261,13 +261,37 @@ describe('OTA-1380 — it reaches the places a human actually looks', () => {
     expect(about).toContain('accessibilityState={{ checked: crashOptIn, disabled: !crashConfigured }}');
   });
 
-  it('⚠⚠ the privacy policy says on-device-only, and does not promise a service', () => {
+  it('⚠⚠ the privacy policy and the CODE agree about whether a service exists', () => {
+    // ⚠⚠ OTA-1401 — REWRITTEN, BECAUSE THE ANSWER CHANGED AND THE TEST SHOULD NOT
+    // HAVE TO. This read "does not promise a service", pinning the exact wording
+    // of a build that had none — true for OTA-1380 and false the moment one was
+    // added. What it was actually protecting is that the policy never DISAGREES
+    // with the code about whether crash reports can leave the device, and that
+    // claim holds in both directions. So it is now derived from the code rather
+    // than from a remembered state: whichever way the repo goes, the document
+    // has to follow, and a change that flips one without the other goes red.
     const priv = src('docs', 'PRIVACY.md');
-    expect(priv).toContain('Crash records (on-device only)');
-    expect(priv).toContain('never leave your device on their own');
-    expect(priv).toContain('off by\ndefault');
-    // it must NOT claim a service exists — none is built in yet
-    expect(priv).toContain('no crash\nreporting service is built into the app');
+    const cfg = src('app.config.js');
+    const hasDestination = /crashReportDsn:\s*\w/.test(cfg);
+    const dep = JSON.parse(src('package.json')) as { dependencies?: Record<string, string> };
+    const hasSdk = !!dep.dependencies?.['@sentry/react-native'];
+
+    if (hasDestination && hasSdk) {
+      // A service exists: the policy must NAME it, and must not still be denying it.
+      expect(priv).toContain('Sentry');
+      expect(priv).not.toContain('no crash\nreporting service is built into the app');
+      expect(priv).not.toContain('crash-reporting service that uploads data');
+    } else {
+      // No service: the policy must say so and must not name one.
+      expect(priv).toContain('no crash\nreporting service is built into the app');
+      expect(priv).not.toContain('Sentry');
+    }
+
+    // TRUE IN BOTH STATES, and the part that actually protects the player: the
+    // records are captured locally, the switch is off unless the player moves it,
+    // and nothing goes anywhere on its own.
+    expect(priv).toMatch(/never leave your device/);
+    expect(priv).toMatch(/off by\s+default/);
   });
 
   it('⚠ the boot path loads the ledger, so the SYNC summaries have data', () => {
