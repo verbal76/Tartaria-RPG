@@ -22,6 +22,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { sharingUnlockedFor, SHARING_UNLOCK_NAMES } from '../app/engine/fallenLedger';
+import { FEATURES } from '../app/config/features';
 
 const src = (...p: string[]) => readFileSync(join(__dirname, '..', ...p), 'utf8');
 const codex = src('app', 'components', 'LoreCodexBody.tsx');
@@ -31,7 +32,11 @@ describe('OTA-1363 — HAL ONLY: the two-name door', () => {
   it('⚠⚠ HAL-ONLY MARKER — do not port this suite to golem / steam / html', () => {
     // Those lines ship the panel to everyone. A green run of this file there
     // would mean the gate leaked, not that the gate works.
-    expect(src('app', 'buildInfo.ts')).toContain('2026-08-20-1363-the-shared-roll-behind-a-name');
+    // ⚠ The marker is the FLAG, not a build-id string. `expect()` throws rather
+    // than returning, so an `a || b` of two expects is meaningless — the first
+    // one decides the test and the second never runs. The flag is the real fact
+    // anyway: this suite asserts a gated panel, and only a gated line has one.
+    expect(FEATURES.fallenSharing).toBe('gated');
   });
 
   it('opens for the two names the owner named', () => {
@@ -73,7 +78,16 @@ describe('OTA-1363 — HAL ONLY: the two-name door', () => {
 describe('OTA-1363 — the door is the ONLY thing gated', () => {
   it('⚠⚠ the EXCHANGE panel is behind the gate', () => {
     expect(codex).toContain('sharingUnlockedFor');
-    expect(codex).toContain('const exchangeUnlocked = sharingUnlockedFor(player?.name);');
+    // ⚠ OTA-1366 — the gate's SHAPE changed at step 3 and this assertion moved UP
+    // with it, which makes it stronger rather than weaker. The panel used to be
+    // hidden by a hand-ported HAL-only line; it is now hidden by the shared
+    // expression plus this line's `FEATURES.fallenSharing` constant. Asserting
+    // the CONSTANT is the real HAL-only fact — the expression is now identical
+    // on all four products, so pinning the expression alone would pass on the
+    // three lines where the panel is wide open.
+    expect(FEATURES.fallenSharing).toBe('gated');
+    expect(codex).toContain(
+      "FEATURES.fallenSharing === 'open' || sharingUnlockedFor(player?.name)");
     expect(codex).toContain('{exchangeUnlocked && (');
   });
 

@@ -39,6 +39,7 @@ import {
   fallenTitle, restRollLine, sharingUnlockedFor,
   type ForeignFallen, type RestRecord, type PairedHouse,
 } from '../engine/fallenLedger';
+import { FEATURES } from '../config/features';
 import {
   loadLedger, loadHouseName, setHouseName, buildExportPayload, importPayloadText,
   myHouseCode, acceptHouseCode, revokeHouse, loadPaired,
@@ -154,6 +155,19 @@ export function LoreCodexBody() {
   const [exchangeNote, setExchangeNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [paired, setPaired] = useState<PairedHouse[]>([]);
+  /** ⚠⚠ OTA-1367 [DIVERGENCE E3] — THE PAYLOAD ALSO TRAVELS AS VISIBLE TEXT.
+   *  Ported from the steam/html lines, where it was written because a browser
+   *  can refuse clipboard access outright. It belongs here too: a phone
+   *  clipboard write CAN fail, and when it did, this line's only response was
+   *  "Could not copy. Try again." with the player's ledger nowhere — which for
+   *  the exchange means their dead cannot cross at all.
+   *
+   *  `payloadOut` is the export, shown and selectable even when the copy
+   *  succeeded; `payloadIn` is a paste box that takes precedence over the
+   *  clipboard on import. Clipboard stays the fast path; text is the one that
+   *  cannot be taken away. */
+  const [payloadIn, setPayloadIn] = useState('');
+  const [payloadOut, setPayloadOut] = useState('');
   const [codeIn, setCodeIn] = useState('');
   const refreshLedger = React.useCallback(async () => {
     const l = await loadLedger();
@@ -227,10 +241,14 @@ export function LoreCodexBody() {
     setBusy(true);
     try {
       const payload = await buildExportPayload();
-      await Clipboard.setStringAsync(payload);
-      setExchangeNote(`Copied. ${Math.round(payload.length / 1024)}KB of your dead — paste it to whoever you ride with.`);
+      setPayloadOut(payload);
+      let copied = false;
+      try { await Clipboard.setStringAsync(payload); copied = true; } catch { copied = false; }
+      setExchangeNote(copied
+        ? `Copied. ${Math.round(payload.length / 1024)}KB of your dead — paste it to whoever you ride with. It is also in the box below if the copy did not take.`
+        : `${Math.round(payload.length / 1024)}KB of your dead is in the box below — select it all and copy it by hand. This machine would not give up its clipboard.`);
     } catch {
-      setExchangeNote('Could not copy. Try again.');
+      setExchangeNote('Could not gather your dead. Try again.');
     } finally { setBusy(false); }
   };
 
@@ -240,10 +258,14 @@ export function LoreCodexBody() {
     if (busy) return;
     setBusy(true);
     try {
-      const text = await Clipboard.getStringAsync();
-      if (!text || text.trim().length === 0) { setExchangeNote('Nothing on the clipboard to read.'); return; }
+      let text = payloadIn.trim();
+      if (text.length === 0) {
+        try { text = (await Clipboard.getStringAsync()) ?? ''; } catch { text = ''; }
+      }
+      if (text.trim().length === 0) { setExchangeNote('Nothing to read — paste their ledger into the box below, or copy it to the clipboard first.'); return; }
       const out = await importPayloadText(text);
       await refreshLedger();
+      if (out.added > 0 || out.rests > 0) setPayloadIn('');
       const bits = [`${out.added} joined your wastes`];
       if (out.rests > 0) bits.push(`${out.rests} put to rest elsewhere`);
       if (out.skippedDuplicate > 0) bits.push(`${out.skippedDuplicate} already known`);
@@ -275,7 +297,8 @@ export function LoreCodexBody() {
    *  ⚠ It reads the CHARACTER's name, not the house name — the house name is a
    *  free-text field the player types, so gating on it would be gating on
    *  nothing. */
-  const exchangeUnlocked = sharingUnlockedFor(player?.name);
+  const exchangeUnlocked =
+    FEATURES.fallenSharing === 'open' || sharingUnlockedFor(player?.name);
 
   const canPlanRoute = !!player;
   const here = player?.currentLocationId ?? null;
@@ -621,6 +644,30 @@ export function LoreCodexBody() {
               <Text style={styles.exchangeBtnText}>TAKE IN THEIRS</Text>
             </TouchableOpacity>
           </View>
+          <TextInput
+            style={styles.payloadBox}
+            value={payloadIn}
+            onChangeText={setPayloadIn}
+            placeholder="paste their ledger here (or leave blank to read the clipboard)"
+            placeholderTextColor="#7a705c"
+            multiline
+            autoCapitalize="none"
+            autoCorrect={false}
+            accessibilityLabel="Their ledger"
+          />
+          {!!payloadOut && (
+            <>
+              <Text style={styles.meta}>YOUR LEDGER — select all and copy if the clipboard would not take it.</Text>
+              <TextInput
+                style={styles.payloadBox}
+                value={payloadOut}
+                multiline
+                editable={false}
+                selectTextOnFocus
+                accessibilityLabel="Your ledger"
+              />
+            </>
+          )}
           {!!exchangeNote && <Text style={styles.exchangeNote}>{exchangeNote}</Text>}
 
           {/* ⚠⚠ THE MAILBOX — COMING SOON, and shown as such rather than hidden.
@@ -735,6 +782,13 @@ const styles = StyleSheet.create({
   },
   exchangeBtnText: { color: '#9ec0ef', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
   exchangeNote: { marginTop: 8, color: '#9ec96a', fontSize: 12, fontStyle: 'italic' },
+  // OTA-1367 — the visible-text fallback. Monospace-ish and tall enough to
+  // select by drag; the export is thousands of characters.
+  payloadBox: {
+    marginTop: 8, borderWidth: 1, borderColor: '#6a5a4a', borderRadius: 3,
+    paddingHorizontal: 8, paddingVertical: 6, color: '#c9bda0', fontSize: 10,
+    minHeight: 64, maxHeight: 120, textAlignVertical: 'top',
+  },
   pairedRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 },
   pairedName: { color: '#e8dcc0', fontSize: 13 },
   pairedCut: { color: '#e07a5f', fontSize: 10, fontWeight: '700', letterSpacing: 1 },

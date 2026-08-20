@@ -7,8 +7,10 @@
 // availability check at init disables the toggle in settings; once
 // disabled nothing here runs.
 
+import { Platform } from 'react-native';
 import * as Speech from 'expo-speech';
 import { getVoiceSettings, loadVoiceSettings, onVoiceSettingsChange } from './voiceSettings';
+import { speakWeb as kokoroSpeakWeb, stopWeb as kokoroStopWeb } from './kokoroWeb';
 import { cleanForSpeech } from './loreLexicon';
 import { setMusicDuck } from '../audio/AudioManager';
 import {
@@ -169,6 +171,16 @@ export function speak(text: string, channel?: string, voiceId?: string | null, o
       // beginScene's warm hook keeps the latency invisible. Pool is
       // capped at 2 simultaneous voices (Arbiter sticky + 1 vendor
       // slot, LRU-evicted).
+      // ⚠ OTA-1366 — WEB/DESKTOP ROUTES TO THE ONNX ENGINE. The native
+      // executorch Kokoro path is a stub on web (see kokoroWeb.ts), so without
+      // this the PC lines are silent. Metro resolves kokoroWeb.ts on native —
+      // a no-op — so this branch costs the phone builds one Platform check.
+      if (Platform.OS === 'web') {
+        // Fire-and-forget: it queues internally and downloads the model on
+        // first use.
+        kokoroSpeakWeb(trimmed, voiceId);
+        return nextId++;
+      }
       return piperSpeak(trimmed, voiceId, channel, opts);
     }
     // else: bundled install failed — fall through to the system queue.
@@ -224,6 +236,7 @@ export function stopAndClear(): void {
   void setMusicDuck(false);
   if (coalesceTimer != null) { clearTimeout(coalesceTimer); coalesceTimer = null; }
   try { void Speech.stop(); } catch { /* ignore */ }
+  if (Platform.OS === 'web') { try { kokoroStopWeb(); } catch { /* ignore */ } }
   // Unhandled-rejection-safe — piperStopAndClear awaits expo-av
   // teardown which can reject on Android when a sound is mid-load
   // or already-unloaded. Without this .catch the rejection
