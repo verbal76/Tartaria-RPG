@@ -1085,16 +1085,28 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           "color split"). ImageBackground tiles reliably; opacity goes on the
           CONTAINER style (not imageStyle, which iOS ignored) so it dims
           reliably AND repeats. */}
-      <ImageBackground
-        source={require('./assets/textures/parchment.png')}
-        resizeMode="repeat"
-        style={[StyleSheet.absoluteFill, { opacity: display.textureOpacity }]}
-      />
-      <Image
-        source={require('./assets/textures/vignette.png')}
-        resizeMode="stretch"
-        style={[StyleSheet.absoluteFill, { opacity: display.vignetteStrength }]}
-      />
+      {/* ⚠ OTA-1384 — the parchment grain + vignette give MOBILE its "aged paper"
+          look, but react-native-web mis-renders both: resizeMode="repeat" draws
+          ONE copy in the corner (a hard-edged square) and the stretched vignette
+          reads as a crisp colour split. On web/desktop we drop them and show the
+          solid base colour the player picked in Settings.
+          ⚠ `Platform.OS !== 'web'` is ALWAYS TRUE on a phone, so this wrapper is
+          behaviour-neutral here. It exists so App.tsx is the SAME FILE on all
+          four products — the last source difference between the lines. */}
+      {Platform.OS !== 'web' && (
+        <>
+          <ImageBackground
+            source={require('./assets/textures/parchment.png')}
+            resizeMode="repeat"
+            style={[StyleSheet.absoluteFill, { opacity: display.textureOpacity }]}
+          />
+          <Image
+            source={require('./assets/textures/vignette.png')}
+            resizeMode="stretch"
+            style={[StyleSheet.absoluteFill, { opacity: display.vignetteStrength }]}
+          />
+        </>
+      )}
       <View style={[styles.safe, { paddingTop: top, paddingBottom: bottomPad, paddingLeft: insets.left, paddingRight: insets.right }]}>
         <StatusBar style="light" hidden />
         <View

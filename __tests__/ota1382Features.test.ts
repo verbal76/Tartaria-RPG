@@ -112,9 +112,19 @@ describe('OTA-1382 — platform capability is NOT a flag', () => {
     // splashArt.web.ts requires splash-art-pc.png. A line carrying the module
     // without the asset would break its web bundle; a line carrying the asset
     // without the module would ship 2.4MB for nothing. Both or neither.
+    // ⚠ OTA-1384 MOVED THE ASSET, and this assertion moved with it rather than
+    // being relaxed. The pairing rule is unchanged — module and asset travel
+    // together — but the asset now lives in `assets-pc/` instead of `assets/`,
+    // because `assetBundlePatterns: ["assets/**/*"]` EMBEDS everything under
+    // assets/ into the native binary whether or not code requires it. Under one
+    // trunk the phone products carry this repo too, so the old location would
+    // have put 2.4MB of PC art into their download.
     const hasModule = existsSync(path('app', 'ui', 'splashArt.web.ts'));
-    const hasAsset = existsSync(path('assets', 'splash-art-pc.png'));
+    const hasAsset = existsSync(path('assets-pc', 'splash-art-pc.png'));
     expect(hasModule).toBe(hasAsset);
+    // ⚠⚠ AND IT MUST NOT BE UNDER THE EMBED GLOB. This is the half that costs
+    // real megabytes on a phone if someone ever "tidies" the asset back.
+    expect(existsSync(path('assets', 'splash-art-pc.png'))).toBe(false);
     // the phone half is unconditional
     expect(existsSync(path('app', 'ui', 'splashArt.ts'))).toBe(true);
   });

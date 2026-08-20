@@ -58,6 +58,45 @@ export interface ProductFeatures {
  *  shared roll has never been tested with two real houses. Owner: *"port the
  *  feature to Hal, but make it only visible if the characters name is Verbal or
  *  Sasmooch."* Promoting it later is this constant, not a port. */
+/** ⚠⚠ OTA-1384 — THE FLAG NOW COMES FROM THE BUILD, NOT FROM THE BRANCH.
+ *
+ *  `app.config.js` puts the product's mode into `expo.extra.fallenSharing`,
+ *  selected by the `TARTARIA_LINE` env var. That is the only channel a
+ *  build-time value has into a running React Native app, and `crashReportDsn`
+ *  already uses it, so the pattern is proven in-tree.
+ *
+ *  ⚠ IT FALLS BACK TO `'open'`, DELIBERATELY, and the direction matters. If the
+ *  config fails to load, the app degrades to the ORDINARY product — the one
+ *  three of the four lines ship — rather than to a mystery state where a panel
+ *  is missing and nobody can say why. The gated build is the exception, and an
+ *  exception should have to be asserted, never assumed.
+ *
+ *  ⚠ Read ONCE at module load. `expoConfig` is populated before any React tree
+ *  renders, and a flag that could change mid-session is not a product flag. */
+function readMode(): FallenSharingMode {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const Constants = require('expo-constants').default as { expoConfig?: { extra?: Record<string, unknown> } };
+    const v = Constants?.expoConfig?.extra?.fallenSharing;
+    return v === 'gated' ? 'gated' : 'open';
+  } catch {
+    return 'open';
+  }
+}
+
 export const FEATURES: ProductFeatures = {
-  fallenSharing: 'open',
+  fallenSharing: readMode(),
 };
+
+/** Which product this build is, for diagnostics. `'unknown'` on a config that
+ *  did not load — never a guess at a real line's name. */
+export function productLine(): string {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const Constants = require('expo-constants').default as { expoConfig?: { extra?: Record<string, unknown> } };
+    const v = Constants?.expoConfig?.extra?.tartariaLine;
+    return typeof v === 'string' && v ? v : 'unknown';
+  } catch {
+    return 'unknown';
+  }
+}

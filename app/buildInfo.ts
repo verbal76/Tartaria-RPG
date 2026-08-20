@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.277';
+export const DISPLAY_VERSION = '4.29.278';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24167,7 +24167,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SAME latch, written into player saves under two keys. Renaming either orphans
 // data on disk — which is why HAL's ledger refused to copy it. Declaring both
 // converges the type without touching a single save.
-export const OTA_BUILD_ID = '2026-08-20-1383-the-lines-converge';
+// ⚠⚠ OTA-1384 — ONE TRUNK, FOUR PRODUCTS (step 4a of the collapse). `app.json`
+// gains a sibling `app.config.js` holding the ONLY four things that differ per
+// product — name, channel, android/ios id, and the fallenSharing flag — selected
+// by a TARTARIA_LINE env var. An unset var builds golem (the dev line); an
+// UNKNOWN one throws, because guessing publishes one product's binary to
+// another's channel. The flag reaches the app through `expo.extra`, falling back
+// to 'open' so a config that fails to load degrades to the ordinary product.
+// ⚠ THE SOURCE CENSUS COULD NOT SEE package.json: steam and html carried three
+// web deps (react-dom, react-native-web, @expo/metro-runtime) and an export:web
+// script that golem and HAL lacked. The trunk carries all four; nothing in the
+// native require graph imports them, so phone bundles are unaffected.
+// ⚠ The 2.4MB PC splash moved to assets-pc/ — assetBundlePatterns is
+// "assets/**/*", which EMBEDS everything under assets/ whether or not code
+// requires it, so leaving it there would put it in the phone download.
+// ⚠ PROVEN, NOT ASSUMED: `npm run check:lines` renders all four configs through
+// Expo's own resolver, asserts every identity is distinct (a shared channel is
+// the worst outcome available here), and asserts an unknown line FAILS.
+export const OTA_BUILD_ID = '2026-08-20-1384-one-trunk-four-products';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1383-the-lines-converge';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1382-one-file-of-difference';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1381-the-drift-closed';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1380-the-crash-ledger';
