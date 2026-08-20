@@ -48,6 +48,7 @@ on:
       - 'app.json'
       - 'metro.config.js'
       - 'babel.config.js'
+      - 'web-stubs/**'
       - '**/*.web.ts'
       - '**/*.web.tsx'
       - '.github/workflows/build-web.yml'

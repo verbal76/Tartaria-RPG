@@ -70,4 +70,48 @@ const config = getDefaultConfig(__dirname);
 config.resolver = config.resolver ?? {};
 config.resolver.unstable_enablePackageExports = true;
 
+// ⚠⚠ OTA-1389 — WEB-ONLY NATIVE-MODULE STUBBING. Came back from html_dev/steam_Dev.
+//
+// The web and desktop builds run the game through react-native-web, which has no
+// on-device AI or voice runtime. These four packages are native-ONLY and have no
+// browser build at all; without the swap below, `expo export --platform web`
+// fails outright. The first web build ever run in CI died on exactly that:
+//
+//   Unable to resolve module ../../package.json from
+//   node_modules/react-native-executorch/lib/module/constants/resourceFetcher.js
+//
+// ⚠ THIS FILE WAS ANOTHER CASUALTY OF THE COLLAPSE, and the third of the same
+// kind. `scripts/divergence.py` measured `app/` only, so metro.config.js — like
+// `.github/workflows/`, `desktop/` and package.json before it — was never in the
+// census. The trunk inherited golem's copy, which never needed this because a
+// phone build never resolves for web. Nothing was red; the web product simply
+// could not be built, and nothing built it, so nobody found out.
+//
+// ⚠ THE PLATFORM GUARD IS THE WHOLE SAFETY ARGUMENT. `platform === 'web'` is
+// never true on an Android or iOS bundle, so this cannot reach the phone
+// products — which is what makes it safe to carry on a shared trunk. Removing
+// the guard would silently strip the AI and voice engines out of the phone
+// builds, and they would still compile.
+//
+// The game's managers already try/catch these and fall back to template
+// narration and silent text, so a no-op keeps the bundle compiling and the game
+// playable. Real desktop runtimes (node-llama-cpp / ONNX Runtime) get wired in
+// later behind the same hooks.
+const path = require('path');
+const WEB_NATIVE_STUBS = new Set([
+  'llama.rn',
+  'onnxruntime-react-native',
+  'react-native-executorch',
+  'expo-speech-recognition',
+]);
+const WEB_STUB_FILE = path.resolve(__dirname, 'web-stubs/native-noop.js');
+const __priorResolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (platform === 'web' && WEB_NATIVE_STUBS.has(moduleName)) {
+    return { type: 'sourceFile', filePath: WEB_STUB_FILE };
+  }
+  const next = __priorResolveRequest ?? context.resolveRequest;
+  return next(context, moduleName, platform);
+};
+
 module.exports = config;

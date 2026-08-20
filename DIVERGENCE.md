@@ -33,6 +33,10 @@ the whole of what it looked at. Three parts of the tree were never in it:
 | `package.json` / `package-lock.json` | `react-dom`, `react-native-web`, `@expo/metro-runtime` were on steam + html only | by accident, during OTA-1384 |
 | `.github/workflows/` | Windows, Linux and macOS packaging existed **only** on `steam_Dev`, `linux_dev`, `mac_dev` | OTA-1387, after the trunk was already live |
 | `desktop/` | the entire Electron wrapper — three of six shipping targets depend on it | same |
+| `metro.config.js` | a **web-only** resolver swapping four native-only packages (`llama.rn`, `onnxruntime-react-native`, `react-native-executorch`, `expo-speech-recognition`) for a no-op stub — without it `expo export --platform web` fails outright | OTA-1389, by the first web build ever run in CI |
+
+⚠ **Every one of these was found by trying to build something, not by reading a
+report.** The census is a reading; it cannot fail the way a build fails.
 
 ⚠ **The second and third are the serious ones.** A clean census read as "the
 lines are 98% identical", and that was true of the game code and false of the
