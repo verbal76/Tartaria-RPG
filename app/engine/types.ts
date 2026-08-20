@@ -1529,6 +1529,18 @@ export interface PlayerCharacter {
    *  once ever. A dog lost AFTER this OTA stays lost (death mechanic intact going forward). */
   /** @deprecated OTA-949 — the one-time dog-revive migration was retired; this flag is now
    *  inert (kept for save/test back-compat only; nothing reads it). */
+  /** ⚠⚠ OTA-1367 — BOTH NAMES ARE DECLARED, ON EVERY LINE, and that is the
+   *  point. This one latch was written into player saves under TWO keys:
+   *  `dogRevivedOta915` on the golem and steam lines, `dogRevivedOta938` on
+   *  HAL and html. The split was deliberate — HAL's ledger records it was
+   *  *"caught and NOT copied: a PERSISTED field"* — because renaming a key
+   *  already on disk orphans it.
+   *
+   *  So the fix is not to pick one. Declaring both converges the TYPE across
+   *  all four products while leaving every existing save readable, and any
+   *  future reader must accept either. Inert today: the dog loads as saved
+   *  since OTA-938 and nothing reads these. */
+  dogRevivedOta915?: boolean;
   dogRevivedOta938?: boolean;
   /** OTA-941 — latches the one-time owner Mud Siren rematch (refund + re-stage) so it fires once. */
   /** @deprecated OTA-948 — the rematch was reverted and its load-path wiring removed; this

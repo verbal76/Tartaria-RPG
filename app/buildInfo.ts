@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.232';
+export const DISPLAY_VERSION = '4.29.233';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -25061,7 +25061,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // real drifts the census found), and STEP 3 (the intentional differences become
 // app/config/features.ts — HAL is the `fallenSharing: 'gated'` line). Twin of
 // golem OTA-1380 / 1381 / 1382.
-export const OTA_BUILD_ID = '2026-08-20-1366-one-file-of-difference';
+// ⚠⚠ OTA-1367 — THE LINES CONVERGE. Owner: *"have steam and html match Hal and
+// golem and the rest non vignette or texture."* The census now reports 5-7 real
+// differences per pair, down from 1,053 raw paths this morning, and every one is
+// accounted for: app.json (channel/runtime/name), features.ts (the product
+// flag), splashArt.web.ts + the PC asset on the PC lines, and App.tsx's
+// `Platform.OS !== 'web'` parchment/vignette branch — the owner's named
+// exception. Everything else is comment prose.
+//
+// Closed here: the payloadBox colour (two hex digits apart, invisible, and
+// exactly how "why does the PC build look different" starts), a VendorScreen
+// import position, and three data files where only prose or ORDER differed —
+// ⚠ including concepts.json, where all 178 entries matched but `hollowed` sat at
+// index 50 on golem and LAST on HAL, so the live channel listed the codex in a
+// different order. The census had filed that as whitespace; it was not.
+//
+// ⚠ THE DOG FLAG IS NOW DECLARED UNDER BOTH NAMES ON EVERY LINE.
+// `dogRevivedOta915` (golem, steam) and `dogRevivedOta938` (HAL, html) name the
+// SAME latch, written into player saves under two keys. Renaming either orphans
+// data on disk — which is why HAL's ledger refused to copy it. Declaring both
+// converges the type without touching a single save.
+export const OTA_BUILD_ID = '2026-08-20-1367-the-lines-converge';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1366-one-file-of-difference';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1365-the-more-tray-holds';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1364-a-cleared-room-stays-cleared';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1363-the-shared-roll-behind-a-name';
