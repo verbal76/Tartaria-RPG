@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.278';
+export const DISPLAY_VERSION = '4.31.0';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24184,7 +24184,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ⚠ PROVEN, NOT ASSUMED: `npm run check:lines` renders all four configs through
 // Expo's own resolver, asserts every identity is distinct (a shared channel is
 // the worst outcome available here), and asserts an unknown line FAILS.
-export const OTA_BUILD_ID = '2026-08-20-1384-one-trunk-four-products';
+// ⚠⚠ OTA-1385 — THE FOUR OTA SEQUENCES BECOME ONE. Owner: *"ota sequences
+// become 1."*
+//
+// From here there is ONE number for all four products. golem's sequence is the
+// one that continues, because it was the highest (1384, against HAL 1367, steam
+// 1371 and html web11) — so no product's OTA number goes backwards.
+//
+// ⚠⚠ DISPLAY_VERSION JUMPS TO 4.31.0, AND THAT IS NOT A TYPO. html was on
+// 4.30.10 — AHEAD of golem's 4.29.278 — so simply continuing golem's patch
+// count would have moved html players' version BACKWARDS. It is cosmetic (the
+// Expo `version` that gates OTA compatibility is 2.4.1 and unchanged on every
+// line), but a version that appears to roll back is read as a downgrade in the
+// About screen, in every bug report and now in every crash-ledger record. The
+// unified sequence therefore starts ABOVE every line's last number. A MINOR bump
+// is what the scheme in VERSION.md calls "a significant feature wave", which the
+// collapse is, and it resets PATCH to 0.
+//
+// ⚠ THE RETIRED SEQUENCES ARE NOT DELETED. HAL's, steam's and html's ledgers
+// stay whole on their own branches and in RESTORE-POINTS.md. What ends is their
+// FUTURE numbering, not their history.
+export const OTA_BUILD_ID = '2026-08-20-1385-one-sequence';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1384-one-trunk-four-products';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1383-the-lines-converge';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1382-one-file-of-difference';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1381-the-drift-closed';
