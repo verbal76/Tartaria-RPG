@@ -2357,6 +2357,23 @@ export interface VisitedRoom {
    *  seq, so the building can't be farmed in place. Lazily stamped on the
    *  first re-entry observing a non-empty consumed set. */
   clearedAtMacroSeq?: number;
+  /** ⚠⚠ OTA-1378 — THE GEAR THIS ROOM HOLDS, DECIDED ONCE.
+   *
+   *  `pickTakeableGearForScene` draws a room's gear from a stream seeded by the
+   *  room key, then post-filters it against `recentTakeableGearNames` — a
+   *  10-deep ROLLING window whose job is stopping adjacent rooms from offering
+   *  identical loot. OTA-991 wrote the rule down: *"the window can hide a pick,
+   *  never substitute one."* Hiding is right on first sight. The defect is that
+   *  hiding was TEMPORARY and taking is PERMANENT, so a piece the window masked
+   *  on arrival was never consumed, and surfaced alone the next time the player
+   *  walked back in — the "I cleared this room and one item came back" report.
+   *
+   *  Stamping the post-window list here makes the mask permanent: what the room
+   *  offered on first sight is what the room holds, forever. Reads apply the
+   *  consumed filter on top, so a cleared room stays cleared, and the roster is
+   *  deliberately NOT wiped by the macro-visit restock — a restocked room puts
+   *  its own goods back out rather than rolling a fresh lottery. */
+  gearRoster?: string[];
   /** 2026-05-26 OTA-071 — per-room investigation table. Seeded
    *  on first scene generation from ambientNouns. Each entry
    *  has a category, curated/Qwen lore, optional yield, hook

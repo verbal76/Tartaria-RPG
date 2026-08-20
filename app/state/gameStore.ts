@@ -37230,17 +37230,72 @@ function rollTileGear(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { pickTakeableGearForScene } = require('../engine/takeableGearSpawns');
   const consumed = roomConsumedSet(get().worldMemory, roomKey);
+  // ⚠⚠ OTA-1378 — A ROOM'S GEAR IS DECIDED ONCE AND THEN IT IS A FACT.
+  //
+  // Owner: *"once i've cleared a room in an outpost and go back into it why does
+  // the take/salvage repopulate but just one item?"* Because the seeded stream
+  // was stable but the WINDOW filtered against it was not.
+  //
+  // `pickTakeableGearForScene` post-filters its seeded draw against
+  // `recentTakeableGearNames`, a 10-deep rolling ring that stops adjacent rooms
+  // offering the same loot. OTA-991 was right to post-filter — filtering INSIDE
+  // the draw consumed RNG for excluded names and made the picks a function of
+  // (seed, window), which was farmable — and it wrote the rule down: the window
+  // may hide a pick, never substitute one. What nobody noticed is that hiding
+  // is TEMPORARY and taking is PERMANENT:
+  //
+  //   room stream  [Force Wave, Cudgel, Sentinel's Gauntlets]
+  //   visit 1      Cudgel is in the window (a room four back rolled it) →
+  //                the player is shown two items and takes both
+  //   …walk on…    the ring is 10 deep and each room pushes 1–3 → Cudgel ages out
+  //   visit 2      nothing hides Cudgel and nothing consumed it → ONE item
+  //
+  // One item, always, because a room holds 1–3 pieces and the window rarely
+  // masks more than one. It reads as take AND salvage because most gear names
+  // also carry the `salvageable` tag, so the single noun shows in both rows.
+  //
+  // ⚠ THE FIX IS TO MAKE THE MASK PERMANENT, not to remove it. The window's
+  // purpose is variety on FIRST sight; re-consulting it on a revisit was never
+  // meaningful, and releasing it is the whole defect. So the post-window list is
+  // stamped on the room the first time it is rolled, and every later visit reads
+  // that roster instead of re-rolling. The consumed filter still runs on top, so
+  // a cleared room stays cleared.
+  //
+  // ⚠ THE ROSTER SURVIVES THE MACRO-VISIT RESTOCK on purpose. That restock wipes
+  // the consumed set so a room the player left and came back to has goods again;
+  // it does not wipe the roster, so the room puts ITS OWN goods back out. A
+  // re-roll there would just be the same lottery in a slower loop.
+  //
+  // ⚠ ONE-TIME COST ON EXISTING SAVES, stated rather than hidden: a save already
+  // standing in a half-cleared room has no roster, so the first entry after this
+  // OTA stamps one from the full stream and can surface the masked piece that
+  // one last time. There is no history to reconstruct it from, it is a single
+  // item, and it never happens again for that room.
+  const stamped = get().worldMemory.visitedRooms?.[roomKey]?.gearRoster;
+  if (stamped) return stamped.filter((n: string) => !isConsumedNoun(consumed, n));
   const recent = new Set((get().worldMemory.recentTakeableGearNames ?? []).map((n) => n.toLowerCase()));
-  const picks: string[] = pickTakeableGearForScene(roomKey, recent)
-    .filter((n: string) => !isConsumedNoun(consumed, n));
-  if (picks.length > 0) {
-    get().appendLog('debug', `spawn: gear=[${picks.join(', ')}] window=${recent.size}`);
-    set((s) => ({
+  const roster: string[] = pickTakeableGearForScene(roomKey, recent);
+  set((s) => {
+    // ⚠ The record may not exist yet — rollTileGear runs BEFORE beginScene's
+    // visit block. Same visitCount-0 shell the OTA-071 investigation seeder
+    // uses; the visit block owns the counting and spreads whatever it finds,
+    // and OTA-1104's `visitCount >= 1` guard means a shell never greets the
+    // player as a returning visitor.
+    const prev = s.worldMemory.visitedRooms?.[roomKey];
+    const base: VisitedRoom = prev ?? { firstVisitAt: Date.now(), lastVisitAt: Date.now(), visitCount: 0 };
+    return {
       worldMemory: {
         ...s.worldMemory,
-        recentTakeableGearNames: [...(s.worldMemory.recentTakeableGearNames ?? []), ...picks].slice(-10),
+        visitedRooms: { ...(s.worldMemory.visitedRooms ?? {}), [roomKey]: { ...base, gearRoster: roster } },
+        recentTakeableGearNames: roster.length > 0
+          ? [...(s.worldMemory.recentTakeableGearNames ?? []), ...roster].slice(-10)
+          : s.worldMemory.recentTakeableGearNames,
       },
-    }));
+    };
+  });
+  const picks: string[] = roster.filter((n: string) => !isConsumedNoun(consumed, n));
+  if (picks.length > 0) {
+    get().appendLog('debug', `spawn: gear=[${picks.join(', ')}] window=${recent.size} roster=new`);
   }
   return picks;
 }

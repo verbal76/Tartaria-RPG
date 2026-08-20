@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.271';
+export const DISPLAY_VERSION = '4.29.272';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24097,7 +24097,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // not content, so both towers stand: Grand Spire of Asgardar (14 tiers, Cuirass) and Grand
 // Spire of Etheria (15, Crown). ota1333 pins 5 climbs / 5 pieces so nobody merges them by
 // accident. New suite ota1333 (6). DISPLAY_VERSION 4.29.227.
-export const OTA_BUILD_ID = '2026-08-20-1377-the-orderly-exit-is-marked';
+// ⚠⚠ OTA-1378 — A CLEARED ROOM STAYS CLEARED. Owner: *"once i've cleared a room
+// in an outpost and go back into it why does the take/salvage repopulate but just
+// one item?"* Because a room's gear is a seeded stream post-filtered against a
+// 10-deep ROLLING window of recently-spawned names — and hiding a pick is
+// temporary while taking one is permanent. A piece the window masked on arrival
+// was never offered, never consumed, and surfaced alone on the next visit. One
+// item, because a room holds 1–3; in both TAKE and SALVAGE, because most gear
+// names also carry the salvageable tag. The room's post-window list is now
+// stamped as its roster on the first roll and read back on every later visit, so
+// the mask is permanent and the window is only ever consulted on first sight.
+export const OTA_BUILD_ID = '2026-08-20-1378-a-cleared-room-stays-cleared';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1377-the-orderly-exit-is-marked';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-19-1376-beasts-first-and-the-corner-taught';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-19-1375-one-way-into-the-atlas';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-19-1374-zoom-about-the-centre-of-the-screen';
