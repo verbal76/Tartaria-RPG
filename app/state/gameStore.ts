@@ -134,6 +134,8 @@ import {
   type SlotSummary,
 } from '../engine/saveSystem';
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
+import { MAX_LOG_IN_MEMORY } from './saveLimits';
+import { createPersistSlice } from './slices/persistSlice';
 import { setLastBootBreadcrumb } from '../diagnostics/runtimePressure'; // OTA-1276
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName, nameWasAltered } from '../engine/playerName';
@@ -7103,7 +7105,7 @@ export function generateDefaultName(raceId: string | null | undefined): string {
   return `${adj} ${raceSingular(raceId)}`;
 }
 
-interface GameStore {
+export interface GameStore {
   player: PlayerCharacter | null;
   worldMemory: WorldMemory;
   gameLog: GameLogEntry[];
@@ -8322,7 +8324,11 @@ interface GameStore {
 // limit, while still giving generous on-screen scrollback. The FULL
 // history is unaffected for diagnostics: COPY LOG reads the dedicated
 // on-disk log key (readFullLog), not this in-memory buffer.
-const MAX_LOG_IN_MEMORY = 500;
+// ⚠ OTA-1392 — MOVED to app/state/saveLimits.ts. The persist path left this
+// file for slices/persistSlice.ts and still needs this cap; keeping the value
+// here would have made the two files import each other. See saveLimits.ts for
+// what a value cycle costs (an uncapped save log, failing silently).
+// const MAX_LOG_IN_MEMORY = 500;
 
 /** OTA-1055 — total player-visible lines emitted this session, never trimmed.
  *  gameLog is capped at MAX_LOG_IN_MEMORY, so its length cannot measure "how
@@ -8360,38 +8366,17 @@ const POST_BOSS_GRACE_HOURS = 3;
 // can never be stuck nameless. Generous, because the player isn't waiting on it.
 const FUSE_NAME_TIMEOUT_MS = 120000;
 
-// OTA-397 — save-size telemetry. persist() logs the per-part byte breakdown on
-// failure, on a trim, AND every Nth persist as a heartbeat, so the slot blob's
-// size is VISIBLE in the log as it grows (instead of only surfacing once it's
-// already too big to save). Module-level so it counts across persist calls.
-const PERSIST_SIZE_SAMPLE_EVERY = 10;
-let persistSizeSampleCounter = 0;
+// ⚠ OTA-1392 — save-size telemetry state MOVED with persist() to
+// slices/persistSlice.ts. It was referenced by nothing else in this file, which
+// is exactly why persist() was the first slice taken out: mutable module state
+// cannot be assigned across a module boundary, so a slice has to carry its own.
 
-// OTA-627 — persist concurrency guard. persist() is fired `void`-style from ~120
-// call sites, and a single user action (e.g. crafting) can trip several in one
-// tick. With no serialization, those concurrent saveSlot() writes raced on the 8
-// rotating temp keys: each one's verify read back a DIFFERENT concurrent writer's
-// bytes → "readback mismatch (got N vs M)" → emergencyReclaimDiskSpace() (a heavy
-// getAllKeys + multiRemove) → retry → and the failures kept re-staging in a tight
-// loop that hammered AsyncStorage hard enough to ANR the app (player report: app
-// "dropped to desktop" after crafting Spark Strike). Serializing so only ONE write
-// runs at a time means each stage verifies its OWN bytes (no concurrent writer),
-// which removes the mismatch, the reclaim, and the storm. A burst of calls
-// coalesces to the in-flight write plus at most ONE trailing write (which captures
-// the latest state), so nothing is lost.
-let persistInFlight: Promise<boolean> | null = null;
-let persistTrailingQueued = false;
+// ⚠ OTA-1392 — the persist concurrency guard (persistInFlight /
+// persistTrailingQueued) MOVED with persist() to slices/persistSlice.ts.
 
 
-// OTA-440 — [audit #25] proactive save-size warning. trimSaveStateToFit only
-// acts at 100% of SAFE_BLOB_CHARS (and silently sheds data); the player never
-// learns their save is bloating until items start vanishing from the saved
-// copy. We surface a single in-feed heads-up the first time the pre-trim blob
-// crosses WARN fraction of the budget, with light hysteresis (re-arm once it
-// falls back under CLEAR) so a genuine later regrowth can warn again.
-const SAVE_SIZE_WARN_FRACTION = 0.70;
-const SAVE_SIZE_CLEAR_FRACTION = 0.55;
-let saveSizeWarnedThisSession = false;
+// ⚠ OTA-1392 — the proactive save-size warning state MOVED with persist() to
+// slices/persistSlice.ts.
 
 // arb-fix — which equip slot currently holds a given inventory-item id. Used
 // by the equipped-faction-catalyst fusion prompt to know which slot to free.
@@ -35257,159 +35242,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     return { ok: true };
   },
 
-  async persist() {
-    // OTA-627 — coalescing guard (see persistInFlight note above). If a write is
-    // already running, request ONE trailing write (to capture any state that
-    // changes before it finishes) and return the in-flight promise instead of
-    // starting a racing saveSlot() on the shared rotating temp keys.
-    if (persistInFlight) {
-      persistTrailingQueued = true;
-      return persistInFlight;
-    }
-    const runPersistOnce = async (): Promise<boolean> => {
-    const { player, worldMemory, gameLog, currentScreen, currentScene, activeSlotId, wastelandStepsSinceEncounter } = get();
-    if (!activeSlotId) return false; // No active slot — nothing to write to.
-    // CRITICAL: refuse to overwrite a save with player=null. This guards
-    // against transient states (mid-load, mid-death-cleanup, mid-OTA-
-    // reload) where activeSlotId is still set but player has been
-    // cleared. Writing player=null silently here was a major source of
-    // "save file is missing the character record" errors across updates.
-    if (!player) return false;
-    // OTA-368 — structural integrity guard. Beyond player=null, refuse to
-    // overwrite a slot when the in-memory player is missing its core
-    // identity (name / raceId / stats) — a sign of a half-constructed or
-    // corrupt record (mid-migration, a backfill that produced a stub,
-    // etc.). Writing such a record would blow out a good save on disk;
-    // skipping leaves the last-good save intact. A real character always
-    // has all three.
-    if (!player.name || !player.raceId || !player.stats) {
-      get().appendLog(
-        'debug',
-        `persist: skipped — player record missing core identity (name=${player.name ? '✓' : '∅'}, raceId=${player.raceId ? '✓' : '∅'}, stats=${player.stats ? '✓' : '∅'}); slot ${activeSlotId} left intact`,
-      );
-      return false;
-    }
-    // 2026-05-25 OTA-046 — stamp the player's lastSessionEndedAt at
-    // every persist so a slot-load round trip can compute "real-time
-    // since last play" for the while-you-were-away beat. persist
-    // fires on every meaningful action, so this approximates session-
-    // end well enough for the 6-hour bucket the load path tests for.
-    // Update in-memory too so other code paths reading the field see
-    // the fresh value without waiting for a reload.
-    const stampNow = Date.now();
-    const playerForSave: PlayerCharacter = { ...player, lastSessionEndedAt: stampNow };
-    set((s) => (s.player ? { player: { ...s.player, lastSessionEndedAt: stampNow } } : s));
-    // OTA-395/396 — slot-blob size guard. AsyncStorage reads a value back
-    // through a SQLite cursor window; a blob over it returns truncated, the
-    // staged save fails to verify, and progress silently stops saving.
-    // trimSaveStateToFit sheds the cheapest-to-lose data (regenerable lore
-    // tables → oldest rooms → old memos → the saved scene) ONLY when over budget,
-    // so a normal-size save is unchanged. In-memory state is untouched.
-    const builtState = {
-      version: 1 as const,
-      savedAt: stampNow,
-      player: playerForSave,
-      worldMemory,
-      gameLog: gameLog.slice(-MAX_LOG_IN_MEMORY),
-      currentScreen,
-      // Snapshot the live scene so resume picks up exactly where the player left
-      // off. Skipped only when currentScene is null (title / mid-load), and shed
-      // by the trim's last resort when the blob is otherwise too big.
-      currentScene: currentScene ?? undefined,
-      // 2026-05-25 — persist the wasteland encounter step counter so a save-load
-      // round trip can't reset it (cheese).
-      wastelandStepsSinceEncounter,
-    };
-    // OTA-413 — PROACTIVELY drop regenerable per-room lore tables from every room
-    // except the one the player is standing in, on EVERY save. visitedRooms's
-    // roomInvestigationTable is the dominant grower (a playtest hit rooms=156 KB);
-    // it re-seeds on demand and isn't anti-farm state, so pruning it keeps the
-    // blob small instead of letting it creep toward the 800K trim / the save
-    // self-heal. The current room's table is kept so an immediate resume reads the
-    // same text. In-memory state is untouched (this only shapes the saved copy).
-    const currentRoomKey = currentScene
-      ? makeRoomKey(playerForSave.currentLocationId, currentScene.microMicroId, playerForSave.mapX, playerForSave.mapY, playerForSave.hubRoomId)
-      : null;
-    const pruned = pruneRegenerableRoomTables(builtState, currentRoomKey);
-    const trim = trimSaveStateToFit(pruned.state);
-    if (trim.trimmed) {
-      get().appendLog(
-        'debug',
-        `persist: trimmed to fit (${trim.charsBefore}→${trim.charsAfter} chars; -${trim.tablesStripped} room tables, -${trim.roomsDropped} rooms${trim.memosCapped ? ', capped memos' : ''}${trim.sceneDropped ? ', dropped scene' : ''})`,
-      );
-    }
-    // OTA-440 — [audit #25] proactive save-size heads-up. Warn once when the
-    // pre-trim blob crosses 70% of the budget, BEFORE the silent trim begins
-    // shedding rooms/scene at 100%. Re-arm if it falls back under 55%.
-    {
-      const pct = trim.charsBefore / SAFE_BLOB_CHARS;
-      if (pct >= SAVE_SIZE_WARN_FRACTION && !saveSizeWarnedThisSession) {
-        saveSizeWarnedThisSession = true;
-        get().appendLog(
-          'system',
-          `⚠ This character's save is getting large (${Math.round(pct * 100)}% of the safe size). The game auto-trims regenerable lore + old rooms to keep saving reliably, but consider scrapping or selling junk you don't need to keep your pack lean.`,
-        );
-      } else if (pct < SAVE_SIZE_CLEAR_FRACTION) {
-        saveSizeWarnedThisSession = false;
-      }
-    }
-    await saveSlot(activeSlotId, trim.state);
-    // OTA-354 — persist health on-device, FAILURE-ONLY. saveSlot is atomic and
-    // never throws; it records getLastSaveWriteError() on a failed write.
-    const saveErr = getLastSaveWriteError();
-    if (saveErr) {
-      get().appendLog('debug', `persist: slot ${activeSlotId} FAILED — ${saveErr}`);
-    }
-    // OTA-406 — if saveSlot had to emergency-purge the on-disk copy-log to land
-    // the save (a DB the pre-398 unbounded log had stuffed full), record that the
-    // self-heal fired. OTA-415 — this goes on the DEBUG channel (diagnostic log
-    // only), NOT a player-facing line: "storage was full / diagnostic log" is
-    // dev-speak that shouldn't surface in the world feed. The save was rescued
-    // silently; the log still captures that it happened for triage.
-    if (consumeSaveReclaimedFlag()) {
-      get().appendLog(
-        'debug',
-        'persist: emergency-purged the on-disk copy-log to free storage; save landed on retry (self-heal).',
-      );
-    }
-    // OTA-396/397 — per-part byte breakdown so we never guess what's oversized.
-    // Logged on a FAILED write, on a trim, AND as a periodic heartbeat so the
-    // blob size is visible as it climbs toward the limit, not just at the cliff.
-    persistSizeSampleCounter += 1;
-    if (saveErr || trim.trimmed || persistSizeSampleCounter % PERSIST_SIZE_SAMPLE_EVERY === 0) {
-      // OTA-413 — report the ACTUALLY-SAVED (pruned + trimmed) blob, not the raw
-      // in-memory builtState, so the heartbeat reflects what landed on disk.
-      const rpBreakdown = saveSizeBreakdown(trim.state);
-      // OTA-1172 — bank the size so a memory-warning line can name it without rebuilding
-      // the blob; allocating to measure while the OS asks for memory back is exactly the
-      // wrong move.
-      const rpKb = /total=(\d+)/.exec(rpBreakdown);
-      if (rpKb) noteSaveKb(parseInt(rpKb[1]!, 10));
-      get().appendLog('debug', rpBreakdown);
-    }
-    return !saveErr;
-    };
-    // Run serialized: one write at a time. Drain trailing requests that piled up
-    // during the write, but collapse them — at most one extra write per quiescent
-    // gap. The cap is a safety valve against a pathological infinite caller: after
-    // it, release the lock and let the next call restart rather than livelock the
-    // promise forever.
-    persistInFlight = (async () => {
-      let result = await runPersistOnce();
-      let drained = 0;
-      while (persistTrailingQueued && drained < 64) {
-        persistTrailingQueued = false;
-        drained += 1;
-        result = await runPersistOnce();
-      }
-      return result;
-    })();
-    try {
-      return await persistInFlight;
-    } finally {
-      persistInFlight = null;
-    }
-  },
+  // ⚠⚠ OTA-1392 — SLICE 1. `persist()` and its module state now live in
+  // `slices/persistSlice.ts`. Spread last so the key lands on the same store
+  // object with the same name and the same type — `useGameStore` is unchanged,
+  // and all 473 files importing it are untouched by this move.
+  //
+  // ⚠ `makeRoomKey` is handed in rather than imported by the slice: it is
+  // defined in THIS file, and importing it there as a value would make the two
+  // modules import each other. Passing it keeps the dependency one-way.
+  ...createPersistSlice(set, get, { makeRoomKey, noteSaveKb }),
 }));
 
 // Human-readable label for the combat range bands. OTA-550 — sourced from

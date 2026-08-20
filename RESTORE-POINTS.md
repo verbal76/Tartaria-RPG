@@ -14,7 +14,18 @@ here. These are the backstop for when that is not enough.
 
 | name | commit | what it is |
 |---|---|---|
-| **pre-segmentation** | `453467f7` | The trunk immediately before `gameStore.ts` is split up. 45,050 lines, one file. 880 suites / 8119 tests green. One codebase already produces all four products. |
+| **pre-segmentation** | `08e3b502` | The trunk immediately before `gameStore.ts` is split up. 45,050 lines, one file, 76 exports, imported by 473 files. 886 suites / 8,259 tests green. One codebase produces all four products, and all six build targets have been run from it. |
+
+⚠⚠ **THIS POINTER MOVED, AND THAT IS THE POINT.** It first named `453467f7` —
+the trunk before segmentation was *expected* to start. Seven OTAs landed before it
+actually did (1385–1391: the OTA sequences unified, then the build pipeline
+repaired one target at a time). Going back to `453467f7` today would land you on a
+trunk that **cannot build Windows, Linux, macOS or the web**, and whose live OTA
+channel has no publisher at all. That is a worse place to stand than most of the
+bugs you would be escaping.
+
+⚠ A restore point is only worth having if it names the last known-good state, so
+**re-point it when a phase ends**, not once at the beginning and never again.
 
 If a segmentation slice goes wrong: **revert that slice first.** Each one is its
 own gated commit, so stepping back one commit is nearly always enough.

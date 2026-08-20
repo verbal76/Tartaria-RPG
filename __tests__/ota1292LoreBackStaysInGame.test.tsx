@@ -143,12 +143,20 @@ describe("OTA-1292 — lore's BACK stays in the game", () => {
   });
 
   it('⚠⚠ the two guards that make navigation wipes impossible stay pinned', () => {
-    const store = src('app', 'state', 'gameStore.ts');
+    // ⚠ OTA-1392 — THE FIRST GUARD MOVED FILES, AND THIS ASSERTION MOVED WITH IT.
+    // `persist()` left gameStore.ts for `app/state/slices/persistSlice.ts` when
+    // the store split began. The guard is character-for-character the same; only
+    // its address changed. Re-pointing this rather than relaxing it is the whole
+    // point — a source pin that gets loosened after a refactor stops pinning
+    // anything, and this one guards against overwriting a real save with a stub.
+    const persistSrc = src('app', 'state', 'slices', 'persistSlice.ts');
     // persist() refuses a null player and a stub player outright.
-    expect(store).toContain('if (!player) return false;');
-    expect(store).toContain('if (!player.name || !player.raceId || !player.stats) {');
+    expect(persistSrc).toContain('if (!player) return false;');
+    expect(persistSrc).toContain('if (!player.name || !player.raceId || !player.stats) {');
     // ...and a failed load rolls the active slot back BEFORE anything can
-    // persist over it.
+    // persist over it. This half is still in gameStore — loadSlotIntoGame has
+    // not been sliced out.
+    const store = src('app', 'state', 'gameStore.ts');
     expect(store).toContain('try { await setActiveSlot(null); } catch { /* ignore */ }');
   });
 });
