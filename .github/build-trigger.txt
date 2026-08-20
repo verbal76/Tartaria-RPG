@@ -1,0 +1,47 @@
+TRIGGER TOUCH FILE — OTA-1390
+=============================
+
+Editing this file (add a line, save, commit) is how you fire the workflows whose
+push trigger is path-filtered. It exists so nobody has to edit a workflow's own
+comment block to make it run — which is what was actually being done for months;
+build-apk.yml's header is a stack of "trigger-touch" notes that are edits to a
+comment and nothing else.
+
+WHY IT IS NEEDED
+----------------
+build-apk.yml and build-ios.yml ignore app/**, assets/**, scripts/**,
+__tests__/** and **.md. That is right — a JS-only change ships over the air and
+must not spend 30-60 minutes of runner time. But it also means an OTA-stamp
+commit (which only touches app/buildInfo.ts and VERSION.md) fires NOTHING, so a
+commit-title marker like [build-aab] alone does nothing at all: the workflow
+never starts, so it never reads the marker.
+
+.github/** is NOT path-ignored. Touching this file starts those workflows; the
+commit-title marker then decides what they actually build.
+
+HOW TO USE IT
+-------------
+  1. Add a dated line at the bottom saying what you are firing and why.
+  2. Put the marker in the FIRST LINE of the commit title.
+  3. Commit both together.
+
+MARKERS (see docs/WORKFLOWS.md for the full table)
+--------------------------------------------------
+  [build-aab]        production AAB for the Play Console      (needs this touch)
+  [build-ios]        TestFlight-ready IPA via EAS             (needs this touch)
+  [submit-ios]       ...and auto-submit it to TestFlight      (with [build-ios])
+  [build-ios-native] IPA on a GitHub macOS runner             (no touch needed)
+  [build-exe]        portable Windows .exe                    (no touch needed)
+  [build-linux]      Linux / Steam Deck AppImage              (no touch needed)
+  [build-dmg]        unsigned macOS .dmg                      (no touch needed)
+  [build-desktop]    all three desktop targets at once        (no touch needed)
+  [ota-hal]          publish the OTA to the LIVE HAL channels (no touch needed)
+  [ota-ios-only]     / [ota-android-only] — narrow an OTA to one platform
+
+⚠ A marker is not a formality. [build-aab] produces a Play-Store-bound bundle and
+[ota-hal] reaches people who are actually playing. Do not put one in a commit
+unless that build is genuinely intended.
+
+LOG
+---
+2026-08-20  OTA-1390  first trial build of all six targets from the one trunk.

@@ -52,6 +52,11 @@ on:
       - '**/*.web.ts'
       - '**/*.web.tsx'
       - '.github/workflows/build-web.yml'
+      # ⚠ OTA-1390 — the shared trigger-touch file. Editing it fires this
+      # workflow (and the two mobile ones) on demand, so a build can be asked
+      # for without editing a workflow's comment block to make it run, which is
+      # what was actually being done. See .github/build-trigger.txt.
+      - '.github/build-trigger.txt'
 
 permissions:
   contents: read

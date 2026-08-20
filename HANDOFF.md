@@ -798,6 +798,23 @@ and the desktop/web lines build via their own workflows on push. **Do not put
 `[build-aab]` / `[golem-apk]` / native markers in a commit unless a native build
 is actually intended.**
 
+⚠⚠ **`docs/WORKFLOWS.md` is the full audit — read it before starting any build.**
+Written 2026-08-20 (OTA-1390) after the branch collapse: every workflow, what
+triggers it, what it produces, which secrets it needs. Two things in it are worth
+knowing before touching anything.
+
+* **A marker alone does not always start a workflow.** `build-apk.yml` and
+  `build-ios.yml` path-ignore `app/**` and `**.md`, so an OTA-stamp commit starts
+  nothing at all and the marker is never read. Edit `.github/build-trigger.txt` in
+  the same commit — `.github/**` is not ignored, so that starts them, and the
+  marker then decides what they build. Established by running it: a first attempt
+  at a trial build produced no runs at all.
+* **Builds do not need the Actions UI.** Markers exist so a session without
+  dispatch access can still ship; `build-apk.yml`'s own header says as much. A 403
+  from the workflow-dispatch API means the wrong door, not a closed one.
+  (Recorded 2026-08-20, after I reported that 403 to the owner as a blocker and
+  was corrected — the docs already said otherwise.)
+
 ## 6. Commit & PR conventions
 
 - End every commit body with the two trailers:

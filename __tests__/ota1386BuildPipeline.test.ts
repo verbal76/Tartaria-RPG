@@ -212,14 +212,22 @@ describe('OTA-1386 — every build prints the identity it actually resolved', ()
 describe('OTA-1386 — the OTA firewall survives the collapse', () => {
   const ota = wf('eas-update-golem.yml');
 
-  it('⚠⚠ an AUTOMATIC (push) run can only ever reach golem', () => {
+  it('⚠⚠ an UNASKED run can only ever reach golem', () => {
     // The original guarantee was structural: the file knew one string, so no path
     // in it could reach a live channel. One trunk means one workflow must serve
     // four products, so the string had to go. The guarantee is kept by splitting
-    // the triggers instead — a push is unattended and locked to the dev phone; a
-    // dispatch is a person choosing a line.
-    expect(ota).toContain("if [ \"${{ github.event_name }}\" != \"workflow_dispatch\" ] && [ \"$TARTARIA_LINE\" != \"golem\" ]; then");
-    expect(ota).toContain('an automatic (push) run may only target golem');
+    // the triggers instead — an unattended push is locked to the dev phone; a
+    // dispatch, or a typed marker, is a person choosing a line.
+    //
+    // ⚠ OTA-1390 WIDENED "asked" from dispatch-only to dispatch-or-marker, so
+    // this assertion moved with it. The property is unchanged and is the one
+    // that matters: NOTHING UNATTENDED REACHES A PLAYER. What changed is that a
+    // deliberate act no longer has to be a button press — the repo's whole
+    // native-build convention is commit-title markers, for sessions that cannot
+    // reach the Actions UI.
+    expect(ota).toContain('an unselected (automatic) run may only target golem');
+    expect(ota).toContain('[ "${{ steps.line.outputs.how }}" = "default (automatic push)" ]');
+    expect(ota).toContain("grep -q '\\[ota-hal\\]'");
   });
 
   it('⚠⚠ the channel comes from the RESOLVED config, not from app.json', () => {
@@ -237,9 +245,22 @@ describe('OTA-1386 — the OTA firewall survives the collapse', () => {
     expect(ota).toContain('if [ "$RESOLVED_LINE" != "$TARTARIA_LINE" ]; then');
   });
 
-  it('⚠ shared/legacy channels stay refused', () => {
-    expect(ota).toContain('preview|ios-preview|production|development|arbiters-line)');
-    expect(ota).toContain('Refusing to publish to shared channel');
+  it('⚠⚠ the blanket refusal of `preview` is GONE, and that is deliberate', () => {
+    // This asserted a `case` refusing preview / ios-preview / production /
+    // development / arbiters-line outright. OTA-1390 removed it, because it was
+    // wrong about `preview`: HAL's production iOS build is stamped channel
+    // "preview" by eas.json, so `preview`/ios is HAL's ONLY iOS route. The old
+    // guard would have refused the one publish iOS testers depend on.
+    //
+    // ⚠ What replaces a blanket refusal is a closed set. A line publishes to the
+    // targets its own table entry names and to nothing else, so there is no path
+    // for an arbitrary channel string to be reached at all — which is a stronger
+    // guarantee than a denylist that had to be kept in step with reality.
+    expect(ota).not.toContain('Refusing to publish to shared channel');
+    expect(ota).toContain('TARGETS="hal2001:android:false hal2001:ios:true preview:ios:true"');
+    expect(ota).toContain('TARGETS="golem-line:android:false"');
+    // and an unknown line reaches no channel at all
+    expect(ota).toContain("echo \"::error::Line '$TARTARIA_LINE' has no channel set.\"");
   });
 });
 

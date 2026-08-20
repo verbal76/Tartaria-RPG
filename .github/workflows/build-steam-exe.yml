@@ -13,12 +13,29 @@ name: Build · Windows (.exe)
 # What it does: exports the game to a web bundle (react-native-web), hardens it,
 # wraps it in Electron, and packages a single portable Windows .exe.
 #
-# ⚠ DISPATCH ONLY on the trunk. The old version fired on every push to
-# steam_Dev; Windows runners bill Actions minutes at 2x, and the trunk takes
-# every commit for all four products now, so an automatic build here would be a
-# standing tax. Ask for it when you want it.
+# ⚠⚠ OPT-IN, TWO WAYS — OTA-1390 corrected this.
+#
+# The old version fired on every push to steam_Dev. Windows runners bill Actions
+# minutes at 2x and the trunk takes every commit for all four products, so an
+# automatic build here would be a standing tax — OTA-1387 made it dispatch-only
+# for that reason, and thereby made it unbuildable by anything that cannot reach
+# the Actions UI. This repo's whole native-build convention is commit-title
+# markers precisely because of that (HANDOFF.md §5), and build-engine-exe.yml has
+# used this exact opt-in shape for months.
+#
+# So: a normal push builds NOTHING. The .exe builds only when asked, two ways:
+#   • the "Run workflow" button (workflow_dispatch), or
+#   • a push whose head commit message contains [build-exe] (or [build-desktop],
+#     which fires all three desktop targets).
+# The job-level `if` below is the gate.
 
 on:
+  push:
+    branches:
+      - golem-line
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
   workflow_dispatch:
     inputs:
       line:
@@ -47,6 +64,11 @@ jobs:
     name: Portable Windows .exe
     runs-on: windows-latest
     timeout-minutes: 45
+    # Opt-in gate — see the header. An untagged push skips cleanly.
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || contains(github.event.head_commit.message, '[build-exe]')
+      || contains(github.event.head_commit.message, '[build-desktop]')
     env:
       TARTARIA_LINE: ${{ github.event.inputs.line || 'steam' }}
     steps:

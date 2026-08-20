@@ -1,32 +1,50 @@
 name: Publish · OTA (one line at a time)
 
 # ⚠ The file is still named eas-update-golem.yml so its run history survives.
-# It is no longer golem-only — see OTA-1386 below.
+# It has not been golem-only since OTA-1386.
 #
-# Publishes the trunk's JS bundle as an OTA to ONE product line's EAS channel.
+# Publishes the trunk's JS bundle as an OTA to ONE product line's channel set.
 #
-# ⚠⚠ THE FIREWALL, AND HOW IT SURVIVED THE COLLAPSE — OTA-1386.
+# ⚠⚠ OTA-1390 — THIS FILE ABSORBED eas-update.yml, THE LIVE PUBLISHER.
 #
-# The original guarantee was structural: this file knew ONE string, "golem-line",
-# so no code path in it could reach a live playtester channel. Under four
-# branches that was enough, because each branch had its own everything.
+# Until now the trunk could publish golem, on Android, and nothing else. HAL's
+# real OTA path lived in `eas-update.yml` on the HaL2001 branch and never came
+# across, because that file chooses what to publish with `case "$BRANCH"` — on
+# the trunk it would have fallen through to "branch not mapped, skipping". So
+# the collapse left the LIVE CHANNEL with no way to receive an update, and the
+# only symptom would have been testers quietly never getting one.
 #
-# One trunk means one workflow has to be able to publish four products, so the
-# single hardcoded string had to go. The guarantee is kept by SPLITTING THE
-# TRIGGERS instead:
+# Two things it knew that a naive port would have lost:
 #
-#   • A PUSH is automatic, unattended, and can only ever publish golem-line —
-#     the developer's own test phone. That is asserted below, and a push that
-#     somehow named another channel is a hard failure, not a warning.
-#   • A DISPATCH is a person choosing a line in the Actions UI. That one may
-#     publish to hal / steam / html, because somebody decided to.
+#   ⚠⚠ 1. HAL'S iOS BUILD DOES NOT LISTEN ON hal2001. The production iOS build
+#         is stamped channel "preview" by eas.json's production profile, which
+#         OVERRIDES the `expo-channel-name` in the app config. Publishing to
+#         hal2001/ios alone reaches nobody on iOS — the Expo server correctly
+#         answers "no update available" and nothing looks wrong. OTA-303 found
+#         this the hard way ("Last OTA applied: No" on the iPad). So HAL's set
+#         includes preview/ios, and it is written out rather than derived,
+#         because deriving it from the config would silently drop it again.
 #
-# So the property that mattered is intact: nothing that happens on its own can
-# reach a real player. Only a deliberate button press can.
+#      2. iOS publishes are BEST-EFFORT. An iOS-side publish failure must warn,
+#         not fail, or it takes the Android publish — the workhorse — down with
+#         it.
+#
+# ⚠⚠ THE FIREWALL, AND HOW IT SURVIVES.
+#
+# The original guarantee was structural: the file knew ONE string, "golem-line",
+# so no path in it could reach a live playtester. One trunk means one workflow
+# serves four products, so the string had to go. The guarantee moved to the
+# TRIGGER, and the rule is: NOTHING UNATTENDED REACHES A PLAYER.
+#
+#   • An ordinary push publishes golem — the developer's own test phone — and
+#     nothing else. Asserted below; a push that named another line is a hard
+#     failure, not a warning.
+#   • Reaching HAL takes a deliberate act: a dispatch from the Actions UI, or
+#     the marker `[ota-hal]` typed into a commit title. Both are somebody
+#     deciding. Neither can happen by accident.
 #
 # Trigger: a JS-bundle (app/**) push to the trunk. Native / build-config changes
-# are path-ignored here because they need a fresh binary (build-apk.yml via
-# workflow_dispatch), not an OTA.
+# are path-ignored here because they need a fresh binary, not an OTA.
 
 on:
   push:
@@ -47,10 +65,12 @@ on:
       - 'scripts/**'
       - 'android/**'
       - 'ios/**'
+      - 'desktop/**'
+      - 'web-stubs/**'
   workflow_dispatch:
     inputs:
       line:
-        description: 'Product line to publish to (golem = dev phone; hal/steam/html reach real installs)'
+        description: 'Product line to publish to (golem = dev phone; hal reaches live testers)'
         required: false
         default: 'golem'
         type: choice
@@ -65,18 +85,42 @@ permissions:
 
 jobs:
   ota:
-    name: Publish OTA to one line's channel
+    name: Publish OTA to one line's channel set
     runs-on: ubuntu-latest
     # Belt-and-suspenders — this job only ever runs from the trunk. If anything
     # ever re-points it, it no-ops instead of leaking.
     if: github.ref == 'refs/heads/golem-line'
-    env:
-      # ⚠ A PUSH has no input and falls to golem. That is the whole automatic
-      # path, and it is why an unattended run can never reach a player.
-      TARTARIA_LINE: ${{ github.event.inputs.line || 'golem' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # ⚠ The line is resolved in its own step because a push can now select one
+      # too, via a commit marker. Keeping the resolution visible and separate is
+      # what lets the firewall assertion below be a simple comparison.
+      - name: Resolve which product line this run publishes
+        id: line
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          set -euo pipefail
+          DISPATCHED="${{ github.event.inputs.line }}"
+          if [ -n "$DISPATCHED" ]; then
+            LINE="$DISPATCHED"
+            HOW="dispatch"
+          elif echo "${COMMIT_MSG:-}" | grep -q '\[ota-hal\]'; then
+            # ⚠ A typed marker is a deliberate act, the same as pressing the
+            # button. It exists because the Actions UI is not always reachable —
+            # the repo's whole native-build convention is commit-title markers
+            # (see HANDOFF.md §5) for exactly that reason.
+            LINE="hal"
+            HOW="commit marker [ota-hal]"
+          else
+            LINE="golem"
+            HOW="default (automatic push)"
+          fi
+          echo "line=$LINE" >> "$GITHUB_OUTPUT"
+          echo "how=$HOW" >> "$GITHUB_OUTPUT"
+          echo "Publishing line '$LINE' — selected by $HOW"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -87,27 +131,23 @@ jobs:
       - name: Setup Expo and EAS CLI
         uses: expo/expo-github-action@v8
         with:
+          # Pinned. 16.6.1 was too old for the current Expo backend (auth passed,
+          # publish failed with stale-API errors); 19.0.8 was broken outright
+          # (run #404). 18.1.x is the last known-good series. Bump deliberately,
+          # after confirming the new version still auth-validates.
           eas-version: 18.1.0
           token: ${{ secrets.TARTARIATWO }}
 
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Publish OTA to the selected line's channel
+      - name: Publish OTA to the selected line's channel set
         env:
           EXPO_TOKEN: ${{ secrets.TARTARIATWO }}
+          TARTARIA_LINE: ${{ steps.line.outputs.line }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
           set -euo pipefail
-
-          # ⚠⚠ THE CHANNEL COMES FROM THE RESOLVED CONFIG, NOT FROM A FILE.
-          # The old version read app.json directly. Since OTA-1384 app.json is
-          # only the shared BASE — it still says "golem-line" for every line —
-          # so reading it would have "verified" golem-line and then published a
-          # bundle built as hal. Ask Expo what this build actually is.
-          CFG=$(npx expo config --type public --json)
-          CHANNEL=$(node -e "const c=JSON.parse(process.argv[1]);process.stdout.write((c.updates&&c.updates.requestHeaders&&c.updates.requestHeaders['expo-channel-name'])||'')" "$CFG")
-          APP_VERSION=$(node -e "const c=JSON.parse(process.argv[1]);process.stdout.write(c.version||'')" "$CFG")
-          RESOLVED_LINE=$(node -e "const c=JSON.parse(process.argv[1]);process.stdout.write((c.extra&&c.extra.tartariaLine)||'')" "$CFG")
 
           # ── HARD FENCE ────────────────────────────────────────────────
           # 1. Only ever from the trunk.
@@ -115,70 +155,139 @@ jobs:
             echo "::error::Refusing to publish — branch '${GITHUB_REF_NAME}' is not the trunk."
             exit 1
           fi
-          # 2. ⚠⚠ AN AUTOMATIC RUN MAY ONLY REACH THE DEV PHONE. This is the
-          #    firewall that used to be "this file knows one string". A push
-          #    happens with nobody watching; a dispatch is somebody choosing.
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ "$TARTARIA_LINE" != "golem" ]; then
-            echo "::error::Refusing to publish — an automatic (push) run may only target golem, got '$TARTARIA_LINE'."
+          # 2. ⚠⚠ NOTHING UNATTENDED REACHES A PLAYER. An ordinary push — no
+          #    dispatch, no marker — may only publish golem. This is the whole
+          #    firewall now that the file knows more than one channel name.
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] \
+             && [ "${{ steps.line.outputs.how }}" = "default (automatic push)" ] \
+             && [ "$TARTARIA_LINE" != "golem" ]; then
+            echo "::error::Refusing to publish — an unselected (automatic) run may only target golem, got '$TARTARIA_LINE'."
             exit 1
           fi
-          # 3. The config must agree with what we asked for. A mismatch means the
-          #    env var did not reach Expo, and the bundle is not the product named
-          #    in this run's title.
+          # ──────────────────────────────────────────────────────────────
+
+          # ⚠ The identity comes from the RESOLVED config, not from app.json.
+          # Since OTA-1384 app.json is only the shared BASE — it still says
+          # "golem-line" for every line — so reading it would have "verified"
+          # golem while publishing a bundle built as hal.
+          CFG=$(npx expo config --type public --json)
+          APP_VERSION=$(node -e "const c=JSON.parse(process.argv[1]);process.stdout.write(c.version||'')" "$CFG")
+          RESOLVED_LINE=$(node -e "const c=JSON.parse(process.argv[1]);process.stdout.write((c.extra&&c.extra.tartariaLine)||'')" "$CFG")
+          CFG_CHANNEL=$(node -e "const c=JSON.parse(process.argv[1]);process.stdout.write((c.updates&&c.updates.requestHeaders&&c.updates.requestHeaders['expo-channel-name'])||'')" "$CFG")
+
           if [ "$RESOLVED_LINE" != "$TARTARIA_LINE" ]; then
             echo "::error::Config resolved to line '$RESOLVED_LINE' but this run selected '$TARTARIA_LINE'. Aborting."
             exit 1
           fi
-          if [ -z "$CHANNEL" ]; then
-            echo "::error::No expo-channel-name resolved — the built bundle would reach nobody."
-            exit 1
-          fi
-          # 4. Never a channel no product listens on. These are the legacy /
-          #    shared names; publishing to one is a bundle sent into the dark or,
-          #    worse, onto a track nobody chose.
-          case "$CHANNEL" in
-            preview|ios-preview|production|development|arbiters-line)
-              echo "::error::Refusing to publish to shared channel '$CHANNEL' — no single product owns it."
+
+          # ⚠⚠ THE CHANNEL SET, WRITTEN OUT PER LINE. Each entry is
+          # "channel:platform:optional". This is a TABLE and not a derivation on
+          # purpose: HAL's iOS route (preview/ios) does NOT follow from the app
+          # config, and any clever derivation drops it — which is the exact bug
+          # OTA-303 spent a session chasing.
+          case "$TARTARIA_LINE" in
+            golem)
+              # The dev phone. Android only — no golem iOS build exists.
+              TARGETS="golem-line:android:false"
+              ;;
+            hal)
+              # ⚠⚠ preview:ios IS NOT A TYPO. The production iOS build is
+              # stamped channel "preview" by eas.json, not hal2001, so an
+              # hal2001-only publish reaches nobody on iOS and looks fine.
+              TARGETS="hal2001:android:false hal2001:ios:true preview:ios:true"
+              ;;
+            steam|html)
+              # ⚠ These products do not consume EAS updates at all. steam ships
+              # as a new .exe / AppImage / .dmg and html as a new web deploy —
+              # publishing to steam-dev / html-dev would put a bundle somewhere
+              # nothing is listening, which reads in the dashboard exactly like a
+              # successful release.
+              echo "::notice::Line '$TARTARIA_LINE' does not consume EAS updates — it ships as a new build (build-steam-exe / build-linux / build-mac / build-web). Nothing to publish."
+              exit 0
+              ;;
+            *)
+              echo "::error::Line '$TARTARIA_LINE' has no channel set."
               exit 1 ;;
           esac
-          # ──────────────────────────────────────────────────────────────
+
+          # Platform markers — publish one platform only when a fix is
+          # platform-specific. Both markers at once is a contradiction, so it
+          # means neither.
+          IOS_ONLY=false; ANDROID_ONLY=false
+          echo "${COMMIT_MSG:-}" | grep -q '\[ota-ios-only\]'     && IOS_ONLY=true
+          echo "${COMMIT_MSG:-}" | grep -q '\[ota-android-only\]' && ANDROID_ONLY=true
+          if [ "$IOS_ONLY" = "true" ] && [ "$ANDROID_ONLY" = "true" ]; then
+            echo "::warning::Both [ota-ios-only] and [ota-android-only] present — ignoring both."
+            IOS_ONLY=false; ANDROID_ONLY=false
+          fi
 
           MSG="OTA ${TARTARIA_LINE} — ${GITHUB_REF_NAME}@${GITHUB_SHA::7} (run #${{ github.run_number }})"
 
           echo "=== OTA — pre-flight ==="
-          echo "Trigger:          ${{ github.event_name }}"
+          echo "Trigger:          ${{ github.event_name }} (${{ steps.line.outputs.how }})"
           echo "Line:             $TARTARIA_LINE"
-          echo "Channel:          $CHANNEL"
+          echo "Config channel:   $CFG_CHANNEL"
+          echo "Targets:          $TARGETS"
+          echo "Platform markers: ios_only=$IOS_ONLY android_only=$ANDROID_ONLY"
           echo "App version (rt): $APP_VERSION"
           echo "========================"
 
-          set +e
-          eas update \
-            --branch "$CHANNEL" \
-            --message "$MSG" \
-            --platform android \
-            --non-interactive \
-            --json > result.json
-          rc=$?
-          set -e
-          if [ $rc -ne 0 ]; then
-            echo "::error::Publish to '$CHANNEL' failed (exit $rc)."
-            cat result.json 2>/dev/null || true
-            exit $rc
-          fi
+          publish_one() {
+            local channel="$1" platform="$2" optional="$3"
+            local out="result-${channel}-${platform}.json"
+            echo ""
+            echo "--- $channel ($platform)${optional:+ [best-effort]} ---"
 
-          # Map the channel to its same-named branch (idempotent) so the installed
-          # build's 'expo-channel-name' header resolves here.
-          eas channel:view "$CHANNEL" --non-interactive >/dev/null 2>&1 \
-            || eas channel:create "$CHANNEL" --non-interactive 2>&1 || true
-          eas channel:edit "$CHANNEL" --branch "$CHANNEL" --non-interactive 2>&1 \
-            || echo "::warning::channel:edit failed for '$CHANNEL' — check the EAS dashboard mapping."
+            set +e
+            eas update --branch "$channel" --message "$MSG" --platform "$platform" \
+              --non-interactive --json > "$out"
+            local rc=$?
+            set -e
+            if [ $rc -ne 0 ]; then
+              cat "$out" 2>/dev/null || true
+              if [ "$optional" = "true" ]; then
+                echo "::warning::Optional publish to '$channel' ($platform) failed (exit $rc) — continuing."
+                return 0
+              fi
+              echo "::error::Publish to '$channel' ($platform) failed (exit $rc)."
+              return $rc
+            fi
 
-          # Runtime guard — an installed build requests runtimeVersion = app
-          # version; a mismatch silently no-ops.
-          PUB_RT=$(node -e "const r=JSON.parse(require('fs').readFileSync('result.json','utf8'));const a=Array.isArray(r)?r:[r];console.log(a[0]&&a[0].runtimeVersion||'')")
-          if [ "$PUB_RT" != "$APP_VERSION" ]; then
-            echo "::error::Published runtimeVersion '$PUB_RT' != app '$APP_VERSION' — the installed build will reject it."
+            # Map the channel to its same-named branch (idempotent) so an
+            # installed build's expo-channel-name header resolves here.
+            eas channel:view "$channel" --non-interactive >/dev/null 2>&1 \
+              || eas channel:create "$channel" --non-interactive 2>&1 || true
+            eas channel:edit "$channel" --branch "$channel" --non-interactive 2>&1 \
+              || echo "::warning::channel:edit failed for '$channel' — check the EAS dashboard mapping."
+
+            # ⚠ Runtime-version guard. An installed build asks for
+            # runtimeVersion = app version; a mismatch is silently ignored by the
+            # device, so it has to fail loudly here or it fails invisibly there.
+            local rt
+            rt=$(node -e "const r=JSON.parse(require('fs').readFileSync('$out','utf8'));const a=Array.isArray(r)?r:[r];console.log((a[0]&&a[0].runtimeVersion)||'')")
+            if [ "$rt" != "$APP_VERSION" ]; then
+              echo "::error::Published runtimeVersion '$rt' != app '$APP_VERSION' — installed builds will reject it."
+              return 1
+            fi
+            echo "  ✓ $channel ($platform) at runtimeVersion $rt"
+          }
+
+          PUBLISHED=0
+          for t in $TARGETS; do
+            CH="${t%%:*}"; REST="${t#*:}"; PLAT="${REST%%:*}"; OPT="${REST#*:}"
+            if [ "$IOS_ONLY" = "true" ] && [ "$PLAT" != "ios" ]; then
+              echo "::notice::[ota-ios-only] — skipping $CH ($PLAT)."; continue
+            fi
+            if [ "$ANDROID_ONLY" = "true" ] && [ "$PLAT" != "android" ]; then
+              echo "::notice::[ota-android-only] — skipping $CH ($PLAT)."; continue
+            fi
+            publish_one "$CH" "$PLAT" "$OPT"
+            PUBLISHED=$((PUBLISHED + 1))
+          done
+
+          if [ "$PUBLISHED" -eq 0 ]; then
+            echo "::error::Platform markers excluded every target — nothing was published, which is never what was meant."
             exit 1
           fi
-          echo "✓ Published OTA for line '$TARTARIA_LINE' to channel '$CHANNEL' (android) at runtimeVersion $PUB_RT."
+          echo ""
+          echo "✓ OTA complete for line '$TARTARIA_LINE' — $PUBLISHED target(s)."

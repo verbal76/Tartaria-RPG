@@ -9,10 +9,19 @@ name: Build · Linux / Steam Deck (AppImage)
 # single portable AppImage that runs on SteamOS (Steam Deck Desktop Mode) and
 # most distros. Artifact only — it touches no EAS channel and no store listing.
 #
-# ⚠ DISPATCH ONLY on the trunk. The old version fired on every push to
-# linux_dev; the trunk takes every commit for all four products now.
+# ⚠⚠ OPT-IN, TWO WAYS — OTA-1390. A normal push builds NOTHING; the AppImage
+# builds only when asked, either by the "Run workflow" button or by a push whose
+# head commit message contains [build-linux] (or [build-desktop], which fires all
+# three desktop targets). OTA-1387 made this dispatch-only, which also made it
+# unbuildable by anything that cannot reach the Actions UI — see build-steam-exe.yml.
 
 on:
+  push:
+    branches:
+      - golem-line
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
   workflow_dispatch:
     inputs:
       line:
@@ -31,6 +40,11 @@ jobs:
     name: Portable Linux AppImage
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    # Opt-in gate — see the header. An untagged push skips cleanly.
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || contains(github.event.head_commit.message, '[build-linux]')
+      || contains(github.event.head_commit.message, '[build-desktop]')
     env:
       TARTARIA_LINE: ${{ github.event.inputs.line || 'steam' }}
     steps:

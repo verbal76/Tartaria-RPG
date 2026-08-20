@@ -115,14 +115,23 @@ describe('OTA-1387 — the desktop workflows, as they are on the trunk', () => {
     expect(y).toContain('      line:');
   });
 
-  it.each(DESKTOP)('%s is DISPATCH-ONLY on the trunk', (f) => {
+  it.each(DESKTOP)('%s does not build on an ordinary push', (f) => {
     // ⚠ Each of these fired on every push to its own branch, which was fine when
     // that branch saw occasional PC work. The trunk takes every commit for all
     // four products, and Windows runners bill at 2x, macOS at 10x — an automatic
     // desktop build here would be a standing tax on ordinary phone work.
+    //
+    // ⚠⚠ SUPERSEDED BY OTA-1390, AND THE ORIGINAL WORDING WAS THE BUG. This
+    // asserted `not.toMatch(/^\s*push:/)` — dispatch-only — which achieved the
+    // cost goal and also removed the only way anything without the Actions UI
+    // could build these at all. The repo's own convention is commit-title
+    // markers (HANDOFF.md §5), and build-engine-exe.yml had the right shape all
+    // along: keep the push trigger, gate the JOB. What must stay true is that an
+    // UNASKED push builds nothing — which is what this now checks.
     const y = wf(f);
-    expect(y).not.toMatch(/^\s*push:/m);
     expect(y).toContain('workflow_dispatch:');
+    expect(y).toContain("      github.event_name == 'workflow_dispatch'");
+    expect(y).toContain("contains(github.event.head_commit.message, '[build-desktop]')");
   });
 
   it.each(DESKTOP)('%s hardens the bundle before packaging it', (f) => {
