@@ -174,15 +174,33 @@ describe('OTA-1402 — the card cannot be scrolled away from', () => {
 
   it('⚠ it can be dismissed two ways, and both go through the same clear', () => {
     const i = screen.indexOf('{contractsNotice?.body ? (');
-    const block = screen.slice(i, i + 1600);
-    expect((block.match(/onPress=\{clearContractsNotice\}/g) ?? []).length).toBe(2);
-    expect(block).toContain('GOT IT');
+    // ⚠⚠ WINDOWED BY THE BLOCK'S OWN END, NOT BY A BYTE COUNT. The first spelling
+    // sliced a fixed 1,600 characters and OTA-1403 pushed the dismiss button past
+    // it by adding the runner offer — the same fixed-window rot that has needed
+    // hand-widening four separate times in this repo (ota1172 carries three such
+    // notes). A slice that falls short reads as "the code is missing" rather than
+    // "my window is too small", which is the worst way for a test to be wrong.
+    // The card is the last thing this component renders, so "to the end of the
+    // render" IS the block — and unlike a byte count or a `) : null}` search
+    // (which now matches the nested runner offer first) it cannot go stale.
+    const block = screen.slice(i, screen.indexOf('\n  );\n}', i));
+    // ⚠ OTA-1403 — the dismiss button's onPress became an arrow when it gained a
+    // conditional label ("NOT NOW" when a runner offer is present, "GOT IT"
+    // otherwise), so counting the bare handler string is no longer the way to
+    // ask this. What matters is that BOTH exits clear the notice and neither
+    // leaves it standing.
+    expect(block).toContain('onPress={clearContractsNotice}');          // backdrop
+    expect(block).toContain("accessibilityLabel={contractsNotice.action ? 'Not now' : 'Got it'}");
+    expect(block).toContain("'NOT NOW' : 'GOT IT'");
   });
 
   it('⚠ the old strip still works for callers that raise a bare line', () => {
     // Not every notice is a refusal with a rule to explain; a bare `text` notice
     // keeps the cheaper treatment rather than being forced into a card.
-    expect(store).toContain('contractsNotice: { text: string; ts: number; title?: string; body?: string } | null;');
+    // ⚠ OTA-1403 widened the type with an optional `action`. Matched on the two
+    // fields this claim is about rather than the whole line, so the next
+    // addition does not fail a test that is not about it.
+    expect(store).toMatch(/contractsNotice: \{[\s\S]{0,600}?body\?: string;/);
     expect(screen).toContain('styles.contractsNotice,');
   });
 });

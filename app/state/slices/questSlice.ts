@@ -135,6 +135,7 @@ export interface QuestSlice {
   toggleReserveForQuest: (itemId: string) => void;
   clearMissionCompleteNotice: () => void;
   clearContractsNotice: () => void;
+  sendContractByRunner: (kind: 'faction_quest' | 'mystery' | 'storyline', id: string) => void;
   announceMissionComplete: (kind: string, title: string, body: string) => void;
   raiseMissionCompleteNotice: (kind: string, title: string, body: string) => void;
 }
@@ -198,8 +199,9 @@ export const createQuestSlice = (
     sourceLabel: string,
     contractFactionId: string | null | undefined,
     title?: string | null,
+    courier?: { kind: 'faction_quest' | 'mystery' | 'storyline'; id: string },
   ): void {
-    const input = { sourceLabel, contractFactionId, title };
+    const input = { sourceLabel, contractFactionId, title, courierable: !!courier };
     const line = wrongCounterpartyLine(input);
     const now = Date.now();
     if (line !== lastRefusalLine || now - lastRefusalAt > REFUSAL_FEED_QUIET_MS) {
@@ -213,6 +215,12 @@ export const createQuestSlice = (
         ts: now,
         title: WRONG_COUNTERPARTY_TITLE,
         body: wrongCounterpartyBody(input),
+        // ⚠⚠ OTA-1403 — THE WAY OUT, ON THE CARD. The owner's whole report was
+        // ten taps into what looked like nothing; telling him why is half a fix,
+        // and the other half is letting him do the thing he was trying to do
+        // without leaving the screen. Only set when a runner can genuinely carry
+        // this one — a button that then refuses is the same failure in a hat.
+        ...(courier ? { action: { label: 'SEND BY RUNNER (−25%)', ...courier } } : {}),
       },
     });
   }
@@ -758,7 +766,11 @@ export const createQuestSlice = (
         turnSourceName = `the ${homeFaction.name} hall`;
       }
     }
-    if ((!turnFaction && !atBroker) || !turnSourceName) {
+    // ⚠ OTA-1403 — and the SAME omission one gate earlier. On a tile with no
+    // vendor, no board and no owning faction there is nobody to hand to — which is
+    // true face to face and irrelevant to a runner. A remote hand-in skips
+    // straight to the contract lookup, exactly as the other three families do.
+    if (!remote && ((!turnFaction && !atBroker) || !turnSourceName)) {
       // If the player named a specific contract, fuzzy-match it and tell
       // them the exact faction + sample vendor names. Otherwise fall
       // back to listing the factions they owe across all active quests.
@@ -831,8 +843,25 @@ export const createQuestSlice = (
     // its own. Computed here rather than reused from `atBroker` so a contract the broker
     // could have taken anyway (unaligned, or his own) is NOT charged a cut.
     const questViaBroker = atBroker && candidate.factionId !== turnFaction;
-    if (!questViaBroker && candidate.factionId !== turnFaction) {
-      refuseWrongCounterparty(sourceLabel, candidate.factionId, candidate.title);
+    // ⚠⚠ OTA-1403 — `!remote` — THE GUARD THIS FAMILY LOST, AND THE ONE THE OTHER
+    // THREE KEPT. Hunts check `!remote`, mysteries `!mystViaCourier`, storylines
+    // `!storyViaCourier`. Faction deeds took the `remote` parameter, documented it
+    // ("REMOTELY by courier from anywhere, for a cut"), threaded it into
+    // `creditTurnIn`, implemented its fetch exception at the line below — and then
+    // refused on faction mismatch BEFORE any of that could run. Three of four is
+    // exactly the shape that hides: the feature works everywhere you test it.
+    //
+    // Proven, not assumed: `turnInFactionQuest(id, /* remote */ true)` against a
+    // mismatched counterparty left the contract on the slate and printed the
+    // refusal. Owner: "you can remotely hand in from anywhere outside" — and for
+    // three of the four families you always could.
+    if (!remote && !questViaBroker && candidate.factionId !== turnFaction) {
+      refuseWrongCounterparty(
+        sourceLabel, candidate.factionId, candidate.title,
+        // ⚠ A fetch deed cannot be couriered (you cannot mail the goods), so the
+        // offer is withheld rather than made and then refused twelve lines later.
+        candidate.fetch ? undefined : { kind: 'faction_quest', id: candidate.id },
+      );
       return;
     }
     // Stage gate — quests with authored stages require the player to
@@ -1437,6 +1466,10 @@ export const createQuestSlice = (
     const huntViaBroker = CB.isContractBroker(scene?.vendor)
       && !!candidate.factionId && candidate.factionId !== huntParty.faction;
     if (!remote && !CB.vendorCanTakeContract({ id: scene?.vendor?.id, faction: huntParty.faction }, candidate.factionId)) {
+      // ⚠ NO RUNNER OFFER HERE, and that is the rule rather than an oversight:
+      // a bounty is settled by showing the trophy in person (OTA-810), and this
+      // handler refuses `remote` outright a hundred lines up. Offering a button
+      // that would then refuse is the silent-refusal failure wearing a hat.
       refuseWrongCounterparty(sourceLabel, candidate.factionId, candidate.title);
       return;
     }
@@ -1820,7 +1853,10 @@ export const createQuestSlice = (
     const mysteryViaBroker = !mystViaCourier && CB.isContractBroker(scene?.vendor)
       && !!candidate.factionId && candidate.factionId !== mystParty?.faction;
     if (!mystViaCourier && !CB.vendorCanTakeContract({ id: scene?.vendor?.id, faction: mystParty!.faction }, candidate.factionId)) {
-      refuseWrongCounterparty(sourceLabel, candidate.factionId, candidate.title);
+      refuseWrongCounterparty(
+        sourceLabel, candidate.factionId, candidate.title,
+        { kind: 'mystery', id: candidate.id },
+      );
       return;
     }
     const trophy: InventoryItem = stampDurability({
@@ -2618,6 +2654,26 @@ export const createQuestSlice = (
   clearMissionCompleteNotice() { set({ missionCompleteNotice: null }); },
 
   clearContractsNotice() { set({ contractsNotice: null }); },
+
+  /**
+   * ⚠⚠ OTA-1403 — SEND IT BY RUNNER, from the card that just refused you.
+   *
+   * The Contracts COMPLETE button is face-to-face by design (B2 closed the
+   * pay-from-any-tile hole), and the courier has only ever been reachable by
+   * TYPING "send word <contract>". So a player tapping buttons could not get at
+   * a feature the game has had since OTA-456 — which is most of why ten taps
+   * read as ten dead ends.
+   *
+   * ⚠ It delegates to the same typed handler rather than reimplementing the
+   * payout. One source of truth for the cut, the rep, the clock and the fetch
+   * refusal; a second copy is how the button and the command start disagreeing.
+   */
+  sendContractByRunner(kind, id) {
+    set({ contractsNotice: null });
+    if (kind === 'faction_quest') get().turnInFactionQuest(id, true);
+    else if (kind === 'mystery') get().turnInMystery(id, true);
+    else get().turnInStoryline(id, true);
+  },
 
   announceMissionComplete(kind, title, body) {
     // The feed line is unchanged — the log stays a complete record, and anything

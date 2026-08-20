@@ -7328,7 +7328,18 @@ export interface GameStore {
    *  explanation appears off-screen. The owner tapped ten and reported "all did
    *  nothing". `text` stays for the feed line; a notice carrying `body` is
    *  rendered as a card the player has to dismiss. */
-  contractsNotice: { text: string; ts: number; title?: string; body?: string } | null;
+  contractsNotice: {
+    text: string; ts: number; title?: string; body?: string;
+    /** ⚠⚠ OTA-1403 — the way OUT, offered on the card. Telling the player why a
+     *  hand-in was refused is half a fix; the other half is letting them do the
+     *  thing they were trying to do without leaving the screen. Only ever set
+     *  when a runner can genuinely carry that contract from where they stand —
+     *  a button that then refuses is the silent refusal wearing a hat. */
+    action?: { label: string; kind: 'faction_quest' | 'mystery' | 'storyline'; id: string };
+  } | null;
+  /** OTA-1403 — run the offer above. Routes to the same typed turn-in the
+   *  "send word" command uses, with `remote` true. */
+  sendContractByRunner: (kind: 'faction_quest' | 'mystery' | 'storyline', id: string) => void;
   clearContractsNotice: () => void;
   /** OTA-987 — the one way a mission/contract/thread ends. Writes the feed line AND
    *  raises the holding notice, so no completion can be silent again. Repeated

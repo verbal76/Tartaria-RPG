@@ -57,6 +57,14 @@ export interface ContractRefusalInput {
   contractFactionId: string | null | undefined;
   /** The contract's title, when the caller knows it. */
   title?: string | null;
+  /**
+   * ⚠⚠ OTA-1403 — whether a runner could carry THIS contract from where the
+   * player is standing. Only set when it is actually true: offering a way out
+   * that then refuses is the same failure as the silent refusal, wearing a
+   * button. Hunts are never courierable (the trophy is shown in person, OTA-810)
+   * and neither is a fetch deed (you cannot mail the goods, OTA-456).
+   */
+  courierable?: boolean;
 }
 
 /**
@@ -66,9 +74,15 @@ export interface ContractRefusalInput {
  * full explanation belongs in the popup the player is actually looking at. A
  * five-line refusal repeated per tap is the Chatty-Kathy failure again.
  */
+/** ⚠ OTA-1403 — "Stone Builders's" is what the first draft printed, caught by a
+ *  probe rather than by reading. Four of the nine faction names end in s. */
+export function possessive(name: string): string {
+  return name.endsWith('s') ? `${name}'` : `${name}'s`;
+}
+
 export function wrongCounterpartyLine(input: ContractRefusalInput): string {
   const who = factionDisplayName(input.contractFactionId);
-  return `${input.sourceLabel} won't take it — that contract is ${who}'s. Their people, or any outpost's trading post.`;
+  return `${input.sourceLabel} won't take it — that contract is ${possessive(who)}. Their people, or any outpost's trading post.`;
 }
 
 /**
@@ -94,8 +108,11 @@ export function wrongCounterpartyBody(input: ContractRefusalInput): string {
     + `for where you are standing right now.\n\n`
     + `This is not about your standing with them. How much they like you does not enter `
     + `into it; it is about whose contract it is.\n\n`
-    + `Take it to ${who}'s people, or hand it in at the trading post at any outpost gate — `
-    + `a trading post brokers for anyone, for a cut.`
+    + `Take it to ${possessive(who)} people, or hand it in at the trading post at any outpost `
+    + `gate — a trading post brokers for anyone, for a cut.`
+    + (input.courierable
+      ? `\n\nOr send it by runner from right here, for a quarter of the pay. Full standing either way.`
+      : '')
   );
 }
 

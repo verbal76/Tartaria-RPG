@@ -95,6 +95,7 @@ export function ContractsScreen() {
   const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
   const contractsNotice = useGameStore((s) => s.contractsNotice);
   const clearContractsNotice = useGameStore((s) => s.clearContractsNotice);
+  const sendContractByRunner = useGameStore((s) => s.sendContractByRunner);
   const abandonContract = useGameStore((s) => s.abandonContract);
   const setFactionQuestActive = useGameStore((s) => s.setFactionQuestActive);
   const setContractActive = useGameStore((s) => s.setContractActive);
@@ -2023,13 +2024,33 @@ export function ContractsScreen() {
           <View style={styles.refusalCard} accessibilityViewIsModal>
             <Text style={styles.refusalTitle}>{contractsNotice.title ?? 'CANNOT HAND THIS IN HERE'}</Text>
             <Text style={styles.refusalBody}>{contractsNotice.body}</Text>
+            {/* ⚠⚠ OTA-1403 — THE WAY OUT, WHEN THERE IS ONE. The COMPLETE button is
+                face-to-face by design (B2), and the courier has only ever been
+                reachable by TYPING "send word <contract>" — so a player tapping
+                buttons could not get at a feature the game has had since OTA-456.
+                That is most of why ten taps read as ten dead ends. Rendered only
+                when the store said a runner can genuinely carry this one. */}
+            {contractsNotice.action ? (
+              <TouchableOpacity
+                style={[styles.refusalButton, styles.refusalButtonPrimary]}
+                onPress={() => sendContractByRunner(
+                  contractsNotice.action!.kind, contractsNotice.action!.id,
+                )}
+                accessibilityRole="button"
+                accessibilityLabel={contractsNotice.action.label}
+              >
+                <Text style={styles.refusalButtonText}>{contractsNotice.action.label}</Text>
+              </TouchableOpacity>
+            ) : null}
             <TouchableOpacity
               style={styles.refusalButton}
               onPress={clearContractsNotice}
               accessibilityRole="button"
-              accessibilityLabel="Got it"
+              accessibilityLabel={contractsNotice.action ? 'Not now' : 'Got it'}
             >
-              <Text style={styles.refusalButtonText}>GOT IT</Text>
+              <Text style={styles.refusalButtonText}>
+                {contractsNotice.action ? 'NOT NOW' : 'GOT IT'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -2525,6 +2546,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2a2118',
   },
   refusalButtonText: { color: '#e8c894', fontSize: 12, fontWeight: '700', letterSpacing: 1.4 },
+  refusalButtonPrimary: { backgroundColor: '#3a2c1c', borderColor: '#f0bd77' },
   // Activate / deactivate toggle (single-active). Active = teal; paused = grey.
   trackBtn: {
     marginTop: 8, backgroundColor: 'transparent', borderColor: '#54d6c4',

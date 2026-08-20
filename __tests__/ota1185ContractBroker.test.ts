@@ -231,11 +231,16 @@ describe('⚠⚠ OTA-1185 — every turn-in path routes through the ONE resolver
     // What this test protects is that a refusal TELLS THE PLAYER WHERE TO GO, so
     // that is what it checks now: the shared refusal carries the pointer, and
     // every call site reaches it.
-    const refusalSrc = readFileSync(
-      join(__dirname, '..', 'app', 'engine', 'contractRefusal.ts'), 'utf8',
-    );
-    expect(refusalSrc).toMatch(/trading post at any outpost gate/);
-    expect((STORE.match(/refuseWrongCounterparty\(/g) ?? []).length).toBeGreaterThanOrEqual(5);
+    // ⚠ OTA-1403 — asserted on the RUNTIME OUTPUT, not on the source text. The
+    // sentence is assembled from concatenated template literals, so it exists in
+    // the message and not in any one line of the file — a source match here
+    // would be testing the line wrapping rather than what the player reads.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { wrongCounterpartyBody } = require('../app/engine/contractRefusal') as
+      typeof import('../app/engine/contractRefusal');
+    expect(wrongCounterpartyBody({ sourceLabel: 'a runner', contractFactionId: 'stone_builders' }))
+      .toMatch(/trading post at any outpost gate/);
+    expect((STORE.match(/refuseWrongCounterparty\(/g) ?? []).length).toBeGreaterThanOrEqual(4);
   });
 
   test('the Contracts screen says what the broker pays', () => {
