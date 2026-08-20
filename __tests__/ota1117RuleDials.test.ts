@@ -24,6 +24,11 @@ import path from 'path';
 import {
   PRESSURE_PROFILES, DEFAULT_PRESSURE, PRESET_TIERS, DIFFICULTY_SYSTEMS, profileOf,
 } from '../app/engine/pressure';
+// ⚠ OTA-1395 — reads the store AND its slices. Part 4 is splitting gameStore
+// into slices, and the literals these pins look for travel with the code. A
+// pin like this was never a claim about a FILE; it is a claim about the STORE.
+// See __tests__/helpers/storeSource.ts for when NOT to use it.
+import { storeSource } from '../test-utils/storeSource';
 
 const src = (rel: string): string =>
   fs.readFileSync(path.join(__dirname, '..', rel), 'utf8');
@@ -115,7 +120,7 @@ describe('OTA-1117 — witholdIntel takes the FREE read, never the earned one', 
 });
 
 describe('OTA-1117 — witholdIdentity stops the free enrichment, not the item', () => {
-  const store = src('app/state/gameStore.ts');
+  const store = storeSource();
 
   it('the synthesis requester checks the dial', () => {
     expect(store).toContain('if (profileOf(get().player).witholdIdentity) return;');
@@ -175,7 +180,7 @@ describe('OTA-1117 — ⚠ the hunger dial is gone, and the file says why', () =
     // unreachable narration branches. OTA-1118 deleted the lot, so the evidence
     // this test wants is now the ABSENCE of the accrual rather than a zeroed
     // version of it. ota1118HungerCarcass owns the full sweep.
-    const store = src('app/state/gameStore.ts');
+    const store = storeSource();
     expect(store).not.toContain('const newHunger = 0;');
     expect(store).not.toContain('hungerStaminaPenalty: newHunger');
     expect(store).toContain('HUNGER REMOVED');

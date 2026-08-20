@@ -39,6 +39,11 @@ import {
 } from '../app/ai/generation/qwenTelemetry';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+// ⚠ OTA-1395 — reads the store AND its slices. Part 4 is splitting gameStore
+// into slices, and the literals these pins look for travel with the code. A
+// pin like this was never a claim about a FILE; it is a claim about the STORE.
+// See __tests__/helpers/storeSource.ts for when NOT to use it.
+import { storeSource } from '../test-utils/storeSource';
 
 const src = (p: string): string => readFileSync(join(__dirname, '..', p), 'utf8');
 
@@ -147,7 +152,7 @@ describe('OTA-1107 — wasted work is counted honestly', () => {
 });
 
 describe('OTA-1107 — the four waste sites are wired', () => {
-  const store = src('app/state/gameStore.ts');
+  const store = storeSource();
 
   it('⚠ narration cancelled mid-flight is reported, not silently swallowed', () => {
     // ⚠ RETARGETED BY OTA-1129 — the recurring lesson, again: an assertion that

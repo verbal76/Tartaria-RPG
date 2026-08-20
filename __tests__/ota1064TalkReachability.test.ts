@@ -58,6 +58,15 @@ jest.setTimeout(60_000);
 import { hasTopicsFor, topicsFor, TOPIC_CLASS_KEYS, classKeyFor, type TalkContext } from '../app/engine/dialogue';
 import { npcLedgerId } from '../app/engine/npcMemory';
 import { useGameStore } from '../app/state/gameStore';
+// ⚠ OTA-1395 — reads gameStore ALONE, deliberately. These pins extract a WINDOW
+// from a named function and assert on its contents; concatenating the slices
+// shifts those windows and produces both false passes and false failures. The
+// code they pin is still in gameStore. See test-utils/storeSource.ts, which
+// says exactly this under WHEN NOT TO USE IT.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const readStoreFile = (): string => require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const TOPICS = require('../app/data/npcs/dialogue_topics.json') as {
@@ -98,8 +107,7 @@ describe('OTA-1064 — the identity bug that made a whole cast mute', () => {
 
   it('both call sites now ask with the ledger id', () => {
     /* eslint-disable @typescript-eslint/no-require-imports */
-    const store: string = require('fs').readFileSync(
-      require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+    const store: string = readStoreFile();
     const screen: string = require('fs').readFileSync(
       require('path').join(__dirname, '../app/screens/ExplorationScreen.tsx'), 'utf8');
     /* eslint-enable @typescript-eslint/no-require-imports */
@@ -113,8 +121,7 @@ describe('OTA-1064 — the identity bug that made a whole cast mute', () => {
 
 describe('OTA-1064 — every authored class set has a live route', () => {
   /* eslint-disable @typescript-eslint/no-require-imports */
-  const store: string = require('fs').readFileSync(
-    require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+  const store: string = readStoreFile();
   /* eslint-enable @typescript-eslint/no-require-imports */
 
   it('there are 11 class sets and not one of them is decorative', () => {
@@ -128,7 +135,14 @@ describe('OTA-1064 — every authored class set has a live route', () => {
     expect(store).toContain('topicsNpcId');
     expect(store).toMatch(/parleyIntoTalk: \(\) => \{/);
     // ...and stepping into it must not roll or resolve anything.
-    const fn = codeOnly(store.slice(store.indexOf('parleyIntoTalk: () => {'), store.indexOf('async hydrate()')));
+    // ⚠ OTA-1395 — THE END ANCHOR WAS `async hydrate()`, WHICH MOVED OUT in slice
+    // 4. `indexOf` returned -1, `slice(start, -1)` cut back to one char before the
+    // end of the file, and the window silently became the WRONG REGION — a test
+    // that could have passed or failed for reasons unrelated to parley. Anchored
+    // to the method's own closing brace instead, which cannot move away from the
+    // method it closes.
+    const start = store.indexOf('parleyIntoTalk: () => {');
+    const fn = codeOnly(store.slice(start, store.indexOf('\n  },', start) + 5));
     expect(fn).not.toContain('runParleyOutcome');
     expect(fn).not.toContain('resolveParley');
   });
@@ -302,8 +316,7 @@ describe('OTA-1064 audit — hostility cannot be farmed for rival standing', () 
   /* eslint-disable @typescript-eslint/no-require-imports */
   const factions: string = require('fs').readFileSync(
     require('path').join(__dirname, '../app/engine/factions.ts'), 'utf8');
-  const store: string = require('fs').readFileSync(
-    require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+  const store: string = readStoreFile();
   /* eslint-enable @typescript-eslint/no-require-imports */
 
   it('THE MECHANISM: a standing LOSS is a standing GAIN for every rival', () => {
@@ -345,8 +358,7 @@ describe('OTA-1064 audit — hostility cannot be farmed for rival standing', () 
 
 describe('OTA-1064 audit — a grant that cannot land does not spend the topic', () => {
   /* eslint-disable @typescript-eslint/no-require-imports */
-  const store: string = require('fs').readFileSync(
-    require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+  const store: string = readStoreFile();
   /* eslint-enable @typescript-eslint/no-require-imports */
 
   it('applyTopicGrant reports whether it delivered', () => {
@@ -380,8 +392,7 @@ describe('OTA-1064 audit — a grant that cannot land does not spend the topic',
 
 describe('OTA-1064 audit — gifting reaches the same cast as talking', () => {
   /* eslint-disable @typescript-eslint/no-require-imports */
-  const store: string = require('fs').readFileSync(
-    require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+  const store: string = readStoreFile();
   /* eslint-enable @typescript-eslint/no-require-imports */
 
   it('the gift picker is derived from the talkable list, not a second copy', () => {

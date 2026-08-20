@@ -38,10 +38,15 @@ import {
   setReportingEnabled, loadReportingPref, installCrashTransport, flushCrashReports,
   crashReportDsn, _resetCrashReporterForTests,
 } from '../app/diagnostics/crashReporter';
+// ⚠ OTA-1395 — reads the store AND its slices. Part 4 is splitting gameStore
+// into slices, and the literals these pins look for travel with the code. A
+// pin like this was never a claim about a FILE; it is a claim about the STORE.
+// See __tests__/helpers/storeSource.ts for when NOT to use it.
+import { storeSource } from '../test-utils/storeSource';
 
 const src = (...p: string[]) => readFileSync(join(__dirname, '..', ...p), 'utf8');
 const app = src('App.tsx');
-const store = src('app', 'state', 'gameStore.ts');
+const store = storeSource();
 
 // Appends are fire-and-forget and now SERIALISED; awaiting the queue is the
 // honest way to observe them, rather than guessing at a tick count.

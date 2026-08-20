@@ -54,6 +54,10 @@ import {
   APPROX_CONTEXT_MB,
 } from '../app/ai/generation/contextLedger';
 import { LlamaRuntime, __setLlamaModuleForTests, type LlamaModule } from '../app/ai/generation/LlamaRuntime';
+// ⚠ OTA-1395 — reads the store AND its slices. Part 4 is splitting gameStore into
+// slices and the literals these pins look for travel with the code; a pin like
+// this was never a claim about a FILE. See test-utils/storeSource.ts.
+import { storeSource } from '../test-utils/storeSource';
 
 const SRC = (rel: string) => fs.readFileSync(path.join(__dirname, '..', rel), 'utf8');
 
@@ -344,7 +348,7 @@ describe('OTA-1177 — structure', () => {
   });
 
   test('the sink is installed in hydrate, before anything can load a context', () => {
-    const src = codeOnly(SRC('app/state/gameStore.ts'));
+    const src = codeOnly(storeSource());
     expect(src.match(/setContextLedgerSink\(/g) ?? []).toHaveLength(1);
     // ⚠ In hydrate() beside the other two sinks — NOT in startRuntimePressureWatch. A sink
     // armed after the first load would miss the race it exists to catch.

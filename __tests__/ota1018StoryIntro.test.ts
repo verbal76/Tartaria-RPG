@@ -179,12 +179,18 @@ describe('OTA-1018 — SOURCE LOCKS (category: the story reaches the screen)', (
    *  have quietly stopped covering half the paths, which is the failure mode a
    *  count-based lock is most prone to. */
   const slotSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'slices', 'slotSlice.ts'), 'utf8');
-  const loadPathsSrc = storeSrc + slotSrc;
+  /** ⚠ OTA-1395 — and `hydrate` + `startNewGame` moved out too, to
+   *  `slices/bootSlice.ts`. Three files now, one invariant: every path that
+   *  loads or resets clears the overlay. */
+  const bootSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'slices', 'bootSlice.ts'), 'utf8');
+  const loadPathsSrc = storeSrc + slotSrc + bootSrc;
   const createSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'screens', 'CharacterCreationScreen.tsx'), 'utf8');
   const charSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'screens', 'CharacterScreen.tsx'), 'utf8');
 
   it('startNewGame raises the crawl and every load/reset path clears it', () => {
-    expect(storeSrc).toMatch(/storyIntro: introPagesFor\(player\.storyMotive, player\.factionId\)/);
+    // ⚠ OTA-1395 — startNewGame RAISES the crawl and moved to bootSlice; the
+    // clears are spread across all three files. The claim is unchanged.
+    expect(bootSrc).toMatch(/storyIntro: introPagesFor\(player\.storyMotive, player\.factionId\)/);
     const clears = loadPathsSrc.match(/storyIntro: null/g) ?? [];
     // initial state + slot load + delete-slot + hard reset
     expect(clears.length).toBeGreaterThanOrEqual(4);

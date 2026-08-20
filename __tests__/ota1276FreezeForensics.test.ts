@@ -106,7 +106,11 @@ describe('OTA-1276 — it is stamped at the doors a freeze happens behind', () =
   });
 
   it('⚠⚠ boot READS it before clearing, and says so in the log', () => {
-    const store = src('app', 'state', 'gameStore.ts');
+    // ⚠ OTA-1395 — `hydrate` moved to `app/state/slices/bootSlice.ts` with slice
+    // 4. Re-pointed, not relaxed: what this holds down is the ORDER — the
+    // surviving breadcrumb is read and reported BEFORE it is cleared, so a
+    // freeze that killed the last session still has a witness at the next boot.
+    const store = src('app', 'state', 'slices', 'bootSlice.ts');
     // ⚠ OTA-1381 — the window is the try/catch, NOT a byte count. This read
     // `store.slice(i, i + 1400)`, and OTA-1380 adding the native-death promotion
     // between the read and the clear pushed `clearLiveBreadcrumb` past 1400 —

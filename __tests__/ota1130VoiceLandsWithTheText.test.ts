@@ -50,6 +50,10 @@ import {
   ML_PRIORITY_LLM,
   ML_PRIORITY_HOMEWORK,
 } from '../app/ai/nativeMlLock';
+// ⚠ OTA-1395 — reads the store AND its slices. Part 4 is splitting gameStore into
+// slices and the literals these pins look for travel with the code; a pin like
+// this was never a claim about a FILE. See test-utils/storeSource.ts.
+import { storeSource } from '../test-utils/storeSource';
 
 jest.setTimeout(60_000);
 
@@ -62,9 +66,7 @@ const LOCK: string = require('fs').readFileSync(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('path').join(__dirname, '../app/ai/nativeMlLock.ts'), 'utf8');
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const STORE: string = require('fs').readFileSync(
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+const STORE: string = storeSource();
 
 const tick = () => new Promise((r) => setTimeout(r, 0));
 

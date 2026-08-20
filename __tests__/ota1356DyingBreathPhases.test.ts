@@ -43,6 +43,11 @@ import { readLiveBreadcrumb, stampLiveBreadcrumb, stampBreadcrumbPhase } from '.
 import { runtimePressureSummary, setLastBootBreadcrumb } from '../app/diagnostics/runtimePressure';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+// ⚠ OTA-1395 — reads the store AND its slices. Part 4 is splitting gameStore
+// into slices, and the literals these pins look for travel with the code. A
+// pin like this was never a claim about a FILE; it is a claim about the STORE.
+// See __tests__/helpers/storeSource.ts for when NOT to use it.
+import { storeSource } from '../test-utils/storeSource';
 
 jest.setTimeout(120_000);
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; });
@@ -85,7 +90,7 @@ describe('OTA-1356 — the dying breath learns phases', () => {
   });
 
   it('⚠ source locks: every exit path stamps engine-done; the screen stamps rendered; homework stamps itself', () => {
-    const store = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+    const store = storeSource();
     // The try/finally wrap — engine-done must ride EVERY early return.
     expect(store).toContain("stampBreadcrumbPhase('engine-done'");
     expect(store).toContain('} finally {');

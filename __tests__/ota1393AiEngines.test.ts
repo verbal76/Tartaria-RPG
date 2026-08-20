@@ -122,9 +122,13 @@ describe('OTA-1393 — the watchdogs are handed in, not imported', () => {
     expect(slice).toContain('deps.startRuntimePressureWatch(get, set);');
   });
 
-  it('⚠ and they are still defined in gameStore, called nowhere else', () => {
-    expect(store).toMatch(/^function startQwenWatchdog\(/m);
-    expect(store).toMatch(/^function startRuntimePressureWatch\(/m);
+  it('⚠ and they are still defined in gameStore', () => {
+    // ⚠ OTA-1395 — `startRuntimePressureWatch` picked up an `export` when slice 4
+    // needed its TYPE (`typeof Store.fn`). The word matters here: it is exported
+    // so a slice can be TYPED against it, not so a slice can IMPORT it — that is
+    // still forbidden, and ota1392 enforces it directory-wide.
+    expect(store).toMatch(/^(export )?function startQwenWatchdog\(/m);
+    expect(store).toMatch(/^(export )?function startRuntimePressureWatch\(/m);
   });
 
   it('⚠⚠ the slice imports NO value from gameStore', () => {

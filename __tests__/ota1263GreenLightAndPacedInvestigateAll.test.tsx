@@ -45,12 +45,17 @@ jest.mock('llama.rn', () => ({
 // which noun.
 import { readFileSync } from 'fs';
 import { join } from 'path';
+// ⚠ OTA-1395 — reads the store AND its slices. Part 4 is splitting gameStore
+// into slices, and the literals these pins look for travel with the code. A
+// pin like this was never a claim about a FILE; it is a claim about the STORE.
+// See __tests__/helpers/storeSource.ts for when NOT to use it.
+import { storeSource } from '../test-utils/storeSource';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
 describe('OTA-1263 (A) — the adaptive idle threshold actually finds its job', () => {
   it('⚠⚠ it looks up the label the telemetry ACTUALLY records', () => {
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     // The label is built here, and it is the only place it is built.
     expect(store).toContain('job: opts?.bankOnly ? `narration:${intent}_fill` : `narration:${intent}`,');
     // ...so the lookup must use the assembled form, not the bare intent.
@@ -74,7 +79,7 @@ describe('OTA-1263 (A) — the adaptive idle threshold actually finds its job', 
   });
 
   it('⚠ the armed-at line survives — it is how the NEXT log grades this', () => {
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     expect(store).toContain('intro-fill armed after ${idleNeeded}ms idle');
   });
 });
@@ -101,7 +106,7 @@ describe('OTA-1263 (B) — the per-call ms/t obeys the same guard the aggregate 
   });
 
   it('⚠⚠ the source carries the guard, not just this mirror', () => {
-    const store = src('app', 'state', 'gameStore.ts');
+    const store = storeSource();
     const i = store.indexOf('const prefillIsPossible = r.prefillMs != null');
     expect(i).toBeGreaterThan(-1);
     const block = store.slice(i, i + 200);

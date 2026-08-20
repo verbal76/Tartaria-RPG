@@ -31,6 +31,11 @@ import {
 } from '../app/ai/generation/qwenTelemetry';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+// ⚠ OTA-1395 — reads the store AND its slices. Part 4 is splitting gameStore
+// into slices, and the literals these pins look for travel with the code. A
+// pin like this was never a claim about a FILE; it is a claim about the STORE.
+// See __tests__/helpers/storeSource.ts for when NOT to use it.
+import { storeSource } from '../test-utils/storeSource';
 
 const src = (p: string): string => readFileSync(join(__dirname, '..', p), 'utf8');
 
@@ -109,7 +114,7 @@ describe('OTA-1105 — every consumer is labeled', () => {
   });
 
   it('⚠ all nine call sites name their job', () => {
-    const store = src('app/state/gameStore.ts');
+    const store = storeSource();
     const fusion = src('app/engine/itemFusion.ts');
     // Narration is labeled PER-INTENT — the exact grain OTA-1093 asked for.
     // ⚠ RETARGETED BY OTA-1129, same reflow lesson as the ambient label two
@@ -137,7 +142,7 @@ describe('OTA-1105 — every consumer is labeled', () => {
   });
 
   it('the store surfaces calls in the debug log, rollup every tenth', () => {
-    const store = src('app/state/gameStore.ts');
+    const store = storeSource();
     expect(store).toContain('setQwenTelemetrySink((r) => {');
     expect(store).toContain('qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms');
     expect(store).toContain('qwenCallCount() % 10 === 0');

@@ -65,11 +65,16 @@ describe('OTA-1394 — the eight moved, and the two that did not', () => {
     expect(store).toContain('...createSlotSlice(set, get, {');
   });
 
-  it('⚠⚠ hydrate and startNewGame STAYED, and the reason is measured', () => {
-    // Not a judgement call — they share no unexported dependency with the eight.
-    expect(store).toMatch(/^  async hydrate\(\)/m);
-    expect(store).toMatch(/^  async startNewGame\(/m);
+  it('⚠⚠ hydrate and startNewGame did NOT come with the eight, and still have not', () => {
+    // Not a judgement call — they share no unexported dependency with these eight.
+    //
+    // ⚠ OTA-1395 — this assertion originally read "…STAYED" and checked they were
+    // still in gameStore. Slice 4 moved them to `bootSlice.ts` one OTA later, so
+    // the wording was true for about an hour. What the test is actually FOR is
+    // that the two groups never mixed — so it now checks they are not in THIS
+    // slice, which is the claim that survives every later move.
     expect(slice).not.toMatch(/^  async hydrate\(\)/m);
+    expect(slice).not.toMatch(/^  async startNewGame\(/m);
     expect(store).toContain('share ZERO unexported dependencies');
   });
 });

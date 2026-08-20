@@ -85,13 +85,15 @@ import {
   _INTRO_BANK_PER_LOC,
   _INTRO_BANK_TOTAL,
 } from '../app/state/gameStore';
+// ⚠ OTA-1395 — reads the store AND its slices. Part 4 is splitting gameStore into
+// slices and the literals these pins look for travel with the code; a pin like
+// this was never a claim about a FILE. See test-utils/storeSource.ts.
+import { storeSource } from '../test-utils/storeSource';
 
 jest.setTimeout(60_000);
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const STORE: string = require('fs').readFileSync(
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+const STORE: string = storeSource();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const INJ: string = require('fs').readFileSync(
   // eslint-disable-next-line @typescript-eslint/no-require-imports

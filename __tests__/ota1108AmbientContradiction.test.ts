@@ -53,6 +53,11 @@ import { synthesizeItemViaQwen } from '../app/engine/itemSynthesisQwen';
 import { _resetCacheForTests } from '../app/engine/itemSynthesisCache';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+// ⚠ OTA-1395 — reads the store AND its slices. Part 4 is splitting gameStore
+// into slices, and the literals these pins look for travel with the code. A
+// pin like this was never a claim about a FILE; it is a claim about the STORE.
+// See __tests__/helpers/storeSource.ts for when NOT to use it.
+import { storeSource } from '../test-utils/storeSource';
 
 const src = (p: string): string => readFileSync(join(__dirname, '..', p), 'utf8');
 
@@ -113,7 +118,7 @@ describe('OTA-1108 — the cache number was being read backwards', () => {
   it('⚠⚠ ...and it is NO LONGER PRINTED, in the rollup or the per-call line', () => {
     call('ambient', { promptTokens: 546, outTokens: 31, cachedTokens: 577 });
     expect(qwenTelemetrySummary()).not.toContain('reuse');
-    const store = src('app/state/gameStore.ts');
+    const store = storeSource();
     expect(store).not.toContain('reuse ${reused}t');
     expect(store).not.toContain('r.cachedTokens - (r.promptTokens ?? 0) - (r.outTokens ?? 0)');
   });
@@ -121,7 +126,7 @@ describe('OTA-1108 — the cache number was being read backwards', () => {
   it('⚠⚠ the per-call line carries PREFILL PER PROMPT TOKEN instead — the real signal', () => {
     // A cold call and a warm one are two visibly different numbers here, which is
     // the whole point: this one CAN move.
-    const store = src('app/state/gameStore.ts');
+    const store = storeSource();
     // ⚠ OTA-1263 added OTA-1139's sanity guard to this line (a prefill longer than
     // its own call is not a measurement), so the expression is non-null-asserted.
     expect(store).toContain('(r.prefillMs! / r.promptTokens!).toFixed(1)');

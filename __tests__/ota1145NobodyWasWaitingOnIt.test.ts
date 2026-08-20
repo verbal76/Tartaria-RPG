@@ -32,9 +32,8 @@
 import { VOICE_RESERVATION_MS } from '../app/ai/nativeMlLock';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const STORE: string = require('fs').readFileSync(
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('path').join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const STORE: string = (require('../test-utils/storeSource') as { storeSource: () => string }).storeSource();
 
 /** The on-demand requester registered with itemDefaults — NOT the homework
  *  slot above it. Sliced so the two can't be confused for one another. */

@@ -173,7 +173,11 @@ describe('OTA-1020 — SOURCE LOCKS (category: the cards reach the screen)', () 
    *  have quietly stopped covering half the paths, which is the failure mode a
    *  count-based lock is most prone to. */
   const slotSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'slices', 'slotSlice.ts'), 'utf8');
-  const loadPathsSrc = storeSrc + slotSrc;
+  /** ⚠ OTA-1395 — and `hydrate` + `startNewGame` moved out too, to
+   *  `slices/bootSlice.ts`. Three files now, one invariant: every path that
+   *  loads or resets clears the overlay. */
+  const bootSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'slices', 'bootSlice.ts'), 'utf8');
+  const loadPathsSrc = storeSrc + slotSrc + bootSrc;
   const endingSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'screens', 'EndingScreen.tsx'), 'utf8');
 
   it('triggerMainQuest raises the card on phase change and every load/reset path clears it', () => {

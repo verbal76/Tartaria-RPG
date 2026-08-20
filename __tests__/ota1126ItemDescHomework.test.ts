@@ -1,3 +1,19 @@
+// ⚠ OTA-1395 — reads bootSlice.ts ALONE, deliberately, and this took two goes.
+// `homeworkTick` is defined INSIDE `hydrate()`, so slice 4 carried it out of
+// gameStore. The first attempt pointed this at the concatenated store-plus-slices
+// helper, which was wrong for a different reason: these pins extract a WINDOW
+// between two anchors and assert on its contents, and concatenation moves the
+// anchors, producing both false passes and false failures. A window pin has to
+// read the one file its window is in. See test-utils/storeSource.ts, WHEN NOT TO
+// USE IT.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const readStoreFile = (): string => require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const readBootSlice = (): string => require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'slices', 'bootSlice.ts'), 'utf8');
 // OTA-1126 — THE FIRST HOMEWORK SLOT: ITEM DESCRIPTIONS.
 //
 // Owner's governing rule for the whole homework track, and the thing that
@@ -33,9 +49,12 @@ export {};
 jest.setTimeout(60_000);
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const SRC: string = require('fs').readFileSync(
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('path').join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+const SRC: string = readStoreFile();
+/** ⚠ OTA-1395 — the TICK is in bootSlice, the STATE it reads is in gameStore.
+ *  `homeworkTick` is defined inside `hydrate()`, so slice 4 carried it out; the
+ *  idle stamp it gates on (`uiIdleSince`) and the action door that clears it
+ *  stayed. Each assertion below reads whichever file holds the line it pins. */
+const BOOT: string = readBootSlice();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const SYNTH: string = require('fs').readFileSync(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -61,13 +80,18 @@ describe('OTA-1126 — the slot reuses the live path rather than copying it', ()
   });
 
   it('the scheduler calls the real synthesizer with the flag set', () => {
-    expect(SRC).toContain('synth.synthesizeItemViaQwen(target.name, target.tags, qwen, { homework: true })');
+    expect(BOOT).toContain('synth.synthesizeItemViaQwen(target.name, target.tags, qwen, { homework: true })');
   });
 });
 
 describe('OTA-1126 — the idle gate, and every muzzle it inherits', () => {
-  const tick = SRC.slice(SRC.indexOf('const homeworkTick = (): void => {'),
-    SRC.indexOf('setHomeworkTick(homeworkTick);'));
+  // ⚠ OTA-1395 — the TICK is in bootSlice, the STATE it reads is in gameStore.
+  // `homeworkTick` is defined inside `hydrate()`, so slice 4 carried it out; the
+  // idle stamp it gates on (`uiIdleSince`) and the action door that clears it
+  // stayed. This suite reads both files, one per claim, which is what a
+  // window-extracting pin has to do once the code it windows has moved.
+  const tick = BOOT.slice(BOOT.indexOf('const homeworkTick = (): void => {'),
+    BOOT.indexOf('deps.setHomeworkTick(homeworkTick);'));
 
   it('⚠ nothing runs without an idle stamp — null is the safe default', () => {
     expect(tick).toContain('const idleSince = get().uiIdleSince;');
@@ -78,7 +102,10 @@ describe('OTA-1126 — the idle gate, and every muzzle it inherits', () => {
   it('⚠ combat and the tutorial muzzle it, exactly like ambient', () => {
     // A free description is still the wrong thing to be computing mid-fight.
     expect(tick).toContain("if ((get().currentScene?.enemies?.length ?? 0) > 0) return;");
-    expect(tick).toContain('if (inScriptedTutorialPhase(get)) return;');
+    // ⚠ `deps.` — the slice takes gameStore's private helpers as injected
+    // dependencies rather than importing them, so the call site reads through
+    // the deps object. Same function, same guard, one hop.
+    expect(tick).toContain('if (deps.inScriptedTutorialPhase(get)) return;');
   });
 
   it('⚠ the difficulty dial still wins — a hard run gets no free identification', () => {
@@ -93,13 +120,13 @@ describe('OTA-1126 — the idle gate, and every muzzle it inherits', () => {
   });
 
   it('⚠ spacing is far wider than the interactive gap — this is unasked-for battery', () => {
-    expect(SRC).toContain('const HOMEWORK_GAP_MS = 30_000;');
-    expect(SRC).toContain('const SYNTH_GAP_MS = 20_000;');
+    expect(BOOT).toContain('const HOMEWORK_GAP_MS = 30_000;');
+    expect(BOOT).toContain('const SYNTH_GAP_MS = 20_000;');
   });
 
   it('an item already cached is never re-synthesized', () => {
-    expect(SRC).toContain('if (synth.readSynthCache(it.name)) continue;');
-    expect(SRC).toContain('if (pending.has(key)) continue;');
+    expect(BOOT).toContain('if (synth.readSynthCache(it.name)) continue;');
+    expect(BOOT).toContain('if (pending.has(key)) continue;');
   });
 });
 
@@ -129,7 +156,7 @@ describe('OTA-1126 — ⚠ the player coming back always wins', () => {
   });
 
   it('the outcome is logged either way, so a silent slot is visible', () => {
-    expect(SRC).toContain("`homework: item_desc \"${target.name}\" ${got ? '✓' : '∅'} ${Date.now() - t0}ms`");
+    expect(BOOT).toContain("`homework: item_desc \"${target.name}\" ${got ? '✓' : '∅'} ${Date.now() - t0}ms`");
   });
 });
 

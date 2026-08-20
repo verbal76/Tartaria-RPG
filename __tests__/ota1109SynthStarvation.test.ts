@@ -52,6 +52,11 @@ import {
 } from '../app/ai/generation/qwenTelemetry';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+// ⚠ OTA-1395 — reads the store AND its slices. Part 4 is splitting gameStore
+// into slices, and the literals these pins look for travel with the code. A
+// pin like this was never a claim about a FILE; it is a claim about the STORE.
+// See __tests__/helpers/storeSource.ts for when NOT to use it.
+import { storeSource } from '../test-utils/storeSource';
 
 const src = (p: string): string => readFileSync(join(__dirname, '..', p), 'utf8');
 
@@ -167,7 +172,7 @@ describe('OTA-1109 — the brief stops asking for an essay', () => {
 });
 
 describe('OTA-1109 — item synthesis yields to the jobs the player is waiting on', () => {
-  const store = src('app/state/gameStore.ts');
+  const store = storeSource();
 
   it('⚠ only one synthesis runs at a time — a salvage haul cannot queue five', () => {
     expect(store).toContain('let synthInFlight = false;');

@@ -11,9 +11,13 @@
  */
 import { readFileSync } from 'fs';
 import { join } from 'path';
+// ⚠ OTA-1395 — reads the store AND its slices. Part 4 is splitting gameStore into
+// slices and the literals these pins look for travel with the code; a pin like
+// this was never a claim about a FILE. See test-utils/storeSource.ts.
+import { storeSource } from '../test-utils/storeSource';
 
 const src = (...p: string[]) => readFileSync(join(__dirname, '..', ...p), 'utf8');
-const store = src('app', 'state', 'gameStore.ts');
+const store = storeSource();
 const save = src('app', 'engine', 'saveSystem.ts');
 
 describe('OTA-1377 — the orderly exit is marked', () => {

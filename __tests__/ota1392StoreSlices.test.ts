@@ -202,6 +202,10 @@ describe('OTA-1392 — source pins follow the code they pin', () => {
       // slash-joined string. Requiring a slash here produced five false
       // positives against the suite that documents the slices themselves.
       if (/\bslices\b/.test(body)) continue;
+      // ⚠ OTA-1395 — nor a suite using `storeSource()`, which reads the store
+      // AND its slices on purpose. Those pins are claims about the STORE, not
+      // about a file, and the helper says so at length.
+      if (/storeSource/.test(body)) continue;
       for (const m of body.matchAll(/toContain\(\s*(['"`])((?:\\.|(?!\1)[^\\])*)\1\s*\)/g)) {
         const needle = m[2];
         if (!needle || needle.length < 25) continue;   // short strings match everywhere
