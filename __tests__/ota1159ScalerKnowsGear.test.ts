@@ -16,6 +16,10 @@
 //      difficulty. That is the failure mode this design exists to avoid, and it is
 //      invisible in play until a tester reports "everything is suddenly brutal".
 
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import {
   enemyScalePower, gearPowerTerm,
   AC_POWER_BASELINE, DMG_POWER_BASELINE, GEAR_POWER_DIVISOR, GEAR_POWER_BLEND,
@@ -107,7 +111,7 @@ describe('OTA-1159 — nothing saturates the curve', () => {
 });
 
 describe('OTA-1159 — one place builds a scale power', () => {
-  const STORE = read('app', 'state', 'gameStore.ts');
+  const STORE = storeSource();
 
   it('every spawner routes through scalePowerOf', () => {
     // SEVEN call sites each hand-rolled the formula, which is exactly how the AC

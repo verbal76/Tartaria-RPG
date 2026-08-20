@@ -19,11 +19,15 @@
  * and only meaningful when every line runs it. If a future port drops one of
  * these, the line that lost it goes red rather than silently diverging again.
  */
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
 const src = (...p: string[]) => readFileSync(join(__dirname, '..', ...p), 'utf8');
-const store = src('app', 'state', 'gameStore.ts');
+const store = storeSource();
 const tts = src('app', 'voice', 'TTSManager.ts');
 const codex = src('app', 'components', 'LoreCodexBody.tsx');
 

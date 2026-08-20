@@ -274,6 +274,8 @@ import { createBootSlice } from './slices/bootSlice';
 import { createVendorSlice } from './slices/vendorSlice';
 import { createCraftingSlice } from './slices/craftingSlice';
 import { createInventorySlice } from './slices/inventorySlice';
+import { createQuestSlice } from './slices/questSlice';
+import { createBoardSlice } from './slices/boardSlice';
 import { setLastBootBreadcrumb } from '../diagnostics/runtimePressure'; // OTA-1276
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName, nameWasAltered } from '../engine/playerName';
@@ -763,7 +765,7 @@ const stageAdvancesInFlight = new Set<string>();
  *  ⚠ Granted ONCE, guarded on what is already in the pack — a boss stage freezes for the
  *  kill and re-runs this path, and a quest item that duplicates per visit is a currency
  *  press wearing a story hat. */
-function grantStageItems(
+export function grantStageItems(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   title: string,
@@ -1247,7 +1249,7 @@ export function freshInstanceId(prefix: string): string {
  *  identical local closure (fusion reserve, quest reserve, and now the bulk
  *  fusion reserve). Three copies of a merge-safety predicate is three chances
  *  for one of them to fall behind when a new per-instance field lands. */
-function sameStackUnit(a: InventoryItem, b: InventoryItem): boolean {
+export function sameStackUnit(a: InventoryItem, b: InventoryItem): boolean {
   return a.name === b.name && a.kind === b.kind
     && !a.coating && !b.coating
     && !a.instanceStats && !b.instanceStats
@@ -2843,7 +2845,7 @@ const TRAVEL_MIN_STAMINA = STAMINA_COSTS.travel;
 // very same call), so this rides an OTA — no native change. Inline-required
 // + try/caught so the engine stays import-clean and jest (which mocks
 // react-native) is unaffected; on web / missing-permission it no-ops.
-function buzzBlocked(): void {
+export function buzzBlocked(): void {
   try {
     const { Vibration, Platform } = require('react-native');
     if (Platform?.OS !== 'web') Vibration?.vibrate?.(30);
@@ -3651,12 +3653,9 @@ const WORLD_TICK_HOURS = 2;
 // fills at a satisfying pace instead of one line every real hour.
 const PATROL_SUBSTEPS_PER_TICK = 4;
 
-// OTA-859 [bounty board] — how many kill-bounties the player may carry at once. Small
-// enough that the slate stays meaningful, big enough to stack a grind.
-const MAX_ACTIVE_BOUNTIES = 3;
 // Read the player's bounty slate, migrating a LEGACY single activeBounty into the array
 // so an old save mid-contract doesn't lose it.
-function activeBountiesOf(
+export function activeBountiesOf(
   player: { activeBounties?: import('../engine/factionBounty').FactionBounty[]; activeBounty?: import('../engine/factionBounty').FactionBounty } | null | undefined,
 ): import('../engine/factionBounty').FactionBounty[] {
   if (!player) return [];
@@ -4074,7 +4073,7 @@ const RAID_TRIGGER_CHANCE = 0.3; // per eligible action, once past the cooldown
 // post-mitigation damage, EXTRA (never absorbed off the player), so a clean
 // parry that zeroes the hit spares the party too. Pool at 0 = the escort FAILS
 // on the spot. Parked (deactivated) parties are out of the fight.
-function applyEscortDamage(
+export function applyEscortDamage(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   baseDmg: number,
@@ -4109,7 +4108,7 @@ function applyEscortDamage(
 // Drop one or more failed escort contracts: pulled from the active lists (NOT
 // marked completed), and announce who fell. The party is gone with the quest
 // record, so the HUD clears automatically.
-function failEscortQuests(
+export function failEscortQuests(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   failedIds: string[],
@@ -4295,7 +4294,7 @@ function healEscortsOnRest(
  *  clean bullets, an ordinary line is untouched (no marker to split on), and the
  *  Beacon Rifle's doubled `✦✦` flourish still yields exactly one entry because
  *  empty pieces are dropped. */
-function mergeRewardLines(existing: readonly string[], incoming: readonly string[]): string[] {
+export function mergeRewardLines(existing: readonly string[], incoming: readonly string[]): string[] {
   const out = [...existing];
   for (const raw of incoming) {
     for (const piece of raw.split(/✦+/)) {
@@ -4427,7 +4426,7 @@ function meterSpiteGains(
  *  Scene-conditional racial/title AC is deliberately NOT included: it swings by room,
  *  and an enemy roster that re-scales when you step indoors is worse than one that is
  *  slightly conservative. */
-function scalePowerOf(player: PlayerCharacter): number {
+export function scalePowerOf(player: PlayerCharacter): number {
   const base = Math.max(
     player.stats.strength, player.stats.dexterity, player.stats.intelligence,
   );
@@ -5899,7 +5898,7 @@ async function prefetchFlourish(
  *  recall; get three pilgrims killed and the survivors greeted you like a
  *  stranger. This is the same rememberNpcMeeting the vendor path uses — the
  *  ledger did not need extending, only pointing at the rest of the cast. */
-function sightPerson(
+export function sightPerson(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   npc: { id: string; name: string; role?: string; factionId?: string | null },
@@ -6046,93 +6045,7 @@ function resolveVendorSubmission(
   void get().persist();
 }
 
-/** ⚠⚠ OTA-1187 (PUNCHLIST P8) — WHO CAN TAKE A CONTRACT HERE.
- *
- *  `turnInFactionQuest` has accepted a same-faction VENDOR, the OUTPOST MISSION BOARD
- *  (OTA-451) or the faction's own HALL (OTA-617) since those OTAs shipped. The other three
- *  handlers required `scene.vendor` and nothing else — so **a player could stand at the
- *  board that posted a hunt, holding the trophy, and be told to go find a vendor.** The
- *  board is the poster; it should take back what it put up.
- *
- *  ⚠ ONE resolver rather than a fourth hand-rolled copy. The three handlers had three
- *  different refusal wordings for the same rule already, which is exactly how they drifted
- *  apart in the first place.
- *
- *  Returns `null` when there is genuinely nobody here to hand anything to. */
-function turnInCounterparty(
-  get: () => GameStore,
-  player: PlayerCharacter,
-  scene: CurrentScene | null | undefined,
-): { faction: string | null; name: string; vendorPresent: boolean } | null {
-  const v = scene?.vendor;
-  if (v) {
-    // ⚠⚠ OTA-1201 (PUNCHLIST P9) — AT AN OWNED SITE, THE PEOPLE ANSWER FOR THE HOST.
-    // Owner's ruling: *"keep the grab like it is … make handin specific."* The hub anchors
-    // used to take work for whatever faction THEY carried — Irma re-pointed to the
-    // player's, Tarek a Reclaimer everywhere, Jorah Forgotten Order everywhere — so
-    // hand-ins never cared whose ground you stood on. Now the counterparty a hub anchor
-    // answers for is the SITE OWNER (OTA-1186's `hubOwnerFaction`, the map that already
-    // drives the room skins): host work is taken face to face at 100%, and anything else
-    // goes through the paid fallbacks (Halem 80% at this very gate, market 90%,
-    // courier 75%).
-    //
-    // ⚠ Scoped exactly: only inside a hub room, only at one of the NINE owned sites, and
-    // never for the broker — Halem's whole job is taking any faction's work, and a host
-    // stamp on him would DELETE the fallback this rule depends on. Random vendors, the
-    // outskirts hub, capitals and stalls keep today's behaviour, and the GRAB side (which
-    // work a vendor OFFERS, driven by `vendor.faction`) is deliberately untouched.
-    // ⚠ ANCHOR-PRECISE, not location-wide: the stamp applies only when the vendor in the
-    // scene IS the current room's anchor (matched by the room's own `anchorNpc`). The
-    // first spelling stamped ANY vendor standing in a hub — which is the anchor in real
-    // play, but the rule is about the anchors, and guarding by location made the seam
-    // claim more than the ruling says. (It also broke four suites that inject matching-
-    // faction agents into hub scenes — an artificial state, and still the correct hint.)
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
-    const room = isHubLocation(player.currentLocationId) && player.hubRoomId
-      ? hubRoomFor(player.hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId))
-      : null;
-    const isRoomAnchor = !!room && room.anchorNpc === v.name;
-    const host = isRoomAnchor && !CB.isContractBroker(scene?.vendor)
-      ? hubOwnerFaction(player.currentLocationId)
-      : null;
-    return { faction: host ?? (v.faction ?? null), name: v.name, vendorPresent: true };
-  }
-  const board = scene?.missionBoard;
-  if (board) return { faction: board.faction ?? null, name: 'The mission board', vendorPresent: false };
-  // OTA-617 — building-level: inside a faction's own hub, that faction's hall takes its
-  // own work with no specific agent in the room.
-  if (isHubLocation(player.currentLocationId)) {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { startingLocationForFaction } = require('../engine/character') as typeof import('../engine/character');
-    const home = FACTIONS.find((f) => {
-      try { return startingLocationForFaction(f.id) === player.currentLocationId; } catch { return false; }
-    });
-    if (home) return { faction: home.id, name: `the ${home.name} hall`, vendorPresent: false };
-  }
-  return null;
-}
 
-/** OTA-1050 — credit a finished contract to the person who took it back.
- *
- *  Called from the five announceMissionComplete sites rather than from inside
- *  announceMissionComplete itself, because only the caller knows whether the
- *  turn-in was face to face. A "send word" courier turn-in (OTA-456, faction
- *  quests only) can happen while the player happens to be standing at some
- *  unrelated stall, and crediting that stall would be a lie the greeting layer
- *  then repeats for the rest of the save. */
-function creditTurnIn(
-  get: () => GameStore,
-  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
-  remote: boolean,
-): void {
-  if (remote) return;
-  const v = get().currentScene?.vendor;
-  if (!v) return; // mission board / faction hall — nobody to credit
-  set((s) => ({
-    worldMemory: recordNpcDealing(s.worldMemory, vendorNpcId(v), { contractsTurnedIn: 1 }),
-  }));
-}
 
 export function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
   const oldHours = player.hoursElapsed ?? 0;
@@ -6181,7 +6094,7 @@ export function advanceTime(player: PlayerCharacter, hours: number): PlayerChara
  *  player variable four different ways, and a stamp that is right at eight of them is a
  *  contract that silently pays the legacy rate at the ninth. Returns an EMPTY object when
  *  there is no player, so spreading it is always safe and never writes `undefined`. */
-function acceptCellStamp(get: () => GameStore): { acceptedAtCell?: { x: number; y: number } } {
+export function acceptCellStamp(get: () => GameStore): { acceptedAtCell?: { x: number; y: number } } {
   const p = get().player;
   return p ? { acceptedAtCell: playerGridCell(p) } : {};
 }
@@ -6354,15 +6267,6 @@ function grantTutorialItem(
 // operate on the room), the scene-bar label shows "Building · Room", and any
 // wilderness vendor / hooks are cleared (you're indoors). Combat fields are
 // left untouched — buildings are entered from peaceful scenes.
-// OTA-789 — a Hidden Market stall is a neutral-ground BROKER: its Contracts
-// board posts EVERY faction's open work (see VendorContractsModal), not just its
-// own rostered faction. So a contract accepted there usually belongs to a
-// DIFFERENT faction than the vendor. The accept handlers use this to search
-// every faction's pool for a broker vendor (a normal vendor / mission board
-// searches only its single faction).
-function isBrokerVendorId(id: string | null | undefined): boolean {
-  return typeof id === 'string' && id.startsWith('hidden_market_');
-}
 
 function patchSceneForBuildingRoom(
   get: () => GameStore,
@@ -7864,12 +7768,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ storyReveal: { storyId } });
   },
   pendingContractsTab: null,
-  requestContractsTab(tab) {
-    set({ pendingContractsTab: tab });
-  },
-  clearPendingContractsTab() {
-    set({ pendingContractsTab: null });
-  },
   pendingInventoryCategory: null,
   requestInventoryCategory(cat) {
     set({ pendingInventoryCategory: cat });
@@ -8350,6 +8248,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // ⚠⚠ OTA-1399 — SLICE 8. The plan said one slice; measuring said THREE, because
   // the dependency sets separate almost perfectly (inventory ∩ crafting is EMPTY).
   // Three files, three honest deps objects — see each header.
+
+  // ⚠⚠ OTA-1400 — SLICE 9. Slice 8 measured and SPLIT; this one measured and did
+  // NOT. The four contract families share 14-18 of ~20 module symbols each — one
+  // job, not four. The mission BOARD shares ZERO with all of them, so that is the
+  // seam, and it is not the one the file layout suggested.
+  ...createQuestSlice(set, get, {
+    FRESH_ENEMY_ARRAYS,
+    _chainRouting,
+    acceptCellStamp,
+    advanceMissionRoute,
+    advanceTime,
+    anyTrackedContract,
+    applyEscortDamage,
+    applyTrainAndLog,
+    bumpQuestsAccepted,
+    desiredMissionLeg,
+    failEscortQuests,
+    freshInstanceId,
+    grantStageItems,
+    logRepChanges,
+    maybeTeachRecipeReward,
+    mergeRewardLines,
+    nextAcceptBurstIndex,
+    recordMemorableEvent,
+    safeLocName,
+    sameStackUnit,
+    scalePowerOf,
+    sightPerson,
+    statNowClause,
+    vendorNpcId,
+  }),
+  ...createBoardSlice(set, get, {
+    activeBountiesOf,
+    buzzBlocked,
+  }),
   ...createVendorSlice(set, get, {
     SKYREACHER_CHART_NAMES,
     freshInstanceId,
@@ -23211,16 +23144,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  generateNewQuest() {
-    const memory = get().worldMemory;
-    const quest = generateQuest(memory);
-    const player = get().player;
-    if (player) {
-      set({ player: { ...player, activeQuests: [...player.activeQuests, quest] } });
-    }
-    void get().persist();
-    return quest;
-  },
 
   resolveEnemyDefeat() {
     const { currentScene, player, worldMemory } = get();
@@ -24736,330 +24659,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
 
 
-  acceptFactionQuest(titleOrId) {
-    const state = get();
-    const player = state.player;
-    const scene = state.currentScene;
-    if (!player) return;
-    if (state.tutorialDemoVendor) {
-      get().appendLog('system', 'Tour mode — contracts can\'t be accepted until the tutorial ends.');
-      return;
-    }
-    // OTA-451 — a contract can be picked up from a same-faction VENDOR or from
-    // the OUTPOST MISSION BOARD. Resolve the quest faction + a display source
-    // name from whichever is present.
-    const acceptFaction = scene?.vendor?.faction ?? scene?.missionBoard?.faction ?? null;
-    const acceptSourceName = scene?.vendor?.name ?? (scene?.missionBoard ? 'the mission board' : null);
-    if (!acceptFaction || !acceptSourceName) {
-      // Resolve the named contract to its faction so we can tell the
-      // player WHICH vendor archetype to seek, not just "a faction
-      // agent." Falls back to the generic line if the input doesn't
-      // fuzzy-match any cataloged hunt / mystery / storyline / quest.
-      const hint = findQuestFactionHint(titleOrId);
-      if (hint && hint.vendorNames.length > 0) {
-        const sample = hint.vendorNames.slice(0, 2).join(' or ');
-        get().appendLog(
-          'arbiter',
-          `The Arbiter looks past you. "${hint.contractTitle} is ${withArticle(hint.kind)} of the ${hint.factionLabel}. Find ${sample} — or any other ${hint.factionLabel} agent — to pick it up."`,
-        );
-      } else if (hint) {
-        get().appendLog(
-          'arbiter',
-          `The Arbiter shrugs. "${hint.contractTitle} is ${withArticle(hint.kind)} of the ${hint.factionLabel}. Find ${withArticle(hint.factionLabel)} agent."`,
-        );
-      } else {
-        get().appendLog(
-          'arbiter',
-          `The Arbiter shrugs. "Contracts come from wandering faction vendors — keep walking until one shows up at your scene."`,
-        );
-      }
-      return;
-    }
-    // Direct id match first, then fuzzy title within the faction pool. A broker
-    // (Hidden Market stall) searches EVERY faction's pool, since its board posts
-    // all factions' work — the contract's faction may not be the vendor's own.
-    const direct = findFactionQuestById(titleOrId);
-    const searchFactions = isBrokerVendorId(scene?.vendor?.id)
-      ? FACTIONS.map((f) => f.id)
-      : [acceptFaction];
-    let matchedQuest: typeof direct | null = null;
-    let factionId: string = acceptFaction;
-    const offered: string[] = [];
-    for (const fid of searchFactions) {
-      const pool = availableFactionQuests(
-        fid,
-        getStanding(player.factionStanding, fid),
-        player.activeFactionQuestIds ?? [],
-        player.completedFactionQuestIds ?? [],
-      );
-      for (const q of pool) offered.push(`"${q.title}"`);
-      const found = direct && pool.includes(direct) ? direct : fuzzyFindFactionQuest(titleOrId, pool);
-      if (found) { matchedQuest = found; factionId = fid; break; }
-    }
-    if (!matchedQuest) {
-      const titles = offered.join(', ');
-      get().appendLog(
-        'arbiter',
-        titles
-          ? `${acceptSourceName} — currently on offer: ${titles}.`
-          : `${acceptSourceName} has nothing on offer for you right now.`,
-      );
-      return;
-    }
-    const quest = matchedQuest;
-    const wasFirstQuest = (player.activeFactionQuestIds?.length ?? 0) === 0
-      && (player.completedFactionQuestIds?.length ?? 0) === 0;
-    // SINGLE-ACTIVE — a new contract joins ACTIVE only if you aren't already
-    // running one; otherwise it's parked, so batch-accepting from the board
-    // doesn't make everything live at once. You activate it when you're ready.
-    const hasActiveOther = anyTrackedContract(player); // OTA-972 — #118: cross-kind
-    const newTracked = !hasActiveOther;
-    // OTA-962 — ESCORT contract: accepting spawns the shared-pool party (engine_Dev
-    // model). It rides on the quest record; collateral damage + failure live in
-    // applyEscortDamage / failEscortQuests.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const escortMod = require('../engine/escort') as typeof import('../engine/escort');
-    const escortSpec = escortMod.escortSpecForQuest(quest);
-    const escort = escortSpec
-      ? escortMod.spawnEscortPool(escortSpec.count, player.hpMax ?? 20, escortSpec.label)
-      : null;
-    // OTA-1057 — the escort leader goes on the ledger the moment you take them
-    // on. `escort_` keys them by name, so the same person walked twice is one
-    // relationship, and whether you got them home is recorded against it below.
-    if (escort?.leaderName) {
-      sightPerson(get, set, {
-        id: `escort_${escort.leaderName}`,
-        name: escort.leaderName,
-        role: 'under your protection',
-        factionId: quest.factionId,
-      });
-    }
-    set((s) =>
-      s.player
-        ? {
-            player: {
-              ...s.player,
-              activeFactionQuestIds: [...(s.player.activeFactionQuestIds ?? []), quest.id],
-              activeFactionQuests: [
-                ...(s.player.activeFactionQuests ?? []),
-                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: newTracked, ...(escort ? { escort } : {}), ...acceptCellStamp(get) },
-              ],
-            },
-          }
-        : s,
-    );
-    if (escort) {
-      const fallsV = escort.count === 1 ? 'falls' : 'fall';
-      const standsV = escort.count === 1 ? 'stands' : 'stand';
-      get().appendLog(
-        'world',
-        newTracked
-          ? `Your ${escort.label} ${fallsV} in beside you (${escort.hp} HP). Keep them alive — if the party is cut down, the escort fails.`
-          : `Your ${escort.label} (${escort.hp} HP) ${standsV} by for ${quest.title}. They'll fall in when you ACTIVATE this contract.`,
-      );
-    }
-    // OTA-1055 — the sixth accept path. The other five credit contractsTaken;
-    // this one — the most face-to-face of them — never did, so a faction agent
-    // could show "1 contract finished" having no record of handing it over, and
-    // never reached the 'known' rung that OTA-1050 added contractsTaken to.
-    if (scene?.vendor) {
-      set((st) => ({
-        worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(scene.vendor!), { contractsTaken: 1 }),
-      }));
-    }
-    const factionCompact = acceptIsCompact(); // OTA-1048 — before the bump.
-    bumpQuestsAccepted(get, set);
-    // First-quest milestone — Arbiter can reference "the first
-    // contract you took" later. Fires only on the first accept of
-    // the run; type union added in this batch.
-    if (wasFirstQuest) {
-      recordMemorableEvent(get, set, {
-        kind: 'first_quest',
-        text: `took your first contract — ${quest.title}`,
-        factionId,
-      });
-    }
-    get().appendLog(
-      'reward',
-      `New faction contract — ${quest.title}${parkedTag(newTracked)}. ${quest.objective} (${factionId.replace(/_/g, ' ')})`,
-    );
-    // Play the first stage immediately so the player has narrative
-    // momentum, mirroring how hunts / mysteries / storylines open.
-    // Per-quest stage0.arbiter SUPPRESSED on accept — when the player
-    // chip-taps six contracts in a row the per-quest Arbiter lines
-    // pile up as offhand reactions to descriptions the player has
-    // already moved past. bumpQuestsAccepted handles the meta-level
-    // commentary (first-quest line, burst-start, "stacking", "slow
-    // down") instead.
-    const stage0 = quest.stages?.[0];
-    // OTA-1048 — mid-burst the opening beat is dropped with the rest of the
-    // detail; it is replayed in Contracts when the contract is activated.
-    if (stage0 && !factionCompact) {
-      get().appendLog('world', stage0.narration);
-    }
-    // OTA 059 — accepting a contract is a social close — you
-    // convinced the agent you were worth handing the work to.
-    // Trains CHA on every accept.
-    {
-      const chaLeveled = trainAcceptCharismaGated(get, set);
-      if (chaLeveled != null) {
-        get().appendLog(
-          'reward',
-          `✦ They handed you the contract. +1 CHA (${statNowClause(get().player, 'charisma', chaLeveled)}).`,
-        );
-      }
-      // OTA-057 — accepting a contract is an active CHA push; the
-      // matching WIS train fires on the completion path, not on accept.
-    }
-    void get().persist();
-  },
 
-  setFactionQuestActive(id, active) {
-    const player = get().player;
-    if (!player) return;
-    const list = player.activeFactionQuests ?? [];
-    const rec = list.find((q) => q.id === id);
-    if (!rec) return;
-    const nextActive = active != null ? active : rec.tracked === false;
-    // SINGLE-ACTIVE — "the mission you're on." Activating one PAUSES every other
-    // contract (it stays on the slate; ABANDON is the only thing that drops one).
-    const othersPaused = nextActive
-      ? list.filter((q) => q.id !== id && q.tracked !== false).length
-      : 0;
-    set((s) => (s.player ? {
-      player: {
-        ...s.player,
-        // ⚠ OTA-1320 — activating any contract also clears a routed tower.
-        // routedClimbId was write-only and never cleared, so after routing a
-        // tower and then a contract, the field still named the tower as "the
-        // mission you're on" — stale state waiting to lie to its first reader.
-        routedClimbId: nextActive ? null : s.player.routedClimbId,
-        activeFactionQuests: (s.player.activeFactionQuests ?? []).map((q) =>
-          q.id === id ? { ...q, tracked: nextActive } : (nextActive ? { ...q, tracked: false } : q)),
-        // OTA-992 — cross-kind: "the mission you're on" means across ALL routed
-        // kinds, not just this list. See setContractActive's mirror sweep.
-        activeHunts: nextActive ? (s.player.activeHunts ?? []).map((h) => ({ ...h, tracked: false })) : (s.player.activeHunts ?? []),
-        activeMysteries: nextActive ? (s.player.activeMysteries ?? []).map((m) => ({ ...m, tracked: false })) : (s.player.activeMysteries ?? []),
-        activeStorylines: nextActive ? (s.player.activeStorylines ?? []).map((st) => ({ ...st, tracked: false })) : (s.player.activeStorylines ?? []),
-      },
-    } : s));
-    const def = findFactionQuestById(id);
-    const title = def?.title ?? id;
-    const pausedNote = othersPaused > 0 ? ` (${othersPaused} other contract${othersPaused > 1 ? 's' : ''} paused.)` : '';
-    // OTA-962 — an escort's party PARKS when its contract is deactivated (off the
-    // HUD, no combat damage) and falls back in on re-activate.
-    const party = rec.escort && rec.escort.hp > 0 ? rec.escort : null;
-    const partyFalls = party && party.count === 1 ? 'falls' : 'fall';
-    const partyWaits = party && party.count === 1 ? 'waits' : 'wait';
-    if (nextActive) {
-      get().appendLog('world', (party
-        ? `Now on ${title}. Your ${party.label} ${partyFalls} in beside you.`
-        : `Now on ${title}. It's the contract you're running.`) + pausedNote);
-    } else {
-      get().appendLog('world', party
-        ? `Stood down from ${title}. Your ${party.label} ${partyFalls} back to safety and ${partyWaits}; they'll rejoin when you re-activate it.`
-        : `Paused ${title}. It won't advance until you re-activate it.`);
-    }
-    // Switching the active contract (or pausing the routed one) drops a route
-    // chain that no longer matches the mission you're on.
-    if (get().player?.routedMission && get().player?.routedMission?.id !== id) {
-      set((s) => (s.player ? { player: { ...s.player, routedMission: null } } : s));
-    }
-    if (!nextActive && get().player?.routedMission?.id === id) {
-      set((s) => (s.player ? { player: { ...s.player, routedMission: null } } : s));
-    }
-    void get().persist();
-  },
 
-  setContractActive(kind, id, active) {
-    // Faction quests keep their own single-active routing semantics.
-    if (kind === 'faction_quest') { get().setFactionQuestActive(id, active); return; }
-    const player = get().player;
-    if (!player) return;
-    const resolve = (cur: boolean) => (active != null ? active : !cur);
-    let title = id;
-    let nextActive = true;
-    let changed = false;
-    if (kind === 'hunt') {
-      const rec = (player.activeHunts ?? []).find((h) => h.id === id);
-      if (!rec) return;
-      nextActive = resolve(rec.tracked !== false);
-      title = findHuntById(id)?.title ?? id;
-      set((s) => (s.player ? { player: { ...s.player, activeHunts: (s.player.activeHunts ?? []).map((h) => h.id === id ? { ...h, tracked: nextActive } : h) } } : s));
-      changed = true;
-    } else if (kind === 'mystery') {
-      const rec = (player.activeMysteries ?? []).find((m) => m.id === id);
-      if (!rec) return;
-      nextActive = resolve(rec.tracked !== false);
-      title = findMysteryById(id)?.title ?? id;
-      set((s) => (s.player ? { player: { ...s.player, activeMysteries: (s.player.activeMysteries ?? []).map((m) => m.id === id ? { ...m, tracked: nextActive } : m) } } : s));
-      changed = true;
-    } else if (kind === 'storyline') {
-      const rec = (player.activeStorylines ?? []).find((st) => st.id === id);
-      if (!rec) return;
-      nextActive = resolve(rec.tracked !== false);
-      title = findStorylineById(id)?.title ?? id;
-      set((s) => (s.player ? { player: { ...s.player, activeStorylines: (s.player.activeStorylines ?? []).map((st) => st.id === id ? { ...st, tracked: nextActive } : st) } } : s));
-      changed = true;
-    } else if (kind === 'whisper') {
-      const rec = (player.activeWhispers ?? []).find((w) => w.id === id);
-      if (!rec) return;
-      nextActive = resolve(rec.tracked !== false);
-      title = 'the whisper';
-      set((s) => (s.player ? { player: { ...s.player, activeWhispers: (s.player.activeWhispers ?? []).map((w) => w.id === id ? { ...w, tracked: nextActive } : w) } } : s));
-      changed = true;
-    } else if (kind === 'lead') {
-      const rec = (player.activeQuests ?? []).find((q) => q.id === id);
-      if (!rec) return;
-      nextActive = resolve(rec.tracked !== false);
-      title = `${rec.objective.verb} ${rec.objective.target}`;
-      set((s) => (s.player ? { player: { ...s.player, activeQuests: (s.player.activeQuests ?? []).map((q) => q.id === id ? { ...q, tracked: nextActive } : q) } } : s));
-      changed = true;
-    } else if (kind === 'broker') {
-      const m = player.brokerMission;
-      if (!m || m.done) return;
-      // Broker stores the INVERSE flag (`paused`); active === !paused.
-      nextActive = active != null ? active : m.paused === true;
-      title = 'the parley';
-      set((s) => (s.player && s.player.brokerMission ? { player: { ...s.player, brokerMission: { ...s.player.brokerMission, paused: !nextActive } } } : s));
-      changed = true;
-    }
-    if (!changed) return;
-    // OTA-992 — SINGLE-ACTIVE, enforced at ACTIVATION. The accept-side parking was
-    // trivially undone by two taps of SET ACTIVE, leaving several contracts
-    // live at once forever after (every later accept then parked "because
-    // you're busy" against contracts the player couldn't see were both live).
-    // Activating a routed contract stands every other routed contract down,
-    // across kinds. Whispers, leads and the parley are ambient-tier: they are
-    // breadcrumbs, not routes, and deliberately do not participate.
-    if (changed && nextActive && (kind === 'hunt' || kind === 'mystery' || kind === 'storyline')) {
-      set((s2) => (s2.player ? {
-        player: {
-          ...s2.player,
-          activeHunts: (s2.player.activeHunts ?? []).map((h) => (kind === 'hunt' && h.id === id ? h : { ...h, tracked: false })),
-          activeMysteries: (s2.player.activeMysteries ?? []).map((m) => (kind === 'mystery' && m.id === id ? m : { ...m, tracked: false })),
-          activeStorylines: (s2.player.activeStorylines ?? []).map((st) => (kind === 'storyline' && st.id === id ? st : { ...st, tracked: false })),
-          activeFactionQuests: (s2.player.activeFactionQuests ?? []).map((q) => ({ ...q, tracked: false })),
-          // ⚠ OTA-1361 — the tower belongs in this sweep. setFactionQuestActive has
-          // cleared `routedClimbId` since OTA-1320, but THIS sweep never did, so
-          // activating a hunt/mystery/storyline left the routed tower still flagged
-          // as the mission you're on. Invisible while nothing read the flag; the
-          // moment the climb cards grew an ACTIVE toggle it would show two live
-          // missions at once.
-          routedClimbId: null,
-        },
-      } : s2));
-    }
-    // Staged contracts + leads truly FREEZE when paused (auto-advance / auto-complete
-    // gated); whispers + the parley just drop off the standing reminders.
-    const reminderOnly = kind === 'whisper' || kind === 'broker';
-    get().appendLog('world', nextActive
-      ? `Re-activated ${title}. It's back in play.`
-      : reminderOnly
-        ? `Deactivated ${title}. It stays on your slate but drops off your reminders until you re-activate it.`
-        : `Deactivated ${title}. It stays on your slate but won't advance until you re-activate it.`);
-    void get().persist();
-  },
 
   routeGreatClimb(climbId) {
     const player = get().player;
@@ -25153,1583 +24754,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  routeMission(id) {
-    const player = get().player;
-    if (!player) return;
-    const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
-    if (!rec) { get().appendLog('arbiter', "That contract isn't on your slate."); return; }
-    // Routing to a contract IS choosing to run it — make it the single active one.
-    if (rec.tracked === false || (player.activeFactionQuests ?? []).some((q) => q.id !== id && q.tracked !== false)) {
-      get().setFactionQuestActive(id, true);
-    }
-    const def = findFactionQuestById(id);
-    if (!def) return;
-    const live = get().player ?? player;
-    const want = desiredMissionLeg(live, def, rec);
-    if (live.currentLocationId === want.loc) {
-      // Already at this leg's target — seed the chain so it continues after the
-      // deed / turn-in, then let advanceMissionRoute settle it.
-      set((s) => (s.player ? { player: { ...s.player, routedMission: { id, phase: want.phase } } } : s));
-      get().appendLog('world', want.phase === 'to_turnin'
-        ? `You're already at ${safeLocName(want.loc)} — hand ${def.title} in here.`
-        : `You're already at the objective for ${def.title}.`);
-      advanceMissionRoute(get, set);
-      void get().persist();
-      return;
-    }
-    set((s) => (s.player ? { player: { ...s.player, routedMission: { id, phase: want.phase } } } : s));
-    _chainRouting = true;
-    try { get().setTravelCourse(want.loc); } finally { _chainRouting = false; }
-    get().appendLog('world', want.phase === 'to_turnin'
-      ? `✦ Course set — ${def.title}. Heading to turn in at ${safeLocName(want.loc)}.`
-      : `✦ Course set — ${def.title}. Heading to the objective: ${safeLocName(want.loc)}.`);
-    void get().persist();
-  },
 
-  turnInFactionQuest(titleOrId, remote = false) {
-    const state = get();
-    const player = state.player;
-    const scene = state.currentScene;
-    if (!player) return;
-    // OTA-451 — turn in to a same-faction VENDOR or the OUTPOST MISSION BOARD.
-    // OTA-456 — or REMOTELY by courier ("send word <quest>") from anywhere, for a
-    // 15% TC cut (full rep). Travel to claim in full stays the optimal play.
-    // OTA-1185 — the trading post brokers ANY faction's contract for a cut (PUNCHLIST P2).
-    // ⚠ Resolved here, before `turnFaction`, because this handler decides who it is
-    // dealing with BEFORE it knows which contract is meant — and the broker's whole point
-    // is that he does not need to match. Without this the outskirts gate (a hub with no
-    // owning faction, so no hall fallback) would refuse him at the early return below.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
-    const atBroker = CB.isContractBroker(scene?.vendor);
-    let turnFaction = scene?.vendor?.faction ?? scene?.missionBoard?.faction ?? null;
-    let turnSourceName = scene?.vendor?.name ?? (scene?.missionBoard ? 'The mission board' : null);
-    // OTA-617 — BUILDING-LEVEL in-person turn-in. If you're inside a faction's
-    // home outpost (no specific board/vendor needed in this exact room), that
-    // faction's hall takes its own contracts at FULL pay. Keeps the three
-    // turn-in paths (this, completeContractFromUI, autoSubmit) in agreement and
-    // is what makes "auto-complete on entering the building" actually pay out.
-    if (!turnFaction && isHubLocation(player.currentLocationId)) {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { startingLocationForFaction } = require('../engine/character');
-      const homeFaction = FACTIONS.find((f) => {
-        try { return startingLocationForFaction(f.id) === player.currentLocationId; } catch { return false; }
-      });
-      if (homeFaction) {
-        turnFaction = homeFaction.id;
-        turnSourceName = `the ${homeFaction.name} hall`;
-      }
-    }
-    if ((!turnFaction && !atBroker) || !turnSourceName) {
-      // If the player named a specific contract, fuzzy-match it and tell
-      // them the exact faction + sample vendor names. Otherwise fall
-      // back to listing the factions they owe across all active quests.
-      const namedHint = findQuestFactionHint(titleOrId);
-      if (namedHint && namedHint.vendorNames.length > 0) {
-        const sample = namedHint.vendorNames.slice(0, 2).join(' or ');
-        get().appendLog(
-          'arbiter',
-          `The Arbiter waves. "${namedHint.contractTitle} closes out with the ${namedHint.factionLabel}. Find ${sample} — or any other ${namedHint.factionLabel} agent — and hand it over in person. The trip pays a long-haul bonus."`,
-        );
-        return;
-      }
-      const active = (player.activeFactionQuestIds ?? [])
-        .map((id) => findFactionQuestById(id))
-        .filter((q): q is NonNullable<ReturnType<typeof findFactionQuestById>> => !!q);
-      if (active.length > 0) {
-        // List the unique factions the player owes a turn-in to AND a
-        // sample vendor name from each so they know what to look for.
-        const factionEntries = Array.from(
-          new Map(
-            active.map((q) => {
-              const f = FACTIONS.find((x) => x.id === q.factionId);
-              return [q.factionId, f?.name ?? q.factionId.replace(/_/g, ' ')];
-            }),
-          ).entries(),
-        );
-        const lines = factionEntries.map(([fid, fname]) => {
-          const sample = VENDORS.filter((v) => v.faction === fid).slice(0, 2).map((v) => v.name).join(' / ');
-          return sample ? `${fname} (e.g. ${sample})` : fname;
-        });
-        const list =
-          lines.length === 1
-            ? `${withArticle(lines[0])} vendor`
-            : `a vendor from one of: ${lines.join('; ')}`;
-        get().appendLog(
-          'arbiter',
-          `The Arbiter waves. "Find ${list} and turn that contract in face to face — the trek pays a long-haul bonus. Set a course to the ◆ pin in Contracts."`,
-        );
-      } else {
-        get().appendLog(
-          'arbiter',
-          `The Arbiter waves. "You have no active contracts. Find a faction vendor first."`,
-        );
-      }
-      return;
-    }
-    // OTA-456 — the agent name shown in the flow. Remote turn-ins have no vendor
-    // present, so a "runner" stands in.
-    const sourceLabel = turnSourceName ?? 'A runner';
-    // OTA-1002 — the STAGED records are the truth; the legacy id mirror alone
-    // refused READY contracts whenever a path wrote only the records.
-    const active = Array.from(new Set([
-      ...(player.activeFactionQuestIds ?? []),
-      ...(player.activeFactionQuests ?? []).map((q) => q.id),
-    ]));
-    // Direct id, then fuzzy title across active list.
-    const direct = findFactionQuestById(titleOrId);
-    const candidate = direct ?? fuzzyFindFactionQuest(
-      titleOrId,
-      active.map((id) => findFactionQuestById(id)).filter((q): q is NonNullable<typeof q> => !!q),
-    );
-    if (!candidate || !active.includes(candidate.id)) {
-      get().appendLog(
-        'arbiter',
-        `${sourceLabel} doesn't list that one on your active slate.`,
-      );
-      return;
-    }
-    // OTA-1185 — brokered when the trading post is standing in for a faction that is not
-    // its own. Computed here rather than reused from `atBroker` so a contract the broker
-    // could have taken anyway (unaligned, or his own) is NOT charged a cut.
-    const questViaBroker = atBroker && candidate.factionId !== turnFaction;
-    if (!questViaBroker && candidate.factionId !== turnFaction) {
-      get().appendLog(
-        'arbiter',
-        `${sourceLabel} won't take it — wrong faction. Bring it to ${candidate.factionId.replace(/_/g, ' ')}, or to the trading post at any outpost gate.`,
-      );
-      return;
-    }
-    // Stage gate — quests with authored stages require the player to
-    // reach the final stage before turn-in. Quests without stages
-    // (legacy single-objective) are turn-in-able immediately, matching
-    // the pre-refactor behavior.
-    const activeRecord = (player.activeFactionQuests ?? []).find((q) => q.id === candidate.id);
-    if (candidate.stages && candidate.stages.length > 0) {
-      const currentStage = activeRecord?.stage ?? 0;
-      if (currentStage < candidate.stages.length) {
-        get().appendLog(
-          'arbiter',
-          `${sourceLabel}: "${candidate.title}" isn't done — you're on step ${currentStage + 1} of ${candidate.stages.length}. Come back when the work's behind you.`,
-        );
-        return;
-      }
-    }
-    // OTA-456 — a FETCH quest is a PHYSICAL delivery: it can't be couriered
-    // remotely (you can't mail the goods). Refuse a remote turn-in for a fetch
-    // contract; it has to change hands in person. (Non-fetch contracts may still
-    // be couriered for a reduced cut — handled by their own turn-in paths.)
-    if (remote && candidate.fetch) {
-      const fLabel = candidate.factionId.replace(/_/g, ' ');
-      get().appendLog(
-        'arbiter',
-        `The Arbiter shakes their head. "${candidate.title} is a delivery — the ${candidate.fetch.itemName} has to change hands in person. Carry it to ${fLabel} yourself."`,
-      );
-      return;
-    }
-    // ⚠⚠ OTA-1185 — THE BROKER DOES TAKE DELIVERIES, and the first version of this did
-    // not. Getting that wrong would have opened a NEW unfinishable state while closing
-    // P2, so the reasoning is recorded here rather than left to be re-derived.
-    //
-    //   The first pass refused a fetch quest at the broker, on the strength of OTA-456
-    //   ("a FETCH quest is a PHYSICAL delivery … you can't mail the goods"), and argued it
-    //   cost no reachability because faction quests come from the player's OWN mission
-    //   board. ⚠ THAT SECOND CLAIM IS FALSE, and this suite's own premise check caught it:
-    //   faction quests are ALSO offered by vendors (`acceptFaction`, from the scene
-    //   vendor), and a Hidden Market stall searches EVERY faction's pool. A player can
-    //   therefore be holding an unreachable faction's fetch quest — exactly the contract
-    //   this OTA exists to un-strand — and the refusal would have stranded it.
-    //
-    //   ⚠ OTA-456's rule is not violated by allowing it. Its words are about goods
-    //   travelling by word of mouth with nobody present. Here the player stands at the
-    //   counter and the items leave their hands: the fetch gate immediately below still
-    //   verifies the player HOLDS them and still consumes them. The goods change hands in
-    //   person. Only the final destination is delegated, which is what a broker is.
-    //
-    // OTA-450 — fetch gate. The generic per-faction starter quests require the
-    // player to actually HOLD the items; verify, then consume them on turn-in so
-    // it's a real "gather N, bring them back" loop (not a free narrative close).
-    if (candidate.fetch) {
-      const { itemName, quantity } = candidate.fetch;
-      const have = player.inventory
-        .filter((i) => i.name.toLowerCase() === itemName.toLowerCase())
-        .reduce((n, i) => n + (i.quantity ?? 1), 0);
-      if (have < quantity) {
-        get().appendLog(
-          'arbiter',
-          `${sourceLabel} checks the slate: "${candidate.title}" needs ${quantity}× ${itemName} — you've brought ${have}. Come back when you've got the rest.`,
-        );
-        return;
-      }
-      let toRemove = quantity;
-      const consumed = player.inventory
-        .map((i) => {
-          if (toRemove <= 0 || i.name.toLowerCase() !== itemName.toLowerCase()) return i;
-          const take = Math.min(toRemove, i.quantity ?? 1);
-          toRemove -= take;
-          return { ...i, quantity: (i.quantity ?? 1) - take };
-        })
-        .filter((i) => (i.quantity ?? 1) > 0);
-      set((s) => (s.player ? { player: { ...s.player, inventory: consumed } } : s));
-    }
-    // B2 — full pay in person + a long-haul TC bonus scaled to how far you carried it.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.reward.tc, activeRecord?.acceptedAtCell);
-    // OTA-964 — ESCORT pay model (owner: "go with the scaled party for most
-    // escorts, but make the higher tier escorts all or nothing"). Scaled
-    // escorts pay the TC fee times the fraction of the party still standing
-    // (floored at 10% — you did walk them there); all_or_nothing drop-offs
-    // skip the scaling entirely. Rep pays in full either way — the faction
-    // credits the delivery itself.
-    let escortPayMult = 1;
-    if (activeRecord?.escort && candidate.escort?.mode !== 'all_or_nothing') {
-      const e = activeRecord.escort;
-      if (e.hpMax > 0) escortPayMult = Math.max(0.1, Math.min(1, e.hp / e.hpMax));
-    }
-    // OTA-1185 — the broker takes his cut and forfeits the long-haul bonus; the escort
-    // multiplier still applies on top, because that one prices how many of the party you
-    // actually walked home and has nothing to do with who paid you.
-    const baseAndJourneyTc = CB.contractPayoutTc(candidate.reward.tc, journeyTc, questViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
-    const payTc = Math.max(1, Math.round(baseAndJourneyTc * escortPayMult));
-    // ⚠ The announce line must not claim a long-haul bonus the broker did not pay.
-    const shownJourneyTc = questViaBroker ? 0 : journeyTc;
-    if (questViaBroker) {
-      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
-    }
-    const payRep = candidate.reward.rep;
-    const repResult = applyRepChange(player.factionStanding, candidate.factionId, payRep);
-    set((s) =>
-      s.player
-        ? {
-            player: {
-              ...s.player,
-              tc: s.player.tc + payTc,
-              factionStanding: repResult.standing,
-              activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((id) => id !== candidate.id),
-              activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => q.id !== candidate.id),
-              completedFactionQuestIds: [...(s.player.completedFactionQuestIds ?? []), candidate.id],
-            },
-          }
-        : s,
-    );
-    const fLabel = candidate.factionId.replace(/_/g, ' ');
-    get().announceMissionComplete(
-      'Contract',
-      candidate.title,
-      `✦ Faction contract complete — ${candidate.title}. +${payTc} TC${shownJourneyTc > 0 ? ` (incl. +${shownJourneyTc} long-haul)` : ''}${questViaBroker ? ` (broker's cut taken)` : ''}${payRep > 0 ? `, +${payRep} rep with ${fLabel}` : ''}.`,
-    );
-    // OTA-1050 — the agent who took it back remembers that you finished it.
-    creditTurnIn(get, set, remote);
-    // OTA-805 — RAPPORT unlocked. Turning in a faction's rapport quest opens
-    // Charisma-scaled dealing with its vendors (the discount is derived from this
-    // completion — see factionRapport.hasFactionRapport). Announce it, and show the
-    // rate the player's current CHA earns so the payoff is concrete.
-    if (candidate.id === rapportQuestId(candidate.factionId)) {
-      const pct = Math.round(chaPriceDiscount(effectiveStats(get().player ?? player).charisma) * 100);
-      get().appendLog(
-        'reward',
-        `✦ You've earned dealing with the ${fLabel}. From now their vendors cut you the partner's rate — currently ${pct}% off buys and +${pct}% on sell-backs (it grows with your Charisma).`,
-      );
-    }
-    // OTA-966 — escorts pay in coin and care, not schematics: the recipe roll
-    // belongs to salvage-and-spoils contracts. Escort turn-ins instead press
-    // HEALTH supplies into your hands (below), so their loot is only TC +
-    // healing — the owner's rule for these missions.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const eModPay = require('../engine/escort') as typeof import('../engine/escort');
-    if (!eModPay.escortSpecForQuest(candidate)) {
-      maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils');
-    }
-    logRepChanges(get, repResult.changed);
-    // OTA-962 — delivered the escort party alive (a dead pool fails + drops the
-    // quest before it can ever reach turn-in), so name them in the win.
-    {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const eMod = require('../engine/escort') as typeof import('../engine/escort');
-      const dSpec = eMod.escortSpecForQuest(candidate);
-      if (dSpec) {
-        get().appendLog('reward', escortPayMult < 1
-          ? `You delivered your ${dSpec.label} — battered, but breathing. The fee reflects the shape you brought them in (${Math.round(escortPayMult * 100)}% pay).`
-          : `You delivered your ${dSpec.label} safely. They peel off with a nod.`);
-        // OTA-1057 — and the person who walked at the front remembers it. This
-        // is the payoff of naming the leader: take a second contract with the
-        // same party and you are not a stranger to them. Recorded only on
-        // DELIVERY -- a wiped party fails the quest long before turn-in, and
-        // there is nobody left to remember anything.
-        const leader = (get().player?.activeFactionQuests ?? [])
-          .find((q) => q.id === candidate.id)?.escort?.leaderName;
-        if (leader) {
-          set((st) => ({
-            worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId({ id: `escort_${leader}`, name: leader }), { contractsTurnedIn: 1 }),
-          }));
-        }
-        // OTA-966 — the delivered party presses HEALTH supplies on you with the
-        // fee (2 kits on an all-or-nothing drop-off, 1 otherwise). This is the
-        // whole of an escort's item loot: TC + healing, nothing else.
-        const medLook = lookupCraftedItem('First Aid Kit');
-        const medQty = candidate.escort?.mode === 'all_or_nothing' ? 2 : 1;
-        set((s2) => (s2.player ? {
-          player: {
-            ...s2.player,
-            inventory: mergeOrPushItem(s2.player.inventory, stampDurability({
-              id: `escmed_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-              name: 'First Aid Kit', kind: medLook.kind, rarity: medLook.rarity,
-              quantity: medQty, tags: [...medLook.tags, 'loot'],
-            })),
-          },
-        } : s2));
-        get().appendLog('reward', `✦ ${medQty > 1 ? `${medQty}× ` : ''}First Aid Kit — pressed into your hands with the fee.`);
-      }
-    }
-    plantNextContractHint(get, candidate.factionId, 'faction_quest');
-    void get().persist();
-  },
 
-  readMissionBoard() {
-    const player = get().player;
-    const scene = get().currentScene;
-    if (!player) return;
-    const board = scene?.missionBoard;
-    if (!board) {
-      get().appendLog('arbiter', `The Arbiter glances around. "No board posted here."`);
-      return;
-    }
-    const factionLabel = FACTIONS.find((f) => f.id === board.faction)?.name ?? board.faction.replace(/_/g, ' ');
-    const pool = availableFactionQuests(
-      board.faction,
-      getStanding(player.factionStanding, board.faction),
-      player.activeFactionQuestIds ?? [],
-      player.completedFactionQuestIds ?? [],
-    );
-    if (pool.length === 0) {
-      get().appendLog('world', `The ${factionLabel} mission board is clear — nothing posted for you right now. Turn in your active work, then check back.`);
-      return;
-    }
-    get().appendLog('world', `▣ ${factionLabel} Mission Board — open postings:`);
-    for (const q of pool) {
-      get().appendLog('world', `• "${q.title}" — ${q.objective} (reward: ${q.reward.tc} TC${q.reward.rep > 0 ? `, +${q.reward.rep} rep` : ''})`);
-    }
-    get().appendLog(
-      'arbiter',
-      `The Arbiter taps the board. "Type ACCEPT <name> to take one on — e.g. accept ${pool[0]!.title.toLowerCase()}. Bring the work back here, or to any ${factionLabel} agent, to turn it in."`,
-    );
-    void get().persist();
-  },
 
-  acceptHunt(titleOrId) {
-    const state = get();
-    const player = state.player;
-    const scene = state.currentScene;
-    if (!player) return;
-    if (state.tutorialDemoVendor) {
-      get().appendLog('system', 'Tour mode — contracts can\'t be accepted until the tutorial ends.');
-      return;
-    }
-    // OTA 185 — faction-neutral hunts (factionId === null in the
-    // catalog) skip the vendor-in-scene requirement. The playtest
-    // case: Irma offered the Bog Dragon hunt in the Armory, player
-    // walked away, tried 'accept drakova' on the road — fell into
-    // this branch and got redirected back to the vendor. But the
-    // hunt is faction-neutral; any wandering agent could have
-    // posted it; the player already heard the offer. Let them take
-    // it. Faction-aligned hunts still gate at the vendor.
-    if (!scene?.vendor) {
-      const direct = findHuntById(titleOrId);
-      const neutralMatch = direct && direct.factionId === null
-        ? direct
-        : fuzzyFindHunt(titleOrId, HUNTS.filter((h) => h.factionId === null));
-      const alreadyActive = neutralMatch
-        && (player.activeHunts ?? []).some((h) => h.id === neutralMatch.id);
-      const alreadyDone = neutralMatch
-        && (player.completedHuntIds ?? []).includes(neutralMatch.id);
-      if (neutralMatch && !alreadyActive && !alreadyDone) {
-        const neutralTracked = !anyTrackedContract(player); // OTA-972 — #118
-        get().appendLog('debug', `accept: neutral ${neutralMatch.id} tracked=${neutralTracked}`);
-      // OTA-1049 — a contract handed over face to face is business with THAT
-      // agent, so it goes on their ledger. Guarded on a live vendor because
-      // board/remote accepts have no one standing across from you.
-      if (scene?.vendor) {
-        set((st) => ({
-          worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(scene.vendor!), { contractsTaken: 1 }),
-        }));
-      }
-        set((s) => (s.player ? {
-          player: {
-            ...s.player,
-            activeHunts: [
-              ...(s.player.activeHunts ?? []),
-              { id: neutralMatch.id, stage: firstActionableHuntStage(neutralMatch), postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked, ...acceptCellStamp(get) },
-            ],
-          },
-        } : s));
-        // ⚠⚠ P19 — the opening beat HANDS YOU SOMETHING, and accept skips past it.
-        // `firstActionableHuntStage` starts the record after every leading null stage, so
-        // the inciting_hook's `grants` was never awarded by anything and the next stage
-        // refused forever. Award the skipped prefix here, once, guarded on the pack.
-        grantStageItems(get, set, neutralMatch.title, neutralMatch.stages, 0, firstActionableHuntStage(neutralMatch));
-        const neutralCompact = acceptIsCompact(); // OTA-1048 — before the bump.
-        bumpQuestsAccepted(get, set);
-        if (neutralCompact) {
-          get().appendLog('reward', `✦ Contract accepted — ${neutralMatch.title}${parkedTag(neutralTracked)}.`);
-        } else {
-          get().appendLog(
-            'arbiter',
-            `The Arbiter nods. "You take ${theLower(neutralMatch.title)} on. Open the Contracts board to see the stages."`,
-          );
-          if (!neutralTracked) {
-            get().appendLog('world', `${neutralMatch.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
-          }
-        }
-        void get().persist();
-        return;
-      }
-      const hint = findQuestFactionHint(titleOrId);
-      if (hint && hint.vendorNames.length > 0) {
-        const sample = hint.vendorNames.slice(0, 2).join(' or ');
-        get().appendLog(
-          'arbiter',
-          `The Arbiter shakes their head. "${hint.contractTitle} is a hunt of the ${hint.factionLabel}. Find ${sample} — or any other ${hint.factionLabel} agent — to take it on."`,
-        );
-      } else {
-        get().appendLog(
-          'arbiter',
-          `The Arbiter shakes their head. "Hunts come from wandering faction vendors. Keep walking until one turns up at your scene."`,
-        );
-      }
-      return;
-    }
-    // A broker (Hidden Market stall) searches EVERY faction's pool; a normal
-    // vendor searches only its own. availableHunts folds in faction-neutral
-    // bounties for each searched faction.
-    const searchFactions: (string | null)[] = isBrokerVendorId(scene.vendor.id)
-      ? FACTIONS.map((f) => f.id)
-      : [scene.vendor.faction];
-    const direct = findHuntById(titleOrId);
-    let matchedHunt: typeof direct | null = null;
-    let factionId: string | null = scene.vendor.faction;
-    const offered = new Set<string>();
-    for (const fid of searchFactions) {
-      const playerRep = fid ? getStanding(player.factionStanding, fid) : 0;
-      const pool = availableHunts(
-        fid,
-        playerRep,
-        (player.activeHunts ?? []).map((h) => h.id),
-        player.completedHuntIds ?? [],
-      );
-      for (const h of pool) offered.add(`"${h.title}"`);
-      const found = direct && pool.includes(direct) ? direct : fuzzyFindHunt(titleOrId, pool);
-      if (found) { matchedHunt = found; factionId = fid; break; }
-    }
-    if (!matchedHunt) {
-      const titles = [...offered].join(', ');
-      get().appendLog(
-        'arbiter',
-        titles
-          ? `${scene.vendor.name} thumbs through papers. "Not that one. Currently posted: ${titles}."`
-          : `${scene.vendor.name} shakes their head. "No bounties for you right now."`,
-      );
-      return;
-    }
-    const hunt = matchedHunt;
-    // OTA-972 — #118: same single-active rule as faction quests — accepting while
-    // ANY contract (any kind) is live PARKS the new one instead of
-    // auto-activating it.
-    const huntTracked = !anyTrackedContract(player);
-    get().appendLog('debug', `accept: hunt ${hunt.id} tracked=${huntTracked}`);
-      // OTA-1049 — a contract handed over face to face is business with THAT
-      // agent, so it goes on their ledger. Guarded on a live vendor because
-      // board/remote accepts have no one standing across from you.
-      if (scene?.vendor) {
-        set((st) => ({
-          worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(scene.vendor!), { contractsTaken: 1 }),
-        }));
-      }
-    set((s) =>
-      s.player
-        ? {
-            player: {
-              ...s.player,
-              activeHunts: [
-                ...(s.player.activeHunts ?? []),
-                { id: hunt.id, stage: firstActionableHuntStage(hunt), postedByFaction: factionId, acceptedAt: Date.now(), tracked: huntTracked, ...acceptCellStamp(get) },
-              ],
-            },
-          }
-        : s,
-    );
-    // ⚠⚠ P19 — same skipped-prefix grant as the neutral accept door above. The faction
-    // door had the identical hole; two doors, one silence.
-    grantStageItems(get, set, hunt.title, hunt.stages, 0, firstActionableHuntStage(hunt));
-    // OTA-1048 — read the burst index BEFORE the bump, so this accept is
-    // judged on its own position in the burst rather than the next one's.
-    const huntCompact = acceptIsCompact();
-    bumpQuestsAccepted(get, set);
-    // Per-hunt stage0.arbiter suppressed on accept (see acceptFactionQuest
-    // for rationale). Burst-aware meta line comes from bumpQuestsAccepted.
-    const stage0 = hunt.stages[0];
-    if (stage0) {
-      if (huntCompact) {
-        // OTA-1048 — one line. Destination is folded in; poster text, stage
-        // narration and the danger detail are all in Contracts.
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { biomeLabel: bl } = require('../engine/hunts');
-        const where = hunt.targetLocationName ?? bl(hunt.biomeTag);
-        get().appendLog('reward', `✦ Hunt accepted — ${hunt.title}${parkedTag(huntTracked)} → ${where}.`);
-      } else {
-        get().appendLog('reward', `✦ Hunt accepted — ${hunt.title}${parkedTag(huntTracked)}. ${hunt.posterText}`);
-        get().appendLog('world', stage0.narration);
-        // 2026-05-26 OTA-053 — playtester ask: "I get handed a poster.
-        // It doesn't give me an idea of where I'm supposed to go."
-        // Emit an explicit Arbiter line naming the target location so
-        // the player isn't reduced to scanning posterText for a proper
-        // noun. Uses targetLocationName when authored, falls back to
-        // biomeLabel() for legacy hunts.
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { biomeLabel: huntBiomeLabel } = require('../engine/hunts');
-        const locLabel = hunt.targetLocationName ?? huntBiomeLabel(hunt.biomeTag);
-        get().appendLog(
-          'arbiter',
-          `The Arbiter taps the poster. "Travel to ${locLabel} to begin. The ${hunt.targetEnemyName} won't come to you."`,
-        );
-      }
-      // 2026-05-26 OTA-055 — difficulty warning. If the player is
-      // both under-HP and under-weapon, the Arbiter calls it out
-      // before they walk into the boss. Doesn't block accept — the
-      // player can still take the contract and try — but they
-      // can't say nobody warned them. OTA-1048 — full-detail accepts only;
-      // mid-burst the numbers are on the Contracts card.
-      if (!huntCompact && hunt.recommendedHp && hunt.recommendedWeaponRarity) {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { weaponRarityMeets: huntWeaponRarityMeets } = require('../engine/hunts');
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { getItemPreview: huntGetItemPreview } = require('../components/itemPreview');
-        const livePlayerHunt = get().player;
-        const hpOk = !!livePlayerHunt && livePlayerHunt.hp >= hunt.recommendedHp;
-        const mainName = livePlayerHunt?.equipped?.main;
-        const mainRarity = mainName ? (huntGetItemPreview(mainName).rarity ?? undefined) : undefined;
-        const weaponOk = huntWeaponRarityMeets(mainRarity, hunt.recommendedWeaponRarity);
-        if (!hpOk && !weaponOk) {
-          get().appendLog(
-            'arbiter',
-            `The Arbiter looks at you straight. "This one will kill you as you are right now. Train up, gear up, or come back with friends. Recommended: ${hunt.recommendedHp} HP and ${withArticle(hunt.recommendedWeaponRarity)} weapon. You sit at ${livePlayerHunt?.hp ?? '?'} HP."`,
-          );
-        } else if (!hpOk || !weaponOk) {
-          get().appendLog(
-            'arbiter',
-            `The Arbiter taps the table. "Going to be tight. Recommended ${hunt.recommendedHp} HP and ${withArticle(hunt.recommendedWeaponRarity)} weapon. ${!hpOk ? "Your HP is short of that — " : ''}${!weaponOk ? "Your weapon's a tier below — " : ''}take a beat before you commit."`,
-          );
-        }
-      }
-    }
-    set((s) =>
-      s.player
-        ? {
-            player: {
-              ...s.player,
-              activeHunts: (s.player.activeHunts ?? []).map((h) =>
-                h.id === hunt.id ? { ...h, stage: 1 } : h,
-              ),
-            },
-          }
-        : s,
-    );
-    // OTA 059 — same shape as faction-quest accept: trains CHA.
-    {
-      const chaLeveled = trainAcceptCharismaGated(get, set);
-      if (chaLeveled != null) {
-        get().appendLog(
-          'reward',
-          `✦ The hunt is yours to take. +1 CHA (${statNowClause(get().player, 'charisma', chaLeveled)}).`,
-        );
-      }
-      // OTA-057 — accepting a hunt is an active CHA push; the matching
-      // WIS train fires on completion, not on accept.
-    }
-    void get().persist();
-  },
 
   // Advance the player's most relevant active hunt one stage. Called by
   // skill-check successes when the player's intent matches the next stage's
   // expected check kind. Final stage spawns the scaled boss into the scene.
-  advanceHunt(huntId) {
-    const state = get();
-    const player = state.player;
-    if (!player) return;
-    const active = player.activeHunts ?? [];
-    const record = active.find((h) => h.id === huntId);
-    const hunt = findHuntById(huntId);
-    if (!record || !hunt) return;
-    const stageDef = hunt.stages[record.stage];
-    if (!stageDef) return;
-    get().appendLog('world', stageDef.narration);
-    if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
-    // ⚠⚠ P19 — THE STAGE ACTUALLY HANDS YOU THE THING NOW. Owner: *"if it's calling for
-    // you to investigate an area, find a certain object and take that object to the next
-    // area, well then it has to give you the damn object."* The narration has always
-    // described the find; nothing ever put it in the pack, so the next stage talked about
-    // a logbook the player had never seen and the inventory's mission section was empty.
-    {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const QS = require('../engine/questStage') as typeof import('../engine/questStage');
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
-      grantStageItems(get, set, hunt.title, hunt.stages, record.stage, record.stage + 1);
-      // ⚠ AND IT SAYS WHERE THE NEXT ONE IS. *"each stage has to direct you to the next
-      // stage. otherwise you have no idea where you're going."* Speaks only when there is
-      // something to say — new ground, a person to find, or a thing to bring.
-      const nextDef = hunt.stages[record.stage + 1];
-      if (nextDef) {
-        const hereId = QS.stageLocationId(stageDef, CM.huntAnchorId(hunt), CM.resolvePosterLocation);
-        const nextId = QS.stageLocationId(nextDef, CM.huntAnchorId(hunt), CM.resolvePosterLocation);
-        const movedGround = nextId !== hereId;
-        const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, movedGround);
-        if (dir) get().appendLog('system', dir);
-        // ⚠⚠ P19 — AND IT ACTUALLY SETS THE COURSE. Owner: *"it didn't auto route me to
-        // the next stage."* He was not exaggerating — `advanceMissionRoute` reads
-        // `activeFactionQuests` and NOTHING ELSE, so hunts have never had a route chain
-        // of any kind. A stage that moves the player now points the road at the new
-        // ground the moment the old stage closes, exactly as the faction-quest chain
-        // does on a leg transition.
-        // ⚠ Only when the ground actually MOVED and the player isn't already walking
-        // there — re-issuing a course you're already on resets the tile countdown, and
-        // hijacking a course the player set for themselves is the "yank them back"
-        // failure the chain guard exists to prevent.
-        const liveNow = get().player;
-        if (movedGround && liveNow && liveNow.currentLocationId !== nextId
-            && liveNow.travelTarget?.locationId !== nextId) {
-          _chainRouting = true;
-          try { get().setTravelCourse(nextId); } finally { _chainRouting = false; }
-          // ⚠⚠ ONLY CLAIM IT IF IT HAPPENED. `setTravelCourse` has six refusals of its own
-          // (unplaceable destination, already standing on the target's cell, no scene…) and
-          // every one of them returns without setting a course. Announcing the auto-route
-          // unconditionally is the "lit button that doesn't fire" failure in log form — the
-          // player reads "Auto-routing to X" and no road appears. Check the state, then speak.
-          if (get().player?.travelTarget?.locationId === nextId) {
-            get().appendLog('world', `Auto-routing to the next stage of ${hunt.title}: ${safeLocName(nextId)}.`);
-          }
-        }
-      }
-    }
-    // Boss stage spawns the scaled enemy. OTA-796 — the FINAL boss stage FREEZES
-    // the hunt here (no stage increment): the boss must actually be KILLED to
-    // complete it (resolveEnemyDefeat does the final advance). Previously every
-    // boss stage — including the last — incremented on SPAWN, so the moment the
-    // apex enemy appeared the stage hit stages.length and the turn-in gate
-    // (`stage < stages.length`) passed; the player could flee/despawn the boss
-    // and collect the full bounty without the fight (exploit sweep). Mid-hunt
-    // boss stages (there are hunts with a boss beat before the apex) still
-    // increment on spawn.
-    let lastBossIndex = -1;
-    for (let i = 0; i < hunt.stages.length; i++) {
-      if (hunt.stages[i]?.checkKind === 'boss') lastBossIndex = i;
-    }
-    const freezeForKill = stageDef.checkKind === 'boss' && record.stage === lastBossIndex;
-    if (stageDef.checkKind === 'boss') {
-      // ⚠ OTA-1167 — pass the REAL power measure, so the boss sees stats, weapon and AC
-      // rather than max HP alone. `scalePowerOf` carries the guarded gear read.
-      const boss = scaleHuntBoss(player, hunt, scalePowerOf(player));
-      if (boss) {
-        set((s) =>
-          s.currentScene
-            ? {
-                currentScene: {
-                  ...s.currentScene,
-                  ...FRESH_ENEMY_ARRAYS,
-                  enemies: [boss],
-                  enemyHps: [boss.hp],
-                  activeEnemyIdx: 0,
-                  range: 'mid',
-                },
-              }
-            : s,
-        );
-        get().appendLog('combat', `${boss.name} closes the distance. The hunt comes to its end.`);
-      }
-    }
-    if (!freezeForKill) {
-      // ⚠ OTA-1219 — auto-consume pure-narration (checkKind: null) stages, the
-      // OTA-871 loop mysteries and storylines always had and hunts never got.
-      // No hunt authors a mid-chain null today, but the day one does, a stage
-      // no verb can match must not wedge the chain (that is exactly how every
-      // freshly-accepted hunt got stuck at stage 0 until this OTA).
-      let nextStage = record.stage + 1;
-      while (nextStage < hunt.stages.length && hunt.stages[nextStage]!.checkKind === null) {
-        const epi = hunt.stages[nextStage]!;
-        get().appendLog('world', epi.narration);
-        if (epi.arbiter) get().appendLog('arbiter', epi.arbiter);
-        nextStage++;
-      }
-      set((s) =>
-        s.player
-          ? {
-              player: {
-                ...s.player,
-                activeHunts: (s.player.activeHunts ?? []).map((h) =>
-                  h.id === huntId ? { ...h, stage: nextStage } : h,
-                ),
-              },
-            }
-          : s,
-      );
-    }
-    void get().persist();
-  },
 
-  turnInHunt(titleOrId, remote = false) {
-    const state = get();
-    const player = state.player;
-    const scene = state.currentScene;
-    if (!player) return;
-    // OTA-810 — a HUNT is a FACE-TO-FACE turn-in (user's call). The trophy is the
-    // proof, and proof has to be shown in person to a paying agent — the OTA-456
-    // remote "send word" courier option is removed for hunts. (Mysteries / storylines
-    // / faction deeds keep their remote cut; a bounty specifically is paid at the
-    // table.) This also closes the B2 exploit of closing hunts 100% from a safe hub.
-    if (remote) {
-      get().appendLog(
-        'arbiter',
-        `The Arbiter shakes their head. "A trophy's no good sent by runner — a bounty is paid face to face. Carry it to an agent and put it on the table yourself."`,
-      );
-      return;
-    }
-    // OTA-1187 (PUNCHLIST P8) — the posting BOARD and the faction's own HALL take it back
-    // too, exactly as they always have for faction quests. A trophy handed over at the
-    // board that posted the bounty is still a face-to-face hand-in.
-    const huntParty = turnInCounterparty(get, player, scene);
-    if (!huntParty) {
-      get().appendLog(
-        'arbiter',
-        `The Arbiter folds their arms. "A bounty's settled in person — find a vendor, a posting board, or the faction's own hall and show them the trophy."`,
-      );
-      return;
-    }
-    const sourceLabel = huntParty.name;
-    const active = player.activeHunts ?? [];
-    const direct = findHuntById(titleOrId);
-    const candidate = direct ?? fuzzyFindHunt(
-      titleOrId,
-      active.map((r) => findHuntById(r.id)).filter((h): h is NonNullable<typeof h> => !!h),
-    );
-    if (!candidate) {
-      get().appendLog('arbiter', `${sourceLabel} squints. "That hunt is not on your slate."`);
-      return;
-    }
-    const record = active.find((h) => h.id === candidate.id);
-    if (!record) {
-      get().appendLog('arbiter', `${sourceLabel} squints. "That hunt is not on your slate."`);
-      return;
-    }
-    if (record.stage < candidate.stages.length) {
-      get().appendLog(
-        'arbiter',
-        `${sourceLabel} reads your face. "The trophy is the proof. You don't have it yet."`,
-      );
-      return;
-    }
-    // OTA-1185 — the trading post brokers another faction's bounty for a cut (PUNCHLIST
-    // P2). ⚠ The trophy still changes hands IN PERSON, at an outpost the player walked to
-    // — OTA-810's rule ("a bounty is paid face to face, not sent by runner") is intact.
-    // What is gone is the requirement that the RIGHT faction's agent happen to be
-    // standing there when you arrive.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
-    const huntViaBroker = CB.isContractBroker(scene?.vendor)
-      && !!candidate.factionId && candidate.factionId !== huntParty.faction;
-    if (!remote && !CB.vendorCanTakeContract({ id: scene?.vendor?.id, faction: huntParty.faction }, candidate.factionId)) {
-      get().appendLog(
-        'arbiter',
-        `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId!.replace(/_/g, ' ')} posted that one — them, or the trading post at any outpost gate."`,
-      );
-      return;
-    }
-    // Pay out: TC + optional item + optional rep + always the trophy.
-    const trophy: InventoryItem = stampDurability({
-      id: `trophy_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-      name: candidate.trophyName,
-      kind: 'relic',
-      rarity: 'Rare',
-      quantity: 1,
-      tags: ['trophy', 'hunt'],
-      description: `Trophy from the hunt for the ${candidate.targetEnemyName}.`,
-    });
-    const huntRewardLookup = candidate.rewardItem ? lookupCraftedItem(candidate.rewardItem) : null;
-    // 2026-05-25 — route through grantItem so the inventory cap is
-    // honored. Previously raw spread silently bypassed the cap on
-    // hunt rewards (HANDOFF "silent swallow"). grantItem returns
-    // {inventory, accepted, dropped} per item; we log a refusal
-    // line when something didn't fit.
-    let huntNext = grantItem(player.inventory, trophy);
-    if (candidate.rewardItem && huntRewardLookup) {
-      const reward = stampDurability({
-        id: `huntreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-        name: candidate.rewardItem,
-        kind: huntRewardLookup.kind,
-        rarity: huntRewardLookup.rarity,
-        quantity: 1,
-        tags: huntRewardLookup.tags,
-      });
-      const rewardGrant = grantItem(huntNext.inventory, reward);
-      if (rewardGrant.accepted <= 0) {
-        get().appendLog(
-          'world',
-          `Pack too full — ${candidate.rewardItem} couldn't be carried. Make room and come back to claim it.`,
-        );
-      }
-      huntNext = { ...rewardGrant, inventory: rewardGrant.inventory };
-    }
-    const newInventory = huntNext.inventory;
-    const repResult = candidate.factionId && candidate.rewardRep
-      ? applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep)
-      : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
-    // OTA-810 — face-to-face only, so always full pay. B2 — plus a long-haul bonus
-    // scaled to how far you carried the trophy.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc, record?.acceptedAtCell);
-    // OTA-1185 — 80% and no long-haul bonus when the trading post carried it.
-    const payTc = CB.contractPayoutTc(candidate.rewardTc, journeyTc, huntViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
-    if (huntViaBroker) {
-      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
-    }
-    set((s) =>
-      s.player
-        ? {
-            player: {
-              ...s.player,
-              tc: s.player.tc + payTc,
-              inventory: newInventory,
-              factionStanding: repResult.standing,
-              activeHunts: (s.player.activeHunts ?? []).filter((h) => h.id !== candidate.id),
-              completedHuntIds: [...(s.player.completedHuntIds ?? []), candidate.id],
-            },
-          }
-        : s,
-    );
-    get().announceMissionComplete(
-      'Hunt',
-      candidate.title,
-      `✦ Hunt complete — ${candidate.title}. +${payTc} TC${!huntViaBroker && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${huntViaBroker ? ` (broker's cut taken)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
-    );
-    // OTA-1050 — the agent who took it back remembers that you finished it.
-    creditTurnIn(get, set, false);
-    maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706
-    applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
-    if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
-    recordMemorableEvent(get, set, {
-      kind: 'rare_kill',
-      text: `Completed the hunt for the ${candidate.targetEnemyName}.`,
-      enemyName: candidate.targetEnemyName,
-    });
-    plantNextContractHint(get, candidate.factionId ?? null, 'hunt');
-    void get().persist();
-  },
 
-  acceptMystery(titleOrId) {
-    const state = get();
-    const player = state.player;
-    const scene = state.currentScene;
-    if (!player) return;
-    if (state.tutorialDemoVendor) {
-      get().appendLog('system', 'Tour mode — contracts can\'t be accepted until the tutorial ends.');
-      return;
-    }
-    // OTA 185 — faction-neutral mysteries accept without a vendor in
-    // scene. Same rationale as acceptHunt: if the player heard the
-    // offer in a hub and walked off, the second 'accept' tap from
-    // anywhere should land the contract.
-    if (!scene?.vendor) {
-      const directMatch = findMysteryById(titleOrId);
-      const neutralMatch = directMatch && directMatch.factionId === null
-        ? directMatch
-        : fuzzyFindMystery(titleOrId, MYSTERIES.filter((m) => m.factionId === null));
-      const alreadyActive = neutralMatch
-        && (player.activeMysteries ?? []).some((m) => m.id === neutralMatch.id);
-      const alreadyDone = neutralMatch
-        && (player.completedMysteryIds ?? []).includes(neutralMatch.id);
-      if (neutralMatch && !alreadyActive && !alreadyDone) {
-        const neutralTracked = !anyTrackedContract(player); // OTA-972 — #118
-        get().appendLog('debug', `accept: neutral ${neutralMatch.id} tracked=${neutralTracked}`);
-      // OTA-1049 — a contract handed over face to face is business with THAT
-      // agent, so it goes on their ledger. Guarded on a live vendor because
-      // board/remote accepts have no one standing across from you.
-      if (scene?.vendor) {
-        set((st) => ({
-          worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(scene.vendor!), { contractsTaken: 1 }),
-        }));
-      }
-        set((s) => (s.player ? {
-          player: {
-            ...s.player,
-            activeMysteries: [
-              ...(s.player.activeMysteries ?? []),
-              // ⚠ OTA-1220 — start past the leading pure-narration stage. The VENDOR
-              // branch has always bumped to stage 1 after playing stage-0's text;
-              // this branch never did, and the OTA-1213 matcher can't match a null
-              // checkKind — so every faction-NEUTRAL mystery accepted without a
-              // vendor in scene was wedged at stage 0 forever. Same class as the
-              // hunt wedge (OTA-1219); the walker caught this one too.
-              { id: neutralMatch.id, stage: firstActionableHuntStage(neutralMatch), postedByFaction: null, acceptedAt: Date.now(), tracked: neutralTracked, ...acceptCellStamp(get) },
-            ],
-          },
-        } : s));
-        // ⚠⚠ P19 — the opening beat HANDS YOU SOMETHING, and accept skips past it.
-        // `firstActionableHuntStage` starts the record after every leading null stage, so
-        // the inciting_hook's `grants` was never awarded by anything and the next stage
-        // refused forever. Award the skipped prefix here, once, guarded on the pack.
-        grantStageItems(get, set, neutralMatch.title, neutralMatch.stages, 0, firstActionableHuntStage(neutralMatch));
-        const neutralCompact = acceptIsCompact(); // OTA-1048 — before the bump.
-        bumpQuestsAccepted(get, set);
-        if (neutralCompact) {
-          get().appendLog('reward', `✦ Contract accepted — ${neutralMatch.title}${parkedTag(neutralTracked)}.`);
-        } else {
-          get().appendLog(
-            'arbiter',
-            `The Arbiter nods. "You take ${theLower(neutralMatch.title)} on. Open the Contracts board to see the stages."`,
-          );
-          if (!neutralTracked) {
-            get().appendLog('world', `${neutralMatch.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
-          }
-        }
-        void get().persist();
-        return;
-      }
-      const hint = findQuestFactionHint(titleOrId);
-      if (hint && hint.vendorNames.length > 0) {
-        const sample = hint.vendorNames.slice(0, 2).join(' or ');
-        get().appendLog(
-          'arbiter',
-          `The Arbiter shakes their head. "${hint.contractTitle} is a mystery the ${hint.factionLabel} pay for. Find ${sample} — or any other ${hint.factionLabel} agent — to take it on."`,
-        );
-      } else {
-        get().appendLog('arbiter', `The Arbiter shakes their head. "Mystery work needs a buyer. Find a vendor."`);
-      }
-      return;
-    }
-    // A broker (Hidden Market stall) searches EVERY faction's pool; a normal
-    // vendor searches only its own. availableMysteries folds in faction-neutral
-    // work for each searched faction.
-    const searchFactions: (string | null)[] = isBrokerVendorId(scene.vendor.id)
-      ? FACTIONS.map((f) => f.id)
-      : [scene.vendor.faction];
-    const direct = findMysteryById(titleOrId);
-    let matchedMystery: typeof direct | null = null;
-    let factionId: string | null = scene.vendor.faction;
-    const offered = new Set<string>();
-    for (const fid of searchFactions) {
-      const playerRep = fid ? getStanding(player.factionStanding, fid) : 0;
-      const pool = availableMysteries(
-        fid,
-        playerRep,
-        (player.activeMysteries ?? []).map((m2) => m2.id),
-        player.completedMysteryIds ?? [],
-      );
-      for (const m2 of pool) offered.add(`"${m2.title}"`);
-      const found = direct && pool.includes(direct) ? direct : fuzzyFindMystery(titleOrId, pool);
-      if (found) { matchedMystery = found; factionId = fid; break; }
-    }
-    if (!matchedMystery) {
-      const titles = [...offered].join(', ');
-      get().appendLog(
-        'arbiter',
-        titles
-          ? `${scene.vendor.name} unrolls a list. "Not that one. Currently posted: ${titles}."`
-          : `${scene.vendor.name} shakes their head. "No mystery work for you right now."`,
-      );
-      return;
-    }
-    const m = matchedMystery;
-    const mysteryTracked = !anyTrackedContract(player); // OTA-972 — #118
-    get().appendLog('debug', `accept: mystery ${m.id} tracked=${mysteryTracked}`);
-      // OTA-1049 — a contract handed over face to face is business with THAT
-      // agent, so it goes on their ledger. Guarded on a live vendor because
-      // board/remote accepts have no one standing across from you.
-      if (scene?.vendor) {
-        set((st) => ({
-          worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(scene.vendor!), { contractsTaken: 1 }),
-        }));
-      }
-    set((s) =>
-      s.player
-        ? {
-            player: {
-              ...s.player,
-              activeMysteries: [
-                ...(s.player.activeMysteries ?? []),
-                { id: m.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: mysteryTracked, ...acceptCellStamp(get) },
-              ],
-            },
-          }
-        : s,
-    );
-    const mysteryCompact = acceptIsCompact(); // OTA-1048 — before the bump.
-    bumpQuestsAccepted(get, set);
-    // Per-mystery stage0.arbiter suppressed (burst-aware line above).
-    const stage0 = m.stages[0];
-    if (stage0) {
-      if (mysteryCompact) {
-        get().appendLog('reward', `✦ Mystery accepted — ${m.title}${parkedTag(mysteryTracked)}.`);
-      } else {
-        get().appendLog('reward', `✦ Mystery accepted — ${m.title}${parkedTag(mysteryTracked)}. ${m.posterText}`);
-        get().appendLog('world', stage0.narration);
-      }
-    }
-    set((s) =>
-      s.player
-        ? {
-            player: {
-              ...s.player,
-              activeMysteries: (s.player.activeMysteries ?? []).map((mm) =>
-                mm.id === m.id ? { ...mm, stage: 1 } : mm,
-              ),
-            },
-          }
-        : s,
-    );
-    // OTA 059 — same shape as faction-quest accept: trains CHA.
-    {
-      const chaLeveled = trainAcceptCharismaGated(get, set);
-      if (chaLeveled != null) {
-        get().appendLog(
-          'reward',
-          `✦ They confide the mystery to you. +1 CHA (${statNowClause(get().player, 'charisma', chaLeveled)}).`,
-        );
-      }
-      // OTA-057 — accepting a mystery is an active CHA push; the WIS
-      // train fires on resolution, not on accept.
-    }
-    void get().persist();
-  },
 
-  advanceMystery(mysteryId) {
-    const state = get();
-    const player = state.player;
-    if (!player) return;
-    const active = player.activeMysteries ?? [];
-    const record = active.find((m) => m.id === mysteryId);
-    const mystery = findMysteryById(mysteryId);
-    if (!record || !mystery) return;
-    const stageDef = mystery.stages[record.stage];
-    if (!stageDef) return;
-    get().appendLog('world', stageDef.narration);
-    if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
-    // ⚠⚠ P19 — the same three things the hunts got: hand over what the stage promised,
-    // say where the next one is, and actually set the course.
-    {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const QS = require('../engine/questStage') as typeof import('../engine/questStage');
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
-      grantStageItems(get, set, mystery.title, mystery.stages, record.stage, record.stage + 1);
-      const nextDef = mystery.stages[record.stage + 1];
-      if (nextDef) {
-        const anchor = CM.contractAnchorId(mystery);
-        const hereId = QS.stageLocationId(stageDef, anchor, CM.resolvePosterLocation);
-        const nextId = QS.stageLocationId(nextDef, anchor, CM.resolvePosterLocation);
-        const moved = nextId !== hereId;
-        const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, moved);
-        if (dir) get().appendLog('system', dir);
-        const liveNow = get().player;
-        if (moved && liveNow && liveNow.currentLocationId !== nextId
-            && liveNow.travelTarget?.locationId !== nextId) {
-          _chainRouting = true;
-          try { get().setTravelCourse(nextId); } finally { _chainRouting = false; }
-          // ⚠ Only claim it if it happened — setTravelCourse has six silent refusals.
-          if (get().player?.travelTarget?.locationId === nextId) {
-            get().appendLog('world', `Auto-routing to the next stage of ${mystery.title}: ${safeLocName(nextId)}.`);
-          }
-        }
-      }
-    }
-    // Final stage is the "synthesis" — the player has the trophy in hand
-    // (narratively); advance the stage past the end so turn-in unlocks.
-    let nextStage = record.stage + 1;
-    // OTA-871 — auto-consume pure-narration (checkKind: null) stages. They have no player-
-    // action gate, so a trailing null epilogue (a denouement authored after the boss stage)
-    // would otherwise leave the quest one stage short of turn-in forever. Display each such
-    // stage's narration, then advance past it — so epilogues read AND the quest completes.
-    while (nextStage < mystery.stages.length && mystery.stages[nextStage]!.checkKind === null) {
-      const epi = mystery.stages[nextStage]!;
-      get().appendLog('world', epi.narration);
-      if (epi.arbiter) get().appendLog('arbiter', epi.arbiter);
-      // ⚠ P19 — a consumed null stage still hands over what it promised. Without this the
-      // auto-consume loop reads the prose and silently drops the item, which is the same
-      // silence that made a stage-0 grant vanish on the hunts.
-      grantStageItems(get, set, mystery.title, mystery.stages, nextStage, nextStage + 1);
-      nextStage++;
-    }
-    set((s) =>
-      s.player
-        ? {
-            player: {
-              ...s.player,
-              activeMysteries: (s.player.activeMysteries ?? []).map((m) =>
-                m.id === mysteryId ? { ...m, stage: nextStage } : m,
-              ),
-            },
-          }
-        : s,
-    );
-    if (nextStage >= mystery.stages.length) {
-      get().appendLog(
-        'reward',
-        `✦ ${mystery.trophyName} recovered. Return to a posting agent to turn in "${mystery.title}".`,
-      );
-    }
-    void get().persist();
-  },
 
-  turnInMystery(titleOrId, remote = false) {
-    const state = get();
-    const player = state.player;
-    const scene = state.currentScene;
-    if (!player) return;
-    // ⚠ OTA-1188 (PUNCHLIST P3) — a mystery is a REPORT, so a runner can carry it. The
-    // counterparty check below is skipped for a courier hand-in; everything else (the
-    // stage gate, the artifact-is-the-proof check) still applies.
-    const mystViaCourier = remote;
-    // B2 — the artifact is the proof and it changes hands IN PERSON now (no courier).
-    // OTA-1187 (PUNCHLIST P8) — board and hall count, same as for faction quests.
-    const mystParty = turnInCounterparty(get, player, scene);
-    if (!mystViaCourier && !mystParty) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Need a buyer, in the flesh. Carry the proof to a vendor, a posting board, or the faction's hall — set a course to the ◆ pin in Contracts."`);
-      return;
-    }
-    const sourceLabel = mystViaCourier ? 'A runner' : mystParty!.name;
-    const active = player.activeMysteries ?? [];
-    const direct = findMysteryById(titleOrId);
-    const candidate = direct ?? fuzzyFindMystery(
-      titleOrId,
-      active.map((r) => findMysteryById(r.id)).filter((m): m is NonNullable<typeof m> => !!m),
-    );
-    if (!candidate) {
-      get().appendLog('arbiter', `${sourceLabel} squints. "That mystery is not on your slate."`);
-      return;
-    }
-    const record = active.find((m) => m.id === candidate.id);
-    if (!record) {
-      get().appendLog('arbiter', `${sourceLabel} squints. "That mystery is not on your slate."`);
-      return;
-    }
-    if (record.stage < candidate.stages.length) {
-      get().appendLog(
-        'arbiter',
-        `${sourceLabel} reads your face. "The artifact is the proof. You don't have it yet."`,
-      );
-      return;
-    }
-    // OTA-1185 — the trading post brokers another faction's work for a cut (PUNCHLIST P2).
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
-    const mysteryViaBroker = !mystViaCourier && CB.isContractBroker(scene?.vendor)
-      && !!candidate.factionId && candidate.factionId !== mystParty?.faction;
-    if (!mystViaCourier && !CB.vendorCanTakeContract({ id: scene?.vendor?.id, faction: mystParty!.faction }, candidate.factionId)) {
-      get().appendLog(
-        'arbiter',
-        `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId!.replace(/_/g, ' ')} posted that — take it to them, or to the trading post at any outpost gate."`,
-      );
-      return;
-    }
-    const trophy: InventoryItem = stampDurability({
-      id: `mystery_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-      name: candidate.trophyName,
-      kind: 'relic',
-      rarity: 'Rare',
-      quantity: 1,
-      tags: ['trophy', 'mystery'],
-      description: `Recovered from the mystery: ${candidate.title}.`,
-    });
-    const mysteryRewardLookup = candidate.rewardItem ? lookupCraftedItem(candidate.rewardItem) : null;
-    // 2026-05-25 — grantItem honors cap (same fix as hunt path).
-    let mysteryNext = grantItem(player.inventory, trophy);
-    if (candidate.rewardItem && mysteryRewardLookup) {
-      const reward = stampDurability({
-        id: `mysteryreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-        name: candidate.rewardItem,
-        kind: mysteryRewardLookup.kind,
-        rarity: mysteryRewardLookup.rarity,
-        quantity: 1,
-        tags: mysteryRewardLookup.tags,
-      });
-      const rewardGrant = grantItem(mysteryNext.inventory, reward);
-      if (rewardGrant.accepted <= 0) {
-        get().appendLog(
-          'world',
-          `Pack too full — ${candidate.rewardItem} couldn't be carried. Make room and come back to claim it.`,
-        );
-      }
-      mysteryNext = { ...rewardGrant, inventory: rewardGrant.inventory };
-    }
-    const newInventory = mysteryNext.inventory;
-    const repResult = candidate.factionId && candidate.rewardRep
-      ? applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep)
-      : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
-    // B2 — full pay + a LONG-HAUL bonus scaled to how far you carried it.
-    // OTA-1185 — unless the trading post brokered it, which pays 80% and no bonus.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc, record?.acceptedAtCell);
-    // ⚠ OTA-1188 — a courier hand-in pays the runner's rate and NO long-haul bonus.
-    const payTc = mystViaCourier
-      ? CB.courierPayoutTc(candidate.rewardTc)
-      : CB.contractPayoutTc(candidate.rewardTc, journeyTc, mysteryViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
-    if (mystViaCourier) {
-      get().appendLog('arbiter', CB.courierSentLine(candidate.title, payTc));
-      set((st) => (st.player ? { player: advanceTime(st.player, CB.COURIER_DELAY_HOURS) } : st));
-    }
-    if (mysteryViaBroker) {
-      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
-    }
-    set((s) =>
-      s.player
-        ? {
-            player: {
-              ...s.player,
-              tc: s.player.tc + payTc,
-              inventory: newInventory,
-              factionStanding: repResult.standing,
-              activeMysteries: (s.player.activeMysteries ?? []).filter((m) => m.id !== candidate.id),
-              completedMysteryIds: [...(s.player.completedMysteryIds ?? []), candidate.id],
-            },
-          }
-        : s,
-    );
-    get().announceMissionComplete(
-      'Mystery',
-      candidate.title,
-      `✦ Mystery complete — ${candidate.title}. +${payTc} TC${!mysteryViaBroker && !mystViaCourier && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${mysteryViaBroker ? ` (broker's cut taken)` : ''}${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`,
-    );
-    // OTA-1050 — the agent who took it back remembers that you finished it.
-    creditTurnIn(get, set, mystViaCourier);
-    applyTrainAndLog(get, set, 'wisdom', '✦ A mystery resolved sharpens you. +1 WIS (now {to}).');
-    if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
-    plantNextContractHint(get, candidate.factionId ?? null, 'mystery');
-    void get().persist();
-  },
 
-  acceptStoryline(titleOrId) {
-    const state = get();
-    const player = state.player;
-    const scene = state.currentScene;
-    if (!player) return;
-    if (state.tutorialDemoVendor) {
-      get().appendLog('system', 'Tour mode — contracts can\'t be accepted until the tutorial ends.');
-      return;
-    }
-    // A broker (Hidden Market stall) proceeds even if its own rostered faction
-    // has no storylines — it posts every faction's board. A normal vendor still
-    // needs a faction of its own.
-    if (!scene?.vendor || (!scene.vendor.faction && !isBrokerVendorId(scene.vendor.id))) {
-      const hint = findQuestFactionHint(titleOrId);
-      if (hint && hint.vendorNames.length > 0) {
-        const sample = hint.vendorNames.slice(0, 2).join(' or ');
-        get().appendLog(
-          'arbiter',
-          `The Arbiter shakes their head. "${hint.contractTitle} is a storyline of the ${hint.factionLabel}. Find ${sample} — or any other ${hint.factionLabel} agent — to take it on."`,
-        );
-      } else {
-        get().appendLog('arbiter', `The Arbiter shakes their head. "Storylines come from faction agents. Find one."`);
-      }
-      return;
-    }
-    // A broker searches EVERY faction's storyline pool; a normal vendor only its
-    // own.
-    const searchFactions: string[] = isBrokerVendorId(scene.vendor.id)
-      ? FACTIONS.map((f) => f.id)
-      : (scene.vendor.faction ? [scene.vendor.faction] : []);
-    const direct = findStorylineById(titleOrId);
-    let matchedStoryline: typeof direct | null = null;
-    let factionId: string | null = scene.vendor.faction;
-    const offered = new Set<string>();
-    for (const fid of searchFactions) {
-      const playerRep = getStanding(player.factionStanding, fid);
-      const pool = availableStorylines(
-        fid,
-        playerRep,
-        (player.activeStorylines ?? []).map((s2) => s2.id),
-        player.completedStorylineIds ?? [],
-      );
-      for (const s2 of pool) offered.add(`"${s2.title}"`);
-      const found = direct && pool.includes(direct) ? direct : fuzzyFindStoryline(titleOrId, pool);
-      if (found) { matchedStoryline = found; factionId = fid; break; }
-    }
-    if (!matchedStoryline) {
-      const titles = [...offered].join(', ');
-      get().appendLog(
-        'arbiter',
-        titles
-          ? `${scene.vendor.name} unrolls a thicker scroll. "Not that one. Currently posted storyline: ${titles}."`
-          : `${scene.vendor.name} shakes their head. "No long-form work for you right now."`,
-      );
-      return;
-    }
-    const s = matchedStoryline;
-    const storyTracked = !anyTrackedContract(player); // OTA-972 — #118
-    get().appendLog('debug', `accept: storyline ${s.id} tracked=${storyTracked}`);
-      // OTA-1049 — a contract handed over face to face is business with THAT
-      // agent, so it goes on their ledger. Guarded on a live vendor because
-      // board/remote accepts have no one standing across from you.
-      if (scene?.vendor) {
-        set((st) => ({
-          worldMemory: recordNpcDealing(st.worldMemory, vendorNpcId(scene.vendor!), { contractsTaken: 1 }),
-        }));
-      }
-    set((st) =>
-      st.player
-        ? {
-            player: {
-              ...st.player,
-              activeStorylines: [
-                ...(st.player.activeStorylines ?? []),
-                { id: s.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: storyTracked, ...acceptCellStamp(get) },
-              ],
-            },
-          }
-        : st,
-    );
-    const storyCompact = acceptIsCompact(); // OTA-1048 — before the bump.
-    bumpQuestsAccepted(get, set);
-    // Per-storyline stage0.arbiter suppressed (burst-aware line above).
-    const stage0 = s.stages[0];
-    if (stage0) {
-      if (storyCompact) {
-        get().appendLog('reward', `✦ Storyline accepted — ${s.title}${parkedTag(storyTracked)}.`);
-      } else {
-        get().appendLog('reward', `✦ Storyline accepted — ${s.title}${parkedTag(storyTracked)}. ${s.posterText}`);
-        get().appendLog('world', stage0.narration);
-      }
-    }
-    set((st) =>
-      st.player
-        ? {
-            player: {
-              ...st.player,
-              activeStorylines: (st.player.activeStorylines ?? []).map((rec) =>
-                rec.id === s.id ? { ...rec, stage: 1 } : rec,
-              ),
-            },
-          }
-        : st,
-    );
-    // OTA 059 — same shape as faction-quest accept: trains CHA.
-    {
-      const chaLeveled = trainAcceptCharismaGated(get, set);
-      if (chaLeveled != null) {
-        get().appendLog(
-          'reward',
-          `✦ The storyline opens to you. +1 CHA (${statNowClause(get().player, 'charisma', chaLeveled)}).`,
-        );
-      }
-      // OTA-057 — accepting a storyline is an active CHA push; WIS
-      // fires on chapter completion, not on accept.
-    }
-    void get().persist();
-  },
 
-  advanceStoryline(storylineId) {
-    const state = get();
-    const player = state.player;
-    if (!player) return;
-    const active = player.activeStorylines ?? [];
-    const record = active.find((s) => s.id === storylineId);
-    const def = findStorylineById(storylineId);
-    if (!record || !def) return;
-    const stageDef = def.stages[record.stage];
-    if (!stageDef) return;
-    get().appendLog('world', stageDef.narration);
-    if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
-    // ⚠⚠ P19 — hand over what the stage promised, say where the next one is, set the course.
-    {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const QS = require('../engine/questStage') as typeof import('../engine/questStage');
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
-      grantStageItems(get, set, def.title, def.stages, record.stage, record.stage + 1);
-      const nextDef = def.stages[record.stage + 1];
-      if (nextDef) {
-        const anchor = CM.contractAnchorId(def);
-        const hereId = QS.stageLocationId(stageDef, anchor, CM.resolvePosterLocation);
-        const nextId = QS.stageLocationId(nextDef, anchor, CM.resolvePosterLocation);
-        const moved = nextId !== hereId;
-        const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, moved);
-        if (dir) get().appendLog('system', dir);
-        const liveNow = get().player;
-        if (moved && liveNow && liveNow.currentLocationId !== nextId
-            && liveNow.travelTarget?.locationId !== nextId) {
-          _chainRouting = true;
-          try { get().setTravelCourse(nextId); } finally { _chainRouting = false; }
-          // ⚠ Only claim it if it happened — setTravelCourse has six silent refusals.
-          if (get().player?.travelTarget?.locationId === nextId) {
-            get().appendLog('world', `Auto-routing to the next chapter of ${def.title}: ${safeLocName(nextId)}.`);
-          }
-        }
-      }
-    }
-    let nextStage = record.stage + 1;
-    // OTA-871 — auto-consume trailing pure-narration (checkKind: null) epilogue stages so a
-    // storyline authored with a denouement after its final action doesn't hang one stage
-    // short of turn-in. Show each epilogue's narration, then advance past it.
-    while (nextStage < def.stages.length && def.stages[nextStage]!.checkKind === null) {
-      const epi = def.stages[nextStage]!;
-      get().appendLog('world', epi.narration);
-      if (epi.arbiter) get().appendLog('arbiter', epi.arbiter);
-      // ⚠ P19 — a consumed null stage still hands over what it promised.
-      grantStageItems(get, set, def.title, def.stages, nextStage, nextStage + 1);
-      nextStage++;
-    }
-    set((s) =>
-      s.player
-        ? {
-            player: {
-              ...s.player,
-              activeStorylines: (s.player.activeStorylines ?? []).map((rec) =>
-                rec.id === storylineId ? { ...rec, stage: nextStage } : rec,
-              ),
-            },
-          }
-        : s,
-    );
-    if (nextStage >= def.stages.length) {
-      get().appendLog(
-        'reward',
-        `✦ Storyline complete in the field — ${def.title}. Return to a posting agent to turn it in.`,
-      );
-    }
-    void get().persist();
-  },
 
-  turnInStoryline(titleOrId, remote = false) {
-    const state = get();
-    const player = state.player;
-    const scene = state.currentScene;
-    if (!player) return;
-    // ⚠ OTA-1188 (PUNCHLIST P3) — a storyline closes with a report, so a runner can carry it.
-    const storyViaCourier = remote;
-    // B2 — a storyline arc is closed FACE TO FACE now (no courier).
-    // OTA-1187 (PUNCHLIST P8) — board and hall count, same as for faction quests.
-    const storyParty = turnInCounterparty(get, player, scene);
-    if (!storyViaCourier && !storyParty) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Find the agent in person — a vendor, the posting board, or the faction's hall. Open Contracts, set a course to the ◆ pin, and close it there. The trip pays."`);
-      return;
-    }
-    const sourceLabel = storyViaCourier ? 'A runner' : storyParty!.name;
-    const active = player.activeStorylines ?? [];
-    const direct = findStorylineById(titleOrId);
-    const candidate = direct ?? fuzzyFindStoryline(
-      titleOrId,
-      active.map((r) => findStorylineById(r.id)).filter((s): s is NonNullable<typeof s> => !!s),
-    );
-    if (!candidate) {
-      get().appendLog('arbiter', `${sourceLabel} squints. "Not on your slate."`);
-      return;
-    }
-    const record = active.find((s) => s.id === candidate.id);
-    if (!record) {
-      get().appendLog('arbiter', `${sourceLabel} squints. "Not on your slate."`);
-      return;
-    }
-    if (record.stage < candidate.stages.length) {
-      get().appendLog(
-        'arbiter',
-        `${sourceLabel} reads your face. "Storyline isn't finished. Come back."`,
-      );
-      return;
-    }
-    // OTA 011 — match hunt/mystery null-faction guard pattern. If a
-    // storyline ever ships with factionId=null (none currently do,
-    // but schema allows it) the old bare !== check would reject
-    // every vendor; the && short-circuits that.
-    // OTA-1185 — the trading post brokers another faction's work for a cut (PUNCHLIST P2).
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
-    const storyViaBroker = !storyViaCourier && CB.isContractBroker(scene?.vendor)
-      && !!candidate.factionId && candidate.factionId !== storyParty?.faction;
-    if (!storyViaCourier && !CB.vendorCanTakeContract({ id: scene?.vendor?.id, faction: storyParty!.faction }, candidate.factionId)) {
-      get().appendLog(
-        'arbiter',
-        `${sourceLabel} shakes their head. "Wrong faction. ${candidate.factionId!.replace(/_/g, ' ')} posted that one — them, or the trading post at any outpost gate."`,
-      );
-      return;
-    }
-    const storyRewardLookup = candidate.rewardItem ? lookupCraftedItem(candidate.rewardItem) : null;
-    const newInventory = candidate.rewardItem && storyRewardLookup
-      ? [...player.inventory, stampDurability({
-          id: `story_reward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          name: candidate.rewardItem,
-          kind: storyRewardLookup.kind,
-          rarity: storyRewardLookup.rarity,
-          quantity: 1,
-          tags: storyRewardLookup.tags,
-        })]
-      : [...player.inventory];
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const journeyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, candidate.rewardTc, record?.acceptedAtCell);
-    // OTA-1185 — 80% and no long-haul bonus when the trading post carried it.
-    // ⚠ OTA-1188 — courier rate, no long-haul bonus.
-    const payTc = storyViaCourier
-      ? CB.courierPayoutTc(candidate.rewardTc)
-      : CB.contractPayoutTc(candidate.rewardTc, journeyTc, storyViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
-    if (storyViaCourier) {
-      get().appendLog('arbiter', CB.courierSentLine(candidate.title, payTc));
-      set((st) => (st.player ? { player: advanceTime(st.player, CB.COURIER_DELAY_HOURS) } : st));
-    }
-    if (storyViaBroker) {
-      get().appendLog('arbiter', CB.brokerAcceptLine(sourceLabel, candidate.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
-    }
-    const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep);
-    set((s) =>
-      s.player
-        ? {
-            player: {
-              ...s.player,
-              tc: s.player.tc + payTc,
-              inventory: newInventory,
-              factionStanding: repResult.standing,
-              activeStorylines: (s.player.activeStorylines ?? []).filter((rec) => rec.id !== candidate.id),
-              completedStorylineIds: [...(s.player.completedStorylineIds ?? []), candidate.id],
-            },
-          }
-        : s,
-    );
-    get().announceMissionComplete(
-      'Storyline',
-      candidate.title,
-      `✦ Storyline complete — ${candidate.title}. +${payTc} TC${!storyViaBroker && !storyViaCourier && journeyTc > 0 ? ` (incl. +${journeyTc} long-haul)` : ''}${storyViaBroker ? ` (broker's cut taken)` : ''}, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
-    );
-    // ⚠ OTA-1203 (PUNCHLIST P16, route C) — four storylines ALSO hand over the faction's
-    // Procedure Text, alongside (never instead of) the authored reward. The text is an
-    // OBJECT; the read path teaches and INT-gates, so an arc finished early banks the
-    // technique rather than wasting it.
-    {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const AT = require('../engine/aetherTechniques') as typeof import('../engine/aetherTechniques');
-      const textTechId = AT.STORYLINE_TEXT_REWARDS[candidate.id];
-      const textTech = AT.findTechnique(textTechId ?? null);
-      if (textTech) {
-        const textName = AT.techniqueTextName(textTech);
-        const cat = lookupCraftedItem(textName);
-        set((s) => (s.player ? {
-          player: {
-            ...s.player,
-            inventory: mergeOrPushItem(s.player.inventory, stampDurability({
-              id: freshInstanceId('text'),
-              name: textName,
-              kind: cat.kind,
-              rarity: cat.rarity,
-              quantity: 1,
-              tags: cat.tags,
-            })),
-          },
-        } : s));
-        get().appendLog('reward', `✦ ${textName} — the written procedure itself, handed over with the rest. Read it when your head is ready for it.`);
-      }
-    }
-    // OTA-1050 — the agent who took it back remembers that you finished it.
-    creditTurnIn(get, set, storyViaCourier);
-    maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706
-    applyTrainAndLog(get, set, 'wisdom', '✦ A storyline carried through teaches you. +1 WIS (now {to}).');
-    applyTrainAndLog(get, set, 'charisma', '✦ Word of the chapter spreads. +1 CHA (now {to}).');
-    if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
-    plantNextContractHint(get, candidate.factionId, 'storyline');
-    void get().persist();
-  },
 
   // OTA 020 — Contracts-screen tap-to-complete. Skips the vendor
   // proximity requirement the normal turn-in handlers enforce.
@@ -26745,152 +24783,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // crumbs. If the tap doesn't raise the completion popup, the freshest
   // Arbiter line — or, when the arbiter dedup swallowed a repeat, the line it
   // suppressed — is surfaced as contractsNotice for the screen's strip.
-  completeContractFromUI(kind, id) {
-    const logBefore = get().gameLog;
-    const lastIdBefore = logBefore[logBefore.length - 1]?.id ?? null;
-    const noticeBefore = get().missionCompleteNotice;
-    get().completeContractFromUIInner(kind, id);
-    if (get().missionCompleteNotice !== noticeBefore) {
-      // Completed — the popup tells the story; drop any stale refusal.
-      if (get().contractsNotice) set({ contractsNotice: null });
-      return;
-    }
-    const logAfter = get().gameLog;
-    let refusal: string | null = null;
-    for (let i = logAfter.length - 1; i >= 0; i--) {
-      const e = logAfter[i];
-      if (!e || e.id === lastIdBefore) break;
-      if (e.channel === 'arbiter') { refusal = e.text; break; }
-    }
-    if (!refusal) {
-      // No fresh line and no popup: the arbiter dedup ate a repeat refusal.
-      // Surface the newest arbiter line — on a repeat tap that IS the refusal.
-      for (let i = logAfter.length - 1; i >= 0; i--) {
-        const e = logAfter[i];
-        if (e?.channel === 'arbiter') { refusal = e.text; break; }
-      }
-    }
-    if (refusal) set({ contractsNotice: { text: refusal, ts: Date.now() } });
-  },
 
-  completeContractFromUIInner(kind, id) {
-    const player = get().player;
-    if (!player) return;
-    if (kind === 'hunt') {
-      const def = findHuntById(id);
-      const rec = (player.activeHunts ?? []).find((h) => h.id === id);
-      if (!def || !rec) {
-        get().appendLog('arbiter', `The Arbiter shakes their head. "That hunt isn't on your slate."`);
-        return;
-      }
-      if (rec.stage < def.stages.length) {
-        get().appendLog('arbiter', `The Arbiter eyes the contract. "Not done. The trophy is the proof — you don't have it yet."`);
-        return;
-      }
-      // OTA-810 — a HUNT is a FACE-TO-FACE turn-in (user's call). The Contracts-UI
-      // COMPLETE used to pay FULL from any tile — the B2 exploit (whole bounties
-      // closed from a safe hub). Now it requires a paying agent present, and the
-      // RIGHT faction's agent, exactly like the typed turn-in.
-      const scene = get().currentScene;
-      // OTA-1187 (PUNCHLIST P8) — board and hall count here too, so the COMPLETE button
-      // and the typed turn-in cannot disagree about who may take a bounty back.
-      const huntUiParty = turnInCounterparty(get, player, scene);
-      if (!huntUiParty) {
-        get().appendLog('arbiter', `The Arbiter folds their arms. "A bounty's settled in person — stand in front of a vendor, a posting board, or the faction's own hall and show them the trophy."`);
-        return;
-      }
-      // OTA-1185 — the trading post brokers it for a cut (PUNCHLIST P2). Same rule as the
-      // typed turn-in above, resolved by the same function so the button and the command
-      // cannot disagree about who may take a contract.
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const CB = require('../engine/contractBroker') as typeof import('../engine/contractBroker');
-      const huntUiViaBroker = CB.isContractBroker(scene?.vendor)
-        && !!def.factionId && def.factionId !== huntUiParty.faction;
-      if (!CB.vendorCanTakeContract({ id: scene?.vendor?.id, faction: huntUiParty.faction }, def.factionId)) {
-        get().appendLog('arbiter', `${huntUiParty.name} waves you off. "Wrong agent. ${def.factionId!.replace(/_/g, ' ')} posted that bounty — take it to their people, or to the trading post at any outpost gate."`);
-        return;
-      }
-      const trophy: InventoryItem = stampDurability({
-        id: `trophy_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-        name: def.trophyName,
-        kind: 'relic',
-        rarity: 'Rare',
-        quantity: 1,
-        tags: ['trophy', 'hunt'],
-        description: `Trophy from the hunt for the ${def.targetEnemyName}.`,
-      });
-      const grantResult = grantItem(player.inventory, trophy);
-      const huntUiRewardLookup = def.rewardItem ? lookupCraftedItem(def.rewardItem) : null;
-      const newInventory = def.rewardItem && huntUiRewardLookup
-        ? grantItem(grantResult.inventory, stampDurability({
-            id: `huntreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-            name: def.rewardItem,
-            kind: huntUiRewardLookup.kind,
-            rarity: huntUiRewardLookup.rarity,
-            quantity: 1,
-            tags: huntUiRewardLookup.tags,
-          })).inventory
-        : grantResult.inventory;
-      const repResult = def.factionId && def.rewardRep
-        ? applyRepChange(player.factionStanding, def.factionId, def.rewardRep)
-        : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
-      // B2 — long-haul bonus, same as the typed turn-in.
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const huntJourneyTc = (require('../engine/contractMarkers') as typeof import('../engine/contractMarkers')).contractJourneyBonusTc(player.currentLocationId, def.rewardTc, rec?.acceptedAtCell);
-      // OTA-1185 — 80% and NO long-haul bonus when the trading post carried it.
-      const huntPayTc = CB.contractPayoutTc(def.rewardTc, huntJourneyTc, huntUiViaBroker ? CB.brokerShareFor(scene?.vendor) : null);
-      // ⚠ And the announce line below must not claim a bonus that was not paid — the
-      // OTA-1156 defect (a diagnostic stating an outcome nobody checked) in reward copy.
-      const huntShownJourneyTc = huntUiViaBroker ? 0 : huntJourneyTc;
-      if (huntUiViaBroker) {
-        get().appendLog('arbiter', CB.brokerAcceptLine(huntUiParty.name, def.factionId!.replace(/_/g, ' '), CB.brokerShareFor(scene?.vendor) ?? undefined));
-      }
-      set((s) => (s.player ? {
-        player: {
-          ...s.player,
-          tc: s.player.tc + huntPayTc,
-          inventory: newInventory,
-          factionStanding: repResult.standing,
-          activeHunts: (s.player.activeHunts ?? []).filter((h) => h.id !== def.id),
-          completedHuntIds: [...(s.player.completedHuntIds ?? []), def.id],
-        },
-      } : s));
-      get().announceMissionComplete(
-        'Hunt',
-        def.title,
-        `✦ Hunt complete — ${def.title}. From your pack: the ${def.trophyName}. +${huntPayTc} TC${huntShownJourneyTc > 0 ? ` (incl. +${huntShownJourneyTc} long-haul)` : ''}${huntUiViaBroker ? ` (broker's cut taken)` : ''}${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
-      );
-      // OTA-1050 — the agent who took it back remembers that you finished it.
-      creditTurnIn(get, set, false);
-      maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706
-      applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
-      if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
-      plantNextContractHint(get, def.factionId ?? null, 'hunt');
-      void get().persist();
-      return;
-    }
-    if (kind === 'mystery') {
-      // B2 — the Contracts-UI COMPLETE used to pay from ANY tile (the remote hole).
-      // Delegate to the typed turn-in, which now enforces a FACE-TO-FACE hand-in
-      // (vendor present + right faction) + the long-haul bonus — one source of truth.
-      get().turnInMystery(id);
-      return;
-    }
-    if (kind === 'storyline') {
-      // B2 — delegate to the face-to-face typed turn-in (closes the any-tile hole,
-      // adds the long-haul bonus).
-      get().turnInStoryline(id);
-      return;
-    }
-    if (kind === 'faction_quest') {
-      // B2 — delegate to the face-to-face typed turn-in. It enforces in-person
-      // (a same-faction vendor/board in scene OR inside the faction's home hall),
-      // the fetch gate, full pay + the long-haul bonus. Closes the OTA-617
-      // half-pay-from-anywhere path (now: in person or not at all).
-      get().turnInFactionQuest(id);
-      return;
-    }
-  },
 
   // OTA-478 — arm the active golem with a crafted golem weapon of its kind.
   armGolem(weaponName) {
@@ -26967,79 +24860,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // typed `abandon hunt <title>` / `drop hunt <title>` if the parser
   // routes that intent (kept simple for now — UI-only). Reputation
   // is NOT refunded.
-  abandonContract(kind, id) {
-    const player = get().player;
-    if (!player) return;
-    if (kind === 'hunt') {
-      const def = findHuntById(id);
-      const rec = (player.activeHunts ?? []).find((h) => h.id === id);
-      // OTA-1002 — a record whose def was RETIRED must still be droppable (the
-      // ABANDON button was a silent no-op on an orphan — a permanent slate entry).
-      if (!rec) return;
-      set((s) => (s.player ? {
-        player: {
-          ...s.player,
-          activeHunts: (s.player.activeHunts ?? []).filter((h) => h.id !== id),
-        },
-      } : s));
-      get().appendLog('world', `You set ${def ? theLower(def.title) : 'the hunt'} aside. The poster goes back in the pack, edge-creased.`);
-    } else if (kind === 'mystery') {
-      const def = findMysteryById(id);
-      const rec = (player.activeMysteries ?? []).find((m) => m.id === id);
-      if (!rec) return;
-      set((s) => (s.player ? {
-        player: {
-          ...s.player,
-          activeMysteries: (s.player.activeMysteries ?? []).filter((m) => m.id !== id),
-        },
-      } : s));
-      get().appendLog('world', `You let ${def ? theLower(def.title) : 'the mystery'} go. Some questions Tartaria keeps.`);
-    } else if (kind === 'storyline') {
-      const def = findStorylineById(id);
-      const rec = (player.activeStorylines ?? []).find((s) => s.id === id);
-      if (!rec) return;
-      set((s) => (s.player ? {
-        player: {
-          ...s.player,
-          activeStorylines: (s.player.activeStorylines ?? []).filter((q) => q.id !== id),
-        },
-      } : s));
-      get().appendLog('world', `You step away from ${def ? theLower(def.title) : 'the'} chapter. The Arbiter doesn't argue.`);
-    } else if (kind === 'whisper') {
-      const rec = (player.activeWhispers ?? []).find((w) => w.id === id);
-      if (!rec) return;
-      set((s) => (s.player ? {
-        player: {
-          ...s.player,
-          activeWhispers: (s.player.activeWhispers ?? []).filter((w) => w.id !== id),
-          // Mark it resolved so it isn't re-planted on this character.
-          completedWhisperIds: Array.from(new Set([...(s.player.completedWhisperIds ?? []), id])),
-        },
-      } : s));
-      get().appendLog('world', `You let the rumour go. Some talk is just talk.`);
-    } else if (kind === 'broker') {
-      if (!player.brokerMission || player.brokerMission.done) return;
-      set((s) => (s.player ? {
-        player: { ...s.player, brokerMission: undefined },
-      } : s));
-      get().appendLog('world', `You walk away from the parley. The two leaders can wait on the flats — or not.`);
-    } else {
-      const def = findFactionQuestById(id);
-      const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
-      if (!rec) return;
-      set((s) => (s.player ? {
-        player: {
-          ...s.player,
-          activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => q.id !== id),
-          activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((qid) => qid !== id),
-          // Drop the route chain if it was pointed at this contract.
-          routedMission: s.player.routedMission?.id === id ? null : s.player.routedMission,
-        },
-      } : s));
-      get().appendLog('world', `You hand ${def ? theLower(def.title) : 'the'} contract back to the wind. The Arbiter shrugs.`);
-    }
-    void get().persist();
-  },
 
   // Walk one tile on the procedural map. If the tile contains a named
   // location, switch to it; otherwise narrate a wander. A compass in the
@@ -27048,145 +24868,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // setTravelCourse sets player.travelTarget and takes one step
   // toward the target's procedural position. continueTravel takes
   // additional steps. stopTravel clears the target.
-  acceptBounty(bounty) {
-    const player = get().player;
-    if (!player) return;
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { bountyKey } = require('../engine/factionBounty') as typeof import('../engine/factionBounty');
-    const slate = activeBountiesOf(player);
-    // OTA-859 — don't stack the exact same contract twice.
-    if (slate.some((b) => bountyKey(b) === bountyKey(bounty))) {
-      get().appendLog('system', `You already carry the ${bounty.giverName} contract on the ${bounty.targetName}.`);
-      return;
-    }
-    // OTA-859 — hold up to MAX_ACTIVE_BOUNTIES at once; beyond that the slate is full.
-    if (slate.length >= MAX_ACTIVE_BOUNTIES) {
-      get().appendLog('system', `Your bounty slate is full (${MAX_ACTIVE_BOUNTIES}). Finish or abandon one first.`);
-      return;
-    }
-    // ⚠ OTA-1165 — THE THREE REFUSALS, AND EVERY ONE OF THEM SPEAKS. Standing on the
-    // quarry's own outpost (the 0-tile contract that started this: a 24h window with no
-    // travel in it, against a 6h patrol cooldown, needing 3-9 kills); camping one board
-    // for repeat work; and the board still running, which means no snapshot exists to
-    // lock the politics in. The last one POINTS AT THE FREEZE BUTTON rather than merely
-    // saying no — the whole of OTA-1164 was a control that refused in silence.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const BP = require('../engine/bountyPolitics') as typeof import('../engine/bountyPolitics');
-    const hereCell = playerGridCell(player);
-    const tgtCell0 = canonicalCellOf(bounty.targetLocationId);
-    const verdict = BP.canAcceptBounty({
-      atTargetCell: hereCell.x === tgtCell0.x && hereCell.y === tgtCell0.y,
-      targetLocationName: bounty.targetLocationName,
-      currentOutpostId: player.currentLocationId,
-      currentOutpostName: (() => {
-        try { return getLocationById(player.currentLocationId).name ?? player.currentLocationId; }
-        catch { return player.currentLocationId; }
-      })(),
-      lastClearedOutpostId: get().worldMemory.lastBountyClearedOutpostId,
-      boardFrozen: !!get().frozenBoard,
-    });
-    if (!verdict.ok) {
-      const line = BP.refusalLine(verdict);
-      if (line) {
-        get().appendLog('arbiter', line);
-        // The Contracts/World strip renders this; the feed alone scrolls away.
-        set({ contractsNotice: { text: line, ts: Date.now() } });
-      }
-      buzzBlocked();
-      return;
-    }
-    // ⚠ OTA-1164 — A LIVE COURSE, not merely another contract on the slate. This read
-    // `slate.length > 0`, which conflated "you already hold a bounty" with "you are
-    // already walking somewhere" — and `travelTarget` is CLEARED the moment you arrive.
-    // So the moment you reached your first contract's outpost, every later contract
-    // silently refused to route, while the Arbiter told you *"your current course
-    // holds"* over a course that no longer existed. The intent (see the routing call
-    // below: stacking must not yank you off the first one's road) is preserved exactly
-    // — there is simply nothing to protect when no road is running.
-    const hadCourse = !!player.travelTarget || !!player.whisperCourse;
-    // OTA-862 — stamp the accept hour so the contract can lapse after its in-game deadline.
-    const acceptedAtHour = player.hoursElapsed ?? 0;
-    // OTA-863 — DISTANCE-AWARE deadline. ⚠ OTA-1162 resized the travel term: it is the
-    // 24h JOB budget plus 2.5h per tile (the honest all-in cost of crossing one), not the
-    // old bare hour. Measured from the player's absolute cell at accept.
-    const grid = playerGridCell(player);
-    const tiles = canonicalDistanceFromGrid(grid.x, grid.y, bounty.targetLocationId);
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { bountyDeadlineFor } = require('../engine/factionBounty') as typeof import('../engine/factionBounty');
-    // ⚠ OTA-1165 — `count` is passed now, so the window includes the WAITING. The patrol
-    // cooldown puts a hard 6h floor between engagements, so a 9-kill job cannot be done in
-    // a 3-kill job's time no matter how well it is played.
-    const deadlineHours = bountyDeadlineFor(tiles, bounty.count);
-    // ⚠ OTA-1165 — FREEZE THE POLITICS ONTO THE CONTRACT. Taken from the SNAPSHOT the
-    // player froze, never from the live matrix: the board they read is the deal they get,
-    // even if those two factions are at war by the time the last body drops.
-    const frozen = get().frozenBoard;
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const allFactions = (require('../data/factions/factions.json') as Array<{ id: string }>).map((f) => f.id);
-    const politics = BP.politicsOf(
-      frozen?.relations ?? get().worldMemory.factionRelations,
-      bounty.giverFactionId,
-      allFactions,
-      frozen?.takenAtHour ?? acceptedAtHour,
-    );
-    set((s) => (s.player ? { player: { ...s.player, activeBounties: [...slate, { ...bounty, progress: 0, acceptedAtHour, deadlineHours, politics }], activeBounty: undefined } } : s));
-    // ⚠ AUTO-RELEASE. Owner: "once you accept the bounty it automatically unfreezes."
-    // The press that froze the board is spent the moment it is used, so the next contract
-    // must take its own fresh reading rather than inheriting this one.
-    set({ frozenBoard: null });
-    get().appendLog(
-      'arbiter',
-      hadCourse
-        // ⚠ OTA-1163 — "around <place>" USED TO READ AS A REQUIREMENT and it never was
-        // one: killCountsForBounty tests faction only, with no location term anywhere in
-        // it. The place is a tip about where they gather. Both lines now say so, because
-        // the owner ran a full contract believing he had to do the killing there.
-        ? `"Another contract," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down — anywhere you find them, though they're thickest around ${bounty.targetLocationName}. Added to your slate — your current course holds."`
-        : `"A contract, then," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down — anywhere you find them, though they'll be thick around ${bounty.targetLocationName}. Setting your course there now."`,
-    );
-    // Route the player to the quarry's outpost — but only if they weren't already on a
-    // bounty course. Stacking a second contract must not yank you off the first one's road.
-    if (!hadCourse) get().setTravelCourse(bounty.targetLocationId);
-    // ⚠ OTA-1163 — THE FIRST CONTRACT COMES WITH SOMEONE TO EXPLAIN IT. Owner: "the first
-    // time someone accepts a bounty gets a pop-up and it does it in character… since this
-    // is your first bounty I'll show you the ropes." Raised LAST so it sits on top of the
-    // routing, and gated on a one-shot flag rather than `slate.length === 0` — a player
-    // who finished a contract has still seen the ropes, and an empty slate would show them
-    // the card again every time they cleared it.
-    if (!player.bountyPrimerSeen) {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { bountyPrimerCard } = require('../engine/bountyPrimer') as typeof import('../engine/bountyPrimer');
-      const card = bountyPrimerCard(bounty, deadlineHours, getStanding(player.factionStanding, bounty.giverFactionId));
-      set((s) => (s.player ? { player: { ...s.player, bountyPrimerSeen: true } } : s));
-      get().raiseSpotlightNotice(card.heading, card.title, card.flavor, card.rewards, {
-        takeLabel: card.takeLabel,
-        // Four paragraphs, shown once in a playthrough, with no way back to it.
-        holdMs: 240000,
-      });
-    }
-  },
 
-  toggleBoardFreeze() {
-    const s = get();
-    if (s.frozenBoard) {
-      // Release. The manual escape hatch — owner: "in case you hit the pause button, then
-      // decide you don't want to do a bounty… or maybe you just want to see the cool green
-      // and red lights flicker."
-      set({ frozenBoard: null });
-      get().appendLog('system', 'The board runs again — the war picks up where it never actually stopped.');
-      return;
-    }
-    // ⚠ CLEAR, THEN CAPTURE, EVERY TIME. There is deliberately no reuse of a previous
-    // snapshot: the press that creates one is the press that unlocks accepting, and
-    // accepting releases the freeze, so a snapshot cannot outlive the decision it was
-    // taken for. That is the whole reason it can never go stale.
-    const hour = s.player?.hoursElapsed ?? 0;
-    set({ frozenBoard: { relations: { ...(s.worldMemory.factionRelations ?? {}) }, takenAtHour: hour } });
-    get().appendLog(
-      'system',
-      'You hold the board still. Whoever stands together right now is who your standing will carry to — take the contract on this reading.',
-    );
-  },
 
   worldRealtimeTick() {
     // OTA-857 — the world moves on WALL-CLOCK time, always. The in-game
@@ -27726,49 +25408,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // OTA-656 — accept a stumbled-onto mission offer. Commits the contract that
   // handleBroker previously created silently: builds the broker mission, canonizes
   // its two relic-source grid markers, and prints the objective line.
-  acceptMissionOffer() {
-    const offer = get().pendingMissionOffer;
-    const player = get().player;
-    if (!offer || !player) { set({ pendingMissionOffer: null }); return; }
-    if (offer.kind === 'broker') {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const broker = require('../engine/broker');
-      const tileName = (id: string) => getLocationById(id)?.name ?? id;
-      const mission = { factionA: offer.factionA, factionB: offer.factionB };
-      set((s) => (s.player ? {
-        player: { ...s.player, brokerMission: mission, brokerOfferDeclined: false },
-        pendingMissionOffer: null,
-      } : s));
-      // OTA-506 — the parley contract becomes grid events: a yellow "?" at each
-      // faction's relic location, flipped to a red "X" when the alliance is sealed.
-      for (const l of (broker.missionLegs(mission) ?? [])) {
-        const cell = canonicalCellFor((l as { tileId: string }).tileId);
-        get().canonizeLocation({
-          id: `contract_${(l as { factionId: string }).factionId}`,
-          name: `${(l as { factionName: string }).factionName}: ${(l as { itemName: string }).itemName}`,
-          type: 'contract', danger: 2, source: 'contract',
-          gx: cell.x, gy: cell.y, marker: 'pending',
-        });
-      }
-      const has = (name: string) => get().player!.inventory.some((i) => i.name === name);
-      const line = broker.brokerMissionLine(mission, has, tileName);
-      get().appendLog('world', `You sit down at the parley stone — the contract is yours.${line ? ` ${line}` : ''}`);
-      void get().persist();
-      return;
-    }
-    set({ pendingMissionOffer: null });
-  },
   // OTA-656 — decline a stumbled-onto mission offer. Doesn't create anything; sets
   // a soft flag so ambient pokes don't re-pop the prompt (explicit PARLEY re-opens).
-  declineMissionOffer() {
-    const offer = get().pendingMissionOffer;
-    if (!offer) { set({ pendingMissionOffer: null }); return; }
-    set((s) => (s.player
-      ? { player: { ...s.player, brokerOfferDeclined: true }, pendingMissionOffer: null }
-      : { pendingMissionOffer: null }));
-    get().appendLog('world', `You give the leaders a nod and step back. They'll keep the flats warm — PARLEY if you change your mind.`);
-    void get().persist();
-  },
 
   stepDirection(dir: Direction) {
     const player = get().player;
@@ -30028,61 +27669,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  toggleReserveForQuest(itemId) {
-    const player = get().player;
-    if (!player) return;
-    const item = player.inventory.find((i) => i.id === itemId);
-    if (!item) return;
-    // A hand-authored objective item (quest / contract / broker / whisper tag) is
-    // already hard-locked and lives in the Quest Items section on its own — there's
-    // nothing to earmark, and its modal is view-only anyway.
-    if (isQuestLockedItem(item)) return;
-    // Mutually exclusive with the fusion reserve: an item can't be both fodder for
-    // the Crucible and saved for a turn-in. If it's reserved for fusion, that has to
-    // be released first (the UI hides this button in that case).
-    if (item.reservedForFusion && !item.reservedForQuest) return;
-    const reserving = !item.reservedForQuest;
-    const qty = item.quantity ?? 1;
-    // A single-unit stack just flips the flag in place.
-    if (qty <= 1) {
-      set((s) => s.player
-        ? {
-            player: {
-              ...s.player,
-              inventory: s.player.inventory.map((i) =>
-                i.id === itemId ? { ...i, reservedForQuest: reserving } : i,
-              ),
-            },
-          }
-        : s);
-      return;
-    }
-    // A multi-unit stack peels exactly ONE unit across the reserved/free boundary so
-    // the player can save one (or a few) and keep the rest free — save 2 rations for
-    // the quest, eat the other 3. Tapping again moves another unit; the opposite-
-    // state stack re-absorbs it on un-save. Mirrors toggleReserveForFusion's split.
-    const sameUnit = sameStackUnit;
-    set((s) => {
-      if (!s.player) return s;
-      let inv = s.player.inventory
-        .map((i) => (i.id === itemId ? { ...i, quantity: (i.quantity ?? 1) - 1 } : i))
-        .filter((i) => (i.quantity ?? 1) > 0);
-      const destIdx = inv.findIndex(
-        (i) => i.id !== itemId && sameUnit(i, item) && (i.reservedForQuest === true) === reserving,
-      );
-      if (destIdx >= 0) {
-        inv = inv.map((i, idx) => (idx === destIdx ? { ...i, quantity: (i.quantity ?? 1) + 1 } : i));
-      } else {
-        inv = [...inv, {
-          ...item,
-          id: `${item.name.replace(/\s+/g, '_')}_${reserving ? 'q' : 'free'}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-          quantity: 1,
-          reservedForQuest: reserving,
-        }];
-      }
-      return { player: { ...s.player, inventory: inv } };
-    });
-  },
 
 
 
@@ -30091,7 +27677,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   clearFusionBlockedNotice() { set({ fusionBlockedNotice: null }); },
 
-  clearMissionCompleteNotice() { set({ missionCompleteNotice: null }); },
 
   // OTA-1018 — close the opening crawl. The SEEN flag lives on the CHARACTER
   // (persisted), so a save that finished or skipped the crawl never gets
@@ -30267,27 +27852,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  clearContractsNotice() { set({ contractsNotice: null }); },
 
-  announceMissionComplete(kind, title, body) {
-    // The feed line is unchanged — the log stays a complete record, and anything
-    // that greps it (chronicle, bug reports) keeps working.
-    get().appendLog('reward', body);
-    get().raiseMissionCompleteNotice(kind, title, body);
-  },
 
-  raiseMissionCompleteNotice(kind, title, body) {
-    const prev = get().missionCompleteNotice;
-    // OTA-1035 — also merge into a VICTORY card that's already up. A boss kill
-    // that finishes a hunt used to raise two popups that fought over the screen;
-    // one battle should read as one result.
-    const mergeInto = prev && (prev.title === title || !!prev.heading);
-    set({
-      missionCompleteNotice: mergeInto
-        ? { ...prev!, rewards: mergeRewardLines(prev!.rewards, [body]) }
-        : { kind, title, rewards: mergeRewardLines([], [body]) },
-    });
-  },
 
   raiseBossVictoryNotice(name, flavor, rewards) {
     get().raiseSpotlightNotice('VICTORY', name, flavor, rewards);
@@ -32109,14 +29675,14 @@ function advanceActiveFactionQuests(
 // once the work is done — auto-courses to the turn-in. `_chainRouting` lets the
 // engine's own setTravelCourse calls bypass the "player diverted, drop the chain"
 // guard in setTravelCourse.
-let _chainRouting = false;
+export let _chainRouting = false;
 
-function safeLocName(id: string): string {
+export function safeLocName(id: string): string {
   try { return getLocationById(id).name ?? id; } catch { return id; }
 }
 
 /** The destination + leg this contract should be heading to right now. */
-function desiredMissionLeg(
+export function desiredMissionLeg(
   player: PlayerCharacter,
   def: import('../engine/factionQuests').FactionQuestDef,
   rec: { stage: number },
@@ -32143,7 +29709,7 @@ function desiredMissionLeg(
 // FINISHING things: completing a contract / mystery / storyline / hunt, or
 // cracking open a container. Rolls `chance`, teaches one unknown discoverable
 // recipe from the live table, logs it. Additive — never replaces the real reward.
-function maybeTeachRecipeReward(
+export function maybeTeachRecipeReward(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   chanceKey: 'MISSION_RECIPE_CHANCE' | 'LOOT_RECIPE_CHANCE',
@@ -32316,7 +29882,7 @@ function tryVendorServiceVerb(
   return false;
 }
 
-function advanceMissionRoute(
+export function advanceMissionRoute(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
 ): void {
@@ -32373,27 +29939,11 @@ const BURST_WINDOW_MS = 5000;
  *  the first-ever-contract one-shot and the burst-tier Arbiter lines, and its
  *  position relative to each path's own logging differs. Every caller reads
  *  this BEFORE its bump, so the value is the index of the accept in hand. */
-function nextAcceptBurstIndex(): number {
+export function nextAcceptBurstIndex(): number {
   return Date.now() - _burstLastAt > BURST_WINDOW_MS ? 1 : _burstCount + 1;
 }
 
-/** The first accept of a burst gets the full treatment; everything after it
- *  collapses to one line. Detail is never lost -- poster text, stage narration
- *  and the full danger numbers all live in Contracts, which is where a player
- *  reviewing thirteen commitments is actually going to look. */
-function acceptIsCompact(): boolean {
-  return nextAcceptBurstIndex() > 1;
-}
 
-/** " (parked)" when a contract lands inactive. Replaces a full dedicated line
- *  ("X added to your slate (paused -- you're already on another contract).
- *  Activate it in Contracts when you're ready.") that repeated verbatim on
- *  every single accept. OTA-992 added that notice deliberately so parked
- *  grants say so -- this keeps the information and drops twelve repetitions
- *  of the sentence explaining it. */
-function parkedTag(tracked: boolean): string {
-  return tracked ? '' : ' (parked)';
-}
 
 /** Test seam. The burst tracker is module-level and transient by design (it
  *  models a few seconds of chip-tapping, not save state), which means one Jest
@@ -32434,7 +29984,7 @@ export function _bumpQuestsAcceptedForTest(opts?: { granted?: boolean }): void {
   bumpQuestsAccepted(() => useGameStore.getState(), useGameStore.setState as never, opts);
 }
 
-function bumpQuestsAccepted(
+export function bumpQuestsAccepted(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   /** OTA-1055 — the world HANDED this over; the player did not take it.
@@ -32966,7 +30516,7 @@ export function ledgeredSalvage(
   return out;
 }
 
-function applyTrainAndLog(
+export function applyTrainAndLog(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   stat: StatKey,
@@ -33670,7 +31220,7 @@ function describeWornForAcLedger(player: PlayerCharacter): string {
  *  them down" promise held for HP and silently failed for AC), and a stagger
  *  latched on a non-boss survived into the next roster. Spread this FIRST in
  *  any wholesale roster write; explicit per-site resets after it still win. */
-const FRESH_ENEMY_ARRAYS = {
+export const FRESH_ENEMY_ARRAYS = {
   enemyStatuses: undefined,
   enemyArmorShred: undefined,
   enemyCorruptionStacks: undefined,
@@ -35749,66 +33299,6 @@ function autoSubmitReadyFactionQuests(
   }
 }
 
-function plantNextContractHint(
-  get: () => GameStore,
-  factionId: string | null,
-  kind: ContractKind,
-): void {
-  const player = get().player;
-  if (!player) return;
-  let nextTitle: string | undefined;
-  if (factionId) {
-    const rep = getStanding(player.factionStanding, factionId);
-    if (kind === 'hunt') {
-      const pool = availableHunts(
-        factionId,
-        rep,
-        (player.activeHunts ?? []).map((h) => h.id),
-        player.completedHuntIds ?? [],
-      );
-      nextTitle = pool[0]?.title;
-    } else if (kind === 'mystery') {
-      const pool = availableMysteries(
-        factionId,
-        rep,
-        (player.activeMysteries ?? []).map((m) => m.id),
-        player.completedMysteryIds ?? [],
-      );
-      nextTitle = pool[0]?.title;
-    } else if (kind === 'storyline') {
-      const pool = availableStorylines(
-        factionId,
-        rep,
-        (player.activeStorylines ?? []).map((s) => s.id),
-        player.completedStorylineIds ?? [],
-      );
-      nextTitle = pool[0]?.title;
-    } else {
-      const pool = availableFactionQuests(
-        factionId,
-        rep,
-        player.activeFactionQuestIds ?? [],
-        player.completedFactionQuestIds ?? [],
-      );
-      nextTitle = pool[0]?.title;
-    }
-  }
-  if (nextTitle) {
-    const kindLabel = kind === 'hunt' ? 'hunt'
-      : kind === 'mystery' ? 'mystery'
-      : kind === 'storyline' ? 'chapter'
-      : 'contract';
-    get().appendLog(
-      'arbiter',
-      `Before you go, the agent slides a second leaf across the table. "Something heavier when you're ready — the ${kindLabel} '${nextTitle}'."`,
-    );
-  } else {
-    get().appendLog(
-      'arbiter',
-      `Word will travel that you finished this clean. The next thread will find you.`,
-    );
-  }
-}
 
 // 2026-05-25 OTA-043 — "tiny find on footfall" narration. Every
 // cardinal step in stepDirection rolls 10%; if it hits AND nothing
@@ -39447,28 +36937,6 @@ export const STORY_BEAT_META = { storyBeat: true } as const;
 
 
 
-// OTA-612 — exploit close: contract/hunt accept trains CHA, but accept→abandon→
-// re-accept happens with ZERO in-game time passing, so it was a free CHA grind.
-// Gate the accept-CHA train behind a short IN-GAME-HOUR cooldown: an instant
-// re-accept (same hoursElapsed) won't train; legit accepts spaced out over the
-// journey still do. Also tames chip-tapping six contracts → +CHA on each.
-const ACCEPT_CHA_COOLDOWN_HOURS = 3;
-let lastAcceptChaTrainAtHours = -1000;
-/** Train CHA for accepting a contract/hunt, once per cooldown window. Returns
- *  the leveled-to value if it leveled (for the caller's reward line), else null. */
-function trainAcceptCharismaGated(
-  get: () => GameStore,
-  set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
-): number | null {
-  const p = get().player;
-  if (!p) return null;
-  const nowH = p.hoursElapsed ?? 0;
-  if (nowH - lastAcceptChaTrainAtHours < ACCEPT_CHA_COOLDOWN_HOURS) return null;
-  lastAcceptChaTrainAtHours = nowH;
-  const tr = trainStat(p, 'charisma', true);
-  set((s) => (s.player ? { player: tr.player } : s));
-  return tr.leveled ? tr.leveled.to : null;
-}
 
 
 

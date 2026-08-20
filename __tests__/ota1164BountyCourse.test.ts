@@ -46,6 +46,10 @@ jest.mock('expo-av', () => ({
   },
 }));
 
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import {
   bountyCourseState, bountyCourseLabel, bountyCourseIsButton,
 } from '../app/engine/bountyCourse';
@@ -57,7 +61,7 @@ import * as path from 'path';
 const read = (...p: string[]): string =>
   fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 
-const STORE = read('app', 'state', 'gameStore.ts');
+const STORE = storeSource();
 const WORLD = read('app', 'screens', 'WorldScreen.tsx');
 const CONTRACTS = read('app', 'screens', 'ContractsScreen.tsx');
 

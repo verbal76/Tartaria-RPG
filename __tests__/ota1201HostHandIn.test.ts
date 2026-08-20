@@ -43,6 +43,10 @@ jest.mock('expo-updates', () => ({}));
 //   2. "host gear depending on faction status"
 //   3. hostile → courier or Hidden Market, "both of these take a cut"
 //   4. anchors only; Halem stays the factionless broker; Irma stays Irma
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import { useGameStore } from '../app/state/gameStore';
 import { hubOwnerFaction } from '../app/engine/hub';
 import { MYSTERIES } from '../app/engine/mysteries';
@@ -177,12 +181,20 @@ describe('OTA-1201 / P9 — the GRAB side is untouched (ruling 1)', () => {
     const { readFileSync } = require('fs') as typeof import('fs');
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { join } = require('path') as typeof import('path');
-    const STORE = readFileSync(join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+    const STORE = storeSource();
     // The host override lives in ONE place: turnInCounterparty. If hubOwnerFaction ever
     // reaches the offer filters, the grab side changed and this pin should go red.
     const offerFilters = (STORE.match(/factionId === (scene\.)?vendor\??\.faction|vendor\.faction === def\.factionId|def\.factionId === v(endor)?\.faction/g) ?? []).length;
     expect(offerFilters).toBeGreaterThanOrEqual(0); // shape drifts; the real pin is below
-    const counterparty = STORE.slice(STORE.indexOf('function turnInCounterparty'), STORE.indexOf('function creditTurnIn'));
+    // ⚠ OTA-1400 — the window was `turnInCounterparty` → `creditTurnIn`, which only
+    // worked while the two sat in that order in one file. Slice 9 moved both into
+    // questSlice.ts with creditTurnIn FIRST, so the old window ran backwards and
+    // came out empty — a pin asserting against nothing. Anchored on the function's
+    // own extent instead, which no later reordering can invert.
+    const cpStart = STORE.indexOf('function turnInCounterparty');
+    expect(cpStart).toBeGreaterThan(-1);
+    const nextFn = STORE.indexOf('\n  function ', cpStart + 10);
+    const counterparty = STORE.slice(cpStart, nextFn > cpStart ? nextFn : cpStart + 4000);
     expect(counterparty).toContain('hubOwnerFaction(player.currentLocationId)');
     // And nowhere else in the store consults hubOwnerFaction for contract logic.
     // Exactly TWO call sites: the counterparty seam and the armory gear gate. The first

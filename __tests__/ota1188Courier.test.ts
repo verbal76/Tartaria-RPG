@@ -13,6 +13,10 @@
 // paid face to face"), and fetch deliveries stay in person (OTA-456: "you can't mail the
 // goods"). A runner carries a REPORT — exactly the line OTA-456 itself drew.
 
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import {
   courierPayoutTc,
   courierSentLine,
@@ -25,7 +29,7 @@ import fs from 'fs';
 import path from 'path';
 
 const SRC = (rel: string) => fs.readFileSync(path.join(__dirname, '..', rel), 'utf8');
-const STORE = SRC('app/state/gameStore.ts');
+const STORE = storeSource();
 
 describe('OTA-1188 — what the courier costs', () => {
   test('it pays 75% of base', () => {

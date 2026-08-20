@@ -43,6 +43,10 @@ jest.mock('expo-updates', () => ({}));
 //     as contractsNotice, rendered as a strip ON the Contracts screen.
 jest.setTimeout(30000);
 
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import * as fs from 'fs';
 import * as path from 'path';
 import { useGameStore } from '../app/state/gameStore';
@@ -144,7 +148,7 @@ describe('OTA-1014 — a refused COMPLETE tap answers on the Contracts screen', 
 });
 
 describe('OTA-1014 — SOURCE LOCKS (category: course-cancel clears routing; refusals visible on-screen)', () => {
-  const storeSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+  const storeSrc = storeSource();
   const screenSrc = fs.readFileSync(path.join(__dirname, '..', 'app', 'screens', 'ContractsScreen.tsx'), 'utf8');
 
   it('both course-cancel paths clear routedMission (new shape present)', () => {

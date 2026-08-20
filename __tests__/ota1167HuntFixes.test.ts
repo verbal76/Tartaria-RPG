@@ -16,6 +16,10 @@
 
 jest.setTimeout(20000);
 
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import {
   scaleHuntBoss, HUNT_HP_CEILING, HUNT_DAMAGE_STEP_T, findHuntById,
 } from '../app/engine/hunts';
@@ -26,7 +30,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 const read = (...p: string[]): string => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const CONTRACTS = read('app', 'screens', 'ContractsScreen.tsx');
-const STORE = read('app', 'state', 'gameStore.ts');
+const STORE = storeSource();
 
 // ⚠ hunts.json is WRAPPED (`{_description, hunts}`) while enemies.json is a bare array.
 // The first draft assumed both were arrays and the suite failed to load at all.
@@ -107,7 +111,11 @@ describe('OTA-1167 — the boss finally reads the whole character', () => {
   });
 
   it('the store passes the guarded power measure', () => {
-    expect(STORE).toContain('scaleHuntBoss(player, hunt, scalePowerOf(player))');
+    // ⚠ OTA-1400 — SLICE 9. The call reads `deps.X(...)` now, because a slice
+    // reaches a store helper by INJECTION. That is not a looser pin: the deps
+    // object is typed `typeof Store.X`, so the compiler guarantees it is the
+    // same function — the prefix is the proof of the wiring, not a hole in it.
+    expect(STORE).toContain('scaleHuntBoss(player, hunt, deps.scalePowerOf(player))');
   });
 });
 

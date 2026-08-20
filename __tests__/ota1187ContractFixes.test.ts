@@ -5,6 +5,10 @@
 //   P8 — a finished bounty could not be handed in at the board that posted it.
 //   P5 — a comment claimed the location challenges were switched off. All six are on.
 
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import {
   contractJourneyBonusTc,
   contractTurnInRemoteness,
@@ -20,7 +24,7 @@ import fs from 'fs';
 import path from 'path';
 
 const SRC = (rel: string) => fs.readFileSync(path.join(__dirname, '..', rel), 'utf8');
-const STORE = SRC('app/state/gameStore.ts');
+const STORE = storeSource();
 const HUB = 'tartarian_outskirts';
 const cellOf = (id: string) => canonicalCellOf(id);
 
@@ -92,7 +96,14 @@ describe('⚠⚠ OTA-1187 / P7 — the stamp is written and read everywhere', ()
     // that is right at eight of them is a contract that silently pays the legacy rate at
     // the ninth — so they all go through `acceptCellStamp`.
     expect(STORE).toContain('function acceptCellStamp(');
-    expect((STORE.match(/\.\.\.acceptCellStamp\(get\)/g) ?? []).length).toBeGreaterThanOrEqual(9);
+    // ⚠ OTA-1400 — SLICE 9. The call reads `deps.X(...)` now, because a slice
+    // reaches a store helper by INJECTION. That is not a looser pin: the deps
+    // object is typed `typeof Store.X`, so the compiler guarantees it is the
+    // same function — the prefix is the proof of the wiring, not a hole in it.
+    // ⚠ Both forms counted: three accept sites are still in gameStore and call it
+    // directly; six moved into questSlice and reach it through the deps object.
+    // Nine call sites either way — which is the claim.
+    expect((STORE.match(/\.\.\.(deps\.)?acceptCellStamp\(get\)/g) ?? []).length).toBeGreaterThanOrEqual(9);
   });
 
   test('⚠ the legacy backfill is deliberately NOT stamped', () => {

@@ -103,6 +103,14 @@ const SRC: string = require('fs').readFileSync(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('path').join(__dirname, '../app/ai/narration.ts'),
   'utf8',
+// ⚠ OTA-1400 — SLICE 9. The six manual accept paths moved to questSlice.ts, so
+// this concatenation grew a third file. Each read is still a named file: the
+// store, the narration leaf (the ambient stamp), and the quest slice (accepts).
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+) + '\n' + require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '../app/state/slices/questSlice.ts'),
+  'utf8',
 );
 
 async function boot(name: string) {
@@ -327,7 +335,10 @@ describe('OTA-1055 — the Arbiter only counts what the PLAYER took', () => {
   });
 
   it('the six manual accept paths are not', () => {
-    expect((SRC.match(/bumpQuestsAccepted\(get, set\);/g) ?? []).length).toBe(6);
+    // ⚠ OTA-1400 — the six now read `deps.bumpQuestsAccepted(get, set)`, because a
+    // slice reaches a store helper by injection. The deps object is typed
+    // `typeof Store.bumpQuestsAccepted`, so it is provably the same function.
+    expect((SRC.match(/(deps\.)?bumpQuestsAccepted\(get, set\);/g) ?? []).length).toBe(6);
   });
 
   it('a grant leaves the burst counter alone', () => {

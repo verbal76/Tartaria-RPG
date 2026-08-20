@@ -97,10 +97,17 @@ describe('OTA-1398 — narration moved, whole', () => {
     // story-beat meta flag (used at six appendLog sites across the store), the
     // accept-CHA cooldown, and the dog-vest loot roll. Extracting them because
     // they were nearby would have been the opposite of measuring.
-    for (const kept of ['STORY_BEAT_META', 'trainAcceptCharismaGated', 'rollDogVestLootName']) {
+    // ⚠ OTA-1400 — `trainAcceptCharismaGated` moved ONE OTA LATER, to questSlice: the
+    // accept-CHA gate belongs to contracts, and slice 9 measured it as exclusive to
+    // them. The claim slice 7 was making is unchanged and still checked — it did not
+    // travel with NARRATION, which is what "stayed for a reason" meant. Pinning it
+    // where it is now, rather than deleting the row, keeps that history legible.
+    for (const kept of ['STORY_BEAT_META', 'rollDogVestLootName']) {
       expect(store).toContain(kept);
       expect(narr).not.toMatch(new RegExp(`^(export )?(const|function) ${kept}\\b`, 'm'));
     }
+    expect(narr).not.toContain('trainAcceptCharismaGated');
+    expect(src('app', 'state', 'slices', 'questSlice.ts')).toContain('function trainAcceptCharismaGated(');
   });
 });
 

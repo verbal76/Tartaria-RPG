@@ -51,6 +51,10 @@ jest.mock('expo-av', () => ({
   },
 }));
 
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import { bountyPrimerCard, formatWindow, BOUNTY_BROKER } from '../app/engine/bountyPrimer';
 import { killCountsForBounty, bountyTerms, giverDifficulty } from '../app/engine/factionBounty';
 import type { FactionBounty } from '../app/engine/factionBounty';
@@ -62,7 +66,7 @@ import * as path from 'path';
 const read = (...p: string[]): string =>
   fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 
-const STORE = read('app', 'state', 'gameStore.ts');
+const STORE = storeSource();
 
 const BOUNTY: FactionBounty = {
   giverFactionId: 'reclaimers_guild', giverName: 'Reclaimers Guild',
@@ -228,9 +232,19 @@ describe('OTA-1163 — the feed stopped implying the place is a requirement', ()
   it('both accept lines say the kills count anywhere', () => {
     // The wording that misled the owner through a whole 23-tile contract: "put down
     // around <place>" reads as an instruction when the place is only a tip.
-    const i = STORE.indexOf('"Another contract," the Arbiter says');
+    // ⚠⚠ OTA-1400 — RE-POINTED AND RE-ANCHORED, and the second part is the real
+    // lesson. `acceptBounty` moved to `app/state/slices/boardSlice.ts`; reading the
+    // concatenated store made the anchor NON-UNIQUE — gameStore has a canned line
+    // starting `"Another contract," the Arbiter says` in a flavour array, and
+    // indexOf found THAT one and windowed 1,200 characters of unrelated text. The
+    // suite passed or failed for reasons unrelated to its claim. Reading the one
+    // file that owns the bounty accept makes the anchor unique again.
+    const BOARD = require('fs').readFileSync(
+      require('path').join(__dirname, '../app/state/slices/boardSlice.ts'), 'utf8',
+    ) as string;
+    const i = BOARD.indexOf('"Another contract," the Arbiter says');
     expect(i).toBeGreaterThan(-1);
-    const both = STORE.slice(i - 400, i + 800);
+    const both = BOARD.slice(i - 400, i + 800);
     expect((both.match(/anywhere you find them/g) ?? []).length).toBe(2);
     expect(both).not.toMatch(/put down around \$\{bounty\.targetLocationName\}/);
   });

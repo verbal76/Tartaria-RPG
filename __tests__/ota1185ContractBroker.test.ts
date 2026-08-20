@@ -18,6 +18,10 @@
 // but make the journey worth the loot."* A hand-in at the trading post reverses nothing —
 // it is still face to face, still at an outpost the player travelled to.
 
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import {
   isContractBroker,
   vendorCanTakeContract,
@@ -175,7 +179,7 @@ describe('OTA-1185 — what the broker costs', () => {
 });
 
 describe('⚠⚠ OTA-1185 — every turn-in path routes through the ONE resolver', () => {
-  const STORE = SRC('app/state/gameStore.ts');
+  const STORE = storeSource();
 
   test('no handler still hand-rolls the faction comparison as its gate', () => {
     // Four handlers had three different wordings of the same rule. A fifth spelling is
@@ -226,7 +230,7 @@ describe('⚠⚠ OTA-1185 — every turn-in path routes through the ONE resolver
 });
 
 describe('⚠⚠ OTA-1185 — the broker DOES take deliveries, and this suite is why', () => {
-  const STORE = SRC('app/state/gameStore.ts');
+  const STORE = storeSource();
 
   test('⚠⚠ a fetch quest is NOT refused at the broker', () => {
     // The first version refused it, citing OTA-456's "you can't mail the goods", and

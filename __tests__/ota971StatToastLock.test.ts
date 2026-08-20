@@ -4,6 +4,10 @@
 // toasts still printing the bare base stat. This suite closes the category and
 // LOCKS it: no player-facing "+1 <STAT> (now ${...})" toast may bypass
 // statNowClause ever again — any future toast written the old way fails here.
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -12,7 +16,7 @@ import * as path from 'path';
 // (placeholder form `(now {to})`) and the parley `X → Y` form sailed past it —
 // green over eight live offenders. The added assertions close both shapes.
 describe('OTA-971 — every player stat toast reads the sheet (category lock)', () => {
-  const src = fs.readFileSync(path.join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+  const src = storeSource();
 
   it('no reward toast prints a bare base stat ("+1 XXX (now ${...})")', () => {
     const offenders = src
@@ -30,7 +34,7 @@ describe('OTA-971 — every player stat toast reads the sheet (category lock)', 
   });
 
   it('the {to}-placeholder helper routes through statNowClause (audit D1.1)', () => {
-    const src = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+    const src = storeSource();
     const helper = src.slice(src.indexOf('function applyTrainAndLog('), src.indexOf('function applyTrainAndLog(') + 900);
     expect(helper).toContain('statNowClause(get().player, stat, tr.leveled.to)');
     // The raw base-value substitution may survive only as the fallback AFTER
@@ -39,7 +43,7 @@ describe('OTA-971 — every player stat toast reads the sheet (category lock)', 
   });
 
   it('no player-facing toast prints a raw "X \u2192 Y" stat jump (audit D1.1, parley)', () => {
-    const src = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+    const src = storeSource();
     expect(src).not.toMatch(/appendLog\('reward', `[^`]*\$\{trained\.leveled\.from\} \u2192 \$\{trained\.leveled\.to\}/);
   });
 });

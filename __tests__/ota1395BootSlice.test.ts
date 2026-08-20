@@ -172,10 +172,12 @@ describe('OTA-1395 — four slices in', () => {
   it('⚠ there are four slices, and the policy suite covers all of them', () => {
     expect(sliceNames()).toEqual([
       'aiLifecycleSlice.ts',
+      'boardSlice.ts',
       'bootSlice.ts',
       'craftingSlice.ts',
       'inventorySlice.ts',
       'persistSlice.ts',
+      'questSlice.ts',
       'slotSlice.ts',
       'vendorSlice.ts',
     ]);

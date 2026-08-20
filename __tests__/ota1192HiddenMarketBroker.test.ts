@@ -11,6 +11,10 @@
 // Hidden Market is ONE location out past the frontier camps. Same rate at both would make
 // the trip pointless, and OTA-1187 just spent a whole OTA establishing that travel pays.
 
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import {
   brokerShareFor,
   isContractBroker,
@@ -26,7 +30,7 @@ import fs from 'fs';
 import path from 'path';
 
 const SRC = (rel: string) => fs.readFileSync(path.join(__dirname, '..', rel), 'utf8');
-const STORE = SRC('app/state/gameStore.ts');
+const STORE = storeSource();
 const HALEM = { id: 'halem_trader', faction: null as string | null };
 const STALL = { id: 'hidden_market_2', faction: 'stone_builders' as string | null };
 const IRMA = { id: 'irma_ironhand', faction: 'stone_builders' as string | null };

@@ -198,10 +198,12 @@ describe('OTA-1399 — the source pins, and the helper finally paying for itself
     // the mutable-state rule without anyone extending a list.
     expect(sliceNames()).toEqual([
       'aiLifecycleSlice.ts',
+      'boardSlice.ts',
       'bootSlice.ts',
       'craftingSlice.ts',
       'inventorySlice.ts',
       'persistSlice.ts',
+      'questSlice.ts',
       'slotSlice.ts',
       'vendorSlice.ts',
     ]);

@@ -50,6 +50,10 @@ jest.mock('expo-av', () => ({
   },
 }));
 
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import { useGameStore } from '../app/state/gameStore';
 import type { InventoryItem } from '../app/engine/types';
 import { readFileSync } from 'fs';
@@ -232,11 +236,15 @@ describe('OTA-1097 — source locks on the selection surface', () => {
 
 describe('OTA-1097 — the merge predicate has ONE definition', () => {
   it('sameStackUnit is module-level and every reserve path routes through it', () => {
-    const store = src('app/state/gameStore.ts');
+    const store = storeSource();
     expect(store).toContain('function sameStackUnit(a: InventoryItem, b: InventoryItem): boolean {');
     // Was three identical local closures — three chances for one to fall behind
     // when a new per-instance field lands.
-    expect((store.match(/const sameUnit = sameStackUnit;/g) ?? []).length).toBe(2);
+    // ⚠ OTA-1400 — SLICE 9. The call reads `deps.X(...)` now, because a slice
+    // reaches a store helper by INJECTION. That is not a looser pin: the deps
+    // object is typed `typeof Store.X`, so the compiler guarantees it is the
+    // same function — the prefix is the proof of the wiring, not a hole in it.
+    expect((store.match(/const sameUnit = (deps\.)?sameStackUnit;/g) ?? []).length).toBe(2);
     expect(store).not.toMatch(/const sameUnit = \(a: InventoryItem, b: InventoryItem\): boolean =>/);
   });
 });

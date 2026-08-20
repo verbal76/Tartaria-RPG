@@ -45,13 +45,17 @@ jest.mock('expo-updates', () => ({}));
 // one the owner hit would leave six others just as missable, so this OTA creates
 // the choke point and routes all seven through it. The source lock below is the
 // part that keeps it true — an eighth completion site cannot log its way past.
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import * as fs from 'fs';
 import * as path from 'path';
 import { useGameStore } from '../app/state/gameStore';
 
 const STORE_SRC = fs.readFileSync(
   path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8',
-);
+) + '\n' + storeSource();
 
 describe('OTA-987 — a finished mission announces itself', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });

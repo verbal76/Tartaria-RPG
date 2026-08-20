@@ -9,6 +9,10 @@
 //     it." A boss kill fires eight-plus lines from five modules in one tick and
 //     the story beat gets shoved off screen by the reward lines. It is collected
 //     into one card now.
+// ⚠ OTA-1400 — SLICE 9 sent contracts and the mission board into
+// `app/state/slices/`. Re-pointed via `storeSource()`, which reads gameStore AND
+// every slice — what a pin on THE STORE has meant since slice 4.
+import { storeSource } from '../test-utils/storeSource';
 import * as fs from 'fs';
 import * as path from 'path';
 import {
@@ -119,7 +123,7 @@ describe('OTA-1035 — a faction fighter is a PERSON', () => {
 describe('OTA-1035 — the battle follow-up card', () => {
   const store = fs.readFileSync(
     path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8',
-  );
+  ) + '\n' + storeSource();
   const modal = fs.readFileSync(
     path.join(__dirname, '..', 'app', 'components', 'MissionCompleteModal.tsx'), 'utf8',
   );
