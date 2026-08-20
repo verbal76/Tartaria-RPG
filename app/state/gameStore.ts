@@ -3040,6 +3040,39 @@ function startRuntimePressureWatch(
         rpStartFrameClock();
       } else {
         rpStopFrameClock();
+        // ⚠⚠ OTA-1377 — THE ORDERLY EXIT, FINALLY MARKED. The freeze breadcrumb
+        // rests on one invariant, written in its own doc comment at
+        // saveSystem.clearLiveBreadcrumb: *"a breadcrumb that SURVIVES to the
+        // next boot means the process died while it was still live."* That was
+        // never true, because nothing ever cleared it on the way out —
+        // `clearLiveBreadcrumb` had exactly one caller, `hydrate()`, which runs
+        // at BOOT. Worse than an omission: the stamp at the top of this handler
+        // writes a fresh crumb on the way to background and then leaves it
+        // there, so every cold start found one and the boot line reported a
+        // mid-action death whether or not anything had gone wrong. An
+        // instrument that says the same thing every time carries no
+        // information, and this is the instrument being used to hunt B9.
+        //
+        // ⚠ LAST STATEMENT IN THE HANDLER, ON PURPOSE. OTA-1357 added the stamp
+        // above because the third B9 freeze died within 1ms of a state change,
+        // on a path nothing else covered. Clearing at the TOP would have traded
+        // a false positive for a blind spot over exactly that window. Anything
+        // that dies earlier in this handler never reaches this line, so the
+        // crumb survives and still names the transition it died in; reaching
+        // here is itself the proof the transition completed.
+        //
+        // ⚠ `background` ONLY, never `inactive`. iOS reports `inactive` for a
+        // notification banner, a Control Center pull, a peek at the app
+        // switcher — none of which is an exit, and clearing on one would drop
+        // the crumb for a freeze that happened while the banner was up.
+        //
+        // ⚠ WHAT THIS DOES NOT FIX, STATED PLAINLY: background work that stamps
+        // a phase AFTER this point re-arms the crumb, so an OS reclaim of a
+        // long-backgrounded app can still surface as "died mid-action". That is
+        // a much rarer shape than the one being removed here — which fired on
+        // literally every clean exit — and closing it would mean recording a
+        // separate "exited cleanly" fact rather than deleting a stale one.
+        if (nextStr === 'background') void clearLiveBreadcrumb();
       }
     }) as { remove: () => void } | null;
   } catch { /* AppState unavailable (headless/test) */ }
