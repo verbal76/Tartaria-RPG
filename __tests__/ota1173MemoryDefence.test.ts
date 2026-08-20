@@ -58,7 +58,16 @@ jest.mock('expo-av', () => ({
 import * as fs from 'fs';
 import * as path from 'path';
 const read = (...p: string[]): string => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
-const STORE = read('app', 'state', 'gameStore.ts');
+/** ⚠ OTA-1396 — SLICE 5 split this subsystem across two files, and this suite
+ *  reads BOTH on purpose. The instruments (the memory-warning handler, the
+ *  dispose, the quiet-window latch) moved to
+ *  `app/diagnostics/runtimePressureWatch.ts`; the Qwen watchdog that CONSULTS
+ *  them stayed in gameStore and now reads them through accessors. The interlock
+ *  this suite pins is precisely the seam between the two, so a claim about it is
+ *  a claim about both files. Concatenating them keeps every assertion honest
+ *  without pretending the code is still in one place. */
+const STORE = read('app', 'state', 'gameStore.ts')
+  + '\n' + read('app', 'diagnostics', 'runtimePressureWatch.ts');
 const RUNTIME = read('app', 'ai', 'generation', 'LlamaRuntime.ts');
 
 /** Strip comment blocks before asserting on code. ⚠ This file describes the very calls it

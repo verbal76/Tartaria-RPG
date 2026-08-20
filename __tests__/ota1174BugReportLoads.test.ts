@@ -114,12 +114,31 @@ describe('OTA-1174 — the bug-report module loads and runs', () => {
     expect(() => require('../app/diagnostics/aboutSummary')).not.toThrow();
   });
 
-  it('⚠ AND THE STORE IMPORT RESOLVES TO A REAL FUNCTION, not undefined', () => {
+  it('⚠ AND THE SNAPSHOT IMPORT RESOLVES TO A REAL FUNCTION, not undefined', () => {
     // A require CYCLE does not throw on import — it hands back a half-built module whose
     // exports are `undefined`. That failure only shows up when something calls them, which
     // is why "it imported fine" is not the assertion worth making.
-    const store = require('../app/state/gameStore') as { runtimePressureSnapshot?: unknown };
-    expect(typeof store.runtimePressureSnapshot).toBe('function');
+    //
+    // ⚠⚠ OTA-1396 — RE-POINTED, NOT RELAXED. This used to require
+    // `app/state/gameStore`, because that is where `runtimePressureSnapshot` lived when
+    // the header above was written. Slice 5 moved the instruments to
+    // `app/diagnostics/runtimePressureWatch.ts`, so the function aboutSummary imports now
+    // comes from there. The assertion is the same claim at the new address: the thing the
+    // bug-report path calls must be a real function, not a cycle's `undefined`.
+    //
+    // ⚠ AND THE CYCLE RISK HERE WENT UP, NOT DOWN, WHICH IS WHY THIS STAYS. aboutSummary
+    // still imports `useGameStore` (it reads live state for the report), so the store is
+    // still on the SHARE path; what changed is that the snapshot now arrives from a leaf
+    // that imports no value from the store. Two entry points into that graph instead of
+    // one — exactly the arrangement where a half-built module is easy to get and hard to
+    // notice.
+    const watch = require('../app/diagnostics/runtimePressureWatch') as {
+      runtimePressureSnapshot?: unknown;
+    };
+    expect(typeof watch.runtimePressureSnapshot).toBe('function');
+    // ...and via the importer itself, which is the order a device actually loads them in.
+    const about = readSrc('app', 'diagnostics', 'aboutSummary.ts');
+    expect(about).toContain("import { runtimePressureSnapshot } from './runtimePressureWatch';");
   });
 
   it('⚠⚠ AND THE REPORT ACTUALLY BUILDS — the path a player takes when they hit SHARE', () => {

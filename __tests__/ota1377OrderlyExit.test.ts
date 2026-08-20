@@ -9,7 +9,7 @@
  * so the reader had one input and two possible causes and always guessed the
  * same one.
  */
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 // ⚠ OTA-1395 — reads the store AND its slices. Part 4 is splitting gameStore into
 // slices and the literals these pins look for travel with the code; a pin like
@@ -17,14 +17,37 @@ import { join } from 'path';
 import { storeSource } from '../test-utils/storeSource';
 
 const src = (...p: string[]) => readFileSync(join(__dirname, '..', ...p), 'utf8');
-const store = storeSource();
 const save = src('app', 'engine', 'saveSystem.ts');
+
+// ⚠⚠ OTA-1396 — AND HERE IS WHERE `storeSource()` STOPPED BEING ENOUGH, which is worth
+// stating rather than papering over. Slice 5 did not move the app-state handler into a
+// SLICE; it moved it DOWN, out of the store's neighbourhood entirely, into
+// `app/diagnostics/runtimePressureWatch.ts`. `storeSource()` is "the store plus its
+// slices" on purpose and must stay that — widening it to "wherever the code went" would
+// make every pin in the repo unfalsifiable.
+//
+// So this suite names the handler's file explicitly, and the ONE claim that was really
+// about the whole app — how many callers `clearLiveBreadcrumb` has — is now counted
+// across `app/` instead of across whatever text happened to be concatenated. That is
+// strictly stronger: a third caller added in a screen would have slipped past the old
+// count, and cannot slip past this one.
+const store = storeSource();
+const watch = src('app', 'diagnostics', 'runtimePressureWatch.ts');
+
+function appFiles(dir: string, out: string[] = []): string[] {
+  for (const e of readdirSync(dir)) {
+    const full = join(dir, e);
+    if (statSync(full).isDirectory()) appFiles(full, out);
+    else if (/\.tsx?$/.test(e)) out.push(full);
+  }
+  return out;
+}
 
 describe('OTA-1377 — the orderly exit is marked', () => {
   it('⚠⚠ the crumb is cleared when the app reaches background', () => {
     // This is the whole fix. Before it, `clearLiveBreadcrumb` had exactly ONE
     // caller — hydrate(), at boot — so nothing on the way OUT ever cleared it.
-    expect(store).toContain("if (nextStr === 'background') void clearLiveBreadcrumb();");
+    expect(watch).toContain("if (nextStr === 'background') void clearLiveBreadcrumb();");
   });
 
   it('⚠⚠ …as the LAST statement of the handler, so OTA-1357 keeps its window', () => {
@@ -33,9 +56,9 @@ describe('OTA-1377 — the orderly exit is marked', () => {
     // Clearing at the top would trade a false positive for a blind spot over
     // exactly that window. Anything that dies earlier never reaches the clear,
     // so the crumb survives and still names the transition it died in.
-    const start = store.indexOf("rpAppStateSub = AppState.addEventListener");
-    const handler = store.slice(
-      start, store.indexOf('}) as { remove: () => void } | null;', start));
+    const start = watch.indexOf("rpAppStateSub = AppState.addEventListener");
+    const handler = watch.slice(
+      start, watch.indexOf('}) as { remove: () => void } | null;', start));
     const stamp = handler.indexOf('stampBreadcrumbPhase(');
     const clear = handler.indexOf('clearLiveBreadcrumb()');
     expect(stamp).toBeGreaterThanOrEqual(0);
@@ -48,8 +71,10 @@ describe('OTA-1377 — the orderly exit is marked', () => {
     // iOS reports `inactive` for a notification banner, a Control Center pull,
     // a peek at the app switcher. None is an exit, and clearing on one would
     // drop the crumb for a freeze that happened while the banner was up.
-    expect(store).not.toContain("nextStr === 'inactive') void clearLiveBreadcrumb");
-    expect(store).not.toContain("nextStr !== 'active') void clearLiveBreadcrumb");
+    for (const body of [store, watch]) {
+      expect(body).not.toContain("nextStr === 'inactive') void clearLiveBreadcrumb");
+      expect(body).not.toContain("nextStr !== 'active') void clearLiveBreadcrumb");
+    }
   });
 
   it('the invariant the crumb rests on is now actually enforced', () => {
@@ -57,7 +82,16 @@ describe('OTA-1377 — the orderly exit is marked', () => {
     expect(save).toContain('Cleared on an ORDERLY exit');
     // two writers, one reader, one clearer — and the clearer now has the two
     // callers the contract always implied: boot (consume) and background (mark).
-    expect(store.match(/clearLiveBreadcrumb\(\)/g)?.length).toBe(2);
+    // ⚠ OTA-1396 — counted across `app/` rather than across the store text, because
+    // "two callers" was always a claim about the application and never about a file.
+    // saveSystem.ts is excluded: that is where the function is DEFINED.
+    const callers = appFiles(join(__dirname, '..', 'app'))
+      .filter((f) => !f.endsWith(join('engine', 'saveSystem.ts')))
+      .filter((f) => /clearLiveBreadcrumb\(\)/.test(readFileSync(f, 'utf8')));
+    expect(callers.map((f) => f.split('app/')[1]).sort()).toEqual([
+      'diagnostics/runtimePressureWatch.ts',   // background — mark the orderly exit
+      'state/slices/bootSlice.ts',             // boot — consume the survivor
+    ]);
   });
 
   it('⚠ and it adds no new instrument — the fix is a deletion', () => {
@@ -65,9 +99,9 @@ describe('OTA-1377 — the orderly exit is marked', () => {
     // change needs one it should be argued for on its own; the value here is
     // that an existing signal starts meaning something, not that there is more
     // of it.
-    const start = store.indexOf('rpAppStateSub = AppState.addEventListener');
-    const handler = store.slice(
-      start, store.indexOf('}) as { remove: () => void } | null;', start));
+    const start = watch.indexOf('rpAppStateSub = AppState.addEventListener');
+    const handler = watch.slice(
+      start, watch.indexOf('}) as { remove: () => void } | null;', start));
     expect(handler).not.toContain('AsyncStorage');
     expect(handler).not.toContain('setItem');
     // exactly one appendLog in the handler, the pre-existing appstate line

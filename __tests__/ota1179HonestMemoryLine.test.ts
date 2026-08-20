@@ -90,7 +90,15 @@ describe('OTA-1179 — the release claim is conditional on an actual release', (
   // reason; these pin the code expressions themselves.
   const fs = require('fs') as typeof import('fs');
   const path = require('path') as typeof import('path');
-  const src = fs.readFileSync(path.join(__dirname, '..', 'app/state/gameStore.ts'), 'utf8');
+  // ⚠ OTA-1396 — RE-POINTED, NOT RELAXED. The memory-warning handler these five pins
+  // describe moved out of gameStore with the rest of the freeze instruments (slice 5 of
+  // the store split) into `app/diagnostics/runtimePressureWatch.ts`. Not one character of
+  // the handler changed; only its address did. Reading the new file directly keeps every
+  // assertion below a claim about ONE block of code, which is the property that made the
+  // non-unique-anchor note further down worth writing.
+  const src = fs.readFileSync(
+    path.join(__dirname, '..', 'app/diagnostics/runtimePressureWatch.ts'), 'utf8',
+  );
 
   test('the handler snapshots the release count before disposing', () => {
     expect(src).toContain('const before = contextLedger().released;');

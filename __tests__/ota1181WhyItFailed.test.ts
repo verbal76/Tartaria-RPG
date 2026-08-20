@@ -31,6 +31,20 @@ import fs from 'fs';
 import path from 'path';
 
 const STORE = fs.readFileSync(path.join(__dirname, '..', 'app/state/gameStore.ts'), 'utf8');
+// ⚠⚠ OTA-1396 — THE FLAG AND THE MESSAGE NOW LIVE IN DIFFERENT FILES, and this suite is
+// the one that had to say the most about it. Slice 5 of the store split moved the five
+// memory-pressure latches — including `rpStandDownLogged`, which this OTA created — down
+// into `app/diagnostics/runtimePressureWatch.ts`, because the freeze instruments and the
+// qwen watchdog BOTH read and write them and shared mutable state cannot travel with
+// either owner. The watchdog stayed in gameStore and reaches them through accessors.
+//
+// ⚠ SO EACH PIN BELOW MOVED TO WHICHEVER FILE OWNS ITS HALF, and the assertions got
+// STRONGER rather than looser: the "re-arms one but not the other" claim used to compare
+// two assignments sitting near each other in one file, and is now a comparison between a
+// named reset function and a handler that provably does not call it.
+const WATCH = fs.readFileSync(
+  path.join(__dirname, '..', 'app/diagnostics/runtimePressureWatch.ts'), 'utf8',
+);
 const ABOUT = fs.readFileSync(path.join(__dirname, '..', 'app/diagnostics/aboutSummary.ts'), 'utf8');
 
 function codeOnly(src: string): string {
@@ -74,10 +88,13 @@ describe('OTA-1181 — the report says WHY the model failed', () => {
 
 describe('OTA-1181 — "for good" is said once', () => {
   const code = codeOnly(STORE);
+  const watch = codeOnly(WATCH);
 
   test('the permanent message has its own flag', () => {
-    expect(code).toContain('let rpStandDownLogged = false;');
-    expect(code).toContain('if (!rpStandDownLogged) {');
+    // ⚠ The flag now lives with the other four latches; the message that reads it stays
+    // in the watchdog, so this claim spans both files and is checked on both.
+    expect(watch).toContain('let rpStandDownLogged = false;');
+    expect(code).toContain('if (!standDownAlreadyLogged()) {');
   });
 
   test('⚠⚠ a memory warning re-arms the QUIET notice but NOT the stand-down', () => {
@@ -88,27 +105,34 @@ describe('OTA-1181 — "for good" is said once', () => {
     // because the declaration matches too — a magic total that is one refactor from being
     // wrong for a reason nobody will want to reread. What actually matters is WHERE each
     // reset lives, so that is what this checks.
-    const watchdog = code.indexOf('rpMemoryPressureUntil = 0;');
-    expect(watchdog).toBeGreaterThan(-1);
-    const restartBlock = code.slice(watchdog, watchdog + 300);
-    // The watchdog restart clears BOTH — a fresh session starts clean.
-    expect(restartBlock).toContain('rpMemoryQuietLogged = false;');
-    expect(restartBlock).toContain('rpStandDownLogged = false;');
+    const clear = watch.indexOf('export function clearMemoryPressureLatches(): void {');
+    expect(clear).toBeGreaterThan(-1);
+    const clearBlock = watch.slice(clear, watch.indexOf('}', clear) + 1);
+    // The full-reset path clears BOTH — a fresh session starts clean.
+    expect(clearBlock).toContain('rpMemoryQuietLogged = false;');
+    expect(clearBlock).toContain('rpStandDownLogged = false;');
+    // ⚠ …and the watchdog restart is the caller, so "a fresh session starts clean" is
+    // still a claim about the watchdog and not just about a function nobody invokes.
+    expect(code).toContain('clearMemoryPressureLatches();');
   });
 
   test('⚠ the per-warning handler does not touch the stand-down flag', () => {
-    const i = code.indexOf("AppState.addEventListener('memoryWarning'");
+    const i = watch.indexOf("AppState.addEventListener('memoryWarning'");
     expect(i).toBeGreaterThan(-1);
-    const handler = code.slice(i, i + 3000);
+    const handler = watch.slice(i, i + 3000);
     expect(handler).toContain('rpMemoryQuietLogged = false;');
     expect(handler).not.toContain('rpStandDownLogged');
+    // ⚠ AND IT CANNOT REACH IT BY THE BACK DOOR EITHER. The one-call reset would set the
+    // stand-down flag too, so calling it here would reintroduce the exact bug this OTA
+    // fixed — a permanent message re-armed by every warning.
+    expect(handler).not.toContain('clearMemoryPressureLatches()');
   });
 
   test('the two messages are on separate branches, not one ternary', () => {
     // They had different lifetimes all along; sharing a ternary is what let them share a
     // flag without anyone noticing.
-    expect(code).toContain('if (rpQwenStoodDownForMemory) {');
-    expect(code).toContain('} else if (!rpMemoryQuietLogged) {');
+    expect(code).toContain('if (qwenStoodDownForMemory()) {');
+    expect(code).toContain('} else if (!memoryQuietAlreadyLogged()) {');
     expect(code).toContain('STANDING DOWN for good');
     expect(code).toContain('holding reloads for ');
   });
@@ -116,8 +140,12 @@ describe('OTA-1181 — "for good" is said once', () => {
   test('⚠ the behaviour is unchanged — the gate still refuses the reload', () => {
     // Only the logging was wrong. The interlock itself was doing its job in that log: no
     // reload followed any of the three messages.
-    expect(code).toContain('if (rpQwenStoodDownForMemory || Date.now() < rpMemoryPressureUntil)');
-    const i = code.indexOf('if (rpQwenStoodDownForMemory || Date.now() < rpMemoryPressureUntil)');
+    // ⚠ OTA-1396 — `Date.now() < rpMemoryPressureUntil` is now `underMemoryPressure()`,
+    // which reads the same variable behind an accessor and takes `now` as an argument so
+    // the comparison itself stayed in one place rather than being copied to a caller.
+    expect(code).toContain('if (qwenStoodDownForMemory() || underMemoryPressure()) {');
+    const i = code.indexOf('if (qwenStoodDownForMemory() || underMemoryPressure()) {');
     expect(code.slice(i, i + 1600)).toContain('return false;');
+    expect(watch).toContain('return now < rpMemoryPressureUntil;');
   });
 });

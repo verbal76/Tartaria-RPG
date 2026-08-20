@@ -83,7 +83,11 @@ describe('OTA-1360 — the Kokoro voice load is contained', () => {
     // Every guard sits BEFORE the warm, inside the timer body.
     for (const guard of [
       'if (playerIsSprinting()) return;',
-      'if (Date.now() < rpMemoryPressureUntil) return;',
+      // ⚠ OTA-1396 — the same comparison, now behind an accessor. `rpMemoryPressureUntil`
+      // moved down to `app/diagnostics/runtimePressureWatch.ts` with the rest of the
+      // freeze instruments, and `underMemoryPressure()` reads it there. The guard this
+      // pins is unchanged: a warm that fires inside an open pressure window is refused.
+      'if (underMemoryPressure()) return;',
       'if (get().currentScene?.vendor?.voiceId !== nextVendorVoice) return;',
     ]) {
       const at = timerBody.indexOf(guard);
@@ -101,7 +105,11 @@ describe('OTA-1360 — the Kokoro voice load is contained', () => {
   });
 
   it('⚠ source lock: the memoryWarning listener tells the voice subsystem to stand down', () => {
-    const src = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+    // ⚠ OTA-1396 — re-pointed with the listener. It moved out of gameStore into the
+    // diagnostics leaf; the call it makes into the voice subsystem is byte-identical.
+    const src = readFileSync(
+      join(__dirname, '..', 'app', 'diagnostics', 'runtimePressureWatch.ts'), 'utf8',
+    );
     expect(src).toContain('p.noteMemoryPressureForVoiceLoads(MEMORY_PRESSURE_QUIET_MS);');
   });
 

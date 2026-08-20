@@ -21,11 +21,19 @@ import { stampLiveBreadcrumb, stampBreadcrumbPhase, readLiveBreadcrumb } from '.
 
 describe('OTA-1357 — lifecycle phase stamps', () => {
   it('⚠⚠ source lock: the appstate handler stamps BEFORE it logs (the third freeze died on that log line)', () => {
-    const src = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
-    const stampAt = src.indexOf('stampBreadcrumbPhase(`appstate:${prev}→${nextStr}`);');
+    // ⚠ OTA-1396 — TWO FILES NOW, BECAUSE THE TWO STAMPS ENDED UP IN DIFFERENT ONES.
+    // Slice 5 moved the app-state listener down to `app/diagnostics/runtimePressureWatch.ts`
+    // with the rest of the freeze instruments; the qwen reinit path stayed in the store
+    // with the watchdog. Each stamp is pinned against the file that now holds it, which
+    // keeps the ORDER claim — stamp before log — a claim about one real handler.
+    const watch = readFileSync(
+      join(__dirname, '..', 'app', 'diagnostics', 'runtimePressureWatch.ts'), 'utf8',
+    );
+    const stampAt = watch.indexOf('stampBreadcrumbPhase(`appstate:${prev}→${nextStr}`);');
     expect(stampAt).toBeGreaterThan(-1);
-    const logAt = src.indexOf('appendLog(\'debug\', appStateLine(prev, nextStr,', stampAt - 2000);
+    const logAt = watch.indexOf('appendLog(\'debug\', appStateLine(prev, nextStr,', stampAt - 2000);
     expect(logAt).toBeGreaterThan(stampAt); // stamp first, log second
+    const src = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
     expect(src).toContain("stampBreadcrumbPhase('qwen-reinit', `attempt#${rpAttemptNo}`);");
   });
 

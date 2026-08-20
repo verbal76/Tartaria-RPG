@@ -155,7 +155,11 @@ describe('OTA-1276 — it is stamped at the doors a freeze happens behind', () =
 
 describe('OTA-1276 — why the existing detector could never have caught this', () => {
   it('⚠⚠ BOTH freeze clocks are JS-thread timers, so a wedge kills the detector too', () => {
-    const store = src('app', 'state', 'gameStore.ts');
+    // ⚠ OTA-1396 — re-pointed, not relaxed: slice 5 moved both clocks out of gameStore
+    // into `app/diagnostics/runtimePressureWatch.ts`. They are the same two timers, and
+    // the point of this test is unchanged — it is why the detector could not have caught
+    // the freeze it was built for, which is a fact about WHAT they are, not where.
+    const store = src('app', 'diagnostics', 'runtimePressureWatch.ts');
     // Clock A: rAF — believed native, actually a JS timer in RN.
     expect(store).toContain('rpFrameRaf = requestAnimationFrame(frameTick)');
     // Clock B: setTimeout.

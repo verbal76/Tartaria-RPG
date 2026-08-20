@@ -62,6 +62,16 @@ const STORE = read('app', 'state', 'gameStore.ts');
 const INPUT = read('app', 'components', 'InputBox.tsx');
 const ABOUT = read('app', 'diagnostics', 'aboutSummary.ts');
 
+// ⚠⚠ OTA-1396 — THE INSTRUMENTS THIS SUITE BUILT NOW LIVE IN THEIR OWN MODULE, and the
+// pins below were re-pointed one by one rather than pointed at a concatenation of both
+// files. Slice 5 of the gameStore split moved every `rp*` variable, both freeze clocks,
+// the memory-warning listener and the app-state listener DOWN to a leaf; the qwen
+// watchdog, which shares five latches with them, stayed. So this suite now reads TWO
+// files, and which one an assertion reads is itself a claim about where that behaviour
+// lives. A pin that reads "the store or its slices, whichever has it" would have gone on
+// passing if a listener had been dropped and re-added somewhere else entirely.
+const WATCH = read('app', 'diagnostics', 'runtimePressureWatch.ts');
+
 const BASE: PressureSnapshot = {
   memoryWarnings: 0, lastMemoryWarningAt: null, appStateTrail: [],
   lastVerdict: 'ok', worstFrameGapMs: 0, worstJsGapMs: 0, uiStalls: 0,
@@ -70,7 +80,9 @@ const BASE: PressureSnapshot = {
 describe('OTA-1172 — the memory warning the owner asked for', () => {
   it('⚠⚠ THE APP NOW LISTENS FOR IT AT ALL — it previously did not, anywhere', () => {
     // The entire ask. Verified by grep before building: zero handlers existed.
-    expect(STORE).toContain("AppState.addEventListener('memoryWarning'");
+    // ⚠ OTA-1396 — re-pointed to the leaf the listener moved to. The claim is the same
+    // one the owner asked for: something in this app listens for `memoryWarning`.
+    expect(WATCH).toContain("AppState.addEventListener('memoryWarning'");
   });
 
   it('⚠ THE COUNT IS THE SEVERITY, so the line carries an ordinal', () => {
@@ -135,8 +147,8 @@ describe('OTA-1172 — two clocks, because one cannot answer the question', () =
     // silence from it IS a stall, whatever the sample rate.
     // ⚠ The first draft of this test asserted the frame gap was net of the interval too,
     // which is exactly backwards and would have hidden every stall shorter than 5s.
-    expect(STORE).toContain('const jsGap = t - rpLastJsAt - FREEZE_SAMPLE_MS;');
-    expect(STORE).toContain('const frameGap = t - rpLastFrameAt;');
+    expect(WATCH).toContain('const jsGap = t - rpLastJsAt - FREEZE_SAMPLE_MS;');
+    expect(WATCH).toContain('const frameGap = t - rpLastFrameAt;');
     // A healthy tick: JS net-zero, frames fresh.
     expect(freezeVerdict(0, 16)).toBe('ok');
     // Frames quiet for nearly a whole sample interval is a REAL stall, not an artefact.
@@ -163,15 +175,15 @@ describe('OTA-1172 — two clocks, because one cannot answer the question', () =
   it('⚠ IT ONLY JUDGES WHILE FOREGROUNDED — a backgrounded app rightly stops painting', () => {
     // Counting that as a render stall would cry wolf every time the player reads a text,
     // and a detector nobody believes is worse than no detector.
-    const i = STORE.indexOf('const sample = ()');
+    const i = WATCH.indexOf('const sample = ()');
     expect(i).toBeGreaterThan(-1);
-    const block = STORE.slice(i, i + 1400);
+    const block = WATCH.slice(i, i + 1400);
     expect(block).toContain("if (rpAppState === 'active')");
   });
 
   it('⚠ AND IT LOGS ON THE EDGE, not once per sample', () => {
-    const i = STORE.indexOf('const sample = ()');
-    const block = STORE.slice(i, i + 1400);
+    const i = WATCH.indexOf('const sample = ()');
+    const block = WATCH.slice(i, i + 1400);
     expect(block).toContain('v !== rpLastVerdict');
   });
 });
@@ -187,9 +199,9 @@ describe('OTA-1172 — the app-state trail, which is evidence and not noise', ()
     // The reported freeze showed three `active` bounces ~350ms apart, each buying a fresh
     // ~400MB reload. Without the transitions written down the watchdog log read as a
     // self-contradiction: "holding revival" then reinitializing a third of a second later.
-    const i = STORE.indexOf("AppState.addEventListener('change', (next) => {\n      const t = Date.now();");
+    const i = WATCH.indexOf("AppState.addEventListener('change', (next) => {\n      const t = Date.now();");
     expect(i).toBeGreaterThan(-1);
-    const block = STORE.slice(i, i + 900);
+    const block = WATCH.slice(i, i + 900);
     expect(block).toContain('appStateLine(prev, nextStr');
     // No filter that would drop `inactive` before it is logged.
     expect(block).not.toMatch(/next\s*===\s*'active'\s*\)\s*\{\s*$/m);
@@ -197,11 +209,11 @@ describe('OTA-1172 — the app-state trail, which is evidence and not noise', ()
 
   it('the trail is a ring, so iOS churn cannot grow it without bound', () => {
     expect(APPSTATE_TRAIL_MAX).toBeGreaterThan(0);
-    expect(STORE).toContain('.slice(-APPSTATE_TRAIL_MAX)');
+    expect(WATCH).toContain('.slice(-APPSTATE_TRAIL_MAX)');
   });
 
   it('a repeated state is not logged twice', () => {
-    const i = STORE.indexOf("if (nextStr === prev) return;");
+    const i = WATCH.indexOf("if (nextStr === prev) return;");
     expect(i).toBeGreaterThan(-1);
   });
 });
@@ -333,34 +345,38 @@ describe('OTA-1172 — this OTA changes no behaviour, deliberately', () => {
     // The starter used to hand-roll its own teardown, which had already drifted from what
     // it should clear. Both paths now go through ONE `stopRuntimePressureWatch()`, so
     // idempotence is true by construction rather than by the starter remembering.
-    const i = STORE.indexOf('function startRuntimePressureWatch');
+    // ⚠ OTA-1396 — anchored on `export function`, not the bare name. gameStore keeps a
+    // thin wrapper around the starter (it injects the qwen attempt counter), and it is
+    // deliberately named `startPressureWatchWithHooks` for exactly this reason — an
+    // indexOf for the bare name across two files is how you assert against the wrong body.
+    const i = WATCH.indexOf('export function startRuntimePressureWatch(');
     expect(i).toBeGreaterThan(-1);
-    expect(STORE.slice(i, i + 900)).toContain('stopRuntimePressureWatch();');
-    const j = STORE.indexOf('export function stopRuntimePressureWatch(): void {');
+    expect(WATCH.slice(i, i + 900)).toContain('stopRuntimePressureWatch();');
+    const j = WATCH.indexOf('export function stopRuntimePressureWatch(): void {');
     expect(j).toBeGreaterThan(-1);
-    const stopper = STORE.slice(j, j + 700);
+    const stopper = WATCH.slice(j, j + 700);
     expect(stopper).toContain('if (rpSampleTimer !== null)');
     expect(stopper).toContain('rpStopFrameClock()');
     expect(stopper).toContain('rpMemorySub.remove()');
   });
 
   it('⚠ EVERY LISTENER IS GUARDED — headless and test environments have no AppState', () => {
-    const i = STORE.indexOf('function startRuntimePressureWatch');
+    const i = WATCH.indexOf('export function startRuntimePressureWatch(');
     // ⚠ Widened by OTA-1173, which added the memory-warning RESPONSE (a dispose) between
     // the listener and the frame clock. A fixed slice that stops short reads as a missing
     // guard rather than as a moved one — the ota1163 defect in a new costume.
     // ⚠ Widened again by OTA-1179, which recorded inside this handler why its own release
     // line used to assert an outcome it never checked. Third time a fixed slice here has
     // needed moving — the count claim is sound, the window keeps aging.
-    const block = STORE.slice(i, i + 12000);
+    const block = WATCH.slice(i, i + 12000);
     // Each addEventListener sits inside its own try/catch.
     const listeners = (block.match(/AppState\.addEventListener/g) ?? []).length;
     expect(listeners).toBe(2);
     // ⚠ RETARGETED BY OTA-1176 — the rAF guard moved into `rpStartFrameClock` when the
     // frame clock learned to pause on background. Same guard, one place instead of two.
-    const raf = STORE.indexOf('function rpStartFrameClock(): void {');
+    const raf = WATCH.indexOf('function rpStartFrameClock(): void {');
     expect(raf).toBeGreaterThan(-1);
-    const rafBlock = STORE.slice(raf, raf + 500);
+    const rafBlock = WATCH.slice(raf, raf + 500);
     expect(rafBlock).toContain("typeof requestAnimationFrame !== 'function'");
     expect(rafBlock).toContain('catch');
   });

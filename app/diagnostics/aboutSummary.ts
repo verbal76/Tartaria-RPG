@@ -20,7 +20,9 @@ import { getBuildCodename, getApkCodename } from '../buildCodename';
 import { mlHealthSummary } from './mlHealth';
 // OTA-1172 — memory warnings / freeze watch / app-state trail.
 import { runtimePressureSummary } from './runtimePressure';
-import { runtimePressureSnapshot, useGameStore } from '../state/gameStore';
+import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1396 — the snapshot moved with the instruments it reads.
+import { runtimePressureSnapshot } from './runtimePressureWatch';
 // OTA-1177 — how many ~400MB model contexts are live, and how many disposes freed nothing.
 import { contextLedgerSummary } from '../ai/generation/contextLedger';
 

@@ -63,7 +63,16 @@ jest.mock('expo-av', () => ({
 import * as fs from 'fs';
 import * as path from 'path';
 const read = (...p: string[]): string => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
-const STORE = read('app', 'state', 'gameStore.ts');
+/** ⚠ OTA-1396 — SLICE 5 split this subsystem across two files, and this suite
+ *  reads BOTH on purpose. The instruments (the memory-warning handler, the
+ *  dispose, the quiet-window latch) moved to
+ *  `app/diagnostics/runtimePressureWatch.ts`; the Qwen watchdog that CONSULTS
+ *  them stayed in gameStore and now reads them through accessors. The interlock
+ *  this suite pins is precisely the seam between the two, so a claim about it is
+ *  a claim about both files. Concatenating them keeps every assertion honest
+ *  without pretending the code is still in one place. */
+const STORE = read('app', 'state', 'gameStore.ts')
+  + '\n' + read('app', 'diagnostics', 'runtimePressureWatch.ts');
 
 describe('OTA-1175 — a memory warning now silences the watchdog', () => {
   it('⚠⚠ THE QUIET WINDOW EXISTS AT ALL — this is the whole regression', () => {
@@ -91,8 +100,8 @@ describe('OTA-1175 — a memory warning now silences the watchdog', () => {
   });
 
   it('⚠ THE WATCHDOG ACTUALLY CHECKS IT, and refuses the reload', () => {
-    expect(STORE).toContain('if (rpQwenStoodDownForMemory || Date.now() < rpMemoryPressureUntil)');
-    const i = STORE.indexOf('if (rpQwenStoodDownForMemory || Date.now() < rpMemoryPressureUntil)');
+    expect(STORE).toContain('if (qwenStoodDownForMemory() || underMemoryPressure())');
+    const i = STORE.indexOf('if (qwenStoodDownForMemory() || underMemoryPressure())');
     // Must RETURN, not fall through to the kick.
     // ⚠ WINDOW-FREE, and deliberately so. This was `STORE.slice(i, i + 1000)` and it is the
     // FIFTH fixed-size source slice to age this session — OTA-1181 restructured the two
@@ -108,7 +117,7 @@ describe('OTA-1175 — a memory warning now silences the watchdog', () => {
   });
 
   it('⚠⚠ AND THE GATE SITS BEFORE THE KICK, not after it', () => {
-    const gate = STORE.indexOf('if (rpQwenStoodDownForMemory || Date.now() < rpMemoryPressureUntil)');
+    const gate = STORE.indexOf('if (qwenStoodDownForMemory() || underMemoryPressure())');
     const kick = STORE.indexOf('qwenReinitAttempts += 1;');
     expect(gate).toBeGreaterThan(-1);
     expect(kick).toBeGreaterThan(gate);
@@ -123,7 +132,7 @@ describe('OTA-1175 — a memory warning now silences the watchdog', () => {
 
   it('it says so once, in plain words, and then goes quiet', () => {
     expect(STORE).toContain('STANDING DOWN for good');
-    expect(STORE).toContain('if (!rpMemoryQuietLogged)');
+    expect(STORE).toContain('if (!memoryQuietAlreadyLogged())');
   });
 
   it('the quiet window outlasts the backoff ladder it has to override', () => {
@@ -157,8 +166,10 @@ describe('OTA-1175 — a memory warning now silences the watchdog', () => {
   it('and a re-hydrate clears the interlock rather than inheriting it', () => {
     const i = STORE.indexOf('function startQwenWatchdog');
     const block = STORE.slice(i, i + 1600);
-    expect(block).toContain('rpMemoryPressureUntil = 0;');
-    expect(block).toContain('rpQwenStoodDownForMemory = false;');
+    // ⚠ OTA-1396 — the four latches are cleared by ONE call now. Clearing three
+    // of four was always the bug waiting to happen, so they were given a single
+    // owner in runtimePressureWatch.ts; the watchdog asks it to reset them.
+    expect(block).toContain('clearMemoryPressureLatches();');
   });
 });
 
@@ -178,7 +189,11 @@ describe('OTA-1176 — the instrument stops when nobody is looking', () => {
   it('⚠ THE STARTER REUSES THE STOPPER, so the two cannot drift', () => {
     // The hand-rolled teardown inside the starter already differed from what it should
     // have cleared. One implementation, used by both paths.
-    const i = STORE.indexOf('function startRuntimePressureWatch(');
+    // ⚠ OTA-1396 — anchored on `export function`, which only the real starter
+    // has. This suite concatenates two files, so a bare `function …(` matched a
+    // COMMENT in the other one and windowed the wrong body.
+    const i = STORE.indexOf('export function startRuntimePressureWatch(');
+    expect(i).toBeGreaterThan(-1);
     const block = STORE.slice(i, i + 900);
     expect(block).toContain('stopRuntimePressureWatch();');
   });

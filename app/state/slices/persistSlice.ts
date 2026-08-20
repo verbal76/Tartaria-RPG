@@ -47,6 +47,16 @@ import {
   SAFE_BLOB_CHARS,
 } from '../../engine/saveTrim';
 import { MAX_LOG_IN_MEMORY } from '../saveLimits';
+/**
+ * ⚠ OTA-1396 — IMPORTED DIRECTLY NOW, and that is a dependency this slice LOST.
+ * `noteSaveKb` used to be handed in, because it lived in gameStore and a value
+ * import back would have been a cycle. Slice 5 moved the runtime-pressure
+ * instruments — and their save-size field with them — into a leaf under
+ * `diagnostics/`, so it can simply be imported. The deps object shrank by one
+ * without anything being redesigned, which is the point of moving shared things
+ * DOWN rather than sideways: each move makes the next one smaller.
+ */
+import { noteSaveKb } from '../../diagnostics/runtimePressureWatch';
 
 /**
  * ⚠ The store's own type, imported TYPE-ONLY and deliberately so. gameStore
@@ -130,7 +140,9 @@ export function _persistStateForTest(): {
 }
 
 /**
- * ⚠⚠ THE TWO FUNCTIONS THAT ARE HANDED IN RATHER THAN IMPORTED.
+ * ⚠⚠ THE FUNCTION THAT IS HANDED IN RATHER THAN IMPORTED.
+ *
+ * (It was two until OTA-1396 — see the note on the `noteSaveKb` import above.)
  *
  * Both `makeRoomKey` and `noteSaveKb` are defined in `gameStore.ts` and both are
  * already exported — so importing them here would compile. It would also make
@@ -157,7 +169,6 @@ export interface PersistSliceDeps {
     mapY: number | null | undefined,
     hubRoomId?: string | null | undefined,
   ) => string;
-  noteSaveKb: (kb: number) => void;
 }
 
 export const createPersistSlice = (
@@ -296,7 +307,7 @@ export const createPersistSlice = (
       // the blob; allocating to measure while the OS asks for memory back is exactly the
       // wrong move.
       const rpKb = /total=(\d+)/.exec(rpBreakdown);
-      if (rpKb) deps.noteSaveKb(parseInt(rpKb[1]!, 10));
+      if (rpKb) noteSaveKb(parseInt(rpKb[1]!, 10));
       get().appendLog('debug', rpBreakdown);
     }
     return !saveErr;

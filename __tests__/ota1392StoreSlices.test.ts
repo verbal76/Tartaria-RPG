@@ -94,7 +94,7 @@ describe('OTA-1392 — persist moved whole, and its state went with it', () => {
     // 473 files import useGameStore. The point of the slice pattern is that not
     // one of them changes: same key, same name, same type on the same object.
     expect(store).toContain('  persist: () => Promise<boolean>;');
-    expect(store).toContain('...createPersistSlice(set, get, { makeRoomKey, noteSaveKb }),');
+    expect(store).toContain("...createPersistSlice(set, get, { makeRoomKey }),");
   });
 
   it('⚠⚠ all four pieces of persist state left gameStore', () => {

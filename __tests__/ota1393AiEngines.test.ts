@@ -92,7 +92,10 @@ describe('OTA-1393 — the five lifecycle actions moved, and one deliberately di
     for (const name of MOVED) {
       expect(store).toContain(`  ${name}: () => Promise<void>;`);
     }
-    expect(store).toContain('...createAiLifecycleSlice(set, get, { startQwenWatchdog, startRuntimePressureWatch }),');
+    // ⚠ OTA-1396 — the pressure watcher moved to a leaf and now needs one hook back
+    // from the watchdog, so gameStore passes a small wrapper under the same dep
+    // name. The slice is untouched; only what is handed to it changed.
+    expect(store).toContain('startRuntimePressureWatch: startPressureWatchWithHooks,');
   });
 
   it('⚠⚠ cancelGeneration STAYED, and the reason is written down', () => {
@@ -128,7 +131,13 @@ describe('OTA-1393 — the watchdogs are handed in, not imported', () => {
     // so a slice can be TYPED against it, not so a slice can IMPORT it — that is
     // still forbidden, and ota1392 enforces it directory-wide.
     expect(store).toMatch(/^(export )?function startQwenWatchdog\(/m);
-    expect(store).toMatch(/^(export )?function startRuntimePressureWatch\(/m);
+    // ⚠ OTA-1396 — `startRuntimePressureWatch` is no longer defined here at all:
+    // it moved to app/diagnostics/runtimePressureWatch.ts with the instruments it
+    // starts. gameStore keeps a differently-named wrapper that supplies the one
+    // hook the watcher needs back.
+    expect(store).toMatch(/^function startPressureWatchWithHooks\(/m);
+    expect(src('app', 'diagnostics', 'runtimePressureWatch.ts'))
+      .toMatch(/^export function startRuntimePressureWatch\(/m);
   });
 
   it('⚠⚠ the slice imports NO value from gameStore', () => {
