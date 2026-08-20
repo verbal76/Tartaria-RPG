@@ -395,8 +395,17 @@ jobs:
       # that differs from the HaL sideload key, this lets the production
       # AAB use the right one without rotating the HaL keystore.
       # Player reminder: "don't forget to match keys as well."
-      - name: Configure release signing (production AAB + HaL2001 APK)
-        if: steps.meta.outputs.profile == 'production' || github.ref_name == 'HaL2001'
+      # ⚠⚠ OTA-1388 — THE LAST BRANCH-NAME COUPLING IN THIS FILE.
+      # This condition read `github.ref_name == 'HaL2001'`. OTA-1386 replaced the
+      # other two branch checks and missed this one, which is the quietest of the
+      # three to get wrong: on the trunk `ref_name` is `golem-line`, so a
+      # `line: hal` sideload APK would have skipped release signing entirely and
+      # come out DEBUG-SIGNED. It builds, it installs, it runs — and it is signed
+      # with a throwaway key, so it cannot upgrade an existing HAL install and
+      # cannot be traced to the HaL upload key. Nothing about that is visible in
+      # the run; you find out when a tester's install refuses the update.
+      - name: Configure release signing (production AAB + HAL sideload APK)
+        if: steps.meta.outputs.profile == 'production' || env.TARTARIA_LINE == 'hal'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -708,7 +717,10 @@ jobs:
           TAG="${{ steps.meta.outputs.tag }}"
           PROFILE="${{ steps.meta.outputs.profile }}"
           VERSION="${{ steps.meta.outputs.version }}"
-          BRANCH="${GITHUB_REF_NAME}"
+          # ⚠ OTA-1388 — the branch no longer identifies the product; one trunk
+          # builds all four. The release note has to say which one this is, or a
+          # downloaded APK is unattributable.
+          BRANCH="${GITHUB_REF_NAME} (line: ${TARTARIA_LINE})"
           SHORT_SHA="${GITHUB_SHA::7}"
 
           if [ "$PROFILE" = "production" ]; then
