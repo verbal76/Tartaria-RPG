@@ -6077,6 +6077,18 @@ function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
 // ⚠⚠ OTA-1254 — RETURNS THE SLOT IT READIED, OR NULL, BECAUSE THE CALLER NARRATES
 // THE RESULT. It used to return void and the cudgel beat printed "[equipped]"
 // unconditionally — see the intercept for the measurement.
+// ⚠ OTA-1405 — refusal-burst state for `nudgeTutorialBlocked`. Session-scoped
+// and deliberately NOT persisted: a burst is a thing that happens inside a few
+// seconds of tapping, and carrying it across a reload would silence the first
+// refusal of a fresh attempt.
+const TUTORIAL_NUDGE_QUIET_MS = 6_000;
+let tutorialNudgeBeatId = '';
+let tutorialNudgeAt = 0;
+let tutorialNudgeStreak = 0;
+export function _resetTutorialNudgeForTest(): void {
+  tutorialNudgeBeatId = ''; tutorialNudgeAt = 0; tutorialNudgeStreak = 0;
+}
+
 function grantTutorialItem(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -9044,6 +9056,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
     skipHubEntry?: boolean;
     arrivalFromName?: string;
   }) {
+    // ⚠⚠ OTA-1405 — THE SPRINT DETECTOR HAD ONE FEED AND SCENES HAVE SEVERAL
+    // DOORS, so the gate that exists to stop wasted scene intros could not see
+    // the churn that wastes them.
+    //
+    // OTA-1358 built the gate and fed it from `submitPlayerAction` — the door
+    // for TYPED and chip-driven input. But `travelTo`, `continueTravel`,
+    // `confirmLeaveAndTravel`, `enterBuilding` and `goBuildingRoom` are separate
+    // store actions: a player crossing the map by button never touched the one
+    // feed, so `playerIsSprinting()` stayed false through the entire burst while
+    // every one of those arrivals fired a scene intro. From the owner's log:
+    // thirteen generations started and nine of ten discarded as
+    // `cancelled:player-acted-again` — the EPOCH could see the churn (it is
+    // bumped per narration) while the SPRINT DETECTOR could not.
+    //
+    // ⚠ Noting it HERE rather than at each of those five actions is deliberate.
+    // Five call sites is five chances to add a sixth mover later and not notice;
+    // this is the one line every scene intro is dispatched from, so the thing
+    // being measured and the thing being gated are the same event by
+    // construction. Coalesced in `sprint.ts`, so a typed action that also begins
+    // a scene still counts once.
+    notePlayerActionForSprint();
     try {
       get()._beginSceneCore(opts);
     } catch (e) {
@@ -26632,6 +26665,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
       investigate: 'tap the glowing INVESTIGATE button and look at the door.',
       explore_or_leave: 'answer the prompt — stay and explore, or leave the outpost.',
     };
+    // ⚠⚠ OTA-1405 — ONE VOICE PER REFUSAL BURST, AND IT ESCALATES.
+    //
+    // The owner's 2026-08-20 log has seven of these lines inside 2.6 seconds on
+    // the vest beat — identical text, seven times, each one also queued to the
+    // TTS. OTA-1251 saw the same shape ("fourteen refusals in ninety seconds")
+    // and rewrote the COPY; the copy was never the problem. **A hint that did
+    // not land the first time does not land better six more times**, and the
+    // repetition buries the beat's own instruction in its own scrollback.
+    //
+    // ⚠ THE REAL FIX IS THE STRIP IN GatherModal — the answer now appears in the
+    // card the player is tapping, which is where they are looking. This is the
+    // feed's half: keep the record (a log that drops refusals hides a stuck
+    // player from the next bug report) without repeating the sentence.
+    const now = Date.now();
+    const fresh = id !== tutorialNudgeBeatId || (now - tutorialNudgeAt) > TUTORIAL_NUDGE_QUIET_MS;
+    if (fresh) { tutorialNudgeStreak = 0; }
+    tutorialNudgeStreak += 1;
+    tutorialNudgeBeatId = id;
+    tutorialNudgeAt = now;
+    // First refusal of a burst speaks. The rest are counted, not narrated —
+    // except the third, which stops repeating the hint and names the way out,
+    // because a player who has missed it three times is stuck, not careless.
+    if (tutorialNudgeStreak === 3) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter lowers the slate. "You have tried that three times. ${hint[id] ?? "Do what I've asked"} — or tap SKIP TUTORIAL and I will stop asking."`,
+      );
+      return;
+    }
+    if (!fresh) return;
     get().appendLog(
       'arbiter',
       `The Arbiter raps the slate. "Not that — ${hint[id] ?? "do what I've asked, or tap SKIP TUTORIAL."}"`,

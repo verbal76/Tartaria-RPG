@@ -127,7 +127,7 @@ export const createAiLifecycleSlice = (
           qwenError: null,
           qwenModelId: qwen.getModelId(),
         });
-      } else {
+      } else if (qwen.getStatus() === 'failed') {
         const why = qwen.getLastError() ?? 'Qwen failed to initialize';
         set({ qwenStatus: 'failed', qwenError: why });
         // ⚠⚠ OTA-1182 — SAY IT IN THE LOG, NOT ONLY IN STATE. OTA-1181 put this reason in
@@ -137,6 +137,31 @@ export const createAiLifecycleSlice = (
         // including one about something else entirely. This is the single line that says
         // whether the narration engine is missing, out of memory, or out of disk.
         try { get().appendLog('debug', `qwen: LOAD FAILED — ${why}`); } catch { /* ignore */ }
+      } else {
+        // ⚠⚠ OTA-1405 — A CANCELLED LOAD IS NOT A FAILED ONE, and calling it one
+        // cost the owner a wrong reading of his own log. From the 2026-08-20
+        // capture: `qwen: LOAD FAILED — Qwen failed to initialize`, with no cause
+        // attached, at 20:31:02. Nothing had failed. He had switched away from the
+        // app mid-load, `dispose()` bumped the lifecycle generation, and
+        // `runInitialize` did exactly what OTA-1084 built it to do: it threw the
+        // straggler context away and left `status: 'idle'` with `lastError: null`.
+        //
+        // ⚠ THE TELL WAS RIGHT THERE AND WE READ PAST IT. `getLastError()` returned
+        // null — the engine had no complaint to make — and this branch invented one
+        // with `?? 'Qwen failed to initialize'`. **A default reason is a lie whenever
+        // the absence of a reason is the actual information.** The made-up string
+        // then read as a real diagnosis in the log and in the bug-report header.
+        //
+        // ⚠ AND IT STUCK THE STORE, which is the part the player feels. Writing
+        // `qwenStatus: 'failed'` put "✗ AI LOAD FAILED — SEE BELOW" on the About
+        // screen for a model that was merely parked, and left it there. `'idle'` is
+        // both true and useful: App.tsx's settled-foreground re-warm calls bootQwen()
+        // again, and its guard admits 'idle', so the load resumes on its own.
+        const st = qwen.getStatus();
+        set({ qwenStatus: 'idle', qwenFraction: 0, qwenError: null });
+        try {
+          get().appendLog('debug', `qwen: LOAD CANCELLED (status=${st}) — app moved on mid-load; will re-warm`);
+        } catch { /* ignore */ }
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);

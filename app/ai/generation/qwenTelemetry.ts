@@ -125,6 +125,49 @@ interface JobAggregate {
   discarded: number;
   /** Milliseconds burned on those calls — the honest waste number. */
   discardedMs: number;
+  /** ⚠ OTA-1405 — calls whose native read/write split was physically possible,
+   *  and therefore the only ones `avgPrefillMs` / `avgDecodeMs` speak for. */
+  timingSamples: number;
+  /** ⚠ OTA-1405 — calls that reported a split we refused. Surfaced in the
+   *  summary so a rollup built on half the session says so out loud. */
+  timingsRejected: number;
+}
+
+/**
+ * ⚠⚠ OTA-1405 — CAN THIS TIMING BE TRUE? One answer, asked by everything that
+ * prints or averages a read/write split.
+ *
+ * llama.rn's `timings.prompt_ms` is native-reported and is NOT reliably
+ * per-call: the device logs carry `investigate_lore ok 5353ms read 54112ms`
+ * (OTA-1139), `ok 6863ms read 8286ms/write 4020ms` (OTA-1263) and, from the
+ * owner's 2026-08-20 capture, `read 49256ms` on a call that finished in 5.4
+ * seconds. Prefill and decode both happen INSIDE the call, so their sum cannot
+ * exceed the call's own wall-clock. When it does, the native numbers are not a
+ * measurement of this call and nothing may be built on them.
+ *
+ * ⚠ THIS RULE HAS BEEN WRITTEN THREE TIMES AND APPLIED IN THE WRONG PLACES
+ * TWICE. OTA-1139 guarded the ms/tok RANGE. OTA-1263 guarded the per-line ms/tok
+ * FIGURE and recorded, in its own comment, that it had cost a wrong finding. In
+ * between, the raw `read Xms/write Yms` pair kept printing as fact on the very
+ * same line, and the AVERAGE kept summing the same rejected samples. Both of
+ * those are the numbers a reader reaches for first. So the rule now lives in one
+ * exported function and every consumer calls it — because the failure mode here
+ * is not "the guard is wrong", it is "the guard is somewhere else".
+ */
+export function qwenTimingsArePossible(r: {
+  prefillMs?: number; decodeMs?: number; totalMs: number;
+}): boolean {
+  const hasPrefill = typeof r.prefillMs === 'number';
+  const hasDecode = typeof r.decodeMs === 'number';
+  // Nothing reported is not the same as something impossible — but there is
+  // still no usable split, so callers get one honest `false` for both.
+  if (!hasPrefill && !hasDecode) return false;
+  // ⚠ Negatives are as impossible as overruns and llama.rn has been seen to
+  // report them; `>= 0` rather than a truthiness check, so a real zero prefill
+  // (a fully-cached prompt) stays a legitimate measurement.
+  if (hasPrefill && r.prefillMs! < 0) return false;
+  if (hasDecode && r.decodeMs! < 0) return false;
+  return (r.prefillMs ?? 0) + (r.decodeMs ?? 0) <= r.totalMs;
 }
 
 const jobs = new Map<string, JobAggregate>();
@@ -149,6 +192,7 @@ function emptyAggregate(): JobAggregate {
     reusedTokens: 0, cacheSamples: 0,
     bestMsPerPromptTok: Infinity, worstMsPerPromptTok: 0, prefillSamples: 0,
     hitLimit: 0, discarded: 0, discardedMs: 0,
+    timingSamples: 0, timingsRejected: 0,
   };
 }
 
@@ -156,6 +200,15 @@ function emptyAggregate(): JobAggregate {
  *  A throwing sink must never break a generation — recording swallows. */
 export function setQwenTelemetrySink(fn: ((r: QwenCallRecord) => void) | null): void {
   sink = fn;
+}
+
+/** Tests only. Session-scoped module state, so a suite that records calls has to
+ *  be able to start from nothing — same seam `sprint.ts` and the flourish bank
+ *  already carry. */
+export function _resetQwenTelemetryForTest(): void {
+  jobs.clear();
+  callCount = 0;
+  lastCall = null;
 }
 
 export function recordQwenCall(r: QwenCallRecord): void {
@@ -170,8 +223,22 @@ export function recordQwenCall(r: QwenCallRecord): void {
   if (r.outcome === 'dormant') agg.dormant += 1;
   if (r.outcome === 'preempted') agg.preempted += 1;
   if (r.outcome === 'error') agg.error += 1;
-  agg.prefillMs += r.prefillMs ?? 0;
-  agg.decodeMs += r.decodeMs ?? 0;
+  // ⚠⚠ OTA-1405 — THE AVERAGE OBEYS THE SAME RULE THE RANGE DOES. It did not,
+  // and the rollup therefore contradicted itself in the same breath: the ms/tok
+  // range below has refused impossible prefills since OTA-1139, while this line
+  // summed them straight into `avgPrefillMs`. One rollup, two standards of
+  // evidence — and the average is the number a reader trusts first, because it
+  // has no visible spread to make them suspicious.
+  if (qwenTimingsArePossible(r)) {
+    agg.prefillMs += r.prefillMs ?? 0;
+    agg.decodeMs += r.decodeMs ?? 0;
+    agg.timingSamples += 1;
+  } else if (r.prefillMs != null || r.decodeMs != null) {
+    // ⚠ COUNTED, NOT QUIETLY DROPPED. A rollup that silently discards samples
+    // reads as "this is what the session did"; this one can say how much of the
+    // session it is actually speaking for.
+    agg.timingsRejected += 1;
+  }
   agg.promptTokens += r.promptTokens ?? 0;
   agg.outTokens += r.outTokens ?? 0;
   agg.cachedTokens += r.cachedTokens ?? 0;
@@ -193,8 +260,14 @@ export function recordQwenCall(r: QwenCallRecord): void {
   // evidently not always per-call; a physically impossible sample fed straight
   // into this range would set worst-ms/tok to garbage, and the parked caching
   // investigation is waiting on exactly that number to decide anything.
-  if (typeof r.prefillMs === 'number' && r.prefillMs <= r.totalMs && (r.promptTokens ?? 0) > 0 && r.outcome !== 'preempted') {
-    const per = r.prefillMs / (r.promptTokens ?? 1);
+  // ⚠ OTA-1405 — the inline `r.prefillMs <= r.totalMs` that used to sit here is
+  // now `qwenTimingsArePossible`, so the range, the average and the per-call log
+  // line all ask ONE function. Three copies of a rule is three chances to fix it
+  // in two places, which is exactly what happened: OTA-1139 guarded the range,
+  // OTA-1263 guarded the per-line ms/tok figure, and neither guarded the average
+  // or the raw `read`/`write` pair printed beside them.
+  if (qwenTimingsArePossible(r) && (r.promptTokens ?? 0) > 0 && r.outcome !== 'preempted') {
+    const per = (r.prefillMs ?? 0) / (r.promptTokens ?? 1);
     agg.bestMsPerPromptTok = Math.min(agg.bestMsPerPromptTok, per);
     agg.worstMsPerPromptTok = Math.max(agg.worstMsPerPromptTok, per);
     agg.prefillSamples += 1;
@@ -340,6 +413,10 @@ export interface QwenJobStats {
   hitLimit: number;
   discarded: number;
   discardedMs: number;
+  /** ⚠ OTA-1405 — how many calls the read/write average actually speaks for,
+   *  and how many reported a split we refused as physically impossible. */
+  timingSamples: number;
+  timingsRejected: number;
 }
 
 /** Per-job aggregates, busiest first. */
@@ -356,8 +433,14 @@ export function qwenJobStats(): QwenJobStats[] {
       dormant: a.dormant,
       preempted: a.preempted,
       error: a.error,
-      avgPrefillMs: Math.round(a.prefillMs / a.count),
-      avgDecodeMs: Math.round(a.decodeMs / a.count),
+      // ⚠⚠ OTA-1405 — DIVIDED BY THE SAMPLES THAT SURVIVED, NOT BY EVERY CALL.
+      // Dividing an accepted-only sum by the full count is the second way to
+      // get a wrong average out of a right filter: reject four of ten samples,
+      // still divide by ten, and every job with rejected timings reads as
+      // faster than it is. Zero samples yields 0, which `split` then omits
+      // entirely rather than printing `read0.0s` as if it were measured.
+      avgPrefillMs: a.timingSamples > 0 ? Math.round(a.prefillMs / a.timingSamples) : 0,
+      avgDecodeMs: a.timingSamples > 0 ? Math.round(a.decodeMs / a.timingSamples) : 0,
       avgPromptTokens: Math.round(a.promptTokens / a.count),
       avgOutTokens: Math.round(a.outTokens / a.count),
       cachedTokens: a.cachedTokens,
@@ -369,6 +452,8 @@ export function qwenJobStats(): QwenJobStats[] {
       hitLimit: a.hitLimit,
       discarded: a.discarded,
       discardedMs: a.discardedMs,
+      timingSamples: a.timingSamples,
+      timingsRejected: a.timingsRejected,
     }))
     .sort((x, y) => y.count - x.count);
 }
@@ -387,9 +472,13 @@ export function qwenTelemetrySummary(): string {
     // OTA-1107 — read/write split + prompt size. This is the shape that made
     // OTA-1106 obvious; now it rides every rollup instead of needing a
     // code-reading session to reconstruct.
+    // ⚠ OTA-1405 — and it says how many samples it threw out. A rollup that
+    // silently drops half its evidence still reads as "this is what the session
+    // did"; `⚠2 bogus` is the difference between an average and a claim.
     const split = j.avgPrefillMs > 0 || j.avgDecodeMs > 0
       ? ` read${s(j.avgPrefillMs)}/write${s(j.avgDecodeMs)}`
       : '';
+    const rejected = j.timingsRejected > 0 ? ` ⚠${j.timingsRejected}bogus` : '';
     const sizes = j.avgPromptTokens > 0 ? ` in${j.avgPromptTokens}t→out${j.avgOutTokens}t` : '';
     // ⚠⚠ OTA-1259 (N4) — `reuse` IS NO LONGER PRINTED. It was derived as
     // `cachedTokens - promptTokens - outTokens`, and llama.rn reports
@@ -410,7 +499,7 @@ export function qwenTelemetrySummary(): string {
     // player is the feature. ⏸ reads as "paused for you", not as a fault.
     const yielded = j.preempted > 0 ? ` ⏸${j.preempted}` : '';
     const waste = j.discarded > 0 ? ` ✂${j.discarded}/${s(j.discardedMs)}` : '';
-    return `${j.job} n${j.count} avg${s(j.avgMs)} max${s(j.maxMs)}${split}${sizes}${cached}${perTok}${capped}${wait}${bad}${yielded}${waste}`;
+    return `${j.job} n${j.count} avg${s(j.avgMs)} max${s(j.maxMs)}${split}${rejected}${sizes}${cached}${perTok}${capped}${wait}${bad}${yielded}${waste}`;
   });
   if (parts.length === 0) return 'no calls yet';
   const w = qwenWasteTotals();

@@ -61,7 +61,7 @@
 // **the OTA-1229 test that guarded it stayed pinned to TakeModal.tsx — a file
 // nothing has rendered since OTA-1233.** The pin kept passing against a corpse.
 // A source pin proves a line exists; it cannot prove anything renders it.
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Modal, View, Text, StyleSheet, ScrollView, TouchableWithoutFeedback, Pressable,
 } from 'react-native';
@@ -167,7 +167,36 @@ export function GatherModal({
   const lockKey = lockedNoun ? lockedNoun.toLowerCase().trim() : null;
   const isLocked = (noun: string): boolean =>
     lockKey !== null && noun.toLowerCase().trim() !== lockKey;
-  const refuse = (): void => { onBlocked?.(); };
+  // ⚠⚠ OTA-1405 — THE REFUSAL IS SAID IN HERE, WHERE THE PLAYER IS LOOKING.
+  //
+  // It was already being said. `onBlocked` calls `nudgeTutorialBlocked`, which
+  // appends an Arbiter line naming the exact thing to tap — and that line lands
+  // in the FEED, which is behind this modal's scrim. So the player taps a dimmed
+  // row, gets a buzz and nothing else, and taps again. The owner's 2026-08-20 log
+  // has seven refusals in 2.6 seconds on the vest beat; the answer to all seven
+  // was on screen the whole time, underneath this card.
+  //
+  // ⚠⚠ THIS IS OTA-1402 AGAIN, IN A DIFFERENT ROOM. That one found a contract
+  // refusal rendered above a scrolling list the player had scrolled past. Same
+  // shape, same cost: the game answers, and the answer is somewhere the player
+  // is not. Twice in one session is a pattern worth naming — **a refusal has to
+  // be rendered by whatever is on top, not by whatever raised it.**
+  const [refusal, setRefusal] = useState<string | null>(null);
+  const refuseSeq = useRef(0);
+  const refuse = (): void => {
+    onBlocked?.();
+    // The card's own copy of the answer, in the card. Deliberately the SAME
+    // sentence the header already carries — the player is not being told
+    // something new, they are being told it where the tap happened.
+    setRefusal(lockedNoun
+      ? `Not that one — tap the ${lockedNoun}.`
+      : 'Not that one.');
+    const mine = ++refuseSeq.current;
+    setTimeout(() => { if (refuseSeq.current === mine) setRefusal(null); }, 2600);
+  };
+  // A fresh open starts clean — a stale refusal from the last beat would be a
+  // second wrong answer.
+  useEffect(() => { if (!visible) { refuseSeq.current += 1; setRefusal(null); } }, [visible]);
   // ⚠ Matched on the same case-insensitive substring rule the engine's rescue
   // dispatch uses, so a noun the engine treats as the dog hook is a noun this
   // picker treats as a lead. A protector matching a different set from the firer
@@ -441,6 +470,15 @@ export function GatherModal({
                   ? `Tap the ${lockedNoun}. The rest of the room keeps.`
                   : 'Tap a line to act on it. Or clear a whole colour with its button.'}
               </Text>
+              {/* ⚠ OTA-1405 — the refusal strip. Rendered inside the card and
+                  above the list, so it cannot be scrolled away from (the mistake
+                  OTA-1014 made and OTA-1402 paid for) and cannot be hidden behind
+                  anything (the mistake this OTA is fixing). */}
+              {refusal !== null && (
+                <View style={styles.refusalStrip}>
+                  <Text style={styles.refusalText} accessibilityLiveRegion="polite">{refusal}</Text>
+                </View>
+              )}
 
               {rows.length === 0 ? (
                 <Text style={styles.empty}>
@@ -569,6 +607,23 @@ const styles = StyleSheet.create({
   rowUpgrade: { borderColor: '#d09a63', borderWidth: 2 },
   rowConsumed: { opacity: 0.35 },
   // ⚠⚠ OTA-1250 — LOCKED, NOT SPENT. Deliberately a LIGHTER dim than
+  // ⚠ OTA-1405 — the refusal strip. Red enough to read as a "no", quiet enough
+  // that it does not compete with the lane colours the card exists to teach.
+  refusalStrip: {
+    borderWidth: 1,
+    borderColor: '#a8412f',
+    backgroundColor: 'rgba(168,65,47,0.14)',
+    borderRadius: 3,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    marginBottom: 8,
+  },
+  refusalText: {
+    color: '#e8a294',
+    fontSize: 13,
+    letterSpacing: 0.3,
+    textAlign: 'center',
+  },
   // `rowConsumed` (0.35): a consumed row is finished forever and a locked one is
   // coming back in a moment, and rendering them identically would tell the player
   // the room had emptied. Still unmistakably not-now at a glance.

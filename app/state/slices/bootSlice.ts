@@ -35,6 +35,9 @@ import {
   qwenCallCount,
   qwenJobStats,
   qwenTelemetrySummary,
+  // ⚠ OTA-1405 — the ONE answer to "can this timing be true?", shared with the
+  // rollup so the printed line and the average cannot disagree about one call.
+  qwenTimingsArePossible,
   setQwenDiscardSink,
   setQwenTelemetrySink,
 } from '../../ai/generation/qwenTelemetry';
@@ -158,8 +161,26 @@ export const createBootSlice = (
       // (ingesting the prompt) and `write` is generation: the single most
       // useful pair of numbers in this log, because they point at completely
       // different fixes (trim the prompt vs cut the token budget).
+      // ⚠⚠ OTA-1405 — AND THE RAW PAIR OBEYS THE RULE ITS OWN DERIVED FIGURE
+      // ALREADY DID. This is the third time this defect has been fixed and the
+      // first time it has been fixed HERE. OTA-1139 guarded the ms/tok range;
+      // OTA-1263 guarded the ms/tok figure printed on this very line and wrote
+      // down that the ungurded number had already cost it a wrong finding. Both
+      // left `read Xms/write Yms` — the number a reader actually looks at —
+      // printing whatever the native side said. The owner's 2026-08-20 log then
+      // carried `read 49256ms` on a call that finished in 5.4 seconds, and he
+      // read it as real, because nothing on the line suggested otherwise.
+      //
+      // ⚠ MARKED, NOT DELETED. Hiding an impossible split would hide the fact
+      // that llama.rn is reporting one, which is itself a finding worth keeping
+      // — and the numbers stay legible for whoever eventually chases it. The
+      // `⚠` and the trailing tag are there so no future rollup, and no future
+      // reader, mistakes it for a measurement of this call.
+      const timingsOk = qwenTimingsArePossible(r);
       const split = r.prefillMs != null || r.decodeMs != null
-        ? ` read ${r.prefillMs ?? '?'}ms/write ${r.decodeMs ?? '?'}ms`
+        ? (timingsOk
+          ? ` read ${r.prefillMs ?? '?'}ms/write ${r.decodeMs ?? '?'}ms`
+          : ` read ⚠${r.prefillMs ?? '?'}ms/write ⚠${r.decodeMs ?? '?'}ms NOT-PER-CALL`)
         : '';
       const sizes = r.promptTokens != null ? ` in ${r.promptTokens}t→out ${r.outTokens ?? '?'}t` : '';
       // ⚠⚠ OTA-1259 (N4) — THE `reuse Nt` NUMBER WAS STRUCTURALLY ZERO AND IS GONE.
@@ -201,9 +222,10 @@ export const createBootSlice = (
       // behaviour — three consecutive `investigate_lore` calls at 59.2 (cold, and
       // itself impossible), then **2.4 and 2.5 ms/t** — which is prefix reuse
       // working, exactly as OTA-1259 concluded from the source.
-      const prefillIsPossible = r.prefillMs != null
-        && r.prefillMs <= r.totalMs
-        && (r.promptTokens ?? 0) > 0;
+      // ⚠ OTA-1405 — the inline arithmetic that used to live here is now the
+      // shared `qwenTimingsArePossible`, so this figure, the raw pair above and
+      // the rollup's average cannot drift apart again. They had.
+      const prefillIsPossible = timingsOk && (r.promptTokens ?? 0) > 0;
       const msPerTok = prefillIsPossible
         ? ` ${(r.prefillMs! / r.promptTokens!).toFixed(1)}ms/t`
         : '';

@@ -50,6 +50,8 @@ import { join } from 'path';
 // pin like this was never a claim about a FILE; it is a claim about the STORE.
 // See __tests__/helpers/storeSource.ts for when NOT to use it.
 import { storeSource } from '../test-utils/storeSource';
+// ⚠ OTA-1405 — the REAL predicate, not a copy of it. See the note on `shows`.
+import { qwenTimingsArePossible } from '../app/ai/generation/qwenTelemetry';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -85,9 +87,15 @@ describe('OTA-1263 (A) — the adaptive idle threshold actually finds its job', 
 });
 
 describe('OTA-1263 (B) — the per-call ms/t obeys the same guard the aggregate does', () => {
-  /** The shipped predicate, mirrored. */
+  /** ⚠ OTA-1405 — NO LONGER MIRRORED. This used to be a hand-copy of the shipped
+   *  expression, which is how a guard ends up living in three places and being
+   *  fixed in two: OTA-1139 guarded the range, OTA-1263 guarded this figure, and
+   *  the raw `read Xms/write Yms` pair beside it kept printing native numbers as
+   *  fact until the owner's 2026-08-20 log carried `read 49256ms` on a 5.4-second
+   *  call. The rule now lives in `qwenTimingsArePossible` and this suite calls the
+   *  real thing, so the test cannot keep passing against a copy that drifted. */
   const shows = (prefillMs: number | null, totalMs: number, promptTokens: number): boolean =>
-    prefillMs != null && prefillMs <= totalMs && promptTokens > 0;
+    qwenTimingsArePossible({ prefillMs: prefillMs ?? undefined, totalMs }) && promptTokens > 0;
 
   it('⚠⚠ the rows that produced the bogus finding are REFUSED', () => {
     // Both verbatim from device logs, both physically impossible.
@@ -105,13 +113,19 @@ describe('OTA-1263 (B) — the per-call ms/t obeys the same guard the aggregate 
     expect(shows(100, 1_000, 0)).toBe(false);
   });
 
-  it('⚠⚠ the source carries the guard, not just this mirror', () => {
+  it('⚠⚠ the source asks the SHARED predicate, so the three copies cannot drift again', () => {
     const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
-    const i = store.indexOf('const prefillIsPossible = r.prefillMs != null');
+    const i = store.indexOf('const prefillIsPossible = timingsOk');
     expect(i).toBeGreaterThan(-1);
-    const block = store.slice(i, i + 200);
-    expect(block).toContain('r.prefillMs <= r.totalMs');
-    expect(block).toContain('(r.promptTokens ?? 0) > 0');
+    expect(store.slice(i, i + 200)).toContain('(r.promptTokens ?? 0) > 0');
+    // ⚠ OTA-1405 — and the RAW pair on the same line obeys it too. That is the
+    // half OTA-1139 and OTA-1263 both left open, and the half the owner read.
+    expect(store).toContain('const timingsOk = qwenTimingsArePossible(r);');
+    expect(store).toContain('NOT-PER-CALL');
+    // The rule is defined once, and not re-derived here or anywhere else.
+    const tel = src('app', 'ai', 'generation', 'qwenTelemetry.ts');
+    expect(tel).toContain('export function qwenTimingsArePossible(');
+    expect((store.match(/prefillMs <= r\.totalMs/g) ?? []).length).toBe(0);
   });
 });
 

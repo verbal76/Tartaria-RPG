@@ -112,6 +112,29 @@ export function arbiterAddress(player: PlayerCharacter | null | undefined, fallb
 export function bumpArbiterGeneration(): void {
   arbiterGenerationEpoch += 1;
 }
+
+/** ⚠⚠ OTA-1405 — BURNED ONCE, BACK OFF. When was the last LIVE narration thrown
+ *  away because the player had already moved on?
+ *
+ *  The sprint gate needs three actions inside four seconds before it trips, so
+ *  the FIRST generation of any burst always starts — and by the time the third
+ *  action arrives that generation is sixteen seconds into a native call it
+ *  cannot be pulled out of. OTA-1368's `shouldAbort` closes the door and stops
+ *  the writing, but says so itself: it CANNOT interrupt a prompt read already in
+ *  flight. So the first one of every burst is paid for in full.
+ *
+ *  This is the cheap complement: the discard we just filed is itself evidence
+ *  that the player is moving faster than the model. One wasted generation per
+ *  burst is a fair price for a gate that stays quiet for readers; nine of ten,
+ *  which is what the owner's log measured, is not.
+ *
+ *  ⚠ LIVE ONLY, and the asymmetry is the same one OTA-1258 established: a fill
+ *  that arrives late still goes to the bank and is re-vetted when it is spent,
+ *  so late text is free text later. Only a line with a reader waiting on it can
+ *  be wasted by being late. */
+const NARRATION_BURN_BACKOFF_MS = 4_000;
+let lastLiveNarrationBurnedAt = 0;
+export function _resetNarrationBurnForTest(): void { lastLiveNarrationBurnedAt = 0; }
 export function arbiterGeneration(): number {
   return arbiterGenerationEpoch;
 }
@@ -793,7 +816,14 @@ export async function narrateViaArbiter(
   // purpose — homework riding a 4-second lull mid-sprint is the exact
   // generation that gets thrown away.
   const sprinting = playerIsSprinting();
-  if (!qwen.isReady() || get().isGenerating || inCombat || !intentAllowsQwen || cooldownActive || sprinting) {
+  // ⚠⚠ OTA-1405 — AND THE ONE THE SPRINT GATE STRUCTURALLY CANNOT CATCH. The
+  // sprint gate needs three actions to trip, so the first generation of a burst
+  // is always already running by then. This one is evidence-driven rather than
+  // predictive: the LAST live line was thrown away unread, so the next one waits
+  // for a pause instead of guessing. Fills are exempt — see the constant.
+  const burnedRecently = !opts?.bankOnly
+    && (Date.now() - lastLiveNarrationBurnedAt) < NARRATION_BURN_BACKOFF_MS;
+  if (!qwen.isReady() || get().isGenerating || inCombat || !intentAllowsQwen || cooldownActive || sprinting || burnedRecently) {
     // OTA-1129 — a background fill has no line to fall back to and no player
     // waiting on it. It simply does not run this tick, silently, and the next
     // tick asks again.
@@ -807,7 +837,8 @@ export async function narrateViaArbiter(
       : inCombat ? 'combat'
       : !intentAllowsQwen ? `intent-not-allowed:${intent}`
       : cooldownActive ? 'cooldown'
-      : 'sprinting'; // OTA-1358 — the device log's proof the gate is working
+      : sprinting ? 'sprinting' // OTA-1358 — the device log's proof the gate is working
+      : 'burned-recently'; // OTA-1405 — the last live line was discarded unread
     get().appendLog('debug', `arbiter: template (reason=${reason})`);
     // arb166 — CANNED flavor line: voiced ~30% of the time. (Was 60% — but once
     // arb164 tripled the pools the 30s repeat-guard stopped suppressing dupes,
@@ -951,6 +982,9 @@ export async function narrateViaArbiter(
     // (OTA-1129); the preempt path just never got the memo.
     const preemptedFill = opts?.bankOnly === true && myEpoch !== arbiterGenerationEpoch;
     if (myEpoch !== arbiterGenerationEpoch && !preemptedFill) {
+      // ⚠ OTA-1405 — remember that this happened. See NARRATION_BURN_BACKOFF_MS:
+      // the discard is the evidence, and the next live generation reads it.
+      if (!opts?.bankOnly) lastLiveNarrationBurnedAt = Date.now();
       noteQwenDiscarded('cancelled:player-acted-again');
       return;
     }

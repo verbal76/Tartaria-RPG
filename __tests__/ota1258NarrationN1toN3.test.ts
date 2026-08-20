@@ -169,7 +169,14 @@ describe('OTA-1258 N3 — preempted text is kept, not binned', () => {
     const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
     const i = store.indexOf('const preemptedFill = opts?.bankOnly === true');
     expect(i).toBeGreaterThan(-1);
-    const block = store.slice(i, i + 320);
+    // ⚠ OTA-1405 — RE-ANCHORED ON THE BLOCK, NOT ON 320 BYTES. The fixed window
+    // aged exactly as this repo's fixed windows always do: OTA-1405 added two
+    // comment lines inside the guard and the second assertion fell off the end,
+    // so the test failed for a reason that had nothing to do with what it guards.
+    // The block ends where it ends; that is a landmark, and a byte count is not.
+    const end = store.indexOf('\n    }', i);
+    expect(end).toBeGreaterThan(i);
+    const block = store.slice(i, end);
     expect(block).toContain('if (myEpoch !== arbiterGenerationEpoch && !preemptedFill) {');
     expect(block).toContain("noteQwenDiscarded('cancelled:player-acted-again');");
   });

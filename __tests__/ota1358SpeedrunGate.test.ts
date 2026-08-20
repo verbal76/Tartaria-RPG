@@ -74,10 +74,24 @@ describe('OTA-1358 — the sprint gate and classifier parity', () => {
     const src = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8')
       + '\n' + readFileSync(join(__dirname, '..', 'app', 'ai', 'narration.ts'), 'utf8');
     expect(src).toContain('const sprinting = playerIsSprinting();');
-    expect(src).toContain('|| cooldownActive || sprinting)');
-    expect(src).toContain(": 'sprinting'");
-    // Fed at the same single door every action passes.
-    expect(src).toContain('notePlayerActionForSprint();');
+    // ⚠ OTA-1405 — the gate grew a term. `burnedRecently` is the evidence-driven
+    // half: the sprint gate needs three actions to trip, so the FIRST generation
+    // of a burst always starts, and only a discard can prove it was wasted.
+    expect(src).toContain('|| cooldownActive || sprinting || burnedRecently)');
+    expect(src).toContain("? 'sprinting'");
+    expect(src).toContain("'burned-recently'");
+    // ⚠⚠ OTA-1405 — AND IT IS FED FROM TWO DOORS, NOT ONE. This assertion used to
+    // say "the same single door every action passes", and that premise was wrong:
+    // `submitPlayerAction` is the door for TYPED and chip input only. Travelling,
+    // entering a building and changing rooms are separate store actions, so a
+    // player crossing the map by button was invisible to the detector — which is
+    // why the owner's log shows thirteen scene intros started and nine of ten
+    // discarded while the gate reported nothing. `beginScene` is the door every
+    // scene intro is actually dispatched from.
+    expect((src.match(/notePlayerActionForSprint\(\);/g) ?? []).length).toBeGreaterThanOrEqual(2);
+    const bs = src.indexOf('  beginScene(opts?: {');
+    expect(bs).toBeGreaterThan(-1);
+    expect(src.slice(bs, bs + 2200)).toContain('notePlayerActionForSprint();');
   });
 
   it('⚠⚠ source lock: the classifier runs under the native-ML lock — create AND inference', () => {

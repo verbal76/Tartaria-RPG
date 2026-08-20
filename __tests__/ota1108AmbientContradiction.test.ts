@@ -130,7 +130,9 @@ describe('OTA-1108 — the cache number was being read backwards', () => {
     // ⚠ OTA-1263 added OTA-1139's sanity guard to this line (a prefill longer than
     // its own call is not a measurement), so the expression is non-null-asserted.
     expect(store).toContain('(r.prefillMs! / r.promptTokens!).toFixed(1)');
-    expect(store).toContain('const prefillIsPossible = r.prefillMs != null');
+    // ⚠ OTA-1405 — the guard moved into the shared `qwenTimingsArePossible`, so
+    // this pin follows it to the name the line now uses.
+    expect(store).toContain('const prefillIsPossible = timingsOk');
     expect(store).toContain('${msPerTok}');
   });
 

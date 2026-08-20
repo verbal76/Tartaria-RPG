@@ -29,8 +29,28 @@
 // deliberately short — one thoughtful pause (>4s) and the Arbiter is back.
 const SPRINT_WINDOW_MS = 4_000;
 const SPRINT_ACTIONS = 3;
+/** ⚠⚠ OTA-1405 — ONE PLAYER ACTION COUNTS ONCE, HOWEVER MANY DOORS IT PASSES.
+ *
+ *  This exists because the fix below had to widen the feed. Until now the only
+ *  caller was `submitPlayerAction`, so the detector could only ever see TYPED and
+ *  chip-driven input — and the actions that begin a scene (travelling, entering a
+ *  building, changing rooms, continuing a journey) are separate store actions
+ *  that never pass through that door. A player crossing the map by button was
+ *  invisible to it: `playerIsSprinting()` stayed false through the entire burst,
+ *  and the scene-intro gate it guards therefore never fired for the single most
+ *  repeated interaction in the game.
+ *
+ *  ⚠ Feeding it from `beginScene` as well fixes that, and introduces the reason
+ *  for this window: one typed action can BOTH submit and begin a scene, and
+ *  counting it twice would trip a 3-action gate on two real actions. So notes
+ *  inside this window coalesce. It is far shorter than any human double-tap
+ *  (measured at ~180-250ms in the device logs), so it collapses one action's
+ *  several doors without ever collapsing two genuine taps. */
+const SPRINT_COALESCE_MS = 120;
 let sprintActionTimes: number[] = [];
 export function notePlayerActionForSprint(now: number = Date.now()): void {
+  const last = sprintActionTimes[sprintActionTimes.length - 1];
+  if (last !== undefined && now - last < SPRINT_COALESCE_MS) return;
   sprintActionTimes = sprintActionTimes.filter((t) => now - t < SPRINT_WINDOW_MS);
   sprintActionTimes.push(now);
 }
