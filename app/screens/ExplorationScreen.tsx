@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { canonicalItemTags } from '../engine/crafting';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { playerWeaponReach, useGameStore, makeRoomKey, chipDismissTileKey } from '../state/gameStore';
+import { useGameStore, makeRoomKey, chipDismissTileKey } from '../state/gameStore';
+// ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
+import { playerWeaponReach } from '../state/combatResolution';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError, stampBreadcrumbPhase } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { FirstTimeHint } from '../components/FirstTimeHint';

@@ -6,7 +6,9 @@
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useGameStore, effectiveACBreakdown, playerArmorResistKinds } from '../state/gameStore';
+import { useGameStore } from '../state/gameStore';
+// ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
+import { effectiveACBreakdown, playerArmorResistKinds } from '../state/combatResolution';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';

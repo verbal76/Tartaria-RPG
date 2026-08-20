@@ -20,6 +20,16 @@ import { combatEnemyLabel } from '../app/engine/narrativeGenerator';
 import { dressFactionFighter } from '../app/engine/factionBodies';
 import type { Enemy } from '../app/engine/types';
 
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
+
 const human = (over?: Partial<Enemy>): Enemy => ({
   name: 'Reclaimer Ambusher',
   type: 'Human',
@@ -94,8 +104,8 @@ describe('OTA-1093 — source locks for the store-side fixes', () => {
   ) as string;
 
   it('#2 the pack swing cap counts shooters standing in the scrum', () => {
-    expect(src).toMatch(/const inTheScrum = \(liveScene\.range \?\? 'close'\) === 'close';/);
-    expect(src).toMatch(/const meleeAttacker = !enemy\.boss && \(inTheScrum \|\| !isRangedEnemy\(enemy\)\);/);
+    expect(COMBAT_SRC).toMatch(/const inTheScrum = \(liveScene\.range \?\? 'close'\) === 'close';/);
+    expect(COMBAT_SRC).toMatch(/const meleeAttacker = !enemy\.boss && \(inTheScrum \|\| !isRangedEnemy\(enemy\)\);/);
   });
 
   it('#4 gifting still refuses a piece you are still wearing, before spending it', () => {

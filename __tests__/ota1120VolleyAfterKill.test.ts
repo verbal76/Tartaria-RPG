@@ -61,6 +61,16 @@ import type { Enemy } from '../app/engine/types';
 import fs from 'fs';
 import path from 'path';
 
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
+
 const store = useGameStore;
 const src = (rel: string): string =>
   fs.readFileSync(path.join(__dirname, '..', rel), 'utf8');
@@ -160,8 +170,8 @@ describe('OTA-1120 — every killing path routes through the one guard', () => {
   const gs = src('app/state/gameStore.ts');
 
   it('the guard exists and checks survivors, not the kill', () => {
-    expect(gs).toContain('export function runSurvivorVolley(');
-    expect(gs).toContain('if (!scene || scene.enemies.length === 0) return;');
+    expect(COMBAT_SRC).toContain('export function runSurvivorVolley(');
+    expect(COMBAT_SRC).toContain('if (!scene || scene.enemies.length === 0) return;');
   });
 
   it('⚠ the melee kill branch calls it, and honours initiative', () => {

@@ -39,8 +39,19 @@ jest.mock('expo-updates', () => ({}));
 // One resolver now: playerWeaponReach, exported from the store, read by both.
 import * as fs from 'fs';
 import * as path from 'path';
-import { playerWeaponReach } from '../app/state/gameStore';
+// ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
+import { playerWeaponReach } from '../app/state/combatResolution';
 import { reachBandsFor } from '../app/engine/types';
+
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
 
 const APP = path.join(__dirname, '..', 'app');
 const read = (...p: string[]) => fs.readFileSync(path.join(APP, ...p), 'utf8');
@@ -87,7 +98,7 @@ describe('OTA-1006 — category lock: no local reach derivations in the UI', () 
   const store = read('state', 'gameStore.ts');
 
   it('the store EXPORTS the one resolver', () => {
-    expect(store.includes('export function playerWeaponReach(')).toBe(true);
+    expect(COMBAT_SRC.includes('export function playerWeaponReach(')).toBe(true);
   });
 
   it('InputBox tones through playerWeaponReach — its local copy is gone', () => {

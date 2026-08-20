@@ -15,7 +15,9 @@ import { TutorialTarget } from './TutorialTarget';
 import { visibleBuildingRooms } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from './tutorialSteps';
-import { playerWeaponReach, useGameStore, logUiTap } from '../state/gameStore';
+import { useGameStore, logUiTap } from '../state/gameStore';
+// ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
+import { playerWeaponReach } from '../state/combatResolution';
 import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';

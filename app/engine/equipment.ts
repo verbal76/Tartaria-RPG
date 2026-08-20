@@ -727,6 +727,24 @@ export function gearHpBonus(name: string | null | undefined): number {
 // Aethercraft, Aetherborn +2 INT near relics) stay strings in
 // race.traits for now; a follow-up OTA will wire them through a
 // contextMods arg.
+/** OTA-970 — #116: the level-up toast shows the number the CHARACTER SHEET shows
+ *  (owner: "display the appropriate stat"). The sheet displays base + gear;
+ *  the toast used to print the bare base — "+1 DEX (now 7)" beside a sheet
+ *  reading 11. When no gear rides the stat the two agree and the short form
+ *  stands. Pure; exported for tests.
+ *
+ *  ⚠ OTA-1404 — MOVED HERE FROM gameStore, and this is its right address: it is
+ *  a thin reading of `effectiveStats`, defined immediately below. It moved
+ *  because the combat resolver needs it and a leaf may never import a VALUE from
+ *  the store. `gameStore` re-exports the name, so its call sites, the three
+ *  slices that thread it as a dep, and the suites that import it from there are
+ *  all untouched by the move. */
+export function statNowClause(p: PlayerCharacter | null | undefined, stat: string, base: number): string {
+  if (!p) return `now ${base}`;
+  const eff = (effectiveStats(p) as unknown as Record<string, number>)[stat] ?? base;
+  return eff === base ? `now ${base}` : `base ${base}, ${eff} as you stand`;
+}
+
 export function effectiveStats(
   player: PlayerCharacter,
   weatherMod?: Partial<Stats>,

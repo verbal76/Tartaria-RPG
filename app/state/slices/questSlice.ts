@@ -89,6 +89,9 @@ import { findStorylineById, availableStorylines, fuzzyFindStoryline } from '../.
  */
 import { fuzzyFindFactionQuest } from '../../engine/factionQuests';
 import type * as Store from '../gameStore';
+// ⚠ OTA-1404 — type-only, same as the Store import above and for the same
+//   reason: it is erased at compile time, so it cannot form a runtime cycle.
+import type * as Combat from '../combatResolution';
 
 type GameStore = Store.GameStore;
 type CurrentScene = Store.CurrentScene;
@@ -147,11 +150,13 @@ export interface QuestSliceDeps {
   advanceMissionRoute: typeof Store.advanceMissionRoute;
   advanceTime: typeof Store.advanceTime;
   anyTrackedContract: typeof Store.anyTrackedContract;
-  applyEscortDamage: typeof Store.applyEscortDamage;
+  // ⚠ OTA-1404 — these two now live in the combat leaf rather than the store.
+  //   The dep threading is unchanged; only the address they are TYPED against moved.
+  applyEscortDamage: typeof Combat.applyEscortDamage;
   applyTrainAndLog: typeof Store.applyTrainAndLog;
   bumpQuestsAccepted: typeof Store.bumpQuestsAccepted;
   desiredMissionLeg: typeof Store.desiredMissionLeg;
-  failEscortQuests: typeof Store.failEscortQuests;
+  failEscortQuests: typeof Combat.failEscortQuests;
   freshInstanceId: typeof Store.freshInstanceId;
   grantStageItems: typeof Store.grantStageItems;
   logRepChanges: typeof Store.logRepChanges;

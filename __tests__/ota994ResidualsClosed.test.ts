@@ -45,6 +45,16 @@ import {
 import { effectiveHealAmount } from '../app/components/itemPreview';
 import { scaledHealHP } from '../app/engine/itemEffect';
 
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
+
 const STORE = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
 
 describe('OTA-994 — the reclaim: real gear captured at death, real gear back', () => {
@@ -91,7 +101,7 @@ describe('OTA-994 — the reclaim: real gear captured at death, real gear back',
   });
 
   it('death records the snapshot; the defeat block grants the weapon outright and the rolls skip it', () => {
-    expect(STORE).toContain('buildFallenGearSnapshot(player)');
+    expect(COMBAT_SRC).toContain('buildFallenGearSnapshot(player)');
     expect(STORE).toContain('revenantReclaimWeapon(');
     expect(STORE).toContain('basePool.filter((n) => n !== revWeaponName)');
     expect(STORE).toContain('reconstructFallenPiece(revPiece');

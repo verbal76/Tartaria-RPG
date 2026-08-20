@@ -54,6 +54,9 @@ import { pickFragmentForBiome } from '../../engine/collectables';
  * this file stops compiling rather than silently accepting the wrong shape.
  */
 import type * as Store from '../gameStore';
+// ⚠ OTA-1404 — type-only, same as the Store import above and for the same
+//   reason: it is erased at compile time, so it cannot form a runtime cycle.
+import type * as Combat from '../combatResolution';
 
 type GameStore = Store.GameStore;
 type SetState = (
@@ -79,9 +82,12 @@ export interface InventorySlice {
 export interface InventorySliceDeps {
   AT_isProcedureTextName: typeof Store.AT_isProcedureTextName;
   STAMINA_COSTS: typeof Store.STAMINA_COSTS;
-  activeEnemy: typeof Store.activeEnemy;
+  // ⚠ OTA-1404 — these three now live in the combat leaf rather than the store.
+  //   The dep threading is unchanged: gameStore imports them and hands them over
+  //   exactly as before; only the address they are TYPED against moved.
+  activeEnemy: typeof Combat.activeEnemy;
   advanceTime: typeof Store.advanceTime;
-  aggregateArmor: typeof Store.aggregateArmor;
+  aggregateArmor: typeof Combat.aggregateArmor;
   assembleBeaconRifle: typeof Store.assembleBeaconRifle;
   debugLoadout: typeof Store.debugLoadout;
   effectiveStaminaMax: typeof Store.effectiveStaminaMax;
@@ -90,7 +96,7 @@ export interface InventorySliceDeps {
   makeRoomKey: typeof Store.makeRoomKey;
   nonClimbMarkers: typeof Store.nonClimbMarkers;
   pickFragmentSalvageLine: typeof Store.pickFragmentSalvageLine;
-  playerArmorResistKinds: typeof Store.playerArmorResistKinds;
+  playerArmorResistKinds: typeof Combat.playerArmorResistKinds;
   restoreStamina: typeof Store.restoreStamina;
   spendStamina: typeof Store.spendStamina;
   statNowClause: typeof Store.statNowClause;

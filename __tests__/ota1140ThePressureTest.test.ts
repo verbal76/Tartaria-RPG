@@ -86,6 +86,16 @@ jest.mock('expo-speech-recognition', () => ({}));
 
 import { enemyPowerScore } from '../app/engine/powerRating';
 
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
+
 jest.setTimeout(60_000);
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -132,15 +142,15 @@ describe('OTA-1140 — the stagger family is sealed', () => {
 
 describe('OTA-1140 — the exploits are closed', () => {
   it('⚠ THE PACK PURSUES — a benched melee enemy closes one band at volley end', () => {
-    expect(STORE).toContain('const outOfReach: string[] = [];');
-    expect(STORE).toContain("{ outOfReach.push(enemy.name); continue; }");
-    expect(STORE).toContain("cur === 'distant' ? 'far' : cur === 'far' ? 'mid' : cur === 'mid' ? 'close' : null;");
-    expect(STORE).toContain('closes the distance. (range: ${closed})');
+    expect(COMBAT_SRC).toContain('const outOfReach: string[] = [];');
+    expect(COMBAT_SRC).toContain("{ outOfReach.push(enemy.name); continue; }");
+    expect(COMBAT_SRC).toContain("cur === 'distant' ? 'far' : cur === 'far' ? 'mid' : cur === 'mid' ? 'close' : null;");
+    expect(COMBAT_SRC).toContain('closes the distance. (range: ${closed})');
   });
 
   it('⚠ pursuit never passes close, and only fires when someone was actually benched', () => {
-    const from = STORE.indexOf('// OTA-1140 — the pursuit itself.');
-    const block = STORE.slice(from, from + 1200);
+    const from = COMBAT_SRC.indexOf('// OTA-1140 — the pursuit itself.');
+    const block = COMBAT_SRC.slice(from, from + 1200);
     expect(block).toContain('if (outOfReach.length > 0 && (get().player?.hp ?? 0) > 0)');
     expect(block).toContain("cur === 'mid' ? 'close' : null");
     expect(block).toContain('if (closed) {');
@@ -175,8 +185,8 @@ describe('OTA-1140 — the exploits are closed', () => {
 
 describe('OTA-1140 — three more surfaces stop lying', () => {
   it('⚠ effectiveACBreakdown applies the trim and NAMES it as a chip', () => {
-    const from = STORE.indexOf('export function effectiveACBreakdown(');
-    const body = STORE.slice(from, from + 4200);
+    const from = COMBAT_SRC.indexOf('export function effectiveACBreakdown(');
+    const body = COMBAT_SRC.slice(from, from + 4200);
     expect(body).toContain('const trimDelta = trimStandingAc(standingRaw) - standingRaw;');
     expect(body).toContain("sources.push({ label: 'bulk trim', delta: trimDelta });");
     expect(body).toContain('trimStandingAc(standingRaw) + statusAdj');
@@ -203,13 +213,13 @@ describe('OTA-1140 — three more surfaces stop lying', () => {
   });
 
   it('the to-hit log admits the cap when the cap decided', () => {
-    expect(STORE).toContain('const acCapEngaged = effectiveAc - (atkTotal - atkRoll) > ENEMY_HIT_NEEDED_CAP;');
-    expect(STORE).toContain('needs nat ${acHitNat}+ — AC capped');
+    expect(COMBAT_SRC).toContain('const acCapEngaged = effectiveAc - (atkTotal - atkRoll) > ENEMY_HIT_NEEDED_CAP;');
+    expect(COMBAT_SRC).toContain('needs nat ${acHitNat}+ — AC capped');
   });
 
   it('the damage clause admits the mitigation floor', () => {
-    expect(STORE).toContain('floorEngaged: mitFloorEngaged,');
-    expect(STORE).toContain("if (opts.floorEngaged) mods.push('floor 30%');");
+    expect(COMBAT_SRC).toContain('floorEngaged: mitFloorEngaged,');
+    expect(COMBAT_SRC).toContain("if (opts.floorEngaged) mods.push('floor 30%');");
   });
 
   it('the boss flavour line prices the real swing too', () => {

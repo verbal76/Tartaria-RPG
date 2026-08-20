@@ -64,6 +64,16 @@ import {
 import type { SaveState } from '../app/engine/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
+
 jest.setTimeout(120_000);
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 beforeEach(async () => { await AsyncStorage.clear(); });
@@ -171,9 +181,9 @@ describe('OTA-1311 — restore is only for a character that disappeared', () => 
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { join } = require('path');
     const store: string = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
-    const death = store.indexOf('function handlePlayerDeath');
+    const death = COMBAT_SRC.indexOf('function handlePlayerDeath');
     expect(death).toBeGreaterThan(-1);
-    const body = store.slice(death, death + 6000);
+    const body = COMBAT_SRC.slice(death, death + 6000);
     expect(body).toContain('recordFallenSeed(characterSeedOf(player))');
     // Adjacent to the memorial, so the two records cannot drift apart.
     expect(body.indexOf('recordFallenSeed')).toBeLessThan(body.indexOf('recordFallen(hero)'));

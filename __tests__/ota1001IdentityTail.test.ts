@@ -14,6 +14,16 @@ import { validSlotsForItem } from '../app/engine/equipment';
 import { isSigilItem, sigilFaction } from '../app/engine/sigils';
 import { itemIsTool } from '../app/engine/pouchEligibility';
 
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
+
 const it_ = (name: string, extra: Record<string, unknown> = {}) =>
   ({ id: 'x', name, kind: 'misc', quantity: 1, tags: [], ...extra }) as any;
 
@@ -60,7 +70,7 @@ describe('OTA-1001 — the store-side cluster is canonical (source locks)', () =
   });
   it('the consume-on-throw and reach paths use the shared throwable predicate', () => {
     expect(STORE).toContain('!!equippedItem && itemIsThrowable(equippedItem)');
-    expect(STORE).toContain('=== wpName.toLowerCase() && itemIsThrowable(it)');
+    expect(COMBAT_SRC).toContain('=== wpName.toLowerCase() && itemIsThrowable(it)');
   });
   it('the fused-kind load heal is guarded and the CHA channel heal exists', () => {
     expect(STORE).toContain("!item.uniqueStats && !(item.tags ?? []).includes('fused') && lookup.kind !== 'misc'");

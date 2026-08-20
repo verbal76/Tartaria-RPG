@@ -71,6 +71,16 @@ jest.mock('expo-speech-recognition', () => ({}));
 
 import { combineDamageTypeMatch, traitDamageMultiplier } from '../app/engine/enemyTraits';
 
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
+
 jest.setTimeout(60_000);
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -165,8 +175,8 @@ describe('OTA-1137 — ⚠ a weapon hit on a weakness staggers too', () => {
 
 describe('OTA-1137 — ⚠ what the stagger actually costs the boss', () => {
   it('a staggered boss forfeits the SECOND swing', () => {
-    const from = STORE.indexOf('bosses do not yield the tempo');
-    const block = STORE.slice(from - 1400, from + 400);
+    const from = COMBAT_SRC.indexOf('bosses do not yield the tempo');
+    const block = COMBAT_SRC.slice(from - 1400, from + 400);
     expect(from).toBeGreaterThan(0);
     expect(block).toContain('if (takeStagger(get, set, liveIdx)) {');
     expect(block).toContain('STAGGERED: no second swing this round.');
@@ -180,9 +190,9 @@ describe('OTA-1137 — ⚠ what the stagger actually costs the boss', () => {
     // only swing (otherwise the Searing Paste would be worthless exactly where
     // he fights). The rule is "a stagger denies ONE swing"; the gated
     // exception is pinned in the ota1141 suite, not here.
-    const bossAt = STORE.indexOf('if (enemy.boss && bossSwingsTwice(enemy)) {');
-    const staggerAt = STORE.indexOf('if (takeStagger(get, set, liveIdx)) {');
-    const counterAt = STORE.indexOf('applyEnemyCounter(enemy, livePlayer ?? fallbackPlayer, get, set, liveIdx);');
+    const bossAt = COMBAT_SRC.indexOf('if (enemy.boss && bossSwingsTwice(enemy)) {');
+    const staggerAt = COMBAT_SRC.indexOf('if (takeStagger(get, set, liveIdx)) {');
+    const counterAt = COMBAT_SRC.indexOf('applyEnemyCounter(enemy, livePlayer ?? fallbackPlayer, get, set, liveIdx);');
     expect(counterAt).toBeGreaterThan(0);
     expect(bossAt).toBeGreaterThan(counterAt);
     expect(staggerAt).toBeGreaterThan(bossAt);
@@ -192,8 +202,8 @@ describe('OTA-1137 — ⚠ what the stagger actually costs the boss', () => {
     // takeStagger reads and clears in one step. A stagger that expired on a
     // round tick instead could persist through an action that never triggered a
     // second swing, and quietly eat the NEXT round's too.
-    const from = STORE.indexOf('function takeStagger(');
-    const fn = STORE.slice(from, from + 700);
+    const from = COMBAT_SRC.indexOf('function takeStagger(');
+    const fn = COMBAT_SRC.slice(from, from + 700);
     expect(from).toBeGreaterThan(0);
     expect(fn).toContain('if (cur <= 0) return false;');
     expect(fn).toContain('next[idx] = 0;');
@@ -201,8 +211,8 @@ describe('OTA-1137 — ⚠ what the stagger actually costs the boss', () => {
   });
 
   it('the setter is bounds-safe and lazily creates the array', () => {
-    const from = STORE.indexOf('function staggerEnemy(');
-    const fn = STORE.slice(from, from + 800);
+    const from = COMBAT_SRC.indexOf('function staggerEnemy(');
+    const fn = COMBAT_SRC.slice(from, from + 800);
     expect(fn).toContain('if (idx < 0 || idx >= n) return s;');
     expect(fn).toContain('s.currentScene.enemyStaggered ?? s.currentScene.enemies.map(() => 0)');
     expect(fn).toContain('while (next.length < n) next.push(0);');
@@ -220,16 +230,16 @@ describe('OTA-1137 — ⚠ what the stagger actually costs the boss', () => {
 
 describe('OTA-1137 — the file records why the multiplier was left alone', () => {
   it('names the measured reward and the reason it was not enough', () => {
-    expect(STORE).toContain('THE WEAKNESS HAS TO BE WORTH BRINGING');
-    expect(STORE).toContain('It did take damage. It did not take NOTICE.');
+    expect(COMBAT_SRC).toContain('THE WEAKNESS HAS TO BE WORTH BRINGING');
+    expect(COMBAT_SRC).toContain('It did take damage. It did not take NOTICE.');
   });
 
   it('and states the rejected fix explicitly', () => {
-    expect(STORE).toContain('THE FIX IS NOT A BIGGER MULTIPLIER');
-    expect(STORE).toContain('RIGHT\n *  ANSWER CHANGED NOTHING ABOUT WHAT HAPPENED NEXT');
+    expect(COMBAT_SRC).toContain('THE FIX IS NOT A BIGGER MULTIPLIER');
+    expect(COMBAT_SRC).toContain('RIGHT\n *  ANSWER CHANGED NOTHING ABOUT WHAT HAPPENED NEXT');
   });
 
   it('and the bound that keeps it from becoming a stun-lock', () => {
-    expect(STORE).toContain('DELIBERATELY NOT A LOCK');
+    expect(COMBAT_SRC).toContain('DELIBERATELY NOT A LOCK');
   });
 });

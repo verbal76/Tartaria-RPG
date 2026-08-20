@@ -52,7 +52,9 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-import { useGameStore, runEnemyGroupCounters, applyEnemyCounterToDog } from '../app/state/gameStore';
+import { useGameStore } from '../app/state/gameStore';
+// ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
+import { runEnemyGroupCounters, applyEnemyCounterToDog } from '../app/state/combatResolution';
 import { getRaces, getFactions } from '../app/engine/character';
 import type { DogCompanion, Enemy } from '../app/engine/types';
 

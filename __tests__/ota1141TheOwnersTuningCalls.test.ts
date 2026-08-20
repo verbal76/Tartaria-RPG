@@ -79,6 +79,16 @@ jest.mock('expo-speech-recognition', () => ({}));
 
 import { bossSwingsTwice, enemyDamageDisplay, enemyDamageCompact } from '../app/engine/combatRules';
 
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
+
 jest.setTimeout(60_000);
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -116,7 +126,7 @@ describe('OTA-1141 — ⚠ the second swing is a tier privilege now', () => {
   });
 
   it('⚠ the volley consults the gate, not just the display', () => {
-    expect(STORE).toContain('if (enemy.boss && bossSwingsTwice(enemy)) {');
+    expect(COMBAT_SRC).toContain('if (enemy.boss && bossSwingsTwice(enemy)) {');
   });
 
   it('⚠ THE CARDS KEEP TELLING THE TRUTH — a gated Guardian does not advertise ×2', () => {
@@ -131,26 +141,26 @@ describe('OTA-1141 — ⚠ the second swing is a tier privilege now', () => {
 
 describe('OTA-1141 — ⚠ a stagger denies ONE swing, whichever swing that is', () => {
   it('a gated boss consumes its stagger BEFORE its only swing', () => {
-    expect(STORE).toContain('if (enemy.boss && !bossSwingsTwice(enemy) && takeStagger(get, set, liveIdx)) {');
-    expect(STORE).toContain('STAGGERED: no swing this round.');
+    expect(COMBAT_SRC).toContain('if (enemy.boss && !bossSwingsTwice(enemy) && takeStagger(get, set, liveIdx)) {');
+    expect(COMBAT_SRC).toContain('STAGGERED: no swing this round.');
   });
 
   it('a two-swing boss still consumes it at the second swing — 1160 unchanged there', () => {
-    expect(STORE).toContain('if (takeStagger(get, set, liveIdx)) {');
-    expect(STORE).toContain('STAGGERED: no second swing this round.');
+    expect(COMBAT_SRC).toContain('if (takeStagger(get, set, liveIdx)) {');
+    expect(COMBAT_SRC).toContain('STAGGERED: no second swing this round.');
   });
 
   it('⚠ the revision of 1160\'s first-swing rule is recorded as deliberate', () => {
-    expect(STORE).toContain('A STAGGER DENIES ONE SWING');
-    expect(STORE).toContain('the trade the owner chose');
+    expect(COMBAT_SRC).toContain('A STAGGER DENIES ONE SWING');
+    expect(COMBAT_SRC).toContain('the trade the owner chose');
   });
 
   it('the gated check runs AFTER the dog redirect, so a soaked swing never spends the stagger', () => {
     // ⚠ RETARGETED for OTA-1142: the redirect grew a !enemy.boss gate on the
     // random soak (bosses fight the person in front of them). The ORDERING this
     // test pins — redirect first, stagger check after — is unchanged.
-    const from = STORE.indexOf('if (dogUp && (forcedOnDog || (!enemy.boss && Math.random() < DOG_TARGET_CHANCE))) {');
-    const staggerAt = STORE.indexOf('if (enemy.boss && !bossSwingsTwice(enemy) && takeStagger(get, set, liveIdx)) {');
+    const from = COMBAT_SRC.indexOf('if (dogUp && (forcedOnDog || (!enemy.boss && Math.random() < DOG_TARGET_CHANCE))) {');
+    const staggerAt = COMBAT_SRC.indexOf('if (enemy.boss && !bossSwingsTwice(enemy) && takeStagger(get, set, liveIdx)) {');
     expect(from).toBeGreaterThan(0);
     expect(staggerAt).toBeGreaterThan(from);
   });
@@ -158,26 +168,30 @@ describe('OTA-1141 — ⚠ a stagger denies ONE swing, whichever swing that is',
 
 describe('OTA-1141 — ⚠ armor pays again: the floor rises and the excess soaks', () => {
   it('the hit-floor ceiling is 16 — a maxed tank takes one swing in four, not two in five', () => {
-    expect(STORE).toContain('const ENEMY_HIT_NEEDED_CAP = 16;');
-    expect(STORE).not.toContain('const ENEMY_HIT_NEEDED_CAP = 13;');
+    expect(COMBAT_SRC).toContain('const ENEMY_HIT_NEEDED_CAP = 16;');
+    // ⚠ OTA-1404 — this absence pin follows the constant to the combat leaf. Left
+    // reading the store it would have passed for the wrong reason: the constant is
+    // not there AT ALL any more, so "it is not 13" would have been true of an empty
+    // file. An absence pin has to be aimed at the file the value actually lives in.
+    expect(COMBAT_SRC).not.toContain('const ENEMY_HIT_NEEDED_CAP = 13;');
   });
 
   it('⚠ PLATE: 2 excess AC = −1 damage, max −4, floored at 1', () => {
-    expect(STORE).toContain('const plateDr = acCapEngaged');
-    expect(STORE).toContain('Math.min(4, Math.floor(((effectiveAc - (atkTotal - atkRoll)) - ENEMY_HIT_NEEDED_CAP) / 2))');
-    expect(STORE).toContain('if (plateDr > 0 && dmg > 1) dmg = Math.max(1, dmg - plateDr);');
+    expect(COMBAT_SRC).toContain('const plateDr = acCapEngaged');
+    expect(COMBAT_SRC).toContain('Math.min(4, Math.floor(((effectiveAc - (atkTotal - atkRoll)) - ENEMY_HIT_NEEDED_CAP) / 2))');
+    expect(COMBAT_SRC).toContain('if (plateDr > 0 && dmg > 1) dmg = Math.max(1, dmg - plateDr);');
   });
 
   it('⚠ plate runs BEFORE the mitigation floor — never immune still holds', () => {
-    const plateAt = STORE.indexOf('if (plateDr > 0 && dmg > 1)');
-    const floorAt = STORE.indexOf('const MITIGATION_FLOOR = 0.30;');
+    const plateAt = COMBAT_SRC.indexOf('if (plateDr > 0 && dmg > 1)');
+    const floorAt = COMBAT_SRC.indexOf('const MITIGATION_FLOOR = 0.30;');
     expect(plateAt).toBeGreaterThan(0);
     expect(plateAt).toBeLessThan(floorAt);
   });
 
   it('the damage clause names the plate so the tank can see it working', () => {
-    expect(STORE).toContain('plate: plateDr,');
-    expect(STORE).toContain('mods.push(`plate −${opts.plate}`)');
+    expect(COMBAT_SRC).toContain('plate: plateDr,');
+    expect(COMBAT_SRC).toContain('mods.push(`plate −${opts.plate}`)');
   });
 });
 

@@ -77,6 +77,16 @@ jest.mock('expo-speech-recognition', () => ({}));
 import { standingAc, equippedGearAc, trimStandingAc, ARMOR_SLOTS } from '../app/engine/equipment';
 import type { PlayerCharacter } from '../app/engine/types';
 
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
+
 jest.setTimeout(60_000);
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -233,12 +243,15 @@ describe('OTA-1135 — ⚠ the worn half keeps combat bit-identical', () => {
   });
 });
 
-describe('OTA-1135 — ⚠ there is ONE implementation, and the store calls it', () => {
+// ⚠ OTA-1404 — `aggregateArmor` moved to the combat leaf, so the wording below
+// says "the resolver" where it used to say "the store". What is being pinned is
+// unchanged: there is ONE AC implementation and this one delegates to it.
+describe('OTA-1135 — ⚠ there is ONE implementation, and the resolver calls it', () => {
   it('aggregateArmor no longer owns an AC sum', () => {
     // The whole point. A second implementation is what produced 15 and 18.
-    const from = STORE.indexOf('function aggregateArmor(');
-    const to = STORE.indexOf('export function effectiveACBreakdown(');
-    const body = STORE.slice(from, to);
+    const from = COMBAT_SRC.indexOf('function aggregateArmor(');
+    const to = COMBAT_SRC.indexOf('export function effectiveACBreakdown(');
+    const body = COMBAT_SRC.slice(from, to);
     expect(from).toBeGreaterThan(0);
     expect(body).toContain('const gearAc = equippedGearAc(player);');
     expect(body).toContain('const acBonus = gearAc.worn + gearAc.accessories;');
@@ -246,20 +259,20 @@ describe('OTA-1135 — ⚠ there is ONE implementation, and the store calls it',
     expect(body).not.toContain('acBonus +=');
   });
 
-  it('⚠ the amulet and ring loops are GONE from the store, not duplicated', () => {
-    const from = STORE.indexOf('function aggregateArmor(');
-    const to = STORE.indexOf('export function effectiveACBreakdown(');
-    const body = STORE.slice(from, to);
+  it('⚠ the amulet and ring loops are GONE from the resolver, not duplicated', () => {
+    const from = COMBAT_SRC.indexOf('function aggregateArmor(');
+    const to = COMBAT_SRC.indexOf('export function effectiveACBreakdown(');
+    const body = COMBAT_SRC.slice(from, to);
     expect(body).not.toContain('findAmuletByName');
     expect(body).not.toContain('findRingByName');
   });
 
-  it('the store still owns the RESISTANCE walk — that genuinely lives there', () => {
+  it('the resolver still owns the RESISTANCE walk — that genuinely lives with it', () => {
     // Combat weights a resist by the slot it came from; nothing else needs that,
-    // so it stays. Only the AC half moved.
-    const from = STORE.indexOf('function aggregateArmor(');
-    const to = STORE.indexOf('export function effectiveACBreakdown(');
-    const body = STORE.slice(from, to);
+    // so it stays beside the resolver. Only the AC half moved (to equipment.ts).
+    const from = COMBAT_SRC.indexOf('function aggregateArmor(');
+    const to = COMBAT_SRC.indexOf('export function effectiveACBreakdown(');
+    const body = COMBAT_SRC.slice(from, to);
     expect(body).toContain('resistSlots.push({ type: r, slot });');
   });
 
@@ -275,15 +288,15 @@ describe('OTA-1135 — ⚠ there is ONE implementation, and the store calls it',
 
 describe('OTA-1135 — ⚠ the card names which gear, so this is visible next time', () => {
   it('armor and accessories are separate chips, not one lump', () => {
-    const from = STORE.indexOf('export function effectiveACBreakdown(');
-    const body = STORE.slice(from, from + 3000);
+    const from = COMBAT_SRC.indexOf('export function effectiveACBreakdown(');
+    const body = COMBAT_SRC.slice(from, from + 3000);
     expect(body).toContain("sources.push({ label: 'armor', delta: armor })");
     expect(body).toContain("sources.push({ label: 'accessories', delta: accessories })");
   });
 
   it('and the total counts both — splitting a label must not drop a term', () => {
-    const from = STORE.indexOf('export function effectiveACBreakdown(');
-    const body = STORE.slice(from, from + 3000);
+    const from = COMBAT_SRC.indexOf('export function effectiveACBreakdown(');
+    const body = COMBAT_SRC.slice(from, from + 3000);
     // RETARGETED BY OTA-1140 (pressure test) — the breakdown now applies the
     // OTA-947 trim exactly as the resolver does (it had been skipping it, so
     // the expanded card over-read a heavy build). Both terms still counted:
@@ -292,8 +305,8 @@ describe('OTA-1135 — ⚠ the card names which gear, so this is visible next ti
   });
 
   it('the breakdown draws its gear from the same helper the panel does', () => {
-    const from = STORE.indexOf('export function effectiveACBreakdown(');
-    const body = STORE.slice(from, from + 3000);
+    const from = COMBAT_SRC.indexOf('export function effectiveACBreakdown(');
+    const body = COMBAT_SRC.slice(from, from + 3000);
     expect(body).toContain('const gearAc = equippedGearAc(player);');
   });
 });

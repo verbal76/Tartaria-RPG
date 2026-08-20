@@ -133,7 +133,7 @@ describe('OTA-1202 / P16 — LIVE, each technique in a real volley', () => {
   test('⚠⚠ SHIELD: the channel consumes the swing (cost mirror) and the field is real AC', async () => {
     const store = await freshFight('technique:aether_shield');
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { runEnemyGroupCounters } = require('../app/state/gameStore') as typeof import('../app/state/gameStore');
+    const { runEnemyGroupCounters } = require('../app/state/combatResolution') as typeof import('../app/state/combatResolution');
     const hpBefore = store.getState().player!.hp;
     const before = store.getState().gameLog.length;
     runEnemyGroupCounters(store.getState as never, useGameStore.setState as never, store.getState().player!);
@@ -200,7 +200,7 @@ describe('OTA-1202 / P16 — LIVE, each technique in a real volley', () => {
   test('⚠⚠ VEIL: the channel spends a swing, the NEXT swing lands at +5, once', async () => {
     const store = await freshFight('technique:veil_of_ether');
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { runEnemyGroupCounters } = require('../app/state/gameStore') as typeof import('../app/state/gameStore');
+    const { runEnemyGroupCounters } = require('../app/state/combatResolution') as typeof import('../app/state/combatResolution');
     const before = store.getState().gameLog.length;
     runEnemyGroupCounters(store.getState as never, useGameStore.setState as never, store.getState().player!);
     expect(feedSince(before)).toMatch(/VEILED/);
@@ -214,7 +214,7 @@ describe('OTA-1202 / P16 — LIVE, each technique in a real volley', () => {
   test('⚠⚠ CASCADE: held until cornered, then 5d10 out + 1d10 back through itself, ONCE', async () => {
     const store = await freshFight('technique:resonance_cascade');
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { runEnemyGroupCounters } = require('../app/state/gameStore') as typeof import('../app/state/gameStore');
+    const { runEnemyGroupCounters } = require('../app/state/combatResolution') as typeof import('../app/state/combatResolution');
     // At full HP it holds the technique and fights normally.
     const before0 = store.getState().gameLog.length;
     runEnemyGroupCounters(store.getState as never, useGameStore.setState as never, store.getState().player!);

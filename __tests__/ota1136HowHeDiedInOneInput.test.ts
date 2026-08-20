@@ -92,6 +92,16 @@ jest.mock('expo-speech-recognition', () => ({}));
 
 import { enemyDamageDisplay } from '../app/engine/combatRules';
 
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
+
 jest.setTimeout(60_000);
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -124,12 +134,12 @@ describe('OTA-1136 — ⚠ the enemy card tells the truth about a boss', () => {
   it('⚠ the +1d6 it advertises is the one the resolver actually rolls', () => {
     // If someone retunes or removes the boss bonus, this display becomes the
     // new lie. Pinned to the resolver line itself.
-    expect(STORE).toContain('if (enemy.boss) {\n      rawDmg += rollDie(6);');
+    expect(COMBAT_SRC).toContain('if (enemy.boss) {\n      rawDmg += rollDie(6);');
   });
 
   it('⚠ and "twice per round" is the second swing, not a figure of speech', () => {
-    expect(STORE).toContain('bosses do not yield the tempo');
-    expect(STORE).toContain('applyEnemyCounter(enemy, liveAfter, get, set, liveIdx, true);');
+    expect(COMBAT_SRC).toContain('bosses do not yield the tempo');
+    expect(COMBAT_SRC).toContain('applyEnemyCounter(enemy, liveAfter, get, set, liveIdx, true);');
   });
 
   it('all three enemy cards route through the one helper', () => {

@@ -30,7 +30,8 @@ jest.mock('expo-av', () => ({
   Audio: { setAudioModeAsync: jest.fn(), Sound: class { static createAsync = jest.fn(async () => ({ sound: { playAsync: jest.fn(async () => {}), unloadAsync: jest.fn(async () => {}) } })); } },
 }));
 
-import { recordEnemyIntel } from '../app/state/gameStore';
+// ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
+import { recordEnemyIntel } from '../app/state/combatResolution';
 
 // Minimal fake store: recordEnemyIntel only touches s.worldMemory via get()/set().
 function makeStore(initial: Record<string, { weak: string[]; resist: string[] }> = {}) {

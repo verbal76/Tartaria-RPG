@@ -29,7 +29,8 @@ jest.mock('expo-av', () => ({
   Audio: { setAudioModeAsync: jest.fn(), Sound: class { static createAsync = jest.fn(async () => ({ sound: { playAsync: jest.fn(async () => {}), unloadAsync: jest.fn(async () => {}) } })); } },
 }));
 
-import { effectiveACBreakdown } from '../app/state/gameStore';
+// ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
+import { effectiveACBreakdown } from '../app/state/combatResolution';
 import type { PlayerCharacter, InventoryItem } from '../app/engine/types';
 
 // A fused ("unique") chest piece — self-contained, no catalog lookup needed

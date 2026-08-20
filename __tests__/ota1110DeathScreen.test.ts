@@ -44,6 +44,16 @@ import { STORY_MOTIVE_IDS } from '../app/engine/story';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
+
 const src = (p: string): string => readFileSync(join(__dirname, '..', p), 'utf8');
 
 const base = {
@@ -197,8 +207,8 @@ describe('OTA-1110 — nothing happens after zero', () => {
   it('the check reads LIVE state, never a snapshot', () => {
     // The entire bug class here is code acting on a player captured before the
     // killing blow (cf. OTA-969, OTA-1103).
-    expect(store).toContain('export function playerIsDownNotDead(get: () => GameStore): boolean {');
-    expect(store).toContain('return !!p && p.hp <= 0 && !p.dead;');
+    expect(COMBAT_SRC).toContain('export function playerIsDownNotDead(get: () => GameStore): boolean {');
+    expect(COMBAT_SRC).toContain('return !!p && p.hp <= 0 && !p.dead;');
   });
 
   it('⚠ no HP floor can resurrect a corpse — all four sites routed', () => {
@@ -216,8 +226,12 @@ describe('OTA-1110 — nothing happens after zero', () => {
   });
 
   it('⚠ death raises the screen instead of a bare timer', () => {
-    expect(store).toContain('set(() => ({ pendingDeath: scene }));');
+    expect(COMBAT_SRC).toContain('set(() => ({ pendingDeath: scene }));');
+    // ⚠ OTA-1404 — the death path moved to the combat leaf, so the old bare timer
+    // must be absent from BOTH files. Checking only the store would now pass
+    // because the code left, not because the timer is gone.
     expect(store).not.toContain('}, 3500);');
+    expect(COMBAT_SRC).not.toContain('}, 3500);');
   });
 
   it('the handover clears everything still queued behind the death', () => {
@@ -237,7 +251,7 @@ describe('OTA-1110 — nothing happens after zero', () => {
   });
 
   it('the save is written BEFORE the screen goes up, so nothing is lost by leaving it', () => {
-    const death = store.slice(store.indexOf('function handlePlayerDeath('));
+    const death = COMBAT_SRC.slice(COMBAT_SRC.indexOf('function handlePlayerDeath('));
     expect(death.indexOf('void get().persist();'))
       .toBeLessThan(death.indexOf('set(() => ({ pendingDeath: scene }));'));
   });

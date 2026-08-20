@@ -35,6 +35,16 @@ import {
 import fs from 'fs';
 import path from 'path';
 
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
+
 const SRC = (rel: string) => fs.readFileSync(path.join(__dirname, '..', rel), 'utf8');
 const idsOf = (storyId: string) =>
   CHARACTER_STORIES.find((s) => s.id === storyId)!.fragments.map((f) => f.id);
@@ -143,8 +153,8 @@ describe('⚠⚠ OTA-1184 — EVERY PERK HAS A CONSUMER. This is the whole rule.
   });
 
   test('ruinsDefenseBonus is read by the AC path', () => {
-    expect(STORE).toMatch(/tPerks\.ruinsDefenseBonus > 0/);
-    expect(STORE).toContain("detectACContexts(player, scene).has('constructed_environment')");
+    expect(COMBAT_SRC).toMatch(/tPerks\.ruinsDefenseBonus > 0/);
+    expect(COMBAT_SRC).toContain("detectACContexts(player, scene).has('constructed_environment')");
   });
 
   test('mechanicalDamageDice is read by the attack path', () => {
@@ -164,9 +174,9 @@ describe('⚠⚠ OTA-1184 — EVERY PERK HAS A CONSUMER. This is the whole rule.
   test('⚠ cold resist is injected at the ONE function ~16 sites read', () => {
     // playerArmorResistKinds feeds weather ticks, weather stat modifiers, attack
     // penalties and visibility. Injecting at the source means no site is silently missed.
-    const i = STORE.indexOf('export function playerArmorResistKinds');
+    const i = COMBAT_SRC.indexOf('export function playerArmorResistKinds');
     expect(i).toBeGreaterThan(-1);
-    const body = STORE.slice(i, i + 1400);
+    const body = COMBAT_SRC.slice(i, i + 1400);
     expect(body).toContain('grantsColdResist');
     expect(body).toContain("kinds.push('cold')");
     // ⚠ And it must not double-add over an armour piece that already resists cold.
@@ -174,8 +184,8 @@ describe('⚠⚠ OTA-1184 — EVERY PERK HAS A CONSUMER. This is the whole rule.
   });
 
   test('⚠ the perk lookup can never break the resist read', () => {
-    const i = STORE.indexOf('export function playerArmorResistKinds');
-    const body = STORE.slice(i, i + 1400);
+    const i = COMBAT_SRC.indexOf('export function playerArmorResistKinds');
+    const body = COMBAT_SRC.slice(i, i + 1400);
     expect(body).toContain('try {');
     expect(body).toContain('catch');
   });

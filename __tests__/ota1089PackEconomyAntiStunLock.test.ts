@@ -64,11 +64,23 @@ jest.mock('expo-updates', () => ({}));
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { useGameStore, runEnemyGroupCounters } from '../app/state/gameStore';
+import { useGameStore } from '../app/state/gameStore';
+// ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
+import { runEnemyGroupCounters } from '../app/state/combatResolution';
 import { getRaces, getFactions } from '../app/engine/character';
 import { findEnemyByName } from '../app/engine/encounter';
 import { tickEffects, applyEffect } from '../app/engine/statusEffects';
 import type { Enemy } from '../app/engine/types';
+
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
 
 const _origLog = console.log;
 const _origWarn = console.warn;
@@ -281,12 +293,12 @@ describe('OTA-1089 — braced tick class + source locks', () => {
   const src = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
 
   it('the braced window is 3 rounds and the melee cap is 3 swings', () => {
-    expect(src).toMatch(/const BRACED_ROUNDS = 3;/);
-    expect(src).toMatch(/const MELEE_PACK_SWINGS_PER_ROUND = 3;/);
+    expect(COMBAT_SRC).toMatch(/const BRACED_ROUNDS = 3;/);
+    expect(COMBAT_SRC).toMatch(/const MELEE_PACK_SWINGS_PER_ROUND = 3;/);
   });
 
   it('both incapacitation kinds are gated (stun AND paralyzed)', () => {
-    expect(src).toMatch(/const isIncapKind = \(k: string\) => k === 'stun' \|\| k === 'paralyzed';/);
+    expect(COMBAT_SRC).toMatch(/const isIncapKind = \(k: string\) => k === 'stun' \|\| k === 'paralyzed';/);
   });
 
   it('bosses and ranged enemies are exempt from the swing cap', () => {
@@ -295,7 +307,7 @@ describe('OTA-1089 — braced tick class + source locks', () => {
     // the old exact line is gone. The invariant this lock stands for is
     // unchanged: bosses are never capped, and range decides whether a ranged
     // enemy is exempt.
-    expect(src).toMatch(/const meleeAttacker = !enemy\.boss && \(inTheScrum \|\| !isRangedEnemy\(enemy\)\);/);
-    expect(src).toMatch(/const inTheScrum = \(liveScene\.range \?\? 'close'\) === 'close';/);
+    expect(COMBAT_SRC).toMatch(/const meleeAttacker = !enemy\.boss && \(inTheScrum \|\| !isRangedEnemy\(enemy\)\);/);
+    expect(COMBAT_SRC).toMatch(/const inTheScrum = \(liveScene\.range \?\? 'close'\) === 'close';/);
   });
 });

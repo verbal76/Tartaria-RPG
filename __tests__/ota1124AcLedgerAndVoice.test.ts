@@ -78,6 +78,16 @@ const NARRATOR_ONLY = (s: string): boolean => {
 };
 const FIRST_PERSON_OPENER = { test: NARRATOR_ONLY };
 
+
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
 describe("OTA-1124 — the first-person opener, and what it must NOT eat", () => {
   it('⚠ drops narrator-only lines', () => {
     expect(FIRST_PERSON_OPENER.test('My eyes have seen worse roads than this.')).toBe(true);
@@ -149,8 +159,8 @@ describe('OTA-1124 — an accepted ambient line leaves a trace', () => {
 
 describe('OTA-1124 — the AC ledger prints a derivation, not a number', () => {
   it('⚠ it fires on a shift of 2 or more, at the one place AC is computed', () => {
-    expect(SRC).toContain('const prev = _lastEffectiveAc;');
-    expect(SRC).toContain('if (prev !== null && Math.abs(effectiveAc - prev) >= 2) {');
+    expect(COMBAT_SRC).toContain('const prev = _lastEffectiveAc;');
+    expect(COMBAT_SRC).toContain('if (prev !== null && Math.abs(effectiveAc - prev) >= 2) {');
   });
 
   it('⚠ every component is named — the point is WHICH one moved', () => {
@@ -159,32 +169,32 @@ describe('OTA-1124 — the AC ledger prints a derivation, not a number', () => {
     for (const part of ['race/base ${racialAC}', 'gear ${armorPieces.acBonus}',
       'title ${titleRuinsAc}', 'trimmed ${acFromGear}',
       'status ${statusAcAdjustment(player.statusEffects)}']) {
-      expect(SRC).toContain(part);
+      expect(COMBAT_SRC).toContain(part);
     }
   });
 
   it('⚠ EMPTY slots are named too — that is the finding, not a gap in it', () => {
     // A worn-list that silently omits missing pieces cannot show "the chest
     // slot is empty", which is the single most likely explanation.
-    expect(SRC).toContain("parts.push(`${slot}=${name ?? '—'}`);");
+    expect(COMBAT_SRC).toContain("parts.push(`${slot}=${name ?? '—'}`);");
   });
 
   it('a fresh session prints nothing until it has something to compare', () => {
-    expect(SRC).toContain('let _lastEffectiveAc: number | null = null;');
+    expect(COMBAT_SRC).toContain('let _lastEffectiveAc: number | null = null;');
   });
 
   it('⚠ it changes no behaviour — debug channel only', () => {
-    const start = SRC.indexOf('const prev = _lastEffectiveAc;');
-    const end = SRC.indexOf('const enemyCrit =', start);
-    const block = SRC.slice(start, end);
+    const start = COMBAT_SRC.indexOf('const prev = _lastEffectiveAc;');
+    const end = COMBAT_SRC.indexOf('const enemyCrit =', start);
+    const block = COMBAT_SRC.slice(start, end);
     expect(block).toContain("appendLog('debug'");
     expect(block).not.toContain('set(');
     // The AC it reports is the AC the swing actually used.
-    expect(SRC.indexOf('const effectiveAc = Math.max(1,')).toBeLessThan(start);
+    expect(COMBAT_SRC.indexOf('const effectiveAc = Math.max(1,')).toBeLessThan(start);
   });
 
   it('the threshold is explained, because a noisy ledger gets ignored', () => {
-    expect(SRC).toContain('Threshold 2 because ±1 is ordinary');
+    expect(COMBAT_SRC).toContain('Threshold 2 because ±1 is ordinary');
   });
 });
 

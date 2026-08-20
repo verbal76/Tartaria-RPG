@@ -28,7 +28,8 @@ jest.mock('expo-av', () => ({
   Audio: { setAudioModeAsync: jest.fn(), Sound: class { static createAsync = jest.fn(async () => ({ sound: { playAsync: jest.fn(async () => {}), unloadAsync: jest.fn(async () => {}) } })); } },
 }));
 
-import { damageModClause } from '../app/state/gameStore';
+// ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
+import { damageModClause } from '../app/state/combatResolution';
 
 describe('OTA-842 — damageModClause', () => {
   it('no modifiers → empty clause (no bracket)', () => {

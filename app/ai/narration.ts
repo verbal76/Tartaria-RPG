@@ -71,6 +71,32 @@ import { visibleLogTotal } from '../state/visibleLogCount';
 
 const allLocations = locationsData as Location[];
 
+/**
+ * How the Arbiter addresses the player in a line it is about to speak — their
+ * first name, or the caller's generic fallback.
+ *
+ * ⚠ OTA-1404 — MOVED HERE FROM gameStore. This is the Arbiter choosing what to
+ * call someone, which is this file's whole subject; it only ever sat in the
+ * store because that is where its first caller happened to be. It moved because
+ * the combat resolver's low-HP warning needs it, and a leaf may never import a
+ * VALUE from the store. Nothing outside gameStore imported it, so the move costs
+ * one import line and no re-export.
+ */
+export function arbiterAddress(player: PlayerCharacter | null | undefined, fallback: string): string {
+  if (!player?.name) return fallback;
+  // OTA-635 — name the player MORE often (was 0.34). Player ask: "I want to hear
+  // the name of the character more often — that brings them in." 0.6 leans into the
+  // name for immersion without it reading robotic (still ~40% the generic address).
+  if (Math.random() < 0.6) {
+    // Use the first whitespace-separated token so a long custom
+    // name ("Verbal of the Tartarian Giants") doesn't read awkward
+    // in a one-line address. Players who type a single name see it
+    // verbatim.
+    return player.name.split(/\s+/)[0]!;
+  }
+  return fallback;
+}
+
 /** ⚠⚠ THE GENERATION EPOCH, AND WHY IT LIVES HERE RATHER THAN WITH ITS OTHER
  *  WRITER. Monotonic counter, incremented every time a new Arbiter generation
  *  begins. Each call captures the epoch at start; if it has moved by the time

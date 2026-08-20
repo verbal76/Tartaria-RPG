@@ -39,7 +39,9 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-import { useGameStore, runEnemyGroupCounters } from '../app/state/gameStore';
+import { useGameStore } from '../app/state/gameStore';
+// ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
+import { runEnemyGroupCounters } from '../app/state/combatResolution';
 import {
   spawnGuardianForCapital,
   guardianPlayerPower,

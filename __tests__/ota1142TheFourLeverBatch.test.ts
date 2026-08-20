@@ -31,6 +31,16 @@ import type { GuardianTier } from '../app/engine/coreGuardians';
 import { LOST_CAPITAL_LOCATIONS } from '../app/engine/mainQuest';
 import { acidShredCap, ACID_SHRED_MAX } from '../app/engine/weaponCoating';
 
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
+
 const gameStoreSrc = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
 const guardiansSrc = readFileSync(join(__dirname, '..', 'app', 'engine', 'coreGuardians.ts'), 'utf8');
 
@@ -127,7 +137,7 @@ describe('OTA-1142 lever 4 — bosses fight the person in front of them', () => 
   // The redirect condition in runEnemyGroupCounters. Grab the exact line so
   // both halves of the owner's call are pinned: no RANDOM soak on a boss,
   // but a FAILED DISTRACT (forcedOnDog) still redirects unconditionally.
-  const redirectLine = gameStoreSrc
+  const redirectLine = COMBAT_SRC
     .split('\n')
     .find((l) => l.includes('applyEnemyCounterToDog') === false && l.includes('DOG_TARGET_CHANCE') && l.includes('forcedOnDog'));
 
@@ -143,7 +153,7 @@ describe('OTA-1142 lever 4 — bosses fight the person in front of them', () => 
   });
 
   it('forcedOnDog itself carries no boss condition (OTA-795 semantics intact)', () => {
-    const def = gameStoreSrc.split('\n').find((l) => l.includes('const forcedOnDog ='));
+    const def = COMBAT_SRC.split('\n').find((l) => l.includes('const forcedOnDog ='));
     expect(def).toBeDefined();
     expect(def).not.toContain('boss');
     expect(def).toContain('forceDogEnemyIdx');

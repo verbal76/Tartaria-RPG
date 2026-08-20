@@ -21,6 +21,16 @@ import {
 } from '../app/engine/aetherTechniques';
 import { statusAcAdjustment } from '../app/engine/statusEffects';
 
+// ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
+// the pins below follow the code to its new address rather than reading both
+// files and hoping. A helper that searches "wherever the code went" can never
+// fail, and a pin that cannot fail is not a test. Everything still asserted
+// against the store constant above is still IN the store.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const COMBAT_SRC: string = require('fs').readFileSync(
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('path').join(__dirname, '..', 'app', 'state', 'combatResolution.ts'), 'utf8');
+
 const STORE = storeSource();
 
 /** Landmark-anchored slice. ⚠ Deliberately NOT a fixed number of lines: this session has
@@ -32,6 +42,18 @@ function between(from: string, to: string): string {
   const j = STORE.indexOf(to, i);
   expect(j).toBeGreaterThan(i);
   return STORE.slice(i, j);
+}
+
+/** ⚠ OTA-1404 — the SAME slicer against the combat leaf. Two functions rather
+ *  than one that searches both files: a window that can find its landmarks in
+ *  either file no longer says WHERE the code is, which is half of what these
+ *  pins are for. */
+function betweenCombat(from: string, to: string): string {
+  const i = COMBAT_SRC.indexOf(from);
+  expect(i).toBeGreaterThan(-1);
+  const j = COMBAT_SRC.indexOf(to, i);
+  expect(j).toBeGreaterThan(i);
+  return COMBAT_SRC.slice(i, j);
 }
 
 describe('OTA-1195 / P16 — fuel', () => {
@@ -169,8 +191,8 @@ describe('OTA-1195 / P16 — the effects land in machinery that already existed'
   });
 
   test('⚠ the sweep is EXTRACTED, and the DOT tick now calls the same one', () => {
-    expect(STORE).toContain('function sweepDeadEnemies(');
-    expect(between('function tickEnemyDotsAndMaybeEndFight(', 'function sweepDeadEnemies('))
+    expect(COMBAT_SRC).toContain('function sweepDeadEnemies(');
+    expect(betweenCombat('function tickEnemyDotsAndMaybeEndFight(', 'function sweepDeadEnemies('))
       .toContain('return sweepDeadEnemies(get, set);');
   });
 
@@ -182,19 +204,19 @@ describe('OTA-1195 / P16 — the effects land in machinery that already existed'
 
 describe('OTA-1195 / P16 — Temporal Slip', () => {
   test('⚠⚠ it does NOT stop a natural 20 — nothing buys immunity (the OTA-815 rule)', () => {
-    const verdict = between('const wouldHit = dodgeWin === true', 'const outcomeTag = slipped');
+    const verdict = betweenCombat('const wouldHit = dodgeWin === true', 'const outcomeTag = slipped');
     expect(verdict).toContain('wouldHit && !enemyCrit && slipHeld');
   });
 
   test('it is spent when it fires', () => {
-    const verdict = between('const wouldHit = dodgeWin === true', 'const outcomeTag = slipped');
+    const verdict = betweenCombat('const wouldHit = dodgeWin === true', 'const outcomeTag = slipped');
     expect(verdict).toContain("filter((e) => e.kind !== 'temporal_slip')");
   });
 
   test('⚠ it sits at the to-hit verdict, so nothing downstream runs on a slipped blow', () => {
     // If it were folded into the damage stack the blow would still have "landed" — armor,
     // resists and wards would all fire and the technique's own claim would be false.
-    expect(STORE.indexOf('const slipHeld =')).toBeLessThan(STORE.indexOf('let shieldTag ='));
+    expect(COMBAT_SRC.indexOf('const slipHeld =')).toBeLessThan(COMBAT_SRC.indexOf('let shieldTag ='));
   });
 
   test('⚠ the data no longer promises "once per encounter", which is not what shipped', () => {

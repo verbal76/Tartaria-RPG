@@ -222,7 +222,8 @@ describe('OTA-1195 / P16 — buying the procedure', () => {
 // statusEffects" is not "the blow did not land".
 
 import { findEnemyByName } from '../app/engine/encounter';
-import { runEnemyGroupCounters } from '../app/state/gameStore';
+// ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
+import { runEnemyGroupCounters } from '../app/state/combatResolution';
 
 function plantEnemies(count: number) {
   const proto = findEnemyByName('Silt Serpent') ?? findEnemyByName('Mud Spider');
