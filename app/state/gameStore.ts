@@ -3430,6 +3430,73 @@ export function acceptKeyword(title: string, taken?: Set<string>): string {
  *  literal inside loadSlotIntoGame only, so resurrectSlot loaded RAW memory:
  *  no canon-location resync — a whole revived session of missing atlas pins
  *  and dead contract markers. */
+// ⚠⚠ OTA-1370 — UNIVERSALISED, NOT FLAGGED. This was HAL-only, and the reason
+// recorded there was sound at the time: HAL is the line with real tester saves
+// written before OTA-838's observed-weakness system existed, and golem had no
+// such saves to strand.
+//
+// It is shared now because that reasoning stopped being the whole story. The
+// About screen's IMPORT SAVE accepts an export "from this or another install",
+// so a pre-838 save can walk from HAL onto any other line — and on the lines
+// without this backfill it stays blank forever, which is precisely the defect
+// the backfill exists to prevent.
+//
+// ⚠ It is NOT a feature flag, because it does not need to be: the call site is
+// `wm.enemyIntel ?? backfill(...)`, so it fires only when a save carries no
+// intel at all, and the function returns `{}` before requiring anything when
+// there are no defeats. On a line with no legacy saves it is a no-op costing one
+// nullish check. A migration that self-gates is safe to run everywhere — and a
+// flag here would be a second code path only one product ever executes, which is
+// the shape step 3 exists to remove.
+export function backfillEnemyIntelFromDefeats(
+  defeatedNames: readonly string[] | undefined,
+): Record<string, { weak: string[]; resist: string[] }> {
+  const out: Record<string, { weak: string[]; resist: string[] }> = {};
+  if (!defeatedNames || defeatedNames.length === 0) return out;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const enemies = require('../data/enemies/enemies.json') as Array<{ name: string; type?: string; traits?: string[] }>;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { enemyTypeDefenses } = require('../engine/crafting') as typeof import('../engine/crafting');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { traitDefenses } = require('../engine/enemyTraits') as typeof import('../engine/enemyTraits');
+  const byName = new Map(enemies.map((e) => [e.name.toLowerCase(), e]));
+  for (const rawName of new Set(defeatedNames.map((n) => n.toLowerCase()))) {
+    const e = byName.get(rawName);
+    if (!e) continue;
+    const type = enemyTypeDefenses(e.type);
+    const trait = traitDefenses(e.traits);
+    const all = Array.from(new Set([...type.resist, ...type.weak, ...trait.resists, ...trait.weaknesses]));
+    const weak: string[] = [];
+    const resist: string[] = [];
+    for (const dt of all) {
+      const typeDir = type.weak.includes(dt) ? 1 : type.resist.includes(dt) ? -1 : 0;
+      const traitDir = trait.weaknesses.includes(dt) ? 1 : trait.resists.includes(dt) ? -1 : 0;
+      const dir = traitDir !== 0 ? traitDir : typeDir; // trait wins on a discord (mirrors defensesFor)
+      if (dir > 0) weak.push(dt);
+      else if (dir < 0) resist.push(dt);
+    }
+    if (weak.length || resist.length) out[rawName] = { weak, resist };
+  }
+  return out;
+}
+
+// OTA-368 — THE SAVE-UPGRADE STEP. Scans a loaded save and brings it up
+// to the current game's spec: fills new fields with defaults and migrates
+// renamed / reshaped ones (staminaMax formula, single→multi-slot equipped,
+// per-item durability / kind / tags, fused-item name repair, world-map
+// recalibration, dog + travel-target fields, …). Runs on EVERY load
+// (loadSlotIntoGame + resurrectSlot), so an old save plays under the new
+// rules without the player doing anything. The public wrapper below makes
+// it NEVER throw out of a load: a genuinely malformed legacy save degrades
+// to the raw saved player (which still loads — and the persist integrity
+// guard then refuses to write it back if it's missing core identity)
+// instead of failing the load to .bak / a slot-load error.
+// Exported for the OTA-486 regression test (equipped hands/cloak must survive a
+// load). The save/load round-trip funnels every load through this migration.
+/** OTA-998 — ONE worldMemory load-migration for every door into a save. It was a
+ *  literal inside loadSlotIntoGame only, so resurrectSlot loaded RAW memory:
+ *  no canon-location resync — a whole revived session of missing atlas pins
+ *  and dead contract markers. */
 export function migrateLoadedWorldMemory(wm: WorldMemory): WorldMemory {
   return {
     ...wm,
@@ -3448,6 +3515,7 @@ export function migrateLoadedWorldMemory(wm: WorldMemory): WorldMemory {
     earnedTitleAnnounced: wm.earnedTitleAnnounced ?? [],
     fusionCompensationGranted: wm.fusionCompensationGranted ?? false,
     pendingDogOnboarding: wm.pendingDogOnboarding ?? null,
+    enemyIntel: wm.enemyIntel ?? backfillEnemyIntelFromDefeats(wm.defeatedEnemies),
   };
 }
 
@@ -3915,7 +3983,18 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // Migrate legacy flat-id list into the new staged shape. We don't
     // know the original posting faction; pull it from the FactionQuestDef
     // catalog. Saves that already wrote activeFactionQuests pass through.
-    activeFactionQuests: p.activeFactionQuests ?? (p.activeFactionQuestIds ?? []).map((id) => {
+    // ⚠⚠ OTA-1369 [DIVERGENCE E1] — SINGLE-ACTIVE BACKFILL, and it was missing here.
+    // The census found this migration on HAL and html and NOT on this line, a
+    // 2-of-4 split with no rationale recorded anywhere. It is not cosmetic: all
+    // four lines read tracked-ness through `q.tracked !== false`, which treats
+    // `undefined` as TRACKED — so a save written before the `tracked` field
+    // existed showed EVERY accepted faction quest as active here, and exactly
+    // one on the other two lines. Same save, same predicate, different game.
+    //
+    // ⚠ Records that already carry `tracked` are left exactly as the player set
+    // them. This only fills the hole legacy saves have; it never re-picks an
+    // explicit choice.
+    activeFactionQuests: ((p.activeFactionQuests ?? (p.activeFactionQuestIds ?? []).map((id) => {
       const def = findFactionQuestById(id);
       return {
         id,
@@ -3923,7 +4002,8 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
         postedByFaction: def?.factionId ?? 'unknown',
         acceptedAt: Date.now(),
       };
-    }),
+    })) as { id: string; stage: number; postedByFaction: string; acceptedAt: number; tracked?: boolean }[])
+      .map((q, i) => (q.tracked === undefined ? { ...q, tracked: i === 0 } : q)),
     completedFactionQuestIds: p.completedFactionQuestIds ?? [],
     collectables: p.collectables ?? [],
     activeHunts: p.activeHunts ?? [],
@@ -8870,6 +8950,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
         setLastBootBreadcrumb(crumb);
         get().appendLog('debug',
           `freeze forensics: last boot ended mid-action — ${crumb.what} @ ${crumb.room ?? '?'} (${new Date(crumb.at).toISOString()})`);
+        // ⚠⚠ OTA-1370 — AND IT IS PROMOTED TO A CRASH, which is the whole point.
+        // This crumb was ALREADY the evidence of a B9-class death: the process
+        // was killed while an action was live, so no JS handler ran, nothing
+        // wrote `@tartaria/lastCrash`, and the crash existed only as one debug
+        // line that scrolled away. Recording it means a native kill finally
+        // shows up where every other crash does — in the ledger, in About, and
+        // in the bug report — instead of needing the owner to read a log at
+        // exactly the right moment.
+        //
+        // ⚠ Recorded BEFORE the clear, so a failure to clear cannot cost the
+        // record. Deduped on id (`ts_kind`), so a second hydrate in the same
+        // session cannot invent a second crash from one crumb.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        (require('../diagnostics/crashLedger') as typeof import('../diagnostics/crashLedger')).recordCrash({
+          kind: 'native-death',
+          ts: crumb.at,
+          stage: crumb.phase ?? 'mid-action',
+          message: `Process died with no orderly exit while: ${crumb.what}`,
+          isFatal: true,
+          breadcrumb: crumb,
+        });
         await clearLiveBreadcrumb();
       }
     } catch { /* forensics must never block a boot */ }
@@ -37218,17 +37319,72 @@ function rollTileGear(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { pickTakeableGearForScene } = require('../engine/takeableGearSpawns');
   const consumed = roomConsumedSet(get().worldMemory, roomKey);
+  // ⚠⚠ OTA-1367 — A ROOM'S GEAR IS DECIDED ONCE AND THEN IT IS A FACT.
+  //
+  // Owner: *"once i've cleared a room in an outpost and go back into it why does
+  // the take/salvage repopulate but just one item?"* Because the seeded stream
+  // was stable but the WINDOW filtered against it was not.
+  //
+  // `pickTakeableGearForScene` post-filters its seeded draw against
+  // `recentTakeableGearNames`, a 10-deep rolling ring that stops adjacent rooms
+  // offering the same loot. OTA-991 was right to post-filter — filtering INSIDE
+  // the draw consumed RNG for excluded names and made the picks a function of
+  // (seed, window), which was farmable — and it wrote the rule down: the window
+  // may hide a pick, never substitute one. What nobody noticed is that hiding
+  // is TEMPORARY and taking is PERMANENT:
+  //
+  //   room stream  [Force Wave, Cudgel, Sentinel's Gauntlets]
+  //   visit 1      Cudgel is in the window (a room four back rolled it) →
+  //                the player is shown two items and takes both
+  //   …walk on…    the ring is 10 deep and each room pushes 1–3 → Cudgel ages out
+  //   visit 2      nothing hides Cudgel and nothing consumed it → ONE item
+  //
+  // One item, always, because a room holds 1–3 pieces and the window rarely
+  // masks more than one. It reads as take AND salvage because most gear names
+  // also carry the `salvageable` tag, so the single noun shows in both rows.
+  //
+  // ⚠ THE FIX IS TO MAKE THE MASK PERMANENT, not to remove it. The window's
+  // purpose is variety on FIRST sight; re-consulting it on a revisit was never
+  // meaningful, and releasing it is the whole defect. So the post-window list is
+  // stamped on the room the first time it is rolled, and every later visit reads
+  // that roster instead of re-rolling. The consumed filter still runs on top, so
+  // a cleared room stays cleared.
+  //
+  // ⚠ THE ROSTER SURVIVES THE MACRO-VISIT RESTOCK on purpose. That restock wipes
+  // the consumed set so a room the player left and came back to has goods again;
+  // it does not wipe the roster, so the room puts ITS OWN goods back out. A
+  // re-roll there would just be the same lottery in a slower loop.
+  //
+  // ⚠ ONE-TIME COST ON EXISTING SAVES, stated rather than hidden: a save already
+  // standing in a half-cleared room has no roster, so the first entry after this
+  // OTA stamps one from the full stream and can surface the masked piece that
+  // one last time. There is no history to reconstruct it from, it is a single
+  // item, and it never happens again for that room.
+  const stamped = get().worldMemory.visitedRooms?.[roomKey]?.gearRoster;
+  if (stamped) return stamped.filter((n: string) => !isConsumedNoun(consumed, n));
   const recent = new Set((get().worldMemory.recentTakeableGearNames ?? []).map((n) => n.toLowerCase()));
-  const picks: string[] = pickTakeableGearForScene(roomKey, recent)
-    .filter((n: string) => !isConsumedNoun(consumed, n));
-  if (picks.length > 0) {
-    get().appendLog('debug', `spawn: gear=[${picks.join(', ')}] window=${recent.size}`);
-    set((s) => ({
+  const roster: string[] = pickTakeableGearForScene(roomKey, recent);
+  set((s) => {
+    // ⚠ The record may not exist yet — rollTileGear runs BEFORE beginScene's
+    // visit block. Same visitCount-0 shell the OTA-071 investigation seeder
+    // uses; the visit block owns the counting and spreads whatever it finds,
+    // and OTA-1104's `visitCount >= 1` guard means a shell never greets the
+    // player as a returning visitor.
+    const prev = s.worldMemory.visitedRooms?.[roomKey];
+    const base: VisitedRoom = prev ?? { firstVisitAt: Date.now(), lastVisitAt: Date.now(), visitCount: 0 };
+    return {
       worldMemory: {
         ...s.worldMemory,
-        recentTakeableGearNames: [...(s.worldMemory.recentTakeableGearNames ?? []), ...picks].slice(-10),
+        visitedRooms: { ...(s.worldMemory.visitedRooms ?? {}), [roomKey]: { ...base, gearRoster: roster } },
+        recentTakeableGearNames: roster.length > 0
+          ? [...(s.worldMemory.recentTakeableGearNames ?? []), ...roster].slice(-10)
+          : s.worldMemory.recentTakeableGearNames,
       },
-    }));
+    };
+  });
+  const picks: string[] = roster.filter((n: string) => !isConsumedNoun(consumed, n));
+  if (picks.length > 0) {
+    get().appendLog('debug', `spawn: gear=[${picks.join(', ')}] window=${recent.size} roster=new`);
   }
   return picks;
 }

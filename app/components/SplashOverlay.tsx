@@ -5,7 +5,11 @@
 // Self-contained: owns its timer + Kokoro subscription, returns null when done.
 
 import React, { useEffect, useState } from 'react';
-import { View, Image, Text, StyleSheet, Dimensions, Platform } from 'react-native';
+import { View, Image, Text, StyleSheet, Dimensions } from 'react-native';
+// ⚠ OTA-1370 — the art and its fit come from a PLATFORM-RESOLVED module, not
+// from a branch and not from a Platform.OS ternary. Metro resolves `require()`
+// statically, so a ternary would pull the 2.4MB PC asset into the phone bundle.
+import { SPLASH_SOURCE, splashImageStyle } from '../ui/splashArt';
 import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/PiperTTSManager';
 
 // Splash art native dimensions (assets/splash-art.jpg).
@@ -54,17 +58,12 @@ export function SplashOverlay() {
   const screenW = Dimensions.get('window').width;
   const imgW = Math.round(screenW * SPLASH_SCALE);
   const imgH = Math.round((imgW * SPLASH_H) / SPLASH_W);
-  // PC/web — the portrait phone art doesn't fit a landscape window. Use the
-  // dedicated 16:9 key art (assets/splash-art-pc.png), full-bleed cover.
-  const isWeb = Platform.OS === 'web';
 
   return (
     <View style={styles.overlay} pointerEvents="auto" accessibilityViewIsModal={true}>
       <Image
-        source={isWeb ? require('../../assets/splash-art-pc.png') : require('../../assets/splash-art.jpg')}
-        style={isWeb
-          ? StyleSheet.absoluteFillObject
-          : { position: 'absolute', top: 0, left: 0, width: imgW, height: imgH }}
+        source={SPLASH_SOURCE}
+        style={splashImageStyle(imgW, imgH)}
         resizeMode="cover"
         accessibilityElementsHidden={true}
         importantForAccessibility="no-hide-descendants"

@@ -10623,7 +10623,7 @@
 // OTA-1163 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1161.
-export const DISPLAY_VERSION = '4.29.215';
+export const DISPLAY_VERSION = '4.29.219';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -24104,7 +24104,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The instruction was about NAMES, not content, so both stand (Asgardar 14 tiers/Cuirass,
 // Etheria 15/Crown) and ota1333 pins 5 climbs / 5 pieces against an accidental merge.
 // Twin of golem OTA-1333. DISPLAY_VERSION 4.29.181.
-export const OTA_BUILD_ID = '2026-08-20-1366-the-orderly-exit-is-marked';
+// ⚠⚠ OTA-1367 — A CLEARED ROOM STAYS CLEARED. Owner: *"once i've cleared a room
+// in an outpost and go back into it why does the take/salvage repopulate but just
+// one item?"* Because a room's gear is a seeded stream post-filtered against a
+// 10-deep ROLLING window of recently-spawned names — and hiding a pick is
+// temporary while taking one is permanent. A piece the window masked on arrival
+// was never offered, never consumed, and surfaced alone on the next visit. One
+// item, because a room holds 1–3; in both TAKE and SALVAGE, because most gear
+// names also carry the salvageable tag. The room's post-window list is now
+// stamped as its roster on the first roll and read back on every later visit, so
+// the mask is permanent and the window is only ever consulted on first sight.
+// ⚠⚠ OTA-1368 — THE MORE TRAY STAYS OPEN UNTIL THE PLAYER CLOSES IT. Owner:
+// *"when I hit the more button it should stay expanded until hit less."* Nothing
+// was closing it — `setMoreOpen` has exactly ONE caller, the toggle itself. The
+// tray collapsed because the COMPONENT was destroyed and `useState(false)` ran
+// again on the way back: InputBox is the last branch of ExplorationScreen's
+// action-slot ternary (a dice roll, payoff, conversation, parley or pickpocket
+// picker replaces it outright), and the whole screen unmounts on every trip to
+// inventory, missions, the map, the codex or the character sheet. A module-scope
+// latch outside the component holds the choice for the session.
+// ⚠⚠ OTA-1369 + OTA-1370 — CRASH REPORTING (staged: capture now, delivery behind a DSN and
+// an opt-in that is OFF by default), plus STEP 2 of the four-line collapse (the
+// three real drifts the census found) and STEP 3 (the intentional differences
+// become app/config/features.ts). Twin of golem OTA-1380 / 1381 / 1382.
+export const OTA_BUILD_ID = '2026-08-20-1370-one-file-of-difference';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1368-the-more-tray-holds';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1367-a-cleared-room-stays-cleared';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1366-the-orderly-exit-is-marked';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-19-1365-beasts-first-and-the-corner-taught';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-19-1364-the-anchor-knows-where-the-box-is';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-19-1363-the-corner-mini-map';

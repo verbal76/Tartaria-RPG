@@ -107,13 +107,27 @@ describe('OTA-1276 — it is stamped at the doors a freeze happens behind', () =
 
   it('⚠⚠ boot READS it before clearing, and says so in the log', () => {
     const store = src('app', 'state', 'gameStore.ts');
+    // ⚠ OTA-1370 — the window is the try/catch, NOT a byte count. This read
+    // `store.slice(i, i + 1400)`, and OTA-1370 adding the native-death promotion
+    // between the read and the clear pushed `clearLiveBreadcrumb` past 1400 —
+    // so the test failed while the invariant it guards was completely intact.
+    // A magic-number window turns "somebody added a comment" into a red build
+    // and teaches the next reader to distrust the suite. Anchored to the real
+    // block, it fails only when the ORDER actually changes.
     const i = store.indexOf('async hydrate() {');
-    const block = store.slice(i, i + 1400);
+    const end = store.indexOf('forensics must never block a boot', i);
+    expect(end).toBeGreaterThan(i);
+    const block = store.slice(i, end);
     expect(block).toContain('await readLiveBreadcrumb()');
     expect(block).toContain('setLastBootBreadcrumb(crumb)');
     expect(block).toContain('freeze forensics: last boot ended mid-action');
     // Cleared AFTER it is read and reported — never before.
     expect(block.indexOf('await readLiveBreadcrumb()')).toBeLessThan(block.indexOf('await clearLiveBreadcrumb()'));
+    // ⚠ And the OTA-1370 crash record lands between them: recorded before the
+    // clear, so a failure clearing cannot cost the one crash class that has no
+    // other evidence anywhere.
+    expect(block.indexOf("kind: 'native-death'")).toBeGreaterThan(block.indexOf('await readLiveBreadcrumb()'));
+    expect(block.indexOf("kind: 'native-death'")).toBeLessThan(block.indexOf('await clearLiveBreadcrumb()'));
   });
 
   it('⚠⚠ the orderly-exit clear is wired, or every boot would cry freeze', () => {
