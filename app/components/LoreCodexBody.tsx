@@ -21,7 +21,7 @@
 // host still renders the entries as info-only).
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { BrandedModal } from './BrandedModal';
 import factionsData from '../data/factions/factions.json';
 import racesData from '../data/races/races.json';
@@ -34,6 +34,15 @@ import { useGameStore } from '../state/gameStore';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../engine/hiddenLocations';
 import { isGreatClimbLocationLocked, SUMMIT_BOSS_BASES } from '../engine/greatClimbs';
 import { loadFallen, type FallenHero } from '../engine/saveSystem';
+import * as Clipboard from 'expo-clipboard';
+import {
+  fallenTitle, restRollLine, sharingUnlockedFor,
+  type ForeignFallen, type RestRecord, type PairedHouse,
+} from '../engine/fallenLedger';
+import {
+  loadLedger, loadHouseName, setHouseName, buildExportPayload, importPayloadText,
+  myHouseCode, acceptHouseCode, revokeHouse, loadPaired,
+} from '../engine/fallenLedgerStore';
 
 // OTA-837 — Tier-1 QoL #2: the codex now includes a discovery-gated BESTIARY (fills
 // in as you defeat enemy types) and a LORE tab that finally surfaces the 172-entry
@@ -136,11 +145,137 @@ export function LoreCodexBody() {
   // OTA-845 [The Fallen] — install-wide roll of the dead, loaded async from the global
   // stash. Newest first (most recent death at the top of the memorial).
   const [fallen, setFallen] = useState<FallenHero[]>([]);
+  // ⚠⚠ OTA-1363 — the SHARED roll. `hollowed` are corpses imported from other
+  // houses that this world has not yet put down; `rests` are the trophies, which
+  // outlive the corpse and carry the death description home.
+  const [hollowed, setHollowed] = useState<ForeignFallen[]>([]);
+  const [rests, setRests] = useState<RestRecord[]>([]);
+  const [house, setHouse] = useState('');
+  const [exchangeNote, setExchangeNote] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [paired, setPaired] = useState<PairedHouse[]>([]);
+  const [codeIn, setCodeIn] = useState('');
+  const refreshLedger = React.useCallback(async () => {
+    const l = await loadLedger();
+    setHollowed([...l.foreign].reverse());
+    setRests([...l.rests].reverse());
+    setPaired(await loadPaired());
+  }, []);
   useEffect(() => {
     let live = true;
     void loadFallen().then((f) => { if (live) setFallen([...f].reverse()); });
+    void loadHouseName().then((h) => { if (live) setHouse(h); });
+    void refreshLedger();
     return () => { live = false; };
-  }, []);
+  }, [refreshLedger]);
+
+  /** ⚠⚠ THE REQUEST. Your house card — everything another player needs to
+   *  accept you, checksummed so a mangled paste is refused rather than pairing
+   *  them with a broken id. They text it back and you accept theirs. */
+  const sendRequest = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await setHouseName(house);
+      const code = await myHouseCode();
+      await Clipboard.setStringAsync(code);
+      setExchangeNote('Your house card is copied. Send it to them — when they accept, have them send theirs back so you can accept too.');
+    } catch {
+      setExchangeNote('Could not copy your house card.');
+    } finally { setBusy(false); }
+  };
+
+  /** ⚠⚠ THE ACCEPT. This is the authorization decision, and nothing else is:
+   *  from here their dead may walk in your wastes, and until here they may not,
+   *  however well-formed their payload is. */
+  const acceptRequest = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const text = codeIn.trim() || (await Clipboard.getStringAsync());
+      const out = await acceptHouseCode(text ?? '');
+      if (!out.ok) {
+        setExchangeNote(out.reason === 'self'
+          ? 'That is your own house card.'
+          : 'That is not a house card — check it came across whole.');
+        return;
+      }
+      setCodeIn('');
+      await refreshLedger();
+      setExchangeNote(out.already
+        ? `You already ride with ${out.house.player}.`
+        : `You ride with ${out.house.player}. Their dead may walk here now — send them your dead when you are ready.`);
+    } catch {
+      setExchangeNote('Could not read that house card.');
+    } finally { setBusy(false); }
+  };
+
+  const cutOff = async (h: PairedHouse) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await revokeHouse(h.installId);
+      await refreshLedger();
+      setExchangeNote(`You no longer ride with ${h.player}. Their Hollowed already here still walk — you agreed to those.`);
+    } finally { setBusy(false); }
+  };
+
+  /** Hand this house's dead out. The player carries the string wherever they
+   *  like — the transport is theirs until the mailbox lands. */
+  const shareMyDead = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const payload = await buildExportPayload();
+      await Clipboard.setStringAsync(payload);
+      setExchangeNote(`Copied. ${Math.round(payload.length / 1024)}KB of your dead — paste it to whoever you ride with.`);
+    } catch {
+      setExchangeNote('Could not copy. Try again.');
+    } finally { setBusy(false); }
+  };
+
+  /** Take a house's dead in. Everything crosses the validator; a torn or
+   *  hostile paste costs the paste and nothing else. */
+  const importTheirDead = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const text = await Clipboard.getStringAsync();
+      if (!text || text.trim().length === 0) { setExchangeNote('Nothing on the clipboard to read.'); return; }
+      const out = await importPayloadText(text);
+      await refreshLedger();
+      const bits = [`${out.added} joined your wastes`];
+      if (out.rests > 0) bits.push(`${out.rests} put to rest elsewhere`);
+      if (out.skippedDuplicate > 0) bits.push(`${out.skippedDuplicate} already known`);
+      if (out.skippedRested > 0) bits.push(`${out.skippedRested} you already put down`);
+      if (out.unpaired > 0) bits.push(`${out.unpaired} turned away — no house you ride with`);
+      if (out.rejected > 0) bits.push(`${out.rejected} refused`);
+      setExchangeNote(out.added === 0 && out.rests === 0
+        ? `Nothing new. ${bits.join(' · ')}`
+        : `${bits.join(' · ')}.${out.arrivals.length > 0 ? ` ${out.arrivals.slice(0, 3).join(', ')}${out.arrivals.length > 3 ? '…' : ''} walk now.` : ''}`);
+    } catch {
+      setExchangeNote('That paste was not a ledger.');
+    } finally { setBusy(false); }
+  };
+
+  /** ⚠⚠ OTA-1363 — THE DOOR, AND IT IS THE ONLY ONE. Owner: *"port the feature
+   *  to Hal, but make it only visible if the characters name is Verbal or
+   *  Sasmooch."* Every other line ships the exchange to everyone; on HAL it is
+   *  a two-name panel.
+   *
+   *  ⚠ VISIBILITY, NOT MACHINERY — and that distinction is deliberate. The
+   *  engine below (the pool, the rest records, the gear faucet) stays wired for
+   *  every character, because a locked player never has a ledger to read: no
+   *  panel means no pairing means no import means `foreign` and `rests` are both
+   *  empty, and every consumer of them is already written to handle empty. Gating
+   *  the ENGINE too would have meant a second, divergent code path that only two
+   *  names ever execute — the exact shape of bug this codebase keeps paying for.
+   *  One path, one door.
+   *
+   *  ⚠ It reads the CHARACTER's name, not the house name — the house name is a
+   *  free-text field the player types, so gating on it would be gating on
+   *  nothing. */
+  const exchangeUnlocked = sharingUnlockedFor(player?.name);
 
   const canPlanRoute = !!player;
   const here = player?.currentLocationId ?? null;
@@ -329,7 +464,8 @@ export function LoreCodexBody() {
             ending is never a clean wipe: every fallen predecessor is remembered here,
             readable between runs from the title screen too. */}
         {section === 'fallen' && (
-          fallen.length === 0 ? (
+          <>
+          {fallen.length === 0 ? (
             <Text style={styles.fallenEmpty}>No one has fallen yet. Tartaria is patient.</Text>
           ) : (
             <>
@@ -354,7 +490,153 @@ export function LoreCodexBody() {
                 </View>
               ))}
             </>
-          )
+          )}
+
+          {/* ⚠⚠ OTA-1363 — THE HOLLOWED: dead imported from other houses that
+              this world has not yet put down. Named with their lineage, because
+              a corpse that travelled carries its house — "Francis child of
+              Sasmooch". They rise on quiet ground like your own dead do, and
+              the more of them stand un-rested, the likelier the wastes are to
+              give one back.
+
+              ⚠ NOT NAME-GATED, and it does not need to be: a locked character
+              can never have imported one, so this list is empty for them and
+              renders nothing at all. */}
+          {hollowed.length > 0 && (
+            <>
+              <Text style={styles.sectionHeading}>THE HOLLOWED</Text>
+              <Text style={styles.counter}>
+                {hollowed.length} walking your wastes, sent by other houses
+              </Text>
+              {hollowed.map((h, i) => (
+                <View key={`hol_${h.origin.installId}_${h.ts}_${i}`} style={[styles.entry, styles.hollowedEntry]}>
+                  <Text style={styles.name}>† {fallenTitle(h)}</Text>
+                  <Text style={styles.subtitle}>{h.raceName} • fell at {h.locationName}</Text>
+                  {!!h.epitaph && <Text style={styles.desc}>{h.epitaph}</Text>}
+                  <Text style={styles.meta}>{h.kills} foes bested • {h.hours}h in Tartaria • {h.corruption}</Text>
+                  <Text style={styles.fallenWalking}>— NEVER RECEIVED. The task is still on their lips, and they are looking for it here.</Text>
+                </View>
+              ))}
+            </>
+          )}
+
+          {/* The separate roll the owner asked for: who it was, whose it was,
+              and how it ended in YOUR world. */}
+          {rests.length > 0 && (
+            <>
+              <Text style={styles.sectionHeading}>PUT TO REST</Text>
+              <Text style={styles.counter}>{rests.length} errands finally set down</Text>
+              {rests.map((r, i) => (
+                <View key={`rest_${r.fallenKey}_${r.byInstallId}_${i}`} style={[styles.entry, styles.restEntry]}>
+                  <Text style={styles.name}>✓ {restRollLine(r)}</Text>
+                  {!!r.description && <Text style={styles.desc}>{r.description}</Text>}
+                </View>
+              ))}
+            </>
+          )}
+
+          {/* ⚠⚠ THE EXCHANGE — the one gated panel, and the only way in. No
+              pairing without it, no import without pairing, so hiding it here
+              closes the whole feature for every other character without a
+              second code path existing anywhere. Deliberately manual: a string
+              out, a string in. The automatic mailbox calls these same two
+              functions. */}
+          {exchangeUnlocked && (
+            <>
+          <Text style={styles.sectionHeading}>THE EXCHANGE</Text>
+          <Text style={styles.desc}>
+            Your dead can walk in another player&apos;s wastes, and theirs in yours. Name your house,
+            send your dead, and take in what they send back.
+          </Text>
+          <Text style={styles.meta}>YOUR HOUSE — your dead are named &quot;&lt;name&gt; child of {house || 'your house'}&quot; abroad.</Text>
+          <TextInput
+            style={styles.houseInput}
+            value={house}
+            onChangeText={setHouse}
+            onEndEditing={() => { void setHouseName(house); }}
+            onBlur={() => { void setHouseName(house); }}
+            placeholder="your house name"
+            placeholderTextColor="#7a705c"
+            maxLength={32}
+            accessibilityLabel="Your house name"
+          />
+          {/* ⚠⚠ THE HANDSHAKE, before any dead move. Validation says a payload
+              is SAFE; pairing says it is WANTED. Unpaired dead are turned away
+              at import even when they parse perfectly. */}
+          <Text style={styles.meta}>
+            {paired.length === 0
+              ? 'YOU RIDE ALONE. Send your house card, accept theirs, and your dead can cross.'
+              : `YOU RIDE WITH ${paired.length} ${paired.length === 1 ? 'HOUSE' : 'HOUSES'}`}
+          </Text>
+          {paired.map((h) => (
+            <View key={h.installId} style={styles.pairedRow}>
+              <Text style={styles.pairedName}>⚔ {h.player}</Text>
+              <TouchableOpacity onPress={() => { void cutOff(h); }} accessibilityRole="button" disabled={busy}>
+                <Text style={styles.pairedCut}>CUT OFF</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+          <View style={styles.exchangeRow}>
+            <TouchableOpacity
+              style={styles.exchangeBtn}
+              onPress={() => { void sendRequest(); }}
+              accessibilityRole="button"
+              disabled={busy}
+            >
+              <Text style={styles.exchangeBtnText}>SEND REQUEST</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.exchangeBtn}
+              onPress={() => { void acceptRequest(); }}
+              accessibilityRole="button"
+              disabled={busy}
+            >
+              <Text style={styles.exchangeBtnText}>ACCEPT REQUEST</Text>
+            </TouchableOpacity>
+          </View>
+          <TextInput
+            style={styles.houseInput}
+            value={codeIn}
+            onChangeText={setCodeIn}
+            placeholder="paste their house card (or leave blank to read the clipboard)"
+            placeholderTextColor="#7a705c"
+            maxLength={200}
+            accessibilityLabel="Their house card"
+          />
+          <View style={styles.exchangeRow}>
+            <TouchableOpacity
+              style={styles.exchangeBtn}
+              onPress={() => { void shareMyDead(); }}
+              accessibilityRole="button"
+              disabled={busy}
+            >
+              <Text style={styles.exchangeBtnText}>SEND MY DEAD</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.exchangeBtn}
+              onPress={() => { void importTheirDead(); }}
+              accessibilityRole="button"
+              disabled={busy}
+            >
+              <Text style={styles.exchangeBtnText}>TAKE IN THEIRS</Text>
+            </TouchableOpacity>
+          </View>
+          {!!exchangeNote && <Text style={styles.exchangeNote}>{exchangeNote}</Text>}
+
+          {/* ⚠⚠ THE MAILBOX — COMING SOON, and shown as such rather than hidden.
+              The delivery machinery is built and tested (fallenMailbox.ts); what
+              it lacks is somewhere to live. An address field that silently never
+              works is worse than no field, so the panel says what it will do and
+              stays out of the way until there is a box to point it at. */}
+          <Text style={styles.sectionHeading}>THE MAILBOX  ·  COMING SOON</Text>
+          <Text style={styles.desc}>
+            One day the dead will cross on their own: your phone leaves them somewhere
+            you both can reach, picks up theirs, and neither of you touches a thing.
+            That day is not today — for now they travel by hand, which works perfectly well.
+          </Text>
+            </>
+          )}
+          </>
         )}
       </ScrollView>
 
@@ -438,6 +720,24 @@ const styles = StyleSheet.create({
   entryLocked: { borderStyle: 'dashed' },
   // OTA-845 — The Fallen memorial.
   fallenEntry: { borderLeftWidth: 3, borderLeftColor: '#6a5a4a' },
+  // OTA-1363 — a foreign corpse reads colder than your own dead; a trophy reads settled.
+  hollowedEntry: { borderLeftWidth: 3, borderLeftColor: '#5a6a7a' },
+  restEntry: { borderLeftWidth: 3, borderLeftColor: '#4a6a4a' },
+  sectionHeading: { color: '#c9a86a', fontSize: 13, fontWeight: '800', letterSpacing: 2, marginTop: 18, marginBottom: 4 },
+  houseInput: {
+    marginTop: 6, borderWidth: 1, borderColor: '#6a5a4a', borderRadius: 3,
+    paddingHorizontal: 10, paddingVertical: 8, color: '#e8dcc0', fontSize: 13,
+  },
+  exchangeRow: { flexDirection: 'row', gap: 8, marginTop: 10 },
+  exchangeBtn: {
+    flex: 1, borderWidth: 1, borderColor: '#6f93c4', borderRadius: 3,
+    paddingVertical: 9, alignItems: 'center',
+  },
+  exchangeBtnText: { color: '#9ec0ef', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
+  exchangeNote: { marginTop: 8, color: '#9ec96a', fontSize: 12, fontStyle: 'italic' },
+  pairedRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 },
+  pairedName: { color: '#e8dcc0', fontSize: 13 },
+  pairedCut: { color: '#e07a5f', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   fallenEmpty: { color: '#a2977b', fontSize: 12, fontStyle: 'italic', marginTop: 8 },
   // OTA-1018 — un-avenged entries carry a live warning, amber against the memorial browns.
   fallenWalking: { color: '#d9a441', fontSize: 12, fontStyle: 'italic', marginTop: 2 },

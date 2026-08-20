@@ -25606,7 +25606,47 @@ export const useGameStore = create<GameStore>((set, get) => ({
               }
             }
           }
-          rev998.markAvenged(fr.ts, get().player?.name ?? 'a wanderer');
+          // ⚠⚠ OTA-1363 — WHOSE ROLL DOES THIS DEATH GO ON? A local corpse is
+          // marked avenged in place, as it always was. A corpse that came from
+          // another house cannot be mutated — someone else's ledger is not ours
+          // to edit, and mutation would break the union that lets two phones
+          // merge without a referee. It gets an APPEND-ONLY rest record instead,
+          // which is the separate roll the owner asked for AND the receipt that
+          // travels home to the player whose character it was.
+          {
+            const frOrigin = (fr as { origin?: { player: string; installId: string } }).origin;
+            if (frOrigin?.installId) {
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const ledgerMod = require('../engine/fallenLedger') as typeof import('../engine/fallenLedger');
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const storeMod = require('../engine/fallenLedgerStore') as typeof import('../engine/fallenLedgerStore');
+              const killer = get().player;
+              let whereRested = 'unmarked ground';
+              try { whereRested = getLocationById(killer?.currentLocationId ?? '').name ?? whereRested; } catch { /* keep default */ }
+              void storeMod.recordRest({
+                fallenKey: ledgerMod.fallenKey({ origin: frOrigin, ts: fr.ts }),
+                fallenName: fr.name,
+                fallenOriginPlayer: frOrigin.player,
+                byPlayer: storeMod.cachedHouseName() || 'an unnamed house',
+                byInstallId: storeMod.cachedInstallId(),
+                byCharacter: killer?.name ?? 'a wanderer',
+                whereRested,
+                ts: Date.now(),
+                description: closing.world,
+              }).then(() => {
+                // ⚠ A rest is the news the other houses actually want, so it is
+                // the one moment worth nudging the mailbox. Declines quietly
+                // unless auto-sync is on and the interval has passed.
+                try {
+                  // eslint-disable-next-line @typescript-eslint/no-require-imports
+                  (require('../engine/fallenMailbox') as typeof import('../engine/fallenMailbox')).maybeAutoSync();
+                } catch { /* no mailbox configured */ }
+              }).catch(() => { /* the kill still stands; the receipt retries next export */ });
+              get().appendLog('world', `The roll of the Hollowed closes on ${ledgerMod.fallenTitle({ name: fr.name, origin: frOrigin })}. Word of it will find their house.`);
+            } else {
+              rev998.markAvenged(fr.ts, get().player?.name ?? 'a wanderer');
+            }
+          }
           set((s2) => ({ worldMemory: { ...s2.worldMemory, activeRevenant: undefined } }));
           get().appendLog('debug', `revenant: ${fr.name}@${fr.ts} put to rest`);
         }
@@ -30664,14 +30704,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
             && rvProven && !rvRolled.includes(rvTileKey)) {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const rev = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
-          const rvPool = rev.cachedFallen().filter((f) => !f.avengedTs);
+          // ⚠⚠ OTA-1363 — the pool is now LOCAL DEAD + IMPORTED DEAD, and the
+          // roll climbs with it. A flat 4% against a five-player pool would have
+          // given variety without danger; the owner asked for the world to get
+          // harder as the fallen populate it, so the rate itself scales
+          // (gently: +1 point per un-rested foreign corpse, ceiling 12%).
+          const rvPool = rev.revenantPool();
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const rvLedger = require('../engine/fallenLedger') as typeof import('../engine/fallenLedger');
+          const rvForeignCount = rvPool.filter((f) => !!(f as { origin?: unknown }).origin).length;
+          const rvChance = rvLedger.revenantSpawnChance(rvForeignCount);
           if (rvPool.length > 0) {
             set((s2) => ({ worldMemory: {
               ...s2.worldMemory,
               revenantRolledTiles: [...(s2.worldMemory.revenantRolledTiles ?? []), rvTileKey].slice(-120),
             } }));
           }
-          if (rvPool.length > 0 && Math.random() < 0.04) {
+          if (rvPool.length > 0 && Math.random() < rvChance) {
             revenantBeatFired = true;
             const fr = rvPool[Math.floor(Math.random() * rvPool.length)]!;
             const foe = rev.revenantFromFallen(fr, rvPlayer.hpMax);
@@ -35578,7 +35627,7 @@ function applyHookEffect(
       }
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const rev = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
-      const pool = rev.cachedFallen().filter((f) => !f.avengedTs);
+      const pool = rev.revenantPool();
       if (pool.length === 0) {
         return { inlineSummary: 'the trail is cold — whatever walked here has been put down already', fatal: false };
       }

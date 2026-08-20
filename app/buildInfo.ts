@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.29.228';
+export const DISPLAY_VERSION = '4.29.229';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -25029,7 +25029,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The instruction was about NAMES, not content, so both stand (Asgardar 14 tiers/Cuirass,
 // Etheria 15/Crown) and ota1333 pins 5 climbs / 5 pieces against an accidental merge.
 // Twin of golem OTA-1333. DISPLAY_VERSION 4.29.197.
-export const OTA_BUILD_ID = '2026-08-20-1362-the-orderly-exit-is-marked';
+// ⚠⚠ OTA-1363 — THE SHARED ROLL LANDS ON HAL, BEHIND A NAME. Owner: *"port the
+// feature to Hal, but make it only visible if the characters name is Verbal or
+// Sasmooch."* Two houses can pair, trade their dead as text, and each other's
+// Hollowed then rise in the other's wastes. On the other three lines the panel
+// is open to everyone; here it is a two-name door, and the door is the ONLY
+// thing gated — the engine underneath runs one path for every character,
+// because a locked character can never pair, so their ledger is empty and every
+// consumer of it already handles empty. Twin of golem OTA-1362.
+export const OTA_BUILD_ID = '2026-08-20-1363-the-shared-roll-behind-a-name';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1362-the-orderly-exit-is-marked';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-19-1361-the-corner-mini-map';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-19-1360-the-map-is-the-authority';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-19-1359-the-native-queue-and-the-undercroft';
