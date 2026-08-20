@@ -152,6 +152,38 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
+/** ⚠⚠ OTA-web9 — THE MORE TRAY STAYS OPEN UNTIL THE PLAYER CLOSES IT.
+ *
+ *  Owner: *"when I hit the more button it should stay expanded until hit less."*
+ *  It did not, and nothing was closing it — `setMoreOpen` has exactly ONE caller,
+ *  the toggle itself. The tray was collapsing because the COMPONENT was being
+ *  destroyed and `useState(false)` ran again on the way back.
+ *
+ *  InputBox is the final branch of ExplorationScreen's action-slot ternary, so it
+ *  unmounts for a dice roll, a payoff, a conversation, a parley and the pickpocket
+ *  picker — and the whole screen unmounts on every trip to inventory, missions,
+ *  the map, the codex or the character sheet. Those are the most common things a
+ *  player does BETWEEN needing the tray, which is why it felt like the button
+ *  never held.
+ *
+ *  ⚠ A latch outside the component is the fix precisely BECAUSE it is outside:
+ *  the state has to outlive the thing that keeps dying. Not lifted to
+ *  ExplorationScreen (that unmounts too) and not put in the game store, because
+ *  this is a bar preference, not world state — it has no business in a save file
+ *  or a save migration.
+ *
+ *  ⚠ Session-scoped, deliberately. A cold start opens collapsed, which is the
+ *  layout every player has always seen on launch, and it keeps this to one
+ *  in-memory boolean with no key, no write, no hydration race and nothing to
+ *  flicker. "Until hit less" is honoured for as long as the app is alive; if the
+ *  owner wants it to survive a restart, that is a persisted preference and should
+ *  be argued as one.
+ *
+ *  ⚠ The tutorial's forced-open (`moreOpen || tutLock`) is untouched and does NOT
+ *  write the latch — a beat pointing at a control must not silently re-set the
+ *  player's own choice for the rest of the session. */
+let MORE_TRAY_OPEN = false;
+
 export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, pickpocketPossible, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   // arb-fix (OTA — adaptive quick row) — the out-of-combat quick row shows the
@@ -162,7 +194,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // — so discoverability holds and the layout doesn't jump as you move. During
   // the tutorial the tray is forced open so every beat can still point at its
   // control.
-  const [moreOpen, setMoreOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(MORE_TRAY_OPEN);
   // arb110 — combat bandolier popup. Resolve the racked throwable ids to live
   // inventory rows (qty > 0); tapping one hurls it via throwFromBandolier.
   const [bandolierOpen, setBandolierOpen] = useState(false);
@@ -726,7 +758,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 during the tutorial, where the tray is force-shown so the beats
                 can point at every control. */}
             {!tutLock && (
-              <QuickBtn label={moreOpen ? 'less ▴' : 'more ▾'} onPress={() => setMoreOpen((v) => !v)} />
+              <QuickBtn label={moreOpen ? 'less ▴' : 'more ▾'} onPress={() => setMoreOpen((v) => { MORE_TRAY_OPEN = !v; return !v; })} />
             )}
             {(moreOpen || tutLock) && (
               <>

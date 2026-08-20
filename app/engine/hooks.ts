@@ -34,7 +34,7 @@ export type HookKind =
   | 'sealed_vault_door'
   | 'preserved_corpse'
   | 'stranded_traveler'
-  // OTA-1004 — The Hollowed: a rumour of one of this install's fallen, walking.
+  // OTA-981 — The Hollowed: a rumour of one of this install's fallen, walking.
   // Spawner-planted only (weight 0), like stranded_traveler.
   | 'fallen_whisper'
   // OTA-418 — Tier-3: INTERIOR finds (indoors-only). Planted by the indoor
@@ -122,7 +122,7 @@ export const HOOK_PLANTS: Record<HookKind, { line: string; nouns: string[] }[]> 
     { line: 'A thread of cold air leaks from somewhere behind the rubble.', nouns: ['cold', 'air', 'draft', 'breeze'] },
   ],
   resonance: [
-    // OTA-1048 — pool widened 2 → 5 (and the hardcoded compass direction cut): with
+    // OTA-1025 — pool widened 2 → 5 (and the hardcoded compass direction cut): with
     // only two lines this hook repeated verbatim often enough that the owner
     // called it overused even before the weight cut.
     { line: 'A faint resonance pulses from somewhere close. Something there is awake.', nouns: ['resonance', 'pulse', 'hum', 'vibration'] },
@@ -187,13 +187,13 @@ export const HOOK_PLANTS: Record<HookKind, { line: string; nouns: string[] }[]> 
   preserved_corpse: [
     { line: 'A Tartarian body lies in the silt, the mud-glass having frozen them at the moment they fell — robes still pristine, satchel still buckled.', nouns: ['body', 'corpse', 'robes', 'satchel', 'tartarian'] },
   ],
-  // OTA-988 — HOOK ESCORT. Planted only by the stepDirection spawner (weight 0),
+  // OTA-965 — HOOK ESCORT. Planted only by the stepDirection spawner (weight 0),
   // never by the random picker: a stranded traveler offers a field escort.
   stranded_traveler: [
     { line: 'Someone is sitting on their pack at the edge of the path — no party, no fire, and a long way from anywhere. They stand when they see you.',
       nouns: ['traveler', 'traveller', 'stranger', 'stranded', 'figure', 'person', 'walker'] },
   ],
-  // OTA-1004 — THE HOLLOWED rumour. Planted only by the stepDirection spawner
+  // OTA-981 — THE HOLLOWED rumour. Planted only by the stepDirection spawner
   // (weight 0): a trail sign that one of the install's fallen is walking.
   fallen_whisper: [
     { line: 'Someone has driven a broken blade into the mud at the verge, hilt up, the way the road-people mark a killing. A strip of cloth is knotted around the guard — a warband colour, faded, and far too well-kept to have been left long.',
@@ -266,7 +266,7 @@ export type HookEffect =
   | { type: 'grant_tc'; amount: number }
   | { type: 'grant_item'; name: string }
   | { type: 'spawn_enemy_tag'; tag: string }
-  // OTA-1109 — spawn a NAMED enemy. For hooks whose narration promises a
+  // OTA-1086 — spawn a NAMED enemy. For hooks whose narration promises a
   // specific creature: mud_golem_stir narrated "a hulking shape of stone and
   // silt … The Golem turns toward your scent" and then spawn_enemy_tag
   // 'Construct' rolled an Aetheric Scarab (owner's log). When the prose
@@ -293,11 +293,11 @@ export type HookEffect =
   // pool and routes through grantQuestHook so the entry lands in
   // player.activeQuests with the canonical arbiter narration.
   | { type: 'grant_random_quest_hook'; pool: 'hunt' | 'mystery' | 'any' }
-  // OTA-988 — HOOK ESCORT: start a faction escort contract from the wild, no
+  // OTA-965 — HOOK ESCORT: start a faction escort contract from the wild, no
   // vendor. Resolves a rep-0 `_stranded_escort` def the player doesn't already
   // hold, spawns the shared pool, pushes the activeFactionQuests record.
   | { type: 'start_escort_contract'; idSuffix: string }
-  // OTA-1004 — THE HOLLOWED: call one of this install's un-avenged fallen out of
+  // OTA-981 — THE HOLLOWED: call one of this install's un-avenged fallen out of
   // the mud as a revenant BOSS in the current scene. Empty pool = cold trail.
   | { type: 'spawn_fallen_revenant' };
 
@@ -595,7 +595,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     {
       line: 'The Golem turns toward your scent. It has decided.',
       arbiterLine: '"Aether Golems do not negotiate," the Arbiter says.',
-      // OTA-1109 — the narration names a golem, so a golem is what stands up.
+      // OTA-1086 — the narration names a golem, so a golem is what stands up.
       effects: [{ type: 'spawn_enemy_name', name: 'Mud Golem' }],
       done: true,
     },
@@ -824,7 +824,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       done: true,
     },
   ],
-  // OTA-988 — HOOK ESCORT chain: beat 1 is the offer (CONTINUE accepts, ABANDON
+  // OTA-965 — HOOK ESCORT chain: beat 1 is the offer (CONTINUE accepts, ABANDON
   // declines via the existing hook modal); beat 2 takes the contract.
   stranded_traveler: [
     {
@@ -840,7 +840,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       done: true,
     },
   ],
-  // OTA-1004 — THE HOLLOWED rumour chain. Beat 1 reads the marker and names what
+  // OTA-981 — THE HOLLOWED rumour chain. Beat 1 reads the marker and names what
   // it means; beat 2 is the answer walking out of the mud. Two beats so a
   // player who wants no part of it can ABANDON at the sign.
   fallen_whisper: [
@@ -1020,7 +1020,7 @@ export const HOOK_WEIGHTS: Record<HookKind, number> = {
   glint: 10,
   handprint: 6,
   thread: 8,
-  resonance: 2, // OTA-1048 — was 5; the owner called it overused, and with the smallest line pool it repeated hardest
+  resonance: 2, // OTA-1025 — was 5; the owner called it overused, and with the smallest line pool it repeated hardest
   half_buried_spire: 8,
   etheric_storm: 5,
   pulsing_mud: 9,
@@ -1039,8 +1039,8 @@ export const HOOK_WEIGHTS: Record<HookKind, number> = {
   aether_grid_hum: 6,
   sealed_vault_door: 3, // mostly chained
   preserved_corpse: 6,
-  stranded_traveler: 0, // OTA-988 — spawner-planted only, never randomly drawn
-  fallen_whisper: 0, // OTA-1004 — The Hollowed: spawner-planted only
+  fallen_whisper: 0, // OTA-981 — The Hollowed: spawner-planted only
+  stranded_traveler: 0, // OTA-965 — spawner-planted only, never randomly drawn
 
   // OTA-418 — interior weights (only ever drawn by the INDOOR picker below).
   loose_floorboard: 8,

@@ -10623,7 +10623,7 @@
 // OTA-1186 both shipped without bumping this (or OTA_BUILD_ID); the rule is PATCH
 // +1 PER OTA, so catching up is three, not one. See the gap note beside
 // OTA_BUILD_ID before reading any device log stamped 1184.
-export const DISPLAY_VERSION = '4.30.6';
+export const DISPLAY_VERSION = '4.30.10';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -25029,7 +25029,54 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The instruction was about NAMES, not content, so both stand (Asgardar 14 tiers/Cuirass,
 // Etheria 15/Crown) and ota1333 pins 5 climbs / 5 pieces against an accidental merge.
 // Twin of golem OTA-1333. DISPLAY_VERSION 4.29.197.
-export const OTA_BUILD_ID = '2026-08-20-web7-the-orderly-exit-is-marked';
+// ⚠⚠ OTA-web8 — A CLEARED ROOM STAYS CLEARED. Owner: *"once i've cleared a room
+// in an outpost and go back into it why does the take/salvage repopulate but just
+// one item?"* Because a room's gear is a seeded stream post-filtered against a
+// 10-deep ROLLING window of recently-spawned names — and hiding a pick is
+// temporary while taking one is permanent. A piece the window masked on arrival
+// was never offered, never consumed, and surfaced alone on the next visit. One
+// item, because a room holds 1–3; in both TAKE and SALVAGE, because most gear
+// names also carry the salvageable tag. The room's post-window list is now
+// stamped as its roster on the first roll and read back on every later visit, so
+// the mask is permanent and the window is only ever consulted on first sight.
+// ⚠⚠ OTA-web9 — THE MORE TRAY STAYS OPEN UNTIL THE PLAYER CLOSES IT. Owner:
+// *"when I hit the more button it should stay expanded until hit less."* Nothing
+// was closing it — `setMoreOpen` has exactly ONE caller, the toggle itself. The
+// tray collapsed because the COMPONENT was destroyed and `useState(false)` ran
+// again on the way back: InputBox is the last branch of ExplorationScreen's
+// action-slot ternary (a dice roll, payoff, conversation, parley or pickpocket
+// picker replaces it outright), and the whole screen unmounts on every trip to
+// inventory, missions, the map, the codex or the character sheet. A module-scope
+// latch outside the component holds the choice for the session.
+// ⚠⚠ OTA-web10 — CRASH REPORTING (staged: capture now, delivery behind a DSN and
+// an opt-in that is OFF by default), plus STEP 2 of the four-line collapse (the
+// three real drifts the census found) and STEP 3 (the intentional differences
+// become app/config/features.ts). Twin of golem OTA-1380 / 1381 / 1382.
+// ⚠⚠ OTA-web11 — THE LINES CONVERGE. Owner: *"have steam and html match Hal and
+// golem and the rest non vignette or texture."* The census now reports 5-7 real
+// differences per pair, down from 1,053 raw paths this morning, and every one is
+// accounted for: app.json (channel/runtime/name), features.ts (the product
+// flag), splashArt.web.ts + the PC asset on the PC lines, and App.tsx's
+// `Platform.OS !== 'web'` parchment/vignette branch — the owner's named
+// exception. Everything else is comment prose.
+//
+// Closed here: the payloadBox colour (two hex digits apart, invisible, and
+// exactly how "why does the PC build look different" starts), a VendorScreen
+// import position, and three data files where only prose or ORDER differed —
+// ⚠ including concepts.json, where all 178 entries matched but `hollowed` sat at
+// index 50 on golem and LAST on HAL, so the live channel listed the codex in a
+// different order. The census had filed that as whitespace; it was not.
+//
+// ⚠ THE DOG FLAG IS NOW DECLARED UNDER BOTH NAMES ON EVERY LINE.
+// `dogRevivedOta915` (golem, steam) and `dogRevivedOta938` (HAL, html) name the
+// SAME latch, written into player saves under two keys. Renaming either orphans
+// data on disk — which is why HAL's ledger refused to copy it. Declaring both
+// converges the type without touching a single save.
+export const OTA_BUILD_ID = '2026-08-20-web11-the-lines-converge';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-web10-one-file-of-difference';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-web9-the-more-tray-holds';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-web8-a-cleared-room-stays-cleared';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-web7-the-orderly-exit-is-marked';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-web6-beasts-first-and-the-corner-taught';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-19-web5-the-anchor-knows-where-the-box-is';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-19-web4-the-corner-mini-map';

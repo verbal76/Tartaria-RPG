@@ -35,7 +35,8 @@ import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../e
 import { isGreatClimbLocationLocked, SUMMIT_BOSS_BASES } from '../engine/greatClimbs';
 import { loadFallen, type FallenHero } from '../engine/saveSystem';
 import * as Clipboard from 'expo-clipboard';
-import { fallenTitle, restRollLine, type ForeignFallen, type RestRecord, type PairedHouse } from '../engine/fallenLedger';
+import { fallenTitle, restRollLine, sharingUnlockedFor, type ForeignFallen, type RestRecord, type PairedHouse } from '../engine/fallenLedger';
+import { FEATURES } from '../config/features';
 import {
   loadLedger, loadHouseName, setHouseName, buildExportPayload, importPayloadText,
   myHouseCode, acceptHouseCode, revokeHouse, loadPaired,
@@ -273,6 +274,13 @@ export function LoreCodexBody() {
       setExchangeNote('That paste was not a ledger.');
     } finally { setBusy(false); }
   };
+
+  /** ⚠ OTA-web10 — one expression, four products. `'open'` short-circuits, so the
+   *  name check only ever runs on a gated build. It reads the CHARACTER's name,
+   *  never the house name — the house name is typed INTO the gated panel, so
+   *  gating on it would be a lock whose key is behind itself. */
+  const exchangeUnlocked =
+    FEATURES.fallenSharing === 'open' || sharingUnlockedFor(player?.name);
 
   const canPlanRoute = !!player;
   const here = player?.currentLocationId ?? null;
@@ -528,8 +536,22 @@ export function LoreCodexBody() {
             </>
           )}
 
-          {/* THE EXCHANGE. Deliberately manual for now: a string out, a string
-              in. The automatic mailbox calls these same two functions. */}
+          {/* ⚠⚠ OTA-web10 — THE EXCHANGE, BEHIND THE ONE PRODUCT FLAG.
+              `FEATURES.fallenSharing` is 'open' here and 'gated' on HAL, and that
+              constant is now the ONLY difference between the four lines' copies
+              of this file. Before this, HAL carried a hand-ported gate and the
+              other three carried none — the same decision expressed as a branch
+              difference, which is what made it indistinguishable from drift.
+
+              ⚠ VISIBILITY ONLY. The engine below runs identically for every
+              character on every product: a locked character never pairs, so
+              never imports, so their ledger is empty and every consumer of it
+              already handles empty.
+
+              Deliberately manual for now: a string out, a string in. The
+              automatic mailbox calls these same two functions. */}
+          {exchangeUnlocked && (
+            <>
           <Text style={styles.sectionHeading}>THE EXCHANGE</Text>
           <Text style={styles.desc}>
             Your dead can walk in another player&apos;s wastes, and theirs in yours. Name your house,
@@ -645,6 +667,8 @@ export function LoreCodexBody() {
             you both can reach, picks up theirs, and neither of you touches a thing.
             That day is not today — for now they travel by hand, which works perfectly well.
           </Text>
+            </>
+          )}
           </>
         )}
       </ScrollView>
@@ -748,7 +772,7 @@ const styles = StyleSheet.create({
   exchangeNote: { marginTop: 8, color: '#9ec96a', fontSize: 12, fontStyle: 'italic' },
   payloadBox: {
     marginTop: 8, borderWidth: 1, borderColor: '#6a5a4a', borderRadius: 3,
-    paddingHorizontal: 8, paddingVertical: 6, color: '#cbbf9f', fontSize: 10,
+    paddingHorizontal: 8, paddingVertical: 6, color: '#c9bda0', fontSize: 10,
     minHeight: 64, maxHeight: 120, textAlignVertical: 'top',
   },
   pairedRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 },

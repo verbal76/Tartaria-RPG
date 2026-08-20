@@ -34,6 +34,9 @@ import {
 } from '../engine/saveSystem';
 import { BugReportModal } from '../components/BugReportModal';
 import { composeAndSendBugReport } from '../diagnostics/bugReport';
+import {
+  loadReportingPref, setReportingEnabled, reportingStatusLine, reportingConfigured,
+} from '../diagnostics/crashReporter';
 import { getAudioSettings, setAudioSettings, onAudioSettingsChange, type AudioSettings } from '../audio/audioSettings';
 import { forceReapplyAudioFromState } from '../audio/AudioController';
 import {
@@ -134,6 +137,20 @@ export function AboutScreen() {
   // COPY INVENTORY) hide behind this toggle. (COPY AI HEALTH was removed — its
   // output is already inside COPY LOG / REPORT A BUG's device summary.)
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  // ⚠ OTA-web10 — the crash-delivery opt-in.
+  const crashConfigured = reportingConfigured();
+  const [crashOptIn, setCrashOptIn] = useState(false);
+  const [reportingStatus, setReportingStatus] = useState(reportingStatusLine());
+  useEffect(() => {
+    let live = true;
+    void loadReportingPref().then((on) => {
+      if (!live) return;
+      setCrashOptIn(on);
+      setReportingStatus(reportingStatusLine());
+    });
+    return () => { live = false; };
+  }, []);
+
   // OTA-341 — COPY SAVE: export the loadable save state for brick repro.
   const [saveCopied, setSaveCopied] = useState(false);
   const [saveCharCount, setSaveCharCount] = useState(0);
@@ -880,6 +897,46 @@ export function AboutScreen() {
           >
             <Text style={styles.sessionBtnPrimaryText}>REPORT A BUG</Text>
           </TouchableOpacity>
+          {/* ⚠⚠ OTA-web10 — AUTOMATIC CRASH REPORTS. OFF BY DEFAULT, and that is
+              the owner's explicit ruling, not a placeholder. This is an
+              offline-first game with on-device AI; a fair number of people
+              chose it partly BECAUSE nothing phones home, and shipping opt-out
+              would trade that for crash volume.
+
+              ⚠ The row states what this BUILD can actually do, not what the
+              feature will eventually do. No transport is installed and no
+              destination is configured yet (Sentry is a native module — it
+              needs a store build, not an OTA), so the toggle is shown disabled
+              with the reason spelled out. A live-looking switch that silently
+              cannot deliver is how a player concludes their reports are being
+              received when nothing is being sent. */}
+          <View style={styles.crashOptRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.crashOptTitle}>AUTOMATIC CRASH REPORTS</Text>
+              <Text style={styles.crashOptBody}>{reportingStatus}</Text>
+              <Text style={styles.crashOptBody}>
+                Crashes are always recorded ON THIS DEVICE either way — REPORT A BUG sends them
+                only when you choose to.
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={[styles.crashOptBtn, crashOptIn && styles.crashOptBtnOn,
+                      !crashConfigured && styles.crashOptBtnDead]}
+              onPress={() => {
+                const next = !crashOptIn;
+                setCrashOptIn(next);
+                void setReportingEnabled(next).then(() => setReportingStatus(reportingStatusLine()));
+              }}
+              activeOpacity={0.7}
+              accessibilityRole="switch"
+              accessibilityState={{ checked: crashOptIn, disabled: !crashConfigured }}
+              disabled={!crashConfigured}
+            >
+              <Text style={[styles.crashOptBtnText, crashOptIn && styles.crashOptBtnTextOn]}>
+                {crashOptIn ? 'ON' : 'OFF'}
+              </Text>
+            </TouchableOpacity>
+          </View>
           {/* arb172 — rarely-needed clipboard dumps tucked behind a toggle so the
               page isn't a wall of COPY buttons. COPY SAVE = the loadable save for
               brick-repro; COPY INVENTORY = the pack snapshot for balance reports. */}
@@ -1688,6 +1745,23 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: 3,
   },
+  // OTA-web10 — the crash-delivery opt-in row.
+  crashOptRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12,
+    borderWidth: 1, borderColor: '#4a4136', borderRadius: 3, padding: 10,
+  },
+  crashOptTitle: { color: '#c9a86a', fontSize: 11, fontWeight: '800', letterSpacing: 2 },
+  crashOptBody: { color: '#a2977b', fontSize: 11, lineHeight: 16, marginTop: 4 },
+  crashOptBtn: {
+    borderWidth: 1, borderColor: '#6f93c4', borderRadius: 3,
+    paddingVertical: 8, paddingHorizontal: 14, minWidth: 62, alignItems: 'center',
+  },
+  crashOptBtnOn: { backgroundColor: '#123a3a', borderColor: '#7ef0dd' },
+  // ⚠ Dashed + muted when the build cannot deliver, matching the codex's
+  // locked-row language rather than dimming the whole row's contrast.
+  crashOptBtnDead: { borderStyle: 'dashed', borderColor: '#5a5245' },
+  crashOptBtnText: { color: '#9ec0ef', fontSize: 12, fontWeight: '800', letterSpacing: 2 },
+  crashOptBtnTextOn: { color: '#c7fff4' },
   // Failed-save flash on the SAVE button — red so a silent save failure is loud
   // (bright enough that the dark primary text still reads on it).
   sessionBtnDanger: {

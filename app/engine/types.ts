@@ -1529,6 +1529,18 @@ export interface PlayerCharacter {
    *  once ever. A dog lost AFTER this OTA stays lost (death mechanic intact going forward). */
   /** @deprecated OTA-949 — the one-time dog-revive migration was retired; this flag is now
    *  inert (kept for save/test back-compat only; nothing reads it). */
+  /** ⚠⚠ OTA-web11 — BOTH NAMES ARE DECLARED, ON EVERY LINE, and that is the
+   *  point. This one latch was written into player saves under TWO keys:
+   *  `dogRevivedOta915` on the golem and steam lines, `dogRevivedOta938` on
+   *  HAL and html. The split was deliberate — HAL's ledger records it was
+   *  *"caught and NOT copied: a PERSISTED field"* — because renaming a key
+   *  already on disk orphans it.
+   *
+   *  So the fix is not to pick one. Declaring both converges the TYPE across
+   *  all four products while leaving every existing save readable, and any
+   *  future reader must accept either. Inert today: the dog loads as saved
+   *  since OTA-938 and nothing reads these. */
+  dogRevivedOta915?: boolean;
   dogRevivedOta938?: boolean;
   /** OTA-941 — latches the one-time owner Mud Siren rematch (refund + re-stage) so it fires once. */
   /** @deprecated OTA-948 — the rematch was reverted and its load-path wiring removed; this
@@ -2357,6 +2369,23 @@ export interface VisitedRoom {
    *  seq, so the building can't be farmed in place. Lazily stamped on the
    *  first re-entry observing a non-empty consumed set. */
   clearedAtMacroSeq?: number;
+  /** ⚠⚠ OTA-web8 — THE GEAR THIS ROOM HOLDS, DECIDED ONCE.
+   *
+   *  `pickTakeableGearForScene` draws a room's gear from a stream seeded by the
+   *  room key, then post-filters it against `recentTakeableGearNames` — a
+   *  10-deep ROLLING window whose job is stopping adjacent rooms from offering
+   *  identical loot. OTA-991 wrote the rule down: *"the window can hide a pick,
+   *  never substitute one."* Hiding is right on first sight. The defect is that
+   *  hiding was TEMPORARY and taking is PERMANENT, so a piece the window masked
+   *  on arrival was never consumed, and surfaced alone the next time the player
+   *  walked back in — the "I cleared this room and one item came back" report.
+   *
+   *  Stamping the post-window list here makes the mask permanent: what the room
+   *  offered on first sight is what the room holds, forever. Reads apply the
+   *  consumed filter on top, so a cleared room stays cleared, and the roster is
+   *  deliberately NOT wiped by the macro-visit restock — a restocked room puts
+   *  its own goods back out rather than rolling a fresh lottery. */
+  gearRoster?: string[];
   /** 2026-05-26 OTA-071 — per-room investigation table. Seeded
    *  on first scene generation from ambientNouns. Each entry
    *  has a category, curated/Qwen lore, optional yield, hook
