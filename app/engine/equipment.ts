@@ -11,6 +11,18 @@ import { resolveDisplayArmorByName } from './itemResolution';
  * Return the list of slots an item could legally be equipped into.
  * Empty array = the item can't be equipped at all.
  */
+/** ⚠ OTA-1408 — tags that mean "this is not gear, whatever it is called". The
+ *  name-based equip fallback further down is deliberately generous — the owner's
+ *  rule was *"anything that LOOKS equippable should BE equippable"* — and that
+ *  generosity is exactly why it needs a list of things it must never touch. */
+const NEVER_EQUIPPABLE_TAGS = new Set([
+  // paper: charts, notes, journal leaves, recipes, the collectables ledger
+  'chart', 'map', 'document', 'note', 'page', 'journal', 'letter', 'book',
+  'recipe', 'lore', 'collectable', 'collectible',
+  // things kept rather than used
+  'keepsake', 'currency', 'trophy',
+]);
+
 export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   const nameLower = item.name.toLowerCase();
   // OTA-120 Phase 5 — dog vests have kind 'dog_armor' and never go in
@@ -37,6 +49,39 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
     if (u.kind === 'armor' && u.armorSlot) return [u.armorSlot];
     if (u.kind === 'dog_armor') return [];
   }
+  // ⚠⚠ OTA-1408 — WHAT AN ITEM SAYS IT IS BEATS WHAT ITS NAME SOUNDS LIKE, and
+  // this sits ABOVE every name-based lookup because name inference happens in
+  // three separate layers below, not one.
+  //
+  // From the owner's 4.31.5 pack: five identical Skyreacher charts, and the fifth
+  // — `Skyreacher Map 5 of 5 — Zharak Fang` — offered `equip:main / equip:off`.
+  // Zharak Fang is a mountain; the equip fallback at the bottom of this function
+  // matches `\bfang\b`. Maps 1-4 name towers and spires, so the defect could only
+  // ever show on one row out of five.
+  //
+  // ⚠⚠ AND IT IS NOT ONE REGEX. Probing the fix turned up two more layers doing
+  // the same inference EARLIER: `findWeaponByName` / `findArmorByName` match
+  // fuzzily (a document titled "The Black Cloak Confessions" resolves to cloak
+  // ARMOUR), and `canonicalItemTags` invents tags from names outright — "Serpent
+  // Fang Trophy" comes back tagged `weapon, natural, melee, improvised`. A guard
+  // placed after the catalog lookups fixed the chart and missed both. So it goes
+  // here, ahead of all of them.
+  //
+  // ⚠ THIS IS THE MATERIALS TRAP BELOW, GENERALISED. That guard exists because
+  // "Sentinel Core Plate" matched the ARMOR regex and got routed to the chest
+  // slot, and its comment predicts this exactly: *"same trap for any future
+  // material whose name happens to contain helm / boot / blade tokens."* Right
+  // about the trap, too narrow about the class — the class is everything that
+  // already declares what it is. It is left in place: a material with no telling
+  // tag still needs it.
+  //
+  // ⚠ `uniqueStats` is deliberately checked ABOVE this: a fused piece's name is
+  // synthesised and catalog-absent (OTA-224), so it must route off its own stats
+  // before any tag is consulted.
+  //
+  // ⚠ Verified against every catalog file when this shipped: zero weapons or
+  // armour carry any of these tags, so this cannot cost a real item its slot.
+  if (item.tags.some((t) => NEVER_EQUIPPABLE_TAGS.has(t.toLowerCase()))) return [];
   if (findWeaponByName(item.name)) {
     return ['main', 'off']; // any weapon can go in either hand
   }
