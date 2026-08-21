@@ -256,7 +256,15 @@ describe('OTA-1123 — the wiring, and the first homework job', () => {
     expect(tel).toContain('const yielded = j.preempted > 0');
     expect(tel).toContain('${bad}${yielded}');
     // It is composed OUTSIDE `bad`, which is where ∅ / 💀 / err live.
-    const bad = tel.slice(tel.indexOf('const bad = ('), tel.indexOf('const split ='));
+    // ⚠ OTA-1406 — COMMENTS STRIPPED FIRST. This window is source text, and
+    // OTA-1406 added a comment inside it that explains why a job whose calls were
+    // all PREEMPTED has no honest decode average. The assertion is about what the
+    // CODE composes, and it was failing on the word appearing in an explanation of
+    // itself — the same self-match trap this repo has now hit four times. An
+    // assertion that forbids a word also forbids explaining it.
+    const codeOnly = (x: string) =>
+      x.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    const bad = codeOnly(tel.slice(tel.indexOf('const bad = ('), tel.indexOf('const readPart =')));
     expect(bad).not.toContain('preempted');
   });
 

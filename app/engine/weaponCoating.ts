@@ -69,6 +69,44 @@ export function isCoatableItem(item: Pick<InventoryItem, 'name' | 'kind' | 'uniq
   return isCoatableWeapon(item.name);
 }
 
+/**
+ * ⚠⚠ OTA-1407 — WHY THIS WEAPON CANNOT TAKE A COATING, in words, or null if it
+ * can. Returns a reason the PLAYER can act on, not a rule id.
+ *
+ * From the owner, playing 4.31.5: *"I can't apply coatings to my off hand
+ * weapon."* He was right that it did not work and wrong about why, and the game
+ * is the reason he was wrong. His off hand held a Force Wave — a RUNECASTER,
+ * refused by `isCoatableWeapon` because a shaped force wave has no edge for the
+ * substance to sit on. His off hand was never the problem: the Bolt-Caster in
+ * the same pack is coatable and equips to either hand.
+ *
+ * ⚠⚠ THE RULE WAS ENFORCED BY OMISSION. The picker filtered the pack to coatable
+ * weapons and listed those; the Force Wave simply was not there, with nothing
+ * said. A player cannot tell "this weapon is excluded" from "this picker is
+ * broken" — so he generalised from the one weapon he tried to the whole off
+ * hand, and filed a bug about a rule that does not exist.
+ *
+ * ⚠ FOURTH TIME IN ONE SESSION. OTA-1402 (a contract refusal drawn off-screen),
+ * OTA-1405 (a tutorial refusal drawn behind its own popup), OTA-1405 again (a
+ * cancelled load reported as a failure) and now this. The shape is always the
+ * same: **the game knows, and does not say.** A rule the player cannot read is
+ * indistinguishable from a bug, and it costs a bug report every time.
+ */
+export function coatingRefusalFor(
+  item: Pick<InventoryItem, 'name' | 'kind' | 'uniqueStats' | 'tags'>,
+): string | null {
+  if (isCoatableItem(item)) return null;
+  const w = findWeaponByName(item.name);
+  if (!w) return 'not a weapon a coating can sit on';
+  if (w.weaponKind === 'runecaster') {
+    return 'a rune-caster shapes raw force — there is no edge or point for the coating to ride';
+  }
+  if (w.weaponKind === 'melee') {
+    return `${w.damageType} does its work without a surface to paint — coatings need a blade, a point or a hammer-face`;
+  }
+  return 'an energy weapon fires nothing solid to carry the coating — a bolt or an arrow can, a beam cannot';
+}
+
 /** The player-facing name for an item, prefixed with the coating
  *  adjective(s) when one is applied ("Corrupted Battle Axe"). OTA-873 — a
  *  dual-coat weapon shows BOTH adjectives ("Corrupted Venomous Battle Axe").

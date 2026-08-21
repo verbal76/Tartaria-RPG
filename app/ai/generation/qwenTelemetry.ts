@@ -125,9 +125,12 @@ interface JobAggregate {
   discarded: number;
   /** Milliseconds burned on those calls — the honest waste number. */
   discardedMs: number;
-  /** ⚠ OTA-1405 — calls whose native read/write split was physically possible,
-   *  and therefore the only ones `avgPrefillMs` / `avgDecodeMs` speak for. */
-  timingSamples: number;
+  /** ⚠ OTA-1406 — SEPARATE COUNTS, because prefill and decode are measured on
+   *  different records. A preempted call contributes a complete prefill and a
+   *  truncated decode; one shared counter could only ever be right for one of
+   *  them, and was wrong for both. */
+  prefillAvgSamples: number;
+  decodeAvgSamples: number;
   /** ⚠ OTA-1405 — calls that reported a split we refused. Surfaced in the
    *  summary so a rollup built on half the session says so out loud. */
   timingsRejected: number;
@@ -170,6 +173,86 @@ export function qwenTimingsArePossible(r: {
   return (r.prefillMs ?? 0) + (r.decodeMs ?? 0) <= r.totalMs;
 }
 
+/**
+ * ⚠⚠ OTA-1406 — POSSIBLE IS NOT THE SAME AS MEASURED, and asking one question
+ * for both is what let two more classes of garbage into numbers already
+ * "guarded".
+ *
+ * `qwenTimingsArePossible` answers a physics question: could these numbers
+ * describe this call at all? It cannot answer whether they describe anything.
+ * Two records pass it and mean nothing:
+ *
+ *   · A DORMANT call. OTA-1119 named this exact record — `empty 8809ms read 0ms/
+ *     write 0ms in 309t→out 0t`, 8.8 seconds of wall time against a context that
+ *     had already been detached. `0 + 0 <= 8809` is true, so the physics check
+ *     waves it through; the zero then drags every average toward zero AND sets
+ *     the BEST end of the ms/tok range to 0.0. Measured, one real 11.0 ms/tok
+ *     call plus one dormant record printed `ms/tok 0.0-11.0` and halved
+ *     `avgPrefillMs` from 3400 to 1700.
+ *
+ *   · An ERROR call. Same shape, same reason: nothing came back.
+ *
+ * ⚠⚠ AND PREFILL AND DECODE DO NOT SHARE PHYSICS, which is the variance the
+ * single yes/no was hiding. `stopCompletion()` is polled in llama.cpp's DECODE
+ * loop — this repo established that twice from two device logs (the intro-fill
+ * preempt analysis, and the `item_synthesis preempted 3565ms in 328t→out 0t` row
+ * where all 3565ms was prefill). So on a preempted call:
+ *
+ *   · PREFILL COMPLETED. It runs to the end before a single token is emitted, so
+ *     it is a whole, honest measurement — and the ms/tok range was throwing it
+ *     away, which is why `prefillSamples` came back 0 for exactly the calls the
+ *     HANDOFF was using to reason about prefill cost.
+ *   · DECODE WAS CUT SHORT. Averaging it says generation is fast when it was
+ *     interrupted — and the same record was being averaged in, unfiltered.
+ *
+ * One record, two verdicts, and the old code had BOTH backwards: the range
+ * refused a prefill that was real, the average accepted a decode that was not.
+ */
+function nativeSideRan(outcome: QwenCallOutcome): boolean {
+  return outcome !== 'dormant' && outcome !== 'error';
+}
+
+/** Is this record's PREFILL a real measurement? Preempted calls COUNT — see above.
+ *
+ *  ⚠⚠ OTA-1407 — AND A ZERO PREFILL AGAINST EVALUATED TOKENS DOES NOT. Found in
+ *  the owner's 4.31.5 play log, which the OTA-1406 audit had not seen:
+ *
+ *    qwen⏱ narration:scene_intro_fill preempted 5681ms read 0ms/write 0ms
+ *          in 792t→out 0t 0.0ms/t (0ch)
+ *
+ *  792 prompt tokens evaluated in zero milliseconds is not a fast read, it is a
+ *  read that never happened — OTA-1368's door abort refuses the job after the
+ *  lock is won and before the native call, and llama.rn hands back a zeroed
+ *  timings block. The physics check passes it (`0 + 0 <= 5681`), `nativeSideRan`
+ *  passes it (a preempt is not a dormancy), and it would then have pinned the
+ *  BEST end of the ms/tok range to 0.0 — the exact poisoning OTA-1406 had just
+ *  removed for dormant calls, arriving through a second door.
+ *
+ *  ⚠ `promptTokens` is llama.cpp's `tokens_evaluated`, so a genuinely cached
+ *  prompt reports ~0 tokens AND ~0 ms and is correctly excluded by the caller's
+ *  own `promptTokens > 0` gate rather than by this one. Tokens evaluated with no
+ *  time spent is the contradiction; tokens NOT evaluated is just a cache hit. */
+export function qwenPrefillIsMeasured(r: {
+  prefillMs?: number; decodeMs?: number; totalMs: number;
+  promptTokens?: number; outcome: QwenCallOutcome;
+}): boolean {
+  if (typeof r.prefillMs !== 'number') return false;
+  if (!qwenTimingsArePossible(r)) return false;
+  if (!nativeSideRan(r.outcome)) return false;
+  if (r.prefillMs === 0 && (r.promptTokens ?? 0) > 0) return false;
+  return true;
+}
+
+/** Is this record's DECODE a real measurement? Preempted calls do NOT count. */
+export function qwenDecodeIsMeasured(r: {
+  prefillMs?: number; decodeMs?: number; totalMs: number; outcome: QwenCallOutcome;
+}): boolean {
+  return typeof r.decodeMs === 'number'
+    && qwenTimingsArePossible(r)
+    && nativeSideRan(r.outcome)
+    && r.outcome !== 'preempted';
+}
+
 const jobs = new Map<string, JobAggregate>();
 let callCount = 0;
 let sink: ((r: QwenCallRecord) => void) | null = null;
@@ -192,7 +275,7 @@ function emptyAggregate(): JobAggregate {
     reusedTokens: 0, cacheSamples: 0,
     bestMsPerPromptTok: Infinity, worstMsPerPromptTok: 0, prefillSamples: 0,
     hitLimit: 0, discarded: 0, discardedMs: 0,
-    timingSamples: 0, timingsRejected: 0,
+    prefillAvgSamples: 0, decodeAvgSamples: 0, timingsRejected: 0,
   };
 }
 
@@ -229,14 +312,18 @@ export function recordQwenCall(r: QwenCallRecord): void {
   // summed them straight into `avgPrefillMs`. One rollup, two standards of
   // evidence — and the average is the number a reader trusts first, because it
   // has no visible spread to make them suspicious.
-  if (qwenTimingsArePossible(r)) {
-    agg.prefillMs += r.prefillMs ?? 0;
-    agg.decodeMs += r.decodeMs ?? 0;
-    agg.timingSamples += 1;
-  } else if (r.prefillMs != null || r.decodeMs != null) {
-    // ⚠ COUNTED, NOT QUIETLY DROPPED. A rollup that silently discards samples
-    // reads as "this is what the session did"; this one can say how much of the
-    // session it is actually speaking for.
+  // ⚠⚠ OTA-1406 — ASKED PER HALF. See `qwenPrefillIsMeasured` for why one
+  // question could not answer for both.
+  const usedPrefill = qwenPrefillIsMeasured(r);
+  const usedDecode = qwenDecodeIsMeasured(r);
+  if (usedPrefill) { agg.prefillMs += r.prefillMs ?? 0; agg.prefillAvgSamples += 1; }
+  if (usedDecode) { agg.decodeMs += r.decodeMs ?? 0; agg.decodeAvgSamples += 1; }
+  // ⚠ COUNTED, NOT QUIETLY DROPPED. A rollup that silently discards samples
+  // reads as "this is what the session did"; this one can say how much of the
+  // session it is actually speaking for. A record that contributed to NEITHER
+  // half is rejected; one that contributed only its prefill (a preempt) is not —
+  // that is a partial measurement, correctly used in part.
+  if (!usedPrefill && !usedDecode && (r.prefillMs != null || r.decodeMs != null)) {
     agg.timingsRejected += 1;
   }
   agg.promptTokens += r.promptTokens ?? 0;
@@ -266,7 +353,12 @@ export function recordQwenCall(r: QwenCallRecord): void {
   // in two places, which is exactly what happened: OTA-1139 guarded the range,
   // OTA-1263 guarded the per-line ms/tok figure, and neither guarded the average
   // or the raw `read`/`write` pair printed beside them.
-  if (qwenTimingsArePossible(r) && (r.promptTokens ?? 0) > 0 && r.outcome !== 'preempted') {
+  // ⚠⚠ OTA-1406 — TWO CORRECTIONS, IN OPPOSITE DIRECTIONS. It now REFUSES a
+  // dormant/error record (a zero prefill against a detached context was setting
+  // the BEST end of this range to 0.0) and it now ACCEPTS a preempted one
+  // (prefill completes before decode, so it is a whole measurement; excluding it
+  // threw away exactly the samples the HANDOFF reasoned about).
+  if (qwenPrefillIsMeasured(r) && (r.promptTokens ?? 0) > 0) {
     const per = (r.prefillMs ?? 0) / (r.promptTokens ?? 1);
     agg.bestMsPerPromptTok = Math.min(agg.bestMsPerPromptTok, per);
     agg.worstMsPerPromptTok = Math.max(agg.worstMsPerPromptTok, per);
@@ -413,9 +505,12 @@ export interface QwenJobStats {
   hitLimit: number;
   discarded: number;
   discardedMs: number;
-  /** ⚠ OTA-1405 — how many calls the read/write average actually speaks for,
-   *  and how many reported a split we refused as physically impossible. */
-  timingSamples: number;
+  /** ⚠ OTA-1406 — how many calls each half of the read/write average actually
+   *  speaks for. They differ: a preempted call has a real prefill and a
+   *  truncated decode. `timingsRejected` counts records that contributed to
+   *  neither. */
+  prefillAvgSamples: number;
+  decodeAvgSamples: number;
   timingsRejected: number;
 }
 
@@ -439,8 +534,8 @@ export function qwenJobStats(): QwenJobStats[] {
       // still divide by ten, and every job with rejected timings reads as
       // faster than it is. Zero samples yields 0, which `split` then omits
       // entirely rather than printing `read0.0s` as if it were measured.
-      avgPrefillMs: a.timingSamples > 0 ? Math.round(a.prefillMs / a.timingSamples) : 0,
-      avgDecodeMs: a.timingSamples > 0 ? Math.round(a.decodeMs / a.timingSamples) : 0,
+      avgPrefillMs: a.prefillAvgSamples > 0 ? Math.round(a.prefillMs / a.prefillAvgSamples) : 0,
+      avgDecodeMs: a.decodeAvgSamples > 0 ? Math.round(a.decodeMs / a.decodeAvgSamples) : 0,
       avgPromptTokens: Math.round(a.promptTokens / a.count),
       avgOutTokens: Math.round(a.outTokens / a.count),
       cachedTokens: a.cachedTokens,
@@ -452,7 +547,8 @@ export function qwenJobStats(): QwenJobStats[] {
       hitLimit: a.hitLimit,
       discarded: a.discarded,
       discardedMs: a.discardedMs,
-      timingSamples: a.timingSamples,
+      prefillAvgSamples: a.prefillAvgSamples,
+      decodeAvgSamples: a.decodeAvgSamples,
       timingsRejected: a.timingsRejected,
     }))
     .sort((x, y) => y.count - x.count);
@@ -474,11 +570,22 @@ export function qwenTelemetrySummary(): string {
     // code-reading session to reconstruct.
     // ⚠ OTA-1405 — and it says how many samples it threw out. A rollup that
     // silently drops half its evidence still reads as "this is what the session
-    // did"; `⚠2 bogus` is the difference between an average and a claim.
-    const split = j.avgPrefillMs > 0 || j.avgDecodeMs > 0
-      ? ` read${s(j.avgPrefillMs)}/write${s(j.avgDecodeMs)}`
+    // did"; `⚠2unusable` is the difference between an average and a claim.
+    // ⚠⚠ OTA-1406 — THE TWO HALVES PRINT INDEPENDENTLY, because they are now
+    // measured on different sets of calls. A job whose every call was preempted
+    // has a real prefill average and NO honest decode average, and the old
+    // combined string printed `read3.5s/write0.0s` for it — a zero that reads as
+    // "generation was instant" when the truth is "generation never finished".
+    const readPart = j.prefillAvgSamples > 0 ? `read${s(j.avgPrefillMs)}` : '';
+    const writePart = j.decodeAvgSamples > 0 ? `write${s(j.avgDecodeMs)}` : '';
+    const split = readPart || writePart
+      ? ` ${[readPart, writePart].filter(Boolean).join('/')}`
       : '';
-    const rejected = j.timingsRejected > 0 ? ` ⚠${j.timingsRejected}bogus` : '';
+    // ⚠ OTA-1406 — "unusable", not "bogus": this now covers two different
+    // causes — a split that is physically impossible, and one that is possible
+    // but measures nothing (a dormant call's 0/0 against a detached context).
+    // Calling the second one bogus would be its own small lie.
+    const rejected = j.timingsRejected > 0 ? ` ⚠${j.timingsRejected}unusable` : '';
     const sizes = j.avgPromptTokens > 0 ? ` in${j.avgPromptTokens}t→out${j.avgOutTokens}t` : '';
     // ⚠⚠ OTA-1259 (N4) — `reuse` IS NO LONGER PRINTED. It was derived as
     // `cachedTokens - promptTokens - outTokens`, and llama.rn reports

@@ -1291,17 +1291,35 @@ export function InventoryScreen() {
   if (coatTarget) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { isCoatableItem, coatedDisplayName, nextCoatSlot } = require('../engine/weaponCoating');
+      const { isCoatableItem, coatedDisplayName, nextCoatSlot, coatingRefusalFor } = require('../engine/weaponCoating');
       const coatable = (player.inventory ?? []).filter(
         // OTA-453 — instance-aware so FUSED weapons (catalog-absent) are listed.
         (i: InventoryItem) => isCoatableItem(i),
       // OTA-1094 — the weapon you are HOLDING is the one you almost always mean
       // to coat, so it heads the list instead of sitting wherever pack order put it.
       ).sort(byWornFirst(wornIds));
+      // ⚠⚠ OTA-1407 — NAME WHAT WAS LEFT OUT, AND WHY. The picker used to filter
+      // the pack down to coatable weapons and show only those, so a weapon that
+      // cannot take a coating simply was not there. The owner hit exactly that
+      // with a Force Wave in his off hand and reported "I can't apply coatings to
+      // my off hand weapon" — a rule about RUNE-CASTERS, read as a rule about
+      // HANDS, because the only thing the game told him was an absence.
+      // ⚠ Same discipline as the tutorial picker's lock (OTA-1250): SHOW
+      // EVERYTHING, ALLOW ONE. Here the excluded weapons live in the body rather
+      // than as dead buttons — a row that refuses on tap would be the OTA-1405
+      // failure again, one layer down.
+      const refused = (player.inventory ?? [])
+        .filter((i: InventoryItem) => i.kind === 'weapon' && !isCoatableItem(i))
+        .map((i: InventoryItem) => `• ${i.name}${wornIds.has(i.id) ? ' (equipped)' : ''} — ${coatingRefusalFor(i)}`);
+      const refusedNote = refused.length
+        ? `\n\nNot on the list:\n${refused.join('\n')}`
+        : '';
       if (coatable.length === 0) {
-        coatPickerBody = 'Nothing in your pack can hold this coating. A coating needs an edge or a point to carry it — a blade, an arrow-arm, or a bolt-caster.';
+        coatPickerBody = 'Nothing in your pack can hold this coating. A coating needs an edge or a point to carry it — a blade, an arrow-arm, or a bolt-caster.'
+          + refusedNote;
       } else {
-        coatPickerBody = `Paint the ${coatTarget.name.toLowerCase()} onto which weapon? It stays on until the weapon breaks (a repair won't scrub it off).`;
+        coatPickerBody = `Paint the ${coatTarget.name.toLowerCase()} onto which weapon? It stays on until the weapon breaks (a repair won't scrub it off).`
+          + refusedNote;
         coatPickerButtons = coatable.map((w: InventoryItem) => {
           // OTA-873 — dual-slot aware label: an upgraded weapon with an open 2nd slot
           // ADDS a coating; a full weapon REPLACES slot 1; a bare one just coats.

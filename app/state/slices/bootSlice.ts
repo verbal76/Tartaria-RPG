@@ -38,6 +38,9 @@ import {
   // ⚠ OTA-1405 — the ONE answer to "can this timing be true?", shared with the
   // rollup so the printed line and the average cannot disagree about one call.
   qwenTimingsArePossible,
+  // ⚠ OTA-1406 — and the measured-vs-possible distinction, so this line and the
+  // rollup accept exactly the same samples.
+  qwenPrefillIsMeasured,
   setQwenDiscardSink,
   setQwenTelemetrySink,
 } from '../../ai/generation/qwenTelemetry';
@@ -225,7 +228,12 @@ export const createBootSlice = (
       // ⚠ OTA-1405 — the inline arithmetic that used to live here is now the
       // shared `qwenTimingsArePossible`, so this figure, the raw pair above and
       // the rollup's average cannot drift apart again. They had.
-      const prefillIsPossible = timingsOk && (r.promptTokens ?? 0) > 0;
+      // ⚠⚠ OTA-1406 — asks the SAME predicate the rollup's range asks, so the
+      // per-call figure and the session range can no longer disagree about one
+      // record. They did: a preempted call printed an ms/t here that the range
+      // refused, and a dormant call printed 0.0 here AND poisoned the range's
+      // best end with it.
+      const prefillIsPossible = qwenPrefillIsMeasured(r) && (r.promptTokens ?? 0) > 0;
       const msPerTok = prefillIsPossible
         ? ` ${(r.prefillMs! / r.promptTokens!).toFixed(1)}ms/t`
         : '';

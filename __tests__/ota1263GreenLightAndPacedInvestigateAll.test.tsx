@@ -115,7 +115,7 @@ describe('OTA-1263 (B) — the per-call ms/t obeys the same guard the aggregate 
 
   it('⚠⚠ the source asks the SHARED predicate, so the three copies cannot drift again', () => {
     const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
-    const i = store.indexOf('const prefillIsPossible = timingsOk');
+    const i = store.indexOf('const prefillIsPossible = qwenPrefillIsMeasured(r)');
     expect(i).toBeGreaterThan(-1);
     expect(store.slice(i, i + 200)).toContain('(r.promptTokens ?? 0) > 0');
     // ⚠ OTA-1405 — and the RAW pair on the same line obeys it too. That is the
@@ -125,6 +125,11 @@ describe('OTA-1263 (B) — the per-call ms/t obeys the same guard the aggregate 
     // The rule is defined once, and not re-derived here or anywhere else.
     const tel = src('app', 'ai', 'generation', 'qwenTelemetry.ts');
     expect(tel).toContain('export function qwenTimingsArePossible(');
+    // ⚠ OTA-1406 — and the two that separate POSSIBLE from MEASURED. The physics
+    // check alone waved through a dormant call's 0/0, which set the best end of
+    // the ms/tok range to 0.0.
+    expect(tel).toContain('export function qwenPrefillIsMeasured(');
+    expect(tel).toContain('export function qwenDecodeIsMeasured(');
     expect((store.match(/prefillMs <= r\.totalMs/g) ?? []).length).toBe(0);
   });
 });

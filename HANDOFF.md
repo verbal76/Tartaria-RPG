@@ -934,6 +934,17 @@ Key invariants worth knowing:
     answers the question OTA-1127 parked as unknowable, using the metric
     OTA-1127 shipped for it.
 
+    ⚠⚠ **CORRECTION (OTA-1406) — THE "0.0 LOWS" WERE PROBABLY NOT PREFIX REUSE.**
+    Until OTA-1406 the ms/tok range accepted DORMANT records, and a dormant call
+    reports `read 0ms/write 0ms` against a context that was already detached
+    (OTA-1119's `empty 8809ms read 0ms/write 0ms in 309t→out 0t`). A single one of
+    those pins the BEST end of the range to 0.0 — measured: one real 11.0 ms/tok
+    call plus one dormant record printed `ms/tok 0.0-11.0`. So a 0.0 low is
+    equally consistent with "the cache is working" and with "one call ran against
+    a dead context", and this entry could not tell them apart. The
+    best≈worst-on-intro-fill half of the reading stands; **the short-job half does
+    not, and should be re-measured on a post-OTA-1406 log.**
+
   - **⚠ FIXED IN OTA-1157 — KEPT AS THE DIAGNOSIS, NOT AS A LIVE DEFECT.**
     *(2026-08-07: the owner decided this one — "you should work to get standing,
     not earn it by breathing" — and OTA-1157 removed both grants; the two events
@@ -2910,9 +2921,18 @@ rediscovering them.
   deliberately on the reasoning that the field might start reporting properly —
   **there is no such future build.**
 
-  ⚠ **STILL OPEN:** `investigate_lore` at **64.7 ms/prompt-token** vs
-  `scene_intro`'s 3.67–12.2 — a short prompt taking a long read. That is where the
-  prefill money is. Full story: the VERSION.md 4.29.185 row.
+  ⚠⚠ **WITHDRAWN (OTA-1263), AND IT STOOD HERE AS "STILL OPEN" FOR ANOTHER
+  THIRTEEN OTAs.** It read: *"`investigate_lore` at 64.7 ms/prompt-token vs
+  `scene_intro`'s 3.67–12.2 — that is where the prefill money is."* **The number
+  was impossible** — the row was `ok 6863ms read 8286ms/write 4020ms`, twelve
+  seconds of reported work inside a seven-second call. OTA-1263 retracted it in
+  full (see the entry ~1,250 lines above this one) and the next log settled the
+  real behaviour at **2.4–2.5 ms/t**.
+
+  ⚠ **The retraction and the open item lived in the same document and did not
+  know about each other**, so a reader arriving at the punchlist would go chase a
+  number that had already been withdrawn. Found by the OTA-1406 audit. A finding
+  is not withdrawn until every place that carries it says so.
 
 - **⚠⚠⚠ GOLEM-ONLY DIVERGENCE — NARRATION N1–N3 (2026-08-14).** Golem
   OTA-1258. ⚠ **THESE THREE ARE LINE-AGNOSTIC** — the bank, the idle trigger and

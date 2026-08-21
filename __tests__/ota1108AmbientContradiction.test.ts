@@ -132,7 +132,7 @@ describe('OTA-1108 — the cache number was being read backwards', () => {
     expect(store).toContain('(r.prefillMs! / r.promptTokens!).toFixed(1)');
     // ⚠ OTA-1405 — the guard moved into the shared `qwenTimingsArePossible`, so
     // this pin follows it to the name the line now uses.
-    expect(store).toContain('const prefillIsPossible = timingsOk');
+    expect(store).toContain('const prefillIsPossible = qwenPrefillIsMeasured(r)');
     expect(store).toContain('${msPerTok}');
   });
 

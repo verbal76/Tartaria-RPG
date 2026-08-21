@@ -251,7 +251,8 @@ describe('OTA-1405 (4) — an impossible timing is refused everywhere, by one ru
     recordQwenCall({ job: 'j', totalMs: 5_400, waitMs: 0, chars: 10, outcome: 'ok', at: 0,
       prefillMs: 49_256, decodeMs: 2_771, promptTokens: 100 });
     const [j] = qwenJobStats();
-    expect(j!.timingSamples).toBe(1);
+    expect(j!.prefillAvgSamples).toBe(1);
+    expect(j!.decodeAvgSamples).toBe(1);
     expect(j!.timingsRejected).toBe(1);
     // 2000, not (2000 + 49256) / 2 — and not 2000/2 either.
     expect(j!.avgPrefillMs).toBe(2_000);
@@ -269,14 +270,14 @@ describe('OTA-1405 (4) — an impossible timing is refused everywhere, by one ru
       prefillMs: 3_000, decodeMs: 500, promptTokens: 50 });
     const j = qwenJobStats().find((x) => x.job === 'k')!;
     expect(j.count).toBe(4);
-    expect(j.timingSamples).toBe(1);
+    expect(j.prefillAvgSamples).toBe(1);
     expect(j.avgPrefillMs).toBe(3_000);
   });
 
   it('⚠ the rollup SAYS how much it threw away, rather than dropping it silently', () => {
     recordQwenCall({ job: 'm', totalMs: 1_000, waitMs: 0, chars: 5, outcome: 'ok', at: 0,
       prefillMs: 40_000, promptTokens: 10 });
-    expect(qwenTelemetrySummary()).toContain('bogus');
+    expect(qwenTelemetrySummary()).toContain('unusable');
   });
 
   it('⚠⚠ the per-call LINE marks it too — the number the owner actually read', () => {
