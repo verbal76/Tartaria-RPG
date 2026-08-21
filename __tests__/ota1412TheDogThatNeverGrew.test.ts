@@ -182,14 +182,20 @@ describe('OTA-1412 — surviving a hit is the door that trained nothing', () => 
 });
 
 describe('OTA-1412 — the dog does not grow silently', () => {
-  it('⚠⚠ every one of the four training sites appends the HP clause', () => {
-    // Four separate call sites each write their own log string. A hand-rolled
-    // clause at each would be four readings of one rule — the drift this
-    // session has repaired five times elsewhere. One function owns it.
+  it('⚠⚠ every one of the training sites appends the HP clause', () => {
+    // Separate call sites each write their own log string. A hand-rolled clause
+    // at each would be several readings of one rule — the drift this session has
+    // repaired five times elsewhere. One function owns it.
+    //
+    // RETARGETED BY OTA-1414 — four doors became three when the sniff beat
+    // stopped training INT (one stat, one job). The CLAIM is unchanged: every
+    // door that trains must say what it gave. Counted against the doors that
+    // exist rather than a number typed once, so ota1414's own count test and
+    // this one cannot disagree.
+    const doors = (STORE + COMBAT).split('trainDogStat(').length - 1;
     const uses = (STORE + COMBAT).split('dogHpGainClause(trained.dog, trained.leveled)').length - 1;
-    expect(uses).toBe(4);
-    expect(STORE).toContain("'s INT rises to ${trained.leveled.to}.${dogHpGainClause");
-    expect(STORE).toContain("'s STR rises to ${trained.leveled.to}.${dogHpGainClause");
+    expect(uses).toBe(doors);
+    expect(STORE).toContain("rises to ${trained.leveled.to}.${dogHpGainClause");
     expect(COMBAT).toContain("'s DEX rises to ${trained.leveled.to}.${dogHpGainClause");
   });
 

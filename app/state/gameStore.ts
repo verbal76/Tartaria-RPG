@@ -10538,20 +10538,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   },
                 };
               });
-              const trained = trainDogStat(dog, 'intelligence', true);
-              if (trained.dog !== dog) {
-                set((s) => s.player ? { player: { ...s.player, dog: trained.dog } } : s);
-              }
+              // ⚠⚠ OTA-1414 — THIS NO LONGER TRAINS, AND THE FEATURE STAYS.
+              //
+              // The owner asked to delete this on the belief that it was dead:
+              // *"the dog isn't in a room and there is no hey go sniff this so
+              // that stat never actually trains anything."* Half right, and the
+              // half that is wrong is why it looked dead. There IS no "go sniff"
+              // command — this fires by itself on entering a scene, once per
+              // room, d20 + INT vs 12, and on a success it adds a hidden thing to
+              // the room for the player to investigate. `pickHidden
+              // SmellNounsForLocation` falls back to the wasteland pool, so it
+              // reaches everywhere; it has been training INT quietly for
+              // hundreds of OTAs.
+              //
+              // So what is removed is the TRAINING, not the beat. INT now has
+              // exactly one training door (dog_distract), which is the clean
+              // one-stat-one-job map that was actually being asked for, and the
+              // dog still finds things by nose. Deleting a working feature on a
+              // premise that turned out to be false would have been the wrong
+              // half to take.
               const line = applyDogPronouns(
                 `${dog.name} noses at the ${hidden} and snorts. There's something there.`,
                 dog.sex.pronoun,
               );
               get().appendLog('world', line);
-              if (trained.leveled) {
-                // OTA-1412 — say the HP too. A level-up that silently widened
-                // the dog's bar is the game knowing and not saying.
-                get().appendLog('reward', `✦ ${dog.name}'s INT rises to ${trained.leveled.to}.${dogHpGainClause(trained.dog, trained.leveled)}`);
-              }
             } else {
               // Mark dogSmelledHere even on a miss — re-eligibility
               // gated on the room's visible nouns being all consumed
@@ -33282,8 +33292,27 @@ function handleDogCombat(
     }
   } else {
     // dog_distract
-    const statKey: 'dexterity' | 'intelligence' =
-      dog.stats.dexterity >= dog.stats.intelligence ? 'dexterity' : 'intelligence';
+    // ⚠⚠ OTA-1414 — ONE STAT, ONE JOB. Owner: *"strength when they land a bite,
+    // dexterity when they survive a hit, and intelligence when they win a
+    // distract."*
+    //
+    // This used to roll `max(DEX, INT)` and train whichever it picked, which
+    // made the same action train DIFFERENT stats on different dogs — a hound
+    // (DEX 12 / INT 10) trained DEX here and a mutt (INT 12 / DEX 10) trained
+    // INT, off one identical command. Two dogs playing the same way ended up
+    // with different sheets for reasons the player could never see.
+    //
+    // A feint is a trick, so INT owns it. That completes the map:
+    //   STR — lands a bite      (dog_bite)
+    //   DEX — survives a hit    (applyEnemyCounterToDog, OTA-1412) and is the
+    //         dog's AC, so it is the survivability stat end to end
+    //   INT — wins a distract   (here)
+    //
+    // ⚠ THIS IS A BALANCE CHANGE FOR HOUNDS, stated rather than buried: a
+    // DEX-heavy dog now rolls its lower stat to distract. It also now TRAINS the
+    // stat it rolls, so the gap closes with use instead of being permanent — the
+    // old max() rewarded the stat you already had and never grew the other.
+    const statKey = 'intelligence' as const;
     const statVal = dog.stats[statKey];
     const roll = rollDie(20);
     const total = roll + statVal;

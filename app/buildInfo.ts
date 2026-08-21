@@ -24234,7 +24234,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the About screen both read one breadcrumb and both called it a mid-action
 // death; OTA-1377 predicted this shape in writing and judged it rare, and the
 // Qwen teardown re-arms the crumb on EVERY backgrounding.
-export const OTA_BUILD_ID = '2026-08-21-1413-a-reclaim-is-not-a-crash';
+// OTA-1414 — one stat, one job. STR lands a bite, DEX survives a hit, INT wins
+// a distract. The distract used to roll max(DEX,INT) and train whichever it
+// picked, so one command trained different stats on different dogs.
+export const OTA_BUILD_ID = '2026-08-21-1414-one-stat-one-job';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1413-a-reclaim-is-not-a-crash';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1412-the-dog-that-never-grew';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1403-remote-hand-in-for-all-four';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1402-the-refusal-is-seen';
