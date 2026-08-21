@@ -24204,7 +24204,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ⚠ THE RETIRED SEQUENCES ARE NOT DELETED. HAL's, steam's and html's ledgers
 // stay whole on their own branches and in RESTORE-POINTS.md. What ends is their
 // FUTURE numbering, not their history.
-export const OTA_BUILD_ID = '2026-08-20-1403-remote-hand-in-for-all-four';
+// ⚠⚠ OTA-1412 — THE MARKER STOPPED BEING BUMPED AND THE ABOUT SCREEN KEPT
+// REPORTING CONFIDENTLY. This file's own header says the value is "bumped
+// manually on each JS-only push so the About screen can prove the OTA actually
+// reached the device" — and then 1404 through 1411 landed as code-only commits
+// and this line stayed at 1403. Nine OTAs of work would have shipped under a
+// label naming the tenth-oldest of them.
+//
+// That matters more than a stale string, because this marker is the ONE thing
+// the owner reads to answer "which build am I actually on?" — the question that
+// opened this OTA. A version marker that under-reports is worse than none: it
+// answers, and it is wrong, so the reader stops checking. Same shape as the
+// checkmarks (OTA-1410), the timing guard (OTA-1406) and the coating refusal
+// (OTA-1407): the game knew and did not say.
+//
+// The gap is closed by jumping straight to 1412 rather than back-filling eight
+// SUPERSEDED lines that were never published as OTAs. What they were is
+// recorded here instead, once:
+//
+//   1404 slice 10 — combat resolution leaves gameStore
+//   1405 four things the device log was saying that were not true
+//   1406 full audit of the timing guard
+//   1407 a coating refusal that never spoke
+//   1408 a paper chart offered to be wielded
+//   1409 three from the play session — a dead man, a wrong price, a wrong name
+//   1410 outpost ✓ marks belong to one visit to one outpost
+//   1411 the outpost corridor tax, and a rope that was a tool
+export const OTA_BUILD_ID = '2026-08-21-1412-the-dog-that-never-grew';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1403-remote-hand-in-for-all-four';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1402-the-refusal-is-seen';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1401-crash-reports-have-somewhere-to-go';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1400-slice-nine-quests-and-the-board';

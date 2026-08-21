@@ -29,6 +29,7 @@ import {
   defaultDogName,
   applyDogPronouns,
   trainDogStat,
+  dogHpGainClause,
   type RescueScenarioId,
   type RescueScenario,
 } from '../engine/dogCompanion';
@@ -10547,7 +10548,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               );
               get().appendLog('world', line);
               if (trained.leveled) {
-                get().appendLog('reward', `✦ ${dog.name}'s INT rises to ${trained.leveled.to}.`);
+                // OTA-1412 — say the HP too. A level-up that silently widened
+                // the dog's bar is the game knowing and not saying.
+                get().appendLog('reward', `✦ ${dog.name}'s INT rises to ${trained.leveled.to}.${dogHpGainClause(trained.dog, trained.leveled)}`);
               }
             } else {
               // Mark dogSmelledHere even on a miss — re-eligibility
@@ -33251,7 +33254,7 @@ function handleDogCombat(
       if (trained.leveled) {
         get().appendLog(
           'reward',
-          `✦ ${dog.name}'s STR rises to ${trained.leveled.to}.`,
+          `✦ ${dog.name}'s STR rises to ${trained.leveled.to}.${dogHpGainClause(trained.dog, trained.leveled)}`,
         );
       }
       if (newHp <= 0) {
@@ -33333,7 +33336,7 @@ function handleDogCombat(
       if (trained.leveled) {
         get().appendLog(
           'reward',
-          `✦ ${dog.name}'s ${statKey.slice(0, 3).toUpperCase()} rises to ${trained.leveled.to}.`,
+          `✦ ${dog.name}'s ${statKey.slice(0, 3).toUpperCase()} rises to ${trained.leveled.to}.${dogHpGainClause(trained.dog, trained.leveled)}`,
         );
       }
     } else {

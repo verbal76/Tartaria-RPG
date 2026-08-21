@@ -54,7 +54,7 @@
  * combat family.
  */
 import type { PlayerCharacter, Enemy, CombatRange } from '../engine/types';
-import { applyDogPronouns } from '../engine/dogCompanion';
+import { applyDogPronouns, trainDogStat, dogHpGainClause } from '../engine/dogCompanion';
 import { profileOf, scaledSwingCap } from '../engine/pressure';
 import { addResurrectionGems, recordFallen, recordFallenSeed, characterSeedOf } from '../engine/saveSystem';
 import { buildDeathScene, daysBelow } from '../engine/deathScene';
@@ -747,6 +747,18 @@ export function applyEnemyCounterToDog(
   const newHp = Math.max(0, dog.hp - dmg);
   const downed = newHp <= 0;
   const now = player.hoursElapsed ?? 0;
+  // ⚠⚠ OTA-1412 — SURVIVING A HIT TRAINS DEX. The other half of the loop the
+  // golem got at OTA-467 and the dog never did. Until now this function — the
+  // ONE place in the game where the dog takes a hit and lives — trained nothing,
+  // so the dog only ever grew by attacking. DEX is the right stat because it is
+  // what the dog's AC is built from three lines above (10 + dexMod + vest), which
+  // makes this the same "learn to take fewer hits" curve resilience gives the
+  // golem — and under OTA-1412 every level-up also adds +3 max HP.
+  //
+  // ⚠ Only on a HIT THAT WAS SURVIVED, mirroring the golem's `else` branch: a
+  // miss teaches nothing (the code already returned above) and being dropped is
+  // not a lesson. Downed dogs bench with a 24h bleed-out; see below.
+  const trained = downed ? null : trainDogStat({ ...dog, hp: newHp }, 'dexterity', true);
   set((s) => {
     if (!s.player?.dog) return s;
     const dd = s.player.dog;
@@ -755,13 +767,33 @@ export function applyEnemyCounterToDog(
         ...s.player,
         dog: {
           ...dd,
-          hp: newHp,
+          hp: trained ? trained.dog.hp : newHp,
+          // ⚠ Spread the trained FIELDS onto the live record rather than
+          // replacing it with `trained.dog`: the training was computed off the
+          // dog captured at the top of this function, and only these four fields
+          // are this call's to write.
+          ...(trained
+            ? {
+                stats: trained.dog.stats,
+                statProgress: trained.dog.statProgress,
+                hpMax: trained.dog.hpMax,
+              }
+            : {}),
           ...(downed ? { status: 'waiting_at_base' as const, downedAtHour: now, bleedWarned: false } : {}),
         },
       },
     };
   });
-  get().appendLog('combat', `${dog.name} takes ${dmg}. (${newHp}/${dog.hpMax} HP left)`);
+  get().appendLog(
+    'combat',
+    `${dog.name} takes ${dmg}. (${trained ? trained.dog.hp : newHp}/${trained ? trained.dog.hpMax : dog.hpMax} HP left)`,
+  );
+  if (trained?.leveled) {
+    get().appendLog(
+      'reward',
+      `✦ ${dog.name}'s DEX rises to ${trained.leveled.to}.${dogHpGainClause(trained.dog, trained.leveled)}`,
+    );
+  }
   if (downed) {
     get().appendLog(
       'arbiter',

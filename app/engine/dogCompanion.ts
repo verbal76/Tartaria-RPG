@@ -420,9 +420,51 @@ const DOG_LEVEL_UP_THRESHOLD = 100;
 // a companion could be ground past the player and past sane damage/AC scaling.
 const DOG_MAX_TRAINED_STAT = 30;
 
+// ⚠⚠ OTA-1412 — THE COPY GREW AND THE ORIGINAL DID NOT.
+//
+// Owner's log: Ember, 14 max HP, took 15 damage in one hit. That is not an
+// unlucky roll — the dog's HP pool is a CONSTANT for the entire campaign.
+// `hpMax` is written in exactly one place in the codebase (createDogCompanion,
+// 12-18 by profile) and read in nine. Nothing else in the game holds still:
+//
+//   · the PLAYER gains +1 hpMax per milestone, plus gearHpBonus on every
+//     equip (hpBreakdown.ts);
+//   · the GOLEM gains +3 hpMax per stat level (arb170) and trains RESILIENCE
+//     every time it survives a hit (OTA-467);
+//   · ESCORTEES are spawned at 0.35 × the player's hpMax, so they are scaled
+//     to whoever is walking with them (escort.ts).
+//
+// The dog is the only companion pool that never moves — and the reason is
+// visible in the source. `golems.ts:185` opens with "mirrors
+// dogCompanion.trainDogStat": the golem's loop was COPIED FROM THIS FUNCTION.
+// Both HP growth and survive-training were added to the copy afterwards, and
+// neither came back. The dog kept the offensive half of the loop (it trains on
+// a landed bite and a successful distract) and got neither defensive half.
+//
+// So this is not a balance opinion about the starting number — 14 is fine
+// against the 1d6 the early game throws. It is a growth curve that was written
+// once and inherited in one direction. Both halves are mirrored back below,
+// with the golem's own constants, and the existing award curve caps it exactly
+// as it caps the golem: `hpBump` only fires on `leveled`, and `leveled` is null
+// at DOG_MAX_TRAINED_STAT.
+const DOG_HP_PER_LEVEL = 3;
+
 export interface DogTrainResult {
   dog: DogCompanion;
-  leveled: { stat: DogStatKey; from: number; to: number } | null;
+  leveled: { stat: DogStatKey; from: number; to: number; hpGained: number } | null;
+}
+
+/** OTA-1412 — the clause that says the frame toughened, appended to whichever
+ *  stat line the caller prints. ONE owner: the dog trains at four separate
+ *  call sites (bite, distract, an INT beat, and now surviving a hit) and each
+ *  writes its own log string, so a hand-rolled HP clause at each would be four
+ *  readings of one rule — the drift this session has repaired five times. */
+export function dogHpGainClause(
+  trainedDog: DogCompanion,
+  leveled: DogTrainResult['leveled'],
+): string {
+  if (!leveled || leveled.hpGained <= 0) return '';
+  return ` +${leveled.hpGained} max HP (${trainedDog.hp}/${trainedDog.hpMax}).`;
 }
 
 /** Train one of the dog's stats. Caller passes the relevant key and
@@ -446,14 +488,22 @@ export function trainDogStat(
     progress -= DOG_LEVEL_UP_THRESHOLD;
     const before = next;
     next = before + 1;
-    if (!leveled) leveled = { stat, from: before, to: next };
+    if (!leveled) leveled = { stat, from: before, to: next, hpGained: 0 };
   }
   if (next >= DOG_MAX_TRAINED_STAT) progress = 0;
+  // OTA-1412 — a stat level-up also toughens the dog, exactly as arb170 does for
+  // the golem: +3 max HP, healed by the same amount so a level-up never lowers
+  // the fraction of the bar that is full. Awarded per LEVEL-UP, not per stat, so
+  // a dog that trains STR on bites and DEX on surviving grows from both.
+  const hpBump = leveled ? DOG_HP_PER_LEVEL : 0;
+  if (leveled) leveled.hpGained = hpBump;
   return {
     dog: {
       ...dog,
       stats: { ...dog.stats, [stat]: next },
       statProgress: { ...dog.statProgress, [stat]: progress },
+      hpMax: dog.hpMax + hpBump,
+      hp: dog.hp + hpBump,
     },
     leveled,
   };
