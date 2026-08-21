@@ -24246,7 +24246,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // since OTA-020, and exactly what nobody checked for three weeks.
 // OTA-1416 — pet the dog. `pet dog` now works, and the menu button that always
 // WAS petting ("Scratch their ear") now leads with the word a player uses.
-export const OTA_BUILD_ID = '2026-08-21-1416-pet-the-dog';
+// ⚠⚠ OTA-1417 — HAL CATCHES UP, AND THE RULE THAT SAYS IT MUST IS WRITTEN DOWN.
+// Thirteen bug-fix OTAs (1404-1416) shipped to golem and none to HAL, the line
+// with live players on it. Owner: *"when we are just bug fixing all branches get
+// updated as we go."* The trunk collapse made an ordinary push publish golem and
+// only golem, so the line that must stay current became the one needing an extra
+// act. See HANDOFF.md §4 "Which lines a change goes to".
+export const OTA_BUILD_ID = '2026-08-21-1417-hal-catches-up';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1416-pet-the-dog';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1415-nothing-had-shipped-since-1393';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1414-one-stat-one-job';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1413-a-reclaim-is-not-a-crash';

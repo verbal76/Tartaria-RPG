@@ -1,6 +1,11 @@
 # Tartaria Realms — Session Handoff
 
-**This checkout:** branch `HaL2001` — **LIVE Tartaria line / PRODUCTION** — in the wild with internal testers. Channel `hal2001`+`preview`+`ios-preview`. Vetted changes only; a push OTAs their devices.
+**This checkout:** branch `golem-line` — **THE TRUNK.** Since OTA-1384 one branch
+builds all four products, selected by `TARTARIA_LINE` (see `app.config.js`). The
+`HaL2001` branch is archived; **the HAL PRODUCT is not** — it is the live line at
+real players and must stay current. See *"Which lines a change goes to"* in §4
+before deciding where a change ships; the answer depends on whether it is a bug
+fix or a direction change, and the publish default does **not** match the policy.
 
 > **This doc was rewritten & de-bloated on 2026-07-02.** The previous 5,400-line
 > HANDOFF (with the full open/closed issue tracker and the entire OTA changelog)
@@ -140,12 +145,49 @@ one line is applied **per-line, code-specifically** (see §4).
 - **Never push to a line the user didn't authorize.** Blanket "push these as you
   go" authorization is granted per-session and does **not** carry over.
 
+### ⚠⚠ WHICH LINES A CHANGE GOES TO — the owner's standing rule (OTA-1417)
+
+Stated by the owner after a session shipped thirteen bug-fix OTAs to golem and
+none to HAL:
+
+> *"HAL is not retired, HAL is my external testing branch with live players on
+> it. It must be up to date. Golem is my divergence branch for when we are
+> testing large direction changes in the game before porting to HAL. When we are
+> just bug fixing all branches get updated as we go. You will be made aware when
+> golem needs to become primary."*
+
+The routing rule is about the KIND of change, not the branch you are standing in:
+
+| kind of change | where it goes |
+|---|---|
+| **bug fix** | **every line, as it lands** — HAL included, same session |
+| **large direction change** | golem only, until the owner says port |
+| **golem becomes primary** | only when the owner says so; never inferred |
+
+⚠⚠ **THE TRUNK COLLAPSE SILENTLY INVERTED THE DEFAULT, AND THAT IS HOW THIS WAS
+MISSED.** Before OTA-1384 each line was its own branch, so reaching HAL meant
+pushing to HAL — visible, deliberate, hard to forget. After the collapse one
+trunk serves four products and the publish firewall makes an ordinary push
+publish **golem and nothing else**; HAL needs a dispatch or an `[ota-hal]`
+commit marker. That firewall is right — nothing unattended should reach a live
+player — but its side effect is that **the line which MUST stay current became
+the one that takes an extra act, and the divergence branch became the freebie.**
+
+⚠ So on bug-fix work `[ota-hal]` is not an exceptional step needing
+justification. It is part of shipping, and OMITTING it is what needs justifying.
+
+⚠ **A branch being archived is not the product being retired.** The `HaL2001`
+git branch was archived into the trunk at OTA-1383 — its future *numbering*
+ended, not its role. HAL the product is live, at real players, and is the line
+that matters most. Reading that archive commit as "HAL is retired" is the exact
+mistake this section exists to prevent; it was made once already.
+
 ### Line identity table
 
 | Line (branch) | app name | package / bundle id | OTA channel | Role |
 |---|---|---|---|---|
 | **HaL2001** | Tartaria Realms HAL | `…tartarprim.hal2001` | `hal2001` + `preview` + `ios-preview` | **LIVE Tartaria game** — the build at real testers (production) |
-| **golem-line** | Tartaria Realms Golem | `…tartarprim.golem` | `golem-line` | **HAL's warm standby** — kept current with HAL; the fork point for future engine-breaking work (installs side-by-side) |
+| **golem-line** | Tartaria Realms Golem | `…tartarprim.golem` | `golem-line` | **THE TRUNK, and the divergence branch.** Builds all four products. Owner's words: *"my divergence branch for when we are testing large direction changes before porting to HAL."* Bug fixes do not stop here — they go to every line as they land. Installs side-by-side with HAL |
 | **engine_Dev** | RPG Engine (dev) | `…tartarprim.engine` | `engine_Dev` | **Separate project** — lore-agnostic interaction engine (JSON/pack-driven content, lore-neutral prefills), NOT the Tartaria game |
 | **steam_Dev** | Tartaria Realms PC (Steam Dev) | `…tartarprim.steamdev` | `steam-dev` | Windows/Electron; updates via Steam depot, not OTA |
 | **mac_dev** | Tartaria Realms (Mac Dev) | `…tartarprim.macdev` | `mac-dev` | macOS `.dmg` (Electron) |
