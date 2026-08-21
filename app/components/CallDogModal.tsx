@@ -30,7 +30,9 @@ export function CallDogModal() {
         visible
         title={`Treat for ${dog.name}`}
         body={treatItems.length === 0
-          ? 'Your pack has no food the dog can eat. Forage, trade, or scavenge a consumable first.'
+          // ⚠ OTA-1423 — `dog` is already in scope three lines up; this said
+          // "the dog" while the title one line above said the name.
+          ? `Your pack has no food ${dog.name} can eat. Forage, trade, or scavenge a consumable first.`
           : `Pick a consumable to hand ${dog.name}. Dog treats (marked [treat]) give +40 loyalty; regular food gives +20.`}
         buttons={[
           ...treatItems.slice(0, 10).map((item) => ({

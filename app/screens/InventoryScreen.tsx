@@ -941,7 +941,13 @@ export function InventoryScreen() {
       });
     } else if (dogActive && pendingIsDogArmor) {
       buttons.push({
-        label: 'Equip on dog',
+        // ⚠ OTA-1423 — THE DOG'S NAME, like every other dog affordance.
+        // Owner, twice: at OTA-184 ("let's use the dogs name instead of just
+        // dog") and again here. That fix landed on the FEED button and this
+        // one, eleven lines away, kept saying 'dog' — as did the Unequip label
+        // directly ABOVE it, which has read `worn by ${name}` the whole time.
+        // The right answer was sitting in the sibling branch.
+        label: `Equip on ${player!.dog!.name}`,
         onPress: () => {
           // Route via submitPlayerAction so the engine's equip-on-dog
           // path can grow without UI changes. Falls back to direct
@@ -986,7 +992,9 @@ export function InventoryScreen() {
         const n = healBatchCount(perItemHP, dog.hpMax - dog.hp, stackQty);
         if (n >= 2) {
           buttons.push({
-            label: `Feed Max ×${n} → ${Math.min(dog.hpMax, dog.hp + perItemHP * n)}/${dog.hpMax}`,
+            // ⚠ OTA-1423 — the other half of the OTA-184 feed fix. The button
+            // above it says "Feed Ember"; this one said "Feed Max".
+            label: `Feed ${dogName} Max ×${n} → ${Math.min(dog.hpMax, dog.hp + perItemHP * n)}/${dog.hpMax}`,
             onPress: () => { useHealBatch(pending.item.name, 'dog', n); closeModal(); },
             tone: 'primary',
           });

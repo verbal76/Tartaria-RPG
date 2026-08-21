@@ -24266,7 +24266,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (the trunk already built them), PR #7 closed as superseded, and the standing
 // rule written down that CLAUDE fires every requested build. Tag pushes remain
 // the one genuine owner-side step — re-verified by probe, still 403.
-export const OTA_BUILD_ID = '2026-08-21-1421-claude-pushes-the-builds';
+// ⚠ OTA-1422 IS DELIBERATELY ABSENT FROM THIS LEDGER. It changed only
+// `.github/**` and `docs/**`, both path-ignored by the publisher, so it never
+// shipped as an OTA. This marker's contract is "the OTA that reached the
+// device", so bumping it for a change no device received would have been the
+// OTA-1412 defect wearing the opposite coat — a marker that over-reports.
+//
+// OTA-1423 — "Equip on dog". She has a name, and the owner had asked once
+// already at OTA-184; that fix landed on the FEED button and stopped there.
+// Four player-facing strings, plus the pronouns that naming her requires.
+export const OTA_BUILD_ID = '2026-08-21-1423-the-dog-has-a-name';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1421-claude-pushes-the-builds';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1420-a-dog-is-rolled-for';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1419-the-title-never-the-body';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1418-a-marker-that-works-anywhere';

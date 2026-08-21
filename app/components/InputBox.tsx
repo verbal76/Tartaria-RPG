@@ -22,6 +22,10 @@ import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 import { reachBandsFor } from '../engine/types';
+// ⚠ OTA-1423 — the three Arbiter refusals below name the dog, so they also
+// have to gender it. Without this they read "bring it up" about a companion
+// the player named and chose a sex for.
+import { applyDogPronouns } from '../engine/dogCompanion';
 // OTA-1170 — the dodge recharge bar reads its fill from one place.
 import { dodgeFill, dodgeCooldownRounds } from '../engine/dodgeCooldown';
 // OTA-1171 — the dodge lock is per difficulty tier; dialOf resolves CUSTOM per system.
@@ -640,11 +644,17 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                       Vibration.vibrate(40);
                       useGameStore.getState().appendLog(
                         'arbiter',
-                        dogBlocked === 'aerial'
-                          ? `"${dog.name} can't reach what's in the air," the Arbiter says. "Bring it down, or fight it yourself."`
-                          : dogBlocked === 'downed'
-                            ? `"${dog.name} is still down from that last fight," the Arbiter says. "Feed the dog to bring it up, then rest somewhere safe and it will fall in at your side."`
-                            : `"${dog.name} is holding the ground below," the Arbiter says. "Dogs don't climb — come down to fight at ${dog.name}'s side."`,
+                        applyDogPronouns(
+                          dogBlocked === 'aerial'
+                            ? `"${dog.name} can't reach what's in the air," the Arbiter says. "Bring it down, or fight it yourself."`
+                            : dogBlocked === 'downed'
+                              ? `"${dog.name} is still down from that last fight," the Arbiter says. "Feed {object} to bring {object} up, then rest somewhere safe and {pronoun} will fall in at your side."`
+                              : `"${dog.name} is holding the ground below," the Arbiter says. "Dogs don't climb — come down to fight at ${dog.name}'s side."`,
+                          // ⚠ The local `dog` here is a narrowed view ({name, hp, hpMax})
+                          // with no sex on it, so the pronoun comes from the store. 'they'
+                          // is the fallback the parser itself uses for an unknown answer.
+                          useGameStore.getState().player?.dog?.sex.pronoun ?? 'they',
+                        ),
                       );
                       return;
                     }
