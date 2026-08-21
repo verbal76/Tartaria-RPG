@@ -50,6 +50,47 @@ const STAT_KEYS: readonly StatKey[] = [
 
 const KNOWN_KINDS = ['weapon', 'armor', 'accessory', 'consumable', 'misc', 'relic'] as const;
 
+/**
+ * ⚠⚠ OTA-1411 — NEAR-MISS KINDS ARE COERCED, NOT BINNED. Fifth device log in a
+ * row where this job threw work away, and the FIRST one where the model was not
+ * really wrong:
+ *
+ *     item_synth:rejected-by-clamp bad-kind="tool"   ("Reclaimer's Rope")
+ *     …and again, same item, 45 seconds later. ~10s of native lock, twice.
+ *
+ * A rope IS a tool. `tool` is simply not a word in `KNOWN_KINDS`, so a correct
+ * answer was discarded on vocabulary. The four previous OTAs on this job all
+ * rewrote the PROMPT (token cap, then shape, then the pipe loop, then the
+ * nesting) on the premise that the model was getting it wrong. Here the
+ * validator's dictionary is the thing that is short, and rewriting the brief a
+ * fifth time would not have touched it.
+ *
+ * ⚠ COERCION IS DELIBERATELY TINY AND ONE-WAY. Only words with an unambiguous
+ * home go in: nothing here changes what an item DOES, it only stops a legal
+ * description being thrown away over a synonym. Anything genuinely unknown still
+ * fails the clamp and still says so in the log.
+ */
+const KIND_SYNONYMS: Readonly<Record<string, typeof KNOWN_KINDS[number]>> = {
+  tool: 'misc',
+  utility: 'misc',
+  material: 'misc',
+  gear: 'accessory',
+  trinket: 'accessory',
+  amulet: 'accessory',
+  ring: 'accessory',
+  potion: 'consumable',
+  food: 'consumable',
+  artifact: 'relic',
+};
+
+/** The kind this row should be filed under, after synonym coercion. Returns ''
+ *  when the word has no legal home — the clamp then rejects and names it. */
+export function canonicalSynthKind(raw: unknown): string {
+  const k = typeof raw === 'string' ? raw.trim().toLowerCase() : '';
+  if ((KNOWN_KINDS as readonly string[]).includes(k)) return k;
+  return KIND_SYNONYMS[k] ?? '';
+}
+
 /** Synchronous cache lookup — call BEFORE deciding to fire the LLM.
  *  Returns the cached row if Qwen has already balanced this name. */
 export function readSynthCache(name: string): SynthesizedItem | null {
@@ -254,7 +295,7 @@ export async function synthesizeItemViaQwen(
   const validated = validateAndClamp(name, obj);
   if (!validated) {
     const kindSeen = typeof obj.kind === 'string' ? obj.kind : `(${typeof obj.kind})`;
-    const why = !(KNOWN_KINDS as readonly string[]).includes(String(obj.kind).toLowerCase())
+    const why = !canonicalSynthKind(obj.kind)
       ? `bad-kind="${kindSeen}"`
       : 'no-content';   // parsed, legal kind, but no description/tags/effect to add
     noteQwenDiscarded(`item_synth:rejected-by-clamp ${why}`);
@@ -349,7 +390,9 @@ function asStatKey(v: unknown): StatKey | undefined {
  *  clamp any numeric fields. Returns null if the row is unsalvageable
  *  (missing kind, invalid stat names, etc.). */
 function validateAndClamp(name: string, raw: Record<string, unknown>): SynthesizedItem | null {
-  const kindRaw = typeof raw.kind === 'string' ? raw.kind.toLowerCase() : '';
+  // ⚠ OTA-1411 — coerced first. See KIND_SYNONYMS: `tool` on a rope is a right
+  // answer in a word the dictionary did not have.
+  const kindRaw = canonicalSynthKind(raw.kind);
   if (!(KNOWN_KINDS as readonly string[]).includes(kindRaw)) {
     // We don't NEED kind to be set to enrich the row, but a Qwen
     // response missing kind is usually missing the rest too — bail.

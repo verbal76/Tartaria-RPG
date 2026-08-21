@@ -202,7 +202,13 @@ describe('OTA-1405 (3) — the sprint detector is fed from every door that begin
     // honest evidence, so the next LIVE line waits for a pause.
     expect(NARRATION).toContain('const NARRATION_BURN_BACKOFF_MS = 4_000;');
     expect(NARRATION).toContain('lastLiveNarrationBurnedAt = Date.now();');
-    expect(NARRATION).toContain('|| sprinting || burnedRecently)');
+    // ⚠ MEMBERSHIP, not tail position — see the same note in ota1358. OTA-1411
+    // appended `inOutpostRoom` to this gate and this line broke, which is the pin
+    // objecting to growth rather than to a change in the rule.
+    const gate = NARRATION.slice(
+      NARRATION.indexOf('if (!qwen.isReady() ||'), NARRATION.indexOf('if (opts?.bankOnly) return;'));
+    expect(gate).toContain('sprinting');
+    expect(gate).toContain('burnedRecently');
     expect(NARRATION).toContain("'burned-recently'");
   });
 

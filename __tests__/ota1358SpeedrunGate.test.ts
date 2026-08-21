@@ -77,7 +77,15 @@ describe('OTA-1358 — the sprint gate and classifier parity', () => {
     // ⚠ OTA-1405 — the gate grew a term. `burnedRecently` is the evidence-driven
     // half: the sprint gate needs three actions to trip, so the FIRST generation
     // of a burst always starts, and only a discard can prove it was wasted.
-    expect(src).toContain('|| cooldownActive || sprinting || burnedRecently)');
+    // ⚠ MEMBERSHIP, not tail position. This pin read `|| sprinting)` at OTA-1358
+    // and `|| sprinting || burnedRecently)` at OTA-1405, and broke both times the
+    // gate grew a term (OTA-1411 appended `inOutpostRoom`). An assertion that
+    // fails whenever the gate GROWS pins line shape rather than the rule. Third
+    // tail-anchored pin to rot this session — read the expression, check the term.
+    const gate = src.slice(src.indexOf('if (!qwen.isReady() ||'), src.indexOf('if (opts?.bankOnly) return;'));
+    expect(gate).toContain('cooldownActive');
+    expect(gate).toContain('sprinting');
+    expect(gate).toContain('burnedRecently');
     expect(src).toContain("? 'sprinting'");
     expect(src).toContain("'burned-recently'");
     // ⚠⚠ OTA-1405 — AND IT IS FED FROM TWO DOORS, NOT ONE. This assertion used to

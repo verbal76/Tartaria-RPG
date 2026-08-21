@@ -823,7 +823,44 @@ export async function narrateViaArbiter(
   // for a pause instead of guessing. Fills are exempt — see the constant.
   const burnedRecently = !opts?.bankOnly
     && (Date.now() - lastLiveNarrationBurnedAt) < NARRATION_BURN_BACKOFF_MS;
-  if (!qwen.isReady() || get().isGenerating || inCombat || !intentAllowsQwen || cooldownActive || sprinting || burnedRecently) {
+  // ⚠⚠ OTA-1411 — AN OUTPOST ROOM NEVER GETS A LIVE SCENE INTRO, and the owner's
+  // 4.31.5 log is unambiguous about why:
+  //
+  //   narration:scene_intro n9 avg9.5s max13.1s read8.6s/write0.2s
+  //                         in748t→out4t ⏸8 ✂8/72.8s
+  //
+  //   ⚠ Native queue: 13 generations thrown away (92.2s)
+  //
+  // NINE started, EIGHT preempted and discarded, 72.8 seconds of the one native
+  // lock spent on lines nobody read — and every one of them fired in an outpost
+  // interior. That is a structural mismatch, not bad luck:
+  //
+  //   · Hub rooms have NO BANK. `introPrefetchCandidates` returns [] inside a
+  //     hub (OTA-1258), so every room entry falls through to the LIVE path and
+  //     pays a full ~9-12s prefill on an ~840-token prompt.
+  //   · Hub rooms are where the player moves FASTEST. His corridor cadence was
+  //     1.4 seconds a room. The slowest path in the game is wired to the
+  //     quickest movement in the game.
+  //   · And the room already has authored prose. Every outpost room prints a
+  //     hand-written description ("Architect's Cell — The Pump Room. Old
+  //     Aetheric pumps churn the silt-water out of the lower floors…") before
+  //     the Arbiter says anything. The model was being asked to add an aside to
+  //     a room that is already described, and losing 89% of them.
+  //
+  // ⚠ THE ONE THAT LANDED WAS WRONG ANYWAY. The single scene_intro that survived
+  // in the previous session narrated the Unaligned Poacher — a man dead 51
+  // seconds and a tile away (OTA-1409). So the measured value of this path in
+  // two logs is: eight discards, one wrong line, seventy-plus seconds.
+  //
+  // ⚠ THE PLAYER STILL GETS AN ARBITER LINE. This routes to the template, which
+  // is the authored `buildArbiterSceneIntro` output — the gate below appends it
+  // exactly as it does for cooldown or sprinting. Nothing goes quiet; what stops
+  // is paying twelve seconds for a sentence that gets thrown away.
+  //
+  // ⚠ SCENE INTROS ONLY. A travel or diplomacy narration inside an outpost is a
+  // REACTION the player is waiting on, and those keep the model.
+  const inOutpostRoom = intent === 'scene_intro' && !!get().player?.hubRoomId;
+  if (!qwen.isReady() || get().isGenerating || inCombat || !intentAllowsQwen || cooldownActive || sprinting || burnedRecently || inOutpostRoom) {
     // OTA-1129 — a background fill has no line to fall back to and no player
     // waiting on it. It simply does not run this tick, silently, and the next
     // tick asks again.
@@ -838,7 +875,8 @@ export async function narrateViaArbiter(
       : !intentAllowsQwen ? `intent-not-allowed:${intent}`
       : cooldownActive ? 'cooldown'
       : sprinting ? 'sprinting' // OTA-1358 — the device log's proof the gate is working
-      : 'burned-recently'; // OTA-1405 — the last live line was discarded unread
+      : burnedRecently ? 'burned-recently' // OTA-1405 — the last live line was discarded unread
+      : 'outpost-room'; // OTA-1411 — authored prose already describes it; 8 of 9 were binned
     get().appendLog('debug', `arbiter: template (reason=${reason})`);
     // arb166 — CANNED flavor line: voiced ~30% of the time. (Was 60% — but once
     // arb164 tripled the pools the 30s repeat-guard stopped suppressing dupes,

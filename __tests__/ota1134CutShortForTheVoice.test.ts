@@ -179,7 +179,14 @@ describe('OTA-1134 — the last unnamed discard finally names its culprit', () =
   it('the classification uses the same KNOWN_KINDS the clamp does', () => {
     // A second hand-written list here would drift from the validator and start
     // lying in the log — the failure mode this whole OTA is about.
-    expect(SYNTH).toContain('!(KNOWN_KINDS as readonly string[]).includes(String(obj.kind).toLowerCase())');
+    //
+    // RETARGETED BY OTA-1411 — the rule moved into `canonicalSynthKind()`, which
+    // also folds near-miss synonyms ("tool" → misc). The CLAIM is unchanged and
+    // is now stronger: both sides ask ONE function rather than two hand-rolled
+    // readings of one list. Pinning the old inline expression would have blocked
+    // the shared function it was asking for.
+    expect(SYNTH).toContain('const kindRaw = canonicalSynthKind(raw.kind);');
+    expect(SYNTH).toContain('const why = !canonicalSynthKind(obj.kind)');
   });
 
   it('its neighbours keep the instrumentation that made THIS bug findable', () => {
