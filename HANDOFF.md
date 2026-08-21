@@ -829,16 +829,44 @@ HAL − 23 offset.
 Worktrees used this session: `/tmp/hal-main-fix` (HaL2001), `/tmp/hal-golem`
 (golem-line), `/tmp/hal-eng7` (engine_Dev) — each checked out on its branch.
 
-## 5. Native / artifact builds (rare — confirm first)
+## 5. Native / artifact builds
+
+### ⚠⚠ WHO FIRES A BUILD — the owner's standing rule (OTA-1421)
+
+> *"AGAIN you push all requested builds. I do not push builds, you have
+> everything you need to accomplish that and have been doing it for over
+> 2 months."*
+
+**Once a build is asked for, Claude fires it.** The marker, the trigger touch,
+the push, and watching the run to green are all Claude's job. The owner decides
+*whether* and *when* a build happens; he does not operate the machinery, and
+handing him a "you'll need to run this" instruction for something Claude can do
+is the mistake this section exists to stop. It has been made more than once.
+
+⚠ **Confirm the DECISION, not the mechanics.** "Should we cut a native build
+now?" is a real question — native builds are rare, cost quota, and can reach
+testers. "Here are the steps for you to run" is not; that is a handoff of work
+that was never the owner's.
+
+⚠ **THE ONE GENUINE EXCEPTION: annotated git TAGS.** `git push origin <tag>`
+returns **HTTP 403** from Claude's session — verified again at OTA-1421 by
+pushing a throwaway tag and reading the failure, not by repeating the claim.
+Branch pushes are fine; only tags are blocked. So the `git tag -a` commands in
+`RESTORE-POINTS.md` are genuinely owner-side, and they are the *only* thing in
+this section that is.
+
+### When a native rebuild is actually needed
 
 OTA covers everything in the JS bundle (engine, screens, JSON, bundled assets). A
 native rebuild is needed ONLY for: a new native module / Expo plugin, an
 `app.json`/runtime-version change, edits under `ios/`/`android/`, an Expo SDK bump,
-or Hermes/permission changes. **Confirm with the user first.** Commit-title markers
-lead the title: `[build-aab]` / `[build-ios]` / `[submit-ios]` (mobile native),
-and the desktop/web lines build via their own workflows on push. **Do not put
-`[build-aab]` / `[golem-apk]` / native markers in a commit unless a native build
-is actually intended.**
+or Hermes/permission changes. Commit-title markers: `[build-aab]` /
+`[build-ios]` / `[submit-ios]` (mobile native), and the desktop/web lines build
+via their own workflows on push. Since OTA-1418 a marker may sit **anywhere in
+the commit title** — it no longer has to lead — but it is still read from the
+title only, never the body (OTA-1419). **Do not put `[build-aab]` /
+`[golem-apk]` / native markers in a commit unless a native build is actually
+intended.**
 
 ⚠⚠ **`docs/WORKFLOWS.md` is the full audit — read it before starting any build.**
 Written 2026-08-20 (OTA-1390) after the branch collapse: every workflow, what

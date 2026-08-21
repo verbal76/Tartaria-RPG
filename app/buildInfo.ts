@@ -24262,7 +24262,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1420 — a dog is rolled for, like a person. Starting HP is 2d4 + a profile
 // bonus, mirroring the player's 5d10 + race bonus. Each profile's mean is its
 // old flat value exactly, so nothing about the balance moved — only the spread.
-export const OTA_BUILD_ID = '2026-08-21-1420-a-dog-is-rolled-for';
+// OTA-1421 — housekeeping the owner cleared: linux_dev and mac_dev archived
+// (the trunk already built them), PR #7 closed as superseded, and the standing
+// rule written down that CLAUDE fires every requested build. Tag pushes remain
+// the one genuine owner-side step — re-verified by probe, still 403.
+export const OTA_BUILD_ID = '2026-08-21-1421-claude-pushes-the-builds';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1420-a-dog-is-rolled-for';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1419-the-title-never-the-body';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1418-a-marker-that-works-anywhere';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1417-hal-catches-up';
