@@ -113,6 +113,46 @@ would remove that step and is not set up.
 
 ---
 
+### ⚠⚠ "preview" MEANS TWO OPPOSITE THINGS — OTA-1422
+
+There is a build **profile** called `preview` and an update **channel** called
+`preview`. They are unrelated, and confusing them has cost real time twice.
+
+| | what it is | effect |
+|---|---|---|
+| **profile** `preview` | `distribution: internal` in `eas.json` — a sideload build with no App Store credentials | **cannot reach TestFlight.** If the iOS build resolves to this profile, the run produces something unsubmittable |
+| **channel** `preview` | what the *production* profile stamps into the binary (`eas.json` → `production.channel`) | **required.** The shipped TestFlight build polls this channel; publishing only to `hal2001` leaves iOS with *"Last OTA applied: No"* |
+
+So: **profile preview breaks the iOS build. Channel preview is what keeps it
+updatable.** One is a failure, the other is the mechanism.
+
+Both halves have already bitten:
+
+* **OTA-302 / arb172** — the commit title led with another marker, the *profile*
+  fell back to `preview`, and the build could never be submitted. Fixed at
+  OTA-1418 (a marker may now sit anywhere in the title).
+* **OTA-303** — the publisher sent only to `hal2001`, so the TestFlight build,
+  polling *channel* `preview`, never received an OTA. Fixed by publishing
+  `preview → ios` as well; re-verified server-side at OTA-1174, and the HAL
+  target set is `hal2001:android hal2001:ios preview:ios` to this day.
+
+⚠ **A rename was considered and rejected.** The channel name cannot change —
+every installed TestFlight build polls that string, so renaming it re-creates
+OTA-303 deliberately. The *profile* could be renamed safely, but after OTA-1418
+a fallback to `preview` no longer produces a broken build (it resolves to a
+non-production profile, and the build step then skips), and `preview` is Expo's
+own conventional profile name. The remaining risk is a person misreading a log,
+which is what this table is for.
+
+⚠ **This ambiguity had already shipped to testers.** Every playtest APK's
+GitHub Release note read *"OTA updates ship continuously to channel preview"* —
+untrue since Android moved to a local Gradle build, where the channel comes from
+`app.config.js` and is `golem-line` / `hal2001`, never `preview`. The note now
+prints the channel resolved for that actual build, and the step fails loudly if
+the config carries no channel at all.
+
+---
+
 ## 3. Over-the-air updates
 
 `eas-update-golem.yml` — one workflow, one line per run. (The filename is

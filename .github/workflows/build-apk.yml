@@ -335,12 +335,24 @@ jobs:
           echo "Production AAB — package/bundle id will resolve to the bare store id."
 
       - name: Show the resolved identity actually being built
+        id: identity
         run: |
           # ⚠ Read it back through EXPO'S resolver, not from a file. The whole
           # reason the strip broke unnoticed is that the file and the resolved
           # config had stopped agreeing. This line is what the binary gets.
-          npx expo config --type public --json \
+          # ⚠ OTA-1422 — resolved ONCE and reused. The channel is also captured
+          # as a step output so the GitHub Release note can NAME it rather than
+          # assert one from memory; see the note step below for what it used to
+          # tell testers.
+          CFG=$(npx expo config --type public --json)
+          echo "$CFG" \
             | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const c=JSON.parse(s);console.log('line:    '+(c.extra&&c.extra.tartariaLine));console.log('name:    '+c.name);console.log('package: '+(c.android&&c.android.package));console.log('channel: '+(c.updates&&c.updates.requestHeaders&&c.updates.requestHeaders['expo-channel-name']));console.log('sharing: '+(c.extra&&c.extra.fallenSharing));})"
+          CH=$(node -e "const c=JSON.parse(process.argv[1]);process.stdout.write((c.updates&&c.updates.requestHeaders&&c.updates.requestHeaders['expo-channel-name'])||'')" "$CFG")
+          if [ -z "$CH" ]; then
+            echo "::error::Resolved config carries no expo-channel-name. An install built from this cannot receive OTAs."
+            exit 1
+          fi
+          echo "channel=$CH" >> "$GITHUB_OUTPUT"
 
       - name: Generate native Android project
         run: npx expo prebuild --platform android --no-install
@@ -753,7 +765,7 @@ jobs:
           2. Open it. If prompted, enable Install unknown apps for your browser or file manager.
           3. Tap Install. Launch Tartaria Realms.
 
-          Release-optimized APK, debug-signed for sideloaded playtesting. Each build uses a fresh debug key, so uninstall the previous version first if Android refuses the upgrade. OTA updates ship continuously to channel preview while this APK is installed."
+          Release-optimized APK, debug-signed for sideloaded playtesting. Each build uses a fresh debug key, so uninstall the previous version first if Android refuses the upgrade. OTA updates ship to channel ${{ steps.identity.outputs.channel }} while this APK is installed."
           fi
 
           gh release create "$TAG" \
