@@ -160,7 +160,7 @@ export const createBootSlice = (
         // ⚠ OTA-1413 — only a crumb that did NOT come after an orderly exit.
         if (!reclaimed) {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          (require('../diagnostics/crashLedger') as typeof import('../../diagnostics/crashLedger')).recordCrash({
+          (require('../../diagnostics/crashLedger') as typeof import('../../diagnostics/crashLedger')).recordCrash({
             kind: 'native-death',
             ts: crumb.at,
             stage: crumb.phase ?? 'mid-action',
@@ -314,7 +314,7 @@ export const createBootSlice = (
     // (visible in dev tools / `adb logcat`) instead of appendLog.
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const itemDefaults = require('../engine/itemDefaults');
+      const itemDefaults = require('../../engine/itemDefaults');
       if (typeof itemDefaults.setOnInferred === 'function') {
         itemDefaults.setOnInferred((label: string) => {
           try { console.log(`[Tartaria][inferred-stats] ${label}`); } catch { /* ignore */ }
@@ -329,7 +329,7 @@ export const createBootSlice = (
     // re-spend the model on day 2.
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const synthCache = require('../engine/itemSynthesisCache');
+      const synthCache = require('../../engine/itemSynthesisCache');
       if (typeof synthCache.loadSynthCache === 'function') {
         await synthCache.loadSynthCache();
       }
@@ -346,9 +346,9 @@ export const createBootSlice = (
     // spam the LLM with duplicates.
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const itemDefaults = require('../engine/itemDefaults');
+      const itemDefaults = require('../../engine/itemDefaults');
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const synth = require('../engine/itemSynthesisQwen');
+      const synth = require('../../engine/itemSynthesisQwen');
       if (typeof itemDefaults.setQwenSynthRequester === 'function') {
         const pending = new Set<string>();
         // ⚠ OTA-1109 — A PRIORITY INVERSION, MEASURED. The per-name `pending`
@@ -651,9 +651,9 @@ export const createBootSlice = (
     // place so the inventory screen reflects the upgrade immediately.
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const synthCache = require('../engine/itemSynthesisCache');
+      const synthCache = require('../../engine/itemSynthesisCache');
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const backfill = require('../engine/itemBackfill');
+      const backfill = require('../../engine/itemBackfill');
       if (typeof synthCache.onSynthLanded === 'function'
         && typeof backfill.restampInventoryForName === 'function') {
         synthCache.onSynthLanded((name: string) => {
@@ -712,7 +712,7 @@ export const createBootSlice = (
     // queued behind it in Kokoro (same delay as the welcome-back on resume).
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      void require('../voice/TTSManager').stopAndClear();
+      void require('../../voice/TTSManager').stopAndClear();
     } catch { /* TTS not loaded yet — fine */ }
     // Tungsten Spire — accept an empty name. The Arbiter asks the
     // player for their name in the outpost (tutorial beat 0). For

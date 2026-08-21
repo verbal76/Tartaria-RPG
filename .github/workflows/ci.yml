@@ -115,6 +115,24 @@ jobs:
       - name: Four product lines resolve distinctly (blocking)
         run: npm run check:lines
 
+      # ⚠⚠ OTA-1415 — THE CHECK THAT WOULD HAVE SAVED TWENTY-ONE OTAs.
+      #
+      # Every gate was green from OTA-1394 to OTA-1414 and not one of them
+      # shipped: the publish workflow ran on every push and FAILED on every
+      # push, because eleven lazy `require()` calls in the freshly-carved slices
+      # still pointed at gameStore's old directory. Metro was the only thing in
+      # the pipeline that knew, and it knew in a log nobody opens.
+      #
+      # tsc does not resolve a require() string — several of these carried a
+      # CORRECT type annotation beside a wrong path. eslint does not either;
+      # they all sit under a no-require-imports disable. jest does not, because
+      # they are cold paths no test walks.
+      #
+      # This is the cheapest stand-in for "Metro can bundle this" and it runs in
+      # under a second. See the header of scripts/check-requires.mjs.
+      - name: Relative require() specifiers all resolve (blocking)
+        run: npm run check:requires
+
   test:
     name: jest (fast · required)
     runs-on: ubuntu-latest

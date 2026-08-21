@@ -178,7 +178,7 @@ export const createSlotSlice = (
     // which is the multi-second gap before the greeting is spoken.
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      void require('../voice/TTSManager').stopAndClear();
+      void require('../../voice/TTSManager').stopAndClear();
     } catch { /* TTS not loaded yet — fine */ }
     let saved;
     try {
@@ -469,12 +469,12 @@ export const createSlotSlice = (
           const pulses = Math.min(OFFLINE_PULSE_CAP, Math.floor((Date.now() - lastEnd) / OFFLINE_MS_PER_PULSE));
           if (pulses >= 1) {
             // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const factions = require('../data/factions/factions.json') as import('../../engine/worldPulse').FactionMeta[];
+            const factions = require('../../data/factions/factions.json') as import('../../engine/worldPulse').FactionMeta[];
             // OTA-851 — offline advance runs the same VARIED event engine, so a return
             // after days away reads a mix of skirmishes / musters / caravans, not a row
             // of identical surges.
             // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const WE = require('../engine/worldEvents') as typeof import('../../engine/worldEvents');
+            const WE = require('../../engine/worldEvents') as typeof import('../../engine/worldEvents');
             let tides = { ...(get().worldMemory.factionTides ?? {}) };
             const rumors: { text: string; hour: number }[] = [];
             const eventRows: { text: string; hour: number; kind: string }[] = [];
@@ -798,7 +798,7 @@ export const createSlotSlice = (
     // doesn't crash the exit path.
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { stopAndClear } = require('../voice/TTSManager');
+      const { stopAndClear } = require('../../voice/TTSManager');
       stopAndClear();
     } catch { /* TTSManager not loaded (e.g. in tests) — non-fatal */ }
     await get().persist();

@@ -24237,7 +24237,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1414 — one stat, one job. STR lands a bite, DEX survives a hit, INT wins
 // a distract. The distract used to roll max(DEX,INT) and train whichever it
 // picked, so one command trained different stats on different dogs.
-export const OTA_BUILD_ID = '2026-08-21-1414-one-stat-one-job';
+// ⚠⚠ OTA-1415 — AND THIS MARKER IS HOW YOU KNOW. Twenty-one OTAs never left the
+// building: the publish workflow ran on every push and FAILED on every push,
+// because eleven lazy require()s in the carved-out slices still pointed at
+// gameStore's old directory. Metro was the only thing that knew. The single
+// symptom visible from inside the game was THIS STRING not matching the one on
+// the About screen — which is exactly what this file's header has said it is for
+// since OTA-020, and exactly what nobody checked for three weeks.
+export const OTA_BUILD_ID = '2026-08-21-1415-nothing-had-shipped-since-1393';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1414-one-stat-one-job';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1413-a-reclaim-is-not-a-crash';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1412-the-dog-that-never-grew';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-20-1403-remote-hand-in-for-all-four';

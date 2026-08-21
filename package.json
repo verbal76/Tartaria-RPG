@@ -20,6 +20,7 @@
     "check:handoff": "node scripts/check-handoff-claims.mjs",
     "check:reachability": "node scripts/check-reachability.mjs",
     "check:huntstages": "node scripts/check-hunt-stages.mjs",
+    "check:requires": "node scripts/check-requires.mjs",
     "export:web": "expo export --platform web",
     "check:lines": "node scripts/verify-lines.mjs"
   },
