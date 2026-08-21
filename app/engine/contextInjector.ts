@@ -65,6 +65,29 @@ export interface ContextInputs {
   ladder?: { macro: MacroLocation; micro: MicroLocation; microMicro: MicroMicroLocation } | null;
   /** arb163 — request the ambient (reflective companion) instruction. */
   ambient?: boolean;
+  /**
+   * ⚠⚠ OTA-1409 — WHEN THE CURRENT SCENE BEGAN. Everything the player did
+   * BEFORE this moment happened somewhere else, and handing it to the model as
+   * "recent history" is how a scene intro ends up narrating the last place.
+   *
+   * From the owner's 4.31.5 log. He killed an Unaligned Poacher at The
+   * Architect's Blind, travelled to Asgardar, and the arrival narration said:
+   *
+   *   "You approach the Unaligned Poacher, a man with a twisted grin that fits
+   *    the atmosphere."
+   *
+   * The poacher had been dead for 51 seconds and was a tile away. Nothing
+   * hallucinated him — `formatRecentHistory` handed the model the last three
+   * PLAYER lines regardless of where they happened, and they were
+   * `investigate footprint ← approach Unaligned Poacher ← attack with the mud
+   * repeater crossbow`. Asked to open a scene and given that, the model reached
+   * for the only concrete noun in it.
+   *
+   * ⚠ Omitted (or 0) keeps the old unscoped behaviour, so a caller that has no
+   * stamp — a pre-generated intro for a place the player has not reached — is
+   * unchanged rather than silently filtered to nothing.
+   */
+  sceneStartedAt?: number;
 }
 
 export interface SceneSlice {
@@ -113,7 +136,7 @@ export function buildLlmContext(input: ContextInputs): LlmContext {
     active_entities: formatActiveEntities(scene),
     player_stats: formatPlayerStats(player),
     full_inventory: stringifyInventory(player?.inventory ?? [], player?.equipped, player?.tc ?? 0),
-    recent_history: formatRecentHistory(gameLog),
+    recent_history: formatRecentHistory(gameLog, input.sceneStartedAt),
     in_combat: (scene?.enemies?.length ?? 0) > 0,
     player_faction_id: player?.factionId,
     ambient: input.ambient ?? false,
@@ -324,9 +347,20 @@ const AMBIENT_RULES =
   // section OTA-1106 removed from this prompt.
   AMBIENT_VOICE_RULES;
 
+// ⚠⚠ OTA-1409 — "the road behind you both" IS GONE, and the deletion is the point.
+// This beat is about the PERSON, and that phrase invited travelogue: the owner's
+// logs came back with "traversing the Borderlands" and "traversing through the
+// winding streets of the Borderlands" while he was standing in open mud, and an
+// older one put alleyways and stone pillars inside a flooded-house kitchen.
+// Asked to reflect on a road, a 0.5B model describes a road — and it has no idea
+// which roads exist. The remaining prompts (how far they have come, their growth,
+// your read of them) all point at the character, where this beat can only be
+// right. The explicit prohibition backs it up, because the invitation is what the
+// model was following.
 const AMBIENT_TASK =
   'Make ONE short, UNPROMPTED aside — a passing reflection on how far they have ' +
-  'come, their growth, the road behind you both, or your changing read of them. ' +
+  'come, their growth, or your changing read of them. ' +
+  'Never describe places, scenery or where they have been — only the person. ' +
   'ONE short sentence — about 18 words, no more.';
 
 /** OTA-1121 — the generic half of the location anchor. Carries no room name, so
@@ -637,11 +671,21 @@ function describeEquipped(equipped: PlayerEquipped | undefined, _names: Set<stri
  * never dump the full game log — only the player-typed lines, which are the
  * only thing the model needs to "acknowledge their last action."
  */
-export function formatRecentHistory(log: readonly GameLogEntry[]): string {
+export function formatRecentHistory(
+  log: readonly GameLogEntry[],
+  /** ⚠ OTA-1409 — see `ContextInputs.sceneStartedAt`. Lines older than this
+   *  happened at a different place and are not this scene's history. */
+  sceneStartedAt?: number,
+): string {
   const playerLines: string[] = [];
   for (let i = log.length - 1; i >= 0 && playerLines.length < 3; i--) {
     const entry = log[i];
-    if (entry?.channel === 'player' && entry.text) {
+    if (!entry) continue;
+    // ⚠ STOP at the boundary rather than skipping past it. Walking on would
+    // reach back through the previous scene for three lines and reintroduce the
+    // exact bug — "recent" would mean "the last three things you ever typed".
+    if (sceneStartedAt && entry.ts < sceneStartedAt) break;
+    if (entry.channel === 'player' && entry.text) {
       playerLines.push(entry.text.trim());
     }
   }

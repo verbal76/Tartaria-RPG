@@ -5428,9 +5428,32 @@ function applyForkEffects(
     // ⚠ Clamped at zero. A fork that could put the player into debt they
     // cannot see is a trap, and "you pay what you have" is what the writing
     // says anyway — the collector's man counts it and knows it is not enough.
+    //
+    // ⚠⚠ OTA-1409 — AND THE LINE NOW REPORTS WHAT WAS ACTUALLY TAKEN. It read
+    // the balance AFTER the deduction and was therefore wrong in both
+    // directions, which is worse than being wrong in one:
+    //
+    //   · Short of the price. The owner's 4.31.5 log: ~249 TC, a 260 TC page,
+    //     and `−260 TC` printed. `Math.min(260, 0)` is 0, and the `|| 260`
+    //     fallback then substituted the STICKER PRICE for the zero — so the one
+    //     case the min() existed to handle was the one it could not report.
+    //   · Able to afford it. 300 TC and a 260 TC page prints `−40 TC`: the min()
+    //     compares the price against the CHANGE, not the payment.
+    //
+    // It was only ever right when the two happened to coincide. Reading the
+    // balance BEFORE the write is the whole fix; there is no clamping subtlety
+    // left once the number is measured at the right moment.
+    const before = get().player?.tc ?? 0;
+    const delta = fx.tc < 0 ? -Math.min(Math.abs(fx.tc), before) : fx.tc;
     set((st) => (st.player ? { player: { ...st.player, tc: Math.max(0, st.player.tc + fx.tc!) } } : {}));
-    const paid = fx.tc < 0 ? `−${Math.min(Math.abs(fx.tc), get().player?.tc ?? 0) || Math.abs(fx.tc)}` : `+${fx.tc}`;
-    get().appendLog('reward', `${paid} TC.`);
+    get().appendLog('reward', `${delta < 0 ? '−' : '+'}${Math.abs(delta)} TC.`);
+    // ⚠ And SAY when the price was not met, rather than letting a smaller number
+    // pass for the asking price. The writing already assumes the collector's man
+    // notices; the player had no way to.
+    if (fx.tc < 0 && Math.abs(delta) < Math.abs(fx.tc)) {
+      get().appendLog('system',
+        `You were ${Math.abs(fx.tc) - Math.abs(delta)} TC short — they took what you had.`);
+    }
   }
   if (fx.item) {
     const keep: InventoryItem = {
@@ -6536,6 +6559,15 @@ export interface GameStore {
    *  door every action passes through — so it cannot drift out of step with
    *  what the player is actually doing. Null until the first action. */
   lastPlayerActionAt: number | null;
+  /** ⚠⚠ OTA-1409 — WHEN THE CURRENT SCENE BEGAN, so "recent history" can mean
+   *  "in this place" rather than "the last three things you ever typed". The
+   *  owner's 4.31.5 arrival at Asgardar was narrated as *"You approach the
+   *  Unaligned Poacher"* — a man he had killed 51 seconds and one tile earlier,
+   *  who was in the prompt only because the history window did not stop at the
+   *  scene boundary. Session-scoped and deliberately NOT persisted: on a fresh
+   *  load there is no prior scene to bleed in from, and 0 reads as "no boundary
+   *  known", which is the old behaviour rather than a silent empty history. */
+  sceneStartedAt: number;
   /** Count of cardinal travel steps since the last wasteland
    *  encounter fired. stepDirection increments this every step;
    *  pickWastelandEncounter resets to 0 when an encounter lands.
@@ -7743,6 +7775,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   isGenerating: false,
   uiIdleSince: null,
   lastPlayerActionAt: null,
+  sceneStartedAt: 0,
   // OTA-1126 — idempotent on the way IN: a screen that re-focuses must not
   // restart the dwell clock, or a UI that re-renders every second would keep
   // resetting it and homework would never see an idle window at all.
@@ -10197,7 +10230,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
     } catch { /* voice modules not present in tests */ }
-    set({ currentScene: scene, pendingRolls: null, pendingHookContinue: null });
+    // ⚠ OTA-1409 — stamped in the SAME set() that installs the scene, so there is
+    // no window in which the scene is current and the boundary is not.
+    set({ currentScene: scene, pendingRolls: null, pendingHookContinue: null, sceneStartedAt: Date.now() });
     // arb36 — announce a discovered structure so the new ENTER affordance
     // isn't unexplained. Skipped on the opening scene (you start on the
     // anchor, so sceneBuilding is null there anyway).

@@ -890,6 +890,14 @@ export async function narrateViaArbiter(
     scene: sceneSlice,
     gameLog: state.gameLog,
     ladder,
+    // ⚠⚠ OTA-1409 — the scene boundary, so "recent history" stops at the door.
+    // ⚠ NOT passed when narrating a place the player has not reached (`forLoc`):
+    // a pre-generated intro has no scene of its own to be bounded by, and the
+    // history it would then see belongs to wherever they are actually standing.
+    // Omitting the stamp there keeps the old unscoped behaviour rather than
+    // filtering to an empty history — but the intro prompt does not lean on
+    // history anyway, which is why this was safe to leave alone.
+    sceneStartedAt: forLoc ? undefined : state.sceneStartedAt,
   });
   const messages = buildSystemPrompt(ctx);
   // ⚠ OTA-1129 — A BACKGROUND FILL DOES NOT OWN THE EPOCH. The epoch exists so
@@ -1305,6 +1313,27 @@ export async function maybeGenerateAmbientArbiter(
         const secondPerson = /\b(you|your|you're|you've|yours|yourself)\b/i.test(s);
         return !(firstPerson && !secondPerson);
       })
+      // ⚠⚠ OTA-1409 — THE NARRATOR CALLING THE PLAYER BY ITS OWN JOB TITLE.
+      // Twice in two of the owner's logs, one day apart:
+      //   "You, a companion, have walked a long road, traversing the Borderlands…"
+      //   "You, my companion, have traveled far and wide, traversing through the
+      //    winding streets of the Borderlands."
+      // AMBIENT_RULES opens *"Speak as a companion who has travelled a long road
+      // at their side"* and the model folds that word straight into the line —
+      // addressing the PLAYER as the companion, which inverts who is who.
+      //
+      // ⚠ It slipped every existing guard, and each one for a good reason. The
+      // voice rules demand a sentence starting with "You", so the opener test
+      // passes it. It contains both "my" and "you", so OTA-1125's first-person
+      // filter keeps it. It names no off-canon entity. Nothing was broken — the
+      // shape simply had not been seen before, so it goes in beside the others
+      // rather than being folded into one of them.
+      //
+      // ⚠ NARROW ON PURPOSE, the OTA-1031 lesson: this tests the APPOSITION ONLY.
+      // "You have walked a long road, my friend" survives — that is the Arbiter
+      // addressing the player warmly, which is the beat working. Only the form
+      // that RE-LABELS them is dropped.
+      .filter((s) => !/^\s*(?:and\s+)?you\s*,\s*(?:my|a|an|the|our)?\s*(companion|friend|traveller|traveler|wanderer|comrade|partner|stranger)\s*,/i.test(s))
       // Ambient is the narrator's own idle musing, not world narration — a
       // second-person ACTION opener ("You step back, surveying...") reads as
       // scene text in the arbiter channel and in practice is an off-scene
