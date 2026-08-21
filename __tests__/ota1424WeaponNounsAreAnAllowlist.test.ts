@@ -182,7 +182,12 @@ describe('OTA-1425 — the catalogue is the biggest source, and it caught a hole
     let checked = 0;
     for (const w of WEAPONS as Array<{ name: string; weaponKind?: string }>) {
       if (w.weaponKind === 'runecaster') continue;
-      const tail = (w.name.trim().split(/\s+/).pop() ?? '').replace(/[()]/g, '').toLowerCase();
+      // ⚠ OTA-1427 — mirrors the source: an "X of Y" name is named by its X,
+      // so the head noun is taken before the preposition. This walked the raw
+      // last word and so asserted that LIGHT and STORMS must be accepted —
+      // the test encoding the very slip the source had.
+      const head = w.name.trim().split(/\s+\b(?:of|the)\b\s+/i)[0] ?? w.name;
+      const tail = (head.trim().split(/\s+/).pop() ?? '').replace(/[()]/g, '').toLowerCase();
       if (!/^[a-z-]{2,}$/.test(tail) || QUALIFIERS.has(tail)) continue;
       checked++;
       expect(accepted(`Rust-Eaten ${tail}`)).toBe(true);
@@ -316,5 +321,43 @@ describe('OTA-1426 — rule 5: short names, and the prompt aims at the target', 
     expect(SRC).toContain('Names are short (2-3 words)');
     expect(SRC).not.toContain('Names are short (2-4 words)');
     expect(SRC).toContain('const MAX_FORGED_NAME_WORDS = 4;');
+  });
+});
+
+describe('OTA-1427 — "X of Y" names the X', () => {
+  it('⚠⚠ the two words that were never nouns are gone', () => {
+    // "Aetheric Sword of Light" taught the allowlist LIGHT; "…of Storms" taught
+    // it STORMS. Both were accepted as forge names. "Cairn Storms" is precisely
+    // the silly name this run of OTAs exists to stop — admitted by a parsing
+    // slip rather than by anyone's decision.
+    expect(accepted('Cairn Storms')).toBe(false);
+    expect(accepted('Rust-Eaten Light')).toBe(false);
+  });
+
+  it('⚠⚠ …and the half that IS the noun is taught instead', () => {
+    expect(accepted('Rust-Eaten Sword')).toBe(true);   // from "Sword of Light"
+    expect(accepted('Grave Blade')).toBe(true);        // from "Blade of Light"
+  });
+
+  it('⚠⚠ the owner\'s three improvised commons stay, as he asked', () => {
+    // "leave them as low level improvised weapons, just basic commons" — these
+    // are real Common catalogue weapons (Reclaimer's Trowel 1d4, Order
+    // Letter-Opener 1d4, Mud-fist Wraps 1d10), not parsing noise.
+    expect(accepted('Quarry-Hewn Trowel')).toBe(true);
+    expect(accepted('Bog-Oak Letter-Opener')).toBe(true);
+    expect(accepted('Mud-fist Wraps')).toBe(true);
+  });
+
+  it('⚠ the other four "of" names stop leaking their second half', () => {
+    // Crown of Verdict, Barrier of Aether, Flame of Aether, Wrath of Titans —
+    // all runecaster-ish abstractions whose tails were never weapon nouns.
+    for (const n of ['Iron Verdict', 'Grave Titans', 'Cairn Aether']) {
+      expect(accepted(n)).toBe(false);
+    }
+  });
+
+  it('⚠ the split is on the PREPOSITION, and is pinned', () => {
+    expect(SRC).toContain('"X OF Y" NAMES THE X');
+    expect(SRC).toContain('.map((w) => w.name.trim().split(/\\s+\\b(?:of|the)\\b\\s+/i)[0] ?? w.name)');
   });
 });

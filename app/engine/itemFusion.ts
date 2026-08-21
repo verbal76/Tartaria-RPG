@@ -719,7 +719,15 @@ const WEAPON_ANCHOR_NOUNS = {
  * free, and nobody has to remember this file exists. */
 const CATALOG_WEAPON_TAILS: readonly string[] = WEAPONS
   .filter((w) => (w as { weaponKind?: string }).weaponKind !== 'runecaster')
-  .map((w) => w.name.trim().split(/\s+/).pop() ?? '')
+  // ⚠⚠ OTA-1427 — "X OF Y" NAMES THE X. Seven catalogue weapons are built that
+  // way, and taking the last word made nouns out of the wrong half: "Aetheric
+  // Sword of Light" taught the allowlist **Light**, "…of Storms" taught it
+  // **Storms**. Both were then accepted as forge names — "Cairn Storms" is
+  // precisely the silly name this whole run of OTAs exists to stop, admitted by a
+  // parsing slip rather than by anyone's decision. The head noun sits BEFORE the
+  // preposition; take that instead.
+  .map((w) => w.name.trim().split(/\s+\b(?:of|the)\b\s+/i)[0] ?? w.name)
+  .map((n) => n.trim().split(/\s+/).pop() ?? '')
   .map((t) => t.replace(/[()]/g, '').toLowerCase())
   // Qualifier words that appear only inside those parentheses, never as a noun.
   .filter((t) => /^[a-z-]{2,}$/.test(t)
