@@ -40,11 +40,16 @@ const read = (...p: string[]) =>
 const STORE = read('app', 'state', 'gameStore.ts');
 const COMBAT = read('app', 'state', 'combatResolution.ts');
 
+/** ⚠ OTA-1420 — hp/hpMax pinned; starting HP is a 2d4 roll now and these tests
+ *  are about which STAT trains, not which number the dice gave. See ota1412's
+ *  helper for the longer note, and ota1420 for the roll itself. */
 const dog = (over: Partial<DogCompanion> = {}): DogCompanion => ({
   ...createDogCompanion({
     name: 'Ember', breed: 'mutt', rawSex: 'girl',
     startingProfile: 'mutt', currentHour: 0,
   }),
+  hp: 14,
+  hpMax: 14,
   ...over,
 });
 

@@ -17,6 +17,7 @@
 //     only (NOT abandonment). Rubble-puppy is the post-all-Guardians
 //     fallback.
 
+import { rollDice } from './rng';
 import type {
   DogCompanion,
   DogStartingProfile,
@@ -280,6 +281,51 @@ const STARTING_STATS: Record<DogStartingProfile, { strength: number; dexterity: 
   puppy:    { strength: 8,  dexterity: 9,  intelligence: 9,  hpMax: 12 },
 };
 
+// ⚠⚠ OTA-1420 — A DOG IS ROLLED FOR, LIKE A PERSON.
+//
+// Owner: *"let's set the dogs for a dice roll for starting number. not a floor,
+// let's make it like the start process for the player."*
+//
+// The player's shape (character.ts): `rollStartingHP(race)` = **5d10 + the
+// race's bonus** — a fistful of dice for spread, plus a flat term that says
+// which KIND you are. Two dogs off the same rescue were previously identical to
+// the point; now they are not, and the profile still decides the neighbourhood.
+//
+// ⚠ THE MEAN IS THE OLD NUMBER, EXACTLY. `2d4` averages 5, so each profile's
+// bonus is simply its old flat HP minus 5. Nothing about the balance moves —
+// the mongrel still averages 16, the puppy still averages 12 — only the spread
+// is new. That was the point of picking dice around the existing values rather
+// than inventing a new curve: this is a character-creation change, not a tuning
+// pass, and the tuning was already done.
+//
+//   profile    bonus   range    mean (= the old flat value)
+//   shepherd    +13    15-21     18
+//   mongrel     +11    13-19     16
+//   hound        +9    11-17     14
+//   mutt         +9    11-17     14
+//   puppy        +7     9-15     12
+//
+// ⚠ 2d4 AND NOT 2d6 OR 1d8. Two dice bell slightly, so the middle is common and
+// the extremes are rare — the same reason the player rolls five dice instead of
+// one big one. 2d6 would have given a 10-point spread on a ~14 HP pool, which
+// puts a puppy at 7 HP: one hit from anything, decided before the player has
+// made a single choice. ±3 is a dog that feels individual without being a
+// lottery you reload for.
+//
+// ⚠ EXISTING SAVES ARE UNTOUCHED. This runs once, at creation. A dog already in
+// a save keeps the hpMax it has and grows from there under OTA-1412.
+const DOG_HP_DICE = { count: 2, sides: 4 } as const;
+const DOG_HP_BONUS: Record<DogStartingProfile, number> = {
+  mongrel: 11, shepherd: 13, hound: 9, mutt: 9, puppy: 7,
+};
+
+/** The dog's answer to `rollStartingHP` — 2d4 plus the profile's bonus. Exported
+ *  for the same reason the player's is: it is the one place the number comes
+ *  from, and a test that re-implements it is not testing anything. */
+export function rollStartingDogHP(profile: DogStartingProfile): number {
+  return rollDice(DOG_HP_DICE.count, DOG_HP_DICE.sides) + DOG_HP_BONUS[profile];
+}
+
 /** Build a DogCompanion from the finished onboarding payload. */
 export function createDogCompanion(args: {
   name: string;
@@ -289,6 +335,8 @@ export function createDogCompanion(args: {
   currentHour: number;
 }): DogCompanion {
   const base = STARTING_STATS[args.startingProfile];
+  // OTA-1420 — rolled, not read off the table. See rollStartingDogHP.
+  const hpMax = rollStartingDogHP(args.startingProfile);
   return {
     id: `dog_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
     name: args.name.slice(0, 16).trim() || 'Marrow',
@@ -298,8 +346,8 @@ export function createDogCompanion(args: {
       pronoun: parsePronoun(args.rawSex),
     },
     startingProfile: args.startingProfile,
-    hp: base.hpMax,
-    hpMax: base.hpMax,
+    hp: hpMax,
+    hpMax,
     stats: {
       strength: base.strength,
       dexterity: base.dexterity,

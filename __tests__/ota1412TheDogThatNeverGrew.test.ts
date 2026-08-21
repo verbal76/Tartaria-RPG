@@ -39,12 +39,25 @@ const COMBAT = read('app', 'state', 'combatResolution.ts');
 const STORE = read('app', 'state', 'gameStore.ts');
 const GOLEMS = read('app', 'engine', 'golems.ts');
 
-/** Ember: a mutt, which is the profile the rescue scenarios hand out. */
+/**
+ * Ember: a mutt, which is the profile the rescue scenarios hand out.
+ *
+ * ⚠ OTA-1420 — hp/hpMax PINNED TO 14 HERE, and that is not the suite drifting
+ * from the game. Starting HP became a 2d4 roll, so a fresh mutt is now 11-17.
+ * Every test below is about the GROWTH arithmetic — does a level add 3, does it
+ * heal by the same 3, does the ceiling stop it — and none of them is about which
+ * number the dice gave. Letting the roll through would make them flake one time
+ * in seven for a reason unrelated to what they check. 14 is the roll's mean and
+ * the owner's logged value, so the arithmetic reads exactly as his did.
+ * The roll itself is tested in ota1420, where it is the subject.
+ */
 const ember = (over: Partial<DogCompanion> = {}): DogCompanion => ({
   ...createDogCompanion({
     name: 'Ember', breed: 'mutt', rawSex: 'girl',
     startingProfile: 'mutt', currentHour: 0,
   }),
+  hp: 14,
+  hpMax: 14,
   ...over,
 });
 
@@ -248,16 +261,18 @@ describe('OTA-1412 — every existing save heals itself, with no migration', () 
   });
 
   it('⚠ a dog created by any profile grows the same way', () => {
-    for (const [profile, base] of [
-      ['mongrel', 16], ['shepherd', 18], ['hound', 14], ['mutt', 14], ['puppy', 12],
-    ] as const) {
+    // RETARGETED BY OTA-1420 — this asserted the flat table value each profile
+    // used to start at. That number is now a 2d4 roll around the same mean, so
+    // the claim here is what it was always really about: WHATEVER it starts at,
+    // a level adds exactly 3. The start itself belongs to ota1420.
+    for (const profile of ['mongrel', 'shepherd', 'hound', 'mutt', 'puppy'] as const) {
       const d = createDogCompanion({
         name: 'X', breed: 'b', rawSex: 'they',
         startingProfile: profile, currentHour: 0,
       });
-      expect(d.hpMax).toBe(base);
       const r = trainDogStat(brink(d, 'dexterity'), 'dexterity', true);
-      expect(r.dog.hpMax).toBe(base + 3);
+      expect(r.dog.hpMax).toBe(d.hpMax + 3);
+      expect(r.dog.hp).toBe(d.hp + 3);
     }
   });
 });

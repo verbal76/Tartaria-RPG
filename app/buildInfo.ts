@@ -24259,7 +24259,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1419 — the OTA publisher grepped the whole commit message, so a commit
 // that merely MENTIONED the hal marker in prose published to live players. All
 // three marker reads now pipe through `head -1`: the title, never the body.
-export const OTA_BUILD_ID = '2026-08-21-1419-the-title-never-the-body';
+// OTA-1420 — a dog is rolled for, like a person. Starting HP is 2d4 + a profile
+// bonus, mirroring the player's 5d10 + race bonus. Each profile's mean is its
+// old flat value exactly, so nothing about the balance moved — only the spread.
+export const OTA_BUILD_ID = '2026-08-21-1420-a-dog-is-rolled-for';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1419-the-title-never-the-body';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1418-a-marker-that-works-anywhere';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1417-hal-catches-up';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1416-pet-the-dog';

@@ -63,6 +63,13 @@ async function bootWithDog(opts?: { hp?: number; loyalty?: number; inventory?: a
       ...p0,
       dog: {
         ...dog,
+        // ⚠ OTA-1420 — hpMax PINNED. Starting HP became a 2d4 roll (a mongrel
+        // is now 13-19), and these tests are about feeding and healing, not
+        // about what the dice gave. Left unpinned, the heal-to-full assertion
+        // below flakes roughly six times in seven. 16 is the roll's mean and the
+        // mongrel's pre-OTA-1420 flat value, so the arithmetic reads exactly as
+        // it did when it was written. The roll is tested in ota1420.
+        hpMax: 16,
         hp: opts?.hp ?? 8, // half-HP so heal has room
         loyalty: opts?.loyalty ?? 50,
         lastFedAtHour: 0,
@@ -139,7 +146,10 @@ describe('OTA-120 Phase 4 — feed / heal / use on dog', () => {
     store.getState().submitPlayerAction('heal dog First Aid Kit');
     const dog = store.getState().player?.dog;
     expect(dog).toBeDefined();
-    // hpMax for mongrel is 16; First Aid Kit healHP=25 clamps to (16-4)=12.
+    // The fixture pins hpMax to 16; a First Aid Kit's healHP=25 clamps to the
+    // gap. ⚠ OTA-1420 — asserted as "healed to FULL" rather than the literal,
+    // so the claim survives the starting roll being re-tuned.
+    expect(dog!.hp).toBe(dog!.hpMax);
     expect(dog!.hp).toBe(16);
     expect(dog!.loyalty).toBeGreaterThan(50);
     expect(store.getState().player?.inventory.find((i) => i.name === 'First Aid Kit')).toBeUndefined();
