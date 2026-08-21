@@ -24279,7 +24279,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // twice before (OTA-801, OTA-814) and beaten a third time by a word nobody
 // had banned. Inverted to an allowlist built from the forge's own noun
 // pools, so a bad weapon name is impossible rather than merely enumerable.
-export const OTA_BUILD_ID = '2026-08-21-1424-a-weapon-noun-allowlist';
+// OTA-1425 — the catalogue teaches the namer. OTA-1424's hand-written
+// allowlist omitted AXE (nine ship), Greatsword, Shield, Buckler, Cannon,
+// Longbow, Kukri, Railgun... Now derived from the 276 shipped weapons.
+export const OTA_BUILD_ID = '2026-08-21-1425-the-catalogue-teaches-the-namer';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1424-a-weapon-noun-allowlist';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1423-the-dog-has-a-name';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1421-claude-pushes-the-builds';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1420-a-dog-is-rolled-for';

@@ -22,7 +22,7 @@
 // refusal instead of crafting a degenerate item.
 
 import type { InventoryItem, UniqueItemStats } from './types';
-import { canonicalItemTags, isInferredItem, isRecipeIngredientName, findWeaponByName, findArmorByName } from './crafting';
+import { canonicalItemTags, isInferredItem, isRecipeIngredientName, findWeaponByName, findArmorByName, WEAPONS } from './crafting';
 import { inferGearTagPack } from './itemDefaults';
 // OTA-1086 — the salvage-curio catalog, so the forge can refuse to name its
 // product after stock salvage (see the input-echo rejection in the namer).
@@ -642,6 +642,38 @@ const WEAPON_NOUNS_EXTRA = {
   ],
 } as const;
 
+/** ⚠⚠ OTA-1425 — AND THE CATALOGUE ITSELF IS THE BIGGEST SOURCE.
+ *
+ * OTA-1424 hand-wrote the accepted vocabulary and shipped a hole big enough to
+ * see from orbit: **`Axe` was not on it.** The catalogue carries nine melee axes
+ * and a throwing axe, and a Qwen name ending in "Axe" would have been thrown
+ * away in favour of the pool. Also absent: Greatsword (6 of them), Shield (10),
+ * Buckler (5), Cannon (5), Longbow (3), Shortsword (3), Kukri, Claymore,
+ * Knuckles, Gauntlet, Railgun, Handgun, Blaster.
+ *
+ * Writing the list by hand was the blocklist mistake wearing the other coat — a
+ * curated set that has to be remembered, when the game already ships 276 weapons
+ * whose names say exactly what a weapon is called here. So the head noun of every
+ * catalogue weapon is now part of the allowlist, computed at module load.
+ *
+ * ⚠ Runecasters are EXCLUDED. Their head nouns are effects, not arms — Blight,
+ * Rebirth, Verdict, Ripple, Torrent — and folding them in would re-admit exactly
+ * the abstract-noun names OTA-814 removed ("Aether Core" is a Core; "Sunken
+ * Rebirth" would be no better).
+ *
+ * ⚠ Parenthetical tags are stripped. Catalogue names carry qualifiers like
+ * "(Legendary)", "(Throwing)", "(Single)" that are not nouns at all.
+ *
+ * ⚠ Net effect: adding a weapon to the catalogue teaches the namer its noun for
+ * free, and nobody has to remember this file exists. */
+const CATALOG_WEAPON_TAILS: readonly string[] = WEAPONS
+  .filter((w) => (w as { weaponKind?: string }).weaponKind !== 'runecaster')
+  .map((w) => w.name.trim().split(/\s+/).pop() ?? '')
+  .map((t) => t.replace(/[()]/g, '').toLowerCase())
+  // Qualifier words that appear only inside those parentheses, never as a noun.
+  .filter((t) => /^[a-z-]{2,}$/.test(t)
+    && !['legendary', 'rare', 'uncommon', 'common', 'single', 'stealth', 'throw', 'throwing', 'ranged'].includes(t));
+
 /** Every noun a forged WEAPON is allowed to end on, lowercased. */
 const WEAPON_TAIL_NOUNS: ReadonlySet<string> = new Set(
   [
@@ -649,7 +681,7 @@ const WEAPON_TAIL_NOUNS: ReadonlySet<string> = new Set(
     ...WEAPON_NOUNS_LONG,
     ...WEAPON_NOUNS_RANGED,
     ...Object.values(WEAPON_NOUNS_EXTRA).flat(),
-  ].map((n) => n.toLowerCase()),
+  ].map((n) => n.toLowerCase()).concat(CATALOG_WEAPON_TAILS),
 );
 
 /** ⚠ OTA-1424 — TRUE when a model-supplied WEAPON name does NOT end in a noun

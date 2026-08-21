@@ -145,3 +145,60 @@ describe('OTA-1424 — one source, so the pools and the guard cannot drift', () 
     expect(SRC).toContain("const last = (name.trim().toLowerCase().split(/\\s+/).pop() ?? '').replace(/[^a-z-]/g, '');");
   });
 });
+
+describe('OTA-1425 — the catalogue is the biggest source, and it caught a hole', () => {
+  it('⚠⚠ AXE. Nine of them ship, and OTA-1424 would have rejected the word', () => {
+    // The hole that proved a hand-written allowlist is the blocklist mistake
+    // wearing the other coat: a curated set someone has to REMEMBER, against a
+    // game that already ships 276 weapons saying what a weapon is called here.
+    expect(accepted('Rust-Eaten Axe')).toBe(true);
+  });
+
+  it('⚠⚠ …and the rest of what was missing', () => {
+    for (const n of [
+      'Cairn Greatsword', 'Slag-Cast Buckler', 'Iron-Bound Shield', 'Voltaic Cannon',
+      'Bog-Oak Longbow', 'Tempered Shortsword', 'Bog-Oak Kukri', 'Forge-Black Claymore',
+      'Scrap-Welded Knuckles', 'Anvil-Struck Gauntlet', 'Voltaic Railgun', 'Salvaged Handgun',
+    ]) expect(accepted(n)).toBe(true);
+  });
+
+  it('⚠⚠ every non-runecaster catalogue weapon name passes its own guard', () => {
+    // The strongest form of the claim: no weapon the game ships could be
+    // rejected if the namer proposed its noun.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { WEAPONS } = require('../app/engine/crafting');
+    const QUALIFIERS = new Set(['legendary', 'rare', 'uncommon', 'common', 'single', 'stealth', 'throw', 'throwing', 'ranged']);
+    let checked = 0;
+    for (const w of WEAPONS as Array<{ name: string; weaponKind?: string }>) {
+      if (w.weaponKind === 'runecaster') continue;
+      const tail = (w.name.trim().split(/\s+/).pop() ?? '').replace(/[()]/g, '').toLowerCase();
+      if (!/^[a-z-]{2,}$/.test(tail) || QUALIFIERS.has(tail)) continue;
+      checked++;
+      expect(accepted(`Rust-Eaten ${tail}`)).toBe(true);
+    }
+    expect(checked).toBeGreaterThan(180);
+  });
+
+  it('⚠⚠ RUNECASTERS ARE EXCLUDED — their head nouns are effects, not arms', () => {
+    // Blight, Rebirth, Verdict, Ripple, Torrent. Folding these in would re-admit
+    // exactly the abstract-noun names OTA-814 removed.
+    for (const n of ['Sunken Rebirth', 'Mud Verdict', 'Hollow Blight', 'Still Ripple']) {
+      expect(accepted(n)).toBe(false);
+    }
+    expect(SRC).toContain("weaponKind !== 'runecaster'");
+  });
+
+  it('⚠ parenthetical qualifiers never become nouns', () => {
+    // Catalogue names carry "(Legendary)", "(Throwing)", "(Single)". Those are
+    // tags, and admitting them would accept "Rust-Eaten Legendary".
+    for (const n of ['Rust-Eaten Legendary', 'Cairn Rare', 'Iron Throwing', 'Slag Single']) {
+      expect(accepted(n)).toBe(false);
+    }
+  });
+
+  it('⚠ it is DERIVED, so a new catalogue weapon teaches the namer for free', () => {
+    expect(SRC).toContain('const CATALOG_WEAPON_TAILS: readonly string[] = WEAPONS');
+    expect(SRC).toContain('.concat(CATALOG_WEAPON_TAILS)');
+    expect(SRC).toContain('AND THE CATALOGUE ITSELF IS THE BIGGEST SOURCE');
+  });
+});
