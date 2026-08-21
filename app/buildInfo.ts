@@ -24282,7 +24282,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1425 — the catalogue teaches the namer. OTA-1424's hand-written
 // allowlist omitted AXE (nine ship), Greatsword, Shield, Buckler, Cannon,
 // Longbow, Kukri, Railgun... Now derived from the 276 shipped weapons.
-export const OTA_BUILD_ID = '2026-08-21-1425-the-catalogue-teaches-the-namer';
+// OTA-1426 — the owner's 300-noun anchor library, in whole. His rule 7 gates
+// the AGENT category on damage type, which is what lets Dust and Mist back in
+// where they read right without re-opening the OTA-801 complaint.
+export const OTA_BUILD_ID = '2026-08-21-1426-the-anchor-noun-library';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1425-the-catalogue-teaches-the-namer';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1424-a-weapon-noun-allowlist';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1423-the-dog-has-a-name';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1421-claude-pushes-the-builds';

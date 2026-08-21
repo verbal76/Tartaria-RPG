@@ -107,9 +107,11 @@ describe('OTA-1424 — armor is untouched, which is deliberate', () => {
     // asked for, and both call sites gate on kind === 'weapon'.
     const calls = [...SRC.matchAll(/fusedWeaponNameReadsSoft\(/g)];
     expect(calls.length).toBeGreaterThanOrEqual(2);
+    // RETARGETED BY OTA-1426 — both sites now pass the damage type through, for
+    // rule 7. The claim is unchanged: the guard is reached only for weapons.
     for (const kindGate of [
-      "stats.kind === 'weapon' && fusedWeaponNameReadsSoft(name)",
-      "item.uniqueStats.kind === 'weapon' && fusedWeaponNameReadsSoft(item.name)",
+      "stats.kind === 'weapon' && fusedWeaponNameReadsSoft(name, stats.damageType)",
+      "item.uniqueStats.kind === 'weapon' && fusedWeaponNameReadsSoft(item.name, item.uniqueStats.damageType)",
     ]) expect(SRC).toContain(kindGate);
   });
 });
@@ -122,11 +124,16 @@ describe('OTA-1424 — one source, so the pools and the guard cannot drift', () 
     expect(SRC).toContain('long: [...WEAPON_NOUNS_LONG],');
     expect(SRC).toContain('ranged: [...WEAPON_NOUNS_RANGED],');
     expect(SRC).toContain('...WEAPON_NOUNS_MELEE,');
-    expect(SRC).toContain('...Object.values(WEAPON_NOUNS_EXTRA).flat(),');
+    // RETARGETED BY OTA-1426 — the hand-written extras became the owner's
+    // anchor library, and agent is spread separately so rule 7 can gate it.
+    for (const cat of ['blade', 'blunt', 'polearm', 'ranged', 'natural']) {
+      expect(SRC).toContain(`...WEAPON_ANCHOR_NOUNS.${cat},`);
+    }
+    expect(SRC).toContain('WEAPON_ANCHOR_NOUNS.agent.map((n) => n.toLowerCase())');
   });
 
   it('⚠ the extra vocabulary is grouped by category, as asked', () => {
-    for (const cat of ['blade:', 'blunt:', 'polearm:', 'ranged:', 'natural:', 'agent:']) {
+    for (const cat of ['  blade: [', '  blunt: [', '  polearm: [', '  ranged: [', '  natural: [', '  agent: [']) {
       expect(SRC).toContain(cat);
     }
   });
@@ -142,7 +149,11 @@ describe('OTA-1424 — one source, so the pools and the guard cannot drift', () 
     // "Resonant Cleaver" became one token and nothing passed. The OTA-801 suite
     // caught it, which is what it was written to do.
     expect(SRC).toContain('SPLIT FIRST, THEN STRIP');
-    expect(SRC).toContain("const last = (name.trim().toLowerCase().split(/\\s+/).pop() ?? '').replace(/[^a-z-]/g, '');");
+    // RETARGETED BY OTA-1426 — the split now feeds the word-count rule as well,
+    // so the tokens are kept rather than popped inline. Same claim: split on
+    // whitespace FIRST, strip punctuation from the tail only.
+    expect(SRC).toContain("const words = name.trim().toLowerCase().split(/\\s+/).filter(Boolean);");
+    expect(SRC).toContain("const last = (words.pop() ?? '').replace(/[^a-z-]/g, '');");
   });
 });
 
@@ -200,5 +211,110 @@ describe('OTA-1425 — the catalogue is the biggest source, and it caught a hole
     expect(SRC).toContain('const CATALOG_WEAPON_TAILS: readonly string[] = WEAPONS');
     expect(SRC).toContain('.concat(CATALOG_WEAPON_TAILS)');
     expect(SRC).toContain('AND THE CATALOGUE ITSELF IS THE BIGGEST SOURCE');
+  });
+});
+
+// ── OTA-1426 — the owner's 300-noun anchor library ──────────────────────────
+import { readFileSync as rf } from 'fs';
+const ANCHORS = (() => {
+  const i = SRC.indexOf('const WEAPON_ANCHOR_NOUNS = {');
+  const body = SRC.slice(i, SRC.indexOf('} as const;', i));
+  const out: Record<string, string[]> = {};
+  for (const m of body.matchAll(/^  (\w+): \[([\s\S]*?)\n  \],/gm)) {
+    out[m[1]!] = [...m[2]!.matchAll(/'([^']+)'/g)].map((x) => x[1]!);
+  }
+  return out;
+})();
+
+describe('OTA-1426 — the anchor library is in, whole', () => {
+  it('⚠⚠ six categories, fifty anchors each, exactly as supplied', () => {
+    expect(Object.keys(ANCHORS).sort()).toEqual(['agent', 'blade', 'blunt', 'natural', 'polearm', 'ranged']);
+    for (const [cat, list] of Object.entries(ANCHORS)) {
+      expect({ [cat]: list.length }).toEqual({ [cat]: 50 });
+      expect(new Set(list).size).toBe(50); // no duplicates inside a category
+    }
+  });
+
+  it('⚠⚠ his three worked examples all pass', () => {
+    // "Rust-Marked Knife | Grave Iron Maul | Plasma Bolt-Caster"
+    expect(accepted('Rust-Marked Knife')).toBe(true);
+    expect(accepted('Grave Iron Maul')).toBe(true);
+    expect(accepted('Plasma Bolt-Caster')).toBe(true);
+  });
+
+  it('⚠⚠ every non-agent anchor is accepted on any damage type', () => {
+    for (const cat of ['blade', 'blunt', 'polearm', 'ranged', 'natural']) {
+      for (const n of ANCHORS[cat]!) {
+        expect(accepted(`Rust-Marked ${n}`)).toBe(true);
+      }
+    }
+  });
+
+  it('⚠ hyphenated anchors count as ONE anchor (his rule 6)', () => {
+    for (const n of ['Bolt-Caster', 'Cross-Saber', 'Shield-Hammer', 'Magna-Cannon', 'Aether-Lance']) {
+      expect(accepted(`Grave ${n}`)).toBe(true);
+    }
+  });
+});
+
+describe('OTA-1426 — rule 7: agent anchors need the weapon to BE the substance', () => {
+  const soft = (n: string, d?: string) => fusedWeaponNameReadsSoft(n, d);
+
+  it('⚠⚠ an agent name on a PAYLOAD weapon is accepted', () => {
+    for (const d of ['poison', 'burn', 'electrical', 'aetheric']) {
+      expect(soft('Resonant Miasma', d)).toBe(false);
+      expect(soft('Grave Venom', d)).toBe(false);
+    }
+  });
+
+  it('⚠⚠ …and refused on a weapon you simply hit things with', () => {
+    for (const d of ['slashing', 'piercing', 'bludgeoning']) {
+      expect(soft('Resonant Miasma', d)).toBe(true);
+      expect(soft('Grave Venom', d)).toBe(true);
+    }
+  });
+
+  it('⚠⚠ DUST and MIST — the two words that collided with OTA-801/814', () => {
+    // Both are in his AGENT list; both were explicitly banned before for reading
+    // as "anything but a weapon". Neither was dropped: they are admitted exactly
+    // where they read correctly and refused exactly where they read as the old
+    // defect. That is rule 7 doing the work a blanket decision could not.
+    expect(soft('Aether Mist', 'aetheric')).toBe(false);
+    expect(soft('Aether Mist', 'piercing')).toBe(true);
+    expect(soft('Grave Dust', 'poison')).toBe(false);
+    expect(soft('Grave Dust', 'bludgeoning')).toBe(true);
+  });
+
+  it('⚠ with no damage type known, an agent anchor is refused', () => {
+    // The migration path calls this on stored items; absent data must fail
+    // toward the deterministic name rather than toward the old complaint.
+    expect(soft('Resonant Miasma')).toBe(true);
+  });
+
+  it('⚠ every agent anchor obeys the gate, all fifty of them', () => {
+    for (const n of ANCHORS.agent!) {
+      expect(soft(`Grave ${n}`, 'poison')).toBe(false);
+      expect(soft(`Grave ${n}`, 'bludgeoning')).toBe(true);
+    }
+  });
+});
+
+describe('OTA-1426 — rule 5: short names, and the prompt aims at the target', () => {
+  it('⚠⚠ five lexical units is refused', () => {
+    expect(accepted('One Two Three Four Five Cleaver')).toBe(false);
+  });
+
+  it('⚠ four is tolerated — the ceiling is target-plus-one', () => {
+    expect(accepted('Rust-Marked Ancient Aetheric Bolt-Caster')).toBe(true);
+  });
+
+  it('⚠⚠ …and the PROMPT asks for 2-3, so names aim at the target not the ceiling', () => {
+    // Guard and prompt have to be set together. A guard at the target would
+    // throw away names the prompt had just asked for; a prompt at the ceiling
+    // makes every name drift to the longest thing that passes.
+    expect(SRC).toContain('<2-3 word evocative name>');
+    expect(SRC).toContain('Names are short (2-3 words)');
+    expect(SRC).not.toContain('Names are short (2-4 words)');
+    expect(SRC).toContain('const MAX_FORGED_NAME_WORDS = 4;');
   });
 });

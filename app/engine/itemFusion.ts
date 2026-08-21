@@ -386,7 +386,7 @@ function buildPrompt(
       content: [
         'You design a unique fused item for a post-flood salvager RPG. Output ONLY a single JSON object on one line — no markdown, no prose.',
         '',
-        'World tone: Reclaimers scavenge a flooded wasteland; the Aether is a strange resonant material left over from a fallen civilization. Names should be short (2–4 words), evocative, never silly or modern-branded.',
+        'World tone: Reclaimers scavenge a flooded wasteland; the Aether is a strange resonant material left over from a fallen civilization. Names should be short (2–3 words), evocative, never silly or modern-branded.',
         '',
         'Shape (kind === "weapon"):',
         '{ "kind": "weapon", "name": "Marrowsong Cleaver", "description": "<one line>", "rarity": "Rare"|"Legendary", "damageDice": "1d8"|"2d6"|..., "damageType": "slashing"|"piercing"|"bludgeoning"|"aether"|"burn"|"electrical"|"poison", "scalesWith": "strength"|"dexterity"|"intelligence"|"wisdom"|"charisma", "resistance"?: "burn"|"cold"|"poison"|"aetheric"|"electrical"|"degradation", "special": "<one-line flavor>" }',
@@ -608,37 +608,88 @@ const WEAPON_NOUNS_RANGED = [
   'Bow', 'Caster', 'Launcher', 'Slinger', 'Repeater', 'Arbalest', 'Thrower', 'Bolt-Rig',
 ] as const;
 
-/** ⚠ ACCEPTED-BUT-NOT-FORGED. The deterministic namer never picks these; they
- *  exist so a Qwen name can be *better* than the pool rather than merely legal.
- *  Grouped by category because the owner asked for it that way — "guns, knives,
- *  melee or whatever" — and because a category is the unit you extend. Adding a
- *  word here widens what the model may say; adding one to a pool above also
- *  changes what the forge itself produces. */
-const WEAPON_NOUNS_EXTRA = {
+/** ⚠⚠ OTA-1426 — THE OWNER'S ANCHOR NOUN LIBRARY. 300 words, 50 per category,
+ *  supplied as `Tartaria_Weapon_Anchor_Nouns.md` and reproduced here verbatim.
+ *
+ *  His framing: *"Pattern: [modifier] [modifier] [ANCHOR NOUN]"* — the anchor is
+ *  the terminal noun and the thing that decides whether a name reads as a weapon
+ *  at all. That is exactly what this guard tests, so his library replaces the
+ *  hand-written vocabulary OTA-1424 guessed at.
+ *
+ *  ⚠ HIS CATEGORIES ARE KEPT AS THE STRUCTURE, not flattened, because rule 7 of
+ *  his spec is a semantic one — *"a Blade anchor should read as a cutting weapon;
+ *  … Agent as a harmful substance or payload"* — and one category has to be
+ *  gated on it. See PAYLOAD_DAMAGE below.
+ *
+ *  ⚠ Existing Tartaria terminology is preserved on purpose (his note): Rifle,
+ *  Cannon, Carbine, Railgun, Bolt-Caster, Bow and Crossbow coexist. Nothing here
+ *  modernises the setting.
+ */
+const WEAPON_ANCHOR_NOUNS = {
   blade: [
-    'Blade', 'Sword', 'Sabre', 'Saber', 'Falchion', 'Dirk', 'Shiv', 'Knife',
-    'Dagger', 'Machete', 'Cutlass', 'Kris', 'Scimitar', 'Razor', 'Shard',
-    'Shear', 'Shears', 'Slicer', 'Carver', 'Flenser', 'Skinner', 'Scythe',
+    'Blade', 'Knife', 'Dagger', 'Sword', 'Greatsword', 'Shortsword', 'Saber',
+    'Cleaver', 'Axe', 'Claymore', 'Warblade', 'Thornblade', 'Cross-Saber',
+    'Deathblade', 'Longsword', 'Broadsword', 'Cutlass', 'Scimitar', 'Falchion',
+    'Machete', 'Dirk', 'Shiv', 'Razor', 'Kris', 'Kukri', 'Seax', 'Messer',
+    'Chopper', 'Hatchet', 'Handaxe', 'Battleaxe', 'Greataxe', 'Sawblade',
+    'Chainblade', 'Boneblade', 'Hookblade', 'Shardblade', 'Edgeblade',
+    'Riftblade', 'Stormblade', 'Voidblade', 'Sunblade', 'Moonblade',
+    'Frostblade', 'Emberblade', 'Bloodblade', 'Graveblade', 'Ironblade',
+    'Crystalblade', 'Plasmablade'
   ],
   blunt: [
-    'Mace', 'Hammer', 'Club', 'Bludgeon', 'Basher', 'Flail', 'Morningstar',
-    'Warhammer', 'Sledge', 'Mallet', 'Cosh', 'Truncheon', 'Baton', 'Smasher',
-    'Pulper', 'Ram',
+    'Hammer', 'Sledge', 'Maul', 'Club', 'Mace', 'Baton', 'Warhammer', 'Rod',
+    'Gauntlet', 'Shield-Hammer', 'Cudgel', 'Truncheon', 'Mallet', 'Greatclub',
+    'Warclub', 'Flail', 'Morningstar', 'Bludgeon', 'Knuckles', 'Knuckler',
+    'Crusher', 'Breaker', 'Pounder', 'Thumper', 'Smasher', 'Ram', 'Crowbar',
+    'Staff', 'Quarterstaff', 'Boneclub', 'Shock-Maul', 'Piston-Hammer',
+    'Impact-Hammer', 'Power-Hammer', 'Forge-Hammer', 'Siege-Hammer',
+    'Grav-Hammer', 'Arc-Hammer', 'Plasma-Maul', 'Iron-Maul', 'Stone-Maul',
+    'Skull-Mace', 'Chain-Mace', 'Spiked-Mace', 'War-Mallet', 'Battle-Sledge',
+    'Shock-Baton', 'Power-Gauntlet', 'Fist', 'Knuckle-Duster'
   ],
   polearm: [
-    'Poleaxe', 'Bardiche', 'Partisan', 'Trident', 'Fork', 'Pilum', 'Javelin',
-    'Staff', 'Quarterstaff', 'Bill', 'Voulge',
+    'Pike', 'Spear', 'Halberd', 'Aether-Lance', 'Oathspear', 'Lance', 'Glaive',
+    'Poleaxe', 'Polehammer', 'Javelin', 'Trident', 'Harpoon', 'War-Spear',
+    'Longspear', 'Greatspear', 'Hook-Spear', 'Blade-Spear', 'Shock-Spear',
+    'Breach-Lance', 'Shock-Lance', 'War-Lance', 'Poleblade', 'War-Scythe',
+    'Fauchard', 'Guisarme', 'Voulge', 'Partisan', 'Ranseur', 'Spetum',
+    'Bardiche', 'Billhook', 'War-Fork', 'Impaler', 'Skewer', 'Longhook', 'Gaff',
+    'Naginata', 'Guandao', 'Brandistock', 'Lucerne-Hammer', 'Polepick',
+    'Spearstaff', 'Chain-Spear', 'Plasma-Lance', 'Arc-Lance', 'Grav-Lance',
+    'Rift-Spear', 'Thorn-Spear', 'Bone-Spear', 'Shard-Pike'
   ],
   ranged: [
-    'Crossbow', 'Sling', 'Carbine', 'Musket', 'Rifle', 'Pistol', 'Blunderbuss',
-    'Culverin', 'Hurler', 'Flinger', 'Dartcaster', 'Stinger',
+    'Bolt-Caster', 'Rifle', 'Cannon', 'Crossbow', 'Longbow', 'Blaster', 'Gun',
+    'Launcher', 'Pistol', 'Carbine', 'Handgun', 'Magna-Cannon', 'Railgun',
+    'Bow', 'Disk', 'Hand-Cannon', 'Repeater', 'Needler', 'Projector',
+    'Discharger', 'Emitter', 'Accelerator', 'Impeller', 'Scatter-Caster',
+    'Burst-Caster', 'Heavy-Caster', 'Hand-Caster', 'Long-Caster',
+    'Needle-Caster', 'Slug-Caster', 'Flechette-Caster', 'Arc-Caster',
+    'Plasma-Caster', 'Pulse-Caster', 'Shock-Caster', 'Flame-Caster',
+    'Cryo-Caster', 'Grenade-Caster', 'Rail-Caster', 'Coil-Caster',
+    'Harpoon-Launcher', 'Bolt-Rifle', 'Pulse-Rifle', 'Beam-Rifle', 'Arc-Rifle',
+    'Plasma-Rifle', 'Scattergun', 'Autocaster', 'Bombard', 'Thrower'
   ],
   natural: [
-    'Claw', 'Tusk', 'Horn', 'Barb', 'Sting', 'Quill', 'Stinger', 'Beak', 'Maw',
+    'Claw', 'Talon', 'Fang', 'Tusk', 'Horn', 'Antler', 'Spur', 'Stinger',
+    'Barb', 'Quill', 'Spine', 'Spike', 'Thorn', 'Tooth', 'Mandible', 'Pincer',
+    'Beak', 'Tentacle', 'Tendril', 'Tail', 'Jaw', 'Maw', 'Ripper', 'Gouger',
+    'Impaler', 'Piercer', 'Crusher', 'Snapper', 'Spitter', 'Sprayer', 'Gland',
+    'Siphon', 'Lash', 'Hook', 'Boneblade', 'Bonespur', 'Boneclub',
+    'Carapace-Blade', 'Fleshwhip', 'Venom-Spur', 'Needle-Spine', 'Scythe-Claw',
+    'Razor-Fang', 'Hammer-Tail', 'Spine-Whip', 'Thorn-Lash', 'Jawblade',
+    'Sting-Tail', 'Bone-Hook', 'Chitin-Blade'
   ],
   agent: [
-    'Bane', 'Ruin', 'Scourge', 'Reaper', 'Slayer', 'Butcher', 'Widow', 'Wrecker',
-    'Mauler', 'Gutter', 'Piercer', 'Cleaver', 'Rend', 'Cleave', 'Wound',
+    'Poison', 'Venom', 'Toxin', 'Acid', 'Caustic', 'Corrosive', 'Irritant',
+    'Incendiary', 'Accelerant', 'Thermite', 'Phosphor', 'Oxidizer', 'Paralytic',
+    'Mutagen', 'Pathogen', 'Spore', 'Parasite', 'Nanite', 'Swarm', 'Dust',
+    'Powder', 'Aerosol', 'Mist', 'Vapor', 'Gas', 'Smoke', 'Sludge', 'Gel',
+    'Resin', 'Compound', 'Reagent', 'Serum', 'Catalyst', 'Blight', 'Rot',
+    'Plague', 'Contagion', 'Miasma', 'Ichor', 'Bile', 'Slime', 'Sporesac',
+    'Neurotoxin', 'Hemotoxin', 'Cytotoxin', 'Solvent', 'Ash', 'Flux', 'Radiant',
+    'Null-Agent'
   ],
 } as const;
 
@@ -674,15 +725,57 @@ const CATALOG_WEAPON_TAILS: readonly string[] = WEAPONS
   .filter((t) => /^[a-z-]{2,}$/.test(t)
     && !['legendary', 'rare', 'uncommon', 'common', 'single', 'stealth', 'throw', 'throwing', 'ranged'].includes(t));
 
-/** Every noun a forged WEAPON is allowed to end on, lowercased. */
+/** ⚠⚠ OTA-1426 — AGENT ANCHORS ARE GATED ON DAMAGE TYPE, per the owner's rule 7:
+ *  *"Preserve category semantics … Agent as a harmful substance or payload."*
+ *
+ *  His AGENT category is deliberately not weapon-shaped — Poison, Venom, Spore,
+ *  Miasma, Bile, Ash, Dust, Mist. Two of those (Dust, Mist) are words OTA-801
+ *  and OTA-814 explicitly removed for reading as "anything but a weapon", and the
+ *  rest are one bad roll away from the same complaint: "Resonant Miasma" on a
+ *  club is the OTA-801 report again, word for word.
+ *
+ *  Rule 7 says how to keep both: an Agent name is legitimate when the weapon IS
+ *  the substance, and wrong when it is a stick that happens to be coated. The
+ *  game already records which: a weapon dealing poison / burn / electrical /
+ *  aetheric damage is a payload; slashing / piercing / bludgeoning is a thing you
+ *  hit with, and should be named for the thing.
+ *
+ *  ⚠ So no word from his library was dropped — the two that collided with a
+ *  historical rejection are admitted exactly where they read correctly, and
+ *  refused exactly where they read as the old defect. */
+const PAYLOAD_DAMAGE: ReadonlySet<string> = new Set(['poison', 'burn', 'electrical', 'aetheric']);
+
+/** Anchors that only read as a weapon when the weapon IS the substance. */
+const AGENT_TAIL_NOUNS: ReadonlySet<string> = new Set(
+  WEAPON_ANCHOR_NOUNS.agent.map((n) => n.toLowerCase()),
+);
+
+/** Every noun a forged WEAPON may end on regardless of damage type, lowercased. */
 const WEAPON_TAIL_NOUNS: ReadonlySet<string> = new Set(
   [
     ...WEAPON_NOUNS_MELEE,
     ...WEAPON_NOUNS_LONG,
     ...WEAPON_NOUNS_RANGED,
-    ...Object.values(WEAPON_NOUNS_EXTRA).flat(),
+    ...WEAPON_ANCHOR_NOUNS.blade,
+    ...WEAPON_ANCHOR_NOUNS.blunt,
+    ...WEAPON_ANCHOR_NOUNS.polearm,
+    ...WEAPON_ANCHOR_NOUNS.ranged,
+    ...WEAPON_ANCHOR_NOUNS.natural,
   ].map((n) => n.toLowerCase()).concat(CATALOG_WEAPON_TAILS),
 );
+
+/** ⚠ OTA-1426 — the owner's rule 5: *"Prefer short names. Two or three total
+ *  lexical units is the normal target."* Nothing enforced it, and a name is a
+ *  button label as much as flavour — a five-word name wraps to three lines in the
+ *  inventory modal.
+ *
+ *  ⚠ THE CEILING IS FOUR, NOT THREE, and the prompt does the rest. Four is the
+ *  target plus one, so a good three-word name with a hyphenated anchor is never
+ *  punished for the hyphen; the PROMPT was moved from "2-4 words" to "2-3" in the
+ *  same OTA so the model aims at his target rather than at the ceiling. A guard
+ *  set to the target instead would have thrown away legal names the prompt had
+ *  just asked for — the two have to be set together or they fight. */
+const MAX_FORGED_NAME_WORDS = 4;
 
 /** ⚠ OTA-1424 — TRUE when a model-supplied WEAPON name does NOT end in a noun
  *  this game recognises as a weapon, in which case the deterministic name is
@@ -697,16 +790,23 @@ const WEAPON_TAIL_NOUNS: ReadonlySet<string> = new Set(
  *  passes as itself and "Storm-Cleaver" passes on "cleaver". Without that, every
  *  compound the model invents would be rejected and the pool would never be
  *  beaten. */
-export function fusedWeaponNameReadsSoft(name: string): boolean {
+export function fusedWeaponNameReadsSoft(name: string, damageType?: string): boolean {
   // ⚠ SPLIT FIRST, THEN STRIP. The first draft stripped non-letters before
   // splitting, which ate the SPACES too — "Resonant Cleaver" collapsed to one
   // token "resonantcleaver" and every legal name was rejected. Caught by the
   // OTA-801 suite, which is exactly what it was written to hold.
-  const last = (name.trim().toLowerCase().split(/\s+/).pop() ?? '').replace(/[^a-z-]/g, '');
+  const words = name.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  // OTA-1426 — the owner's rule 5, enforced.
+  if (words.length > MAX_FORGED_NAME_WORDS) return true;
+  const last = (words.pop() ?? '').replace(/[^a-z-]/g, '');
   if (!last) return true;
-  if (WEAPON_TAIL_NOUNS.has(last)) return false;
   const tail = last.split('-').pop() ?? '';
-  return !WEAPON_TAIL_NOUNS.has(tail);
+  if (WEAPON_TAIL_NOUNS.has(last) || WEAPON_TAIL_NOUNS.has(tail)) return false;
+  // OTA-1426 — an AGENT anchor only when the weapon IS the substance (rule 7).
+  if (AGENT_TAIL_NOUNS.has(last) || AGENT_TAIL_NOUNS.has(tail)) {
+    return !PAYLOAD_DAMAGE.has((damageType ?? '').toLowerCase());
+  }
+  return true;
 }
 
 /** OTA-631 — name + description ONLY for an already-stat-balanced fused item.
@@ -776,7 +876,7 @@ export async function synthesizeFusionNameViaQwen(
     // stands instead.
     // OTA-801 — and reject a WEAPON name that ends in a soft / non-weapon noun
     // ("Aetheric Thread", "Resonant Veil") so the deterministic weapon pool names it.
-    const weaponReadsSoft = stats.kind === 'weapon' && fusedWeaponNameReadsSoft(name);
+    const weaponReadsSoft = stats.kind === 'weapon' && fusedWeaponNameReadsSoft(name, stats.damageType);
     // OTA-1086 — reject an INPUT ECHO / curio-catalog name. The prompt lists
     // the reserved pieces by name and the model can hand one straight back:
     // the owner's Legendary chest armor came out named "Hollow Quill Sheaf" —
@@ -808,9 +908,13 @@ function buildNamePrompt(
       role: 'system',
       content: [
         'You name forged items for a salvage-wasteland RPG. Output ONLY one JSON object on one line, no markdown, no prose.',
-        'Shape: {"name":"<2-4 word evocative name>","description":"<one short evocative sentence>"}',
+        'Shape: {"name":"<2-3 word evocative name>","description":"<one short evocative sentence>"}',
         'World tone: Reclaimers scavenge a flooded wasteland; the Aether is a strange resonant material left over from a fallen civilization.',
-        'Names are short (2-4 words), evocative, never silly or modern-branded. The description is one line and grounds the item in its materials.',
+        // ⚠ OTA-1426 — 2-3, not 2-4. The owner's generator spec: "Prefer short names.
+        // Two or three total lexical units is the normal target." The guard tolerates a
+        // fourth word; the PROMPT should still aim at the target rather than the ceiling,
+        // or every name drifts to the longest thing that passes.
+        'Names are short (2-3 words), evocative, never silly or modern-branded. The description is one line and grounds the item in its materials.',
       ].join('\n'),
     },
     {
@@ -1168,7 +1272,7 @@ export function migrateFusedName(item: InventoryItem): InventoryItem {
   if (!item.uniqueStats) return item;
   // OTA-801 — also re-mint a WEAPON whose stored name ends in a soft / non-weapon
   // noun ("Aetheric Thread") so old saves heal to a proper weapon name.
-  const weaponReadsSoft = item.uniqueStats.kind === 'weapon' && fusedWeaponNameReadsSoft(item.name);
+  const weaponReadsSoft = item.uniqueStats.kind === 'weapon' && fusedWeaponNameReadsSoft(item.name, item.uniqueStats.damageType);
   return (fusedNameCollidesCrossKind(item) || isLowQualityForgeName(item.name) || weaponReadsSoft)
     ? { ...item, name: deterministicFusedName(item) }
     : item;
