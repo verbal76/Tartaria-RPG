@@ -128,7 +128,7 @@ jobs:
       github.event_name == 'workflow_dispatch'
       || startsWith(github.ref, 'refs/tags/')
       || github.ref != 'refs/heads/golem-line'
-      || startsWith(github.event.head_commit.message, '[build-ios]')
+      || contains(github.event.head_commit.message, '[build-ios]')
     env:
       # Job-wide so every Expo invocation agrees. A push carries no input and
       # falls to golem — the dev line, never someone else's shipping product.
@@ -171,21 +171,38 @@ jobs:
         run: |
           # Resolution chain:
           #   1. tag v*-ios → production (TestFlight-ready)
-          #   2. commit message FIRST LINE STARTS WITH [build-ios] →
-          #      production. Strict prefix match so commits like
-          #      "Fix iOS workflow false-positive on [build-ios] in
-          #      body" don't false-positive production. To intentionally
-          #      fire production iOS, title the commit:
-          #        [build-ios] OTA-XXX — description
-          #        or to also auto-submit to TestFlight:
-          #        [build-ios] [submit-ios] OTA-XXX — description
+          #   2. commit message FIRST LINE CONTAINS [build-ios] → production
           #   3. workflow_dispatch input → as chosen
           #   4. default → preview (sideload internal build)
+          #
+          # ⚠⚠ OTA-1418 — ANYWHERE IN THE TITLE, NOT ONLY AT THE FRONT.
+          # This was a strict `^` prefix match, and every other build workflow
+          # (apk, linux, mac, steam) plus the OTA publisher used `contains`. The
+          # odd one out was also the one it had already bitten: at OTA-302 a
+          # commit led with [build-aab], so [build-ios] later in the same title
+          # was ignored, the profile silently resolved to `preview`, and the run
+          # built something that could never reach TestFlight. A marker that only
+          # works in first position fails whenever two products ship together —
+          # the normal case on a trunk that builds four.
+          #
+          # ⚠ THE FIRST-LINE RESTRICTION IS KEPT ON PURPOSE, and it is the half
+          # that was actually load-bearing. The old comment justified `^` with
+          # "so a commit BODY discussing [build-ios] doesn't false-positive
+          # production" — a real hazard, and one that has nothing to do with
+          # position WITHIN the title. Reading only $FIRST_LINE keeps that guard
+          # whole while letting the marker sit anywhere in the title.
+          #
+          #   "[build-aab] [build-ios] OTA-XXX — desc"      → production ✓
+          #   "OTA-XXX — desc" + body mentioning [build-ios] → NOT production ✓
+          #
+          # To fire production iOS, put the marker in the TITLE:
+          #   [build-ios] OTA-XXX — description
+          #   [build-ios] [submit-ios] OTA-XXX — description   (also TestFlight)
           FIRST_LINE=$(echo "$COMMIT_MSG" | head -1)
           if [[ "${GITHUB_REF}" == refs/tags/v*-ios ]]; then
             PROFILE="production"
             SHOULD_SUBMIT="true"
-          elif [[ "$FIRST_LINE" =~ ^\[build-ios\] ]]; then
+          elif [[ "$FIRST_LINE" =~ \[build-ios\] ]]; then
             PROFILE="production"
             # [submit-ios] gates the auto-submit step. Must also be
             # in the first line (anywhere after [build-ios]).
@@ -353,10 +370,21 @@ jobs:
             --no-wait \
             $AUTOSUBMIT
 
-# arb172 trigger-touch — re-fire the production (TestFlight) IPA with [build-ios]
-# LEADING the commit first line. The prior trailing-marker commit selected the
-# preview profile (no internal-distribution creds) and failed; OTA-302 same fix.
-
-# arb172 re-trigger #2 — [build-ios] MUST be the first token (^\[build-ios\]);
-# the prior "[build-aab] [build-ios]" title started with [build-aab] so the iOS
-# regex anchor missed and it fell to preview. Title now leads with [build-ios].
+# ⚠⚠ OTA-1418 — THE TWO NOTES BELOW ARE HISTORY NOW, AND THEY ARE THE RECEIPT.
+#
+# They were live instructions until this OTA, and they are kept because together
+# they show the anchor cost a build TWICE, not once — OTA-302 and then arb172,
+# the same shape, weeks apart. Somebody wrote the workaround down both times and
+# nobody changed the rule that made a workaround necessary.
+#
+# Both are now WRONG as instructions: the marker matches anywhere in the title.
+# Do not lead with it on their account.
+#
+#   [superseded] arb172 trigger-touch — re-fire the production (TestFlight) IPA
+#   with [build-ios] LEADING the commit first line. The prior trailing-marker
+#   commit selected the preview profile (no internal-distribution creds) and
+#   failed; OTA-302 same fix.
+#
+#   [superseded] arb172 re-trigger #2 — [build-ios] MUST be the first token; the
+#   prior "[build-aab] [build-ios]" title started with [build-aab] so the iOS
+#   regex anchor missed and it fell to preview. Title now leads with [build-ios].

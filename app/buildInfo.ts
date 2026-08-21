@@ -24252,7 +24252,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // updated as we go."* The trunk collapse made an ordinary push publish golem and
 // only golem, so the line that must stay current became the one needing an extra
 // act. See HANDOFF.md §4 "Which lines a change goes to".
-export const OTA_BUILD_ID = '2026-08-21-1417-hal-catches-up';
+// OTA-1418 — the two iOS build markers matched only in FIRST position while the
+// other seven matched anywhere. The odd ones out were the ones the anchor had
+// already cost a build — twice, OTA-302 and arb172. Now: anywhere in the title,
+// never the body.
+export const OTA_BUILD_ID = '2026-08-21-1418-a-marker-that-works-anywhere';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1417-hal-catches-up';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1416-pet-the-dog';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1415-nothing-had-shipped-since-1393';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1414-one-stat-one-job';

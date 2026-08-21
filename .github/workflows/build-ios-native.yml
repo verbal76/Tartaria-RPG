@@ -40,13 +40,18 @@ name: iOS Build (native, GitHub Actions macOS fallback)
 # the GitHub Actions minute quota (private repos: Free = 2000 min/mo
 # = ~8 macOS builds; Pro = 3000 = ~12). Reserved for fallback use,
 # not every commit. Triggered manually via workflow_dispatch OR by a
-# commit whose FIRST LINE starts with [build-ios-native].
+# commit whose FIRST LINE CONTAINS [build-ios-native] (OTA-1418 — anywhere
+# in the title, not only at the front; the body is still ignored).
 #
 # TRIGGER PATHS:
 #   - workflow_dispatch (Actions UI → Run workflow); the only way
 #     you fire this when EAS is down on a calm day.
-#   - commit FIRST LINE starts with [build-ios-native] — useful for
-#     scripted recovery during long outages.
+#   - commit FIRST LINE contains [build-ios-native] — useful for scripted
+#     recovery during long outages. ⚠ OTA-1418: this was a strict `^` prefix
+#     match, so a title that led with another marker ([build-aab], an OTA
+#     slug) silently never fired it — the OTA-302 failure, in the sibling
+#     workflow. The FIRST-LINE limit stays: it is what keeps a commit BODY
+#     that merely discusses the marker from burning macOS quota.
 #
 # DOES NOT auto-fire on regular pushes (paths-ignore: ['**']). Quota
 # is precious; macOS minutes don't get spent on every code change.
@@ -100,7 +105,7 @@ jobs:
     # `should_run` check below stays as a second line of defence.
     if: >-
       github.event_name == 'workflow_dispatch'
-      || startsWith(github.event.head_commit.message, '[build-ios-native]')
+      || contains(github.event.head_commit.message, '[build-ios-native]')
     env:
       # ⚠ This job compiles ON THIS RUNNER (xcodebuild, not EAS), so the job env
       # is in scope when `expo prebuild` evaluates app.config.js. That is not true
@@ -123,7 +128,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             SHOULD_RUN="true"
             SHOULD_SUBMIT="${{ github.event.inputs.submit || 'false' }}"
-          elif [[ "$FIRST_LINE" =~ ^\[build-ios-native\] ]]; then
+          elif [[ "$FIRST_LINE" =~ \[build-ios-native\] ]]; then
             SHOULD_RUN="true"
             if [[ "$FIRST_LINE" =~ \[submit-ios\] ]]; then
               SHOULD_SUBMIT="true"

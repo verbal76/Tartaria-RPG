@@ -50,9 +50,34 @@ marker then decides what they build.
 | `[ota-hal]` | OTA to the **live** HAL channels | no |
 | `[ota-ios-only]` / `[ota-android-only]` | narrows an OTA to one platform | no |
 
-⚠ `[build-ios]` and `[build-ios-native]` must **lead the commit title** — they are
-matched with a `^` anchor, so a title starting with `[build-aab]` will not fire
-them. The others match anywhere in the message.
+### Where a marker has to sit — OTA-1418
+
+**Anywhere in the commit TITLE.** Order does not matter, so markers combine:
+`[build-aab] [build-ios] OTA-XXXX — description` fires both.
+
+⚠ **The two iOS markers used to require FIRST position** (`^` anchor) while the
+other seven matched anywhere. The odd ones out were also the ones it had already
+bitten: at **OTA-302** a commit led with `[build-aab]`, so `[build-ios]` later in
+the same title was ignored, the profile silently resolved to `preview`, and the
+run built an IPA that could never reach TestFlight. A marker that only works in
+first position fails whenever two products ship together — the normal case on a
+trunk that builds four. Both now match anywhere in the title.
+
+⚠ **The title-only limit is deliberate and stays.** A marker in the commit BODY
+does **not** select a build profile. That guard is what stops a commit
+*discussing* `[build-ios]` — like this very paragraph — from shipping to
+TestFlight.
+
+⚠⚠ **KNOWN GAP, NOT CLOSED HERE.** Only the iOS *profile resolution* is
+title-only. Every job-level `if:` gate, and the OTA publisher's `grep`, read the
+**whole message** — body included. Consequences differ by workflow: a body
+mention starts an iOS job that then resolves to a non-production profile and
+skips (wasted minutes, safe), but on `eas-update-golem.yml` a body mention of
+`[ota-hal]` **publishes to the live player channel**. That path is live today:
+the OTA-1417 commit body contained the string `[ota-hal]` and would have fired
+HAL on its own. Tightening every marker read to the first line is the fix; it
+was left out of OTA-1418 because it changes the live publisher's trigger
+semantics days after that publisher was repaired, and that deserves its own OTA.
 
 ---
 

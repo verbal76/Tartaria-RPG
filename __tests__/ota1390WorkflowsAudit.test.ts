@@ -214,7 +214,11 @@ describe('OTA-1391 — the trunk is actually IN the mobile workflows\' trigger l
     // still too expensive. The step-level should_run check stays as a second
     // line of defence, but the job-level `if` is what saves the money.
     const y = wf('build-ios-native.yml');
-    expect(y).toContain("startsWith(github.event.head_commit.message, '[build-ios-native]')");
+    // RETARGETED BY OTA-1418 — the claim is that the job is GATED on the marker,
+    // not which matcher does the gating. It read `startsWith`, which was the one
+    // marker in the repo that had to lead the title, and that anchor cost a
+    // build twice. `contains` gates just as tightly for the money question here.
+    expect(y).toContain("contains(github.event.head_commit.message, '[build-ios-native]')");
     expect(y).toContain('never allocated');
     expect(y).toContain("steps.meta.outputs.should_run != 'true'");
   });

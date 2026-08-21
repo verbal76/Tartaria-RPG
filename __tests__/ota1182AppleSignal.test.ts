@@ -69,7 +69,12 @@ describe('OTA-1182 — a red iOS check now means something', () => {
   test('⚠ the three production triggers still work', () => {
     // Skipping preview must not have closed the paths that DO build.
     expect(WF).toMatch(/refs\/tags\/v\*-ios/);
-    expect(WF).toMatch(/\^\\\[build-ios\\\]/);
+    // RETARGETED BY OTA-1418 — this pinned the `^\[build-ios\]` ANCHOR, which
+    // turned out to be the defect rather than the trigger. The claim is "a
+    // [build-ios] title still selects production", and that is unchanged; what
+    // changed is that the marker no longer has to LEAD. Pinning the anchor would
+    // have blocked its own removal.
+    expect(WF).toMatch(/=~ \\\[build-ios\\\]/);
     expect(WF).toContain("github.event.inputs.profile || 'preview'");
   });
 
