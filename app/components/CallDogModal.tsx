@@ -59,7 +59,12 @@ export function CallDogModal() {
       body={`${dog.name} (${dog.breed}) trots over and waits. What now?`}
       buttons={[
         {
-          label: 'Scratch their ear (+2 loyalty)',
+          // ⚠⚠ OTA-1416 — LEADS WITH THE WORD A PLAYER ACTUALLY USES. This read
+          // "Scratch their ear (+2 loyalty)" from OTA-120 until the owner typed
+          // `pet dog`, got this menu, and reported that none of the options were
+          // petting the dog. One of them was. He was looking for "pet" and the
+          // button never said it, so the right answer read as a wrong one.
+          label: 'Pet them — scratch behind the ear (+2 loyalty)',
           onPress: () => select('scratch'),
           tone: 'primary',
         },

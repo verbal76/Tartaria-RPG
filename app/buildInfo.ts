@@ -24244,7 +24244,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // symptom visible from inside the game was THIS STRING not matching the one on
 // the About screen — which is exactly what this file's header has said it is for
 // since OTA-020, and exactly what nobody checked for three weeks.
-export const OTA_BUILD_ID = '2026-08-21-1415-nothing-had-shipped-since-1393';
+// OTA-1416 — pet the dog. `pet dog` now works, and the menu button that always
+// WAS petting ("Scratch their ear") now leads with the word a player uses.
+export const OTA_BUILD_ID = '2026-08-21-1416-pet-the-dog';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1415-nothing-had-shipped-since-1393';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1414-one-stat-one-job';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1413-a-reclaim-is-not-a-crash';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1412-the-dog-that-never-grew';

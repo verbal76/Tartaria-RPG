@@ -12857,6 +12857,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       void get().persist();
       return;
     }
+    // ⚠ OTA-1416 — `pet dog` / `pet <name>`, beside its sibling. Placed here
+    // rather than in the verb table because it needs the DOG to resolve the
+    // target, exactly like tryDogCallVerb above it.
+    //
+    // ⚠ CHECKED, NOT ASSUMED — and the check corrected a guess. Six of the seven
+    // PET_VERBS appear nowhere in parser.ts or llmParser.ts. `stroke` DOES: it is
+    // a `gesture` verb (stroke a carving, touch a bell). The intercept takes it
+    // only when the target is the dog, and `gesture` on a dog had no handler —
+    // it fell through to a generic backstory-fill flavour line. So this trades a
+    // shrug for a pet on exactly one phrasing and steals nothing else.
+    //
+    // The target guard below ("dog" or the dog's name) is what holds that line,
+    // and it is the thing to re-check if a dig/search verb ever claims `scratch`.
+    if (tryDogPetVerb(get, set, trimmed)) return;
     // arb91 — Pry Bar intercept. "use pry bar on X" / "crowbar X" / "pry
     // open X with the bar" → a chance-based pry on a sealed/stuck container.
     // Self-contained (returns before normal intent routing) so it can't
@@ -34276,6 +34290,72 @@ function handleCallDogOption(
   set((s) => s.player
     ? { player: advanceTime(s.player, 1 / 60) }
     : s);
+}
+
+// ⚠⚠ OTA-1416 — "PET DOG" DID NOT WORK, AND THE GAME COULD ALREADY DO IT.
+//
+// Owner: *"when I type pet dog a little pop-up jumps in and there's some
+// options. none of them are actually pet the dog. I would like to add pet the
+// dog."*
+//
+// The pop-up he means IS petting. `call dog` opens the CallDogModal and its
+// first button has read **"Scratch their ear (+2 loyalty)"** since OTA-120. He
+// looked at a menu that contained the thing he wanted and correctly concluded it
+// did not, because it never used his word.
+//
+// The same species as OTA-1402 (a refused hand-in that did not say why),
+// OTA-1405 (a tutorial that would not say what it wanted), OTA-1407 (a coating
+// refusal that never spoke) and OTA-1411 (a rope binned for a vocabulary miss):
+// **the game had the thing and did not say it in the words the player used.**
+//
+// Two doors, because there are two ways he could have meant it:
+//
+//   1. TYPING IT WORKS. `pet dog` / `pet <name>` — plus pat, stroke, scratch,
+//      fuss, cuddle — runs the pet DIRECTLY. He typed a complete instruction;
+//      answering a complete instruction with a menu is the refusal again in a
+//      politer coat.
+//   2. THE WORD IS IN THE MENU. The modal's button now leads with "Pet", so
+//      anyone arriving by `call dog` sees the word too.
+//
+// ⚠ NO NEW MECHANIC. This routes to the existing 'scratch' option — same +2
+// loyalty, same one minute, same line. Nothing was invented, so nothing needs
+// balancing; what changes is that the game answers to what it already does.
+const PET_VERBS = ['pet', 'pat', 'stroke', 'scratch', 'fuss', 'cuddle', 'snuggle'] as const;
+
+/** Parser intercept for `pet dog` / `pet <dogname>` and its synonyms. Performs
+ *  the pet immediately — see PET_VERBS above for why this does NOT open a menu.
+ *  Returns true when handled. */
+function tryDogPetVerb(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  rawInput: string,
+): boolean {
+  const dog = get().player?.dog;
+  if (!dog) return false;
+  // ⚠ A dog that is benched, gone or dead is not a dog you can reach. Refused
+  // OUT LOUD rather than silently, because a silent no is the defect this OTA
+  // exists to fix — and because "why can't I pet my dog" has exactly one honest
+  // answer at any moment.
+  const lower = rawInput.trim().toLowerCase().replace(/\s+/g, ' ');
+  const verbs = PET_VERBS.join('|');
+  const match = new RegExp(`^(?:${verbs})\\s+(?:the\\s+)?(.+)$`, 'i').exec(lower);
+  if (!match) return false;
+  const target = match[1]!.trim().replace(/^(my|your)\s+/, '');
+  if (target !== 'dog' && target !== dog.name.toLowerCase()) return false;
+  if (dog.status === 'dead' || dog.status === 'abandoned') {
+    get().appendLog('world', `${dog.name} is not with you any more.`);
+    return true;
+  }
+  if (dog.status !== 'with_player') {
+    get().appendLog(
+      'world',
+      `${dog.name} is not at your side — ${dog.hp <= 0 ? 'down and waiting to be tended' : 'waiting back at base'}.`,
+    );
+    return true;
+  }
+  handleCallDogOption(get, set, 'scratch');
+  void get().persist();
+  return true;
 }
 
 /** Parser intercept for `call <dogname>` / `call dog`. When matched,
