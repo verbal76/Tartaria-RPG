@@ -24275,7 +24275,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1423 — "Equip on dog". She has a name, and the owner had asked once
 // already at OTA-184; that fix landed on the FEED button and stopped there.
 // Four player-facing strings, plus the pronouns that naming her requires.
-export const OTA_BUILD_ID = '2026-08-21-1423-the-dog-has-a-name';
+// OTA-1424 — "Valve Gear". The weapon-name guard was a BLOCKLIST, extended
+// twice before (OTA-801, OTA-814) and beaten a third time by a word nobody
+// had banned. Inverted to an allowlist built from the forge's own noun
+// pools, so a bad weapon name is impossible rather than merely enumerable.
+export const OTA_BUILD_ID = '2026-08-21-1424-a-weapon-noun-allowlist';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1423-the-dog-has-a-name';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1421-claude-pushes-the-builds';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1420-a-dog-is-rolled-for';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1419-the-title-never-the-body';

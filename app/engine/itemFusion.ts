@@ -559,34 +559,122 @@ export async function synthesizeFusionViaQwen(
   }
 }
 
-/** OTA-801 — soft / non-weapon head-nouns that read as textile, ethereal, or
- *  botanical rather than something you'd swing or fire. A forged WEAPON named
- *  "Aetheric Thread" / "Resonant Veil" / "Humming Wisp" passed every other gate
- *  (no article, no rarity word, no digits, no "weapon" kind-word, no catalog
- *  collision) yet reads as anything but a weapon — the player report behind this
- *  fix. When the Qwen namer lands one of these as the LAST word of a weapon name,
- *  we reject it so the deterministic weapon pool (Cleaver / Edge / Reaver / …)
- *  supplies a name that actually reads as a weapon. */
-const WEAPON_SOFT_TAIL_NOUNS = new Set([
-  'thread', 'threads', 'veil', 'wisp', 'silk', 'gauze', 'ribbon', 'lace',
-  'gossamer', 'filament', 'strand', 'fluff', 'down', 'mist', 'whisper', 'sigh',
-  'petal', 'bloom', 'feather', 'cloth', 'cloak', 'scarf', 'shawl', 'quilt',
-  'shroud', 'drape', 'weave', 'fringe', 'tassel',
-  // OTA-814 — item/material/abstract nouns that read as a THING, not a weapon.
-  // Playtest: a forged weapon got named "Aether Core" (a core isn't a weapon), which
-  // the player had to re-roll by hand. These end-nouns now push a weapon back to the
-  // deterministic suffix pool (Cleaver / Edge / Reaver / …). Armor keeps them.
-  'core', 'orb', 'eye', 'heart', 'crystal', 'essence', 'stone', 'rune', 'sigil',
-  'dust', 'seed', 'husk', 'shell', 'node', 'glow', 'echo', 'hum',
-]);
+/** ⚠⚠ OTA-1424 — THE GUARD IS AN ALLOWLIST NOW, BECAUSE A BLOCKLIST CANNOT WIN.
+ *
+ * Owner: *"we just made a weapon with a stupid name — it was Valve Gear. what is
+ * that. we need to pick nouns that sound like weapons ... 'Spiral Mace',
+ * 'Revenant Cudgel', that type of thing."*
+ *
+ * This is the THIRD report of the same defect, and the first two were both
+ * answered by adding words to a list of banned ones:
+ *
+ *   · OTA-801 — "Aetheric Thread", "Resonant Veil". Banned thread/veil/wisp/…
+ *   · OTA-814 — "Aether Core".                      Banned core/orb/heart/…
+ *   · now    — "Valve Gear".                        valve and gear were not banned.
+ *
+ * Each fix was correct about the instance and wrong about the shape. English has
+ * more non-weapon nouns than anyone will ever enumerate, so a blocklist is a
+ * promise to be surprised again — the next report was always going to be a word
+ * nobody had thought of.
+ *
+ * ⚠ THE DETERMINISTIC NAMER WAS ALREADY RIGHT. "Quarry-Hewn Skewer",
+ * "Rust-Eaten Cleaver", "Cairn Maul" — exactly the register the owner asked for.
+ * Only the Qwen namer, which OVERRIDES it, produces junk. So the rule inverts:
+ * a model-supplied weapon name is accepted only when it ends in a noun this
+ * game already agrees is a weapon, and otherwise the deterministic name stands.
+ * Bad names stop being enumerable and start being impossible.
+ *
+ * ⚠ THE ALLOWLIST IS BUILT FROM THE POOLS THE DETERMINISTIC NAMER USES, plus a
+ * wider accepted vocabulary by category so the model has room to be interesting.
+ * Deriving it from those pools rather than re-typing them is the point: the two
+ * cannot drift, and a noun added to the forge is accepted from the namer for
+ * free.
+ */
 
-/** True when a forged WEAPON name ends in a soft / non-weapon noun (see the set
- *  above) — used to reject a Qwen weapon name that doesn't read as a weapon so the
- *  deterministic weapon-suffix pool stands instead. Only meaningful for weapons;
- *  armor/dog_armor pass through (a "Veil" or "Shroud" is a fine armor name). */
+/** Melee nouns — also the deterministic melee suffix pool. */
+const WEAPON_NOUNS_MELEE = [
+  'Cleaver', 'Edge', 'Spike', 'Lash', 'Maul', 'Reaver', 'Fang', 'Render',
+  'Splitter', 'Brand', 'Gouge', 'Hewer', 'Cudgel', 'Talon', 'Ripper', 'Crusher',
+  'Skewer', 'Breaker', 'Sunder', 'Biter',
+] as const;
+
+/** Reach nouns — spears and hafted things. */
+const WEAPON_NOUNS_LONG = [
+  'Spear', 'Pike', 'Lance', 'Harpoon', 'Glaive', 'Halberd', 'Prong', 'Warstaff',
+] as const;
+
+/** Ranged nouns. */
+const WEAPON_NOUNS_RANGED = [
+  'Bow', 'Caster', 'Launcher', 'Slinger', 'Repeater', 'Arbalest', 'Thrower', 'Bolt-Rig',
+] as const;
+
+/** ⚠ ACCEPTED-BUT-NOT-FORGED. The deterministic namer never picks these; they
+ *  exist so a Qwen name can be *better* than the pool rather than merely legal.
+ *  Grouped by category because the owner asked for it that way — "guns, knives,
+ *  melee or whatever" — and because a category is the unit you extend. Adding a
+ *  word here widens what the model may say; adding one to a pool above also
+ *  changes what the forge itself produces. */
+const WEAPON_NOUNS_EXTRA = {
+  blade: [
+    'Blade', 'Sword', 'Sabre', 'Saber', 'Falchion', 'Dirk', 'Shiv', 'Knife',
+    'Dagger', 'Machete', 'Cutlass', 'Kris', 'Scimitar', 'Razor', 'Shard',
+    'Shear', 'Shears', 'Slicer', 'Carver', 'Flenser', 'Skinner', 'Scythe',
+  ],
+  blunt: [
+    'Mace', 'Hammer', 'Club', 'Bludgeon', 'Basher', 'Flail', 'Morningstar',
+    'Warhammer', 'Sledge', 'Mallet', 'Cosh', 'Truncheon', 'Baton', 'Smasher',
+    'Pulper', 'Ram',
+  ],
+  polearm: [
+    'Poleaxe', 'Bardiche', 'Partisan', 'Trident', 'Fork', 'Pilum', 'Javelin',
+    'Staff', 'Quarterstaff', 'Bill', 'Voulge',
+  ],
+  ranged: [
+    'Crossbow', 'Sling', 'Carbine', 'Musket', 'Rifle', 'Pistol', 'Blunderbuss',
+    'Culverin', 'Hurler', 'Flinger', 'Dartcaster', 'Stinger',
+  ],
+  natural: [
+    'Claw', 'Tusk', 'Horn', 'Barb', 'Sting', 'Quill', 'Stinger', 'Beak', 'Maw',
+  ],
+  agent: [
+    'Bane', 'Ruin', 'Scourge', 'Reaper', 'Slayer', 'Butcher', 'Widow', 'Wrecker',
+    'Mauler', 'Gutter', 'Piercer', 'Cleaver', 'Rend', 'Cleave', 'Wound',
+  ],
+} as const;
+
+/** Every noun a forged WEAPON is allowed to end on, lowercased. */
+const WEAPON_TAIL_NOUNS: ReadonlySet<string> = new Set(
+  [
+    ...WEAPON_NOUNS_MELEE,
+    ...WEAPON_NOUNS_LONG,
+    ...WEAPON_NOUNS_RANGED,
+    ...Object.values(WEAPON_NOUNS_EXTRA).flat(),
+  ].map((n) => n.toLowerCase()),
+);
+
+/** ⚠ OTA-1424 — TRUE when a model-supplied WEAPON name does NOT end in a noun
+ *  this game recognises as a weapon, in which case the deterministic name is
+ *  kept instead. Replaces the OTA-801/814 blocklist; the name is unchanged so
+ *  both call sites and the migration keep reading the same way.
+ *
+ *  ⚠ Only ever consulted for `kind === 'weapon'`. Armor and dog armor keep the
+ *  open vocabulary they had — a "Veil" or a "Shroud" is a fine armor name, and
+ *  narrowing those was never asked for.
+ *
+ *  ⚠ A hyphenated tail is tested WHOLE and then by its last part, so "Bolt-Rig"
+ *  passes as itself and "Storm-Cleaver" passes on "cleaver". Without that, every
+ *  compound the model invents would be rejected and the pool would never be
+ *  beaten. */
 export function fusedWeaponNameReadsSoft(name: string): boolean {
-  const last = name.trim().toLowerCase().split(/\s+/).pop() ?? '';
-  return WEAPON_SOFT_TAIL_NOUNS.has(last);
+  // ⚠ SPLIT FIRST, THEN STRIP. The first draft stripped non-letters before
+  // splitting, which ate the SPACES too — "Resonant Cleaver" collapsed to one
+  // token "resonantcleaver" and every legal name was rejected. Caught by the
+  // OTA-801 suite, which is exactly what it was written to hold.
+  const last = (name.trim().toLowerCase().split(/\s+/).pop() ?? '').replace(/[^a-z-]/g, '');
+  if (!last) return true;
+  if (WEAPON_TAIL_NOUNS.has(last)) return false;
+  const tail = last.split('-').pop() ?? '';
+  return !WEAPON_TAIL_NOUNS.has(tail);
 }
 
 /** OTA-631 — name + description ONLY for an already-stat-balanced fused item.
@@ -837,11 +925,9 @@ export function synthesizeFusionDeterministic(
     ],
   };
   const suffixPool: Record<string, string[]> = {
-    weapon: [
-      'Cleaver', 'Edge', 'Spike', 'Lash', 'Maul', 'Reaver', 'Fang', 'Render',
-      'Splitter', 'Brand', 'Gouge', 'Hewer', 'Cudgel', 'Talon', 'Ripper', 'Crusher',
-      'Skewer', 'Breaker', 'Sunder', 'Biter',
-    ],
+    // ⚠ OTA-1424 — one source. This list also feeds the namer's allowlist, so a
+    // noun added here is accepted from Qwen for free and the two cannot drift.
+    weapon: [...WEAPON_NOUNS_MELEE],
     armor: [
       'Brace', 'Vigil', 'Mantle', 'Shroud', 'Bulwark', 'Ward', 'Carapace', 'Aegis',
       'Husk', 'Bastion', 'Girdle', 'Plating', 'Cuirass', 'Harness', 'Shell', 'Guard',
@@ -893,8 +979,8 @@ export function synthesizeFusionDeterministic(
   // same inputs always forge the same thing.
   const WEAPON_REACH_NOUNS: Record<'melee' | 'long' | 'ranged', string[]> = {
     melee: suffixPool.weapon!,
-    long: ['Spear', 'Pike', 'Lance', 'Harpoon', 'Glaive', 'Halberd', 'Prong', 'Warstaff'],
-    ranged: ['Bow', 'Caster', 'Launcher', 'Slinger', 'Repeater', 'Arbalest', 'Thrower', 'Bolt-Rig'],
+    long: [...WEAPON_NOUNS_LONG],
+    ranged: [...WEAPON_NOUNS_RANGED],
   };
   let weaponReach: 'melee' | 'long' | 'ranged' | undefined;
   if (kind === 'weapon') {
