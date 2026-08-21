@@ -9209,7 +9209,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // they actually arrive at their destination.
     const passingThrough = !!player.travelTarget
       && player.travelTarget.locationId !== player.currentLocationId;
-    if (inHub && !hubRoomId && !opts?.skipHubEntry && !passingThrough) {
+    // ⚠⚠ OTA-1410 — THIS IS THE MOMENT AN OUTPOST VISIT BEGINS, and it is the
+    // only one. `inHub && !hubRoomId` means the player was outside and is now
+    // through the gate — however they got here, by travel or by walking back in
+    // from the tile they just left. Six different places null `hubRoomId` on the
+    // way OUT; there is exactly one place that fills it on the way IN, so the
+    // per-visit reset below hangs off this and nothing has to be threaded
+    // through the exits. (Threading it through six doors is the mistake this
+    // session has now fixed three times.)
+    const freshOutpostVisit = inHub && !hubRoomId && !opts?.skipHubEntry && !passingThrough;
+    if (freshOutpostVisit) {
       hubRoomId = hubEntryRoomId();
       set((s) => (s.player ? { player: { ...s.player, hubRoomId } } : s));
     }
@@ -10841,11 +10850,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // Track hub-room visits separately from the procedural visitedRooms
     // map so hub-specific UI can read it without scanning roomKeys.
+    //
+    // ⚠⚠ OTA-1410 — THE SET BELONGS TO ONE VISIT TO ONE OUTPOST. Owner: *"I went
+    // to a new outpost it already had all rooms checkmarked."*
+    //
+    // It stored BARE ROOM IDS — `seen.add(hubRoom.id)` — and OTA-1279 made the
+    // outpost navigation graph UNIVERSAL, so every outpost uses the same ones:
+    // `outpost_gate`, `buried_landing_one`, `buried_storage`, `buried_pumps`.
+    // Walking Asgardar therefore ticked those rooms EVERYWHERE. The type comment
+    // beside the field even explains why this used to be safe — *"hub rooms have
+    // stable string ids, not the composite map key"* — and that was true right up
+    // until the ids stopped being unique. **OTA-1279 turned "stable" into
+    // "shared" and this set was never re-keyed.** `visitedRooms`, the procedural
+    // map next to it, has carried `locationId` in its key since OTA-140.
+    //
+    // ⚠ TWO CONDITIONS, AND THEY GUARD DIFFERENT FAILURES:
+    //   · `freshOutpostVisit` — the owner's other requirement, *"whenever you
+    //     leave an outpost all room visited ✓ should be erased"*. The marks are
+    //     per-VISIT: walk out, come back, and the place is unmarked again.
+    //   · `hubVisitedFor !== location.id` — a different outpost owns the set, so
+    //     empty it. This is what makes a never-seen outpost blank even if the
+    //     reset above was never reached (a crash or a force-quit inside an
+    //     outpost), and it is what heals every existing save on the next entry.
     if (hubRoom) {
       set((s) => {
-        const seen = new Set(s.worldMemory.hubVisited ?? []);
+        const wm = s.worldMemory;
+        const fresh = freshOutpostVisit || wm.hubVisitedFor !== location.id;
+        const seen = new Set(fresh ? [] : (wm.hubVisited ?? []));
         seen.add(hubRoom.id);
-        return { worldMemory: { ...s.worldMemory, hubVisited: Array.from(seen) } };
+        return { worldMemory: { ...wm, hubVisited: Array.from(seen), hubVisitedFor: location.id } };
       });
     }
     // HANDOFF #15 — record this room visit in the MapGraph. The key

@@ -1952,12 +1952,29 @@ export interface WorldMemory {
   /** OTA-975 — the Hollowed revenant currently standing in the scene (the fallen
    *  record it was built from); cleared when put to rest. */
   activeRevenant?: { name: string; ts: number; raceName: string; epitaph: string; locationName: string; kills: number; corruption: string; hours: number; gearNames?: string[]; gear?: FallenGearPiece[]; avengedBy?: string; avengedTs?: number };
-  /** HANDOFF #15b — hub rooms the player has visited at least once.
-   *  Used by hub fast-travel to gate "jump to the workshop" against
-   *  rooms the player actually knows. Stored separately from
-   *  visitedRooms because hub rooms have stable string ids, not the
-   *  composite map key. */
+  /** Hub rooms walked during the CURRENT visit to the CURRENT outpost — the ✓
+   *  marks on the outpost map and on the room chips.
+   *
+   *  ⚠⚠ OTA-1410 — RE-SCOPED, and the old comment is left below as the record of
+   *  why it broke. It read: *"Used by hub fast-travel to gate 'jump to the
+   *  workshop' against rooms the player actually knows. Stored separately from
+   *  visitedRooms because hub rooms have stable string ids, not the composite map
+   *  key."* Two things were wrong with it by the time the owner hit this:
+   *
+   *    · The fast-travel consumer does not exist. Grepping every reader turns up
+   *      the map's ✓ and the chips' ✓ and nothing else, so the sentence justified
+   *      a global lifetime for a set that only ever drew per-place marks.
+   *    · "Stable string ids" stopped meaning "unique" at OTA-1279, which made the
+   *      outpost graph UNIVERSAL. Every outpost now has an `outpost_gate` and a
+   *      `buried_landing_one`, so one global set marked them all.
+   *
+   *  Now owned by `hubVisitedFor` and emptied on each fresh arrival. */
   hubVisited?: string[];
+  /** ⚠ OTA-1410 — which outpost `hubVisited` belongs to. A set whose owner is
+   *  not the outpost you are standing in is another place's marks and is
+   *  discarded rather than shown; that is also what heals saves written before
+   *  this OTA, on the next outpost entry. */
+  hubVisitedFor?: string;
   /** OTA 454 — every named NPC the player has met at least once.
    *  Populated by vendor encounters, Core Guardian first-sight,
    *  faction-quest givers, and any other named-NPC interaction. The
