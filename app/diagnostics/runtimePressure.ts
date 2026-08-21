@@ -173,6 +173,8 @@ let rpLastBreadcrumb: {
   at: number; what: string; screen?: string; room?: string;
   // OTA-1356 — the phase checkpoints (see saveSystem.stampBreadcrumbPhase).
   phase?: string; phaseAt?: number; phaseDetail?: string;
+  /** OTA-1413 — see saveSystem.LiveBreadcrumb. */
+  afterOrderlyExit?: boolean;
 } | null = null;
 export function setLastBootBreadcrumb(c: typeof rpLastBreadcrumb): void { rpLastBreadcrumb = c; }
 
@@ -181,24 +183,37 @@ export function runtimePressureSummary(s: PressureSnapshot): string {
   if (rpLastBreadcrumb) {
     const ago = Math.max(0, Date.now() - rpLastBreadcrumb.at);
     const mins = Math.round(ago / 60_000);
-    out.push(`  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.`);
-    out.push(`     Last thing the app did: ${rpLastBreadcrumb.what}`);
-    out.push(`     Where: ${rpLastBreadcrumb.room ?? '(unknown)'} on ${rpLastBreadcrumb.screen ?? '(unknown)'} screen`);
-    out.push(`     When: ${new Date(rpLastBreadcrumb.at).toISOString()} (${mins} min before this boot)`);
-    // OTA-1356 — the phase names WHERE in that activity's life the app died:
-    // `engine-done` but never `rendered` → render side; stuck at `parsed:` →
-    // the engine; `homework:` → the background writer, not the player at all.
-    if (rpLastBreadcrumb.phase) {
-      const dt = rpLastBreadcrumb.phaseAt != null
-        ? ` (+${Math.max(0, rpLastBreadcrumb.phaseAt - rpLastBreadcrumb.at)}ms after it)`
-        : '';
-      out.push(`     Last checkpoint reached: ${rpLastBreadcrumb.phase}`
-        + (rpLastBreadcrumb.phaseDetail ? ` [${rpLastBreadcrumb.phaseDetail}]` : '') + dt);
+    // ⚠⚠ OTA-1413 — SECOND DOOR. The crash ledger and THIS line both read the
+    // same crumb and both asserted a mid-action death, so suppressing the false
+    // record in the ledger alone would have left About still saying it. Six
+    // fixes this session have been the many-doors mistake; this is the pair.
+    if (rpLastBreadcrumb.afterOrderlyExit) {
+      out.push(`  · Last boot exited cleanly, then the OS reclaimed it — not a crash.`);
+      out.push(`     A ~400MB model app is what Android drops first when it needs memory.`);
+      out.push(`     Kept because the phase is still evidence if a real freeze lands here.`);
+      out.push(`     Last checkpoint: ${rpLastBreadcrumb.phase ?? '(none)'}`
+        + ` at ${new Date(rpLastBreadcrumb.phaseAt ?? rpLastBreadcrumb.at).toISOString()}`
+        + ` (${mins} min before this boot)`);
     } else {
-      out.push(`     Last checkpoint reached: (none — the action never cleared its first phase)`);
+      out.push(`  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.`);
+      out.push(`     Last thing the app did: ${rpLastBreadcrumb.what}`);
+      out.push(`     Where: ${rpLastBreadcrumb.room ?? '(unknown)'} on ${rpLastBreadcrumb.screen ?? '(unknown)'} screen`);
+      out.push(`     When: ${new Date(rpLastBreadcrumb.at).toISOString()} (${mins} min before this boot)`);
+      // OTA-1356 — the phase names WHERE in that activity's life the app died:
+      // `engine-done` but never `rendered` → render side; stuck at `parsed:` →
+      // the engine; `homework:` → the background writer, not the player at all.
+      if (rpLastBreadcrumb.phase) {
+        const dt = rpLastBreadcrumb.phaseAt != null
+          ? ` (+${Math.max(0, rpLastBreadcrumb.phaseAt - rpLastBreadcrumb.at)}ms after it)`
+          : '';
+        out.push(`     Last checkpoint reached: ${rpLastBreadcrumb.phase}`
+          + (rpLastBreadcrumb.phaseDetail ? ` [${rpLastBreadcrumb.phaseDetail}]` : '') + dt);
+      } else {
+        out.push(`     Last checkpoint reached: (none — the action never cleared its first phase)`);
+      }
+      out.push(`     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines`);
+      out.push(`       die in memory when the JS thread wedges. Trust this line over it.`);
     }
-    out.push(`     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines`);
-    out.push(`       die in memory when the JS thread wedges. Trust this line over it.`);
   }
   out.push(s.memoryWarnings === 0
     ? `  Memory warnings: none this session`

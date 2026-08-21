@@ -123,10 +123,28 @@ export const createBootSlice = (
     // say, because its pending lines never drain through a wedge.
     try {
       const crumb = await readLiveBreadcrumb();
+      // ⚠⚠ OTA-1413 — AN OS RECLAIM OF A BACKGROUNDED APP IS NOT A CRASH.
+      // The owner's golem ledger: `PROCESS KILLED — no JS ran · stage
+      // ctx-release-done · while: (no action yet)`. Nothing died. He backgrounded
+      // the app, the Qwen teardown ran and FINISHED, and Android reclaimed a
+      // ~400MB idle process some time later. Every one of those facts is on the
+      // record's own face — a teardown phase, and no action ever live.
+      //
+      // This matters more than one wrong line, because the ledger is the
+      // instrument being used to hunt B9. An instrument that fires on every
+      // app-switch buries the one real event in noise, which is the same reason
+      // OTA-1377 stopped the boot line crying wolf in the first place.
+      //
+      // ⚠ The crumb is still SET as the last-boot breadcrumb and still logged —
+      // suppressing the record entirely would trade a false positive for a blind
+      // spot, which is the trade OTA-1377 explicitly refused. What changes is
+      // that it is not promoted to a fatal crash.
+      const reclaimed = !!crumb?.afterOrderlyExit;
       if (crumb) {
         setLastBootBreadcrumb(crumb);
-        get().appendLog('debug',
-          `freeze forensics: last boot ended mid-action — ${crumb.what} @ ${crumb.room ?? '?'} (${new Date(crumb.at).toISOString()})`);
+        get().appendLog('debug', reclaimed
+          ? `freeze forensics: last boot exited cleanly, then the OS reclaimed it — last phase ${crumb.phase ?? '?'} (${new Date(crumb.phaseAt ?? crumb.at).toISOString()})`
+          : `freeze forensics: last boot ended mid-action — ${crumb.what} @ ${crumb.room ?? '?'} (${new Date(crumb.at).toISOString()})`);
         // ⚠⚠ OTA-1380 — AND IT IS PROMOTED TO A CRASH, which is the whole point.
         // This crumb was ALREADY the evidence of a B9-class death: the process
         // was killed while an action was live, so no JS handler ran, nothing
@@ -139,15 +157,18 @@ export const createBootSlice = (
         // ⚠ Recorded BEFORE the clear, so a failure to clear cannot cost the
         // record. Deduped on id (`ts_kind`), so a second hydrate in the same
         // session cannot invent a second crash from one crumb.
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        (require('../diagnostics/crashLedger') as typeof import('../../diagnostics/crashLedger')).recordCrash({
-          kind: 'native-death',
-          ts: crumb.at,
-          stage: crumb.phase ?? 'mid-action',
-          message: `Process died with no orderly exit while: ${crumb.what}`,
-          isFatal: true,
-          breadcrumb: crumb,
-        });
+        // ⚠ OTA-1413 — only a crumb that did NOT come after an orderly exit.
+        if (!reclaimed) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          (require('../diagnostics/crashLedger') as typeof import('../../diagnostics/crashLedger')).recordCrash({
+            kind: 'native-death',
+            ts: crumb.at,
+            stage: crumb.phase ?? 'mid-action',
+            message: `Process died with no orderly exit while: ${crumb.what}`,
+            isFatal: true,
+            breadcrumb: crumb,
+          });
+        }
         await clearLiveBreadcrumb();
       }
     } catch { /* forensics must never block a boot */ }

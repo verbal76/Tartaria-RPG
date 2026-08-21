@@ -53,7 +53,7 @@ import {
   type FreezeVerdict,
   type PressureSnapshot,
 } from './runtimePressure';
-import { clearLiveBreadcrumb, stampBreadcrumbPhase } from '../engine/saveSystem';
+import { clearLiveBreadcrumb, stampBreadcrumbPhase, noteForegrounded } from '../engine/saveSystem';
 import { qwen } from '../ai/engines';
 import { nativePressure } from '../ai/generation/qwenTelemetry';
 import { APPROX_CONTEXT_MB, contextLedger } from '../ai/generation/contextLedger';
@@ -308,6 +308,11 @@ export function startRuntimePressureWatch(
       // was making the measurement slightly worse.
       if (nextStr === 'active') {
         rpLastFrameAt = t; rpLastJsAt = t;
+        // ⚠⚠ OTA-1413 — THE CLEAN-EXIT LATCH RELEASES HERE, and it must release
+        // BEFORE any foreground work can stamp a phase. From this instant a
+        // surviving crumb means a real death again — including the third B9
+        // freeze, which died 1ms into this very transition.
+        noteForegrounded();
         rpStartFrameClock();
       } else {
         rpStopFrameClock();
@@ -343,6 +348,14 @@ export function startRuntimePressureWatch(
         // a much rarer shape than the one being removed here — which fired on
         // literally every clean exit — and closing it would mean recording a
         // separate "exited cleanly" fact rather than deleting a stale one.
+        //
+        // ⚠⚠ OTA-1413 — CLOSED, AND BY EXACTLY THAT PRESCRIPTION. It was not
+        // rarer than predicted: the owner's golem ledger carried one within a
+        // day, because the Qwen teardown stamps `ctx-release` / `ctx-release-done`
+        // immediately AFTER this line every single time the app backgrounds.
+        // `clearLiveBreadcrumb` now latches the clean exit as a fact, so those
+        // stamps are labelled `afterOrderlyExit` and boot can tell an OS reclaim
+        // from a death. See saveSystem.stampBreadcrumbPhase.
         if (nextStr === 'background') void clearLiveBreadcrumb();
       }
     }) as { remove: () => void } | null;

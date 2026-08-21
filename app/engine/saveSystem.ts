@@ -767,6 +767,12 @@ export interface LiveBreadcrumb {
   phase?: string;
   phaseAt?: number;
   phaseDetail?: string;
+  /** ⚠⚠ OTA-1413 — THIS CRUMB WAS WRITTEN AFTER THE APP ALREADY LEFT CLEANLY.
+   *  Set when a phase is stamped between an orderly `background` exit and the
+   *  next foreground. Such a crumb surviving to the next boot means the OS
+   *  reclaimed a backgrounded process — normal for a ~400MB model app — and NOT
+   *  that anything died mid-action. See stampBreadcrumbPhase. */
+  afterOrderlyExit?: boolean;
 }
 
 /** Fire-and-forget. Never awaited by callers — a breadcrumb that could block an
@@ -794,6 +800,52 @@ export function stampLiveBreadcrumb(crumb: LiveBreadcrumb): void {
 // report already trusts.
 let _lastLiveCrumb: LiveBreadcrumb | null = null;
 let _lastPhaseWriteAt = 0;
+// ⚠⚠ OTA-1413 — THE ORDERLY EXIT SURVIVES THE STAMPS THAT COME AFTER IT.
+//
+// OTA-1377 made `background` clear the crumb so a clean exit stopped being
+// reported as a mid-action death, and its own comment named what it did not
+// fix: *"background work that stamps a phase AFTER this point re-arms the
+// crumb, so an OS reclaim of a long-backgrounded app can still surface as
+// 'died mid-action'."*
+//
+// It does, and the owner's ledger has one. Backgrounding the app runs the
+// AppState handler (crumb cleared — orderly exit ✓) and THEN tears down Qwen,
+// which stamps `ctx-release` and `ctx-release-done`. Both re-write the key.
+// Android then reclaims a ~400MB idle process, which is not a crash, it is
+// Android. The next boot finds a crumb and reports **PROCESS KILLED — no JS
+// ran · Process died with no orderly exit**. His record even carries the proof
+// on its face: `what` is `(no action yet)` — no player action was ever live —
+// and the phase is a background-teardown phase.
+//
+// ⚠ It also cleared only HALF the state: `clearLiveBreadcrumb` removed the disk
+// key but left `_lastLiveCrumb`, so the next stamp rebuilt the SAME crumb —
+// original `at`, original `what` — from a mirror that was supposed to be gone.
+// That is why his record is stamped with the boot time rather than the
+// teardown's.
+//
+// The fix is the one that comment prescribed: record the clean exit as a FACT
+// rather than deleting a stale one. `_exitedCleanly` latches on background and
+// releases on foreground, and every crumb written inside that window is
+// labelled. Boot then has the one thing it never had — the difference between
+// "died during teardown" and "was reclaimed after teardown finished".
+//
+// ⚠⚠ AND THE B9 DETECTION IS UNTOUCHED, which is the whole point of doing it
+// this way. A death DURING the background transition never reaches the handler's
+// last line, so the flag is still false and the crash still records (OTA-1357's
+// case). A death 1ms into the return to foreground has already had the flag
+// released by `active` (the third B9 freeze). Nothing that was a crash stops
+// being one; what stops is the ledger crying wolf every time the owner switches
+// apps — on the instrument being used to hunt B9.
+let _exitedCleanly = false;
+export function noteOrderlyExit(): void { _exitedCleanly = true; }
+export function noteForegrounded(): void { _exitedCleanly = false; }
+/** Test seam — the flag is module state, and a suite that sets it must be able
+ *  to put it back. */
+export function _resetBreadcrumbMirrorForTest(): void {
+  _lastLiveCrumb = null;
+  _lastPhaseWriteAt = 0;
+  _exitedCleanly = false;
+}
 export function stampBreadcrumbPhase(phase: string, detail?: string): void {
   try {
     const base: LiveBreadcrumb = _lastLiveCrumb ?? { at: Date.now(), what: '(no action yet)' };
@@ -801,7 +853,18 @@ export function stampBreadcrumbPhase(phase: string, detail?: string): void {
     // The render phase fires once per React commit; collapse bursts so the
     // instrumentation costs at most a couple of tiny writes per second.
     if (phase === 'rendered' && base.phase === 'rendered' && now - _lastPhaseWriteAt < 500) return;
-    _lastLiveCrumb = { ...base, phase, phaseAt: now, phaseDetail: detail };
+    // ⚠⚠ SET FROM THE LATCH, NEVER INHERITED FROM `base`. The first draft of
+    // this spread the flag forward out of the previous crumb, which made it
+    // STICKY: once a background stamp set it, the `appstate:background→active`
+    // stamp on the way back in carried it too — so a death 1ms into the return
+    // to foreground would have been filed as a routine OS reclaim and dropped.
+    // That is the third B9 freeze exactly, and OTA-1357 exists because of it.
+    // Suppressing a false positive is worth doing; buying it with a blind spot
+    // over the one event this instrument was built to catch is not.
+    const next: LiveBreadcrumb = { ...base, phase, phaseAt: now, phaseDetail: detail };
+    if (_exitedCleanly) next.afterOrderlyExit = true;
+    else delete next.afterOrderlyExit;
+    _lastLiveCrumb = next;
     _lastPhaseWriteAt = now;
     void AsyncStorage.setItem(LAST_BREADCRUMB_KEY, JSON.stringify(_lastLiveCrumb)).catch(() => { /* ignore */ });
   } catch { /* never let instrumentation break the game */ }
@@ -821,6 +884,13 @@ export async function readLiveBreadcrumb(): Promise<LiveBreadcrumb | null> {
  *  still live — the signature of the hard freeze + swipe-kill the owner keeps
  *  having to do. Same discipline as arb126's in-flight crash breadcrumbs. */
 export async function clearLiveBreadcrumb(): Promise<void> {
+  // ⚠⚠ OTA-1413 — CLEAR BOTH HALVES. This removed the disk key and left
+  // `_lastLiveCrumb`, so the next `stampBreadcrumbPhase` spread the mirror back
+  // out to disk — same `at`, same `what` — and the "cleared" crumb reappeared
+  // with the original boot timestamp on it. A clear that leaves the thing it
+  // cleared in memory is not a clear.
+  _lastLiveCrumb = null;
+  noteOrderlyExit();
   try { await AsyncStorage.removeItem(LAST_BREADCRUMB_KEY); } catch { /* ignore */ }
 }
 
