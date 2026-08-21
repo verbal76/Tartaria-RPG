@@ -33,6 +33,7 @@ import {
   type RescueScenarioId,
   type RescueScenario,
 } from '../engine/dogCompanion';
+import { musterHallNameFor, musterHallHookLabel } from '../engine/musterHall';
 // ⚠ OTA-1236 — ONE rule for "this noun carries a next step", shared by the engine
 // dispatch, the bulk-salvage guard, the loot picker's lead lane and the
 // INVESTIGATE ALL ordering. See engine/storyNouns.ts for why they must agree.
@@ -1363,8 +1364,31 @@ const ARBITER_QUESTION_PROMPTS: readonly string[] = [
   `The Arbiter thumbs the edge of an old coin. "Ask me about the factions sometime, if you can't tell whose side the dust is on."`,
 ];
 
-function buildingApproachLine(buildingId: string, autoTraveling = false): string {
-  const label = getBuilding(buildingId)?.hookLabel ?? 'a structure';
+/** ⚠⚠ OTA-1428 — THE FOUND HALL'S NAME. Owner: *"can we keep a list of multiple
+ *  names for this and just have it randomly pull one as we find it?"*
+ *
+ *  Hashed from the tile, not rolled: a hall keeps the name it was found under
+ *  when the player walks out and back in. A fresh roll per entry would rename
+ *  the same building on the same tile, which reads as a different one — and
+ *  hashing needs nothing stored, so no save migration and no new field.
+ *
+ *  ⚠ Only the `outpost` template. The others (flooded house, shack, shed,
+ *  market) have one name each by design and no painted plan to belong to. */
+export function foundBuildingName(buildingId: string, tileKey: string): string {
+  const b = getBuilding(buildingId);
+  if (buildingId !== 'outpost') return b?.name ?? 'a structure';
+  return musterHallNameFor(tileKey);
+}
+
+function buildingTileKey(get: () => GameStore): string {
+  const p = get().player;
+  return `${p?.currentLocationId ?? '?'}:${p?.mapX ?? 0}:${p?.mapY ?? 0}`;
+}
+
+function buildingApproachLine(buildingId: string, autoTraveling = false, tileKey?: string): string {
+  const label = buildingId === 'outpost' && tileKey
+    ? musterHallHookLabel(musterHallNameFor(tileKey))
+    : getBuilding(buildingId)?.hookLabel ?? 'a structure';
   const Cap = label.charAt(0).toUpperCase() + label.slice(1);
   // arb120 — while auto-travelling the travel row shows STOP, not an ENTER
   // button, so a plain "Tap ENTER" dangles (the player had to discover they
@@ -6478,6 +6502,12 @@ export interface GameStore {
   activeBuildingId: string | null;
   activeBuildingRoomId: string | null;
   buildingRevealed: string[];
+  /** ⚠ OTA-1428 — rooms walked THIS VISIT, for the ✓ on the room chips and on
+   *  the hall map. Transient with the rest of building state (see above): a save
+   *  made inside a building reloads you outside, so there is no visit to carry
+   *  marks into. That is also what outpost marks became at OTA-1410, after the
+   *  owner walked into a brand-new outpost and found every room pre-ticked. */
+  buildingVisited: string[];
   /** The exact wild scene the player entered the building FROM. Restored
    *  on EXIT so they come back out at the same spot, same weather, and
    *  (critically) the same plotted course / distance — entering a building
@@ -7744,6 +7774,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   activeBuildingId: null,
   activeBuildingRoomId: null,
   buildingRevealed: [],
+  buildingVisited: [],
   preBuildingScene: null,
   tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false, vest: false },
 
@@ -8672,11 +8703,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       activeBuildingId: buildingId,
       activeBuildingRoomId: entry.id,
       buildingRevealed: [],
+      // OTA-1428 — the room you walk in through counts as walked.
+      buildingVisited: [entry.id],
       // Snapshot the wild tile so EXIT returns here unchanged (no re-roll,
       // no travel step, same plotted distance to the city).
       preBuildingScene: scene ?? null,
     });
-    get().appendLog('world', `You step inside ${b.name.toLowerCase()}, into ${entry.name.toLowerCase()}.`);
+    // OTA-1428 — the hall is named for the tile it stands on, so the line the
+    // player reads on the way in matches the one the approach hook used.
+    const foundName = foundBuildingName(buildingId, buildingTileKey(get));
+    get().appendLog('world', `You step inside ${foundName.toLowerCase()}, into ${entry.name.toLowerCase()}.`);
     get().appendLog('world', entry.description);
     patchSceneForBuildingRoom(get, set, buildingId, entry.id);
     // OTA-914 — a home or outbuilding the flood sealed can still hold one of its
@@ -8726,7 +8762,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (room.secret && !get().buildingRevealed.includes(roomId)) return;
     const p = get().player;
     if (p) set({ player: advanceTime(spendStamina(p, 1), 0.25) });
-    set({ activeBuildingRoomId: roomId });
+    // OTA-1428 — record the room for its ✓. Deduped: walking back and forth
+    // between two rooms must not grow the list without bound.
+    set((st) => ({
+      activeBuildingRoomId: roomId,
+      buildingVisited: st.buildingVisited.includes(roomId)
+        ? st.buildingVisited
+        : [...st.buildingVisited, roomId],
+    }));
     get().appendLog('world', `You step into ${room.name.toLowerCase()}.`);
     get().appendLog('world', room.description);
     patchSceneForBuildingRoom(get, set, id, roomId);
@@ -8739,7 +8782,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!id) return;
     const b = getBuilding(id);
     const snap = get().preBuildingScene;
-    set({ activeBuildingId: null, activeBuildingRoomId: null, buildingRevealed: [], preBuildingScene: null });
+    set({ activeBuildingId: null, activeBuildingRoomId: null, buildingRevealed: [], buildingVisited: [], preBuildingScene: null });
     get().appendLog('world', `You step back outside${b ? `, leaving ${b.name.toLowerCase()} behind` : ''}.`);
     if (snap) {
       // Restore the exact tile you entered from — same weather + spot, and
@@ -10266,7 +10309,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
     } else if (scene.sceneBuilding && !opts?.isOpening) {
       const onRoute = !!get().player?.travelTarget || !!get().player?.whisperCourse;
-      get().appendLog('world', buildingApproachLine(scene.sceneBuilding, onRoute));
+      get().appendLog('world', buildingApproachLine(scene.sceneBuilding, onRoute, buildingTileKey(get)));
     }
     // OTA-807 — announce a wandering NPC on arrival so the TALK affordance isn't
     // unexplained. Names the person after the archetype's greeting.
@@ -26039,7 +26082,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (here !== prior) {
           set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, sceneBuilding: here } } : s));
           if (here && !livePlayer.travelTarget) {
-            get().appendLog('world', buildingApproachLine(here, !!livePlayer.whisperCourse));
+            get().appendLog('world', buildingApproachLine(here, !!livePlayer.whisperCourse, buildingTileKey(get)));
           }
         }
       }

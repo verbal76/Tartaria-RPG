@@ -24288,7 +24288,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1427 — "X of Y" names the X. Seven catalogue weapons are built that way,
 // and taking the last word taught the allowlist LIGHT and STORMS off "Aetheric
 // Sword of Light/Storms". Both were being accepted as forge names.
-export const OTA_BUILD_ID = '2026-08-21-1427-x-of-y-names-the-x';
+// OTA-1428 — the found hall gets a name pool, its painted floor plan on both
+// the minimap and the atlas, per-visit room checkmarks and direction arrows.
+// Also splits it from the faction outpost, whose name it had been sharing.
+export const OTA_BUILD_ID = '2026-08-21-1428-the-found-hall';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1427-x-of-y-names-the-x';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1426-the-anchor-noun-library';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1425-the-catalogue-teaches-the-namer';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1424-a-weapon-noun-allowlist';

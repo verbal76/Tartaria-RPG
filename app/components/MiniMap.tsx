@@ -33,6 +33,12 @@ import React, { useMemo } from 'react';
 import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useGameStore, playerGridCell } from '../state/gameStore';
 import { hubRoomFor, hubSkinFactionFor } from '../engine/hub';
+import { getBuildingRoom } from '../engine/buildings';
+import { MUSTER_HALL_ASPECT, MUSTER_HALL_ROOM_MARKS } from '../engine/musterHall';
+/** ⚠ The full-size painting, same asset the atlas uses — there is no
+ *  downscaled hall tile yet. One building, one image; if more halls get art
+ *  this wants the same tiles/ treatment the outposts have. */
+const MUSTER_HALL_TILE = require('../../assets/buildings/muster_hall.png');
 import { outpostRoomMark } from '../engine/outpostRoomMarks';
 import { worldMarkerFraction, viewportOffset, type MapFrac } from '../engine/mapFraction';
 
@@ -70,6 +76,8 @@ const WORLD_ZOOM = 4;
 
 export function MiniMap({ onPress }: { onPress?: () => void }) {
   const player = useGameStore((s) => s.player);
+  const buildingId = useGameStore((s) => s.activeBuildingId);
+  const buildingRoomId = useGameStore((s) => s.activeBuildingRoomId);
   const [box, setBox] = React.useState<{ w: number; h: number } | null>(null);
 
   const view = useMemo((): {
@@ -95,6 +103,26 @@ export function MiniMap({ onPress }: { onPress?: () => void }) {
         };
       }
     }
+    // ── inside the found hall ────────────────────────────────────────────────
+    // ⚠⚠ OTA-1428 — the owner asked for this building to use its painting "for
+    // both the mini-map like we do the Outpost and for the atlas". It reads the
+    // STORE, not the player: building state lives on the store (activeBuildingId
+    // / activeBuildingRoomId), unlike hubRoomId which is on the player. Reading
+    // it off `player` is the mistake gameStore's own OTA-4452 comment records —
+    // "every one of these read 'outdoors' while the player was inside".
+    if (buildingId === 'outpost' && buildingRoomId) {
+      const mark = MUSTER_HALL_ROOM_MARKS[buildingRoomId];
+      const room = getBuildingRoom('outpost', buildingRoomId);
+      if (mark) {
+        return {
+          src: MUSTER_HALL_TILE,
+          frac: mark,
+          aspect: MUSTER_HALL_ASPECT,
+          zoom: OUTPOST_ZOOM,
+          label: room?.name ?? 'the hall',
+        };
+      }
+    }
     // ── out in the world ─────────────────────────────────────────────────────
     if (!player.currentLocationId) return null;
     const cell = playerGridCell(player);
@@ -105,7 +133,7 @@ export function MiniMap({ onPress }: { onPress?: () => void }) {
       zoom: WORLD_ZOOM,
       label: 'the wilds',
     };
-  }, [player]);
+  }, [player, buildingId, buildingRoomId]);
 
   const geom = useMemo(() => {
     if (!box || !view) return null;

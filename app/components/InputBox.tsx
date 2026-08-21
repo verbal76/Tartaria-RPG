@@ -26,6 +26,7 @@ import { reachBandsFor } from '../engine/types';
 // have to gender it. Without this they read "bring it up" about a companion
 // the player named and chose a sex for.
 import { applyDogPronouns } from '../engine/dogCompanion';
+import { musterHallChipLabel } from '../engine/musterHall';
 // OTA-1170 — the dodge recharge bar reads its fill from one place.
 import { dodgeFill, dodgeCooldownRounds } from '../engine/dodgeCooldown';
 // OTA-1171 — the dodge lock is per difficulty tier; dialOf resolves CUSTOM per system.
@@ -251,6 +252,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const sceneBuilding = useGameStore((s) => s.currentScene?.sceneBuilding ?? null);
   const enterBuilding = useGameStore((s) => s.enterBuilding);
   const goBuildingRoom = useGameStore((s) => s.goBuildingRoom);
+  const buildingVisited = useGameStore((s) => s.buildingVisited);
   const exitBuilding = useGameStore((s) => s.exitBuilding);
   const buildingRooms = useMemo(
     () => (activeBuildingId
@@ -511,7 +513,15 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               {buildingRooms.slice(0, 4).map((r) => (
                 <TravelBtn
                   key={r.id}
-                  label={r.shortName}
+                  // ⚠ OTA-1428 — the found hall's chips carry a direction arrow
+                  // and a ✓ for rooms already walked this visit, matching the
+                  // outpost's travel chips. Only that building has a painted
+                  // floor plan to be directional ABOUT: every other template is
+                  // a flat room list, and an arrow invented for one would point
+                  // at nothing. Those keep the plain label.
+                  label={activeBuildingId === 'outpost'
+                    ? musterHallChipLabel(activeBuildingRoomId ?? '', r, buildingVisited)
+                    : r.shortName}
                   active={r.id === activeBuildingRoomId}
                   onPress={() => goBuildingRoom(r.id)}
                 />

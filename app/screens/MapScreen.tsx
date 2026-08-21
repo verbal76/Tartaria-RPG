@@ -50,6 +50,7 @@ import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { openContractMarkers, type ContractFamily } from '../engine/contractMarkers';
 import { LOCATION_TO_MACRO } from '../engine/worldLadder';
 import { isHubLocation, hubRoomFor, hubNameForFaction, hubSkinFactionFor } from '../engine/hub';
+import { MUSTER_HALL_ASPECT, MUSTER_HALL_ROOM_MARKS } from '../engine/musterHall';
 import { outpostRoomMark } from '../engine/outpostRoomMarks'; // OTA-1355 — the marker walks the outpost too
 import { FACTION_STARTING_LOCATION } from '../engine/character';
 // OTA 051 — locations.json carries the human-readable name we want
@@ -198,6 +199,9 @@ const OUTPOST_MAPS: Record<string, number> = {
   servants_of_giants: require('../../assets/outposts/servants_of_giants.png'),
 };
 
+/** OTA-1428 — the found hall's floor plan, the same asset the minimap uses. */
+const MUSTER_HALL_MAP = require('../../assets/buildings/muster_hall.png');
+
 // Gesture clamps.
 const MIN_SCALE = 0.8;
 // OTA 060 — no zoom-in cap. Player explicitly asked for unrestricted
@@ -236,6 +240,10 @@ export function MapScreen() {
   // ⚠ OTA-1355 — rooms already walked, for the outpost map's ✓ marks. The SAME
   // set the travel chips' ✓ reads (OTA-1277), so map and chips can never disagree.
   const hubVisited = useGameStore((s) => s.worldMemory?.hubVisited);
+  // OTA-1428 — the found hall's state, from the STORE (see the mode switch).
+  const buildingId = useGameStore((s) => s.activeBuildingId);
+  const buildingRoomId = useGameStore((s) => s.activeBuildingRoomId);
+  const buildingVisited = useGameStore((s) => s.buildingVisited);
   // OTA-171 — Places list sorted with the current location pinned at
   // the top so the player can see where they are at a glance, then
   // by danger ascending (safer trips first) so the easiest
@@ -338,8 +346,22 @@ export function MapScreen() {
   // mapAspect drives the fill/letterbox math below.
   const outpostMapSource = inHub && player?.factionId ? OUTPOST_MAPS[player.factionId] : undefined;
   const showingOutpost = !!outpostMapSource;
-  const mapSource = outpostMapSource ?? WORLD_ATLAS;
-  const mapAspect = showingOutpost ? 1 : ATLAS_W / ATLAS_H;
+  // ⚠⚠ OTA-1428 — THE FOUND HALL GETS THE ATLAS TOO. Owner: *"use this image for
+  // both the mini-map like we do the Outpost and for the atlas."* Its state lives
+  // on the STORE (activeBuildingId), not on the player like hubRoomId — reading
+  // it off `player` is the mistake gameStore's own comment records, where a row
+  // of checks "read outdoors while the player was inside".
+  const inHall = buildingId === 'outpost' && !!buildingRoomId;
+  const hallMapSource = inHall ? MUSTER_HALL_MAP : undefined;
+  const showingHall = !!hallMapSource;
+  /** ⚠ Either interior. Used by everything that means "we are not looking at the
+   *  world" — the hidden-market pin, the event glyphs, the contract pins. Those
+   *  all belong to the overland atlas and must stay off ANY interior plan, not
+   *  just the outpost's; without this they would paint world markers across the
+   *  hall's floor. */
+  const showingInterior = showingOutpost || showingHall;
+  const mapSource = outpostMapSource ?? hallMapSource ?? WORLD_ATLAS;
+  const mapAspect = showingOutpost ? 1 : showingHall ? MUSTER_HALL_ASPECT : ATLAS_W / ATLAS_H;
   const atCenter =
     safeMapX === WORLD_MAP_CENTER_X && safeMapY === WORLD_MAP_CENTER_Y;
 
@@ -450,7 +472,19 @@ export function MapScreen() {
   // the view belongs to the player's fingers, so a re-render can never yank it.
   const autoGlided = useRef(false);
   useEffect(() => {
-    if (autoGlided.current || !showingOutpost || !imgBox || !player?.hubRoomId) return;
+    // ⚠ OTA-1428 — the hall glides to its room the same way the outpost does, but
+    // to its OWN mark table. The first draft shared one code path and lost the
+    // hubRoomId null-narrowing the outpost lookup below depends on; the compiler
+    // caught it. Two interiors, two lookups, one glide.
+    if (autoGlided.current || !imgBox) return;
+    if (showingHall && buildingRoomId) {
+      const hallMark = MUSTER_HALL_ROOM_MARKS[buildingRoomId];
+      if (!hallMark) return;
+      autoGlided.current = true;
+      centerOnPlayer(hallMark);
+      return;
+    }
+    if (!showingOutpost || !player?.hubRoomId) return;
     const room = hubRoomFor(player.hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
     if (!room?.structuralId) return;
     autoGlided.current = true;
@@ -458,7 +492,7 @@ export function MapScreen() {
     // centerOnPlayer/hub lookups are render-stable helpers; the deps that matter
     // are the ones that decide WHETHER the glide can run yet.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showingOutpost, imgBox, player?.hubRoomId]);
+  }, [showingOutpost, showingHall, imgBox, player?.hubRoomId, buildingRoomId]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -655,7 +689,7 @@ export function MapScreen() {
     labelScale = renderedW / ATLAS_W;
     // OTA-498 — pin the Hidden Market overlay to its fixed atlas fraction (world
     // atlas only). Centered on the point via the fixed wrap size.
-    const hm = showingOutpost ? null : HIDDEN_LOCATIONS.hidden_market;
+    const hm = showingInterior ? null : HIDDEN_LOCATIONS.hidden_market;
     if (hm) {
       hiddenMarketStyle = {
         left: offsetX + renderedW * hm.fx - HM_LABEL_W / 2,
@@ -672,7 +706,7 @@ export function MapScreen() {
     // landmark's pin, and the same layout holds at every zoom on every screen. The Hidden
     // Market is deliberately NOT in that set: it keeps its own reveal-gated "?" → name
     // behaviour, which is a different rule (you have to find it first).
-    if (!showingOutpost) {
+    if (!showingInterior) {
       for (const l of ATLAS_LABELS) {
         nameLabelStyles.push({
           id: l.id,
@@ -690,7 +724,7 @@ export function MapScreen() {
         });
       }
     }
-    if (!showingOutpost) {
+    if (!showingInterior) {
       for (const ev of canonLocations ?? []) {
         if (ev.marker !== 'pending' && ev.marker !== 'done') continue;
         const cell = (typeof ev.gx === 'number' && typeof ev.gy === 'number')
@@ -777,6 +811,34 @@ export function MapScreen() {
         const f = outpostRoomMark(artFactionId, room.structuralId);
         visitedRoomMarkStyles.push({
           id: room.structuralId,
+          left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
+          top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
+        });
+      }
+    }
+    // ⚠ OTA-1428 — the found hall, by the same rules: the room you are IN wears
+    // the marker, every OTHER room walked this visit wears a ✓. The painting is
+    // 1122px wide rather than the outpost's 1254, so the glyph scale is taken
+    // from its own width — reusing the outpost's constant would draw the hall's
+    // marks ~12% large.
+    if (showingHall && buildingRoomId) {
+      labelScale = renderedW / 1122;
+      const here = MUSTER_HALL_ROOM_MARKS[buildingRoomId];
+      if (here) {
+        const size = Math.max(12, 46 * labelScale);
+        playerFrac = here;
+        playerMarkerBox = {
+          left: offsetX + renderedW * here.fx - size / 2,
+          top: offsetY + renderedH * here.fy - size / 2,
+          size,
+        };
+      }
+      for (const roomId of buildingVisited ?? []) {
+        if (roomId === buildingRoomId) continue;
+        const f = MUSTER_HALL_ROOM_MARKS[roomId];
+        if (!f) continue;
+        visitedRoomMarkStyles.push({
+          id: roomId,
           left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
           top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
         });
@@ -882,7 +944,7 @@ export function MapScreen() {
             style={styles.atlas}
             resizeMode="contain"
             accessibilityRole="image"
-            accessibilityLabel={showingOutpost ? 'Outpost interior map' : 'World atlas map'}
+            accessibilityLabel={showingOutpost ? 'Outpost interior map' : showingHall ? 'Hall interior map' : 'World atlas map'}
           />
           {/* ⚠⚠ OTA-1335 — PLACE NAMES. Drawn UNDER every pin and glyph below, on purpose:
               a name is context, a marker is information, and when the two land close
@@ -1024,7 +1086,7 @@ export function MapScreen() {
               marker is drawn on it (removed OTA-182). The footer text above
               carries your location/bearings; this line is just the gesture
               hint. */}
-          Drag to pan · pinch to zoom · double-tap to reset. {showingOutpost ? 'Your outpost interior.' : 'A reference map of the buried world.'}
+          Drag to pan · pinch to zoom · double-tap to reset. {showingOutpost ? 'Your outpost interior.' : showingHall ? 'The hall you are standing in.' : 'A reference map of the buried world.'}
         </Text>
       </View>
 
