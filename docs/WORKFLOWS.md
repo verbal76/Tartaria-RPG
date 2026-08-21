@@ -68,16 +68,22 @@ does **not** select a build profile. That guard is what stops a commit
 *discussing* `[build-ios]` — like this very paragraph — from shipping to
 TestFlight.
 
-⚠⚠ **KNOWN GAP, NOT CLOSED HERE.** Only the iOS *profile resolution* is
-title-only. Every job-level `if:` gate, and the OTA publisher's `grep`, read the
-**whole message** — body included. Consequences differ by workflow: a body
-mention starts an iOS job that then resolves to a non-production profile and
-skips (wasted minutes, safe), but on `eas-update-golem.yml` a body mention of
-`[ota-hal]` **publishes to the live player channel**. That path is live today:
-the OTA-1417 commit body contained the string `[ota-hal]` and would have fired
-HAL on its own. Tightening every marker read to the first line is the fix; it
-was left out of OTA-1418 because it changes the live publisher's trigger
-semantics days after that publisher was repaired, and that deserves its own OTA.
+⚠⚠ **THE PUBLISHER IS NOW TITLE-ONLY TOO — OTA-1419.** All three of its marker
+reads (`[ota-hal]`, `[ota-ios-only]`, `[ota-android-only]`) pipe through
+`head -1`. Before this, they grepped the **whole message**, so a commit that
+merely *mentioned* `[ota-hal]` in prose published to the **live player channel**.
+That was live, not theoretical: the OTA-1417 commit body carried the string
+while explaining what the marker does, and the OTA-1418 body had to be written
+with the iOS markers deliberately **unbracketed** to avoid allocating a 10×
+macOS runner. When writing about the tooling can ship to players, the tooling is
+wrong — not the writing.
+
+⚠ **Still whole-message: the job-level `if:` gates.** GitHub's expression
+language has no "first line" function, so `contains()` there sees the body. The
+consequence is bounded and one-directional — a body mention can *start* a job,
+which then reads the title, finds no marker, and skips. It costs minutes (10× on
+`build-ios-native.yml`) and ships nothing. Every decision that actually
+*publishes or submits* is made in shell, from the title alone.
 
 ---
 

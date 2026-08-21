@@ -24256,7 +24256,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // other seven matched anywhere. The odd ones out were the ones the anchor had
 // already cost a build — twice, OTA-302 and arb172. Now: anywhere in the title,
 // never the body.
-export const OTA_BUILD_ID = '2026-08-21-1418-a-marker-that-works-anywhere';
+// OTA-1419 — the OTA publisher grepped the whole commit message, so a commit
+// that merely MENTIONED the hal marker in prose published to live players. All
+// three marker reads now pipe through `head -1`: the title, never the body.
+export const OTA_BUILD_ID = '2026-08-21-1419-the-title-never-the-body';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1418-a-marker-that-works-anywhere';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1417-hal-catches-up';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1416-pet-the-dog';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1415-nothing-had-shipped-since-1393';

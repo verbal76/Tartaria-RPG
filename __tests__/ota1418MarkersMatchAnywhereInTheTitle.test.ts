@@ -145,13 +145,20 @@ describe('OTA-1418 — the record, including what was deliberately left open', (
     expect(IOS).toContain('THE FIRST-LINE RESTRICTION IS KEPT ON PURPOSE');
   });
 
-  it('⚠⚠ the gap this OTA did NOT close is documented, not quietly left', () => {
-    // Job gates and the OTA publisher still read the whole message. On the
-    // publisher that means a BODY mention of [ota-hal] reaches live players —
-    // which the OTA-1417 commit body would have done on its own.
-    expect(DOCS).toContain('KNOWN GAP, NOT CLOSED HERE');
-    expect(DOCS).toContain('publishes to the live player channel');
-    expect(DOCS).toContain('the OTA-1417 commit body contained the string');
+  it('⚠⚠ …and OTA-1419 closed it on the publisher, where it reached real people', () => {
+    // Left open by OTA-1418, closed the same day: a BODY mention of the hal
+    // marker published to LIVE PLAYERS. The OTA-1417 commit body carried the
+    // string while explaining what the marker does.
+    expect(DOCS).toContain('THE PUBLISHER IS NOW TITLE-ONLY TOO');
+    expect(DOCS).toContain('**live player channel**');
+  });
+
+  it('⚠ the residue that CANNOT be closed is named, with its bound', () => {
+    // GitHub's expression language has no first-line function, so job-level
+    // `if:` gates still see the body. Bounded and one-directional: a body
+    // mention starts a job that then reads the title, finds nothing, and skips.
+    expect(DOCS).toContain('Still whole-message: the job-level `if:` gates');
+    expect(DOCS).toContain('ships nothing');
   });
 
   it('⚠ the docs table no longer teaches the old rule', () => {

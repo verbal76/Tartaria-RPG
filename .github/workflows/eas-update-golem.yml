@@ -107,11 +107,34 @@ jobs:
           if [ -n "$DISPATCHED" ]; then
             LINE="$DISPATCHED"
             HOW="dispatch"
-          elif echo "${COMMIT_MSG:-}" | grep -q '\[ota-hal\]'; then
+          elif echo "${COMMIT_MSG:-}" | head -1 | grep -q '\[ota-hal\]'; then
             # ⚠ A typed marker is a deliberate act, the same as pressing the
             # button. It exists because the Actions UI is not always reachable —
             # the repo's whole native-build convention is commit-title markers
             # (see HANDOFF.md §5) for exactly that reason.
+            #
+            # ⚠⚠ OTA-1419 — `head -1`. THE TITLE, NOT THE WHOLE MESSAGE.
+            #
+            # This grepped the ENTIRE commit message, body included, so any
+            # commit that so much as MENTIONED the marker in prose published to
+            # the live player channel. Not theoretical: OTA-1417's body carried
+            # the string while explaining what the marker does, and OTA-1418's
+            # body had to be written with the sibling iOS markers deliberately
+            # UNBRACKETED to avoid allocating a 10x macOS runner. When writing
+            # about your own tooling can ship to players, the tooling is wrong,
+            # not the writing.
+            #
+            # ⚠ The firewall above was never in question — an unattended push
+            # still cannot reach HAL. What changed is that reaching HAL now needs
+            # the marker in the TITLE, which is the only place anyone ever meant
+            # to put it.
+            #
+            # ⚠ `head -1` and NOT a `^` anchor, deliberately. The marker may sit
+            # anywhere in the title so it composes with others. Anchoring is the
+            # exact bug OTA-1418 removed from the iOS workflows — a marker that
+            # only works in first position silently does nothing the moment two
+            # products ship together. One silent failure is not worth trading for
+            # another.
             LINE="hal"
             HOW="commit marker [ota-hal]"
           else
@@ -213,9 +236,14 @@ jobs:
           # Platform markers — publish one platform only when a fix is
           # platform-specific. Both markers at once is a contradiction, so it
           # means neither.
+          # ⚠ OTA-1419 — `head -1` here too. These NARROW a publish rather than
+          # starting one, so a body false-positive was quieter than the hal
+          # marker's — it would have silently dropped a platform from a publish
+          # that was otherwise correct, and the log would have read as a success.
+          # Same rule everywhere is also the point: one place to remember.
           IOS_ONLY=false; ANDROID_ONLY=false
-          echo "${COMMIT_MSG:-}" | grep -q '\[ota-ios-only\]'     && IOS_ONLY=true
-          echo "${COMMIT_MSG:-}" | grep -q '\[ota-android-only\]' && ANDROID_ONLY=true
+          echo "${COMMIT_MSG:-}" | head -1 | grep -q '\[ota-ios-only\]'     && IOS_ONLY=true
+          echo "${COMMIT_MSG:-}" | head -1 | grep -q '\[ota-android-only\]' && ANDROID_ONLY=true
           if [ "$IOS_ONLY" = "true" ] && [ "$ANDROID_ONLY" = "true" ]; then
             echo "::warning::Both [ota-ios-only] and [ota-android-only] present — ignoring both."
             IOS_ONLY=false; ANDROID_ONLY=false
