@@ -182,9 +182,17 @@ Each group below has a **FORMAT BLOCK**. Paste it alongside the style header and
 ---
 ---
 
-# GROUP 2 — FACTION CRESTS (9)
+# GROUP 2 — FACTION CRESTS (9) ✅ **DELIVERED**
 
-**What these are for:** the crest appears on the standing screen, vendor screens, the quest board, outpost interiors and the About screen. Nine images that touch every screen in the game — the best value-per-asset on this whole list.
+> ## ⚠⚠ ALL NINE ARE DONE. DO NOT GENERATE FROM THIS SECTION.
+>
+> The nine emblems shipped and live in **`art/02-crests/`**. What arrived does **not** match the devices described below — the generated art went its own way, and rather than discard nine good images each was read for what it actually shows and **re-matched to the faction whose lore it fits.** Six files were renamed; three stayed put.
+>
+> **[`art/02-crests/README.md`](../art/02-crests/README.md) is the truth for this group.** It records what each emblem depicts and why it belongs to its faction. The prompts below survive only as the historical brief — if a crest is ever regenerated, read that README first, so the replacement matches the set it is joining rather than the paragraph that produced the mismatch.
+>
+> **Two rules changed for this group, by the owner's call.** These are used as a **corner overlay on a character portrait** and as a **full-screen flash when a faction is picked** — never shrunk to a chip. So the square canvas, the clear margin and the circular-mask rule in the format block below **do not apply to the delivered nine**, and their geometry must not be "corrected": cropping and padding would shrink the artwork for a use the game does not have. The alpha requirement did apply, and all nine met it.
+
+**What these are for:** a corner overlay on the character portrait, and a full-screen flash on faction selection. Nine images that carry a faction's identity where it is felt rather than read.
 
 > **FORMAT BLOCK — faction crests.** Generate at **1024 × 1024, square, with a fully transparent background.**
 >
