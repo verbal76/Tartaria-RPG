@@ -66,13 +66,36 @@ describe('OTA-1431 — every faction has an emblem, and every emblem a faction',
   });
 });
 
-describe('OTA-1431 — the popup can never become an obstacle', () => {
-  it('⚠⚠ it only fires on a CHANGE — re-tapping your own faction is a no-op', () => {
-    // The faction step is a list the player reads down and compares. A popup on
-    // every tap means re-reading your own choice costs an animation you did not
-    // ask for, and tapping through all nine to compare them costs nine.
-    expect(CREATE).toContain('if (id !== factionId) setCrestFor(id);');
-    expect(CREATE).toContain('onPress={() => pickFaction(f.id)}');
+describe('OTA-1432 — it plays on the COMMIT, not on the tap', () => {
+  it('⚠⚠ tapping a faction row only selects it — no popup', () => {
+    // OTA-1431 read "as you choose your faction" as the row tap. It is not.
+    // Owner: *"when we pick the faction isn't when we click on it, but when we
+    // hit next."* Tapping rows is BROWSING — you tap through several to read
+    // their goals and flavor. A popup there lands in the middle of a comparison.
+    expect(CREATE).toContain('onPress={() => setFactionId(f.id)}');
+    expect(CREATE).not.toContain('pickFaction');
+  });
+
+  it('⚠⚠ hitting NEXT from the faction step plays the emblem, and WAITS for it', () => {
+    // The flash sits between the decision and the next step: its own onDone is
+    // the transition, so tapping to skip advances instantly and letting it run
+    // advances when it ends — one path out, from one place.
+    const i = CREATE.indexOf("if (step === 'faction') {");
+    expect(i).toBeGreaterThan(-1);
+    expect(CREATE.indexOf('setCrestFor(factionId);', i)).toBeGreaterThan(i);
+    expect(CREATE).toContain("onDone={() => { setCrestFor(null); setStep('motive'); }}");
+  });
+
+  it('⚠⚠ a faction with NO art advances instead of stranding the player', () => {
+    // FactionCrestFlash renders null when there is no art, so it would never
+    // call onDone — setting crestFor unconditionally would leave a tenth faction
+    // sitting on the faction step with a NEXT button that does nothing. This is
+    // a soft-lock guard, not a tidiness check.
+    expect(CREATE).toContain('if (factionCrest(factionId)) {');
+    const i = CREATE.indexOf("if (step === 'faction') {");
+    const guard = CREATE.indexOf('if (factionCrest(factionId)) {', i);
+    const fallthrough = CREATE.indexOf("setStep('motive');", guard);
+    expect(fallthrough).toBeGreaterThan(guard);
   });
 
   it('⚠⚠ tapping anywhere dismisses it, and kills the timer on the way out', () => {

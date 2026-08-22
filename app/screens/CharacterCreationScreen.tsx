@@ -9,6 +9,7 @@ import { PRESET_TIERS, PRESSURE_PROFILES, DEFAULT_PRESSURE, DIFFICULTY_SYSTEMS, 
 import { DifficultyCustomModal } from '../components/DifficultyCustomModal';
 // OTA-1431 — the emblem, when you pick the faction.
 import { FactionCrestFlash } from '../components/FactionCrestFlash';
+import { factionCrest } from '../engine/factionCrests';
 
 // Tungsten Spire — the 'name' step is gone. New flow: race → faction →
 // BEGIN. The player gives their name in-game when the Arbiter prompts
@@ -59,21 +60,19 @@ export function CharacterCreationScreen() {
   const [pressureCustom, setPressureCustom] = useState<PressureCustom | undefined>(undefined);
   const [customOpen, setCustomOpen] = useState(false);
 
-  // ⚠⚠ OTA-1431 — THE EMBLEM FLASHES WHEN YOU PICK A FACTION. Owner: *"as you
-  // choose your faction, the emblem should show for a few seconds as a popup."*
+  // ⚠⚠ OTA-1432 — THE EMBLEM PLAYS ON COMMIT, NOT ON TAP.
   //
-  // ⚠ ONLY ON A CHANGE. Re-tapping the faction you already chose is a no-op, not
-  // another popup. This step is a LIST the player reads down and compares, and
-  // the first version of anything like this fires on every tap — so tapping your
-  // own choice twice, or tapping it to re-read its flavor line, costs you an
-  // animation you did not ask for. Combined with tap-anywhere-to-dismiss inside
-  // the flash itself, the popup can never become an obstacle to comparing two
-  // factions, which is the actual job of this screen.
+  // OTA-1431 read the owner's *"as you choose your faction"* as the moment a row
+  // is tapped. It is not. Owner: *"when we pick the faction isn't when we click
+  // on it, but when we hit next."* Tapping a row is BROWSING — you tap through
+  // several to read their goals and flavor lines. Hitting NEXT is the decision.
+  //
+  // ⚠ AND THAT IS ALSO WHY THE OTA-1431 GUARDS ARE GONE. The old version fired
+  // on every change and needed an only-on-change rule to stop the popup landing
+  // in the middle of a comparison. Moving it to the commit removes the problem
+  // at the source rather than defending against it: there is exactly one NEXT
+  // per run of this screen, so the flash can never interrupt anything.
   const [crestFor, setCrestFor] = useState<string | null>(null);
-  const pickFaction = (id: string) => {
-    if (id !== factionId) setCrestFor(id);
-    setFactionId(id);
-  };
 
   const stepIndex = STEP_ORDER.indexOf(step);
   const selectedRace = races.find((r) => r.id === raceId) ?? races[0]!;
@@ -97,6 +96,20 @@ export function CharacterCreationScreen() {
       return;
     }
     if (step === 'faction') {
+      // ⚠⚠ OTA-1432 — the emblem plays HERE, on the commit, and the step waits
+      // for it. The flash's own onDone advances to 'motive', so tapping to skip
+      // moves on instantly and letting it run moves on when it finishes.
+      //
+      // ⚠ THE `factionCrest` GUARD IS A SOFT-LOCK GUARD, not a tidiness check.
+      // FactionCrestFlash renders null when a faction has no art — so if this
+      // set `crestFor` unconditionally, an art-less faction would show nothing,
+      // never call onDone, and strand the player on the faction step with a NEXT
+      // button that does nothing. A test asserts all nine have art; this makes
+      // the tenth degrade to "no flash" instead of "cannot start the game".
+      if (factionCrest(factionId)) {
+        setCrestFor(factionId);
+        return;
+      }
       setStep('motive');
       return;
     }
@@ -176,7 +189,7 @@ export function CharacterCreationScreen() {
               <TouchableOpacity
                 key={f.id}
                 style={[styles.option, factionId === f.id && styles.optionSelected]}
-                onPress={() => pickFaction(f.id)}
+                onPress={() => setFactionId(f.id)}
                 activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityState={{ selected: factionId === f.id }}
@@ -192,12 +205,16 @@ export function CharacterCreationScreen() {
             {/* ⚠ OTA-1431 — rendered INSIDE the faction step, so leaving the
                 step unmounts it and its pending timer with it. Mounted at the
                 screen root it would survive a BACK tap and fire its dismiss
-                against a screen the player has already left. */}
+                against a screen the player has already left.
+                ⚠⚠ OTA-1432 — onDone is the TRANSITION. The flash is what sits
+                between hitting NEXT and arriving at the motive step, so
+                whichever way it ends — tapped away or run out — the step
+                advances exactly once, from one place. */}
             <FactionCrestFlash
               factionId={crestFor}
               factionName={factions.find((f) => f.id === crestFor)?.name}
               subtitle={factions.find((f) => f.id === crestFor)?.subtitle}
-              onDone={() => setCrestFor(null)}
+              onDone={() => { setCrestFor(null); setStep('motive'); }}
             />
             <View style={styles.beginBlock}>
               <Text style={styles.contextLine}>

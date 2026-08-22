@@ -24302,7 +24302,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // anywhere to skip it, and re-tapping the faction you already chose does
 // nothing. Six of the nine were renamed first, to the faction each one actually
 // depicts rather than the prompt it drifted from.
-export const OTA_BUILD_ID = '2026-08-22-1431-the-emblem-when-you-pick';
+// OTA-1432 — the faction emblem now plays when you hit NEXT, not when you tap a
+// row. Tapping through the list to read the factions is browsing; NEXT is the
+// decision, and that is where the emblem belongs.
+export const OTA_BUILD_ID = '2026-08-22-1432-the-emblem-on-the-commit';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1431-the-emblem-when-you-pick';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1430-every-building-is-a-map';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1428-the-found-hall';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1427-x-of-y-names-the-x';
