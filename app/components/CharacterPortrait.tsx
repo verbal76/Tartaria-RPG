@@ -17,13 +17,21 @@
 // dropped the third. So the banner carries all three: race as the plate, faction
 // as the emblem, motive as the mark opposite it.
 //
-// ⚠ AND IT IS THE TITLE ALONE. The first draft set it under a "WHY YOU CAME
-// DOWN" eyebrow and a rule; the owner cut both — *"the stylized writing should
-// just be the two words like 'The Exile'."* He is right, and the reason is worth
-// keeping: a label explains, and this does not need explaining. Two words in
-// gold in the corner of your own portrait read as a title the character CARRIES.
-// The same two words under a caption read as a form field. The explanation was
-// costing the thing it explained.
+// ⚠ AND IT IS THE TITLE ALONE, ON NOTHING. The first draft set it under a "WHY
+// YOU CAME DOWN" eyebrow and a rule, on a dim plate; the owner cut all of it —
+// *"the stylized writing should just be the two words like 'The Exile'"*, then
+// *"the title for the reason should have 0 background, and the text needs to be
+// more stylized."* He is right twice over: a label explains, and this does not
+// need explaining; and a plate makes a mark sit ON the picture rather than IN
+// it. Two words in gold on the painting itself read as a title the character
+// CARRIES. The same two words boxed and captioned read as a form field.
+//
+// ⚠ WHICH MOVES THE LEGIBILITY JOB FROM THE PLATE ONTO THE GLYPHS. With nothing
+// behind it, gold type has to survive a lantern, a pale sky and a wet stone
+// floor. So: the house gold (#e8c766, the same one ChapterCardOverlay's titles
+// use), a serif face, wide tracking, and a hard dark shadow doing the work the
+// plate used to. The same reasoning removes the emblem's plate — the crests are
+// alpha cut-outs with their own heavy dark masses, so they hold themselves.
 //
 // ⚠ THE HEIGHT IS MEASURED FROM THE IMAGE, NOT GUESSED. The seven portraits do
 // not share an aspect — 0.667 twice, 0.800 twice, 0.847, 0.866, and aetherborn
@@ -41,7 +49,7 @@
 // with no change here.
 
 import React from 'react';
-import { View, Image, Text, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Image, Text, StyleSheet, Platform, useWindowDimensions } from 'react-native';
 import { racePortrait } from '../engine/racePortraits';
 import { factionCrest } from '../engine/factionCrests';
 import { motiveById, assignMotive } from '../engine/story';
@@ -111,20 +119,18 @@ export function CharacterPortrait({
     >
       <Image source={portrait} style={styles.portrait} resizeMode="contain" />
       {crest ? (
-        // ⚠ The emblem sits on its own dim plate. The crests are cut-outs with
-        // real alpha, so on a light patch of a portrait — a lantern, a pale sky —
-        // fine gold filigree would otherwise disappear into it.
-        <View style={styles.crestPlate} pointerEvents="none">
-          <Image source={crest} style={styles.crest} resizeMode="contain" />
-        </View>
+        // ⚠ NO PLATE BEHIND IT. The emblem is an alpha cut-out and sits directly
+        // on the painting, which is what makes it read as a mark ON the
+        // character rather than a badge stuck over them.
+        <Image source={crest} style={styles.crest} resizeMode="contain" />
       ) : null}
-      {/* ⚠ The motive, opposite the emblem — the title and nothing else. Its own
-          dim plate for the same reason the crest has one: fine gold type over a
-          lantern or a pale sky would otherwise vanish into the painting. */}
+      {/* ⚠ The motive, opposite the emblem — the title, on nothing. Its shadow
+          is what keeps it legible over an unpredictable painting; a plate would
+          make it a badge instead of a mark. */}
       {motive ? (
-        <View style={styles.motivePlate} pointerEvents="none">
-          <Text style={styles.motiveTitle} numberOfLines={1}>{motive.title}</Text>
-        </View>
+        <Text style={styles.motiveTitle} numberOfLines={1}>
+          {motive.title}
+        </Text>
       ) : null}
       {/* A faint floor to the band so the sheet's first card does not appear to
           float off the bottom edge of the picture. */}
@@ -149,38 +155,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   portrait: { width: '100%', height: '100%' },
-  crestPlate: {
+  crest: {
     position: 'absolute',
-    top: 8,
-    left: 8,
-    width: CREST_SIZE + 10,
-    height: CREST_SIZE + 10,
-    borderRadius: 6,
-    backgroundColor: 'rgba(8,7,6,0.55)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    top: 10,
+    left: 10,
+    width: CREST_SIZE,
+    height: CREST_SIZE,
   },
-  crest: { width: CREST_SIZE, height: CREST_SIZE },
-  motivePlate: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    maxWidth: '52%',
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: 6,
-    backgroundColor: 'rgba(8,7,6,0.55)',
-    alignItems: 'flex-end',
-  },
-  // ⚠ Two words, and they have to carry the corner on their own now that the
-  // label is gone — so a size up, wide tracking, and the title as AUTHORED
-  // ("The Exile", not "THE EXILE"). Shouting it would turn a title back into a
-  // label, which is the thing that was just removed.
+  // ⚠ Two words, on nothing, carrying the corner by themselves. The house gold
+  // and the serif face do the styling; the hard dark shadow does the legibility
+  // the removed plate used to. Title AS AUTHORED ("The Exile", not "THE EXILE")
+  // — shouting it would turn a title back into the label that was cut.
   motiveTitle: {
-    color: '#e2cf9c',
-    fontSize: 18,
-    letterSpacing: 2.5,
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    maxWidth: '56%',
     textAlign: 'right',
+    color: '#e8c766',
+    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+    fontSize: 21,
+    fontStyle: 'italic',
+    letterSpacing: 2,
+    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 7,
   },
   floor: {
     position: 'absolute',

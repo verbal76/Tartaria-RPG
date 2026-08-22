@@ -24313,7 +24313,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the plate, your faction's emblem small in the top-left corner, and the reason
 // you came down named in the top right. All three creation choices, on one
 // banner, before a single number.
-export const OTA_BUILD_ID = '2026-08-22-1434-the-sheet-leads-with-you';
+// OTA-1435 — the two overlays on the character portrait lost their backing
+// plates: the faction emblem and the reason-you-came-down title now sit
+// directly on the painting. The title is restyled to carry itself — serif,
+// gold, italic, with a hard shadow doing the work the plate used to.
+export const OTA_BUILD_ID = '2026-08-22-1435-marks-on-the-painting';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1434-the-sheet-leads-with-you';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1433-the-races-have-faces';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1432-the-emblem-on-the-commit';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1431-the-emblem-when-you-pick';

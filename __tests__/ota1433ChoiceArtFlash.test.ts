@@ -283,12 +283,23 @@ describe('OTA-1434 — the character sheet leads with who you are', () => {
   });
 
   it('⚠⚠ the crest is a small TOP-LEFT overlay, not a second picture', () => {
-    expect(BANNER).toContain('top: 8,');
-    expect(BANNER).toContain('left: 8,');
+    expect(BANNER).toContain('top: 10,');
+    expect(BANNER).toContain('left: 10,');
     expect(BANNER).toContain('position: \'absolute\',');
     const size = BANNER.match(/const CREST_SIZE = (\d+);/);
     expect(size).toBeTruthy();
     expect(Number(size![1])).toBeLessThanOrEqual(120);
+  });
+
+  it('⚠⚠ NEITHER overlay sits on a plate — both are on the painting itself', () => {
+    // Owner: *"the title for the reason should have 0 background ... also the
+    // images for the factions should have no background as well."* A plate makes
+    // a mark sit ON the picture; nothing behind it puts the mark IN the picture.
+    // Both overlays previously shared one dim backing colour — asserting that
+    // exact literal is absent catches either one growing a plate back.
+    expect(BANNER).not.toContain('rgba(8,7,6,0.55)');
+    expect(BANNER).not.toContain('crestPlate');
+    expect(BANNER).not.toContain('motivePlate');
   });
 
   it('⚠⚠ contain, and the height is MEASURED from the image', () => {
@@ -318,8 +329,8 @@ describe('OTA-1434 — and the third choice, top right', () => {
     // Character creation asks three questions — what you are, who took you in,
     // and why you came down. The sheet showed the first two and dropped the
     // third; the banner now carries all three.
-    expect(BANNER).toContain('motivePlate');
-    expect(BANNER).toContain('right: 8,');
+    expect(BANNER).toContain('motiveTitle');
+    expect(BANNER).toContain('right: 12,');
     expect(BANNER).toContain('{motive.title}');
   });
 
@@ -337,7 +348,20 @@ describe('OTA-1434 — and the third choice, top right', () => {
     expect(BANNER).not.toContain('motive.title.toUpperCase()');
     expect(BANNER).toContain('motiveTitle');
     expect(BANNER).toContain("textAlign: 'right'");
-    expect(BANNER).toContain("alignItems: 'flex-end'");
+  });
+
+  it('⚠⚠ with no plate, the GLYPHS carry the legibility', () => {
+    // Removing the backing moved that job onto the type: gold type now has to
+    // survive a lantern, a pale sky and a wet stone floor. Serif face, wide
+    // tracking, and a hard dark shadow doing what the plate used to do.
+    expect(BANNER).toContain("fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif'");
+    expect(BANNER).toContain("fontStyle: 'italic'");
+    expect(BANNER).toContain("textShadowColor: 'rgba(0,0,0,0.95)'");
+    expect(BANNER).toContain('textShadowRadius: 7,');
+    // ⚠ The house gold — the same one ChapterCardOverlay's titles use, so the
+    // sheet's one piece of display type belongs to the game rather than to this
+    // component.
+    expect(BANNER).toContain("color: '#e8c766'");
   });
 
   it('⚠⚠ a save with NO stored motive shows the same one the crawl uses', () => {
