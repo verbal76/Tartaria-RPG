@@ -50,7 +50,7 @@ import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { openContractMarkers, type ContractFamily } from '../engine/contractMarkers';
 import { LOCATION_TO_MACRO } from '../engine/worldLadder';
 import { isHubLocation, hubRoomFor, hubNameForFaction, hubSkinFactionFor } from '../engine/hub';
-import { MUSTER_HALL_ASPECT, MUSTER_HALL_ROOM_MARKS } from '../engine/musterHall';
+import { buildingMap } from '../engine/buildingMaps';
 import { outpostRoomMark } from '../engine/outpostRoomMarks'; // OTA-1355 — the marker walks the outpost too
 import { FACTION_STARTING_LOCATION } from '../engine/character';
 // OTA 051 — locations.json carries the human-readable name we want
@@ -199,8 +199,6 @@ const OUTPOST_MAPS: Record<string, number> = {
   servants_of_giants: require('../../assets/outposts/servants_of_giants.png'),
 };
 
-/** OTA-1428 — the found hall's floor plan, the same asset the minimap uses. */
-const MUSTER_HALL_MAP = require('../../assets/buildings/muster_hall.png');
 
 // Gesture clamps.
 const MIN_SCALE = 0.8;
@@ -351,8 +349,10 @@ export function MapScreen() {
   // on the STORE (activeBuildingId), not on the player like hubRoomId — reading
   // it off `player` is the mistake gameStore's own comment records, where a row
   // of checks "read outdoors while the player was inside".
-  const inHall = buildingId === 'outpost' && !!buildingRoomId;
-  const hallMapSource = inHall ? MUSTER_HALL_MAP : undefined;
+  // ⚠ OTA-1429 — ANY painted building, not just the hall. One table lookup; a
+  // third painting is an entry in buildingMaps.ts and no edit here.
+  const bMap = buildingRoomId ? buildingMap(buildingId) : undefined;
+  const hallMapSource = bMap?.art;
   const showingHall = !!hallMapSource;
   /** ⚠ Either interior. Used by everything that means "we are not looking at the
    *  world" — the hidden-market pin, the event glyphs, the contract pins. Those
@@ -361,7 +361,7 @@ export function MapScreen() {
    *  hall's floor. */
   const showingInterior = showingOutpost || showingHall;
   const mapSource = outpostMapSource ?? hallMapSource ?? WORLD_ATLAS;
-  const mapAspect = showingOutpost ? 1 : showingHall ? MUSTER_HALL_ASPECT : ATLAS_W / ATLAS_H;
+  const mapAspect = showingOutpost ? 1 : bMap ? bMap.aspect : ATLAS_W / ATLAS_H;
   const atCenter =
     safeMapX === WORLD_MAP_CENTER_X && safeMapY === WORLD_MAP_CENTER_Y;
 
@@ -477,8 +477,8 @@ export function MapScreen() {
     // hubRoomId null-narrowing the outpost lookup below depends on; the compiler
     // caught it. Two interiors, two lookups, one glide.
     if (autoGlided.current || !imgBox) return;
-    if (showingHall && buildingRoomId) {
-      const hallMark = MUSTER_HALL_ROOM_MARKS[buildingRoomId];
+    if (bMap && buildingRoomId) {
+      const hallMark = bMap.marks[buildingRoomId];
       if (!hallMark) return;
       autoGlided.current = true;
       centerOnPlayer(hallMark);
@@ -816,14 +816,16 @@ export function MapScreen() {
         });
       }
     }
-    // ⚠ OTA-1428 — the found hall, by the same rules: the room you are IN wears
-    // the marker, every OTHER room walked this visit wears a ✓. The painting is
-    // 1122px wide rather than the outpost's 1254, so the glyph scale is taken
-    // from its own width — reusing the outpost's constant would draw the hall's
-    // marks ~12% large.
-    if (showingHall && buildingRoomId) {
-      labelScale = renderedW / 1122;
-      const here = MUSTER_HALL_ROOM_MARKS[buildingRoomId];
+    // ⚠ OTA-1428 — a painted building, by the same rules: the room you are IN
+    // wears the marker, every OTHER room walked this visit wears a ✓. Each
+    // painting has its own natural width (1122, 1370, 1402 …) against the
+    // outpost's 1254, so the glyph scale comes from the table rather than a
+    // constant — the hall's marks would otherwise draw ~12% large.
+    if (bMap && buildingRoomId) {
+      // ⚠ Each painting's OWN width. A shared constant would draw one
+      // building's marks at another's scale.
+      labelScale = renderedW / bMap.artWidth;
+      const here = bMap.marks[buildingRoomId];
       if (here) {
         const size = Math.max(12, 46 * labelScale);
         playerFrac = here;
@@ -835,7 +837,7 @@ export function MapScreen() {
       }
       for (const roomId of buildingVisited ?? []) {
         if (roomId === buildingRoomId) continue;
-        const f = MUSTER_HALL_ROOM_MARKS[roomId];
+        const f = bMap.marks[roomId];
         if (!f) continue;
         visitedRoomMarkStyles.push({
           id: roomId,
@@ -944,7 +946,7 @@ export function MapScreen() {
             style={styles.atlas}
             resizeMode="contain"
             accessibilityRole="image"
-            accessibilityLabel={showingOutpost ? 'Outpost interior map' : showingHall ? 'Hall interior map' : 'World atlas map'}
+            accessibilityLabel={showingOutpost ? 'Outpost interior map' : showingHall ? 'Building interior map' : 'World atlas map'}
           />
           {/* ⚠⚠ OTA-1335 — PLACE NAMES. Drawn UNDER every pin and glyph below, on purpose:
               a name is context, a marker is information, and when the two land close
@@ -1086,7 +1088,7 @@ export function MapScreen() {
               marker is drawn on it (removed OTA-182). The footer text above
               carries your location/bearings; this line is just the gesture
               hint. */}
-          Drag to pan · pinch to zoom · double-tap to reset. {showingOutpost ? 'Your outpost interior.' : showingHall ? 'The hall you are standing in.' : 'A reference map of the buried world.'}
+          Drag to pan · pinch to zoom · double-tap to reset. {showingOutpost ? 'Your outpost interior.' : showingHall ? 'The building you are standing in.' : 'A reference map of the buried world.'}
         </Text>
       </View>
 

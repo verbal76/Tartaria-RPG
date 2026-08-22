@@ -74,14 +74,24 @@ describe('building templates', () => {
     }
   });
 
-  it('shows at most 4 rooms on the nav row (so the row + EXIT = 5 fits)', () => {
+  it('⚠ no building has more rooms than the nav row renders', () => {
+    // ⚠⚠ OTA-1430 — THIS PIN MOVED FROM 4 TO 6, AND CAUGHT THE CHANGE THAT MOVED
+    // IT. The market square stopped being navHidden (the exit is now tied to the
+    // room with the door, and for the market that IS the square — hidden, it
+    // would have been a stall with no way back), which took the market to five
+    // tabs. Under the old slice(0, 4) the materials stall would simply have
+    // stopped existing on the row. The row wraps (travelRow: flexWrap), so the
+    // fifth and sixth chips cost a line, not a room — but the cap is still real,
+    // so it stays asserted against the SAME number InputBox slices to.
     const none = new Set<string>();
     for (const id of buildingIds()) {
-      // OTA-787 — the nav row (InputBox) filters out navHidden rooms (the market
-      // SQUARE you land in is not a tab; its exits are the four stall tabs + EXIT).
-      // Mirror that filter so the count reflects what's actually on the row.
       const navTabs = visibleBuildingRooms(id, none).filter((r) => !r.navHidden);
-      expect(navTabs.length).toBeLessThanOrEqual(4);
+      expect({ id, tabs: navTabs.length }).toEqual({ id, tabs: navTabs.length });
+      expect(navTabs.length).toBeLessThanOrEqual(6);
+      // …counting a revealed secret room too, which is what the player ends up
+      // looking at: the shed's four rooms plus its cellar.
+      expect(visibleBuildingRooms(id, new Set(['cellar'])).filter((r) => !r.navHidden).length)
+        .toBeLessThanOrEqual(6);
     }
   });
 
@@ -108,10 +118,20 @@ describe('building templates', () => {
   });
 
   describe('shed hidden cellar', () => {
-    it('shows only the shed until the cellar is revealed', () => {
+    it('⚠ OTA-1430 — shed = shed / bedroom / storage, plus the secret cellar', () => {
+      // The owner's painting labels four rooms; the template carried two. A mark
+      // on the map for a room the player cannot enter is OTA-1402's defect, so
+      // the rooms were built rather than the map trimmed.
+      expect(BUILDINGS.shed!.rooms.map((r) => r.shortName)).toEqual([
+        'Shed', 'Bedroom', 'Storage', 'Cellar',
+      ]);
+      expect(BUILDINGS.shed!.rooms.filter((r) => r.secret).map((r) => r.id)).toEqual(['cellar']);
+    });
+
+    it('the cellar stays off the nav row until it is revealed', () => {
       const none = new Set<string>();
       const visible = visibleBuildingRooms('shed', none);
-      expect(visible.map((r) => r.id)).toEqual(['shed']);
+      expect(visible.map((r) => r.id)).toEqual(['shed', 'bedroom', 'storage']);
     });
 
     it('investigating the floorboards reveals the cellar', () => {
@@ -124,7 +144,7 @@ describe('building templates', () => {
     it('once revealed, the cellar joins the nav row', () => {
       const revealed = new Set<string>(['cellar']);
       const visible = visibleBuildingRooms('shed', revealed);
-      expect(visible.map((r) => r.id)).toEqual(['shed', 'cellar']);
+      expect(visible.map((r) => r.id)).toEqual(['shed', 'bedroom', 'storage', 'cellar']);
     });
   });
 

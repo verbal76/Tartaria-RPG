@@ -87,11 +87,20 @@ describe('OTA-786 — market stalls auto-open their wares', () => {
     }
   });
 
-  it('keeps the navHidden square OFF the stall tab list (four stalls only)', async () => {
+  it('⚠⚠ OTA-1430 — the SQUARE is back on the tab list, and it is still not a vendor', () => {
+    // It was navHidden from OTA-787 ("the row is the four stall tabs + EXIT").
+    // OTA-1430 tied the way out to the room with the door, and for the market
+    // that room IS the square — so a hidden square would have left a player at
+    // the food stall with no chip back to it and no EXIT of its own: stranded.
+    // It is a tab again. What must NOT change is that walking into it opens no
+    // vendor, which is this file's whole subject — it carries no stallCategory.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { visibleBuildingRooms } = require('../app/engine/buildings') as typeof import('../app/engine/buildings');
+    const { visibleBuildingRooms, getBuildingRoom } = require('../app/engine/buildings') as typeof import('../app/engine/buildings');
     const tabs = visibleBuildingRooms('market', new Set<string>()).filter((r) => !r.navHidden);
-    expect(tabs.map((r) => r.id)).toEqual(['weapons_stall', 'armor_stall', 'food_stall', 'materials_stall']);
+    expect(tabs.map((r) => r.id)).toEqual([
+      'market_square', 'weapons_stall', 'armor_stall', 'food_stall', 'materials_stall',
+    ]);
+    expect(getBuildingRoom('market', 'market_square')?.stallCategory).toBeUndefined();
   });
 
   it('does NOT auto-open a vendor for ordinary (non-market) building rooms', async () => {

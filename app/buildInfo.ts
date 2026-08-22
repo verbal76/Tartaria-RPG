@@ -24291,7 +24291,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1428 — the found hall gets a name pool, its painted floor plan on both
 // the minimap and the atlas, per-visit room checkmarks and direction arrows.
 // Also splits it from the faction outpost, whose name it had been sharing.
-export const OTA_BUILD_ID = '2026-08-21-1428-the-found-hall';
+// OTA-1430 — every building template is now a painted floor plan: the flooded
+// house, the shack, the market and the shed join the found hall, all through one
+// table instead of a module per building. The shed grew the two rooms its
+// artwork names. And the way out is tied to the room with the door — you can no
+// longer step out of a sealed vault, or out of a cellar under the floorboards,
+// straight into the weather; refusing says which room the door is in.
+export const OTA_BUILD_ID = '2026-08-22-1430-every-building-is-a-map';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1428-the-found-hall';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1427-x-of-y-names-the-x';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1426-the-anchor-noun-library';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1425-the-catalogue-teaches-the-namer';

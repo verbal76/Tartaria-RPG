@@ -49,6 +49,12 @@ export interface BuildingRoom {
   /** The interactable noun whose INVESTIGATE reveals this (secret) room.
    *  Lives as an interactable on another room in the same building. */
   revealOnInvestigate?: string;
+  /** ⚠⚠ OTA-1430 — THIS ROOM HAS A DOOR TO THE OUTSIDE. Owner: *"I want the
+   *  exit tied to the correct room."* The entry room ALWAYS has one (you walked
+   *  in through it) and does not need the flag; this marks the EXTRA doors a
+   *  painting shows — the shack's second gate into the storage is the first.
+   *  See buildingExitRooms(). */
+  exitDoor?: boolean;
 }
 
 export interface BuildingTemplate {
@@ -176,13 +182,25 @@ export const BUILDINGS: Record<string, BuildingTemplate> = {
         name: 'The Storage',
         shortName: 'Storage',
         description:
-          'Shelves of odds and ends. Sacks slumped against the wall, dented tins, a loose coil of wire.',
-        interactables: ['shelf', 'sack', 'tin', 'wire'],
+          'Shelves of odds and ends. Sacks slumped against the wall, dented tins, a loose coil of wire. A plank gate at the back of the room hangs open on the yard.',
+        interactables: ['shelf', 'sack', 'tin', 'wire', 'gate'],
+        // ⚠ OTA-1430 — the painting shows a SECOND way out here, a gate at the
+        // bottom right of the shack, so the storage carries the EXIT chip too.
+        exitDoor: true,
       },
     ],
   },
 
-  // ── Shed — one room, with a hidden cellar revealed by INVESTIGATE.
+  // ── Shed — a work room, two side rooms, and a hidden cellar revealed by
+  //    INVESTIGATE.
+  //
+  // ⚠⚠ OTA-1430 — THE ART AND THE TEMPLATE DISAGREED, AND THE ART WON. The
+  // owner's painting labels FOUR rooms — The Shed, The Bedroom, The Storage and
+  // the inset Hidden Cellar — where this template carried only two. Marking a
+  // bedroom on the map for a room the player can never walk into is OTA-1402's
+  // defect (the game showing a thing it cannot do), so the choice was: leave the
+  // shed unmapped, or build the rooms. Owner: *"if it's a mismatch of rooms we
+  // might just update the game to match the artwork"*. Built.
   shed: {
     id: 'shed',
     name: 'Shed',
@@ -196,6 +214,22 @@ export const BUILDINGS: Record<string, BuildingTemplate> = {
         description:
           'Tools hang on pegs over a scarred workbench; the air is oil and dust. The floorboards by the bench sit oddly proud, as if something underneath pushes them up.',
         interactables: ['workbench', 'tools', 'pegs', 'floorboards'],
+      },
+      {
+        id: 'bedroom',
+        name: 'The Bedroom',
+        shortName: 'Bedroom',
+        description:
+          'Somebody slept in here long after the shed stopped being a shed — a low bed under the eaves, a cupboard of stoppered jars, and a lamp burned down to its socket.',
+        interactables: ['bed', 'cupboard', 'jars', 'lamp'],
+      },
+      {
+        id: 'storage',
+        name: 'The Storage',
+        shortName: 'Storage',
+        description:
+          'Shelves run the length of the wall, stacked with bottles, tins and sacking. Whatever was worth keeping was kept here, and most of it is still keeping.',
+        interactables: ['shelves', 'bottles', 'tins', 'sacking'],
       },
       {
         id: 'cellar',
@@ -228,7 +262,14 @@ export const BUILDINGS: Record<string, BuildingTemplate> = {
         description:
           'You push past the outer carts into the market proper — a press of canvas awnings, lantern smoke, and haggling voices. Stalls ring the square on every side: weapons, armor, food, and materials. Step up to whichever you like, or slip back out the way you came.',
         interactables: ['crowd', 'lanterns'],
-        navHidden: true,
+        // ⚠⚠ OTA-1430 — THE SQUARE BECAME A TAB. It was navHidden (OTA-787: you
+        // land here, and the row is "the four stalls + EXIT"). That was safe
+        // only while EXIT stood in every room. Now the exit is tied to the room
+        // with the door — which for the market IS the square — so a hidden
+        // square would leave a player at the food stall with no tappable way
+        // back to it and no EXIT: stranded. Un-hidden, the market reads like
+        // every other building: the rooms you can walk to, plus EXIT where the
+        // way out actually is.
         anchorNpc: null,
       },
       {
@@ -345,6 +386,34 @@ export function buildingEntryRoom(id: string | null | undefined): BuildingRoom |
   const b = getBuilding(id);
   if (!b) return null;
   return getBuildingRoom(b.id, b.entryRoomId) ?? b.rooms[0] ?? null;
+}
+
+/** ⚠⚠ OTA-1430 — WHICH ROOMS YOU CAN LEAVE FROM. Owner: *"I want the exit tied
+ *  to the correct room."* Before this, EXIT stood in every room of a found
+ *  building, so the player could step out of a sealed vault or a cellar under
+ *  the floorboards straight into the weather.
+ *
+ *  ⚠ The ENTRY ROOM IS ALWAYS ONE, unconditionally — you walked in through it,
+ *  so it has a door by construction, and making it implicit means a new template
+ *  is correct with no flag to remember. `exitDoor: true` adds the extra doors a
+ *  painting shows. The result is never empty, which is the whole point: OTA-1271
+ *  is the record of the owner's own playtest stranded in the outpost workshop by
+ *  an exit rule with no floor under it. */
+export function buildingExitRooms(id: string | null | undefined): BuildingRoom[] {
+  const b = getBuilding(id);
+  if (!b) return [];
+  const entry = buildingEntryRoom(b.id);
+  const out = b.rooms.filter((r) => r.exitDoor && r.id !== entry?.id);
+  return entry ? [entry, ...out] : out;
+}
+
+/** Can the player step outside from where they are standing? */
+export function roomHasExitDoor(
+  id: string | null | undefined,
+  roomId: string | null | undefined,
+): boolean {
+  if (!id || !roomId) return false;
+  return buildingExitRooms(id).some((r) => r.id === roomId);
 }
 
 /** Rooms to show on the nav row: every non-secret room, plus any secret

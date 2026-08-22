@@ -12,7 +12,7 @@ import {
   Vibration,
 } from 'react-native';
 import { TutorialTarget } from './TutorialTarget';
-import { visibleBuildingRooms } from '../engine/buildings';
+import { visibleBuildingRooms, roomHasExitDoor } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from './tutorialSteps';
 import { useGameStore, logUiTap } from '../state/gameStore';
@@ -26,7 +26,7 @@ import { reachBandsFor } from '../engine/types';
 // have to gender it. Without this they read "bring it up" about a companion
 // the player named and chose a sex for.
 import { applyDogPronouns } from '../engine/dogCompanion';
-import { musterHallChipLabel } from '../engine/musterHall';
+import { buildingChipLabel, buildingMap } from '../engine/buildingMaps';
 // OTA-1170 — the dodge recharge bar reads its fill from one place.
 import { dodgeFill, dodgeCooldownRounds } from '../engine/dodgeCooldown';
 // OTA-1171 — the dodge lock is per difficulty tier; dialOf resolves CUSTOM per system.
@@ -260,6 +260,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
       // the row is the four stall tabs + EXIT whether you're in the square or a
       // stall.
       ? visibleBuildingRooms(activeBuildingId, new Set(buildingRevealed)).filter((r) => !r.navHidden)
+      // ⚠ OTA-1430 — nothing is navHidden any more (the market square stopped
+      // being, so the exit could be tied to it), but the filter stays: it is the
+      // contract for any future room that should be enterable without being a
+      // tab, and dropping it would put such a room on the row silently.
       : []),
     [activeBuildingId, buildingRevealed],
   );
@@ -508,9 +512,15 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
       {!inCombat && (
         <TutorialTarget area="travel-row" style={styles.travelRow}>
           {activeBuildingId ? (
-            // Inside a building: up to 4 room buttons + EXIT (no MAP).
+            // Inside a building: the room buttons + EXIT (no MAP).
+            // ⚠ OTA-1430 — the cap was 4, from when four rooms was the biggest
+            // building. The market is five with the square un-hidden, and the
+            // shed is four plus a revealed cellar. A silent slice(0, 4) would
+            // have dropped the materials stall off the row — the row wraps
+            // (travelRow: flexWrap), so a fifth and sixth chip cost a line, not
+            // a room.
             <>
-              {buildingRooms.slice(0, 4).map((r) => (
+              {buildingRooms.slice(0, 6).map((r) => (
                 <TravelBtn
                   key={r.id}
                   // ⚠ OTA-1428 — the found hall's chips carry a direction arrow
@@ -519,18 +529,35 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   // floor plan to be directional ABOUT: every other template is
                   // a flat room list, and an arrow invented for one would point
                   // at nothing. Those keep the plain label.
-                  label={activeBuildingId === 'outpost'
-                    ? musterHallChipLabel(activeBuildingRoomId ?? '', r, buildingVisited)
+                  // ⚠ OTA-1429 — any building WITH A PAINTED PLAN gets arrows
+                  // and ✓; the rest keep the plain label. Branches on the plan
+                  // existing, not on an id, so a third painting needs no edit
+                  // here.
+                  label={buildingMap(activeBuildingId)
+                    ? buildingChipLabel(activeBuildingId!, activeBuildingRoomId ?? '', r, buildingVisited)
                     : r.shortName}
                   active={r.id === activeBuildingRoomId}
                   onPress={() => goBuildingRoom(r.id)}
                 />
               ))}
               {/* OTA-781 — the nav row stays CLEAN like a building's rooms:
-                  just the stall tabs + EXIT. Tapping a stall swaps to it; EXIT
-                  leaves the whole market. TRADE / FUSE live in the quick-action
-                  row below (not here, not as floating chips). */}
-              <TravelBtn label="EXIT" onPress={() => exitBuilding()} />
+                  just the room tabs + EXIT. Tapping a room swaps to it; EXIT
+                  leaves the whole building. TRADE / FUSE live in the quick-action
+                  row below (not here, not as floating chips).
+
+                  ⚠⚠ OTA-1430 — EXIT ONLY WHERE THERE IS A DOOR. Owner: *"I want
+                  the exit tied to the correct room."* It used to stand in every
+                  room, so the player could walk out of a sealed vault or a
+                  cellar under the floorboards straight into the weather. The
+                  rule is data-driven (roomHasExitDoor) and the entry room always
+                  qualifies, so no template can strand anyone — which is the
+                  failure OTA-1271 records, the owner's own playtest stuck in the
+                  outpost workshop behind an exit rule with no floor under it.
+                  Every room is one tap away on this same row, so the way out is
+                  never more than two taps. */}
+              {roomHasExitDoor(activeBuildingId, activeBuildingRoomId) ? (
+                <TravelBtn label="EXIT" onPress={() => exitBuilding()} />
+              ) : null}
             </>
           ) : travelTargetName ? (
             <>

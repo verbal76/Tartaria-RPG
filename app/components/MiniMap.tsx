@@ -34,11 +34,7 @@ import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useGameStore, playerGridCell } from '../state/gameStore';
 import { hubRoomFor, hubSkinFactionFor } from '../engine/hub';
 import { getBuildingRoom } from '../engine/buildings';
-import { MUSTER_HALL_ASPECT, MUSTER_HALL_ROOM_MARKS } from '../engine/musterHall';
-/** ⚠ The full-size painting, same asset the atlas uses — there is no
- *  downscaled hall tile yet. One building, one image; if more halls get art
- *  this wants the same tiles/ treatment the outposts have. */
-const MUSTER_HALL_TILE = require('../../assets/buildings/muster_hall.png');
+import { buildingMap } from '../engine/buildingMaps';
 import { outpostRoomMark } from '../engine/outpostRoomMarks';
 import { worldMarkerFraction, viewportOffset, type MapFrac } from '../engine/mapFraction';
 
@@ -110,16 +106,20 @@ export function MiniMap({ onPress }: { onPress?: () => void }) {
     // / activeBuildingRoomId), unlike hubRoomId which is on the player. Reading
     // it off `player` is the mistake gameStore's own OTA-4452 comment records —
     // "every one of these read 'outdoors' while the player was inside".
-    if (buildingId === 'outpost' && buildingRoomId) {
-      const mark = MUSTER_HALL_ROOM_MARKS[buildingRoomId];
-      const room = getBuildingRoom('outpost', buildingRoomId);
+    const bmap = buildingMap(buildingId);
+    if (bmap && buildingRoomId) {
+      const mark = bmap.marks[buildingRoomId];
+      const room = getBuildingRoom(buildingId!, buildingRoomId);
       if (mark) {
         return {
-          src: MUSTER_HALL_TILE,
+          // ⚠ The full-size painting, same asset the atlas uses — there are no
+          // downscaled building tiles. If a third gets art this wants the same
+          // tiles/ treatment the outposts have.
+          src: bmap.art,
           frac: mark,
-          aspect: MUSTER_HALL_ASPECT,
+          aspect: bmap.aspect,
           zoom: OUTPOST_ZOOM,
-          label: room?.name ?? 'the hall',
+          label: room?.name ?? 'inside',
         };
       }
     }

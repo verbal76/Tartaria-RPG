@@ -181,9 +181,20 @@ describe('OTA-1404 — the move changed no behaviour, and here is the arithmetic
   it('⚠ the store is ~2,300 lines lighter and the leaf is that much heavier', () => {
     // Not a vanity metric: a move that "shrank" the store by more than it added
     // to the leaf would mean something was dropped on the floor.
+    //
+    // ⚠ OTA-1430 — the ceiling moved 35,000 → 35,400. The store is a LIVING file
+    // that keeps getting features (this one: the exit tied to the room with the
+    // door), so a hard line count is a countdown, not a ratchet — it fails on the
+    // day someone adds a legitimate twenty lines and says nothing about whether
+    // the SLICE still holds. What the slice actually claims is the pre-move
+    // baseline of ~37,300, which is what the second assertion below now guards.
     const storeLines = STORE.split('\n').length;
     const leafLines = COMBAT.split('\n').length + GEARWEAR.split('\n').length;
-    expect(storeLines).toBeLessThan(35_000);
+    expect(storeLines).toBeLessThan(35_400);
+    // ⚠ THE CLAIM ITSELF: the store is still at least ~2,300 lines below where it
+    // stood before the move, and the leaf still carries them. This is the part
+    // that would break if the extraction were reverted or hollowed out.
+    expect(37_300 - storeLines).toBeGreaterThan(2_000);
     expect(leafLines).toBeGreaterThan(2_400);
   });
 

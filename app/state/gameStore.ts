@@ -33,7 +33,7 @@ import {
   type RescueScenarioId,
   type RescueScenario,
 } from '../engine/dogCompanion';
-import { musterHallNameFor, musterHallHookLabel } from '../engine/musterHall';
+import { buildingNameFor, buildingHookLabel, buildingArrow } from '../engine/buildingMaps';
 // ⚠ OTA-1236 — ONE rule for "this noun carries a next step", shared by the engine
 // dispatch, the bulk-salvage guard, the loot picker's lead lane and the
 // INVESTIGATE ALL ordering. See engine/storyNouns.ts for why they must agree.
@@ -452,6 +452,8 @@ import {
   resolveBuildingRoom,
   secretRoomRevealedBy,
   visibleBuildingRooms,
+  buildingExitRooms,
+  roomHasExitDoor,
 } from '../engine/buildings';
 import { sellPriceFor, isUnsellable, applySellCaps } from '../engine/sellPrice';
 import { vendorPriceMod, rapportQuestId, chaPriceDiscount, standingTier, standingTierLabel, standingPriceDiscount } from '../engine/factionRapport';
@@ -1372,12 +1374,13 @@ const ARBITER_QUESTION_PROMPTS: readonly string[] = [
  *  the same building on the same tile, which reads as a different one — and
  *  hashing needs nothing stored, so no save migration and no new field.
  *
- *  ⚠ Only the `outpost` template. The others (flooded house, shack, shed,
- *  market) have one name each by design and no painted plan to belong to. */
+ *  ⚠ Only buildings with a NON-EMPTY name pool in buildingMaps.ts. The shed has
+ *  no painted plan at all; the market has one but no pool, because it is a
+ *  single fixed place and rolling a name for it would rename a landmark the
+ *  player was told about and routed to. Both fall through to the template's own
+ *  name here, which is the pre-OTA-1428 behaviour exactly. */
 export function foundBuildingName(buildingId: string, tileKey: string): string {
-  const b = getBuilding(buildingId);
-  if (buildingId !== 'outpost') return b?.name ?? 'a structure';
-  return musterHallNameFor(tileKey);
+  return buildingNameFor(buildingId, tileKey) ?? getBuilding(buildingId)?.name ?? 'a structure';
 }
 
 function buildingTileKey(get: () => GameStore): string {
@@ -1386,8 +1389,9 @@ function buildingTileKey(get: () => GameStore): string {
 }
 
 function buildingApproachLine(buildingId: string, autoTraveling = false, tileKey?: string): string {
-  const label = buildingId === 'outpost' && tileKey
-    ? musterHallHookLabel(musterHallNameFor(tileKey))
+  const pooled = tileKey ? buildingNameFor(buildingId, tileKey) : undefined;
+  const label = pooled
+    ? buildingHookLabel(pooled)
     : getBuilding(buildingId)?.hookLabel ?? 'a structure';
   const Cap = label.charAt(0).toUpperCase() + label.slice(1);
   // arb120 — while auto-travelling the travel row shows STOP, not an ENTER
@@ -11984,8 +11988,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const inBuilding = get().activeBuildingId;
       if (inBuilding) {
         // EXIT back to the open world.
+        // ⚠⚠ OTA-1430 — ONLY FROM A ROOM WITH A DOOR. Owner: *"I want the exit
+        // tied to the correct room."* The chip already hides itself elsewhere
+        // (InputBox), but the TYPED path is the one that would have quietly kept
+        // the old behaviour — the "many-doors" mistake, one door fixed and its
+        // sibling left open.
+        //
+        // ⚠ AND IT SAYS WHERE THE DOOR IS. A bare refusal is the failure shape
+        // this session has named more than any other — the game knows and does
+        // not say. It names the room and, where the building has a painted plan,
+        // points at it, so the way out is one tap on the row already on screen.
         if (isLeaveHubCommand(trimmed) || isBareExitCommand(trimmed)) {
           if (!_opts?.silent) get().appendLog('player', trimmed);
+          const hereRoom = get().activeBuildingRoomId;
+          if (!roomHasExitDoor(inBuilding, hereRoom)) {
+            const doors = buildingExitRooms(inBuilding);
+            const say = doors
+              .map((d) => {
+                const arrow = buildingArrow(inBuilding, hereRoom ?? '', d.id);
+                return `${d.name}${arrow ? ` ${arrow}` : ''}`;
+              })
+              .join(' or ');
+            get().appendLog(
+              'world',
+              doors.length
+                ? `There's no way out from here — the door is back through ${say}. Tap it, then EXIT.`
+                : `There's no way out from this room.`,
+            );
+            return;
+          }
           get().exitBuilding();
           return;
         }
@@ -31798,7 +31829,23 @@ function narrateCasualLook(
         .filter((r) => !r.navHidden)
         .map((r) => r.shortName);
       if (rooms.length > 0) exitLine.push(`Rooms here: ${rooms.join(' · ')}.`);
-      exitLine.push(`(Tap EXIT, or type 'exit', to step back outside.)`);
+      // ⚠⚠ OTA-1430 — DON'T PROMISE AN EXIT THAT ISN'T IN THIS ROOM. The way out
+      // is now tied to the room with the door, so this line has to name where
+      // that is rather than telling the player to tap a chip they cannot see —
+      // the game knowing and not saying is the shape this session keeps finding.
+      const bId = get().activeBuildingId!;
+      const hereId = get().activeBuildingRoomId;
+      if (roomHasExitDoor(bId, hereId)) {
+        exitLine.push(`(Tap EXIT, or type 'exit', to step back outside.)`);
+      } else {
+        const doors = buildingExitRooms(bId)
+          .map((d) => {
+            const arrow = buildingArrow(bId, hereId ?? '', d.id);
+            return `${d.name}${arrow ? ` ${arrow}` : ''}`;
+          })
+          .join(' or ');
+        if (doors) exitLine.push(`(The way out is through ${doors} — tap it, then EXIT.)`);
+      }
     } else {
       exitLine.push(`Cardinal travel: north, east, south, west.`);
     }
