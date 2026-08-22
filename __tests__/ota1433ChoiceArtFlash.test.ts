@@ -245,3 +245,125 @@ describe('OTA-1433 — one flash component, two choices', () => {
     expect(flash).toBeLessThan(nextStep);
   });
 });
+
+/**
+ * OTA-1434 — THE PORTRAIT AT THE TOP OF THE CHARACTER SHEET.
+ *
+ * Owner: *"when you hit your character portrait and it goes into your full
+ * breakdown of your character at the very top should be the portrait of your
+ * character with their faction icon shrunken down and put in the top left
+ * corner as an overlay."*
+ */
+const SHEET = read('app', 'screens', 'CharacterScreen.tsx');
+const BANNER = read('app', 'components', 'CharacterPortrait.tsx');
+
+describe('OTA-1434 — the character sheet leads with who you are', () => {
+  it('⚠⚠ the banner is the FIRST thing in the scroll, above the header card', () => {
+    const scroll = SHEET.indexOf('<ScrollView style={styles.scroll}');
+    expect(scroll).toBeGreaterThan(-1);
+    const banner = SHEET.indexOf('<CharacterPortrait', scroll);
+    const headerCard = SHEET.indexOf('{/* ── HEADER CARD', scroll);
+    expect(banner).toBeGreaterThan(scroll);
+    expect(banner).toBeLessThan(headerCard);
+  });
+
+  it('⚠ it is INSIDE the scroll, not pinned above it', () => {
+    // This sheet exists to audit numbers. A permanently pinned banner would cost
+    // a fifth of every screenful of them; scrolling away hands the screen back.
+    const scrollEnd = SHEET.indexOf('</ScrollView>');
+    expect(SHEET.indexOf('<CharacterPortrait')).toBeLessThan(scrollEnd);
+  });
+
+  it('⚠⚠ it is driven by the PLAYER RECORD, not by a name or a hard-coded id', () => {
+    expect(SHEET).toContain('raceId={player.raceId}');
+    expect(SHEET).toContain('factionId={player.factionId}');
+    // The component looks the art up itself and knows no race or faction names.
+    expect(BANNER).toContain('racePortrait(raceId)');
+    expect(BANNER).toContain('factionCrest(factionId)');
+  });
+
+  it('⚠⚠ the crest is a small TOP-LEFT overlay, not a second picture', () => {
+    expect(BANNER).toContain('top: 8,');
+    expect(BANNER).toContain('left: 8,');
+    expect(BANNER).toContain('position: \'absolute\',');
+    const size = BANNER.match(/const CREST_SIZE = (\d+);/);
+    expect(size).toBeTruthy();
+    expect(Number(size![1])).toBeLessThanOrEqual(120);
+  });
+
+  it('⚠⚠ contain, and the height is MEASURED from the image', () => {
+    // The seven portraits do not share an aspect and one is landscape. A fixed
+    // band would crop some — and the crop is the dangerous half, because these
+    // are two-figure compositions with the heads in the upper third.
+    expect(BANNER).toContain('Image.resolveAssetSource(portrait)');
+    expect(BANNER).toContain('resizeMode="contain"');
+    expect(BANNER).not.toContain('resizeMode="cover"');
+  });
+
+  it('⚠ no portrait means NO BANNER — not an empty box', () => {
+    // A race added without art must leave the sheet looking deliberate.
+    expect(BANNER).toContain('if (!portrait) return null;');
+  });
+
+  it('⚠ a missing resolveAssetSource falls back rather than collapsing to zero', () => {
+    // It returns null in some environments (and under jest's asset mock); a
+    // zero-height band would silently hide the whole feature.
+    expect(BANNER).toContain('meta?.width && meta?.height');
+    expect(BANNER).toContain(': cap;');
+  });
+});
+
+describe('OTA-1434 — and the third choice, top right', () => {
+  it('⚠⚠ the motive is a TOP-RIGHT overlay, opposite the crest', () => {
+    // Character creation asks three questions — what you are, who took you in,
+    // and why you came down. The sheet showed the first two and dropped the
+    // third; the banner now carries all three.
+    expect(BANNER).toContain('motivePlate');
+    expect(BANNER).toContain('right: 8,');
+    expect(BANNER).toContain('{motive.title}');
+  });
+
+  it('⚠⚠ THE TITLE ALONE — no label, no rule, no shouting', () => {
+    // The first draft set it under a "WHY YOU CAME DOWN" eyebrow and a rule.
+    // Owner: *"the stylized writing should just be the two words like 'The
+    // Exile'."* A label explains, and this does not need explaining — two words
+    // in gold on your own portrait read as a title the character CARRIES, where
+    // the same words under a caption read as a form field.
+    expect(BANNER).not.toContain('WHY YOU CAME DOWN');
+    expect(BANNER).not.toContain('motiveEyebrow');
+    expect(BANNER).not.toContain('motiveRule');
+    // …and the title is rendered AS AUTHORED. Uppercasing it would turn the
+    // title straight back into the label that was just removed.
+    expect(BANNER).not.toContain('motive.title.toUpperCase()');
+    expect(BANNER).toContain('motiveTitle');
+    expect(BANNER).toContain("textAlign: 'right'");
+    expect(BANNER).toContain("alignItems: 'flex-end'");
+  });
+
+  it('⚠⚠ a save with NO stored motive shows the same one the crawl uses', () => {
+    // storyMotive postdates OTA-1018 and older characters were dealt one
+    // deterministically by assignMotive rather than having it stored. Deriving
+    // it the same way here stops the sheet inventing a SECOND answer to a
+    // question the opening crawl already answered for that character.
+    expect(BANNER).toContain('motiveById(motiveId ?? (characterName ? assignMotive(characterName) : undefined))');
+    expect(SHEET).toContain('motiveId={player.storyMotive}');
+    expect(SHEET).toContain('characterName={player.name}');
+  });
+
+  it('⚠ the motive title is one of the five, and short enough to sit in a corner', () => {
+    const { getStoryMotives } = require('../app/engine/story') as typeof import('../app/engine/story');
+    const motives = getStoryMotives();
+    expect(motives.length).toBe(5);
+    for (const m of motives) {
+      // Two words is the shape the owner asked for, and the corner is sized for
+      // it. A five-word motive added later would overrun or ellipsize.
+      expect({ id: m.id, words: m.title.trim().split(/\s+/).length <= 2 })
+        .toEqual({ id: m.id, words: true });
+      expect({ id: m.id, len: m.title.length <= 18 }).toEqual({ id: m.id, len: true });
+    }
+  });
+
+  it('⚠ the screen reader gets all three choices, not just the picture', () => {
+    expect(BANNER).toContain('came down for ${motive.title}');
+  });
+});

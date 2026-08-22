@@ -10,6 +10,8 @@ import { useGameStore } from '../state/gameStore';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { effectiveACBreakdown, playerArmorResistKinds } from '../state/combatResolution';
 import { FirstTimeHint } from '../components/FirstTimeHint';
+// OTA-1434 — who you are, at the top of the sheet.
+import { CharacterPortrait } from '../components/CharacterPortrait';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import { JOIN_THRESHOLD, BUY_REP_TC_PER_STANDING } from '../engine/factions';
@@ -181,6 +183,21 @@ export function CharacterScreen() {
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        {/* ⚠ OTA-1434 — THE PORTRAIT, FIRST THING. Owner: *"at the very top
+            should be the portrait of your character with their faction icon
+            shrunken down and put in the top left corner as an overlay."*
+            Above the header card, inside the scroll rather than pinned, so it
+            scrolls away and hands the screen back to the numbers — this sheet's
+            job is auditing values, and a permanent banner would cost a fifth of
+            every screenful of them. */}
+        <CharacterPortrait
+          raceId={player.raceId}
+          factionId={player.factionId}
+          raceName={race?.name}
+          factionName={faction?.name}
+          motiveId={player.storyMotive}
+          characterName={player.name}
+        />
         {/* ── HEADER CARD ───────────────────────────────────────── */}
         <View style={styles.card}>
           <Text style={styles.name}>{player.name}</Text>
