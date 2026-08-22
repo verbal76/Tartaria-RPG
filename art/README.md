@@ -46,8 +46,23 @@ unknowing_mass.png
 aetherborn.png
 ```
 
-### `02-crests/` — 9 files · **square, ALPHA REQUIRED**
-Faction emblems. Ids from `app/data/factions/factions.json`.
+### `02-crests/` — ✅ **DONE, AND MOVED OUT**
+All nine landed and are **wired in** as of OTA-1431. They now live in
+**`assets/crests/`**, not here.
+
+⚠ **That move is the flow, not a one-off.** `art/` is the INBOX — where a
+finished image lands from the generator. `assets/` is what SHIPS: it is the only
+tree `app.json`'s `assetBundlePatterns` bundles into the app, and it is where
+every other piece of the game's art already lives (`assets/buildings/`,
+`assets/outposts/`, `assets/minimap/`). So when a group gets wired, its files are
+`git mv`'d from `art/<group>/` into `assets/<name>/` and the folder here goes
+back to empty. Leaving a shipped asset in `art/` would mean the game references
+a file from a folder that is not part of the app.
+
+**What each emblem depicts, and why six of them were renamed:**
+[`assets/crests/README.md`](../assets/crests/README.md).
+
+Ids from `app/data/factions/factions.json`.
 
 ```
 mud_monarchs.png

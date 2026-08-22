@@ -7,6 +7,8 @@ import { getStoryMotives } from '../engine/story'; // OTA-1018
 import { PRESET_TIERS, PRESSURE_PROFILES, DEFAULT_PRESSURE, DIFFICULTY_SYSTEMS, type PressureTier, type PressureCustom } from '../engine/pressure';
 // OTA-1113 — the CUSTOM row's popup.
 import { DifficultyCustomModal } from '../components/DifficultyCustomModal';
+// OTA-1431 — the emblem, when you pick the faction.
+import { FactionCrestFlash } from '../components/FactionCrestFlash';
 
 // Tungsten Spire — the 'name' step is gone. New flow: race → faction →
 // BEGIN. The player gives their name in-game when the Arbiter prompts
@@ -56,6 +58,22 @@ export function CharacterCreationScreen() {
   // switches where they left them.
   const [pressureCustom, setPressureCustom] = useState<PressureCustom | undefined>(undefined);
   const [customOpen, setCustomOpen] = useState(false);
+
+  // ⚠⚠ OTA-1431 — THE EMBLEM FLASHES WHEN YOU PICK A FACTION. Owner: *"as you
+  // choose your faction, the emblem should show for a few seconds as a popup."*
+  //
+  // ⚠ ONLY ON A CHANGE. Re-tapping the faction you already chose is a no-op, not
+  // another popup. This step is a LIST the player reads down and compares, and
+  // the first version of anything like this fires on every tap — so tapping your
+  // own choice twice, or tapping it to re-read its flavor line, costs you an
+  // animation you did not ask for. Combined with tap-anywhere-to-dismiss inside
+  // the flash itself, the popup can never become an obstacle to comparing two
+  // factions, which is the actual job of this screen.
+  const [crestFor, setCrestFor] = useState<string | null>(null);
+  const pickFaction = (id: string) => {
+    if (id !== factionId) setCrestFor(id);
+    setFactionId(id);
+  };
 
   const stepIndex = STEP_ORDER.indexOf(step);
   const selectedRace = races.find((r) => r.id === raceId) ?? races[0]!;
@@ -158,7 +176,7 @@ export function CharacterCreationScreen() {
               <TouchableOpacity
                 key={f.id}
                 style={[styles.option, factionId === f.id && styles.optionSelected]}
-                onPress={() => setFactionId(f.id)}
+                onPress={() => pickFaction(f.id)}
                 activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityState={{ selected: factionId === f.id }}
@@ -171,6 +189,16 @@ export function CharacterCreationScreen() {
                 )}
               </TouchableOpacity>
             ))}
+            {/* ⚠ OTA-1431 — rendered INSIDE the faction step, so leaving the
+                step unmounts it and its pending timer with it. Mounted at the
+                screen root it would survive a BACK tap and fire its dismiss
+                against a screen the player has already left. */}
+            <FactionCrestFlash
+              factionId={crestFor}
+              factionName={factions.find((f) => f.id === crestFor)?.name}
+              subtitle={factions.find((f) => f.id === crestFor)?.subtitle}
+              onDone={() => setCrestFor(null)}
+            />
             <View style={styles.beginBlock}>
               <Text style={styles.contextLine}>
                 {selectedRace.name} · {selectedFaction.name}

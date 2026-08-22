@@ -186,7 +186,7 @@ Each group below has a **FORMAT BLOCK**. Paste it alongside the style header and
 
 > ## ⚠⚠ ALL NINE ARE DONE. DO NOT GENERATE FROM THIS SECTION.
 >
-> The nine emblems shipped and live in **`art/02-crests/`**. What arrived does **not** match the devices described below — the generated art went its own way, and rather than discard nine good images each was read for what it actually shows and **re-matched to the faction whose lore it fits.** Six files were renamed; three stayed put.
+> The nine emblems shipped, are **wired in as of OTA-1431**, and live in **`assets/crests/`** (they moved out of the `art/` drop folder when they were wired — `assets/` is the only tree bundled into the app). What arrived does **not** match the devices described below — the generated art went its own way, and rather than discard nine good images each was read for what it actually shows and **re-matched to the faction whose lore it fits.** Six files were renamed; three stayed put.
 >
 > **[`art/02-crests/README.md`](../art/02-crests/README.md) is the truth for this group.** It records what each emblem depicts and why it belongs to its faction. The prompts below survive only as the historical brief — if a crest is ever regenerated, read that README first, so the replacement matches the set it is joining rather than the paragraph that produced the mismatch.
 >

@@ -1,5 +1,11 @@
 # The nine faction emblems — what each one actually depicts
 
+**Wired in at OTA-1431.** `app/engine/factionCrests.ts` keys these by faction id;
+`app/components/FactionCrestFlash.tsx` shows one as a popup when the player picks
+a faction in character creation. They arrived in `art/02-crests/` (the drop
+folder) and moved here when they were wired, because `assets/` is the only tree
+bundled into the app.
+
 ⚠ **Six of these files were renamed after they were generated.** The artwork is unchanged; only the filenames moved. This file records *what each emblem shows* and *why it belongs to the faction it is now named for*, so nobody has to re-derive the reasoning from the pictures a second time.
 
 The nine arrived with names that did not match their content — a generated emblem is only ever as well-labelled as the prompt that produced it, and the devices drifted. Rather than regenerate nine good images, they were re-matched: every emblem was read for what it actually shows, then assigned to the faction whose lore it fits. It came out as a clean six-way rotation with three staying put — **every image used exactly once, every faction covered exactly once.**

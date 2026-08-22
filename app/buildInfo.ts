@@ -24297,7 +24297,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // artwork names. And the way out is tied to the room with the door — you can no
 // longer step out of a sealed vault, or out of a cellar under the floorboards,
 // straight into the weather; refusing says which room the door is in.
-export const OTA_BUILD_ID = '2026-08-22-1430-every-building-is-a-map';
+// OTA-1431 — the nine faction emblems are in the game. Picking a faction in
+// character creation flashes its emblem as a popup for a couple of seconds; tap
+// anywhere to skip it, and re-tapping the faction you already chose does
+// nothing. Six of the nine were renamed first, to the faction each one actually
+// depicts rather than the prompt it drifted from.
+export const OTA_BUILD_ID = '2026-08-22-1431-the-emblem-when-you-pick';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1430-every-building-is-a-map';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1428-the-found-hall';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1427-x-of-y-names-the-x';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1426-the-anchor-noun-library';
