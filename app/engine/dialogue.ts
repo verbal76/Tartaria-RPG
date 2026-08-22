@@ -108,6 +108,26 @@ export interface TopicGrant {
   tc?: number;
 }
 
+/** ⚠⚠ OTA-1437 — WOULD THIS GRANT BOUNCE? A pure look-ahead, so the caller can
+ *  decide BEFORE it starts talking.
+ *
+ *  Only the lead can bounce: the player holds one pending lead at a time, and
+ *  overwriting an unclaimed one would silently delete something they were told
+ *  to go and find (OTA-1064). Whispers and coin always land — a duplicate
+ *  whisper is skipped in silence and coin is coin.
+ *
+ *  ⚠ AND THAT IS WHY DEFERRING THE WHOLE TOPIC IS SAFE. No authored topic pairs
+ *  a lead with a whisper or a payment — checked across dialogue_topics.json — so
+ *  holding one back cannot quietly withhold something else that would have
+ *  worked. If that ever stops being true this predicate is the place it breaks,
+ *  loudly, rather than the player silently losing a whisper. */
+export function topicGrantWouldDefer(
+  grants: TopicGrant | undefined,
+  hasPendingLead: boolean,
+): boolean {
+  return !!grants?.lead && hasPendingLead;
+}
+
 export interface Topic {
   id: string;
   label: string;

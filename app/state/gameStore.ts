@@ -53,6 +53,7 @@ import { giftBlockReason } from '../engine/giftEligibility';
 import {
   hasTopicsFor, topicsFor, topicReply, alreadySaidLine, nothingToSayLine,
   lockedTopicCount, teaserDeflectionLine,
+  topicGrantWouldDefer,
   type Topic as TalkTopic,
 } from '../engine/dialogue';
 // OTA-1063 — the flourish: one beat of stage business under an authored reply.
@@ -8103,6 +8104,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // — asking again is a thing you did, and hiding it would make the "I have
     // told you that one" answer look like it arrived unprompted.
     get().appendLog('player', topic.label);
+    // ⚠⚠ OTA-1437 — A TOPIC THAT CANNOT PAY OUT DOES NOT GET SPOKEN AT ALL.
+    //
+    // OTA-1064 correctly stopped a bounced lead from spending the topic, so the
+    // tip really would keep. But it left the REPLY on the first-raise path, and
+    // an unspent topic is permanently `asked === 0` — so every re-ask replayed
+    // the entire first-raise sequence: the full speech, then a sentence saying
+    // the speech had not happened yet, then a fresh flourish. The owner's log
+    // has Bran deliver the same nine-line reveal twenty-five times in ninety
+    // seconds, each one followed by "ask again when your hands are free".
+    //
+    // It is OTA-1402's defect wearing new clothes: the game knew it could not
+    // deliver and said the payload anyway. Checking BEFORE the reply is the fix
+    // — one honest line, no wall of text, and the topic still unspent so it can
+    // genuinely be collected later.
+    if (asked === 0 && topicGrantWouldDefer(topic.grants, !!get().player?.pendingLead)) {
+      const line = `${t.npcName} has something worth hearing, but you are already chasing one lead. Come back when your hands are free.`;
+      get().appendLog('world', line);
+      recordTalkTurn(set, t.npcId, topic.label, line);
+      return;
+    }
     // Repetition is acknowledged rather than replayed. An NPC who answers the
     // same question twice as though it were the first time is the exact
     // "checklist, not a relationship" failure Phase 1 was written against.

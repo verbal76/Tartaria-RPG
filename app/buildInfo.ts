@@ -24321,7 +24321,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // lost its shading too, and now uses the same gold serif as the reason-you-came-
 // down title. Both marks draw from one shared type object, so they cannot drift
 // apart later.
-export const OTA_BUILD_ID = '2026-08-22-1436-one-hand-on-the-banner';
+// OTA-1437 — a vendor whose tip cannot land now says so in one line instead of
+// delivering the whole reveal and then telling you it has not happened yet. The
+// tip still keeps; it just stops repeating itself.
+export const OTA_BUILD_ID = '2026-08-22-1437-ask-before-you-speak';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1436-one-hand-on-the-banner';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1435-marks-on-the-painting';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1434-the-sheet-leads-with-you';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1433-the-races-have-faces';
