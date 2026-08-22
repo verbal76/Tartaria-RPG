@@ -14,11 +14,12 @@
  * BOTH directions: every faction has art, and every piece of art has a faction.
  */
 import { factionCrest, crestFactionIds } from '../app/engine/factionCrests';
-import { getFactions } from '../app/engine/character';
+import { racePortrait, portraitRaceIds } from '../app/engine/racePortraits';
+import { getFactions, getRaces } from '../app/engine/character';
 
 const read = (...p: string[]) =>
   require('fs').readFileSync(require('path').join(__dirname, '..', ...p), 'utf8') as string;
-const FLASH = read('app', 'components', 'FactionCrestFlash.tsx');
+const FLASH = read('app', 'components', 'ArtFlash.tsx');
 const CREATE = read('app', 'screens', 'CharacterCreationScreen.tsx');
 
 describe('OTA-1431 — every faction has an emblem, and every emblem a faction', () => {
@@ -121,8 +122,12 @@ describe('OTA-1432 — it plays on the COMMIT, not on the tap', () => {
     // them. Only `contain` shows all nine whole.
     expect(FLASH).toContain('resizeMode="contain"');
     expect(FLASH).not.toContain('resizeMode="cover"');
-    // Box measured off the SHORT edge, so a sideways handset does not overflow.
-    expect(FLASH).toContain('Math.min(width, height)');
+    // ⚠ OTA-1433 — ONE box for every shape, sized off BOTH screen axes and left
+    // to `contain`. It now has to hold crests (near-square, edge-to-edge art)
+    // AND race portraits running 0.667 to 1.250 with one landscape among six
+    // portraits. A box measured off a single axis would overflow one of them.
+    expect(FLASH).toContain('const boxW = width * 0.9;');
+    expect(FLASH).toContain('const boxH = height * 0.62;');
   });
 
   it('⚠ it unmounts with the faction step, taking its timer with it', () => {
@@ -130,9 +135,113 @@ describe('OTA-1432 — it plays on the COMMIT, not on the tap', () => {
     // dismiss against a screen the player has already left.
     const step = CREATE.indexOf("{step === 'faction' && (");
     expect(step).toBeGreaterThan(-1);
-    const flash = CREATE.indexOf('<FactionCrestFlash', step);
+    const flash = CREATE.indexOf('<ArtFlash', step);
     expect(flash).toBeGreaterThan(step);
     const nextStep = CREATE.indexOf("{step === 'motive' && (", step);
+    expect(flash).toBeLessThan(nextStep);
+  });
+});
+
+/**
+ * OTA-1433 — THE RACE PORTRAITS, ON THE SAME COMPONENT.
+ *
+ * Owner, having seen the faction emblem land: *"same thing, show the popup at
+ * selection."*
+ *
+ * ⚠⚠ "SAME THING" IS THE MOMENT A COMPONENT GETS COPIED, and a copy is how this
+ * session's most-repeated defect arrives — two implementations, one bug fixed in
+ * one of them (the many-doors mistake). So `FactionCrestFlash` became `ArtFlash`,
+ * taking a source and a key instead of a faction id, and both call sites are the
+ * same component. These tests assert that: not that the behaviour matches, but
+ * that there is only one implementation of it to match.
+ */
+describe('OTA-1433 — every race has a portrait, and every portrait a race', () => {
+  it('⚠⚠ all seven races resolve to art', () => {
+    const races = getRaces();
+    expect(races.length).toBe(7);
+    for (const r of races) {
+      expect({ id: r.id, hasArt: racePortrait(r.id) !== undefined })
+        .toEqual({ id: r.id, hasArt: true });
+    }
+  });
+
+  it('⚠⚠ …and no portrait is stranded on an id no race uses', () => {
+    const ids = new Set(getRaces().map((r) => r.id));
+    for (const id of portraitRaceIds()) {
+      expect({ id, isRealRace: ids.has(id) }).toEqual({ id, isRealRace: true });
+    }
+    expect(portraitRaceIds().sort()).toEqual([...ids].sort());
+  });
+
+  it('⚠ an unknown / null / empty race gets undefined, not a broken image', () => {
+    expect(racePortrait('mud_wraith')).toBeUndefined();
+    expect(racePortrait(null)).toBeUndefined();
+    expect(racePortrait(undefined)).toBeUndefined();
+    expect(racePortrait('')).toBeUndefined();
+  });
+
+  it('⚠⚠ the portraits are on disk under the race ids, and are real PNGs', () => {
+    // require() of a missing asset fails at Metro time only — invisible to tsc
+    // and to jest's asset mock. This is the cheap filesystem version of the
+    // check OTA-1415 had to write a whole script for.
+    const fs = require('fs') as typeof import('fs');
+    const path = require('path') as typeof import('path');
+    for (const r of getRaces()) {
+      const p = path.join(__dirname, '..', 'assets', 'races', `${r.id}.png`);
+      expect({ id: r.id, onDisk: fs.existsSync(p) }).toEqual({ id: r.id, onDisk: true });
+      const head = fs.readFileSync(p).subarray(0, 26);
+      expect({ id: r.id, png: head.subarray(1, 4).toString() }).toEqual({ id: r.id, png: 'PNG' });
+    }
+  });
+});
+
+describe('OTA-1433 — one flash component, two choices', () => {
+  it('⚠⚠ the old faction-only component is GONE, not left beside the new one', () => {
+    // A stale second copy is the whole failure this refactor exists to prevent:
+    // it would keep compiling, keep passing, and quietly stop receiving fixes.
+    const fs = require('fs') as typeof import('fs');
+    const path = require('path') as typeof import('path');
+    expect(fs.existsSync(path.join(__dirname, '..', 'app', 'components', 'FactionCrestFlash.tsx')))
+      .toBe(false);
+    expect(CREATE).not.toContain('FactionCrestFlash');
+  });
+
+  it('⚠⚠ ArtFlash knows nothing about factions or races', () => {
+    // It takes a source and a key. The moment it learns an id it has to learn a
+    // second one, and then it is two components wearing one filename.
+    expect(FLASH).toContain('artKey');
+    expect(FLASH).toContain('source: number | undefined;');
+    expect(FLASH).not.toContain('factionCrest');
+    expect(FLASH).not.toContain('racePortrait');
+  });
+
+  it('⚠⚠ BOTH choices play on the commit and BOTH advance from the flash', () => {
+    expect(CREATE).toContain("onDone={() => { setRacePortraitFor(null); setStep('faction'); }}");
+    expect(CREATE).toContain("onDone={() => { setCrestFor(null); setStep('motive'); }}");
+    // …and both use the same component, not a lookalike.
+    expect((CREATE.match(/<ArtFlash/g) ?? []).length).toBe(2);
+  });
+
+  it('⚠⚠ a race with NO art advances instead of stranding the player', () => {
+    // Same soft-lock guard as the faction step: ArtFlash renders null with no
+    // source and so never calls onDone, which would leave NEXT doing nothing.
+    const i = CREATE.indexOf("if (step === 'race') {");
+    expect(i).toBeGreaterThan(-1);
+    const guard = CREATE.indexOf('if (racePortrait(raceId)) {', i);
+    expect(guard).toBeGreaterThan(i);
+    expect(CREATE.indexOf("setStep('faction');", guard)).toBeGreaterThan(guard);
+  });
+
+  it('⚠ tapping a race row only selects it — the flash is on NEXT', () => {
+    expect(CREATE).toContain('onPress={() => setRaceId(r.id)}');
+  });
+
+  it('⚠ the race flash unmounts with the race step', () => {
+    const step = CREATE.indexOf("{step === 'race' && (");
+    expect(step).toBeGreaterThan(-1);
+    const flash = CREATE.indexOf('<ArtFlash', step);
+    const nextStep = CREATE.indexOf("{step === 'faction' && (", step);
+    expect(flash).toBeGreaterThan(step);
     expect(flash).toBeLessThan(nextStep);
   });
 });

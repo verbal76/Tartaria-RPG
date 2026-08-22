@@ -7,9 +7,11 @@ import { getStoryMotives } from '../engine/story'; // OTA-1018
 import { PRESET_TIERS, PRESSURE_PROFILES, DEFAULT_PRESSURE, DIFFICULTY_SYSTEMS, type PressureTier, type PressureCustom } from '../engine/pressure';
 // OTA-1113 — the CUSTOM row's popup.
 import { DifficultyCustomModal } from '../components/DifficultyCustomModal';
-// OTA-1431 — the emblem, when you pick the faction.
-import { FactionCrestFlash } from '../components/FactionCrestFlash';
+// OTA-1431/1433 — the art that plays when a choice is committed. ONE component
+// for both, so the skip behaviour and timer handling cannot drift apart.
+import { ArtFlash } from '../components/ArtFlash';
 import { factionCrest } from '../engine/factionCrests';
+import { racePortrait } from '../engine/racePortraits';
 
 // Tungsten Spire — the 'name' step is gone. New flow: race → faction →
 // BEGIN. The player gives their name in-game when the Arbiter prompts
@@ -73,6 +75,8 @@ export function CharacterCreationScreen() {
   // at the source rather than defending against it: there is exactly one NEXT
   // per run of this screen, so the flash can never interrupt anything.
   const [crestFor, setCrestFor] = useState<string | null>(null);
+  // OTA-1433 — the race portrait, by the same rule and on the same component.
+  const [racePortraitFor, setRacePortraitFor] = useState<string | null>(null);
 
   const stepIndex = STEP_ORDER.indexOf(step);
   const selectedRace = races.find((r) => r.id === raceId) ?? races[0]!;
@@ -92,6 +96,15 @@ export function CharacterCreationScreen() {
 
   const goNext = () => {
     if (step === 'race') {
+      // ⚠⚠ OTA-1433 — the portrait plays HERE, on the commit, exactly as the
+      // faction emblem does. Owner: *"same thing, show the popup at selection."*
+      // The `racePortrait` guard is the same soft-lock guard as the faction's:
+      // ArtFlash renders null with no source and so never calls onDone, which
+      // would strand the player on the race step with a dead NEXT button.
+      if (racePortrait(raceId)) {
+        setRacePortraitFor(raceId);
+        return;
+      }
       setStep('faction');
       return;
     }
@@ -101,7 +114,7 @@ export function CharacterCreationScreen() {
       // moves on instantly and letting it run moves on when it finishes.
       //
       // ⚠ THE `factionCrest` GUARD IS A SOFT-LOCK GUARD, not a tidiness check.
-      // FactionCrestFlash renders null when a faction has no art — so if this
+      // ArtFlash renders null when a faction has no art — so if this
       // set `crestFor` unconditionally, an art-less faction would show nothing,
       // never call onDone, and strand the player on the faction step with a NEXT
       // button that does nothing. A test asserts all nine have art; this makes
@@ -182,6 +195,21 @@ export function CharacterCreationScreen() {
           );
         })}
 
+        {/* ⚠ OTA-1433 — inside the race step, so leaving it unmounts the flash
+            and its pending timer together. At the screen root it would survive a
+            BACK tap and fire its dismiss against a screen already left.
+            Its onDone IS the transition: skip or wait, the step advances once,
+            from one place. */}
+        {step === 'race' && (
+          <ArtFlash
+            artKey={racePortraitFor}
+            source={racePortrait(racePortraitFor)}
+            title={races.find((r) => r.id === racePortraitFor)?.name}
+            subtitle={races.find((r) => r.id === racePortraitFor)?.description}
+            onDone={() => { setRacePortraitFor(null); setStep('faction'); }}
+          />
+        )}
+
         {step === 'faction' && (
           <>
             <Text style={styles.contextLine}>Race: {selectedRace.name}</Text>
@@ -210,9 +238,10 @@ export function CharacterCreationScreen() {
                 between hitting NEXT and arriving at the motive step, so
                 whichever way it ends — tapped away or run out — the step
                 advances exactly once, from one place. */}
-            <FactionCrestFlash
-              factionId={crestFor}
-              factionName={factions.find((f) => f.id === crestFor)?.name}
+            <ArtFlash
+              artKey={crestFor}
+              source={factionCrest(crestFor)}
+              title={factions.find((f) => f.id === crestFor)?.name}
               subtitle={factions.find((f) => f.id === crestFor)?.subtitle}
               onDone={() => { setCrestFor(null); setStep('motive'); }}
             />

@@ -33,8 +33,15 @@ The generator's raw output is fine to keep. If a file lands over ~4 MB, say so a
 
 ## Where each file goes
 
-### `01-races/` — 7 files · **portrait, no alpha**
-Character creation. Filenames are the race ids from `app/data/races/races.json`.
+### `01-races/` — ✅ **DONE, AND MOVED OUT**
+All seven landed and are **wired in** as of OTA-1433 — they now live in
+**`assets/races/`**, not here. Same inbox-to-assets flow as the crests below.
+
+⚠ Every one is a PAIR, one male and one female. The brief below asked for a
+single figure and the brief was wrong: this screen picks a people, not a
+pre-made character. Kept as delivered.
+
+Filenames are the race ids from `app/data/races/races.json`.
 
 ```
 tartarian_giant.png

@@ -24305,7 +24305,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1432 — the faction emblem now plays when you hit NEXT, not when you tap a
 // row. Tapping through the list to read the factions is browsing; NEXT is the
 // decision, and that is where the emblem belongs.
-export const OTA_BUILD_ID = '2026-08-22-1432-the-emblem-on-the-commit';
+// OTA-1433 — the seven race portraits are in the game, and play the same way the
+// faction emblem does: hit NEXT on the race step and the portrait fills the
+// screen for a couple of seconds, tap anywhere to skip. One shared component
+// drives both popups rather than two copies of it.
+export const OTA_BUILD_ID = '2026-08-22-1433-the-races-have-faces';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1432-the-emblem-on-the-commit';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1431-the-emblem-when-you-pick';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1430-every-building-is-a-map';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-21-1428-the-found-hall';
