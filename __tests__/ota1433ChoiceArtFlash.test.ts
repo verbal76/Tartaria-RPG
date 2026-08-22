@@ -300,6 +300,37 @@ describe('OTA-1434 — the character sheet leads with who you are', () => {
     expect(BANNER).not.toContain('rgba(8,7,6,0.55)');
     expect(BANNER).not.toContain('crestPlate');
     expect(BANNER).not.toContain('motivePlate');
+    // ⚠ OTA-1436 — and the bottom caption's scrim went the same way. Owner:
+    // *"both words on the bottom ... should also have no shading behind them."*
+    expect(BANNER).not.toContain('rgba(13,11,9,0.55)');
+    expect(BANNER).not.toContain('styles.floor');
+  });
+
+  it('⚠⚠ OTA-1436 — BOTH marks draw from ONE shared type object', () => {
+    // Owner: the caption should be *"in the same text as the text for the reason
+    // you went down there."* Two style blocks with matching values are one
+    // careless edit away from disagreeing, and nothing would fail when they did.
+    // Composition makes "the same text as" structural instead of coincidental.
+    expect(BANNER).toContain('const MARK_TYPE = {');
+    expect(BANNER).toContain('...MARK_TYPE,');
+    // Both, not one.
+    expect((BANNER.match(/\.\.\.MARK_TYPE,/g) ?? []).length).toBe(2);
+    // …and the shared object owns the face, the colour and the shadow, so
+    // neither mark can quietly acquire its own.
+    const block = BANNER.slice(BANNER.indexOf('const MARK_TYPE = {'), BANNER.indexOf('};', BANNER.indexOf('const MARK_TYPE = {')));
+    expect(block).toContain("color: '#e8c766'");
+    expect(block).toContain("fontStyle: 'italic'");
+    expect(block).toContain('textShadowRadius: 7,');
+    expect(block).toContain("'Georgia' : 'serif'");
+  });
+
+  it('⚠ the caption shows names AS AUTHORED and may wrap rather than truncate', () => {
+    // It used to shout them in caps. The longest real pairing — "Architectural
+    // Sentinels · Conspiracy Architects" — does not fit one phone line at this
+    // size, and wrapping beats an ellipsis eating half a faction's name.
+    expect(BANNER).not.toContain('raceName.toUpperCase()');
+    expect(BANNER).not.toContain('factionName.toUpperCase()');
+    expect(BANNER).toContain('numberOfLines={2}');
   });
 
   it('⚠⚠ contain, and the height is MEASURED from the image', () => {

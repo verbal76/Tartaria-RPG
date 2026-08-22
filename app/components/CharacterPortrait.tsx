@@ -33,6 +33,15 @@
 // plate used to. The same reasoning removes the emblem's plate — the crests are
 // alpha cut-outs with their own heavy dark masses, so they hold themselves.
 //
+// ⚠⚠ AND THE SAME RULE THEN APPLIED TO THE BOTTOM CAPTION. Owner: *"both words
+// on the bottom where it shows the race and faction ... should also have no
+// shading behind them and be in the same text as the text for the reason you
+// went down there."* So the floor scrim came off too, and both marks now draw
+// from ONE shared type object (`MARK_TYPE`) rather than two style blocks that
+// happen to agree today. "The same text as" is a requirement about the future as
+// much as the present: two blocks with matching values are one careless edit
+// away from disagreeing, and nothing would fail when they did.
+//
 // ⚠ THE HEIGHT IS MEASURED FROM THE IMAGE, NOT GUESSED. The seven portraits do
 // not share an aspect — 0.667 twice, 0.800 twice, 0.847, 0.866, and aetherborn
 // alone at 1.250 LANDSCAPE. A fixed band would letterbox some and crop others,
@@ -63,6 +72,24 @@ const MAX_SCREEN_FRACTION = 0.42;
  *  device, small enough that it reads as a mark ON the portrait rather than a
  *  second picture beside it. */
 const CREST_SIZE = 76;
+
+/** ⚠⚠ THE BANNER'S ONE TYPEFACE, shared by both marks by COMPOSITION rather than
+ *  by two style blocks that happen to match. The owner asked for the bottom
+ *  caption to be "in the same text as" the motive title; spreading one object
+ *  into both is what keeps that true after the next edit to either.
+ *
+ *  ⚠ The shadow is the load-bearing part. Nothing sits behind either mark any
+ *  more, so gold type has to hold against whatever the painting puts under it —
+ *  a lit lantern, a pale sky, a wet stone floor. Colour is the house gold, the
+ *  same one ChapterCardOverlay's titles use. */
+const MARK_TYPE = {
+  color: '#e8c766',
+  fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+  fontStyle: 'italic' as const,
+  textShadowColor: 'rgba(0,0,0,0.95)',
+  textShadowOffset: { width: 0, height: 1 },
+  textShadowRadius: 7,
+};
 
 export function CharacterPortrait({
   raceId,
@@ -132,13 +159,15 @@ export function CharacterPortrait({
           {motive.title}
         </Text>
       ) : null}
-      {/* A faint floor to the band so the sheet's first card does not appear to
-          float off the bottom edge of the picture. */}
-      <View style={styles.floor} pointerEvents="none" />
+      {/* ⚠ The race and faction, on nothing, in the motive's own type. Two lines
+          allowed rather than one: the longest real pairing ("Architectural
+          Sentinels · Conspiracy Architects") will not fit a phone's width at this
+          size, and wrapping reads better than an ellipsis eating half a faction's
+          name. */}
       {raceName ? (
-        <Text style={styles.caption} numberOfLines={1}>
-          {raceName.toUpperCase()}
-          {factionName ? `  ·  ${factionName.toUpperCase()}` : ''}
+        <Text style={styles.caption} numberOfLines={2}>
+          {raceName}
+          {factionName ? `  ·  ${factionName}` : ''}
         </Text>
       ) : null}
     </View>
@@ -162,41 +191,30 @@ const styles = StyleSheet.create({
     width: CREST_SIZE,
     height: CREST_SIZE,
   },
-  // ⚠ Two words, on nothing, carrying the corner by themselves. The house gold
-  // and the serif face do the styling; the hard dark shadow does the legibility
-  // the removed plate used to. Title AS AUTHORED ("The Exile", not "THE EXILE")
-  // — shouting it would turn a title back into the label that was cut.
+  // ⚠ Two words, on nothing, carrying the corner by themselves. Title AS
+  // AUTHORED ("The Exile", not "THE EXILE") — shouting it would turn a title
+  // back into the label that was cut.
   motiveTitle: {
+    ...MARK_TYPE,
     position: 'absolute',
     top: 12,
     right: 12,
     maxWidth: '56%',
     textAlign: 'right',
-    color: '#e8c766',
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
     fontSize: 21,
-    fontStyle: 'italic',
     letterSpacing: 2,
-    textShadowColor: 'rgba(0,0,0,0.95)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 7,
   },
-  floor: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 44,
-    backgroundColor: 'rgba(13,11,9,0.55)',
-  },
+  // ⚠ Same type as the motive, smaller. The size is the ONLY difference, and it
+  // has to be one: this line carries two full names where the motive carries two
+  // words, and at 21px the longest pairing does not fit any phone.
   caption: {
+    ...MARK_TYPE,
     position: 'absolute',
-    left: 12,
-    right: 12,
+    left: 14,
+    right: 14,
     bottom: 10,
-    color: '#c9b98d',
-    fontSize: 11,
-    letterSpacing: 2,
+    fontSize: 16,
+    letterSpacing: 1.2,
     textAlign: 'center',
   },
 });

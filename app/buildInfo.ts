@@ -24317,7 +24317,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // plates: the faction emblem and the reason-you-came-down title now sit
 // directly on the painting. The title is restyled to carry itself — serif,
 // gold, italic, with a hard shadow doing the work the plate used to.
-export const OTA_BUILD_ID = '2026-08-22-1435-marks-on-the-painting';
+// OTA-1436 — the race and faction line at the bottom of the character portrait
+// lost its shading too, and now uses the same gold serif as the reason-you-came-
+// down title. Both marks draw from one shared type object, so they cannot drift
+// apart later.
+export const OTA_BUILD_ID = '2026-08-22-1436-one-hand-on-the-banner';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1435-marks-on-the-painting';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1434-the-sheet-leads-with-you';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1433-the-races-have-faces';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1432-the-emblem-on-the-commit';
