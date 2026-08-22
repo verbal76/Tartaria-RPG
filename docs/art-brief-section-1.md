@@ -38,13 +38,62 @@ Paste the **STYLE HEADER** below at the top of every request, then paste one ent
 > **Never include:** modern clothing, guns that look contemporary, plastic, text or lettering (unless the entry explicitly asks for it), watermarks, signatures, borders, UI frames.
 
 ---
+
+## TECHNICAL SPEC — paste the relevant block with every prompt
+
+Each group below has a **FORMAT BLOCK**. Paste it alongside the style header and the entry's prompt. These are not arbitrary numbers — they exist because of how the app actually displays the image, and the explanation is included so the model composes for it rather than just resizing at the end.
+
+### Why the bleed rule exists — explain this to the generator
+
+> **How this image will be used:** it is displayed inside a container whose shape changes with the device. The same picture is shown on a tall phone screen, on a short wide one, on a tablet, and sometimes inside a small square card. The app **scales the image to fill that container and crops from the centre** — it never letterboxes and never pads. That means the edges of your image get cut off by an unpredictable amount, on an unpredictable side, every single time it is shown.
+>
+> Two things follow, and both are mandatory:
+>
+> **1 — Paint all the way to every edge.** The artwork must run right off all four sides of the frame with no border, no frame, no matte, no rounded corners, no letterbox bars, no flat colour band, and no vignette that hardens into a visible edge. If the picture stops short of the frame — even by a few pixels of dark or blank — the player sees that blank strip as a black bar down the side of a character card. **Full bleed, edge to edge, with real painted content in the corners.**
+>
+> **2 — Keep everything that matters in the middle.** Treat the outer **15% on each side as expendable** — it exists purely to be cropped away. Every essential element (the face, the silhouette, the held object, the thing the picture is *about*) must sit inside the **centred 70%**. Compose so the image still reads correctly if the left and right thirds vanish, and still reads correctly if the top and bottom vanish. A subject whose head is near the top edge will be decapitated on a wide screen.
+
+### Why the alpha rule exists — explain this for crests and icons
+
+> **How this image will be used:** it is a symbol composited over many different backgrounds — dark UI panels, painted map artwork, parchment, plain black — at many different sizes, from a **40-pixel chip** in a corner up to a full-screen watermark. It is never shown on the background you generated it against.
+>
+> **1 — Transparent background, and a real outer silhouette.** The emblem is an *object* — a stamped seal, a metal plate, a carved stone, a stitched patch. Everything outside that object's outer edge must be fully transparent. The object needs a **definable outer boundary**; do not let it fade, feather, smear or scorch off into nothing, because there is then no line to cut on.
+>
+> **2 — No drop shadow, no outer glow, no ground plane, no plinth, no backing rectangle.** A soft shadow falling onto the background is neither emblem nor background, and it is the single thing that makes a clean cut-out impossible.
+>
+> **3 — It must survive being shrunk to 40 pixels.** Bold silhouette, high contrast, one clear read. No hairline detail, no fine texture that turns to mush, no lettering of any kind, no thin lines under about 8 px at full size.
+>
+> **4 — It must survive a circular mask.** Crests are sometimes shown in round chips. Nothing essential may sit outside a **circle inscribed in the centre of the frame**, and nothing at all may touch the frame edge.
+
+### Quick reference
+
+| Group | Request this size | Orientation | Alpha | Safe area | Notes |
+|---|---|---|---|---|---|
+| Races, Arbiter, Golems | **1024 × 1536** | Portrait | No | centre 70% (≈717 × 1075) | Full bleed all four edges |
+| Dogs, Bosses, Locations, Death | **1536 × 1024** | Landscape | No | centre 70% (≈1075 × 717) | Full bleed all four edges |
+| The four towers | **1024 × 1536** | Portrait | No | centre 70% | Vertical exception in Group 7 |
+| Crests | **1024 × 1024** | Square | **Yes** | inscribed circle, ⌀ 800 px | ≥110 px clear margin all round |
+| Weather + Hazard icons | **1024 × 1024** | Square | **Yes** | inscribed circle, ⌀ 820 px | ≥100 px clear margin all round |
+| Equipment slots | **1024 × 1024** | Square | **Yes** | centred 780 × 780 box | Flat single-colour silhouette |
+
+**On sizes:** `1024 × 1536`, `1536 × 1024` and `1024 × 1024` are the image model's native output sizes — ask for those exact numbers and it will not letterbox or pad to reach them. Anything larger is an upscale afterwards, which is fine: **generate at native, upscale 2× for shipping if wanted, never generate at a non-native size and hope.**
+
+**On file delivery:** finished images go into the repo at `art/<group>/<id>.png` — the folder, the exact filenames and the alpha fallback are all in [`art/README.md`](../art/README.md). Do not paste finished images into a chat window; they are expensive to read, they crowd out everything else in the conversation, and they are not saved anywhere when the session ends.
+
+---
 ---
 
 # GROUP 1 — RACE PORTRAITS (7)
 
 **What these are for:** character creation. Right now a new player picks their race off a plain text list. These seven images are the first thing anyone sees, so they carry the most weight of anything on this list.
 
-**Format for all 7:** vertical portrait, roughly 3:4. Waist-up or three-quarter body. Single figure, centred, dark environmental background suggesting where that race lives — not a flat colour, but not a busy scene either. Face visible and readable. Neutral standing pose with weight and presence, not an action pose.
+> **FORMAT BLOCK — race portraits.** Generate at **1024 × 1536, portrait**. Waist-up or three-quarter body, single figure, **centred**. Dark environmental background suggesting where the race lives — not a flat colour, but not a busy scene either. Face visible and readable. Neutral standing pose with weight and presence, not an action pose.
+>
+> **Full bleed:** the painting runs off all four edges. No border, no frame, no vignette that hardens into an edge, no flat colour band anywhere along a side. Real painted environment in all four corners.
+>
+> **Safe area:** the figure's **head, face and the whole silhouette read must sit inside the centred 70%** — roughly 717 × 1075 of the 1024 × 1536 frame. This picture is cropped from the centre to fit containers of different shapes, so the outer 15% on every side will be cut away by an unknown amount. Leave the head well clear of the top edge; a head near the top gets decapitated on a wide crop. Everything in the outer 15% must be expendable environment.
+>
+> **File:** `art/01-races/<race_id>.png` · no alpha · PNG.
 
 ---
 
@@ -137,7 +186,21 @@ Paste the **STYLE HEADER** below at the top of every request, then paste one ent
 
 **What these are for:** the crest appears on the standing screen, vendor screens, the quest board, outpost interiors and the About screen. Nine images that touch every screen in the game — the best value-per-asset on this whole list.
 
-**Format for all 9:** square, centred, symmetrical heraldic emblem on a plain dark background so it can be dropped anywhere. **No text, no lettering, no scrolls or banners with words.** Should read clearly at small size (a 40-pixel chip) *and* hold up large. Aged metal, worn enamel, carved stone or stamped leather — never clean vector, never glossy. Each faction has a named accent colour below; keep everything else desaturated so the accent does the identifying.
+> **FORMAT BLOCK — faction crests.** Generate at **1024 × 1024, square, with a fully transparent background.**
+>
+> **This is a cut-out symbol, not a picture of a symbol.** It gets composited over dark UI panels, painted map artwork, parchment and plain black, at sizes from a **40-pixel chip** up to a full-screen watermark. It is never shown against the background you generated it on.
+>
+> - **Transparent everywhere outside the emblem.** The emblem is a physical *object* — a stamped seal, a metal plate, a carved stone, a stitched patch — and it needs a **hard, definable outer edge**. Do not let it fade, feather, smear or scorch away into nothing; there must be a clean line to cut on.
+> - **No drop shadow. No outer glow. No ground plane, plinth, pedestal or backing rectangle.** A soft shadow falling onto the background is the single thing that makes a clean cut-out impossible.
+> - **Fits a circle.** Crests are sometimes shown in round chips, so nothing essential may sit outside a **circle of ⌀ 800 px centred in the frame**, and nothing at all may touch the frame edge — leave at least **110 px of clear transparency on all four sides**.
+> - **Survives 40 pixels.** Bold silhouette, one clear read, high contrast. No hairline detail, no fine texture, **no text or lettering of any kind**, no line thinner than about 8 px at full size.
+> - **Symmetrical and centred** unless the entry explicitly says otherwise.
+> - **Material, not vector.** Aged metal, worn enamel, carved stone, stamped leather. Never clean flat vector, never glossy, never chrome.
+> - Each faction has a named accent colour. Keep everything else desaturated so the accent does the identifying at small size.
+>
+> **If the generator will not produce transparency:** put the emblem on a **flat pure black (#000000)** background with no shadow and no glow reaching the edge of frame, and save it anyway. That keys to alpha cleanly in one pass. Do not substitute grey, white or a gradient.
+>
+> **File:** `art/02-crests/<faction_id>.png` · **alpha required** · PNG.
 
 ---
 
@@ -179,7 +242,7 @@ Paste the **STYLE HEADER** below at the top of every request, then paste one ent
 **Read as:** a trade mark, not a coat of arms. Practical, mercenary, unashamed.
 **Accent:** brass and rust-red on grey canvas.
 
-**Prompt:** A **grappling hook** and a **balance scale** crossed over each other — take it, then weigh it. Below them, a coin held between two fingers, or a coin with a bite out of it. No crown, no laurel, no honour symbols of any kind — deliberately unheroic. The whole emblem is branded or stencilled onto worn canvas and leather rather than cast in metal, like a crate-mark or a shipping stamp. Edges scuffed, the stencil slightly misaligned, as if applied fast and often.
+**Prompt:** A **grappling hook** and a **balance scale** crossed over each other — take it, then weigh it. Below them, a coin held between two fingers, or a coin with a bite out of it. No crown, no laurel, no honour symbols of any kind — deliberately unheroic. The whole emblem is branded and stencilled onto **a single rectangular leather trade-tag with a hard cut edge and one punched eyelet** — a crate-mark, not a coat of arms. The tag's outline is the emblem's outline; nothing extends past it. Leather scuffed, the stencil slightly misaligned, as if applied fast and often.
 
 ---
 
@@ -221,7 +284,7 @@ Paste the **STYLE HEADER** below at the top of every request, then paste one ent
 **Read as:** a mark that does not want to be a mark. Bureaucratic, quiet, everywhere.
 **Accent:** ink-black and bone-paper white, almost no colour at all.
 
-**Prompt:** A **wax seal pressed over a sheaf of documents** — and the seal's device is a mouth with a line drawn across it, or a keyhole with no key. Behind the seal, several overlapping printed pages, all of them **redacted**: heavy black bars struck through the text, the text itself illegible and unreadable. A quill laid across the whole thing. Deliberately dull and clerical — this should look like a departmental stamp, not heraldry. The most desaturated crest of the nine; near-monochrome, only the dull red of the wax carrying any colour.
+**Prompt:** A **wax seal pressed over a sheaf of documents** — and the seal's device is a mouth with a line drawn across it, or a keyhole with no key. Behind the seal, several overlapping printed pages, all of them **redacted**: heavy black bars struck through the text, the text itself illegible and unreadable. A quill laid across the whole thing. The **outer edge of the document stack is the emblem's outline** — squared-off paper with clean corners, slightly fanned; nothing drifts past it and no page curls out of frame. Deliberately dull and clerical: a departmental stamp, not heraldry. The most desaturated crest of the nine; near-monochrome, only the dull red of the wax carrying any colour.
 
 ---
 
@@ -235,7 +298,7 @@ Paste the **STYLE HEADER** below at the top of every request, then paste one ent
 **Read as:** raw devotional faith. Homemade, fervent, unofficial — a pilgrim's mark, not a state's.
 **Accent:** candle-gold and ash-grey on rough cloth.
 
-**Prompt:** An enormous **closed eye**, stylised, laid horizontally — the sleeping Giant — with a ring of small kneeling human figures arranged around and beneath it, tiny by comparison, to establish the scale. Above the eye, a scattering of small flames or votive candles. **The rendering matters more than the device:** this should look hand-stitched onto coarse pilgrim cloth with uneven thread, or daubed on with ash and finger-paint on stone — devotional and homemade, not manufactured. Slight asymmetry is correct here.
+**Prompt:** An enormous **closed eye**, stylised, laid horizontally — the sleeping Giant — with a ring of small kneeling human figures arranged around and beneath it, tiny by comparison, to establish the scale. Above the eye, a scattering of small flames or votive candles. **The rendering matters more than the device:** hand-stitched with uneven thread onto **a roughly circular patch of coarse pilgrim cloth with a defined, whipstitched outer edge** — devotional and homemade, not manufactured. The patch's edge is the emblem's edge: frayed in silhouette is fine, but it must be a real boundary, not a fade-out. Slight asymmetry inside the patch is correct here.
 
 ---
 
@@ -263,7 +326,7 @@ Paste the **STYLE HEADER** below at the top of every request, then paste one ent
 **Read as:** an agitator's mark. Loud, urgent, painted fast, meant to be seen and to frighten people.
 **Accent:** hot Aether-white and violent orange-red on soot-black.
 
-**Prompt:** A **massive lever or switch thrown fully to the ON position**, with raw Aether energy blasting out from around its housing in hard jagged arcs. Beneath the housing, a wave-form line rising — the second flood, drawn as a rising tide, and *not* drawn as a warning. The whole emblem is **hand-painted in thick strokes with a brush**, running slightly at the bottom edges as if applied to a wall in haste. Soot-blackened background, scorching at the edges. Deliberately the crudest and most kinetic of the nine — the only one that looks angry.
+**Prompt:** A **massive lever or switch thrown fully to the ON position**, with raw Aether energy blasting out from around its housing in hard jagged arcs. Beneath the housing, a wave-form line rising — the second flood, drawn as a rising tide, and *not* drawn as a warning. The device is **hand-painted in thick brush strokes, running slightly at the bottom as if applied in haste** — onto **a circular riveted iron disc, soot-blackened and scorched, with a hard machine-cut outer edge**. The paint runs and the scorching stay *inside* the disc; the disc's rim is the emblem's outline and it is clean and unbroken. Deliberately the crudest and most kinetic of the nine — the only one that looks angry.
 
 ---
 ---
@@ -280,7 +343,12 @@ He is not a servant, a guide, or a quest-giver. He is a survivor of Tartaria who
 >
 > **His name — spoken once, at the very end of the game, only to a player who earned it:** "The Arbiter stops at the threshold. *'You asked me once whether I had a name.'* He says it quietly, and only once, and not in the voice he uses for lore. *'Tovan Irekh. The city that used it is under nine hundred feet of mud and I have not said it aloud since the water came.'* A pause. *'You may use it. Nobody else living has the standing.'*"
 
-**Format:** vertical portrait, roughly 3:4, waist-up.
+> **FORMAT BLOCK — the Arbiter.** Generate at **1024 × 1536, portrait**. Waist-up, single figure, centred.
+>
+> **Full bleed:** the painting runs off all four edges — no border, no frame, no matte, no letterbox bar, no flat colour band along any side, and no vignette that hardens into a visible edge. Real painted content in all four corners.
+>
+> **Safe area:** everything essential sits inside the **centred 70%**. The app scales this to fill containers of different shapes and **crops from the centre**, so the outer 15% on every side will be cut away by an unknown amount. Compose so it still reads with the left and right thirds gone, and still reads with the top and bottom gone.
+> **File:** `art/03-arbiter/arbiter.png` · no alpha · PNG.
 
 **Prompt:** A man who watched his city drown nine hundred feet down and has not said its name aloud since. Age is deliberately ambiguous — he could be sixty, he could be far older, and Aether exposure has left it unclear. Lean, upright, composed, standing slightly apart. Clothing: the remains of a formal Tartarian office — a long dark coat of good cut, worn to threads, mended carefully many times, with a faded insignia at the collar that no longer means anything to anyone alive. He carries no weapon and no pack; he is not equipped for the journey, which is itself unsettling. Faintest trace of blue-violet Aether behind the eyes, otherwise no glow. **The whole image lives in the expression:** watchful, reserved, withholding judgement — a man who has not decided about you yet and wants you to know it. Not kind, not cruel. Half-lit from one side, the other half in shadow. Background: dark, indistinct, a suggestion of a drowned street far behind him.
 
@@ -291,7 +359,12 @@ He is not a servant, a guide, or a quest-giver. He is a survivor of Tartaria who
 
 **What these are for:** the companion card. Every dog in the game is **rescued from a captor** — you find one chained, caged, snared or held, you kill the person holding it, and it decides whether to follow you. The starting profile is set by where you found it. Their strength, dexterity and intelligence all train up over time from what they actually do: strength from landing a bite, dexterity from surviving a hit, intelligence from winning a distraction.
 
-**Format for all 5:** horizontal, roughly 4:3. Single dog, full body or three-quarter. **Alive, wary, and recently freed — never posed like a pet portrait.** Each one should look like it has just made a decision about you. Mud on the legs, a mark from whatever was holding it.
+> **FORMAT BLOCK — dog companions.** Generate at **1536 × 1024, landscape**. Single dog, full body or three-quarter, centred. **Alive, wary, and recently freed — never posed like a pet portrait.** Each one should look like it has just made a decision about you. Mud on the legs, and the mark of whatever was holding it.
+>
+> **Full bleed:** the painting runs off all four edges — no border, no frame, no matte, no letterbox bar, no flat colour band along any side, and no vignette that hardens into a visible edge. Real painted content in all four corners.
+>
+> **Safe area:** everything essential sits inside the **centred 70%**. The app scales this to fill containers of different shapes and **crops from the centre**, so the outer 15% on every side will be cut away by an unknown amount. Compose so it still reads with the left and right thirds gone, and still reads with the top and bottom gone.
+> **File:** `art/04-dogs/<profile>.png` — `mongrel` / `shepherd` / `hound` / `mutt` / `puppy` · no alpha · PNG.
 
 ---
 
@@ -348,7 +421,14 @@ He is not a servant, a guide, or a quest-giver. He is a survivor of Tartaria who
 
 **What these are for:** the companion card, and the summoning screen. A golem is not found — it is **built**. You gather the fuel, you roll Aethercraft against a difficulty, and if you succeed you seal a name into the Aetherstone. They train **power** and **resilience** as they fight.
 
-**Format for all 4:** vertical, roughly 3:4. Full body, standing, seen slightly from below so they read as heavy. Dark workshop or ruin background.
+> **FORMAT BLOCK — golem companions.** Generate at **1024 × 1536, portrait**. Full body, standing, centred, seen slightly from below so they read as heavy. Dark workshop or ruin background.
+>
+> **Full bleed:** the painting runs off all four edges — no border, no frame, no matte, no letterbox bar, no flat colour band along any side, and no vignette that hardens into a visible edge. Real painted content in all four corners.
+>
+> **Safe area:** everything essential sits inside the **centred 70%**. The app scales this to fill containers of different shapes and **crops from the centre**, so the outer 15% on every side will be cut away by an unknown amount. Compose so it still reads with the left and right thirds gone, and still reads with the top and bottom gone.
+> ⚠ Full body means the **feet must clear the bottom safe line** — keep the whole figure inside the centred 70% vertically, not just the head.
+>
+> **File:** `art/05-golems/<kind>.png` — `mud_golem` / `iron_golem` / `aether_golem` / `crystal_golem` · no alpha · PNG.
 
 ---
 
@@ -397,7 +477,14 @@ He is not a servant, a guide, or a quest-giver. He is a survivor of Tartaria who
 
 **What these are for:** shown once, full-screen, at the opening of a boss fight. These are the eight legendary enemies in the game.
 
-**Format for all 8:** horizontal, cinematic, roughly 16:9. The creature dominant and close. Low camera angle. Environment implied but subordinate to the silhouette.
+> **FORMAT BLOCK — boss plates.** Generate at **1536 × 1024, landscape**. Cinematic. The creature dominant, close, and **centred**. Low camera angle. Environment implied but subordinate to the silhouette.
+>
+> **Full bleed:** the painting runs off all four edges — no border, no frame, no matte, no letterbox bar, no flat colour band along any side, and no vignette that hardens into a visible edge. Real painted content in all four corners.
+>
+> **Safe area:** everything essential sits inside the **centred 70%**. The app scales this to fill containers of different shapes and **crops from the centre**, so the outer 15% on every side will be cut away by an unknown amount. Compose so it still reads with the left and right thirds gone, and still reads with the top and bottom gone.
+> ⚠ These are shown full-screen on phones held **both ways**, so the crop is severe in both directions. The creature's head and its main weapon or limb must be well inside the centre.
+>
+> **File:** `art/06-bosses/<name>.png` · no alpha · PNG.
 
 ---
 
@@ -494,7 +581,14 @@ He is not a servant, a guide, or a quest-giver. He is a survivor of Tartaria who
 
 **What these are for:** shown on arrival, once, when the player reaches a named place. This is what turns *"you are at Asgardar"* into actually arriving somewhere.
 
-**Format for all:** wide landscape, roughly 16:9. **Establishing shot**, always from the traveller's point of view arriving — a middle-distance view of the place, never an interior, never a close-up. Include a small human figure or two somewhere in frame for scale wherever it fits; the scale is half the point. No text.
+> **FORMAT BLOCK — location plates.** Generate at **1536 × 1024, landscape** — except the four towers in the second wave, which are **1024 × 1536, portrait**. **Establishing shot**, always from the traveller's point of view arriving: a middle-distance view of the place, never an interior, never a close-up. Include a small human figure or two for scale wherever it fits; the scale is half the point. **No text anywhere in the image.**
+>
+> **Full bleed:** the painting runs off all four edges — no border, no frame, no matte, no letterbox bar, no flat colour band along any side, and no vignette that hardens into a visible edge. Real painted content in all four corners.
+>
+> **Safe area:** everything essential sits inside the **centred 70%**. The app scales this to fill containers of different shapes and **crops from the centre**, so the outer 15% on every side will be cut away by an unknown amount. Compose so it still reads with the left and right thirds gone, and still reads with the top and bottom gone.
+> ⚠ The landmark that names the place — the spire, the tower, the chasm — must sit inside the centred 70%. A tower placed at the far left of frame is simply gone on a square crop.
+>
+> **File:** `art/07-locations/<location_id>.png` · no alpha · PNG.
 
 ## Priority wave — 12
 
@@ -605,7 +699,13 @@ Each of the five great climbs deserves its own vertical plate — these are the 
 
 **What these are for:** the world header — a small state indicator that tells you what you are travelling through.
 
-**Format for all 9:** square icon, roughly 256×256. Simple, legible at very small size, strong silhouette. A single evocative motif rather than a scene. Consistent framing across all nine so they read as a set.
+> **FORMAT BLOCK — weather icons.** Generate at **1024 × 1024, square, fully transparent background.**
+>
+> These sit in the world header at roughly **64 pixels**, over a dark panel. A single evocative motif, **not a scene** — one idea, strong silhouette, high contrast, legible when tiny. Nothing essential outside a **circle of ⌀ 820 px centred in the frame**; at least **100 px of clear transparency on all four sides**. No text, no hairline detail, no line thinner than about 8 px, **no drop shadow and no outer glow** (a shadow on the background is what makes a clean cut-out impossible). Identical framing and visual weight across all nine so they read as one designed set.
+>
+> **If transparency fails:** flat pure black (#000000) background, no shadow, no glow reaching the frame edge. That keys cleanly.
+>
+> **File:** `art/08-weather/<weather_id>.png` · **alpha required** · PNG.
 
 | # | State | In-game description (verbatim) | Effect | Prompt |
 |---|---|---|---|---|
@@ -626,7 +726,11 @@ Each of the five great climbs deserves its own vertical plate — these are the 
 
 **What these are for:** the hazard indicator when an environmental danger is active in a room or on a tile.
 
-**Format for all 11:** square icon, roughly 256×256. Same set-consistency rule as the weather icons, but with a **warning-red or hot-orange accent** so hazards read as a distinct category from weather at a glance.
+> **FORMAT BLOCK — hazard icons.** Generate at **1024 × 1024, square, fully transparent background.** Every rule from the weather block applies unchanged — same size, same ⌀ 820 px safe circle, same 100 px margin, same no-shadow / no-glow / no-text rule, same set consistency.
+>
+> **The one difference:** hazards carry a **warning-red or hot-orange accent** where weather carries cold blue and grey, so the two categories are told apart at a glance in the header without reading anything.
+>
+> **File:** `art/09-hazards/<hazard_id>.png` · **alpha required** · PNG.
 
 | # | Hazard | In-game description (verbatim) | Prompt |
 |---|---|---|---|
@@ -649,7 +753,15 @@ Each of the five great climbs deserves its own vertical plate — these are the 
 
 **What these are for:** the paper-doll equipment screen. These are **empty-slot placeholders**, not item art — the game has 293 armour pieces and 79 gear items, so per-item art will never be worth it. Eleven silhouettes make the equipment screen read as gear instead of as a list.
 
-**Format for all 11:** square, roughly 128×128. A **flat, single-colour silhouette** in a muted desaturated tone against transparent or plain dark — no detail, no shading, no colour. These sit *behind* the item name when a slot is empty. Consistent line weight and visual mass across all eleven; they must look like one designed set.
+> **FORMAT BLOCK — equipment slot silhouettes.** Generate at **1024 × 1024, square, fully transparent background.**
+>
+> **A flat, single-colour silhouette — one solid shape, no interior detail, no shading, no gradient, no highlights, no outline, no colour.** These sit *behind* the item name in an empty slot and must never compete with it. Shown at roughly **96 pixels**.
+>
+> Object centred inside a **780 × 780 box** in the middle of the frame, leaving clear transparency all round. **Consistent visual mass across all eleven** — the boot and the ring must occupy a similar amount of ink, or the equipment screen looks lopsided. No drop shadow, no glow, no text.
+>
+> **If transparency fails:** solid white shape on flat pure black. That inverts and keys in one pass.
+>
+> **File:** `art/10-slots/<slot>.png` · **alpha required** · PNG.
 
 | # | Slot | Silhouette |
 |---|---|---|
@@ -674,7 +786,14 @@ Each of the five great climbs deserves its own vertical plate — these are the 
 
 **What this is for:** the emotional peak of the entire game, currently rendered as plain text. Tartaria has **permadeath** — when a character dies, that character is gone, and the game keeps a ledger of the fallen. This image is the last thing a player sees of a character they may have spent many hours with.
 
-**Format:** full screen, 16:9. Room for a short line of text to sit over the lower third.
+> **FORMAT BLOCK — death screen.** Generate at **1536 × 1024, landscape**.
+>
+> **Full bleed:** the painting runs off all four edges — no border, no frame, no matte, no letterbox bar, no flat colour band along any side, and no vignette that hardens into a visible edge. Real painted content in all four corners.
+>
+> **Safe area:** everything essential sits inside the **centred 70%**. The app scales this to fill containers of different shapes and **crops from the centre**, so the outer 15% on every side will be cut away by an unknown amount. Compose so it still reads with the left and right thirds gone, and still reads with the top and bottom gone.
+> ⚠ **Text safe zone:** the **bottom third must stay visually quiet** — low contrast, no detail, no bright point — because a line of text is drawn over it. Keep the lantern and every other point of interest in the **upper two-thirds** of the centred safe area.
+>
+> **File:** `art/11-death/death.png` · no alpha · PNG.
 
 **Prompt:** Not gore, not a corpse, not a monster. **Absence.** A wide, quiet, cold shot of the mud closing over something — a single dropped lantern lying on its side in shallow grey water, still burning, its light already going out. Around it: the last few objects of a life, half-sunk and being taken by the mud. A boot print filling in. Faint ripples spreading from something that has just gone under, off-centre and out of reach. No figure. No blood. **Total stillness.** Steel-grey and cold blue with one small failing point of warm lantern gold at the centre — the last warm thing in the frame, and it is going out. Composed with dead space in the lower third for text. This image should be quiet and it should hurt.
 
