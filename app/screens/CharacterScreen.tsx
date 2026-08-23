@@ -150,7 +150,16 @@ export function CharacterScreen() {
 
   // arb119 — section header helper, mirroring the inventory headers: each section
   // title is a tappable plate (semi-transparent backing so the gold label reads
-  // over any background) with a ▾/▴ chevron that folds the section away.
+  // over any background) with a ▸/▾ chevron that folds the section away.
+  //
+  // ⚠⚠ OTA-1456 — THE CHEVRON DESCRIBES STATE, NOT THE TAP. This read
+  // `collapsed ? '▾' : '▴'` — chevron-as-affordance, "tap to open downward" —
+  // while the stat rows nine hundred lines below read `expanded ? '▾' : '▸'`,
+  // chevron-as-state. Both conventions are defensible; running BOTH is not,
+  // because it makes `▾` mean COLLAPSED in one half of this screen and EXPANDED
+  // in the other. State won because it was already the majority here and in
+  // AboutScreen, and because it is the one a player can read without having
+  // tapped anything first.
   const setPressure = useGameStore((st) => st.setPressure); // OTA-1066
 
   const sectionHeader = (key: string, label: string) => (
@@ -161,7 +170,7 @@ export function CharacterScreen() {
       accessibilityRole="button"
       accessibilityState={{ expanded: !collapsed[key] }}
     >
-      <Text style={styles.sectionChevron}>{collapsed[key] ? '▾' : '▴'}</Text>
+      <Text style={styles.sectionChevron}>{collapsed[key] ? '▸' : '▾'}</Text>
       <Text style={styles.sectionHeaderLabel}>{label}</Text>
     </TouchableOpacity>
   );
@@ -397,7 +406,9 @@ export function CharacterScreen() {
                           {part.label}
                           {/* ⚠ OTA-1161 — the affordance. A tappable row that looks
                               identical to a flat one is a feature nobody finds. */}
-                          {part.kind === 'gifts' ? <Text style={styles.tapHint}>{giftsOpen ? '  ▾' : '  ›'}</Text> : null}
+                          {/* ⚠ OTA-1456 — was `›`, a THIRD pair on this screen. Same
+                              vocabulary as everything else now: ▸ closed, ▾ open. */}
+                          {part.kind === 'gifts' ? <Text style={styles.tapHint}>{giftsOpen ? '  ▾' : '  ▸'}</Text> : null}
                         </Text>
                         <Text style={[styles.kvValue, { color: part.value >= 0 ? '#7a8a5a' : '#a85a3a' }]}>
                           {part.value >= 0 ? '+' : ''}{part.value}

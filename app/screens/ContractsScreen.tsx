@@ -57,7 +57,10 @@ function MilestoneStat({
       <Text style={milestoneStyles.value}>{value}</Text>
       <Text style={milestoneStyles.label}>{label}</Text>
       <Text style={milestoneStyles.next}>{toNext === next ? `next ${suffix} after ${next}` : `${toNext} → ${suffix}`}</Text>
-      {onPress ? <Text style={milestoneStyles.tapHint}>{active ? '▴ tap to close' : '▾ tap to list'}</Text> : null}
+      {/* ⚠ OTA-1456 — chevron-as-state (▸ closed, ▾ open), matching every other
+          accordion in the app. The words carry the affordance; the glyph carries
+          the state, so the two are not competing to say the same thing. */}
+      {onPress ? <Text style={milestoneStyles.tapHint}>{active ? '▾ tap to close' : '▸ tap to list'}</Text> : null}
     </View>
   );
   if (!onPress) return body;
@@ -594,7 +597,8 @@ export function ContractsScreen() {
             accessibilityRole="button"
             accessibilityState={{ expanded: mqExpanded }}
           >
-            <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE  {mqExpanded ? '▴' : '▾'}</Text>
+            {/* ⚠ OTA-1456 — chevron-as-state, ▸ closed / ▾ open. */}
+            <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE  {mqExpanded ? '▾' : '▸'}</Text>
             <Text style={styles.mainQuestPhase}>{phaseLabel(mq.phase)}</Text>
             <Text style={styles.mainQuestHint}>{phaseHint(mq.phase, recoveredCount)}</Text>
             {(() => {

@@ -1665,7 +1665,8 @@ export function InventoryScreen() {
               >
                 <View style={styles.sectionHeaderLeft}>
                   <Text style={[styles.sectionChevron, { color: CATEGORY_COLORS[cat] }]}>
-                    {collapsed ? '▾' : '▴'}
+                    {/* ⚠ OTA-1456 — chevron-as-state: ▸ closed, ▾ open. */}
+                    {collapsed ? '▸' : '▾'}
                   </Text>
                   <Text style={[styles.sectionLabel, { color: CATEGORY_COLORS[cat] }]}>
                     {CATEGORY_LABEL[cat].toUpperCase()}

@@ -24493,7 +24493,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // typed sentence that comes back rejected teaches "typing does not work here",
 // which is the opposite of the lesson. The tutorial name beat and combat keep
 // their own wording, because there the player already has one thing to look at.
-export const OTA_BUILD_ID = '2026-08-23-1455-a-bar-that-speaks';
+export const OTA_BUILD_ID = '2026-08-23-1456-one-chevron-vocabulary';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1455-a-bar-that-speaks';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1454-groups-that-read';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1453-the-labelled-door';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1452-the-free-outranks-everything';

@@ -475,7 +475,7 @@ export function VendorScreen() {
       accessibilityState={{ expanded: !collapsed }}
     >
       <View style={styles.sectionHeaderLeft}>
-        <Text style={[styles.sectionChevron, { color: CATEGORY_COLORS[cat] }]}>{collapsed ? '▾' : '▴'}</Text>
+        <Text style={[styles.sectionChevron, { color: CATEGORY_COLORS[cat] }]}>{collapsed ? '▸' : '▾'}</Text>
         <Text style={[styles.sectionLabel, { color: CATEGORY_COLORS[cat] }]}>{CATEGORY_LABEL[cat].toUpperCase()}</Text>
       </View>
       <Text style={styles.sectionCount}>{count}</Text>
@@ -803,7 +803,7 @@ export function VendorScreen() {
                   accessibilityState={{ expanded: !collapsed }}
                 >
                   <View style={styles.sectionHeaderLeft}>
-                    <Text style={[styles.sectionChevron, { color: RECIPE_ACCENT }]}>{collapsed ? '▾' : '▴'}</Text>
+                    <Text style={[styles.sectionChevron, { color: RECIPE_ACCENT }]}>{collapsed ? '▸' : '▾'}</Text>
                     <Text style={[styles.sectionLabel, { color: RECIPE_ACCENT }]}>WORKINGS TO LEARN</Text>
                   </View>
                   <Text style={styles.sectionCount}>{recipeOffers.length}</Text>

@@ -82,10 +82,53 @@ describe('OTA-1379 — the latch', () => {
 
   it('⚠ it is a bar preference, not world state — nothing reaches the save', () => {
     // Deliberately not in the game store: this has no business in a save file
-    // or a save migration, and the label is still derived from React state so
-    // the button re-renders normally.
+    // or a save migration.
+    //
+    // ⚠⚠ REBUILT BY OTA-1456 — THE FIFTH LABEL-SHAPED PIN BROKEN IN TWO DAYS,
+    // and the most instructive of them. This test's CLAIM is in its own title:
+    // the tray is a bar preference and nothing reaches the save. Two assertions
+    // prove exactly that. The third used to be
+    //
+    //     expect(input).toContain("label={moreOpen ? 'less ▴' : 'more ▾'}");
+    //
+    // which proves nothing about the claim. It was written to stand in for "the
+    // label is still DERIVED from React state so the button re-renders", but a
+    // literal string match cannot show derivation — it pins two glyphs and a
+    // pair of words. So unifying the app's chevron vocabulary (▸ closed, ▾ open)
+    // failed a test about SAVE FILES.
+    //
+    // The derivation claim is worth keeping; it just has to be asserted as a
+    // PROPERTY. Rebuilt to cover every variation of it — the label must read
+    // the React state (not the module latch, not the store), it must be a real
+    // two-branch toggle, and the branches must differ — while glyphs and
+    // wording stay free to keep improving.
     expect(input).not.toContain('moreTrayOpen: ');
-    expect(src('app', 'engine', 'types.ts')).not.toContain('MORE_TRAY_OPEN');
-    expect(input).toContain("label={moreOpen ? 'less ▴' : 'more ▾'}");
+
+    // ⚠ The latch never reaches persistence. It is a module-level `let`, which
+    // is exactly why this is worth pinning: a module global is the easiest
+    // thing in the world to start writing into a save "for convenience".
+    for (const f of [['app', 'engine', 'types.ts'], ['app', 'state', 'slices', 'persistSlice.ts']]) {
+      expect(src(...f)).not.toContain('MORE_TRAY_OPEN');
+    }
+
+    // ⚠⚠ THE DERIVATION, AS A PROPERTY. The label comes from the React state
+    // variable, so the button re-renders on toggle. Glyph-agnostic on purpose.
+    const label = /label=\{moreOpen \? '([^']*)' : '([^']*)'\}/.exec(input);
+    expect(label).not.toBeNull();
+    // ⚠ Defaulted to '' rather than `!`-asserted: under strict index access a
+    // capture group is `string | undefined`, and defaulting means a group that
+    // somehow did not match falls into the blank-branch assertion below and
+    // FAILS, instead of being waved through by a non-null assertion.
+    const [, whenOpen = '', whenClosed = ''] = label!;
+    // …and it genuinely toggles: two branches that do not read the same.
+    expect(whenOpen).not.toBe(whenClosed);
+    // …and neither branch is blank, which would render a button with no face.
+    expect(whenOpen.trim().length).toBeGreaterThan(0);
+    expect(whenClosed.trim().length).toBeGreaterThan(0);
+
+    // ⚠ And the label must NOT be driven by the module latch directly. Reading
+    // MORE_TRAY_OPEN in the JSX renders a stale face: the latch is written
+    // inside the state updater, so it lags the state it is mirroring.
+    expect(input).not.toMatch(/label=\{MORE_TRAY_OPEN/);
   });
 });

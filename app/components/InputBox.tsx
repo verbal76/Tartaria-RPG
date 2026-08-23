@@ -844,7 +844,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 during the tutorial, where the tray is force-shown so the beats
                 can point at every control. */}
             {!tutLock && (
-              <QuickBtn label={moreOpen ? 'less ▴' : 'more ▾'} onPress={() => setMoreOpen((v) => { MORE_TRAY_OPEN = !v; return !v; })} />
+              <QuickBtn label={moreOpen ? 'less ▾' : 'more ▸'} onPress={() => setMoreOpen((v) => { MORE_TRAY_OPEN = !v; return !v; })} />
             )}
             {(moreOpen || tutLock) && (
               <>
