@@ -98,6 +98,7 @@ export function CharacterPortrait({
   factionName,
   motiveId,
   characterName,
+  sex,
 }: {
   raceId: string | null | undefined;
   factionId: string | null | undefined;
@@ -108,6 +109,12 @@ export function CharacterPortrait({
   /** Only used to derive a motive when the save has none — same seed the rest
    *  of the story layer uses, so the sheet cannot disagree with the crawl. */
   characterName?: string;
+  /** ⚠ OTA-1441 — the ♂/♀ mark the owner asked for over the player image:
+   *  *"it didn't put the male or female symbol on the character image."* Rides
+   *  the caption in the banner's one type. Absent on saves predating the pick
+   *  (OTA-1439 made sex optional) — then nothing shows, which is correct: the
+   *  game never asked that character. */
+  sex?: 'male' | 'female' | null;
 }) {
   const { width, height } = useWindowDimensions();
   const portrait = racePortrait(raceId);
@@ -166,6 +173,7 @@ export function CharacterPortrait({
           name. */}
       {raceName ? (
         <Text style={styles.caption} numberOfLines={2}>
+          {sex === 'male' ? '♂  ' : sex === 'female' ? '♀  ' : ''}
           {raceName}
           {factionName ? `  ·  ${factionName}` : ''}
         </Text>

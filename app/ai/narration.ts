@@ -51,6 +51,7 @@
 import type { GameStore } from '../state/gameStore';
 import type { Location, Intent, PlayerCharacter, Enemy } from '../engine/types';
 import { cognitive, qwen } from './engines';
+import { spokenName } from '../engine/npcMemory';
 import { stripForeignWords, repairGluedNarration, looksLikeInstructionEcho, isSecondPersonActionOpener } from '../engine/foreignText';
 import { sentenceNamesOffCanonEntity, buildEntityAllowList, normalizeEntity } from '../engine/entityGuard';
 import { getLocationById } from '../engine/encounter';
@@ -88,11 +89,11 @@ export function arbiterAddress(player: PlayerCharacter | null | undefined, fallb
   // the name of the character more often — that brings them in." 0.6 leans into the
   // name for immersion without it reading robotic (still ~40% the generic address).
   if (Math.random() < 0.6) {
-    // Use the first whitespace-separated token so a long custom
-    // name ("Verbal of the Tartarian Giants") doesn't read awkward
-    // in a one-line address. Players who type a single name see it
-    // verbatim.
-    return player.name.split(/\s+/)[0]!;
+    // OTA-1441 — the ONE spoken-name rule (engine/npcMemory.spokenName): a
+    // short name is said whole ("Great Scott"), a long one is clipped to its
+    // first word ("Verbal of the Tartarian Giants" → "Verbal"). It was a bare
+    // first-token split here, which greeted the owner's tester as "Great".
+    return spokenName(player.name) ?? fallback;
   }
   return fallback;
 }

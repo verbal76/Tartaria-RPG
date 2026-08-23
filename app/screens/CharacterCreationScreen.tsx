@@ -25,10 +25,18 @@ import { racePortrait } from '../engine/racePortraits';
 // AFTER the motive on purpose. You say why you came down, and then you say what
 // you are prepared to have it cost — which is the same order the Arbiter would
 // ask in, and the last thing decided before the crawl starts.
-type Step = 'race' | 'faction' | 'motive' | 'pressure';
+// ⚠⚠ OTA-1441 — SEX IS ITS OWN STEP, FIRST, WITH NO PRESET. The OTA-1439 pick
+// was a header row on the race step; the owner tried it and named both flaws:
+// *"it will get missed"* (a control above a list the eye goes straight past)
+// and a preset answers a question the player never saw. Now it is the first
+// question, and NEXT stays dead until one of the two signs is chosen — the only
+// step on this screen without a default, because every other default is a
+// neutral starting point and this one would be a guess about the player.
+type Step = 'sex' | 'race' | 'faction' | 'motive' | 'pressure';
 
-const STEP_ORDER: Step[] = ['race', 'faction', 'motive', 'pressure'];
+const STEP_ORDER: Step[] = ['sex', 'race', 'faction', 'motive', 'pressure'];
 const STEP_TITLE: Record<Step, string> = {
+  sex: 'MALE OR FEMALE?',
   race: 'CHOOSE YOUR RACE',
   faction: 'CHOOSE YOUR FACTION',
   motive: 'WHY DID YOU COME DOWN?',
@@ -50,14 +58,11 @@ export function CharacterCreationScreen() {
 
   const motives = getStoryMotives();
 
-  const [step, setStep] = useState<Step>('race');
+  const [step, setStep] = useState<Step>('sex');
   const [raceId, setRaceId] = useState(races[0]!.id);
-  // ⚠ OTA-1439 — ♂/♀, picked on the race step beside the people it describes
-  // (every race portrait is a male/female pair). Defaulting to the first option
-  // is this screen's idiom — race and faction both do it — and the pick is
-  // FLAVOR ONLY: it decides whether a stranger calls you "sir" or "miss"
-  // before they learn your name, and nothing mechanical.
-  const [sex, setSex] = useState<'male' | 'female'>('male');
+  // OTA-1441 — null until the player chooses. Flavor only: it decides whether a
+  // stranger calls you "sir" or "miss" before they learn your name.
+  const [sex, setSex] = useState<'male' | 'female' | null>(null);
   const [factionId, setFactionId] = useState(factions[0]!.id);
   const [motiveId, setMotiveId] = useState(motives[0]!.id);
   const [pressure, setPressure] = useState<PressureTier>(DEFAULT_PRESSURE); // OTA-1066
@@ -89,8 +94,10 @@ export function CharacterCreationScreen() {
   const selectedFaction = factions.find((f) => f.id === factionId) ?? factions[0]!;
 
   const goBack = () => {
-    if (step === 'race') {
+    if (step === 'sex') {
       setScreen('title');
+    } else if (step === 'race') {
+      setStep('sex');
     } else if (step === 'faction') {
       setStep('race');
     } else if (step === 'motive') {
@@ -101,6 +108,14 @@ export function CharacterCreationScreen() {
   };
 
   const goNext = () => {
+    if (step === 'sex') {
+      // The button is disabled until a sign is picked; this guard is the belt
+      // to that visual brace, so a stray tap can never advance an unanswered
+      // question.
+      if (!sex) return;
+      setStep('race');
+      return;
+    }
     if (step === 'race') {
       // ⚠⚠ OTA-1433 — the portrait plays HERE, on the commit, exactly as the
       // faction emblem does. Owner: *"same thing, show the popup at selection."*
@@ -141,12 +156,14 @@ export function CharacterCreationScreen() {
     // (the name beat) and the InputBox routes the next submission as
     // the player's name. The motive drives the opening crawl.
     void startNewGame({
-      name: '', raceId, factionId, motiveId, pressure, sex,
+      name: '', raceId, factionId, motiveId, pressure, sex: sex ?? undefined,
       ...(pressure === 'custom' && pressureCustom ? { pressureCustom } : {}),
     });
   };
 
   const nextLabel = step === 'pressure' ? 'BEGIN' : 'NEXT →';
+  // OTA-1441 — the one step that refuses to move until answered.
+  const nextDisabled = step === 'sex' && !sex;
 
   return (
     <View style={styles.container}>
@@ -157,29 +174,33 @@ export function CharacterCreationScreen() {
       <Text style={styles.stepTitle} accessibilityRole="header">{STEP_TITLE[step]}</Text>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        {/* ⚠ OTA-1439 — the ♂/♀ signs, over the people they describe. Owner:
-            *"we could do the male and female signs over the player image in the
-            beginning"* — the images are the race portraits below, each a
-            male/female pair, so the signs sit at the head of that list. */}
-        {step === 'race' && (
-          <View style={styles.sexRow}>
+        {/* ⚠ OTA-1441 — the two signs, full-height, nothing else on the page.
+            No preselection: both sit unlit until the player commits, and NEXT
+            is dead until one of them does. */}
+        {step === 'sex' && (
+          <>
             {(['male', 'female'] as const).map((sx) => (
               <TouchableOpacity
                 key={sx}
-                style={[styles.sexChip, sex === sx && styles.optionSelected]}
+                style={[styles.sexCard, sex === sx && styles.optionSelected]}
                 onPress={() => setSex(sx)}
                 activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityState={{ selected: sex === sx }}
                 accessibilityLabel={sx === 'male' ? 'Male' : 'Female'}
               >
-                <Text style={[styles.sexGlyph, sex === sx && styles.sexGlyphSelected]}>
+                <Text style={[styles.sexCardGlyph, sex === sx && styles.sexGlyphSelected]}>
                   {sx === 'male' ? '\u2642' : '\u2640'}
                 </Text>
-                <Text style={styles.sexLabel}>{sx === 'male' ? 'MALE' : 'FEMALE'}</Text>
+                <Text style={styles.optionName}>{sx === 'male' ? 'MALE' : 'FEMALE'}</Text>
               </TouchableOpacity>
             ))}
-          </View>
+            <View style={styles.beginBlock}>
+              <Text style={styles.beginHint}>
+                This is how the world addresses you before it learns your name.
+              </Text>
+            </View>
+          </>
         )}
         {step === 'race' && races.map((r) => {
           const statBumps = r.racialStatBonuses ?? {};
@@ -391,11 +412,13 @@ export function CharacterCreationScreen() {
           <Text style={styles.backBtnText}>← BACK</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.nextBtn}
+          style={[styles.nextBtn, nextDisabled && styles.nextBtnDisabled]}
           onPress={goNext}
+          disabled={nextDisabled}
           activeOpacity={0.7}
           hitSlop={8}
           accessibilityRole="button"
+          accessibilityState={{ disabled: nextDisabled }}
         >
           <Text style={styles.nextBtnText}>{nextLabel}</Text>
         </TouchableOpacity>
@@ -434,24 +457,21 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   optionSelected: { borderColor: '#c9a86a' },
-  // OTA-1439 — the ♂/♀ row. Same plate/border language as the option cards so
-  // the pick reads as part of the same form, not a foreign control.
-  sexRow: { flexDirection: 'row', gap: 8, marginBottom: 10 },
-  sexChip: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
+  // OTA-1441 — the ♂/♀ step's two cards. Same plate/border language as every
+  // other option card, sized so two of them own the page.
+  sexCard: {
     backgroundColor: '#13110f',
     borderColor: '#3a342c',
     borderWidth: 1,
-    paddingVertical: 10,
     borderRadius: 4,
+    marginBottom: 10,
+    paddingVertical: 34,
+    alignItems: 'center',
+    gap: 8,
   },
-  sexGlyph: { color: '#a2977b', fontSize: 20 },
+  sexCardGlyph: { color: '#a2977b', fontSize: 56, lineHeight: 60 },
   sexGlyphSelected: { color: '#c9a86a' },
-  sexLabel: { color: '#cdbf99', fontSize: 12, letterSpacing: 2 },
+  nextBtnDisabled: { opacity: 0.35 },
   optionName: { color: '#e6d8b3', fontWeight: '700', fontSize: 14 },
   optionDesc: { color: '#cdbf99', fontSize: 12, marginTop: 2 },
   optionMeta: { color: '#a2977b', fontSize: 11, marginTop: 4, letterSpacing: 0.5 },

@@ -80,19 +80,21 @@ describe('OTA-1439 — the honorific lives on the stranger rung', () => {
 });
 
 describe('OTA-1439 — the pick itself', () => {
-  it('⚠⚠ the ♂/♀ signs sit on the race step, over the paired portraits', () => {
-    const race = CREATE.indexOf("{step === 'race' && (");
-    expect(race).toBeGreaterThan(-1);
+  it('⚠⚠ the ♂/♀ signs are asked — as their OWN step (moved there by OTA-1441)', () => {
+    // This test originally pinned the signs to a header row on the race step.
+    // The owner tried it and overruled the placement: *"the male or female
+    // choice should be its own screen choice, not a header on race or faction,
+    // it will get missed."* OTA-1441 owns the pins for the step's shape; this
+    // suite keeps only 1439's own claim — the two glyphs exist and are offered.
+    expect(CREATE).toContain("{step === 'sex' && (");
     expect(CREATE).toContain("'\\u2642'");
     expect(CREATE).toContain("'\\u2640'");
-    expect(CREATE).toContain('styles.sexRow');
-    expect(CREATE.indexOf('styles.sexRow')).toBeLessThan(CREATE.indexOf('races.map((r) =>'));
   });
 
   it('⚠⚠ the pick reaches the player record — not silently dropped', () => {
     // Screen → startNewGame → createCharacter → player.sex. A picked value
     // that never lands is the "game knows and does not say" shape in reverse.
-    expect(CREATE).toContain('name: \'\', raceId, factionId, motiveId, pressure, sex,');
+    expect(CREATE).toContain('name: \'\', raceId, factionId, motiveId, pressure, sex: sex ?? undefined,');
     const p = createCharacter({ name: 'T', raceId: 'reclaimer', factionId: 'reclaimers_guild', sex: 'female' });
     expect(p.sex).toBe('female');
     const q = createCharacter({ name: 'T', raceId: 'reclaimer', factionId: 'reclaimers_guild' });

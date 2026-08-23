@@ -55,10 +55,35 @@ export type FlourishKind =
   | 'forge' | 'arms' | 'counter' | 'curio' | 'books'
   | 'field' | 'quarters' | 'road' | 'escort' | 'guardian';
 
+/** ⚠⚠ OTA-1440 — A LINE IS EITHER PRONOUN-FREE OR IT COMES IN THREE VOICES.
+ *  Owner, from his own device log: Bran — "he" in every authored reply — was
+ *  "testing a coil of rope against THEIR knee". The pool was written once for
+ *  every NPC, so it spoke of everyone as "they" while the dialogue beside it
+ *  said "he", and the mismatch read as the game forgetting who it was talking
+ *  about.
+ *
+ *  ⚠ THE VARIANTS ARE HAND-WRITTEN, NEVER SUBSTITUTED. Fifteen of the twenty
+ *  carry verb agreement ("while they talk" → "while he talkS"); a token swap
+ *  yields "while he talk", which is worse than the mismatch it fixes. And two
+ *  pronoun-looking lines deliberately stayed plain strings: the tally-slate
+ *  "them" is the chalked NAMES, and the books line's "they" is generic people —
+ *  the two traps a regex pass would have sprung. */
+export type NpcGender = 'male' | 'female';
+export type FlourishLine = string | { n: string; m: string; f: string };
+
+/** n for anyone without a recorded gender — the exact text every player has
+ *  always seen, so nothing changes for wanderers, constructs, or old saves. */
+export function resolveFlourishLine(line: FlourishLine, gender?: NpcGender | null): string {
+  if (typeof line === 'string') return line;
+  if (gender === 'male') return line.m;
+  if (gender === 'female') return line.f;
+  return line.n;
+}
+
 interface FlourishData {
-  byKind: Record<string, string[]>;
-  byRegard: Record<string, string[]>;
-  fallback: string[];
+  byKind: Record<string, FlourishLine[]>;
+  byRegard: Record<string, FlourishLine[]>;
+  fallback: FlourishLine[];
 }
 const DATA = rawFlourishes as unknown as FlourishData;
 
@@ -106,7 +131,7 @@ function hash(s: string): number {
 /** Both voices at once: what their trade does to their hands, and what this
  *  relationship does to their posture. Concatenated rather than chosen between
  *  so a familiar smith can draw either. */
-export function flourishPool(kind: FlourishKind | null, regard: NpcRegard): string[] {
+export function flourishPool(kind: FlourishKind | null, regard: NpcRegard): FlourishLine[] {
   const byKind = kind ? (DATA.byKind[kind] ?? []) : [];
   const byRegard = DATA.byRegard[regard] ?? [];
   const pool = [...byKind, ...byRegard];
@@ -123,6 +148,9 @@ export interface FlourishRequest {
   topicId: string;
   /** Lines already spent in THIS conversation. */
   used: readonly string[];
+  /** OTA-1440 — the NPC's gender, when the data records one. Absent = neutral
+   *  lines, which is what everyone got before. */
+  gender?: NpcGender | null;
 }
 
 /** The template line, which is also the fallback line, because there is only
@@ -136,7 +164,8 @@ export function flourishFor(req: FlourishRequest): string | null {
   const start = hash(`${req.npcId}:${req.topicId}`) % pool.length;
   const usedSet = new Set(req.used);
   for (let i = 0; i < pool.length; i++) {
-    const line = pool[(start + i) % pool.length]!.replace(/\{npc\}/g, req.npcName);
+    const line = resolveFlourishLine(pool[(start + i) % pool.length]!, req.gender)
+      .replace(/\{npc\}/g, req.npcName);
     if (!usedSet.has(line)) return line;
   }
   return null;
@@ -165,6 +194,16 @@ export function vetModelFlourish(raw: string, npcName: string): string | null {
   if (/\b(i|i'm|i've|my|me|mine|we|our)\b/i.test(first)) return null;
   if (/^\s*you\b/i.test(first)) return null;
   if (/\b(assistant|system prompt|the user|instruction|rules?:|narrator:|player)\b/i.test(first)) return null;
+  // ⚠⚠ OTA-1440 — THE INVENTED SCENE. The owner's log, verbatim: "Bran the
+  // Beastmaster, with his bow and axe, stands among the ruins, preparing for
+  // the night." — during a conversation at his stall, indoors, holding a cup.
+  // The model equipped him, moved him outdoors, and gave him a future. A
+  // flourish is HANDS AND EYES, MID-SENTENCE; anything with weapons, scenery,
+  // time of day, or preparation is a different genre. Rejection is free — the
+  // authored pool answers at the same speed and the player never sees the miss
+  // — so this list leans wide on purpose. Forge tools (hammer, tongs) stay
+  // legal: a smith setting a hammer down is exactly the business we want.
+  if (/\b(bows?|axes?|swords?|blades?|spears?|shields?|daggers?|knives|knife|maces?|arrows?|quivers?|battle|fight(s|ing)?|enem(y|ies)|ruins?|rubble|wasteland|horizon|night(fall)?|dawn|dusk|moonlight|moon|stars|sunset|sunrise|campfire|journey|travels|traveling|travelling|wander(s|ing|ed)?|prepar(e|es|ing|ed)|stands? (among|amid)|patrol(s|ling)?|keeps? watch)\b/i.test(first)) return null;
   if (!npcName || !first.toLowerCase().includes(npcName.toLowerCase())) return null;
   return first;
 }
@@ -173,15 +212,28 @@ export function vetModelFlourish(raw: string, npcName: string): string | null {
  *  judge so the brief and the rules that grade it cannot drift apart. */
 export const FLOURISH_SYSTEM =
   'You write one short line of stage business for a character in a grim, ' +
-  'mud-drowned buried world. RULES: exactly one sentence, under 25 words. ' +
-  'Describe only what the named person is doing with their hands, eyes or ' +
-  'body while they talk — never what they say. Use their name. No dialogue, ' +
-  'no quotation marks, no questions. Do not address the reader. Do not ' +
-  'invent names of places, factions, items or people. End with a full stop.';
+  'mud-drowned buried world. The person is MID-CONVERSATION at their own ' +
+  'shop, stall or post, answering a customer. RULES: exactly one sentence, ' +
+  'under 25 words. Describe only what the named person is doing with their ' +
+  'hands, eyes or posture while talking — never what they say. Use their ' +
+  'name. No weapons, no fighting, no travel, no scenery, no time of day, and ' +
+  'no preparing for anything — only the present moment at the counter. No ' +
+  'dialogue, no quotation marks, no questions. Do not address the reader. ' +
+  'Do not invent names of places, factions, items or people. End with a ' +
+  'full stop.';
 
 /** The user half. Given the same person and trade this is stable, which keeps
  *  the request cacheable and the debug log readable. */
-export function flourishPrompt(npcName: string, role: string | null | undefined, kind: FlourishKind | null): string {
+export function flourishPrompt(
+  npcName: string,
+  role: string | null | undefined,
+  kind: FlourishKind | null,
+  gender?: NpcGender | null,
+): string {
   const trade = (role ?? '').trim() || (kind ?? 'trader');
-  return `${npcName} is a ${trade}. Write the one line.`;
+  // OTA-1440 — the model is told the gender where one is recorded, so a line
+  // about Bran says "his hands" rather than "their hands" and matches every
+  // authored reply beside it. No gender, no claim — same rule as the pools.
+  const who = gender === 'male' ? 'a man, a ' : gender === 'female' ? 'a woman, a ' : 'a ';
+  return `${npcName} is ${who}${trade}. Write the one line.`;
 }

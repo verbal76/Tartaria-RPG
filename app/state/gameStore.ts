@@ -34,13 +34,16 @@ import {
   type RescueScenario,
 } from '../engine/dogCompanion';
 import { buildingNameFor, buildingHookLabel, buildingArrow } from '../engine/buildingMaps';
+// OTA-1440 — the first reader of vendors.json's gender field.
+import { npcGenderFor } from '../engine/npcGender';
 // ⚠ OTA-1236 — ONE rule for "this noun carries a next step", shared by the engine
 // dispatch, the bulk-salvage guard, the loot picker's lead lane and the
 // INVESTIGATE ALL ordering. See engine/storyNouns.ts for why they must agree.
 import { rescueScenarioForNoun } from '../engine/storyNouns';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse, spireMoveNoticeLine } from '../engine/worldMemory';
 // OTA-1049 — Phase 1: the per-person ledger the greeting layer reads.
-import { rememberNpcMeeting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName, vendorLedgerId, pocketLossMumble } from '../engine/npcMemory';
+import {
+  spokenName, rememberNpcMeeting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName, vendorLedgerId, pocketLossMumble } from '../engine/npcMemory';
 // OTA-1053 — the relationship reaches the counter.
 import { npcRegard, regardPriceMult } from '../engine/npcMemory';
 // OTA-1054 — the offscreen war reaches the people who live in it.
@@ -2741,8 +2744,8 @@ export function welcomeBackLine(
   player: PlayerCharacter | null | undefined,
   opts?: { offlineRecap?: boolean },
 ): string {
-  const first = player?.name?.split(/\s+/)[0];
-  const name = first && first.length > 0 ? first : 'friend';
+  // OTA-1441 — spokenName: "Great Scott" is greeted whole, not as "Great".
+  const name = spokenName(player?.name) ?? 'friend';
   let line = WELCOME_BACK_LINES[Math.floor(Math.random() * WELCOME_BACK_LINES.length)]!
     .replace('{name}', name);
   if (opts?.offlineRecap) {
@@ -5736,6 +5739,9 @@ function emitFlourish(
     regard: npcRegard(rel),
     topicId,
     used: t.flourishesUsed,
+    // OTA-1440 — Bran's business says "his knee" now; anyone without a
+    // recorded gender keeps the neutral line they always had.
+    gender: npcGenderFor(t.npcId),
   });
   // Null means the pool is spent for this conversation. Silence beats repeating
   // a gesture the player watched two taps ago.
@@ -5784,7 +5790,7 @@ async function prefetchFlourish(
     const out = await qwen.generate(
       [
         { role: 'system', content: FLOURISH_SYSTEM },
-        { role: 'user', content: flourishPrompt(npcName, role, flourishKindFor(npcId, role)) },
+        { role: 'user', content: flourishPrompt(npcName, role, flourishKindFor(npcId, role), npcGenderFor(npcId)) },
       ],
       { maxNewTokens: 48, temperature: 0.8, job: 'flourish' },
     );
@@ -19295,6 +19301,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
               'world',
               `You reach the top of the ${tgt} (tier ${currentTier}/${totalTiers}). The view changes; the room reads differently from here.`,
             );
+            // ⚠ OTA-1441 — THE TUTORIAL CLIMB PAYS. Owner, typed into his device
+            // log mid-game: *"when we are do the climb part of the tutorial have
+            // it award something a climb with no reward is a bad tutorial plot
+            // point."* He is right about the design: every other tutorial beat
+            // hands the player something (a cudgel, a vest, a rope, salvage
+            // parts) and the climb — the beat that USES the rope they just took
+            // — paid out only via rollClimbTopLoot's dice, which can roll
+            // nothing. A GUARANTEED find while the beat is live: coins someone
+            // left at the top, so the lesson lands as "high places hold things."
+            // Once by construction — the beat only advances on climb-down, so
+            // the player cannot be at a top twice while it is still 'climb'.
+            if (TUTORIAL_STEPS[get().tutorialStep ?? -1]?.id === 'climb') {
+              set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + 15 } } : s));
+              get().appendLog(
+                'reward',
+                `✦ A small pouch, tucked where only a climber would look — 15 TC. High places keep things for whoever bothers to reach them.`,
+              );
+            }
             // OTA-910 — great-climb summit: a GUARANTEED Skyreacher armor piece,
             // once per climb. The five pieces (one per landmark) make the
             // Legendary Skyreacher set — AC+4, three heavy resistances each; it

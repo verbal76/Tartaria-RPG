@@ -69,11 +69,16 @@ const DATA = require('../app/data/npcs/flourishes.json') as {
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const VENDORS = require('../app/data/npcs/vendors.json') as { vendors: { id: string; name: string; title: string }[] };
 
+// ⚠ OTA-1440 — a line is either a plain string or {n, m, f}. `voices` flattens
+// one entry into every text it can produce, so this suite's "every authored
+// line" claims cover all three voices rather than crashing on the object shape.
+const voices = (l: string | { n: string; m: string; f: string }): string[] =>
+  typeof l === 'string' ? [l] : [l.n, l.m, l.f];
 const allAuthored = [
   ...Object.values(DATA.byKind).flat(),
   ...Object.values(DATA.byRegard).flat(),
   ...DATA.fallback,
-];
+].flatMap(voices);
 
 const req = (over: Partial<Parameters<typeof flourishFor>[0]> = {}) => ({
   npcId: 'irma_ironhand', npcName: 'Irma Ironhand', role: 'Heavy Armorer',
@@ -214,8 +219,11 @@ describe('OTA-1063 — deterministic, and not a dice roll', () => {
   });
 
   it('an exhausted pool goes SILENT rather than repeating a gesture', () => {
+    // ⚠ OTA-1440 — the request below carries no gender, so flourishFor resolves
+    // every variant to its NEUTRAL voice; `used` must hold exactly those texts
+    // or the pool never looks exhausted.
     const pool = flourishPool(flourishKindFor('irma_ironhand', 'Heavy Armorer'), 'known')
-      .map((l) => l.replace(/\{npc\}/g, 'Irma Ironhand'));
+      .map((l) => (typeof l === 'string' ? l : l.n).replace(/\{npc\}/g, 'Irma Ironhand'));
     expect(flourishFor(req({ used: pool }))).toBeNull();
   });
 });
@@ -373,6 +381,8 @@ describe('OTA-1063 — in the exchange', () => {
     openTalk();
     useGameStore.getState().raiseTopic(topics[0]!.id);
     const line = useGameStore.getState().pendingTalk!.flourishesUsed[0]!;
+    // allAuthored already carries all three voices of every line — necessary
+    // here, because the store path looks up Irma's gender and emits the f text.
     const authored = allAuthored.map((l) => l.replace(/\{npc\}/g, 'Irma Ironhand'));
     expect(authored).toContain(line);
   });

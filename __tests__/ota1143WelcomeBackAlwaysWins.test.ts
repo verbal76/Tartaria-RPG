@@ -66,9 +66,21 @@ const STORE: string = require('fs').readFileSync(
 const player = { name: 'Verbal Kint' } as unknown as PlayerCharacter;
 
 describe('OTA-1143 — the greeting composes', () => {
-  it('always greets by first name', () => {
+  it('always greets by name — said WHOLE when it is short (OTA-1441)', () => {
+    // RETARGETED BY OTA-1441: the greeting used a bare first-token split, which
+    // turned the owner's tester "Great Scott" into "Welcome back, Great." The
+    // spokenName rule now says a name of ≤2 words and ≤16 chars whole — so
+    // "Verbal Kint" is greeted as "Verbal Kint". What this test has always
+    // guarded is unchanged: the greeting NAMES the player, every time.
     for (let i = 0; i < 30; i++) {
-      expect(welcomeBackLine(player)).toContain('Welcome back, Verbal.');
+      expect(welcomeBackLine(player)).toContain('Welcome back, Verbal Kint.');
+    }
+  });
+
+  it('a long styled name is still clipped to its first word', () => {
+    const styled = { name: 'Verbal of the Tartarian Giants' } as unknown as PlayerCharacter;
+    for (let i = 0; i < 30; i++) {
+      expect(welcomeBackLine(styled)).toContain('Welcome back, Verbal.');
     }
   });
 
@@ -80,7 +92,7 @@ describe('OTA-1143 — the greeting composes', () => {
   it('with the offline recap pending, the recap rides INSIDE the same quote', () => {
     for (let i = 0; i < 30; i++) {
       const line = welcomeBackLine(player, { offlineRecap: true });
-      expect(line).toContain('Welcome back, Verbal.');
+      expect(line).toContain('Welcome back, Verbal Kint.');
       // The recap sentence sits before the closing quote — one continuous
       // Arbiter speech, so TTS reads a single hello.
       expect(line).toMatch(/The waste did not sleep while you were gone — blood was spilled and ground changed hands\. Read the World for the account\."$/);

@@ -798,9 +798,18 @@ export function MapScreen() {
         const f = outpostRoomMark(artFactionId, hereRoom.structuralId);
         const size = Math.max(12, 46 * (renderedW / 1254));
         playerFrac = f;
+        // ⚠ OTA-1441 — ABOVE the name, not ON it. The interior mark points are
+        // calibrated to the painted room NAMES (that is how they were sighted
+        // in), so centring the ring on the point parks it on the text. Owner:
+        // *"it places the you are here icon directly on the name of the room,
+        // I need it directly above it but not obscuring any of it."* The ring's
+        // BOTTOM edge now sits a name's half-height above the point — the lift
+        // scales with the art like every other glyph, floored where it still
+        // clears the text on a small render.
+        const lift = Math.max(7, INTERIOR_MARKER_LIFT * labelScale);
         playerMarkerBox = {
           left: offsetX + renderedW * f.fx - size / 2,
-          top: offsetY + renderedH * f.fy - size / 2,
+          top: offsetY + renderedH * f.fy - size - lift,
           size,
         };
       }
@@ -829,9 +838,14 @@ export function MapScreen() {
       if (here) {
         const size = Math.max(12, 46 * labelScale);
         playerFrac = here;
+        // ⚠ OTA-1441 — same lift as the outpost branch: the ring rides ABOVE
+        // the painted room name instead of covering it. One constant for both
+        // interiors, so the marker cannot sit differently in a shed than in
+        // the outpost.
+        const lift = Math.max(7, INTERIOR_MARKER_LIFT * labelScale);
         playerMarkerBox = {
           left: offsetX + renderedW * here.fx - size / 2,
-          top: offsetY + renderedH * here.fy - size / 2,
+          top: offsetY + renderedH * here.fy - size - lift,
           size,
         };
       }
@@ -1267,6 +1281,14 @@ export function MapScreen() {
 // OTA-498 — Hidden Market overlay wrap size (centers the "?" / name on the coord).
 const HM_LABEL_W = 96;
 const HM_LABEL_H = 34;
+
+// ⚠ OTA-1441 — how far (in art pixels, scaled by labelScale) the interior
+// "you are here" ring's BOTTOM edge sits above its mark point. Interior mark
+// points are sighted onto the painted room NAMES, and the names run ~30-40 art
+// px tall, so 24 clears the text's upper half plus a sliver of air. Owner: the
+// icon *"directly above it but not obscuring any of it."* Interiors only — the
+// world atlas marker stands on silhouettes, not text, and stays centred.
+const INTERIOR_MARKER_LIFT = 24;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },

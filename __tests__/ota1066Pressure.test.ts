@@ -255,8 +255,11 @@ describe('OTA-1066 — in the real store', () => {
   });
 
   it('the toggle is the LAST step of creation, after the motive', () => {
-    expect(creation).toContain("type Step = 'race' | 'faction' | 'motive' | 'pressure';");
-    expect(creation).toMatch(/STEP_ORDER: Step\[\] = \['race', 'faction', 'motive', 'pressure'\]/);
+    // RETARGETED BY OTA-1441: the walk gained a 'sex' step at the FRONT. This
+    // test's claim is about the BACK of the walk — pressure last, after the
+    // motive — and that part is unchanged.
+    expect(creation).toContain("type Step = 'sex' | 'race' | 'faction' | 'motive' | 'pressure';");
+    expect(creation).toMatch(/STEP_ORDER: Step\[\] = \['sex', 'race', 'faction', 'motive', 'pressure'\]/);
     expect(creation).toContain("const nextLabel = step === 'pressure' ? 'BEGIN' : 'NEXT →';");
     // ...and it is carried into the character.
     // RETARGETED BY OTA-1113: the call gained the optional CUSTOM payload

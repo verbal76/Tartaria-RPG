@@ -584,12 +584,28 @@ export function longAbsence(rel: NpcRelation | null | undefined, hoursNow: numbe
  *  the Tartarian Giants") doesn't read absurd inside a line of dialogue — the
  *  same rule arbiterAddress has always followed, so the Arbiter and the world
  *  agree on what you are called. */
+/** ⚠ OTA-1441 — HOW A NAME IS SAID ALOUD, in one place. The first-token rule
+ *  exists so "Verbal of the Tartarian Giants" does not read absurd inside a
+ *  line of dialogue — but applied to "Great Scott" it produced the owner's log
+ *  line *"Welcome back, Great."*, which is a different absurdity. A SHORT name
+ *  is said whole: two words and sixteen characters is the widest a name can be
+ *  and still sit naturally in speech. Shared by npcAddress, arbiterAddress and
+ *  welcomeBackLine, so the Arbiter and the world can never disagree about what
+ *  you are called. */
+export function spokenName(name: string | null | undefined): string | undefined {
+  const trimmed = name?.trim();
+  if (!trimmed) return undefined;
+  const tokens = trimmed.split(/\s+/);
+  if (tokens.length <= 2 && trimmed.length <= 16) return trimmed;
+  return tokens[0];
+}
+
 export function npcAddress(
   rel: NpcRelation | null | undefined,
   playerName: string | null | undefined,
   sex?: 'male' | 'female' | null,
 ): string {
-  const first = playerName?.trim().split(/\s+/)[0];
+  const first = spokenName(playerName);
   if (!knowsPlayerName(rel) || !first) {
     // ⚠ OTA-1439 — SIR/MISS IS WHAT STRANGERS CALL YOU. The honorific slots
     // into the exact rung where an NPC does not know your name yet, which is

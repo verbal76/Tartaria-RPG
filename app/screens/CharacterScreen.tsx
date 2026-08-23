@@ -197,6 +197,7 @@ export function CharacterScreen() {
           factionName={faction?.name}
           motiveId={player.storyMotive}
           characterName={player.name}
+          sex={player.sex}
         />
         {/* ── HEADER CARD ───────────────────────────────────────── */}
         <View style={styles.card}>

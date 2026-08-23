@@ -24328,7 +24328,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fifteen pieces of junk on a vendor no longer makes you their regular.
 // OTA-1439 — the ♂/♀ pick at creation; strangers now say "sir"/"miss" until
 // they learn your name; the regular's bar moves to four visits.
-export const OTA_BUILD_ID = '2026-08-23-1439-what-strangers-call-you';
+// OTA-1440 — NPC stage business now matches its speaker: Bran is "he" in his
+// own gestures, Irma is "she", and anyone without a recorded gender keeps the
+// exact lines every player has always seen. The AI's one-line flourish prompt
+// is tightened to mid-conversation business only — no weapons, no scenery, no
+// preparing for the night — and the judge rejects what the prompt forbids.
+// OTA-1441 — the ♂/♀ pick is its own first screen with no preset and NEXT
+// walled until you choose; the mark now shows on the character sheet's
+// portrait caption; "Great Scott" is greeted whole instead of as "Great"
+// (one spoken-name rule for the Arbiter, vendors, and the welcome-back line);
+// the tutorial climb pays — a guaranteed 15 TC pouch at the top; and the
+// interior "you are here" ring now rides directly ABOVE the painted room name
+// instead of covering it (outpost and building maps; the world atlas marker
+// stands on silhouettes and stays centred).
+export const OTA_BUILD_ID = '2026-08-23-1441-your-own-first-screen';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1439-what-strangers-call-you';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1437-ask-before-you-speak';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1436-one-hand-on-the-banner';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1435-marks-on-the-painting';
