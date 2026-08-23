@@ -7,7 +7,11 @@ import * as FileSystem from 'expo-file-system';
 // the Tensor chip family. Inference runs at LLM priority: a queued 60ms embed
 // preempts homework (the lock's hook cuts it short) and waits briefly behind a
 // live narration, which only delays an enrichment label nobody is blocked on.
-import { runExclusiveNativeMl, ML_PRIORITY_LLM } from '../nativeMlLock';
+// ⚠⚠ OTA-1460 — COGNITION, NOT GENERATION. These sessions decide what the player
+// just did; the game waits on the answer. They used to queue at ML_PRIORITY_COGNITION —
+// the same rank as Qwen — and the owner's log caught a 100ms classification taking
+// 4954ms behind a generation. See ML_PRIORITY_COGNITION.
+import { runExclusiveNativeMl, ML_PRIORITY_COGNITION } from '../nativeMlLock';
 import { WordPieceTokenizer } from './Tokenizer';
 import { EmbeddingCache } from './EmbeddingCache';
 import type { ModelInfo } from '../types';
@@ -30,7 +34,7 @@ export class SemanticEmbeddingService {
 
   async initialize(modelPath: string, vocabText: string): Promise<void> {
     this.tokenizer.loadVocab(vocabText);
-    this.session = await runExclusiveNativeMl(() => ort.InferenceSession.create(modelPath), ML_PRIORITY_LLM);
+    this.session = await runExclusiveNativeMl(() => ort.InferenceSession.create(modelPath), ML_PRIORITY_COGNITION);
     this.modelPath = modelPath;
   }
 
@@ -72,7 +76,7 @@ export class SemanticEmbeddingService {
   async reinitializeIfNeeded(): Promise<void> {
     if (this.session || !this.modelPath || !this.tokenizer.isLoaded()) return;
     const path = this.modelPath;
-    this.session = await runExclusiveNativeMl(() => ort.InferenceSession.create(path), ML_PRIORITY_LLM);
+    this.session = await runExclusiveNativeMl(() => ort.InferenceSession.create(path), ML_PRIORITY_COGNITION);
   }
 
   clearCache(): void {
@@ -105,7 +109,7 @@ export class SemanticEmbeddingService {
     // OTA-1358 — capture the session like LlamaRuntime captures its context:
     // dispose() nulls the field, and the lock may hold this call briefly.
     const session = this.session;
-    const results = await runExclusiveNativeMl(() => session.run(feeds), ML_PRIORITY_LLM);
+    const results = await runExclusiveNativeMl(() => session.run(feeds), ML_PRIORITY_COGNITION);
     const output = results.last_hidden_state ?? results.token_embeddings ?? results.embeddings;
     if (!output) throw new Error('ONNX output missing expected tensor');
 

@@ -103,13 +103,51 @@ describe('OTA-1358 — the sprint gate and classifier parity', () => {
     expect(blockAt(src, '  beginScene(opts?: {')).toContain('notePlayerActionForSprint();');
   });
 
+  // ⚠⚠⚠ REBUILT BY OTA-1460 — THE EIGHTH LABEL-SHAPED PIN IN THREE DAYS.
+  //
+  // The CLAIM here is load-bearing and unchanged: every native call the classifier
+  // makes — session CREATE and INFERENCE alike — goes through the exclusivity lock.
+  // That is the guarantee that stopped a reproducible process SIGSEGV from Qwen and
+  // Kokoro running concurrently, and it must never quietly lapse.
+  //
+  // ⚠ But it asserted that by quoting the import line VERBATIM, priority constant
+  // included. OTA-1460 moved the classifier off ML_PRIORITY_LLM onto a new rank —
+  // because the owner's log caught a 100ms classification taking 4954ms behind a
+  // generation — and a test about LOCK COVERAGE failed over a PRIORITY CHANGE.
+  //
+  // ⚠ WHICH RANK IT USES IS NOT THIS TEST'S BUSINESS. That is OTA-1460's claim and
+  // it is pinned in ota1460CognitionOutranksGeneration, where the ordering
+  // properties live. Two tests owning one fact is how they end up disagreeing.
+  // This one owns COVERAGE: is anything native left outside the lock?
   it('⚠⚠ source lock: the classifier runs under the native-ML lock — create AND inference', () => {
     const src = readFileSync(join(__dirname, '..', 'app', 'ai', 'embedding', 'SemanticEmbeddingService.ts'), 'utf8');
-    expect(src).toContain("import { runExclusiveNativeMl, ML_PRIORITY_LLM } from '../nativeMlLock';");
-    expect(src).toContain('runExclusiveNativeMl(() => ort.InferenceSession.create(modelPath), ML_PRIORITY_LLM)');
-    expect(src).toContain('runExclusiveNativeMl(() => session.run(feeds), ML_PRIORITY_LLM)');
+    // It imports the lock at all.
+    expect(src).toMatch(/import \{[^}]*runExclusiveNativeMl[^}]*\} from '\.\.\/nativeMlLock';/);
+    // ⚠ EVERY session create is wrapped — both of them (model path and fallback path).
+    const creates = src.match(/ort\.InferenceSession\.create\(/g) ?? [];
+    expect(creates.length).toBeGreaterThanOrEqual(2);
+    const wrappedCreates = src.match(/runExclusiveNativeMl\(\(\) => ort\.InferenceSession\.create\(/g) ?? [];
+    expect(wrappedCreates.length).toBe(creates.length);
+    // ⚠ And the inference itself is wrapped, with a priority argument of some kind —
+    // the lock's own signature requires one; which one is OTA-1460's business.
+    expect(src).toMatch(/runExclusiveNativeMl\(\(\) => session\.run\(feeds\), ML_PRIORITY_[A-Z]+\)/);
     // No bare native call remains outside the lock.
     expect(src).not.toContain('await this.session.run(feeds)');
+    // ⚠⚠ THE CATCH-ALL: every runExclusiveNativeMl call passes a priority. A bare
+    // two-arg call silently defaults, which is exactly the omission that made
+    // OTA-1452's teardown sit below the voice and hold 425MB nine seconds too long.
+    //
+    // ⚠ BOUNDED SPANS, NOT A PAREN-STOPPING PATTERN — the mistake ota1152 wrote
+    // down and I made anyway on the first draft of this line. The wrapped call is
+    // itself a call, so a non-greedy `\)` terminates at `create(modelPath)` and
+    // never reaches the priority argument, failing on correct code.
+    let from = 0;
+    for (;;) {
+      const at = src.indexOf('runExclusiveNativeMl(', from);
+      if (at === -1) break;
+      expect(src.slice(at, at + 220)).toMatch(/ML_PRIORITY_[A-Z]+/);
+      from = at + 1;
+    }
   });
 
   it('⚠ source lock: the classifier resume is debounced behind a settled foreground', () => {

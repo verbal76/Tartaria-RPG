@@ -80,6 +80,38 @@ export const ML_PRIORITY_HOMEWORK = -1;
  *
  *  Homework stays below everything, so idle work still yields to both. */
 export const ML_PRIORITY_VOICE = 2;
+
+/** ⚠⚠⚠ OTA-1460 — GAMEPLAY COGNITION OUTRANKS GENERATIVE WORK.
+ *
+ *  ⚠⚠ THE MEASUREMENT, from the owner's device log. The cognitive classifier —
+ *  the ONNX embedding + intent + emotion stack that decides WHAT THE PLAYER JUST
+ *  DID — normally answers in about 100ms. In one session it logged:
+ *
+ *      [cognitive] REST    (4954ms)
+ *      [cognitive] REST    (2380ms)
+ *      [cognitive] TRAVEL  (1474ms)
+ *
+ *  Fifty times its own runtime, because `SemanticEmbeddingService` queued at
+ *  `ML_PRIORITY_LLM` — THE SAME RANK AS QWEN — and a 100ms classification sat
+ *  behind a multi-second generation. FIFO within a rank did the rest.
+ *
+ *  ⚠⚠ THE TWO ARE NOT THE SAME KIND OF WORK, WHICH IS THE WHOLE ARGUMENT.
+ *  Cognition is part of RESOLVING THE ACTION THE PLAYER JUST TOOK — the game is
+ *  waiting on it to know what happened. Qwen generation is elaboration ON an
+ *  action already resolved. Sharing a rank made "what did they do" wait behind
+ *  "what should we say about it", which is backwards.
+ *
+ *  ⚠ IT STAYS BELOW VOICE. The voice is the one thing a player perceives as late
+ *  — OTA-1130 established that with arithmetic, and nothing here disturbs it.
+ *  Cognition slots between: above elaboration, below performance.
+ *
+ *  ⚠ AND IT IS EXEMPT FROM THE VOICE RESERVATION — see `pumpMl`. That hold exists
+ *  to stop unrelated speculative work slipping into the gap between a line
+ *  appearing and the request to speak it. Cognition is not unrelated speculative
+ *  work; it is the current action still resolving. Holding a ~100ms inference for
+ *  up to 350ms on the chance audio might arrive is the same inversion one rank
+ *  lower. */
+export const ML_PRIORITY_COGNITION = 1.5;
 export const ML_PRIORITY_LLM = 1;
 
 /** ⚠⚠⚠ OTA-1452 — GIVING BACK ~425MB OUTRANKS EVERYTHING, INCLUDING THE VOICE.
@@ -218,7 +250,9 @@ function pumpMl(): void {
   // waits: a voice op is the thing being waited for, and homework already
   // yields to everything. The deadline makes this self-clearing, so a line that
   // never arrives costs the LLM one short deferral and nothing more.
-  if (pending[bestIdx]!.priority < ML_PRIORITY_VOICE) {
+  // ⚠ OTA-1460 — cognition is exempt: it is the player's current action still
+  // resolving, not speculative work that could collide with the handoff.
+  if (pending[bestIdx]!.priority < ML_PRIORITY_COGNITION) {
     const holdMs = voiceReservedUntil - Date.now();
     if (holdMs > 0) {
       if (deferTimer === null) {
