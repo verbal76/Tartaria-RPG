@@ -159,17 +159,17 @@ export function CharacterPortrait({
         // character rather than a badge stuck over them.
         <Image source={crest} style={styles.crest} resizeMode="contain" />
       ) : null}
-      {/* ⚠ OTA-1443 — THE ♂/♀ SIGN, EMBLEM-SIZED, ON THE EMBLEM'S RIGHT.
-          The OTA-1441 cut tucked it into the bottom caption at text size;
-          owner: *"it is easily overlooked ... it needs to sit on the right of
-          the faction emblem and be the same size as it is."* So it joins the
-          top-left rank as a peer of the crest: same box, same size, gold with
-          the banner's hard shadow, nothing behind it. When a save has no
-          crest art it takes the crest's own spot rather than floating beside
-          a gap. */}
+      {/* ⚠ OTA-1443/1446 — THE ♂/♀ SIGN, EMBLEM-SIZED, DIRECTLY UNDER THE
+          EMBLEM. OTA-1441 tucked it into the bottom caption at text size
+          ("easily overlooked" — owner); OTA-1443 raised it to the emblem's
+          right; the owner looked at that too and placed it: *"let's put it
+          directly under the faction emblem. I think that'll look better."*
+          Same box, same size, gold with the banner's hard shadow, nothing
+          behind it. When a save has no crest art it takes the crest's own
+          spot rather than floating under a gap. */}
       {sex ? (
         <Text
-          style={[styles.sexSign, { left: crest ? 10 + CREST_SIZE + 6 : 10 }]}
+          style={[styles.sexSign, { top: crest ? 10 + CREST_SIZE + 6 : 10 }]}
           accessibilityLabel={sex === 'male' ? 'Male' : 'Female'}
         >
           {sex === 'male' ? '♂' : '♀'}
@@ -215,14 +215,14 @@ const styles = StyleSheet.create({
     width: CREST_SIZE,
     height: CREST_SIZE,
   },
-  // ⚠ OTA-1443 — the ♂/♀ sign: a CREST_SIZE box on the crest's right (its
-  // `left` is computed inline — it depends on whether a crest rendered), the
-  // glyph filling it. Gold with the banner's hard shadow, upright rather than
-  // MARK_TYPE's italic — a symbol is not prose, and slanting it reads as a
-  // rendering error at this size.
+  // ⚠ OTA-1443/1446 — the ♂/♀ sign: a CREST_SIZE box directly under the crest
+  // (its `top` is computed inline — it depends on whether a crest rendered),
+  // the glyph filling it. Gold with the banner's hard shadow, upright rather
+  // than MARK_TYPE's italic — a symbol is not prose, and slanting it reads as
+  // a rendering error at this size.
   sexSign: {
     position: 'absolute',
-    top: 10,
+    left: 10,
     width: CREST_SIZE,
     height: CREST_SIZE,
     fontSize: CREST_SIZE - 8,

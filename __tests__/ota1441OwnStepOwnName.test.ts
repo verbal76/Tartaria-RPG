@@ -81,10 +81,12 @@ describe('OTA-1441/1443 — the ♂/♀ mark reaches the character sheet, at ran
     expect(PORTRAIT).toContain("{sex === 'male' ? '♂' : '♀'}");
   });
 
-  it('⚠⚠ EMBLEM-SIZED, ON THE EMBLEM\'S RIGHT — not the overlookable caption mark', () => {
-    // Same box the crest gets, sitting one gap beyond it; falls back to the
-    // crest's own spot when there is no crest art to sit beside.
-    expect(PORTRAIT).toContain('{ left: crest ? 10 + CREST_SIZE + 6 : 10 }');
+  it('⚠⚠ EMBLEM-SIZED, DIRECTLY UNDER THE EMBLEM — not the overlookable caption mark', () => {
+    // OTA-1443 put it on the crest's right; the owner looked at it and placed
+    // it below instead (OTA-1446). Same box the crest gets, one gap under it;
+    // falls back to the crest's own spot when there is no crest art.
+    expect(PORTRAIT).toContain('{ top: crest ? 10 + CREST_SIZE + 6 : 10 }');
+    expect(PORTRAIT.slice(PORTRAIT.indexOf('sexSign: {'))).toContain('left: 10,');
     const style = PORTRAIT.slice(PORTRAIT.indexOf('sexSign: {'));
     expect(style).toContain('width: CREST_SIZE,');
     expect(style).toContain('height: CREST_SIZE,');

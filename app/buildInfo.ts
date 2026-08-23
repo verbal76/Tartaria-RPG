@@ -24367,7 +24367,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // FOR OTA UPDATE, then Restore from backup — and all three the same height
 // (the lead button drops to the OTA line's padding and font size; its rank
 // shows in the amber border and lighter fill now, not in extra thickness).
-export const OTA_BUILD_ID = '2026-08-23-1445-three-buttons-one-height';
+// OTA-1446 — the ♂/♀ sign moves once more, by owner's eye: directly UNDER
+// the faction emblem instead of beside it, same emblem size, same gold.
+export const OTA_BUILD_ID = '2026-08-23-1446-the-sign-below-the-emblem';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1445-three-buttons-one-height';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1444-the-ledger-grew-a-line';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1443-the-sign-at-rank';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1442-type-it-yourself';
