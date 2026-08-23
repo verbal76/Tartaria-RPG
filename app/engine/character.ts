@@ -270,6 +270,9 @@ export interface CreateCharacterInput {
   pressure?: string;
   /** OTA-1113 — the CUSTOM payload, when `pressure === 'custom'`. */
   pressureCustom?: { intensity: string; systems: string[] };
+  /** OTA-1439 — ♂/♀ from the race step. Optional so sims and legacy callers
+   *  keep working; absent means no honorific, never a guessed one. */
+  sex?: 'male' | 'female';
 }
 
 // v2.4.1 (OTA 029) — canonical per-faction starting location.
@@ -354,6 +357,7 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
   }));
 
   return {
+    sex: input.sex,
     name: input.name,
     storyMotive,
     pressure, // OTA-1066

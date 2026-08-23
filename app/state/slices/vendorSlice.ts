@@ -421,6 +421,10 @@ export const createVendorSlice = (
         tcTraded: totalCost,
         // OTA-1055 — only money the player HANDS OVER can pay a debt.
         spent: totalCost,
+        // ⚠ OTA-1438 — the visit stamp. `trades` counts VISITS, not line items;
+        // the comment above already argued this for units of one stack, and
+        // this is the same rule across separate purchases in one stop.
+        atHours: s.player?.hoursElapsed ?? 0,
       }),
     }));
     const relAfterBuy = getRelation(get().worldMemory, deps.vendorNpcId(scene.vendor));
@@ -596,6 +600,11 @@ export const createVendorSlice = (
       worldMemory: recordNpcDealing(s.worldMemory, deps.vendorNpcId(scene.vendor!), {
         trades: opts?.social !== false ? 1 : 0,
         tcTraded: price,
+        // ⚠⚠ OTA-1438 — AND THIS IS THE ONE THAT WAS ACTUALLY LEAKING. The
+        // `social` flag dedupes units of ONE stack; selling three different
+        // items is three calls, each a fresh first unit, so an inventory dump
+        // credited a trade per item. The owner's log: fifteen in 400ms.
+        atHours: s.player?.hoursElapsed ?? 0,
       }),
     }));
     // arb45 — Relic Trader: count relic barters toward the title (5 needed).

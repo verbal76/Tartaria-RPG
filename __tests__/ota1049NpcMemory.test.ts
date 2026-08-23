@@ -187,7 +187,7 @@ describe('OTA-1049 — the regard ladder', () => {
   });
 
   it('real custom makes you a regular', () => {
-    expect(npcRegard(withDealing({ trades: 3 }))).toBe('familiar');
+    expect(npcRegard(withDealing({ trades: 4 /* OTA-1439: familiar bar moved 3→4 */ }))).toBe('familiar');
     expect(npcRegard(withDealing({ tcTraded: TC_FOR_FAMILIAR }))).toBe('familiar');
     expect(npcRegard(withDealing({ contractsTurnedIn: 1 }))).toBe('familiar');
   });

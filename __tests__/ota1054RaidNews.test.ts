@@ -96,7 +96,7 @@ describe('OTA-1054 — who gets told, and who does not', () => {
   });
 
   it('somebody who caught you stealing tells you nothing', () => {
-    const m = withRaids(seenTwice(10, 100, { trades: 3, wrongs: 1 }), [raid(50)]);
+    const m = withRaids(seenTwice(10, 100, { trades: 4 /* OTA-1439: familiar bar moved 3→4 */, wrongs: 1 }), [raid(50)]);
     expect(npcRegard(getRelation(m, IRMA.id))).toBe('wronged');
     expect(raidNewsFor(m, getRelation(m, IRMA.id), 100)).toBeNull();
   });
@@ -104,7 +104,7 @@ describe('OTA-1054 — who gets told, and who does not', () => {
   it('a factionless roadside trader has no outpost to lose', () => {
     const loner: NpcMet = { id: 'roadside:grit', name: 'Grit' };
     let m = recordNpcSighting(emptyMemory(), loner, { nowMs: 1, hoursElapsed: 10 });
-    m = recordNpcDealing(m, loner.id, { trades: 3 });
+    m = recordNpcDealing(m, loner.id, { trades: 4 });
     m = recordNpcSighting(m, loner, { nowMs: 2, hoursElapsed: 100 });
     expect(raidNewsFor(withRaids(m, [raid(50)]), getRelation(m, loner.id), 100)).toBeNull();
   });
@@ -124,7 +124,7 @@ describe('OTA-1054 — what they say', () => {
   };
 
   it('every tier names the attacker and leaves no placeholder', () => {
-    const tiers: Record<string, number>[] = [{ trades: 1 }, { trades: 3 }, { contractsTurnedIn: 2 }];
+    const tiers: Record<string, number>[] = [{ trades: 1 }, { trades: 4 }, { contractsTurnedIn: 2 }];
     for (const dealings of tiers) {
       const line = lineFor(dealings);
       expect(line).toContain('Reclaimers Guild');
@@ -136,10 +136,10 @@ describe('OTA-1054 — what they say', () => {
   it('the closer tiers name the ground; the acquaintance tier just says "our outpost"', () => {
     // Deliberate: someone who merely places you does not walk you through which
     // holding was lost. It reads as a passing remark, which is what it is.
-    expect(lineFor({ trades: 3 })).toContain('order hold');       // underscores humanised
+    expect(lineFor({ trades: 4 })).toContain('order hold');       // underscores humanised
     expect(lineFor({ contractsTurnedIn: 2 })).toContain('order hold');
     expect(lineFor({ trades: 1 })).toContain('our outpost');
-    const all: Record<string, number>[] = [{ trades: 1 }, { trades: 3 }, { contractsTurnedIn: 2 }];
+    const all: Record<string, number>[] = [{ trades: 1 }, { trades: 4 }, { contractsTurnedIn: 2 }];
     for (const d of all) {
       expect(lineFor(d)).not.toContain('_');
     }
@@ -147,7 +147,7 @@ describe('OTA-1054 — what they say', () => {
 
   it('warms with the relationship — a regular hears more than an acquaintance', () => {
     const known = lineFor({ trades: 1 });
-    const familiar = lineFor({ trades: 3 });
+    const familiar = lineFor({ trades: 4 });
     const trusted = lineFor({ contractsTurnedIn: 2 });
     expect(new Set([known, familiar, trusted]).size).toBe(3);
   });
@@ -159,8 +159,8 @@ describe('OTA-1054 — what they say', () => {
   });
 
   it('is deterministic — same state, same sentence', () => {
-    const first = lineFor({ trades: 3 });
-    for (let i = 0; i < 100; i++) expect(lineFor({ trades: 3 })).toBe(first);
+    const first = lineFor({ trades: 4 });
+    for (let i = 0; i < 100; i++) expect(lineFor({ trades: 4 })).toBe(first);
   });
 });
 

@@ -52,6 +52,12 @@ export function CharacterCreationScreen() {
 
   const [step, setStep] = useState<Step>('race');
   const [raceId, setRaceId] = useState(races[0]!.id);
+  // ⚠ OTA-1439 — ♂/♀, picked on the race step beside the people it describes
+  // (every race portrait is a male/female pair). Defaulting to the first option
+  // is this screen's idiom — race and faction both do it — and the pick is
+  // FLAVOR ONLY: it decides whether a stranger calls you "sir" or "miss"
+  // before they learn your name, and nothing mechanical.
+  const [sex, setSex] = useState<'male' | 'female'>('male');
   const [factionId, setFactionId] = useState(factions[0]!.id);
   const [motiveId, setMotiveId] = useState(motives[0]!.id);
   const [pressure, setPressure] = useState<PressureTier>(DEFAULT_PRESSURE); // OTA-1066
@@ -135,7 +141,7 @@ export function CharacterCreationScreen() {
     // (the name beat) and the InputBox routes the next submission as
     // the player's name. The motive drives the opening crawl.
     void startNewGame({
-      name: '', raceId, factionId, motiveId, pressure,
+      name: '', raceId, factionId, motiveId, pressure, sex,
       ...(pressure === 'custom' && pressureCustom ? { pressureCustom } : {}),
     });
   };
@@ -151,6 +157,30 @@ export function CharacterCreationScreen() {
       <Text style={styles.stepTitle} accessibilityRole="header">{STEP_TITLE[step]}</Text>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        {/* ⚠ OTA-1439 — the ♂/♀ signs, over the people they describe. Owner:
+            *"we could do the male and female signs over the player image in the
+            beginning"* — the images are the race portraits below, each a
+            male/female pair, so the signs sit at the head of that list. */}
+        {step === 'race' && (
+          <View style={styles.sexRow}>
+            {(['male', 'female'] as const).map((sx) => (
+              <TouchableOpacity
+                key={sx}
+                style={[styles.sexChip, sex === sx && styles.optionSelected]}
+                onPress={() => setSex(sx)}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityState={{ selected: sex === sx }}
+                accessibilityLabel={sx === 'male' ? 'Male' : 'Female'}
+              >
+                <Text style={[styles.sexGlyph, sex === sx && styles.sexGlyphSelected]}>
+                  {sx === 'male' ? '\u2642' : '\u2640'}
+                </Text>
+                <Text style={styles.sexLabel}>{sx === 'male' ? 'MALE' : 'FEMALE'}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
         {step === 'race' && races.map((r) => {
           const statBumps = r.racialStatBonuses ?? {};
           const statBumpStrs = Object.entries(statBumps)
@@ -404,6 +434,24 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   optionSelected: { borderColor: '#c9a86a' },
+  // OTA-1439 — the ♂/♀ row. Same plate/border language as the option cards so
+  // the pick reads as part of the same form, not a foreign control.
+  sexRow: { flexDirection: 'row', gap: 8, marginBottom: 10 },
+  sexChip: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#13110f',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    paddingVertical: 10,
+    borderRadius: 4,
+  },
+  sexGlyph: { color: '#a2977b', fontSize: 20 },
+  sexGlyphSelected: { color: '#c9a86a' },
+  sexLabel: { color: '#cdbf99', fontSize: 12, letterSpacing: 2 },
   optionName: { color: '#e6d8b3', fontWeight: '700', fontSize: 14 },
   optionDesc: { color: '#cdbf99', fontSize: 12, marginTop: 2 },
   optionMeta: { color: '#a2977b', fontSize: 11, marginTop: 4, letterSpacing: 0.5 },

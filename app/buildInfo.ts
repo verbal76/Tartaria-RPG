@@ -24324,7 +24324,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1437 — a vendor whose tip cannot land now says so in one line instead of
 // delivering the whole reveal and then telling you it has not happened yet. The
 // tip still keeps; it just stops repeating itself.
-export const OTA_BUILD_ID = '2026-08-22-1437-ask-before-you-speak';
+// OTA-1438 — a trade counts once per VISIT, not once per line item, so dumping
+// fifteen pieces of junk on a vendor no longer makes you their regular.
+// OTA-1439 — the ♂/♀ pick at creation; strangers now say "sir"/"miss" until
+// they learn your name; the regular's bar moves to four visits.
+export const OTA_BUILD_ID = '2026-08-23-1439-what-strangers-call-you';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1437-ask-before-you-speak';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1436-one-hand-on-the-banner';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1435-marks-on-the-painting';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1434-the-sheet-leads-with-you';

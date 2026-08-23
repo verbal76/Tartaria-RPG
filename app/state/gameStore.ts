@@ -5850,8 +5850,8 @@ function emitVendorGreeting(
   const rel = getRelation(get().worldMemory, vendorNpcId(vendor));
   if (!rel || rel.meetings <= 1) return; // a stranger gets the arrival line, not a greeting
   const hours = player.hoursElapsed ?? 0;
-  get().appendLog('world', npcGreeting(rel, vendor.name, player.name));
-  const awayLine = npcAbsenceLine(rel, vendor.name, player.name, hours);
+  get().appendLog('world', npcGreeting(rel, vendor.name, player.name, player.sex));
+  const awayLine = npcAbsenceLine(rel, vendor.name, player.name, hours, player.sex);
   if (awayLine) get().appendLog('world', awayLine);
   const raid = raidNewsFor(get().worldMemory, rel, hours);
   if (raid) {
@@ -10350,7 +10350,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
       const wRel = getRelation(get().worldMemory, vendorNpcId(scene.wanderer));
       if (wRel && wRel.meetings > 1) {
-        get().appendLog('world', npcGreeting(wRel, scene.wanderer.name, get().player?.name));
+        get().appendLog('world', npcGreeting(wRel, scene.wanderer.name, get().player?.name, get().player?.sex));
         // OTA-1081 — a wanderer lifted clean on an earlier road notices the
         // loss when your paths cross again — and never looks at you.
         const wMumble = pocketLossMumble(wRel, scene.wanderer.name);
@@ -11176,8 +11176,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // off the meeting count, never rolled. An NPC who alternates between
         // knowing you and not reads as broken, not as varied.
         const rel = relNow;
-        get().appendLog('world', npcGreeting(rel, vendor.name, player.name));
-        const awayLine = npcAbsenceLine(rel, vendor.name, player.name, player.hoursElapsed ?? 0);
+        get().appendLog('world', npcGreeting(rel, vendor.name, player.name, player.sex));
+        const awayLine = npcAbsenceLine(rel, vendor.name, player.name, player.hoursElapsed ?? 0, player.sex);
         if (awayLine) get().appendLog('world', awayLine);
         // OTA-1081 — the delayed mumble: a pocket lifted CLEAN on an earlier
         // visit surfaces here, on the return, as them noticing the loss out

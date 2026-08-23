@@ -116,21 +116,47 @@ describe('OTA-1049 — the store writes the ledger', () => {
   });
 
   it('TC still accumulates across separate purchases', async () => {
+    // ⚠ OTA-1438 — TC accrues per transaction; the trade COUNT does not. Money
+    // that moved really moved, and the amends ledger and the TC rungs both read
+    // it. Only the count means "a piece of business".
     const store = await boot('Spender');
     store.getState().buyFromVendor('Rope', 1);
     const afterOne = rel(store)!.tcTraded;
     store.getState().buyFromVendor('Bandage', 1);
     expect(rel(store)!.tcTraded).toBeGreaterThan(afterOne);
-    expect(rel(store)!.trades).toBe(2);
+    expect(rel(store)!.trades).toBe(1);
   });
 
-  it('three separate visits to the counter make you a regular', async () => {
+  it('four separate visits to the counter make you a regular', async () => {
+    // ⚠⚠ OTA-1438 — THIS TEST'S NAME WAS ALWAYS RIGHT AND ITS BODY NEVER WAS.
+    // It said "three separate visits" and performed three purchases without the
+    // clock moving, which is one visit. It passed because `trades` counted line
+    // items, so the wrong setup produced the right number by accident — and the
+    // vocabulary gap hid the defect the owner eventually hit in play: three junk
+    // sales in one breath made a stranger a regular. The clock now advances
+    // between them, so the test does what it always claimed to.
     const store = await boot('Regular');
+    const step = (h: number) =>
+      store.setState((s) => ({ player: { ...s.player!, hoursElapsed: h } }));
+    step(4); store.getState().buyFromVendor('Rope', 1);
+    step(19); store.getState().buyFromVendor('Bandage', 1);
+    step(37); store.getState().buyFromVendor('Rope', 1);
+    // ⚠ OTA-1439 — the bar is FOUR visits now, by the owner's call.
+    expect(npcRegard(rel(store))).not.toBe('familiar');
+    step(55); store.getState().buyFromVendor('Bandage', 1);
+    expect(rel(store)!.trades).toBe(4);
+    expect(npcRegard(rel(store))).toBe('familiar');
+  });
+
+  it('⚠⚠ OTA-1438 — and three purchases in ONE visit do NOT', async () => {
+    // The defect, as the owner met it. Same three taps, same counter, no time
+    // passing: one piece of business, and not yet a regular.
+    const store = await boot('Dumper');
     store.getState().buyFromVendor('Rope', 1);
     store.getState().buyFromVendor('Bandage', 1);
     store.getState().buyFromVendor('Rope', 1);
-    expect(rel(store)!.trades).toBe(3);
-    expect(npcRegard(rel(store))).toBe('familiar');
+    expect(rel(store)!.trades).toBe(1);
+    expect(npcRegard(rel(store))).not.toBe('familiar');
   });
 
   it('the ledger is per-person — another trader knows nothing about it', async () => {

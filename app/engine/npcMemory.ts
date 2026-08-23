@@ -324,14 +324,41 @@ export function recordNpcDealing(
      *  a debt. `tcTraded` counts business in both directions, so inferring
      *  amends from it meant SELLING to someone you robbed settled the debt AND
      *  paid you for it. Restitution has to cost something. */
-    & { spent?: number },
+    & { spent?: number }
+    /** ⚠⚠ OTA-1438 — THE IN-GAME HOUR, so `trades` can mean VISITS. */
+    & { atHours?: number },
 ): WorldMemory {
   const seeded = seedRelationsFromMet(memory);
   const prev = seeded.npcRelations?.[id];
   if (!prev) return seeded;
+  // ⚠⚠ OTA-1438 — ONE TRADE PER VISIT. Owner: *"I think the advanced
+  // conversations unlock a little too quick. I use the fuse crucible 3 times
+  // with Halem and it unlocks most of his conversation tree."*
+  //
+  // `trades >= 3` is the `familiar` rung, and familiar opens two thirds of an
+  // NPC's topics. It was counting LINE ITEMS: the sell screen passes
+  // `social: i === 0` so a stack of twenty is one trade — but three DIFFERENT
+  // items are three separate calls, each one a fresh first unit. The owner's own
+  // log has fifteen sales to Bran inside four hundred milliseconds, which is
+  // fifteen trades and a stranger promoted twice over from one inventory dump.
+  //
+  // ⚠ The buy path already knew this shape — its comment says counting units
+  // "would let a stack purchase vault a stranger to trusted in a single tap" —
+  // and the guard it grew was per-stack, so it never covered the second item.
+  // This is the same rule one level up, where it should have been.
+  //
+  // Same-hour means same visit, which is the rule recordNpcSighting already uses
+  // for repeat-visit suppression. An ABSENT stamp credits: old relations simply
+  // start counting visits from here rather than being retro-promoted or
+  // retro-demoted.
+  const sameVisit = patch.atHours !== undefined && prev.lastTradeHours === patch.atHours;
+  const tradeCredit = sameVisit ? 0 : (patch.trades ?? 0);
   let next: NpcRelation = {
     ...prev,
-    trades: prev.trades + (patch.trades ?? 0),
+    trades: prev.trades + tradeCredit,
+    lastTradeHours: tradeCredit > 0 && patch.atHours !== undefined
+      ? patch.atHours
+      : prev.lastTradeHours,
     tcTraded: prev.tcTraded + (patch.tcTraded ?? 0),
     contractsTaken: prev.contractsTaken + (patch.contractsTaken ?? 0),
     contractsTurnedIn: prev.contractsTurnedIn + (patch.contractsTurnedIn ?? 0),
@@ -423,7 +450,10 @@ export function npcRegard(rel: NpcRelation | null | undefined): NpcRegard {
   if (!rel || rel.meetings <= 0) return 'stranger';
   if (rel.wrongs > 0) return 'wronged';
   if (rel.contractsTurnedIn >= 2 || rel.tcTraded >= TC_FOR_TRUSTED) return 'trusted';
-  if (rel.trades >= 3 || rel.contractsTurnedIn >= 1 || rel.tcTraded >= TC_FOR_FAMILIAR) return 'familiar';
+  // ⚠ OTA-1439 — FOUR visits, up from three, by the owner's call. Three was
+  // tuned when `trades` counted line items; OTA-1438 made a trade mean a VISIT,
+  // and with honest counting the owner set the regular's bar at four.
+  if (rel.trades >= 4 || rel.contractsTurnedIn >= 1 || rel.tcTraded >= TC_FOR_FAMILIAR) return 'familiar';
   // OTA-1050 — contractsTaken belongs on this rung. Slice 1 let it earn the
   // player's NAME (knowsPlayerName) but not any regard, so someone who had
   // handed you work was ranked below someone you had merely walked past three
@@ -557,10 +587,21 @@ export function longAbsence(rel: NpcRelation | null | undefined, hoursNow: numbe
 export function npcAddress(
   rel: NpcRelation | null | undefined,
   playerName: string | null | undefined,
+  sex?: 'male' | 'female' | null,
 ): string {
   const first = playerName?.trim().split(/\s+/)[0];
   if (!knowsPlayerName(rel) || !first) {
-    return npcRegard(rel) === 'wronged' ? 'you' : 'traveler';
+    // ⚠ OTA-1439 — SIR/MISS IS WHAT STRANGERS CALL YOU. The honorific slots
+    // into the exact rung where an NPC does not know your name yet, which is
+    // where address actually works that way: a shopkeeper says "sir" until
+    // they can say "Verbal", and the switch from one to the other is the
+    // relationship becoming visible in speech. No authored line changes —
+    // every {name} slot inherits it. 'wronged' keeps the cold bare 'you':
+    // civility is exactly what someone you robbed has withdrawn.
+    if (npcRegard(rel) === 'wronged') return 'you';
+    if (sex === 'male') return 'sir';
+    if (sex === 'female') return 'miss';
+    return 'traveler';
   }
   return first;
 }
@@ -615,13 +656,14 @@ export function npcGreeting(
   rel: NpcRelation | null | undefined,
   npcName: string,
   playerName: string | null | undefined,
+  sex?: 'male' | 'female' | null,
 ): string {
   const regard = npcRegard(rel);
   const pool = GREETINGS[regard];
   const idx = pool.length > 0 ? Math.abs(rel?.meetings ?? 0) % pool.length : 0;
   return (pool[idx] ?? '')
     .replace(/\{npc\}/g, npcName)
-    .replace(/\{name\}/g, npcAddress(rel, playerName));
+    .replace(/\{name\}/g, npcAddress(rel, playerName, sex));
 }
 
 /** The extra beat for someone you've been away from. Null when the tier has
@@ -631,13 +673,14 @@ export function npcAbsenceLine(
   npcName: string,
   playerName: string | null | undefined,
   hoursNow: number,
+  sex?: 'male' | 'female' | null,
 ): string | null {
   if (!longAbsence(rel, hoursNow)) return null;
   const line = ABSENCE_LINES[npcRegard(rel)];
   if (!line) return null;
   return line
     .replace(/\{npc\}/g, npcName)
-    .replace(/\{name\}/g, npcAddress(rel, playerName));
+    .replace(/\{name\}/g, npcAddress(rel, playerName, sex));
 }
 
 // ---------------------------------------------------------------------------

@@ -415,13 +415,13 @@ describe('OTA-1055 — they call the place by its name', () => {
   });
 
   it('THE BUG: the id was de-slugged into a lowercase non-name', () => {
-    const line = raidNewsLine(relAt({ trades: 3 }), raid(), 'Irma', 'Verbal');
+    const line = raidNewsLine(relAt({ trades: 4 /* OTA-1439: familiar bar moved 3→4 */ }), raid(), 'Irma', 'Verbal');
     expect(line).toContain('reclaimer stake'); // the old behaviour, kept as the migration fallback
     expect(line).not.toContain('_');
   });
 
   it('...and with the authored name stamped on, they say it properly', () => {
-    const line = raidNewsLine(relAt({ trades: 3 }), raid("Reclaimer's Stake"), 'Irma', 'Verbal');
+    const line = raidNewsLine(relAt({ trades: 4 }), raid("Reclaimer's Stake"), 'Irma', 'Verbal');
     expect(line).toContain("Reclaimer's Stake");
     expect(line).not.toContain('reclaimer stake');
   });
@@ -432,7 +432,7 @@ describe('OTA-1055 — they call the place by its name', () => {
   });
 
   it('a blank name falls back rather than leaving a hole in the sentence', () => {
-    const line = raidNewsLine(relAt({ trades: 3 }), { ...raid(), locationName: '   ' }, 'Irma', 'Verbal');
+    const line = raidNewsLine(relAt({ trades: 4 }), { ...raid(), locationName: '   ' }, 'Irma', 'Verbal');
     expect(line).toContain('reclaimer stake');
   });
 

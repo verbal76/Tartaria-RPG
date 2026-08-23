@@ -1019,6 +1019,11 @@ export interface PlayerCharacter {
   name: string;
   raceId: string;
   factionId: string;
+  /** ⚠ OTA-1439 — the sex picked at creation (♂/♀ on the race step). FLAVOR
+   *  ONLY: it feeds npcAddress's honorific ("sir"/"miss" from an NPC who does
+   *  not know your name yet) and nothing mechanical. Optional — saves predating
+   *  the pick simply keep hearing "traveler", which is what they always heard. */
+  sex?: 'male' | 'female';
   /** OTA-1018 — THE REASON YOU CAME DOWN. One of engine/story's five motive
    *  ids (debt / missing / exile / calling / record). Picked at character
    *  creation; saves that predate the feature are dealt one deterministically
@@ -2183,8 +2188,16 @@ export interface NpcRelation {
   prevSeenHours?: number;
   /** Scene arrivals in front of this NPC. NOT deduped; repetition is signal. */
   meetings: number;
-  /** Completed buy/sell transactions. */
+  /** Completed buy/sell transactions. ⚠ ONE PER VISIT — see recordNpcDealing's
+   *  `atHours`. Counting line items let three junk sales in one breath make a
+   *  stranger a regular (OTA-1438). */
   trades: number;
+  /** OTA-1438 — in-game hour of the last trade credited here, so a second
+   *  transaction in the same visit does not count as a second piece of
+   *  business. Absent on relations from before OTA-1438; an absent stamp
+   *  credits, which is the safe direction (it can only under-count, never
+   *  retro-promote). */
+  lastTradeHours?: number;
   /** TC moved across their table, either direction. */
   tcTraded: number;
   contractsTaken: number;
