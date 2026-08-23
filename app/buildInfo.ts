@@ -24355,7 +24355,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the faction emblem in the portrait's top-left corner, instead of a small
 // caption prefix at the bottom ("easily overlooked" — owner). Old saves
 // without the pick still show nothing.
-export const OTA_BUILD_ID = '2026-08-23-1443-the-sign-at-rank';
+// OTA-1444 — every veteran save completes the portrait. Characters from
+// before the ♂/♀ pick get asked ONCE, in the Arbiter's voice, the first time
+// they open the character sheet after this OTA ("The ledger grew a line").
+// Nothing preselected, confirm dead until a sign is chosen, write-once on the
+// record; backing out postpones to the next sheet visit. Race, faction, and
+// motive were already covered (creation requires the first two; the OTA-1022
+// one-time motive picker asks veterans the third on load), so sex was the one
+// missing field — now no save, however old, shows an incomplete banner.
+export const OTA_BUILD_ID = '2026-08-23-1444-the-ledger-grew-a-line';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1443-the-sign-at-rank';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1442-type-it-yourself';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1441-your-own-first-screen';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1439-what-strangers-call-you';

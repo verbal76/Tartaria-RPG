@@ -12,6 +12,9 @@ import { effectiveACBreakdown, playerArmorResistKinds } from '../state/combatRes
 import { FirstTimeHint } from '../components/FirstTimeHint';
 // OTA-1434 — who you are, at the top of the sheet.
 import { CharacterPortrait } from '../components/CharacterPortrait';
+// OTA-1444 — the one-time veteran ♂/♀ ask, raised here because this sheet is
+// where the incomplete banner would show.
+import { SexPickerModal } from '../components/SexPickerModal';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import { JOIN_THRESHOLD, BUY_REP_TC_PER_STANDING } from '../engine/factions';
@@ -199,6 +202,10 @@ export function CharacterScreen() {
           characterName={player.name}
           sex={player.sex}
         />
+        {/* ⚠ OTA-1444 — a save from before the ♂/♀ pick gets asked HERE, once,
+            the first time it opens the sheet the sign would be missing from.
+            The modal renders null for every character whose sex is recorded. */}
+        <SexPickerModal />
         {/* ── HEADER CARD ───────────────────────────────────────── */}
         <View style={styles.card}>
           <Text style={styles.name}>{player.name}</Text>

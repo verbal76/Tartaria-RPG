@@ -7095,6 +7095,10 @@ export interface GameStore {
   /** OTA-1022 — commit the pick (or the kept guess): sets the motive,
    *  marks it CHOSEN on the character (never asked again), persists. */
   confirmMotivePick: (motiveId: string) => void;
+  /** OTA-1444 — the one-time veteran ♂/♀ ask (SexPickerModal, raised on the
+   *  character sheet for saves that predate the OTA-1439 pick). Write-once:
+   *  a character whose sex is already recorded is never changed here. */
+  confirmSexPick: (sex: 'male' | 'female') => void;
   /** OTA-1027 — dog onboarding popup commit. Breed/name/sex arrive together from
    *  DogOnboardingModal (the typed three-step takeover is gone — a playtester
    *  couldn't tell the ask from a fight and "rest" became the breed). Applies
@@ -27977,6 +27981,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // under the old motive stay in the map, harmless and unread. Nothing is
     // re-asked and nothing is lost, because both facts are derived.
     raiseDueFork(get, set);
+  },
+
+  // ⚠ OTA-1444 — the one-time veteran ♂/♀ ask commits here. Same shape as the
+  // OTA-1022 motive picker one block up: the durable answer lives on the
+  // character, so the data IS the "asked" flag — no separate pending state to
+  // desync. WRITE-ONCE by the same rule the creation screen enforces with a
+  // dead NEXT button: a recorded answer is never flipped from this path, so a
+  // replayed tap (or anything else reaching this action late) cannot rewrite
+  // the record.
+  confirmSexPick(sex) {
+    const p = get().player;
+    if (!p || p.sex) return;
+    if (sex !== 'male' && sex !== 'female') return;
+    set({ player: { ...p, sex } });
+    get().appendLog(
+      'arbiter',
+      `The Arbiter adds one line to an old page. "So marked. The record keeps you whole now — the buried country will know how to address you before it learns your name."`,
+    );
+    void get().persist();
   },
 
   // OTA-1027 — the dog onboarding popup commits here; the shared finalization
