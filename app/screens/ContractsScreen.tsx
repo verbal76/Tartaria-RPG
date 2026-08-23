@@ -122,6 +122,34 @@ export function ContractsScreen() {
   // 2026-05-25 — branded refusal modal for hub-room gate. Same
   // palette as the rest of the game; replaces native Alert.alert.
   const [tab, setTab] = useState<Tab>('contracts');
+  // ⚠⚠⚠ OTA-1459 — ACTIVE / PARKED, BECAUSE THE WALL IS THE PROBLEM, NOT THE CAP.
+  //
+  // Owner's device log: in about ninety seconds at one market he accepted ELEVEN
+  // faction contracts, five mysteries and four storylines — twenty commitments. The
+  // Arbiter itself pushed back mid-flood ("You're stacking promises", "You can only
+  // walk one road at a time") and the UI let him keep going.
+  //
+  // ⚠⚠ AN OUTSIDE REVIEW READ THAT AS A MISSING CAP AND PROPOSED LIMITING ACTIVE
+  // CONTRACTS TO THREE. THAT CAP ALREADY EXISTS AND IS TIGHTER: exactly ONE stage-run
+  // may be tracked at a time (OTA-972 — "ONE definition of already running a
+  // contract"), and bounties have had MAX_ACTIVE_BOUNTIES = 3 since OTA-859. Nothing
+  // in the flood was mechanically wrong. All nineteen extras were PARKED, doing
+  // nothing, waiting.
+  //
+  // So the defect is presentation: one active row buried in nineteen parked ones,
+  // with no way to see either set on its own. This filters; it changes no rule.
+  //
+  // ⚠ DEFAULTS TO 'all' ON PURPOSE. A filter that hides rows the player did not ask
+  // to hide is how a contract goes missing and the screen starts lying — the same
+  // family as the atlas insisting you had not moved. Opt-in, never opt-out.
+  const [slate, setSlate] = useState<'all' | 'active' | 'parked'>('all');
+  /** Does a row with this tracked-flag survive the current filter?
+   *  ⚠ Applied ONLY to the four stage-run sections, which are the ones that carry a
+   *  tracked flag and the ones that flooded. Bounties, whispers, leads and sigils have
+   *  no parked state to filter on and are left whole rather than half-filtered. */
+  const passesSlate = (tracked: boolean): boolean =>
+    slate === 'all' || (slate === 'active' ? tracked : !tracked);
+
   // arb-fix — SORT BY DISTANCE. When on, each mission section (and the Primary
   // Objective's 9-Capital list) is ordered by how many MOVES it is to its target,
   // nearest first — but sections stay grouped by TYPE (we only sort WITHIN each
@@ -351,6 +379,25 @@ export function ContractsScreen() {
     rec,
     def: findFactionQuestById(rec.id),
   }));
+
+  /** Live counts for the slate chips.
+   *  ⚠ Derived from the SAME four lists the filter acts on, and derived HERE rather
+   *  than memoised higher up — the lists are rebuilt from the store on every render,
+   *  so a memo keyed on them would recompute anyway while adding a dependency array
+   *  that can go stale. A count computed from a different source than the rows it
+   *  describes is a second source of truth, and that is the bug this screen has been
+   *  bitten by twice today. */
+  const slateFlags: boolean[] = [
+    ...hunts.map((h) => h.run.tracked !== false),
+    ...mysteries.map((m) => m.run.tracked !== false),
+    ...storylines.map((sl) => sl.run.tracked !== false),
+    ...factionQuests.map((fq) => fq.rec.tracked !== false),
+  ];
+  const slateCounts = {
+    active: slateFlags.filter(Boolean).length,
+    parked: slateFlags.filter((f) => !f).length,
+    all: slateFlags.length,
+  };
 
   // Whispers (OTA 187) — the emergent Pittsburgh-loop chains. Tipped
   // off by non-vendor NPCs in hubs, tracked here so they're not lost
@@ -778,6 +825,31 @@ export function ContractsScreen() {
           </TouchableOpacity>
         );
       })()}
+
+      {/* ⚠ OTA-1459 — the slate filter. Only rendered when there is actually a wall
+          to cut through: below a handful of commitments it would be one more control
+          for no gain, and an empty filter row on a fresh save teaches nothing. */}
+      {tab === 'contracts' && slateCounts.all > 3 && (
+        <View style={styles.slateRow} accessibilityRole="tablist">
+          {([
+            ['all', `ALL (${slateCounts.all})`],
+            ['active', `ACTIVE (${slateCounts.active})`],
+            ['parked', `PARKED (${slateCounts.parked})`],
+          ] as const).map(([key, label]) => (
+            <TouchableOpacity
+              key={key}
+              onPress={() => setSlate(key)}
+              style={[styles.slateBtn, slate === key && styles.slateBtnOn]}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityState={{ selected: slate === key }}
+              accessibilityLabel={`Show ${label}`}
+            >
+              <Text style={[styles.slateBtnText, slate === key && styles.slateBtnTextOn]}>{label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
 
       <View style={styles.tabRow}>
         <TouchableOpacity
@@ -1219,7 +1291,7 @@ export function ContractsScreen() {
         {hunts.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle} accessibilityRole="header">HUNTS</Text>
-              {byMoves(hunts, (h) => markerLocId(`h_${h.run.id}`), (h) => stageRunReady('hunt', h.run, h.def)).map(({ run, def }) => {
+              {byMoves(hunts.filter((h) => passesSlate(h.run.tracked !== false)), (h) => markerLocId(`h_${h.run.id}`), (h) => stageRunReady('hunt', h.run, h.def)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `h_${run.id}`;
                 const open = !!expanded[key];
@@ -1369,7 +1441,7 @@ export function ContractsScreen() {
           {mysteries.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle} accessibilityRole="header">MYSTERIES</Text>
-              {byMoves(mysteries, (m) => markerLocId(`m_${m.run.id}`), (m) => stageRunReady('mystery', m.run, m.def)).map(({ run, def }) => {
+              {byMoves(mysteries.filter((m) => passesSlate(m.run.tracked !== false)), (m) => markerLocId(`m_${m.run.id}`), (m) => stageRunReady('mystery', m.run, m.def)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `m_${run.id}`;
                 const open = !!expanded[key];
@@ -1439,7 +1511,7 @@ export function ContractsScreen() {
           {storylines.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle} accessibilityRole="header">STORYLINES</Text>
-              {byMoves(storylines, (sl) => markerLocId(`s_${sl.run.id}`), (sl) => stageRunReady('storyline', sl.run, sl.def)).map(({ run, def }) => {
+              {byMoves(storylines.filter((sl) => passesSlate(sl.run.tracked !== false)), (sl) => markerLocId(`s_${sl.run.id}`), (sl) => stageRunReady('storyline', sl.run, sl.def)).map(({ run, def }) => {
                 if (!def) return null;
                 const key = `s_${run.id}`;
                 const open = !!expanded[key];
@@ -1509,7 +1581,7 @@ export function ContractsScreen() {
           {factionQuests.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle} accessibilityRole="header">FACTION QUESTS</Text>
-              {byMoves(factionQuests, (fq) => factionSortLocId(fq), (fq) => factionRecReady(fq.rec, fq.def)).map(({ rec, def }, i) => {
+              {byMoves(factionQuests.filter((fq) => passesSlate(fq.rec.tracked !== false)), (fq) => factionSortLocId(fq), (fq) => factionRecReady(fq.rec, fq.def)).map(({ rec, def }, i) => {
                 if (!def) return null;
                 const key = `q_${def.id}_${i}`;
                 const open = !!expanded[key];
@@ -2371,6 +2443,18 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   content: { paddingBottom: 32 },
   section: { marginBottom: 14 },
+  // ⚠ OTA-1459 — the slate filter chips. Outlined, never filled: OTA-1454 reserved a
+  // solid fill for the turn-ending strike, and a view toggle is the mildest control on
+  // the screen. The SELECTED chip is marked by a brighter border and text rather than a
+  // fill, so it reads as "this one" without shouting.
+  slateRow: { flexDirection: 'row', gap: 6, paddingHorizontal: 10, paddingBottom: 6 },
+  slateBtn: {
+    borderColor: '#3a342c', borderWidth: 1, backgroundColor: '#12100e',
+    borderRadius: 4, paddingVertical: 5, paddingHorizontal: 10,
+  },
+  slateBtnOn: { borderColor: '#c9a86a' },
+  slateBtnText: { color: '#8a8070', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
+  slateBtnTextOn: { color: '#c9a86a' },
   sectionTitle: {
     color: '#c9a86a',
     fontSize: 12,

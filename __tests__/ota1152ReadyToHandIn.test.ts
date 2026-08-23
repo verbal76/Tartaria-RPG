@@ -135,14 +135,40 @@ describe('OTA-1152 — category lock: NO SECTION IS LEFT OUT OF THE FLOAT', () =
   // The named failure mode: wire the button to one kind and the other kinds
   // never rise. Every sortable section that CAN be handed in must pass its
   // readiness accessor to byMoves, and every kind must appear in the roll-up.
+  // ⚠⚠⚠ REBUILT BY OTA-1459 — THE SEVENTH LABEL-SHAPED PIN IN THREE DAYS.
+  //
+  // The CLAIM is in the describe title and it is a good one: no section may be
+  // left out of the ready-float. The old pattern asserted it by matching the
+  // literal `byMoves(hunts,` — the list expression itself — so adding a filter to
+  // that expression (`byMoves(hunts.filter(...), ...)`) failed a test about
+  // READINESS ACCESSORS. The accessor was never touched.
+  //
+  // ⚠ The list expression is not the claim. It is going to keep changing: it has
+  // now grown a slate filter and will grow sorting and paging next. What must not
+  // change is that each section HANDS byMoves A READINESS ACCESSOR — so that is
+  // what is asserted, anchored on the section's own accessor rather than on the
+  // shape of the argument in front of it.
   it('all four contract sections pass a readiness accessor to byMoves', () => {
-    // Bounded spans, not [^)]* — the locOf argument is itself a call, so a
-    // paren-excluding pattern can never reach the readiness argument and the
-    // lock would fail on correct code.
-    expect(SCREEN).toMatch(/byMoves\(hunts,[\s\S]{0,160}?stageRunReady\('hunt'/);
-    expect(SCREEN).toMatch(/byMoves\(mysteries,[\s\S]{0,160}?stageRunReady\('mystery'/);
-    expect(SCREEN).toMatch(/byMoves\(storylines,[\s\S]{0,160}?stageRunReady\('storyline'/);
-    expect(SCREEN).toMatch(/byMoves\(factionQuests,[\s\S]{0,160}?factionRecReady/);
+    // Each entry: the list byMoves is called on, and the readiness accessor that
+    // call must reach. The span is generous because the list expression is free
+    // to grow — filters, sorts, whatever comes next.
+    const sections: Array<[string, string]> = [
+      ['hunts', "stageRunReady('hunt'"],
+      ['mysteries', "stageRunReady('mystery'"],
+      ['storylines', "stageRunReady('storyline'"],
+      ['factionQuests', 'factionRecReady'],
+    ];
+    for (const [list, ready] of sections) {
+      const call = SCREEN.indexOf(`byMoves(${list}`);
+      expect({ list, found: call }).toEqual({ list, found: expect.any(Number) });
+      expect(call).toBeGreaterThan(-1);
+      // …and the readiness accessor appears inside THAT call, not somewhere else
+      // in the file: bounded to the span between this call and the `.map(` that
+      // consumes it.
+      const consumed = SCREEN.indexOf('.map(', call);
+      expect(consumed).toBeGreaterThan(call);
+      expect(SCREEN.slice(call, consumed)).toContain(ready);
+    }
   });
 
   it('the roll-up gathers all five turn-in-able kinds', () => {
@@ -188,7 +214,15 @@ describe('OTA-1152 — the two sort buttons are one mode', () => {
     // hands in at, not to the objective. The sort read the objective, so the
     // ordering disagreed with the printed number on exactly the cards this
     // feature is about.
+    //
+    // ⚠ REBUILT BY OTA-1459 alongside its sibling above, for the same reason: this
+    // matched `byMoves(factionQuests,` immediately followed by the sort key, so a
+    // filter added to the list broke a test about WHICH LOCATION THE SORT READS.
     expect(SCREEN).toContain('factionSortLocId');
-    expect(SCREEN).toMatch(/byMoves\(factionQuests,\s*\(fq\) => factionSortLocId\(fq\)/);
+    const call = SCREEN.indexOf('byMoves(factionQuests');
+    expect(call).toBeGreaterThan(-1);
+    const consumed = SCREEN.indexOf('.map(', call);
+    // The sort key inside that call is the one the CARD displays, not the objective.
+    expect(SCREEN.slice(call, consumed)).toContain('factionSortLocId(fq)');
   });
 });

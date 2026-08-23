@@ -203,6 +203,8 @@ import {
 // OTA: single-owner state moves WITH its owner, shared state moves DOWN.
 import { notePlayerActionForSprint, playerIsSprinting, _resetSprintForTest } from './sprint';
 import { playerGridCell } from './playerGrid';
+// ⚠ OTA-1459 — the bounty nudge's in-game-hours cooldown.
+import { takeBountyNudge } from '../engine/arbiterNudge';
 import { noteVisibleLogLine, visibleLogTotal, _resetVisibleLogCountForTest } from './visibleLogCount';
 // ⚠⚠ OTA-1404 — SLICE 10. Combat resolution — the counter-swing, the group
 // volley, armour and AC, stagger, damage-type procs and their DOTs, the dog
@@ -363,7 +365,7 @@ import { pickWastelandEncounter, RECENT_ENCOUNTER_MEMORY } from '../engine/waste
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
-import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGraceApplies, escapePursuit } from '../engine/combatRules';
+import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGraceApplies, escapePursuit, FLEE_STAMINA_COST } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
@@ -3731,7 +3733,13 @@ function worldTideCheck(
     // Only PLAYER-directed nudges reach the exploration feed (a posted bounty). The
     // ambient world churn stays on the board so it never clutters play.
     if (ev.effect.musterPatrols) musterPatrols(get, set, factions, ev.effect.musterPatrols.factionId, ev.effect.musterPatrols.count);
-    if (ev.effect.offerBounty) {
+    // ⚠⚠ OTA-1459 — ON A COOLDOWN NOW, MEASURED IN GAME HOURS. This call site never
+    // joined `narration.ts`'s flavour choke point, so nothing ever budgeted it: the
+    // world tick fires whenever TIME passes, the player advances time in 8-hour
+    // rests, and the owner's log has him resting fifteen times in four real minutes.
+    // Seven identical lines, five of them caught only by the near-duplicate guard —
+    // which is a last resort, not a voice. See engine/arbiterNudge.ts.
+    if (ev.effect.offerBounty && takeBountyNudge(hour)) {
       get().appendLog('arbiter', `"There's coin on the board for a willing blade," the Arbiter says. "Read the World."`);
     }
   }
@@ -21832,6 +21840,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ? { currentScene: { ...s.currentScene, ...FRESH_ENEMY_ARRAYS, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null } }
                 : s));
             }
+            // ⚠⚠⚠ OTA-1459 — RUNNING COSTS SOMETHING NOW. See FLEE_STAMINA_COST.
+            //
+            // ⚠⚠ AND IT IS CHARGED AFTER THE ESCAPE, NEVER AS A GATE ON IT. Fleeing
+            // must remain possible at zero stamina, always. A player cornered by
+            // something that outclasses them, with an empty tank, must not be held in
+            // a fight they cannot win by a resource rule — that is a softlock wearing
+            // the costume of a difficulty knob. `Math.max(0, …)` is the whole safety
+            // property: the cost lands where there is stamina to take, and where there
+            // is none the escape still happens for free.
+            set((s) => (s.player
+              ? { player: { ...s.player, stamina: Math.max(0, s.player.stamina - FLEE_STAMINA_COST) } }
+              : s));
             // OTA-455 — the first-steps grace caught this one. Mark the near miss
             // so the player feels the danger without being trapped by it.
             if (fleeGraceSaved) {

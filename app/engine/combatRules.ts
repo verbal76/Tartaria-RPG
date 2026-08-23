@@ -687,6 +687,19 @@ export function parseDamageDice(notation: string): { sides: number; count: numbe
  *  grows monotonically to its cap, never returns to ≤3 — so this reliably means
  *  "brand-new character"). The flee stays a real roll everywhere else. */
 export const FLEE_GRACE_STEPS = 3;
+
+/** ⚠⚠⚠ OTA-1459 — WHAT RUNNING COSTS. Owner's device log: he fled NINE of twelve
+ *  encounters and won every escape roll. The only price was fifteen minutes of
+ *  clock, which he was already spending eight hours at a time resting away. With no
+ *  cost and a near-certain roll, "flee" is not a decision — it is the button that
+ *  makes the fight go away, and the whole combat system becomes optional friction.
+ *
+ *  ⚠ FLAT, AND MODEST. His stamina pool ran 8–17, so 3 is roughly one free escape
+ *  per rest: enough that a second flight in the same stretch is a real choice,
+ *  nowhere near enough to feel like a punishment for retreating from something that
+ *  would kill you. Retreat should stay a legitimate tactic; it just should not be
+ *  cheaper than thinking. */
+export const FLEE_STAMINA_COST = 3;
 export function fleeGraceApplies(intent: string, skillSucceeded: boolean, tilesSeen: number): boolean {
   return intent === 'escape' && !skillSucceeded && tilesSeen <= FLEE_GRACE_STEPS;
 }
