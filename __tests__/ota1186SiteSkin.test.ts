@@ -22,6 +22,8 @@ import {
   hubNameForFaction,
   findHubRoom,
   HUB,
+  isLostCapitalHub,
+  hubDisplayNameFor,
 } from '../app/engine/hub';
 import { FACTION_STARTING_LOCATION } from '../app/engine/character';
 import fs from 'fs';
@@ -67,13 +69,71 @@ describe('⚠⚠ OTA-1186 — nine sites move, and NOTHING else does', () => {
     expect(hubSkinFactionFor('monarch_waystation', 'mud_monarchs')).toBe('mud_monarchs');
   });
 
-  test('⚠⚠ an UNOWNED site falls back to the player — today’s behaviour, unchanged', () => {
-    // The first version returned null here, reasoning that neutral ground should read as
-    // neutral. That is wrong on the data: hubNameForFaction(null) resolves to HUB.hubName,
-    // which is "Reclaimers' Outpost" — so it would have renamed four LOST CAPITALS, owned
-    // by nobody and Reclaimer in no sense, to the Reclaimers' Outpost.
-    expect(hubSkinFactionFor('asgardar', 'mud_monarchs')).toBe('mud_monarchs');
+  // ⚠⚠⚠ REBUILT BY OTA-1458, AND THE SPLIT IS THE WHOLE POINT. This was one test
+  // asserting one rule — "an UNOWNED site falls back to the player" — over two cases
+  // that turned out to want opposite answers. The owner, from his device log, walking
+  // into a sealed pre-flood capital: *"[world] You've left The Hidden Market and
+  // entered Drakova. A Lost Capital. [world] You pass through the gate into Monarch
+  // Court — The Atrium."* He called that an error. A drowned city cannot present the
+  // Mud Monarchs' toll-court because the visitor happens to be a Monarch — that is
+  // precisely the defect OTA-1186 set out to kill, surviving in the places nobody
+  // holds.
+  //
+  // ⚠ OTA-1186'S OBJECTION WAS REAL AND IS NOW ANSWERED, NOT OVERRULED. It declined
+  // to return null because `hubNameForFaction(null)` resolves to "Reclaimers' Outpost"
+  // — a worse lie. `hubDisplayNameFor` now names an unheld capital after ITSELF, so
+  // the objection no longer applies. The reasoning was sound; the missing piece was
+  // the namer.
+  //
+  // ⚠ AND HALF THE OLD CLAIM SURVIVES INTACT. `tartarian_outskirts` is unowned too,
+  // and genuinely IS the Reclaimers' Outpost (static_hub.json still anchors HUB.hubName
+  // there), so the player fallback stays exactly right for it. Splitting the test is
+  // what makes both halves testable; the old one could only be right about one.
+  test('⚠⚠⚠ an unheld CAPITAL wears NOBODY’s colours — not even the visitor’s', () => {
+    for (const capital of ['asgardar', 'drakova', 'buried_cities', 'giant_vault']) {
+      expect(hubSkinFactionFor(capital, 'mud_monarchs')).toBeNull();
+      expect(hubSkinFactionFor(capital, 'stone_builders')).toBeNull();
+      expect(isLostCapitalHub(capital)).toBe(true);
+    }
+  });
+
+  test('⚠⚠⚠ …and ALL FOUR are found — the first derivation silently missed two', () => {
+    // The first version of this derived the set from the macro-region ladder
+    // (LOCATION_TO_MACRO === 'lost_capitals'). It matched Drakova and Asgardar and
+    // MISSED Giant Vault (filed under aetherstone_deep) and Buried Cities (silt_wastes)
+    // — the ladder classifies by GEOGRAPHY, not by who holds a place. Two of the four
+    // would have shipped still wearing the player's colours, with nothing failing.
+    // Ownership is the property actually in question, so ownership is what it reads.
+    const found = ['asgardar', 'drakova', 'buried_cities', 'giant_vault']
+      .filter((id) => isLostCapitalHub(id));
+    expect(found).toHaveLength(4);
+  });
+
+  test('⚠⚠ an unheld capital NAMES ITSELF — the objection OTA-1186 raised is closed', () => {
+    // The failure this forbids is the one that stopped OTA-1186 making this change:
+    // a capital renamed to somebody else's outpost. Both wrong answers are checked,
+    // not just the one we happen to produce today.
+    for (const [id, name] of [['drakova', 'Drakova'], ['giant_vault', 'The Giant Vault']] as const) {
+      const shown = hubDisplayNameFor(id, 'mud_monarchs');
+      expect(shown).toBe(name);
+      expect(shown).not.toBe(HUB.hubName);              // not "Reclaimers' Outpost"
+      expect(shown).not.toBe(hubNameForFaction('mud_monarchs')); // not the visitor's
+    }
+  });
+
+  test('⚠⚠ an unowned NON-capital still falls back to the player — unchanged', () => {
+    // The surviving half of OTA-1186's claim. tartarian_outskirts is unowned but is
+    // the Reclaimers' Outpost in fact, so the visitor fallback is correct there.
     expect(hubSkinFactionFor('tartarian_outskirts', 'stone_builders')).toBe('stone_builders');
+    expect(isLostCapitalHub('tartarian_outskirts')).toBe(false);
+  });
+
+  test('⚠⚠ AND THE NINE OWNED SITES DID NOT MOVE — this OTA touches only the unheld', () => {
+    // The regression that would matter most: breaking the thing OTA-1186 built while
+    // correcting its edge case.
+    expect(hubSkinFactionFor('architect_blind', 'mud_monarchs')).toBe('conspiracy_architects');
+    expect(hubSkinFactionFor('monarch_waystation', 'stone_builders')).toBe('mud_monarchs');
+    expect(hubSkinFactionFor('varakush', 'mud_monarchs')).toBe('forgotten_order');
   });
 
   test('⚠ the premise of that fallback — the neutral name really is a faction’s', () => {

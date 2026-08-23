@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, Dimensions } from 'react-native';
+// ⚠⚠ OTA-1458 — "am I standing at X?" is a grid-cell question, asked once.
+import { standingAtLocation } from '../engine/standingAt';
 import { useGameStore } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { bountyKey, bountyHoursLeft, BOUNTY_DEADLINE_HOURS } from '../engine/factionBounty';
@@ -219,7 +221,7 @@ export function ContractsScreen() {
         </Text>
       );
     }
-    if (player?.currentLocationId === info.anchorId) {
+    if (standingAtLocation(player, info.anchorId)) {
       return <Text style={styles.routeHereNote}>▸ {info.number}◆ You're at {info.anchorName}.</Text>;
     }
     return (
@@ -665,7 +667,7 @@ export function ContractsScreen() {
                   const def = GUARDIANS_BY_CAPITAL[capId];
                   const recovered = mq.coresRecovered.includes(capId);
                   const guardianDown = (mq.guardiansDefeated ?? []).includes(capId);
-                  const here = player.currentLocationId === capId;
+                  const here = standingAtLocation(player, capId);
                   const fleeCount = fledByCapital[capId] ?? 0;
                   let status: string;
                   let color: string;
@@ -952,7 +954,7 @@ export function ContractsScreen() {
                         (`currentLocationId: climb.locationId`) instead of
                         travelling, so the route was never once exercised. */}
                     {!done && movesLine(c.locationId)}
-                    {!done && player?.currentLocationId !== c.locationId && (
+                    {!done && !standingAtLocation(player, c.locationId) && (
                       <Pressable
                         style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                         onPress={() => setPendingRoute({ id: c.locationId, name: safeLocName(c.locationId), climbId: c.id })}
@@ -961,7 +963,7 @@ export function ContractsScreen() {
                         <Text style={styles.routeBtnText}>▸ SET COURSE TO {safeLocName(c.locationId).toUpperCase()}</Text>
                       </Pressable>
                     )}
-                    {!done && player?.currentLocationId === c.locationId && (
+                    {!done && standingAtLocation(player, c.locationId) && (
                       <Text style={styles.routeHereNote}>▸ You're here — start the climb.</Text>
                     )}
                     {/* ⚠ OTA-1361 — THE TOWERS TOGGLE LIKE EVERY OTHER MISSION.
@@ -1555,7 +1557,7 @@ export function ContractsScreen() {
                       // carrying the stale flag.
                       const courseLive = !!player?.travelTarget || !!player?.whisperCourse;
                       const routed = courseLive && player?.routedMission?.id === def.id;
-                      const atObj = player?.currentLocationId === objId;
+                      const atObj = standingAtLocation(player, objId);
                       if (routed) {
                         const phase = player?.routedMission?.phase;
                         return (
@@ -1695,7 +1697,7 @@ export function ContractsScreen() {
                 {brokerLegs.map((l) => {
                   const inHand = hasRelic(l.itemName);
                   const here =
-                    player?.currentLocationId === l.tileId;
+                    standingAtLocation(player, l.tileId);
                   return (
                     <View key={`broker_${l.factionId}`} style={{ marginTop: 8 }}>
                       <Text style={styles.cardStageLabel}>{l.factionName}</Text>
@@ -1727,7 +1729,7 @@ export function ContractsScreen() {
                     : 'Bring both relics to the Parley Ground, then SEAL THE ALLIANCE.'}
                 </Text>
                 {movesLine('parley_ground')}
-                {player?.currentLocationId !== 'parley_ground' && (
+                {!standingAtLocation(player, 'parley_ground') && (
                   <Pressable
                     style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                     onPress={() => setPendingRoute({ id: 'parley_ground', name: safeLocName('parley_ground') })}
@@ -1881,8 +1883,8 @@ export function ContractsScreen() {
               {byMoves(carriedSigils(player.inventory), (sg) => sg.tileId).map((sg) => {
                 // OTA-783 — the Hidden Market brokers any faction's sigil, so the
                 // RETURN button lights up there too, not only at the home stake.
-                const atMarket = player.currentLocationId === 'hidden_market';
-                const here = player.currentLocationId === sg.tileId || atMarket;
+                const atMarket = standingAtLocation(player, 'hidden_market');
+                const here = standingAtLocation(player, sg.tileId) || atMarket;
                 const qty = sg.item.quantity > 1 ? ` ×${sg.item.quantity}` : '';
                 return (
                   <View key={`sigil_${sg.item.id}`} style={styles.card}>

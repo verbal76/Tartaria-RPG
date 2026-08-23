@@ -49,7 +49,9 @@ import { revealedLocationName, isLocationRevealed, isHiddenLocation, HIDDEN_LOCA
 import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { openContractMarkers, type ContractFamily } from '../engine/contractMarkers';
 import { LOCATION_TO_MACRO } from '../engine/worldLadder';
-import { isHubLocation, hubRoomFor, hubNameForFaction, hubSkinFactionFor, hubExitRooms } from '../engine/hub';
+import { isHubLocation, hubRoomFor, hubNameForFaction, hubDisplayNameFor, hubSkinFactionFor, hubExitRooms } from '../engine/hub';
+// ⚠⚠ OTA-1458 — "am I standing at X?" is a GRID-CELL question, asked once.
+import { standingAtLocation } from '../engine/standingAt';
 import { buildingMap } from '../engine/buildingMaps';
 import {
   outpostRoomMark, INTERIOR_MARKER_LIFT_FRAC, INTERIOR_VISITED_DROP_FRAC,
@@ -103,8 +105,21 @@ function cardinalBetween(from: { fx: number; fy: number }, to: { fx: number; fy:
   return (ns + ew) || 'close by';
 }
 /** A verbal "you are near …" line built from the canon atlas layout. */
-function describeWhereabouts(locId: string, locs: Location[]): string {
-  const here = LOCATION_ATLAS_COORDS[locId] ?? atlasCoordForLocation(locId);
+// ⚠⚠ OTA-1458 — `here` IS THE PLAYER'S OWN FRACTION NOW, not a location's.
+// The footer used to describe the neighbours of `currentLocationId` — the last
+// NAMED place walked through — so four tiles west of the Hidden Market it still
+// read "Near the Hidden Market", naming a place the player had left. The marker
+// above it was already honest (OTA-1347); this is the sentence catching up.
+//
+// ⚠ `region` still comes from the location id, deliberately: macro-regions are
+// defined per named place and there is no cell→region map. Being one region-name
+// stale at the boundary is a far smaller lie than naming the wrong landmarks, and
+// unlike the landmarks it is not what the player is using to find themselves.
+function describeWhereabouts(
+  here: { fx: number; fy: number } | null,
+  locId: string,
+  locs: Location[],
+): string {
   if (!here) return '';
   const region = REGION_DISPLAY[LOCATION_TO_MACRO[locId] ?? ''] ?? '';
   const near = locs
@@ -930,7 +945,7 @@ export function MapScreen() {
     ? hubRoomFor(player?.hubRoomId, hubSkinFactionFor(player?.currentLocationId, player?.factionId))
     : null;
   const hubLabel = inHub
-    ? `${hubNameForFaction(hubSkinFactionFor(player?.currentLocationId, player?.factionId))} — ${hubRoomDisplay?.name ?? 'Hub'}`
+    ? `${hubDisplayNameFor(player?.currentLocationId, player?.factionId)} — ${hubRoomDisplay?.name ?? 'Hub'}`
     : null;
   const whereLine = hubLabel
     ?? (atCenter && currentLocation
@@ -944,8 +959,8 @@ export function MapScreen() {
   // neighbours is orientation the pulsing dot cannot give. Inside a hub we just
   // name the outpost; out in the world we describe the region + nearest landmarks.
   const whereaboutsLine = inHub
-    ? `Inside the ${hubNameForFaction(hubSkinFactionFor(player?.currentLocationId, player?.factionId))} — a fixed outpost interior.`
-    : describeWhereabouts(player.currentLocationId, LOCATIONS);
+    ? `Inside the ${hubDisplayNameFor(player?.currentLocationId, player?.factionId)} — a fixed outpost interior.`
+    : describeWhereabouts(markerFraction(playerGridCell(player).x, playerGridCell(player).y), player.currentLocationId, LOCATIONS);
 
   return (
     <View style={styles.container}>
@@ -1147,7 +1162,7 @@ export function MapScreen() {
         ) : null}
         <Text style={styles.footerDist}>
           {inHub
-            ? `Inside the ${hubNameForFaction(hubSkinFactionFor(player?.currentLocationId, player?.factionId))}.`
+            ? `Inside the ${hubDisplayNameFor(player?.currentLocationId, player?.factionId)}.`
             : tiles === 0
               ? `At ${fromName}.`
               : `${tiles} day${tiles === 1 ? '' : 's'} of travel from ${fromName}.`}
@@ -1192,7 +1207,8 @@ export function MapScreen() {
               <Text style={styles.contractSectionTitle} accessibilityRole="header">◆ OPEN CONTRACTS</Text>
               {contractMarkers.map((cm) => {
                 const info = placesView.find((p) => p.id === cm.anchorId);
-                const isHere = player?.currentLocationId === cm.anchorId;
+                // ⚠ OTA-1458 — same question, same answer (see the ALL PLACES row).
+                const isHere = standingAtLocation(player, cm.anchorId);
                 const anchorName = info?.name ?? cm.label;
                 return (
                   <TouchableOpacity
@@ -1269,7 +1285,11 @@ export function MapScreen() {
             </>
           )}
           {placesView.map((p) => {
-            const isHere = player?.currentLocationId === p.id;
+            // ⚠⚠⚠ OTA-1458 — THE OWNER'S BUG, EXACTLY HERE. An id compare marks the
+            // last NAMED place as "here" for as long as the player wanders open
+            // ground, so the row renders as You're-here instead of a route button
+            // and the atlas refuses to send you back to a place you have left.
+            const isHere = standingAtLocation(player, p.id);
             // OTA-498 — a hidden location reads as "?" (routable) until visited.
             const hidden = isHiddenLocation(p.id) && !isLocationRevealed(p.id, discoveredIds);
             const rowName = revealedLocationName(p.id, p.name, discoveredIds);

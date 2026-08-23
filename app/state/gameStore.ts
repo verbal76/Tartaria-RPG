@@ -439,7 +439,7 @@ import {
   hubRoomFor,
   hubRoomOpenAir,
   hubEntryRoomId,
-  hubNameForFaction,
+  hubNameForFaction, hubDisplayNameFor,
   hubSkinFactionFor,
   hubOwnerFaction,
   findHubRoom,
@@ -10689,7 +10689,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // entirely — its location-pool prose doesn't apply when you're
     // standing inside a hand-authored room.
     const sceneText = hubRoom
-      ? `${hubNameForFaction(hubSkinFactionFor(player.currentLocationId, player.factionId))} — ${hubRoom.name}. ${hubRoom.description}`
+      ? `${hubDisplayNameFor(player.currentLocationId, player.factionId)} — ${hubRoom.name}. ${hubRoom.description}`
       : buildScene({ weather, location, hazard, enemy: sceneEnemy, quest: player.activeQuests[0] });
     // Opening scene — emit a three-paragraph introduction narrative as
     // SEPARATE log entries so AdventureFeed renders real paragraph
@@ -10710,7 +10710,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         location,
         hubRoomName: hubRoom?.name ?? null,
         hubRoomDescription: hubRoom?.description ?? null,
-        hubName: hubNameForFaction(hubSkinFactionFor(player.currentLocationId, player.factionId)),
+        hubName: hubDisplayNameFor(player.currentLocationId, player.factionId),
       });
       get().appendLog('world', p1);
       get().appendLog('world', p2);
@@ -10750,7 +10750,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         && !livePlayerForHubHint.milestones?.firstOutpostHintShown
         && get().tutorialStep === null
       ) {
-        const hubLabel = hubNameForFaction(hubSkinFactionFor(livePlayerForHubHint.currentLocationId, livePlayerForHubHint.factionId))
+        const hubLabel = hubDisplayNameFor(livePlayerForHubHint.currentLocationId, livePlayerForHubHint.factionId)
           || hubRoom?.name
           || 'the outpost';
         get().appendLog(
@@ -10842,7 +10842,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (hubRoom) {
         get().appendLog(
           'world',
-          `You pass through the gate into ${hubNameForFaction(hubSkinFactionFor(player.currentLocationId, player.factionId))} — ${hubRoom.name}. ${hubRoom.description}`,
+          `You pass through the gate into ${hubDisplayNameFor(player.currentLocationId, player.factionId)} — ${hubRoom.name}. ${hubRoom.description}`,
         );
       }
     } else {

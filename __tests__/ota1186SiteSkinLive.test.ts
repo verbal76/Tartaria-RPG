@@ -112,14 +112,55 @@ describe('OTA-1186 — live: a foreign site reads as its owner', () => {
     expect(feedSince(mark)).toContain(hubNameForFaction('mud_monarchs'));
   });
 
-  test('⚠ at an UNOWNED site (a lost capital) nothing changed — still the visitor’s', async () => {
+  // ⚠⚠⚠ REBUILT BY OTA-1458. This asserted OTA-1186's deliberate scope limit —
+  // "at an UNOWNED site nothing changed — still the visitor's" — end to end, and the
+  // owner has since called that behaviour an error from his own device log:
+  //
+  //   [world] You've left The Hidden Market and entered Drakova. A Lost Capital.
+  //   [world] You pass through the gate into Monarch Court — The Atrium.
+  //   [world] Paths: north to Standards · south to First Landing.
+  //
+  // A sealed pre-flood city presenting the Mud Monarchs' toll-court, with the Monarchs'
+  // own room names, because the visitor happens to be a Monarch.
+  //
+  // ⚠⚠ AND IT IS REBUILT AS THE OPPOSITE CLAIM AT FULL STRENGTH, not merely inverted.
+  // Three separate wrong answers are forbidden — the visitor's colours, the Reclaimers'
+  // (the trap that stopped OTA-1186 making this change), and the Monarch room NAMES
+  // that were the visible symptom in the log. Checking only "not the visitor's" would
+  // pass on a capital renamed to somebody else's outpost, which is the failure mode
+  // OTA-1186 correctly refused to ship.
+  test('⚠⚠⚠ an unheld capital presents ITSELF — nobody’s colours, nobody’s rooms', async () => {
     const store = useGameStore;
     await store.getState().hydrate();
     await store.getState().startNewGame({ name: 'Skin Probe 4', raceId: 'tartarian_giant', factionId: 'mud_monarchs' });
     store.getState().skipTutorial?.();
     const mark = logLength();
     await enterHub('asgardar', 'outpost_gate');
-    expect(feedSince(mark)).toContain(hubNameForFaction('mud_monarchs'));
+    const feed = feedSince(mark);
+
+    // …not the visitor's court,
+    expect(feed).not.toContain(hubNameForFaction('mud_monarchs'));
+    // …not the Reclaimers' either — the objection that blocked this for two OTAs,
+    expect(feed).not.toContain(hubNameForFaction('reclaimers_guild'));
+    // …and not the Monarch ROOM names, which is what the owner actually read.
+    expect(feed).not.toContain('The Atrium');
+    // It names itself, and its rooms are the neutral base names.
+    expect(feed).toContain('Asgardar');
+    expect(feed).toContain('The Gate');
+  });
+
+  test('⚠⚠ …while an OWNED site still wears its owner — 1186 is not undone', async () => {
+    // The regression that would matter most: correcting the edge case by breaking the
+    // nine sites OTA-1186 exists to have moved.
+    const store = useGameStore;
+    await store.getState().hydrate();
+    await store.getState().startNewGame({ name: 'Skin Probe 4b', raceId: 'tartarian_giant', factionId: 'mud_monarchs' });
+    store.getState().skipTutorial?.();
+    const mark = logLength();
+    await enterHub('architect_blind', 'outpost_gate');
+    const feed = feedSince(mark);
+    expect(feed).toContain(hubNameForFaction('conspiracy_architects'));
+    expect(feed).not.toContain(hubNameForFaction('mud_monarchs'));
   });
 
   test('⚠ and the broker is still standing in the gate at the foreign site', async () => {

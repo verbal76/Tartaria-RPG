@@ -193,7 +193,110 @@ export function hubSkinFactionFor(
   locationId: string | null | undefined,
   playerFactionId: string | null | undefined,
 ): string | null {
+  // ⚠⚠⚠ OTA-1458 — A LOST CAPITAL WEARS NOBODY'S COLOURS, LEAST OF ALL YOURS.
+  //
+  // Owner's device log, walking into Drakova — a sealed pre-flood capital under
+  // a throat of Aetherstone mud, held by no living faction:
+  //
+  //   [world] You've left The Hidden Market and entered Drakova. A Lost Capital.
+  //   [world] You pass through the gate into Monarch Court — The Atrium.
+  //   [world] Paths: north to Standards · south to First Landing.
+  //
+  // A drowned city, presenting the Mud Monarchs' own toll-court, because the
+  // player happens to be a Monarch. He called it an error and he is right: it is
+  // the exact defect OTA-1186 set out to kill — "one map wearing your colours
+  // wherever you went, which is precisely why the world did not read as though
+  // factions held ground" — left standing in the five places nobody holds.
+  //
+  // ⚠ OTA-1186 SAW THIS AND DECLINED IT, FOR A REASON THAT WAS TRUE AT THE TIME:
+  // returning null here routes through `hubNameForFaction(null)`, which resolves
+  // to HUB.hubName — **"Reclaimers' Outpost"** — so the capitals would have been
+  // renamed after a faction they have even less to do with. That was a real
+  // objection to a missing piece, not to the idea. The piece now exists:
+  // `hubDisplayNameFor` below names an unowned capital after ITSELF, and with no
+  // skin the rooms fall back to the base names — The Gate, The Central Square,
+  // The Armory — which are neutral by construction.
+  //
+  // ⚠ `tartarian_outskirts` is deliberately NOT in this set. It is the original
+  // single hub and genuinely IS the Reclaimers' Outpost (static_hub.json still
+  // anchors HUB.hubName there), so the player-faction fallback stays correct for
+  // it and for anything else unowned that is not a capital.
+  if (isLostCapitalHub(locationId)) return null;
   return hubOwnerFaction(locationId) ?? playerFactionId ?? null;
+}
+
+/** The hub sites NOBODY HOLDS — the four sealed capitals.
+ *
+ *  ⚠⚠ THE FIRST VERSION OF THIS DERIVED THE SET FROM THE MACRO-REGION LADDER
+ *  (`LOCATION_TO_MACRO[id] === 'lost_capitals'`) AND IT WAS WRONG ON THE DATA.
+ *  It matched Drakova and Asgardar and MISSED the other two, because the ladder
+ *  classifies by GEOGRAPHY, not by who holds a place: `giant_vault` is filed under
+ *  `aetherstone_deep` and `buried_cities` under `silt_wastes`. Both are sealed
+ *  capitals; neither is in the capitals region. A predicate that agrees with the
+ *  answer on half the cases is not a predicate, it is a coincidence — and it would
+ *  have shipped two of the four still wearing the player's colours.
+ *
+ *  ⚠ So it is derived from OWNERSHIP, which is the property actually in question:
+ *  a hub macro-location with no entry in `FACTION_STARTING_LOCATION`. That is
+ *  self-maintaining — add a tenth faction and its site leaves this set on its own,
+ *  no list to remember — and it is the same source `hubOwnerFaction` already reads,
+ *  so the two cannot disagree.
+ *
+ *  ⚠ `tartarian_outskirts` is the ONE deliberate exception. It is unowned, but it
+ *  genuinely IS the Reclaimers' Outpost — the original single hub, still anchored
+ *  there by HUB.hubName in static_hub.json — so it keeps the old fallback.
+ *
+ *  ⚠ Lazy for the same reason `ownerByLocation` is: `hub.ts` must not pull another
+ *  module's import chain at load time. */
+const LEGACY_RECLAIMER_ANCHOR = 'tartarian_outskirts';
+let UNHELD_HUB_SITES: ReadonlySet<string> | null = null;
+export function isLostCapitalHub(locationId: string | null | undefined): boolean {
+  if (!locationId) return false;
+  if (!UNHELD_HUB_SITES) {
+    const set = new Set(
+      [...HUB_LOCATION_SET].filter(
+        (id) => id !== LEGACY_RECLAIMER_ANCHOR && !hubOwnerFaction(id),
+      ),
+    );
+    // ⚠⚠ SELF-CHECK, same discipline as check:verbreach. A derived set that
+    // silently empties reports every capital as faction-held and the bug returns
+    // with no symptom at the derivation site. Drakova is the case the owner
+    // reported; if it is not in here, the derivation is broken, not the data.
+    if (!set.has('drakova')) {
+      throw new Error(
+        'hub: unheld-site derivation is broken — drakova is not in the set. '
+        + 'FACTION_STARTING_LOCATION or hubLocationIds changed shape.',
+      );
+    }
+    UNHELD_HUB_SITES = set;
+  }
+  return UNHELD_HUB_SITES.has(locationId);
+}
+
+/** What to CALL this hub site. One namer, so the interior title and the travel
+ *  list cannot disagree about whose ground the player is standing on.
+ *
+ *  ⚠ An unowned capital is named after ITSELF. `hubNameForFaction` cannot do this
+ *  job — it maps factions, and its null case is "Reclaimers' Outpost", which is
+ *  the wrong answer for a drowned city by a wider margin than the bug it replaces. */
+let CAPITAL_NAMES: Record<string, string> | null = null;
+export function hubDisplayNameFor(
+  locationId: string | null | undefined,
+  playerFactionId: string | null | undefined,
+): string {
+  if (!isLostCapitalHub(locationId)) {
+    return hubNameForFaction(hubSkinFactionFor(locationId, playerFactionId));
+  }
+  // ⚠ RESOLVED HERE, NOT AT THE SEVEN CALL SITES. Every one of them had to build
+  // the name the same way; making each pass a `locationName` is seven chances to
+  // pass a different one, which is how the interior title and the travel list end
+  // up disagreeing about where the player is standing.
+  if (!CAPITAL_NAMES) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const locs = require('../data/locations/locations.json') as Array<{ id: string; name: string }>;
+    CAPITAL_NAMES = Object.fromEntries(locs.map((l) => [l.id, l.name]));
+  }
+  return CAPITAL_NAMES[locationId!] ?? locationId ?? HUB.hubName;
 }
 
 export function findHubRoom(roomId: string | null | undefined): HubRoom | null {

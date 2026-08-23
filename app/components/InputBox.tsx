@@ -182,6 +182,13 @@ function buzzWrong() {
   try { Vibration.vibrate([0, 32, 45, 32]); } catch { /* ignore */ }
 }
 
+/** ⚠ OTA-1458 — "you cannot do this YET", distinct from "wrong control". A single
+ *  soft pulse rather than the double-pulse error: empty legs are a state to fix,
+ *  not a mistake to scold, and the two should not feel the same in the hand. */
+function buzzSpent() {
+  try { Vibration.vibrate(28); } catch { /* ignore */ }
+}
+
 function shortWeaponLabel(name: string): string {
   const tokens = name.split(/\s+/);
   if (tokens.length <= 2) return name;
@@ -257,6 +264,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // quick-button tones (replaces the old intelligence-only read).
   const reachPlayer = useGameStore((s) => s.player ?? null);
   // OTA-1170 — rounds left on the dodge lockout; 0/absent = ready (full blue).
+  // ⚠⚠ OTA-1458 — EMPTY LEGS. Drives the travel row's spent state so a move the
+  // store is about to refuse never looks tappable. See TravelBtn's `spent`.
+  const noStamina = useGameStore((s) => (s.player?.stamina ?? 1) <= 0);
   const dodgeCooldown = useGameStore((s) => s.player?.dodgeCooldown ?? 0);
   // ⚠ OTA-1171 — the bar's DENOMINATOR is this character's difficulty tier, not the bare
   // constant. Divide bury_me's 5-round lock by 3 and the chip reads full blue with two
@@ -605,7 +615,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               {sceneBuilding ? (
                 <TravelBtn label="ENTER" onPress={() => enterBuilding(sceneBuilding)} />
               ) : null}
-              <TravelBtn label={`→ ${travelTargetName.toUpperCase()}`} destination onPress={onContinueTravel ?? (() => {})} />
+              <TravelBtn label={`→ ${travelTargetName.toUpperCase()}`} destination spent={noStamina} onPress={onContinueTravel ?? (() => {})} />
               <TravelBtn label="STOP TRAVEL" onPress={onStopTravel ?? (() => {})} />
               {typeof movesLeft === 'number' && movesLeft >= 0 ? (
                 <View style={styles.movesBadge}>
@@ -627,7 +637,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 <TravelBtn key={c.submit} label={c.label} a11yLabel={c.a11y} destination={false} onPress={() => onSubmit(c.submit)} blocked={tutLock} />
               ))}
               {showExitChip ? (
-                <TravelBtn label="🚪 EXIT" wayOut testID="exit-chip" a11yLabel="Exit, leave the outpost for the wilds" onPress={() => onSubmit('leave outpost')} blocked={tutLock && currentBeatId !== 'explore_or_leave'} />
+                <TravelBtn label="🚪 EXIT" wayOut testID="exit-chip" a11yLabel="Exit, leave the outpost for the wilds" onPress={() => onSubmit('leave outpost')} spent={noStamina} blocked={tutLock && currentBeatId !== 'explore_or_leave'} />
               ) : null}
             </>
           ) : sceneBuilding ? (
@@ -640,17 +650,17 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             // the outpost `tutLock` is false and this costs nothing.
             <>
               <TravelBtn label="ENTER" onPress={() => enterBuilding(sceneBuilding)} blocked={tutLock} />
-              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} blocked={tutLock} />
-              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} blocked={tutLock} />
-              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} blocked={tutLock} />
-              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} blocked={tutLock} />
+              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} blocked={tutLock} spent={noStamina} />
+              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} blocked={tutLock} spent={noStamina} />
+              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} blocked={tutLock} spent={noStamina} />
+              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} blocked={tutLock} spent={noStamina} />
             </>
           ) : (
             <>
-              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} blocked={tutLock} />
-              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} blocked={tutLock} />
-              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} blocked={tutLock} />
-              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} blocked={tutLock} />            </>
+              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} blocked={tutLock} spent={noStamina} />
+              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} blocked={tutLock} spent={noStamina} />
+              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} blocked={tutLock} spent={noStamina} />
+              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} blocked={tutLock} spent={noStamina} />            </>
           )}
         </TutorialTarget>
       )}
@@ -1109,8 +1119,20 @@ const DIR_ARROW: Record<'north' | 'south' | 'east' | 'west', string> = {
  *  like its neighbours: the 🚪 the map already uses for the same rooms
  *  (OTA-1451), plus its own border so the row reads as "doors… and the way
  *  out." One glyph, two surfaces, same meaning. */
-function TravelBtn({ label, onPress, blocked, active, destination, wayOut, a11yLabel, testID }: {
+function TravelBtn({ label, onPress, blocked, spent, active, destination, wayOut, a11yLabel, testID }: {
   label: string; onPress: () => void; blocked?: boolean; active?: boolean;
+  /** ⚠⚠⚠ OTA-1458 — EMPTY LEGS, SHOWN BEFORE THE TAP RATHER THAN AFTER.
+   *  Owner's device log: fifteen-plus refused travel taps in one session, twice
+   *  on the EXIT button, each one reading "You have no stamina left" AFTER the
+   *  fact — and each one charging 15 minutes of game clock for a move that never
+   *  happened. He tapped WEST, was refused, tapped WEST again, then rested. The
+   *  button looked identical whether it would work or not, so the only way to
+   *  discover the answer was to spend time finding out.
+   *
+   *  ⚠ CLIMB has shown exactly this state since OTA-628 ("red now covers EVERY
+   *  blocked case… the playtest where CLIMB was tapped repeatedly on 0 stamina").
+   *  The pattern was already here; the travel row never adopted it. */
+  spent?: boolean;
   destination?: boolean; wayOut?: boolean; a11yLabel?: string;
   /** ⚠⚠ OTA-1454 — A STABLE HANDLE THAT IS NOT THE COPY. ota1271 found this
    *  button by matching /^exit$/i against its label, so adding a door glyph and
@@ -1126,12 +1148,25 @@ function TravelBtn({ label, onPress, blocked, active, destination, wayOut, a11yL
   const handlePress = () => {
     logUiTap(label); // OTA-1172 — before any handler; see the note in QuickBtn.
     if (blocked) { buzzWrong(); useGameStore.getState().nudgeTutorialBlocked(); return; }
+    // ⚠⚠ OTA-1458 — a spent tap SAYS SO AND COSTS NOTHING. It does not reach the
+    // store's travel path, so it never spends the 15-minute anti-stuck tick
+    // (OTA-163) that a genuine refused move still charges. Refusing a move the
+    // player was never shown they could not make, and billing them for it, is the
+    // part that turned one mistake into thirty wasted minutes in his log.
+    if (spent) {
+      buzzSpent();
+      useGameStore.getState().appendLog(
+        'world',
+        "Your legs are done — you can't travel until you rest. Tap REST (8h) and the road will still be there.",
+      );
+      return;
+    }
     onPress();
   };
   return (
     <TouchableOpacity
       testID={testID}
-      style={[styles.travelBtn, isDestination && styles.travelBtnDest, wayOut && styles.travelBtnWayOut, blocked && styles.travelBtnBlocked, active && styles.travelBtnActive]}
+      style={[styles.travelBtn, isDestination && styles.travelBtnDest, wayOut && styles.travelBtnWayOut, (blocked || spent) && styles.travelBtnBlocked, active && styles.travelBtnActive]}
       onPress={handlePress}
       activeOpacity={blocked ? 1 : 0.7}
       accessibilityRole="button"
