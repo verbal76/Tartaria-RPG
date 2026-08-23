@@ -104,7 +104,9 @@ describe('Tungsten Spire — tutorial play loop (TUTORIAL_STEPS)', () => {
 
   it('the rope beat demos typed input — the player types it themselves (OTA-861: no pre-fill)', () => {
     const rope = TUTORIAL_STEPS.find((s) => s.id === 'rope')!;
-    expect(rope.draftText).toBeUndefined();
+    // OTA-1442 removed the draftText field from the type entirely — the cast
+    // keeps this claim checkable: the pre-fill stays gone.
+    expect((rope as { draftText?: string }).draftText).toBeUndefined();
     expect(rope.body.toLowerCase()).toContain('type');
     expect(rope.inputPulse).toBe(true);
   });

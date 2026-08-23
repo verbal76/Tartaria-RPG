@@ -271,14 +271,13 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const currentTutStep = tutorialStep !== null ? TUTORIAL_STEPS[tutorialStep] ?? null : null;
   const currentBeatId = currentTutStep?.id ?? null;
 
-  // Pre-fill input from pendingInputDraft (the rope beat queues "take
-  // rope"). We pre-fill the text as a VISIBLE hint but deliberately do
-  // NOT call .focus() here — auto-focusing raised the soft keyboard on
-  // its own (e.g. the instant the rope beat became active after the
-  // player took the cudgel), which the player reported as the keyboard
-  // popping up unbidden. Rule now: the keyboard only ever appears when
-  // the player taps the text field themselves. The pre-filled command
-  // sits in the field ready to send via the TAKE chip or a tap+enter.
+  // Pre-fill input from pendingInputDraft — the Action Reference help cards
+  // queue "finish this phrase" examples here. (⚠ OTA-1442: the TUTORIAL no
+  // longer uses this — the old rope beat seeded "take rope", and the owner
+  // cut it: typing the command yourself is the lesson.) We deliberately do
+  // NOT call .focus() here — auto-focusing raised the soft keyboard on its
+  // own, which the player reported as the keyboard popping up unbidden. Rule:
+  // the keyboard only ever appears when the player taps the text field.
   useEffect(() => {
     if (pendingDraft !== null) {
       const draft = consumeDraft();
@@ -287,8 +286,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   }, [pendingDraft, consumeDraft]);
 
   // Tungsten Spire — input row pulses when the current tutorial step
-  // has `inputPulse: true` (name beat + rope beat). Pulses a border
-  // colour animation; same Animated pattern as TutorialTarget.
+  // has `inputPulse: true` (name beat + rope beat).
   const inputPulse = currentTutStep?.inputPulse === true;
   // OTA-898 (SA-6) — respect the reduce-motion preference: hold the tutorial
   // input cue as a STATIC highlight instead of a looping pulse (the cue still
@@ -301,10 +299,20 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
       pulse.setValue(0);
       return;
     }
+    // ⚠⚠ OTA-1442 — NATIVE driver, and the reason is the KEYBOARD, not the
+    // frame rate. This loop used to animate borderColor on the JS driver —
+    // a style write across the bridge every frame, for the whole beat, at the
+    // exact moment the player taps the field. That JS load is when Android
+    // starts dropping the tap→focus→keyboard event chain (OTA-1075 caught one
+    // symptom; the owner's rope-beat "types blind behind the keyboard" is
+    // another — the floating bar's mount signal raced the saturated thread).
+    // borderColor cannot run native, so the pulse is now an OVERLAY border in
+    // the bright colour whose OPACITY crossfades over a static dim border —
+    // same look, zero per-frame JS.
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulse, { toValue: 1, duration: 700, useNativeDriver: false }),
-        Animated.timing(pulse, { toValue: 0, duration: 700, useNativeDriver: false }),
+        Animated.timing(pulse, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 0, duration: 700, useNativeDriver: true }),
       ]),
     );
     loop.start();
@@ -313,7 +321,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const inputBorderColor = inputPulse
     ? (reduceMotion
         ? '#ffe28a'  // static highlight — no motion, still clearly cued
-        : pulse.interpolate({ inputRange: [0, 1], outputRange: ['#c9a86a', '#ffe28a'] }))
+        : '#c9a86a') // the dim end; the bright overlay crossfades above it
     : '#3a342c';
 
   const handleSubmit = () => {
@@ -867,7 +875,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
         </View>
       ) : null}
       <TutorialTarget area="input-row" style={styles.inputRow}>
-        <Animated.View style={[styles.inputWrap, { borderColor: inputBorderColor }]}>
+        <View style={[styles.inputWrap, { borderColor: inputBorderColor }]}>
+          {/* OTA-1442 — the pulse itself: bright border fading in and out on
+              the NATIVE driver, over the static dim border above. */}
+          {inputPulse && !reduceMotion ? (
+            <Animated.View pointerEvents="none" style={[styles.inputPulseOverlay, { opacity: pulse }]} />
+          ) : null}
           <TextInput
             ref={inputRef}
             style={styles.input}
@@ -897,7 +910,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             autoComplete="off"
             textContentType="none"
           />
-        </Animated.View>
+        </View>
         {Platform.OS === 'ios' ? (
           <TouchableOpacity
             style={styles.kbDismiss}
@@ -1189,6 +1202,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 4,
     backgroundColor: '#1a1714',
+  },
+  // OTA-1442 — the bright half of the tutorial pulse. Sits exactly on the
+  // wrap's own 1px border (offset -1 reaches back over it) and fades in/out
+  // on the native driver; only its opacity ever animates.
+  inputPulseOverlay: {
+    position: 'absolute',
+    top: -1, left: -1, right: -1, bottom: -1,
+    borderWidth: 1,
+    borderRadius: 4,
+    borderColor: '#ffe28a',
   },
   input: {
     color: '#e6d8b3',

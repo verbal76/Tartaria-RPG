@@ -10,8 +10,7 @@
 //   - id        — string the gameStore matches on for advancement
 //   - area      — which screen region pulses (TutorialTarget)
 //   - pulse     — true to animate the highlight (off = static glow)
-//   - inputPulse — true to pulse the text input + run a pre-typed draft
-//   - draftText — text seeded into the input box for typed-input demos
+//   - inputPulse — true to pulse the text input (the rope beat's cue)
 //   - arbiter   — line the Arbiter speaks when the step opens
 //   - screen    — for legacy compatibility; defaults to 'exploration'
 //
@@ -65,11 +64,12 @@ export interface TutorialStep {
   /** When true, TutorialTarget animates the glow on the area. */
   pulse?: boolean;
   /** When true, the input row pulses + the placeholder switches to
-   *  prompt mode. Paired with draftText to demo typed input. */
+   *  prompt mode.
+   *  ⚠ OTA-1442 — there is deliberately NO pre-fill companion to this any
+   *  more (the old `draftText` seeded "take rope" into the box). Owner: *"I
+   *  don't want take rope pre-filled. I want the player to still have to type
+   *  it so they understand the concept."* Typing the words IS the lesson. */
   inputPulse?: boolean;
-  /** Text to seed into the InputBox via pendingInputDraft. Triggers on
-   *  step entry; the player can edit or submit as-is. */
-  draftText?: string;
   /** Line the Arbiter speaks when this step opens. Routed through
    *  appendLog('arbiter', ...). Falls back to body if not set. */
   arbiter?: string;

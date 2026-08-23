@@ -13,9 +13,18 @@ interface Props extends ViewProps {
 // area, the wrapper applies an amber glow directly to the rendered
 // component — no overlay coordinate math, no measurement, no drift.
 // Tungsten Spire — when the current step has `pulse: true` the glow
-// animates between dim and bright to draw the eye. Animation runs on
-// the JS driver because borderColor isn't native-animatable; pulse is
-// short and cheap enough that off-native is fine.
+// animates between dim and bright to draw the eye.
+//
+// ⚠⚠ OTA-1442 — the pulse moved to the NATIVE driver. The old loop animated
+// borderColor/shadowOpacity on the JS driver ("short and cheap enough that
+// off-native is fine" — it was not): a style write across the bridge every
+// frame for the whole beat, and on the rope beat it ran ALONGSIDE the input
+// box's own JS pulse. That sustained JS load is when Android starts dropping
+// the tap→focus→keyboard event chain — the owner typed blind behind the
+// keyboard because the floating input bar's mount signal lost that race.
+// borderColor cannot run native, so the glow is now two layers: a static DIM
+// border+shadow on the wrapper, and a BRIGHT border+shadow on an absolute
+// overlay whose opacity crossfades natively. Same look, zero per-frame JS.
 export function TutorialTarget({ area, children, style, ...rest }: Props) {
   const tutorialStep = useGameStore((s) => s.tutorialStep);
   const step = tutorialStep !== null ? TUTORIAL_STEPS[tutorialStep] ?? null : null;
@@ -35,8 +44,8 @@ export function TutorialTarget({ area, children, style, ...rest }: Props) {
     }
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulse, { toValue: 1, duration: 700, useNativeDriver: false }),
-        Animated.timing(pulse, { toValue: 0, duration: 700, useNativeDriver: false }),
+        Animated.timing(pulse, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 0, duration: 700, useNativeDriver: true }),
       ]),
     );
     loop.start();
@@ -49,17 +58,10 @@ export function TutorialTarget({ area, children, style, ...rest }: Props) {
     return <Animated.View style={style} {...rest}>{children}</Animated.View>;
   }
 
-  // Static glow for non-pulse beats; pulse-interpolated glow for the
-  // ones the player should act on right now.
-  const borderColor = shouldPulse
-    ? pulse.interpolate({ inputRange: [0, 1], outputRange: ['#c9a86a', '#ffe28a'] })
-    : '#c9a86a';
-  const shadowOpacity = shouldPulse
-    ? pulse.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.95] })
-    : 0.95;
-
-  const animatedStyle = {
-    borderColor,
+  // The wrapper carries the STATIC glow: the dim end of the pulse when
+  // animating, the full-bright glow when not (non-pulse beats, reduce-motion).
+  const baseStyle = {
+    borderColor: '#c9a86a',
     borderWidth: 2,
     borderRadius: 6,
     // arb-fix — NO translucent fill. The amber fill (rgba(201,168,106,0.08))
@@ -70,7 +72,7 @@ export function TutorialTarget({ area, children, style, ...rest }: Props) {
     // the fill is pure cost. Keep the region's own background (transparent).
     backgroundColor: 'transparent',
     shadowColor: '#c9a86a',
-    shadowOpacity,
+    shadowOpacity: shouldPulse ? 0.35 : 0.95,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 0 },
     elevation: 16,
@@ -78,7 +80,27 @@ export function TutorialTarget({ area, children, style, ...rest }: Props) {
 
   return (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    <Animated.View style={[style as any, animatedStyle as any]} {...rest}>
+    <Animated.View style={[style as any, baseStyle as any]} {...rest}>
+      {/* OTA-1442 — the bright half of the pulse, opacity-crossfaded on the
+          native driver over the static dim border above. Offset -2 sits it
+          exactly on the wrapper's own 2px border. */}
+      {shouldPulse ? (
+        <Animated.View
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+            top: -2, left: -2, right: -2, bottom: -2,
+            borderColor: '#ffe28a',
+            borderWidth: 2,
+            borderRadius: 6,
+            shadowColor: '#c9a86a',
+            shadowOpacity: 0.95,
+            shadowRadius: 12,
+            shadowOffset: { width: 0, height: 0 },
+            opacity: pulse,
+          }}
+        />
+      ) : null}
       {children}
     </Animated.View>
   );

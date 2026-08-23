@@ -26783,11 +26783,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // this the audio runs a full beat behind the screen.
       get().appendLog('arbiter', nextStep.arbiter, { supersede: true });
     }
-    // Pre-fill the input with the draft text (the rope beat uses
-    // this to demo typed input).
-    if (nextStep.draftText) {
-      get().queueInputDraft(nextStep.draftText);
-    }
+    // ⚠ OTA-1442 — NO beat pre-fills the input any more (the old draftText
+    // seeded "take rope" here). Owner: typing the command yourself IS the
+    // lesson. queueInputDraft stays for the Action Reference help cards,
+    // which are a "finish this phrase" surface, not a tutorial beat.
   },
   maybeAdvanceTutorial(beatId) {
     const state = get();

@@ -127,6 +127,28 @@ export function KeyboardInputBar() {
       // this timer.
       if (hideTimer) clearTimeout(hideTimer);
       hideTimer = setTimeout(() => {
+        // ⚠⚠ OTA-1442 — TRUST THE KEYBOARD, NOT THE EVENT. On Android's New
+        // Architecture the focus swap (in-flow field → this bar's autoFocus)
+        // fires keyboardDidHide and then DROPS the matching didShow ~half the
+        // time under JS load — the tutorial's pulse beats were the worst case.
+        // The old timer then retracted the bar and WIPED the draft while the
+        // keyboard was still standing: the owner typed blind into the covered
+        // in-flow field with no ACT button. So before retracting, ask the
+        // keyboard itself; if it is still up, this hide was a lie — keep the
+        // bar and re-sync the height instead. Android only: iOS reports stale
+        // non-zero metrics during the dismiss animation (the arb71 ghost),
+        // and its events are reliable anyway.
+        if (Platform.OS === 'android') {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const k = Keyboard as any;
+            if (typeof k.isVisible === 'function' && k.isVisible()) {
+              const m = typeof k.metrics === 'function' ? k.metrics() : null;
+              if (m?.height) applyHeight(m.height);
+              return;
+            }
+          } catch { /* metrics unavailable — fall through to the retract */ }
+        }
         setKeyboardOffset(0);
         setText('');
         // Keyboard is really gone (not a quick refocus) → retract the bar.

@@ -24341,7 +24341,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // interior "you are here" ring now rides directly ABOVE the painted room name
 // instead of covering it (outpost and building maps; the world atlas marker
 // stands on silhouettes and stays centred).
-export const OTA_BUILD_ID = '2026-08-23-1441-your-own-first-screen';
+// OTA-1442 — the rope beat lets you see what you type. The tutorial's two
+// pulsing highlights ran JS-driven animation loops that saturated the thread
+// exactly while the player tapped the text field, making Android drop the
+// keyboard events the floating input bar mounts on — typing landed blind
+// behind the keyboard with no ACT button. Both pulses now run on the native
+// driver (bright-border overlay crossfading over a static dim border), the
+// bar's hide-timer verifies the keyboard is actually gone before retracting
+// (and re-syncs its height when the hide was a dropped-event lie), and the
+// pre-fill plumbing (draftText) is deleted outright — typing "take rope"
+// yourself is the lesson, per the owner.
+export const OTA_BUILD_ID = '2026-08-23-1442-type-it-yourself';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1441-your-own-first-screen';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1439-what-strangers-call-you';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1437-ask-before-you-speak';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1436-one-hand-on-the-banner';
