@@ -24351,7 +24351,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (and re-syncs its height when the hide was a dropped-event lie), and the
 // pre-fill plumbing (draftText) is deleted outright — typing "take rope"
 // yourself is the lesson, per the owner.
-export const OTA_BUILD_ID = '2026-08-23-1442-type-it-yourself';
+// OTA-1443 — the ♂/♀ sign moves up in rank: emblem-sized, directly right of
+// the faction emblem in the portrait's top-left corner, instead of a small
+// caption prefix at the bottom ("easily overlooked" — owner). Old saves
+// without the pick still show nothing.
+export const OTA_BUILD_ID = '2026-08-23-1443-the-sign-at-rank';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1442-type-it-yourself';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1441-your-own-first-screen';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1439-what-strangers-call-you';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-22-1437-ask-before-you-speak';

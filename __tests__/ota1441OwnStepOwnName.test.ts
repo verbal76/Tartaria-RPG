@@ -70,27 +70,37 @@ describe('OTA-1441 — the pick is its OWN first step', () => {
   });
 });
 
-describe('OTA-1441 — the ♂/♀ mark reaches the character sheet', () => {
-  it('⚠⚠ THE REPORTED GAP: the banner takes a sex prop and draws the glyph', () => {
+describe('OTA-1441/1443 — the ♂/♀ mark reaches the character sheet, at rank', () => {
+  it('⚠⚠ THE REPORTED GAP: the banner takes a sex prop and draws the sign', () => {
     // "it didn't put the male or female symbol on the character image" — the
-    // pick landed on the record and stopped there. The banner now carries it
-    // in the caption, in the banner's one type (MARK_TYPE), same as every
-    // other mark on the painting.
+    // pick landed on the record and stopped there (OTA-1441). Then the owner
+    // sized it: *"it needs to sit on the right of the faction emblem and be
+    // the same size as it is"* (OTA-1443) — so it renders as its own
+    // emblem-sized glyph, not a caption prefix.
     expect(PORTRAIT).toContain("sex?: 'male' | 'female' | null;");
-    expect(PORTRAIT).toContain("sex === 'male' ? '♂  ' : sex === 'female' ? '♀  ' : ''");
+    expect(PORTRAIT).toContain("{sex === 'male' ? '♂' : '♀'}");
+  });
+
+  it('⚠⚠ EMBLEM-SIZED, ON THE EMBLEM\'S RIGHT — not the overlookable caption mark', () => {
+    // Same box the crest gets, sitting one gap beyond it; falls back to the
+    // crest's own spot when there is no crest art to sit beside.
+    expect(PORTRAIT).toContain('{ left: crest ? 10 + CREST_SIZE + 6 : 10 }');
+    const style = PORTRAIT.slice(PORTRAIT.indexOf('sexSign: {'));
+    expect(style).toContain('width: CREST_SIZE,');
+    expect(style).toContain('height: CREST_SIZE,');
+    expect(style).toContain('fontSize: CREST_SIZE - 8,');
+    // …and the caption no longer carries a glyph prefix.
+    expect(PORTRAIT).not.toContain("'♂  '");
   });
 
   it('⚠⚠ …and the sheet actually passes it — a prop unpassed is the gap reborn', () => {
     expect(SHEET).toContain('sex={player.sex}');
   });
 
-  it('⚠ a save from before the pick shows NO glyph — the game never asked them', () => {
-    // The ternary's third arm is the empty string, not a default symbol.
-    // Guessing a mark for a character who was never asked would be wrong in
-    // exactly half of all cases.
-    const i = PORTRAIT.indexOf("sex === 'male' ? '♂  '");
-    expect(i).toBeGreaterThan(-1);
-    expect(PORTRAIT.slice(i, PORTRAIT.indexOf('\n', i))).toContain(": ''");
+  it('⚠ a save from before the pick shows NO sign — the game never asked them', () => {
+    // The whole element is behind `sex ?` — guessing a mark for a character
+    // who was never asked would be wrong in exactly half of all cases.
+    expect(PORTRAIT).toContain('{sex ? (');
   });
 });
 

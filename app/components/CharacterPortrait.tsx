@@ -109,11 +109,12 @@ export function CharacterPortrait({
   /** Only used to derive a motive when the save has none — same seed the rest
    *  of the story layer uses, so the sheet cannot disagree with the crawl. */
   characterName?: string;
-  /** ⚠ OTA-1441 — the ♂/♀ mark the owner asked for over the player image:
-   *  *"it didn't put the male or female symbol on the character image."* Rides
-   *  the caption in the banner's one type. Absent on saves predating the pick
-   *  (OTA-1439 made sex optional) — then nothing shows, which is correct: the
-   *  game never asked that character. */
+  /** ⚠ OTA-1443 — the ♂/♀ mark, in the TOP-LEFT RANK with the emblem. The
+   *  OTA-1441 version rode the bottom caption at text size; owner: *"it needs
+   *  to sit on the right of the faction emblem and be the same size as it is.
+   *  Right now with its size and placement it is easily overlooked."* Absent on
+   *  saves predating the pick (OTA-1439 made sex optional) — then nothing
+   *  shows, which is correct: the game never asked that character. */
   sex?: 'male' | 'female' | null;
 }) {
   const { width, height } = useWindowDimensions();
@@ -158,6 +159,22 @@ export function CharacterPortrait({
         // character rather than a badge stuck over them.
         <Image source={crest} style={styles.crest} resizeMode="contain" />
       ) : null}
+      {/* ⚠ OTA-1443 — THE ♂/♀ SIGN, EMBLEM-SIZED, ON THE EMBLEM'S RIGHT.
+          The OTA-1441 cut tucked it into the bottom caption at text size;
+          owner: *"it is easily overlooked ... it needs to sit on the right of
+          the faction emblem and be the same size as it is."* So it joins the
+          top-left rank as a peer of the crest: same box, same size, gold with
+          the banner's hard shadow, nothing behind it. When a save has no
+          crest art it takes the crest's own spot rather than floating beside
+          a gap. */}
+      {sex ? (
+        <Text
+          style={[styles.sexSign, { left: crest ? 10 + CREST_SIZE + 6 : 10 }]}
+          accessibilityLabel={sex === 'male' ? 'Male' : 'Female'}
+        >
+          {sex === 'male' ? '♂' : '♀'}
+        </Text>
+      ) : null}
       {/* ⚠ The motive, opposite the emblem — the title, on nothing. Its shadow
           is what keeps it legible over an unpredictable painting; a plate would
           make it a badge instead of a mark. */}
@@ -173,7 +190,6 @@ export function CharacterPortrait({
           name. */}
       {raceName ? (
         <Text style={styles.caption} numberOfLines={2}>
-          {sex === 'male' ? '♂  ' : sex === 'female' ? '♀  ' : ''}
           {raceName}
           {factionName ? `  ·  ${factionName}` : ''}
         </Text>
@@ -198,6 +214,24 @@ const styles = StyleSheet.create({
     left: 10,
     width: CREST_SIZE,
     height: CREST_SIZE,
+  },
+  // ⚠ OTA-1443 — the ♂/♀ sign: a CREST_SIZE box on the crest's right (its
+  // `left` is computed inline — it depends on whether a crest rendered), the
+  // glyph filling it. Gold with the banner's hard shadow, upright rather than
+  // MARK_TYPE's italic — a symbol is not prose, and slanting it reads as a
+  // rendering error at this size.
+  sexSign: {
+    position: 'absolute',
+    top: 10,
+    width: CREST_SIZE,
+    height: CREST_SIZE,
+    fontSize: CREST_SIZE - 8,
+    lineHeight: CREST_SIZE,
+    textAlign: 'center',
+    color: '#e8c766',
+    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 7,
   },
   // ⚠ Two words, on nothing, carrying the corner by themselves. Title AS
   // AUTHORED ("The Exile", not "THE EXILE") — shouting it would turn a title
