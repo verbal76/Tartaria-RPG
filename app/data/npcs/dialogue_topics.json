@@ -2518,6 +2518,13 @@
      ]
     },
     {
+     "id": "vael_stores",
+     "label": "Ask what the stores actually run to",
+     "lines": [
+      "\"Rope, lamp oil, dried fish, knee-wrap.\" Vael counts it off without looking at the shelves. \"Pilgrims come in asking after relics and leave with knee-wrap. The stone is nine hours' walk over broken ground, and they arrive believing faith will carry them. Faith does not carry them. Knee-wrap carries them.\""
+     ]
+    },
+    {
      "id": "t_known",
      "label": "Ask about their people",
      "gate": {
@@ -2659,6 +2666,13 @@
      ]
     },
     {
+     "id": "cartographer_price",
+     "label": "Ask what a map costs",
+     "lines": [
+      "\"Depends what is on it.\" The Cartographer does not reach for anything. \"A road anyone can walk, two coins. A road with a reason nobody walks it, considerably more — and the price is the reason, not the paper.\" A pause of exactly the right length. \"There are three I do not price at all. I would rather keep them than be asked where I got them.\""
+     ]
+    },
+    {
      "id": "t_known",
      "label": "Ask about their people",
      "gate": {
@@ -2797,6 +2811,13 @@
      "label": "Ask about their trade",
      "lines": [
       "\"Supplies for the Revival,\" says Yune warmly. \"Which is mostly bandages and bread. Faith is very physical work.\""
+     ]
+    },
+    {
+     "id": "yune_needs",
+     "label": "Ask what the Revival needs most",
+     "lines": [
+      "\"Boots,\" Yune says at once, like someone who has been waiting to be asked. \"Everyone wants to donate a relic. Nobody wants to donate boots. There is a room upstairs full of beautiful useless things and eleven people downstairs walking on wrapped feet.\" She softens it with a shrug. \"Bring me boots and I will get your name said in something.\""
      ]
     },
     {

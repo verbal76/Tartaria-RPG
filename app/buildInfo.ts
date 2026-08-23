@@ -24417,7 +24417,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // where regulars stand. Nothing was deleted: the same depth is there, it
 // arrives in a better order. Three separate visits still place you on their
 // own, and every rung still has something new waiting at it.
-export const OTA_BUILD_ID = '2026-08-23-1451-never-have-to-guess';
+// OTA-1452 — the teardown path, and three quartermasters who could only say one
+// thing. THE FREE NOW OUTRANKS EVERYTHING. Handing back the model's ~425MB was
+// queued at the ordinary rank, which put it BELOW the voice and inside the
+// reservation window that holds the lock open for a line that has been promised
+// but not yet arrived — so a backgrounded app could sit on the whole model
+// waiting on speech nobody was present to hear. The crash ledger has the shape:
+// `ctx-release` stamped, no `ctx-release-done`, and the process killed nine
+// seconds later. Teardown now ranks above every other kind of work, and cuts
+// short anything interruptible that is already running.
+// AND A LOAD NOBODY WANTS FREES ITSELF. If the app backgrounds while the model
+// is still loading there is nothing to release yet, so the old code released
+// nothing and then let the finished context land on an object nobody held — a
+// leak the code has described in a comment since OTA-1177 without fixing. The
+// load now checks whether anyone still wants it and frees itself if not, in the
+// same indivisible step, so no second load can start while the unwanted one is
+// still allocated. ⚠ NOT claimed as the cause of the two process kills — those
+// stay open. What is proven is that the race existed and no longer does.
+// Also: Vael, the Cartographer and Sister Yune each get a second counter
+// question, so every vendor now opens with two.
+export const OTA_BUILD_ID = '2026-08-23-1452-the-free-outranks-everything';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1451-never-have-to-guess';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1450-the-board-knows-your-size';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1448-the-sheet-says-what-it-knows';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1446-the-sign-below-the-emblem';

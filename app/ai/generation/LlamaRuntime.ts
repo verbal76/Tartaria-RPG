@@ -1,10 +1,13 @@
 import * as FileSystem from 'expo-file-system';
-import { runExclusiveNativeMl, ML_PRIORITY_LLM, ML_PRIORITY_HOMEWORK } from '../nativeMlLock';
+import {
+  runExclusiveNativeMl, ML_PRIORITY_LLM, ML_PRIORITY_HOMEWORK, ML_PRIORITY_TEARDOWN,
+} from '../nativeMlLock';
 import { recordQwenCall } from './qwenTelemetry';
 import {
   noteContextOpened,
   noteContextReleased,
   noteDisposeFoundNothing,
+  noteStragglerTornDown,
 } from './contextLedger';
 
 // ---------------------------------------------------------------------------
@@ -242,6 +245,19 @@ export class LlamaRuntime {
    *  and we would be reading a story again instead of a measurement. */
   private loadInFlight = false;
 
+  /** ⚠⚠ OTA-1452 — HOW MANY TIMES SOMEBODY HAS ASKED FOR EVERYTHING TO GO AWAY.
+   *
+   *  Bumped by `dispose()`, read by `initialize()` on both sides of the ~425MB
+   *  await. Same number = nobody changed their mind while we were allocating, so
+   *  the context is wanted. Different = a dispose landed mid-load and the thing
+   *  that just finished allocating belongs to nobody, so the LOAD frees it.
+   *
+   *  ⚠ A counter, not a boolean. Background → foreground → background inside one
+   *  slow load is not exotic — the owner's log has an app-active window of 485ms
+   *  — and a flag that got set and cleared would read as "nothing happened" at
+   *  exactly the moment two things did. */
+  private disposeEpoch = 0;
+
   isReady(): boolean {
     return this.context !== null;
   }
@@ -292,26 +308,99 @@ export class LlamaRuntime {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       (require('../../engine/saveSystem') as typeof import('../../engine/saveSystem')).stampBreadcrumbPhase('ctx-open');
     } catch { /* instrumentation never blocks a load */ }
-    this.context = await runExclusiveNativeMl(() => mod.initLlama({
-      model: opts.modelPath,
-      n_ctx: opts.contextSize ?? 2048,
-      n_gpu_layers: 0, // mobile CPU only — GPU offload is desktop territory
-      n_threads: opts.threads ?? 4,
-      use_mlock: false, // lets the OS swap weights out under memory pressure
-      // OTA-459 — shrink the compute batch. llama.cpp defaults (n_batch 2048 /
-      // n_ubatch 512) allocate a large compute graph/buffer; on newer ARM cores
-      // (Pixel 10 Pro XL / Tensor G5) the SVE-optimized kernels SIGSEGV a few
-      // tokens into generation. n_ubatch sizes that pre-allocated buffer, so a
-      // smaller physical batch shrinks the faulting region. Cost is purely a hair
-      // more prompt-prefill latency (decode speed + output text are unchanged);
-      // peak RAM drops too. Conservative values that keep prefill throughput sane.
-      n_batch: opts.batch ?? 512,
-      n_ubatch: opts.ubatch ?? 128,
-    }), ML_PRIORITY_LLM).finally(() => { this.loadInFlight = false; });
-    // OTA-1177 — a native context now exists. Counted here and NOT one line earlier:
-    // before `initLlama` resolves there is nothing allocated we could account for, and a
-    // load that throws must not inflate the count.
-    noteContextOpened();
+    // ⚠⚠ OTA-1452 — WHICH DISPOSE GENERATION THIS LOAD BELONGS TO. Read BEFORE the
+    // await; compared after. If it moved, a dispose landed mid-allocation and the
+    // context arriving below belongs to nobody. See the adoption check.
+    const epochAtLoad = this.disposeEpoch;
+    const fresh = await runExclusiveNativeMl<LlamaContext | null>(async () => {
+      const ctx = await mod.initLlama({
+        model: opts.modelPath,
+        n_ctx: opts.contextSize ?? 2048,
+        n_gpu_layers: 0, // mobile CPU only — GPU offload is desktop territory
+        n_threads: opts.threads ?? 4,
+        use_mlock: false, // lets the OS swap weights out under memory pressure
+        // OTA-459 — shrink the compute batch. llama.cpp defaults (n_batch 2048 /
+        // n_ubatch 512) allocate a large compute graph/buffer; on newer ARM cores
+        // (Pixel 10 Pro XL / Tensor G5) the SVE-optimized kernels SIGSEGV a few
+        // tokens into generation. n_ubatch sizes that pre-allocated buffer, so a
+        // smaller physical batch shrinks the faulting region. Cost is purely a hair
+        // more prompt-prefill latency (decode speed + output text are unchanged);
+        // peak RAM drops too. Conservative values that keep prefill throughput sane.
+        n_batch: opts.batch ?? 512,
+        n_ubatch: opts.ubatch ?? 128,
+      });
+      // OTA-1177 — a native context now exists. Counted here and NOT one line earlier:
+      // before `initLlama` resolves there is nothing allocated we could account for, and
+      // a load that throws must not inflate the count.
+      noteContextOpened();
+
+      // ⚠⚠⚠ OTA-1452 — THE ORPHAN RACE, CLOSED. ⚠ NOT PROVEN TO BE B9 — READ ON.
+      //
+      // OTA-1177 wrote the description of this bug and built the instrument that counts
+      // it, and then returned without fixing it. The field comment above `loadInFlight`
+      // has said so in plain words ever since: *"lets a ~400MB context land on an object
+      // nobody holds — the orphan we are hunting."*
+      //
+      // Backgrounding calls dispose(). dispose() sets `this.context = null` and finds
+      // nothing to free, because `initLlama` has not resolved yet — so it records the
+      // miss and returns. Then the allocation completes, and the old code assigned it
+      // straight back into `this.context`, OVERWRITING THE NULL DISPOSE JUST WROTE. The
+      // app then sits in the background holding a live ~425MB native context that every
+      // layer above believes was released; nothing will ever free it, and Android's
+      // low-memory killer reaps large-RSS background processes first.
+      //
+      // ⚠⚠⚠ WHAT THE EVIDENCE DOES AND DOES NOT SAY, because getting this wrong is how
+      // OTA-1173 happened. I first read the owner's 4.32.11 report as showing this leak
+      // and it does NOT. That block reads `Opened: 7 · Released: 6 · Peak live: 1`, and
+      // PEAK LIVE 1 SETTLES IT: an orphan makes the NEXT load the second live context, so
+      // peak would be 2. Both orphan counters read 0. `live=1` at capture was simply the
+      // app foregrounded and warm. What IS measured is that the race exists in executed
+      // code — remove the epoch bump from dispose() and ota1177's mid-load test reports
+      // `released=0, live=1` with the native release never called.
+      //
+      // ⚠⚠ AND THE FREE HAPPENS *INSIDE THIS CRITICAL SECTION*, WHICH IS THE WHOLE
+      // POINT OF THE SHAPE. The first cut of this guard freed the straggler through a
+      // SECOND `runExclusiveNativeMl` call, after the load had already dropped the lock.
+      // OTA-1452's own interleaving test deadlocked on that and exposed the real defect
+      // underneath: between the two acquisitions, a queued load can take the lock — so
+      // the orphan stays allocated *while another ~425MB load runs*, which is two live
+      // contexts, the exact thing this guard exists to prevent. Load-and-disown is one
+      // indivisible operation or it is not a fix.
+      if (this.disposeEpoch !== epochAtLoad) {
+        // ⚠⚠ OTA-1452 — ITS OWN BRACKET, and it needs one for the same reason the other
+        // two natives have one. This is a THIRD native free, and without a crumb of its
+        // own a process that died inside it would leave `ctx-open` standing — which reads
+        // as "died inside initLlama" and would send the next investigation at the load.
+        // A crumb that names the wrong call is worse than no crumb.
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          (require('../../engine/saveSystem') as typeof import('../../engine/saveSystem')).stampBreadcrumbPhase('ctx-orphan-free');
+        } catch { /* instrumentation never blocks a free */ }
+        try {
+          await ctx.release();
+          noteContextReleased();
+          // ⚠ OTA-1177 wrote this counter for a guard that did not exist yet — *"the GOOD
+          // path… if orphans are climbing while this stays at 0, the guard is not
+          // running."* This is that guard. It can stop reading zero.
+          noteStragglerTornDown();
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            (require('../../engine/saveSystem') as typeof import('../../engine/saveSystem')).stampBreadcrumbPhase('ctx-orphan-free-done');
+          } catch { /* ignore */ }
+        } catch { /* best effort — a native side already torn down is the good case */ }
+        return null;
+      }
+      return ctx;
+    }, ML_PRIORITY_LLM).finally(() => { this.loadInFlight = false; });
+
+    // ⚠ Throwing rather than returning quietly, because a caller that got no context must
+    // not go on believing it has one. `qwenReinitAttempts` is incremented by the watchdog
+    // BEFORE this call either way, and the only thing that produces this is backgrounding
+    // — which resets that counter — so it cannot walk the reload ceiling down on its own.
+    if (!fresh) {
+      throw new Error('qwen load cancelled: disposed mid-allocation (OTA-1452 orphan guard)');
+    }
+    this.context = fresh;
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       (require('../../engine/saveSystem') as typeof import('../../engine/saveSystem')).stampBreadcrumbPhase('ctx-open-done'); // OTA-1357
@@ -528,6 +617,13 @@ export class LlamaRuntime {
     // (2) ask any in-flight prediction to stop so the lock frees promptly; (3)
     // release THROUGH the same runExclusiveNativeMl lock as completion(), so the
     // free is serialized behind the running prediction and the window is closed.
+    // ⚠⚠ OTA-1452 — SAY SO BEFORE ANYTHING ELSE, INCLUDING BEFORE THE EARLY RETURN.
+    // This is the whole repair. A load that is mid-flight cannot be freed from
+    // here — `this.context` is still null — so instead we leave a mark the LOAD
+    // will find when it lands, and it frees itself. Bumped unconditionally and
+    // first, because the case that matters is exactly the one that returns two
+    // lines below having done nothing.
+    this.disposeEpoch += 1;
     const ctx = this.context;
     this.context = null;
     this.modelPath = null;
@@ -553,7 +649,12 @@ export class LlamaRuntime {
       // stopCompletion unsupported / nothing running — fine; the lock still guards us.
     }
     try {
-      await runExclusiveNativeMl(() => Promise.resolve(ctx.release()));
+      // ⚠⚠ OTA-1452 — AT TEARDOWN RANK, not at the default. This call used to pass no
+      // priority, which put the free BELOW the voice and inside OTA-1144's reservation
+      // hold — so a backgrounded app could sit on 425MB waiting for a Kokoro line, or
+      // for one that had merely been promised. The owner's crash ledger has the shape:
+      // `ctx-release (+9152ms)` with no `ctx-release-done` and then a PROCESS KILLED.
+      await runExclusiveNativeMl(() => Promise.resolve(ctx.release()), ML_PRIORITY_TEARDOWN);
       // OTA-1177 — counted only on the path where release() actually returned. A throw
       // below leaves the context unaccounted for, which is exactly the honest reading:
       // we do not know that it was freed.

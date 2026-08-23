@@ -286,10 +286,14 @@ describe('OTA-1451 — the first rung is a step, not a floodgate', () => {
     // each — and then 93 more arriving at once. One purchase roughly tripled a
     // vendor, which is why the first rung read as a floodgate rather than a step.
     //
-    // ⚠ THE TOP OF THE LADDER DID NOT MOVE. Depth was re-tiered, not deleted:
-    // the same 301 topics are reachable, they just arrive in a different order.
+    // ⚠ NOTHING WAS DELETED — the claim this line exists to hold. Depth was
+    // RE-TIERED, not cut: everything reachable before is still reachable, it
+    // just arrives in a better order. Stated as a floor, not an equality,
+    // because the re-tier was allowed to ADD (OTA-1452 wrote three new counter
+    // questions for the quartermasters) and an exact count would read a
+    // deliberate addition as a regression.
     expect(total('met')).toBeGreaterThanOrEqual(60);       // was 42
-    expect(total('trusted')).toBe(301);                    // unchanged, deliberately
+    expect(total('trusted')).toBeGreaterThanOrEqual(301);  // was 301 — never fewer
     // The step INTO `known` is now smaller than the opening tier it follows.
     expect(total('known') - total('met')).toBeLessThan(total('met'));
   });

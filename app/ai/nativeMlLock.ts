@@ -82,6 +82,45 @@ export const ML_PRIORITY_HOMEWORK = -1;
 export const ML_PRIORITY_VOICE = 2;
 export const ML_PRIORITY_LLM = 1;
 
+/** ⚠⚠⚠ OTA-1452 — GIVING BACK ~425MB OUTRANKS EVERYTHING, INCLUDING THE VOICE.
+ *
+ *  ⚠⚠ THE MEASUREMENT, off the owner's crash ledger — a gap between two
+ *  breadcrumbs, which is the one thing a dead process still tells you:
+ *      PROCESS KILLED — no JS ran
+ *      last checkpoint: ctx-release (+9152ms)
+ *  `dispose()` stamps `ctx-release`, frees the context, then stamps
+ *  `ctx-release-done`. The second crumb never landed. So the free was asked for,
+ *  did not finish for NINE SECONDS, and the process died mid-teardown —
+ *  backgrounded, still holding the whole model, which is precisely the state
+ *  Android's low-memory killer reaps first.
+ *
+ *  ⚠⚠ AND THE TEARDOWN WAS QUEUED AT `ML_PRIORITY_LLM` BY DEFAULT, because it
+ *  passed no priority at all. Two things follow from that one omission, and both
+ *  make a backgrounded app hold 425MB for longer:
+ *
+ *    1. It sits BELOW voice, so any queued Kokoro synth — up to three whole
+ *       lines, per OTA-634's cap — runs before the free does.
+ *    2. Worse, it trips OTA-1144's reservation hold. `pumpMl` defers anything
+ *       BELOW `ML_PRIORITY_VOICE` while a voice slot is reserved, so the
+ *       teardown can be parked waiting on a line that has not arrived yet and
+ *       may never arrive.
+ *
+ *  Both behaviours are right for narration and wrong for a free. The app has
+ *  been told to go away; a voice line nobody is present to hear cannot outrank
+ *  handing back the largest allocation in the process.
+ *
+ *  ⚠ IT ALSO PREEMPTS. Ranking above everything means `priority > runningPriority`
+ *  holds against whatever is running, so an op that offered an `onPreempt` hook
+ *  is cut short the moment a teardown is enqueued instead of being waited out.
+ *  `dispose()` separately calls llama.cpp's `stopCompletion()` outside the lock
+ *  for the ops that offer no hook.
+ *
+ *  ⚠ NOTHING ELSE MAY USE THIS RANK. It does not mean "important work", it means
+ *  "the process is going away". A generation that gave itself this rank would
+ *  starve the voice permanently — the exact failure OTA-634 spent an OTA
+ *  undoing. */
+export const ML_PRIORITY_TEARDOWN = 3;
+
 /** ⚠ OTA-1144 — THE HANDOFF WINDOW: PRIORITY CANNOT RANK WORK THAT HASN'T
  *  ARRIVED YET.
  *

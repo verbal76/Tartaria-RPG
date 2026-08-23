@@ -57,7 +57,7 @@ jest.mock('expo-av', () => ({
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { blockAt } from '../test-utils/srcBlock';
+import { blockAt, between } from '../test-utils/srcBlock';
 const read = (...p: string[]): string => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 /** ⚠ OTA-1396 — SLICE 5 split this subsystem across two files, and this suite
  *  reads BOTH on purpose. The instruments (the memory-warning handler, the
@@ -85,26 +85,87 @@ const codeOnly = (src: string): string => src
   .replace(/^\s*\/\/.*$/gm, '');
 
 describe('OTA-1173 — the model load finally takes the native-ML lock', () => {
+  // ⚠⚠⚠ ALL THREE REBUILT BY OTA-1452, AND THE REASON IS THE POINT. Each asserted a
+  // SYNTAX — a literal call spelling, a fixed 1200-char window, a count of occurrences —
+  // as a stand-in for a CLAIM. OTA-1452 restructured the load into
+  // `runExclusiveNativeMl<LlamaContext | null>(async () => { … })` so that the load and
+  // its possible immediate self-free are one indivisible critical section, and all three
+  // pins broke while every claim they defend stayed true. A test that fails on a rename
+  // it does not care about teaches you to edit tests instead of reading them.
+  //
+  // Rebuilt to find each native entry point by NAME and check that one, so they survive
+  // reformatting and still fail the instant a native call escapes the lock.
+
+  const LOAD_ANCHOR = 'const fresh = await runExclusiveNativeMl';
+
   it('⚠⚠ THE BIGGEST ALLOCATION IN THE APP WAS THE ONE CALL GOING IN UNSERIALIZED', () => {
     // Completion took the lock (OTA-459's Tensor G5 SIGSEGV). Release took it (OTA-1123).
     // The ~400MB context LOAD — larger than either — did not.
     const code = codeOnly(RUNTIME);
-    expect(code).toContain('runExclusiveNativeMl(() => mod.initLlama(');
-    // The bare unserialized call must be gone, not merely wrapped somewhere nearby.
-    expect(code).not.toMatch(/=\s*await\s+mod\.initLlama\(/);
+    const load = blockAt(code, LOAD_ANCHOR, { mode: 'opener' });
+    expect(load).toMatch(/mod\.initLlama\(/);
+    // ⚠ And NOWHERE ELSE — the assertion that actually forbids the bug rather than
+    // confirming the fix. An unserialized load added later lands outside this block.
+    expect(code.replace(load, '')).not.toMatch(/mod\.initLlama\(/);
   });
 
   it('⚠ IT LOADS AT LLM PRIORITY, so a voice line still outranks a reload', () => {
     // The player hears the Arbiter on time and the reload waits its turn. Loading ABOVE
     // voice would trade a crash for a stutter on every line.
-    const i = codeOnly(RUNTIME).indexOf('runExclusiveNativeMl(() => mod.initLlama(');
-    expect(i).toBeGreaterThan(-1);
-    expect(codeOnly(RUNTIME).slice(i, i + 1200)).toContain('ML_PRIORITY_LLM');
+    //
+    // ⚠ Read off the END of the lock call rather than a fixed window from its start. The
+    // old 1200-char slice is exactly the fragility the slice-pin ratchet exists to
+    // remove, and it went stale the first time the body grew.
+    // ⚠ THE FIRST priority token after the load's lock call is the load's own rank.
+    // Position-based: no fixed window, and it cannot drift onto a neighbour's argument
+    // the way a byte-count slice does.
+    const code = codeOnly(RUNTIME);
+    const at = code.indexOf(LOAD_ANCHOR);
+    expect(at).toBeGreaterThan(-1);
+    const prioAt = code.indexOf('ML_PRIORITY_', at);
+    expect(prioAt).toBeGreaterThan(at);
+    const rank = /ML_PRIORITY_[A-Z]+/.exec(code.slice(prioAt))?.[0];
+    expect(rank).toBe('ML_PRIORITY_LLM');
+    // ⚠ Explicitly NOT the teardown rank. OTA-1452 added a tier above voice for handing
+    // memory BACK; a load wearing it would starve the voice on every single line.
+    expect(rank).not.toBe('ML_PRIORITY_TEARDOWN');
   });
 
-  it('all three native entry points are serialized now — load, completion, release', () => {
+  it('⚠⚠ EVERY native entry point is serialized — the load, completion, and EVERY release', () => {
+    // ⚠ REBUILT: this counted `runExclusiveNativeMl(` occurrences and asserted >= 3,
+    // which is a proxy rather than the claim — and OTA-1452 broke the proxy while making
+    // the claim MORE true. The straggler free stopped being a separate acquisition
+    // precisely BECAUSE a second one let a queued load slip in between it and the load.
+    // Now every native call site is located and checked for itself.
     const code = codeOnly(RUNTIME);
-    expect((code.match(/runExclusiveNativeMl\(/g) ?? []).length).toBeGreaterThanOrEqual(3);
+    const NATIVE = [
+      { what: 'the ~425MB model LOAD', re: /mod\.initLlama\(/g },
+      { what: 'a COMPLETION', re: /\bctx\.completion\(|\bcontext\.completion\(/g },
+      { what: 'a context RELEASE', re: /\.release\(\)/g },
+    ];
+    for (const { what, re } of NATIVE) {
+      const sites = [...code.matchAll(re)].map((m) => m.index ?? -1);
+      expect({ what, found: sites.length > 0 }).toEqual({ what, found: true });
+      for (const at of sites) {
+        // Every one must sit after some `runExclusiveNativeMl` on the same statement
+        // chain — i.e. there is a lock acquisition between the top of the function and
+        // this call. Position-based; no magic distances.
+        const lockAt = code.lastIndexOf('runExclusiveNativeMl', at);
+        expect({ what, at, guarded: lockAt > -1 && lockAt < at }).toEqual({ what, at, guarded: true });
+      }
+    }
+  });
+
+  it('⚠⚠ …and the LOAD does not re-enter the lock while it already holds it', () => {
+    // OTA-1452's deadlock, pinned from the other side. The straggler free lives INSIDE
+    // the load's callback, so it must not acquire the lock again — that second
+    // acquisition is what let another ~425MB load start while the orphan was still
+    // allocated, which is two live contexts and the very thing the guard prevents.
+    // ⚠ Scoped to the disown branch itself — from the epoch comparison to the `return
+    // null` that ends it — so the claim is about THAT code and nothing around it.
+    const straggler = between(codeOnly(RUNTIME), 'if (this.disposeEpoch !== epochAtLoad)', 'return null;');
+    expect(straggler).toContain('.release()');            // it does free in there…
+    expect(straggler).not.toContain('runExclusiveNativeMl'); // …without queueing to do it
   });
 });
 

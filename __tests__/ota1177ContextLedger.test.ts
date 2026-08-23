@@ -249,13 +249,45 @@ describe('OTA-1177 — a real LlamaRuntime, driven', () => {
 
     // Now let the load land. It opens a context that the dispose already gave up on.
     f.settle();
-    await loading;
+
+    // ⚠⚠⚠ AMENDED BY OTA-1452 — THIS TEST USED TO ASSERT THE LEAK. IT NOW ASSERTS ITS
+    // DEATH. What stood here was:
+    //     expect(l.released).toBe(0);
+    //     expect(l.live).toBe(1);   // "live=1 with nobody having asked for it"
+    // — correct, deliberate, and shipped as a DIAGNOSIS. OTA-1177's rule was *"measure
+    // the cause, or ship an instrument"*, so it described the orphan, counted it, changed
+    // no behaviour, and closed with "whether it happens on the owner's phone is still
+    // unmeasured."
+    //
+    // ⚠⚠⚠ AND THE MEASUREMENT IS THIS TEST, NOT A DEVICE LOG. Stated exactly, because
+    // OTA-1173 is what happens when it is not. I first read the owner's 4.32.11 report as
+    // showing this leak in the wild; it does not. `Opened: 7 · Released: 6 · Peak live: 1`
+    // — and PEAK LIVE 1 settles it, since an orphan makes the next load the second live
+    // context. Both orphan counters were 0 (they print only when non-zero and neither line
+    // appears). `live=1` at capture was just the app foregrounded and warm.
+    //
+    // What DID get measured is right here: run this suite with the epoch bump removed from
+    // `dispose()` and it reports `released=0, live=1` with the fake's `release()` never
+    // called — a ~425MB context alive and unreachable, in executed code rather than in a
+    // paragraph. That satisfies OTA-1177's rule; the owner's two PROCESS KILLED entries
+    // are NOT claimed as this bug and stay open.
+    //
+    // The load disowns itself: a dispose it never saw landed mid-allocation, so the
+    // context it just finished building belongs to nobody and it frees it rather than
+    // assigning it over the null the dispose wrote.
+    await expect(loading).rejects.toThrow(/disposed mid-allocation/);
     const l = contextLedger();
     expect(l.opened).toBe(1);
-    expect(l.released).toBe(0);
-    // ⚠ live=1 with nobody having asked for it. THIS is the shape we are looking for in
-    // the device log — and whether it happens on the owner's phone is still unmeasured.
-    expect(l.live).toBe(1);
+    expect(l.released).toBe(1);
+    expect(l.live).toBe(0);                 // ⚠ the orphan is gone
+    expect(f.releaseCount()).toBe(1);       // and the NATIVE side was genuinely freed
+    expect(l.stragglersTornDown).toBe(1);   // by the guard, not by luck
+    // ⚠ disposeFoundNothing STAYS at 1, and must: it records that a dispose freed zero
+    // bytes, which is still true and still worth seeing. The straggler counter beside it
+    // is what says the bytes were reclaimed a moment later, through the other door.
+    expect(l.disposeFoundNothing).toBe(1);
+    // …and the runtime did not quietly adopt it.
+    expect(rt.isReady()).toBe(false);
   });
 
   test('the routine empty dispose stays SILENT', async () => {
