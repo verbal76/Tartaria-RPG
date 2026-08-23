@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { canonicalItemTags } from '../engine/crafting';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
@@ -36,6 +36,11 @@ import { CombatPrimerModal } from '../components/CombatPrimerModal'; // OTA-1321
 const INVESTIGATE_ALL_GAP_MS = 2_200;
 // OTA-1251 — the ★ takes AND wears; both read from the same catalog lookups.
 import { isUpgradeOverEquipped, upgradeEquipSlot } from '../engine/gatherSort';
+// ⚠ OTA-1457 — the feed's trailing action chip. Leaf module: it imports no
+// screen and no store, so its rule can be tested without a renderer.
+import {
+  pickFeedActionChip, feedActionChipLabel, feedActionChipA11yLabel,
+} from '../engine/feedActionChip';
 import { ClimbModal } from '../components/ClimbModal';
 import { TorchProbeModal } from '../components/TorchProbeModal';
 import { HookContinueModal } from '../components/HookContinueModal';
@@ -766,6 +771,53 @@ export function ExplorationScreen() {
     if (currentScene?.wanderer?.name) return `talk to ${currentScene.wanderer.name}`;
     return null;
   }, [gatherChips, currentScene?.vendor?.name, currentScene?.wanderer?.name]);
+
+  // ⚠⚠⚠ OTA-1457 — TAKE-AND-WEAR, IN ONE PLACE, BECAUSE IT NOW HAS TWO CALLERS.
+  //
+  // This is the OTA-1237 block verbatim, lifted out of the gather picker's
+  // `onTake` so the feed chip runs THE SAME CODE rather than a copy of it. A
+  // second hand-written copy is how the two would eventually disagree about
+  // when the equip is safe — and the safety here is subtle enough that a copy
+  // WOULD drift:
+  //
+  //   • the slot comes from the same catalog lookups the ★ mark uses, so a row
+  //     cannot advertise an upgrade and then have nowhere to put it; and
+  //   • the equip only runs IF THE TAKE ACTUALLY LANDED. `takeAmbientNoun`
+  //     refuses by LOGGING, not by throwing — a full pack, an already-worked-over
+  //     noun — so equipping regardless would answer one refusal with a second
+  //     ("I don't see it on you") at a player who did nothing wrong.
+  const takeAndWear = useCallback((noun: string) => {
+    const wear = isUpgradeOverEquipped(player, noun) ? upgradeEquipSlot(player, noun) : null;
+    takeAmbientNoun(noun);
+    if (!wear) return;
+    const held = useGameStore.getState().player?.inventory ?? [];
+    if (held.some((i) => i.name.toLowerCase() === wear.name.toLowerCase() && i.quantity > 0)) {
+      useGameStore.getState().equipItem(wear.name, wear.slot);
+    }
+  }, [player, takeAmbientNoun]);
+
+  // ⚠⚠ OTA-1457 — THE FEED'S TRAILING CHIP, DERIVED FROM THE PICKER'S OWN ARRAY.
+  // `gatherChips` is the exact list the take picker renders, consumed rows already
+  // flagged by the pass that greys them. So the chip cannot offer a noun the picker
+  // would refuse — the same structural guarantee OTA-1455 gave the parser hint, and
+  // for the same reason: an offer the game then rejects teaches the player that the
+  // offer meant nothing.
+  const feedChip = useMemo(
+    // ⚠⚠⚠ NOT DURING THE TUTORIAL, AND THIS WAS A REAL BUG THE SUITE CAUGHT.
+    // `takeAndWear` is the NON-TUTORIAL tail of the picker's `onTake`: the
+    // tutorial branches above it advance the beat, and the chip skips them. So a
+    // player who tapped the chip during the armor beat got the vest, wore it, and
+    // stayed stuck on `armor` — the beat waiting forever for a tap on a row they
+    // had already been given a faster way past. ota1253 failed exactly this way.
+    //
+    // ⚠ The gate is the WHOLE tutorial (`tutBeat !== null`), not the narrower
+    // `tutLock`. During a scripted beat there is exactly one right control and the
+    // beat is pointing at it; a second, faster route to the same action competes
+    // with the thing being taught. Same reasoning the more-tray uses for refusing
+    // to let a forced-open tray write the player's own preference.
+    () => (tutBeat !== null ? null : pickFeedActionChip(player, gatherChips)),
+    [player, gatherChips, tutBeat],
+  );
   const gatherLaneCount = gatherCounts.lanes;
   /** ⚠ Rows the picker would actually draw. Zero = an empty card, so the button
    *  must not promise one. */
@@ -1520,7 +1572,13 @@ export function ExplorationScreen() {
           row (see InputBox `torch` QuickBtn), NOT a top banner. */}
 
       <TutorialTarget area="feed" style={styles.feed}>
-        <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
+        <AdventureFeed
+          entries={gameLog}
+          enemyNames={currentScene?.enemies.map((e) => e.name)}
+          actionChipLabel={feedChip ? feedActionChipLabel(feedChip) : null}
+          actionChipA11yLabel={feedChip ? feedActionChipA11yLabel(feedChip) : undefined}
+          onActionChipPress={feedChip ? () => takeAndWear(feedChip.noun) : undefined}
+        />
         {/* ⚠ OTA-1168 — THE LIVE TEXT IS NO LONGER SHOWN. Owner: "while the arbiter is
             typing live, can we keep that hidden and just see the end result on the screen
             like the rest of the text."
@@ -2340,18 +2398,8 @@ export function ExplorationScreen() {
           // time" since the owner first asked about the mark (OTA-1237); it just had
           // never done it. The slot comes from the same catalog lookups the mark
           // does, so a row cannot show ★ and then have nowhere to go.
-          const wear = isUpgradeOverEquipped(player, noun) ? upgradeEquipSlot(player, noun) : null;
-          takeAmbientNoun(noun);
-          // ⚠ ONLY IF IT ACTUALLY LANDED. The take can refuse — a full pack, an
-          // already-worked-over noun — and both refuse by logging rather than
-          // throwing. Equipping regardless would answer the refusal with a second
-          // one ("I don't see it on you") for a player who did nothing wrong.
-          if (wear) {
-            const held = useGameStore.getState().player?.inventory ?? [];
-            if (held.some((i) => i.name.toLowerCase() === wear.name.toLowerCase() && i.quantity > 0)) {
-              useGameStore.getState().equipItem(wear.name, wear.slot);
-            }
-          }
+          // ⚠ OTA-1457 — shared with the feed chip; see `takeAndWear` above.
+          takeAndWear(noun);
         }}
         onSalvage={(noun) => {
           Keyboard.dismiss();

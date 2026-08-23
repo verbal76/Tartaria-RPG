@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import type { GameLogEntry, LogChannel } from '../engine/types';
 import { HIDDEN_LOG_CHANNELS } from '../engine/gameLog';
 
@@ -9,6 +9,17 @@ interface Props {
    *  mentions inline within world / combat / reward text in the combat
    *  color so they stand out as the live threats. */
   enemyNames?: string[];
+  /** ⚠ OTA-1457 — the trailing action chip's button face, or null for none.
+   *  A LABEL and a HANDLER, not a chip object: this component stays ignorant of
+   *  what the action is, which is what keeps the reachability rule enforceable
+   *  in the one place that owns the truth (ExplorationScreen, which holds the
+   *  picker's own array). A feed that understood equipment would be a second
+   *  place that could decide something is takeable. */
+  actionChipLabel?: string | null;
+  /** Screen-reader sentence for the chip. ⚠ Required whenever a label is given —
+   *  see the pin in ota1457. */
+  actionChipA11yLabel?: string;
+  onActionChipPress?: () => void;
 }
 
 // Color palette per the user's spec:
@@ -134,7 +145,7 @@ function renderBodyWithEnemyHighlight(
   return <Text style={[styles.body, { color: baseColor }]}>{parts}</Text>;
 }
 
-export function AdventureFeed({ entries, enemyNames }: Props) {
+export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChipA11yLabel, onActionChipPress }: Props) {
   const scrollRef = useRef<ScrollView>(null);
   const visible = entries.filter((e) => !HIDDEN_CHANNELS.has(e.channel));
   const names = useMemo(
@@ -237,6 +248,35 @@ export function AdventureFeed({ entries, enemyNames }: Props) {
           </View>
         );
       })}
+
+      {/* ⚠⚠⚠ OTA-1457 — THE TRAILING ACTION CHIP, AND WHY IT IS *HERE*.
+          It renders AFTER the entry map, outside it, so it is structurally
+          incapable of attaching to a historic entry. That is not a layout
+          preference — it is the fix for the one way this feature could hurt.
+
+          This feed auto-scrolls UNCONDITIONALLY: `scrollToEnd` fires from both
+          the entry-count effect and `onContentSizeChange`. Yank-to-bottom is
+          deliberate (OTA 026, after a playtester lost her own death to a
+          sticky-bottom gate). So ANY element that changes content height above
+          the fold drags the view down under the player's thumb mid-read. A chip
+          appended at the very bottom cannot do that: the feed is already there.
+
+          If somebody later moves this inside the map "so each line can carry its
+          own chip", that IS the bug. It belongs outside. */}
+      {actionChipLabel ? (
+        <View style={styles.chipRow}>
+          <TouchableOpacity
+            style={styles.chip}
+            activeOpacity={0.7}
+            onPress={onActionChipPress}
+            accessibilityRole="button"
+            accessibilityLabel={actionChipA11yLabel}
+            testID="feed-action-chip"
+          >
+            <Text style={styles.chipText}>{actionChipLabel}</Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
     </ScrollView>
   );
 }
@@ -293,4 +333,25 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   storyBody: { fontSize: 15, lineHeight: 25 },
+  // ⚠ OTA-1457 — the trailing action chip.
+  //
+  // ⚠⚠ OUTLINE, NOT FILL, AND THAT IS LOAD-BEARING. OTA-1454 spent a whole OTA
+  // establishing that a SOLID fill means "this is the turn-ending strike" and an
+  // outline means "this is a side action". A take-and-wear is emphatically a side
+  // action, so it takes the outline. The review that asked for this chip proposed
+  // defaulting it to the `ready` green — the exact fill we had just retired from
+  // the attack buttons — which would have re-imported the ambiguity one layer down.
+  //
+  // ⚠ AND THE FILL IS OPAQUE (arb86): the feed background is player-tunable, and a
+  // low-alpha fill lets a bright user-picked hue flood straight through the chip.
+  chipRow: { marginTop: 4, marginBottom: 4, flexDirection: 'row' },
+  chip: {
+    borderColor: '#9ec96a',
+    borderWidth: 1,
+    backgroundColor: '#12160e',
+    borderRadius: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  chipText: { color: '#9ec96a', fontSize: 13, fontWeight: '700' },
 });
