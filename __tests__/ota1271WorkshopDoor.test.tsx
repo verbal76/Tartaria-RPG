@@ -88,15 +88,49 @@ function textOf(n: unknown): string {
   return node?.props ? textOf(node.props.children) : '';
 }
 
+/** ⚠⚠ REBUILT BY OTA-1454, AND THE REASON MATTERS MORE THAN THE FIX. This found
+ *  the way out by matching `/^exit$/i` against the button's LABEL. So the moment
+ *  the label gained a door glyph and a real screen-reader sentence — copy
+ *  changes, both improvements — this test failed, and its actual claim ("the way
+ *  out appears at the Gate and the Square, and NOT in the Vault") had not moved
+ *  an inch. Worse, its failure cascaded: it aborted before walking, so the NEXT
+ *  test started from the wrong room and failed for a reason that did not exist.
+ *
+ *  ⚠ A control's IDENTITY is not its wording. `testID` is the contract, the label
+ *  is copy, and the copy is supposed to keep improving. Same lesson the verb-reach
+ *  tool was rebuilt on the same day: assert on what a thing IS, not what it is
+ *  currently called. */
 function exitChipVisible(): boolean {
   let tree!: Tree;
   renderer.act(() => { tree = renderer.create(React.createElement(ExplorationScreen)); });
-  const hits = tree.root.findAll((n) =>
-    typeof n.props?.onPress === 'function'
-    && /^exit$/i.test((typeof n.props.accessibilityLabel === 'string' && n.props.accessibilityLabel.length > 0
-      ? n.props.accessibilityLabel : textOf(n)).trim()));
+  const hits = tree.root.findAll((n) => n.props?.testID === 'exit-chip');
   renderer.act(() => { tree.unmount(); });
   return hits.length > 0;
+}
+
+/** ⚠ …and the SCREEN-READER contract is still checked, separately. Keying the
+ *  lookup on testID would otherwise let the button go on announcing anything at
+ *  all — including nothing — while this suite reported it healthy.
+ *
+ *  ⚠⚠ ONLY the accessibility label, deliberately. My first cut also asserted the
+ *  VISIBLE text through `textOf`, which does not reach the nested <Text> inside a
+ *  composite in react-test-renderer — so it failed on a button that was perfectly
+ *  correct. That assertion was redundant anyway: ota1454 pins the visible label
+ *  (`🚪 EXIT`) at source, where it can be read exactly. Two suites, two claims,
+ *  neither of them guessing at the other's job. */
+function exitChipAnnouncesItself(): boolean {
+  let tree!: Tree;
+  renderer.act(() => { tree = renderer.create(React.createElement(ExplorationScreen)); });
+  // ⚠ ACROSS EVERY node carrying the id, not just the first. `findAll` returns
+  // the COMPOSITE (TravelBtn, whose prop is `a11yLabel`) before the host element
+  // (TouchableOpacity, whose prop is `accessibilityLabel`) — so reading `[0]`
+  // asked the wrong object and got undefined from a button that was correct.
+  // Third time today that assuming a shape beat reading one.
+  const labels = tree.root
+    .findAll((n) => n.props?.testID === 'exit-chip')
+    .map((n) => String(n.props?.accessibilityLabel ?? n.props?.a11yLabel ?? ''));
+  renderer.act(() => { tree.unmount(); });
+  return labels.some((l) => /exit/i.test(l));
 }
 
 const beat = (): string | null => {
@@ -167,6 +201,8 @@ describe('OTA-1271 — played on the real screen', () => {
   it('⚠⚠ EXIT shows at the Gate, shows in the middle, and NOT in the Vault', () => {
     expect(useGameStore.getState().player?.hubRoomId).toBe('outpost_gate');
     expect(exitChipVisible()).toBe(true);
+    // ⚠ OTA-1454 — and it still announces itself as the way out.
+    expect(exitChipAnnouncesItself()).toBe(true);
     // ⚠ OTA-1279 — walked one legal edge at a time. The old version of this
     // test used `go to the workshop` and relied on earned fast-travel, which
     // the owner's navigation spec deleted.

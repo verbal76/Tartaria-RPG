@@ -83,8 +83,18 @@ describe('⚠⚠ OTA-1194 — the fallback is the point', () => {
   });
 
   it('the chip is actually gated on it in the render', () => {
+    // ⚠⚠ REBUILT BY OTA-1454, THIRD PIN TODAY BROKEN BY A LABEL CHANGE. This
+    // matched the literal `<TravelBtn label="EXIT"` immediately after the gate, so
+    // giving the button a door glyph and a screen-reader sentence failed a test
+    // whose claim — "the chip is gated on showExitChip, not rendered blindly" —
+    // was untouched. The gate is the claim; the wording of the thing it gates is
+    // copy, and copy is supposed to keep improving.
     const src = SRC('app/components/InputBox.tsx');
     expect(src).toContain('{showExitChip ? (');
-    expect(src).toMatch(/showExitChip \? \(\s*\n\s*<TravelBtn label="EXIT"/);
+    // The gate wraps a TravelBtn carrying the exit CONTRACT, however it is worded.
+    const gated = src.slice(src.indexOf('{showExitChip ? ('));
+    const upToClose = gated.slice(0, gated.indexOf(') : null}'));
+    expect(upToClose).toContain('<TravelBtn');
+    expect(upToClose).toContain('testID="exit-chip"');
   });
 });

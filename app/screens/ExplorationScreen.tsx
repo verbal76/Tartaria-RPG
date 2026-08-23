@@ -742,6 +742,30 @@ export function ExplorationScreen() {
     }
     return { lanes: lanes.size, rows };
   }, [gatherChips]);
+  /** ⚠⚠ OTA-1455 — WHAT TO SUGGEST TYPING, DRAWN FROM WHAT IS ACTUALLY HERE.
+   *
+   *  The parser is a first-class way to play — several verbs are typed-only by
+   *  design — and the input advertised it with a static "What do you do?", which
+   *  reads as a search box rather than as a conversation. An outside review put
+   *  it well: a generic bar says "Google fallback", not "this engine takes prose".
+   *
+   *  ⚠⚠⚠ AND IT MUST NEVER SUGGEST SOMETHING THE PARSER WOULD REFUSE. A hint that
+   *  fails is worse than no hint: the player's first typed sentence gets rejected
+   *  and they conclude typing does not work. So the noun comes from `gatherChips`
+   *  — THE EXACT ARRAY THE PICKER RENDERS, consumed rows already flagged — not
+   *  from the raw scene list and not from a table of nice-sounding examples. If
+   *  the picker would grey it, this cannot offer it.
+   *
+   *  ⚠ It changes when the noun is spent, which is the right moment: a hint that
+   *  held while its subject was worked over would go stale in place. Deterministic
+   *  (first live row, authored order) so it does not flicker between renders. */
+  const parserHint = useMemo(() => {
+    const live = gatherChips.find((c) => !c.consumed);
+    if (live) return `take the ${live.noun}`;
+    if (currentScene?.vendor?.name) return `talk to ${currentScene.vendor.name}`;
+    if (currentScene?.wanderer?.name) return `talk to ${currentScene.wanderer.name}`;
+    return null;
+  }, [gatherChips, currentScene?.vendor?.name, currentScene?.wanderer?.name]);
   const gatherLaneCount = gatherCounts.lanes;
   /** ⚠ Rows the picker would actually draw. Zero = an empty card, so the button
    *  must not promise one. */
@@ -1694,6 +1718,7 @@ export function ExplorationScreen() {
               const marks = worldMemory.visitedRooms?.[roomKey]?.searchedAmbientNouns ?? [];
               return sceneNouns.filter((n) => isClimbable(n) && !isClimbCleared(n, marks)).length;
             })()}
+            parserHint={parserHint}
             investigateCount={(() => {
               // 2026-05-25 — green tone for INVESTIGATE when the scene
               // has at least one chip still actionable (not

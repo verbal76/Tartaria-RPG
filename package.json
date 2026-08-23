@@ -23,6 +23,7 @@
     "check:requires": "node scripts/check-requires.mjs",
     "export:web": "expo export --platform web",
     "check:lines": "node scripts/verify-lines.mjs",
+    "check:verbreach": "node scripts/check-verb-reach.mjs",
     "check:slicepins": "node scripts/check-slice-pins.mjs"
   },
   "dependencies": {

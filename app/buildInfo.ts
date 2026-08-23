@@ -24456,7 +24456,46 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // which a cold radio at launch routinely misses. Ten now, the same budget every
 // other caller already uses. A live connection answers in under a second, so the
 // only devices that spend the extra time are the ones that were failing.
-export const OTA_BUILD_ID = '2026-08-23-1453-the-labelled-door';
+// OTA-1454 — groups that actually read, from an outside UX review.
+// ⚠ AND THE COMBAT HALF USES THE REVIEWER'S OWN METHOD, not my first one. I gave
+// attacks a NEW colour; they proposed keeping the hue and separating by WEIGHT —
+// a solid green block for a decisive strike, the same green as a thin border for
+// the ready pool's modifiers. Better, and the owner took it: in a restricted
+// parchment-and-soot palette you do not spend a colour on rank. Their "ghost /
+// transparent" spelling is the one thing that had to change — arb86 records what
+// transparency costs here once the background is player-tunable — so the ghost is
+// a solid near-black that merely reads unfilled.
+// COMBAT: the review said the row was "11 identical flat buttons" and asked for
+// the verbs to be colour-coded. They already were — and it was right anyway, for
+// a reason screenshots could not show: every attack within reach and every
+// utility chip (golem, ability, loot, bandolier) were BOTH green, so the
+// turn-ending strikes were indistinguishable from the side actions and only the
+// blue defensive group read as a group. Attacks now have their own tone — the
+// game's parchment turned up, no new hue, because amber already means
+// out-of-reach and red already means unavailable. The out-of-reach amber is
+// untouched: that is a state, not a group.
+// THE WAY OUT: the review and the owner independently said the same thing about
+// EXIT — it wears the identical chip as the room doors beside it, so leaving the
+// building reads as stepping next door. It carries the 🚪 the maps already use
+// for the same rooms and its own cooler border now. Marked, not moved: every
+// room stays one tap away on that row, which is what keeps anyone from being
+// stranded behind an exit rule.
+// OTA-1455 — the input bar says what it accepts, using this room.
+// It said "What do you do?" no matter where you stood, which reads as a search
+// field — and the parser is a first-class way to play here, with verbs that have
+// no button at all. It now offers a real example drawn from what is actually in
+// front of you ("❯ try: take the rusted grate"), behind a ❯ prompt that marks it
+// as something that takes sentences rather than keywords.
+// ⚠ THE SUGGESTION CAN NEVER BE ONE THE PARSER WOULD REFUSE. It is read from the
+// same array the TAKE/SALVAGE picker renders, consumed rows already flagged — so
+// if the picker would grey it, the bar cannot offer it. When a room has nothing
+// live to point at the bar says nothing rather than inventing an example: a first
+// typed sentence that comes back rejected teaches "typing does not work here",
+// which is the opposite of the lesson. The tutorial name beat and combat keep
+// their own wording, because there the player already has one thing to look at.
+export const OTA_BUILD_ID = '2026-08-23-1455-a-bar-that-speaks';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1454-groups-that-read';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1453-the-labelled-door';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1452-the-free-outranks-everything';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1451-never-have-to-guess';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1450-the-board-knows-your-size';

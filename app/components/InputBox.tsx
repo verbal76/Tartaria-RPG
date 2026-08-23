@@ -41,14 +41,37 @@ import type { InventoryItem, CombatRange, PlayerCharacter } from '../engine/type
  *  green at mid range while the gate refused every swing. Bare hands
  *  (punch/kick, hand = null) stay a fixed barehanded check regardless of
  *  what's equipped. */
+/** ⚠⚠ OTA-1454 — AN IN-REACH ATTACK IS `strike`, NOT `ready`, AND THAT ONE WORD
+ *  IS THE WHOLE FIX.
+ *
+ *  An outside reviewer given only screenshots read the combat row as *"11
+ *  identical flat buttons"* and asked for the groups to be colour-coded. They
+ *  already were — and the review was still right, because two DIFFERENT groups
+ *  had been given the SAME colour:
+ *
+ *    · every attack in reach            → 'ready'  (green)
+ *    · golem / ability / loot / bandolier → 'ready'  (green)
+ *
+ *  So the turn-ending strikes and the utility chips were indistinguishable, and
+ *  `defensive` blue was the only group that read as a group at all. Colour was
+ *  never missing; it was AMBIGUOUS, which is worse, because it looks deliberate.
+ *
+ *  ⚠ THE OUT-OF-REACH AMBER IS UNTOUCHED. That amber is not a group, it is a
+ *  STATE — "this one cannot land from here" — and OTA-930's whole point is that
+ *  a control which cannot act must not look like one that can. Only the
+ *  in-reach answer moved.
+ *
+ *  ⚠ AND NO NEW HUE. `strike` is the game's own parchment turned up, because
+ *  amber already means out-of-reach and red already means unavailable; a sixth
+ *  colour here would have read as a warning on the button you press most. */
 function weaponTone(
   player: PlayerCharacter | null,
   hand: 'main' | 'off' | null,
   range: CombatRange | null | undefined,
-): 'ready' | 'needs-approach' | undefined {
+): 'strike' | 'needs-approach' | undefined {
   if (!range) return undefined;
   const bands = hand && player ? playerWeaponReach(player, hand).bands : reachBandsFor('barehanded');
-  return bands.includes(range) ? 'ready' : 'needs-approach';
+  return bands.includes(range) ? 'strike' : 'needs-approach';
 }
 
 interface Props {
@@ -128,6 +151,12 @@ interface Props {
   // learned to climb; 'aerial' = target flies — can't jump that high).
   dogBlocked?: 'elevated' | 'aerial' | 'downed' | null;
   // arb-fix — a once/day race ability is available → show the ✦ ability chip.
+  /** ⚠⚠ OTA-1455 — a real, currently-actionable thing to suggest typing. Built by
+   *  ExplorationScreen from the SAME array the gather picker renders, so the bar
+   *  can never propose something the parser would refuse. Null when the scene has
+   *  nothing live to point at — and then the bar says nothing rather than
+   *  inventing an example, because a hint that fails teaches the wrong lesson. */
+  parserHint?: string | null;
   raceAbilityReady?: boolean;
   onOpenRaceAbilities?: () => void;
 }
@@ -191,7 +220,7 @@ function shortWeaponLabel(name: string): string {
  *  player's own choice for the rest of the session. */
 let MORE_TRAY_OPEN = false;
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, pickpocketPossible, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, pickpocketPossible, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, parserHint, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   // arb-fix (OTA — adaptive quick row) — the out-of-combat quick row shows the
   // world-interaction verbs (look / rest / investigate / take / salvage / climb /
@@ -564,7 +593,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   Every room is one tap away on this same row, so the way out is
                   never more than two taps. */}
               {roomHasExitDoor(activeBuildingId, activeBuildingRoomId) ? (
-                <TravelBtn label="EXIT" onPress={() => exitBuilding()} />
+                <TravelBtn label="🚪 EXIT" wayOut testID="exit-chip" a11yLabel="Exit, leave this building" onPress={() => exitBuilding()} />
               ) : null}
             </>
           ) : travelTargetName ? (
@@ -598,7 +627,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 <TravelBtn key={c.submit} label={c.label} a11yLabel={c.a11y} destination={false} onPress={() => onSubmit(c.submit)} blocked={tutLock} />
               ))}
               {showExitChip ? (
-                <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} blocked={tutLock && currentBeatId !== 'explore_or_leave'} />
+                <TravelBtn label="🚪 EXIT" wayOut testID="exit-chip" a11yLabel="Exit, leave the outpost for the wilds" onPress={() => onSubmit('leave outpost')} blocked={tutLock && currentBeatId !== 'explore_or_leave'} />
               ) : null}
             </>
           ) : sceneBuilding ? (
@@ -895,12 +924,24 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             // and the retry when it did not — first tap always lands.
             onPressIn={() => inputRef.current?.focus()}
             onFocus={() => setExplorationInputActive(true)}
+            // ⚠⚠ OTA-1455 — THE BAR SAYS WHAT IT ACCEPTS, USING THIS ROOM.
+            // Static "What do you do?" reads as a search box; a concrete example
+            // drawn from what is actually in front of the player reads as an
+            // engine that takes sentences. `❯` marks it as a prompt rather than
+            // a field — one character that says "terminal, not search".
+            //
+            // ⚠ ORDER MATTERS. The tutorial name beat and combat keep their own
+            // wording: during the name beat there is exactly one right answer and
+            // a suggestion would compete with it, and in combat the quick buttons
+            // are the thing to look at.
             placeholder={
               awaitingTutorialName
                 ? 'Speak your name…'
                 : inCombat
                 ? 'What do you do? (or use quick buttons)'
-                : 'What do you do?'
+                : parserHint
+                ? `❯ try: ${parserHint}`
+                : '❯ what do you do?'
             }
             placeholderTextColor="#c9a86a"
             onSubmitEditing={handleSubmit}
@@ -928,7 +969,19 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   );
 }
 
-type QuickBtnTone = 'ready' | 'needs-approach' | 'defensive' | 'unavailable';
+/** ⚠⚠ OTA-1454 — `strike` JOINS THE TONES, AND IT IS THE ONE THAT WAS MISSING.
+ *  An outside reviewer looking only at screenshots read the combat row as
+ *  *"11 identical flat buttons"* and asked for the groups to be colour-coded.
+ *  They ALREADY were — `defensive` has a blue border, `ready` a green border and
+ *  fill, and the two range states their own ambers. What had no tone at all was
+ *  the ATTACKS, which fell through to the base `quick` chip: a `#3a342c` grey
+ *  border, dimmer than every utility beside it.
+ *
+ *  ⚠ So the hierarchy was INVERTED. The turn-ending action — hit the thing — was
+ *  the quietest control on the row, and Dodge, Stealth and the bandolier all
+ *  outshouted it. That is why the groups did not read: not because they were
+ *  absent, but because the most important one was wearing the default. */
+type QuickBtnTone = 'strike' | 'ready' | 'needs-approach' | 'defensive' | 'unavailable';
 
 function QuickBtn({
   label,
@@ -964,6 +1017,7 @@ function QuickBtn({
     : tone ?? (defensive ? 'defensive' : undefined);
   const containerStyle = [
     styles.quick,
+    resolvedTone === 'strike' && styles.quickStrike,
     resolvedTone === 'defensive' && styles.quickDefensive,
     resolvedTone === 'ready' && styles.quickReady,
     resolvedTone === 'needs-approach' && styles.quickNeedsApproach,
@@ -972,6 +1026,7 @@ function QuickBtn({
   ];
   const textStyle = [
     styles.quickText,
+    resolvedTone === 'strike' && styles.quickStrikeText,
     resolvedTone === 'defensive' && styles.quickDefensiveText,
     resolvedTone === 'ready' && styles.quickReadyText,
     resolvedTone === 'needs-approach' && styles.quickNeedsApproachText,
@@ -1038,9 +1093,31 @@ const DIR_ARROW: Record<'north' | 'south' | 'east' | 'west', string> = {
   north: '↑', south: '↓', east: '→', west: '←',
 };
 
-function TravelBtn({ label, onPress, blocked, active, destination, a11yLabel }: {
+/** ⚠⚠ OTA-1454 — `wayOut` MARKS THE ONE BUTTON ON THIS ROW THAT IS NOT A ROOM.
+ *
+ *  An outside UX review, and the owner separately, landed on the same thing:
+ *  *"relocate EXIT out of the directional grid so players don't confuse it with
+ *  adjacent room doors"* / *"the exit doesn't feel right where it is, it should
+ *  be easily noticeable."* EXIT sits in the travel row wearing the identical
+ *  chip as `↑ FIRST LANDING` and `→ ARSENAL`, so it reads as one more door among
+ *  the doors — except this one leaves the building entirely.
+ *
+ *  ⚠ IT IS MARKED, NOT MOVED. Relocating it to a different row would put the way
+ *  out somewhere the player is not looking when they want to leave, and would
+ *  break the "every room is one tap away on this same row" property OTA-1430
+ *  relies on so nobody can be stranded. It keeps its place and stops looking
+ *  like its neighbours: the 🚪 the map already uses for the same rooms
+ *  (OTA-1451), plus its own border so the row reads as "doors… and the way
+ *  out." One glyph, two surfaces, same meaning. */
+function TravelBtn({ label, onPress, blocked, active, destination, wayOut, a11yLabel, testID }: {
   label: string; onPress: () => void; blocked?: boolean; active?: boolean;
-  destination?: boolean; a11yLabel?: string;
+  destination?: boolean; wayOut?: boolean; a11yLabel?: string;
+  /** ⚠⚠ OTA-1454 — A STABLE HANDLE THAT IS NOT THE COPY. ota1271 found this
+   *  button by matching /^exit$/i against its label, so adding a door glyph and
+   *  a descriptive screen-reader label broke a test whose CLAIM ("the way out
+   *  appears here and not there") had not changed at all. Visible words are
+   *  copy and will keep moving; what a control IS should not be read off them. */
+  testID?: string;
 }) {
   const isDestination = destination ?? label.startsWith('→');
   // arb108/arb109 — during the outpost tutorial lockdown, travel/room buttons
@@ -1053,7 +1130,8 @@ function TravelBtn({ label, onPress, blocked, active, destination, a11yLabel }: 
   };
   return (
     <TouchableOpacity
-      style={[styles.travelBtn, isDestination && styles.travelBtnDest, blocked && styles.travelBtnBlocked, active && styles.travelBtnActive]}
+      testID={testID}
+      style={[styles.travelBtn, isDestination && styles.travelBtnDest, wayOut && styles.travelBtnWayOut, blocked && styles.travelBtnBlocked, active && styles.travelBtnActive]}
       onPress={handlePress}
       activeOpacity={blocked ? 1 : 0.7}
       accessibilityRole="button"
@@ -1061,7 +1139,7 @@ function TravelBtn({ label, onPress, blocked, active, destination, a11yLabel }: 
       accessibilityState={{ disabled: !!blocked, selected: !!active }}
     >
       <Text
-        style={[styles.travelBtnText, isDestination && styles.travelBtnTextDest, active && styles.travelBtnTextActive]}
+        style={[styles.travelBtnText, isDestination && styles.travelBtnTextDest, wayOut && styles.travelBtnWayOutText, active && styles.travelBtnTextActive]}
         numberOfLines={isDestination ? 2 : 1}
         ellipsizeMode="tail"
         adjustsFontSizeToFit={!isDestination}
@@ -1134,6 +1212,11 @@ const styles = StyleSheet.create({
   // "LIVING ROOM") fit the equal-width slots without shrinking/ellipsizing
   // as hard. Short labels (NORTH / EXIT) still read fine with it.
   travelBtnText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 2 },
+  // ⚠ OTA-1454 — the way OUT, distinct from the doors beside it. Cooler and
+  // dimmer than the room chips' warm gold: leaving is not the same kind of act as
+  // stepping next door, and on this row it was the only one that looked like it.
+  travelBtnWayOut: { borderColor: '#7a8c9b', backgroundColor: '#161b1f' },
+  travelBtnWayOutText: { color: '#a8bcc9' },
   travelBtnDest: { paddingVertical: 8 },
   travelBtnBlocked: { borderColor: '#2a2620', backgroundColor: '#141210', opacity: 0.5 },
   // you-are-here: the room the player currently stands in, inside a building.
@@ -1163,6 +1246,28 @@ const styles = StyleSheet.create({
     // OTA-1170 — clips the cooldown fill to the chip's rounded corners.
     overflow: 'hidden',
   },
+  // ⚠⚠⚠ OTA-1454 — FILL vs OUTLINE INSIDE ONE HUE, WHICH IS BETTER THAN WHAT I
+  // FIRST BUILT. My first cut gave strikes a NEW colour — a bone border in the
+  // parchment family — reasoning that amber already meant out-of-reach and red
+  // already meant unavailable, so a fresh hue would read as a warning. True, and
+  // it solved the wrong half: it separated the groups by inventing a meaning
+  // instead of ranking the one already there.
+  //
+  // The reviewer's answer is the standard one and it is correct for a restricted
+  // palette: KEEP THE HUE, SEPARATE BY WEIGHT. Green goes on meaning "available".
+  // A SOLID green block with soot lettering is a decisive, turn-ending commitment;
+  // the same green as a thin border on near-black is the ready pool's modifiers
+  // and setup tools. One axis, one job, and no sixth colour in a game built out
+  // of parchment and soot.
+  //
+  // ⚠ OPAQUE, NOT TRANSPARENT — the constraint the reviewer could not know. The
+  // "ghost" variant is spelled as a transparent dark background everywhere it is
+  // taught, and arb86 is this project's record of what that costs here: chips
+  // once used a ~6% alpha fill, and once the BACKGROUND BECAME PLAYER-TUNABLE a
+  // bright hue flooded straight through them ("weird coloring"). So the ghost
+  // reads unfilled and is a solid near-black; the effect is the same and it
+  // survives any background the player picks.
+  quickStrike: { borderColor: '#9ec96a', backgroundColor: '#9ec96a' },
   quickDefensive: { borderColor: '#6a9bbf' },
   // ⚠ OTA-1170 — the dodge recharge bar. Two absolute layers INSIDE the chip and behind
   // the label, clipped by the chip's own radius. `overflow: 'hidden'` on `quick` is what
@@ -1178,6 +1283,9 @@ const styles = StyleSheet.create({
   // player-tunable background a bright hue FLOODED through the chip ("weird
   // coloring"). Now a fully OPAQUE dark green-tinted fill so the chip keeps a
   // solid background on any tuned hue; the green border still marks "ready".
+  // ⚠ THE GHOST HALF of the pair above: same green, worn as a border on a solid
+  // near-black. Unchanged by OTA-1454 — the utilities were never the problem, the
+  // strikes were, and moving both would only have relocated the collision.
   quickReady: { borderColor: '#9ec96a', backgroundColor: '#1b2417' },
   quickNeedsApproach: { borderColor: '#c9a86a' },
   quickUnavailable: { borderColor: '#e07a5f' },
@@ -1189,6 +1297,9 @@ const styles = StyleSheet.create({
   quickDisabled: { borderColor: '#2a2620', backgroundColor: '#141210' },
   quickText: { color: '#cdbf99', fontSize: 12 },
   quickDisabledText: { color: '#6a6253' },
+  // Soot on the solid block — the dark-on-light inversion is what makes it read
+  // as FILLED at a glance rather than as another outlined chip.
+  quickStrikeText: { color: '#15180f', fontWeight: '700' },
   quickDefensiveText: { color: '#6a9bbf' },
   quickReadyText: { color: '#9ec96a' },
   quickNeedsApproachText: { color: '#c9a86a' },
