@@ -50,6 +50,33 @@ const renderer = require('react-test-renderer') as {
   act(cb: () => void): void;
   create(el: React.ReactElement): { toJSON(): unknown };
 };
+
+// ⚠⚠ OTA-1449 — CLOSE WHAT YOU OPEN. This suite mounted a screen and never
+// unmounted it. The screens carry LOOPING animations (the tutorial highlight,
+// the map's "you are here" ring), and a loop whose component is still mounted
+// keeps ticking after the test file finishes — straight into jest tearing the
+// module registry down under it. The tick then reaches freed internals and
+// kills the worker, which ends the run with NO SUMMARY LINE AT ALL: no pass
+// count, no fail count, nothing to notice. A test system that can die silently
+// is the same defect this project spent OTA-1447 removing from its source pins.
+//
+// ⚠ The app itself was never at risk: every looping animation in app/ cancels
+// itself in its unmount cleanup, and screens unmount normally in play. This is
+// test hygiene, and it is why a dozen sibling suites already call unmount().
+const _mounted: Array<{ unmount(): void }> = [];
+// ⚠ Typed as the renderer's OWN create, so callers keep `.toJSON()` / `.root`
+// exactly as before — the tracking is invisible to every existing assertion.
+const trackedCreate = ((el: Parameters<typeof renderer.create>[0]) => {
+  const tree = renderer.create(el);
+  _mounted.push(tree as unknown as { unmount(): void });
+  return tree;
+}) as typeof renderer.create;
+afterEach(() => {
+  const roots = _mounted.splice(0);
+  (renderer as unknown as { act(cb: () => void): void }).act(() => {
+    for (const r of roots) { try { r.unmount(); } catch { /* already gone */ } }
+  });
+});
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -70,7 +97,7 @@ function mountWithScene(nouns: string[]) {
     },
   } as never);
   let tree!: { toJSON(): unknown };
-  renderer.act(() => { tree = renderer.create(<ExplorationScreen />); });
+  renderer.act(() => { tree = trackedCreate(<ExplorationScreen />); });
   return tree;
 }
 

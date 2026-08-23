@@ -50,6 +50,33 @@ const renderer = require('react-test-renderer') as {
   act(cb: () => void): void;
   create(el: React.ReactElement): { toJSON(): unknown; root: RendererNode };
 };
+
+// ⚠⚠ OTA-1449 — CLOSE WHAT YOU OPEN. This suite mounted a screen and never
+// unmounted it. The screens carry LOOPING animations (the tutorial highlight,
+// the map's "you are here" ring), and a loop whose component is still mounted
+// keeps ticking after the test file finishes — straight into jest tearing the
+// module registry down under it. The tick then reaches freed internals and
+// kills the worker, which ends the run with NO SUMMARY LINE AT ALL: no pass
+// count, no fail count, nothing to notice. A test system that can die silently
+// is the same defect this project spent OTA-1447 removing from its source pins.
+//
+// ⚠ The app itself was never at risk: every looping animation in app/ cancels
+// itself in its unmount cleanup, and screens unmount normally in play. This is
+// test hygiene, and it is why a dozen sibling suites already call unmount().
+const _mounted: Array<{ unmount(): void }> = [];
+// ⚠ Typed as the renderer's OWN create, so callers keep `.toJSON()` / `.root`
+// exactly as before — the tracking is invisible to every existing assertion.
+const trackedCreate = ((el: Parameters<typeof renderer.create>[0]) => {
+  const tree = renderer.create(el);
+  _mounted.push(tree as unknown as { unmount(): void });
+  return tree;
+}) as typeof renderer.create;
+afterEach(() => {
+  const roots = _mounted.splice(0);
+  (renderer as unknown as { act(cb: () => void): void }).act(() => {
+    for (const r of roots) { try { r.unmount(); } catch { /* already gone */ } }
+  });
+});
 type RendererNode = {
   findAll(pred: (n: { props: Record<string, unknown> }) => boolean): { props: Record<string, unknown> }[];
 };
@@ -60,6 +87,7 @@ import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { OUTPOST_ROOM_MARKS, outpostRoomMark } from '../app/engine/outpostRoomMarks';
 import { STRUCTURAL_IDS } from '../app/engine/outpostGraph';
+import { blockAt } from '../test-utils/srcBlock';
 
 jest.setTimeout(120_000);
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; });
@@ -86,7 +114,7 @@ async function mountInOutpost(visited: string[]) {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { MapScreen } = require('../app/screens/MapScreen');
   let tree!: { toJSON(): unknown; root: RendererNode };
-  renderer.act(() => { tree = renderer.create(<MapScreen />); });
+  renderer.act(() => { tree = trackedCreate(<MapScreen />); });
   const withLayout = tree.root.findAll((n) => typeof n.props.onLayout === 'function');
   renderer.act(() => {
     for (const n of withLayout) {
@@ -134,7 +162,7 @@ describe('OTA-1355 — the outpost map knows the room you are in', () => {
     const src = readFileSync(join(__dirname, '..', 'app', 'screens', 'MapScreen.tsx'), 'utf8');
     const at = src.indexOf('const autoGlided = useRef(false);');
     expect(at).toBeGreaterThan(-1);
-    const effect = src.slice(at, at + 900);
+    const effect = blockAt(src, 'const autoGlided = useRef(false);');
     expect(effect).toContain('autoGlided.current = true;');
     expect(effect).toContain('centerOnPlayer(outpostRoomMark(');
     // And the ✓ list is built from the SAME visited set the travel chips read,

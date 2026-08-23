@@ -125,7 +125,7 @@ describe('OTA-1244 — the guarantee is recorded once and read everywhere', () =
     const store = src('app', 'state', 'gameStore.ts');
     const i = store.indexOf('const pinnedAmbientNouns = Array.from(new Set([');
     expect(i).toBeGreaterThan(-1);
-    const block = store.slice(i, i + 220);
+    const block = blockAt(store, 'const pinnedAmbientNouns = Array.from(new Set([');
     expect(block).toContain('sceneGearNouns');
     expect(block).toContain('waterSourceNouns');
     expect(block).toContain('rescuePropNouns');

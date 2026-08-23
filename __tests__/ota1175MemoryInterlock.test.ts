@@ -98,7 +98,7 @@ describe('OTA-1175 — a memory warning now silences the watchdog', () => {
     // past the previous 4,000-char slice and made this test read -1 for "not found"
     // rather than for "out of order". The ORDERING CLAIM below is unchanged and is still
     // the whole point — only the window it is measured in moved.
-    const block = STORE.slice(i, i + 9000);
+    const block = blockAt(STORE, "AppState.addEventListener('memoryWarning'");
     const flag = block.indexOf('rpMemoryPressureUntil = Date.now() + MEMORY_PRESSURE_QUIET_MS;');
     const dispose = block.indexOf('.dispose()');
     expect(flag).toBeGreaterThan(-1);
@@ -165,7 +165,7 @@ describe('OTA-1175 — a memory warning now silences the watchdog', () => {
     // release claim is now conditional on a real release.
     const i = STORE.indexOf("AppState.addEventListener('memoryWarning'");
     expect(i).toBeGreaterThan(-1);
-    const block = STORE.slice(i, i + 9000);
+    const block = blockAt(STORE, "AppState.addEventListener('memoryWarning'");
     expect(block).toContain('.dispose()');
     expect(block).toContain('const freed = contextLedger().released > before;');
   });
@@ -186,7 +186,7 @@ describe('OTA-1176 — the instrument stops when nobody is looking', () => {
     // that never get cleared." That one was mine, from the same afternoon.
     expect(STORE).toContain('export function stopRuntimePressureWatch(): void {');
     const i = STORE.indexOf('export function stopRuntimePressureWatch(): void {');
-    const block = STORE.slice(i, i + 700);
+    const block = blockAt(STORE, 'export function stopRuntimePressureWatch(): void {');
     expect(block).toContain('clearTimeout(rpSampleTimer)');
     expect(block).toContain('rpStopFrameClock()');
     expect(block).toContain('rpMemorySub.remove()');
@@ -201,7 +201,7 @@ describe('OTA-1176 — the instrument stops when nobody is looking', () => {
     // COMMENT in the other one and windowed the wrong body.
     const i = STORE.indexOf('export function startRuntimePressureWatch(');
     expect(i).toBeGreaterThan(-1);
-    const block = STORE.slice(i, i + 900);
+    const block = blockAt(STORE, 'export function startRuntimePressureWatch(');
     expect(block).toContain('stopRuntimePressureWatch();');
   });
 
@@ -213,7 +213,10 @@ describe('OTA-1176 — the instrument stops when nobody is looking', () => {
     expect(STORE).toContain('rpStopFrameClock();');
     const i = STORE.indexOf("if (nextStr === 'active') {");
     expect(i).toBeGreaterThan(-1);
-    const block = STORE.slice(i, i + 500);
+    // ⚠ OTA-1447 KEPT A BYTE WINDOW HERE, deliberately: the claim spans the
+    // if-block AND its `} else {`, and the if-block's own boundary closes before
+    // the else. A correct block window is narrower than the assertion's subject.
+    const block = STORE.slice(i, i + 900);
     expect(block).toContain('rpStartFrameClock();');
     expect(block).toContain('} else {');
     expect(block).toContain('rpStopFrameClock();');
@@ -222,7 +225,7 @@ describe('OTA-1176 — the instrument stops when nobody is looking', () => {
   it('⚠ AND TWO LOOPS CAN NEVER STACK — the starter is guarded', () => {
     const i = STORE.indexOf('function rpStartFrameClock(): void {');
     expect(i).toBeGreaterThan(-1);
-    expect(STORE.slice(i, i + 260)).toContain('if (rpFrameRaf !== null) return;');
+    expect(blockAt(STORE, 'function rpStartFrameClock(): void {')).toContain('if (rpFrameRaf !== null) return;');
   });
 });
 

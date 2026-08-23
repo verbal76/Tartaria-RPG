@@ -38,6 +38,7 @@ import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 jest.setTimeout(120_000);
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; });
@@ -94,6 +95,6 @@ describe('OTA-1352 — the rest-in-combat refusal speaks on every tap', () => {
     const src = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
     const at = src.indexOf('Nothing here has agreed to that');
     expect(at).toBeGreaterThan(-1);
-    expect(src.slice(at, at + 400)).toContain('skipDedup: true');
+    expect(blockAt(src, 'Nothing here has agreed to that')).toContain('skipDedup: true');
   });
 });

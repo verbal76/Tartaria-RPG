@@ -58,6 +58,7 @@ import { useGameStore } from '../app/state/gameStore';
 import { GREAT_CLIMBS } from '../app/engine/greatClimbs';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 jest.setTimeout(120_000);
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
@@ -128,6 +129,10 @@ describe('OTA-1304 — a beacon tower routes like every other mission', () => {
     const screen = readFileSync(join(__dirname, '..', 'app', 'screens', 'ContractsScreen.tsx'), 'utf8');
     const i = screen.indexOf('const climbMissions = GREAT_CLIMBS.filter');
     expect(i).toBeGreaterThan(-1);
+    // ⚠ OTA-1447 KEPT A BYTE WINDOW HERE, deliberately. The anchor is a
+    // statement inside JSX-adjacent code with no block of its own to close, so
+    // blockAt throws rather than guess. A positive pin that fails loudly when it
+    // rots is the better of the two imperfect options at this site.
     const section = screen.slice(i, i + 4000);
     expect(section).toContain('SET COURSE TO');
     expect(section).toContain('climbId: c.id');

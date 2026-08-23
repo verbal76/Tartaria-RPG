@@ -37,7 +37,22 @@ const baselineFile = join(root, '.ci-slice-pins-baseline');
 const testsDir = join(root, '__tests__');
 
 // `SRC.slice(i, i + 1200)` — a window whose far edge is a literal byte count.
-const FIXED_WINDOW = /\.slice\(\s*([A-Za-z_$][\w$.]*)\s*,\s*[A-Za-z_$][\w$.]*\s*\+\s*\d+\s*\)/;
+const FIXED_WINDOW = /\.slice\(\s*([A-Za-z_$][\w$.]*)\s*,\s*[A-Za-z_$][\w$.]*\s*\+\s*(\d+)\s*\)/;
+
+// ⚠ WHAT IS NOT A FIXED WINDOW, though it matches the shape. Counting these
+// inflates the number and sends the next reader chasing ghosts:
+//
+//   • `block.slice(recordStart, i + 1)` — `i` is a COMPUTED end (a hand-rolled
+//     brace matcher, a `lastIndexOf('}')`, an array span). The `+ 1` is
+//     inclusivity, not a guess about size. A small addend is the tell.
+//   • the same text sitting inside a comment — several of this project's pins
+//     quote their own history ("this read `store.slice(i, i + 1400)` and
+//     OTA-1380 pushed the target past it"), which is documentation, not code.
+const COMPUTED_END_MAX = 2;
+const isComment = (line) => {
+  const t = line.trim();
+  return t.startsWith('//') || t.startsWith('*') || t.startsWith('/*');
+};
 
 function scan() {
   let positive = 0;
@@ -46,7 +61,10 @@ function scan() {
     if (!/\.tsx?$/.test(name)) continue;
     const lines = readFileSync(join(testsDir, name), 'utf8').split('\n');
     lines.forEach((line, n) => {
-      if (!FIXED_WINDOW.test(line)) return;
+      const m = FIXED_WINDOW.exec(line);
+      if (!m) return;
+      if (isComment(line)) return;
+      if (Number(m[2]) <= COMPUTED_END_MAX) return;
       // The assertion may sit on this line or a few below (`const block = ...`).
       const ctx = lines.slice(n, n + 4).join(' ');
       if (ctx.includes('.not.')) negatives.push(`${name}:${n + 1}`);

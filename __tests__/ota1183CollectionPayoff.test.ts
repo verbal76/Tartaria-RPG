@@ -171,7 +171,7 @@ describe('OTA-1183 — the story screen shows only what was earned', () => {
     const src = SRC('app/state/gameStore.ts');
     const i = src.indexOf('openStoryReveal(storyId)');
     expect(i).toBeGreaterThan(-1);
-    const body = src.slice(i, i + 700);
+    const body = blockAt(src, 'openStoryReveal(storyId)');
     expect(body).toContain('built.parts.length !== built.story.fragments.length');
     expect(body).toContain('return;');
   });
@@ -183,20 +183,20 @@ describe('OTA-1183 — completion is announced where the player is looking', () 
   test('it fires through announceMissionComplete, not a quiet log line', () => {
     const i = src.indexOf('const finished = storyCompletedBy(fragmentId, owned);');
     expect(i).toBeGreaterThan(-1);
-    const block = src.slice(i, i + 1600);
+    const block = blockAt(src, 'const finished = storyCompletedBy(fragmentId, owned);');
     expect(block).toContain('announceMissionComplete');
     expect(block).toContain("story is complete");
   });
 
   test('the title progress is recorded with the story count', () => {
     const i = src.indexOf('const finished = storyCompletedBy(fragmentId, owned);');
-    const block = src.slice(i, i + 1600);
+    const block = blockAt(src, 'const finished = storyCompletedBy(fragmentId, owned);');
     expect(block).toContain('recordTitleProgress(get, set, { collectableStoriesCompleted: done })');
   });
 
   test('the story screen is raised', () => {
     const i = src.indexOf('const finished = storyCompletedBy(fragmentId, owned);');
-    const block = src.slice(i, i + 1600);
+    const block = blockAt(src, 'const finished = storyCompletedBy(fragmentId, owned);');
     expect(block).toContain('set({ storyReveal: { storyId: finished.id } })');
   });
 

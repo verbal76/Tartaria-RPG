@@ -29,21 +29,25 @@
 // anchor, so a rename fails as a rename instead of as nothing at all.
 //
 // ⚠⚠ WHEN A BYTE WINDOW IS STILL THE RIGHT ANSWER — READ THIS BEFORE
-// "FINISHING THE JOB". 86 fixed windows were left in place ON PURPOSE, and 29
-// of those because converting them would make the pin WEAKER, not stronger:
+// "FINISHING THE JOB". A handful of fixed windows survive ON PURPOSE, each
+// marked at its site with "OTA-1447 KEPT A BYTE WINDOW HERE, deliberately".
+// Converting them would make the pin WEAKER or WRONG, not stronger:
 //
-//   The direction of the assertion decides which way slack cuts. Widening a
-//   NEGATIVE pin's window is always safe — more code searched for a forbidden
-//   thing. Widening a POSITIVE pin's window is a LOOSENING: "X appears within
-//   1600 bytes of the anchor" becomes "X appears somewhere in this 30,000-char
-//   handler", and at the extreme (a 485,000-char enclosing block, measured on
-//   real sites here) the pin stops proving anything at all.
+//   • The BLOCK IS NARROWER THAN THE CLAIM. An anchor inside an object literal
+//     closes at that literal's `}` while the assertion is about code after it;
+//     an `if (…) {` closes before the `} else {` the pin also means to cover.
+//     A correct block boundary is still the wrong window for those claims.
+//   • THE ANCHOR HAS NO BLOCK — a bare statement. blockAt throws rather than
+//     guess, which is the design, and `between()` fits only when a genuine end
+//     landmark exists.
+//   • THE BLOCK IS ENORMOUS. Widening a NEGATIVE pin is always safe — more code
+//     searched for a forbidden thing. Widening a POSITIVE pin LOOSENS it: "X
+//     within 1600 bytes of the anchor" becomes "X somewhere in this 30,000-char
+//     handler", and at the extreme (485,000 characters, measured on a real site
+//     here) it proves nothing at all.
 //
-//   So: a positive pin whose enclosing block is enormous is better served by a
-//   byte window (arbitrary but tight) or by `between()` with a real end
-//   landmark — NOT by `blockAt`. The remaining fixed windows are all positive,
-//   all fail loudly when they rot, and the ratchet in scripts/check-slice-pins
-//   deliberately does not gate them.
+// Every survivor is positive, so it fails loudly rather than going silent, and
+// the ratchet in scripts/check-slice-pins deliberately does not gate them.
 
 /** Locate `anchor`, or throw naming the anchor that has gone missing. */
 function requireIndex(src: string, anchor: string, from = 0): number {
@@ -140,12 +144,30 @@ function walk(src: string, start: number, mode: 'inside' | 'opener'): string | n
  *
  *   Record<string, { weak: string[] }> {   ← `,` before it: a type literal
  *   ) {                                    ← `)` before it: the body
- *   case 'rest': {                         ← `:` before it: also a body
+ *   case 'rest': {                         ← `:` before it: a body
+ *   ): { total: number } {                 ← `:` before it: a RETURN TYPE
  *
- * Skipping `, < | & =` and stopping at the first survivor covers every shape in
- * this codebase, and it stops the moment it has an answer.
+ * ⚠⚠ THE LAST TWO PAIR ON `:` AND MEAN OPPOSITE THINGS, which is what broke
+ * eight assertions across four suites before it was pinned down. They are told
+ * apart by what precedes the colon: a return type's colon follows the parameter
+ * list's `)`, a case label's does not. Everything else is decided by the single
+ * character before the brace, and the first survivor wins.
  */
 const TYPE_POSITION = new Set([',', '<', '|', '&', '=']);
+
+/** Is this `{` in a type position rather than opening a body? */
+function inTypePosition(src: string, braceAt: number, floor: number): boolean {
+  let k = braceAt - 1;
+  while (k > floor && /\s/.test(src[k]!)) k -= 1;
+  const prev = src[k]!;
+  if (TYPE_POSITION.has(prev)) return true;
+  if (prev !== ':') return false;
+  // `:` — a return type's colon sits right after the parameter list's `)`;
+  // a `case 'x':` label's does not.
+  let j = k - 1;
+  while (j > floor && /\s/.test(src[j]!)) j -= 1;
+  return src[j] === ')';
+}
 
 function openerBody(src: string, start: number): string | null {
   let parens = 0;
@@ -168,10 +190,8 @@ function openerBody(src: string, start: number): string | null {
       // A brace inside the parameter list is never the body; nor is one in a
       // type position. Either way the whole group is skipped — nested braces
       // cannot be the body of the thing this anchor opened.
-      if (parens <= 0 && group) {
-        let k = i - 1;
-        while (k > start && /\s/.test(src[k]!)) k -= 1;
-        if (!TYPE_POSITION.has(src[k]!)) return src.slice(start, i + group.length);
+      if (parens <= 0 && group && !inTypePosition(src, i, start)) {
+        return src.slice(start, i + group.length);
       }
       i += group ? group.length : 1;
       continue;

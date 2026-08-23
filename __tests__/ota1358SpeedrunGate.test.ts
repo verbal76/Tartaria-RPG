@@ -49,6 +49,7 @@ jest.mock('expo-updates', () => ({}));
 // could not travel with either owner — assigning to an imported binding is a
 // compile error. It went to `app/state/sprint.ts`, which neither owns.
 import { notePlayerActionForSprint, playerIsSprinting, _resetSprintForTest } from '../app/state/sprint';
+import { blockAt } from '../test-utils/srcBlock';
 
 describe('OTA-1358 — the sprint gate and classifier parity', () => {
   beforeEach(() => _resetSprintForTest());
@@ -99,7 +100,7 @@ describe('OTA-1358 — the sprint gate and classifier parity', () => {
     expect((src.match(/notePlayerActionForSprint\(\);/g) ?? []).length).toBeGreaterThanOrEqual(2);
     const bs = src.indexOf('  beginScene(opts?: {');
     expect(bs).toBeGreaterThan(-1);
-    expect(src.slice(bs, bs + 2200)).toContain('notePlayerActionForSprint();');
+    expect(blockAt(src, '  beginScene(opts?: {')).toContain('notePlayerActionForSprint();');
   });
 
   it('⚠⚠ source lock: the classifier runs under the native-ML lock — create AND inference', () => {

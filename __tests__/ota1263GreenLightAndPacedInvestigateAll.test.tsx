@@ -147,7 +147,7 @@ describe('OTA-1263 (C) — the button and the card read the same array', () => {
     // array the picker renders.
     const i = screen.indexOf('const gatherCounts = useMemo(');
     expect(i).toBeGreaterThan(-1);
-    const block = screen.slice(i, i + 700);
+    const block = blockAt(screen, 'const gatherCounts = useMemo(');
     expect(block).toContain('for (const c of gatherChips)');
     expect(block).toContain('return { lanes: lanes.size, rows };');
     expect(screen).toContain('chips={gatherChips}');

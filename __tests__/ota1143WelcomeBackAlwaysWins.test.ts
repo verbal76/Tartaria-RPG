@@ -51,6 +51,7 @@ jest.mock('expo-speech-recognition', () => ({}));
 //   - "Welcome back, {name}" still leads, every time (arb164 non-negotiable).
 import { welcomeBackLine } from '../app/state/gameStore';
 import type { PlayerCharacter } from '../app/engine/types';
+import { blockAt } from '../test-utils/srcBlock';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 // ⚠ OTA-1394 — THE WELCOME-BACK CALL SITE MOVED. `welcomeBackLine` itself is
@@ -126,6 +127,6 @@ describe('OTA-1143 — the load path fires ONE arbiter line', () => {
     // Not deleted — just not load-fired. A future surface can use them.
     const at = STORE.indexOf('const WHILE_AWAY_LINES');
     expect(at).toBeGreaterThan(0);
-    expect(STORE.slice(at, at + 2000)).toContain(`channel: 'arbiter'`);
+    expect(blockAt(STORE, 'const WHILE_AWAY_LINES')).toContain(`channel: 'arbiter'`);
   });
 });

@@ -14,6 +14,7 @@ import { join } from 'path';
 import { resolveLootItem, findCatalogItem } from '../app/engine/crafting';
 import { sellPriceFor } from '../app/engine/sellPrice';
 import type { InventoryItem } from '../app/engine/types';
+import { blockAt } from '../test-utils/srcBlock';
 
 const store = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
 
@@ -65,7 +66,7 @@ describe('OTA-1204 — every noun-harvest mint classifies through resolveLootIte
         // A mint with NO classifier (the hard-coded Aether Residue sleight-of-hand
         // grant authors its own tags by hand) has nothing to pin — skip it rather
         // than judging some unrelated earlier assignment.
-        if (!store.slice(at, at + 500).includes('itemCat')) continue;
+        if (!blockAt(store, `id: ${idPrefix}`).includes('itemCat')) continue;
         found += 1;
         // ⚠ The judged text is the mint's OWN classifier — the `const itemCat =`
         // assignment nearest above the id. A plain no-lookupCraftedItem-nearby

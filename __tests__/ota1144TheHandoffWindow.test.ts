@@ -1,3 +1,4 @@
+import { blockAt } from '../test-utils/srcBlock';
 // OTA-1144 — THE HANDOFF WINDOW.
 //
 // Owner, from the device on the very next load after 1166 shipped:
@@ -182,6 +183,6 @@ describe('OTA-1144 — only lines that need the lock reserve it', () => {
   it('a drained queue drops the reservation instead of waiting out the deadline', () => {
     const emptyAt = TTS.indexOf('// Nothing left to speak');
     expect(emptyAt).toBeGreaterThan(0);
-    expect(TTS.slice(emptyAt, emptyAt + 400)).toContain('releaseVoiceSlot();');
+    expect(blockAt(TTS, '// Nothing left to speak')).toContain('releaseVoiceSlot();');
   });
 });

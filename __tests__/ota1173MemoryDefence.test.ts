@@ -114,7 +114,7 @@ describe('OTA-1173 — a memory warning is ANSWERED, not just written down', () 
     // process instead. We hold a ~400MB context and we have a dispose() for it.
     const i = STORE.indexOf('AppState.addEventListener(\'memoryWarning\'');
     expect(i).toBeGreaterThan(-1);
-    const block = STORE.slice(i, i + 9000);
+    const block = blockAt(STORE, 'AppState.addEventListener(\'memoryWarning\'');
     expect(block).toContain('.dispose()');
   });
 
@@ -134,7 +134,7 @@ describe('OTA-1173 — a memory warning is ANSWERED, not just written down', () 
 
   it('⚠ A FAILED RELEASE CANNOT ESCALATE A WARNING INTO A CRASH', () => {
     const i = STORE.indexOf('AppState.addEventListener(\'memoryWarning\'');
-    const block = STORE.slice(i, i + 9000);
+    const block = blockAt(STORE, 'AppState.addEventListener(\'memoryWarning\'');
     expect(block).toContain('a failed release must never escalate a memory warning into a crash');
     expect(block).toMatch(/\.catch\(/);
   });
@@ -143,7 +143,7 @@ describe('OTA-1173 — a memory warning is ANSWERED, not just written down', () 
     // Disposing without letting the watchdog bring Qwen back would turn one memory
     // warning into permanently template-only narration for the rest of the session.
     const i = STORE.indexOf('AppState.addEventListener(\'memoryWarning\'');
-    const block = STORE.slice(i, i + 9000);
+    const block = blockAt(STORE, 'AppState.addEventListener(\'memoryWarning\'');
     expect(block).toMatch(/watchdog is deliberately NOT suppressed/i);
   });
 });

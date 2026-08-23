@@ -121,7 +121,7 @@ describe('OTA-1248 — the armor beat', () => {
     expect(takeBranch).not.toContain("maybeAdvanceTutorial('armor')");
     // ...and equipItem does, from the top, so EVERY equip route counts.
     const equipAt = store.indexOf('  equipItem(itemName, slot, itemId) {');
-    expect(store.slice(equipAt, equipAt + 600)).toContain("maybeAdvanceTutorial('armor')");
+    expect(blockAt(store, '  equipItem(itemName, slot, itemId) {')).toContain("maybeAdvanceTutorial('armor')");
   });
 
   it('⚠ the vest is a REAL catalog piece, so the ★ computes honestly', () => {

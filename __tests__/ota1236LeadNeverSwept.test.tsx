@@ -35,6 +35,33 @@ const renderer = require('react-test-renderer') as {
   act(cb: () => void): void;
   create(el: React.ReactElement): { toJSON(): unknown; update(el: React.ReactElement): void };
 };
+
+// ⚠⚠ OTA-1449 — CLOSE WHAT YOU OPEN. This suite mounted a screen and never
+// unmounted it. The screens carry LOOPING animations (the tutorial highlight,
+// the map's "you are here" ring), and a loop whose component is still mounted
+// keeps ticking after the test file finishes — straight into jest tearing the
+// module registry down under it. The tick then reaches freed internals and
+// kills the worker, which ends the run with NO SUMMARY LINE AT ALL: no pass
+// count, no fail count, nothing to notice. A test system that can die silently
+// is the same defect this project spent OTA-1447 removing from its source pins.
+//
+// ⚠ The app itself was never at risk: every looping animation in app/ cancels
+// itself in its unmount cleanup, and screens unmount normally in play. This is
+// test hygiene, and it is why a dozen sibling suites already call unmount().
+const _mounted: Array<{ unmount(): void }> = [];
+// ⚠ Typed as the renderer's OWN create, so callers keep `.toJSON()` / `.root`
+// exactly as before — the tracking is invisible to every existing assertion.
+const trackedCreate = ((el: Parameters<typeof renderer.create>[0]) => {
+  const tree = renderer.create(el);
+  _mounted.push(tree as unknown as { unmount(): void });
+  return tree;
+}) as typeof renderer.create;
+afterEach(() => {
+  const roots = _mounted.splice(0);
+  (renderer as unknown as { act(cb: () => void): void }).act(() => {
+    for (const r of roots) { try { r.unmount(); } catch { /* already gone */ } }
+  });
+});
 import { GatherModal } from '../app/components/GatherModal';
 import { laneForKind, laneHasSweep } from '../app/engine/gatherSort';
 import {
@@ -50,7 +77,7 @@ import { blockAt } from '../test-utils/srcBlock';
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
 function renderRoom(chips: { noun: string }[], leadNouns: string[]) {
-  const tree = renderer.create(
+  const tree = trackedCreate(
     <GatherModal
       visible
       player={null}
@@ -106,7 +133,7 @@ describe('OTA-1236 — the exposure, measured from the shipped data', () => {
     expect(store).toContain("import { rescueScenarioForNoun } from '../engine/storyNouns'");
     const i = store.indexOf('function matchRescueHookNoun(');
     expect(i).toBeGreaterThan(-1);
-    const body = store.slice(i, i + 200);
+    const body = blockAt(store, 'function matchRescueHookNoun(');
     expect(body).toContain('return rescueScenarioForNoun(text);');
   });
 });
@@ -116,7 +143,7 @@ describe('OTA-1236 — SALVAGE ALL leaves the lead alone, and says so', () => {
     const store = storeSource();
     const i = store.indexOf('salvageAllAmbient(nouns) {');
     expect(i).toBeGreaterThan(-1);
-    const fn = store.slice(i, i + 14000);
+    const fn = blockAt(store, 'salvageAllAmbient(nouns) {');
     expect(fn).toContain('const skippedLead: string[] = []');
     expect(fn).toContain('isBulkLeadNoun(noun, bulkLeadCtx)');
     expect(fn).toContain('skippedLead.push(noun)');
@@ -152,7 +179,7 @@ describe('OTA-1236 — SALVAGE ALL leaves the lead alone, and says so', () => {
     expect(isLeadNoun('snare pit', { rescueEligible: false })).toBe(false);
     const store = storeSource();
     const i = store.indexOf('const bulkLeadCtx =');
-    const block = store.slice(i, i + 400);
+    const block = blockAt(store, 'const bulkLeadCtx =');
     expect(block).toContain('rescueEligible');
     expect(block).toContain('player?.dog');
     expect(block).toContain('pendingDogOnboarding');
@@ -344,7 +371,7 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('const liveEnemyCount =');
     expect(i).toBeGreaterThan(-1);
-    const block = screen.slice(i, i + 300);
+    const block = blockAt(screen, 'const liveEnemyCount =');
     expect(block).toContain('takeOpen && liveEnemyCount > 0');
     expect(block).toContain('setTakeOpen(false)');
   });
@@ -399,7 +426,7 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
         />
       );
       let tree!: { toJSON(): unknown; update(e: React.ReactElement): void };
-      renderer.act(() => { tree = renderer.create(el([{ noun: 'bench' }])); });
+      renderer.act(() => { tree = trackedCreate(el([{ noun: 'bench' }])); });
       renderer.act(() => { tree.update(el([])); });
       // ⚠⚠ NO HOLD. The owner watched the red IGNORE button sit on an empty card
       // for ~2.5s after three sweeps and asked for it gone: *"the minute the last
@@ -423,7 +450,7 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
     try {
       let closed = 0;
       renderer.act(() => {
-        renderer.create(
+        trackedCreate(
           <GatherModal
             visible player={null} chips={[]} leadNouns={[]}
             onTake={() => {}} onSalvage={() => {}} onTakeAll={() => {}} onSalvageAll={() => {}}
@@ -455,6 +482,6 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('const leadNouns = useMemo(');
     expect(i).toBeGreaterThan(-1);
-    expect(screen.slice(i, i + 900)).toContain('!isExhaustedHookNoun(n)');
+    expect(blockAt(screen, 'const leadNouns = useMemo(')).toContain('!isExhaustedHookNoun(n)');
   });
 });

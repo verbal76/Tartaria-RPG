@@ -76,6 +76,7 @@ jest.mock('expo-speech-recognition', () => ({}));
 
 import { standingAc, equippedGearAc, trimStandingAc, ARMOR_SLOTS } from '../app/engine/equipment';
 import type { PlayerCharacter } from '../app/engine/types';
+import { blockAt } from '../test-utils/srcBlock';
 
 // ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
 // the pins below follow the code to its new address rather than reading both
@@ -289,14 +290,14 @@ describe('OTA-1135 — ⚠ there is ONE implementation, and the resolver calls i
 describe('OTA-1135 — ⚠ the card names which gear, so this is visible next time', () => {
   it('armor and accessories are separate chips, not one lump', () => {
     const from = COMBAT_SRC.indexOf('export function effectiveACBreakdown(');
-    const body = COMBAT_SRC.slice(from, from + 3000);
+    const body = blockAt(COMBAT_SRC, 'export function effectiveACBreakdown(');
     expect(body).toContain("sources.push({ label: 'armor', delta: armor })");
     expect(body).toContain("sources.push({ label: 'accessories', delta: accessories })");
   });
 
   it('and the total counts both — splitting a label must not drop a term', () => {
     const from = COMBAT_SRC.indexOf('export function effectiveACBreakdown(');
-    const body = COMBAT_SRC.slice(from, from + 3000);
+    const body = blockAt(COMBAT_SRC, 'export function effectiveACBreakdown(');
     // RETARGETED BY OTA-1140 (pressure test) — the breakdown now applies the
     // OTA-947 trim exactly as the resolver does (it had been skipping it, so
     // the expanded card over-read a heavy build). Both terms still counted:
@@ -306,7 +307,7 @@ describe('OTA-1135 — ⚠ the card names which gear, so this is visible next ti
 
   it('the breakdown draws its gear from the same helper the panel does', () => {
     const from = COMBAT_SRC.indexOf('export function effectiveACBreakdown(');
-    const body = COMBAT_SRC.slice(from, from + 3000);
+    const body = blockAt(COMBAT_SRC, 'export function effectiveACBreakdown(');
     expect(body).toContain('const gearAc = equippedGearAc(player);');
   });
 });

@@ -164,7 +164,7 @@ describe('OTA-1251 — the tap takes AND wears', () => {
     // player who equips from the pack instead is not punished for it.
     const store = storeSource();
     const eq = store.indexOf('  equipItem(itemName, slot, itemId) {');
-    expect(store.slice(eq, eq + 600)).toContain("maybeAdvanceTutorial('armor')");
+    expect(blockAt(store, '  equipItem(itemName, slot, itemId) {')).toContain("maybeAdvanceTutorial('armor')");
   });
 });
 

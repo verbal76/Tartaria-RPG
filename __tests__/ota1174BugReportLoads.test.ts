@@ -104,7 +104,7 @@ describe('OTA-1174 — the boot update check reports itself to the DEVICE log', 
     // to update — the worst possible place to be clever.
     const i = APPTSX.indexOf('const otaLog = (m: string): void =>');
     expect(i).toBeGreaterThan(-1);
-    expect(APPTSX.slice(i, i + 220)).toContain('catch');
+    expect(blockAt(APPTSX, 'const otaLog = (m: string): void =>')).toContain('catch');
   });
 });
 

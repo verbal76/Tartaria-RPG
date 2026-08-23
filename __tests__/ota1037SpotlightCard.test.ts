@@ -42,6 +42,7 @@ jest.mock('expo-updates', () => ({}));
 import * as fs from 'fs';
 import * as path from 'path';
 import { useGameStore } from '../app/state/gameStore';
+import { blockAt } from '../test-utils/srcBlock';
 
 jest.setTimeout(60000);
 const STORE_SRC = fs.readFileSync(
@@ -98,7 +99,7 @@ describe('OTA-1037 — SOURCE LOCKS', () => {
 
   it('raiseBossVictoryNotice delegates — one card implementation, not two', () => {
     const start = STORE_SRC.indexOf('raiseBossVictoryNotice(name, flavor, rewards) {');
-    const body = STORE_SRC.slice(start, start + 220);
+    const body = blockAt(STORE_SRC, 'raiseBossVictoryNotice(name, flavor, rewards) {');
     expect(body).toMatch(/raiseSpotlightNotice\('VICTORY', name, flavor, rewards\)/);
   });
 

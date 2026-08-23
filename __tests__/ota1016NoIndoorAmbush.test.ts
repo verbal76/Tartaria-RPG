@@ -44,6 +44,7 @@ jest.setTimeout(60000);
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 describe('OTA-1016 — SOURCE LOCKS: one roof test, used by every outdoor spawner', () => {
   const src = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
@@ -65,7 +66,7 @@ describe('OTA-1016 — SOURCE LOCKS: one roof test, used by every outdoor spawne
       const at = src.indexOf(`function ${fn}(`);
       expect(at).toBeGreaterThan(-1);
       // The guard appears within the function's opening block.
-      expect(src.slice(at, at + 1400)).toMatch(/if \(underRoof\(s, player\)\) return;/);
+      expect(blockAt(src, `function ${fn}(`)).toMatch(/if \(underRoof\(s, player\)\) return;/);
     }
   });
 

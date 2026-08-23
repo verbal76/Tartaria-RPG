@@ -63,6 +63,7 @@ import {
 // and it was the one error the typecheck:tests ratchet caught (203 > 202).
 import type { SaveState } from '../app/engine/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { blockAt } from '../test-utils/srcBlock';
 
 // ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
 // the pins below follow the code to its new address rather than reading both
@@ -183,7 +184,7 @@ describe('OTA-1311 — restore is only for a character that disappeared', () => 
     const store: string = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
     const death = COMBAT_SRC.indexOf('function handlePlayerDeath');
     expect(death).toBeGreaterThan(-1);
-    const body = COMBAT_SRC.slice(death, death + 6000);
+    const body = blockAt(COMBAT_SRC, 'function handlePlayerDeath');
     expect(body).toContain('recordFallenSeed(characterSeedOf(player))');
     // Adjacent to the memorial, so the two records cannot drift apart.
     expect(body.indexOf('recordFallenSeed')).toBeLessThan(body.indexOf('recordFallen(hero)'));

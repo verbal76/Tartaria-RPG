@@ -74,7 +74,7 @@ describe('OTA-1405 (1) — the tutorial refusal is said where the tap happened',
     // A refusal that stops being logged is a stuck player who leaves no trace in
     // the next bug report. Both, not either.
     const i = GATHER.indexOf('const refuse = ()');
-    const body = GATHER.slice(i, i + 700);
+    const body = blockAt(GATHER, 'const refuse = ()');
     expect(body).toContain('onBlocked?.();');
     expect(body).toContain('setRefusal(');
   });

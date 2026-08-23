@@ -151,7 +151,7 @@ describe('OTA-1140 — the exploits are closed', () => {
 
   it('⚠ pursuit never passes close, and only fires when someone was actually benched', () => {
     const from = COMBAT_SRC.indexOf('// OTA-1140 — the pursuit itself.');
-    const block = COMBAT_SRC.slice(from, from + 1200);
+    const block = blockAt(COMBAT_SRC, '// OTA-1140 — the pursuit itself.');
     expect(block).toContain('if (outOfReach.length > 0 && (get().player?.hp ?? 0) > 0)');
     expect(block).toContain("cur === 'mid' ? 'close' : null");
     expect(block).toContain('if (closed) {');
@@ -159,7 +159,7 @@ describe('OTA-1140 — the exploits are closed', () => {
 
   it('⚠ you cannot CAMP in front of something trying to kill you', () => {
     const from = STORE.indexOf("case 'rest': {");
-    const block = STORE.slice(from, from + 2200);
+    const block = blockAt(STORE, "case 'rest': {");
     expect(block).toContain('!parsed.resolvedItemId');
     expect(block).toContain('Nothing here has agreed to that.');
   });
@@ -167,7 +167,7 @@ describe('OTA-1140 — the exploits are closed', () => {
   it('eating mid-fight stays the OTA-619 free action — the guard keys on resolvedItemId', () => {
     // "eat ration" arrives with resolvedItemId set; only the bare CAMP is refused.
     const from = STORE.indexOf("case 'rest': {");
-    const block = STORE.slice(from, from + 2200);
+    const block = blockAt(STORE, "case 'rest': {");
     expect(block).toContain('if (!parsed.resolvedItemId');
   });
 
@@ -187,7 +187,7 @@ describe('OTA-1140 — the exploits are closed', () => {
 describe('OTA-1140 — three more surfaces stop lying', () => {
   it('⚠ effectiveACBreakdown applies the trim and NAMES it as a chip', () => {
     const from = COMBAT_SRC.indexOf('export function effectiveACBreakdown(');
-    const body = COMBAT_SRC.slice(from, from + 4200);
+    const body = blockAt(COMBAT_SRC, 'export function effectiveACBreakdown(');
     expect(body).toContain('const trimDelta = trimStandingAc(standingRaw) - standingRaw;');
     expect(body).toContain("sources.push({ label: 'bulk trim', delta: trimDelta });");
     expect(body).toContain('trimStandingAc(standingRaw) + statusAdj');

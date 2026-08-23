@@ -79,17 +79,18 @@ describe('OTA-1181 — the report says WHY the model failed', () => {
   });
 
   test('it still cannot break the export', () => {
-    const i = code.indexOf('function contextLedgerBlock');
-    // ⚠ Brace-matched rather than a fixed slice. Four assertions in this repo needed their
-    // windows widened this session because a handler grew a comment and a magic-number
-    // slice stopped reaching its target; a slice that falls short reads as "the code is
-    // missing" rather than "my window is too small". Same claim, no magic number.
-    let depth = 0; let end = i;
-    for (let k = code.indexOf('{', i); k < code.length; k++) {
-      if (code[k] === '{') depth++;
-      else if (code[k] === '}') { depth--; if (depth === 0) { end = k; break; } }
-    }
-    const body = code.slice(i, end + 1);
+    // ⚠ Brace-matched rather than a fixed slice. This test's author reached the
+    // same conclusion OTA-1447 later reached repo-wide: "a slice that falls short
+    // reads as 'the code is missing' rather than 'my window is too small'. Same
+    // claim, no magic number."
+    //
+    // ⚠⚠ OTA-1447 swapped the INLINE matcher for the shared one, and that is a
+    // CORRECTNESS fix, not tidying. Counting raw braces treats a `}` inside a
+    // string or a comment as real, and this codebase's narration is full of them
+    // — one brace in one quoted line and the window closes early, silently, in
+    // the safe-looking direction. blockAt skips quotes and comments and is
+    // tested for exactly that.
+    const body = blockAt(code, 'function contextLedgerBlock');
     expect(body).toContain('catch');
     expect((body.match(/try \{/g) ?? []).length).toBeGreaterThanOrEqual(2);
   });
@@ -156,7 +157,7 @@ describe('OTA-1181 — "for good" is said once', () => {
     // the comparison itself stayed in one place rather than being copied to a caller.
     expect(code).toContain('if (qwenStoodDownForMemory() || underMemoryPressure()) {');
     const i = code.indexOf('if (qwenStoodDownForMemory() || underMemoryPressure()) {');
-    expect(code.slice(i, i + 1600)).toContain('return false;');
+    expect(blockAt(code, 'if (qwenStoodDownForMemory() || underMemoryPressure()) {')).toContain('return false;');
     expect(watch).toContain('return now < rpMemoryPressureUntil;');
   });
 });

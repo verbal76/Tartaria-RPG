@@ -52,6 +52,7 @@ jest.mock('expo-updates', () => ({}));
 import { _qwenSetForegroundSince, _qwenForegroundSettled } from '../app/ai/qwenWatchdog';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const STORE = readFileSync(join(__dirname, '..', 'app', 'ai', 'qwenWatchdog.ts'), 'utf8');
 const APP = readFileSync(join(__dirname, '..', 'App.tsx'), 'utf8');
@@ -89,7 +90,7 @@ describe('OTA-1278 — one settle window, both doors', () => {
 
   it('⚠⚠ backgrounding RESTARTS the clock — leaving is what makes a visit short', () => {
     const s = STORE.indexOf("if (next === 'background') {");
-    const block = STORE.slice(s, s + 400);
+    const block = blockAt(STORE, "if (next === 'background') {");
     expect(block).toContain('qwenForegroundSince = null;');
   });
 

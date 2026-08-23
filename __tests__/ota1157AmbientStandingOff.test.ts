@@ -80,7 +80,7 @@ describe('OTA-1157 — no ambient event grants standing', () => {
     expect(WORLD_EVENTS).toContain('standingOf(ctx, f.id) >= 10');
     for (const kind of ['setback', 'bounty']) {
       const i = WORLD_EVENTS.indexOf(`kind: '${kind}', weight:`);
-      expect(WORLD_EVENTS.slice(i, i + 400)).toContain('favored(ctx)');
+      expect(blockAt(WORLD_EVENTS, `kind: '${kind}', weight:`)).toContain('favored(ctx)');
     }
   });
 

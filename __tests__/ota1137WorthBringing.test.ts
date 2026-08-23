@@ -131,7 +131,7 @@ describe('OTA-1137 — ⚠ the reproduction: Mara really is burn-weak', () => {
 describe('OTA-1137 — ⚠ a thrown vial on a weakness staggers', () => {
   it('the throw path staggers, and says so', () => {
     const from = STORE.indexOf('You hurl the ${item.name}. It bursts across');
-    const block = STORE.slice(from, from + 1600);
+    const block = blockAt(STORE, 'You hurl the ${item.name}. It bursts across');
     expect(from).toBeGreaterThan(0);
     expect(block).toContain("burstCombined.match === 'weak'");
     expect(block).toContain('staggerEnemy(set, idx);');
@@ -140,7 +140,7 @@ describe('OTA-1137 — ⚠ a thrown vial on a weakness staggers', () => {
 
   it('⚠ a KILLING throw does not stagger a corpse', () => {
     const from = STORE.indexOf('You hurl the ${item.name}. It bursts across');
-    const block = STORE.slice(from, from + 1600);
+    const block = blockAt(STORE, 'You hurl the ${item.name}. It bursts across');
     expect(block).toContain("if (newHp > 0 && burstCombined.match === 'weak')");
   });
 
@@ -148,7 +148,7 @@ describe('OTA-1137 — ⚠ a thrown vial on a weakness staggers', () => {
     // Only the 'weak' branch reaches staggerEnemy — there is no second call site
     // in the throw block that could fire on a resist.
     const from = STORE.indexOf('You hurl the ${item.name}. It bursts across');
-    const block = STORE.slice(from, from + 1600);
+    const block = blockAt(STORE, 'You hurl the ${item.name}. It bursts across');
     expect((block.match(/staggerEnemy\(/g) ?? []).length).toBe(1);
   });
 });
@@ -157,7 +157,7 @@ describe('OTA-1137 — ⚠ a weapon hit on a weakness staggers too', () => {
   it('the flinch is mechanical now, not just a word', () => {
     expect(STORE).toContain('Weakness exposed — ${enemy.name} flinches.');
     const from = STORE.indexOf('Weakness exposed — ${enemy.name} flinches.');
-    const block = STORE.slice(from, from + 800);
+    const block = blockAt(STORE, 'Weakness exposed — ${enemy.name} flinches.');
     // RETARGETED BY OTA-1140 — the melee stagger is now gated on surviving the
     // blow, closing the corpse-stagger seam the pressure test found.
     expect(block).toContain('if (newEnemyHp > 0) staggerEnemy(set, activeIdx);');
@@ -165,7 +165,7 @@ describe('OTA-1137 — ⚠ a weapon hit on a weakness staggers too', () => {
 
   it('⚠ a RESISTED hit does not — the branch is the weakness branch', () => {
     const from = STORE.indexOf('Weakness exposed — ${enemy.name} flinches.');
-    const block = STORE.slice(from, from + 800);
+    const block = blockAt(STORE, 'Weakness exposed — ${enemy.name} flinches.');
     // The resist branch begins right after; nothing between it and the stagger.
     const resistAt = block.indexOf('shrugs off the');
     const staggerAt = block.indexOf('staggerEnemy(set, activeIdx);');
@@ -204,7 +204,7 @@ describe('OTA-1137 — ⚠ what the stagger actually costs the boss', () => {
     // round tick instead could persist through an action that never triggered a
     // second swing, and quietly eat the NEXT round's too.
     const from = COMBAT_SRC.indexOf('function takeStagger(');
-    const fn = COMBAT_SRC.slice(from, from + 700);
+    const fn = blockAt(COMBAT_SRC, 'function takeStagger(');
     expect(from).toBeGreaterThan(0);
     expect(fn).toContain('if (cur <= 0) return false;');
     expect(fn).toContain('next[idx] = 0;');
@@ -213,7 +213,7 @@ describe('OTA-1137 — ⚠ what the stagger actually costs the boss', () => {
 
   it('the setter is bounds-safe and lazily creates the array', () => {
     const from = COMBAT_SRC.indexOf('function staggerEnemy(');
-    const fn = COMBAT_SRC.slice(from, from + 800);
+    const fn = blockAt(COMBAT_SRC, 'function staggerEnemy(');
     expect(fn).toContain('if (idx < 0 || idx >= n) return s;');
     expect(fn).toContain('s.currentScene.enemyStaggered ?? s.currentScene.enemies.map(() => 0)');
     expect(fn).toContain('while (next.length < n) next.push(0);');

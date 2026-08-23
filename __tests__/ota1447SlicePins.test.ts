@@ -67,6 +67,13 @@ describe('OTA-1447 — the window follows the code, not a byte count', () => {
     expect(blockAt(params, 'function f(')).toContain('realBody();');
     const ret = 'function g(x): Record<string, { weak: string[] }> {\n  realBody();\n}';
     expect(blockAt(ret, 'function g(')).toContain('realBody();');
+    // ⚠⚠ The pair that cost eight assertions across four suites: a `:` before a
+    // brace means BODY after a case label and RETURN TYPE after the parameter
+    // list's `)`. Told apart by what precedes the colon.
+    const objRet = 'function h(p): { total: number; base: number } {\n  realBody();\n}';
+    expect(blockAt(objRet, 'function h(')).toContain('realBody();');
+    const caseLabel = "switch (k) {\n  case 'rest': {\n    realBody();\n  }\n}";
+    expect(blockAt(caseLabel, "case 'rest': {")).toContain('realBody();');
   });
 
   it('⚠⚠ THE BODY IS THIS ANCHOR\'S, NOT THE BIGGEST ONE IN THE FILE', () => {

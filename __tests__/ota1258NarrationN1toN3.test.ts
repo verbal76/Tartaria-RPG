@@ -51,6 +51,7 @@ import { join } from 'path';
 // pin like this was never a claim about a FILE; it is a claim about the STORE.
 // See __tests__/helpers/storeSource.ts for when NOT to use it.
 import { storeSource } from '../test-utils/storeSource';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -146,7 +147,7 @@ describe('OTA-1258 N2 — the trigger is no longer shorter than the job', () => 
     const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
     const i = store.indexOf('const introIdleMs = (): number => {');
     expect(i).toBeGreaterThan(-1);
-    const block = store.slice(i, i + 500);
+    const block = blockAt(store, 'const introIdleMs = (): number => {');
     // ⚠⚠ OTA-1263 CORRECTED THIS PIN AND THE CODE UNDER IT. The lookup used the
     // bare intent `'scene_intro'`, but the telemetry label is
     // `narration:scene_intro_fill` — so it never matched and the threshold never
@@ -189,7 +190,7 @@ describe('OTA-1258 N3 — preempted text is kept, not binned', () => {
     const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
     const i = store.indexOf('const endsWhole = /[.!?]["\']?$/.test(finalText);');
     expect(i).toBeGreaterThan(-1);
-    const block = store.slice(i, i + 500);
+    const block = blockAt(store, 'const endsWhole = /[.!?]["\']?$/.test(finalText);');
     expect(block).toContain('const truncated = preemptedFill && !endsWhole;');
     expect(block).toContain("'intro-fill:preempted-partial'");
 

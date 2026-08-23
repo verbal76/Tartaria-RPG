@@ -222,7 +222,7 @@ describe('OTA-1250 — the lock is wired to the beat, in one place', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('onBlocked={()');
     expect(i).toBeGreaterThan(-1);
-    const block = screen.slice(i, i + 220);
+    const block = blockAt(screen, 'onBlocked={()');
     expect(block).toContain('Vibration.vibrate([0, 32, 45, 32])'); // the "wrong control" double-pulse
     expect(block).toContain('nudgeTutorialBlocked()');
   });
@@ -241,7 +241,7 @@ describe('OTA-1250 — the prop goes spent when it is taken', () => {
     expect(screen).not.toContain('{ noun: tutorialProp, consumed: false }');
     const i = screen.indexOf('const propConsumed = useGameStore(');
     expect(i).toBeGreaterThan(-1);
-    const block = screen.slice(i, i + 320);
+    const block = blockAt(screen, 'const propConsumed = useGameStore(');
     // Each beat reads ITS OWN prop's flag — the ids differ from the beat ids.
     expect(block).toContain('tutorialPropsConsumed.cudgel');
     expect(block).toContain('tutorialPropsConsumed.vest');

@@ -50,6 +50,7 @@ import { HP_REGEN_CAP } from '../app/engine/equipment';
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 const read = (...p: string[]): string => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const STORE = read('app', 'state', 'gameStore.ts');
 
@@ -57,7 +58,7 @@ const STORE = read('app', 'state', 'gameStore.ts');
 const regenBlock = (): string => {
   const i = STORE.indexOf('OTA-1169 — HP REGEN IS PER TILE NOW');
   expect(i).toBeGreaterThan(-1);
-  return STORE.slice(i, i + 2600);
+  return blockAt(STORE, 'OTA-1169 — HP REGEN IS PER TILE NOW');
 };
 
 describe('OTA-1169 — regen no longer ticks on every action', () => {

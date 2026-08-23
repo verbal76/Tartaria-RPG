@@ -13,6 +13,7 @@ import {
   INDOOR_AETHERKIN, isIndoorPlausibleEnemy, pickIndoorFactionIntruder,
 } from '../app/engine/indoorAmbush';
 import { findEnemyByName } from '../app/engine/encounter';
+import { blockAt } from '../test-utils/srcBlock';
 
 describe('OTA-1033 — the three groups the owner named are all in', () => {
   it('raiders, soldiers and Aetherkin are each represented in the listed cast', () => {
@@ -105,7 +106,7 @@ describe('OTA-1033 — SOURCE LOCKS', () => {
 
   it('only a NEGATIVE standing counts as a motive, and never your own faction', () => {
     const start = store.indexOf('function worstStandingFaction(');
-    const body = store.slice(start, start + 1200);
+    const body = blockAt(store, 'function worstStandingFaction(');
     expect(body).toMatch(/if \(f\.id === player\.factionId\) continue;/);
     expect(body).toMatch(/let worstValue = 0;/);
   });

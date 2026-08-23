@@ -54,6 +54,7 @@ import {
 } from '../app/engine/hub';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const OPPOSITE = { north: 'south', south: 'north', east: 'west', west: 'east' } as const;
 
@@ -278,7 +279,7 @@ describe('OTA-1279 — one edge at a time, and directions when you ask for more'
     const store = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
     const i = store.indexOf("interiorMove.via === 'not_adjacent'");
     expect(i).toBeGreaterThan(-1);
-    const block = store.slice(i, i + 1200);
+    const block = blockAt(store, "interiorMove.via === 'not_adjacent'");
     expect(block).toContain("isn't off this one. Head ${dir} to the ${step.shortName}");
     // The branch must end the command. If it fell through, 'go to the workshop'
     // would leave the outpost looking for a location called workshop.

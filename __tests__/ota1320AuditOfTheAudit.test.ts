@@ -66,6 +66,7 @@ import { findCatalogItem } from '../app/engine/crafting';
 import { isGearItem } from '../app/engine/bulkSell';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 jest.setTimeout(180_000);
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
@@ -134,7 +135,7 @@ describe('OTA-1320 — the audit of the audit', () => {
     const store = read('state', 'slices', 'slotSlice.ts');
     const i = store.indexOf('OTA-1320 — BACKFILL tileGearNouns ON LEGACY SCENES');
     expect(i).toBeGreaterThan(-1);
-    const block = store.slice(i, i + 2200);
+    const block = blockAt(store, 'OTA-1320 — BACKFILL tileGearNouns ON LEGACY SCENES');
     expect(block).toContain('tileGearNouns === undefined');
     expect(block).toContain('findCatalogItem(n, { aliases: true })');
     // The cardinal-step consumer still reads the record, never the catalog.
@@ -162,7 +163,7 @@ describe('OTA-1320 — the audit of the audit', () => {
     // difference between a paid revival and a free one, so it follows the code.
     const store = read('state', 'slices', 'slotSlice.ts');
     const r = store.indexOf('async resurrectSlot(');
-    const body = store.slice(r, r + 4000);
+    const body = blockAt(store, 'async resurrectSlot(');
     expect(body).toContain('clearFallenSeed(characterSeedOf(revived))');
     expect(body.indexOf('addResurrectionGems(-1)')).toBeLessThan(body.indexOf('clearFallenSeed'));
   });
@@ -201,6 +202,10 @@ describe('OTA-1320 — the audit of the audit', () => {
     // itself is walked by the climb walkers).
     const store = read('state', 'gameStore.ts');
     const i = store.indexOf('summitBossesDefeated: nextDefeated');
+    // ⚠ OTA-1447 KEPT A BYTE WINDOW HERE, deliberately. The anchor sits inside an
+    // object literal, so its block ends at that literal's `}` — and the claim is
+    // about code AFTER it. The block boundary is real but narrower than the
+    // claim, so the byte window stays.
     expect(store.slice(i, i + 700)).toContain("routedClimbId === summitClimbId");
   });
 });

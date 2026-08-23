@@ -58,6 +58,7 @@ import { LlamaRuntime, __setLlamaModuleForTests, type LlamaModule } from '../app
 // slices and the literals these pins look for travel with the code; a pin like
 // this was never a claim about a FILE. See test-utils/storeSource.ts.
 import { storeSource } from '../test-utils/storeSource';
+import { blockAt } from '../test-utils/srcBlock';
 
 const SRC = (rel: string) => fs.readFileSync(path.join(__dirname, '..', rel), 'utf8');
 
@@ -344,7 +345,7 @@ describe('OTA-1177 — structure', () => {
     const i = src.indexOf('noteStragglerTornDown()');
     expect(i).toBeGreaterThan(0);
     // It sits in the stale-generation branch, immediately before the teardown it reports.
-    expect(src.slice(i, i + 120)).toContain('runtime.dispose()');
+    expect(blockAt(src, 'noteStragglerTornDown()')).toContain('runtime.dispose()');
   });
 
   test('the sink is installed in hydrate, before anything can load a context', () => {

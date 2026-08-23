@@ -150,7 +150,7 @@ describe('OTA-1275 — the source keeps the asymmetry', () => {
   it('⚠ the timer is torn down with the listener — no stray load after unmount', () => {
     const i = APP.indexOf("const sub = AppState.addEventListener('change', onChange);");
     expect(i).toBeGreaterThan(-1);
-    const teardown = APP.slice(i, i + 400);
+    const teardown = blockAt(APP, "const sub = AppState.addEventListener('change', onChange);");
     expect(teardown).toContain('sub.remove();');
     expect(teardown).toContain('clearTimeout(qwenRewarmTimer.current)');
   });

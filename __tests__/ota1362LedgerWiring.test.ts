@@ -257,7 +257,7 @@ describe('OTA-1362 — the store wiring, locked at the source', () => {
     // phones merge without a referee — and it is not ours to edit.
     const i = STORE.indexOf('WHOSE ROLL DOES THIS DEATH GO ON?');
     expect(i).toBeGreaterThan(-1);
-    const block = STORE.slice(i, i + 4000);
+    const block = blockAt(STORE, 'WHOSE ROLL DOES THIS DEATH GO ON?');
     expect(block).toContain('storeMod.recordRest({');
     expect(block).toContain('fallenKey: ledgerMod.fallenKey(');
     expect(block).toContain('description: closing.world');

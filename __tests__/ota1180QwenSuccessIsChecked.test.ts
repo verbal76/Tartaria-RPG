@@ -140,7 +140,7 @@ describe('OTA-1180 — the report block says whether the model loaded', () => {
   test('and it cannot break the export', () => {
     // The bug report must never be the thing that fails when the app is already in trouble.
     const i = code.indexOf('function contextLedgerBlock');
-    const body = code.slice(i, i + 700);
+    const body = blockAt(code, 'function contextLedgerBlock');
     // Its own inner guard, plus the outer one this block already had.
     expect((body.match(/try \{/g) ?? []).length).toBeGreaterThanOrEqual(2);
     expect(body).toContain('catch');

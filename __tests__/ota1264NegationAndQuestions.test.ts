@@ -54,6 +54,7 @@ import { parseInput } from '../app/engine/parser';
 import { describeIssues } from '../app/engine/parseValidator';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 const P = (s: string) => parseInput(s, { inventory: [], enemyPresent: false });
@@ -208,7 +209,7 @@ describe('OTA-1264 — the refusal reaches the player, and never reaches Qwen', 
   it('⚠⚠ it ANSWERS rather than refusing in silence — the OTA-1164 rule', () => {
     const store = src('app', 'state', 'gameStore.ts');
     const guard = store.indexOf("(parsed.validationIssues ?? []).includes('negated_command')");
-    const block = store.slice(guard, guard + 500);
+    const block = blockAt(store, "(parsed.validationIssues ?? []).includes('negated_command')");
     expect(block).toContain("appendLog('arbiter', describeIssues(['negated_command']))");
   });
 

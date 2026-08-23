@@ -31,6 +31,7 @@
  */
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const path = (...p: string[]) => join(__dirname, '..', ...p);
 const src = (...p: string[]) => readFileSync(path(...p), 'utf8');
@@ -80,7 +81,7 @@ describe('OTA-1396 — the instruments live in diagnostics now', () => {
   it('⚠ the starter still reuses the stopper, so the two cannot drift', () => {
     const i = watch.indexOf('export function startRuntimePressureWatch(');
     expect(i).toBeGreaterThan(-1);
-    expect(watch.slice(i, i + 900)).toContain('stopRuntimePressureWatch();');
+    expect(blockAt(watch, 'export function startRuntimePressureWatch(')).toContain('stopRuntimePressureWatch();');
   });
 });
 

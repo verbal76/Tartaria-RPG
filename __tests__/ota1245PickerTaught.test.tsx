@@ -29,6 +29,33 @@ import React from 'react';
 const renderer = require('react-test-renderer') as {
   create(el: React.ReactElement): { toJSON(): unknown };
 };
+
+// ⚠⚠ OTA-1449 — CLOSE WHAT YOU OPEN. This suite mounted a screen and never
+// unmounted it. The screens carry LOOPING animations (the tutorial highlight,
+// the map's "you are here" ring), and a loop whose component is still mounted
+// keeps ticking after the test file finishes — straight into jest tearing the
+// module registry down under it. The tick then reaches freed internals and
+// kills the worker, which ends the run with NO SUMMARY LINE AT ALL: no pass
+// count, no fail count, nothing to notice. A test system that can die silently
+// is the same defect this project spent OTA-1447 removing from its source pins.
+//
+// ⚠ The app itself was never at risk: every looping animation in app/ cancels
+// itself in its unmount cleanup, and screens unmount normally in play. This is
+// test hygiene, and it is why a dozen sibling suites already call unmount().
+const _mounted: Array<{ unmount(): void }> = [];
+// ⚠ Typed as the renderer's OWN create, so callers keep `.toJSON()` / `.root`
+// exactly as before — the tracking is invisible to every existing assertion.
+const trackedCreate = ((el: Parameters<typeof renderer.create>[0]) => {
+  const tree = renderer.create(el);
+  _mounted.push(tree as unknown as { unmount(): void });
+  return tree;
+}) as typeof renderer.create;
+afterEach(() => {
+  const roots = _mounted.splice(0);
+  (renderer as unknown as { act(cb: () => void): void }).act(() => {
+    for (const r of roots) { try { r.unmount(); } catch { /* already gone */ } }
+  });
+});
 import { GatherModal } from '../app/components/GatherModal';
 import { classifyGatherNoun, laneForKind } from '../app/engine/gatherSort';
 import { readFileSync } from 'fs';
@@ -38,7 +65,7 @@ import { blockAt } from '../test-utils/srcBlock';
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
 function render(chips: { noun: string }[]) {
-  const tree = renderer.create(
+  const tree = trackedCreate(
     <GatherModal
       visible player={null} chips={chips} leadNouns={[]}
       onTake={() => {}} onSalvage={() => {}} onTakeAll={() => {}} onSalvageAll={() => {}}
@@ -141,7 +168,7 @@ describe('OTA-1245 — taught where it is true', () => {
     // only the shape of the return changed.
     const i = screen.indexOf('const gatherCounts = useMemo(');
     expect(i).toBeGreaterThan(-1);
-    const block = screen.slice(i, i + 900);
+    const block = blockAt(screen, 'const gatherCounts = useMemo(');
     expect(block).toContain('for (const c of gatherChips)');
     expect(block).toContain('c.consumed');          // a spent row is not a lane
     expect(block).toContain('}, [gatherChips]);');  // and it tracks that array

@@ -34,6 +34,7 @@ import {
 } from '../app/engine/collectables';
 import fs from 'fs';
 import path from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 // ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
 // the pins below follow the code to its new address rather than reading both
@@ -176,7 +177,7 @@ describe('⚠⚠ OTA-1184 — EVERY PERK HAS A CONSUMER. This is the whole rule.
     // penalties and visibility. Injecting at the source means no site is silently missed.
     const i = COMBAT_SRC.indexOf('export function playerArmorResistKinds');
     expect(i).toBeGreaterThan(-1);
-    const body = COMBAT_SRC.slice(i, i + 1400);
+    const body = blockAt(COMBAT_SRC, 'export function playerArmorResistKinds');
     expect(body).toContain('grantsColdResist');
     expect(body).toContain("kinds.push('cold')");
     // ⚠ And it must not double-add over an armour piece that already resists cold.
@@ -185,7 +186,7 @@ describe('⚠⚠ OTA-1184 — EVERY PERK HAS A CONSUMER. This is the whole rule.
 
   test('⚠ the perk lookup can never break the resist read', () => {
     const i = COMBAT_SRC.indexOf('export function playerArmorResistKinds');
-    const body = COMBAT_SRC.slice(i, i + 1400);
+    const body = blockAt(COMBAT_SRC, 'export function playerArmorResistKinds');
     expect(body).toContain('try {');
     expect(body).toContain('catch');
   });

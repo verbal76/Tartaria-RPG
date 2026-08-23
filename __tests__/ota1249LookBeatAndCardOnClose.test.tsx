@@ -235,7 +235,7 @@ describe('OTA-1249 — the colour card waits for the picker to close', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('const lanesWhileOpen = useRef(0);');
     expect(i).toBeGreaterThan(-1);
-    const block = screen.slice(i, i + 420);
+    const block = blockAt(screen, 'const lanesWhileOpen = useRef(0);');
     expect(block).toContain('Math.max(lanesWhileOpen.current, gatherLaneCount)');
     expect(block).toContain('lanesWhileOpen.current >= 2');
     // Reset on close, so a later single-lane picker cannot inherit the mark.

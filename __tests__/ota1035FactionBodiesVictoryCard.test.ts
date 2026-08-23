@@ -21,6 +21,7 @@ import {
 } from '../app/engine/factionBodies';
 import { findEnemyByName } from '../app/engine/encounter';
 import { pickIndoorFactionIntruder } from '../app/engine/indoorAmbush';
+import { blockAt } from '../test-utils/srcBlock';
 
 const ROSTER = (() => {
   const raw = JSON.parse(
@@ -144,7 +145,7 @@ describe('OTA-1035 — the battle follow-up card', () => {
 
   it('rewards and story are split by channel; combat rolls stay in the feed', () => {
     const start = store.indexOf('function captureBossVictoryLine(');
-    const body = store.slice(start, start + 900);
+    const body = blockAt(store, 'function captureBossVictoryLine(');
     expect(body).toMatch(/channel === 'reward' \? cap\.rewards/);
     expect(body).toMatch(/channel === 'arbiter' \|\| channel === 'world' \? cap\.flavor/);
     expect(body).toMatch(/: null;/);
@@ -157,7 +158,7 @@ describe('OTA-1035 — the battle follow-up card', () => {
 
   it('one battle raises one card — a mission finished in the same fight merges', () => {
     const start = store.indexOf('raiseMissionCompleteNotice(kind, title, body) {');
-    const body = store.slice(start, start + 700);
+    const body = blockAt(store, 'raiseMissionCompleteNotice(kind, title, body) {');
     expect(body).toMatch(/prev\.title === title \|\| !!prev\.heading/);
     expect(store).toMatch(/function mergeRewardLines\(/);
   });

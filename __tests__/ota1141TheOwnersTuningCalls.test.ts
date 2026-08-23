@@ -78,6 +78,7 @@ jest.mock('expo-speech-recognition', () => ({}));
 // top of HANDOFF §8, per the owner's instruction.
 
 import { bossSwingsTwice, enemyDamageDisplay, enemyDamageCompact } from '../app/engine/combatRules';
+import { blockAt } from '../test-utils/srcBlock';
 
 // ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
 // the pins below follow the code to its new address rather than reading both
@@ -205,7 +206,7 @@ describe('OTA-1141 — the standing tuning list exists where the owner asked', (
     const h = read('HANDOFF.md');
     expect(h).toContain('STANDING TUNING LIST');
     const at = h.indexOf('STANDING TUNING LIST');
-    const win = h.slice(at, at + 5000).toLowerCase();
+    const win = blockAt(h, 'STANDING TUNING LIST').toLowerCase();
     for (const item of ['59', 'acid', 'dog soak', 'DEX']) {
       expect(win).toContain(item.toLowerCase());
     }

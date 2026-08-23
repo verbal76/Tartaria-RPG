@@ -94,7 +94,7 @@ describe('OTA-1276 — it is stamped at the doors a freeze happens behind', () =
     const store = src('app', 'state', 'gameStore.ts');
     const i = store.indexOf('export function logUiTap(');
     expect(i).toBeGreaterThan(-1);
-    const block = store.slice(i, i + 900);
+    const block = blockAt(store, 'export function logUiTap(');
     expect(block).toContain('stampLiveBreadcrumb({');
     expect(block).toContain('what: `tap "${label}"`');
     // The room is captured, because "which room was I entering" is the question.

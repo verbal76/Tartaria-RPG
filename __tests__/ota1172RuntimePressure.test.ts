@@ -359,7 +359,7 @@ describe('OTA-1172 — this OTA changes no behaviour, deliberately', () => {
     // indexOf for the bare name across two files is how you assert against the wrong body.
     const i = WATCH.indexOf('export function startRuntimePressureWatch(');
     expect(i).toBeGreaterThan(-1);
-    expect(WATCH.slice(i, i + 900)).toContain('stopRuntimePressureWatch();');
+    expect(blockAt(WATCH, 'export function startRuntimePressureWatch(')).toContain('stopRuntimePressureWatch();');
     const j = WATCH.indexOf('export function stopRuntimePressureWatch(): void {');
     expect(j).toBeGreaterThan(-1);
     const stopper = blockAt(WATCH, 'export function stopRuntimePressureWatch(): void {');
@@ -376,7 +376,7 @@ describe('OTA-1172 — this OTA changes no behaviour, deliberately', () => {
     // ⚠ Widened again by OTA-1179, which recorded inside this handler why its own release
     // line used to assert an outcome it never checked. Third time a fixed slice here has
     // needed moving — the count claim is sound, the window keeps aging.
-    const block = WATCH.slice(i, i + 12000);
+    const block = blockAt(WATCH, 'export function startRuntimePressureWatch(');
     // Each addEventListener sits inside its own try/catch.
     const listeners = (block.match(/AppState\.addEventListener/g) ?? []).length;
     expect(listeners).toBe(2);

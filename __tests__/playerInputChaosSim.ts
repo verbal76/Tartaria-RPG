@@ -88,6 +88,7 @@ jest.mock('expo-updates', () => ({}));
 
 import { parseInput } from '../app/engine/parser';
 import { rollOverlayEncounter, overlayById } from '../app/engine/elevatedOverlay';
+import { blockAt } from '../test-utils/srcBlock';
 import type { InventoryItem } from '../app/engine/types';
 
 // ----------------------- Seeded RNG ----------------------------------
@@ -675,7 +676,7 @@ describe('OTA-110-CHAOS — playerInputChaosSim', () => {
       // Window wide enough to span the OTA-356 fork (ground-refusal + fall).
       // OTA-1011 — 1600 chars stopped reaching climbFall( once later OTAs grew
       // the refusal branch's comments (measured 2504 today); margin added.
-      const window = src.slice(idx, idx + 5000);
+      const window = blockAt(src, 'if (player.stamina < climbStaminaCost)');
       // The mid-climb fall path is still present...
       expect(window).toMatch(/climbFall\(/);
       // ...gated on already being elevated (the "no ground, no fall" fork)...
