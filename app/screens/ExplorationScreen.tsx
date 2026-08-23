@@ -1248,6 +1248,31 @@ export function ExplorationScreen() {
               traders, so this button only ever appeared for the 30 named vendors
               whose raw id happens to equal their ledger id — and it was the only
               route into their conversation that a player would ever find. */}
+          {/* ⚠⚠ OTA-1453 — STORE, AND IT IS DELIBERATELY REDUNDANT WITH THE CHIP.
+              Reported by a player who is not the owner, which is why it is worth
+              the pixels: *"why do I have to gift someone before I can use them?"*
+              She had not found the store at all. The chip IS the button and its
+              hint says "tap to trade" — but the only things on this row that LOOK
+              like buttons were TALK and GIFT, so gifting read as the way in. A
+              player conditioned by other games looks for the labelled control and
+              never learns that the banner itself is tappable.
+              ⚠ Same handler as the chip, on purpose. This is not a second route
+              into the store, it is the same route wearing the shape people expect
+              — so the two can never disagree about where they go. It sits FIRST
+              and in the vendor's gold rather than the quiet TALK grey, because
+              trading is the primary action at a counter and the other two are
+              not. Nested touchables do not bubble in RN, so tapping it navigates
+              exactly once. */}
+          <TouchableOpacity
+            style={[styles.placeChipTalk, styles.placeChipStore]}
+            onPress={() => setScreen('vendor')}
+            hitSlop={8}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Open ${currentScene.vendor.name}'s store, ${currentScene.vendor.offers.length} offers`}
+          >
+            <Text style={[styles.placeChipTalkText, styles.placeChipStoreText]}>STORE</Text>
+          </TouchableOpacity>
           {hasTopicsFor(npcLedgerId(currentScene.vendor)) ? (
             // OTA-1079 — the glow means "something NEW to hear": green while
             // any gate-open topic still has unread lines, back to gold once
@@ -2838,6 +2863,11 @@ const styles = StyleSheet.create({
   // it reads as a sibling of the quest box / vendor banner rather than a
   // detached, narrower chip. Mirrors `vendorBanner`'s box model; only the
   // purple accent colour distinguishes it.
+  // ⚠ OTA-1453 — STORE wears the vendor's own gold so it reads as the PRIMARY
+  // action on the row, unlike the deliberately quiet TALK/GIFT beside it. Same
+  // geometry as placeChipTalk (it layers on top) so the three stay aligned.
+  placeChipStore: { borderColor: '#c9a86a', backgroundColor: '#2a2113' },
+  placeChipStoreText: { color: '#e8c766' },
   fusionBannerStripe: { width: 4, backgroundColor: '#b88ce0', alignSelf: 'stretch' },
   fusionBannerName: { color: '#b88ce0', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
   // arb152 — dismiss (✕) on the Fusing Crucible chip.

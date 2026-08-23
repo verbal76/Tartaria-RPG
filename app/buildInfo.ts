@@ -24436,7 +24436,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stay open. What is proven is that the race existed and no longer does.
 // Also: Vael, the Cartographer and Sister Yune each get a second counter
 // question, so every vendor now opens with two.
-export const OTA_BUILD_ID = '2026-08-23-1452-the-free-outranks-everything';
+// OTA-1453 — the door has to look like a door, and the update should land on
+// the start that finds it.
+// A SECOND PLAYER asked why she had to gift someone before she could use them:
+// she had never found the store. The vendor banner IS the button and its hint
+// says "tap to trade", and none of that reached her, because the only things on
+// that row that LOOKED like buttons were TALK and GIFT — so gifting read as the
+// way in to a shopkeeper. There is a STORE button now, first on the row and in
+// the vendor's gold while the other two stay quiet. It fires the same handler
+// the banner fires, so the two can never disagree about where they go, and the
+// banner keeps its hint — the button adds an affordance rather than replacing
+// the one people already found.
+// AND THE BOOT UPDATE CHECK GETS THE TIME TO ANSWER. Owner: "most will never
+// think to restart right away and will miss an update." Nothing is missed — a
+// downloaded update already applies by itself the next time the app opens — but
+// it was costing the whole session it was found in. The check at boot is the
+// only moment an update can be applied on the start that finds it (later is the
+// crash OTA-404 hit and OTA-405 reverted), and it had five seconds to answer,
+// which a cold radio at launch routinely misses. Ten now, the same budget every
+// other caller already uses. A live connection answers in under a second, so the
+// only devices that spend the extra time are the ones that were failing.
+export const OTA_BUILD_ID = '2026-08-23-1453-the-labelled-door';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1452-the-free-outranks-everything';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1451-never-have-to-guess';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1450-the-board-knows-your-size';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1448-the-sheet-says-what-it-knows';

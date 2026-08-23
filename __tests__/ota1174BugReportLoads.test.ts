@@ -92,11 +92,32 @@ describe('OTA-1174 — the boot update check reports itself to the DEVICE log', 
 
   it('⚠⚠ AND NOT ONE LINE OF CONTROL FLOW CHANGED — additive only, deliberately', () => {
     // This is the one path where a clever fix that goes wrong leaves the player unable to
-    // receive the correction. Same call, same options, same branches, same fall-through.
-    expect(APPTSX).toContain("checkTimeoutMs: 5000");
+    // receive the correction. Same call, same branches, same fall-through.
+    //
+    // ⚠⚠ REBUILT BY OTA-1453, AND THE DISTINCTION IS THE POINT. This pinned the literal
+    // `checkTimeoutMs: 5000` as part of "nothing changed", which conflated two different
+    // claims: that the CONTROL FLOW is untouched — OTA-1174's actual promise, since it
+    // shipped logging and nothing else — and that one TUNING NUMBER never moves. The
+    // second was never OTA-1174's to make, and it made a deliberate retune read as a
+    // regression. 5s was losing the race on a cold radio, and losing it costs the player
+    // the whole session's update: the boot-front is the ONLY window where an update can
+    // be applied on the start that finds it.
+    //
+    // The flow is pinned exactly as before. The budget is now pinned as a PROPERTY —
+    // that one exists, and that it is bounded at both ends — rather than as a specific
+    // value that belongs to somebody else's decision.
     expect(APPTSX).toContain('skipTeardown: true');
     expect(APPTSX).toContain("if (otaResult === 'applied') {");
     expect(APPTSX).toContain("setStage('ota:done');");
+    // ⚠ A budget still EXISTS. An unbounded check would hold the splash forever on a
+    // dead network, which is the failure the number was introduced to prevent.
+    const budget = /checkTimeoutMs:\s*([\d_]+)/.exec(APPTSX)?.[1]?.replace(/_/g, '');
+    expect(budget).toBeDefined();
+    const ms = Number(budget);
+    // …and it is sane at both ends: long enough for a cold radio to answer, short enough
+    // that an offline launch is not held at the splash.
+    expect(ms).toBeGreaterThanOrEqual(8_000);
+    expect(ms).toBeLessThanOrEqual(20_000);
   });
 
   it('⚠ LOGGING CAN NEVER BLOCK THE BOOT', () => {

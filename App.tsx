@@ -365,7 +365,34 @@ export default function App() {
           } catch { /* diagnostics must never gate the check */ }
           const otaResult = await checkAndApplyOTA({
             silent: true,
-            checkTimeoutMs: 5000,
+            // ⚠⚠⚠ OTA-1453 — 5s WAS TOO SHORT, AND LOSING THAT RACE COSTS A WHOLE
+            // SESSION. Owner: *"most will never think to restart right away and will
+            // miss an update"* — and, of a second player's phone, *"why does hers
+            // always have to update 2-3 times to catch up when everyone else's only
+            // takes the newest one."* Both reports are this one number.
+            //
+            // ⚠⚠ THIS IS THE ONLY WINDOW IN THE APP WHERE AN UPDATE CAN LAND ON THE
+            // START THAT FINDS IT. It runs before bootQwen / bootCognitive / bootAudio
+            // / initTTSManager, which is what makes `skipTeardown` honest — there are
+            // no native handles to race. OTA-404 proved what happens anywhere later:
+            // reloadAsync while those four are mid-init drops the process to the home
+            // screen ("title screen visible for 1 second then drops to the phone's
+            // homescreen"), and OTA-405 reverted it. So a check that does not answer
+            // HERE cannot be applied until the next launch, and the player spends this
+            // whole session on the old bundle.
+            //
+            // ⚠⚠ WHAT THE SHORT BUDGET WAS PROTECTING, AND WHY 10s STILL PROTECTS IT.
+            // It exists so an OFFLINE launch is not held at the splash — real, but
+            // priced wrong. A live network answers this in well under a second, so the
+            // extra time is spent only by a device that is offline or on a cold radio
+            // — and a cold radio at launch is exactly the case that was failing. 10s is
+            // not a fresh magic number either: it is `checkAndApplyOTA`'s own default,
+            // which every other caller already uses. The boot-front was the single
+            // place that shortened it, and the single place where losing costs most.
+            //
+            // ⚠ The DOWNLOAD budget is untouched (240s, OTA-369). This is the "is there
+            // one?" question, not the transfer.
+            checkTimeoutMs: 10_000,
             skipTeardown: true,
             // ⚠ `silent` only suppresses UI. These now land in the device log, so a
             // report shows 'Checking…' → 'Downloading…' → what happened, or where it
