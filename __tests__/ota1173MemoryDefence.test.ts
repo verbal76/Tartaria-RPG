@@ -57,6 +57,7 @@ jest.mock('expo-av', () => ({
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 const read = (...p: string[]): string => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 /** ⚠ OTA-1396 — SLICE 5 split this subsystem across two files, and this suite
  *  reads BOTH on purpose. The instruments (the memory-warning handler, the
@@ -207,7 +208,7 @@ describe('OTA-1173 — the reloads have a ceiling now', () => {
     // indexOf found that one and read the wrong block.
     const i = STORE.indexOf('if (!qwenTrulyBackgrounded) return;');
     expect(i).toBeGreaterThan(-1);
-    const block = STORE.slice(i, i + 700);
+    const block = blockAt(STORE, 'if (!qwenTrulyBackgrounded) return;');
     expect(block).toContain('qwenReinitAttempts = 0;');
     expect(block).toContain('qwenReinitCeilingLogged = false;');
     expect(block).toContain('qwenBackoffLevel = 0;');
@@ -215,7 +216,7 @@ describe('OTA-1173 — the reloads have a ceiling now', () => {
 
   it('and a re-hydrate starts clean rather than inheriting the last run refusals', () => {
     const i = STORE.indexOf('function startQwenWatchdog');
-    const block = STORE.slice(i, i + 1400);
+    const block = blockAt(STORE, 'function startQwenWatchdog');
     expect(block).toContain('qwenReinitCeilingLogged = false;');
     expect(block).toContain('qwenTrulyBackgrounded = false;');
   });
@@ -239,7 +240,7 @@ describe('OTA-1173 — what this OTA does NOT claim', () => {
     // "this is why it crashed" is not yet proven and must not be written as though it is.
     const i = RUNTIME.indexOf('THE MODEL LOAD NOW TAKES THE NATIVE-ML LOCK');
     expect(i).toBeGreaterThan(-1);
-    const block = RUNTIME.slice(i, i + 1800);
+    const block = blockAt(RUNTIME, 'THE MODEL LOAD NOW TAKES THE NATIVE-ML LOCK');
     expect(block).toMatch(/overwhelmingly common/i); // hedged, not asserted
     expect(block).toMatch(/none recorded/);          // and the evidence is cited
   });

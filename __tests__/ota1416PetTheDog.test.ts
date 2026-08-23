@@ -22,6 +22,7 @@
  */
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const read = (...p: string[]) => readFileSync(join(__dirname, '..', ...p), 'utf8');
 const STORE = read('app', 'state', 'gameStore.ts');
@@ -123,7 +124,7 @@ describe('OTA-1416 — a dog you cannot reach says so', () => {
     // Both are `waiting_at_base`; only one is on a 24h bleed-out clock, and
     // that is the one where the answer changes what the player should do next.
     const i = STORE.indexOf("if (dog.status !== 'with_player') {");
-    expect(STORE.slice(i, i + 400)).toContain('dog.hp <= 0');
+    expect(blockAt(STORE, "if (dog.status !== 'with_player') {")).toContain('dog.hp <= 0');
   });
 });
 
@@ -138,7 +139,7 @@ describe('OTA-1416 — no new mechanic was invented', () => {
   it('⚠ the intercept sits beside its sibling and persists like it', () => {
     expect(STORE).toContain('if (tryDogPetVerb(get, set, trimmed)) return;');
     const i = STORE.indexOf('function tryDogPetVerb(');
-    expect(STORE.slice(i, i + 2200)).toContain('void get().persist();');
+    expect(blockAt(STORE, 'function tryDogPetVerb(')).toContain('void get().persist();');
   });
 });
 

@@ -29,6 +29,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { canonicalSynthKind } from '../app/engine/itemSynthesisQwen';
+import { blockAt } from '../test-utils/srcBlock';
 
 const read = (...p: string[]) => readFileSync(join(__dirname, '..', ...p), 'utf8');
 const NARRATION = read('app', 'ai', 'narration.ts');
@@ -49,7 +50,7 @@ describe('OTA-1411 — an outpost room takes the authored line, not a 12-second 
     // `buildArbiterSceneIntro` output — the same path cooldown and sprinting take.
     // Nothing goes quiet; what stops is paying twelve seconds for a discard.
     const i = NARRATION.indexOf('const inOutpostRoom =');
-    const body = NARRATION.slice(i, i + 4000);
+    const body = blockAt(NARRATION, 'const inOutpostRoom =');
     expect(body).toContain("get().appendLog('debug', `arbiter: template (reason=${reason})`);");
   });
 

@@ -50,6 +50,7 @@ jest.mock('expo-file-system', () => ({
 import * as fs from 'fs';
 import * as path from 'path';
 import { QwenGenerativeEngine } from '../app/ai/generation/QwenGenerativeEngine';
+import { blockAt } from '../test-utils/srcBlock';
 
 type InitOpts = NonNullable<Parameters<QwenGenerativeEngine['initialize']>[0]>;
 
@@ -173,12 +174,12 @@ describe('OTA-1084 — SOURCE LOCKS (watchdog rules)', () => {
     // The reset itself is intact behind that gate — this is a narrower trigger, not a
     // removed behaviour.
     const fg = store.indexOf('if (!qwenTrulyBackgrounded) return;');
-    const gated = store.slice(fg, fg + 700);
+    const gated = blockAt(store, 'if (!qwenTrulyBackgrounded) return;');
     expect(gated).toMatch(/qwenBackoffLevel = 0;/);
     expect(gated).toMatch(/tick\(\);/);
     // Recovery path zeroes the whole ledger.
     const start = store.indexOf('function runQwenHealthCheck(');
-    const body = store.slice(start, start + 2500);
+    const body = blockAt(store, 'function runQwenHealthCheck(');
     expect(body).toMatch(/qwenReinitAttempts = 0;\s*\n\s*qwenBackoffLevel = 0;/);
   });
 

@@ -18,6 +18,7 @@
  */
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]) => readFileSync(join(__dirname, '..', ...p), 'utf8');
 const input = src('app', 'components', 'InputBox.tsx');
@@ -75,7 +76,7 @@ describe('OTA-1379 — the latch', () => {
     // for the rest of the session, so the latch is written by the toggle only.
     expect(input).toContain('{(moreOpen || tutLock) && (');
     const forced = input.indexOf('{(moreOpen || tutLock) && (');
-    const after = input.slice(forced, forced + 2000);
+    const after = blockAt(input, '{(moreOpen || tutLock) && (');
     expect(after).not.toContain('MORE_TRAY_OPEN =');
   });
 

@@ -33,6 +33,7 @@
 // REBUILD waits for a settled foreground.
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const APP = readFileSync(join(__dirname, '..', 'App.tsx'), 'utf8');
 
@@ -130,7 +131,7 @@ describe('OTA-1275 — the source keeps the asymmetry', () => {
     // (OTA-1177's jetsam reports). Only the rebuild is allowed to wait.
     const i = APP.indexOf("if (status === 'background') {");
     expect(i).toBeGreaterThan(-1);
-    const block = APP.slice(i, i + 300);
+    const block = blockAt(APP, "if (status === 'background') {");
     expect(block).toContain('void shutdownQwen();');
     expect(block).not.toContain('setTimeout');
   });

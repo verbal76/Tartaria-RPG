@@ -18,6 +18,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const read = (...p: string[]): string =>
   fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
@@ -42,7 +43,7 @@ describe('OTA-1157 — no ambient event grants standing', () => {
     for (const kind of ['defector', 'windfall']) {
       const i = WORLD_EVENTS.indexOf(`kind: '${kind}', weight:`);
       expect(i).toBeGreaterThan(-1);
-      const body = WORLD_EVENTS.slice(i, i + 700);
+      const body = blockAt(WORLD_EVENTS, `kind: '${kind}', weight:`);
       expect(body).toContain('tideDelta');
       expect(body).not.toContain('repDelta');
     }

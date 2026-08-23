@@ -62,6 +62,7 @@ jest.mock('expo-av', () => ({
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 const read = (...p: string[]): string => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 /** ⚠ OTA-1396 — SLICE 5 split this subsystem across two files, and this suite
  *  reads BOTH on purpose. The instruments (the memory-warning handler, the
@@ -109,7 +110,7 @@ describe('OTA-1175 — a memory warning now silences the watchdog', () => {
     expect(STORE).toContain('if (qwenStoodDownForMemory() || underMemoryPressure())');
     const i = STORE.indexOf('if (qwenStoodDownForMemory() || underMemoryPressure())');
     // Must RETURN, not fall through to the kick.
-    // ⚠ WINDOW-FREE, and deliberately so. This was `STORE.slice(i, i + 1000)` and it is the
+    // ⚠ WINDOW-FREE, and deliberately so. This was `blockAt(STORE, 'if (qwenStoodDownForMemory() || underMemoryPressure())')` and it is the
     // FIFTH fixed-size source slice to age this session — OTA-1181 restructured the two
     // stand-down messages onto separate branches and pushed `return false;` past the
     // magic number. The claim never changed; the window kept going stale, and a slice that
@@ -171,7 +172,7 @@ describe('OTA-1175 — a memory warning now silences the watchdog', () => {
 
   it('and a re-hydrate clears the interlock rather than inheriting it', () => {
     const i = STORE.indexOf('function startQwenWatchdog');
-    const block = STORE.slice(i, i + 1600);
+    const block = blockAt(STORE, 'function startQwenWatchdog');
     // ⚠ OTA-1396 — the four latches are cleared by ONE call now. Clearing three
     // of four was always the bug waiting to happen, so they were given a single
     // owner in runtimePressureWatch.ts; the watchdog asks it to reset them.

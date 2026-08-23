@@ -42,6 +42,7 @@ import { GatherModal } from '../app/components/GatherModal';
 import { isUpgradeOverEquipped, upgradeEquipSlot } from '../app/engine/gatherSort';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -134,7 +135,7 @@ describe('OTA-1251 — the tap takes AND wears', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('const wear = isUpgradeOverEquipped(player, noun)');
     expect(i).toBeGreaterThan(-1);
-    const block = screen.slice(i, i + 900);
+    const block = blockAt(screen, 'const wear = isUpgradeOverEquipped(player, noun)');
     expect(block).toContain('takeAmbientNoun(noun);');
     expect(block).toContain('equipItem(wear.name, wear.slot)');
   });
@@ -146,7 +147,7 @@ describe('OTA-1251 — the tap takes AND wears', () => {
     // at a player who did nothing wrong.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('const wear = isUpgradeOverEquipped(player, noun)');
-    const block = screen.slice(i, i + 900);
+    const block = blockAt(screen, 'const wear = isUpgradeOverEquipped(player, noun)');
     expect(block).toContain('player?.inventory ?? []');
     expect(block).toContain('i.quantity > 0');
   });
@@ -155,7 +156,7 @@ describe('OTA-1251 — the tap takes AND wears', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf("if (tutBeat === 'armor' && /vest|warden/i.test(noun)) {");
     expect(i).toBeGreaterThan(-1);
-    const block = screen.slice(i, i + 800);
+    const block = blockAt(screen, "if (tutBeat === 'armor' && /vest|warden/i.test(noun)) {");
     expect(block).toContain('setTakeOpen(false);');
     expect(block).toContain('submit(`take ${noun}`);');
     expect(block).toContain(`equipItem("Mud-Warden's Vest", 'chest')`);

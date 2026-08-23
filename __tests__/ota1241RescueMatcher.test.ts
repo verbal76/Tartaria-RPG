@@ -24,6 +24,7 @@ import { RESCUE_SCENARIOS } from '../app/engine/dogCompanion';
 import { WEAPONS, ARMOR } from '../app/engine/crafting';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -139,7 +140,7 @@ describe('OTA-1241 — the intro names what the player looked at', () => {
     const store = src('app', 'state', 'gameStore.ts');
     const i = store.indexOf('const introLines: Record<RescueScenarioId, string>');
     expect(i).toBeGreaterThan(-1);
-    const block = store.slice(i, i + 1600);
+    const block = blockAt(store, 'const introLines: Record<RescueScenarioId, string>');
     expect(block).not.toContain('You crest the snare pit');
     expect(block).not.toContain("You step into the smelter's ruin");
     expect(block).not.toContain('The overturned wagon shifts');

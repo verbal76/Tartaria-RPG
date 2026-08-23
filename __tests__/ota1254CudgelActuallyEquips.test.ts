@@ -31,6 +31,7 @@ import { WEAPONS } from '../app/engine/crafting';
 import { isUpgradeOverEquipped, upgradeEquipSlot } from '../app/engine/gatherSort';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -117,7 +118,7 @@ describe('OTA-1254 — the beat says what happened', () => {
     const store = src('app', 'state', 'gameStore.ts');
     const i = store.indexOf("if (tStep?.id === 'cudgel' &&");
     expect(i).toBeGreaterThan(-1);
-    const block = store.slice(i, i + 1800);
+    const block = blockAt(store, "if (tStep?.id === 'cudgel' &&");
     expect(block).toContain('const readiedIn = grantTutorialItem(get, set, \'cudgel\');');
     expect(block).toContain("readiedIn ? '✦ Cudgel (Common). [equipped]' : '✦ Cudgel (Common).'");
     // The world line branches too — "you equip it without thinking" was the other
@@ -130,7 +131,7 @@ describe('OTA-1254 — the beat says what happened', () => {
     // The caller cannot narrate honestly without it — that signature IS the fix.
     const store = src('app', 'state', 'gameStore.ts');
     const i = store.indexOf('function grantTutorialItem(');
-    const fn = store.slice(i, i + 2600);
+    const fn = blockAt(store, 'function grantTutorialItem(');
     expect(fn).toContain('): EquipSlot | null {');
     expect(fn).toContain('return readied?.slot ?? null;');
     // One comparison, shared with the picker's ★.
@@ -143,6 +144,6 @@ describe('OTA-1254 — the beat says what happened', () => {
     // called Cudgel" rather than the one just granted.
     const store = src('app', 'state', 'gameStore.ts');
     const i = store.indexOf('function grantTutorialItem(');
-    expect(store.slice(i, i + 2600)).toContain('[SLOT_ID_KEY[readied.slot]]: item.id');
+    expect(blockAt(store, 'function grantTutorialItem(')).toContain('[SLOT_ID_KEY[readied.slot]]: item.id');
   });
 });

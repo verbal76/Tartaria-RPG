@@ -13,6 +13,7 @@ import * as path from 'path';
 import { rollOfferQuantity, findVendorByName } from '../app/engine/vendors';
 import vendorsData from '../app/data/npcs/vendors.json';
 import materialsData from '../app/data/items/materials.json';
+import { blockAt } from '../test-utils/srcBlock';
 
 type Offer = { itemName: string; price: number; quantity?: number };
 type Vendor = { name: string; offers?: Offer[] };
@@ -147,7 +148,7 @@ describe('OTA-1034 — SOURCE LOCKS', () => {
     const store = read('app', 'state', 'gameStore.ts') + '\n' + read('app', 'ai', 'narration.ts');
     const start = store.indexOf("if (!ambientUsable) {");
     expect(start).toBeGreaterThan(0);
-    const block = store.slice(start, start + 1600);
+    const block = blockAt(store, "if (!ambientUsable) {");
     expect(block).toMatch(/appendLog\('debug'/);
     expect(block).not.toMatch(/appendLog\('arbiter'/);
     expect(block).not.toMatch(/appendLog\('world'/);

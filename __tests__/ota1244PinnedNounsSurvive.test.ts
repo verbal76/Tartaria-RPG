@@ -29,6 +29,7 @@
 // why it surfaced now rather than in June.
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -136,7 +137,7 @@ describe('OTA-1244 — the guarantee is recorded once and read everywhere', () =
     const store = src('app', 'state', 'gameStore.ts');
     const i = store.indexOf('const pins = (s.currentScene.pinnedAmbientNouns');
     expect(i).toBeGreaterThan(-1);
-    const block = store.slice(i, i + 500);
+    const block = blockAt(store, 'const pins = (s.currentScene.pinnedAmbientNouns');
     expect(block).toContain('pool.includes(n)');                 // membership gate
     expect(block).toContain('pool.filter((n) => !pinned.includes(n))'); // no dupes
     expect(block).toContain('AMBIENT_DISPLAY_CAP - pinned.length');     // window stays full

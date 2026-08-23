@@ -45,6 +45,7 @@ import { hasSalvageYield } from '../app/engine/salvagePools';
 import type { Hook } from '../app/engine/hooks';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -129,7 +130,7 @@ describe('OTA-1236 — SALVAGE ALL leaves the lead alone, and says so', () => {
     const store = storeSource();
     const i = store.indexOf('if (skippedLead.length > 0)');
     expect(i).toBeGreaterThan(-1);
-    const block = store.slice(i, i + 500);
+    const block = blockAt(store, 'if (skippedLead.length > 0)');
     expect(block).toContain("'arbiter'");
     expect(block).toContain('(INVESTIGATE.)');
   });
@@ -139,9 +140,9 @@ describe('OTA-1236 — SALVAGE ALL leaves the lead alone, and says so', () => {
     // whose only scrap-shaped noun is the dog chain reports the sweep as broken.
     const store = storeSource();
     const i = store.indexOf('const hadOtherOutput =');
-    expect(store.slice(i, i + 400)).toContain('skippedLead.length > 0');
+    expect(blockAt(store, 'const hadOtherOutput =')).toContain('skippedLead.length > 0');
     const j = store.indexOf('&& skippedTakeable.length === 0');
-    expect(store.slice(j, j + 200)).toContain('&& skippedLead.length === 0');
+    expect(blockAt(store, '&& skippedTakeable.length === 0')).toContain('&& skippedLead.length === 0');
   });
 
   it('⚠⚠ the protection LIFTS once the quest cannot fire — a snare is a snare again', () => {
@@ -228,7 +229,7 @@ describe('OTA-1236 — RENDERED: the lead is last, and no button touches it', ()
     const mod = src('app', 'components', 'GatherModal.tsx');
     // Checked FIRST in the press handler, before the scrap and take branches.
     const i = mod.indexOf('onPress={() => {');
-    const handler = mod.slice(i, i + 320);
+    const handler = blockAt(mod, 'onPress={() => {');
     expect(handler.indexOf("lane === 'lead'")).toBeLessThan(handler.indexOf("lane === 'scrap'"));
     expect(handler).toContain('onInvestigate(noun)');
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
@@ -272,7 +273,7 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
     // ⚠ OTA-1268 — window widened past the self-abort fix's incident note; the
     // enemy-abort rule this pins is unchanged (ota1268 now also proves it
     // BEHAVIOURALLY, by staging an enemy mid-sweep and counting).
-    const block = screen.slice(i, i + 2400);
+    const block = blockAt(screen, 'onInvestigateAll={(nouns) => {');
     expect(block).toContain('orderByStoryTier(nouns');
     expect(block).toContain('currentScene?.enemies ?? []).length > 0');
     // ⚠ OTA-1263 paced the sweep, so the abort is an early `return` out of the
@@ -290,7 +291,7 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
     expect(modal).toContain('leadNouns');
     const i = modal.indexOf('const visibleChips = [');
     expect(i).toBeGreaterThan(-1);
-    const block = modal.slice(i, i + 260);
+    const block = blockAt(modal, 'const visibleChips = [');
     expect(block).toContain('!isLeadChip(c.noun)');
     // Non-leads first, leads appended after — the same partition as the sweep.
     expect(block.indexOf('!isLeadChip')).toBeLessThan(block.lastIndexOf('isLeadChip'));

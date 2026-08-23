@@ -73,6 +73,7 @@ import { useGameStore } from '../app/state/gameStore';
 import { FACTION_QUESTS } from '../app/engine/factionQuests';
 import { possessive, wrongCounterpartyBody } from '../app/engine/contractRefusal';
 import { FACTIONS } from '../app/engine/factions';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]) => readFileSync(join(__dirname, '..', ...p), 'utf8');
 const quest = src('app', 'state', 'slices', 'questSlice.ts');
@@ -177,7 +178,7 @@ describe('OTA-1403 — the guard the other three families always had', () => {
     // The trophy is shown in person (OTA-810) and turnInHunt refuses `remote`
     // outright. A button that would then refuse is the silent refusal in a hat.
     const i = quest.indexOf("if (!remote && !CB.vendorCanTakeContract(");
-    const block = quest.slice(i, i + 700);
+    const block = blockAt(quest, "if (!remote && !CB.vendorCanTakeContract(");
     expect(block).toContain('NO RUNNER OFFER HERE');
     expect(block).not.toContain("kind: 'hunt'");
   });

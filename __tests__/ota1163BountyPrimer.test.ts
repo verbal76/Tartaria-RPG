@@ -62,6 +62,7 @@ import { useGameStore } from '../app/state/gameStore';
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const read = (...p: string[]): string =>
   fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
@@ -125,7 +126,7 @@ describe('OTA-1163 — the card tells the truth about the job', () => {
     // payout, which pushed `announceMissionComplete` past a 2400-char window and failed a
     // claim that is still perfectly true. The assertion — the payout fires from the KILL
     // path, not a hand-in verb — is unchanged; only the window it looks through grew.
-    const block = STORE.slice(i, i + 4000);
+    const block = blockAt(STORE, 'killCountsForBounty(b, enemy.factionId)');
     expect(block).toContain('announceMissionComplete');
     expect(block).toContain('rewardTc');
     // And the real guarantee behind the claim: no turn-in verb gates it.

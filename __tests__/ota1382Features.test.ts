@@ -24,6 +24,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { FEATURES, type ProductFeatures } from '../app/config/features';
 import { sharingUnlockedFor } from '../app/engine/fallenLedger';
+import { blockAt } from '../test-utils/srcBlock';
 
 const path = (...p: string[]) => join(__dirname, '..', ...p);
 const src = (...p: string[]) => readFileSync(path(...p), 'utf8');
@@ -146,7 +147,7 @@ describe('OTA-1382 — the migration that was universalised rather than flagged'
     // defeats. On a line with no legacy saves it costs one nullish check.
     expect(store).toContain('enemyIntel: wm.enemyIntel ??');
     const i = store.indexOf('export function backfillEnemyIntelFromDefeats(');
-    const head = store.slice(i, i + 400);
+    const head = blockAt(store, 'export function backfillEnemyIntelFromDefeats(');
     expect(head).toContain('if (!defeatedNames || defeatedNames.length === 0) return out;');
     // the early return precedes the requires, so a fresh save loads nothing
     expect(head.indexOf('return out;')).toBeLessThan(head.indexOf('require('));

@@ -33,6 +33,7 @@ import { GatherModal } from '../app/components/GatherModal';
 import { classifyGatherNoun, laneForKind } from '../app/engine/gatherSort';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -168,7 +169,7 @@ describe('OTA-1245 — taught where it is true', () => {
     // the salvage button", OTA-1075).
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('id="picker_colour_lanes"');
-    const body = /body="([^"]+)"/.exec(screen.slice(i, i + 600));
+    const body = /body="([^"]+)"/.exec(blockAt(screen, 'id="picker_colour_lanes"'));
     expect(body).not.toBeNull();
     expect(body![1]!.split(/\s+/).length).toBeLessThanOrEqual(30);
     // It names the colours, because the colours ARE the system.

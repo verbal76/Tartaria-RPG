@@ -48,6 +48,7 @@ import {
 } from '../app/engine/saveSystem';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 const flush = (): Promise<void> => new Promise((r) => setTimeout(r, 0));
@@ -140,7 +141,7 @@ describe('OTA-1276 — it is stamped at the doors a freeze happens behind', () =
     // It sits with the other orderly-exit breadcrumb wipe (arb126).
     const i = app.indexOf('void clearInFlightBreadcrumbs();');
     expect(i).toBeGreaterThan(-1);
-    expect(app.slice(i, i + 400)).toContain('clearLiveBreadcrumb');
+    expect(blockAt(app, 'void clearInFlightBreadcrumbs();')).toContain('clearLiveBreadcrumb');
   });
 
   it('⚠⚠ the report SAYS the log tail is untrustworthy — the mistake I actually made', () => {
@@ -176,7 +177,7 @@ describe('OTA-1276 — why the existing detector could never have caught this', 
     expect(save).toContain('logWriteChain = logWriteChain.then(async () => {');
     // The breadcrumb deliberately does NOT ride that chain.
     const i = save.indexOf('export function stampLiveBreadcrumb(');
-    const block = save.slice(i, i + 400);
+    const block = blockAt(save, 'export function stampLiveBreadcrumb(');
     expect(block).not.toContain('logWriteChain');
     expect(block).not.toContain('pendingLogLines');
   });

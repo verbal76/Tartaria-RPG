@@ -29,6 +29,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const STORE = fs.readFileSync(path.join(__dirname, '..', 'app/state/gameStore.ts'), 'utf8');
 // ⚠⚠ OTA-1396 — THE FLAG AND THE MESSAGE NOW LIVE IN DIFFERENT FILES, and this suite is
@@ -129,7 +130,7 @@ describe('OTA-1181 — "for good" is said once', () => {
   test('⚠ the per-warning handler does not touch the stand-down flag', () => {
     const i = watch.indexOf("AppState.addEventListener('memoryWarning'");
     expect(i).toBeGreaterThan(-1);
-    const handler = watch.slice(i, i + 3000);
+    const handler = blockAt(watch, "AppState.addEventListener('memoryWarning'");
     expect(handler).toContain('rpMemoryQuietLogged = false;');
     expect(handler).not.toContain('rpStandDownLogged');
     // ⚠ AND IT CANNOT REACH IT BY THE BACK DOOR EITHER. The one-call reset would set the

@@ -52,6 +52,7 @@ import { join } from 'path';
 import { storeSource } from '../test-utils/storeSource';
 // ⚠ OTA-1405 — the REAL predicate, not a copy of it. See the note on `shows`.
 import { qwenTimingsArePossible } from '../app/ai/generation/qwenTelemetry';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -117,7 +118,7 @@ describe('OTA-1263 (B) — the per-call ms/t obeys the same guard the aggregate 
     const store = storeSource() + '\n' + src('app', 'ai', 'narration.ts');
     const i = store.indexOf('const prefillIsPossible = qwenPrefillIsMeasured(r)');
     expect(i).toBeGreaterThan(-1);
-    expect(store.slice(i, i + 200)).toContain('(r.promptTokens ?? 0) > 0');
+    expect(blockAt(store, 'const prefillIsPossible = qwenPrefillIsMeasured(r)')).toContain('(r.promptTokens ?? 0) > 0');
     // ⚠ OTA-1405 — and the RAW pair on the same line obeys it too. That is the
     // half OTA-1139 and OTA-1263 both left open, and the half the owner read.
     expect(store).toContain('const timingsOk = qwenTimingsArePossible(r);');
@@ -159,7 +160,7 @@ describe('OTA-1263 (C) — the button and the card read the same array', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('onOpenTake={() => {');
     expect(i).toBeGreaterThan(-1);
-    const block = screen.slice(i, i + 600);
+    const block = blockAt(screen, 'onOpenTake={() => {');
     expect(block).toContain('if (gatherRowCount === 0) {');
     expect(block).toContain('The room is picked clean.');
     expect(block).toContain('return;');
@@ -170,7 +171,7 @@ describe('OTA-1263 (C) — the button and the card read the same array', () => {
   it('⚠ a room with rows still opens the picker', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('onOpenTake={() => {');
-    expect(screen.slice(i, i + 600)).toContain('setTakeOpen(true);');
+    expect(blockAt(screen, 'onOpenTake={() => {')).toContain('setTakeOpen(true);');
   });
 });
 
@@ -185,7 +186,7 @@ describe('OTA-1263 (D) — INVESTIGATE ALL resolves one at a time', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('onInvestigateAll={(nouns) => {');
     expect(i).toBeGreaterThan(-1);
-    const block = screen.slice(i, i + 1800);
+    const block = blockAt(screen, 'onInvestigateAll={(nouns) => {');
     expect(block).toContain('setTimeout(step, INVESTIGATE_ALL_GAP_MS)');
     // The old shape — every submit inside one synchronous for-loop — is gone.
     expect(block).not.toContain('for (const n of ordered) {');
@@ -212,7 +213,7 @@ describe('OTA-1263 (D) — INVESTIGATE ALL resolves one at a time', () => {
     // sweep abort on its own footsteps.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('onInvestigateAll={(nouns) => {');
-    const block = screen.slice(i, i + 1800);
+    const block = blockAt(screen, 'onInvestigateAll={(nouns) => {');
     expect(block).toContain("(s.currentScene?.enemies ?? []).length > 0) return;");
     expect(block).toContain('s.lastPlayerActionAt !== watermark');
     expect(block).toContain('watermark = useGameStore.getState().lastPlayerActionAt;');
@@ -222,6 +223,6 @@ describe('OTA-1263 (D) — INVESTIGATE ALL resolves one at a time', () => {
     // OTA-1236: a lead sorts last so the sweep cannot bury the next step.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('onInvestigateAll={(nouns) => {');
-    expect(screen.slice(i, i + 1200)).toContain('orderByStoryTier(nouns, (n) => n, leadCtx)');
+    expect(blockAt(screen, 'onInvestigateAll={(nouns) => {')).toContain('orderByStoryTier(nouns, (n) => n, leadCtx)');
   });
 });

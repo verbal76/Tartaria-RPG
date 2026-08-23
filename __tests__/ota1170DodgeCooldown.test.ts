@@ -55,6 +55,7 @@ import { useGameStore } from '../app/state/gameStore';
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { blockAt, between } from '../test-utils/srcBlock';
 const read = (...p: string[]): string => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const STORE = read('app', 'state', 'gameStore.ts');
 const INPUT = read('app', 'components', 'InputBox.tsx');
@@ -134,7 +135,7 @@ describe('OTA-1170 — the store arms and ticks it', () => {
     expect(i).toBeGreaterThan(-1);
     // ⚠ Wide enough to clear the comment banner. The first draft sliced 900 chars and
     // read only prose — the code it meant to assert on started after that.
-    const block = STORE.slice(i, i + 1800);
+    const block = blockAt(STORE, 'OTA-1170 — THE COOLDOWN GATE');
     expect(block).toContain('DC.dodgeCooldownLine(player.dodgeCooldown)');
     expect(block).toContain('buzzBlocked();');
     expect(block).toContain('break;');
@@ -172,7 +173,7 @@ describe('OTA-1170 — the button shows it', () => {
 
   it('fills from the LEFT', () => {
     const i = INPUT.indexOf('cooldownFill: {');
-    const style = INPUT.slice(i, i + 160);
+    const style = blockAt(INPUT, 'cooldownFill: {');
     expect(style).toContain('left: 0');
     expect(style).not.toContain('right: 0');
   });
@@ -180,8 +181,15 @@ describe('OTA-1170 — the button shows it', () => {
   it('⚠ THE CHIP STAYS TAPPABLE WHILE RED — the engine answers, the UI does not swallow', () => {
     // Disabling it in the UI would refuse in silence, which is the bug OTA-1164 existed to
     // remove. The tap goes through and the store buzzes + explains.
-    const i = INPUT.indexOf('OTA-1170 — DODGE carries a recharge bar');
-    const block = INPUT.slice(i, i + 400);
+    // ⚠ OTA-1447 — a JSX region, so `between` rather than `blockAt`: this anchor
+    // sits INSIDE a `{/* … */}` comment, and brace-walking out of a comment is
+    // meaningless. Two real landmarks bound the dodge chip exactly, and BOTH are
+    // required — a rename fails here instead of quietly shrinking the window.
+    const block = between(
+      INPUT,
+      'OTA-1170 — DODGE carries a recharge bar',
+      "onPress={() => onSubmit('dodge')} /> : null}",
+    );
     // ⚠ OTA-1171 RETARGETED, NOT RELAXED — the bar's DENOMINATOR is now the character's
     // difficulty tier. Divide bury_me's 5-round lock by the bare constant 3 and the chip
     // paints full blue with two beats still locked, inviting a tap it will then refuse.

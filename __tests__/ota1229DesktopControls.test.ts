@@ -20,6 +20,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { STAT_ROW_MAX_WIDTH } from '../app/ui/layoutConstants';
+import { blockAt } from '../test-utils/srcBlock';
 import {
   pushBackHandler, fireBack, backHandlerCount, initDesktopBack,
 } from '../app/ui/desktopBack';
@@ -170,7 +171,7 @@ describe('OTA-1239 — the take popup has no stealth toggle at all', () => {
     const store = src('app/state/gameStore.ts');
     const i = store.indexOf("case 'steal': {");
     expect(i).toBeGreaterThan(-1);
-    const block = store.slice(i, i + 3000);
+    const block = blockAt(store, "case 'steal': {");
     expect(block).toContain('stealthTimeBonus');
     expect(block).toContain('roll + stats.stealth + timeBonus');
     // ⚠ NOT a "one caller" check — that was my first draft of this assertion and

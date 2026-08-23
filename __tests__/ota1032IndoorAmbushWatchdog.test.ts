@@ -13,6 +13,7 @@ import {
   pickIndoorAmbusher, indoorRestWakeLine, indoorRestArrivalLine,
 } from '../app/engine/indoorAmbush';
 import { findEnemyByName } from '../app/engine/encounter';
+import { blockAt } from '../test-utils/srcBlock';
 
 describe('OTA-1032 — the indoor cast is real, and believable', () => {
   it('every name in the cast exists in the enemy roster', () => {
@@ -108,14 +109,14 @@ describe('OTA-1032 — SOURCE LOCKS', () => {
     // so the old spelling kicked a ~400MB context load on incidental twitches.
     expect(watchdog).toMatch(/if \(!qwenTrulyBackgrounded\) return;/);
     const fg = watchdog.indexOf('if (!qwenTrulyBackgrounded) return;');
-    expect(watchdog.slice(fg, fg + 700)).toMatch(/tick\(\);/);
+    expect(blockAt(watchdog, 'if (!qwenTrulyBackgrounded) return;')).toMatch(/tick\(\);/);
   });
 
   it('the health check reports health rather than just returning', () => {
     expect(watchdog).toMatch(/function runQwenHealthCheck\(/);
     // Healthy path returns true, recovering paths return false.
     const start = watchdog.indexOf('function runQwenHealthCheck(');
-    const body = watchdog.slice(start, start + 4000);
+    const body = blockAt(watchdog, 'function runQwenHealthCheck(');
     expect(body).toMatch(/return true;/);
     expect(body).toMatch(/return false;/);
   });

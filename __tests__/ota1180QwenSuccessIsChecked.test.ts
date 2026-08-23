@@ -35,6 +35,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const APP = fs.readFileSync(path.join(__dirname, '..', 'App.tsx'), 'utf8');
 /** ⚠ OTA-1393 — `bootQwen` MOVED OUT OF gameStore.ts, into
@@ -60,7 +61,7 @@ describe('OTA-1180 — the premise: bootQwen resolves on failure', () => {
     const code = codeOnly(STORE);
     const i = code.indexOf('async bootQwen()');
     expect(i).toBeGreaterThan(0);
-    const body = code.slice(i, i + 1600);
+    const body = blockAt(code, 'async bootQwen()');
     expect(body).toContain("qwenStatus: 'failed'");
     // No rethrow anywhere in the body — the failure is swallowed into state.
     expect(body).not.toMatch(/\bthrow\b/);

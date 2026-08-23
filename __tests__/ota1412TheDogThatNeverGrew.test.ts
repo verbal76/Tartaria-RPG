@@ -30,6 +30,7 @@ import {
   dogHpGainClause,
 } from '../app/engine/dogCompanion';
 import type { DogCompanion } from '../app/engine/types';
+import { blockAt } from '../test-utils/srcBlock';
 
 const read = (...p: string[]) =>
   require('fs').readFileSync(require('path').join(__dirname, '..', ...p), 'utf8') as string;
@@ -178,7 +179,7 @@ describe('OTA-1412 — surviving a hit is the door that trained nothing', () => 
     // only these four fields are this call\'s to write. Replacing the whole
     // record would silently revert anything else the turn had changed.
     const i = COMBAT.indexOf('const trained = downed ? null :');
-    const body = COMBAT.slice(i, i + 1400);
+    const body = blockAt(COMBAT, 'const trained = downed ? null :');
     expect(body).toContain('stats: trained.dog.stats,');
     expect(body).toContain('statProgress: trained.dog.statProgress,');
     expect(body).toContain('hpMax: trained.dog.hpMax,');

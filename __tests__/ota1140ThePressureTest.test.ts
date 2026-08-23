@@ -1,3 +1,4 @@
+import { blockAt } from '../test-utils/srcBlock';
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
@@ -172,7 +173,7 @@ describe('OTA-1140 — the exploits are closed', () => {
 
   it('⚠ the bandolier any-pack-copy fallback is out-of-combat only', () => {
     const from = STORE.indexOf('throwFromBandolier(itemName, itemId) {');
-    const block = STORE.slice(from, from + 1800);
+    const block = blockAt(STORE, 'throwFromBandolier(itemName, itemId) {');
     expect(block).toContain('const inCombat = scene.enemies.some(');
     expect(block).toContain('?? (inCombat ? undefined : player.inventory.find(');
   });

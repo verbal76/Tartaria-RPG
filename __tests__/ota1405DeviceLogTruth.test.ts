@@ -27,6 +27,7 @@
  */
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt, between } from '../test-utils/srcBlock';
 import {
   qwenTimingsArePossible,
   _resetQwenTelemetryForTest,
@@ -160,7 +161,7 @@ describe('OTA-1405 (3) — the sprint detector is fed from every door that begin
     // it, and `playerIsSprinting()` stayed false through the whole burst.
     const i = STORE.indexOf('  beginScene(opts?: {');
     expect(i).toBeGreaterThan(-1);
-    const body = STORE.slice(i, i + 2200);
+    const body = blockAt(STORE, '  beginScene(opts?: {');
     expect(body).toContain('notePlayerActionForSprint();');
     // Before `_beginSceneCore` runs, so the intro it dispatches sees the note.
     expect(body.indexOf('notePlayerActionForSprint();'))
@@ -216,8 +217,10 @@ describe('OTA-1405 (3) — the sprint detector is fed from every door that begin
     // OTA-1258: a late fill still goes to the bank and is re-vetted when spent,
     // so late text is free text later. Only a line with a reader waiting can be
     // wasted by being late.
-    const i = NARRATION.indexOf('const burnedRecently =');
-    expect(NARRATION.slice(i, i + 200)).toContain('!opts?.bankOnly');
+    // ⚠ OTA-1447 — a STATEMENT, not a block, so `between` bounds it by its own
+    // semicolon. blockAt walks braces and there are none here, so it throws
+    // rather than guess a window — which is how this site got the right tool.
+    expect(between(NARRATION, 'const burnedRecently =', ';')).toContain('!opts?.bankOnly');
   });
 });
 
@@ -294,7 +297,7 @@ describe('OTA-1405 (4) — an impossible timing is refused everywhere, by one ru
     expect(BOOT).toContain('NOT-PER-CALL');
     // Marked, not deleted: that llama.rn reports these at all is itself a finding.
     const i = BOOT.indexOf('const timingsOk =');
-    const block = BOOT.slice(i, i + 500);
+    const block = blockAt(BOOT, 'const timingsOk =');
     expect(block).toContain("read ⚠${r.prefillMs ?? '?'}ms");
   });
 

@@ -33,6 +33,7 @@
  */
 import { trainDogStat, createDogCompanion } from '../app/engine/dogCompanion';
 import type { DogCompanion } from '../app/engine/types';
+import { blockAt } from '../test-utils/srcBlock';
 
 const read = (...p: string[]) =>
   require('fs').readFileSync(require('path').join(__dirname, '..', ...p), 'utf8') as string;
@@ -143,7 +144,7 @@ describe('OTA-1414 — the sniff beat survives, only its training left', () => {
 
   it('⚠ the now-dead level-up log went with the training, not left orphaned', () => {
     const i = STORE.indexOf("noses at the ${hidden}");
-    const after = STORE.slice(i, i + 600);
+    const after = blockAt(STORE, "noses at the ${hidden}");
     expect(after).not.toContain("'s INT rises to");
   });
 });

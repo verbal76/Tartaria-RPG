@@ -40,6 +40,7 @@ import {
   wrongCounterpartyLine,
 } from '../app/engine/contractRefusal';
 import { FACTIONS } from '../app/engine/factions';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]) => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -167,7 +168,7 @@ describe('OTA-1402 — the card cannot be scrolled away from', () => {
     // backdrop still eats touches. That turns "the button does nothing" into
     // "the screen does nothing", which is worse than the bug being fixed.
     const i = screen.indexOf('{contractsNotice?.body ? (');
-    const block = screen.slice(i, i + 1600);
+    const block = blockAt(screen, '{contractsNotice?.body ? (');
     expect(block).not.toContain('<Modal');
     expect(screen).toContain('present a nested native Modal INVISIBLY');
   });

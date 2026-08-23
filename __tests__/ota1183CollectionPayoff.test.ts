@@ -24,6 +24,7 @@ import {
 import { EMPTY_TITLE_PROGRESS, WIRED_TITLES } from '../app/engine/titles';
 import fs from 'fs';
 import path from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const SRC = (rel: string) => fs.readFileSync(path.join(__dirname, '..', rel), 'utf8');
 
@@ -256,7 +257,7 @@ describe('OTA-1183 — INVESTIGATE ALL', () => {
     // per noun, with no second resolver anywhere.
     // ⚠ OTA-1268 grew it again (the self-abort fix carries its incident note in
     // the source). Window widened once more; the pinned RULE has not moved.
-    const block = src.slice(i, i + 2400);
+    const block = blockAt(src, 'onInvestigateAll={(nouns) => {');
     expect(block).toContain('submit(`investigate ${ordered[i]!}`)');
     // Still one submit per noun, walked in order, and still no bulk resolver.
     expect(block).toContain('const ordered = orderByStoryTier(');

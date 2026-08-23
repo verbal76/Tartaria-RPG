@@ -66,6 +66,7 @@ import { dressFactionFighter, FACTION_BODIES, pickFactionBody } from '../app/eng
 import { scaleEncounterForContext, findEnemyByName } from '../app/engine/encounter';
 import { bossSwingsTwice } from '../app/engine/combatRules';
 import type { Enemy } from '../app/engine/types';
+import { blockAt } from '../test-utils/srcBlock';
 
 const read = (...p: string[]) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 // ⚠ OTA-1398 — the scene-intro path this suite pins moved to app/ai/narration.ts.
@@ -279,7 +280,7 @@ describe('OTA-1155 #3 — a dressed faction fighter is rank and file, never a bo
 describe('OTA-1155 #4 — a container is not a prop in the room', () => {
   const SNIP = (() => {
     const i = STORE.indexOf('function collectSceneNouns');
-    return i > 0 ? STORE.slice(i, i + 3200) : '';
+    return i > 0 ? blockAt(STORE, 'function collectSceneNouns') : '';
   })();
 
   it('⚠ location aliases are pushed AFTER the scene\'s own nouns', () => {

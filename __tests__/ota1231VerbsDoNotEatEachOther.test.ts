@@ -38,6 +38,7 @@ import { rollSalvagePool } from '../app/engine/salvagePools';
 import { findCatalogItem } from '../app/engine/crafting';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -58,7 +59,7 @@ describe('OTA-1231 — the marker contract', () => {
     // The gate that produced "You've already examined the brick."
     const i = store.indexOf('const alreadyExamined =');
     expect(i).toBeGreaterThan(-1);
-    const gate = store.slice(i, i + 200);
+    const gate = blockAt(store, 'const alreadyExamined =');
     expect(gate).toContain('!isSalvageVerb');
     // ...and the verb is read from the parse, not guessed from the raw text.
     expect(store).toContain("(reparsed.matchedVerb ?? '').toLowerCase() === 'salvage'");

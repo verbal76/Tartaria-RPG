@@ -57,6 +57,7 @@ import {
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 const read = (...p: string[]): string => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const STORE = read('app', 'state', 'gameStore.ts');
 const INPUT = read('app', 'components', 'InputBox.tsx');
@@ -184,13 +185,13 @@ describe('OTA-1172 — two clocks, because one cannot answer the question', () =
     // and a detector nobody believes is worse than no detector.
     const i = WATCH.indexOf('const sample = ()');
     expect(i).toBeGreaterThan(-1);
-    const block = WATCH.slice(i, i + 1400);
+    const block = blockAt(WATCH, 'const sample = ()');
     expect(block).toContain("if (rpAppState === 'active')");
   });
 
   it('⚠ AND IT LOGS ON THE EDGE, not once per sample', () => {
     const i = WATCH.indexOf('const sample = ()');
-    const block = WATCH.slice(i, i + 1400);
+    const block = blockAt(WATCH, 'const sample = ()');
     expect(block).toContain('v !== rpLastVerdict');
   });
 });
@@ -208,7 +209,7 @@ describe('OTA-1172 — the app-state trail, which is evidence and not noise', ()
     // self-contradiction: "holding revival" then reinitializing a third of a second later.
     const i = WATCH.indexOf("AppState.addEventListener('change', (next) => {\n      const t = Date.now();");
     expect(i).toBeGreaterThan(-1);
-    const block = WATCH.slice(i, i + 900);
+    const block = blockAt(WATCH, "AppState.addEventListener('change', (next) => {\n      const t = Date.now();");
     expect(block).toContain('appStateLine(prev, nextStr');
     // No filter that would drop `inactive` before it is logged.
     expect(block).not.toMatch(/next\s*===\s*'active'\s*\)\s*\{\s*$/m);
@@ -232,7 +233,7 @@ describe('OTA-1172 — the tap breadcrumb', () => {
     // Move this below the handler and it can no longer tell those apart.
     const i = INPUT.indexOf('const handlePress = () => {');
     expect(i).toBeGreaterThan(-1);
-    const block = INPUT.slice(i, i + 700);
+    const block = blockAt(INPUT, 'const handlePress = () => {');
     const tap = block.indexOf('logUiTap(label);');
     const blocked = block.indexOf('if (blocked)');
     expect(tap).toBeGreaterThan(-1);
@@ -254,7 +255,7 @@ describe('OTA-1172 — the tap breadcrumb', () => {
     // incident note pushed the closing `catch` past 400 chars. The RULE this
     // pins — instrumentation is wrapped and can never break a control — is
     // unchanged, and now covers BOTH writes.
-    const block = STORE.slice(i, i + 1200);
+    const block = blockAt(STORE, 'export function logUiTap');
     expect(block).toContain('try {');
     expect(block).toContain('catch');
   });
@@ -289,7 +290,7 @@ describe('OTA-1172 — the counts reach the bug report header', () => {
   it('⚠ AND IT CANNOT BREAK THE EXPORT — it matters most when things are already wrong', () => {
     const i = ABOUT.indexOf('function runtimePressureBlock');
     expect(i).toBeGreaterThan(-1);
-    const block = ABOUT.slice(i, i + 400);
+    const block = blockAt(ABOUT, 'function runtimePressureBlock');
     expect(block).toContain('try {');
     expect(block).toContain('catch');
   });
@@ -331,7 +332,7 @@ describe('OTA-1172 — this OTA changes no behaviour, deliberately', () => {
     const RP = read('app', 'diagnostics', 'runtimePressure.ts');
     const i = RP.indexOf('DIAGNOSTICS ONLY');
     expect(i).toBeGreaterThan(-1);
-    const block = RP.slice(i, i + 900);
+    const block = blockAt(RP, 'DIAGNOSTICS ONLY');
     expect(block).toMatch(/instrument first, then fix/i);
     // And the defect it is holding back is described, so it cannot be quietly forgotten.
     expect(block).toMatch(/backoff ladder/i);
@@ -361,7 +362,7 @@ describe('OTA-1172 — this OTA changes no behaviour, deliberately', () => {
     expect(WATCH.slice(i, i + 900)).toContain('stopRuntimePressureWatch();');
     const j = WATCH.indexOf('export function stopRuntimePressureWatch(): void {');
     expect(j).toBeGreaterThan(-1);
-    const stopper = WATCH.slice(j, j + 700);
+    const stopper = blockAt(WATCH, 'export function stopRuntimePressureWatch(): void {');
     expect(stopper).toContain('if (rpSampleTimer !== null)');
     expect(stopper).toContain('rpStopFrameClock()');
     expect(stopper).toContain('rpMemorySub.remove()');
@@ -383,7 +384,7 @@ describe('OTA-1172 — this OTA changes no behaviour, deliberately', () => {
     // frame clock learned to pause on background. Same guard, one place instead of two.
     const raf = WATCH.indexOf('function rpStartFrameClock(): void {');
     expect(raf).toBeGreaterThan(-1);
-    const rafBlock = WATCH.slice(raf, raf + 500);
+    const rafBlock = blockAt(WATCH, 'function rpStartFrameClock(): void {');
     expect(rafBlock).toContain("typeof requestAnimationFrame !== 'function'");
     expect(rafBlock).toContain('catch');
   });

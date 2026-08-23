@@ -1,3 +1,4 @@
+import { blockAt } from '../test-utils/srcBlock';
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
@@ -160,7 +161,7 @@ describe('OTA-1136 — ⚠ the enemy card tells the truth about a boss', () => {
 describe('OTA-1136 — ⚠ the card no longer claims a range the spawn did not set', () => {
   it('the Core Guardian spawn sets mid, and the card now says mid', () => {
     const from = STORE.indexOf('const guardian = cg.spawnGuardianForCapital(player, capitalId);');
-    const block = STORE.slice(from, from + 2500);
+    const block = blockAt(STORE, 'const guardian = cg.spawnGuardianForCapital(player, capitalId);');
     expect(from).toBeGreaterThan(0);
     expect(block).toContain("range: 'mid',");
     expect(block).toContain('(range: mid) ★ CORE GUARDIAN');
@@ -206,13 +207,13 @@ describe('OTA-1136 — ⚠ the greeting, and the beat after the name', () => {
     // Padding the last chunk of a line would add the beat to the inter-LINE gap
     // the voice work has spent several OTAs tightening.
     const from = VOICE.indexOf('if (batch.length === 1) {');
-    const block = VOICE.slice(from, from + 1200);
+    const block = blockAt(VOICE, 'if (batch.length === 1) {');
     expect(block).toContain('queue[0].lineId === next.lineId');
   });
 
   it('the pad cannot silence the voice if it throws', () => {
     const from = VOICE.indexOf('if (batch.length === 1) {');
-    const block = VOICE.slice(from, from + 1200);
+    const block = blockAt(VOICE, 'if (batch.length === 1) {');
     expect(block).toContain('catch { /* unpadded */ }');
   });
 

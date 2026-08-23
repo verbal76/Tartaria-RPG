@@ -33,6 +33,7 @@ import { storeSource } from '../test-utils/storeSource';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { TUTORIAL_STEPS } from '../app/components/tutorialSteps';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -115,7 +116,7 @@ describe('OTA-1248 — the armor beat', () => {
     expect(takeAt).toBeGreaterThan(-1);
     // ⚠ OTA-1250 widened this branch with the already-consumed guard, so the
     // window has to reach past that comment block to still see the grant.
-    const takeBranch = store.slice(takeAt, takeAt + 2000);
+    const takeBranch = blockAt(store, "tStep?.id === 'armor'");
     expect(takeBranch).toContain("grantTutorialItem(get, set, 'vest')");
     expect(takeBranch).not.toContain("maybeAdvanceTutorial('armor')");
     // ...and equipItem does, from the top, so EVERY equip route counts.

@@ -22,7 +22,8 @@
     "check:huntstages": "node scripts/check-hunt-stages.mjs",
     "check:requires": "node scripts/check-requires.mjs",
     "export:web": "expo export --platform web",
-    "check:lines": "node scripts/verify-lines.mjs"
+    "check:lines": "node scripts/verify-lines.mjs",
+    "check:slicepins": "node scripts/check-slice-pins.mjs"
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.1",

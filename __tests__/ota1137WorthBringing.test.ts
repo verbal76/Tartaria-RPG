@@ -70,6 +70,7 @@ jest.mock('expo-speech-recognition', () => ({}));
 // swap. Weapons were never the complaint; consumables were.
 
 import { combineDamageTypeMatch, traitDamageMultiplier } from '../app/engine/enemyTraits';
+import { blockAt } from '../test-utils/srcBlock';
 
 // ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
 // the pins below follow the code to its new address rather than reading both
@@ -94,7 +95,7 @@ const GUARDIANS = read('app/engine/coreGuardians.ts');
 describe('OTA-1137 — ⚠ the reproduction: Mara really is burn-weak', () => {
   it('the Guardian the owner fought carries the trait he exploited', () => {
     const from = GUARDIANS.indexOf('const MARA_HIEROPHANT');
-    const def = GUARDIANS.slice(from, from + 900);
+    const def = blockAt(GUARDIANS, 'const MARA_HIEROPHANT');
     expect(from).toBeGreaterThan(0);
     expect(def).toContain("'vulnerable:burn'");
     expect(def).toContain("'resist:cold'");

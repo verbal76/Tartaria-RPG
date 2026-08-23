@@ -67,6 +67,7 @@ import { AFFILIATED_STANDING } from '../app/engine/locationChallenges';
 import { hostileHuntChance, HOSTILE_STANDING, profileOf } from '../app/engine/pressure';
 import { backfillPlayer } from '../app/state/gameStore';
 import type { PlayerCharacter } from '../app/engine/types';
+import { blockAt } from '../test-utils/srcBlock';
 
 const read = (...p: string[]) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const STORE = storeSource();
@@ -265,7 +266,7 @@ describe('OTA-1156 — honest custom is not confiscated', () => {
     // without the behaviour relocating with it.
     const i = STORE.indexOf('const buyRepPool = (player.buyRepProgress ?? 0) + totalCost;');
     expect(i).toBeGreaterThan(0);
-    const block = STORE.slice(i, i + 2600);
+    const block = blockAt(STORE, 'const buyRepPool = (player.buyRepProgress ?? 0) + totalCost;');
     expect(block).toContain('const buyRepLanded = repResult.changed.length > 0;');
     expect(block).toContain('const nextBuyRepProgress = buyRepLanded');
     expect(STORE).toContain('canonicalFactionId(scene.vendor.faction)');

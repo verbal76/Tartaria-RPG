@@ -46,6 +46,7 @@ const renderer = require('react-test-renderer') as {
 import { GatherModal } from '../app/components/GatherModal';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -271,7 +272,7 @@ describe('OTA-1250 — the prop goes spent when it is taken', () => {
     const store = src('app', 'state', 'gameStore.ts');
     const i = store.indexOf("if (tStep?.id === 'armor' &&");
     expect(i).toBeGreaterThan(-1);
-    const block = store.slice(i, i + 1400);
+    const block = blockAt(store, "if (tStep?.id === 'armor' &&");
     const guard = block.indexOf('if (get().tutorialPropsConsumed.vest) {');
     const grant = block.indexOf("grantTutorialItem(get, set, 'vest');");
     const reward = block.indexOf("appendLog('reward'");
@@ -293,6 +294,6 @@ describe('OTA-1250 — the prop goes spent when it is taken', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf("if (tutBeat === 'armor' && /vest|warden/i.test(noun)) {");
     expect(i).toBeGreaterThan(-1);
-    expect(screen.slice(i, i + 160)).toContain('setTakeOpen(false);');
+    expect(blockAt(screen, "if (tutBeat === 'armor' && /vest|warden/i.test(noun)) {")).toContain('setTakeOpen(false);');
   });
 });

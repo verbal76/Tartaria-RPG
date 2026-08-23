@@ -66,6 +66,7 @@ const renderer = require('react-test-renderer') as {
 import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from '../app/components/tutorialSteps';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -118,7 +119,7 @@ describe('OTA-1249 — the lockdown covers the whole outpost, in one place', () 
     const store = src('app', 'state', 'gameStore.ts');
     const i = store.indexOf('const beatAllows =');
     expect(i).toBeGreaterThan(-1);
-    const allows = store.slice(i, i + 420);
+    const allows = blockAt(store, 'const beatAllows =');
     expect(allows).toContain("lockBeatId === 'look' && isLookCmd");
     expect(allows).toContain("lockBeatId === 'armor' && isWearCmd");
     expect(allows).toContain("lockBeatId === 'climb' && isClimbCmd");

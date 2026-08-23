@@ -48,6 +48,7 @@ import {
 } from '../app/engine/fallenLedger';
 import { revenantPool, _setFallenCacheForTests, revenantFromFallen } from '../app/engine/fallenRevenants';
 import { recordFallen } from '../app/engine/saveSystem';
+import { blockAt } from '../test-utils/srcBlock';
 
 jest.setTimeout(60_000);
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
@@ -248,7 +249,7 @@ describe('OTA-1362 — the store wiring, locked at the source', () => {
     // elsewhere in the store that a file-wide assertion would catch strangers.
     const at = STORE.indexOf('const rvPool = rev.revenantPool();');
     expect(at).toBeGreaterThan(-1);
-    expect(STORE.slice(at, at + 1200)).not.toContain('Math.random() < 0.04');
+    expect(blockAt(STORE, 'const rvPool = rev.revenantPool();')).not.toContain('Math.random() < 0.04');
   });
 
   it("⚠⚠ a foreign corpse gets a REST RECORD; a local one is still marked avenged", () => {

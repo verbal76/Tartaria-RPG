@@ -32,6 +32,7 @@
  */
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const path = (...p: string[]) => join(__dirname, '..', ...p);
 const src = (...p: string[]) => readFileSync(path(...p), 'utf8');
@@ -182,7 +183,7 @@ describe('OTA-1397 — nothing starts at import time', () => {
 
   it('⚠ the starter still tears down before it re-arms, so a re-hydrate cannot stack timers', () => {
     const i = watchdog.indexOf('export function startQwenWatchdog(');
-    const block = watchdog.slice(i, i + 900);
+    const block = blockAt(watchdog, 'export function startQwenWatchdog(');
     expect(block).toContain('clearTimeout(qwenWatchdogTimer);');
     expect(block).toContain('qwenAppStateSub.remove();');
   });
@@ -191,7 +192,7 @@ describe('OTA-1397 — nothing starts at import time', () => {
     // OTA-1228 — on web there is no native context to revive, so it retried a
     // load that cannot succeed, forever, burying the bug report it was inside.
     const i = watchdog.indexOf('export function startQwenWatchdog(');
-    const block = watchdog.slice(i, i + 600);
+    const block = blockAt(watchdog, 'export function startQwenWatchdog(');
     expect(block.indexOf("Platform.OS === 'web'"))
       .toBeLessThan(block.indexOf('qwenWatchdogTimer !== null'));
   });

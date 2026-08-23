@@ -59,6 +59,7 @@ jest.mock('expo-av', () => ({
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 const readSrc = (...p: string[]): string => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const APPTSX = readSrc('App.tsx');
 
@@ -77,7 +78,7 @@ describe('OTA-1174 — the boot update check reports itself to the DEVICE log', 
     // its own step; without them a stall is just silence.
     const i = APPTSX.indexOf('const otaResult = await checkAndApplyOTA({');
     expect(i).toBeGreaterThan(-1);
-    const block = APPTSX.slice(i, i + 700);
+    const block = blockAt(APPTSX, 'const otaResult = await checkAndApplyOTA({');
     expect(block).toContain('onStatus:');
     expect(block).toContain('onError:');
   });

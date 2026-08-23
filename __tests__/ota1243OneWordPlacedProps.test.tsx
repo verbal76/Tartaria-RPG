@@ -28,6 +28,7 @@ import { RESCUE_SCENARIOS } from '../app/engine/dogCompanion';
 import { hasSalvageYield } from '../app/engine/salvagePools';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 
@@ -149,7 +150,7 @@ describe('OTA-1243 — the rescue props are placed, not hoped for', () => {
     const store = src('app', 'state', 'gameStore.ts');
     expect(store).toContain('if (rescuePropNouns.length > 0) {');
     const i = store.indexOf('if (rescuePropNouns.length > 0) {');
-    expect(store.slice(i, i + 260)).toContain('displayedAmbientNouns = Array.from(new Set([...rescuePropNouns,');
+    expect(blockAt(store, 'if (rescuePropNouns.length > 0) {')).toContain('displayedAmbientNouns = Array.from(new Set([...rescuePropNouns,');
   });
 
   it('⚠ every primary prop is salvageable AFTER the quest — no post-quest dead noun', () => {

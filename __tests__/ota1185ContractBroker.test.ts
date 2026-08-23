@@ -34,6 +34,7 @@ import {
 } from '../app/engine/contractBroker';
 import fs from 'fs';
 import path from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 
 const SRC = (rel: string) => fs.readFileSync(path.join(__dirname, '..', rel), 'utf8');
 const HALEM = { id: 'halem_trader', faction: null as string | null };
@@ -94,7 +95,7 @@ describe('OTA-1185 — who the broker is', () => {
   test('⚠ hubRoomFor must never let a faction skin override the anchor', () => {
     const src = SRC('app/engine/hub.ts');
     const i = src.indexOf('export function hubRoomFor');
-    const body = src.slice(i, i + 900);
+    const body = blockAt(src, 'export function hubRoomFor');
     expect(body).toContain('name: override.name');
     // anchorNpc is taken from the base and must not appear as an override target
     expect(body).not.toMatch(/anchorNpc:\s*override/);

@@ -61,6 +61,7 @@ import {
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { blockAt } from '../test-utils/srcBlock';
 const read = (...p: string[]): string => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const STORE = read('app', 'state', 'gameStore.ts');
 const INPUT = read('app', 'components', 'InputBox.tsx');
@@ -279,7 +280,7 @@ describe('OTA-1171 — the amendment is on the record', () => {
     const P = read('app', 'engine', 'pressure.ts');
     const i = P.indexOf('KNOWINGLY CROSSES THIS FILE');
     expect(i).toBeGreaterThan(-1);
-    const block = P.slice(i, i + 1600);
+    const block = blockAt(P, 'KNOWINGLY CROSSES THIS FILE');
     expect(block).toMatch(/OTA-1113/);          // names the precedent it follows
     expect(block).toMatch(/DAMAGE SPONGE/i);    // names what the rule was protecting
     expect(block).toMatch(/identity row/i);     // names what still protects the tuning
