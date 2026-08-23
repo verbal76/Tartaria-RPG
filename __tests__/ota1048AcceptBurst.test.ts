@@ -78,6 +78,14 @@ async function boot(name: string, withAgent = false) {
   store.setState((s) => ({
     player: {
       ...s.player!,
+      // ⚠ OTA-1450 — this suite measures LOG NOISE, not who may take what, so the
+      // fixture must clear BOTH posting gates the same way it always cleared the
+      // rep one: standing 60 for reputation, a grown hpMax for reach. `hp` is
+      // deliberately left at the fresh-character value — the board asks what you
+      // could ever survive (hpMax) while the Arbiter's danger line asks how beat
+      // up you are right now (hp), so the "this one will kill you" warning this
+      // suite pins still fires.
+      hpMax: 999,
       factionStanding: [
         ...s.player!.factionStanding.filter((r) => r.factionId !== FACTION),
         { factionId: FACTION, standing: 60 },

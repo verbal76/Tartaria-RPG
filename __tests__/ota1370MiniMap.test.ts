@@ -122,8 +122,16 @@ describe('OTA-1370 — the viewport maths', () => {
 
   it('the component positions the marker from geom, never from the box centre', () => {
     const mm = src('app', 'components', 'MiniMap.tsx');
+    // ⚠ RETARGETED IN OTA-1450, CLAIM UNCHANGED. This test's whole point is that
+    // the dot is placed by the SAME arithmetic that placed the art, read back
+    // out — never at the box centre, which is what came apart when the viewport
+    // clamped. OTA-1450 subtracted an interior lift from the Y so the ring stops
+    // sitting on the painted room name; the marker is still derived from
+    // `top + view.frac.fy * renderedH`, so the rule holds and only the tail of
+    // the line moved. Pinned on the derivation, not on the whole statement.
     expect(mm).toContain('markerX: left + view.frac.fx * renderedW,');
-    expect(mm).toContain('markerY: top + view.frac.fy * renderedH,');
+    expect(mm).toContain('markerY: top + view.frac.fy * renderedH');
+    expect(mm).not.toContain('markerY: box.h / 2');
     expect(mm).toContain('left: geom.markerX - DOT / 2,');
     expect(mm).toContain('top: geom.markerY - DOT / 2,');
   });

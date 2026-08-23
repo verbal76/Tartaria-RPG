@@ -49,9 +49,11 @@ import { revealedLocationName, isLocationRevealed, isHiddenLocation, HIDDEN_LOCA
 import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { openContractMarkers, type ContractFamily } from '../engine/contractMarkers';
 import { LOCATION_TO_MACRO } from '../engine/worldLadder';
-import { isHubLocation, hubRoomFor, hubNameForFaction, hubSkinFactionFor } from '../engine/hub';
+import { isHubLocation, hubRoomFor, hubNameForFaction, hubSkinFactionFor, hubExitRooms } from '../engine/hub';
 import { buildingMap } from '../engine/buildingMaps';
-import { outpostRoomMark } from '../engine/outpostRoomMarks'; // OTA-1355 — the marker walks the outpost too
+import {
+  outpostRoomMark, INTERIOR_MARKER_LIFT_FRAC, INTERIOR_VISITED_DROP_FRAC,
+} from '../engine/outpostRoomMarks'; // OTA-1355 — the marker walks the outpost too
 import { FACTION_STARTING_LOCATION } from '../engine/character';
 // OTA 051 — locations.json carries the human-readable name we want
 // to surface in the "You are here: <name>" chip when the player is
@@ -652,7 +654,11 @@ export function MapScreen() {
   // OTA-1355 — ✓ marks for outpost rooms already walked (hubVisited), drawn on
   // the interior art. The CURRENT room is deliberately absent from this list:
   // it wears the pulsing marker instead of its checkmark.
-  const visitedRoomMarkStyles: { id: string; left: number; top: number }[] = [];
+  // ⚠ OTA-1451 — and `glyph`, because this row below the room name now carries
+  // more than one fact. See the outpost branch: a room can be walked (✓), be a
+  // way out (🚪), or both, and one text node per room makes the two impossible
+  // to draw on top of each other.
+  const visitedRoomMarkStyles: { id: string; left: number; top: number; glyph: string }[] = [];
   // arb101 — overlay-label scale. The atlas's own painted labels shrink with the
   // contain-fit; a constant-size overlay would dwarf them. labelScale = rendered
   // width ÷ atlas natural width keeps overlay text proportional to the art at the
@@ -806,22 +812,57 @@ export function MapScreen() {
         // BOTTOM edge now sits a name's half-height above the point — the lift
         // scales with the art like every other glyph, floored where it still
         // clears the text on a small render.
-        const lift = Math.max(7, INTERIOR_MARKER_LIFT * labelScale);
+        const lift = interiorLift(renderedW);
         playerMarkerBox = {
           left: offsetX + renderedW * f.fx - size / 2,
           top: offsetY + renderedH * f.fy - size - lift,
           size,
         };
       }
+      // ⚠⚠ OTA-1451 — ONE ROW UNDER EACH ROOM NAME, CARRYING EVERY MARK IT EARNS.
+      //
+      // Owner: *"the exit doesn't feel right where it is, it should be easily
+      // noticeable where it is. maybe a little door icon at the bottom?"* Nothing
+      // on either map had ever said which room has the door — the EXIT chip knows,
+      // and the map did not, so finding the way out meant walking until the button
+      // appeared. A player who guesses "it must be the bottom room" guesses the
+      // Shallow Digs, which is the DEEPEST point of the outpost, three levels the
+      // wrong way.
+      //
+      // ⚠ THE DOOR IS READ FROM `roomIsExit`, THE SAME PREDICATE THE CHIP READS.
+      // Not a hard-coded R10: the Central Square carries `exterior_door` too, and
+      // OTA-1271 exists because the owner was stranded when the rule and the
+      // layout disagreed. A map that painted doors the chip does not offer would
+      // be that bug with a picture attached.
+      //
+      // ⚠ AND BOTH FACTS SHARE ONE TEXT NODE. A ✓ layer and a separate 🚪 layer
+      // would land on the same point and draw on top of each other in the Gate,
+      // which is both walked and a way out — the exact collision this row was
+      // created to stop.
+      const roomGlyphs = new Map<string, string>();
       for (const roomId of hubVisited ?? []) {
         if (roomId === player.hubRoomId) continue; // the room you are IN shows the icon, not the ✓
         const room = hubRoomFor(roomId, hubSkinFactionFor(player.currentLocationId, player.factionId));
         if (!room?.structuralId) continue;
-        const f = outpostRoomMark(artFactionId, room.structuralId);
+        roomGlyphs.set(room.structuralId, '✓');
+      }
+      // ⚠ The door does NOT depend on having been there. Standing in the Gate and
+      // wondering which way is out is the case the owner reported; a mark that
+      // only appears once you have already found the room answers nothing.
+      for (const room of hubExitRooms()) {
+        if (!room.structuralId) continue;
+        const walked = roomGlyphs.get(room.structuralId);
+        roomGlyphs.set(room.structuralId, walked ? `${walked} 🚪` : '🚪');
+      }
+      for (const [structuralId, glyph] of roomGlyphs) {
+        const f = outpostRoomMark(artFactionId, structuralId as never);
         visitedRoomMarkStyles.push({
-          id: room.structuralId,
+          id: structuralId,
           left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
-          top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
+          // ⚠ OTA-1451 — BELOW the name, the mirror of the marker's lift above
+          // it. See interiorVisitedDrop.
+          top: offsetY + renderedH * f.fy - HM_LABEL_H / 2 + interiorVisitedDrop(renderedW),
+          glyph,
         });
       }
     }
@@ -842,21 +883,30 @@ export function MapScreen() {
         // the painted room name instead of covering it. One constant for both
         // interiors, so the marker cannot sit differently in a shed than in
         // the outpost.
-        const lift = Math.max(7, INTERIOR_MARKER_LIFT * labelScale);
+        const lift = interiorLift(renderedW);
         playerMarkerBox = {
           left: offsetX + renderedW * here.fx - size / 2,
           top: offsetY + renderedH * here.fy - size - lift,
           size,
         };
       }
+      // ⚠ OTA-1451 — no 🚪 layer here, and that is not an oversight. A painted
+      // BUILDING has one door and the EXIT chip is governed by `roomHasExitDoor`
+      // against that building's own layout, not by the hub's tags — marking it
+      // from `hubExitRooms()` would paint the outpost's answer onto a shed. The
+      // owner's report was about the outpost, so this stays a ✓-only row until a
+      // building's door table exists to read.
       for (const roomId of buildingVisited ?? []) {
         if (roomId === buildingRoomId) continue;
         const f = bMap.marks[roomId];
         if (!f) continue;
         visitedRoomMarkStyles.push({
           id: roomId,
+          glyph: '✓',
           left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
-          top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
+          // ⚠ OTA-1451 — same drop as the outpost branch. Both interiors, one
+          // rule, so a shed cannot mark itself differently from an outpost.
+          top: offsetY + renderedH * f.fy - HM_LABEL_H / 2 + interiorVisitedDrop(renderedW),
         });
       }
     }
@@ -1036,10 +1086,15 @@ export function MapScreen() {
           {/* ⚠ OTA-1355 — outpost rooms already walked wear a ✓ on the interior
               art (the same hubVisited set the travel chips' ✓ reads). The room
               the player is STANDING in is excluded above — it wears the pulsing
-              marker instead, drawn after these so it wins the overlap. */}
+              marker instead, drawn after these so it wins the overlap.
+
+              ⚠ OTA-1451 — the testID is `room-mark`, not `room-visited`: this row
+              is no longer only about having been there. It carries the ✓ AND the
+              🚪, so a test asking "does R10 wear a checkmark?" must read the
+              glyph rather than count nodes — the Gate has a row either way. */}
           {visitedRoomMarkStyles.map((m) => (
-            <View key={m.id} testID={`room-visited-${m.id}`} pointerEvents="none" style={[styles.hiddenMarketWrap, { left: m.left, top: m.top }]}>
-              <Text style={[styles.roomVisitedMark, { fontSize: Math.max(7, 34 * labelScale), lineHeight: Math.max(8, 37 * labelScale) }]}>✓</Text>
+            <View key={m.id} pointerEvents="none" style={[styles.hiddenMarketWrap, { left: m.left, top: m.top }]}>
+              <Text testID={`room-mark-${m.id}`} style={[styles.roomVisitedMark, { fontSize: Math.max(7, 34 * labelScale), lineHeight: Math.max(8, 37 * labelScale) }]}>{m.glyph}</Text>
             </View>
           ))}
           {/* ⚠⚠ OTA-1344 — THE "YOU ARE HERE" MARKER, BACK BY OWNER ORDER. OTA-182
@@ -1282,13 +1337,19 @@ export function MapScreen() {
 const HM_LABEL_W = 96;
 const HM_LABEL_H = 34;
 
-// ⚠ OTA-1441 — how far (in art pixels, scaled by labelScale) the interior
-// "you are here" ring's BOTTOM edge sits above its mark point. Interior mark
-// points are sighted onto the painted room NAMES, and the names run ~30-40 art
-// px tall, so 24 clears the text's upper half plus a sliver of air. Owner: the
-// icon *"directly above it but not obscuring any of it."* Interiors only — the
-// world atlas marker stands on silhouettes, not text, and stays centred.
-const INTERIOR_MARKER_LIFT = 24;
+// ⚠⚠ OTA-1450 — THE LIFT NOW COMES FROM THE ENGINE, shared with the corner
+// mini-map. This was a local constant in art pixels, and the mini-map — a
+// separate component with its own copy of the marker arithmetic — never got it,
+// so the owner still saw the ring on the room name there. One symbol, both
+// readers. It is a fraction of the RENDERED width so it scales with the
+// mini-map's ×2.5 zoom, where the painted lettering is larger too.
+const interiorLift = (renderedWidth: number) =>
+  Math.max(7, INTERIOR_MARKER_LIFT_FRAC * renderedWidth);
+
+// ⚠ OTA-1451 — and the ✓'s drop below it, from the same engine table, so the
+// pair reads the same on the Atlas and in the corner mini-map.
+const interiorVisitedDrop = (renderedWidth: number) =>
+  Math.max(9, INTERIOR_VISITED_DROP_FRAC * renderedWidth);
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },

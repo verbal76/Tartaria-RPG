@@ -309,6 +309,26 @@ export function hubDefinesExitRoom(): boolean {
   return HUB.rooms.some((r) => roomIsExit(r));
 }
 
+/** ⚠⚠ OTA-1451 — EVERY ROOM WITH A DOOR TO THE OUTSIDE, for the maps to mark.
+ *
+ *  Owner: *"the exit doesn't feel right where it is, it should be easily
+ *  noticeable where it is. maybe a little door icon at the bottom?"* The EXIT
+ *  chip has known which rooms these are since OTA-1194; neither map did, so the
+ *  only way to find the way out was to walk until the button appeared.
+ *
+ *  ⚠ IT RETURNS THE ROOMS, NOT A LIST OF IDS, and it is `roomIsExit` doing the
+ *  deciding — the SAME predicate the chip calls. Hard-coding "the gate" into a
+ *  map would put the door under a room that may not offer the button (the
+ *  Central Square carries `exterior_door` as well), and a painted door the game
+ *  then refuses to open is the failure OTA-1271 was filed for, with a picture
+ *  attached.
+ *
+ *  ⚠ Tags survive the per-faction re-skin, so this holds for all nine outposts —
+ *  which is what makes one call enough for a map that shows any of them. */
+export function hubExitRooms(): HubRoom[] {
+  return HUB.rooms.filter((r) => roomIsExit(r));
+}
+
 export type HubTravel =
   | { roomId: string; via: 'cardinal' | 'adjacent' }
   /** ⚠⚠ The player named a real room that is NOT one step away. This is a

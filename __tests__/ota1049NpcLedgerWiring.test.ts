@@ -101,9 +101,13 @@ describe('OTA-1049 — the store writes the ledger', () => {
 
     expect(rel(store)!.trades).toBe(1);
     expect(rel(store)!.tcTraded).toBeGreaterThan(0);
-    // ...and that is what earns the name, on the very next greeting.
+    // ...and that is what earns the NAME, on the very next greeting.
     expect(knowsPlayerName(rel(store))).toBe(true);
-    expect(npcRegard(rel(store))).toBe('known');
+    // ⚠ OTA-1451 — but not the REGARD, not on the visit you bought. Knowing your
+    // name off a sale is right; discussing their family off one is not. The rung
+    // now waits for you to come back. This suite is about what the STORE WRITES
+    // — the ledger row — and that is unchanged: one visit, one trade, TC moved.
+    expect(npcRegard(rel(store))).toBe('met');
   });
 
   it('a bulk buy is ONE piece of business, not one per unit', async () => {
@@ -112,7 +116,7 @@ describe('OTA-1049 — the store writes the ledger', () => {
     const store = await boot('Bulk');
     store.getState().buyFromVendor('Rope', 5);
     expect(rel(store)!.trades).toBe(1);
-    expect(npcRegard(rel(store))).toBe('known');
+    expect(npcRegard(rel(store))).toBe('met');   // OTA-1451 — see above
   });
 
   it('TC still accumulates across separate purchases', async () => {

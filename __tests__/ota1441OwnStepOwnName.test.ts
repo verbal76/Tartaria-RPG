@@ -157,8 +157,16 @@ describe('OTA-1441 — the interior marker rides ABOVE the room name', () => {
     // interior mark points are sighted onto the NAMES, so a centred ring sat
     // on the text. Both interiors — outpost and painted buildings — now anchor
     // the ring's bottom edge a lift above the point, from ONE constant.
-    expect(MAP).toContain('const INTERIOR_MARKER_LIFT = 24;');
-    expect((MAP.match(/Math\.max\(7, INTERIOR_MARKER_LIFT \* labelScale\)/g) ?? []).length).toBe(2);
+    //
+    // ⚠ RETARGETED IN OTA-1450, CLAIM UNCHANGED. The constant was a local pixel
+    // count here; OTA-1450 moved it into the engine as a fraction so the corner
+    // MINI-MAP could read the same number — it had its own copy of the marker
+    // arithmetic and never got this fix, and the owner saw the ring on the room
+    // name there. "ONE constant, both branches" is still exactly the assertion;
+    // the constant simply lives one file over now, and is shared more widely.
+    expect(MAP).toContain('INTERIOR_MARKER_LIFT_FRAC');
+    expect(MAP).not.toContain('const INTERIOR_MARKER_LIFT = ');
+    expect((MAP.match(/const lift = interiorLift\(renderedW\);/g) ?? []).length).toBe(2);
     expect((MAP.match(/- size - lift,/g) ?? []).length).toBe(2);
   });
 

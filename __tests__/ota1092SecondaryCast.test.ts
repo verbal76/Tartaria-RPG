@@ -33,11 +33,26 @@ describe('OTA-1092 — the secondary cast carries a ladder', () => {
   });
 
   it('each secondary named NPC drew exactly one pool topic per rung', () => {
+    // ⚠⚠ OTA-1451 — THE LOWEST POOL RUNG MOVED DOWN A STEP FOR MOST OF THEM, and
+    // the ladder shape this test guards is what survived. The bottom pool topic
+    // is a counter question — "Ask how they learned the craft", "Ask what the
+    // work is really like", "Ask what the position actually involves" — and it
+    // sat behind `known`, which left a stranger with a single thing to say to
+    // anybody. Those opened. The ones that are genuinely personal at the bottom
+    // ("Ask which scar taught the most", "Ask why they serve") stayed at `known`,
+    // because opening THOSE to a stranger fixes a count and breaks a character.
+    //
+    // ⚠ STILL EXACTLY THREE, STILL ONE PER STEP, STILL ASCENDING — which is the
+    // invariant OTA-1092 was written for. Only the floor differs, per person.
+    const OPEN = undefined;   // no gate: the shop front
     for (const id of secondaryNamed) {
       const pool = NPCS[id]!.topics.filter((t) => t.id.includes('_pool_'));
       expect(pool.length).toBe(3);
-      const rungs = pool.map((t) => t.gate?.minRegard).sort();
-      expect(rungs).toEqual(['familiar', 'known', 'trusted']);
+      const rungs = pool.map((t) => t.gate?.minRegard);
+      expect([
+        [OPEN, 'familiar', 'trusted'],
+        ['known', 'familiar', 'trusted'],
+      ]).toContainEqual(rungs);
     }
   });
 

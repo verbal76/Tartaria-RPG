@@ -466,6 +466,25 @@ export function ExplorationScreen() {
     player?.mapX,
     player?.mapY,
     currentScene?.microMicroId,
+    // ⚠⚠ OTA-1451 — hubRoomId IS PART OF THE KEY, SO IT MUST BE PART OF THE DEPS.
+    //
+    // OTA-164 added it to `makeRoomKey` above and did not add it here, and the
+    // hole it left is invisible everywhere except the one place it matters. Out
+    // in the world, changing rooms always changes locationId / mapX / mapY /
+    // microMicroId, so the memo recomputes and nobody notices. INSIDE AN OUTPOST
+    // OR A BUILDING, walking from one room to the next changes NOTHING IN THIS
+    // LIST — only hubRoomId moves — so this memo kept serving the PREVIOUS
+    // room's consumed nouns until something else happened to touch visitedRooms.
+    //
+    // Owner: *"sometimes when I go through a room investigate still stays lit
+    // and when I tap it again it's empty, and when I leave it it clears then."*
+    // That is exactly this, and the "when I leave it it clears" half is the
+    // tell — leaving finally moves one of the other deps. Walk into a room you
+    // already stripped while carrying a fresh room's set and none of its nouns
+    // look consumed, so INVESTIGATE lights; the picker itself resolves the nouns
+    // properly and comes up empty. A lit button over an empty menu is OTA-1402's
+    // defect in UI form: the game knows and shows the opposite.
+    player?.hubRoomId,
     worldMemory.visitedRooms,
   ]);
   // OTA-1211 — a RESOLVED hook's noun must grey like any spent chip. The
@@ -528,6 +547,11 @@ export function ExplorationScreen() {
     player?.mapX,
     player?.mapY,
     currentScene?.microMicroId,
+    // ⚠⚠ OTA-1451 — the SIBLING DOOR. This memo is a copy of the one above,
+    // keyed the same way and missing the same dependency, and fixing only the
+    // first would have left half the stale-lit INVESTIGATE standing: the count
+    // subtracts flavour-exhausted nouns from this set too. Both, or neither.
+    player?.hubRoomId,
     worldMemory.visitedRooms,
   ]);
 

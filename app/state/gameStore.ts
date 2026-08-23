@@ -11319,11 +11319,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
         // Hunt board: post one hunt the vendor's faction has available.
+        // ⚠ OTA-1450 — hpMax gates what is POSTED, so the board a vendor points
+        // at is the board the player can actually take. Offering what accept
+        // would refuse is the "many doors" shape: two surfaces, one rule.
         const huntPool = availableHunts(
           vendor.faction,
           getStanding(player.factionStanding, vendor.faction),
           (player.activeHunts ?? []).map((h) => h.id),
           player.completedHuntIds ?? [],
+          player.hpMax,
         );
         if (offerAllowed.has('hunt') && huntPool.length > 0) {
           const h = huntPool[0]!;

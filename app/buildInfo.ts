@@ -24377,7 +24377,49 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // nobody could place. DEFENSE shows what makes up your AC always, with no tap.
 // CORRUPTION moves out of the wallet and up beside HP and stamina as a third
 // meter, where a condition that eats your stats belongs.
-export const OTA_BUILD_ID = '2026-08-23-1448-the-sheet-says-what-it-knows';
+// OTA-1450 — the bounty board now asks how big you are. Every hunt has always
+// carried a recommended HP (30-65) that nothing read: reputation was the only
+// gate, and 16 of the 18 sit at zero, so a character who had never left the
+// outpost was posted the near-complete board — nine Veteran, five Elite, two
+// Apex. Hunts are offered only when their recommended HP is within reach of
+// yours, so the board opens as the character grows. (A carry cap was built for
+// this and then removed: OTA-972 already decided that question on purpose —
+// only one contract is ever TRACKED, every later accept parks — so a limit on
+// how many you may HOLD would have undone a shipped design. What was reported
+// was what the vendor GIVES OUT, and that is the reach gate.)
+// Also: the corner mini-map finally gets the marker lift the Atlas got in
+// OTA-1441 — it was a separate component with its own copy of the arithmetic,
+// so the ring still sat on the painted room name there. One shared constant,
+// both maps.
+// OTA-1451 — three things that told you the opposite of what they knew.
+// (1) BOTH MAPS NOW BRACKET THE ROOM NAME. The "you are here" ring rides above
+// it and the ✓ drops below it, so neither glyph sits on the lettering — and the
+// corner mini-map, which had never drawn a ✓ at all, now draws them from the
+// same two visited sets the Atlas reads. One engine constant per offset, both
+// maps reading it, because the last time only one map got the fix.
+// (2) INVESTIGATE STOPS LIGHTING OVER AN EMPTY MENU. The two memos that decide
+// which nouns are already spent build their room key from hubRoomId and did not
+// list hubRoomId as a dependency. Outdoors that never showed, because changing
+// rooms also changes your map coordinates. Inside an outpost, walking to the
+// next room moves hubRoomId and nothing else on that list — so the screen kept
+// the room you left. Walk back into somewhere you already stripped and the
+// button lit over a picker with nothing in it, and only cleared when you left.
+// (3) PEOPLE OPEN UP SLOWER, AND THE FIRST RUNG IS A STEP INSTEAD OF A
+// FLOODGATE. Two reports, one problem. Accepting a contract promoted a
+// shopkeeper eighteen seconds after meeting him; one purchase did the same for
+// the next one — "way too familiar with these guys. way too quick." Both now
+// need you to come back, which is the rule the rest of the ladder already
+// worked by. And the conversation itself was re-tiered rather than only slowed:
+// a stranger used to get about one shop-front question per person and then 93
+// more arrived at once, so every vendor now opens with a second counter
+// question, and the personal ones — a man's dead friend holding up his roof,
+// why she never leaves her stall, how she prices grief — moved up to the rung
+// where regulars stand. Nothing was deleted: the same depth is there, it
+// arrives in a better order. Three separate visits still place you on their
+// own, and every rung still has something new waiting at it.
+export const OTA_BUILD_ID = '2026-08-23-1451-never-have-to-guess';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1450-the-board-knows-your-size';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1448-the-sheet-says-what-it-knows';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1446-the-sign-below-the-emblem';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1445-three-buttons-one-height';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1444-the-ledger-grew-a-line';

@@ -458,7 +458,51 @@ export function npcRegard(rel: NpcRelation | null | undefined): NpcRegard {
   // player's NAME (knowsPlayerName) but not any regard, so someone who had
   // handed you work was ranked below someone you had merely walked past three
   // times. Found by a slice-2 test; the ladder was wrong, not the test.
-  if (rel.trades >= 1 || rel.contractsTaken >= 1 || rel.meetings >= MEETINGS_FOR_NAME) return 'known';
+  //
+  // ⚠⚠ OTA-1451 — BUT NOT ON THE VISIT YOU MET THEM. Owner: *"look at all the
+  // vendor conversations I had in this log, it seems too easy to get to the
+  // later tiers of topics."* He is right, and the log has the whole story with
+  // timestamps: Tarek the Tinkerer first appears at 16:09:39, a contract is
+  // accepted at 16:09:57 — EIGHTEEN SECONDS later — and by 16:11:58, without
+  // the player ever leaving the room, Tarek is answering "Ask about their
+  // people" and "Ask how they learned the craft."
+  //
+  // ⚠ WHY THIS RUNG AND NOT THE ONES ABOVE IT. Everything else on this ladder
+  // costs the player something real: `trades` is a visit where money changed
+  // hands, `contractsTurnedIn` means you went out, did the work and came back,
+  // `tcTraded` is 400/1500 TC actually spent, `meetings` is clock-guarded so a
+  // re-render cannot inflate it (OTA-1055). ACCEPTING is the one rung you can
+  // climb by tapping — it is a promise, not a payment — and this rung holds 93
+  // of the cast's 344 topics, the whole "Ask about their people" tier.
+  //
+  // ⚠ AND OTA-1050's ORDERING SURVIVES INTACT, which is why this is a second
+  // condition rather than a deletion. Compare at equal visits: after one visit a
+  // contract-giver and a passer-by are both `met`; after two the contract-giver
+  // is `known` and the passer-by is still `met`; only at three does the
+  // passer-by catch up. Handing you work still counts for MORE than walking
+  // past — it never counts for less, which was the whole complaint.
+  //
+  // ⚠⚠ AND THE SAME RULE FOR A PURCHASE, ADDED IN THE SAME OTA AFTER A SECOND
+  // REPORT. The first cut only slowed `contractsTaken`; the owner came straight
+  // back with Halem the Trader, who reaches this rung on ONE PURCHASE and then
+  // opens the whole middle of his conversation — *"way too familiar with these
+  // guys. way too quick. look at all these conversation options I just opened up
+  // with Halem with barely any contact."*
+  //
+  // A single sale is not a relationship, it is a transaction, and it was buying
+  // the same rung that three separate visits buy. Buying and COMING BACK is a
+  // customer; buying once is a stranger with a receipt. One rule now covers both
+  // ways in — coin and contract — so neither can be the cheap one.
+  //
+  // ⚠ `meetings` is clock-guarded (OTA-1055): a same-hour re-entry is the same
+  // visit, and hub room moves cost no time at all, so walking out of the Atrium
+  // and back in cannot manufacture the return trip. It has to be a real one.
+  //
+  // ⚠ THREE VISITS STILL STAND ALONE, deliberately. Being around often enough
+  // that your face is furniture is its own way to be placed, and it is the
+  // slowest of the three — nothing to do with what you spent.
+  const cameBack = rel.meetings >= 2;
+  if ((cameBack && (rel.trades >= 1 || rel.contractsTaken >= 1)) || rel.meetings >= MEETINGS_FOR_NAME) return 'known';
   return 'met';
 }
 

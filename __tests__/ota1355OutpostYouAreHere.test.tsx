@@ -146,10 +146,25 @@ describe('OTA-1355 — the outpost map knows the room you are in', () => {
     const tree = await mountInOutpost(['outpost_gate', 'outpost_central', 'outpost_armory']);
     expect(tree.root.findAll((n) => n.props.testID === 'player-marker').length).toBeGreaterThanOrEqual(1);
     expect(tree.root.findAll((n) => n.props.testID === 'center-on-player').length).toBeGreaterThanOrEqual(1);
-    expect(tree.root.findAll((n) => n.props.testID === 'room-visited-R01').length).toBeGreaterThanOrEqual(1);
-    expect(tree.root.findAll((n) => n.props.testID === 'room-visited-R06').length).toBeGreaterThanOrEqual(1);
+    // ⚠ OTA-1451 — RETARGETED, SAME CLAIM. The testID is `room-mark-<id>` now,
+    // and the Gate HAS one, because that row also carries the 🚪 door glyph. The
+    // rule this test has always asserted — the room you stand in wears the
+    // marker and NOT a checkmark — is unchanged, so it is now read off the GLYPH
+    // rather than counted off node presence, which is the stronger check anyway.
+    // ⚠ The testID sits on the <Text> that holds the glyph, so `children` is the
+    // rendered string itself — no walking, and nothing to stringify (a test
+    // instance holds a Fiber, and JSON.stringify of one throws on the cycle).
+    const glyphOf = (id: string): string => {
+      const node = tree.root.findAll((n) => n.props.testID === `room-mark-${id}`)[0];
+      return typeof node?.props.children === 'string' ? node.props.children : '';
+    };
+    expect(glyphOf('R01')).toContain('✓');
+    expect(glyphOf('R06')).toContain('✓');
     // The current room (Gate = R10) shows the icon, not the checkmark.
-    expect(tree.root.findAll((n) => n.props.testID === 'room-visited-R10').length).toBe(0);
+    expect(glyphOf('R10')).not.toContain('✓');
+    // ⚠ …and it DOES wear the door, because the Gate is the way out. Owner:
+    // *"the exit doesn't feel right where it is, it should be easily noticeable."*
+    expect(glyphOf('R10')).toContain('🚪');
   });
 
   it('⚠ ⌖ ME centers on the room without throwing (the same glide path the auto-open uses)', async () => {

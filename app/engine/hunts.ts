@@ -203,20 +203,63 @@ export function firstActionableHuntStage(hunt: { stages: ReadonlyArray<{ checkKi
   return i;
 }
 
+/** ⚠⚠ OTA-1450 — A CARRY CAP WAS BUILT HERE AND THEN REMOVED, DELIBERATELY.
+ *
+ *  The owner's log shows sixteen hunts signed in ten seconds, so the first cut
+ *  of this OTA capped how many could be held. That was an over-reach and it is
+ *  recorded rather than quietly dropped: OTA-972 had already decided this
+ *  question on purpose — *"first contract goes LIVE; every later accept — any
+ *  kind — parks"* — so the flood was already answered by TRACKING exactly one.
+ *  The Arbiter's "you can only walk one road at a time" describes that rule and
+ *  is accurate.
+ *
+ *  What the owner actually reported was what Tarek GIVES OUT, not what a player
+ *  may hold, and that is the reach gate below. A cap would also have deleted a
+ *  design two suites document. If a carry limit is ever wanted it is a balance
+ *  decision for the owner, not a bug fix. */
+
+
+/** ⚠⚠ OTA-1450 — THE CATALOGUE ALREADY KNEW, AND NOTHING ASKED IT.
+ *
+ *  Every hunt carries `recommendedHp` — authored, 30 to 65 across the eighteen —
+ *  and no gate ever read it. `minRep` was the only filter, and SIXTEEN OF THE
+ *  EIGHTEEN sit at minRep 0, so a character who had never left the outpost was
+ *  posted the near-complete board: nine Veteran, five Elite, two Apex. Owner:
+ *  *"Tarek the Tinkerer still gives out a ton of higher end missions in the
+ *  outpost."*
+ *
+ *  Reputation answers "do they trust you with this", which is a different
+ *  question from "can you live through it" — and the second had no gate at all.
+ *  A hunt is posted when its recommended HP is within reach of yours, so the
+ *  board opens as the character grows instead of arriving whole on day one.
+ *
+ *  ⚠ hpMax is OPTIONAL and omitting it keeps the old behaviour. The catalogue
+ *  readers (the Contracts modal's "what exists" list, the walkers) mean
+ *  something different by "available" than a vendor posting work at you, and a
+ *  readiness filter applied there would hide content from the wrong surface.
+ *  Every player-facing OFFER passes it. */
+export function huntWithinReach(hunt: HuntDef, hpMax: number | undefined): boolean {
+  if (hpMax === undefined) return true;
+  return (hunt.recommendedHp ?? 0) <= hpMax;
+}
+
 // Available to a player from a given vendor or in general. Filters by
 // faction (vendors aligned with a faction only post their own hunts —
 // hunts with factionId=null are open contracts anyone can offer),
-// minimum rep, and already-active/completed lists.
+// minimum rep, already-active/completed lists, and — OTA-1450 — whether the
+// character can plausibly survive the thing.
 export function availableHunts(
   factionId: string | null,
   playerRep: number,
   active: readonly string[],
   completed: readonly string[],
+  hpMax?: number,
 ): HuntDef[] {
   return HUNTS.filter(
     (h) =>
       (h.factionId === factionId || (factionId !== null && h.factionId === null)) &&
       playerRep >= h.minRep &&
+      huntWithinReach(h, hpMax) &&
       !active.includes(h.id) &&
       !completed.includes(h.id),
   );

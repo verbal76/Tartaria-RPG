@@ -153,6 +153,17 @@ describe('Quest progression audit', () => {
     });
     store.getState().skipTutorial?.();
 
+    // ⚠⚠ OTA-1450 — AND FORCE THE HP CEILING, for the same reason the standing
+    // is forced below. This audit asks *"can every authored quest be walked from
+    // accept to turn-in?"* — a CONTENT question. It is not asking whether a
+    // day-one character is ready for the Apex hunts, and reputation stopped
+    // being the only thing a board checks: hunts now post only when their
+    // authored `recommendedHp` is within reach of yours. A fresh Auditor sits
+    // around 50 HP, so 86 of the catalogue's stages went unwalkable overnight
+    // and the audit reported them as broken content. The character is a probe,
+    // not a playthrough; give it the reach to see the whole catalogue.
+    store.setState((s) => (s.player ? { ...s, player: { ...s.player, hpMax: 999 } } : s));
+
     // Force-set faction standing so rep gates pass. Add the row if
     // missing — fresh characters only have the row for their own
     // faction.

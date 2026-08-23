@@ -182,8 +182,19 @@ describe('OTA-1049 — the regard ladder', () => {
     expect(npcRegard(rel(see(emptyMemory())))).toBe('met');
   });
 
-  it('one trade places you', () => {
-    expect(npcRegard(withDealing({ trades: 1 }))).toBe('known');
+  it('one trade places you — ON THE RETURN VISIT', () => {
+    // ⚠⚠ AMENDED BY OTA-1451 ON A SECOND OWNER REPORT, AND THE AMENDMENT IS THE
+    // POINT. Halem the Trader reached this rung on a single purchase and opened
+    // the whole middle of his conversation: *"way too familiar with these guys.
+    // way too quick... with barely any contact."* One sale was buying the same
+    // rung that three separate visits buy.
+    //
+    // ⚠ WHAT OTA-1049 ASSERTED SURVIVES: money that changed hands still places
+    // you, and still faster than being merely seen around. It waits for you to
+    // come back — the rule contracts already work by — so neither coin nor
+    // contract is the cheap way in.
+    expect(npcRegard(withDealing({ trades: 1 }))).toBe('met');
+    expect(npcRegard(withDealing({ trades: 1 }, 2))).toBe('known');
   });
 
   it('real custom makes you a regular', () => {

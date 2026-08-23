@@ -32,10 +32,12 @@
 import React, { useMemo } from 'react';
 import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useGameStore, playerGridCell } from '../state/gameStore';
-import { hubRoomFor, hubSkinFactionFor } from '../engine/hub';
+import { hubRoomFor, hubSkinFactionFor, hubExitRooms } from '../engine/hub';
 import { getBuildingRoom } from '../engine/buildings';
 import { buildingMap } from '../engine/buildingMaps';
-import { outpostRoomMark } from '../engine/outpostRoomMarks';
+import {
+  outpostRoomMark, INTERIOR_MARKER_LIFT_FRAC, INTERIOR_VISITED_DROP_FRAC,
+} from '../engine/outpostRoomMarks';
 import { worldMarkerFraction, viewportOffset, type MapFrac } from '../engine/mapFraction';
 
 /** ⚠ The downscaled tiles — NOT assets/outposts/ and NOT assets/world-atlas.png.
@@ -74,10 +76,38 @@ export function MiniMap({ onPress }: { onPress?: () => void }) {
   const player = useGameStore((s) => s.player);
   const buildingId = useGameStore((s) => s.activeBuildingId);
   const buildingRoomId = useGameStore((s) => s.activeBuildingRoomId);
+  // ⚠ OTA-1451 — the same two sets the Atlas reads for its ✓ marks. Outpost
+  // rooms live on worldMemory (they persist across visits); building rooms live
+  // on the store and reset per visit. Reading either off `player` is the mistake
+  // gameStore's own note records.
+  const hubVisited = useGameStore((s) => s.worldMemory?.hubVisited);
+  const buildingVisited = useGameStore((s) => s.buildingVisited);
   const [box, setBox] = React.useState<{ w: number; h: number } | null>(null);
 
   const view = useMemo((): {
     src: number; frac: MapFrac; aspect: number; zoom: number; label: string;
+    /** ⚠ OTA-1450 — interiors mark painted room NAMES, so their marker rides
+     *  above the point; the world atlas marks silhouettes and stays centred. */
+    interior: boolean;
+    /** ⚠⚠ OTA-1451 — EVERY OTHER ROOM ALREADY WALKED, so the ✓ the Atlas has
+     *  drawn since OTA-1355 exists here too. Owner: *"when you are looking at
+     *  the mini-map or the Atlas map it should show the you are here above the
+     *  name, and the ✓ below it, that way you never have to guess."* The corner
+     *  map showed only the marker, so the two maps answered the same question
+     *  differently — and at ×2.5 zoom the neighbours in frame are exactly the
+     *  rooms the travel chips point at, which is where "have I been there?"
+     *  gets asked. Empty out in the world: nothing there is a room. */
+    visited: MapFrac[];
+    /** ⚠⚠ OTA-1451 — WHERE THE DOOR IS. Owner: *"the exit doesn't feel right
+     *  where it is, it should be easily noticeable where it is. maybe a little
+     *  door icon at the bottom?"* Read from `hubExitRooms()` — the same
+     *  `roomIsExit` predicate the EXIT chip uses — so the map cannot paint a
+     *  door the button will not offer. Unlike the ✓, it does NOT depend on
+     *  having been there: standing in a room wondering which way is out is the
+     *  case reported, and a mark that appears only after you find the room
+     *  answers nothing. Empty for buildings (their door is governed by their own
+     *  layout, not the hub's tags) and for the world. */
+    doors: MapFrac[];
   } | null => {
     if (!player) return null;
     // ── inside an outpost ────────────────────────────────────────────────────
@@ -96,6 +126,19 @@ export function MiniMap({ onPress }: { onPress?: () => void }) {
           aspect: OUTPOST_ASPECT,
           zoom: OUTPOST_ZOOM,
           label: room.name,
+          interior: true,
+          // ⚠ The room you are IN wears the marker, never a ✓ — the same rule
+          // the Atlas follows, and the owner asked for it there in OTA-1355.
+          // Identity flows through structuralId, never a drawn name (OTA-1279).
+          visited: (hubVisited ?? [])
+            .filter((id) => id !== player.hubRoomId)
+            .map((id) => hubRoomFor(id, skin)?.structuralId)
+            .filter((id): id is NonNullable<typeof id> => !!id)
+            .map((id) => outpostRoomMark(player.factionId, id)),
+          doors: hubExitRooms()
+            .map((r) => r.structuralId)
+            .filter((id): id is NonNullable<typeof id> => !!id)
+            .map((id) => outpostRoomMark(player.factionId, id)),
         };
       }
     }
@@ -120,6 +163,12 @@ export function MiniMap({ onPress }: { onPress?: () => void }) {
           aspect: bmap.aspect,
           zoom: OUTPOST_ZOOM,
           label: room?.name ?? 'inside',
+          interior: true,
+          visited: (buildingVisited ?? [])
+            .filter((id) => id !== buildingRoomId)
+            .map((id) => bmap.marks[id])
+            .filter((f): f is MapFrac => !!f),
+          doors: [],
         };
       }
     }
@@ -132,8 +181,11 @@ export function MiniMap({ onPress }: { onPress?: () => void }) {
       aspect: WORLD_ASPECT,
       zoom: WORLD_ZOOM,
       label: 'the wilds',
+      interior: false,
+      visited: [],
+      doors: [],
     };
-  }, [player, buildingId, buildingRoomId]);
+  }, [player, buildingId, buildingRoomId, hubVisited, buildingVisited]);
 
   const geom = useMemo(() => {
     if (!box || !view) return null;
@@ -165,7 +217,32 @@ export function MiniMap({ onPress }: { onPress?: () => void }) {
       left,
       top,
       markerX: left + view.frac.fx * renderedW,
-      markerY: top + view.frac.fy * renderedH,
+      // ⚠⚠ OTA-1450 — ABOVE THE NAME, NOT ON IT. OTA-1441 lifted the Atlas's
+      // marker and missed this one: the mini-map is a separate component with
+      // its own copy of the arithmetic, so the owner still saw the ring sitting
+      // on "The Royal Strongroom" here. The lift is the engine's shared
+      // fraction, scaled by the RENDERED width — which is zoomed ×2.5 here, and
+      // so is the painted lettering, so the gap reads the same on both maps.
+      // The half-ring keeps the ring's BOTTOM edge on the gap, matching the
+      // Atlas, since this marker is drawn centred on markerY.
+      markerY: top + view.frac.fy * renderedH
+        - (view.interior ? INTERIOR_MARKER_LIFT_FRAC * renderedW + RING / 2 : 0),
+      // ⚠ OTA-1451 — the ✓ drops BELOW the name by the same engine fraction the
+      // marker rises above it, so the pair brackets the lettering instead of one
+      // of them landing on it. Scaled by the RENDERED width, which is zoomed
+      // ×2.5 here — and so is the painted lettering, so the gap reads the same
+      // as on the Atlas.
+      visited: view.visited.map((f) => ({
+        x: left + f.fx * renderedW,
+        y: top + f.fy * renderedH + INTERIOR_VISITED_DROP_FRAC * renderedW,
+      })),
+      // ⚠ OTA-1451 — the door rides on the ✓'s row, offset sideways rather than
+      // stacked, so a room that is BOTH walked and a way out (the Gate, always)
+      // shows both facts side by side instead of one glyph over the other.
+      doors: view.doors.map((f) => ({
+        x: left + f.fx * renderedW + TICK_W,
+        y: top + f.fy * renderedH + INTERIOR_VISITED_DROP_FRAC * renderedW,
+      })),
     };
   }, [box, view]);
 
@@ -198,6 +275,30 @@ export function MiniMap({ onPress }: { onPress?: () => void }) {
             accessibilityElementsHidden
             importantForAccessibility="no-hide-descendants"
           />
+          {/* ⚠ OTA-1451 — rooms already walked. Drawn BEFORE the marker so that
+              if a ✓ and the ring ever overlap, the "you are here" answer is the
+              one on top. Off-box ticks cost nothing: the wrap clips them. */}
+          {geom.visited.map((v, i) => (
+            <Text
+              key={`v${i}`}
+              style={[styles.visitedTick, { left: v.x - TICK_W / 2, top: v.y - TICK_H / 2 }]}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            >
+              ✓
+            </Text>
+          ))}
+          {/* ⚠ OTA-1451 — where the way out is. Same row as the ✓, offset right. */}
+          {geom.doors.map((d, i) => (
+            <Text
+              key={`d${i}`}
+              style={[styles.doorMark, { left: d.x - TICK_W / 2, top: d.y - TICK_H / 2 }]}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            >
+              🚪
+            </Text>
+          ))}
           {/* ⚠ The marker is DRAWN, not an image. assets/player-marker.png is
               2MB, and at 9pt across a bordered dot is indistinguishable from it
               — the same reasoning that downscaled the maps, applied to the one
@@ -240,6 +341,11 @@ export function MiniMap({ onPress }: { onPress?: () => void }) {
 
 const DOT = 9;
 const RING = 19;
+// ⚠ OTA-1451 — the ✓'s own box, so it can be centred on its point the way the
+// Atlas centres its label wrap. Sized for a 130pt corner tile: big enough to
+// read at a glance, small enough that three neighbours in frame are not a rash.
+const TICK_W = 14;
+const TICK_H = 14;
 
 const styles = StyleSheet.create({
   press: { flex: 1 },
@@ -267,6 +373,35 @@ const styles = StyleSheet.create({
     width: DOT, height: DOT, borderRadius: DOT / 2,
     backgroundColor: '#e8dcc0',
     borderWidth: 1, borderColor: '#4a3f2f',
+  },
+  // ⚠ OTA-1451 — the SAME green and the same hard shadow the Atlas uses for its
+  // ✓ (MapScreen's roomVisitedMark). A different tick on the second map would
+  // read as a different fact.
+  visitedTick: {
+    position: 'absolute',
+    width: TICK_W,
+    height: TICK_H,
+    lineHeight: TICK_H,
+    fontSize: 12,
+    color: '#6fd680',
+    fontWeight: '900',
+    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+  // ⚠ The door is an emoji, so it carries its own colour — no `color` here; the
+  // shadow is what keeps it readable against pale outpost stone.
+  doorMark: {
+    position: 'absolute',
+    width: TICK_W,
+    height: TICK_H,
+    lineHeight: TICK_H,
+    fontSize: 11,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
   blank: { color: '#3a342c', fontSize: 22 },
 });

@@ -54,9 +54,6 @@
     {
      "id": "irma_prices",
      "label": "Ask why her prices never move",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"Because the iron does not care what season it is.\" Irma keeps working. \"Halem haggles. Tellin haggles. They sell things people want. I sell the difference between a wound and a bruise, and that has cost the same since the water.\""
      ]
@@ -65,7 +62,7 @@
      "id": "irma_apprentice",
      "label": "Ask if she has an apprentice",
      "gate": {
-      "minRegard": "known"
+      "minRegard": "familiar"
      },
      "lines": [
       "\"Had.\" One word, one hammer blow. Then, because you wait: \"Three. One quit, one got married to a farrier out east, one went over the wall with a raid party against my telling and did not come back over it.\" She checks the seam. \"I am not taking a fourth until I stop counting the third.\""
@@ -75,7 +72,7 @@
      "id": "irma_halem",
      "label": "Ask what she makes of Halem's stock",
      "gate": {
-      "minRegard": "known"
+      "minRegard": "familiar"
      },
      "lines": [
       "Irma snorts, which from her is nearly affection. \"Halem sells what people bring him, and people bring him what did not save them.\" She taps the piece she is working. \"Buy his rope. Buy his tins. If you buy his armour, have him point at the man who traded it in. He will not be able to.\""
@@ -176,9 +173,6 @@
     {
      "id": "halem_post",
      "label": "Ask about the trading post",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"It was my father's, and it was not a post then, it was a front room.\" He gestures at the roof, which is three different roofs. \"Every bit of this is somebody's payment. That beam is a debt. That shutter is a debt. I have been paid in doors more times than in coin.\" He grins. \"Do not tell anybody. It is the only reason I have a building.\""
      ]
@@ -218,7 +212,7 @@
      "id": "halem_beam",
      "label": "Ask about the beam that is a debt",
      "gate": {
-      "minRegard": "known"
+      "minRegard": "familiar"
      },
      "lines": [
       "\"Ah, you remembered.\" Halem pats it like a horse. \"Ossek the wheelwright. Owed me for a winter of feed, paid me in roof. He is dead now — the mud fever, eight years back — so this is the last of him holding my house up.\" He looks at it a moment. \"Best debt I ever collected. I would not trade it for the coin now.\""
@@ -387,9 +381,6 @@
     {
      "id": "tellin_ledger",
      "label": "Ask about the ledger",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"This is the third volume.\" Tellin lays a flat hand on it, like an oath. \"The first two are buried under the counter in wax-cloth. Every honest weight in this settlement for nine years, and I will tell you what it is worth: nothing, to anyone, until somebody lies. Then it is worth everything.\""
      ]
@@ -398,7 +389,7 @@
      "id": "tellin_worst",
      "label": "Ask the worst trade he ever made",
      "gate": {
-      "minRegard": "known"
+      "minRegard": "familiar"
      },
      "lines": [
       "\"A man sold me a crate of hinges once.\" Tellin's mouth goes thin. \"Good hinges. Underpriced. I was so pleased with the margin that I did not ask the only question that matters, which is: what did the doors look like, that somebody took the hinges and left?\" He shakes his head. \"I made four coins on that crate and I still think about the doors.\""
@@ -464,7 +455,7 @@
      "id": "tellin_light",
      "label": "Ask if he has lost anything lately",
      "gate": {
-      "minRegard": "known",
+      "minRegard": "familiar",
       "minPocketsMumbled": 1
      },
      "lines": [
@@ -558,9 +549,6 @@
     {
      "id": "vesryn_method",
      "label": "Ask how a catalogue is made",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"Slowly, or wrongly. There is no third way.\" Vesryn holds up a slip. \"Object, place, hand, date, condition — five facts, and the discipline is writing only those. The moment you write what a thing MEANS, you have stopped cataloguing and started arguing with the dead.\" They file the slip. \"The dead always win those. They have more time.\""
      ]
@@ -678,9 +666,6 @@
     {
      "id": "korash_short",
      "label": "Ask what runs short first",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"Salt. Always salt. Then boot-leather, then lamp-oil, then patience.\" Korash ticks them off like a drill. \"Nobody ever raids for salt and nobody ever thanks you for it either. Half of quartermastering is loving the boring things on behalf of people who cannot afford to notice them.\""
      ]
@@ -767,7 +752,7 @@
      "id": "korash_upworld",
      "label": "Ask what he makes of the upworld",
      "gate": {
-      "minRegard": "known"
+      "minRegard": "familiar"
      },
      "lines": [
       "\"Too much sky.\" Korash says it flatly, and he is not entirely joking. \"You people live under weather that changes its mind hourly and you call the deep dangerous. Down home, the ceiling has held for a thousand years and it has never once rained on my count.\" He hefts a crate. \"But the trade is up here, so up here I stand, getting rained on. The things we do for salt.\""
@@ -829,9 +814,6 @@
     {
      "id": "wandering_drifter_pool_road",
      "label": "Ask what the road has taught them",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"That you can leave anything behind except your feet.\" Naha says it lightly, but it has corners. \"People think the road is freedom. The road is a landlord like any other — it takes its rent in soles and weather and names of places you will not see twice. I pay it because I am worse at paying the other kind.\""
      ]
@@ -901,9 +883,6 @@
     {
      "id": "thalan_wanderer_pool_carry",
      "label": "Ask what they always carry",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "Thalan does not have to think. \"Needle and thread, a dry pair of socks, and one thing that is worth nothing.\" They pat a pocket without showing you. \"The first two keep you walking. The third keeps you a person. You meet walkers who dropped their nothing-thing to lighten the load, and you can tell. You can always tell.\""
      ]
@@ -1045,9 +1024,6 @@
     {
      "id": "jorah_scholar_pool_why",
      "label": "Ask what they are looking for",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"The same thing as everyone in my line — the piece that makes the rest make sense.\" Jorah the Scholar smiles at their own phrasing. \"You imagine it as a door, when you start. A vault, a tablet, one big answer. Twenty years in, you understand it is a THREAD. You do not find it. You notice you have been holding it a while.\""
      ]
@@ -1130,9 +1106,6 @@
     {
      "id": "elara_provenance",
      "label": "Ask where the stock comes from",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"Estates, mostly. Which is a soft word for rooms nobody was coming back to.\" Elara lays out three rings in a row. \"I do not dig and I do not lift. I buy from the ones who do, and I ask exactly one question — where — because the where is what the next buyer is paying for.\" She smiles. \"Everyone thinks my trade is objects. My trade is stories with a clasp on them.\""
      ]
@@ -1141,7 +1114,7 @@
      "id": "elara_grief",
      "label": "Ask how she prices grief",
      "gate": {
-      "minRegard": "known"
+      "minRegard": "familiar"
      },
      "lines": [
       "\"Carefully. And never to the griever.\" Elara turns a locket face-down, out of some private courtesy. \"A stranger pays for the shine. But twice a year somebody comes to this cloth and goes white at something on it, and that person does not pay the stranger's price.\" She shrugs. \"Sometimes they pay nothing. Bad business. I keep doing it. Do not tell the guild of me.\""
@@ -1208,7 +1181,7 @@
      "id": "elara_professional",
      "label": "Ask about light hands",
      "gate": {
-      "minRegard": "known",
+      "minRegard": "familiar",
       "minPocketsMumbled": 1
      },
      "lines": [
@@ -1271,9 +1244,6 @@
     {
      "id": "tarek_tinkerer_pool_hands",
      "label": "Ask how they learned the craft",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"Badly, first.\" Tarek the Tinkerer holds up their hands as evidence — old burns, old lines. \"Everything I know is a mistake I only made once. The craft is not in the making, it is in the remembering. My hands keep the notes.\""
      ]
@@ -1359,9 +1329,6 @@
     {
      "id": "felra_fit",
      "label": "Ask what makes a boot right",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"Nothing you can see on the shelf.\" Felra flexes a sole against her thumb. \"A right boot disagrees with you for a week and then agrees with you for years. A wrong boot flatters your foot on day one — comfort up front is how leather lies.\" She hands it back. \"Same as people, and I will charge you extra for the wisdom.\""
      ]
@@ -1380,7 +1347,7 @@
      "id": "felra_stall",
      "label": "Ask why she never leaves the stall",
      "gate": {
-      "minRegard": "known"
+      "minRegard": "familiar"
      },
      "lines": [
       "\"Two years behind this counter and my feet still wake me up asking about it.\" Felra shrugs. \"But a stall at a crossing sees more road than a runner ever did. Every pair that lands on this counter is a route, walked, sworn to under oath of wear.\" She taps her temple. \"I know this country better standing still. That is either wisdom or an excuse, and I resole either way.\""
@@ -1500,9 +1467,6 @@
     {
      "id": "korr_stonefoot_pool_work",
      "label": "Ask what the work is really like",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"Waiting,\" Korr Stonefoot says flatly. \"Nine parts waiting, one part everything at once. The stories keep the one part and sell it as the whole trade.\" A shrug. \"Nobody sings about standing in the rain outside a door. The rain is the job.\""
      ]
@@ -1644,9 +1608,6 @@
     {
      "id": "odar_flameforge_pool_good",
      "label": "Ask what makes a piece good",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "Odar Flameforge picks up a finished piece and turns it. \"Not the look. The look is for buyers. A good piece is one that fails SLOWLY — it warns you, it complains, it gives you a season of creaking before it lets go.\" They set it down. \"Anything that breaks without warning first lied to you for years.\""
      ]
@@ -1716,9 +1677,6 @@
     {
      "id": "silvan_the_quiet_pool_road",
      "label": "Ask what the road has taught them",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"That you can leave anything behind except your feet.\" Silvan the Quiet says it lightly, but it has corners. \"People think the road is freedom. The road is a landlord like any other — it takes its rent in soles and weather and names of places you will not see twice. I pay it because I am worse at paying the other kind.\""
      ]
@@ -1804,9 +1762,6 @@
     {
      "id": "bran_dogs",
      "label": "Ask about the dogs",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"Strays, the lot of them. Or were.\" The nearest one thumps its tail at Bran's voice without opening its eyes. \"People think I collect them soft-heartedly. It is a working arrangement — nothing on four legs crosses my fence line unannounced, and in exchange nobody here goes hungry or gets left out in the weather.\" He scratches an ear. \"Same deal I would take, honestly.\""
      ]
@@ -1943,9 +1898,6 @@
     {
      "id": "vela_ironheart_pool_work",
      "label": "Ask what the work is really like",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"Waiting,\" Vela Ironheart says flatly. \"Nine parts waiting, one part everything at once. The stories keep the one part and sell it as the whole trade.\" A shrug. \"Nobody sings about standing in the rain outside a door. The rain is the job.\""
      ]
@@ -2087,9 +2039,6 @@
     {
      "id": "yara_windcaller_pool_why",
      "label": "Ask what they are looking for",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"The same thing as everyone in my line — the piece that makes the rest make sense.\" Yara the Windcaller smiles at their own phrasing. \"You imagine it as a door, when you start. A vault, a tablet, one big answer. Twenty years in, you understand it is a THREAD. You do not find it. You notice you have been holding it a while.\""
      ]
@@ -2159,9 +2108,6 @@
     {
      "id": "zorin_nightblade_pool_work",
      "label": "Ask what the work is really like",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"Waiting,\" Zorin Nightblade says flatly. \"Nine parts waiting, one part everything at once. The stories keep the one part and sell it as the whole trade.\" A shrug. \"Nobody sings about standing in the rain outside a door. The rain is the job.\""
      ]
@@ -2231,9 +2177,6 @@
     {
      "id": "kirin_spellweaver_pool_method",
      "label": "Ask how they know what is true",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "Kirin Spellweaver takes the question seriously, which few do. \"I keep two lists. Things I can show you, and things I believe. The discipline is remembering which list is which — every fraud I have ever met started by letting the second list borrow the first one’s clothes.\""
      ]
@@ -2391,9 +2334,6 @@
     {
      "id": "nalren_kills",
      "label": "Ask what the cold actually kills",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"Deciding. That is what the cold kills first.\" Nalren says it like a man reading off a list he wrote in his own blood. \"Your hands go, then your feet, but you are still fine — until the part of you that picks between two options starts agreeing with whatever is easiest. Sitting down becomes reasonable. Everyone the cold has taken, it took by making the wrong thing sound sensible.\" He pushes a pair of liners across the counter. \"Buy the liners. That is me deciding for you while you can still afford it.\""
      ]
@@ -2480,7 +2420,7 @@
      "id": "nalren_pitch",
      "label": "Ask why his stall faces the wind",
      "gate": {
-      "minRegard": "known"
+      "minRegard": "familiar"
      },
      "lines": [
       "\"On purpose. It is the whole shopfront.\" Nalren spreads his arms into the gust like a man showing off a garden. \"Every other trader tucks in behind the wall and sells you warm-weather promises. You stand at MY counter, you feel exactly what the gear is for, while you are deciding.\" He grins, briefly, a rare sight. \"Cheapest honest advertising in Tartaria. The wind works for free.\""
@@ -2531,9 +2471,6 @@
     {
      "id": "monarch_agent_pool_office",
      "label": "Ask what the position actually involves",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"Less power and more paper than anyone believes.\" Veska of the Hollow gestures at the evidence. \"People imagine the faction as a fist. From the inside it is a LEDGER — everything my people are owed, everything we owe, and me at the hinge making sure the two lists never meet by surprise. The fist is what happens when someone like me makes an error.\""
      ]
@@ -2675,9 +2612,6 @@
     {
      "id": "dynasty_factor_pool_office",
      "label": "Ask what the position actually involves",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"Less power and more paper than anyone believes.\" Magister Caul Veyre gestures at the evidence. \"People imagine the faction as a fist. From the inside it is a LEDGER — everything my people are owed, everything we owe, and me at the hinge making sure the two lists never meet by surprise. The fist is what happens when someone like me makes an error.\""
      ]
@@ -2819,9 +2753,6 @@
     {
      "id": "builders_foreman_pool_office",
      "label": "Ask what the position actually involves",
-     "gate": {
-      "minRegard": "known"
-     },
      "lines": [
       "\"Less power and more paper than anyone believes.\" Foreman Drest Holloway gestures at the evidence. \"People imagine the faction as a fist. From the inside it is a LEDGER — everything my people are owed, everything we owe, and me at the hinge making sure the two lists never meet by surprise. The fist is what happens when someone like me makes an error.\""
      ]

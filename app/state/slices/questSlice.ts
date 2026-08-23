@@ -299,6 +299,7 @@ export const createQuestSlice = (
           rep,
           (player.activeHunts ?? []).map((h) => h.id),
           player.completedHuntIds ?? [],
+          player.hpMax, // OTA-1450 — never tease work the board will not post
         );
         nextTitle = pool[0]?.title;
       } else if (kind === 'mystery') {
@@ -1153,6 +1154,7 @@ export const createQuestSlice = (
         playerRep,
         (player.activeHunts ?? []).map((h) => h.id),
         player.completedHuntIds ?? [],
+        player.hpMax, // OTA-1450 — the same reach rule the offer used
       );
       for (const h of pool) offered.add(`"${h.title}"`);
       const found = direct && pool.includes(direct) ? direct : fuzzyFindHunt(titleOrId, pool);

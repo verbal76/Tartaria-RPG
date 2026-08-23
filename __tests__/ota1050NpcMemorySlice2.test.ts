@@ -39,9 +39,21 @@ const see = (m: WorldMemory, npc: NpcMet, times = 1, hours = 0) => {
 const rel = (m: WorldMemory, id: string) => (m.npcRelations ?? {})[id]!;
 
 describe('OTA-1050 — finishing the work is what counts', () => {
-  it('a contract TAKEN places you; a contract FINISHED makes you a regular', () => {
+  it('a contract TAKEN places you — ONCE YOU COME BACK; a contract FINISHED makes you a regular', () => {
+    // ⚠⚠ AMENDED BY OTA-1451 ON THE OWNER'S REPORT, AND THE AMENDMENT IS THE
+    // POINT. This rung used to open the instant a contract was signed, so a
+    // shopkeeper met eighteen seconds earlier would start discussing their
+    // people: *"it seems too easy to get to the later tiers of topics."*
+    // Accepting is a promise, not a payment — the only rung on this ladder that
+    // could be climbed by tapping.
+    //
+    // ⚠ WHAT OTA-1050 ASSERTED IS UNCHANGED. Taking work still PLACES you and
+    // still outranks merely being seen around; it now waits for the return trip.
     let m = see(emptyMemory(), IRMA);
     m = recordNpcDealing(m, IRMA.id, { contractsTaken: 1 });
+    expect(npcRegard(rel(m, IRMA.id))).toBe('met');       // same visit — not yet
+
+    m = see(m, IRMA, 1, 1);                                // …and now you're back
     expect(npcRegard(rel(m, IRMA.id))).toBe('known');
 
     m = recordNpcDealing(m, IRMA.id, { contractsTurnedIn: 1 });

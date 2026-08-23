@@ -126,9 +126,23 @@ describe('OTA-1058 — the slice is three people, and it says so', () => {
 });
 
 describe('OTA-1058 — warmth opens the conversation up', () => {
-  it('a stranger gets the shop-front topic and nothing personal', () => {
+  it('a stranger gets the shop-front topicS and nothing personal', () => {
+    // ⚠⚠ OTA-1451 — TWO counter questions now, not one, and the plural is the
+    // amendment. Owner, on the whole cast: *"it seems too easy to get to the
+    // later tiers of topics."* The fix had two halves, and this is the half
+    // people notice less: a stranger used to get ONE question per person across
+    // forty-one people, so the first rung read as a floodgate rather than a step
+    // — everything interesting arrived at once the moment you were placed. Irma
+    // now opens with her trade AND why her prices never move, both pure counter
+    // talk, and the personal ones moved up to where regulars stand.
+    //
+    // ⚠ THE CLAIM THIS TEST WAS WRITTEN FOR IS UNCHANGED AND STILL CHECKED: a
+    // stranger gets shop-front questions and NOTHING PERSONAL.
     const open = ids('irma_ironhand', at({ regard: 'met' }));
-    expect(open).toEqual(['irma_trade']);
+    expect(open).toEqual(['irma_trade', 'irma_prices']);
+    for (const personal of ['irma_apprentice', 'irma_halem', 'irma_giants']) {
+      expect(open).not.toContain(personal);
+    }
   });
 
   it('being placed unlocks the next layer', () => {

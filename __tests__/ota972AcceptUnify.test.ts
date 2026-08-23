@@ -62,6 +62,12 @@ async function boot(name: string) {
   store.setState((s) => ({
     player: {
       ...s.player!,
+      // ⚠ OTA-1450 — and a grown hpMax, because reputation stopped being the
+      // only gate on what a board posts: a hunt is offered when its recommended
+      // HP is within reach of yours. This suite is about what happens when three
+      // DIFFERENT contract kinds are accepted in a row, so the fixture has to
+      // clear the posting gates the same way it already cleared the rep one.
+      hpMax: 999,
       factionStanding: [
         ...s.player!.factionStanding.filter((r) => r.factionId !== FACTION),
         { factionId: FACTION, standing: 60 },

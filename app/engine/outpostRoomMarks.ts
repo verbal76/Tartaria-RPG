@@ -187,3 +187,46 @@ export function outpostRoomMark(factionId: string | null | undefined, structural
   const table = (factionId && OUTPOST_ROOM_MARKS[factionId]) || RECLAIMERS;
   return table[structuralId];
 }
+
+/** ⚠⚠ OTA-1450 — HOW FAR THE "YOU ARE HERE" MARKER RIDES ABOVE ITS POINT, as a
+ *  fraction of the RENDERED art width. Every point in the tables above was
+ *  sighted onto a painted room NAME, so a marker centred on its point sits on
+ *  the lettering. Owner: *"it places the you are here icon directly on the name
+ *  of the room, I need it directly above it but not obscuring any of it."*
+ *
+ *  ⚠⚠ AND IT LIVES HERE BECAUSE THERE ARE TWO MAPS. OTA-1441 lifted the marker
+ *  on the Atlas and left the corner mini-map — a separate component carrying its
+ *  own copy of the arithmetic — still centring on the point. The owner found it
+ *  the same day: *"the mini-map still has the location on the name."* That is
+ *  this project's many-doors mistake in its purest form: one door fixed, its
+ *  sibling left standing. The lift is ONE exported symbol now, and both maps
+ *  read it rather than each keeping a number.
+ *
+ *  ⚠ A FRACTION OF WIDTH, not a pixel count, because the mini-map ZOOMS its art
+ *  (×2.5). A fixed pixel lift would clear the name on the Atlas and land back on
+ *  it in the mini-map, where the painted lettering is two and a half times
+ *  larger. Scaling with the render keeps the gap visually identical on both.
+ *
+ *  ⚠ INTERIORS ONLY. The world atlas marks landmark silhouettes, not text, and
+ *  its placement was approved on device — lifting it there would be a
+ *  regression dressed as consistency. */
+export const INTERIOR_MARKER_LIFT_FRAC = 0.019;
+
+/** ⚠⚠ OTA-1451 — AND HOW FAR THE ✓ SITS BELOW ITS POINT. Same units, same
+ *  reason, opposite direction. Owner: *"when you are looking at the mini-map or
+ *  the Atlas map it should show the you are here above the name, and the ✓ below
+ *  it, that way you never have to guess."*
+ *
+ *  The ✓ carried the exact defect the marker carried before OTA-1441, and it
+ *  went unspotted for longer because a ✓ is small enough to read as decoration
+ *  when it lands on lettering: it was drawn CENTRED on the same name-point, so
+ *  it covered the middle of the room name it was meant to be endorsing. The two
+ *  glyphs now BRACKET the name — marker above, ✓ below — and the name itself is
+ *  never touched by either.
+ *
+ *  ⚠ Bigger than the lift on purpose, and it is not a taste call. The marker is
+ *  positioned by its BOTTOM edge, so its whole gap is the lift. The ✓ is drawn
+ *  inside a tall label box positioned by its TOP edge, and the glyph floats in
+ *  the middle of that box, so part of this number is spent crossing the box's
+ *  own padding before the tick appears. */
+export const INTERIOR_VISITED_DROP_FRAC = 0.030;
