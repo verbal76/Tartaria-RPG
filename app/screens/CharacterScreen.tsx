@@ -33,7 +33,14 @@ import {
   HOSTILE_STANDING,
 } from '../engine/pressure';
 // OTA-1067 — Phase 5: where the Arbiter stands, and what he thinks of you.
-import { arbiterSheetLines } from '../engine/arbiterPersona';
+// OTA-1448 — the sheet draws BOTH ladders in full, so it needs the orders, the
+// labels and the thresholds. All read from the engine, never copied: the rung
+// the player sees and the rule the engine applies are the same symbols.
+import {
+  arbiterSheetLines,
+  STANCE_ORDER, STANCE_MIN_CORES, STANCE_LABEL,
+  REGARD_ORDER, REGARD_BAND_FLOOR, REGARD_LABEL, REGARD_MIN,
+} from '../engine/arbiterPersona';
 import { hpBreakdown, hpBreakdownLine } from '../engine/hpBreakdown';
 import { giftLedger, giftLedgerLine } from '../engine/giftLedger';
 import type { EquipSlot } from '../engine/types';
@@ -83,7 +90,6 @@ export function CharacterScreen() {
   // arb119 — per-section collapse (hook must precede the early return below).
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   // OTA-848 — tap-to-expand: the AC breakdown, and which title's provenance is open.
-  const [acOpen, setAcOpen] = useState(false);
   const [openTitle, setOpenTitle] = useState<string | null>(null);
   // OTA-1161 — the gift ledger drills into the Arbiter's "N gifts given" row.
   const [giftsOpen, setGiftsOpen] = useState(false);
@@ -114,6 +120,15 @@ export function CharacterScreen() {
     ? `${barehand.count}d${barehand.sides}`
     : `${barehand.count}d${barehand.sides}${barehand.bonus > 0 ? '+' : ''}${barehand.bonus}`;
   const tier = corruptionTierOf(player.corruption ?? 0);
+  // ⚠ OTA-1448 — corruption's meter, beside HP and STA. The scale is the
+  // HOLLOWED floor (61) rather than an invented 100: corruption is uncapped, so
+  // "full" has to mean "the worst tier has been reached", and the fill clamps.
+  // Colour climbs with the tier so the bar reads before the label does.
+  const corrPct = (player.corruption ?? 0) / 61;
+  const corrColor = tier === 'hollowed' ? '#e07a5f'
+    : tier === 'corrupted' ? '#d08a4a'
+    : tier === 'tainted' ? '#c9a86a'
+    : '#7a8a5a';
 
   // OTA-1067 [Phase 5] — where the Arbiter stands in the arc, what he thinks
   // of this character, and the itemised reasons for it.
@@ -243,6 +258,26 @@ export function CharacterScreen() {
             </View>
             <Text style={styles.barValue}>{player.stamina}/{player.staminaMax}</Text>
           </View>
+          {/* ⚠⚠ OTA-1448 — CORRUPTION BELONGS WITH THE BODY, NOT THE PURSE.
+              Owner: *"corruption should be in the same section as hp and stamina
+              under your image, not listed with your wallet."* He is right about
+              the category error: TC is what you HAVE, corruption is what is
+              happening TO you — it subtracts from every stat, raises every
+              vendor's price, and pulls extra encounters. Filed under WALLET it
+              read as an accounting line; here it reads as a condition, beside
+              the other two meters that decide whether you live.
+              ⚠ Drawn as a bar for the same reason: a number among bars reads as
+              a footnote. The scale tops out at the HOLLOWED floor, so a full bar
+              means the worst tier has been reached rather than some invented
+              ceiling — corruption itself is uncapped. */}
+          <View style={styles.barRow}>
+            <Text style={styles.barLabel}>COR</Text>
+            <View style={styles.barBg}>
+              <View style={[styles.barFill, { width: `${Math.min(100, Math.max(0, corrPct * 100))}%`, backgroundColor: corrColor }]} />
+            </View>
+            <Text style={styles.barValue}>{player.corruption ?? 0} · {tierLabel(tier)}</Text>
+          </View>
+          <Text style={styles.kvSub}>↳ {tierDescription(tier)}</Text>
         </View>
 
         {/* ── HOW MUCH IT TAKES ─────────────────────────────────── */}
@@ -296,8 +331,63 @@ export function CharacterScreen() {
             {sectionHeader('arbiter', 'THE ARBITER')}
             {!collapsed.arbiter && (
             <View style={styles.card}>
-              <Text style={styles.kvKey}>{arbiter.stance}</Text>
-              <Text style={styles.kvValue}>{arbiter.regard}</Text>
+              {/* ⚠⚠ OTA-1448 — TWO LADDERS, DRAWN IN FULL. Owner: *"I have no
+                  idea what the text in there means... maybe post all the
+                  outcomes that are possible and gray them all out except what
+                  level you are at so we can see progression."*
+
+                  The sheet used to print exactly two sentences — his stance and
+                  his regard — with nothing to say they were RUNGS on anything.
+                  A line that quietly changes between sessions then reads as the
+                  writing wandering, not as something the player earned. Same
+                  fix the difficulty section already uses: show every rung, mark
+                  the one you are on, dim the rest. */}
+              <Text style={styles.ladderTitle}>WHERE HE STANDS</Text>
+              <Text style={styles.ladderNote}>
+                Rises with Cores recovered — {arbiter.cores} of 9. It only ever goes up.
+              </Text>
+              {STANCE_ORDER.map((id) => {
+                const here = id === arbiter.stanceId;
+                const need = STANCE_MIN_CORES[id];
+                return (
+                  <View key={id} style={[styles.ladderRow, !here && styles.ladderRowDim]}>
+                    <Text style={[styles.ladderMark, here && styles.ladderMarkOn]}>{here ? '▸' : ' '}</Text>
+                    <Text style={[styles.ladderText, here && styles.ladderTextOn]}>
+                      {STANCE_LABEL[id]}
+                    </Text>
+                    <Text style={[styles.ladderReq, here && styles.ladderReqOn]}>
+                      {need === 0 ? 'start' : `${need} Core${need === 1 ? '' : 's'}`}
+                    </Text>
+                  </View>
+                );
+              })}
+
+              {/* ⚠ The second ladder moves BOTH ways, and saying so is the point:
+                  stance is a road, regard is a verdict you can climb back from.
+                  The floors come from REGARD_BAND_FLOOR — the same symbols
+                  regardBandOf compares against, never a copy of them. */}
+              <Text style={[styles.ladderTitle, { marginTop: 14 }]}>WHAT HE THINKS OF YOU</Text>
+              <Text style={styles.ladderNote}>
+                Earned by conduct, and it moves both ways — you are at {arbiter.score >= 0 ? '+' : ''}{arbiter.score}.
+              </Text>
+              {REGARD_ORDER.map((id) => {
+                const here = id === arbiter.bandId;
+                const floor = REGARD_BAND_FLOOR[id];
+                return (
+                  <View key={id} style={[styles.ladderRow, !here && styles.ladderRowDim]}>
+                    <Text style={[styles.ladderMark, here && styles.ladderMarkOn]}>{here ? '▸' : ' '}</Text>
+                    <Text style={[styles.ladderText, here && styles.ladderTextOn]}>
+                      {REGARD_LABEL[id]}
+                    </Text>
+                    <Text style={[styles.ladderReq, here && styles.ladderReqOn]}>
+                      {floor <= REGARD_MIN ? 'lowest' : `${floor >= 0 ? '+' : ''}${floor}`}
+                    </Text>
+                  </View>
+                );
+              })}
+              {arbiter.parts.length > 0 && (
+                <Text style={[styles.ladderTitle, { marginTop: 14 }]}>WHAT MOVED IT</Text>
+              )}
               {arbiter.parts.length > 0 && (
                 <View style={{ marginTop: 10 }}>
                   {arbiter.parts.map((part, i) => {
@@ -399,30 +489,25 @@ export function CharacterScreen() {
         {sectionHeader('defense', 'DEFENSE')}
         {!collapsed.defense && (
         <View style={styles.card}>
-          {/* OTA-848 — the whole AC row is tappable: it expands a readable,
-              line-per-source breakdown of exactly what builds the number (base +
-              each armor piece / stance / title / racial). OTA-836 first surfaced
-              these as chips; the tap keeps the card clean by default and lets the
-              player audit any surprising AC on demand. */}
-          <TouchableOpacity
-            style={styles.kvRow}
-            activeOpacity={acBd.sources.length > 0 ? 0.7 : 1}
-            onPress={() => acBd.sources.length > 0 && setAcOpen((v) => !v)}
-            accessibilityRole="button"
-            accessibilityState={{ expanded: acOpen }}
-          >
-            <Text style={styles.kvKey}>
-              Armor Class{acBd.sources.length > 0 && <Text style={styles.tapHint}>  {acOpen ? '▾' : '▸'}</Text>}
-            </Text>
+          {/* OTA-848 — a readable, line-per-source breakdown of exactly what
+              builds the number (base + each armor piece / stance / title /
+              racial). OTA-836 first surfaced these as chips.
+              ⚠⚠ OTA-1448 — AND IT IS NO LONGER BEHIND A TAP. Owner: *"in the
+              defense category it should always show what makes up your AC, you
+              shouldn't have to tap to see it."* The tap was added to keep the
+              card tidy, which traded the one number players most often want to
+              audit for a row of whitespace. AC is the number that decides
+              whether a hit lands; a breakdown nobody opens is a breakdown that
+              may as well not exist. Always open, no state, no affordance to
+              miss. */}
+          <View style={styles.kvRow}>
+            <Text style={styles.kvKey}>Armor Class</Text>
             <Text style={styles.kvValue}>
               {acBd.total}
               {acBd.sources.length > 0 && <Text style={styles.statBase}>  (base {acBd.base})</Text>}
             </Text>
-          </TouchableOpacity>
-          {acBd.sources.length > 0 && !acOpen && (
-            <Text style={styles.tapHintLine}>tap to see what makes up your AC ›</Text>
-          )}
-          {acBd.sources.length > 0 && acOpen && (
+          </View>
+          {acBd.sources.length > 0 && (
             <View style={styles.breakdownList}>
               <View style={styles.breakdownRow}>
                 <Text style={styles.breakdownDelta}>{acBd.base}</Text>
@@ -455,21 +540,21 @@ export function CharacterScreen() {
         </View>
         )}
 
-        {/* ── WALLET & CONDITION ────────────────────────────────── */}
-        {sectionHeader('wallet', 'WALLET & CONDITION')}
+        {/* ── WALLET & REPUTATION ───────────────────────────────── */}
+        {/* ⚠ OTA-1448 — was "WALLET & CONDITION". The condition half (corruption)
+            moved to the header card beside HP and STA, which leaves coin and the
+            reputation for violence — so the header says what the card holds. */}
+        {sectionHeader('wallet', 'WALLET & REPUTATION')}
         {!collapsed.wallet && (
         <View style={styles.card}>
           <View style={styles.kvRow}>
             <Text style={styles.kvKey}>TC</Text>
             <Text style={styles.kvValue}>{player.tc}</Text>
           </View>
-          <View style={styles.kvRow}>
-            <Text style={styles.kvKey}>Corruption</Text>
-            <Text style={[styles.kvValue, tier === 'hollowed' && styles.danger, tier === 'corrupted' && styles.warning]}>
-              {player.corruption} · {tierLabel(tier)}
-            </Text>
-          </View>
-          <Text style={styles.kvSub}>↳ {tierDescription(tier)}</Text>
+          {/* ⚠ OTA-1448 — CORRUPTION MOVED OUT of this card, up to the header
+              beside HP and STA. It is a condition, not an asset; filing it next
+              to TC made it read as bookkeeping. Menace stays: it IS a fact about
+              your standing in the world rather than your body. */}
           {/* OTA-808 — MENACE: your reputation for ruling by fear. Shown once you've
               built any (intimidation raises it), so it doesn't clutter a peaceful
               run. Higher menace stiffens your own intimidate checks and draws
@@ -1173,6 +1258,19 @@ const styles = StyleSheet.create({
   // OTA-848 — tap-to-expand affordances + readable breakdown lists.
   tapHint: { color: '#a2977b', fontSize: 11, fontWeight: '400' },
   tapHintLine: { color: '#a2977b', fontSize: 9, fontStyle: 'italic', marginTop: 3, letterSpacing: 0.3 },
+  // ⚠ OTA-1448 — the Arbiter's two ladders. Dimming carries the whole meaning
+  // here, so the lit/unlit gap is deliberately wide: an unreached rung has to
+  // read as "not yet" at a glance, not as slightly quieter text.
+  ladderTitle: { color: '#8aa0a4', fontSize: 10, letterSpacing: 3, fontWeight: '700', marginBottom: 2 },
+  ladderNote: { color: '#a2977b', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
+  ladderRow: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 3 },
+  ladderRowDim: { opacity: 0.38 },
+  ladderMark: { color: '#5a6a6e', fontSize: 12, width: 14 },
+  ladderMarkOn: { color: '#c9a86a', fontWeight: '700' },
+  ladderText: { color: '#cdbf99', fontSize: 12, flex: 1, lineHeight: 17 },
+  ladderTextOn: { color: '#e6d8b3', fontWeight: '700' },
+  ladderReq: { color: '#8aa0a4', fontSize: 10, marginLeft: 8, minWidth: 52, textAlign: 'right' },
+  ladderReqOn: { color: '#c9a86a', fontWeight: '700' },
   breakdownList: { marginTop: 6, borderTopColor: '#2a2620', borderTopWidth: 1, paddingTop: 6 },
   breakdownRow: { flexDirection: 'row', alignItems: 'baseline', paddingVertical: 2 },
   breakdownDelta: { color: '#9ec96a', fontSize: 12, fontWeight: '700', width: 40 },

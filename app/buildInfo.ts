@@ -24369,7 +24369,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // shows in the amber border and lighter fill now, not in extra thickness).
 // OTA-1446 — the ♂/♀ sign moves once more, by owner's eye: directly UNDER
 // the faction emblem instead of beside it, same emblem size, same gold.
-export const OTA_BUILD_ID = '2026-08-23-1446-the-sign-below-the-emblem';
+// OTA-1448 — three things the character sheet knew and did not say. THE
+// ARBITER now draws both of his ladders in full — where he stands (five rungs,
+// each labelled with the Cores it costs) and what he thinks of you (five bands
+// with their thresholds and your current score) — with your rung lit and the
+// rest greyed, so the section reads as progression instead of two sentences
+// nobody could place. DEFENSE shows what makes up your AC always, with no tap.
+// CORRUPTION moves out of the wallet and up beside HP and stamina as a third
+// meter, where a condition that eats your stats belongs.
+export const OTA_BUILD_ID = '2026-08-23-1448-the-sheet-says-what-it-knows';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1446-the-sign-below-the-emblem';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1445-three-buttons-one-height';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1444-the-ledger-grew-a-line';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1443-the-sign-at-rank';

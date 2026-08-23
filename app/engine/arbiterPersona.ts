@@ -210,12 +210,29 @@ export function regardScore(
   return clamp(regardParts(p, wm).reduce((n, part) => n + part.value, 0), REGARD_MIN, REGARD_MAX);
 }
 
+/** ⚠ OTA-1448 — THE BAND FLOORS, IN ONE PLACE. These were four inline
+ *  comparisons inside `regardBandOf`, which meant the character sheet could not
+ *  show the player what the next band costs without copying the numbers — and a
+ *  copied threshold is the OTA-1156/1158 defect this project keeps paying for.
+ *  The ladder the sheet draws and the rule the engine applies are now the same
+ *  symbols, so they cannot drift.
+ *
+ *  Ascending, same shape as STANCE_MIN_CORES. `cold` floors at REGARD_MIN
+ *  because the total is clamped there. */
+export const REGARD_BAND_FLOOR: Record<RegardBand, number> = {
+  cold: REGARD_MIN,
+  wary: -29,
+  even: -9,
+  warm: 15,
+  kin: 40,
+};
+
 export function regardBandOf(score: number): RegardBand {
-  if (score <= -30) return 'cold';
-  if (score <= -10) return 'wary';
-  if (score < 15) return 'even';
-  if (score < 40) return 'warm';
-  return 'kin';
+  let out: RegardBand = 'cold';
+  for (const b of REGARD_ORDER) {
+    if (score >= REGARD_BAND_FLOOR[b]) out = b;
+  }
+  return out;
 }
 
 export function regardOf(
@@ -478,11 +495,34 @@ export function arbiterBrief(
 
 /** Character-sheet copy: where he stands, what he thinks, and the itemised
  *  why. Same contract as the Phase 4 pressure section — the player can always
- *  see what the game has decided about them. */
+ *  see what the game has decided about them.
+ *
+ *  ⚠⚠ OTA-1448 — AND NOW WHERE THAT SITS ON THE LADDER. Owner, reading his own
+ *  sheet: *"I have no idea what the text in there means, and I don't think the
+ *  player does either — maybe post all the outcomes that are possible and gray
+ *  them all out except what level you are at so we can see progression."*
+ *
+ *  He is right, and the diagnosis is precise: the sheet printed two evocative
+ *  sentences ("He watches your hands.") with nothing to say they were RUNGS.
+ *  Two hidden ladders, no floor and no ceiling shown, so a line that changes
+ *  between sessions reads as the writing wandering rather than as progress the
+ *  player caused. The ids, the whole ordered ladders, the score and the Cores
+ *  count now come back too, so the screen can draw both in full and light the
+ *  rung you are on — the same treatment the difficulty section already gets. */
 export function arbiterSheetLines(
   p: (Parameters<typeof regardParts>[0] & Pick<PlayerCharacter, 'mainQuest'>) | null | undefined,
   wm: Parameters<typeof regardParts>[1],
-): { stance: string; regard: string; parts: RegardPart[] } | null {
+): {
+  stance: string;
+  regard: string;
+  parts: RegardPart[];
+  stanceId: ArbiterStance;
+  bandId: RegardBand;
+  /** The summed opinion, clamped exactly as the engine clamps it. */
+  score: number;
+  /** Cores recovered — what moves the stance ladder, and nothing else does. */
+  cores: number;
+} | null {
   if (!p) return null;
   const stance = stanceOf(p);
   const band = regardOf(p, wm);
@@ -490,6 +530,10 @@ export function arbiterSheetLines(
     stance: STANCE_LABEL[stance],
     regard: REGARD_LABEL[band],
     parts: regardParts(p, wm),
+    stanceId: stance,
+    bandId: band,
+    score: regardScore(p, wm),
+    cores: p.mainQuest?.coresRecovered?.length ?? 0,
   };
 }
 
