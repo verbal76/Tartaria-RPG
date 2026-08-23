@@ -24363,7 +24363,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // motive were already covered (creation requires the first two; the OTA-1022
 // one-time motive picker asks veterans the third on load), so sex was the one
 // missing field — now no save, however old, shows an incomplete banner.
-export const OTA_BUILD_ID = '2026-08-23-1444-the-ledger-grew-a-line';
+// OTA-1445 — title-screen footer, by owner order: New Tartarian, then CHECK
+// FOR OTA UPDATE, then Restore from backup — and all three the same height
+// (the lead button drops to the OTA line's padding and font size; its rank
+// shows in the amber border and lighter fill now, not in extra thickness).
+export const OTA_BUILD_ID = '2026-08-23-1445-three-buttons-one-height';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1444-the-ledger-grew-a-line';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1443-the-sign-at-rank';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1442-type-it-yourself';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1441-your-own-first-screen';

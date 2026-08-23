@@ -1161,20 +1161,6 @@ export function TitleScreen() {
                 {bootGateOpen ? 'New Tartarian' : `${bootGateReason}`}
               </Text>
             </TouchableOpacity>
-            {/* OTA-1178 — restore a backed-up character from the clipboard.
-                Sits under New Tartarian because that is where a player goes when
-                they have no character and want one. It never overwrites: a
-                restore always arrives as an additional character. */}
-            <TouchableOpacity
-              style={[styles.secondaryBtn, !bootGateOpen && styles.btnDisabled]}
-              onPress={() => { void restoreFromClipboard(); }}
-              activeOpacity={0.7}
-              disabled={!bootGateOpen}
-              accessibilityRole="button"
-              accessibilityState={{ disabled: !bootGateOpen }}
-            >
-              <Text style={styles.secondaryBtnText}>Restore from backup</Text>
-            </TouchableOpacity>
             {/* 2026-05-25 — manual CHECK FOR OTA UPDATE button restored.
                 Removed in v2.4.1 (OTA 051) on the theory that the auto-
                 check in useEffect was sufficient. Playtester report:
@@ -1247,6 +1233,22 @@ export function TitleScreen() {
                 {applyingOTA
                   ?? (modelsLoading ? 'Models loading — please wait' : 'CHECK FOR OTA UPDATE')}
               </Text>
+            </TouchableOpacity>
+            {/* OTA-1178 — restore a backed-up character from the clipboard. It
+                never overwrites: a restore always arrives as an additional
+                character. ⚠ OTA-1445 — moved BELOW the OTA button by owner
+                order ("new tartarian first, check for OTA update second and
+                restore from backup third"): restoring is the rarest of the
+                three actions, so it takes the last slot. */}
+            <TouchableOpacity
+              style={[styles.secondaryBtn, !bootGateOpen && styles.btnDisabled]}
+              onPress={() => { void restoreFromClipboard(); }}
+              activeOpacity={0.7}
+              disabled={!bootGateOpen}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !bootGateOpen }}
+            >
+              <Text style={styles.secondaryBtnText}>Restore from backup</Text>
             </TouchableOpacity>
           </View>
         }
@@ -1786,15 +1788,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   footerActions: { gap: 8, marginTop: 12 },
+  // ⚠ OTA-1445 — SAME THICKNESS AS THE OTA LINE, by owner order: padding and
+  // font size are the secondaryBtn's exact metrics, so all three footer
+  // buttons stand the same height. The lead action keeps its amber border and
+  // lighter fill — rank shows in colour now, not in size.
   primaryBtn: {
     backgroundColor: '#3a342c',
-    paddingVertical: 14,
+    paddingVertical: 12,
     alignItems: 'center',
     borderRadius: 4,
     borderColor: '#c9a86a',
     borderWidth: 1,
   },
-  primaryBtnText: { color: '#e6d8b3', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  primaryBtnText: { color: '#e6d8b3', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
   secondaryBtn: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',
