@@ -57,3 +57,98 @@ export const HOURS_PER_TILE_TRUE = 2.5;
 export function travelHoursFor(distanceTiles: number): number {
   return Math.max(0, distanceTiles) * HOURS_PER_TILE_TRUE;
 }
+
+// ---------------------------------------------------------------------------
+// OTA-1477 — AND THE ONE PLACE TIME BECOMES WORDS.
+// ---------------------------------------------------------------------------
+//
+// ⚠ OTA-1167 fixed the autoroute BANNER to quote `travelHoursFor` and stopped
+// there. The COMPASS kept its own conversion — `TILES_PER_DAY = 1` in
+// worldDirections, plus a hand-inlined second copy of the same arithmetic in
+// gameStore — and so the two instruments priced one distance an order of
+// magnitude apart. From the 4.32.11 log, 70 seconds apart, about the same two
+// tiles:
+//     23:49:04  You set course for Voronov. 2 tiles — about 5 hours of travel, all in.
+//     23:50:14  [Voronov] north: Drakova (2 days' travel) · east: Ostragar (9 days' travel)
+// 48 hours against 5. A player budgeting a contract window off the compass is
+// off by 9.6×, and nothing in the game tells them which number to believe.
+//
+// The named class is copied-constant drift, and the fix is the same one every
+// time: delete the copy rather than correct it. `formatWindow` moved here from
+// bountyPrimer (it is a time formatter, not a bounty concern; bountyPrimer
+// re-exports it so its callers are untouched), and the three surfaces that
+// price a distance for the player — banner, compass radar, ASK answer — now
+// come out of `travelPhraseFor` and cannot disagree again.
+//
+// ⚠ THE UNIT IS THE ALL-IN ALLOWANCE, NOT THE WORLD CLOCK. Walking 2 tiles
+// advances `hoursElapsed` by 0.5 h (TILE_HOURS). We quote 5 h because that is
+// what the journey COSTS once the stamina is rested back, and because it is
+// the number `bountyDeadlineFor` builds a deadline out of. A compass that
+// quoted the clock would be precisely accurate and useless for the only
+// decision a player makes with it.
+
+/** Render an in-game hour count the way the owner asked time to read — "days, hours",
+ *  never steps or rests. ("I still want time to be seen as time in the game days,
+ *  hours, things like that.") */
+export function formatWindow(hours: number): string {
+  const h = Math.max(0, Math.round(hours));
+  const d = Math.floor(h / 24);
+  const r = h % 24;
+  const dPart = d > 0 ? `${d} day${d === 1 ? '' : 's'}` : '';
+  const hPart = r > 0 ? `${r} hour${r === 1 ? '' : 's'}` : '';
+  if (dPart && hPart) return `${dPart}, ${hPart}`;
+  return dPart || hPart || '0 hours';
+}
+
+/** ⚠ What a compass says when it does not know. A non-finite distance is a data
+ *  bug upstream (a missing map position, a subtraction against undefined), and
+ *  the two things it must NOT become are "NaN tiles" and a confident zero. The
+ *  old `distanceInDays` produced "NaN days' travel" for exactly this input;
+ *  `Math.max(0, NaN)` is NaN, so the clamp everybody assumes is there is not. */
+export const UNKNOWN_DISTANCE = 'distance unknown';
+
+/** "2 tiles" / "1 tile". The distance the player can count on the map, in the
+ *  same word the travel banner already uses for it. */
+export function tilesPhrase(distanceTiles: number): string {
+  if (!Number.isFinite(distanceTiles)) return UNKNOWN_DISTANCE;
+  const t = Math.max(0, Math.round(distanceTiles));
+  return `${t} tile${t === 1 ? '' : 's'}`;
+}
+
+/** ⚠ THE ONE NUMBER. Both renderings below quote this and nothing else, so a
+ *  short line and a long sentence can never come to differ about a distance the
+ *  way the compass and the banner did. */
+export function travelWindowFor(distanceTiles: number): string {
+  return formatWindow(travelHoursFor(Math.max(0, Math.round(distanceTiles))));
+}
+
+/** ⚠ THE PHRASE, long form — for a surface that says it ONCE, in a sentence:
+ *  "Drakova lies north — 2 tiles, about 5 hours of travel." Standing on the
+ *  thing answers "you stand on it"; the compass and the name lookup both need
+ *  that case and both used to spell it out themselves.
+ *
+ *  Reads as a noun phrase deliberately, so callers hang it off a dash instead
+ *  of splicing it mid-clause. The old phrase was short enough to splice
+ *  ("Drakova lies 2 days' travel north") and this one is not — a call site that
+ *  keeps the old grammar now reads as obvious garbage instead of quiet nonsense. */
+export function travelPhraseFor(distanceTiles: number): string {
+  if (!Number.isFinite(distanceTiles)) return UNKNOWN_DISTANCE;
+  const t = Math.max(0, Math.round(distanceTiles));
+  if (t <= 0) return 'you stand on it';
+  return `${tilesPhrase(t)}, about ${travelWindowFor(t)} of travel`;
+}
+
+/** ⚠ THE SAME PHRASE, short form — for the four-cardinal radar and the compass
+ *  bearings line, where it repeats FOUR TIMES in one entry and "about … of
+ *  travel" ×4 is noise rather than information. "2 tiles, 5 hours".
+ *
+ *  ⚠ This is ONE DERIVATION WITH TWO RENDERINGS, not a second scale: both go
+ *  through `travelWindowFor`. That distinction is the whole subject of this OTA,
+ *  so if a third surface wants a third shape, add it HERE — do not spell a
+ *  format out at the call site, which is exactly how the day scale survived. */
+export function travelPhraseShort(distanceTiles: number): string {
+  if (!Number.isFinite(distanceTiles)) return UNKNOWN_DISTANCE;
+  const t = Math.max(0, Math.round(distanceTiles));
+  if (t <= 0) return 'you stand on it';
+  return `${tilesPhrase(t)}, ${travelWindowFor(t)}`;
+}

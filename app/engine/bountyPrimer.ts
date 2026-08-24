@@ -21,6 +21,7 @@
 
 import type { FactionBounty } from './factionBounty';
 import { giverDifficulty } from './factionBounty';
+import { formatWindow } from './travelTime';
 
 /** The broker. Named for the nine halls whose paper he has carried — which is every
  *  faction in the game, and the reason he can speak for a trade none of them owns.
@@ -30,18 +31,12 @@ import { giverDifficulty } from './factionBounty';
  *  the systems. */
 export const BOUNTY_BROKER = 'Jakar Nine-Halls';
 
-/** Render an in-game hour count the way the owner asked time to read — "days, hours",
- *  never steps or rests. ("I still want time to be seen as time in the game days,
- *  hours, things like that.") */
-export function formatWindow(hours: number): string {
-  const h = Math.max(0, Math.round(hours));
-  const d = Math.floor(h / 24);
-  const r = h % 24;
-  const dPart = d > 0 ? `${d} day${d === 1 ? '' : 's'}` : '';
-  const hPart = r > 0 ? `${r} hour${r === 1 ? '' : 's'}` : '';
-  if (dPart && hPart) return `${dPart}, ${hPart}`;
-  return dPart || hPart || '0 hours';
-}
+/** ⚠ OTA-1477 — `formatWindow` MOVED to `travelTime.ts`, beside the tile→hour
+ *  conversion whose output it formats, because the compass needed the same
+ *  vocabulary and a bounty module is the wrong owner for the game's clock words.
+ *  Re-exported here so every existing caller and pin keeps working. This is the
+ *  SAME function re-exported, not a second copy — do not re-inline it. */
+export { formatWindow };
 
 /** Why THIS contract asks for THIS many. The count is not flavor — it is
  *  `3 + ceil(tide/2) + giverDifficulty(standing)`, so a hall that trusts you asks for

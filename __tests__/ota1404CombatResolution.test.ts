@@ -114,20 +114,23 @@ describe('OTA-1404 — single-owner state travelled WITH its owner', () => {
   });
 });
 
-describe('OTA-1404 — the whole family went, and nothing was left behind', () => {
-  const MOVED = [
-    'applyEnemyCounter', 'applyEnemyCounterToDog', 'runEnemyGroupCounters',
-    'tickEnemyDotsAndMaybeEndFight', 'sweepDeadEnemies', 'runSurvivorVolley',
-    'enemyChannelsTechnique', 'swapEnemyTrait', 'staggerEnemy', 'takeStagger',
-    'aggregateArmor', 'effectiveACBreakdown', 'describeWornForAcLedger',
-    'playerArmorResistKinds', 'playerColdResist', 'playerWeaponReach',
-    'dogVestAcBonus', 'damageModClause', 'recordEnemyIntel', 'playerIsDownNotDead',
-    'handlePlayerDeath', 'runMoveCombatRange', 'enemyIsAirborne', 'isRangedEnemy',
-    'enemyCanReach', 'parseEnemyAP', 'playerBuildScore', 'enemyBuildScore',
-    'canonDT', 'dtProcChance', 'activeEnemy', 'checkLowHpWarning',
-    'applyEscortDamage', 'failEscortQuests',
-  ];
+/** ⚠ MODULE scope, not describe scope — the arithmetic block at the bottom needs
+ *  the same list, and a second copy of it in this file would be the very defect
+ *  the file is written to guard against. */
+const MOVED = [
+  'applyEnemyCounter', 'applyEnemyCounterToDog', 'runEnemyGroupCounters',
+  'tickEnemyDotsAndMaybeEndFight', 'sweepDeadEnemies', 'runSurvivorVolley',
+  'enemyChannelsTechnique', 'swapEnemyTrait', 'staggerEnemy', 'takeStagger',
+  'aggregateArmor', 'effectiveACBreakdown', 'describeWornForAcLedger',
+  'playerArmorResistKinds', 'playerColdResist', 'playerWeaponReach',
+  'dogVestAcBonus', 'damageModClause', 'recordEnemyIntel', 'playerIsDownNotDead',
+  'handlePlayerDeath', 'runMoveCombatRange', 'enemyIsAirborne', 'isRangedEnemy',
+  'enemyCanReach', 'parseEnemyAP', 'playerBuildScore', 'enemyBuildScore',
+  'canonDT', 'dtProcChance', 'activeEnemy', 'checkLowHpWarning',
+  'applyEscortDamage', 'failEscortQuests',
+];
 
+describe('OTA-1404 — the whole family went, and nothing was left behind', () => {
   it('⚠⚠ every one of the 34 is DEFINED in the leaf and nowhere else', () => {
     const storeCode = codeOnly(STORE);
     for (const name of MOVED) {
@@ -178,24 +181,99 @@ describe('OTA-1404 — the pins were re-pointed, not blunted', () => {
 });
 
 describe('OTA-1404 — the move changed no behaviour, and here is the arithmetic', () => {
-  it('⚠ the store is ~2,300 lines lighter and the leaf is that much heavier', () => {
-    // Not a vanity metric: a move that "shrank" the store by more than it added
-    // to the leaf would mean something was dropped on the floor.
+  it('⚠ the leaf is carrying real bodies, not just the names of them', () => {
+    // ⚠⚠ OTA-1477 — THIS TEST WAS A COUNTDOWN DRESSED AS A RATCHET, AND IT WENT
+    // OFF. It read:
+    //     expect(storeLines).toBeLessThan(35_400);
+    //     expect(37_300 - storeLines).toBeGreaterThan(2_000);
+    //     expect(leafLines).toBeGreaterThan(2_400);
+    // OTA-1430 had already moved the first ceiling once (35,000 → 35,400) and
+    // wrote, correctly, that "a hard line count is a countdown, not a ratchet —
+    // it fails on the day someone adds a legitimate twenty lines and says
+    // nothing about whether the SLICE still holds." It then committed the same
+    // mistake in the next line: `37_300 - storeLines > 2_000` is the identical
+    // countdown with a subtraction in front of it. It went red on a two-line
+    // compass fix — 1,998 against 2,000 — having said nothing whatsoever about
+    // combat resolution.
     //
-    // ⚠ OTA-1430 — the ceiling moved 35,000 → 35,400. The store is a LIVING file
-    // that keeps getting features (this one: the exit tied to the room with the
-    // door), so a hard line count is a countdown, not a ratchet — it fails on the
-    // day someone adds a legitimate twenty lines and says nothing about whether
-    // the SLICE still holds. What the slice actually claims is the pre-move
-    // baseline of ~37,300, which is what the second assertion below now guards.
-    const storeLines = STORE.split('\n').length;
+    // ⚠ WHAT THE SLICE ACTUALLY CLAIMS is not a number of lines in gameStore. It
+    // is: the 34 functions live in the leaf, the store has no copy of them, and
+    // the leaf carries their real BODIES rather than 34 one-line stubs
+    // delegating somewhere else. The first two are pinned above, by name, and
+    // cannot rot. The third is what this test now measures.
+    //
+    // ⚠ The floor below is a TRUE ratchet: the leaf only grows as combat grows,
+    // so nothing legitimate ever drives it down. What drives it down is the
+    // extraction being reverted or hollowed out, which is precisely the event
+    // worth failing on. It is deliberately not an upper bound — an upper bound
+    // on a living file is the countdown all over again.
+    const bodyLinesOf = (src: string, name: string): number => {
+      const start = src.search(new RegExp(`^(export )?function ${name}[(<]`, 'm'));
+      if (start < 0) return 0;
+      // A top-level function ends at the first `}` in column 0 after it.
+      const end = src.indexOf('\n}', start);
+      if (end < 0) return 0;
+      return src.slice(start, end).split('\n').length;
+    };
+
+    // ⚠ THE FIVE THAT ARE GENUINELY TINY, BY NAME. A first draft of this test
+    // set a blanket bar of "> 3 lines" on the reasoning that `canonDT` and
+    // `activeEnemy` were the smallest members. That was a guess and it was
+    // wrong — five of the 34 are one-expression predicates, and the bar failed
+    // on the fix rather than on a defect. Measured instead of assumed:
+    //   enemyIsAirborne 2 · dtProcChance 2 · playerColdResist 3
+    //   playerIsDownNotDead 3 · isRangedEnemy 3 · then parseEnemyAP 4
+    // Naming them is the instrument: a SIXTH member shrinking to three lines is
+    // a function being hollowed out, and it fails here.
+    const KNOWN_TINY = new Set([
+      'enemyIsAirborne', 'dtProcChance', 'playerColdResist',
+      'playerIsDownNotDead', 'isRangedEnemy',
+    ]);
+
+    let measured = 0;
+    const unexpectedlyTiny: string[] = [];
+    for (const name of MOVED) {
+      const lines = bodyLinesOf(COMBAT, name);
+      // ⚠ ABSENT vs NOT-WHERE-I-LOOKED: a 0 means the regex stopped matching,
+      // and it must never be allowed to read as "a very small function".
+      expect(lines).toBeGreaterThan(0);
+      if (lines <= 3 && !KNOWN_TINY.has(name)) unexpectedlyTiny.push(`${name} (${lines})`);
+      measured += lines;
+    }
+    // Prove the measurement ran over the whole list rather than a slice of it.
+    expect(MOVED.length).toBe(34);
+    expect(unexpectedlyTiny).toEqual([]);
+    // …and that the allowlist is not quietly covering for functions that grew
+    // past it — an allowlist nobody prunes is a suppression, not a rule.
+    for (const name of KNOWN_TINY) {
+      expect(bodyLinesOf(COMBAT, name)).toBeLessThanOrEqual(3);
+    }
+
+    // The family weighs what a moved family should weigh. Measured at 1,954
+    // lines across the 34; the floor is set below that with room for ordinary
+    // trimming, and it only ever moves UP.
+    expect(measured).toBeGreaterThan(1_800);
+    // …and it is the bulk of the leaf, not a corner of it — so the file cannot
+    // pass by having grown unrelated code while the combat family shrank.
+    // …and it is the BULK of the leaf (measured: 1,954 of 2,517 lines, 78%),
+    // not a corner of it — so the file cannot pass this test by growing
+    // unrelated code while the combat family quietly shrinks.
     const leafLines = COMBAT.split('\n').length + GEARWEAR.split('\n').length;
-    expect(storeLines).toBeLessThan(35_400);
-    // ⚠ THE CLAIM ITSELF: the store is still at least ~2,300 lines below where it
-    // stood before the move, and the leaf still carries them. This is the part
-    // that would break if the extraction were reverted or hollowed out.
-    expect(37_300 - storeLines).toBeGreaterThan(2_000);
     expect(leafLines).toBeGreaterThan(2_400);
+    expect(measured / leafLines).toBeGreaterThan(0.6);
+  });
+
+  it('⚠ the store still holds no body for any of them, however big it grows', () => {
+    // The half of the old arithmetic that was worth keeping, said in a way that
+    // cannot rot: it is about gameStore's CONTENT, not gameStore's SIZE.
+    const storeCode = codeOnly(STORE);
+    let checked = 0;
+    for (const name of MOVED) {
+      expect(storeCode).not.toMatch(new RegExp(`^(export )?function ${name}\\b`, 'm'));
+      expect(storeCode).not.toMatch(new RegExp(`^const ${name}\\s*=\\s*(async\\s*)?\\(`, 'm'));
+      checked++;
+    }
+    expect(checked).toBe(34);
   });
 
   it('⚠ the header records what measuring said, including what it REFUSED to move', () => {

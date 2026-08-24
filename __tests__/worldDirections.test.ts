@@ -1,13 +1,19 @@
 import {
-  distanceInDays,
   findNamedById,
   findNamedByQuery,
   findNearestNamed,
   describeAllDirections,
   parseDirectionQuestion,
-  TILES_PER_DAY,
 } from '../app/engine/worldDirections';
 import { generateWorldMap } from '../app/engine/worldMap';
+import {
+  travelPhraseFor,
+  travelPhraseShort,
+  travelHoursFor,
+  formatWindow,
+  HOURS_PER_TILE_TRUE,
+} from '../app/engine/travelTime';
+import * as worldDirections from '../app/engine/worldDirections';
 
 // A deterministic map for the lookup tests. Seed and starting location
 // fixed so the test is reproducible.
@@ -20,23 +26,98 @@ const start = map.positions[TEST_START]!;
 const fromX = start.x;
 const fromY = start.y;
 
-describe('distanceInDays', () => {
-  it('returns the "you stand on it" sentinel at zero', () => {
-    expect(distanceInDays(0)).toBe('you stand on it');
-    expect(distanceInDays(-1)).toBe('you stand on it');
+// ---------------------------------------------------------------------------
+// OTA-1477 — the compass no longer owns a distance scale.
+// ---------------------------------------------------------------------------
+//
+// ⚠ WHAT THIS BLOCK REPLACED. It used to assert `distanceInDays(1) === "a day's
+// travel"` and `distanceInDays(2) === "2 days' travel"`, plus
+// `expect(TILES_PER_DAY).toBeGreaterThan(0)`. All four passed for the entire
+// life of the defect, because they checked that the module agreed with ITSELF.
+// Nothing here ever asked whether the compass agreed with the travel banner,
+// which is the only question that mattered, and the answer was 9.6× no.
+//
+// So the assertions below are all cross-module: the phrase the compass prints
+// for N tiles must be the phrase built from `travelHoursFor(N)`, the number the
+// banner and the bounty deadline are both built from. There is nothing left to
+// pin locally, because there is nothing local left.
+describe('OTA-1477 — the compass is priced off travelTime and nothing else', () => {
+  it('has no distance scale of its own left to drift', () => {
+    // The named class is copied-constant drift; the fix was deletion, not a
+    // better value. If either of these comes back, the compass has re-grown a
+    // second opinion about what a tile costs.
+    expect((worldDirections as Record<string, unknown>).TILES_PER_DAY).toBeUndefined();
+    expect((worldDirections as Record<string, unknown>).distanceInDays).toBeUndefined();
   });
 
-  it('formats one tile as a single day phrase', () => {
-    expect(distanceInDays(1)).toBe("a day's travel");
+  it('prices every distance the map can hold exactly as travelHoursFor does', () => {
+    // Whole reachable range on an 82×41 grid: Manhattan distance tops out at
+    // 81 + 40 = 121 tiles. Walk all of it, not a sample.
+    let checked = 0;
+    for (let tiles = 1; tiles <= 121; tiles++) {
+      expect(travelPhraseFor(tiles)).toBe(
+        `${tiles} tile${tiles === 1 ? '' : 's'}, about ${formatWindow(travelHoursFor(tiles))} of travel`,
+      );
+      checked++;
+    }
+    expect(checked).toBe(121); // an empty loop is a failure, not a pass
   });
 
-  it('formats larger tile counts pluralised', () => {
-    expect(distanceInDays(2)).toBe("2 days' travel");
-    expect(distanceInDays(7)).toBe("7 days' travel");
+  it('answers the two lines from the 4.32.11 log with the banner\'s own numbers', () => {
+    // 23:49:04  You set course for Voronov. 2 tiles — about 5 hours of travel, all in.
+    // 23:50:14  [Voronov] north: Drakova (2 days' travel) · east: Ostragar (9 days' travel)
+    // Voronov(52,21) → Drakova(52,19) is 2 tiles; → Ostragar(58,18) is 9.
+    expect(travelPhraseFor(2)).toBe('2 tiles, about 5 hours of travel');
+    expect(travelPhraseFor(9)).toBe('9 tiles, about 23 hours of travel');
+    // And the old answers are gone from both.
+    expect(travelPhraseFor(2)).not.toContain('day');
+    expect(travelPhraseFor(9)).not.toContain('day');
   });
 
-  it('round-trips through the TILES_PER_DAY constant', () => {
-    expect(TILES_PER_DAY).toBeGreaterThan(0);
+  it('keeps the standing-on-it sentinel, which callers still branch on', () => {
+    expect(travelPhraseFor(0)).toBe('you stand on it');
+    expect(travelPhraseFor(-1)).toBe('you stand on it');
+    expect(travelPhraseFor(-999)).toBe('you stand on it');
+    expect(travelPhraseFor(0.4)).toBe('you stand on it'); // rounds to 0
+  });
+
+  it('singularises exactly one tile and pluralises everything else', () => {
+    expect(travelPhraseFor(1)).toContain('1 tile,');
+    expect(travelPhraseFor(1)).not.toContain('1 tiles');
+    for (const t of [2, 3, 10, 24, 121]) {
+      expect(travelPhraseFor(t)).toContain(`${t} tiles,`);
+    }
+  });
+
+  it('rolls over into days at the same boundary the deadline does', () => {
+    // 24 h is the rollover. HOURS_PER_TILE_TRUE = 2.5, so 9 tiles = 22.5 h
+    // (rounds to 23, still hours) and 10 tiles = 25 h (1 day, 1 hour).
+    expect(HOURS_PER_TILE_TRUE).toBe(2.5);
+    expect(travelPhraseFor(9)).toContain('23 hours');
+    expect(travelPhraseFor(9)).not.toContain('day');
+    expect(travelPhraseFor(10)).toContain('1 day, 1 hour');
+    // The boundary is formatWindow's, not a second one invented here.
+    expect(formatWindow(travelHoursFor(10))).toBe('1 day, 1 hour');
+  });
+
+  it('never decreases as the distance grows — monotone in hours', () => {
+    let prev = -1;
+    for (let tiles = 0; tiles <= 121; tiles++) {
+      const h = travelHoursFor(tiles);
+      expect(h).toBeGreaterThanOrEqual(prev);
+      prev = h;
+    }
+    expect(prev).toBe(121 * HOURS_PER_TILE_TRUE);
+  });
+
+  it('is the phrase the lookups actually hand back, not a parallel one', () => {
+    // The instrument must not be measuring a function nobody calls. Prove the
+    // DirectedLocation records carry this exact string.
+    const otherId = Object.keys(map.positions).find((id) => id !== TEST_START)!;
+    const result = findNamedById(map, fromX, fromY, otherId)!;
+    expect(result.travelPhrase).toBe(travelPhraseFor(result.tiles));
+    const near = findNearestNamed(map, fromX, fromY, { excludeId: TEST_START })!;
+    expect(near.travelPhrase).toBe(travelPhraseFor(near.tiles));
   });
 });
 
@@ -128,10 +209,36 @@ describe('describeAllDirections', () => {
     expect(summary).toContain(' · ');
   });
 
-  it('uses the days phrasing, not raw tiles', () => {
+  it('prices each named cardinal with the shared travel phrase', () => {
+    // ⚠ OTA-1477 — this test used to accept /travel|open ground/, which the
+    // broken "2 days' travel" satisfied just as happily as the fix does. It
+    // now recomputes the expected fragment from the map itself.
     const summary = describeAllDirections(map, fromX, fromY);
-    // Either a "days' travel" / "day's travel" phrase OR "open ground".
-    expect(summary).toMatch(/travel|open ground/);
+    let named = 0;
+    for (const dir of ['north', 'east', 'south', 'west'] as const) {
+      const frag = summary.split(' · ').find((f) => f.startsWith(`${dir}: `))!;
+      expect(frag).toBeDefined();
+      if (frag === `${dir}: open ground`) continue;
+      named++;
+      const m = /^\w+: (.+) \((.+)\)$/.exec(frag)!;
+      expect(m).not.toBeNull();
+      // Find the tile this fragment is describing and re-derive its phrase.
+      const hit = findNamedByQuery(map, fromX, fromY, m[1]!)!;
+      expect(hit).not.toBeNull();
+      // SHORT form — four fragments in one line. Same numbers as the long
+      // form, which is asserted directly in ota1477OneWayToPriceADistance.
+      expect(m[2]).toBe(travelPhraseShort(hit.tiles));
+      expect(travelPhraseFor(hit.tiles)).toContain(m[2]!.split(', ')[1]!);
+    }
+    // The start tile is not on an empty rim; at least one cardinal is named,
+    // so the loop above cannot have been a silent no-op.
+    expect(named).toBeGreaterThan(0);
+  });
+
+  it('says nothing in days anywhere in the radar line', () => {
+    // The exact shape the 4.32.11 log caught: "north: Drakova (2 days' travel)".
+    const summary = describeAllDirections(map, fromX, fromY);
+    expect(summary).not.toMatch(/days?' travel/);
   });
 });
 

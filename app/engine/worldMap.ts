@@ -80,8 +80,13 @@ export interface MapTile {
 
 // Wide grid: 41×41 = 1681 tiles for ~21 named locations means most
 // movement is open ground (wandering). Sized so the lore-canonical
-// danger bands (D5 = 20-28 days' travel from start) fit without
-// clamping at the grid edge. Most tiles are empty — wasteland
+// danger bands (D5 = 20-28 TILES from start) fit without
+// clamping at the grid edge. ⚠ OTA-1477 — this line said "20-28 days'
+// travel", written back when worldDirections priced one tile as one day. It
+// does not any more (2.5 h all-in, `HOURS_PER_TILE_TRUE`), which makes that
+// band ~2-3 days. Stated in tiles here because tiles is what a grid is sized
+// in, and because a second unit in a sizing comment is how the last one
+// drifted. Most tiles are empty — wasteland
 // encounters and roadside traders fill the wandering ground.
 //
 // Doubled from the original 21×21 in the v2.4.1 map-marker overhaul

@@ -1,30 +1,36 @@
 import { type Direction, type WorldMap } from './worldMap';
+import { travelPhraseFor, travelPhraseShort } from './travelTime';
 
 // ---------------------------------------------------------------------------
-// Narrative distance scale
+// OTA-1477 — THE COMPASS AND THE BANNER NOW PRICE A DISTANCE THE SAME WAY.
 // ---------------------------------------------------------------------------
 //
-// The procedural world map is dense at the mechanical layer — 1 cardinal
-// step costs 1 in-game hour of stamina time. But the Arbiter narrates
-// distances at the *imperial* scale, where Tartaria's wastes take days to
-// cross on foot. This is a game-feel item: when the player asks "how far
-// to Asgardar?" they expect a number that sounds like a journey, not a
-// commute.
+// ⚠ WHAT WAS HERE, AND WHY IT IS GONE. This file used to own a second distance
+// scale: `TILES_PER_DAY = 1`, with `distanceInDays()` on top of it, justified by
+// a game-feel argument ("the wastes take days to cross; a player asking how far
+// to Asgardar expects a journey, not a commute"). The argument was fine. The
+// number was a guess, it was made before OTA-1162 gave tiles a real price, and
+// nothing ever went back for it — so the compass drifted 9.6× away from the
+// travel banner, which OTA-1167 HAD moved onto the real one. From the 4.32.11
+// log, 70 seconds apart, about the same two tiles:
+//     23:49:04  You set course for Voronov. 2 tiles — about 5 hours of travel, all in.
+//     23:50:14  [Voronov] north: Drakova (2 days' travel) · east: Ostragar (9 days' travel)
 //
-// TILES_PER_DAY converts grid distance to in-game-days-of-constant-travel
-// (no rest). 1 tile = 1 day. Asgardar at danger=4 sits 8–16 tiles from the
-// Outskirts, so "8–16 days east" for the lost capital — a journey, not a
-// stroll.
-export const TILES_PER_DAY = 1;
+// ⚠ THE FIX IS NOT A BETTER CONSTANT. A corrected `TILES_PER_DAY` would be the
+// same defect with a nicer value in it — two derivations of one fact, free to
+// drift again the next time the stamina economy moves. There is now exactly one:
+// `travelPhraseFor` in travelTime.ts, which every distance-pricing surface in the
+// game calls. Do not add a scale here. If the journey ever needs to *feel*
+// longer, HOURS_PER_TILE_TRUE is the honest place to say so, and it moves the
+// deadline with it — which is the point.
 
 /**
- * Formats a Manhattan-distance tile count into a human phrase the Arbiter
- * uses in answers. "5 days' travel", "a day's travel", "you stand on it".
+ * Formats a Manhattan-distance tile count into the human phrase the Arbiter
+ * uses in answers. Thin pass-through kept so the lookups below read cleanly;
+ * the arithmetic lives in travelTime.ts and only there.
  */
-export function distanceInDays(tiles: number): string {
-  if (tiles <= 0) return 'you stand on it';
-  const days = Math.max(1, Math.round(tiles / TILES_PER_DAY));
-  return days === 1 ? "a day's travel" : `${days} days' travel`;
+function distancePhrase(tiles: number): string {
+  return travelPhraseFor(tiles);
 }
 
 // ---------------------------------------------------------------------------
@@ -38,7 +44,9 @@ export interface DirectedLocation {
   direction: Direction;
   /** Manhattan distance in tiles. */
   tiles: number;
-  /** Pre-formatted "N days' travel" phrase. */
+  /** Pre-formatted "2 tiles, about 5 hours of travel" phrase — a NOUN PHRASE,
+   *  so callers hang it off a sentence with a dash rather than splicing it in
+   *  mid-clause. ("Drakova lies north — 2 tiles, about 5 hours of travel.") */
   travelPhrase: string;
 }
 
@@ -66,7 +74,7 @@ function describe(
     locationName: tile.locationName,
     direction: dominantDirection(dx, dy),
     tiles,
-    travelPhrase: distanceInDays(tiles),
+    travelPhrase: distancePhrase(tiles),
   };
 }
 
@@ -135,8 +143,13 @@ export function findNearestNamed(
 
 /**
  * Concatenated four-cardinal survey for "what's around me" answers.
- * Returns "north: Asgardar (3 days' travel) · east: Voronov (1 day's
- * travel) · …", with empty quadrants represented as "open ground".
+ * Returns "north: Asgardar (12 tiles, 1 day, 6 hours) · east: Voronov
+ * (2 tiles, 5 hours) · …", with empty quadrants represented as "open ground".
+ *
+ * ⚠ SHORT form, not the sentence form. Four fragments in one log entry, and
+ * the long phrase repeated four times ran the line past 200 characters — a
+ * paragraph where the player wanted a glance. Same numbers, both out of
+ * `travelWindowFor`; see travelTime.ts.
  */
 export function describeAllDirections(
   map: WorldMap,
@@ -161,7 +174,7 @@ export function describeAllDirections(
   const fragments: string[] = [];
   for (const dir of ['north', 'east', 'south', 'west'] as Direction[]) {
     const s = best[dir];
-    fragments.push(s ? `${dir}: ${s.locationName} (${s.travelPhrase})` : `${dir}: open ground`);
+    fragments.push(s ? `${dir}: ${s.locationName} (${travelPhraseShort(s.tiles)})` : `${dir}: open ground`);
   }
   return fragments.join(' · ');
 }

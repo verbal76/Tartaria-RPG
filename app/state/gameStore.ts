@@ -502,9 +502,17 @@ export { statNowClause };
 // so the award and the explanation can never quote different numbers.
 import { MILESTONE_KILL_STEP } from '../engine/hpBreakdown';
 // OTA-1162 — one owner for what a tile costs the clock.
-import { TILE_HOURS, travelHoursFor } from '../engine/travelTime';
 // OTA-1167 — the course banner now quotes travel in the same units the deadline uses.
-import { formatWindow } from '../engine/bountyPrimer';
+// OTA-1477 — and so does every compass surface in this file, through `travelPhraseFor`.
+// ⚠ Do not hand-inline a tiles→time conversion anywhere below. There was one, at the
+// 'directional' ASK branch, and it is exactly how the compass drifted 9.6× off.
+import {
+  TILE_HOURS,
+  travelHoursFor,
+  formatWindow,
+  travelPhraseFor,
+  travelPhraseShort,
+} from '../engine/travelTime';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible, itemIsThrowable } from '../engine/bandolierEligibility';
 import { applyLegacyItemRenames } from '../engine/itemMigrations';
@@ -9032,8 +9040,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // World channel: dedup bracket-prefixed banner lines (radar / direction
     // summaries / scene labels). Playtest log printed the same
-    // "[Endless Stair] north: Nimari (2 days' travel)..." twice within 65
-    // seconds with nothing in between to justify a repeat.
+    // "[Endless Stair] north: Nimari (...)" twice within 65 seconds with
+    // nothing in between to justify a repeat. (The log quoted here said
+    // "2 days' travel"; OTA-1477 replaced that scale, and the quote is
+    // trimmed rather than updated so nobody reads it as a live format.)
     if (channel === 'world' && text.startsWith('[')) {
       const recent = get().gameLog.slice(-8);
       for (const prev of recent) {
@@ -17729,7 +17739,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (near) {
               get().appendLog(
                 'arbiter',
-                `The Arbiter points ${near.direction}. "Nearest is ${near.locationName} — ${near.travelPhrase} ${near.direction}, give or take. Vendors come and go, but that's the closest hub you'll find."`,
+                `The Arbiter points ${near.direction}. "Nearest is ${near.locationName}, ${near.direction} — ${near.travelPhrase}, give or take. Vendors come and go, but that's the closest hub you'll find."`,
               );
             } else {
               get().appendLog(
@@ -17741,18 +17751,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           // 'directional' — closest named tile in a SPECIFIC cardinal
           // direction. Uses surveyAll's per-direction sense to pull the
-          // first named neighbor along that vector, then formats with
-          // the existing travelPhrase math.
+          // first named neighbor along that vector.
+          //
+          // ⚠ OTA-1477 — this branch used to carry a HAND-INLINED copy of the
+          // old day scale (`days <= 1 ? "a day's travel" : ...`), which meant a
+          // third derivation of one fact: the banner's, worldDirections', and
+          // this one. It priced `hit.distance` — a RAY distance in tiles — as
+          // days, so "what's north of me" answered 2 days for a 5-hour walk.
+          // It now calls the same `travelPhraseFor` as everything else.
           if (dirQ.kind === 'directional') {
             const survey = surveyAll(map, fromX, fromY);
             const dir = dirQ.target as Direction;
             const hit = survey[dir];
             if (hit) {
-              const days = hit.distance;
-              const travelPhrase = days <= 1 ? 'a day\'s travel' : `${days} days' travel`;
               get().appendLog(
                 'arbiter',
-                `The Arbiter gestures ${dir}. "${hit.name} lies ${travelPhrase} ${dir}."`,
+                `The Arbiter gestures ${dir}. "${hit.name} lies ${dir} — ${travelPhraseFor(hit.distance)}."`,
               );
             } else {
               get().appendLog(
@@ -17770,7 +17784,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               'arbiter',
               here
                 ? `The Arbiter taps the ground. "You're standing on ${found.locationName}."`
-                : `The Arbiter gestures ${found.direction}. "${found.locationName} lies ${found.travelPhrase} ${found.direction}."`,
+                : `The Arbiter gestures ${found.direction}. "${found.locationName} lies ${found.direction} — ${found.travelPhrase}."`,
             );
           } else {
             get().appendLog(
@@ -17800,7 +17814,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const fragments: string[] = [];
             for (const dir of ['north', 'east', 'south', 'west'] as Direction[]) {
               const s = survey[dir];
-              if (s) fragments.push(`${dir}: ${s.name} (${s.distance} stretch${s.distance > 1 ? 'es' : ''})`);
+              // ⚠ OTA-1477 — "stretches" was a FOURTH unit for the same fact,
+              // and the only one that was not a lie, because nothing defines a
+              // stretch. It still left the compass and the travel banner
+              // speaking different languages about one distance. Short form
+              // here: four fragments in one line, same numbers as everywhere.
+              if (s) fragments.push(`${dir}: ${s.name} (${travelPhraseShort(s.distance)})`);
             }
             const summary = fragments.length > 0
               ? fragments.join(' · ')
@@ -26465,7 +26484,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const survey = surveyAll(map, step.x, step.y);
       const ahead = survey[dir];
       const hint = ahead
-        ? `The compass tells you ${ahead.name} lies ${ahead.distance} stretch${ahead.distance > 1 ? 'es' : ''} further ${dir}.`
+        ? `The compass tells you ${ahead.name} lies further ${dir} — ${travelPhraseFor(ahead.distance)}.`
         : `The compass points ${dir} into open ground.`;
       get().appendLog('world', `You walk ${dir} through open silt. ${hint}`);
     } else {
