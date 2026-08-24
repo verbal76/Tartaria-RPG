@@ -203,6 +203,14 @@ import {
 // OTA: single-owner state moves WITH its owner, shared state moves DOWN.
 import { notePlayerActionForSprint, playerIsSprinting, _resetSprintForTest } from './sprint';
 import { playerGridCell } from './playerGrid';
+// ⚠⚠ OTA-1461 — the pools for the lines a player hears ten times an hour. Each is
+// consumed through `rotatingPick`, which cycles in order and refuses an immediate
+// repeat, so a pool of forty is forty distinct fires before anything comes round.
+// ⚠ `fleeLine` is a FUNCTION rather than a pool because the indoor/outdoor
+// choice is itself a claim worth testing — see its header.
+import {
+  UNRESOLVED_HOOK_LINES, DOG_SETTLE_LINES, TAKE_LINES, fleeLine,
+} from '../engine/voicePools';
 // ⚠ OTA-1459 — the bounty nudge's in-game-hours cooldown.
 import { takeBountyNudge } from '../engine/arbiterNudge';
 import { noteVisibleLogLine, visibleLogTotal, _resetVisibleLogCountForTest } from './visibleLogCount';
@@ -8503,7 +8511,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
     // OTA-078 — pack-full path already returned early above, so
     // we only reach here when the grant landed.
-    get().appendLog('world', `You take the ${cat.name} from where it lay.`);
+    // ⚠ OTA-1461 — was ONE line, ~15 fires a session. See voicePools.
+    get().appendLog('world', rotatingPick(TAKE_LINES, 'take-noun').replace(/\{thing\}/g, cat.name));
     get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}).`);
     void get().persist();
   },
@@ -16741,8 +16750,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 : s);
               get().appendLog(
                 'world',
+                // ⚠ OTA-1461 — was ONE template, fired on EVERY rest (fifteen times in
+                // four real minutes of the owner's log). `{Name}` is substituted here
+                // because it is not a pronoun token; everything else is.
                 applyDogPronouns(
-                  `${restDog.name} circles three times and curls beside you. {Possessive} breathing slows to yours.`,
+                  rotatingPick(DOG_SETTLE_LINES, 'dog-settle').replace(/\{Name\}/g, restDog.name),
                   restDog.sex.pronoun,
                 ),
               );
@@ -20372,7 +20384,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   };
                 });
                 if (grantResult.accepted > 0) {
-                  get().appendLog('world', `You take the ${cat.name} from where it lay.`);
+                  // ⚠ OTA-1461 — was ONE line, ~15 fires a session. See voicePools.
+    get().appendLog('world', rotatingPick(TAKE_LINES, 'take-noun').replace(/\{thing\}/g, cat.name));
                   get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}).`);
                 } else {
                   get().appendLog('world', `Found ${withArticle(cat.name.toLowerCase())}, but your pack is already full of them.`);
@@ -21830,10 +21843,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // entrance" while "the chamber" settled behind him. There was no
               // entrance and no chamber. Indoors the original line is right, so
               // it stays where it is true and the open world gets its own.
+              // ⚠ OTA-1461 — was TWO lines for ~9 fires a session; now 30 + 15.
+              // ⚠⚠ OTA-1462 — and the CHOICE between them is `fleeLine`'s, not
+              // this site's. This store decides only the one thing it is the
+              // authority on — whether the player is under a roof. See the
+              // header on `fleeLine`: the old pin here quoted a sentence and a
+              // 400-character window, which broke on a refactor that changed no
+              // behaviour and would have passed a swapped ternary that restored
+              // the original defect.
               const fleeIndoors = !!get().activeBuildingId || !!get().player?.hubRoomId;
-              get().appendLog('world', fleeIndoors
-                ? 'You break for the entrance. Behind you the chamber settles back into silence.'
-                : 'You break away across the open ground. Behind you the thing you ran from gives up the chase.');
+              get().appendLog('world', fleeLine(fleeIndoors));
             }
             if (currentScene.enemies.length > 0) {
               set((s) => (s.currentScene
@@ -32103,7 +32122,8 @@ function narrateWanderingJourney(
   // show them something. Skip if one is already active so we don't pile up.
   const activeUnresolved = (scene.hooks ?? []).some((h) => !h.resolved);
   if (activeUnresolved) {
-    get().appendLog('world', `${opener}The thread you were following waits where you left it.`);
+    // ⚠ OTA-1461 — was ONE hardcoded sentence, fired ~25 times in one session.
+    get().appendLog('world', `${opener}${rotatingPick(UNRESOLVED_HOOK_LINES, 'hook-waiting')}`);
     return;
   }
   const hook = plantHookByKind(pickRandomHookKind());
@@ -33304,8 +33324,11 @@ function finalizeDogOnboarding(
     },
   }));
   // Pronoun-templated rest beat.
+  // ⚠ OTA-1461 — same pool as the rest beat, different rotation key so the
+  // FIRST-EVER settle (the end of the rescue arc) cannot collide with whatever the
+  // nightly rest beat happened to be showing.
   const settleLine = applyDogPronouns(
-    `${dog.name} circles three times and settles at your boot. {Possessive} breathing slows to yours.`,
+    rotatingPick(DOG_SETTLE_LINES, 'dog-settle-first').replace(/\{Name\}/g, dog.name),
     dog.sex.pronoun,
   );
   get().appendLog('world', settleLine);

@@ -1241,15 +1241,46 @@ export function InventoryScreen() {
     try { modalPreview = getItemPreviewForInstance(pending.item); }
     catch { modalPreview = null; }
   }
+  // ⚠⚠⚠ OTA-1463 — WHILE GIVING, THE SHEET TALKS ABOUT GIVING. Owner, mid-session:
+  //
+  //   "I just tried to gift scrap metal to brisk cartwright and it told me that
+  //    I cannot equip it... I'm not trying to equip it... it even says at the
+  //    top of the screen that I'm gifting so that's a glitch"
+  //
+  // He was right that it reads as a refusal, and wrong only about what was
+  // refused — nothing was. The `Give to <name>` action WAS on the sheet (the
+  // gift-mode branch below adds it whenever `giftBlockReason` is null, and for
+  // Scrap Metal it is null). What he read was this body text, which answers a
+  // question nobody asked while he was in the middle of a different one.
+  //
+  // ⚠⚠ THAT IS THE NAMED DEFECT, INVERTED. "The game offers a thing and does not
+  // look like it's offering" has cost this project several OTAs; here the game
+  // offered correctly and then TALKED him out of it. A modal that is going to
+  // volunteer prose must volunteer prose about the mode the player is in — the
+  // gift bar is on screen saying GIVING TO BERSK CARTWRIGHT, and the sheet
+  // underneath it was lecturing about equip slots.
+  //
+  // ⚠ AND THE BLOCKED CASE IS THE MORE VALUABLE HALF. `giftBlockReason` already
+  // computes a plain-English reason for every item that CANNOT be given — worn,
+  // racked, reserved, wanted by a fetch contract. None of it ever reached the
+  // screen: a blocked item simply had no GIVE button and said nothing about why,
+  // which is the-game-knows-and-does-not-say (OTA-1402) on a second door.
+  const giftBlock = giftMode && pending && player ? giftBlockReason(pending.item, player) : null;
   const modalBody = pending && isQuestLockedItem(pending.item)
     ? 'Reserved for your objective — this stays in your pack until you turn it in. It can\'t be dropped, salvaged, sold, or fused.'
     // OTA-872 — a soft "Save for quest" earmark: explain that it's out of the sell
     // tab and filed under Quest Items, but still yours to use or drop.
     : pending && pending.item.reservedForQuest
       ? 'Saved for a quest — filed under Quest Items and hidden from vendor sell lists so you don\'t sell it by accident. You can still use or drop it, or tap "Saved for quest" to release it.'
-      : pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
-        ? 'This item cannot be equipped, but you can still keep, sell, or use it.'
-        : undefined;
+      // ⚠ Gift mode outranks the equip note, because it is what the player is
+      // doing right now. Blocked first — a reason beats a silence.
+      : giftMode && giftBlock !== null
+        ? `You can't give this to ${giftMode.toName} — ${giftBlock}.`
+        : giftMode && pending
+          ? `Tap "Give to ${giftMode.toName}" below to hand this over.`
+          : pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
+            ? 'This item cannot be equipped, but you can still keep, sell, or use it.'
+            : undefined;
   // OTA-945 — fusion info block: for a fusable/reservable item, name the material it
   // contributes and how diversity drives output rarity (a common playtest question:
   // "does what I put in change the quality?" — yes: DIFFERENT materials, not rarity).

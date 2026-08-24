@@ -202,6 +202,44 @@ try {
 // app-switching free.
 const QWEN_REWARM_DELAY_MS = 8_000;
 
+// ⚠⚠⚠ OTA-1462 — HOW LONG A `background` MUST LAST BEFORE WE BELIEVE IT.
+//
+// OTA-1275 debounced the way back IN and left the way OUT immediate, with a
+// stated reason: *"The dump on `background` stays IMMEDIATE — that is the
+// jetsam fix, and holding 425MB while backgrounded is what gets us killed. Only
+// the reload waits."* That is right about a real background. It is wrong about
+// what Android actually sends, and the owner's 2026-08-23 log is the proof —
+// five of these inside ninety seconds, every one of them a few hundred
+// milliseconds long:
+//
+//   23:52:09.808  active → background      23:52:10.163  → active (355ms)
+//   23:52:51.665  active → background      23:52:51.831  → active (166ms)
+//   23:54:00.671  active → background      23:54:00.874  → active (204ms)
+//   23:54:15.820  active → background      23:54:16.045  → active (225ms)
+//   23:54:30.087  active → background      23:54:30.483  → active (396ms)
+//
+// Nobody switches away and back in 204ms. That is a focus blip — a shade pull,
+// a system dialog, a keyboard, a gesture — and the app never actually left.
+//
+// ⚠⚠ AND THE TEARDOWN LANDED AFTER THE RETURN, ON ALL FIVE. `ctx: RELEASED` is
+// stamped at :10.325, :52.067, :01.021, :16.187, :30.774 — every one of them
+// AFTER the matching `→ active`. So the release was not protecting a
+// backgrounded app from the low-memory killer; it was freeing 425MB belonging
+// to an app that was already back on screen, which the watchdog then spent
+// another 425MB rebuilding eight seconds later. Five full allocate/free cycles
+// of a ~425MB native context in ninety seconds, all of it pure waste — and at
+// 23:54:46, 126ms into a `flee`, the process was reaped mid-action.
+//
+// ⚠ THE SAME BLIP ALSO BLINDED THE CRASH FORENSICS, which is why all three
+// records in his ledger read `doing: (no action yet)` — see the deferred
+// `clearLiveBreadcrumb` below. One cause, two symptoms.
+//
+// The window is measured, not guessed: every blip in that log is ≤396ms and
+// every genuine background is ≥7.7s. 1500ms sits between them with almost four
+// times the margin over the longest blip, and delays a real dump by 1.5s —
+// which the killer does not act inside of.
+const BACKGROUND_SETTLE_MS = 1_500;
+
 export default function App() {
   const screen = useGameStore((s) => s.currentScreen);
   const hydrated = useGameStore((s) => s.hydrated);
@@ -225,6 +263,10 @@ export default function App() {
   // one of those transitions — and a 2-second app-switch does not need the
   // classifier back at all.
   const cognitiveResumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // ⚠⚠⚠ OTA-1462 — the teardown timer. A `background` no longer tears anything
+  // down on the spot; it ARMS this, and a `active` inside the window disarms it
+  // with nothing having happened. See BACKGROUND_SETTLE_MS.
+  const backgroundTeardownTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Android immersive mode — hide the navigation bar (3-button bar at
   // the bottom) and let the status bar overlay-swipe back. Same UX as
@@ -678,24 +720,61 @@ export default function App() {
           clearTimeout(cognitiveResumeTimer.current);
           cognitiveResumeTimer.current = null;
         }
-        if (status === 'background') {
-          if (useGameStore.getState().qwenStatus === 'ready') qwenParkedRef.current = true;
-          void shutdownQwen();
+        // ⚠⚠⚠ OTA-1462 — EVERYTHING BELOW IS DEFERRED, AND NOTHING ABOVE IS.
+        //
+        // The split is the whole fix. Above: `persist()`, `shutdownCognitive()`
+        // and the two timer cancellations — all cheap, all idempotent, and
+        // persisting immediately is the one thing a blip must NOT delay, because
+        // a real kill can follow one. Below: the destructive half — freeing
+        // ~425MB and erasing the forensic breadcrumb — which must only happen
+        // once we believe the app has actually gone.
+        //
+        // ⚠ IF THE PLAYER COMES BACK INSIDE THE WINDOW, NONE OF THIS RUNS AT
+        // ALL. Not "runs and is undone" — never runs. That is what makes the
+        // re-warm unnecessary too: the context was never released, so there is
+        // nothing to rebuild, and the 425MB round-trip disappears rather than
+        // being merely postponed.
+        if (status === 'background' && !backgroundTeardownTimer.current) {
+          backgroundTeardownTimer.current = setTimeout(() => {
+            backgroundTeardownTimer.current = null;
+            // ⚠⚠ THE PARK FLAG IS SET HERE, NOT AT `background`. Setting it up
+            // there would mark the model parked on a blip that never released
+            // it, and the `active` handler would then "re-warm" a context that
+            // was live the whole time — a 425MB load to replace nothing. The
+            // flag means "we took it away", so it belongs where we take it away.
+            if (useGameStore.getState().qwenStatus === 'ready') qwenParkedRef.current = true;
+            void shutdownQwen();
+            // arb126 — leaving the foreground is an ORDERLY exit, so any Qwen
+            // completion / TTS breadcrumb still sitting in storage did NOT crash
+            // the process. Wipe it, before the OS can reclaim us. A breadcrumb
+            // that survives to next boot then means a real FOREGROUND native
+            // crash — the only signal the completion/voice guards should ever
+            // act on. This stops a benign swipe-away from being mis-counted as a
+            // crash and falsely benching the Arbiter.
+            void clearInFlightBreadcrumbs();
+            // ⚠⚠⚠ OTA-1276 SET THIS UP; OTA-1462 IS WHY IT KEPT LYING. An
+            // orderly exit clears the live breadcrumb, so one that SURVIVES to
+            // the next boot means the process died while still live. Correct —
+            // but on the immediate path a 300ms blip wiped the crumb of a
+            // LIVE PLAYER ACTION, and the next render stamp rebuilt one from
+            // scratch with `what: '(no action yet)'`.
+            //
+            // That is precisely what the owner's ledger shows. All three
+            // `native-death` records say `doing: (no action yet) · room ? ·
+            // screen ?`, and the newest of them is timestamped 126ms into a
+            // `flee` the log records plainly. Five OTAs of forensics, answering
+            // "nothing was happening" every time something was. Deferring the
+            // clear past the blip is what lets the crumb keep the action.
+            void clearLiveBreadcrumb();
+          }, BACKGROUND_SETTLE_MS);
         }
-        // arb126 — leaving the foreground is an ORDERLY exit, so any Qwen
-        // completion / TTS breadcrumb still sitting in storage did NOT crash the
-        // process. Wipe it now, before the OS can reclaim us. A breadcrumb that
-        // survives to next boot then means a real FOREGROUND native crash — the
-        // only signal the completion/voice guards should ever act on. This stops
-        // a benign swipe-away / background from being mis-counted as a crash and
-        // falsely benching the Arbiter (the user never crashes, yet the guard
-        // disabled Qwen + flagged a Kokoro "voice crash" off one benign close).
-        void clearInFlightBreadcrumbs();
-        // ⚠⚠ OTA-1276 — an ORDERLY exit clears the live breadcrumb, so one that
-        // SURVIVES to the next boot means the process died while still live —
-        // the swipe-kill after a hard freeze. Same discipline as arb126 above.
-        void clearLiveBreadcrumb();
       } else if (status === 'active') {
+        // ⚠⚠⚠ OTA-1462 — DISARM. A return inside the window means the app never
+        // really left: no context freed, no breadcrumb erased, nothing to undo.
+        if (backgroundTeardownTimer.current) {
+          clearTimeout(backgroundTeardownTimer.current);
+          backgroundTeardownTimer.current = null;
+        }
         // OTA-1358 — debounced, mirroring the Qwen re-warm below. The classifier
         // is enrichment: nothing the player is waiting on breaks while it waits
         // for a settled foreground.
@@ -760,6 +839,9 @@ export default function App() {
       sub.remove();
       if (qwenRewarmTimer.current) { clearTimeout(qwenRewarmTimer.current); qwenRewarmTimer.current = null; }
       if (cognitiveResumeTimer.current) { clearTimeout(cognitiveResumeTimer.current); cognitiveResumeTimer.current = null; } // OTA-1358
+      // ⚠ OTA-1462 — and the teardown timer, or a pending release fires against
+      // a torn-down subscription after the listener is gone.
+      if (backgroundTeardownTimer.current) { clearTimeout(backgroundTeardownTimer.current); backgroundTeardownTimer.current = null; }
     };
   }, [shutdownCognitive, resumeCognitive, shutdownQwen, bootQwen]);
 

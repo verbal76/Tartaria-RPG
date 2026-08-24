@@ -126,14 +126,52 @@ describe('OTA-1275 — app-switching stops costing 425MB a trip', () => {
 });
 
 describe('OTA-1275 — the source keeps the asymmetry', () => {
-  it('⚠⚠ the DUMP is still immediate — the jetsam fix is untouched', () => {
-    // Holding ~425MB while backgrounded is what gets the process killed
-    // (OTA-1177's jetsam reports). Only the rebuild is allowed to wait.
-    const i = APP.indexOf("if (status === 'background') {");
-    expect(i).toBeGreaterThan(-1);
-    const block = blockAt(APP, "if (status === 'background') {");
-    expect(block).toContain('void shutdownQwen();');
-    expect(block).not.toContain('setTimeout');
+  // ⚠⚠⚠ SUPERSEDED BY OTA-1462, AND REWRITTEN RATHER THAN DELETED.
+  //
+  // This used to read: the background block contains `shutdownQwen()` and
+  // contains no `setTimeout`. That was a faithful pin on what OTA-1275 decided —
+  // *"The dump on `background` stays IMMEDIATE... Only the reload waits."* —
+  // and OTA-1462 deliberately overturned it, so the test failed and was RIGHT
+  // to fail. That is the good kind of failure: a claim changed and the suite
+  // said so, out loud, instead of a defect slipping past a green board.
+  //
+  // ⚠⚠ WHAT DID NOT CHANGE IS WHY THE PIN EXISTED. Holding ~425MB while
+  // genuinely backgrounded is what gets the process reaped (OTA-1177's jetsam
+  // reports), and the asymmetry this file is named for still stands: going out
+  // and coming back are different risks and must not share a window. The claim
+  // is now "the dump waits only long enough to disbelieve a focus blip" —
+  // weaker than "immediate", far stronger than "waits".
+  //
+  // ⚠ Deleting it and letting ota1462 carry everything was the tempting move and
+  // the wrong one. THIS suite owns the asymmetry, and an asymmetry needs both
+  // sides asserted in one place, or the next person to widen the settle window
+  // has nothing telling them what it must stay under.
+  it('⚠⚠⚠ THE DUMP STILL HAPPENS, AND STILL NOT ON THE RE-WARM CLOCK', () => {
+    // Deferred — but by the SHORT window, never the long one. If the two were
+    // ever "simplified" into one constant, the jetsam fix would quietly become
+    // an eight-second hold on a backgrounded 425MB process.
+    const bg = APP.match(/BACKGROUND_SETTLE_MS\s*=\s*([\d_]+)/);
+    const rw = APP.match(/QWEN_REWARM_DELAY_MS\s*=\s*([\d_]+)/);
+    expect(bg).not.toBeNull();
+    expect(rw).not.toBeNull();
+    const settle = Number(bg![1]!.replace(/_/g, ''));
+    const rewarm = Number(rw![1]!.replace(/_/g, ''));
+    expect({ settle, under: settle < rewarm }).toEqual({ settle, under: true });
+    // and it stays a debounce rather than becoming a policy.
+    expect(settle).toBeGreaterThan(0);
+    expect(settle).toBeLessThanOrEqual(2_000);
+  });
+
+  it('⚠⚠ …and the release is UNCONDITIONAL once that window passes', () => {
+    // The other half of the same claim. A deferral that could be skipped
+    // outright — by a flag, an early return, a status check — would be a way to
+    // hold the memory indefinitely, which is the regression this file guards.
+    // Exactly one call, reached by nothing but the timer firing.
+    const calls = APP.match(/void shutdownQwen\(\)/g) ?? [];
+    expect(calls.length).toBe(1);
+    const armIdx = APP.indexOf('backgroundTeardownTimer.current = setTimeout');
+    expect(armIdx).toBeGreaterThan(-1);
+    expect(APP.slice(armIdx, armIdx + 1400)).toContain('void shutdownQwen()');
   });
 
   it('⚠⚠ the RE-WARM is behind the timer, and leaving CANCELS it', () => {

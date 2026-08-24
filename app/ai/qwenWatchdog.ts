@@ -102,6 +102,13 @@ let qwenAppStateSub: { remove: () => void } | null = null;
 // watchdog must observe the SAME quiet period or it simply re-opens the door
 // App.tsx just closed. Mirrors QWEN_REWARM_DELAY_MS in App.tsx.
 const QWEN_FOREGROUND_SETTLE_MS = 8_000;
+/** ⚠⚠ OTA-1462 — MUST EQUAL `BACKGROUND_SETTLE_MS` in App.tsx, and `ota1462`
+ *  fails if it does not. How long a `background` must last before this module
+ *  believes it. Kept as a local constant because the edge to App.tsx would be a
+ *  cycle; kept honest by the pin rather than by hope. See the app-state handler
+ *  below for the measurement that chose 1500. */
+export const QWEN_BACKGROUND_SETTLE_MS = 1_500;
+let qwenBackgroundSettleTimer: ReturnType<typeof setTimeout> | null = null;
 let qwenForegroundSince: number | null = null;
 let qwenUnsettledLogged = false;
 function qwenForegroundSettled(): boolean {
@@ -368,6 +375,13 @@ export function startQwenWatchdog(
     qwenAppStateSub.remove();
     qwenAppStateSub = null;
   }
+  // ⚠ OTA-1462 — the settle latch is a timer like the others, and a pending one
+  // outliving the subscription would flip `trulyBackgrounded` for a listener
+  // that no longer exists. Cleared with everything else it lives beside.
+  if (qwenBackgroundSettleTimer !== null) {
+    clearTimeout(qwenBackgroundSettleTimer);
+    qwenBackgroundSettleTimer = null;
+  }
   qwenReinitInFlightSince = 0;
   qwenReinitAttempts = 0;
   qwenBackoffLevel = 0;
@@ -416,10 +430,35 @@ export function startQwenWatchdog(
       // and OTA-1084's own comment says "kicking a ~400MB context load from the
       // background is guaranteed wasted work". iOS walked straight through that rule.
       // Requiring a genuine `background` first is what closes it.
+      // ⚠⚠⚠ OTA-1462 — AND A BLIP MUST NOT REACH HERE EITHER. App.tsx now defers
+      // the teardown past BACKGROUND_SETTLE_MS, so a ~300ms focus blip releases
+      // nothing. If this half still latched on the raw event, the watchdog would
+      // restart its settle clock and set `trulyBackgrounded` for a background
+      // that never happened — and then, on the return, treat a live context as a
+      // put-away-and-return worth a fresh ~425MB revival. Half a fix applied at
+      // one of two readers is this codebase's most repeated lesson.
+      //
+      // ⚠ The window is duplicated rather than imported ON PURPOSE, and the
+      // duplication is guarded: gameStore → watchdog is a one-way leaf edge (see
+      // the header), and importing App.tsx here would be a cycle through the
+      // component tree. `ota1462` asserts the two constants agree, so a change
+      // to one that is not made to the other fails the suite rather than
+      // silently re-opening exactly the gap this closes.
       if (next === 'background') {
-        qwenTrulyBackgrounded = true;
-        qwenForegroundSince = null;   // OTA-1278 — the clock restarts on return
+        if (qwenBackgroundSettleTimer !== null) return;
+        qwenBackgroundSettleTimer = setTimeout(() => {
+          qwenBackgroundSettleTimer = null;
+          qwenTrulyBackgrounded = true;
+          qwenForegroundSince = null;   // OTA-1278 — the clock restarts on return
+        }, QWEN_BACKGROUND_SETTLE_MS);
         return;
+      }
+      // ⚠ OTA-1462 — a return inside the window cancels the pending latch, so
+      // the foreground clock is never disturbed and the app is treated, exactly
+      // as it should be, as having been in the foreground the whole time.
+      if (qwenBackgroundSettleTimer !== null) {
+        clearTimeout(qwenBackgroundSettleTimer);
+        qwenBackgroundSettleTimer = null;
       }
       if (next !== 'active') return; // `inactive` alone is a twitch, not a return.
       // ⚠ OTA-1278 — stamp the return, then let the gate above decide. The tick

@@ -60,6 +60,8 @@ jest.mock('expo-updates', () => ({}));
 //      "the entrance" while "the chamber" settled behind him.
 import { useGameStore } from '../app/state/gameStore';
 import { TUTORIAL_STEPS } from '../app/components/tutorialSteps';
+import { fleeLine, FLEE_OPEN_LINES, FLEE_INDOOR_LINES } from '../app/engine/voicePools';
+import { resetRotationCursors } from '../app/engine/rng';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -278,13 +280,93 @@ describe('OTA-1301 — the world stops contradicting itself', () => {
     });
   });
 
-  it('⚠ fleeing in the open does not name an entrance or a chamber', () => {
-    const store = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
-    const i = store.indexOf('You break for the entrance');
-    expect(i).toBeGreaterThan(-1);
-    // The indoor line survives, but only behind an indoors test.
-    const window = store.slice(Math.max(0, i - 400), i);
-    expect(window).toContain('const fleeIndoors = !!get().activeBuildingId || !!get().player?.hubRoomId;');
-    expect(store).toContain('You break away across the open ground.');
+  // ⚠⚠⚠ REBUILT IN FULL — the original pin was one of the label-shaped ones.
+  //
+  // It read: find the literal `'You break for the entrance'` in gameStore.ts,
+  // then require a specific `const fleeIndoors = …` line inside the 400
+  // characters above it. Two things were wrong with that, and only the first
+  // one announced itself:
+  //
+  //   1. It broke when OTA-1461 moved the sentence into a pool — a refactor
+  //      that changed no behaviour whatsoever. That is a false alarm, and false
+  //      alarms are how a suite gets ignored.
+  //   2. ⚠⚠ FAR WORSE, AND SILENT: it could not fail on the regression it
+  //      exists to prevent. Swap the two arms of the ternary and every outdoor
+  //      flee names a chamber again — the owner's exact complaint, restored —
+  //      while both literals sit in the same file, in the same order, 400
+  //      characters apart. The pin would have stayed green through it.
+  //
+  // The claim was never "this string is in this file". It was: WHAT THE PLAYER
+  // HEARS WHEN THEY RUN MATCHES WHERE THEY ARE STANDING. That is now a named
+  // function taking one boolean, so it can be asked directly — and asked of
+  // every line in both pools rather than of one sentence.
+  describe('fleeing names the place you are actually standing in', () => {
+    // The vocabulary of a roof. If any of these reaches a player who is on open
+    // mud-flats, this OTA has come undone.
+    const INTERIOR = /\b(entrance|chamber|doorway|door|room|hall|corridor|passage|stair|stairs|threshold|ceiling|frame|indoors)\b/i;
+
+    beforeEach(() => { resetRotationCursors(); });
+
+    it('⚠⚠⚠ NOT ONE OF THE 30 OPEN-GROUND LINES NAMES A ROOM', () => {
+      // Content-level, so a line added to the pool next year is covered the day
+      // it is written — the old pin only ever knew about one sentence.
+      for (const line of FLEE_OPEN_LINES) {
+        expect({ line, namesARoom: INTERIOR.test(line) }).toEqual({ line, namesARoom: false });
+      }
+    });
+
+    it('⚠⚠⚠ AND OUTDOORS NEVER *DRAWS* ONE — every fire, a full cycle and past it', () => {
+      // The pool being clean and the outdoor branch reading the clean pool are
+      // two different facts. This exercises the second: cycle twice over, so a
+      // wrap-around that fell through to the wrong pool is caught too.
+      for (let i = 0; i < FLEE_OPEN_LINES.length * 2 + 1; i++) {
+        const said = fleeLine(false);
+        expect({ i, said, namesARoom: INTERIOR.test(said) })
+          .toEqual({ i, said, namesARoom: false });
+        expect(FLEE_OPEN_LINES).toContain(said);
+      }
+    });
+
+    it('⚠⚠⚠ THE SWAPPED-TERNARY CASE — indoors draws ONLY from the indoor pool', () => {
+      // The half the old pin could not express. If the arms are ever exchanged,
+      // this fails on the first call, and so does the test above it.
+      for (let i = 0; i < FLEE_INDOOR_LINES.length * 2 + 1; i++) {
+        const said = fleeLine(true);
+        expect(FLEE_INDOOR_LINES).toContain(said);
+        expect(FLEE_OPEN_LINES).not.toContain(said);
+      }
+    });
+
+    it('⚠⚠ the original line SURVIVED — it was wrong outdoors, not wrong', () => {
+      // OTA-1301 was a placement fix, not a deletion. Indoors, "you break for
+      // the entrance and the chamber settles behind you" is exactly right, and
+      // a later cleanup that quietly dropped it would be a real content loss.
+      expect(FLEE_INDOOR_LINES).toContain(
+        'You break for the entrance. Behind you the chamber settles back into silence.',
+      );
+      expect(FLEE_INDOOR_LINES.some((l) => INTERIOR.test(l))).toBe(true);
+    });
+
+    it('⚠⚠ the two pools share no line — one sentence cannot be right in both places', () => {
+      // A line living in both pools would make the branch decorative: the same
+      // text could surface indoors and out, which is the defect wearing a
+      // disguise. Also catches a copy-paste that duplicates rather than moves.
+      const open = new Set<string>(FLEE_OPEN_LINES);
+      const both = FLEE_INDOOR_LINES.filter((l) => open.has(l));
+      expect(both).toEqual([]);
+    });
+
+    it('⚠⚠ and the store asks the question it is the authority on, then delegates', () => {
+      // The ONE thing left that source has to answer, because it is about
+      // wiring rather than behaviour: the store must not have grown a second,
+      // private copy of the decision. It supplies WHERE the player is; the
+      // choice of words is not its business.
+      const store = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
+      expect(store).toContain('fleeLine(fleeIndoors)');
+      // No second decision site: the pools are not named in the store at all
+      // any more, so there is nowhere for a stray `? OPEN : INDOOR` to hide.
+      expect(store).not.toContain('FLEE_OPEN_LINES');
+      expect(store).not.toContain('FLEE_INDOOR_LINES');
+    });
   });
 });
