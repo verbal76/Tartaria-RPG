@@ -85,3 +85,68 @@ export function powerMatchup(playerPower: number, enemyPower: number): PowerMatc
   if (enemyPower <= playerPower * 0.85) return 'favored';
   return 'even';
 }
+
+/**
+ * ⚠⚠⚠ OTA-1476 — ONE READING OF "HOW STRONG IS THIS PLAYER", FOR THE WORLD AND
+ * FOR THE GUARDIANS ALIKE.
+ *
+ * `encounter.ts` says, in its own words, that the gear term is optional so that
+ * "the pure stat/HP proxy stays callable for tooling and for THE GUARDIAN CURVE
+ * THIS IS KEPT IN SYNC WITH". That sentence stopped being true the day OTA-1159
+ * shipped: the wilderness spawner opted into the gear term and
+ * `guardianPlayerPower` did not, and its own comment records the intent to catch
+ * up later — "a gear term could sharpen it later; base is dependency-light".
+ * Nothing came back.
+ *
+ * ⚠⚠ MEASURED ON THE OWNER'S OWN CHARACTER, at the Voronov Cantor fight
+ * (STR 16 / DEX 16 / INT 11, hpMax 67, AC 24, Bolt-Caster):
+ *
+ *              guardian sees   world sees   gap   over-level curve
+ *   salvage        22.7           23.7      1.0     0.48 → 0.54
+ *   owed           22.7           24.8      2.1     0.48 → 0.60
+ *   bury_me        22.7           26.8      4.1     0.48 → 0.71
+ *
+ * So the world scales him 25–48% further up the over-level curve than the main
+ * quest's own boss does. He is a harder target to a roadside patrol than he is
+ * to the thing the entire game is about.
+ *
+ * ⚠ AND IT IS FREE AT THE LOW END, which is what makes this a drift fix rather
+ * than a difficulty change: a fresh arrival reads 15.0 BOTH ways, because
+ * `gearPowerTerm` clamps at the baselines. OTA-448's promise — "a kitted fresh
+ * arrival still meets the authored Tier 1" — holds without a special case, and
+ * `guardianOverLevel` is upward-only besides.
+ *
+ * ⚠⚠ THIS IS NOT THE WHOLE OF THE ATK 17 vs ATK 7 GAP in that log, and saying so
+ * matters. A rival raid also adds the faction's World-Pulse `tide` on top of
+ * player power with no ceiling, and lifts `packDanger` by `floor(tide/2)`. That
+ * is a deliberate dial ("the raids grow with the game") and it is the larger
+ * half. This OTA fixes the part that is unambiguously a drift — two definitions
+ * of one fact, one of which is documented as being in sync and is not.
+ */
+export interface PlayerPowerGear {
+  ac: number;
+  avgWeaponDamage: number;
+}
+
+/** ⚠ The BASELINES are the fallback, deliberately: `gearPowerTerm` reads them as
+ *  exactly zero, so a player object we cannot inspect scales as if it carries
+ *  nothing rather than inventing difficulty from a guess. That reasoning is
+ *  `scalePowerOf`'s, and it moves here with the code so it cannot be lost.
+ *
+ *  ⚠⚠ AND IT MUST NEVER THROW. `getEquippedWeapon` iterates `player.inventory`
+ *  with no guard, and a fixture without one raised "player.inventory is not
+ *  iterable" inside a spawn that was wrapped in try/catch — 200 consecutive
+ *  attempts produced no enemy at all and the only symptom was `spawned=false`.
+ *  A difficulty PROXY that can abort an encounter is far worse than an
+ *  imprecise one. */
+export function playerPowerGear(
+  player: PlayerCharacter,
+  baselines: { ac: number; avgWeaponDamage: number },
+): PlayerPowerGear {
+  try {
+    const weapon = getEquippedWeapon(player, 'main');
+    return { ac: standingAc(player), avgWeaponDamage: avgDamageNotation(weapon?.damageDice) };
+  } catch {
+    return { ...baselines };
+  }
+}

@@ -594,7 +594,7 @@ import { canonicalItemKind, canonicalItemRarity, canonicalItemTags } from '../en
 import { rollBossSpoils } from '../engine/bossLoot';
 // OTA-1159 — avgDamageNotation is the SAME damage proxy playerPowerScore uses, so the
 // difficulty curve and the Power gauge price a weapon identically.
-import { enemyPowerScore, avgDamageNotation } from '../engine/powerRating';
+import { enemyPowerScore, avgDamageNotation, playerPowerGear } from '../engine/powerRating';
 import { levenshtein } from '../engine/editDistance';
 import { matchLocationByName } from '../engine/locationMatch';
 import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
@@ -4386,18 +4386,16 @@ export function scalePowerOf(player: PlayerCharacter): number {
   // this function, and adding a dial at each of them is how the AC term went missing for
   // as long as it did. `dialOf`, not `profileOf`, so a CUSTOM character who left "The
   // world reads your kit" unchecked gets the 'owed' weight for it.
+  // ⚠⚠ OTA-1476 — THE READ MOVED DOWN TO `powerRating.playerPowerGear`, and the
+  // reasoning above moved with it. It is not a refactor for tidiness: the
+  // Guardian curve needs the identical reading, and `encounter.ts` has claimed
+  // in its own comment since OTA-1159 that the two are "kept in sync" while they
+  // demonstrably were not. One function, both callers, no way to drift.
   const tierBlend = dialOf(player, 'gearBlend');
-  let gear = { ac: AC_POWER_BASELINE, avgWeaponDamage: DMG_POWER_BASELINE, tierBlend };
-  try {
-    const weapon = getEquippedWeapon(player, 'main');
-    gear = {
-      ac: standingAc(player),
-      avgWeaponDamage: avgDamageNotation(weapon?.damageDice),
-      tierBlend,
-    };
-  } catch {
-    // degrade to the authored curve; never let gear inspection kill a spawn
-  }
+  const gear = {
+    ...playerPowerGear(player, { ac: AC_POWER_BASELINE, avgWeaponDamage: DMG_POWER_BASELINE }),
+    tierBlend,
+  };
   return enemyScalePower(base, player.hpMax, gear);
 }
 

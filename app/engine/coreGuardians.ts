@@ -25,6 +25,11 @@
 
 import type { Enemy, InventoryItem, PlayerCharacter, Stats } from './types';
 import { LOST_CAPITAL_LOCATIONS } from './mainQuest';
+// ⚠ OTA-1476 — the world's own power proxy, imported rather than re-derived.
+// Both are engine leaves; `powerRating` reaches equipment/combatRules/enemyTraits
+// and none of those reach back here, so this cannot cycle.
+import { enemyScalePower, AC_POWER_BASELINE, DMG_POWER_BASELINE } from './encounter';
+import { playerPowerGear } from './powerRating';
 
 /** Trait tag every Guardian carries. Used by gameStore to detect
  *  Guardian kills/flees without name-matching. */
@@ -166,7 +171,35 @@ const CANON_BASE_HP = 42;
 export function guardianPlayerPower(player: PlayerCharacter): number {
   const s = player.stats;
   const bestCombat = Math.max(s.strength, s.dexterity, s.intelligence);
-  return bestCombat + player.hpMax / 10;
+  // ⚠⚠⚠ OTA-1476 — AND WHAT THEY ARE WEARING AND SWINGING, which this function
+  // has been ignoring since OTA-1159 gave the wilderness spawner a gear term and
+  // left the Guardian curve on the bare stat proxy. `encounter.ts` still says the
+  // two are "kept in sync"; the note directly above says "a gear term could
+  // sharpen it later". Later is now — and it is the SAME function the world
+  // calls, not a second copy, so they cannot drift again.
+  //
+  // Measured on the owner's character at the Voronov Cantor fight (STR 16 /
+  // DEX 16 / INT 11, hpMax 67, AC 24, Bolt-Caster): the Guardian read 22.7 while
+  // the world read 24.8 — 0.48 vs 0.60 up the over-level curve. He was a harder
+  // target to a roadside patrol than to the thing the whole game is about.
+  //
+  // ⚠ FREE AT THE LOW END, which is what makes this a drift fix and not a
+  // difficulty change: `gearPowerTerm` clamps at the baselines, so a fresh
+  // arrival reads 15.0 either way and OTA-448's promise ("a kitted fresh arrival
+  // still meets the authored Tier 1") needs no special case. `guardianOverLevel`
+  // is upward-only besides.
+  //
+  // ⚠⚠ `tierBlend` is deliberately the DEFAULT 1, not `dialOf(player,
+  // 'gearBlend')`. The pressure dials tune how hard the WORLD leans on a
+  // player's kit; the main quest's own ladder is authored, tested and monotone
+  // (OTA-926/931), and handing it a per-character multiplier would make the
+  // story's difficulty depend on a survey answer. The world may lean harder or
+  // softer; the Guardian reads the shipped half weight and nothing else.
+  const gear = playerPowerGear(player, {
+    ac: AC_POWER_BASELINE,
+    avgWeaponDamage: DMG_POWER_BASELINE,
+  });
+  return enemyScalePower(bestCombat, player.hpMax, gear);
 }
 
 /** Over-level multiplier for a Guardian at `tier`. 1.0 when the player is at/under

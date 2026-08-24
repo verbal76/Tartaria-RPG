@@ -24,6 +24,8 @@ import {
   enemyScalePower, gearPowerTerm,
   AC_POWER_BASELINE, DMG_POWER_BASELINE, GEAR_POWER_DIVISOR, GEAR_POWER_BLEND,
 } from '../app/engine/encounter';
+// ⚠ OTA-1476 — the read moved here so the Guardian curve could share it.
+import { playerPowerGear } from '../app/engine/powerRating';
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -145,8 +147,19 @@ describe('OTA-1159 — one place builds a scale power', () => {
     // ⚠ OTA-1133 exists because two surfaces disagreed about what the player's AC
     // was. Spelling it a third time inside the difficulty curve would rebuild that
     // bug somewhere nobody would look for it.
-    expect(STORE).toContain('ac: standingAc(player)');
-    expect(STORE).toContain('avgWeaponDamage: avgDamageNotation(weapon?.damageDice)');
+    //
+    // ⚠⚠ OTA-1476 MOVED THE READ, and this pin quoted its two lines verbatim in
+    // gameStore. The claim was never about which FILE holds them — it is that
+    // there is ONE reader and it defers to `standingAc`. The read now lives in
+    // `powerRating.playerPowerGear` so the Guardian curve can call the identical
+    // function, which is a strengthening of exactly what this test protects.
+    const PR = read('app', 'engine', 'powerRating.ts');
+    expect(PR).toContain('export function playerPowerGear');
+    expect(PR).toContain('ac: standingAc(player)');
+    expect(PR).toContain('avgWeaponDamage: avgDamageNotation(weapon?.damageDice)');
+    // and gameStore defers to it rather than keeping a copy
+    expect(STORE).toContain('playerPowerGear(player, {');
+    expect(STORE).not.toContain('ac: standingAc(player)');
   });
 
   it('⚠ reading gear can never throw a spawn away', () => {
@@ -156,7 +169,24 @@ describe('OTA-1159 — one place builds a scale power', () => {
     // so an uncaught throw here does not surface as an error, it surfaces as an
     // encounter that silently never happens. A difficulty PROXY that can delete a
     // fight is a worse bug than the one this OTA fixes. Verified by probe 2026-08-07.
-    expect(STORE).toContain('  } catch {\n    // degrade to the authored curve; never let gear inspection kill a spawn\n  }');
+    // ⚠⚠ OTA-1476 — ASSERTED AS BEHAVIOUR NOW, NOT AS A QUOTED CATCH BLOCK. The
+    // old pin matched the exact text of the `} catch {` and its comment, so
+    // moving the read one file across broke it while the guarantee was fully
+    // intact. Calling the thing and proving it does not throw is both stronger
+    // and immune to the next move — and it is the property the comment above
+    // actually describes.
+    for (const broken of [{}, { stats: {} }, { hpMax: 40 }, { inventory: null }] as unknown[]) {
+      expect(() => playerPowerGear(
+        broken as never,
+        { ac: AC_POWER_BASELINE, avgWeaponDamage: DMG_POWER_BASELINE },
+      )).not.toThrow();
+    }
+    // ⚠ AND NOT A PIN ON THE COMMENT'S WORDING. A first draft of this rebuild
+    // asserted the prose "never let gear inspection kill a spawn" had travelled
+    // with the code; it had been paraphrased, and the assertion failed on a
+    // rewrite that changed nothing. Quoting a comment is the same mistake as
+    // quoting a sentence of narration — the four pins that broke this week were
+    // all this shape. The calls above prove the guarantee; nothing else needs to.
     // ⚠ and the fallback must be the BASELINES — which make gearPowerTerm exactly 0,
     // i.e. the pre-OTA-1159 number. If we cannot see the gear we scale as though there
     // is none, rather than inventing difficulty from a guess.
@@ -165,7 +195,17 @@ describe('OTA-1159 — one place builds a scale power', () => {
     // two baselines are still the fallback — and it is now asserted more tightly than
     // before: the fallback must read exactly 0 AT EVERY TIER WEIGHT, which is the
     // property the original assertion was really protecting.
-    expect(STORE).toContain('let gear = { ac: AC_POWER_BASELINE, avgWeaponDamage: DMG_POWER_BASELINE, tierBlend };');
+    // ⚠ The FALLBACK, as a consequence rather than as a literal: whatever an
+    // unreadable player yields, its gear term must be exactly zero at every tier
+    // weight. That is what "we scale as though there is none" means, and it
+    // survives the read moving house.
+    for (const broken of [{}, { stats: {} }, { inventory: null }] as unknown[]) {
+      const g = playerPowerGear(broken as never, { ac: AC_POWER_BASELINE, avgWeaponDamage: DMG_POWER_BASELINE });
+      for (const blend of [0, 0.5, 1, 1.5, 2]) {
+        expect({ blend, term: gearPowerTerm(g.ac, g.avgWeaponDamage, blend) }).toEqual({ blend, term: 0 });
+      }
+    }
+    expect(STORE).toContain('ac: AC_POWER_BASELINE, avgWeaponDamage: DMG_POWER_BASELINE');
     expect(gearPowerTerm(AC_POWER_BASELINE, DMG_POWER_BASELINE)).toBe(0);
     for (const blend of [0, 0.5, 1, 1.5, 2]) {
       expect(gearPowerTerm(AC_POWER_BASELINE, DMG_POWER_BASELINE, blend)).toBe(0);
