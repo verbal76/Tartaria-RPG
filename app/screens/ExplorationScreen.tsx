@@ -1506,13 +1506,41 @@ export function ExplorationScreen() {
         const atLocationCrucible = !!(player.fusionPending
           || (player.hubRoomId && (player.macroVisitSeq ?? 0) >= 1)
           || activeBuildingId === 'market');
-        // arb-fix (player) — a VENDOR's portable Crucible is offered from INSIDE the
-        // vendor screen (its own fuse chip). On a roadside-vendor tile the old OTA-739
-        // exploration chip DUPLICATED that offer (chip on the tile + fuse chip in the
-        // vendor). So the tile chip now shows ONLY for a location's OWN Crucible; a
-        // vendor-carried Crucible lives solely in the vendor screen. No Crucible is
-        // stranded — the vendor screen still fires useVendorCrucible for 25 TC.
-        if (!atLocationCrucible) return null;
+        // ⚠⚠⚠ OTA-1470 — AND A VENDOR'S PORTABLE CRUCIBLE IS A CHIP TOO, FROM THE
+        // FIRST MOMENT. This REVERSES the arb-fix decision that used to live here
+        // ("a vendor-carried Crucible lives solely in the vendor screen"), on the
+        // owner's explicit ask:
+        //
+        //   "when I first went to ovik's shop inside there was the fuse screen we
+        //    were looking for... but when I backed out it put the store chip and
+        //    the fuse chip on the same line like we had decided before. it's only
+        //    the initial time i enter that I see the messed up fuse block. it's
+        //    not that it's broken, it just shouldn't be there, it should be a
+        //    separate chip from the start."
+        //
+        // ⚠⚠ WHAT HE WAS SEEING WAS TWO DIFFERENT AFFORDANCES FOR ONE THING, and
+        // which one he got depended on whether he had already paid. Before the
+        // 25 TC: a full-width CRUCIBLE button buried in the vendor screen — the
+        // "messed up fuse block". After paying, `fusionPending` flips, and the
+        // same Crucible becomes a chip on the tile beside the store chip. Same
+        // Crucible, same tap, two completely different pieces of UI, switching
+        // under him mid-session.
+        //
+        // arb-fix was right that the two must never BOTH show — that was the
+        // duplication it removed. It picked the wrong survivor. The chip is the
+        // one that composes (it shares `placeChipRow` with the store chip, which
+        // is the layout he is asking for by name), so the chip wins and the
+        // vendor-screen button goes.
+        //
+        // ⚠ `macroVisitSeq >= 1` mirrors `useVendorCrucible`'s own refusal — "the
+        // Crucible's not for first-timers". A chip that renders lit and answers
+        // with a wall is the exact defect OTA-1024 and the vendor screen's own
+        // comment already record; the requirement is known at render time, so it
+        // is consulted at render time.
+        const vendorCrucible = !atLocationCrucible
+          && !!currentScene?.vendor
+          && (player.macroVisitSeq ?? 0) >= 1;
+        if (!atLocationCrucible && !vendorCrucible) return null;
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { gateFusion, findFactionCatalyst } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
         // arb-fix — mirror the fuse handler: a reserved faction catalyst counts
@@ -1524,11 +1552,25 @@ export function ExplorationScreen() {
         );
         const bannerCatalyst = findFactionCatalyst(player.inventory ?? [], bannerEquippedIds);
         const gate = gateFusion(player.inventory ?? [], bannerCatalyst);
-        // A location forge is free via 'fuse' (a vendor's paid Crucible lives in the
-        // vendor screen now).
-        const fireCrucible = () => useGameStore.getState().submitPlayerAction('fuse');
-        const readyName = '★★ Crucible ready';
-        const readyHint = 'tap to fuse · spends ♥ items';
+        // ⚠ OTA-1470 — a LOCATION forge is free ('fuse'); a VENDOR's is 25 TC and
+        // goes through `useVendorCrucible`, which owns the charge, the tour-mode
+        // refusal and the first-timer refusal. Routing the chip through the same
+        // action the vendor button used means the price and every gate behind it
+        // move with it — the chip is a new door onto the old handler, not a
+        // second implementation of it.
+        const fireCrucible = () => (vendorCrucible
+          ? useGameStore.getState().useVendorCrucible()
+          : useGameStore.getState().submitPlayerAction('fuse'));
+        const shortOfCoin = vendorCrucible && (player.tc ?? 0) < 25;
+        const readyName = vendorCrucible ? '★★ Crucible · 25 TC' : '★★ Crucible ready';
+        // ⚠ OTA-1024's lesson, carried onto the chip: say the fee AND the balance
+        // BEFORE the tap. He once spent down to 11 TC, tapped, and learned about
+        // the fee from a buried system line.
+        const readyHint = shortOfCoin
+          ? `25 TC to fire — you have ${player.tc ?? 0}`
+          : vendorCrucible
+            ? `${currentScene?.vendor?.name ?? 'the trader'} fires it · spends ♥ items`
+            : 'tap to fuse · spends ♥ items';
         return (
         <TouchableOpacity
           style={[styles.placeChip, styles.fusionChip]}
@@ -1544,7 +1586,10 @@ export function ExplorationScreen() {
             {/* OTA-220's reason line survives the OTA-1029 squeeze: the READY case
                 is a one-liner, but a BLOCKED Crucible still spells out what's
                 missing (a player once tapped fuse 5× not knowing). */}
-            <Text style={styles.placeChipHint} numberOfLines={gate.ok ? 1 : 2}>
+            <Text
+              style={[styles.placeChipHint, shortOfCoin && gate.ok && styles.placeChipHintShort]}
+              numberOfLines={gate.ok ? 1 : 2}
+            >
               {gate.ok
                 ? readyHint
                 : (gate.reason ?? 'tap for details')}
@@ -2900,6 +2945,10 @@ const styles = StyleSheet.create({
   },
   placeChipBody: { flex: 1, paddingHorizontal: 7, paddingVertical: 3, minWidth: 0 },
   placeChipHint: { color: '#a2977b', fontSize: 9, letterSpacing: 0.5, marginTop: 1 },
+  // OTA-1024's short-of-coin amber, carried onto the chip with the fee line it
+  // belongs to. It is the colour that made "you have 11" read as a WARNING and
+  // not as trivia, on the exact screen where he missed it the first time.
+  placeChipHintShort: { color: '#e0a75f' },
   placeChipArrow: { color: '#8a8070', fontSize: 16, paddingHorizontal: 7 },
   placeChipX: { paddingHorizontal: 9, paddingVertical: 7, alignSelf: 'center' },
   vendorChip: { borderColor: '#c9a86a' },

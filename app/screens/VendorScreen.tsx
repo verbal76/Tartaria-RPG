@@ -60,7 +60,6 @@ export function VendorScreen() {
   const sellToVendor = useGameStore((s) => s.sellToVendor);
   const stealFromVendor = useGameStore((s) => s.stealFromVendor);
   const dismissVendor = useGameStore((s) => s.dismissVendor);
-  const useVendorCrucible = useGameStore((s) => s.useVendorCrucible);
   const acceptFactionQuest = useGameStore((s) => s.acceptFactionQuest);
   const acceptHunt = useGameStore((s) => s.acceptHunt);
   const acceptMystery = useGameStore((s) => s.acceptMystery);
@@ -531,44 +530,44 @@ export function VendorScreen() {
             ✦ Bad blood — they deal, but at +{Math.abs(rapportPct)}% on buys and {rapportPct}% on your sell-backs (faction standing)
           </Text>
         )}
-        {/* arb103 — every vendor will fire a portable Fusing Crucible for 25 TC.
-            arb153 — …EXCEPT where the LOCATION already has its own Crucible chip
-            (outpost / Hidden Market / a live fusion permit): the exploration
-            screen already offers that Crucible, so the vendor's paid 25 TC copy
-            is redundant. Mirror the exploration chip's own gate so the two never
-            both show. Roadside / wild stalls (no hub, not market) keep it — it's
-            the only Crucible there. */}
-        {/* ⚠⚠ AND NOT BEFORE YOU HAVE EVER LEFT. `useVendorCrucible` refuses outright
-            while `macroVisitSeq < 1` — "the Crucible's not for first-timers" — but that
-            check lived ONLY inside the handler, so the chip rendered lit, took the tap,
-            and answered with a wall. Owner's device log, at a roadside stall mid-first-
-            journey: four taps, four identical refusals in seventy seconds. ⚠ The comment
-            twelve lines below cites OTA-1024, which exists because he hit exactly this
-            shape on the FEE — "a lit button that doesn't fire". Same defect, different
-            gate, so it gets the same answer: the requirement is known at render time,
-            so consult it at render time. The handler's refusal stays as the backstop for
-            any other path in. */}
-        {(player?.macroVisitSeq ?? 0) >= 1
-          && !(player?.fusionPending
-          || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1)
-          || activeBuildingId === 'market') && (
-          <TouchableOpacity
-            style={styles.crucibleBtn}
-            onPress={() => { useVendorCrucible(); setScreen('exploration'); }}
-            activeOpacity={0.7}
-            accessibilityRole="button"
-          >
-            {/* OTA-1024 — say the fee AND the balance BEFORE the tap. The
-                owner spent down to 11 TC, tapped, and learned about the fee
-                from a buried system line — a lit button that doesn't fire.
-                Short-of-coin now reads amber with the exact shortfall. */}
-            <Text style={[styles.crucibleBtnText, (player?.tc ?? 0) < 25 && styles.crucibleBtnShort]}>
-              {(player?.tc ?? 0) < 25
-                ? `★★ USE CRUCIBLE · 25 TC — you have ${player?.tc ?? 0}`
-                : '★★ USE CRUCIBLE · 25 TC'}
-            </Text>
-          </TouchableOpacity>
-        )}
+        {/* ⚠⚠⚠ OTA-1470 — THE FULL-WIDTH CRUCIBLE BUTTON THAT USED TO LIVE HERE
+            IS GONE, and its work moved to the tile chip in ExplorationScreen's
+            `placeChipRow`. Owner:
+
+              "it's only the initial time i enter that I see the messed up fuse
+               block. it's not that it's broken, it just shouldn't be there, it
+               should be a separate chip from the start."
+
+            He was seeing TWO DIFFERENT AFFORDANCES for one Crucible, and which
+            one he got depended on whether he had already paid: before the 25 TC
+            this button; after it, `fusionPending` flips and the same Crucible
+            becomes a chip beside the store chip on the tile. Same Crucible, same
+            tap, two pieces of UI swapping under him mid-session.
+
+            arb153 was right that the two must never both show. It picked the
+            wrong survivor. The chip composes — it shares a row with the store
+            chip, which is the layout he asks for by name — so the chip stays and
+            this goes.
+
+            ⚠ NOTHING IS STRANDED. The chip fires the same `useVendorCrucible`,
+            which still owns the 25 TC charge, the tour-mode refusal and the
+            first-timer refusal; and the chip mirrors the `macroVisitSeq >= 1`
+            gate at render time exactly as this button learned to. `fuse` typed
+            at a vendor tile still works too.
+
+            ⚠⚠ TWO RULES THIS BUTTON CARRIED MOVE WITH IT, because both were
+            learned the hard way and neither is obvious from the chip's side:
+
+              • arb103/arb153 — every vendor fires a portable Crucible for 25 TC,
+                EXCEPT where the location already has its own (outpost / Hidden
+                Market / a live fusion permit). The chip's `!atLocationCrucible`
+                is that same rule; the two must never both show.
+              • "not before you have ever left" — `useVendorCrucible` refuses
+                outright while `macroVisitSeq < 1`, and that check once lived
+                ONLY in the handler, so the button rendered lit, took the tap and
+                answered with a wall. His log: four taps, four identical refusals
+                in seventy seconds. The requirement is known at render time, so
+                it is consulted at render time — on the chip now, as it was here. */}
       </View>
 
       {tutorialDemoVendor && (
@@ -1265,18 +1264,12 @@ const styles = StyleSheet.create({
   vendorTitle: { color: '#a2977b', fontSize: 11, letterSpacing: 1, marginTop: 1 },
   vendorDesc: { color: '#cdbf99', fontSize: 12, marginTop: 6, lineHeight: 17, fontStyle: 'italic' },
   rapportBanner: { color: '#9ec96a', fontSize: 12, marginTop: 6, fontWeight: '700' },
-  // arb103 — vendor Fusing Crucible offer.
-  crucibleBtn: {
-    marginTop: 10,
-    paddingVertical: 8,
-    borderRadius: 4,
-    borderColor: '#b88ce0',
-    borderWidth: 1,
-    backgroundColor: '#1e1726',
-    alignItems: 'center',
-  },
-  crucibleBtnText: { color: '#d9b8f0', fontSize: 12, fontWeight: '800', letterSpacing: 1 },
-  crucibleBtnShort: { color: '#e0a75f' }, // OTA-1024 — short-of-coin amber
+  // ⚠ OTA-1470 — `crucibleBtn` / `crucibleBtnText` / `crucibleBtnShort` are gone
+  // with the button they dressed. A style sheet is a claim about what a
+  // component renders, and three orphaned entries would keep saying this screen
+  // has a Crucible in it. The purple-on-dark it carried lives on in the chip's
+  // `fusionChip` / `fusionBannerStripe`, and the short-of-coin amber in the
+  // chip's hint line.
   walletRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
