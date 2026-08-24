@@ -63,19 +63,25 @@ jobs:
               for ev in events[:8]:
                   print(f'  seen: title={ev.get("title")!r} message={ev.get("message")!r} id={ev.get("eventID","")[:8]} at={ev.get("dateCreated")}')
               for ev in events:
+                  # ⚠ EVERYTHING is the owner's own diagnostics — player-log
+                  # bundles AND the crash-ledger reports (the six native-death
+                  # events were the first proof the whole pipeline works).
                   title = ' '.join(str(x) for x in [ev.get('title'), ev.get('message')])
-                  if 'player-log' not in title:
-                      continue
+                  kind = 'player-log' if 'player-log' in title else 'crash'
                   eid = ev['eventID']
                   stamp = (ev.get('dateCreated') or '').replace(':', '-')[:19]
-                  safe = re.sub(r'[^A-Za-z0-9_-]', '_', f'{stamp}_{eid[:12]}')
+                  safe = re.sub(r'[^A-Za-z0-9_-]', '_', f'{kind}_{stamp}_{eid[:12]}')
                   d = out_root / safe
                   if (d / 'event.json').exists():
                       continue  # already synced on a previous run
                   d.mkdir(parents=True, exist_ok=True)
-                  (d / 'event.json').write_bytes(json.dumps(
-                      {'title': title, 'eventID': eid, 'dateCreated': ev.get('dateCreated'),
-                       'tags': ev.get('tags'), 'project': slug}, indent=2).encode())
+                  try:
+                      full = api(f'/projects/{org}/{slug}/events/{eid}/')
+                  except Exception as e:
+                      print(f'{eid}: full event fetch failed: {e}')
+                      full = {'title': title, 'eventID': eid, 'dateCreated': ev.get('dateCreated'),
+                              'tags': ev.get('tags'), 'project': slug}
+                  (d / 'event.json').write_bytes(json.dumps(full, indent=2).encode())
                   try:
                       atts = api(f'/projects/{org}/{slug}/events/{eid}/attachments/')
                   except Exception as e:
