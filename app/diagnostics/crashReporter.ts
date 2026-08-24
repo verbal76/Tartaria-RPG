@@ -123,6 +123,33 @@ export async function setReportingEnabled(on: boolean): Promise<void> {
   try { await AsyncStorage.setItem(CRASH_REPORTING_PREF_KEY, on ? 'true' : 'false'); } catch { /* ignore */ }
 }
 
+// ⚠⚠ OTA-1488 — THE ONE-TIME NOTICE, AND WHY THE FLUSH WAITS FOR IT. An
+// opt-out default is only honest if the player is TOLD before the first byte
+// leaves. App.tsx skips the boot flush while the notice is owed; the popup
+// (CrashReportNoticeOverlay) flushes when dismissed. Once the flag is stored,
+// every later boot flushes normally.
+export const CRASH_NOTICE_SEEN_KEY = '@tartaria/crashNoticeSeen';
+
+/** True when the one-time popup should show: delivery is configured, the
+ *  loaded preference resolves ON, and the notice is unseen. A player with a
+ *  recorded OFF never sees it — for them nothing changed. */
+export async function crashNoticeNeeded(): Promise<boolean> {
+  if (!reportingConfigured()) return false;
+  if (!(await loadReportingPref())) return false;
+  try {
+    return (await AsyncStorage.getItem(CRASH_NOTICE_SEEN_KEY)) !== 'true';
+  } catch {
+    // An unreadable flag must not loop the popup forever; and the flush this
+    // answer would unblock is still held by loadReportingPref's own read-error
+    // default (false), so nothing sends untold either.
+    return false;
+  }
+}
+
+export async function markCrashNoticeSeen(): Promise<void> {
+  try { await AsyncStorage.setItem(CRASH_NOTICE_SEEN_KEY, 'true'); } catch { /* ignore */ }
+}
+
 /** One line for the About screen, and it says which switch is holding it. A
  *  toggle that reads "on" while a missing DSN silently blocks delivery is how a
  *  player (or the owner, reading a bug report) concludes reports are arriving

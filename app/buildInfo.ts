@@ -24529,7 +24529,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // turns it off; a stored OFF from any version is permanent and never
 // overridden; nothing sends before the stored answer is read; PRIVACY.md
 // moved in the same commit.
-export const OTA_BUILD_ID = '2026-08-24-1487-opt-out-not-opt-in';
+// OTA-1488 — the one-time crash-delivery popup (owner's ask, his own
+// screenshot inside): says delivery is on, shows exactly where the switch
+// is (SETTINGS -> SESSION -> REPORTING, row framed), offers TURN OFF and
+// KEEP ON, and GATES the first send — the boot flush waits until the
+// notice is dismissed, so every player is told before the first byte leaves.
+export const OTA_BUILD_ID = '2026-08-24-1488-told-first-sent-second';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1487-opt-out-not-opt-in';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1486-wield-is-not-wear';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1485-the-chip-joins-the-tap-ledger';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1484-a-pin-states-a-claim';

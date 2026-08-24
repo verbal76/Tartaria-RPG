@@ -45,6 +45,7 @@ import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
 import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1020
 import { DedicationOverlay } from './app/components/DedicationOverlay';
+import { CrashReportNoticeOverlay } from './app/components/CrashReportNoticeOverlay'; // OTA-1488
 import { StoryRevealOverlay } from './app/components/StoryRevealOverlay'; // OTA-1183
 import { StoryForkOverlay } from './app/components/StoryForkOverlay'; // OTA-1065
 import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1022
@@ -348,7 +349,11 @@ export default function App() {
         st.installSentryIfAvailable();
         await cl.loadCrashLedger();
         await cr.loadReportingPref();
-        await cr.flushCrashReports();
+        // ⚠ OTA-1488 — the FIRST send waits for the one-time opt-out notice:
+        // nothing leaves the device before the player has seen the popup that
+        // says it will. The overlay flushes on dismissal; once the notice flag
+        // is stored, every later boot takes this flush as before.
+        if (!(await cr.crashNoticeNeeded())) await cr.flushCrashReports();
       } catch { /* diagnostics must never block a boot */ }
     })();
     // OTA-405 — GATE A safety cap. otaBootResolved opens the character-entry
@@ -940,6 +945,13 @@ export default function App() {
           whatever the opening is doing at that moment. */}
       <SilentBoundary tag="DedicationOverlay">
         <DedicationOverlay />
+      </SilentBoundary>
+      {/* ⚠ OTA-1488 — the one-time crash-delivery notice (owner's ask, with his
+          own screenshot inside). Mounted globally so it lands on the first boot
+          after OTA-1487 regardless of screen; it also holds the first flush
+          until dismissed — told first, sent second. */}
+      <SilentBoundary tag="CrashReportNoticeOverlay">
+        <CrashReportNoticeOverlay />
       </SilentBoundary>
       {/* OTA-1183 — a completed collectible story, read whole. Mounted beside the
           chapter card because it is the same register of beat, and globally because a
