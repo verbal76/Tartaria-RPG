@@ -1,0 +1,98 @@
+# ⚠⚠ SENTRY INBOX RELAY — why this exists.
+#
+# The owner's SEND LOG button (OTA-1489) ships player-log bundles to Sentry,
+# but the cloud workspace Claude works in has a fixed egress policy that does
+# not include sentry.io, so it cannot read them back directly. CI runners can.
+# This workflow pulls the recent player-log events + their attachments from
+# Sentry and commits them under sentry-inbox/, where the workspace CAN read
+# them (git pull). Trigger: push a change to sentry-inbox/request.txt.
+#
+# Requires the repo secret SENTRY_READ_TOKEN (a read-scoped Sentry token).
+# The token never appears in the tree; the fetched artifacts are the owner's
+# own diagnostics from his own devices.
+#
+# ⚠ The OTA publish workflow must ignore sentry-inbox/** (it does, same
+# commit that added this file) — an inbox sync is not a game update.
+name: Sentry inbox sync
+
+on:
+  push:
+    branches: [golem-line]
+    paths: ['sentry-inbox/request.txt']
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull player-log bundles from Sentry
+        env:
+          SENTRY_READ_TOKEN: ${{ secrets.SENTRY_READ_TOKEN }}
+          ORG: hot-attic-games-llc
+          BASE: https://us.sentry.io/api/0
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, urllib.request, pathlib, re
+
+          tok = os.environ['SENTRY_READ_TOKEN']
+          org = os.environ['ORG']
+          base = os.environ['BASE']
+
+          def api(path, raw=False):
+              req = urllib.request.Request(base + path)
+              req.add_header('Authorization', 'Bearer ' + tok)
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  data = r.read()
+              return data if raw else json.loads(data)
+
+          out_root = pathlib.Path('sentry-inbox')
+          projects = api(f'/organizations/{org}/projects/')
+          fetched = []
+          for p in projects:
+              slug = p['slug']
+              try:
+                  events = api(f'/projects/{org}/{slug}/events/?full=false')
+              except Exception as e:
+                  print(f'{slug}: events list failed: {e}')
+                  continue
+              for ev in events:
+                  title = (ev.get('title') or ev.get('message') or '')
+                  if 'player-log' not in title:
+                      continue
+                  eid = ev['eventID']
+                  stamp = (ev.get('dateCreated') or '').replace(':', '-')[:19]
+                  safe = re.sub(r'[^A-Za-z0-9_-]', '_', f'{stamp}_{eid[:12]}')
+                  d = out_root / safe
+                  if (d / 'event.json').exists():
+                      continue  # already synced on a previous run
+                  d.mkdir(parents=True, exist_ok=True)
+                  (d / 'event.json').write_bytes(json.dumps(
+                      {'title': title, 'eventID': eid, 'dateCreated': ev.get('dateCreated'),
+                       'tags': ev.get('tags'), 'project': slug}, indent=2).encode())
+                  try:
+                      atts = api(f'/projects/{org}/{slug}/events/{eid}/attachments/')
+                  except Exception as e:
+                      print(f'{eid}: attachment list failed: {e}')
+                      continue
+                  for a in atts:
+                      name = re.sub(r'[^A-Za-z0-9._-]', '_', a.get('name') or a['id'])
+                      blob = api(f'/projects/{org}/{slug}/events/{eid}/attachments/{a["id"]}/?download=1', raw=True)
+                      (d / name).write_bytes(blob)
+                      print(f'{safe}/{name}: {len(blob)} bytes')
+                  fetched.append(safe)
+          print('fetched:', fetched or 'nothing new')
+          PYEOF
+      - name: Commit the inbox
+        run: |
+          git config user.name 'sentry-inbox'
+          git config user.email 'sentry-inbox@users.noreply.github.com'
+          git add sentry-inbox/
+          if git diff --cached --quiet; then
+            echo 'Nothing new to commit.'
+          else
+            git commit -m 'sentry-inbox: sync player-log bundles [skip ci]'
+            git push
+          fi

@@ -51,6 +51,9 @@ on:
     branches:
       - golem-line
     paths-ignore:
+      # Sentry inbox syncs (see sentry-inbox.yml) are diagnostics plumbing,
+      # not a game update — a synced log must never republish the bundle.
+      - 'sentry-inbox/**'
       - 'package.json'
       - 'package-lock.json'
       - 'app.json'
