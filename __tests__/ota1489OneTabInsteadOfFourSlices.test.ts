@@ -106,8 +106,11 @@ describe('OTA-1489 — the switch governs every contact with Sentry', () => {
 });
 
 describe('OTA-1489 — the button is the owner\'s, and honest about its work', () => {
-  it('⚠⚠ the render gate is the unlock-name check AND a configured build', () => {
-    expect(ABOUT).toContain('{sharingUnlockedFor(player?.name) && crashConfigured && (');
+  it('⚠⚠ the render gate is the owner unlock AND a configured build', () => {
+    // ⚠ OTA-1490 widened the unlock from the loaded character's name to the
+    // DEVICE (sticky flag; see ota1490TheDeviceIsTheOwner) — the gate shape
+    // here is the claim that SOME owner gate still fronts the button.
+    expect(ABOUT).toContain('{ownerTools && crashConfigured && (');
   });
 
   it('⚠⚠ the gate function itself: owner names pass, a player name does not', () => {

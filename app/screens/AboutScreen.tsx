@@ -38,7 +38,10 @@ import {
   loadReportingPref, setReportingEnabled, reportingStatusLine, reportingConfigured,
 } from '../diagnostics/crashReporter';
 import { sendDiagnosticsBundle } from '../diagnostics/sentryTransport'; // OTA-1489
-import { sharingUnlockedFor } from '../engine/fallenLedger'; // OTA-1489 — owner gate
+// ⚠ OTA-1490 — the owner gate is DEVICE-sticky now: any character on a device
+// that has ever held an unlock-named one gets the owner tools ("I have 2
+// characters on 1 account and only 1 has the send log option").
+import { noteOwnerCharacterSeen, ownerToolsUnlocked, unlockOwnerTools } from '../diagnostics/ownerTools';
 import { getAudioSettings, setAudioSettings, onAudioSettingsChange, type AudioSettings } from '../audio/audioSettings';
 import { forceReapplyAudioFromState } from '../audio/AudioController';
 import {
@@ -128,6 +131,29 @@ export function AboutScreen() {
   const [logCleared, setLogCleared] = useState(false);
   // OTA-1489 — SEND LOG button lifecycle (owner-gated; see the render site).
   const [logSendState, setLogSendState] = useState<'idle' | 'busy' | 'sent' | 'failed'>('idle');
+  // OTA-1490 — device-sticky owner unlock: seeing an unlock-named character
+  // marks the device, then EVERY character on it gets the owner tools.
+  const [ownerTools, setOwnerTools] = useState(false);
+  useEffect(() => {
+    let live = true;
+    void noteOwnerCharacterSeen(player?.name)
+      .then(() => ownerToolsUnlocked(player?.name))
+      .then((on) => { if (live) setOwnerTools(on); });
+    return () => { live = false; };
+  }, [player?.name]);
+  // ⚠ OTA-1490 — the universal unlock: SEVEN TAPS on the About info block
+  // (the dev-mode ritual). The owner runs golem AND hal with three characters
+  // across two accounts; per-install storage means a name-based unlock cannot
+  // reach an install whose roster carries ordinary names. This can.
+  const [ownerTaps, setOwnerTaps] = useState(0);
+  const handleOwnerTap = () => {
+    if (ownerTools) return;
+    const next = ownerTaps + 1;
+    setOwnerTaps(next);
+    if (next >= 7) {
+      void unlockOwnerTools().then(() => setOwnerTools(true));
+    }
+  };
   // Manual SAVE button feedback. 'saving' while the write runs, then a 'saved'
   // / 'failed' flash reflecting whether the atomic write actually landed.
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'failed'>('idle');
@@ -976,7 +1002,7 @@ export function AboutScreen() {
               device, and a log carries what they typed, so players never see
               this affordance. It also obeys the crash-reports switch: OFF means
               the app contacts Sentry for nothing, this included. */}
-          {sharingUnlockedFor(player?.name) && crashConfigured && (
+          {ownerTools && crashConfigured && (
             <TouchableOpacity
               style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
               onPress={() => { void handleSendLog(); }}
@@ -1571,7 +1597,15 @@ export function AboutScreen() {
 
         {tab === 'about' && (
         <>
-          <Text style={styles.mono}>{info}</Text>
+          <Text style={styles.mono} onPress={handleOwnerTap}>{info}</Text>
+          {/* OTA-1490 — a quiet countdown once the ritual is clearly deliberate,
+              and a pointer to where the unlocked tool actually lives. */}
+          {!ownerTools && ownerTaps >= 3 && (
+            <Text style={styles.mono}>{`${7 - ownerTaps} more taps to unlock owner tools`}</Text>
+          )}
+          {ownerTools && ownerTaps > 0 && (
+            <Text style={styles.mono}>OWNER TOOLS UNLOCKED — SEND LOG is under SESSION → REPORTING</Text>
+          )}
           <View style={styles.dedication}>
             <Text style={styles.dedicationRule}>· · ·</Text>
             <Text style={styles.dedicationBody}>

@@ -24546,7 +24546,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // is the workflow's golem path; the Actions-UI dispatch was unavailable), so
 // the owner's golem install gains 1481-1489 — the wield verb, the opt-out
 // switch, the notice popup, and SEND LOG for his golem saves.
-export const OTA_BUILD_ID = '2026-08-24-1489-one-tap-instead-of-four-slices';
+// OTA-1490 — the owner unlock is DEVICE-sticky ("I have 2 characters on 1
+// account and only 1 has the send log option"): seeing an unlock-named
+// character marks the device once, then every character on it gets the
+// owner tools. A device that never held one never unlocks.
+export const OTA_BUILD_ID = '2026-08-24-1490-the-device-is-the-owner';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1489-one-tap-instead-of-four-slices';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1488-told-first-sent-second';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1487-opt-out-not-opt-in';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1486-wield-is-not-wear';
