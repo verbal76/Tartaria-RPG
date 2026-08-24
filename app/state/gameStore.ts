@@ -25253,6 +25253,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // drop any active route chain so it doesn't yank them back.
     const dropChain = !_chainRouting;
     set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId, distanceRemaining: tiles }, whisperCourse: null, ...(dropChain ? { routedMission: null } : {}) } } : s));
+    // ⚠⚠⚠ OTA-1469 — THE BANNER USED TO DESCRIBE A DEPARTURE THAT HAD ALREADY
+    // HAPPENED. Owner, typed into the game: *"when I set an autoroute it
+    // refreshes whatever tile I am on with new items."*
+    //
+    // He was reading a real event correctly and being told the wrong story about
+    // it. Setting a course TAKES THE FIRST STEP IMMEDIATELY — deliberately, since
+    // OTA 053, "so the player sees motion now" — and the banner then told him to
+    // tap the travel button "to press on", as though he had not moved. He had:
+    // he was on a new tile, which rolled its own gear, which is why the ground
+    // appeared to restock under him. From his 2026-08-24 log, one second apart:
+    //
+    //   23:57:11.551  You set course for The Hidden Market. 11 tiles…
+    //                 Tap the → THE HIDDEN MARKET button … to press on
+    //   23:57:11.595  spawn: gear=[Earthshaker, Repeater Rifle, …] roster=new
+    //   23:57:11.606  You walk north.
+    //
+    // ⚠⚠ THE AUTO-STEP IS NOT THE DEFECT AND IS NOT BEING REMOVED. It is a
+    // deliberate feel decision with its own OTA behind it. The defect is that the
+    // sentence describing it was copied from the TUTORIAL path, which genuinely
+    // does not auto-depart (see the pick_city branch below, which says "When
+    // you're ready to leave, tap…" and means it). One of the two paths moves you
+    // and one does not, and they were sharing a sentence.
+    //
+    // ⚠ So the banner is now built AFTER we know which happened. A depleted
+    // player keeps the route and does NOT step (OTA-615), and for them the
+    // original wording was true all along — so they still get it.
+    const firstDir = nextCardinalToward(grid.x, grid.y, tgtCell.x, tgtCell.y);
+    const willStep = !!firstDir && get().player!.stamina >= STAMINA_COSTS.wander;
     get().appendLog(
       'world',
       // ⚠ OTA-1167 — IT CALLED EVERY TILE "A DAY". A tile costs TILE_HOURS (0.25h) on the
@@ -25261,7 +25289,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // banner was the last surface still quoting the pre-1185 fiction, and a player
       // reading it cannot budget a contract window at all. Now it quotes the SAME number
       // the deadline is built from, in the same units the deadline is expressed in.
-      `You set course for ${tgtName}. ${tiles} tile${tiles === 1 ? '' : 's'} — about ${formatWindow(travelHoursFor(tiles))} of travel, all in. Tap the → ${tgtName.toUpperCase()} button on the travel row to press on; STOP TRAVEL to halt.`,
+      `You set course for ${tgtName}. ${tiles} tile${tiles === 1 ? '' : 's'} — about ${formatWindow(travelHoursFor(tiles))} of travel, all in. `
+      + (willStep
+        ? `You set off now — the ground ahead is new ground. Keep tapping → ${tgtName.toUpperCase()} on the travel row to close the distance; STOP TRAVEL to halt.`
+        : `Tap the → ${tgtName.toUpperCase()} button on the travel row to press on; STOP TRAVEL to halt.`),
     );
     // Tungsten Spire — during the pick_city tutorial beat, picking a Capital
     // marks the road but does NOT auto-depart: the Arbiter hands control back
@@ -25286,11 +25317,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // arb47 — step toward the target's fixed CANON cell from the player's
     // absolute grid cell, not the re-centered visual map. Movement and distance
     // now share one frame, so every step provably shortens the canon distance.
-    const firstDir = nextCardinalToward(grid.x, grid.y, tgtCell.x, tgtCell.y);
     // OTA-615 — only take the first step if the player has the legs for it. The
     // COURSE is already set above; a depleted player keeps the planned route (the
     // travel row shows) and is told to rest, instead of losing the route entirely.
-    if (firstDir && get().player!.stamina >= STAMINA_COSTS.wander) {
+    //
+    // ⚠ OTA-1469 — `willStep` is computed with the banner above, from these same
+    // two conditions, so the sentence the player reads and the movement they get
+    // cannot disagree. Two derivations of one fact is how they come to.
+    if (willStep) {
       set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), TILE_HOURS) });
       get().stepDirection(firstDir);
       // arb103 — arrival is cell-based; and ALWAYS re-plot the badge from the new
