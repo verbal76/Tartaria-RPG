@@ -18,7 +18,10 @@
 // defers to template lines while the LLM warms up.
 
 import type { ItemEffect, StatKey } from './itemEffect';
-import { getCachedSynth, setCachedSynth, type SynthesizedItem } from './itemSynthesisCache';
+import {
+  getCachedSynth, setCachedSynth, noteSynthRefused, wasSynthRefused, clearSynthRefusal,
+  type SynthesizedItem,
+} from './itemSynthesisCache';
 import { noteQwenDiscarded, lastQwenCallPreempted } from '../ai/generation/qwenTelemetry';
 
 /** Minimal Qwen interface — same shape as llmParser.ts so tests can
@@ -74,6 +77,32 @@ const KIND_SYNONYMS: Readonly<Record<string, typeof KNOWN_KINDS[number]>> = {
   tool: 'misc',
   utility: 'misc',
   material: 'misc',
+  // ⚠⚠ OTA-1465 — the SAME miss this table was created to fix, one vocabulary
+  // later. The owner's 2026-08-24 log rejected "Smooth Stone" three times on
+  // `bad-kind="junk"`, and junk is a perfectly correct answer for a smooth
+  // stone. Every word below is one a small model reaches for when the honest
+  // answer is "this is ordinary stuff": still one-way, still changes nothing
+  // about what an item DOES.
+  junk: 'misc',
+  trash: 'misc',
+  scrap: 'misc',
+  debris: 'misc',
+  resource: 'misc',
+  ingredient: 'misc',
+  component: 'misc',
+  part: 'misc',
+  curio: 'misc',
+  oddment: 'misc',
+  keepsake: 'misc',
+  supply: 'misc',
+  drink: 'consumable',
+  medicine: 'consumable',
+  ration: 'consumable',
+  jewelry: 'accessory',
+  necklace: 'accessory',
+  charm: 'accessory',
+  shield: 'armor',
+  clothing: 'armor',
   gear: 'accessory',
   trinket: 'accessory',
   amulet: 'accessory',
@@ -96,6 +125,14 @@ export function canonicalSynthKind(raw: unknown): string {
 export function readSynthCache(name: string): SynthesizedItem | null {
   return getCachedSynth(name);
 }
+
+/** ⚠ OTA-1465 — re-exported through THIS module because the homework scanner
+ *  reaches the synthesis job as one unit (`require('itemSynthesisQwen')`), and a
+ *  caller should not have to know that "has it been described?" and "has it been
+ *  refused?" happen to live in two different files. Both are asked at the same
+ *  seam, one line apart; answering only half of them here is exactly the split
+ *  that lets the other half be forgotten at the next call site. */
+export { wasSynthRefused } from './itemSynthesisCache';
 
 /** Synthesize a stat overlay for `name` via Qwen. Fire-and-forget —
  *  the result lands in the cache for the NEXT lookup. Returns
@@ -299,9 +336,17 @@ export async function synthesizeItemViaQwen(
       ? `bad-kind="${kindSeen}"`
       : 'no-content';   // parsed, legal kind, but no description/tags/effect to add
     noteQwenDiscarded(`item_synth:rejected-by-clamp ${why}`);
+    // ⚠⚠⚠ OTA-1465 — AND REMEMBER IT. Without this the homework scanner picks
+    // the same name again on the next tick, forever, AND — because it takes the
+    // first eligible item — starves every item behind it in the pack. Three
+    // identical discards for "Smooth Stone" in one of his sessions, and nothing
+    // else described after it appeared.
+    noteSynthRefused(name);
     return null;
   }
 
+  // ⚠ A success retires any standing refusal for this name. See clearSynthRefusal.
+  clearSynthRefusal(name);
   setCachedSynth(name, validated);
   return validated;
 }

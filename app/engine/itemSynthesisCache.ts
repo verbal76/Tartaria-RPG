@@ -159,12 +159,73 @@ async function persistCache(): Promise<void> {
   }
 }
 
+// ⚠⚠⚠ OTA-1465 — THE REFUSAL LEDGER. Names this job has already tried and been
+// rejected on.
+//
+// This cache only ever remembered SUCCESS. A rejected name was written nowhere,
+// so `nextHomeworkItem` — which returns the FIRST inventory entry that is
+// neither pending nor cached — picked the same one again on every tick, forever.
+// The owner's 2026-08-24 log, one session:
+//
+//   00:02:02  item_synthesis_hw 6045ms ✂ DISCARDED — rejected-by-clamp bad-kind="junk"
+//   00:10:01  item_synthesis_hw 4596ms ✂ DISCARDED — rejected-by-clamp bad-kind="junk"
+//   00:11:00  item_synthesis_hw 4359ms ✂ DISCARDED — rejected-by-clamp bad-kind="junk"
+//                                        …all three "Smooth Stone"
+//
+// ⚠⚠ AND THE WASTE IS THE SMALL HALF. Because the scan takes the FIRST eligible
+// item, one permanently-failing name STARVES EVERY ITEM BEHIND IT. From the
+// moment Smooth Stone entered his pack, no other item in the pack could ever be
+// described — the queue was not slow, it was blocked. That is why this is a
+// cache fix and not a fifth rewrite of the prompt.
+//
+// ⚠ NOT PERSISTED, ON PURPOSE. A refusal is a fact about THIS BUILD's prompt and
+// validator, both of which change under the player between sessions; carrying it
+// to disk would make a fixed item stay broken until someone cleared storage. In
+// memory it costs one retry per launch and self-heals the moment a build lands
+// that can describe the thing.
+const REFUSED = new Set<string>();
+
+/** ⚠ Bounded like the positive cache, and for the same reason: a player who
+ *  hoards 400 distinct junk names should not grow this without limit. Oldest-in
+ *  wins eviction because Set preserves insertion order. */
+const MAX_REFUSED = 256;
+
+/** Record that synthesis for this name was rejected and should not be retried
+ *  this session. */
+export function noteSynthRefused(name: string): void {
+  const k = name.toLowerCase();
+  if (REFUSED.has(k)) return;
+  REFUSED.add(k);
+  if (REFUSED.size > MAX_REFUSED) {
+    const oldest = REFUSED.values().next().value as string | undefined;
+    if (oldest !== undefined) REFUSED.delete(oldest);
+  }
+}
+
+/** Has this name already been tried and rejected this session? */
+export function wasSynthRefused(name: string): boolean {
+  return REFUSED.has(name.toLowerCase());
+}
+
+/** ⚠ A LATER SUCCESS CLEARS THE REFUSAL. Nothing in the shipped game re-tries a
+ *  refused name today, but a future caller that forces one (a manual "describe
+ *  this", a prompt change behind a flag) must not leave the ledger claiming a
+ *  name is hopeless when the cache holds a good row for it. Two records of the
+ *  same fact are how they come to disagree. */
+export function clearSynthRefusal(name: string): void {
+  REFUSED.delete(name.toLowerCase());
+}
+
 /** Test/diagnostic hook — reset the in-memory cache. The persisted
  *  store on disk is left alone. */
 export function _resetCacheForTests(): void {
   STATE.entries.clear();
   STATE.loaded = false;
+  REFUSED.clear();
 }
+
+/** Test/diagnostic hook — how many names are on the refusal ledger. */
+export function _refusedCountForTests(): number { return REFUSED.size; }
 
 /** Test/diagnostic hook — snapshot of the current cache. */
 export function _snapshotCacheForTests(): SynthesizedItem[] {

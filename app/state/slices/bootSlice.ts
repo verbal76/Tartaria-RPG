@@ -524,6 +524,16 @@ export const createBootSlice = (
             const key = it.name.toLowerCase();
             if (pending.has(key)) continue;
             if (synth.readSynthCache(it.name)) continue;
+            // ⚠⚠⚠ OTA-1465 — AND SKIP WHAT WE HAVE ALREADY BEEN REFUSED. This
+            // scan takes the FIRST eligible item, so before this line one
+            // permanently-rejected name did not merely waste its own
+            // generation — it OCCUPIED THE SLOT and starved every item behind
+            // it in the pack for the rest of the session. The owner's
+            // 2026-08-24 log shows "Smooth Stone" discarded three times
+            // (6.0s + 4.6s + 4.4s) and not one other item described after it
+            // entered his inventory. The waste was the visible half; the
+            // blockage was the expensive one.
+            if (synth.wasSynthRefused(it.name)) continue;
             return { name: it.name, tags: canonicalItemTags(it) };
           }
           return null;
