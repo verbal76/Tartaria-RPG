@@ -46,6 +46,10 @@ interface SentryLike {
   // Same runtime function, wider type — crash records keep calling it 1-arg.
   captureEvent: (event: Record<string, unknown>, hint?: Record<string, unknown>) => void;
   setTag?: (key: string, value: string) => void;
+  // ⚠ OTA-1492 — flush forces the queued envelope OUT and answers whether it
+  // went. Without it, captureEvent is fire-and-forget: the owner's first three
+  // SEND LOG taps reported "SENT" while nothing ever arrived server-side.
+  flush?: (timeout?: number) => PromiseLike<boolean>;
 }
 
 let sdk: SentryLike | null = null;
@@ -228,6 +232,13 @@ export async function sendDiagnosticsBundle(bundle: DiagnosticsBundle): Promise<
         ],
       },
     );
+    // ⚠⚠ OTA-1492 — DON'T REPORT WHAT WAS NOT DELIVERED. The owner's first
+    // three sends showed success while zero events reached the server: the
+    // capture only QUEUES. flush() pushes the envelope out now and says
+    // whether everything went; an SDK without flush keeps the old behavior.
+    if (typeof s.flush === 'function') {
+      return await s.flush(10_000);
+    }
     return true;
   } catch {
     return false; // the button shows FAILED and the clipboard path still exists

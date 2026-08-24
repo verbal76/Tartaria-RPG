@@ -270,6 +270,10 @@ export function AboutScreen() {
         save: stampSaveExport(buildSaveSnapshot(s.player, s.worldMemory), device, s.player?.name),
         device,
       });
+      // ⚠ OTA-1492 — the outcome goes in the log either way, so a send that
+      // "succeeded" on the button but never arrived server-side (the owner's
+      // first three taps) leaves a line the next diagnosis can start from.
+      useGameStore.getState().appendLog('debug', `send-log: ${ok ? 'flushed to Sentry' : 'FAILED - envelope did not go out'}`);
       setLogSendState(ok ? 'sent' : 'failed');
     } catch {
       setLogSendState('failed');

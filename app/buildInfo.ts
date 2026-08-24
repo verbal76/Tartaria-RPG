@@ -24560,7 +24560,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // same trunk to the golem channel, so the owner's golem install — whose
 // characters carry ordinary names — can unlock SEND LOG by the ritual and
 // ship its saves.
-export const OTA_BUILD_ID = '2026-08-24-1491-two-taps-to-load';
+// OTA-1492 — SENT MEANS ARRIVED: the owner's first three SEND LOG taps
+// showed success while zero events reached Sentry (captureEvent only
+// queues). The send now flushes the envelope and answers with DELIVERY;
+// the outcome is logged on-device either way. The inbox sync also pulls
+// the crash-ledger reports — six native-death events, the pipeline's
+// first server-side proof.
+export const OTA_BUILD_ID = '2026-08-24-1492-sent-means-arrived';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1491-two-taps-to-load';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1490-the-device-is-the-owner';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1489-one-tap-instead-of-four-slices';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1488-told-first-sent-second';
