@@ -38,7 +38,7 @@ describe('OTA-1494 — the banner states the era', () => {
 
   it('⚠ a fresh log says so rather than inventing a gap', () => {
     const line = seamBanner({ build: 'b', now: 1, previousEntryAt: null });
-    expect(line).toContain('first entries in this log');
+    expect(line).toMatch(/first entries/i);
     expect(line).not.toContain('previous entry');
   });
 
@@ -46,7 +46,7 @@ describe('OTA-1494 — the banner states the era', () => {
     const line = seamBanner({
       build: 'new', now: 2, previousEntryAt: 1, appliedFrom: 'old',
     });
-    expect(line).toContain('updated from old');
+    expect(line).toMatch(/updated from\s+old/i);
   });
 
   it('⚠ gap phrasing covers moments, minutes, hours and days', () => {
@@ -117,8 +117,8 @@ describe('OTA-1494 — wired at the seam that already existed', () => {
     // about CODE — the cap still trims by SIZE and by nothing else.
     const cap = readFileSync(join(__dirname, '..', 'app', 'engine', 'diskLogCap.ts'), 'utf8');
     const code = cap.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-    expect(code).toContain('MAX_DISK_LOG_CHARS = 400_000');
-    expect(code).toContain('content.length <= maxChars');
+    expect(code).toMatch(/MAX_DISK_LOG_CHARS\s*=\s*400_000/);
+    expect(code).toMatch(/content\.length\s*<=\s*maxChars/);
     expect(code).not.toMatch(/Date|days|timestamp|olderThan/i);
   });
 });

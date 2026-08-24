@@ -7173,6 +7173,15 @@ export interface GameStore {
   dedicationCard: { kicker: string; body: string; signoff: string } | null;
   /** Close the dedication card (tap-through). */
   dismissDedication: () => void;
+  /** ⚠ OTA-1495 — the summon-mid-fight refusal, raised as a POPUP. The engine
+   *  has refused this since OTA-1480 and said why in the feed — but a feed line
+   *  during a fight scrolls past under the player's thumb, so the refusal read
+   *  as a dead button. Owner: "block summoning mid fight with a finish your
+   *  current battle before you strive for more punishment popup". Holds the
+   *  engine's own refusal narration; null when nothing is owed. */
+  summonRefusal: string | null;
+  /** Dismiss the summon refusal popup. */
+  dismissSummonRefusal: () => void;
   /** OTA-1022 — TRUE while the one-time veteran motive picker is owed: the
    *  loaded character's motive was DEALT by backfill (storyMotiveChosen !==
    *  true), so the player gets one "why did you come down?" ask. Transient —
@@ -7859,6 +7868,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingDeath: null, // OTA-1110
   chapterCard: null, // OTA-1020
   dedicationCard: null,
+  summonRefusal: null,  // OTA-1495
   pendingFork: null, // OTA-1065
   motivePickerPending: false, // OTA-1022
   fusionBlockedNotice: null,
@@ -28217,6 +28227,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     raiseDueFork(get, set);
   },
 
+  dismissSummonRefusal() {
+    set({ summonRefusal: null });
+  },
   dismissDedication() {
     set({ dedicationCard: null });
   },
@@ -29185,14 +29198,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const live = get().currentScene;
       const hostiles = cg.summonHostiles(live?.enemies, live?.enemyHps, live?.enemyKnockedOut);
       if (hostiles.blocked) {
-        get().appendLog(
-          'arbiter',
-          cg.summonHostilesLine(
-            cg.GUARDIANS_BY_CAPITAL[capitalId]?.capitalName ?? 'this Capital',
-            hostiles,
-          ),
-          { skipDedup: true },
+        const line = cg.summonHostilesLine(
+          cg.GUARDIANS_BY_CAPITAL[capitalId]?.capitalName ?? 'this Capital',
+          hostiles,
         );
+        get().appendLog('arbiter', line, { skipDedup: true });
+        // ⚠ OTA-1495 — and RAISE it. The feed line stays (the log is the
+        // record); the popup is what makes a refusal mid-fight impossible to
+        // miss, which is the OTA-220 / OTA-1402 rule this one beat was missing.
+        set({ summonRefusal: line });
         return { ok: false, reason: 'hostiles_present' };
       }
     }

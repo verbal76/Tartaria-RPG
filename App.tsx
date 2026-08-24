@@ -47,6 +47,7 @@ import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA
 import { DedicationOverlay } from './app/components/DedicationOverlay';
 import { CrashReportNoticeOverlay } from './app/components/CrashReportNoticeOverlay'; // OTA-1488
 import { armQwenWarm } from './app/ai/deferredQwenWarm'; // OTA-1493
+import { SummonRefusalModal } from './app/components/SummonRefusalModal'; // OTA-1495
 import { StoryRevealOverlay } from './app/components/StoryRevealOverlay'; // OTA-1183
 import { StoryForkOverlay } from './app/components/StoryForkOverlay'; // OTA-1065
 import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1022
@@ -241,6 +242,14 @@ const QWEN_REWARM_DELAY_MS = 8_000;
 // times the margin over the longest blip, and delays a real dump by 1.5s —
 // which the killer does not act inside of.
 const BACKGROUND_SETTLE_MS = 1_500;
+
+// ⚠ OTA-1495 — subscribes so the modal file stays presentational (message in,
+// dismiss out) and cannot drift into owning refusal logic.
+function SummonRefusalGate() {
+  const message = useGameStore((s) => s.summonRefusal);
+  const dismiss = useGameStore((s) => s.dismissSummonRefusal);
+  return <SummonRefusalModal message={message} onDismiss={dismiss} />;
+}
 
 export default function App() {
   const screen = useGameStore((s) => s.currentScreen);
@@ -964,6 +973,12 @@ export default function App() {
           until dismissed — told first, sent second. */}
       <SilentBoundary tag="CrashReportNoticeOverlay">
         <CrashReportNoticeOverlay />
+      </SilentBoundary>
+      {/* ⚠ OTA-1495 — the summon-mid-fight refusal, raised where a feed line
+          could not be seen. Mounted globally beside the other overlays because
+          the summon button exists on more than one screen. */}
+      <SilentBoundary tag="SummonRefusalModal">
+        <SummonRefusalGate />
       </SilentBoundary>
       {/* OTA-1183 — a completed collectible story, read whole. Mounted beside the
           chapter card because it is the same register of beat, and globally because a

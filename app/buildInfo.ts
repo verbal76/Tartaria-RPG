@@ -24583,7 +24583,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 2026-08-24 — FIFTH GOLEM CATCH-UP PUBLISH: 1494 (the log seam banner) to
 // the golem channel via the markerless path. Golem logs carry the same
 // era-mixing hazard the iPhone bundle exposed.
-export const OTA_BUILD_ID = '2026-08-24-1494-the-log-says-which-era';
+// OTA-1495 — the mid-fight summon refusal becomes a POPUP (owner's call:
+// "finish your current battle before you strive for more punishment").
+// The block is OTA-1480's and the narration is OTA-1466's — unchanged; this
+// only raises it where a feed line mid-fight could not be seen.
+export const OTA_BUILD_ID = '2026-08-24-1495-finish-this-fight-first';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1494-the-log-says-which-era';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1493-the-warm-waits-for-the-player';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1492-sent-means-arrived';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1491-two-taps-to-load';
