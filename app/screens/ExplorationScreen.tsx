@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { canonicalItemTags } from '../engine/crafting';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { useGameStore, makeRoomKey, chipDismissTileKey } from '../state/gameStore';
+import { useGameStore, makeRoomKey, chipDismissTileKey, logUiTap } from '../state/gameStore';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { playerWeaponReach } from '../state/combatResolution';
 // OTA-1480 — "am I really at the place my record names", once, for all four readers.
@@ -812,8 +812,16 @@ export function ExplorationScreen() {
     takeAmbientNoun(noun);
     if (!wear) return;
     const held = useGameStore.getState().player?.inventory ?? [];
+    // ⚠ OTA-1485 — both outcomes of the equip half leave a debug line. The owner
+    // reported a take-and-wear landing on the wrong slot and taps that did
+    // nothing, and the log could name neither: the take half logs through
+    // takeAmbientNoun, but which slot the equip resolved to — and whether it ran
+    // at all — was invisible. The slot named here is the one the equip is given.
     if (held.some((i) => i.name.toLowerCase() === wear.name.toLowerCase() && i.quantity > 0)) {
+      useGameStore.getState().appendLog('debug', `take&wear: equipping "${wear.name}" -> ${wear.slot}`);
       useGameStore.getState().equipItem(wear.name, wear.slot);
+    } else {
+      useGameStore.getState().appendLog('debug', `take&wear: take of "${noun}" did not land - equip skipped`);
     }
   }, [player, takeAmbientNoun]);
 
@@ -1691,7 +1699,17 @@ export function ExplorationScreen() {
           enemyNames={currentScene?.enemies.map((e) => e.name)}
           actionChipLabel={feedChip ? feedActionChipLabel(feedChip) : null}
           actionChipA11yLabel={feedChip ? feedActionChipA11yLabel(feedChip) : undefined}
-          onActionChipPress={feedChip ? () => takeAndWear(feedChip.noun) : undefined}
+          onActionChipPress={feedChip ? () => {
+            // ⚠ OTA-1485 — logUiTap FIRST, before any work. This chip was the
+            // one pressable in the game outside the tap ledger: the owner
+            // picked it, nothing visibly happened, and the log had no tap line
+            // and no live breadcrumb to say the touch even arrived. Same
+            // ordering rule as every QuickBtn (OTA-1172/1276) — moving the log
+            // after the handler destroys the frozen-screen-vs-frozen-engine
+            // signal.
+            logUiTap(feedActionChipLabel(feedChip));
+            takeAndWear(feedChip.noun);
+          } : undefined}
         />
         {/* ⚠ OTA-1168 — THE LIVE TEXT IS NO LONGER SHOWN. Owner: "while the arbiter is
             typing live, can we keep that hidden and just see the end result on the screen

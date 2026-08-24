@@ -24514,7 +24514,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ⚠ And the gate caught its FIRST forgotten stamp one OTA after it was built —
 // this very line was still 1482 when ota1483's suite landed. That is the gate
 // paying for itself on day one, and the reason it exists in the chain.
-export const OTA_BUILD_ID = '2026-08-24-1484-a-pin-states-a-claim';
+// OTA-1485 — the feed's take-&-wear chip was the one pressable outside the
+// tap ledger (owner: "you have nothing in place to track that?"). Its tap
+// now logs through logUiTap before any work, and takeAndWear logs which
+// slot the equip resolved to — the wrong-slot and dead-tap reports become
+// answerable from the next device log.
+export const OTA_BUILD_ID = '2026-08-24-1485-the-chip-joins-the-tap-ledger';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1484-a-pin-states-a-claim';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1483-three-from-the-second-sweep';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1482-the-build-says-which-build-it-is';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1469-the-course-banner-tells-the-truth';
