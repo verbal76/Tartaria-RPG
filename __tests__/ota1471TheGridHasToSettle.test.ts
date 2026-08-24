@@ -368,6 +368,19 @@ describe('OTA-1471 — the wiring, driven through the real store', () => {
         // stopped resembling a real player.
         travelTarget: undefined,
         hubRoomId: null,
+        // ⚠⚠ OTA-1480 — gridX/gridY HAVE TO MOVE WITH currentLocationId, and this
+        // fixture used to leave them behind. It set the id to Voronov and the
+        // VISUAL frame to centre while the AUTHORITATIVE cell still held the
+        // character's START location — a state the game cannot produce: character
+        // creation, travelTo and stepDirection all write both, and the save loader
+        // DERIVES mapX/mapY from gridX/gridY via `gridToVisual`. It passed only
+        // because `isStationedAtNamedLocation` asked the derived value.
+        //
+        // `gridToVisual` makes the two an identity — mapX === CENTER_X exactly
+        // when gridX === canonicalCellOf(currentLocationId).x — so this is the
+        // same fixture it always meant to be, now written so both readings agree
+        // and so it still resembles a player the game could actually hand you.
+        ...(() => { const c = canonicalCellOf('voronov'); return { gridX: c.x, gridY: c.y }; })(),
         mapX: CX,
         mapY: CY,
         hoursElapsed: opts.hoursElapsed,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, Dimensions } from 'react-native';
 // ⚠⚠ OTA-1458 — "am I standing at X?" is a grid-cell question, asked once.
-import { standingAtLocation } from '../engine/standingAt';
+import { standingAtLocation, stationedAtNamedLocation } from '../engine/standingAt';
 import { useGameStore } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { bountyKey, bountyHoursLeft, BOUNTY_DEADLINE_HOURS } from '../engine/factionBounty';
@@ -627,12 +627,16 @@ export function ContractsScreen() {
         // OTA-412 — only while STANDING ON the capital's anchor tile.
         // currentLocationId lingers as the capital after a cardinal step into the
         // wilderness; gating on it alone left the SUMMON chip live miles outside
-        // the city. Mirror isStationedAtNamedLocation (the summon action enforces
-        // the same — summonCoreGuardian → not_at_capital).
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { WORLD_MAP_CENTER_X: cx, WORLD_MAP_CENTER_Y: cy } = require('../engine/worldMap');
-        const stationedAtCapital = !player.travelTarget
-          && (player.hubRoomId != null || (player.mapX === cx && player.mapY === cy));
+        // the city. (The summon action enforces the same — summonCoreGuardian →
+        // not_at_capital.)
+        //
+        // ⚠⚠ OTA-1480 — SECOND HAND-ROLLED COPY, now retired. This and the MAIN
+        // QUEST chip on ExplorationScreen both mirrored the store's private
+        // `isStationedAtNamedLocation` by hand, each under a comment saying so.
+        // The predicate is exported from app/engine/standingAt.ts and reads the
+        // authoritative grid cell; see the header there for why the visual frame
+        // was the wrong coordinate to have been asking.
+        const stationedAtCapital = stationedAtNamedLocation(player);
         const atCapitalForSummon =
           stationedAtCapital
           && (mq.phase === 'revelation' || mq.phase === 'cores')
@@ -643,10 +647,18 @@ export function ContractsScreen() {
         // into only one of them is the many-doors mistake — the defect class
         // this project has hit six times. Same helper, same field, both chips.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { coreSettleState, settleWaitPhrase } = require('../engine/coreGuardians') as typeof import('../engine/coreGuardians');
+        const { coreSettleState, settleWaitPhrase, summonHostiles, hostileNamePhrase } = require('../engine/coreGuardians') as typeof import('../engine/coreGuardians');
         const summonSettle = atCapitalForSummon
           ? coreSettleState(player.hoursElapsed ?? 0, mq.lastCoreAtHours)
           : { ready: true, hoursLeft: 0 };
+        // ⚠⚠ OTA-1480 — SAME SECOND DOOR, SAME RULE. The hostiles guard is wired
+        // into the ACTION, so a chip that did not know about it would be a lit
+        // button that refuses — and wiring it into only one of the two chips would
+        // be the many-doors mistake the note above was written about.
+        const scene = useGameStore.getState().currentScene;
+        const summonBlocked = atCapitalForSummon
+          ? summonHostiles(scene?.enemies, scene?.enemyHps, scene?.enemyKnockedOut)
+          : { blocked: false, count: 0, names: [] as string[] };
         return (
           <TouchableOpacity
             style={styles.mainQuestCard}
@@ -672,7 +684,14 @@ export function ContractsScreen() {
               // Guardian. ★ SUMMON, directly below, is the only door.
               return <Text style={styles.mainQuestNextAction}>→ At this Capital: {next}. Then tap ★ SUMMON.</Text>;
             })()}
-            {atCapitalForSummon && !summonSettle.ready && (
+            {atCapitalForSummon && summonBlocked.blocked && (
+              // OTA-1480 — the nearer of the two reasons, and the one the player
+              // can act on right now.
+              <Text style={styles.mainQuestNextAction}>
+                → {hostileNamePhrase(summonBlocked.names)} still {summonBlocked.count === 1 ? 'stands' : 'stand'} here. The Core-hum will not answer over a fight.
+              </Text>
+            )}
+            {atCapitalForSummon && !summonBlocked.blocked && !summonSettle.ready && (
               // OTA-1471 — say the wait BEFORE the tap, where the player is
               // deciding. The chip below still takes the tap and prints the
               // whole reason; this line is what stops them tapping four times.
@@ -682,17 +701,21 @@ export function ContractsScreen() {
             )}
             {atCapitalForSummon && (
               <TouchableOpacity
-                style={[styles.summonChip, !summonSettle.ready && styles.summonChipWait]}
+                style={[styles.summonChip, (!summonSettle.ready || summonBlocked.blocked) && styles.summonChipWait]}
                 onPress={() => useGameStore.getState().summonCoreGuardian()}
                 activeOpacity={0.7}
                 hitSlop={6}
                 accessibilityRole="button"
-                accessibilityLabel={summonSettle.ready
-                  ? 'Summon Guardian'
-                  : `Guardian settling, ${settleWaitPhrase(summonSettle.hoursLeft)} to wait`}
+                accessibilityLabel={summonBlocked.blocked
+                  ? `Cannot summon, ${hostileNamePhrase(summonBlocked.names)} still standing`
+                  : summonSettle.ready
+                    ? 'Summon Guardian'
+                    : `Guardian settling, ${settleWaitPhrase(summonSettle.hoursLeft)} to wait`}
               >
-                <Text style={[styles.summonChipText, !summonSettle.ready && styles.summonChipWaitText]}>
-                  {summonSettle.ready ? '★ SUMMON' : `★ SETTLING · ${Math.max(1, Math.round(summonSettle.hoursLeft))}h`}
+                <Text style={[styles.summonChipText, (!summonSettle.ready || summonBlocked.blocked) && styles.summonChipWaitText]}>
+                  {summonBlocked.blocked
+                    ? '★ FIGHT FIRST'
+                    : summonSettle.ready ? '★ SUMMON' : `★ SETTLING · ${Math.max(1, Math.round(summonSettle.hoursLeft))}h`}
                 </Text>
               </TouchableOpacity>
             )}

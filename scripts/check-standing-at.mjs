@@ -46,6 +46,36 @@ const PATTERNS = [
 ];
 
 /**
+ * ⚠⚠ OTA-1480 — THE SECOND SHAPE, AND THE ONE THAT ACTUALLY HAPPENED TWICE.
+ *
+ * The patterns above forbid asking the question with the WRONG FIELD. They say
+ * nothing about asking it with the right idea, hand-rolled — and that is what both
+ * SUMMON chips did:
+ *
+ *     const stationedAtCapital = !player.travelTarget
+ *       && (player.hubRoomId != null || (player.mapX === cx && player.mapY === cy));
+ *
+ * in ExplorationScreen AND in ContractsScreen, each under a comment reading
+ * "Mirror isStationedAtNamedLocation" — which was private to gameStore, so both
+ * screens knew they were duplicating a rule and had nowhere else to get it. A
+ * predicate private to one file and needed by three is not private, it is copied.
+ *
+ * ⚠ AND THE COPIES USED THE WRONG COORDINATE. `mapX/mapY` is the RE-CENTERED
+ * display frame; `playerGridCell` is the authoritative absolute cell (OTA-1398:
+ * "ONE source of truth for where the player is"). Two coordinate systems, one
+ * question. They agree only for as long as every write keeps them in step.
+ *
+ * So: a player-facing file may not test the map-centre anchor by hand. Use
+ * `stationedAtNamedLocation(player)` from app/engine/standingAt.ts.
+ */
+const ANCHOR_PATTERNS = [
+  /\.mapX\s*===\s*[\w.]*(?:WORLD_MAP_)?CENTER_?X/i,
+  /\.mapY\s*===\s*[\w.]*(?:WORLD_MAP_)?CENTER_?Y/i,
+  /\.mapX\s*===\s*cx\b/,
+  /\.mapY\s*===\s*cy\b/,
+];
+
+/**
  * ⚠ ALLOWLIST, WITH A REASON EACH. An entry here is a claim that this particular
  * compare is asking "which place's rules apply", not "where is the player standing".
  * Adding one without a reason is how the gate becomes decoration.
@@ -85,6 +115,24 @@ const SELF_TEST = [
   ['const name = getLocationById(player.currentLocationId).name;', false],
   ['weatherFor(player.currentLocationId)', false],
 ];
+/** ⚠ OTA-1480 — the anchor matcher gets its own known answers, fired at the exact
+ *  two lines that were live in the tree before this OTA plus the fix that replaced
+ *  them. A matcher that stops matching prints OK forever. */
+const ANCHOR_SELF_TEST = [
+  ['&& (player.hubRoomId != null || (player.mapX === cx && player.mapY === cy));', true],
+  ['return p.mapX === WORLD_MAP_CENTER_X && p.mapY === WORLD_MAP_CENTER_Y;', true],
+  ['const stationedAtCapital = stationedAtNamedLocation(player);', false],
+  ['const fromX = player.mapX ?? WORLD_MAP_CENTER_X;', false],
+  ['marker.mapX = player.mapX;', false],
+];
+for (const [line, expected] of ANCHOR_SELF_TEST) {
+  const got = ANCHOR_PATTERNS.some((re) => re.test(line));
+  if (got !== expected) {
+    console.error('✗ check:standingat — ANCHOR SELF-TEST FAILED. Matcher is broken; real scan not run.');
+    console.error(`    expected ${expected ? 'FLAGGED' : 'clean'}: ${line}`);
+    process.exit(1);
+  }
+}
 for (const [line, expected] of SELF_TEST) {
   const got = PATTERNS.some((re) => re.test(line));
   if (got !== expected) {
@@ -103,9 +151,11 @@ for (const dir of SCAN_DIRS) {
     fs.readFileSync(file, 'utf8').split('\n').forEach((line, i) => {
       const t = line.trim();
       if (t.startsWith('//') || t.startsWith('*') || t.startsWith('/*')) return;
-      if (!PATTERNS.some((re) => re.test(line))) return;
+      const idHit = PATTERNS.some((re) => re.test(line));
+      const anchorHit = ANCHOR_PATTERNS.some((re) => re.test(line));
+      if (!idHit && !anchorHit) return;
       if (ALLOW.some((a) => rel === a.file && i + 1 === a.line)) return;
-      hits.push({ rel, line: i + 1, src: t });
+      hits.push({ rel, line: i + 1, src: t, kind: anchorHit ? 'anchor' : 'id' });
     });
   }
 }
@@ -116,14 +166,24 @@ if (!scanned) {
 }
 
 if (hits.length) {
-  console.error(`✗ check:standingat — ${hits.length} player-facing "am I here?" compare(s) using currentLocationId:`);
-  for (const h of hits) console.error(`    ${h.rel}:${h.line}\n      ${h.src}`);
+  const ids = hits.filter((h) => h.kind === 'id');
+  const anchors = hits.filter((h) => h.kind === 'anchor');
+  console.error(`✗ check:standingat — ${hits.length} player-facing "am I here?" check(s) asking it the wrong way:`);
+  for (const h of hits) console.error(`    [${h.kind}] ${h.rel}:${h.line}\n      ${h.src}`);
   console.error('');
-  console.error('  `currentLocationId` is the LAST NAMED PLACE, not a position — walking open');
-  console.error('  ground between locations leaves it unchanged. Use standingAtLocation(player, id)');
-  console.error('  from app/engine/standingAt.ts, or add an allowlist entry WITH A REASON if this');
-  console.error('  compare really is asking "which place\'s rules apply to me".');
+  if (ids.length) {
+    console.error('  [id] `currentLocationId` is the LAST NAMED PLACE, not a position — walking open');
+    console.error('  ground between locations leaves it unchanged. Use standingAtLocation(player, id)');
+    console.error('  from app/engine/standingAt.ts, or add an allowlist entry WITH A REASON if this');
+    console.error('  compare really is asking "which place\'s rules apply to me".');
+  }
+  if (anchors.length) {
+    console.error('  [anchor] A hand-rolled map-centre test. `mapX/mapY` is the RE-CENTERED display');
+    console.error('  frame; the authoritative cell is playerGridCell (OTA-1398). Both SUMMON chips');
+    console.error('  carried this copy under a comment saying "Mirror isStationedAtNamedLocation".');
+    console.error('  Use stationedAtNamedLocation(player) from app/engine/standingAt.ts.');
+  }
   process.exit(1);
 }
 
-console.log(`[check:standingat] OK — ${scanned} player-facing files, no id-compare "am I here?" checks.`);
+console.log(`[check:standingat] OK — ${scanned} player-facing files, no id-compare and no hand-rolled anchor "am I here?" checks.`);

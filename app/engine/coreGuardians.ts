@@ -1293,3 +1293,92 @@ export function coreSettleLine(capitalName: string, hoursLeft: number): string {
     + `No Guardian will rise at ${capitalName} for ${settleWaitPhrase(hoursLeft)} yet. `
     + `Rest the night, or put the time to use; the seat will open on its own.`;
 }
+
+// ---------------------------------------------------------------------------
+// OTA-1480 — A GUARDIAN DOES NOT WALK INTO SOMEBODY ELSE'S FIGHT.
+// ---------------------------------------------------------------------------
+//
+// Owner, on the open list: *"summoning while enemies are present."*
+//
+// ⚠ THERE WAS NO GUARD AT ALL. `summonCoreGuardian` checked the Capital, the
+// phase, whether the Core was already taken, whether a Guardian was already in
+// the scene, and (OTA-1471) whether the grid had settled — and then appended the
+// Guardian to `currentScene.enemies` whatever else was standing there, setting
+// `activeEnemyIdx` to the new index. So a player mid-pack could call down a Core
+// Guardian, have the game silently switch their target to it, and leave the pack
+// alive and swinging behind them.
+//
+// ⚠ WHY A REFUSAL AND NOT A FEATURE. The Guardian fight is the main quest's
+// set-piece: OTA-931 stages it, OTA-1471 paces it, OTA-1476 scales it off one
+// power reading. Every one of those assumes it is the fight the player is in,
+// not a second fight bolted onto a first. Adding hostiles to it does not make it
+// harder in a way anything measures — it makes the tier maths wrong and the
+// target-switch invisible. If the intent were ever "the Guardian answers when
+// you are already bleeding", that is a designed encounter, not this accident.
+//
+// ⚠ AND IT REFUSES OUT LOUD. OTA-220's rule: a wall the player cannot read is
+// the worst kind. The line says what is in the way, how many, and what to do.
+
+export interface SummonHostiles {
+  /** True when something living stands between the player and the summons. */
+  blocked: boolean;
+  /** How many living, non-Guardian hostiles are in the scene. */
+  count: number;
+  /** Their names, deduped, in scene order — for the refusal line. */
+  names: string[];
+}
+
+/**
+ * ⚠ ONE DERIVATION OF "IS ANYTHING STILL STANDING", called by the action AND by
+ * both SUMMON chips — the same rule `coreSettleState` follows above, and for the
+ * same reason: two definitions of one fact is how a lit button comes to refuse.
+ *
+ * ⚠ LIVING ONLY. A corpse still in `enemies` (sweepDeadEnemies runs on its own
+ * beat) must not block the summons, or a player who just won the fight is walled
+ * for a turn with no way to tell why. Knocked-out enemies (OTA-361) are out of
+ * the fight by definition and do not block either.
+ *
+ * ⚠ A GUARDIAN ALREADY PRESENT IS NOT A BLOCKER. That case is `already_present`
+ * upstream — a fight the player fled and came back to — and it must keep
+ * resolving to "bounce them into it", never to "you are busy".
+ */
+export function summonHostiles(
+  enemies: readonly Enemy[] | undefined,
+  hps: readonly number[] | undefined,
+  knockedOut: readonly boolean[] | undefined,
+): SummonHostiles {
+  const list = enemies ?? [];
+  const names: string[] = [];
+  for (let i = 0; i < list.length; i++) {
+    const e = list[i];
+    if (!e) continue;
+    if (isCoreGuardian(e)) continue;
+    // ⚠ ABSENT hp array means "no per-enemy hp tracked", which is a live scene,
+    // not an empty one — defaulting to dead would silently disable the guard.
+    const hp = hps?.[i];
+    if (typeof hp === 'number' && hp <= 0) continue;
+    if (knockedOut?.[i] === true) continue;
+    if (!names.includes(e.name)) names.push(e.name);
+  }
+  return { blocked: names.length > 0, count: names.length, names };
+}
+
+/** The names as a player reads them — "a Bog Hound", "a Bog Hound and a Mudling",
+ *  "three of them" once the list stops being worth reciting. */
+export function hostileNamePhrase(names: readonly string[]): string {
+  if (names.length === 0) return 'nothing';
+  if (names.length === 1) return names[0]!;
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
+/**
+ * ⚠ WHAT THE PLAYER IS TOLD. Same three things every refusal in this game owes
+ * them (OTA-220, OTA-1402, OTA-1466): what is happening, why, and what to do
+ * about it. Deliberately not "you can't do that".
+ */
+export function summonHostilesLine(capitalName: string, hostiles: SummonHostiles): string {
+  return `The Core-hum will not answer over the noise of a fight — ${hostileNamePhrase(hostiles.names)} `
+    + `${hostiles.count === 1 ? 'is' : 'are'} still standing. `
+    + `Finish here, or break off and come back; the seat at ${capitalName} keeps.`;
+}

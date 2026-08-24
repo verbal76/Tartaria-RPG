@@ -506,6 +506,8 @@ import { MILESTONE_KILL_STEP } from '../engine/hpBreakdown';
 // DANGER units against the encounter picker's RARITY units, and it is how the
 // Arbiter came to call the Mud Seas danger 2.
 import { playerDangerCap, dangerWarningLine } from '../engine/dangerTier';
+// OTA-1480 — "am I really at the place my record names", once, for all four readers.
+import { stationedAtNamedLocation } from '../engine/standingAt';
 // ⚠ Static, not the lazy `require` used elsewhere for this module: mainQuest
 // imports nothing but types, so there is no cycle to dodge and a real import
 // gets the signature checked.
@@ -1337,11 +1339,14 @@ export function sameStackUnit(a: InventoryItem, b: InventoryItem): boolean {
  *  a wandering Mudling (a Monarch's gate intent is `attack`), and its
  *  Guardian would materialise in the wilderness. Every arrival snaps the
  *  player to WORLD_MAP_CENTER, so anchor + no travelTarget == "really here". */
-function isStationedAtNamedLocation(p: PlayerCharacter): boolean {
-  if (p.travelTarget) return false; // mid-journey — the departure city isn't "here"
-  if (p.hubRoomId != null) return true; // inside a building at the location
-  return p.mapX === WORLD_MAP_CENTER_X && p.mapY === WORLD_MAP_CENTER_Y;
-}
+// ⚠⚠ OTA-1480 — MOVED TO app/engine/standingAt.ts AND EXPORTED. It was private to
+// this file, which is why both SUMMON chips ended up carrying hand-rolled copies
+// under comments reading "Mirror isStationedAtNamedLocation". A predicate that is
+// private to one file and needed by three is not private, it is copied. The leaf
+// version also reads the AUTHORITATIVE grid cell instead of the re-centered visual
+// frame, matching `playerGridCell` and `standingAtLocation`; the suite proves the
+// two spellings agree across every reachable state rather than assuming it.
+const isStationedAtNamedLocation = stationedAtNamedLocation;
 
 /** OTA-417 — true when the player is INDOORS (a hub room or a building interior).
  *  The wandering-lead hooks (HOOK_PLANTS) are all OUTDOOR sightings — smoke in
@@ -29135,6 +29140,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // standing in the scene is a fight the player fled and came back to, not a
     // fresh manifestation — locking them out of finishing it would be a far
     // worse bug than the pacing one this fixes.
+    // ⚠⚠ OTA-1480 — NOT INTO SOMEBODY ELSE'S FIGHT.
+    //
+    // Owner's open list: "summoning while enemies are present." There was no
+    // guard whatsoever — the block below simply appended the Guardian to
+    // `currentScene.enemies` and pointed `activeEnemyIdx` at it, so a player
+    // mid-pack could call the Guardian down, have their target silently switched,
+    // and leave the pack alive and swinging behind them. Every piece of the
+    // Guardian encounter (OTA-931 staging, OTA-1471 pacing, OTA-1476 scaling)
+    // assumes it is THE fight, not a second one bolted onto a first.
+    //
+    // ⚠ ALSO BELOW `already_present`, and for the same reason the settle gate is:
+    // a Guardian already standing there is a fight the player fled and came back
+    // to, and bouncing them into it must never turn into "you are busy".
+    {
+      const live = get().currentScene;
+      const hostiles = cg.summonHostiles(live?.enemies, live?.enemyHps, live?.enemyKnockedOut);
+      if (hostiles.blocked) {
+        get().appendLog(
+          'arbiter',
+          cg.summonHostilesLine(
+            cg.GUARDIANS_BY_CAPITAL[capitalId]?.capitalName ?? 'this Capital',
+            hostiles,
+          ),
+          { skipDedup: true },
+        );
+        return { ok: false, reason: 'hostiles_present' };
+      }
+    }
     {
       const settle = cg.coreSettleState(player.hoursElapsed ?? 0, mqState.lastCoreAtHours);
       if (!settle.ready) {

@@ -5,6 +5,8 @@ import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey, chipDismissTileKey } from '../state/gameStore';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { playerWeaponReach } from '../state/combatResolution';
+// OTA-1480 — "am I really at the place my record names", once, for all four readers.
+import { stationedAtNamedLocation } from '../engine/standingAt';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError, stampBreadcrumbPhase } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -1172,6 +1174,10 @@ export function ExplorationScreen() {
         // in-world reason, which is more use to a confused player than a dead
         // control (OTA-220's rule).
         let summonSettle: { ready: boolean; hoursLeft: number } = { ready: true, hoursLeft: 0 };
+        // ⚠ OTA-1480 — the other thing that can stand between the player and the
+        // seat. Same render-time read, same helper as the action.
+        let summonBlocked: { blocked: boolean; count: number; names: string[] } =
+          { blocked: false, count: 0, names: [] };
         if (!mq || mq.phase === 'ended') {
           // No active main quest — chip still serves as the menu
           // entry but doesn't pretend to point anywhere.
@@ -1182,28 +1188,40 @@ export function ExplorationScreen() {
           // STANDING ON the capital's anchor tile. currentLocationId lingers as
           // the capital after a cardinal step off into the wilderness, so gating
           // on it alone left the chip drawn (and the "recover the core here" line)
-          // miles outside the city. Mirror isStationedAtNamedLocation: not
-          // mid-journey, and either inside a building or on the map-center anchor.
-          // The summon ACTION already enforces this (summonCoreGuardian →
-          // not_at_capital); this hides the button so the affordance matches.
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { WORLD_MAP_CENTER_X: cx, WORLD_MAP_CENTER_Y: cy } = require('../engine/worldMap');
-          const stationedAtCapital = !player.travelTarget
-            && (player.hubRoomId != null || (player.mapX === cx && player.mapY === cy));
+          // miles outside the city. The summon ACTION already enforces this
+          // (summonCoreGuardian → not_at_capital); this hides the button so the
+          // affordance matches.
+          //
+          // ⚠⚠ OTA-1480 — THIS WAS A HAND-ROLLED COPY of the store's private
+          // `isStationedAtNamedLocation`, under a comment that admitted it
+          // ("Mirror isStationedAtNamedLocation") — and ContractsScreen carried a
+          // second copy under the same comment. Three spellings of one rule, all
+          // three testing the RE-CENTERED visual frame while every other position
+          // question in the game reads the authoritative grid cell. One exported
+          // predicate now, so the chip and the action cannot come to disagree.
+          const stationedAtCapital = stationedAtNamedLocation(player);
           atUnrecovered = stationedAtCapital
             && capitals.includes(player.currentLocationId)
             && !mq.coresRecovered.includes(player.currentLocationId)
             && (mq.phase === 'revelation' || mq.phase === 'cores');
           if (atUnrecovered) {
             // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const { coreSettleState, settleWaitPhrase } = require('../engine/coreGuardians') as typeof import('../engine/coreGuardians');
+            const { coreSettleState, settleWaitPhrase, summonHostiles, hostileNamePhrase } = require('../engine/coreGuardians') as typeof import('../engine/coreGuardians');
             summonSettle = coreSettleState(player.hoursElapsed ?? 0, mq.lastCoreAtHours);
-            mainLine = summonSettle.ready
-              // ⚠ The faction next-action is FLAVOUR now, not an instruction: the verb
-              // path that used to summon is gone, so the line ends at the control that
-              // actually raises the Guardian — the ★ SUMMON chip beside this text.
-              ? `${coreGateNextAction(player.factionId)} — then ★ SUMMON.`
-              : `The grid is still closing over the last seat — ${settleWaitPhrase(summonSettle.hoursLeft)}.`;
+            // ⚠⚠ OTA-1480 — read at RENDER time, same helper the ACTION calls, for
+            // the same reason the settle window is (OTA-1324: a lit button that
+            // refuses is four taps and four walls in seventy seconds). The chip
+            // stays PRESSABLE — a tap prints the full in-world reason, which beats
+            // a dead control (OTA-220).
+            summonBlocked = summonHostiles(currentScene?.enemies, currentScene?.enemyHps, currentScene?.enemyKnockedOut);
+            mainLine = summonBlocked.blocked
+              ? `${hostileNamePhrase(summonBlocked.names)} still ${summonBlocked.count === 1 ? 'stands' : 'stand'} between you and the seat.`
+              : summonSettle.ready
+                // ⚠ The faction next-action is FLAVOUR now, not an instruction: the verb
+                // path that used to summon is gone, so the line ends at the control that
+                // actually raises the Guardian — the ★ SUMMON chip beside this text.
+                ? `${coreGateNextAction(player.factionId)} — then ★ SUMMON.`
+                : `The grid is still closing over the last seat — ${settleWaitPhrase(summonSettle.hoursLeft)}.`;
           } else {
             mainLine = phaseHint(mq.phase, cores);
           }
@@ -1234,16 +1252,20 @@ export function ExplorationScreen() {
               </Text>
               {atUnrecovered && (
                 <TouchableOpacity
-                  style={[styles.objectiveChipSummon, !summonSettle.ready && styles.objectiveChipSummonWait]}
+                  style={[styles.objectiveChipSummon, (!summonSettle.ready || summonBlocked.blocked) && styles.objectiveChipSummonWait]}
                   onPress={() => useGameStore.getState().summonCoreGuardian()}
                   activeOpacity={0.7}
                   hitSlop={8}
                   accessibilityRole="button"
                 >
                   {/* OTA-1471 — the label names the wait BEFORE the tap; the tap
-                      still prints the full reason. */}
-                  <Text style={[styles.objectiveChipSummonText, !summonSettle.ready && styles.objectiveChipSummonWaitText]}>
-                    {summonSettle.ready ? '★ SUMMON' : `★ SETTLING · ${Math.max(1, Math.round(summonSettle.hoursLeft))}h`}
+                      still prints the full reason.
+                      OTA-1480 — and names the fight, which is the nearer of the two
+                      reasons and the one the player can do something about now. */}
+                  <Text style={[styles.objectiveChipSummonText, (!summonSettle.ready || summonBlocked.blocked) && styles.objectiveChipSummonWaitText]}>
+                    {summonBlocked.blocked
+                      ? '★ FIGHT FIRST'
+                      : summonSettle.ready ? '★ SUMMON' : `★ SETTLING · ${Math.max(1, Math.round(summonSettle.hoursLeft))}h`}
                   </Text>
                 </TouchableOpacity>
               )}
