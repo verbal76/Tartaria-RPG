@@ -243,6 +243,129 @@ export function huntWithinReach(hunt: HuntDef, hpMax: number | undefined): boole
   return (hunt.recommendedHp ?? 0) <= hpMax;
 }
 
+/**
+ * ⚠⚠⚠ OTA-1466 — WHY A BOUNTY IS NOT ON THE BOARD.
+ *
+ * The owner, typed into the game on 2026-08-24 after tapping a posting twelve
+ * times in nine seconds and getting the same shrug every time:
+ *
+ *   "I couldn't accept the core ass mission from this vendor, but there was no
+ *    pop-up telling me why. I'm imagining it's because either I've hit my cap of
+ *    missions that I can have or I don't have enough standing but it doesn't say
+ *    which. so either we need to have a pop-up or maybe like an angular set of
+ *    writing like how they do, you know kind of faded, that says need standing
+ *    or something like that?"
+ *
+ * ⚠⚠ HE HAD TO GUESS, AND BOTH HIS GUESSES WERE WRONG. There is no mission cap —
+ * `anyTrackedContract` PARKS an extra contract, it never refuses one — and
+ * standing is only one of FOUR reasons `availableHunts` can drop a posting. The
+ * fourth, `huntWithinReach`, is almost certainly the one he hit and it is the one
+ * nothing anywhere names.
+ *
+ * This is the-game-knows-and-does-not-say (OTA-1402) on the contracts board: the
+ * filter has the answer at the moment it excludes the row, and then throws it
+ * away and renders nothing.
+ *
+ * ⚠ ORDER IS THE ORDER OF FINALITY, most permanent first. A completed hunt is
+ * never coming back; a rep gate might lift this evening. Reporting "you need
+ * standing 3" about a contract the player finished last week would be true of
+ * the number and useless as an answer.
+ */
+export type HuntBlock =
+  | { kind: 'completed'; text: string }
+  | { kind: 'active'; text: string }
+  | { kind: 'faction'; text: string }
+  | { kind: 'standing'; text: string; need: number; have: number }
+  | { kind: 'reach'; text: string; need: number; have: number };
+
+export function huntBlockReason(
+  hunt: HuntDef,
+  factionId: string | null,
+  playerRep: number,
+  active: readonly string[],
+  completed: readonly string[],
+  hpMax?: number,
+): HuntBlock | null {
+  if (completed.includes(hunt.id)) {
+    return { kind: 'completed', text: 'already finished' };
+  }
+  if (active.includes(hunt.id)) {
+    return { kind: 'active', text: 'already on your slate' };
+  }
+  // Mirrors the faction clause in `availableHunts` exactly: a vendor posts its
+  // own work, plus open contracts (factionId === null) when it has a faction of
+  // its own to post them alongside.
+  if (!(hunt.factionId === factionId || (factionId !== null && hunt.factionId === null))) {
+    return { kind: 'faction', text: 'posted by another faction' };
+  }
+  if (playerRep < hunt.minRep) {
+    return {
+      kind: 'standing',
+      text: `need standing ${hunt.minRep} (you have ${playerRep})`,
+      need: hunt.minRep, have: playerRep,
+    };
+  }
+  if (!huntWithinReach(hunt, hpMax)) {
+    const need = hunt.recommendedHp ?? 0;
+    return {
+      kind: 'reach',
+      // ⚠ Phrased as the thing the player can change. "Recommended HP 80" is a
+      // stat; "come back at 80 HP" is an instruction, and the difference is
+      // whether he knows what to do about it.
+      text: `come back at ${need} HP (you have ${hpMax ?? 0})`,
+      need, have: hpMax ?? 0,
+    };
+  }
+  return null;
+}
+
+/**
+ * Every hunt this vendor COULD post, each with the reason it is not on the board
+ * — or `null` when it is. Built from the same predicates `availableHunts`
+ * filters on, so the two cannot drift: a hunt with a null reason here is exactly
+ * a hunt that survives the filter there, and `huntBoardIsConsistent` asserts it.
+ */
+export function huntBoardWithReasons(
+  factionId: string | null,
+  playerRep: number,
+  active: readonly string[],
+  completed: readonly string[],
+  hpMax?: number,
+): { hunt: HuntDef; blocked: HuntBlock | null }[] {
+  return HUNTS
+    .map((hunt) => ({
+      hunt,
+      blocked: huntBlockReason(hunt, factionId, playerRep, active, completed, hpMax),
+    }))
+    // A contract from a faction this vendor has nothing to do with is not
+    // "locked", it is simply somebody else's business — showing it greyed on
+    // every board would bury the four rows that matter under eighteen that
+    // never will.
+    .filter((r) => r.blocked?.kind !== 'faction');
+}
+
+/** ⚠⚠ THE TWO-DEFINITIONS GUARD. `availableHunts` decides what is offered and
+ *  `huntBlockReason` explains what is not, and they are separate code. If they
+ *  ever disagree the board shows a row it will refuse, or hides one it would
+ *  accept — both worse than the silence this OTA replaced. Exported so the suite
+ *  can assert it across the whole catalogue rather than trusting the reading. */
+export function huntBoardIsConsistent(
+  factionId: string | null,
+  playerRep: number,
+  active: readonly string[],
+  completed: readonly string[],
+  hpMax?: number,
+): boolean {
+  const offered = new Set(
+    availableHunts(factionId, playerRep, active, completed, hpMax).map((h) => h.id),
+  );
+  for (const h of HUNTS) {
+    const blocked = huntBlockReason(h, factionId, playerRep, active, completed, hpMax);
+    if (offered.has(h.id) !== (blocked === null)) return false;
+  }
+  return true;
+}
+
 // Available to a player from a given vendor or in general. Filters by
 // faction (vendors aligned with a faction only post their own hunts —
 // hunts with factionId=null are open contracts anyone can offer),

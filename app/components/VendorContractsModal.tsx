@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { availableFactionQuests } from '../engine/factionQuests';
-import { availableHunts } from '../engine/hunts';
+import { availableHunts, huntBoardWithReasons } from '../engine/hunts';
 import { availableMysteries } from '../engine/mysteries';
 import { availableStorylines } from '../engine/factionStorylines';
 import { getStanding, FACTIONS } from '../engine/factions';
@@ -38,6 +38,14 @@ interface Posting {
   rep?: number | null;
   accent: string;
   onAccept: () => void;
+  /** ⚠⚠⚠ OTA-1466 — why this posting cannot be taken, or undefined when it can.
+   *  Owner: *"there was no pop-up telling me why... maybe like an angular set of
+   *  writing like how they do, you know kind of faded, that says need standing
+   *  or something like that?"* Before this the row was not dimmed, it was ABSENT
+   *  — the board silently omitted every posting the player was not yet eligible
+   *  for, so there was nothing on screen for an explanation to attach to and no
+   *  way to tell "you can't have this yet" from "there is no work here". */
+  locked?: string;
 }
 
 // arb151 — vendor CONTRACTS as a mission-board-style POPUP instead of an inline
@@ -51,6 +59,10 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
   // Raw selectors (no `?? []` inside the selector — that returns a fresh array
   // every render and Object.is would loop the component). Default inside useMemo.
   const factionStanding = useGameStore((s) => s.player?.factionStanding);
+  // ⚠ OTA-1466 — the reach gate needs it. Every player-facing OFFER passes hpMax
+  // (see huntWithinReach's header); this board is one, and it was not passing it,
+  // so it could offer a hunt the accept path would then refuse.
+  const hpMax = useGameStore((s) => s.player?.hpMax);
   const activeFactionQuestIds = useGameStore((s) => s.player?.activeFactionQuestIds);
   const completedFactionQuestIds = useGameStore((s) => s.player?.completedFactionQuestIds);
   const activeHunts = useGameStore((s) => s.player?.activeHunts);
@@ -76,6 +88,7 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
     const activeStorylineIds = (activeStorylines ?? []).map((s) => s.id);
     const quests: ReturnType<typeof availableFactionQuests> = [];
     const hunts: ReturnType<typeof availableHunts> = [];
+    const lockedHunts: { hunt: ReturnType<typeof availableHunts>[number]; why: string }[] = [];
     const mysteries: ReturnType<typeof availableMysteries> = [];
     const stories: ReturnType<typeof availableStorylines> = [];
     const seen = new Set<string>();
@@ -89,8 +102,22 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
           if (!seen.has(`s:${s.id}`)) { seen.add(`s:${s.id}`); stories.push(s); }
         }
       }
-      for (const h of availableHunts(fid, rep, activeHuntIds, completedHuntIds ?? [])) {
-        if (!seen.has(`h:${h.id}`)) { seen.add(`h:${h.id}`); hunts.push(h); }
+      // ⚠⚠ OTA-1466 — the board now carries what is LOCKED as well as what is
+      // open, each with the reason, and `huntBoardWithReasons` derives both from
+      // the same predicates `availableHunts` filters on so the two cannot
+      // disagree about a row. `hpMax` is passed because the reach gate is the
+      // one the owner almost certainly hit and the only one nothing named.
+      for (const r of huntBoardWithReasons(fid, rep, activeHuntIds, completedHuntIds ?? [], hpMax)) {
+        const k = `h:${r.hunt.id}`;
+        if (seen.has(k)) continue;
+        // ⚠ A hunt already finished or already on the slate is not "locked
+        // content the player is working toward" — it is done, or it is on the
+        // Contracts screen. Showing either here is noise on the one surface
+        // that should read as "work available at this vendor".
+        if (r.blocked && (r.blocked.kind === 'completed' || r.blocked.kind === 'active')) continue;
+        seen.add(k);
+        if (r.blocked) lockedHunts.push({ hunt: r.hunt, why: r.blocked.text });
+        else hunts.push(r.hunt);
       }
       for (const m of availableMysteries(fid, rep, activeMysteryIds, completedMysteryIds ?? [])) {
         if (!seen.has(`m:${m.id}`)) { seen.add(`m:${m.id}`); mysteries.push(m); }
@@ -107,13 +134,21 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
         })),
       });
     }
-    if (hunts.length > 0) {
+    if (hunts.length > 0 || lockedHunts.length > 0) {
       out.push({
         label: 'BOUNTIES',
-        postings: hunts.map((h) => ({
-          key: `h_${h.id}`, title: h.title, body: h.posterText, tc: h.rewardTc, rep: h.rewardRep,
-          accent: '#e07a5f', onAccept: () => acceptHunt(h.title),
-        })),
+        postings: [
+          ...hunts.map((h) => ({
+            key: `h_${h.id}`, title: h.title, body: h.posterText, tc: h.rewardTc, rep: h.rewardRep,
+            accent: '#e07a5f', onAccept: () => acceptHunt(h.title),
+          })),
+          // ⚠ Locked rows sort BELOW the open ones. The board's job is still to
+          // offer work; what you cannot take yet belongs underneath what you can.
+          ...lockedHunts.map(({ hunt: h, why }) => ({
+            key: `hlock_${h.id}`, title: h.title, body: h.posterText, tc: h.rewardTc, rep: h.rewardRep,
+            accent: '#5c5347', onAccept: () => { /* locked — the row is inert */ }, locked: why,
+          })),
+        ],
       });
     }
     if (mysteries.length > 0) {
@@ -165,22 +200,38 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
                       <View key={sec.label} style={styles.section}>
                         <Text style={styles.sectionTitle} accessibilityRole="header">{sec.label}</Text>
                         {sec.postings.map((p) => (
-                          <View key={p.key} style={styles.posting}>
+                          <View
+                            key={p.key}
+                            style={[styles.posting, p.locked && styles.postingLocked]}
+                            // ⚠ OTA-1466 — the reason travels to the screen reader too.
+                            // A dimmed row with a small grey label is invisible to
+                            // anyone using TalkBack, and "why can't I take this" is
+                            // exactly the question they cannot answer by squinting.
+                            accessibilityLabel={p.locked
+                              ? `${p.title} — locked: ${p.locked}`
+                              : `${p.title}. ${p.tc} TC.`}
+                          >
                             <View style={[styles.stripe, { backgroundColor: p.accent }]} />
                             <View style={styles.postingBody}>
-                              <Text style={styles.postingTitle}>{p.title}</Text>
-                              <Text style={styles.postingObjective}>{p.body}</Text>
+                              <Text style={[styles.postingTitle, p.locked && styles.lockedText]}>{p.title}</Text>
+                              <Text style={[styles.postingObjective, p.locked && styles.lockedText]}>{p.body}</Text>
                               <View style={styles.postingFooter}>
-                                <Text style={styles.postingReward}>
+                                <Text style={[styles.postingReward, p.locked && styles.lockedText]}>
                                   ✦ {p.tc} TC{p.rep ? ` · +${p.rep} rep` : ''}
                                 </Text>
-                                <Pressable
-                                  style={({ pressed }) => [styles.acceptBtn, pressed && styles.btnPressed]}
-                                  onPress={p.onAccept}
-                                  accessibilityRole="button"
-                                >
-                                  <Text style={styles.acceptBtnText}>ACCEPT</Text>
-                                </Pressable>
+                                {p.locked ? (
+                                  // The owner asked for this shape by name: not a
+                                  // popup, "kind of faded that says need standing".
+                                  <Text style={styles.lockedWhy}>{p.locked}</Text>
+                                ) : (
+                                  <Pressable
+                                    style={({ pressed }) => [styles.acceptBtn, pressed && styles.btnPressed]}
+                                    onPress={p.onAccept}
+                                    accessibilityRole="button"
+                                  >
+                                    <Text style={styles.acceptBtnText}>ACCEPT</Text>
+                                  </Pressable>
+                                )}
                               </View>
                             </View>
                           </View>
@@ -218,6 +269,12 @@ const styles = StyleSheet.create({
   sectionTitle: { color: '#9a8f78', fontSize: 10, letterSpacing: 2, fontWeight: '700', marginBottom: 6 },
   posting: { flexDirection: 'row', backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, marginBottom: 8, overflow: 'hidden' },
   stripe: { width: 4 },
+  // ⚠⚠ OTA-1466 — the locked row. Dimmed rather than hidden: the owner asked for
+  // "kind of faded that says need standing", and a row he can SEE is a goal,
+  // where a row that is absent is just an empty board.
+  postingLocked: { opacity: 0.45, backgroundColor: '#161412' },
+  lockedText: { color: '#8d8272' },
+  lockedWhy: { color: '#b98a4a', fontSize: 11, fontStyle: 'italic', flexShrink: 1, textAlign: 'right' },
   postingBody: { flex: 1, padding: 11 },
   postingTitle: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   postingObjective: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginTop: 4 },

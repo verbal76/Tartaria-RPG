@@ -77,7 +77,7 @@ import {
   wrongCounterpartyLine,
 } from '../../engine/contractRefusal';
 import { findFactionQuestById, availableFactionQuests } from '../../engine/factionQuests';
-import { HUNTS, findHuntById, availableHunts, fuzzyFindHunt, scaleHuntBoss, firstActionableHuntStage } from '../../engine/hunts';
+import { HUNTS, findHuntById, availableHunts, fuzzyFindHunt, scaleHuntBoss, firstActionableHuntStage, huntBlockReason } from '../../engine/hunts';
 import { MYSTERIES, findMysteryById, availableMysteries, fuzzyFindMystery } from '../../engine/mysteries';
 import { findStorylineById, availableStorylines, fuzzyFindStoryline } from '../../engine/factionStorylines';
 
@@ -1161,12 +1161,46 @@ export const createQuestSlice = (
       if (found) { matchedHunt = found; factionId = fid; break; }
     }
     if (!matchedHunt) {
+      // ⚠⚠⚠ OTA-1466 — SAY WHY. The owner tapped a posting twelve times in nine
+      // seconds and got this same shrug each time, then typed: *"there was no
+      // pop-up telling me why. I'm imagining it's because either I've hit my cap
+      // of missions that I can have or I don't have enough standing but it
+      // doesn't say which."*
+      //
+      // He had to guess, and both guesses were wrong. There is NO mission cap —
+      // an extra contract is PARKED, never refused — and standing is one of four
+      // reasons a posting can be withheld. `availableHunts` knows exactly which
+      // one at the moment it drops the row, and then throws the answer away.
+      //
+      // ⚠ A named hunt beats a summary of the board: if the player asked for
+      // something specific that exists and is blocked, report why THAT one is.
+      const asked = findHuntById(titleOrId) ?? fuzzyFindHunt(titleOrId, HUNTS);
+      let why: string | null = null;
+      if (asked) {
+        for (const fid of searchFactions) {
+          const rep = fid ? getStanding(player.factionStanding, fid) : 0;
+          const b = huntBlockReason(
+            asked, fid, rep,
+            (player.activeHunts ?? []).map((h) => h.id),
+            player.completedHuntIds ?? [],
+            player.hpMax,
+          );
+          // A broker searches every faction. If ANY of them could post it, it is
+          // not blocked at all; otherwise prefer a substantive reason over
+          // "somebody else's business", which tells the player nothing they can
+          // act on.
+          if (b === null) { why = null; break; }
+          if (why === null || b.kind !== 'faction') why = b.text;
+        }
+      }
       const titles = [...offered].join(', ');
       get().appendLog(
         'arbiter',
-        titles
-          ? `${scene.vendor.name} thumbs through papers. "Not that one. Currently posted: ${titles}."`
-          : `${scene.vendor.name} shakes their head. "No bounties for you right now."`,
+        asked && why
+          ? `${scene.vendor.name} taps the posting. "${asked.title} — ${why}."`
+          : titles
+            ? `${scene.vendor.name} thumbs through papers. "Not that one. Currently posted: ${titles}."`
+            : `${scene.vendor.name} shakes their head. "No bounties for you right now."`,
       );
       return;
     }
