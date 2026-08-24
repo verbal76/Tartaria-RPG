@@ -7,6 +7,9 @@ import hazardsData from '../data/hazards/hazards.json';
 import locationsData from '../data/locations/locations.json';
 import lootData from '../data/relics/loot_tables.json';
 import type { LadderTriple } from './worldLadder';
+// OTA-1478 — the player-tier ladder, once, as data. `dangerTier` imports
+// nothing from here, so the dependency runs one way and cannot grow a cycle.
+import { playerRarityCap } from './dangerTier';
 
 const enemies = enemiesData as Enemy[];
 const weather = weatherData as WeatherEntry[];
@@ -394,12 +397,16 @@ export function pickEnemyForLocationGuaranteed(location: Location, playerHpMax?:
   //   hpMax ≥ 140  → all rarities (location-cap rules)
   // When playerHpMax is undefined the caller didn't opt in — keep
   // the legacy location-only behavior for back-compat.
+  //
+  // ⚠ OTA-1478 — THE LADDER IS DATA NOW, in `dangerTier.ts`, and this is one of
+  // its two readers. It used to be spelled out here in Rarity terms and AGAIN in
+  // gameStore in DANGER terms, under a comment claiming they were the "same
+  // brackets" — a claim in two vocabularies that nothing could diff. The
+  // gameStore copy had already been used to tell an under-levelled player the
+  // Mud Seas were danger 2. They are danger 4. Read the ladder; never restate it.
   let effectiveCap: Rarity = dangerCap;
   if (typeof playerHpMax === 'number') {
-    const playerCap: Rarity = playerHpMax < 60 ? 'Common'
-      : playerHpMax < 100 ? 'Uncommon'
-      : playerHpMax < 140 ? 'Rare'
-      : 'Legendary';
+    const playerCap: Rarity = playerRarityCap(playerHpMax);
     effectiveCap = rarityRank(playerCap) < rarityRank(dangerCap) ? playerCap : dangerCap;
   }
   const allowed = enemies.filter((e) => rarityRank(e.rarity) <= rarityRank(effectiveCap));

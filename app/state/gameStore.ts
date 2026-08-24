@@ -501,6 +501,15 @@ export { statNowClause };
 // OTA-1161 — the milestone step lives with the code that EXPLAINS it on the sheet,
 // so the award and the explanation can never quote different numbers.
 import { MILESTONE_KILL_STEP } from '../engine/hpBreakdown';
+// OTA-1478 — one owner for "how heavy is this player, and where is safe".
+// ⚠ Do not restate the hp→tier ladder anywhere below. There was a copy here, in
+// DANGER units against the encounter picker's RARITY units, and it is how the
+// Arbiter came to call the Mud Seas danger 2.
+import { playerDangerCap, dangerWarningLine } from '../engine/dangerTier';
+// ⚠ Static, not the lazy `require` used elsewhere for this module: mainQuest
+// imports nothing but types, so there is no cycle to dodge and a real import
+// gets the signature checked.
+import { ensureMainQuest, phaseHint } from '../engine/mainQuest';
 // OTA-1162 — one owner for what a tile costs the clock.
 // OTA-1167 — the course banner now quotes travel in the same units the deadline uses.
 // OTA-1477 — and so does every compass surface in this file, through `travelPhraseFor`.
@@ -10469,11 +10478,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // worldMemory.dangerWarnedLocations). Threshold maps player
     // hpMax to safe danger ceiling — same brackets as the
     // pickEnemyForLocationGuaranteed cap.
+    //
+    // ⚠⚠ OTA-1478 — THIS SENTENCE HAD THREE FALSE STATEMENTS IN IT, and it is
+    // specifically the sentence the game speaks when it has decided the player
+    // is about to get killed. It read:
+    //
+    //   "…67 HP carries you through the Outskirts (danger 2) or the Mud Seas
+    //    (danger 2). Start the main quest before you camp here again…"
+    //
+    //   1 THE MUD SEAS ARE DANGER 4. locations.json has said so, alongside
+    //     "storms catastrophic, the creatures within mutated", the whole time.
+    //     The warning sent a player too weak for danger-4 country into danger-4
+    //     country and stamped an invented "(danger 2)" on it so they'd trust it.
+    //   2 The safe tier was hard-coded to 2 while `playerCap` right here
+    //     computes 1, 2 or 3 — correct for exactly one of the three brackets.
+    //   3 "Start the main quest" was said to a player carrying TWO Cores
+    //     (4.32.11 log). `phaseHint()` has said the right thing since OTA-430.
+    //
+    // All three are one root: a sentence built from remembered facts instead of
+    // read ones. Every number in it now comes from the catalogue or from live
+    // state, and the cap ladder is data in `dangerTier.ts` shared with the
+    // encounter picker it always claimed to mirror.
     if (player) {
       const loc = scene.location;
       const danger = loc?.danger ?? 0;
       const hpMax = player.hpMax ?? 0;
-      const playerCap = hpMax < 60 ? 1 : hpMax < 100 ? 2 : hpMax < 140 ? 3 : 5;
+      const playerCap = playerDangerCap(hpMax);
       // Suppressed during the tutorial — the only Arbiter voice before the
       // name prompt should be the name prompt. The warning still fires the
       // first time the player re-enters this danger tile after the tutorial
@@ -10487,10 +10517,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
               dangerWarnedLocations: [...warned, loc.id],
             },
           }));
-          const tierLabel = ['', 'unsafe', 'edgy', 'dangerous', 'lethal', 'lethal'][danger] ?? 'lethal';
+          // ⚠ The quest hint is READ, not assumed. `ensureMainQuest` supplies
+          // the 'hook' default for a character who has not started, so a fresh
+          // player still gets "Visit a Lost Capital…" and a two-Core player gets
+          // "2/9 Cores recovered. Visit the remaining Lost Capitals."
+          const mq = ensureMainQuest(player.mainQuest);
           get().appendLog(
             'arbiter',
-            `The Arbiter takes you in. "${loc.name} is ${tierLabel} country. The things that wake here pull above your weight. ${hpMax} HP carries you through the Outskirts (danger 2) or the Mud Seas (danger 2). Start the main quest before you camp here again, or move on until you've got your legs under you."`,
+            dangerWarningLine({
+              locationName: loc.name,
+              locationId: loc.id,
+              danger,
+              hpMax,
+              questHint: phaseHint(mq.phase, mq.coresRecovered.length),
+              // ⚠ Ground the player has actually found ranks first. Advice that
+              // names two camps they have never seen is a different flavour of
+              // useless, not a fix.
+              discoveredIds: get().worldMemory?.discoveredLocationIds ?? [],
+            }),
           );
         }
       }
