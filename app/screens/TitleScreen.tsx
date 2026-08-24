@@ -209,6 +209,9 @@ export function TitleScreen() {
   };
 
   const [lastTappedSlot, setLastTappedSlot] = useState<SlotSummary | null>(null);
+  // OTA-1491 — which slot card is expanded to full size (one at a time; null =
+  // all compact). Expansion is presentation only: no store read, no load.
+  const [expandedSlotId, setExpandedSlotId] = useState<string | null>(null);
 
   const onSlotTap = (slot: SlotSummary) => {
     // OTA-405 — boot gate (A+B). Don't load a save until the boot OTA check
@@ -738,7 +741,50 @@ export function TitleScreen() {
     setTimeout(() => setInviteSent(false), 2200);
   };
 
-  const renderItem = ({ item }: { item: SlotSummary }) => (
+  // ⚠⚠ OTA-1491 — TWO-STAGE SLOT CARDS. Owner: "shrink the character blocks on
+  // the character selection screen to a block that just has the name and the
+  // status line … when they tap on it it opens to the full size block and they
+  // can then select that player." So a COLLAPSED card shows the name row and
+  // the same bottom status line the full card ends on (the resume objective,
+  // or the HP line when a save predates objectives); the FIRST tap expands it
+  // in place; the SECOND tap — on the full card — is what loads. One card
+  // expanded at a time; expanding one collapses the last. Swipe-to-delete
+  // works in both states (SwipeableRow wraps both).
+  const renderItem = ({ item }: { item: SlotSummary }) => {
+    if (expandedSlotId !== item.slotId) {
+      return (
+        <SwipeableRow onDelete={() => confirmDelete(item)}>
+          <TouchableOpacity
+            style={[styles.slot, styles.slotCompact, item.dead && styles.slotDead, !bootGateOpen && styles.btnDisabled]}
+            onPress={() => setExpandedSlotId(item.slotId)}
+            activeOpacity={0.7}
+            disabled={!bootGateOpen}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !bootGateOpen, expanded: false }}
+            accessibilityHint={`Shows ${item.playerName}'s full details`}
+          >
+            <View style={styles.slotHead}>
+              <View style={styles.slotNameRow}>
+                <Text style={[styles.slotName, item.dead && styles.slotNameDead]}>{item.playerName}</Text>
+                {item.dead && <Text style={styles.deadBadge}>DEAD</Text>}
+              </View>
+              <Text style={styles.slotTime}>{timeAgo(item.savedAt)}</Text>
+            </View>
+            {item.mainQuestPhase ? (
+              <Text style={styles.slotObjective} numberOfLines={1}>
+                {resumeObjectiveLine(
+                  item.mainQuestPhase as MainQuestPhase,
+                  item.mainQuestCoresRecovered ?? 0,
+                )}
+              </Text>
+            ) : (
+              <Text style={styles.slotMeta}>HP {item.hp}/{item.hpMax}</Text>
+            )}
+          </TouchableOpacity>
+        </SwipeableRow>
+      );
+    }
+    return (
     <SwipeableRow onDelete={() => confirmDelete(item)}>
       <TouchableOpacity
         style={[styles.slot, item.dead && styles.slotDead, !bootGateOpen && styles.btnDisabled]}
@@ -746,7 +792,8 @@ export function TitleScreen() {
         activeOpacity={0.7}
         disabled={!bootGateOpen}
         accessibilityRole="button"
-        accessibilityState={{ disabled: !bootGateOpen }}
+        accessibilityState={{ disabled: !bootGateOpen, expanded: true }}
+        accessibilityHint={`Loads ${item.playerName}`}
       >
         <View style={styles.slotHead}>
           <View style={styles.slotNameRow}>
@@ -877,7 +924,8 @@ export function TitleScreen() {
         )}
       </TouchableOpacity>
     </SwipeableRow>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -1130,6 +1178,7 @@ export function TitleScreen() {
         data={slots}
         keyExtractor={(s) => s.slotId}
         renderItem={renderItem}
+        extraData={expandedSlotId}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#c9a86a" />
         }
@@ -1498,6 +1547,8 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   slotDead: { borderColor: '#5a2a26', opacity: 0.75 },
+  // OTA-1491 — the collapsed two-line card: tighter padding, same frame.
+  slotCompact: { paddingVertical: 8 },
   slotHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   slotNameRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8, flexShrink: 1 },
   slotName: { color: '#e6d8b3', fontSize: 16, fontWeight: '700' },

@@ -24550,7 +24550,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // account and only 1 has the send log option"): seeing an unlock-named
 // character marks the device once, then every character on it gets the
 // owner tools. A device that never held one never unlocks.
-export const OTA_BUILD_ID = '2026-08-24-1490-the-device-is-the-owner';
+// OTA-1491 — two-stage slot cards on the character select: collapsed shows
+// name + the bottom status line; first tap expands in place; the tap on the
+// full card is what loads. One expanded at a time; swipe-delete works in
+// both states.
+export const OTA_BUILD_ID = '2026-08-24-1491-two-taps-to-load';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1490-the-device-is-the-owner';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1489-one-tap-instead-of-four-slices';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1488-told-first-sent-second';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1487-opt-out-not-opt-in';
