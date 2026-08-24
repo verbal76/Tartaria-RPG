@@ -143,6 +143,11 @@ interface Props {
    *  blocked cases, and the no-stamina-only haptic buzz. */
   climbBlockedReason?: ClimbBlockReason;
   investigateCount?: number;
+  /** OTA-1483 — true while the paced INVESTIGATE ALL sweep is streaming its
+   *  results. The chip drops its green glow and reads "investigating…" so it
+   *  stops inviting a tap that would talk over the stream. Still pressable —
+   *  opening the picker is harmless and a dead control teaches nothing. */
+  investigateSweeping?: boolean;
   golem?: { name: string; hp: number; hpMax: number } | null;
   dog?: { name: string; hp: number; hpMax: number } | null;
   // arb-fix — why the dog can't act THIS swing, if at all. The dog chip still
@@ -227,7 +232,7 @@ function shortWeaponLabel(name: string): string {
  *  player's own choice for the rest of the session. */
 let MORE_TRAY_OPEN = false;
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, pickpocketPossible, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, parserHint, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, pickpocketPossible, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, investigateSweeping, parserHint, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   // arb-fix (OTA — adaptive quick row) — the out-of-combat quick row shows the
   // world-interaction verbs (look / rest / investigate / take / salvage / climb /
@@ -481,9 +486,14 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const salvageTone: 'ready' | undefined = tutActionBeat
     ? (tutActionBeat === 'scrap' ? 'ready' : undefined)
     : (salvageOverride || (salvageableCount && salvageableCount > 0) ? 'ready' : undefined);
-  const investigateTone: 'ready' | undefined = tutActionBeat
-    ? (tutActionBeat === 'investigate' ? 'ready' : undefined)
-    : (investigateOverride || (investigateCount && investigateCount > 0) ? 'ready' : undefined);
+  // OTA-1483 — a running sweep unlights the chip regardless of the count: the
+  // count says "there is more to investigate", which is exactly what the sweep
+  // is busy doing.
+  const investigateTone: 'ready' | undefined = investigateSweeping
+    ? undefined
+    : tutActionBeat
+      ? (tutActionBeat === 'investigate' ? 'ready' : undefined)
+      : (investigateOverride || (investigateCount && investigateCount > 0) ? 'ready' : undefined);
   // CLIMB is green whenever the room has climbables, which during the
   // tutorial meant it glowed through every beat. Gate it to the climb beat
   // so green points only at the current action; normal count/rope logic
@@ -803,7 +813,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               <QuickBtn label="✦ ability" onPress={onOpenRaceAbilities} tone="ready" />
             ) : null}
             <QuickBtn
-              label="investigate"
+              label={investigateSweeping ? 'investigating…' : 'investigate'}
               onPress={investigateOverride ?? onOpenSearch}
               tone={investigateTone}
               blocked={investigateBlocked}

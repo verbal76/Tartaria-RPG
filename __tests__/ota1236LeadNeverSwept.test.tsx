@@ -308,7 +308,12 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
     // unchanged and is what matters:** the enemy check runs before every submit,
     // and now it runs before EACH one rather than once per frame — which is
     // strictly stronger, because the sweep is live for seconds.
-    expect(block).toContain("(s.currentScene?.enemies ?? []).length > 0) return;");
+    // ⚠ OTA-1483 — the abort now ALSO unlights the INVESTIGATE chip on its way
+    // out (`{ endSweep(); return; }`), and this pin used to quote the bare
+    // `…) return;` spelling — the ELEVENTH quoted-source pin to break on a
+    // reword this week. The claim: the enemy guard EXITS the step without
+    // submitting, whatever housekeeping rides along.
+    expect(block).toMatch(/\(s\.currentScene\?\.enemies \?\? \[\]\)\.length > 0\)\s*\{?[^\n]*return;/);
   });
 
   it('⚠⚠ the investigate picker LISTS in the same order it SWEEPS', () => {

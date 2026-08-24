@@ -1271,20 +1271,39 @@ export function siteLootForScene(get: StoreGet): { name: string; rarity: import(
   return enc.ladderLootPool(findMicroMicroAnywhere(mmId));
 }
 
-function findConcept(targetText: string | undefined): Concept | null {
+// (exported for the OTA-1483 suite — the matcher's ranking rule is the subject
+// under test, and driving 178 concepts through the parser to reach it would
+// test the parser, not the rule.)
+export function findConcept(targetText: string | undefined): Concept | null {
   if (!targetText) return null;
   const t = targetText.toLowerCase();
   if (!t.trim()) return null;
-  // Prefer longer keyword matches (so "burn damage" matches before "burn").
-  const sorted = [...getAllConcepts()].sort(
-    (a, b) => Math.max(...b.keywords.map((k) => k.length)) - Math.max(...a.keywords.map((k) => k.length)),
-  );
-  for (const c of sorted) {
+  // ⚠⚠ OTA-1483 — THE LONGEST **MATCHED** KEYWORD WINS, not any keyword of the
+  // concept that HAPPENS TO OWN a long one. The old loop sorted CONCEPTS by
+  // their longest keyword and then, walking that order, returned on ANY keyword
+  // hit — so a concept could win the race on the strength of a 20-character
+  // keyword and then match on its 8-character one. From the owner's 4.32.11
+  // log: "aetheric abilities" answered with the AETHERIC DAMAGE TYPE
+  // ("Invisible, concussive force…") because the damage concept's bare
+  // "aetheric" matched and nothing more specific was even consulted — the
+  // comment above the sort ("so 'burn damage' matches before 'burn'") claimed a
+  // property the code did not have.
+  //
+  // Now every (concept, keyword) pair is scored by the length of the keyword
+  // that ACTUALLY MATCHED, and the longest wins. Ties keep catalogue order, so
+  // existing single-keyword resolutions are unchanged.
+  let best: Concept | null = null;
+  let bestLen = 0;
+  for (const c of getAllConcepts()) {
     for (const kw of c.keywords) {
-      if (t.includes(kw.toLowerCase())) return c;
+      const k = kw.toLowerCase();
+      if (k.length > bestLen && t.includes(k)) {
+        best = c;
+        bestLen = k.length;
+      }
     }
   }
-  return null;
+  return best;
 }
 
 const allLocations = locationsData as Location[];
@@ -29186,6 +29205,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const guardian = cg.spawnGuardianForCapital(player, capitalId);
     if (!guardian) return { ok: false, reason: 'no_guardian_def' };
+    // ⚠ OTA-1483 — THE PLAYER'S ACT IS LOGGED BEFORE THE THING IT CAUSES. From
+    // the 4.32.11 log: a Guardian "spawned with no logged player action" — which
+    // was TRUE as far as the feed could show. The ★ SUMMON chip is a BUTTON, so
+    // nothing goes through submitPlayerAction and no "> …" line lands; the next
+    // thing in the feed was the Guardian card, apparently from nowhere. Same
+    // rule as every picker tap since OTA-1273 ("a GIVE tap logs its [player]
+    // line first, on every outcome"): the feed tells you who started it.
+    get().appendLog(
+      'world',
+      `You lay a hand on the cold Core seat and call its Guardian up.`,
+      { skipDedup: true },
+    );
     set((s) => (
       s.currentScene
         ? {

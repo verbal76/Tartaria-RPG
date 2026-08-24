@@ -24511,7 +24511,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ⚠ OTAs 1470–1480 SHIPPED UNDER THE 1469 STAMP — they are real, applied, and
 // live on devices that report 1469. Recorded here because a save exported from
 // that window names a build it is newer than.
-export const OTA_BUILD_ID = '2026-08-24-1482-the-build-says-which-build-it-is';
+// ⚠ And the gate caught its FIRST forgotten stamp one OTA after it was built —
+// this very line was still 1482 when ota1483's suite landed. That is the gate
+// paying for itself on day one, and the reason it exists in the chain.
+export const OTA_BUILD_ID = '2026-08-24-1483-three-from-the-second-sweep';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1482-the-build-says-which-build-it-is';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1469-the-course-banner-tells-the-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1460-what-you-did-outranks-what-we-say';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1459-one-thought-at-a-time';

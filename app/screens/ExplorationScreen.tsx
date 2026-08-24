@@ -223,6 +223,10 @@ export function ExplorationScreen() {
   // tall enemy card scrolls within the top-right corner instead of growing the row.
   const [statsColH, setStatsColH] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
+  // OTA-1483 — true while the paced INVESTIGATE ALL sweep (OTA-1263) is live;
+  // unlights the INVESTIGATE chip so it stops inviting a tap that would talk
+  // over its own stream. Cleared on every sweep exit (see endSweep).
+  const [investigateSweepRunning, setInvestigateSweepRunning] = useState(false);
   const [approachOpen, setApproachOpen] = useState(false);
   // OTA-847 (STEALTH SYSTEM) — PICKPOCKET picker (replaces the peaceful APPROACH).
   const [pickpocketOpen, setPickpocketOpen] = useState(false);
@@ -1887,6 +1891,7 @@ export function ExplorationScreen() {
               return sceneNouns.filter((n) => isClimbable(n) && !isClimbCleared(n, marks)).length;
             })()}
             parserHint={parserHint}
+            investigateSweeping={investigateSweepRunning}
             investigateCount={(() => {
               // 2026-05-25 — green tone for INVESTIGATE when the scene
               // has at least one chip still actionable (not
@@ -2398,6 +2403,14 @@ export function ExplorationScreen() {
         onInvestigateAll={(nouns) => {
           setSearchOpen(false);
           const ordered = orderByStoryTier(nouns, (n) => n, leadCtx);
+          // ⚠ OTA-1483 — THE BUTTON KNOWS THE SWEEP IS RUNNING. The paced sweep
+          // (OTA-1263) is live for ordered.length × 2.2s, and for all of it the
+          // INVESTIGATE chip kept its green "ready" glow — a lit invitation to
+          // tap the very control whose input stream the sweep is speaking on.
+          // Owner's log: the button "stays lit during the paced stream". The
+          // chip now reads "investigating…" (unlit) until the sweep ends by ANY
+          // exit — finished, combat abort, or the player acting.
+          setInvestigateSweepRunning(true);
           // ⚠⚠ OTA-1268 — THE SWEEP WAS ABORTING ON ITS OWN FOOTSTEPS. The 1263
           // abort compared against the stamp from BEFORE the sweep started — but
           // `submitPlayerAction` stamps `lastPlayerActionAt` on EVERY submit,
@@ -2409,17 +2422,22 @@ export function ExplorationScreen() {
           // the only thing that can move it between steps is a real player action.
           let watermark = useGameStore.getState().lastPlayerActionAt;
           let i = 0;
+          // ⚠ ONE exit door for the sweep, so no abort path can forget to unlight
+          // the chip — a "running" flag that survives its run is a lit button
+          // lying in the other direction.
+          const endSweep = (): void => setInvestigateSweepRunning(false);
           const step = (): void => {
-            if (i >= ordered.length) return;
+            if (i >= ordered.length) { endSweep(); return; }
             const s = useGameStore.getState();
-            if ((s.currentScene?.enemies ?? []).length > 0) return;
+            if ((s.currentScene?.enemies ?? []).length > 0) { endSweep(); return; }
             // ⚠ The player did something of their own — stop rather than queue
             // lines behind whatever they just asked for.
-            if (s.lastPlayerActionAt !== watermark) return;
+            if (s.lastPlayerActionAt !== watermark) { endSweep(); return; }
             submit(`investigate ${ordered[i]!}`);
             watermark = useGameStore.getState().lastPlayerActionAt;
             i += 1;
             if (i < ordered.length) setTimeout(step, INVESTIGATE_ALL_GAP_MS);
+            else endSweep();
           };
           step();
         }}

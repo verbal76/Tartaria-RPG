@@ -214,8 +214,13 @@ describe('OTA-1263 (D) — INVESTIGATE ALL resolves one at a time', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const i = screen.indexOf('onInvestigateAll={(nouns) => {');
     const block = blockAt(screen, 'onInvestigateAll={(nouns) => {');
-    expect(block).toContain("(s.currentScene?.enemies ?? []).length > 0) return;");
+    // ⚠ OTA-1483 — the aborts now route through `endSweep()` so the chip
+    // unlights on every exit; this pin quoted the bare `…) return;` spelling
+    // and broke on that reword (the TENTH such break this week). The claims:
+    // both guards exit the step, and both do it through the one exit door.
+    expect(block).toMatch(/\(s\.currentScene\?\.enemies \?\? \[\]\)\.length > 0\)\s*\{?[^\n]*return;/);
     expect(block).toContain('s.lastPlayerActionAt !== watermark');
+    expect((block.match(/endSweep\(\)/g) ?? []).length).toBeGreaterThanOrEqual(3);
     expect(block).toContain('watermark = useGameStore.getState().lastPlayerActionAt;');
   });
 
