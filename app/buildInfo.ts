@@ -24566,6 +24566,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the outcome is logged on-device either way. The inbox sync also pulls
 // the crash-ledger reports — six native-death events, the pipeline's
 // first server-side proof.
+// 2026-08-24 — THIRD GOLEM CATCH-UP PUBLISH: 1492 (flush-verified SEND LOG)
+// to the golem channel via the markerless path, same trunk as HAL's #(prev).
 export const OTA_BUILD_ID = '2026-08-24-1492-sent-means-arrived';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1491-two-taps-to-load';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1490-the-device-is-the-owner';
