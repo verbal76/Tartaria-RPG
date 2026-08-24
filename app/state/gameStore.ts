@@ -10259,7 +10259,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
         scenePerchPlacements = Object.fromEntries(liveNouns.map((n) => [n, seeded.placements[n]!]));
       }
     }
+    // ⚠⚠ OTA-1479 — THE AREA LABEL HAS TO SURVIVE A SCENE REBUILD.
+    //
+    // OTA-1348 made the map walk with the player: every cardinal step recomputes
+    // `transitArea` from the authoritative grid cell — "Voronov Outskirts", "The
+    // road to Ostragar", or the atlas band's own name — so the scene bar stops
+    // claiming the last place you actually arrived at. It worked, and then every
+    // `beginScene` threw it away, because the scene literal below simply did not
+    // carry the field and a fresh scene starts with it undefined.
+    //
+    // So the label was correct only between a step and the next scene rebuild,
+    // and any rebuild — an encounter resolving, a menu round-trip, a re-entry —
+    // silently reverted BOTH readers to `location.name`. From the 4.32.11 log:
+    //
+    //   [Voronov] north: Drakova (2 tiles) · … · west: Voronov (1 tile)
+    //
+    // The bracket says you are AT Voronov while the radar, correctly, reports
+    // Voronov one tile west. The radar was never wrong. The label was stale, and
+    // it is the same shape as the compass: one surface got the fix, its sibling
+    // did not, and the two then disagreed in front of the player.
+    //
+    // ⚠ RECOMPUTED, NOT INHERITED. Carrying the previous scene's string forward
+    // would make it stale in a different way (right label, wrong tile). It is
+    // derived here from the same `overlandAreaLabel` the step path uses, which
+    // returns null exactly when the player stands ON a named tile — so "am I
+    // actually here?" has one answer and both readers get it.
+    //
+    // ⚠ OUTDOORS ONLY. Interiors set their own label ("<Building> · <Room>"), and
+    // stamping a wilds name over it would be a third wrong answer. Indoors this
+    // stays null, which is precisely what the scene literal did before.
+    const sceneIndoors = !!hubRoom || !!get().activeBuildingId;
+    const sceneAreaLabel = sceneIndoors
+      ? null
+      : (() => {
+        const gx = player.gridX;
+        const gy = player.gridY;
+        if (typeof gx !== 'number' || typeof gy !== 'number') return null;
+        const roadTgtId = player.travelTarget?.locationId ?? null;
+        const roadToName = roadTgtId
+          ? (getLocationById(roadTgtId)?.name ?? null)
+          : null;
+        return overlandAreaLabel(gx, gy, roadToName);
+      })();
     const scene: CurrentScene = {
+      transitArea: sceneAreaLabel,
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
       vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, pinnedAmbientNouns, tileGearNouns: sceneGearNouns, microMicroId,
       nounPlacements: scenePerchPlacements,
@@ -11229,15 +11272,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // meaningful and consistent, so a second bogus north beside them is pure
     // noise. The radar is a WILDERNESS instrument; indoors it has nothing to
     // describe. Same reason the building interior never wanted it.
-    const indoors = !!hubRoom || !!get().activeBuildingId;
-    if (!opts?.isOpening && !indoors) {
+    // ⚠ OTA-1479 — `sceneIndoors`, computed once beside the area label above.
+    // This line used to recompute the identical expression, which is how two
+    // answers to one question start; the label and the radar gate must agree by
+    // construction, not by both happening to be written the same way.
+    if (!opts?.isOpening && !sceneIndoors) {
       try {
         const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
         const map = generateWorldMap(seed, player.currentLocationId);
         const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
         const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
         const radar = describeAllDirections(map, fromX, fromY);
-        get().appendLog('world', `[${location.name}] ${radar}`);
+        // ⚠ OTA-1479 — the bracket names where the player IS, which is not always
+        // the location they last arrived at. `scene.transitArea` is null exactly
+        // when they stand on the named tile, so this reads `[Voronov]` there and
+        // `[Voronov Outskirts]` one step out — and can no longer contradict the
+        // radar beside it, which had been correctly reporting Voronov to the west
+        // of a banner claiming to be Voronov.
+        get().appendLog('world', `[${scene.transitArea ?? location.name}] ${radar}`);
       } catch {
         // best-effort radar — never block the scene on a map-generation hiccup
       }

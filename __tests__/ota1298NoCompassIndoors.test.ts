@@ -124,9 +124,62 @@ describe('OTA-1298 — the overland compass stays outdoors', () => {
     expect(compassLines(feedSince(mark)).length).toBeGreaterThan(0);
   });
 
-  it('⚠ the gate is decided by BEING indoors, not by the room name', () => {
+  it("⚠⚠ EVERY room stays quiet, not just the five on the owner's path", async () => {
+    // ⚠ THIS TEST USED TO BE A SOURCE QUOTE. It read:
+    //
+    //     expect(store).toContain('const indoors = !!hubRoom || !!get().activeBuildingId;');
+    //
+    // and it broke on OTA-1479, which renamed that local to `sceneIndoors` while
+    // changing nothing at all about the behaviour it was guarding. A pin that
+    // quotes a line of source instead of stating a claim fails on a rewording and
+    // passes on a rewrite that breaks the rule — the defect class this project has
+    // now been bitten by seven times in a week.
+    //
+    // The claim was "the gate is decided by BEING indoors, not by the room name",
+    // and that is testable as BEHAVIOUR: if the gate keyed off a room name, some
+    // room would leak. So walk the whole reachable interior instead of the five
+    // rooms the owner happened to walk, and require silence in all of them.
+    await freshAtGate();
+    const seen = new Set<string>();
+    const mark = useGameStore.getState().gameLog.length;
+    const dirs = ['go north', 'go east', 'go south', 'go west'];
+    for (let i = 0; i < 40; i++) {
+      const room = useGameStore.getState().player?.hubRoomId ?? null;
+      if (room === null) break; // stepped outside — the next test owns that case
+      seen.add(room);
+      sub(dirs[i % dirs.length]!);
+    }
+    // ⚠ ABSENT vs NOT-WHERE-I-LOOKED: a walk that reached one room would pass this
+    // trivially. Require real coverage before believing the silence.
+    expect(seen.size).toBeGreaterThanOrEqual(3);
+    expect(compassLines(feedSince(mark))).toEqual([]);
+  });
+
+  it('⚠ the guard is negated on an indoors flag built from BOTH interior kinds', () => {
+    // The one genuinely structural part: the flag must come from being in a hub
+    // room OR inside a building, because those are the two ways to be under a roof
+    // and OTA-1103 already found a faction skin that moved a room indoors.
+    // Asserted on the SHAPE, not on a chosen variable name — what the author calls
+    // the local is their business, and renaming it must never fail a build.
     const store = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
-    expect(store).toContain('const indoors = !!hubRoom || !!get().activeBuildingId;');
-    expect(store).toContain('if (!opts?.isOpening && !indoors) {');
+    const code = store.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+
+    // Whatever it is called, something is defined as "hub room OR active building".
+    const decl = /const (\w+)\s*=\s*!!hubRoom \|\| !!get\(\)\.activeBuildingId;/.exec(code);
+    expect(decl).not.toBeNull();
+    const flag = decl![1]!;
+
+    // …and the radar emit is guarded on the negation of THAT flag.
+    const emitAt = code.indexOf('describeAllDirections(map, fromX, fromY)');
+    expect(emitAt).toBeGreaterThan(-1);
+    const guard = code.lastIndexOf(`!opts?.isOpening && !${flag}`, emitAt);
+    expect(guard).toBeGreaterThan(-1);
+    expect(emitAt - guard).toBeLessThan(600); // the guard really encloses the emit
+
+    // And nothing between the guard and the emit tests a room by name.
+    const between = code.slice(guard, emitAt);
+    expect(between).not.toMatch(/hubRoomId\s*===/);
+    expect(between).not.toMatch(/roomId\s*===/);
+    expect(between).not.toMatch(/'(gate|square|culvert|armory|mess|workshop|quarters|lab|vault|chapel)'/);
   });
 });

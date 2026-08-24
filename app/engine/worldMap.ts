@@ -295,8 +295,35 @@ export const OUTSKIRTS_RADIUS = 2;
 const chebyshev = (ax: number, ay: number, bx: number, by: number): number =>
   Math.max(Math.abs(ax - bx), Math.abs(ay - by));
 
+/** ⚠ OTA-1479 — WHOSE TILE IS THIS, INCLUDING THE HIDDEN ONES.
+ *
+ *  `nearestNamedLocation` below deliberately skips hidden locations, and that is
+ *  right for what it is FOR: an unfound place must not name the ground from two
+ *  tiles away, or the label leaks the Hidden Market to somebody who has never
+ *  found it. But hiding governs what you can see from a DISTANCE. It has nothing
+ *  to say about what you are standing in — and using the proximity reader to
+ *  answer "am I here?" made the game tell a player standing INSIDE the Hidden
+ *  Market that they were in the Cradle of Dusk's Outskirts, two tiles away.
+ *
+ *  ⚠ Measured against `canonicalPositions()`, which is what `canonicalCellOf`,
+ *  `standingAt` and travel arrival all use. `nearestNamedLocation` measures
+ *  against the RAW `canonicalCellFor` instead — a second answer to "where is
+ *  this place" that happens to agree today (zero locations are displaced by
+ *  collision resolution) and would silently stop agreeing the moment two
+ *  locations collided. This reader takes the resolved table on purpose. */
+export function namedCellOwner(x: number, y: number): { id: string; name: string } | null {
+  const positions = canonicalPositions();
+  for (const loc of allKnownLocations()) {
+    const c = positions[loc.id];
+    if (c && c.x === x && c.y === y) return { id: loc.id, name: loc.name };
+  }
+  return null;
+}
+
 /** Nearest STATIC named location to a cell, by chebyshev distance on the canon
- *  grid (hidden locations excluded — an unfound place must not name the ground). */
+ *  grid (hidden locations excluded — an unfound place must not name the ground).
+ *  ⚠ This is a PROXIMITY reader. For "am I standing on it", use `namedCellOwner`
+ *  above; the two are different questions and were being answered by one call. */
 export function nearestNamedLocation(x: number, y: number): { id: string; name: string; dist: number } | null {
   let best: { id: string; name: string; dist: number } | null = null;
   for (const loc of ALL_LOCATIONS) {
@@ -324,8 +351,14 @@ export function overlandAreaLabel(
   y: number,
   roadToName?: string | null,
 ): string | null {
+  // ⚠ OTA-1479 — "am I standing on it" is asked of `namedCellOwner`, which sees
+  // hidden locations too. The old `near.dist === 0` test used the proximity
+  // reader, which skips them, so a player inside the Hidden Market was labelled
+  // with the nearest VISIBLE place instead — "Cradle of Dusk Outskirts", two
+  // tiles from where they actually stood. Returning null here is what makes the
+  // caller fall through to the real location name.
+  if (namedCellOwner(x, y)) return null;
   const near = nearestNamedLocation(x, y);
-  if (near && near.dist === 0) return null;
   if (near && near.dist <= OUTSKIRTS_RADIUS) return `${near.name} Outskirts`;
   if (roadToName) return `The road to ${roadToName}`;
   return wildsNameFor(x, y);
