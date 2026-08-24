@@ -24554,6 +24554,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // name + the bottom status line; first tap expands in place; the tap on the
 // full card is what loads. One expanded at a time; swipe-delete works in
 // both states.
+// 2026-08-24 — SECOND GOLEM CATCH-UP PUBLISH. 1490 (the device-is-the-owner
+// unlock: name-sticky + the seven-tap ritual) and 1491 (two-stage slot
+// cards) went to HAL under [ota-hal]; this markerless commit publishes the
+// same trunk to the golem channel, so the owner's golem install — whose
+// characters carry ordinary names — can unlock SEND LOG by the ritual and
+// ship its saves.
 export const OTA_BUILD_ID = '2026-08-24-1491-two-taps-to-load';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1490-the-device-is-the-owner';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1489-one-tap-instead-of-four-slices';
