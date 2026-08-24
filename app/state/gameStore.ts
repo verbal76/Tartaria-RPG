@@ -358,6 +358,11 @@ import {
   getLocationFlavors,
 } from '../engine/narrativeGenerator';
 import { parseInput, splitClauses, mentionsWaitVerb, type ParseContext } from '../engine/parser';
+// ⚠⚠ OTA-1464 — telling a note ABOUT the game from a command TO it. Extracted
+// from two inline regexes here so it can be exercised against the owner's real
+// typed corpus in both directions; see the module header for what the inline
+// version cost.
+import { classifyMetaComment, anyClauseIsMeta } from '../engine/metaComment';
 // ⚠ OTA-1264 — describeIssues has existed since OTA-205 and nothing has
 // ever called it; a demoted parse just fell through to the generic
 // refusal. The negated-command reply is its first real consumer.
@@ -12195,24 +12200,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
     //       chars, slipped past the (A) length gate, fired the help
     //       intent). These shapes are specific enough that no in-
     //       character text is likely to match.
-    const longSuggestion = trimmed.length > 60 &&
-      /^(ok\b|btw\b|fyi\b|hey\b|so\b|when (i|the)\b)|(\b(we|i) ((\w+)\s+)?(should|need|could|gotta|gonna|wish|want|really)\b|\byou should\b|\bi think\b|\bi'?d like\b|\bcan we\b|\bcould you\b|\bshould have\b|\bneeds? to be\b|\bit should (have|be|also)\b|\badd a\b|\bplease add\b)/i.test(trimmed);
-    const frustrationVent =
-      /\bsorry\s+(guys|y'?all|everyone|folks|all|dudes)\b/i.test(trimmed) ||
-      /\b(i\s+tried|tried\s+to)\s+.{0,30}\b(game|app|engine|parser|menu|button|inventory)\b/i.test(trimmed) ||
-      /\bthis\s+(game|app)\s+(is|keeps|won'?t|doesn'?t|wont|dont)\b/i.test(trimmed) ||
-      /\bthe\s+game'?s?\s+(being|is|was)\b/i.test(trimmed) ||
-      /\b(retarded|buggy|glitched)\b/i.test(trimmed);
-    if (
-      !_opts?.skipPreChecks &&
-      (longSuggestion || frustrationVent)
-    ) {
+    // ⚠⚠⚠ OTA-1464 — THE TWO REGEXES THAT USED TO LIVE HERE ARE NOW
+    // `engine/metaComment.ts`, exercised against every note the owner actually
+    // typed and every command he actually issued. They missed two of eight
+    // notes, and one of the misses cast a spell:
+    //
+    //   [player] hitting summon when there were already enemies screwed up that fight
+    //   parser: intent=cast conf=1.00 verb=summon target=enemies screwed fight
+    //
+    // ⚠⚠ AND THE GUARD IS NO LONGER SKIPPED FOR A CLAUSE. It used to be gated on
+    // `!_opts?.skipPreChecks`, which the clause splitter below sets on every
+    // fragment it re-submits — so a note typed as five sentences was cut up and
+    // each piece handed to the parser with the guard switched off. Three gift
+    // attempts came out of one bug report. The check now runs on EVERY entry to
+    // this function, clause or not; see `anyClauseIsMeta` for why a note stays a
+    // note after it has been cut up.
+    const metaVerdict = classifyMetaComment(trimmed);
+    if (metaVerdict.isMeta) {
       if (!_opts?.silent) get().appendLog('player', trimmed, { meta: true });
       get().appendLog(
         'arbiter',
         `The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb — 'investigate the rubble', 'go east', 'attack the figure'."`,
       );
-      get().appendLog('debug', `meta-comment guard: skipped intent parse on ${trimmed.length}-char input`);
+      // ⚠ The REASON and the MATCH, not just a character count. The old line
+      // printed only the length, so a device log could tell you the guard fired
+      // but never why — and, more to the point, never why it hadn't.
+      get().appendLog(
+        'debug',
+        `meta-comment guard: skipped intent parse (${metaVerdict.reason}: "${metaVerdict.match}") on ${trimmed.length}-char input`,
+      );
       return;
     }
 
@@ -12228,6 +12244,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // first one failed.
     if (!_opts?.skipPreChecks) {
       const clauses = splitClauses(trimmed);
+      // ⚠⚠⚠ OTA-1464 — PROSE DOES NOT BECOME A COMMAND BY BEING CUT UP. Checked
+      // BEFORE the loop, on the clause list as a whole: a bug report typed as
+      // five sentences is one bug report, and running the fragments that don't
+      // individually look like prose is still running fragments of a paragraph
+      // as commands. If any clause reads as a note, the entire input is a note.
+      if (clauses.length > 1) {
+        const clauseVerdict = anyClauseIsMeta(trimmed, clauses);
+        if (clauseVerdict.isMeta) {
+          if (!_opts?.silent) get().appendLog('player', trimmed, { meta: true });
+          get().appendLog(
+            'arbiter',
+            `The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb — 'investigate the rubble', 'go east', 'attack the figure'."`,
+          );
+          get().appendLog(
+            'debug',
+            `meta-comment guard: ${clauses.length} clauses, one reads as a note `
+            + `(${clauseVerdict.reason}: "${clauseVerdict.match}") — none run`,
+          );
+          return;
+        }
+      }
       if (clauses.length > 1) {
         get().appendLog('debug', `multi-clause: ${clauses.length} parts`);
         for (let i = 0; i < clauses.length; i++) {
