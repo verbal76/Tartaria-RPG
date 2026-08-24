@@ -29,6 +29,7 @@ import {
 import type { MainQuestPhase, MainQuestState } from '../app/engine/types';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { placedAt } from '../test-utils/placePlayer';
 
 const PHASES: MainQuestPhase[] = ['hook', 'revelation', 'cores', 'descent', 'nexus', 'choice', 'ended'];
 const CAPS = LOST_CAPITAL_LOCATIONS;
@@ -52,7 +53,7 @@ describe('OTA-1224 — the dev note is gone, and cannot come back', () => {
         for (const trig of triggers) {
           const player = {
             mainQuest: state, factionId: 'reclaimers_guild', name: 'Proof',
-            currentLocationId: (trig.locationId as string) ?? 'asgardar',
+            ...placedAt((trig.locationId as string) ?? 'asgardar'),
           } as never;
           const next = advanceMainQuest(player, trig as never);
           // ⚠ MIRROR OF gameStore.triggerMainQuest — both early-returns, then the

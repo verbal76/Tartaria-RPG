@@ -69,6 +69,7 @@ import { useGameStore } from '../app/state/gameStore';
 import { GREAT_CLIMBS } from '../app/engine/greatClimbs';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { placedAt } from '../test-utils/placePlayer';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const renderer = require('react-test-renderer') as {
@@ -101,7 +102,7 @@ async function freshPlayer(): Promise<void> {
     currentScene: SCENE,
     player: {
       ...s.player, hubRoomId: null, stamina: 200, staminaMax: 200,
-      currentLocationId: 'tartarian_outskirts', routedClimbId: null, travelTarget: null,
+      ...placedAt('tartarian_outskirts'), routedClimbId: null, travelTarget: null,
     },
   } : s) as never);
 }

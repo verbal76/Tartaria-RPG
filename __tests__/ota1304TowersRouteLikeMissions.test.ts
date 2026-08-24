@@ -59,6 +59,7 @@ import { GREAT_CLIMBS } from '../app/engine/greatClimbs';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { blockAt } from '../test-utils/srcBlock';
+import { placedAt } from '../test-utils/placePlayer';
 
 jest.setTimeout(120_000);
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
@@ -71,7 +72,7 @@ async function player(): Promise<void> {
   } as never);
   useGameStore.getState().skipTutorial?.();
   useGameStore.setState((s) => (s.player ? {
-    player: { ...s.player, hubRoomId: null, stamina: 200, staminaMax: 200, currentLocationId: 'tartarian_outskirts' },
+    player: { ...s.player, hubRoomId: null, stamina: 200, staminaMax: 200, ...placedAt('tartarian_outskirts') },
   } : s));
 }
 const unlock = (id: string): void => {

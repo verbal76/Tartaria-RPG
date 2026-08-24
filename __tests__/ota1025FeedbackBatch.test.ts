@@ -7,13 +7,14 @@ import * as path from 'path';
 import { monotoneTierDmgBonus, spawnGuardianForCapital, guardianOverLevel } from '../app/engine/coreGuardians';
 import { HOOK_WEIGHTS } from '../app/engine/hooks';
 import type { GuardianTier } from '../app/engine/coreGuardians';
+import { placedAt } from '../test-utils/placePlayer';
 
 const mkPlayer = (best: number, hpMax: number, cores: string[] = []) => ({
   name: 'P', raceId: 'r', factionId: 'f',
   stats: { strength: best, dexterity: 5, intelligence: 5, wisdom: 5, charisma: 5, stealth: 5 },
   hp: hpMax, hpMax, stamina: 10, staminaMax: 10,
   inventory: [], factionStanding: [], activeQuests: [],
-  currentLocationId: 'asgardar', tc: 0,
+  ...placedAt('asgardar'), tc: 0,
   mainQuest: { phase: 'cores', coresRecovered: cores },
 } as any);
 

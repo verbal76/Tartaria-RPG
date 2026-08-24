@@ -46,6 +46,7 @@ jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
+import { placedAt } from '../test-utils/placePlayer';
 
 async function freshGame() {
   const store = useGameStore;
@@ -62,7 +63,7 @@ async function freshGame() {
 function stage(store: typeof useGameStore, locationId: string, stat: 'strength' | 'dexterity', value: number) {
   store.setState((s) =>
     s.player
-      ? { player: { ...s.player, currentLocationId: locationId, stats: { ...s.player.stats, [stat]: value } } }
+      ? { player: { ...s.player, ...placedAt(locationId), stats: { ...s.player.stats, [stat]: value } } }
       : s,
   );
 }

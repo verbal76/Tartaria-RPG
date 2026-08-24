@@ -48,6 +48,8 @@ jest.setTimeout(15000);
 
 import { useGameStore, makeRoomKey } from '../app/state/gameStore';
 import { getBuilding, buildingEntryRoom } from '../app/engine/buildings';
+import { placedAt } from '../test-utils/placePlayer';
+import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from '../app/engine/worldMap';
 
 async function boot() {
   const store = useGameStore;
@@ -57,7 +59,7 @@ async function boot() {
   const p = store.getState().player!;
   // Off the city anchor, not in a hub room — a wild tile that can hold a building.
   store.setState({
-    player: { ...p, currentLocationId: 'outskirts', mapX: 5, mapY: 5, hubRoomId: null },
+    player: { ...p, ...placedAt('outskirts', { dx: 5 - WORLD_MAP_CENTER_X, dy: 5 - WORLD_MAP_CENTER_Y }), hubRoomId: null },
     currentScene: { ...store.getState().currentScene!, microMicroId: null, enemies: [], enemyHps: [], vendor: null, elevatedOn: null },
   });
   return store;

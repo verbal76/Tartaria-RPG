@@ -43,6 +43,7 @@ import { isClimbable } from '../app/engine/interactionTags';
 import { availableFactionQuests, FACTION_QUESTS } from '../app/engine/factionQuests';
 import { getRaces, getFactions } from '../app/engine/character';
 import type { InventoryItem } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 async function boot(name: string) {
   const store = useGameStore;
@@ -96,7 +97,7 @@ describe('OTA-970 — playtest truth batch', () => {
   it('#112 — arrival at a hub location narrates the gate BEFORE the room Paths line', async () => {
     const store = await boot('Wayfarer');
     store.setState((s) => ({
-      player: { ...s.player!, currentLocationId: 'reclaimer_stake', hubRoomId: null, travelTarget: undefined },
+      player: { ...s.player!, ...placedAt('reclaimer_stake'), hubRoomId: null, travelTarget: undefined },
     }));
     store.getState().beginScene({ arrivalFromName: "The Architect's Blind" });
     await new Promise((r) => setTimeout(r, 10));

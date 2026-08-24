@@ -65,6 +65,7 @@ import { getRaces, getFactions } from '../app/engine/character';
 import { GREAT_CLIMBS, SUMMIT_BOSS_TRAIT_PREFIX } from '../app/engine/greatClimbs';
 import { CHAINS } from '../app/engine/whispers';
 import type { InventoryItem } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 jest.setTimeout(600000);
 
@@ -122,7 +123,7 @@ describe('OTA-1222 — Texas Ranger on the Great Climbs and the whisper chains',
       useGameStore.setState({
         player: {
           ...p,
-          currentLocationId: climb.locationId,
+          ...placedAt(climb.locationId),
           hubRoomId: null,
           hp: 500, hpMax: 500, stamina: 200, staminaMax: 200,
           stats: { ...p.stats, strength: 20, dexterity: 20 },
@@ -234,7 +235,7 @@ describe('OTA-1222 — Texas Ranger on the Great Climbs and the whisper chains',
         player: {
           ...p,
           hp: 500, hpMax: 500, stamina: 200, staminaMax: 200,
-          currentLocationId: 'tartarian_outskirts',
+          ...placedAt('tartarian_outskirts'),
           hubRoomId: null,
           hoursElapsed: hour,
           tc: 0,

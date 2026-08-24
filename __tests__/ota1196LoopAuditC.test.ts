@@ -37,6 +37,7 @@ jest.mock('expo-updates', () => ({}));
 // OTA-1196 — LOOP AUDIT, BATCH 3. Same bar: start it, finish it, assert a payoff the
 // PLAYER can see.
 import { useGameStore } from '../app/state/gameStore';
+import { placedAt } from '../test-utils/placePlayer';
 
 jest.setTimeout(180000);
 
@@ -100,7 +101,7 @@ describe('LOOP 12 — the Labyrinth: walked live, start to heart', () => {
   test('⚠⚠ enter → walk → the heart pays a keepsake, and a SECOND walk does not', async () => {
     const store = await fresh('Wanderer');
     const p = store.getState().player!;
-    useGameStore.setState({ player: { ...p, currentLocationId: 'iskan_veil' } });
+    useGameStore.setState({ player: { ...p, ...placedAt('iskan_veil') } });
 
     await store.getState().submitPlayerAction('enter the labyrinth');
     expect(store.getState().player!.labyrinthRun).toBeTruthy();

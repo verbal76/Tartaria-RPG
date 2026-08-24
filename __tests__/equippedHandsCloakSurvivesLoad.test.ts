@@ -47,6 +47,7 @@ jest.mock('expo-updates', () => ({}));
 
 import { backfillPlayer } from '../app/state/gameStore';
 import type { PlayerCharacter, InventoryItem } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 function item(id: string, name: string): InventoryItem {
   return { id, name, kind: 'armor', rarity: 'Common', quantity: 1 } as unknown as InventoryItem;
@@ -60,7 +61,7 @@ function makePlayer(over: Partial<PlayerCharacter>): PlayerCharacter {
     stamina: 10, staminaMax: 15,
     inventory: [],
     equipped: {},
-    currentLocationId: 'tartarian_outskirts',
+    ...placedAt('tartarian_outskirts'),
     factionId: 'reclaimers',
     raceId: 'mud_dweller',
     dead: false,

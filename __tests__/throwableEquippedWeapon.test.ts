@@ -28,6 +28,7 @@ import { validSlotsForItem } from '../app/engine/equipment';
 import { getEquippedWeapon } from '../app/engine/combatRules';
 import { throwDamageNotation } from '../app/engine/itemWeight';
 import type { InventoryItem, PlayerCharacter } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 function mkShard(overrides: Partial<InventoryItem> = {}): InventoryItem {
   return {
@@ -54,7 +55,7 @@ function mkPlayer(inv: InventoryItem[], equipped: Record<string, string | null> 
     corruption: 0,
     inventory: inv,
     factionStanding: [],
-    currentLocationId: 'x',
+    ...placedAt('x'),
     activeQuests: [],
     equipped,
   } as unknown as PlayerCharacter;

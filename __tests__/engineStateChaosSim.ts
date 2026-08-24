@@ -75,6 +75,7 @@ import {
 import { seedInvestigationTable } from '../app/engine/investigationTable';
 import type { InvestigationEntry } from '../app/engine/investigationTable';
 import type { InventoryItem } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 // `useGameStore` is a typed zustand store (UseBoundStore); using
 // its own type for the helper params avoids the unknown cascade
@@ -503,9 +504,7 @@ describe('engineStateChaosSim — adversarial regression', () => {
       store.setState({
         player: {
           ...player,
-          currentLocationId: 'asgardar',
-          mapX: 0,
-          mapY: 0,
+          ...placedAt('asgardar'),
           hubRoomId: 'asgardar_chandelier_study',
         },
       });

@@ -26,6 +26,7 @@ import {
   totalGuardiansCount,
 } from '../app/engine/coreGuardians';
 import { LOST_CAPITAL_LOCATIONS } from '../app/engine/mainQuest';
+import { placedAt } from '../test-utils/placePlayer';
 
 function makePlayer(overrides: Partial<PlayerCharacter> = {}): PlayerCharacter {
   return {
@@ -44,7 +45,7 @@ function makePlayer(overrides: Partial<PlayerCharacter> = {}): PlayerCharacter {
     corruption: 0,
     inventory: [],
     factionStanding: [],
-    currentLocationId: 'asgardar',
+    ...placedAt(overrides.currentLocationId ?? 'asgardar'),
     activeQuests: [],
     mainQuest: { phase: 'revelation', coresRecovered: [] },
     ...overrides,

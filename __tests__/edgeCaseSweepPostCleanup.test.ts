@@ -70,6 +70,7 @@ import type { Hook } from '../app/engine/hooks';
 import { getGolemDefinition, GOLEM_DEFINITIONS } from '../app/engine/golems';
 import { aethercraftDcModifier } from '../app/engine/raceMechanics';
 import { createDogCompanion } from '../app/engine/dogCompanion';
+import { placedAt } from '../test-utils/placePlayer';
 
 const NEW_VERBS = ['drink', 'rotate', 'knock', 'turn', 'twist', 'press', 'push', 'pull'] as const;
 const ADVERSARIAL_TARGETS = [
@@ -224,9 +225,7 @@ describe('save/load round-trip with a fully-populated player', () => {
       stamina: 23,
       staminaMax: 50,
       hubRoomId: 'chandelier_study',
-      currentLocationId: 'asgardar',
-      mapX: 20,
-      mapY: 20,
+      ...placedAt('asgardar'),
       travelTarget: { locationId: 'voronov', distanceRemaining: 4 },
       dog,
       companion: {

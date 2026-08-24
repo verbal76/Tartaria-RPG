@@ -46,13 +46,14 @@ jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
 import { hubNameForFaction } from '../app/engine/hub';
+import { placedAt } from '../test-utils/placePlayer';
 
 jest.setTimeout(120000);
 
 async function enterHub(locationId: string, room: string) {
   const store = useGameStore;
   const p = store.getState().player!;
-  useGameStore.setState({ player: { ...p, currentLocationId: locationId, hubRoomId: room } });
+  useGameStore.setState({ player: { ...p, ...placedAt(locationId), hubRoomId: room } });
   await store.getState().beginScene?.();
   return store.getState();
 }

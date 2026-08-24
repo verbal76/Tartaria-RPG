@@ -1,5 +1,6 @@
 import { buildSkillSteps } from '../app/engine/combatRules';
 import type { PlayerCharacter } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 function makePlayer(over: Partial<PlayerCharacter> = {}): PlayerCharacter {
   return {
@@ -16,7 +17,7 @@ function makePlayer(over: Partial<PlayerCharacter> = {}): PlayerCharacter {
     corruption: 0,
     inventory: [],
     factionStanding: [],
-    currentLocationId: 'asgardar',
+    ...placedAt('asgardar'),
     activeQuests: [],
     ...over,
   } as PlayerCharacter;

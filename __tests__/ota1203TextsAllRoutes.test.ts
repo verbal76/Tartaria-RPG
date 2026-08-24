@@ -55,6 +55,7 @@ import {
 import { ladderLootPool } from '../app/engine/encounter';
 import { WORLD_LADDER, findMicroMicroAnywhere } from '../app/engine/worldLadder';
 import type { InventoryItem } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 jest.setTimeout(180000);
 
@@ -179,7 +180,7 @@ describe('OTA-1203 / P16 — door 3, the story pays the text', () => {
     useGameStore.setState({
       player: {
         ...p,
-        currentLocationId: FACTION_STARTING_LOCATION[def.factionId]!,
+        ...placedAt(FACTION_STARTING_LOCATION[def.factionId]!),
         hubRoomId: 'outpost_armory',
         activeStorylines: [{ id: sid, stage: def.stages.length, postedByFaction: def.factionId, acceptedAt: Date.now() }],
       },

@@ -68,6 +68,7 @@ import personaData from '../app/data/lore/arbiter-persona.json';
 import forksData from '../app/data/story/forks.json';
 import fs from 'fs';
 import path from 'path';
+import { placedAt } from '../test-utils/placePlayer';
 
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
@@ -79,7 +80,7 @@ function pc(over: Partial<PlayerCharacter> = {}): PlayerCharacter {
     name: 'Test', raceId: 'reclaimer', factionId: 'reclaimers_guild',
     stats: { strength: 5, dexterity: 5, intelligence: 5, wisdom: 5, charisma: 5, stealth: 5 },
     hp: 30, hpMax: 30, stamina: 10, staminaMax: 10, ac: 10, tc: 0, corruption: 0,
-    inventory: [], factionStanding: [], currentLocationId: 'x', activeQuests: [],
+    inventory: [], factionStanding: [], ...placedAt('x'), activeQuests: [],
     ...over,
   } as PlayerCharacter;
 }

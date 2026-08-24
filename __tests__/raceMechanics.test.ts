@@ -5,6 +5,7 @@ import {
   detectACContexts,
 } from '../app/engine/raceMechanics';
 import type { PlayerCharacter, Stats } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 const ZERO_STATS: Stats = { strength: 0, dexterity: 0, intelligence: 0, wisdom: 0, charisma: 0 };
 
@@ -25,11 +26,9 @@ function makePlayer(overrides: Partial<PlayerCharacter> = {}): PlayerCharacter {
     corruption: 0,
     inventory: [],
     factionStanding: [],
-    currentLocationId: 'tartarian_outskirts',
+    ...placedAt('tartarian_outskirts'),
     activeQuests: [],
     mapSeed: 'test|test|test|0',
-    mapX: 4,
-    mapY: 4,
     ...overrides,
   } as PlayerCharacter;
 }

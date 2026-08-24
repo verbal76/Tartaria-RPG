@@ -46,6 +46,7 @@ import { MYSTERIES } from '../app/engine/mysteries';
 import { STORYLINES } from '../app/engine/factionStorylines';
 import { huntAnchorId, huntStageAnchorId } from '../app/engine/contractMarkers';
 import { canonicalCellOf } from '../app/engine/worldMap';
+import { placedAt } from '../test-utils/placePlayer';
 
 jest.setTimeout(120000);
 
@@ -159,7 +160,7 @@ describe("OTA-1213 — LIVE: the owner's exact wall, torn down", () => {
     const { store, anchor } = await bootWithBogDragon(true);
     const p = store.getState().player!;
     useGameStore.setState({
-      player: { ...p, currentLocationId: anchor, activeHunts: [{ id: 'hunt_bog_dragon', stage: 1, tracked: false, postedByFaction: null, acceptedAt: 0 }] },
+      player: { ...p, ...placedAt(anchor), activeHunts: [{ id: 'hunt_bog_dragon', stage: 1, tracked: false, postedByFaction: null, acceptedAt: 0 }] },
     });
     await store.getState().submitPlayerAction('investigate the area');
     await new Promise((r) => setTimeout(r, 400));

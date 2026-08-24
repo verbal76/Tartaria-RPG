@@ -44,6 +44,7 @@ jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
 import { HUNTS } from '../app/engine/hunts';
+import { placedAt } from '../test-utils/placePlayer';
 
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
@@ -79,7 +80,7 @@ describe('OTA-810 — hunts are a face-to-face turn-in', () => {
     // any hall will settle it. The B2 protection this test exists for is about closing a
     // bounty FROM ANYWHERE, so the player is moved somewhere there is genuinely nobody.
     store.setState((st) => ({
-      player: { ...st.player!, currentLocationId: 'asgardar', hubRoomId: undefined },
+      player: { ...st.player!, ...placedAt('asgardar'), hubRoomId: undefined },
     }));
     const tcBefore = store.getState().player!.tc;
     store.getState().completeContractFromUI('hunt', def.id);

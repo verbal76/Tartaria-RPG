@@ -14,6 +14,7 @@ import {
 } from '../app/engine/coreGuardians';
 import type { GuardianTier } from '../app/engine/coreGuardians';
 import { LOST_CAPITAL_LOCATIONS } from '../app/engine/mainQuest';
+import { placedAt } from '../test-utils/placePlayer';
 
 // hpMax fixed at 100 → the HP term contributes exactly 10, so power = strength + 10.
 function makePlayer(strength: number, cores: string[]): PlayerCharacter {
@@ -34,7 +35,7 @@ function makePlayer(strength: number, cores: string[]): PlayerCharacter {
     corruption: 0,
     inventory: [],
     factionStanding: [],
-    currentLocationId: 'asgardar',
+    ...placedAt('asgardar'),
     activeQuests: [],
     mainQuest: { phase: 'cores', coresRecovered: cores },
   } as unknown as PlayerCharacter;

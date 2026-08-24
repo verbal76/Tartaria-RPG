@@ -40,6 +40,7 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import type { InventoryItem } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 jest.setTimeout(120_000);
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; });
@@ -54,7 +55,7 @@ async function bootOnMud(withOmen: boolean) {
       ...s.player!,
       // OUTDOORS — the outpost's floor has its own scavenge path; the scrape is
       // a wild-ground affordance, so the fixture stands on the open plains.
-      currentLocationId: 'great_tartary_plains',
+      ...placedAt('great_tartary_plains'),
       hubRoomId: null,
       inventory: [
         { id: 'knife1', name: 'Pocket Knife', kind: 'weapon', rarity: 'Common', quantity: 1, tags: ['weapon', 'knife', 'tool'] },

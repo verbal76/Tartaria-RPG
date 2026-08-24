@@ -17,6 +17,7 @@ jest.mock('@react-native-async-storage/async-storage', () => {
 
 import { effectiveStats } from '../app/engine/equipment';
 import type { PlayerCharacter } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 function mkPlayer(overrides: Partial<PlayerCharacter> = {}): PlayerCharacter {
   return {
@@ -30,7 +31,7 @@ function mkPlayer(overrides: Partial<PlayerCharacter> = {}): PlayerCharacter {
     corruption: 0,
     inventory: [],
     factionStanding: [],
-    currentLocationId: 'x',
+    ...placedAt('x'),
     activeQuests: [],
     ...overrides,
   } as PlayerCharacter;

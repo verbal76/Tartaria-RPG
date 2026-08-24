@@ -47,6 +47,7 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore, siteLootForScene } from '../app/state/gameStore';
 import { ladderLootPool } from '../app/engine/encounter';
 import { WORLD_LADDER, findMicroMicroAnywhere } from '../app/engine/worldLadder';
+import { placedAt } from '../test-utils/placePlayer';
 
 jest.setTimeout(180000);
 
@@ -85,7 +86,7 @@ describe('OTA-1199 / P15 — LIVE, the store hands the roller the site table', (
     const openTile = Object.keys(LOCATION_TO_MACRO).find((k) => LOCATION_TO_MACRO[k] === site!.macro.id);
     expect(openTile).toBeTruthy();
     const p0 = store.getState().player!;
-    useGameStore.setState({ player: { ...p0, currentLocationId: openTile!, hubRoomId: null } });
+    useGameStore.setState({ player: { ...p0, ...placedAt(openTile!), hubRoomId: null } });
 
     await store.getState().beginScene({ microMicroId: site!.mm.id });
     // The premise: the scene really is standing on that micro-micro.
@@ -105,7 +106,7 @@ describe('OTA-1199 / P15 — LIVE, the store hands the roller the site table', (
     // character standing out in the silt leaves them outdoors, and the first version of
     // this test did exactly that and read the outdoor table back.
     useGameStore.setState({
-      player: { ...p, currentLocationId: FACTION_STARTING_LOCATION['mud_monarchs']!, hubRoomId: 'outpost_gate' },
+      player: { ...p, ...placedAt(FACTION_STARTING_LOCATION['mud_monarchs']!), hubRoomId: 'outpost_gate' },
     });
     await store.getState().beginScene();
     expect(store.getState().currentScene?.microMicroId ?? null).toBeNull();
@@ -121,7 +122,7 @@ describe('OTA-1199 / P15 — LIVE, the store hands the roller the site table', (
     const { LOCATION_TO_MACRO } = require('../app/engine/worldLadder') as typeof import('../app/engine/worldLadder');
     const openTile = Object.keys(LOCATION_TO_MACRO).find((k) => LOCATION_TO_MACRO[k] === site.macro.id)!;
     const p = store.getState().player!;
-    useGameStore.setState({ player: { ...p, currentLocationId: openTile, hubRoomId: null } });
+    useGameStore.setState({ player: { ...p, ...placedAt(openTile), hubRoomId: null } });
     await store.getState().beginScene({ microMicroId: site.mm.id });
     const before = store.getState().gameLog.length;
     await store.getState().submitPlayerAction('search the rubble');

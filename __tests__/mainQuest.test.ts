@@ -21,6 +21,7 @@ import {
   FACTION_CORE_GATES,
 } from '../app/engine/mainQuest';
 import type { PlayerCharacter } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 function makePlayer(overrides: Partial<PlayerCharacter> = {}): PlayerCharacter {
   return {
@@ -38,11 +39,9 @@ function makePlayer(overrides: Partial<PlayerCharacter> = {}): PlayerCharacter {
     corruption: 0,
     inventory: [],
     factionStanding: [],
-    currentLocationId: 'tartarian_outskirts',
+    ...placedAt(overrides.currentLocationId ?? 'tartarian_outskirts'),
     activeQuests: [],
     mapSeed: 'test',
-    mapX: 20,
-    mapY: 20,
     mainQuest: initMainQuest(),
     ...overrides,
   } as PlayerCharacter;

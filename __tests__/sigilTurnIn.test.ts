@@ -46,6 +46,7 @@ import { getRaces, getFactions } from '../app/engine/character';
 import { isSigilItem, sigilFaction, carriedSigils, rollSigilDrop, inferEnemyFaction, FACTION_SIGIL_NAME } from '../app/engine/sigils';
 import { findCatalogItem } from '../app/engine/crafting';
 import type { InventoryItem } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 const orderSigil = (id = 'sig1', qty = 1): InventoryItem =>
   ({ id, name: 'Forgotten Order Sigil', kind: 'misc', quantity: qty, rarity: 'Common', tags: ['sigil', 'forgotten_order', 'keepsake'] } as InventoryItem);
@@ -122,7 +123,7 @@ describe('turnInSigil (OTA-691)', () => {
   it('at the faction stake: +1 standing and the sigil is spent', async () => {
     const store = await freshGame();
     const p = store.getState().player!;
-    store.setState({ player: { ...p, inventory: [...p.inventory, orderSigil()], currentLocationId: 'varakush' } });
+    store.setState({ player: { ...p, inventory: [...p.inventory, orderSigil()], ...placedAt('varakush') } });
     const before = standingOf(store, 'forgotten_order');
 
     store.getState().turnInSigil('sig1');
@@ -134,7 +135,7 @@ describe('turnInSigil (OTA-691)', () => {
   it('away from the stake: no standing change, sigil kept', async () => {
     const store = await freshGame();
     const p = store.getState().player!;
-    store.setState({ player: { ...p, inventory: [...p.inventory, orderSigil()], currentLocationId: 'tartarian_outskirts' } });
+    store.setState({ player: { ...p, inventory: [...p.inventory, orderSigil()], ...placedAt('tartarian_outskirts') } });
     const before = standingOf(store, 'forgotten_order');
 
     store.getState().turnInSigil('sig1');

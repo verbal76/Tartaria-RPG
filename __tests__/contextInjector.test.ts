@@ -19,6 +19,7 @@ import type {
   WeatherEntry,
   StatusEffect,
 } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 // ---------------------------------------------------------------------------
 // Test fixtures
@@ -91,7 +92,7 @@ function makePlayer(over: Partial<PlayerCharacter> = {}): PlayerCharacter {
     corruption: 0,
     inventory: [],
     factionStanding: [],
-    currentLocationId: 'asgardar',
+    ...placedAt('asgardar'),
     activeQuests: [],
     ...over,
   };

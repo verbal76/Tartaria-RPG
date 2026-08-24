@@ -47,7 +47,7 @@
 // coordinates.
 
 import { execFileSync } from 'child_process';
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { placedAt } from '../test-utils/placePlayer';
 import { canonicalCellOf, gridToVisual, WORLD_MAP_CENTER_X } from '../app/engine/worldMap';
@@ -134,5 +134,39 @@ describe('placedAt — fixtures can no longer invent impossible coordinates', ()
   it('returns only position fields — quest state stays the caller\'s business', () => {
     const keys = Object.keys(placedAt('voronov')).sort();
     expect(keys).toEqual(['currentLocationId', 'gridX', 'gridY', 'mapX', 'mapY']);
+  });
+
+  it('⚠⚠ THE RATCHET — bare currentLocationId fixtures may only shrink', () => {
+    // The OTA-1484 fixture wave spread placedAt over every LIVE player-state
+    // fixture (setState players, engine-call builders). What remains bare is
+    // reviewed and stays bare ON PURPOSE, each for one of these reasons:
+    //   • on-disk save payloads (saveSnapshot, atomicSaveWrites, emergencyReclaim,
+    //     ota1178, ota1311) and legacy-backfill inputs (ota1018, ota1022) — a
+    //     cell-less player IS the state under test; the loader must derive.
+    //   • minimal argument objects for pure predicates (ota1164's course states,
+    //     indoorHooksTravel, arbiterKnowledge, parleyInterceptGuard, ota1029's
+    //     chip keys) — not player state; coords would be dead weight.
+    //   • hand-written coordinates that ARE the subject (hubRoomKeyCollision's
+    //     same-tile collisions, travelSceneBarChaos's deliberately cleared frame).
+    //   • pass-throughs of the live location (metaNavStress, setCourseRepro) and
+    //     helper CALL SITES whose helper now derives via placedAt (mainQuest,
+    //     coreGuardians) — consistent already, invisible to this scan.
+    // A NEW bare site fails this count: spread placedAt, or — if it truly falls
+    // in one of the classes above — say which one at the site and re-baseline.
+    const testsDir = __dirname;
+    const needle = 'currentLocationId' + ':'; // split so this test does not count itself
+    let bare = 0;
+    for (const f of readdirSync(testsDir).sort()) {
+      if (!/\.(ts|tsx)$/.test(f)) continue;
+      const lines = readFileSync(join(testsDir, f), 'utf8').split('\n');
+      lines.forEach((l, idx) => {
+        if (!l.includes(needle)) return;
+        const windowText = lines.slice(Math.max(0, idx - 6), idx + 3).join('\n');
+        if (windowText.includes('placedAt') || windowText.includes('gridX')) return;
+        bare += 1;
+      });
+    }
+    expect(bare).toBeGreaterThan(30); // the scan still finds its subjects
+    expect(bare).toBeLessThanOrEqual(50); // the baseline — shrink-only
   });
 });

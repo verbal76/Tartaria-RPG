@@ -5,6 +5,7 @@
 
 import { buildCombatSteps } from '../app/engine/combatRules';
 import type { PlayerCharacter, Enemy, StatusEffect } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 function makePlayer(effects: StatusEffect[] = []): PlayerCharacter {
   return {
@@ -27,7 +28,7 @@ function makePlayer(effects: StatusEffect[] = []): PlayerCharacter {
     completedQuests: [],
     factionStanding: {},
     statusEffects: effects,
-    currentLocationId: 'tartarian_outskirts',
+    ...placedAt('tartarian_outskirts'),
     activeFactionQuestIds: [],
     completedFactionQuestIds: [],
     activeHunts: [],
@@ -36,8 +37,6 @@ function makePlayer(effects: StatusEffect[] = []): PlayerCharacter {
     completedMysteryIds: [],
     activeStorylines: [],
     completedStorylineIds: [],
-    mapX: 4,
-    mapY: 4,
   } as unknown as PlayerCharacter;
 }
 

@@ -49,6 +49,7 @@ import {
 } from '../app/engine/coreGuardians';
 import { hasFactionRapport, rapportQuestId } from '../app/engine/factionRapport';
 import type { PlayerCharacter, InventoryItem, Stats } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
@@ -146,7 +147,7 @@ describe('OTA-815 C — returning a sigil unlocks that faction\'s CHA trade rapp
     // hidden_market accepts ANY faction's sigil (neutral broker), so no travel needed.
     useGameStore.setState({
       player: {
-        ...p0, currentLocationId: 'hidden_market',
+        ...p0, ...placedAt('hidden_market'),
         inventory: [...p0.inventory, sigil],
         completedFactionQuestIds: [],
       },

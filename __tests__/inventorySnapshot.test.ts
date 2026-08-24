@@ -6,6 +6,7 @@
 
 import { buildInventorySnapshot, stampInventoryExport } from '../app/diagnostics/inventorySnapshot';
 import type { InventoryItem, PlayerCharacter } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 function mkItem(over: Partial<InventoryItem>): InventoryItem {
   return {
@@ -32,7 +33,7 @@ function mkPlayer(over: Partial<PlayerCharacter>): PlayerCharacter {
     corruption: 3,
     inventory: [],
     factionStanding: [],
-    currentLocationId: 'outskirts',
+    ...placedAt('outskirts'),
     activeQuests: [],
     ...over,
   } as PlayerCharacter;

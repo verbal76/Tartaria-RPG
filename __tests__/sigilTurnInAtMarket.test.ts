@@ -46,6 +46,7 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { getStanding } from '../app/engine/factions';
+import { placedAt } from '../test-utils/placePlayer';
 
 async function bootstrap(name: string) {
   const store = useGameStore;
@@ -85,7 +86,7 @@ describe('OTA-783 — sigil turn-in at the Hidden Market', () => {
     giveSigil(store);
     const before = reclaimerStanding();
     // Stand in the market.
-    store.setState({ player: { ...store.getState().player!, currentLocationId: 'hidden_market' } });
+    store.setState({ player: { ...store.getState().player!, ...placedAt('hidden_market') } });
 
     store.getState().turnInSigil(SIGIL_ID);
 
@@ -97,7 +98,7 @@ describe('OTA-783 — sigil turn-in at the Hidden Market', () => {
     const store = await bootstrap('SigilNowhere');
     giveSigil(store);
     const before = reclaimerStanding();
-    store.setState({ player: { ...store.getState().player!, currentLocationId: 'some_random_tile_xyz' } });
+    store.setState({ player: { ...store.getState().player!, ...placedAt('some_random_tile_xyz') } });
 
     store.getState().turnInSigil(SIGIL_ID);
 

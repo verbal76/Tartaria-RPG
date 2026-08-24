@@ -56,6 +56,7 @@ jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
 import type { Hook } from '../app/engine/hooks';
+import { placedAt } from '../test-utils/placePlayer';
 
 async function bootClean(name = 'Integrator') {
   const store = useGameStore;
@@ -376,9 +377,7 @@ describe('hub-room key isolation (OTA-140) — two interiors at same coords', ()
     store.setState({
       player: {
         ...p,
-        currentLocationId: 'asgardar',
-        mapX: 20,
-        mapY: 20,
+        ...placedAt('asgardar'),
         hubRoomId: 'chandelier_study',
       },
     });

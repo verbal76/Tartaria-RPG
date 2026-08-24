@@ -77,6 +77,7 @@ import { getRaces, getFactions } from '../app/engine/character';
 import { canonicalCellFor } from '../app/engine/worldMap';
 import { LOCATION_ATLAS_COORDS } from '../app/engine/atlasCoords';
 import { atlasVisualFraction } from '../app/engine/atlasLabels';
+import { placedAt } from '../test-utils/placePlayer';
 
 interface RendererNode {
   findAll(pred: (n: { props: Record<string, unknown> }) => boolean): { props: Record<string, unknown> }[];
@@ -91,7 +92,7 @@ async function mountAtlasAt(locationId: string) {
   await store.getState().startNewGame({ name: 'Marker', raceId: getRaces()[0]!.id, factionId: getFactions()[0]!.id });
   store.getState().skipTutorial?.();
   store.setState((s) => ({
-    player: { ...s.player!, currentLocationId: locationId, hubRoomId: null } as never,
+    player: { ...s.player!, ...placedAt(locationId), hubRoomId: null } as never,
   }));
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { MapScreen } = require('../app/screens/MapScreen');

@@ -38,6 +38,7 @@ jest.mock('expo-updates', () => ({}));
 // PLAYER can see.
 // OTA-1196 — LOOP AUDIT, BATCH 4 — the last of the WIRED rows.
 import { useGameStore } from '../app/state/gameStore';
+import { placedAt } from '../test-utils/placePlayer';
 
 jest.setTimeout(180000);
 
@@ -66,7 +67,7 @@ describe('LOOP 28 — faction standing: a real action moves it, and the world re
     useGameStore.setState({
       player: {
         ...p,
-        currentLocationId: FACTION_STARTING_LOCATION['forgotten_order']!,
+        ...placedAt(FACTION_STARTING_LOCATION['forgotten_order']!),
         hubRoomId: 'outpost_quarters',
         activeHunts: [{ id: hunt.id, stage: hunt.stages.length, postedByFaction: hunt.factionId, acceptedAt: Date.now() }],
       },

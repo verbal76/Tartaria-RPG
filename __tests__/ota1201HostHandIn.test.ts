@@ -52,6 +52,7 @@ import { hubOwnerFaction } from '../app/engine/hub';
 import { MYSTERIES } from '../app/engine/mysteries';
 import { FACTION_STARTING_LOCATION } from '../app/engine/character';
 import { factionGearOffers } from '../app/engine/vendors';
+import { placedAt } from '../test-utils/placePlayer';
 
 jest.setTimeout(180000);
 
@@ -65,7 +66,7 @@ async function standAt(name: string, factionId: string, siteLocation: string, ro
   await store.getState().startNewGame({ name, raceId: 'tartarian_giant', factionId });
   store.getState().skipTutorial?.();
   const p = store.getState().player!;
-  useGameStore.setState({ player: { ...p, currentLocationId: siteLocation, hubRoomId: room } });
+  useGameStore.setState({ player: { ...p, ...placedAt(siteLocation), hubRoomId: room } });
   await store.getState().beginScene?.();
   return store;
 }

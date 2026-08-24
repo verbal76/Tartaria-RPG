@@ -48,6 +48,7 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore } from '../app/state/gameStore';
 import { MYSTERIES } from '../app/engine/mysteries';
 import { BROKER_PLAYER_SHARE } from '../app/engine/contractBroker';
+import { placedAt } from '../test-utils/placePlayer';
 
 jest.setTimeout(120000);
 
@@ -66,7 +67,7 @@ async function standAt(room: string, vendorName: string, locationId: string) {
   for (let i = 0; i < 80; i++) {
     const p = useGameStore.getState().player;
     if (!p) return null;
-    useGameStore.setState({ player: { ...p, currentLocationId: locationId, hubRoomId: room } });
+    useGameStore.setState({ player: { ...p, ...placedAt(locationId), hubRoomId: room } });
     await store.getState().beginScene?.();
     const v = store.getState().currentScene?.vendor;
     if (v?.name === vendorName) return v;
@@ -160,7 +161,7 @@ describe('OTA-1185 — a foreign faction’s mystery closes at the trading post'
 
     // AND THE WORK IS NOT STRANDED: at the player's OWN site the same hand-in pays full.
     const p = store.getState().player!;
-    useGameStore.setState({ player: { ...p, currentLocationId: 'builders_survey_camp', hubRoomId: 'outpost_armory' } });
+    useGameStore.setState({ player: { ...p, ...placedAt('builders_survey_camp'), hubRoomId: 'outpost_armory' } });
     await store.getState().beginScene?.();
     const tcBefore = store.getState().player!.tc ?? 0;
     store.getState().turnInMystery(own!.id);

@@ -41,6 +41,7 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore } from '../app/state/gameStore';
 import { HUNTS } from '../app/engine/hunts';
 import { FACTION_STARTING_LOCATION } from '../app/engine/character';
+import { placedAt } from '../test-utils/placePlayer';
 
 jest.setTimeout(120000);
 
@@ -51,7 +52,7 @@ const EMPTY_ROOM = 'outpost_quarters';
 async function standInHall(locationId: string) {
   const store = useGameStore;
   const p = store.getState().player!;
-  useGameStore.setState({ player: { ...p, currentLocationId: locationId, hubRoomId: EMPTY_ROOM } });
+  useGameStore.setState({ player: { ...p, ...placedAt(locationId), hubRoomId: EMPTY_ROOM } });
   await store.getState().beginScene?.();
   return store.getState();
 }
@@ -127,7 +128,7 @@ describe('OTA-1187 / P8 — the faction hall takes its own bounty back', () => {
     useGameStore.setState({
       player: {
         ...p,
-        currentLocationId: 'asgardar', hubRoomId: undefined,
+        ...placedAt('asgardar'), hubRoomId: undefined,
         activeHunts: [{
           id: hunt.id, stage: hunt.stages.length,
           postedByFaction: hunt.factionId, acceptedAt: Date.now(),

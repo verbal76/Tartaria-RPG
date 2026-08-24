@@ -13,6 +13,7 @@ import {
   LEVEL_UP_THRESHOLD,
 } from '../app/engine/statTraining';
 import type { PlayerCharacter } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 function makePlayer(overrides: Partial<PlayerCharacter> = {}): PlayerCharacter {
   return {
@@ -31,11 +32,9 @@ function makePlayer(overrides: Partial<PlayerCharacter> = {}): PlayerCharacter {
     corruption: 0,
     inventory: [],
     factionStanding: [],
-    currentLocationId: 'tartarian_outskirts',
+    ...placedAt('tartarian_outskirts'),
     activeQuests: [],
     mapSeed: 'test',
-    mapX: 10,
-    mapY: 10,
     ...overrides,
   } as PlayerCharacter;
 }

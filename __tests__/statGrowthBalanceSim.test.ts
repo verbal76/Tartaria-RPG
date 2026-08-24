@@ -45,6 +45,7 @@ import {
   type StatKey,
 } from '../app/engine/statTraining';
 import type { PlayerCharacter } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 // ---------------------------------------------------------------
 // Seeded RNG — mulberry32. trainStat itself is deterministic given
@@ -198,11 +199,9 @@ function makePlayer(): PlayerCharacter {
     corruption: 0,
     inventory: [],
     factionStanding: [],
-    currentLocationId: 'tartarian_outskirts',
+    ...placedAt('tartarian_outskirts'),
     activeQuests: [],
     mapSeed: 'sim',
-    mapX: 0,
-    mapY: 0,
   } as PlayerCharacter;
 }
 

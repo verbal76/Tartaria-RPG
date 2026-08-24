@@ -36,6 +36,7 @@ import { buildCombatSteps } from '../app/engine/combatRules';
 import { coatingCapacity, nextCoatSlot, coatedDisplayName } from '../app/engine/weaponCoating';
 import { useGameStore } from '../app/state/gameStore';
 import type { InventoryItem, PlayerCharacter, Enemy } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 const poison = { kind: 'poison' as const, dice: '1d4', label: 'Venomous' };
 const acid = { kind: 'acid' as const, dice: '1d4', label: 'Corrosive' };
@@ -62,10 +63,9 @@ function makePlayer(inv: InventoryItem[], equipped: Record<string, string>): Pla
     hp: 20, maxHp: 20, stamina: 10, maxStamina: 10, ac: 10, tc: 0, level: 1, xp: 0,
     stats: { strength: 12, dexterity: 12, intelligence: 10, wisdom: 10, charisma: 10, constitution: 10 },
     inventory: inv, equipped, activeQuests: [], completedQuests: [], factionStanding: {},
-    statusEffects: [], currentLocationId: 'tartarian_outskirts',
+    statusEffects: [], ...placedAt('tartarian_outskirts'),
     activeFactionQuestIds: [], completedFactionQuestIds: [], activeHunts: [], completedHuntIds: [],
     activeMysteries: [], completedMysteryIds: [], activeStorylines: [], completedStorylineIds: [],
-    mapX: 4, mapY: 4,
   } as unknown as PlayerCharacter;
 }
 

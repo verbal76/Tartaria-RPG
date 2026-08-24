@@ -30,6 +30,7 @@ import { spawnGuardianForCapital, monotoneTierHp } from '../app/engine/coreGuard
 import type { GuardianTier } from '../app/engine/coreGuardians';
 import { LOST_CAPITAL_LOCATIONS } from '../app/engine/mainQuest';
 import { acidShredCap, ACID_SHRED_MAX } from '../app/engine/weaponCoating';
+import { placedAt } from '../test-utils/placePlayer';
 
 // ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
 // the pins below follow the code to its new address rather than reading both
@@ -50,7 +51,7 @@ function makePlayer(strength: number, cores: string[]): PlayerCharacter {
     name: 'Batch', raceId: 'human', factionId: 'reclaimers_guild',
     stats: { strength, dexterity: 1, intelligence: 1, wisdom: 8, charisma: 8, stealth: 1 },
     hp: 100, hpMax: 100, stamina: 10, staminaMax: 10, ac: 12, tc: 0, corruption: 0,
-    inventory: [], factionStanding: [], currentLocationId: 'asgardar', activeQuests: [],
+    inventory: [], factionStanding: [], ...placedAt('asgardar'), activeQuests: [],
     mainQuest: { phase: 'cores', coresRecovered: cores },
   } as unknown as PlayerCharacter;
 }

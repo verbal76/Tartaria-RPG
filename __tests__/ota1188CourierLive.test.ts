@@ -41,6 +41,7 @@ import { useGameStore } from '../app/state/gameStore';
 import { MYSTERIES } from '../app/engine/mysteries';
 import { HUNTS } from '../app/engine/hunts';
 import { COURIER_PLAYER_SHARE, COURIER_DELAY_HOURS } from '../app/engine/contractBroker';
+import { placedAt } from '../test-utils/placePlayer';
 
 jest.setTimeout(120000);
 
@@ -48,7 +49,7 @@ async function inTheWilds(extra: Record<string, unknown>) {
   const store = useGameStore;
   const p = store.getState().player!;
   useGameStore.setState({
-    player: { ...p, currentLocationId: 'asgardar', hubRoomId: undefined, ...extra },
+    player: { ...p, ...placedAt('asgardar'), hubRoomId: undefined, ...extra },
   });
   return store.getState();
 }

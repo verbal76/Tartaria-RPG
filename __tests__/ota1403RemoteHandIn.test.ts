@@ -74,6 +74,7 @@ import { FACTION_QUESTS } from '../app/engine/factionQuests';
 import { possessive, wrongCounterpartyBody } from '../app/engine/contractRefusal';
 import { FACTIONS } from '../app/engine/factions';
 import { blockAt } from '../test-utils/srcBlock';
+import { placedAt } from '../test-utils/placePlayer';
 
 const src = (...p: string[]) => readFileSync(join(__dirname, '..', ...p), 'utf8');
 const quest = src('app', 'state', 'slices', 'questSlice.ts');
@@ -100,7 +101,7 @@ function standOnMismatchedGround(deedId: string): void {
       worldMemory: undefined,
       // ⚠ architect_blind is a Conspiracy Architects site; the deed below is not
       // theirs. hubRoomId null = standing OUTSIDE, which is where the owner was.
-      currentLocationId: 'architect_blind', hubRoomId: null,
+      ...placedAt('architect_blind'), hubRoomId: null,
       activeFactionQuestIds: [deedId],
       activeFactionQuests: [{ id: deedId, stage: 0, tracked: true }],
       activeQuests: [], activeHunts: [], activeMysteries: [], activeStorylines: [],

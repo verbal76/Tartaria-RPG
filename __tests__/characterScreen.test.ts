@@ -1,6 +1,7 @@
 import { effectiveStatsBreakdown } from '../app/engine/equipment';
 import { tierDescription } from '../app/engine/corruption';
 import type { PlayerCharacter, Stats, StatusEffect } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 const BASE_STATS: Stats = { strength: 10, dexterity: 10, intelligence: 10, wisdom: 10, charisma: 10 };
 
@@ -21,11 +22,9 @@ function makePlayer(overrides: Partial<PlayerCharacter> = {}): PlayerCharacter {
     corruption: 0,
     inventory: [],
     factionStanding: [],
-    currentLocationId: 'tartarian_outskirts',
+    ...placedAt('tartarian_outskirts'),
     activeQuests: [],
     mapSeed: 'test|test|test|0',
-    mapX: 4,
-    mapY: 4,
     ...overrides,
   } as PlayerCharacter;
 }

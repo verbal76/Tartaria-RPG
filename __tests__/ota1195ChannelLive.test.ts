@@ -165,7 +165,7 @@ describe('OTA-1195 / P16 — buying the procedure', () => {
     useGameStore.setState({
       player: {
         ...p,
-        currentLocationId: FACTION_STARTING_LOCATION['mud_monarchs']!,
+        ...placedAt(FACTION_STARTING_LOCATION['mud_monarchs']!),
         hubRoomId: 'outpost_workshop',
         completedFactionQuestIds: [...(p.completedFactionQuestIds ?? []), rapportQuestId(faction)],
         stats: { ...p.stats, intelligence: 20 },
@@ -196,7 +196,7 @@ describe('OTA-1195 / P16 — buying the procedure', () => {
     useGameStore.setState({
       player: {
         ...p,
-        currentLocationId: FACTION_STARTING_LOCATION['mud_monarchs']!,
+        ...placedAt(FACTION_STARTING_LOCATION['mud_monarchs']!),
         hubRoomId: 'outpost_workshop',
         completedFactionQuestIds: [],
         stats: { ...p.stats, intelligence: 20 },
@@ -224,6 +224,7 @@ describe('OTA-1195 / P16 — buying the procedure', () => {
 import { findEnemyByName } from '../app/engine/encounter';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { runEnemyGroupCounters } from '../app/state/combatResolution';
+import { placedAt } from '../test-utils/placePlayer';
 
 function plantEnemies(count: number) {
   const proto = findEnemyByName('Silt Serpent') ?? findEnemyByName('Mud Spider');

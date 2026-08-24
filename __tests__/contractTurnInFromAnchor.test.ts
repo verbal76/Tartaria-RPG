@@ -32,6 +32,7 @@ jest.mock('expo-av', () => ({
 import { useGameStore } from '../app/state/gameStore';
 import { openContractMarkers } from '../app/engine/contractMarkers';
 import type { InventoryItem } from '../app/engine/types';
+import { placedAt } from '../test-utils/placePlayer';
 
 async function boot() {
   await useGameStore.getState().hydrate();
@@ -87,7 +88,7 @@ describe('OTA-616 — turn a faction fetch quest in from its map anchor', () => 
     useGameStore.setState((s) => ({
       player: s.player ? {
         ...s.player,
-        currentLocationId: 'voronov',
+        ...placedAt('voronov'),
         activeFactionQuests: [{ id: 'fq_reclaimers_starter', stage: 0, postedByFaction: 'reclaimers_guild', acceptedAt: 0 }],
         activeFactionQuestIds: ['fq_reclaimers_starter'],
         inventory: [...s.player.inventory, scrapMetal(3)],
