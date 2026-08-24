@@ -54,7 +54,12 @@ describe('the stamp', () => {
     // Saves exported between 1469 and this stamp name a build they are newer
     // than; the SUPERSEDED line is how a bug report from that window resolves.
     const src = readFileSync(join(ROOT, 'app', 'buildInfo.ts'), 'utf8');
-    expect(src).toContain("// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1469");
+    // ⚠ OTA-1484 — the pin gate's first live catch outside its grandfather set
+    // was THIS line, quoting the SUPERSEDED comment's exact spelling — written
+    // by the same hand that built the gate, one day earlier. The claim survives
+    // as a PATTERN: a superseded record naming the 1469 id must exist, however
+    // the line around it is worded.
+    expect(src).toMatch(/SUPERSEDED:.*2026-08-24-1469/);
     // Exactly one LIVE export — a second would be the two-derivations defect
     // reborn inside the very constant that fixes it.
     const lives = src.match(/^export const OTA_BUILD_ID = /gm) ?? [];
