@@ -50,6 +50,7 @@ jobs:
 
           out_root = pathlib.Path('sentry-inbox')
           projects = api(f'/organizations/{org}/projects/')
+          print('projects:', [q['slug'] for q in projects])
           fetched = []
           for p in projects:
               slug = p['slug']
@@ -58,8 +59,11 @@ jobs:
               except Exception as e:
                   print(f'{slug}: events list failed: {e}')
                   continue
+              print(f'{slug}: {len(events)} recent events')
+              for ev in events[:8]:
+                  print(f'  seen: title={ev.get("title")!r} message={ev.get("message")!r} id={ev.get("eventID","")[:8]} at={ev.get("dateCreated")}')
               for ev in events:
-                  title = (ev.get('title') or ev.get('message') or '')
+                  title = ' '.join(str(x) for x in [ev.get('title'), ev.get('message')])
                   if 'player-log' not in title:
                       continue
                   eid = ev['eventID']
