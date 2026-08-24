@@ -24580,6 +24580,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // with no seam — and two-week-old lines were read as live behaviour within the
 // hour. A session banner at the existing OTA-099 marker now states build, wall
 // clock and the gap since the previous entry. Banner only; no age trim.
+// 2026-08-24 — FIFTH GOLEM CATCH-UP PUBLISH: 1494 (the log seam banner) to
+// the golem channel via the markerless path. Golem logs carry the same
+// era-mixing hazard the iPhone bundle exposed.
 export const OTA_BUILD_ID = '2026-08-24-1494-the-log-says-which-era';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1493-the-warm-waits-for-the-player';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1492-sent-means-arrived';
