@@ -59,6 +59,7 @@ jest.mock('expo-av', () => ({
   },
 }));
 
+import { RETURN_AGAIN_LINES, RETURN_FAMILIAR_LINES } from '../app/engine/voicePools';
 import { useGameStore } from '../app/state/gameStore';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -69,8 +70,32 @@ const roomCounts = (): Record<string, number> => {
   const rooms = useGameStore.getState().worldMemory.visitedRooms ?? {};
   return Object.fromEntries(Object.entries(rooms).map(([k, r]) => [k, r.visitCount]));
 };
+// ⚠⚠⚠ OTA-1467 REPLACED THE SENTENCE THIS USED TO MATCH, and this helper broke
+// with it — the SECOND downstream pin in one night to fail because it recognised
+// a behaviour by quoting the words instead of naming the thing (ota1275 was the
+// first, on the same night, for the same reason).
+//
+// The old body was `e.text.includes("You've stood here")`, and the assertion
+// below read `toContain("You've stood here before. (visit 2)")`. OTA-1104's
+// CLAIM has nothing to do with either string: it is that a FIRST entry is silent
+// and a RETURN greets. The counter in that literal is the exact thing the owner
+// asked to be removed —
+//
+//   "you can't say 'this is my second time here'... find some other kind of
+//    flavour"
+//
+// — so a pin written that way was guaranteed to break the moment anyone did
+// what he asked, and to break with a message about a missing sentence rather
+// than about visit counting.
+//
+// ⚠ Now it recognises the greeting by MEMBERSHIP IN THE RETURN POOLS. That is
+// the actual identity of the thing: whatever words the pools happen to hold,
+// a return greeting is a line drawn from them, and a first entry produces none.
+const RETURN_POOL = new Set<string>([...RETURN_AGAIN_LINES, ...RETURN_FAMILIAR_LINES]);
 const stoodLines = (): string[] => useGameStore.getState().gameLog
-  .filter((e) => e.text.includes("You've stood here"))
+  // The store may append a cleared-bodies note to the greeting, so a line
+  // COUNTS if it starts with a pool entry rather than equalling one.
+  .filter((e) => [...RETURN_POOL].some((l) => e.text.startsWith(l)))
   .map((e) => e.text);
 const move = async (cmd: string) => {
   useGameStore.getState().submitPlayerAction(cmd);
@@ -93,7 +118,7 @@ describe('OTA-1104 — a first visit is a first visit', () => {
     expect(keys).toHaveLength(1);
     expect(keys[0]).toMatch(/@outpost_gate$/);
     expect(counts[keys[0]!]).toBe(1);
-    // No "stood here" greeting anywhere in a fresh opening.
+    // No RETURN greeting anywhere in a fresh opening.
     expect(stoodLines()).toHaveLength(0);
   });
 
@@ -110,7 +135,13 @@ describe('OTA-1104 — a first visit is a first visit', () => {
     expect(counts[gateKey]).toBe(2);
     const lines = stoodLines();
     expect(lines).toHaveLength(1);
-    expect(lines[0]).toContain("You've stood here before. (visit 2)");
+    // ⚠ The claim, stated: a return is greeted, the greeting comes from the
+    // recognition tier (this is the second visit, not a well-trodden one), and
+    // it carries NO counter — which is what the owner objected to and what
+    // OTA-1467 removed.
+    expect(RETURN_AGAIN_LINES.some((l) => lines[0]!.startsWith(l))).toBe(true);
+    expect(lines[0]).not.toMatch(/\(visit \d+\)/);
+    expect(lines[0]).not.toMatch(/\d/);
 
     await move('go north'); // central again
     counts = roomCounts();
