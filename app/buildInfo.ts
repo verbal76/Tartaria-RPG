@@ -24572,6 +24572,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 3s-after-boot Qwen warm becomes warm-on-first-player-action. All three
 // boot paths arm; the OTA-1276 action door fires, once; the guard is
 // re-checked at fire time; the watchdog defers with the boot it belongs to.
+// 2026-08-24 — FOURTH GOLEM CATCH-UP PUBLISH: 1493 (the deferred warm) to
+// the golem channel via the markerless path. Its first receipt was a golem
+// kill (Aug 21, ctx-release-done) — golem gets the cure too.
 export const OTA_BUILD_ID = '2026-08-24-1493-the-warm-waits-for-the-player';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1492-sent-means-arrived';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1491-two-taps-to-load';
