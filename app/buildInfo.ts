@@ -24524,7 +24524,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // right action. Hand-slot chips now say "Take & wield" on the face and in
 // the screen-reader sentence; armor keeps "wear". Words only — the equip
 // path is untouched.
-export const OTA_BUILD_ID = '2026-08-24-1486-wield-is-not-wear';
+// OTA-1487 — crash delivery flips to OPT-OUT on the owner's explicit ruling
+// ("make it an opt out, not an opt in"). Default ON; the Settings switch
+// turns it off; a stored OFF from any version is permanent and never
+// overridden; nothing sends before the stored answer is read; PRIVACY.md
+// moved in the same commit.
+export const OTA_BUILD_ID = '2026-08-24-1487-opt-out-not-opt-in';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1486-wield-is-not-wear';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1485-the-chip-joins-the-tap-ledger';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1484-a-pin-states-a-claim';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1483-three-from-the-second-sweep';

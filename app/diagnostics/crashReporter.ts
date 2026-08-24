@@ -13,10 +13,20 @@
 //      null, `reportingConfigured()` is false, and every function here is a
 //      no-op that costs one boolean check.
 //
-//   2. ENABLED — the player has turned it on in Settings. Default OFF, and the
-//      default is not a formality: this is an offline-first game with on-device
-//      AI, and a fair number of people will have chosen it partly BECAUSE
-//      nothing phones home. Shipping opt-out would trade that for crash volume.
+//   2. ENABLED — the player has not turned it OFF in Settings.
+//
+//      ⚠⚠ OTA-1487 — THE DEFAULT FLIPPED, ON THE OWNER'S EXPLICIT RULING
+//      (2026-08-24: "make it an opt out, not an opt in"). Delivery now defaults
+//      ON; the Settings switch turns it off. Three things did NOT change:
+//        · an explicit OFF is absolute — a stored 'false' wins over the new
+//          default forever, so nobody who said no is re-enrolled;
+//        · before the stored preference has been READ, nothing sends — the
+//          in-memory default stays false so an opt-out can never lose a race
+//          with a boot-time flush (App.tsx awaits loadReportingPref first);
+//        · docs/PRIVACY.md changed in the same commit, because a policy that
+//          says "off until you turn it on" over an opt-out build is a lie.
+//      The original OTA-1380 ruling (opt-in, default off) is preserved above in
+//      history; this paragraph is the record of it being overturned.
 //
 // ⚠ THE ORDER OF THOSE CHECKS MATTERS AND IS NOT AN ACCIDENT. `reportingEnabled`
 // requires configured AND opted-in, so a build with no DSN cannot transmit even
@@ -92,9 +102,15 @@ export function reportingOptedIn(): boolean { return optedIn; }
 export async function loadReportingPref(): Promise<boolean> {
   if (prefLoaded) return optedIn;
   try {
+    // ⚠⚠ OTA-1487 — OPT-OUT: no stored answer means ON. Only an explicit,
+    // recorded 'false' (the player pressed the switch off, on any version)
+    // holds delivery off. `raw === 'true'` was the opt-in reading.
     const raw = await AsyncStorage.getItem(CRASH_REPORTING_PREF_KEY);
-    optedIn = raw === 'true';
+    optedIn = raw !== 'false';
   } catch {
+    // ⚠ A preference we could not READ might have been an explicit opt-out.
+    // Deliver nothing rather than risk overriding a recorded no — the next
+    // successful read restores the real answer.
     optedIn = false;
   }
   prefLoaded = true;

@@ -1,6 +1,9 @@
 # Privacy Policy for Tartaria Realms
 
 **Effective date:** May 23, 2026
+**Last updated:** August 24, 2026 — automatic crash reports now start ON;
+see "The AUTOMATIC CRASH REPORTS switch" below for what changed and how to
+turn them off.
 **Publisher:** Hot Attic Games
 **Contact:** ernstkevin@yahoo.com
 
@@ -12,16 +15,19 @@ The game runs entirely on your device after a one-time download of
 two AI model files from a public host. We do not operate any
 backend server that holds player data.
 
-The one exception is crash reports, and they are **off until you turn
-them on**. If you do, technical details about a crash — never anything
-about you, and never anything from your saves — go to Sentry so the
-crash can be fixed. What that includes, exactly, is listed below.
+The one exception is crash reports, which are **on by default in this
+version and can be switched off at any time**. While they are on,
+technical details about a crash — never anything about you, and never
+anything from your saves — go to Sentry so the crash can be fixed. What
+that includes, exactly, is listed below, along with the switch that
+stops it.
 
 ## Data we collect
 
-**Nothing, unless you turn on crash reports.** The app does not request
-or store any personal information about you or your device, and it
-transmits nothing at all until you switch crash reporting on yourself.
+**Nothing except crash reports, and only while their switch is on.**
+The app does not request or store any personal information about you or
+your device. Crash reporting starts on; switch it off in Settings and
+the app transmits nothing at all.
 
 There is no:
 - account or login system
@@ -30,8 +36,9 @@ There is no:
 - social-media SDK
 - in-app purchase or payment system
 
-There **is** a crash-reporting service in this version, and it is off
-until you turn it on. It is named and described in full below.
+There **is** a crash-reporting service in this version. It starts on,
+a single switch turns it off, and it is named and described in full
+below.
 
 ### Crash records
 
@@ -41,18 +48,22 @@ you were on — into its own private storage on your device, keeping the
 ten most recent. This is how the LAST CRASH notice on the title screen
 works, and it is what REPORT A BUG copies to your clipboard.
 
-**These records never leave your device unless you switch automatic
-crash reports on.** With the switch off — which is how every install
-starts — they are sent only when *you* choose to send them, by using
-REPORT A BUG and pasting the result somewhere yourself.
+**These records leave your device only while the AUTOMATIC CRASH
+REPORTS switch is on.** The switch starts on in this version; turn it
+off and the records are sent only when *you* choose to send them, by
+using REPORT A BUG and pasting the result somewhere yourself.
 
 ### The AUTOMATIC CRASH REPORTS switch
 
-Settings contains an AUTOMATIC CRASH REPORTS switch. It is **off by
-default**. An earlier version of this policy said that if a future
-version ever added a reporting service, this document would name it and
-say exactly what it receives *before* the switch could do anything.
-This is that update.
+Settings contains an AUTOMATIC CRASH REPORTS switch. As of August 24,
+2026 it is **on by default**; earlier versions shipped it off by
+default. Two promises hold across that change: **turning it off stops
+all automatic sending immediately**, and **an explicit OFF is
+permanent** — if you switched it off on any version, it stays off; the
+new default never overrides a recorded choice. An earlier version of
+this policy said that if a future version ever added a reporting
+service, this document would name it and say exactly what it receives
+*before* the switch could do anything. This is that update.
 
 **The service is Sentry** (sentry.io, operated by Functional Software,
 Inc.), on their **United States** infrastructure. If you turn the
@@ -81,7 +92,7 @@ tracking, network-error capture and background breadcrumb collection are
 all switched **off**. Nothing is transmitted at the moment of a crash;
 records are sent on a later launch, and only while the switch is on.
 
-You can turn the switch off again at any time, and reporting stops.
+You can turn the switch off at any time, and reporting stops.
 
 Sentry's own handling of received data is governed by their privacy
 policy at https://sentry.io/privacy/.
@@ -129,12 +140,12 @@ circumstances:
    Services on your device, not by Tartaria Realms. See Google's
    own privacy policies for details on what Play Services collects.
 
-4. **Crash reports — only if you switch them on.** With AUTOMATIC
-   CRASH REPORTS on, the app posts stored crash records to
-   `ingest.us.sentry.io`. With the switch off — the state every
-   install starts in — the app never contacts Sentry at all, not
-   even to check in. The full contents of a report are listed under
-   "The AUTOMATIC CRASH REPORTS switch" above.
+4. **Crash reports — unless you switch them off.** With AUTOMATIC
+   CRASH REPORTS on — the state this version starts in — the app posts
+   stored crash records to `ingest.us.sentry.io`. With the switch off,
+   the app never contacts Sentry at all, not even to check in. The
+   full contents of a report are listed under "The AUTOMATIC CRASH
+   REPORTS switch" above.
 
 No other outbound network traffic originates from the app.
 

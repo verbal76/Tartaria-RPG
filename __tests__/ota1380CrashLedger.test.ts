@@ -34,7 +34,7 @@ import {
   CRASH_LEDGER_CAP, CRASH_LEDGER_KEY, type CrashRecord,
 } from '../app/diagnostics/crashLedger';
 import {
-  reportingConfigured, reportingEnabled, reportingOptedIn, reportingStatusLine,
+  reportingConfigured, reportingEnabled, reportingOptedIn, reportingStatusLine, CRASH_REPORTING_PREF_KEY,
   setReportingEnabled, loadReportingPref, installCrashTransport, flushCrashReports,
   crashReportDsn, _resetCrashReporterForTests,
 } from '../app/diagnostics/crashReporter';
@@ -209,7 +209,9 @@ describe('OTA-1380 — delivery is inert, and needs BOTH switches', () => {
   });
 
   it('⚠⚠ and a configured build does NOT deliver until the player opts in', async () => {
-    // Owner's explicit ruling: opt-in, default off. This is that ruling as code.
+    // Was: "Owner's explicit ruling: opt-in, default off." OTA-1487 flipped the
+    // DEFAULT (opt-out now) — but an explicit OFF is still absolute, which is
+    // exactly what this test proves: a stored 'false' blocks every send.
     const sent: CrashRecord[] = [];
     installCrashTransport({ name: 'test', send: async (r) => { sent.push(r); } });
     recordCrash({ kind: 'js-fatal', stage: 's', message: 'boom', ts: 42 });
@@ -220,9 +222,17 @@ describe('OTA-1380 — delivery is inert, and needs BOTH switches', () => {
     expect(sent).toEqual([]);
   });
 
-  it('⚠ default is OFF on a fresh install', async () => {
+  it('⚠ default is ON on a fresh install — OTA-1487, the owner\'s opt-out ruling', async () => {
+    // (The test above stored an explicit 'false'; a fresh install has no key.)
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ASM = require('@react-native-async-storage/async-storage');
+    await (ASM.default ?? ASM).removeItem(CRASH_REPORTING_PREF_KEY);
     _resetCrashReporterForTests();
-    expect(await loadReportingPref()).toBe(false);
+    expect(await loadReportingPref()).toBe(true);
+    expect(reportingOptedIn()).toBe(true);
+    // ⚠ And before the pref is READ, nothing is on — the in-memory seed stays
+    // false so an explicit opt-out can never lose a race with a boot flush.
+    _resetCrashReporterForTests();
     expect(reportingOptedIn()).toBe(false);
   });
 
@@ -288,10 +298,12 @@ describe('OTA-1380 — it reaches the places a human actually looks', () => {
     }
 
     // TRUE IN BOTH STATES, and the part that actually protects the player: the
-    // records are captured locally, the switch is off unless the player moves it,
-    // and nothing goes anywhere on its own.
-    expect(priv).toMatch(/never leave your device/);
-    expect(priv).toMatch(/off by\s+default/);
+    // records are captured locally and the SWITCH is the only door out.
+    // ⚠ OTA-1487 — the default flipped to ON (owner's opt-out ruling), so the
+    // protective claims are now "only while the switch is on" and the default
+    // is stated as on. The permanence of an explicit OFF is pinned in ota1401.
+    expect(priv).toMatch(/leave your device only while/);
+    expect(priv).toMatch(/on by\s+default/);
   });
 
   it('⚠ the boot path loads the ledger, so the SYNC summaries have data', () => {

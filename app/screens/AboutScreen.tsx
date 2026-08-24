@@ -137,9 +137,12 @@ export function AboutScreen() {
   // COPY INVENTORY) hide behind this toggle. (COPY AI HEALTH was removed — its
   // output is already inside COPY LOG / REPORT A BUG's device summary.)
   const [advancedOpen, setAdvancedOpen] = useState(false);
-  // ⚠ OTA-1380 — the crash-delivery opt-in. `crashConfigured` is FIXED for the
-  // life of the build (a transport is installed or it is not), so it is read
-  // once; the preference is loaded async because it lives in AsyncStorage.
+  // ⚠ OTA-1380 — the crash-delivery switch (opt-OUT since OTA-1487, owner's
+  // ruling). `crashConfigured` is FIXED for the life of the build (a transport
+  // is installed or it is not), so it is read once; the preference is loaded
+  // async because it lives in AsyncStorage. The `false` seed below is the
+  // pre-read state, not the policy default — loadReportingPref answers `true`
+  // when no explicit opt-out is stored, and the row updates when it lands.
   const crashConfigured = reportingConfigured();
   const [crashOptIn, setCrashOptIn] = useState(false);
   const [reportingStatus, setReportingStatus] = useState(reportingStatusLine());
@@ -898,24 +901,25 @@ export function AboutScreen() {
           >
             <Text style={styles.sessionBtnPrimaryText}>REPORT A BUG</Text>
           </TouchableOpacity>
-          {/* ⚠⚠ OTA-1380 — AUTOMATIC CRASH REPORTS. OFF BY DEFAULT, and that is
-              the owner's explicit ruling, not a placeholder. This is an
-              offline-first game with on-device AI; a fair number of people
-              chose it partly BECAUSE nothing phones home, and shipping opt-out
-              would trade that for crash volume.
+          {/* ⚠⚠ OTA-1380 — AUTOMATIC CRASH REPORTS. Was opt-in, default off;
+              ⚠⚠ OTA-1487 flipped it to OPT-OUT, DEFAULT ON — the owner's
+              explicit ruling ("make it an opt out, not an opt in",
+              2026-08-24), recorded in crashReporter.ts alongside the original.
+              An explicit OFF, stored on any version, is still absolute, and
+              docs/PRIVACY.md moved in the same commit.
 
               ⚠ The row states what this BUILD can actually do, not what the
-              feature will eventually do. No transport is installed and no
-              destination is configured yet (Sentry is a native module — it
-              needs a store build, not an OTA), so the toggle is shown disabled
-              with the reason spelled out. A live-looking switch that silently
-              cannot deliver is how a player concludes their reports are being
-              received when nothing is being sent. */}
+              feature will eventually do. On a build with no transport or no
+              destination, the toggle is shown disabled with the reason spelled
+              out. A live-looking switch that silently cannot deliver is how a
+              player concludes their reports are being received when nothing is
+              being sent. */}
           <View style={styles.crashOptRow}>
             <View style={{ flex: 1 }}>
               <Text style={styles.crashOptTitle}>AUTOMATIC CRASH REPORTS</Text>
               <Text style={styles.crashOptBody}>{reportingStatus}</Text>
               <Text style={styles.crashOptBody}>
+                On unless you turn it off — flipping it OFF stops all automatic sending, permanently.
                 Crashes are always recorded ON THIS DEVICE either way — REPORT A BUG sends them
                 only when you choose to.
               </Text>

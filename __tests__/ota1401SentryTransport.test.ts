@@ -87,17 +87,20 @@ describe('OTA-1401 — the OTA cannot brick delivery on builds without the nativ
   });
 });
 
-describe('OTA-1401 — the opt-in switch is still the only thing that sends', () => {
+// ⚠ OTA-1487 flipped the switch's DEFAULT (opt-out now); everything pinned
+// here is about the MECHANISM and survived the flip untouched: the switch —
+// whatever its default — is the only thing that sends.
+describe('OTA-1401 — the switch is still the only thing that sends', () => {
   it('⚠⚠ Sentry auto-capture is OFF, so nothing bypasses the player', () => {
     // Left on, the SDK would post a crash the instant it happened — before the
-    // opt-in is even consulted — which would make the About screen's promise and
+    // switch is even consulted — which would make the About screen's promise and
     // the privacy policy false at the same time.
     expect(transport).toContain('enableAutoSessionTracking: false');
     expect(transport).toContain('enableCaptureFailedRequests: false');
     expect(transport).toContain('maxBreadcrumbs: 0');
   });
 
-  it('⚠⚠ delivery still runs only through flushCrashReports, which requires opt-in', () => {
+  it('⚠⚠ delivery still runs only through flushCrashReports, which requires the switch on', () => {
     // Untouched by this OTA, and asserted here because this is the OTA that made
     // it matter: before today the gate had nothing behind it.
     expect(reporter).toContain('if (!reportingEnabled()) return 0;');
@@ -215,9 +218,18 @@ describe('OTA-1401 — the privacy policy promise, kept', () => {
     expect(privacy).not.toContain('### Crash records (on-device only)');
   });
 
-  it('⚠ it says OFF BY DEFAULT, and says it more than once', () => {
-    expect((privacy.match(/off by\s+default|off until you turn|switched \*\*off\*\*|\*\*off until you turn/gi) ?? []).length)
-      .toBeGreaterThanOrEqual(2);
+  it('⚠ it says ON BY DEFAULT — and pairs every mention with the way off', () => {
+    // ⚠ OTA-1487 — the owner flipped the policy to opt-out, and the policy
+    // document flipped in the same commit (a policy saying "off until you turn
+    // it on" over an opt-out build is a lie). The claims that must hold now:
+    // the default is stated more than once, the off-switch is stated with it,
+    // and an explicit OFF is promised to be permanent.
+    expect((privacy.match(/on by\s+default|starts on|start ON/gi) ?? []).length).toBeGreaterThanOrEqual(2);
+    expect(privacy).toMatch(/switch(ed)? (it )?off|turns? (it|them) off/i);
+    expect(privacy).toMatch(/an explicit OFF is\s+permanent/);
+    // And the stale opt-in claims are GONE, not left standing beside the new ones.
+    expect(privacy).not.toContain('off until you turn');
+    expect(privacy).not.toMatch(/It is \*\*off by\s+default\*\*/);
   });
 
   it('⚠ it lists what is sent AND what is never sent', () => {
@@ -229,7 +241,7 @@ describe('OTA-1401 — the privacy policy promise, kept', () => {
   it('⚠ the outbound-traffic list grew the fourth entry it now needs', () => {
     // That list ends "No other outbound network traffic originates from the
     // app." — a sentence that becomes false the moment a report is posted.
-    expect(privacy).toContain('4. **Crash reports — only if you switch them on.**');
+    expect(privacy).toContain('4. **Crash reports — unless you switch them off.**');
     expect(privacy).toContain('No other outbound network traffic originates from the app.');
   });
 });
