@@ -115,32 +115,52 @@ describe('OTA-1099 — hold to pick, tap to add', () => {
 });
 
 describe('OTA-1099 — the group sells honestly', () => {
-  it('⚠ ONE NEGOTIATION — only the FIRST unit across the WHOLE group trains CHA', () => {
+  // ⚠ OTA-1481 REBUILT ALL THREE OF THESE. They quoted the per-unit loop's exact
+  // source ('for (let i = 0; i < p.qty; i++)', 'let unit = 0') — and that loop
+  // WAS the 2355ms stall the owner's 155-coin sell produced: one full persist,
+  // one disk-logged line and three set()s per unit. The claims below are the
+  // same claims the old pins meant; they are just stated against the batched
+  // shape (one sellToVendor call per ROW, the stack riding in `units`), and
+  // where possible against a rule rather than a spelling.
+  const groupFn = () => view.slice(
+    view.indexOf('const doGroupSell = ()'),
+    view.indexOf('const doGroupSell = ()') + 1400,
+  );
+
+  it('⚠ ONE NEGOTIATION — only the FIRST row across the WHOLE group is social', () => {
     // OTA-727 made a stack sale one negotiation. A group sale is the same beat at
-    // a larger scale: if the counter reset per item, selling ten things together
+    // a larger scale: if every row were social, selling ten things together
     // would farm ten times the Charisma of selling them one at a time — a brand
     // new exploit introduced by a convenience feature.
-    expect(view).toContain('sellToVendor(p.name, p.id, { social: unit === 0 });');
-    // The counter is declared OUTSIDE both loops. A `let unit = 0` inside the
-    // per-item loop is exactly the bug this asserts against.
-    const fn = view.slice(view.indexOf('const doGroupSell = ()'), view.indexOf('const doGroupSell = ()') + 1400);
-    expect(fn).toMatch(/let unit = 0;[\s\S]*for \(const p of plan\)/);
+    const fn = groupFn();
+    expect(fn).toMatch(/social:\s*idx === 0/);
+    // Exactly ONE sell call in the group path — the per-unit inner loop must not
+    // come back, because it multiplies persists by stack size again.
+    expect((fn.match(/sellToVendor\(/g) ?? []).length).toBe(1);
+    expect(fn).not.toMatch(/for \(let i = 0; i < p\.qty/);
   });
 
   it('WHOLE stacks move, matching what the row and the total say', () => {
-    const fn = view.slice(view.indexOf('const doGroupSell = ()'), view.indexOf('const doGroupSell = ()') + 1400);
+    const fn = groupFn();
     expect(fn).toContain('qty: r.item.quantity ?? 1');
-    expect(fn).toContain('for (let i = 0; i < p.qty; i++)');
+    // The stack rides in `units` on the single call — the slice clamps it to the
+    // live quantity, so the row count and the moved count cannot disagree.
+    expect(fn).toMatch(/units:\s*p\.qty/);
     // …and the total the bar shows is priced the same way, so the number the
     // player agreed to is the number they get.
     expect(view).toContain('selectedRows.reduce((n, r) => n + r.price * (r.item.quantity ?? 1), 0)');
   });
 
   it('the plan is SNAPSHOT before the first sale mutates the list it came from', () => {
-    const fn = view.slice(view.indexOf('const doGroupSell = ()'), view.indexOf('const doGroupSell = ()') + 1400);
-    expect(fn).toMatch(/const plan = selectedRows\.map\(/);
-    // The loop reads `plan`, never `selectedRows`, which is re-derived per render.
-    expect(fn).toContain('for (const p of plan)');
+    const fn = groupFn();
+    const planAt = fn.search(/const plan = selectedRows\.map\(/);
+    expect(planAt).toBeGreaterThan(-1);
+    // Every read after the snapshot is of `plan`; the sale iteration never
+    // touches `selectedRows`, which is re-derived per render and mutates under
+    // the first set().
+    const afterPlan = fn.slice(planAt + 'const plan = selectedRows.map('.length);
+    expect(afterPlan).toMatch(/plan\.forEach|for \(const p of plan\)/);
+    expect(afterPlan).not.toMatch(/sellToVendor\([^)]*selectedRows/);
   });
 
   it('⚠ the group confirm carries the SAME warnings the single-item confirm raises', () => {

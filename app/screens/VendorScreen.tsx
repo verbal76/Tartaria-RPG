@@ -188,8 +188,13 @@ export function VendorScreen() {
   const pendingGateLoss = pending?.mode === 'sell' ? gateLossFor(pending.itemName) : null;
 
   // arb57 — current stack size + batch-sell helper. `repsOverride` lets
-  // "Sell All" pass the whole stack; default uses the stepper value. Each
-  // sellToVendor call is one unit (its own TC credit + log line).
+  // "Sell All" pass the whole stack; default uses the stepper value.
+  // ⚠⚠ OTA-1481 — ONE CALL, NOT A LOOP. This used to fire sellToVendor once per
+  // unit, and each unit was three set()s, a disk-persisted log line and a FULL
+  // state persist — the owner's 155-coin sell stalled the JS thread 2355ms. The
+  // slice takes `units` now (the buy side has taken a count since arb92) and
+  // the whole stack is one transaction, one line, one persist. OTA-708's rule
+  // rides along unchanged: one negotiation, one CHA train.
   const sellStackFor = (name: string) =>
     player.inventory.find((i) => i.name.toLowerCase() === name.toLowerCase())?.quantity ?? 1;
   const pendingSellStack = pending?.mode === 'sell' ? sellStackFor(pending.itemName) : 1;
@@ -198,9 +203,7 @@ export function VendorScreen() {
     if (pending?.mode !== 'sell') return;
     const stack = sellStackFor(pending.itemName);
     const reps = Math.max(1, Math.min(repsOverride ?? sellQty, stack));
-    // OTA-708 — a bulk sale is one negotiation: only the first unit trains CHA,
-    // so dumping a big stack no longer farms Charisma one level at a time.
-    for (let i = 0; i < reps; i++) sellToVendor(pending.itemName, pending.itemId, { social: i === 0 });
+    sellToVendor(pending.itemName, pending.itemId, { social: true, units: reps });
     setPending(null);
   };
   // arb92 — buy-quantity helpers. Stock comes from the matching offer; the
@@ -267,13 +270,15 @@ export function VendorScreen() {
       // ⚠ Re-plan at fire time against the CURRENT list. The confirm showed a
       // snapshot; between the tap and the yes the player may have sold a row by
       // hand, and selling from a stale plan would try to sell what is gone.
-      // Each row still goes through sellToVendor one call at a time, so every
-      // piece takes the same price, log line and standing effect it would have
-      // taken sold individually — this is a shortcut for the taps, not for the
-      // rules.
+      // ⚠ OTA-1481 — one call per ROW, whole stack as `units`. Same prices, same
+      // ledger, same standing effects the per-unit loop paid; what changed is
+      // the cost of paying them — one state write and one persist per row
+      // instead of per piece. Only the first row is the negotiation (OTA-727).
+      let bulkRowIdx = 0;
       for (const row of planCommonGearSale(bulkSellable).rows) {
         const reps = Math.max(1, row.item.quantity ?? 1);
-        for (let i = 0; i < reps; i++) sellToVendor(row.item.name, row.item.id, { social: i === 0 });
+        sellToVendor(row.item.name, row.item.id, { social: bulkRowIdx === 0, units: reps });
+        bulkRowIdx++;
       }
     }
     else if (pending.mode === 'accept') {
@@ -436,17 +441,13 @@ export function VendorScreen() {
   const doGroupSell = () => {
     // Snapshot first: each sale mutates the inventory the rows were derived from.
     const plan = selectedRows.map((r) => ({ name: r.item.name, id: r.item.id, qty: r.item.quantity ?? 1 }));
-    let unit = 0;
-    for (const p of plan) {
-      for (let i = 0; i < p.qty; i++) {
-        // OTA-727's rule, applied to the whole group: a bulk sale is ONE
-        // negotiation, so only the very first unit across the entire group
-        // trains Charisma. Selling ten things at once must not pay ten times the
-        // social XP of selling them one at a time.
-        sellToVendor(p.name, p.id, { social: unit === 0 });
-        unit++;
-      }
-    }
+    // OTA-727's rule, applied to the whole group: a bulk sale is ONE
+    // negotiation, so only the very first ROW across the entire group trains
+    // Charisma. ⚠ OTA-1481 — each row's whole stack goes in one call now; the
+    // per-unit loop was the 2355ms stall.
+    plan.forEach((p, idx) => {
+      sellToVendor(p.name, p.id, { social: idx === 0, units: p.qty });
+    });
     setGroupSellConfirm(false);
     exitSellSelect();
   };

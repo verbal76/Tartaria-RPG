@@ -6955,7 +6955,10 @@ export interface GameStore {
    *  A BULK sale is one negotiation, so the VendorScreen loop passes social:true
    *  only on the first unit and false for the rest — otherwise dumping a big stack
    *  farmed Charisma one level at a time. */
-  sellToVendor: (itemName: string, itemId?: string, opts?: { social?: boolean }) => void;
+  // ⚠ OTA-1481 — `units` sells N of one stack as ONE transaction (one write, one
+  // log line, one persist). See vendorSlice for the derivation; the buy side has
+  // taken a count since arb92 and the sell side looping was the 2355ms stall.
+  sellToVendor: (itemName: string, itemId?: string, opts?: { social?: boolean; units?: number }) => void;
   stealFromVendor: (itemName: string) => void;
   repairWithVendor: (itemName: string) => void;
   acceptFactionQuest: (titleOrId: string) => void;

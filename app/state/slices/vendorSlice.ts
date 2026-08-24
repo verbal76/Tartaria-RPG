@@ -73,7 +73,11 @@ type SetState = (
 
 export interface VendorSlice {
   buyFromVendor: (itemName: string, qty?: number) => void;
-  sellToVendor: (itemName: string, itemId?: string, opts?: { social?: boolean }) => void;
+  /** ⚠ OTA-1481 — `units` sells N of the stack as ONE transaction: one state
+   *  write, one log line, one ledger entry, one persist. The buy side has done
+   *  quantity since arb92; the sell side was left looping the screen-side, and
+   *  a 155-coin dump was 155 full persists — the owner's 2355ms JS stall. */
+  sellToVendor: (itemName: string, itemId?: string, opts?: { social?: boolean; units?: number }) => void;
   useVendorCrucible: () => void;
   repairWithVendor: (itemName: string) => void;
 }
@@ -573,24 +577,54 @@ export const createVendorSlice = (
       get().appendLog('system', `${scene.vendor.name} won't pay for ${item.name} — no resale value.`);
       return;
     }
+    // ⚠⚠ OTA-1481 — THE WHOLE STACK IS ONE TRANSACTION, NOT N OF THEM.
+    //
+    // Owner's 4.32.11 log: a 155-coin sell froze the JS thread for 2355ms. The
+    // screen looped `sellToVendor` per unit, and each unit was: three `set()`
+    // calls (inventory rebuild, ledger, CHA), one DISK-PERSISTED log line, and a
+    // FULL STATE `persist()`. 155 persists for one tap. The buy side has taken a
+    // quantity since arb92 — the sell side simply never got the same treatment,
+    // which is the usual story: one half of a symmetric pair gets the fix.
+    //
+    // ⚠ THE RULES DO NOT CHANGE WITH THE BATCHING. Price is per-unit and constant
+    // across a stack (it depends on the item def, rapport, war heat — not on the
+    // count), so total = price × units, exactly what the loop paid. The ledger
+    // still records ONE trade per negotiation (OTA-1438), CHA still trains once
+    // per negotiation (OTA-708), and every refusal above ran before a single
+    // unit moved — as it always did, since a stack is copies of one item.
+    // ⚠ FOUND BY THE SUITE, NOT BY THE FIX: NaN slides straight through
+    // Math.max/Math.min (both return NaN), and `quantity - NaN` is NaN, which the
+    // >0 filter then DROPS — a NaN units request would have vaporised the whole
+    // stack and credited NaN TC. Same lesson as OTA-1477's clamp: the guard
+    // everyone assumes Math.max provides does not exist for NaN.
+    const askedUnits = Number(opts?.units ?? 1);
+    const units = Number.isFinite(askedUnits)
+      ? Math.max(1, Math.min(Math.floor(askedUnits), item.quantity))
+      : 1;
+    const total = price * units;
     set((s) => {
       if (!s.player || !s.currentScene?.vendor) return s;
       const newInventory = s.player.inventory
-        .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+        .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - units } : i))
         .filter((i) => i.quantity > 0);
       return {
         player: {
           ...s.player,
-          tc: s.player.tc + price,
+          tc: s.player.tc + total,
           inventory: newInventory,
         },
       };
     });
+    // One line per NEGOTIATION. A 155-line receipt was its own defect — the feed
+    // is a story, not a cash-register tape. The unit price stays visible so the
+    // player can still check the arithmetic.
+    const soldWhat = units === 1 ? item.name : `${units}× ${item.name}`;
+    const forWhat = units === 1 ? `${total} TC` : `${total} TC (${price} TC each)`;
     get().appendLog(
       'reward',
       fenced
-        ? `Fenced ${item.name} to ${scene.vendor.name} for ${price} TC — no questions asked, and none answered. (${player.tc + price} TC on hand)`
-        : `Sold ${item.name} to ${scene.vendor.name} for ${price} TC. (${player.tc + price} TC on hand)`,
+        ? `Fenced ${soldWhat} to ${scene.vendor.name} for ${forWhat} — no questions asked, and none answered. (${player.tc + total} TC on hand)`
+        : `Sold ${soldWhat} to ${scene.vendor.name} for ${forWhat}. (${player.tc + total} TC on hand)`,
     );
     // OTA-1049 — on the ledger with THIS person. TC accrues per unit, but the
     // TRADE count rides the same `social` flag the Charisma train already uses
@@ -599,7 +633,7 @@ export const createVendorSlice = (
     set((s) => ({
       worldMemory: recordNpcDealing(s.worldMemory, deps.vendorNpcId(scene.vendor!), {
         trades: opts?.social !== false ? 1 : 0,
-        tcTraded: price,
+        tcTraded: total,
         // ⚠⚠ OTA-1438 — AND THIS IS THE ONE THAT WAS ACTUALLY LEAKING. The
         // `social` flag dedupes units of ONE stack; selling three different
         // items is three calls, each a fresh first unit, so an inventory dump
@@ -608,7 +642,9 @@ export const createVendorSlice = (
       }),
     }));
     // arb45 — Relic Trader: count relic barters toward the title (5 needed).
-    if (isRelicTrade) deps.recordTitleProgress(get, set, { relicsTraded: 1 });
+    // arb45 — relic barters count toward the title PER PIECE, as the loop always
+    // did: five relics is five barters whether they left in one negotiation or five.
+    if (isRelicTrade) deps.recordTitleProgress(get, set, { relicsTraded: units });
     // OTA 059 — successful SELL trains CHA. Closing the trade
     // counts as social work.
     // OTA-708 — but ONE negotiation, not one per unit: a bulk sale passes
