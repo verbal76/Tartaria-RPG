@@ -19,7 +19,7 @@
  * All 18 are converted. This suite is the helper's own receipts: a safety net
  * with no tests is just a claim.
  */
-import { blockAt, between, expectAbsent } from '../test-utils/srcBlock';
+import { blockAt, between, callAt, expectAbsent } from '../test-utils/srcBlock';
 
 const SRC = [
   "function alpha(a) {",
@@ -106,6 +106,37 @@ describe('OTA-1447 — the window follows the code, not a byte count', () => {
   it('⚠ between() requires BOTH landmarks', () => {
     expect(between(SRC, 'function alpha', 'return label;')).toContain('inner();');
     expect(() => between(SRC, 'function alpha', 'nope()')).toThrow(/anchor not found/);
+  });
+});
+
+describe('OTA-1484 — callAt: the call is its own window', () => {
+  it('⚠⚠ a wrapped call closes at the OUTER paren — the exact ota1358 shape', () => {
+    // The non-greedy `\)` a regex would reach for stops at `run(feeds)` and
+    // never sees the priority argument; the walker keeps counting.
+    const src = 'await runExclusiveNativeMl(() => session.run(feeds), ML_PRIORITY_TEARDOWN); after();';
+    const call = callAt(src, 'runExclusiveNativeMl(');
+    expect(call).toContain('ML_PRIORITY_TEARDOWN');
+    expect(call.endsWith(')')).toBe(true);
+    expect(call).not.toContain('after');
+  });
+
+  it('⚠ parens inside strings and comments do not close the window', () => {
+    const src = "f('a ) paren', /* also ) here */ realArg); tail();";
+    const call = callAt(src, 'f(');
+    expect(call).toContain('realArg');
+    expect(call).not.toContain('tail');
+  });
+
+  it('⚠⚠ a missing anchor, a non-call anchor, and an unclosed call all THROW', () => {
+    expect(() => callAt('nothing here', 'g(')).toThrow(/anchor not found/);
+    expect(() => callAt('const g = value; and much much later, fifty characters on, an ( appears', 'const g = value;'))
+      .toThrow(/no call opens/);
+    expect(() => callAt('g(never, closed', 'g(')).toThrow(/never closes/);
+  });
+
+  it('⚠ from: picks THIS site, not the first in the file', () => {
+    const src = 'g(first); g(second);';
+    expect(callAt(src, 'g(', { from: 5 })).toBe('g(second)');
   });
 });
 

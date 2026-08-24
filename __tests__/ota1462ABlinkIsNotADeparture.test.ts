@@ -79,6 +79,7 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
+import { blockAt, between } from '../test-utils/srcBlock';
 import {
   QWEN_BACKGROUND_SETTLE_MS,
   _qwenSetForegroundSince,
@@ -165,7 +166,11 @@ describe('OTA-1462 — nothing destructive happens on the raw event', () => {
   const armIdx = APP_CODE.indexOf('backgroundTeardownTimer.current = setTimeout');
   const teardownBody = (): string => {
     expect(armIdx).toBeGreaterThan(-1);
-    return APP_CODE.slice(armIdx, armIdx + 1400);
+    // ⚠ OTA-1484 wave — the byte window (armIdx + 1400) is now the setTimeout
+    // STATEMENT itself, bounded to where its callback closes: the claim is
+    // about what sits inside the deferred callback, so the window is exactly
+    // that callback, however it grows.
+    return blockAt(APP_CODE, 'backgroundTeardownTimer.current = setTimeout', { mode: 'opener' });
   };
 
   it('⚠⚠⚠ THE ~425MB RELEASE IS INSIDE THE DEFERRED CALLBACK', () => {
@@ -208,9 +213,8 @@ describe('OTA-1462 — nothing destructive happens on the raw event', () => {
   it('⚠⚠⚠ AND A RETURN CANCELS IT — the disarm exists on the active path', () => {
     // Without this the timer fires anyway and the whole exercise is a 1.5s
     // postponement of the same churn rather than its removal.
-    const activeIdx = APP_CODE.indexOf("} else if (status === 'active')");
-    expect(activeIdx).toBeGreaterThan(-1);
-    const activeBody = APP_CODE.slice(activeIdx, activeIdx + 500);
+    // ⚠ OTA-1484 wave — the branch's own body, not 500 guessed bytes.
+    const activeBody = blockAt(APP_CODE, "} else if (status === 'active')", { mode: 'opener' });
     expect(activeBody).toContain('clearTimeout(backgroundTeardownTimer.current)');
     expect(activeBody).toContain('backgroundTeardownTimer.current = null');
   });
@@ -219,9 +223,10 @@ describe('OTA-1462 — nothing destructive happens on the raw event', () => {
     // A pending teardown outliving the AppState subscription fires against a
     // listener that is gone. The two neighbouring timers are already cleaned up
     // in that same return; this one must not be the exception.
-    const cleanupIdx = APP_CODE.indexOf('sub.remove();');
-    expect(cleanupIdx).toBeGreaterThan(-1);
-    const cleanup = APP_CODE.slice(cleanupIdx, cleanupIdx + 700);
+    // ⚠ OTA-1484 wave — the rest of the unmount cleanup block, walked to its
+    // real close ('inside' mode: a bare statement's window is its enclosing
+    // block's remainder), not 700 guessed bytes.
+    const cleanup = blockAt(APP_CODE, 'sub.remove();', { mode: 'inside' });
     expect(cleanup).toContain('backgroundTeardownTimer.current');
     expect(cleanup).toContain('clearTimeout(qwenRewarmTimer.current)');
   });
@@ -238,9 +243,8 @@ describe('OTA-1462 — the watchdog observes the same window', () => {
     // The half a fix applied at one of two readers. The latch and the
     // foreground-clock reset must both sit behind the settle timer, or the
     // watchdog treats a blip as a put-away-and-return worth a fresh 425MB.
-    const bgIdx = WATCHDOG_CODE.indexOf("if (next === 'background')");
-    expect(bgIdx).toBeGreaterThan(-1);
-    const bgBody = WATCHDOG_CODE.slice(bgIdx, bgIdx + 420);
+    // ⚠ OTA-1484 wave — the branch's own body.
+    const bgBody = blockAt(WATCHDOG_CODE, "if (next === 'background')", { mode: 'opener' });
     expect(bgBody).toContain('qwenBackgroundSettleTimer = setTimeout');
     // both pieces of state moved inside — not just the flag
     const inside = bgBody.slice(bgBody.indexOf('setTimeout'));
@@ -255,9 +259,13 @@ describe('OTA-1462 — the watchdog observes the same window', () => {
   });
 
   it('⚠⚠ the latch timer is cleared when the watchdog stops', () => {
-    const stopIdx = WATCHDOG_CODE.indexOf('qwenAppStateSub.remove();');
-    expect(stopIdx).toBeGreaterThan(-1);
-    expect(WATCHDOG_CODE.slice(stopIdx, stopIdx + 400)).toContain('qwenBackgroundSettleTimer');
+    // ⚠ OTA-1484 wave — `between()`, not blockAt: the remove() sits inside an
+    // `if (qwenAppStateSub) {…}` whose block closes BEFORE the timer clear, so
+    // "rest of my block" is narrower than the claim (the srcBlock header's
+    // documented case). The span runs from the unsubscribe to the clear itself,
+    // and both landmarks are REQUIRED — a rename fails as a rename.
+    const stopSpan = between(WATCHDOG_CODE, 'qwenAppStateSub.remove();', 'qwenBackgroundSettleTimer = null;');
+    expect(stopSpan).toContain('clearTimeout(qwenBackgroundSettleTimer)');
   });
 
   it('⚠⚠ OTA-1278 IS UNDISTURBED — the foreground gate still works, both ways', () => {

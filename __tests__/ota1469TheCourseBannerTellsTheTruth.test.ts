@@ -121,9 +121,15 @@ describe('OTA-1469 — the sentence and the movement cannot disagree', () => {
     // The auto-step costs stamina and time (OTA 053) precisely so multi-step
     // travel cannot bypass the fatigue economy. Moving the banner must not have
     // moved that.
-    const body = courseBody();
-    const i = body.indexOf('if (willStep) {');
-    const guarded = body.slice(i, i + 400);
+    // ⚠ OTA-1484 wave — `if (willStep) {` OPENS a block, so its own brace-walked
+    // body is the exact window the byte guess (i + 400) was approximating.
+    // Anchored on the FULL store, not courseBody(): that helper's window is
+    // itself truncated and cuts the if-block mid-body, which blockAt correctly
+    // refused to close rather than silently truncate — the first conversion hit
+    // exactly that refusal.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { blockAt } = require('../test-utils/srcBlock') as typeof import('../test-utils/srcBlock');
+    const guarded = blockAt(STORE, 'if (willStep) {');
     expect(guarded).toContain('spendStamina');
     expect(guarded).toContain('advanceTime');
     expect(guarded).toContain('stepDirection(firstDir)');

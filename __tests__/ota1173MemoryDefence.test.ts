@@ -227,9 +227,16 @@ describe('OTA-1173 — an iOS twitch no longer buys a 400MB reload', () => {
   it('a real background→active round trip still gets its fast retry', () => {
     // The OTA-1084 behaviour that was RIGHT is preserved: the player is genuinely back, so
     // the first retry should be immediate.
-    const i = codeOnly(STORE).indexOf('qwenTrulyBackgrounded = false;\n      qwenBackoffLevel = 0;');
-    expect(i).toBeGreaterThan(-1);
-    expect(codeOnly(STORE).slice(i, i + 400)).toContain('tick();');
+    // ⚠ OTA-1484 — the 400-byte guess became the span the claim is actually
+    // about: from the genuine-return reset to `tick();` (the file's only tick
+    // call), with no `return` between them — so the reset path REACHES the tick
+    // instead of merely preceding it somewhere in the next 400 bytes.
+    const span = between(
+      codeOnly(STORE),
+      'qwenTrulyBackgrounded = false;\n      qwenBackoffLevel = 0;',
+      'tick();',
+    );
+    expect(span).not.toMatch(/\breturn\b/);
   });
 
   it('⚠ THE FLAG IS ONLY SET BY A GENUINE `background`, never by `inactive`', () => {

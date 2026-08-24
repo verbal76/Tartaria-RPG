@@ -11,6 +11,7 @@
  * written down. The wording of the Arbiter's line, the chip labels and the refusal
  * text are all free to keep improving.
  */
+import { blockAt } from '../test-utils/srcBlock';
 import {
   takeBountyNudge, _resetBountyNudge, BOUNTY_NUDGE_COOLDOWN_HOURS,
 } from '../app/engine/arbiterNudge';
@@ -88,9 +89,8 @@ describe('OTA-1459 — the Arbiter stops repeating itself', () => {
     // `narration.ts` has had a flavour choke point all along; this line never joined
     // it, calling appendLog('arbiter', …) straight from the world tick. Pinning the
     // module in isolation would prove nothing about the line the player reads.
-    const i = STORE.indexOf('if (ev.effect.offerBounty');
-    expect(i).toBeGreaterThan(-1);
-    expect(STORE.slice(i, i + 200)).toContain('takeBountyNudge(hour)');
+    // ⚠ OTA-1484 wave — the branch's own body, not 200 guessed bytes.
+    expect(blockAt(STORE, 'if (ev.effect.offerBounty')).toContain('takeBountyNudge(hour)');
   });
 });
 
@@ -173,7 +173,12 @@ describe('OTA-1459 — the slate stops being a wall', () => {
   it('⚠ every chip is reachable to a screen reader', () => {
     const i = CONTRACTS.indexOf('OTA-1459 — the slate filter');
     expect(i).toBeGreaterThan(-1);
+    // ⚠ OTA-1447 KEPT A BYTE WINDOW HERE, deliberately (reviewed in the OTA-1484
+    // wave): the anchor is a JSX comment over a chip ROW — no brace block opens
+    // at it, and srcBlock's walker is brace-based, not JSX-aware. The pin is
+    // POSITIVE, so drift fails loudly; the canary below keeps it honest.
     const block = CONTRACTS.slice(i, i + 1400);
+    expect(block).toContain('styles.slateRow'); // canary: still the filter row
     expect(block).toContain('accessibilityRole="button"');
     expect(block).toContain('accessibilityLabel=');
     expect(block).toContain('accessibilityState={{ selected:');

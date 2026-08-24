@@ -27,6 +27,7 @@ import {
 } from '../app/engine/hub';
 import { FACTION_STARTING_LOCATION } from '../app/engine/character';
 import fs from 'fs';
+import { callAt } from '../test-utils/srcBlock';
 import path from 'path';
 
 const SRC = (rel: string) => fs.readFileSync(path.join(__dirname, '..', rel), 'utf8');
@@ -193,9 +194,11 @@ describe('⚠⚠ OTA-1186 — no call site still passes the player’s faction r
       expect(src).toContain('hubSkinFactionFor');
       for (const fn of ['hubRoomFor(', 'hubNameForFaction(']) {
         for (let i = src.indexOf(fn); i !== -1; i = src.indexOf(fn, i + 1)) {
-          const call = src.slice(i, i + 140);
-          // the import line names the function without calling it
-          if (/^\w+\(\s*$/.test(call.split('\n')[0] ?? '')) continue;
+          // ⚠ OTA-1484 — the 140-byte guess became the call's OWN parens
+          // (callAt), so the window is exactly this call's arguments — and a
+          // multiline call, which the old first-line skip quietly excused from
+          // the rule, is now inspected like every other.
+          const call = callAt(src, fn, { from: i });
           if (call.startsWith('hubNameForFaction(factionId)')) continue;  // arb105, below
           if (src.slice(Math.max(0, i - 60), i + 80).includes(arb105)) continue;
           // ⚠ Two accepted spellings: the resolver called inline, or its result hoisted
@@ -208,7 +211,7 @@ describe('⚠⚠ OTA-1186 — no call site still passes the player’s faction r
           // would have sailed through unnoticed if someone happened to name it
           // `skinFactionId`. A bare identifier now counts only when this file actually
           // assigns it from the resolver, which is what the rule was ever about.
-          const line = call.split('\n')[0]!;
+          const line = call.replace(/\s+/g, ' ');
           const local = /,\s*([A-Za-z_$][\w$]*)\s*\)/.exec(line)?.[1];
           const hoisted = !!local
             && new RegExp(`(?:const|let)\\s+${local}\\s*=\\s*[^;]*hubSkinFactionFor\\(`).test(src);

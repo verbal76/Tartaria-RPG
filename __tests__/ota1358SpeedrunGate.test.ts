@@ -49,7 +49,7 @@ jest.mock('expo-updates', () => ({}));
 // could not travel with either owner — assigning to an imported binding is a
 // compile error. It went to `app/state/sprint.ts`, which neither owns.
 import { notePlayerActionForSprint, playerIsSprinting, _resetSprintForTest } from '../app/state/sprint';
-import { blockAt } from '../test-utils/srcBlock';
+import { blockAt, callAt } from '../test-utils/srcBlock';
 
 describe('OTA-1358 — the sprint gate and classifier parity', () => {
   beforeEach(() => _resetSprintForTest());
@@ -141,11 +141,16 @@ describe('OTA-1358 — the sprint gate and classifier parity', () => {
     // down and I made anyway on the first draft of this line. The wrapped call is
     // itself a call, so a non-greedy `\)` terminates at `create(modelPath)` and
     // never reaches the priority argument, failing on correct code.
+    // ⚠ OTA-1484 — and the 220-byte guess it left behind became callAt: the
+    // window is this call's own balanced parens, so the priority is found
+    // however long the wrapped work grows. (Only calls match — the import line
+    // names the function without the paren, and the definition lives in
+    // nativeMlLock.ts.)
     let from = 0;
     for (;;) {
       const at = src.indexOf('runExclusiveNativeMl(', from);
       if (at === -1) break;
-      expect(src.slice(at, at + 220)).toMatch(/ML_PRIORITY_[A-Z]+/);
+      expect(callAt(src, 'runExclusiveNativeMl(', { from: at })).toMatch(/ML_PRIORITY_[A-Z]+/);
       from = at + 1;
     }
   });

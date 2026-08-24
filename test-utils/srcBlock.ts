@@ -233,6 +233,56 @@ export function blockAt(
 }
 
 /**
+ * ⚠ OTA-1484 — THE CALL IS ITS OWN WINDOW. Two byte-window survivors (ota1186,
+ * ota1358) pinned claims about a CALL'S ARGUMENTS — a paren group, which
+ * blockAt's brace walker cannot see and a paren-stopping regex famously cannot
+ * close (the wrapped call is itself a call, so a non-greedy `\)` stops at the
+ * inner one; ota1358 wrote that lesson down and then kept a 220-byte guess
+ * anyway). This walks the parens the way blockAt walks braces: comments and
+ * strings skipped, depth counted, silence impossible.
+ *
+ * Anchor on the callee, open paren included (`hubRoomFor(`); the window is the
+ * whole call expression through its own closing paren, however long the
+ * arguments grow.
+ */
+export function callAt(src: string, anchor: string, opts?: { from?: number }): string {
+  const start = requireIndex(src, anchor, opts?.from ?? 0);
+  // The call's open paren: inside the anchor when the anchor carries it,
+  // otherwise the next one — but NEAR, or this is not a call site at all.
+  let i = src.indexOf('(', start);
+  if (i < 0 || i > start + anchor.length + 40) {
+    throw new Error(
+      `srcBlock: no call opens at ${JSON.stringify(anchor.slice(0, 80))} — ` +
+      'callAt pins a call expression; anchor it on the callee, open paren included.',
+    );
+  }
+  let depth = 0;
+  while (i < src.length) {
+    const c = src[i]!;
+    const next = src[i + 1];
+    if (c === '/' && next === '/') { const nl = src.indexOf('\n', i); i = nl < 0 ? src.length : nl + 1; continue; }
+    if (c === '/' && next === '*') { const e = src.indexOf('*/', i + 2); i = e < 0 ? src.length : e + 2; continue; }
+    if (c === '"' || c === "'" || c === '`') {
+      const q = c; i += 1;
+      while (i < src.length) { if (src[i] === '\\') { i += 2; continue; } if (src[i] === q) { i += 1; break; } i += 1; }
+      continue;
+    }
+    if (c === '(') { depth += 1; i += 1; continue; }
+    if (c === ')') {
+      depth -= 1;
+      if (depth === 0) return src.slice(start, i + 1);
+      i += 1;
+      continue;
+    }
+    i += 1;
+  }
+  throw new Error(
+    `srcBlock: the call at ${JSON.stringify(anchor.slice(0, 80))} never closes — ` +
+    'unbalanced parens under the walker (or the anchor is not a call at all).',
+  );
+}
+
+/**
  * The source between two REQUIRED landmarks — for pins whose subject is a span
  * with a real end ("between the check and the return"), rather than the rest of
  * a block. `to` is searched for after `from`, and both must exist.

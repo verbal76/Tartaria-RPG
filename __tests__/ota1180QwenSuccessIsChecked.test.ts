@@ -83,9 +83,15 @@ describe('OTA-1180 — App.tsx checks the outcome before recording success', () 
     const sites = [...code.matchAll(/void bootQwen\(\)/g)].map((m) => m.index ?? 0);
     expect(sites.length).toBeGreaterThanOrEqual(2);
 
+    // ⚠ OTA-1484 — the 500-byte guess became the code's own shape: the window
+    // IS the `.then(() => { … })` continuation attached to the call, walked by
+    // blockAt. A site with no such continuation (the .catch-only fallback, the
+    // bare AppState re-warm) cannot record success in one — and the sibling
+    // test below proves every Qwen-side markMLInitSucceeded in the file sits
+    // behind the `ok` guard, wherever it is written.
     let marking = 0;
-    for (const at of sites) {
-      const cont = code.slice(at, at + 500);
+    for (const m of code.matchAll(/void bootQwen\(\)\s*\.then\(\(\) => \{/g)) {
+      const cont = blockAt(code, '() => {', { from: m.index ?? 0, mode: 'opener' });
       if (!cont.includes('markMLInitSucceeded')) continue;
       marking += 1;
       expect(cont).toContain("const ok = useGameStore.getState().qwenStatus === 'ready';");

@@ -27,6 +27,7 @@
  * smooth stone, and the synonym table that exists to catch exactly this had no
  * entry for it).
  */
+import { blockAt } from '../test-utils/srcBlock';
 import {
   noteSynthRefused, wasSynthRefused, clearSynthRefusal,
   _resetCacheForTests, _refusedCountForTests,
@@ -129,9 +130,14 @@ describe('OTA-1465 — the blocked queue, which was the expensive half', () => {
   });
 
   it('⚠⚠ the rejection site records the refusal', () => {
-    const i = QWEN.indexOf('item_synth:rejected-by-clamp');
-    expect(i).toBeGreaterThan(-1);
-    expect(QWEN.slice(i, i + 300)).toContain('noteSynthRefused(name)');
+    // ⚠ OTA-1484 wave — the claim is "the refusal is recorded in the SAME
+    // branch that logs the rejection". Anchored on the branch's OPENER (a code
+    // landmark), because anchoring blockAt on text inside a template STRING
+    // hands back the string, not the block — the first conversion did exactly
+    // that and the canary below is what caught it.
+    const branch = blockAt(QWEN, 'if (!validated) {');
+    expect(branch).toContain('item_synth:rejected-by-clamp'); // canary: right block
+    expect(branch).toContain('noteSynthRefused(name)');
   });
 
   it('⚠⚠ …and the success site clears it', () => {

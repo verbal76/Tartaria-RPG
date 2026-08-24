@@ -43,6 +43,7 @@ import {
 } from '../app/engine/hunts';
 import { getFactions } from '../app/engine/character';
 import { readFileSync } from 'fs';
+import { between } from '../test-utils/srcBlock';
 import { join } from 'path';
 
 const read = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
@@ -186,9 +187,15 @@ describe('OTA-1474 — and the refusal is never deduped into silence', () => {
     // Twelve taps, one line, eleven `dedup: suppressed arbiter repeat`. From tap
     // two onward he was answered with nothing at all, which is precisely why he
     // kept tapping.
-    const i = QUEST.indexOf('emptyWhy!');
-    expect(i).toBeGreaterThan(-1);
-    expect(QUEST.slice(i, i + 200)).toContain('skipDedup: true');
+    // ⚠ OTA-1484 wave — byte window (i + 200) converted to the appendLog CALL
+    // itself, bounded by its own closing paren-and-semicolon: the claim is
+    // "the call that speaks emptyWhy carries the flag", so the window IS that
+    // call, however long its arguments grow.
+    const callStart = QUEST.lastIndexOf('appendLog(', QUEST.indexOf('emptyWhy!'));
+    expect(callStart).toBeGreaterThan(-1);
+    const call = between(QUEST.slice(callStart), 'appendLog(', ');');
+    expect(call).toContain('emptyWhy!');
+    expect(call).toContain('skipDedup: true');
   });
 
   it('⚠⚠⚠ AND THE DEDUP REALLY WOULD HAVE EATEN IT — the flag is load-bearing', () => {
@@ -238,7 +245,9 @@ describe('OTA-1474 — what it must not have disturbed', () => {
   });
 
   it('⚠⚠ it searches the SAME factions the offer searched, broker or not', () => {
-    const i = QUEST.indexOf('emptyBoardTally(');
-    expect(QUEST.slice(i, i + 120)).toContain('searchFactions');
+    // ⚠ OTA-1484 wave — the claim is about the CALL's arguments; bound the
+    // window by the call's own close instead of guessing 120 bytes.
+    const tallyCall = between(QUEST, 'emptyBoardTally(', ')');
+    expect(tallyCall).toContain('searchFactions');
   });
 });

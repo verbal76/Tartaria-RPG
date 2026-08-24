@@ -169,9 +169,10 @@ describe('OTA-1275 — the source keeps the asymmetry', () => {
     // Exactly one call, reached by nothing but the timer firing.
     const calls = APP.match(/void shutdownQwen\(\)/g) ?? [];
     expect(calls.length).toBe(1);
-    const armIdx = APP.indexOf('backgroundTeardownTimer.current = setTimeout');
-    expect(armIdx).toBeGreaterThan(-1);
-    expect(APP.slice(armIdx, armIdx + 1400)).toContain('void shutdownQwen()');
+    // ⚠ OTA-1484 wave — the setTimeout statement's own extent (its callback),
+    // walked by brace instead of 1400 guessed bytes.
+    expect(blockAt(APP, 'backgroundTeardownTimer.current = setTimeout', { mode: 'opener' }))
+      .toContain('void shutdownQwen()');
   });
 
   it('⚠⚠ the RE-WARM is behind the timer, and leaving CANCELS it', () => {
