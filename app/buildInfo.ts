@@ -24539,6 +24539,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // relay. Renders only for the unlock names; obeys the crash-reports
 // switch (OFF = the app contacts Sentry for nothing, this included);
 // past the cap the TAIL survives.
+// 2026-08-24 — GOLEM CATCH-UP PUBLISH. Every publish from OTA-1481 through
+// 1489 carried the [ota-hal] marker, so only the HAL channel received them;
+// the golem dev channel sat at its last markerless push the whole stretch.
+// This commit exists to publish the same trunk to golem (a markerless push
+// is the workflow's golem path; the Actions-UI dispatch was unavailable), so
+// the owner's golem install gains 1481-1489 — the wield verb, the opt-out
+// switch, the notice popup, and SEND LOG for his golem saves.
 export const OTA_BUILD_ID = '2026-08-24-1489-one-tap-instead-of-four-slices';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1488-told-first-sent-second';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1487-opt-out-not-opt-in';
