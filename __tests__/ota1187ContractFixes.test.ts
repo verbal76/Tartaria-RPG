@@ -178,7 +178,26 @@ describe('⚠⚠ OTA-1187 / P8 — the board takes back what it posted', () => {
   });
 
   test('faction quests were always allowed all three — this closes the gap, not opens one', () => {
-    expect(STORE).toContain("scene?.vendor?.faction ?? scene?.missionBoard?.faction ?? null");
+    // ⚠⚠ THIS PIN QUOTED THE EXPRESSION, and OTA-1475 reformatted it — a vendor
+    // still outranks a board, but the Hidden Market's neutral post now falls
+    // through to the CONTRACT's own faction, so the chain gained a clause and
+    // three lines. Nothing about OTA-1187's rule moved.
+    //
+    // ⚠ The FOURTH pin this week to fail on a quotation rather than a claim
+    // (ota1301, ota1104, ota1466 were the others). The claim is the PRECEDENCE:
+    // a vendor standing there beats the board, and the board beats nothing.
+    // Asserted as an ordering, which survives any amount of reformatting and
+    // fails on the thing that would actually be wrong.
+    for (const decl of ['const acceptFaction =', 'let turnFaction =']) {
+      const i = STORE.indexOf(decl);
+      expect({ decl, found: i > -1 }).toEqual({ decl, found: true });
+      const chain = STORE.slice(i, STORE.indexOf(';', i));
+      expect(chain).toContain('vendor?.faction');
+      expect(chain).toContain('missionBoard?.faction');
+      expect(chain.indexOf('vendor?.faction')).toBeLessThan(chain.indexOf('missionBoard?.faction'));
+      // and it still ends in a null rather than inventing a faction
+      expect(chain.trimEnd().endsWith('null')).toBe(true);
+    }
   });
 });
 

@@ -76,7 +76,7 @@ import {
   wrongCounterpartyBody,
   wrongCounterpartyLine,
 } from '../../engine/contractRefusal';
-import { findFactionQuestById, availableFactionQuests } from '../../engine/factionQuests';
+import { findFactionQuestById, availableFactionQuests, factionOfFactionQuest } from '../../engine/factionQuests';
 import { HUNTS, findHuntById, availableHunts, fuzzyFindHunt, scaleHuntBoss, firstActionableHuntStage, huntBlockReason, emptyBoardTally, emptyBoardLine } from '../../engine/hunts';
 import { MYSTERIES, findMysteryById, availableMysteries, fuzzyFindMystery } from '../../engine/mysteries';
 import { findStorylineById, availableStorylines, fuzzyFindStoryline } from '../../engine/factionStorylines';
@@ -482,8 +482,26 @@ export const createQuestSlice = (
     // OTA-451 — a contract can be picked up from a same-faction VENDOR or from
     // the OUTPOST MISSION BOARD. Resolve the quest faction + a display source
     // name from whichever is present.
-    const acceptFaction = scene?.vendor?.faction ?? scene?.missionBoard?.faction ?? null;
-    const acceptSourceName = scene?.vendor?.name ?? (scene?.missionBoard ? 'the mission board' : null);
+    // ⚠⚠⚠ OTA-1475 — THE MARKET'S POST HAS NO FACTION OF ITS OWN, SO THE
+    // CONTRACT SUPPLIES ONE. `missionBoard.faction === null` is the Hidden
+    // Market square, where every faction posts under the truce; taking a
+    // Reclaimers posting off it is Reclaimers work, paying and costing
+    // Reclaimers standing. That is exactly what the owner asked for — "all of
+    // the factions should be able to post there without interaction from each
+    // other" — and it needs no new accept path, only the faction resolved from
+    // the paper instead of from the wall.
+    //
+    // ⚠ Resolved by `factionOfFactionQuest`, which uses the SAME fuzzy matcher
+    // the accept below uses. A title that found a row on the board therefore
+    // cannot fail to find it here a moment later — two matchers would be two
+    // definitions of "which contract is this".
+    const boardIsNeutral = !!scene?.missionBoard && scene.missionBoard.faction === null;
+    const acceptFaction = scene?.vendor?.faction
+      ?? scene?.missionBoard?.faction
+      ?? (boardIsNeutral ? factionOfFactionQuest(titleOrId) : null)
+      ?? null;
+    const acceptSourceName = scene?.vendor?.name
+      ?? (scene?.missionBoard ? (boardIsNeutral ? 'the Market post' : 'the mission board') : null);
     if (!acceptFaction || !acceptSourceName) {
       // Resolve the named contract to its faction so we can tell the
       // player WHICH vendor archetype to seek, not just "a faction
@@ -754,8 +772,16 @@ export const createQuestSlice = (
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const CB = require('../../engine/contractBroker') as typeof import('../../engine/contractBroker');
     const atBroker = CB.isContractBroker(scene?.vendor);
-    let turnFaction = scene?.vendor?.faction ?? scene?.missionBoard?.faction ?? null;
-    let turnSourceName = scene?.vendor?.name ?? (scene?.missionBoard ? 'The mission board' : null);
+    // ⚠ OTA-1475 — same rule on the way back in. A contract taken off the
+    // Market post is turned in there too; whose colour it flies is decided by
+    // the contract, not by the board it came off.
+    const turnBoardNeutral = !!scene?.missionBoard && scene.missionBoard.faction === null;
+    let turnFaction = scene?.vendor?.faction
+      ?? scene?.missionBoard?.faction
+      ?? (turnBoardNeutral ? factionOfFactionQuest(titleOrId) : null)
+      ?? null;
+    let turnSourceName = scene?.vendor?.name
+      ?? (scene?.missionBoard ? (turnBoardNeutral ? 'The Market post' : 'The mission board') : null);
     // OTA-617 — BUILDING-LEVEL in-person turn-in. If you're inside a faction's
     // home outpost (no specific board/vendor needed in this exact room), that
     // faction's hall takes its own contracts at FULL pay. Keeps the three

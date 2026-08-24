@@ -1446,7 +1446,11 @@ export interface CurrentScene {
    *  contracts it posts so a new player has an immediate quest on-ramp; the UI
    *  renders a tappable "Mission Board" chip and acceptFactionQuest /
    *  turnInFactionQuest treat it as a quest source (no vendor required). */
-  missionBoard?: { faction: string } | null;
+  /** ⚠⚠ OTA-1475 — `faction: null` is THE HIDDEN MARKET'S NEUTRAL BOARD, where
+   *  every faction posts side by side under the square's truce. Owner: "all of
+   *  the factions should be able to post there without interaction from each
+   *  other." A named faction is the ordinary outpost board and is unchanged. */
+  missionBoard?: { faction: string | null } | null;
   /** OTA-807 — a wandering NPC (a PERSON, not a vendor) resting on this peaceful
    *  outdoor tile. You can talk / greet / persuade them for a small payoff (a tip,
    *  a few coins, or a rare standing nudge). Spawned in beginScene only on NOVEL
@@ -6286,6 +6290,24 @@ function patchSceneForBuildingRoom(
         activeEnemyIdx: 0,
         range: null,
         vendor: stallVendor,
+        // ⚠⚠⚠ OTA-1475 — THE MARKET SQUARE'S NEUTRAL BOARD. Owner: *"I think in
+        // the hidden market in the square should be a version of the missions
+        // board like in the starter outpost, since it's a no fighting zone, then
+        // I'm guessing that all of the factions should be able to post there
+        // without interaction from each other."*
+        //
+        // ⚠ `faction: null` is what makes it neutral — every faction's postings,
+        // side by side, each still its own faction's business. The outpost board
+        // (`outpost_central`, in beginScene) carries a named faction and is
+        // untouched.
+        //
+        // ⚠⚠ THE SQUARE, NOT THE STALLS. Placed on `market_square` alone because
+        // that is the room the truce lives in — the one with no anchor vendor,
+        // where you land on entry and choose a direction. A board inside the
+        // armour stall would be Korash's board, which is the opposite of the ask.
+        missionBoard: (buildingId === 'market' && roomId === 'market_square')
+          ? { faction: null }
+          : null,
         hooks: [],
       },
     };
@@ -10116,7 +10138,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // posts the player's own faction's contracts (the rep-0 starters + anything
     // they qualify for), giving a brand-new character an immediate quest on-ramp
     // without having to stumble onto a wandering trader.
-    const missionBoard: { faction: string } | null =
+    const missionBoard: { faction: string | null } | null =
       hubRoom?.id === 'outpost_central' && player?.factionId
         ? { faction: player.factionId }
         : null;

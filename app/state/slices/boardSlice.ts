@@ -22,7 +22,7 @@
 import { playerGridCell } from '../playerGrid';
 import { getLocationById } from '../../engine/encounter';
 import { FACTIONS, getStanding } from '../../engine/factions';
-import { availableFactionQuests } from '../../engine/factionQuests';
+import { availableFactionQuests, neutralBoardPostings } from '../../engine/factionQuests';
 import { refusalLine } from '../../engine/portability';
 import { canonicalDistanceFromGrid, canonicalCellOf, canonicalCellFor } from '../../engine/worldMap';
 
@@ -78,6 +78,52 @@ export const createBoardSlice = (
     const board = scene?.missionBoard;
     if (!board) {
       get().appendLog('arbiter', `The Arbiter glances around. "No board posted here."`);
+      return;
+    }
+    // ⚠⚠⚠ OTA-1475 — THE HIDDEN MARKET'S BOARD HAS NO FACTION OF ITS OWN.
+    // `faction: null` means every faction posts here, side by side, under the
+    // square's truce — owner: "all of the factions should be able to post there
+    // without interaction from each other." Rows stay GROUPED by faction because
+    // that phrase is the whole point: a Reclaimers posting taken off this board
+    // is still Reclaimers work, costing and paying Reclaimers standing.
+    if (board.faction === null) {
+      const groups = neutralBoardPostings(
+        FACTIONS,
+        (fid) => getStanding(player.factionStanding, fid),
+        player.activeFactionQuestIds ?? [],
+        player.completedFactionQuestIds ?? [],
+      );
+      if (groups.length === 0) {
+        // ⚠ OTA-1474's rule, on this door too: an empty board says WHY it is
+        // empty rather than shrugging. Here the honest answer is that nine
+        // pools came back with nothing, which is a different fact from one
+        // faction having nothing.
+        get().appendLog(
+          'world',
+          'The Market post is bare — every colour has cleared its work off it. '
+          + 'Turn in what you are carrying, or earn standing with somebody, and it fills again.',
+        );
+        return;
+      }
+      const total = groups.reduce((n, g) => n + g.postings.length, 0);
+      get().appendLog(
+        'world',
+        `▣ The Market Post — ${total} open ${total === 1 ? 'contract' : 'contracts'} from `
+        + `${groups.length} ${groups.length === 1 ? 'faction' : 'factions'}. `
+        + 'The square\'s truce holds on the paper too: nobody here minds who else is nailed up beside them.',
+      );
+      for (const g of groups) {
+        get().appendLog('world', `— ${g.factionName} —`);
+        for (const q of g.postings) {
+          get().appendLog('world', `• "${q.title}" — ${q.objective} (reward: ${q.reward.tc} TC${q.reward.rep > 0 ? `, +${q.reward.rep} rep with the ${g.factionName}` : ''})`);
+        }
+      }
+      get().appendLog(
+        'arbiter',
+        `The Arbiter reads down the post. "Type ACCEPT <name> to take one on — e.g. accept ${groups[0]!.postings[0]!.title.toLowerCase()}. `
+        + 'Whose colour it flies decides who you answer to for it, and who pays."',
+      );
+      void get().persist();
       return;
     }
     const factionLabel = FACTIONS.find((f) => f.id === board.faction)?.name ?? board.faction.replace(/_/g, ' ');

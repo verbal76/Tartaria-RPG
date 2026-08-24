@@ -202,3 +202,70 @@ export function repLockedFactionQuests(
 export function fuzzyFindFactionQuest(text: string, pool: readonly FactionQuestDef[]): FactionQuestDef | null {
   return findByTitle(text, pool);
 }
+
+/**
+ * ⚠⚠⚠ OTA-1475 — THE HIDDEN MARKET POSTS FOR EVERYBODY.
+ *
+ * THE OWNER, 4.32.11, standing in the Market square:
+ *
+ *   "also, I think in the hidden market in the square should be a version of the
+ *    missions board like in the starter outpost, since it's a no fighting zone,
+ *    then I'm guessing that all of the factions should be able to post there
+ *    without interaction from each other"
+ *
+ * ⚠⚠ THE TRUCE IS ALREADY IN THE FICTION, and the Market says so itself when a
+ * hostile party finds you there: *"The Market's truce is older than any grudge;
+ * whoever wants you settles for watching you trade."* Nine factions that will
+ * not fight in the square have no reason not to nail work to the same post — and
+ * a broker stall in that same market ALREADY searches every faction's hunt pool
+ * (`isBrokerVendorId`). This is the same idea, for the contract board, which had
+ * exactly one shape: `{ faction: string }`, one faction, outpost_central only.
+ *
+ * ⚠ "WITHOUT INTERACTION FROM EACH OTHER" IS THE LOAD-BEARING PHRASE, and it is
+ * why this returns rows GROUPED BY FACTION rather than a merged list. Taking a
+ * Reclaimers posting off the Market board is a Reclaimers contract: it costs and
+ * pays Reclaimers standing, and it does not touch what the Eternal Dynasty will
+ * post you tomorrow. Nothing here mixes the pools; it only puts them side by side
+ * under one roof.
+ */
+export interface NeutralBoardGroup {
+  factionId: string;
+  factionName: string;
+  postings: FactionQuestDef[];
+}
+
+/**
+ * Every faction's open postings, side by side, each still its own faction's
+ * business. `standingFor` is injected rather than read here so the board and the
+ * accept path cannot end up with two different ideas of the player's standing.
+ *
+ * ⚠ Factions with nothing open are dropped: a board showing five empty headings
+ * buries the two that have work, which is the same reasoning that keeps
+ * `huntBoardWithReasons` from listing somebody else's business.
+ */
+export function neutralBoardPostings(
+  factions: readonly { id: string; name: string }[],
+  standingFor: (factionId: string) => number,
+  active: readonly string[],
+  completed: readonly string[],
+): NeutralBoardGroup[] {
+  const out: NeutralBoardGroup[] = [];
+  for (const f of factions) {
+    const postings = availableFactionQuests(f.id, standingFor(f.id), active, completed);
+    if (postings.length > 0) out.push({ factionId: f.id, factionName: f.name, postings });
+  }
+  return out;
+}
+
+/**
+ * ⚠⚠ WHICH FACTION'S WORK IS THIS? The neutral board has no faction of its own,
+ * so the contract the player names supplies it — which is precisely what "all
+ * factions post there without interaction" means in code. Resolved by the SAME
+ * fuzzy matcher the accept path already uses, so a title that finds a posting on
+ * the board cannot fail to find it a second later at the accept.
+ */
+export function factionOfFactionQuest(titleOrId: string): string | null {
+  const byId = findFactionQuestById(titleOrId);
+  if (byId) return byId.factionId;
+  return fuzzyFindFactionQuest(titleOrId, FACTION_QUESTS)?.factionId ?? null;
+}

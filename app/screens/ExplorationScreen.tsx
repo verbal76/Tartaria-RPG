@@ -238,6 +238,21 @@ export function ExplorationScreen() {
   const missionBoardHasPostings = useMemo(() => {
     const board = currentScene?.missionBoard;
     if (!board || !player) return false;
+    // ⚠ OTA-1475 — `faction: null` is the Hidden Market's neutral post: every
+    // faction's pool, side by side. Same question ("is there anything to take"),
+    // asked of nine pools instead of one.
+    if (board.faction === null) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { neutralBoardPostings } = require('../engine/factionQuests') as typeof import('../engine/factionQuests');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { FACTIONS } = require('../engine/factions') as typeof import('../engine/factions');
+      return neutralBoardPostings(
+        FACTIONS,
+        (fid) => getStanding(player.factionStanding ?? [], fid),
+        player.activeFactionQuestIds ?? [],
+        player.completedFactionQuestIds ?? [],
+      ).length > 0;
+    }
     return availableFactionQuests(
       board.faction,
       getStanding(player.factionStanding ?? [], board.faction),
@@ -1452,8 +1467,17 @@ export function ExplorationScreen() {
         >
           <View style={styles.missionBoardStripe} />
           <View style={styles.placeChipBody}>
-            <Text style={styles.missionBoardName} numberOfLines={1}>⚑ MISSION BOARD</Text>
-            <Text style={styles.placeChipHint} numberOfLines={1}>tap to view postings</Text>
+            {/* OTA-1475 — the Market's post is a different thing from a
+                faction outpost's board, and saying so is why he asked for it:
+                every colour, under the square's truce. */}
+            <Text style={styles.missionBoardName} numberOfLines={1}>
+              {currentScene.missionBoard.faction === null ? '⚑ THE MARKET POST' : '⚑ MISSION BOARD'}
+            </Text>
+            <Text style={styles.placeChipHint} numberOfLines={1}>
+              {currentScene.missionBoard.faction === null
+                ? 'every faction posts here · tap to read'
+                : 'tap to view postings'}
+            </Text>
           </View>
           <Text style={styles.placeChipArrow}>›</Text>
         </TouchableOpacity>
