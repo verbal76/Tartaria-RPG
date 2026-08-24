@@ -450,3 +450,112 @@ export interface ActiveHunt {
   postedByFaction: string | null;
   acceptedAt: number;
 }
+
+/**
+ * ⚠⚠⚠ OTA-1474 — AN EMPTY BOARD IS THE ONE CASE OTA-1466 LEFT SILENT.
+ *
+ * THE OWNER, 4.32.11, at the Hidden Market armor stall. Twelve taps in nine
+ * seconds, and the log for all twelve:
+ *
+ *   00:14:05.959  Korash of the Deep shakes their head. "No bounties for you
+ *                 right now."
+ *   00:14:07.690  dedup: suppressed arbiter repeat — "Korash of the Deep …"
+ *   …             ×10 more
+ *
+ * Then, at 00:14:52:
+ *
+ *   "I couldn't accept the core ass mission from this vendor, but there was no
+ *    pop-up telling me why. I'm imagining it's because either I've hit my cap
+ *    of missions that I can have or I don't have enough standing but it doesn't
+ *    say which. so either we need to have a pop-up or maybe like an angular set
+ *    of writing like how they do, you know kind of faded, that says need
+ *    standing or something like that"
+ *
+ * ⚠⚠ OTA-1466 ANSWERED THE OTHER TWO BRANCHES AND NOT THIS ONE. Its fix names a
+ * specific posting when he asks for one, and lists what IS posted when he asks
+ * for something that is not. Both need the board to have something on it. When
+ * `availableHunts` comes back empty for every faction the vendor searches, the
+ * code falls through to a bare shrug — and that is precisely the moment the
+ * player has the least information and the most reason to keep tapping.
+ *
+ * ⚠ The reasons were never missing. `huntBlockReason` can say, for every hunt in
+ * the catalogue, exactly why it is not on offer. The empty case just threw them
+ * all away. Nothing new is computed here; the same verdicts are counted instead
+ * of discarded.
+ *
+ * ⚠⚠ AND HIS TWO GUESSES WERE BOTH WRONG, which is the real cost of the shrug:
+ * there is no mission cap (an extra contract PARKS, it is never refused), and
+ * standing is one of four reasons. He spent the guess because we made him.
+ */
+export interface EmptyBoardTally {
+  standing: number;
+  reach: number;
+  active: number;
+  completed: number;
+}
+
+/** Count why nothing is posted, across every faction this vendor searches. Each
+ *  hunt is counted ONCE, under the reason that actually blocked it — the same
+ *  ordering `huntBlockReason` uses, so the tally and the row agree.
+ *
+ *  ⚠ A hunt blocked for one faction but OPEN for another is not blocked at all:
+ *  a broker searches every pool, and reporting it as withheld would be a second
+ *  definition of "offered" disagreeing with `availableHunts`. */
+export function emptyBoardTally(
+  searchFactions: readonly (string | null)[],
+  repFor: (factionId: string | null) => number,
+  active: readonly string[],
+  completed: readonly string[],
+  hpMax?: number,
+): EmptyBoardTally {
+  const tally: EmptyBoardTally = { standing: 0, reach: 0, active: 0, completed: 0 };
+  for (const hunt of HUNTS) {
+    let worst: HuntBlock | null = null;
+    let openSomewhere = false;
+    for (const fid of searchFactions) {
+      const b = huntBlockReason(hunt, fid, repFor(fid), active, completed, hpMax);
+      if (b === null) { openSomewhere = true; break; }
+      // Prefer a substantive reason over "somebody else's business" — the same
+      // preference the spoken refusal makes.
+      if (worst === null || (worst.kind === 'faction' && b.kind !== 'faction')) worst = b;
+    }
+    if (openSomewhere || worst === null || worst.kind === 'faction') continue;
+    tally[worst.kind] += 1;
+  }
+  return tally;
+}
+
+const PLURAL = (n: number, one: string, many: string): string => (n === 1 ? one : many);
+
+/**
+ * ⚠ WHAT HE IS TOLD WHEN THE BOARD IS BARE. It owes him the same three things
+ * every refusal in this game owes: what is happening, why, and what would change
+ * it. Written as a trader talking, not as a tally — but every number in it is
+ * real, which is the whole difference from the shrug it replaces.
+ */
+export function emptyBoardLine(vendorName: string, t: EmptyBoardTally): string {
+  const parts: string[] = [];
+  if (t.standing > 0) {
+    parts.push(`${t.standing} ${PLURAL(t.standing, 'wants', 'want')} standing you have not earned yet`);
+  }
+  if (t.reach > 0) {
+    parts.push(`${t.reach} ${PLURAL(t.reach, 'is', 'are')} further out than you can carry yourself`);
+  }
+  if (t.active > 0) {
+    parts.push(`${t.active} ${PLURAL(t.active, 'is', 'are')} already on your slate`);
+  }
+  if (t.completed > 0) {
+    parts.push(`${t.completed} ${PLURAL(t.completed, 'is', 'are')} finished`);
+  }
+  if (parts.length === 0) {
+    // Nothing withheld and nothing offered — the pools genuinely have nothing
+    // for this vendor's factions. Say THAT, rather than implying a gate.
+    return `${vendorName} turns the empty board around. "Nothing posted here — not withheld, just nothing. `
+      + `Try a vendor of another colour, or come back when the road has stirred something up."`;
+  }
+  const list = parts.length === 1
+    ? parts[0]!
+    : `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]!}`;
+  return `${vendorName} turns the board around so you can see it. "Nothing I can post you today — ${list}. `
+    + `There is no limit on how many you carry; a second one simply waits its turn."`;
+}

@@ -217,8 +217,26 @@ describe('OTA-1466 — it reaches the screen', () => {
     // The board is the fix for tapping; this is the fix for typing "accept X".
     expect(QUEST).toContain('huntBlockReason(');
     expect(QUEST).toMatch(/taps the posting\./);
-    // and the old shrug survives as the last resort, for when there is genuinely
-    // nothing and no named hunt to explain.
-    expect(QUEST).toContain('No bounties for you right now.');
+  });
+
+  it('⚠⚠⚠ AND THE LAST RESORT IS NO LONGER A SHRUG — OTA-1474', () => {
+    // ⚠⚠ THIS PIN USED TO READ `toContain('No bounties for you right now.')`,
+    // with a comment calling that sentence a survivor: "the old shrug survives
+    // as the last resort, for when there is genuinely nothing and no named hunt
+    // to explain." That was OTA-1466 writing down its own blind spot and
+    // describing it as a decision — and the owner's very next log has twelve
+    // taps against exactly that branch in nine seconds, eleven of them swallowed
+    // by the arbiter dedup, followed by "there was no pop-up telling me why".
+    //
+    // ⚠ The THIRD pin this week to fail because it quoted the sentence instead
+    // of stating the claim (ota1301 and ota1104 were the others). OTA-1466's
+    // claim is "a refusal says why". So it is now asserted where the refusal was
+    // WEAKEST rather than where it happened to be implemented first — and a pin
+    // written this way could not have blessed the gap in the first place.
+    expect(QUEST).not.toContain('No bounties for you right now');
+    expect(QUEST).toContain('emptyBoardLine(');
+    expect(QUEST).toContain('emptyBoardTally(');
+    // and the whole refusal now survives being tapped twice
+    expect(QUEST).toContain('skipDedup: true');
   });
 });

@@ -77,7 +77,7 @@ import {
   wrongCounterpartyLine,
 } from '../../engine/contractRefusal';
 import { findFactionQuestById, availableFactionQuests } from '../../engine/factionQuests';
-import { HUNTS, findHuntById, availableHunts, fuzzyFindHunt, scaleHuntBoss, firstActionableHuntStage, huntBlockReason } from '../../engine/hunts';
+import { HUNTS, findHuntById, availableHunts, fuzzyFindHunt, scaleHuntBoss, firstActionableHuntStage, huntBlockReason, emptyBoardTally, emptyBoardLine } from '../../engine/hunts';
 import { MYSTERIES, findMysteryById, availableMysteries, fuzzyFindMystery } from '../../engine/mysteries';
 import { findStorylineById, availableStorylines, fuzzyFindStoryline } from '../../engine/factionStorylines';
 
@@ -1194,13 +1194,38 @@ export const createQuestSlice = (
         }
       }
       const titles = [...offered].join(', ');
+      // ⚠⚠⚠ OTA-1474 — AND THE EMPTY BOARD SAYS WHY IT IS EMPTY. OTA-1466
+      // answered the two branches above and left this one a shrug: "No bounties
+      // for you right now." His log has twelve taps against it in nine seconds.
+      // The reasons were never missing — `huntBlockReason` can explain every
+      // hunt in the catalogue — the empty case simply threw them all away.
+      const emptyWhy = titles
+        ? null
+        : emptyBoardLine(
+            scene.vendor.name,
+            emptyBoardTally(
+              searchFactions,
+              (fid) => (fid ? getStanding(player.factionStanding, fid) : 0),
+              (player.activeHunts ?? []).map((h) => h.id),
+              player.completedHuntIds ?? [],
+              player.hpMax,
+            ),
+          );
       get().appendLog(
         'arbiter',
         asked && why
           ? `${scene.vendor.name} taps the posting. "${asked.title} — ${why}."`
           : titles
             ? `${scene.vendor.name} thumbs through papers. "Not that one. Currently posted: ${titles}."`
-            : `${scene.vendor.name} shakes their head. "No bounties for you right now."`,
+            : emptyWhy!,
+        // ⚠⚠ OTA-1474 — AND IT IS NEVER DEDUPED INTO SILENCE. OTA-947 already
+        // settled this rule — "a refusal must ALWAYS answer" — after eight
+        // identical salvage attempts drew one reply and seven suppressions. This
+        // site never got the flag, and his log is the same shape: twelve taps,
+        // ONE line, eleven `dedup: suppressed arbiter repeat`. From tap two
+        // onward the game answered him with nothing at all, which is exactly why
+        // he kept tapping.
+        { skipDedup: true },
       );
       return;
     }
