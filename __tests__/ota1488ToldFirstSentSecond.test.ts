@@ -116,6 +116,15 @@ describe('OTA-1488 — the popup says and shows what the owner asked', () => {
     expect(OVERLAY).toMatch(/notice once|one[- ]?time/i);
   });
 
+  it('⚠⚠ the screenshot is sized in WINDOW pixels, never a bare percentage', () => {
+    // The first shipped cut styled it `width: '100%'` inside a card with no
+    // determinate width, so RN used the image's NATIVE 1020px and the owner
+    // got one corner of a 2.4×-screen-wide picture ("waaaaaaaay to big").
+    expect(OVERLAY).toContain('useWindowDimensions');
+    expect(OVERLAY).toContain('{ width: shotW, height: shotH }');
+    expect(OVERLAY).not.toMatch(/shot:\s*\{[^}]*width:\s*'100%'/);
+  });
+
   it('⚠ it is mounted globally in App.tsx, inside a SilentBoundary', () => {
     expect(APP).toContain('<CrashReportNoticeOverlay />');
     expect(between(APP, 'SilentBoundary tag="CrashReportNoticeOverlay"', '</SilentBoundary>'))

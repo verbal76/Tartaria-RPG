@@ -24534,7 +24534,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // is (SETTINGS -> SESSION -> REPORTING, row framed), offers TURN OFF and
 // KEEP ON, and GATES the first send — the boot flush waits until the
 // notice is dismissed, so every player is told before the first byte leaves.
-export const OTA_BUILD_ID = '2026-08-24-1488-told-first-sent-second';
+// OTA-1489 — SEND LOG TO SENTRY (owner-gated): one tap ships the whole
+// stamped log as an event attachment, replacing the four-part clipboard
+// relay. Renders only for the unlock names; obeys the crash-reports
+// switch (OFF = the app contacts Sentry for nothing, this included);
+// past the cap the TAIL survives.
+export const OTA_BUILD_ID = '2026-08-24-1489-one-tap-instead-of-four-slices';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1488-told-first-sent-second';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1487-opt-out-not-opt-in';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1486-wield-is-not-wear';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1485-the-chip-joins-the-tap-ledger';

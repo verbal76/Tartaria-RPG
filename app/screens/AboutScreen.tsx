@@ -37,6 +37,8 @@ import { composeAndSendBugReport } from '../diagnostics/bugReport';
 import {
   loadReportingPref, setReportingEnabled, reportingStatusLine, reportingConfigured,
 } from '../diagnostics/crashReporter';
+import { sendDiagnosticsBundle } from '../diagnostics/sentryTransport'; // OTA-1489
+import { sharingUnlockedFor } from '../engine/fallenLedger'; // OTA-1489 — owner gate
 import { getAudioSettings, setAudioSettings, onAudioSettingsChange, type AudioSettings } from '../audio/audioSettings';
 import { forceReapplyAudioFromState } from '../audio/AudioController';
 import {
@@ -124,6 +126,8 @@ export function AboutScreen() {
   const [logCharCount, setLogCharCount] = useState(0);
   const [logCopied, setLogCopied] = useState(false);
   const [logCleared, setLogCleared] = useState(false);
+  // OTA-1489 — SEND LOG button lifecycle (owner-gated; see the render site).
+  const [logSendState, setLogSendState] = useState<'idle' | 'busy' | 'sent' | 'failed'>('idle');
   // Manual SAVE button feedback. 'saving' while the write runs, then a 'saved'
   // / 'failed' flash reflecting whether the atomic write actually landed.
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'failed'>('idle');
@@ -222,6 +226,30 @@ export function AboutScreen() {
     setBackupState(result === 'ok' ? 'done' : 'failed');
     setTimeout(() => setBackupState('idle'), 3000);
   };
+  // ⚠ OTA-1489 — the WHOLE PICTURE in one tap ("game log, inventory log, save
+  // file, about information all at one time"). Each part is composed by the
+  // SAME function its COPY button uses — one derivation per artifact, so what
+  // arrives at Sentry can never disagree with what a clipboard export says.
+  // Same freshness discipline as COPY LOG: flush the batched writes first.
+  async function handleSendLog() {
+    setLogSendState('busy');
+    try {
+      await flushLogWrites();
+      const fresh = await readFullLog();
+      const s = useGameStore.getState();
+      const device = buildBasicDeviceSummary();
+      const ok = await sendDiagnosticsBundle({
+        log: stampLogExport(fresh),
+        inventory: stampInventoryExport(buildInventorySnapshot(s.player), device, s.player?.name),
+        save: stampSaveExport(buildSaveSnapshot(s.player, s.worldMemory), device, s.player?.name),
+        device,
+      });
+      setLogSendState(ok ? 'sent' : 'failed');
+    } catch {
+      setLogSendState('failed');
+    }
+    setTimeout(() => setLogSendState('idle'), 3500);
+  }
   async function handleCopyLog() {
     try {
       await flushLogWrites();
@@ -942,6 +970,29 @@ export function AboutScreen() {
               </Text>
             </TouchableOpacity>
           </View>
+          {/* ⚠⚠ OTA-1489 — SEND LOG, the owner's tool ("it's easier than copying
+              slices"). Renders ONLY for the unlock names — the privacy policy
+              promises players that nothing but crash records leaves their
+              device, and a log carries what they typed, so players never see
+              this affordance. It also obeys the crash-reports switch: OFF means
+              the app contacts Sentry for nothing, this included. */}
+          {sharingUnlockedFor(player?.name) && crashConfigured && (
+            <TouchableOpacity
+              style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+              onPress={() => { void handleSendLog(); }}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="Send the full game log to Sentry"
+              disabled={logSendState === 'busy'}
+            >
+              <Text style={styles.sessionBtnSecondaryText}>
+                {logSendState === 'busy' ? 'SENDING LOG…'
+                  : logSendState === 'sent' ? '✓ LOG SENT TO SENTRY'
+                  : logSendState === 'failed' ? '✗ SEND FAILED — USE COPY LOG'
+                  : 'SEND LOG TO SENTRY'}
+              </Text>
+            </TouchableOpacity>
+          )}
           {/* arb172 — rarely-needed clipboard dumps tucked behind a toggle so the
               page isn't a wall of COPY buttons. COPY SAVE = the loadable save for
               brick-repro; COPY INVENTORY = the pack snapshot for balance reports. */}

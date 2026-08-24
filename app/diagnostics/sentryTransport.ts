@@ -34,13 +34,17 @@
  */
 import Constants from 'expo-constants';
 import type { CrashRecord } from './crashLedger';
-import { crashReportDsn, installCrashTransport } from './crashReporter';
+import { crashReportDsn, installCrashTransport, reportingEnabled } from './crashReporter';
+import { OTA_BUILD_ID } from '../buildInfo';
 
 /** Minimal shape of the bits of the SDK this file uses. Declared rather than
  *  imported so the type does not drag the module into the bundle graph. */
 interface SentryLike {
   init: (opts: Record<string, unknown>) => void;
-  captureEvent: (event: Record<string, unknown>) => void;
+  // ⚠ OTA-1489 — the optional second argument is the SDK's event HINT; its
+  // `attachments` array is how a whole game log rides along with one event.
+  // Same runtime function, wider type — crash records keep calling it 1-arg.
+  captureEvent: (event: Record<string, unknown>, hint?: Record<string, unknown>) => void;
   setTag?: (key: string, value: string) => void;
 }
 
@@ -159,6 +163,74 @@ export function installSentryIfAvailable(): boolean {
   } catch {
     // A diagnostic that throws on the way up is worse than no diagnostic.
     return false;
+  }
+}
+
+// ⚠⚠ OTA-1489 — SEND LOG: the WHOLE PICTURE to Sentry, on one deliberate tap.
+//
+// Owner: *"are we able to have logs pushed to sentry for you to view? it's
+// easier than copying slices"* — and then: *"have the log include the game
+// log, inventory log, save file, about information all at one time so you
+// always see the whole picture."* So one event carries FOUR attachments:
+//
+//   game-log.txt   — the stamped full log (tail-capped; recent lines are the
+//                    evidence, the head of an enormous log was already fixed)
+//   inventory.txt  — the same stamped snapshot COPY INVENTORY exports
+//   save.json      — the same loadable export COPY SAVE produces. ⚠ NEVER
+//                    truncated: a cut save does not round-trip, and a save
+//                    that cannot be loaded is dead weight, not evidence.
+//   device.txt     — the basic device / install summary (the About picture)
+//
+// Attachments, not message/extra fields, because Sentry truncates long strings
+// in those; files arrive whole.
+//
+// ⚠⚠ TWO GATES, NEITHER OPTIONAL:
+//   · `reportingEnabled()` — the privacy policy says that with the crash-
+//     reports switch off "the app never contacts Sentry at all, not even to
+//     check in." This send is contacting Sentry; the switch governs it too.
+//   · The BUTTON that calls this renders only for the owner's unlock names
+//     (`sharingUnlockedFor`, the fallen-exchange gate). The policy promises
+//     players that only crash records leave; a player-facing upload of their
+//     log and save would break that promise, so players never see it at all.
+const LOG_ATTACHMENT_MAX_CHARS = 800_000;
+
+export interface DiagnosticsBundle {
+  /** Stamped full game log — the play-by-play. */
+  log: string;
+  /** Stamped inventory snapshot. */
+  inventory: string;
+  /** Stamped loadable save export. Sent WHOLE, never cut. */
+  save: string;
+  /** The basic device / install summary. */
+  device: string;
+}
+
+export async function sendDiagnosticsBundle(bundle: DiagnosticsBundle): Promise<boolean> {
+  try {
+    if (!reportingEnabled()) return false;
+    const s = loadSdk();
+    if (!s || crashReportDsn() === null) return false;
+    const logTail = bundle.log.length > LOG_ATTACHMENT_MAX_CHARS
+      ? bundle.log.slice(-LOG_ATTACHMENT_MAX_CHARS)
+      : bundle.log;
+    s.captureEvent(
+      {
+        message: `player-log ${OTA_BUILD_ID}`,
+        level: 'info',
+        tags: { kind: 'player-log', line: productLine() },
+      },
+      {
+        attachments: [
+          { filename: 'game-log.txt', data: logTail, contentType: 'text/plain' },
+          { filename: 'inventory.txt', data: bundle.inventory, contentType: 'text/plain' },
+          { filename: 'save.json', data: bundle.save, contentType: 'application/json' },
+          { filename: 'device.txt', data: bundle.device, contentType: 'text/plain' },
+        ],
+      },
+    );
+    return true;
+  } catch {
+    return false; // the button shows FAILED and the clipboard path still exists
   }
 }
 

@@ -18,13 +18,22 @@
 // opted out) and who have not seen it, once. A player with a recorded OFF —
 // from any version — never sees it, because for them nothing changed.
 import React, { useEffect, useState } from 'react';
-import { Modal, View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { Modal, View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
 import {
   crashNoticeNeeded, markCrashNoticeSeen, setReportingEnabled, flushCrashReports,
 } from '../diagnostics/crashReporter';
 
 export function CrashReportNoticeOverlay() {
   const [visible, setVisible] = useState(false);
+  // ⚠⚠ OTA-1489 — EXPLICIT PIXELS, NOT A PERCENTAGE. The first shipped cut
+  // styled the screenshot `width: '100%'` — but inside this card nothing above
+  // it has a determinate width, so React Native fell back to the image's
+  // NATIVE size (1020px) and the owner got a popup showing one corner of a
+  // 2.4×-screen-wide picture ("waaaaaaaay to big"). Width is now computed
+  // from the window and the height from the asset's real 1020×770 ratio.
+  const { width: windowW } = useWindowDimensions();
+  const shotW = Math.min(windowW - 44, 560); // card padding ×2; sane cap on tablets
+  const shotH = Math.round(shotW * (770 / 1020));
 
   useEffect(() => {
     let live = true;
@@ -64,7 +73,7 @@ export function CrashReportNoticeOverlay() {
             </Text>
             <Image
               source={require('../../assets/crash-notice-where.png')}
-              style={styles.shot}
+              style={[styles.shot, { width: shotW, height: shotH }]}
               resizeMode="contain"
               accessibilityLabel="The Settings screen, Session tab, Reporting section, with the Automatic Crash Reports row and its ON switch highlighted"
             />
@@ -109,7 +118,7 @@ const styles = StyleSheet.create({
   rule: { height: 1, backgroundColor: '#3a4448', marginVertical: 14, marginHorizontal: 40 },
   body: { color: '#d8cfc0', fontSize: 15, lineHeight: 23, marginBottom: 12 },
   shot: {
-    width: '100%', aspectRatio: 1020 / 770, borderRadius: 4,
+    alignSelf: 'center', borderRadius: 4,
     borderWidth: 1, borderColor: '#4a4136', marginBottom: 12,
   },
   fine: { color: '#a2977b', fontSize: 12, lineHeight: 18, marginBottom: 16 },
