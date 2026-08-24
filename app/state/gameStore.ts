@@ -209,7 +209,7 @@ import { playerGridCell } from './playerGrid';
 // ⚠ `fleeLine` is a FUNCTION rather than a pool because the indoor/outdoor
 // choice is itself a claim worth testing — see its header.
 import {
-  UNRESOLVED_HOOK_LINES, DOG_SETTLE_LINES, TAKE_LINES, fleeLine,
+  UNRESOLVED_HOOK_LINES, DOG_SETTLE_LINES, TAKE_LINES, fleeLine, returnLine,
 } from '../engine/voicePools';
 // ⚠ OTA-1459 — the bounty nudge's in-game-hours cooldown.
 import { takeBountyNudge } from '../engine/arbiterNudge';
@@ -11006,11 +11006,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // have created the record as a visitCount-0 shell to hang their table on;
     // greeting off bare existence read every first entry as a return.
     if (existing && existing.visitCount >= 1) {
-      const tag = existing.visitCount >= 5 ? 'many times' : existing.visitCount >= 2 ? 'again' : 'before';
+      // ⚠⚠⚠ OTA-1467 — NO COUNTER. Owner: *"instead of saying 'hey, I've been
+      // here before' — you can't say 'this is my second time here'. I think I've
+      // been here more than once cuz you're saying the same thing. find some
+      // other kind of flavour."*
+      //
+      // The old line was `You've stood here ${tag}. (visit ${n})` — seven words,
+      // three possible tags, and a debug readout on the end. It fires on every
+      // re-entry to every tile, which makes it the most repeated string in the
+      // game on his own logs.
+      //
+      // ⚠ `returnLine` takes the count and returns PROSE, so there is no
+      // argument a caller can leak to the screen. Same reasoning as `fleeLine`:
+      // a decision with no name can only be tested through the text around it.
       const clearedNote = recentlyCleared
         ? ` The bodies you left are still here. Nothing has moved in to replace them.`
         : '';
-      get().appendLog('world', `You've stood here ${tag}. (visit ${existing.visitCount + 1})${clearedNote}`);
+      get().appendLog('world', `${returnLine(existing.visitCount)}${clearedNote}`);
       // Tourist-and-Vandal persistence — surface the room's leftover
       // state from prior visits so the narration reflects what's
       // actually on disk. Dropped items show as a "still on the

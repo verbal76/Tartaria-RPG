@@ -306,3 +306,122 @@ export function fleeLine(indoors: boolean): string {
     ? rotatingPick(FLEE_INDOOR_LINES, 'flee-indoor')
     : rotatingPick(FLEE_OPEN_LINES, 'flee-open');
 }
+
+/**
+ * ⚠⚠⚠ OTA-1467 — COMING BACK SOMEWHERE, WITHOUT RECITING A NUMBER.
+ *
+ * Owner: *"instead of saying 'hey, I've been here before' — you can't say 'this
+ * is my second time here'. I think I've been here more than once cuz you're
+ * saying the same thing. find some other kind of flavour."*
+ *
+ * The line was `You've stood here ${tag}. (visit ${n})` — one sentence, three
+ * possible tags, and a literal counter bolted on the end. It fires on EVERY
+ * re-entry to EVERY tile, which on his own logs is the single most frequent
+ * string in the game: he crosses the same ground constantly, and every crossing
+ * printed the same seven words and a number.
+ *
+ * ⚠⚠ THE COUNTER IS THE PART HE OBJECTED TO, AND IT IS THE PART THAT LOOKS LIKE
+ * INFORMATION. "(visit 2)" is a debug readout wearing narration's clothes: it
+ * tells the player something the character would never think, in a register
+ * nothing else in the game uses. Familiarity is a FEELING — the ground knows
+ * your weight, you stop reading the walls, you catch yourself taking the same
+ * line through the rubble. None of that needs an integer.
+ *
+ * ⚠ Three tiers because returning twice and returning twelve times are different
+ * experiences, and the old code already knew that (before / again / many times)
+ * — it just spent the distinction on one adjective. Angles rotate the way
+ * UNRESOLVED_HOOK_LINES does: the ground · the body · what changed · what did
+ * not · time · your own habits · the company you keep.
+ */
+
+/** Second time here. The recognition is still an event. */
+export const RETURN_AGAIN_LINES: readonly string[] = Object.freeze([
+  // recognition
+  'You have been here. The shape of it comes back before the details do.',
+  'Something about this ground is already familiar.',
+  'You know this place. Not well, but you know it.',
+  'The look of it lands a half-second before the memory does.',
+  'You have stood on this exact patch of ground before.',
+  // the body
+  'Your feet find the dry line without being asked.',
+  'You step around something that is no longer there.',
+  'Your shoulders drop a fraction. Whatever this place is, it is not new.',
+  'You breathe easier here than you did the first time.',
+  'Some part of you already knew where the footing was bad.',
+  // what changed
+  'The mud has moved since you were last through. Not much. Some.',
+  'Something has shifted here, and you cannot say what.',
+  'It is a little emptier than you remember, or you are.',
+  'The light is different. The place is not.',
+  'Whatever was making the noise last time has stopped.',
+  // what did not
+  'Nothing here has bothered to change on your account.',
+  'Same silt, same lean, same everything.',
+  'The place has been waiting exactly where you left it.',
+  'It has not aged a day, which in Tartaria means nothing at all.',
+  'Everything is where it was. That is either comfort or warning.',
+  // time
+  'It has been a while. Not long enough for the ground to forget you.',
+  'Days have gone by out there. In here it may as well be the same afternoon.',
+  'Time has passed. This ground has no opinion on it.',
+  // your own habits
+  'You catch yourself walking the same line through the wreckage.',
+  'You look for the same landmark you looked for last time, and find it.',
+  'You almost check a corner you have already checked.',
+  'You do not bother reading the walls. You read them already.',
+  // the company
+  'Pike lifts his head, then puts it down. He has been here too.',
+  'The quiet here is one you have already learned the shape of.',
+  'You have an opinion about this place now. That is new.',
+]);
+
+/** Many visits. Familiarity has curdled into routine. */
+export const RETURN_FAMILIAR_LINES: readonly string[] = Object.freeze([
+  // routine
+  'You could walk this stretch with your eyes shut, and nearly do.',
+  'This ground has stopped being a place and started being a route.',
+  'You know this patch better than you ever meant to.',
+  'You stopped looking at this place some visits ago.',
+  'Familiar to the point of invisibility.',
+  // the body
+  'Your feet do the thinking here. You are just along for it.',
+  'You cross it without deciding to.',
+  'No part of you tenses any more. Whether that is wisdom or habit is not clear.',
+  'You are through it before you notice you have started.',
+  // wear
+  'Your own tracks are still here, layered over each other.',
+  'The ground remembers you in the plural.',
+  'There is a path worn here now, and it is yours.',
+  'Whatever this place was to you the first time, it is furniture now.',
+  // the cost of knowing
+  'Nothing about this ground can surprise you, which is its own kind of danger.',
+  'You have taken everything worth taking from here, and then some.',
+  'You have run out of questions to ask this place.',
+  'The novelty went a long time ago. The mud stayed.',
+  // time
+  'You measure your time out here partly in crossings of this ground.',
+  'This place has become one of the things your days are made of.',
+  'It goes on being here, and you go on coming back.',
+]);
+
+/**
+ * ⚠⚠ THE PICKER, AND THE REASON THE TIERS LIVE IN HERE. `visitCount` is a
+ * number, and every previous version of this line let the number leak to the
+ * player. Handing it to a function that returns PROSE and nothing else makes
+ * that structurally impossible — there is no argument a caller can pass through
+ * to the screen. Same reasoning as `fleeLine`: the decision had no name, so the
+ * only thing a test could reach for was the text around it.
+ *
+ * ⚠ `visitCount` is the number of PRIOR visits, so 1 means "this is the second
+ * time". The old call site read `visitCount + 1` to build its counter, which is
+ * exactly the off-by-one that made OTA-1104's phantom shell record surface as
+ * "(visit 2)" on a first entry.
+ */
+export const RETURN_MANY_THRESHOLD = 5;
+
+export function returnLine(visitCount: number): string {
+  const n = Number.isFinite(visitCount) ? visitCount : 1;
+  return n >= RETURN_MANY_THRESHOLD
+    ? rotatingPick(RETURN_FAMILIAR_LINES, 'return-familiar')
+    : rotatingPick(RETURN_AGAIN_LINES, 'return-again');
+}

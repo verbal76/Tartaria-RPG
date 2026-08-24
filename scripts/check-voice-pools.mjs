@@ -57,6 +57,11 @@ const POOLS = [
   { name: 'TAKE_LINES', floor: FLOOR_CONSTANT, why: '~15 fires/session — was 1 line' },
   { name: 'FLEE_OPEN_LINES', floor: FLOOR_CONSTANT, why: '~9 fires/session — was 1 line' },
   { name: 'FLEE_INDOOR_LINES', floor: FLOOR_FREQUENT, why: 'the indoor half of the same beat' },
+  // ⚠ OTA-1467 — the most repeated string in the game on the owner's own logs:
+  // it fires on EVERY re-entry to EVERY tile, and he re-crosses ground
+  // constantly. Was one sentence with a counter bolted on the end.
+  { name: 'RETURN_AGAIN_LINES', floor: FLOOR_CONSTANT, why: 'every tile re-entry — was 1 line + "(visit N)"' },
+  { name: 'RETURN_FAMILIAR_LINES', floor: FLOOR_FREQUENT, why: 'the well-trodden half of the same beat' },
 ];
 
 const SRC = fs.readFileSync(path.join(ROOT, 'app/engine/voicePools.ts'), 'utf8');
