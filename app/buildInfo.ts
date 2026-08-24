@@ -24493,7 +24493,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // typed sentence that comes back rejected teaches "typing does not work here",
 // which is the opposite of the lesson. The tutorial name beat and combat keep
 // their own wording, because there the player already has one thing to look at.
-export const OTA_BUILD_ID = '2026-08-24-1469-the-course-banner-tells-the-truth';
+// ⚠⚠ OTA-1482 — THE BUILD SAYS WHICH BUILD IT IS, AND A GATE NOW HOLDS IT TO THAT.
+//
+// Owner, from the device: *"I'm only on OTA 1469 and it says fully up to date."*
+// Both halves were TRUE. The updater had delivered every bundle through 1481 —
+// eleven publish runs, all green — but this constant is what the game DISPLAYS,
+// and no session since 1469 had stamped it. The bundles shipped wearing the old
+// badge, and the just-updated toast (bootSlice keys it on this value changing)
+// never fired, so from the phone it looked exactly like no update ever arriving.
+//
+// The same defect class as the compass and the tier ladder: one fact — "which
+// OTA is this" — derived twice, in the commit title and in this constant, with
+// nothing tying them. The tie is now `check:otastamp`: the number in this id
+// must equal the highest OTA suite in __tests__/, which every OTA creates in
+// the same commit. Forgetting the stamp fails the gate, not the player.
+//
+// ⚠ OTAs 1470–1480 SHIPPED UNDER THE 1469 STAMP — they are real, applied, and
+// live on devices that report 1469. Recorded here because a save exported from
+// that window names a build it is newer than.
+export const OTA_BUILD_ID = '2026-08-24-1482-the-build-says-which-build-it-is';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1469-the-course-banner-tells-the-truth';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1460-what-you-did-outranks-what-we-say';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1459-one-thought-at-a-time';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-23-1458-where-you-actually-are';

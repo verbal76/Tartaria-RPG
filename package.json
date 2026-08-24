@@ -26,6 +26,7 @@
     "check:verbreach": "node scripts/check-verb-reach.mjs",
     "check:chevrons": "node scripts/check-chevrons.mjs",
     "check:standingat": "node scripts/check-standing-at.mjs",
+    "check:otastamp": "node scripts/check-ota-stamp.mjs",
     "check:voicepools": "node scripts/check-voice-pools.mjs",
     "check:slicepins": "node scripts/check-slice-pins.mjs",
     "check:guardianclaims": "node scripts/check-guardian-claims.mjs"
