@@ -1123,3 +1123,140 @@ export function guardianDefeatLine(def: CoreGuardianDef, coresRecovered: number)
 export function guardianRebukeLine(def: CoreGuardianDef): string {
   return def.rebukeLine;
 }
+
+/**
+ * ⚠⚠⚠ OTA-1471 — TWO SEATS THE ATLAS PUT NEXT DOOR TO EACH OTHER.
+ *
+ * THE OWNER, 2026-08-24, after taking Drakova and Voronov back to back:
+ *
+ *   "why do we have some of the core guardians so close together, I think my
+ *    2 fights were what 2 blocks apart?"
+ *
+ * He counted exactly right, and the measurement is worth writing down because
+ * it decides what this fix is allowed to be. On the canonical grid:
+ *
+ *   drakova   (52,19)          voronov  (52,21)        2.00 tiles apart
+ *   next closest pair          asgardar ↔ iskan_veil   4.24
+ *   then                       asgardar ↔ samarran     5.10
+ *                              yuldra_tul ↔ ostragar   5.39
+ *                              nimari ↔ karok_sa       5.83
+ *   median of all 36 pairs                            16.55
+ *   farthest pair                                     34.06
+ *
+ * Every Capital's nearest neighbour sits between 4.24 and 5.83 — except this
+ * one pair, at 2.00. It is a lone outlier, not a cluster, and at 12% of the
+ * median it is less than half the next-tightest gap in the game.
+ *
+ * ⚠⚠ AND THE ATLAS IS NOT WRONG. Checked rather than assumed, because "move the
+ * pin" was the obvious first answer. Drakova sits at atlas fraction (0.77,0.47)
+ * and Voronov at (0.78,0.56) — 89 pixels apart on a 1619×971 painting, which is
+ * where the artwork actually puts them. The grid's SPREAD_X/SPREAD_Y (40/22 ≈
+ * 1.82) tracks the painting's own aspect (1.67) closely enough that correcting
+ * it moves this pair by zero tiles. The pins are calibrated to painted
+ * landmarks and they are faithful. There is no coordinate bug to fix.
+ *
+ * ⚠⚠⚠ SO WHAT BROKE IS AN ASSUMPTION, NOT A NUMBER. This module scales
+ * difficulty by KILL COUNT (`tierForKills`) precisely so the player's choice of
+ * order is preserved — see the header. That curve quietly assumes a JOURNEY
+ * happens between seats: you travel, you fight things, you bank gear, and you
+ * arrive at T2 as a bigger character than the one who beat T1. For 35 of the 36
+ * pairs that assumption holds. For this one it does not, and the player can go
+ * T1 → T2 inside two minutes having gained nothing but the T1 drops.
+ *
+ * ⚠ THE FIX IS A SETTLE WINDOW, AND THE NUMBER IS ONE REST — NOT A WALK.
+ *
+ * ⚠⚠ THE FIRST DERIVATION OF THIS CONSTANT WAS WRONG, AND THE MAIN-QUEST WALKER
+ * CAUGHT IT. Worth writing down, because the mistake is a tempting one. It ran
+ * the pair distances through `travelTime.HOURS_PER_TILE_TRUE` (2.5) — 2.00 tiles
+ * → 5.0 h, 4.24 tiles → 10.6 h — and reported that 8 h sat neatly between the
+ * outlier and the shortest real journey. But that constant is a DEADLINE
+ * ALLOWANCE, walking plus the rests walking forces; this gate reads the WORLD
+ * CLOCK, which walking advances by `TILE_HOURS` (0.25) and nothing else. Against
+ * the clock the same distances read:
+ *
+ *   drakova ↔ voronov        2.00 tiles →  0.50 h
+ *   shortest real journey    4.24 tiles →  1.06 h
+ *   median journey          16.55 tiles →  4.14 h
+ *   longest crossing        34.06 tiles →  8.51 h
+ *
+ * No ordinary journey clears eight hours ON FOOT — only the single longest
+ * crossing on the map does. Comparing against `travelHoursFor` had dressed a
+ * felt number up as a derived one, and two numbers that mean different things is
+ * exactly how a false derivation survives its own review.
+ *
+ * ⚠⚠⚠ THE HONEST RULE IS "SLEEP ON IT", NOT "WALK IT OFF", and eight is precisely
+ * that: the parser rest advances the clock by a fixed EIGHT HOURS (see
+ * travelTime's derivation — "min(room, 8) over a fixed 8 hours"). One rest clears
+ * the window exactly, always, for every character at every stamina cap. Between
+ * two tier-scaled boss fights a player wants full HP and stamina anyway, so the
+ * gate makes explicit what good play already does; and any crossing past ~8 tiles
+ * forces a rest through the stamina economy regardless — the median journey costs
+ * 33 stamina against a tank that floors at 12 + STR/2.
+ *
+ * ⚠ So it is ONE ACTION, universally available, that the player was almost
+ * certainly about to take. Not a distance, not a chore, and nothing they can
+ * fail.
+ *
+ * ⚠ IT IS NOT A WALL AND IT MUST NOT BECOME ONE. Nothing is blocked, nothing is
+ * lost, no route is closed: the seat opens on its own after a night. A Guardian
+ * ALREADY standing in the scene — the player fled and came back — is untouched,
+ * because that is a fight in progress and not a fresh manifestation.
+ */
+
+/** ⚠ In-game hours the grid needs after a Core is torn out of it. See above for
+ *  where 8 comes from; it is the one dial worth turning if the pacing wants it. */
+export const CORE_SETTLE_HOURS = 8;
+
+export interface CoreSettleState {
+  /** Will a Guardian manifest right now? */
+  ready: boolean;
+  /** In-game hours still to run. 0 when ready. */
+  hoursLeft: number;
+}
+
+/**
+ * ⚠ ONE DERIVATION OF "IS THE GRID SETTLED", called by the action AND by both
+ * SUMMON chips. Two definitions of one fact is how a lit button comes to refuse
+ * — the exact defect OTA-1324 was written for, four taps and four walls in
+ * seventy seconds.
+ *
+ * `lastCoreAtHours` is absent for a player who has taken no Core yet and for
+ * every save predating this OTA. Both mean READY: the first seat has nothing to
+ * settle from, and an existing character must never wake up newly blocked.
+ */
+export function coreSettleState(
+  hoursElapsed: number,
+  lastCoreAtHours: number | null | undefined,
+): CoreSettleState {
+  if (lastCoreAtHours == null || !Number.isFinite(lastCoreAtHours)) {
+    return { ready: true, hoursLeft: 0 };
+  }
+  const now = Number.isFinite(hoursElapsed) ? hoursElapsed : 0;
+  // ⚠ A clock that ran BACKWARDS (a restored backup, a repaired save) reads as
+  // settled rather than as a negative wait. Refusing on corrupt arithmetic would
+  // strand the main quest, and stranding it is far worse than one early summon.
+  const elapsed = now - lastCoreAtHours;
+  if (!(elapsed >= 0)) return { ready: true, hoursLeft: 0 };
+  const left = CORE_SETTLE_HOURS - elapsed;
+  return left <= 0 ? { ready: true, hoursLeft: 0 } : { ready: false, hoursLeft: left };
+}
+
+/** Hours as a player reads them — never "0.5h", never a raw float. */
+export function settleWaitPhrase(hoursLeft: number): string {
+  const h = Math.max(0, hoursLeft);
+  if (h < 1) return 'less than an hour';
+  const whole = Math.round(h);
+  return whole === 1 ? 'about an hour' : `about ${whole} hours`;
+}
+
+/**
+ * ⚠ WHAT THE PLAYER IS TOLD, and it says the three things a refusal owes them:
+ * what is happening, how long it lasts, and what they can do about it. OTA-220's
+ * rule — "a player once tapped fuse 5× not knowing" — applies to every wall in
+ * the game, and a Guardian that simply failed to appear would be the worst kind.
+ */
+export function coreSettleLine(capitalName: string, hoursLeft: number): string {
+  return `The Core-hum here is ragged — the grid is still closing over the seat you emptied. `
+    + `No Guardian will rise at ${capitalName} for ${settleWaitPhrase(hoursLeft)} yet. `
+    + `Rest the night, or put the time to use; the seat will open on its own.`;
+}

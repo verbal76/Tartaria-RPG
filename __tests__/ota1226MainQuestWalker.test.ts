@@ -63,7 +63,7 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { LOST_CAPITAL_LOCATIONS, canStayAtTheNexus, ensureMainQuest } from '../app/engine/mainQuest';
-import { isCoreGuardian } from '../app/engine/coreGuardians';
+import { isCoreGuardian, coreSettleState } from '../app/engine/coreGuardians';
 import { STORY_MOTIVE_IDS } from '../app/engine/story';
 import type { MainQuestEnding } from '../app/engine/types';
 
@@ -179,6 +179,12 @@ describe('OTA-1226 — the main quest walker: creation to credits, nine factions
       expect(mq().phase).toBe('hook');
 
       // ── The nine Capitals, in canon order ──
+      // ⚠ OTA-1471 — how many seats actually made this walk sleep. Counted so
+      // the settle block below cannot quietly become a no-op: if the walk's own
+      // clock ever outruns the window on every capital, the `if` stops firing
+      // and the coverage evaporates without a single test going red. An empty
+      // result is a failure, never a clean board.
+      let seatsThatMadeHimWait = 0;
       for (const capital of LOST_CAPITAL_LOCATIONS) {
         // Trap #9 — the REAL arrival, with every trigger it carries.
         store.getState().travelTo(capital);
@@ -195,6 +201,41 @@ describe('OTA-1226 — the main quest walker: creation to credits, nine factions
             enemies: [], enemyHps: [], hooks: [], range: null, enemiesAtBase: false,
           },
         });
+        // ⚠⚠⚠ OTA-1471 — THE WALKER HAS TO SLEEP BETWEEN SEATS, because a real
+        // player now does. Drakova and Voronov sit 2 tiles apart against a
+        // 16.55-tile median, and difficulty is keyed to KILL COUNT, so a Core's
+        // removal now shuts the next seat for one rest — a fixed 8 in-game hours.
+        // This walker teleports with `travelTo`, which advances no clock at all,
+        // so before this block it took all nine Guardians in zero hours and the
+        // new gate refused seats two through nine. THAT REFUSAL WAS CORRECT; the
+        // walker was the thing modelling the world wrongly.
+        //
+        // ⚠ The rule is COVERED, not routed around. The assertion here proves the
+        // summon is refused BEFORE the rest and accepted after, on every capital
+        // of every faction — nine factions × eight seats, which makes this walk
+        // the widest coverage the settle gate has. Winding the clock forward
+        // silently would have deleted that.
+        {
+          // ⚠ ASK THE HELPER WHETHER THE GATE APPLIES, don't assume it does.
+          // The first draft asserted a refusal on every capital after the first
+          // and failed at Drakova, because the walk's own clock had already run
+          // past the window by then (arrivals and fights advance it). That was
+          // the instrument inventing a precondition. The real claim is that the
+          // ACTION and the HELPER agree — which is checkable wherever the gate
+          // happens to bite, and is silent where it does not.
+          const pNow = store.getState().player!;
+          if (!coreSettleState(pNow.hoursElapsed ?? 0, pNow.mainQuest?.lastCoreAtHours).ready) {
+            const tooSoon = store.getState().summonCoreGuardian();
+            expect({ capital, refusedBeforeRest: tooSoon.reason })
+              .toEqual({ capital, refusedBeforeRest: 'core_settling' });
+            seatsThatMadeHimWait++;
+            // One rest. The parser rest's fixed 8 hours, applied straight to the
+            // clock so the walk need not route through the rest handler.
+            useGameStore.setState((s) => ({
+              player: { ...s.player!, hoursElapsed: (s.player!.hoursElapsed ?? 0) + 8 },
+            }));
+          }
+        }
         const res = store.getState().summonCoreGuardian();
         expect({ faction: faction.id, capital, summon: res.ok }).toEqual({ faction: faction.id, capital, summon: true });
         await settle(() => (store.getState().currentScene?.enemies ?? []).some((e) => isCoreGuardian(e)));
@@ -221,6 +262,13 @@ describe('OTA-1226 — the main quest walker: creation to credits, nine factions
         // The Core is a real ITEM in the pack, not just a counter.
         expect(store.getState().player!.inventory.some((i) => i.name === CORE_NAMES[capital])).toBe(true);
       }
+
+      // ⚠ OTA-1471 — and the settle gate really did bite on this walk. Without
+      // this line the block above is free to become a silent no-op the day the
+      // walk's clock changes, and nine green rows would say the rule is covered
+      // when nothing had exercised it.
+      expect({ faction: faction.id, seatsThatMadeHimWait: seatsThatMadeHimWait > 0 })
+        .toEqual({ faction: faction.id, seatsThatMadeHimWait: true });
 
       // Nine Cores → the Stair opens.
       expect(mq().coresRecovered.length).toBe(9);

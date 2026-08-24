@@ -91,12 +91,35 @@ const roomCounts = (): Record<string, number> => {
 // ⚠ Now it recognises the greeting by MEMBERSHIP IN THE RETURN POOLS. That is
 // the actual identity of the thing: whatever words the pools happen to hold,
 // a return greeting is a line drawn from them, and a first entry produces none.
-const RETURN_POOL = new Set<string>([...RETURN_AGAIN_LINES, ...RETURN_FAMILIAR_LINES]);
-const stoodLines = (): string[] => useGameStore.getState().gameLog
-  // The store may append a cleared-bodies note to the greeting, so a line
-  // COUNTS if it starts with a pool entry rather than equalling one.
-  .filter((e) => [...RETURN_POOL].some((l) => e.text.startsWith(l)))
-  .map((e) => e.text);
+//
+// ⚠⚠ AND THE FIRST REBUILD OF THIS HELPER WAS ALSO WRONG, in a way worth writing
+// down because it is the third instrument mistake in the same family. It used
+// `startsWith`, on the reasoning that the store appends a cleared-bodies note to
+// the greeting — true, but only half the story. `appendLog` COALESCES consecutive
+// same-kind 'world' entries, so what actually reaches the log is one block:
+//
+//   Architect's Cell — The Reception. A clerical office with filing cabinets…
+//
+//   You have been here. The shape of it comes back before the details do.
+//
+//   Paths: north to Operations · south to First Landing.
+//
+// The greeting is a MIDDLE paragraph of a merged entry, so it has a prefix as
+// well as a suffix and `startsWith` found nothing — an empty result, reported as
+// "the game stopped greeting returns", when the game was greeting them fine. An
+// instrument that cannot tell ABSENT from NOT-WHERE-I-LOOKED is worse than none.
+const RETURN_POOL: readonly string[] = [...RETURN_AGAIN_LINES, ...RETURN_FAMILIAR_LINES];
+/** ⚠ The GREETING itself, lifted out of whatever block it was merged into — not
+ *  the containing entry. Downstream assertions ("no counter", "no digits") are
+ *  about the greeting, and running them against a whole scene block would test
+ *  the scene description instead. */
+const stoodLines = (): string[] => {
+  const out: string[] = [];
+  for (const e of useGameStore.getState().gameLog) {
+    for (const l of RETURN_POOL) if (e.text.includes(l)) out.push(l);
+  }
+  return out;
+};
 const move = async (cmd: string) => {
   useGameStore.getState().submitPlayerAction(cmd);
   await new Promise((r) => setTimeout(r, 700));
@@ -108,6 +131,18 @@ describe('OTA-1104 — a first visit is a first visit', () => {
     await useGameStore.getState().startNewGame({ name: 'Counter', raceId: 'reclaimer', factionId: 'conspiracy_architects' });
     useGameStore.getState().skipTutorial?.();
     await new Promise((r) => setTimeout(r, 400));
+  });
+
+  it('⚠⚠⚠ THE INSTRUMENT SELF-CHECKS FIRST — the pools are loaded and unambiguous', () => {
+    // A matcher that scans for substrings has two ways to lie, and both are
+    // checked here rather than assumed. An EMPTY pool would make every "no
+    // greeting" assertion below pass while measuring nothing; and one pool line
+    // contained inside another would make a single greeting count twice, which
+    // is exactly what `toHaveLength(1)` is relying on not to happen.
+    expect(RETURN_POOL.length).toBeGreaterThan(20);
+    const dupes = RETURN_POOL.filter((a, i) =>
+      RETURN_POOL.some((b, j) => i !== j && b.includes(a)));
+    expect(dupes).toEqual([]);
   });
 
   it('⚠ the opening scene counts ONE visit, greets nobody, and files under the HUB key', () => {
@@ -122,7 +157,7 @@ describe('OTA-1104 — a first visit is a first visit', () => {
     expect(stoodLines()).toHaveLength(0);
   });
 
-  it('⚠ first entry to a new room is silent at count 1; the RETURN greets "(visit 2)"', async () => {
+  it('⚠ first entry to a new room is silent at count 1; the RETURN is greeted', async () => {
     await move('go north'); // gate -> central, first time
     let counts = roomCounts();
     const centralKey = Object.keys(counts).find((k) => k.endsWith('@outpost_central'))!;
@@ -139,14 +174,28 @@ describe('OTA-1104 — a first visit is a first visit', () => {
     // recognition tier (this is the second visit, not a well-trodden one), and
     // it carries NO counter — which is what the owner objected to and what
     // OTA-1467 removed.
-    expect(RETURN_AGAIN_LINES.some((l) => lines[0]!.startsWith(l))).toBe(true);
+    expect(RETURN_AGAIN_LINES).toContain(lines[0]);
     expect(lines[0]).not.toMatch(/\(visit \d+\)/);
     expect(lines[0]).not.toMatch(/\d/);
 
-    await move('go north'); // central again
+    await move('go north'); // central again — a return to the OTHER room
     counts = roomCounts();
     expect(counts[centralKey]).toBe(2);
-    expect(stoodLines().filter((l) => l.includes('(visit 2)'))).toHaveLength(2);
+    // ⚠ TWO returns have now happened (the gate, then central), so two greetings
+    // stand in the log. The old assertion counted entries containing the literal
+    // `(visit 2)` — the debug readout OTA-1467 removed at the owner's word — so
+    // it was measuring the very thing he asked to be taken out.
+    const both = stoodLines();
+    expect(both).toHaveLength(2);
+    for (const g of both) {
+      expect(RETURN_AGAIN_LINES).toContain(g);   // second visits, not well-trodden ones
+      expect(g).not.toMatch(/\d/);
+    }
+    // ⚠ AND THEY ARE NOT THE SAME SENTENCE TWICE. `rotatingPick` refuses an
+    // immediate repeat, which is the whole reason the pools replaced one fixed
+    // string: "I think I've been here more than once cuz you're saying the same
+    // thing."
+    expect(both[0]).not.toBe(both[1]);
   });
 
   it('the investigation table still seeds on first entry — riding the SAME record the counter owns', async () => {

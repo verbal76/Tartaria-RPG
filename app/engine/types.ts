@@ -1013,6 +1013,14 @@ export interface MainQuestState {
    *  saves don't see fresh Guardian fights on already-cleared
    *  Capitals. */
   guardiansDefeated?: string[];
+  /** ⚠ OTA-1471 — `hoursElapsed` at the moment the most recent Core was granted.
+   *  Drives the settle window that stops two Capitals the atlas placed 2 tiles
+   *  apart (drakova / voronov, against a 16.55-tile median across all 36 pairs)
+   *  from being fought back to back on a curve keyed to kill-count. Optional,
+   *  and absent means READY: a player who has taken no Core has nothing to
+   *  settle from, and a save predating this OTA must never wake up newly
+   *  blocked. */
+  lastCoreAtHours?: number;
 }
 
 export interface PlayerCharacter {

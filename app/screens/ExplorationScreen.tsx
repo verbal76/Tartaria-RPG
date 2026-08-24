@@ -1149,6 +1149,14 @@ export function ExplorationScreen() {
         // uses — both stay live so the secondary path remains as a
         // backup.
         let atUnrecovered = false;
+        // ⚠⚠ OTA-1471 — the settle window, read at RENDER time so this chip never
+        // becomes the lit-button-that-refuses (OTA-1324: four taps, four
+        // identical walls in seventy seconds). Same helper the ACTION calls —
+        // two derivations of "can I summon" is how a label and a handler come to
+        // disagree. The chip stays PRESSABLE on purpose: a tap prints the full
+        // in-world reason, which is more use to a confused player than a dead
+        // control (OTA-220's rule).
+        let summonSettle: { ready: boolean; hoursLeft: number } = { ready: true, hoursLeft: 0 };
         if (!mq || mq.phase === 'ended') {
           // No active main quest — chip still serves as the menu
           // entry but doesn't pretend to point anywhere.
@@ -1171,12 +1179,19 @@ export function ExplorationScreen() {
             && capitals.includes(player.currentLocationId)
             && !mq.coresRecovered.includes(player.currentLocationId)
             && (mq.phase === 'revelation' || mq.phase === 'cores');
-          mainLine = atUnrecovered
-            // ⚠ The faction next-action is FLAVOUR now, not an instruction: the verb
-            // path that used to summon is gone, so the line ends at the control that
-            // actually raises the Guardian — the ★ SUMMON chip beside this text.
-            ? `${coreGateNextAction(player.factionId)} — then ★ SUMMON.`
-            : phaseHint(mq.phase, cores);
+          if (atUnrecovered) {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { coreSettleState, settleWaitPhrase } = require('../engine/coreGuardians') as typeof import('../engine/coreGuardians');
+            summonSettle = coreSettleState(player.hoursElapsed ?? 0, mq.lastCoreAtHours);
+            mainLine = summonSettle.ready
+              // ⚠ The faction next-action is FLAVOUR now, not an instruction: the verb
+              // path that used to summon is gone, so the line ends at the control that
+              // actually raises the Guardian — the ★ SUMMON chip beside this text.
+              ? `${coreGateNextAction(player.factionId)} — then ★ SUMMON.`
+              : `The grid is still closing over the last seat — ${settleWaitPhrase(summonSettle.hoursLeft)}.`;
+          } else {
+            mainLine = phaseHint(mq.phase, cores);
+          }
         }
         return (
           <TutorialTarget area="objective-chip">
@@ -1204,13 +1219,17 @@ export function ExplorationScreen() {
               </Text>
               {atUnrecovered && (
                 <TouchableOpacity
-                  style={styles.objectiveChipSummon}
+                  style={[styles.objectiveChipSummon, !summonSettle.ready && styles.objectiveChipSummonWait]}
                   onPress={() => useGameStore.getState().summonCoreGuardian()}
                   activeOpacity={0.7}
                   hitSlop={8}
                   accessibilityRole="button"
                 >
-                  <Text style={styles.objectiveChipSummonText}>★ SUMMON</Text>
+                  {/* OTA-1471 — the label names the wait BEFORE the tap; the tap
+                      still prints the full reason. */}
+                  <Text style={[styles.objectiveChipSummonText, !summonSettle.ready && styles.objectiveChipSummonWaitText]}>
+                    {summonSettle.ready ? '★ SUMMON' : `★ SETTLING · ${Math.max(1, Math.round(summonSettle.hoursLeft))}h`}
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -2919,6 +2938,10 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
   },
+  // OTA-1471 — a settling seat reads muted, so the chip does not look like a
+  // live call to action while it is naming a wait.
+  objectiveChipSummonWait: { borderColor: '#5c5343' },
+  objectiveChipSummonWaitText: { color: '#8b8069' },
   objectiveChipSummonText: {
     color: '#c9a86a',
     fontSize: 11,

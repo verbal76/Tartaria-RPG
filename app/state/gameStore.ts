@@ -28985,6 +28985,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set({ currentScreen: 'exploration' });
       return { ok: true, reason: 'already_present' };
     }
+    // ⚠⚠⚠ OTA-1471 — THE GRID HAS TO SETTLE BETWEEN SEATS.
+    //
+    // Owner: *"why do we have some of the core guardians so close together, I
+    // think my 2 fights were what 2 blocks apart?"* He counted right. Drakova
+    // (52,19) and Voronov (52,21) are 2.00 tiles apart; every other Capital's
+    // nearest neighbour is 4.24–5.83, and the median across all 36 pairs is
+    // 16.55. The atlas is faithful — they really are 89 painted pixels apart —
+    // so the pins are not the thing to move. What breaks is the assumption
+    // under `tierForKills`: that a JOURNEY happens between seats. See the
+    // derivation in coreGuardians.ts for where 8 hours comes from.
+    //
+    // ⚠ DELIBERATELY BELOW THE `already_present` CHECK. A Guardian already
+    // standing in the scene is a fight the player fled and came back to, not a
+    // fresh manifestation — locking them out of finishing it would be a far
+    // worse bug than the pacing one this fixes.
+    {
+      const settle = cg.coreSettleState(player.hoursElapsed ?? 0, mqState.lastCoreAtHours);
+      if (!settle.ready) {
+        get().appendLog(
+          'arbiter',
+          cg.coreSettleLine(
+            cg.GUARDIANS_BY_CAPITAL[capitalId]?.capitalName ?? 'this Capital',
+            settle.hoursLeft,
+          ),
+        );
+        return { ok: false, reason: 'core_settling' };
+      }
+    }
     const guardian = cg.spawnGuardianForCapital(player, capitalId);
     if (!guardian) return { ok: false, reason: 'no_guardian_def' };
     set((s) => (
@@ -30914,8 +30942,17 @@ function triggerMainQuest(
   // entry). Core items are inline-created InventoryItems — Phase 1
   // doesn't add catalog rows for them since they're quest-bound.
   let inventory = player.inventory;
+  // ⚠⚠⚠ OTA-1471 — THE SETTLE CLOCK, stamped in the SAME branch that mints the
+  // Core item. Drakova and Voronov sit 2 tiles apart against a 16.55-tile median
+  // across all 36 Capital pairs, and difficulty is keyed to KILL COUNT, so
+  // without this a player takes T1 and T2 inside two minutes. `coreSettleState`
+  // reads this field. If the stamp ever came from a different branch than the
+  // grant, the two could disagree about whether a Core was taken at all — two
+  // definitions of one fact, which is how they drift. One branch, both facts.
+  let questState = nextState;
   if (trigger.kind === 'core_recovered'
       && nextState.coresRecovered.length > prevState.coresRecovered.length) {
+    questState = { ...nextState, lastCoreAtHours: player.hoursElapsed ?? 0 };
     const capitalNames: Record<string, string> = {
       asgardar: 'Asgardar Core',
       samarran: 'Samarran Core',
@@ -30941,7 +30978,7 @@ function triggerMainQuest(
     }
   }
   set({
-    player: { ...player, mainQuest: nextState, inventory },
+    player: { ...player, mainQuest: questState, inventory },
   });
   // Narration log
   const context: Record<string, unknown> = { seed: player.name };

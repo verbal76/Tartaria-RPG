@@ -638,6 +638,15 @@ export function ContractsScreen() {
           && (mq.phase === 'revelation' || mq.phase === 'cores')
           && LOST_CAPITAL_LOCATIONS.includes(player.currentLocationId)
           && !mq.coresRecovered.includes(player.currentLocationId);
+        // ⚠⚠ OTA-1471 — SECOND DOOR. Two SUMMON chips reach one action (this one
+        // and the MAIN QUEST chip on the exploration screen), and a gate wired
+        // into only one of them is the many-doors mistake — the defect class
+        // this project has hit six times. Same helper, same field, both chips.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { coreSettleState, settleWaitPhrase } = require('../engine/coreGuardians') as typeof import('../engine/coreGuardians');
+        const summonSettle = atCapitalForSummon
+          ? coreSettleState(player.hoursElapsed ?? 0, mq.lastCoreAtHours)
+          : { ready: true, hoursLeft: 0 };
         return (
           <TouchableOpacity
             style={styles.mainQuestCard}
@@ -663,16 +672,28 @@ export function ContractsScreen() {
               // Guardian. ★ SUMMON, directly below, is the only door.
               return <Text style={styles.mainQuestNextAction}>→ At this Capital: {next}. Then tap ★ SUMMON.</Text>;
             })()}
+            {atCapitalForSummon && !summonSettle.ready && (
+              // OTA-1471 — say the wait BEFORE the tap, where the player is
+              // deciding. The chip below still takes the tap and prints the
+              // whole reason; this line is what stops them tapping four times.
+              <Text style={styles.mainQuestNextAction}>
+                → The grid is still closing over the last seat — {settleWaitPhrase(summonSettle.hoursLeft)} before a Guardian will rise here.
+              </Text>
+            )}
             {atCapitalForSummon && (
               <TouchableOpacity
-                style={styles.summonChip}
+                style={[styles.summonChip, !summonSettle.ready && styles.summonChipWait]}
                 onPress={() => useGameStore.getState().summonCoreGuardian()}
                 activeOpacity={0.7}
                 hitSlop={6}
                 accessibilityRole="button"
-                accessibilityLabel="Summon Guardian"
+                accessibilityLabel={summonSettle.ready
+                  ? 'Summon Guardian'
+                  : `Guardian settling, ${settleWaitPhrase(summonSettle.hoursLeft)} to wait`}
               >
-                <Text style={styles.summonChipText}>★ SUMMON</Text>
+                <Text style={[styles.summonChipText, !summonSettle.ready && styles.summonChipWaitText]}>
+                  {summonSettle.ready ? '★ SUMMON' : `★ SETTLING · ${Math.max(1, Math.round(summonSettle.hoursLeft))}h`}
+                </Text>
               </TouchableOpacity>
             )}
             {mqExpanded && (
@@ -2281,6 +2302,10 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
   },
+  // OTA-1471 — a settling seat reads muted, matching the exploration chip, so
+  // neither surface looks like a live call to action while it names a wait.
+  summonChipWait: { borderColor: '#5c5343' },
+  summonChipWaitText: { color: '#8b8069' },
   summonChipText: {
     color: '#c9a86a',
     fontSize: 11,
