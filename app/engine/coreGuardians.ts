@@ -581,11 +581,21 @@ const CANTOR: CoreGuardianDef = {
     boss: true,
   },
   approachLine:
-    'A pure tone fills the chamber — one chord, held, the kind of sound that re-arranges the dust in your lungs. The Voronov-Beneath High Cantor steps from the Core\'s housing in robes the colour of old gold, a tuning-fork the length of your forearm in one hand. "The Order has watched five Capitals fall to you," he says, voice both unhurried and very close. "This one does not fall. Stand and prove me wrong, or turn and live another hour."',
+    // ⚠⚠⚠ OTA-1468 — `{fallen}`, NOT "five". This line shipped claiming the
+    // Order had watched FIVE Capitals fall to the player, to every player, on
+    // their first Voronov visit as readily as their last. The owner's
+    // 2026-08-23 log caught it: he had taken ONE Core when the Cantor said it.
+    'A pure tone fills the chamber — one chord, held, the kind of sound that re-arranges the dust in your lungs. The Voronov-Beneath High Cantor steps from the Core\'s housing in robes the colour of old gold, a tuning-fork the length of your forearm in one hand. "The Order has watched {fallen}," he says, voice both unhurried and very close. "This one does not fall. Stand and prove me wrong, or turn and live another hour."',
   rebukeLine:
     'The Cantor does not raise his voice. "Turn, then. The Order has its answer." The chord drops. Your ears are still ringing as you cross the threshold — and they will keep ringing. The Cantor, in the silence behind you, is unmarked. Whole. Waiting.',
   defeatLine:
-    'The chord cracks once and dies. The Cantor settles to one knee, the tuning-fork ringing flat against the stone. "...so. The last seat. The Order... is done." The Core lifts itself out of the housing and into your hand. The silence afterwards is the loudest sound in Tartaria.',
+    // ⚠⚠⚠ AND `{seat}`, NOT "The last seat". This claimed Voronov was the FINAL
+    // Capital — a line only true for a player who saved it for last. In the
+    // owner's log he took it SECOND, and the dying Cantor announced the Order
+    // was finished with seven Cores still outstanding. Same defect as the
+    // approach line, on the same guardian, and it survived because nothing
+    // downstream reads these strings for claims about the player.
+    'The chord cracks once and dies. The Cantor settles to one knee, the tuning-fork ringing flat against the stone. "...so. {seat}" The Core lifts itself out of the housing and into your hand. The silence afterwards is the loudest sound in Tartaria.',
 };
 
 /** Karok-Sa — Sealwarden Tobiel, master of the Forgotten Order's
@@ -1039,3 +1049,77 @@ export function totalGuardiansCount(): number {
 // Re-export the player + stats types so consumers of this module
 // don't need to also import from types.ts when wiring helpers.
 export type { PlayerCharacter, Stats };
+
+/**
+ * ⚠⚠⚠ OTA-1468 — A GUARDIAN MUST NOT INVENT THE PLAYER'S HISTORY.
+ *
+ * Two lines on the Voronov Cantor asserted facts about how far the player had
+ * got, as fixed strings, to every player at every point in the run:
+ *
+ *   approachLine  "The Order has watched five Capitals fall to you"
+ *   defeatLine    "...so. The last seat. The Order... is done."
+ *
+ * The owner's 2026-08-23 log has him hearing the first with ONE Core recovered,
+ * and the second as his SECOND kill — a dying high priest announcing the Order
+ * was finished while seven Cores were still out there.
+ *
+ * ⚠⚠ THIS IS THE SAME SHAPE AS THE VISIT COUNTER (OTA-1467) AND THE OPPOSITE
+ * CONCLUSION. There, a number in the prose was a debug readout the character
+ * would never think, and the fix was to remove counting entirely. Here the count
+ * is exactly what a Guardian WOULD know and say — it is good writing — so the
+ * fix is to make it true. The test is not "does it contain a number", it is
+ * "does the game know this is true when it says it".
+ *
+ * ⚠ Why only Voronov: the module already scales difficulty by kill-count and
+ * deliberately keeps every Capital order-independent (see the header — "the
+ * player's choice of order is preserved"). Eight of the nine were written to
+ * that rule. One was not, and nothing checked, because nothing anywhere reads
+ * these strings for claims about the player. `check-guardian-claims.mjs` now
+ * does.
+ */
+
+/** Spelled out for one to nine, because the surrounding prose counts in words
+ *  ("three voices, then six, then one") and "5 Capitals" would read as UI. */
+const COUNT_WORDS = [
+  'no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
+] as const;
+
+export function fallenCapitalsPhrase(coresRecovered: number): string {
+  const n = Math.max(0, Math.min(9, Math.floor(Number.isFinite(coresRecovered) ? coresRecovered : 0)));
+  if (n === 0) return 'not one Capital fall to you — yet';
+  if (n === 1) return 'one Capital fall to you';
+  return `${COUNT_WORDS[n]} Capitals fall to you`;
+}
+
+/**
+ * What the dying Cantor says about the seat he just lost. `coresRecovered` is
+ * the count BEFORE this kill, so the eighth prior Core makes this the ninth and
+ * final one — the same arithmetic `isFinalGuardian` uses, and it is called here
+ * rather than re-derived so the two cannot drift.
+ */
+export function seatPhrase(coresRecovered: number): string {
+  if (isFinalGuardian(coresRecovered)) return 'The last seat. The Order... is done.';
+  const left = Math.max(0, 8 - Math.floor(coresRecovered));
+  if (left === 1) return 'One seat left. Hold it, brothers.';
+  return `${COUNT_WORDS[Math.min(9, left)] ?? left} seats still stand. Hold them.`;
+}
+
+/**
+ * The approach line as the player should hear it, with any claim about their
+ * progress made true. Every caller of `def.approachLine` must come through here.
+ */
+export function guardianApproachLine(def: CoreGuardianDef, coresRecovered: number): string {
+  return def.approachLine.replace(/\{fallen\}/g, fallenCapitalsPhrase(coresRecovered));
+}
+
+/** The defeat line, same contract. */
+export function guardianDefeatLine(def: CoreGuardianDef, coresRecovered: number): string {
+  return def.defeatLine.replace(/\{seat\}/g, seatPhrase(coresRecovered));
+}
+
+/** The rebuke line. No token today, and routed anyway so a future one cannot be
+ *  added at a call site that never learned to substitute — the many-doors
+ *  mistake is cheaper to prevent than to find. */
+export function guardianRebukeLine(def: CoreGuardianDef): string {
+  return def.rebukeLine;
+}

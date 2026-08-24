@@ -21870,7 +21870,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (fleeingGuardian) {
               const capitalId = cg.capitalIdFromGuardian(fleeingGuardian);
               const def = capitalId ? cg.GUARDIANS_BY_CAPITAL[capitalId] : null;
-              get().appendLog('arbiter', def?.rebukeLine ?? 'The Guardian watches you go without moving.');
+              // ⚠ OTA-1468 — routed even though it carries no token today, so a
+              // future one cannot be added at a call site that never learned to
+              // substitute. The many-doors mistake is cheaper to prevent.
+              get().appendLog(
+                'arbiter',
+                def ? cg.guardianRebukeLine(def) : 'The Guardian watches you go without moving.',
+              );
               const after = cg.fleeAftermathLine(player.factionId);
               if (after) {
                 get().appendLog('arbiter', after);
@@ -24218,7 +24224,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // Log the defeat line + the signature gear drop before
           // the Core itself lands so the chamber narration reads
           // in order.
-          get().appendLog('arbiter', def.defeatLine);
+          // ⚠⚠⚠ OTA-1468 — same door. The Cantor's defeat line claimed Voronov
+          // was "the last seat" and the Order "done"; the owner took it SECOND,
+          // with seven Cores still outstanding. `coresRecovered` is read BEFORE
+          // this kill is banked, which is the count `seatPhrase`/`isFinalGuardian`
+          // both expect.
+          get().appendLog(
+            'arbiter',
+            cg.guardianDefeatLine(def, get().player?.mainQuest?.coresRecovered?.length ?? 0),
+          );
           if (drops) {
             set((s) => (
               s.player
@@ -28960,7 +28974,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'combat',
       `${guardian.name} closes — ${guardian.attack} ready, ${enemyDamageDisplay(guardian)}. (range: mid) ★ CORE GUARDIAN`,
     );
-    get().appendLog('arbiter', cg.GUARDIANS_BY_CAPITAL[capitalId].approachLine);
+    // ⚠⚠⚠ OTA-1468 — THROUGH THE SUBSTITUTER. This line asserted "The Order has
+    // watched five Capitals fall to you" to every player at every point in the
+    // run; the owner heard it with ONE Core recovered. `guardianApproachLine`
+    // makes the claim true from `coresRecovered`.
+    get().appendLog(
+      'arbiter',
+      cg.guardianApproachLine(
+        cg.GUARDIANS_BY_CAPITAL[capitalId],
+        get().player?.mainQuest?.coresRecovered?.length ?? 0,
+      ),
+    );
     recordMemorableEvent(get, set, {
       kind: 'mq_guardian_spawned',
       text: `summoned ${guardian.name} at ${cg.GUARDIANS_BY_CAPITAL[capitalId].capitalName}`,
