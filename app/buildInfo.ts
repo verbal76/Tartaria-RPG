@@ -24519,7 +24519,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // now logs through logUiTap before any work, and takeAndWear logs which
 // slot the equip resolved to — the wrong-slot and dead-tap reports become
 // answerable from the next device log.
-export const OTA_BUILD_ID = '2026-08-24-1485-the-chip-joins-the-tap-ledger';
+// OTA-1486 — the axe and the knife were WEAPONS: the hand was the right
+// slot all along, and the chip's "Take & wear" was the wrong verb over a
+// right action. Hand-slot chips now say "Take & wield" on the face and in
+// the screen-reader sentence; armor keeps "wear". Words only — the equip
+// path is untouched.
+export const OTA_BUILD_ID = '2026-08-24-1486-wield-is-not-wear';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1485-the-chip-joins-the-tap-ledger';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1484-a-pin-states-a-claim';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1483-three-from-the-second-sweep';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1482-the-build-says-which-build-it-is';

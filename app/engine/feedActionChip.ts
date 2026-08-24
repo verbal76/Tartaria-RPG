@@ -93,10 +93,22 @@ export function pickFeedActionChip(
   return null;
 }
 
+/** ⚠⚠ OTA-1486 — HAND SLOTS HOLD THINGS YOU WIELD; EVERYTHING ELSE IS WORN.
+ *  Owner's report, decoded: he tapped "Take & wear" on an AXE and a KNIFE and
+ *  they landed in his hand. The equip was CORRECT — the picker has marked
+ *  weapon upgrades since OTA-1252, and a weapon's slot is the hand — but the
+ *  button promised "wear", which is an armor word, so a right action read as a
+ *  wrong one. One predicate, used by both strings below, so the button face
+ *  and the spoken sentence can never disagree about which verb the action
+ *  deserves. */
+const HAND_SLOTS: ReadonlySet<EquipSlot> = new Set(['main', 'off']);
+
 /** The button face. Kept here beside the picker so the wording and the thing it
  *  acts on cannot drift apart in different files. */
 export function feedActionChipLabel(chip: FeedActionChip): string {
-  return `⬆ Take & wear ${chip.itemName}`;
+  return HAND_SLOTS.has(chip.slot)
+    ? `⬆ Take & wield ${chip.itemName}`
+    : `⬆ Take & wear ${chip.itemName}`;
 }
 
 /** The screen-reader sentence. ⚠ REQUIRED, not optional — the EXIT chip shipped
@@ -105,5 +117,9 @@ export function feedActionChipLabel(chip: FeedActionChip): string {
  *  is called: two actions, in order, so a narration-only player is not surprised
  *  by the second one. */
 export function feedActionChipA11yLabel(chip: FeedActionChip): string {
+  if (HAND_SLOTS.has(chip.slot)) {
+    const hand = chip.slot === 'main' ? 'main hand' : 'off hand';
+    return `Take the ${chip.noun} and wield it in your ${hand}. Replaces what you have equipped there.`;
+  }
   return `Take the ${chip.noun} and wear it as your ${chip.slot}. Replaces what you have equipped there.`;
 }
