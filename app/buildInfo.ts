@@ -24568,7 +24568,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // first server-side proof.
 // 2026-08-24 — THIRD GOLEM CATCH-UP PUBLISH: 1492 (flush-verified SEND LOG)
 // to the golem channel via the markerless path, same trunk as HAL's #(prev).
-export const OTA_BUILD_ID = '2026-08-24-1492-sent-means-arrived';
+// OTA-1493 — the deferred warm, on the owner's word and six receipts: the
+// 3s-after-boot Qwen warm becomes warm-on-first-player-action. All three
+// boot paths arm; the OTA-1276 action door fires, once; the guard is
+// re-checked at fire time; the watchdog defers with the boot it belongs to.
+export const OTA_BUILD_ID = '2026-08-24-1493-the-warm-waits-for-the-player';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1492-sent-means-arrived';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1491-two-taps-to-load';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1490-the-device-is-the-owner';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1489-one-tap-instead-of-four-slices';

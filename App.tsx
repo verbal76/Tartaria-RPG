@@ -46,6 +46,7 @@ import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
 import { ChapterCardOverlay } from './app/components/ChapterCardOverlay'; // OTA-1020
 import { DedicationOverlay } from './app/components/DedicationOverlay';
 import { CrashReportNoticeOverlay } from './app/components/CrashReportNoticeOverlay'; // OTA-1488
+import { armQwenWarm } from './app/ai/deferredQwenWarm'; // OTA-1493
 import { StoryRevealOverlay } from './app/components/StoryRevealOverlay'; // OTA-1183
 import { StoryForkOverlay } from './app/components/StoryForkOverlay'; // OTA-1065
 import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1022
@@ -502,7 +503,12 @@ export default function App() {
             // general crash state (markMLInitSucceeded), healing the classifier
             // on the NEXT launch. So honor only Qwen's own guards here.
             if (shouldAttemptQwen()) {
-              setTimeout(() => {
+              // ⚠⚠ OTA-1493 — the 3s boot timer became the FIRST PLAYER ACTION.
+              // Six native-death receipts (sentry-inbox/crash_*): every kill was
+              // boot-adjacent, "no action yet", inside the ctx lifecycle this
+              // timer started. The guard re-checks at fire time, as the timer did.
+              setStage('qwen:deferred');
+              armQwenWarm(() => {
                 if (!shouldAttemptQwen()) {
                   setStage('qwen:skipped');
                   useGameStore.setState({ qwenStatus: 'skipped' });
@@ -523,7 +529,7 @@ export default function App() {
                     // eslint-disable-next-line no-console
                     console.warn('bootQwen failed:', e);
                   });
-              }, 3000);
+              });
             } else {
               setStage('qwen:skipped');
               useGameStore.setState({ qwenStatus: 'skipped' });
@@ -549,8 +555,10 @@ export default function App() {
           void bootCognitive().then(() => {
             setStage('cognitive:done');
             void markMLInitSucceeded();
-            // Defer Qwen init 3s — see comment above.
-            setTimeout(() => {
+            // ⚠⚠ OTA-1493 — "defer 3s" became "defer to the first player
+            // action"; see the twin site above for the receipts.
+            setStage('qwen:deferred');
+            armQwenWarm(() => {
               // OTA-351 — skip Qwen entirely if its completion-crash guard has
               // tripped (repeated native SIGSEGVs during generation on this
               // device). The classifier above already booted; the Arbiter uses
@@ -596,7 +604,7 @@ export default function App() {
                   // eslint-disable-next-line no-console
                   console.warn('bootQwen failed:', e);
                 });
-            }, 3000);
+            });
           }).catch((e) => {
             // eslint-disable-next-line no-console
             console.warn('bootCognitive failed:', e);
@@ -611,10 +619,14 @@ export default function App() {
           void bootCognitive().then(() => {
             setStage('cognitive:done');
             // OTA-351 — honor the Qwen completion-crash guard on this path too.
-            if (!shouldAttemptQwen()) { setStage('qwen:skipped'); return; }
-            void bootQwen().catch((err) => {
-              // eslint-disable-next-line no-console
-              console.warn('bootQwen failed:', err);
+            // OTA-1493 — and defer to the first action on this path too.
+            setStage('qwen:deferred');
+            armQwenWarm(() => {
+              if (!shouldAttemptQwen()) { setStage('qwen:skipped'); return; }
+              void bootQwen().catch((err) => {
+                // eslint-disable-next-line no-console
+                console.warn('bootQwen failed:', err);
+              });
             });
           }).catch((err) => {
             // eslint-disable-next-line no-console

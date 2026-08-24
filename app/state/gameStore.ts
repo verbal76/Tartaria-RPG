@@ -158,6 +158,7 @@ import {
 // which is why seven of the accessors this file used to name are gone from the
 // import above: their only caller moved.
 import { startQwenWatchdog, qwenReinitAttemptCount } from '../ai/qwenWatchdog';
+import { fireQwenWarmOnPlayerAction } from '../ai/deferredQwenWarm'; // OTA-1493
 // ⚠⚠ OTA-1398 — SLICE 7. Narration and the Arbiter's voice live in
 // `app/ai/narration.ts` now: ~1,250 lines deciding whether the local model
 // writes a line instead of the authored template, what it may say, whether what
@@ -11702,6 +11703,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ lastPlayerActionAt: Date.now() });
     // ⚠ OTA-1358 — and feed the sprint detector at the same door.
     notePlayerActionForSprint();
+    // ⚠⚠ OTA-1493 — and release the deferred Qwen warm at the same door. Six
+    // native-death receipts (sentry-inbox/crash_*) say the 3s-after-boot warm
+    // was getting the process killed before the player ever acted; the first
+    // REAL action is the proof boot pressure has passed. No-op after the first.
+    fireQwenWarmOnPlayerAction();
     // ⚠⚠ OTA-1276 — the unbatched breadcrumb, at the one door every typed and
     // chip-driven action passes through. See saveSystem.stampLiveBreadcrumb:
     // the batched disk log cannot survive a JS wedge, this can.
