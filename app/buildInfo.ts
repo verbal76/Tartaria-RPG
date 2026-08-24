@@ -24575,7 +24575,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 2026-08-24 — FOURTH GOLEM CATCH-UP PUBLISH: 1493 (the deferred warm) to
 // the golem channel via the markerless path. Its first receipt was a golem
 // kill (Aug 21, ctx-release-done) — golem gets the cure too.
-export const OTA_BUILD_ID = '2026-08-24-1493-the-warm-waits-for-the-player';
+// OTA-1494 — the log says which era each line belongs to. The owner's first
+// delivered bundle was 987 entries from Aug 9, 22 from Aug 23, 18 from Aug 24,
+// with no seam — and two-week-old lines were read as live behaviour within the
+// hour. A session banner at the existing OTA-099 marker now states build, wall
+// clock and the gap since the previous entry. Banner only; no age trim.
+export const OTA_BUILD_ID = '2026-08-24-1494-the-log-says-which-era';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1493-the-warm-waits-for-the-player';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1492-sent-means-arrived';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1491-two-taps-to-load';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1490-the-device-is-the-owner';

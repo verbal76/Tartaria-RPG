@@ -50,9 +50,11 @@ import {
   listSlots,
   loadSlot,
   newSlotId,
+  readFullLog,
   saveSlot,
   setActiveSlot,
 } from '../../engine/saveSystem';
+import { seamBanner, lastEntryTime } from '../../engine/logSeam'; // OTA-1494
 import { findMicroMicroAnywhere } from '../../engine/worldLadder';
 import { discoverLocation, emptyMemory, spireMoveNoticeLine } from '../../engine/worldMemory';
 import { extractAmbientNouns } from '../../engine/ambientNouns';
@@ -390,6 +392,23 @@ export const createSlotSlice = (
           );
         }
         get().appendLog('debug', `OTA session start: ${OTA_BUILD_ID}.`);
+        // ⚠⚠ OTA-1494 — AND SAY WHICH ERA THE LINES BELOW BELONG TO. The
+        // owner's iPhone bundle was 987 entries from Aug 9, 22 from Aug 23 and
+        // 18 from Aug 24 with no visible seam — which produced a wrong
+        // diagnosis within the hour (two-week-old lines read as live
+        // behaviour). The banner states the build, the wall clock, and the gap
+        // since the previous entry, so no reader can make that mistake again.
+        // Async and fire-and-forget: the log read must never delay a slot load.
+        void readFullLog()
+          .then((existing) => {
+            get().appendLog('debug', seamBanner({
+              build: OTA_BUILD_ID,
+              now: Date.now(),
+              previousEntryAt: lastEntryTime(existing),
+              appliedFrom: ota099UpdatedFrom ?? null,
+            }));
+          })
+          .catch(() => { /* a missing banner must never cost a load */ });
       } catch { /* hardened: never block slot load on a debug log failure */ }
       // OTA-353 — REMOVED: the one-time faction-catalyst fusion-compensation
       // make-good ("Eternal Dynasty Heir's Aegis"). It was a dev-name-only
