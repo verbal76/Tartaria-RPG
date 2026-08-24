@@ -55,6 +55,7 @@
  *  WHICH rule fired or why the ones that didn't, didn't. */
 export type MetaCommentReason =
   | 'ui-vocabulary'
+  | 'engine-vocabulary'
   | 'report-of-behaviour'
   | 'suggestion'
   | 'frustration';
@@ -115,9 +116,74 @@ const STRONG_MARKERS: readonly RegExp[] = [
  */
 const NOT = String.raw`(?:\s*n'?t|\s+not)`;
 
+/**
+ * ⚠⚠⚠ OTA-1473 — THE WORDS OF SOMEBODY WHO KNOWS HOW IT IS BUILT.
+ *
+ * The 4.32.11 log has four notes that reached the parser on a build that
+ * already carried OTA-1464, and two of them the game ACTED ON:
+ *
+ *   "the last text box was half covered by the keyboard"
+ *      → intent=help verb=cover target=keyboard
+ *      → "You shoulder in beside keyboard — but here, alone on the road,
+ *         there's no second pair of hands to lift."
+ *
+ *   "any investigation story hook that ends in a trade now in a tile that has
+ *    a vendor should not be able to spawn in that tile"
+ *      → intent=unknown → "Your coil of tartarian filament is still there"
+ *   "if there is already a vendor there that story hook gets skipped"
+ *      → intent=maneuver verb=hook
+ *      → "Maneuver against whom? Empty ground does not grapple back."
+ *
+ *   "I selected take and wear throwing knife and it did not go to my bandolier
+ *    … wear did it go?"    → fell through to a 4.7s qwen parse, then refused
+ *
+ * ⚠⚠ THE TIER THAT WAS MISSING IS NOT ABOUT INTERFACE, IT IS ABOUT MACHINERY.
+ * `UI_NOUNS` covers the things a player SEES — screen, button, menu — and is
+ * length-gated because a room can hold a cracked screen. These are different:
+ * `spawn`, `story hook`, `keyboard`, `text box` are words for how the thing is
+ * BUILT. Tartaria has no keyboards and nothing in it spawns; a character in the
+ * fiction could not form these sentences. So they need no length gate and no
+ * corroboration, exactly like `glitch` — they carry their own certainty.
+ *
+ * ⚠ WHAT IS DELIBERATELY ABSENT, because each was checked against the world:
+ *   • bare `hook`     — "Dried meat on hooks" is scene prose and "investigate
+ *                       hooks" is a real command he could type. Only the
+ *                       compound `story hook` is safe.
+ *   • bare `tile`     — the game itself says "2 tiles" AND a kitchen tile is a
+ *                       salvageable noun. Ambiguous both ways.
+ *   • `build`, `flag` — "build a golem", a faction banner. Both in-world.
+ *   • `state`, `cap`  — too generic to be evidence of anything.
+ *
+ * ⚠ And `spawn` was verified never to reach the player: it appears 452 times in
+ * the source, but only ever as an identifier (`${spawn.name}`), never as a word
+ * in a line anyone reads. A player cannot be parroting it back at us.
+ */
+const ENGINE_VOCABULARY: readonly RegExp[] = [
+  /\bre-?spawn(s|ed|ing)?\b/i,
+  /\bspawn(s|ed|ing)?\b/i,
+  /\bstory\s+hooks?\b/i,
+  /\bkey-?boards?\b/i,
+  /\btext\s*(box|boxes|field|fields)\b/i,
+  /\bscroll-?bars?\b/i,
+  /\bmodals?\b/i,
+  /\b(ui|ux|hud)\b/i,
+  /\bota\b/i,
+  /\bparser\b/i,
+];
+
 const REPORT_MARKERS: readonly RegExp[] = [
   /\bit\s+(told|showed|gave)\s+me\b/i,
   new RegExp(String.raw`\bit\s+(?:wo|will|would|did|does|is|was)${NOT}\s+(?:let|allow|show|tell|give)\b`, 'i'),
+  // ⚠⚠ OTA-1473 — THE VERB LIST WAS THE BUG, not the shape. "it did not LET me"
+  // was covered; "it did not GO to my bandolier" was not, and neither was "nor
+  // did it end up in my weapons inventory" — the same sentence, twice, from the
+  // same note. Enumerating the verbs somebody might use is the copied-constant
+  // mistake in a new costume, so the verb is now ANY verb: what makes this a
+  // report is the SUBJECT (a bare `it`/`they`/`that`, i.e. the software) plus a
+  // negated past-tense outcome. No command has that shape — a player says
+  // "attack it", never "it did not go".
+  new RegExp(String.raw`\b(?:it|they|that)\s+(?:wo|will|would|did|does|do|is|was|were|are|has|have|had)${NOT}\s+\w+`, 'i'),
+  new RegExp(String.raw`\bnor\s+(?:did|does|do|is|was|were|has|have)\b`, 'i'),
   /\bit\s+(keeps|kept)\s+\w+ing\b/i,
   /\b(screwed|messed|fouled)\s+up\b/i,
   new RegExp(String.raw`\b(?:does|do|is|are|was|were|will|would|did)${NOT}\s+work(?:ing)?\b`, 'i'),
@@ -140,6 +206,31 @@ const UI_NOUNS = /\b(screens?|buttons?|tabs?|menus?|banners?|chips?|sliders?|che
  *  caught five of his eight notes and there is no reason to disturb it. */
 const SUGGESTION =
   /^(ok\b|btw\b|fyi\b|hey\b|so\b|also\b|when (i|the)\b)|(\b(we|i) ((\w+)\s+)?(should|need|could|gotta|gonna|wish|want|really)\b|\byou should\b|\bi think\b|\bi'?d like\b|\bcan we\b|\bcould you\b|\bshould have\b|\bneeds? to be\b|\bit should (have|be|also)\b|\badd a\b|\bplease add\b)/i;
+
+/**
+ * ⚠⚠ OTA-1473 — A DESIGN DIRECTIVE WITH SOMEBODY ELSE AS THE SUBJECT.
+ *
+ * `SUGGESTION` above requires the sentence to be about `we` or `I` — "we should
+ * add", "I think". But a specification names the THING, not the speaker:
+ *
+ *   "…should not be able to spawn in that tile"
+ *   "…that story hook gets skipped"
+ *
+ * The subject there is a story hook, so every alternative in the pattern above
+ * missed, and the second clause parsed as `intent=maneuver verb=hook`. These
+ * shapes are prescriptive whoever the subject is — "X should be able to Y" and
+ * "X gets skipped" are sentences about how the game ought to behave, and there
+ * is no command that reads like one.
+ *
+ * ⚠ Length-gated with the rest of this tier, deliberately: "should" alone is far
+ * too common to trust in a short line.
+ */
+const DESIGN_DIRECTIVE: readonly RegExp[] = [
+  /\bshould(\s+not|n'?t)?\s+be\s+able\s+to\b/i,
+  /\bshould(\s+not|n'?t)?\s+(spawn|appear|show|fire|trigger|render|happen|exist)\b/i,
+  /\bget(s|ting)?\s+skipped\b/i,
+  /\bshould(\s+not|n'?t)?\s+be\s+(there|here|possible|allowed)\b/i,
+];
 
 /** Frustration vent. Also kept from the original. */
 const FRUSTRATION: readonly RegExp[] = [
@@ -173,6 +264,12 @@ export function classifyMetaComment(raw: string): MetaCommentVerdict {
   const strong = firstMatch(text, STRONG_MARKERS);
   if (strong) return { isMeta: true, reason: 'ui-vocabulary', match: strong };
 
+  // ⚠ OTA-1473 — ungated, alongside STRONG. These words have no meaning inside
+  // the fiction at all, so length adds nothing: a two-word "keyboard covered"
+  // is as certainly a bug report as a two-hundred-character one.
+  const engine = firstMatch(text, ENGINE_VOCABULARY);
+  if (engine) return { isMeta: true, reason: 'engine-vocabulary', match: engine };
+
   const report = firstMatch(text, REPORT_MARKERS);
   if (report) return { isMeta: true, reason: 'report-of-behaviour', match: report };
 
@@ -190,6 +287,9 @@ export function classifyMetaComment(raw: string): MetaCommentVerdict {
   if (text.length > 60) {
     const sug = SUGGESTION.exec(text);
     if (sug) return { isMeta: true, reason: 'suggestion', match: sug[0] };
+    // OTA-1473 — the same tier, with the subject freed. See DESIGN_DIRECTIVE.
+    const spec = firstMatch(text, DESIGN_DIRECTIVE);
+    if (spec) return { isMeta: true, reason: 'suggestion', match: spec };
   }
 
   return { isMeta: false, reason: null, match: null };
