@@ -306,6 +306,63 @@ export function runExclusiveNativeMl<T>(
   });
 }
 
+/**
+ * ⚠⚠⚠ OTA-1472 — THE PLAYER ACTING IS ITSELF A PREEMPTION SIGNAL.
+ *
+ * From the owner's device log: a 3150 ms LOGIC STALL during a flee, immediately
+ * after an 8.2 s `ambient_fill`. The freeze watch samples every
+ * FREEZE_SAMPLE_MS (5000), and `jsGap = now - lastSample - 5000`, so a 3150 ms
+ * gap means the sampler fired 8150 ms late — within 50 ms of the fill's own
+ * 8.2 s runtime. The JS thread was not free for essentially the whole
+ * generation, and the flee landed inside it.
+ *
+ * ⚠⚠ OTA-1123 ALREADY BUILT THE CURE AND WIRED IT TO THE WRONG TRIGGER. It
+ * gave homework an `onPreempt` hook precisely so *"a homework generation six
+ * seconds into a ten-second job"* could not make the player wait — but the hook
+ * fires only from the enqueue path above, i.e. only when some OTHER native-ML
+ * call arrives. A flee needs no model. A move needs no model. A tap on a chip
+ * needs no model. So for every action that is pure logic — which is most of
+ * them — an 8-second homework job ran to completion with the player waiting on
+ * the other side of it, and the mechanism written to prevent exactly that never
+ * got asked.
+ *
+ * ⚠ THE SPRINT GATE IS THE NEAR MISS, and its own OTA says why it cannot cover
+ * this: it governs what STARTS, needs three actions in four seconds to trip,
+ * and OTA-1405 notes that *"the first generation of a burst is always already
+ * running by then"*. Nothing looked at what was ALREADY RUNNING when a single
+ * deliberate action arrived. This is that.
+ *
+ * ⚠ HOMEWORK ONLY, and the guard is a floor rather than a name: anything at or
+ * above ML_PRIORITY_LLM is work somebody asked for — the player's own narration,
+ * cognition still resolving their action, a voice line, a teardown — and cutting
+ * any of those to make the player's action land would be cutting the thing the
+ * action is FOR. Only the lane that nobody asked for yields.
+ *
+ * ⚠ Exclusivity is untouched, exactly as OTA-1123 left it: this asks the running
+ * op to finish EARLY, it does not overlap a second one. The arb159 crash
+ * guarantee is unchanged.
+ *
+ * Returns whether a job was actually cut, so callers and tests can tell a real
+ * preemption from a no-op — an instrument that cannot distinguish "nothing was
+ * running" from "I did not look" is worth nothing.
+ */
+export function preemptHomeworkForPlayer(): boolean {
+  if (!running || !runningPreempt) return false;
+  if (runningPriority >= ML_PRIORITY_LLM) return false;
+  const cut = runningPreempt;
+  runningPreempt = null;
+  homeworkCutsForPlayer += 1;
+  try { cut(); } catch { /* a broken hook must never wedge the chain */ }
+  return true;
+}
+
+/** ⚠ How many times a player action has cut a homework job this session. The
+ *  telemetry already labels the generation `outcome: 'preempted'`, so the device
+ *  log prices the other half; this counts the trigger, which is the half that
+ *  says whether the new signal is firing at all. */
+let homeworkCutsForPlayer = 0;
+export function homeworkCutsForPlayerCount(): number { return homeworkCutsForPlayer; }
+
 /** ⚠ OTA-1144 — a voice line has been accepted for speech and is on its way to
  *  this lock. Hold the slot: work below voice defers until the line arrives or
  *  the deadline passes, whichever comes first. Call ONLY for lines that will
@@ -327,12 +384,17 @@ export function releaseVoiceSlot(): void {
 /** Tests only — the lock is module state. */
 export function _mlLockState(): {
   running: boolean; queued: number; runningPriority: number; voiceReserved: boolean;
+  homeworkCutsForPlayer: number;
 } {
   return {
     running, queued: pending.length, runningPriority,
     voiceReserved: Date.now() < voiceReservedUntil,
+    homeworkCutsForPlayer,
   };
 }
+
+/** Tests only — reset the OTA-1472 counter so suites don't leak into each other. */
+export function _resetHomeworkCutsForTest(): void { homeworkCutsForPlayer = 0; }
 
 /** Tests only — drop any reservation so suites don't leak state into each other. */
 export function _clearVoiceReservation(): void {

@@ -16,7 +16,17 @@
  *
  * ⚠ NOTHING HERE CHANGED. Same window, same threshold, same filter. ota1358
  * covers it and passes unchanged.
+ *
+ * ⚠⚠ OTA-1472 — AND IT IS NOW ALSO THE PREEMPTION SIGNAL. The sprint numbers are
+ * still untouched; what was added is one call at the top of
+ * `notePlayerActionForSprint`, because this function is already the single
+ * canonical "the player did something" feed and the thing being fixed is a hook
+ * that was wired to too few doors. See the comment there.
+ *
+ * ⚠ `app/ai/nativeMlLock` imports nothing at all — it is a pure leaf — so this
+ * dependency cannot cycle.
  */
+import { preemptHomeworkForPlayer } from '../ai/nativeMlLock';
 
 // ⚠⚠ OTA-1358 — THE SPRINT DETECTOR. Owner: "people will turn this into a speed
 // run clicker" — and his own fourth-freeze receipt showed what that costs today:
@@ -49,6 +59,31 @@ const SPRINT_ACTIONS = 3;
 const SPRINT_COALESCE_MS = 120;
 let sprintActionTimes: number[] = [];
 export function notePlayerActionForSprint(now: number = Date.now()): void {
+  // ⚠⚠⚠ OTA-1472 — AND THE PLAYER ACTING CUTS HOMEWORK SHORT.
+  //
+  // Owner's device log: a 3150 ms LOGIC STALL during a flee, right after an
+  // 8.2 s `ambient_fill`. The freeze watch samples every 5000 ms and reports
+  // `now - lastSample - 5000`, so 3150 means the sampler fired 8150 ms late —
+  // within 50 ms of that fill's own runtime. The flee landed inside it.
+  //
+  // ⚠⚠ OTA-1123 built the cure and hung it on the wrong trigger: homework's
+  // `onPreempt` hook fires only when ANOTHER native-ML call is enqueued. A flee
+  // needs no model, and neither does a move, or a chip tap — so for most actions
+  // the mechanism written to stop exactly this was never asked. The sprint gate
+  // below is the near miss: it governs what STARTS, needs three actions to trip,
+  // and (OTA-1405) "the first generation of a burst is always already running by
+  // then". Nothing looked at what was ALREADY RUNNING for a single action.
+  //
+  // ⚠ THIS FUNCTION IS THE RIGHT PLACE PRECISELY BECAUSE OF THE HEADER ABOVE:
+  // it is already the ONE canonical "the player did something" feed, widened by
+  // OTA-1405 to cover the button paths `submitPlayerAction` never saw. A second
+  // door would be the many-doors mistake on the very fix that exists because a
+  // signal was wired to too few doors.
+  //
+  // ⚠ Called BEFORE the coalesce return, so the FIRST door of an action cuts —
+  // waiting for the door that happens to survive coalescing would delay the cut
+  // by nothing useful. It is idempotent: the hook is cleared when it fires.
+  preemptHomeworkForPlayer();
   const last = sprintActionTimes[sprintActionTimes.length - 1];
   if (last !== undefined && now - last < SPRINT_COALESCE_MS) return;
   sprintActionTimes = sprintActionTimes.filter((t) => now - t < SPRINT_WINDOW_MS);
