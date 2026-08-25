@@ -24623,6 +24623,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // its own change so the blast radius ships reviewable and revertible without
 // losing the proven math.
 export const OTA_BUILD_ID = '2026-08-25-1503-the-bullseye-is-the-truth';
+// golem catch-up 2026-08-25: markerless publish of OTA-1503 (bullseye geometry, unwired) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1502-the-swipe-is-the-selector';
 // golem catch-up 2026-08-25: markerless publish of OTA-1502 (approach picker retired in combat) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1501-the-load-failure-names-its-evidence';
