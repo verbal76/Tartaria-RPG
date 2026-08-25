@@ -921,18 +921,40 @@ export function ExplorationScreen() {
     const canHit = player
       ? playerWeaponReach(player, 'main').bands.includes(range)
       : reachBandsFor('barehanded').includes(range);
+    // ⚠⚠ OTA-1502 — BOTH HANDS, from that same resolver. The owner picked a
+    // melee weapon in one hand and a ranged one in the other precisely so range
+    // would matter — and the card only ever spoke for `main`, so the half of
+    // that loadout doing the long work was invisible. `playerWeaponReach` has
+    // taken a slot argument since OTA-027; nothing here needed inventing, the
+    // panel simply never asked it the second question.
+    const hands: Array<{ slot: 'main' | 'off'; label: string; inRange: boolean }> = [];
+    if (player) {
+      const eq = player.equipped ?? {};
+      for (const slot of ['main', 'off'] as const) {
+        const held = slot === 'off' ? eq.off : (eq.main ?? eq.weaponName);
+        if (!held) continue;
+        const reach = playerWeaponReach(player, slot);
+        hands.push({ slot, label: reach.label, inRange: reach.bands.includes(range) });
+      }
+      // Both hands empty is still an answer — bare hands reach at close.
+      if (hands.length === 0) {
+        hands.push({ slot: 'main', label: 'Bare hands', inRange: reachBandsFor('barehanded').includes(range) });
+      }
+    }
     return currentScene.enemies.map((e, i) => ({
       enemy: e,
       currentHp: currentScene.enemyHps[i] ?? e.hp,
       rangeLabel,
       inRange: canHit,
+      hands,
       // OTA-401 — surface active coating/DOT statuses + turns left on the panel.
       statuses: currentScene.enemyStatuses?.[i] ?? [],
     }));
   }, [
     currentScene?.enemies, currentScene?.enemyHps, currentScene?.range,
     currentScene?.enemyStatuses,
-    player?.equipped?.main, player?.equipped?.weaponName, player?.stats?.intelligence,
+    player?.equipped?.main, player?.equipped?.off, player?.equipped?.weaponName,
+    player?.stats?.intelligence,
     player?.inventory,
   ]);
   const activeIdx = Math.min(currentScene?.activeEnemyIdx ?? 0, Math.max(0, enemyViews.length - 1));
@@ -1850,9 +1872,24 @@ export function ExplorationScreen() {
               // picker entirely and dispatch `approach <enemy>` so
               // each tap costs one range step (far → close → arm)
               // toward the only enemy in the scene.
+              //
+              // ⚠⚠⚠ OTA-1502 — THE PICKER IS GONE FROM COMBAT ENTIRELY, not just
+              // from the one-enemy case. The owner: *"does the approach button
+              // even need to select a person to approach or is it just an extra
+              // step that slows down the battle? … all I have to do is slide the
+              // enemy target portrait left or right and I'll be able to select
+              // that target anyways."* He was right, and the code proved it: the
+              // multi-enemy branch's ENTIRE effect was `activeEnemyIdx = idx`
+              // (gameStore's advance handler) — the same assignment the portrait
+              // pager already makes on a swipe, minus the pager's HP, power and
+              // intel. A modal that duplicates a gesture is a tax, so combat now
+              // closes on whoever is UP ON THE PAGER. Out of combat the picker
+              // is untouched: doors, vendors and features have no pager, and
+              // that is where it earns its keep.
               const enemies = currentScene?.enemies ?? [];
-              if (enemies.length === 1 && enemies[0]) {
-                submit(`approach ${enemies[0].name}`);
+              const target = enemies[activeIdx] ?? enemies[0];
+              if (target) {
+                submit(`approach ${target.name}`);
                 return;
               }
               setApproachOpen(true);

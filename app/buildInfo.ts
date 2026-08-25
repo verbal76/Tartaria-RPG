@@ -24597,7 +24597,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // guessing: this OTA changes no behavior and makes the LOAD FAILED line carry
 // the deciding facts (elapsed ms, bytes on disk vs ~398MB nominal, OTA-294
 // sentinel, free disk) so the next SEND LOG closes the case.
-export const OTA_BUILD_ID = '2026-08-25-1501-the-load-failure-names-its-evidence';
+// ⚠⚠⚠ OTA-1502 — STEP ONE OF THE COMBAT RANGE REWORK (owner design, 2026-08-25).
+// The APPROACH picker is gone from combat: its entire effect on a named enemy
+// was `activeEnemyIdx = idx`, the same assignment the portrait pager already
+// makes on a swipe — with less information on it. Combat closes on whoever is
+// up on the pager; out of combat the picker is untouched (no pager exists for
+// doors and vendors). And the enemy card now reports BOTH hands, because the
+// owner's melee/ranged loadout is the whole reason range matters and the card
+// only ever asked about `main`.
+// ⚠ WHAT IS STILL COMING (steps 2–5, per the agreed spec): per-enemy ring
+// geometry (bearing + distance, law of cosines on every step, ambush spreads /
+// patrol clusters, melee closes / ranged holds), nearest-first pager sort,
+// enemy reach classes + the red/yellow/green threat dot, shields recategorised
+// to armour with BLOCK + SHIELD BASH and their own iron-indigo inventory
+// section, and a THROW action for hand-held throwables.
+export const OTA_BUILD_ID = '2026-08-25-1502-the-swipe-is-the-selector';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1501-the-load-failure-names-its-evidence';
 // golem catch-up 2026-08-25: markerless publish of OTA-1501 (qwen load evidence) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1500-the-tutorial-teaches-the-marks';
 // golem catch-up 2026-08-25: markerless publish of OTA-1500 (tutorial teaches the marks) to the golem channel.

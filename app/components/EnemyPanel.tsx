@@ -38,6 +38,14 @@ export interface EnemyView {
   inRange?: boolean;
   /** Human-readable range label — "arm's reach", "close", "far". */
   rangeLabel?: string;
+  /** ⚠⚠ OTA-1502 — WHAT EACH HAND CAN DO ABOUT *THIS* ENEMY. The owner:
+   *  *"if I keep swiping and all of a sudden I'm weapons green across the
+   *  board, then I know that I'm standing in front of that person."* The card
+   *  spoke for the MAIN hand alone, so a dual-wielder carrying the melee /
+   *  ranged pair — the loadout the whole range system exists to serve — could
+   *  not read his off hand at all. One entry per filled hand; a single
+   *  bare-hands entry when both are empty. */
+  hands?: Array<{ slot: 'main' | 'off'; label: string; inRange: boolean }>;
   /** OTA-401 — active coating/DOT statuses on this enemy + turns left. */
   statuses?: EnemyStatusView[];
 }
@@ -398,6 +406,27 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
             : inRange ? 'IN RANGE' : 'OUT OF RANGE'}
         </Text>
       </View>
+      {/* ⚠⚠ OTA-1502 — THE HANDS, PER ENEMY. Green = that hand reaches THIS
+          foe from where you stand; red = it cannot. Swiping the pager until
+          both read green is how the owner asked to find the man he can hit
+          without walking into anyone else's reach. */}
+      {!!view.hands?.length && (
+        <View style={styles.handsRow}>
+          {view.hands.map((h) => (
+            <Text
+              key={h.slot}
+              style={[styles.hand, h.inRange ? styles.handIn : styles.handOut]}
+              numberOfLines={1}
+              accessibilityLabel={`${h.slot === 'main' ? 'Main hand' : 'Off hand'} ${h.label}, ${h.inRange ? 'in range' : 'out of range'}`}
+            >
+              {/* ⚠ NOT ▲/▼ — OTA-1499/1500 spent a tutorial beat teaching those
+                  as BETTER/WORSE than your equipped gear. A lit/unlit dot says
+                  "this hand can reach" without borrowing a taught meaning. */}
+              {h.inRange ? '●' : '○'} {h.label}
+            </Text>
+          ))}
+        </View>
+      )}
       {/* OTA-897 (SA-5) — the bestiary voice line also greets you on the combat
           card, so a foe reads as a described creature, not a bare stat block. */}
       {!!view.enemy.flavor && (
@@ -541,6 +570,13 @@ const styles = StyleSheet.create({
   range: { fontSize: 9, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 2, borderWidth: 1, marginLeft: 6 },
   rangeIn: { color: '#9ec96a', borderColor: '#3d5a2c' },
   rangeOut: { color: '#a2977b', borderColor: '#3a342c' },
+  // OTA-1502 — per-hand reach row. Green shares the picker's "this is good for
+  // you" green (#9ec96a); the unreachable hand goes muted rather than alarm-red,
+  // because an out-of-reach weapon is information, not a warning.
+  handsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 3 },
+  hand: { fontSize: 9, letterSpacing: 0.5 },
+  handIn: { color: '#9ec96a' },
+  handOut: { color: '#7a7263' },
   subline: { color: '#a2977b', fontSize: 11, flexShrink: 1 },
   // OTA-897 (SA-5) — the enemy card's voice line: readable italic prose, set
   // above the stat grid.
