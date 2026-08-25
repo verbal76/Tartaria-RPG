@@ -245,8 +245,21 @@ describe('the tutorial, crawled by thumb', () => {
       renderer.act(() => { tree.unmount(); });
     }
     await flush();
-    expect(beat()).toBe('rope');
+    expect(beat()).toBe('screen_pick');
     expect(useGameStore.getState().player?.equipped?.chest).toMatch(/vest/i);
+
+    // ── screen_pick — OTA-1500: the offer ON the text roll. The chip carries
+    //    the ★ (bare head) and one tap takes AND wears the cap. The sweep
+    //    excludes the offer itself — it IS the beat's control. ───────────────
+    sweeps.push({ beatId: 'screen_pick', ...sweepOffScript([/salvage cap/i]) });
+    {
+      const tree = mount();
+      press(tree, /salvage cap/i);
+      renderer.act(() => { tree.unmount(); });
+    }
+    await flush();
+    expect(beat()).toBe('rope');
+    expect(useGameStore.getState().player?.equipped?.head).toMatch(/salvage cap/i);
 
     // ── rope — typed, by design (the hint says "type 'take rope'"). ────────
     sweeps.push({ beatId: 'rope', ...sweepOffScript([]) });
@@ -337,7 +350,7 @@ describe('the tutorial, crawled by thumb', () => {
     // not the instructed one was pressed and the world did not move. A sweep
     // that pressed nothing proves nothing, so each must have real coverage.
     const byBeat = Object.fromEntries(sweeps.map((s) => [s.beatId, s]));
-    for (const id of ['name', 'look', 'cudgel', 'armor', 'rope', 'scrap', 'climb', 'investigate']) {
+    for (const id of ['name', 'look', 'cudgel', 'armor', 'screen_pick', 'rope', 'scrap', 'climb', 'investigate']) {
       expect({ beat: id, swept: byBeat[id]!.pressed }.swept).toBeGreaterThan(0);
     }
   });

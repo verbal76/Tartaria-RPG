@@ -716,8 +716,9 @@ export function ExplorationScreen() {
   const tutorialProp: string | null =
     tutBeat === 'cudgel' ? 'cudgel'
       : tutBeat === 'armor' ? "Mud-Warden's Vest"
-        : tutBeat === 'scrap' ? 'broken chest plate'
-          : null;
+        : tutBeat === 'screen_pick' ? "Reclaimer's Salvage Cap"
+          : tutBeat === 'scrap' ? 'broken chest plate'
+            : null;
   // ⚠⚠ ...AND THE PROP GOES SPENT WHEN IT IS TAKEN. From the owner's log, the vest
   // row paid out FIVE TIMES: `consumed` was hardcoded false, so the armor beat —
   // the one beat that deliberately does NOT advance on the take (it advances on
@@ -729,7 +730,8 @@ export function ExplorationScreen() {
     tutorialProp === null ? false
       : tutBeat === 'cudgel' ? !!s.tutorialPropsConsumed.cudgel
         : tutBeat === 'armor' ? !!s.tutorialPropsConsumed.vest
-          : !!s.tutorialPropsConsumed.chestPlate);
+          : tutBeat === 'screen_pick' ? !!s.tutorialPropsConsumed.cap
+            : !!s.tutorialPropsConsumed.chestPlate);
   const gatherChips = useMemo(
     () => {
       const room =
@@ -870,7 +872,9 @@ export function ExplorationScreen() {
     // beat is pointing at it; a second, faster route to the same action competes
     // with the thing being taught. Same reasoning the more-tray uses for refusing
     // to let a forced-open tray write the player's own preference.
-    () => (tutBeat !== null ? null : pickFeedActionChip(player, gatherChips)),
+    // ⚠ OTA-1500 — hidden through the tutorial EXCEPT its own beat: screen_pick
+    // exists to teach this exact offer, so that is the one beat that shows it.
+    () => (tutBeat !== null && tutBeat !== 'screen_pick' ? null : pickFeedActionChip(player, gatherChips)),
     [player, gatherChips, tutBeat],
   );
   const gatherLaneCount = gatherCounts.lanes;
@@ -1734,11 +1738,18 @@ export function ExplorationScreen() {
             // after the handler destroys the frozen-screen-vs-frozen-engine
             // signal.
             logUiTap(feedActionChipLabel(feedChip));
+            // ⚠ OTA-1500 — during its own beat the offer is a tutorial prop, not
+            // a scene noun, so the generic take path cannot grant it; the beat's
+            // store action grants, wears and advances (vest-flow rules).
+            if (tutBeat === 'screen_pick') {
+              useGameStore.getState().tutorialScreenPick();
+              return;
+            }
             takeAndWear(feedChip.noun);
           } : undefined}
-          packChipLabel={feedChip ? feedPackChipLabel(feedChip) : null}
+          packChipLabel={feedChip && tutBeat !== 'screen_pick' ? feedPackChipLabel(feedChip) : null}
           packChipA11yLabel={feedChip ? feedPackChipA11yLabel(feedChip) : undefined}
-          onPackChipPress={feedChip ? () => {
+          onPackChipPress={feedChip && tutBeat !== 'screen_pick' ? () => {
             // ⚠ OTA-1498 — same tap-ledger-first rule as the chip above. The pack
             // door is the picker's own plain take (takeAmbientNoun): item lands in
             // the pack, nothing equipped, nothing un-equipped.
@@ -2588,6 +2599,14 @@ export function ExplorationScreen() {
           // time" since the owner first asked about the mark (OTA-1237); it just had
           // never done it. The slot comes from the same catalog lookups the mark
           // does, so a row cannot show ★ and then have nowhere to go.
+          // ⚠ OTA-1500 — the screen_pick cap is a tutorial prop, not a scene
+          // noun; whichever door the player takes it through (this sheet or the
+          // on-screen offer), the beat's store action does the grant + wear.
+          if (tutBeat === 'screen_pick' && /salvage cap/i.test(noun)) {
+            setTakeOpen(false);
+            useGameStore.getState().tutorialScreenPick();
+            return;
+          }
           // ⚠ OTA-1457 — shared with the feed chip; see `takeAndWear` above.
           takeAndWear(noun);
         }}

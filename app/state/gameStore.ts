@@ -6133,7 +6133,7 @@ export function restoreStamina(player: PlayerCharacter, amount: number): PlayerC
 // updated armor."* The cudgel AUTO-equips (grantTutorialItem below), so nothing in
 // the tutorial ever taught the equip step — a player finished it having never
 // opened their pack. The vest deliberately does NOT auto-equip.
-type TutorialPropId = 'cudgel' | 'rope' | 'chestPlate' | 'note' | 'vest';
+type TutorialPropId = 'cudgel' | 'rope' | 'chestPlate' | 'note' | 'vest' | 'cap';
 
 function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
   switch (id) {
@@ -6180,6 +6180,19 @@ function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
       return stampDurability({
         id: freshInstanceId('tutorial_vest'),
         name: "Mud-Warden's Vest",
+        kind: 'armor',
+        rarity: 'Common',
+        quantity: 1,
+        tags: ['armor'],
+      } as InventoryItem);
+    case 'cap':
+      // ⚠ OTA-1500 — like the vest: a REAL catalog piece (armor.json, head,
+      // +1 AC) against a head slot the tutorial leaves bare, so the on-screen
+      // offer's ★ computes honestly and the beat points at a mark the player
+      // is actually looking at.
+      return stampDurability({
+        id: freshInstanceId('tutorial_cap'),
+        name: "Reclaimer's Salvage Cap",
         kind: 'armor',
         rarity: 'Common',
         quantity: 1,
@@ -6622,12 +6635,18 @@ export interface GameStore {
     note: boolean;
     /** ⚠ OTA-1248 — optional so saves written before this OTA still load. */
     vest?: boolean;
+    /** ⚠ OTA-1500 — optional for the same reason. */
+    cap?: boolean;
   };
   /** Tungsten Spire — `maybeAdvanceTutorial(beatId)` advances the
    *  tutorial only if the current beat matches. Used by action
    *  handlers to advance after a verb resolves without coupling them
    *  to step index numbers. */
   maybeAdvanceTutorial: (beatId: string) => void;
+  /** ⚠ OTA-1500 — the screen_pick beat's tap: the on-screen offer (feed chip)
+   *  grants the tutorial cap, wears it, and advances the beat. Mirrors the
+   *  vest flow: say it only if it happened, equip checked not assumed. */
+  tutorialScreenPick: () => void;
   /** Door-open branch (explore_or_leave beat). chooseTutorialExplore →
    *  player keeps poking around; the Arbiter explains how to leave when
    *  ready. chooseTutorialLeave → walk out the gate now. Both ultimately
@@ -7887,7 +7906,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   buildingRevealed: [],
   buildingVisited: [],
   preBuildingScene: null,
-  tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false, vest: false },
+  tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false, vest: false, cap: false },
 
   slots: [],
   activeSlotId: null,
@@ -12006,6 +12025,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       //     the beat: `armor` advances on the EQUIP, because taking a thing and
       //     wearing it are the two halves the tutorial had never separated. The
       //     cudgel auto-equips, which is exactly why nobody learned this step.
+      // ⚠ OTA-1500 — the screen_pick beat's TYPED twin. The beat's control is
+      // the on-screen offer, but a locked beat with no typed escape is a
+      // softlock (the ota1249 rule) — so taking or wearing the cap by words
+      // runs the same store action the tap does.
+      if (tStep?.id === 'screen_pick' && /\b(take|grab|pick\s*up|get|wear|equip|don|put\s*on)\b.*(cap|salvage)/i.test(trimmed)) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        get().tutorialScreenPick();
+        return;
+      }
       if (tStep?.id === 'armor' && /\b(take|grab|pick\s*up|get)\s+.*(vest|mud-warden|warden)/i.test(trimmed)) {
         if (!_opts?.silent) get().appendLog('player', trimmed);
         // ⚠⚠ OTA-1250 — SAY IT ONLY IF IT HAPPENED. From the owner's device log,
@@ -27110,6 +27138,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // lesson. queueInputDraft stays for the Action Reference help cards,
     // which are a "finish this phrase" surface, not a tutorial beat.
   },
+  tutorialScreenPick() {
+    // ⚠ Double-tap safe the same way the vest is (OTA-1250): the grant
+    // early-returns once consumed, and the reward line only prints on the
+    // real grant. The equip is checked against the pack, not assumed.
+    if (!get().tutorialPropsConsumed.cap) {
+      grantTutorialItem(get, set, 'cap');
+      get().appendLog('world', 'You lift the cap from the shelf rail. Salvage-stitched leather over a steel band — a reclaimer wore this into worse places than here.');
+      get().appendLog('reward', "✦ Reclaimer's Salvage Cap (Common).");
+    }
+    const held = get().player?.inventory ?? [];
+    if (held.some((i) => /salvage cap/i.test(i.name) && i.quantity > 0)) {
+      get().equipItem("Reclaimer's Salvage Cap", 'head');
+    }
+    get().maybeAdvanceTutorial('screen_pick');
+  },
+
   maybeAdvanceTutorial(beatId) {
     const state = get();
     if (state.tutorialStep === null) return;
@@ -27195,6 +27239,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       cudgel: 'tap the glowing TAKE / SALVAGE button, then tap the cudgel in the list.',
       rope: "type 'take rope' in the box, then tap ACT.",
       armor: 'tap the ★ vest inside TAKE / SALVAGE — one tap puts it on.',
+      screen_pick: 'tap the ★ offer in the story text — one tap puts the cap on.',
       scrap: 'tap the glowing TAKE / SALVAGE button, then tap the chest plate under SALVAGE.',
       climb: 'tap the glowing CLIMB button.',
       investigate: 'tap the glowing INVESTIGATE button and look at the door.',

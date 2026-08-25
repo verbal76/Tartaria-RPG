@@ -39,7 +39,7 @@
 // deviated from.
 
 import type { PlayerCharacter, EquipSlot } from './types';
-import { isUpgradeOverEquipped, upgradeEquipSlot, upgradeReasonClause } from './gatherSort';
+import { isUpgradeOverEquipped, upgradeEquipSlot, upgradeReasonClause, equipVerdict } from './gatherSort';
 
 /** One row of the gather picker, as `ExplorationScreen` builds it. Structural
  *  rather than imported so this stays a leaf: it imports no screen and no store,
@@ -67,6 +67,11 @@ export interface FeedActionChip {
    *  honestly. Owner: "I don't know how it compares — why would I just grab
    *  it?" A chip that asks for a swap owes the player its reasoning. */
   reason: string | null;
+  /** ⚠ OTA-1500 — the same mark the picker shows (owner: the pyramid marks are
+   *  the vocabulary, on BOTH surfaces): ★ when the destination slot is bare,
+   *  ▲ when the item displaces something it beats. A chip is never a ▼ — a
+   *  downgrade is never offered (OTA-1457). */
+  mark: '★' | '▲';
 }
 
 /**
@@ -98,6 +103,7 @@ export function pickFeedActionChip(
       slot: wear.slot,
       itemName: wear.name,
       reason: upgradeReasonClause(player, c.noun),
+      mark: equipVerdict(player, c.noun)?.state === 'empty' ? '★' : '▲',
     };
   }
   return null;
@@ -119,9 +125,11 @@ export function feedActionChipLabel(chip: FeedActionChip): string {
   // ⚠ OTA-1498 — the face carries the comparator's verdict. The green ⬆ was
   // read as "pick up", not "upgrade"; the clause makes the claim explicit
   // ("2d8 over your 2d6", "your off hand is free") so the swap is informed.
+  // ⚠ OTA-1500 — the glyph is the picker's own mark (★ bare / ▲ beats), not a
+  // third symbol for the same fact. One vocabulary, both surfaces.
   const base = HAND_SLOTS.has(chip.slot)
-    ? `⬆ Take & wield ${chip.itemName}`
-    : `⬆ Take & wear ${chip.itemName}`;
+    ? `${chip.mark} Take & wield ${chip.itemName}`
+    : `${chip.mark} Take & wear ${chip.itemName}`;
   return chip.reason ? `${base} — ${chip.reason}` : base;
 }
 

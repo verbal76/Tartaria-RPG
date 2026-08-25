@@ -135,7 +135,8 @@ describe('OTA-1253 — the armor beat completes inside the picker', () => {
   });
 
   it('⚠⚠ ONE TAP ADVANCES IT — the beat does not wait on a trip to the pack', () => {
-    expect(beat()).toBe('rope');
+    // OTA-1500 — the screen_pick beat now sits between armor and rope.
+    expect(beat()).toBe('screen_pick');
   });
 
   it('⚠⚠ ...and the vest is actually ON, not sitting in the pack', () => {

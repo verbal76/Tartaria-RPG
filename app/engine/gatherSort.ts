@@ -158,28 +158,42 @@ export function isUpgradeOverEquipped(player: PlayerCharacter | null, noun: stri
  *  upgrade or cannot be honestly compared, mirroring the comparator's refusals.
  */
 export function upgradeReasonClause(player: PlayerCharacter | null, noun: string): string | null {
-  if (!player || !isUpgradeOverEquipped(player, noun)) return null;
+  // ⚠⚠ OTA-1500 — REWRITTEN TO DERIVE FROM THE VERDICT, after its own
+  // consistency test caught the two-derivations defect it warned about: the
+  // first draft short-circuited on "off hand free" while `upgradeEquipSlot`'s
+  // range-coverage rule (OTA-1277) was actually sending the ranged piece to
+  // MAIN — a label promising one slot over a tap that filled another. The
+  // clause now reads the destination the verdict names and speaks about THAT
+  // slot only. `averageDamage` appears here to pick between the dice line and
+  // the coverage line — the verdict itself is not re-decided.
+  const v = equipVerdict(player, noun);
+  if (!v || v.state === 'down' || !player) return null;
+  if (v.state === 'empty') {
+    return v.slot === 'off' ? 'your off hand is free'
+      : v.slot === 'main' ? 'your main hand is empty'
+        : `your ${equipSlotWord(v.slot)} slot is bare`;
+  }
   const armor = armorByName(noun);
   if (armor) {
-    const worn = equippedInSlot(player, armor.slot);
-    if (!worn) return `your ${armor.slot} slot is bare`;
-    const wornArmor = armorByName(worn.name);
+    const worn = resolveEquippedItem(player, v.slot);
+    const wornArmor = worn ? armorByName(worn.name) : null;
     if (!wornArmor) return null;
     return `AC +${armor.acBonus} over your +${wornArmor.acBonus}`;
   }
   const weapon = weaponByName(noun);
   if (weapon) {
-    const main = resolveEquippedItem(player, 'main');
-    if (!main) return 'your main hand is empty';
-    if (weapon.style !== 'two_handed' && !resolveEquippedItem(player, 'off')) {
-      return 'your off hand is free';
-    }
-    const heldWeapon = weaponByName(main.name);
+    const held = resolveEquippedItem(player, v.slot);
+    const heldWeapon = held ? weaponByName(held.name) : null;
     if (!heldWeapon) return null;
-    return `${weapon.damageDice} over your ${heldWeapon.damageDice}`;
+    if (averageDamage(weapon.damageDice) > averageDamage(heldWeapon.damageDice)) {
+      return `${weapon.damageDice} over your ${heldWeapon.damageDice}`;
+    }
+    // Placed by OTA-1277's range-coverage rule, not by dice — say that.
+    return 'covers a range your hands lack';
   }
   return null;
 }
+
 
 /** ⚠ The armor catalog's slot names and the player's equip slots are the same
  *  words (head / chest / hands / legs / feet / cloak) — but they are separate

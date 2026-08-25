@@ -109,7 +109,7 @@ export const TUTORIAL_SELF_DEFENCE =
 // (OTA-1236, 1241, 1244, 1245): a rule computed twice drifts. One export, both
 // readers.
 export const TUT_LOCK_BEATS: readonly string[] = [
-  'name', 'look', 'cudgel', 'armor', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave',
+  'name', 'look', 'cudgel', 'armor', 'screen_pick', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave',
 ];
 
 // Tungsten Spire — the new 10-beat in-feed sequence. Each beat is
@@ -190,6 +190,24 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     body: 'A Mud-Warden\'s Vest is here, marked ★ — that means it beats what you have on. Tap it in TAKE / SALVAGE and you put it on in the same move.',
     arbiter:
       '"That vest is better than bare cloth, and the star says so. Open TAKE / SALVAGE and tap it — a starred piece goes straight onto your back."',
+  },
+  {
+    // ⚠⚠ OTA-1500 — THE MARKS, TAUGHT WHERE THEY SHOW. Owner: *"we are going to
+    // need to add that to the tutorial, and have them pick an item from the
+    // screen as well. we will need to explain the star and arrows"* — the star
+    // and the pyramid marks (OTA-1499's vocabulary), plus the offer that
+    // appears right ON the text roll (OTA-1457's feed chip, which the tutorial
+    // had always hidden). The cap is a REAL catalog head piece against the
+    // head slot the tutorial leaves bare, so the ★ on the offer is honest.
+    id: 'screen_pick',
+    remind: 'tap the ★ offer in the story text to put the cap on',
+    screen: 'exploration',
+    area: 'feed',
+    pulse: true,
+    title: 'Read the Marks',
+    body: 'Tartaria sizes gear up for you as you go, and the marks are always the same: ★ fills a slot you have empty, a green ▲ beats what you\'re wearing and swaps in with one tap, a red ▼ loses to it — tapping that only sends it to your pack. When the game spots something worth wearing, the offer appears right in the story text. Your head is bare, so this cap carries the ★ — tap the offer to put it on.',
+    arbiter:
+      '"Tartaria reads your gear as you walk. A star means the slot sits empty — free to fill. A green point up: better than what you wear, one tap swaps it. A red point down: worse — it only goes to your pack. That cap in the text carries the star. Tap the offer, and it\'s on your head."',
   },
   {
     id: 'rope',

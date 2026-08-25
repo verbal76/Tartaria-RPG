@@ -196,6 +196,9 @@ describe('OTA-1281 — PLAYED: a character of every faction walks their outpost'
     sub("take the Mud-Warden's Vest");
     useGameStore.getState().equipItem("Mud-Warden's Vest", 'chest');
     await new Promise((r) => setTimeout(r, 0));
+    // OTA-1500 — the screen_pick beat (the on-screen ★ offer) sits between
+    // armor and rope now; its store action is the tap the beat teaches.
+    useGameStore.getState().tutorialScreenPick();
     sub('take the rope'); sub('scrap the chest plate');
     for (let i = 0; i < 8 && beat() === 'climb'; i++) {
       sub(useGameStore.getState().currentScene?.elevatedOn ? 'climb down' : 'climb');

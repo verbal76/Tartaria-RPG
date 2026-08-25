@@ -147,6 +147,13 @@ beforeAll(async () => {
         useGameStore.getState().equipItem("Mud-Warden's Vest", 'chest');
         continue;
       }
+      // ⚠ OTA-1500 — the screen_pick beat: the on-screen ★ offer, typed here
+      // because this walk is the TYPED-ONLY guarantee. The intercept routes
+      // the words to the same store action the tap runs.
+      if (id === 'screen_pick') {
+        useGameStore.getState().submitPlayerAction('take the salvage cap');
+        continue;
+      }
       if (id === 'climb') {
         // The beat's own instruction: "you go up in stages... top out, then
         // climb back down" — completion fires on the way DOWN. State-aware

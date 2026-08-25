@@ -19,7 +19,14 @@
 // destination was bare — which is the entire difference between ★ and ▲.
 
 import React from 'react';
-import renderer from 'react-test-renderer';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const renderer = require('react-test-renderer') as {
+  create: (el: React.ReactElement) => {
+    toJSON: () => unknown;
+    unmount: () => void;
+    root: { findAll(f: (n: { props: Record<string, unknown> }) => boolean): Array<{ props: Record<string, unknown> }> };
+  };
+};
 import {
   equipVerdict, equipSlotWord, gatherIcon, isUpgradeOverEquipped,
 } from '../app/engine/gatherSort';

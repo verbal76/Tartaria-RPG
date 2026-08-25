@@ -38,7 +38,9 @@ const EXPECTED_BEAT_IDS = [
   // equip a piece of updated armor."* The cudgel AUTO-equips, so a player could
   // finish the whole tutorial having never opened their pack. The vest does not,
   // and the beat completes on the EQUIP.
-  'name', 'look', 'cudgel', 'armor', 'rope', 'scrap', 'climb', 'investigate',
+  // ⚠ OTA-1500 — 'screen_pick' added after 'armor': the on-screen ★ offer
+  // and the mark vocabulary, taught right after the first wear.
+  'name', 'look', 'cudgel', 'armor', 'screen_pick', 'rope', 'scrap', 'climb', 'investigate',
   'explore_or_leave', 'main_quest', 'pick_city',
 ] as const;
 

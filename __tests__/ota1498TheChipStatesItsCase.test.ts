@@ -59,9 +59,13 @@ const rows = (...r: Array<[string, boolean]>): GatherChipRow[] =>
   r.map(([noun, consumed]) => ({ noun, consumed }));
 
 describe('OTA-1498 — the reason clause, from the comparator\'s own lookups', () => {
-  it('⚠⚠⚠ THE OWNER\'S EXACT CASE: a ranged javelin with a free off hand says so', () => {
+  it('⚠⚠⚠ THE OWNER\'S EXACT CASE: the ranged javelin names the coverage rule', () => {
+    // ⚠⚠ The first draft said "your off hand is free" here — and the
+    // consistency test below caught it: upgradeEquipSlot's range-coverage rule
+    // (OTA-1277) actually sends a ranged piece into the MAIN hand of an
+    // all-melee pair. The clause speaks about the slot the tap really fills.
     const clause = upgradeReasonClause(armed('Cudgel'), 'Bone Javelin');
-    expect(clause).toMatch(/off hand is free/);
+    expect(clause).toBe('covers a range your hands lack');
   });
 
   it('⚠⚠ a straight damage upgrade states both dice', () => {
@@ -83,11 +87,15 @@ describe('OTA-1498 — the reason clause, from the comparator\'s own lookups', (
     expect(upgradeReasonClause(bare(), 'rubble')).toBeNull();
   });
 
-  it('⚠ one derivation: the clause lives beside the comparator and reuses its lookups', () => {
+  it('⚠ one derivation: the clause reads the VERDICT and speaks about its slot', () => {
+    // OTA-1500 — rewritten onto equipVerdict after the consistency test caught
+    // the clause promising one slot while the tap filled another. The dice
+    // compare picks the WORDING (damage line vs coverage line); the verdict
+    // itself is not re-decided here.
     const fn = SORT.slice(SORT.indexOf('export function upgradeReasonClause'));
     const body = fn.slice(0, fn.indexOf('\n}'));
-    expect(body).toContain('isUpgradeOverEquipped(player, noun)');
-    expect(body).not.toContain('averageDamage'); // the verdict is reused, not recomputed
+    expect(body).toContain('equipVerdict(player, noun)');
+    expect(body).toContain('resolveEquippedItem(player, v.slot)');
   });
 });
 
@@ -95,10 +103,11 @@ describe('OTA-1498 — the chip carries the verdict', () => {
   it('⚠⚠⚠ the face says why: item, then the clause', () => {
     const chip = pickFeedActionChip(armed('Cudgel'), rows(['Bone Javelin', false]));
     expect(chip).not.toBeNull();
-    expect(chip!.reason).toMatch(/off hand is free/);
+    // OTA-1500 — the ranged piece displaces into MAIN by the coverage rule, so
+    // the mark is ▲ and the clause names the coverage, not a free hand.
+    expect(chip!.reason).toBe('covers a range your hands lack');
     const label = feedActionChipLabel(chip!);
-    expect(label).toMatch(/^⬆ Take & wield Bone Javelin — /);
-    expect(label).toMatch(/off hand is free/);
+    expect(label).toMatch(/^▲ Take & wield Bone Javelin — covers a range/);
   });
 
   it('⚠⚠ the screen-reader sentence carries the same reasoning', () => {
@@ -110,7 +119,7 @@ describe('OTA-1498 — the chip carries the verdict', () => {
   it('⚠ a chip whose clause cannot be stated still renders — face without the dash', () => {
     const chip = pickFeedActionChip(bare(), rows(["Mud-Warden's Vest", false]))!;
     const stripped = { ...chip, reason: null };
-    expect(feedActionChipLabel(stripped)).toBe(`⬆ Take & wear ${chip.itemName}`);
+    expect(feedActionChipLabel(stripped)).toBe(`★ Take & wear ${chip.itemName}`);
   });
 });
 
@@ -130,7 +139,7 @@ describe('OTA-1498 — the second door goes to the pack', () => {
 
   it('⚠⚠⚠ its tap is the picker\'s own plain take — logged first, nothing equipped', () => {
     const span = EXPL.slice(
-      EXPL.indexOf('onPackChipPress={feedChip ? () => {'),
+      EXPL.indexOf("onPackChipPress={feedChip && tutBeat !== 'screen_pick' ? () => {"),
       EXPL.indexOf('} : undefined}', EXPL.indexOf('onPackChipPress=')),
     );
     // Same tap-ledger-first rule as the main chip (OTA-1485).

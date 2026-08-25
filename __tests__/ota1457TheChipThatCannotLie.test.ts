@@ -155,7 +155,7 @@ describe('OTA-1457 — the chip cannot offer what the picker would refuse', () =
     expect(chip!.noun).toBe("Mud-Warden's Vest");
     // OTA-1498 added `reason` — the comparator's verdict for the button face.
     // Still no item id: one identifier, one resolver, unchanged.
-    expect(Object.keys(chip!).sort()).toEqual(['itemName', 'noun', 'reason', 'slot']);
+    expect(Object.keys(chip!).sort()).toEqual(['itemName', 'mark', 'noun', 'reason', 'slot']);
   });
 });
 
@@ -278,7 +278,7 @@ describe('OTA-1457 — it is an accelerator, never the only route', () => {
     // thing being taught.
     const i = EXPL.indexOf('const feedChip = useMemo(');
     const memo = EXPL.slice(i, EXPL.indexOf('[player, gatherChips, tutBeat],', i));
-    expect(memo).toContain('tutBeat !== null ? null :');
+    expect(memo).toContain("tutBeat !== null && tutBeat !== 'screen_pick' ? null :");
     // …and the dep is listed, or the gate goes stale the moment the beat changes —
     // the exact defect class that produced the frozen INVESTIGATE light.
     expect(EXPL.slice(i)).toContain('[player, gatherChips, tutBeat],');
