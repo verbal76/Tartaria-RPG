@@ -1,0 +1,155 @@
+{
+  "id": "da803062f7e841689f596ade057c34da",
+  "groupID": "7689752968",
+  "eventID": "da803062f7e841689f596ade057c34da",
+  "projectID": "4511945117532160",
+  "size": 2707,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: (no action yet)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "Process died with no orderly exit while: (no action yet)",
+  "title": "Process died with no orderly exit while: (no action yet)",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db22:e3:ad2:ae51:4fca:1c1a",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "7389f55c5a0e4d0a8a3e75de25f4689a",
+      "span_id": "8718fbb18894e8bb",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "id": "1787593789532_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "rendered",
+    "lastPhaseAgeMs": -37008,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: (no action yet)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-08-24-1491-two-taps-to-load"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "stage",
+      "value": "rendered"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db22:e3:ad2:ae51:4fca:1c1a",
+      "query": "user.ip:\"2607:fb90:db22:e3:ad2:ae51:4fca:1c1a\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-25T23:10:48.587486Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-24T17:49:49.532000Z",
+  "fingerprints": [
+    "d2a856763bc7c5254aad1c4fed660793"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "ff82d622feff4b24a1afe1798c147503",
+  "previousEventID": "a329a613c9af4b97a6beb9edac2541f0"
+}
