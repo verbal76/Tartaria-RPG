@@ -24611,7 +24611,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // enemy reach classes + the red/yellow/green threat dot, shields recategorised
 // to armour with BLOCK + SHIELD BASH and their own iron-indigo inventory
 // section, and a THROW action for hand-held throwables.
-export const OTA_BUILD_ID = '2026-08-25-1502-the-swipe-is-the-selector';
+// ⚠⚠⚠ OTA-1503 — THE BULLSEYE GEOMETRY, LANDED UNWIRED (step 2a of the combat
+// range rework). engine/combatGeometry.ts holds the owner's model whole: the
+// player at the origin of five rings, every enemy a bearing + distance, one step
+// recomputing the whole field cartesian-exactly (the man at 90° barely moves;
+// the man behind you opens a ring; past ring 4 you are out of the fight), a
+// step that cannot carry you through the man you walk at, ambush spreads /
+// patrol clusters staggered one man per ring, and a nearest-first pager order.
+// 23 tests prove the numbers. NOTHING IMPORTS IT YET — the rewiring of spawn
+// sites, attack gate, counters, pursuit and saves is OTA-1504, deliberately
+// its own change so the blast radius ships reviewable and revertible without
+// losing the proven math.
+export const OTA_BUILD_ID = '2026-08-25-1503-the-bullseye-is-the-truth';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1502-the-swipe-is-the-selector';
 // golem catch-up 2026-08-25: markerless publish of OTA-1502 (approach picker retired in combat) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1501-the-load-failure-names-its-evidence';
 // golem catch-up 2026-08-25: markerless publish of OTA-1501 (qwen load evidence) to the golem channel.
