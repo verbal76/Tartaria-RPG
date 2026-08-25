@@ -83,35 +83,65 @@ export const LOCATION_ATLAS_COORDS: Record<string, AtlasCoord> = {
   obsidian_pillars: { fx: 0.38, fy: 0.33 },
   zharaks_teeth: { fx: 0.53, fy: 0.29 },
 
-  // Lost Capitals band — left of compass
-  asgardar: { fx: 0.16, fy: 0.47 },
-  // ⚠ OWNER, 2026-08-17: *"move asgardars tower to the outskirts as discussed."* The
-  // collector-tower is now its OWN tile rather than a landmark inside the capital, and it
-  // INHERITS the cell the Etheria spire used to hold (27,21) — two tiles south of Asgardar
-  // itself, which is the "technically on the outskirts of the city" he asked for. The two
-  // towers were never one place; they were only ever adjacent on the atlas, and this pass
-  // is what finally separates them on the ground.
-  grand_spire_of_asgardar: { fx: 0.16, fy: 0.53 },
-  samarran: { fx: 0.28, fy: 0.48 },
-  thametans_tower: { fx: 0.33, fy: 0.57 },
+  // ⚠⚠ OTA-1496 — THE CAPITALS SPREAD OUT. OWNER, 2026-08-25: *"I would like to
+  // see at least 20 spaces between the capitals… nothing is nailed down, we just
+  // made it so that the capitals were roughly arranged correctly and filled onto
+  // one of the city looking pieces on the map — can we spread them out?"*
+  //
+  // ⚠⚠ THE MEASUREMENT FIRST: Drakova↔Voronov sat 2 tiles apart, Asgardar↔Samarran
+  // 6, and 18 of the 36 capital pairs were under 20. The drawable pin band
+  // (fx 0.05–0.95 / fy 0.05–0.97 — the atlas guard) maps to a 37×21-tile box at
+  // SPREAD 40/22, and 9 points pairwise ≥20 tiles PROVABLY cannot fit in it (z3
+  // UNSAT; at 20 only 7 fit). ≥16 fits only as a ring that exiles Nimari from the
+  // centre; **14** is the most the map gives while Nimari keeps the middle seat
+  // and every capital keeps its compass identity. So: every pair of Lost Capitals
+  // is now ≥14 tiles apart (worst pair was 2), the mutual east/west/north/south
+  // ordering of every clearly-ordered pair is preserved, and each moved pin was
+  // re-seated on painted art where the geometry allowed (ota1496 suite holds the
+  // spacing as a ratchet).
+  //
+  // ⚠ NIMARI DID NOT MOVE, deliberately — it is the centre capital, and its Red
+  // Tower (42,22) is pinned by id in tests and lore. The three satellite towers
+  // move WITH their capitals (owner, same day: "one of the spires is tied to one
+  // of the capitals as it's in the outskirts — it moves too"): the Asgardar spire
+  // stays exactly two tiles south of Asgardar, Thametan's Tower keeps its (+2,+2)
+  // to Samarran, the Red Tower its (+1,+2) to Nimari.
+
+  // West arc — Asgardar now the south-west seat, on the scorched ground just
+  // below the walled ruin at the painted west edge; its collector-spire two
+  // tiles south, at the round spire-platform the art conveniently keeps there
+  // (grid (23,25) / (23,27); the atlasCoords adjacency test holds capital and
+  // tower within 0.10 of each other per axis, which is why both pins hug the
+  // near edges of their cells).
+  asgardar: { fx: 0.058, fy: 0.744 },
+  grand_spire_of_asgardar: { fx: 0.0585, fy: 0.805 },
+  // Samarran west-mid on the long colonnade ruin (grid (30,17)); Thametan's
+  // Tower two east / two south of it — which lands the tower on the domed city
+  // that used to be Samarran's own silhouette. The tower keeps the old city.
+  samarran: { fx: 0.235, fy: 0.379 },
+  thametans_tower: { fx: 0.265, fy: 0.470 },
 
   // Center & east — capitals + buried cities
   nimari: { fx: 0.50, fy: 0.50 },
   red_tower_of_nimari: { fx: 0.52, fy: 0.60 },
-  drakova: { fx: 0.77, fy: 0.47 },
-  voronov: { fx: 0.78, fy: 0.56 },
+  // Drakova on the gate-tower city north-east of centre (grid (51,16));
+  // Voronov on the bastion tower in the scorched south-east (grid (48,27)).
+  // They were the 2-tile pair; they are now 14 apart and Voronov is properly
+  // SOUTH of Drakova rather than its next-door neighbour.
+  drakova: { fx: 0.750, fy: 0.318 },
+  voronov: { fx: 0.670, fy: 0.813 },
 
   // Southern arc — Forgotten Order stronghold + deep frontier
   varakush: { fx: 0.28, fy: 0.74 },
   endless_stair: { fx: 0.59, fy: 0.76 },
 
   // v2.4.1 (OTA 052) — four additional Lost Capitals so the count
-  // matches the 9 playable factions. Placed in previously-empty
-  // atlas regions so the player has to actually travel for each.
-  iskan_veil:  { fx: 0.07, fy: 0.32 },  // far northwest — Architect's hidden city (kept just inside the painted west edge; the dot clamp floors at 0.06)
-  yuldra_tul:  { fx: 0.88, fy: 0.18 },  // northeast mountains — Giants' tomb-gate capital
-  ostragar:    { fx: 0.93, fy: 0.42 },  // far east wetlands — river-dynasty city
-  karok_sa:    { fx: 0.42, fy: 0.72 },  // south band — Forgotten Order ritual seat
+  // matches the 9 playable factions. OTA-1496 pushed each further into its own
+  // corner of the compass so no capital pair is under 14 tiles.
+  iskan_veil:  { fx: 0.057, fy: 0.060 },  // far northwest corner — Architect's hidden city; the pin sits on bare veil-marsh beside a tented camp, which is exactly how a hidden city should read (grid (23,10))
+  yuldra_tul:  { fx: 0.944, fy: 0.060 },  // northeast peaks — Giants' tomb-gate, now high in the painted mountain range above the great mountain city (grid (59,10))
+  ostragar:    { fx: 0.9445, fy: 0.663 }, // far east cliffs — river-dynasty city, at the southern approach of the lit cliff-city (grid (59,24))
+  karok_sa:    { fx: 0.386, fy: 0.887 },  // deep south — Forgotten Order ritual seat, the southern grounds of the round ritual arena (grid (36,29))
 
   // arb46 — Tier-C challenge tiles (plotted but discoverable:false until the
   // challenges are reviewed + turned on). Placed in previously-empty regions.

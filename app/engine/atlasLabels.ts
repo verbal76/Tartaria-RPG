@@ -139,39 +139,37 @@ export function wrapLabel(name: string, maxChars: number = MAX_LINE_CHARS): stri
 // fissured open ground; `giant_vault` — a sealed door in the ground, nothing built there;
 // `grand_spire_of_etheria` — the art painted no tower near its spot, so its name and pin
 // mark the location honestly rather than being forced onto some other place's building.
+// ⚠ OTA-1496 — THE EIGHT MOVED PINS HAVE NO NUDGE ENTRY, on purpose. Each nudge
+// above was measured against the silhouette its pin stood on BEFORE the capitals
+// spread out; carrying it to a new spot would shove the label toward a building
+// that is no longer there. The relocated pins (asgardar, samarran, drakova,
+// voronov, karok_sa, yuldra_tul, ostragar, iskan_veil, grand_spire_of_asgardar,
+// thametans_tower) were
+// hand-centred on their new art in atlasCoords.ts, so their anchor IS the
+// calibration. Nimari and its Red Tower did not move and keep theirs.
 export const LABEL_ANCHOR_NUDGE: Record<string, readonly [number, number]> = {
   architect_blind: [-0.00859, 0.00185],
-  asgardar: [0.00059, -0.01274],
   builders_survey_camp: [-0.00234, -0.00349],
   buried_cities: [-0.00117, -0.00167],
   cradle_of_dusk: [0.00508, -0.0011],
-  drakova: [-0.00162, -0.0045],
   dynasty_border_post: [-0.00023, 0.01299],
   giant_watch_shrine: [0.00096, -0.00173],
-  grand_spire_of_asgardar: [-0.00435, 0.01789],
   great_tartary_plains: [0.00672, 0.00185],
-  iskan_veil: [0.00165, -0.0028],
   monarch_waystation: [0.01565, 0.01475],
   mud_seas: [0.00896, -0.00167],
   nimari: [-0.0034, -0.00154],
   obsidian_pillars: [0.00295, 0.02015],
-  ostragar: [0.01132, 0.0043],
   parley_ground: [-0.00998, 0.01487],
   pilgrim_waycamp: [0.0086, -0.02645],
   revivalist_field_camp: [0.00414, -0.01173],
-  samarran: [-0.00082, 0.00198],
   sinking_cathedral: [-0.00175, -0.00877],
   tartarian_enclave: [0.00954, -0.00865],
   tartarian_outskirts: [0.0013, 0.00594],
-  voronov: [-0.02151, -0.00387],
-  yuldra_tul: [-0.00786, -0.00286],
   zharaks_teeth: [-0.00869, 0.00248],
   // ── Tier 2 — placed by eye from crops of the artwork (see note above) ──
   reclaimer_stake: [0.01729, -0.0793],
-  thametans_tower: [0.01482, -0.03605],
   red_tower_of_nimari: [0.04138, -0.0206],
   varakush: [0.05683, 0.01442],
-  karok_sa: [0.00185, 0.03192],
   endless_stair: [-0.01421, 0.05973],
   etheric_chamber: [0.01606, -0.04531],
 };

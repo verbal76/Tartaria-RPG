@@ -29169,13 +29169,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ⚠⚠⚠ OTA-1471 — THE GRID HAS TO SETTLE BETWEEN SEATS.
     //
     // Owner: *"why do we have some of the core guardians so close together, I
-    // think my 2 fights were what 2 blocks apart?"* He counted right. Drakova
-    // (52,19) and Voronov (52,21) are 2.00 tiles apart; every other Capital's
-    // nearest neighbour is 4.24–5.83, and the median across all 36 pairs is
-    // 16.55. The atlas is faithful — they really are 89 painted pixels apart —
-    // so the pins are not the thing to move. What breaks is the assumption
-    // under `tierForKills`: that a JOURNEY happens between seats. See the
-    // derivation in coreGuardians.ts for where 8 hours comes from.
+    // think my 2 fights were what 2 blocks apart?"* He counted right — Drakova
+    // and Voronov sat 2.00 tiles apart at the time. What broke was the
+    // assumption under `tierForKills`: that a JOURNEY happens between seats.
+    // See the derivation in coreGuardians.ts for where 8 hours comes from.
+    //
+    // ⚠ OTA-1496 then spread the capitals themselves (every pair ≥14 walking
+    // tiles now; the old 2-tile pair is 14 apart). The window stays — one rest
+    // between seats is the pacing rule, and it now backs up geography instead
+    // of substituting for it.
     //
     // ⚠ DELIBERATELY BELOW THE `already_present` CHECK. A Guardian already
     // standing in the scene is a fight the player fled and came back to, not a

@@ -7,9 +7,19 @@
  *    2 fights were what 2 blocks apart?"
  *
  * He counted exactly right, and the measurement is the whole argument, so this
- * suite computes it rather than quoting it. On the canonical grid drakova (52,19)
- * and voronov (52,21) are 2.00 tiles apart; every other Capital's nearest
- * neighbour is 4.24–5.83; the median across all 36 pairs is 16.55.
+ * suite computes it rather than quoting it. On the canonical grid AS IT STOOD
+ * THEN, drakova (52,19) and voronov (52,21) were 2.00 tiles apart; every other
+ * Capital's nearest neighbour was 4.24–5.83; the median across all 36 pairs
+ * 16.55.
+ *
+ * ⚠⚠ OTA-1496 — THE OUTLIER IS GONE FROM THE MAP ITSELF. The owner then asked
+ * for the capitals to be spread ("at least 20 spaces… can we spread them out?"),
+ * and the atlas now holds every pair ≥14 walking tiles apart — the most the
+ * drawable pin band can give with Nimari kept centred (proven, not felt: ≥17 is
+ * UNSAT outright). The geometry tests below assert the NEW field — an even
+ * spread with no outlier — while the settle-window tests stand unchanged: one
+ * rest between seats is a pacing rule, stated on purpose, that now backs up
+ * geography instead of substituting for it.
  *
  * ⚠⚠ AND THE ATLAS IS NOT WRONG — the first thing checked, because "move the
  * pin" was the obvious first answer and it is the wrong one. The two cities sit
@@ -120,40 +130,40 @@ describe('OTA-1471 — the measurement he was right about', () => {
     expect(pairs().length).toBe(36);
   });
 
-  it('⚠⚠⚠ DRAKOVA AND VORONOV ARE 2 TILES APART — "2 blocks", exactly', () => {
+  it('⚠⚠⚠ OTA-1496: THE 2-TILE HOP IS GONE — no pair is even close any more', () => {
+    // The 2026-08-24 record: drakova/voronov at 2.00, an outlier at 12% of the
+    // median. The spread retired it — the closest pair on the whole map is now
+    // wider than the OLD field's healthiest nearest-neighbour gap.
     const closest = pairs()[0]!;
-    expect(new Set([closest.a, closest.b])).toEqual(new Set(['drakova', 'voronov']));
-    expect(closest.tiles).toBeCloseTo(2, 2);
+    expect(closest.tiles).toBeGreaterThan(9);
   });
 
-  it('⚠⚠⚠ AND IT IS A LONE OUTLIER, NOT A CLUSTER', () => {
-    // This is what decides that a general rule is the wrong fix. If several
-    // pairs were tight, the ATLAS would be the thing to revisit.
+  it('⚠⚠⚠ AND THE FIELD IS EVEN — no lone outlier remains to pace around', () => {
+    // The old shape (one pair at half the next-tightest gap) is what justified a
+    // behaviour fix over an atlas fix. The new shape must never regrow it: the
+    // second-closest pair sits within 2× of the closest.
     const ps = pairs();
-    expect(ps[1]!.tiles).toBeGreaterThan(4);
-    // every OTHER pair is more than double the outlier
-    for (const p of ps.slice(1)) {
-      expect({ pair: `${p.a}/${p.b}`, over: p.tiles > 2 * ps[0]!.tiles })
-        .toEqual({ pair: `${p.a}/${p.b}`, over: true });
-    }
+    expect(ps[1]!.tiles).toBeLessThan(2 * ps[0]!.tiles);
   });
 
-  it('⚠⚠ every OTHER Capital\'s nearest neighbour sits in a tight, healthy band', () => {
+  it('⚠⚠ EVERY Capital\'s nearest neighbour sits in one tight, healthy band', () => {
+    // Before OTA-1496 this band was 4–6 tiles with drakova/voronov exiled from
+    // it; now every seat, those two included, keeps 9–13 tiles of clearance to
+    // its closest peer.
     const ps = pairs();
     for (const id of LOST_CAPITAL_LOCATIONS) {
-      if (id === 'drakova' || id === 'voronov') continue;
       const near = ps.find((p) => p.a === id || p.b === id)!;
-      expect({ id, ok: near.tiles >= 4 && near.tiles <= 6 }).toEqual({ id, ok: true });
+      expect({ id, ok: near.tiles >= 9 && near.tiles <= 13 }).toEqual({ id, ok: true });
     }
   });
 
-  it('⚠⚠ …and the median journey is an order of magnitude longer', () => {
+  it('⚠⚠ …and the median journey stayed a real haul', () => {
     const ds = pairs().map((p) => p.tiles);
     const median = ds[Math.floor(ds.length / 2)]!;
     expect(median).toBeGreaterThan(15);
-    // the outlier is a small fraction of it — this is the sentence in the
-    // commit message, asserted rather than asserted-in-prose
-    expect(ds[0]! / median).toBeLessThan(0.15);
+    // no pair is a rounding error against it any more — the old outlier sat at
+    // 12% of the median; the closest pair now carries at least 40% of it
+    expect(ds[0]! / median).toBeGreaterThan(0.4);
   });
 
   it('⚠⚠⚠ THE ATLAS IS FAITHFUL — "move the pin" was checked and rejected', () => {
@@ -200,7 +210,9 @@ describe('OTA-1471 — the window is ONE REST, and the first derivation was wron
     // and every one of them longer than the median. Stated as a proportion
     // rather than an exact count, because the exact count is an accident of the
     // pin layout and pinning it would make an atlas nudge look like a defect.
-    expect(onFoot.length / ps.length).toBeLessThan(0.1);
+    // (OTA-1496 widened the field: the corner-to-corner crossings that clear 8h
+    // on foot went from 2 to 4 of 36 — still a small minority, all above median)
+    expect(onFoot.length / ps.length).toBeLessThan(0.15);
     const median = ps[Math.floor(ps.length / 2)]!.tiles;
     for (const p of onFoot) {
       expect({ pair: `${p.a}/${p.b}`, longerThanMedian: p.tiles > median })
@@ -214,12 +226,13 @@ describe('OTA-1471 — the window is ONE REST, and the first derivation was wron
     expect(travelHoursFor(ps[0]!.tiles) / (ps[0]!.tiles * TILE_HOURS)).toBe(10);
   });
 
-  it('⚠⚠⚠ HIS 2-TILE HOP IS NOWHERE NEAR CLEARING IT', () => {
-    // Which is the point. Wandering the two blocks back and forth cannot buy the
-    // window off; the player sleeps, or spends the time on something.
+  it('⚠⚠⚠ EVEN THE CLOSEST CROSSING DOES NOT CLEAR IT — the gate still bites', () => {
+    // His 2026-08-24 hop was 0.5h against the 8h window; OTA-1496 stretched the
+    // closest crossing to ~2.5h+ — still well inside the window, so back-to-back
+    // seats still mean a rest first. The player sleeps, or spends the time.
     const hop = pairs()[0]!.tiles * TILE_HOURS;
-    expect(hop).toBeCloseTo(0.5, 3);
-    expect(CORE_SETTLE_HOURS / hop).toBe(16);
+    expect(hop).toBeGreaterThan(2);
+    expect(hop).toBeLessThan(CORE_SETTLE_HOURS);
     expect(coreSettleState(hop, 0).ready).toBe(false);
   });
 
@@ -553,12 +566,15 @@ describe('OTA-1471 — what this OTA must NOT have changed', () => {
     expect(cg.tierForKills(50)).toBe(9);
   });
 
-  it('⚠⚠⚠ NO CAPITAL MOVED — the pins are untouched by this fix', () => {
-    // The measurement above is the evidence for a behaviour change, not a
-    // licence to edit the atlas. If a pin ever does move, the derivation test
-    // fails first and the constant gets re-figured.
-    expect(canonicalCellOf('drakova')).toEqual({ x: 52, y: 19 });
-    expect(canonicalCellOf('voronov')).toEqual({ x: 52, y: 21 });
+  it('⚠⚠⚠ OTA-1496 IS THE ONE LICENSED MOVE — and the constant was re-figured', () => {
+    // This pin used to hold the OLD cells with the note "if a pin ever does
+    // move, the derivation test fails first and the constant gets re-figured".
+    // That is exactly what happened: the owner ordered the spread, the
+    // derivation tests above were re-run against the new field, and
+    // CORE_SETTLE_HOURS keeps its value because one-rest-between-seats is a
+    // pacing rule, not a distance patch. The new cells are held in ota1496.
+    expect(canonicalCellOf('drakova')).toEqual({ x: 51, y: 16 });
+    expect(canonicalCellOf('voronov')).toEqual({ x: 48, y: 27 });
   });
 
   it('⚠⚠ the settle gate sits BELOW the already-present check in the source', () => {

@@ -1234,6 +1234,19 @@ export function guardianRebukeLine(def: CoreGuardianDef): string {
  * lost, no route is closed: the seat opens on its own after a night. A Guardian
  * ALREADY standing in the scene — the player fled and came back — is untouched,
  * because that is a fight in progress and not a fresh manifestation.
+ *
+ * ⚠ OTA-1496 ADDENDUM — the outlier this OTA measured no longer exists on the
+ * map. The owner then asked for the capitals to be SPREAD ("at least 20 spaces…
+ * can we spread them out?"), and the atlas now holds every capital pair ≥14
+ * tiles apart: the drawable pin band provably cannot seat 9 capitals at ≥17,
+ * and ≥15 only by exiling Nimari from the centre, so 14 is the map's honest
+ * maximum with the arrangement kept. The nearest pair is still Drakova↔Voronov
+ * — at 14 tiles / 3.5 h on the world clock now, not 2 tiles / 0.50 h — the
+ * median crossing is ~20 tiles and the farthest 39. The settle window STAYS:
+ * one rest between seats is a pacing rule this module states on purpose, and it
+ * now backs up geography instead of substituting for it. The figures above this
+ * addendum are the 2026-08-24 measurement, kept as the record of why the window
+ * exists.
  */
 
 /** ⚠ In-game hours the grid needs after a Core is torn out of it. See above for
