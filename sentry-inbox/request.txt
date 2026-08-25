@@ -1,1 +1,1 @@
-2026-08-26T00:10:00Z sync-6 with outcomes ledger
+2026-08-26T00:25:00Z sync-7 owner resent with wait
