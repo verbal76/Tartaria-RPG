@@ -67,6 +67,7 @@ import {
 } from 'react-native';
 import {
   classifyGatherNoun, isUpgradeOverEquipped, sortGatherRows, gatherIcon,
+  equipVerdict, equipSlotWord,
   isActionableGatherKind, laneForKind, upgradeEquipSlot,
   type GatherRow, type GatherLane,
 } from '../engine/gatherSort';
@@ -217,6 +218,8 @@ export function GatherModal({
         // sweep button over it.
         kind: isLead(c.noun) ? ('lead' as const) : classifyGatherNoun(c.noun),
         upgrade: isUpgradeOverEquipped(player, c.noun),
+        // OTA-1499 — the three-state mark: ★ bare slot / ▲ beats worn / ▼ loses.
+        verdict: equipVerdict(player, c.noun),
         consumed: !!c.consumed,
       }))
       // ⚠⚠ OTA-1234 — DROP THE INERT BLOCKS. A noun that is neither takeable nor
@@ -296,7 +299,7 @@ export function GatherModal({
   // back to the full-width shape it had before OTA-1235 — only now its outline
   // carries the lane hue, which is the part that was actually worth adding.
   const renderRow = (row: GatherRow, lane: GatherLane) => {
-    const { noun, kind, upgrade, consumed } = row;
+    const { noun, kind, upgrade, consumed, verdict } = row;
     const locked = isLocked(noun);
     // ⚠⚠ OTA-1251 — THE TAIL SAYS WHAT THE TAP DOES, AND FOR A ★ THAT IS NO LONGER
     // "→ pack". Owner: *"it was supposed to highlight the fact you can select and
@@ -312,13 +315,22 @@ export function GatherModal({
     // player decides. Armor keeps `worn` — it has exactly one slot and the name of
     // it (chest / head / feet) is already obvious from the item.
     const wear = upgrade ? upgradeEquipSlot(player, noun) : null;
+    // ⚠⚠ OTA-1499 — THE OWNER'S VOCABULARY: *"what if star was for a slot that
+    // isn't filled, and we put a green up or red down arrow on an item and the
+    // slot's name so we can compare it."* Three states, each naming its slot:
+    //   ★ → off hand   the slot is BARE — taking it displaces nothing
+    //   ▲ → main hand  it BEATS what is worn there — one tap swaps it in
+    //   ▼ main hand · → pack   it LOSES to what is worn — the tap only pockets it
+    // The tail still names the tap's ACTION (the OTA-1251 rule): ★ and ▲ rows
+    // take-and-equip, ▼ rows go to the pack like any plain take.
     const tail =
       lane === 'lead' ? 'INVESTIGATE'
-        : wear?.slot === 'main' ? '★ → main hand'
-          : wear?.slot === 'off' ? '★ → off hand'
-            : upgrade ? '★ → worn'
-              : lane === 'scrap' ? 'salvage'
-                : '→ pack';
+        : verdict?.state === 'empty' ? `★ → ${equipSlotWord(verdict.slot)}`
+          : verdict?.state === 'up' ? `▲ → ${equipSlotWord(verdict.slot)}`
+            : verdict?.state === 'down' ? `▼ ${equipSlotWord(verdict.slot)} · → pack`
+              : upgrade ? '★ → worn'
+                : lane === 'scrap' ? 'salvage'
+                  : '→ pack';
     return (
       <Pressable
         key={noun}
@@ -358,8 +370,10 @@ export function GatherModal({
             : lane === 'lead'
               ? `${noun}. Worth a look. Tap to investigate. No bulk action will touch this.`
               : wear
-                ? `Upgrade. ${noun}. Tap to take it and ${wear.slot === 'main' || wear.slot === 'off' ? `ready it in your ${wear.slot === 'main' ? 'main' : 'off'} hand` : 'put it on'}.`
-                : `${noun}. ${lane === 'scrap' ? 'Tap to salvage' : 'Tap to take'}`
+                ? `${verdict?.state === 'empty' ? `Your ${equipSlotWord(wear.slot)} is bare` : 'Upgrade'}. ${noun}. Tap to take it and ${wear.slot === 'main' || wear.slot === 'off' ? `ready it in your ${wear.slot === 'main' ? 'main' : 'off'} hand` : 'put it on'}.`
+                : verdict?.state === 'down'
+                  ? `${noun}. Weaker than what is in your ${equipSlotWord(verdict.slot)}. Tap to take it into your pack.`
+                  : `${noun}. ${lane === 'scrap' ? 'Tap to salvage' : 'Tap to take'}`
         }
       >
         <Text style={[
@@ -369,8 +383,10 @@ export function GatherModal({
           lane === 'scrap' && styles.iconScrap,
           lane === 'lead' && styles.iconLead,
           upgrade && lane !== 'lead' && styles.iconUpgrade,
+          verdict?.state === 'up' && lane !== 'lead' && styles.iconBetter,
+          verdict?.state === 'down' && lane !== 'lead' && styles.iconWorse,
         ]}>
-          {gatherIcon({ kind, upgrade })}
+          {gatherIcon({ kind, upgrade, verdict })}
         </Text>
         <Text
           style={[styles.rowText, consumed && styles.rowTextConsumed]}
@@ -385,6 +401,8 @@ export function GatherModal({
           lane === 'scrap' && styles.textScrap,
           lane === 'lead' && styles.textLead,
           upgrade && lane !== 'lead' && styles.tailUpgrade,
+          verdict?.state === 'up' && lane !== 'lead' && styles.tailBetter,
+          verdict?.state === 'down' && lane !== 'lead' && styles.tailWorse,
         ]}>
           {tail}
         </Text>
@@ -638,11 +656,17 @@ const styles = StyleSheet.create({
   iconScrap: { color: SCRAP },
   iconLead: { color: LEAD },
   iconUpgrade: { color: '#d09a63' },
+  // OTA-1499 — the verdict tones: green for a ▲ that beats what is worn, the
+  // feed's combat red for a ▼ that loses to it. The ★ keeps the gold above.
+  iconBetter: { color: '#9ec96a' },
+  iconWorse: { color: '#e07a5f' },
 
   rowText: { flex: 1, color: '#e6d8b3', fontSize: 14, fontWeight: '600' },
   rowTextConsumed: { color: '#6f6759', textDecorationLine: 'line-through' },
   rowTail: { fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
   tailUpgrade: { color: '#d09a63' },
+  tailBetter: { color: '#9ec96a' },
+  tailWorse: { color: '#e07a5f' },
 
   // ⚠ The sweep buttons keep a faint face — they are the one thing here that is
   // pressed rather than read, and a bare outline at the bottom of a list of bare

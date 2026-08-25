@@ -24588,7 +24588,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The block is OTA-1480's and the narration is OTA-1466's — unchanged; this
 // only raises it where a feed line mid-fight could not be seen.
 // 2026-08-24 — SIXTH GOLEM CATCH-UP: 1495 (the mid-fight summon popup).
-export const OTA_BUILD_ID = '2026-08-25-1497-the-sheet-settles-first';
+export const OTA_BUILD_ID = '2026-08-25-1499-star-means-bare-arrow-means-compared';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1498-the-chip-states-its-case';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1497-the-sheet-settles-first';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1496-room-between-the-thrones';
 // golem catch-up 2026-08-25: markerless publish of OTA-1497 (sheet-settle freeze fix) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1495-finish-this-fight-first';

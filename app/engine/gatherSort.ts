@@ -148,6 +148,39 @@ export function isUpgradeOverEquipped(player: PlayerCharacter | null, noun: stri
   return false;
 }
 
+/** ⚠⚠ OTA-1498 — THE CHIP SAYS WHY. Owner, with a "Take & wield Bone Javelin"
+ *  chip mid-fight: *"I don't know how it compares — why would I just grab it?"*
+ *  The chip only ever exists because `isUpgradeOverEquipped` above said yes —
+ *  but that verdict was invisible, so a correct offer read as a blind grab.
+ *  This clause is the verdict made visible, derived from THE SAME lookups the
+ *  comparator used (one derivation — a second comparison here is how the label
+ *  and the mark end up disagreeing). Returns null when the noun is not an
+ *  upgrade or cannot be honestly compared, mirroring the comparator's refusals.
+ */
+export function upgradeReasonClause(player: PlayerCharacter | null, noun: string): string | null {
+  if (!player || !isUpgradeOverEquipped(player, noun)) return null;
+  const armor = armorByName(noun);
+  if (armor) {
+    const worn = equippedInSlot(player, armor.slot);
+    if (!worn) return `your ${armor.slot} slot is bare`;
+    const wornArmor = armorByName(worn.name);
+    if (!wornArmor) return null;
+    return `AC +${armor.acBonus} over your +${wornArmor.acBonus}`;
+  }
+  const weapon = weaponByName(noun);
+  if (weapon) {
+    const main = resolveEquippedItem(player, 'main');
+    if (!main) return 'your main hand is empty';
+    if (weapon.style !== 'two_handed' && !resolveEquippedItem(player, 'off')) {
+      return 'your off hand is free';
+    }
+    const heldWeapon = weaponByName(main.name);
+    if (!heldWeapon) return null;
+    return `${weapon.damageDice} over your ${heldWeapon.damageDice}`;
+  }
+  return null;
+}
+
 /** ⚠ The armor catalog's slot names and the player's equip slots are the same
  *  words (head / chest / hands / legs / feet / cloak) — but they are separate
  *  types, so the bridge is written out here ONCE rather than cast at each call.
@@ -283,11 +316,67 @@ function equippedInSlot(player: PlayerCharacter, slot: string): InventoryItem | 
   }
 }
 
+// ⚠⚠ OTA-1499 — THE THREE-STATE VERDICT BEHIND THE PICKER'S MARKS. Owner:
+// *"what if star was for a slot that isn't filled, and we put a green up or
+// red down arrow on an item and the slot's name so we can compare it."*
+//
+// One derivation, layered on the two rulers that already exist:
+//   · `isUpgradeOverEquipped` decides IF the row earns the one-tap equip;
+//   · `upgradeEquipSlot` decides WHERE it would land (its range-coverage and
+//     better-than-main policies are not re-derived here);
+//   · this function only names the STATE of that destination —
+//       'empty' → the slot is bare, taking it costs nothing      (★)
+//       'up'    → it beats what is there, taking it displaces    (▲)
+//       'down'  → it is not better than what is there            (▼, plain take)
+//   Returns null for a row that is not honestly comparable (no catalog entry,
+//   or the worn item is unknown) — mirroring the comparator's own refusals, so
+//   the mark never claims what the tap will not do.
+export type EquipVerdictState = 'empty' | 'up' | 'down';
+export interface EquipVerdict { slot: EquipSlot; state: EquipVerdictState }
+
+export function equipVerdict(
+  player: PlayerCharacter | null,
+  noun: string,
+): EquipVerdict | null {
+  if (!player) return null;
+  if (isUpgradeOverEquipped(player, noun)) {
+    const wear = upgradeEquipSlot(player, noun);
+    if (!wear) return null; // the two rulers disagree — no claim (OTA-1457's case)
+    const occupied = resolveEquippedItem(player, wear.slot) !== null;
+    return { slot: wear.slot, state: occupied ? 'up' : 'empty' };
+  }
+  const armor = armorByName(noun);
+  if (armor) {
+    const slot = ARMOR_SLOT_TO_EQUIP[armor.slot];
+    if (!slot) return null;
+    const worn = resolveEquippedItem(player, slot);
+    if (!worn || !armorByName(worn.name)) return null;
+    return { slot, state: 'down' };
+  }
+  const weapon = weaponByName(noun);
+  if (weapon) {
+    const main = resolveEquippedItem(player, 'main');
+    if (!main || !weaponByName(main.name)) return null;
+    return { slot: 'main', state: 'down' };
+  }
+  return null;
+}
+
+/** The slot as the player reads it — hands get their word, armor slots are
+ *  already words ('chest', 'head', …). One spelling, shared by tail and a11y. */
+export function equipSlotWord(slot: EquipSlot): string {
+  return slot === 'main' ? 'main hand' : slot === 'off' ? 'off hand' : slot;
+}
+
 export interface GatherRow {
   noun: string;
   kind: GatherKind;
   upgrade: boolean;
   consumed: boolean;
+  /** OTA-1499 — the three-state mark (★ empty / ▲ up / ▼ down), or null for a
+   *  row with nothing honest to compare. Optional so fixtures predating the
+   *  verdict still type-check; absent reads as null. */
+  verdict?: EquipVerdict | null;
 }
 
 /** ⚠ THE ORDER IS THE FEATURE: decisions first, sweepable last.
@@ -321,11 +410,19 @@ export function sortGatherRows(rows: readonly GatherRow[]): GatherRow[] {
 
 /** The mark shown at the left of a row. Kept here beside the sort so the icon
  *  and the ordering can never disagree about what a row is. */
-export function gatherIcon(row: { kind: GatherKind; upgrade: boolean }): string {
+export function gatherIcon(row: { kind: GatherKind; upgrade: boolean; verdict?: EquipVerdict | null }): string {
   // ⚠ The lead's ✦ outranks even the upgrade star: a better helm can wait, and
   // the same ✦ is what the Aetheric Torch already marks a worth-a-look noun with,
   // so the player has seen it mean exactly this before.
   if (row.kind === 'lead') return '✦';
+  // ⚠⚠ OTA-1499 — the star narrows to ITS OLD PROMISE KEPT CHEAPLY: a slot that
+  // is not filled. A green ▲ displaces something better-beaten; a red ▼ warns
+  // the item loses to what is worn (its tap goes to the pack, and the tail says
+  // so). A verdict-less upgrade row keeps the ★ so a caller that never computed
+  // verdicts (older fixtures) still renders what it always did.
+  if (row.verdict?.state === 'empty') return '★';
+  if (row.verdict?.state === 'up') return '▲';
+  if (row.verdict?.state === 'down') return '▼';
   if (row.upgrade) return '★';
   if (row.kind === 'weapon') return '⚔';
   if (row.kind === 'armor') return '🛡';

@@ -117,9 +117,14 @@ describe('OTA-1485 — the feed has exactly one pressable, and it is the logged 
     // structural guard: the feed renders ONE touchable, and its onPress is the
     // prop this OTA instrumented. A second pressable added later fails here
     // and forces the author to route it through logUiTap too.
-    expect((FEED.match(/<TouchableOpacity/g) ?? []).length).toBe(1);
-    expect((FEED.match(/onPress=/g) ?? []).length).toBe(1);
+    // OTA-1498 — the pack chip is the second pressable this pin existed to
+    // catch, and it pays the toll this comment demanded: its handler in
+    // ExplorationScreen calls logUiTap first (pinned in ota1498). Count is now
+    // exactly TWO, each wired to a named prop — never an inline handler.
+    expect((FEED.match(/<TouchableOpacity/g) ?? []).length).toBe(2);
+    expect((FEED.match(/onPress=/g) ?? []).length).toBe(2);
     expect(FEED).toContain('onPress={onActionChipPress}');
+    expect(FEED).toContain('onPress={onPackChipPress}');
     expect(FEED).not.toContain('Pressable');
   });
 });

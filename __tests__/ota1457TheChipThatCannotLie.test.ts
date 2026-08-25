@@ -153,7 +153,9 @@ describe('OTA-1457 — the chip cannot offer what the picker would refuse', () =
     // first. The take path resolves nouns; so does the chip.
     const chip = pickFeedActionChip(bare(), rows(["Mud-Warden's Vest", false]));
     expect(chip!.noun).toBe("Mud-Warden's Vest");
-    expect(Object.keys(chip!).sort()).toEqual(['itemName', 'noun', 'slot']);
+    // OTA-1498 added `reason` — the comparator's verdict for the button face.
+    // Still no item id: one identifier, one resolver, unchanged.
+    expect(Object.keys(chip!).sort()).toEqual(['itemName', 'noun', 'reason', 'slot']);
   });
 });
 

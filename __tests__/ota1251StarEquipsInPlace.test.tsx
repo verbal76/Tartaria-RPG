@@ -101,7 +101,9 @@ describe('OTA-1251 — a ★ row goes somewhere', () => {
 describe('OTA-1251 — RENDERED: the row says what the tap does', () => {
   it('⚠⚠ the upgrade tail names the ACTION, not the item', () => {
     const text = textOf([{ noun: "Mud-Warden's Vest" }], BARE);
-    expect(text).toContain('★ → worn');
+    // OTA-1499 — a bare chest keeps the ★ (the owner's "slot that isn't
+    // filled" ruling) and the tail now names the slot itself.
+    expect(text).toContain('★ → chest');
     // ⚠ `BETTER` described the item and left the tap to be guessed — the one row
     // in the card whose tail did not name its own verb.
     expect(text).not.toContain('BETTER');
@@ -111,7 +113,7 @@ describe('OTA-1251 — RENDERED: the row says what the tap does', () => {
     // The distinction only teaches if the non-upgrade row is unchanged.
     const text = textOf([{ noun: 'Aetheric Torch' }], BARE);
     expect(text).toContain('→ pack');
-    expect(text).not.toContain('→ worn');
+    expect(text).not.toContain('→ chest');
   });
 
   it('⚠ the screen reader is told the whole action, not half of it', () => {

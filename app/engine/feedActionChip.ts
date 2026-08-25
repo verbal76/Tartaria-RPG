@@ -39,7 +39,7 @@
 // deviated from.
 
 import type { PlayerCharacter, EquipSlot } from './types';
-import { isUpgradeOverEquipped, upgradeEquipSlot } from './gatherSort';
+import { isUpgradeOverEquipped, upgradeEquipSlot, upgradeReasonClause } from './gatherSort';
 
 /** One row of the gather picker, as `ExplorationScreen` builds it. Structural
  *  rather than imported so this stays a leaf: it imports no screen and no store,
@@ -62,6 +62,11 @@ export interface FeedActionChip {
   slot: EquipSlot;
   /** The resolved item name, for the button face. */
   itemName: string;
+  /** ⚠ OTA-1498 — WHY it is an upgrade, from the comparator's own lookups
+   *  (`upgradeReasonClause`), or null when the comparison cannot be stated
+   *  honestly. Owner: "I don't know how it compares — why would I just grab
+   *  it?" A chip that asks for a swap owes the player its reasoning. */
+  reason: string | null;
 }
 
 /**
@@ -88,7 +93,12 @@ export function pickFeedActionChip(
     // a chip is only offered when BOTH answer. Trusting the first alone would
     // reproduce the ★-with-nowhere-to-go bug that OTA-1237 existed to fix.
     if (!wear) continue;
-    return { noun: c.noun, slot: wear.slot, itemName: wear.name };
+    return {
+      noun: c.noun,
+      slot: wear.slot,
+      itemName: wear.name,
+      reason: upgradeReasonClause(player, c.noun),
+    };
   }
   return null;
 }
@@ -106,9 +116,25 @@ const HAND_SLOTS: ReadonlySet<EquipSlot> = new Set(['main', 'off']);
 /** The button face. Kept here beside the picker so the wording and the thing it
  *  acts on cannot drift apart in different files. */
 export function feedActionChipLabel(chip: FeedActionChip): string {
-  return HAND_SLOTS.has(chip.slot)
+  // ⚠ OTA-1498 — the face carries the comparator's verdict. The green ⬆ was
+  // read as "pick up", not "upgrade"; the clause makes the claim explicit
+  // ("2d8 over your 2d6", "your off hand is free") so the swap is informed.
+  const base = HAND_SLOTS.has(chip.slot)
     ? `⬆ Take & wield ${chip.itemName}`
     : `⬆ Take & wear ${chip.itemName}`;
+  return chip.reason ? `${base} — ${chip.reason}` : base;
+}
+
+/** ⚠ OTA-1498 — THE SECOND DOOR: take it WITHOUT the swap. Owner: "…or there
+ *  should be another block to put it in your pack." Same noun, the picker's
+ *  plain-take path (`takeAmbientNoun`), no equip — so a player who wants the
+ *  javelin for later is not forced to un-wield their axe to have it. */
+export function feedPackChipLabel(_chip: FeedActionChip): string {
+  return '⤵ Just take it — to your pack';
+}
+
+export function feedPackChipA11yLabel(chip: FeedActionChip): string {
+  return `Take the ${chip.noun} into your pack without equipping it. What you have equipped stays as it is.`;
 }
 
 /** The screen-reader sentence. ⚠ REQUIRED, not optional — the EXIT chip shipped
@@ -117,9 +143,10 @@ export function feedActionChipLabel(chip: FeedActionChip): string {
  *  is called: two actions, in order, so a narration-only player is not surprised
  *  by the second one. */
 export function feedActionChipA11yLabel(chip: FeedActionChip): string {
+  const why = chip.reason ? ` It is offered because ${chip.reason}.` : '';
   if (HAND_SLOTS.has(chip.slot)) {
     const hand = chip.slot === 'main' ? 'main hand' : 'off hand';
-    return `Take the ${chip.noun} and wield it in your ${hand}. Replaces what you have equipped there.`;
+    return `Take the ${chip.noun} and wield it in your ${hand}. Replaces what you have equipped there.${why}`;
   }
-  return `Take the ${chip.noun} and wear it as your ${chip.slot}. Replaces what you have equipped there.`;
+  return `Take the ${chip.noun} and wear it as your ${chip.slot}. Replaces what you have equipped there.${why}`;
 }

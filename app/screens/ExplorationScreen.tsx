@@ -42,6 +42,7 @@ import { isUpgradeOverEquipped, upgradeEquipSlot } from '../engine/gatherSort';
 // screen and no store, so its rule can be tested without a renderer.
 import {
   pickFeedActionChip, feedActionChipLabel, feedActionChipA11yLabel,
+  feedPackChipLabel, feedPackChipA11yLabel,
 } from '../engine/feedActionChip';
 import { ClimbModal } from '../components/ClimbModal';
 import { TorchProbeModal } from '../components/TorchProbeModal';
@@ -1734,6 +1735,15 @@ export function ExplorationScreen() {
             // signal.
             logUiTap(feedActionChipLabel(feedChip));
             takeAndWear(feedChip.noun);
+          } : undefined}
+          packChipLabel={feedChip ? feedPackChipLabel(feedChip) : null}
+          packChipA11yLabel={feedChip ? feedPackChipA11yLabel(feedChip) : undefined}
+          onPackChipPress={feedChip ? () => {
+            // ⚠ OTA-1498 — same tap-ledger-first rule as the chip above. The pack
+            // door is the picker's own plain take (takeAmbientNoun): item lands in
+            // the pack, nothing equipped, nothing un-equipped.
+            logUiTap(feedPackChipLabel(feedChip));
+            takeAmbientNoun(feedChip.noun);
           } : undefined}
         />
         {/* ⚠ OTA-1168 — THE LIVE TEXT IS NO LONGER SHOWN. Owner: "while the arbiter is

@@ -159,16 +159,22 @@ describe('OTA-1252 — RENDERED: the row names the hand', () => {
 
   const { weak, strong } = pickPair();
 
-  it('⚠⚠ "→ off hand" when it fills the bare one, "→ main hand" when it displaces', () => {
+  it('⚠⚠ "★ → off hand" fills the bare one; "▲ → main hand" displaces', () => {
     // ⚠ `→ worn` would be the same vagueness one step smaller. Filling a bare off
     // hand and displacing your main are DIFFERENT DECISIONS, and the row is where
     // the player makes them.
+    // ⚠⚠ OTA-1499 sharpened the glyph half of this: the owner's ruling — *"star
+    // was for a slot that isn't filled"* — so the free-fill keeps the ★ and the
+    // displace case now carries the green ▲. Same slots, same taps.
     expect(tailFor(wielding(strong), weak)).toContain('★ → off hand');
-    expect(tailFor(wielding(weak), strong)).toContain('★ → main hand');
+    expect(tailFor(wielding(weak), strong)).toContain('▲ → main hand');
   });
 
-  it('⚠ armor keeps "→ worn" — it has one slot and the item already names it', () => {
-    expect(tailFor({ equipped: {}, inventory: [] }, "Mud-Warden's Vest")).toContain('★ → worn');
+  it('⚠ OTA-1499 — armor names its slot now, by the same ruling', () => {
+    // "→ worn" survived OTA-1252 because the slot seemed obvious from the item;
+    // the owner then asked for "the slot's name so we can compare it" — chest,
+    // head, feet — and a bare slot earns the ★.
+    expect(tailFor({ equipped: {}, inventory: [] }, "Mud-Warden's Vest")).toContain('★ → chest');
   });
 
   it('⚠ a non-upgrade weapon still reads → pack, unmarked', () => {

@@ -20,6 +20,11 @@ interface Props {
    *  see the pin in ota1457. */
   actionChipA11yLabel?: string;
   onActionChipPress?: () => void;
+  /** ⚠ OTA-1498 — the pack-only sibling under the take-and-equip chip. Both or
+   *  neither: the pack door only renders beside an offer, never alone. */
+  packChipLabel?: string | null;
+  packChipA11yLabel?: string;
+  onPackChipPress?: () => void;
 }
 
 // Color palette per the user's spec:
@@ -145,7 +150,7 @@ function renderBodyWithEnemyHighlight(
   return <Text style={[styles.body, { color: baseColor }]}>{parts}</Text>;
 }
 
-export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChipA11yLabel, onActionChipPress }: Props) {
+export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChipA11yLabel, onActionChipPress, packChipLabel, packChipA11yLabel, onPackChipPress }: Props) {
   const scrollRef = useRef<ScrollView>(null);
   const visible = entries.filter((e) => !HIDDEN_CHANNELS.has(e.channel));
   const names = useMemo(
@@ -277,6 +282,23 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
           </TouchableOpacity>
         </View>
       ) : null}
+      {/* ⚠ OTA-1498 — the quieter second door: same item, straight to the pack,
+          nothing un-equipped. Rendered only beside the offer above so the pair
+          reads as one choice — swap in, or just carry it. */}
+      {actionChipLabel && packChipLabel ? (
+        <View style={styles.chipRow}>
+          <TouchableOpacity
+            style={styles.packChip}
+            activeOpacity={0.7}
+            onPress={onPackChipPress}
+            accessibilityRole="button"
+            accessibilityLabel={packChipA11yLabel}
+            testID="feed-pack-chip"
+          >
+            <Text style={styles.packChipText}>{packChipLabel}</Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
     </ScrollView>
   );
 }
@@ -354,4 +376,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   chipText: { color: '#9ec96a', fontSize: 13, fontWeight: '700' },
+  // OTA-1498 — pack chip: deliberately quieter than the equip offer above it
+  // (neutral border, smaller face) so the recommended action stays primary.
+  packChip: {
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    backgroundColor: 'transparent',
+    borderRadius: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  packChipText: { color: '#cdbf99', fontSize: 12, fontWeight: '600' },
 });
