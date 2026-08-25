@@ -1,0 +1,1732 @@
+=== TARTARIA LOG · 179705 CHARS · BEGIN ===
+[2026-08-09T01:42:09.001Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #2).
+[2026-08-09T01:42:09.676Z] [debug] ⚠⚠ MEMORY WARNING #2 from the OS (4.8s since the last one) — app=active · qwen='downloading' · reloads=2. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T01:42:09.682Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T01:42:10.830Z] [debug] qwen-watchdog: reinit #2 settled in 1827ms → status='idle'.
+[2026-08-09T01:42:12.229Z] [debug] ui: tap "salvage"
+[2026-08-09T01:42:13.281Z] [player] salvage table
+[2026-08-09T01:42:13.283Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=table resolved=table range=- enemies=0 hooks=0
+[2026-08-09T01:42:13.284Z] [world] You break the table apart. Among the pieces, something worth keeping.
+[2026-08-09T01:42:13.286Z] [reward] ✦ Stick (Common).
+[2026-08-09T01:42:13.290Z] [system] ⏳ Time passed: 15 min
+[2026-08-09T01:42:13.364Z] [cognitive] neutral  (76ms)
+[2026-08-09T01:42:14.017Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #3).
+[2026-08-09T01:42:14.498Z] [debug] ⚠⚠ MEMORY WARNING #3 from the OS (4.8s since the last one) — app=active · qwen='downloading' · reloads=3. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T01:42:14.538Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T01:42:14.600Z] [debug] ui: tap "✦ ability"
+[2026-08-09T01:42:15.333Z] [reward] ✦ Defensive Protocols — an Aetheric shield flares around you. Incoming damage halved for 3 rounds.
+[2026-08-09T01:42:15.500Z] [debug] qwen-watchdog: reinit #3 settled in 1481ms → status='idle'.
+[2026-08-09T01:42:18.203Z] [debug] ui: tap "PLANS"
+[2026-08-09T01:42:18.204Z] [system] Defensive Protocols fades.
+[2026-08-09T01:42:18.220Z] [player] go north
+[2026-08-09T01:42:18.221Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-09T01:42:18.222Z] [world] You head on to the Plans.
+[2026-08-09T01:42:18.222Z] [debug] scene: loc=builders_survey_camp hub=outpost_central arrival=n opening=n passing=n
+[2026-08-09T01:42:18.279Z] [debug] spawn: gear=[Aetheric Scout Greaves, Sentinel's Overcoat] window=1
+[2026-08-09T01:42:18.280Z] [world] Stone Builders' Workshop — The Plan Floor. A workshop floor of laid blueprints and stacked stone. The center stone has the Buried Cities' load-bearing tunnels chalked across it in three layers.
+[2026-08-09T01:42:18.280Z] [world] Paths: north to Smithy · south to Threshold · east to Forge · west to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T01:42:18.281Z] [system] Weather effect — Black Rain: -1 CHA
+[2026-08-09T01:42:18.284Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T01:42:18.284Z] [world] You think back to the table from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-08-09T01:42:18.285Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T01:42:18.285Z] [arbiter] "Defense protocols hum under your hand," the Arbiter says. "Do not waste them on the first thing that moves."
+[2026-08-09T01:42:18.287Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-09T01:42:18.334Z] [cognitive] TRAVEL  (45ms)
+[2026-08-09T01:42:18.424Z] [debug] persist sizes(KB): total=30 player=7 wm=16[rooms=3 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=5 scene=2
+[2026-08-09T01:42:19.032Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #4).
+[2026-08-09T01:42:19.583Z] [debug] ui: tap "salvage"
+[2026-08-09T01:42:19.646Z] [debug] ⚠⚠ MEMORY WARNING #4 from the OS (5.1s since the last one) — app=active · qwen='downloading' · reloads=4 · save=30KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T01:42:19.690Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T01:42:19.736Z] [debug] ⚠⚠ MEMORY WARNING #5 from the OS (0.1s since the last one) — app=active · qwen='idle' · reloads=4 · save=30KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T01:42:19.783Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T01:42:20.555Z] [world] You salvage the shattered library archive console. The take is small but real.
+[2026-08-09T01:42:20.555Z] [world] You break the dust-buried sentinel diagnostic console apart. Among the pieces, something worth keeping.
+[2026-08-09T01:42:20.555Z] [world] You work the bench over. A part of it comes loose, intact.
+[2026-08-09T01:42:20.555Z] [world] You salvage the Sentinel's Overcoat. The take is small but real.
+[2026-08-09T01:42:20.555Z] [world] You break the cracked royal vault pedestal apart. Among the pieces, something worth keeping.
+[2026-08-09T01:42:20.555Z] [reward] ✦ Salvage haul:
+[2026-08-09T01:42:20.556Z] [reward]     • Aether Dust x2 (Common)
+[2026-08-09T01:42:20.556Z] [reward]     • Automaton Circuit x2 (Common)
+[2026-08-09T01:42:20.556Z] [reward]     • Cloth Scrap x2 (Common)
+[2026-08-09T01:42:20.556Z] [reward]     • Aether Crystal (Common)
+[2026-08-09T01:42:20.556Z] [reward]     • Worn Tartarian Coin x2 (Common)
+[2026-08-09T01:42:20.960Z] [debug] qwen-watchdog: reinit #4 settled in 1927ms → status='idle'.
+[2026-08-09T01:42:21.899Z] [debug] ui: tap "take"
+[2026-08-09T01:42:22.822Z] [debug] voice⏱ gap 4537ms (wait 0ms + synth 4413ms, live) "Defense protocols hum under your hand."
+[2026-08-09T01:42:22.908Z] [world] You take the Aetheric Scout Greaves from where it lay.
+[2026-08-09T01:42:22.908Z] [reward] ✦ Aetheric Scout Greaves (Common).
+[2026-08-09T01:42:22.911Z] [world] You take the Aetheric Torch from where it lay.
+[2026-08-09T01:42:22.912Z] [reward] ✦ Aetheric Torch (Common).
+[2026-08-09T01:42:23.849Z] [debug] ui: tap "investigate"
+[2026-08-09T01:42:24.048Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #5).
+[2026-08-09T01:42:24.048Z] [debug] qwen-watchdog: 5 attempts without recovery — backing off (next check in ~10s).
+[2026-08-09T01:42:24.704Z] [debug] ⚠⚠ MEMORY WARNING #6 from the OS (5.0s since the last one) — app=active · qwen='downloading' · reloads=5 · save=30KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T01:42:24.787Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T01:42:24.863Z] [player] investigate square
+[2026-08-09T01:42:24.865Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=square resolved=square range=- enemies=0 hooks=1
+[2026-08-09T01:42:24.871Z] [world] The square resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-08-09T01:42:24.971Z] [cognitive] neutral  (97ms)
+[2026-08-09T01:42:25.932Z] [debug] ui: tap "investigate"
+[2026-08-09T01:42:26.141Z] [debug] qwen-watchdog: reinit #5 settled in 2092ms → status='idle'.
+[2026-08-09T01:42:29.566Z] [debug] appstate: active → inactive (was active for 25566ms)
+[2026-08-09T01:42:29.888Z] [debug] appstate: inactive → background (was inactive for 322ms)
+[2026-08-09T01:42:32.232Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #1).
+[2026-08-09T01:42:32.234Z] [debug] appstate: background → active (was background for 2346ms)
+[2026-08-09T01:42:33.057Z] [debug] ⚠⚠ MEMORY WARNING #7 from the OS (8.3s since the last one) — app=active · qwen='downloading' · reloads=1 · save=30KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T01:42:33.126Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T01:42:33.225Z] [debug] appstate: active → inactive (was active for 991ms)
+[2026-08-09T01:42:34.219Z] [debug] appstate: inactive → background (was inactive for 994ms)
+[2026-08-09T01:42:34.968Z] [debug] qwen-watchdog: reinit #1 settled in 2735ms → status='idle'.
+[2026-08-09T01:42:39.036Z] [debug] qwen-watchdog: app is backgrounded — holding revival until foreground (status='idle').
+[2026-08-09T01:42:39.361Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #1).
+[2026-08-09T01:42:39.362Z] [debug] appstate: background → active (was background for 5143ms)
+[2026-08-09T01:42:40.155Z] [debug] ⚠⚠ MEMORY WARNING #8 from the OS (7.1s since the last one) — app=active · qwen='downloading' · reloads=1 · save=30KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T01:42:40.201Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T01:42:40.266Z] [debug] appstate: active → inactive (was active for 904ms)
+[2026-08-09T01:42:40.359Z] [debug] persist sizes(KB): total=40 player=8 wm=18[rooms=4 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=12 scene=2
+[2026-08-09T01:42:41.877Z] [debug] qwen-watchdog: reinit #1 settled in 2516ms → status='idle'.
+[2026-08-09T01:42:42.031Z] [debug] appstate: inactive → background (was inactive for 1765ms)
+[2026-08-09T01:42:44.629Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=019fe262-6afb-7d3c-acd4-a721cd9e8208
+[2026-08-09T01:42:44.629Z] [debug] ota: Checking…
+[2026-08-09T01:42:45.684Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-09T01:42:45.930Z] [debug] ota: Saving progress…
+[2026-08-09T01:42:45.930Z] [debug] ota: Restarting to apply…
+[2026-08-09T01:42:46.237Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=019fe2e2-7598-783b-b4db-8966814acd2f
+[2026-08-09T01:42:46.237Z] [debug] ota: Checking…
+[2026-08-09T01:42:46.354Z] [debug] ota: Already up to date
+[2026-08-09T01:42:46.354Z] [debug] ota: boot check result = noUpdate
+[2026-08-09T01:42:46.420Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-09T01:42:46.420Z] [debug] voice: bundled loading
+[2026-08-09T01:42:52.170Z] [debug] voice: bundled ready
+[2026-08-09T01:42:54.156Z] [debug] voice⏱ gap 1953ms (wait 0ms + synth 1941ms, live) "Choose your character."
+[2026-08-09T01:42:56.177Z] [debug] appstate: active → inactive (was active for 233ms)
+[2026-08-09T01:42:58.710Z] [debug] appstate: inactive → background (was inactive for 2534ms)
+[2026-08-09T01:43:01.781Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=019fe2e2-7598-783b-b4db-8966814acd2f
+[2026-08-09T01:43:01.782Z] [debug] ota: Checking…
+[2026-08-09T01:43:01.967Z] [debug] ota: Already up to date
+[2026-08-09T01:43:01.967Z] [debug] ota: boot check result = noUpdate
+[2026-08-09T01:43:02.058Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-09T01:43:02.058Z] [debug] voice: bundled loading
+[2026-08-09T01:43:07.550Z] [debug] voice: bundled ready
+[2026-08-09T01:43:09.218Z] [debug] OTA session start: 2026-08-08-1199-instrument-teardown.
+[2026-08-09T01:43:09.219Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-08-09T01:43:09.219Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Verbal. The road kept your place."
+[2026-08-09T01:43:09.832Z] [debug] voice⏱ gap 2254ms (wait 0ms + synth 2243ms, live) "Choose your character."
+[2026-08-09T01:43:11.361Z] [debug] ui: tap "investigate"
+[2026-08-09T01:43:11.693Z] [debug] voice⏱ gap 2474ms (wait 478ms + synth 1791ms, live) "Welcome back, Verbal."
+[2026-08-09T01:43:22.281Z] [debug] ui: tap "investigate"
+[2026-08-09T01:43:25.441Z] [player] investigate path
+[2026-08-09T01:43:25.443Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=path resolved=path range=- enemies=0 hooks=1
+[2026-08-09T01:43:25.444Z] [world] You look for a way forward. The Arbiter notes a lost capital toward Iskan-Veil and a region toward Great Tartary Plains.
+[2026-08-09T01:43:25.526Z] [cognitive] neutral  (79ms)
+[2026-08-09T01:43:30.012Z] [debug] ui: tap "SMITHY"
+[2026-08-09T01:43:30.056Z] [player] go north
+[2026-08-09T01:43:30.057Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=1
+[2026-08-09T01:43:30.058Z] [world] You head on to the Smithy.
+[2026-08-09T01:43:30.058Z] [debug] scene: loc=builders_survey_camp hub=outpost_workshop arrival=n opening=n passing=n
+[2026-08-09T01:43:30.103Z] [debug] spawn: gear=[Aetheric Helm of Insight] window=3
+[2026-08-09T01:43:30.105Z] [world] Stone Builders' Workshop — The Aethercraft Smithy. Tarek's home turf. Half-assembled Aethercraft engines, drone chassis, mud-glass casting molds — the Builders' real art happens at this bench.
+[2026-08-09T01:43:30.105Z] [world] Paths: north to Materials · south to Plans · east to Forge · west to Drafting. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T01:43:30.107Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T01:43:30.107Z] [world] Hoofbeats on the silt. Tarek the Tinkerer draws up beside you, Mechanical Outfitter's mark on the pack. "Trade?" they ask.
+[2026-08-09T01:43:30.107Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Tarek the Tinkerer, Mechanical Outfitter. Eccentric and energetic, Tarek runs a Reclaimer workshop full of half-finished gadgets. Carries golem parts and experimental gear."
+[2026-08-09T01:43:30.114Z] [world] Rare workings for sale: Violet Cap Distillate (200 TC), Void Edge (500 TC), Voidspawn Bolt (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-08-09T01:43:30.115Z] [world] Tarek the Tinkerer offers a contract: "Scrap Run." (Say 'accept scrap' or open Contracts for details.)
+[2026-08-09T01:43:30.115Z] [world] Tarek the Tinkerer points at the bounty board: "The Bog Dragon of Old Drakova." (Say 'accept drakova' or open Contracts.)
+[2026-08-09T01:43:30.115Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T01:43:30.115Z] [arbiter] "Three things in this place would reward attention," the Arbiter says, without naming them. "I would start with the one you cannot quite see."
+[2026-08-09T01:43:30.118Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-09T01:43:30.167Z] [cognitive] TRAVEL  (47ms)
+[2026-08-09T01:43:31.361Z] [debug] ui: tap "salvage"
+[2026-08-09T01:43:32.364Z] [world] the rusted capacitor coil rack gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-08-09T01:43:32.364Z] [world] You strip the stripped tartarian power conduit carefully. Something usable comes free in your hand.
+[2026-08-09T01:43:32.364Z] [world] the bench gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-08-09T01:43:32.364Z] [world] You break the crate apart. Among the pieces, something worth keeping.
+[2026-08-09T01:43:32.364Z] [reward] ✦ Salvage haul:
+[2026-08-09T01:43:32.364Z] [reward]     • Mud-Frosted Bead (Common)
+[2026-08-09T01:43:32.364Z] [reward]     • Scrap Metal x3 (Common)
+[2026-08-09T01:43:32.365Z] [reward]     • Obsidian Chip (Common)
+[2026-08-09T01:43:32.365Z] [reward]     • Worn Tartarian Coin x5 (Common)
+[2026-08-09T01:43:32.758Z] [debug] voice⏱ gap 2649ms (wait 0ms + synth 2546ms, live) "Tarek thuh Tinkerer, Mechanical Outfitte…"
+[2026-08-09T01:43:33.176Z] [debug] ui: tap "take"
+[2026-08-09T01:43:35.077Z] [world] You take the Aetheric Helm of Insight from where it lay.
+[2026-08-09T01:43:35.077Z] [reward] ✦ Aetheric Helm of Insight (Common).
+[2026-08-09T01:43:36.343Z] [debug] ui: tap "PLANS"
+[2026-08-09T01:43:36.355Z] [player] go south
+[2026-08-09T01:43:36.356Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-08-09T01:43:36.356Z] [world] You head on to the Plans.
+[2026-08-09T01:43:36.356Z] [debug] scene: loc=builders_survey_camp hub=outpost_central arrival=n opening=n passing=n
+[2026-08-09T01:43:36.361Z] [world] Stone Builders' Workshop — The Plan Floor. A workshop floor of laid blueprints and stacked stone. The center stone has the Buried Cities' load-bearing tunnels chalked across it in three layers.
+[2026-08-09T01:43:36.361Z] [world] You've stood here before. (visit 2)
+[2026-08-09T01:43:36.362Z] [world] Paths: north to Smithy · south to Threshold · east to Forge · west to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T01:43:36.364Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T01:43:36.366Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T01:43:36.366Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T01:43:36.366Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-09T01:43:36.417Z] [cognitive] neutral  (49ms)
+[2026-08-09T01:43:37.626Z] [debug] ui: tap "SMITHY"
+[2026-08-09T01:43:37.637Z] [player] go north
+[2026-08-09T01:43:37.637Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-09T01:43:37.638Z] [world] You head on to the Smithy.
+[2026-08-09T01:43:37.638Z] [debug] scene: loc=builders_survey_camp hub=outpost_workshop arrival=n opening=n passing=n
+[2026-08-09T01:43:37.642Z] [world] Stone Builders' Workshop — The Aethercraft Smithy. Tarek's home turf. Half-assembled Aethercraft engines, drone chassis, mud-glass casting molds — the Builders' real art happens at this bench.
+[2026-08-09T01:43:37.643Z] [world] You've stood here before. (visit 2)
+[2026-08-09T01:43:37.643Z] [world] Paths: north to Materials · south to Plans · east to Forge · west to Drafting. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T01:43:37.645Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T01:43:37.645Z] [world] Tarek the Tinkerer glances up. "You again." Not warm, not cold — noted.
+[2026-08-09T01:43:37.645Z] [world] Tarek the Tinkerer nods at a mystery notice: "Cradle of Dusk Compass." (Say 'accept compass' or open Contracts.)
+[2026-08-09T01:43:37.645Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T01:43:37.646Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T01:43:37.724Z] [cognitive] TRAVEL  (74ms)
+[2026-08-09T01:43:38.993Z] [debug] ui: tap "PLANS"
+[2026-08-09T01:43:39.004Z] [player] go south
+[2026-08-09T01:43:39.004Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-08-09T01:43:39.005Z] [world] You head on to the Plans.
+[2026-08-09T01:43:39.005Z] [debug] scene: loc=builders_survey_camp hub=outpost_central arrival=n opening=n passing=n
+[2026-08-09T01:43:39.009Z] [world] Stone Builders' Workshop — The Plan Floor. A workshop floor of laid blueprints and stacked stone. The center stone has the Buried Cities' load-bearing tunnels chalked across it in three layers.
+[2026-08-09T01:43:39.009Z] [world] You've stood here again. (visit 3)
+[2026-08-09T01:43:39.009Z] [world] Paths: north to Smithy · south to Threshold · east to Forge · west to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T01:43:39.011Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T01:43:39.011Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T01:43:39.011Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T01:43:39.014Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T01:43:39.014Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T01:43:39.062Z] [cognitive] neutral  (46ms)
+[2026-08-09T01:43:39.148Z] [debug] persist sizes(KB): total=55 player=9 wm=20[rooms=4 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=24 scene=2
+[2026-08-09T01:43:39.896Z] [debug] ui: tap "SMITHY"
+[2026-08-09T01:43:39.906Z] [player] go north
+[2026-08-09T01:43:39.906Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-09T01:43:39.907Z] [world] You head on to the Smithy.
+[2026-08-09T01:43:39.907Z] [debug] scene: loc=builders_survey_camp hub=outpost_workshop arrival=n opening=n passing=n
+[2026-08-09T01:43:39.911Z] [world] Stone Builders' Workshop — The Aethercraft Smithy. Tarek's home turf. Half-assembled Aethercraft engines, drone chassis, mud-glass casting molds — the Builders' real art happens at this bench.
+[2026-08-09T01:43:39.911Z] [world] You've stood here again. (visit 3)
+[2026-08-09T01:43:39.912Z] [world] Paths: north to Materials · south to Plans · east to Forge · west to Drafting. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T01:43:39.914Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T01:43:39.914Z] [world] Tarek the Tinkerer glances up. "You again." Not warm, not cold — noted.
+[2026-08-09T01:43:39.914Z] [world] Tarek the Tinkerer offers a contract: "Scrap Run." (Say 'accept scrap' or open Contracts for details.)
+[2026-08-09T01:43:39.915Z] [world] Tarek the Tinkerer points at the bounty board: "The Bog Dragon of Old Drakova." (Say 'accept drakova' or open Contracts.)
+[2026-08-09T01:43:39.915Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T01:43:39.915Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T01:43:39.973Z] [cognitive] TRAVEL  (54ms)
+[2026-08-09T01:43:40.659Z] [debug] ui: tap "FORGE"
+[2026-08-09T01:43:40.670Z] [player] go east
+[2026-08-09T01:43:40.671Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-08-09T01:43:40.671Z] [world] You head on to the Forge.
+[2026-08-09T01:43:40.671Z] [debug] scene: loc=builders_survey_camp hub=outpost_armory arrival=n opening=n passing=n
+[2026-08-09T01:43:40.675Z] [debug] spawn: gear=[Lightfoot Dash, Golem Leather Gloves, Compact Blaster] window=4
+[2026-08-09T01:43:40.676Z] [world] Stone Builders' Workshop — The Forge Shrine. Anvils on Aetheric isolators. Irma builds — she does not break. Each weapon she sets out is also a tool: a chisel that cuts mud-glass, a maul that lifts stone.
+[2026-08-09T01:43:40.677Z] [world] Paths: north to Smithy · west to Plans. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T01:43:40.679Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T01:43:40.679Z] [world] A figure crests the rise — Irma Ironhand, Heavy Armorer, pack heavy across the shoulders. They set down to trade.
+[2026-08-09T01:43:40.679Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Irma Ironhand, Heavy Armorer. A gruff, no-nonsense smith from the Tartarian Giant encampments. Specializes in durable armor for melee combatants."
+[2026-08-09T01:43:40.686Z] [world] Rare workings for sale: Gravity Pike (500 TC), Hardened Mudstone (200 TC), Heart of the Aetherstorm (500 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-08-09T01:43:40.687Z] [world] Irma Ironhand nods at a mystery notice: "Cradle of Dusk Compass." (Say 'accept compass' or open Contracts.)
+[2026-08-09T01:43:40.687Z] [arbiter] Irma Ironhand unrolls a thick scroll. "Long-form work — Scripture in Stone. A Stone Builder lodge-master at the Survey Camp needs the Architectural Sorcery of the Grand Spire read before his lodge cracks apart under it. 1500 TC and standing. Say 'accept stone' to take it."
+[2026-08-09T01:43:40.688Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T01:43:40.688Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T01:43:40.691Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-09T01:43:40.764Z] [cognitive] neutral  (71ms)
+[2026-08-09T01:43:41.441Z] [debug] ⚠⚠ MEMORY WARNING #1 from the OS (first this session) — app=active · qwen='failed' · reloads=0 · save=55KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T01:43:41.516Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T01:43:41.711Z] [debug] ui: tap "salvage"
+[2026-08-09T01:43:42.406Z] [debug] ⚠⚠ MEMORY WARNING #2 from the OS (1.0s since the last one) — app=active · qwen='idle' · reloads=0 · save=55KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T01:43:42.457Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T01:43:42.715Z] [reward] ✦ Found Goodbye, on a Dining Napkin — The Family in the Mud. (open Contracts → Collectibles to read)
+[2026-08-09T01:43:42.718Z] [world] You break the cracked tartarian power conduit apart. Among the pieces, something worth keeping.
+[2026-08-09T01:43:42.718Z] [world] You work the shattered royal display case over. A part of it comes loose, intact.
+[2026-08-09T01:43:42.719Z] [world] the Golem Leather Gloves gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-08-09T01:43:42.720Z] [world] You break the weathered dormant architectural sentinel down. Among the pieces, a fragment of someone's writing — held against the world by stubbornness alone.
+[2026-08-09T01:43:42.720Z] [world] Already worked over: rack.
+[2026-08-09T01:43:42.720Z] [reward] ✦ Salvage haul:
+[2026-08-09T01:43:42.720Z] [reward]     • Scrap Metal x2 (Common)
+[2026-08-09T01:43:42.720Z] [reward]     • Worn Tartarian Coin x3 (Common)
+[2026-08-09T01:43:42.720Z] [reward]     • Iron-Pinned Plank Shard (Uncommon)
+[2026-08-09T01:43:43.123Z] [debug] ⚠⚠ MEMORY WARNING #3 from the OS (0.7s since the last one) — app=active · qwen='idle' · reloads=0 · save=55KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T01:43:43.175Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T01:43:52.845Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=019fe2e2-7598-783b-b4db-8966814acd2f
+[2026-08-09T01:43:52.845Z] [debug] ota: Checking…
+[2026-08-09T01:43:53.029Z] [debug] ota: Already up to date
+[2026-08-09T01:43:53.029Z] [debug] ota: boot check result = noUpdate
+[2026-08-09T01:43:53.103Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-09T01:43:53.104Z] [debug] voice: bundled loading
+[2026-08-09T01:43:58.558Z] [debug] voice: bundled ready
+[2026-08-09T01:44:00.484Z] [debug] voice⏱ gap 1917ms (wait 0ms + synth 1912ms, live) "Choose your character."
+[2026-08-09T01:44:13.176Z] [debug] appstate: active → inactive (was active for 10499ms)
+[2026-08-09T01:44:14.496Z] [debug] appstate: inactive → background (was inactive for 1320ms)
+[2026-08-09T01:44:34.944Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #1).
+[2026-08-09T01:44:34.953Z] [debug] appstate: background → active (was background for 20457ms)
+[2026-08-09T01:44:40.641Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=019fe2e2-7598-783b-b4db-8966814acd2f
+[2026-08-09T01:44:40.641Z] [debug] ota: Checking…
+[2026-08-09T01:44:40.778Z] [debug] ota: Already up to date
+[2026-08-09T01:44:40.778Z] [debug] ota: boot check result = noUpdate
+[2026-08-09T01:44:40.867Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-09T01:44:40.868Z] [debug] voice: bundled loading
+[2026-08-09T01:44:46.621Z] [debug] voice: bundled ready
+[2026-08-09T01:44:48.722Z] [debug] voice⏱ gap 2074ms (wait 0ms + synth 2060ms, live) "Choose your character."
+[2026-08-09T01:45:09.132Z] [debug] appstate: active → inactive (was active for 18042ms)
+[2026-08-09T01:45:10.063Z] [debug] appstate: inactive → background (was inactive for 931ms)
+[2026-08-09T01:45:29.226Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=019fe2e2-7598-783b-b4db-8966814acd2f
+[2026-08-09T01:45:29.226Z] [debug] ota: Checking…
+[2026-08-09T01:45:29.460Z] [debug] ota: Already up to date
+[2026-08-09T01:45:29.460Z] [debug] ota: boot check result = noUpdate
+[2026-08-09T01:45:29.565Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-09T01:45:29.566Z] [debug] voice: bundled loading
+[2026-08-09T01:45:35.073Z] [debug] voice: bundled ready
+[2026-08-09T01:45:37.125Z] [debug] voice⏱ gap 2030ms (wait 0ms + synth 2017ms, live) "Choose your character."
+[2026-08-09T01:45:42.908Z] [debug] OTA session start: 2026-08-08-1199-instrument-teardown.
+[2026-08-09T01:45:42.909Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-08-09T01:45:42.909Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Verbal. We've still got ground to cover, you and I."
+[2026-08-09T01:45:44.646Z] [debug] voice⏱ gap 1736ms (wait 0ms + synth 1543ms, live) "Welcome back, Verbal."
+[2026-08-09T01:45:45.251Z] [debug] ui: tap "take"
+[2026-08-09T01:45:46.235Z] [world] You take the Lightfoot Dash from where it lay.
+[2026-08-09T01:45:46.236Z] [reward] ✦ Lightfoot Dash (Common).
+[2026-08-09T01:45:46.239Z] [world] You take the Compact Blaster from where it lay.
+[2026-08-09T01:45:46.239Z] [reward] ✦ Compact Blaster (Common).
+[2026-08-09T01:45:46.240Z] [world] You take the Bolt-Caster from where it lay.
+[2026-08-09T01:45:46.240Z] [reward] ✦ Bolt-Caster (Uncommon).
+[2026-08-09T01:45:48.737Z] [debug] ui: tap "EXIT"
+[2026-08-09T01:45:48.777Z] [player] leave outpost
+[2026-08-09T01:45:48.778Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0
+[2026-08-09T01:45:48.779Z] [world] You walk back through the gate and out into the open ground. The outpost falls away behind you.
+[2026-08-09T01:45:48.779Z] [debug] scene: loc=builders_survey_camp hub=- arrival=n opening=n passing=n
+[2026-08-09T01:45:48.822Z] [debug] spawn: gear=[Mud-Lurker Boots, Titan's Forehead Guard, Mud Shortsword] window=7
+[2026-08-09T01:45:48.838Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.
+
+You are at Builders' Survey Camp. A Stone Builders' survey staging post — theodolite stakes, chalked plans, and stacked shoring timber at the safe edge of the ruin-field before the works run deep.
+
+A Bog Hound (Animal, Common) emerges. Its Pack Attack can deal 1D6.
+[2026-08-09T01:45:48.838Z] [combat] Distance: mid-range. Tartarian Spear ✓ in range.
+[2026-08-09T01:45:48.849Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T01:45:48.849Z] [combat] A Bog Hound and a Mud Strider close on you. Tap the right-side panel to cycle targets.
+[2026-08-09T01:45:48.849Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T01:45:48.849Z] [arbiter] "That one bleeds slow," the Arbiter says quietly. "Plan two moves, not one."
+[2026-08-09T01:45:48.854Z] [system] ⏳ Time passed: 1h
+[2026-08-09T01:45:48.950Z] [cognitive] RETREAT · DISENGAGE · HIDE  (96ms)
+[2026-08-09T01:46:01.420Z] [debug] ui: tap "tartarian spear"
+[2026-08-09T01:46:01.497Z] [player] attack with the tartarian spear
+[2026-08-09T01:46:01.498Z] [debug] parser: intent=attack conf=1.00 verb=attack target=tartarian spear resolved=Tartarian Spear range=mid enemies=2 hooks=0
+[2026-08-09T01:46:01.499Z] [debug] attack: target=Bog Hound range=mid reach.bands=[mid,close] reach.label=Tartarian Spear bareHand=false
+[2026-08-09T01:46:01.511Z] [world] You raise the tartarian spear toward Bog Hound. The room narrows around the both of you.
+[2026-08-09T01:46:01.512Z] [system] ⏳ Time passed: 6 min
+[2026-08-09T01:46:01.574Z] [cognitive] ATTACK · USE_ITEM · SEARCH · DISENGAGE · TRAVEL · THROW  (60ms)
+[2026-08-09T01:46:06.195Z] [world] Bog Hound moves first. The pressure is immediate.
+[2026-08-09T01:46:06.196Z] [combat] Bog Hound — d20 → 15 + ATK 5 = 20 vs your AC 10 — ✓ HIT
+[2026-08-09T01:46:06.197Z] [combat] Mud Strider — d20 → 12 + ATK 7 = 19 vs your AC 10 — ✓ HIT
+[2026-08-09T01:46:06.197Z] [combat] You — d20 → 8 + STR 13 = 21 vs Bog Hound AC 8 — ✓ HIT
+[2026-08-09T01:46:06.198Z] [combat] Piercing flares — +3 on hit.
+[2026-08-09T01:46:06.198Z] [combat] Final strike with the tartarian spear for 11. Bog Hound is still. The Aetherstone hums on, indifferent.
+[2026-08-09T01:46:06.199Z] [reward] Bog Hound defeated. You recover Aetheric Teeth.
+[2026-08-09T01:46:06.199Z] [combat] 1 attacker remains. Mud Strider now in your sights.
+[2026-08-09T01:46:06.200Z] [reward] +10 TC pried from the dust.
+[2026-08-09T01:46:06.296Z] [combat] Bog Hound deals 4 piercing damage. You have 24 HP remaining.
+[2026-08-09T01:46:06.296Z] [combat] Mud Strider deals 5 piercing damage. You have 19 HP remaining.
+[2026-08-09T01:46:07.404Z] [debug] ui: tap "tartarian spear"
+[2026-08-09T01:46:07.481Z] [player] attack with the tartarian spear
+[2026-08-09T01:46:07.481Z] [debug] parser: intent=attack conf=1.00 verb=attack target=tartarian spear resolved=Tartarian Spear range=mid enemies=1 hooks=0
+[2026-08-09T01:46:07.482Z] [debug] attack: target=Mud Strider range=mid reach.bands=[mid,close] reach.label=Tartarian Spear bareHand=false
+[2026-08-09T01:46:07.495Z] [world] You commit forward with the tartarian spear. Mud Strider watches your hands.
+[2026-08-09T01:46:07.495Z] [system] ⏳ Time passed: 6 min
+[2026-08-09T01:46:07.555Z] [cognitive] ATTACK · USE_ITEM · SEARCH · DISENGAGE · TRAVEL · THROW  (58ms)
+[2026-08-09T01:46:12.313Z] [world] Mud Strider moves first. The pressure is immediate.
+[2026-08-09T01:46:12.314Z] [combat] Mud Strider — d20 → 19 + ATK 5 = 24 vs your AC 10 — ✓ HIT
+[2026-08-09T01:46:12.314Z] [combat] You — d20 → 18 + STR 13 = 31 vs Mud Strider AC 9 — ✓ HIT
+[2026-08-09T01:46:12.315Z] [combat] Piercing flares — +2 on hit.
+[2026-08-09T01:46:12.316Z] [combat] Mud Strider shrugs off the piercing. (resisted, ×0.25 for 4)
+[2026-08-09T01:46:12.317Z] [arbiter] The Arbiter watches the piercing skid off. "Swap to the Compact Blaster — burn will bite where piercing won't."
+[2026-08-09T01:46:12.318Z] [combat] The blow with the tartarian spear finds purchase — 4 damage, 8 HP standing. Mud Strider commits to the counter.
+[2026-08-09T01:46:12.318Z] [arbiter] The Arbiter watches the mud strider. "It is not the first thing here that decided to keep its distance, then changed its mind."
+[2026-08-09T01:46:12.399Z] [combat] Mud Strider deals 9 piercing damage. You have 10 HP remaining.
+[2026-08-09T01:46:12.832Z] [debug] ui: tap "dodge"
+[2026-08-09T01:46:12.836Z] [player] dodge
+[2026-08-09T01:46:12.837Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0
+[2026-08-09T01:46:12.837Z] [world] You commit to the dodge. Slip Mud Strider's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-09T01:46:12.849Z] [combat] Mud Strider — d20 → 18 + ATK 5 = 23 vs your AC 10 — ✓ HIT
+[2026-08-09T01:46:12.849Z] [combat] Dodge — d20 → 10 + DEX 5 = 15 vs ATK 23. ✗ You misread it — no opening, and the blow lands as it normally would (armor still counts).
+[2026-08-09T01:46:12.849Z] [world] Your read is a beat off — you fail to make the opening, and the swing lands the way it always meant to.
+[2026-08-09T01:46:12.850Z] [system] ⏳ Time passed: 6 min
+[2026-08-09T01:46:12.929Z] [combat] Mud Strider deals 5 piercing damage. You have 5 HP remaining.
+[2026-08-09T01:46:13.005Z] [cognitive] neutral  (154ms)
+[2026-08-09T01:46:13.165Z] [debug] persist sizes(KB): total=80 player=11 wm=24[rooms=8 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=42 scene=3
+[2026-08-09T01:46:14.282Z] [debug] ui: tap "tartarian spear"
+[2026-08-09T01:46:14.315Z] [player] attack with the tartarian spear
+[2026-08-09T01:46:14.316Z] [debug] parser: intent=attack conf=1.00 verb=attack target=tartarian spear resolved=Tartarian Spear range=mid enemies=1 hooks=0
+[2026-08-09T01:46:14.316Z] [debug] attack: target=Mud Strider range=mid reach.bands=[mid,close] reach.label=Tartarian Spear bareHand=false
+[2026-08-09T01:46:14.316Z] [debug] attack: status mods tired -1
+[2026-08-09T01:46:14.330Z] [world] Your tartarian spear comes around in an arc; Mud Strider squares up to meet it.
+[2026-08-09T01:46:14.330Z] [system] ⏳ Time passed: 6 min
+[2026-08-09T01:46:14.400Z] [cognitive] ATTACK · USE_ITEM · SEARCH · DISENGAGE · TRAVEL · THROW  (69ms)
+[2026-08-09T01:46:16.060Z] [debug] voice⏱ gap 3743ms (wait 0ms + synth 3591ms, live) "Swap to thuh Compact Blaster, burn will …"
+[2026-08-09T01:46:19.167Z] [world] Mud Strider moves first. The pressure is immediate.
+[2026-08-09T01:46:19.168Z] [combat] Mud Strider — d20 → 14 + ATK 5 = 19 vs your AC 10 — ✓ HIT
+[2026-08-09T01:46:19.258Z] [combat] Mud Strider deals 11 piercing damage. You fall.
+[2026-08-09T01:46:19.258Z] [combat] Verbal's breath leaves. The dust settles back into its old patterns.
+[2026-08-09T01:46:19.259Z] [system] Verbal has fallen. A Resurrection Gem from the title screen can bring them back.
+[2026-08-09T01:46:19.396Z] [reward] ✦ A Resurrection Gem pulses in Verbal's pack — the buried world owes you one. (3 held)
+[2026-08-09T01:46:31.534Z] [debug] voice⏱ gap 1537ms (wait 0ms + synth 1518ms, live) "Choose your character."
+[2026-08-09T01:46:39.448Z] [debug] qwen-watchdog: Qwen not ready (status='failed'); reinitializing (attempt #1).
+[2026-08-09T01:46:40.382Z] [debug] ⚠⚠ MEMORY WARNING #1 from the OS (first this session) — app=active · qwen='downloading' · reloads=1 · save=80KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T01:46:40.390Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T01:46:41.926Z] [debug] qwen-watchdog: reinit #1 settled in 2472ms → status='idle'.
+[2026-08-09T01:46:42.113Z] [debug] ⚠⚠ MEMORY WARNING #2 from the OS (1.7s since the last one) — app=active · qwen='idle' · reloads=1 · save=80KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T01:46:42.114Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T01:46:44.464Z] [debug] qwen-watchdog: holding reloads for 90s — the OS just asked for memory back and a reload is the biggest thing we could do to it.
+[2026-08-09T01:46:44.697Z] [debug] appstate: active → inactive (was active for 65252ms)
+[2026-08-09T01:46:45.572Z] [debug] appstate: inactive → background (was inactive for 876ms)
+[2026-08-09T02:50:30.379Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=019fe2e2-7598-783b-b4db-8966814acd2f
+[2026-08-09T02:50:30.379Z] [debug] ota: Checking…
+[2026-08-09T02:50:31.357Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-09T02:50:31.577Z] [debug] ota: Saving progress…
+[2026-08-09T02:50:31.578Z] [debug] ota: Restarting to apply…
+[2026-08-09T02:50:31.799Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=019fe463-4d74-7c69-9782-36dc05c59119
+[2026-08-09T02:50:31.799Z] [debug] ota: Checking…
+[2026-08-09T02:50:31.919Z] [debug] ota: Already up to date
+[2026-08-09T02:50:31.920Z] [debug] ota: boot check result = noUpdate
+[2026-08-09T02:50:31.971Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-09T02:50:31.972Z] [debug] voice: bundled loading
+[2026-08-09T02:50:38.638Z] [debug] voice: bundled ready
+[2026-08-09T02:50:41.341Z] [debug] voice⏱ gap 2658ms (wait 0ms + synth 2646ms, live) "Choose your character."
+[2026-08-09T02:50:44.497Z] [debug] scene: loc=builders_survey_camp hub=outpost_gate arrival=n opening=n passing=n
+[2026-08-09T02:50:44.540Z] [world] Stone Builders' Workshop — The Tool Threshold. An open shop entry with a chalkboard for jobs taken and a rack of clean Aethercraft instruments. The foreman waves you to the slate without looking up.
+[2026-08-09T02:50:44.540Z] [world] You've stood here before. (visit 2)
+[2026-08-09T02:50:44.541Z] [world] Paths: north to Plans · east to Forge · west to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T02:50:44.542Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T02:50:44.543Z] [world] Halem the Trader half-recognises you and doesn't say so. The wares stay where they are.
+[2026-08-09T02:50:44.543Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T02:50:44.543Z] [arbiter] "This place has changed since I last passed through," the Arbiter says. "Or perhaps it has not, and I have."
+[2026-08-09T02:50:44.546Z] [reward] ✦ Resurrection. Verbal returns to Tartaria, restored. The Aetherstone hums in recognition.
+[2026-08-09T02:50:45.915Z] [debug] ⚠⚠ MEMORY WARNING #1 from the OS (first this session) — app=active · qwen='failed' · reloads=0. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T02:50:45.964Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T02:50:50.319Z] [player] Ask how business is
+[2026-08-09T02:50:50.320Z] [world] "Business is people," Halem says cheerfully, moving a crate that did not need moving. "Everything on this post came off somebody who needed something else more. I do not think there is a single new thing in Tartaria. Just things that have changed hands enough times to look new."
+[2026-08-09T02:50:50.320Z] [world] Halem the Trader shifts the pack higher on their shoulder and does not put it down.
+[2026-08-09T02:50:51.191Z] [debug] ⚠⚠ MEMORY WARNING #2 from the OS (5.3s since the last one) — app=active · qwen='idle' · reloads=0. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T02:50:51.237Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T02:50:51.281Z] [debug] ⚠⚠ MEMORY WARNING #3 from the OS (0.1s since the last one) — app=active · qwen='idle' · reloads=0. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T02:50:51.325Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T02:50:52.639Z] [world] You let the conversation go and Halem the Trader gets back to it.
+[2026-08-09T02:51:00.122Z] [debug] ui: tap "more ▾"
+[2026-08-09T02:51:03.289Z] [debug] ui: tap "inventory"
+[2026-08-09T02:51:31.255Z] [debug] ui: tap "PLANS"
+[2026-08-09T02:51:31.267Z] [world] Black rain runs down your collar. Something in you tightens that should not have.
+[2026-08-09T02:51:31.301Z] [player] go north
+[2026-08-09T02:51:31.302Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-09T02:51:31.303Z] [world] You head on to the Plans.
+[2026-08-09T02:51:31.303Z] [debug] scene: loc=builders_survey_camp hub=outpost_central arrival=n opening=n passing=n
+[2026-08-09T02:51:31.312Z] [world] Stone Builders' Workshop — The Plan Floor. A workshop floor of laid blueprints and stacked stone. The center stone has the Buried Cities' load-bearing tunnels chalked across it in three layers.
+[2026-08-09T02:51:31.313Z] [world] You've stood here again. (visit 4)
+[2026-08-09T02:51:31.313Z] [world] Paths: north to Smithy · south to Threshold · east to Forge · west to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T02:51:31.315Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T02:51:31.316Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T02:51:31.316Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T02:51:31.396Z] [cognitive] TRAVEL  (73ms)
+[2026-08-09T02:51:33.369Z] [debug] ui: tap "THRESHOLD"
+[2026-08-09T02:51:33.389Z] [player] go south
+[2026-08-09T02:51:33.390Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-08-09T02:51:33.391Z] [world] You head on to the Threshold.
+[2026-08-09T02:51:33.391Z] [debug] scene: loc=builders_survey_camp hub=outpost_gate arrival=n opening=n passing=n
+[2026-08-09T02:51:33.398Z] [world] Stone Builders' Workshop — The Tool Threshold. An open shop entry with a chalkboard for jobs taken and a rack of clean Aethercraft instruments. The foreman waves you to the slate without looking up.
+[2026-08-09T02:51:33.399Z] [world] You've stood here again. (visit 3)
+[2026-08-09T02:51:33.399Z] [world] Paths: north to Plans · east to Forge · west to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T02:51:33.401Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T02:51:33.402Z] [world] Halem the Trader half-recognises you and doesn't say so. The wares stay where they are.
+[2026-08-09T02:51:33.402Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T02:51:33.402Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T02:51:33.465Z] [cognitive] neutral  (54ms)
+[2026-08-09T02:51:33.535Z] [debug] persist sizes(KB): total=86 player=12 wm=21[rooms=3 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=52 scene=2
+[2026-08-09T02:51:34.718Z] [debug] ui: tap "FORGE"
+[2026-08-09T02:51:34.727Z] [player] go east
+[2026-08-09T02:51:34.727Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-08-09T02:51:34.728Z] [world] You head on to the Forge.
+[2026-08-09T02:51:34.728Z] [debug] scene: loc=builders_survey_camp hub=outpost_armory arrival=n opening=n passing=n
+[2026-08-09T02:51:34.733Z] [world] Stone Builders' Workshop — The Forge Shrine. Anvils on Aetheric isolators. Irma builds — she does not break. Each weapon she sets out is also a tool: a chisel that cuts mud-glass, a maul that lifts stone.
+[2026-08-09T02:51:34.733Z] [world] You've stood here before. (visit 2)
+[2026-08-09T02:51:34.733Z] [world] Paths: north to Smithy · west to Plans. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T02:51:34.735Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T02:51:34.735Z] [world] Irma Ironhand glances up. "You again." Not warm, not cold — noted.
+[2026-08-09T02:51:34.736Z] [world] Irma Ironhand offers a contract: "Quarry Quota." (Say 'accept quota' or open Contracts for details.)
+[2026-08-09T02:51:34.736Z] [world] Irma Ironhand points at the bounty board: "The Bog Dragon of Old Drakova." (Say 'accept drakova' or open Contracts.)
+[2026-08-09T02:51:34.736Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T02:51:34.736Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T02:51:34.793Z] [cognitive] neutral  (52ms)
+[2026-08-09T02:51:35.205Z] [debug] ⚠⚠ MEMORY WARNING #4 from the OS (43.9s since the last one) — app=active · qwen='idle' · reloads=0 · save=86KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T02:51:35.260Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T02:51:36.232Z] [debug] ⚠⚠ MEMORY WARNING #5 from the OS (1.0s since the last one) — app=active · qwen='idle' · reloads=0 · save=86KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T02:51:36.293Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T02:51:42.780Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=019fe463-4d74-7c69-9782-36dc05c59119
+[2026-08-09T02:51:42.780Z] [debug] ota: Checking…
+[2026-08-09T02:51:42.924Z] [debug] ota: Already up to date
+[2026-08-09T02:51:42.925Z] [debug] ota: boot check result = noUpdate
+[2026-08-09T02:51:43.008Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-09T02:51:43.008Z] [debug] voice: bundled loading
+[2026-08-09T02:51:48.568Z] [debug] voice: bundled ready
+[2026-08-09T02:51:50.592Z] [debug] voice⏱ gap 2004ms (wait 0ms + synth 1994ms, live) "Choose your character."
+[2026-08-09T02:51:52.707Z] [debug] OTA session start: 2026-08-09-1200-context-ledger.
+[2026-08-09T02:51:52.707Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-08-09T02:51:52.707Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Verbal. The buried country is no place to walk alone."
+[2026-08-09T02:51:54.646Z] [debug] voice⏱ gap 1938ms (wait 128ms + synth 1598ms, live) "Welcome back, Verbal."
+[2026-08-09T02:52:04.835Z] [debug] appstate: active → inactive (was active for 11786ms)
+[2026-08-09T02:52:05.791Z] [debug] appstate: inactive → background (was inactive for 956ms)
+[2026-08-09T03:27:28.498Z] [debug] qwen-watchdog: app is backgrounded — holding revival until foreground (status='idle').
+[2026-08-09T03:27:28.793Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #1).
+[2026-08-09T03:27:28.797Z] [debug] appstate: background → active (was background for 2123006ms)
+[2026-08-09T03:27:30.134Z] [debug] ⚠⚠ MEMORY WARNING #1 from the OS (first this session) — app=active · qwen='downloading' · reloads=1. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T03:27:30.244Z] [debug] memory: released the Qwen context (~400MB) in response to the warning; narration falls back to templates until it recovers.
+[2026-08-09T03:27:31.626Z] [debug] qwen-watchdog: reinit #1 settled in 2832ms → status='idle'.
+[2026-08-09T03:27:32.539Z] [debug] voice⏱ gap 2068ms (wait 0ms + synth 2048ms, live) "Choose your character."
+[2026-08-09T03:27:33.811Z] [debug] qwen-watchdog: holding reloads for 90s — the OS just asked for memory back and a reload is the biggest thing we could do to it.
+[2026-08-09T03:27:36.953Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=019fe48f-3117-72b5-8e9d-3dcd6751e14a
+[2026-08-09T03:27:36.953Z] [debug] ota: Checking…
+[2026-08-09T03:27:37.071Z] [debug] ota: Already up to date
+[2026-08-09T03:27:37.071Z] [debug] ota: boot check result = noUpdate
+[2026-08-09T03:27:37.121Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-09T03:27:37.121Z] [debug] voice: bundled loading
+[2026-08-09T03:27:42.724Z] [debug] voice: bundled ready
+[2026-08-09T03:27:44.808Z] [debug] voice⏱ gap 2051ms (wait 0ms + synth 2018ms, live) "Choose your character."
+[2026-08-09T03:27:46.985Z] [debug] OTA applied: 2026-08-09-1200-context-ledger → 2026-08-09-1202-honest-memory-line.
+[2026-08-09T03:27:46.986Z] [debug] OTA session start: 2026-08-09-1202-honest-memory-line.
+[2026-08-09T03:27:46.986Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-08-09T03:27:46.986Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Verbal. We've still got ground to cover, you and I."
+[2026-08-09T03:27:48.691Z] [debug] ui: tap "SMITHY"
+[2026-08-09T03:27:48.703Z] [player] go north
+[2026-08-09T03:27:48.703Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-09T03:27:48.704Z] [world] You head on to the Smithy.
+[2026-08-09T03:27:48.704Z] [debug] scene: loc=builders_survey_camp hub=outpost_workshop arrival=n opening=n passing=n
+[2026-08-09T03:27:48.739Z] [world] Stone Builders' Workshop — The Aethercraft Smithy. Tarek's home turf. Half-assembled Aethercraft engines, drone chassis, mud-glass casting molds — the Builders' real art happens at this bench.
+[2026-08-09T03:27:48.739Z] [world] You've stood here again. (visit 4)
+[2026-08-09T03:27:48.740Z] [world] Paths: north to Materials · south to Plans · east to Forge · west to Drafting. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T03:27:48.741Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T03:27:48.741Z] [world] Tarek the Tinkerer places you as you come in. "Verbal. What are you after?"
+[2026-08-09T03:27:48.742Z] [world] Tarek the Tinkerer jerks their chin north. "The Conspiracy Architects raided our outpost while you were out there. Word travels slower than they do."
+[2026-08-09T03:27:48.742Z] [world] Tarek the Tinkerer nods at a mystery notice: "Cradle of Dusk Compass." (Say 'accept compass' or open Contracts.)
+[2026-08-09T03:27:48.819Z] [cognitive] TRAVEL  (69ms)
+[2026-08-09T03:27:49.032Z] [debug] voice⏱ gap 2045ms (wait 0ms + synth 1838ms, live) "Welcome back, Verbal."
+[2026-08-09T03:27:49.924Z] [debug] ui: tap "climb"
+[2026-08-09T03:27:50.894Z] [player] climb leaning maintenance tunnel ladder
+[2026-08-09T03:27:50.894Z] [debug] parser: intent=climb conf=1.00 verb=climb target=leaning maintenance tunnel ladder resolved=leaning maintenance tunnel ladder range=- enemies=0 hooks=0
+[2026-08-09T03:27:50.907Z] [world] You loop your Reclaimer's Rope around the leaning maintenance tunnel ladder and walk the line. Tier 1/2 cleared.
+[2026-08-09T03:27:50.907Z] [world] You reach the first hold of the leaning maintenance tunnel ladder (tier 1/2). Higher still to go.
+[2026-08-09T03:27:50.908Z] [system] ⏳ Time passed: 30 min
+[2026-08-09T03:27:50.999Z] [cognitive] CLIMB  (90ms)
+[2026-08-09T03:27:52.207Z] [debug] ui: tap "climb up (1/2)"
+[2026-08-09T03:27:52.250Z] [player] climb leaning maintenance tunnel ladder
+[2026-08-09T03:27:52.251Z] [debug] parser: intent=climb conf=1.00 verb=climb target=leaning maintenance tunnel ladder resolved=leaning maintenance tunnel ladder range=- enemies=0 hooks=0
+[2026-08-09T03:27:52.264Z] [world] You loop your Reclaimer's Rope around the leaning maintenance tunnel ladder and walk the line. Tier 2/2 cleared.
+[2026-08-09T03:27:52.264Z] [world] You reach the top of the leaning maintenance tunnel ladder (tier 2/2). The view changes; the room reads differently from here.
+[2026-08-09T03:27:52.265Z] [reward] ✦ Aetheric Shard (Uncommon) — tucked into a crack at the top of the leaning maintenance tunnel ladder.
+[2026-08-09T03:27:52.268Z] [world] Just sky. The view, and nothing else but the wind, and what the wind knows.
+[2026-08-09T03:27:52.269Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T03:27:52.269Z] [arbiter] The Arbiter eyes the reality fracture. "Tartaria's older hazards are the ones you can't see coming. This one you can."
+[2026-08-09T03:27:52.269Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-09T03:27:52.270Z] [system] ⏳ Time passed: 30 min
+[2026-08-09T03:27:52.337Z] [cognitive] CLIMB  (65ms)
+[2026-08-09T03:27:52.709Z] [debug] ⚠⚠ MEMORY WARNING #1 from the OS (first this session) — app=active · qwen='failed' · voice='ready' · reloads=0. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T03:27:52.762Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='failed'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-08-09T03:27:53.442Z] [debug] ui: tap "climb down"
+[2026-08-09T03:27:53.453Z] [player] climb down
+[2026-08-09T03:27:53.454Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0
+[2026-08-09T03:27:53.454Z] [world] You climb down from the lookout and rejoin the ground beside the leaning maintenance tunnel ladder. Boots back on the ground.
+[2026-08-09T03:27:53.455Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T03:27:53.455Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T03:27:53.455Z] [system] ⏳ Time passed: 15 min
+[2026-08-09T03:27:53.518Z] [cognitive] CLIMB  (62ms)
+[2026-08-09T03:27:54.657Z] [debug] ui: tap "PLANS"
+[2026-08-09T03:27:54.669Z] [player] go south
+[2026-08-09T03:27:54.670Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-08-09T03:27:54.670Z] [world] You head on to the Plans.
+[2026-08-09T03:27:54.671Z] [debug] scene: loc=builders_survey_camp hub=outpost_central arrival=n opening=n passing=n
+[2026-08-09T03:27:54.675Z] [world] Stone Builders' Workshop — The Plan Floor. A workshop floor of laid blueprints and stacked stone. The center stone has the Buried Cities' load-bearing tunnels chalked across it in three layers.
+[2026-08-09T03:27:54.675Z] [world] You've stood here again. (visit 5)
+[2026-08-09T03:27:54.675Z] [world] Paths: north to Smithy · south to Threshold · east to Forge · west to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T03:27:54.679Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T03:27:54.679Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T03:27:54.679Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T03:27:54.684Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-09T03:27:54.748Z] [cognitive] neutral  (62ms)
+[2026-08-09T03:27:55.607Z] [debug] ui: tap "climb"
+[2026-08-09T03:27:56.506Z] [player] climb jagged maintenance tunnel ladder
+[2026-08-09T03:27:56.506Z] [debug] parser: intent=climb conf=1.00 verb=climb target=jagged maintenance tunnel ladder resolved=jagged maintenance tunnel ladder range=- enemies=0 hooks=0
+[2026-08-09T03:27:56.523Z] [world] You loop your Reclaimer's Rope around the jagged maintenance tunnel ladder and walk the line. Tier 1/2 cleared.
+[2026-08-09T03:27:56.523Z] [world] You reach the first hold of the jagged maintenance tunnel ladder (tier 1/2). Higher still to go.
+[2026-08-09T03:27:56.524Z] [system] ⏳ Time passed: 30 min
+[2026-08-09T03:27:56.608Z] [cognitive] TRAVEL · CLIMB  (82ms)
+[2026-08-09T03:27:58.774Z] [debug] ui: tap "climb up (1/2)"
+[2026-08-09T03:27:58.822Z] [player] climb jagged maintenance tunnel ladder
+[2026-08-09T03:27:58.822Z] [debug] parser: intent=climb conf=1.00 verb=climb target=jagged maintenance tunnel ladder resolved=jagged maintenance tunnel ladder range=- enemies=0 hooks=0
+[2026-08-09T03:27:58.839Z] [world] You loop your Reclaimer's Rope around the jagged maintenance tunnel ladder and walk the line. Tier 2/2 cleared.
+[2026-08-09T03:27:58.839Z] [world] You reach the top of the jagged maintenance tunnel ladder (tier 2/2). The view changes; the room reads differently from here.
+[2026-08-09T03:27:58.841Z] [world] A door at the top of the climb. The hinges are mounted on this side — as if to keep something IN.
+[2026-08-09T03:27:58.842Z] [combat] Rust Lurker is here — and it has seen you.
+[2026-08-09T03:27:58.842Z] [debug] enemy: Rust Lurker hp=55 ac=9 atk=Claw Slash dmg=2D6 rarity=Uncommon ap=4
+[2026-08-09T03:27:58.842Z] [system] ⏳ Time passed: 30 min
+[2026-08-09T03:27:58.953Z] [cognitive] TRAVEL · CLIMB  (109ms)
+[2026-08-09T03:27:59.448Z] [debug] voice⏱ gap 7178ms (wait 895ms + synth 3904ms, live) "tar taireeuh's older hazards are thuh on…"
+[2026-08-09T03:27:59.568Z] [debug] ui: tap "flee"
+[2026-08-09T03:27:59.570Z] [player] flee
+[2026-08-09T03:27:59.570Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=0
+[2026-08-09T03:27:59.584Z] [system] ⏳ Time passed: 15 min
+[2026-08-09T03:27:59.661Z] [cognitive] FEAR · RETREAT · HIDE  (74ms)
+[2026-08-09T03:27:59.756Z] [debug] persist sizes(KB): total=106 player=12 wm=21[rooms=3 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=69 scene=4
+[2026-08-09T03:28:01.548Z] [debug] skillcheck: escape d20=7 DEX 5 = 12 vs Pursuit 6 — Rust Lurker (d20 2 + SPD 4) → PASS
+[2026-08-09T03:28:01.574Z] [debug] stats: STR13 DEX5 INT6 WIS6 CHA9 STE3 | gear: STR+1 | worn: main=Tartarian Spear
+[2026-08-09T03:28:01.574Z] [debug] train: dexterity (escape check) → progress 24/100
+[2026-08-09T03:28:01.575Z] [world] You kick off the jagged maintenance tunnel ladder and take the wall in one desperate line — 2 tiers at double burn (-4 stamina).
+[2026-08-09T03:28:01.575Z] [world] You hit the ground moving. Whatever was up there keeps the height.
+[2026-08-09T03:28:02.810Z] [debug] ui: tap "investigate"
+[2026-08-09T03:28:03.998Z] [player] investigate jagged maintenance tunnel ladder
+[2026-08-09T03:28:03.998Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=jagged maintenance tunnel ladder resolved=jagged maintenance tunnel ladder range=- enemies=0 hooks=0
+[2026-08-09T03:28:03.999Z] [world] You run a hand along the jagged maintenance tunnel ladder. Cold, set fast in place, and about as talkative as the rest of the buried world.
+[2026-08-09T03:28:03.999Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-09T03:28:04.059Z] [cognitive] neutral  (58ms)
+[2026-08-09T03:28:04.877Z] [debug] ui: tap "investigate"
+[2026-08-09T03:28:05.802Z] [player] investigate the floor
+[2026-08-09T03:28:05.802Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-08-09T03:28:05.805Z] [world] You scan the floor. Something small catches the light, half-kicked under the boards.
+[2026-08-09T03:28:05.806Z] [reward] ✦ Cloth Scrap.
+[2026-08-09T03:28:05.806Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-09T03:28:05.886Z] [cognitive] neutral  (78ms)
+[2026-08-09T03:28:07.292Z] [debug] ui: tap "FORGE"
+[2026-08-09T03:28:07.314Z] [player] go east
+[2026-08-09T03:28:07.315Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-08-09T03:28:07.316Z] [world] You head on to the Forge.
+[2026-08-09T03:28:07.316Z] [debug] scene: loc=builders_survey_camp hub=outpost_armory arrival=n opening=n passing=n
+[2026-08-09T03:28:07.375Z] [world] Stone Builders' Workshop — The Forge Shrine. Anvils on Aetheric isolators. Irma builds — she does not break. Each weapon she sets out is also a tool: a chisel that cuts mud-glass, a maul that lifts stone.
+[2026-08-09T03:28:07.375Z] [world] You've stood here again. (visit 3)
+[2026-08-09T03:28:07.375Z] [world] Paths: north to Smithy · west to Plans. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T03:28:07.377Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T03:28:07.377Z] [world] Irma Ironhand places you as you come in. "Verbal. What are you after?"
+[2026-08-09T03:28:07.377Z] [world] Irma Ironhand offers a contract: "Quarry Quota." (Say 'accept quota' or open Contracts for details.)
+[2026-08-09T03:28:07.378Z] [world] Irma Ironhand points at the bounty board: "The Bog Dragon of Old Drakova." (Say 'accept drakova' or open Contracts.)
+[2026-08-09T03:28:07.378Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T03:28:07.378Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T03:28:07.440Z] [cognitive] neutral  (55ms)
+[2026-08-09T03:28:08.000Z] [debug] ⚠⚠ MEMORY WARNING #2 from the OS (15.3s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=0 · save=106KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T03:28:08.061Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-08-09T03:28:08.323Z] [debug] ui: tap "investigate"
+[2026-08-09T03:28:09.183Z] [player] investigate blade
+[2026-08-09T03:28:09.184Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=blade resolved=blade range=- enemies=0 hooks=0
+[2026-08-09T03:28:09.184Z] [world] You look the blade over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-08-09T03:28:09.258Z] [cognitive] DISENGAGE · ATTACK  (71ms)
+[2026-08-09T03:28:09.358Z] [debug] ⚠⚠ MEMORY WARNING #3 from the OS (1.4s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=0 · save=106KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T03:28:09.413Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-08-09T03:28:10.273Z] [debug] ui: tap "investigate"
+[2026-08-09T03:28:11.358Z] [player] investigate the floor
+[2026-08-09T03:28:11.359Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-08-09T03:28:11.360Z] [world] You scan the floor. Something small catches the light, half-kicked under the boards.
+[2026-08-09T03:28:11.361Z] [reward] ✦ Worn Tartarian Coin.
+[2026-08-09T03:28:11.361Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-09T03:28:11.449Z] [cognitive] neutral  (86ms)
+[2026-08-09T03:28:12.173Z] [debug] ui: tap "investigate"
+[2026-08-09T03:28:12.951Z] [player] investigate anvil
+[2026-08-09T03:28:12.954Z] [dog_quest] You step into the smelter's ruin. The Reclaimer Deserter is here, working a chain that ends in a dog's collar. Reclaimer Deserter sees you. "Walk on. This one's not yours."
+[2026-08-09T03:28:17.979Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=019fe48f-3117-72b5-8e9d-3dcd6751e14a
+[2026-08-09T03:28:17.979Z] [debug] ota: Checking…
+[2026-08-09T03:28:18.213Z] [debug] ota: Already up to date
+[2026-08-09T03:28:18.214Z] [debug] ota: boot check result = noUpdate
+[2026-08-09T03:28:18.272Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-09T03:28:18.272Z] [debug] voice: bundled loading
+[2026-08-09T03:28:23.758Z] [debug] voice: bundled ready
+[2026-08-09T03:28:25.807Z] [debug] voice⏱ gap 2020ms (wait 0ms + synth 2009ms, live) "Choose your character."
+[2026-08-09T03:28:34.082Z] [debug] OTA session start: 2026-08-09-1202-honest-memory-line.
+[2026-08-09T03:28:34.082Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-08-09T03:28:34.083Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Verbal. We've still got ground to cover, you and I."
+[2026-08-09T03:28:35.864Z] [debug] voice⏱ gap 1780ms (wait 0ms + synth 1542ms, live) "Welcome back, Verbal."
+[2026-08-09T03:28:45.906Z] [debug] appstate: active → inactive (was active for 17897ms)
+[2026-08-09T03:28:46.837Z] [debug] appstate: inactive → background (was inactive for 931ms)
+[2026-08-09T03:50:14.644Z] [debug] qwen-watchdog: app is backgrounded — holding revival until foreground (status='idle').
+[2026-08-09T03:50:14.989Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #1).
+[2026-08-09T03:50:14.989Z] [debug] appstate: background → active (was background for 1288152ms)
+[2026-08-09T03:50:16.160Z] [debug] ⚠⚠ MEMORY WARNING #1 from the OS (first this session) — app=active · qwen='downloading' · voice='ready' · reloads=1. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T03:50:16.205Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='downloading'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-08-09T03:50:17.280Z] [debug] qwen-watchdog: reinit #1 settled in 2290ms → status='idle'.
+[2026-08-09T03:50:18.771Z] [debug] voice⏱ gap 1779ms (wait 0ms + synth 1764ms, live) "Choose your character."
+[2026-08-09T03:50:20.022Z] [debug] qwen-watchdog: holding reloads for 90s — the OS just asked for memory back and a reload is the biggest thing we could do to it.
+[2026-08-09T03:50:23.538Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=019fe4a3-6208-7a56-b5f6-74fc0dc58326
+[2026-08-09T03:50:23.538Z] [debug] ota: Checking…
+[2026-08-09T03:50:23.680Z] [debug] ota: Already up to date
+[2026-08-09T03:50:23.680Z] [debug] ota: boot check result = noUpdate
+[2026-08-09T03:50:23.733Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-09T03:50:23.734Z] [debug] voice: bundled loading
+[2026-08-09T03:50:29.861Z] [debug] voice: bundled ready
+[2026-08-09T03:50:31.595Z] [debug] OTA applied: 2026-08-09-1202-honest-memory-line → 2026-08-09-1203-qwen-success-checked.
+[2026-08-09T03:50:31.595Z] [debug] OTA session start: 2026-08-09-1203-qwen-success-checked.
+[2026-08-09T03:50:31.596Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-08-09T03:50:31.596Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Verbal. The road kept your place."
+[2026-08-09T03:50:32.182Z] [debug] voice⏱ gap 2286ms (wait 0ms + synth 2277ms, live) "Choose your character."
+[2026-08-09T03:50:33.925Z] [debug] voice⏱ gap 2328ms (wait 352ms + synth 1644ms, live) "Welcome back, Verbal."
+[2026-08-09T03:50:39.632Z] [debug] ui: tap "inventory"
+[2026-08-09T03:50:44.246Z] [debug] stats: STR13 DEX5 INT8 WIS6 CHA9 STE3 | gear: INT+2,STR+1 | worn: main=Tartarian Spear head=Aetheric Helm of Insight
+[2026-08-09T03:50:49.309Z] [debug] stats: STR13 DEX7 INT8 WIS6 CHA9 STE3 | gear: INT+2,DEX+2,STR+1 | worn: main=Tartarian Spear head=Aetheric Helm of Insight hands=Stone-Grip Gloves
+[2026-08-09T03:50:52.498Z] [debug] stats: STR13 DEX9 INT8 WIS6 CHA9 STE3 | gear: INT+2,DEX+4,STR+1 | worn: main=Tartarian Spear head=Aetheric Helm of Insight hands=Stone-Grip Gloves legs=Aetheric Scout Greaves
+[2026-08-09T03:50:59.295Z] [debug] stats: STR13 DEX10 INT8 WIS6 CHA9 STE3 | gear: INT+2,DEX+5,STR+1 | worn: main=Tartarian Spear off=Bolt-Caster head=Aetheric Helm of Insight hands=Stone-Grip Gloves legs=Aetheric Scout Greaves
+[2026-08-09T03:51:24.089Z] [world] You clip Pulse Scanner into your scanner pouch. It runs whenever you search.
+[2026-08-09T03:51:28.003Z] [debug] ui: tap "off: bolt-caster"
+[2026-08-09T03:51:28.081Z] [player] attack with the off-hand bolt-caster
+[2026-08-09T03:51:28.082Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bolt caster resolved=bolt-caster range=mid enemies=1 hooks=0
+[2026-08-09T03:51:28.083Z] [debug] attack: target=Reclaimer Deserter range=mid reach.bands=[distant,far,mid,close] reach.label=Bolt-Caster bareHand=false
+[2026-08-09T03:51:28.096Z] [world] Your bolt-caster comes around in an arc; Reclaimer Deserter squares up to meet it.
+[2026-08-09T03:51:28.098Z] [system] ⏳ Time passed: 6 min
+[2026-08-09T03:51:28.166Z] [cognitive] AGGRESSION · AIM · RELOAD · ATTACK · DISENGAGE  (68ms)
+[2026-08-09T03:51:33.201Z] [world] You seize the initiative. Reclaimer Deserter has no time to react.
+[2026-08-09T03:51:33.203Z] [combat] You — d20 → 17 + DEX 10 = 27 vs Reclaimer Deserter AC 9 — ✓ HIT
+[2026-08-09T03:51:33.204Z] [combat] Your strike with the bolt-caster lands for 8. Reclaimer Deserter staggers — 6 HP remaining. It answers.
+[2026-08-09T03:51:33.204Z] [combat] Reclaimer Deserter — d20 → 12 + ATK 4 = 16 vs your AC 16 — ✓ HIT
+[2026-08-09T03:51:33.284Z] [combat] Reclaimer Deserter deals 3 bludgeoning damage. You have 30 HP remaining.
+[2026-08-09T03:51:34.220Z] [debug] ui: tap "tartarian spear"
+[2026-08-09T03:51:34.298Z] [player] attack with the tartarian spear
+[2026-08-09T03:51:34.299Z] [debug] parser: intent=attack conf=1.00 verb=attack target=tartarian spear resolved=Tartarian Spear range=mid enemies=1 hooks=0
+[2026-08-09T03:51:34.299Z] [debug] attack: target=Reclaimer Deserter range=mid reach.bands=[mid,close] reach.label=Tartarian Spear bareHand=false
+[2026-08-09T03:51:34.313Z] [world] You commit forward with the tartarian spear. Reclaimer Deserter watches your hands.
+[2026-08-09T03:51:34.313Z] [system] ⏳ Time passed: 6 min
+[2026-08-09T03:51:34.378Z] [cognitive] ATTACK · USE_ITEM · SEARCH · DISENGAGE · TRAVEL · THROW  (63ms)
+[2026-08-09T03:51:34.463Z] [debug] persist sizes(KB): total=121 player=12 wm=23[rooms=3 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=84 scene=2
+[2026-08-09T03:51:37.299Z] [debug] qwen-watchdog: Qwen not ready (status='failed'); reinitializing (attempt #1).
+[2026-08-09T03:51:38.159Z] [debug] ⚠⚠ MEMORY WARNING #1 from the OS (first this session) — app=active · qwen='downloading' · voice='ready' · reloads=1 · save=121KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T03:51:38.227Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='downloading'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-08-09T03:51:38.747Z] [world] Reclaimer Deserter moves first. The pressure is immediate.
+[2026-08-09T03:51:38.747Z] [combat] Reclaimer Deserter — d20 → 11 + ATK 4 = 15 vs your AC 16 — ✗ MISS
+[2026-08-09T03:51:38.747Z] [combat] You — d20 → 4 + STR 13 = 17 vs Reclaimer Deserter AC 9 — ✓ HIT
+[2026-08-09T03:51:38.749Z] [combat] The killing blow with the tartarian spear: 7. Reclaimer Deserter drops where it stood.
+[2026-08-09T03:51:38.750Z] [reward] Reclaimer Deserter defeated. You recover Hardtack, Mud Cloth.
+[2026-08-09T03:51:38.756Z] [dog_quest] The Reclaimer deserter falls into the slag. The dog is still chained, watching you with the wary level look of an animal that has read its odds. They were keeping the dog illegally. No faction reckoning falls on you for this.
+[2026-08-09T03:51:38.757Z] [reward] +18 TC pried from the dust.
+[2026-08-09T03:51:39.265Z] [debug] qwen-watchdog: reinit #1 settled in 1964ms → status='idle'.
+[2026-08-09T03:51:42.316Z] [debug] qwen-watchdog: holding reloads for 90s — the OS just asked for memory back and a reload is the biggest thing we could do to it.
+[2026-08-09T03:52:06.166Z] [world] A Shepard. Cinder. The name settles on the dog like a coat.
+[2026-08-09T03:52:06.166Z] [world] Cinder circles three times and settles at your boot. Her breathing slows to yours.
+[2026-08-09T03:52:06.167Z] [dog_quest] The Arbiter studies the new pair. "Cinder, then. The chain is off. The road is open."
+[2026-08-09T03:52:08.918Z] [debug] ui: tap "climb"
+[2026-08-09T03:52:10.280Z] [player] climb jagged aether-tether grapple point
+[2026-08-09T03:52:10.281Z] [debug] parser: intent=climb conf=1.00 verb=climb target=jagged aether tether grapple point resolved=jagged aether-tether grapple point range=- enemies=0 hooks=0
+[2026-08-09T03:52:10.297Z] [world] You loop your Reclaimer's Rope around the jagged aether-tether grapple point and walk the line. Tier 1/1 cleared.
+[2026-08-09T03:52:10.297Z] [world] You reach the top of the jagged aether-tether grapple point (tier 1/1). The view changes; the room reads differently from here.
+[2026-08-09T03:52:10.298Z] [reward] ✦ Aether Crystal (Common) — tucked into a crack at the top of the jagged aether-tether grapple point.
+[2026-08-09T03:52:10.299Z] [world] Cinder eyes the jagged aether-tether grapple point, then settles at its base. She is not built for the climb.
+[2026-08-09T03:52:10.302Z] [system] ⏳ Time passed: 30 min
+[2026-08-09T03:52:10.383Z] [cognitive] USE_ITEM · CLIMB  (80ms)
+[2026-08-09T03:52:12.718Z] [debug] ui: tap "climb down"
+[2026-08-09T03:52:12.759Z] [player] climb down
+[2026-08-09T03:52:12.760Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0
+[2026-08-09T03:52:12.761Z] [world] You make your way back down the jagged aether-tether grapple point. Boots back on the ground.
+[2026-08-09T03:52:12.762Z] [world] Cinder stands and stretches as you hit the ground. She has waited.
+[2026-08-09T03:52:12.763Z] [system] ⏳ Time passed: 15 min
+[2026-08-09T03:52:12.839Z] [cognitive] CLIMB  (75ms)
+[2026-08-09T03:52:14.201Z] [debug] ui: tap "investigate"
+[2026-08-09T03:52:15.262Z] [player] investigate anvil
+[2026-08-09T03:52:15.263Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=anvil resolved=anvil range=- enemies=0 hooks=0
+[2026-08-09T03:52:15.264Z] [world] The metal is cold and unresponsive. A faint Aetheric hum, fading, says the mechanism was alive within the last decade.
+[2026-08-09T03:52:15.354Z] [cognitive] neutral  (87ms)
+[2026-08-09T03:52:16.718Z] [debug] ui: tap "EXIT"
+[2026-08-09T03:52:16.772Z] [player] leave outpost
+[2026-08-09T03:52:16.772Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0
+[2026-08-09T03:52:16.773Z] [world] You walk back through the gate and out into the open ground. The outpost falls away behind you.
+[2026-08-09T03:52:16.774Z] [debug] scene: loc=builders_survey_camp hub=- arrival=n opening=n passing=n
+[2026-08-09T03:52:16.821Z] [debug] spawn: gear=[Lost Scholar's Robe] window=10
+[2026-08-09T03:52:16.837Z] [world] Cinder noses at the faint musk and snorts. There's something there.
+[2026-08-09T03:52:16.837Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.
+
+You are at Builders' Survey Camp. A Stone Builders' survey staging post — theodolite stakes, chalked plans, and stacked shoring timber at the safe edge of the ruin-field before the works run deep.
+
+An Aetherbat (Aetheric Creature, Common) emerges. Its Sonic Scream can deal 1D6.
+[2026-08-09T03:52:16.837Z] [combat] Distance: mid-range. Tartarian Spear ✓ in range · Bolt-Caster ✓ in range.
+[2026-08-09T03:52:16.850Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (5 days' travel) · south: Obsidian Pillars (6 days' travel) · west: Sinking Cathedral (3 days' travel)
+[2026-08-09T03:52:16.851Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T03:52:16.851Z] [arbiter] "You can take it, or you can leave it," the Arbiter says. "It will remember either way."
+[2026-08-09T03:52:16.856Z] [system] ⏳ Time passed: 1h
+[2026-08-09T03:52:16.856Z] [arbiter] "There's coin on the board for a willing blade," the Arbiter says. "Read the World."
+[2026-08-09T03:52:16.957Z] [cognitive] RETREAT · DISENGAGE · HIDE  (99ms)
+[2026-08-09T03:52:20.718Z] [debug] ui: tap "dodge"
+[2026-08-09T03:52:20.746Z] [player] dodge
+[2026-08-09T03:52:20.747Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0
+[2026-08-09T03:52:20.748Z] [world] You commit to the dodge. Slip Aetherbat's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-09T03:52:20.777Z] [combat] Aetherbat — d20 → 1 + ATK 4 = 5 vs your AC 16 — ✗ EVADED
+[2026-08-09T03:52:20.777Z] [combat] Dodge — Aetherbat overcommits past you. ✓ Free opening (next strike ×2 dice).
+[2026-08-09T03:52:20.778Z] [system] ⏳ Time passed: 6 min
+[2026-08-09T03:52:20.879Z] [cognitive] neutral  (100ms)
+[2026-08-09T03:52:21.080Z] [debug] persist sizes(KB): total=129 player=13 wm=27[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=87 scene=3
+[2026-08-09T03:52:21.651Z] [debug] ui: tap "off: bolt-caster"
+[2026-08-09T03:52:21.731Z] [player] attack with the off-hand bolt-caster
+[2026-08-09T03:52:21.731Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bolt caster resolved=Bolt-Caster range=mid enemies=1 hooks=0
+[2026-08-09T03:52:21.732Z] [debug] attack: target=Aetherbat range=mid reach.bands=[distant,far,mid,close] reach.label=Bolt-Caster bareHand=false
+[2026-08-09T03:52:21.733Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-08-09T03:52:21.748Z] [world] You bring the bolt-caster to bear on Aetherbat.
+[2026-08-09T03:52:21.748Z] [system] ⏳ Time passed: 6 min
+[2026-08-09T03:52:21.825Z] [cognitive] AGGRESSION · AIM · RELOAD · ATTACK · DISENGAGE  (76ms)
+[2026-08-09T03:52:26.730Z] [world] Aetherbat moves first. The pressure is immediate.
+[2026-08-09T03:52:26.731Z] [combat] Aetherbat — d20 → 19 + ATK 4 = 23 vs your AC 16 — ✓ HIT
+[2026-08-09T03:52:26.732Z] [combat] You — d20 → 17 + DEX 10 perfect opening (2× dice) = 27 vs Aetherbat AC 9 — ✓ HIT
+[2026-08-09T03:52:26.732Z] [combat] Your strike with the bolt-caster lands for 12. Aetherbat staggers — 3 HP remaining. It answers.
+[2026-08-09T03:52:26.733Z] [arbiter] The Arbiter watches the aetherbat. "It is not the first thing here that decided to keep its distance, then changed its mind."
+[2026-08-09T03:52:26.836Z] [combat] Aetherbat deals 2 aetheric damage [armor −39%, Aetheric Constitution absorbs 50%]. You have 28 HP remaining.
+[2026-08-09T03:52:27.918Z] [debug] ui: tap "tartarian spear"
+[2026-08-09T03:52:27.927Z] [world] Black rain runs down your collar. Something in you tightens that should not have.
+[2026-08-09T03:52:27.996Z] [player] attack with the tartarian spear
+[2026-08-09T03:52:27.997Z] [debug] parser: intent=attack conf=1.00 verb=attack target=tartarian spear resolved=Tartarian Spear range=mid enemies=1 hooks=0
+[2026-08-09T03:52:27.997Z] [debug] attack: target=Aetherbat range=mid reach.bands=[mid,close] reach.label=Tartarian Spear bareHand=false
+[2026-08-09T03:52:28.012Z] [world] Your tartarian spear comes around in an arc; Aetherbat squares up to meet it.
+[2026-08-09T03:52:28.012Z] [system] ⏳ Time passed: 6 min
+[2026-08-09T03:52:28.091Z] [cognitive] ATTACK · USE_ITEM · SEARCH · DISENGAGE · TRAVEL · THROW  (77ms)
+[2026-08-09T03:52:32.724Z] [world] You seize the initiative. Aetherbat has no time to react.
+[2026-08-09T03:52:32.724Z] [combat] You — d20 → 13 + STR 13 = 26 vs Aetherbat AC 9 — ✓ HIT
+[2026-08-09T03:52:32.725Z] [combat] The killing blow with the tartarian spear: 10. Aetherbat drops where it stood.
+[2026-08-09T03:52:32.726Z] [reward] Aetherbat defeated. You recover Aether Wing.
+[2026-08-09T03:52:32.727Z] [reward] ✦ You feel hardier from your trials. +1 max HP (now 34). [3 enemies defeated]
+[2026-08-09T03:52:32.727Z] [reward] +4 TC pried from the dust.
+[2026-08-09T03:52:32.742Z] [arbiter] The Arbiter eyes your new pieces. "You could make an Aetheric Scanner now, if you wanted."
+[2026-08-09T03:52:34.291Z] [debug] ui: tap "take"
+[2026-08-09T03:52:35.382Z] [world] You take the Lost Scholar's Robe from where it lay.
+[2026-08-09T03:52:35.382Z] [reward] ✦ Lost Scholar's Robe (Common).
+[2026-08-09T03:52:35.395Z] [world] You take the Aetheric Torch from where it lay.
+[2026-08-09T03:52:35.395Z] [reward] ✦ Aetheric Torch (Common).
+[2026-08-09T03:52:36.417Z] [debug] ui: tap "salvage"
+[2026-08-09T03:52:37.427Z] [reward] ✦ Found Fifth Inscription — the prophecy — The Giant's Watch. (open Contracts → Collectibles to read)
+[2026-08-09T03:52:37.448Z] [world] You strip the shattered tartarian relay carefully. Something usable comes free in your hand.
+[2026-08-09T03:52:37.448Z] [world] You break the dust-buried fallen sentinel husk apart. Among the pieces, something worth keeping.
+[2026-08-09T03:52:37.449Z] [world] Wedged into the broken obsidian pillar, half-hidden by the dust: a sealed letter. You pocket it carefully.
+[2026-08-09T03:52:37.450Z] [reward] ✦ Salvage haul:
+[2026-08-09T03:52:37.450Z] [reward]     • Automaton Circuit x2 (Common)
+[2026-08-09T03:52:37.451Z] [reward]     • Aether Crystal (Common)
+[2026-08-09T03:52:39.551Z] [debug] ui: tap "climb"
+[2026-08-09T03:52:40.970Z] [player] climb broken obsidian pillar
+[2026-08-09T03:52:40.971Z] [debug] parser: intent=climb conf=1.00 verb=climb target=broken obsidian pillar resolved=broken obsidian pillar range=- enemies=0 hooks=0
+[2026-08-09T03:52:40.986Z] [world] You loop your Reclaimer's Rope around the broken obsidian pillar and walk the line. Tier 1/3 cleared.
+[2026-08-09T03:52:40.986Z] [world] You reach the first hold of the broken obsidian pillar (tier 1/3). Higher still to go.
+[2026-08-09T03:52:40.987Z] [world] Beside your handhold, a weathered bird nest — twigs, wire, and something that glints.
+[2026-08-09T03:52:40.988Z] [world] Cinder eyes the broken obsidian pillar, then settles at its base. She is not built for the climb.
+[2026-08-09T03:52:40.988Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-09T03:52:40.988Z] [system] ⏳ Time passed: 30 min
+[2026-08-09T03:52:41.103Z] [cognitive] SEARCH · THROW · CLIMB · USE_ITEM · RETREAT · DISENGAGE  (114ms)
+[2026-08-09T03:52:41.209Z] [debug] persist sizes(KB): total=130 player=13 wm=27[rooms=9 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=87 scene=2
+[2026-08-09T03:52:42.213Z] [debug] ui: tap "climb up (1/3)"
+[2026-08-09T03:52:42.247Z] [player] climb broken obsidian pillar
+[2026-08-09T03:52:42.248Z] [debug] parser: intent=climb conf=1.00 verb=climb target=broken obsidian pillar resolved=broken obsidian pillar range=- enemies=0 hooks=0
+[2026-08-09T03:52:42.264Z] [world] You loop your Reclaimer's Rope around the broken obsidian pillar and walk the line. Tier 2/3 cleared.
+[2026-08-09T03:52:42.264Z] [world] You reach the last stretch of the broken obsidian pillar (tier 2/3). Higher still to go.
+[2026-08-09T03:52:42.265Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T03:52:42.265Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T03:52:42.265Z] [system] ⏳ Time passed: 30 min
+[2026-08-09T03:52:42.356Z] [cognitive] SEARCH · THROW · CLIMB · USE_ITEM · RETREAT · DISENGAGE  (90ms)
+[2026-08-09T03:52:43.234Z] [debug] ui: tap "climb up (2/3)"
+[2026-08-09T03:52:43.311Z] [player] climb broken obsidian pillar
+[2026-08-09T03:52:43.312Z] [debug] parser: intent=climb conf=1.00 verb=climb target=broken obsidian pillar resolved=broken obsidian pillar range=- enemies=0 hooks=0
+[2026-08-09T03:52:43.328Z] [world] You loop your Reclaimer's Rope around the broken obsidian pillar and walk the line. Tier 3/3 cleared.
+[2026-08-09T03:52:43.329Z] [world] You reach the top of the broken obsidian pillar (tier 3/3). The view changes; the room reads differently from here.
+[2026-08-09T03:52:43.330Z] [reward] ✦ Aetheric Shard (Uncommon) — tucked into a crack at the top of the broken obsidian pillar.
+[2026-08-09T03:52:43.330Z] [world] A scout in faded leathers turns from the horizon as you crest. "Took you long enough. I saw something on the wind worth telling. Hear me out, and it costs you nothing — not yet."
+[2026-08-09T03:52:43.331Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T03:52:43.331Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T03:52:43.331Z] [system] ⏳ Time passed: 30 min
+[2026-08-09T03:52:43.407Z] [cognitive] SEARCH · THROW · CLIMB · USE_ITEM · RETREAT · DISENGAGE  (74ms)
+[2026-08-09T03:52:47.448Z] [debug] ui: tap "climb down"
+[2026-08-09T03:52:47.490Z] [player] climb down
+[2026-08-09T03:52:47.491Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1
+[2026-08-09T03:52:47.492Z] [world] You climb down from the scout's vantage and rejoin the ground beside the broken obsidian pillar. Boots back on the ground.
+[2026-08-09T03:52:47.493Z] [world] Cinder stands and stretches as you hit the ground. She has waited.
+[2026-08-09T03:52:47.493Z] [system] ⏳ Time passed: 15 min
+[2026-08-09T03:52:47.593Z] [cognitive] CLIMB  (98ms)
+[2026-08-09T03:52:51.234Z] [debug] ui: tap "EAST"
+[2026-08-09T03:52:51.276Z] [player] go east
+[2026-08-09T03:52:51.277Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-08-09T03:52:51.283Z] [world] Someone is sitting on their pack at the edge of the path — no party, no fire, and a long way from anywhere. They stand when they see you.
+[2026-08-09T03:52:51.285Z] [system] Try "talk to the traveler" — they want something from you.
+[2026-08-09T03:52:51.285Z] [world] You walk east. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-08-09T03:52:51.287Z] [world] After a while you set down on the next stretch of ground.  A crystal embedded in a half-broken pillar whispers — actual words, almost — when you pass within arm's reach.
+[2026-08-09T03:52:51.287Z] [system] ⏳ Time passed: 15 min
+[2026-08-09T03:52:51.369Z] [cognitive] neutral  (81ms)
+[2026-08-09T03:52:54.800Z] [debug] ui: tap "salvage"
+[2026-08-09T03:52:56.411Z] [player] salvage barrel
+[2026-08-09T03:52:56.411Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=barrel resolved=barrel range=- enemies=0 hooks=2
+[2026-08-09T03:52:56.414Z] [world] You work the barrel over. A part of it comes loose, intact.
+[2026-08-09T03:52:56.416Z] [reward] ✦ Aetheric Shard (Uncommon).
+[2026-08-09T03:52:56.417Z] [system] ⏳ Time passed: 15 min
+[2026-08-09T03:52:56.523Z] [cognitive] RELOAD  (105ms)
+[2026-08-09T03:52:57.666Z] [debug] ui: tap "salvage"
+[2026-08-09T03:52:58.662Z] [player] salvage cracked submerged giant statue
+[2026-08-09T03:52:58.662Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=cracked submerged giant statue resolved=cracked submerged giant statue range=- enemies=0 hooks=2
+[2026-08-09T03:52:58.663Z] [world] You work the cracked submerged giant statue apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-08-09T03:52:58.664Z] [reward] ✦ Hollow Quill Sheaf (Uncommon).
+[2026-08-09T03:52:58.664Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T03:52:58.665Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T03:52:58.665Z] [system] ⏳ Time passed: 15 min
+[2026-08-09T03:52:58.763Z] [cognitive] neutral  (97ms)
+[2026-08-09T03:53:01.217Z] [debug] ui: tap "investigate"
+[2026-08-09T03:53:02.201Z] [player] investigate cart
+[2026-08-09T03:53:02.202Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cart resolved=cart range=- enemies=0 hooks=2
+[2026-08-09T03:53:02.205Z] [world] You look the cart over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-08-09T03:53:02.206Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T03:53:02.206Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T03:53:02.210Z] [world] A Conspiracy Architects war party crests the rise — 5 of them, blades already out. They've marked you for standing with the Stone Builders.
+[2026-08-09T03:53:02.210Z] [arbiter] "The Conspiracy Architects do not forgive a friend of the Stone Builders," the Arbiter murmurs. "Stand, or run — but decide now."
+[2026-08-09T03:53:02.376Z] [cognitive] neutral  (168ms)
+[2026-08-09T03:53:06.346Z] [debug] ui: tap "tartarian spear"
+[2026-08-09T03:53:06.379Z] [player] attack with the tartarian spear
+[2026-08-09T03:53:06.379Z] [debug] parser: intent=attack conf=1.00 verb=attack target=tartarian spear resolved=Tartarian Spear range=mid enemies=5 hooks=2
+[2026-08-09T03:53:06.380Z] [debug] attack: target=Conspiracy Architects Raider 1 range=mid reach.bands=[mid,close] reach.label=Tartarian Spear bareHand=false
+[2026-08-09T03:53:06.395Z] [world] You bring the tartarian spear to bear on Conspiracy Architects Raider 1.
+[2026-08-09T03:53:06.395Z] [system] ⏳ Time passed: 6 min
+[2026-08-09T03:53:06.489Z] [cognitive] ATTACK · USE_ITEM · SEARCH · DISENGAGE · TRAVEL · THROW  (93ms)
+[2026-08-09T03:53:12.829Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #2).
+[2026-08-09T03:53:13.728Z] [debug] ⚠⚠ MEMORY WARNING #2 from the OS (95.6s since the last one) — app=active · qwen='downloading' · voice='ready' · reloads=2 · save=130KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T03:53:13.841Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='downloading'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-08-09T03:53:13.968Z] [world] Conspiracy Architects Raider 1 moves first. The pressure is immediate.
+[2026-08-09T03:53:13.969Z] [combat] Conspiracy Architects Raider 5 — d20 → 4 + ATK 6 = 10 vs your AC 16 — ✗ MISS
+[2026-08-09T03:53:13.969Z] [combat] Conspiracy Architects Raider 1 — d20 → 4 + ATK 9 = 13 vs your AC 16 — ✗ MISS
+[2026-08-09T03:53:13.970Z] [combat] Conspiracy Architects Raider 2 — d20 → 10 + ATK 9 = 19 vs your AC 16 — ✓ HIT
+[2026-08-09T03:53:13.971Z] [combat] Conspiracy Architects Raider 3 turns on Cinder — d20 20 + ATK 7 = 27 vs Cinder's AC 10 — ✓ CRIT
+[2026-08-09T03:53:13.972Z] [combat] Cinder takes 5. (11/16 HP left)
+[2026-08-09T03:53:13.972Z] [combat] Conspiracy Architects Raider 4 — d20 → 11 + ATK 9 = 20 vs your AC 16 — ✓ HIT
+[2026-08-09T03:53:13.973Z] [combat] You — d20 → 5 + STR 13 = 18 vs Conspiracy Architects Raider 1 AC 11 — ✓ HIT
+[2026-08-09T03:53:13.973Z] [combat] Piercing flares — +4 on hit.
+[2026-08-09T03:53:13.974Z] [combat] The killing blow with the tartarian spear: 13. Conspiracy Architects Raider 1 drops where it stood.
+[2026-08-09T03:53:13.975Z] [reward] Conspiracy Architects Raider 1 defeated. You recover Patched Cloth ×2, Architect Sigil.
+[2026-08-09T03:53:13.976Z] [reward] You strip the body: Bone Crossbow, Reclaimer's Salvage Vest (+8 TC). The kit took the fight badly.
+[2026-08-09T03:53:13.977Z] [combat] 4 attackers remain. Conspiracy Architects Raider 2 now in your sights.
+[2026-08-09T03:53:13.979Z] [system] Forgotten Order standing +1 (now 1)
+[2026-08-09T03:53:13.979Z] [system] Conspiracy Architects standing -3 (now -23)
+[2026-08-09T03:53:13.980Z] [system] Faction standing is how a faction sees you: at −20 or below they turn hostile, at +20 or above they treat you as an ally, neutral in between. It shifts as you act — and as their own rivalries play out — and it shapes vendor prices, the work they will offer you, and who fights beside you when blades come out.
+[2026-08-09T03:53:13.981Z] [reward] +8 TC pried from the dust.
+[2026-08-09T03:53:13.996Z] [arbiter] The Arbiter eyes your new pieces. "You could make a Reclaimer's Trousers now, if you wanted."
+[2026-08-09T03:53:14.135Z] [combat] Conspiracy Architects Raider 2 deals 7 slashing damage [armor −12%]. You have 23 HP remaining.
+[2026-08-09T03:53:14.136Z] [combat] Conspiracy Architects Raider 2's strike leaves you bleeding.
+[2026-08-09T03:53:14.136Z] [combat] Conspiracy Architects Raider 4 deals 4 slashing damage. You have 19 HP remaining.
+[2026-08-09T03:53:14.575Z] [debug] persist sizes(KB): total=132 player=14 wm=28[rooms=9 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=85 scene=5
+[2026-08-09T03:53:15.145Z] [debug] qwen-watchdog: reinit #2 settled in 2315ms → status='idle'.
+[2026-08-09T03:53:15.685Z] [debug] ⚠⚠ MEMORY WARNING #3 from the OS (2.0s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=2 · save=132KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T03:53:15.834Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-08-09T03:53:17.299Z] [debug] ui: tap "dodge"
+[2026-08-09T03:53:17.305Z] [world] Black rain runs down your collar. Something in you tightens that should not have.
+[2026-08-09T03:53:17.327Z] [player] dodge
+[2026-08-09T03:53:17.328Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=4 hooks=2
+[2026-08-09T03:53:17.330Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 2's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-09T03:53:17.331Z] [combat] Conspiracy Architects Raider 2 turns on Cinder — d20 12 + ATK 7 = 19 vs Cinder's AC 10 — ✓ HIT
+[2026-08-09T03:53:17.332Z] [combat] Cinder takes 7. (4/16 HP left)
+[2026-08-09T03:53:17.363Z] [combat] Conspiracy Architects Raider 3 — d20 → 15 + ATK 9 = 24 vs your AC 16 — ✓ HIT
+[2026-08-09T03:53:17.363Z] [combat] Dodge — d20 → 2 + DEX 10 = 12 vs ATK 24. ✗ You misread it — no opening, and the blow lands as it normally would (armor still counts).
+[2026-08-09T03:53:17.364Z] [world] Your read is a beat off — you fail to make the opening, and the swing lands the way it always meant to.
+[2026-08-09T03:53:17.365Z] [combat] Conspiracy Architects Raider 4 turns on Cinder — d20 20 + ATK 7 = 27 vs Cinder's AC 10 — ✓ CRIT
+[2026-08-09T03:53:17.365Z] [combat] Cinder takes 7. (0/16 HP left)
+[2026-08-09T03:53:17.365Z] [arbiter] Cinder drops under the Conspiracy Architects Raider 4 and drags herself clear of the fight. She is down — tend her within a day or she won't get back up.
+[2026-08-09T03:53:17.366Z] [combat] Conspiracy Architects Raider 5 — d20 → 5 + ATK 6 = 11 vs your AC 16 — ✗ MISS
+[2026-08-09T03:53:17.367Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-09T03:53:17.367Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-09T03:53:17.368Z] [system] ⏳ Time passed: 6 min
+[2026-08-09T03:53:17.490Z] [combat] Conspiracy Architects Raider 3 deals 6 bludgeoning damage. You have 13 HP remaining.
+[2026-08-09T03:53:17.597Z] [cognitive] neutral  (122ms)
+[2026-08-09T03:53:17.845Z] [debug] qwen-watchdog: 3 memory warnings this session — STANDING DOWN for good. This device will not hold the context; narration stays on templates.
+[2026-08-09T03:53:18.162Z] [debug] ui: tap "tartarian spear"
+[2026-08-09T03:53:18.194Z] [player] attack with the tartarian spear
+[2026-08-09T03:53:18.194Z] [debug] parser: intent=attack conf=1.00 verb=attack target=tartarian spear resolved=Tartarian Spear range=mid enemies=4 hooks=2
+[2026-08-09T03:53:18.194Z] [debug] attack: target=Conspiracy Architects Raider 2 range=mid reach.bands=[mid,close] reach.label=Tartarian Spear bareHand=false
+[2026-08-09T03:53:18.212Z] [world] You raise the tartarian spear toward Conspiracy Architects Raider 2. The room narrows around the both of you.
+[2026-08-09T03:53:18.212Z] [system] ⏳ Time passed: 6 min
+[2026-08-09T03:53:18.309Z] [cognitive] ATTACK · USE_ITEM · SEARCH · DISENGAGE · TRAVEL · THROW  (95ms)
+[2026-08-09T03:53:23.060Z] [world] Conspiracy Architects Raider 2 moves first. The pressure is immediate.
+[2026-08-09T03:53:23.061Z] [combat] Conspiracy Architects Raider 2 — d20 → 11 + ATK 7 = 18 vs your AC 16 — ✓ HIT
+[2026-08-09T03:53:23.062Z] [combat] Conspiracy Architects Raider 3 — d20 → 15 + ATK 7 = 22 vs your AC 16 — ✓ HIT
+[2026-08-09T03:53:23.063Z] [combat] Conspiracy Architects Raider 4 — d20 → 15 + ATK 7 = 22 vs your AC 16 — ✓ HIT
+[2026-08-09T03:53:23.064Z] [combat] Conspiracy Architects Raider 5 — d20 → 6 + ATK 6 = 12 vs your AC 16 — ✗ MISS
+[2026-08-09T03:53:23.064Z] [combat] You — d20 → 12 + STR 13 = 25 vs Conspiracy Architects Raider 2 AC 11 — ✓ HIT
+[2026-08-09T03:53:23.065Z] [combat] Piercing flares — +1 on hit (weak — bites deep!).
+[2026-08-09T03:53:23.065Z] [combat] Weakness exposed — Conspiracy Architects Raider 2 flinches. (piercing ×2.25 for 12)
+[2026-08-09T03:53:23.067Z] [combat] You crack the Conspiracy Architects Raider 2 with the Tartarian Spear for 12 — half their fight, gone in one blow. They crumple, out cold. (1/13 HP) Loot them before they come to.
+[2026-08-09T03:53:23.068Z] [combat] Conspiracy Architects Raider 2 is out of it. Conspiracy Architects Raider 3 now in your sights.
+[2026-08-09T03:53:23.068Z] [arbiter] The Arbiter watches the blow land or fail. "Both are answers."
+[2026-08-09T03:53:23.190Z] [combat] Conspiracy Architects Raider 2 deals 5 slashing damage [armor −12%]. You have 8 HP remaining.
+[2026-08-09T03:53:23.190Z] [combat] Conspiracy Architects Raider 3 deals 4 bludgeoning damage. You have 4 HP remaining.
+[2026-08-09T03:53:23.190Z] [combat] Conspiracy Architects Raider 4 deals 1 slashing damage. You have 3 HP remaining.
+[2026-08-09T03:53:30.016Z] [debug] ui: tap "stealth"
+[2026-08-09T03:53:30.021Z] [system] bleeding fades.
+[2026-08-09T03:53:30.028Z] [player] sneak
+[2026-08-09T03:53:30.029Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=4 hooks=2
+[2026-08-09T03:53:30.077Z] [system] ⏳ Time passed: 15 min
+[2026-08-09T03:53:30.078Z] [arbiter] "There's coin on the board for a willing blade," the Arbiter says. "Read the World."
+[2026-08-09T03:53:30.078Z] [debug] dedup: suppressed arbiter repeat — ""There's coin on the board for a willing blade," the Arbiter…"
+[2026-08-09T03:53:30.186Z] [cognitive] DISENGAGE · HIDE · TAKE_COVER  (109ms)
+[2026-08-09T03:53:31.949Z] [debug] skillcheck: stealth d20=14 STE 3 = 17 vs DC 12 — Hard → (resolved below)
+[2026-08-09T03:53:32.007Z] [debug] stats: STR13 DEX10 INT8 WIS6 CHA9 STE3 | gear: INT+2,DEX+5,STR+1 | worn: main=Tartarian Spear off=Bolt-Caster head=Aetheric Helm of Insight hands=Stone-Grip Gloves legs=Aetheric Scout Greaves
+[2026-08-09T03:53:32.008Z] [debug] train: stealth (stealth check) → progress 3/100
+[2026-08-09T03:53:32.008Z] [world] The daylight leaves you little cover. (stealth −1, day)
+[2026-08-09T03:53:32.009Z] [world] You drop low and move quiet, closing on Conspiracy Architects Raider 3 unseen across the open ground. (+5 next attack)
+[2026-08-09T03:53:32.009Z] [debug] stealth: opener carried by the skill roll (17 vs DC 12 — Hard) — UNSEEN
+[2026-08-09T03:53:34.732Z] [debug] ui: tap "off: bolt-caster"
+[2026-08-09T03:53:34.812Z] [player] attack with the off-hand bolt-caster
+[2026-08-09T03:53:34.813Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bolt caster resolved=Bolt-Caster range=mid enemies=4 hooks=2
+[2026-08-09T03:53:34.813Z] [debug] attack: target=Conspiracy Architects Raider 3 range=mid reach.bands=[distant,far,mid,close] reach.label=Bolt-Caster bareHand=false
+[2026-08-09T03:53:34.814Z] [debug] attack: status mods stealthed +5
+[2026-08-09T03:53:34.832Z] [world] You commit forward with the bolt-caster. Conspiracy Architects Raider 3 watches your hands.
+[2026-08-09T03:53:34.833Z] [system] ⏳ Time passed: 6 min
+[2026-08-09T03:53:34.930Z] [cognitive] AGGRESSION · AIM · RELOAD · ATTACK · DISENGAGE  (96ms)
+[2026-08-09T03:53:39.682Z] [world] You seize the initiative. Conspiracy Architects Raider 3 has no time to react.
+[2026-08-09T03:53:39.682Z] [combat] You — d20 → 14 + DEX 10 stealthed +5 = 29 vs Conspiracy Architects Raider 3 AC 11 — ✓ HIT
+[2026-08-09T03:53:39.683Z] [combat] Piercing flares — +4 on hit.
+[2026-08-09T03:53:39.683Z] [combat] Final strike with the bolt-caster for 20. Conspiracy Architects Raider 3 is still. The Aetherstone hums on, indifferent.
+[2026-08-09T03:53:39.684Z] [reward] Conspiracy Architects Raider 3 defeated. You recover Bone Bolt ×3.
+[2026-08-09T03:53:39.688Z] [reward] You strip the body: Bone Crossbow, Reclaimer's Salvage Vest (+8 TC). The kit took the fight badly.
+[2026-08-09T03:53:39.688Z] [combat] 2 attackers remain. Conspiracy Architects Raider 4 now in your sights.
+[2026-08-09T03:53:39.688Z] [system] Forgotten Order standing +1 (now 2)
+[2026-08-09T03:53:39.689Z] [system] Conspiracy Architects standing -3 (now -26)
+[2026-08-09T03:53:39.689Z] [reward] +10 TC pried from the dust.
+[2026-08-09T03:53:39.710Z] [combat] Conspiracy Architects Raider 4 — d20 → 10 + ATK 7 = 17 vs your AC 16 — ✓ HIT
+[2026-08-09T03:53:39.824Z] [combat] Conspiracy Architects Raider 4 deals 7 slashing damage [armor −12%]. You fall.
+[2026-08-09T03:53:39.824Z] [combat] Conspiracy Architects Raider 4's strike leaves you bleeding.
+[2026-08-09T03:53:39.824Z] [combat] Verbal does not rise. The ruins remember another.
+[2026-08-09T03:53:39.824Z] [system] Verbal has fallen. A Resurrection Gem from the title screen can bring them back.
+[2026-08-09T03:53:39.825Z] [combat] Cinder falls beside you. The buried world claims them too.
+[2026-08-09T03:53:40.054Z] [reward] ✦ A Resurrection Gem pulses in Verbal's pack — the buried world owes you one. (3 held)
+[2026-08-09T03:53:44.267Z] [debug] voice⏱ gap 1647ms (wait 0ms + synth 1634ms, live) "Choose your character."
+[2026-08-09T03:53:50.516Z] [debug] scene: loc=builders_survey_camp hub=outpost_gate arrival=n opening=n passing=n
+[2026-08-09T03:53:50.520Z] [debug] spawn: gear=[Architect's Field Jacket, Plasma Dagger] window=10
+[2026-08-09T03:53:50.522Z] [world] Stone Builders' Workshop — The Tool Threshold. An open shop entry with a chalkboard for jobs taken and a rack of clean Aethercraft instruments. The foreman waves you to the slate without looking up.
+[2026-08-09T03:53:50.523Z] [world] Paths: north to Plans · east to Forge · west to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-09T03:53:50.525Z] [world] [Builders' Survey Camp] north: open ground · east: Great Tartary Plains (4 days' travel) · south: Obsidian Pillars (7 days' travel) · west: Builders' Survey Camp (a day's travel)
+[2026-08-09T03:53:50.525Z] [world] Halem the Trader glances up. "You again." Not warm, not cold — noted.
+[2026-08-09T03:53:50.531Z] [reward] ✦ Resurrection. Verbal returns to Tartaria, restored. The Aetherstone hums in recognition.
+[2026-08-09T03:53:50.769Z] [debug] persist sizes(KB): total=130 player=16 wm=25[rooms=5 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=86 scene=3
+[2026-08-09T03:53:51.368Z] [debug] ⚠⚠ MEMORY WARNING #4 from the OS (35.7s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=2 · save=130KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T03:53:51.447Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-08-09T03:53:52.793Z] [debug] ⚠⚠ MEMORY WARNING #5 from the OS (1.4s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=2 · save=130KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T03:53:52.794Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-08-09T03:53:52.943Z] [debug] qwen-watchdog: 5 memory warnings this session — STANDING DOWN for good. This device will not hold the context; narration stays on templates.
+[2026-08-09T03:53:53.799Z] [debug] ⚠⚠ MEMORY WARNING #6 from the OS (1.0s since the last one) — app=active · qwen='idle' · voice='ready' · reloads=2 · save=130KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T03:53:53.799Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-08-09T03:53:57.963Z] [debug] qwen-watchdog: 6 memory warnings this session — STANDING DOWN for good. This device will not hold the context; narration stays on templates.
+[2026-08-09T03:54:06.663Z] [debug] appstate: active → inactive (was active for 209366ms)
+[2026-08-09T03:54:07.649Z] [debug] appstate: inactive → background (was inactive for 987ms)
+[2026-08-09T03:54:08.057Z] [debug] qwen-watchdog: app is backgrounded — holding revival until foreground (status='idle').
+[2026-08-09T03:54:08.166Z] [debug] ⚠⚠ MEMORY WARNING #7 from the OS (14.4s since the last one) — app=background · qwen='idle' · voice='ready' · reloads=2 · save=130KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-09T03:54:08.169Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-08-23T17:58:40.821Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=019fe4a3-6208-7a56-b5f6-74fc0dc58326
+[2026-08-23T17:58:40.821Z] [debug] ota: Checking…
+[2026-08-23T17:58:45.833Z] [debug] ota: Error
+[2026-08-23T17:58:45.834Z] [debug] ⚠ ota error: Error OTA check timed out after 5s
+      Error: OTA check timed out after 5s |     at anonymous (address at /var/mobile/Containers/Data/Application/CFCB2065-4292-4EC4-A18E-EB698F414844/Library/Application Support/.expo-internal/52fc539dc19ba39388a3e73efe16abb8.bundle:1:2514956)
+[2026-08-23T17:58:45.835Z] [debug] ota: boot check result = errored
+[2026-08-23T17:58:45.923Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-23T17:58:45.923Z] [debug] voice: bundled loading
+[2026-08-23T17:59:04.782Z] [debug] voice: bundled ready
+[2026-08-23T17:59:07.037Z] [debug] voice⏱ gap 2193ms (wait 0ms + synth 2174ms, live) "Choose your character."
+[2026-08-23T17:59:10.447Z] [debug] appstate: active → inactive (was active for 6226ms)
+[2026-08-23T17:59:11.444Z] [debug] appstate: inactive → background (was inactive for 997ms)
+[2026-08-23T20:35:09.658Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a02d4c-3b28-72d9-b422-19ec5ee4698d
+[2026-08-23T20:35:09.659Z] [debug] ota: Checking…
+[2026-08-23T20:35:09.887Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-23T20:35:11.185Z] [debug] ota: Saving progress…
+[2026-08-23T20:35:11.185Z] [debug] ota: Restarting to apply…
+[2026-08-23T20:35:11.348Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a03045-c17d-7aa9-bb44-352861ce9b39
+[2026-08-23T20:35:11.348Z] [debug] ota: Checking…
+[2026-08-23T20:35:11.477Z] [debug] ota: Already up to date
+[2026-08-23T20:35:11.477Z] [debug] ota: boot check result = noUpdate
+[2026-08-23T20:35:11.528Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-23T20:35:11.528Z] [debug] voice: bundled loading
+[2026-08-24T21:20:27.100Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a03045-c17d-7aa9-bb44-352861ce9b39
+[2026-08-24T21:20:27.100Z] [debug] ota: Checking…
+[2026-08-24T21:20:28.331Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-24T21:20:28.489Z] [debug] ota: Saving progress…
+[2026-08-24T21:20:28.489Z] [debug] ota: Restarting to apply…
+[2026-08-24T21:20:28.676Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a03540-802d-7869-b4a8-3a8a9d5df954
+[2026-08-24T21:20:28.676Z] [debug] ota: Checking…
+[2026-08-24T21:20:28.846Z] [debug] ota: Already up to date
+[2026-08-24T21:20:28.846Z] [debug] ota: boot check result = noUpdate
+[2026-08-24T21:20:28.909Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-24T21:20:28.909Z] [debug] voice: bundled loading
+[2026-08-24T21:20:35.031Z] [debug] voice: bundled ready
+[2026-08-24T21:20:36.525Z] [debug] voice⏱ gap 1475ms (wait 0ms + synth 1471ms, live) "Choose your character."
+[2026-08-24T21:20:51.719Z] [debug] OTA applied: 2026-08-23-1455-a-bar-that-speaks → 2026-08-24-1493-the-warm-waits-for-the-player.
+[2026-08-24T21:20:51.720Z] [debug] OTA session start: 2026-08-24-1493-the-warm-waits-for-the-player.
+[2026-08-24T21:20:51.720Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-08-24T21:20:51.720Z] [world] The wind has shifted while you were away. The Aetheric haze sits a little thicker on the horizon now.
+[2026-08-24T21:20:51.729Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Verbal. I wondered when you'd take up the thread again. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-08-24T21:20:59.448Z] [debug] send-log: flushed to Sentry
+[2026-08-24T22:35:16.578Z] [debug] persist sizes(KB): total=130 player=16 wm=25[rooms=5 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=86 scene=3
+[2026-08-24T22:35:24.195Z] [debug] voice⏱ gap 1796ms (wait 1ms + synth 1787ms, live) "Choose your character."
+[2026-08-24T22:35:29.479Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a035de-f1e7-7c82-b17e-0e3c57db80a5
+[2026-08-24T22:35:29.479Z] [debug] ota: Checking…
+[2026-08-24T22:35:29.646Z] [debug] ota: Already up to date
+[2026-08-24T22:35:29.647Z] [debug] ota: boot check result = noUpdate
+[2026-08-24T22:35:29.698Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-24T22:35:29.698Z] [debug] voice: bundled loading
+[2026-08-24T22:35:35.272Z] [debug] voice: bundled ready
+[2026-08-24T22:35:37.057Z] [debug] voice⏱ gap 1776ms (wait 0ms + synth 1771ms, live) "Choose your character."
+[2026-08-24T22:35:39.093Z] [debug] OTA applied: 2026-08-24-1493-the-warm-waits-for-the-player → 2026-08-24-1494-the-log-says-which-era.
+[2026-08-24T22:35:39.093Z] [debug] OTA session start: 2026-08-24-1494-the-log-says-which-era.
+[2026-08-24T22:35:39.093Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-08-24T22:35:39.093Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Verbal. I wondered when you'd take up the thread again."
+[2026-08-24T22:35:39.338Z] [debug] ═══ SESSION 2026-08-24T22:35:39.337Z · build 2026-08-24-1494-the-log-says-which-era · updated from 2026-08-24-1493-the-warm-waits-for-the-player · previous entry moments earlier ═══
+[2026-08-24T23:48:20.135Z] [player] how do i know if i want tontakw and equip this it jas no stats, take and take and wauip should be 2 didferent options
+[2026-08-24T23:48:20.137Z] [arbiter] The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb — 'investigate the rubble', 'go east', 'attack the figure'."
+[2026-08-24T23:48:20.139Z] [debug] meta-comment guard: skipped intent parse (suggestion: "i want") on 117-char input
+[2026-08-24T23:48:22.567Z] [debug] ui: tap "⬆ Take & wear Architect's Field Jacket"
+[2026-08-24T23:48:22.574Z] [world] You take the Architect's Field Jacket from where it lay.
+[2026-08-24T23:48:22.580Z] [reward] ✦ Architect's Field Jacket (Common).
+[2026-08-24T23:48:22.585Z] [debug] take&wear: equipping "Architect's Field Jacket" -> cloak
+[2026-08-24T23:48:22.603Z] [debug] stats: STR13 DEX11 INT8 WIS6 CHA9 STE3 | gear: INT+2,DEX+6,STR+1 | worn: main=Tartarian Spear off=Bolt-Caster head=Aetheric Helm of Insight hands=Stone-Grip Gloves legs=Aetheric Scout Greaves cloak=Architect's Field Jacket
+[2026-08-24T23:48:25.508Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:48:25.722Z] [debug] qwen: LOAD FAILED — Load failed: Failed to load the model
+[2026-08-24T23:48:27.585Z] [world] You pick up the Plasma Dagger.
+[2026-08-24T23:48:27.587Z] [reward] ✦ Plasma Dagger (Common).
+[2026-08-24T23:48:28.616Z] [reward] ✦ Found Unsent Letter — to the Council of Sovereigns — The Black Cloak Confessions. (open Contracts → Collectibles to read)
+[2026-08-24T23:48:28.640Z] [world] You strip the brick carefully. Something usable comes free in your hand.
+[2026-08-24T23:48:28.640Z] [world] You break the dust-buried vault relic pedestal apart. Among the pieces, something worth keeping.
+[2026-08-24T23:48:28.641Z] [world] Something papery rustles as you strip the half-buried engine chamber scaffolding. You pull free a journal leaf.
+[2026-08-24T23:48:28.641Z] [world] You strip the lantern carefully. Something usable comes free in your hand.
+[2026-08-24T23:48:28.642Z] [world] You work the sign over. A part of it comes loose, intact.
+[2026-08-24T23:48:28.642Z] [world] The stripped maintenance panel yields little of value, though a Cloth Scrap ends up in your pack.
+[2026-08-24T23:48:28.643Z] [world] You salvage the table. The take is small but real.
+[2026-08-24T23:48:28.643Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:48:28.644Z] [reward]     • Mud Fragment x2 (Common)
+[2026-08-24T23:48:28.644Z] [reward]     • Worn Tartarian Coin x3 (Common)
+[2026-08-24T23:48:28.645Z] [reward]     • Aether Crystal (Common)
+[2026-08-24T23:48:28.645Z] [reward]     • Scrap Metal (Common)
+[2026-08-24T23:48:28.645Z] [reward]     • Cloth Scrap (Common)
+[2026-08-24T23:48:28.646Z] [reward]     • Bent Nail (Common)
+[2026-08-24T23:48:28.750Z] [debug] ⚠⚠ MEMORY WARNING #1 from the OS (first this session) — app=active · qwen='failed' · voice='ready' · reloads=0. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-24T23:48:28.900Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='failed'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-08-24T23:48:39.072Z] [debug] persist sizes(KB): total=132 player=17 wm=26[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=86 scene=3
+[2026-08-24T23:48:40.445Z] [debug] ui: tap "↓ FIRST LANDING"
+[2026-08-24T23:48:40.498Z] [player] go south
+[2026-08-24T23:48:40.500Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:48:40.501Z] [world] You head on to the First Landing.
+[2026-08-24T23:48:40.502Z] [debug] scene: loc=builders_survey_camp hub=buried_landing_one arrival=n opening=n passing=n
+[2026-08-24T23:48:40.539Z] [debug] spawn: gear=[Mud Heater Sword, Reclaimer's Salvage Vest] window=10 roster=new
+[2026-08-24T23:48:40.543Z] [world] Stone Builders' Workshop — First Landing. A wide platform of cracked Tartarian stone, chalked with arrows and a load rating in a foreman's hand. The stair behind you climbs north to the threshold; ahead it keeps dropping south, and the chalk stops where the surveys do.
+[2026-08-24T23:48:40.543Z] [world] Paths: north to Threshold · south to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:48:40.544Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:48:40.544Z] [arbiter] "The Stone Builders work where most have given up the ground," the Arbiter says. "It shows in their hands. And eventually in yours."
+[2026-08-24T23:48:42.808Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:48:44.469Z] [world] You lift the Reclaimer's Salvage Vest clear.
+[2026-08-24T23:48:44.471Z] [reward] ✦ Reclaimer's Salvage Vest (Common).
+[2026-08-24T23:48:44.492Z] [debug] take&wear: equipping "Reclaimer's Salvage Vest" -> chest
+[2026-08-24T23:48:44.528Z] [debug] stats: STR13 DEX11 INT8 WIS6 CHA9 STE3 | gear: INT+2,DEX+6,STR+1 | worn: main=Tartarian Spear off=Bolt-Caster head=Aetheric Helm of Insight chest=Reclaimer's Salvage Vest hands=Stone-Grip Gloves legs=Aetheric Scout Greaves cloak=Architect's Field Jacket
+[2026-08-24T23:48:45.881Z] [world] You get a hand under the Mud Heater Sword and take it.
+[2026-08-24T23:48:45.882Z] [reward] ✦ Mud Heater Sword (Common).
+[2026-08-24T23:48:47.148Z] [world] You break the cracked engine chamber scaffolding apart. Among the pieces, something worth keeping.
+[2026-08-24T23:48:47.148Z] [world] You salvage the lantern. The take is small but real.
+[2026-08-24T23:48:47.148Z] [world] You work the platform apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-08-24T23:48:47.149Z] [world] You break the stone apart. Among the pieces, something worth keeping.
+[2026-08-24T23:48:47.149Z] [world] You break the stripped hidden weapon locker apart. Among the pieces, something worth keeping.
+[2026-08-24T23:48:47.150Z] [world] You break the stripped maintenance panel apart. Among the pieces, something worth keeping.
+[2026-08-24T23:48:47.150Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:48:47.151Z] [reward]     • Automaton Circuit x2 (Common)
+[2026-08-24T23:48:47.151Z] [reward]     • Scrap Metal x2 (Common)
+[2026-08-24T23:48:47.151Z] [reward]     • Glass-Beaded Strap (Uncommon)
+[2026-08-24T23:48:47.152Z] [reward]     • Mud Fragment x3 (Common)
+[2026-08-24T23:48:47.152Z] [reward]     • Worn Tartarian Coin x3 (Common)
+[2026-08-24T23:48:47.152Z] [reward]     • Aetheric Shard (Uncommon)
+[2026-08-24T23:48:49.178Z] [debug] ui: tap "climb"
+[2026-08-24T23:48:50.309Z] [player] climb cracked engine chamber scaffolding
+[2026-08-24T23:48:50.310Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked engine chamber scaffolding resolved=cracked engine chamber scaffolding range=- enemies=0 hooks=0
+[2026-08-24T23:48:50.332Z] [world] You loop your Reclaimer's Rope around the cracked engine chamber scaffolding and walk the line. Tier 1/3 cleared.
+[2026-08-24T23:48:50.332Z] [world] You reach the first hold of the cracked engine chamber scaffolding (tier 1/3). Higher still to go.
+[2026-08-24T23:48:50.335Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:48:50.335Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:48:50.335Z] [system] ⏳ Time passed: 30 min
+[2026-08-24T23:48:51.407Z] [debug] ui: tap "climb up (1/3)"
+[2026-08-24T23:48:51.408Z] [system] bleeding fades.
+[2026-08-24T23:48:51.460Z] [player] climb cracked engine chamber scaffolding
+[2026-08-24T23:48:51.461Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked engine chamber scaffolding resolved=cracked engine chamber scaffolding range=- enemies=0 hooks=0
+[2026-08-24T23:48:51.481Z] [world] You loop your Reclaimer's Rope around the cracked engine chamber scaffolding and walk the line. Tier 2/3 cleared.
+[2026-08-24T23:48:51.482Z] [world] You reach the last stretch of the cracked engine chamber scaffolding (tier 2/3). Higher still to go.
+[2026-08-24T23:48:51.482Z] [system] ⏳ Time passed: 30 min
+[2026-08-24T23:48:51.927Z] [debug] ui: tap "climb up (2/3)"
+[2026-08-24T23:48:52.025Z] [player] climb cracked engine chamber scaffolding
+[2026-08-24T23:48:52.026Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked engine chamber scaffolding resolved=cracked engine chamber scaffolding range=- enemies=0 hooks=0
+[2026-08-24T23:48:52.047Z] [world] You loop your Reclaimer's Rope around the cracked engine chamber scaffolding and walk the line. Tier 3/3 cleared.
+[2026-08-24T23:48:52.047Z] [world] You reach the top of the cracked engine chamber scaffolding (tier 3/3). The view changes; the room reads differently from here.
+[2026-08-24T23:48:52.049Z] [reward] ✦ Aether Crystal (Common) — tucked into a crack at the top of the cracked engine chamber scaffolding.
+[2026-08-24T23:48:52.050Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-24T23:48:52.050Z] [system] ⏳ Time passed: 30 min
+[2026-08-24T23:48:53.361Z] [debug] ui: tap "climb down"
+[2026-08-24T23:48:53.404Z] [player] climb down
+[2026-08-24T23:48:53.405Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:48:53.407Z] [world] You make your way back down the cracked engine chamber scaffolding. Boots back on the ground.
+[2026-08-24T23:48:53.407Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:48:53.407Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:48:53.408Z] [system] ⏳ Time passed: 15 min
+[2026-08-24T23:48:53.532Z] [debug] persist sizes(KB): total=129 player=17 wm=26[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=84 scene=2
+[2026-08-24T23:48:54.961Z] [debug] ui: tap "↑ THRESHOLD"
+[2026-08-24T23:48:55.008Z] [player] go north
+[2026-08-24T23:48:55.008Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:48:55.009Z] [world] You head on to the Threshold.
+[2026-08-24T23:48:55.010Z] [debug] scene: loc=builders_survey_camp hub=outpost_gate arrival=n opening=n passing=n
+[2026-08-24T23:48:55.047Z] [world] Stone Builders' Workshop — The Tool Threshold. An open shop entry with a chalkboard for jobs taken and a rack of clean Aethercraft instruments. The foreman waves you to the slate without looking up.
+[2026-08-24T23:48:55.047Z] [world] You have been here. The shape of it comes back before the details do.
+[2026-08-24T23:48:55.048Z] [world] Paths: north to Plan Floor · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:48:55.048Z] [world] Halem the Trader places you as you come in. "Verbal. What are you after?"
+[2026-08-24T23:48:55.053Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-24T23:48:55.993Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:48:57.405Z] [world] You work the stairwell over. A part of it comes loose, intact.
+[2026-08-24T23:48:57.405Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:48:57.405Z] [reward]     • Mud Fragment x3 (Common)
+[2026-08-24T23:49:00.659Z] [player] Ask about the trading post
+[2026-08-24T23:49:00.662Z] [world] "It was my father's, and it was not a post then, it was a front room." He gestures at the roof, which is three different roofs. "Every bit of this is somebody's payment. That beam is a debt. That shutter is a debt. I have been paid in doors more times than in coin." He grins. "Do not tell anybody. It is the only reason I have a building."
+[2026-08-24T23:49:00.664Z] [world] Halem the Trader shifts the pack higher on his shoulder and does not put it down.
+[2026-08-24T23:49:01.410Z] [player] Ask who else trades the crossroads
+[2026-08-24T23:49:01.412Z] [world] "Everyone, twice a season; nobody, the rest of it." Halem counts on his fingers. "Felra for boots — go to her, do not let me sell you boots. Irma if you plan to be hit. Tellin if you want a fair number said to your face." He grins. "And me for everything in between, which is where all the living actually happens."
+[2026-08-24T23:49:01.414Z] [world] Halem the Trader looks at the road behind you before he answers anything at all.
+[2026-08-24T23:49:02.128Z] [player] Ask about the acid trade
+[2026-08-24T23:49:02.131Z] [world] "Careful with that shelf." Halem slides a wax-sealed flask an inch further from your elbow. "Battery bile. The old world kept its lightning in acid — jar-batteries taller than a house, vault floors full of them. The flood shorted the lightning out and left the bile leaking for a thousand years. Scavengers milk the jars that held; I cut it with aether dust so it eats armor instead of hands." He taps the wax. "Sells to people who plan on winning slowly."
+[2026-08-24T23:49:02.134Z] [world] Halem the Trader keeps facing the way he was going, and talks to you sideways.
+[2026-08-24T23:49:02.943Z] [world] You let the conversation go and Halem the Trader gets back to it.
+[2026-08-24T23:49:10.118Z] [reward] Sold Cudgel to Halem the Trader for 14 TC. (160 TC on hand)
+[2026-08-24T23:49:10.149Z] [reward] Sold Lightfoot Dash to Halem the Trader for 14 TC. (174 TC on hand)
+[2026-08-24T23:49:10.167Z] [reward] Sold Plasma Dagger to Halem the Trader for 14 TC. (188 TC on hand)
+[2026-08-24T23:49:10.185Z] [reward] Sold Pocket Knife to Halem the Trader for 12 TC. (200 TC on hand)
+[2026-08-24T23:49:10.202Z] [reward] Sold Compact Blaster to Halem the Trader for 13 TC. (213 TC on hand)
+[2026-08-24T23:49:10.219Z] [reward] Sold Mud Heater Sword to Halem the Trader for 13 TC. (226 TC on hand)
+[2026-08-24T23:49:10.236Z] [reward] Sold Lost Scholar's Robe to Halem the Trader for 8 TC. (234 TC on hand)
+[2026-08-24T23:49:10.253Z] [reward] Sold Reclaimer's Salvage Vest to Halem the Trader for 8 TC. (242 TC on hand)
+[2026-08-24T23:49:10.270Z] [reward] Sold Reclaimer's Salvage Vest to Halem the Trader for 5 TC. (247 TC on hand)
+[2026-08-24T23:49:12.732Z] [debug] persist sizes(KB): total=129 player=15 wm=27[rooms=7 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=85 scene=2
+[2026-08-24T23:49:15.926Z] [debug] ui: tap "↑ PLAN FLOOR"
+[2026-08-24T23:49:15.938Z] [world] Black rain runs down your collar. Something in you tightens that should not have.
+[2026-08-24T23:49:15.973Z] [player] go north
+[2026-08-24T23:49:15.974Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:49:15.975Z] [world] You head on to the Plan Floor.
+[2026-08-24T23:49:15.975Z] [debug] scene: loc=builders_survey_camp hub=outpost_central arrival=n opening=n passing=n
+[2026-08-24T23:49:15.983Z] [debug] spawn: gear=[Bone Club] window=10 roster=new
+[2026-08-24T23:49:15.985Z] [world] Stone Builders' Workshop — The Plan Floor. A workshop floor of laid blueprints and stacked stone. The center stone has the Buried Cities' load-bearing tunnels chalked across it in three layers.
+[2026-08-24T23:49:15.988Z] [world] Paths: north to Materials · south to Threshold · east to Forge · west to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:49:17.373Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:49:18.986Z] [world] You claim the Bone Club.
+[2026-08-24T23:49:18.987Z] [reward] ✦ Bone Club (Common).
+[2026-08-24T23:49:19.896Z] [reward] ✦ Found Frantic Note — front hall — The Family in the Mud. (open Contracts → Collectibles to read)
+[2026-08-24T23:49:19.907Z] [world] The bench yields little of value, though a Smooth Stone ends up in your pack.
+[2026-08-24T23:49:19.907Z] [world] You lever something loose from the cracked royal display case — not standard salvage. Odd enough that the Crucible would know what to do with it.
+[2026-08-24T23:49:19.907Z] [world] You strip the lantern down. Mostly debris — but a Smooth Stone comes loose at the bottom of the pile.
+[2026-08-24T23:49:19.908Z] [world] You break the map-stone apart. Among the pieces, something worth keeping.
+[2026-08-24T23:49:19.908Z] [world] You salvage the shattered dormant architectural sentinel. The take is small but real.
+[2026-08-24T23:49:19.909Z] [world] Something papery rustles as you strip the stripped maintenance panel. You pull free a journal leaf.
+[2026-08-24T23:49:19.909Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:49:19.910Z] [reward]     • Smooth Stone x2 (Common)
+[2026-08-24T23:49:19.910Z] [reward]     • Glass-Beaded Strap (Uncommon)
+[2026-08-24T23:49:19.910Z] [reward]     • Worn Tartarian Coin x6 (Common)
+[2026-08-24T23:49:19.911Z] [reward]     • Aether Dust x3 (Common)
+[2026-08-24T23:49:21.483Z] [debug] ui: tap "investigate"
+[2026-08-24T23:49:22.684Z] [player] investigate the floor
+[2026-08-24T23:49:22.685Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:49:22.688Z] [world] You scan the floor. Something small catches the light, half-kicked under the boards.
+[2026-08-24T23:49:22.688Z] [reward] ✦ Stick.
+[2026-08-24T23:49:22.688Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:49:22.689Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:49:24.758Z] [debug] ui: tap "↑ MATERIALS"
+[2026-08-24T23:49:24.803Z] [player] go north
+[2026-08-24T23:49:24.804Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:49:24.805Z] [world] You head on to the Materials.
+[2026-08-24T23:49:24.807Z] [debug] scene: loc=builders_survey_camp hub=outpost_relic_vault arrival=n opening=n passing=n
+[2026-08-24T23:49:24.816Z] [debug] spawn: gear=[Mud-Treader's Greaves, Aetheric Spark] window=10 roster=new
+[2026-08-24T23:49:24.817Z] [world] Stone Builders' Workshop — The Materials Vault. Aether-shielded shelves of un-cast components, rare alloys, and a few prototype Aethercraft cores. Tagged by project, ready for assembly.
+[2026-08-24T23:49:24.818Z] [world] Paths: south to Plan Floor · east to Smithy · west to Drafting. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:49:24.818Z] [system] Weather effect — Ash Storm: -1 STR
+[2026-08-24T23:49:24.818Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:49:24.819Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:49:24.825Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:49:24.826Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:49:25.738Z] [debug] qwen-watchdog: holding reloads for 90s — the OS just asked for memory back and a reload is the biggest thing we could do to it.
+[2026-08-24T23:49:26.040Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:49:27.539Z] [world] The Aetheric Spark comes up out of the silt with a small sucking protest.
+[2026-08-24T23:49:27.539Z] [reward] ✦ Aetheric Spark (Common).
+[2026-08-24T23:49:27.544Z] [world] The Mud-Treader's Greaves was half under something. It is not now.
+[2026-08-24T23:49:27.544Z] [reward] ✦ Mud-Treader's Greaves (Common).
+[2026-08-24T23:49:27.766Z] [debug] persist sizes(KB): total=129 player=16 wm=27[rooms=7 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=83 scene=2
+[2026-08-24T23:49:28.482Z] [reward] ✦ Found Report D — flagged: do not file — The Black Cloak Confessions. (open Contracts → Collectibles to read)
+[2026-08-24T23:49:28.504Z] [reward] ✦ Found A Child's Drawing — The Family in the Mud. (open Contracts → Collectibles to read)
+[2026-08-24T23:49:28.507Z] [world] You work the cracked vault relic pedestal over. A part of it comes loose, intact.
+[2026-08-24T23:49:28.507Z] [world] You lever something loose from the crate — not standard salvage. Odd enough that the Crucible would know what to do with it.
+[2026-08-24T23:49:28.508Z] [world] Something papery rustles as you strip the lock. You pull free a journal leaf.
+[2026-08-24T23:49:28.508Z] [world] You break the rusted royal vault pedestal apart. Among the pieces, something worth keeping.
+[2026-08-24T23:49:28.508Z] [world] You break the salt-crusted forgotten order reliquary down. Among the pieces, a fragment of someone's writing — held against the world by stubbornness alone.
+[2026-08-24T23:49:28.509Z] [world] You salvage the shelf. The take is small but real.
+[2026-08-24T23:49:28.509Z] [world] Already worked over: relic.
+[2026-08-24T23:49:28.510Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:49:28.510Z] [reward]     • Aether Dust x5 (Common)
+[2026-08-24T23:49:28.510Z] [reward]     • Verdigris Bell Fragment (Common)
+[2026-08-24T23:49:28.511Z] [reward]     • Worn Tartarian Coin x6 (Common)
+[2026-08-24T23:49:31.559Z] [debug] ui: tap "→ SMITHY"
+[2026-08-24T23:49:31.602Z] [player] go east
+[2026-08-24T23:49:31.603Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:49:31.604Z] [world] You head on to the Smithy.
+[2026-08-24T23:49:31.604Z] [debug] scene: loc=builders_survey_camp hub=outpost_workshop arrival=n opening=n passing=n
+[2026-08-24T23:49:31.641Z] [debug] spawn: gear=[Salvager's Trench Coat, Bone Knife] window=10 roster=new
+[2026-08-24T23:49:31.642Z] [world] Stone Builders' Workshop — The Aethercraft Smithy. Tarek's home turf. Half-assembled Aethercraft engines, drone chassis, mud-glass casting molds — the Builders' real art happens at this bench.
+[2026-08-24T23:49:31.643Z] [world] Paths: west to Materials. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:49:31.643Z] [world] Tarek the Tinkerer nods once. "Verbal. Come look — a few things moved since you were last through."
+[2026-08-24T23:49:31.643Z] [world] Tarek the Tinkerer jerks their chin north. "The Mud Monarchs raided our outpost while you were out there. Word travels slower than they do."
+[2026-08-24T23:49:31.644Z] [world] Tarek the Tinkerer nods at a mystery notice: "Cradle of Dusk Compass." (Say 'accept compass' or open Contracts.)
+[2026-08-24T23:49:32.610Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:49:33.765Z] [world] You work the Throwing Knife loose from where the mud had it.
+[2026-08-24T23:49:33.767Z] [reward] ✦ Throwing Knife (Common).
+[2026-08-24T23:49:33.790Z] [world] The Salvager's Trench Coat had settled into the ground. You unsettle it.
+[2026-08-24T23:49:33.791Z] [reward] ✦ Salvager's Trench Coat (Common).
+[2026-08-24T23:49:34.618Z] [world] You scavenge the bench thoroughly. One Stick survives the sorting.
+[2026-08-24T23:49:34.619Z] [world] You salvage the conduit. The take is small but real.
+[2026-08-24T23:49:34.620Z] [world] You break the dust-buried vault relic pedestal apart. Among the pieces, something worth keeping.
+[2026-08-24T23:49:34.622Z] [world] You break the tilted hidden weapon locker apart. Among the pieces, something worth keeping.
+[2026-08-24T23:49:34.623Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:49:34.624Z] [reward]     • Stick (Common)
+[2026-08-24T23:49:34.625Z] [reward]     • Scrap Metal x2 (Common)
+[2026-08-24T23:49:34.625Z] [reward]     • Worn Tartarian Coin x5 (Common)
+[2026-08-24T23:49:34.629Z] [reward]     • Aether Dust x2 (Common)
+[2026-08-24T23:49:36.458Z] [debug] ui: tap "investigate"
+[2026-08-24T23:49:37.437Z] [player] investigate the floor
+[2026-08-24T23:49:37.438Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:49:37.439Z] [world] You give the floor a once-over. Clean enough to fail you.
+[2026-08-24T23:49:37.440Z] [arbiter] "There's coin on the board for a willing blade," the Arbiter says. "Read the World."
+[2026-08-24T23:49:37.440Z] [debug] dedup: suppressed arbiter repeat — ""There's coin on the board for a willing blade," the Arbiter…"
+[2026-08-24T23:49:39.009Z] [debug] ui: tap "← ✓ MATERIALS"
+[2026-08-24T23:49:39.047Z] [player] go west
+[2026-08-24T23:49:39.048Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:49:39.049Z] [world] You head on to the Materials.
+[2026-08-24T23:49:39.050Z] [debug] scene: loc=builders_survey_camp hub=outpost_relic_vault arrival=n opening=n passing=n
+[2026-08-24T23:49:39.057Z] [world] Stone Builders' Workshop — The Materials Vault. Aether-shielded shelves of un-cast components, rare alloys, and a few prototype Aethercraft cores. Tagged by project, ready for assembly.
+[2026-08-24T23:49:39.058Z] [world] Something about this ground is already familiar.
+[2026-08-24T23:49:39.059Z] [world] Paths: south to Plan Floor · east to Smithy · west to Drafting. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:49:39.059Z] [world] You think back to the bench from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-08-24T23:49:39.264Z] [debug] persist sizes(KB): total=130 player=16 wm=28[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=84 scene=2
+[2026-08-24T23:49:41.140Z] [debug] ui: tap "← DRAFTING"
+[2026-08-24T23:49:41.159Z] [player] go west
+[2026-08-24T23:49:41.159Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=1
+[2026-08-24T23:49:41.161Z] [world] You head on to the Drafting.
+[2026-08-24T23:49:41.162Z] [debug] scene: loc=builders_survey_camp hub=outpost_lab arrival=n opening=n passing=n
+[2026-08-24T23:49:41.202Z] [debug] spawn: gear=[Repeater Rifle, Mud Shell] window=10 roster=new
+[2026-08-24T23:49:41.203Z] [world] Stone Builders' Workshop — The Drafting Office. Plan-tables, slide-rules, and an Aethercraft compendium that fills two walls. Jorah is the senior planner; everything the Builders raise begins on her board.
+[2026-08-24T23:49:41.203Z] [world] Paths: east to Materials. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:49:41.204Z] [world] A figure crests the rise — Jorah the Scholar, Tomekeeper, pack heavy across the shoulders. They set down to trade.
+[2026-08-24T23:49:41.204Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Jorah the Scholar, Tomekeeper. Kind and knowledgeable, Jorah keeps a stall at the Reclaimers' University. Focuses on wisdom-based items, scrolls, and staves."
+[2026-08-24T23:49:41.212Z] [world] Rare workings for sale: Shadow Caller (200 TC), Stormcaller (200 TC), Titan's Iron Band (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-08-24T23:49:41.213Z] [world] Jorah the Scholar offers a contract: "Field Samples." (Say 'accept samples' or open Contracts for details.)
+[2026-08-24T23:49:41.213Z] [world] Jorah the Scholar points at the bounty board: "Silence the Doubter." (Say 'accept doubter' or open Contracts.)
+[2026-08-24T23:49:41.213Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:49:41.213Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:49:42.442Z] [debug] ui: tap "→ ✓ MATERIALS"
+[2026-08-24T23:49:42.485Z] [player] go east
+[2026-08-24T23:49:42.486Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:49:42.487Z] [world] You head on to the Materials.
+[2026-08-24T23:49:42.487Z] [debug] scene: loc=builders_survey_camp hub=outpost_relic_vault arrival=n opening=n passing=n
+[2026-08-24T23:49:42.495Z] [world] Stone Builders' Workshop — The Materials Vault. Aether-shielded shelves of un-cast components, rare alloys, and a few prototype Aethercraft cores. Tagged by project, ready for assembly.
+[2026-08-24T23:49:42.496Z] [world] You know this place. Not well, but you know it.
+[2026-08-24T23:49:42.497Z] [world] Paths: south to Plan Floor · east to Smithy · west to Drafting. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:49:42.497Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:49:42.498Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:49:43.289Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:49:44.876Z] [world] You salvage the half-buried dormant architectural sentinel. The take is small but real.
+[2026-08-24T23:49:44.877Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:49:44.881Z] [reward]     • Automaton Circuit (Common)
+[2026-08-24T23:49:47.739Z] [debug] ui: tap "✦ ability"
+[2026-08-24T23:49:49.409Z] [reward] ✦ Defensive Protocols — an Aetheric shield flares around you. Incoming damage halved for 3 rounds.
+[2026-08-24T23:49:51.391Z] [debug] ui: tap "← ✓ DRAFTING"
+[2026-08-24T23:49:51.398Z] [system] Defensive Protocols fades.
+[2026-08-24T23:49:51.433Z] [player] go west
+[2026-08-24T23:49:51.434Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:49:51.435Z] [world] You head on to the Drafting.
+[2026-08-24T23:49:51.435Z] [debug] scene: loc=builders_survey_camp hub=outpost_lab arrival=n opening=n passing=n
+[2026-08-24T23:49:51.471Z] [world] Stone Builders' Workshop — The Drafting Office. Plan-tables, slide-rules, and an Aethercraft compendium that fills two walls. Jorah is the senior planner; everything the Builders raise begins on her board.
+[2026-08-24T23:49:51.471Z] [world] The look of it lands a half-second before the memory does.
+[2026-08-24T23:49:51.472Z] [world] Paths: east to Materials. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:49:51.472Z] [world] Jorah the Scholar glances up. "You again." Not warm, not cold — noted.
+[2026-08-24T23:49:51.473Z] [world] Jorah the Scholar nods at a mystery notice: "Fragment of the Red Tower." (Say 'accept tower' or open Contracts.)
+[2026-08-24T23:49:52.509Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:49:53.964Z] [world] Whatever the Mud Shell was lying against, it lets go without much argument.
+[2026-08-24T23:49:53.966Z] [reward] ✦ Mud Shell (Common).
+[2026-08-24T23:49:53.988Z] [world] The Repeater Rifle is heavier than it looks. Most things down here are.
+[2026-08-24T23:49:53.988Z] [reward] ✦ Repeater Rifle (Common).
+[2026-08-24T23:49:54.252Z] [debug] persist sizes(KB): total=132 player=17 wm=29[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=84 scene=3
+[2026-08-24T23:49:54.876Z] [world] You salvage the cracked library archive console. The take is small but real.
+[2026-08-24T23:49:54.877Z] [world] Slim pickings on the jar. You pocket a Bent Nail on the way out.
+[2026-08-24T23:49:54.877Z] [world] You break the lantern apart. Among the pieces, something worth keeping.
+[2026-08-24T23:49:54.877Z] [world] You work the rusted submerged library shelf over. A part of it comes loose, intact.
+[2026-08-24T23:49:54.878Z] [world] You work the stripped hidden weapon locker apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-08-24T23:49:54.878Z] [world] You salvage the tome. The take is small but real.
+[2026-08-24T23:49:54.879Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:49:54.879Z] [reward]     • Aether Crystal x3 (Common)
+[2026-08-24T23:49:54.879Z] [reward]     • Bent Nail (Common)
+[2026-08-24T23:49:54.880Z] [reward]     • Aether Dust x4 (Common)
+[2026-08-24T23:49:54.880Z] [reward]     • Flint Core Nodule (Common)
+[2026-08-24T23:49:56.641Z] [debug] ui: tap "→ ✓ MATERIALS"
+[2026-08-24T23:49:56.684Z] [player] go east
+[2026-08-24T23:49:56.685Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:49:56.686Z] [world] You head on to the Materials.
+[2026-08-24T23:49:56.686Z] [debug] scene: loc=builders_survey_camp hub=outpost_relic_vault arrival=n opening=n passing=n
+[2026-08-24T23:49:56.696Z] [world] Stone Builders' Workshop — The Materials Vault. Aether-shielded shelves of un-cast components, rare alloys, and a few prototype Aethercraft cores. Tagged by project, ready for assembly.
+[2026-08-24T23:49:56.696Z] [world] You have stood on this exact patch of ground before.
+[2026-08-24T23:49:56.697Z] [world] Paths: south to Plan Floor · east to Smithy · west to Drafting. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:49:56.697Z] [world] You think back to the jar from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-08-24T23:49:58.754Z] [debug] ui: tap "↓ ✓ PLAN FLOOR"
+[2026-08-24T23:49:58.775Z] [player] go south
+[2026-08-24T23:49:58.776Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1
+[2026-08-24T23:49:58.777Z] [world] You head on to the Plan Floor.
+[2026-08-24T23:49:58.777Z] [debug] scene: loc=builders_survey_camp hub=outpost_central arrival=n opening=n passing=n
+[2026-08-24T23:49:58.783Z] [world] Stone Builders' Workshop — The Plan Floor. A workshop floor of laid blueprints and stacked stone. The center stone has the Buried Cities' load-bearing tunnels chalked across it in three layers.
+[2026-08-24T23:49:58.783Z] [world] Your feet find the dry line without being asked.
+[2026-08-24T23:49:58.784Z] [world] Paths: north to Materials · south to Threshold · east to Forge · west to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:49:58.784Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:49:58.784Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:50:00.853Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #1).
+[2026-08-24T23:50:01.710Z] [debug] ⚠⚠ MEMORY WARNING #2 from the OS (93.0s since the last one) — app=active · qwen='downloading' · voice='ready' · reloads=1 · save=132KB. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-24T23:50:01.798Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='downloading'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-08-24T23:50:02.974Z] [debug] qwen-watchdog: reinit #1 settled in 2117ms → status='idle'.
+[2026-08-24T23:50:03.505Z] [debug] ui: tap "→ FORGE"
+[2026-08-24T23:50:03.544Z] [player] go east
+[2026-08-24T23:50:03.545Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:50:03.546Z] [world] You head on to the Forge.
+[2026-08-24T23:50:03.547Z] [debug] scene: loc=builders_survey_camp hub=outpost_armory arrival=n opening=n passing=n
+[2026-08-24T23:50:03.587Z] [debug] spawn: gear=[Architect's Observer Visor, Arcane Sprinter's Legplates, Aether-Weaver's Mantle] window=10 roster=new
+[2026-08-24T23:50:03.591Z] [world] Stone Builders' Workshop — The Forge Shrine. Anvils on Aetheric isolators. Irma builds — she does not break. Each weapon she sets out is also a tool: a chisel that cuts mud-glass, a maul that lifts stone.
+[2026-08-24T23:50:03.592Z] [world] Paths: south to Foundation · west to Plan Floor. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:50:03.592Z] [world] Irma Ironhand nods once. "Verbal. Come look — a few things moved since you were last through."
+[2026-08-24T23:50:03.592Z] [world] Irma Ironhand jerks their chin north. "The True Tartarians raided our outpost while you were out there. Word travels slower than they do."
+[2026-08-24T23:50:03.593Z] [world] Irma Ironhand offers a contract: "Quarry Quota." (Say 'accept quota' or open Contracts for details.)
+[2026-08-24T23:50:03.593Z] [world] Irma Ironhand points at the bounty board: "Silence the Doubter." (Say 'accept doubter' or open Contracts.)
+[2026-08-24T23:50:03.594Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:50:03.594Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:50:05.773Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:50:05.918Z] [debug] qwen-watchdog: holding reloads for 90s — the OS just asked for memory back and a reload is the biggest thing we could do to it.
+[2026-08-24T23:50:07.630Z] [world] The Bolt-Caster is lighter than it looks, which is its own kind of warning.
+[2026-08-24T23:50:07.632Z] [reward] ✦ Bolt-Caster (Uncommon).
+[2026-08-24T23:50:07.658Z] [world] The Aether-Weaver's Mantle is cold through your glove.
+[2026-08-24T23:50:07.659Z] [reward] ✦ Aether-Weaver's Mantle (Common).
+[2026-08-24T23:50:07.661Z] [world] The Arcane Sprinter's Legplates fits the hand better than it has any right to.
+[2026-08-24T23:50:07.661Z] [reward] ✦ Arcane Sprinter's Legplates (Common).
+[2026-08-24T23:50:07.663Z] [world] You turn the Architect's Observer Visor over once, then keep it.
+[2026-08-24T23:50:07.663Z] [reward] ✦ Architect's Observer Visor (Common).
+[2026-08-24T23:50:08.876Z] [world] You work the blade over. A part of it comes loose, intact.
+[2026-08-24T23:50:08.877Z] [world] You strip the cracked engine chamber scaffolding carefully. Something usable comes free in your hand.
+[2026-08-24T23:50:08.878Z] [world] You salvage the salt-crusted capacitor coil rack. The take is small but real.
+[2026-08-24T23:50:08.879Z] [world] You work the stripped hidden weapon locker over. A part of it comes loose, intact.
+[2026-08-24T23:50:08.880Z] [world] You break the workbench apart. Among the pieces, something worth keeping.
+[2026-08-24T23:50:08.881Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:50:08.882Z] [reward]     • Scrap Metal x3 (Common)
+[2026-08-24T23:50:08.882Z] [reward]     • Automaton Circuit (Common)
+[2026-08-24T23:50:08.883Z] [reward]     • Aether Dust x2 (Common)
+[2026-08-24T23:50:08.884Z] [reward]     • Stick (Common)
+[2026-08-24T23:50:09.131Z] [debug] persist sizes(KB): total=136 player=18 wm=31[rooms=9 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=84 scene=3
+[2026-08-24T23:50:10.421Z] [debug] ui: tap "investigate"
+[2026-08-24T23:50:11.600Z] [player] investigate the floor
+[2026-08-24T23:50:11.601Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:50:11.603Z] [world] You give the floor a once-over. Clean enough to fail you.
+[2026-08-24T23:50:11.603Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:50:11.604Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:50:13.354Z] [debug] ui: tap "↓ FOUNDATION"
+[2026-08-24T23:50:13.399Z] [player] go south
+[2026-08-24T23:50:13.399Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:50:13.400Z] [world] You head on to the Foundation.
+[2026-08-24T23:50:13.401Z] [debug] scene: loc=builders_survey_camp hub=outpost_culvert_descent arrival=n opening=n passing=n
+[2026-08-24T23:50:13.410Z] [debug] spawn: gear=[Salvager's Worn Gloves, Mud Heater Shield, Mud Claymore] window=10 roster=new
+[2026-08-24T23:50:13.412Z] [world] Stone Builders' Workshop — The Foundation Descent. Stairs to the structural cellars — load-bearing test pieces, the older Aethercraft cores still in service, the foundry pits.
+[2026-08-24T23:50:13.413Z] [world] Paths: north to Forge. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:50:13.413Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:50:13.413Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:50:15.502Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:50:17.139Z] [world] The Mud Claymore comes away clean.
+[2026-08-24T23:50:17.140Z] [reward] ✦ Mud Claymore (Common).
+[2026-08-24T23:50:17.158Z] [world] It takes two pulls. The Mud Heater Shield is yours on the second.
+[2026-08-24T23:50:17.159Z] [reward] ✦ Mud Heater Shield (Common).
+[2026-08-24T23:50:17.163Z] [world] The Salvager's Worn Gloves resists, then does not.
+[2026-08-24T23:50:17.164Z] [reward] ✦ Salvager's Worn Gloves (Common).
+[2026-08-24T23:50:18.365Z] [reward] ✦ Found Third Inscription — The Giant's Watch. (open Contracts → Collectibles to read)
+[2026-08-24T23:50:18.390Z] [reward] ✦ Found Second Inscription — The Giant's Watch. (open Contracts → Collectibles to read)
+[2026-08-24T23:50:18.394Z] [world] The barrel gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-08-24T23:50:18.395Z] [world] You break the broken submerged library shelf apart. Among the pieces, something worth keeping.
+[2026-08-24T23:50:18.395Z] [world] You crack the dust-buried sentinel diagnostic console open. A page slides out — paper somehow dry, ink somehow still legible.
+[2026-08-24T23:50:18.396Z] [world] You work the lantern over. A part of it comes loose, intact.
+[2026-08-24T23:50:18.396Z] [world] You strip the mud-glazed tartarian power conduit carefully. Something usable comes free in your hand.
+[2026-08-24T23:50:18.397Z] [world] Behind the stairwell, where the floods didn't reach: a single page, in a hand you haven't read before.
+[2026-08-24T23:50:18.397Z] [world] You break the step apart. Among the pieces, something worth keeping.
+[2026-08-24T23:50:18.397Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:50:18.398Z] [reward]     • Flint-and-Twine Bundle (Common)
+[2026-08-24T23:50:18.398Z] [reward]     • Worn Tartarian Coin x6 (Common)
+[2026-08-24T23:50:18.399Z] [reward]     • Aether Dust x2 (Common)
+[2026-08-24T23:50:18.399Z] [reward]     • Aether Crystal x2 (Common)
+[2026-08-24T23:50:18.399Z] [reward]     • Smooth Stone x2 (Common)
+[2026-08-24T23:50:20.924Z] [debug] ui: tap "↑ ✓ FORGE"
+[2026-08-24T23:50:20.939Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.
+[2026-08-24T23:50:20.978Z] [player] go north
+[2026-08-24T23:50:20.979Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:50:20.980Z] [world] You head on to the Forge.
+[2026-08-24T23:50:20.981Z] [debug] scene: loc=builders_survey_camp hub=outpost_armory arrival=n opening=n passing=n
+[2026-08-24T23:50:21.016Z] [world] Stone Builders' Workshop — The Forge Shrine. Anvils on Aetheric isolators. Irma builds — she does not break. Each weapon she sets out is also a tool: a chisel that cuts mud-glass, a maul that lifts stone.
+[2026-08-24T23:50:21.016Z] [world] You step around something that is no longer there.
+[2026-08-24T23:50:21.016Z] [world] Paths: south to Foundation · west to Plan Floor. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:50:21.017Z] [system] Weather effect — Eerie Calm: +1 WIS
+[2026-08-24T23:50:21.017Z] [world] Irma Ironhand sets down what they're holding. "Didn't expect you today, Verbal."
+[2026-08-24T23:50:21.017Z] [world] Irma Ironhand nods at a mystery notice: "Cradle of Dusk Compass." (Say 'accept compass' or open Contracts.)
+[2026-08-24T23:50:21.019Z] [arbiter] Irma Ironhand unrolls a thick scroll. "Long-form work — Scripture in Stone. A Stone Builder lodge-master at the Survey Camp needs the Architectural Sorcery of the Grand Spire read before his lodge cracks apart under it. 1500 TC and standing. Say 'accept stone' to take it."
+[2026-08-24T23:50:21.255Z] [debug] persist sizes(KB): total=136 player=19 wm=31[rooms=9 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=84 scene=2
+[2026-08-24T23:50:26.653Z] [debug] ui: tap "investigate"
+[2026-08-24T23:50:27.734Z] [player] investigate forge
+[2026-08-24T23:50:27.737Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=forge resolved=forge range=- enemies=0 hooks=0
+[2026-08-24T23:50:27.739Z] [world] The metal is cold and unresponsive. A faint Aetheric hum, fading, says the mechanism was alive within the last decade.
+[2026-08-24T23:50:29.539Z] [debug] ui: tap "↓ ✓ FOUNDATION"
+[2026-08-24T23:50:29.584Z] [player] go south
+[2026-08-24T23:50:29.585Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:50:29.586Z] [world] You head on to the Foundation.
+[2026-08-24T23:50:29.586Z] [debug] scene: loc=builders_survey_camp hub=outpost_culvert_descent arrival=n opening=n passing=n
+[2026-08-24T23:50:29.595Z] [world] Stone Builders' Workshop — The Foundation Descent. Stairs to the structural cellars — load-bearing test pieces, the older Aethercraft cores still in service, the foundry pits.
+[2026-08-24T23:50:29.596Z] [world] Your shoulders drop a fraction. Whatever this place is, it is not new.
+[2026-08-24T23:50:29.596Z] [world] Paths: north to Forge. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:50:29.598Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:50:29.598Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:50:29.605Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:50:29.606Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:50:31.786Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:50:33.122Z] [world] You salvage the leaning engine chamber scaffolding. The take is small but real.
+[2026-08-24T23:50:33.123Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:50:33.125Z] [reward]     • Automaton Circuit (Common)
+[2026-08-24T23:50:35.636Z] [debug] ui: tap "↑ ✓ FORGE"
+[2026-08-24T23:50:35.672Z] [player] go north
+[2026-08-24T23:50:35.673Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:50:35.674Z] [world] You head on to the Forge.
+[2026-08-24T23:50:35.674Z] [debug] scene: loc=builders_survey_camp hub=outpost_armory arrival=n opening=n passing=n
+[2026-08-24T23:50:35.703Z] [world] Stone Builders' Workshop — The Forge Shrine. Anvils on Aetheric isolators. Irma builds — she does not break. Each weapon she sets out is also a tool: a chisel that cuts mud-glass, a maul that lifts stone.
+[2026-08-24T23:50:35.703Z] [world] You breathe easier here than you did the first time.
+[2026-08-24T23:50:35.703Z] [world] Paths: south to Foundation · west to Plan Floor. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:50:35.704Z] [world] You think back to the leaning engine chamber scaffolding from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-08-24T23:50:35.704Z] [world] Irma Ironhand places you as you come in. "Verbal. What are you after?"
+[2026-08-24T23:50:35.704Z] [world] Irma Ironhand offers a contract: "Quarry Quota." (Say 'accept quota' or open Contracts for details.)
+[2026-08-24T23:50:35.705Z] [world] Irma Ironhand points at the bounty board: "Silence the Doubter." (Say 'accept doubter' or open Contracts.)
+[2026-08-24T23:50:51.020Z] [debug] ui: tap "↓ ✓ FOUNDATION"
+[2026-08-24T23:50:51.060Z] [player] go south
+[2026-08-24T23:50:51.060Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1
+[2026-08-24T23:50:51.061Z] [world] You head on to the Foundation.
+[2026-08-24T23:50:51.062Z] [debug] scene: loc=builders_survey_camp hub=outpost_culvert_descent arrival=n opening=n passing=n
+[2026-08-24T23:50:51.071Z] [world] Stone Builders' Workshop — The Foundation Descent. Stairs to the structural cellars — load-bearing test pieces, the older Aethercraft cores still in service, the foundry pits.
+[2026-08-24T23:50:51.071Z] [world] Some part of you already knew where the footing was bad.
+[2026-08-24T23:50:51.072Z] [world] Paths: north to Forge. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:50:51.283Z] [debug] persist sizes(KB): total=135 player=19 wm=31[rooms=9 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=84 scene=1
+[2026-08-24T23:50:53.203Z] [debug] ui: tap "↑ ✓ FORGE"
+[2026-08-24T23:50:53.228Z] [player] go north
+[2026-08-24T23:50:53.228Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:50:53.229Z] [world] You head on to the Forge.
+[2026-08-24T23:50:53.229Z] [debug] scene: loc=builders_survey_camp hub=outpost_armory arrival=n opening=n passing=n
+[2026-08-24T23:50:53.264Z] [world] Stone Builders' Workshop — The Forge Shrine. Anvils on Aetheric isolators. Irma builds — she does not break. Each weapon she sets out is also a tool: a chisel that cuts mud-glass, a maul that lifts stone.
+[2026-08-24T23:50:53.264Z] [world] The mud has moved since you were last through. Not much. Some.
+[2026-08-24T23:50:53.264Z] [world] Paths: south to Foundation · west to Plan Floor. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:50:53.265Z] [world] Irma Ironhand places you as you come in. "Verbal. What are you after?"
+[2026-08-24T23:50:53.265Z] [world] Irma Ironhand jerks their chin north. "The True Tartarians raided our outpost while you were out there. Word travels slower than they do."
+[2026-08-24T23:50:53.266Z] [world] Irma Ironhand nods at a mystery notice: "Cradle of Dusk Compass." (Say 'accept compass' or open Contracts.)
+[2026-08-24T23:50:53.266Z] [arbiter] Irma Ironhand unrolls a thick scroll. "Long-form work — Scripture in Stone. A Stone Builder lodge-master at the Survey Camp needs the Architectural Sorcery of the Grand Spire read before his lodge cracks apart under it. 1500 TC and standing. Say 'accept stone' to take it."
+[2026-08-24T23:50:53.266Z] [debug] dedup: suppressed arbiter repeat — "Irma Ironhand unrolls a thick scroll. "Long-form work — Scri…"
+[2026-08-24T23:50:53.266Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:50:53.266Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:50:53.271Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:50:53.272Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:50:54.738Z] [debug] ui: tap "← ✓ PLAN FLOOR"
+[2026-08-24T23:50:54.783Z] [player] go west
+[2026-08-24T23:50:54.784Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:50:54.785Z] [world] You head on to the Plan Floor.
+[2026-08-24T23:50:54.785Z] [debug] scene: loc=builders_survey_camp hub=outpost_central arrival=n opening=n passing=n
+[2026-08-24T23:50:54.797Z] [world] Stone Builders' Workshop — The Plan Floor. A workshop floor of laid blueprints and stacked stone. The center stone has the Buried Cities' load-bearing tunnels chalked across it in three layers.
+[2026-08-24T23:50:54.797Z] [world] Something has shifted here, and you cannot say what.
+[2026-08-24T23:50:54.798Z] [world] Paths: north to Materials · south to Threshold · east to Forge · west to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:50:54.798Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:50:54.798Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:50:57.135Z] [debug] ui: tap "↑ ✓ MATERIALS"
+[2026-08-24T23:50:57.158Z] [player] go north
+[2026-08-24T23:50:57.159Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:50:57.159Z] [world] You head on to the Materials.
+[2026-08-24T23:50:57.160Z] [debug] scene: loc=builders_survey_camp hub=outpost_relic_vault arrival=n opening=n passing=n
+[2026-08-24T23:50:57.165Z] [world] Stone Builders' Workshop — The Materials Vault. Aether-shielded shelves of un-cast components, rare alloys, and a few prototype Aethercraft cores. Tagged by project, ready for assembly.
+[2026-08-24T23:50:57.166Z] [world] It is a little emptier than you remember, or you are.
+[2026-08-24T23:50:57.166Z] [world] Paths: south to Plan Floor · east to Smithy · west to Drafting. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:50:57.167Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:50:57.167Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:51:02.154Z] [debug] ui: tap "← ✓ DRAFTING"
+[2026-08-24T23:51:02.198Z] [player] go west
+[2026-08-24T23:51:02.199Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:51:02.200Z] [world] You head on to the Drafting.
+[2026-08-24T23:51:02.201Z] [debug] scene: loc=builders_survey_camp hub=outpost_lab arrival=n opening=n passing=n
+[2026-08-24T23:51:02.242Z] [world] Stone Builders' Workshop — The Drafting Office. Plan-tables, slide-rules, and an Aethercraft compendium that fills two walls. Jorah is the senior planner; everything the Builders raise begins on her board.
+[2026-08-24T23:51:02.242Z] [world] The light is different. The place is not.
+[2026-08-24T23:51:02.243Z] [world] Paths: east to Materials. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:51:02.243Z] [world] Jorah the Scholar places you as you come in. "Verbal. What are you after?"
+[2026-08-24T23:51:02.244Z] [world] Jorah the Scholar offers a contract: "Field Samples." (Say 'accept samples' or open Contracts for details.)
+[2026-08-24T23:51:02.244Z] [world] Jorah the Scholar points at the bounty board: "Silence the Doubter." (Say 'accept doubter' or open Contracts.)
+[2026-08-24T23:51:02.244Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:51:02.244Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:51:04.167Z] [debug] ui: tap "→ ✓ MATERIALS"
+[2026-08-24T23:51:04.184Z] [player] go east
+[2026-08-24T23:51:04.185Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:51:04.185Z] [world] You head on to the Materials.
+[2026-08-24T23:51:04.186Z] [debug] scene: loc=builders_survey_camp hub=outpost_relic_vault arrival=n opening=n passing=n
+[2026-08-24T23:51:04.190Z] [world] Stone Builders' Workshop — The Materials Vault. Aether-shielded shelves of un-cast components, rare alloys, and a few prototype Aethercraft cores. Tagged by project, ready for assembly.
+[2026-08-24T23:51:04.191Z] [world] You could walk this stretch with your eyes shut, and nearly do.
+[2026-08-24T23:51:04.191Z] [world] Paths: south to Plan Floor · east to Smithy · west to Drafting. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:51:04.192Z] [world] You think back to the stairwell from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-08-24T23:51:04.192Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:51:04.192Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:51:04.403Z] [debug] persist sizes(KB): total=136 player=19 wm=31[rooms=9 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=84 scene=1
+[2026-08-24T23:51:13.968Z] [debug] ui: tap "↓ ✓ PLAN FLOOR"
+[2026-08-24T23:51:14.015Z] [player] go south
+[2026-08-24T23:51:14.016Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1
+[2026-08-24T23:51:14.017Z] [world] You head on to the Plan Floor.
+[2026-08-24T23:51:14.021Z] [debug] scene: loc=builders_survey_camp hub=outpost_central arrival=n opening=n passing=n
+[2026-08-24T23:51:14.029Z] [world] Stone Builders' Workshop — The Plan Floor. A workshop floor of laid blueprints and stacked stone. The center stone has the Buried Cities' load-bearing tunnels chalked across it in three layers.
+[2026-08-24T23:51:14.029Z] [world] Whatever was making the noise last time has stopped.
+[2026-08-24T23:51:14.030Z] [world] Paths: north to Materials · south to Threshold · east to Forge · west to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:51:14.030Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:51:14.030Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:51:14.038Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:51:14.038Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:51:17.355Z] [debug] ui: tap "← BENCH"
+[2026-08-24T23:51:17.396Z] [player] go west
+[2026-08-24T23:51:17.397Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:51:17.398Z] [world] You head on to the Bench.
+[2026-08-24T23:51:17.399Z] [debug] scene: loc=builders_survey_camp hub=outpost_messhall arrival=n opening=n passing=n
+[2026-08-24T23:51:17.441Z] [debug] spawn: gear=[Rusted Blade, Aetheric Spark] window=10 roster=new
+[2026-08-24T23:51:17.443Z] [world] Stone Builders' Workshop — The Mess Bench. A workshop break-room with iron-leg tables and tin plates. Halem feeds whoever can hold a tool; the food is hot, plenty, and gone in an hour.
+[2026-08-24T23:51:17.443Z] [world] Paths: south to Plan Room · east to Plan Floor · west to Crew. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:51:17.443Z] [world] Halem the Trader nods once. "Verbal. Come look — a few things moved since you were last through."
+[2026-08-24T23:51:18.670Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:51:20.628Z] [world] You brace a foot and the Aetheric Spark gives.
+[2026-08-24T23:51:20.629Z] [reward] ✦ Aetheric Spark (Common).
+[2026-08-24T23:51:20.660Z] [world] One good tug and the Rusted Blade is out.
+[2026-08-24T23:51:20.660Z] [reward] ✦ Rusted Blade (Common).
+[2026-08-24T23:51:21.570Z] [reward] ✦ Found Entry 5 — Aetheric Rot — The Greedy Reclaimer. (open Contracts → Collectibles to read)
+[2026-08-24T23:51:21.584Z] [reward] ✦ Found Fourth Tablet — the toy — The Tunneler. (open Contracts → Collectibles to read)
+[2026-08-24T23:51:21.585Z] [reward] ✦ Found Entry 6 — the Teeth — The Greedy Reclaimer. (open Contracts → Collectibles to read)
+[2026-08-24T23:51:21.586Z] [world] You salvage the firepit. The take is small but real.
+[2026-08-24T23:51:21.586Z] [world] You strip the pot carefully. Something usable comes free in your hand.
+[2026-08-24T23:51:21.587Z] [world] The rusted royal vault pedestal gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-08-24T23:51:21.587Z] [world] You crack the shelf open. A page slides out — paper somehow dry, ink somehow still legible.
+[2026-08-24T23:51:21.588Z] [world] You salvage the stripped maintenance panel. The take is small but real.
+[2026-08-24T23:51:21.588Z] [world] Behind the tilting grand spire capacitor, where the floods didn't reach: a single page, in a hand you haven't read before.
+[2026-08-24T23:51:21.589Z] [world] You break the weathered forgotten order reliquary down. Among the pieces, a fragment of someone's writing — held against the world by stubbornness alone.
+[2026-08-24T23:51:21.589Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:51:21.590Z] [reward]     • Mud Fragment (Common)
+[2026-08-24T23:51:21.590Z] [reward]     • Scrap Metal x6 (Common)
+[2026-08-24T23:51:21.590Z] [reward]     • Split Slate Piece (Common)
+[2026-08-24T23:51:22.100Z] [debug] persist sizes(KB): total=138 player=20 wm=32[rooms=10 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=84 scene=2
+[2026-08-24T23:51:23.503Z] [debug] ui: tap "← CREW"
+[2026-08-24T23:51:23.549Z] [player] go west
+[2026-08-24T23:51:23.549Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:51:23.550Z] [world] You head on to the Crew.
+[2026-08-24T23:51:23.551Z] [debug] scene: loc=builders_survey_camp hub=outpost_quarters arrival=n opening=n passing=n
+[2026-08-24T23:51:23.559Z] [debug] spawn: gear=[Forgotten Leggings, Bone Shiv (Stealth)] window=10 roster=new
+[2026-08-24T23:51:23.561Z] [world] Stone Builders' Workshop — The Crew Bunks. Sturdy bunks with tool-racks at the foot of each. Sawdust on the floor. The Builders sleep when the day's set work is mortared.
+[2026-08-24T23:51:23.562Z] [world] Paths: east to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:51:23.571Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:51:23.571Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:51:24.933Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:51:26.185Z] [world] The Bone Shiv (Stealth) leaves a shape behind it in the mud, filling slowly.
+[2026-08-24T23:51:26.185Z] [reward] ✦ Bone Shiv (Stealth) (Common).
+[2026-08-24T23:51:26.201Z] [world] Where the Forgotten Leggings was, the ground is a shade darker.
+[2026-08-24T23:51:26.202Z] [reward] ✦ Forgotten Leggings (Common).
+[2026-08-24T23:51:27.127Z] [world] You salvage the curtain. The take is small but real.
+[2026-08-24T23:51:27.127Z] [world] You salvage the half-buried maintenance tunnel ladder. The take is small but real.
+[2026-08-24T23:51:27.128Z] [world] You strip the lantern carefully. Something usable comes free in your hand.
+[2026-08-24T23:51:27.128Z] [world] You salvage the mud-glazed royal display case. The take is small but real.
+[2026-08-24T23:51:27.129Z] [world] The pack gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-08-24T23:51:27.129Z] [world] You break the shattered forgotten order reliquary apart. Among the pieces, something worth keeping.
+[2026-08-24T23:51:27.130Z] [world] You work the shelf over. A part of it comes loose, intact.
+[2026-08-24T23:51:27.130Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:51:27.131Z] [reward]     • Cloth Scrap (Common)
+[2026-08-24T23:51:27.131Z] [reward]     • Smooth Stone x2 (Common)
+[2026-08-24T23:51:27.131Z] [reward]     • Aether Dust x3 (Common)
+[2026-08-24T23:51:27.132Z] [reward]     • Dried Tendon Coil (Common)
+[2026-08-24T23:51:27.132Z] [reward]     • Worn Tartarian Coin x2 (Common)
+[2026-08-24T23:51:27.132Z] [reward]     • Aetheric Shard (Uncommon)
+[2026-08-24T23:51:29.103Z] [debug] ui: tap "→ ✓ BENCH"
+[2026-08-24T23:51:29.147Z] [player] go east
+[2026-08-24T23:51:29.148Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:51:29.149Z] [world] You head on to the Bench.
+[2026-08-24T23:51:29.150Z] [debug] scene: loc=builders_survey_camp hub=outpost_messhall arrival=n opening=n passing=n
+[2026-08-24T23:51:29.194Z] [world] Stone Builders' Workshop — The Mess Bench. A workshop break-room with iron-leg tables and tin plates. Halem feeds whoever can hold a tool; the food is hot, plenty, and gone in an hour.
+[2026-08-24T23:51:29.194Z] [world] Nothing here has bothered to change on your account.
+[2026-08-24T23:51:29.195Z] [world] Paths: south to Plan Room · east to Plan Floor · west to Crew. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:51:29.195Z] [world] Halem the Trader sets down what they're holding. "Didn't expect you today, Verbal."
+[2026-08-24T23:51:29.195Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:51:29.195Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:51:32.219Z] [debug] ui: tap "↓ PLAN ROOM"
+[2026-08-24T23:51:32.272Z] [player] go south
+[2026-08-24T23:51:32.273Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:51:32.274Z] [world] You head on to the Plan Room.
+[2026-08-24T23:51:32.274Z] [debug] scene: loc=builders_survey_camp hub=outpost_chapel arrival=n opening=n passing=n
+[2026-08-24T23:51:32.279Z] [debug] spawn: gear=[Stone-Warden's Footwraps, Bone Sling, Echoing Steps Boots] window=10 roster=new
+[2026-08-24T23:51:32.281Z] [world] Stone Builders' Workshop — The Plan Room. A room with one drafting table and a single Aether-lamp. The Builders sit here when a structural problem refuses to yield on the workshop floor.
+[2026-08-24T23:51:32.281Z] [world] Paths: north to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:51:32.289Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:51:32.289Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:51:33.365Z] [debug] ui: tap "↑ ✓ BENCH"
+[2026-08-24T23:51:33.390Z] [player] go north
+[2026-08-24T23:51:33.390Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:51:33.391Z] [world] You head on to the Bench.
+[2026-08-24T23:51:33.391Z] [debug] scene: loc=builders_survey_camp hub=outpost_messhall arrival=n opening=n passing=n
+[2026-08-24T23:51:33.427Z] [world] Stone Builders' Workshop — The Mess Bench. A workshop break-room with iron-leg tables and tin plates. Halem feeds whoever can hold a tool; the food is hot, plenty, and gone in an hour.
+[2026-08-24T23:51:33.427Z] [world] Same silt, same lean, same everything.
+[2026-08-24T23:51:33.427Z] [world] Paths: south to Plan Room · east to Plan Floor · west to Crew. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:51:33.428Z] [world] Halem the Trader sets down what they're holding. "Didn't expect you today, Verbal."
+[2026-08-24T23:51:33.428Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:51:33.428Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:51:33.542Z] [debug] persist sizes(KB): total=138 player=20 wm=32[rooms=10 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=84 scene=2
+[2026-08-24T23:51:35.069Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:51:36.481Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #2).
+[2026-08-24T23:51:36.591Z] [world] Tucked inside the bench: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-08-24T23:51:36.591Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:51:36.591Z] [reward]     • Salt-Cured Dowel (Common)
+[2026-08-24T23:51:43.151Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a035de-f1e7-7c82-b17e-0e3c57db80a5
+[2026-08-24T23:51:43.151Z] [debug] ota: Checking…
+[2026-08-24T23:51:50.253Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-24T23:51:50.956Z] [debug] ota: Saving progress…
+[2026-08-24T23:51:51.010Z] [debug] ota: Restarting to apply…
+[2026-08-24T23:51:55.456Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a03601-bbaa-7063-87e8-949212604775
+[2026-08-24T23:51:55.456Z] [debug] ota: Checking…
+[2026-08-24T23:51:56.177Z] [debug] ota: Already up to date
+[2026-08-24T23:51:56.178Z] [debug] ota: boot check result = noUpdate
+[2026-08-24T23:51:56.662Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-24T23:51:56.678Z] [debug] voice: bundled loading
+[2026-08-24T23:51:59.566Z] [debug] voice: bundled downloading
+[2026-08-24T23:52:04.167Z] [debug] voice: bundled loading
+[2026-08-24T23:52:09.260Z] [debug] voice: bundled ready
+[2026-08-24T23:52:10.053Z] [debug] OTA applied: 2026-08-24-1494-the-log-says-which-era → 2026-08-24-1495-finish-this-fight-first.
+[2026-08-24T23:52:10.053Z] [debug] OTA session start: 2026-08-24-1495-finish-this-fight-first.
+[2026-08-24T23:52:10.054Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-08-24T23:52:10.055Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Verbal. I kept watch while you were gone."
+[2026-08-24T23:52:10.519Z] [debug] ═══ SESSION 2026-08-24T23:52:10.516Z · build 2026-08-24-1495-finish-this-fight-first · updated from 2026-08-24-1494-the-log-says-which-era · previous entry moments earlier ═══
+[2026-08-24T23:52:12.675Z] [debug] voice⏱ gap 3379ms (wait 0ms + synth 3376ms, live) "Choose your character."
+
+=== END LOG · 179705 CHARS ===
+
+Tartaria Realms
+
+Device
+  Name: iPhone
+  Platform: ios 18.7.9
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 414×896 / screen 414×896 @ 2x density
+  Captured at: 2026-08-24T23:52:21.475Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 33
+  AAB: (build 33)
+  OTA: (2026-08-24-1495-finish-this-fight-first)
+  Boot stage: tts:done
+
+ML runtime health
+  Status: auto-disabled after 3 crashes (template narration in use)
+  Crash count: 3
+  Last init attempt: 2026-08-24T23:48:20.118Z
+  Last init success: 2026-08-23T17:58:47.877Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+Crash ledger
+  No crashes recorded.
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle

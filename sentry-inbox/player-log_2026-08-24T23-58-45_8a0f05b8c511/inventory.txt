@@ -1,0 +1,208 @@
+=== TARTARIA INVENTORY · 7525 CHARS · BEGIN ===
+Inventory (Verbal)
+  HP: 45/45  Stamina: 12.5/17  TC: 259  Corruption: 0
+  Pack: 71 distinct rows / 286 total
+
+Weapons (16)
+  Aetheric Spark (1d6 aetheric, dur 14/14, [runecaster,rune_power,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Spark (1d6 aetheric, dur 27/27, [runecaster,rune_power,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bolt-Caster (Uncommon, 2d6 piercing, dur 35/38, equipped:off, [weapon,ranged,bolt-caster,firearm])
+    actions: equip:main, unequip:off, use, repair
+  Bolt-Caster (Uncommon, 2d6 piercing, dur 21/21, [weapon,ranged,bolt-caster,firearm])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Club (1d6 bludgeoning, dur 34/34, [weapon,melee,single_handed,hammer,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 2/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 2/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Shiv (Stealth) (1d4 piercing, dur 24/24, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Sling (1d4 bludgeoning, dur 24/24, [weapon,ranged,thrown,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Claymore (1d8 slashing, dur 39/39, [weapon,melee,two_handed,blade,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Heater Shield (1d4 bludgeoning, dur 39/39, [weapon,shield,dual_wield,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Shell (1d6 bludgeoning, dur 31/31, [runecaster,rune_power,mud_dwellers,ward])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Repeater Rifle (1d8 piercing, dur 41/41, [weapon,ranged,two_handed,firearm,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Rusted Blade (1d6 slashing, dur 37/37, [weapon,blade,melee])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Tartarian Spear (2d6 piercing, dur 21/27, equipped:main, [weapon,starter,spear,melee])
+    actions: equip:off, unequip:main, use(off), repair
+  Throwing Knife (1d4 piercing, dur 32/32, [throwable,weapon,ranged,knife,thrown])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (14)
+  Aether-Weaver's Mantle (dur 33/33, [armor,cloak,outer,aetherborn])
+    actions: equip:cloak, use, scrap, drop
+  Aetheric Helm of Insight (dur 7/9, equipped:head, [armor,head,cloth,helmet,aetherborn])
+    actions: unequip:head, repair
+  Aetheric Scout Greaves (dur 6/8, equipped:legs, [armor,legs,greaves,tartarian_giants])
+    actions: unequip:legs, repair
+  Arcane Sprinter's Legplates (dur 24/24, [armor,legs,greaves,aetherborn])
+    actions: equip:legs, use, scrap, drop
+  Architect's Field Jacket (dur 32/32, [armor,cloak,outer,tartarian_giants])
+    actions: equip:cloak, use, scrap, drop
+  Architect's Observer Visor (dur 14/14, [armor,head,cloth,helmet,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Echoing Steps Boots (dur 17/17, [armor,feet,boots,race_starter,reclaimer])
+    actions: equip:feet, use, scrap, drop
+  Forgotten Leggings (dur 28/28, [armor,legs,greaves,unknowing_masses])
+    actions: equip:legs, use, scrap, drop
+  Mud-Treader's Greaves (dur 16/16, [armor,legs,greaves,mud_dwellers])
+    actions: equip:legs, use, scrap, drop
+  Reclaimer's Salvage Vest (dur 3/20, equipped:chest, [armor,chest,plate,reclaimers,loot])
+    actions: unequip:chest, repair
+  Salvager's Trench Coat (dur 19/19, [armor,cloak,outer,reclaimers,stealth])
+    actions: equip:cloak, use, scrap, drop
+  Salvager's Worn Gloves (dur 18/18, [armor,hands,gauntlets,reclaimers])
+    actions: equip:hands, use, scrap, drop
+  Stone-Grip Gloves (dur 16/21, [armor,hands,gauntlets,mud_golems])
+    actions: equip:hands, use, scrap, repair, drop
+  Stone-Warden's Footwraps (Uncommon, dur 42/42, equipped:feet, [armor,feet,boots,mud_golems])
+    actions: unequip:feet
+
+Amulets & Rings (1)
+  Aetheric Locket (dur 30/30, [detection,amulet,relic])
+    actions: equip:amulet, use, scrap, drop
+
+Consumables (5)
+  Bioluminescent Fungus ×20 (Uncommon, [food,foraged,mushroom,light,aether])
+    actions: use(eat), drop
+  First Aid Kit ×10 (Uncommon, [healing,crafted,gift])
+    actions: use(apply), drop
+  Smoke-Cured Jerky Strip ×20 ([food,treat,dog_treat,gift])
+    actions: use(eat), drop
+  Trail Rations ×24 ([food])
+    actions: use(eat), drop
+  Water Bottle ×2 ([drink,water,container])
+    actions: use(drink), drop
+
+Tools (4)
+  Aetheric Circuit Repair Kit ([exploration,tool,common,race_starter,architectural_sentinel])
+    actions: use, scrap, drop
+  Aetheric Torch ×4 (dur 25/25, [light,relic])
+    actions: use, scrap, drop
+  Pulse Scanner ([exploration,relic,common,race_starter,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Reclaimer's Rope (dur 135/300, [climb,rope,fiber,exploration,tool])
+    actions: use, scrap, repair, drop
+
+Materials (29)
+  Aether Crystal ×13 ([aether,crystal,climb_top])
+    actions: drop
+  Aether Dust ×26 ([aether,dust,distillable])
+    actions: drop
+  Aether Residue ([aether])
+    actions: drop
+  Aether Wing ([organic,aether,loot])
+    actions: scrap, drop
+  Aetheric Shard ×5 (Uncommon, [aether,crystal,climb_top])
+    actions: drop
+  ◆ Aetheric Teeth (♥reserved, [trophy,loot,organic,aether])
+    actions: scrap, release-from-fusion, drop
+  Automaton Circuit ×11 ([automation,tech,scrap])
+    actions: drop
+  Bent Nail ×2 ([metal,junk,scrap])
+    actions: scrap, drop
+  ◆ Bone Bolt ×3 ([ammunition,bone,loot])
+    actions: save-for-fusion, drop
+  Cloth Scrap ×5 ([fiber,junk,scrap])
+    actions: scrap, drop
+  ◆ Dried Tendon Coil ([trophy,organic])
+    actions: scrap, save-for-fusion, drop
+  ◆ Flint Core Nodule ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  ◆ Flint-and-Twine Bundle ([trophy,fiber,stone])
+    actions: scrap, save-for-fusion, drop
+  ◆ Glass-Beaded Strap ×2 (Uncommon, [trophy,crystal,cloth])
+    actions: scrap, save-for-fusion, drop
+  ◆ Hollow Quill Sheaf ×2 (Uncommon, [organic])
+    actions: scrap, save-for-fusion, drop
+  ◆ Iron-Pinned Plank Shard (Uncommon, ♥reserved, [crystal,metal,wood])
+    actions: scrap, release-from-fusion, drop
+  ◆ Mud Cloth (Uncommon, [trophy,loot,cloth])
+    actions: scrap, save-for-fusion, drop
+  Mud Fragment ×9 ([mud])
+    actions: drop
+  ◆ Mud-Frosted Bead (♥reserved, [crystal])
+    actions: scrap, release-from-fusion, drop
+  ◆ Obsidian Chip (♥reserved, [stone])
+    actions: scrap, release-from-fusion, drop
+  Patched Cloth ×2 ([fiber,cloth,loot])
+    actions: drop
+  ◆ Salt-Cured Dowel ([trophy,wood])
+    actions: scrap, save-for-fusion, drop
+  Scrap Metal ×19 ([metal])
+    actions: drop
+  ◆ Slate-Weighted Netting (♥reserved, [fiber,stone])
+    actions: scrap, release-from-fusion, drop
+  Smooth Stone ×6 ([stone,junk,scrap])
+    actions: scrap, drop
+  ◆ Split Slate Piece ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  Stick ×4 ([wood,improvised,kindling])
+    actions: drop
+  ◆ Verdigris Bell Fragment ([trophy,metal])
+    actions: scrap, save-for-fusion, drop
+  Worn Tartarian Coin ×47 ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+Loot (2)
+  Architect Sigil ([sigil,conspiracy_architects,keepsake,loot])
+    actions: drop
+  ◆ Hardtack (Uncommon, [trophy,loot,improvised])
+    actions: scrap, save-for-fusion, drop
+=== END INVENTORY · 7525 CHARS ===
+
+Tartaria Realms · Verbal
+
+Device
+  Name: iPhone
+  Platform: ios 18.7.9
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 414×896 / screen 414×896 @ 2x density
+  Captured at: 2026-08-24T23:58:45.549Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 33
+  AAB: (build 33)
+  OTA: (2026-08-24-1495-finish-this-fight-first)
+  Boot stage: tts:done
+
+ML runtime health
+  Status: auto-disabled after 5 crashes (template narration in use)
+  Crash count: 5
+  Last init attempt: 2026-08-24T23:54:50.803Z
+  Last init success: 2026-08-23T17:58:47.877Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+Crash ledger
+  No crashes recorded.
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle

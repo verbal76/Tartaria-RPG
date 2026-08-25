@@ -1,0 +1,230 @@
+{
+  "id": "c1e48514953544608cf92bf659f599d5",
+  "groupID": "7690450029",
+  "eventID": "c1e48514953544608cf92bf659f599d5",
+  "projectID": "4511945117532160",
+  "size": 3932,
+  "entries": [
+    {
+      "data": {
+        "values": [
+          {
+            "type": "TypeError",
+            "value": "Network request failed",
+            "mechanism": {
+              "type": "onunhandledrejection",
+              "handled": true
+            },
+            "threadId": null,
+            "module": null,
+            "stacktrace": {
+              "frames": [
+                {
+                  "filename": "app:///main.jsbundle",
+                  "absPath": "app:///main.jsbundle",
+                  "module": "main",
+                  "package": null,
+                  "platform": null,
+                  "instructionAddr": null,
+                  "symbolAddr": null,
+                  "function": "anonymous",
+                  "rawFunction": null,
+                  "symbol": null,
+                  "context": [],
+                  "lineNo": 1,
+                  "colNo": 358555,
+                  "parentIndex": null,
+                  "sampleCount": null,
+                  "inApp": true,
+                  "trust": null,
+                  "errors": null,
+                  "lock": null,
+                  "sourceLink": null,
+                  "vars": null
+                }
+              ],
+              "framesOmitted": null,
+              "registers": null,
+              "hasSystemFrames": true
+            },
+            "rawStacktrace": {
+              "frames": [
+                {
+                  "filename": "app:///main.jsbundle",
+                  "absPath": "app:///main.jsbundle",
+                  "module": null,
+                  "package": null,
+                  "platform": null,
+                  "instructionAddr": null,
+                  "symbolAddr": null,
+                  "function": "anonymous",
+                  "rawFunction": null,
+                  "symbol": null,
+                  "context": [],
+                  "lineNo": 1,
+                  "colNo": 358555,
+                  "parentIndex": null,
+                  "sampleCount": null,
+                  "inApp": true,
+                  "trust": null,
+                  "errors": null,
+                  "lock": null,
+                  "sourceLink": null,
+                  "vars": null
+                }
+              ],
+              "framesOmitted": null,
+              "registers": null,
+              "hasSystemFrames": true
+            },
+            "rawValue": null,
+            "rawModule": null,
+            "rawType": null
+          }
+        ],
+        "hasSystemFrames": true,
+        "excOmitted": null
+      },
+      "type": "exception"
+    }
+  ],
+  "dist": null,
+  "message": "",
+  "title": "TypeError: Network request failed",
+  "location": "app:///main.jsbundle",
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": false,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "6b6fea2de15747f794cbdc248af6362b",
+      "span_id": "99e06e78e8a045b6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "error",
+  "metadata": {
+    "filename": "app:///main.jsbundle",
+    "function": "anonymous",
+    "in_app_frame_mix": "in-app-only",
+    "type": "TypeError",
+    "value": "Network request failed"
+  },
+  "tags": [
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "handled",
+      "value": "yes"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "exception"
+    },
+    {
+      "key": "level",
+      "value": "error"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "mechanism",
+      "value": "onunhandledrejection"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-24T23:52:08.158779Z",
+  "errors": [
+    {
+      "type": "js_no_source",
+      "message": "Source code was not found",
+      "data": {
+        "symbolicator_type": "missing_source",
+        "url": "app:///main.jsbundle"
+      }
+    }
+  ],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "anonymous(main)",
+  "dateCreated": "2026-08-24T23:52:03.590000Z",
+  "fingerprints": [
+    "355a0976fea288b97f9e47c4089b376f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}
