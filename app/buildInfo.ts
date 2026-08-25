@@ -24612,6 +24612,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // to armour with BLOCK + SHIELD BASH and their own iron-indigo inventory
 // section, and a THROW action for hand-held throwables.
 export const OTA_BUILD_ID = '2026-08-25-1502-the-swipe-is-the-selector';
+// golem catch-up 2026-08-25: markerless publish of OTA-1502 (approach picker retired in combat) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1501-the-load-failure-names-its-evidence';
 // golem catch-up 2026-08-25: markerless publish of OTA-1501 (qwen load evidence) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1500-the-tutorial-teaches-the-marks';
