@@ -93,7 +93,9 @@ const beat = (): string | null => {
 // The advance is 20ms — enough for every deferred setTimeout(0) the store uses,
 // far short of the 700ms glow pulse, so no animation frames ever run.
 const flush = async (): Promise<void> => {
-  await renderer.act(async () => { jest.advanceTimersByTime(20); await Promise.resolve(); });
+  // OTA-1497 — 20 → 460: sheet-originated submits defer 400ms behind the
+  // sheet's dismissal now, so a flush must carry the clock past them.
+  await renderer.act(async () => { jest.advanceTimersByTime(460); await Promise.resolve(); });
 };
 
 /** All text inside a node's subtree, joined — how a thumb identifies a row. */

@@ -70,7 +70,9 @@ const beat = (): string | null => {
 };
 
 /** Let the deferred `maybeAdvanceTutorial` inside equipItem run. */
-const flush = async (): Promise<void> => { await new Promise((r) => setTimeout(r, 0)); };
+// OTA-1497 — sheet submits now settle for 400ms before running (the iPhone
+// modal-wedge fix), so a flush that outruns them reads the world too early.
+const flush = async (): Promise<void> => { await new Promise((r) => setTimeout(r, 450)); };
 
 /** Mount the real ExplorationScreen, open the picker, and press the vest row.
  *  ⚠ Two presses and no store calls: the tutorial's claim is "one tap in the

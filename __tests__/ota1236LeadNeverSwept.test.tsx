@@ -261,7 +261,10 @@ describe('OTA-1236 — RENDERED: the lead is last, and no button touches it', ()
     expect(handler).toContain('onInvestigate(noun)');
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     expect(screen).toContain('onInvestigate={(noun) => {');
-    expect(screen).toContain('submit(`investigate ${noun}`)');
+    // OTA-1497 — the lead tap still INVESTIGATES, now via the sheet-settle
+    // deferral (the iPhone freeze: its story-thread popup presented into the
+    // closing sheet and wedged the window).
+    expect(screen).toContain('submitAfterSheetSettles(`investigate ${noun}`)');
   });
 });
 
@@ -364,7 +367,9 @@ describe('OTA-1236 — INVESTIGATE ALL runs the owner’s order, and stops at a 
     const take = block.slice(block.indexOf('onTake={'), block.indexOf('onTake={') + 400);
     expect(take).toContain("tutBeat === 'cudgel'");
     expect(take).toContain('setTakeOpen(false)');
-    const salv = block.slice(block.indexOf('onSalvage={'), block.indexOf('onSalvage={') + 300);
+    // OTA-1497 widened this window: the handler grew a documented deferral
+    // block above the tutBeat branch, pushing it past the old 300 chars.
+    const salv = block.slice(block.indexOf('onSalvage={'), block.indexOf('onSalvage={') + 900);
     expect(salv).toContain("tutBeat === 'scrap'");
   });
 

@@ -158,7 +158,10 @@ describe('OTA-1251 — the tap takes AND wears', () => {
     expect(i).toBeGreaterThan(-1);
     const block = blockAt(screen, "if (tutBeat === 'armor' && /vest|warden/i.test(noun)) {");
     expect(block).toContain('setTakeOpen(false);');
-    expect(block).toContain('submit(`take ${noun}`);');
+    // OTA-1497 — the submit now rides submitAfterSheetSettles so the popup it
+    // could raise never presents into the closing sheet; the equip check rides
+    // the same deferral's callback. One tap, same outcome, settled window.
+    expect(block).toContain('submitAfterSheetSettles(`take ${noun}`, () => {');
     expect(block).toContain(`equipItem("Mud-Warden's Vest", 'chest')`);
     // ...and equipItem is still what advances the beat, from its own top, so a
     // player who equips from the pack instead is not punished for it.

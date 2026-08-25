@@ -124,6 +124,11 @@ function timeOfDayTint(hours: number): string {
   return '#0e0b08';                       // evening — dusty rust
 }
 
+// ⚠ OTA-1497 — how long a sheet's native dismissal gets before a deferred
+// submit runs. The RN <Modal> fade is ~300ms on iOS; 400 clears it with margin
+// without reading as lag (the tap still lands its feed line right after).
+const SHEET_SETTLE_MS = 400;
+
 export function ExplorationScreen() {
   const player = useGameStore((s) => s.player);
   const gameLog = useGameStore((s) => s.gameLog);
@@ -135,6 +140,26 @@ export function ExplorationScreen() {
   const partialArbiterText = useGameStore((s) => s.partialArbiterText);
   const isGenerating = useGameStore((s) => s.isGenerating);
   const submit = useGameStore((s) => s.submitPlayerAction);
+  // ⚠⚠ OTA-1497 — A SHEET FINISHES CLOSING BEFORE ITS ACTION CAN RAISE A POPUP.
+  //
+  // THE FOUR iPHONE FREEZES (sentry-inbox/player-log_2026-08-25T02-07-26): the
+  // player tapped a marked lead ("bench") inside the take/salvage sheet. The
+  // sheet's handler did `setTakeOpen(false); submit('investigate bench')` in one
+  // tick — the sheet's native <Modal> began its ~300ms dismissal while the
+  // submit synchronously set pendingHookContinue, flipping HookContinueModal
+  // visible in the SAME render pass. On iOS, presenting one modal while another
+  // is mid-dismissal wedges the window: the log shows the ★ STORY THREAD line
+  // landing and then fifty seconds of appstate churn without one ui: tap —
+  // JS alive, screen dead, force-close. Twice in a row, same three log lines.
+  //
+  // ⚠ THE FIX IS WHEN, NOT WHAT: any submit that leaves a closing sheet waits
+  // out the dismissal before it runs, so a popup it raises presents against a
+  // settled window. Feed-chip and typed submits are untouched — no sheet is
+  // closing under those. Modals raised over a sheet that STAYS open are fine
+  // (present-over-presented works); it is present-during-dismiss that wedges.
+  const submitAfterSheetSettles = (text: string, after?: () => void): void => {
+    setTimeout(() => { submit(text); after?.(); }, SHEET_SETTLE_MS);
+  };
   const setInputModalOpen = useGameStore((s) => s.setInputModalOpen);
   const setScreen = useGameStore((s) => s.setScreen);
   // OTA-1059 — the Phase 2 talk exchange, reachable by tap rather than only by typing.
@@ -2384,7 +2409,9 @@ export function ExplorationScreen() {
           // 'investigate' intent, so this is cosmetic (log lines
           // read "investigate the trap" now) — no engine behavior
           // change.
-          submit(`investigate ${target}`);
+          // OTA-1497 — deferred: this is the verb that raises the story-thread
+          // popup, and the sheet above is still dismissing.
+          submitAfterSheetSettles(`investigate ${target}`);
         }}
         // ⚠ OTA-1183 — INVESTIGATE ALL. Deliberately loops the SAME submit path a player
         // tapping each chip would take, rather than adding a bulk resolver.
@@ -2457,7 +2484,11 @@ export function ExplorationScreen() {
             if (i < ordered.length) setTimeout(step, INVESTIGATE_ALL_GAP_MS);
             else endSweep();
           };
-          step();
+          // OTA-1497 — the sweep's FIRST submit raced the sheet's dismissal
+          // exactly like a manual pick; it waits out the close like one too.
+          // The abort checks run inside step(), so a player acting during the
+          // wait still cancels the sweep before its first line.
+          setTimeout(step, SHEET_SETTLE_MS);
         }}
         leadNouns={leadNouns}
         onCancel={() => setSearchOpen(false)}
@@ -2516,7 +2547,7 @@ export function ExplorationScreen() {
           Keyboard.dismiss();
           if (tutBeat === 'cudgel' && noun.toLowerCase() === 'cudgel') {
             setTakeOpen(false);
-            submit('take cudgel');
+            submitAfterSheetSettles('take cudgel');
             return;
           }
           // ⚠⚠ OTA-1251 — THE ARMOR BEAT IS ONE TAP, IN THIS CARD. Owner: *"why are
@@ -2529,14 +2560,17 @@ export function ExplorationScreen() {
           // player who had already taken it. The tap grants AND wears.
           if (tutBeat === 'armor' && /vest|warden/i.test(noun)) {
             setTakeOpen(false);
-            submit(`take ${noun}`);
             // ⚠ The grant is a synchronous `set`, so the vest is in the pack by the
-            // time this reads it — and it is checked rather than assumed, because
-            // `grantTutorialItem` refuses a second grant and a full pack refuses the
-            // first. equipItem advances the beat from its own top.
-            if ((useGameStore.getState().player?.inventory ?? []).some((i) => /vest/i.test(i.name))) {
-              useGameStore.getState().equipItem("Mud-Warden's Vest", 'chest');
-            }
+            // time the callback reads it — and it is checked rather than assumed,
+            // because `grantTutorialItem` refuses a second grant and a full pack
+            // refuses the first. equipItem advances the beat from its own top.
+            // OTA-1497 — the check rides the deferred submit so it still runs
+            // right after the grant, just on the far side of the dismissal.
+            submitAfterSheetSettles(`take ${noun}`, () => {
+              if ((useGameStore.getState().player?.inventory ?? []).some((i) => /vest/i.test(i.name))) {
+                useGameStore.getState().equipItem("Mud-Warden's Vest", 'chest');
+              }
+            });
             return;
           }
           // ⚠⚠ AND THE SAME RULE OUTSIDE THE TUTORIAL — the ★ is not a label you go
@@ -2549,10 +2583,17 @@ export function ExplorationScreen() {
         }}
         onSalvage={(noun) => {
           Keyboard.dismiss();
-          if (tutBeat === 'scrap') setTakeOpen(false);
           // Routed through the parser exactly as the old salvage picker did, so
           // the hook system and scene-noun matcher see the same input they always
           // have (OTA-117 made 'salvage' an investigate verb synonym for that).
+          // OTA-1497 — when the tutorial beat closes the sheet, the submit waits
+          // out the dismissal; the ordinary stays-open salvage is untouched
+          // (present-over-a-PRESENTED sheet does not wedge — only mid-dismiss).
+          if (tutBeat === 'scrap') {
+            setTakeOpen(false);
+            submitAfterSheetSettles(`salvage ${noun}`);
+            return;
+          }
           submit(`salvage ${noun}`);
         }}
         // ⚠⚠ OTA-1236 — the lead lane's single tap INVESTIGATES. It is the only
@@ -2566,7 +2607,10 @@ export function ExplorationScreen() {
         onInvestigate={(noun) => {
           Keyboard.dismiss();
           setTakeOpen(false);
-          submit(`investigate ${noun}`);
+          // OTA-1497 — THE FREEZE PATH, verbatim from the iPhone log: this tap is
+          // the one that "opens a story hook pop-up" (the comment above always
+          // said so), and it must not present that popup into a closing sheet.
+          submitAfterSheetSettles(`investigate ${noun}`);
         }}
         leadNouns={leadNouns}
         // ⚠⚠ OTA-1239 — NO STEALTH TOGGLE HERE ANY MORE. Owner, for the second
@@ -2621,7 +2665,8 @@ export function ExplorationScreen() {
           // USE STEALTH toggle (sneak-up opener) is retired; the pre-fight sneak
           // attack migrated to the in-combat STEALTH button's first action. In
           // combat this closes the gap and switches focus to the named enemy.
-          submit(`approach ${target}`);
+          // OTA-1497 — approach is hook-eligible; same closing-sheet rule.
+          submitAfterSheetSettles(`approach ${target}`);
         }}
         onCancel={() => setApproachOpen(false)}
       />
@@ -2663,7 +2708,8 @@ export function ExplorationScreen() {
             cleared={cleared}
             onSubmit={(target) => {
               setClimbOpen(false);
-              submit(`climb ${target}`);
+              // OTA-1497 — same closing-sheet rule.
+              submitAfterSheetSettles(`climb ${target}`);
             }}
             onCancel={() => setClimbOpen(false)}
           />
