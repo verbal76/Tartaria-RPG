@@ -171,6 +171,45 @@ export class ModelDownloader {
   }
 
   /**
+   * OTA-1501 — the facts the LOAD FAILED line needs, gathered where the file
+   * lives. `Failed to load the model` is llama.rn's one message for BOTH a
+   * GGUF llama.cpp cannot parse AND an allocation it cannot make, so the log
+   * line has to carry the discriminating evidence itself: the exact bytes on
+   * disk (full ≈398 MB = the file is whole, memory is the suspect; short =
+   * the cache is poisoned), whether the completion sentinel is standing, and
+   * how much disk is left (a full disk is the one way a download goes short).
+   * Best effort — every probe failure reports null rather than throwing,
+   * because this runs inside a failure path that must still fail cleanly.
+   */
+  async statQwenGguf(): Promise<{
+    sizeBytes: number | null;
+    sentinel: boolean;
+    freeDiskBytes: number | null;
+  }> {
+    let sizeBytes: number | null = null;
+    let sentinel = false;
+    let freeDiskBytes: number | null = null;
+    const root = FileSystem.documentDirectory;
+    if (root) {
+      const ggufPath = root + QWEN_CACHE_SUBDIR + QWEN_GGUF_FILE_NAME;
+      try {
+        const info = await FileSystem.getInfoAsync(ggufPath, { size: true });
+        if (info.exists) {
+          sizeBytes = (info as { size?: number }).size ?? null;
+        }
+      } catch { /* unknown stays null */ }
+      try {
+        const s = await FileSystem.getInfoAsync(ggufPath + '.complete');
+        sentinel = s.exists;
+      } catch { /* unknown reads as no sentinel */ }
+    }
+    try {
+      freeDiskBytes = await FileSystem.getFreeDiskStorageAsync();
+    } catch { /* unknown stays null */ }
+    return { sizeBytes, sentinel, freeDiskBytes };
+  }
+
+  /**
    * Ensures the Qwen GGUF is present on the device. Downloads from
    * HuggingFace on first run, caches under
    *   documentDirectory/tartaria-models/qwen/qwen2.5-0.5b-instruct-q4_k_m.gguf

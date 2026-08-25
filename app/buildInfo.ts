@@ -24588,7 +24588,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The block is OTA-1480's and the narration is OTA-1466's — unchanged; this
 // only raises it where a feed line mid-fight could not be seen.
 // 2026-08-24 — SIXTH GOLEM CATCH-UP: 1495 (the mid-fight summon popup).
-export const OTA_BUILD_ID = '2026-08-25-1500-the-tutorial-teaches-the-marks';
+// OTA-1501 — the Qwen load failure names its evidence. Since 2026-08-23 the
+// owner's iPhone fails every load with llama.rn's one-size message ("Failed
+// to load the model"), which cannot say whether llama.cpp rejected the FILE
+// (poisoned cache) or an ALLOCATION (memory). The crash receipts lean memory
+// — a ctx-open-done dying breath proves the GGUF loaded whole at least once,
+// and ctx-open deaths bracket the load window — but the RCA rule is no
+// guessing: this OTA changes no behavior and makes the LOAD FAILED line carry
+// the deciding facts (elapsed ms, bytes on disk vs ~398MB nominal, OTA-294
+// sentinel, free disk) so the next SEND LOG closes the case.
+export const OTA_BUILD_ID = '2026-08-25-1501-the-load-failure-names-its-evidence';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1500-the-tutorial-teaches-the-marks';
 // golem catch-up 2026-08-25: markerless publish of OTA-1500 (tutorial teaches the marks) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1499-star-means-bare-arrow-means-compared';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1498-the-chip-states-its-case';

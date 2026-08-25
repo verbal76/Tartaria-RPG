@@ -23,7 +23,11 @@ export interface QwenInitOptions {
   /** Override the on-device cache path (test hook). */
   modelPath?: string;
   /** Inject a custom downloader for tests. */
-  downloader?: { ensureQwenGguf(opts: { url?: string; onProgress?: (f: number) => void }): Promise<string> };
+  downloader?: {
+    ensureQwenGguf(opts: { url?: string; onProgress?: (f: number) => void }): Promise<string>;
+    /** OTA-1501 — optional so older test doubles keep working unchanged. */
+    statQwenGguf?(): Promise<{ sizeBytes: number | null; sentinel: boolean; freeDiskBytes: number | null }>;
+  };
   /** Inject a custom LlamaRuntime instance for tests. */
   runtime?: LlamaRuntime;
   /** Optional progress callback fired during download + load. */
@@ -73,6 +77,45 @@ export interface GenerateOptions {
 
 /** Label shown in About / debug surfaces. Not a registry id. */
 export const DEFAULT_QWEN_MODEL_ID = 'Qwen2.5-0.5B-Instruct (Q4_K_M GGUF)';
+
+/**
+ * OTA-1501 — renders the failure-evidence suffix appended to lastError.
+ * Exported for its unit tests; formatting lives in one place so the log
+ * line, the About screen and the bug-report header cannot drift apart.
+ * `downloader` null = the load did not come from the on-device cache
+ * (injected modelPath), so file facts would be about the wrong file and only
+ * timing is reported. `elapsedMs` null = the download stage failed, where a
+ * load duration does not exist. Never throws; a probe that fails simply
+ * leaves its fact out.
+ */
+export async function describeQwenLoadEvidence(
+  downloader: { statQwenGguf?(): Promise<{ sizeBytes: number | null; sentinel: boolean; freeDiskBytes: number | null }> } | null,
+  elapsedMs: number | null,
+): Promise<string> {
+  const facts: string[] = [];
+  if (elapsedMs !== null) facts.push(`after ${elapsedMs}ms`);
+  try {
+    const stat = downloader?.statQwenGguf ? await downloader.statQwenGguf() : null;
+    if (stat) {
+      if (stat.sizeBytes !== null) {
+        const mb = (stat.sizeBytes / (1024 * 1024)).toFixed(1);
+        facts.push(`gguf ${mb}MB on disk (~398MB nominal)`);
+      } else {
+        facts.push('gguf MISSING on disk');
+      }
+      facts.push(stat.sentinel ? 'sentinel ok' : 'NO SENTINEL');
+      if (stat.freeDiskBytes !== null) {
+        // A nearly-full disk is the fact this line exists for — below 1GB it
+        // reports MB so "0.0GB" can never hide a disk with no room to load.
+        const free = stat.freeDiskBytes;
+        facts.push(free < 1024 * 1024 * 1024
+          ? `disk free ${Math.round(free / (1024 * 1024))}MB`
+          : `disk free ${(free / (1024 * 1024 * 1024)).toFixed(1)}GB`);
+      }
+    }
+  } catch { /* evidence is best effort — the failure itself still reports */ }
+  return facts.length ? ` (${facts.join('; ')})` : '';
+}
 
 // ---------------------------------------------------------------------------
 // QwenGenerativeEngine
@@ -216,7 +259,9 @@ export class QwenGenerativeEngine {
       // wants ('idle'); don't overwrite it with 'failed'.
       if (this.lifecycleGen !== gen) return;
       this.status = 'failed';
-      this.lastError = err instanceof Error ? `GGUF download failed: ${err.message}` : String(err);
+      const base = err instanceof Error ? `GGUF download failed: ${err.message}` : String(err);
+      // OTA-1501 — a full disk is the one way a download reliably dies; say so.
+      this.lastError = base + (await describeQwenLoadEvidence(downloader, null));
       return;
     }
     if (this.lifecycleGen !== gen) { this.status = 'idle'; return; }
@@ -224,6 +269,11 @@ export class QwenGenerativeEngine {
     // ── 2) Load the model into a llama.cpp context ────────────────────────
     this.status = 'loading';
     onProgress?.('loading', 0);
+    // OTA-1501 — how long the native load ran before it failed. llama.rn's
+    // "Failed to load the model" cannot say whether llama.cpp rejected the
+    // file at the header (instant) or gave up on an allocation (seconds in);
+    // the elapsed time can.
+    const loadStartedAt = Date.now();
     try {
       const runtime = opts.runtime ?? new LlamaRuntime();
       await runtime.initialize({
@@ -254,7 +304,23 @@ export class QwenGenerativeEngine {
     } catch (err) {
       if (this.lifecycleGen !== gen) { this.status = 'idle'; this.runtime = null; return; }
       this.status = 'failed';
-      this.lastError = err instanceof Error ? `Load failed: ${err.message}` : String(err);
+      const base = err instanceof Error ? `Load failed: ${err.message}` : String(err);
+      // ⚠⚠ OTA-1501 — THE EVIDENCE RIDES THE ERROR. Since 2026-08-23 the
+      // owner's iPhone fails every load with the one-size-fits-all native
+      // message, and the crash receipts point both ways at once: a
+      // `ctx-open-done` dying breath proves the GGUF parsed and loaded whole
+      // at least once (so the file CAN be good), while `ctx-open` deaths and
+      // memory-warning storms say the load window is where the process gets
+      // hurt. This suffix — elapsed ms, exact bytes on disk vs the ~398 MB
+      // nominal, sentinel, free disk — makes the next SEND LOG decide it:
+      // short file → poisoned cache; full file + seconds-long failure →
+      // memory. It reaches the log via aiLifecycleSlice's LOAD FAILED line,
+      // the About screen, and the bug-report header, all of which already
+      // print lastError verbatim. Only stat the cache the load actually came
+      // from — an injected modelPath (tests, future bundles) says nothing
+      // about the cache.
+      this.lastError = base + (await describeQwenLoadEvidence(
+        opts.modelPath ? null : downloader, Date.now() - loadStartedAt));
       this.runtime = null;
     }
   }
