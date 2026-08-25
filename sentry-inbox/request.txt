@@ -1,1 +1,1 @@
-2026-08-26T00:00:00Z sync-5 final retry
+2026-08-26T00:10:00Z sync-6 with outcomes ledger

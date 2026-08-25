@@ -94,6 +94,31 @@ jobs:
                       print(f'{safe}/{name}: {len(blob)} bytes')
                   fetched.append(safe)
           print('fetched:', fetched or 'nothing new')
+
+          # ⚠⚠ 2026-08-25 — THE OUTCOMES LEDGER, because "sent" and "kept" are
+          # different facts. Tonight the owner's SEND LOG showed sent (the
+          # client got its acknowledgment) and the events never appeared in the
+          # project: Sentry accepts an envelope at the door and can still drop
+          # it server-side (quota, rate limit, spike protection, filters) —
+          # visible ONLY in the org outcome stats. Print accepted vs dropped by
+          # reason for the last 24h so a silent discard can never again read
+          # as "the device never sent it".
+          try:
+              import urllib.parse
+              q = urllib.parse.urlencode([
+                  ('field', 'sum(quantity)'), ('statsPeriod', '24h'),
+                  ('groupBy', 'outcome'), ('groupBy', 'reason'),
+                  ('groupBy', 'category'), ('interval', '24h'),
+              ])
+              stats = api(f'/organizations/{org}/stats_v2/?{q}')
+              print('── outcomes, last 24h (outcome / reason / category → count):')
+              for g in stats.get('groups', []):
+                  by = g.get('by', {})
+                  total = (g.get('totals', {}) or {}).get('sum(quantity)', 0)
+                  if total:
+                      print(f"  {by.get('outcome')} / {by.get('reason')} / {by.get('category')} → {total}")
+          except Exception as e:
+              print('outcomes query failed:', e)
           PYEOF
       - name: Commit the inbox
         run: |
