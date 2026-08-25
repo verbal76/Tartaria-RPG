@@ -24589,6 +24589,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // only raises it where a feed line mid-fight could not be seen.
 // 2026-08-24 — SIXTH GOLEM CATCH-UP: 1495 (the mid-fight summon popup).
 export const OTA_BUILD_ID = '2026-08-25-1500-the-tutorial-teaches-the-marks';
+// golem catch-up 2026-08-25: markerless publish of OTA-1500 (tutorial teaches the marks) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1499-star-means-bare-arrow-means-compared';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1498-the-chip-states-its-case';
 // golem catch-up 2026-08-25: markerless publish of OTA-1498+1499 (gear marks say why) to the golem channel.
