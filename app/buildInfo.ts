@@ -24590,6 +24590,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 2026-08-24 — SIXTH GOLEM CATCH-UP: 1495 (the mid-fight summon popup).
 export const OTA_BUILD_ID = '2026-08-25-1497-the-sheet-settles-first';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1496-room-between-the-thrones';
+// golem catch-up 2026-08-25: markerless publish of OTA-1497 (sheet-settle freeze fix) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1495-finish-this-fight-first';
 // golem catch-up 2026-08-25: markerless publish of OTA-1496 (capitals spread) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-24-1494-the-log-says-which-era';
