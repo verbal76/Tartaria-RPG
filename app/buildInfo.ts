@@ -24646,6 +24646,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // button, marked per crash so a loop cannot storm, silent on every player
 // device (the privacy page's "slim crash records only" stays true for them).
 export const OTA_BUILD_ID = '2026-08-26-1505-the-crash-brings-its-own-evidence';
+// golem catch-up 2026-08-26: markerless publish of OTA-1505 (auto-bundle on crash for owner/sasmooch devices) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1504-the-bundle-survives-the-kill';
 // golem catch-up 2026-08-26: markerless publish of OTA-1504 (durable send-log + last-sign-of-life dating) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1503-the-bullseye-is-the-truth';
