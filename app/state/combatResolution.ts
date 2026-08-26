@@ -1093,6 +1093,12 @@ export function sweepDeadEnemies(
         set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: keep } } : s));
       }
     }
+    // ⚠ OTA-1507 — however the sweep left the sights, the legacy band follows
+    // them: bodies were spliced and the target may have been re-pointed, so
+    // the compat `range` re-derives from whoever is actually on the card now.
+    set((s) => (s.currentScene && s.currentScene.enemies.length > 0
+      ? { currentScene: { ...s.currentScene, range: derivedSceneRange(s.currentScene) ?? s.currentScene.range } }
+      : s));
   }
   return false;
 }

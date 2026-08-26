@@ -24661,7 +24661,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // migrate lazily — positions synthesize deterministically from the shared band
 // they stored. STILL COMING: enemy reach classes + threat dot (step 3),
 // shields/BLOCK/SHIELD BASH + iron-indigo section (step 4), THROW (step 5).
-export const OTA_BUILD_ID = '2026-08-26-1506-the-field-goes-live';
+// ⚠⚠⚠ OTA-1507 — THE BAND FOLLOWS THE SIGHTS. From the owner's FIRST live
+// 1506 log (01:46, the two-raider fight): the acid flask dropped Raider 1 at
+// arm's reach, the sights auto-promoted to Raider 2 standing at HIS mid ring,
+// and the legacy `scene.range` kept the corpse's 'close' — the attack gate
+// told the truth (refused at mid) while the parser debug and legacy readers
+// said 'close'. One kill, two answers. Every sights-mover now re-derives the
+// compat band from whoever is actually on the card: the kill promotion in
+// resolveEnemyDefeat, the KO promotion, and the DOT/AoE sweep (the swipe
+// already did, since 1506). Proven live-store: corpse close + survivor far →
+// sweep leaves range 'far'.
+export const OTA_BUILD_ID = '2026-08-26-1507-the-band-follows-the-sights';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1506-the-field-goes-live';
 // golem catch-up 2026-08-26: markerless publish of OTA-1506 (per-enemy bullseye combat) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1505-the-crash-brings-its-own-evidence';
 // golem catch-up 2026-08-26: markerless publish of OTA-1505 (auto-bundle on crash for owner/sasmooch devices) to the golem channel.

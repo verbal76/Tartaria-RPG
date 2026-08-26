@@ -23237,7 +23237,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // Others still stand — move the sights OFF the sleeping body so
               // the next swing meets someone actually fighting back.
               const nextUp = standing[0]!;
-              set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: nextUp.i2 } } : s));
+              // ⚠ OTA-1507 — same correction as the kill path: the sights
+              // moved, so the legacy band re-derives to the NEW target's ring.
+              set((s) => {
+                if (!s.currentScene) return s;
+                const moved = { ...s.currentScene, activeEnemyIdx: nextUp.i2 };
+                return { currentScene: { ...moved, range: derivedSceneRange(moved) ?? s.currentScene.range } };
+              });
               get().appendLog('combat', `${enemy.name} is out of it. ${nextUp.e2.name} now in your sights.`);
             }
           }
@@ -23912,7 +23918,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // free one handed to whoever slid into the vacated slot.
           enemyStaggered: dropAt(currentScene.enemyStaggered),
           activeEnemyIdx: nextActiveIdx,
-          range: stillFighting ? currentScene.range : null,
+          // ⚠ OTA-1507 — RE-DERIVED FOR THE PROMOTED TARGET, from the owner's
+          // first live 1506 log: the acid flask dropped Raider 1 (close), the
+          // sights moved to Raider 2 (standing at HIS mid ring), and this line
+          // carried the corpse's 'close' forward — the attack gate then told
+          // the truth ('mid') while the parser debug and every legacy reader
+          // still said 'close'. One kill, two answers. The band now follows
+          // the sights the moment they move.
+          range: stillFighting
+            ? (derivedSceneRange({ ...currentScene, enemies: remainingEnemies, activeEnemyIdx: nextActiveIdx })
+              ?? currentScene.range)
+            : null,
           hooks: currentScene.hooks ?? [],
         },
         worldMemory: recordEnemyDefeat(s.worldMemory ?? worldMemory, enemy.name),
