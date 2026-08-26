@@ -24834,6 +24834,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // should, because acid eats the ARMOUR and the answer to a chewed plate is
 // the repair bench, not a swallow.
 export const OTA_BUILD_ID = '2026-08-26-1513-the-other-side-of-the-vial';
+// golem catch-up 2026-08-26: markerless publish of OTA-1513 (enemy weapon coatings, hit location, inflict/cure symmetry) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1512-the-worn-piece-is-readable';
 // golem catch-up 2026-08-26: markerless publish of OTA-1512 (forged gear readable + threat dot visible + send-attempt guard + investigate pacing + the melee-main/ranged-off hand rule) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1511-the-spear-leaves-your-hand';
