@@ -96,9 +96,15 @@ describe('OTA-1277 (2b) — the hands cover two ranges, then maximise damage', (
     expect(got?.slot).not.toBe('main');
   });
 
-  it('⚠ the source states the damage rule the owner gave', () => {
+  it('⚠ the source states the HAND rule the owner gave (OTA-1512 superseded the coverage puzzle)', () => {
+    // ⚠⚠ OTA-1512 — his newer instruction, verbatim: "always melee in main and
+    // ranged in off, for auto equips." That replaced OTA-1277's band-coverage
+    // derivation, so this pin follows the live rule instead of quoting a
+    // comment the code no longer implements. Damage still decides WHETHER to
+    // displace within a hand; it no longer decides WHICH hand.
     const s = src('app', 'engine', 'gatherSort.ts');
-    expect(s).toContain('1d6 bolt');           // his exact example, kept verbatim
-    expect(s).toContain('averageDamage(weapon.damageDice) > averageDamage(offWeapon.damageDice)');
+    expect(s).toContain('melee in main and ranged in off');
+    expect(s).toContain("shootsRatherThanSwings(newCls) ? 'off' : 'main'");
+    expect(s).toContain('averageDamage(weapon.damageDice) > averageDamage(occupant.damageDice)');
   });
 });

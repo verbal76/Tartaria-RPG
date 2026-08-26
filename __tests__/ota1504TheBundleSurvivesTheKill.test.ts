@@ -225,7 +225,18 @@ describe('OTA-1504 — the boot retry', () => {
     expect(at).toBeGreaterThan(-1);
     const gate = APP.lastIndexOf('if (!(await cr.crashNoticeNeeded()))', at);
     expect(gate).toBeGreaterThan(-1);
-    expect(at - gate).toBeLessThan(700); // the call sits inside that gated block
+    // ⚠ OTA-1512 — WAS a byte-distance check (`at - gate < 700`), which is the
+    // brittle shape this repo has a ratchet against: adding the OTA-resolved
+    // wait between the gate and the call broke it while the CLAIM — the retry
+    // runs inside the told-first block — stayed true the whole time. Assert the
+    // structure instead: nothing between them re-opens or closes that block.
+    const GATE = 'if (!(await cr.crashNoticeNeeded()))';
+    const between = APP.slice(gate + GATE.length, at);
+    expect(between).not.toContain('crashNoticeNeeded');   // no second gate opened
+    expect(between).not.toMatch(/\n {6}\}/);              // and this one never closed
+    // ⚠⚠ OTA-1512 — and it now waits on the OTA verdict as well, so an attempt
+    // is never spent on a process that is about to reloadAsync.
+    expect(between).toContain('otaBootResolved');
     // And the outcome line lands in the log, where every send-log line lives.
     expect(APP).toContain("if (line) useGameStore.getState().appendLog('debug', line);");
   });

@@ -193,14 +193,18 @@ describe('OTA-1263 (D) — INVESTIGATE ALL resolves one at a time', () => {
   });
 
   it('⚠ the gap is in the range the owner asked for', () => {
-    // "maybe 2+3 seconds". Low end, because a six-noun sweep must stay readable
-    // without becoming a stall.
+    // Originally "maybe 2+3 seconds", taken at the low end so a six-noun sweep
+    // stayed readable without becoming a stall. OTA-1512 took a second off it
+    // on his revised word — see the band below.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
     const m = /const INVESTIGATE_ALL_GAP_MS = ([\d_]+);/.exec(screen);
     expect(m).not.toBeNull();
     const ms = Number(m![1]!.replace(/_/g, ''));
-    expect(ms).toBeGreaterThanOrEqual(2_000);
-    expect(ms).toBeLessThanOrEqual(3_000);
+    // ⚠ OTA-1512 — the owner took a second off after living with it ("remove 1
+    // second from in between investigations"), so the band moved down with his
+    // instruction: 2.2s → 1.2s. Still a real beat, not an instant dump.
+    expect(ms).toBeGreaterThanOrEqual(1_000);
+    expect(ms).toBeLessThanOrEqual(2_000);
   });
 
   it('⚠⚠ BOTH aborts survive, and they matter MORE now the sweep is live for seconds', () => {

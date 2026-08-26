@@ -65,13 +65,15 @@ describe('OTA-1500 — the chip wears the picker\'s marks', () => {
     expect(feedActionChipLabel(chip)).toMatch(/^▲ Take & wield Cudgel — 1d8 over your 1d6$/);
   });
 
-  it('⚠ the javelin is a ▲ into MAIN — the coverage rule, mark and clause agreeing', () => {
-    // upgradeEquipSlot (OTA-1277) sends a ranged piece into the main hand of an
-    // all-melee pair; the destination is occupied, so the honest mark is ▲ and
-    // the clause names the coverage rule that placed it.
+  it('⚠ the javelin is a ★ into the OFF hand — mark and clause still agreeing', () => {
+    // ⚠ OTA-1512 — the owner named the hands ("always melee in main and ranged
+    // in off"), so a ranged piece is an off-hand piece. That hand is bare here,
+    // so the destination is empty and the honest mark is the bare-slot ★ with
+    // the bare-slot clause. The CLAIM this test makes is unchanged and is the
+    // one that matters: the mark and the clause describe the same destination.
     const chip = pickFeedActionChip(armed('Cudgel'), rows(['Bone Javelin', false]))!;
-    expect(chip.mark).toBe('▲');
-    expect(chip.reason).toBe('covers a range your hands lack');
+    expect(chip.mark).toBe('★');
+    expect(chip.reason).toBe('your off hand is free');
   });
 });
 

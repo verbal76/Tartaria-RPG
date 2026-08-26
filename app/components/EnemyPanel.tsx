@@ -314,6 +314,17 @@ function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { weak: s
   if (view.rangeLabel) {
     lines.push(`Range: ${view.rangeLabel}${(view.inRange ?? true) ? '' : ' (out of range)'}`);
   }
+  // ⚠⚠ OTA-1512 — THE POPUP ANSWERS IT TOO. The owner tapped the portrait
+  // precisely because the dot was clipped, and found the popup had never
+  // carried the threat at all — so both routes to the same question were
+  // dead. This body is plain text, so the dot becomes its glyph and its
+  // sentence: the colour is the same verdict (enemyThreatAt), spelled out.
+  if (view.threat) {
+    const says = view.threat === 'red' ? '● RED — it can hit you where you stand'
+      : view.threat === 'yellow' ? '● YELLOW — it can reach you, but only weakly'
+        : '● GREEN — it cannot touch you from there';
+    lines.push(`Threat: ${says}`);
+  }
   lines.push('');
   lines.push(`HP ${view.currentHp}/${e.hp}     AC ${ac}`);
   // OTA-1139 (audit) — a boss's real per-round output, not the notation third of it.
@@ -390,6 +401,25 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
     >
       <View style={styles.head}>
         <View style={styles.headLeft}>
+          {/* ⚠⚠⚠ OTA-1512 — THE DOT MOVED TO THE TOP, because at the bottom it
+              could not be seen at all. Owner: *"we can no longer scroll up to
+              see the bottom of the enemy portrait, and the colored range dot
+              isn't in the popup when we tap the enemy portrait, so i cannot
+              see it either way."* OTA-1508 pinned it to the card's
+              bottom-right with `position:'absolute'`, which put the one thing
+              that answers "can it hit me?" on the single edge the corner
+              panel clips. A signal you have to scroll to is not a signal.
+              Riding in the head row beside the Power rating it is on the
+              first line of the card, cannot be clipped, and sits next to the
+              other at-a-glance matchup colour. Same resolver, same meaning —
+              only the position changed. (The popup carries it too now; see
+              enemyDetailBody.) */}
+          {!!view.threat && (
+            <View
+              style={[styles.threatDot, styles[`threat_${view.threat}`]]}
+              accessibilityLabel={`threat ${view.threat}`}
+            />
+          )}
           {/* OTA-928 — enemy Power rating, top-left; faces the player's Power (top-right
               of the stats panel). Colour by matchup: red = it outclasses you. */}
           <Text
@@ -534,16 +564,6 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
           ))}
         </View>
       )}
-      {/* ⚠⚠ OTA-1508 — the threat dot, bottom-right corner, exactly where the
-          owner asked for it. Its color comes from the SAME resolver the
-          counter volley rolls with (enemyThreatAt), so what the dot promises
-          is what the next enemy round does. */}
-      {!!view.threat && (
-        <View
-          style={[styles.threatDot, styles[`threat_${view.threat}`]]}
-          accessibilityLabel={`threat ${view.threat}`}
-        />
-      )}
     </View>
   );
 }
@@ -567,16 +587,17 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   // OTA-1508 — the threat dot. A thin dark ring keeps it readable against
-  // whatever the card's bottom edge holds.
+  // whatever sits behind it.
+  // ⚠ OTA-1512 — no longer absolute/bottom-right (it was clipped there and the
+  // owner could not see it at all): a flex child of the head row, aligned to
+  // the Power text's centre rather than the baseline a circle has none of.
   threatDot: {
-    position: 'absolute',
-    bottom: 5,
-    right: 5,
     width: 10,
     height: 10,
     borderRadius: 5,
     borderWidth: 1,
     borderColor: '#0d0b0a',
+    alignSelf: 'center',
   },
   threat_red: { backgroundColor: '#e05f5f' },
   threat_yellow: { backgroundColor: '#e0c05f' },

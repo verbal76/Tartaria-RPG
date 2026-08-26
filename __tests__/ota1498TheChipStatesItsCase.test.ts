@@ -59,13 +59,17 @@ const rows = (...r: Array<[string, boolean]>): GatherChipRow[] =>
   r.map(([noun, consumed]) => ({ noun, consumed }));
 
 describe('OTA-1498 — the reason clause, from the comparator\'s own lookups', () => {
-  it('⚠⚠⚠ THE OWNER\'S EXACT CASE: the ranged javelin names the coverage rule', () => {
-    // ⚠⚠ The first draft said "your off hand is free" here — and the
-    // consistency test below caught it: upgradeEquipSlot's range-coverage rule
-    // (OTA-1277) actually sends a ranged piece into the MAIN hand of an
-    // all-melee pair. The clause speaks about the slot the tap really fills.
+  it('⚠⚠⚠ THE OWNER\'S EXACT CASE: the ranged javelin goes to the OFF hand and says so', () => {
+    // ⚠⚠ This clause has now been right twice for two different rules, which is
+    // the point of deriving it from the verdict rather than restating one.
+    // Under OTA-1277 the javelin displaced into MAIN by band coverage, so it
+    // read "covers a range your hands lack". Under OTA-1512 the owner named the
+    // hands outright — "always melee in main and ranged in off" — so a ranged
+    // piece belongs in the off hand, that hand is bare, and the honest clause is
+    // the bare-slot one. The rule changed; the clause followed it without being
+    // told, because it reads the destination the tap actually fills.
     const clause = upgradeReasonClause(armed('Cudgel'), 'Bone Javelin');
-    expect(clause).toBe('covers a range your hands lack');
+    expect(clause).toBe('your off hand is free');
   });
 
   it('⚠⚠ a straight damage upgrade states both dice', () => {
@@ -103,11 +107,11 @@ describe('OTA-1498 — the chip carries the verdict', () => {
   it('⚠⚠⚠ the face says why: item, then the clause', () => {
     const chip = pickFeedActionChip(armed('Cudgel'), rows(['Bone Javelin', false]));
     expect(chip).not.toBeNull();
-    // OTA-1500 — the ranged piece displaces into MAIN by the coverage rule, so
-    // the mark is ▲ and the clause names the coverage, not a free hand.
-    expect(chip!.reason).toBe('covers a range your hands lack');
+    // OTA-1512 — the ranged piece goes to the OFF hand by the owner's hand rule.
+    // That hand is bare, so the mark is the bare-slot ★ and the clause says so.
+    expect(chip!.reason).toBe('your off hand is free');
     const label = feedActionChipLabel(chip!);
-    expect(label).toMatch(/^▲ Take & wield Bone Javelin — covers a range/);
+    expect(label).toMatch(/^★ Take & wield Bone Javelin — your off hand is free/);
   });
 
   it('⚠⚠ the screen-reader sentence carries the same reasoning', () => {

@@ -371,10 +371,34 @@ export default function App() {
         // success, because that claim has been caught lying. Behind the same
         // told-first gate as the crash flush: nothing leaves before the notice.
         if (!(await cr.crashNoticeNeeded())) {
-          // eslint-disable-next-line @typescript-eslint/no-var-requires
-          const pb = require('./app/diagnostics/pendingBundle');
-          const line = await pb.retryPendingBundleAtBoot();
-          if (line) useGameStore.getState().appendLog('debug', line);
+          // ⚠⚠⚠ OTA-1512 — WAIT FOR THE OTA CHECK BEFORE SPENDING AN ATTEMPT.
+          // The owner's 22:02 log caught this retry firing INTO an update: the
+          // send started at :32.453 and `ota: Restarting to apply…` landed at
+          // :33.270, 0.8s later. No ~270KB envelope uploads in 0.8s, and
+          // reloadAsync takes the whole JS context down with it — so the
+          // attempt was spent on a process that was already dying. The boot on
+          // the far side of that restart then burned a THIRD attempt 25ms in,
+          // before the Sentry transport even existed.
+          //
+          // `otaBootResolved` is exactly the right signal and already exists:
+          // the OTA path sets it only when the check is done AND we are staying
+          // on this bundle (the 'applied' branch returns without setting it,
+          // precisely because that context is dead). Waiting on it means a
+          // restarting boot never attempts at all, and a staying boot attempts
+          // with a live transport and a network no longer busy with the update.
+          const staying = await new Promise<boolean>((resolve) => {
+            if (useGameStore.getState().otaBootResolved) { resolve(true); return; }
+            const timer = setTimeout(() => { unsub(); resolve(false); }, 15_000);
+            const unsub = useGameStore.subscribe((st) => {
+              if (st.otaBootResolved) { clearTimeout(timer); unsub(); resolve(true); }
+            });
+          });
+          if (staying) {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const pb = require('./app/diagnostics/pendingBundle');
+            const line = await pb.retryPendingBundleAtBoot();
+            if (line) useGameStore.getState().appendLog('debug', line);
+          }
         }
       } catch { /* diagnostics must never block a boot */ }
     })();

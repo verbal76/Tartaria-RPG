@@ -33,9 +33,16 @@ import { GatherModal } from '../components/GatherModal'; // OTA-1233 — one pic
 import { CombatPrimerModal } from '../components/CombatPrimerModal'; // OTA-1321 — the first fight explains itself
 
 /** ⚠ OTA-1263 — the beat between INVESTIGATE ALL's results. The owner asked for
- *  "maybe 2+3 seconds"; 2.2s is the low end of that, because the sweep can be six
- *  nouns long and the whole point is that it stays readable, not that it stalls. */
-const INVESTIGATE_ALL_GAP_MS = 2_200;
+ *  "maybe 2+3 seconds"; 2.2s was the low end of that, because the sweep can be six
+ *  nouns long and the whole point is that it stays readable, not that it stalls.
+ *
+ *  ⚠⚠ OTA-1512 — A SECOND OFF, ON THE OWNER'S WORD AFTER LIVING WITH IT:
+ *  *"remove 1 second from in between investigations."* 2.2s → 1.2s. He set the
+ *  original figure sight-unseen and has now read hundreds of sweeps at it; the
+ *  readable floor is what he says it is, not what the first guess said. The
+ *  gate below moved with it — a range pinned to a superseded instruction is a
+ *  test asserting the past. */
+const INVESTIGATE_ALL_GAP_MS = 1_200;
 // OTA-1251 — the ★ takes AND wears; both read from the same catalog lookups.
 import { isUpgradeOverEquipped, upgradeEquipSlot } from '../engine/gatherSort';
 // ⚠ OTA-1457 — the feed's trailing action chip. Leaf module: it imports no

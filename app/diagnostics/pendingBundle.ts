@@ -56,6 +56,28 @@ export const PENDING_BUNDLE_FILE = 'pending-diagnostics-bundle.json';
  *  and bounds the duplicate-upload cost of a bundle that arrived first try. */
 export const MAX_SEND_ATTEMPTS = 5;
 
+/** ⚠⚠⚠ OTA-1512 — THE SHORTEST GAP AN ATTEMPT IS ALLOWED TO FOLLOW ANOTHER BY.
+ *
+ * MEASURED, from the owner's 2026-08-26 22:02 log: bundle #mt9gmr2ylu58 burned
+ * attempts 2 AND 3 **1.3 seconds apart** — one before the OTA restart, one on
+ * the boot that restart produced:
+ *
+ *     22:02:32.453  attempt 2/5 did not go out
+ *     22:02:33.270  ota: Restarting to apply…
+ *     22:02:33.752  attempt 3/5 did not go out
+ *
+ * Attempt 3 answered in 25ms, far too fast for a 10s flush of a ~270KB
+ * envelope: the Sentry transport was not up yet on that half-second-old
+ * process. Neither send had a chance, and both spent one of the five the
+ * bundle gets. The relay's outcome ledger settles what happened to them —
+ * accepted/error and accepted/attachment were byte-identical before and
+ * after, so nothing reached Sentry's door at all.
+ *
+ * An attempt is meant to be a real chance at delivery. One that follows
+ * another inside this window is a restart artifact, not a chance, and is now
+ * HELD instead of burned. */
+export const MIN_RETRY_GAP_MS = 60_000;
+
 export interface PendingBundle {
   /** Rides in the event message (`#id`) and tags so the relay reader can
    *  dedupe re-sends of the same bundle. */
@@ -64,6 +86,10 @@ export interface PendingBundle {
   /** Attempts already BURNED (counted before each send goes out — a kill
    *  mid-send must spend the attempt, or a boot-loop retries forever). */
   attempts: number;
+  /** OTA-1512 — when the last attempt was spent, so a restart-driven double
+   *  boot cannot burn two inside a second. Absent on records written before
+   *  1512; `createdAt` stands in, which is correct (the tap is attempt 1). */
+  lastAttemptAt?: number;
   bundle: DiagnosticsBundle;
 }
 
@@ -88,6 +114,7 @@ export async function persistPendingBundle(bundle: DiagnosticsBundle): Promise<P
       id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
       createdAt: Date.now(),
       attempts: 1,
+      lastAttemptAt: Date.now(),
       bundle,
     };
     await FileSystem.writeAsStringAsync(uri, JSON.stringify(rec));
@@ -143,15 +170,26 @@ export async function retryPendingBundleAtBoot(): Promise<string | null> {
       await clearPendingBundle();
       return `send-log: bundle #${p.id} spent all ${MAX_SEND_ATTEMPTS} attempts — cleared`;
     }
+    // ⚠⚠ OTA-1512 — a restart is not a second chance. See MIN_RETRY_GAP_MS.
+    // Held, NOT burned: the bundle keeps every attempt it has not really had.
+    const sinceLast = Date.now() - (p.lastAttemptAt ?? p.createdAt);
+    if (sinceLast < MIN_RETRY_GAP_MS) {
+      return `send-log: bundle #${p.id} held — only ${Math.round(sinceLast / 1000)}s since the last try (a restart, not a chance); ${MAX_SEND_ATTEMPTS - p.attempts} left`;
+    }
     const attempt = p.attempts + 1;
     const uri = fileUri();
-    if (uri) await FileSystem.writeAsStringAsync(uri, JSON.stringify({ ...p, attempts: attempt }));
+    if (uri) await FileSystem.writeAsStringAsync(uri, JSON.stringify({ ...p, attempts: attempt, lastAttemptAt: Date.now() }));
+    // ⚠ OTA-1512 — TIME THE SEND. A failure at 25ms and a failure at 10s are
+    // different diagnoses (no transport yet vs a flush that ran out of clock),
+    // and the 22:02 log could not tell them apart. Now the line says.
+    const startedAt = Date.now();
     const ok = await sendDiagnosticsBundle(p.bundle, { bundleId: p.id, attempt });
+    const took = Date.now() - startedAt;
     if (attempt >= MAX_SEND_ATTEMPTS) {
       await clearPendingBundle();
-      return `send-log: bundle #${p.id} attempt ${attempt}/${MAX_SEND_ATTEMPTS} ${ok ? 'flushed' : 'did not go out'} — final try, cleared`;
+      return `send-log: bundle #${p.id} attempt ${attempt}/${MAX_SEND_ATTEMPTS} ${ok ? 'flushed' : `did not go out (after ${took}ms)`} — final try, cleared`;
     }
-    return `send-log: bundle #${p.id} attempt ${attempt}/${MAX_SEND_ATTEMPTS} ${ok ? 'flushed to Sentry' : 'did not go out — kept for next boot'}`;
+    return `send-log: bundle #${p.id} attempt ${attempt}/${MAX_SEND_ATTEMPTS} ${ok ? 'flushed to Sentry' : `did not go out (after ${took}ms) — kept for next boot`}`;
   } catch {
     return null; // the retry is best-effort; the file stays for the next boot
   }

@@ -113,6 +113,22 @@ const investigates = (from: number): string[] =>
     .filter((e: { channel: string; text: string }) => e.channel === 'player' && /^investigate /.test(String(e.text)))
     .map((e: { text: string }) => String(e.text));
 
+/** ⚠ OTA-1512 — ONE BEAT, read from the screen instead of hardcoded. These
+ *  ticks were `2_300` — the old 2.2s gap plus a hair — so when the owner took
+ *  a second off the pacing ("remove 1 second from in between investigations")
+ *  every one of them silently spanned TWO beats and the strictly-one-per-beat
+ *  assertions below would have started measuring the wrong thing. Derived from
+ *  the constant now, so the next retune moves the test with it. */
+const BEAT_MS = (() => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { readFileSync: rf } = require('fs');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { join: jn } = require('path');
+  const src = rf(jn(__dirname, '..', 'app', 'screens', 'ExplorationScreen.tsx'), 'utf8');
+  const m = /const INVESTIGATE_ALL_GAP_MS = ([\d_]+);/.exec(src);
+  return Number((m?.[1] ?? '2200').replace(/_/g, '')) + 100;
+})();
+
 const tick = async (ms: number): Promise<void> => {
   await renderer.act(async () => { jest.advanceTimersByTime(ms); await Promise.resolve(); });
 };
@@ -161,13 +177,13 @@ describe('OTA-1268 — INVESTIGATE ALL, run for real', () => {
     await tick(0);
     const first = investigates(from).length;
     expect(first).toBe(1);                       // one immediately…
-    await tick(2_300);
+    await tick(BEAT_MS);
     expect(investigates(from).length).toBe(2);   // …one more per gap —
     // ⚠ THIS is the assertion 1263 lacked: under the shipped bug the count
     // stays 1 forever, because the sweep read its own submit as the player.
     let last = 2;
     for (let guard = 0; guard < 12; guard++) {
-      await tick(2_300);
+      await tick(BEAT_MS);
       const now = investigates(from).length;
       if (now === last) break;                   // sweep finished
       expect(now).toBe(last + 1);                // strictly one per beat
@@ -193,8 +209,8 @@ describe('OTA-1268 — INVESTIGATE ALL, run for real', () => {
     // The player does something of their own mid-sweep.
     useGameStore.getState().submitPlayerAction('look around');
     const before = investigates(from).length;
-    await tick(2_300);
-    await tick(2_300);
+    await tick(BEAT_MS);
+    await tick(BEAT_MS);
     expect(investigates(from).length).toBe(before); // nothing queued over them
     renderer.act(() => { tree.unmount(); });
   });
@@ -213,8 +229,8 @@ describe('OTA-1268 — INVESTIGATE ALL, run for real', () => {
       },
     });
     const before = investigates(from).length;
-    await tick(2_300);
-    await tick(2_300);
+    await tick(BEAT_MS);
+    await tick(BEAT_MS);
     expect(investigates(from).length).toBe(before);
     useGameStore.setState({ currentScene: { ...useGameStore.getState().currentScene!, enemies: [] } });
     renderer.act(() => { tree.unmount(); });
@@ -230,7 +246,10 @@ describe('OTA-1268 — INVESTIGATE ALL, run for real', () => {
     const m = /const INVESTIGATE_ALL_GAP_MS = ([\d_]+);/.exec(screen);
     expect(m).not.toBeNull();
     const ms = Number(m![1]!.replace(/_/g, ''));
-    expect(ms).toBeGreaterThanOrEqual(2_000);
-    expect(ms).toBeLessThanOrEqual(3_000);
+    // ⚠ OTA-1512 — the owner took a second off after living with it ("remove 1
+    // second from in between investigations"), so the band moved down with his
+    // instruction: 2.2s → 1.2s. Still a real beat, not an instant dump.
+    expect(ms).toBeGreaterThanOrEqual(1_000);
+    expect(ms).toBeLessThanOrEqual(2_000);
   });
 });

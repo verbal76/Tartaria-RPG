@@ -22,9 +22,10 @@
 // entry, and any slot the player has nothing in yet, is handled explicitly below
 // rather than falling out of a comparison against undefined.
 import type { PlayerCharacter, InventoryItem, EquipSlot } from './types';
-import { WEAPONS, ARMOR, findCatalogItem } from './crafting';
+import { WEAPONS, ARMOR, findCatalogItem, findWeaponByName } from './crafting';
+import { inferArmor } from './itemDefaults';
 import { resolveEquippedItem } from './equipment';
-import { reachBandsFor } from './types';                 // OTA-1277
+import { reachBandsFor, type WeaponReachClass } from './types';   // OTA-1277
 import { reachClassFor } from './combatRules';           // OTA-1277
 
 export type GatherKind = 'weapon' | 'armor' | 'other' | 'scenery' | 'inert' | 'lead';
@@ -51,6 +52,131 @@ function weaponByName(name: string): (typeof WEAPONS)[number] | null {
 function armorByName(name: string): (typeof ARMOR)[number] | null {
   const lower = name.toLowerCase();
   return ARMOR.find((a) => a.name.toLowerCase() === lower) ?? null;
+}
+
+// ⚠⚠⚠ OTA-1512 — WHAT THE WORN PIECE IS, AND WHY THE CATALOG ALONE COULD NOT SAY.
+//
+// Owner, on picking up a Salvager's Mask of Secrets while wearing a
+// Forge-Black Cowl: *"if there was no star that means I have something
+// equipped. so how come there was no red or green pyramid for the mask?"*
+// He read the marks exactly right. The mask resolved fine (armor.json, head,
+// AC +1). The COWL did not — it is Crucible-forged, and a forged name is
+// assembled at the bench (`Forge-Black` from the metal theme bank, `Cowl`
+// from the head slot nouns), so it will never appear in a hand-authored
+// catalog. Every worn-side read in this file was `armorByName(worn.name)` /
+// `weaponByName(main.name)` — catalog or nothing — so the comparison refused
+// and the row fell through to a plain 🛡 with no slot named.
+//
+// ⚠⚠ THE CLASS, NOT THE CASE: that same catalog-only read appears SEVEN times
+// (isUpgradeOverEquipped ×2, upgradeEquipSlot, upgradeReasonClause ×2,
+// equipVerdict ×2). Any player wearing forged gear had that slot permanently
+// marker-blind — and forged gear is end-game gear, so the marks went dark
+// exactly when the choices start mattering. One resolver per kind, read by
+// all seven, in order of authority:
+//
+//   1 the hand-authored catalog row — the truth when it exists;
+//   2 THE FORGE'S OWN STAMP on the instance (`uniqueStats`) — a fused piece
+//     carries its real acBonus/armorSlot/damageDice there, which is where the
+//     equip and preview resolvers have always read it;
+//   3 the name heuristic (`inferArmor` / the inference half of
+//     `findWeaponByName`) that already backs equip, preview and scrap.
+//
+// The refusal survives where it is HONEST — a noun nothing can identify still
+// returns null and still earns no mark. What changed is that "the forge made
+// it" stopped counting as "unidentifiable".
+//
+// ⚠ `instanceStats.acBonus` outranks the catalog number for THIS copy (the
+// per-instance roll, OTA-1440's rule, already honoured by every other
+// resolver), so the AC the mark compares is the AC the player actually wears.
+export interface WornArmorFacts {
+  name: string;
+  slot: string;
+  acBonus: number;
+  resistances?: readonly string[];
+  statBonuses?: readonly { amount: number }[];
+}
+
+export function wornArmorFacts(item: InventoryItem | null | undefined): WornArmorFacts | null {
+  if (!item) return null;
+  let slot: string | null = null;
+  let acBonus = 0;
+  let resistances: readonly string[] | undefined;
+  let statBonuses: readonly { amount: number }[] | undefined;
+  const row = armorByName(item.name);
+  const u = item.uniqueStats;
+  if (row) {
+    slot = row.slot;
+    acBonus = row.acBonus;
+    resistances = row.resistances;
+    statBonuses = row.statBonuses;
+  } else if (u && u.kind === 'armor' && u.armorSlot && typeof u.acBonus === 'number') {
+    slot = u.armorSlot;
+    acBonus = u.acBonus;
+    resistances = u.resistance ? [u.resistance] : undefined;
+    statBonuses = u.statBonus ? [u.statBonus] : undefined;
+  } else {
+    const inferred = inferArmor(item.name);
+    if (inferred) {
+      slot = inferred.slot;
+      acBonus = inferred.acBonus;
+      resistances = inferred.resistances;
+      statBonuses = inferred.statBonuses;
+    }
+  }
+  if (!slot) return null;
+  return {
+    name: item.name,
+    slot,
+    acBonus: item.instanceStats?.acBonus ?? acBonus,
+    resistances,
+    statBonuses,
+  };
+}
+
+// ⚠ `kind` and `tags` ride along because the reach reader (OTA-1277's
+// two-bands rule in upgradeEquipSlot) classifies the held weapon as well as
+// scoring it, and both must come from ONE resolution or the slot and the
+// damage line can disagree about what is in the hand. For a forged weapon the
+// forge's own `reachClass` names the kind — and the NAME is safe to lean on
+// here besides, because the bench picks the form noun to match that class
+// (Spike/Maul = melee, Spear/Pike = long, Bow/Caster = ranged, OTA-955).
+export interface WornWeaponFacts {
+  name: string;
+  damageDice: string;
+  kind?: string;
+  tags?: readonly string[];
+}
+
+export function wornWeaponFacts(item: InventoryItem | null | undefined): WornWeaponFacts | null {
+  if (!item) return null;
+  const row = weaponByName(item.name);
+  if (row?.damageDice) {
+    // ⚠⚠ `kind` IS DELIBERATELY NOT SET FROM `row.weaponKind`, AND THAT IS NOT A
+    // TYPO. The pre-1512 code passed the raw catalog row into the reach reader
+    // below, which reads `w.kind` — a field catalog rows do not have (theirs is
+    // `weaponKind`). So for every catalog weapon the reader has ALWAYS seen
+    // `kind: undefined` and fallen back to 'melee', letting the name and tags do
+    // the classifying. That is a real latent bug, but it is a live BALANCE rule:
+    // supplying the true kind here re-decides OTA-1277's main/off pairing and
+    // moved a starter weapon to the other hand (ota1254 caught it). Fixing it is
+    // a deliberate combat change for the owner to call, not a side effect of
+    // making forged gear readable. Reproduce the old shape exactly.
+    return { name: row.name, damageDice: row.damageDice, tags: row.tags };
+  }
+  const u = item.uniqueStats;
+  if (u && u.kind === 'weapon' && u.damageDice) {
+    return {
+      name: item.name,
+      damageDice: u.damageDice,
+      kind: u.reachClass === 'ranged' ? 'ranged' : 'melee',
+      tags: item.tags,
+    };
+  }
+  // The catalog half already missed above, so this is the inference half.
+  const inferred = findWeaponByName(item.name);
+  return inferred?.damageDice
+    ? { name: item.name, damageDice: inferred.damageDice, kind: inferred.weaponKind, tags: inferred.tags }
+    : null;
 }
 
 /** ⚠⚠ Which lane a scene noun belongs in — and the distinction OTA-1233 GOT WRONG.
@@ -114,7 +240,9 @@ export function isUpgradeOverEquipped(player: PlayerCharacter | null, noun: stri
   if (armor) {
     const worn = equippedInSlot(player, armor.slot);
     if (!worn) return true; // nothing there — anything is an improvement
-    const wornArmor = armorByName(worn.name);
+    // OTA-1512 — reads the forge's stamp and the name heuristic too, so a
+    // Crucible piece is compared instead of refusing the whole slot.
+    const wornArmor = wornArmorFacts(worn);
     if (!wornArmor) return false; // cannot compare honestly → do not claim
     return armor.acBonus > wornArmor.acBonus;
   }
@@ -140,7 +268,7 @@ export function isUpgradeOverEquipped(player: PlayerCharacter | null, noun: stri
     const main = resolveEquippedItem(player, 'main');
     if (!main) return true;
     if (weapon.style !== 'two_handed' && !resolveEquippedItem(player, 'off')) return true;
-    const heldWeapon = weaponByName(main.name);
+    const heldWeapon = wornWeaponFacts(main); // OTA-1512 — forged mains compare too
     if (!heldWeapon) return false;
     return averageDamage(weapon.damageDice) > averageDamage(heldWeapon.damageDice);
   }
@@ -176,14 +304,14 @@ export function upgradeReasonClause(player: PlayerCharacter | null, noun: string
   const armor = armorByName(noun);
   if (armor) {
     const worn = resolveEquippedItem(player, v.slot);
-    const wornArmor = worn ? armorByName(worn.name) : null;
+    const wornArmor = wornArmorFacts(worn); // OTA-1512
     if (!wornArmor) return null;
     return `AC +${armor.acBonus} over your +${wornArmor.acBonus}`;
   }
   const weapon = weaponByName(noun);
   if (weapon) {
     const held = resolveEquippedItem(player, v.slot);
-    const heldWeapon = held ? weaponByName(held.name) : null;
+    const heldWeapon = wornWeaponFacts(held); // OTA-1512
     if (!heldWeapon) return null;
     if (averageDamage(weapon.damageDice) > averageDamage(heldWeapon.damageDice)) {
       return `${weapon.damageDice} over your ${heldWeapon.damageDice}`;
@@ -251,7 +379,7 @@ export function upgradeEquipSlot(
     // which could downgrade a better piece already on your back.
     if (player) {
       const worn = resolveEquippedItem(player, slot);
-      const wornArmor = worn ? armorByName(worn.name) : null;
+      const wornArmor = wornArmorFacts(worn); // OTA-1512
       if (wornArmor && armorScore(armor) <= armorScore(wornArmor)) return null;
     }
     return { name: armor.name, slot };
@@ -271,53 +399,63 @@ export function upgradeEquipSlot(
   if (!player || weapon.style === 'two_handed') return { name: weapon.name, slot: 'main' };
   const main = resolveEquippedItem(player, 'main');
   if (!main) return { name: weapon.name, slot: 'main' };
-  const heldWeapon = weaponByName(main.name);
-  // ⚠⚠ OTA-1277 — COVER TWO RANGES, THEN MAXIMISE DAMAGE. Owner's spec:
-  // *"you should always recommend two different ranged weapons. try to get one
-  // long range like a bolt caster or a bow or a crossbow and try to make the
-  // other one a melee weapon... and go for the highest roll value. so a 1d6 bolt
-  // caster is going to get beat by a 2d8 bolt caster."*
-  // His own log is the case for it: he had a Bolt-Caster and a Tartarian Spear
-  // and ended up swinging the RANGED one from the off hand at mid range while a
-  // spear sat in main — the pair was right by accident, not by rule.
-  const off = resolveEquippedItem(player, 'off');
-  const offWeapon = off ? weaponByName(off.name) : null;
-  const isFar = (w: { name: string; kind?: string; tags?: readonly string[] } | null): boolean => {
-    if (!w) return false;
-    const bands = reachBandsFor(reachClassFor({
-      weaponKind: w.kind === 'ranged' || w.kind === 'runecaster' ? w.kind : 'melee',
+  const heldWeapon = wornWeaponFacts(main); // OTA-1512 — forged mains classify too
+  // ⚠⚠⚠ OTA-1512 — THE OWNER'S RULE, AND IT REPLACES THE HEURISTIC: *"always
+  // melee in main and ranged in off, for auto equips."*
+  //
+  // What stood here was OTA-1277's coverage puzzle — cover two bands first,
+  // then maximise damage, with four interacting branches deciding the hand.
+  // It was built from his EARLIER spec ("always recommend two different ranged
+  // weapons… one long range… the other melee"), and it got the pair right
+  // while leaving WHICH HAND to a damage comparison, so the same two weapons
+  // could sit either way round. He has now named the hands outright. A rule he
+  // can predict beats a rule that is merely defensible: he knows before he taps
+  // where the thing is going to land.
+  //
+  // The pairing intent survives intact — a ranged piece still goes opposite a
+  // melee one — it is just stated as a fact about hands instead of derived from
+  // band coverage. Damage still decides WHETHER to displace (the caller only
+  // asks after `isUpgradeOverEquipped` said yes), never WHERE.
+  //
+  // ⚠ A two-hander is exempt above: it takes both hands, so it is always main.
+  const reachOf = (w: { name: string; kind?: string; tags?: readonly string[] } | null): WeaponReachClass | null =>
+    w ? reachClassFor({
+      weaponKind: w.kind === 'ranged' || w.kind === 'runecaster' ? w.kind : undefined,
       name: w.name,
       tags: w.tags,
-    }));
-    return bands.length > 1;   // anything that reaches past `close`
-  };
-  const newIsFar = isFar(weapon);
-  const mainIsFar = isFar(heldWeapon);
-  const offIsFar = isFar(offWeapon);
-  // If the pair currently covers only ONE band and this weapon covers the other,
-  // it fills the gap — that outranks a raw damage comparison, because a player
-  // with two melee weapons cannot answer a ranged enemy at all.
-  const pairCoversBoth = mainIsFar !== offIsFar && !!offWeapon;
-  if (!pairCoversBoth) {
-    if (newIsFar && !mainIsFar && !offIsFar) return { name: weapon.name, slot: off ? 'off' : 'main' };
-    if (!newIsFar && mainIsFar && (!offWeapon || offIsFar)) return { name: weapon.name, slot: off ? 'off' : 'off' };
+    }) : null;
+  /** His two buckets. `ranged` and `runecaster` shoot; `throwable` is thrown,
+   *  which is the off hand's business too. Everything that closes to arm's
+   *  reach — melee and the long shafts that stab from mid — is main-hand. */
+  const shootsRatherThanSwings = (cls: WeaponReachClass | null): boolean =>
+    cls === 'ranged' || cls === 'runecaster' || cls === 'throwable';
+  const newCls = reachClassFor({ weaponKind: weapon.weaponKind, name: weapon.name, tags: weapon.tags });
+  const wantedSlot: EquipSlot = shootsRatherThanSwings(newCls) ? 'off' : 'main';
+  const occupant = wantedSlot === 'main' ? heldWeapon : wornWeaponFacts(resolveEquippedItem(player, 'off'));
+  // The named hand is free — take it, no comparison needed.
+  if (!occupant) return { name: weapon.name, slot: wantedSlot };
+  // The named hand is held by something of the SAME kind: the better one wins it.
+  if (shootsRatherThanSwings(reachOf(occupant)) === shootsRatherThanSwings(newCls)) {
+    if (averageDamage(weapon.damageDice) > averageDamage(occupant.damageDice)) {
+      return { name: weapon.name, slot: wantedSlot };
+    }
+    // ⚠⚠ AND IF THE OTHER HAND IS BARE, IT STILL GOES THERE — OTA-1252's rule
+    // survives the new one: "an empty hand is an empty slot", and OTA-1254's
+    // promise is that no race finishes the starting beat with the cudgel sitting
+    // in the pack. A second melee that loses to your main is not better than
+    // your main; it is still better than a bare hand. The owner's rule names
+    // the PREFERRED hand, and this only fires once that hand is spoken for.
+    const spare: EquipSlot = wantedSlot === 'main' ? 'off' : 'main';
+    if (!resolveEquippedItem(player, spare)) return { name: weapon.name, slot: spare };
+    return null;
   }
-  const beatsMain = heldWeapon
-    ? averageDamage(weapon.damageDice) > averageDamage(heldWeapon.damageDice)
-    : false;
-  // ⚠ Only displace a same-range weapon on damage. Swapping a better melee into
-  // main when main is the only ranged piece would COST the pair its coverage.
-  if (beatsMain && newIsFar === mainIsFar) return { name: weapon.name, slot: 'main' };
-  if (!off) return { name: weapon.name, slot: 'off' };
-  // Same band as the off hand and better than it — take that slot.
-  if (offWeapon && newIsFar === offIsFar
-      && averageDamage(weapon.damageDice) > averageDamage(offWeapon.damageDice)) {
-    return { name: weapon.name, slot: 'off' };
-  }
-  if (beatsMain) return { name: weapon.name, slot: 'main' };
-  // Both hands full and it beats neither — the mark would not have fired, but a
-  // caller that asks anyway gets the honest answer rather than a silent swap.
-  return null;
+  // The named hand is held by the WRONG kind (a bow in main, a blade in off).
+  // This weapon belongs there by the rule, so it takes the slot and the
+  // mis-filed piece is displaced into the pack — the hands end up right.
+  // (The old "both hands full and it beats neither → null" tail lived here and
+  // is now unreachable: that case is answered above, inside the same-kind
+  // branch, which is the only way to lose a hand you are entitled to.)
+  return { name: weapon.name, slot: wantedSlot };
 }
 
 function equippedInSlot(player: PlayerCharacter, slot: string): InventoryItem | null {
@@ -364,13 +502,16 @@ export function equipVerdict(
     const slot = ARMOR_SLOT_TO_EQUIP[armor.slot];
     if (!slot) return null;
     const worn = resolveEquippedItem(player, slot);
-    if (!worn || !armorByName(worn.name)) return null;
+    // ⚠ OTA-1512 — THE OWNER'S CASE. `!worn` here is unreachable (an empty slot
+    // was already answered 'empty' above); the live meaning was "the worn piece
+    // has no catalog row", which is every forged piece. It reads them now.
+    if (!worn || !wornArmorFacts(worn)) return null;
     return { slot, state: 'down' };
   }
   const weapon = weaponByName(noun);
   if (weapon) {
     const main = resolveEquippedItem(player, 'main');
-    if (!main || !weaponByName(main.name)) return null;
+    if (!main || !wornWeaponFacts(main)) return null; // OTA-1512
     return { slot: 'main', state: 'down' };
   }
   return null;

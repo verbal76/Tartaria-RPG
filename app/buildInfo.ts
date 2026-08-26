@@ -24738,7 +24738,62 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // synthesize. This closes the range rework: bullseye field (1506), band
 // follows the sights (1507), enemy reach + threat dot (1508), shields
 // (1509), BLOCK/BASH (1510), THROW (1511).
-export const OTA_BUILD_ID = '2026-08-26-1511-the-spear-leaves-your-hand';
+// ⚠⚠⚠ OTA-1512 — THE WORN PIECE IS READABLE (two defects from the owner's
+// 22:03 log). ONE, his question: "if there was no star that means I have
+// something equipped. so how come there was no red or green pyramid for the
+// mask?" He read the marks exactly right — the failure was that the picker
+// could not read what he was WEARING. A Salvager's Mask resolves (armor.json,
+// head, AC +1); his Forge-Black Cowl does not, because it is Crucible-forged
+// and a forged name is assembled at the bench, never catalogued. Every
+// worn-side read in gatherSort was catalog-or-nothing — NINE of them across
+// isUpgradeOverEquipped, upgradeEquipSlot, upgradeReasonClause and
+// equipVerdict — so the comparison refused and the row fell through to a
+// plain 🛡 with no slot named. Any player in forged gear had that slot
+// permanently marker-blind, which is end-game gear: the marks went dark
+// exactly when the choices start mattering. One resolver per kind now reads
+// the catalog row, then THE FORGE'S OWN STAMP (uniqueStats), then the name
+// heuristic that already backs equip and preview — and this copy's rolled
+// instanceStats AC outranks the catalog number, so the mark compares the AC
+// actually worn. The refusal survives where it is honest: a worn thing
+// nothing can identify still earns no mark. TWO: the durable send was
+// burning attempts that were never chances — bundle #mt9gmr2ylu58 spent
+// attempts 2 AND 3 one-point-three seconds apart on either side of an OTA
+// restart, the second answering in 25ms, before the Sentry transport
+// existed; the relay's outcome ledger proves neither reached the door. The
+// boot retry now waits on `otaBootResolved` (set only when the check is done
+// AND we are staying on this bundle), holds instead of burning inside a
+// 60-second gap, and times every send so a 25ms failure and a 10s timeout
+// stop reading alike. THREE, his pacing note the same evening: "remove 1
+// second from in between investigations" — INVESTIGATE ALL's beat goes 2.2s →
+// 1.2s. He set the original figure sight-unseen ("maybe 2+3 seconds") and has
+// now read hundreds of sweeps at it; the readable floor is what he says it is.
+// The two gates that pinned the old band moved with his instruction, and the
+// sweep tests now DERIVE their tick from the constant instead of hardcoding
+// 2_300 — every one of them silently spanned two beats the moment the gap
+// shrank, which is a test measuring the wrong thing rather than failing.
+// FOUR, and it is OTA-1508's own dot: "we can no longer scroll up to see the
+// bottom of the enemy portrait, and the colored range dot isn't in the popup
+// when we tap the enemy portrait, so i cannot see it either way." 1508 pinned
+// the threat dot to the card's bottom-right with position:'absolute' — the one
+// edge the corner panel clips — and never gave the detail popup a threat line
+// at all, so the mark that answers "can it hit me?" shipped invisible on BOTH
+// routes. The dot now rides the head row beside the Power rating, on the
+// card's first line where nothing can clip it, and the popup (plain text, so
+// it cannot draw a dot) spells the same verdict out in words from the same
+// resolver. The three colours are untouched: this moved the mark, it did not
+// redefine it. FIVE, a rule he named outright: "always melee in main and
+// ranged in off, for auto equips." That REPLACES OTA-1277's band-coverage
+// puzzle, which was built from his earlier spec and got the PAIR right while
+// leaving WHICH HAND to a damage comparison — so the same two weapons could
+// sit either way round. A rule he can predict beats one that is merely
+// defensible. The pairing intent survives (a ranged piece still goes opposite
+// a melee one); it is now stated as a fact about hands instead of derived.
+// Damage still decides WHETHER to displace within a hand, never WHERE — and
+// OTA-1252's "an empty hand is an empty slot" survives as the fallback, so a
+// spare melee that loses to your main still fills a bare off hand rather than
+// sitting in the pack (OTA-1254's promise, kept).
+export const OTA_BUILD_ID = '2026-08-26-1512-the-worn-piece-is-readable';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1511-the-spear-leaves-your-hand';
 // golem catch-up 2026-08-26: markerless publish of OTA-1511 (THROW SPEAR + authored throwable dice) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1510-the-shield-answers-both-ways';
 // golem catch-up 2026-08-26: markerless publish of OTA-1510 (BLOCK absorb + SHIELD BASH stagger + the two combat buttons) to the golem channel.
