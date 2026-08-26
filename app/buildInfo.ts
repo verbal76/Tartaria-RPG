@@ -24637,7 +24637,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // LAST SIGN OF LIFE (phaseAt) instead of the action's start — the 15:08 record
 // was 44 minutes off and read "died doing that" — with a staleness clause when
 // the standing action was >2m old, in the ledger, the boot line, and About.
-export const OTA_BUILD_ID = '2026-08-25-1504-the-bundle-survives-the-kill';
+// ⚠⚠⚠ OTA-1505 — THE CRASH BRINGS ITS OWN EVIDENCE. Owner: "make it so my
+// characters and sasmooches characters push the full bundle." A slot load on
+// a device passing the SEND LOG unlock (verbal/sasmooch names, or the
+// OTA-1490 sticky flag) now checks the ledger for a crash newer than the last
+// one bundled and pushes the full four-attachment bundle through the OTA-1504
+// durable pipeline automatically — composed by the same stampers as the
+// button, marked per crash so a loop cannot storm, silent on every player
+// device (the privacy page's "slim crash records only" stays true for them).
+export const OTA_BUILD_ID = '2026-08-26-1505-the-crash-brings-its-own-evidence';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1504-the-bundle-survives-the-kill';
 // golem catch-up 2026-08-26: markerless publish of OTA-1504 (durable send-log + last-sign-of-life dating) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1503-the-bullseye-is-the-truth';
 // golem catch-up 2026-08-25: markerless publish of OTA-1503 (bullseye geometry, unwired) to the golem channel.

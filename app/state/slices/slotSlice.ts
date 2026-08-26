@@ -410,6 +410,21 @@ export const createSlotSlice = (
           })
           .catch(() => { /* a missing banner must never cost a load */ });
       } catch { /* hardened: never block slot load on a debug log failure */ }
+      // ⚠⚠ OTA-1505 — owner: "make it so my characters and sasmooches
+      // characters push the full bundle." If the ledger holds a crash newer
+      // than the last one bundled AND this device passes the SEND LOG unlock
+      // (verbal/sasmooch names, or the OTA-1490 sticky device flag), the full
+      // four-attachment bundle goes out through the OTA-1504 durable pipeline
+      // automatically. Players' devices never pass the gate — they keep the
+      // privacy-page promise (slim crash records only). Fire-and-forget: the
+      // gate checks are two cheap reads on the common path.
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const ab = require('../../diagnostics/autoBundle') as typeof import('../../diagnostics/autoBundle');
+        void ab.maybeAutoQueueCrashBundle(get().player, get().worldMemory)
+          .then((line) => { if (line) get().appendLog('debug', line); })
+          .catch(() => { /* never a slot-load hazard */ });
+      } catch { /* never a slot-load hazard */ }
       // OTA-353 — REMOVED: the one-time faction-catalyst fusion-compensation
       // make-good ("Eternal Dynasty Heir's Aegis"). It was a dev-name-only
       // repayment for the pre-OTA-336 fusion-gate bug; the devs have theirs
