@@ -25,6 +25,14 @@ on:
   # and commits anything new — whichever session opens next just `git pull`s
   # and the evidence is already in the tree. Quiet hours cost nothing: no new
   # events → no commit (the "Nothing new" branch below).
+  #
+  # ⚠⚠ THIS CLOCK ONLY TICKS FROM THE DEFAULT BRANCH. GitHub reads `schedule:`
+  # from the workflow file as it exists on the repo's DEFAULT branch (`main`)
+  # — never from a topic branch. Added here on golem-line 2026-08-26 at 01:14,
+  # it fired ZERO times in the twelve hours that followed; every run in the
+  # history was a push. A copy of this file must live on `main` for the hour
+  # to mean anything, which is why the checkout below pins the ref: a
+  # schedule firing from main must still read and write GOLEM-LINE's tree.
   schedule:
     - cron: '0 * * * *'
 
@@ -35,7 +43,12 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
+      # ⚠ ALWAYS golem-line, whatever fired us. A scheduled run launched from
+      # the default branch would otherwise check out `main` and try to commit
+      # the inbox there — the evidence has to land where the work lives.
       - uses: actions/checkout@v4
+        with:
+          ref: golem-line
       - name: Pull player-log bundles from Sentry
         env:
           SENTRY_READ_TOKEN: ${{ secrets.SENTRY_READ_TOKEN }}
