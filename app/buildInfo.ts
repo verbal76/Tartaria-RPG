@@ -24793,6 +24793,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // spare melee that loses to your main still fills a bare off hand rather than
 // sitting in the pack (OTA-1254's promise, kept).
 export const OTA_BUILD_ID = '2026-08-26-1512-the-worn-piece-is-readable';
+// golem catch-up 2026-08-26: markerless publish of OTA-1512 (forged gear readable + threat dot visible + send-attempt guard + investigate pacing + the melee-main/ranged-off hand rule) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1511-the-spear-leaves-your-hand';
 // golem catch-up 2026-08-26: markerless publish of OTA-1511 (THROW SPEAR + authored throwable dice) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1510-the-shield-answers-both-ways';
