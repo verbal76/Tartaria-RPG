@@ -24718,6 +24718,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // live-store: two raiders vs a raised Mud Heater Shield — one absorb, one
 // normal d20, block gone. STILL COMING: THROW (step 5).
 export const OTA_BUILD_ID = '2026-08-26-1510-the-shield-answers-both-ways';
+// golem catch-up 2026-08-26: markerless publish of OTA-1510 (BLOCK absorb + SHIELD BASH stagger + the two combat buttons) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1509-shields-ride-the-off-arm';
 // golem catch-up 2026-08-26: markerless publish of OTA-1509 (Shields section + off-arm routing + back-stamp) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1508-the-enemies-have-ranges-too';
