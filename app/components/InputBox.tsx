@@ -19,6 +19,7 @@ import { useGameStore, logUiTap } from '../state/gameStore';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { playerWeaponReach } from '../state/combatResolution';
 import { itemIsShield } from '../engine/crafting';
+import { itemIsHandThrownSpear } from '../engine/bandolierEligibility';
 import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
@@ -277,6 +278,18 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     const inst = reachPlayer?.inventory.find((i) => i.id === eq.offId)
       ?? reachPlayer?.inventory.find((i) => i.name === eq.off);
     return inst && itemIsShield(inst) ? inst.name : null;
+  })();
+  // ⚠ OTA-1511 — the SPARE throwing spear, if any: lights the owner's THROW
+  // SPEAR button ("you should have spare and then throw spear button"). A
+  // spare is a long-shaft hand throwable (throwable+spear — the population
+  // OTA-605 keeps off the bandolier) that is either unequipped or a stack
+  // deep enough that hurling one does not empty the hand.
+  const throwSpearItem = (() => {
+    const inv = reachPlayer?.inventory ?? [];
+    const eq = reachPlayer?.equipped;
+    return inv.find((i) =>
+      itemIsHandThrownSpear(i) && i.quantity > 0
+      && ((i.id !== eq?.mainId && i.id !== eq?.offId) || i.quantity > 1)) ?? null;
   })();
   // OTA-1170 — rounds left on the dodge lockout; 0/absent = ready (full blue).
   // ⚠⚠ OTA-1458 — EMPTY LEGS. Drives the travel row's spent state so a move the
@@ -785,6 +798,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               ) : null}
               {offShieldName ? (
                 <QuickBtn label="shield bash" onPress={() => onSubmit(`attack with the off-hand ${offShieldName.toLowerCase()}`)} />
+              ) : null}
+              {/* ⚠ OTA-1511 — THROW SPEAR: hurl the spare long shaft through the
+                  store's dedicated hand-throw (same full pipeline the bandolier
+                  rides — throwable reach, authored dice, consume-on-hit). */}
+              {throwSpearItem ? (
+                <QuickBtn label="throw spear" onPress={() => useGameStore.getState().throwHeldWeapon(throwSpearItem.name, throwSpearItem.id)} />
               ) : null}
               {/* OTA-847 (STEALTH SYSTEM) — in-combat STEALTH. First action of the
                   fight = SNEAK ATTACK (free STE check for the drop); mid-combat =

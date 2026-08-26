@@ -24717,7 +24717,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Both buttons appear exactly when a shield rides the off arm. Proven
 // live-store: two raiders vs a raised Mud Heater Shield — one absorb, one
 // normal d20, block gone. STILL COMING: THROW (step 5).
-export const OTA_BUILD_ID = '2026-08-26-1510-the-shield-answers-both-ways';
+// ⚠⚠⚠ OTA-1511 — THE SPEAR LEAVES YOUR HAND (step 5, the LAST of the combat
+// range rework). Owner: "you should have spare and then throw spear button."
+// The long shafts (throwable+spear: both javelins, both Tartarian throwing
+// spears, the Mud and Plasma throwing spears) were the one throwable
+// population with NO throw path — OTA-605 turns them away from the bandolier
+// ("carry it in hand") and its throw button with them. throwHeldWeapon now
+// hurls one through the same rack-in-the-off-hand + throwSettlement dance as
+// the bandolier's weapon tail, so the full attack pipeline comes free:
+// throwable reach bands, authored dice, coatings, consume-on-hit with
+// auto-unequip, the group's answer. The THROW SPEAR button lights when a
+// SPARE rides the pack (unequipped, or a stack deep enough to keep the
+// hand). The OTA-1140 seal holds — spears are bandolier-ineligible, so no
+// rack cap is bypassed; melee spears with the emergency `thrown` tag stay on
+// the typed improvised throw. AND the OTA-208 shadow dies: the throwable
+// synthesize loop pre-empted the catalog for every throwable-tagged item, so
+// catalogued throwing weapons landed weight dice hardcoded 'aetheric'
+// instead of their authored rows (a Throwing Knife was never 1d4 piercing) —
+// authored rows win now; catalog-absent shards/plates/samples still
+// synthesize. This closes the range rework: bullseye field (1506), band
+// follows the sights (1507), enemy reach + threat dot (1508), shields
+// (1509), BLOCK/BASH (1510), THROW (1511).
+export const OTA_BUILD_ID = '2026-08-26-1511-the-spear-leaves-your-hand';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1510-the-shield-answers-both-ways';
 // golem catch-up 2026-08-26: markerless publish of OTA-1510 (BLOCK absorb + SHIELD BASH stagger + the two combat buttons) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1509-shields-ride-the-off-arm';
 // golem catch-up 2026-08-26: markerless publish of OTA-1509 (Shields section + off-arm routing + back-stamp) to the golem channel.

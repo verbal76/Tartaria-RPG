@@ -308,6 +308,16 @@ export function getEquippedWeapon(
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     if (!(require('./bandolierEligibility') as typeof import('./bandolierEligibility')).itemIsThrowable(it)) continue;
     if (it.name.toLowerCase() !== name.toLowerCase()) continue;
+    // ⚠ OTA-1511 — AUTHORED ROWS WIN. This synthesize loop pre-empted the
+    // catalog lookup below for EVERY throwable-tagged item, so a catalogued
+    // throwing weapon (Throwing Knife 1d4 piercing, Mud Spear (Throwing) 1d8
+    // piercing…) landed weight-scaled dice with a hardcoded 'aetheric' type
+    // instead of what the catalog wrote for it — the same shadow class the
+    // OTA-1510 shield-dice branch died of. Catalog-absent throwables (the
+    // shards / plates / samples this loop was built for at OTA-208) still
+    // synthesize below.
+    const authoredRow = findWeaponByName(it.name);
+    if (authoredRow?.damageDice) return authoredRow;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { throwDamageNotation } = require('./itemWeight');
     return {

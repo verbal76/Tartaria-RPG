@@ -7303,6 +7303,12 @@ export interface GameStore {
   stowInBandolier: (itemName: string) => void;
   removeFromBandolier: (itemName: string, itemId?: string) => void;
   throwFromBandolier: (itemName: string, itemId?: string) => void;
+  /** ⚠ OTA-1511 — hurl a hand-carried throwing spear / javelin (the long
+   *  shafts OTA-605 keeps OFF the bandolier) at the active enemy through the
+   *  same full attack pipeline the bandolier uses: throwable reach bands,
+   *  authored catalog dice, consume-on-hit, enemy counters. Owner: "you
+   *  should have spare and then throw spear button." */
+  throwHeldWeapon: (itemName: string, itemId?: string) => void;
   /** OTA-676 — return a found faction SIGIL (a slain member's crest) to that
    *  faction's frontier stake to honor their dead: +1 standing, the sigil is
    *  spent. Only works while standing on the faction's turn-in tile. */
@@ -28148,6 +28154,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // A swing that never opened the dice modal (a refusal, or a synchronous
     // resolution whose hit-consume already spent the unit) settles NOW —
     // 'cancelled' restores the hand and spends nothing extra.
+    if (!get().pendingRolls) get().settleThrowRestore('cancelled');
+    void get().persist();
+  },
+
+  // ⚠⚠⚠ OTA-1511 — THE SPEAR LEAVES YOUR HAND (step 5 of the combat range
+  // rework). Owner: "you should have spare and then throw spear button."
+  // Long-shaft throwables (throwable+spear) can't rack on the bandolier
+  // (OTA-605: "carry it in hand"), so they get their own hurl: same
+  // rack-in-the-off-hand + throwSettlement dance as throwFromBandolier's
+  // weapon tail, which buys the whole attack pipeline for free — throwable
+  // reach bands (far, weak edge), the authored catalog dice, coatings,
+  // consume-on-hit with auto-unequip, and the group's answer. No rack gate
+  // here on purpose: spears are bandolier-INELIGIBLE, so the OTA-1140 seal
+  // (rackable ordnance must be racked in combat) is not bypassed.
+  throwHeldWeapon(itemName, itemId) {
+    const player = get().player;
+    const scene = get().currentScene;
+    if (!player || !scene) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { itemIsHandThrownSpear } = require('../engine/bandolierEligibility') as typeof import('../engine/bandolierEligibility');
+    const item = (itemId ? player.inventory.find((i) => i.id === itemId && i.quantity > 0) : undefined)
+      ?? player.inventory.find((i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0);
+    if (!item || !itemIsHandThrownSpear(item)) {
+      get().appendLog('arbiter', `The Arbiter eyes your grip. "No throwing spear to hand for that — the long shafts ride in the pack, not the bandolier."`);
+      return;
+    }
+    const prevOff = player.equipped?.off;
+    const prevOffId = player.equipped?.offId;
+    set((s) => s.player
+      ? { player: { ...s.player, equipped: { ...(s.player.equipped ?? {}), off: item.name, offId: item.id } } }
+      : s);
+    set({ throwSettlement: { itemId: item.id, qtyAtThrow: item.quantity, prevOff, prevOffId } });
+    get().submitPlayerAction(`attack with the off-hand ${item.name}`);
     if (!get().pendingRolls) get().settleThrowRestore('cancelled');
     void get().persist();
   },

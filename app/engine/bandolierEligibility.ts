@@ -29,6 +29,19 @@ export function itemIsThrowableCoating(item: InventoryItem): boolean {
   return canonicalItemTags(item).includes('weapon_coating');
 }
 
+/** ⚠ OTA-1511 — a LONG-SHAFT hand throwable: javelins and throwing spears
+ *  (`throwable` + `spear` tags), exactly the population OTA-605 turns away
+ *  from the bandolier with "carry it in hand." These hurl via the store's
+ *  throwHeldWeapon (the THROW SPEAR button); rackable small ordnance must
+ *  still go through the bandolier so BANDOLIER_MAX keeps meaning something
+ *  (the OTA-1140 seal). Melee spears that merely CARRY the emergency
+ *  `thrown` tag (Stone/Iron/Aether-Shard Spear) stay on the typed
+ *  improvised-throw path — no `throwable` tag, no button. */
+export function itemIsHandThrownSpear(item: InventoryItem): boolean {
+  const tags = canonicalItemTags(item);
+  return tags.includes('throwable') && tags.includes('spear');
+}
+
 export interface BandolierEligibility {
   eligible: boolean;
   reason: string;
