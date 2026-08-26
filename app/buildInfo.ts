@@ -24739,6 +24739,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // follows the sights (1507), enemy reach + threat dot (1508), shields
 // (1509), BLOCK/BASH (1510), THROW (1511).
 export const OTA_BUILD_ID = '2026-08-26-1511-the-spear-leaves-your-hand';
+// golem catch-up 2026-08-26: markerless publish of OTA-1511 (THROW SPEAR + authored throwable dice) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1510-the-shield-answers-both-ways';
 // golem catch-up 2026-08-26: markerless publish of OTA-1510 (BLOCK absorb + SHIELD BASH stagger + the two combat buttons) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1509-shields-ride-the-off-arm';
