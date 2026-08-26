@@ -24689,6 +24689,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // lunge. STILL COMING: shields/BLOCK/SHIELD BASH + iron-indigo section
 // (step 4), THROW (step 5).
 export const OTA_BUILD_ID = '2026-08-26-1508-the-enemies-have-ranges-too';
+// golem catch-up 2026-08-26: markerless publish of OTA-1508 (enemy reach classes + threat dot + weak-edge halving) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1507-the-band-follows-the-sights';
 // golem catch-up 2026-08-26: markerless publish of OTA-1507 (band re-derives on kill/KO/sweep promotion) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1506-the-field-goes-live';
