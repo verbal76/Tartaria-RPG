@@ -1592,6 +1592,24 @@ function applyEnemyCounter(
     return;
   }
 
+  // ⚠⚠⚠ OTA-1510 — THE SHIELD'S PROMISE, KEPT HERE: a raised BLOCK absorbs
+  // the FIRST incoming attack, whole — no roll, no partials — and is spent on
+  // the spot. Owner: "if you're using it as a defense, it only absorbs the
+  // first incoming attack." The second attacker of the same volley finds the
+  // shield already ringing and resolves normally, which is exactly the cost
+  // of holding position while everybody gets a shot.
+  if ((player.statusEffects ?? []).some((e) => e.kind === 'shield_block' && e.remainingRounds > 0)) {
+    set((s) => (s.player
+      ? { player: { ...s.player, statusEffects: (s.player.statusEffects ?? []).filter((e) => e.kind !== 'shield_block') } }
+      : s));
+    get().appendLog(
+      'combat',
+      `${enemy.name} strikes — and the blow breaks WHOLE on your raised shield. ✓ BLOCKED (absorbed; the block is spent).`,
+      { combatOutcome: 'enemy_miss' },
+    );
+    return;
+  }
+
   // Fight Back — if the player declared fight_back this round, the
   // enemy attack resolves as an opposed Fighting roll instead of a
   // flat AC check. Both roll d20 + their fighting stat; higher wins.

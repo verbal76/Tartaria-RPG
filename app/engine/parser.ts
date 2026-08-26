@@ -202,10 +202,16 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   // cover / bolster / reinforce.
   dodge: [
     'dodge', 'evade', 'sidestep', 'duck', 'juke', 'tumble', 'slip', 'twist', 'roll',
-    'block', 'parry', 'deflect', 'shield', 'brace', 'guard', 'fend', 'absorb', 'ward',
+    'parry', 'deflect', 'brace', 'guard', 'fend', 'absorb', 'ward',
     'defend',
   ],
-  block: [],
+  // ⚠⚠ OTA-1510 — BLOCK IS A REAL INTENT AGAIN, the shield's defense (owner:
+  // "the shield has a block function"). 'block' and 'shield' reclaim it; the
+  // rest of the old block-flavored verbs (parry / deflect / brace / guard /
+  // fend / absorb / ward / defend) STAY on dodge so an empty-handed player's
+  // muscle memory keeps reaching the parry mechanic. A shieldless 'block' is
+  // refused with DODGE named — see the gameStore case.
+  block: ['block', 'shield'],
   advance: [
     // sprint and rush moved to dash — they semantically describe fast
     // movement, not the "close one combat range band" beat that

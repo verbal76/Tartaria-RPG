@@ -890,6 +890,13 @@ export type StatusEffectKind =
   | 'dodging'
   // OTA-365 — 'blocking' removed (retired: no engine path ever applied
   // it; the dodge rework folded block into dodge).
+  // ⚠⚠ OTA-1510 — BLOCK is back, as the SHIELD's defense (owner: "the shield
+  // has a block function … if you're using it as a defense, it only absorbs
+  // the first incoming attack"). Set by the BLOCK action when a shield rides
+  // the off arm; the FIRST enemy blow that round breaks on the shield
+  // (consumed in applyEnemyCounter), the rest land normally. Distinct from
+  // the retired 'blocking' so no legacy cached effect resurrects into it.
+  | 'shield_block'
   // Action-card status effects. Each one is a one-round die modifier
   // routed through rollMods() in combatRules.ts.
   | 'aiming'         // +2 on next ranged attack vs the same target

@@ -17894,13 +17894,55 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'block': {
-        // Unreachable as of 2026-05-21 — parser.ts maps every
-        // block-flavored verb (block / parry / deflect / shield /
-        // brace / guard / fend / absorb / ward) to the 'dodge'
-        // intent above. Kept as a sealed-switch landing pad so
-        // legacy saves with cached intent='block' still resolve
-        // cleanly instead of falling into the default branch.
-        get().appendLog('world', `You set your stance. (block folded into dodge — see the parry mechanic above.)`);
+        // ⚠⚠⚠ OTA-1510 — BLOCK IS THE SHIELD'S DEFENSE, un-retired on the
+        // owner's word: "the shield has a block function … if you're using it
+        // as a defense, it only absorbs the first incoming attack" and
+        // "blocking holds position, gives everybody a shot." The stance costs
+        // the turn (the whole pack answers, exactly like dodge); the FIRST
+        // enemy blow of that volley breaks on the shield (consumed in
+        // applyEnemyCounter), the rest land as they normally would.
+        // ('block' verbs routed to dodge 2026-05-21..OTA-1509; the parser
+        // reclaimed 'block'/'shield' for this intent at OTA-1510, while
+        // parry/deflect/brace/guard/defend stay on dodge for the shieldless.)
+        const blockOffInst = player.inventory.find((i) => i.id === player.equipped?.offId)
+          ?? (player.equipped?.off ? player.inventory.find((i) => i.name === player.equipped?.off) : undefined);
+        const blockShieldName = blockOffInst && itemIsShield(blockOffInst) ? blockOffInst.name : null;
+        if (!blockShieldName) {
+          get().appendLog('arbiter', `The Arbiter taps your off arm. "Nothing there will stop a blow — BLOCK wants a shield on the off arm. Empty-handed, DODGE is the read."`, { skipDedup: true });
+          buzzBlocked();
+          break;
+        }
+        const alreadyBlocking = (player.statusEffects ?? []).some((e) => e.kind === 'shield_block');
+        if (alreadyBlocking) {
+          get().appendLog('world', `You're already set behind the ${blockShieldName} — the first blow that comes breaks on it.`);
+          break;
+        }
+        const blockEff: StatusEffect = {
+          kind: 'shield_block',
+          // Single-shot, same shape as 'dodging': consumed by the first
+          // incoming attack via applyEnemyCounter, expires on its own if
+          // nothing swings.
+          remainingRounds: 1,
+          label: `blocking (${blockShieldName})`,
+        };
+        set((s) =>
+          s.player
+            ? { player: advanceTime(spendStamina({
+                ...s.player,
+                statusEffects: applyEffect(s.player.statusEffects ?? [], blockEff),
+              }, 1), 0.1) }
+            : s,
+        );
+        get().appendLog(
+          'world',
+          currentScene.enemies.length > 0
+            ? `You plant your feet behind the ${blockShieldName} and hold position. The first blow that comes breaks on it — the rest you take as they come.`
+            : `You set the ${blockShieldName}. Nothing tests it.`,
+        );
+        // "gives everybody a shot" — holding position IS the turn.
+        if (currentScene.enemies.length > 0) {
+          runEnemyGroupCounters(get, set, get().player ?? player);
+        }
         break;
       }
       case 'advance':
@@ -22960,6 +23002,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (newEnemyHp > 0) staggerEnemy(set, activeIdx);
       } else if (effectiveMod.match === 'resist') {
         get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×${effectiveMod.multiplier} for ${dmg})`);
+      }
+      // ⚠⚠ OTA-1510 — SHIELD BASH rings the target: a landed blow with a
+      // SHIELD earns the same mechanical stagger a weakness hit does (one
+      // swing denied, OTA-1141 semantics), because a bash is about knocking
+      // the fight out of somebody, not cutting them. Same survive-the-blow
+      // guard as the flinch above — a bash KILL writes no stagger onto the
+      // corpse's inherited slot.
+      if (newEnemyHp > 0 && equipped && itemIsShield({ name: equipped.name, tags: equipped.tags ?? [] })) {
+        staggerEnemy(set, activeIdx);
+        get().appendLog('combat', `The ${equipped.name} slams home — ${enemy.name} reels from the bash. STAGGERED: no swing next round.`);
       }
       // OTA-1088 — wear bookkeeping. Count this landed resisted hit; at
       // GUARD_CRACK_HITS the pair cracks (the shrug-off line above still

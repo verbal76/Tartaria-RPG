@@ -103,12 +103,13 @@ describe('defensive verbs advance the round', () => {
     void stillDodging; // accepted either way
   });
 
-  it("'block' verb is now an alias for dodge — sets dodging status + triggers enemy counter + parry resolves", async () => {
+  it("shieldless 'block' is refused and does NOT advance the round; 'parry' still rides dodge", async () => {
     // Pre-2026-05-21 'block' set a separate 'blocking' status with a
-    // d20+weapon.defense roll. After the dodge rework, 'block' /
-    // 'parry' / 'deflect' / 'shield' etc all parse to the dodge
-    // intent. The status this commit sets is 'dodging', not
-    // 'blocking'.
+    // d20+weapon.defense roll; the dodge rework folded it into dodge.
+    // ⚠ OTA-1510 un-folded it: 'block' is the SHIELD's intent now. With
+    // no shield on the off arm the store refuses (names DODGE) and the
+    // turn is NOT spent — no enemy counter. The dodge alias family
+    // (parry/deflect/guard…) still advances the round as before.
     const store = useGameStore;
     await store.getState().hydrate();
     const race = getRaces()[0]!;
@@ -139,12 +140,20 @@ describe('defensive verbs advance the round', () => {
     store.getState().submitPlayerAction('block');
     const newLines = store.getState().gameLog.slice(beforeLog).flatMap((e) => e.text);
 
-    // Enemy counter fired this turn.
-    expect(newLines.some((t) => /vs your AC/i.test(t))).toBe(true);
-    // The legacy 'blocking' status MUST NOT be in play — the new
-    // mechanic uses 'dodging' for both (and OTA-365 removed the kind
-    // from the union entirely; compare as a string).
-    expect(store.getState().player!.statusEffects?.some((e) => (e.kind as string) === 'blocking')).toBe(false);
+    // Refused: BLOCK wants a shield; no enemy counter fired, turn kept.
+    expect(newLines.some((t) => /BLOCK wants a shield on the off arm/.test(t))).toBe(true);
+    expect(newLines.some((t) => /vs your AC/i.test(t))).toBe(false);
+    // The legacy 'blocking' status MUST NOT be in play (OTA-365 removed
+    // the kind from the union entirely; compare as a string) — and the
+    // refusal raised no shield_block either.
+    expect(store.getState().player!.statusEffects?.some((e) => (e.kind as string) === 'blocking') ?? false).toBe(false);
+    expect(store.getState().player!.statusEffects?.some((e) => e.kind === 'shield_block') ?? false).toBe(false);
+
+    // The dodge alias family still advances the round: 'parry' counters.
+    const beforeParry = store.getState().gameLog.length;
+    store.getState().submitPlayerAction('parry');
+    const parryLines = store.getState().gameLog.slice(beforeParry).flatMap((e) => e.text);
+    expect(parryLines.some((t) => /vs your AC/i.test(t))).toBe(true);
   });
 
   it('take_cover triggers the enemy counter so the cover bonus actually gates an incoming swing', async () => {

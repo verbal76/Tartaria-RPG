@@ -18,6 +18,7 @@ import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from './tutorialSteps';
 import { useGameStore, logUiTap } from '../state/gameStore';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { playerWeaponReach } from '../state/combatResolution';
+import { itemIsShield } from '../engine/crafting';
 import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
@@ -268,6 +269,15 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // OTA-1006 — the whole player, for the shared reach resolver behind the weapon
   // quick-button tones (replaces the old intelligence-only read).
   const reachPlayer = useGameStore((s) => s.player ?? null);
+  // ⚠ OTA-1510 — the shield on the off arm, if any: lights the owner's BLOCK
+  // ("should have a block button up here during combat") and SHIELD BASH.
+  const offShieldName = (() => {
+    const eq = reachPlayer?.equipped;
+    if (!eq?.off) return null;
+    const inst = reachPlayer?.inventory.find((i) => i.id === eq.offId)
+      ?? reachPlayer?.inventory.find((i) => i.name === eq.off);
+    return inst && itemIsShield(inst) ? inst.name : null;
+  })();
   // OTA-1170 — rounds left on the dodge lockout; 0/absent = ready (full blue).
   // ⚠⚠ OTA-1458 — EMPTY LEGS. Drives the travel row's spent state so a move the
   // store is about to refuse never looks tappable. See TravelBtn's `spent`.
@@ -765,6 +775,17 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               {/* OTA-1170 — DODGE carries a recharge bar. Still tappable while red: the
                   engine buzzes and names the beats left rather than refusing in silence. */}
               {!elevatedOn ? <QuickBtn label="dodge" defensive cooldownFill={dodgeFill(dodgeCooldown, dodgeMax)} onPress={() => onSubmit('dodge')} /> : null}
+              {/* ⚠⚠ OTA-1510 — the owner's BLOCK, "up here during combat", lit
+                  exactly when a shield rides the off arm: the first blow of the
+                  round breaks on it; holding position gives everybody a shot.
+                  SHIELD BASH is the same shield turned offense — it rings the
+                  target (stagger on hit) through the normal attack flow. */}
+              {offShieldName && !elevatedOn ? (
+                <QuickBtn label="block" defensive onPress={() => onSubmit('block')} />
+              ) : null}
+              {offShieldName ? (
+                <QuickBtn label="shield bash" onPress={() => onSubmit(`attack with the off-hand ${offShieldName.toLowerCase()}`)} />
+              ) : null}
               {/* OTA-847 (STEALTH SYSTEM) — in-combat STEALTH. First action of the
                   fight = SNEAK ATTACK (free STE check for the drop); mid-combat =
                   BACKSTAB attempt (costs your turn, STE initiative race). The

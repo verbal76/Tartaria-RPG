@@ -160,6 +160,9 @@ const COMBAT_ONLY_STATUSES: ReadonlySet<StatusEffectKind> = new Set([
   // OTA-1089 — the anti-stun-lock window is per-encounter: it protects the
   // recovery rounds of THIS fight and never carries immunity into the next.
   'braced',
+  // OTA-1510 — the shield stance is this round's, this fight's. An unspent
+  // block never carries out of the encounter that raised it.
+  'shield_block',
 ]);
 const STAMINA_GATED_STATUSES: ReadonlySet<StatusEffectKind> = new Set(['tired', 'exhausted']);
 

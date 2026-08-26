@@ -73,9 +73,9 @@ describe('dodge rework — active parry', () => {
     console.error = () => {};
   });
 
-  it("parser routes 'block' verbs through the dodge intent (block intent is unreachable)", () => {
+  it("parser keeps parry/deflect on dodge; 'block' is the shield's own intent since OTA-1510", () => {
     const p1 = parseInput('block');
-    expect(p1.intent).toBe('dodge');
+    expect(p1.intent).toBe('block');
     const p2 = parseInput('parry');
     expect(p2.intent).toBe('dodge');
     const p3 = parseInput('deflect');

@@ -321,6 +321,13 @@ export function getEquippedWeapon(
       description: it.description ?? 'A one-shot throwable. One throw, then gone.',
     };
   }
+  // ⚠ OTA-1510 — SHIELD BASH rides this same lookup with no special case:
+  // every catalog shield row carries AUTHORED bash dice (1d4 on the common
+  // bucklers up to 1d10 on the legendaries — several effects literally say
+  // "can bash"), so an off-arm shield resolves as a weapon through the same
+  // pipeline as any other — to-hit, resists, durability wear. The
+  // stagger-on-hit rides in the gameStore damage block beside the weakness
+  // flinch.
   return findWeaponByName(name);
 }
 

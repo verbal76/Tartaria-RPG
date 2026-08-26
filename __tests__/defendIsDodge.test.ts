@@ -33,9 +33,12 @@ describe('OTA-159 — `defend` routes to dodge, not help', () => {
 
   it.each([
     ['parry', 'dodge'],
-    ['block', 'dodge'],
+    // OTA-1510 — 'block' and 'shield' left the dodge pile: they are the
+    // shield's own intent now (BLOCK, the raised-shield absorb). The rest
+    // of the defensive verbs stay on dodge.
+    ['block', 'block'],
     ['guard', 'dodge'],
-    ['shield', 'dodge'],
+    ['shield', 'block'],
   ])('%j still parses to %s (existing dodge synonyms intact)', (input, intent) => {
     const r = parseInput(input, { ambientNouns: [] });
     expect(r.intent).toBe(intent);

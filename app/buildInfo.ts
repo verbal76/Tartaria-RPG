@@ -24699,7 +24699,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the load-time back-stamp in backfillPlayer that walks a main-hand shield
 // from an old save onto a free off arm — or back to the pack when that arm
 // is taken, never lost. BLOCK + SHIELD BASH are step 4b, next.
-export const OTA_BUILD_ID = '2026-08-26-1509-shields-ride-the-off-arm';
+// ⚠⚠⚠ OTA-1510 — THE SHIELD ANSWERS BOTH WAYS (step 4b of the combat range
+// rework). Owner, verbatim: "the shield has a block function and a shield
+// bash function. that way it can be used as a defense and an offense. if
+// you're using it as a defense, it only absorbs the first incoming attack"
+// — and "blocking holds position, gives everybody a shot", buttons "up here
+// during combat." BLOCK is a real intent again ('block'/'shield' reclaimed
+// from the dodge pile; parry/deflect/brace/guard/defend stay dodge for the
+// shieldless): it wants a shield on the off arm (refusal names DODGE), costs
+// the turn, holds position, and the whole pack answers — the FIRST blow of
+// that volley breaks WHOLE on the shield and the block is spent on the spot,
+// so the second attacker resolves normally. SHIELD BASH needed no new dice:
+// the catalog already authored real bash dice on every shield row (1d4
+// bucklers up to 1d10 legendaries — "can bash" is written in the effects),
+// so an off-arm shield swings through the normal weapon pipeline, and a
+// landed bash RINGS the target with the OTA-1141 stagger (one swing denied).
+// Both buttons appear exactly when a shield rides the off arm. Proven
+// live-store: two raiders vs a raised Mud Heater Shield — one absorb, one
+// normal d20, block gone. STILL COMING: THROW (step 5).
+export const OTA_BUILD_ID = '2026-08-26-1510-the-shield-answers-both-ways';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1509-shields-ride-the-off-arm';
 // golem catch-up 2026-08-26: markerless publish of OTA-1509 (Shields section + off-arm routing + back-stamp) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1508-the-enemies-have-ranges-too';
 // golem catch-up 2026-08-26: markerless publish of OTA-1508 (enemy reach classes + threat dot + weak-edge halving) to the golem channel.

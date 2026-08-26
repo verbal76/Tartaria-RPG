@@ -174,10 +174,12 @@ describe('Adjacent feature claims still match the code', () => {
     expect(/recipes\s*tab/i.test(src) || /tab.*=.*['"]recipes['"]/i.test(src)).toBe(false);
   });
 
-  it('OTA-113 — gameStore "block" case still routes to the dodge fold message', () => {
+  it('OTA-113/1510 — gameStore "block" case exists and is LIVE (the shield stance, not the dodge fold)', () => {
     const src = readGameStoreSource();
     expect(src.includes("case 'block':")).toBe(true);
-    expect(src.includes('block folded into dodge')).toBe(true);
+    // OTA-1510 un-retired the case: it raises the shield_block status
+    // instead of printing the old dodge-fold message.
+    expect(src.includes("kind: 'shield_block',")).toBe(true);
   });
 
   it('OTA-112 — gameStore intent dispatcher contains jump + disengage handlers', () => {
