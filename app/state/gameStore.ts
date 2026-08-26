@@ -565,6 +565,7 @@ import {
   AMULETS,
   RINGS,
   findCatalogItem,
+  itemIsShield,
 } from '../engine/crafting';
 import {
   FACTIONS,
@@ -3121,6 +3122,30 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   if (!out.dead && (out.hp ?? 0) <= 0) {
     const safeMax = out.hpMax && out.hpMax > 0 ? out.hpMax : 1;
     out = { ...out, hp: safeMax, stamina: out.staminaMax ?? out.stamina ?? 0 };
+  }
+  // ⚠⚠ OTA-1509 — SHIELDS RIDE THE OFF ARM: the load-time back-stamp. A save
+  // from before the recategorization can hold a shield in the MAIN hand
+  // (shields equipped as weapons until now). Move it to the off hand when that
+  // hand is free; when the off hand is occupied, the shield simply unequips —
+  // same item, same id, back in the pack, never lost. Matched through
+  // itemIsShield (the catalog `shield` tag), the same predicate the slot
+  // router and the inventory section use.
+  {
+    const mainName = out.equipped?.main;
+    if (mainName) {
+      const mainInst = out.inventory?.find((i) => i.id === out.equipped?.mainId)
+        ?? out.inventory?.find((i) => i.name === mainName);
+      if (mainInst && itemIsShield(mainInst)) {
+        const eq = { ...out.equipped };
+        if (!eq.off) {
+          eq.off = eq.main;
+          eq.offId = eq.mainId;
+        }
+        delete eq.main;
+        delete eq.mainId;
+        out = { ...out, equipped: eq };
+      }
+    }
   }
   // ⚠⚠ OTA-1219 — heal hunts wedged on a pure-narration stage. The OTA-1213
   // verb matcher can never match a null checkKind, and hunts (unlike mysteries

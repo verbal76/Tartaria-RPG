@@ -62,15 +62,22 @@ function pickPair() {
 }
 
 describe('OTA-1252 — the engine always allowed either hand', () => {
-  it('⚠⚠ MEASURED: every one-handed catalog weapon is valid in BOTH hands', () => {
+  it('⚠⚠ MEASURED: every one-handed catalog weapon is valid in BOTH hands — except shields, which ride the off arm', () => {
     // The premise of the whole change, checked against the shipped catalog rather
     // than trusted from a comment.
+    // ⚠ OTA-1509 — shields left this population by the owner's ruling
+    // ("categorized as a shield as armor piece used for offhand"): their only
+    // slot is 'off', asserted here so the carve-out is measured, not assumed.
     const oneHanded = WEAPONS.filter((w) => w.style !== 'two_handed');
     expect(oneHanded.length).toBeGreaterThan(10);
     for (const w of oneHanded.slice(0, 40)) {
       const slots = validSlotsForItem({
         id: 'x', name: w.name, kind: 'weapon', rarity: 'Common', quantity: 1, tags: [],
       } as never);
+      if ((w.tags ?? []).some((t) => t.toLowerCase() === 'shield')) {
+        expect(slots).toEqual(['off']);
+        continue;
+      }
       expect(slots).toContain('main');
       expect(slots).toContain('off');
     }

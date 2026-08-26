@@ -5,11 +5,14 @@ import { itemIsTool } from '../engine/pouchEligibility';
 import { isQuestLockedItem } from '../engine/questItems';
 import { isWeaponCoatingItem } from '../engine/weaponCoating';
 import { itemIsThrowable } from '../engine/bandolierEligibility';
-import { canonicalItemKind, canonicalItemTags } from '../engine/crafting';
+import { canonicalItemKind, canonicalItemTags, itemIsShield } from '../engine/crafting';
 
 export type InventoryCategory =
   | 'weapon'
   | 'armor'
+  // ⚠ OTA-1509 — shields are their own family (owner: "categorized as a
+  // shield as armor piece used for offhand"), with their own collapse bar.
+  | 'shield'
   // Dog companion vests (kind 'dog_armor'). Their own section so a stray vest
   // never hides among the player's own Armor or scatters into Loot/Materials.
   | 'dog_armor'
@@ -30,6 +33,7 @@ export type InventoryCategory =
 export const CATEGORY_COLORS: Record<InventoryCategory, string> = {
   weapon: '#e07a5f',
   armor: '#6a9bbf',
+  shield: '#6f7fae', // iron indigo — the owner picked it for the Shields bar
   dog_armor: '#b5764a', // leather brown — dog companion vests
   accessory: '#d4a55a',
   consumable: '#9ec96a',
@@ -68,6 +72,7 @@ export function rarityHexColor(rarity: string | null | undefined): string {
 export const CATEGORY_LABEL: Record<InventoryCategory, string> = {
   weapon: 'Weapons',
   armor: 'Armor',
+  shield: 'Shields',
   dog_armor: 'Dog Armor',
   accessory: 'Amulets & Rings',
   consumable: 'Consumables',
@@ -85,7 +90,8 @@ export const CATEGORY_LABEL: Record<InventoryCategory, string> = {
 export const CATEGORY_ORDER: InventoryCategory[] = [
   'weapon',
   'armor',
-  'dog_armor', // right after the player's own armor
+  'shield', // OTA-1509 — right after Armor (they are armor for the off arm)
+  'dog_armor', // after the player's own defensive gear
   'accessory',
   'consumable',
   'coating', // engine_Dev — combat-prep reagents, right after the things you eat
@@ -162,6 +168,11 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   // which combat + validSlotsForItem already wield as a melee weapon — lands in the
   // Weapons category instead of falling through to Loot. findWeaponByName's own
   // isCataloguedElsewhere guard keeps armor/material/amulet drops out of here.
+  // ⚠ OTA-1509 — shields OUT of Weapons and into their own section, checked
+  // before the weapon-catalog lookup that would otherwise claim them (they
+  // live in weapons.json). Tag-matched via itemIsShield — the Aetheric
+  // Shield-Hammer (a hammer that merely names a shield) stays a weapon.
+  if (itemIsShield(item)) return 'shield';
   if (findWeaponByName(item.name)) return 'weapon';
   if (ARMOR.some((a) => a.name.toLowerCase() === nameLower)) return 'armor';
   if (AMULETS.some((a) => a.name.toLowerCase() === nameLower)) return 'accessory';
@@ -251,6 +262,7 @@ export function groupInventoryByCategory(
   const groups: Record<InventoryCategory, InventoryItem[]> = {
     weapon: [],
     armor: [],
+    shield: [],
     dog_armor: [],
     accessory: [],
     consumable: [],

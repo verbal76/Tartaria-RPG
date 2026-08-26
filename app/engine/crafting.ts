@@ -994,6 +994,18 @@ function canonicalRowFor(name: string): ReturnType<typeof findCatalogItem> {
   return row;
 }
 
+/** ⚠⚠ OTA-1509 — IS THIS A SHIELD? The owner's ruling: *"Shields are
+ *  supposed to be categorized as a shield as armor piece used for offhand."*
+ *  One predicate answers it everywhere — the inventory section, the equip
+ *  slot routing, and the load-time back-stamp — matched on the catalog's
+ *  `shield` TAG (all ten shield rows carry it; the Aetheric Shield-Hammer,
+ *  a hammer that merely NAMES a shield, does not), never on the name. */
+export function itemIsShield(item: { name: string; tags?: readonly string[] }): boolean {
+  if ((item.tags ?? []).some((t) => t.toLowerCase() === 'shield')) return true;
+  const row = findWeaponByName(item.name);
+  return !!row?.tags?.some((t) => t.toLowerCase() === 'shield');
+}
+
 /** OTA-999 — canonical KIND: fused pieces stay instance-authoritative
  *  (uniqueStats.kind), catalog rows answer by name, and only a non-catalog
  *  name falls back to the persisted snapshot. The load-time kind heal is

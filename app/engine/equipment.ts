@@ -1,5 +1,5 @@
 import type { InventoryItem, EquipSlot, PlayerCharacter, PlayerEquipped, Stats } from './types';
-import { canonicalItemKind, canonicalItemTags, findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName } from './crafting';
+import { canonicalItemKind, canonicalItemTags, findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName, itemIsShield } from './crafting';
 import { isWeaponCoatingItem } from './weaponCoating';
 import { itemIsThrowable } from './bandolierEligibility';
 import { aggregateInventoryPassives, inventoryHasGate, isScanner, type EffectResolver, type GateKind, type ScannerBias } from './itemEffect';
@@ -82,6 +82,11 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   // ⚠ Verified against every catalog file when this shipped: zero weapons or
   // armour carry any of these tags, so this cannot cost a real item its slot.
   if (item.tags.some((t) => NEVER_EQUIPPABLE_TAGS.has(t.toLowerCase()))) return [];
+  // ⚠⚠ OTA-1509 — SHIELDS RIDE THE OFF ARM, and only the off arm. Owner:
+  // "Shields are supposed to be categorized as a shield as armor piece used
+  // for offhand." Checked BEFORE the weapon-catalog lookup, which would
+  // otherwise offer both hands (shields live in weapons.json).
+  if (itemIsShield(item)) return ['off'];
   if (findWeaponByName(item.name)) {
     return ['main', 'off']; // any weapon can go in either hand
   }
