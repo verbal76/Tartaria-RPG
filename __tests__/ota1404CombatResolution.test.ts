@@ -228,6 +228,11 @@ describe('OTA-1404 — the move changed no behaviour, and here is the arithmetic
     const KNOWN_TINY = new Set([
       'enemyIsAirborne', 'dtProcChance', 'playerColdResist',
       'playerIsDownNotDead', 'isRangedEnemy',
+      // ⚠ OTA-1508 — enemyCanReach became a two-line delegation to enemyReach
+      // (the one resolver for enemy reach classes). Not hollowed out: its body
+      // MOVED INTO the resolver so the counter gate and the threat dot cannot
+      // carry two spellings of "what can this enemy hit".
+      'enemyCanReach',
     ]);
 
     let measured = 0;

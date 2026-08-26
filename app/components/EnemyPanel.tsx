@@ -46,6 +46,12 @@ export interface EnemyView {
    *  not read his off hand at all. One entry per filled hand; a single
    *  bare-hands entry when both are empty. */
   hands?: Array<{ slot: 'main' | 'off'; label: string; inRange: boolean }>;
+  /** ⚠⚠ OTA-1508 — THE OWNER'S THREAT DOT, his words: *"a small circle in
+   *  one of the bottom corners … red means they can hit me, yellow is they
+   *  can reach me but it'd be weak damage, green means they can't touch
+   *  me."* Judged at THIS enemy's own ring by the same resolver the counter
+   *  volley uses (enemyThreatAt). */
+  threat?: 'red' | 'yellow' | 'green';
   /** OTA-401 — active coating/DOT statuses on this enemy + turns left. */
   statuses?: EnemyStatusView[];
 }
@@ -378,7 +384,9 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
   return (
     <View
       style={[styles.card, { width: cardWidth }]}
-      accessibilityLabel={`${view.enemy.name}, ${view.enemy.type}, ${view.enemy.rarity}. HP ${view.currentHp} of ${view.enemy.hp}, AC ${ac}, ${inRange ? 'in range' : 'out of range'}`}
+      accessibilityLabel={`${view.enemy.name}, ${view.enemy.type}, ${view.enemy.rarity}. HP ${view.currentHp} of ${view.enemy.hp}, AC ${ac}, ${inRange ? 'in range' : 'out of range'}${
+        view.threat ? `. Threat: ${view.threat === 'red' ? 'can hit you' : view.threat === 'yellow' ? 'can reach you weakly' : 'cannot reach you'}` : ''
+      }`}
     >
       <View style={styles.head}>
         <View style={styles.headLeft}>
@@ -526,6 +534,16 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
           ))}
         </View>
       )}
+      {/* ⚠⚠ OTA-1508 — the threat dot, bottom-right corner, exactly where the
+          owner asked for it. Its color comes from the SAME resolver the
+          counter volley rolls with (enemyThreatAt), so what the dot promises
+          is what the next enemy round does. */}
+      {!!view.threat && (
+        <View
+          style={[styles.threatDot, styles[`threat_${view.threat}`]]}
+          accessibilityLabel={`threat ${view.threat}`}
+        />
+      )}
     </View>
   );
 }
@@ -548,6 +566,21 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 8,
   },
+  // OTA-1508 — the threat dot. A thin dark ring keeps it readable against
+  // whatever the card's bottom edge holds.
+  threatDot: {
+    position: 'absolute',
+    bottom: 5,
+    right: 5,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#0d0b0a',
+  },
+  threat_red: { backgroundColor: '#e05f5f' },
+  threat_yellow: { backgroundColor: '#e0c05f' },
+  threat_green: { backgroundColor: '#9ec96a' },
   head: {
     flexDirection: 'row',
     justifyContent: 'space-between',

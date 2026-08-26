@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platfor
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey, chipDismissTileKey, logUiTap } from '../state/gameStore';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
-import { enemyBandOf, playerWeaponReach } from '../state/combatResolution';
+import { enemyBandOf, enemyThreatAt, playerWeaponReach } from '../state/combatResolution';
 // OTA-1480 — "am I really at the place my record names", once, for all four readers.
 import { stationedAtNamedLocation } from '../engine/standingAt';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError, stampBreadcrumbPhase } from '../engine/saveSystem';
@@ -947,6 +947,10 @@ export function ExplorationScreen() {
         rangeLabel: band === null ? 'out of range' : RANGE_LABELS[band],
         inRange: hands[0]?.inRange ?? false,
         hands,
+        // ⚠ OTA-1508 — the owner's corner dot: red = it can hit you from where
+        // it stands, yellow = only weakly (halved), green = it can't touch you.
+        // A dead body threatens nobody.
+        threat: (currentScene.enemyHps[i] ?? e.hp) <= 0 ? ('green' as const) : enemyThreatAt(e, band),
         // OTA-401 — surface active coating/DOT statuses + turns left on the panel.
         statuses: currentScene.enemyStatuses?.[i] ?? [],
       };

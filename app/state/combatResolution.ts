@@ -475,19 +475,101 @@ function isRangedEnemy(enemy: Enemy): boolean {
   return /(bow|arrow|crossbow|ranged|projectile|firearm|sling|dart|laser|beam|breath|burst|venom|bolt|blast|aetheric|pulse|spit|spine|quill)/.test(sig);
 }
 
+// ---------------------------------------------------------------------------
+// ⚠⚠⚠ OTA-1508 — THE ENEMIES HAVE RANGES TOO. The owner, designing the
+// bullseye: *"remember range should limit my weapons ability and theirs
+// depending on what they have so the enemies have to have a range too."*
+// One resolver answers it — the enemy-side mirror of playerWeaponReach:
+//
+//   1. A humanoid that CARRIES weapons (OTA-361 kit) fights with them: each
+//      carried name resolves through the real catalog → reachClassFor →
+//      reachBandsFor, the same chain the player's hands use.
+//   2. The authored `attack` text always contributes a class too (the Bog
+//      Dragon's Breath is ranged whatever it carries): the OTA-796 ranged
+//      regex, a long-arm regex (spear/pike/whip/tail…), else melee.
+//
+// Each class reaches some bands FULL and its outermost band WEAK — the weak
+// band is where the owner's YELLOW dot lives ("they can reach me, but it'd
+// be weak damage"), and a blow landed from it arrives HALVED:
+//
+//   melee      → full [close]            weak [mid]      (⚠ mid stays reachable
+//                — the OTA-550 conservatism kept deliberately, but the lunge
+//                from a ring out now lands at half; the reach itself is
+//                unchanged so no fight becomes safe that wasn't)
+//   long       → full [close, mid]       weak []         (a spear AT mid is
+//                its whole job — never weak there)
+//   throwable  → full [close, mid]       weak [far]
+//   ranged /
+//   runecaster → full [close, mid, far]  weak [distant]  (the extreme-range
+//                arc harasses; it no longer hits like a mid-range shot)
+// ---------------------------------------------------------------------------
+
+const LONG_ARM_RE = /\b(spear|pike|lance|halberd|glaive|polearm|whip|tail|tendril|tentacle|lash)\b/i;
+
+type EnemyReachClass = 'melee' | 'long' | 'throwable' | 'ranged';
+
+const REACH_CLASS_BANDS: Record<EnemyReachClass, { full: CombatRange[]; weak: CombatRange[] }> = {
+  melee: { full: ['close'], weak: ['mid'] },
+  long: { full: ['close', 'mid'], weak: [] },
+  throwable: { full: ['close', 'mid'], weak: ['far'] },
+  ranged: { full: ['close', 'mid', 'far'], weak: ['distant'] },
+};
+
+function enemyReachClasses(enemy: Enemy): EnemyReachClass[] {
+  const classes = new Set<EnemyReachClass>();
+  // The authored attack is always a source — it is what the bestiary says
+  // this thing DOES.
+  if (isRangedEnemy(enemy)) classes.add('ranged');
+  else if (LONG_ARM_RE.test(`${enemy.attack ?? ''} ${enemy.name ?? ''}`)) classes.add('long');
+  else classes.add('melee');
+  // A carried kit widens it: the raider with a crossbow on his back shoots.
+  for (const name of enemy.carries?.weapons ?? []) {
+    const w = findWeaponByName(name);
+    if (!w) continue;
+    const cls = reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags });
+    if (cls === 'ranged' || cls === 'runecaster') classes.add('ranged');
+    else if (cls === 'throwable') classes.add('throwable');
+    else if (cls === 'long') classes.add('long');
+    else classes.add('melee');
+  }
+  return [...classes];
+}
+
+/** The enemy's whole reach: every band it can strike from, and which of those
+ *  are its WEAK edge (a band is weak only if NO class covers it full). */
+export function enemyReach(enemy: Enemy): { bands: CombatRange[]; weakBands: CombatRange[] } {
+  const full = new Set<CombatRange>();
+  const weak = new Set<CombatRange>();
+  for (const cls of enemyReachClasses(enemy)) {
+    const spec = REACH_CLASS_BANDS[cls];
+    for (const b of spec.full) full.add(b);
+    for (const b of spec.weak) weak.add(b);
+  }
+  for (const b of full) weak.delete(b);
+  return { bands: [...full, ...weak], weakBands: [...weak] };
+}
+
+/** ⚠ THE OWNER'S DOT, verbatim: *"a small circle in one of the bottom
+ *  corners … red means they can hit me, yellow is they can reach me but it'd
+ *  be weak damage, green means they can't touch me."* Judged at the enemy's
+ *  own band; null (ring 5 walker) is green — he is absent and closing. */
+export function enemyThreatAt(enemy: Enemy, band: CombatRange | null): 'red' | 'yellow' | 'green' {
+  if (band === null) return 'green';
+  const reach = enemyReach(enemy);
+  if (!reach.bands.includes(band)) return 'green';
+  return reach.weakBands.includes(band) ? 'yellow' : 'red';
+}
+
 // Whether an enemy can still strike the player at the given range.
-// Lore: melee = arm's reach, ranged = close + far, runecasters mostly close
-// + arm. We use a conservative default — most generic enemies threaten arm
-// and close, plus anything carrying a ranged hint reaches at far.
-// ⚠ OTA-1506 — the range passed here is now THAT ENEMY'S OWN band
-// (enemyBandOf), and null means ring 5: present, walking in, unable to act.
+// ⚠ OTA-1506 — the range passed here is THAT ENEMY'S OWN band (enemyBandOf),
+// and null means ring 5: present, walking in, unable to act.
+// ⚠ OTA-1508 — now answered by the reach resolver above. For text-classified
+// enemies this is band-for-band what OTA-550 shipped (melee close+mid, ranged
+// all four); what changed is that a carried kit can WIDEN it, and the weak
+// edge halves the blow (see applyEnemyCounter).
 function enemyCanReach(enemy: Enemy, range: CombatRange | null): boolean {
   if (range === null) return false;
-  // OTA-550 — at close/mid a generic (melee-capable) enemy threatens the
-  // player; at far/distant only a ranged enemy can still strike.
-  if (range === 'close' || range === 'mid') return true;
-  // 'far' / 'distant' — only ranged enemies can still strike.
-  return isRangedEnemy(enemy);
+  return enemyReach(enemy).bands.includes(range);
 }
 
 export function parseEnemyAP(enemy: { abilityPoint?: string } | null | undefined, fallback = 3): number {
@@ -1919,6 +2001,13 @@ function applyEnemyCounter(
 
   if (hit) {
     let rawDmg = rollFromNotation(String(enemy.damage)) || rollDie(6);
+    // ⚠⚠ OTA-1508 — A BLOW FROM THE WEAK EDGE OF ITS REACH ARRIVES HALVED.
+    // The owner's yellow dot made a promise ("they can reach me but it'd be
+    // weak damage"); this is the promise kept. Judged at THIS enemy's own
+    // band; callers that pass no index keep the full-damage shipped behavior.
+    const edgeScene = get().currentScene;
+    const edgeBand = edgeScene && enemyIdx !== undefined ? enemyBandOf(edgeScene, enemyIdx) : null;
+    const edgeWeak = edgeBand !== null && enemyReach(enemy).weakBands.includes(edgeBand);
     // Critical: roll damage twice and sum, mirroring the player's
     // double-dice crit treatment so the bite hurts. OTA-796 — skipped when a
     // dodge contest resolved this swing: the contest replaced the to-hit roll,
@@ -1935,6 +2024,9 @@ function applyEnemyCounter(
     if (enemy.boss) {
       rawDmg += rollDie(6);
     }
+    // ⚠ OTA-1508 — applied AFTER crit/boss dice so the halving covers the
+    // whole blow, not just the base notation.
+    if (edgeWeak) rawDmg = Math.max(1, Math.ceil(rawDmg / 2));
     // arb119 — concrete damage type for EVERY enemy (explicit word in the
     // damage string, else inferred from the attack/name verb, else physical).
     // Drives the resistance check + the player-facing display so the OTA-529
@@ -2129,8 +2221,8 @@ function applyEnemyCounter(
         plate: plateDr,                // OTA-1141 — capped-off AC soaks instead
       });
       const msg = killed
-        ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}. You fall.`
-        : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}. You have ${newHp} HP remaining.`;
+        ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}${edgeWeak ? ' [edge of reach — halved]' : ''}. You fall.`
+        : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}${edgeWeak ? ' [edge of reach — halved]' : ''}. You have ${newHp} HP remaining.`;
       const prevHpForWarn = nextPlayer.hp;
       const hpMaxForWarn = nextPlayer.hpMax ?? 1;
       void Promise.resolve().then(() => {

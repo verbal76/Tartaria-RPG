@@ -110,6 +110,30 @@ approved, apply the FIX RULE above per item, and keep the owner's design
 calls (intentional exploits, kept tradeoffs) on record in HANDOFF §8 so a
 future session doesn't "fix" them.
 
+**⚠ ALWAYS critique TRAVEL and COMBAT — every log, no exceptions** (owner
+directive, 2026-08-26: "those 2 items have so many variations they must
+always be critiqued"). These two systems have the most moving parts and the
+most ways to be quietly wrong, so a log pass is not done until each has its
+own explicit verdict:
+
+- **Combat**: check every fight's arithmetic against the systems — spawn
+  staggering and per-enemy rings (OTA-1506+), the attack gate judging the
+  TARGET'S own band, movement deltas (one ring per head-on step, the
+  CONTACT_MIN 0.35 clamp), pursuit per body, counter eligibility per enemy
+  reach class (OTA-1508 full/weak bands, weak-edge halving), initiative,
+  AC/damage math, DOT ticks, dodge/stealth economies, boss double-swings,
+  and the kill promotion re-deriving the band (OTA-1507). Verify the
+  numbers, don't skim the prose.
+- **Travel**: check every movement beat — overland steps vs the compass and
+  where-line, route/auto-travel behavior, tile canon (locations matching
+  the atlas), encounter spawn timing on the road, outpost/room navigation
+  against the graph, ENTER affordances, weather reposition costs, and
+  time-passed stamps against the action taken. If the log contains NO
+  travel, say so explicitly rather than silently skipping the category.
+
+State both verdicts even when one is "clean" or "absent" — an unexamined
+category reads identical to a passing one, which is how variations slip by.
+
 ## Inventory snapshot triage
 
 Whenever the user pastes a COPY INVENTORY export — recognizable

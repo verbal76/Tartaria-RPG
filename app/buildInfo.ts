@@ -24671,7 +24671,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // resolveEnemyDefeat, the KO promotion, and the DOT/AoE sweep (the swipe
 // already did, since 1506). Proven live-store: corpse close + survivor far →
 // sweep leaves range 'far'.
-export const OTA_BUILD_ID = '2026-08-26-1507-the-band-follows-the-sights';
+// ⚠⚠⚠ OTA-1508 — THE ENEMIES HAVE RANGES TOO (step 3 of the combat range
+// rework). Owner: "range should limit my weapons ability and theirs depending
+// on what they have so the enemies have to have a range too" + the corner
+// dot: "red means they can hit me, yellow is they can reach me but it'd be
+// weak damage, green means they can't touch me." One resolver (enemyReach)
+// mirrors playerWeaponReach for the other side: the carried kit (OTA-361)
+// resolves through the real weapon catalog, the authored attack text is the
+// always-on fallback (ranged regex / long-arm regex / melee), and each class
+// reaches some bands FULL and its outermost band WEAK. The counter gate rolls
+// with it (band-for-band the OTA-550 reach for text-classified enemies — no
+// fight becomes safe that wasn't; a carried crossbow finally shoots), a blow
+// from the weak edge lands HALVED with the log saying so, and every enemy
+// card wears the red/yellow/green threat dot in its bottom-right corner,
+// judged at that enemy's own ring by the same resolver. Proven live-store
+// with deterministic dice: the same cudgel deals exactly half from the mid
+// lunge. STILL COMING: shields/BLOCK/SHIELD BASH + iron-indigo section
+// (step 4), THROW (step 5).
+export const OTA_BUILD_ID = '2026-08-26-1508-the-enemies-have-ranges-too';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1507-the-band-follows-the-sights';
 // golem catch-up 2026-08-26: markerless publish of OTA-1507 (band re-derives on kill/KO/sweep promotion) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1506-the-field-goes-live';
 // golem catch-up 2026-08-26: markerless publish of OTA-1506 (per-enemy bullseye combat) to the golem channel.
