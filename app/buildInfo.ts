@@ -24700,6 +24700,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // from an old save onto a free off arm — or back to the pack when that arm
 // is taken, never lost. BLOCK + SHIELD BASH are step 4b, next.
 export const OTA_BUILD_ID = '2026-08-26-1509-shields-ride-the-off-arm';
+// golem catch-up 2026-08-26: markerless publish of OTA-1509 (Shields section + off-arm routing + back-stamp) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1508-the-enemies-have-ranges-too';
 // golem catch-up 2026-08-26: markerless publish of OTA-1508 (enemy reach classes + threat dot + weak-edge halving) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1507-the-band-follows-the-sights';
