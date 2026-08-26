@@ -24672,6 +24672,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // already did, since 1506). Proven live-store: corpse close + survivor far →
 // sweep leaves range 'far'.
 export const OTA_BUILD_ID = '2026-08-26-1507-the-band-follows-the-sights';
+// golem catch-up 2026-08-26: markerless publish of OTA-1507 (band re-derives on kill/KO/sweep promotion) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1506-the-field-goes-live';
 // golem catch-up 2026-08-26: markerless publish of OTA-1506 (per-enemy bullseye combat) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1505-the-crash-brings-its-own-evidence';
