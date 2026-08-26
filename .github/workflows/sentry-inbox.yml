@@ -19,6 +19,14 @@ on:
   push:
     branches: [golem-line]
     paths: ['sentry-inbox/request.txt']
+  # ⚠ 2026-08-26 — THE HOURLY CLOCK, on the owner's word: "we need to set you
+  # to pull all sentry when I start a new session or periodically." A session
+  # start can't be hooked server-side, so the relay pulls on its own schedule
+  # and commits anything new — whichever session opens next just `git pull`s
+  # and the evidence is already in the tree. Quiet hours cost nothing: no new
+  # events → no commit (the "Nothing new" branch below).
+  schedule:
+    - cron: '0 * * * *'
 
 permissions:
   contents: write
