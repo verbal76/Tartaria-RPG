@@ -24638,6 +24638,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // was 44 minutes off and read "died doing that" — with a staleness clause when
 // the standing action was >2m old, in the ledger, the boot line, and About.
 export const OTA_BUILD_ID = '2026-08-25-1504-the-bundle-survives-the-kill';
+// golem catch-up 2026-08-26: markerless publish of OTA-1504 (durable send-log + last-sign-of-life dating) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1503-the-bullseye-is-the-truth';
 // golem catch-up 2026-08-25: markerless publish of OTA-1503 (bullseye geometry, unwired) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1502-the-swipe-is-the-selector';
