@@ -24645,7 +24645,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // durable pipeline automatically — composed by the same stampers as the
 // button, marked per crash so a loop cannot storm, silent on every player
 // device (the privacy page's "slim crash records only" stays true for them).
-export const OTA_BUILD_ID = '2026-08-26-1505-the-crash-brings-its-own-evidence';
+// ⚠⚠⚠ OTA-1506 — THE FIELD GOES LIVE (step 2b of the combat range rework —
+// the OTA-1503 bullseye wired into the game). Every enemy now carries its own
+// `pos` (bearing + distance on the rings); spawns land staggered — parties
+// cluster patrol-style across rings 1-4, nearest first, which IS the pager
+// order; a lone foe keeps the shipped mid opening so the duel keeps its
+// approach game. The attack gate, counter volley, and scrum cap all judge THAT
+// enemy's own band (a ring-5 walker is refused outright — absent, closing);
+// one APPROACH/STEP BACK moves the whole field cartesian-exactly (north
+// closes, south opens, the 90° man barely moves) with a one-line field-shift
+// narration; the pack pursues PER BODY down its own bearing; the enemy card
+// reports both hands against its own enemy's ring; and the legacy shared
+// `scene.range` survives as a derived compatibility band (active target,
+// re-derived on swipe/step/pursuit) so old readers stay truthful. Old saves
+// migrate lazily — positions synthesize deterministically from the shared band
+// they stored. STILL COMING: enemy reach classes + threat dot (step 3),
+// shields/BLOCK/SHIELD BASH + iron-indigo section (step 4), THROW (step 5).
+export const OTA_BUILD_ID = '2026-08-26-1506-the-field-goes-live';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1505-the-crash-brings-its-own-evidence';
 // golem catch-up 2026-08-26: markerless publish of OTA-1505 (auto-bundle on crash for owner/sasmooch devices) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1504-the-bundle-survives-the-kill';
 // golem catch-up 2026-08-26: markerless publish of OTA-1504 (durable send-log + last-sign-of-life dating) to the golem channel.

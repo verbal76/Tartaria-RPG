@@ -63,7 +63,9 @@ describe('OTA-1502 — combat approach closes on the pager selection', () => {
 
 describe('OTA-1502 — both hands report against the enemy on screen', () => {
   it('⚠⚠⚠ THE OFF HAND IS ASKED TOO — the half of his loadout that was mute', () => {
-    const i = EXPL.indexOf('const hands:');
+    // ⚠ OTA-1506 — the hands resolve ONCE (handReaches) and each card asks its
+    // own enemy's band; the claim is unchanged: both slots are consulted.
+    const i = EXPL.indexOf('const handReaches:');
     expect(i).toBeGreaterThan(-1);
     const body = EXPL.slice(i, EXPL.indexOf('return currentScene.enemies.map', i));
     expect(body).toContain("for (const slot of ['main', 'off'] as const)");
@@ -73,14 +75,16 @@ describe('OTA-1502 — both hands report against the enemy on screen', () => {
   it('⚠⚠ reach comes from the resolver the attack gate rolls with, not a local copy', () => {
     // OTA-1006 settled this for the main hand: a second derivation drifts, and
     // the drift shows up as a weapon glowing green while every swing bounces.
-    const i = EXPL.indexOf('const hands:');
+    const i = EXPL.indexOf('const handReaches:');
     const body = EXPL.slice(i, EXPL.indexOf('return currentScene.enemies.map', i));
     expect(body).not.toMatch(/reachClassFor|findWeaponByName|RANGE_ORDER/);
-    expect(body).toContain('reach.bands.includes(range)');
+    // ⚠ OTA-1506 — the membership test moved into the per-enemy map, judged at
+    // that enemy's own band, still from the resolver's bands and nothing local.
+    expect(EXPL).toContain('inRange: band !== null && h.bands.includes(band),');
   });
 
   it('⚠⚠ empty hands still answer — bare hands reach at close', () => {
-    const i = EXPL.indexOf('const hands:');
+    const i = EXPL.indexOf('const handReaches:');
     const body = EXPL.slice(i, EXPL.indexOf('return currentScene.enemies.map', i));
     expect(body).toContain("label: 'Bare hands'");
     expect(body).toContain("reachBandsFor('barehanded')");

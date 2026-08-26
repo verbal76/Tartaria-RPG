@@ -308,6 +308,7 @@ describe('OTA-1089 — braced tick class + source locks', () => {
     // unchanged: bosses are never capped, and range decides whether a ranged
     // enemy is exempt.
     expect(COMBAT_SRC).toMatch(/const meleeAttacker = !enemy\.boss && \(inTheScrum \|\| !isRangedEnemy\(enemy\)\);/);
-    expect(COMBAT_SRC).toMatch(/const inTheScrum = \(liveScene\.range \?\? 'close'\) === 'close';/);
+    // ⚠ OTA-1506 — the scrum is judged at THAT enemy's own band (liveRange).
+    expect(COMBAT_SRC).toMatch(/const inTheScrum = liveRange === 'close';/);
   });
 });

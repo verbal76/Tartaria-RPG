@@ -144,17 +144,20 @@ describe('OTA-1140 — the stagger family is sealed', () => {
 describe('OTA-1140 — the exploits are closed', () => {
   it('⚠ THE PACK PURSUES — a benched melee enemy closes one band at volley end', () => {
     expect(COMBAT_SRC).toContain('const outOfReach: string[] = [];');
-    expect(COMBAT_SRC).toContain("{ outOfReach.push(enemy.name); continue; }");
-    expect(COMBAT_SRC).toContain("cur === 'distant' ? 'far' : cur === 'far' ? 'mid' : cur === 'mid' ? 'close' : null;");
-    expect(COMBAT_SRC).toContain('closes the distance. (range: ${closed})');
+    // ⚠ OTA-1506 — the pursuit walks each benched BODY down its own line
+    // (enemyCloses on its pos) instead of stepping one shared band.
+    expect(COMBAT_SRC).toContain('outOfReach.push(enemy.name);');
+    expect(COMBAT_SRC).toContain('pos: enemyCloses(enemyPosOf(sceneAtClose, i))');
+    expect(COMBAT_SRC).toContain('closes the distance.');
   });
 
   it('⚠ pursuit never passes close, and only fires when someone was actually benched', () => {
     const from = COMBAT_SRC.indexOf('// OTA-1140 — the pursuit itself.');
     const block = blockAt(COMBAT_SRC, '// OTA-1140 — the pursuit itself.');
     expect(block).toContain('if (outOfReach.length > 0 && (get().player?.hp ?? 0) > 0)');
-    expect(block).toContain("cur === 'mid' ? 'close' : null");
-    expect(block).toContain('if (closed) {');
+    // ⚠ OTA-1506 — "never past close" is now geometry: enemyCloses floors at
+    // CONTACT_MIN (proven in ota1503), and dead bodies do not walk.
+    expect(block).toContain('(sceneAtClose.enemyHps[i] ?? 0) <= 0) return e;');
   });
 
   it('⚠ you cannot CAMP in front of something trying to kill you', () => {

@@ -549,7 +549,11 @@ export function buildOverlayOverrides(
   overlay: ElevatedOverlay,
   encounterEnemy: Enemy | null,
 ): OverlaySceneOverrides {
-  const enemies = encounterEnemy ? [encounterEnemy] : [];
+  // OTA-1506 — the single overlay foe stands on the bullseye at the shipped
+  // 'mid' opening (matches the range literal the swap-in scene writes).
+  const enemies = encounterEnemy
+    ? [{ ...encounterEnemy, pos: { bearing: Math.random() * 360, distance: 1.5 } }]
+    : [];
   return {
     ambientNouns: [...overlay.ambientNouns],
     displayedAmbientNouns: [...overlay.ambientNouns],

@@ -222,9 +222,10 @@ import { noteVisibleLogLine, visibleLogTotal, _resetVisibleLogCountForTest } fro
 // interface change, nothing an importer notices. These names are called from
 // here exactly as they were when they sat a few thousand lines further down.
 import {
-  activeEnemy, aggregateArmor, applyEscortDamage, BUILTIN_DT_COMBAT, canonDT,
-  checkLowHpWarning, DEV_REVIVE_NAMES, dtProcChance, enemyBuildScore, enemyIsAirborne,
-  failEscortQuests, handlePlayerDeath, parseEnemyAP, playerArmorResistKinds,
+  activeEnemy, aggregateArmor, applyEscortDamage, arrivalPos, BUILTIN_DT_COMBAT, canonDT,
+  checkLowHpWarning, derivedSceneRange, DEV_REVIVE_NAMES, dtProcChance, enemyBandOf, enemyBuildScore,
+  enemyIsAirborne, failEscortQuests, handlePlayerDeath, openingRange, parseEnemyAP,
+  placeEnemies, playerArmorResistKinds,
   playerBuildScore, playerIsDownNotDead, playerWeaponReach, RANGE_LABEL,
   recordEnemyIntel, runEnemyGroupCounters, runMoveCombatRange, runSurvivorVolley,
   staggerEnemy, sweepDeadEnemies, tickEnemyDotsAndMaybeEndFight,
@@ -4524,15 +4525,18 @@ function injectFactionParty(
       scaled = [{ ...body, hp: folded.hpBudget, eliteReplaced: folded.elite.eliteReplaced }];
     }
   }
-  const enemyHps = scaled.map((e) => e.hp);
+  // ⚠ OTA-1506 — the party lands ON THE BULLSEYE: a raid travels together, so
+  // it clusters (patrol shape) and staggers across the rings, leader nearest.
+  const placedParty = placeEnemies(scaled, 'patrol');
+  const enemyHps = placedParty.map((e) => e.hp);
   set((st) => (st.currentScene ? {
     currentScene: {
       ...st.currentScene,
-      enemies: scaled,
+      enemies: placedParty,
       enemyHps,
       activeEnemyIdx: 0,
-      range: 'mid',
-      enemyAmbushUsed: scaled.map(() => false),
+      range: openingRange(placedParty),
+      enemyAmbushUsed: placedParty.map(() => false),
       stealthOpenerUsed: false,
       // OTA-960 — a party that crests the rise while you're UP a climb masses at
       // the BASE (drives the elevation combat gates); on level ground the
@@ -5665,7 +5669,8 @@ function vendorCatchesThief(
             // OTA-1056 — but not gone. See CurrentScene.vendorInFight.
             vendorInFight: vendor,
             ...FRESH_ENEMY_ARRAYS,
-            enemies: [enemy],
+            // OTA-1506 — onto the bullseye at the shipped opening distance.
+            enemies: [{ ...enemy, pos: arrivalPos('mid') }],
             enemyHps: [enemy.hp],
             activeEnemyIdx: 0,
             range: 'mid',
@@ -6409,7 +6414,8 @@ function spawnAetherkin(
   if (!base) return false;
   const power = scalePowerOf(player);
   const danger = scene.location?.danger ?? 0;
-  const scaled = scaleEncounterForContext([{ ...base }], danger, power);
+  // OTA-1506 — onto the bullseye (a lone emergence keeps the shipped mid).
+  const scaled = placeEnemies(scaleEncounterForContext([{ ...base }], danger, power), 'patrol');
   const hps = scaled.map((e) => e.hp);
   set((s) => (s.currentScene ? {
     currentScene: {
@@ -6418,7 +6424,7 @@ function spawnAetherkin(
       enemies: scaled,
       enemyHps: hps,
       activeEnemyIdx: 0,
-      range: 'mid',
+      range: openingRange(scaled),
       enemyAmbushUsed: scaled.map(() => false),
       enemyKnockedOut: scaled.map(() => false),
       stealthOpenerUsed: false,
@@ -8789,7 +8795,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           name: `${markName}'s Guard`, type: 'Human', abilityPoint: 'Dexterity 2',
           attack: 'Cudgel', damage: '1D6+1', hp: 14, rarity: 'Common', loot: [], traits: [],
         }));
-        const party = [leaderEnemy, ...guards];
+        // OTA-1506 — the mark's party turns on you together: patrol shape,
+        // staggered across the rings, the mark himself nearest.
+        const party = placeEnemies([leaderEnemy, ...guards], 'patrol');
         set((s) => (s.currentScene
           ? {
               currentScene: {
@@ -8797,7 +8805,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 enemies: party,
                 enemyHps: party.map((e) => e.hp),
                 activeEnemyIdx: 0,
-                range: 'mid',
+                range: openingRange(party),
                 enemyAmbushUsed: party.map(() => false),
               },
             }
@@ -9616,7 +9624,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scalePower = player
       ? scalePowerOf(player)
       : 0;
-    const enemies: Enemy[] = scaleEncounterForContext(encounter, location.danger, scalePower);
+    // ⚠ OTA-1506 — THE MAIN ENCOUNTER PATH LANDS ON THE BULLSEYE: a met-on-the-
+    // ground lineup clusters ahead of you (patrol shape) and staggers across
+    // the rings, nearest first. A lone foe keeps the shipped 'mid' opening.
+    const enemies: Enemy[] = placeEnemies(
+      scaleEncounterForContext(encounter, location.danger, scalePower), 'patrol',
+    );
     const enemyHps: number[] = enemies.map((e) => e.hp);
     const activeEnemyIdx = 0;
     const hasEnemies = enemies.length > 0;
@@ -9723,7 +9736,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // not already swinging. The player advances (distant→far→mid→close) to
     // land melee, or holds the gap for a ranged/throwable shot. (This is the
     // four-band remap of the old middle 'close' opening band.)
-    const range: CombatRange | null = hasEnemies ? 'mid' : null;
+    // ⚠ OTA-1506 — for a STAGGERED lineup the opening band is where the
+    // leader actually stands (the pager's first card), read off the field.
+    const range: CombatRange | null = hasEnemies ? openingRange(enemies) : null;
     // Hooks — pending cross-scene chains land first; otherwise no hook is
     // planted at scene start. Wandering / exploration plants fresh hooks.
     const initialHooks: Hook[] = [];
@@ -13198,7 +13213,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             scene = {
               ...scene,
-              enemies: [...scene.enemies, spawn],
+              enemies: [...scene.enemies, { ...spawn, pos: arrivalPos('close') }],
               enemyHps: [...scene.enemyHps, spawn.hp],
               activeEnemyIdx: scene.enemies.length,
               range: 'close',
@@ -13847,7 +13862,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
               get().equipItem(swapTo.name, 'main');
             }
           }
-          const range = currentScene.range ?? 'close';
+          // ⚠⚠ OTA-1506 — the gate rolls against the TARGET'S OWN band, not the
+          // shared scene band: the owner's whole design is that swiping the
+          // pager changes which distance the weapons are judged at. A ring-5
+          // walker (band null) is absent from the fight — nobody can act on
+          // him — so the swing is refused outright before any reach math.
+          const targetBandIdx = Math.max(0, Math.min(sceneAfterDots.activeEnemyIdx, sceneAfterDots.enemies.length - 1));
+          const targetBand = enemyBandOf(sceneAfterDots, targetBandIdx);
+          if (targetBand === null) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter shakes his head. "${targetEnemy.name} is out of the fight entirely — still closing the ground. Nothing reaches that far. Pick a closer target, or let them come."`,
+              { skipDedup: true },
+            );
+            break;
+          }
+          const range = targetBand;
           // OTA-934 — same fix as the damage site (OTA-940), which this reach lookup missed:
           // a swung weapon whose NAME contains a body word ("Mud-FIST Wraps") tripped the
           // bare-hand test and resolved reach as Bare hands. Strip the equipped weapon's
@@ -14058,7 +14088,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               return {
                 currentScene: {
                   ...scene,
-                  enemies: [...scene.enemies, spawn],
+                  enemies: [...scene.enemies, { ...spawn, pos: arrivalPos('close') }],
                   enemyHps: [...scene.enemyHps, spawn.hp],
                   activeEnemyIdx: scene.enemies.length,
                   range: 'close',
@@ -14648,7 +14678,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               return {
                 currentScene: {
                   ...s.currentScene,
-                  enemies: [...s.currentScene.enemies, finalSpawn],
+                  enemies: [...s.currentScene.enemies, { ...finalSpawn, pos: arrivalPos('mid') }],
                   enemyHps: [...s.currentScene.enemyHps, finalSpawn.hp],
                   activeEnemyIdx: s.currentScene.enemies.length,
                   range: 'mid',
@@ -17109,7 +17139,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ? {
                     currentScene: {
                       ...s.currentScene,
-                      enemies: [...s.currentScene.enemies, enemy],
+                      enemies: [...s.currentScene.enemies, { ...enemy, pos: arrivalPos('far') }],
                       enemyHps: [...s.currentScene.enemyHps, enemy.hp],
                       enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
                       range: 'far',
@@ -19631,7 +19661,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   set((s) => (s.currentScene ? {
                     currentScene: {
                       ...s.currentScene,
-                      enemies: [...s.currentScene.enemies, boss],
+                      enemies: [...s.currentScene.enemies, { ...boss, pos: arrivalPos('mid') }],
                       enemyHps: [...s.currentScene.enemyHps, boss.hp],
                       activeEnemyIdx: s.currentScene.enemies.length,
                       range: 'mid',
@@ -19794,7 +19824,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               const livePl = get().player ?? player;
               const climbPower = scalePowerOf(livePl);
               const climbDanger = sceneNow.location?.danger ?? 3;
-              const scaledEnc = scaleEncounterForContext(enc.enemies, climbDanger, climbPower);
+              // OTA-1506 — a climb encounter meets you on the route: patrol shape.
+              const scaledEnc = placeEnemies(scaleEncounterForContext(enc.enemies, climbDanger, climbPower), 'patrol');
               const scaledEncHps = scaledEnc.map((e) => e.hp);
               set((s) => (s.currentScene ? {
                 currentScene: {
@@ -19802,7 +19833,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   enemies: scaledEnc,
                   enemyHps: scaledEncHps,
                   activeEnemyIdx: 0,
-                  range: 'mid',
+                  range: openingRange(scaledEnc),
                   enemyAmbushUsed: scaledEnc.map(() => false),
                   enemyKnockedOut: scaledEnc.map(() => false),
                   stealthOpenerUsed: false,
@@ -26433,7 +26464,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               currentScene: {
                 ...s2.currentScene,
                 ...FRESH_ENEMY_ARRAYS,
-                enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
+                enemies: [{ ...foe, pos: arrivalPos('mid') }], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
                 enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
                 resistWear: {}, resistCracked: [],
               },
@@ -26539,7 +26570,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               currentScene: {
                 ...s.currentScene,
                 ...FRESH_ENEMY_ARRAYS,
-                enemies: [{ ...purifier }],
+                enemies: [{ ...purifier, pos: arrivalPos('mid') }],
                 enemyHps: [purifier.hp],
                 activeEnemyIdx: 0,
                 range: 'mid',
@@ -26565,7 +26596,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 currentScene: {
                   ...s.currentScene,
                   ...FRESH_ENEMY_ARRAYS,
-                  enemies: [{ ...apparition }],
+                  enemies: [{ ...apparition, pos: arrivalPos('mid') }],
                   enemyHps: [apparition.hp],
                   activeEnemyIdx: 0,
                   range: 'mid',
@@ -26973,7 +27004,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               return {
                 currentScene: {
                   ...s.currentScene,
-                  enemies: [...s.currentScene.enemies, finalSpawn],
+                  enemies: [...s.currentScene.enemies, { ...finalSpawn, pos: arrivalPos(s.currentScene.range ?? 'close') }],
                   enemyHps: [...s.currentScene.enemyHps, finalSpawn.hp],
                   activeEnemyIdx: s.currentScene.enemies.length,
                   range: s.currentScene.range ?? 'close',
@@ -27333,7 +27364,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => {
       if (!s.currentScene || s.currentScene.enemies.length === 0) return {};
       const clamped = Math.max(0, Math.min(s.currentScene.enemies.length - 1, idx));
-      return { currentScene: { ...s.currentScene, activeEnemyIdx: clamped } };
+      // ⚠ OTA-1506 — the swipe IS the range instrument: the legacy shared
+      // `range` re-derives to the NEW target's own band the moment the pager
+      // moves, so every old reader (narration, sneak odds, weapon chips)
+      // speaks about the enemy actually on the card.
+      const swapped = { ...s.currentScene, activeEnemyIdx: clamped };
+      return { currentScene: { ...swapped, range: derivedSceneRange(swapped) ?? s.currentScene.range } };
     });
   },
 
@@ -29289,7 +29325,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? {
             currentScene: {
               ...s.currentScene,
-              enemies: [...s.currentScene.enemies, guardian],
+              enemies: [...s.currentScene.enemies, { ...guardian, pos: arrivalPos('mid') }],
               enemyHps: [...s.currentScene.enemyHps, guardian.hp],
               activeEnemyIdx: s.currentScene.enemies.length,
               range: 'mid',
@@ -29459,7 +29495,7 @@ function applyHookEffect(
         : rawSpawn;
       set((s) =>
         s.currentScene
-          ? { currentScene: { ...s.currentScene, ...FRESH_ENEMY_ARRAYS, enemies: [spawn], enemyHps: [spawn.hp], activeEnemyIdx: 0, range: 'mid' } }
+          ? { currentScene: { ...s.currentScene, ...FRESH_ENEMY_ARRAYS, enemies: [{ ...spawn, pos: arrivalPos('mid') }], enemyHps: [spawn.hp], activeEnemyIdx: 0, range: 'mid' } }
           : s,
       );
       // OTA-1086 — the old line said "close range" while the state above sets
@@ -29605,7 +29641,7 @@ function applyHookEffect(
         currentScene: {
           ...s2.currentScene,
           ...FRESH_ENEMY_ARRAYS,
-                enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
+                enemies: [{ ...foe, pos: arrivalPos('mid') }], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
           enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
           resistWear: {}, resistCracked: [],
         },
@@ -30751,7 +30787,7 @@ function fireYulkaFetch(
     return {
       currentScene: {
         ...s.currentScene,
-        enemies: [...s.currentScene.enemies, proto],
+        enemies: [...s.currentScene.enemies, { ...proto, pos: arrivalPos('mid') }],
         enemyHps: [...s.currentScene.enemyHps, proto.hp],
         activeEnemyIdx: s.currentScene.enemies.length,
         range: 'mid',
@@ -30854,7 +30890,7 @@ function fireYulkaReturn(
     set((s) => (s.currentScene ? {
       currentScene: {
         ...s.currentScene,
-        enemies: [...s.currentScene.enemies, proto],
+        enemies: [...s.currentScene.enemies, { ...proto, pos: arrivalPos('mid') }],
         enemyHps: [...s.currentScene.enemyHps, proto.hp],
         activeEnemyIdx: s.currentScene.enemies.length,
         range: 'mid',
@@ -30889,7 +30925,7 @@ function fireYulkaAmbush(
       return {
         currentScene: {
           ...s.currentScene,
-          enemies: [...s.currentScene.enemies, proto],
+          enemies: [...s.currentScene.enemies, { ...proto, pos: arrivalPos('mid') }],
           enemyHps: [...s.currentScene.enemyHps, proto.hp],
           activeEnemyIdx: s.currentScene.enemies.length,
           range: 'mid',
@@ -31380,7 +31416,7 @@ function advanceStoryDrip(
           currentScene: {
             ...scene,
             ...FRESH_ENEMY_ARRAYS,
-                enemies: [foe], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
+                enemies: [{ ...foe, pos: arrivalPos('mid') }], enemyHps: [foe.hp], activeEnemyIdx: 0, range: 'mid',
             enemyAmbushUsed: [false], enemyKnockedOut: [false], stealthOpenerUsed: false,
             resistWear: {}, resistCracked: [],
           },
@@ -33632,7 +33668,7 @@ function tryFireRescueScenario(
     ? {
         currentScene: {
           ...s.currentScene,
-          enemies: [...s.currentScene.enemies, captor],
+          enemies: [...s.currentScene.enemies, { ...captor, pos: arrivalPos('mid') }],
           enemyHps: [...s.currentScene.enemyHps, captor.hp],
           enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
           activeEnemyIdx: s.currentScene.enemies.length,
@@ -34835,7 +34871,7 @@ function runParleyOutcome(
           currentScene: {
             ...s.currentScene,
             wanderer: null,
-            enemies: [...s.currentScene.enemies, foe],
+            enemies: [...s.currentScene.enemies, { ...foe, pos: arrivalPos('close') }],
             enemyHps: [...s.currentScene.enemyHps, foe.hp],
             enemyKnockedOut: [...(s.currentScene.enemyKnockedOut ?? []), false],
             enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],

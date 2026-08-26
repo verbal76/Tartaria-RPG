@@ -245,7 +245,9 @@ describe('OTA-1226 — the main quest walker: creation to credits, nine factions
         useGameStore.setState({
           currentScene: {
             ...store.getState().currentScene!,
-            enemies: [guardian], enemyHps: [1], activeEnemyIdx: 0, range: 'close',
+            // ⚠ OTA-1506 — the gate reads the TARGET'S OWN ring now, so the
+            // fixture moves the BODY to arm's reach, not just the legacy label.
+            enemies: [{ ...guardian, pos: { bearing: 0, distance: 0.5 } }], enemyHps: [1], activeEnemyIdx: 0, range: 'close',
             enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
             enemyArmorShred: [0], enemyCorruptionStacks: [0], enemiesAtBase: false,
           },

@@ -62,6 +62,12 @@ import { rollDie, rollFromNotation, pick } from '../engine/rng';
 import { findArmorByName, findWeaponByName, findDogGearByName, applyDamageTypeModifier, applyArmorResistance, armorResistances, fusedArmorResistances, type ArmorSlotResist } from '../engine/crafting';
 import { reachClassFor, bossSwingsTwice } from '../engine/combatRules';
 import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
+// ⚠ OTA-1506 — the bullseye (per-enemy bearing + distance). See the FIELD
+// helpers below activeEnemy for how the legacy shared band is derived from it.
+import {
+  bandOf, CONTACT_MIN, distanceForBand, enemyCloses, staggerSpawn, stepAwayFrom, stepToward,
+  type EnemyPosition,
+} from '../engine/combatGeometry';
 import { ACID_SHRED_DECAY_PER_ROUND } from '../engine/weaponCoating';
 import { effectiveAC } from '../engine/raceMechanics';
 import { trainStat } from '../engine/statTraining';
@@ -100,6 +106,75 @@ export function activeEnemy(scene: CurrentScene | null): Enemy | null {
   if (!scene || scene.enemies.length === 0) return null;
   const idx = Math.max(0, Math.min(scene.activeEnemyIdx, scene.enemies.length - 1));
   return scene.enemies[idx] ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// ⚠⚠⚠ OTA-1506 — THE FIELD GOES LIVE. The owner's bullseye (combatGeometry,
+// proven at OTA-1503) becomes the source of truth for where everybody stands:
+// each enemy carries its own `pos` (bearing + distance), and the old shared
+// `scene.range` survives only as a DERIVED compatibility field — the band to
+// the ACTIVE target — so the dozens of narration/UI readers keep working while
+// the attack gate, counters, movement and pursuit all go per-enemy.
+// ---------------------------------------------------------------------------
+
+/** ⚠ LAZY MIGRATION for saves written before positions existed. A fight loaded
+ *  from an old save has enemies with no `pos` and a shared `scene.range`; each
+ *  one is synthesized mid-ring in that band (distanceForBand), bearings spread
+ *  by the golden angle so a lineup never stacks on one heading — DETERMINISTIC
+ *  on purpose: two reads of the same save must agree, so no rng here. */
+export function enemyPosOf(scene: CurrentScene, idx: number): EnemyPosition {
+  const e = scene.enemies[idx];
+  if (e?.pos && Number.isFinite(e.pos.bearing) && Number.isFinite(e.pos.distance)) return e.pos;
+  return {
+    bearing: (idx * 137.5) % 360,
+    distance: distanceForBand(scene.range ?? 'mid'),
+  };
+}
+
+/** The band THIS enemy stands in — null past ring 4 (present, walking in,
+ *  unable to act or be acted on). This is the per-enemy read every gate uses. */
+export function enemyBandOf(scene: CurrentScene, idx: number): CombatRange | null {
+  return bandOf(enemyPosOf(scene, idx).distance);
+}
+
+/** The legacy shared field, derived: the band to the ACTIVE target, clamped to
+ *  'distant' for a ring-5 walker so old readers never see a null mid-fight. */
+export function derivedSceneRange(scene: CurrentScene): CombatRange | null {
+  if (scene.enemies.length === 0) return null;
+  const idx = Math.max(0, Math.min(scene.activeEnemyIdx, scene.enemies.length - 1));
+  return enemyBandOf(scene, idx) ?? 'distant';
+}
+
+/** Where one NEWCOMER stands when he joins a scene mid-fiction (a provoked
+ *  apex, a rest ambush, a summoned Guardian): mid-ring of the band the spawn
+ *  site's fiction names, at a fresh bearing. Keeps every add-one site's
+ *  shipped opening distance exactly. */
+export function arrivalPos(band: CombatRange, rng: () => number = Math.random): { bearing: number; distance: number } {
+  return { bearing: rng() * 360, distance: distanceForBand(band) };
+}
+
+/** Stamp a fresh lineup onto the bullseye. `shape` is the fiction: an AMBUSH
+ *  chose the ground and rings the player; a PATROL (or any met-on-the-road
+ *  lineup) clusters in a narrow arc ahead. Either way the distances stagger one
+ *  man per ring (nearest-first by index — which IS the pager order, so a swipe
+ *  walks the line outward with no separate sort).
+ *
+ *  ⚠ A LONE BODY KEEPS THE SHIPPED OPENING DISTANCE (mid). The stagger is what
+ *  makes "hit the closest first so I don't walk into anyone else's reach" a
+ *  decision — a duel has no such decision, and opening it at contact would
+ *  delete the approach/step-back game instead of making it functional. */
+export function placeEnemies(enemies: Enemy[], shape: 'ambush' | 'patrol', rng: () => number = Math.random): Enemy[] {
+  if (enemies.length === 1) return enemies.map((e) => ({ ...e, pos: arrivalPos('mid', rng) }));
+  const spots = staggerSpawn(enemies.length, shape, rng);
+  return enemies.map((e, i) => ({ ...e, pos: spots[i] ?? { bearing: (i * 137.5) % 360, distance: 0.5 } }));
+}
+
+/** The legacy `range` literal a FRESH spawn site writes, computed from where
+ *  the lineup actually stands: the leader's band (index 0 is nearest by
+ *  construction — the pager's opening target). */
+export function openingRange(placed: Enemy[]): CombatRange {
+  const d = placed[0]?.pos?.distance;
+  return (d !== undefined ? bandOf(d) : null) ?? 'mid';
 }
 
 /** OTA-1089 — anti-stun-lock. When a stun/paralyze takes hold, the player is
@@ -257,14 +332,16 @@ export function runMoveCombatRange(
     get().appendLog('arbiter', `The Arbiter shrugs. "Nothing to ${direction === 'advance' ? 'advance on' : 'pull back from'}. The ground here is quiet."`);
     return;
   }
-  // OTA-550 — RANGE_ORDER runs farthest → closest (distant,far,mid,close).
-  // "advance"/"approach" moves one band CLOSER (index up); "retreat" moves
-  // one band farther (index down).
-  const order = RANGE_ORDER;
-  const cur: CombatRange = scene.range ?? 'mid';
-  const curIdx = order.indexOf(cur);
-  const nextIdx = direction === 'advance' ? Math.min(order.length - 1, curIdx + 1) : Math.max(0, curIdx - 1);
-  const next = order[nextIdx]!;
+  // ⚠⚠⚠ OTA-1506 — ONE STEP MOVES THE WHOLE FIELD. The owner's model: "if I
+  // step closer to the guy directly north of me, I get one ring closer, but
+  // the guy south of me, he's now one ring further away … every time I move we
+  // need to recalculate that." The step is a real vector (stepToward /
+  // stepAwayFrom), every enemy's position is recomputed, and the legacy shared
+  // band is re-derived from the ACTIVE target for the old readers.
+  const activeIdx = Math.max(0, Math.min(scene.activeEnemyIdx, scene.enemies.length - 1));
+  const field = scene.enemies.map((_, i) => enemyPosOf(scene, i));
+  const curPos = field[activeIdx]!;
+  const curBand = bandOf(curPos.distance);
   // OTA-146 — pluralization grammar fix. Pre-fix this always did
   // "the N {moveEnemy.name}s" — when the scene held two DIFFERENT
   // enemies (e.g. Silt Thief + Voronov-Beneath High Cantor), the
@@ -281,13 +358,16 @@ export function runMoveCombatRange(
     }
     return `the ${moveEnemy.name} and ${scene.enemies.length - 1} others`;
   })();
-  if (next === cur) {
-    get().appendLog(
-      'world',
-      direction === 'advance'
-        ? `You are already at close / arm's reach with ${groupLabel}.`
-        : `You cannot put more ground between you and ${groupLabel}.`,
-    );
+  // ⚠ The guards speak in the field's terms: advance ends at CONTACT (toe to
+  // toe with the target), retreat ends once the target is already out past
+  // ring 4 — he is absent from the fight and closing; more backing up buys
+  // nothing but ground the pursuit reclaims.
+  if (direction === 'advance' && curPos.distance <= CONTACT_MIN + 1e-6) {
+    get().appendLog('world', `You are already at close / arm's reach with ${groupLabel}.`);
+    return;
+  }
+  if (direction === 'retreat' && curBand === null) {
+    get().appendLog('world', `You cannot put more ground between you and ${groupLabel}.`);
     return;
   }
 
@@ -326,22 +406,50 @@ export function runMoveCombatRange(
     return;
   }
 
-  // Full move — range actually changes. Reset progress.
+  // Full move — the step lands. The whole field translates; positions write
+  // back onto the enemies, and the legacy `range` is re-derived from the
+  // active target so every old reader keeps a truthful band.
+  const after = direction === 'advance' ? stepToward(field, activeIdx) : stepAwayFrom(field, activeIdx);
+  const movedEnemies = scene.enemies.map((e, i) => ({ ...e, pos: after[i] ?? enemyPosOf(scene, i) }));
+  const nextBand = bandOf(after[activeIdx]!.distance);
   set((s) => (s.currentScene
-    ? { currentScene: { ...s.currentScene, range: next, repositionPartial: 0, repositionDir: undefined } }
+    ? {
+      currentScene: {
+        ...s.currentScene,
+        enemies: movedEnemies,
+        range: nextBand ?? 'distant',
+        repositionPartial: 0,
+        repositionDir: undefined,
+      },
+    }
     : s));
-  get().appendLog('debug', `move: range ${cur} -> ${next}`);
+  get().appendLog('debug',
+    `move: field ${direction} target=${moveEnemy.name} d ${curPos.distance.toFixed(2)}->${after[activeIdx]!.distance.toFixed(2)} band ${curBand ?? 'out'}->${nextBand ?? 'out'}`);
   get().appendLog(
     'world',
     direction === 'advance'
-      ? `You close the gap with ${groupLabel}. (range: ${RANGE_LABEL[next]})`
-      : `You pull back from ${groupLabel}. (range: ${RANGE_LABEL[next]})`,
+      ? `You close the gap with ${groupLabel}. (range: ${RANGE_LABEL[nextBand ?? 'close']})`
+      : nextBand === null
+        ? `You pull back from ${groupLabel} — ${moveEnemy.name} drops out of the fight, left to close the ground.`
+        : `You pull back from ${groupLabel}. (range: ${RANGE_LABEL[nextBand]})`,
   );
-  // Movement takes a beat — let any enemy still in their effective
-  // range counter-attack. Group: every reaching enemy fires.
-  const reachers = scene.enemies.filter((e, i) =>
-    enemyCanReach(e, next) && (scene.enemyHps[i] ?? 0) > 0,
-  );
+  // ⚠ THE OWNER'S SENTENCE, NARRATED: everybody else moved too. One compact
+  // line, only when somebody's band actually flipped — the geometry is felt,
+  // not spammed.
+  const shifted = movedEnemies
+    .map((e, i) => ({ e, from: bandOf(field[i]!.distance), to: bandOf(after[i]!.distance), i }))
+    .filter((x) => x.i !== activeIdx && x.from !== x.to && (scene.enemyHps[x.i] ?? 0) > 0);
+  if (shifted.length > 0) {
+    const bits = shifted.map((x) => `${x.e.name} now ${x.to === null ? 'out of range' : RANGE_LABEL[x.to]}`);
+    get().appendLog('world', `The field shifts around you — ${bits.join('; ')}.`);
+  }
+  // Movement takes a beat — let any enemy still in ITS OWN effective range
+  // counter-attack. Group: every reaching enemy fires.
+  const sceneNow = get().currentScene;
+  const reachers = sceneNow
+    ? sceneNow.enemies.filter((e, i) =>
+      enemyCanReach(e, enemyBandOf(sceneNow, i)) && (sceneNow.enemyHps[i] ?? 0) > 0)
+    : [];
   if (reachers.length > 0) {
     runEnemyGroupCounters(get, set, get().player ?? player);
   }
@@ -371,7 +479,10 @@ function isRangedEnemy(enemy: Enemy): boolean {
 // Lore: melee = arm's reach, ranged = close + far, runecasters mostly close
 // + arm. We use a conservative default — most generic enemies threaten arm
 // and close, plus anything carrying a ranged hint reaches at far.
-function enemyCanReach(enemy: Enemy, range: CombatRange): boolean {
+// ⚠ OTA-1506 — the range passed here is now THAT ENEMY'S OWN band
+// (enemyBandOf), and null means ring 5: present, walking in, unable to act.
+function enemyCanReach(enemy: Enemy, range: CombatRange | null): boolean {
+  if (range === null) return false;
   // OTA-550 — at close/mid a generic (melee-capable) enemy threatens the
   // player; at far/distant only a ranged enemy can still strike.
   if (range === 'close' || range === 'mid') return true;
@@ -1151,6 +1262,9 @@ export function runEnemyGroupCounters(
   // of reach, the pack closes ONE band at the end of the volley — kiting still
   // buys the round it always bought, it just stops buying the whole fight.
   const outOfReach: string[] = [];
+  // ⚠ OTA-1506 — the pursuit is per-BODY, and names collide ("2 Gutter Rats"),
+  // so the indices of the benched are tracked alongside the narration names.
+  const outOfReachIdx: number[] = [];
   for (let i = 0; i < volleyOrder.length; i++) {
     const enemy = volleyOrder[i]!;
     // Skip enemies that died earlier this round (HP <= 0 in the live
@@ -1163,11 +1277,16 @@ export function runEnemyGroupCounters(
     if (hpAtCounter === undefined || hpAtCounter <= 0) continue;
     // OTA-361 — a knocked-out enemy is unconscious: it never counters.
     if (liveScene.enemyKnockedOut?.[liveIdx]) continue;
-    // Range gate — melee enemies can't counter when the player is at
-    // 'far'. Ranged enemies (matched on attack/damage flavor) reach
-    // all bands. Mirrors enemyCanReach used by movement intents.
-    const liveRange = liveScene.range ?? 'close';
-    if (!enemyCanReach(enemy, liveRange)) { outOfReach.push(enemy.name); continue; }
+    // Range gate — melee enemies can't counter when THEY stand at 'far';
+    // ranged enemies (matched on attack/damage flavor) reach from far too.
+    // ⚠ OTA-1506 — judged at THIS enemy's own band, not a shared one: the
+    // spear-length man in your face swings while his distant packmates walk.
+    const liveRange = enemyBandOf(liveScene, liveIdx);
+    if (!enemyCanReach(enemy, liveRange)) {
+      outOfReach.push(enemy.name);
+      outOfReachIdx.push(liveIdx);
+      continue;
+    }
     // Bail if the player is dead.
     const livePlayer = get().player;
     if (!livePlayer || livePlayer.hp <= 0 || livePlayer.dead) return;
@@ -1216,7 +1335,9 @@ export function runEnemyGroupCounters(
     // so at close range it takes a slot like any other body. Bosses stay exempt
     // at every band; ranged enemies keep their exemption at mid and beyond,
     // which is the case the reasoning was actually about.
-    const inTheScrum = (liveScene.range ?? 'close') === 'close';
+    // ⚠ OTA-1506 — the scrum is per-body now: a shooter is jostling for space
+    // only when HE is standing in it, not when the active target happens to be.
+    const inTheScrum = liveRange === 'close';
     const meleeAttacker = !enemy.boss && (inTheScrum || !isRangedEnemy(enemy));
     // ⚠ OTA-1113 — THE CAP MOVES WITH THE PACK, AND BY LESS. A tier that grows
     // parties without growing this cap does not make the fight harder, it makes
@@ -1280,21 +1401,31 @@ export function runEnemyGroupCounters(
       }
     }
   }
-  // OTA-1140 — the pursuit itself. One band per round, never past 'close',
-  // and only when someone real was actually benched by distance (elevation
-  // benching is its own system and stays out of this).
+  // OTA-1140 — the pursuit itself. ⚠ OTA-1506 — PER BODY now: each enemy that
+  // spent its turn out of reach walks ONE step straight down its own line
+  // (enemyCloses keeps the bearing — he is coming at you, not circling), while
+  // packmates already in reach hold their ground. Kiting still buys the round
+  // it always bought; it just stops buying the whole fight — and it no longer
+  // teleports the whole pack when one straggler closes.
   if (outOfReach.length > 0 && (get().player?.hp ?? 0) > 0) {
-    const cur = get().currentScene?.range ?? null;
-    const closed: CombatRange | null = cur === 'distant' ? 'far' : cur === 'far' ? 'mid' : cur === 'mid' ? 'close' : null;
-    if (closed) {
-      set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, range: closed } } : s));
+    const sceneAtClose = get().currentScene;
+    if (sceneAtClose) {
+      const pursuers = new Set(outOfReachIdx);
+      const closedEnemies = sceneAtClose.enemies.map((e, i) => {
+        if (!pursuers.has(i) || (sceneAtClose.enemyHps[i] ?? 0) <= 0) return e;
+        return { ...e, pos: enemyCloses(enemyPosOf(sceneAtClose, i)) };
+      });
+      const withPositions: CurrentScene = { ...sceneAtClose, enemies: closedEnemies };
+      set((s) => (s.currentScene
+        ? { currentScene: { ...s.currentScene, enemies: closedEnemies, range: derivedSceneRange(withPositions) } }
+        : s));
       const first = outOfReach[0]!;
       const rest = outOfReach.length - 1;
       get().appendLog(
         'combat',
         rest > 0
-          ? `${first} and ${rest} other${rest > 1 ? 's' : ''} close the distance. (range: ${closed})`
-          : `${first} closes the distance. (range: ${closed})`,
+          ? `${first} and ${rest} other${rest > 1 ? 's' : ''} close the distance.`
+          : `${first} closes the distance.`,
       );
     }
   }

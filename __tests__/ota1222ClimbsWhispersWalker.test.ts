@@ -197,7 +197,9 @@ describe('OTA-1222 — Texas Ranger on the Great Climbs and the whisper chains',
       useGameStore.setState({
         currentScene: {
           ...store.getState().currentScene!,
-          enemies: [boss], enemyHps: [1], activeEnemyIdx: 0, range: 'close',
+          // ⚠ OTA-1506 — the gate reads the TARGET'S OWN ring now, so the
+          // fixture moves the BODY to arm's reach, not just the legacy label.
+          enemies: [{ ...boss, pos: { bearing: 0, distance: 0.5 } }], enemyHps: [1], activeEnemyIdx: 0, range: 'close',
           enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
           enemyArmorShred: [0], enemyCorruptionStacks: [0],
           // ⚠ The summit boss is AT THE CROWN with you — a stale enemiesAtBase
@@ -298,7 +300,8 @@ describe('OTA-1222 — Texas Ranger on the Great Climbs and the whisper chains',
       useGameStore.setState({
         currentScene: {
           ...store.getState().currentScene!,
-          enemies: [thief], enemyHps: [1], activeEnemyIdx: 0, range: 'close',
+          // ⚠ OTA-1506 — move the body, not just the label (see above).
+          enemies: [{ ...thief, pos: { bearing: 0, distance: 0.5 } }], enemyHps: [1], activeEnemyIdx: 0, range: 'close',
           enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
           enemyArmorShred: [0], enemyCorruptionStacks: [0],
         },

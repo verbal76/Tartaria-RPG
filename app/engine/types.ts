@@ -228,6 +228,14 @@ export interface Faction {
 export interface Enemy {
   name: string;
   type: string;
+  /** ⚠ OTA-1506 — where this body stands on the owner's bullseye (see
+   *  engine/combatGeometry): compass bearing from the player + distance in
+   *  ring-widths. Runtime combat state that RIDES ON THE ENEMY deliberately —
+   *  splices, kills, saves and loads all carry it with no parallel-array
+   *  bookkeeping. Absent on spawn DEFINITIONS and on saves from before this
+   *  OTA; readers synthesize it from the legacy shared `scene.range` via
+   *  combatResolution.enemyPosOf. */
+  pos?: { bearing: number; distance: number };
   abilityPoint: string;
   attack: string;
   damage: string;

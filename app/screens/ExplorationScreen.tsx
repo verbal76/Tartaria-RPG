@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platfor
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey, chipDismissTileKey, logUiTap } from '../state/gameStore';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
-import { playerWeaponReach } from '../state/combatResolution';
+import { enemyBandOf, playerWeaponReach } from '../state/combatResolution';
 // OTA-1480 — "am I really at the place my record names", once, for all four readers.
 import { stationedAtNamedLocation } from '../engine/standingAt';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError, stampBreadcrumbPhase } from '../engine/saveSystem';
@@ -911,45 +911,46 @@ export function ExplorationScreen() {
   // enemy the player is currently looking at.
   const enemyViews: EnemyView[] = useMemo(() => {
     if (!currentScene || currentScene.enemies.length === 0) return [];
-    const range: CombatRange = currentScene.range ?? 'mid';
-    const rangeLabel = RANGE_LABELS[range];
-    // OTA-1006 — in-range comes from the SAME resolver the attack gate rolls with
+    // OTA-1006 — reach comes from the SAME resolver the attack gate rolls with
     // (playerWeaponReach: throwable instance → catalog row → forge-stamped
     // uniqueStats.reachClass on fused weapons → runecaster INT gate). The
-    // local copy this replaces missed the forge stamp, so a close-only fused
+    // local copy this replaced missed the forge stamp, so a close-only fused
     // weapon read as in-range at mid while every swing bounced.
-    const canHit = player
-      ? playerWeaponReach(player, 'main').bands.includes(range)
-      : reachBandsFor('barehanded').includes(range);
-    // ⚠⚠ OTA-1502 — BOTH HANDS, from that same resolver. The owner picked a
-    // melee weapon in one hand and a ranged one in the other precisely so range
-    // would matter — and the card only ever spoke for `main`, so the half of
-    // that loadout doing the long work was invisible. `playerWeaponReach` has
-    // taken a slot argument since OTA-027; nothing here needed inventing, the
-    // panel simply never asked it the second question.
-    const hands: Array<{ slot: 'main' | 'off'; label: string; inRange: boolean }> = [];
+    // ⚠⚠ OTA-1502 — BOTH HANDS, from that same resolver.
+    // ⚠⚠⚠ OTA-1506 — AND NOW PER ENEMY. Each hand's bands resolve once; the
+    // per-card question is which bands THIS enemy's own ring falls in — which
+    // is the owner's whole design: "if I slide the enemy portraits left and
+    // right … it would show me my weapons at different ranges."
+    const handReaches: Array<{ slot: 'main' | 'off'; label: string; bands: CombatRange[] }> = [];
     if (player) {
       const eq = player.equipped ?? {};
       for (const slot of ['main', 'off'] as const) {
         const held = slot === 'off' ? eq.off : (eq.main ?? eq.weaponName);
         if (!held) continue;
         const reach = playerWeaponReach(player, slot);
-        hands.push({ slot, label: reach.label, inRange: reach.bands.includes(range) });
+        handReaches.push({ slot, label: reach.label, bands: reach.bands });
       }
       // Both hands empty is still an answer — bare hands reach at close.
-      if (hands.length === 0) {
-        hands.push({ slot: 'main', label: 'Bare hands', inRange: reachBandsFor('barehanded').includes(range) });
+      if (handReaches.length === 0) {
+        handReaches.push({ slot: 'main', label: 'Bare hands', bands: reachBandsFor('barehanded') });
       }
     }
-    return currentScene.enemies.map((e, i) => ({
-      enemy: e,
-      currentHp: currentScene.enemyHps[i] ?? e.hp,
-      rangeLabel,
-      inRange: canHit,
-      hands,
-      // OTA-401 — surface active coating/DOT statuses + turns left on the panel.
-      statuses: currentScene.enemyStatuses?.[i] ?? [],
-    }));
+    return currentScene.enemies.map((e, i) => {
+      // Band null = ring 5: present and closing, out of everyone's reach.
+      const band = enemyBandOf(currentScene, i);
+      const hands = handReaches.map((h) => ({
+        slot: h.slot, label: h.label, inRange: band !== null && h.bands.includes(band),
+      }));
+      return {
+        enemy: e,
+        currentHp: currentScene.enemyHps[i] ?? e.hp,
+        rangeLabel: band === null ? 'out of range' : RANGE_LABELS[band],
+        inRange: hands[0]?.inRange ?? false,
+        hands,
+        // OTA-401 — surface active coating/DOT statuses + turns left on the panel.
+        statuses: currentScene.enemyStatuses?.[i] ?? [],
+      };
+    });
   }, [
     currentScene?.enemies, currentScene?.enemyHps, currentScene?.range,
     currentScene?.enemyStatuses,

@@ -104,7 +104,8 @@ describe('OTA-1093 — source locks for the store-side fixes', () => {
   ) as string;
 
   it('#2 the pack swing cap counts shooters standing in the scrum', () => {
-    expect(COMBAT_SRC).toMatch(/const inTheScrum = \(liveScene\.range \?\? 'close'\) === 'close';/);
+    // ⚠ OTA-1506 — the scrum is judged at THAT enemy's own band (liveRange).
+    expect(COMBAT_SRC).toMatch(/const inTheScrum = liveRange === 'close';/);
     expect(COMBAT_SRC).toMatch(/const meleeAttacker = !enemy\.boss && \(inTheScrum \|\| !isRangedEnemy\(enemy\)\);/);
   });
 

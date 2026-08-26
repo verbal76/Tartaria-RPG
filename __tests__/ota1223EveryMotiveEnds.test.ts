@@ -224,7 +224,9 @@ describe('OTA-1223 — LIVE: every motive answers itself at a Lost Capital', () 
         useGameStore.setState({
           currentScene: {
             ...store.getState().currentScene!,
-            enemies: [foe], enemyHps: [1], activeEnemyIdx: 0, range: 'close',
+            // ⚠ OTA-1506 — the gate reads the TARGET'S OWN ring now, so the
+            // fixture moves the BODY to arm's reach, not just the legacy label.
+            enemies: [{ ...foe, pos: { bearing: 0, distance: 0.5 } }], enemyHps: [1], activeEnemyIdx: 0, range: 'close',
             enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
             enemyArmorShred: [0], enemyCorruptionStacks: [0], enemiesAtBase: false,
           },
