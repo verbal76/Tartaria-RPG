@@ -1,2 +1,2 @@
-2026-08-26T13:44:19Z
-pull: EVERYTHING — full sweep of all events, issues and bundles (owner asked)
+2026-08-26T22:09:12Z
+pull: did bundle #mt9gmr2ylu58 land? attempts 2/5 and 3/5 fired 22:02Z, flush said no
