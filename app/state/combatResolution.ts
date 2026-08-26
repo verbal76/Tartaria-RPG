@@ -53,7 +53,7 @@
  * ota1110, ota1120, ota1133, ota1135, ota1137, ota1195, ota1202 and the dog
  * combat family.
  */
-import type { PlayerCharacter, Enemy, CombatRange } from '../engine/types';
+import type { PlayerCharacter, Enemy, CombatRange, StatusEffect } from '../engine/types';
 import { applyDogPronouns, trainDogStat, dogHpGainClause } from '../engine/dogCompanion';
 import { profileOf, scaledSwingCap } from '../engine/pressure';
 import { addResurrectionGems, recordFallen, recordFallenSeed, characterSeedOf } from '../engine/saveSystem';
@@ -68,7 +68,7 @@ import {
   bandOf, CONTACT_MIN, distanceForBand, enemyCloses, staggerSpawn, stepAwayFrom, stepToward,
   type EnemyPosition,
 } from '../engine/combatGeometry';
-import { ACID_SHRED_DECAY_PER_ROUND } from '../engine/weaponCoating';
+import { ACID_SHRED_DECAY_PER_ROUND, COATING_DOT_TURNS } from '../engine/weaponCoating';
 import { effectiveAC } from '../engine/raceMechanics';
 import { trainStat } from '../engine/statTraining';
 import { ARMOR_SLOTS, effectiveStats, aggregateEquippedStatBonuses, resolveEquippedItem, trimStandingAc, equippedGearAc } from '../engine/equipment';
@@ -2198,6 +2198,56 @@ function applyEnemyCounter(
     const incapSuppressed = (newEffect !== null && landedEffect === null)
       || (traitHit !== null && landedTraitHit === null);
 
+    // ⚠⚠⚠ OTA-1513 — THE ENEMY'S COATING, AND WHERE IT LANDED. Owner: *"my
+    // stacked AC makes me a little overpowered mid game… enemies should have
+    // weapon coatings as well… we need to take damage from it like they do, it
+    // will have to factor in resists from my armor, so it will have to roll on
+    // each attack what piece of armor their attack lands on. that way we can
+    // see if my coatings have any effect."*
+    //
+    // ⚠⚠ THIS RIDES **AFTER** THE TO-HIT ROLL, WHICH IS THE WHOLE DESIGN. AC is
+    // a miss-chance stat, so every point he stacks deletes enemy attacks before
+    // anything downstream runs — a coating can only reach him on the blows that
+    // already landed, so it restores a floor of pressure without touching the
+    // number he spent the mid-game earning.
+    //
+    // ⚠ ONE PIECE ANSWERS IT, not the aggregate. The arb119 weighted resist
+    // stack still governs ORDINARY damage above; for a coating the question is
+    // "which piece caught it", so a single weighted location roll picks the
+    // slot and THAT piece's resist decides. That is what makes a poison-proof
+    // pair of tassets visibly worth its slot instead of vanishing into a total.
+    // A roll onto a bare slot is a real outcome and says so — full coverage is
+    // supposed to be worth something.
+    //
+    // ⚠ The OTA-959 wear roll below is deliberately left alone: it is a
+    // separate, tuned distribution (uniform over WORN slots so wear always
+    // lands), and folding the two would silently re-weight armour durability.
+    let coatingClause = '';
+    let coatingAilment: string | null = null;
+    let coatingCorruption = 0;
+    if (enemy.coating) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const ec = require('../engine/enemyCoating') as typeof import('../engine/enemyCoating');
+      const struck = ec.rollHitLocation(Math.random);
+      const wornName = player.equipped?.[struck];
+      const raw = Math.max(1, rollFromNotation(enemy.coating.dice) || 1);
+      // The struck piece's OWN resists — read from the same resistSlots the
+      // aggregate is built from, filtered to the one slot that took the blow.
+      const pieceResists = armorPieces.resistSlots
+        .filter((r) => r.slot === struck)
+        .map((r) => String(r.type).toLowerCase());
+      const resistedHere = pieceResists.includes(String(enemy.coating.kind).toLowerCase());
+      const coatDmg = resistedHere ? Math.max(1, Math.ceil(raw / 2)) : raw;
+      dmg += coatDmg;
+      coatingClause = wornName
+        ? ` +${coatDmg} ${enemy.coating.kind} [${wornName} took it${resistedHere ? `, ${enemy.coating.kind}-resistant, halved` : ''}]`
+        : ` +${coatDmg} ${enemy.coating.kind} [caught you where you wear nothing]`;
+      coatingAilment = ec.ailmentForCoating(enemy.coating.kind);
+      // ⚠⚠ A corruption-coated blade raises the METER, so the corruption vial
+      // he drinks subtracts from the same number. Symmetry is the whole point
+      // of the three-uses loop: the right answer has to answer.
+      coatingCorruption = ec.corruptionFromCoating(enemy.coating.kind, coatDmg);
+    }
     // OTA-959 — armor wear: a landed blow chips ONE worn piece, not the whole
     // set. The old loop wore EVERY slot per hit, so a 5-piece set spent 5
     // durability per blow and a 5-raider pack ate a freshly crafted set inside
@@ -2239,8 +2289,8 @@ function applyEnemyCounter(
         plate: plateDr,                // OTA-1141 — capped-off AC soaks instead
       });
       const msg = killed
-        ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}${edgeWeak ? ' [edge of reach — halved]' : ''}. You fall.`
-        : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}${edgeWeak ? ' [edge of reach — halved]' : ''}. You have ${newHp} HP remaining.`;
+        ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}${edgeWeak ? ' [edge of reach — halved]' : ''}${coatingClause}. You fall.`
+        : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}${edgeWeak ? ' [edge of reach — halved]' : ''}${coatingClause}. You have ${newHp} HP remaining.`;
       const prevHpForWarn = nextPlayer.hp;
       const hpMaxForWarn = nextPlayer.hpMax ?? 1;
       void Promise.resolve().then(() => {
@@ -2263,6 +2313,19 @@ function applyEnemyCounter(
       }
       // OTA-1089 — the incapacitation that just took hold opens the braced
       // window: the stunned round plus the recovery rounds it protects.
+      // ⚠⚠ OTA-1513 — the coating's mark, seeded through the SAME applyEffect
+      // path as every other on-hit status so it stacks, expires and displays
+      // by the existing rules. `chilled` is the precedent OTA-831 set from the
+      // other side of the vial; this gives the rest of the kinds the same
+      // shape. Elemental kinds that leave no scar seed nothing — their damage
+      // above was the whole effect.
+      if (coatingAilment) {
+        effects = applyEffect(effects ?? [], {
+          kind: coatingAilment as StatusEffect['kind'],
+          remainingRounds: COATING_DOT_TURNS,
+          label: `${enemy.coating?.kind ?? 'coating'} (from ${enemy.name})`,
+        });
+      }
       if ((landedEffect && isIncapKind(landedEffect.effect.kind))
           || (landedTraitHit && isIncapKind(landedTraitHit.kind))) {
         effects = applyEffect(effects ?? [], {
@@ -2276,7 +2339,18 @@ function applyEnemyCounter(
           .map((e) => (e.kind === 'stone_ward' ? { ...e, absorb: wardRemain! } : e))
           .filter((e) => e.kind !== 'stone_ward' || (e.absorb ?? 0) > 0);
       }
-      return { player: { ...nextPlayer, hp: newHp, statusEffects: effects } };
+      return {
+        player: {
+          ...nextPlayer,
+          hp: newHp,
+          statusEffects: effects,
+          // ⚠ OTA-1513 — corruption from a coated blade, on the same meter the
+          // corruption vial clears (coatingRemedy's own branch).
+          ...(coatingCorruption > 0
+            ? { corruption: (nextPlayer.corruption ?? 0) + coatingCorruption }
+            : {}),
+        },
+      };
     });
 
     // OTA-962 — the same connecting swing can catch the escort party the player is

@@ -236,6 +236,15 @@ export interface Enemy {
    *  OTA; readers synthesize it from the legacy shared `scene.range` via
    *  combatResolution.enemyPosOf. */
   pos?: { bearing: number; distance: number };
+  /** ⚠⚠⚠ OTA-1513 — the coating this enemy came to the fight carrying, rolled
+   *  ONCE at birth (enemyCoating.rollEnemyCoating) and never re-rolled: a blade
+   *  is filthy or it is clean, and re-deciding per swing would make the same
+   *  weapon both in one fight. Owner: "we need a roll when the enemy is born to
+   *  see if it will have a coating, and what it will be if it does."
+   *  Rides ON the enemy object exactly like `pos` above, so scene splices,
+   *  saves and the pager carry it for free. Absent = a clean weapon, which is
+   *  most of them. */
+  coating?: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn' | 'cold'; dice: string };
   abilityPoint: string;
   attack: string;
   damage: string;

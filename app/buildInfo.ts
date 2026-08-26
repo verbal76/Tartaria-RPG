@@ -24792,7 +24792,49 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1252's "an empty hand is an empty slot" survives as the fallback, so a
 // spare melee that loses to your main still fills a bare off hand rather than
 // sitting in the pack (OTA-1254's promise, kept).
-export const OTA_BUILD_ID = '2026-08-26-1512-the-worn-piece-is-readable';
+// ⚠⚠⚠ OTA-1513 — THE OTHER SIDE OF THE VIAL (enemy weapon coatings). Owner:
+// "my stacked AC makes me a little overpowered mid game… enemies should have
+// weapon coatings as well. we need a roll when the enemy is born to see if it
+// will have a coating, and what it will be if it does. and we need to take
+// damage from it like they do, it will have to factor in resists from my
+// armor, so it will have to roll on each attack what piece of armor their
+// attack lands on. that way we can see if my coatings have any effect."
+// AC is a MISS-CHANCE stat, so every point he stacks deletes enemy attacks
+// before anything downstream of the to-hit roll runs — which is why the stack
+// runs away with the mid-game. A coating rides on the blows that DID land, so
+// it cannot be stacked out of existence and restores a floor of pressure
+// without touching the number he earned. One roll at birth
+// (enemyCoating.rollEnemyCoating, on scaledEnemyForContext — the one path
+// every enemy is born through, boss branch included, and idempotent so a
+// re-scale never re-decides what the blade is): chance rises with rarity and
+// nudges with danger, near-nothing on commons because his complaint was about
+// MID game; the kind follows the enemy's TYPE first and its name second (a
+// mud-dweller's blade is filthy, an aether construct arcs). On a landed hit a
+// weighted hit-location roll picks ONE worn slot and THAT piece's resist
+// alone halves it — the aggregate stack still governs ordinary damage, but
+// for a coating "which piece caught it" is the whole question, which is what
+// makes a poison-proof pair of tassets visibly earn its slot. The log names
+// the piece, or says the blow caught him where he wears nothing. The mark it
+// leaves reuses the ailments the player already knows from his own vials
+// (OTA-831's `chilled` set the precedent). The OTA-959 wear roll is
+// deliberately untouched — two questions, two distributions.
+// ⚠⚠ AND THE THIRD USE ALREADY EXISTED, which is the reason this OTA is
+// smaller than it looked. The owner named three uses for a coating — paint a
+// weapon, paint armour, DRINK it as medicine — and the drink half is built:
+// `coatingRemedy.coatingDrinkRemedy` already purges poison, soothes burns,
+// steadies nerves, lifts a chill and subtracts corruption (OTA-831 wrote the
+// chill counter). So the work was to make the INFLICTION side agree with the
+// cure table that was already there, and checking it caught a real
+// asymmetry: a corruption coating was seeding 'poisoned' (no distinct
+// corruption status exists), which would have meant drinking the CORRECT
+// vial did nothing. Corruption now raises `player.corruption` — the same
+// meter the corruption vial subtracts from — and a test pins every kind's
+// mark against the remedy's own switch so the two tables cannot drift.
+// Acid is the deliberate exception: `isCoatingDrinkable` excludes it and
+// should, because acid eats the ARMOUR and the answer to a chewed plate is
+// the repair bench, not a swallow.
+export const OTA_BUILD_ID = '2026-08-26-1513-the-other-side-of-the-vial';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1512-the-worn-piece-is-readable';
 // golem catch-up 2026-08-26: markerless publish of OTA-1512 (forged gear readable + threat dot visible + send-attempt guard + investigate pacing + the melee-main/ranged-off hand rule) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1511-the-spear-leaves-your-hand';
 // golem catch-up 2026-08-26: markerless publish of OTA-1511 (THROW SPEAR + authored throwable dice) to the golem channel.

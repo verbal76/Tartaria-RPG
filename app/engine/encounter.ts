@@ -296,6 +296,26 @@ function soloScaledHp(baseHp: number, d: number, t: number): number {
 /** Scale one rolled enemy to the player's power and the tile's danger. Pure; returns
  *  a fresh object (never mutates). Bosses pass through untouched. Use for SOLO spawns
  *  (rest-ambush, hook spawns); packs go through scaleEncounterForContext. */
+/** ⚠⚠⚠ OTA-1513 — THE BIRTH ROLL, on the one path every enemy is born through.
+ *
+ *  Owner: *"we need a roll when the enemy is born to see if it will have a
+ *  coating, and what it will be if it does."* `scaledEnemyForContext` is where
+ *  an enemy stops being a spawn DEFINITION and becomes this fight's enemy — it
+ *  already owns the injected `rng` and already runs for every path including
+ *  the boss early-return, so one call here covers the whole population and no
+ *  future spawn site has to remember to ask.
+ *
+ *  ⚠ IDEMPOTENT ON PURPOSE. An enemy that already carries a coating keeps it:
+ *  a few paths re-scale an existing enemy, and a second roll would let the same
+ *  blade change what it is mid-fight. */
+function withBirthCoating(enemy: Enemy, rng: () => number, danger: number): Enemy {
+  if (enemy.coating) return enemy;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { rollEnemyCoating } = require('./enemyCoating') as typeof import('./enemyCoating');
+  const coating = rollEnemyCoating(enemy, rng, danger);
+  return coating ? { ...enemy, coating } : enemy;
+}
+
 export function scaledEnemyForContext(enemy: Enemy, danger: number, power: number, rng: () => number = Math.random): Enemy {
   if (enemy.boss) {
     // OTA-896 (SA-4) — Core Guardians own their curve (spawnGuardianForCapital);
@@ -304,7 +324,7 @@ export function scaledEnemyForContext(enemy: Enemy, danger: number, power: numbe
     // static-boss scaler so it tracks the player like the Legendaries already do.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { scaleStaticBoss } = require('./coreGuardians') as typeof import('./coreGuardians');
-    return scaleStaticBoss(power, enemy);
+    return withBirthCoating(scaleStaticBoss(power, enemy), rng, danger);
   }
   const d = Math.max(0, danger);
   const t = overLevelT(power);
@@ -314,7 +334,11 @@ export function scaledEnemyForContext(enemy: Enemy, danger: number, power: numbe
   // Attack/AC: a small bump (abilityPoint drives both, per combatRules) so a scaled
   // enemy can still land on a geared player — modest, +1 (d0) .. +4 (d5) at max power.
   const bonus = Math.round(t * (1 + d * 0.5));
-  return randomizeEnemyDefense({ ...enemy, hp, abilityPoint: bumpAbilityPointNumber(enemy.abilityPoint, bonus) }, rng);
+  return withBirthCoating(
+    randomizeEnemyDefense({ ...enemy, hp, abilityPoint: bumpAbilityPointNumber(enemy.abilityPoint, bonus) }, rng),
+    rng,
+    danger,
+  );
 }
 
 // OTA-797 — PACK-AWARE scaling. A pack must be scaled as a PACKAGE, not per-body: if
