@@ -209,7 +209,14 @@ export interface DiagnosticsBundle {
   device: string;
 }
 
-export async function sendDiagnosticsBundle(bundle: DiagnosticsBundle): Promise<boolean> {
+export async function sendDiagnosticsBundle(
+  bundle: DiagnosticsBundle,
+  // ⚠ OTA-1504 — the durable-send retry stamps each send with its bundle's id
+  // and attempt number. The SAME bundle can now arrive more than once (that is
+  // the design — see pendingBundle.ts), and the id in the message + tags is
+  // what lets the relay reader collapse the copies back into one bundle.
+  opts: { bundleId?: string; attempt?: number } = {},
+): Promise<boolean> {
   try {
     if (!reportingEnabled()) return false;
     const s = loadSdk();
@@ -219,9 +226,15 @@ export async function sendDiagnosticsBundle(bundle: DiagnosticsBundle): Promise<
       : bundle.log;
     s.captureEvent(
       {
-        message: `player-log ${OTA_BUILD_ID}`,
+        message: `player-log ${OTA_BUILD_ID}${opts.bundleId ? ` #${opts.bundleId}` : ''}`,
         level: 'info',
-        tags: { kind: 'player-log', line: productLine() },
+        tags: {
+          kind: 'player-log',
+          line: productLine(),
+          ...(opts.bundleId
+            ? { bundleId: opts.bundleId, sendAttempt: String(opts.attempt ?? 1) }
+            : {}),
+        },
       },
       {
         attachments: [

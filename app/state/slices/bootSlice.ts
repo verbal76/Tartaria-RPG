@@ -144,7 +144,10 @@ export const createBootSlice = (
         setLastBootBreadcrumb(crumb);
         get().appendLog('debug', reclaimed
           ? `freeze forensics: last boot exited cleanly, then the OS reclaimed it — last phase ${crumb.phase ?? '?'} (${new Date(crumb.phaseAt ?? crumb.at).toISOString()})`
-          : `freeze forensics: last boot ended mid-action — ${crumb.what} @ ${crumb.room ?? '?'} (${new Date(crumb.at).toISOString()})`);
+          // ⚠ OTA-1504 — dated at the LAST SIGN OF LIFE (phaseAt), not the
+          // action's start; the record below explains why that distinction
+          // cost a night of forensics.
+          : `freeze forensics: last boot ended mid-action — ${crumb.what} @ ${crumb.room ?? '?'} (${new Date(crumb.phaseAt ?? crumb.at).toISOString()})`);
         // ⚠⚠ OTA-1380 — AND IT IS PROMOTED TO A CRASH, which is the whole point.
         // This crumb was ALREADY the evidence of a B9-class death: the process
         // was killed while an action was live, so no JS handler ran, nothing
@@ -159,12 +162,28 @@ export const createBootSlice = (
         // session cannot invent a second crash from one crumb.
         // ⚠ OTA-1413 — only a crumb that did NOT come after an orderly exit.
         if (!reclaimed) {
+          // ⚠⚠ OTA-1504 — DATE THE DEATH AT THE LAST SIGN OF LIFE, NOT AT THE
+          // ACTION'S START. The owner's 2026-08-25 15:08 record wore
+          // `ctx-release (+2,639,101ms)`: the crumb's action was 44 MINUTES old
+          // at the last phase stamp, yet the record (and the Sentry alert built
+          // from it) carried the action's own timestamp — misdating the death
+          // by three-quarters of an hour and reading as "died doing that". The
+          // truth the crumb actually holds is narrower: the process was last
+          // seen alive at `phaseAt`, and it died somewhere between that stamp
+          // and this boot. So `ts` is the last stamp, and an action that had
+          // already been standing a long while at that point is SAID to be
+          // stale rather than presented as what killed the app.
+          const lastAlive = crumb.phaseAt ?? crumb.at;
+          const staleMs = Math.max(0, lastAlive - crumb.at);
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           (require('../../diagnostics/crashLedger') as typeof import('../../diagnostics/crashLedger')).recordCrash({
             kind: 'native-death',
-            ts: crumb.at,
+            ts: lastAlive,
             stage: crumb.phase ?? 'mid-action',
-            message: `Process died with no orderly exit while: ${crumb.what}`,
+            message: `Process died with no orderly exit while: ${crumb.what}`
+              + (staleMs > 120_000
+                ? ` — begun ${Math.round(staleMs / 60_000)}m before the last sign of life; treat the action label as stale, not as the killer`
+                : ''),
             isFatal: true,
             breadcrumb: crumb,
           });

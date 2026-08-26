@@ -364,6 +364,18 @@ export default function App() {
         // says it will. The overlay flushes on dismissal; once the notice flag
         // is stored, every later boot takes this flush as before.
         if (!(await cr.crashNoticeNeeded())) await cr.flushCrashReports();
+        // ⚠⚠ OTA-1504 — THE DURABLE SEND-LOG RETRY. A bundle the owner tapped
+        // out and then force-closed (his exact habit, and the proven killer of
+        // every bundle on 2026-08-25) is sitting in a file; each boot re-sends
+        // it until its attempts are spent — even after a flush() that claimed
+        // success, because that claim has been caught lying. Behind the same
+        // told-first gate as the crash flush: nothing leaves before the notice.
+        if (!(await cr.crashNoticeNeeded())) {
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const pb = require('./app/diagnostics/pendingBundle');
+          const line = await pb.retryPendingBundleAtBoot();
+          if (line) useGameStore.getState().appendLog('debug', line);
+        }
       } catch { /* diagnostics must never block a boot */ }
     })();
     // OTA-405 — GATE A safety cap. otaBootResolved opens the character-entry

@@ -181,7 +181,13 @@ export function setLastBootBreadcrumb(c: typeof rpLastBreadcrumb): void { rpLast
 export function runtimePressureSummary(s: PressureSnapshot): string {
   const out: string[] = ['Runtime pressure'];
   if (rpLastBreadcrumb) {
-    const ago = Math.max(0, Date.now() - rpLastBreadcrumb.at);
+    // ⚠ OTA-1504 — "min before this boot" is measured from the LAST SIGN OF
+    // LIFE (phaseAt), not the action's start: the crumb's action can be
+    // three-quarters of an hour older than the last phase stamp (the owner's
+    // 15:08 record was), and dating the death off it misled a whole night's
+    // forensics. Same correction as the ledger record in bootSlice.
+    const lastAlive = rpLastBreadcrumb.phaseAt ?? rpLastBreadcrumb.at;
+    const ago = Math.max(0, Date.now() - lastAlive);
     const mins = Math.round(ago / 60_000);
     // ⚠⚠ OTA-1413 — SECOND DOOR. The crash ledger and THIS line both read the
     // same crumb and both asserted a mid-action death, so suppressing the false
@@ -198,7 +204,7 @@ export function runtimePressureSummary(s: PressureSnapshot): string {
       out.push(`  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.`);
       out.push(`     Last thing the app did: ${rpLastBreadcrumb.what}`);
       out.push(`     Where: ${rpLastBreadcrumb.room ?? '(unknown)'} on ${rpLastBreadcrumb.screen ?? '(unknown)'} screen`);
-      out.push(`     When: ${new Date(rpLastBreadcrumb.at).toISOString()} (${mins} min before this boot)`);
+      out.push(`     Last seen alive: ${new Date(lastAlive).toISOString()} (${mins} min before this boot — the kill landed somewhere in that gap)`);
       // OTA-1356 — the phase names WHERE in that activity's life the app died:
       // `engine-done` but never `rendered` → render side; stuck at `parsed:` →
       // the engine; `homework:` → the background writer, not the player at all.

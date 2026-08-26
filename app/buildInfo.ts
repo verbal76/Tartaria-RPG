@@ -24619,10 +24619,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // step that cannot carry you through the man you walk at, ambush spreads /
 // patrol clusters staggered one man per ring, and a nearest-first pager order.
 // 23 tests prove the numbers. NOTHING IMPORTS IT YET — the rewiring of spawn
-// sites, attack gate, counters, pursuit and saves is OTA-1504, deliberately
-// its own change so the blast radius ships reviewable and revertible without
-// losing the proven math.
-export const OTA_BUILD_ID = '2026-08-25-1503-the-bullseye-is-the-truth';
+// sites, attack gate, counters, pursuit and saves is a following OTA (it was
+// slated as 1504 until the owner's pasted bug reports proved the send-log
+// losses and took that number), deliberately its own change so the blast
+// radius ships reviewable and revertible without losing the proven math.
+// ⚠⚠⚠ OTA-1504 — THE BUNDLE SURVIVES THE KILL. The owner's pasted bug reports
+// (both installs, Pixel 10 Pro XL) proved every SEND LOG bundle of 2026-08-25
+// died client-side: force-close killed the flush mid-send (his own theory —
+// "maybe me sending logs then force closing it caused the after crashes" —
+// confirmed), AND flush()===true was caught reporting envelopes that never
+// arrived (zero server-side drops in the relay's outcomes ledger). So the
+// bundle is written to a document-directory file BEFORE the first send and
+// re-sent once per boot until 5 attempts are spent, regardless of flush()'s
+// answer; the event carries a #bundleId for relay-side dedupe, and the button
+// says SAFE TO CLOSE / SAVED — WILL RETRY AT BOOT honestly. Same OTA fixes the
+// misdated native-deaths those kills exposed: records are now dated at the
+// LAST SIGN OF LIFE (phaseAt) instead of the action's start — the 15:08 record
+// was 44 minutes off and read "died doing that" — with a staleness clause when
+// the standing action was >2m old, in the ledger, the boot line, and About.
+export const OTA_BUILD_ID = '2026-08-25-1504-the-bundle-survives-the-kill';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1503-the-bullseye-is-the-truth';
 // golem catch-up 2026-08-25: markerless publish of OTA-1503 (bullseye geometry, unwired) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1502-the-swipe-is-the-selector';
 // golem catch-up 2026-08-25: markerless publish of OTA-1502 (approach picker retired in combat) to the golem channel.

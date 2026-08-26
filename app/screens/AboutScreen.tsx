@@ -38,6 +38,7 @@ import {
   loadReportingPref, setReportingEnabled, reportingStatusLine, reportingConfigured,
 } from '../diagnostics/crashReporter';
 import { sendDiagnosticsBundle } from '../diagnostics/sentryTransport'; // OTA-1489
+import { persistPendingBundle, MAX_SEND_ATTEMPTS } from '../diagnostics/pendingBundle'; // OTA-1504
 // ⚠ OTA-1490 — the owner gate is DEVICE-sticky now: any character on a device
 // that has ever held an unlock-named one gets the owner tools ("I have 2
 // characters on 1 account and only 1 has the send log option").
@@ -130,7 +131,9 @@ export function AboutScreen() {
   const [logCopied, setLogCopied] = useState(false);
   const [logCleared, setLogCleared] = useState(false);
   // OTA-1489 — SEND LOG button lifecycle (owner-gated; see the render site).
-  const [logSendState, setLogSendState] = useState<'idle' | 'busy' | 'sent' | 'failed'>('idle');
+  // ⚠ OTA-1504 — 'queued' = the flush failed but the bundle is safe on disk
+  // and boots will retry it; 'failed' now means it could not even be saved.
+  const [logSendState, setLogSendState] = useState<'idle' | 'busy' | 'sent' | 'queued' | 'failed'>('idle');
   // OTA-1490 — device-sticky owner unlock: seeing an unlock-named character
   // marks the device, then EVERY character on it gets the owner tools.
   const [ownerTools, setOwnerTools] = useState(false);
@@ -264,17 +267,29 @@ export function AboutScreen() {
       const fresh = await readFullLog();
       const s = useGameStore.getState();
       const device = buildBasicDeviceSummary();
-      const ok = await sendDiagnosticsBundle({
+      const bundle = {
         log: stampLogExport(fresh),
         inventory: stampInventoryExport(buildInventorySnapshot(s.player), device, s.player?.name),
         save: stampSaveExport(buildSaveSnapshot(s.player, s.worldMemory), device, s.player?.name),
         device,
-      });
+      };
+      // ⚠⚠ OTA-1504 — PERSIST BEFORE THE FIRST SEND. The owner's habit is tap
+      // SEND LOG and swipe the app away; the night of 2026-08-25 that killed
+      // every bundle mid-flush. With the file written first, the kill costs
+      // nothing — the next boot re-sends it (see pendingBundle.ts). And the
+      // retries run even after a "successful" flush, because flush()===true
+      // has been caught reporting envelopes that never arrived.
+      const pending = await persistPendingBundle(bundle);
+      const ok = await sendDiagnosticsBundle(bundle, pending ? { bundleId: pending.id, attempt: 1 } : {});
       // ⚠ OTA-1492 — the outcome goes in the log either way, so a send that
       // "succeeded" on the button but never arrived server-side (the owner's
       // first three taps) leaves a line the next diagnosis can start from.
-      useGameStore.getState().appendLog('debug', `send-log: ${ok ? 'flushed to Sentry' : 'FAILED - envelope did not go out'}`);
-      setLogSendState(ok ? 'sent' : 'failed');
+      useGameStore.getState().appendLog('debug', `send-log: ${ok ? 'flushed to Sentry' : 'FAILED - envelope did not go out'}${
+        pending
+          ? ` — bundle #${pending.id} kept on disk, boots retry up to ${MAX_SEND_ATTEMPTS} sends total`
+          : ' — and the retry file could not be written'
+      }`);
+      setLogSendState(ok ? 'sent' : pending ? 'queued' : 'failed');
     } catch {
       setLogSendState('failed');
     }
@@ -1017,7 +1032,8 @@ export function AboutScreen() {
             >
               <Text style={styles.sessionBtnSecondaryText}>
                 {logSendState === 'busy' ? 'SENDING LOG…'
-                  : logSendState === 'sent' ? '✓ LOG SENT TO SENTRY'
+                  : logSendState === 'sent' ? '✓ LOG SENT — SAFE TO CLOSE'
+                  : logSendState === 'queued' ? '⏳ SAVED — WILL RETRY AT BOOT'
                   : logSendState === 'failed' ? '✗ SEND FAILED — USE COPY LOG'
                   : 'SEND LOG TO SENTRY'}
               </Text>
