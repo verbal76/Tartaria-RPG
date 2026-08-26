@@ -24662,6 +24662,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // they stored. STILL COMING: enemy reach classes + threat dot (step 3),
 // shields/BLOCK/SHIELD BASH + iron-indigo section (step 4), THROW (step 5).
 export const OTA_BUILD_ID = '2026-08-26-1506-the-field-goes-live';
+// golem catch-up 2026-08-26: markerless publish of OTA-1506 (per-enemy bullseye combat) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1505-the-crash-brings-its-own-evidence';
 // golem catch-up 2026-08-26: markerless publish of OTA-1505 (auto-bundle on crash for owner/sasmooch devices) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-25-1504-the-bundle-survives-the-kill';
