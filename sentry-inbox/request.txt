@@ -1,2 +1,2 @@
-2026-08-26T01:52:16Z
-pull: check for OTA-1505 auto-bundle after owner's 01:45 slot load
+2026-08-26T13:44:19Z
+pull: EVERYTHING — full sweep of all events, issues and bundles (owner asked)
