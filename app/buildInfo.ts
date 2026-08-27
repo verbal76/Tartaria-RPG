@@ -25077,6 +25077,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // This is the first defect closed off task #75, which had been waiting on raw
 // 4.32.11 lines that OTA-1520 finally delivered intact.
 export const OTA_BUILD_ID = '2026-08-27-1522-the-stun-does-not-outlive-itself';
+// golem catch-up 2026-08-27: markerless publish of OTA-1521 (the OTA reload marks
+// its own orderly exit, so a deliberate restart stops being recorded as a
+// PROCESS KILLED) and OTA-1522 (the incapacitation gate reads the post-tick
+// status list, so a stun no longer eats the action it just released) to the
+// golem channel. Both channels level at 1522.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1521-the-restart-is-not-a-death';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1520-the-scrubber-takes-a-whole-value';
 // golem catch-up 2026-08-27: markerless publish of OTA-1520 (the log slice goes
