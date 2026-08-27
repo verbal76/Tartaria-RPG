@@ -1,0 +1,202 @@
+{
+  "id": "4fd74862ee0b4d8ea66e18b01d6ddc24",
+  "groupID": "7696249525",
+  "eventID": "4fd74862ee0b4d8ea66e18b01d6ddc24",
+  "projectID": "4511945117532160",
+  "size": 17854,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbqd4edoeu9 [inline 14/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbqd4edoeu9 [inline 14/27]",
+  "title": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbqd4edoeu9 [inline 14/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "cb5fb4bbec214b6097638360682cb1f7",
+      "span_id": "80dca0da04f4fafb",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "oming Aetheric damage (in combat AND from Etheric weather) \u2014 and halves incoming electrical damage in combat.\"\n[2026-08-26T22:41:05.893Z] [player] investigate ledge\n[2026-08-26T22:41:05.894Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ledge resolved=ledge range=- enemies=0 hooks=0\n",
+      "[2026-08-26T22:41:05.894Z] [world] You study the ledge and find no answer. The silence here is patient; whatever it knew, it has decided to keep.\n[2026-08-26T22:41:05.895Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T22:41:05.895Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-26T22:41:06.050Z] [cognitive] JUMP \u00b7 SEARCH \u00b7 CLIMB \u00b7 DISENGAGE  (152ms)\n[2026-08-26T22:41:07.864Z] [debug] qwen\u23f1 investigate_lore ok 1819ms read 250ms/write 1532ms in 124t\u2192out 45t 2.0ms/t (201ch)\n[2026-08-26T22:41:08.213Z] [player] investigate charcoal sketches\n",
+      "[2026-08-26T22:41:08.214Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=charcoal sketches resolved=charcoal sketches range=- enemies=0 hooks=0\n[2026-08-26T22:41:08.215Z] [world] The charcoal sketches resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n[2026-08-26T22:41:09.277Z] [debug] ui: tap \"rest\"\n",
+      "[2026-08-26T22:41:09.284Z] [player] rest\n[2026-08-26T22:41:09.284Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n[2026-08-26T22:41:09.285Z] [arbiter] The Arbiter looks up. \"A line gets you up \u2014 it won't hold you asleep. Only a Hardened Climbing Strap will. Climb down, or come back wearing one.\"\n[2026-08-26T22:41:09.511Z] [cognitive] REST  (221ms)\n",
+      "[2026-08-26T22:41:11.379Z] [debug] ui: tap \"climb down\"\n[2026-08-26T22:41:11.408Z] [player] climb down\n[2026-08-26T22:41:11.409Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0\n[2026-08-26T22:41:11.410Z] [world] Your arms are done \u2014 the last stretch off the tower is a half-climb, half-fall. -9 HP (46/58).\n",
+      "[2026-08-26T22:41:11.411Z] [world] You climb down from the vantage and rejoin the ground beside the tower. Boots back on the ground.\n[2026-08-26T22:41:11.411Z] [system] \u23f3 Time passed: 15 min\n[2026-08-26T22:41:13.511Z] [debug] ui: tap \"rest\"\n[2026-08-26T22:41:13.513Z] [player] rest\n",
+      "[2026-08-26T22:41:13.514Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:41:13.514Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 25, morning)\n[2026-08-26T22:41:13.523Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T22:41:13.681Z] [cognitive] REST  (157ms)\n[2026-08-26T22:41:14.343Z] [debug] ui: tap \"rest\"\n",
+      "[2026-08-26T22:41:14.348Z] [player] rest\n[2026-08-26T22:41:14.349Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:41:14.350Z] [world] You rest for 8 hours. +3 HP, +8 stamina recovered. (Day 25, afternoon)\n",
+      "[2026-08-26T22:41:14.350Z] [arbiter] The Arbiter goes still. \"It watched you sleep from the treeline and made up its mind about you.\"\n[2026-08-26T22:41:14.351Z] [world] A Rust Lurker rises out of the silt where you took it for a ridge. The rest is over.\n[2026-08-26T22:41:14.351Z] [debug] enemy: Rust Lurker hp=68 ac=10 atk=Claw Slash dmg=2D6 rarity=Uncommon ap=5\n",
+      "[2026-08-26T22:41:14.351Z] [debug] arbiter: template (reason=combat)\n[2026-08-26T22:41:14.351Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:41:14.352Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T22:41:14.593Z] [cognitive] REST  (241ms)\n",
+      "[2026-08-26T22:41:19.137Z] [debug] qwen\u23f1 ambient ok 13093ms wait 2005ms read 4346ms/write 2293ms in 364t\u2192out 31t 11.9ms/t HIT-CAP (160ch)\n[2026-08-26T22:41:19.526Z] [debug] ui: tap \"dodge\"\n[2026-08-26T22:41:19.529Z] [player] dodge\n[2026-08-26T22:41:19.530Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=far enemies=1 hooks=1\n",
+      "[2026-08-26T22:41:19.530Z] [world] You commit to the dodge. Slip Rust Lurker's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-26T22:41:19.530Z] [combat] Rust Lurker closes the distance.\n[2026-08-26T22:41:19.531Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-26T22:41:19.531Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:41:19.531Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:41:19.730Z] [cognitive] neutral  (198ms)\n[2026-08-26T22:41:19.932Z] [debug] arbiter: ambient stale:combat-started\u2192banked 14036ms\n",
+      "[2026-08-26T22:41:19.933Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You've traversed the dense forest, the echoes of ancient battle echoed through the trees, and you felt a strange sense o\"\n[2026-08-26T22:41:20.131Z] [cognitive] SEARCH  (11915ms)\n[2026-08-26T22:41:20.332Z] [debug] ui: tap \"dodge\"\n[2026-08-26T22:41:20.333Z] [system] dodging (parry) fades.\n",
+      "[2026-08-26T22:41:20.336Z] [player] dodge\n[2026-08-26T22:41:20.336Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1\n[2026-08-26T22:41:20.337Z] [world] You're already committed to the dodge \u2014 no need to spend another beat on it.\n[2026-08-26T22:41:20.337Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-26T22:41:20.337Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:41:20.533Z] [cognitive] neutral  (195ms)\n[2026-08-26T22:41:20.731Z] [cognitive] CLIMB  (9319ms)\n[2026-08-26T22:41:20.929Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:41:20.955Z] [player] attack with the off-hand compact blaster\n",
+      "[2026-08-26T22:41:20.956Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1\n[2026-08-26T22:41:20.956Z] [debug] attack: target=Rust Lurker range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:41:20.957Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-26T22:41:21.013Z] [world] You bring the compact blaster to bear on Rust Lurker.\n[2026-08-26T22:41:21.013Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:41:21.215Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (200ms)\n[2026-08-26T22:41:23.283Z] [debug] qwen\u23f1 investigate_lore ok 14923ms wait 12371ms read 1528ms/write 942ms in 125t\u2192out 28t 12.2ms/t (144ch)\n",
+      "[2026-08-26T22:41:26.295Z] [world] You seize the initiative. Rust Lurker has no time to react.\n[2026-08-26T22:41:26.295Z] [combat] You \u2014 d20 \u2192 4 + DEX 14 \u2212 1 (Whisper Fog) = 17 vs Rust Lurker AC 12 \u2014 \u2713 HIT\n[2026-08-26T22:41:26.296Z] [combat] Weakness exposed \u2014 Rust Lurker flinches. (burn \u00d71.5 for 8)\n",
+      "[2026-08-26T22:41:26.297Z] [combat] Rust Lurker takes 8 with the compact blaster. It reels: 60 left. Then it fights back.\n[2026-08-26T22:41:26.298Z] [combat] Burn sets in \u2014 4/turn for 2 turns.\n[2026-08-26T22:41:26.303Z] [combat] Rust Lurker goes still, half a beat out of step with the room. It holds a TEMPORAL SLIP instead of swinging \u2014 your next clean hit may find nothing.\n",
+      "[2026-08-26T22:41:26.620Z] [debug] persist sizes(KB): total=226 player=64 wm=78[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=5\n[2026-08-26T22:41:28.149Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:41:28.205Z] [player] attack with the off-hand compact blaster\n",
+      "[2026-08-26T22:41:28.206Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1\n[2026-08-26T22:41:28.206Z] [combat] Rust Lurker suffers \u2014 burn eats 4. (56/68 HP, 1 turn left)\n",
+      "[2026-08-26T22:41:28.207Z] [debug] attack: target=Rust Lurker range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:41:28.208Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:41:28.263Z] [world] You bring the compact blaster to bear on Rust Lurker.\n[2026-08-26T22:41:28.264Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-26T22:41:28.462Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (197ms)\n[2026-08-26T22:41:33.155Z] [world] Rust Lurker moves first. The pressure is immediate.\n[2026-08-26T22:41:33.157Z] [combat] Rust Lurker \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-26T22:41:33.157Z] [combat] You \u2014 d20 \u2192 13 + DEX 14 \u2212 1 (Whisper Fog) = 26 vs Rust Lurker AC 12 \u2014 \u2717 SLIPPED\n[2026-08-26T22:41:33.157Z] [combat] Your blow lands where Rust Lurker WAS \u2014 it is a half-second past the spot, and the slip closes behind it, spent.\n[2026-08-26T22:41:37.992Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-08-26T22:41:37.998Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-26T22:41:38.007Z] [player] dodge\n[2026-08-26T22:41:38.008Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1\n",
+      "[2026-08-26T22:41:38.009Z] [world] You commit to the dodge. Slip Rust Lurker's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-26T22:41:38.009Z] [combat] Rust Lurker suffers \u2014 burn eats 4. (52/68 HP, 0 turns left)\n",
+      "[2026-08-26T22:41:38.009Z] [combat] Rust Lurker shakes off the last of the coating \u2014 the burn has run its course.\n[2026-08-26T22:41:38.076Z] [combat] Rust Lurker \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-08-26T22:41:38.076Z] [combat] Dodge \u2014 d20 \u2192 4 + DEX 14 = 18 vs ATK 9. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-08-26T22:41:38.077Z] [debug] arbiter: template (reason=combat)\n[2026-08-26T22:41:38.077Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:41:38.077Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:41:38.285Z] [cognitive] neutral  (206ms)\n[2026-08-26T22:41:39.043Z] [debug] ui: tap \"off: compact blaster\"\n",
+      "[2026-08-26T22:41:39.072Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:41:39.072Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1\n[2026-08-26T22:41:39.073Z] [debug] attack: target=Rust Lurker range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n",
+      "[2026-08-26T22:41:39.074Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:41:39.074Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-26T22:41:39.127Z] [world] You commit forward with the compact blaster. Rust Lurker watches your hands.\n[2026-08-26T22:41:39.128Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-26T22:41:39.329Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (201ms)\n[2026-08-26T22:41:44.554Z] [world] You seize the initiative. Rust Lurker has no time to react.\n[2026-08-26T22:41:44.555Z] [combat] You \u2014 d20 \u2192 11 + DEX 14 \u2212 1 (Whisper Fog) perfect opening (2\u00d7 dice) = 24 vs Rust Lurker AC 12 \u2014 \u2713 HIT\n",
+      "[2026-08-26T22:41:44.556Z] [combat] Weakness exposed \u2014 Rust Lurker flinches. (burn \u00d71.5 for 14)\n[2026-08-26T22:41:44.557Z] [combat] Your strike with the compact blaster lands for 14. Rust Lurker staggers \u2014 38 HP remaining. It answers.\n[2026-08-26T22:41:44.557Z] [combat] Burn sets in \u2014 3/turn for 2 turns.\n",
+      "[2026-08-26T22:41:44.559Z] [combat] Rust Lurker \u2014 d20 \u2192 2 + ATK 5 = 7 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:41:54.881Z] [debug] appstate: active \u2192 background (was active for 280308ms)\n[2026-08-26T22:42:49.938Z] [debug] appstate: background \u2192 active (was background for 55057ms)\n[2026-08-26T22:42:51.382Z] [debug] ui: tap \"off: compact blaster\"\n",
+      "[2026-08-26T22:42:51.410Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:42:51.411Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1\n[2026-08-26T22:42:51.412Z] [combat] Rust Lurker suffers \u2014 burn eats 3. (35/68 HP, 1 turn left)\n",
+      "[2026-08-26T22:42:51.412Z] [debug] attack: target=Rust Lurker range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:42:51.415Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:42:51.475Z] [world] You raise the compact blaster toward Rust Lurker. The room narrows around the both of you.\n",
+      "[2026-08-26T22:42:51.475Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:42:56.696Z] [world] Rust Lurker moves first. The pressure is immediate.\n[2026-08-26T22:42:56.698Z] [combat] Rust Lurker \u2014 d20 \u2192 1 + ATK 5 = 6 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n[2026-08-26T22:42:56.698Z] [combat] You \u2014 d20 \u2192 2 + DEX 14 \u2212 1 (Whisper Fog) = 15 vs Rust Lurker AC 12 \u2014 \u2713 HIT\n",
+      "[2026-08-26T22:42:56.700Z] [combat] Weakness exposed \u2014 Rust Lurker flinches. (burn \u00d71.5 for 3)\n[2026-08-26T22:42:56.701Z] [combat] The blow with the compact blaster finds purchase \u2014 3 damage, 32 HP standing. Rust Lurker commits to the counter.\n[2026-08-26T22:42:56.701Z] [combat] Burn sets in \u2014 1/turn for 2 turns.\n[2026-08-26T22:42:57.835Z] [debug] ui: tap \"off: compact blaster\"\n",
+      "[2026-08-26T22:42:57.886Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:42:57.888Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1\n[2026-08-26T22:42:57.888Z] [combat] Rust Lurker suffers \u2014 burn eats 1. (31/68 HP, 1 turn left)\n",
+      "[2026-08-26T22:42:57.889Z] [debug] attack: target=Rust Lurker range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:42:57.890Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:42:57.945Z] [world] You bring the compact blaster to bear on Rust Lurker.\n[2026-08-26T22:42:57.945Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-26T22:42:58.210Z] [debug] persist sizes(KB): total=226 player=64 wm=78[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=5\n[2026-08-26T22:43:05.662Z] [world] Rust Lurker moves first. The pressure is immediate.\n[2026-08-26T22:43:05.665Z] [combat] Rust Lurker \u2014 d20 \u2192 1 + ATK 5 = 6 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n",
+      "[2026-08-26T22:43:05.666Z] [combat] You \u2014 d20 \u2192 5 + DEX 14 \u2212 1 (Whisper Fog) = 18 vs Rust Lurker AC 12 \u2014 \u2713 HIT\n[2026-08-26T22:43:05.668Z] [combat] Weakness exposed \u2014 Rust Lurker flinches. (burn \u00d71.5 for 6)\n[2026-08-26T22:43:05.669Z] [combat] Clean hit with the compact blaster for 6. Rust Lurker has 25 left and does not back away.\n",
+      "[2026-08-26T22:43:05.670Z] [combat] Burn sets in \u2014 2/turn for 2 turns.\n[2026-08-26T22:43:07.896Z] [debug] ui: tap \"stealth\"\n[2026-08-26T22:43:07.902Z] [player] sneak\n[2026-08-26T22:43:07.903Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=1 hooks=1\n[2026-08-26T22:43:07.979Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-26T22:43:08.372Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (392ms)\n[2026-08-26T22:43:09.959Z] [debug] skillc"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbqd4edoeu9 [inline 14/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbqd4edoeu9"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "14"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T19:35:23.194000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T19:35:24.023000Z",
+  "fingerprints": [
+    "82f17a8e70d8bf54d353a3b48521207e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "6ed39c68ad5342cfb60f0f5d2b721104",
+  "previousEventID": "455d47c1caf143ac9eb1eec15507bdfe"
+}

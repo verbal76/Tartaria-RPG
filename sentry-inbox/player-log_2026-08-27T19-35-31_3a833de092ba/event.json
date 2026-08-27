@@ -1,0 +1,242 @@
+{
+  "id": "3a833de092ba43e28279141994b4bc92",
+  "groupID": "7696249525",
+  "eventID": "3a833de092ba43e28279141994b4bc92",
+  "projectID": "4511945117532160",
+  "size": 17313,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbxa8u29r1x [inline 4/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbxa8u29r1x [inline 4/27]",
+  "title": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbxa8u29r1x [inline 4/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "cb5fb4bbec214b6097638360682cb1f7",
+      "span_id": "80dca0da04f4fafb",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "neutral  (463ms)\n[2026-08-26T02:08:38.521Z] [cognitive] neutral  (435ms)\n[2026-08-26T02:08:38.533Z] [cognitive] neutral  (419ms)\n[2026-08-26T02:08:38.536Z] [cognitive] neutral  (395ms)\n[2026-08-26T02:08:41.064Z] [debug] qwen\u23f1 ambient ok 2573ms read 1485ms/write 1023ms in 368t\u2192out 31t 4.0ms/t HIT-CAP (155ch)\n",
+      "[2026-08-26T02:08:41.065Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro_fill n5 avg9.8s max20.8s read7.7s \u26a04unusable in654t\u2192out17t ms/tok 11.8-11.8 cap2 \u23f83 \u27023/23.6s | ambient n3 avg6.6s max10.8s read2.6s/write1.3s in365t\u2192out31t ms/tok 4.0-10.3 cap3 wait0.6s \u27021/10.8s | investigate_lore n2 avg3.7s max5.8s read0.3s/write1.3s \u26a01unusable in124t\u2192out36t ms/tok 2.4-2.4 wait1.0s || WASTED 4 calls / 34.5s\n",
+      "[2026-08-26T02:08:41.080Z] [arbiter] You've traversed the far reaches of the ancient, forgotten world of Tartaria, your journey marked by countless challenges and trials.\n[2026-08-26T02:08:41.080Z] [debug] arbiter: ambient \u2713 2940ms\n",
+      "[2026-08-26T02:08:41.080Z] [debug] arbiter: ambient-said \"You've traversed the far reaches of the ancient, forgotten world of Tartaria, your journey marked by countless challenges and trials.\"\n[2026-08-26T02:08:44.415Z] [debug] ui: tap \"rest\"\n[2026-08-26T02:08:44.427Z] [player] rest\n",
+      "[2026-08-26T02:08:44.428Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T02:08:44.429Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 21, night)\n[2026-08-26T02:08:44.440Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T02:08:44.440Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n",
+      "[2026-08-26T02:08:44.578Z] [cognitive] REST  (137ms)\n[2026-08-26T02:08:45.138Z] [debug] persist sizes(KB): total=207 player=50 wm=73[rooms=27 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=81 scene=4\n[2026-08-26T02:08:45.433Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-08-26T02:08:45.459Z] [world] You head west. Mud-flats stretch the same in every direction \u2014 only the wind tells you you've moved.\n[2026-08-26T02:08:45.461Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n[2026-08-26T02:08:46.482Z] [debug] ui: tap \"\u2726 ability\"\n[2026-08-26T02:08:51.501Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-26T02:08:53.655Z] [world] The Throwing Knife is lighter than it looks, which is its own kind of warning.\n[2026-08-26T02:08:53.656Z] [reward] \u2726 Throwing Knife (Common).\n[2026-08-26T02:08:54.428Z] [world] The Worn Tartarian Coin is cold through your glove.\n[2026-08-26T02:08:54.429Z] [reward] \u2726 Worn Tartarian Coin (Common).\n",
+      "[2026-08-26T02:08:55.447Z] [world] You strip the cracked mirror carefully. Something usable comes free in your hand.\n[2026-08-26T02:08:55.448Z] [world] You break the lantern pole apart. Among the pieces, something worth keeping.\n[2026-08-26T02:08:55.448Z] [world] You strip the market debris carefully. Something usable comes free in your hand.\n",
+      "[2026-08-26T02:08:55.448Z] [world] You lever something loose from the merchant sign \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-26T02:08:55.448Z] [world] You strip the pavement carefully. Something usable comes free in your hand.\n[2026-08-26T02:08:55.449Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:08:55.449Z] [reward]     \u2022 Cloth Scrap (Common)\n",
+      "[2026-08-26T02:08:55.449Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-26T02:08:55.450Z] [reward]     \u2022 Aether Dust (Common)\n[2026-08-26T02:08:55.450Z] [reward]     \u2022 Flint Core Nodule (Common)\n[2026-08-26T02:08:55.450Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-08-26T02:08:56.685Z] [debug] ui: tap \"craft\"\n",
+      "[2026-08-26T02:09:00.611Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-26T02:09:00.618Z] [world] You repair the Anvil-Struck Footguards. Back to full. (spent: Small Rock x2)\n[2026-08-26T02:09:00.657Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-08-26T02:09:00.657Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-08-26T02:09:00.658Z] [world] You repair the Burl Aegis. Back to full. (spent: Small Rock x2)\n[2026-08-26T02:09:00.676Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-08-26T02:09:00.676Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-08-26T02:09:00.677Z] [world] You repair the Forge-Black Cowl. Back to full. (spent: Small Rock x2)\n[2026-08-26T02:09:00.692Z] [world] You repair the Plasma Cutter. Back to full. (spent: Scrap Metal x4, Stick x2)\n",
+      "[2026-08-26T02:09:00.706Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-26T02:09:00.706Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-08-26T02:09:00.707Z] [world] You repair the Spore-Crusted Tassets. Back to full. (spent: Small Rock x2)\n",
+      "[2026-08-26T02:09:00.722Z] [world] You repair the Traveler's Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-08-26T02:09:00.736Z] [world] You repair the Wanderer's Worn Gauntlets. Back to full. (spent: Patched Cloth x4)\n[2026-08-26T02:09:00.750Z] [world] You repair the Aetheric Crystal Blade. Back to full. (spent: Scrap Metal x6, Stick x2)\n",
+      "[2026-08-26T02:09:00.764Z] [world] You repair the Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n[2026-08-26T02:09:00.778Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-08-26T02:09:00.792Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n",
+      "[2026-08-26T02:09:00.806Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-08-26T02:09:00.831Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock, Horn-Capped Dowel \u2192 Stick.\"\n[2026-08-26T02:09:00.842Z] [world] You repair the Cudgel. Back to full. (spent: Small Rock x4, Stick x2)\n",
+      "[2026-08-26T02:09:00.856Z] [arbiter] The Arbiter eyes the Cudgel. \"Short on stock: Stick 1 short. Gather, then return.\"\n[2026-08-26T02:09:00.857Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T02:09:00.871Z] [arbiter] The Arbiter nods. \"Patched in: 3\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-08-26T02:09:00.872Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T02:09:00.887Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T02:09:00.888Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-08-26T02:09:00.902Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T02:09:00.902Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Clot\u2026\"\n[2026-08-26T02:09:00.903Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-08-26T02:09:00.918Z] [arbiter] The Arbiter nods. \"Patched in: Bent Nail \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T02:09:00.920Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T02:09:00.935Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Bent Nail \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-08-26T02:09:00.937Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T02:09:04.287Z] [debug] ui: tap \"investigate\"\n[2026-08-26T02:09:05.842Z] [world] Iron fog disorients you. Compasses spin; intent costs more.\n[2026-08-26T02:09:05.864Z] [player] investigate the ground\n",
+      "[2026-08-26T02:09:05.865Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-26T02:09:05.866Z] [world] Something shifted while you were turned away \u2014 a Gutter Rat breaks cover, fast and low. (range: close)\n[2026-08-26T02:09:05.866Z] [combat] Gutter Rat \u2014 Bite ready, 1D6 damage on a hit.\n",
+      "[2026-08-26T02:09:05.866Z] [debug] enemy: Gutter Rat hp=8 ac=7 atk=Bite dmg=1D6 rarity=Common ap=2\n[2026-08-26T02:09:05.867Z] [debug] arbiter: template (reason=combat)\n[2026-08-26T02:09:05.867Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:09:06.049Z] [cognitive] CLIMB  (181ms)\n[2026-08-26T02:09:09.281Z] [debug] ui: tap \"approach\"\n",
+      "[2026-08-26T02:09:09.325Z] [player] approach Gutter Rat\n[2026-08-26T02:09:09.326Z] [debug] parser: intent=advance conf=1.00 verb=approach target=gutter rat resolved=Gutter Rat range=mid enemies=1 hooks=1\n[2026-08-26T02:09:09.328Z] [debug] move: advance from range=mid enemies=1 weather=Iron Fog cost=2 partial=1\n",
+      "[2026-08-26T02:09:09.328Z] [debug] move: field advance target=Gutter Rat d 1.50->0.50 band mid->close\n[2026-08-26T02:09:09.328Z] [world] You close the gap with Gutter Rat. (range: close / arm's reach)\n[2026-08-26T02:09:09.330Z] [combat] Gutter Rat \u2014 d20 \u2192 3 + ATK 3 = 6 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:09:09.525Z] [cognitive] neutral  (193ms)\n",
+      "[2026-08-26T02:09:10.398Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-26T02:09:10.463Z] [player] attack with the cantor's tuning fork\n[2026-08-26T02:09:10.463Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1\n",
+      "[2026-08-26T02:09:10.464Z] [debug] attack: target=Gutter Rat range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-26T02:09:10.465Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-08-26T02:09:10.465Z] [debug] attack: status mods tired -1\n",
+      "[2026-08-26T02:09:10.510Z] [world] Your searing cantor's tuning fork comes around in an arc; Gutter Rat squares up to meet it.\n[2026-08-26T02:09:10.510Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:09:10.677Z] [cognitive] neutral  (166ms)\n[2026-08-26T02:09:10.881Z] [debug] persist sizes(KB): total=207 player=50 wm=73[rooms=28 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=80 scene=4\n",
+      "[2026-08-26T02:09:17.176Z] [world] Gutter Rat moves first. The pressure is immediate.\n[2026-08-26T02:09:17.178Z] [combat] Gutter Rat \u2014 d20 \u2192 7 + ATK 3 = 10 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:09:17.178Z] [combat] You \u2014 d20 \u2192 20 + INT 10 \u2212 2 (Iron Fog) tired -1 = 27 vs Gutter Rat AC 7 \u2014 \u2713 CRITICAL HIT\n[2026-08-26T02:09:17.179Z] [combat] Aetheric flares \u2014 +1 on hit.\n",
+      "[2026-08-26T02:09:17.179Z] [combat] The killing blow with the searing cantor's tuning fork: 21. Gutter Rat drops where it stood.\n[2026-08-26T02:09:17.180Z] [reward] Gutter Rat defeated. You recover Rat Fur.\n[2026-08-26T02:09:17.180Z] [reward] +9 TC pried from the dust.\n[2026-08-26T02:09:20.093Z] [debug] ui: tap \"rest\"\n[2026-08-26T02:09:20.110Z] [player] rest\n",
+      "[2026-08-26T02:09:20.111Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T02:09:20.113Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 21, afternoon)\n[2026-08-26T02:09:20.124Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T02:09:20.282Z] [cognitive] REST  (157ms)\n",
+      "[2026-08-26T02:09:21.360Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T02:09:21.377Z] [debug] spawn: gear=[Repeater Rifle, Lost Scholar's Robe, Mud-Walker Mask] window=10 roster=new\n[2026-08-26T02:09:21.379Z] [world] You move west under a sky the color of rust. Whatever sun there was has been wrung out by the haze.\n",
+      "[2026-08-26T02:09:21.380Z] [world] Your eye goes back to it before you decide to look.\n[2026-08-26T02:09:22.610Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T02:09:24.094Z] [world] The Repeater Rifle fits the hand better than it has any right to.\n[2026-08-26T02:09:24.095Z] [reward] \u2726 Repeater Rifle (Common).\n",
+      "[2026-08-26T02:09:24.110Z] [world] You turn the Lost Scholar's Robe over once, then keep it.\n[2026-08-26T02:09:24.110Z] [reward] \u2726 Lost Scholar's Robe (Common).\n[2026-08-26T02:09:24.111Z] [world] The Mud-Walker Mask comes away clean.\n[2026-08-26T02:09:24.111Z] [reward] \u2726 Mud-Walker Mask (Common).\n[2026-08-26T02:09:25.022Z] [world] You salvage the core. The take is small but real.\n",
+      "[Filtered]",
+      "[2026-08-26T02:09:25.023Z] [reward]     \u2022 Glass-Beaded Strap (Uncommon)\n[2026-08-26T02:09:25.024Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-08-26T02:09:26.947Z] [debug] ui: tap \"investigate\"\n[2026-08-26T02:09:28.453Z] [player] investigate the ground\n[2026-08-26T02:09:28.454Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T02:09:28.457Z] [world] You scrape at the silt with the aetheric crystal blade. Nothing of worth.\n[2026-08-26T02:09:28.462Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T02:09:28.462Z] [arbiter] The Arbiter glances toward the cold. \"Still there. Still yours, if you take it.\"\n[2026-08-26T02:09:28.463Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-26T02:09:28.613Z] [cognitive] CLIMB  (150ms)\n[2026-08-26T02:09:33.829Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T02:09:33.845Z] [debug] spawn: gear=[Rough Hewn Mask] window=10 roster=new\n[2026-08-26T02:09:33.852Z] [world] You press west. Clouds drag along the horizon like silt in still water, slow and indifferent.\n",
+      "[2026-08-26T02:09:33.853Z] [world] You had a question here. You still have it.\n[2026-08-26T02:09:34.863Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T02:09:36.552Z] [world] It takes two pulls. The Rough Hewn Mask is yours on the second.\n[2026-08-26T02:09:36.553Z] [reward] \u2726 Rough Hewn Mask (Common).\n",
+      "[2026-08-26T02:09:36.772Z] [debug] persist sizes(KB): total=207 player=51 wm=73[rooms=28 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=4\n[2026-08-26T02:09:37.634Z] [world] You strip the barrel lid carefully. Something usable comes free in your hand.\n[2026-08-26T02:09:37.635Z] [world] You work the cache over. A part of it comes loose, intact.\n",
+      "[Filtered]",
+      "[2026-08-26T02:09:37.636Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:09:37.637Z] [reward]     \u2022 Worn Tartarian Coin x12 (Common)\n[2026-08-26T02:09:37.637Z] [reward]     \u2022 Aether Dust x2 (Common)\n[202"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbxa8u29r1x [inline 4/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbxa8u29r1x"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "4"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T19:35:30.330500Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "36": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 372,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "42": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 350,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T19:35:31.278000Z",
+  "fingerprints": [
+    "82f17a8e70d8bf54d353a3b48521207e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "3e62f5e0a1e242cfbc0049f473f9f42d",
+  "previousEventID": "39e576494ebe465b9d44a1bb53b74810"
+}

@@ -1,0 +1,199 @@
+{
+  "id": "300b98220fd348a49406dd74a4fdf2a2",
+  "groupID": "7696249525",
+  "eventID": "300b98220fd348a49406dd74a4fdf2a2",
+  "projectID": "4511945117532160",
+  "size": 17835,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbxa8u29r1x [inline 5/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbxa8u29r1x [inline 5/27]",
+  "title": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbxa8u29r1x [inline 5/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "cb5fb4bbec214b6097638360682cb1f7",
+      "span_id": "80dca0da04f4fafb",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "6-08-26T02:09:37.637Z] [reward]     \u2022 Mortar-Bound Cobble (Common)\n[2026-08-26T02:09:37.638Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-26T02:09:39.114Z] [debug] ui: tap \"investigate\"\n[2026-08-26T02:09:41.983Z] [player] investigate the ground\n[2026-08-26T02:09:41.984Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T02:09:41.990Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Raspberries (Uncommon).\n[2026-08-26T02:09:41.996Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T02:09:41.997Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:09:41.997Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-26T02:09:41.997Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T02:09:42.143Z] [cognitive] CLIMB  (145ms)\n[2026-08-26T02:09:52.853Z] [debug] ui: tap \"rest\"\n[2026-08-26T02:09:52.864Z] [player] rest\n[2026-08-26T02:09:52.865Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T02:09:52.866Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 22, night)\n[2026-08-26T02:09:52.866Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-26T02:09:52.880Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n[2026-08-26T02:09:52.881Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-26T02:09:52.881Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T02:09:53.019Z] [cognitive] REST  (135ms)\n[2026-08-26T02:09:54.034Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T02:09:54.048Z] [debug] spawn: gear=[Compact Blaster, Mud Claymore] window=10 roster=new\n",
+      "[2026-08-26T02:09:54.050Z] [world] You walk north. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-26T02:09:54.051Z] [world] Some part of you has been keeping the place bookmarked.\n[2026-08-26T02:09:55.419Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T02:09:57.036Z] [world] The Compact Blaster resists, then does not.\n",
+      "[2026-08-26T02:09:57.036Z] [reward] \u2726 Compact Blaster (Common).\n[2026-08-26T02:09:57.044Z] [world] You brace a foot and the Mud Claymore gives.\n[2026-08-26T02:09:57.044Z] [reward] \u2726 Mud Claymore (Common).\n[2026-08-26T02:09:57.998Z] [world] One good tug and the Aetheric Shard is out.\n[2026-08-26T02:09:57.999Z] [reward] \u2726 Aetheric Shard (Uncommon).\n",
+      "[2026-08-26T02:09:59.307Z] [world] You scavenge the broken lantern thoroughly. One Cloth Scrap survives the sorting.\n[2026-08-26T02:09:59.308Z] [world] You strip the cracked chest down. Mostly debris \u2014 but a Smooth Stone comes loose at the bottom of the pile.\n[2026-08-26T02:09:59.308Z] [world] You salvage the fungal patch. The take is small but real.\n",
+      "[2026-08-26T02:09:59.309Z] [world] You strip the tower relay carefully. Something usable comes free in your hand.\n[2026-08-26T02:09:59.309Z] [world] You break the wagon axle apart. Among the pieces, something worth keeping.\n[2026-08-26T02:09:59.309Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:09:59.310Z] [reward]     \u2022 Cloth Scrap (Common)\n",
+      "[2026-08-26T02:09:59.310Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-08-26T02:09:59.310Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-08-26T02:09:59.311Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-08-26T02:09:59.311Z] [reward]     \u2022 Worn Tartarian Coin x4 (Common)\n[2026-08-26T02:10:01.612Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-26T02:10:02.208Z] [debug] persist sizes(KB): total=208 player=51 wm=73[rooms=28 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=4\n[2026-08-26T02:10:10.217Z] [debug] qwen\u23f1 item_synthesis_hw ok 4340ms read 3611ms/write 689ms in 323t\u2192out 21t 11.2ms/t (88ch)\n[2026-08-26T02:10:10.234Z] [debug] homework: item_desc \"Cloth Scrap\" \u2713 4833ms\n",
+      "[2026-08-26T02:10:22.084Z] [debug] ui: tap \"missions\"\n[2026-08-26T02:10:24.916Z] [debug] ui: tap \"inventory\"\n[2026-08-26T02:10:32.454Z] [debug] ui: tap \"investigate\"\n[2026-08-26T02:10:33.939Z] [player] investigate the ground\n[2026-08-26T02:10:33.940Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T02:10:33.945Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Raspberries (Uncommon).\n[2026-08-26T02:10:33.962Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T02:10:33.963Z] [arbiter] The Arbiter looks around. \"Listen for the bells. Nimari had bells, once. They sometimes remember.\"\n",
+      "[2026-08-26T02:10:33.963Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-26T02:10:33.963Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T02:10:33.965Z] [world] An Eternal Dynasty war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Mud Monarchs.\n",
+      "[2026-08-26T02:10:33.965Z] [arbiter] \"The Eternal Dynasty do not forgive a friend of the Mud Monarchs,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-26T02:10:34.201Z] [cognitive] CLIMB  (237ms)\n[2026-08-26T02:10:34.661Z] [debug] persist sizes(KB): total=212 player=52 wm=73[rooms=28 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=7\n",
+      "[2026-08-26T02:10:34.841Z] [debug] ui: tap \"off: plasma cutter\"\n[2026-08-26T02:10:34.868Z] [player] attack with the off-hand plasma cutter\n[2026-08-26T02:10:34.869Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand plasma cutter resolved=Plasma Cutter range=close enemies=5 hooks=1\n",
+      "[2026-08-26T02:10:34.869Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Plasma Cutter bareHand=false\n[2026-08-26T02:10:34.870Z] [arbiter] Whisper Fog hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-08-26T02:10:34.870Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-26T02:10:34.871Z] [debug] attack: status mods tired -1\n[2026-08-26T02:10:34.915Z] [world] You raise the plasma cutter toward Eternal Dynasty Raider 1. The room narrows around the both of you.\n[2026-08-26T02:10:34.915Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:10:35.096Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 THROW  (180ms)\n[2026-08-26T02:10:36.842Z] [system] Action cancelled.\n",
+      "[2026-08-26T02:10:38.656Z] [debug] ui: tap \"dodge\"\n[2026-08-26T02:10:38.670Z] [player] dodge\n[2026-08-26T02:10:38.671Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=1\n",
+      "[2026-08-26T02:10:38.672Z] [world] You commit to the dodge. Slip Eternal Dynasty Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-26T02:10:38.734Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 8 + ATK 9 = 17 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-08-26T02:10:38.734Z] [combat] Dodge \u2014 d20 \u2192 15 + DEX 13 = 28 vs ATK 17. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-26T02:10:38.734Z] [world] You slip Eternal Dynasty Raider 2's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-08-26T02:10:38.735Z] [debug] ac-shift 28\u219231: race/base 12 + gear 24 + title 0 \u2192 trimmed 28 + status 3 | worn: head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak\n",
+      "[2026-08-26T02:10:38.735Z] [combat] Eternal Dynasty Raider 3 \u2014 d20 \u2192 5 + ATK 9 = 14 vs your AC 31 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:10:38.736Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 15 + ATK 9 = 24 vs your AC 31 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:10:38.737Z] [combat] Eternal Dynasty Raider 4 and 1 other close the distance.\n",
+      "[2026-08-26T02:10:38.737Z] [debug] arbiter: template (reason=combat)\n[2026-08-26T02:10:38.737Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:10:38.738Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:10:38.932Z] [cognitive] neutral  (193ms)\n[2026-08-26T02:10:39.888Z] [debug] ui: tap \"searing tuning fork\"\n",
+      "[2026-08-26T02:10:39.893Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-26T02:10:39.956Z] [player] attack with the cantor's tuning fork\n[2026-08-26T02:10:39.957Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=5 hooks=1\n",
+      "[2026-08-26T02:10:39.958Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-26T02:10:39.958Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T02:10:39.959Z] [debug] attack: status mods exhausted -2 \u00b7 perfect opening (2\u00d7 dice)\n",
+      "[2026-08-26T02:10:40.004Z] [world] You raise the searing cantor's tuning fork toward Eternal Dynasty Raider 1. The room narrows around the both of you.\n[2026-08-26T02:10:40.004Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:10:40.190Z] [cognitive] neutral  (185ms)\n[2026-08-26T02:10:44.274Z] [world] Eternal Dynasty Raider 1 moves first. The pressure is immediate.\n",
+      "[2026-08-26T02:10:44.275Z] [debug] ac-shift 31\u219228: race/base 12 + gear 24 + title 0 \u2192 trimmed 28 + status 0 | worn: head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak\n",
+      "[2026-08-26T02:10:44.275Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 11 + ATK 7 = 18 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:10:44.276Z] [combat] Eternal Dynasty Raider 3 \u2014 d20 \u2192 9 + ATK 7 = 16 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-26T02:10:44.277Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 11 + ATK 7 = 18 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:10:44.277Z] [combat] Eternal Dynasty Raider 4 and 1 other close the distance.\n[2026-08-26T02:10:44.277Z] [combat] You \u2014 d20 \u2192 3 + INT 10 \u2212 1 (Whisper Fog) exhausted -2 perfect opening (2\u00d7 dice) = 10 vs Eternal Dynasty Raider 1 AC 11 \u2014 \u2717 MISS\n",
+      "[2026-08-26T02:10:44.277Z] [combat] Half a beat too slow. Eternal Dynasty Raider 1 steps inside your reach.\n[2026-08-26T02:10:45.900Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-26T02:10:45.987Z] [player] attack with the cantor's tuning fork\n[2026-08-26T02:10:45.988Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=5 hooks=1\n",
+      "[2026-08-26T02:10:45.991Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-26T02:10:45.992Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T02:10:45.992Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T02:10:46.037Z] [world] You raise the searing cantor's tuning fork toward Eternal Dynasty Raider 1. The room narrows around the both of you.\n[2026-08-26T02:10:46.037Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:10:46.219Z] [cognitive] neutral  (181ms)\n[2026-08-26T02:10:55.327Z] [world] You seize the initiative. Eternal Dynasty Raider 1 has no time to react.\n",
+      "[2026-08-26T02:10:55.327Z] [combat] You \u2014 d20 \u2192 5 + INT 10 \u2212 1 (Whisper Fog) exhausted -2 = 12 vs Eternal Dynasty Raider 1 AC 11 \u2014 \u2713 HIT\n[2026-08-26T02:10:55.327Z] [combat] Eternal Dynasty Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 4)\n",
+      "[2026-08-26T02:10:55.360Z] [combat] The blow with the searing cantor's tuning fork finds purchase \u2014 4 damage, 10 HP standing. Eternal Dynasty Raider 1 commits to the counter.\n[2026-08-26T02:10:55.361Z] [combat] Searing Cantor's Tuning Fork \u2014 2 burn bites in and festers (3 turns).\n",
+      "[2026-08-26T02:10:55.362Z] [combat] Eternal Dynasty Raider 5 \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-26T02:10:55.364Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 16 + ATK 7 = 23 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-08-26T02:10:55.366Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 3 + ATK 7 = 10 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:10:55.366Z] [combat] Eternal Dynasty Raider 3 \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:10:55.367Z] [combat] Eternal Dynasty Raider 4 presses in behind the others, waiting for an opening.\n",
+      "[2026-08-26T02:10:55.598Z] [combat] Eternal Dynasty Raider 5 deals 3 bludgeoning damage [plate \u22123]. You have 37 HP remaining.\n[2026-08-26T02:10:55.598Z] [combat] Eternal Dynasty Raider 5's strike leaves you stunned.\n[2026-08-26T02:10:55.598Z] [combat] Eternal Dynasty Raider 1 deals 4 bludgeoning damage [plate \u22122]. You have 33 HP remaining.\n[2026-08-26T02:11:03.870Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-08-26T02:11:03.873Z] [system] stunned fades.\n[2026-08-26T02:11:03.874Z] [world] You cannot move. Your action is lost.\n[2026-08-26T02:11:04.703Z] [debug] ui: tap \"off: plasma cutter\"\n[2026-08-26T02:11:04.747Z] [player] attack with the off-hand plasma cutter\n",
+      "[2026-08-26T02:11:04.748Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand plasma cutter resolved=Plasma Cutter range=close enemies=5 hooks=1\n[2026-08-26T02:11:04.749Z] [combat] Eternal Dynasty Raider 1 blisters \u2014 clinging fire sears 2. (8/14 HP, 2 turns left)\n",
+      "[2026-08-26T02:11:04.749Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Plasma Cutter bareHand=false\n[2026-08-26T02:11:04.751Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T02:11:04.751Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T02:11:04.800Z] [world] You raise the plasma cutter toward Eternal Dynasty Raider 1. The room narrows around the both of you.\n[2026-08-26T02:11:04.800Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:11:04.991Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 THROW  (190ms)\n[2026-08-26T02:11:09.965Z] [world] You seize the initiative. Eternal Dynasty Raider 1 has no time to react.\n",
+      "[2026-08-26T02:11:09.965Z] [combat] You \u2014 d20 \u2192 5 + DEX 13 \u2212 1 (Whisper Fog) exhausted -2 = 15 vs Eternal Dynasty Raider 1 AC 11 \u2014 \u2713 HIT\n[2026-08-26T02:11:09.971Z] [combat] The blow with the plasma cutter finds purchase \u2014 2 damage, 6 HP standing. Eternal Dynasty Raider 1 commits to the counter.\n[2026-08-26T02:11:09.971Z] [combat] Burn sets in \u2014 3/turn for 2 turns.\n",
+      "[2026-08-26T02:11:09.973Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 18 + ATK 7 = 25 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-26T02:11:09.976Z] [combat] Eternal Dynasty Raider 3 \u2014 d20 \u2192 17 + ATK 7 = 24 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-08-26T02:11:09.978Z] [combat] Eternal Dynasty Raider 4 \u2014 d20 \u2192 9 + ATK 6 = 15 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:11:09.979Z] [combat] Eternal Dynasty Raider 5 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:11:09.979Z] [combat] Eternal Dynasty Raider 1 presses in behind the others, waiting for an opening.\n",
+      "[2026-08-26T02:11:10.198Z] [combat] Eternal Dynasty Raider 2 deals 2 slashing damage ["
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbxa8u29r1x [inline 5/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbxa8u29r1x"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "5"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T19:35:30.346033Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T19:35:31.278000Z",
+  "fingerprints": [
+    "82f17a8e70d8bf54d353a3b48521207e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "39e576494ebe465b9d44a1bb53b74810",
+  "previousEventID": "1f5e6f42ec65419ba63c8ba32e277a20"
+}

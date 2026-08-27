@@ -1,0 +1,197 @@
+{
+  "id": "f0cff7a7e93f488ca0bcff72ebd7a7be",
+  "groupID": "7696249525",
+  "eventID": "f0cff7a7e93f488ca0bcff72ebd7a7be",
+  "projectID": "4511945117532160",
+  "size": 17861,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbxo8c42v25 [inline 12/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbxo8c42v25 [inline 12/27]",
+  "title": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbxo8c42v25 [inline 12/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "cb5fb4bbec214b6097638360682cb1f7",
+      "span_id": "80dca0da04f4fafb",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "artarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.332Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T22:44:08.353Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-08-26T22:44:08.362Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T22:44:08.383Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.383Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scra\u2026\"\n",
+      "[2026-08-26T22:44:08.392Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T22:44:08.403Z] [arbiter] The Arbiter eyes the Plasma Cutter. \"Short on stock: Stick 1 short. Gather, then return.\"\n[2026-08-26T22:44:08.404Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-08-26T22:44:08.405Z] [world] You repair the Reclaimer's Rope. Back to full. (spent: Patched Cloth x4)\n[2026-08-26T22:44:08.426Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.426Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scra\u2026\"\n",
+      "[2026-08-26T22:44:08.435Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T22:44:08.455Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-08-26T22:44:08.455Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scra\u2026\"\n[2026-08-26T22:44:08.464Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-08-26T22:44:08.484Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.484Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scra\u2026\"\n",
+      "[2026-08-26T22:44:08.494Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T22:44:08.519Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 2\u00d7 Cloth Scrap \u2192 Patched Cloth, 2\u00d7 Spider Silk \u2192 Patched Cloth.\"\n",
+      "[2026-08-26T22:44:08.533Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T22:44:08.557Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Spider Silk \u2192 Patched Cloth.\"\n",
+      "[2026-08-26T22:44:08.570Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T22:44:08.843Z] [debug] persist sizes(KB): total=224 player=64 wm=78[rooms=32 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=78 scene=4\n[2026-08-26T22:44:43.024Z] [player] summon crystal golem\n",
+      "[2026-08-26T22:44:43.025Z] [debug] parser: intent=cast conf=1.00 verb=summon target=crystal golem resolved=crystal range=- enemies=0 hooks=1\n[2026-08-26T22:44:43.091Z] [reward] Aether Golem Constructor \u2014 d20 13 + INT 10 = 23 vs DC 22 \u2014 \u2713 SUMMONED\n[2026-08-26T22:44:43.091Z] [world] (2\u00d7 Aether Crystal + 1\u00d7 Aetheric Cloth + 1\u00d7 Aetheric Shard consumed.)\n",
+      "[2026-08-26T22:44:43.092Z] [world] Aetherstone lifts out of the ground and folds into a shape that walks. Crystal Golem stands ready beside you. Your mastery shapes it stronger than most. (HP 68/68, 1d20 piercing)\n[2026-08-26T22:44:43.092Z] [arbiter] The Arbiter studies the standing shape. \"You gave it life. You might as well give it a name.\"\n",
+      "[2026-08-26T22:44:43.092Z] [debug] arbiter: template (reason=intent-not-allowed:cast)\n[2026-08-26T22:44:43.092Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:44:43.093Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-26T22:44:43.097Z] [world] An Eternal Dynasty war party crests the rise \u2014 2 of them, blades already out. They've marked you for standing with the Mud Monarchs.\n[2026-08-26T22:44:43.097Z] [arbiter] \"The Eternal Dynasty do not forgive a friend of the Mud Monarchs,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-26T22:44:43.360Z] [cognitive] USE_ITEM  (265ms)\n",
+      "[2026-08-26T22:44:53.695Z] [debug] qwen\u23f1 ambient ok 10345ms read 3962ms/write 1275ms in 365t\u2192out 31t 10.9ms/t HIT-CAP (153ch)\n[2026-08-26T22:44:54.090Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 3283ms \u00b7 frames 199ms). Something blocked the JS thread \u2014 look for a long synchronous run.\n[2026-08-26T22:44:54.286Z] [debug] arbiter: ambient stale:combat-started\u2192banked 11193ms\n",
+      "[2026-08-26T22:44:54.286Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You pause, feeling the weight of your journey settle on your shoulders. The Red Tower Interior, the last bastion of the \"\n[2026-08-26T22:44:55.364Z] [world] Dick Dragon. The name takes hold in the Aetherstone.\n[2026-08-26T22:44:55.365Z] [arbiter] The Arbiter nods. \"Dick Dragon, then.\"\n",
+      "[2026-08-26T22:44:59.100Z] [debug] freeze watch: recovered \u2014 painting again after 1834ms quiet.\n[2026-08-26T22:44:59.329Z] [debug] ui: tap \"golem (68/68)\"\n[2026-08-26T22:44:59.330Z] [player] use golem\n[2026-08-26T22:44:59.330Z] [combat] Dick Dragon attacks Eternal Dynasty Raider 1 \u2014 d20 12 + 3 = 15 vs AC 10 \u2014 \u2713 HIT\n",
+      "[2026-08-26T22:44:59.331Z] [combat] Dick Dragon lands 5 piercing damage on Eternal Dynasty Raider 1. (20 HP left)\n[2026-08-26T22:44:59.331Z] [combat] Eternal Dynasty Raider 1 retaliates \u2014 d20 13 + 5 hits Dick Dragon for 5 (35% resisted). (63/68)\n[2026-08-26T22:44:59.338Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-08-26T22:44:59.340Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 3 + ATK 6 = 9 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:44:59.558Z] [combat] Eternal Dynasty Raider 2 deals 4 bludgeoning damage [plate \u22123] [edge of reach \u2014 halved]. You have 54 HP remaining.\n[2026-08-26T22:44:59.559Z] [combat] Eternal Dynasty Raider 2's strike leaves you stunned.\n",
+      "[2026-08-26T22:45:00.539Z] [debug] ui: tap \"golem (63/68)\"\n[2026-08-26T22:45:00.541Z] [system] stunned fades.\n[2026-08-26T22:45:00.542Z] [world] You cannot move. Your action is lost.\n[2026-08-26T22:45:02.406Z] [debug] ui: tap \"golem (63/68)\"\n[2026-08-26T22:45:02.412Z] [player] use golem\n",
+      "[2026-08-26T22:45:02.412Z] [combat] Dick Dragon attacks Eternal Dynasty Raider 1 \u2014 d20 10 + 3 = 13 vs AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:45:02.413Z] [combat] Dick Dragon lands 11 piercing damage on Eternal Dynasty Raider 1. (9 HP left)\n[2026-08-26T22:45:02.414Z] [combat] Eternal Dynasty Raider 1 retaliates \u2014 d20 20 + 5 (NAT 20) hits Dick Dragon for 11 (35% resisted). (52/68)\n",
+      "[2026-08-26T22:45:02.428Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-26T22:45:02.434Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 18 + ATK 6 = 24 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-26T22:45:02.670Z] [combat] Eternal Dynasty Raider 1 deals 6 bludgeoning damage [plate \u22123]. You have 48 HP remaining.\n",
+      "[2026-08-26T22:45:02.670Z] [combat] Eternal Dynasty Raider 2 deals 2 bludgeoning damage [plate \u22123] [edge of reach \u2014 halved]. You have 46 HP remaining.\n[2026-08-26T22:45:03.291Z] [debug] ui: tap \"golem (52/68)\"\n[2026-08-26T22:45:03.292Z] [system] braced \u2014 will not go down again fades.\n[2026-08-26T22:45:03.294Z] [player] use golem\n",
+      "[2026-08-26T22:45:03.294Z] [combat] Dick Dragon attacks Eternal Dynasty Raider 1 \u2014 d20 9 + 3 = 12 vs AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:45:03.295Z] [combat] Dick Dragon lands 24 piercing damage on Eternal Dynasty Raider 1. (0 HP left)\n[2026-08-26T22:45:03.295Z] [world] Eternal Dynasty Raider 1 crumbles under Dick Dragon's assault.\n",
+      "[2026-08-26T22:45:03.296Z] [reward] Eternal Dynasty Raider 1 defeated. You recover Aether Residue \u00d73.\n[2026-08-26T22:45:03.298Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+10 TC). The kit took the fight badly.\n[2026-08-26T22:45:03.298Z] [combat] 1 attacker remains. Eternal Dynasty Raider 2 now in your sights.\n",
+      "[2026-08-26T22:45:03.298Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-26T22:45:03.299Z] [reward] +8 TC pried from the dust.\n[2026-08-26T22:45:03.348Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 7 + ATK 6 = 13 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-26T22:45:03.820Z] [debug] persist sizes(KB): total=226 player=65 wm=79[rooms=32 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=78 scene=4\n[2026-08-26T22:45:04.857Z] [debug] ui: tap \"golem (52/68)\"\n[2026-08-26T22:45:04.861Z] [player] use golem\n[2026-08-26T22:45:04.861Z] [combat] Dick Dragon attacks Eternal Dynasty Raider 2 \u2014 d20 10 + 3 = 13 vs AC 10 \u2014 \u2713 HIT\n",
+      "[2026-08-26T22:45:04.863Z] [combat] Dick Dragon lands 23 piercing damage on Eternal Dynasty Raider 2. (2 HP left)\n[2026-08-26T22:45:04.864Z] [combat] Eternal Dynasty Raider 2 retaliates \u2014 d20 14 + 5 hits Dick Dragon for 6 (35% resisted). (46/68)\n[2026-08-26T22:45:04.881Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 4 + ATK 6 = 10 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-26T22:45:05.825Z] [debug] ui: tap \"golem (46/68)\"\n[2026-08-26T22:45:05.838Z] [player] use golem\n[2026-08-26T22:45:05.839Z] [combat] Dick Dragon attacks Eternal Dynasty Raider 2 \u2014 d20 19 + 3 = 22 vs AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:45:05.840Z] [combat] Dick Dragon lands 12 piercing damage on Eternal Dynasty Raider 2. (0 HP left)\n",
+      "[2026-08-26T22:45:05.840Z] [world] Eternal Dynasty Raider 2 crumbles under Dick Dragon's assault.\n[2026-08-26T22:45:05.842Z] [reward] Eternal Dynasty Raider 2 defeated. You recover Aether Residue \u00d72, Patched Cloth.\n[2026-08-26T22:45:05.843Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+10 TC). The kit took the fight badly.\n",
+      "[2026-08-26T22:45:05.844Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-26T22:45:05.844Z] [reward] +4 TC pried from the dust.\n[2026-08-26T22:45:15.670Z] [debug] ui: tap \"investigate\"\n[2026-08-26T22:45:17.179Z] [player] investigate the ground\n",
+      "[2026-08-26T22:45:17.180Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:45:17.183Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Raspberries (Uncommon).\n[2026-08-26T22:45:17.189Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T22:45:17.359Z] [cognitive] CLIMB  (168ms)\n",
+      "[2026-08-26T22:45:18.821Z] [debug] ui: tap \"rest\"\n[2026-08-26T22:45:18.837Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-26T22:45:18.843Z] [player] rest\n[2026-08-26T22:45:18.844Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T22:45:18.846Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 26, afternoon)\n[2026-08-26T22:45:18.859Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n[2026-08-26T22:45:18.860Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:45:18.860Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T22:45:19.017Z] [cognitive] REST  (156ms)\n",
+      "[2026-08-26T22:45:20.489Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T22:45:20.507Z] [debug] spawn: gear=[Seer's Veil of the Aether] window=10 roster=new\n[2026-08-26T22:45:20.508Z] [world] You strike out north. The country resists you with sameness more than distance.\n[2026-08-26T22:45:20.509Z] [world] You had a question here. You still have it.\n",
+      "[2026-08-26T22:45:21.555Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T22:45:23.542Z] [world] The Seer's Veil of the Aether is lighter than it looks, which is its own kind of warning.\n[2026-08-26T22:45:23.543Z] [reward] \u2726 Seer's Veil of the Aether (Common).\n",
+      "[2026-08-26T22:45:23.822Z] [debug] persist sizes(KB): total=225 player=65 wm=78[rooms=32 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=77 scene=4\n[2026-08-26T22:45:24.369Z] [world] The Worn Tartarian Coin is cold through your glove.\n[2026-08-26T22:45:24.370Z] [reward] \u2726 Worn Tartarian Coin (Common).\n",
+      "[2026-08-26T22:45:25.646Z] [world] You strip the broken scaffold carefully. Something usable comes free in your hand.\n[2026-08-26T22:45:25.647Z] [world] You break the broken scale apart. Among the pieces, something worth keeping.\n[2026-08-26T22:45:25.647Z] [world] You lever something loose from the cooling valve \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-08-26T22:45:25.647Z] [world] You salvage the horn. The take is small but real.\n[2026-08-26T22:45:25.648Z] [world] You salvage the silt mound. The take is small but real.\n[2026-08-26T22:45:25.648Z] [world] You strip the tower relay carefully. Something usable comes free in your hand.\n[2026-08-26T22:45:25.648Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-26T22:45:25.649Z] [reward]     \u2022 Stick x2 (Common)\n[2026-08-26T22:45:25.649Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-08-26T22:45:25.649Z] [reward]     \u2022 Mud-Frosted Bead (Common)\n[2026-08-26T22:45:25.650Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n[2026-08-26T22:45:25.650Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-26T22:45:27.407Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-26T22:45:28.981Z] [player] investigate the ground\n[2026-08-26T22:45:28.982Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:45:28.986Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Blueberries (Uncommon).\n",
+      "[2026-08-26T22:45:28.994Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T22:45:28.994Z] [arbiter] The Arbiter looks around. \"Nimari's upper streets still hold roofs, doors, the suggestion of windows. Below, the mud is decisive.\"\n[2026-08-26T22:45:28.995Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T22:45:29.168Z] [cognitive] CLIMB  (172ms)\n",
+      "[2026-08-26T22:45:30.626Z] [debug] ui: tap \"rest\"\n[2026-08-26T22:45:30.640Z] [player] rest\n[2026-08-26T22:45:30.641Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:45:30.642Z] [world] You rest for 8 hours. +3 HP, +8 stamina recovered. (Day 27, night)\n",
+      "[2026-08-26T22:45:30.642Z] [arbiter] The Arbiter is quiet a long moment after you stir. \"I was wrong about something earlier. I'll say so when the moment's right.\"\n[2026-08-26T22:45:30.652Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-26T22:45:30.652Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T22:45:30.811Z] [cognitive] REST  (158ms)\n[2026-08-26T22:4"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1526-the-ledger-was-writing-its-own-corpses #mtbxo8c42v25 [inline 12/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbxo8c42v25"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "12"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T19:46:22.836601Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T19:46:23.685000Z",
+  "fingerprints": [
+    "82f17a8e70d8bf54d353a3b48521207e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "f6360d051ffa416ba20183e847d36ebe",
+  "previousEventID": "ec2fc44d87d94d84abc2ee63cff4462b"
+}
