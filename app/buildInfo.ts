@@ -25030,6 +25030,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // characters, and checks each part against the length it declared — so a hole
 // can never again be stitched in silence under a README claiming "27/27 parts".
 export const OTA_BUILD_ID = '2026-08-27-1520-the-scrubber-takes-a-whole-value';
+// golem catch-up 2026-08-27: markerless publish of OTA-1520 (the log slice goes
+// as an array of ~400-char blocks so @password:filter can no longer take a whole
+// 15,000-char part) to the golem channel. Both channels level at 1520.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1519-the-attachment-was-the-fault';
 // golem catch-up 2026-08-27: markerless publish of OTA-1519 (all senders inline,
 // flush restored as the delivery signal) to the golem channel. Both channels
