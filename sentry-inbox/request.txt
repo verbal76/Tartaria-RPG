@@ -1,2 +1,2 @@
-2026-08-26T22:09:12Z
-pull: did bundle #mt9gmr2ylu58 land? attempts 2/5 and 3/5 fired 22:02Z, flush said no
+2026-08-27T00:09:48Z
+pull: owner just tapped SEND LOG on OTA-1513 — did it land this time?
