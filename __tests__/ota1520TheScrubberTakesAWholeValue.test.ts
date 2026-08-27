@@ -241,9 +241,13 @@ describe('OTA-1520 — the relay reads the reason, and stops stitching silent ho
     // new files either way. The owner was told twice that his log was somewhere
     // it was not. The run now states which case it is, last, so it lands in the
     // tail of the job log instead of buried mid-stream.
-    expect(RELAY).toContain("print('════ VERDICT ════')");
+    expect(RELAY).toContain("say('════ VERDICT ════')");
     expect(RELAY).toContain('page_audit[path] = (pages, len(rows), bool(url))');
     expect(RELAY).toContain('DO NOT ask for another send on this basis.');
+    // ⚠⚠ AND IT LANDS IN THE TREE, NOT ONLY IN A JOB LOG. Reading the verdict
+    // meant digging it out of the middle of a CI log every time; a `git pull`
+    // now answers "what did the last run find?" with no API call at all.
+    expect(RELAY).toContain("(out_root / 'VERDICT.txt').write_text(chr(10).join(V) + chr(10))");
   });
 
   it('⚠⚠⚠ AND "NO NEXT CURSOR" IS NOT ACCEPTED AS PROOF — a capped feed lies the same way', () => {

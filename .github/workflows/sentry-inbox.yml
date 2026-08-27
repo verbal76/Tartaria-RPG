@@ -513,8 +513,12 @@ jobs:
           PAGE_SIZE = 100
           suspect = [p for p, (_, rows, capped) in page_audit.items()
                      if capped or (rows and rows % PAGE_SIZE == 0)]
-          print()
-          print('════ VERDICT ════')
+          V = []
+          def say(line=''):
+              V.append(line)
+              print(line)
+          say()
+          say('════ VERDICT ════')
           for path, (pages, rows, capped) in sorted(page_audit.items()):
               if capped:
                   state = 'TRUNCATED — page cap hit, more remain'
@@ -523,24 +527,34 @@ jobs:
                            f'cursor; this endpoint caps rather than paginates')
               else:
                   state = 'COMPLETE — ended short of a full page'
-              print(f'  {path}')
-              print(f'    {pages} page(s), {rows} rows — {state}')
+              say(f'  {path}')
+              say(f'    {pages} page(s), {rows} rows — {state}')
           if suspect:
-              print('  ⚠⚠ AT LEAST ONE LISTING IS NOT PROVEN COMPLETE. Any MISSING parts'
-                    ' below are UNPROVEN — they may simply be unread. DO NOT conclude'
-                    ' the device failed, and DO NOT ask for another send on this basis.')
+              say('  ⚠⚠ AT LEAST ONE LISTING IS NOT PROVEN COMPLETE. Any MISSING parts'
+                  ' below are UNPROVEN — they may simply be unread. DO NOT conclude'
+                  ' the device failed, and DO NOT ask for another send on this basis.')
           else:
-              print('  ⚠ Every listing ended short of a full page, so each genuinely ran'
-                    ' out. MISSING parts are ABSENT FROM SENTRY — only a fresh send'
-                    ' recovers them.')
+              say('  ⚠ Every listing ended short of a full page, so each genuinely ran'
+                  ' out. MISSING parts are ABSENT FROM SENTRY — only a fresh send'
+                  ' recovers them.')
           incomplete = [(bid, len(b['seen']), b['total'])
                         for bid, b in bundles.items() if len(b['seen']) < b['total']]
           if incomplete:
-              print('  incomplete bundles:')
+              say('  incomplete bundles:')
               for bid, have, total in sorted(incomplete):
-                  print(f'    {bid}: {have}/{total} parts')
+                  say(f'    {bid}: {have}/{total} parts')
           else:
-              print('  every bundle is complete')
+              say('  every bundle is complete')
+          if scrubbed:
+              say('  scrub cost per bundle:')
+              for bid, notes in sorted(scrubbed.items()):
+                  say(f'    {bid}: {len(notes)} redactions, {sum(l for _, _, l in notes)} chars')
+          # ⚠⚠⚠ AND WRITE IT INTO THE TREE. Reading this verdict meant pulling it
+          # out of the middle of a job log every single time — slow, and it burned
+          # attention that belonged on the evidence. The relay commits sentry-inbox/
+          # anyway; one more file costs nothing and means a `git pull` answers
+          # "what did the last run actually find?" without touching the API.
+          (out_root / 'VERDICT.txt').write_text(chr(10).join(V) + chr(10))
           PYEOF
       # ⚠⚠⚠ 2026-08-27 — REBASE BEFORE PUSHING, BECAUSE THE RELAY LOSES RACES.
       # This step used to `git push` bare, against a branch a session is actively

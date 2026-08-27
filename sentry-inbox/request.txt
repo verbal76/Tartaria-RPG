@@ -1,24 +1,13 @@
-sync 2026-08-27 — walk the ISSUE feed, because the project feed caps at 100.
+sync 2026-08-27 — write the verdict into the tree.
 
-THE VERDICT BLOCK'S FIRST RUN LIED, AND IT CAUGHT ITSELF DOING IT:
+Every run now leaves sentry-inbox/VERDICT.txt: which listings ran to a genuine
+end and which merely stopped being offered, which bundles are incomplete, and
+what each scrub cost. Reading that meant digging it out of the middle of a CI job
+log every time, which is slow and spends attention that belongs on the evidence.
+A git pull now answers it.
 
-  1 page(s), 100 rows — COMPLETE — cursor exhausted
-  ⚠ MISSING parts are therefore ABSENT FROM SENTRY
-
-Exactly 100 rows, one page, no next cursor offered — while this tree already
-holds 256 synced event directories. Sentry plainly has more than a hundred. The
-legacy /projects/.../events/ feed returns the newest 100 and declines to
-paginate past them, reporting "no next page" in exactly the way a genuinely
-exhausted listing would. Acting on that would have meant asking the owner to
-re-send logs already sitting in Sentry.
-
-TWO CHANGES:
-1. A listing that ends ON a full page is now SUSPECT, never COMPLETE. Only one
-   that ends SHORT of its page size has actually run out.
-2. The issue feed is walked as well — /organizations/.../issues/{id}/events/
-   follows a real cursor to the end. Project feed for recency, issue feed for
-   depth, unioned by event id.
-
-Expected: "N events after walking M issues" with N far above 100, and
-mtaxtx2bzl8l (Great Scott, currently 5/27) and mtawqdrsm78g (3/23) filling in
-without another send.
+Still open on this thread: mtaxtx2bzl8l (Great Scott) at 5/27 and mtawqdrsm78g at
+3/23. The previous run reported "1 page, 100 rows, cursor exhausted" and called
+that COMPLETE — which was false, since this tree already holds 256 synced event
+directories. The issue-feed walk added last commit is what should actually reach
+them; VERDICT.txt will say whether it did.
