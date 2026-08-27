@@ -164,6 +164,41 @@ describe('OTA-1513 — the mark it leaves, and the vial that answers it', () => 
   });
 });
 
+describe('OTA-1514 — the enemy portrait scrolls again', () => {
+  // ⚠⚠⚠ Owner, after OTA-1512 moved the threat dot up: *"the enemy portrait
+  // still doesn't scroll up."* 1512 fixed the DOT's visibility and left this
+  // standing — everything else below the fold (traits, active effects, the
+  // stat grid) was still unreachable. The word that matters in his original
+  // report is NO LONGER: arb146 added tap-to-open by wrapping the ScrollView
+  // in a TouchableOpacity, and a parent Touchable WINS THE RESPONDER on a
+  // vertical drag, so the scroll container inside it was inert.
+  const PANEL = readFileSync(join(ROOT, 'app', 'components', 'EnemyPanel.tsx'), 'utf8');
+
+  it('⚠⚠⚠ THE SCROLLVIEW IS THE PARENT — a scroll container inside a press target cannot scroll', () => {
+    const wrap = PANEL.slice(PANEL.indexOf('const scrollWrap ='), PANEL.indexOf('const onMomentumEnd'));
+    const scrollAt = wrap.indexOf('<ScrollView');
+    const touchAt = wrap.indexOf('<TouchableOpacity');
+    expect(scrollAt).toBeGreaterThan(-1);
+    expect(touchAt).toBeGreaterThan(-1);
+    expect(scrollAt).toBeLessThan(touchAt);   // ScrollView OUTSIDE, Touchable in
+  });
+
+  it('⚠⚠ neither call site re-wraps it in a Touchable — that is how the bug got in', () => {
+    // Both the pager cell and the single-enemy branch must hand the press to
+    // scrollWrap rather than wrapping its result.
+    expect(PANEL).not.toMatch(/<TouchableOpacity[^>]*>\s*\{?\s*scrollWrap\(/);
+    expect(PANEL).toContain('const renderItem: ListRenderItem<EnemyView> = ({ item }) => scrollWrap(');
+    expect((PANEL.match(/scrollWrap\(\n/g) ?? []).length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('⚠ the tap still opens the detail popup — the scroll fix did not cost the gesture', () => {
+    expect(PANEL).toContain('() => setDetailView(item),');
+    expect(PANEL).toContain('() => setDetailView(enemies[0]!),');
+    // And the cap that made scrolling necessary is still there.
+    expect(PANEL).toContain('style={{ maxHeight: capH }}');
+  });
+});
+
 describe('OTA-1513 — the wiring (source claims)', () => {
   it('⚠⚠⚠ the coating resolves AFTER the to-hit roll — the entire reason it answers stacked AC', () => {
     // It must sit inside the landed-hit block, after the damage has survived

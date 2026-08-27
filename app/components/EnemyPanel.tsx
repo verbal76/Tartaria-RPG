@@ -204,13 +204,36 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
   const capH = Math.max(80, (maxHeight && maxHeight > 0 ? maxHeight : FALLBACK_H) - (enemies.length > 1 ? 16 : 0));
 
   // Wrap a card so it scrolls vertically inside the corner instead of overflowing.
-  const scrollWrap = (card: React.ReactNode) => (
+  //
+  // ⚠⚠⚠ OTA-1514 — THE SCROLLVIEW MUST BE THE PARENT, AND THAT IS THE WHOLE
+  // BUG. Owner: *"we can no longer scroll up to see the bottom of the enemy
+  // portrait."* The word that matters is NO LONGER — this used to work.
+  // arb146 added tap-to-open-the-detail-popup by wrapping this ScrollView in a
+  // TouchableOpacity, and in React Native a parent Touchable WINS THE RESPONDER
+  // on a vertical drag: the gesture is claimed as a press before the inner
+  // ScrollView ever sees it, so the card was capped at `capH` with no way to
+  // reach what the cap cut off. A scroll container inside a press target does
+  // not scroll.
+  //
+  // Inverted: the ScrollView owns the pan, and the Touchable sits INSIDE around
+  // the card, where a tap still reaches it (a ScrollView passes taps through to
+  // its children — it only intercepts drags). Both gestures now do what they
+  // look like they do.
+  //
+  // ⚠ OTA-1512 moved the threat dot to the head row so the mark was legible
+  // WITHOUT scrolling — that was the right fix for the dot, and it left this
+  // one standing: everything else below the fold (traits, effects, the full
+  // stat grid) was still unreachable. Two defects in one sentence of his.
+  const scrollWrap = (card: React.ReactNode, onPress: () => void) => (
     <ScrollView
       style={{ maxHeight: capH }}
       showsVerticalScrollIndicator
       nestedScrollEnabled
+      keyboardShouldPersistTaps="handled"
     >
-      {card}
+      <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={onPress}>
+        {card}
+      </TouchableOpacity>
     </ScrollView>
   );
 
@@ -232,10 +255,9 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
   // ask: "tap the enemy's portrait → full pop-up → dismiss back to a portrait."
   const [detailView, setDetailView] = useState<EnemyView | null>(null);
 
-  const renderItem: ListRenderItem<EnemyView> = ({ item }) => (
-    <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={() => setDetailView(item)}>
-      {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(item.enemy.name)} playerPower={playerPower} />)}
-    </TouchableOpacity>
+  const renderItem: ListRenderItem<EnemyView> = ({ item }) => scrollWrap(
+    <EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(item.enemy.name)} playerPower={playerPower} />,
+    () => setDetailView(item),
   );
 
   // onLayout must stay mounted even when empty so the measurement is ready the
@@ -247,9 +269,10 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
         // Single enemy: no pager (nothing to scroll horizontally), just the card —
         // capped to the corner height and vertically scrollable when it's tall.
         // arb146 — tappable to open the full-detail popup.
-        <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)}>
-          {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(enemies[0]!.enemy.name)} playerPower={playerPower} />)}
-        </TouchableOpacity>
+        scrollWrap(
+          <EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(enemies[0]!.enemy.name)} playerPower={playerPower} />,
+          () => setDetailView(enemies[0]!),
+        )
       ) : (
         <FlatList
           data={enemies}

@@ -24833,7 +24833,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Acid is the deliberate exception: `isCoatingDrinkable` excludes it and
 // should, because acid eats the ARMOUR and the answer to a chewed plate is
 // the repair bench, not a swallow.
-export const OTA_BUILD_ID = '2026-08-26-1513-the-other-side-of-the-vial';
+// ⚠⚠⚠ OTA-1514 — THE ENEMY PORTRAIT SCROLLS AGAIN. Owner, after 1512 moved
+// the threat dot up out of the clipped corner: "the enemy portrait still
+// doesn't scroll up." He was right and 1512 only fixed half of his original
+// sentence — the DOT became legible without scrolling, while everything else
+// below the fold (traits, active effects, the stat grid) stayed unreachable.
+// The word that matters in the first report is NO LONGER: arb146 added
+// tap-to-open-the-detail-popup by wrapping the card's ScrollView in a
+// TouchableOpacity, and in React Native a parent Touchable WINS THE RESPONDER
+// on a vertical drag — the gesture is claimed as a press before the inner
+// ScrollView ever sees it. A scroll container inside a press target does not
+// scroll. Inverted at both call sites: the ScrollView owns the pan and the
+// Touchable sits inside around the card, where a tap still reaches it (a
+// ScrollView passes taps through and only intercepts drags). Both gestures
+// now do what they look like they do, and a test pins the nesting order so
+// the next tap-target cannot swallow it again.
+export const OTA_BUILD_ID = '2026-08-27-1514-the-portrait-scrolls-again';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1513-the-other-side-of-the-vial';
 // golem catch-up 2026-08-26: markerless publish of OTA-1513 (enemy weapon coatings, hit location, inflict/cure symmetry) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1512-the-worn-piece-is-readable';
 // golem catch-up 2026-08-26: markerless publish of OTA-1512 (forged gear readable + threat dot visible + send-attempt guard + investigate pacing + the melee-main/ranged-off hand rule) to the golem channel.
