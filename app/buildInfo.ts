@@ -25140,7 +25140,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // do nothing reads as broken.
 // The card itself stays UNgated by the flag: turning off tips silences tips, not
 // questions the engine needs answered.
-export const OTA_BUILD_ID = '2026-08-27-1525-the-dog-card-gets-the-switch-too';
+// ⚠⚠⚠ OTA-1526 — THE LEDGER WAS WRITING ITS OWN CORPSES. Task #81 chased a
+// "native death class": 22 `PROCESS KILLED — no JS ran` records, every one at
+// stage `rendered`, blamed first on the diagnostics bundle's memory (OTA-1516,
+// which did not stop them) and then on the Qwen context lifecycle. Both were
+// guesses. Mining every assembled log for the records themselves:
+//   • 20 of 22 dated within 30 SECONDS of a session boot marker, 15 within ONE.
+//   • 9 sit INSIDE the session that filed them — 2026-08-27T01:34:40.055 lands
+//     544ms after its own session header, and the log keeps running for seconds
+//     afterwards with no new header. That process did not die.
+//   • 2026-08-24T23:58:42: `OTA session start` at .251, PROCESS KILLED at .465,
+//     session header at .576. A corpse 214ms old.
+//   • 19 of the 21 parseable records read `(no action yet) · room ? · screen ?`.
+// hydrate() read the breadcrumb key with an await, and the fresh process writes
+// that same key from its own phase stamps (the render checkpoint fires on every
+// commit, no dep array). Stamp wins → boot reads back its own handwriting and
+// files it as a fatal death. Survivor exists → the stamp overwrites it first and
+// a real death is re-dated to the boot with its action erased. The universal
+// `stage rendered` was never a fact about the app; it was the signature of the
+// writer that won the race. The fix takes the read out of the race: the key's
+// value at MODULE LOAD is the survivor, because the module is evaluated before
+// any component renders. No writer changes, so nothing detectable stops being
+// detectable — the one genuine record in the corpus (an attack at nimari,
+// mid-action, its log tail swallowed by the wedge) survives whole.
+export const OTA_BUILD_ID = '2026-08-27-1526-the-ledger-was-writing-its-own-corpses';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1525-the-dog-card-gets-the-switch-too';
 // golem catch-up 2026-08-27: markerless publish of OTA-1525 (the dog card offers
 // the tips switch — silencing every future tip without dismissing the one
 // question the engine still needs answered) to the golem channel. Both channels

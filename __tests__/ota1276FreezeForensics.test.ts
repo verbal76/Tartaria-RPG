@@ -123,15 +123,20 @@ describe('OTA-1276 — it is stamped at the doors a freeze happens behind', () =
     const end = store.indexOf('forensics must never block a boot', i);
     expect(end).toBeGreaterThan(i);
     const block = store.slice(i, end);
-    expect(block).toContain('await readLiveBreadcrumb()');
+    // ⚠ OTA-1526 — THE READER CHANGED NAME, THE ORDER DID NOT. Boot now takes
+    // the snapshot captured at module load instead of racing the live key
+    // against this session's own phase stamps. Read → report → promote → clear
+    // is the invariant this test has always guarded, and it still holds, so the
+    // pin is re-aimed rather than relaxed or deleted.
+    expect(block).toContain('await readSurvivingBreadcrumb()');
     expect(block).toContain('setLastBootBreadcrumb(crumb)');
     expect(block).toContain('freeze forensics: last boot ended mid-action');
     // Cleared AFTER it is read and reported — never before.
-    expect(block.indexOf('await readLiveBreadcrumb()')).toBeLessThan(block.indexOf('await clearLiveBreadcrumb()'));
+    expect(block.indexOf('await readSurvivingBreadcrumb()')).toBeLessThan(block.indexOf('await clearLiveBreadcrumb()'));
     // ⚠ And the OTA-1380 crash record lands between them: recorded before the
     // clear, so a failure clearing cannot cost the one crash class that has no
     // other evidence anywhere.
-    expect(block.indexOf("kind: 'native-death'")).toBeGreaterThan(block.indexOf('await readLiveBreadcrumb()'));
+    expect(block.indexOf("kind: 'native-death'")).toBeGreaterThan(block.indexOf('await readSurvivingBreadcrumb()'));
     expect(block.indexOf("kind: 'native-death'")).toBeLessThan(block.indexOf('await clearLiveBreadcrumb()'));
   });
 

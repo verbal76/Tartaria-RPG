@@ -66,7 +66,10 @@ describe('OTA-1395 — the boot order that a freeze investigation depends on', (
     expect(i).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(i);
     const block = slice.slice(i, end);
-    expect(block.indexOf('await readLiveBreadcrumb()'))
+    // ⚠ OTA-1526 — re-aimed at the snapshot reader. Boot no longer reads the
+    // live key (which it shared with this session's own phase stamps); the
+    // read-before-clear order this test guards is untouched.
+    expect(block.indexOf('await readSurvivingBreadcrumb()'))
       .toBeLessThan(block.indexOf('await clearLiveBreadcrumb()'));
   });
 
@@ -76,7 +79,7 @@ describe('OTA-1395 — the boot order that a freeze investigation depends on', (
     // breadcrumb still exists.
     const i = slice.indexOf('async hydrate() {');
     const block = slice.slice(i, slice.indexOf('forensics must never block a boot', i));
-    const read = block.indexOf('await readLiveBreadcrumb()');
+    const read = block.indexOf('await readSurvivingBreadcrumb()'); // OTA-1526
     const promote = block.indexOf('crashLedger');
     const clear = block.indexOf('await clearLiveBreadcrumb()');
     expect(read).toBeLessThan(promote);

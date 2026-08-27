@@ -846,6 +846,15 @@ export function _resetBreadcrumbMirrorForTest(): void {
   _lastPhaseWriteAt = 0;
   _exitedCleanly = false;
 }
+// ⚠⚠ OTA-1526 — THE `??` BELOW IS DELIBERATE, AND IT IS NOT THE BUG. A phase
+// stamped with nothing live synthesises `(no action yet)`, which is what makes
+// an idle process's death visible at all: the app can be killed sitting on a
+// rendered screen with no action in flight, and that is still a death worth a
+// record. Removing the fallback was the first draft of the 1526 fix and it was
+// wrong — it would have blinded the instrument to the OTA-1357 case (a freeze
+// 1ms into the return to foreground, before any action) which is one of the
+// three B9 freezes this whole hunt exists for. What was actually broken was
+// WHO READ THE CRUMB; see readSurvivingBreadcrumb below.
 export function stampBreadcrumbPhase(phase: string, detail?: string): void {
   try {
     const base: LiveBreadcrumb = _lastLiveCrumb ?? { at: Date.now(), what: '(no action yet)' };
@@ -873,10 +882,96 @@ export function stampBreadcrumbPhase(phase: string, detail?: string): void {
 export async function readLiveBreadcrumb(): Promise<LiveBreadcrumb | null> {
   try {
     const raw = await AsyncStorage.getItem(LAST_BREADCRUMB_KEY);
-    if (!raw) return null;
+    return parseCrumb(raw);
+  } catch { return null; }
+}
+
+function parseCrumb(raw: string | null): LiveBreadcrumb | null {
+  if (!raw) return null;
+  try {
     const p = JSON.parse(raw) as LiveBreadcrumb;
     return typeof p?.at === 'number' && typeof p?.what === 'string' ? p : null;
   } catch { return null; }
+}
+
+// ⚠⚠⚠ OTA-1526 — THE SURVIVOR IS WHAT WAS ON DISK WHEN THIS PROCESS STARTED.
+// NOT WHAT IS THERE BY THE TIME BOOT GETS AROUND TO LOOKING.
+//
+// This is the whole of task #81. The owner's crash ledger held 22
+// `PROCESS KILLED — no JS ran` records and the ledger was writing most of them
+// itself. Measured against every assembled log in sentry-inbox:
+//
+//   • 20 of 22 are dated within 30 SECONDS of a session boot marker; 15 within
+//     ONE second.
+//   • 9 are dated AFTER a boot marker — the record sits INSIDE the session that
+//     filed it. 2026-08-27T01:34:40.055 is the clean one: session header at
+//     01:34:39.511, "death" 544ms later, and the log keeps running for seconds
+//     afterwards with no new session header. That process did not die. It
+//     recorded itself.
+//   • 2026-08-24T23:58:42 is the same shape end to end: `OTA session start` at
+//     .251, PROCESS KILLED at .465, session header at .576 — a corpse 214ms old.
+//   • Three wear `last checkpoint: rendered (+0ms)`: the crumb was created and
+//     "killed" in the same millisecond.
+//   • 19 of the 21 parseable records read `(no action yet) · room ? · screen ?`,
+//     the shape a phase stamp synthesises when nothing is live — so the record
+//     never described a player, only the instrument.
+//
+// THE MECHANISM. `hydrate()` read the key with an await, and the fresh process
+// writes that same key from its own phase stamps — ExplorationScreen's render
+// checkpoint fires on every commit with no dep array (OTA-1356). Whichever won
+// the race decided what boot believed. When the stamp won, hydrate read back a
+// crumb THIS process had written milliseconds earlier, found no orderly exit on
+// it (of course not — it was seconds old) and promoted it to a fatal
+// native-death. When a real survivor was there, the same stamp overwrote it
+// first, so a genuine death was re-dated to the boot and its `what`/`room`
+// replaced with `(no action yet) · room ?`. Both directions are wrong, and both
+// are the same race.
+//
+// It also explains the headline that made #81 unreadable — every record at
+// `stage rendered`. That was never a fact about where the app dies. It is the
+// shape of the writer that won the race.
+//
+// THE FIX IS TO TAKE THE READ OUT OF THE RACE. The key's value at module load
+// IS the survivor, by definition: this module is evaluated before any component
+// renders, so no phase stamp can have run yet. The snapshot is taken once, here,
+// and handed to boot exactly once. Nothing about the writers changes — every
+// stamp, every synthesised `(no action yet)`, every OTA-1413 label behaves as
+// before — so no detection is lost. What changes is that boot can no longer be
+// shown this session's own handwriting.
+//
+// ⚠ `readLiveBreadcrumb` is deliberately left alone: it is the live "what is on
+// disk right now" probe the diagnostics screens and suites use, and it must stay
+// live. Only the boot promotion path reads the snapshot.
+let _survivorSnapshot: Promise<LiveBreadcrumb | null> | null = snapshotSurvivor();
+
+// ⚠ THE READ IS ISSUED ON A MICROTASK, NOT INSIDE THE MODULE BODY ITSELF. The
+// binding is still initialised at module load — which is the property that
+// matters, since it is what puts the read ahead of every render — but the
+// getItem lands after the module graph has finished evaluating, so the snapshot
+// cannot be lost to an import-order accident (a native module not yet attached,
+// a cycle that leaves the storage binding half-built). React's first commit is
+// queued by AppRegistry long after the microtask queue drains, so nothing can
+// stamp a phase in between.
+function snapshotSurvivor(): Promise<LiveBreadcrumb | null> {
+  return Promise.resolve()
+    .then(() => AsyncStorage.getItem(LAST_BREADCRUMB_KEY))
+    .then(parseCrumb)
+    .catch(() => null);
+}
+
+/** The crumb the PREVIOUS session left, captured before this one could write.
+ *  Handed out once — a second caller in the same process gets null, because a
+ *  survivor is a fact about a boot, not a value to be re-read. */
+export async function readSurvivingBreadcrumb(): Promise<LiveBreadcrumb | null> {
+  const pending = _survivorSnapshot;
+  _survivorSnapshot = null;
+  return pending ? await pending : null;
+}
+
+/** Test seam — re-take the snapshot so a suite can stage "the process starts
+ *  with THIS on disk" without a second module instance. */
+export function _armSurvivorSnapshotForTest(): void {
+  _survivorSnapshot = snapshotSurvivor();
 }
 
 /** Cleared on an ORDERLY exit (background / save-and-quit). A breadcrumb that

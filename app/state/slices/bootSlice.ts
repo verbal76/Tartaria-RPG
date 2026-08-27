@@ -62,7 +62,7 @@ import {
   loadGlobalStash,
   migrateLegacySlotIfPresent,
   newSlotId,
-  readLiveBreadcrumb,
+  readSurvivingBreadcrumb,
   setActiveSlot,
   stampBreadcrumbPhase,
 } from '../../engine/saveSystem';
@@ -122,7 +122,15 @@ export const createBootSlice = (
     // doing at the moment the JS thread stopped — the batched disk log cannot
     // say, because its pending lines never drain through a wedge.
     try {
-      const crumb = await readLiveBreadcrumb();
+      // ⚠⚠⚠ OTA-1526 — AND READ THE SNAPSHOT, NOT THE LIVE KEY. This line used
+      // to be `await readLiveBreadcrumb()`, which raced the fresh process's own
+      // phase stamps for the same key: 20 of the owner's 22 native-death records
+      // are dated within 30 seconds of a boot marker and 9 of them sit INSIDE the
+      // session that filed them. The snapshot is taken at module load — before
+      // any component can render, so before any stamp can have run — which is
+      // the only reading of "what the last session left" that a live read cannot
+      // give. See saveSystem.readSurvivingBreadcrumb for the measurement.
+      const crumb = await readSurvivingBreadcrumb();
       // ⚠⚠ OTA-1413 — AN OS RECLAIM OF A BACKGROUNDED APP IS NOT A CRASH.
       // The owner's golem ledger: `PROCESS KILLED — no JS ran · stage
       // ctx-release-done · while: (no action yet)`. Nothing died. He backgrounded
