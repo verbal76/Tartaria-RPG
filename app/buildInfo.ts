@@ -25163,7 +25163,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // any component renders. No writer changes, so nothing detectable stops being
 // detectable — the one genuine record in the corpus (an attack at nimari,
 // mid-action, its log tail swallowed by the wedge) survives whole.
-export const OTA_BUILD_ID = '2026-08-27-1526-the-ledger-was-writing-its-own-corpses';
+// ⚠⚠⚠ OTA-1527 — THE CHIP ROW ANSWERED WHAT THE INTEL GATE HAD JUST REFUSED.
+// The owner asked what the words under an Eternal Dynasty Raider's BURN box were.
+// Reading them settled more than the wording. The chips reconstruct the spawn:
+// randomizeEnemyDefense stamps `inured:` on every kind-weakness but the rolled
+// one, so inured{slashing,poison,corruption} + vulnerable:piercing is a Human
+// exactly — real defences `RESIST Aetheric · WEAK Piercing, Slashing, Poison,
+// Corruption`. The card read `WEAK Burn`, and no type in TYPE_RESISTANCE_MAP
+// yields that for this trait set, so the card was in the OTA-838 observed branch
+// showing only what had been learned by hitting — while the chip row underneath
+// spelled the truth out. OTA-798 gates the RESIST/WEAK block on Wisdom, OTA-838
+// replaces the free read with strike-to-learn, OTA-1117 adds a dial that switches
+// it off; three OTAs guarding one reader, and the chip row guarded nothing. The
+// detail popup had the identical hole. Now: `resist:`/`vulnerable:` chips are
+// dropped as redundant (they already feed the RESIST/WEAK line), `inured:` is
+// kept behind the same gate and finally reads `Not Weak: X` rather than its raw
+// id — a cancellation to ×1.0, never armour, so "Resist" would have been the
+// OTA-1093 inversion again — and `profiled`, an idempotence marker that was never
+// a trait, no longer reaches the player at all. Behavioural chips stay ungated:
+// Armored, Savage, Quick, Ambusher, Bleeder, Concussive are how the thing fights.
+export const OTA_BUILD_ID = '2026-08-27-1527-the-chips-answered-what-the-gate-refused';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1526-the-ledger-was-writing-its-own-corpses';
 // golem catch-up 2026-08-27: markerless publish of OTA-1526 (boot reads the
 // breadcrumb snapshot taken at module load instead of racing this session's own
 // phase stamps for the same key, so the crash ledger stops filing the boot's own

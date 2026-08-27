@@ -112,6 +112,7 @@ describe('OTA-1526 — a session cannot hand boot its own handwriting', () => {
     });
     stampBreadcrumbPhase('engine-done');
     await flush();
+    const sessionA = await readLiveBreadcrumb();
 
     // Session B starts and its first render fires the checkpoint immediately —
     // the exact write that used to destroy the evidence above.
@@ -123,11 +124,21 @@ describe('OTA-1526 — a session cannot hand boot its own handwriting', () => {
     expect(survivor?.what).toBe('action "attack with the cantor\'s tuning fork"');
     expect(survivor?.room).toBe('nimari');
     expect(survivor?.phase).toBe('engine-done');
-    // ⚠ AND THE DATE SURVIVES TOO. `hydrate` dates the death at `phaseAt`
-    // (OTA-1504); if the new boot's stamp had won, that field would carry the
-    // boot's own clock and the death would be misdated to the restart.
-    expect(survivor?.phaseAt).toBeLessThan(Date.now());
-    expect(survivor?.what).not.toBe('(no action yet)');
+    // ⚠⚠ AND THE DATE SURVIVES TOO — the field the death is actually filed under.
+    // `hydrate` dates the record at `phaseAt` (OTA-1504), so if session B's stamp
+    // had won, the death would carry the BOOT's clock and be misdated to the
+    // restart. Pinned against session A's own recorded stamp.
+    //
+    // ⚠ COMPARED BY IDENTITY, NOT BY CLOCK. The first draft asserted
+    // `phaseAt < Date.now()` and went red in the full run when the whole test
+    // executed inside a single millisecond — a true claim stated in a way that
+    // depended on wall time passing. Session B's live crumb is checked as the
+    // other half of the same fact: this process DID write one, and boot was
+    // handed the other.
+    expect(survivor?.phaseAt).toBe(sessionA?.phaseAt);
+    const live = await readLiveBreadcrumb();
+    expect(live?.what).toBe('(no action yet)');
+    expect(live?.phase).toBe('rendered');
   });
 
   it('⚠⚠ the survivor is handed out ONCE — it is a fact about a boot, not a value', async () => {

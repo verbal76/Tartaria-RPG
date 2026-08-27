@@ -239,10 +239,80 @@ export function describeTrait(t: string): string {
   // resist:slashing / vulnerable:burn → "Resist Slashing" / "Vuln Burn"
   const [key, arg] = t.split(':');
   if (arg) {
-    if (key === 'resist') return `Resist ${arg.charAt(0).toUpperCase()}${arg.slice(1)}`;
-    if (key === 'vulnerable') return `Vuln ${arg.charAt(0).toUpperCase()}${arg.slice(1)}`;
+    if (key === 'resist') return `Resist ${cap(arg)}`;
+    if (key === 'vulnerable') return `Vuln ${cap(arg)}`;
+    // ⚠⚠ OTA-1527 — `inured:` HAD NO LABEL, so it fell through to `TRAIT_LABEL[t] ?? t`
+    // and printed its own raw id: the owner's portrait showed `inured:slashing`,
+    // `inured:poison`, `inured:corruption` beside properly-worded chips.
+    //
+    // ⚠ AND THE OBVIOUS LABEL WOULD HAVE BEEN A LIE. `inured` is a CANCELLATION,
+    // not armour — traitDamageMultiplier returns ×1.0 and combineDamageTypeMatch
+    // only ever cancels a WEAKNESS ("you cannot be 'used to' something that was
+    // never soft"). Calling it `Resist Slashing` would tell the player to put the
+    // axe away when the axe is merely ORDINARY here, which is the same inversion
+    // OTA-1093 was written to undo. `Not Weak:` says exactly what it does: its
+    // kind is soft to this, and this one is not.
+    if (key === 'inured') return `Not Weak: ${cap(arg)}`;
   }
   return TRAIT_LABEL[t] ?? t;
+}
+
+function cap(s: string): string {
+  return `${s.charAt(0).toUpperCase()}${s.slice(1)}`;
+}
+
+/** ⚠⚠⚠ OTA-1527 — WHICH TRAIT CHIPS THE PORTRAIT MAY PRINT, AND WHY THE LIST IS
+ *  SHORTER THAN THE TRAITS.
+ *
+ *  The owner's screenshot of an Eternal Dynasty Raider printed twelve chips. The
+ *  card above them read `RESIST Aetheric · WEAK Burn`. Reconstructing the spawn
+ *  from its own chips — randomizeEnemyDefense stamps `inured:` on every
+ *  kind-weakness EXCEPT the rolled one, so inured{slashing, poison, corruption}
+ *  plus vulnerable:piercing identifies a Human exactly — its real defences are
+ *  `RESIST Aetheric · WEAK Piercing, Slashing, Poison, Corruption`. No enemy type
+ *  in TYPE_RESISTANCE_MAP yields `WEAK Burn` alone for that trait set. The card
+ *  was therefore in the OTA-838 OBSERVED branch, printing only what the player had
+ *  learned by hitting — while the chip row underneath spelled out `Vuln Piercing`
+ *  and `Resist Aetheric` in full.
+ *
+ *  ⚠⚠ THE CHIP ROW DEFEATED THE INTEL GATE. OTA-798 gates the RESIST/WEAK block on
+ *  Wisdom, OTA-838 replaces it with strike-to-learn, and OTA-1117 added a dial that
+ *  switches the free read off entirely. All three guard one reader. The chip row
+ *  guarded nothing: it mapped every trait unconditionally, so a card reading
+ *  `DEF ? — strike to learn` could still be answered by reading two lines down.
+ *  The detail popup had the identical hole — it narrates the gate's refusal and
+ *  then lists the raw traits beneath it.
+ *
+ *  So the rule is by KIND, not by blanket gating:
+ *   • `resist:` / `vulnerable:` — dropped always. Not censored: REDUNDANT. Both
+ *     already feed defensesFor, so whatever they say is in the RESIST/WEAK line
+ *     with the type table folded in. The chip was the raw input to a sum the card
+ *     had already printed.
+ *   • `inured:` — real information the RESIST/WEAK line cannot carry (traitDefenses
+ *     ignores it), so it is kept — behind the same gate, because "its kind is soft
+ *     here and this one isn't" is exactly the intel Wisdom is supposed to buy.
+ *   • `profiled` — never a trait. It is randomizeEnemyDefense's idempotence marker
+ *     and reached the player only because it fell through `TRAIT_LABEL[t] ?? t`.
+ *   • everything else — ungated. Armored, Savage, Quick, Ambusher, Bleeder,
+ *     Concussive describe how the thing FIGHTS, which you learn by looking at it;
+ *     hiding those would be blindness rather than difficulty, the trade OTA-1117
+ *     explicitly refused. */
+export function portraitTraitChips(
+  traits: readonly string[] | undefined,
+  canReadDefenses: boolean,
+): string[] {
+  const out: string[] = [];
+  for (const t of traits ?? []) {
+    if (t === 'profiled') continue;
+    const [key, arg] = t.split(':');
+    if (arg && (key === 'resist' || key === 'vulnerable')) continue;
+    if (arg && key === 'inured') {
+      if (canReadDefenses) out.push(t);
+      continue;
+    }
+    out.push(t);
+  }
+  return out;
 }
 
 export function describeTraits(traits: readonly string[] | undefined): string {

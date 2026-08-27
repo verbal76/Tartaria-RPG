@@ -14,7 +14,7 @@ import {
   type ListRenderItem,
 } from 'react-native';
 import type { Enemy } from '../engine/types';
-import { describeTrait, traitACBonus, traitDefenses } from '../engine/enemyTraits';
+import { describeTrait, portraitTraitChips, traitACBonus, traitDefenses } from '../engine/enemyTraits';
 import { enemyPowerScore, powerMatchup } from '../engine/powerRating';
 import { enemyTypeDefenses } from '../engine/crafting';
 import { enemyDamageType } from '../engine/damageTypes';
@@ -371,7 +371,13 @@ function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { weak: s
       lines.push("You can't read its weaknesses at a glance — strike it and watch what bites (Wisdom 12 reads them on sight).");
     }
   }
-  const traits = e.traits ?? [];
+  // ⚠⚠ OTA-1527 — THE SECOND DOOR. The block above narrates the gate's refusal
+  // ("You can't read its weaknesses at a glance — strike it and watch what
+  // bites"), and this list then printed every raw trait underneath it — `Vuln
+  // Piercing`, `Resist Aetheric` — answering the question the line above had just
+  // declined to answer. Same filter as the card's chip row; see
+  // portraitTraitChips for what is dropped and why.
+  const traits = portraitTraitChips(e.traits, e.boss || canRead);
   if (traits.length) {
     lines.push('');
     lines.push('Traits:');
@@ -398,6 +404,10 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
   const apNum = apMatch ? parseInt(apMatch[0], 10) : NaN;
   const baseAc = isNaN(apNum) ? 8 : Math.max(5, Math.min(18, 5 + apNum));
   const ac = Math.max(1, baseAc + traitACBonus(view.enemy.traits) + (view.enemy.boss ? 6 : 0));
+  // OTA-1527 — the chips this card is allowed to print. Gated on the SAME
+  // condition as the RESIST/WEAK block below, because the row sits directly
+  // under it and was answering what that block declined to say.
+  const chips = portraitTraitChips(view.enemy.traits, view.enemy.boss || canRead);
   const attackNum = parseInt(String(view.enemy.attack), 10);
   const atkLabel = Number.isFinite(attackNum) ? `+${attackNum}` : String(view.enemy.attack);
   const hpPct = Math.max(0, Math.min(1, view.currentHp / Math.max(1, view.enemy.hp)));
@@ -578,9 +588,14 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
           })}
         </View>
       )}
-      {view.enemy.traits && view.enemy.traits.length > 0 && (
+      {/* ⚠⚠⚠ OTA-1527 — THE CHIP ROW USED TO DEFEAT THE INTEL GATE. It mapped
+          `view.enemy.traits` unconditionally while the RESIST/WEAK block a few
+          lines above is gated on `view.enemy.boss || canRead`, so a card reading
+          `DEF ? — strike to learn` could still be answered by reading two lines
+          down. It also printed `inured:slashing` and `profiled` as raw ids. */}
+      {chips.length > 0 && (
         <View style={styles.traitRow}>
-          {view.enemy.traits.map((t) => (
+          {chips.map((t) => (
             <Text key={t} style={styles.traitBadge}>
               {describeTrait(t)}
             </Text>
