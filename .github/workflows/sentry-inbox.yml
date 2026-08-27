@@ -1,0 +1,250 @@
+# ⚠⚠ SENTRY INBOX RELAY — why this exists.
+#
+# The owner's SEND LOG button (OTA-1489) ships player-log bundles to Sentry,
+# but the cloud workspace Claude works in has a fixed egress policy that does
+# not include sentry.io, so it cannot read them back directly. CI runners can.
+# This workflow pulls the recent player-log events + their attachments from
+# Sentry and commits them under sentry-inbox/, where the workspace CAN read
+# them (git pull). Trigger: push a change to sentry-inbox/request.txt.
+#
+# Requires the repo secret SENTRY_READ_TOKEN (a read-scoped Sentry token).
+# The token never appears in the tree; the fetched artifacts are the owner's
+# own diagnostics from his own devices.
+#
+# ⚠ The OTA publish workflow must ignore sentry-inbox/** (it does, same
+# commit that added this file) — an inbox sync is not a game update.
+name: Sentry inbox sync (hourly clock)
+
+# ⚠⚠⚠ THIS IS THE `main` COPY, AND IT EXISTS ONLY TO CARRY THE CLOCK.
+# GitHub reads `schedule:` from the DEFAULT branch and nowhere else, so the
+# identical file on golem-line — where this workflow was born and where all its
+# real work happens — has never once fired on its hour. It only ever ran when a
+# push to sentry-inbox/request.txt triggered it by hand.
+#
+# ⚠⚠ THE PUSH TRIGGER IS DELIBERATELY ABSENT HERE. golem-line's copy keeps it
+# and owns every on-demand sync; if both copies carried it, one request.txt push
+# would start two runs racing to commit the same fetched events to the same
+# branch. Two triggers, two files, one job each — never both at once.
+#
+# ⚠ EVERYTHING BELOW IS A VERBATIM COPY of golem-line's file, including the
+# pinned `ref: golem-line` on checkout. A run launched from main must still read
+# and write GOLEM-LINE's tree: main is a docs-only router branch and the
+# evidence has to land where the work lives.
+on:
+  # ⚠ 2026-08-26 — THE HOURLY CLOCK, on the owner's word: "we need to set you
+  # to pull all sentry when I start a new session or periodically." A session
+  # start can't be hooked server-side, so the relay pulls on its own schedule
+  # and commits anything new — whichever session opens next just `git pull`s
+  # and the evidence is already in the tree. Quiet hours cost nothing: no new
+  # events → no commit (the "Nothing new" branch below).
+  #
+  # ⚠⚠ THIS CLOCK ONLY TICKS FROM THE DEFAULT BRANCH. GitHub reads `schedule:`
+  # from the workflow file as it exists on the repo's DEFAULT branch (`main`)
+  # — never from a topic branch. Added here on golem-line 2026-08-26 at 01:14,
+  # it fired ZERO times in the twelve hours that followed; every run in the
+  # history was a push. A copy of this file must live on `main` for the hour
+  # to mean anything, which is why the checkout below pins the ref: a
+  # schedule firing from main must still read and write GOLEM-LINE's tree.
+  schedule:
+    - cron: '0 * * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      # ⚠ ALWAYS golem-line, whatever fired us. A scheduled run launched from
+      # the default branch would otherwise check out `main` and try to commit
+      # the inbox there — the evidence has to land where the work lives.
+      - uses: actions/checkout@v4
+        with:
+          ref: golem-line
+      - name: Pull player-log bundles from Sentry
+        env:
+          SENTRY_READ_TOKEN: ${{ secrets.SENTRY_READ_TOKEN }}
+          ORG: hot-attic-games-llc
+          BASE: https://us.sentry.io/api/0
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, urllib.request, pathlib, re
+
+          tok = os.environ['SENTRY_READ_TOKEN']
+          org = os.environ['ORG']
+          base = os.environ['BASE']
+
+          def api(path, raw=False):
+              req = urllib.request.Request(base + path)
+              req.add_header('Authorization', 'Bearer ' + tok)
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  data = r.read()
+              return data if raw else json.loads(data)
+
+          out_root = pathlib.Path('sentry-inbox')
+          projects = api(f'/organizations/{org}/projects/')
+          print('projects:', [q['slug'] for q in projects])
+          fetched = []
+          for p in projects:
+              slug = p['slug']
+              try:
+                  events = api(f'/projects/{org}/{slug}/events/?full=false')
+              except Exception as e:
+                  print(f'{slug}: events list failed: {e}')
+                  continue
+              print(f'{slug}: {len(events)} recent events')
+              for ev in events[:8]:
+                  print(f'  seen: title={ev.get("title")!r} message={ev.get("message")!r} id={ev.get("eventID","")[:8]} at={ev.get("dateCreated")}')
+              for ev in events:
+                  # ⚠ EVERYTHING is the owner's own diagnostics — player-log
+                  # bundles AND the crash-ledger reports (the six native-death
+                  # events were the first proof the whole pipeline works).
+                  title = ' '.join(str(x) for x in [ev.get('title'), ev.get('message')])
+                  kind = 'player-log' if 'player-log' in title else 'crash'
+                  eid = ev['eventID']
+                  stamp = (ev.get('dateCreated') or '').replace(':', '-')[:19]
+                  safe = re.sub(r'[^A-Za-z0-9_-]', '_', f'{kind}_{stamp}_{eid[:12]}')
+                  d = out_root / safe
+                  if (d / 'event.json').exists():
+                      continue  # already synced on a previous run
+                  d.mkdir(parents=True, exist_ok=True)
+                  try:
+                      full = api(f'/projects/{org}/{slug}/events/{eid}/')
+                  except Exception as e:
+                      print(f'{eid}: full event fetch failed: {e}')
+                      full = {'title': title, 'eventID': eid, 'dateCreated': ev.get('dateCreated'),
+                              'tags': ev.get('tags'), 'project': slug}
+                  (d / 'event.json').write_bytes(json.dumps(full, indent=2).encode())
+                  try:
+                      atts = api(f'/projects/{org}/{slug}/events/{eid}/attachments/')
+                  except Exception as e:
+                      print(f'{eid}: attachment list failed: {e}')
+                      continue
+                  for a in atts:
+                      name = re.sub(r'[^A-Za-z0-9._-]', '_', a.get('name') or a['id'])
+                      blob = api(f'/projects/{org}/{slug}/events/{eid}/attachments/{a["id"]}/?download=1', raw=True)
+                      (d / name).write_bytes(blob)
+                      print(f'{safe}/{name}: {len(blob)} bytes')
+                  fetched.append(safe)
+          print('fetched:', fetched or 'nothing new')
+
+          # ⚠⚠⚠ OTA-1515 — REASSEMBLE THE PARTS. A chunked send arrives as N
+          # separate events, each with one slice of the log, all sharing a
+          # `bundleId` tag and carrying their own `part`/`parts`. Twenty
+          # fragments in twenty directories is not evidence anyone can read, so
+          # stitch them back into one file per bundle, IN ORDER, and say plainly
+          # which parts are missing rather than silently concatenating a hole.
+          def tagval(ev, key):
+              for t in (ev.get('tags') or []):
+                  if isinstance(t, dict) and t.get('key') == key:
+                      return str(t.get('value'))
+              return None
+
+          bundles = {}
+          for d in sorted(out_root.glob('player-log_*')):
+              ev_path = d / 'event.json'
+              if not ev_path.exists():
+                  continue
+              try:
+                  ev = json.loads(ev_path.read_text())
+              except Exception:
+                  continue
+              bid = tagval(ev, 'bundleId')
+              part = tagval(ev, 'part')
+              parts = tagval(ev, 'parts')
+              if not bid or not part or not parts:
+                  continue
+              slices = sorted(d.glob('game-log.part*'))
+              if not slices:
+                  continue
+              bundles.setdefault(bid, {'total': int(parts), 'seen': {}})
+              try:
+                  bundles[bid]['seen'][int(part)] = slices[0].read_text(errors='replace')
+              except Exception as e:
+                  print(f'  part {part} of {bid} unreadable: {e}')
+
+          for bid, b in bundles.items():
+              total = b['total']
+              have = sorted(b['seen'])
+              missing = [n for n in range(1, total + 1) if n not in b['seen']]
+              dest = out_root / f'assembled_{bid}'
+              dest.mkdir(parents=True, exist_ok=True)
+              text = ''.join(b['seen'][n] for n in have)
+              (dest / 'game-log.txt').write_text(text)
+              note = f'bundle {bid}: {len(have)}/{total} parts, {len(text)} chars'
+              if missing:
+                  note += f' — MISSING {missing}'
+              (dest / 'README.txt').write_text(note + chr(10))
+              print('  assembled:', note)
+
+          # ⚠⚠ 2026-08-25 — THE OUTCOMES LEDGER, because "sent" and "kept" are
+          # different facts. Tonight the owner's SEND LOG showed sent (the
+          # client got its acknowledgment) and the events never appeared in the
+          # project: Sentry accepts an envelope at the door and can still drop
+          # it server-side (quota, rate limit, spike protection, filters) —
+          # visible ONLY in the org outcome stats. Print accepted vs dropped by
+          # reason for the last 24h so a silent discard can never again read
+          # as "the device never sent it".
+          # ⚠⚠⚠ OTA-1515 AUDIT — 24h WAS TOO SHORT A LENS, and that is why this
+          # hunt stalled. A CLIENT-SIDE rate limit is cached by the SDK from a
+          # 429 it saw EARLIER and then silently drops that category's items
+          # for the whole window — which can be a month on a quota. Reading
+          # only the last day showed "accepted / error" and nothing else, which
+          # looks like health and is actually the sound of attachments being
+          # thrown away before they leave the phone. Widen the lens and print
+          # EVERY outcome, not just the ones that arrived: rate_limited,
+          # filtered, invalid, client_discard (the SDK's own confession that it
+          # dropped something locally) all name different faults.
+          import urllib.parse
+          for period in ('24h', '7d', '30d'):
+              try:
+                  q = urllib.parse.urlencode([
+                      ('field', 'sum(quantity)'), ('statsPeriod', period),
+                      ('groupBy', 'outcome'), ('groupBy', 'reason'),
+                      # ⚠ interval must DIVIDE the period — passing interval==period
+                      # 400s, which is how the first widened run came back empty
+                      # for 7d and 30d and told us nothing.
+                      ('groupBy', 'category'), ('interval', '1d'),
+                  ])
+                  stats = api(f'/organizations/{org}/stats_v2/?{q}')
+                  print(f'── outcomes, last {period} (outcome / reason / category → count):')
+                  rows = 0
+                  for g in stats.get('groups', []):
+                      by = g.get('by', {})
+                      total = (g.get('totals', {}) or {}).get('sum(quantity)', 0)
+                      if total:
+                          rows += 1
+                          print(f"  {by.get('outcome')} / {by.get('reason')} / {by.get('category')} → {total}")
+                  if rows == 0:
+                      print('  (nothing at all in this window)')
+              except Exception as e:
+                  print(f'outcomes query failed for {period}:', e)
+          # ⚠⚠ AND THE QUOTA ITSELF — the second direction. If the attachment
+          # category is capped or exhausted, that is the fact the SDK is
+          # reacting to, and it is visible here rather than inferred from
+          # silence.
+          try:
+              sub = api(f'/organizations/{org}/subscription/')
+              print('── subscription / quota:')
+              for k in ('planTier', 'plan', 'isFree', 'isTrial', 'canTrial'):
+                  if k in sub:
+                      print(f'  {k}: {sub[k]}')
+              cats = sub.get('categories') or {}
+              for name, c in (cats.items() if isinstance(cats, dict) else []):
+                  if isinstance(c, dict):
+                      print(f"  {name}: reserved={c.get('reserved')} used={c.get('usageExceeded') if 'usageExceeded' in c else ''} "
+                            f"prepaid={c.get('prepaid')} usage={c.get('usage')}")
+          except Exception as e:
+              print('subscription query failed (token may lack billing scope):', e)
+          PYEOF
+      - name: Commit the inbox
+        run: |
+          git config user.name 'sentry-inbox'
+          git config user.email 'sentry-inbox@users.noreply.github.com'
+          git add sentry-inbox/
+          if git diff --cached --quiet; then
+            echo 'Nothing new to commit.'
+          else
+            git commit -m 'sentry-inbox: sync player-log bundles [skip ci]'
+            git push
+          fi
