@@ -1,14 +1,20 @@
-sync 2026-08-27 — pull everything, and make the relay confess its own failures.
+sync 2026-08-27 — the issue walk was 400ing. Fixed; go get the missing parts.
 
-Last run's VERDICT.txt showed only the project-events listing in the page audit.
-The issue-feed walk added to reach past that feed's 100-row cap does not appear
-at all, which means it threw and the failure went nowhere but a buried print. A
-fallback that fails silently is a fallback believed in for no reason.
+VERDICT.txt named it in one line, which is exactly why it now reports failed
+fetches:
 
-So fetch_notes now collects every failed fetch and VERDICT.txt states them up
-front. If the issue walk is broken, this run says so in one line instead of
-leaving a capped listing looking like the whole story.
+  issue list FAILED for tartaria: HTTP Error 400: Bad Request
 
-Still open: mtaxtx2bzl8l (Great Scott) at 5/27 and mtawqdrsm78g at 3/23. Neither
-has been PROVEN absent from Sentry — the only listing that has run is one that
-ends on a full page, which proves nothing.
+`statsPeriod=90d` is rejected by the project-issues endpoint — it accepts only
+'', '24h' or '14d'. So the walk added to read past the project feed's 100-row cap
+never ran at all, while the verdict showed a single capped listing and no sign
+anything was missing.
+
+Two parameters now, both load-bearing:
+  · statsPeriod=  (empty) — anything else risks the same 400.
+  · query=        (empty) — the default is `is:unresolved`, which would silently
+    skip every resolved issue and take its whole event history with it.
+
+Expected: the fetch-problems block reads "every fetch this run succeeded", the
+issues path appears in the page audit with real page counts, and mtaxtx2bzl8l
+(Great Scott, 5/27) and mtawqdrsm78g (3/23) fill in — with no new send.

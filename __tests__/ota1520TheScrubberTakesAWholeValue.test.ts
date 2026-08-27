@@ -270,7 +270,7 @@ describe('OTA-1520 — the relay reads the reason, and stops stitching silent ho
   it('⚠⚠ THE ISSUE FEED IS WALKED TOO, because that one actually paginates', () => {
     // Project events cap at 100; issue events walk a real cursor. Take the
     // project feed for recency, the issue feed for depth, union by event id.
-    expect(RELAY).toContain("issues = api_all(f'/projects/{org}/{slug}/issues/?statsPeriod=90d')");
+    expect(RELAY).toContain("issues = api_all(f'/projects/{org}/{slug}/issues/?query=&statsPeriod=')");
     expect(RELAY).toContain("iev = api_all(f'/organizations/{org}/issues/{iid}/events/?full=false')");
     expect(RELAY).toContain("seen_ids = {e.get('eventID') for e in events}");
     expect(RELAY).toContain('events after walking');

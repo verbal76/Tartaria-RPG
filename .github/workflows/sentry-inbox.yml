@@ -151,7 +151,17 @@ jobs:
               # and it is the difference between reading the evidence and guessing
               # about it.
               try:
-                  issues = api_all(f'/projects/{org}/{slug}/issues/?statsPeriod=90d')
+                  # ⚠⚠⚠ EMPTY query AND empty statsPeriod, both deliberate.
+                  # `statsPeriod=90d` returned HTTP 400 — this endpoint accepts
+                  # only '', '24h' or '14d', and the failure was swallowed, so
+                  # the walk that was supposed to read past the project feed's
+                  # 100-row cap never ran at all while the verdict showed a
+                  # single capped listing and no sign anything was missing.
+                  # `query=` (empty) is equally load-bearing: the default is
+                  # `is:unresolved`, which would silently skip every resolved
+                  # issue — and a player-log issue gets resolved the moment
+                  # anyone triages it, taking its whole event history with it.
+                  issues = api_all(f'/projects/{org}/{slug}/issues/?query=&statsPeriod=')
               except Exception as e:
                   issues = []
                   # ⚠⚠ 2026-08-27 — THIS FAILURE USED TO VANISH. The issue walk was
