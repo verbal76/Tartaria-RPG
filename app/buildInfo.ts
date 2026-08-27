@@ -25183,6 +25183,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // a trait, no longer reaches the player at all. Behavioural chips stay ungated:
 // Armored, Savage, Quick, Ambusher, Bleeder, Concussive are how the thing fights.
 export const OTA_BUILD_ID = '2026-08-27-1527-the-chips-answered-what-the-gate-refused';
+// golem catch-up 2026-08-27: markerless publish of OTA-1527 (the enemy portrait's
+// trait chips now respect the same Wisdom gate as the RESIST/WEAK block above
+// them, `inured:` reads `Not Weak: X` instead of its raw id, and `profiled`
+// stops reaching the player) to the golem channel. Both channels level at 1527.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1526-the-ledger-was-writing-its-own-corpses';
 // golem catch-up 2026-08-27: markerless publish of OTA-1526 (boot reads the
 // breadcrumb snapshot taken at module load instead of racing this session's own
