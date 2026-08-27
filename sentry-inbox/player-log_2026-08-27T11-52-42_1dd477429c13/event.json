@@ -1,0 +1,198 @@
+{
+  "id": "1dd477429c1343fa991b91862f9b887a",
+  "groupID": "7695394759",
+  "eventID": "1dd477429c1343fa991b91862f9b887a",
+  "projectID": "4511945117532160",
+  "size": 17848,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbgr26bocft [inline 6/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbgr26bocft [inline 6/28]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbgr26bocft [inline 6/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "a0a0920555e241eeb4188ebf82868d32",
+      "span_id": "ba5d589f2cdb9a15",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "n\n[2026-08-26T02:10:40.190Z] [cognitive] neutral  (185ms)\n[2026-08-26T02:10:44.274Z] [world] Eternal Dynasty Raider 1 moves first. The pressure is immediate.\n[2026-08-26T02:10:44.275Z] [debug] ac-shift 31\u219228: race/base 12 + gear 24 + title 0 \u2192 trimmed 28 + status 0 | worn: head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards",
+      " cloak=Traveler's Cloak\n[2026-08-26T02:10:44.275Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 11 + ATK 7 = 18 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:10:44.276Z] [combat] Eternal Dynasty Raider 3 \u2014 d20 \u2192 9 + ATK 7 = 16 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-26T02:10:44.277Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 11 + ATK 7 = 18 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:10:44.277Z] [combat] Eternal Dynasty Raider 4 and 1 other close the distance.\n[2026-08-26T02:10:44.277Z] [combat] You \u2014 d20 \u2192 3 + INT 10 \u2212 1 (Whisper Fog) exhausted -2 perfect opening (2\u00d7 dice) = 10 vs Eternal Dynasty Raider 1 AC 11 \u2014 \u2717 MISS\n",
+      "[2026-08-26T02:10:44.277Z] [combat] Half a beat too slow. Eternal Dynasty Raider 1 steps inside your reach.\n[2026-08-26T02:10:45.900Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-26T02:10:45.987Z] [player] attack with the cantor's tuning fork\n[2026-08-26T02:10:45.988Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=5 hooks=1\n",
+      "[2026-08-26T02:10:45.991Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-26T02:10:45.992Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T02:10:45.992Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T02:10:46.037Z] [world] You raise the searing cantor's tuning fork toward Eternal Dynasty Raider 1. The room narrows around the both of you.\n[2026-08-26T02:10:46.037Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:10:46.219Z] [cognitive] neutral  (181ms)\n[2026-08-26T02:10:55.327Z] [world] You seize the initiative. Eternal Dynasty Raider 1 has no time to react.\n",
+      "[2026-08-26T02:10:55.327Z] [combat] You \u2014 d20 \u2192 5 + INT 10 \u2212 1 (Whisper Fog) exhausted -2 = 12 vs Eternal Dynasty Raider 1 AC 11 \u2014 \u2713 HIT\n[2026-08-26T02:10:55.327Z] [combat] Eternal Dynasty Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 4)\n",
+      "[2026-08-26T02:10:55.360Z] [combat] The blow with the searing cantor's tuning fork finds purchase \u2014 4 damage, 10 HP standing. Eternal Dynasty Raider 1 commits to the counter.\n[2026-08-26T02:10:55.361Z] [combat] Searing Cantor's Tuning Fork \u2014 2 burn bites in and festers (3 turns).\n",
+      "[2026-08-26T02:10:55.362Z] [combat] Eternal Dynasty Raider 5 \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-26T02:10:55.364Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 16 + ATK 7 = 23 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-08-26T02:10:55.366Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 3 + ATK 7 = 10 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:10:55.366Z] [combat] Eternal Dynasty Raider 3 \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:10:55.367Z] [combat] Eternal Dynasty Raider 4 presses in behind the others, waiting for an opening.\n",
+      "[2026-08-26T02:10:55.598Z] [combat] Eternal Dynasty Raider 5 deals 3 bludgeoning damage [plate \u22123]. You have 37 HP remaining.\n[2026-08-26T02:10:55.598Z] [combat] Eternal Dynasty Raider 5's strike leaves you stunned.\n[2026-08-26T02:10:55.598Z] [combat] Eternal Dynasty Raider 1 deals 4 bludgeoning damage [plate \u22122]. You have 33 HP remaining.\n[2026-08-26T02:11:03.870Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-08-26T02:11:03.873Z] [system] stunned fades.\n[2026-08-26T02:11:03.874Z] [world] You cannot move. Your action is lost.\n[2026-08-26T02:11:04.703Z] [debug] ui: tap \"off: plasma cutter\"\n[2026-08-26T02:11:04.747Z] [player] attack with the off-hand plasma cutter\n",
+      "[2026-08-26T02:11:04.748Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand plasma cutter resolved=Plasma Cutter range=close enemies=5 hooks=1\n[2026-08-26T02:11:04.749Z] [combat] Eternal Dynasty Raider 1 blisters \u2014 clinging fire sears 2. (8/14 HP, 2 turns left)\n",
+      "[2026-08-26T02:11:04.749Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Plasma Cutter bareHand=false\n[2026-08-26T02:11:04.751Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T02:11:04.751Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T02:11:04.800Z] [world] You raise the plasma cutter toward Eternal Dynasty Raider 1. The room narrows around the both of you.\n[2026-08-26T02:11:04.800Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:11:04.991Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 THROW  (190ms)\n[2026-08-26T02:11:09.965Z] [world] You seize the initiative. Eternal Dynasty Raider 1 has no time to react.\n",
+      "[2026-08-26T02:11:09.965Z] [combat] You \u2014 d20 \u2192 5 + DEX 13 \u2212 1 (Whisper Fog) exhausted -2 = 15 vs Eternal Dynasty Raider 1 AC 11 \u2014 \u2713 HIT\n[2026-08-26T02:11:09.971Z] [combat] The blow with the plasma cutter finds purchase \u2014 2 damage, 6 HP standing. Eternal Dynasty Raider 1 commits to the counter.\n[2026-08-26T02:11:09.971Z] [combat] Burn sets in \u2014 3/turn for 2 turns.\n",
+      "[2026-08-26T02:11:09.973Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 18 + ATK 7 = 25 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-26T02:11:09.976Z] [combat] Eternal Dynasty Raider 3 \u2014 d20 \u2192 17 + ATK 7 = 24 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-08-26T02:11:09.978Z] [combat] Eternal Dynasty Raider 4 \u2014 d20 \u2192 9 + ATK 6 = 15 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:11:09.979Z] [combat] Eternal Dynasty Raider 5 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:11:09.979Z] [combat] Eternal Dynasty Raider 1 presses in behind the others, waiting for an opening.\n",
+      "[2026-08-26T02:11:10.198Z] [combat] Eternal Dynasty Raider 2 deals 2 slashing damage [armor \u221265%, plate \u22122]. You have 31 HP remaining.\n[2026-08-26T02:11:10.198Z] [combat] That's your slashing resist working \u2014 the armor drank most of that hit (2 of 3 got through).\n[2026-08-26T02:11:10.199Z] [combat] Eternal Dynasty Raider 3 deals 1 bludgeoning damage [plate \u22122]. You have 30 HP remaining.\n",
+      "[2026-08-26T02:11:15.490Z] [debug] ui: tap \"inventory\"\n[2026-08-26T02:11:16.077Z] [debug] persist sizes(KB): total=213 player=52 wm=74[rooms=28 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=80 scene=7\n",
+      "[2026-08-26T02:11:26.222Z] [debug] stats: STR20 DEX12 INT10 WIS12 CHA12 STE3 | gear: STR+7,DEX+6,STE+2,WIS+1,CHA+1 | worn: main=Cantor's Tuning Fork off=Bone Crossbow head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring\n",
+      "[2026-08-26T02:11:29.226Z] [debug] ui: tap \"dodge\"\n[2026-08-26T02:11:29.230Z] [system] braced \u2014 will not go down again fades.\n[2026-08-26T02:11:29.241Z] [player] dodge\n[2026-08-26T02:11:29.242Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=1\n",
+      "[2026-08-26T02:11:29.243Z] [world] You commit to the dodge. Slip Eternal Dynasty Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-26T02:11:29.243Z] [combat] Eternal Dynasty Raider 1 blisters \u2014 clinging fire sears 2. (4/14 HP, 1 turn left)\n",
+      "[2026-08-26T02:11:29.244Z] [combat] Eternal Dynasty Raider 1 suffers \u2014 burn eats 3. (1/14 HP, 1 turn left)\n[2026-08-26T02:11:29.304Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 20 + ATK 7 = 27 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-08-26T02:11:29.304Z] [combat] Dodge \u2014 Eternal Dynasty Raider 2 rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.\n",
+      "[2026-08-26T02:11:29.306Z] [combat] Eternal Dynasty Raider 3 \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:11:29.306Z] [combat] Eternal Dynasty Raider 4 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-26T02:11:29.308Z] [combat] Eternal Dynasty Raider 5 \u2014 d20 \u2192 8 + ATK 6 = 14 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:11:29.308Z] [combat] Eternal Dynasty Raider 1 presses in behind the others, waiting for an opening.\n[2026-08-26T02:11:29.308Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-26T02:11:29.308Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:11:29.309Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:11:29.536Z] [combat] Eternal Dynasty Raider 2 deals 4 slashing damage [armor \u221265%, plate \u22122, floor 30%]. You have 26 HP remaining.\n[2026-08-26T02:11:29.537Z] [combat] Eternal Dynasty Raider 2's strike leaves you bleeding.\n",
+      "[2026-08-26T02:11:29.716Z] [cognitive] neutral  (228ms)\n[2026-08-26T02:11:30.178Z] [debug] ui: tap \"off: bone crossbow\"\n[2026-08-26T02:11:30.221Z] [player] attack with the off-hand bone crossbow\n[2026-08-26T02:11:30.222Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=5 hooks=1\n",
+      "[2026-08-26T02:11:30.223Z] [combat] Eternal Dynasty Raider 1 blisters \u2014 clinging fire sears 2. (0/14 HP, 0 turns left)\n[2026-08-26T02:11:30.223Z] [combat] Eternal Dynasty Raider 1 shakes off the last of the fire \u2014 the Cantor's Tuning Fork has run its course.\n[2026-08-26T02:11:30.223Z] [combat] Eternal Dynasty Raider 1 suffers \u2014 burn eats 3. (0/14 HP, 0 turns left)\n",
+      "[2026-08-26T02:11:30.223Z] [combat] Eternal Dynasty Raider 1 shakes off the last of the coating \u2014 the burn has run its course.\n[2026-08-26T02:11:30.225Z] [reward] Eternal Dynasty Raider 1 defeated. You recover Bone Bolt \u00d72, Patched Cloth.\n[2026-08-26T02:11:30.226Z] [reward] You strip the body: Bone Crossbow, Reclaimer's Salvage Vest (+8 TC). The kit took the fight badly.\n",
+      "[2026-08-26T02:11:30.229Z] [combat] 4 attackers remain. Eternal Dynasty Raider 2 now in your sights.\n[2026-08-26T02:11:30.230Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-26T02:11:30.230Z] [reward] +8 TC pried from the dust.\n",
+      "[2026-08-26T02:11:30.264Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-26T02:11:30.265Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T02:11:30.265Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T02:11:30.310Z] [world] Your bone crossbow comes around in an arc; Eternal Dynasty Raider 2 squares up to meet it.\n[2026-08-26T02:11:30.310Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:11:30.531Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (220ms)\n[2026-08-26T02:11:35.140Z] [world] You seize the initiative. Eternal Dynasty Raider 2 has no time to react.\n",
+      "[2026-08-26T02:11:35.140Z] [combat] You \u2014 d20 \u2192 9 + DEX 12 \u2212 1 (Whisper Fog) exhausted -2 = 18 vs Eternal Dynasty Raider 2 AC 11 \u2014 \u2713 HIT\n[2026-08-26T02:11:35.142Z] [combat] Piercing flares \u2014 +4 on hit (weak \u2014 bites deep!).\n[2026-08-26T02:11:35.142Z] [combat] Weakness exposed \u2014 Eternal Dynasty Raider 2 flinches. (piercing \u00d72.25 for 13)\n",
+      "[2026-08-26T02:11:35.144Z] [combat] You crack the Eternal Dynasty Raider 2 with the Bone Crossbow for 13 \u2014 half their fight, gone in one blow. They crumple, out cold. (3/16 HP) Loot them before they come to.\n[2026-08-26T02:11:35.144Z] [combat] Eternal Dynasty Raider 2 is out of it. Eternal Dynasty Raider 3 now in your sights.\n",
+      "[2026-08-26T02:11:35.145Z] [combat] Eternal Dynasty Raider 4 \u2014 d20 \u2192 6 + ATK 6 = 12 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:11:35.146Z] [combat] Eternal Dynasty Raider 5 \u2014 d20 \u2192 2 + ATK 6 = 8 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-26T02:11:35.147Z] [combat] Eternal Dynasty Raider 3 \u2014 d20 \u2192 19 + ATK 7 = 26 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-26T02:11:35.148Z] [arbiter] The Arbiter watches the Eternal Dynasty Raider 3 circle. \"It's measuring you. Give it the wrong number.\"\n",
+      "[2026-08-26T02:11:35.367Z] [combat] Eternal Dynasty Raider 3 deals 4 bludgeoning damage [plate \u22122]. You have 22 HP remaining.\n[2026-08-26T02:11:37.395Z] [debug] ui: tap \"inventory\"\n[2026-08-26T02:11:46.125Z] [reward] You work the acid flask along the weapon. Now wielding the Acid-Etched Bone Crossbow \u2014 1d4 acid on every landing hit.\n",
+      "[2026-08-26T02:11:48.538Z] [debug] persist sizes(KB): total=212 player=53 wm=74[rooms=29 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=80 scene=6\n[2026-08-26T02:11:51.113Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T02:11:51.138Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-26T02:11:51.139Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=4 hooks=1\n[2026-08-26T02:11:51.139Z] [debug] attack: target=Eternal Dynasty Raider 3 range=far reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-26T02:11:51.140Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-26T02:11:51.140Z] [debug] attack: status mods exhausted -2\n[2026-08-26T02:11:51.186Z] [world] You commit forward with the acid-etched bone crossbow. Eternal Dynasty Raider 3 watches your hands.\n[2026-08-26T02:11:51.186Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:11:51.365Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (177ms)\n",
+      "[2026-08-26T02:11:57.974Z] [world] Eternal Dynasty Raider 3 moves first. The pressure is immediate.\n[2026-08-26T02:11:57.976Z] [combat] Eternal Dynasty Raider 4 \u2014 d20 \u2192 9 + ATK 6 = 15 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:11:57.977Z] [combat] Eternal Dynasty Raider 5 \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-08-26T02:11:57.979Z] [combat] Eternal Dynasty Raider 3 \u2014 d20 \u2192 11 + ATK 7 = 18 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:11:57.979Z] [combat] You \u2014 d20 \u2192 14 + DEX 12 \u2212 1 (Whisper Fog) exhausted -2 = 23 vs Eternal Dynasty Raider 3 AC 11 \u2014 \u2713 HIT\n[2026-08-26T02:11:57.980Z] [combat] Piercing flares \u2014 +1 on hit (weak \u2014 bites deep!).\n",
+      "[2026-08-26T02:11:57.980Z] [combat] Weakness exposed \u2014 Eternal Dynasty Raider 3 flinches. (piercing \u00d72.25 for 21)\n[2026-08-26T02:11:57.981Z] [combat] Final strike with the acid-etched bone crossbow for 21. Eternal Dynasty Raider 3 is still. The Aetherstone hums on, indifferent.\n[2026-08-26T02:11:57.985Z] [reward] Eternal Dynasty Raider 3 defeated. You recover Patched Cloth, Bone Bolt.\n",
+      "[2026-08-26T02:11:57.986Z] [reward] You strip the body: Bone Crossbow, Reclaimer's Salvage Vest (+8 TC). The kit took the fight badly.\n[2026-08-26T02:11:57.986Z] [combat] 2 attackers remain. Eternal Dynasty Raider 4 now in your sights.\n[2026-08-26T02:11:57.986Z] [system] Word moves through t"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbgr26bocft [inline 6/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbgr26bocft"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "6"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T11:52:41.689190Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T11:52:42.199000Z",
+  "fingerprints": [
+    "a809e8f5126ba3e40839cff155de331e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "25fd69ebd3d6490fa3512701ab885567",
+  "previousEventID": "12f8f07c4d5348c9823558afd7884c12"
+}

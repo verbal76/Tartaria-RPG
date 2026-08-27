@@ -1,0 +1,222 @@
+{
+  "id": "33e93abe29384a239524c359dae69531",
+  "groupID": "7694761507",
+  "eventID": "33e93abe29384a239524c359dae69531",
+  "projectID": "4511945117532160",
+  "size": 17663,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbgr039mc3t [inline 16/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbgr039mc3t [inline 16/28]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbgr039mc3t [inline 16/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "a0a0920555e241eeb4188ebf82868d32",
+      "span_id": "ba5d589f2cdb9a15",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " conf=1.00 verb=climb target=staircase resolved=staircase range=- enemies=0 hooks=1\n[2026-08-26T22:43:48.276Z] [world] You loop your Reclaimer's Rope around the staircase and walk the line. Tier 1/2 cleared.\n[2026-08-26T22:43:48.276Z] [world] You reach the first hold of the staircase (tier 1/2). Higher still to go.\n[2026-08-26T22:43:48.277Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-26T22:43:48.461Z] [cognitive] CLIMB  (183ms)\n[2026-08-26T22:43:48.672Z] [debug] persist sizes(KB): total=224 player=65 wm=77[rooms=31 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=78 scene=4\n[2026-08-26T22:43:49.466Z] [debug] ui: tap \"climb up (1/2)\"\n[2026-08-26T22:43:49.502Z] [player] climb staircase\n",
+      "[2026-08-26T22:43:49.503Z] [debug] parser: intent=climb conf=1.00 verb=climb target=staircase resolved=staircase range=- enemies=0 hooks=1\n[2026-08-26T22:43:49.565Z] [world] You loop your Reclaimer's Rope around the staircase and walk the line. Tier 2/2 cleared.\n",
+      "[2026-08-26T22:43:49.566Z] [world] You reach the top of the staircase (tier 2/2). The view changes; the room reads differently from here.\n[2026-08-26T22:43:49.566Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n[2026-08-26T22:43:49.566Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:43:49.567Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-26T22:43:49.746Z] [cognitive] CLIMB  (178ms)\n[2026-08-26T22:43:50.567Z] [debug] ui: tap \"climb down\"\n[2026-08-26T22:43:50.578Z] [reward] \u2726 The corruption tightens its grip \u2014 Tainted. (CHA \u22121)\n[2026-08-26T22:43:50.579Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-26T22:43:50.598Z] [player] climb down\n",
+      "[2026-08-26T22:43:50.599Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:43:50.600Z] [world] You make your way back down the staircase. Boots back on the ground.\n[2026-08-26T22:43:50.601Z] [system] \u23f3 Time passed: 15 min\n[2026-08-26T22:43:50.778Z] [cognitive] CLIMB  (177ms)\n",
+      "[2026-08-26T22:43:52.250Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T22:43:52.267Z] [debug] spawn: gear=[Mud-Bound Cloak] window=10 roster=new\n[2026-08-26T22:43:52.268Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n",
+      "[2026-08-26T22:43:52.269Z] [world] You set out west. Your boots sink half an inch into the mud-flats and pull free with each step.\n[2026-08-26T22:43:52.270Z] [world] Your eye goes back to it before you decide to look.\n[2026-08-26T22:43:53.300Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T22:43:56.166Z] [world] Whatever the Mud-Bound Cloak was lying against, it lets go without much argument.\n",
+      "[Filtered]",
+      "[2026-08-26T22:43:58.117Z] [world] You strip the fungus carefully. Something usable comes free in your hand.\n[2026-08-26T22:43:58.118Z] [world] You strip the mirror carefully. Something usable comes free in your hand.\n[2026-08-26T22:43:58.118Z] [world] You break the rusted lockbox apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-26T22:43:58.119Z] [world] You work the tower relay over. A part of it comes loose, intact.\n[2026-08-26T22:43:58.119Z] [reward] \u2726 Salvage haul:\n[2026-08-26T22:43:58.119Z] [reward]     \u2022 Stiffened Leather Offcut (Uncommon)\n[2026-08-26T22:43:58.119Z] [reward]     \u2022 Bone Sliver x2 (Common)\n[2026-08-26T22:43:58.120Z] [reward]     \u2022 Aether Crystal x2 (Common)\n",
+      "[2026-08-26T22:43:58.120Z] [reward]     \u2022 Worn Tartarian Coin x9 (Common)\n[2026-08-26T22:43:59.451Z] [debug] ui: tap \"more \u25b8\"\n[2026-08-26T22:44:00.936Z] [debug] ui: tap \"inventory\"\n[2026-08-26T22:44:05.980Z] [debug] ui: tap \"craft\"\n[2026-08-26T22:44:08.084Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-08-26T22:44:08.090Z] [world] You repair the Anvil-Struck Footguards. Back to full. (spent: Small Rock x2)\n[2026-08-26T22:44:08.133Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-26T22:44:08.133Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n",
+      "[2026-08-26T22:44:08.135Z] [world] You repair the Burl Aegis. Back to full. (spent: Small Rock x2)\n[2026-08-26T22:44:08.155Z] [world] You repair the Compact Blaster. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-08-26T22:44:08.170Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-08-26T22:44:08.170Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-08-26T22:44:08.170Z] [world] You repair the Forge-Black Cowl. Back to full. (spent: Small Rock x2)\n[2026-08-26T22:44:08.184Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-08-26T22:44:08.184Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-08-26T22:44:08.185Z] [world] You repair the Spore-Crusted Tassets. Back to full. (spent: Small Rock x2)\n[2026-08-26T22:44:08.198Z] [world] You repair the Wanderer's Worn Gauntlets. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-26T22:44:08.212Z] [arbiter] The Arbiter nods. \"Patched in: 5\u00d7 Bent Nail \u2192 Scrap Metal.\"\n[2026-08-26T22:44:08.214Z] [world] You repair the Aetheric Crystal Blade. Back to full. (spent: Scrap Metal x6, Stick x2)\n[2026-08-26T22:44:08.238Z] [arbiter] The Arbiter nods. \"Patched in: 6\u00d7 Bent Nail \u2192 Scrap Metal, Firewood \u2192 Stick.\"\n",
+      "[2026-08-26T22:44:08.249Z] [world] You repair the Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n[2026-08-26T22:44:08.273Z] [arbiter] The Arbiter nods. \"Patched in: 6\u00d7 Bent Nail \u2192 Scrap Metal, 2\u00d7 Firewood \u2192 Stick.\"\n[2026-08-26T22:44:08.285Z] [world] You repair the Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n",
+      "[2026-08-26T22:44:08.297Z] [arbiter] The Arbiter eyes the Bone Crossbow. \"Short on stock: Stick 1 short. Gather, then return.\"\n[2026-08-26T22:44:08.297Z] [arbiter] The Arbiter eyes the Bone Knife. \"Short on stock: Stick 1 short. Gather, then return.\"\n[2026-08-26T22:44:08.298Z] [arbiter] The Arbiter eyes the Bone Knife. \"Short on stock: Stick 1 short. Gather, then return.\"\n",
+      "[2026-08-26T22:44:08.298Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Bone Knife. \"Short on stock: Stick 1 sh\u2026\"\n[2026-08-26T22:44:08.298Z] [arbiter] The Arbiter eyes the Cudgel. \"Short on stock: Stick 1 short. Gather, then return.\"\n[2026-08-26T22:44:08.298Z] [arbiter] The Arbiter eyes the Cudgel. \"Short on stock: Stick 1 short. Gather, then return.\"\n",
+      "[2026-08-26T22:44:08.298Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Cudgel. \"Short on stock: Stick 1 short.\u2026\"\n[2026-08-26T22:44:08.298Z] [arbiter] The Arbiter eyes the Acid-Etched Cudgel. \"Short on stock: Stick 1 short. Gather, then return.\"\n[2026-08-26T22:44:08.298Z] [arbiter] The Arbiter eyes the Iron Spear. \"Short on stock: Stick 1 short. Gather, then return.\"\n",
+      "[2026-08-26T22:44:08.299Z] [arbiter] The Arbiter nods. \"Patched in: 3\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.301Z] [world] You repair the Mud-Bound Cloak. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-26T22:44:08.322Z] [arbiter] The Arbiter nods. \"Patched in: Bent Nail \u2192 Scrap Metal, Reeve's Brass Token \u2192 Scrap Metal, 2\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.332Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-08-26T22:44:08.353Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.362Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-08-26T22:44:08.383Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.383Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scra\u2026\"\n[2026-08-26T22:44:08.392Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-08-26T22:44:08.403Z] [arbiter] The Arbiter eyes the Plasma Cutter. \"Short on stock: Stick 1 short. Gather, then return.\"\n[2026-08-26T22:44:08.404Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.405Z] [world] You repair the Reclaimer's Rope. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-26T22:44:08.426Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.426Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scra\u2026\"\n",
+      "[2026-08-26T22:44:08.435Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T22:44:08.455Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-08-26T22:44:08.455Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scra\u2026\"\n[2026-08-26T22:44:08.464Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-08-26T22:44:08.484Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.484Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scra\u2026\"\n",
+      "[2026-08-26T22:44:08.494Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T22:44:08.519Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 2\u00d7 Cloth Scrap \u2192 Patched Cloth, 2\u00d7 Spider Silk \u2192 Patched Cloth.\"\n",
+      "[2026-08-26T22:44:08.533Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T22:44:08.557Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Spider Silk \u2192 Patched Cloth.\"\n",
+      "[2026-08-26T22:44:08.570Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T22:44:08.843Z] [debug] persist sizes(KB): total=224 player=64 wm=78[rooms=32 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=78 scene=4\n[2026-08-26T22:44:43.024Z] [player] summon crystal golem\n",
+      "[2026-08-26T22:44:43.025Z] [debug] parser: intent=cast conf=1.00 verb=summon target=crystal golem resolved=crystal range=- enemies=0 hooks=1\n[2026-08-26T22:44:43.091Z] [reward] Aether Golem Constructor \u2014 d20 13 + INT 10 = 23 vs DC 22 \u2014 \u2713 SUMMONED\n[2026-08-26T22:44:43.091Z] [world] (2\u00d7 Aether Crystal + 1\u00d7 Aetheric Cloth + 1\u00d7 Aetheric Shard consumed.)\n",
+      "[2026-08-26T22:44:43.092Z] [world] Aetherstone lifts out of the ground and folds into a shape that walks. Crystal Golem stands ready beside you. Your mastery shapes it stronger than most. (HP 68/68, 1d20 piercing)\n[2026-08-26T22:44:43.092Z] [arbiter] The Arbiter studies the standing shape. \"You gave it life. You might as well give it a name.\"\n",
+      "[2026-08-26T22:44:43.092Z] [debug] arbiter: template (reason=intent-not-allowed:cast)\n[2026-08-26T22:44:43.092Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:44:43.093Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-26T22:44:43.097Z] [world] An Eternal Dynasty war party crests the rise \u2014 2 of them, blades already out. They've marked you for standing with the Mud Monarchs.\n[2026-08-26T22:44:43.097Z] [arbiter] \"The Eternal Dynasty do not forgive a friend of the Mud Monarchs,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-26T22:44:43.360Z] [cognitive] USE_ITEM  (265ms)\n",
+      "[2026-08-26T22:44:53.695Z] [debug] qwen\u23f1 ambient ok 10345ms read 3962ms/write 1275ms in 365t\u2192out 31t 10.9ms/t HIT-CAP (153ch)\n[2026-08-26T22:44:54.090Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 3283ms \u00b7 frames 199ms). Something blocked the JS thread \u2014 look for a long synchronous run.\n[2026-08-26T22:44:54.286Z] [debug] arbiter: ambient stale:combat-started\u2192banked 11193ms\n",
+      "[2026-08-26T22:44:54.286Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You pause, feeling the weight of your journey settle on your shoulders. The Red Tower Interior, the last bastion of the \"\n[2026-08-26T22:44:55.364Z] [world] Dick Dragon. The name takes hold in the Aetherstone.\n[2026-08-26T22:44:55.365Z] [arbiter] The Arbiter nods. \"Dick Dragon, then.\"\n",
+      "[2026-08-26T22:44:59.100Z] [debug] freeze watch: recovered \u2014 painting again after 1834ms quiet.\n[2026-08-26T22:44:59.329Z] [debug] ui: tap \"golem (68/68)\"\n[2026-08-26T22:44:59.330Z] [player] use golem\n[2026-08-26T22:44:59.330Z] [combat] Dick Dragon attacks Eternal Dynasty Raider 1 \u2014 d20 12 + 3 = 15 vs AC 10 \u2014 \u2713 HIT\n",
+      "[2026-08-26T22:44:59.331Z] [combat] Dick Dragon lands 5 piercing damage on Eternal Dynasty Raider 1. (20 HP left)\n[2026-08-26T22:44:59.331Z] [combat] Eternal Dynasty Raider 1 retaliates \u2014 d20 13 + 5 hits Dick Dragon for 5 (35% resisted). (63/68)\n[2026-08-26T22:44:59.338Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-08-26T22:44:59.340Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 3 + ATK 6 = 9 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:44:59.558Z] [combat] Eternal Dynasty Raider 2 deals 4 bludgeoning damage [plate \u22123] [edge of reach \u2014 halved]. You have 54 HP remaining.\n[2026-08-26T22:44:59.559Z] [combat] Eternal Dynasty Raider 2's strike leaves you stunned.\n",
+      "[2026-08-26T22:45:00.539Z] [debug] ui: tap \"golem (63/68)\"\n[2026-08-26T22:45:00.541Z] [system] stunned fades.\n[2026-08-26T22:45:00.542Z] [world] You cannot move. Your action is lost.\n[2026-08-26T22:45:02.406Z] [debug] ui: tap \"golem (63/68)\"\n[2026-08-26T22:45:02.412Z] [player] use golem\n",
+      "[2026-08-26T22:45:02.412Z] [combat] Dick Dragon attacks Eternal Dynasty Raider 1 \u2014 d20 10 + 3 = 13 vs AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:45:02.413Z] [combat] Dick Dragon lands 11 piercing damage on Eternal Dynasty Raider 1. (9 HP left)\n[2026-08-26T22:45:02.414Z] [combat] Eternal Dynasty Raider 1 retaliates \u2014 d20 20 + 5 (NAT 20) hits Dick Dragon for 11 (35% resisted). (52/68)\n",
+      "[2026-08-26T22:45:02.428Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-26T22:45:02.434Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 18 + ATK 6 = 24 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbgr039mc3t [inline 16/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbgr039mc3t"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "16"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T11:52:39.361000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "8": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 383,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T11:52:39.629000Z",
+  "fingerprints": [
+    "e0f4cb018e4ab970e70b2d84412932d2"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "3b812c73520347ecaa71972cfc583ca9",
+  "previousEventID": "2aaeb78438364d38b9cda9356f005f3f"
+}

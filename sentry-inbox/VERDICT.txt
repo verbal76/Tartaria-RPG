@@ -1,0 +1,20 @@
+
+════ VERDICT ════
+  /projects/hot-attic-games-llc/tartaria/events/?full=false
+    1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
+  ⚠⚠ AT LEAST ONE LISTING IS NOT PROVEN COMPLETE. Any MISSING parts below are UNPROVEN — they may simply be unread. DO NOT conclude the device failed, and DO NOT ask for another send on this basis.
+  incomplete bundles:
+    mtawqdrsm78g: 3/23 parts
+    mtaxtx2bzl8l: 5/27 parts
+  scrub cost per bundle:
+    mtavnjvdw4u4: 4 redactions, 60000 chars
+    mtawqnivyk0q: 5 redactions, 74999 chars
+    mtawr2axtwkc: 4 redactions, 60000 chars
+    mtawr57g7td7: 8 redactions, 61376 chars
+    mtaxu4o1qm9m: 4 redactions, 1498 chars
+    mtaxudrxsjum: 2 redactions, 778 chars
+    mtaxuqrhd0b3: 4 redactions, 1376 chars
+    mtaxut1k7apv: 4 redactions, 1376 chars
+    mtbgr039mc3t: 10 redactions, 3526 chars
+    mtbgr26bocft: 10 redactions, 3526 chars
+    mtbgrdejaghk: 10 redactions, 3491 chars

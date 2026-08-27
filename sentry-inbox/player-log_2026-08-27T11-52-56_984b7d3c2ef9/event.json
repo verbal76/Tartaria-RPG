@@ -1,0 +1,197 @@
+{
+  "id": "984b7d3c2ef94d23aece5f9d162edaf3",
+  "groupID": "7695395115",
+  "eventID": "984b7d3c2ef94d23aece5f9d162edaf3",
+  "projectID": "4511945117532160",
+  "size": 17866,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbgrdejaghk [inline 7/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbgrdejaghk [inline 7/28]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbgrdejaghk [inline 7/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "00bc76a9aaeb4ada827b60359d5140cf",
+      "span_id": "a4c74f063a4b8ef0",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "pped) \u2014 \u2717 MISS\n[2026-08-26T02:12:06.274Z] [debug] arbiter: template (reason=combat)\n[2026-08-26T02:12:06.274Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:12:06.274Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:12:06.464Z] [cognitive] neutral  (189ms)\n[2026-08-26T02:12:07.613Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n",
+      "[2026-08-26T02:12:07.658Z] [player] attack with the off-hand bone crossbow\n[2026-08-26T02:12:07.659Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=3 hooks=1\n[2026-08-26T02:12:07.659Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-26T02:12:07.660Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T02:12:07.660Z] [debug] attack: status mods exhausted -2\n[2026-08-26T02:12:07.710Z] [world] You bring the acid-etched bone crossbow to bear on Eternal Dynasty Raider 2.\n[2026-08-26T02:12:07.710Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-26T02:12:07.892Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (181ms)\n[2026-08-26T02:12:17.095Z] [world] You seize the initiative. Eternal Dynasty Raider 2 has no time to react.\n[2026-08-26T02:12:17.095Z] [combat] You \u2014 d20 \u2192 2 + DEX 12 \u2212 1 (Whisper Fog) exhausted -2 = 11 vs Eternal Dynasty Raider 2 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-08-26T02:12:17.097Z] [combat] Piercing flares \u2014 +2 on hit (weak \u2014 bites deep!).\n[2026-08-26T02:12:17.097Z] [combat] Weakness exposed \u2014 Eternal Dynasty Raider 2 flinches. (piercing \u00d72.25 for 18)\n[2026-08-26T02:12:17.098Z] [combat] Your blow with the acid-etched bone crossbow lands clean \u2014 18 damage. Eternal Dynasty Raider 2 crumples in the dust. The Aetherstone settles.\n",
+      "[2026-08-26T02:12:17.099Z] [reward] Eternal Dynasty Raider 2 defeated. You recover Aether Residue \u00d72, Patched Cloth, Eternal Dynasty Sigil.\n[2026-08-26T02:12:17.100Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-08-26T02:12:17.100Z] [combat] 2 attackers remain. Eternal Dynasty Raider 4 now in your sights.\n",
+      "[2026-08-26T02:12:17.101Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-26T02:12:17.101Z] [reward] +14 TC pried from the dust.\n[2026-08-26T02:12:17.140Z] [arbiter] The Arbiter eyes your new pieces. \"You could make a Galvanic Paste now, if you wanted.\"\n",
+      "[2026-08-26T02:12:17.149Z] [combat] Eternal Dynasty Raider 5 \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:12:17.150Z] [combat] Eternal Dynasty Raider 4 \u2014 d20 \u2192 7 + ATK 6 = 13 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:12:21.236Z] [debug] ui: tap \"stealth\"\n[2026-08-26T02:12:21.247Z] [player] sneak\n",
+      "[2026-08-26T02:12:21.247Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=2 hooks=1\n[2026-08-26T02:12:21.305Z] [system] \u23f3 Time passed: 15 min\n[2026-08-26T02:12:21.483Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (176ms)\n[2026-08-26T02:12:23.041Z] [debug] skillcheck: stealth d20=13 STE 3 = 16 vs DC 12 \u2014 Hard \u2192 (resolved below)\n",
+      "[2026-08-26T02:12:23.127Z] [debug] stats: STR20 DEX12 INT10 WIS12 CHA12 STE3 | gear: STR+7,DEX+6,STE+2,WIS+1,CHA+1 | worn: main=Cantor's Tuning Fork off=Bone Crossbow head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring\n",
+      "[2026-08-26T02:12:23.127Z] [debug] train: stealth (stealth check) \u2192 progress 44/100\n[2026-08-26T02:12:23.127Z] [world] Dusk is with you \u2014 the silt eats sound after dark. (stealth +1, night)\n[2026-08-26T02:12:23.127Z] [world] You drop low and move quiet, closing on Eternal Dynasty Raider 4 unseen across the open ground. (+5 next attack)\n",
+      "[2026-08-26T02:12:23.128Z] [debug] stealth: opener carried by the skill roll (16 vs DC 12 \u2014 Hard) \u2014 UNSEEN\n[2026-08-26T02:12:24.352Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T02:12:24.396Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-26T02:12:24.397Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=2 hooks=1\n[2026-08-26T02:12:24.398Z] [debug] attack: target=Eternal Dynasty Raider 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-26T02:12:24.401Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-26T02:12:24.402Z] [debug] attack: status mods exhausted -2 \u00b7 stealthed +5\n[2026-08-26T02:12:24.450Z] [world] You bring the acid-etched bone crossbow to bear on Eternal Dynasty Raider 4.\n[2026-08-26T02:12:24.450Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:12:24.634Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (182ms)\n",
+      "[2026-08-26T02:12:24.857Z] [debug] persist sizes(KB): total=212 player=53 wm=74[rooms=29 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=5\n[2026-08-26T02:12:31.936Z] [world] Eternal Dynasty Raider 4 moves first. The pressure is immediate.\n[2026-08-26T02:12:31.938Z] [combat] Eternal Dynasty Raider 5 \u2014 d20 \u2192 6 + ATK 6 = 12 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-26T02:12:31.943Z] [combat] Eternal Dynasty Raider 4 \u2014 d20 \u2192 15 + ATK 6 = 21 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:12:31.943Z] [combat] You \u2014 d20 \u2192 11 + DEX 12 \u2212 1 (Whisper Fog) exhausted -2 stealthed +5 = 25 vs Eternal Dynasty Raider 4 AC 10 \u2014 \u2713 HIT\n[2026-08-26T02:12:31.944Z] [combat] Piercing flares \u2014 +2 on hit.\n",
+      "[2026-08-26T02:12:31.944Z] [combat] Eternal Dynasty Raider 4 folds under the acid-etched bone crossbow. 18 damage was enough. The room exhales.\n[2026-08-26T02:12:31.945Z] [reward] Eternal Dynasty Raider 4 defeated. You recover Aether Residue \u00d72, Patched Cloth.\n[2026-08-26T02:12:31.946Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+10 TC). The kit took the fight badly.\n",
+      "[2026-08-26T02:12:31.946Z] [combat] 1 attacker remains. Eternal Dynasty Raider 5 now in your sights.\n[2026-08-26T02:12:31.947Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-26T02:12:31.947Z] [system] \u25b2 Mud Monarchs now counts you TRUSTED \u2014 their counters take 10% off.\n[2026-08-26T02:12:31.947Z] [reward] +14 TC pried from the dust.\n",
+      "[2026-08-26T02:12:36.440Z] [debug] ui: tap \"dodge\"\n[2026-08-26T02:12:36.452Z] [player] dodge\n[2026-08-26T02:12:36.453Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1\n",
+      "[2026-08-26T02:12:36.454Z] [world] You commit to the dodge. Slip Eternal Dynasty Raider 5's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-26T02:12:36.515Z] [combat] Eternal Dynasty Raider 5 \u2014 d20 \u2192 17 + ATK 6 = 23 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-08-26T02:12:36.515Z] [combat] Dodge \u2014 d20 \u2192 12 + DEX 12 = 24 vs ATK 23. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-26T02:12:36.516Z] [debug] arbiter: template (reason=combat)\n[2026-08-26T02:12:36.516Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:12:36.516Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-26T02:12:36.704Z] [cognitive] neutral  (187ms)\n[2026-08-26T02:12:37.590Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T02:12:37.636Z] [player] attack with the off-hand bone crossbow\n[2026-08-26T02:12:37.637Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n",
+      "[2026-08-26T02:12:37.638Z] [debug] attack: target=Eternal Dynasty Raider 5 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-26T02:12:37.639Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T02:12:37.639Z] [debug] attack: status mods exhausted -2 \u00b7 perfect opening (2\u00d7 dice)\n",
+      "[2026-08-26T02:12:37.699Z] [world] You raise the acid-etched bone crossbow toward Eternal Dynasty Raider 5. The room narrows around the both of you.\n[2026-08-26T02:12:37.700Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:12:37.884Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (184ms)\n[2026-08-26T02:12:44.610Z] [world] Eternal Dynasty Raider 5 moves first. The pressure is immediate.\n",
+      "[2026-08-26T02:12:44.612Z] [combat] Eternal Dynasty Raider 5 \u2014 d20 \u2192 3 + ATK 6 = 9 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:12:44.612Z] [combat] You \u2014 d20 \u2192 12 + DEX 12 \u2212 1 (Whisper Fog) exhausted -2 perfect opening (2\u00d7 dice) = 21 vs Eternal Dynasty Raider 5 AC 10 \u2014 \u2713 HIT\n[2026-08-26T02:12:44.614Z] [combat] Piercing flares \u2014 +4 on hit.\n",
+      "[2026-08-26T02:12:44.617Z] [combat] You crack the Eternal Dynasty Raider 5 with the Acid-Etched Bone Crossbow for 16 \u2014 half their fight, gone in one blow. They crumple, out cold. (2/18 HP) Loot them before they come to.\n[2026-08-26T02:12:44.618Z] [combat] Nobody left standing \u2014 the fight is yours.\n",
+      "[2026-08-26T02:12:44.619Z] [reward] You strip the unconscious Eternal Dynasty Raider 5 \u2014 Cudgel, Reclaimer's Salvage Vest, Aether Residue, Patched Cloth, +18 TC. The gear's seen better days (worn from the fight).\n[2026-08-26T02:12:44.626Z] [combat] Acid-Etched Bone Crossbow \u2014 3 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-08-26T02:12:44.626Z] [arbiter] The Arbiter glances at you. \"Steady. Good. Tartaria rewards steady.\"\n[2026-08-26T02:12:44.626Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:12:47.851Z] [debug] ui: tap \"rest\"\n[2026-08-26T02:12:47.858Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-26T02:12:47.863Z] [player] rest\n",
+      "[2026-08-26T02:12:47.863Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T02:12:47.864Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 22, afternoon)\n[2026-08-26T02:12:47.868Z] [arbiter] The Arbiter goes still. \"It watched you sleep from the treeline and made up its mind about you.\"\n",
+      "[2026-08-26T02:12:47.868Z] [world] An Aetherbat rises out of the silt where you took it for a ridge. The rest is over.\n[2026-08-26T02:12:47.869Z] [debug] enemy: Aetherbat hp=19 ac=9 atk=Sonic Scream dmg=1D6 rarity=Common ap=4\n[2026-08-26T02:12:47.880Z] [debug] arbiter: template (reason=busy)\n[2026-08-26T02:12:47.880Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-26T02:12:47.881Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T02:12:48.072Z] [cognitive] REST  (191ms)\n[2026-08-26T02:12:55.373Z] [debug] ui: tap \"dodge\"\n[2026-08-26T02:12:55.378Z] [player] dodge\n[2026-08-26T02:12:55.378Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=far enemies=1 hooks=1\n",
+      "[2026-08-26T02:12:55.378Z] [world] You commit to the dodge. Slip Aetherbat's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-26T02:12:55.378Z] [combat] Aetherbat smokes \u2014 acid eats 3. (16/19 HP, 2 turns left)\n[2026-08-26T02:12:55.379Z] [combat] Aetherbat closes the distance.\n",
+      "[2026-08-26T02:12:55.379Z] [debug] arbiter: template (reason=combat)\n[2026-08-26T02:12:55.379Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:12:55.379Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:12:55.569Z] [cognitive] neutral  (189ms)\n",
+      "[2026-08-26T02:12:58.379Z] [debug] qwen\u23f1 ambient_fill preempted 10136ms read 4000ms/write 1162ms in 367t\u2192out 31t 10.9ms/t HIT-CAP (141ch)\n[2026-08-26T02:12:58.553Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 3568ms \u00b7 frames 0ms). Something blocked the JS thread \u2014 look for a long synchronous run.\n[2026-08-26T02:12:58.916Z] [debug] arbiter: ambient-fill banked (2/3) 11050ms\n",
+      "[2026-08-26T02:13:00.831Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T02:13:00.836Z] [system] dodging (parry) fades.\n[2026-08-26T02:13:00.880Z] [player] attack with the off-hand bone crossbow\n[2026-08-26T02:13:00.881Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n",
+      "[2026-08-26T02:13:00.881Z] [combat] Aetherbat smokes \u2014 acid eats 3. (13/19 HP, 1 turn left)\n[2026-08-26T02:13:00.882Z] [debug] attack: target=Aetherbat range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-26T02:13:00.883Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-26T02:13:00.933Z] [world] You commit forward with the acid-etched bone crossbow. Aetherbat watches your hands.\n[2026-08-26T02:13:00.933Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:13:01.110Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (176ms)\n",
+      "[2026-08-26T02:13:01.493Z] [debug] persist sizes(KB): total=212 player=54 wm=74[rooms=29 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=4\n[2026-08-26T02:13:03.567Z] [debug] freeze watch: recovered \u2014 painting again after 1300ms quiet.\n[2026-08-26T02:13:07.517Z] [world] You seize the initiative. Aetherbat has no time to react.\n",
+      "[2026-08-26T02:13:07.518Z] [combat] You \u2014 d20 \u2192 16 + DEX 12 \u2212 1 (Whisper Fog) = 27 vs Aetherbat AC 9 \u2014 \u2713 HIT\n[2026-08-26T02:13:07.519Z] [combat] The Acid-Etched coating fails to take on Aetherbat.\n[2026-08-26T02:13:07.520Z] [combat] Clean hit with the acid-etched bone crossbow for 6. Aetherbat has 7 left and does not back away.\n",
+      "[2026-08-26T02:13:07.520Z] [combat] Aetherbat stops \u2014 and the air in front of it thickens, faintly bright. An AETHER SHIELD stands where its swing should have been (+3 AC).\n[2026-08-26T02:13:08.132Z] [debug] ui: tap \"approach\"\n[2026-08-26T02:13:08.165Z] [player] approach Aetherbat\n",
+      "[2026-08-26T02:13:08.166Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetherbat resolved=Aetherbat range=mid enemies=1 hooks=1\n[2026-08-26T02:13:08.168Z] [debug] move: advance from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0\n[2026-08-26T02:13:08.169Z] [debug] move: field advance target=Aetherbat d 1.50->0.50 band mid->close\n",
+      "[2026-08-26T02:13:08.169Z] [world] You close the gap with Aetherbat. (range: close / arm's reach)\n[2026-08-26T02:13:08.169Z] [combat] Aetherbat smokes \u2014 acid eats 3. (4/19 HP, 0 turns left)\n[2026-08-26T02:13:08.169Z] [combat] Aetherbat shakes off the last of the acid \u2014 the Bone Crossbow has run its course.\n",
+      "[2026-08-26T02:13:08.170Z] [combat] Aetherbat \u2014 d20 \u2192 20 + ATK 5 = 25 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-08-26T02:13:08.379Z] [combat] Aetherbat deals 2 aetheric damage [armor \u221253%, plate \u22123, floor 30%]. You have 26 HP remaining.\n[2026-08-26T02:13:08.558Z] [cognitive] RETREAT \u00b7 USE_ITEM  (385ms)\n[2026-08-26T02:13:10.335Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-08-26T02:13:10.348Z] [player] dodge\n[2026-08-26T02:13:10.348Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resol"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbgrdejaghk [inline 7/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbgrdejaghk"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "7"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T11:52:56.206087Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T11:52:56.746000Z",
+  "fingerprints": [
+    "e8e673f89b7fba33114a17771ea49101"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "9ab58d9f39164e7a9a6827486c7a8a2e",
+  "previousEventID": "939c0ba80de84f18a5705ccfea7500cc"
+}
