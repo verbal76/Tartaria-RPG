@@ -1,2 +1,2 @@
-2026-08-27T00:38:11Z
-controlled test: owner started a NEW character (Quiet) and sent — tiny log, old one-envelope path
+sync 2026-08-27T01:20Z — first pull after OTA-1515 (the real-deadline fix) landed on device.
+Looking for player-log parts: game-log.partNNN-of-M.txt sharing one bundleId.
