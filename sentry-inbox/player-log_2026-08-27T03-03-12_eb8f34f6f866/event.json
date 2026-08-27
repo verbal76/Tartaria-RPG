@@ -1,0 +1,196 @@
+{
+  "id": "eb8f34f6f86647ce8b1e084d863390f4",
+  "groupID": "7694761507",
+  "eventID": "eb8f34f6f86647ce8b1e084d863390f4",
+  "projectID": "4511945117532160",
+  "size": 17894,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxu4o1qm9m [inline 14/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxu4o1qm9m [inline 14/23]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxu4o1qm9m [inline 14/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "15b51f4575bd4720814f03ecd3dcf9b7",
+      "span_id": "996fe59a0d2dccdd",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ring Paste range=- enemies=0 hooks=0\n[2026-08-22T01:07:07.006Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-22T01:07:07.017Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=Searing Paste range=- enemies=0 hooks=0\n[2026-08-22T01:07:07.022Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-22T01:07:07.034Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=Searing Paste range=- enemies=0 hooks=0\n[2026-08-22T01:07:07.039Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-22T01:07:07.039Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-22T01:07:07.051Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=Searing Paste range=- enemies=0 hooks=0\n[2026-08-22T01:07:07.057Z] [reward] \u2726 Crafted Searing Paste \u00d710. The Arbiter watches you set the last piece.\n[2026-08-22T01:07:07.117Z] [cognitive] neutral  (224ms)\n[2026-08-22T01:07:07.128Z] [cognitive] neutral  (209ms)\n",
+      "[2026-08-22T01:07:07.144Z] [cognitive] neutral  (206ms)\n[2026-08-22T01:07:07.154Z] [cognitive] neutral  (200ms)\n[2026-08-22T01:07:07.165Z] [cognitive] neutral  (193ms)\n[2026-08-22T01:07:07.172Z] [cognitive] neutral  (182ms)\n[2026-08-22T01:07:07.181Z] [debug] persist sizes(KB): total=189 player=52 wm=57[rooms=25 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=77 scene=3\n",
+      "[2026-08-22T01:07:07.204Z] [cognitive] neutral  (197ms)\n[2026-08-22T01:07:07.219Z] [cognitive] neutral  (195ms)\n[2026-08-22T01:07:07.228Z] [cognitive] neutral  (187ms)\n[2026-08-22T01:07:07.236Z] [cognitive] neutral  (178ms)\n[2026-08-22T01:07:09.795Z] [player] craft Acid Flask\n",
+      "[2026-08-22T01:07:09.795Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=0\n[2026-08-22T01:07:09.797Z] [reward] \u2726 Crafted Acid Flask. The Arbiter watches you set the last piece.\n[2026-08-22T01:07:09.797Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-22T01:07:09.863Z] [cognitive] neutral  (65ms)\n",
+      "[2026-08-22T01:07:24.620Z] [player] summon aether golem\n[2026-08-22T01:07:24.621Z] [debug] parser: intent=cast conf=1.00 verb=summon target=aether golem resolved=Aetheric Bolt Gun range=- enemies=0 hooks=0\n[2026-08-22T01:07:24.655Z] [reward] Aether Golem Constructor \u2014 d20 20 + INT 5 = 25 vs DC 19 \u2014 \u2713 SUMMONED\n[2026-08-22T01:07:24.656Z] [world] (2\u00d7 Aether Crystal + 1\u00d7 Aetheric Shard consumed.)\n",
+      "[2026-08-22T01:07:24.656Z] [world] Aetherstone lifts out of the ground and folds into a shape that walks. Aether Golem stands ready beside you. Your mastery shapes it stronger than most. (HP 44/44, 1d12 aetheric)\n[2026-08-22T01:07:24.656Z] [arbiter] The Arbiter studies the standing shape. \"You gave it life. You might as well give it a name.\"\n",
+      "[2026-08-22T01:07:24.657Z] [system] \u23f3 Time passed: 30 min\n[2026-08-22T01:07:24.786Z] [cognitive] USE_ITEM \u00b7 SEARCH  (127ms)\n[2026-08-22T01:07:36.487Z] [world] Pillar. The name takes hold in the Aetherstone.\n[2026-08-22T01:07:36.489Z] [arbiter] The Arbiter nods. \"Pillar, then.\"\n[2026-08-22T01:07:40.667Z] [debug] homework: intro-fill armed after 11534ms idle\n",
+      "[2026-08-22T01:07:45.956Z] [player] Ask about their trade\n[2026-08-22T01:07:45.958Z] [world] \"Wilderness kit,\" Bran says. \"Traps, feed, the sort of rope that does not mind being wet. And advice, free, which is that most animals out there want less to do with you than you think.\"\n",
+      "[2026-08-22T01:07:45.960Z] [world] Bran the Beastmaster drops their voice, though there is nobody in here but the two of you.\n[2026-08-22T01:07:47.188Z] [player] Ask about their people\n[2026-08-22T01:07:47.189Z] [world] \"Reclaimer, technically. Mostly I just live further out than the rest of them.\" He scratches a dog behind the ears. \"The Guild calls it a posting. It is a house.\"\n",
+      "[2026-08-22T01:07:47.190Z] [world] Bran the Beastmaster tests a coil of rope against their knee and keeps talking over the creak of it.\n[2026-08-22T01:07:48.140Z] [player] Ask what they really think\n[2026-08-22T01:07:48.142Z] [world] \"The animals changed faster than we did.\" Bran says it without drama. \"Three generations. That is all it took. I set traps my grandfather designed and they do not wor",
+      "k any more, because the things they were designed for have learned. We have not learned anything since the water.\"\n[2026-08-22T01:07:48.144Z] [world] Bran the Beastmaster keeps their voice low enough that it does not carry past the doorway.\n[2026-08-22T01:07:48.955Z] [player] Ask if anything out there is worth finding\n",
+      "[2026-08-22T01:07:48.956Z] [world] Bran thinks about it properly, which takes a while. \"East. Two days, maybe less if you push. There was a feed-store out that way and the roof went in on it.\" He scratches the dog. \"Everyone who passes it sees a hole in the ground. The floor held. Whatever went down with it is still under there and dry.\"\n",
+      "[2026-08-22T01:07:48.957Z] [reward] Bran the Beastmaster tells you where to look. (a lead \u2014 you'll turn it up when you next cross fresh ground)\n[2026-08-22T01:07:49.674Z] [player] Ask about the dogs\n[2026-08-22T01:07:49.675Z] [world] \"Strays, the lot of them. Or were.\" The nearest one thumps its tail at Bran's voice without opening its eyes. \"People think I collect them soft-heartedly. It is a wor",
+      "king arrangement \u2014 nothing on four legs crosses my fence line unannounced, and in exchange nobody here goes hungry or gets left out in the weather.\" He scratches an ear. \"Same deal I would take, honestly.\"\n[2026-08-22T01:07:49.858Z] [debug] persist sizes(KB): total=192 player=52 wm=59[rooms=25 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=78 scene=3\n",
+      "[2026-08-22T01:07:49.975Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9201ms read 7918ms/write 1234ms in 785t\u2192out 33t 10.1ms/t HIT-CAP (161ch)\n[2026-08-22T01:07:50.047Z] [debug] homework: scene_intro \"Samarran\" \u2713 9383ms\n[2026-08-22T01:07:50.289Z] [player] Ask for the advice that is not free\n",
+      "[2026-08-22T01:07:50.289Z] [world] \"That one costs a coin, and here it is: when something out there stands its ground instead of running, LOOK BEHIND YOU.\" Bran holds up a finger. \"Standing ground is a message to something else, nine times in ten. You are not the conversation. You are in the middle of it.\" He pockets the coin you did not remember agreeing to. \"Cheap at the price. That one has kept",
+      " me alive four times that I know of.\"\n[2026-08-22T01:07:50.907Z] [player] Ask about living out there\n[2026-08-22T01:07:50.908Z] [world] \"Quiet, which is not the same as silent.\" Bran thinks about it the way he thinks about everything, fully. \"A settlement is noise with no information in it. Out at mine, every sound is a sentence \u2014 what is moving, how big, whether it minds being heard.\" He nods at ",
+      "the dozing dogs. \"They read it all night so I can sleep. Then at dawn they tell me the headlines. Best neighbours I ever had.\"\n[2026-08-22T01:07:51.507Z] [player] Ask which animal changed most\n[2026-08-22T01:07:51.508Z] [world] \"The wasps.\" Not the answer you expected, and Bran knows it. \"Everyone says the big things \u2014 the boars, the hounds. But the mud wasps went from a nuisance to an ARCHITECTUR",
+      "E in my lifetime. Paper cities in the dead trees, galleried, vented, defended in shifts.\" He shakes his head slowly. \"My grandfather smoked them out of fence posts. I negotiate with them. I am not joking about the negotiating.\"\n[2026-08-22T01:07:52.123Z] [player] Ask who the second chair is for\n",
+      "[2026-08-22T01:07:52.124Z] [world] Bran looks at the chair like it might answer for him. \"Tamsin. My wife \u2014 still is, as far as either of us has said out loud.\" He fills the kettle, for something to do. \"She lasted eleven years out here. It was not the quiet that beat her, it was the winters of it. She lives at the settlement now, keeps the infirmary garden.\" A slow breath. \"We trade letters throu",
+      "gh Felra's stall and she visits when the road is dry. Some things do not break. They just... live at different distances. The chair stays.\"\n[2026-08-22T01:07:52.724Z] [player] Ask why he feeds strays\n[2026-08-22T01:07:52.725Z] [world] \"Because I was one.\" Bran says it without ceremony. \"After the water took my family's stead I was nine, and I was fed by a woman at a fence line who never once asked",
+      " my name or my story. Fed me a whole winter. She said feeding a stray is a bet the world places on itself.\" He sets down the bowl he has been holding. \"I have been paying her bet forward for forty years. Dogs, mostly. People, twice.\" He glances up. \"Three times, maybe. We will see how you turn out.\"\n[2026-08-22T01:07:53.325Z] [player] Ask what the learning means\n",
+      "[2026-08-22T01:07:53.327Z] [world] \"You remember what I said \u2014 three generations and my grandfather's traps stopped working.\" Bran stares into the fire a while. \"Here is the part that keeps me up. Learning that fast is not natural selection, it is TEACHING. Something is passing it along.\" The grey-muzzled dog lifts her head, reading his voice. \"I watched a boar sow walk her young around one of my ",
+      "snares last spring. Around it. In order. Like a lesson.\" He scratches the dog until she settles. \"We are not the only ones raising our children carefully any more. I have not decided how to feel about that.\"\n[2026-08-22T01:07:54.157Z] [player] Ask where he stopped setting traps\n",
+      "[2026-08-22T01:07:54.158Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old war",
+      "ren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:07:54.158Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n",
+      "[2026-08-22T01:07:57.443Z] [world] You let the conversation go and Bran the Beastmaster gets back to it.\n[2026-08-22T01:08:14.224Z] [reward] Sold Tartarian Claw Knife to Bran the Beastmaster for 14 TC. (255 TC on hand)\n[2026-08-22T01:08:14.258Z] [reward] Sold Mud Sledge to Bran the Beastmaster for 13 TC. (268 TC on hand)\n",
+      "[2026-08-22T01:08:14.279Z] [reward] Sold Bone Shortsword to Bran the Beastmaster for 13 TC. (281 TC on hand)\n[2026-08-22T01:08:14.299Z] [reward] Sold Bone Shiv to Bran the Beastmaster for 13 TC. (294 TC on hand)\n[2026-08-22T01:08:14.318Z] [reward] Sold Aetheric Bolt Gun to Bran the Beastmaster for 13 TC. (307 TC on hand)\n",
+      "[2026-08-22T01:08:14.337Z] [reward] Sold Plasma Dagger to Bran the Beastmaster for 12 TC. (319 TC on hand)\n[2026-08-22T01:08:14.355Z] [reward] Sold Mud-Warden's Vest to Bran the Beastmaster for 8 TC. (327 TC on hand)\n[2026-08-22T01:08:14.373Z] [reward] Sold Golem-Warden's Legplates to Bran the Beastmaster for 8 TC. (335 TC on hand)\n",
+      "[2026-08-22T01:08:14.391Z] [reward] Sold Titan's Swiftstep Boots to Bran the Beastmaster for 8 TC. (343 TC on hand)\n[2026-08-22T01:08:14.408Z] [reward] Sold Rough-Hewn Chestplate to Bran the Beastmaster for 8 TC. (351 TC on hand)\n[2026-08-22T01:08:14.425Z] [reward] Sold Rough Hewn Mask to Bran the Beastmaster for 6 TC. (357 TC on hand)\n",
+      "[2026-08-22T01:08:14.443Z] [reward] Sold Lost Seeker's Gloves to Bran the Beastmaster for 6 TC. (363 TC on hand)\n[2026-08-22T01:08:14.460Z] [reward] Sold Reclaimer's Cloak to Bran the Beastmaster for 6 TC. (369 TC on hand)\n[2026-08-22T01:08:14.477Z] [reward] Sold Architect's Aether Gloves to Bran the Beastmaster for 6 TC. (375 TC on hand)\n",
+      "[2026-08-22T01:08:14.494Z] [reward] Sold Rough-Hewn Gauntlets to Bran the Beastmaster for 6 TC. (381 TC on hand)\n[2026-08-22T01:08:15.066Z] [debug] persist sizes(KB): total=195 player=47 wm=63[rooms=25 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=82 scene=3\n",
+      "[2026-08-22T01:08:24.881Z] [reward] Bought the Mud-Iron Greatblade working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-08-22T01:08:26.691Z] [arbiter] Bran the Beastmaster taps the cold Crucible. \"Need at least 3 inferred items reserved for fusion (\u2665 in inventory). You have 2.\" No charge until you are ready.\n",
+      "[2026-08-22T01:08:41.995Z] [player] Ask where he stopped setting traps\n[2026-08-22T01:08:41.996Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everythin",
+      "g walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n",
+      "[2026-08-22T01:08:41.996Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:08:41.996Z] [world] Bran the Beastmaster tests a coil of rope against their knee and keeps talking over the creak of it.\n[2026-08-22T01:08:42.515Z] [debug] qwen\u23f1 flourish ok 1723ms read 1326ms/write 372ms in 127t\u2192out 12t 10.4ms/t (55ch)\n",
+      "[2026-08-22T01:08:42.610Z] [debug] flourish: \u2713 1927ms\n[2026-08-22T01:09:07.788Z] [world] You let the conversation go and Bran the Beastmaster gets back to it.\n[2026-08-22T01:09:10.993Z] [player] Ask where he stopped setting traps\n",
+      "[2026-08-22T01:09:10.995Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old war",
+      "ren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:10.997Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n",
+      "[2026-08-22T01:09:10.998Z] [world] Bran the Beastmaster tests a coil of rope against their knee and keeps talking over the creak of it.\n[2026-08-22T01:09:12.324Z] [player] Ask where he stopped setting traps\n",
+      "[2026-08-22T01:09:12.326Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everythin"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxu4o1qm9m [inline 14/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtaxu4o1qm9m"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "14"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T03:03:12.492074Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T03:03:12.692000Z",
+  "fingerprints": [
+    "e0f4cb018e4ab970e70b2d84412932d2"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "f5b34016637a4ba2bcf3703834b40066",
+  "previousEventID": "ea7c0399f836499ea578ba1d91284fc7"
+}

@@ -1,0 +1,196 @@
+{
+  "id": "91f532007efd4918bedc3b68a8666c4e",
+  "groupID": "7694761507",
+  "eventID": "91f532007efd4918bedc3b68a8666c4e",
+  "projectID": "4511945117532160",
+  "size": 17900,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxuqrhd0b3 [inline 14/22]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxuqrhd0b3 [inline 14/22]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxuqrhd0b3 [inline 14/22]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "cc12a2d0dc294ebe97ed7d29c7b7b84c",
+      "span_id": "af31e926665e7971",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:23:04.742Z] [debug] spawn: gear=[Architect's Mantle, Sentinel's Gauntlets, Order Letter-Opener] window=10\n[2026-08-19T22:23:04.744Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Ovik the Patient, wandering trader. Tap the vendor banner to trade.\n",
+      "[2026-08-19T22:23:04.752Z] [world] Rare workings for sale: Golem Sledge (200 TC), Gravity Pike (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-08-19T22:23:04.753Z] [world] You walk east. The ground here looks much like the ground behind you. You have lost track of distance.\n",
+      "[2026-08-19T22:23:04.754Z] [world] The thread you were following waits where you left it.\n[2026-08-19T22:23:04.754Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T22:23:04.755Z] [system] \u23f3 Time passed: 15 min\n[2026-08-19T22:23:04.841Z] [cognitive] neutral  (85ms)\n[2026-08-19T22:23:06.791Z] [debug] ui: tap \"SOUTH\"\n[2026-08-19T22:23:06.806Z] [player] go south\n",
+      "[2026-08-19T22:23:06.807Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:23:06.808Z] [world] You have no stamina left \u2014 you can't travel. Type 'rest' to recover (8h), then back to the road.\n[2026-08-19T22:23:06.808Z] [debug] arbiter: template (reason=sprinting)\n",
+      "[2026-08-19T22:23:06.809Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T22:23:06.809Z] [system] \u23f3 Time passed: 15 min\n[2026-08-19T22:23:06.912Z] [cognitive] neutral  (102ms)\n[2026-08-19T22:23:08.176Z] [debug] ui: tap \"rest\"\n[2026-08-19T22:23:08.184Z] [player] rest\n",
+      "[2026-08-19T22:23:08.185Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:23:08.186Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 3, night)\n[2026-08-19T22:23:08.186Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-19T22:23:08.186Z] [world] You roll up your bedroll and find a small object beneath it \u2014 a gift from the ground, in the buried country's way.\n[2026-08-19T22:23:08.194Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n[2026-08-19T22:23:08.194Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T22:23:08.195Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-08-19T22:23:08.289Z] [cognitive] REST  (93ms)\n[2026-08-19T22:23:08.993Z] [debug] ui: tap \"SOUTH\"\n[2026-08-19T22:23:09.026Z] [player] go south\n[2026-08-19T22:23:09.027Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:23:09.033Z] [debug] spawn: gear=[Lost Scholar's Robe, Cudgel] window=10\n",
+      "[2026-08-19T22:23:09.034Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Riska Panhandle, wandering trader. Tap the vendor banner to trade.\n[2026-08-19T22:23:09.042Z] [world] Rare workings for sale: Titanforged Gauntlets (500 TC), Titanforged Greaves (500 TC), Titanforged Mantle (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and ",
+      "patches up a hurt dog or golem \u2014 just ask.\n[2026-08-19T22:23:09.042Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n[2026-08-19T22:23:09.043Z] [world] You move south under a sky the color of rust. Whatever sun there was has been wrung out by the haze.\n",
+      "[2026-08-19T22:23:09.043Z] [world] The thread you were following waits where you left it.\n[2026-08-19T22:23:09.044Z] [debug] arbiter: template (reason=sprinting)\n[2026-08-19T22:23:09.044Z] [arbiter] The Arbiter glances at the south. \"The seneschal's ledger lies open to today. The page is already half full.\"\n[2026-08-19T22:23:09.045Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-19T22:23:09.124Z] [cognitive] neutral  (79ms)\n[2026-08-19T22:23:09.760Z] [debug] ui: tap \"SOUTH\"\n[2026-08-19T22:23:09.791Z] [player] go south\n[2026-08-19T22:23:09.792Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:23:09.799Z] [debug] spawn: gear=[Gale Binder, Aether-Weaver's Mantle, Crude Golem Pike] window=10\n",
+      "[2026-08-19T22:23:09.800Z] [world] You press south. Clouds drag along the horizon like silt in still water, slow and indifferent.\n[2026-08-19T22:23:09.801Z] [world] The thread you were following waits where you left it.\n[2026-08-19T22:23:09.801Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T22:23:09.802Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-19T22:23:09.888Z] [cognitive] neutral  (85ms)\n[2026-08-19T22:23:11.160Z] [debug] ui: tap \"rest\"\n[2026-08-19T22:23:11.168Z] [player] rest\n[2026-08-19T22:23:11.169Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:23:11.170Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 3, morning)\n",
+      "[2026-08-19T22:23:11.171Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T22:23:11.184Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T22:23:11.185Z] [system] \u23f3 Time passed: 8h\n[2026-08-19T22:23:11.274Z] [cognitive] REST  (88ms)\n[2026-08-19T22:23:11.960Z] [debug] ui: tap \"SOUTH\"\n[2026-08-19T22:23:11.993Z] [player] go south\n",
+      "[2026-08-19T22:23:11.994Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:23:12.000Z] [debug] spawn: gear=[Club] window=10\n[2026-08-19T22:23:12.001Z] [world] A leaning shack stands off the path here \u2014 weathered and quiet, a way in still clear. (Tap ENTER to step inside.)\n",
+      "[2026-08-19T22:23:12.002Z] [world] You walk south. The silence has the weight of old metal. Your breath is the only thing that disagrees.\n[2026-08-19T22:23:12.002Z] [world] The thread you were following waits where you left it.\n[2026-08-19T22:23:12.003Z] [system] \u23f3 Time passed: 15 min\n[2026-08-19T22:23:12.086Z] [cognitive] neutral  (82ms)\n",
+      "[2026-08-19T22:23:12.238Z] [debug] persist sizes(KB): total=127 player=18 wm=25[rooms=5 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=2\n[2026-08-19T22:23:12.977Z] [debug] ui: tap \"rest\"\n[2026-08-19T22:23:12.985Z] [player] rest\n[2026-08-19T22:23:12.986Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-19T22:23:12.988Z] [world] You rest for 8 hours. +4 stamina recovered. (Day 3, evening)\n[2026-08-19T22:23:12.988Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T22:23:13.003Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T22:23:13.004Z] [system] \u23f3 Time passed: 8h\n[2026-08-19T22:23:13.094Z] [cognitive] REST  (89ms)\n[2026-08-19T22:23:13.576Z] [debug] ui: tap \"NORTH\"\n",
+      "[2026-08-19T22:23:13.604Z] [player] go north\n[2026-08-19T22:23:13.605Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:23:13.612Z] [arbiter] The Arbiter, half to themselves: \"The Aether you breathe out here is the same Aether the pre-flood engineers stored. Most of it is theirs, leaking back.\"\n",
+      "[2026-08-19T22:23:13.612Z] [world] You walk north. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-19T22:23:13.613Z] [world] The thread you were following waits where you left it.\n[2026-08-19T22:23:13.613Z] [debug] arbiter: template (reason=sprinting)\n[2026-08-19T22:23:13.614Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-19T22:23:13.614Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T22:23:13.615Z] [system] \u23f3 Time passed: 15 min\n[2026-08-19T22:23:13.705Z] [cognitive] TRAVEL  (89ms)\n[2026-08-19T22:23:14.594Z] [debug] ui: tap \"rest\"\n[2026-08-19T22:23:14.605Z] [player] rest\n[2026-08-19T22:23:14.606Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-19T22:23:14.607Z] [world] You rest for 8 hours. +2 stamina recovered. (Day 4, night)\n[2026-08-19T22:23:14.607Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T22:23:14.617Z] [system] \u23f3 Time passed: 8h\n[2026-08-19T22:23:14.705Z] [cognitive] REST  (87ms)\n[2026-08-19T22:23:15.493Z] [debug] ui: tap \"SOUTH\"\n[2026-08-19T22:23:15.522Z] [player] go south\n",
+      "[2026-08-19T22:23:15.523Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:23:15.530Z] [world] A leaning shack stands off the path here \u2014 weathered and quiet, a way in still clear. (Tap ENTER to step inside.)\n",
+      "[2026-08-19T22:23:15.530Z] [world] You step south. Somewhere distant, something settles \u2014 a stone giving up, or a structure remembering it once stood.\n[2026-08-19T22:23:15.531Z] [world] The thread you were following waits where you left it.\n[2026-08-19T22:23:15.531Z] [debug] arbiter: template (reason=sprinting)\n",
+      "[2026-08-19T22:23:15.532Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T22:23:15.532Z] [system] \u23f3 Time passed: 15 min\n[2026-08-19T22:23:15.622Z] [cognitive] neutral  (88ms)\n[2026-08-19T22:23:16.711Z] [debug] ui: tap \"rest\"\n[2026-08-19T22:23:16.722Z] [player] rest\n",
+      "[2026-08-19T22:23:16.722Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:23:16.725Z] [world] You rest for 8 hours. +2 stamina recovered. (Day 4, morning)\n[2026-08-19T22:23:16.726Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T22:23:16.739Z] [system] \u23f3 Time passed: 8h\n[2026-08-19T22:23:16.845Z] [cognitive] REST  (106ms)\n",
+      "[2026-08-19T22:23:19.029Z] [debug] ui: tap \"SOUTH\"\n[2026-08-19T22:23:19.063Z] [player] go south\n[2026-08-19T22:23:19.064Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:23:19.070Z] [debug] spawn: gear=[Arcane Weaver's Grip, Bone Shiv (Stealth), Seer's Veil of the Aether] window=10\n",
+      "[2026-08-19T22:23:19.073Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n[2026-08-19T22:23:19.073Z] [arbiter] This is one of the Aetherkin, then \u2014 not a story after all. The dead of old Tartaria, still walking because the Aether in them never stopped.\n",
+      "[2026-08-19T22:23:19.074Z] [world] In life it was a bell-ringer, shoulders rounded from a rope pulled ten thousand times \u2014 the set of the jaw is close enough to a portrait you saw once in a flooded hall. Something you stirred woke the Aetherstone that held them; now they're awake and out.\n",
+      "[2026-08-19T22:23:19.074Z] [world] It flinches from you and puts its back to the wall, hands raised \u2014 not a hunter, just something frightened that has forgotten everything except how to be afraid.\n[2026-08-19T22:23:19.074Z] [world] You push south. The wind has a voice today; mostly it just murmurs old syllables you don't quite catch.\n",
+      "[2026-08-19T22:23:19.075Z] [world] The thread you were following waits where you left it.\n[2026-08-19T22:23:19.075Z] [debug] arbiter: template (reason=combat)\n[2026-08-19T22:23:19.075Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T22:23:19.076Z] [system] \u23f3 Time passed: 15 min\n[2026-08-19T22:23:19.181Z] [cognitive] neutral  (105ms)\n",
+      "[2026-08-19T22:23:20.994Z] [debug] ui: tap \"flee\"\n[2026-08-19T22:23:21.003Z] [player] flee\n[2026-08-19T22:23:21.004Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=1\n[2026-08-19T22:23:21.041Z] [system] \u23f3 Time passed: 15 min\n[2026-08-19T22:23:21.131Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (89ms)\n",
+      "[2026-08-19T22:23:21.290Z] [debug] persist sizes(KB): total=127 player=18 wm=25[rooms=5 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=3\n[2026-08-19T22:23:22.575Z] [debug] skillcheck: escape d20=20 DEX 6 = 26 vs Pursuit 13 \u2014 Mud-Wracked Aetherkin (d20 11 + SPD 2) \u2192 PASS\n",
+      "[2026-08-19T22:23:22.612Z] [debug] stats: STR9 DEX7 INT4 WIS1 CHA5 STE1 | gear: DEX+5,STR+3,STE+1 | worn: main=Bolt-Caster off=Mud Heater Sword head=Sentinel's Faceguard hands=Wanderer's Worn Gauntlets legs=Architect's Leg Enhancers feet=Architect's Aetheric Boots cloak=Wanderer's Outercoat\n[2026-08-19T22:23:22.612Z] [debug] train: dexterity (escape check) \u2192 progress 12/100\n",
+      "[2026-08-19T22:23:22.613Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-08-19T22:23:22.614Z] [arbiter] The Arbiter looks around. \"The toll is small and the logging is the point. Someone always knows who went down the road.\"\n[2026-08-19T22:23:27.331Z] [debug] ui: tap \"SOUTH\"\n[2026-08-19T22:23:27.361Z] [player] go south\n",
+      "[2026-08-19T22:23:27.362Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:23:27.368Z] [debug] spawn: gear=[Titan's Forehead Guard, Stone-Strider Boots] window=10\n[2026-08-19T22:23:27.374Z] [world] You head south. The air smells like wet iron and forge ash. Tartaria's signature.\n",
+      "[2026-08-19T22:23:27.375Z] [world] A natural cave mouth, low, half-curtained by a tarp pulled aside. Inside: a cold cookfire, three bedrolls, a strongbox kicked open in haste. Someone left in a hurry \u2014 but someone else is on their way back, and you can hear footsteps in the throat of the cave behind you.\n",
+      "[2026-08-19T22:23:27.376Z] [world] Scratched on the cave wall: a tally of marks in three colours. Whatever they were counting, the count was high.\n[2026-08-19T22:23:27.376Z] [reward] \u2726 Recovered Trail Rations x3.\n",
+      "[2026-08-19T22:23:27.377Z] [combat] Mud Monarch steps out of the shadows of the place \u2014 Royal Slash ready, 3D6 damage on a hit. The loot you found will leave with whoever walks out alive. (range: close)\n[2026-08-19T22:23:27.383Z] [world] The thread you were following waits where you left it.\n[2026-08-19T22:23:27.383Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-19T22:23:27.489Z] [cognitive] neutral  (104ms)\n[2026-08-19T22:23:29.164Z] [debug] ui: tap \"flee\"\n[2026-08-19T22:23:29.172Z] [player] flee\n[2026-08-19T22:23:29.173Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-19T22:23:29.207Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-19T22:23:29.296Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (88ms)\n[2026-08-19T22:23:30.832Z] [debug] skillcheck: escape d20=8 DEX 6 = 14 vs Pursuit 19 \u2014 Mud Monarch (d20 12 + SPD 7) \u2192 FAIL\n[2026-08-19T22:23:30.847Z] [debug] stats: STR9 DEX7 INT4 WIS1 CHA5 STE1 | gear: DEX+5,STR+3,STE+1 | worn: main=Bolt-Caster off=Mud Heater Sword head=Sentinel's Faceguard hands=Wanderer's Worn Gauntlets legs=A",
+      "rchitect's Leg Enhancers feet=Architect's Aetheric Boots cloak=Wanderer's Outercoat\n[2026-08-19T22:23:30.848Z] [world] You break to run \u2014 and turning your back hands them the opening. Try 'dodge' to set a parry, 'attack' to commit, or another 'retreat' to break contact.\n[2026-08-19T22:23:30.849Z] [combat] Mud Monarch \u2014 d20 \u2192 8 + ATK 8 = 16 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-19T22:2"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxuqrhd0b3 [inline 14/22]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtaxuqrhd0b3"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "part",
+      "value": "14"
+    },
+    {
+      "key": "parts",
+      "value": "22"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T03:03:41.032408Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T03:03:41.335000Z",
+  "fingerprints": [
+    "e0f4cb018e4ab970e70b2d84412932d2"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "92f19fcc58dd4b4f87c5a2c6c5e475fd",
+  "previousEventID": "7da00874ba28416cb17d0d87f004f8c4"
+}

@@ -1,0 +1,196 @@
+{
+  "id": "2b84626df72b43d88ca5ac70c932618e",
+  "groupID": "7694761507",
+  "eventID": "2b84626df72b43d88ca5ac70c932618e",
+  "projectID": "4511945117532160",
+  "size": 17905,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxut1k7apv [inline 18/22]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxut1k7apv [inline 18/22]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxut1k7apv [inline 18/22]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "cc12a2d0dc294ebe97ed7d29c7b7b84c",
+      "span_id": "af31e926665e7971",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "rb=craft target=pulse scanner resolved=- range=- enemies=0 hooks=2\n[2026-08-20T00:21:32.587Z] [reward] \u2726 Crafted Pulse Scanner. The Arbiter watches you set the last piece.\n[2026-08-20T00:21:32.587Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-20T00:21:32.629Z] [cognitive] neutral  (40ms)\n[2026-08-20T00:21:34.540Z] [player] craft Aetheric Scanner\n",
+      "[2026-08-20T00:21:34.540Z] [debug] parser: intent=craft conf=1.00 verb=craft target=aetheric scanner resolved=- range=- enemies=0 hooks=2\n[2026-08-20T00:21:34.542Z] [reward] \u2726 Crafted Aetheric Scanner. The Arbiter watches you set the last piece.\n[2026-08-20T00:21:34.542Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-20T00:21:34.600Z] [cognitive] USE_ITEM  (56ms)\n",
+      "[2026-08-20T00:21:40.119Z] [debug] ui: tap \"more \u25be\"\n[2026-08-20T00:21:41.554Z] [debug] ui: tap \"inventory\"\n[2026-08-20T00:21:41.893Z] [debug] persist sizes(KB): total=129 player=22 wm=28[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=77 scene=2\n[2026-08-20T00:21:53.701Z] [debug] qwen\u23f1 item_synthesis_hw ok 6005ms read 5041ms/write 939ms in 330t\u2192out 29t 15.3ms/t (121ch)\n",
+      "[2026-08-20T00:21:53.707Z] [debug] homework: item_desc \"Mud-fist Wraps\" \u2713 6017ms\n[2026-08-20T00:22:05.609Z] [debug] stats: STR10 DEX6 INT4 WIS2 CHA5 STE1 | gear: DEX+4,STR+4,STE+1 | worn: main=Mud-fist Wraps off=Mud Heater Sword head=Sentinel's Faceguard hands=Wanderer's Worn Gauntlets legs=Architect's Leg Enhancers feet=Architect's Aetheric Boots cloak=Wanderer's Outercoat\n",
+      "[2026-08-20T00:22:19.863Z] [debug] qwen\u23f1 item_synthesis_hw ok 2152ms read 437ms/write 1679ms in 334t\u2192out 48t 1.3ms/t (175ch)\n[2026-08-20T00:22:19.879Z] [debug] homework: item_desc \"Aetheric Vision Lens\" \u2713 2183ms\n",
+      "[2026-08-20T00:22:23.311Z] [debug] stats: STR9 DEX7 INT4 WIS2 CHA5 STE1 | gear: DEX+5,STR+3,STE+1 | worn: main=Mud-fist Wraps off=Bolt-Caster head=Sentinel's Faceguard hands=Wanderer's Worn Gauntlets legs=Architect's Leg Enhancers feet=Architect's Aetheric Boots cloak=Wanderer's Outercoat\n",
+      "[2026-08-20T00:22:31.179Z] [debug] stats: STR10 DEX7 INT4 WIS2 CHA5 STE1 | gear: DEX+5,STR+4,STE+1 | worn: main=Mud-fist Wraps off=Bolt-Caster head=Sentinel's Faceguard chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Architect's Leg Enhancers feet=Architect's Aetheric Boots cloak=Wanderer's Outercoat\n[2026-08-20T00:22:34.268Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-20T00:22:35.837Z] [world] You take the Mud Knife from where it lay.\n[2026-08-20T00:22:35.839Z] [reward] \u2726 Mud Knife (Common).\n[2026-08-20T00:22:35.857Z] [world] You take the Shaman's Warden Gloves from where it lay.\n[2026-08-20T00:22:35.857Z] [reward] \u2726 Shaman's Warden Gloves (Common).\n[2026-08-20T00:22:36.667Z] [world] You take the Scrap Metal from where it lay.\n",
+      "[2026-08-20T00:22:36.667Z] [reward] \u2726 Scrap Metal (Common).\n[2026-08-20T00:22:37.581Z] [world] You break the crate apart. Among the pieces, something worth keeping.\n[2026-08-20T00:22:37.582Z] [world] You work the marker apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-08-20T00:22:37.582Z] [world] You break the snare pit apart. Among the pieces, something worth keeping.\n[2026-08-20T00:22:37.583Z] [reward] \u2726 Salvage haul:\n[2026-08-20T00:22:37.583Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-08-20T00:22:37.583Z] [reward]     \u2022 Frayed Rigging Twine (Common)\n[2026-08-20T00:22:37.584Z] [reward]     \u2022 Spider Silk (Common)\n",
+      "[2026-08-20T00:22:42.018Z] [debug] ui: tap \"SOUTH\"\n[2026-08-20T00:22:42.053Z] [player] go south\n[2026-08-20T00:22:42.054Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=2\n[2026-08-20T00:22:42.055Z] [world] You have no stamina left \u2014 you can't travel. Type 'rest' to recover (8h), then back to the road.\n",
+      "[2026-08-20T00:22:42.056Z] [system] \u23f3 Time passed: 15 min\n[2026-08-20T00:22:42.145Z] [cognitive] neutral  (87ms)\n[2026-08-20T00:22:43.486Z] [debug] ui: tap \"rest\"\n[2026-08-20T00:22:43.496Z] [player] rest\n[2026-08-20T00:22:43.496Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-08-20T00:22:43.498Z] [world] Corbel circles three times and curls beside you. Her breathing slows to yours.\n[2026-08-20T00:22:43.499Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 5, afternoon)\n[2026-08-20T00:22:43.501Z] [world] Wind in the silt overnight. Patterns in the mud around your camp \u2014 boot prints not yours, walked around you and away.\n",
+      "[2026-08-20T00:22:43.511Z] [debug] arbiter: template (reason=busy)\n[2026-08-20T00:22:43.511Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-20T00:22:43.512Z] [system] \u23f3 Time passed: 8h\n[2026-08-20T00:22:43.513Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n",
+      "[2026-08-20T00:22:43.513Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"There's coin on the board for a willing blade,\" the Arbiter\u2026\"\n[2026-08-20T00:22:43.611Z] [cognitive] REST  (98ms)\n[2026-08-20T00:22:43.764Z] [debug] persist sizes(KB): total=131 player=22 wm=29[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=77 scene=2\n[2026-08-20T00:22:44.453Z] [debug] ui: tap \"EAST\"\n",
+      "[2026-08-20T00:22:44.484Z] [player] go east\n[2026-08-20T00:22:44.485Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=2\n[2026-08-20T00:22:44.491Z] [debug] spawn: gear=[Mud Sledge, Architect's Mask of Vision, Salvaged Bow] window=10\n",
+      "[2026-08-20T00:22:44.492Z] [world] You walk east. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-20T00:22:44.493Z] [world] The thread you were following waits where you left it.\n[2026-08-20T00:22:44.494Z] [system] \u23f3 Time passed: 15 min\n[2026-08-20T00:22:47.402Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-20T00:22:47.717Z] [debug] qwen\u23f1 ambient_fill preempted 4112ms read 0ms/write 0ms in 352t\u2192out 0t 0.0ms/t (0ch)\n[2026-08-20T00:22:47.794Z] [debug] arbiter: ambient-fill \u2205 4294ms\n[2026-08-20T00:22:47.794Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient_fill after 4112ms \u2014 ambient:fill-\u2205\n[2026-08-20T00:22:47.865Z] [cognitive] neutral  (3370ms)\n",
+      "[2026-08-20T00:22:49.247Z] [world] You take the Mud Sledge from where it lay.\n[2026-08-20T00:22:49.248Z] [reward] \u2726 Mud Sledge (Common).\n[2026-08-20T00:22:49.260Z] [world] You take the Salvaged Bow from where it lay.\n[2026-08-20T00:22:49.260Z] [reward] \u2726 Salvaged Bow (Common).\n[2026-08-20T00:22:49.264Z] [world] You take the Architect's Mask of Vision from where it lay.\n",
+      "[2026-08-20T00:22:49.264Z] [reward] \u2726 Architect's Mask of Vision (Common).\n[2026-08-20T00:22:50.254Z] [reward] \u2726 Found Entry 5 \u2014 Aetheric Rot \u2014 The Greedy Reclaimer. (open Contracts \u2192 Collectibles to read)\n[2026-08-20T00:22:50.262Z] [world] You break the cart down. Among the pieces, a fragment of someone's writing \u2014 held against the world by stubbornness alone.\n",
+      "[2026-08-20T00:22:50.262Z] [world] The posting yields little of value, though a Cloth Scrap ends up in your pack.\n[2026-08-20T00:22:50.262Z] [world] You break the snare pit apart. Among the pieces, something worth keeping.\n[2026-08-20T00:22:50.262Z] [reward] \u2726 Salvage haul:\n[2026-08-20T00:22:50.263Z] [reward]     \u2022 Cloth Scrap (Common)\n",
+      "[2026-08-20T00:22:50.263Z] [reward]     \u2022 Spider Silk (Common)\n[2026-08-20T00:22:54.690Z] [debug] ui: tap \"EAST\"\n[2026-08-20T00:22:54.721Z] [player] go east\n[2026-08-20T00:22:54.722Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=2\n[2026-08-20T00:22:54.729Z] [debug] spawn: gear=[Repeater Rifle, Wanderer's Worn Gauntlets] window=10\n",
+      "[2026-08-20T00:22:54.730Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n[2026-08-20T00:22:54.731Z] [world] You push east. The silt is heavy underfoot, the horizon unchanged.\n[2026-08-20T00:22:54.731Z] [world] The thread you were following waits where you left it.\n",
+      "[2026-08-20T00:22:54.732Z] [system] \u23f3 Time passed: 15 min\n[2026-08-20T00:22:54.830Z] [cognitive] neutral  (97ms)\n[2026-08-20T00:23:11.892Z] [debug] persist sizes(KB): total=131 player=23 wm=28[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=77 scene=3\n[2026-08-20T00:23:16.302Z] [debug] appstate: active \u2192 background (was active for 278834ms)\n",
+      "[2026-08-20T00:23:16.482Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-20T03:26:53.527Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01c73-c293-77e5-832b-cc7dd7a7d4f8\n[2026-08-20T03:26:53.527Z] [debug] ota: Checking\u2026\n[2026-08-20T03:26:54.362Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n",
+      "[2026-08-20T03:26:54.447Z] [debug] ota: Saving progress\u2026\n[2026-08-20T03:26:54.447Z] [debug] ota: Restarting to apply\u2026\n[2026-08-20T03:26:54.499Z] [debug] ota: boot check result = applied\n[2026-08-20T03:26:54.608Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01d02-3001-75ef-b640-ec94297523e9\n[2026-08-20T03:26:54.608Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-20T03:26:54.695Z] [debug] ota: Already up to date\n[2026-08-20T03:26:54.696Z] [debug] ota: boot check result = noUpdate\n[2026-08-20T03:26:54.712Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-20T03:26:54.712Z] [debug] voice: bundled idle\n[2026-08-20T03:26:59.411Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-08-20T03:27:00.824Z] [debug] appstate: active \u2192 background (was active for 1386ms)\n[2026-08-20T03:38:52.080Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01d02-3001-75ef-b640-ec94297523e9\n[2026-08-20T03:38:52.080Z] [debug] ota: Checking\u2026\n[2026-08-20T03:38:52.138Z] [debug] ota: Already up to date\n",
+      "[2026-08-20T03:38:52.138Z] [debug] ota: boot check result = noUpdate\n[2026-08-20T03:38:52.193Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-20T03:38:52.194Z] [debug] voice: bundled idle\n[2026-08-20T03:38:56.798Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-20T03:38:57.449Z] [debug] appstate: active \u2192 background (was active for 641ms)\n",
+      "[2026-08-21T12:59:48.325Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01d02-3001-75ef-b640-ec94297523e9\n[2026-08-21T12:59:48.325Z] [debug] ota: Checking\u2026\n[2026-08-21T12:59:49.386Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-21T12:59:49.474Z] [debug] ota: Saving progress\u2026\n",
+      "[2026-08-21T12:59:49.474Z] [debug] ota: Restarting to apply\u2026\n[2026-08-21T12:59:49.543Z] [debug] ota: boot check result = applied\n[2026-08-21T12:59:49.660Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a0201a-2bb1-71e0-ab9b-808f8426a80e\n[2026-08-21T12:59:49.660Z] [debug] ota: Checking\u2026\n[2026-08-21T12:59:50.042Z] [debug] ota: Already up to date\n",
+      "[2026-08-21T12:59:50.042Z] [debug] ota: boot check result = noUpdate\n[2026-08-21T12:59:50.076Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-21T12:59:50.077Z] [debug] voice: bundled idle\n[2026-08-21T12:59:54.665Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-21T13:00:02.532Z] [debug] appstate: active \u2192 background (was active for 7858ms)\n",
+      "[2026-08-21T13:00:02.663Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-21T13:02:59.943Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a0201a-2bb1-71e0-ab9b-808f8426a80e\n[2026-08-21T13:02:59.943Z] [debug] ota: Checking\u2026\n[2026-08-21T13:03:00.111Z] [debug] ota: Already up to date\n[2026-08-21T13:03:00.112Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-21T13:03:00.134Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-21T13:03:00.135Z] [debug] voice: bundled idle\n[2026-08-21T13:03:04.347Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-21T13:03:13.682Z] [debug] appstate: active \u2192 background (was active for 9314ms)\n",
+      "[2026-08-21T13:20:33.728Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a0201a-2bb1-71e0-ab9b-808f8426a80e\n[2026-08-21T13:20:33.728Z] [debug] ota: Checking\u2026\n[2026-08-21T13:20:33.858Z] [debug] ota: Already up to date\n[2026-08-21T13:20:33.858Z] [debug] ota: boot check result = noUpdate\n[2026-08-21T13:20:33.878Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-21T13:20:33.878Z] [debug] voice: bundled idle\n[2026-08-21T13:20:36.902Z] [debug] OTA session start: 2026-08-20-1393-slice-two-the-engines-move-down.\n[2026-08-21T13:20:36.902Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n",
+      "[2026-08-21T13:20:36.902Z] [world] The wind has shifted while you were away. The Aetheric haze sits a little thicker on the horizon now.\n[2026-08-21T13:20:36.911Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cinderbound. I kept watch while you were gone. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n",
+      "[2026-08-21T13:20:38.377Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-21T13:20:43.316Z] [debug] appstate: active \u2192 background (was active for 4826ms)\n[2026-08-21T13:20:43.474Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-21T13:20:47.389Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-21T13:20:47.389Z] [debug] appstate: background \u2192 active (was background for 4073ms)\n[2026-08-21T13:20:55.408Z] [debug] qwen: re-warming after 8000ms settled foreground\n",
+      "[2026-08-21T13:20:55.960Z] [debug] ctx: OPENED \u2014 live=1 (opened=2 released=1) \u2248425MB est\n[2026-08-21T13:21:02.468Z] [debug] appstate: active \u2192 background (was active for 6505ms)\n[2026-08-21T13:21:02.661Z] [debug] ctx: RELEASED \u2014 live=0 (opened=2 released=2)\n[2026-08-21T14:18:06.812Z] [debug] appstate: background \u2192 active (was background for 3424340ms)\n",
+      "[2026-08-21T14:18:13.954Z] [debug] OTA session start: 2026-08-20-1393-slice-two-the-engines-move-down.\n[2026-08-21T14:18:13.954Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-08-21T14:18:13.954Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cinderbound. The buried country is no place to walk alone.\"\n",
+      "[2026-08-21T14:18:14.823Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-21T14:18:15.867Z] [debug] ctx: OPENED \u2014 live=1 (opened=3 released=2) \u2248425MB est\n[2026-08-21T14:18:18.060Z] [debug] ui: tap \"take / salvage\"\n[2026-08-21T14:18:19.251Z] [world] You take the Repeater Rifle from where it lay.\n[2026-08-21T14:18:19.252Z] [reward] \u2726 Repeater Rifle (Common).\n",
+      "[2026-08-21T14:18:19.267Z] [world] You take the Wanderer's Worn Gauntlets from where it lay.\n[2026-08-21T14:18:19.267Z] [reward] \u2726 Wanderer's Worn Gauntlets (Common).\n[2026-08-21T14:18:19.515Z] [debug] persist sizes(KB): total=135 player=26 wm=29[rooms=6 events=0 memos=0 npcs=1 de"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxut1k7apv [inline 18/22]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtaxut1k7apv"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "part",
+      "value": "18"
+    },
+    {
+      "key": "parts",
+      "value": "22"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T03:03:44.017210Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T03:03:44.277000Z",
+  "fingerprints": [
+    "e0f4cb018e4ab970e70b2d84412932d2"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "3230a2a75e4d4cb0a5e670300ca8fb8f",
+  "previousEventID": "27bc0129a10d47c2b49e113c7c2c4063"
+}

@@ -1,0 +1,199 @@
+{
+  "id": "bfb01910092447c6b6bb7d94d3272b8c",
+  "groupID": "7694761507",
+  "eventID": "bfb01910092447c6b6bb7d94d3272b8c",
+  "projectID": "4511945117532160",
+  "size": 17875,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxut1k7apv [inline 21/22]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxut1k7apv [inline 21/22]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxut1k7apv [inline 21/22]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "cc12a2d0dc294ebe97ed7d29c7b7b84c",
+      "span_id": "af31e926665e7971",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "[debug] appstate: active \u2192 background (was active for 4406ms)\n[2026-08-24T17:12:27.860Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a034b1-0310-7227-9e4a-6f346b6abb92\n[2026-08-24T17:12:27.860Z] [debug] ota: Checking\u2026\n[2026-08-24T17:12:27.999Z] [debug] ota: Already up to date\n[2026-08-24T17:12:27.999Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-24T17:12:28.024Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-24T17:12:28.024Z] [debug] voice: bundled idle\n[2026-08-24T17:12:32.645Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-24T17:12:48.709Z] [debug] OTA applied: 2026-08-23-1446-the-sign-below-the-emblem \u2192 2026-08-24-1489-one-tap-instead-of-four-slices.\n",
+      "[2026-08-24T17:12:48.709Z] [debug] OTA session start: 2026-08-24-1489-one-tap-instead-of-four-slices.\n[2026-08-24T17:12:48.710Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n",
+      "[2026-08-24T17:12:48.710Z] [world] Word reaches you: a roadside trader changed routes while you were elsewhere. The next time you cross the right tile, look for a stall you didn't see before.\n[2026-08-24T17:12:48.715Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cinderbound. The buried country is no place to walk alone. The waste did not sleep while you were gone \u2014 blood was spilled and ",
+      "ground changed hands. Read the World for the account.\"\n[2026-08-24T17:12:57.025Z] [debug] appstate: active \u2192 background (was active for 24372ms)\n[2026-08-24T17:20:49.204Z] [debug] appstate: background \u2192 active (was background for 472177ms)\n[2026-08-24T17:21:02.456Z] [debug] appstate: active \u2192 background (was active for 13254ms)\n",
+      "[2026-08-24T17:21:40.074Z] [debug] appstate: background \u2192 active (was background for 37618ms)\n[2026-08-24T17:21:46.880Z] [debug] appstate: active \u2192 background (was active for 6805ms)\n[2026-08-24T17:49:43.816Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a034b1-0310-7227-9e4a-6f346b6abb92\n[2026-08-24T17:49:43.816Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-24T17:49:44.995Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-24T17:49:45.083Z] [debug] ota: Saving progress\u2026\n[2026-08-24T17:49:45.084Z] [debug] ota: Restarting to apply\u2026\n[2026-08-24T17:49:45.330Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a034df-13e2-7c91-b108-afa0cce467d6\n",
+      "[2026-08-24T17:49:45.330Z] [debug] ota: Checking\u2026\n[2026-08-24T17:49:45.427Z] [debug] ota: Already up to date\n[2026-08-24T17:49:45.427Z] [debug] ota: boot check result = noUpdate\n[2026-08-24T17:49:45.453Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-24T17:49:45.453Z] [debug] voice: bundled idle\n",
+      "[2026-08-24T17:49:49.377Z] [debug] OTA applied: 2026-08-24-1489-one-tap-instead-of-four-slices \u2192 2026-08-24-1491-two-taps-to-load.\n[2026-08-24T17:49:49.377Z] [debug] OTA session start: 2026-08-24-1491-two-taps-to-load.\n[2026-08-24T17:49:49.377Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n",
+      "[2026-08-24T17:49:49.378Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cinderbound. The road kept your place.\"\n[2026-08-24T17:49:50.357Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-24T17:50:17.148Z] [debug] OTA session start: 2026-08-24-1491-two-taps-to-load.\n",
+      "[2026-08-24T17:50:17.148Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-08-24T17:50:17.148Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Cinderbound. I wondered when you'd take up the thread again.\"\n",
+      "[2026-08-25T23:10:50.524Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a034df-13e2-7c91-b108-afa0cce467d6\n[2026-08-25T23:10:50.524Z] [debug] ota: Checking\u2026\n[2026-08-25T23:10:51.397Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-25T23:10:51.515Z] [debug] ota: Saving progress\u2026\n",
+      "[2026-08-25T23:10:51.517Z] [debug] ota: Restarting to apply\u2026\n[2026-08-25T23:10:51.598Z] [debug] ota: boot check result = applied\n[2026-08-25T23:10:51.761Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a03ae4-65ef-7bc3-b9d6-f52ae20a3607\n[2026-08-25T23:10:51.761Z] [debug] ota: Checking\u2026\n[2026-08-25T23:10:51.992Z] [debug] ota: Already up to date\n",
+      "[2026-08-25T23:10:51.992Z] [debug] ota: boot check result = noUpdate\n[2026-08-25T23:10:52.022Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-25T23:10:52.023Z] [debug] voice: bundled idle\n[2026-08-25T23:10:56.481Z] [debug] OTA applied: 2026-08-24-1491-two-taps-to-load \u2192 2026-08-25-1502-the-swipe-is-the-selector.\n",
+      "[2026-08-25T23:10:56.481Z] [debug] OTA session start: 2026-08-25-1502-the-swipe-is-the-selector.\n[2026-08-25T23:10:56.481Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-08-25T23:10:56.481Z] [world] The wind has shifted while you were away. The Aetheric haze sits a little thicker on the horizon now.\n",
+      "[2026-08-25T23:10:56.488Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cinderbound. The road kept your place. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n",
+      "[2026-08-25T23:10:56.664Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-25T23:10:56.660Z \u00b7 build 2026-08-25-1502-the-swipe-is-the-selector \u00b7 updated from 2026-08-24-1491-two-taps-to-load \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-25T23:10:59.995Z] [debug] send-log: FAILED - envelope did not go out\n[2026-08-25T23:11:01.544Z] [debug] send-log: flushed to Sentry\n",
+      "[2026-08-25T23:31:33.913Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a03ae4-65ef-7bc3-b9d6-f52ae20a3607\n[2026-08-25T23:31:33.913Z] [debug] ota: Checking\u2026\n[2026-08-25T23:31:35.120Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-25T23:31:35.236Z] [debug] ota: Saving progress\u2026\n",
+      "[2026-08-25T23:31:35.237Z] [debug] ota: Restarting to apply\u2026\n[2026-08-25T23:31:35.519Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a03b37-0ed7-73aa-94d5-73bac771fe2e\n[2026-08-25T23:31:35.520Z] [debug] ota: Checking\u2026\n[2026-08-25T23:31:35.726Z] [debug] ota: Already up to date\n[2026-08-25T23:31:35.727Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-25T23:31:35.759Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-25T23:31:35.760Z] [debug] voice: bundled idle\n[2026-08-25T23:31:40.116Z] [debug] OTA applied: 2026-08-25-1502-the-swipe-is-the-selector \u2192 2026-08-25-1503-the-bullseye-is-the-truth.\n[2026-08-25T23:31:40.116Z] [debug] OTA session start: 2026-08-25-1503-the-bullseye-is-the-truth.\n",
+      "[2026-08-25T23:31:40.116Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-08-25T23:31:40.117Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cinderbound. I kept watch while you were gone.\"\n",
+      "[2026-08-25T23:31:40.288Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-25T23:31:40.286Z \u00b7 build 2026-08-25-1503-the-bullseye-is-the-truth \u00b7 updated from 2026-08-25-1502-the-swipe-is-the-selector \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-25T23:31:44.981Z] [debug] send-log: FAILED - envelope did not go out\n",
+      "[2026-08-25T23:31:49.756Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a03b37-0ed7-73aa-94d5-73bac771fe2e\n[2026-08-25T23:31:49.756Z] [debug] ota: Checking\u2026\n[2026-08-25T23:31:49.854Z] [debug] ota: Already up to date\n[2026-08-25T23:31:49.854Z] [debug] ota: boot check result = noUpdate\n[2026-08-25T23:31:49.896Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-25T23:31:49.897Z] [debug] voice: bundled idle\n[2026-08-25T23:31:54.851Z] [debug] OTA session start: 2026-08-25-1503-the-bullseye-is-the-truth.\n[2026-08-25T23:31:54.851Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n",
+      "[2026-08-25T23:31:54.851Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cinderbound. We've still got ground to cover, you and I.\"\n[2026-08-25T23:31:55.025Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-25T23:31:55.023Z \u00b7 build 2026-08-25-1503-the-bullseye-is-the-truth \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-25T23:32:02.616Z] [debug] send-log: FAILED - envelope did not go out\n[2026-08-25T23:42:16.364Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a03b37-0ed7-73aa-94d5-73bac771fe2e\n[2026-08-25T23:42:16.364Z] [debug] ota: Checking\u2026\n[2026-08-25T23:42:16.428Z] [debug] ota: Already up to date\n[2026-08-25T23:42:16.428Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-25T23:42:16.453Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-25T23:42:16.453Z] [debug] voice: bundled idle\n[2026-08-25T23:42:20.282Z] [debug] OTA session start: 2026-08-25-1503-the-bullseye-is-the-truth.\n[2026-08-25T23:42:20.283Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n",
+      "[2026-08-25T23:42:20.283Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cinderbound. The road kept your place.\"\n[2026-08-25T23:42:20.466Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-25T23:42:20.463Z \u00b7 build 2026-08-25-1503-the-bullseye-is-the-truth \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-25T23:43:31.615Z] [debug] persist sizes(KB): total=141 player=29 wm=31[rooms=7 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=78 scene=3\n[2026-08-27T01:40:32.738Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a03b37-0ed7-73aa-94d5-73bac771fe2e\n[2026-08-27T01:40:32.738Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-27T01:40:33.761Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-27T01:40:33.883Z] [debug] ota: Saving progress\u2026\n[2026-08-27T01:40:33.885Z] [debug] ota: Restarting to apply\u2026\n[2026-08-27T01:40:33.965Z] [debug] ota: boot check result = applied\n",
+      "[2026-08-27T01:40:34.109Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a040db-8fc5-7376-ba2e-363aac9e0bcb\n[2026-08-27T01:40:34.109Z] [debug] ota: Checking\u2026\n[2026-08-27T01:40:34.291Z] [debug] ota: Already up to date\n[2026-08-27T01:40:34.292Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T01:40:34.316Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-27T01:40:34.316Z] [debug] voice: bundled idle\n[2026-08-27T01:40:39.374Z] [debug] OTA applied: 2026-08-25-1503-the-bullseye-is-the-truth \u2192 2026-08-27-1516-the-quiet-path-sends-the-same-way.\n[2026-08-27T01:40:39.374Z] [debug] OTA session start: 2026-08-27-1516-the-quiet-path-sends-the-same-way.\n",
+      "[2026-08-27T01:40:39.374Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-08-27T01:40:39.375Z] [world] Reclaimers have passed through this stretch since you last stood here. Their wheel-marks are fresh in the silt.\n",
+      "[2026-08-27T01:40:39.381Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Cinderbound. I wondered when you'd take up the thread again. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n",
+      "[2026-08-27T01:40:39.600Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T01:40:39.593Z \u00b7 build 2026-08-27-1516-the-quiet-path-sends-the-same-way \u00b7 updated from 2026-08-25-1503-the-bullseye-is-the-truth \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-27T01:40:40.060Z] [debug] send-log: crash on record (2026-08-25T23:31:40.258Z) \u2014 game log pushed automatically, send-log: #mtauvz0705ht \u2014 0/6 parts out (314104 chars, median 34ms, worst 35ms) \u2014 WHY: flush() resolved false without sending, kept on disk as #mtauvz0705ht\n",
+      "[2026-08-27T01:40:44.112Z] [debug] send-log: #mtauw25knmc3 \u2014 0/6 parts out (314606 chars, median 44ms, worst 49ms) \u2014 WHY: flush() resolved false without sending\n[2026-08-27T01:40:44.112Z] [debug] send-log: only 0/6 parts confirmed \u2014 bundle #mtauw25knmc3 kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-27T01:40:48.681Z] [debug] send-log: #mtauw5o7y9up \u2014 0/6 parts out (314906 chars, median 47ms, worst 52ms) \u2014 WHY: flush() resolved false without sending\n[2026-08-27T01:40:48.682Z] [debug] send-log: only 0/6 parts confirmed \u2014 bundle #mtauw5o7y9up kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-27T01:41:34.822Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a040e0-f13f-7169-bc88-a2f16a3a5c58\n[2026-08-27T01:41:34.822Z] [debug] ota: Checking\u2026\n[2026-08-27T01:41:35.018Z] [debug] ota: Already up to date\n[2026-08-27T01:41:35.019Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-27T01:41:35.064Z] [debug] send-log: bundle #mtauw5o7y9up held \u2014 only 47s since the last try (a restart, not a chance); 4 left\n[2026-08-27T01:41:35.065Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T01:41:35.065Z] [debug] voice: bundled idle\n",
+      "[2026-08-27T01:41:42.575Z] [debug] send-log: #mtauxb80y92a \u2014 0/6 parts out (316557 chars, median 50ms, worst 52ms) \u2014 WHY: flush() resolved false without sending\n[2026-08-27T01:41:42.576Z] [debug] send-log: only 0/6 parts confirmed \u2014 bundle #mtauxb80y92a kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-27T01:41:44.226Z] [debug] send-log: #mtauxci0x6lz \u2014 0/6 parts out (316857 chars, median 50ms, worst 53ms) \u2014 WHY: flush() resolved false without sending\n[2026-08-27T01:41:44.226Z] [debug] send-log: only 0/6 parts confirmed \u2014 bundle #mtauxci0x6lz kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-27T01:51:06.224Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a040e0-f13f-7169-bc88-a2f16a3a5c58\n[2026-08-27T01:51:06.224Z] [debug] ota: Checking\u2026\n[2026-08-27T01:51:06.337Z] [debug] ota: Already up to date\n[2026-08-27T01:51:06.338Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T01:51:06.416Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-27T01:51:06.416Z] [debug] voice: bundled idle\n[2026-08-27T01:51:06.651Z] [debug] send-log: bundle #mtauxci0x6lz attempt 2/5 send-log: #mtauxci0x6lz \u2014 0/6 parts out (316857 chars, median 49ms, worst 80ms) \u2014 WHY: flush() resolved false without sending (after 278ms) \u2014 kept for next boot\n",
+      "[2026-08-27T02:01:57.576Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a040f2-75a9-7a99-9859-56863a37ad0e\n[2026-08-27T02:01:57.577Z] [debug] ota: Checking\u2026\n[2026-08-27T02:01:57.787Z] [debug] ota: Already up to date\n[2026-08-27T02:01:57.787Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T02:01:57.870Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-27T02:01:57.871Z] [debug] voice: bundled idle\n[2026-08-27T02:01:58.174Z] [debug] send-log: bundle #mtauxci0x6lz attempt 3/5 send-log: #mtauxci0x6lz \u2014 0/6 parts out (316857 chars, median 51ms, worst 78ms) \u2014 WHY: flush() resolved false without sending (after 341ms) \u2014 kept for next boot\n[2026-08-27T02:02:01.690Z] [debug] OTA applied: 2026-08-27-1517-the-green-button-can-reach \u2192 2026"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxut1k7apv [inline 21/22]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtaxut1k7apv"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "part",
+      "value": "21"
+    },
+    {
+      "key": "parts",
+      "value": "22"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T03:03:44.092159Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T03:03:44.277000Z",
+  "fingerprints": [
+    "e0f4cb018e4ab970e70b2d84412932d2"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c2a3e6d56a4d4b13bcf73ddc2dc6a2c3",
+  "previousEventID": "b2873c682ffd4936b461d04364e4bd5d"
+}

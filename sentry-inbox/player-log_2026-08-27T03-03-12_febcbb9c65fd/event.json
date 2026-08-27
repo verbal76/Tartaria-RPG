@@ -1,0 +1,196 @@
+{
+  "id": "febcbb9c65fd4715b492f227c2180766",
+  "groupID": "7694761507",
+  "eventID": "febcbb9c65fd4715b492f227c2180766",
+  "projectID": "4511945117532160",
+  "size": 17893,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxu4o1qm9m [inline 13/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxu4o1qm9m [inline 13/23]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxu4o1qm9m [inline 13/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "15b51f4575bd4720814f03ecd3dcf9b7",
+      "span_id": "996fe59a0d2dccdd",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " \u2022 Scrap Metal x4 (Common)\n[2026-08-22T01:05:34.802Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-08-22T01:05:40.556Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-22T01:05:51.287Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10635ms read 10052ms/write 549ms in 794t\u2192out 16t 12.7ms/t (76ch)\n[2026-08-22T01:05:51.406Z] [debug] homework: scene_intro \"Asgardar\" \u2713 10851ms\n",
+      "[2026-08-22T01:06:10.342Z] [debug] ui: tap \"investigate\"\n[2026-08-22T01:06:11.461Z] [player] investigate the ground\n[2026-08-22T01:06:11.462Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-22T01:06:11.468Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n",
+      "[2026-08-22T01:06:11.473Z] [system] \u23f3 Time passed: 24 min\n[2026-08-22T01:06:11.572Z] [cognitive] CLIMB  (98ms)\n[2026-08-22T01:06:16.076Z] [debug] ui: tap \"\u2192 SAMARRAN\"\n[2026-08-22T01:06:16.090Z] [world] You walk south. You arrive at Samarran.\n[2026-08-22T01:06:16.092Z] [debug] scene: loc=samarran hub=- arrival=y opening=n passing=n\n",
+      "[2026-08-22T01:06:16.153Z] [debug] spawn: gear=[Aetheric Bolt Gun] window=10 roster=new\n[2026-08-22T01:06:16.168Z] [arbiter] The Arbiter takes you in. \"Samarran is lethal country. The things that wake here pull above your weight. 35 HP carries you through the Outskirts (danger 2) or the Mud Seas (danger 2). Start the main quest before you camp here again, or move on until you've got your legs unde",
+      "r you.\"\n[2026-08-22T01:06:16.170Z] [world] Ember noses at the lingering scent and snorts. There's something there.\n[2026-08-22T01:06:16.172Z] [world] You've left Asgardar and entered Samarran. The research city. The hum here is not metaphor. It's afternoon. Bran the Beastmaster is the only soul in sight. south leads to Varakush; west leads to Asgardar. Nothing named to the north or east.\n",
+      "[2026-08-22T01:06:16.172Z] [system] Weather effect \u2014 Whisper Fog: -1 WIS\n[2026-08-22T01:06:16.174Z] [world] [Samarran] north: The Buried Cities (7 days' travel) \u00b7 east: Thametan's Tower (4 days' travel) \u00b7 south: Varakush (6 days' travel) \u00b7 west: The Sunken Enclave (4 days' travel)\n",
+      "[2026-08-22T01:06:16.174Z] [world] Bran the Beastmaster (Wilderness Outfitter) is already here when you arrive, stall half-unpacked. They look up and nod once.\n[2026-08-22T01:06:16.174Z] [arbiter] The Arbiter inclines their head toward the newcomer. \"Bran the Beastmaster, Wilderness Outfitter. Enthusiastic and passionate. Animal-handling gear, potions for mounts, unique animal accessories.\"\n",
+      "[2026-08-22T01:06:16.178Z] [world] Rare workings for sale: Mud-Iron Greatblade (200 TC), Mudstone Bulwark (200 TC), Phoenix Rebirth (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-08-22T01:06:16.178Z] [arbiter] Bran the Beastmaster looks at you sideways. \"You still owe us 'Scrap Run'. Say 'turn in scrap run' when you're ready.\"\n[2026-08-22T01:06:16.185Z] [reward] \u2726 Faction contract complete \u2014 Scrap Run. +88 TC (incl. +53 long-haul), +6 rep with Reclaimers Guild.\n",
+      "[2026-08-22T01:06:16.185Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-22T01:06:16.186Z] [arbiter] Word will travel that you finished this clean. The next thread will find you.\n[2026-08-22T01:06:16.186Z] [reward] \u2726 Faction contract complete \u2014 The Stranded Reclaimer. +138 TC (incl. +83 long-haul), +5 rep with Reclaimers Guild.\n",
+      "[2026-08-22T01:06:16.186Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-22T01:06:16.186Z] [reward] You delivered your Stranded Traveler safely. They peel off with a nod.\n[2026-08-22T01:06:16.187Z] [reward] \u2726 First Aid Kit \u2014 pressed into your hands with the fee.\n",
+      "[2026-08-22T01:06:16.187Z] [arbiter] Word will travel that you finished this clean. The next thread will find you.\n[2026-08-22T01:06:16.187Z] [debug] dedup: suppressed arbiter repeat \u2014 \"Word will travel that you finished this clean. The next thre\u2026\"\n",
+      "[2026-08-22T01:06:16.187Z] [world] Samarran is all broken glass and cold arithmetic. Thametan's Tower leans over a plaza of shattered lenses, and the dead Aetheric Engine at its heart still ticks \u2014 one wrong, patient click every few seconds, like a clock counting down to something that already happened.\n",
+      "[2026-08-22T01:06:16.188Z] [arbiter] (Architect route \u2014 the Samarran Core leaves with you only if it is never seen leaving. STEAL it, or investigate until you find the back-door route out.)\n[2026-08-22T01:06:16.188Z] [world] Tacked to the rope-head board, under fresher paper, you find a surface warrant gone soft with mud-damp \u2014 the seal legible, the name washed to a gray ghost. It might be yours. ",
+      "It might be anyone's. Down here even paper forgets, and it only took a season. You leave it where it hangs, retiring.\n[2026-08-22T01:06:16.188Z] [arbiter] The Arbiter falls into step without being asked. \"I do not walk with everyone who comes down. Understand that I have not decided anything yet.\"\n",
+      "[2026-08-22T01:06:16.348Z] [debug] persist sizes(KB): total=188 player=52 wm=56[rooms=25 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=76 scene=3\n[2026-08-22T01:06:25.892Z] [debug] ui: tap \"take / salvage\"\n[2026-08-22T01:06:26.517Z] [debug] qwen\u23f1 narration:scene_intro ok 10218ms read 7105ms/write 1325ms in 909t\u2192out 33t 7.8ms/t HIT-CAP (154ch)\n",
+      "[2026-08-22T01:06:26.607Z] [arbiter] You rest on the edge of the portal, your weary body a silent witness to the decay of the relics.\n[2026-08-22T01:06:26.607Z] [debug] arbiter: qwen \u2713 10428ms (intent=scene_intro)\n[2026-08-22T01:06:28.245Z] [world] You take the Aetheric Bolt Gun from where it lay.\n[2026-08-22T01:06:28.245Z] [reward] \u2726 Aetheric Bolt Gun (Common).\n",
+      "[2026-08-22T01:06:29.849Z] [world] You strip the calibration weight down. Mostly debris \u2014 but a Smooth Stone comes loose at the bottom of the pile.\n[2026-08-22T01:06:29.849Z] [world] You break the core apart. Among the pieces, something worth keeping.\n[2026-08-22T01:06:29.850Z] [world] You strip the cracked supply crate carefully. Something usable comes free in your hand.\n",
+      "[2026-08-22T01:06:29.850Z] [world] Slim pickings on the dust-covered desk. You pocket a Smooth Stone on the way out.\n[2026-08-22T01:06:29.850Z] [world] You strip the half-buried wagon carefully. Something usable comes free in your hand.\n[2026-08-22T01:06:29.850Z] [world] You break the jagged submerged giant statue apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-22T01:06:29.850Z] [world] You strip the laboratory glass carefully. Something usable comes free in your hand.\n[2026-08-22T01:06:29.851Z] [world] You salvage the lingering scent. The take is small but real.\n[2026-08-22T01:06:29.851Z] [world] You strip the microscope carefully. Something usable comes free in your hand.\n",
+      "[2026-08-22T01:06:29.852Z] [world] You break the panel apart. Among the pieces, something worth keeping.\n[2026-08-22T01:06:29.852Z] [reward] \u2726 Salvage haul:\n[2026-08-22T01:06:29.852Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-08-22T01:06:29.852Z] [reward]     \u2022 Automaton Circuit x4 (Common)\n[2026-08-22T01:06:29.853Z] [reward]     \u2022 Aether Crystal x4 (Common)\n",
+      "[2026-08-22T01:06:29.853Z] [reward]     \u2022 Worn Tartarian Coin x7 (Common)\n[2026-08-22T01:06:29.853Z] [reward]     \u2022 Bent Nail (Common)\n[2026-08-22T01:06:30.609Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-22T01:06:31.686Z] [debug] ui: tap \"investigate\"\n[2026-08-22T01:06:32.853Z] [player] investigate the ground\n",
+      "[2026-08-22T01:06:32.854Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-22T01:06:32.862Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Small Rock (Common).\n[2026-08-22T01:06:32.869Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-22T01:06:32.870Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-22T01:06:33.074Z] [cognitive] CLIMB  (203ms)\n[2026-08-22T01:06:37.539Z] [debug] ui: tap \"more \u25be\"\n[2026-08-22T01:06:37.657Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 6940ms read 5685ms/write 1191ms in 783t\u2192out 33t 7.3ms/t HIT-CAP (160ch)\n[2026-08-22T01:06:37.744Z] [debug] homework: scene_intro \"Samarran\" \u2713 7136ms\n[2026-08-22T01:06:38.493Z] [debug] ui: tap \"craft\"\n",
+      "[2026-08-22T01:06:40.371Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-22T01:06:40.383Z] [world] You repair the Architect's Outer Mantle. Back to full. (spent: Patched Cloth x4)\n[2026-08-22T01:06:41.004Z] [arbiter] The Arbiter nods. \"Patched in: Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-08-22T01:06:41.009Z] [world] You repair the Acid-Etched Field-Forged Sunder. Back to full. (spent: Small Rock x2)\n[2026-08-22T01:06:41.499Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-22T01:06:41.505Z] [world] You repair the Frayed Faulds. Back to full. (spent: Small Rock x2)\n",
+      "[2026-08-22T01:06:42.018Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-22T01:06:42.019Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Clot\u2026\"\n[2026-08-22T01:06:42.028Z] [world] You repair the Golem Leather Gloves. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-22T01:06:42.189Z] [debug] persist sizes(KB): total=190 player=52 wm=58[rooms=25 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=76 scene=3\n[2026-08-22T01:06:42.556Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-22T01:06:42.557Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Clot\u2026\"\n",
+      "[2026-08-22T01:06:42.562Z] [world] You repair the Relic Hunter's Boots. Back to full. (spent: Patched Cloth x4)\n[2026-08-22T01:06:43.070Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-22T01:06:43.071Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Clot\u2026\"\n",
+      "[2026-08-22T01:06:43.076Z] [world] You repair the Sentinel's Faceguard. Back to full. (spent: Patched Cloth x4)\n[2026-08-22T01:06:44.134Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-22T01:06:44.134Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n",
+      "[2026-08-22T01:06:44.140Z] [world] You repair the Threadbare Plate. Back to full. (spent: Small Rock x2)\n[2026-08-22T01:06:49.773Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=0\n",
+      "[2026-08-22T01:06:49.784Z] [arbiter] \"Crafting First Aid Kit would strip Rat Fur \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-08-22T01:06:49.784Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-22T01:06:49.785Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-22T01:06:49.825Z] [cognitive] neutral  (39ms)\n[2026-08-22T01:06:51.744Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-22T01:06:51.764Z] [player] craft First Aid Kit\n[2026-08-22T01:06:51.764Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=0\n",
+      "[2026-08-22T01:06:51.774Z] [arbiter] The Arbiter nods. \"Stripped for parts: Rat Fur \u2192 Patched Cloth.\"\n[2026-08-22T01:06:51.781Z] [reward] \u2726 Crafted First Aid Kit. The Arbiter watches you set the last piece.\n[2026-08-22T01:06:51.841Z] [cognitive] neutral  (58ms)\n[2026-08-22T01:06:54.383Z] [player] craft First Aid Kit\n",
+      "[2026-08-22T01:06:54.384Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=0\n[2026-08-22T01:06:54.397Z] [arbiter] \"Crafting First Aid Kit would strip Beetle-Chitin Flake \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-08-22T01:06:54.431Z] [cognitive] neutral  (32ms)\n",
+      "[2026-08-22T01:06:55.358Z] [debug] qwen\u23f1 ambient ok 3517ms read 2482ms/write 1018ms in 361t\u2192out 31t 6.9ms/t HIT-CAP (144ch)\n[2026-08-22T01:06:55.366Z] [arbiter] You have traversed the treacherous path that led you to this ancient ruins, each step a testament to the trials you have endured.\n[2026-08-22T01:06:55.367Z] [debug] arbiter: ambient \u2713 3585ms\n",
+      "[2026-08-22T01:06:55.368Z] [debug] arbiter: ambient-said \"You have traversed the treacherous path that led you to this ancient ruins, each step a testament to the trials you have endured.\"\n[2026-08-22T01:06:55.500Z] [player] craft First Aid Kit\n[2026-08-22T01:06:55.501Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=0\n",
+      "[2026-08-22T01:06:55.509Z] [arbiter] The Arbiter nods. \"Stripped for parts: Beetle-Chitin Flake \u2192 Patched Cloth.\"\n[2026-08-22T01:06:55.519Z] [reward] \u2726 Crafted First Aid Kit. The Arbiter watches you set the last piece.\n[2026-08-22T01:06:55.520Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-08-22T01:06:55.520Z] [arbiter] The Arbiter looks around. \"Samarran does not rest. The walls are still working on Zalmar's last problem.\"\n[2026-08-22T01:06:55.581Z] [cognitive] neutral  (60ms)\n[2026-08-22T01:07:04.092Z] [player] craft Smoldering Paste\n[2026-08-22T01:07:04.095Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-22T01:07:04.097Z] [reward] \u2726 Crafted Smoldering Paste. The Arbiter watches you set the last piece.\n[2026-08-22T01:07:04.173Z] [cognitive] neutral  (73ms)\n[2026-08-22T01:07:06.891Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=- range=- enemies=0 hooks=0\n[2026-08-22T01:07:06.892Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-08-22T01:07:06.892Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-22T01:07:06.911Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=Searing Paste range=- enemies=0 hooks=0\n[2026-08-22T01:07:06.930Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=Searing Paste range=- enemies=0 hooks=0\n",
+      "[2026-08-22T01:07:06.936Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-22T01:07:06.948Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=Searing Paste range=- enemies=0 hooks=0\n[2026-08-22T01:07:06.966Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=Searing Paste range=- enemies=0 hooks=0\n",
+      "[2026-08-22T01:07:06.972Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-22T01:07:06.983Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=Searing Paste range=- enemies=0 hooks=0\n[2026-08-22T01:07:07.000Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=Sea"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxu4o1qm9m [inline 13/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtaxu4o1qm9m"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "13"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T03:03:12.437758Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T03:03:12.691000Z",
+  "fingerprints": [
+    "e0f4cb018e4ab970e70b2d84412932d2"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "12e4ad4ee3524b6bb56ad28b790ad788",
+  "previousEventID": "f5b34016637a4ba2bcf3703834b40066"
+}

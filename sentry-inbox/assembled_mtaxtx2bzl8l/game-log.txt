@@ -1,0 +1,757 @@
+08-26T22:47:35.571Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1
+[2026-08-26T22:47:35.573Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 27, afternoon)
+[2026-08-26T22:47:35.576Z] [world] You shake out your cloak in the morning. Something small falls free that you don't remember picking up.
+[2026-08-26T22:47:35.577Z] [reward] ✦ Smoke-Cured Jerky Strip (Common).
+[2026-08-26T22:47:35.589Z] [system] ⏳ Time passed: 8h
+[2026-08-26T22:47:35.781Z] [cognitive] REST  (191ms)
+[2026-08-26T22:47:38.897Z] [debug] ui: tap "→ THE MONARCH'S WAYSTATION"
+[2026-08-26T22:47:38.914Z] [debug] spawn: gear=[Mud Shortsword, Memory Weaver's Hood] window=10 roster=new
+[2026-08-26T22:47:38.915Z] [world] You strike out west. The country resists you with sameness more than distance.
+[2026-08-26T22:47:38.916Z] [world] Some part of you has been keeping the place bookmarked.
+[2026-08-26T22:47:40.096Z] [debug] ui: tap "take / salvage"
+[2026-08-26T22:47:41.550Z] [world] The Mud Shortsword fits the hand better than it has any right to.
+[2026-08-26T22:47:41.551Z] [reward] ✦ Mud Shortsword (Common).
+[2026-08-26T22:47:41.570Z] [world] You turn the Memory Weaver's Hood over once, then keep it.
+[2026-08-26T22:47:41.570Z] [reward] ✦ Memory Weaver's Hood (Common).
+[2026-08-26T22:47:42.576Z] [world] You strip the broken scale carefully. Something usable comes free in your hand.
+[2026-08-26T22:47:42.577Z] [world] You salvage the cracked mirror. The take is small but real.
+[2026-08-26T22:47:42.577Z] [world] You salvage the pavement. The take is small but real.
+[2026-08-26T22:47:42.578Z] [reward] ✦ Salvage haul:
+[2026-08-26T22:47:42.578Z] [reward]     • Stick x2 (Common)
+[2026-08-26T22:47:42.578Z] [reward]     • Smooth Stone x2 (Common)
+[2026-08-26T22:47:43.946Z] [debug] ui: tap "investigate"
+[2026-08-26T22:47:46.018Z] [player] investigate the ground
+[2026-08-26T22:47:46.019Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1
+[2026-08-26T22:47:46.023Z] [reward] You scrape at the silt with the aetheric crystal blade. ✦ Recovered Aetheric Dust (Uncommon).
+[2026-08-26T22:47:46.030Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-08-26T22:47:46.030Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-26T22:47:46.031Z] [system] ⏳ Time passed: 24 min
+[2026-08-26T22:47:46.031Z] [reward] ✦ The miles have done their work — you carry the road better than you did. +1 max stamina (now 19). [80 on the odometer]
+[2026-08-26T22:47:46.206Z] [cognitive] CLIMB  (174ms)
+[2026-08-26T22:47:46.603Z] [debug] persist sizes(KB): total=231 player=67 wm=79[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=81 scene=4
+[2026-08-26T22:47:48.288Z] [player] investigate window
+[2026-08-26T22:47:48.289Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=window resolved=window range=- enemies=0 hooks=1
+[2026-08-26T22:47:48.292Z] [world] You look the window over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-08-26T22:47:48.293Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-08-26T22:47:48.293Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-26T22:47:48.508Z] [cognitive] neutral  (208ms)
+[2026-08-26T22:47:50.535Z] [player] investigate tower
+[2026-08-26T22:47:50.536Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tower resolved=tower range=- enemies=0 hooks=1
+[2026-08-26T22:47:50.537Z] [world] The tower rises out of the silt like a memory the world refuses to bury. Up close, the surface is scored with old weathering and finer marks — names, prayers, accounts no one closed.
+[2026-08-26T22:47:51.005Z] [debug] qwen⏱ investigate_lore ok 2514ms read 1278ms/write 1099ms in 124t→out 32t 10.3ms/t (146ch)
+[2026-08-26T22:47:51.168Z] [cognitive] neutral  (626ms)
+[2026-08-26T22:47:56.339Z] [debug] qwen⏱ ambient ok 7848ms wait 2674ms read 4075ms/write 1070ms in 373t→out 31t 10.9ms/t HIT-CAP (164ch)
+[2026-08-26T22:47:56.346Z] [arbiter] You've traversed through many lands, exploring ancient ruins and passing through the heart of the Spire, yet your journey has been one of both growth and exhaustion
+[2026-08-26T22:47:56.347Z] [debug] arbiter: ambient ✓ 8052ms
+[2026-08-26T22:47:56.347Z] [debug] arbiter: ambient-said "You've traversed through many lands, exploring ancient ruins and passing through the heart of the Spire, yet your journey has been one of both growth and exhaus"
+[2026-08-26T22:48:00.059Z] [debug] qwen⏱ investigate_lore ok 9254ms wait 5536ms read 1279ms/write 2419ms in 124t→out 38t 10.3ms/t (165ch)
+[2026-08-26T22:48:12.895Z] [debug] appstate: active → background (was active for 322957ms)
+[2026-08-26T22:50:15.542Z] [debug] appstate: background → active (was background for 122647ms)
+[2026-08-26T22:50:24.801Z] [debug] appstate: active → background (was active for 9258ms)
+[2026-08-26T22:59:12.077Z] [debug] appstate: background → active (was background for 527277ms)
+[2026-08-26T22:59:19.700Z] [debug] OTA session start: 2026-08-26-1511-the-spear-leaves-your-hand.
+[2026-08-26T22:59:19.701Z] [world] You step back into Nimari. The world waits for your move.
+[2026-08-26T22:59:19.701Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Great Scott. I kept watch while you were gone."
+[2026-08-26T22:59:19.919Z] [debug] ═══ SESSION 2026-08-26T22:59:19.915Z · build 2026-08-26-1511-the-spear-leaves-your-hand · previous entry moments earlier ═══
+[2026-08-26T22:59:26.301Z] [debug] send-log: FAILED - envelope did not go out — bundle #mtap4mqo387d kept on disk, boots retry up to 5 sends total
+[2026-08-26T22:59:31.510Z] [debug] persist sizes(KB): total=249 player=71 wm=93[rooms=47 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=81 scene=4
+[2026-08-26T22:59:36.080Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a03c39-c981-7889-8f55-b72d20b3d4c4
+[2026-08-26T22:59:36.080Z] [debug] ota: Checking…
+[2026-08-26T22:59:36.291Z] [debug] ota: Already up to date
+[2026-08-26T22:59:36.291Z] [debug] ota: boot check result = noUpdate
+[2026-08-26T22:59:36.306Z] [debug] send-log: bundle #mtap4mqo387d attempt 2/5 did not go out — kept for next boot
+[2026-08-26T22:59:36.311Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-26T22:59:36.311Z] [debug] voice: bundled idle
+[2026-08-26T22:59:46.022Z] [debug] OTA session start: 2026-08-26-1511-the-spear-leaves-your-hand.
+[2026-08-26T22:59:46.023Z] [world] You step back into Nimari. The world waits for your move.
+[2026-08-26T22:59:46.023Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Great Scott. The buried country is no place to walk alone."
+[2026-08-26T22:59:46.328Z] [debug] ═══ SESSION 2026-08-26T22:59:46.325Z · build 2026-08-26-1511-the-spear-leaves-your-hand · previous entry moments earlier ═══
+[2026-08-26T22:59:46.931Z] [debug] send-log: crash on record (2026-08-26T22:59:19.885Z) — full bundle pushed automatically, flush failed, kept on disk as #mtap52kc0jh2
+[2026-08-26T22:59:51.131Z] [debug] send-log: FAILED - envelope did not go out — bundle #mtap55wbfwwt kept on disk, boots retry up to 5 sends total
+[2026-08-26T23:08:14.154Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a03c39-c981-7889-8f55-b72d20b3d4c4
+[2026-08-26T23:08:14.154Z] [debug] ota: Checking…
+[2026-08-26T23:08:14.394Z] [debug] send-log: bundle #mtap55wbfwwt attempt 2/5 did not go out — kept for next boot
+[2026-08-26T23:08:24.178Z] [debug] ota: Error
+[2026-08-26T23:08:24.178Z] [debug] ⚠ ota error: Error OTA check timed out after 10s
+      Error: OTA check timed out after 10s |     at anonymous (address at /data/user/0/com.hotatticgames.tartarprim/files/.expo-internal/3b277afce8ad92253bdb81a42cbdcd7d:1:3456812)
+[2026-08-26T23:08:24.179Z] [debug] ota: boot check result = errored
+[2026-08-26T23:08:24.217Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-26T23:08:24.218Z] [debug] voice: bundled idle
+[2026-08-26T23:08:28.193Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a04054-4a29-7aaf-9337-beed19306dff
+[2026-08-26T23:08:28.193Z] [debug] ota: Checking…
+[2026-08-26T23:08:28.370Z] [debug] ota: Already up to date
+[2026-08-26T23:08:28.371Z] [debug] ota: boot check result = noUpdate
+[2026-08-26T23:08:28.563Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-26T23:08:28.563Z] [debug] voice: bundled idle
+[2026-08-26T23:08:28.596Z] [debug] send-log: bundle #mtap55wbfwwt attempt 3/5 did not go out (after 175ms) — kept for next boot
+[2026-08-26T23:08:33.445Z] [debug] OTA applied: 2026-08-26-1511-the-spear-leaves-your-hand → 2026-08-26-1512-the-worn-piece-is-readable.
+[2026-08-26T23:08:33.445Z] [debug] OTA session start: 2026-08-26-1512-the-worn-piece-is-readable.
+[2026-08-26T23:08:33.445Z] [world] You step back into Nimari. The world waits for your move.
+[2026-08-26T23:08:33.446Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Great Scott. The road kept your place."
+[2026-08-26T23:08:33.741Z] [debug] ═══ SESSION 2026-08-26T23:08:33.738Z · build 2026-08-26-1512-the-worn-piece-is-readable · updated from 2026-08-26-1511-the-spear-leaves-your-hand · previous entry moments earlier ═══
+[2026-08-26T23:08:38.050Z] [debug] send-log: FAILED - envelope did not go out — bundle #mtapgghdl0qj kept on disk, boots retry up to 5 sends total
+[2026-08-26T23:15:14.070Z] [debug] ui: tap "climb"
+[2026-08-26T23:15:16.194Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-08-26T23:15:16.208Z] [player] climb window
+[2026-08-26T23:15:16.209Z] [debug] parser: intent=climb conf=1.00 verb=climb target=window resolved=window range=- enemies=0 hooks=1
+[2026-08-26T23:15:16.269Z] [world] You loop your Reclaimer's Rope around the window and walk the line. Tier 1/2 cleared.
+[2026-08-26T23:15:16.269Z] [world] You reach the first hold of the window (tier 1/2). Higher still to go.
+[2026-08-26T23:15:16.270Z] [world] Dick Dragon sets its stone feet at the base of window and will climb no further — the construct holds the ground while you go up alone.
+[2026-08-26T23:15:16.270Z] [system] ⏳ Time passed: 30 min
+[2026-08-26T23:15:16.460Z] [cognitive] CLIMB  (187ms)
+[2026-08-26T23:15:17.338Z] [debug] ui: tap "climb up (1/2)"
+[2026-08-26T23:15:17.366Z] [player] climb window
+[2026-08-26T23:15:17.367Z] [debug] parser: intent=climb conf=1.00 verb=climb target=window resolved=window range=- enemies=0 hooks=1
+[2026-08-26T23:15:17.429Z] [world] You loop your Reclaimer's Rope around the window and walk the line. Tier 2/2 cleared.
+[2026-08-26T23:15:17.430Z] [world] You reach the top of the window (tier 2/2). The view changes; the room reads differently from here.
+[2026-08-26T23:15:17.431Z] [system] ⏳ Time passed: 30 min
+[2026-08-26T23:15:17.614Z] [cognitive] CLIMB  (183ms)
+[2026-08-26T23:15:17.757Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-08-26T23:15:18.587Z] [debug] ui: tap "climb down"
+[2026-08-26T23:15:18.607Z] [player] climb down
+[2026-08-26T23:15:18.608Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1
+[2026-08-26T23:15:18.609Z] [world] You make your way back down the window. Boots back on the ground.
+[2026-08-26T23:15:18.611Z] [system] ⏳ Time passed: 15 min
+[2026-08-26T23:15:18.783Z] [cognitive] CLIMB  (171ms)
+[2026-08-26T23:15:20.455Z] [debug] ui: tap "climb"
+[2026-08-26T23:15:22.021Z] [player] climb tower
+[2026-08-26T23:15:22.021Z] [debug] parser: intent=climb conf=1.00 verb=climb target=tower resolved=tower range=- enemies=0 hooks=1
+[2026-08-26T23:15:22.080Z] [world] You loop your Reclaimer's Rope around the tower and walk the line. Tier 1/4 cleared.
+[2026-08-26T23:15:22.080Z] [world] You reach the first hold of the tower (tier 1/4). Higher still to go.
+[2026-08-26T23:15:22.081Z] [world] Dick Dragon sets its stone feet at the base of tower and will climb no further — the construct holds the ground while you go up alone.
+[2026-08-26T23:15:22.081Z] [system] ⏳ Time passed: 30 min
+[2026-08-26T23:15:22.261Z] [cognitive] CLIMB  (179ms)
+[2026-08-26T23:15:23.138Z] [debug] ui: tap "climb up (1/4)"
+[2026-08-26T23:15:23.167Z] [player] climb tower
+[2026-08-26T23:15:23.167Z] [debug] parser: intent=climb conf=1.00 verb=climb target=tower resolved=tower range=- enemies=0 hooks=1
+[2026-08-26T23:15:23.234Z] [arbiter] The Arbiter's voice cracks like a whip. "Zero left in your arms. Eat something where you hang, or take the rough slide down — the next reach UP will drop you."
+[2026-08-26T23:15:23.235Z] [combat] Climb tower (tier 2/4) — stamina 0. GRIP FAILING: one more empty reach and you fall.
+[2026-08-26T23:15:23.235Z] [debug] arbiter: template (reason=intent-not-allowed:climb)
+[2026-08-26T23:15:23.235Z] [arbiter] "The cold — still waiting," the Arbiter says. "Decide if it matters."
+[2026-08-26T23:15:23.235Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-26T23:15:23.388Z] [cognitive] CLIMB  (152ms)
+[2026-08-26T23:15:24.189Z] [debug] ui: tap "climb up (1/4)"
+[2026-08-26T23:15:24.228Z] [player] climb tower
+[2026-08-26T23:15:24.229Z] [debug] parser: intent=climb conf=1.00 verb=climb target=tower resolved=tower range=- enemies=0 hooks=1
+[2026-08-26T23:15:24.299Z] [debug] vitals@fall: hp 57/58 stam 0/19 → fall 8 ⇒ hp 49
+[2026-08-26T23:15:24.299Z] [combat] Climb tower (tier 2/4) — stamina 0. Your grip gives out.
+[2026-08-26T23:15:24.299Z] [debug] vitals: pre-fall hp=57/58 stam=0/19 corruption=16 → fall 8 → hp=49
+[2026-08-26T23:15:24.299Z] [world] You reach with nothing left in your arms. The tower sheds you. You drop hard, taking 8 damage (Aetherbound Survivor absorbs 2) (49/58 HP).
+[2026-08-26T23:15:24.299Z] [world] The line whips free and your holds are gone — the tower will have to be climbed again from the base.
+[2026-08-26T23:15:24.454Z] [cognitive] CLIMB  (147ms)
+[2026-08-26T23:15:24.658Z] [debug] persist sizes(KB): total=249 player=71 wm=93[rooms=47 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=81 scene=4
+[2026-08-26T23:15:27.524Z] [debug] ui: tap "rest"
+[2026-08-26T23:15:27.539Z] [player] rest
+[2026-08-26T23:15:27.540Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1
+[2026-08-26T23:15:27.542Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 28, night)
+[2026-08-26T23:15:27.542Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-26T23:15:27.553Z] [debug] arbiter: template (reason=intent-not-allowed:rest)
+[2026-08-26T23:15:27.553Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-26T23:15:27.554Z] [system] ⏳ Time passed: 8h
+[2026-08-26T23:15:27.560Z] [world] An Eternal Dynasty war party crests the rise — 2 of them, blades already out. They've marked you for standing with the Mud Monarchs.
+[2026-08-26T23:15:27.560Z] [arbiter] "The Eternal Dynasty do not forgive a friend of the Mud Monarchs," the Arbiter murmurs. "Stand, or run — but decide now."
+[2026-08-26T23:15:27.813Z] [cognitive] REST  (258ms)
+[2026-08-26T23:15:31.526Z] [debug] ui: tap "searing tuning fork"
+[2026-08-26T23:15:31.597Z] [player] attack with the cantor's tuning fork
+[2026-08-26T23:15:31.598Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=2 hooks=1
+[2026-08-26T23:15:31.599Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false
+[2026-08-26T23:15:31.599Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-26T23:15:31.654Z] [world] You bring the searing cantor's tuning fork to bear on Eternal Dynasty Raider 1.
+[2026-08-26T23:15:31.655Z] [system] ⏳ Time passed: 6 min
+[2026-08-26T23:15:31.870Z] [cognitive] neutral  (214ms)
+[2026-08-26T23:15:38.534Z] [world] You seize the initiative. Eternal Dynasty Raider 1 has no time to react.
+[2026-08-26T23:15:38.534Z] [combat] You — d20 → 9 + INT 10 − 1 (Whisper Fog) = 18 vs Eternal Dynasty Raider 1 AC 10 — ✓ HIT
+[2026-08-26T23:15:38.535Z] [combat] Aetheric flares — +4 on hit.
+[2026-08-26T23:15:38.536Z] [combat] You crack the Eternal Dynasty Raider 1 with the Searing Cantor's Tuning Fork for 19 — half their fight, gone in one blow. They crumple, out cold. (6/25 HP) Loot them before they come to.
+[2026-08-26T23:15:38.536Z] [combat] Eternal Dynasty Raider 1 is out of it. Eternal Dynasty Raider 2 now in your sights.
+[2026-08-26T23:15:38.539Z] [combat] Searing Cantor's Tuning Fork — 3 burn bites in and festers (3 turns).
+[2026-08-26T23:15:38.539Z] [combat] Eternal Dynasty Raider 1 is left exposed — easier to hit.
+[2026-08-26T23:15:38.542Z] [combat] Eternal Dynasty Raider 2 — d20 → 7 + ATK 6 = 13 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-26T23:15:39.779Z] [debug] ui: tap "off: compact blaster"
+[2026-08-26T23:15:39.828Z] [player] attack with the off-hand compact blaster
+[2026-08-26T23:15:39.829Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=2 hooks=1
+[2026-08-26T23:15:39.829Z] [combat] Eternal Dynasty Raider 1 blisters — clinging fire sears 3. (3/25 HP, 2 turns left)
+[2026-08-26T23:15:39.829Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false
+[2026-08-26T23:15:39.830Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-26T23:15:39.888Z] [world] You bring the compact blaster to bear on Eternal Dynasty Raider 2.
+[2026-08-26T23:15:39.888Z] [system] ⏳ Time passed: 6 min
+[2026-08-26T23:15:40.109Z] [cognitive] AGGRESSION · AIM · DISENGAGE · ATTACK · THROW  (220ms)
+[2026-08-26T23:15:46.441Z] [world] You seize the initiative. Eternal Dynasty Raider 2 has no time to react.
+[2026-08-26T23:15:46.441Z] [combat] You — d20 → 4 + DEX 14 − 1 (Whisper Fog) = 17 vs Eternal Dynasty Raider 2 AC 10 — ✓ HIT
+[2026-08-26T23:15:46.448Z] [combat] Your strike with the compact blaster lands for 6. Eternal Dynasty Raider 2 staggers — 19 HP remaining. It answers.
+[2026-08-26T23:15:46.448Z] [combat] Burn sets in — 2/turn for 2 turns.
+[2026-08-26T23:15:46.449Z] [combat] Eternal Dynasty Raider 2 — d20 → 12 + ATK 6 = 18 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-26T23:15:49.714Z] [debug] ui: tap "off: compact blaster"
+[2026-08-26T23:15:49.769Z] [player] attack with the off-hand compact blaster
+[2026-08-26T23:15:49.770Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=2 hooks=1
+[2026-08-26T23:15:49.770Z] [combat] Eternal Dynasty Raider 1 blisters — clinging fire sears 3. (0/25 HP, 1 turn left)
+[2026-08-26T23:15:49.770Z] [combat] Eternal Dynasty Raider 2 suffers — burn eats 2. (17/25 HP, 1 turn left)
+[2026-08-26T23:15:49.771Z] [reward] Eternal Dynasty Raider 1 defeated. You recover Patched Cloth, Aether Residue.
+[2026-08-26T23:15:49.772Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+10 TC). The kit took the fight badly.
+[2026-08-26T23:15:49.772Z] [combat] 1 attacker remains. Eternal Dynasty Raider 2 now in your sights.
+[2026-08-26T23:15:49.773Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-08-26T23:15:49.773Z] [reward] +10 TC pried from the dust.
+[2026-08-26T23:15:49.817Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false
+[2026-08-26T23:15:49.818Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-26T23:15:49.875Z] [world] You commit forward with the compact blaster. Eternal Dynasty Raider 2 watches your hands.
+[2026-08-26T23:15:49.876Z] [system] ⏳ Time passed: 6 min
+[2026-08-26T23:15:50.105Z] [cognitive] AGGRESSION · AIM · DISENGAGE · ATTACK · THROW  (228ms)
+[2026-08-26T23:16:06.831Z] [world] You seize the initiative. Eternal Dynasty Raider 2 has no time to react.
+[2026-08-26T23:16:06.831Z] [combat] You — d20 → 14 + DEX 14 − 1 (Whisper Fog) = 27 vs Eternal Dynasty Raider 2 AC 10 — ✓ HIT
+[2026-08-26T23:16:06.833Z] [combat] Your strike with the compact blaster lands for 3. Eternal Dynasty Raider 2 staggers — 14 HP remaining. It answers.
+[2026-08-26T23:16:06.836Z] [combat] Eternal Dynasty Raider 2 — d20 → 10 + ATK 6 = 16 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-26T23:16:07.380Z] [debug] persist sizes(KB): total=252 player=72 wm=94[rooms=47 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=82 scene=5
+[2026-08-26T23:16:11.612Z] [debug] ui: tap "off: compact blaster"
+[2026-08-26T23:16:11.669Z] [player] attack with the off-hand compact blaster
+[2026-08-26T23:16:11.669Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1
+[2026-08-26T23:16:11.670Z] [combat] Eternal Dynasty Raider 2 suffers — burn eats 2. (12/25 HP, 0 turns left)
+[2026-08-26T23:16:11.670Z] [combat] Eternal Dynasty Raider 2 shakes off the last of the coating — the burn has run its course.
+[2026-08-26T23:16:11.670Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false
+[2026-08-26T23:16:11.671Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-26T23:16:11.729Z] [world] You raise the compact blaster toward Eternal Dynasty Raider 2. The room narrows around the both of you.
+[2026-08-26T23:16:11.729Z] [system] ⏳ Time passed: 6 min
+[2026-08-26T23:16:11.935Z] [cognitive] AGGRESSION · AIM · DISENGAGE · ATTACK · THROW  (204ms)
+[2026-08-26T23:16:20.239Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.
+[2026-08-26T23:16:20.243Z] [combat] Eternal Dynasty Raider 2 — d20 → 4 + ATK 6 = 10 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-26T23:16:20.243Z] [combat] You — d20 → 16 + DEX 14 − 1 (Whisper Fog) = 29 vs Eternal Dynasty Raider 2 AC 10 — ✓ HIT
+[2026-08-26T23:16:20.245Z] [combat] Clean hit with the compact blaster for 2. Eternal Dynasty Raider 2 has 10 left and does not back away.
+[2026-08-26T23:16:20.246Z] [combat] Burn sets in — 2/turn for 2 turns.
+[2026-08-26T23:16:21.370Z] [debug] ui: tap "off: compact blaster"
+[2026-08-26T23:16:21.419Z] [player] attack with the off-hand compact blaster
+[2026-08-26T23:16:21.419Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1
+[2026-08-26T23:16:21.420Z] [combat] Eternal Dynasty Raider 2 suffers — burn eats 2. (8/25 HP, 1 turn left)
+[2026-08-26T23:16:21.420Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false
+[2026-08-26T23:16:21.421Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-26T23:16:21.421Z] [debug] attack: status mods tired -1
+[2026-08-26T23:16:21.480Z] [world] You commit forward with the compact blaster. Eternal Dynasty Raider 2 watches your hands.
+[2026-08-26T23:16:21.480Z] [system] ⏳ Time passed: 6 min
+[2026-08-26T23:16:21.688Z] [cognitive] AGGRESSION · AIM · DISENGAGE · ATTACK · THROW  (206ms)
+[2026-08-26T23:16:25.033Z] [world] You seize the initiative. Eternal Dynasty Raider 2 has no time to react.
+[2026-08-26T23:16:25.033Z] [combat] You — d20 → 1 + DEX 14 − 1 (Whisper Fog) tired -1 = 13 vs Eternal Dynasty Raider 2 AC 10 — ✗ FUMBLE
+[2026-08-26T23:16:25.033Z] [combat] The compact blaster cuts air. Eternal Dynasty Raider 2 answers immediately.
+[2026-08-26T23:16:25.037Z] [combat] Eternal Dynasty Raider 2 — d20 → 12 + ATK 6 = 18 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-26T23:16:27.772Z] [debug] ui: tap "off: compact blaster"
+[2026-08-26T23:16:27.783Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-08-26T23:16:27.833Z] [player] attack with the off-hand compact blaster
+[2026-08-26T23:16:27.834Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1
+[2026-08-26T23:16:27.835Z] [combat] Eternal Dynasty Raider 2 suffers — burn eats 2. (6/25 HP, 0 turns left)
+[2026-08-26T23:16:27.835Z] [combat] Eternal Dynasty Raider 2 shakes off the last of the coating — the burn has run its course.
+[2026-08-26T23:16:27.836Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false
+[2026-08-26T23:16:27.837Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-26T23:16:27.837Z] [debug] attack: status mods tired -1
+[2026-08-26T23:16:27.898Z] [world] You commit forward with the compact blaster. Eternal Dynasty Raider 2 watches your hands.
+[2026-08-26T23:16:27.898Z] [system] ⏳ Time passed: 6 min
+[2026-08-26T23:16:28.105Z] [cognitive] AGGRESSION · AIM · DISENGAGE · ATTACK · THROW  (204ms)
+[2026-08-26T23:16:34.870Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.
+[2026-08-26T23:16:34.872Z] [combat] Eternal Dynasty Raider 2 — d20 → 13 + ATK 6 = 19 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-26T23:16:34.872Z] [combat] You — d20 → 19 + DEX 14 − 1 (Whisper Fog) tired -1 = 31 vs Eternal Dynasty Raider 2 AC 10 — ✓ HIT
+[2026-08-26T23:16:34.876Z] [combat] Eternal Dynasty Raider 2 takes 2 with the compact blaster. It reels: 4 left. Then it fights back.
+[2026-08-26T23:16:37.574Z] [debug] ui: tap "approach"
+[2026-08-26T23:16:37.631Z] [player] approach Eternal Dynasty Raider 2
+[2026-08-26T23:16:37.632Z] [debug] parser: intent=advance conf=1.00 verb=approach target=eternal dynasty raider 2 resolved=Eternal Dynasty Raider 2 range=mid enemies=1 hooks=1
+[2026-08-26T23:16:37.633Z] [debug] move: advance from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0
+[2026-08-26T23:16:37.633Z] [debug] move: field advance target=Eternal Dynasty Raider 2 d 1.49->0.49 band mid->close
+[2026-08-26T23:16:37.633Z] [world] You close the gap with Eternal Dynasty Raider 2. (range: close / arm's reach)
+[2026-08-26T23:16:37.634Z] [combat] Eternal Dynasty Raider 2 — d20 → 12 + ATK 6 = 18 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-26T23:16:37.635Z] [debug] arbiter: template (reason=combat)
+[2026-08-26T23:16:37.635Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-26T23:16:37.868Z] [cognitive] neutral  (231ms)
+[2026-08-26T23:16:38.676Z] [debug] ui: tap "searing tuning fork"
+[2026-08-26T23:16:38.742Z] [player] attack with the cantor's tuning fork
+[2026-08-26T23:16:38.743Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1
+[2026-08-26T23:16:38.745Z] [debug] attack: target=Eternal Dynasty Raider 2 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false
+[2026-08-26T23:16:38.746Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-26T23:16:38.746Z] [debug] attack: status mods tired -1
+[2026-08-26T23:16:38.804Z] [world] You commit forward with the searing cantor's tuning fork. Eternal Dynasty Raider 2 watches your hands.
+[2026-08-26T23:16:38.804Z] [system] ⏳ Time passed: 6 min
+[2026-08-26T23:16:39.010Z] [cognitive] neutral  (205ms)
+[2026-08-26T23:16:46.200Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.
+[2026-08-26T23:16:46.202Z] [combat] Eternal Dynasty Raider 2 — d20 → 16 + ATK 6 = 22 vs your AC 28 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-08-26T23:16:46.203Z] [combat] You — d20 → 2 + INT 10 − 1 (Whisper Fog) tired -1 = 10 vs Eternal Dynasty Raider 2 AC 10 — ✓ HIT
+[2026-08-26T23:16:46.203Z] [combat] Eternal Dynasty Raider 2 shrugs off the aetheric. (resisted, ×0.5 for 5)
+[2026-08-26T23:16:46.203Z] [combat] The aetheric has worn Eternal Dynasty Raider 2's guard through — it bites full from here.
+[2026-08-26T23:16:46.204Z] [combat] Your blow with the searing cantor's tuning fork lands clean — 5 damage. Eternal Dynasty Raider 2 crumples in the dust. The Aetherstone settles.
+[2026-08-26T23:16:46.204Z] [reward] Eternal Dynasty Raider 2 defeated. You recover Patched Cloth ×3.
+[2026-08-26T23:16:46.205Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+10 TC). The kit took the fight badly.
+[2026-08-26T23:16:46.206Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-08-26T23:16:46.206Z] [reward] +14 TC pried from the dust.
+[2026-08-26T23:16:46.429Z] [combat] Eternal Dynasty Raider 2 deals 5 bludgeoning damage [plate −3]. You have 53 HP remaining.
+[2026-08-26T23:16:46.647Z] [debug] persist sizes(KB): total=253 player=72 wm=94[rooms=47 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=82 scene=4
+[2026-08-26T23:16:51.017Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-08-26T23:16:54.160Z] [debug] send-log: FAILED - envelope did not go out — bundle #mtapr3962bvg kept on disk, boots retry up to 5 sends total
+[2026-08-26T23:17:01.946Z] [debug] qwen⏱ narration:scene_intro_fill ok 10746ms read 7608ms/write 3099ms in 678t→out 32t 11.2ms/t (132ch)
+[2026-08-26T23:17:01.968Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 10746ms — intro-fill:near-dup
+[2026-08-26T23:17:01.968Z] [debug] homework: scene_intro "Nimari" ∅ 10953ms
+[2026-08-26T23:20:26.156Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a04054-4a29-7aaf-9337-beed19306dff
+[2026-08-26T23:20:26.157Z] [debug] ota: Checking…
+[2026-08-26T23:20:26.242Z] [debug] ota: Already up to date
+[2026-08-26T23:20:26.242Z] [debug] ota: boot check result = noUpdate
+[2026-08-26T23:20:26.457Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-26T23:20:26.457Z] [debug] voice: bundled idle
+[2026-08-26T23:20:26.492Z] [debug] send-log: bundle #mtapr3962bvg attempt 2/5 did not go out (after 214ms) — kept for next boot
+[2026-08-26T23:52:12.633Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a04054-4a29-7aaf-9337-beed19306dff
+[2026-08-26T23:52:12.633Z] [debug] ota: Checking…
+[2026-08-26T23:52:14.533Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-26T23:52:14.612Z] [debug] ota: Saving progress…
+[2026-08-26T23:52:14.613Z] [debug] ota: Restarting to apply…
+[2026-08-26T23:52:14.678Z] [debug] ota: boot check result = applied
+[2026-08-26T23:52:14.828Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a04076-8e39-72be-9c01-811158d39312
+[2026-08-26T23:52:14.828Z] [debug] ota: Checking…
+[2026-08-26T23:52:14.937Z] [debug] ota: Already up to date
+[2026-08-26T23:52:14.938Z] [debug] ota: boot check result = noUpdate
+[2026-08-26T23:52:15.140Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-26T23:52:15.141Z] [debug] voice: bundled idle
+[2026-08-26T23:52:15.159Z] [debug] send-log: bundle #mtapr3962bvg attempt 3/5 did not go out (after 165ms) — kept for next boot
+[2026-08-27T00:09:19.004Z] [debug] OTA applied: 2026-08-26-1512-the-worn-piece-is-readable → 2026-08-26-1513-the-other-side-of-the-vial.
+[2026-08-27T00:09:19.004Z] [debug] OTA session start: 2026-08-26-1513-the-other-side-of-the-vial.
+[2026-08-27T00:09:19.004Z] [world] You step back into Nimari. The world waits for your move.
+[2026-08-27T00:09:19.004Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Great Scott. The road kept your place."
+[2026-08-27T00:09:19.531Z] [debug] ═══ SESSION 2026-08-27T00:09:19.528Z · build 2026-08-26-1513-the-other-side-of-the-vial · updated from 2026-08-26-1512-the-worn-piece-is-readable · previous entry moments earlier ═══
+[2026-08-27T00:09:22.569Z] [debug] send-log: FAILED - envelope did not go out — bundle #mtarmklvp2ex kept on disk, boots retry up to 5 sends total
+[2026-08-27T00:10:31.466Z] [debug] ui: tap "→ THE MONARCH'S WAYSTATION"
+[2026-08-27T00:10:31.513Z] [debug] spawn: gear=[Rusted Blade, Bone Club, Aetheric Chainmail] window=10 roster=new
+[2026-08-27T00:10:31.518Z] [world] You walk north. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-08-27T00:10:31.519Z] [world] The thread you were following waits where you left it.
+[2026-08-27T00:10:32.998Z] [debug] ui: tap "take / salvage"
+[2026-08-27T00:10:35.257Z] [world] You take the Bone Club from where it lay.
+[2026-08-27T00:10:35.258Z] [reward] ✦ Bone Club (Common).
+[2026-08-27T00:10:35.279Z] [world] You pick up the Rusted Blade.
+[2026-08-27T00:10:35.279Z] [reward] ✦ Rusted Blade (Common).
+[2026-08-27T00:10:35.281Z] [world] You lift the Aetheric Chainmail clear.
+[2026-08-27T00:10:35.281Z] [reward] ✦ Aetheric Chainmail (Common).
+[2026-08-27T00:10:36.395Z] [world] You salvage the door. The take is small but real.
+[2026-08-27T00:10:36.395Z] [world] You break the merchant bones apart. Among the pieces, something worth keeping.
+[2026-08-27T00:10:36.395Z] [world] You salvage the pavement. The take is small but real.
+[2026-08-27T00:10:36.396Z] [reward] ✦ Salvage haul:
+[2026-08-27T00:10:36.396Z] [reward]     • Stick (Common)
+[2026-08-27T00:10:36.396Z] [reward]     • Worn Tartarian Coin x9 (Common)
+[2026-08-27T00:10:38.216Z] [debug] ui: tap "investigate"
+[2026-08-27T00:10:40.027Z] [player] investigate the ground
+[2026-08-27T00:10:40.028Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1
+[2026-08-27T00:10:40.031Z] [world] You scrape at the silt with the aetheric crystal blade. Nothing of worth.
+[2026-08-27T00:10:40.039Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-27T00:10:40.040Z] [arbiter] The Arbiter looks around. "Half-swallowed. The half that remains has stopped pretending it is whole."
+[2026-08-27T00:10:40.040Z] [system] ⏳ Time passed: 24 min
+[2026-08-27T00:10:40.233Z] [cognitive] CLIMB  (190ms)
+[2026-08-27T00:10:41.083Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-08-27T00:10:42.421Z] [debug] ui: tap "rest"
+[2026-08-27T00:10:42.436Z] [player] rest
+[2026-08-27T00:10:42.437Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1
+[2026-08-27T00:10:42.439Z] [world] You rest for 8 hours. +5 HP, +8 stamina recovered. (Day 28, afternoon)
+[2026-08-27T00:10:42.439Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-27T00:10:42.440Z] [world] You wake briefly. The Aetheric haze has cleared enough that for a heartbeat you can see further than usual.
+[2026-08-27T00:10:42.453Z] [system] ⏳ Time passed: 8h
+[2026-08-27T00:10:42.793Z] [cognitive] REST  (340ms)
+[2026-08-27T00:10:42.985Z] [debug] persist sizes(KB): total=238 player=73 wm=80[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=81 scene=4
+[2026-08-27T00:10:43.275Z] [debug] ui: tap "rest"
+[2026-08-27T00:10:43.277Z] [player] rest
+[2026-08-27T00:10:43.278Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1
+[2026-08-27T00:10:43.278Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 28, evening)
+[2026-08-27T00:10:43.278Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-27T00:10:43.279Z] [arbiter] The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."
+[2026-08-27T00:10:43.279Z] [world] A Mud Golem closes the distance through the dark. The rest is over.
+[2026-08-27T00:10:43.279Z] [debug] enemy: Mud Golem hp=156 ac=14 atk=Slam dmg=2D10 rarity=Rare ap=9
+[2026-08-27T00:10:43.280Z] [system] ⏳ Time passed: 8h
+[2026-08-27T00:10:43.494Z] [cognitive] REST  (213ms)
+[2026-08-27T00:11:05.179Z] [debug] appstate: active → background (was active for 23906ms)
+[2026-08-27T00:12:56.329Z] [debug] appstate: background → active (was background for 111150ms)
+[2026-08-27T00:13:09.068Z] [debug] ui: tap "off: compact blaster"
+[2026-08-27T00:13:09.120Z] [player] attack with the off-hand compact blaster
+[2026-08-27T00:13:09.121Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=far enemies=1 hooks=1
+[2026-08-27T00:13:09.124Z] [debug] attack: target=Mud Golem range=far reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false
+[2026-08-27T00:13:09.128Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-27T00:13:09.188Z] [world] You bring the compact blaster to bear on Mud Golem.
+[2026-08-27T00:13:09.188Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:13:09.402Z] [cognitive] AGGRESSION · AIM · DISENGAGE · ATTACK · THROW  (212ms)
+[2026-08-27T00:13:16.415Z] [world] You seize the initiative. Mud Golem has no time to react.
+[2026-08-27T00:13:16.415Z] [combat] You — d20 → 19 + DEX 14 − 1 (Whisper Fog) = 32 vs Mud Golem AC 16 — ✓ HIT
+[2026-08-27T00:13:16.422Z] [combat] Mud Golem takes 5 with the compact blaster. It reels: 151 left. Then it fights back.
+[2026-08-27T00:13:16.422Z] [combat] Burn sets in — 2/turn for 2 turns.
+[2026-08-27T00:13:16.422Z] [combat] Mud Golem closes the distance.
+[2026-08-27T00:13:18.489Z] [debug] ui: tap "off: compact blaster"
+[2026-08-27T00:13:18.535Z] [player] attack with the off-hand compact blaster
+[2026-08-27T00:13:18.536Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1
+[2026-08-27T00:13:18.536Z] [combat] Mud Golem suffers — burn eats 2. (149/156 HP, 1 turn left)
+[2026-08-27T00:13:18.537Z] [debug] attack: target=Mud Golem range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false
+[2026-08-27T00:13:18.538Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-27T00:13:18.597Z] [world] You bring the compact blaster to bear on Mud Golem.
+[2026-08-27T00:13:18.597Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:13:18.799Z] [cognitive] AGGRESSION · AIM · DISENGAGE · ATTACK · THROW  (201ms)
+[2026-08-27T00:13:23.620Z] [world] You seize the initiative. Mud Golem has no time to react.
+[2026-08-27T00:13:23.620Z] [combat] You — d20 → 20 + DEX 14 − 1 (Whisper Fog) = 33 vs Mud Golem AC 16 — ✓ CRITICAL HIT
+[2026-08-27T00:13:23.622Z] [combat] Mud Golem takes 11 with the compact blaster. It reels: 138 left. Then it fights back.
+[2026-08-27T00:13:23.623Z] [combat] Mud Golem stops — and the air in front of it thickens, faintly bright. An AETHER SHIELD stands where its swing should have been (+3 AC).
+[2026-08-27T00:13:26.257Z] [debug] ui: tap "step back"
+[2026-08-27T00:13:26.262Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-08-27T00:13:26.273Z] [player] step back
+[2026-08-27T00:13:26.274Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=mid enemies=1 hooks=1
+[2026-08-27T00:13:26.275Z] [debug] move: retreat from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0
+[2026-08-27T00:13:26.276Z] [debug] move: field retreat target=Mud Golem d 1.50->2.50 band mid->far
+[2026-08-27T00:13:26.276Z] [world] You pull back from Mud Golem. (range: far)
+[2026-08-27T00:13:26.277Z] [debug] arbiter: template (reason=combat)
+[2026-08-27T00:13:26.278Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-27T00:13:26.712Z] [cognitive] neutral  (433ms)
+[2026-08-27T00:13:28.440Z] [debug] ui: tap "off: compact blaster"
+[2026-08-27T00:13:28.489Z] [player] attack with the off-hand compact blaster
+[2026-08-27T00:13:28.489Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=far enemies=1 hooks=1
+[2026-08-27T00:13:28.490Z] [combat] Mud Golem suffers — burn eats 2. (136/156 HP, 0 turns left)
+[2026-08-27T00:13:28.490Z] [combat] Mud Golem shakes off the last of the coating — the burn has run its course.
+[2026-08-27T00:13:28.490Z] [debug] attack: target=Mud Golem range=far reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false
+[2026-08-27T00:13:28.491Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-27T00:13:28.549Z] [world] Your compact blaster comes around in an arc; Mud Golem squares up to meet it.
+[2026-08-27T00:13:28.550Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:13:28.752Z] [cognitive] AGGRESSION · AIM · DISENGAGE · ATTACK · THROW  (201ms)
+[2026-08-27T00:13:29.079Z] [debug] persist sizes(KB): total=238 player=73 wm=80[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=80 scene=5
+[2026-08-27T00:13:33.576Z] [world] Mud Golem moves first. The pressure is immediate.
+[2026-08-27T00:13:33.577Z] [combat] Mud Golem closes the distance.
+[2026-08-27T00:13:33.577Z] [combat] You — d20 → 6 + DEX 14 − 1 (Whisper Fog) = 19 vs Mud Golem AC 19 — ✓ HIT
+[2026-08-27T00:13:33.579Z] [combat] Mud Golem takes 3 with the compact blaster. It reels: 133 left. Then it fights back.
+[2026-08-27T00:13:33.579Z] [arbiter] The Arbiter watches the blow land or fail. "Both are answers."
+[2026-08-27T00:13:34.143Z] [debug] ui: tap "approach"
+[2026-08-27T00:13:34.188Z] [player] approach Mud Golem
+[2026-08-27T00:13:34.189Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud golem resolved=Mud Golem range=mid enemies=1 hooks=1
+[2026-08-27T00:13:34.191Z] [debug] move: advance from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0
+[2026-08-27T00:13:34.192Z] [debug] move: field advance target=Mud Golem d 1.50->0.50 band mid->close
+[2026-08-27T00:13:34.192Z] [world] You close the gap with Mud Golem. (range: close / arm's reach)
+[2026-08-27T00:13:34.194Z] [combat] Mud Golem — d20 → 13 + ATK 8 = 21 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-27T00:13:34.194Z] [debug] arbiter: template (reason=combat)
+[2026-08-27T00:13:34.194Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-27T00:13:34.426Z] [cognitive] SWIM  (230ms)
+[2026-08-27T00:13:37.126Z] [debug] ui: tap "step back"
+[2026-08-27T00:13:37.149Z] [player] step back
+[2026-08-27T00:13:37.150Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=close enemies=1 hooks=1
+[2026-08-27T00:13:37.153Z] [debug] move: retreat from range=close enemies=1 weather=Whisper Fog cost=1 partial=0
+[2026-08-27T00:13:37.153Z] [debug] move: field retreat target=Mud Golem d 0.50->1.50 band close->mid
+[2026-08-27T00:13:37.153Z] [world] You pull back from Mud Golem. (range: mid-range)
+[2026-08-27T00:13:37.156Z] [combat] Mud Golem — d20 → 14 + ATK 8 = 22 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-27T00:13:37.382Z] [cognitive] neutral  (224ms)
+[2026-08-27T00:13:38.076Z] [debug] ui: tap "step back"
+[2026-08-27T00:13:38.092Z] [player] step back
+[2026-08-27T00:13:38.093Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=mid enemies=1 hooks=1
+[2026-08-27T00:13:38.094Z] [debug] move: retreat from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0
+[2026-08-27T00:13:38.097Z] [debug] move: field retreat target=Mud Golem d 1.50->2.50 band mid->far
+[2026-08-27T00:13:38.097Z] [world] You pull back from Mud Golem. (range: far)
+[2026-08-27T00:13:38.098Z] [debug] arbiter: template (reason=combat)
+[2026-08-27T00:13:38.098Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-27T00:13:38.321Z] [cognitive] neutral  (221ms)
+[2026-08-27T00:13:41.395Z] [debug] ui: tap "dodge"
+[2026-08-27T00:13:41.407Z] [player] dodge
+[2026-08-27T00:13:41.407Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=far enemies=1 hooks=1
+[2026-08-27T00:13:41.409Z] [world] You commit to the dodge. Slip Mud Golem's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-27T00:13:41.410Z] [combat] Mud Golem closes the distance.
+[2026-08-27T00:13:41.411Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:13:41.711Z] [cognitive] neutral  (297ms)
+[2026-08-27T00:13:42.262Z] [debug] ui: tap "off: compact blaster"
+[2026-08-27T00:13:42.265Z] [system] dodging (parry) fades.
+[2026-08-27T00:13:42.307Z] [player] attack with the off-hand compact blaster
+[2026-08-27T00:13:42.308Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1
+[2026-08-27T00:13:42.308Z] [debug] attack: target=Mud Golem range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false
+[2026-08-27T00:13:42.310Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-27T00:13:42.368Z] [world] You commit forward with the compact blaster. Mud Golem watches your hands.
+[2026-08-27T00:13:42.368Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:13:42.570Z] [cognitive] AGGRESSION · AIM · DISENGAGE · ATTACK · THROW  (201ms)
+[2026-08-27T00:13:47.626Z] [world] You seize the initiative. Mud Golem has no time to react.
+[2026-08-27T00:13:47.627Z] [combat] You — d20 → 18 + DEX 14 − 1 (Whisper Fog) = 31 vs Mud Golem AC 19 — ✓ HIT
+[2026-08-27T00:13:47.629Z] [combat] The blow with the compact blaster finds purchase — 5 damage, 128 HP standing. Mud Golem commits to the counter.
+[2026-08-27T00:13:47.630Z] [combat] Mud Golem — d20 → 5 + ATK 8 = 13 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-27T00:13:49.296Z] [debug] ui: tap "off: compact blaster"
+[2026-08-27T00:13:49.343Z] [player] attack with the off-hand compact blaster
+[2026-08-27T00:13:49.344Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1
+[2026-08-27T00:13:49.345Z] [debug] attack: target=Mud Golem range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false
+[2026-08-27T00:13:49.346Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-27T00:13:49.404Z] [world] You commit forward with the compact blaster. Mud Golem watches your hands.
+[2026-08-27T00:13:49.405Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:13:49.605Z] [cognitive] AGGRESSION · AIM · DISENGAGE · ATTACK · THROW  (199ms)
+[2026-08-27T00:13:53.120Z] [world] You seize the initiative. Mud Golem has no time to react.
+[2026-08-27T00:13:53.120Z] [combat] You — d20 → 3 + DEX 14 − 1 (Whisper Fog) = 16 vs Mud Golem AC 19 — ✗ MISS
+[2026-08-27T00:13:53.121Z] [combat] Mud Golem reads the motion and slips it — the compact blaster carves only air. The counter is already coming.
+[2026-08-27T00:13:53.122Z] [combat] Mud Golem — d20 → 8 + ATK 8 = 16 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-27T00:13:55.557Z] [debug] ui: tap "step back"
+[2026-08-27T00:13:55.572Z] [player] step back
+[2026-08-27T00:13:55.573Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=mid enemies=1 hooks=1
+[2026-08-27T00:13:55.576Z] [debug] move: retreat from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0
+[2026-08-27T00:13:55.577Z] [debug] move: field retreat target=Mud Golem d 1.50->2.50 band mid->far
+[2026-08-27T00:13:55.577Z] [world] You pull back from Mud Golem. (range: far)
+[2026-08-27T00:13:55.578Z] [debug] arbiter: template (reason=combat)
+[2026-08-27T00:13:55.578Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-27T00:13:55.801Z] [cognitive] neutral  (222ms)
+[2026-08-27T00:13:56.059Z] [debug] persist sizes(KB): total=237 player=73 wm=80[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=5
+[2026-08-27T00:13:56.656Z] [debug] ui: tap "off: compact blaster"
+[2026-08-27T00:13:56.696Z] [player] attack with the off-hand compact blaster
+[2026-08-27T00:13:56.697Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=far enemies=1 hooks=1
+[2026-08-27T00:13:56.698Z] [debug] attack: target=Mud Golem range=far reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false
+[2026-08-27T00:13:56.699Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-27T00:13:56.758Z] [world] You bring the compact blaster to bear on Mud Golem.
+[2026-08-27T00:13:56.758Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:13:56.961Z] [cognitive] AGGRESSION · AIM · DISENGAGE · ATTACK · THROW  (201ms)
+[2026-08-27T00:14:00.289Z] [world] You seize the initiative. Mud Golem has no time to react.
+[2026-08-27T00:14:00.289Z] [combat] You — d20 → 5 + DEX 14 − 1 (Whisper Fog) = 18 vs Mud Golem AC 19 — ✗ MISS
+[2026-08-27T00:14:00.290Z] [combat] The compact blaster cuts air. Mud Golem answers immediately.
+[2026-08-27T00:14:00.290Z] [combat] Mud Golem closes the distance.
+[2026-08-27T00:14:01.958Z] [debug] ui: tap "off: compact blaster"
+[2026-08-27T00:14:02.005Z] [player] attack with the off-hand compact blaster
+[2026-08-27T00:14:02.006Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1
+[2026-08-27T00:14:02.006Z] [debug] attack: target=Mud Golem range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false
+[2026-08-27T00:14:02.007Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-27T00:14:02.065Z] [world] You bring the compact blaster to bear on Mud Golem.
+[2026-08-27T00:14:02.066Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:14:02.266Z] [cognitive] AGGRESSION · AIM · DISENGAGE · ATTACK · THROW  (200ms)
+[2026-08-27T00:14:06.941Z] [world] Mud Golem moves first. The pressure is immediate.
+[2026-08-27T00:14:06.943Z] [combat] Mud Golem — d20 → 8 + ATK 8 = 16 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-27T00:14:06.943Z] [combat] You — d20 → 13 + DEX 14 − 1 (Whisper Fog) = 26 vs Mud Golem AC 19 — ✓ HIT
+[2026-08-27T00:14:06.945Z] [combat] Your strike with the compact blaster lands for 5. Mud Golem staggers — 123 HP remaining. It answers.
+[2026-08-27T00:14:06.945Z] [combat] Burn sets in — 1/turn for 2 turns.
+[2026-08-27T00:14:09.527Z] [debug] ui: tap "dodge"
+[2026-08-27T00:14:09.532Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-08-27T00:14:09.540Z] [player] dodge
+[2026-08-27T00:14:09.541Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1
+[2026-08-27T00:14:09.543Z] [world] You commit to the dodge. Slip Mud Golem's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-27T00:14:09.543Z] [combat] Mud Golem suffers — burn eats 1. (122/156 HP, 1 turn left)
+[2026-08-27T00:14:09.613Z] [combat] Mud Golem — d20 → 14 + ATK 8 = 22 vs your AC 28 (needs nat 16+ — AC capped) — ✗ EVADED
+[2026-08-27T00:14:09.613Z] [combat] Dodge — d20 → 19 + DEX 14 = 33 vs ATK 22. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-08-27T00:14:09.614Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:14:09.825Z] [cognitive] neutral  (210ms)
+[2026-08-27T00:14:10.326Z] [debug] ui: tap "off: compact blaster"
+[2026-08-27T00:14:10.363Z] [player] attack with the off-hand compact blaster
+[2026-08-27T00:14:10.363Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1
+[2026-08-27T00:14:10.364Z] [combat] Mud Golem suffers — burn eats 1. (121/156 HP, 0 turns left)
+[2026-08-27T00:14:10.364Z] [combat] Mud Golem shakes off the last of the coating — the burn has run its course.
+[2026-08-27T00:14:10.364Z] [debug] attack: target=Mud Golem range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false
+[2026-08-27T00:14:10.365Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-27T00:14:10.366Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-08-27T00:14:10.424Z] [world] You bring the compact blaster to bear on Mud Golem.
+[2026-08-27T00:14:10.425Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:14:10.627Z] [cognitive] AGGRESSION · AIM · DISENGAGE · ATTACK · THROW  (202ms)
+[2026-08-27T00:14:15.772Z] [world] You seize the initiative. Mud Golem has no time to react.
+[2026-08-27T00:14:15.772Z] [combat] You — d20 → 9 + DEX 14 − 1 (Whisper Fog) perfect opening (2× dice) = 22 vs Mud Golem AC 19 — ✓ HIT
+[2026-08-27T00:14:15.774Z] [combat] The blow with the compact blaster finds purchase — 9 damage, 112 HP standing. Mud Golem commits to the counter.
+[2026-08-27T00:14:15.776Z] [combat] Mud Golem — d20 → 19 + ATK 8 = 27 vs your AC 28 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-08-27T00:14:16.019Z] [combat] Mud Golem deals 7 bludgeoning damage [plate −2] [edge of reach — halved]. You have 51 HP remaining.
+[2026-08-27T00:14:20.282Z] [debug] ui: tap "approach"
+[2026-08-27T00:14:20.327Z] [player] approach Mud Golem
+[2026-08-27T00:14:20.328Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud golem resolved=Mud Golem range=mid enemies=1 hooks=1
+[2026-08-27T00:14:20.330Z] [debug] move: advance from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0
+[2026-08-27T00:14:20.330Z] [debug] move: field advance target=Mud Golem d 1.50->0.50 band mid->close
+[2026-08-27T00:14:20.331Z] [world] You close the gap with Mud Golem. (range: close / arm's reach)
+[2026-08-27T00:14:20.332Z] [combat] Mud Golem — d20 → 6 + ATK 8 = 14 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-27T00:14:20.333Z] [debug] arbiter: template (reason=combat)
+[2026-08-27T00:14:20.333Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-27T00:14:20.556Z] [cognitive] SWIM  (221ms)
+[2026-08-27T00:14:22.848Z] [debug] ui: tap "dodge"
+[2026-08-27T00:14:22.861Z] [player] dodge
+[2026-08-27T00:14:22.861Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1
+[2026-08-27T00:14:22.862Z] [world] You commit to the dodge. Slip Mud Golem's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-27T00:14:22.933Z] [combat] Mud Golem — d20 → 9 + ATK 8 = 17 vs your AC 28 (needs nat 16+ — AC capped) — ✗ EVADED
+[2026-08-27T00:14:22.933Z] [combat] Dodge — d20 → 12 + DEX 14 = 26 vs ATK 17. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-08-27T00:14:22.934Z] [debug] arbiter: template (reason=combat)
+[2026-08-27T00:14:22.934Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-27T00:14:22.934Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:14:23.146Z] [cognitive] neutral  (211ms)
+[2026-08-27T00:14:23.865Z] [debug] ui: tap "searing tuning fork"
+[2026-08-27T00:14:23.935Z] [player] attack with the cantor's tuning fork
+[2026-08-27T00:14:23.936Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1
+[2026-08-27T00:14:23.937Z] [debug] attack: target=Mud Golem range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false
+[2026-08-27T00:14:23.937Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-27T00:14:23.938Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-08-27T00:14:23.993Z] [world] You commit forward with the searing cantor's tuning fork. Mud Golem watches your hands.
+[2026-08-27T00:14:23.994Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:14:24.205Z] [cognitive] neutral  (210ms)
+[2026-08-27T00:14:24.454Z] [debug] persist sizes(KB): total=236 player=74 wm=80[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=78 scene=5
+[2026-08-27T00:14:29.188Z] [world] Mud Golem moves first. The pressure is immediate.
+[2026-08-27T00:14:29.190Z] [combat] Mud Golem — d20 → 2 + ATK 8 = 10 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-27T00:14:29.190Z] [combat] You — d20 → 8 + INT 10 − 1 (Whisper Fog) perfect opening (2× dice) = 17 vs Mud Golem AC 19 — ✗ MISS
+[2026-08-27T00:14:29.190Z] [combat] Mud Golem reads the motion and slips it — the searing cantor's tuning fork carves only air. The counter is already coming.
+[2026-08-27T00:14:31.017Z] [debug] ui: tap "searing tuning fork"
+[2026-08-27T00:14:31.086Z] [player] attack with the cantor's tuning fork
+[2026-08-27T00:14:31.087Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1
+[2026-08-27T00:14:31.087Z] [debug] attack: target=Mud Golem range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false
+[2026-08-27T00:14:31.088Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-27T00:14:31.089Z] [debug] attack: status mods tired -1
+[2026-08-27T00:14:31.144Z] [world] You commit forward with the searing cantor's tuning fork. Mud Golem watches your hands.
+[2026-08-27T00:14:31.145Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:14:31.346Z] [cognitive] neutral  (201ms)
+[2026-08-27T00:14:34.687Z] [world] You seize the initiative. Mud Golem has no time to react.
+[2026-08-27T00:14:34.687Z] [combat] You — d20 → 8 + INT 10 − 1 (Whisper Fog) tired -1 = 16 vs Mud Golem AC 19 — ✗ MISS
+[2026-08-27T00:14:34.687Z] [combat] The searing cantor's tuning fork cuts air. Mud Golem answers immediately.
+[2026-08-27T00:14:34.689Z] [combat] Mud Golem — d20 → 6 + ATK 8 = 14 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-27T00:14:36.318Z] [debug] ui: tap "dodge"
+[2026-08-27T00:14:36.323Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-08-27T00:14:36.331Z] [player] dodge
+[2026-08-27T00:14:36.332Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1
+[2026-08-27T00:14:36.333Z] [world] You commit to the dodge. Slip Mud Golem's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-27T00:14:36.404Z] [combat] Mud Golem — d20 → 1 + ATK 8 = 9 vs your AC 28 (needs nat 16+ — AC capped) — ✗ EVADED
+[2026-08-27T00:14:36.404Z] [combat] Dodge — Mud Golem overcommits past you. ✓ Free opening (next strike ×2 dice).
+[2026-08-27T00:14:36.405Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:14:36.619Z] [cognitive] neutral  (213ms)
+[2026-08-27T00:14:37.370Z] [debug] ui: tap "searing tuning fork"
+[2026-08-27T00:14:37.441Z] [player] attack with the cantor's tuning fork
+[2026-08-27T00:14:37.442Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1
+[2026-08-27T00:14:37.443Z] [debug] attack: target=Mud Golem range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false
+[2026-08-27T00:14:37.443Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-27T00:14:37.444Z] [debug] attack: status mods tired -1 · perfect opening (2× dice)
+[2026-08-27T00:14:37.499Z] [world] You raise the searing cantor's tuning fork toward Mud Golem. The room narrows around the both of you.
+[2026-08-27T00:14:37.500Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:14:37.703Z] [cognitive] neutral  (202ms)
+[2026-08-27T00:14:46.893Z] [world] Mud Golem moves first. The pressure is immediate.
+[2026-08-27T00:14:46.895Z] [combat] Mud Golem — d20 → 18 + ATK 8 = 26 vs your AC 28 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-08-27T00:14:46.895Z] [combat] You — d20 → 15 + INT 10 − 1 (Whisper Fog) tired -1 perfect opening (2× dice) = 23 vs Mud Golem AC 19 — ✓ HIT
+[2026-08-27T00:14:46.896Z] [combat] Clean hit with the searing cantor's tuning fork for 17. Mud Golem has 95 left and does not back away.
+[2026-08-27T00:14:46.896Z] [combat] Searing Cantor's Tuning Fork — 2 burn bites in and festers (3 turns).
+[2026-08-27T00:14:47.133Z] [combat] Mud Golem deals 17 bludgeoning damage [plate −2]. You have 34 HP remaining.
+[2026-08-27T00:14:49.622Z] [debug] ui: tap "searing tuning fork"
+[2026-08-27T00:14:49.684Z] [player] attack with the cantor's tuning fork
+[2026-08-27T00:14:49.685Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1
+[2026-08-27T00:14:49.686Z] [combat] Mud Golem blisters — clinging fire sears 2. (93/156 HP, 2 turns left)
+[2026-08-27T00:14:49.686Z] [debug] attack: target=Mud Golem range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false
+[2026-08-27T00:14:49.687Z] [debu] ui: tap "step back"
+[2026-08-27T00:16:44.815Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-08-27T00:16:44.823Z] [player] step back
+[2026-08-27T00:16:44.824Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=mid enemies=1 hooks=1
+[2026-08-27T00:16:44.825Z] [debug] move: retreat from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0
+[2026-08-27T00:16:44.826Z] [debug] move: field retreat target=Mud Golem d 1.50->2.50 band mid->far
+[2026-08-27T00:16:44.826Z] [world] You pull back from Mud Golem. (range: far)
+[2026-08-27T00:16:45.050Z] [cognitive] neutral  (222ms)
+[2026-08-27T00:16:46.053Z] [debug] ui: tap "dodge"
+[2026-08-27T00:16:46.062Z] [player] dodge
+[2026-08-27T00:16:46.062Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=far enemies=1 hooks=1
+[2026-08-27T00:16:46.064Z] [world] You commit to the dodge. Slip Mud Golem's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-27T00:16:46.065Z] [combat] Mud Golem closes the distance.
+[2026-08-27T00:16:46.066Z] [debug] arbiter: template (reason=combat)
+[2026-08-27T00:16:46.066Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-27T00:16:46.067Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:16:46.301Z] [cognitive] neutral  (234ms)
+[2026-08-27T00:16:46.954Z] [debug] ui: tap "off: compact blaster"
+[2026-08-27T00:16:46.956Z] [system] dodging (parry) fades.
+[2026-08-27T00:16:47.001Z] [player] attack with the off-hand compact blaster
+[2026-08-27T00:16:47.002Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1
+[2026-08-27T00:16:47.003Z] [debug] attack: target=Mud Golem range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false
+[2026-08-27T00:16:47.004Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-27T00:16:47.069Z] [world] You commit forward with the compact blaster. Mud Golem watches your hands.
+[2026-08-27T00:16:47.069Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:16:47.277Z] [cognitive] AGGRESSION · AIM · DISENGAGE · ATTACK · THROW  (206ms)
+[2026-08-27T00:16:52.368Z] [world] You seize the initiative. Mud Golem has no time to react.
+[2026-08-27T00:16:52.369Z] [combat] You — d20 → 8 + DEX 14 − 1 (Whisper Fog) = 21 vs Mud Golem AC 19 — ✓ HIT
+[2026-08-27T00:16:52.371Z] [combat] The blow with the compact blaster finds purchase — 2 damage, 11 HP standing. Mud Golem commits to the counter.
+[2026-08-27T00:16:52.371Z] [combat] Burn sets in — 4/turn for 2 turns.
+[2026-08-27T00:16:52.373Z] [combat] Mud Golem — d20 → 18 + ATK 8 = 26 vs your AC 28 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-08-27T00:16:52.617Z] [combat] Mud Golem deals 3 bludgeoning damage [plate −2] [edge of reach — halved]. You have 39 HP remaining.
+[2026-08-27T00:16:55.011Z] [debug] ui: tap "approach"
+[2026-08-27T00:16:55.041Z] [player] approach Mud Golem
+[2026-08-27T00:16:55.042Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud golem resolved=Mud Golem range=mid enemies=1 hooks=1
+[2026-08-27T00:16:55.043Z] [debug] move: advance from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0
+[2026-08-27T00:16:55.043Z] [debug] move: field advance target=Mud Golem d 1.50->0.50 band mid->close
+[2026-08-27T00:16:55.043Z] [world] You close the gap with Mud Golem. (range: close / arm's reach)
+[2026-08-27T00:16:55.044Z] [combat] Mud Golem suffers — burn eats 4. (7/156 HP, 1 turn left)
+[2026-08-27T00:16:55.045Z] [combat] Mud Golem — d20 → 14 + ATK 8 = 22 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-27T00:16:55.266Z] [cognitive] SWIM  (220ms)
+[2026-08-27T00:16:55.571Z] [debug] ui: tap "approach"
+[2026-08-27T00:16:55.615Z] [player] approach Mud Golem
+[2026-08-27T00:16:55.616Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud golem resolved=Mud Golem range=close enemies=1 hooks=1
+[2026-08-27T00:16:55.618Z] [debug] move: advance from range=close enemies=1 weather=Whisper Fog cost=1 partial=0
+[2026-08-27T00:16:55.618Z] [debug] move: field advance target=Mud Golem d 0.50->0.35 band close->close
+[2026-08-27T00:16:55.618Z] [world] You close the gap with Mud Golem. (range: close / arm's reach)
+[2026-08-27T00:16:55.618Z] [combat] Mud Golem suffers — burn eats 4. (3/156 HP, 0 turns left)
+[2026-08-27T00:16:55.618Z] [combat] Mud Golem shakes off the last of the coating — the burn has run its course.
+[2026-08-27T00:16:55.620Z] [combat] Mud Golem — d20 → 6 + ATK 8 = 14 vs your AC 28 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-27T00:16:55.621Z] [debug] arbiter: template (reason=combat)
+[2026-08-27T00:16:55.622Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-27T00:16:55.852Z] [cognitive] SWIM  (229ms)
+[2026-08-27T00:16:56.855Z] [debug] ui: tap "dodge"
+[2026-08-27T00:16:56.866Z] [player] dodge
+[2026-08-27T00:16:56.867Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1
+[2026-08-27T00:16:56.868Z] [world] You commit to the dodge. Slip Mud Golem's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-27T00:16:56.939Z] [combat] Mud Golem — d20 → 7 + ATK 8 = 15 vs your AC 28 (needs nat 16+ — AC capped) — ✗ EVADED
+[2026-08-27T00:16:56.940Z] [combat] Dodge — d20 → 2 + DEX 14 = 16 vs ATK 15. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-08-27T00:16:56.940Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:16:57.160Z] [cognitive] neutral  (219ms)
+[2026-08-27T00:16:57.627Z] [debug] persist sizes(KB): total=235 player=73 wm=80[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=77 scene=5
+[2026-08-27T00:16:57.906Z] [debug] ui: tap "searing tuning fork"
+[2026-08-27T00:16:57.965Z] [player] attack with the cantor's tuning fork
+[2026-08-27T00:16:57.966Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1
+[2026-08-27T00:16:57.967Z] [debug] attack: target=Mud Golem range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false
+[2026-08-27T00:16:57.968Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-27T00:16:57.968Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-08-27T00:16:58.024Z] [world] You bring the searing cantor's tuning fork to bear on Mud Golem.
+[2026-08-27T00:16:58.024Z] [system] ⏳ Time passed: 6 min
+[2026-08-27T00:16:58.235Z] [cognitive] neutral  (209ms)
+[2026-08-27T00:17:06.212Z] [world] You seize the initiative. Mud Golem has no time to react.
+[2026-08-27T00:17:06.213Z] [combat] You — d20 → 19 + INT 10 − 1 (Whisper Fog) perfect opening (2× dice) = 28 vs Mud Golem AC 19 — ✓ HIT
+[2026-08-27T00:17:06.214Z] [combat] Final strike with the searing cantor's tuning fork for 23. Mud Golem is still. The Aetherstone hums on, indifferent.
+[2026-08-27T00:17:06.215Z] [reward] Mud Golem defeated. You recover Golem Core ×2, Mudstone.
+[2026-08-27T00:17:06.216Z] [reward] ✦ Hard-won spoils — Mud Essence (Uncommon).
+[2026-08-27T00:17:06.220Z] [reward] +6 TC pried from the dust.
+[2026-08-27T00:17:06.258Z] [arbiter] The Arbiter eyes your new pieces. "You could make a Mud Scanner now, if you wanted."
+[2026-08-27T00:17:06.520Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-08-27T00:17:14.740Z] [debug] qwen⏱ narration:scene_intro_fill ok 8065ms read 7232ms/write 808ms in 666t→out 23t 10.9ms/t (110ch)
+[2026-08-27T00:17:14.908Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 8065ms — intro-fill:near-dup
+[2026-08-27T00:17:14.908Z] [debug] homework: scene_intro "Nimari" ∅ 8388ms
+[2026-08-27T00:17:19.744Z] [debug] send-log: FAILED - envelope did not go out — bundle #mtarwsstavot kept on disk, boots retry up to 5 sends total
+[2026-08-27T00:17:25.417Z] [debug] appstate: active → background (was active for 269088ms)
+[2026-08-27T00:18:48.639Z] [debug] appstate: background → active (was background for 83222ms)
+[2026-08-27T00:18:49.128Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-08-27T00:18:50.525Z] [debug] qwen⏱ narration:scene_intro_fill ok 1256ms read 0ms/write 1222ms in 666t→out 34t HIT-CAP (171ch)
+[2026-08-27T00:18:50.531Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 1256ms — intro-fill:near-dup
+[2026-08-27T00:18:50.532Z] [debug] homework: scene_intro "Nimari" ∅ 1404ms
+[2026-08-27T00:18:52.215Z] [debug] send-log: FAILED - envelope did not go out — bundle #mtarys5cfear kept on disk, boots retry up to 5 sends total
+[2026-08-27T00:18:58.744Z] [debug] appstate: active → background (was active for 10105ms)
+[2026-08-27T00:18:59.005Z] [debug] persist sizes(KB): total=234 player=74 wm=79[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=77 scene=4
+[2026-08-27T00:21:55.616Z] [debug] appstate: background → active (was background for 176872ms)
+[2026-08-27T00:21:55.629Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-08-27T00:21:57.117Z] [debug] qwen⏱ narration:scene_intro_fill ok 1450ms read 0ms/write 1355ms in 666t→out 34t HIT-CAP (171ch)
+[2026-08-27T00:21:57.120Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 1450ms — intro-fill:near-dup
+[2026-08-27T00:21:57.121Z] [debug] homework: scene_intro "Nimari" ∅ 1493ms
+[2026-08-27T00:22:00.736Z] [debug] appstate: active → background (was active for 5120ms)
+[2026-08-27T00:32:54.343Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a04076-8e39-72be-9c01-811158d39312
+[2026-08-27T00:32:54.343Z] [debug] ota: Checking…
+[2026-08-27T00:32:56.867Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-27T00:32:57.001Z] [debug] ota: Saving progress…
+[2026-08-27T00:32:57.002Z] [debug] ota: Restarting to apply…
+[2026-08-27T00:32:57.243Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0409b-a6e2-7d09-bcae-82150532bc23
+[2026-08-27T00:32:57.243Z] [debug] ota: Checking…
+[2026-08-27T00:32:57.378Z] [debug] ota: Already up to date
+[2026-08-27T00:32:57.379Z] [debug] ota: boot check result = noUpdate
+[2026-08-27T00:32:57.587Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-27T00:32:57.587Z] [debug] voice: bundled idle
+[2026-08-27T00:32:57.605Z] [debug] send-log: bundle #mtarys5cfear attempt 2/5 did not go out (after 174ms) — kept for next boot
+[2026-08-27T00:34:40.140Z] [debug] OTA applied: 2026-08-26-1513-the-other-side-of-the-vial → 2026-08-27-1514-the-portrait-scrolls-again.
+[2026-08-27T00:34:40.141Z] [debug] OTA session start: 2026-08-27-1514-the-portrait-scrolls-again.
+[2026-08-27T00:34:40.141Z] [world] You step back into Nimari. The world waits for your move.
+[2026-08-27T00:34:40.141Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Great Scott. The road kept your place."
+[2026-08-27T00:34:40.620Z] [debug] ═══ SESSION 2026-08-27T00:34:40.618Z · build 2026-08-27-1514-the-portrait-scrolls-again · updated from 2026-08-26-1513-the-other-side-of-the-vial · previous entry moments earlier ═══
+[2026-08-27T00:36:44.533Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0409b-a6e2-7d09-bcae-82150532bc23
+[2026-08-27T00:36:44.533Z] [debug] ota: Checking…
+[2026-08-27T00:36:44.617Z] [debug] ota: Already up to date
+[2026-08-27T00:36:44.617Z] [debug] ota: boot check result = noUpdate
+[2026-08-27T00:36:44.654Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-27T00:36:44.655Z] [debug] voice: bundled idle
+[2026-08-27T00:36:44.732Z] [debug] send-log: bundle #mtashpeadyjn attempt 2/5 did not go out (after 64ms) — kept for next boot
+[2026-08-27T01:02:25.367Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a040bc-109c-7840-8b98-4974bf2805c1
+[2026-08-27T01:02:25.367Z] [debug] ota: Checking…
+[2026-08-27T01:02:25.555Z] [debug] ota: Already up to date
+[2026-08-27T01:02:25.555Z] [debug] ota: boot check result = noUpdate
+[2026-08-27T01:02:25.597Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-27T01:02:25.598Z] [debug] voice: bundled idle
+[2026-08-27T01:02:25.612Z] [debug] send-log: bundle #mtashpeadyjn attempt 3/5 did not go out (after 35ms) — kept for next boot
+[2026-08-27T01:02:30.391Z] [debug] OTA applied: 2026-08-27-1514-the-portrait-scrolls-again → 2026-08-27-1515-the-log-goes-in-parts.
+[2026-08-27T01:02:30.391Z] [debug] OTA session start: 2026-08-27-1515-the-log-goes-in-parts.
+[2026-08-27T01:02:30.391Z] [world] You step back into Nimari. The world waits for your move.
+[2026-08-27T01:02:30.391Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Great Scott. The road kept your place."
+[2026-08-27T01:02:30.682Z] [debug] ═══ SESSION 2026-08-27T01:02:30.679Z · build 2026-08-27-1515-the-log-goes-in-parts · updated from 2026-08-27-1514-the-portrait-scrolls-again · previous entry moments earlier ═══
+[2026-08-27T01:02:31.325Z] [debug] send-log: crash on record (2026-08-27T00:34:40.392Z) — full bundle pushed automatically, flush failed, kept on disk as #mtatiwy5oo4p
+[2026-08-27T01:02:35.292Z] [debug] send-log: #mtatj02qozh5 — 0/7 parts out (404814 chars, median 33ms, worst 34ms)
+[2026-08-27T01:02:35.293Z] [debug] send-log: only 0/7 parts confirmed — bundle #mtatj02qozh5 kept on disk, boots retry up to 5 sends total
+[2026-08-27T01:02:40.577Z] [debug] send-log: #mtatj445fa3o — 0/7 parts out (404817 chars, median 33ms, worst 52ms)
+[2026-08-27T01:02:40.578Z] [debug] send-log: only 0/7 parts confirmed — bundle #mtatj445fa3o kept on disk, boots retry up to 5 sends total
+[2026-08-27T01:03:37.580Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a040bc-109c-7840-8b98-4974bf2805c1
+[2026-08-27T01:03:37.581Z] [debug] ota: Checking…
+[2026-08-27T01:03:37.651Z] [debug] ota: Already up to date
+[2026-08-27T01:03:37.651Z] [debug] ota: boot check result = noUpdate
+[2026-08-27T01:03:37.684Z] [debug] send-log: bundle #mtatj445fa3o held — only 57s since the last try (a restart, not a chance); 4 left
+[2026-08-27T01:03:37.700Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-27T01:03:37.700Z] [debug] voice: bundled idle
+[2026-08-27T01:03:44.679Z] [debug] OTA session start: 2026-08-27-1515-the-log-goes-in-parts.
+[2026-08-27T01:03:44.679Z] [world] You step back into Nimari. The world waits for your move.
+[2026-08-27T01:03:44.679Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Great Scott. The road kept your place."
+[2026-08-27T01:03:45.139Z] [debug] ═══ SESSION 2026-08-27T01:03:45.136Z · build 2026-08-27-1515-the-log-goes-in-parts · previous entry moments earlier ═══
+[2026-08-27T01:03:45.638Z] [debug] send-log: crash on record (2026-08-27T01:03:31.295Z) — full bundle pushed automatically, flush failed, kept on disk as #mtatkidl3r67
+[2026-08-27T01:07:55.692Z] [debug] ota: boot check — enabled=

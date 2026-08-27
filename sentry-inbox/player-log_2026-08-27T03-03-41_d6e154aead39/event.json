@@ -1,0 +1,198 @@
+{
+  "id": "d6e154aead394a52a326cc0db61cd384",
+  "groupID": "7694761507",
+  "eventID": "d6e154aead394a52a326cc0db61cd384",
+  "projectID": "4511945117532160",
+  "size": 17877,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxuqrhd0b3 [inline 1/22]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxuqrhd0b3 [inline 1/22]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxuqrhd0b3 [inline 1/22]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "cc12a2d0dc294ebe97ed7d29c7b7b84c",
+      "span_id": "af31e926665e7971",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "=== TARTARIA LOG \u00b7 319853 CHARS \u00b7 BEGIN ===\n[2026-08-18T23:51:30.901Z] [debug] APK session start: 2026-08-18-1361-the-active-one-glows.\n[2026-08-18T23:51:30.903Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=n opening=y passing=n\n[2026-08-18T23:51:30.954Z] [debug] spawn: gear=[Bone Splitter Axe, Salvaged Bow, Mud-Warden's Vest] window=0\n",
+      "[2026-08-18T23:51:30.955Z] [world] Of the Tartarian Giants, sworn to the Mud Monarchs: you have crossed into Tartaria. The buried country. The cataclysm that made it was called the Aetherstone Flood, and it ended a thousand years ago \u2014 yet here, at ground level, it never quite stopped. The mud still moves. The air still hums.\n",
+      "[2026-08-18T23:51:30.955Z] [world] Monarch Court rises out of the silt at the edge of The Monarch's Waystation. You arrive at The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking \u2014 your business has already been logged elsewhere.\n",
+      "[2026-08-18T23:51:30.956Z] [world] The Arbiter is already here, slouched against a post under a cloak that has seen more weather than most people. He looks asleep. He isn't. His eyes track you for one quiet beat before he goes back to looking at nothing. An ash storm presses on the world \u2014 -1 STR. What you do here is yours to choose.\n",
+      "[2026-08-18T23:51:30.956Z] [world] Paths: north to Court \u00b7 south to Landing 1. (Type 'leave outpost' to head into the wilds.)\n[2026-08-18T23:51:30.956Z] [debug] persist: skipped \u2014 player record missing core identity (name=\u2205, raceId=\u2713, stats=\u2713); slot slot_mszbgsi1_inv6if left intact\n",
+      "[2026-08-18T23:51:31.041Z] [debug] persist: skipped \u2014 player record missing core identity (name=\u2205, raceId=\u2713, stats=\u2713); slot slot_mszbgsi1_inv6if left intact\n[2026-08-18T23:51:37.405Z] [arbiter] The Arbiter looks up. \"Your name, traveler. Type it, then tap ACT.\"\n",
+      "[2026-08-18T23:51:37.406Z] [debug] persist: skipped \u2014 player record missing core identity (name=\u2205, raceId=\u2713, stats=\u2713); slot slot_mszbgsi1_inv6if left intact\n[2026-08-18T23:51:52.868Z] [debug] ui: tap \"take / salvage\"\n[2026-08-18T23:51:53.987Z] [world] You take the Salvaged Bow from where it lay.\n[2026-08-18T23:51:53.988Z] [reward] \u2726 Salvaged Bow (Common).\n",
+      "[2026-08-18T23:51:53.994Z] [world] You take the Mud-Warden's Vest from where it lay.\n[2026-08-18T23:51:53.994Z] [reward] \u2726 Mud-Warden's Vest (Common).\n[2026-08-18T23:51:53.996Z] [world] You take the Bone Splitter Axe from where it lay.\n[2026-08-18T23:51:53.996Z] [reward] \u2726 Bone Splitter Axe (Common).\n",
+      "[2026-08-18T23:51:55.156Z] [reward] \u2726 Found A Child's Drawing \u2014 The Family in the Mud. (open Contracts \u2192 Collectibles to read)\n[2026-08-18T23:51:55.163Z] [world] You work the brick over. A part of it comes loose, intact.\n[2026-08-18T23:51:55.163Z] [world] You salvage the gate. The take is small but real.\n",
+      "[2026-08-18T23:51:55.163Z] [world] The the lantern yields little of value, though a Smooth Stone ends up in your pack.\n[2026-08-18T23:51:55.163Z] [world] You work the sign over. A part of it comes loose, intact.\n",
+      "[2026-08-18T23:51:55.164Z] [world] You break the stripped sentinel diagnostic console down. Among the pieces, a fragment of someone's writing \u2014 held against the world by stubbornness alone.\n[2026-08-18T23:51:55.164Z] [world] You salvage the table. The take is small but real.\n[2026-08-18T23:51:55.164Z] [world] You salvage the tilted capacitor coil rack. The take is small but real.\n",
+      "[2026-08-18T23:51:55.164Z] [reward] \u2726 Salvage haul:\n[2026-08-18T23:51:55.164Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-08-18T23:51:55.165Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-18T23:51:55.165Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-08-18T23:51:55.165Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-08-18T23:51:55.165Z] [reward]     \u2022 Bent Nail x2 (Common)\n",
+      "[2026-08-18T23:51:55.165Z] [reward]     \u2022 Automaton Circuit (Common)\n[2026-08-18T23:52:09.034Z] [debug] persist sizes(KB): total=29 player=6 wm=17[rooms=4 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=4 scene=2\n[2026-08-18T23:52:17.951Z] [debug] appstate: active \u2192 background (was active for 49924ms)\n[2026-08-18T23:52:18.113Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-19T00:28:31.303Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01704-bc35-7762-b40b-58936267b253\n[2026-08-19T00:28:31.303Z] [debug] ota: Checking\u2026\n[2026-08-19T00:28:32.225Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-19T00:28:32.428Z] [debug] ota: Saving progress\u2026\n",
+      "[2026-08-19T00:28:32.429Z] [debug] ota: Restarting to apply\u2026\n[2026-08-19T00:28:32.546Z] [debug] ota: boot check result = applied\n[2026-08-19T00:28:32.669Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01764-f343-73b1-a10e-570247f34db2\n[2026-08-19T00:28:32.669Z] [debug] ota: Checking\u2026\n[2026-08-19T00:28:32.747Z] [debug] ota: Already up to date\n",
+      "[2026-08-19T00:28:32.747Z] [debug] ota: boot check result = noUpdate\n[2026-08-19T00:28:32.764Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-19T00:28:32.764Z] [debug] voice: bundled idle\n[2026-08-19T00:28:37.280Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-08-19T00:28:38.475Z] [debug] OTA applied: 2026-08-18-1361-the-active-one-glows \u2192 2026-08-18-1362-the-shared-roll-of-the-fallen.\n[2026-08-19T00:28:38.476Z] [debug] OTA session start: 2026-08-18-1362-the-shared-roll-of-the-fallen.\n[2026-08-19T00:28:38.476Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n",
+      "[2026-08-19T00:28:38.476Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cinderbound. We've still got ground to cover, you and I.\"\n[2026-08-19T00:29:29.119Z] [debug] appstate: active \u2192 background (was active for 51830ms)\n[2026-08-19T00:29:29.251Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-19T03:11:38.964Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-19T03:11:38.966Z] [debug] appstate: background \u2192 active (was background for 9729846ms)\n[2026-08-19T03:11:38.981Z] [debug] freeze forensics: last boot ended mid-action \u2014 (no action yet) @ ? (2026-08-19T00:28:36.494Z)\n",
+      "[2026-08-19T03:11:39.059Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01764-f343-73b1-a10e-570247f34db2\n[2026-08-19T03:11:39.059Z] [debug] ota: Checking\u2026\n[2026-08-19T03:11:39.364Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-19T03:11:40.364Z] [debug] ota: Saving progress\u2026\n",
+      "[2026-08-19T03:11:40.432Z] [debug] ota: Restarting to apply\u2026\n[2026-08-19T03:11:40.450Z] [debug] ota: boot check result = applied\n[2026-08-19T03:11:40.454Z] [debug] appstate: active \u2192 background (was active for 1489ms)\n[2026-08-19T03:11:40.721Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01799-fcbe-706b-8b22-2358aee667b7\n",
+      "[2026-08-19T03:11:40.721Z] [debug] ota: Checking\u2026\n[2026-08-19T03:11:40.814Z] [debug] ota: Already up to date\n[2026-08-19T03:11:40.815Z] [debug] ota: boot check result = noUpdate\n[2026-08-19T03:11:40.853Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-19T03:11:40.854Z] [debug] voice: bundled idle\n",
+      "[2026-08-19T03:11:43.516Z] [debug] OTA applied: 2026-08-18-1362-the-shared-roll-of-the-fallen \u2192 2026-08-19-1363-the-dead-cross-on-their-own.\n[2026-08-19T03:11:43.516Z] [debug] OTA session start: 2026-08-19-1363-the-dead-cross-on-their-own.\n[2026-08-19T03:11:43.516Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n",
+      "[2026-08-19T03:11:43.516Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cinderbound. I kept watch while you were gone.\"\n[2026-08-19T03:11:45.385Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-19T03:12:53.747Z] [debug] appstate: active \u2192 background (was active for 68314ms)\n[2026-08-19T03:12:53.867Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-19T03:13:11.974Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-19T03:13:11.975Z] [debug] appstate: background \u2192 active (was background for 18228ms)\n[2026-08-19T03:13:19.980Z] [debug] qwen: re-warming after 8000ms settled foreground\n",
+      "[2026-08-19T13:15:56.422Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01799-fcbe-706b-8b22-2358aee667b7\n[2026-08-19T13:15:56.422Z] [debug] ota: Checking\u2026\n[2026-08-19T13:15:57.555Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-19T13:15:57.748Z] [debug] ota: Saving progress\u2026\n",
+      "[2026-08-19T13:15:57.756Z] [debug] ota: Restarting to apply\u2026\n[2026-08-19T13:15:57.879Z] [debug] ota: boot check result = applied\n[2026-08-19T13:15:58.032Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a0181b-a0b1-7e7e-93db-7d4a8d47cde0\n[2026-08-19T13:15:58.032Z] [debug] ota: Checking\u2026\n[2026-08-19T13:15:58.115Z] [debug] ota: Already up to date\n",
+      "[2026-08-19T13:15:58.116Z] [debug] ota: boot check result = noUpdate\n[2026-08-19T13:15:58.132Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-19T13:15:58.132Z] [debug] voice: bundled idle\n[2026-08-19T13:16:02.656Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-08-19T13:16:04.754Z] [debug] OTA applied: 2026-08-19-1363-the-dead-cross-on-their-own \u2192 2026-08-19-1364-the-mailbox-waits.\n[2026-08-19T13:16:04.755Z] [debug] OTA session start: 2026-08-19-1364-the-mailbox-waits.\n[2026-08-19T13:16:04.755Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n",
+      "[2026-08-19T13:16:04.755Z] [world] Whispers carried while you slept off the world. Something that was rumour the last time you walked here is closer to fact now.\n[2026-08-19T13:16:04.760Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Cinderbound. I wondered when you'd take up the thread again. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands.",
+      " Read the World for the account.\"\n[2026-08-19T13:16:39.011Z] [debug] appstate: active \u2192 background (was active for 36339ms)\n[2026-08-19T13:16:39.133Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-19T13:17:42.622Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n",
+      "[2026-08-19T13:17:42.622Z] [debug] appstate: background \u2192 active (was background for 63611ms)\n[2026-08-19T13:17:50.644Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-19T13:17:51.160Z] [debug] ctx: OPENED \u2014 live=1 (opened=2 released=1) \u2248425MB est\n[2026-08-19T13:18:00.748Z] [debug] appstate: active \u2192 background (was active for 9583ms)\n",
+      "[2026-08-19T13:18:00.885Z] [debug] ctx: RELEASED \u2014 live=0 (opened=2 released=2)\n[2026-08-19T13:49:38.940Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a0181b-a0b1-7e7e-93db-7d4a8d47cde0\n[2026-08-19T13:49:38.940Z] [debug] ota: Checking\u2026\n[2026-08-19T13:49:39.838Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n",
+      "[2026-08-19T13:49:40.012Z] [debug] ota: Saving progress\u2026\n[2026-08-19T13:49:40.016Z] [debug] ota: Restarting to apply\u2026\n[2026-08-19T13:49:40.130Z] [debug] ota: boot check result = applied\n[2026-08-19T13:49:40.289Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01a3b-305d-742e-ad4f-8c6d32ff4743\n[2026-08-19T13:49:40.289Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-19T13:49:40.360Z] [debug] ota: Already up to date\n[2026-08-19T13:49:40.361Z] [debug] ota: boot check result = noUpdate\n[2026-08-19T13:49:40.380Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-19T13:49:40.380Z] [debug] voice: bundled idle\n[2026-08-19T13:49:43.319Z] [debug] OTA applied: 2026-08-19-1364-the-mailbox-waits \u2192 2026-08-19-1365-beasts-first.\n",
+      "[2026-08-19T13:49:43.319Z] [debug] OTA session start: 2026-08-19-1365-beasts-first.\n[2026-08-19T13:49:43.319Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-08-19T13:49:43.319Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cinderbound. The buried country is no place to walk alone.\"\n",
+      "[2026-08-19T13:49:44.683Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-19T13:50:01.678Z] [debug] appstate: active \u2192 background (was active for 16931ms)\n[2026-08-19T13:50:01.924Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-19T13:50:12.992Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-19T13:50:12.992Z] [debug] appstate: background \u2192 active (was background for 11315ms)\n[2026-08-19T13:50:17.576Z] [debug] qwen: re-warm cancelled (left the foreground first)\n",
+      "[2026-08-19T13:50:17.578Z] [debug] appstate: active \u2192 background (was active for 4586ms)\n[2026-08-19T19:25:17.401Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01a3b-305d-742e-ad4f-8c6d32ff4743\n[2026-08-19T19:25:17.401Z] [debug] ota: Checking\u2026\n[2026-08-19T19:25:18.425Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n",
+      "[2026-08-19T19:25:18.587Z] [debug] ota: Saving progress\u2026\n[2026-08-19T19:25:18.588Z] [debug] ota: Restarting to apply\u2026\n[2026-08-19T19:25:18.834Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01ac8-5821-78ea-9880-c6edd828d2cd\n[2026-08-19T19:25:18.834Z] [debug] ota: Checking\u2026\n[2026-08-19T19:25:18.907Z] [debug] ota: Already up to date\n",
+      "[2026-08-19T19:25:18.907Z] [debug] ota: boot check result = noUpdate\n[2026-08-19T19:25:18.917Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-19T19:25:18.917Z] [debug] voice: bundled idle\n[2026-08-19T19:25:23.523Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-08-19T19:25:26.638Z] [debug] OTA applied: 2026-08-19-1365-beasts-first \u2192 2026-08-19-1366-a-clone-is-sent.\n[2026-08-19T19:25:26.638Z] [debug] OTA session start: 2026-08-19-1366-a-clone-is-sent.\n[2026-08-19T19:25:26.638Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n",
+      "[2026-08-19T19:25:26.642Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cinderbound. The road kept your place. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n[2026-08-19T19:25:33.460Z] [debug] ui: tap \"COURT\"\n[2026-08-19T19:25:33.488Z] [player] go north\n",
+      "[2026-08-19T19:25:33.489Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0\n[2026-08-19T19:25:33.490Z] [world] You head on to the Court.\n[2026-08-19T19:25:33.491Z] [debug] scene: loc=monarch_waystation hub=outpost_central arrival=n opening=n passing=n\n",
+      "[2026-08-19T19:25:33.527Z] [debug] spawn: gear=[Architect's Aetheric Boots, Mud Heater Sword] window=3\n[2026-0"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxuqrhd0b3 [inline 1/22]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtaxuqrhd0b3"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "22"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T03:03:40.851745Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T03:03:41.334000Z",
+  "fingerprints": [
+    "e0f4cb018e4ab970e70b2d84412932d2"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e433b5348a5c41189bc8c580eb238939",
+  "previousEventID": "d2136fa9dfdc4daaa98f308e83ceb6fc"
+}

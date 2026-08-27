@@ -1,0 +1,197 @@
+{
+  "id": "7b067593bc2e42408c2e67472d655069",
+  "groupID": "7694761507",
+  "eventID": "7b067593bc2e42408c2e67472d655069",
+  "projectID": "4511945117532160",
+  "size": 17855,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxu4o1qm9m [inline 5/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxu4o1qm9m [inline 5/23]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxu4o1qm9m [inline 5/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "15b51f4575bd4720814f03ecd3dcf9b7",
+      "span_id": "996fe59a0d2dccdd",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "res for the devout,\" Vael says. \"Which is a great deal of rope and very little comfort, in my experience of the devout.\"\n[2026-08-21T02:14:48.084Z] [world] Vael of the Listening Stone says it as though it has already been written down somewhere and signed.\n[2026-08-21T02:14:49.147Z] [world] You let the conversation go and Vael of the Listening Stone gets back to it.\n",
+      "[2026-08-21T02:14:49.282Z] [debug] qwen\u23f1 flourish ok 2758ms read 2074ms/write 620ms in 129t\u2192out 19t 16.1ms/t (93ch)\n[2026-08-21T02:14:49.376Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 2758ms \u2014 flourish:empty\n[2026-08-21T02:14:49.376Z] [debug] flourish: \u2205 2962ms\n[2026-08-21T02:15:00.031Z] [reward] Sold Mud Shortsword to Vael of the Listening Stone for 14 TC. (24 TC on hand)\n",
+      "[2026-08-21T02:15:00.072Z] [reward] Sold Vine Grasp to Vael of the Listening Stone for 14 TC. (38 TC on hand)\n[2026-08-21T02:15:00.100Z] [reward] Sold Bone Shortsword to Vael of the Listening Stone for 14 TC. (52 TC on hand)\n[2026-08-21T02:15:00.127Z] [reward] Sold Club to Vael of the Listening Stone for 13 TC. (65 TC on hand)\n",
+      "[2026-08-21T02:15:00.153Z] [reward] Sold Compact Laser Pistol (Ranged) to Vael of the Listening Stone for 12 TC. (77 TC on hand)\n[2026-08-21T02:15:00.178Z] [reward] Sold Reclaimer's Trowel to Vael of the Listening Stone for 12 TC. (89 TC on hand)\n[2026-08-21T02:15:00.203Z] [reward] Sold Aetheric Warplate to Vael of the Listening Stone for 8 TC. (97 TC on hand)\n",
+      "[2026-08-21T02:15:00.229Z] [reward] Sold Rough-Hewn Chestplate to Vael of the Listening Stone for 8 TC. (105 TC on hand)\n[2026-08-21T02:15:00.254Z] [reward] Sold Lost Scholar's Robe to Vael of the Listening Stone for 8 TC. (113 TC on hand)\n[2026-08-21T02:15:00.279Z] [reward] Sold Arcane Observer's Circlet to Vael of the Listening Stone for 6 TC. (119 TC on hand)\n",
+      "[2026-08-21T02:15:00.304Z] [reward] Sold Aetheric Scout Greaves to Vael of the Listening Stone for 6 TC. (125 TC on hand)\n[2026-08-21T02:15:00.329Z] [reward] Sold Shaman's Warden Gloves to Vael of the Listening Stone for 6 TC. (131 TC on hand)\n[2026-08-21T02:15:00.353Z] [reward] \u2726 You named your price and held it. +1 CHA (base 6, 9 as you stand).\n",
+      "[2026-08-21T02:15:00.377Z] [reward] Sold Architect's Aetheric Boots to Vael of the Listening Stone for 6 TC. (137 TC on hand)\n[2026-08-21T02:15:00.401Z] [reward] Sold Reclaimer's Boots to Vael of the Listening Stone for 6 TC. (143 TC on hand)\n[2026-08-21T02:15:00.425Z] [reward] Sold Aetheric Helm of Command to Vael of the Listening Stone for 6 TC. (149 TC on hand)\n",
+      "[2026-08-21T02:15:00.450Z] [reward] Sold Sentinel's Greaves to Vael of the Listening Stone for 6 TC. (155 TC on hand)\n[2026-08-21T02:15:00.998Z] [debug] persist sizes(KB): total=194 player=48 wm=58[rooms=29 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=84 scene=5\n[2026-08-21T02:15:19.961Z] [reward] Bought Aetheric Compass from Vael of the Listening Stone for 50 TC. (105 TC left)\n",
+      "[2026-08-21T02:15:19.964Z] [reward] They don't charge a friend full price \u2014 2 TC stayed in your pouch.\n[2026-08-21T02:15:20.003Z] [debug] stats: STR8 DEX14 INT6 WIS6 CHA9 STE9 | gear: DEX+8,STR+4,CHA+2,INT+1,WIS+1,STE+2 | worn: main=Mud Repeater Crossbow off=Quarry-Hewn Skewer head=Sentinel's Faceguard chest=Mud-Warden's Vest hands=Golem Leather Gloves legs=Golem-Warden's Legplates feet=Relic Hunt",
+      "er's Boots cloak=Architect's Outer Mantle amulet=Aetheric Compass ring=Ring of Shadows\n[2026-08-21T02:15:25.241Z] [reward] Bought 3\u00d7 Trail Rations from Vael of the Listening Stone for 21 TC. (84 TC left)\n[2026-08-21T02:15:27.680Z] [reward] Bought First Aid Kit from Vael of the Listening Stone for 23 TC. (61 TC left)\n",
+      "[2026-08-21T02:15:27.681Z] [reward] They don't charge a friend full price \u2014 1 TC stayed in your pouch.\n[2026-08-21T02:15:37.872Z] [reward] Vael of the Listening Stone fires up a portable Crucible for you. (\u221225 TC)\n[2026-08-21T02:15:45.724Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.\n",
+      "[2026-08-21T02:15:45.726Z] [reward] \u2726 The Crucible forges a Legendary piece of armor from your reserved pieces \u2014 and it's in your pack, still cooling.\n[2026-08-21T02:15:45.727Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet \u2014 let it finish. You'll know it the moment it announces itself.\n",
+      "[2026-08-21T02:15:50.163Z] [debug] qwen\u23f1 forge_name ok 4312ms read 2139ms/write 2140ms in 205t\u2192out 63t 10.4ms/t HIT-CAP (235ch)\n[2026-08-21T02:15:50.276Z] [reward] \u2726 The forging finishes \u2014 the Aether names it Threadbare Plate (Legendary).\n[2026-08-21T02:16:00.032Z] [debug] qwen\u23f1 item_synthesis_hw ok 4849ms read 3536ms/write 759ms in 337t\u2192out 24t 10.5ms/t (97ch)\n",
+      "[2026-08-21T02:16:00.032Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n10 avg3.0s max7.2s read1.1s/write1.5s in126t\u2192out28t ms/tok 2.1-22.7 | narration:scene_intro n9 avg9.5s max13.1s read8.6s/write0.2s in748t\u2192out4t ms/tok 12.9-12.9 cap1 wait0.7s \u23f88 \u27028/72.8s | item_synthesis_hw n7 avg4.8s max8.4s read6.3s/write1.9s in341t\u2192out42t ms/tok 1.2-11.1 | narration:scene_intro_fill n5 avg9.1s max10.7s read7.0s/",
+      "write0.9s in790t\u2192out26t ms/tok 9.6-11.9 cap4 \u23f81 \u27021/5.7s | ambient n5 avg8.6s max12.0s read3.8s/write1.2s in354t\u2192out31t ms/tok 7.2-17.6 cap5 wait3.2s | forge_name n2 avg4.7s max5.2s read2.6s/write2.1s in206t\u2192out63t ms/tok 10.4-14.9 cap2 | flourish n2 avg2.4s max2.8s read1.7s/write0.6s in127t\u2192out19t ms/tok 10.4-16.1 \u27021/2.8s || WASTED 10 calls / 81.3s\n",
+      "[2026-08-21T02:16:00.411Z] [debug] qwen\u23f1 \u2702 DISCARDED item_synthesis_hw after 4849ms \u2014 item_synth:rejected-by-clamp bad-kind=\"tool\"\n[2026-08-21T02:16:00.412Z] [debug] homework: item_desc \"Reclaimer's Rope\" \u2205 5241ms\n",
+      "[2026-08-21T02:16:01.215Z] [debug] stats: STR6 DEX16 INT6 WIS6 CHA9 STE9 | gear: DEX+10,STR+2,CHA+2,INT+1,WIS+1,STE+2 | worn: main=Mud Repeater Crossbow off=Quarry-Hewn Skewer head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Golem-Warden's Legplates feet=Relic Hunter's Boots cloak=Architect's Outer Mantle amulet=Aetheric Compass ring=Ring of Shadows\n",
+      "[2026-08-21T02:16:10.474Z] [debug] persist sizes(KB): total=197 player=48 wm=58[rooms=29 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=87 scene=5\n[2026-08-21T02:16:20.088Z] [reward] Vael of the Listening Stone fires up a portable Crucible for you. (\u221225 TC)\n[2026-08-21T02:16:28.543Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.\n",
+      "[2026-08-21T02:16:28.546Z] [reward] \u2726 The Crucible forges a Legendary piece of armor from your reserved pieces \u2014 and it's in your pack, still cooling.\n[2026-08-21T02:16:28.547Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet \u2014 let it finish. You'll know it the moment it announces itself.\n",
+      "[2026-08-21T02:16:32.102Z] [debug] qwen\u23f1 forge_name ok 3419ms read 2128ms/write 1271ms in 205t\u2192out 39t 10.4ms/t (170ch)\n[2026-08-21T02:16:32.228Z] [reward] \u2726 The forging finishes \u2014 the Aether names it Frayed Faulds (Legendary).\n",
+      "[2026-08-21T02:16:39.956Z] [debug] stats: STR6 DEX16 INT6 WIS6 CHA9 STE9 | gear: DEX+10,STR+2,CHA+2,INT+1,WIS+1,STE+2 | worn: main=Mud Repeater Crossbow off=Quarry-Hewn Skewer head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle amulet=Aetheric Compass ring=Ring of Shadows\n",
+      "[2026-08-21T02:16:45.100Z] [debug] qwen\u23f1 item_synthesis_hw ok 4455ms read 3656ms/write 781ms in 337t\u2192out 24t 10.8ms/t (97ch)\n[2026-08-21T02:16:45.104Z] [debug] qwen\u23f1 \u2702 DISCARDED item_synthesis_hw after 4455ms \u2014 item_synth:rejected-by-clamp bad-kind=\"tool\"\n[2026-08-21T02:16:45.105Z] [debug] homework: item_desc \"Reclaimer's Rope\" \u2205 4792ms\n[2026-08-21T02:16:57.271Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-21T02:17:01.276Z] [debug] persist sizes(KB): total=196 player=47 wm=57[rooms=29 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=87 scene=5\n[2026-08-21T02:17:06.656Z] [debug] ui: tap \"craft\"\n[2026-08-21T02:17:16.241Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-08-21T02:17:16.288Z] [player] craft Mud Scanner\n",
+      "[2026-08-21T02:17:16.289Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mud scanner resolved=- range=- enemies=0 hooks=0\n[2026-08-21T02:17:16.292Z] [reward] \u2726 Crafted Mud Scanner. The Arbiter watches you set the last piece.\n[2026-08-21T02:17:16.293Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-08-21T02:17:16.293Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-21T02:17:16.378Z] [cognitive] neutral  (84ms)\n[2026-08-21T02:17:24.989Z] [player] craft Aether-Shard Ring\n[2026-08-21T02:17:24.990Z] [debug] parser: intent=craft conf=1.00 verb=craft target=aether shard ring resolved=Aether Shard range=- enemies=0 hooks=0\n",
+      "[2026-08-21T02:17:24.992Z] [reward] \u2726 Crafted Aether-Shard Ring. The Arbiter watches you set the last piece.\n[2026-08-21T02:17:24.992Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-21T02:17:24.993Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-21T02:17:25.089Z] [cognitive] USE_ITEM  (93ms)\n",
+      "[2026-08-21T02:17:28.547Z] [arbiter] The Arbiter nods. \"Patched in: Smooth Stone \u2192 Small Rock.\"\n[2026-08-21T02:17:28.550Z] [world] You repair the Acid-Etched Quarry-Hewn Skewer. Back to full. (spent: Small Rock x2)\n[2026-08-21T02:17:29.222Z] [arbiter] The Arbiter nods. \"Patched in: Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-08-21T02:17:29.228Z] [world] You repair the Relic Hunter's Boots. Back to full. (spent: Patched Cloth x4)\n[2026-08-21T02:17:29.784Z] [debug] qwen\u23f1 ambient ok 4706ms read 3679ms/write 985ms in 352t\u2192out 31t 10.5ms/t HIT-CAP (150ch)\n[2026-08-21T02:17:29.795Z] [arbiter] You, my companion, have journeyed far from the shadows of the past and the shadows of the lost Capitals.\n",
+      "[2026-08-21T02:17:29.795Z] [debug] arbiter: ambient \u2713 4801ms\n[2026-08-21T02:17:29.796Z] [debug] arbiter: ambient-said \"You, my companion, have journeyed far from the shadows of the past and the shadows of the lost Capitals.\"\n[2026-08-21T02:17:30.008Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-08-21T02:17:30.013Z] [world] You repair the Golem-Warden's Legplates. Back to full. (spent: Patched Cloth x4)\n[2026-08-21T02:17:30.583Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-21T02:17:30.584Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Clot\u2026\"\n",
+      "[2026-08-21T02:17:30.588Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-21T02:17:40.124Z] [debug] persist sizes(KB): total=196 player=47 wm=57[rooms=29 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=87 scene=5\n[2026-08-21T02:17:43.485Z] [player] summon crystal golem\n",
+      "[2026-08-21T02:17:43.485Z] [debug] parser: intent=cast conf=1.00 verb=summon target=crystal golem resolved=crystal range=- enemies=0 hooks=0\n[2026-08-21T02:17:43.521Z] [combat] Aether Golem Constructor \u2014 d20 6 + INT 6 = 12 vs DC 21 \u2014 \u2717 FAILED\n[2026-08-21T02:17:43.523Z] [world] (2\u00d7 Aether Crystal + 1\u00d7 Aetheric Cloth + 1\u00d7 Aetheric Shard consumed.)\n",
+      "[2026-08-21T02:17:43.523Z] [world] The shape slips out of your hands. The aether returns to itself, indifferent.\n[2026-08-21T02:17:43.524Z] [system] \u23f3 Time passed: 30 min\n[2026-08-21T02:17:43.662Z] [cognitive] USE_ITEM  (137ms)\n[2026-08-21T02:17:50.237Z] [player] Ask about their people\n",
+      "[2026-08-21T02:17:50.239Z] [world] \"We serve the Giants.\" A slight bow. \"Not the memory of them. Them. I understand how that sounds to somebody who counts them as history.\"\n[2026-08-21T02:17:50.241Z] [world] Vael of the Listening Stone uses your name in the middle of it without making anything of it.\n",
+      "[2026-08-21T02:17:50.721Z] [debug] qwen\u23f1 flourish ok 1650ms read 1308ms/write 311ms in 129t\u2192out 10t 10.1ms/t (47ch)\n[2026-08-21T02:17:50.818Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 1650ms \u2014 flourish:empty\n[2026-08-21T02:17:50.819Z] [debug] flourish: \u2205 1848ms\n[2026-08-21T02:17:50.903Z] [player] Ask why they serve\n",
+      "[2026-08-21T02:17:50.903Z] [world] Vael of the Listening Stone gives you a look that measures the question for irony and finds none. \"Because somebody stands at this desk, and the last one who stood here was worse. That is the honest shape of it. You do not serve because the cause is clean \u2014 no cause is clean. You serve because you have seen the desk empty, and empty is worse.\"\n",
+      "[2026-08-21T02:17:50.904Z] [world] Vael of the Listening Stone talks to you while doing something else, which is its own kind of trust.\n[2026-08-21T02:17:51.521Z] [player] Ask what the post has cost them\n",
+      "[2026-08-21T02:17:51.522Z] [world] \"Friends, in the ordinary way \u2014 people hear the title before they hear me now.\" Vael of the Listening Stone straightens something on the desk. \"But the real price is smaller and dearer: I have not said a careless sentence in nine years. Every word weighed, every joke checked for edges. You are hearing the loosest I get, and you will notice I am still watching the",
+      " door.\"\n[2026-08-21T02:17:51.523Z] [world] Vael of the Listening Stone says it as though it has already been written down somewhere and signed.\n[2026-08-21T02:17:52.637Z] [world] You let the conversation go and Vael of the Listening Stone gets back to it.\n[2026-08-21T02:18:01.369Z] [debug] appstate: active \u2192 background (was active for 372211ms)\n",
+      "[2026-08-21T02:18:01.651Z] [debug] ctx: RELEASED \u2014 live=0 (opened=6 released=6)\n[2026-08-21T02:18:31.291Z] [debug] appstate: background \u2192 active (was background for 29922ms)\n[2026-08-21T02:18:39.304Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-21T02:18:40.094Z] [debug] ctx: OPENED \u2014 live=1 (opened=7 released=6) \u2248425MB est\n",
+      "[2026-08-21T02:18:46.289Z] [world] You set course for Samarran. 6 tiles \u2014 about 15 hours of travel, all in. Tap the \u2192 SAMARRAN button on the travel row to press on; STOP TRAVEL to halt.\n[2026-08-21T02:18:46.300Z] [debug] spawn: gear=[Titan's Swiftstep Boots, Tartarian Claw Knife] window=10 roster=new\n",
+      "[2026-08-21T02:18:46.302Z] [world] You walk east through open silt. The compass tells you Samarran lies 4 stretches further east.\n[2026-08-21T02:18:46.304Z] [world] You catch the glint of something half-buried as your boot lands. You free it.\n[2026-08-21T02:18:46.304Z] [reward] \u2726 First Aid Kit (Uncommon).\n",
+      "[2026-08-21T02:18:46.305Z] [world] A crystal embedded in a half-broken pillar whispers \u2014 actual words, almost \u2014 when you pass within arm's reach.\n[2026-08-21T02:18:48.957Z] [debug] ui: tap \"take / salvage\"\n[2026-08-21T02:18:50.375Z] [world] You take the Tartarian Claw Knife from where it lay.\n[2026-08-21T02:18:50.376Z] [reward] \u2726 Tartarian Claw Knife (Common).\n",
+      "[2026-08-21T02:18:50.393Z] [world] You take the Titan's Swiftstep Boots from where it lay.\n[2026-08-21T02:18:50.393Z] [reward] \u2726 Titan's Swiftstep Boots (Common).\n[2026-08-21T02:18:50.701Z] [debug] persist sizes(KB): total=181 player=47 wm=43[rooms=14 events=1"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxu4o1qm9m [inline 5/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtaxu4o1qm9m"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "5"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T03:03:12.386633Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T03:03:12.685000Z",
+  "fingerprints": [
+    "e0f4cb018e4ab970e70b2d84412932d2"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "a4b0d70014084a00ba38d079db96cc26",
+  "previousEventID": "78a83f6bb0934011a53a386ffcd67daf"
+}

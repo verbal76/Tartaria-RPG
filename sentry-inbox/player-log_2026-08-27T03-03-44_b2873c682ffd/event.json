@@ -1,0 +1,221 @@
+{
+  "id": "b2873c682ffd4936b461d04364e4bd5d",
+  "groupID": "7694761507",
+  "eventID": "b2873c682ffd4936b461d04364e4bd5d",
+  "projectID": "4511945117532160",
+  "size": 17604,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxut1k7apv [inline 11/22]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxut1k7apv [inline 11/22]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxut1k7apv [inline 11/22]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "cc12a2d0dc294ebe97ed7d29c7b7b84c",
+      "span_id": "af31e926665e7971",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "tro after 5602ms \u2014 cancelled:player-acted-again\n[2026-08-19T21:39:14.631Z] [cognitive] neutral  (339ms)\n[2026-08-19T21:39:17.057Z] [player] Ask about their people\n[2026-08-19T21:39:17.058Z] [world] \"The Guild pays me to make old things work again.\" He wipes his hands. \"What they actually want is for old things to work again in ways they understand. Those are not the same job and I get paid for the",
+      " wrong one.\"\n[2026-08-19T21:39:17.059Z] [world] Tarek the Tinkerer lets the sentence run longer than they would for a stranger.\n[2026-08-19T21:39:17.280Z] [debug] persist sizes(KB): total=132 player=18 wm=25[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=87 scene=2\n[2026-08-19T21:39:17.826Z] [player] Ask how they learned the craft\n",
+      "[2026-08-19T21:39:17.827Z] [world] \"Badly, first.\" Tarek the Tinkerer holds up their hands as evidence \u2014 old burns, old lines. \"Everything I know is a mistake I only made once. The craft is not in the making, it is in the remembering. My hands keep the notes.\"\n",
+      "[2026-08-19T21:39:17.828Z] [world] Tarek the Tinkerer keeps working while they talk \u2014 a rag over a joint, a thumb testing an edge that did not need testing.\n[2026-08-19T21:39:19.376Z] [world] You let the conversation go and Tarek the Tinkerer gets back to it.\n[2026-08-19T21:39:19.504Z] [debug] qwen\u23f1 flourish ok 3693ms read 6516ms/write 1084ms in 129t\u2192out 20t (71ch)\n",
+      "[2026-08-19T21:39:19.626Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 3693ms \u2014 flourish:stale-walked-away\n[2026-08-19T21:39:19.627Z] [debug] flourish: stale 3950ms\n[2026-08-19T21:39:21.926Z] [debug] ui: tap \"\u2190 \u2713 STRONGROOM\"\n[2026-08-19T21:39:21.950Z] [player] go west\n[2026-08-19T21:39:21.955Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-19T21:39:21.956Z] [world] You head on to the Strongroom.\n[2026-08-19T21:39:21.956Z] [debug] scene: loc=monarch_waystation hub=outpost_relic_vault arrival=n opening=n passing=n\n[2026-08-19T21:39:21.963Z] [world] Monarch Court \u2014 The Royal Strongroom. A vault behind two heavy doors, both keyed to the Monarchs' inner circle. The shelves hold what the family wants the world to never see again.",
+      "\n[2026-08-19T21:39:21.963Z] [world] You've stood here many times. (visit 11)\n[2026-08-19T21:39:21.964Z] [world] Paths: south to Standards \u00b7 east to Workshop \u00b7 west to Curiosities. (Type 'leave outpost' to head into the wilds.)\n[2026-08-19T21:39:21.973Z] [debug] arbiter: template (reason=busy)\n[2026-08-19T21:39:21.974Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-19T21:39:24.773Z] [cognitive] TRAVEL  (2796ms)\n[2026-08-19T21:39:24.941Z] [debug] ui: tap \"\u2190 \u2713 CURIOSITIES\"\n[2026-08-19T21:39:24.953Z] [player] go west\n[2026-08-19T21:39:24.954Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0\n[2026-08-19T21:39:24.955Z] [world] You head on to the Curiosities.\n",
+      "[2026-08-19T21:39:24.955Z] [debug] scene: loc=monarch_waystation hub=outpost_lab arrival=n opening=n passing=n\n[2026-08-19T21:39:24.992Z] [world] Monarch Court \u2014 The Cabinet of Curiosities. The Monarchs' private collection of suppressed Tartarian artifacts. Jorah catalogs each piece for the family that owns it; nothing leaves these shelves.\n",
+      "[2026-08-19T21:39:24.993Z] [world] You've stood here again. (visit 3)\n[2026-08-19T21:39:24.993Z] [world] Paths: east to Strongroom. (Type 'leave outpost' to head into the wilds.)\n[2026-08-19T21:39:24.993Z] [world] Jorah the Scholar places you as you come in. \"Cinderbound. What are you after?\"\n",
+      "[2026-08-19T21:39:24.994Z] [world] Jorah the Scholar offers a contract: \"Field Samples.\" (Say 'accept samples' or open Contracts for details.)\n[2026-08-19T21:39:24.994Z] [world] Jorah the Scholar points at the bounty board: \"The Bog Dragon of Old Drakova.\" (Say 'accept drakova' or open Contracts.)\n[2026-08-19T21:39:24.995Z] [debug] arbiter: template (reason=cooldown)\n",
+      "[2026-08-19T21:39:24.995Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T21:39:25.000Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T21:39:25.125Z] [cognitive] TRAVEL  (122ms)\n[2026-08-19T21:39:26.292Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-19T21:39:27.545Z] [world] You break the cracked engine chamber scaffolding apart. Among the pieces, something worth keeping.\n[2026-08-19T21:39:27.546Z] [reward] \u2726 Salvage haul:\n[2026-08-19T21:39:27.546Z] [reward]     \u2022 Automaton Circuit (Common)\n[2026-08-19T21:39:29.225Z] [debug] ui: tap \"\u2192 \u2713 STRONGROOM\"\n[2026-08-19T21:39:29.256Z] [player] go east\n",
+      "[2026-08-19T21:39:29.257Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0\n[2026-08-19T21:39:29.258Z] [world] You head on to the Strongroom.\n[2026-08-19T21:39:29.259Z] [debug] scene: loc=monarch_waystation hub=outpost_relic_vault arrival=n opening=n passing=n\n",
+      "[2026-08-19T21:39:29.266Z] [world] Monarch Court \u2014 The Royal Strongroom. A vault behind two heavy doors, both keyed to the Monarchs' inner circle. The shelves hold what the family wants the world to never see again.\n[2026-08-19T21:39:29.267Z] [world] You've stood here many times. (visit 12)\n",
+      "[2026-08-19T21:39:29.267Z] [world] Paths: south to Standards \u00b7 east to Workshop \u00b7 west to Curiosities. (Type 'leave outpost' to head into the wilds.)\n[2026-08-19T21:39:29.393Z] [cognitive] neutral  (117ms)\n[2026-08-19T21:39:30.659Z] [debug] ui: tap \"\u2193 \u2713 STANDARDS\"\n[2026-08-19T21:39:30.672Z] [player] go south\n",
+      "[2026-08-19T21:39:30.672Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0\n[2026-08-19T21:39:30.673Z] [world] You head on to the Standards.\n[2026-08-19T21:39:30.674Z] [debug] scene: loc=monarch_waystation hub=outpost_central arrival=n opening=n passing=n\n",
+      "[2026-08-19T21:39:30.679Z] [world] Monarch Court \u2014 The Court of Standards. A flagstone court ringed with the standards of every Lost Capital. A Monarch banner hangs over the central plinth where a cracked map-stone has been re-carved twice.\n[2026-08-19T21:39:30.680Z] [world] You've stood here many times. (visit 14)\n",
+      "[2026-08-19T21:39:30.680Z] [world] Paths: north to Strongroom \u00b7 south to Atrium \u00b7 east to Arsenal \u00b7 west to Banquet. (Type 'leave outpost' to head into the wilds.)\n[2026-08-19T21:39:30.680Z] [debug] arbiter: template (reason=cooldown)\n[2026-08-19T21:39:30.681Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T21:39:30.786Z] [cognitive] neutral  (102ms)\n",
+      "[2026-08-19T21:39:31.196Z] [debug] persist sizes(KB): total=131 player=18 wm=25[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=86 scene=2\n[2026-08-19T21:39:40.113Z] [debug] qwen\u23f1 narration:scene_intro preempted 18017ms wait 2676ms read 15214ms/write 0ms in 734t\u2192out 0t 20.7ms/t (3ch)\n",
+      "[2026-08-19T21:39:40.322Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro after 18017ms \u2014 cancelled:player-acted-again\n[2026-08-19T21:39:42.808Z] [debug] appstate: active \u2192 background (was active for 96845ms)\n[2026-08-19T21:39:57.124Z] [debug] qwen\u23f1 ambient dormant 26144ms wait 9342ms read 0ms/write 0ms in 360t\u2192out 0t 0.0ms/t (0ch)\n",
+      "[2026-08-19T21:39:57.514Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 26144ms \u2014 ambient:\u2205\n[2026-08-19T21:39:57.532Z] [debug] arbiter: ambient \u2205 26850ms\n[2026-08-19T21:39:57.533Z] [debug] arbiter: ambient-empty reason=model-returned-nothing\n[2026-08-19T21:39:58.326Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-19T21:46:43.755Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-19T21:46:43.775Z] [debug] appstate: background \u2192 active (was background for 420965ms)\n[2026-08-19T21:46:51.764Z] [debug] qwen: re-warming after 8000ms settled foreground\n",
+      "[2026-08-19T21:46:53.002Z] [debug] ctx: OPENED \u2014 live=1 (opened=2 released=1) \u2248425MB est\n[2026-08-19T21:46:53.727Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-19T21:47:10.761Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 17031ms read 10453ms/write 6533ms in 704t\u2192out 33t 14.8ms/t HIT-CAP (149ch)\n",
+      "[2026-08-19T21:47:10.769Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 17031ms \u2014 intro-fill:near-dup\n[2026-08-19T21:47:10.769Z] [debug] homework: scene_intro \"The Monarch's Waystation\" \u2205 17042ms\n[2026-08-19T21:47:12.258Z] [debug] appstate: active \u2192 background (was active for 19201ms)\n[2026-08-19T21:47:12.401Z] [debug] ctx: RELEASED \u2014 live=0 (opened=2 released=2)\n",
+      "[2026-08-19T22:05:52.415Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01bef-8d2f-73e1-b2c1-7165d8576118\n[2026-08-19T22:05:52.415Z] [debug] ota: Checking\u2026\n[2026-08-19T22:05:52.543Z] [debug] ota: Already up to date\n[2026-08-19T22:05:52.544Z] [debug] ota: boot check result = noUpdate\n[2026-08-19T22:05:52.595Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-19T22:05:52.595Z] [debug] voice: bundled idle\n[2026-08-19T22:05:56.889Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-19T22:06:28.177Z] [debug] appstate: active \u2192 background (was active for 31279ms)\n[2026-08-19T22:06:28.303Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-19T22:14:28.225Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-19T22:14:28.230Z] [debug] appstate: background \u2192 active (was background for 480052ms)\n[2026-08-19T22:14:35.081Z] [debug] qwen: re-warm cancelled (left the foreground first)\n",
+      "[2026-08-19T22:14:35.083Z] [debug] appstate: active \u2192 background (was active for 6855ms)\n[2026-08-19T22:14:38.699Z] [debug] appstate: background \u2192 active (was background for 3616ms)\n[2026-08-19T22:14:43.831Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-19T22:14:43.833Z] [debug] appstate: active \u2192 background (was active for 5134ms)\n",
+      "[2026-08-19T22:14:58.837Z] [debug] appstate: background \u2192 active (was background for 15004ms)\n[2026-08-19T22:15:04.251Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-19T22:15:04.251Z] [debug] appstate: active \u2192 background (was active for 5414ms)\n[2026-08-19T22:17:56.687Z] [debug] appstate: background \u2192 active (was background for 172433ms)\n",
+      "[2026-08-19T22:18:00.279Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-19T22:18:00.279Z] [debug] appstate: active \u2192 background (was active for 3595ms)\n[2026-08-19T22:18:00.543Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01c18-1b8e-7910-ac71-c09063b9c01f\n[2026-08-19T22:18:00.543Z] [debug] ota: Checking\u2026\n",
+      "[Filtered]",
+      "[2026-08-19T22:18:03.335Z] [debug] OTA session start: 2026-08-19-1370-the-corner-mini-map.\n[2026-08-19T22:18:03.335Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-08-19T22:18:03.335Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cinderbound. We've still got ground to cover, you and I.\"\n",
+      "[2026-08-19T22:18:05.361Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-19T22:18:22.165Z] [debug] ui: tap \"\u2191 \u2713 STRONGROOM\"\n[2026-08-19T22:18:22.174Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-08-19T22:18:22.195Z] [player] go north\n",
+      "[2026-08-19T22:18:22.196Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0\n[2026-08-19T22:18:22.197Z] [world] You head on to the Strongroom.\n[2026-08-19T22:18:22.197Z] [debug] scene: loc=monarch_waystation hub=outpost_relic_vault arrival=n opening=n passing=n\n",
+      "[2026-08-19T22:18:22.238Z] [world] Monarch Court \u2014 The Royal Strongroom. A vault behind two heavy doors, both keyed to the Monarchs' inner circle. The shelves hold what the family wants the world to never see again.\n[2026-08-19T22:18:22.239Z] [world] You've stood here many times. (visit 13)\n",
+      "[2026-08-19T22:18:22.239Z] [world] Paths: south to Standards \u00b7 east to Workshop \u00b7 west to Curiosities. (Type 'leave outpost' to head into the wilds.)\n[2026-08-19T22:18:22.246Z] [debug] arbiter: template (reason=busy)\n[2026-08-19T22:18:22.246Z] [arbiter] The Arbiter glances at the north. \"The seneschal logs your name without asking it. The Monarchs' ledgers have their ways.\"\n",
+      "[2026-08-19T22:18:22.307Z] [cognitive] TRAVEL  (59ms)\n[2026-08-19T22:18:31.586Z] [debug] ui: tap \"\u2192 \u2713 WORKSHOP\"\n[2026-08-19T22:18:31.596Z] [player] go east\n[2026-08-19T22:18:31.596Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0\n[2026-08-19T22:18:31.597Z] [world] You head on to the Workshop.\n",
+      "[2026-08-19T22:18:31.598Z] [debug] scene: loc=monarch_waystation hub=outpost_workshop arrival=n opening=n passing=n\n[2026-08-19T22:18:31.626Z] [world] Monarch Court \u2014 The Cabinet Workshop. An immaculate room of polished tools and dynastic technicians. Tarek serves the Monarchs as their relic-repairer \u2014 the older the artifact, the higher up the request came from.\n",
+      "[2026-08-19T22:18:31.627Z] [world] You've stood here again. (visit 5)\n[2026-08-19T22:18:31.627Z] [world] Paths: west to Strongroom. (Type 'leave outpost' to head into the wilds.)\n[2026-08-19T22:18:31.628Z] [world] Tarek the Tinkerer nods once. \"Cinderbound. Come look \u2014 a few things moved since you were last through.\"\n",
+      "[2026-08-19T22:18:31.628Z] [world] Tarek the Tinkerer jerks their chin north. \"The Conspiracy Architects raided our outpost while you were out there. Word travels slower than they do.\"\n[2026-08-19T22:18:31.629Z] [world] Tarek the Tinkerer nods at a mystery notice: \"Cradle of Dusk Compass.\" (Say 'accept compass' or open Contracts.)\n",
+      "[2026-08-19T22:18:31.650Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T22:18:31.769Z] [debug] qwen\u23f1 narration:scene_intro preempted 9466ms read 8956ms/write 440ms in 763t\u2192out 11t 11.7ms/t (56ch)\n[2026-08-19T22:18:31.816Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro after 9466ms \u2014 cancelled:player-acted-again\n[2026-08-19T22:18:31.868Z] [cognitive] neutral  (216ms)\n",
+      "[2026-08-19T22:18:33.701Z] [debug] ui: tap \"\u2190 \u2713 STRONGROOM\"\n[2026-08-19T22:18:33.723Z] [player] go west\n[2026-08-19T22:18:33.724Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0\n[2026-08-19T22:18:33.725Z] [world] You head on to the Strongroom.\n",
+      "[2026-08-19T22:18:33.726Z] [debug] scene: loc=monarch_waystation hub=outpost_relic_vault arrival=n opening=n passing=n\n[2026-08-19T22:18:33.732Z] [world] Monarch Court \u2014 The Royal Strongroom. A vault behind two heavy doors, both keyed to the Monarchs' inner circle. The shelves hold what the family wants the world to never se"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxut1k7apv [inline 11/22]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtaxut1k7apv"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "22"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T03:03:43.968600Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "31": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 393,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T03:03:44.276000Z",
+  "fingerprints": [
+    "e0f4cb018e4ab970e70b2d84412932d2"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "bfb01910092447c6b6bb7d94d3272b8c",
+  "previousEventID": "b24d11ff8eb34c77ba5518e7e78d6add"
+}
