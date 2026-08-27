@@ -1,22 +1,22 @@
-sync 2026-08-27 — follow the pagination cursor and go get Great Scott's missing
-parts. They were never lost; this reader stopped asking for them.
+sync 2026-08-27 — make the reader say which case it is, instead of guessing again.
 
-THE OWNER'S CHARACTER IS GREAT SCOTT, and his bundle is the one that came back
-5/27. The 03:0x sync fetched EXACTLY 100 event directories — Sentry's events
-endpoint caps a page at 100 and paginates with a `Link: rel="next"` cursor this
-reader never read. His four sends were about 120 events, and his character's
-bundle went out FIRST, so its parts were the oldest and fell off page one:
+TWO THINGS THIS RUN SETTLES.
 
-  mtaxtx2bzl8l: 5/27 — have 20,21,22,23,26, missing 1-19, 24, 25, 27
+1. SAFE FIELDS IS SET AND DID NOT WORK. The last run read back
+   safeFields: ['chunkBlocks'], and the four logs sent AFTER that save were still
+   scrubbed — 4 redactions of ~344 chars each, same trigger positions. Safe
+   Fields excludes by field NAME; the slice is an ARRAY, so the rule runs on
+   chunkBlocks.0, .1, .2 and the parent's exemption does not follow it down. The
+   relay no longer promises "redactions should be zero from here on"; it reports
+   what is set and defers the outcome to the measurement.
 
-Late parts present, early parts absent. That is backwards for a send dying on the
-device and is the exact signature of a truncated page. mtawqdrsm78g at 3/23 is
-the same wound. Both were reported as MISSING, which reads like a device fault
-and sent the hunt in the wrong direction.
+2. THE MISSING PARTS — ABSENT, OR UNREAD? The pagination fix recovered nothing,
+   and that run could not distinguish the two cases: whether the events are gone
+   from Sentry or the reader stopped asking, a re-sync produces zero new files
+   either way. So the run now ends with a VERDICT block stating how many pages
+   were walked, how many rows came back, and whether the cursor was exhausted
+   (COMPLETE — the parts are genuinely absent and only a fresh send recovers
+   them) or capped (TRUNCATED — they may simply be unread).
 
-Expected from this run: `tartaria: N events across all pages` with N well over
-100, mtaxtx2bzl8l assembling at or near 27/27, mtawqdrsm78g likewise — and the
-sixty tiles of travel finally readable.
-
-If the page cap is ever reached the run now says so loudly instead of returning a
-short list that looks complete.
+The owner's character is Great Scott and his bundle is mtaxtx2bzl8l at 5/27.
+Whether he needs to send again turns entirely on that one word.

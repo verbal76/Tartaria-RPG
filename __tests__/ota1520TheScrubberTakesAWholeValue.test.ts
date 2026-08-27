@@ -213,12 +213,38 @@ describe('OTA-1520 — the relay reads the reason, and stops stitching silent ho
     expect(RELAY).toContain("chunk = extraval(ev, 'chunk')");
   });
 
-  it('⚠ the scrubber settings are PRINTED, so the one switch that ends this is never assumed', () => {
-    // The blocks cap the damage at ~400 chars and no settings change can undo
-    // that. Listing `chunkBlocks` under the project's Safe Fields takes it to
-    // zero — the owner's switch to throw, since this token is read-scoped.
+  it('⚠ the scrubber settings are PRINTED, so nothing about them is ever assumed', () => {
     expect(RELAY).toContain("for k in ('dataScrubber', 'dataScrubberDefaults', 'scrubIPAddresses',");
     expect(RELAY).toContain("'sensitiveFields', 'safeFields'):");
-    expect(RELAY).toContain("print('  ⚠ chunkBlocks exempt: '");
+  });
+
+  it('⚠⚠ AND THE SAFE-FIELDS LINE NO LONGER PROMISES A RESULT IT DID NOT DELIVER', () => {
+    // ⚠⚠⚠ THIS PIN WAS WRITTEN OPTIMISTIC AND THE OWNER'S DEVICES CORRECTED IT.
+    // It originally required the line "chunkBlocks exempt: YES — redactions
+    // should be zero from here on". He saved `chunkBlocks` into the project's
+    // Safe Fields, the relay read it back as safeFields: ['chunkBlocks'], and
+    // the four logs he then sent on OTA-1520 were STILL scrubbed — 4 redactions,
+    // ~344 chars each, same trigger positions. Safe Fields excludes by field
+    // NAME; the slice is an ARRAY, so the rule runs on chunkBlocks.0, .1, .2 …
+    // and the parent's exemption does not follow it down.
+    // The line now reports only what is SET and defers the outcome to the
+    // measurement, which is the honest division of labour between config and
+    // evidence.
+    expect(RELAY).toContain("print('  ⚠ chunkBlocks in safeFields: '");
+    expect(RELAY).toContain('measured NOT to stop @password:filter on');
+    expect(RELAY).not.toContain('redactions should be zero from here on');
+  });
+
+  it('⚠⚠⚠ A TRUNCATED LISTING CAN NEVER AGAIN PASS AS "NOTHING THERE"', () => {
+    // The reader could not distinguish "those parts are absent from Sentry" from
+    // "I stopped asking at row 100", and both look identical on a re-sync: zero
+    // new files either way. The owner was told twice that his log was somewhere
+    // it was not. The run now states which case it is, last, so it lands in the
+    // tail of the job log instead of buried mid-stream.
+    expect(RELAY).toContain("print('════ VERDICT ════')");
+    expect(RELAY).toContain('page_audit[path] = (pages, len(rows), bool(url))');
+    expect(RELAY).toContain("state = 'TRUNCATED — more remain' if capped else 'COMPLETE — cursor exhausted'");
+    expect(RELAY).toContain('are UNPROVEN — they may simply be unread.');
+    expect(RELAY).toContain('therefore ABSENT FROM SENTRY, not unread');
   });
 });

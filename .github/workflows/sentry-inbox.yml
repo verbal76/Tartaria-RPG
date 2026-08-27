@@ -95,6 +95,7 @@ jobs:
           # bounded — an unbounded one against a busy project would run for
           # hours — but if the bound is ever hit, it SAYS so, loudly, instead of
           # returning a short list that looks complete.
+          page_audit = {}
           def api_all(path, max_pages=40):
               rows, url, pages = [], path, 0
               while url and pages < max_pages:
@@ -111,6 +112,7 @@ jobs:
                           if lo != -1 and hi > lo:
                               url = part[lo + 1:hi]
                           break
+              page_audit[path] = (pages, len(rows), bool(url))
               if url:
                   print(f'  ⚠⚠ PAGE CAP HIT after {pages} pages of {path} — '
                         f'{len(rows)} rows read and MORE REMAIN. Raise max_pages; '
@@ -385,10 +387,19 @@ jobs:
               rp = cfg.get('relayPiiConfig')
               print(f'  relayPiiConfig: {rp if rp else "(none)"}')
               safe = cfg.get('safeFields') or []
-              print('  ⚠ chunkBlocks exempt: '
-                    + ('YES — redactions should be zero from here on'
+              # ⚠⚠ 2026-08-27 — THIS LINE USED TO PROMISE "redactions should be
+              # zero from here on", AND THAT PROMISE IS NOW DISPROVEN. The owner
+              # saved `chunkBlocks` into Safe Fields, then sent four logs on
+              # OTA-1520, and @password:filter still took ~344 chars four times
+              # per bundle. Safe Fields excludes by FIELD NAME; the slice is an
+              # ARRAY, so the scrubber works on chunkBlocks.0, .1, .2 … and the
+              # exemption on the parent name does not follow it down. Say what is
+              # SET, and let the SCRUB TOTALS above say what it achieved.
+              print('  ⚠ chunkBlocks in safeFields: '
+                    + ('YES (set — but measured NOT to stop @password:filter on '
+                       'array elements; see SCRUB TOTALS)'
                        if any('chunkBlocks' in str(s) for s in safe)
-                       else 'NO — @password:filter can still take ~400 chars per hit'))
+                       else 'NO'))
 
           import urllib.parse
           for period in ('24h', '7d', '30d'):
@@ -431,6 +442,40 @@ jobs:
                             f"prepaid={c.get('prepaid')} usage={c.get('usage')}")
           except Exception as e:
               print('subscription query failed (token may lack billing scope):', e)
+
+          # ⚠⚠⚠ 2026-08-27 — THE VERDICT BLOCK, LAST, SO IT IS ALWAYS IN THE TAIL.
+          # Reading this run meant pulling hundreds of lines out of the middle of
+          # a job log to find one number. Worse, the one question that mattered —
+          # "are the missing parts absent from Sentry, or is this reader simply
+          # not asking for them?" — could not be answered at all, because either
+          # way a re-sync produces zero new files and looks identical.
+          #
+          # So the run now STATES it: how many pages were walked, how many rows
+          # came back, and whether the walk ran out of cursor (complete) or hit
+          # the cap (truncated). A reader that cannot distinguish "nothing there"
+          # from "I stopped looking" is how the owner got told twice that his log
+          # was somewhere it was not.
+          print()
+          print('════ VERDICT ════')
+          for path, (pages, rows, capped) in sorted(page_audit.items()):
+              state = 'TRUNCATED — more remain' if capped else 'COMPLETE — cursor exhausted'
+              print(f'  {path}')
+              print(f'    {pages} page(s), {rows} rows — {state}')
+          if any(c for _, _, c in page_audit.values()):
+              print('  ⚠⚠ At least one listing was truncated. Any MISSING parts below'
+                    ' are UNPROVEN — they may simply be unread.')
+          else:
+              print('  ⚠ Every listing ran to the end of its cursor. MISSING parts are'
+                    ' therefore ABSENT FROM SENTRY, not unread — the send did not'
+                    ' complete on the device, and only a fresh send can recover them.')
+          incomplete = [(bid, len(b['seen']), b['total'])
+                        for bid, b in bundles.items() if len(b['seen']) < b['total']]
+          if incomplete:
+              print('  incomplete bundles:')
+              for bid, have, total in sorted(incomplete):
+                  print(f'    {bid}: {have}/{total} parts')
+          else:
+              print('  every bundle is complete')
           PYEOF
       # ⚠⚠⚠ 2026-08-27 — REBASE BEFORE PUSHING, BECAUSE THE RELAY LOSES RACES.
       # This step used to `git push` bare, against a branch a session is actively
