@@ -25127,6 +25127,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // silence a question the game needs answered, or the save wedges exactly where
 // OTA-1027 found it.
 export const OTA_BUILD_ID = '2026-08-27-1524-cover-the-seven-and-mean-the-switch';
+// golem catch-up 2026-08-27: markerless publish of OTA-1523 (BLOCK / SHIELD BASH
+// / THROW SPEAR, elevation both ways, and the combat readout decoded) and
+// OTA-1524 (the seven remaining systems covered, and the tips switch honoured and
+// offered by the combat primer) to the golem channel. Both channels level at 1524.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1523-the-row-grew-and-nobody-said-so';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1522-the-stun-does-not-outlive-itself';
 // golem catch-up 2026-08-27: markerless publish of OTA-1521 (the OTA reload marks
