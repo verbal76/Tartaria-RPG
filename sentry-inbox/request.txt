@@ -1,20 +1,21 @@
-sync 2026-08-27 — the issue walk was 400ing. Fixed; go get the missing parts.
+sync 2026-08-27 — three more logs sent, first pull after OTA-1521 + 1522.
 
-VERDICT.txt named it in one line, which is exactly why it now reports failed
-fetches:
+What to look for in these, in order:
 
-  issue list FAILED for tartaria: HTTP Error 400: Bad Request
+1. PHANTOM DEATHS. OTA-1521 makes the OTA reload mark its own orderly exit, so a
+   deliberate restart should stop minting `PROCESS KILLED — no JS ran` records.
+   Eight of the previous eighteen followed "ota: Restarting to apply..." by 4s to
+   7s. If the fix works, deaths recorded AFTER an OTA apply disappear and only
+   the ten genuinely unexplained ones remain — which is the whole of #81.
 
-`statsPeriod=90d` is rejected by the project-issues endpoint — it accepts only
-'', '24h' or '14d'. So the walk added to read past the project feed's 100-row cap
-never ran at all, while the verdict showed a single capped listing and no sign
-anything was missing.
+2. THE STUN. OTA-1522 makes the incapacitation gate read the post-tick status
+   list. "stunned fades." should never again be followed a millisecond later by
+   "You cannot move. Your action is lost."
 
-Two parameters now, both load-bearing:
-  · statsPeriod=  (empty) — anything else risks the same 400.
-  · query=        (empty) — the default is `is:unresolved`, which would silently
-    skip every resolved issue and take its whole event history with it.
-
-Expected: the fetch-problems block reads "every fetch this run succeeded", the
-issues path appears in the page audit with real page counts, and mtaxtx2bzl8l
-(Great Scott, 5/27) and mtawqdrsm78g (3/23) fill in — with no new send.
+3. mtaxtx2bzl8l, STILL 5/27 AND NOW STRANGE. The device logged
+   `DELIVERED (inline, no attachments): beacon out, 27/27 parts accepted
+   (404834 chars)` at 03:03:03 — accepted AND flush-confirmed — and Sentry holds
+   five parts. Every earlier failure in this hunt was honest about itself; this
+   one is not. The issue walk now runs clean and every listing ends short of a
+   full page, so "unread" is no longer an available excuse. Watch whether the new
+   sends land whole.
