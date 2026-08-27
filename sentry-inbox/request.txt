@@ -1,2 +1,2 @@
-2026-08-27T00:29:35Z
-audit run 2: 30d outcomes with a valid interval
+2026-08-27T00:38:11Z
+controlled test: owner started a NEW character (Quiet) and sent — tiny log, old one-envelope path
