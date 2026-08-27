@@ -140,7 +140,10 @@ jobs:
                   q = urllib.parse.urlencode([
                       ('field', 'sum(quantity)'), ('statsPeriod', period),
                       ('groupBy', 'outcome'), ('groupBy', 'reason'),
-                      ('groupBy', 'category'), ('interval', period),
+                      # ⚠ interval must DIVIDE the period — passing interval==period
+                      # 400s, which is how the first widened run came back empty
+                      # for 7d and 30d and told us nothing.
+                      ('groupBy', 'category'), ('interval', '1d'),
                   ])
                   stats = api(f'/organizations/{org}/stats_v2/?{q}')
                   print(f'── outcomes, last {period} (outcome / reason / category → count):')

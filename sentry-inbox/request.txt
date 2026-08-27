@@ -1,2 +1,2 @@
-2026-08-27T00:28:09Z
-audit: 30d outcomes + quota — hunting a client-side attachment rate limit
+2026-08-27T00:29:35Z
+audit run 2: 30d outcomes with a valid interval
