@@ -1,17 +1,23 @@
-sync 2026-08-27 — the owner added `chunkBlocks` to the tartaria project's Safe
-Fields. This run reads the config back to confirm it saved.
+sync 2026-08-27 — four more logs sent, AFTER `chunkBlocks` was added to the
+tartaria project's Safe Fields. This is the test.
 
-What this sync CAN prove: that `safeFields` now contains chunkBlocks. The config
-probe prints it, and the exemption line flips to YES.
+Three questions this sync answers, in order:
 
-What it CANNOT prove: that the exemption actually stops @password:filter. Safe
-Fields excludes by FIELD NAME, and OTA-1520 sends the slice as an ARRAY — the
-scrubber walks into chunkBlocks.0, chunkBlocks.1 and so on, and whether a
-name-based exclusion reaches an array's children is exactly the thing being
-tested. Scrubbing happens at ingest, so only a send made AFTER the setting was
-saved, from a device running 1520, can answer it.
+1. Did the setting save? The config probe reads `safeFields` back and the
+   exemption line flips to YES.
 
-The verdict will read off the SCRUB TOTALS block on that next sync: zero
-redactions on a fresh bundle means it took; @password:filter still taking ~400
-chars a hit means the name-based exclusion stops at the array and the only
-remaining lever is the "Use Default Scrubbers" toggle.
+2. Were these sends made on OTA-1520? Decisive, because the exemption names
+   `chunkBlocks` and only 1520 sends that field — a device still on 1519 sends a
+   single `chunk` scalar, which Safe Fields was never told about. The build id
+   rides in each event's message, and the reader shows whether the slice arrived
+   as an array or a scalar.
+
+3. Did the exemption actually stop @password:filter? Read it off SCRUB TOTALS.
+   No entry for the new bundles means a name-based exclusion does reach into the
+   array and the loss is zero. Redactions still landing at ~400 chars a hit means
+   the exclusion stops at the array boundary, and the blocks are doing the work
+   on their own.
+
+Older bundles will keep reporting @password:filter forever — they were scrubbed
+at ingest under the old config and nothing rewrites them. Only the bundles dated
+after the setting was saved carry the verdict.
