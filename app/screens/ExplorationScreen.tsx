@@ -10,6 +10,7 @@ import { stationedAtNamedLocation } from '../engine/standingAt';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError, stampBreadcrumbPhase } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { FirstTimeHint } from '../components/FirstTimeHint';
+import { useHintsDisabled } from '../components/useFirstTimeHint'; // OTA-1524 — the primer honours the tips switch
 import { AdventureFeed } from '../components/AdventureFeed';
 import { InputBox } from '../components/InputBox';
 import { DiceRoller } from '../components/DiceRoller';
@@ -68,7 +69,7 @@ import { getLocationById } from '../engine/encounter';
 import { revealedLocationName } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { climbHeightFor, isClimbCleared, reachableWhileElevated } from '../engine/climbHeight';
-import { findCatalogItem } from '../engine/crafting';
+import { findCatalogItem, itemIsShield } from '../engine/crafting'; // itemIsShield: OTA-1523 shield hint
 import { isOversized } from '../engine/portability';
 import { playerHasScannerEquipped } from '../engine/equipment';
 import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
@@ -352,7 +353,15 @@ export function ExplorationScreen() {
   const markCombatPrimerSeen = useGameStore((s) => s.markCombatPrimerSeen);
   const combatPrimerSeen = useGameStore((s) => !!s.player?.milestones?.firstCombatPrimerShown);
   const enemiesDefeatedEver = useGameStore((s) => s.player?.milestones?.enemiesDefeated ?? 0);
-  const combatPrimerOpen = liveEnemyCount > 0 && !combatPrimerSeen && enemiesDefeatedEver === 0;
+  // ⚠⚠⚠ OTA-1524 — AND IT HONOURS THE GLOBAL TIPS SWITCH, WHICH IT NEVER DID.
+  // `setHintsDisabled` has gated every FirstTimeHint since OTA-860, and this
+  // modal ignored it outright: a player who turned tips off still met this card
+  // on their first fight with no way to refuse it. An opt-out that some cards
+  // ignore is not an opt-out. `useHintsDisabled` is the reactive read, so
+  // flipping the Settings toggle or tapping "turn off tips" inside any card
+  // takes effect here live.
+  const hintsOff = useHintsDisabled();
+  const combatPrimerOpen = liveEnemyCount > 0 && !combatPrimerSeen && enemiesDefeatedEver === 0 && !hintsOff;
   // OTA 031 — climb-target picker. Opens to a chip list of every
   // climbable noun in the current scene; tapping one fires `climb
   // <noun>` which resolves one tier in the climb handler.
@@ -902,6 +911,38 @@ export function ExplorationScreen() {
   // sweeping empties lanes, so a player who cleared the room down to one lane —
   // or to none, which auto-closes (OTA-1240) — would read zero at close and never
   // be taught. The high-water mark is what they actually saw.
+  // ⚠⚠⚠ OTA-1524 — THE SEVEN SYSTEMS THE OTA-1523 AUDIT DELIBERATELY SKIPPED,
+  // COVERED ON THE OWNER'S CALL ("cover them anyways"). The audit's argument for
+  // skipping was that each already opens a modal at the point of use and piling
+  // cards on top is how a player learns to reach for "turn off tips". That was an
+  // argument about NOISE — and the owner's answer is the better one: the switch
+  // is the answer to noise, so OTA-1524 covers the systems AND makes certain
+  // every surface actually offers the switch (the two primers did not, and worse,
+  // ignored it entirely — see CombatPrimerModal / DogOnboardingModal).
+  //
+  // ⚠⚠ EVERY ONE LATCHES, RATHER THAN READING LIVE. FirstTimeHint is an absolute
+  // overlay and renders BELOW an RN Modal (OTA-234), so a card raised while the
+  // sheet is still open is invisible — exactly the trap `pickerLanesTaught` below
+  // was built to dodge. Latch on open, render once the sheet is gone.
+  const [pickpocketTaught, setPickpocketTaught] = useState(false);
+  useEffect(() => { if (pickpocketOpen) setPickpocketTaught(true); }, [pickpocketOpen]);
+  const [torchTaught, setTorchTaught] = useState(false);
+  useEffect(() => { if (torchChooserOpen) setTorchTaught(true); }, [torchChooserOpen]);
+  const [climbTaught, setClimbTaught] = useState(false);
+  useEffect(() => { if (climbOpen) setClimbTaught(true); }, [climbOpen]);
+  // ⚠ These three live in the STORE rather than in screen state, so the latch
+  // reads the same field the self-mounting sheet does — a hint cannot fire for a
+  // sheet the player was never shown.
+  const fusionPickerOpen = useGameStore((st) => st.fusionPickerOpen);
+  const [fusionTaught, setFusionTaught] = useState(false);
+  useEffect(() => { if (fusionPickerOpen) setFusionTaught(true); }, [fusionPickerOpen]);
+  // ⚠ pendingParley is ALREADY selected above — reuse it rather than shadowing.
+  const [parleyTaught, setParleyTaught] = useState(false);
+  useEffect(() => { if (pendingParley) setParleyTaught(true); }, [pendingParley]);
+  const giftMode = useGameStore((st) => st.giftMode);
+  const [giftTaught, setGiftTaught] = useState(false);
+  useEffect(() => { if (giftMode) setGiftTaught(true); }, [giftMode]);
+
   const [pickerLanesTaught, setPickerLanesTaught] = useState(false);
   const lanesWhileOpen = useRef(0);
   useEffect(() => {
@@ -1080,6 +1121,123 @@ export function ExplorationScreen() {
           id="power_number"
           title="Power rating"
           body="The ◆ number by your name is your Power — a quick gauge built from your stats, weapon, armour, and health. In a fight, your number AND each foe's are coloured by the matchup: green means you outclass it, gold is an even fight, red means it outclasses you. Your individual stats still matter — Power just tells you at a glance where you stand. Make your character stronger and watch it climb."
+        />
+      )}
+      {/* ⚠⚠⚠ OTA-1523 — THE BUTTON ROW GREW AND NOTHING EVER SAID SO. An audit of
+          every tutorial beat and first-time card found three controls with zero
+          onboarding: BLOCK and SHIELD BASH (OTA-1510, the owner's own request —
+          "should have a block button up here during combat") and THROW SPEAR
+          (OTA-1511). CombatPrimerModal is OTA-1321 and predates all three.
+          ⚠⚠ AND THE PRIMER CANNOT BE THE FIX FOR ANYONE ALREADY PLAYING. It is
+          gated `enemiesDefeatedEver === 0`, so a character past their first kill
+          can never see it again however much copy is added. These buttons appear
+          the moment a shield rides the off arm or a spare spear is in the pack —
+          which for an existing character is the ONLY moment left to teach them.
+          So the teaching goes where the control does. */}
+      {(currentScene?.enemies?.length ?? 0) > 0 && (() => {
+        const eq = player?.equipped;
+        const offInst = eq?.offId
+          ? player?.inventory.find((i) => i.id === eq.offId)
+          : (eq?.off ? player?.inventory.find((i) => i.name === eq.off) : undefined);
+        return !!offInst && itemIsShield(offInst);
+      })() && (
+        <FirstTimeHint
+          id="combat_shield_block"
+          title="The shield on your arm"
+          body="A shield on the off arm adds two buttons. BLOCK sets you behind it — the first blow that comes breaks on it — but you hold position for the round, so everything else in reach gets a swing. SHIELD BASH is the same shield turned offensive: it goes through the normal attack, and a solid hit staggers them. BLOCK wants a shield; bare-armed, DODGE is the read."
+        />
+      )}
+      {/* ⚠ OTA-1523 — THROW SPEAR only exists when a SPARE is in the pack: a long
+          shaft that is either unequipped or stacked deep enough that hurling one
+          does not empty your hand. Taught on the same rule the button lights by. */}
+      {(currentScene?.enemies?.length ?? 0) > 0
+        && (player?.inventory ?? []).some((i) => /spear|lance|javelin|pike/i.test(i.name) && (i.quantity ?? 0) > 0) && (
+        <FirstTimeHint
+          id="combat_throw_spear"
+          title="Throwing a spear"
+          body="Carry a spare long shaft and THROW SPEAR appears in a fight. It hurls the spare at its own throwing range — much further than you can stab with it — and the spear is spent on a hit, so it is a way to open on something before it closes, not a move to lean on. Keep one back if you want it twice."
+        />
+      )}
+      {/* ⚠⚠⚠ OTA-1523 — HIGH GROUND CUTS BOTH WAYS, AND ONLY ONE WAY WAS EVER SAID.
+          The game already narrates the half that helps — "Below, X circles the base
+          — it cannot reach you up here" — and says nothing about the half that
+          hurts: from up here most weapons cannot reach DOWN either, so the attack
+          button simply refuses. That gap cost the OWNER a debugging session (the
+          tuning-fork case behind OTA-1517: the strike button read green on a climb
+          because reach-band and elevation were being answered by the same test).
+          If it confused the person who wrote it, it will confuse a player. */}
+      {!!currentScene?.elevatedOn && !!currentScene?.enemiesAtBase
+        && (currentScene?.enemies?.length ?? 0) > 0 && (
+        <FirstTimeHint
+          id="elevation_first_fight"
+          title="Fighting from up here"
+          body="Height cuts both ways. Nothing on the ground can reach you — but most of what you carry cannot reach DOWN either, and a weapon that cannot will just refuse when you tap it. Bows, slings and thrown weapons work from up here; a blade needs you back on the ground. Your golem cannot climb, so it waits at the base. Climb down to close, or fight with something that carries."
+        />
+      )}
+      {/* ⚠⚠ OTA-1523 — THE COMBAT LOG IS DENSE AND NOTHING DECODES IT. A player
+          reads `d20 → 18 + ATK 8 = 26 vs your AC 28 (needs nat 16+ — AC capped) —
+          HIT` and sees a hit on a total BELOW their armour with no way to learn
+          why. Same for `[plate −2]`, `35% resisted`, `[edge of reach — halved]`.
+          Fires on the first fight, beside the Power card that already reads the
+          top badges — both are "how to read what you are looking at". */}
+      {(currentScene?.enemies?.length ?? 0) > 0 && (
+        <FirstTimeHint
+          id="combat_readout"
+          title="Reading the fight"
+          body="Every swing shows its arithmetic. `d20 → 14 + ATK 8 = 22 vs your AC 28` is their roll against your armour. `needs nat 16+ — AC capped` means your armour is high enough that only the die itself can beat you — a high enough raw roll lands regardless of the total, so no armour makes you untouchable. On damage, `[plate −2]` is flat armour soak, `35% resisted` is your resistance to that damage type, and `[edge of reach — halved]` means they were barely close enough. Coatings tick on their own line — burn and acid keep eating for a set number of turns after the hit that started them."
+        />
+      )}
+      {/* ⚠⚠⚠ OTA-1524 — THE SEVEN, each fired off a durable fact rather than off
+          the sheet that taught nothing. A modal explains WHAT to pick; none of
+          them explains what the system COSTS or when it refuses, which is the
+          part players learn by losing something. */}
+      {pickpocketTaught && (
+        <FirstTimeHint
+          id="pickpocket_first"
+          title="Lifting a pocket"
+          body="PICKPOCKET goes for what someone is carrying, not what they have laid out to sell — their table is a TAKE or a trade. It is a check against them, and failing it is not free: get caught and the mark turns on you, and the whole faction hears about it. Standing you spent hours earning can go in one bad roll."
+        />
+      )}
+      {parleyTaught && (
+        <FirstTimeHint
+          id="parley_first"
+          title="Talking instead of swinging"
+          body="Not every fight has to be one. A parley opens two ways out — leaning on them or winning them over — and which one works depends on who they are and what you have already done to their people. You can skip the choice entirely by typing the verb you want: intimidate, persuade, calm. A parley that fails still costs you the beat, and they act."
+        />
+      )}
+      {giftTaught && (
+        <FirstTimeHint
+          id="gift_first"
+          title="Giving something away"
+          body="GIVE hands an item over for nothing and buys standing instead. What it is worth to them depends on who they are — a Mud Monarch cares about different things than a Tomekeep — and giving to one faction can cool another that hates them. The item is gone either way, so give what you can spare, not what you might need."
+        />
+      )}
+      {torchTaught && (
+        <FirstTimeHint
+          id="torch_first"
+          title="Burning your light"
+          body="A torch, lantern or lamp burns down while it is lit — light is a consumable, not a switch. Some things in the dark can only be found with one burning, so carry a spare before you go deep. When more than one thing here could use the flame, the game asks which; pick the one you actually came for."
+        />
+      )}
+      {fusionTaught && (
+        <FirstTimeHint
+          id="fusion_first"
+          title="The Fusing Crucible"
+          body="The Crucible pushes one item into another and keeps the result. It consumes both — there is no undoing it and no separating them again afterwards — so fuse the spare into the keeper, never the other way round. If a pairing is refused, the Crucible says why rather than wasting the pair."
+        />
+      )}
+      {player?.golem && (
+        <FirstTimeHint
+          id="golem_first"
+          title="Your golem"
+          body="A golem fights beside you and takes hits meant for you, but it is not a second you: it cannot climb, so it waits at the base of anything you go up, and it cannot be healed with your kit. Name it when you raise it — the name sticks, and it is what the log will call it when it goes down for you."
+        />
+      )}
+      {climbTaught && (
+        <FirstTimeHint
+          id="climb_first"
+          title="Going up"
+          body="A climb goes in tiers, and each one costs stamina — the taller the thing, the more it takes to reach the top, and coming down costs again. What is up there is usually worth it, but check your stamina before the last tier: running out partway is how a fall happens. Rope makes every tier cheaper."
         />
       )}
       <View style={styles.topRow}>

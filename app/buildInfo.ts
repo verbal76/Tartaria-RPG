@@ -25076,7 +25076,59 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // A stun with time left still blocks: `tick.effects` retains it.
 // This is the first defect closed off task #75, which had been waiting on raw
 // 4.32.11 lines that OTA-1520 finally delivered intact.
-export const OTA_BUILD_ID = '2026-08-27-1522-the-stun-does-not-outlive-itself';
+// OTA-1523 — THE ROW GREW AND NOBODY SAID SO. Owner asked for an audit of the
+// tutorial and every first-time popup against the current feature set. The three
+// layers all work — 12-step diegetic tutorial, 11 FirstTimeHint sites, 3 primers
+// — and what the audit found is DRIFT: controls that shipped after the card that
+// would have taught them.
+//   BLOCK        OTA-1510, the owner's own request
+//   SHIELD BASH  OTA-1510
+//   THROW SPEAR  OTA-1511
+// CombatPrimerModal is OTA-1321 and predates all three.
+// AND THE PRIMER COULD NOT BE THE FIX, which shaped the whole OTA: it is gated
+// `enemiesDefeatedEver === 0`, so a character past their first kill can never see
+// it again however much copy is added. The buttons appear the moment a shield
+// rides the off arm or a spare spear is in the pack — for an existing character
+// that is the only moment left. So the teaching goes where the control does, and
+// the primer gets only the RULE (the row grows with your kit) so two cards never
+// land on one beat.
+// TWO MORE GAPS, both about reading the screen rather than pressing it:
+//   ELEVATION — the game narrates the half that helps ("it cannot reach you up
+//   here") and never the half that hurts: from up there most weapons cannot reach
+//   DOWN and the button simply refuses. That gap cost the OWNER a debugging
+//   session — the tuning-fork case behind OTA-1517.
+//   THE READOUT — `needs nat 16+ AC capped`, `[plate -2]`, `35% resisted`,
+//   `[edge of reach - halved]`, coating ticks. A hit on a total BELOW your armour
+//   with nothing anywhere explaining why.
+// Three new hints: combat_shield_block, combat_throw_spear (also covers THROW),
+// elevation_first_fight, combat_readout — four ids, three gaps.
+// LEFT ALONE DELIBERATELY: pickpocket, parley, gift, torch, Fusing Crucible,
+// golem naming and climb each already carry their own modal at the point of use.
+// Adding hints there is noise, and noise is what gets tips switched off globally.
+// OTA-1524 — COVER THE SEVEN ANYWAY, AND MAKE THE SWITCH REAL. The owner
+// overruled 1523's decision to skip pickpocket, parley, gift, torch, the Fusing
+// Crucible, golems and climbing: "cover them anyways and make sure they all have
+// a turn off tips button." He is right — the argument for skipping was about
+// NOISE, and the switch is the answer to noise. So all seven get a hint, each
+// latched to fire AFTER its sheet closes (FirstTimeHint renders BELOW an RN
+// Modal, OTA-234 — a card raised over an open sheet is invisible), and each
+// teaches the COST rather than the controls: what pickpocketing costs when you
+// are caught, that a gift is gone, that the Crucible consumes both and cannot be
+// undone, that light burns down, that climbing spends stamina by the tier, that a
+// golem cannot follow you up.
+// AND CHECKING THE SWITCH FOUND A REAL DEFECT. setHintsDisabled has gated every
+// FirstTimeHint since OTA-860 and CombatPrimerModal honoured NEITHER half: no way
+// to turn tips off from inside it, and it ignored the flag outright — a player
+// who had already switched tips off still met the card with no way to refuse.
+// An opt-out that some cards ignore is not an opt-out. Both halves fixed.
+// THE DOG CARD IS EXEMPT ON PURPOSE, and that is not an oversight: its own
+// contract is "No dismiss-without-answering: the dog is already rescued; it needs
+// a name." It asks rather than tells. A switch that silences tips must not also
+// silence a question the game needs answered, or the save wedges exactly where
+// OTA-1027 found it.
+export const OTA_BUILD_ID = '2026-08-27-1524-cover-the-seven-and-mean-the-switch';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1523-the-row-grew-and-nobody-said-so';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1522-the-stun-does-not-outlive-itself';
 // golem catch-up 2026-08-27: markerless publish of OTA-1521 (the OTA reload marks
 // its own orderly exit, so a deliberate restart stops being recorded as a
 // PROCESS KILLED) and OTA-1522 (the incapacitation gate reads the post-tick

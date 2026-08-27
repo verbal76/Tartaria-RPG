@@ -30,6 +30,12 @@
 // is the noise that gets tips switched off.
 import React from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
+// ⚠⚠⚠ OTA-1524 — THIS CARD IGNORED THE GLOBAL TIPS SWITCH ENTIRELY. `setHintsDisabled`
+// has existed since OTA-860 and every FirstTimeHint honours it and offers it; the two
+// dedicated primers did neither, so a player who turned tips off still got this modal
+// in their face and had no way to say no from inside it. An opt-out that some cards
+// ignore is not an opt-out.
+import { setHintsDisabled } from './useFirstTimeHint';
 
 export function CombatPrimerModal({
   visible, enemyName, onClose,
@@ -80,6 +86,21 @@ export function CombatPrimerModal({
               also <Text style={styles.btnRef}>inventory</Text>: tap a piece to equip it.
               You can swap mid-fight, and what you wear changes what gets through.
             </Text>
+            {/* ⚠⚠ OTA-1523 — THE ROW IS NOT FIXED, AND NOBODY EVER SAID SO. Three
+                controls added after this card shipped appear only when your kit
+                earns them: BLOCK and SHIELD BASH with a shield on the off arm
+                (OTA-1510), THROW SPEAR with a spare long shaft (OTA-1511). This
+                line teaches the RULE — new buttons mean new gear — and leaves the
+                mechanics to the hints that fire when each one actually lights, so
+                two cards never land on the same beat. */}
+            <Text style={styles.row}>
+              <Text style={styles.term}>THE ROW GROWS — </Text>
+              some buttons only appear once you are carrying the thing that earns them.
+              Put a shield on your off arm and <Text style={styles.btnRef}>block</Text> and
+              {' '}<Text style={styles.btnRef}>shield bash</Text> turn up; keep a spare spear
+              and <Text style={styles.btnRef}>throw spear</Text> does. Each is explained the
+              first time it appears — so check the row again after you change kit.
+            </Text>
             <Text style={styles.row}>
               <Text style={styles.term}>NOT EVERY FIGHT — </Text>
               you can also type what you want instead of tapping it, and some foes can be
@@ -91,6 +112,18 @@ export function CombatPrimerModal({
               the fallen, and a Resurrection Gem brings one back.
             </Text>
           </ScrollView>
+          {/* ⚠⚠ OTA-1524 — the same escape hatch every FirstTimeHint offers, in the
+              same words, writing the same global flag. A player meeting their first
+              fight is exactly the player most likely to want the tips to stop. */}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Turn off all tips and close this guide"
+            onPress={() => { void setHintsDisabled(true); onClose(); }}
+            hitSlop={8}
+            style={styles.turnOffBtn}
+          >
+            <Text style={styles.turnOffText}>Turn off tips</Text>
+          </Pressable>
           <Pressable
             style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
             onPress={onClose}
@@ -127,6 +160,8 @@ const styles = StyleSheet.create({
   term: { color: '#e0c179', fontSize: 13, letterSpacing: 1 },
   btnRef: { color: '#e0c179' },
   footnote: { color: '#a2977b', fontSize: 12, lineHeight: 18, fontStyle: 'italic', marginTop: 2 },
+  turnOffBtn: { alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 12, marginTop: 4 },
+  turnOffText: { color: '#8aa0a4', fontSize: 12, letterSpacing: 0.6, textDecorationLine: 'underline' },
   btn: {
     alignSelf: 'flex-end', marginTop: 18, paddingVertical: 10, paddingHorizontal: 22,
     borderWidth: 1, borderColor: '#c9a86a', borderRadius: 4,
