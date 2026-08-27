@@ -243,8 +243,32 @@ describe('OTA-1520 — the relay reads the reason, and stops stitching silent ho
     // tail of the job log instead of buried mid-stream.
     expect(RELAY).toContain("print('════ VERDICT ════')");
     expect(RELAY).toContain('page_audit[path] = (pages, len(rows), bool(url))');
-    expect(RELAY).toContain("state = 'TRUNCATED — more remain' if capped else 'COMPLETE — cursor exhausted'");
-    expect(RELAY).toContain('are UNPROVEN — they may simply be unread.');
-    expect(RELAY).toContain('therefore ABSENT FROM SENTRY, not unread');
+    expect(RELAY).toContain('DO NOT ask for another send on this basis.');
+  });
+
+  it('⚠⚠⚠ AND "NO NEXT CURSOR" IS NOT ACCEPTED AS PROOF — a capped feed lies the same way', () => {
+    // ⚠⚠⚠ THE VERDICT BLOCK'S OWN FIRST RUN CAUGHT THIS. It printed
+    //   "1 page(s), 100 rows — COMPLETE — cursor exhausted"
+    // and concluded the missing parts were absent from Sentry. But this tree
+    // already held 256 synced event directories, so Sentry plainly has more than
+    // a hundred: /projects/…/events/ returns the newest 100 and declines to
+    // paginate past them, reporting "no next page" exactly as a genuinely
+    // exhausted listing would. Acting on it would have meant asking the owner to
+    // re-send logs that were sitting in Sentry already.
+    // A listing only counts as finished if it ended SHORT of a full page.
+    expect(RELAY).toContain('PAGE_SIZE = 100');
+    expect(RELAY).toContain("if capped or (rows and rows % PAGE_SIZE == 0)");
+    expect(RELAY).toContain('this endpoint caps rather than paginates');
+    expect(RELAY).toContain("state = 'COMPLETE — ended short of a full page'");
+    expect(RELAY).not.toContain("'COMPLETE — cursor exhausted'");
+  });
+
+  it('⚠⚠ THE ISSUE FEED IS WALKED TOO, because that one actually paginates', () => {
+    // Project events cap at 100; issue events walk a real cursor. Take the
+    // project feed for recency, the issue feed for depth, union by event id.
+    expect(RELAY).toContain("issues = api_all(f'/projects/{org}/{slug}/issues/?statsPeriod=90d')");
+    expect(RELAY).toContain("iev = api_all(f'/organizations/{org}/issues/{iid}/events/?full=false')");
+    expect(RELAY).toContain("seen_ids = {e.get('eventID') for e in events}");
+    expect(RELAY).toContain('events after walking');
   });
 });

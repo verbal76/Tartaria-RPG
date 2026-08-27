@@ -133,7 +133,46 @@ jobs:
               # ⚠ A count of exactly 100 used to be the silent failure mode. Say
               # the number every run so a page boundary can never masquerade as
               # "that is all there was".
-              print(f'{slug}: {len(events)} events across all pages')
+              print(f'{slug}: {len(events)} events from the project feed')
+
+              # ⚠⚠⚠ AND THEN GO ROUND THE OTHER SIDE, BECAUSE THAT FEED IS CAPPED.
+              # /projects/…/events/ returns the most recent 100 and offers no
+              # cursor past them — it reports "no next page" exactly as a genuinely
+              # exhausted listing would. That cap is what hid the owner's log: his
+              # character's bundle was sent first, so its parts were the oldest,
+              # so they sat just beyond the hundred and the reader declared them
+              # missing. Twice.
+              #
+              # ⚠⚠ THE ISSUE FEED DOES PAGINATE. Every player-log part groups into
+              # an issue, and /organizations/…/issues/{id}/events/ walks a real
+              # cursor to the end. So: take the project feed for recency, then
+              # walk every issue for depth, and union them by event id. Slower,
+              # and it is the difference between reading the evidence and guessing
+              # about it.
+              try:
+                  issues = api_all(f'/projects/{org}/{slug}/issues/?statsPeriod=90d')
+              except Exception as e:
+                  issues = []
+                  print(f'{slug}: issue list failed: {e}')
+              seen_ids = {e.get('eventID') for e in events}
+              for iss in issues:
+                  iid = iss.get('id')
+                  if not iid:
+                      continue
+                  try:
+                      iev = api_all(f'/organizations/{org}/issues/{iid}/events/?full=false')
+                  except Exception as e:
+                      print(f'  issue {iid} ({iss.get("title", "")[:40]}): events failed: {e}')
+                      continue
+                  added = 0
+                  for e in iev:
+                      if e.get('eventID') and e['eventID'] not in seen_ids:
+                          seen_ids.add(e['eventID'])
+                          events.append(e)
+                          added += 1
+                  if added:
+                      print(f'  issue {iid} ({iss.get("title", "")[:50]}): +{added} events')
+              print(f'{slug}: {len(events)} events after walking {len(issues)} issues')
               for ev in events[:8]:
                   print(f'  seen: title={ev.get("title")!r} message={ev.get("message")!r} id={ev.get("eventID","")[:8]} at={ev.get("dateCreated")}')
               for ev in events:
@@ -455,19 +494,45 @@ jobs:
           # the cap (truncated). A reader that cannot distinguish "nothing there"
           # from "I stopped looking" is how the owner got told twice that his log
           # was somewhere it was not.
+          # ⚠⚠⚠ AND "CURSOR EXHAUSTED" IS NOT "COMPLETE" — THIS BLOCK'S FIRST
+          # RUN PROVED IT BY LYING. It printed:
+          #
+          #   1 page(s), 100 rows — COMPLETE — cursor exhausted
+          #   ⚠ MISSING parts are therefore ABSENT FROM SENTRY
+          #
+          # Exactly 100 rows, one page, and no next cursor offered. But this tree
+          # already holds 256 synced event directories, so Sentry plainly has more
+          # than a hundred: the legacy /projects/…/events/ endpoint hands back the
+          # most recent 100 and declines to paginate past them. An honest-looking
+          # "no more pages" from a capped endpoint is indistinguishable from a
+          # genuine end, and it produced exactly the wrong instruction — go make
+          # another send to recover parts that may be sitting there already.
+          #
+          # ⚠⚠ SO A FULL FINAL PAGE IS TREATED AS SUSPECT, NOT AS PROOF. Only a
+          # listing that ended SHORT of its page size has actually run out.
+          PAGE_SIZE = 100
+          suspect = [p for p, (_, rows, capped) in page_audit.items()
+                     if capped or (rows and rows % PAGE_SIZE == 0)]
           print()
           print('════ VERDICT ════')
           for path, (pages, rows, capped) in sorted(page_audit.items()):
-              state = 'TRUNCATED — more remain' if capped else 'COMPLETE — cursor exhausted'
+              if capped:
+                  state = 'TRUNCATED — page cap hit, more remain'
+              elif rows and rows % PAGE_SIZE == 0:
+                  state = (f'SUSPECT — ended on a full page of {PAGE_SIZE} with no next '
+                           f'cursor; this endpoint caps rather than paginates')
+              else:
+                  state = 'COMPLETE — ended short of a full page'
               print(f'  {path}')
               print(f'    {pages} page(s), {rows} rows — {state}')
-          if any(c for _, _, c in page_audit.values()):
-              print('  ⚠⚠ At least one listing was truncated. Any MISSING parts below'
-                    ' are UNPROVEN — they may simply be unread.')
+          if suspect:
+              print('  ⚠⚠ AT LEAST ONE LISTING IS NOT PROVEN COMPLETE. Any MISSING parts'
+                    ' below are UNPROVEN — they may simply be unread. DO NOT conclude'
+                    ' the device failed, and DO NOT ask for another send on this basis.')
           else:
-              print('  ⚠ Every listing ran to the end of its cursor. MISSING parts are'
-                    ' therefore ABSENT FROM SENTRY, not unread — the send did not'
-                    ' complete on the device, and only a fresh send can recover them.')
+              print('  ⚠ Every listing ended short of a full page, so each genuinely ran'
+                    ' out. MISSING parts are ABSENT FROM SENTRY — only a fresh send'
+                    ' recovers them.')
           incomplete = [(bid, len(b['seen']), b['total'])
                         for bid, b in bundles.items() if len(b['seen']) < b['total']]
           if incomplete:

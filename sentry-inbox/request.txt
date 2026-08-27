@@ -1,22 +1,24 @@
-sync 2026-08-27 — make the reader say which case it is, instead of guessing again.
+sync 2026-08-27 — walk the ISSUE feed, because the project feed caps at 100.
 
-TWO THINGS THIS RUN SETTLES.
+THE VERDICT BLOCK'S FIRST RUN LIED, AND IT CAUGHT ITSELF DOING IT:
 
-1. SAFE FIELDS IS SET AND DID NOT WORK. The last run read back
-   safeFields: ['chunkBlocks'], and the four logs sent AFTER that save were still
-   scrubbed — 4 redactions of ~344 chars each, same trigger positions. Safe
-   Fields excludes by field NAME; the slice is an ARRAY, so the rule runs on
-   chunkBlocks.0, .1, .2 and the parent's exemption does not follow it down. The
-   relay no longer promises "redactions should be zero from here on"; it reports
-   what is set and defers the outcome to the measurement.
+  1 page(s), 100 rows — COMPLETE — cursor exhausted
+  ⚠ MISSING parts are therefore ABSENT FROM SENTRY
 
-2. THE MISSING PARTS — ABSENT, OR UNREAD? The pagination fix recovered nothing,
-   and that run could not distinguish the two cases: whether the events are gone
-   from Sentry or the reader stopped asking, a re-sync produces zero new files
-   either way. So the run now ends with a VERDICT block stating how many pages
-   were walked, how many rows came back, and whether the cursor was exhausted
-   (COMPLETE — the parts are genuinely absent and only a fresh send recovers
-   them) or capped (TRUNCATED — they may simply be unread).
+Exactly 100 rows, one page, no next cursor offered — while this tree already
+holds 256 synced event directories. Sentry plainly has more than a hundred. The
+legacy /projects/.../events/ feed returns the newest 100 and declines to
+paginate past them, reporting "no next page" in exactly the way a genuinely
+exhausted listing would. Acting on that would have meant asking the owner to
+re-send logs already sitting in Sentry.
 
-The owner's character is Great Scott and his bundle is mtaxtx2bzl8l at 5/27.
-Whether he needs to send again turns entirely on that one word.
+TWO CHANGES:
+1. A listing that ends ON a full page is now SUSPECT, never COMPLETE. Only one
+   that ends SHORT of its page size has actually run out.
+2. The issue feed is walked as well — /organizations/.../issues/{id}/events/
+   follows a real cursor to the end. Project feed for recency, issue feed for
+   depth, unioned by event id.
+
+Expected: "N events after walking M issues" with N far above 100, and
+mtaxtx2bzl8l (Great Scott, currently 5/27) and mtawqdrsm78g (3/23) filling in
+without another send.
