@@ -78,7 +78,9 @@ describe('OTA-1515 — the payload is the game log, and nothing else', () => {
     // The button hands the chunked sender `bundle.log` alone. The bundle is
     // still PERSISTED whole (the boot retry and COPY LOG keep everything);
     // what changed is what crosses the wire.
-    expect(ABOUT).toContain('sendGameLogChunked(bundle.log,');
+    // ⚠ OTA-1518 moved the button to the attachment-free INLINE sender. The
+    // payload pinned here — the game log ALONE — is what did not change.
+    expect(ABOUT).toContain('sendGameLogInline(bundle.log,');
     expect(ABOUT).not.toMatch(/sendDiagnosticsBundle\(bundle/);
     expect(ABOUT).toContain('const pending = await persistPendingBundle(bundle);');
   });

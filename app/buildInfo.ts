@@ -24951,7 +24951,35 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the button he presses most would read as a warning. And one live AIRBORNE foe
 // leaves every button green, because OTA-960's own rule is that a flier comes to
 // you and can be met with any weapon.
-export const OTA_BUILD_ID = '2026-08-27-1517-the-green-button-can-reach';
+// ⚠⚠⚠ OTA-1518 — THE BEACON GOES FIRST. Two wrong root causes have already cost
+// the owner a send apiece — payload size (his own new-character test disproved
+// it) and the discarded flush deadline (real, fixed, not the cause) — so this
+// one stops theorising and MEASURES. What his two devices actually built:
+//                     attachment?  flushed?  arrives?
+//   crash record          no        NEVER     YES — four since Aug 26
+//   log part / bundle    YES         yes       no
+// Identical on hal (APK 293) and golem (APK 299): two builds, two app ids,
+// payloads 314K and 405K, same 33-47ms "flush() resolved false without
+// sending". That kills "build 293 lacks the native module" AND "the payload is
+// too big" outright, and the relay confirms flush is honest this time — zero
+// game-log.part* files ever arrived.
+// SO THE LAST DISCRIMINATOR STANDING IS THE ATTACHMENT, one experiment from
+// proven or eliminated. The BEACON is that experiment: one tiny event, no
+// attachment, shaped exactly like the crash records that still work. Beacon
+// arrives and parts do not → attachments are the fault, conclusively. Beacon
+// does not arrive either → attachments exonerated, transport is the last
+// candidate. Neither outcome needs me to have guessed right first.
+// AND IT DELIVERS WHILE IT MEASURES: the log now rides INLINE in the event
+// bodies behind the beacon, no attachment anywhere, so if attachments are the
+// fault the log comes through on the same tap. flush() no longer decides what
+// counts as sent — it has lied `true` (OTA-1504's whole reason) and now `false`
+// for two days, while the one path that never flushes is the one that works. A
+// part counts when captureEvent accepted it; the relay stays the only thing
+// that decides what actually arrived, and it now names any beacon it finds.
+export const OTA_BUILD_ID = '2026-08-27-1518-the-beacon-goes-first';
+// golem catch-up 2026-08-27: markerless publish of OTA-1518 (attachment-free
+// beacon + inline log parts) to the golem channel.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1517-the-green-button-can-reach';
 // golem catch-up 2026-08-27: markerless publish of OTA-1517 (the weapon button
 // asks the elevation question the gate already asked) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1516-the-quiet-path-sends-the-same-way';

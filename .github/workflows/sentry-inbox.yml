@@ -151,6 +151,48 @@ jobs:
               except Exception as e:
                   print(f'  part {part} of {bid} unreadable: {e}')
 
+          # ⚠⚠⚠ OTA-1518 — THE INLINE PARTS CARRY THEIR TEXT IN THE EVENT, NOT AS
+          # A FILE. Every attachment-bearing send has failed for two days while
+          # every attachment-free one landed, so the log now rides in the event
+          # body. Same bundleId/part/parts tags, so the same stitcher works —
+          # it just has to look in `extra.chunk` instead of on disk. The BEACON
+          # (kind=player-log-beacon) is the experiment's answer all by itself:
+          # if it is here, attachment-free sending works.
+          def extraval(ev, key):
+              for e in (ev.get('entries') or []):
+                  if e.get('type') == 'extra' or e.get('type') == 'context':
+                      d = e.get('data') or {}
+                      if key in d:
+                          return d[key]
+              ctx = ev.get('context') or {}
+              return ctx.get(key)
+
+          beacons = []
+          for d in sorted(out_root.glob('player-log_*')):
+              ev_path = d / 'event.json'
+              if not ev_path.exists():
+                  continue
+              try:
+                  ev = json.loads(ev_path.read_text())
+              except Exception:
+                  continue
+              title = ' '.join(str(x) for x in [ev.get('title'), ev.get('message')])
+              bid = tagval(ev, 'bundleId')
+              if 'beacon' in title or tagval(ev, 'kind') == 'player-log-beacon':
+                  if bid:
+                      beacons.append(bid)
+                  continue
+              part, parts = tagval(ev, 'part'), tagval(ev, 'parts')
+              chunk = extraval(ev, 'chunk')
+              if not bid or not part or not parts or not isinstance(chunk, str):
+                  continue
+              bundles.setdefault(bid, {'total': int(parts), 'seen': {}})
+              bundles[bid]['seen'].setdefault(int(part), chunk)
+          if beacons:
+              print('  ⚠ BEACONS ARRIVED (attachment-free sending WORKS):', sorted(set(beacons)))
+          else:
+              print('  ⚠ no beacons yet')
+
           for bid, b in bundles.items():
               total = b['total']
               have = sorted(b['seen'])

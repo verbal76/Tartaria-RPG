@@ -564,3 +564,161 @@ export function _resetSentryTransportForTests(): void {
   sdk = null;
   attempted = false;
 }
+
+/**
+ * ⚠⚠⚠ OTA-1518 — THE BEACON AND THE INLINE LOG: ONE TAP THAT ANSWERS EITHER WAY.
+ *
+ * ⚠⚠ WHAT TWO NIGHTS OF EVIDENCE NARROWED IT TO, AND NOTHING FURTHER. The table
+ * the owner's two devices built, hal (APK 293) and golem (APK 299):
+ *
+ *                    attachment?   flushed?   arrives?
+ *   crash record         no         NEVER      YES — four since Aug 26
+ *   log part            YES          yes        no
+ *   old bundle          YES          yes        no
+ *
+ * Every send carrying an ATTACHMENT has failed for two days; every send without
+ * one has landed. And the failure is identical across two different APKs, two
+ * app ids and payloads from 314K to 405K — so "the native module is missing
+ * from build 293" and "the payload is too big" are both dead. `flush()` answers
+ * `false` in 33-47ms, and the relay confirms it is telling the truth: zero
+ * `game-log.part*` files ever reached Sentry.
+ *
+ * ⚠⚠⚠ SO STOP THEORISING AND MEASURE. Two wrong root causes have already cost
+ * the owner a send apiece — payload size (his own new-character test disproved
+ * it) and the discarded flush deadline (real, fixed, and not the cause). The
+ * remaining discriminator is the ATTACHMENT, and it is one experiment away from
+ * proven or eliminated. This function IS that experiment, and it is designed so
+ * a single tap settles it whichever way it falls:
+ *
+ *   · a BEACON goes first — one tiny event, NO attachment, nothing else new.
+ *     If the beacon lands and the parts do not, attachments are the fault,
+ *     conclusively, and the answer is in the relay within the hour.
+ *     If the beacon does NOT land either, attachments are EXONERATED and the
+ *     fault is in the flush/transport path — which is equally worth knowing,
+ *     because it is the last candidate standing.
+ *   · then the game log itself, INLINE — each part's text rides in the event
+ *     body, still with no attachment anywhere. So if attachments are the
+ *     fault, this send does not merely diagnose it, it DELIVERS THE LOG.
+ *
+ * ⚠⚠ AND IT DOES NOT GATE ON flush(). OTA-1492 made "sent" mean "flush() said
+ * the queue drained". That premise has now been caught lying in BOTH
+ * directions: `true` while nothing arrived (the reason OTA-1504's durable retry
+ * exists) and `false` on this build for two days straight. Meanwhile the ONE
+ * path that never flushes — the crash transport — is the one path that works.
+ * So a part counts as OUT when `captureEvent` accepted it without throwing, and
+ * the flush answer is recorded as ADVICE beside it. That is not optimism: it is
+ * refusing to trust a narrator that has been wrong both ways, and the relay
+ * remains the only thing that decides what actually arrived.
+ *
+ * ⚠ CHUNK SIZE. Inline text is normalised into the event body, so the parts are
+ * far smaller than the attachment chunks — 15K keeps every event comfortably
+ * inside Sentry's payload budget with room for the tags and message.
+ */
+export const INLINE_CHUNK_CHARS = 15_000;
+
+export interface InlineSendReport extends ChunkedSendReport {
+  /** Did the no-attachment beacon leave without throwing? The experiment. */
+  beaconOut: boolean;
+  /** What flush() claimed, kept as ADVICE only — it no longer gates `sent`. */
+  flushSaid: 'yes' | 'no' | 'no-flush';
+}
+
+export async function sendGameLogInline(
+  fullLog: string,
+  bundleId: string,
+  attempt?: number,
+): Promise<InlineSendReport> {
+  const report: InlineSendReport = {
+    sent: 0, parts: 0, chars: 0, timings: [], threwAt: null, flushNote: null,
+    stopped: null, bundleId, beaconOut: false, flushSaid: 'no-flush',
+  };
+  if (!reportingEnabled()) {
+    report.stopped = 'crash reporting is switched off on this device';
+    return report;
+  }
+  const s = loadSdk();
+  if (!s) {
+    report.stopped = 'this build has no Sentry native module';
+    return report;
+  }
+  if (crashReportDsn() === null) {
+    report.stopped = 'no DSN is configured in this build';
+    return report;
+  }
+
+  const text = String(fullLog ?? '');
+  const total = Math.max(1, Math.ceil(text.length / INLINE_CHUNK_CHARS));
+  report.parts = total;
+
+  // ⚠⚠⚠ THE BEACON. Deliberately the smallest thing this app can send, and
+  // shaped EXACTLY like a crash record — one event, no hint, no attachment —
+  // because crash records are the thing that still works. If this lands and the
+  // parts do not, the attachment is the fault and nothing else is.
+  try {
+    s.captureEvent({
+      message: `player-log-beacon ${OTA_BUILD_ID} #${bundleId}`,
+      level: 'info',
+      tags: {
+        kind: 'player-log-beacon',
+        line: productLine(),
+        bundleId,
+        parts: String(total),
+        ...(attempt ? { sendAttempt: String(attempt) } : {}),
+      },
+    });
+    report.beaconOut = true;
+  } catch (err) {
+    report.threwAt = `beacon: ${err instanceof Error ? err.message : String(err)}`;
+  }
+
+  for (let i = 0; i < total; i++) {
+    const slice = text.slice(i * INLINE_CHUNK_CHARS, (i + 1) * INLINE_CHUNK_CHARS);
+    const partNo = i + 1;
+    const startedAt = Date.now();
+    try {
+      // ⚠ NO HINT, NO ATTACHMENTS — the whole point. The slice rides in `extra`.
+      s.captureEvent({
+        message: `player-log ${OTA_BUILD_ID} #${bundleId} [inline ${partNo}/${total}]`,
+        level: 'info',
+        tags: {
+          kind: 'player-log-inline',
+          line: productLine(),
+          bundleId,
+          part: String(partNo),
+          parts: String(total),
+          ...(attempt ? { sendAttempt: String(attempt) } : {}),
+        },
+        extra: { chunk: slice, chunkChars: slice.length },
+      });
+      // ⚠⚠ ACCEPTED, NOT FLUSHED. See the header: flush() has lied both ways,
+      // and the path that never flushes is the path that works.
+      report.sent += 1;
+      report.chars += slice.length;
+      report.timings.push(Date.now() - startedAt);
+    } catch (err) {
+      report.timings.push(Date.now() - startedAt);
+      if (report.threwAt === null) {
+        report.threwAt = `inline part ${partNo}/${total}: ${err instanceof Error ? err.message : String(err)}`;
+      }
+    }
+  }
+
+  // ⚠ ONE flush at the END, for its OPINION only — it cannot fail the send any
+  // more, but what it says is still evidence and goes in the line.
+  try {
+    const ok = await flushWithRealDeadline(s, PART_FLUSH_MS);
+    report.flushSaid = ok ? 'yes' : 'no';
+    if (!ok) report.flushNote = lastFlushNote;
+  } catch {
+    report.flushSaid = 'no';
+  }
+  return report;
+}
+
+/** One line for the device log — the experiment's result, readable at a glance. */
+export function describeInlineSend(r: InlineSendReport): string {
+  if (r.stopped) return `send-log: #${r.bundleId} — NOT ATTEMPTED: ${r.stopped}`;
+  return `send-log: #${r.bundleId} — INLINE (no attachments): beacon ${r.beaconOut ? 'out' : 'FAILED'}, `
+    + `${r.sent}/${r.parts} parts accepted (${r.chars} chars) — flush said ${r.flushSaid}`
+    + `${r.flushNote ? ` (${r.flushNote})` : ''}${r.threwAt ? ` — THREW at ${r.threwAt}` : ''}`;
+}

@@ -123,7 +123,9 @@ describe('OTA-1454 — the combat groups are mutually distinct', () => {
     expect(fn).toContain("bands.includes(range) ? 'strike' : 'needs-approach'");
     expect(fn).not.toContain("? 'ready'");
     // …and every attack button actually goes through it.
-    for (const call of ['weaponTone(reachPlayer, null, range)', "weaponTone(reachPlayer, 'main', range)", "weaponTone(reachPlayer, 'off', range)"]) {
+    // ⚠ OTA-1517 added the elevation fact as a fourth argument. What this pins —
+    // ONE function behind every attack button — is exactly unchanged.
+    for (const call of ['weaponTone(reachPlayer, null, range, groundedFoesBelow)', "weaponTone(reachPlayer, 'main', range, groundedFoesBelow)", "weaponTone(reachPlayer, 'off', range, groundedFoesBelow)"]) {
       expect(IB).toContain(call);
     }
   });

@@ -127,11 +127,12 @@ describe('OTA-1504 — the bundle is on disk before anything is sent', () => {
   it('⚠⚠ AboutScreen persists BEFORE it sends, and reports the queued state honestly', () => {
     const body = between(ABOUT, 'async function handleSendLog()', 'async function handleCopyLog()');
     const persistAt = body.indexOf('persistPendingBundle(bundle)');
-    // ⚠ OTA-1515 changed WHAT is sent (the game log, in parts) but not this
+    // ⚠ OTA-1515 changed WHAT is sent (the game log, in parts) and OTA-1518
+    // changed HOW (inline, no attachments) — but neither changed this
     // ORDER, which is the whole point of the pin: the durable copy is on disk
     // before anything crosses the wire, so the owner's swipe-away habit is
     // free. Re-pinned to the current sender rather than deleted.
-    const sendAt = body.indexOf('sendGameLogChunked(bundle.log,');
+    const sendAt = body.indexOf('sendGameLogInline(bundle.log,');
     expect(persistAt).toBeGreaterThan(-1);
     expect(sendAt).toBeGreaterThan(persistAt);
     // The three outcomes are distinct: sent, saved-for-retry, truly failed.

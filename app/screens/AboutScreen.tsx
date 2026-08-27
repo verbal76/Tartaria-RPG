@@ -37,7 +37,7 @@ import { composeAndSendBugReport } from '../diagnostics/bugReport';
 import {
   loadReportingPref, setReportingEnabled, reportingStatusLine, reportingConfigured,
 } from '../diagnostics/crashReporter';
-import { sendGameLogChunked, describeChunkedSend } from '../diagnostics/sentryTransport'; // OTA-1489, chunked at OTA-1515
+import { sendGameLogInline, describeInlineSend } from '../diagnostics/sentryTransport'; // OTA-1489 → chunked 1515 → inline 1518
 import { persistPendingBundle, MAX_SEND_ATTEMPTS } from '../diagnostics/pendingBundle'; // OTA-1504
 // ⚠ OTA-1490 — the owner gate is DEVICE-sticky now: any character on a device
 // that has ever held an unlock-named one gets the owner tools ("I have 2
@@ -296,9 +296,21 @@ export function AboutScreen() {
       // ⚠ The bundle is still PERSISTED whole above — the boot retry and the
       // save/inventory evidence keep their durable copy on disk, and COPY LOG
       // still exports everything. This changes what goes over the wire.
-      const chunk = await sendGameLogChunked(bundle.log, pending?.id ?? `t${Date.now().toString(36)}`);
+      // ⚠⚠⚠ OTA-1518 — NO ATTACHMENTS AT ALL, AND A BEACON IN FRONT. Two nights
+      // of evidence say every send carrying an attachment has failed while every
+      // send without one has landed — across TWO different APKs, so it is not a
+      // build and not a payload size. The beacon is one tiny attachment-free
+      // event shaped exactly like a crash record (the thing that still works):
+      // if it arrives and the parts do not, attachments are the fault; if it
+      // does not arrive either, attachments are exonerated and the transport is.
+      // Either way one tap answers it — and if attachments ARE the fault, the
+      // inline parts behind the beacon deliver the log at the same time.
+      const chunk = await sendGameLogInline(bundle.log, pending?.id ?? `t${Date.now().toString(36)}`);
+      // ⚠⚠ NOT GATED ON flush(). It has lied `true` (OTA-1504's whole reason)
+      // and now `false` for two days. A part counts when captureEvent accepted
+      // it; the relay stays the only thing that decides what actually arrived.
       const ok = chunk.sent > 0 && chunk.sent === chunk.parts;
-      useGameStore.getState().appendLog('debug', describeChunkedSend(chunk));
+      useGameStore.getState().appendLog('debug', describeInlineSend(chunk));
       // ⚠ OTA-1492 — the outcome goes in the log either way, so a send that
       // "succeeded" on the button but never arrived server-side (the owner's
       // first three taps) leaves a line the next diagnosis can start from.
@@ -306,9 +318,9 @@ export function AboutScreen() {
       // three causes that used to share one silent `false` (switch off, no
       // native module, no DSN); reading "0/1 parts confirmed" for any of them
       // is what sent the last diagnosis hunting the transport for weeks.
-      useGameStore.getState().appendLog('debug', `send-log: ${ok ? 'all parts flushed to Sentry'
+      useGameStore.getState().appendLog('debug', `send-log: ${ok ? 'all parts accepted by the SDK'
         : chunk.stopped ? `not attempted — ${chunk.stopped}`
-        : `only ${chunk.sent}/${chunk.parts} parts confirmed`}${
+        : `only ${chunk.sent}/${chunk.parts} parts accepted`}${
         pending
           ? ` — bundle #${pending.id} kept on disk, boots retry up to ${MAX_SEND_ATTEMPTS} sends total`
           : ' — and the retry file could not be written'

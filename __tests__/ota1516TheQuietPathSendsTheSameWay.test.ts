@@ -69,7 +69,12 @@ describe('OTA-1516 — every send path sends the same payload the same way', () 
   });
 
   it('⚠⚠ ALL THREE PATHS NOW AGREE — button, boot retry, crash auto-push', () => {
-    for (const src of [ABOUT, PENDING, AUTO]) {
+    // ⚠ OTA-1518 moved the BUTTON one step further, to the attachment-free
+    // inline sender, while the two quiet paths stay on the chunked one. What
+    // this pins is unchanged and is the point of OTA-1516: NO path builds the
+    // whole four-artifact envelope any more. They send the game log alone.
+    expect(codeOnly(ABOUT)).toContain('sendGameLogInline(');
+    for (const src of [PENDING, AUTO]) {
       expect(codeOnly(src)).toContain('sendGameLogChunked(');
     }
     // And nothing anywhere still reaches for the one-envelope sender.
