@@ -1,19 +1,14 @@
-sync 2026-08-27 — first log from a device actually running OTA-1522.
+sync 2026-08-27 — an OLD log repushed from a device now running OTA-1522.
 
-⚠ ONE TRAP TO AVOID READING WRONG. The reload that APPLIED 1522 was executed by
-the code running at that moment — 1520 — which does not clear the liveness crumb.
-So that specific restart will STILL have minted a phantom PROCESS KILLED record,
-and its presence proves nothing about the fix. OTA-1521 only takes effect from
-the NEXT reload onward, because that one runs under 1522's code.
+The interesting question is not what the log SAYS — it is old play — but how much
+of it ARRIVES. The device re-sends whatever is on disk through the CURRENT
+sender, so an old bundle pushed from 1522 rides the OTA-1520 block split and
+should land nearly whole where the same content once lost 60,000-75,000 chars.
 
-So, in order:
-1. BUILD STAMP. Must read 2026-08-27-1522. If it says 1520, the update had not
-   landed when the log was taken and nothing below is testable.
-2. THE STUN — testable RIGHT NOW. "stunned fades." must never be followed a
-   millisecond later by "You cannot move. Your action is lost." Any occurrence of
-   that pair on a 1522 build is OTA-1522 failing outright.
-3. PHANTOM DEATHS — NOT testable from this log alone, for the reason above. What
-   is testable is the count of deaths whose timestamp falls after the 1522 apply.
-   Zero of those is the first real evidence; one is worth investigating.
-4. The ten deaths not explained by an OTA restart are the whole of #81 and are
-   expected to still be present.
+Three reads, in order:
+1. Part count. Complete (N/N) or short? mtaxtx2bzl8l is the open oddity — device
+   logged 27/27 accepted AND flush-confirmed, Sentry holds five.
+2. Scrub cost. Under a 1519-era scalar this class of bundle cost 60,000+ chars;
+   on 1520 blocks it should be ~1,400-3,500.
+3. Whether the issue walk keeps every listing ending SHORT of a full page, which
+   is the only state that proves a MISSING part is genuinely absent.
