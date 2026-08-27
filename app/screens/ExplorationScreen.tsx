@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platfor
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey, chipDismissTileKey, logUiTap } from '../state/gameStore';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
-import { enemyBandOf, enemyThreatAt, playerWeaponReach } from '../state/combatResolution';
+import { enemyBandOf, enemyIsAirborne, enemyThreatAt, playerWeaponReach } from '../state/combatResolution';
 // OTA-1480 — "am I really at the place my record names", once, for all four readers.
 import { stationedAtNamedLocation } from '../engine/standingAt';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError, stampBreadcrumbPhase } from '../engine/saveSystem';
@@ -1966,6 +1966,18 @@ export function ExplorationScreen() {
               if (!elev) return null;
               if (typeof elev === 'string') return { noun: elev, tier: 1, totalTiers: 1 };
               return elev as { noun: string; tier: number; totalTiers: number };
+            })()}
+            // ⚠⚠⚠ OTA-1517 — THE ELEVATION QUESTION, ASKED WHERE THE GATE ASKS IT.
+            // Same three scene facts the store's OTA-960 refusal reads, in the
+            // same order, so the button's look and the gate's answer cannot
+            // disagree. An AIRBORNE foe comes to you — any weapon meets it — so
+            // one live flier is enough to leave every button green.
+            groundedFoesBelow={(() => {
+              if (!currentScene?.elevatedOn || !currentScene?.enemiesAtBase) return false;
+              const live = (currentScene?.enemies ?? []).filter(
+                (e, i) => e && (e.hp ?? 0) > 0 && !(currentScene?.enemyKnockedOut ?? [])[i],
+              );
+              return live.length > 0 && live.every((e) => !enemyIsAirborne(e));
             })()}
             inCombat={inCombat}
             equippedMain={equippedMain}

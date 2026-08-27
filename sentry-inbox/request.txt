@@ -1,2 +1,3 @@
-sync 2026-08-27T01:20Z — first pull after OTA-1515 (the real-deadline fix) landed on device.
-Looking for player-log parts: game-log.partNNN-of-M.txt sharing one bundleId.
+sync 2026-08-27T01:40Z — DECISIVE CHECK: did the 01:34:43 game-log PARTS arrive?
+flush() resolved false, but captureEvent may have worked. Looking for
+game-log.part001-of-007.txt under bundleId mtauoc5xx820 / mtauog3lfrgo.

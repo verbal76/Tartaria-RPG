@@ -662,6 +662,38 @@ export type WeaponReachClass =
 
 /** The range bands a weapon class can strike from: its band AND every
  *  band closer. Returned outermost → closest, matching RANGE_ORDER. */
+/**
+ * ⚠⚠⚠ OTA-1517 — DOES THIS WEAPON SHOOT DOWN? The one question the elevation
+ * gate asks, in ONE place, because asking it in two is the bug it fixes.
+ *
+ * OTA-960 gave the store a refusal for swinging a melee weapon at something
+ * standing at the base of a climb. It never gave the BUTTON the same question.
+ * So the weapon lit its ready green — `weaponTone` asked only "is the target in
+ * a band this weapon covers", and the raider WAS at close band — and then the
+ * tap was refused. The owner hit it four times in a row on the tower relay:
+ *
+ *     22:46:07  tap "searing tuning fork"
+ *     22:46:07  "…Cantor's Tuning Fork won't reach from up here."
+ *     22:46:09  tap "searing tuning fork"   (same refusal)
+ *     22:46:10  tap "searing tuning fork"   (same refusal)
+ *     22:46:13  tap "searing tuning fork"   (same refusal)
+ *
+ * ⚠⚠ THE ERROR CLASS, NOT JUST THE INSTANCE: a control's LOOK and a control's
+ * GATE were computing eligibility from two different predicates. Any fix that
+ * copies the far/distant test into the component would leave the same class
+ * alive — the next change to one side silently desyncs them again. So the test
+ * becomes a named export both sides import, and the suite pins that neither
+ * side hand-rolls it.
+ *
+ * ⚠ WHY far/distant AND NOT A REACH CLASS: throwables reach 'far', and the
+ * refusal itself already blesses them ("Use something that SHOOTS (or a
+ * throwable)"). Asking the BANDS keeps that promise exactly, and keeps working
+ * if a weapon's class is ever re-tuned.
+ */
+export function reachFiresDown(bands: readonly CombatRange[]): boolean {
+  return bands.includes('far') || bands.includes('distant');
+}
+
 export function reachBandsFor(cls: WeaponReachClass): CombatRange[] {
   switch (cls) {
     case 'ranged':

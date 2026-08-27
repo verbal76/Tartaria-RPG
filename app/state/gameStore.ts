@@ -442,7 +442,7 @@ import {
   type Recipe,
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor, enemyDamageDisplay, enemyDamageCompact, bossSwingsTwice } from '../engine/combatRules';
-import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
+import { reachBandsFor, reachFiresDown, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 import { knocksOutHumanoid } from '../engine/knockout';
 import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, COATING_RESIST_LAND_CHANCE, ACID_SHRED_PER_HIT, ACID_SHRED_DECAY_PER_ROUND, acidShredCap, corruptionStackCap, rollLootCoating, secondCoatRolled } from '../engine/weaponCoating';
 import { inferWeapon, inferArmor } from '../engine/itemDefaults';
@@ -13972,7 +13972,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // need a ranged weapon to fire down at the ground and any weapon to
           // attack airborn enemies.")
           if (sceneAfterDots.elevatedOn && sceneAfterDots.enemiesAtBase && !enemyIsAirborne(targetEnemy)) {
-            const firesDown = reach.bands.includes('far') || reach.bands.includes('distant');
+            // ⚠ OTA-1517 — the SAME predicate the button now asks. See reachFiresDown.
+            const firesDown = reachFiresDown(reach.bands);
             if (!firesDown) {
               get().appendLog(
                 'arbiter',

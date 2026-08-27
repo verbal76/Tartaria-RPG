@@ -24927,7 +24927,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // deaths stop, that is the confirmation the record could not give.
 // The durable copy is untouched: the save and inventory still go to disk, and
 // COPY LOG still exports everything. Only the wire narrowed.
-export const OTA_BUILD_ID = '2026-08-27-1516-the-quiet-path-sends-the-same-way';
+// ⚠⚠⚠ OTA-1517 — THE GREEN BUTTON CAN REACH. The owner's question, carried
+// since OTA-1511: "why did the timing fork light up green if it wasn't able to
+// be used??" His 4.32.11 log answered it — top of the tower relay, tier 4/4,
+// Raider 1 down at the base:
+//   22:46:07 tap "searing tuning fork" → "…won't reach from up here."
+//   22:46:09, 22:46:10, 22:46:13 → same refusal, three more times.
+// Four taps, four refusals, ready-green throughout. The debug line names why:
+// reach.bands=[close] and the raider WAS at close band, so weaponTone's only
+// question — "is the target in a band this weapon covers" — answered yes. The
+// gate was asking something else entirely: "can this weapon shoot DOWN a
+// climb", which OTA-960 gave the store and never gave the button.
+// THE DEFECT IS NOT THE BAND TEST, WHICH IS CORRECT. It is that a control's
+// LOOK and a control's GATE computed eligibility from two different predicates.
+// Copying the far/distant test into the component would have fixed this
+// instance and left the class alive — the next edit to either side desyncs them
+// again, silently, and the only symptom is a green button that bounces. So the
+// test became reachFiresDown, one named export both sides import, and the suite
+// pins that neither side hand-rolls it. The screen computes the elevation fact
+// from the same three scene flags the gate reads, in the same order.
+// The amber is REUSED, not replaced: "needs-approach" already means "this one
+// cannot land from here", which is exactly true up a climb — a sixth colour on
+// the button he presses most would read as a warning. And one live AIRBORNE foe
+// leaves every button green, because OTA-960's own rule is that a flier comes to
+// you and can be met with any weapon.
+export const OTA_BUILD_ID = '2026-08-27-1517-the-green-button-can-reach';
+// golem catch-up 2026-08-27: markerless publish of OTA-1517 (the weapon button
+// asks the elevation question the gate already asked) to the golem channel.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1516-the-quiet-path-sends-the-same-way';
 // golem catch-up 2026-08-27: markerless publish of OTA-1516 (boot retry and
 // crash auto-push chunked like the button; flushNote names why a flush refused)
 // to the golem channel.

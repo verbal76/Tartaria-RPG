@@ -23,7 +23,7 @@ import { itemIsHandThrownSpear } from '../engine/bandolierEligibility';
 import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
-import { reachBandsFor } from '../engine/types';
+import { reachBandsFor, reachFiresDown } from '../engine/types';
 // ⚠ OTA-1423 — the three Arbiter refusals below name the dog, so they also
 // have to gender it. Without this they read "bring it up" about a companion
 // the player named and chose a sex for.
@@ -70,9 +70,20 @@ function weaponTone(
   player: PlayerCharacter | null,
   hand: 'main' | 'off' | null,
   range: CombatRange | null | undefined,
+  /** ⚠⚠⚠ OTA-1517 — TRUE WHEN THE ONLY FOES ARE GROUNDED AT THE BASE OF A
+   *  CLIMB. The store has refused melee weapons in this situation since
+   *  OTA-960; the button never knew, so it went ready-green and the tap
+   *  bounced. Four taps in a row on the owner's tower relay. The band test
+   *  below is not wrong — the raider really WAS at close band — it was just
+   *  answering a different question than the gate. */
+  groundedFoesBelow?: boolean,
 ): 'strike' | 'needs-approach' | undefined {
   if (!range) return undefined;
   const bands = hand && player ? playerWeaponReach(player, hand).bands : reachBandsFor('barehanded');
+  // ⚠ Elevation FIRST: a weapon can be perfectly in-band and still unable to
+  // land, and the amber's own meaning ("this one cannot land from here") is
+  // exactly right for it. No new tone — see the header on why not.
+  if (groundedFoesBelow && !reachFiresDown(bands)) return 'needs-approach';
   return bands.includes(range) ? 'strike' : 'needs-approach';
 }
 
@@ -117,6 +128,11 @@ interface Props {
   onClimbUp: () => void;
   onClimbDown: () => void;
   elevatedOn?: { noun: string; tier: number; totalTiers: number } | null;
+  /** ⚠⚠⚠ OTA-1517 — the scene's own answer to "are the only live foes standing
+   *  at the BASE of the climb I'm up?". Computed once by the screen from the
+   *  same scene flags the store's gate reads, so the button's look and the
+   *  gate's refusal cannot drift apart again. */
+  groundedFoesBelow?: boolean;
   inCombat: boolean;
   equippedMain: string | null;
   equippedOff: string | null;
@@ -234,7 +250,7 @@ function shortWeaponLabel(name: string): string {
  *  player's own choice for the rest of the session. */
 let MORE_TRAY_OPEN = false;
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, pickpocketPossible, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, investigateSweeping, parserHint, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, pickpocketPossible, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, groundedFoesBelow, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, investigateSweeping, parserHint, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   // arb-fix (OTA — adaptive quick row) — the out-of-combat quick row shows the
   // world-interaction verbs (look / rest / investigate / take / salvage / climb /
@@ -710,22 +726,22 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               ) && (
                 <>
                   {(() => {
-                    const punchT = weaponTone(reachPlayer, null, range);
+                    const punchT = weaponTone(reachPlayer, null, range, groundedFoesBelow);
                     return <QuickBtn label="punch" onPress={() => onSubmit('punch')} tone={punchT} outOfRange={punchT === 'needs-approach'} />;
                   })()}
                   {(() => {
-                    const kickT = weaponTone(reachPlayer, null, range);
+                    const kickT = weaponTone(reachPlayer, null, range, groundedFoesBelow);
                     return <QuickBtn label="kick" onPress={() => onSubmit('kick')} tone={kickT} outOfRange={kickT === 'needs-approach'} />;
                   })()}
                 </>
               )}
               {equippedMain ? (() => {
-                const mainT = weaponTone(reachPlayer, 'main', range);
+                const mainT = weaponTone(reachPlayer, 'main', range, groundedFoesBelow);
                 const coat = equippedMainCoating ? `${equippedMainCoating.toLowerCase()} ` : '';
                 return <QuickBtn label={`${coat}${shortWeaponLabel(equippedMain).toLowerCase()}`} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
               })() : null}
               {equippedOff ? (() => {
-                const offT = weaponTone(reachPlayer, 'off', range);
+                const offT = weaponTone(reachPlayer, 'off', range, groundedFoesBelow);
                 const coat = equippedOffCoating ? `${equippedOffCoating.toLowerCase()} ` : '';
                 return <QuickBtn label={`off: ${coat}${shortWeaponLabel(equippedOff).toLowerCase()}`} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
               })() : null}
