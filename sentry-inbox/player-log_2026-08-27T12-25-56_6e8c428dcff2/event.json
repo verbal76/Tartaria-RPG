@@ -1,0 +1,197 @@
+{
+  "id": "6e8c428dcff24d178d871ebd9b5d1b15",
+  "groupID": "7694761507",
+  "eventID": "6e8c428dcff24d178d871ebd9b5d1b15",
+  "projectID": "4511945117532160",
+  "size": 17863,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhxsw8mus3 [inline 7/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhxsw8mus3 [inline 7/23]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhxsw8mus3 [inline 7/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "647158f94e2c48faa335de13ece5716b",
+      "span_id": "9ac2e1a01b87b8fe",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "9.178Z] [system] Weather effect \u2014 Aether Lightning: +1 INT\n[2026-08-21T02:20:29.180Z] [world] [Asgardar] north: The Sunken Enclave (3 days' travel) \u00b7 east: Samarran (3 days' travel) \u00b7 south: Varakush (9 days' travel) \u00b7 west: Asgardar (2 days' travel)\n[2026-08-21T02:20:29.180Z] [combat] A Mud Demon and a Gutter Rat close on you. Tap the right-side panel to cycle targets.\n",
+      "[2026-08-21T02:20:29.185Z] [reward] \u2726 Resurrection. Verbal returns to Tartaria, restored. The Aetherstone hums in recognition.\n[2026-08-21T02:20:35.686Z] [debug] appstate: active \u2192 background (was active for 115591ms)\n[2026-08-21T02:20:35.832Z] [debug] ctx: RELEASED \u2014 live=0 (opened=7 released=7)\n[2026-08-21T02:20:42.704Z] [debug] appstate: background \u2192 active (was background for 7018ms)\n",
+      "[2026-08-21T02:20:45.905Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T02:20:45.909Z] [debug] appstate: active \u2192 background (was active for 3205ms)\n[2026-08-21T02:20:45.953Z] [debug] persist sizes(KB): total=199 player=50 wm=58[rooms=28 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=86 scene=4\n",
+      "[2026-08-21T02:20:49.350Z] [debug] appstate: background \u2192 active (was background for 3441ms)\n[2026-08-21T02:20:52.522Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T02:20:52.522Z] [debug] appstate: active \u2192 background (was active for 3172ms)\n[2026-08-21T02:20:55.819Z] [debug] appstate: background \u2192 active (was background for 3297ms)\n",
+      "[2026-08-21T02:20:58.945Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T02:20:58.947Z] [debug] appstate: active \u2192 background (was active for 3128ms)\n[2026-08-21T02:47:12.185Z] [debug] appstate: background \u2192 active (was background for 1573235ms)\n[2026-08-21T02:47:19.439Z] [debug] qwen: re-warm cancelled (left the foreground first)\n",
+      "[2026-08-21T02:47:19.440Z] [debug] appstate: active \u2192 background (was active for 7258ms)\n[2026-08-21T02:47:41.527Z] [debug] appstate: background \u2192 active (was background for 22086ms)\n[2026-08-21T02:47:49.540Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-21T02:47:50.619Z] [debug] ctx: OPENED \u2014 live=1 (opened=8 released=7) \u2248425MB est\n",
+      "[2026-08-21T02:47:56.010Z] [debug] appstate: active \u2192 background (was active for 5273ms)\n[2026-08-21T02:47:56.092Z] [debug] persist sizes(KB): total=199 player=50 wm=58[rooms=28 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=86 scene=4\n[2026-08-21T02:47:56.165Z] [debug] ctx: RELEASED \u2014 live=0 (opened=8 released=8)\n",
+      "[2026-08-21T02:48:25.188Z] [debug] appstate: background \u2192 active (was background for 29178ms)\n[2026-08-21T02:48:32.073Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T02:48:32.079Z] [debug] appstate: active \u2192 background (was active for 6891ms)\n",
+      "[2026-08-21T12:59:26.711Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a01f9a-db47-7c7f-8aee-9e9af9a3e9f5\n[2026-08-21T12:59:26.711Z] [debug] ota: Checking\u2026\n[2026-08-21T12:59:26.926Z] [debug] ota: Already up to date\n[2026-08-21T12:59:26.926Z] [debug] ota: boot check result = noUpdate\n[2026-08-21T12:59:27.134Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-21T12:59:27.134Z] [debug] voice: bundled idle\n[2026-08-21T12:59:31.399Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-21T12:59:46.548Z] [debug] appstate: active \u2192 background (was active for 15141ms)\n[2026-08-21T12:59:46.666Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-21T13:00:02.517Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-21T13:00:02.518Z] [debug] appstate: background \u2192 active (was background for 15969ms)\n[2026-08-21T13:00:10.526Z] [debug] qwen: re-warming after 8000ms settled foreground\n",
+      "[2026-08-21T13:00:11.548Z] [debug] appstate: active \u2192 background (was active for 9030ms)\n[2026-08-21T13:00:11.884Z] [debug] ctx: OPENED \u2014 live=1 (opened=2 released=1) \u2248425MB est\n[2026-08-21T13:00:11.998Z] [debug] ctx: straggler load torn down by the lifecycle guard (count=1)\n[2026-08-21T13:00:12.468Z] [debug] ctx: RELEASED \u2014 live=0 (opened=2 released=2)\n",
+      "[2026-08-21T13:00:12.588Z] [debug] qwen: LOAD FAILED \u2014 Qwen failed to initialize\n[2026-08-21T13:01:27.079Z] [debug] appstate: background \u2192 active (was background for 74486ms)\n[2026-08-21T13:01:34.167Z] [debug] appstate: active \u2192 background (was active for 7089ms)\n",
+      "[2026-08-21T13:19:46.927Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a01f9a-db47-7c7f-8aee-9e9af9a3e9f5\n[2026-08-21T13:19:46.927Z] [debug] ota: Checking\u2026\n[2026-08-21T13:19:47.193Z] [debug] ota: Already up to date\n[2026-08-21T13:19:47.193Z] [debug] ota: boot check result = noUpdate\n[2026-08-21T13:19:47.215Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-21T13:19:47.215Z] [debug] voice: bundled idle\n[2026-08-21T13:19:51.080Z] [debug] OTA session start: 2026-08-20-1390-the-workflows-audit.\n[2026-08-21T13:19:51.080Z] [world] You step back into Asgardar. The world waits for your move.\n[2026-08-21T13:19:51.081Z] [world] A Forgotten Order pilgrim is said to have asked after you in your absence. They left without saying where they were headed.\n",
+      "[2026-08-21T13:19:51.083Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Verbal. I wondered when you'd take up the thread again. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n[2026-08-21T13:19:51.628Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-08-21T13:19:58.234Z] [debug] appstate: active \u2192 background (was active for 6494ms)\n[2026-08-21T13:19:58.443Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-21T13:20:29.125Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n",
+      "[2026-08-21T13:20:29.125Z] [debug] appstate: background \u2192 active (was background for 30891ms)\n[2026-08-21T14:17:55.966Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a01f9a-db47-7c7f-8aee-9e9af9a3e9f5\n[2026-08-21T14:17:55.966Z] [debug] ota: Checking\u2026\n[2026-08-21T14:17:56.240Z] [debug] ota: Already up to date\n",
+      "[2026-08-21T14:17:56.240Z] [debug] ota: boot check result = noUpdate\n[2026-08-21T14:17:56.266Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-21T14:17:56.267Z] [debug] voice: bundled idle\n[2026-08-21T14:18:00.618Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-21T14:18:05.329Z] [debug] appstate: active \u2192 background (was active for 4689ms)\n",
+      "[2026-08-21T14:20:17.029Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a01f9a-db47-7c7f-8aee-9e9af9a3e9f5\n[2026-08-21T14:20:17.030Z] [debug] ota: Checking\u2026\n[2026-08-21T14:20:17.082Z] [debug] ota: Already up to date\n[2026-08-21T14:20:17.082Z] [debug] ota: boot check result = noUpdate\n[2026-08-21T14:20:17.105Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-21T14:20:17.105Z] [debug] voice: bundled idle\n[2026-08-21T14:20:21.105Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-21T14:20:26.192Z] [debug] appstate: active \u2192 background (was active for 5064ms)\n[2026-08-21T14:20:26.334Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-21T19:00:43.547Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-21T19:00:43.551Z] [debug] appstate: background \u2192 active (was background for 16817358ms)\n[2026-08-21T19:00:46.225Z] [debug] qwen: re-warm cancelled (left the foreground first)\n",
+      "[2026-08-21T19:00:46.230Z] [debug] appstate: active \u2192 background (was active for 2680ms)\n[2026-08-21T19:00:46.451Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a02555-852c-72ba-bad3-c0407fc4b405\n[2026-08-21T19:00:46.452Z] [debug] ota: Checking\u2026\n[2026-08-21T19:00:46.542Z] [debug] ota: Already up to date\n",
+      "[2026-08-21T19:00:46.543Z] [debug] ota: boot check result = noUpdate\n[2026-08-21T19:00:46.572Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-21T19:00:46.573Z] [debug] voice: bundled idle\n[2026-08-21T19:00:51.028Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-21T19:00:51.157Z] [debug] appstate: active \u2192 background (was active for 116ms)\n",
+      "[2026-08-21T19:00:51.273Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-21T19:01:02.603Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-21T19:01:02.603Z] [debug] appstate: background \u2192 active (was background for 11446ms)\n",
+      "[2026-08-21T19:01:04.638Z] [debug] OTA applied: 2026-08-20-1390-the-workflows-audit \u2192 2026-08-21-1421-claude-pushes-the-builds.\n[2026-08-21T19:01:04.638Z] [debug] OTA session start: 2026-08-21-1421-claude-pushes-the-builds.\n[2026-08-21T19:01:04.638Z] [world] You step back into Asgardar. The world waits for your move.\n",
+      "[2026-08-21T19:01:04.640Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Verbal. We've still got ground to cover, you and I. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n[2026-08-21T19:01:10.627Z] [debug] qwen: re-warming after 8000ms settled foreground\n",
+      "[2026-08-21T19:01:11.139Z] [debug] ctx: OPENED \u2014 live=1 (opened=2 released=1) \u2248425MB est\n[2026-08-21T19:01:22.311Z] [debug] ui: tap \"\u2726 bandolier (1)\"\n[2026-08-21T19:01:23.734Z] [reward] You hurl the Acid Flask. It bursts across Mud Demon \u2014 6 acid (2/turn \u00d7 3). (111 HP left)\n",
+      "[2026-08-21T19:01:23.736Z] [combat] Mud Demon stops \u2014 and the air in front of it thickens, faintly bright. An AETHER SHIELD stands where its swing should have been (+3 AC).\n[2026-08-21T19:01:23.745Z] [combat] Gutter Rat \u2014 d20 \u2192 4 + ATK 3 = 7 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-21T19:01:28.805Z] [debug] ui: tap \"\u2726 bandolier (1)\"\n",
+      "[2026-08-21T19:01:31.124Z] [reward] You hurl the Acid Flask. It bursts across Mud Demon \u2014 12 acid (4/turn \u00d7 3). (99 HP left)\n[2026-08-21T19:01:31.128Z] [combat] Gutter Rat \u2014 d20 \u2192 15 + ATK 3 = 18 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-21T19:01:31.133Z] [combat] Mud Demon \u2014 d20 \u2192 15 + ATK 11 = 26 vs your AC 25 \u2014 \u2713 HIT\n",
+      "[2026-08-21T19:01:31.300Z] [combat] Mud Demon deals 7 slashing damage [armor \u221265%]. You have 27 HP remaining.\n[2026-08-21T19:01:31.301Z] [combat] That's your slashing resist working \u2014 the armor drank most of that hit (7 of 20 got through).\n[2026-08-21T19:01:31.301Z] [combat] Mud Demon regenerates 2 HP (101/117).\n[2026-08-21T19:01:36.832Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-08-21T19:01:36.847Z] [player] dodge\n[2026-08-21T19:01:36.848Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=2 hooks=0\n[2026-08-21T19:01:36.849Z] [world] You commit to the dodge. Slip Mud Demon's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-21T19:01:36.887Z] [combat] Gutter Rat \u2014 d20 \u2192 9 + ATK 3 = 12 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-08-21T19:01:36.888Z] [combat] Dodge \u2014 d20 \u2192 13 + DEX 16 = 29 vs ATK 12. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-08-21T19:01:36.888Z] [world] You slip Gutter Rat's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-08-21T19:01:36.890Z] [debug] ac-shift 25\u219228: race/base 12 + gear 17 + title 0 \u2192 trimmed 25 + status 3 | worn: head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunte",
+      "r's Boots cloak=Architect's Outer Mantle\n[2026-08-21T19:01:36.890Z] [combat] Mud Demon \u2014 d20 \u2192 19 + ATK 9 = 28 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-21T19:01:36.892Z] [system] \u23f3 Time passed: 6 min\n[2026-08-21T19:01:37.032Z] [combat] Mud Demon deals 6 slashing damage [armor \u221265%, plate \u22121]. You have 21 HP remaining.\n",
+      "[2026-08-21T19:01:37.032Z] [combat] Mud Demon's strike leaves you bleeding.\n[2026-08-21T19:01:37.032Z] [combat] Mud Demon regenerates 2 HP (103/117).\n[2026-08-21T19:01:37.153Z] [cognitive] neutral  (261ms)\n[2026-08-21T19:01:38.286Z] [debug] ui: tap \"smoldering repeater crossbow\"\n[2026-08-21T19:01:38.290Z] [system] unseen \u2014 next strike +5 fades.\n",
+      "[2026-08-21T19:01:38.290Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-21T19:01:38.294Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22122 HP)\n[2026-08-21T19:01:38.339Z] [player] attack with the mud repeater crossbow\n[2026-08-21T19:01:38.339Z] [debug] parser: intent=attack conf=1.00 verb=attack target=mud repeater crossbow resolved=Mud Demon range=mid enemies=2 hooks=0\n",
+      "[2026-08-21T19:01:38.340Z] [debug] attack: target=Mud Demon range=mid reach.bands=[distant,far,mid,close] reach.label=Mud Repeater Crossbow bareHand=false\n[2026-08-21T19:01:38.345Z] [debug] attack: status mods stealthed +5 \u00b7 perfect opening (2\u00d7 dice)\n[2026-08-21T19:01:38.372Z] [world] You bring the smoldering mud repeater crossbow to bear on Mud Demon.\n",
+      "[2026-08-21T19:01:38.372Z] [system] \u23f3 Time passed: 6 min\n[2026-08-21T19:01:38.491Z] [cognitive] ATTACK \u00b7 AIM \u00b7 SWIM \u00b7 TAKE_COVER \u00b7 THROW  (117ms)\n[2026-08-21T19:01:44.953Z] [world] You seize the initiative. Mud Demon has no time to react.\n[2026-08-21T19:01:44.953Z] [combat] You \u2014 d20 \u2192 12 + WIS 6 stealthed +5 perfect opening (2\u00d7 dice) = 23 vs Mud Demon AC 16 \u2014 \u2713 HIT\n",
+      "[2026-08-21T19:01:44.954Z] [combat] Mud Demon shrugs off the piercing. (resisted, \u00d70.5 for 17)\n[2026-08-21T19:01:44.955Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Vaelka's Halberd \u2014 bludgeoning will bite where piercing won't.\"\n[2026-08-21T19:01:44.982Z] [reward] \u2726 The work hones you. +1 STR (base 5, 7 as you stand).\n",
+      "[2026-08-21T19:01:44.982Z] [combat] Your strike with the smoldering mud repeater crossbow lands for 17. Mud Demon staggers \u2014 86 HP remaining. It answers.\n[2026-08-21T19:01:44.983Z] [combat] Smoldering Mud Repeater Crossbow \u2014 9 burn bites in and festers (3 turns).\n",
+      "[2026-08-21T19:01:44.984Z] [debug] ac-shift 28\u219225: race/base 12 + gear 17 + title 0 \u2192 trimmed 25 + status 0 | worn: head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle\n[2026-08-21T19:01:44.984Z] [combat] Mud Demon \u2014 d20 \u2192 14 + ATK 9 = 23 vs your AC 25 \u2014 \u2717 MISS\n",
+      "[2026-08-21T19:01:44.985Z] [combat] Gutter Rat \u2014 d20 \u2192 16 + ATK 3 = 19 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-21T19:01:45.138Z] [combat] Mud Demon regenerates 2 HP (88/117).\n[2026-08-21T19:01:45.138Z] [combat] Gutter Rat deals 3 piercing damage [plate \u22123]. You have 16 HP remaining.\n[2026-08-21T19:01:48.486Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-21T19:01:54.856Z] [world] You use 3\u00d7 Trail Rations. +18 HP (34/34), +1 stamina.\n[2026-08-21T19:01:57.156Z] [debug] "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhxsw8mus3 [inline 7/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbhxsw8mus3"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "7"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T12:25:55.979713Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T12:25:56.376000Z",
+  "fingerprints": [
+    "e0f4cb018e4ab970e70b2d84412932d2"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "775d8288d5f44a7387f3095b45a94b05",
+  "previousEventID": "6d6204422e4446d8ac741be7fc52814c"
+}

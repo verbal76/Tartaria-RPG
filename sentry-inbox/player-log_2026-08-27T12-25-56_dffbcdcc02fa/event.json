@@ -1,0 +1,222 @@
+{
+  "id": "dffbcdcc02fa4fa48e3072b98acc0381",
+  "groupID": "7694761507",
+  "eventID": "dffbcdcc02fa4fa48e3072b98acc0381",
+  "projectID": "4511945117532160",
+  "size": 17587,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhxsw8mus3 [inline 17/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhxsw8mus3 [inline 17/23]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhxsw8mus3 [inline 17/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "647158f94e2c48faa335de13ece5716b",
+      "span_id": "9ac2e1a01b87b8fe",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "er's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T22:43:21.517Z] [world] You let the conversation go and Bran the Beastmaster gets back to it.\n[2026-08-22T22:43:28.595Z] [debug] appstate: active \u2192 background (was active for 22291ms)\n[2026-08-22T22:43:28.696Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-22T22:43:41.583Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-22T22:43:41.583Z] [debug] appstate: background \u2192 active (was background for 12988ms)\n[2026-08-22T22:43:45.003Z] [debug] qwen: re-warm cancelled (left the foreground first)\n",
+      "[2026-08-22T22:43:45.003Z] [debug] appstate: active \u2192 background (was active for 3420ms)\n[2026-08-23T00:28:53.265Z] [debug] appstate: background \u2192 active (was background for 6308258ms)\n[2026-08-23T00:29:01.279Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-23T00:29:02.412Z] [debug] ctx: OPENED \u2014 live=1 (opened=2 released=1) \u2248425MB est\n",
+      "[2026-08-23T00:29:02.413Z] [debug] ctx: straggler load torn down by the lifecycle guard (count=1)\n[2026-08-23T00:29:02.698Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a02bb5-9e20-7e9a-80b7-886b04dde812\n[2026-08-23T00:29:02.698Z] [debug] ota: Checking\u2026\n[2026-08-23T00:29:02.834Z] [debug] ota: Already up to date\n",
+      "[2026-08-23T00:29:02.836Z] [debug] ota: boot check result = noUpdate\n[2026-08-23T00:29:02.862Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-23T00:29:02.862Z] [debug] voice: bundled idle\n[2026-08-23T00:29:06.899Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-23T00:29:09.541Z] [debug] appstate: active \u2192 background (was active for 2625ms)\n",
+      "[2026-08-23T00:29:09.670Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-23T00:29:30.488Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-23T00:29:30.488Z] [debug] appstate: background \u2192 active (was background for 20947ms)\n",
+      "[2026-08-23T00:29:38.510Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-23T00:29:39.027Z] [debug] ctx: OPENED \u2014 live=1 (opened=2 released=1) \u2248425MB est\n[2026-08-24T17:10:42.443Z] [debug] OTA applied: 2026-08-24-1488-told-first-sent-second \u2192 2026-08-24-1489-one-tap-instead-of-four-slices.\n",
+      "[2026-08-24T17:10:42.443Z] [debug] OTA session start: 2026-08-24-1489-one-tap-instead-of-four-slices.\n[2026-08-24T17:10:42.443Z] [world] You step back into Samarran. The world waits for your move.\n[2026-08-24T17:10:42.444Z] [world] Word reaches you: a roadside trader changed routes while you were elsewhere. The next time you cross the right tile, look for a stall you didn't see before.\n",
+      "[2026-08-24T17:10:42.450Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Verbal. I wondered when you'd take up the thread again. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n[2026-08-24T17:11:11.178Z] [debug] OTA session start: 2026-08-24-1489-one-tap-instead-of-four-slices.\n",
+      "[2026-08-24T17:11:11.179Z] [world] You step back into Samarran. The world waits for your move.\n[2026-08-24T17:11:11.179Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Verbal. The road kept your place.\"\n",
+      "[2026-08-24T17:11:18.700Z] [debug] persist sizes(KB): total=230 player=48 wm=81[rooms=25 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=98 scene=3\n[2026-08-25T01:03:35.098Z] [debug] OTA applied: 2026-08-24-1491-two-taps-to-load \u2192 2026-08-25-1496-room-between-the-thrones.\n[2026-08-25T01:03:35.098Z] [debug] OTA session start: 2026-08-25-1496-room-between-the-thrones.\n",
+      "[2026-08-25T01:03:35.098Z] [world] You step back into Samarran. The world waits for your move.\n[2026-08-25T01:03:35.099Z] [world] The Aetheric grid hum is louder than you remember. Something below has woken or shifted while you were elsewhere.\n",
+      "[2026-08-25T01:03:35.101Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Verbal. We've still got ground to cover, you and I. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n",
+      "[2026-08-25T01:03:35.306Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-25T01:03:35.305Z \u00b7 build 2026-08-25-1496-room-between-the-thrones \u00b7 updated from 2026-08-24-1491-two-taps-to-load \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-25T01:04:50.883Z] [world] You set course for Yuldra-Tul. 37 tiles \u2014 about 3 days, 21 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 YULDRA-TUL on the travel row to close the distance; STOP TRAVEL to halt.\n",
+      "[2026-08-25T01:04:50.925Z] [debug] spawn: gear=[Architect's Leg Enhancers, Wanderer's Swiftstride Greaves, Thought-Crafter's Headpiece] window=10 roster=new\n[2026-08-25T01:04:50.926Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n",
+      "[2026-08-25T01:04:50.926Z] [world] You walk east through open silt. The compass tells you Nimari lies further east \u2014 8 tiles, about 20 hours of travel.\n[2026-08-25T01:04:50.928Z] [world] Your foot snags on the silt. You crouch, look \u2014 and find something worth keeping.\n[2026-08-25T01:04:50.928Z] [reward] \u2726 Wild Carrot x2 (Common).\n",
+      "[2026-08-25T01:04:50.928Z] [world] A low harmonic rises out of the ground and fades, as if something beneath just turned over in its sleep.\n[2026-08-25T01:04:52.754Z] [debug] ui: tap \"take / salvage\"\n[2026-08-25T01:04:54.354Z] [world] You take the Architect's Leg Enhancers from where it lay.\n[2026-08-25T01:04:54.354Z] [reward] \u2726 Architect's Leg Enhancers (Common).\n",
+      "[2026-08-25T01:04:54.364Z] [world] You pick up the Thought-Crafter's Headpiece.\n[2026-08-25T01:04:54.364Z] [reward] \u2726 Thought-Crafter's Headpiece (Common).\n[2026-08-25T01:04:54.365Z] [world] You lift the Wanderer's Swiftstride Greaves clear.\n[2026-08-25T01:04:54.365Z] [reward] \u2726 Wanderer's Swiftstride Greaves (Common).\n",
+      "[2026-08-25T01:04:55.167Z] [world] Slim pickings on the archway. You pocket a Bone Sliver on the way out.\n[2026-08-25T01:04:55.168Z] [world] Tucked inside the dust-covered desk: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-08-25T01:04:55.168Z] [world] You work the rune-glass slide over. A part of it comes loose, intact.\n",
+      "[Filtered]",
+      "[2026-08-25T01:04:55.170Z] [reward]     \u2022 Waxed Yarn Bundle (Common)\n[2026-08-25T01:04:56.221Z] [debug] ui: tap \"investigate\"\n[2026-08-25T01:04:57.465Z] [player] investigate experiment notes\n[2026-08-25T01:04:57.466Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=experiment notes resolved=experiment notes range=- enemies=0 hooks=1\n",
+      "[2026-08-25T01:04:57.477Z] [world] You pore over the experiment notes. Faded diagrams, a materials list, a maker's shorthand \u2014 enough to reconstruct the working.\n[2026-08-25T01:04:57.478Z] [reward] \u2726 Recipe learned: Iron-Worm Engine (Rare)! Open Crafting to forge it.\n[2026-08-25T01:04:57.484Z] [system] \u23f3 Time passed: 15 min\n[2026-08-25T01:04:57.576Z] [cognitive] neutral  (91ms)\n",
+      "[2026-08-25T01:04:58.347Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-25T01:04:59.724Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-25T01:04:59.756Z] [player] investigate the ground\n",
+      "[2026-08-25T01:04:59.756Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=ground range=- enemies=0 hooks=1\n[2026-08-25T01:04:59.757Z] [debug] route: hook intercept (kind=resonance, target=\"ground\") \u2014 original intent=investigate\n",
+      "[2026-08-25T01:04:59.757Z] [world] \u2605 STORY THREAD (step 1) \u2014 You step toward the pulse. The air thickens. The hum syncs with your heartbeat for a half-second, then drops away.\n[2026-08-25T01:05:00.017Z] [debug] persist sizes(KB): total=224 player=49 wm=73[rooms=17 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=98 scene=3\n",
+      "[2026-08-25T01:05:01.027Z] [combat] Aetheric Slug rises to meet you. Combat begins at mid range.\n[2026-08-25T01:05:01.028Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 A shape unfolds itself out of the haze \u2014 something the size of a person, made of nothing the eye can hold. It moves toward you.\n[2026-08-25T01:05:01.029Z] [reward] \u2726 For your persistence \u2014 Mudstone (Rare).\n",
+      "[2026-08-25T01:05:01.045Z] [reward] \u2726 Recipe uncovered: Rime Draught (Rare)! Open Crafting to forge it.\n[2026-08-25T01:05:01.045Z] [arbiter] \"This is what comes of pulling at threads,\" the Arbiter says. \"Do not pull lightly.\"\n[2026-08-25T01:05:25.018Z] [debug] appstate: active \u2192 background (was active for 26597ms)\n",
+      "[2026-08-25T01:41:17.809Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a03661-0974-7546-9b14-ea84dc0f0ce3\n[2026-08-25T01:41:17.809Z] [debug] ota: Checking\u2026\n[2026-08-25T01:41:17.869Z] [debug] ota: Already up to date\n[2026-08-25T01:41:17.870Z] [debug] ota: boot check result = noUpdate\n[2026-08-25T01:41:17.898Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-25T01:41:17.898Z] [debug] voice: bundled idle\n[2026-08-25T01:42:51.295Z] [debug] OTA session start: 2026-08-25-1496-room-between-the-thrones.\n[2026-08-25T01:42:51.295Z] [world] You step back into Samarran. The world waits for your move.\n",
+      "[2026-08-25T01:42:51.295Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Verbal. We've still got ground to cover, you and I.\"\n[2026-08-25T01:42:51.513Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-25T01:42:51.511Z \u00b7 build 2026-08-25-1496-room-between-the-thrones \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-25T01:42:55.509Z] [debug] ui: tap \"approach\"\n",
+      "[2026-08-25T01:42:55.553Z] [player] approach Aetheric Slug\n[2026-08-25T01:42:55.554Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetheric slug resolved=Aetheric Slug range=mid enemies=1 hooks=1\n[2026-08-25T01:42:55.560Z] [debug] move: advance from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0\n[2026-08-25T01:42:55.560Z] [debug] move: range mid -> close\n",
+      "[2026-08-25T01:42:55.560Z] [world] You close the gap with Aetheric Slug. (range: close / arm's reach)\n[2026-08-25T01:42:55.565Z] [combat] Aetheric Slug \u2014 d20 \u2192 4 + ATK 2 = 6 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-25T01:42:55.685Z] [cognitive] THROW  (118ms)\n[2026-08-25T01:42:56.509Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-08-25T01:42:56.841Z] [debug] ui: tap \"acid-etched valve gear\"\n[2026-08-25T01:42:56.917Z] [player] attack with the conspiracy architects valve gear\n[2026-08-25T01:42:56.918Z] [debug] parser: intent=attack conf=1.00 verb=attack target=conspiracy architects valve gear resolved=Architect's Leg Enhancers range=close enemies=1 hooks=1\n",
+      "[2026-08-25T01:42:56.919Z] [debug] attack: target=Aetheric Slug range=close reach.bands=[close] reach.label=Conspiracy Architects Valve Gear bareHand=false\n[2026-08-25T01:42:56.921Z] [arbiter] Whisper Fog hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-08-25T01:42:56.921Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-25T01:42:56.948Z] [world] You bring the conspiracy architects valve gear to bear on Aetheric Slug.\n[2026-08-25T01:42:56.949Z] [system] \u23f3 Time passed: 6 min\n[2026-08-25T01:42:57.049Z] [cognitive] neutral  (100ms)\n[2026-08-25T01:43:03.334Z] [world] Aetheric Slug moves first. The pressure is immediate.\n",
+      "[2026-08-25T01:43:03.334Z] [combat] Aetheric Slug turns on Ember \u2014 d20 18 + ATK 2 = 20 vs Ember's AC 15 (vest +5) \u2014 \u2713 HIT\n[2026-08-25T01:43:03.334Z] [combat] Ember takes 1. (13/14 HP left)\n[2026-08-25T01:43:03.334Z] [combat] You \u2014 d20 \u2192 2 + STR 7 \u2212 1 (Whisper Fog) = 8 vs Aetheric Slug AC 8 \u2014 \u2713 HIT\n",
+      "[2026-08-25T01:43:03.336Z] [combat] Your strike with the conspiracy architects valve gear lands for 5. Aetheric Slug staggers \u2014 7 HP remaining. It answers.\n[2026-08-25T01:43:03.336Z] [combat] Conspiracy Architects Valve Gear \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-08-25T01:43:04.744Z] [debug] ui: tap \"off: acid-etched quarry-hewn skewer\"\n[2026-08-25T01:43:04.795Z] [player] attack with the off-hand quarry-hewn skewer\n[2026-08-25T01:43:04.796Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand quarry hewn skewer resolved=Quarry-Hewn Skewer range=close enemies=1 hooks=1\n",
+      "[2026-08-25T01:43:04.796Z] [combat] Aetheric Slug smokes \u2014 acid eats 1. (6/12 HP, 2 turns left)\n[2026-08-25T01:43:04.797Z] [debug] attack: target=Aetheric Slug range=close reach.bands=[close] reach.label=Quarry-Hewn Skewer bareHand=false\n[2026-08-25T01:43:04.798Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-25T01:43:04.819Z] [world] Your acid-etched quarry-hewn skewer comes around in an arc; Aetheric Slug squares up to meet it.\n[2026-08-25T01:43:04.819Z] [system] \u23f3 Time passed: 6 min\n[2026-08-25T01:43:04.926Z] [cognitive] AIM \u00b7 THROW \u00b7 ATTACK  (105ms)\n[2026-08-25T01:43:12.543Z] [world] You seize the initiative. Aetheric Slug has no time to react.\n",
+      "[2026-08-25T01:43:12.543Z] [combat] You \u2014 d20 \u2192 19 + DEX 16 \u2212 1 (Whisper Fog) = 34 vs Aetheric Slug AC 7 \u2014 \u2713 HIT\n[2026-08-25T01:43:12.544Z] [combat] The Acid-Etched coating fails to take on Aetheric Slug.\n[2026-08-25T01:43:12.545Z] [combat] Aetheric Slug folds under the acid-etched quarry-hewn skewer. 10 damage was enough. The room exhales.\n",
+      "[2026-08-25T01:43:12.546Z] [reward] Aetheric Slug defeated. You recover Slug Slime \u00d72.\n[2026-08-25T01:43:12.546Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 36). [9 enemies defeated]\n[2026-08-25T01:43:12.547Z] [reward] +6 TC pried from the dust.\n[2026-08-25T01:43:12.998Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-08-25T01:43:14.948Z] [debug] ui: tap \"investigate\"\n[2026-08-25T01:43:16.017Z] [player] investigate the ground\n[2026-08-25T01:43:16.018Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-25T01:43:16.019Z] [world] Something shifted while you were turned away \u2014 a Gutter Rat breaks cover, fast and low. (range: close)\n",
+      "[2026-08-25T01:43:16.019Z] [combat] Gutter Rat \u2014 Bite ready, 1D6 damage on a hit.\n[2026-08-25T01:43:16.020Z] [debug] enemy: Gutter Rat hp=8 ac=7 atk=Bite dmg=1D6 rarity=Common ap=2\n[2026-08-25T01:43:18.571Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 5491ms read 0ms/write 0ms in 794t\u2192out 0t (0ch)\n[2026-08-25T01:43:18.743Z] [debug] qwen\u23f1 \u2702 DISCAR"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhxsw8mus3 [inline 17/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbhxsw8mus3"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "17"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T12:25:56.240345Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "20": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 388,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T12:25:56.379000Z",
+  "fingerprints": [
+    "e0f4cb018e4ab970e70b2d84412932d2"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e12de69365fb4de885135f9d3df00a68",
+  "previousEventID": "d9478ea0c907458888d987198f6d0534"
+}

@@ -1,0 +1,197 @@
+{
+  "id": "f9c2f66f7bc54dabaeed51e7ae854cf7",
+  "groupID": "7694761507",
+  "eventID": "f9c2f66f7bc54dabaeed51e7ae854cf7",
+  "projectID": "4511945117532160",
+  "size": 17909,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhyaqy0gi8 [inline 13/22]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhyaqy0gi8 [inline 13/22]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhyaqy0gi8 [inline 13/22]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "b81bc244cada414995a66b27ffbb8e04",
+      "span_id": "850114da3ba4413c",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "08-19T22:20:28.016Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n[2026-08-19T22:20:28.018Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 2, morning)\n[2026-08-19T22:20:28.027Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n[2026-08-19T22:20:28.027Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-19T22:20:28.028Z] [system] \u23f3 Time passed: 8h\n[2026-08-19T22:20:28.029Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-08-19T22:20:30.338Z] [debug] qwen\u23f1 ambient ok 5223ms wait 475ms read 2902ms/write 1256ms in 360t\u2192out 31t 8.1ms/t HIT-CAP (159ch)\n[2026-08-19T22:20:30.389Z] [debug] ui: tap \"\u2193 \u2713 ATRIUM\"\n",
+      "[2026-08-19T22:20:30.397Z] [player] go south\n[2026-08-19T22:20:30.397Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0\n[2026-08-19T22:20:30.398Z] [world] You head on to the Atrium.\n[2026-08-19T22:20:30.398Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=n opening=n passing=n\n",
+      "[2026-08-19T22:20:30.421Z] [world] Monarch Court \u2014 The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking \u2014 your business has already been logged elsewhere.\n[2026-08-19T22:20:30.421Z] [world] You've stood here again. (visit 4)\n",
+      "[2026-08-19T22:20:30.421Z] [world] Paths: north to Standards \u00b7 south to First Landing. (Type 'leave outpost' to head into the wilds.)\n[2026-08-19T22:20:30.422Z] [system] Weather effect \u2014 Whisper Fog: -1 WIS\n[2026-08-19T22:20:30.422Z] [world] Halem the Trader nods once. \"Cinderbound. Come look \u2014 a few things moved since you were last through.\"\n",
+      "[2026-08-19T22:20:30.422Z] [debug] arbiter: template (reason=cooldown)\n[2026-08-19T22:20:30.422Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T22:20:30.423Z] [debug] arbiter: template (reason=cooldown)\n[2026-08-19T22:20:30.423Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T22:20:30.485Z] [cognitive] neutral  (61ms)\n",
+      "[2026-08-19T22:20:30.541Z] [debug] arbiter: ambient stale:moved-room\u2192banked 5510ms\n[2026-08-19T22:20:30.542Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You've traveled this far, traversing through the winding roads of Tartaria, each step leading to a new opportunity. Your\"\n[2026-08-19T22:20:30.603Z] [cognitive] RETREAT \u00b7 DISENGAGE \u00b7 HIDE  (4301ms)\n",
+      "[2026-08-19T22:20:30.660Z] [cognitive] REST  (2631ms)\n[2026-08-19T22:20:30.828Z] [debug] persist sizes(KB): total=130 player=18 wm=25[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=86 scene=2\n[2026-08-19T22:20:33.327Z] [debug] ui: tap \"take / salvage\"\n[2026-08-19T22:20:35.012Z] [world] You work the rusted engine chamber scaffolding over. A part of it comes loose, intact.\n",
+      "[2026-08-19T22:20:35.012Z] [reward] \u2726 Salvage haul:\n[2026-08-19T22:20:35.013Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-19T22:20:36.511Z] [debug] ui: tap \"investigate\"\n[2026-08-19T22:20:37.747Z] [player] investigate the floor\n[2026-08-19T22:20:37.748Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-19T22:20:37.749Z] [world] You give the floor a once-over. Clean enough to fail you.\n[2026-08-19T22:20:37.851Z] [cognitive] neutral  (99ms)\n[2026-08-19T22:20:39.146Z] [debug] ui: tap \"investigate\"\n[2026-08-19T22:20:39.986Z] [player] investigate arch\n[2026-08-19T22:20:39.987Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=arch resolved=arch range=- enemies=0 hooks=0\n",
+      "[2026-08-19T22:20:39.988Z] [world] The frame is warped where the hinge anchored \u2014 long-dried iron, blooming with patient rust.\n[2026-08-19T22:20:39.990Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-19T22:20:39.995Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T22:20:40.084Z] [cognitive] TALK \u00b7 SEARCH  (88ms)\n",
+      "[2026-08-19T22:20:42.708Z] [debug] qwen\u23f1 investigate_lore ok 2629ms read 1577ms/write 1027ms in 128t\u2192out 26t 12.3ms/t (117ch)\n[2026-08-19T22:20:44.378Z] [debug] appstate: active \u2192 background (was active for 46208ms)\n[2026-08-19T22:20:44.643Z] [debug] ctx: RELEASED \u2014 live=0 (opened=2 released=2)\n[2026-08-19T22:22:24.607Z] [debug] appstate: background \u2192 active (was background for 100229ms)\n",
+      "[2026-08-19T22:22:28.817Z] [debug] ui: tap \"\u2191 \u2713 STANDARDS\"\n[2026-08-19T22:22:28.845Z] [player] go north\n[2026-08-19T22:22:28.846Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0\n[2026-08-19T22:22:28.848Z] [world] You head on to the Standards.\n",
+      "[2026-08-19T22:22:28.848Z] [debug] scene: loc=monarch_waystation hub=outpost_central arrival=n opening=n passing=n\n[2026-08-19T22:22:28.855Z] [world] Monarch Court \u2014 The Court of Standards. A flagstone court ringed with the standards of every Lost Capital. A Monarch banner hangs over the central plinth where a cracked map-stone has been re-carved twice.\n",
+      "[2026-08-19T22:22:28.855Z] [world] You've stood here many times. (visit 19)\n[2026-08-19T22:22:28.856Z] [world] Paths: north to Strongroom \u00b7 south to Atrium \u00b7 east to Arsenal \u00b7 west to Banquet. (Type 'leave outpost' to head into the wilds.)\n[2026-08-19T22:22:28.856Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-08-19T22:22:28.857Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T22:22:32.616Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-19T22:22:33.204Z] [debug] ctx: OPENED \u2014 live=1 (opened=3 released=2) \u2248425MB est\n[2026-08-19T22:22:37.535Z] [debug] ui: tap \"EXIT\"\n[2026-08-19T22:22:37.564Z] [player] leave outpost\n",
+      "[2026-08-19T22:22:37.565Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0\n[2026-08-19T22:22:37.566Z] [world] You let yourself out the Standards's side door and into the open ground. The outpost falls away behind you.\n[2026-08-19T22:22:37.566Z] [debug] scene: loc=monarch_waystation hub=- arrival=n opening=n passing=n\n",
+      "[2026-08-19T22:22:37.587Z] [debug] spawn: gear=[Sentinel's Chestplate, Reclaimer's Mask] window=10\n[2026-08-19T22:22:37.609Z] [world] A low-hanging mist that murmurs in old Tartarian. Step too far in and you forget which century you came from.\n\n",
+      "You are at The Monarch's Waystation. A frontier toll-court of the Mud Monarchs, last ordered ground before the buried capitals. Banners hang stiff with silt; a seneschal logs every traveler who passes toward the deeper cities.\n",
+      "[2026-08-19T22:22:37.612Z] [world] [The Monarch's Waystation] north: open ground \u00b7 east: Dynasty Border Post (4 days' travel) \u00b7 south: The Architect's Blind (5 days' travel) \u00b7 west: Tartarian Outskirts (3 days' travel)\n[2026-08-19T22:22:37.620Z] [system] \u23f3 Time passed: 1h\n[2026-08-19T22:22:37.695Z] [cognitive] RETREAT \u00b7 DISENGAGE \u00b7 HIDE  (75ms)\n[2026-08-19T22:22:43.468Z] [debug] ui: tap \"SOUTH\"\n",
+      "[2026-08-19T22:22:43.491Z] [player] go south\n[2026-08-19T22:22:43.492Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0\n[2026-08-19T22:22:43.497Z] [debug] spawn: gear=[Bone Throwing Axe, Architect's Leg Enhancers, Golem-Guardian's Greaves] window=10\n",
+      "[2026-08-19T22:22:43.498Z] [world] You walk south. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-19T22:22:43.498Z] [world] A toppled obelisk lies on its side, runes faded but not yet silent.\n[2026-08-19T22:22:43.499Z] [debug] arbiter: template (reason=cooldown)\n",
+      "[2026-08-19T22:22:43.499Z] [arbiter] The Arbiter considers the south. \"Name your intent and I'll grade it.\"\n[2026-08-19T22:22:43.500Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T22:22:43.500Z] [system] \u23f3 Time passed: 15 min\n[2026-08-19T22:22:43.615Z] [cognitive] neutral  (113ms)\n",
+      "[2026-08-19T22:22:43.845Z] [debug] persist sizes(KB): total=130 player=18 wm=25[rooms=5 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=85 scene=2\n[2026-08-19T22:22:45.021Z] [debug] ui: tap \"SOUTH\"\n[2026-08-19T22:22:45.048Z] [player] go south\n[2026-08-19T22:22:45.048Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-19T22:22:45.056Z] [debug] spawn: gear=[Bone Sling] window=10\n[2026-08-19T22:22:45.057Z] [world] You push south. The silt is heavy underfoot, the horizon unchanged.\n[2026-08-19T22:22:45.057Z] [world] The thread you were following waits where you left it.\n[2026-08-19T22:22:45.058Z] [debug] arbiter: template (reason=cooldown)\n",
+      "[2026-08-19T22:22:45.058Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T22:22:45.058Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T22:22:45.059Z] [system] \u23f3 Time passed: 15 min\n[2026-08-19T22:22:45.165Z] [cognitive] neutral  (105ms)\n[2026-08-19T22:22:46.437Z] [debug] ui: tap \"SOUTH\"\n[2026-08-19T22:22:46.468Z] [player] go south\n",
+      "[2026-08-19T22:22:46.469Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:22:46.470Z] [world] You have no stamina left \u2014 you can't travel. Type 'rest' to recover (8h), then back to the road.\n[2026-08-19T22:22:46.471Z] [debug] arbiter: template (reason=cooldown)\n",
+      "[2026-08-19T22:22:46.471Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T22:22:46.471Z] [system] \u23f3 Time passed: 15 min\n[2026-08-19T22:22:46.587Z] [cognitive] neutral  (114ms)\n[2026-08-19T22:22:46.876Z] [debug] qwen\u23f1 narration:travel preempted 9123ms read 9055ms/write 0ms in 738t\u2192out 0t 12.3ms/t (3ch)\n",
+      "[2026-08-19T22:22:46.877Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro n5 avg5.9s max9.5s read7.1s/write0.3s in739t\u2192out9t cap1 \u23f84 \u27024/24.7s | narration:scene_intro_fill n2 avg7.7s max9.8s read6.4s/write1.2s in704t\u2192out33t ms/tok 6.0-12.2 cap2 \u27021/9.8s | ambient n1 avg5.2s max5.2s read2.9s/write1.3s in360t\u2192out31t ms/tok 8.1-8.1 cap1 | investigate_lore n1 avg2.6s max2.6s read1.6s/write1.0s in128t\u2192out26",
+      "t ms/tok 12.3-12.3 | narration:travel n1 avg9.1s max9.1s read9.1s/write0.0s in738t\u2192out0t \u23f81 || WASTED 5 calls / 34.5s\n[2026-08-19T22:22:46.941Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:travel after 9123ms \u2014 cancelled:player-acted-again\n[2026-08-19T22:22:49.205Z] [debug] ui: tap \"rest\"\n",
+      "[2026-08-19T22:22:49.213Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-19T22:22:49.219Z] [player] rest\n[2026-08-19T22:22:49.219Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:22:49.221Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 2, afternoon)\n",
+      "[2026-08-19T22:22:49.221Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T22:22:49.229Z] [system] \u23f3 Time passed: 8h\n[2026-08-19T22:22:49.238Z] [world] An Eternal Dynasty war party crests the rise \u2014 2 of them, blades already out. They've marked you for standing with the Mud Monarchs.\n",
+      "[2026-08-19T22:22:49.238Z] [arbiter] \"The Eternal Dynasty do not forgive a friend of the Mud Monarchs,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-19T22:22:49.378Z] [cognitive] REST  (148ms)\n[2026-08-19T22:22:52.872Z] [debug] ui: tap \"flee\"\n[2026-08-19T22:22:52.886Z] [player] flee\n",
+      "[2026-08-19T22:22:52.887Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=2 hooks=1\n[2026-08-19T22:22:52.925Z] [system] \u23f3 Time passed: 15 min\n[2026-08-19T22:22:53.033Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (107ms)\n[2026-08-19T22:22:54.514Z] [debug] skillcheck: escape d20=9 DEX 7 = 16 vs Pursuit 9 \u2014 Eternal Dynasty Raider 1 (d20 2 + SPD 7) \u2192 PASS\n",
+      "[2026-08-19T22:22:54.552Z] [debug] stats: STR9 DEX7 INT4 WIS1 CHA5 STE1 | gear: DEX+5,STR+3,STE+1 | worn: main=Bolt-Caster off=Mud Heater Sword head=Sentinel's Faceguard hands=Wanderer's Worn Gauntlets legs=Architect's Leg Enhancers feet=Architect's Aetheric Boots cloak=Wanderer's Outercoat\n[2026-08-19T22:22:54.553Z] [debug] train: dexterity (escape check) \u2192 progress 6/100\n",
+      "[2026-08-19T22:22:54.553Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-08-19T22:22:56.940Z] [debug] ui: tap \"SOUTH\"\n[2026-08-19T22:22:56.976Z] [player] go south\n[2026-08-19T22:22:56.977Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-19T22:22:56.984Z] [debug] spawn: gear=[Explorer's Worn Headgear] window=10\n[2026-08-19T22:22:56.985Z] [world] You set out south. Your boots sink half an inch into the mud-flats and pull free with each step.\n[2026-08-19T22:22:56.986Z] [world] The thread you were following waits where you left it.\n[2026-08-19T22:22:56.986Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-19T22:22:57.079Z] [cognitive] neutral  (92ms)\n[2026-08-19T22:22:58.223Z] [debug] ui: tap \"SOUTH\"\n[2026-08-19T22:22:58.253Z] [player] go south\n[2026-08-19T22:22:58.254Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1\n[2026-08-19T22:22:58.260Z] [debug] spawn: gear=[Tartarian Claw Knife] window=10\n",
+      "[2026-08-19T22:22:58.261Z] [world] A weathered shed stands off the path here \u2014 weathered and quiet, a way in still clear. (Tap ENTER to step inside.)\n[2026-08-19T22:22:58.262Z] [world] You strike out south. The country resists you with sameness more than distance.\n",
+      "[2026-08-19T22:22:58.263Z] [world] A body sits cross-legged in the silt, mud-glassed in place. The pose is patient. Whatever they were waiting for never arrived.\n[2026-08-19T22:22:58.263Z] [world] A locket on their chest holds a pre-flood photograph \u2014 a face you don't recognise, smiling at a sky that doesn't exist anymore.\n[2026-08-19T22:22:58.264Z] [reward] \u2726 Recovered Worn Tartarian Coin x2.\n",
+      "[2026-08-19T22:22:58.271Z] [world] The thread you were following waits where you left it.\n[2026-08-19T22:22:58.272Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-19T22:22:58.272Z] [system] \u23f3 Time passed: 15 min\n[2026-08-19T22:22:58.358Z] [cognitive] neutral  (85ms)\n",
+      "[2026-08-19T22:22:58.603Z] [debug] persist sizes(KB): total=128 player=18 wm=25[rooms=5 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=83 scene=2\n[2026-08-19T22:23:03.124Z] [debug] ui: tap \"SOUTH\"\n[2026-08-19T22:23:03.153Z] [player] go south\n[2026-08-19T22:23:03.154Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-19T22:23:03.160Z] [debug] spawn: gear=[Mud Harpoon] window=10\n[2026-08-19T22:23:03.161Z] [world] You head south. Mud-flats stretch the same in every direction \u2014 only the wind tells you you've moved.\n[2026-08-19T22:23:03.162Z] [world] The thread you were following waits where you left it.\n[2026-08-19T22:23:03.163Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-19T22:23:03.248Z] [cognitive] neutral  (84ms)\n[2026-08-19T22:23:04.709Z] [debug] ui: tap \"EAST\"\n[2026-08-19T22:23:04.735Z] [player] go east\n[2026-08-19T22:23:04.735"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhyaqy0gi8 [inline 13/22]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbhyaqy0gi8"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "part",
+      "value": "13"
+    },
+    {
+      "key": "parts",
+      "value": "22"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T12:26:19.844027Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T12:26:19.531000Z",
+  "fingerprints": [
+    "e0f4cb018e4ab970e70b2d84412932d2"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "f495229be787492b9030b6cd29307e7d"
+}

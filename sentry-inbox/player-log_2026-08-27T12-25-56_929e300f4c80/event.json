@@ -1,0 +1,198 @@
+{
+  "id": "929e300f4c804381874c583785bfdf87",
+  "groupID": "7694761507",
+  "eventID": "929e300f4c804381874c583785bfdf87",
+  "projectID": "4511945117532160",
+  "size": 17865,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhxsw8mus3 [inline 19/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhxsw8mus3 [inline 19/23]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhxsw8mus3 [inline 19/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "647158f94e2c48faa335de13ece5716b",
+      "span_id": "9ac2e1a01b87b8fe",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "/base 12 + gear 17 + title 0 \u2192 trimmed 25 + status 0 | worn: head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle\n[2026-08-25T01:44:47.909Z] [combat] True Tartarians Raider 4 \u2014 d20 \u2192 2 + ATK 6 = 8 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-25T01:44:47.909Z] [combat] True Tartarians Raider 5 turns on Ember \u2014 d20 1 + ATK 6 = 7 vs Ember's AC 15 (vest +5) \u2014 \u2717 FUMBLE\n[2026-08-25T01:44:47.910Z] [combat] True Tartarians Raider 3 \u2014 d20 \u2192 16 + ATK 5 = 21 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-08-25T01:44:48.040Z] [combat] True Tartarians Raider 3 deals 3 bludgeoning damage [armor \u221235%, plate \u22122]. You have 31 HP remaining.\n[2026-08-25T01:44:48.040Z] [combat] True Tartarians Raider 3's strike leaves you stunned.\n[2026-08-25T01:44:48.562Z] [debug] persist sizes(KB): total=231 player=52 wm=74[rooms=18 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=100 scene=5\n",
+      "[2026-08-25T01:44:51.616Z] [debug] ui: tap \"off: acid-etched quarry-hewn skewer\"\n[2026-08-25T01:44:51.620Z] [system] stunned fades.\n[2026-08-25T01:44:51.621Z] [world] You cannot move. Your action is lost.\n[2026-08-25T01:44:52.720Z] [debug] ui: tap \"off: acid-etched quarry-hewn skewer\"\n[2026-08-25T01:44:52.773Z] [player] attack with the off-hand quarry-hewn skewer\n",
+      "[2026-08-25T01:44:52.774Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand quarry hewn skewer resolved=Quarry-Hewn Skewer range=close enemies=3 hooks=2\n[2026-08-25T01:44:52.775Z] [debug] attack: target=True Tartarians Raider 3 range=close reach.bands=[close] reach.label=Quarry-Hewn Skewer bareHand=false\n[2026-08-25T01:44:52.776Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-25T01:44:52.802Z] [world] You bring the acid-etched quarry-hewn skewer to bear on True Tartarians Raider 3.\n[2026-08-25T01:44:52.802Z] [system] \u23f3 Time passed: 6 min\n[2026-08-25T01:44:52.913Z] [cognitive] AIM \u00b7 THROW \u00b7 ATTACK  (108ms)\n[2026-08-25T01:45:02.724Z] [world] True Tartarians Raider 3 moves first. The pressure is immediate.\n",
+      "[2026-08-25T01:45:02.725Z] [combat] True Tartarians Raider 4 \u2014 d20 \u2192 9 + ATK 6 = 15 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-25T01:45:02.726Z] [combat] True Tartarians Raider 5 \u2014 d20 \u2192 14 + ATK 6 = 20 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-25T01:45:02.727Z] [combat] True Tartarians Raider 3 \u2014 d20 \u2192 19 + ATK 5 = 24 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-25T01:45:02.728Z] [combat] You \u2014 d20 \u2192 16 + DEX 16 \u2212 1 (Whisper Fog) = 31 vs True Tartarians Raider 3 AC 9 \u2014 \u2713 HIT\n",
+      "[2026-08-25T01:45:02.728Z] [combat] You crack the True Tartarians Raider 3 with the Acid-Etched Quarry-Hewn Skewer for 8 \u2014 half their fight, gone in one blow. They crumple, out cold. (5/13 HP) Loot them before they come to.\n[2026-08-25T01:45:02.729Z] [combat] True Tartarians Raider 3 is out of it. True Tartarians Raider 4 now in your sights.\n",
+      "[2026-08-25T01:45:02.729Z] [combat] Acid-Etched Quarry-Hewn Skewer \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-08-25T01:45:02.862Z] [combat] True Tartarians Raider 3 deals 6 bludgeoning damage [armor \u221235%, plate \u22122]. You have 25 HP remaining.\n",
+      "[2026-08-25T01:45:02.862Z] [combat] True Tartarians Raider 3's blow rings off you \u2014 braced; you keep your feet.\n[2026-08-25T01:45:04.422Z] [debug] ui: tap \"acid-etched valve gear\"\n[2026-08-25T01:45:04.426Z] [system] braced \u2014 will not go down again fades.\n[2026-08-25T01:45:04.502Z] [player] attack with the conspiracy architects valve gear\n",
+      "[2026-08-25T01:45:04.502Z] [debug] parser: intent=attack conf=1.00 verb=attack target=conspiracy architects valve gear resolved=- range=close enemies=3 hooks=2\n[2026-08-25T01:45:04.503Z] [combat] True Tartarians Raider 3 smokes \u2014 acid eats 4. (1/13 HP, 2 turns left)\n",
+      "[2026-08-25T01:45:04.503Z] [debug] attack: target=True Tartarians Raider 4 range=close reach.bands=[close] reach.label=Conspiracy Architects Valve Gear bareHand=false\n[2026-08-25T01:45:04.504Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-25T01:45:04.528Z] [world] Your conspiracy architects valve gear comes around in an arc; True Tartarians Raider 4 squares up to meet it.\n",
+      "[2026-08-25T01:45:04.529Z] [system] \u23f3 Time passed: 6 min\n[2026-08-25T01:45:04.639Z] [cognitive] neutral  (109ms)\n[2026-08-25T01:45:11.543Z] [world] True Tartarians Raider 4 moves first. The pressure is immediate.\n[2026-08-25T01:45:11.581Z] [combat] True Tartarians Raider 4 \u2014 d20 \u2192 11 + ATK 6 = 17 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-25T01:45:11.583Z] [combat] True Tartarians Raider 5 \u2014 d20 \u2192 7 + ATK 6 = 13 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-25T01:45:11.583Z] [combat] You \u2014 d20 \u2192 6 + STR 7 \u2212 1 (Whisper Fog) = 12 vs True Tartarians Raider 4 AC 10 \u2014 \u2713 HIT\n",
+      "[2026-08-25T01:45:11.585Z] [combat] Your strike with the conspiracy architects valve gear lands for 5. True Tartarians Raider 4 staggers \u2014 5 HP remaining. It answers.\n[2026-08-25T01:45:11.585Z] [combat] Conspiracy Architects Valve Gear \u2014 3 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-08-25T01:45:14.825Z] [debug] ui: tap \"acid-etched valve gear\"\n[2026-08-25T01:45:14.906Z] [player] attack with the conspiracy architects valve gear\n[2026-08-25T01:45:14.906Z] [debug] parser: intent=attack conf=1.00 verb=attack target=conspiracy architects valve gear resolved=- range=close enemies=3 hooks=2\n",
+      "[2026-08-25T01:45:14.907Z] [combat] True Tartarians Raider 3 smokes \u2014 acid eats 4. (0/13 HP, 1 turn left)\n[2026-08-25T01:45:14.907Z] [combat] True Tartarians Raider 4 smokes \u2014 acid eats 3. (2/10 HP, 2 turns left)\n[2026-08-25T01:45:14.908Z] [reward] True Tartarians Raider 3 defeated. You recover Aether Residue \u00d72, True Tartarian Sigil.\n",
+      "[2026-08-25T01:45:14.908Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+10 TC). The kit took the fight badly.\n[2026-08-25T01:45:14.908Z] [combat] 2 attackers remain. True Tartarians Raider 4 now in your sights.\n[2026-08-25T01:45:14.909Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n",
+      "[2026-08-25T01:45:14.909Z] [reward] +6 TC pried from the dust.\n[2026-08-25T01:45:14.932Z] [debug] attack: target=True Tartarians Raider 4 range=close reach.bands=[close] reach.label=Conspiracy Architects Valve Gear bareHand=false\n[2026-08-25T01:45:14.933Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-25T01:45:14.956Z] [world] You bring the conspiracy architects valve gear to bear on True Tartarians Raider 4.\n[2026-08-25T01:45:14.956Z] [system] \u23f3 Time passed: 6 min\n[2026-08-25T01:45:15.077Z] [cognitive] neutral  (120ms)\n[2026-08-25T01:45:22.307Z] [world] You seize the initiative. True Tartarians Raider 4 has no time to react.\n",
+      "[2026-08-25T01:45:22.308Z] [combat] You \u2014 d20 \u2192 8 + STR 7 \u2212 1 (Whisper Fog) = 14 vs True Tartarians Raider 4 AC 9 \u2014 \u2713 HIT\n[2026-08-25T01:45:22.309Z] [combat] True Tartarians Raider 4 folds under the conspiracy architects valve gear. 4 damage was enough. The room exhales.\n[2026-08-25T01:45:22.310Z] [reward] True Tartarians Raider 4 defeated. You recover Bone Bolt \u00d72, Patched Cloth.\n",
+      "[2026-08-25T01:45:22.310Z] [reward] You strip the body: Bone Crossbow, Reclaimer's Salvage Vest (+8 TC). The kit took the fight badly.\n[2026-08-25T01:45:22.310Z] [combat] 1 attacker remains. True Tartarians Raider 5 now in your sights.\n[2026-08-25T01:45:22.311Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n",
+      "[2026-08-25T01:45:22.311Z] [reward] +6 TC pried from the dust.\n[2026-08-25T01:45:22.336Z] [combat] True Tartarians Raider 5 \u2014 d20 \u2192 15 + ATK 6 = 21 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-25T01:45:25.144Z] [debug] ui: tap \"off: acid-etched quarry-hewn skewer\"\n[2026-08-25T01:45:25.196Z] [player] attack with the off-hand quarry-hewn skewer\n",
+      "[2026-08-25T01:45:25.197Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand quarry hewn skewer resolved=Quarry-Hewn Skewer range=close enemies=1 hooks=2\n[2026-08-25T01:45:25.198Z] [debug] attack: target=True Tartarians Raider 5 range=close reach.bands=[close] reach.label=Quarry-Hewn Skewer bareHand=false\n[2026-08-25T01:45:25.199Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-25T01:45:25.226Z] [world] You bring the acid-etched quarry-hewn skewer to bear on True Tartarians Raider 5.\n[2026-08-25T01:45:25.226Z] [system] \u23f3 Time passed: 6 min\n[2026-08-25T01:45:25.337Z] [cognitive] AIM \u00b7 THROW \u00b7 ATTACK  (109ms)\n",
+      "[2026-08-25T01:45:25.487Z] [debug] persist sizes(KB): total=231 player=53 wm=74[rooms=18 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=100 scene=4\n[2026-08-25T01:45:33.939Z] [world] You seize the initiative. True Tartarians Raider 5 has no time to react.\n[2026-08-25T01:45:33.939Z] [combat] You \u2014 d20 \u2192 18 + DEX 16 \u2212 1 (Whisper Fog) = 33 vs True Tartarians Raider 5 AC 10 \u2014 \u2713 HIT\n",
+      "[2026-08-25T01:45:33.940Z] [combat] True Tartarians Raider 5 folds under the acid-etched quarry-hewn skewer. 12 damage was enough. The room exhales.\n[2026-08-25T01:45:33.941Z] [reward] True Tartarians Raider 5 defeated. You recover Patched Cloth, Aether Residue, True Tartarian Sigil.\n",
+      "[2026-08-25T01:45:33.944Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-08-25T01:45:33.944Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 37). [15 enemies defeated]\n[2026-08-25T01:45:33.944Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n",
+      "[2026-08-25T01:45:33.945Z] [reward] +18 TC pried from the dust.\n[2026-08-25T01:45:38.198Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-25T01:45:40.423Z] [debug] ui: tap \"look around you\"\n[2026-08-25T01:45:40.428Z] [player] look\n[2026-08-25T01:45:40.428Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-08-25T01:45:40.429Z] [world] You look around. You're in Tartarian Archives, in Samarran. You see: research chart. The mud is unaddressed. Hazard active: Spatial Distortion. Cardinal travel: north, east, south, west.\n[2026-08-25T01:45:40.429Z] [arbiter] \u25b8 Still open \u2014 Travel south of the outpost. Yulka camps somewhere in tiles 2-3 south, after dark (8 pm to 4 am).\n",
+      "[2026-08-25T01:45:42.250Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 3952ms read 0ms/write 0ms in 796t\u2192out 0t (0ch)\n[2026-08-25T01:45:42.330Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 3952ms \u2014 intro-fill:\u2205\n[2026-08-25T01:45:42.331Z] [debug] homework: scene_intro \"Samarran\" \u2205 4135ms\n[2026-08-25T01:45:42.417Z] [cognitive] neutral  (1985ms)\n",
+      "[2026-08-25T01:45:47.791Z] [debug] qwen\u23f1 ambient ok 7227ms wait 1852ms read \u26a06687ms/write \u26a01417ms NOT-PER-CALL in 364t\u2192out 31t HIT-CAP (143ch)\n[2026-08-25T01:45:47.883Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 7227ms \u2014 ambient:\u2205\n[2026-08-25T01:45:47.883Z] [debug] arbiter: ambient \u2205 7453ms\n",
+      "[2026-08-25T01:45:47.884Z] [debug] arbiter: ambient-empty reason=unknown raw=\"You, my companion, have traveled quite a way. Your journey has taken you through the shadows of time, across the vast ex\"\n[2026-08-25T01:45:53.289Z] [player] take the research chart\n",
+      "[2026-08-25T01:45:53.290Z] [debug] parser: intent=pickup conf=1.00 verb=take target=research chart resolved=research chart range=- enemies=0 hooks=2\n[2026-08-25T01:45:53.295Z] [world] You test the research chart. It holds. Whatever story it has is the only thing it's giving up. (Try INVESTIGATE.)\n[2026-08-25T01:45:53.295Z] [debug] arbiter: template (reason=intent-not-allowed:pickup)\n",
+      "[2026-08-25T01:45:53.295Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-25T01:45:53.496Z] [cognitive] neutral  (199ms)\n[2026-08-25T01:46:07.745Z] [player] examine research chart\n[2026-08-25T01:46:07.746Z] [debug] parser: intent=investigate conf=1.00 verb=examine target=research chart resolved=research chart range=- enemies=0 hooks=2\n",
+      "[2026-08-25T01:46:07.747Z] [world] You study the research chart and find no answer. The silence here is patient; whatever it knew, it has decided to keep.\n[2026-08-25T01:46:07.940Z] [cognitive] neutral  (191ms)\n[2026-08-25T01:46:10.107Z] [debug] qwen\u23f1 investigate_lore ok 2257ms read 1252ms/write 898ms in 126t\u2192out 28t 9.9ms/t (141ch)\n[2026-08-25T01:46:10.858Z] [debug] ui: tap \"\u2192 YULDRA-TUL\"\n",
+      "[2026-08-25T01:46:10.872Z] [debug] spawn: gear=[Bone Javelin, Mud-Iron Cleaver, Aetherbound Mask] window=10 roster=new\n[2026-08-25T01:46:10.874Z] [world] You walk east through open silt. The compass tells you Nimari lies further east \u2014 6 tiles, about 15 hours of travel.\n[2026-08-25T01:46:10.875Z] [world] The thread you were following waits where you left it.\n",
+      "[2026-08-25T01:46:11.978Z] [debug] ui: tap \"take / salvage\"\n[2026-08-25T01:46:13.443Z] [world] You get a hand under the Bone Javelin and take it.\n[2026-08-25T01:46:13.444Z] [reward] \u2726 Bone Javelin (Common).\n[2026-08-25T01:46:13.458Z] [world] You claim the Aetherbound Mask.\n[2026-08-25T01:46:13.458Z] [reward] \u2726 Aetherbound Mask (Common).\n",
+      "[2026-08-25T01:46:14.926Z] [world] You work the calibration weight over. A part of it comes loose, intact.\n[2026-08-25T01:46:14.927Z] [world] You salvage the slide rule. The take is small but real.\n[2026-08-25T01:46:14.928Z] [world] You work the student bench over. A part of it comes loose, intact.\n",
+      "[2026-08-25T01:46:14.929Z] [world] You work the vellum scroll over. A part of it comes loose, intact.\n[2026-08-25T01:46:14.930Z] [reward] \u2726 Salvage haul:\n[2026-08-25T01:46:14.930Z] [reward]     \u2022 Aether Dust (Common)\n[2026-08-25T01:46:14.931Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-08-25T01:46:14.932Z] [reward]     \u2022 Bent Nail (Common)\n",
+      "[2026-08-25T01:46:14.933Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-08-25T01:46:16.051Z] [player] investigate Mud-Iron Cleaver\n[2026-08-25T01:46:16.052Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud iron cleaver resolved=Mud-Iron Cleaver range=- enemies=0 hooks=2\n",
+      "[2026-08-25T01:46:16.052Z] [debug] route: hook intercept (kind=pulsing_mud, target=\"mud-iron cleaver\") \u2014 original intent=investigate\n[2026-08-25T01:46:16.053Z] [world] \u2605 STORY THREAD (step 1) \u2014 You step toward the glow. The mud is warm against your boot \u2014 an Aetherstone deposit, surface-thin but real.\n",
+      "[2026-08-25T01:46:16.294Z] [debug] persist sizes(KB): total=230 player=54 wm=75[rooms=18 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=98 scene=3\n[2026-08-25T01:46:17.204Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You pry the deposit out of the silt. A few good shards, dense and humming, plus a thumb-sized core.\n",
+      "[2026-08-25T01:46:17.204Z] [reward] \u2726 Aetheric Shard, Aetheric Shard, Aether Crystal.\n[2026-08-25T01:46:20.377Z] [debug] ui: tap \"investigate\"\n[2026-08-25T01:46:21.461Z] [player] investigate inscription\n[2026-08-25T01:46:21.462Z] [debug] parser: intent=investigate conf=1.00"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtbhxsw8mus3 [inline 19/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbhxsw8mus3"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "19"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T12:25:56.275729Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T12:25:56.381000Z",
+  "fingerprints": [
+    "e0f4cb018e4ab970e70b2d84412932d2"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "95ff56be84ce4caba4d06d6f0670199a",
+  "previousEventID": "8611286b3288490091bb077ff285ebcb"
+}
