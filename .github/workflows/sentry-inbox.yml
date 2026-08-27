@@ -381,6 +381,25 @@ jobs:
           except Exception as e:
               print('subscription query failed (token may lack billing scope):', e)
           PYEOF
+      # ⚠⚠⚠ 2026-08-27 — REBASE BEFORE PUSHING, BECAUSE THE RELAY LOSES RACES.
+      # This step used to `git push` bare, against a branch a session is actively
+      # committing to. Run 31 fetched every event of the post-Safe-Fields send,
+      # committed them, and then threw the whole run away:
+      #
+      #   ! [rejected]  golem-line -> golem-line (fetch first)
+      #   error: failed to push some refs
+      #
+      # Run 29 died the same way. Nothing was corrupted — the next sync re-fetches
+      # what never landed, because the skip test is "does event.json exist in the
+      # tree" and a lost commit leaves it absent — but a red run is indistinguishable
+      # at a glance from a token failure or an API outage, and this hunt has already
+      # cost enough time to misread signals.
+      #
+      # ⚠⚠ REBASE, NOT MERGE, AND NOT FORCE. The relay only ever ADDS files under
+      # sentry-inbox/; a session only ever touches request.txt and the workflow.
+      # They cannot conflict, so replaying the sync commit on top of whatever
+      # arrived is always the correct resolution. Force-pushing would discard the
+      # session's work, which is the one outcome worth failing to avoid.
       - name: Commit the inbox
         run: |
           git config user.name 'sentry-inbox'
@@ -388,7 +407,20 @@ jobs:
           git add sentry-inbox/
           if git diff --cached --quiet; then
             echo 'Nothing new to commit.'
-          else
-            git commit -m 'sentry-inbox: sync player-log bundles [skip ci]'
-            git push
+            exit 0
           fi
+          git commit -m 'sentry-inbox: sync player-log bundles [skip ci]'
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "push rejected on attempt $attempt — rebasing onto the newer tip"
+            git pull --rebase origin golem-line || {
+              echo 'rebase failed; leaving the branch untouched for a human'
+              exit 1
+            }
+            sleep $((attempt * 3))
+          done
+          echo 'could not push after 5 attempts'
+          exit 1

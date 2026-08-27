@@ -1,23 +1,24 @@
-sync 2026-08-27 — four more logs sent, AFTER `chunkBlocks` was added to the
-tartaria project's Safe Fields. This is the test.
+sync 2026-08-27 — read the scrubbing config back cleanly, and prove the rebase
+fix works.
 
-Three questions this sync answers, in order:
+THE BLOCKS FIX IS CONFIRMED ON THE OWNER'S OWN DEVICES. All three new bundles
+report `session start: 2026-08-27-1520`, so they were sent on the array shape,
+and the cost per bundle collapsed:
 
-1. Did the setting save? The config probe reads `safeFields` back and the
-   exemption line flips to YES.
+  mtawqnivyk0q (1519)  5 redactions  74,999 chars
+  mtaxu4o1qm9m (1520)  4 redactions   1,498 chars
+  mtawr2axtwkc (1519)  4 redactions  60,000 chars
+  mtaxuqrhd0b3 (1520)  4 redactions   1,376 chars
 
-2. Were these sends made on OTA-1520? Decisive, because the exemption names
-   `chunkBlocks` and only 1520 sends that field — a device still on 1519 sends a
-   single `chunk` scalar, which Safe Fields was never told about. The build id
-   rides in each event's message, and the reader shows whether the slice arrived
-   as an array or a scalar.
+Same rule, same trigger positions (parts 3/9/10/11), 43x less taken — and about
+61,000 more characters of log per send arriving intact. Travel came back with it:
+27 cardinal steps in a bundle that previously showed zero.
 
-3. Did the exemption actually stop @password:filter? Read it off SCRUB TOTALS.
-   No entry for the new bundles means a name-based exclusion does reach into the
-   array and the loss is zero. Redactions still landing at ~400 chars a hit means
-   the exclusion stops at the array boundary, and the blocks are doing the work
-   on their own.
+BUT @password:filter IS STILL FIRING, so the Safe Fields entry did not stop it.
+That is the answer to the open question: a name-based exclusion does not reach
+into an array's children. This run reads `safeFields` back to confirm the setting
+is genuinely saved, so the conclusion rests on config rather than inference.
 
-Older bundles will keep reporting @password:filter forever — they were scrubbed
-at ingest under the old config and nothing rewrites them. Only the bundles dated
-after the setting was saved carry the verdict.
+Also fixed here: the relay pushed without rebasing and lost races against the
+session. Runs 29 and 31 fetched everything, committed it, then threw the run away
+on `! [rejected] (fetch first)`. It now rebases and retries up to five times.
