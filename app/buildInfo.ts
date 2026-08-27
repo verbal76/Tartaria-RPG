@@ -25164,6 +25164,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // detectable — the one genuine record in the corpus (an attack at nimari,
 // mid-action, its log tail swallowed by the wedge) survives whole.
 export const OTA_BUILD_ID = '2026-08-27-1526-the-ledger-was-writing-its-own-corpses';
+// golem catch-up 2026-08-27: markerless publish of OTA-1526 (boot reads the
+// breadcrumb snapshot taken at module load instead of racing this session's own
+// phase stamps for the same key, so the crash ledger stops filing the boot's own
+// handwriting as a native death) to the golem channel. Both channels level
+// at 1526.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1525-the-dog-card-gets-the-switch-too';
 // golem catch-up 2026-08-27: markerless publish of OTA-1525 (the dog card offers
 // the tips switch — silencing every future tip without dismissing the one
