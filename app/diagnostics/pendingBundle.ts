@@ -47,7 +47,8 @@
  */
 import * as FileSystem from 'expo-file-system';
 import { reportingEnabled } from './crashReporter';
-import { sendDiagnosticsBundle, type DiagnosticsBundle } from './sentryTransport';
+// ⚠⚠⚠ OTA-1516 — the retry sends what the BUTTON sends. See the call site.
+import { sendGameLogChunked, describeChunkedSend, type DiagnosticsBundle } from './sentryTransport';
 
 export const PENDING_BUNDLE_FILE = 'pending-diagnostics-bundle.json';
 
@@ -183,13 +184,39 @@ export async function retryPendingBundleAtBoot(): Promise<string | null> {
     // different diagnoses (no transport yet vs a flush that ran out of clock),
     // and the 22:02 log could not tell them apart. Now the line says.
     const startedAt = Date.now();
-    const ok = await sendDiagnosticsBundle(p.bundle, { bundleId: p.id, attempt });
+    // ⚠⚠⚠ OTA-1516 — THE RETRY SENDS WHAT THE BUTTON SENDS, AND UNTIL NOW IT
+    // DID NOT. OTA-1515 moved the BUTTON to the chunked game-log path and left
+    // this line — and autoBundle's — on `sendDiagnosticsBundle`, which builds
+    // the whole thing in one go: an 800KB log tail plus a NEVER-truncated save
+    // plus inventory plus device, UTF-8'd, concatenated with a full array copy
+    // per item, base64'd into a single JS string, and handed across the RN
+    // bridge in ONE call. That left the largest allocation the app ever makes
+    // running on the path NOBODY WATCHES — every boot, unattended.
+    //
+    // ⚠⚠ AND THE 01:03:31 CRASH RECORD POINTS HERE. It is a `native-death` —
+    // the OS killed the process — stamped `build 2026-08-27-1515` (so the fix
+    // was installed), `lastAction '(no action yet)'`, `lastPhase 'rendered'`
+    // and `lastPhaseAgeMs: 0`: the process died AT the instant it reached
+    // rendered, before the player touched anything. That is exactly where this
+    // retry runs — App.tsx fires it once `otaBootResolved` opens, right at
+    // render — and this is the only megabyte-scale assembly left in the boot.
+    //
+    // ⚠ STATED HONESTLY: that is a strong coincidence, not a proof. The
+    // ledger's native deaths carry no stack, so nothing here can name the
+    // allocation that killed the process. The change stands on its own anyway:
+    // there was never a reason for the retry to send a DIFFERENT, LARGER
+    // payload than the button, and the owner asked for the game log alone
+    // ("not the inventory or save file or anything else"). If the deaths stop,
+    // that is the confirmation the crash record could not give.
+    const chunk = await sendGameLogChunked(p.bundle.log, p.id, attempt);
+    const ok = chunk.sent > 0 && chunk.sent === chunk.parts;
     const took = Date.now() - startedAt;
+    const how = ok ? 'flushed to Sentry' : `${describeChunkedSend(chunk)} (after ${took}ms)`;
     if (attempt >= MAX_SEND_ATTEMPTS) {
       await clearPendingBundle();
-      return `send-log: bundle #${p.id} attempt ${attempt}/${MAX_SEND_ATTEMPTS} ${ok ? 'flushed' : `did not go out (after ${took}ms)`} — final try, cleared`;
+      return `send-log: bundle #${p.id} attempt ${attempt}/${MAX_SEND_ATTEMPTS} ${how} — final try, cleared`;
     }
-    return `send-log: bundle #${p.id} attempt ${attempt}/${MAX_SEND_ATTEMPTS} ${ok ? 'flushed to Sentry' : `did not go out (after ${took}ms) — kept for next boot`}`;
+    return `send-log: bundle #${p.id} attempt ${attempt}/${MAX_SEND_ATTEMPTS} ${how}${ok ? '' : ' — kept for next boot'}`;
   } catch {
     return null; // the retry is best-effort; the file stays for the next boot
   }

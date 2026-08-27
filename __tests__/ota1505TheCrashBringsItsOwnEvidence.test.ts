@@ -101,13 +101,20 @@ describe('OTA-1505 — who it fires for', () => {
     await armed();
     _setCrashLedgerForTests([crash(7000)]);
     const line = await maybeAutoQueueCrashBundle(asPlayer('Verbal'), {});
-    expect(line).toContain('full bundle pushed automatically');
+    expect(line).toContain('game log pushed automatically');
     expect(mockSentry.captureEvent).toHaveBeenCalledTimes(1);
     const [event, hint] = mockSentry.captureEvent.mock.calls[0] as [
       { message: string }, { attachments: Array<{ filename: string; data: string }> },
     ];
-    expect(hint.attachments.map((a) => a.filename))
-      .toEqual(['game-log.txt', 'inventory.txt', 'save.json', 'device.txt']);
+    // ⚠⚠ OTA-1516 NARROWED THE WIRE, DELIBERATELY. The auto-push used to send
+    // all four artifacts in ONE envelope, on a device that had just been proven
+    // unable to hold a process — the single largest allocation the app makes, at
+    // the worst possible moment. It now sends the GAME LOG ALONE, in parts, which
+    // is also the payload the owner asked for ("not the inventory or save file or
+    // anything else"). The save and inventory are NOT lost: the bundle is still
+    // composed and persisted whole to the OTA-1504 slot, pinned just below.
+    expect(hint.attachments).toHaveLength(1);
+    expect(hint.attachments[0]!.filename).toMatch(/^game-log\.part\d+-of-\d+\.txt$/);
     expect(hint.attachments[0]!.data).toBe('LOG[THE LOG BODY]');
     // Durable: the same bundle sits in the OTA-1504 slot with its id on the event.
     const pending = await readPendingBundle();
@@ -120,7 +127,7 @@ describe('OTA-1505 — who it fires for', () => {
     await armed();
     _setCrashLedgerForTests([crash(7000)]);
     const line = await maybeAutoQueueCrashBundle(asPlayer('sasmooch the second'), {});
-    expect(line).toContain('full bundle pushed automatically');
+    expect(line).toContain('game log pushed automatically');
   });
 
   it('⚠⚠ the OTA-1490 sticky device flag fires it for their OTHER characters too', async () => {
@@ -128,7 +135,7 @@ describe('OTA-1505 — who it fires for', () => {
     await AsyncStorage.setItem(OWNER_TOOLS_KEY, 'true'); // device once held an unlock name
     _setCrashLedgerForTests([crash(7000)]);
     const line = await maybeAutoQueueCrashBundle(asPlayer('Mudline Karn'), {});
-    expect(line).toContain('full bundle pushed automatically');
+    expect(line).toContain('game log pushed automatically');
   });
 
   it("⚠⚠⚠ A PLAYER'S DEVICE NEVER AUTO-PUSHES — the privacy promise holds", async () => {
@@ -195,7 +202,7 @@ describe('OTA-1505 — the wiring is honest', () => {
     // And the durable order survives review: persist BEFORE send, mark between.
     const persistAt = AUTO.indexOf('persistPendingBundle(bundle)');
     const markAt = AUTO.indexOf('AsyncStorage.setItem(AUTO_BUNDLE_MARK_KEY,');
-    const sendAt = AUTO.indexOf('sendDiagnosticsBundle(bundle,');
+    const sendAt = AUTO.indexOf('sendGameLogChunked(bundle.log,');
     expect(persistAt).toBeGreaterThan(-1);
     expect(markAt).toBeGreaterThan(persistAt);
     expect(sendAt).toBeGreaterThan(markAt);

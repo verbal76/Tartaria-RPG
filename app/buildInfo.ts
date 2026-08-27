@@ -24893,7 +24893,44 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // order, NAMING any gap rather than concatenating a hole. The bundle is still
 // persisted whole for the retry and COPY LOG still exports everything. The
 // misleading "WILL RETRY AT BOOT" copy is gone: tapping again retries now.
-export const OTA_BUILD_ID = '2026-08-27-1515-the-log-goes-in-parts';
+// ⚠⚠⚠ OTA-1516 — THE QUIET PATH SENDS THE SAME WAY. The gap was in OTA-1515
+// itself: it moved the SEND LOG BUTTON onto the chunked game-log path and left
+// the two paths nobody watches — the boot retry and the post-crash auto-push —
+// still calling sendDiagnosticsBundle, which builds an 800KB log tail plus a
+// NEVER-truncated save plus inventory plus device, UTF-8s them, concatenates
+// with a full array copy per item, base64s the lot into one JS string and hands
+// it across the RN bridge in a single call. The largest allocation the app ever
+// makes was left running unattended on every boot.
+// THE 01:03:31 CRASH RECORD POINTS AT IT. kind native-death (the OS killed the
+// process), build 2026-08-27-1515 (so the fix was installed), lastAction "(no
+// action yet)", lastPhase "rendered", lastPhaseAgeMs 0 — the process died at
+// the instant it reached rendered, before the player touched anything. App.tsx
+// fires the boot retry once otaBootResolved opens, which is exactly there, and
+// after 1515 it was the only megabyte-scale assembly left in the boot.
+// AND THE 01:02 LOG ADDED THE OTHER HALF OF THE ANSWER: the first chunked send
+// reported "0/7 parts out (404814 chars, median 33ms, worst 34ms)". All seven
+// ATTEMPTED (a refusal prints NOT ATTEMPTED), none THREW, and every one answered
+// in 33ms — far too fast for any network round trip, so flush() refused locally
+// and instantly, before a byte left the device. That kills payload size, memory
+// pressure and the missing deadline as explanations outright. What it could not
+// say is WHY, because `ok !== false` flattened three different refusals — a
+// flush that RESOLVED false, one that REJECTED carrying the queued send's real
+// error, and our own deadline — into one boolean. flushNote now records which,
+// with the rejection's message, and the send-log line prints it after "WHY:".
+// The retry keeps OTA-1504's sendAttempt stamp so the relay can still tell a
+// first send from a boot re-send.
+// STATED HONESTLY: a strong coincidence, not a proof. Native deaths carry no
+// stack, so nothing on the device can name the allocation that killed it. The
+// change stands without it — there was never a reason for the retry to send a
+// DIFFERENT, LARGER payload than the button, and the owner asked for the game
+// log alone ("not the inventory or save file or anything else"). If the native
+// deaths stop, that is the confirmation the record could not give.
+// The durable copy is untouched: the save and inventory still go to disk, and
+// COPY LOG still exports everything. Only the wire narrowed.
+export const OTA_BUILD_ID = '2026-08-27-1516-the-quiet-path-sends-the-same-way';
+// golem catch-up 2026-08-27: markerless publish of OTA-1516 (boot retry and
+// crash auto-push chunked like the button) to the golem channel.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1515-the-log-goes-in-parts';
 // golem catch-up 2026-08-27: markerless publish of OTA-1515 (the send root cause
 // — RN's flush() discards the deadline we pass it, so every bundle send waited
 // forever; plus named refusals and the game log in parts) to the golem channel.

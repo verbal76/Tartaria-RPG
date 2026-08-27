@@ -152,7 +152,9 @@ describe('OTA-1515 — THE ROOT CAUSE: the SDK ignores the deadline we hand it',
     // The race exists, and BOTH send paths go through it rather than calling
     // the SDK's flush bare. A bare `await s.flush(` anywhere is the bug back.
     expect(SRC).toContain('async function flushWithRealDeadline(');
-    expect(SRC).toContain('new Promise<boolean>((resolve) => { timer = setTimeout(() => resolve(false), ms); })');
+    // ⚠ OTA-1516 widened the timer arm to also RECORD why it fired; the wall
+    // itself is unchanged, so the pin follows the structure, not the old text.
+    expect(SRC).toMatch(/timer = setTimeout\(\(\) => \{[\s\S]{0,120}resolve\(false\); \}, ms\)/);
     expect(SRC).not.toMatch(/return await s\.flush\(/);
     expect(SRC).toMatch(/await flushWithRealDeadline\(s, PART_FLUSH_MS\)/);
     expect(SRC).toMatch(/await flushWithRealDeadline\(s, 10_000\)/);
@@ -184,7 +186,7 @@ describe('OTA-1515 — a refusal is not a failed send', () => {
 
   it('⚠⚠ the log line says NOT ATTEMPTED, never "0 parts out"', () => {
     const line = describeChunkedSend({
-      sent: 0, parts: 0, chars: 0, timings: [], threwAt: null,
+      sent: 0, parts: 0, chars: 0, timings: [], threwAt: null, flushNote: null,
       stopped: 'crash reporting is switched off on this device', bundleId: 'q1',
     });
     expect(line).toContain('NOT ATTEMPTED');
@@ -201,7 +203,7 @@ describe('OTA-1515 — the report tells the truth about what got out', () => {
     const line = describeChunkedSend({
       sent: 19, parts: 23, chars: 1_150_000,
       timings: [25, 900, 1200, 30_000], threwAt: 'part 20/23: out of memory',
-      stopped: null, bundleId: 'abc123',
+      flushNote: null, stopped: null, bundleId: 'abc123',
     });
     expect(line).toContain('#abc123');
     expect(line).toContain('19/23 parts out');
@@ -212,7 +214,7 @@ describe('OTA-1515 — the report tells the truth about what got out', () => {
 
   it('⚠ a clean run says so without noise', () => {
     const line = describeChunkedSend({
-      sent: 3, parts: 3, chars: 120, timings: [10, 12, 11], threwAt: null, stopped: null, bundleId: 'z9',
+      sent: 3, parts: 3, chars: 120, timings: [10, 12, 11], threwAt: null, flushNote: null, stopped: null, bundleId: 'z9',
     });
     expect(line).toContain('3/3 parts out');
     expect(line).not.toContain('THREW');

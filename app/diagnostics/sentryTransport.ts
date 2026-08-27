@@ -113,13 +113,58 @@ interface SentryLike {
  * delivery is a delivered log. All the race governs is how long we stand there
  * before recording what happened.
  */
+/**
+ * ⚠⚠⚠ OTA-1516 — AND WHY IT SAID NO, WHICH THE 01:02 LOG PROVED WE STILL COULD
+ * NOT SEE. The first chunked send reported, in full:
+ *
+ *     send-log: #mtatj02qozh5 — 0/7 parts out (404814 chars, median 33ms, worst 34ms)
+ *
+ * Read that carefully, because it eliminates almost everything at once. All
+ * SEVEN parts were ATTEMPTED — a refusal would have printed NOT ATTEMPTED with
+ * its reason. None of them THREW — the clause is absent. And every one came
+ * back in THIRTY-THREE MILLISECONDS. No network round trip completes in 33ms
+ * from a phone, so nothing was waiting on a server: `flush()` returned `false`
+ * locally and immediately, before a byte left the device. Payload size, memory
+ * pressure and the missing deadline are all dead as explanations — a 33ms
+ * `false` is the SDK refusing on the spot.
+ *
+ * ⚠⚠ SO THE ONLY THING LEFT TO LEARN IS WHAT IT REFUSED WITH, AND THE CODE
+ * ABOVE WAS THROWING THAT AWAY. `ok !== false` flattened three very different
+ * outcomes into one boolean: a flush that RESOLVED false (the SDK's own
+ * `getClient()`-missing path, which returns false without touching the
+ * network), a flush that REJECTED (the promise buffer rejects when a queued
+ * send fails, and RN's flush catches that and answers false), and our own
+ * deadline firing. Those need completely different fixes, and 33ms cannot tell
+ * them apart on its own. `flushNote` records which one happened, and the
+ * rejection's message with it.
+ *
+ * ⚠ Kept deliberately cheap: one string, only on the failure path, and it
+ * rides the line that already prints. The next send names the cause itself
+ * instead of costing another round of guessing.
+ */
+let lastFlushNote: string | null = null;
+
 async function flushWithRealDeadline(s: SentryLike, ms: number): Promise<boolean> {
+  lastFlushNote = null;
   if (typeof s.flush !== 'function') return true; // old SDK: queue-and-hope, unchanged
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     return await Promise.race([
-      Promise.resolve(s.flush(ms)).then((ok) => ok !== false),
-      new Promise<boolean>((resolve) => { timer = setTimeout(() => resolve(false), ms); }),
+      Promise.resolve(s.flush(ms)).then(
+        (ok) => {
+          // ⚠ A resolved `false` is the SDK declining, NOT a timeout. Say so.
+          if (ok === false) lastFlushNote = 'flush() resolved false without sending';
+          return ok !== false;
+        },
+        (err) => {
+          // ⚠ A REJECTION carries the real fault — the queued send's own error.
+          lastFlushNote = `flush() rejected: ${err instanceof Error ? err.message : String(err)}`;
+          return false;
+        },
+      ),
+      new Promise<boolean>((resolve) => {
+        timer = setTimeout(() => { lastFlushNote = `no answer within ${ms}ms`; resolve(false); }, ms);
+      }),
     ]);
   } finally {
     if (timer) clearTimeout(timer);
@@ -386,6 +431,14 @@ export interface ChunkedSendReport {
   /** First part that threw, with its message — the on-device fault, named. */
   threwAt: string | null;
   /**
+   * ⚠⚠⚠ OTA-1516 — WHY FLUSH SAID NO, when it said no. The 01:02 send reported
+   * "0/7 parts out … median 33ms" — every part attempted, none thrown, all
+   * refused in 33ms. That is a LOCAL refusal, and until now the three ways it
+   * can happen (resolved-false, rejected, our deadline) all read identically.
+   * This carries the first one seen, verbatim.
+   */
+  flushNote: string | null;
+  /**
    * ⚠⚠⚠ WHY NOTHING WAS EVEN ATTEMPTED, when that is the answer.
    *
    * This field exists because its absence cost weeks. Every early return in
@@ -410,9 +463,14 @@ export interface ChunkedSendReport {
 export async function sendGameLogChunked(
   fullLog: string,
   bundleId: string,
+  // ⚠⚠ OTA-1516 — KEEP OTA-1504'S ATTEMPT STAMP. The same bundle can arrive more
+  // than once by design (that is what the durable retry IS), and `sendAttempt`
+  // is how the relay reader tells a first send from a boot re-send rather than
+  // guessing from timestamps. Chunking changed the payload, not that contract.
+  attempt?: number,
 ): Promise<ChunkedSendReport> {
   const report: ChunkedSendReport = {
-    sent: 0, parts: 0, chars: 0, timings: [], threwAt: null, stopped: null, bundleId,
+    sent: 0, parts: 0, chars: 0, timings: [], threwAt: null, flushNote: null, stopped: null, bundleId,
   };
   // ⚠ Each refusal names ITSELF. See `stopped` above for why three different
   // causes sharing one silent `false` is the bug that hid the real one.
@@ -451,6 +509,7 @@ export async function sendGameLogChunked(
             bundleId,
             part: String(partNo),
             parts: String(total),
+            ...(attempt ? { sendAttempt: String(attempt) } : {}),
           },
         },
         {
@@ -466,6 +525,9 @@ export async function sendGameLogChunked(
       // unbounded wait is the whole reason no log has arrived since 2026-08-25.
       const ok = await flushWithRealDeadline(s, PART_FLUSH_MS);
       report.timings.push(Date.now() - startedAt);
+      // ⚠ OTA-1516 — keep the FIRST refusal's reason; later parts fail the same
+      // way and repeating it would bury the line that matters.
+      if (!ok && report.flushNote === null) report.flushNote = lastFlushNote;
       if (ok) report.sent += 1;
       report.chars += slice.length;
     } catch (err) {
@@ -491,7 +553,10 @@ export function describeChunkedSend(r: ChunkedSendReport): string {
   // read alike and mean completely different things to whoever reads this next.
   if (r.stopped) return `send-log: #${r.bundleId} — NOT ATTEMPTED: ${r.stopped}`;
   return `send-log: #${r.bundleId} — ${r.sent}/${r.parts} parts out (${r.chars} chars, `
-    + `median ${median}ms, worst ${worst}ms)${r.threwAt ? ` — THREW at ${r.threwAt}` : ''}`;
+    + `median ${median}ms, worst ${worst}ms)${r.threwAt ? ` — THREW at ${r.threwAt}` : ''}`
+    // ⚠ OTA-1516 — the refusal's own words. "0/7 out in 33ms" was true and
+    // useless; "0/7 out … WHY: flush() rejected: <message>" is a diagnosis.
+    + `${r.flushNote ? ` — WHY: ${r.flushNote}` : ''}`;
 }
 
 /** Tests only. */

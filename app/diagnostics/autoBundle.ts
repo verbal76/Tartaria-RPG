@@ -47,7 +47,8 @@ import { loadCrashLedger, settleCrashWrites } from './crashLedger';
 import { reportingEnabled } from './crashReporter';
 import { ownerToolsUnlocked } from './ownerTools';
 import { persistPendingBundle } from './pendingBundle';
-import { sendDiagnosticsBundle, type DiagnosticsBundle } from './sentryTransport';
+// ⚠⚠⚠ OTA-1516 — chunked, like every other send now. See the call site.
+import { sendGameLogChunked, describeChunkedSend, type DiagnosticsBundle } from './sentryTransport';
 
 export const AUTO_BUNDLE_MARK_KEY = '@tartaria/lastAutoBundledCrashTs';
 
@@ -92,9 +93,18 @@ export async function maybeAutoQueueCrashBundle(
     const bundle = await composeDiagnosticsBundle(player, worldMemory);
     const pending = await persistPendingBundle(bundle);
     try { await AsyncStorage.setItem(AUTO_BUNDLE_MARK_KEY, String(newest)); } catch { /* re-bundles next load */ }
-    const ok = await sendDiagnosticsBundle(bundle, pending ? { bundleId: pending.id, attempt: 1 } : {});
-    return `send-log: crash on record (${new Date(newest).toISOString()}) — full bundle pushed automatically, `
-      + `${ok ? 'flushed to Sentry' : 'flush failed'}${pending ? `, kept on disk as #${pending.id}` : ''}`;
+    // ⚠⚠⚠ OTA-1516 — CHUNKED HERE TOO, AND THIS IS THE WORST PLACE OF ALL FOR
+    // A MEGABYTE ALLOCATION. This path runs immediately after a crash has been
+    // found on the ledger — i.e. on a device that has just been proven to be
+    // under enough pressure to lose a process. Building an 800KB log tail plus
+    // an untruncated save plus inventory plus device, then base64ing the lot
+    // into one JS string for the RN bridge, was asking the freshly-recovered
+    // process to make the single largest allocation it ever makes. The game log
+    // in 60K parts costs a fraction of it and is what the owner asked to see.
+    const chunk = await sendGameLogChunked(bundle.log, pending?.id ?? `auto${newest.toString(36)}`);
+    const ok = chunk.sent > 0 && chunk.sent === chunk.parts;
+    return `send-log: crash on record (${new Date(newest).toISOString()}) — game log pushed automatically, `
+      + `${ok ? 'flushed to Sentry' : describeChunkedSend(chunk)}${pending ? `, kept on disk as #${pending.id}` : ''}`;
   } catch {
     return null; // the auto path must never become a slot-load hazard
   }

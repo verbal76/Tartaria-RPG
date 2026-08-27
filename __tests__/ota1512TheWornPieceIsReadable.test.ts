@@ -37,8 +37,17 @@ jest.mock('expo-file-system', () => {
   };
 });
 jest.mock('../app/diagnostics/crashReporter', () => ({ reportingEnabled: () => true }));
+// ⚠ OTA-1516 moved the boot retry onto the chunked sender, so the stand-in has
+// to offer it. The FAILING shape is what this suite is about — it exists to
+// prove the retry's ACCOUNTING (hold-not-burn, and the timing tell), not that a
+// send succeeds — so the report says nothing went out.
 jest.mock('../app/diagnostics/sentryTransport', () => ({
   sendDiagnosticsBundle: jest.fn(async () => false),
+  sendGameLogChunked: jest.fn(async (_log: string, bundleId: string) => ({
+    sent: 0, parts: 1, chars: 0, timings: [7], threwAt: null,
+    flushNote: 'flush() resolved false without sending', stopped: null, bundleId,
+  })),
+  describeChunkedSend: jest.fn(() => 'did not go out (after 7ms)'),
 }));
 
 import { readFileSync } from 'fs';
