@@ -85,12 +85,35 @@ describe('OTA-1377 — the orderly exit is marked', () => {
     // ⚠ OTA-1396 — counted across `app/` rather than across the store text, because
     // "two callers" was always a claim about the application and never about a file.
     // saveSystem.ts is excluded: that is where the function is DEFINED.
+    //
+    // ⚠⚠⚠ OTA-1521 — A THIRD CALLER, AND IT IS ARGUED, NOT SNUCK IN. This list was
+    // never a cap on how many orderly exits may exist; it enumerated the ones that
+    // DID exist, so that a careless fourth could not appear unnoticed. The contract
+    // above is the real rule — "Cleared on an ORDERLY exit" — and the OTA reload is
+    // the most deliberate exit the app has: it chooses it.
+    // It was missing, and the cost is measured. `reloadAsync()` tears the process
+    // down with no orderly JS exit, so hydrate() promoted the surviving crumb into
+    // a `native-death`. Eight of the eighteen death records in the owner's logs
+    // follow "ota: Restarting to apply…" by 4s · 4s · 5s · 5s · 6s · 7s · 18s ·
+    // 103s — six of them inside seven seconds. Nearly half the crash ledger was the
+    // app killing itself on purpose and being recorded as a victim, which is why an
+    // OTA was spent on a memory-pressure hypothesis that could not have been right.
+    // So: three callers, each named, and a fourth still cannot appear in silence.
+    // ⚠⚠ OTA-1521 — MATCH CODE, NOT PROSE. This scanned raw file text, so
+    // buildInfo.ts registered as a "caller" the moment an OTA note happened to
+    // mention `clearLiveBreadcrumb()` in a comment. A guard that counts English
+    // sentences as call sites reports drift that is not there and, worse,
+    // teaches you to edit the guard instead of reading it.
+    const codeOf = (f: string) => readFileSync(f, 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .split('\n').filter((l) => !l.trim().startsWith('//')).join('\n');
     const callers = appFiles(join(__dirname, '..', 'app'))
       .filter((f) => !f.endsWith(join('engine', 'saveSystem.ts')))
-      .filter((f) => /clearLiveBreadcrumb\(\)/.test(readFileSync(f, 'utf8')));
+      .filter((f) => /clearLiveBreadcrumb\(\)/.test(codeOf(f)));
     expect(callers.map((f) => f.split('app/')[1]).sort()).toEqual([
       'diagnostics/runtimePressureWatch.ts',   // background — mark the orderly exit
       'state/slices/bootSlice.ts',             // boot — consume the survivor
+      'updates/checkAndApplyOTA.ts',           // OTA reload — mark the deliberate exit
     ]);
   });
 

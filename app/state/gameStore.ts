@@ -12607,7 +12607,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? { effects: player.statusEffects ?? [], dotDamage: 0, expired: [] as ReturnType<typeof tickEffects>['expired'] }
       : tickEffects(player.statusEffects ?? [], { inCombat });
     if (!_opts?.skipPreChecks && (player.statusEffects?.length ?? 0) > 0) {
-      const incapacitated = isIncapacitated(player.statusEffects);
+      // ⚠⚠⚠ OTA-1522 — READ THE LIST THE TICK JUST PRODUCED, NOT THE ONE IT
+      // REPLACED. This read `player.statusEffects` — the PRE-tick list — while
+      // the fade lines below read `tick.expired`. So on the very action a stun
+      // wore off, the player was told it faded and then had that same action
+      // eaten by it. Twice in the owner's log, one millisecond apart each time:
+      //   22:45:00.541  stunned fades.
+      //   22:45:00.542  You cannot move. Your action is lost.
+      //   02:11:03.873  stunned fades.
+      //   02:11:03.874  You cannot move. Your action is lost.
+      // Both times he had already tapped — a golem command, then a dodge — and
+      // both were swallowed by an effect the same tick had just cleared.
+      // THE ERROR CLASS: a gate that reads state the tick has already
+      // superseded. The `set()` immediately below commits `tick.effects` as the
+      // truth, so this must consult the same list or it enforces a status that
+      // no longer exists. A stun with time left still blocks — `tick.effects`
+      // keeps it — and `skipPreChecks` callers never reach here at all.
+      const incapacitated = isIncapacitated(tick.effects);
       const newHp = Math.max(0, player.hp - tick.dotDamage);
       set((s) =>
         s.player

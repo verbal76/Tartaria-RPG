@@ -17,6 +17,40 @@ import { stopTTSController } from '../voice/TTSController';
 import { stopAndClear as stopTTS } from '../voice/TTSManager';
 import { disposePiperEngine } from '../voice/PiperTTSManager';
 
+/**
+ * ⚠⚠⚠ OTA-1521 — MARK THE ORDERLY EXIT BEFORE WE KILL OURSELVES.
+ * `reloadAsync()` tears the process down with no orderly JS exit, which is
+ * EXACTLY the signature hydrate() promotes into a `native-death`:
+ * "PROCESS KILLED — no JS ran". Eight of the eighteen death records in the
+ * owner's logs follow the reload by:
+ *   4s · 4s · 5s · 5s · 6s · 7s · 18s · 103s
+ * Six of the eight inside seven seconds. Those are not the OS reaping the app
+ * under memory pressure; they are the app doing what it was told, and the ledger
+ * recording it as a kill. The error class: an orderly exit that does not
+ * announce itself is indistinguishable from a kill, and a ledger full of phantom
+ * kills is worse than an empty one — it sent this hunt at memory pressure
+ * (OTA-1516) while 44% of the evidence was self-inflicted.
+ *
+ * ⚠⚠ LOADED LAZILY, ON PURPOSE. A top-level `import` of saveSystem pulls
+ * AsyncStorage into this module's graph — which broke two suites that keep this
+ * file deliberately light, and would make the boot path pay for a dependency it
+ * only needs on the rare occasion it is actually restarting. The cost belongs at
+ * the call, not at every import of this module.
+ */
+async function markOrderlyExitForReload(): Promise<void> {
+  try {
+    // ⚠ `require`, not `await import()` — this project's tsconfig rejects
+    // dynamic import expressions (TS1323), and Metro resolves the require at
+    // call time just the same. The `typeof import(...)` is a TYPE position,
+    // which is always allowed, so the binding stays fully typed.
+    const save = require('../engine/saveSystem') as typeof import('../engine/saveSystem');
+    await save.clearLiveBreadcrumb();
+  } catch {
+    // ⚠ NEVER BLOCK THE RESTART. A missed clear costs one phantom death record;
+    // a hung restart costs the player their session.
+  }
+}
+
 /** 2026-05-25 — race a promise against a timeout. expo-updates
  *  doesn't expose any built-in cancel/timeout for checkForUpdateAsync
  *  or fetchUpdateAsync, so a dropped network can leave the call
@@ -205,6 +239,8 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
     // old mid-load banner-tap could — no open native handles to race.)
     if (skipTeardown) {
       onStatus?.('Restarting to apply…');
+      // ⚠⚠⚠ OTA-1521 — an intentional restart is an orderly exit; say so first.
+      await markOrderlyExitForReload();
       try {
         await Updates.reloadAsync();
         return 'applied';
@@ -280,6 +316,8 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
     }
 
     onStatus?.('Restarting to apply…');
+    // ⚠⚠⚠ OTA-1521 — an intentional restart is an orderly exit; say so first.
+    await markOrderlyExitForReload();
     try {
       await Updates.reloadAsync();
       return 'applied';

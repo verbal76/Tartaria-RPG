@@ -25029,7 +25029,56 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // relay now reads `_meta`, prints every redaction with its rule and its cost in
 // characters, and checks each part against the length it declared — so a hole
 // can never again be stitched in silence under a README claiming "27/27 parts".
-export const OTA_BUILD_ID = '2026-08-27-1520-the-scrubber-takes-a-whole-value';
+// ⚠⚠⚠ OTA-1521 — THE RESTART IS NOT A DEATH, AND NEARLY HALF THE LEDGER WAS ONE.
+// Task #81 has chased a "native death class" — PROCESS KILLED, no JS ran, every
+// record at stage `rendered` — first blaming memory pressure from the diagnostics
+// bundle (OTA-1516, which did not stop them) and next the Qwen context lifecycle.
+// Both were guesses. Mining every death record out of the owner's own logs
+// settled it by measurement:
+//   18 distinct deaths. EIGHT follow `ota: Restarting to apply...` by
+//     4s . 4s . 5s . 5s . 6s . 7s . 18s . 103s
+//   Six of the eight inside seven seconds.
+// That is not the OS reaping a process under pressure; it is reloadAsync() doing
+// exactly what it was told, and the ledger recording it as a kill. hydrate()
+// promotes a SURVIVING liveness crumb into a native-death, which is sound — an
+// orderly shutdown clears its own crumb — but nothing on the reload path ever
+// cleared it. clearLiveBreadcrumb() had callers on backgrounding and at boot,
+// and none at the two reloadAsync sites.
+// THE ERROR CLASS: an orderly exit that does not announce itself is
+// indistinguishable from a kill, and a ledger full of phantom kills is worse
+// than an empty one — it is why an OTA was spent on memory pressure while 44% of
+// the evidence was self-inflicted. One await at each reload site, guarded so a
+// failed write can never strand the player on "Restarting to apply...".
+// AND WHAT THIS DOES NOT CLAIM: ten deaths remain unexplained by the OTA path.
+// Those are the real #81. This does not fix them; it stops them being buried in
+// noise, which is the precondition for finding them.
+// ALSO MEASURED AND ELIMINATED: the Qwen context lifecycle. Across 475 ctx
+// events in every log, `live` is 0 or 1 and never once 2 — the contexts pair
+// correctly and no second 425MB allocation is ever held. That hypothesis is
+// closed by evidence rather than argument.
+// ⚠⚠⚠ OTA-1522 — THE STUN DOES NOT OUTLIVE ITSELF. Shipped with 1521 above.
+// The game announced a stun had ended and then ate the action for it. From the
+// owner's recovered log, twice, one millisecond apart each time:
+//   22:45:00.539 ui: tap "golem (63/68)" / .541 stunned fades. / .542 You cannot
+//     move. Your action is lost.
+//   02:11:03.870 ui: tap "dodge"        / .873 stunned fades. / .874 You cannot
+//     move. Your action is lost.
+// Both mid-fight against five raiders, both already committed, both swallowed by
+// an effect the same tick had just cleared — and told so in the line above.
+// ONE IDENTIFIER: tickEffects() returns the post-tick list as `tick.effects`,
+// set() commits exactly that, and the fade lines print from `tick.expired`. The
+// incapacitation gate alone read `player.statusEffects`, the PRE-tick list, so
+// it enforced a stun that had already expired in the same breath as the notice.
+// THE ERROR CLASS: a gate reading state the tick has already superseded. Every
+// other consumer in that block had moved to the post-tick list; this one was
+// left behind, and the disagreement is invisible except on the single action
+// where the two lists differ — which is exactly the action the player loses.
+// A stun with time left still blocks: `tick.effects` retains it.
+// This is the first defect closed off task #75, which had been waiting on raw
+// 4.32.11 lines that OTA-1520 finally delivered intact.
+export const OTA_BUILD_ID = '2026-08-27-1522-the-stun-does-not-outlive-itself';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1521-the-restart-is-not-a-death';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1520-the-scrubber-takes-a-whole-value';
 // golem catch-up 2026-08-27: markerless publish of OTA-1520 (the log slice goes
 // as an array of ~400-char blocks so @password:filter can no longer take a whole
 // 15,000-char part) to the golem channel. Both channels level at 1520.
