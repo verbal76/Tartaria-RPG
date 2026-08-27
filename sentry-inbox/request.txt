@@ -1,2 +1,2 @@
-2026-08-27T00:23:52Z
-pull: EVERYTHING — owner sent again and waited 5 minutes for full ingest
+2026-08-27T00:28:09Z
+audit: 30d outcomes + quota — hunting a client-side attachment rate limit

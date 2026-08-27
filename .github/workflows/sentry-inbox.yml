@@ -124,22 +124,54 @@ jobs:
           # visible ONLY in the org outcome stats. Print accepted vs dropped by
           # reason for the last 24h so a silent discard can never again read
           # as "the device never sent it".
+          # ⚠⚠⚠ OTA-1515 AUDIT — 24h WAS TOO SHORT A LENS, and that is why this
+          # hunt stalled. A CLIENT-SIDE rate limit is cached by the SDK from a
+          # 429 it saw EARLIER and then silently drops that category's items
+          # for the whole window — which can be a month on a quota. Reading
+          # only the last day showed "accepted / error" and nothing else, which
+          # looks like health and is actually the sound of attachments being
+          # thrown away before they leave the phone. Widen the lens and print
+          # EVERY outcome, not just the ones that arrived: rate_limited,
+          # filtered, invalid, client_discard (the SDK's own confession that it
+          # dropped something locally) all name different faults.
+          import urllib.parse
+          for period in ('24h', '7d', '30d'):
+              try:
+                  q = urllib.parse.urlencode([
+                      ('field', 'sum(quantity)'), ('statsPeriod', period),
+                      ('groupBy', 'outcome'), ('groupBy', 'reason'),
+                      ('groupBy', 'category'), ('interval', period),
+                  ])
+                  stats = api(f'/organizations/{org}/stats_v2/?{q}')
+                  print(f'── outcomes, last {period} (outcome / reason / category → count):')
+                  rows = 0
+                  for g in stats.get('groups', []):
+                      by = g.get('by', {})
+                      total = (g.get('totals', {}) or {}).get('sum(quantity)', 0)
+                      if total:
+                          rows += 1
+                          print(f"  {by.get('outcome')} / {by.get('reason')} / {by.get('category')} → {total}")
+                  if rows == 0:
+                      print('  (nothing at all in this window)')
+              except Exception as e:
+                  print(f'outcomes query failed for {period}:', e)
+          # ⚠⚠ AND THE QUOTA ITSELF — the second direction. If the attachment
+          # category is capped or exhausted, that is the fact the SDK is
+          # reacting to, and it is visible here rather than inferred from
+          # silence.
           try:
-              import urllib.parse
-              q = urllib.parse.urlencode([
-                  ('field', 'sum(quantity)'), ('statsPeriod', '24h'),
-                  ('groupBy', 'outcome'), ('groupBy', 'reason'),
-                  ('groupBy', 'category'), ('interval', '24h'),
-              ])
-              stats = api(f'/organizations/{org}/stats_v2/?{q}')
-              print('── outcomes, last 24h (outcome / reason / category → count):')
-              for g in stats.get('groups', []):
-                  by = g.get('by', {})
-                  total = (g.get('totals', {}) or {}).get('sum(quantity)', 0)
-                  if total:
-                      print(f"  {by.get('outcome')} / {by.get('reason')} / {by.get('category')} → {total}")
+              sub = api(f'/organizations/{org}/subscription/')
+              print('── subscription / quota:')
+              for k in ('planTier', 'plan', 'isFree', 'isTrial', 'canTrial'):
+                  if k in sub:
+                      print(f'  {k}: {sub[k]}')
+              cats = sub.get('categories') or {}
+              for name, c in (cats.items() if isinstance(cats, dict) else []):
+                  if isinstance(c, dict):
+                      print(f"  {name}: reserved={c.get('reserved')} used={c.get('usageExceeded') if 'usageExceeded' in c else ''} "
+                            f"prepaid={c.get('prepaid')} usage={c.get('usage')}")
           except Exception as e:
-              print('outcomes query failed:', e)
+              print('subscription query failed (token may lack billing scope):', e)
           PYEOF
       - name: Commit the inbox
         run: |
