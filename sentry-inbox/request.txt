@@ -1,17 +1,17 @@
-sync 2026-08-27 — four fresh logs pushed from the devices, and the first run of
-the OTA-1520 reader.
+sync 2026-08-27 — the owner added `chunkBlocks` to the tartaria project's Safe
+Fields. This run reads the config back to confirm it saved.
 
-What changed here: this relay now READS `_meta`, which Sentry has been sending
-all along and nobody looked at. Each of the nine `[Filtered]` parts from the
-02:01 send carries its own reason, already synced into this tree —
+What this sync CAN prove: that `safeFields` now contains chunkBlocks. The config
+probe prints it, and the exemption line flips to YES.
 
-  context.chunk."" = {"len": 15000, "rem": [["@password:filter", "s", 0, 10]]}
+What it CANNOT prove: that the exemption actually stops @password:filter. Safe
+Fields excludes by FIELD NAME, and OTA-1520 sends the slice as an ARRAY — the
+scrubber walks into chunkBlocks.0, chunkBlocks.1 and so on, and whether a
+name-based exclusion reaches an array's children is exactly the thing being
+tested. Scrubbing happens at ingest, so only a send made AFTER the setting was
+saved, from a device running 1520, can answer it.
 
-— so every redaction is now printed with its rule id, its position and its exact
-cost in characters; each part is length-checked against the `chunkChars` it
-declared; and the assembled README states what was taken instead of writing
-"27/27 parts" over a file with 135,000 characters cut out of it.
-
-Also printing each project's live scrubbing settings (dataScrubber,
-dataScrubberDefaults, sensitiveFields, safeFields, relayPiiConfig), so the one
-switch that would take this loss to zero is visible rather than assumed.
+The verdict will read off the SCRUB TOTALS block on that next sync: zero
+redactions on a fresh bundle means it took; @password:filter still taking ~400
+chars a hit means the name-based exclusion stops at the array and the only
+remaining lever is the "Use Default Scrubbers" toggle.
