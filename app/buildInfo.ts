@@ -25141,6 +25141,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The card itself stays UNgated by the flag: turning off tips silences tips, not
 // questions the engine needs answered.
 export const OTA_BUILD_ID = '2026-08-27-1525-the-dog-card-gets-the-switch-too';
+// golem catch-up 2026-08-27: markerless publish of OTA-1525 (the dog card offers
+// the tips switch — silencing every future tip without dismissing the one
+// question the engine still needs answered) to the golem channel. Both channels
+// level at 1525.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1524-cover-the-seven-and-mean-the-switch';
 // golem catch-up 2026-08-27: markerless publish of OTA-1523 (BLOCK / SHIELD BASH
 // / THROW SPEAR, elevation both ways, and the combat readout decoded) and
