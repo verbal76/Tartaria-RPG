@@ -1,3 +1,4 @@
-sync 2026-08-27T01:40Z — DECISIVE CHECK: did the 01:34:43 game-log PARTS arrive?
-flush() resolved false, but captureEvent may have worked. Looking for
-game-log.part001-of-007.txt under bundleId mtauoc5xx820 / mtauog3lfrgo.
+sync 2026-08-27T02:05Z — THE BEACON WENT OUT. 27/27 inline parts accepted and
+flush said YES for the first time in two days, while the attachment path in the
+SAME boot said false. Looking for the beacon + inline parts under bundleId
+mtavmvn26xli.
