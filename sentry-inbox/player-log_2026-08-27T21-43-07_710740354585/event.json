@@ -1,0 +1,196 @@
+{
+  "id": "7107403545854b209224742a1a4d76aa",
+  "groupID": "7696460753",
+  "eventID": "7107403545854b209224742a1a4d76aa",
+  "projectID": "4511945117532160",
+  "size": 17796,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 13/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 13/28]",
+  "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 13/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "5ef0f71a280d4eee887879fa3c192cb3",
+      "span_id": "97544b85870c0fb7",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "k: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:47:17.004Z] [debug] attack: status mods exhausted -2\n[2026-08-26T22:47:17.063Z] [world] You commit forward with the compact blaster. Eternal Dynasty Raider 2 watches your hands.\n[2026-08-26T22:47:17.063Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:47:17.266Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (201ms)\n",
+      "[2026-08-26T22:47:22.902Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.\n[2026-08-26T22:47:22.903Z] [world] Below, Eternal Dynasty Raider 2 circles the base \u2014 it cannot reach you up here.\n[2026-08-26T22:47:22.903Z] [combat] You \u2014 d20 \u2192 2 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 13 vs Eternal Dynasty Raider 2 AC 10 \u2014 \u2713 HIT\n",
+      "[2026-08-26T22:47:22.905Z] [combat] Eternal Dynasty Raider 2 folds under the compact blaster. 6 damage was enough. The room exhales.\n[2026-08-26T22:47:22.906Z] [reward] Eternal Dynasty Raider 2 defeated. You recover Aether Residue \u00d72.\n[2026-08-26T22:47:22.907Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+10 TC). The kit took the fight badly.\n",
+      "[2026-08-26T22:47:22.908Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-26T22:47:22.908Z] [reward] +18 TC pried from the dust.\n[2026-08-26T22:47:26.836Z] [debug] ui: tap \"rest\"\n[2026-08-26T22:47:26.848Z] [player] rest\n[2026-08-26T22:47:26.849Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T22:47:26.850Z] [arbiter] The Arbiter looks up. \"A line gets you up \u2014 it won't hold you asleep. Only a Hardened Climbing Strap will. Climb down, or come back wearing one.\"\n[2026-08-26T22:47:27.017Z] [cognitive] REST  (165ms)\n[2026-08-26T22:47:28.269Z] [debug] ui: tap \"rest\"\n",
+      "[2026-08-26T22:47:28.276Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-26T22:47:28.278Z] [arbiter] The Arbiter studies you a long moment. \"You have earned a name to carry: Aetheric Attuned. Passive: halves incoming Aetheric damage \u2014 in combat AND from Etheric weather.\"\n[2026-08-26T22:47:28.283Z] [player] rest\n",
+      "[2026-08-26T22:47:28.283Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:47:28.284Z] [arbiter] The Arbiter looks up. \"A line gets you up \u2014 it won't hold you asleep. Only a Hardened Climbing Strap will. Climb down, or come back wearing one.\"\n[2026-08-26T22:47:28.285Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n",
+      "[2026-08-26T22:47:28.285Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:47:28.485Z] [cognitive] REST  (198ms)\n[2026-08-26T22:47:28.692Z] [debug] persist sizes(KB): total=231 player=67 wm=80[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=81 scene=4\n[2026-08-26T22:47:30.136Z] [debug] ui: tap \"rest\"\n[2026-08-26T22:47:30.146Z] [player] rest\n",
+      "[2026-08-26T22:47:30.147Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:47:30.148Z] [arbiter] The Arbiter looks up. \"A line gets you up \u2014 it won't hold you asleep. Only a Hardened Climbing Strap will. Climb down, or come back wearing one.\"\n[2026-08-26T22:47:30.149Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n",
+      "[2026-08-26T22:47:30.149Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:47:30.321Z] [cognitive] REST  (170ms)\n[2026-08-26T22:47:34.462Z] [debug] ui: tap \"climb down\"\n[2026-08-26T22:47:34.484Z] [player] climb down\n[2026-08-26T22:47:34.485Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T22:47:34.486Z] [world] Your arms are done \u2014 the last stretch off the tower relay is a half-climb, half-fall. -9 HP (48/58).\n[2026-08-26T22:47:34.487Z] [world] You make your way back down the tower relay. Boots back on the ground.\n[2026-08-26T22:47:34.489Z] [system] \u23f3 Time passed: 15 min\n[2026-08-26T22:47:34.658Z] [cognitive] CLIMB  (168ms)\n",
+      "[2026-08-26T22:47:35.562Z] [debug] ui: tap \"rest\"\n[2026-08-26T22:47:35.570Z] [player] rest\n[2026-08-26T22:47:35.571Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:47:35.573Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 27, afternoon)\n",
+      "[2026-08-26T22:47:35.576Z] [world] You shake out your cloak in the morning. Something small falls free that you don't remember picking up.\n[2026-08-26T22:47:35.577Z] [reward] \u2726 Smoke-Cured Jerky Strip (Common).\n[2026-08-26T22:47:35.589Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T22:47:35.781Z] [cognitive] REST  (191ms)\n[2026-08-26T22:47:38.897Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-08-26T22:47:38.914Z] [debug] spawn: gear=[Mud Shortsword, Memory Weaver's Hood] window=10 roster=new\n[2026-08-26T22:47:38.915Z] [world] You strike out west. The country resists you with sameness more than distance.\n[2026-08-26T22:47:38.916Z] [world] Some part of you has been keeping the place bookmarked.\n[2026-08-26T22:47:40.096Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-26T22:47:41.550Z] [world] The Mud Shortsword fits the hand better than it has any right to.\n[2026-08-26T22:47:41.551Z] [reward] \u2726 Mud Shortsword (Common).\n[2026-08-26T22:47:41.570Z] [world] You turn the Memory Weaver's Hood over once, then keep it.\n[2026-08-26T22:47:41.570Z] [reward] \u2726 Memory Weaver's Hood (Common).\n",
+      "[2026-08-26T22:47:42.576Z] [world] You strip the broken scale carefully. Something usable comes free in your hand.\n[2026-08-26T22:47:42.577Z] [world] You salvage the cracked mirror. The take is small but real.\n[2026-08-26T22:47:42.577Z] [world] You salvage the pavement. The take is small but real.\n[2026-08-26T22:47:42.578Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-26T22:47:42.578Z] [reward]     \u2022 Stick x2 (Common)\n[2026-08-26T22:47:42.578Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-08-26T22:47:43.946Z] [debug] ui: tap \"investigate\"\n[2026-08-26T22:47:46.018Z] [player] investigate the ground\n[2026-08-26T22:47:46.019Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T22:47:46.023Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Aetheric Dust (Uncommon).\n[2026-08-26T22:47:46.030Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T22:47:46.030Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:47:46.031Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-26T22:47:46.031Z] [reward] \u2726 The miles have done their work \u2014 you carry the road better than you did. +1 max stamina (now 19). [80 on the odometer]\n[2026-08-26T22:47:46.206Z] [cognitive] CLIMB  (174ms)\n[2026-08-26T22:47:46.603Z] [debug] persist sizes(KB): total=231 player=67 wm=79[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=81 scene=4\n",
+      "[2026-08-26T22:47:48.288Z] [player] investigate window\n[2026-08-26T22:47:48.289Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=window resolved=window range=- enemies=0 hooks=1\n[2026-08-26T22:47:48.292Z] [world] You look the window over. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n",
+      "[2026-08-26T22:47:48.293Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T22:47:48.293Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:47:48.508Z] [cognitive] neutral  (208ms)\n[2026-08-26T22:47:50.535Z] [player] investigate tower\n",
+      "[2026-08-26T22:47:50.536Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tower resolved=tower range=- enemies=0 hooks=1\n[2026-08-26T22:47:50.537Z] [world] The tower rises out of the silt like a memory the world refuses to bury. Up close, the surface is scored with old weathering and finer marks \u2014 names, prayers, accounts no one closed.\n",
+      "[2026-08-26T22:47:51.005Z] [debug] qwen\u23f1 investigate_lore ok 2514ms read 1278ms/write 1099ms in 124t\u2192out 32t 10.3ms/t (146ch)\n[2026-08-26T22:47:51.168Z] [cognitive] neutral  (626ms)\n[2026-08-26T22:47:56.339Z] [debug] qwen\u23f1 ambient ok 7848ms wait 2674ms read 4075ms/write 1070ms in 373t\u2192out 31t 10.9ms/t HIT-CAP (164ch)\n",
+      "[2026-08-26T22:47:56.346Z] [arbiter] You've traversed through many lands, exploring ancient ruins and passing through the heart of the Spire, yet your journey has been one of both growth and exhaustion\n[2026-08-26T22:47:56.347Z] [debug] arbiter: ambient \u2713 8052ms\n",
+      "[2026-08-26T22:47:56.347Z] [debug] arbiter: ambient-said \"You've traversed through many lands, exploring ancient ruins and passing through the heart of the Spire, yet your journey has been one of both growth and exhaus\"\n[2026-08-26T22:48:00.059Z] [debug] qwen\u23f1 investigate_lore ok 9254ms wait 5536ms read 1279ms/write 2419ms in 124t\u2192out 38t 10.3ms/t (165ch)\n",
+      "[2026-08-26T22:48:12.895Z] [debug] appstate: active \u2192 background (was active for 322957ms)\n[2026-08-26T22:50:15.542Z] [debug] appstate: background \u2192 active (was background for 122647ms)\n[2026-08-26T22:50:24.801Z] [debug] appstate: active \u2192 background (was active for 9258ms)\n[2026-08-26T22:59:12.077Z] [debug] appstate: background \u2192 active (was background for 527277ms)\n",
+      "[2026-08-26T22:59:19.700Z] [debug] OTA session start: 2026-08-26-1511-the-spear-leaves-your-hand.\n[2026-08-26T22:59:19.701Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-26T22:59:19.701Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Great Scott. I kept watch while you were gone.\"\n",
+      "[2026-08-26T22:59:19.919Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-26T22:59:19.915Z \u00b7 build 2026-08-26-1511-the-spear-leaves-your-hand \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-26T22:59:26.301Z] [debug] send-log: FAILED - envelope did not go out \u2014 bundle #mtap4mqo387d kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-26T22:59:31.510Z] [debug] persist sizes(KB): total=249 player=71 wm=93[rooms=47 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=81 scene=4\n[2026-08-26T22:59:36.080Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a03c39-c981-7889-8f55-b72d20b3d4c4\n[2026-08-26T22:59:36.080Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-26T22:59:36.291Z] [debug] ota: Already up to date\n[2026-08-26T22:59:36.291Z] [debug] ota: boot check result = noUpdate\n[2026-08-26T22:59:36.306Z] [debug] send-log: bundle #mtap4mqo387d attempt 2/5 did not go out \u2014 kept for next boot\n[2026-08-26T22:59:36.311Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-26T22:59:36.311Z] [debug] voice: bundled idle\n",
+      "[2026-08-26T22:59:46.022Z] [debug] OTA session start: 2026-08-26-1511-the-spear-leaves-your-hand.\n[2026-08-26T22:59:46.023Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-26T22:59:46.023Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Great Scott. The buried country is no place to walk alone.\"\n",
+      "[2026-08-26T22:59:46.328Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-26T22:59:46.325Z \u00b7 build 2026-08-26-1511-the-spear-leaves-your-hand \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-26T22:59:46.931Z] [debug] send-log: crash on record (2026-08-26T22:59:19.885Z) \u2014 full bundle pushed automatically, flush failed, kept on disk as #mtap52kc0jh2\n",
+      "[2026-08-26T22:59:51.131Z] [debug] send-log: FAILED - envelope did not go out \u2014 bundle #mtap55wbfwwt kept on disk, boots retry up to 5 sends total\n[2026-08-26T23:08:14.154Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a03c39-c981-7889-8f55-b72d20b3d4c4\n[2026-08-26T23:08:14.154Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-26T23:08:14.394Z] [debug] send-log: bundle #mtap55wbfwwt attempt 2/5 did not go out \u2014 kept for next boot\n[2026-08-26T23:08:24.178Z] [debug] ota: Error\n[2026-08-26T23:08:24.178Z] [debug] \u26a0 ota error: Error OTA check timed out after 10s\n",
+      "      Error: OTA check timed out after 10s |     at anonymous (address at /data/user/0/com.hotatticgames.tartarprim/files/.expo-internal/3b277afce8ad92253bdb81a42cbdcd7d:1:3456812)\n[2026-08-26T23:08:24.179Z] [debug] ota: boot check result = errored\n[2026-08-26T23:08:24.217Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-26T23:08:24.218Z] [debug] voice: bundled idle\n",
+      "[2026-08-26T23:08:28.193Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04054-4a29-7aaf-9337-beed19306dff\n[2026-08-26T23:08:28.193Z] [debug] ota: Checking\u2026\n[2026-08-26T23:08:28.370Z] [debug] ota: Already up to date\n[2026-08-26T23:08:28.371Z] [debug] ota: boot check result = noUpdate\n[2026-08-26T23:08:28.563Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-26T23:08:28.563Z] [debug] voice: bundled idle\n[2026-08-26T23:08:28.596Z] [debug] send-log: bundle #mtap55wbfwwt attempt 3/5 did not go out (after 175ms) \u2014 kept for next boot\n[2026-08-26T23:08:33.445Z] [debug] OTA applied: 2026-08-26-1511-the-spear-leaves-your-hand \u2192 2026-08-26-1512-the-worn-piece-is-readable.\n",
+      "[2026-08-26T23:08:33.445Z] [debug] OTA session start: 2026-08-26-1512-the-worn-piece-is-readable.\n[2026-08-26T23:08:33.445Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-26T23:08:33.446Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Great Scott. The road kept your place.\"\n",
+      "[2026-08-26T23:08:33.741Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-26T23:08:33.738Z \u00b7 build 2026-08-26-1512-the-worn-piece-is-readable \u00b7 updated from 2026-08-26-1511-the-spear-leaves-your-hand \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-26T23:08:38.050Z] [debug] send-log: FAILED - envelope did not go out \u2014 bundle #mtapgghdl0qj kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-26T23:15:14.070Z] [debug] ui: tap \"climb\"\n[2026-08-26T23:15:16.194Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-26T23:15:16.208Z] [player] climb window\n[2026-08-26T23:15:16.209Z] [debug] parser: intent=climb conf=1.00 verb=climb target=window resolved=window range=- enemies=0 hooks=1\n",
+      "[2026-08-26T23:15:16.269Z] [world] You loop your Reclaimer's Rope around the window and walk the line. Tier 1/2 cleared.\n[2026-08-26T23:15:16.269Z] [world] You reach the first hold of the window (tier 1/2). Higher still to go.\n[2026-08-26T23:15:16.270Z] [world] Dick Dragon sets its stone feet at the base of window and will climb no further \u2014 the construct holds the ground while you go up alone.\n",
+      "[2026-08-26T23:15:16.270Z] [system] \u23f3 Time passed: 30 min\n[2026-08-26T23:15:16.460Z] [cognitive] CLIMB  (187ms)\n[2026-08-26T23:15:17.338Z] [debug] ui: tap \"climb up (1/2)\"\n[2026-08-26T23:15:17.366Z] [player] climb window\n[2026-08-26T23:15:17.367Z] [debug] parser: intent=climb conf=1.00 verb=climb target=window resolved=window range=- enemies=0 hooks=1\n",
+      "[2026-08-26T23:15:17.429Z] [world] You loop your Reclaimer's Rope around the window and walk the line. Tier 2/2 cleared.\n[2026-08-26T23:15:17.430Z] [world] You reach the top of the window (tier 2/2). The view changes; the room re"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 13/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtc1uckf9p7j"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "13"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T21:43:06.905442Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T21:43:07.573000Z",
+  "fingerprints": [
+    "6176f9207cc18053161b308bba4f6577"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "7a619d699d614075bda18006cb01c7a7",
+  "previousEventID": "6c8bfbffced847839060a87c7c841bc4"
+}

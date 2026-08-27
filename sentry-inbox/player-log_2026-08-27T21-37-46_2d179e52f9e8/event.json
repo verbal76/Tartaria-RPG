@@ -1,0 +1,201 @@
+{
+  "id": "2d179e52f9e84d6982b1fea09f811960",
+  "groupID": "7696460753",
+  "eventID": "2d179e52f9e84d6982b1fea09f811960",
+  "projectID": "4511945117532160",
+  "size": 17789,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 22/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 22/27]",
+  "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 22/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "00197a64f193412fbb5f45cdb2ba9d30",
+      "span_id": "91cf41b43a559c8e",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "026-08-27T00:18:58.744Z] [debug] appstate: active \u2192 background (was active for 10105ms)\n[2026-08-27T00:18:59.005Z] [debug] persist sizes(KB): total=234 player=74 wm=79[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=77 scene=4\n[2026-08-27T00:21:55.616Z] [debug] appstate: background \u2192 active (was background for 176872ms)\n",
+      "[2026-08-27T00:21:55.629Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-27T00:21:57.117Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1450ms read 0ms/write 1355ms in 666t\u2192out 34t HIT-CAP (171ch)\n[2026-08-27T00:21:57.120Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 1450ms \u2014 intro-fill:near-dup\n",
+      "[2026-08-27T00:21:57.121Z] [debug] homework: scene_intro \"Nimari\" \u2205 1493ms\n[2026-08-27T00:22:00.736Z] [debug] appstate: active \u2192 background (was active for 5120ms)\n[2026-08-27T00:32:54.343Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04076-8e39-72be-9c01-811158d39312\n[2026-08-27T00:32:54.343Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-27T00:32:56.867Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-27T00:32:57.001Z] [debug] ota: Saving progress\u2026\n[2026-08-27T00:32:57.002Z] [debug] ota: Restarting to apply\u2026\n[2026-08-27T00:32:57.243Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0409b-a6e2-7d09-bcae-82150532bc23\n[2026-08-27T00:32:57.243Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-27T00:32:57.378Z] [debug] ota: Already up to date\n[2026-08-27T00:32:57.379Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T00:32:57.587Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T00:32:57.587Z] [debug] voice: bundled idle\n[2026-08-27T00:32:57.605Z] [debug] send-log: bundle #mtarys5cfear attempt 2/5 did not go out (after 174ms) \u2014 kept for next boot\n",
+      "[2026-08-27T00:34:40.140Z] [debug] OTA applied: 2026-08-26-1513-the-other-side-of-the-vial \u2192 2026-08-27-1514-the-portrait-scrolls-again.\n[2026-08-27T00:34:40.141Z] [debug] OTA session start: 2026-08-27-1514-the-portrait-scrolls-again.\n[2026-08-27T00:34:40.141Z] [world] You step back into Nimari. The world waits for your move.\n",
+      "[2026-08-27T00:34:40.141Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Great Scott. The road kept your place.\"\n[2026-08-27T00:34:40.620Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T00:34:40.618Z \u00b7 build 2026-08-27-1514-the-portrait-scrolls-again \u00b7 updated from 2026-08-26-1513-the-other-side-of-the-vial \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-27T00:36:44.533Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0409b-a6e2-7d09-bcae-82150532bc23\n[2026-08-27T00:36:44.533Z] [debug] ota: Checking\u2026\n[2026-08-27T00:36:44.617Z] [debug] ota: Already up to date\n[2026-08-27T00:36:44.617Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T00:36:44.654Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-27T00:36:44.655Z] [debug] voice: bundled idle\n[2026-08-27T00:36:44.732Z] [debug] send-log: bundle #mtashpeadyjn attempt 2/5 did not go out (after 64ms) \u2014 kept for next boot\n[2026-08-27T01:02:25.367Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a040bc-109c-7840-8b98-4974bf2805c1\n[2026-08-27T01:02:25.367Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-27T01:02:25.555Z] [debug] ota: Already up to date\n[2026-08-27T01:02:25.555Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T01:02:25.597Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T01:02:25.598Z] [debug] voice: bundled idle\n[2026-08-27T01:02:25.612Z] [debug] send-log: bundle #mtashpeadyjn attempt 3/5 did not go out (after 35ms) \u2014 kept for next boot\n",
+      "[2026-08-27T01:02:30.391Z] [debug] OTA applied: 2026-08-27-1514-the-portrait-scrolls-again \u2192 2026-08-27-1515-the-log-goes-in-parts.\n[2026-08-27T01:02:30.391Z] [debug] OTA session start: 2026-08-27-1515-the-log-goes-in-parts.\n[2026-08-27T01:02:30.391Z] [world] You step back into Nimari. The world waits for your move.\n",
+      "[2026-08-27T01:02:30.391Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Great Scott. The road kept your place.\"\n[2026-08-27T01:02:30.682Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T01:02:30.679Z \u00b7 build 2026-08-27-1515-the-log-goes-in-parts \u00b7 updated from 2026-08-27-1514-the-portrait-scrolls-again \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-27T01:02:31.325Z] [debug] send-log: crash on record (2026-08-27T00:34:40.392Z) \u2014 full bundle pushed automatically, flush failed, kept on disk as #mtatiwy5oo4p\n[2026-08-27T01:02:35.292Z] [debug] send-log: #mtatj02qozh5 \u2014 0/7 parts out (404814 chars, median 33ms, worst 34ms)\n",
+      "[2026-08-27T01:02:35.293Z] [debug] send-log: only 0/7 parts confirmed \u2014 bundle #mtatj02qozh5 kept on disk, boots retry up to 5 sends total\n[2026-08-27T01:02:40.577Z] [debug] send-log: #mtatj445fa3o \u2014 0/7 parts out (404817 chars, median 33ms, worst 52ms)\n[2026-08-27T01:02:40.578Z] [debug] send-log: only 0/7 parts confirmed \u2014 bundle #mtatj445fa3o kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-27T01:03:37.580Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a040bc-109c-7840-8b98-4974bf2805c1\n[2026-08-27T01:03:37.581Z] [debug] ota: Checking\u2026\n[2026-08-27T01:03:37.651Z] [debug] ota: Already up to date\n[2026-08-27T01:03:37.651Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-27T01:03:37.684Z] [debug] send-log: bundle #mtatj445fa3o held \u2014 only 57s since the last try (a restart, not a chance); 4 left\n[2026-08-27T01:03:37.700Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T01:03:37.700Z] [debug] voice: bundled idle\n[2026-08-27T01:03:44.679Z] [debug] OTA session start: 2026-08-27-1515-the-log-goes-in-parts.\n",
+      "[2026-08-27T01:03:44.679Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-27T01:03:44.679Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Great Scott. The road kept your place.\"\n",
+      "[2026-08-27T01:03:45.139Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T01:03:45.136Z \u00b7 build 2026-08-27-1515-the-log-goes-in-parts \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-27T01:03:45.638Z] [debug] send-log: crash on record (2026-08-27T01:03:31.295Z) \u2014 full bundle pushed automatically, flush failed, kept on disk as #mtatkidl3r67\n",
+      "[2026-08-27T01:07:55.692Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a040bc-109c-7840-8b98-4974bf2805c1\n[2026-08-27T01:07:55.692Z] [debug] ota: Checking\u2026\n[2026-08-27T01:07:55.748Z] [debug] ota: Already up to date\n[2026-08-27T01:07:55.748Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T01:07:55.952Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-27T01:07:55.952Z] [debug] voice: bundled idle\n[2026-08-27T01:07:55.965Z] [debug] send-log: bundle #mtatkidl3r67 attempt 2/5 did not go out (after 175ms) \u2014 kept for next boot\n[2026-08-27T01:08:01.738Z] [debug] OTA session start: 2026-08-27-1515-the-log-goes-in-parts.\n[2026-08-27T01:08:01.739Z] [world] You step back into Nimari. The world waits for your move.\n",
+      "[2026-08-27T01:08:01.739Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Great Scott. I kept watch while you were gone.\"\n[2026-08-27T01:08:02.334Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T01:08:02.332Z \u00b7 build 2026-08-27-1515-the-log-goes-in-parts \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-27T01:09:11.029Z] [debug] persist sizes(KB): total=235 player=74 wm=80[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=77 scene=4\n[2026-08-27T01:28:13.990Z] [debug] persist sizes(KB): total=234 player=74 wm=79[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=77 scene=4\n",
+      "[2026-08-27T01:32:19.433Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a040bc-109c-7840-8b98-4974bf2805c1\n[2026-08-27T01:32:19.433Z] [debug] ota: Checking\u2026\n[2026-08-27T01:32:19.591Z] [debug] ota: Already up to date\n[2026-08-27T01:32:19.592Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T01:32:19.676Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-27T01:32:19.676Z] [debug] voice: bundled idle\n[2026-08-27T01:32:19.898Z] [debug] send-log: bundle #mtatkidl3r67 attempt 3/5 did not go out (after 215ms) \u2014 kept for next boot\n[2026-08-27T01:34:33.921Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a040da-b4b1-7339-8553-62264d32e60b\n[2026-08-27T01:34:33.921Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-27T01:34:34.028Z] [debug] ota: Already up to date\n[2026-08-27T01:34:34.031Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T01:34:34.100Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T01:34:34.100Z] [debug] voice: bundled idle\n",
+      "[2026-08-27T01:34:34.329Z] [debug] send-log: bundle #mtatkidl3r67 attempt 4/5 send-log: #mtatkidl3r67 \u2014 0/7 parts out (405243 chars, median 34ms, worst 51ms) \u2014 WHY: flush() resolved false without sending (after 253ms) \u2014 kept for next boot\n[2026-08-27T01:34:39.058Z] [debug] OTA applied: 2026-08-27-1515-the-log-goes-in-parts \u2192 2026-08-27-1516-the-quiet-path-sends-the-same-way.\n",
+      "[2026-08-27T01:34:39.058Z] [debug] OTA session start: 2026-08-27-1516-the-quiet-path-sends-the-same-way.\n[2026-08-27T01:34:39.058Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-27T01:34:39.058Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Great Scott. I kept watch while you were gone.\"\n",
+      "[2026-08-27T01:34:39.517Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T01:34:39.511Z \u00b7 build 2026-08-27-1516-the-quiet-path-sends-the-same-way \u00b7 updated from 2026-08-27-1515-the-log-goes-in-parts \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-27T01:34:43.850Z] [debug] send-log: #mtauoc5xx820 \u2014 0/7 parts out (404761 chars, median 34ms, worst 34ms) \u2014 WHY: flush() resolved false without sending\n",
+      "[2026-08-27T01:34:43.850Z] [debug] send-log: only 0/7 parts confirmed \u2014 bundle #mtauoc5xx820 kept on disk, boots retry up to 5 sends total\n[2026-08-27T01:34:48.951Z] [debug] send-log: #mtauog3lfrgo \u2014 0/7 parts out (404838 chars, median 33ms, worst 34ms) \u2014 WHY: flush() resolved false without sending\n",
+      "[2026-08-27T01:34:48.951Z] [debug] send-log: only 0/7 parts confirmed \u2014 bundle #mtauog3lfrgo kept on disk, boots retry up to 5 sends total\n[2026-08-27T01:47:59.986Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a040da-b4b1-7339-8553-62264d32e60b\n[2026-08-27T01:47:59.987Z] [debug] ota: Checking\u2026\n[2026-08-27T01:48:00.075Z] [debug] ota: Already up to date\n",
+      "[2026-08-27T01:48:00.075Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T01:48:00.189Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T01:48:00.190Z] [debug] voice: bundled idle\n",
+      "[2026-08-27T01:48:00.560Z] [debug] send-log: bundle #mtauog3lfrgo attempt 2/5 send-log: #mtauog3lfrgo \u2014 0/7 parts out (404838 chars, median 50ms, worst 69ms) \u2014 WHY: flush() resolved false without sending (after 396ms) \u2014 kept for next boot\n[2026-08-27T01:52:09.780Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a040da-b4b1-7339-8553-62264d32e60b\n",
+      "[2026-08-27T01:52:09.781Z] [debug] ota: Checking\u2026\n[2026-08-27T01:52:09.869Z] [debug] ota: Already up to date\n[2026-08-27T01:52:09.870Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T01:52:10.148Z] [debug] send-log: bundle #mtauog3lfrgo attempt 3/5 send-log: #mtauog3lfrgo \u2014 0/7 parts out (404838 chars, median 32ms, worst 51ms) \u2014 WHY: flush() resolved false without sending (after 228ms) \u2014 ke",
+      "pt for next boot\n[2026-08-27T01:52:10.160Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T01:52:10.160Z] [debug] voice: bundled idle\n[2026-08-27T02:01:24.883Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a040f2-3776-721c-a9c2-6a8917e0e4fc\n[2026-08-27T02:01:24.883Z] [debug] ota: Checking\u2026\n[2026-08-27T02:01:24.970Z] [debug] ota: Already up to date\n",
+      "[2026-08-27T02:01:24.971Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T02:01:25.056Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T02:01:25.056Z] [debug] voice: bundled idle\n",
+      "[2026-08-27T02:01:25.284Z] [debug] send-log: bundle #mtauog3lfrgo attempt 4/5 send-log: #mtauog3lfrgo \u2014 0/7 parts out (404838 chars, median 33ms, worst 49ms) \u2014 WHY: flush() resolved false without sending (after 259ms) \u2014 kept for next boot\n[2026-08-27T02:01:29.876Z] [debug] OTA applied: 2026-08-27-1516-the-quiet-path-sends-the-same-way \u2192 2026-08-27-1518-the-beacon-goes-first.\n",
+      "[2026-08-27T02:01:29.876Z] [debug] OTA session start: 2026-08-27-1518-the-beacon-goes-first.\n[2026-08-27T02:01:29.876Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-27T02:01:29.876Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Great Scott. The buried country is no place to walk alone.\"\n",
+      "[2026-08-27T02:01:30.359Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T02:01:30.354Z \u00b7 build 2026-08-27-1518-the-beacon-goes-first \u00b7 updated from 2026-08-27-1516-the-quiet-path-sends-the-same-way \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-27T02:01:31.122Z] [debug] send-log: crash on record (2026-08-27T01:34:40.055Z) \u2014 game log pushed automatically, send-log: #mtavms6aoloo \u2014 0/7 parts out (404747 chars, median 37ms, worst 202ms) \u2014 WHY: flush() resolved false without sending, kept on disk as #mtavms6aoloo\n",
+      "[2026-08-27T02:01:35.704Z] [debug] send-log: #mtavmvn26xli \u2014 INLINE (no attachments): beacon out, 27/27 parts accepted (404783 chars) \u2014 flush said yes\n[2026-08-27T02:01:35.705Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtavmvn26xli kept on disk, boots retry up to 5 sends total\n[2026-08-27T02:32:26.956Z] [debug] OTA session start: 2026-08-27-1519-the-attachment-was-the-fault.\n",
+      "[2026-08-27T02:32:26.956Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-27T02:32:26.956Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Great Scott. We've still got ground to cover, you and I.\"\n",
+      "[2026-08-27T02:32:27.402Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T02:32:27.398Z \u00b7 build 2026-08-27-1519-the-attachment-was-the-fault \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-27T02:32:31.498Z] [debug] send-log: #mtawqnivyk0q \u2014 DELIVERED (inline, no attachments): beacon out, 27/27 parts accepted (404818 chars) \u2014 flush said yes\n",
+      "[2026-08-27T02:32:31.500Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtawqnivyk0q kept on disk, boots retry up to 5 sends total\n[2026-08-27T02:49:58.508Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0410f-234c-7c06-8eb4-72c2b54a1546\n[2026-08-27T02:49:58.508Z] [debug] ota: Checking\u2026\n[2026-08-27T02:49:58.565Z] [debug] ota: Already up to date\n",
+      "[2026-08-27T02:49:58.565Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T02:49:58.825Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T02:49:58.825Z] [debug] voice: bundled idle\n[2026-08-27T02:49:58.986Z] [debug] send-log: bundle #mtawqnivyk0q attempt 2/5 delivered to Sentry\n[2026-08-27T03:02:54.512Z] [debug] ota: boot check \u2014 e"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 22/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbxo8c42v25"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "22"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T21:37:45.334339Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T21:37:46.051000Z",
+  "fingerprints": [
+    "6176f9207cc18053161b308bba4f6577"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "2e15cd39a840457792634038ff471400",
+  "previousEventID": "29d8da115c024c349fd4d91173f910f2"
+}

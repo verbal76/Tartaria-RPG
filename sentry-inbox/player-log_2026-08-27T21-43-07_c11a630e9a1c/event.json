@@ -1,0 +1,200 @@
+{
+  "id": "c11a630e9a1c4e868a2df5b11f81cf3b",
+  "groupID": "7696460753",
+  "eventID": "c11a630e9a1c4e868a2df5b11f81cf3b",
+  "projectID": "4511945117532160",
+  "size": 17798,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 25/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 25/28]",
+  "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 25/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "5ef0f71a280d4eee887879fa3c192cb3",
+      "span_id": "97544b85870c0fb7",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "45:33.182Z] [system] \u23f3 Time passed: 15 min\n[2026-08-27T19:45:34.861Z] [cognitive] neutral  (1678ms)\n[2026-08-27T19:45:38.434Z] [player] use Speckled Egg\n[2026-08-27T19:45:38.434Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=speckled egg resolved=Speckled Egg range=close enemies=1 hooks=1\n[2026-08-27T19:45:38.435Z] [world] You use one Speckled Egg. +3 HP, stamina already full.\n",
+      "[2026-08-27T19:45:38.435Z] [debug] arbiter: template (reason=combat)\n[2026-08-27T19:45:38.435Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-27T19:45:38.435Z] [system] \u23f3 Time passed: 15 min\n[2026-08-27T19:45:40.251Z] [cognitive] neutral  (1815ms)\n",
+      "[2026-08-27T19:45:41.540Z] [debug] persist sizes(KB): total=239 player=77 wm=82[rooms=36 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=75 scene=5\n[2026-08-27T19:45:49.659Z] [debug] ui: tap \"dodge\"\n[2026-08-27T19:45:49.681Z] [player] dodge\n[2026-08-27T19:45:49.682Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n",
+      "[2026-08-27T19:45:49.683Z] [world] You commit to the dodge. Slip Eternal Dynasty Raider 2's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-27T19:45:49.766Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 16 + ATK 15 = 31 vs your AC 28 \u2014 \u2713 HIT\n",
+      "[2026-08-27T19:45:49.766Z] [combat] Dodge \u2014 d20 \u2192 8 + DEX 15 = 23 vs ATK 31. \u2717 You misread it \u2014 no opening, and the blow lands as it normally would (armor still counts).\n[2026-08-27T19:45:49.766Z] [world] Your read is a beat off \u2014 you fail to make the opening, and the swing lands the way it always meant to.\n[2026-08-27T19:45:49.767Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-27T19:45:50.033Z] [combat] Eternal Dynasty Raider 2 deals 10 bludgeoning damage. You have 16 HP remaining.\n[2026-08-27T19:45:50.033Z] [combat] Eternal Dynasty Raider 2's strike leaves you stunned.\n[2026-08-27T19:45:50.256Z] [cognitive] neutral  (266ms)\n[2026-08-27T19:45:51.359Z] [debug] ui: tap \"bone crossbow\"\n[2026-08-27T19:45:51.363Z] [system] bleeding fades.\n",
+      "[2026-08-27T19:45:51.364Z] [system] stunned fades.\n[2026-08-27T19:45:51.399Z] [player] attack with the bone crossbow\n[2026-08-27T19:45:51.400Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=1\n",
+      "[2026-08-27T19:45:51.401Z] [debug] attack: target=Eternal Dynasty Raider 2 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-27T19:45:51.466Z] [world] You bring the bone crossbow to bear on Eternal Dynasty Raider 2.\n[2026-08-27T19:45:51.466Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-27T19:45:51.698Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (230ms)\n[2026-08-27T19:45:56.996Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.\n[2026-08-27T19:45:56.999Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 4 + ATK 15 = 19 vs your AC 28 \u2014 \u2717 MISS\n",
+      "[2026-08-27T19:45:56.999Z] [combat] You \u2014 d20 \u2192 11 + DEX 15 + 2 (point blank) = 28 vs Eternal Dynasty Raider 2 AC 20 \u2014 \u2713 HIT\n[2026-08-27T19:45:57.001Z] [combat] Weakness exposed \u2014 Eternal Dynasty Raider 2 flinches. (piercing \u00d72.25 for 18)\n[2026-08-27T19:45:57.074Z] [reward] \u2726 The work hones you. +1 DEX (base 8, 16 as you stand).\n",
+      "[2026-08-27T19:45:57.074Z] [combat] The blow with the bone crossbow finds purchase \u2014 18 damage, 37 HP standing. Eternal Dynasty Raider 2 commits to the counter.\n[2026-08-27T19:45:57.075Z] [arbiter] \"You hit what you commit to,\" the Arbiter says. \"The Eternal Dynasty Raider 2 hears the difference.\"\n[2026-08-27T19:45:59.637Z] [debug] ui: tap \"\u2726 ability\"\n",
+      "[2026-08-27T19:46:00.987Z] [world] \u2726 Legacy of Power \u2014 the channel turns on you. The Aether spikes and leaves +4 corruption behind.\n[2026-08-27T19:46:04.221Z] [debug] ui: tap \"shield bash\"\n[2026-08-27T19:46:04.273Z] [player] attack with the off-hand mud buckler\n",
+      "[2026-08-27T19:46:04.273Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand mud buckler resolved=Mud Buckler range=close enemies=1 hooks=1\n[2026-08-27T19:46:04.274Z] [debug] attack: target=Eternal Dynasty Raider 2 range=close reach.bands=[close] reach.label=Mud Buckler bareHand=false\n",
+      "[2026-08-27T19:46:04.344Z] [world] Your mud buckler comes around in an arc; Eternal Dynasty Raider 2 squares up to meet it.\n[2026-08-27T19:46:04.345Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T19:46:04.580Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 SWIM \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER \u00b7 MANEUVER  (235ms)\n",
+      "[2026-08-27T19:46:09.294Z] [world] You seize the initiative. Eternal Dynasty Raider 2 has no time to react.\n[2026-08-27T19:46:09.294Z] [combat] You \u2014 d20 \u2192 17 + DEX 16 = 33 vs Eternal Dynasty Raider 2 AC 20 \u2014 \u2713 HIT\n[2026-08-27T19:46:09.296Z] [combat] The Mud Buckler slams home \u2014 Eternal Dynasty Raider 2 reels from the bash. STAGGERED: no swing next round.\n",
+      "[2026-08-27T19:46:09.297Z] [combat] Clean hit with the mud buckler for 3. Eternal Dynasty Raider 2 has 34 left and does not back away.\n[2026-08-27T19:46:09.299Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 19 + ATK 15 = 34 vs your AC 28 \u2014 \u2713 HIT\n[2026-08-27T19:46:09.566Z] [combat] Eternal Dynasty Raider 2 deals 16 bludgeoning damage. You fall.\n",
+      "[2026-08-27T19:46:09.566Z] [combat] Eternal Dynasty Raider 2's strike leaves you bleeding.\n[2026-08-27T19:46:09.566Z] [combat] Great Scott does not rise. The ruins remember another.\n[2026-08-27T19:46:09.567Z] [system] Great Scott has fallen. A Resurrection Gem from the title screen can bring them back.\n[2026-08-27T19:46:09.567Z] [combat] Pike falls beside you. The buried world claims them too.\n",
+      "[2026-08-27T19:46:09.842Z] [system] You join the Fallen of Tartaria \u2014 4 names the buried world keeps now. Read the roll from the Lore Codex.\n[2026-08-27T19:46:19.654Z] [debug] scene: loc=nimari hub=- arrival=n opening=n passing=y\n",
+      "[2026-08-27T19:46:19.762Z] [arbiter] A stranger waits at the roadside with a wicker basket. Three pups inside \u2014 some breed you don't recognize. They look up at you. \"I'd trade one for the right kind of help,\" the stranger says, eyeing your pack.\n",
+      "[2026-08-27T19:46:19.762Z] [arbiter] \"That Aetheric Vision Lens you've got \u2014 I've been needing one of those for a season. You hand me that, I hand you a pup. Fair? Type 'accept puppy' or 'decline puppy'.\"\n",
+      "[2026-08-27T19:46:19.762Z] [world] Blue and violet lightning crackles across the horizon, flashing through the sky in unnatural colors \u2014 the Etheric fields the Overload buried still discharging where the old grid shorts against itself. Electronics fail. The air tastes like copper.\n\n",
+      "You are at Nimari. Half-swallowed. The Red Tower of Nimari is rumored to house one of the last operational Aetheric Cores.\n[2026-08-27T19:46:19.764Z] [world] [The Monarch's Waystation Outskirts] north: The Monarch's Waystation (1 tile, 3 hours) \u00b7 east: Dynasty Border Post (4 tiles, 10 hours) \u00b7 south: Samarran (8 tiles, 20 hours) \u00b7 west: Tartarian Outskirts (2 tiles, 5 hours)\n",
+      "[2026-08-27T19:46:19.764Z] [world] Cassia Nightwind sets down what they're holding. \"Didn't expect you today, Great Scott.\"\n[2026-08-27T19:46:19.764Z] [world] \"Been a while,\" Cassia Nightwind says. \"Thought the mud had you.\"\n",
+      "[2026-08-27T19:46:19.764Z] [world] Cassia Nightwind jerks their chin north. \"The Conspiracy Architects raided our outpost while you were out there. Word travels slower than they do.\"\n[2026-08-27T19:46:19.770Z] [reward] \u2726 Resurrection. Great Scott returns to Tartaria, restored. The Aetherstone hums in recognition.\n",
+      "[2026-08-27T19:46:20.397Z] [debug] persist sizes(KB): total=254 player=79 wm=94[rooms=47 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=77 scene=3\n[2026-08-27T19:46:22.307Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-08-27T19:46:23.969Z] [debug] send-log: #mtbxo8c42v25 \u2014 DELIVERED (inline, no attachments): beacon out, 27/27 parts accepted (404925 chars) \u2014 flush said yes\n[2026-08-27T19:46:23.970Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtbxo8c42v25 kept on disk, boots retry up to 5 sends total\n[2026-08-27T19:46:27.369Z] [debug] appstate: active \u2192 background (was active for 205300ms)\n",
+      "[2026-08-27T21:37:43.722Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04478-db1d-7ef8-b4e2-4b2062c99e84\n[2026-08-27T21:37:43.723Z] [debug] ota: Checking\u2026\n[2026-08-27T21:37:45.614Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-27T21:37:45.713Z] [debug] ota: Saving progress\u2026\n[2026-08-27T21:37:45.715Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-08-27T21:37:45.913Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04513-38e1-73b3-acbd-1d3273df8cc5\n[2026-08-27T21:37:45.913Z] [debug] ota: Checking\u2026\n[2026-08-27T21:37:46.008Z] [debug] ota: Already up to date\n[2026-08-27T21:37:46.008Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T21:37:46.064Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-27T21:37:46.064Z] [debug] voice: bundled idle\n[2026-08-27T21:37:46.463Z] [debug] send-log: bundle #mtbxo8c42v25 attempt 2/5 delivered to Sentry\n[2026-08-27T21:37:50.345Z] [debug] OTA applied: 2026-08-27-1526-the-ledger-was-writing-its-own-corpses \u2192 2026-08-27-1528-the-name-was-not-the-identity.\n",
+      "[2026-08-27T21:37:50.346Z] [debug] OTA session start: 2026-08-27-1528-the-name-was-not-the-identity.\n[2026-08-27T21:37:50.346Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-27T21:37:50.346Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Great Scott. I wondered when you'd take up the thread again.\"\n",
+      "[2026-08-27T21:37:50.678Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T21:37:50.675Z \u00b7 build 2026-08-27-1528-the-name-was-not-the-identity \u00b7 updated from 2026-08-27-1526-the-ledger-was-writing-its-own-corpses \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-27T21:37:52.995Z] [reward] Cassia Nightwind fires up a portable Crucible for you. (\u221225 TC)\n[2026-08-27T21:37:58.288Z] [debug] ui: tap \"more \u25b8\"\n",
+      "[2026-08-27T21:38:00.003Z] [debug] ui: tap \"inventory\"\n[2026-08-27T21:38:06.924Z] [player] fuse\n[2026-08-27T21:38:13.101Z] [player] Ask about their people\n[2026-08-27T21:38:13.103Z] [world] \"Aetherborn, before you ask, and no I do not glow.\" She says it like a line she has said often. \"We are people who were near the wrong thing at the wrong time, and everyone has decided that makes us interesting",
+      ".\"\n[2026-08-27T21:38:13.105Z] [world] Half of what Cassia Nightwind says is aimed at you and half at the state of your gear.\n[2026-08-27T21:38:13.899Z] [player] Ask which scar taught the most\n[2026-08-27T21:38:13.900Z] [world] Cassia Nightwind considers the question like an opponent. \"This one.\" Not the biggest \u2014 a thin line along the forearm. \"First season. I blocked with the edge, like a fool, b",
+      "ecause holding the blade felt safer than holding the distance. The distance is the weapon. Everything after that scar has been footwork.\"\n[2026-08-27T21:38:13.902Z] [world] Cassia Nightwind lets the sentence run longer than she would for a stranger.\n[2026-08-27T21:38:15.319Z] [world] You let the conversation go and Cassia Nightwind gets back to it.\n",
+      "[2026-08-27T21:38:23.575Z] [reward] Sold Throwing Knife to Cassia Nightwind for 11 TC. (837 TC on hand)\n[2026-08-27T21:38:23.641Z] [reward] Sold Bonebreaker Mace to Cassia Nightwind for 11 TC. (848 TC on hand)\n[2026-08-27T21:38:23.701Z] [reward] Sold Bone Knife to Cassia Nightwind for 11 TC. (859 TC on hand)\n",
+      "[2026-08-27T21:38:23.761Z] [reward] Sold Bone Knife to Cassia Nightwind for 11 TC. (870 TC on hand)\n[2026-08-27T21:38:23.821Z] [reward] Sold Bone Knife to Cassia Nightwind for 11 TC. (881 TC on hand)\n[2026-08-27T21:38:23.882Z] [reward] Sold Mud Claymore to Cassia Nightwind for 11 TC. (892 TC on hand)\n",
+      "[2026-08-27T21:38:23.942Z] [reward] Sold Mud Shortsword to Cassia Nightwind for 11 TC. (903 TC on hand)\n[2026-08-27T21:38:24.002Z] [reward] Sold Bone Club to Cassia Nightwind for 11 TC. (914 TC on hand)\n[2026-08-27T21:38:24.060Z] [reward] Sold Aetheric Spark to Cassia Nightwind for 11 TC. (925 TC on hand)\n",
+      "[2026-08-27T21:38:24.119Z] [reward] Sold Mud Knife to Cassia Nightwind for 11 TC. (936 TC on hand)\n[2026-08-27T21:38:24.177Z] [reward] Sold Cudgel to Cassia Nightwind for 10 TC. (946 TC on hand)\n[2026-08-27T21:38:24.236Z] [reward] Sold Throwing Knife to Cassia Nightwind for 10 TC. (956 TC on hand)\n",
+      "[2026-08-27T21:38:24.296Z] [reward] Sold Repeater Rifle to Cassia Nightwind for 10 TC. (966 TC on hand)\n[2026-08-27T21:38:24.355Z] [reward] Sold Rusted Blade to Cassia Nightwind for 10 TC. (976 TC on hand)\n[2026-08-27T21:38:24.414Z] [reward] Sold Repeater Rifle to Cassia Nightwind for 10 TC. (986 TC on hand)\n",
+      "[2026-08-27T21:38:24.473Z] [reward] Sold Mud-Iron Cleaver to Cassia Nightwind for 10 TC. (996 TC on hand)\n[2026-08-27T21:38:24.533Z] [reward] Sold Sparkstrike to Cassia Nightwind for 10 TC. (1006 TC on hand)\n[2026-08-27T21:38:24.592Z] [reward] Sold Stone Spear to Cassia Nightwind for 10 TC. (1016 TC on hand)\n",
+      "[2026-08-27T21:38:24.650Z] [reward] Sold Pocket Knife to Cassia Nightwind for 10 TC. (1026 TC on hand)\n[2026-08-27T21:38:24.710Z] [reward] Sold Mud Heater Sword to Cassia Nightwind for 10 TC. (1036 TC on hand)\n[2026-08-27T21:38:24.769Z] [reward] Sold Plasma Cutter to Cassia Nightwind for 9 TC. (1045 TC on hand)\n",
+      "[2026-08-27T21:38:24.827Z] [reward] Sold Cudgel to Cassia Nightwind for 9 TC. (1054 TC on hand)\n[2026-08-27T21:38:24.886Z] [reward] Sold Mud Sledge to Cassia Nightwind for 9 TC. (1063 TC on hand)\n[2026-08-27T21:38:24.945Z] [reward] Sold Bone Shiv (Stealth) to Cassia Nightwind for 9 TC. (1072 TC on hand)\n",
+      "[2026-08-27T21:38:25.004Z] [reward] Sold Aetheric Chainmail to Cassia Nightwind for 8 TC. (1080 TC on hand)\n[2026-08-27T21:38:25.062Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 8 TC. (1088 TC on hand)\n[2026-08-27T21:38:25.120Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 8 TC. (1096 TC on hand)\n",
+      "[2026-08-27T21:38:25.178Z] [reward] Sold Mud-Warden's Vest to Cassia Nightwind for 8 TC. (1104 TC on hand)\n[2026-08-27T21:38:25.237Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 8 TC. (1112 TC on hand)\n[2026-08-27T21:38:25.294Z] [reward] Sold Mud-Warden's Vest to Cassia Nightwind for 8 TC. (1120 TC on hand)\n",
+      "[2026-08-27T21:38:25.352Z] [reward] Sold Mud-Warden's Vest to Cassia Nightwind for 8 TC. (1128 TC on hand)\n[2026-08-27T21:38:25.410Z] [reward] Sold Lost Scholar's Robe to Cassia Nightwind for 8 TC. (1136 TC on hand)\n[2026-08-27T21:38:25.467Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 8 TC. (1144 TC on hand)\n",
+      "[2026-08-27T21:38:25.524Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 8 TC. (1152 TC on hand)\n[2026-08-27T21:38:25.582Z] [reward] Sold Mud-Warden's Vest to Cassia Nightwind for 8 TC. (1160 TC on hand)\n[2026-08-27T21:38:25.639Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 8 TC. (1168 TC on hand)\n",
+      "[2026-08-27T21:38:25.696Z] [reward] Sold Reclaimer's Salvage Vest to Cassia N"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 25/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtc1uckf9p7j"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "25"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T21:43:07.094251Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T21:43:07.574000Z",
+  "fingerprints": [
+    "6176f9207cc18053161b308bba4f6577"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c30441fb9aac441a94203375162be236",
+  "previousEventID": "bacaee67190f417c969d4376078e9a79"
+}

@@ -1,0 +1,245 @@
+{
+  "id": "8b693b14c1cd40f0b15c996002003886",
+  "groupID": "7696460753",
+  "eventID": "8b693b14c1cd40f0b15c996002003886",
+  "projectID": "4511945117532160",
+  "size": 17247,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 7/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 7/27]",
+  "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 7/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "5ef0f71a280d4eee887879fa3c192cb3",
+      "span_id": "97544b85870c0fb7",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      ").\n[2026-08-26T22:18:12.816Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T22:18:12.816Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:18:12.816Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T22:18:12.817Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n",
+      "[2026-08-26T22:18:13.002Z] [cognitive] CLIMB  (185ms)\n[2026-08-26T22:18:15.491Z] [debug] ui: tap \"rest\"\n[2026-08-26T22:18:15.503Z] [player] rest\n[2026-08-26T22:18:15.504Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:18:15.505Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 24, morning)\n",
+      "[2026-08-26T22:18:15.507Z] [world] Wind in the silt overnight. Patterns in the mud around your camp \u2014 boot prints not yours, walked around you and away.\n[2026-08-26T22:18:15.517Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T22:18:15.672Z] [cognitive] REST  (154ms)\n[2026-08-26T22:18:16.775Z] [debug] ui: tap \"ENTER\"\n[2026-08-26T22:18:16.776Z] [world] You step inside a tar-paper shack, into the den.\n",
+      "[2026-08-26T22:18:16.776Z] [world] A low room with a dead stove and a threadbare rug. A board creaks loose underfoot near the wall.\n[2026-08-26T22:18:19.831Z] [debug] ui: tap \"Den\"\n[2026-08-26T22:18:21.949Z] [debug] qwen\u23f1 ambient_fill ok 6143ms read 1304ms/write 1206ms in 361t\u2192out 31t 3.6ms/t HIT-CAP (159ch)\n",
+      "[2026-08-26T22:18:22.089Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 2319ms \u00b7 frames 1834ms). Something blocked the JS thread \u2014 look for a long synchronous run.\n[2026-08-26T22:18:22.234Z] [debug] ui: tap \"investigate\"\n[2026-08-26T22:18:22.235Z] [debug] ui: tap \"investigate\"\n[2026-08-26T22:18:22.384Z] [debug] arbiter: ambient-fill banked (2/3) 6878ms\n",
+      "[2026-08-26T22:18:24.032Z] [player] investigate the ground\n[2026-08-26T22:18:24.033Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-26T22:18:24.037Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Stick (Common).\n",
+      "[2026-08-26T22:18:24.043Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T22:18:24.043Z] [arbiter] The Arbiter looks around. \"Aetheric Cores hum at frequencies the body mistakes for hunger. Notice when you are not actually hungry.\"\n[2026-08-26T22:18:24.043Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T22:18:24.203Z] [cognitive] CLIMB  (159ms)\n",
+      "[2026-08-26T22:18:26.307Z] [player] investigate stove\n[2026-08-26T22:18:26.308Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=stove resolved=stove range=- enemies=0 hooks=0\n[2026-08-26T22:18:26.310Z] [world] The stove resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n",
+      "[2026-08-26T22:18:26.311Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T22:18:26.311Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:18:26.483Z] [cognitive] neutral  (169ms)\n[2026-08-26T22:18:27.094Z] [debug] freeze watch: recovered \u2014 painting again after 1834ms quiet.\n[2026-08-26T22:18:28.674Z] [player] investigate rug\n",
+      "[2026-08-26T22:18:28.674Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rug resolved=rug range=- enemies=0 hooks=0\n[2026-08-26T22:18:28.675Z] [world] You give the rug your full attention. It returns the gesture by being exactly what it appears to be.\n[2026-08-26T22:18:28.841Z] [debug] qwen\u23f1 investigate_lore ok 2371ms read 1243ms/write 919ms in 124t\u2192out 28t 10.0ms/t (123ch)\n",
+      "[2026-08-26T22:18:29.152Z] [cognitive] neutral  (476ms)\n[2026-08-26T22:18:29.348Z] [debug] persist sizes(KB): total=222 player=63 wm=77[rooms=31 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=2\n[2026-08-26T22:18:30.421Z] [debug] qwen\u23f1 investigate_lore ok 1424ms read 298ms/write 954ms in 124t\u2192out 29t 2.4ms/t (143ch)\n[2026-08-26T22:18:30.930Z] [player] investigate board\n",
+      "[Filtered]",
+      "[2026-08-26T22:18:30.934Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:18:31.110Z] [cognitive] neutral  (174ms)\n[2026-08-26T22:18:34.676Z] [debug] qwen\u23f1 investigate_lore ok 3580ms read 246ms/write 3302ms in 124t\u2192out 26t 2.0ms/t (129ch)\n[2026-08-26T22:18:39.789Z] [debug] appstate: active \u2192 background (was active for 35377ms)\n",
+      "[2026-08-26T22:37:14.577Z] [debug] appstate: background \u2192 active (was background for 1114784ms)\n[2026-08-26T22:37:17.968Z] [debug] ui: tap \"\u2197 Bedroom\"\n[2026-08-26T22:37:17.971Z] [world] You step into the bedroom.\n[2026-08-26T22:37:17.971Z] [world] A single cot, a stool, and a stub of candle burned to the holder. Someone left in a hurry.\n[2026-08-26T22:37:19.220Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-26T22:37:20.810Z] [world] You strip the candle carefully. Something usable comes free in your hand.\n[2026-08-26T22:37:20.811Z] [world] You lever something loose from the stool \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-26T22:37:20.811Z] [reward] \u2726 Salvage haul:\n[2026-08-26T22:37:20.812Z] [reward]     \u2022 Cloth Scrap (Common)\n",
+      "[2026-08-26T22:37:20.812Z] [reward]     \u2022 Stiffened Leather Offcut (Uncommon)\n[2026-08-26T22:37:22.004Z] [debug] ui: tap \"investigate\"\n[2026-08-26T22:37:23.589Z] [player] investigate the ground\n[2026-08-26T22:37:23.592Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-26T22:37:23.594Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Firewood (Common).\n[2026-08-26T22:37:23.600Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T22:37:23.760Z] [cognitive] CLIMB  (159ms)\n[2026-08-26T22:37:24.253Z] [debug] ui: tap \"\u2193 Storage\"\n[2026-08-26T22:37:24.256Z] [world] You step into the storage.\n",
+      "[2026-08-26T22:37:24.256Z] [world] Shelves of odds and ends. Sacks slumped against the wall, dented tins, a loose coil of wire. A plank gate at the back of the room hangs open on the yard.\n[2026-08-26T22:37:25.503Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T22:37:25.933Z] [player] investigate cot\n",
+      "[2026-08-26T22:37:25.934Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cot resolved=- range=- enemies=0 hooks=0\n[2026-08-26T22:37:26.118Z] [cognitive] neutral  (180ms)\n[2026-08-26T22:37:26.748Z] [world] You strip the gate carefully. Something usable comes free in your hand.\n",
+      "[Filtered]",
+      "[2026-08-26T22:37:26.748Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-26T22:37:26.749Z] [reward]     \u2022 Obsidian Chip (Common)\n[2026-08-26T22:37:26.749Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-08-26T22:37:26.749Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-26T22:37:29.671Z] [debug] ui: tap \"investigate\"\n[2026-08-26T22:37:31.933Z] [player] investigate the ground\n",
+      "[2026-08-26T22:37:31.933Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-26T22:37:31.937Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Firewood (Common).\n[2026-08-26T22:37:31.947Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-26T22:37:31.948Z] [arbiter] The Arbiter looks around. \"Listen for the bells. Nimari had bells, once. They sometimes remember.\"\n[2026-08-26T22:37:31.948Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T22:37:32.145Z] [cognitive] CLIMB  (196ms)\n[2026-08-26T22:37:35.924Z] [debug] qwen\u23f1 ambient ok 9832ms read 4631ms/write 1287ms in 363t\u2192out 31t 12.8ms/t HIT-CAP (128ch)\n",
+      "[2026-08-26T22:37:35.925Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n4 avg12.3s max41.9s read5.6s/write6.1s in124t\u2192out26t ms/tok 2.0-166.2 wait0.6s | narration:scene_intro_fill n2 avg8.8s max12.6s read6.2s/write2.6s in647t\u2192out33t ms/tok 5.8-13.3 cap2 | ambient n2 avg6.9s max9.8s read3.7s/write1.3s in364t\u2192out31t ms/tok 7.3-12.8 cap2 \u27021/4.0s | ambient_fill n2 avg8.6s max11.0s read2.6s/write1.2s in361t",
+      "\u2192out31t ms/tok 3.6-10.6 cap2 \u23f81 || WASTED 1 calls / 4.0s\n[2026-08-26T22:37:36.207Z] [player] investigate tin\n[2026-08-26T22:37:36.208Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tin resolved=tin range=- enemies=0 hooks=0\n[2026-08-26T22:37:36.209Z] [world] You study the tin and find no answer. The silence here is patient; whatever it knew, it has decided to keep.\n",
+      "[2026-08-26T22:37:36.351Z] [debug] arbiter: ambient stale:log-moved-on\u2192banked 10415ms\n[2026-08-26T22:37:36.352Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You have traversed the treacherous paths of Nimari, the Red Tower, for a long time. The air is thick with the scent of h\"\n[2026-08-26T22:37:36.498Z] [cognitive] neutral  (288ms)\n",
+      "[2026-08-26T22:37:36.860Z] [debug] persist sizes(KB): total=224 player=64 wm=78[rooms=32 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=2\n[2026-08-26T22:37:38.057Z] [debug] ui: tap \"\ud83d\udeaa EXIT\"\n[2026-08-26T22:37:38.058Z] [world] You step back outside, leaving shack behind.\n",
+      "[2026-08-26T22:37:39.173Z] [debug] qwen\u23f1 investigate_lore ok 2684ms read 1297ms/write 1187ms in 124t\u2192out 36t 10.5ms/t (156ch)\n[2026-08-26T22:37:39.367Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'cot' here. Choose words carefully \u2014 try: the mud, the haze, the dust.\"\n[2026-08-26T22:37:42.677Z] [debug] ui: tap \"rest\"\n[2026-08-26T22:37:42.691Z] [player] rest\n",
+      "[2026-08-26T22:37:42.692Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:37:42.693Z] [world] You rest for 8 hours. +7 HP, +8 stamina recovered. (Day 24, evening)\n[2026-08-26T22:37:42.704Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-08-26T22:37:42.712Z] [world] An Eternal Dynasty war party crests the rise \u2014 2 of them, blades already out. They've marked you for standing with the Mud Monarchs.\n[2026-08-26T22:37:42.713Z] [arbiter] \"The Eternal Dynasty do not forgive a friend of the Mud Monarchs,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n",
+      "[2026-08-26T22:37:42.713Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"The Eternal Dynasty do not forgive a friend of the Mud Mona\u2026\"\n[2026-08-26T22:37:42.947Z] [cognitive] REST  (242ms)\n[2026-08-26T22:37:48.277Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-26T22:37:48.353Z] [player] attack with the cantor's tuning fork\n",
+      "[2026-08-26T22:37:48.354Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=2 hooks=1\n[2026-08-26T22:37:48.355Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-26T22:37:48.356Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-26T22:37:48.408Z] [world] You raise the searing cantor's tuning fork toward Eternal Dynasty Raider 1. The room narrows around the both of you.\n[2026-08-26T22:37:48.408Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:37:48.612Z] [cognitive] neutral  (203ms)\n[2026-08-26T22:37:55.523Z] [world] Eternal Dynasty Raider 1 moves first. The pressure is immediate.\n",
+      "[2026-08-26T22:37:55.525Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 3 + ATK 9 = 12 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:37:55.526Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 12 + ATK 9 = 21 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:37:55.526Z] [combat] You \u2014 d20 \u2192 4 + INT 10 \u2212 1 (Whisper Fog) = 13 vs Eternal Dynasty Raider 1 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-08-26T22:37:55.526Z] [combat] Aetheric flares \u2014 +2 on hit.\n[2026-08-26T22:37:55.527Z] [combat] You crack the Eternal Dynasty Raider 1 with the Searing Cantor's Tuning Fork for 14 \u2014 half their fight, gone in one blow. They crumple, out cold. (4/18 HP) Loot them before they come to.\n",
+      "[2026-08-26T22:37:55.527Z] [combat] Eternal Dynasty Raider 1 is out of it. Eternal Dynasty Raider 2 now in your sights.\n[2026-08-26T22:37:55.528Z] [combat] Searing Cantor's Tuning Fork \u2014 2 burn bites in and festers (3 turns).\n[2026-08-26T22:37:55.528Z] [combat] Eternal Dynasty Raider 1 is left exposed \u2014 easier to hit.\n[2026-08-26T22:37:57.522Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n",
+      "[2026-08-26T22:37:57.526Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-26T22:37:57.570Z] [player] attack with the off-hand bone crossbow\n[2026-08-26T22:37:57.571Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=2 hooks=1\n",
+      "[2026-08-26T22:37:57.572Z] [combat] Eternal Dynasty Raider 1 blisters \u2014 clinging fire sears 2. (2/18 HP, 2 turns left)\n[2026-08-26T22:37:57.572Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-26T22:37:57.574Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-26T22:37:57.630Z] [world] You raise the acid-etched bone crossbow toward Eternal Dynasty Raider 2. The room narrows around the both of you.\n[2026-08-26T22:37:57.631Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:37:57.833Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (202ms)\n[2026-08-26T22:38:04.780Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.\n",
+      "[2026-08-26T22:38:04.784Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:38:04.784Z] [combat] You \u2014 d20 \u2192 10 + DEX 12 \u2212 1 (Whisper Fog) = 21 vs Eternal Dynasty Raider 2 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-08-26T22:38:04.787Z] [combat] Eternal Dynasty Raider 2 takes 8 with the acid-etched bone crossbow. It reels: 13 left. Then it fights back.\n[2026-08-26T22:38:04.787Z] [combat] Acid-Etched Bone Crossbow \u2014 3 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-08-26T22:38:04.787Z] [arbiter] \"Make the next strike count for two,\" the Arbiter says. \"Tartaria taxes the first.\"\n[2026-08-26T22:38:05.508Z] [debug] ui: tap \"approach\"\n[2026-08-26T22:38:05.563Z] [player] approach Eternal Dynasty Raider 2\n",
+      "[2026-08-26T22:38:05.564Z] [debug] parser: intent=advance conf=1.00 verb=approach target=eternal dynasty raider 2 resolved=Eternal Dynasty Raider 2 range=mid enemi"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 7/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbxo8c42v25"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "7"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T21:43:02.621436Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "11": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 389,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "19": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 362,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T21:43:03.223000Z",
+  "fingerprints": [
+    "6176f9207cc18053161b308bba4f6577"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "ae24fe52fc1d41b6851a01149d443e75",
+  "previousEventID": "79584853c2384e49beb8e5090cf4d9da"
+}

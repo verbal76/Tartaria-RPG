@@ -1,0 +1,202 @@
+{
+  "id": "e1e2df10c62e41ac80053fbe9f56c41e",
+  "groupID": "7696460753",
+  "eventID": "e1e2df10c62e41ac80053fbe9f56c41e",
+  "projectID": "4511945117532160",
+  "size": 17792,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 6/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 6/27]",
+  "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 6/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "5ef0f71a280d4eee887879fa3c192cb3",
+      "span_id": "97544b85870c0fb7",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "-08-26T22:15:58.440Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T22:15:58.445Z] [system] dodging (parry) fades.\n[2026-08-26T22:15:58.499Z] [player] attack with the off-hand bone crossbow\n[2026-08-26T22:15:58.500Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=2 hooks=1\n",
+      "[2026-08-26T22:15:58.501Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-26T22:15:58.502Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:15:58.502Z] [debug] attack: status mods tired -1\n",
+      "[2026-08-26T22:15:58.558Z] [world] You raise the acid-etched bone crossbow toward Eternal Dynasty Raider 1. The room narrows around the both of you.\n[2026-08-26T22:15:58.558Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:15:58.757Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (198ms)\n[2026-08-26T22:16:06.203Z] [world] Eternal Dynasty Raider 1 moves first. The pressure is immediate.\n",
+      "[2026-08-26T22:16:06.205Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 7 + ATK 7 = 14 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:16:06.207Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 7 + ATK 10 = 17 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-26T22:16:06.207Z] [combat] You \u2014 d20 \u2192 9 + DEX 12 \u2212 1 (Whisper Fog) + 2 (point blank) tired -1 = 21 vs Eternal Dynasty Raider 1 AC 12 \u2014 \u2713 HIT\n[2026-08-26T22:16:06.209Z] [combat] The blow with the acid-etched bone crossbow finds purchase \u2014 9 damage, 15 HP standing. Eternal Dynasty Raider 1 commits to the counter.\n",
+      "[2026-08-26T22:16:06.209Z] [combat] Acid-Etched Bone Crossbow \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-08-26T22:16:07.626Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-26T22:16:07.710Z] [player] attack with the cantor's tuning fork\n",
+      "[2026-08-26T22:16:07.711Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=2 hooks=1\n[2026-08-26T22:16:07.711Z] [combat] Eternal Dynasty Raider 1 smokes \u2014 acid eats 4. (11/24 HP, 2 turns left)\n",
+      "[2026-08-26T22:16:07.712Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-26T22:16:07.713Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:16:07.713Z] [debug] attack: status mods tired -1\n",
+      "[2026-08-26T22:16:07.769Z] [world] You raise the searing cantor's tuning fork toward Eternal Dynasty Raider 1. The room narrows around the both of you.\n[2026-08-26T22:16:07.769Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:16:07.966Z] [cognitive] neutral  (196ms)\n[2026-08-26T22:16:14.183Z] [world] Eternal Dynasty Raider 1 moves first. The pressure is immediate.\n",
+      "[2026-08-26T22:16:14.185Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 3 + ATK 7 = 10 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:16:14.186Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 8 + ATK 8 = 16 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-26T22:16:14.186Z] [combat] You \u2014 d20 \u2192 9 + INT 10 \u2212 1 (Whisper Fog) tired -1 = 17 vs Eternal Dynasty Raider 1 AC 11 \u2014 \u2713 HIT\n[2026-08-26T22:16:14.187Z] [combat] Eternal Dynasty Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 6)\n[2026-08-26T22:16:14.190Z] [combat] The aetheric has worn Eternal Dynasty Raider 1's guard through \u2014 it bites full from here.\n",
+      "[2026-08-26T22:16:14.192Z] [combat] Eternal Dynasty Raider 1 takes 6 with the searing cantor's tuning fork. It reels: 5 left. Then it fights back.\n[2026-08-26T22:16:14.192Z] [combat] Searing Cantor's Tuning Fork \u2014 3 burn bites in and festers (3 turns).\n[2026-08-26T22:16:14.192Z] [arbiter] \"Tartaria does not award style points,\" the Arbiter says, eyes on the Eternal Dynasty Raider 1. \"End it.\"\n",
+      "[2026-08-26T22:16:16.998Z] [debug] ui: tap \"kick\"\n[2026-08-26T22:16:17.005Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-26T22:16:17.009Z] [player] kick\n[2026-08-26T22:16:17.009Z] [debug] parser: intent=attack conf=1.00 verb=kick target=- resolved=- range=close enemies=2 hooks=1\n",
+      "[2026-08-26T22:16:17.010Z] [combat] Eternal Dynasty Raider 1 smokes \u2014 acid eats 4. (1/24 HP, 1 turn left)\n[2026-08-26T22:16:17.011Z] [combat] Eternal Dynasty Raider 1 blisters \u2014 clinging fire sears 3. (0/24 HP, 2 turns left)\n[2026-08-26T22:16:17.012Z] [reward] Eternal Dynasty Raider 1 defeated. You recover Aether Residue \u00d72.\n",
+      "[2026-08-26T22:16:17.013Z] [world] You crouch for the blade \u2014 the Hollow Edge, the black mark of the Forgotten Order's enforcers, its steel weeping a faint corruption that fogs the air. But the grip is wrong. It's honed: razored along the inner curve so the handle itself is a second blade, and only one of its edges is meant for the enemy. Take it up untrained and you flay your own palm to the bone",
+      ". Only a hand that knows the Order's hold \u2014 that two-finger grip they teach behind sealed doors \u2014 can carry it. You leave it where it fell.\n[2026-08-26T22:16:17.014Z] [reward] You strip the body: Mud-Bound Cloak (+15 TC). The kit took the fight badly.\n[2026-08-26T22:16:17.015Z] [combat] 1 attacker remains. Eternal Dynasty Raider 2 now in your sights.\n",
+      "[2026-08-26T22:16:17.015Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-26T22:16:17.016Z] [reward] +9 TC pried from the dust.\n[2026-08-26T22:16:17.069Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[close] reach.label=Bare hands bareHand=true\n",
+      "[2026-08-26T22:16:17.069Z] [arbiter] The Arbiter holds up a hand. \"Bare hands works at close / arm's reach range only \u2014 you're at mid-range. ADVANCE to close in (they'll answer the approach), or attack with something that reaches.\"\n[2026-08-26T22:16:17.306Z] [cognitive] AGGRESSION \u00b7 DISENGAGE  (236ms)\n[2026-08-26T22:16:20.500Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n",
+      "[2026-08-26T22:16:20.547Z] [player] attack with the off-hand bone crossbow\n[2026-08-26T22:16:20.548Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n[2026-08-26T22:16:20.549Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-26T22:16:20.550Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:16:20.550Z] [debug] attack: status mods tired -1\n[2026-08-26T22:16:20.602Z] [world] You bring the acid-etched bone crossbow to bear on Eternal Dynasty Raider 2.\n[2026-08-26T22:16:20.602Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:16:20.796Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (193ms)\n",
+      "[2026-08-26T22:16:21.045Z] [debug] persist sizes(KB): total=223 player=62 wm=77[rooms=30 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=5\n[2026-08-26T22:16:27.325Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.\n[2026-08-26T22:16:27.327Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 9 + ATK 7 = 16 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-26T22:16:27.328Z] [combat] You \u2014 d20 \u2192 8 + DEX 12 \u2212 1 (Whisper Fog) tired -1 = 18 vs Eternal Dynasty Raider 2 AC 11 \u2014 \u2713 HIT\n[2026-08-26T22:16:27.329Z] [combat] Piercing flares \u2014 +1 on hit.\n[2026-08-26T22:16:27.330Z] [combat] Your strike with the acid-etched bone crossbow lands for 9. Eternal Dynasty Raider 2 staggers \u2014 44 HP remaining. It answers.\n",
+      "[2026-08-26T22:16:27.330Z] [combat] Acid-Etched Bone Crossbow \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-08-26T22:16:28.517Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T22:16:28.563Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-26T22:16:28.564Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n[2026-08-26T22:16:28.565Z] [combat] Eternal Dynasty Raider 2 smokes \u2014 acid eats 4. (40/53 HP, 2 turns left)\n",
+      "[2026-08-26T22:16:28.565Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-26T22:16:28.566Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:16:28.566Z] [debug] attack: status mods tired -1\n",
+      "[2026-08-26T22:16:28.631Z] [world] You commit forward with the acid-etched bone crossbow. Eternal Dynasty Raider 2 watches your hands.\n[2026-08-26T22:16:28.631Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:16:28.826Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (193ms)\n[2026-08-26T22:16:35.302Z] [world] You seize the initiative. Eternal Dynasty Raider 2 has no time to react.\n",
+      "[2026-08-26T22:16:35.302Z] [combat] You \u2014 d20 \u2192 12 + DEX 12 \u2212 1 (Whisper Fog) tired -1 = 22 vs Eternal Dynasty Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:16:35.304Z] [combat] Clean hit with the acid-etched bone crossbow for 10. Eternal Dynasty Raider 2 has 30 left and does not back away.\n",
+      "[2026-08-26T22:16:35.304Z] [combat] Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 2 total).\n[2026-08-26T22:16:35.306Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 9 + ATK 7 = 16 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:16:36.703Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n",
+      "[2026-08-26T22:16:36.727Z] [player] attack with the off-hand bone crossbow\n[2026-08-26T22:16:36.728Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n[2026-08-26T22:16:36.728Z] [combat] Eternal Dynasty Raider 2 smokes \u2014 acid eats 2. (28/53 HP, 2 turns left)\n",
+      "[2026-08-26T22:16:36.728Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-26T22:16:36.729Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:16:36.729Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T22:16:36.780Z] [world] Your acid-etched bone crossbow comes around in an arc; Eternal Dynasty Raider 2 squares up to meet it.\n[2026-08-26T22:16:36.780Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:16:36.977Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (196ms)\n[2026-08-26T22:16:43.568Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.\n",
+      "[2026-08-26T22:16:43.570Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 16 + ATK 7 = 23 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-26T22:16:43.571Z] [combat] You \u2014 d20 \u2192 13 + DEX 12 \u2212 1 (Whisper Fog) exhausted -2 = 22 vs Eternal Dynasty Raider 2 AC 9 \u2014 \u2713 HIT\n[2026-08-26T22:16:43.573Z] [combat] Piercing flares \u2014 +3 on hit.\n",
+      "[2026-08-26T22:16:43.574Z] [combat] Your strike with the acid-etched bone crossbow lands for 15. Eternal Dynasty Raider 2 staggers \u2014 13 HP remaining. It answers.\n[2026-08-26T22:16:43.574Z] [combat] Acid-Etched Bone Crossbow \u2014 3 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 3 total).\n",
+      "[2026-08-26T22:16:43.574Z] [arbiter] The Arbiter watches the blow land or fail. \"Both are answers.\"\n[2026-08-26T22:16:43.805Z] [combat] Eternal Dynasty Raider 2 deals 6 piercing damage [armor \u221235%, plate \u22122]. You have 41 HP remaining.\n[2026-08-26T22:16:45.882Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T22:16:45.928Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-26T22:16:45.929Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n[2026-08-26T22:16:45.930Z] [combat] Eternal Dynasty Raider 2 smokes \u2014 acid eats 3. (10/53 HP, 2 turns left)\n",
+      "[2026-08-26T22:16:45.931Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-26T22:16:45.932Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:16:45.933Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T22:16:46.012Z] [world] You bring the acid-etched bone crossbow to bear on Eternal Dynasty Raider 2.\n[2026-08-26T22:16:46.013Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:16:46.207Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (194ms)\n[2026-08-26T22:16:52.974Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.\n",
+      "[2026-08-26T22:16:52.980Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 2 + ATK 7 = 9 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:16:52.980Z] [combat] You \u2014 d20 \u2192 8 + DEX 12 \u2212 1 (Whisper Fog) exhausted -2 = 17 vs Eternal Dynasty Raider 2 AC 8 \u2014 \u2713 HIT\n",
+      "[2026-08-26T22:16:52.982Z] [combat] Final strike with the acid-etched bone crossbow for 10. Eternal Dynasty Raider 2 is still. The Aetherstone hums on, indifferent.\n[2026-08-26T22:16:52.983Z] [reward] Eternal Dynasty Raider 2 defeated. You recover Aetheric Shard, Purification Vial.\n",
+      "[2026-08-26T22:16:52.985Z] [reward] You strip the body: Iron Spear, Mud-Warden's Vest (+20 TC). The kit took the fight badly.\n[2026-08-26T22:16:52.986Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-26T22:16:52.986Z] [reward] +30 TC pried from the dust.\n[2026-08-26T22:16:56.741Z] [debug] appstate: active \u2192 background (was active for 170326ms)\n",
+      "[2026-08-26T22:18:04.412Z] [debug] appstate: background \u2192 active (was background for 67672ms)\n[2026-08-26T22:18:05.059Z] [debug] persist sizes(KB): total=222 player=63 wm=76[rooms=30 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=4\n[2026-08-26T22:18:05.729Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-26T22:18:08.658Z] [world] The Golem-Born Guardian Mask was half under something. It is not now.\n[2026-08-26T22:18:08.659Z] [reward] \u2726 Golem-Born Guardian Mask (Common).\n[2026-08-26T22:18:09.562Z] [world] You lever something loose from the cooling valve \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-08-26T22:18:09.563Z] [world] You work the door over. A part of it comes loose, intact.\n[2026-08-26T22:18:09.563Z] [world] You work the tower relay apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-26T22:18:09.563Z] [reward] \u2726 Salvage haul:\n[2026-08-26T22:18:09.564Z] [reward]     \u2022 Weathered Granite Knob (Common)\n",
+      "[2026-08-26T22:18:09.567Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-08-26T22:18:09.567Z] [reward]     \u2022 Chipped Phial Neck (Common)\n[2026-08-26T22:18:11.231Z] [debug] ui: tap \"investigate\"\n[2026-08-26T22:18:12.804Z] [player] investigate the ground\n[2026-08-26T22:18:12.805Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T22:18:12.809Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Blueberries (Uncommon"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 6/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbxo8c42v25"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "6"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T21:43:02.350458Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T21:43:03.222000Z",
+  "fingerprints": [
+    "6176f9207cc18053161b308bba4f6577"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e6a9111f105947c5a3f6b2c4a04992de",
+  "previousEventID": "cb85deb405c74624ab218ae2a27d4dae"
+}

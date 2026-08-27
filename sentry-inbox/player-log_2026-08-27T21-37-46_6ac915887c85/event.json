@@ -1,0 +1,225 @@
+{
+  "id": "6ac915887c854bcfae9426b540108855",
+  "groupID": "7696460753",
+  "eventID": "6ac915887c854bcfae9426b540108855",
+  "projectID": "4511945117532160",
+  "size": 17570,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 5/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 5/27]",
+  "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 5/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "00197a64f193412fbb5f45cdb2ba9d30",
+      "span_id": "91cf41b43a559c8e",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "tuning fork for 29. Drowned Aetherkin has 18 left and does not back away.\n[2026-08-26T22:10:45.779Z] [combat] Searing Cantor's Tuning Fork \u2014 9 burn bites in and festers (3 turns).\n[2026-08-26T22:10:45.781Z] [arbiter] The Arbiter does not look away from the drowned aetherkin. \"Decide quickly. It already has.\"\n",
+      "[2026-08-26T22:10:45.998Z] [combat] Drowned Aetherkin deals 4 aetheric damage [armor \u221253%, plate \u22124, floor 30%]. You have 38 HP remaining.\n[2026-08-26T22:10:47.705Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-26T22:10:47.772Z] [player] attack with the cantor's tuning fork\n",
+      "[2026-08-26T22:10:47.772Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1\n[2026-08-26T22:10:47.773Z] [combat] Drowned Aetherkin smokes \u2014 acid eats 1. (17/56 HP, 0 turns left)\n[2026-08-26T22:10:47.773Z] [combat] Drowned Aetherkin shakes off the last of the acid \u2014 the Bone Crossbow has run its course.\n",
+      "[2026-08-26T22:10:47.773Z] [combat] Drowned Aetherkin blisters \u2014 clinging fire sears 9. (8/56 HP, 2 turns left)\n[2026-08-26T22:10:47.774Z] [debug] attack: target=Drowned Aetherkin range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-26T22:10:47.775Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-26T22:10:47.775Z] [debug] attack: status mods exhausted -2\n[2026-08-26T22:10:47.823Z] [world] You commit forward with the searing cantor's tuning fork. Drowned Aetherkin watches your hands.\n[2026-08-26T22:10:47.823Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:10:48.012Z] [cognitive] neutral  (188ms)\n",
+      "[2026-08-26T22:10:48.271Z] [debug] persist sizes(KB): total=220 player=61 wm=74[rooms=30 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=80 scene=5\n[2026-08-26T22:10:59.108Z] [world] You seize the initiative. Drowned Aetherkin has no time to react.\n[2026-08-26T22:10:59.109Z] [combat] You \u2014 d20 \u2192 6 + INT 10 \u2212 1 (Whisper Fog) exhausted -2 = 13 vs Drowned Aetherkin AC 9 \u2014 \u2713 HIT\n",
+      "[2026-08-26T22:10:59.109Z] [combat] Aetheric flares \u2014 +2 on hit (weak \u2014 bites deep!).\n[2026-08-26T22:10:59.110Z] [combat] Weakness exposed \u2014 Drowned Aetherkin flinches. (aetheric \u00d71.5 for 23)\n[2026-08-26T22:10:59.110Z] [combat] Final strike with the searing cantor's tuning fork for 23. Drowned Aetherkin is still. The Aetherstone hums on, indifferent.\n",
+      "[2026-08-26T22:10:59.111Z] [reward] Drowned Aetherkin defeated. You recover Veil of Peace \u00d72, Aetheric Padded Vest.\n[2026-08-26T22:10:59.113Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-26T22:10:59.113Z] [system] Word travels among those who keep the flood-dead sacred: you put one of the Aetherkin down.\n",
+      "[2026-08-26T22:10:59.113Z] [reward] +9 TC pried from the dust.\n[2026-08-26T22:11:09.429Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T22:11:12.700Z] [world] You claim the Titan's Vest.\n[2026-08-26T22:11:12.701Z] [reward] \u2726 Titan's Vest (Common).\n[2026-08-26T22:11:13.765Z] [world] You break the broken lantern apart. Among the pieces, something worth keeping.\n",
+      "[Filtered]",
+      "[2026-08-26T22:11:13.766Z] [world] You salvage the rusted lockbox. The take is small but real.\n[2026-08-26T22:11:13.767Z] [world] You strip the shard carefully. Something usable comes free in your hand.\n[2026-08-26T22:11:13.767Z] [reward] \u2726 Salvage haul:\n[2026-08-26T22:11:13.767Z] [reward]     \u2022 Aether Dust x7 (Common)\n[2026-08-26T22:11:13.768Z] [reward]     \u2022 Brittle Antler Fork (Common)\n",
+      "[2026-08-26T22:11:13.768Z] [reward]     \u2022 Worn Tartarian Coin x13 (Common)\n[2026-08-26T22:11:23.083Z] [debug] ui: tap \"investigate\"\n[2026-08-26T22:11:24.788Z] [player] investigate the ground\n[2026-08-26T22:11:24.789Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T22:11:24.792Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Firewood (Common).\n[2026-08-26T22:11:24.804Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T22:11:24.805Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:11:24.806Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-26T22:11:24.973Z] [cognitive] CLIMB  (166ms)\n[2026-08-26T22:11:27.035Z] [player] investigate vent\n[2026-08-26T22:11:27.035Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=vent resolved=vent range=- enemies=0 hooks=1\n",
+      "[2026-08-26T22:11:27.038Z] [world] The vent resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n[2026-08-26T22:11:28.927Z] [debug] qwen\u23f1 ambient ok 3955ms read 2671ms/write 1248ms in 364t\u2192out 31t 7.3ms/t HIT-CAP (153ch)\n[2026-08-26T22:11:29.141Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 3955ms \u2014 ambient:\u2205\n",
+      "[2026-08-26T22:11:29.142Z] [debug] arbiter: ambient \u2205 4336ms\n[2026-08-26T22:11:29.142Z] [debug] arbiter: ambient-empty reason=third-person raw=\"The player, with a weary gaze, reminisced about the adventures they had undertaken before embarking on this journey. The\"\n[2026-08-26T22:11:29.349Z] [cognitive] neutral  (2305ms)\n",
+      "[2026-08-26T22:11:29.831Z] [debug] appstate: active \u2192 background (was active for 94853ms)\n[2026-08-26T22:12:09.241Z] [debug] qwen\u23f1 investigate_lore ok 41938ms wait 2046ms read 20609ms/write 19058ms in 124t\u2192out 21t 166.2ms/t (107ch)\n[2026-08-26T22:14:06.415Z] [debug] appstate: background \u2192 active (was background for 156583ms)\n[2026-08-26T22:14:08.514Z] [debug] ui: tap \"rest\"\n",
+      "[2026-08-26T22:14:08.527Z] [player] rest\n[2026-08-26T22:14:08.527Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:14:08.530Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 23, evening)\n",
+      "[2026-08-26T22:14:08.534Z] [arbiter] The Arbiter goes still. \"The quiet you slept through was not the quiet of an empty place. It was something being patient.\"\n[2026-08-26T22:14:08.534Z] [world] A Mudling comes out of the open ground at a walk, in no particular hurry. The rest is over.\n[2026-08-26T22:14:08.535Z] [debug] enemy: Mudling hp=22 ac=10 atk=Mud Whip dmg=1D6 rarity=Common ap=5\n",
+      "[2026-08-26T22:14:08.546Z] [debug] arbiter: template (reason=busy)\n[2026-08-26T22:14:08.546Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:14:08.546Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T22:14:08.978Z] [debug] persist sizes(KB): total=234 player=62 wm=89[rooms=43 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=80 scene=4\n",
+      "[2026-08-26T22:14:18.571Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T22:14:18.601Z] [player] attack with the off-hand bone crossbow\n[2026-08-26T22:14:18.602Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=far enemies=1 hooks=1\n",
+      "[2026-08-26T22:14:18.602Z] [debug] attack: target=Mudling range=far reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-26T22:14:18.603Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:14:18.657Z] [world] You commit forward with the acid-etched bone crossbow. Mudling watches your hands.\n[2026-08-26T22:14:18.657Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-26T22:14:18.663Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T22:14:18.664Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T22:14:18.665Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T22:14:19.796Z] [debug] qwen\u23f1 ambient_fill preempted 11044ms read 3826ms/write 1057ms in 361t\u2192out 31t 10.6ms/t HIT-CAP (170ch)\n",
+      "[2026-08-26T22:14:19.985Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 3369ms \u00b7 frames 0ms). Something blocked the JS thread \u2014 look for a long synchronous run.\n[2026-08-26T22:14:20.374Z] [debug] arbiter: ambient-fill banked (1/3) 11842ms\n[2026-08-26T22:14:25.003Z] [debug] freeze watch: recovered \u2014 painting again after 193ms quiet.\n",
+      "[2026-08-26T22:14:28.566Z] [world] Mudling moves first. The pressure is immediate.\n[2026-08-26T22:14:28.567Z] [combat] Mudling closes the distance.\n[2026-08-26T22:14:28.567Z] [combat] You \u2014 d20 \u2192 6 + DEX 12 \u2212 1 (Whisper Fog) = 17 vs Mudling AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:14:28.568Z] [combat] Piercing flares \u2014 +2 on hit.\n",
+      "[2026-08-26T22:14:28.569Z] [combat] Mudling shrugs off the piercing. (resisted, \u00d70.5 for 8)\n[2026-08-26T22:14:28.570Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Plasma Cutter \u2014 burn or bludgeoning will bite where piercing won't.\"\n[2026-08-26T22:14:28.571Z] [combat] Your strike with the acid-etched bone crossbow lands for 8. Mudling staggers \u2014 14 HP remaining. It answers.\n",
+      "[2026-08-26T22:14:28.572Z] [combat] Acid-Etched Bone Crossbow \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-08-26T22:14:34.039Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T22:14:34.087Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-26T22:14:34.088Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n[2026-08-26T22:14:34.089Z] [combat] Mudling smokes \u2014 acid eats 4. (10/22 HP, 2 turns left)\n[2026-08-26T22:14:34.089Z] [debug] attack: target=Mudling range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-26T22:14:34.090Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:14:34.142Z] [world] You commit forward with the acid-etched bone crossbow. Mudling watches your hands.\n[2026-08-26T22:14:34.142Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:14:34.332Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (189ms)\n",
+      "[2026-08-26T22:14:54.476Z] [world] You seize the initiative. Mudling has no time to react.\n[2026-08-26T22:14:54.477Z] [combat] You \u2014 d20 \u2192 9 + DEX 12 \u2212 1 (Whisper Fog) = 20 vs Mudling AC 9 \u2014 \u2713 HIT\n[2026-08-26T22:14:54.481Z] [combat] Piercing flares \u2014 +3 on hit.\n[2026-08-26T22:14:54.482Z] [combat] Mudling shrugs off the piercing. (resisted, \u00d70.5 for 8)\n",
+      "[2026-08-26T22:14:54.484Z] [combat] Clean hit with the acid-etched bone crossbow for 8. Mudling has 2 left and does not back away.\n[2026-08-26T22:14:54.484Z] [combat] Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 2 total).\n",
+      "[2026-08-26T22:14:54.485Z] [combat] The light around Mudling bends and declines to leave. It spends the beat VEILED \u2014 the next strike will come from somewhere you are not watching.\n[2026-08-26T22:15:03.884Z] [debug] ui: tap \"dodge\"\n[2026-08-26T22:15:03.892Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-26T22:15:03.902Z] [player] dodge\n",
+      "[2026-08-26T22:15:03.903Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1\n[2026-08-26T22:15:03.904Z] [world] You commit to the dodge. Slip Mudling's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-26T22:15:03.904Z] [combat] Mudling smokes \u2014 acid eats 2. (0/22 HP, 2 turns left)\n[2026-08-26T22:15:03.905Z] [reward] Mudling defeated. You recover Aetheric Sludge.\n[2026-08-26T22:15:03.907Z] [reward] +5 TC pried from the dust.\n[2026-08-26T22:15:03.964Z] [debug] arbiter: template (reason=intent-not-allowed:dodge)\n",
+      "[2026-08-26T22:15:03.965Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:15:03.965Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:15:04.262Z] [cognitive] neutral  (296ms)\n[2026-08-26T22:15:24.967Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T22:15:24.990Z] [debug] spawn: gear=[Cloak of the Mud Shaman, Golem-Born Guardian Mask] window=10 roster=new\n",
+      "[2026-08-26T22:15:24.992Z] [world] You push west. The silt is heavy underfoot, the horizon unchanged.\n[2026-08-26T22:15:24.993Z] [world] Whatever you turned over here is still turned over.\n[2026-08-26T22:15:37.521Z] [debug] multi-clause: 2 parts\n[2026-08-26T22:15:37.569Z] [player] take the cloak of the mud\n",
+      "[2026-08-26T22:15:37.570Z] [debug] parser: intent=pickup conf=1.00 verb=take target=cloak mud resolved=Cloak of the Mud Shaman range=- enemies=0 hooks=1\n[2026-08-26T22:15:37.582Z] [world] The Cloak of the Mud Shaman comes up out of the silt with a small sucking protest.\n[2026-08-26T22:15:37.582Z] [reward] \u2726 Cloak of the Mud Shaman (Common).\n[2026-08-26T22:15:37.602Z] [player] shaman\n",
+      "[2026-08-26T22:15:37.602Z] [debug] parser: intent=unknown conf=0.10 verb=- target=- resolved=Cloak of the Mud Shaman range=- enemies=0 hooks=1\n[2026-08-26T22:15:37.602Z] [arbiter] The Arbiter follows your gaze toward the cloak of the mud shaman. \"Tell me what you would do with it.\"\n[2026-08-26T22:15:37.603Z] [system] Try: inspect cloak of the mud shaman \u00b7 use cloak of the mud shaman\n",
+      "[2026-08-26T22:15:37.957Z] [cognitive] SWIM \u00b7 SEARCH \u00b7 HIDE \u00b7 RETREAT  (373ms)\n[2026-08-26T22:15:38.326Z] [debug] persist sizes(KB): total=221 player=62 wm=77[rooms=30 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=4\n[2026-08-26T22:15:49.356Z] [debug] multi-clause: 2 parts\n[2026-08-26T22:15:49.406Z] [player] take the cloak of the mud\n",
+      "[2026-08-26T22:15:49.407Z] [debug] parser: intent=pickup conf=1.00 verb=take target=cloak mud resolved=Cloak of the Mud Shaman range=- enemies=0 hooks=1\n[2026-08-26T22:15:49.408Z] [world] You've already taken or worked over the Cloak of the Mud Shaman here. Nothing more to claim.\n",
+      "[2026-08-26T22:15:49.410Z] [world] An Eternal Dynasty war party crests the rise \u2014 2 of them, blades already out. They've marked you for standing with the Mud Monarchs.\n[2026-08-26T22:15:49.410Z] [arbiter] \"The Eternal Dynasty do not forgive a friend of the Mud Monarchs,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-26T22:15:49.426Z] [player] shaman\n",
+      "[2026-08-26T22:15:49.426Z] [debug] parser: intent=unknown conf=0.10 verb=- target=- resolved=Cloak of the Mud Shaman range=close enemies=2 hooks=1\n[2026-08-26T22:15:49.428Z] [arbiter] The Arbiter follows your gaze toward the cloak of the mud shaman. \"Tell me what you would do with it.\"\n",
+      "[2026-08-26T22:15:49.428Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter follows your gaze toward the cloak of the mud sh\u2026\"\n[2026-08-26T22:15:49.428Z] [system] Try: inspect cloak of the mud shaman \u00b7 use cloak of the mud shaman \u00b7 attack\n[2026-08-26T22:15:49.666Z] [cognitive] SWIM \u00b7 SEARCH \u00b7 HIDE \u00b7 RETREAT  (257ms)\n[2026-08-26T22:15:53.105Z] [debug] ui: tap \"\u2726 ability\"\n",
+      "[2026-08-26T22:15:55.646Z] [reward] \u2726 Legacy of Power \u2014 you channel Aether into the Bone Crossbow. It mends to full.\n[2026"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtbxo8c42v25 [inline 5/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbxo8c42v25"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "5"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T21:37:45.229204Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "9": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 352,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T21:37:46.048000Z",
+  "fingerprints": [
+    "6176f9207cc18053161b308bba4f6577"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "6fdb1342948240fa8ea1d92df9b77693",
+  "previousEventID": "69c0421343ce4eb2b04d5cb098341643"
+}
