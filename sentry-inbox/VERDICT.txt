@@ -1,5 +1,7 @@
 
 ════ VERDICT ════
+  ⚠⚠ FETCH PROBLEMS THIS RUN — the deeper read may not have happened:
+    issue list FAILED for tartaria: HTTP Error 400: Bad Request
   /projects/hot-attic-games-llc/tartaria/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   ⚠⚠ AT LEAST ONE LISTING IS NOT PROVEN COMPLETE. Any MISSING parts below are UNPROVEN — they may simply be unread. DO NOT conclude the device failed, and DO NOT ask for another send on this basis.
