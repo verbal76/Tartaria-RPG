@@ -1,0 +1,152 @@
+{
+  "id": "ef2ff872c64c4b8d9f5a0a1c3c0e1a4c",
+  "groupID": "7694690094",
+  "eventID": "ef2ff872c64c4b8d9f5a0a1c3c0e1a4c",
+  "projectID": "4511945117532160",
+  "size": 17752,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavojr16pi8 [inline 22/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavojr16pi8 [inline 22/23]",
+  "title": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavojr16pi8 [inline 22/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "d40f66b0cbaf4b979feb773ed22807f7",
+      "span_id": "811a571431b2e1f0",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunk": "dow across drowned streets, and somewhere inside it a working Aetheric core pulses warm enough that the mud around your boots steams faintly.\n[2026-08-25T01:48:31.708Z] [arbiter] (Architect route \u2014 the Nimari Core leaves with you only if it is never seen leaving. STEAL it, or investigate until you find the back-door route out.)\n[2026-08-25T01:48:31.708Z] [arbiter] \"You keep waiting for me to ask what you did,\" the Arbiter says. \"I keep the ledger of what you do. Above ground a name is a verdict. Down here it is a running total, and yours is still being written. I find the second arrangement more honest, and I notice you are starting to.\"\n[2026-08-25T01:48:31.708Z] [world] The stalls are the same stalls, and the prices are not. Somebody upstream has started keeping more back.\n[2026-08-25T01:48:37.220Z] [player] Ask about their trade\n[2026-08-25T01:48:37.220Z] [world] \"Fire,\" Odar says, and the forge behind him agrees. \"Everything on this rack burns something. Mostly the thing you point it at. Occasionally you.\"\n[2026-08-25T01:48:37.221Z] [world] There is half a nod in it \u2014 you are a face now, if not much more than one.\n[2026-08-25T01:48:37.937Z] [player] Ask what makes a piece good\n[2026-08-25T01:48:37.937Z] [world] Odar Flameforge picks up a finished piece and turns it. \"Not the look. The look is for buyers. A good piece is one that fails SLOWLY \u2014 it warns you, it complains, it gives you a season of creaking before it lets go.\" They set it down. \"Anything that breaks without warning first lied to you for years.\"\n[2026-08-25T01:48:37.938Z] [world] Something in the back of Odar Flameforge's shop ticks over and settles, and he does not look up at it.\n[2026-08-25T01:48:38.737Z] [world] You let the conversation go and Odar Flameforge gets back to it.\n[2026-08-25T01:48:40.122Z] [debug] ui: tap \"take / salvage\"\n[2026-08-25T01:48:40.492Z] [debug] qwen\u23f1 flourish ok 4191ms wait 1373ms read \u26a026382ms/write \u26a0552ms NOT-PER-CALL in 180t\u2192out 18t (68ch)\n[2026-08-25T01:48:40.598Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 4191ms \u2014 flourish:stale-walked-away\n[2026-08-25T01:48:40.598Z] [debug] flourish: stale 4426ms\n[2026-08-25T01:48:41.830Z] [world] It takes two pulls. The Bone Javelin is yours on the second.\n[2026-08-25T01:48:41.831Z] [reward] \u2726 Bone Javelin (Common).\n[2026-08-25T01:48:41.853Z] [world] The Plasma Cutter resists, then does not.\n[2026-08-25T01:48:41.853Z] [reward] \u2726 Plasma Cutter (Common).\n[2026-08-25T01:48:41.855Z] [world] You brace a foot and the Salvager's Worn Boots gives.\n[2026-08-25T01:48:41.855Z] [reward] \u2726 Salvager's Worn Boots (Common).\n[2026-08-25T01:48:43.016Z] [world] One good tug and the Scrap Metal is out.\n[2026-08-25T01:48:43.017Z] [reward] \u2726 Scrap Metal (Common).\n[2026-08-25T01:48:43.221Z] [debug] persist sizes(KB): total=232 player=58 wm=90[rooms=32 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=81 scene=4\n[2026-08-25T01:48:44.326Z] [world] You work the core over. A part of it comes loose, intact.\n[2026-08-25T01:48:44.326Z] [world] You break the dust lantern apart. Among the pieces, something worth keeping.\n[2026-08-25T01:48:44.327Z] [world] You work the gate over. A part of it comes loose, intact.\n[2026-08-25T01:48:44.327Z] [world] You break the hook chain apart. Among the pieces, something worth keeping.\n[2026-08-25T01:48:44.327Z] [world] You work the pebble over. A part of it comes loose, intact.\n[2026-08-25T01:48:44.327Z] [world] You break the shelf apart. Among the pieces, something worth keeping.\n[2026-08-25T01:48:44.328Z] [world] You strip the tilting buried market row rooftop carefully. Something usable comes free in your hand.\n[2026-08-25T01:48:44.328Z] [reward] \u2726 Salvage haul:\n[2026-08-25T01:48:44.328Z] [reward]     \u2022 Scrap Metal x4 (Common)\n[2026-08-25T01:48:44.328Z] [reward]     \u2022 Worn Tartarian Coin x19 (Common)\n[2026-08-25T01:48:44.329Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-08-25T01:48:47.993Z] [debug] ui: tap \"inventory\"\n[2026-08-25T01:48:56.226Z] [player] use Skyreacher Map 1 of 5 \u2014 Grand Spire\n[2026-08-25T01:48:56.230Z] [world] You spread the Skyreacher Map 1 of 5 \u2014 Grand Spire again. The Grand Spire of Etheria is already fixed on your route.\n[2026-08-25T01:48:58.209Z] [debug] qwen\u23f1 item_synthesis_hw ok 4840ms read 3730ms/write 1085ms in 334t\u2192out 32t 11.2ms/t (125ch)\n[2026-08-25T01:48:58.213Z] [debug] homework: item_desc \"Golem Leather Gloves\" \u2713 4853ms\n[2026-08-25T01:48:58.362Z] [debug] homework: intro-fill armed after 6384ms idle\n[2026-08-25T01:49:07.712Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9349ms read 8239ms/write 1087ms in 703t\u2192out 33t 11.7ms/t HIT-CAP (107ch)\n[2026-08-25T01:49:07.824Z] [debug] homework: scene_intro \"Nimari\" \u2713 9463ms\n[2026-08-25T01:49:33.376Z] [debug] appstate: active \u2192 background (was active for 396761ms)\n[2026-08-25T15:02:34.060Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a03661-0974-7546-9b14-ea84dc0f0ce3\n[2026-08-25T15:02:34.060Z] [debug] ota: Checking\u2026\n[2026-08-25T15:02:41.624Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-25T15:02:41.724Z] [debug] ota: Saving progress\u2026\n[2026-08-25T15:02:41.725Z] [debug] ota: Restarting to apply\u2026\n[2026-08-25T15:02:41.793Z] [debug] ota: boot check result = applied\n[2026-08-25T15:02:41.964Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a036f0-6693-70ac-927d-b1683896568d\n[2026-08-25T15:02:41.964Z] [debug] ota: Checking\u2026\n[2026-08-25T15:02:43.779Z] [debug] ota: Already up to date\n[2026-08-25T15:02:43.780Z] [debug] ota: boot check result = noUpdate\n[2026-08-25T15:02:43.810Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-25T15:02:43.811Z] [debug] voice: bundled idle\n[2026-08-25T23:10:28.478Z] [debug] OTA session start: 2026-08-25-1502-the-swipe-is-the-selector.\n[2026-08-25T23:10:28.478Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-25T23:10:28.478Z] [world] Word reaches you: a roadside trader changed routes while you were elsewhere. The next time you cross the right tile, look for a stall you didn't see before.\n[2026-08-25T23:10:28.484Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Verbal. We've still got ground to cover, you and I. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n[2026-08-25T23:10:28.943Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-25T23:10:28.941Z \u00b7 build 2026-08-25-1502-the-swipe-is-the-selector \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-25T23:10:32.190Z] [debug] send-log: FAILED - envelope did not go out\n[2026-08-25T23:10:33.774Z] [debug] send-log: flushed to Sentry\n[2026-08-25T23:31:02.592Z] [debug] OTA session start: 2026-08-25-1503-the-bullseye-is-the-truth.\n[2026-08-25T23:31:02.592Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-25T23:31:02.592Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Verbal. The road kept your place.\"\n[2026-08-25T23:31:02.777Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-25T23:31:02.775Z \u00b7 build 2026-08-25-1503-the-bullseye-is-the-truth \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-25T23:31:08.242Z] [debug] send-log: flushed to Sentry\n[2026-08-25T23:40:24.704Z] [debug] OTA session start: 2026-08-25-1503-the-bullseye-is-the-truth.\n[2026-08-25T23:40:24.704Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-25T23:40:24.704Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Verbal. I kept watch while you were gone.\"\n[2026-08-25T23:40:24.929Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-25T23:40:24.926Z \u00b7 build 2026-08-25-1503-the-bullseye-is-the-truth \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-25T23:40:36.261Z] [debug] persist sizes(KB): total=237 player=61 wm=91[rooms=33 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=81 scene=4\n[2026-08-25T23:41:43.165Z] [debug] persist sizes(KB): total=236 player=61 wm=90[rooms=33 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=81 scene=4\n[2026-08-26T00:18:23.643Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a03b36-cd67-7431-99f2-9a8098e7cec2\n[2026-08-26T00:18:23.643Z] [debug] ota: Checking\u2026\n[2026-08-26T00:18:23.773Z] [debug] ota: Already up to date\n[2026-08-26T00:18:23.773Z] [debug] ota: boot check result = noUpdate\n[2026-08-26T00:18:23.804Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-26T00:18:23.804Z] [debug] voice: bundled idle\n[2026-08-26T00:49:53.882Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a03b36-cd67-7431-99f2-9a8098e7cec2\n[2026-08-26T00:49:53.882Z] [debug] ota: Checking\u2026\n[2026-08-26T00:49:54.959Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-26T00:49:55.056Z] [debug] ota: Saving progress\u2026\n[2026-08-26T00:49:55.057Z] [debug] ota: Restarting to apply\u2026\n[2026-08-26T00:49:55.124Z] [debug] ota: boot check result = applied\n[2026-08-26T00:49:55.264Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a03b87-b692-77d0-b8b8-a983194b2bb4\n[2026-08-26T00:49:55.264Z] [debug] ota: Checking\u2026\n[2026-08-26T00:49:55.372Z] [debug] ota: Already up to date\n[2026-08-26T00:49:55.373Z] [debug] ota: boot check result = noUpdate\n[2026-08-26T00:49:55.392Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-26T00:49:55.393Z] [debug] voice: bundled idle\n[2026-08-26T00:50:03.278Z] [debug] OTA applied: 2026-08-25-1503-the-bullseye-is-the-truth \u2192 2026-08-26-1505-the-crash-brings-its-own-evidence.\n[2026-08-26T00:50:03.278Z] [debug] OTA session start: 2026-08-26-1505-the-crash-brings-its-own-evidence.\n[2026-08-26T00:50:03.278Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-26T00:50:03.278Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Verbal. I wondered when you'd take up the thread again.\"\n[2026-08-26T00:50:03.579Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-26T00:50:03.576Z \u00b7 build 2026-08-26-1505-the-crash-brings-its-own-evidence \u00b7 updated from 2026-08-25-1503-the-bullseye-is-the-truth \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-26T00:50:03.977Z] [debug] send-log: crash on record (2026-08-25T23:30:47.449Z) \u2014 full bundle pushed automatically, flush failed, kept on disk as #mt9dn1r1so6y\n[2026-08-27T02:02:48.154Z] [debug] OTA session start: 2026-08-27-1518-the-beacon-goes-first.\n[2026-08-27T02:02:48.154Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-27T02:02:48.154Z] [world] The wind has shifted while you were away. The Aetheric haze sits a little thicker on the horizon now.\n[2026-08-27T02:02:48.161Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Verbal. I wondered when you'd take up the thread again. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n[2026-08-27T02:02:48.549Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T02:02:48.545Z \u00b7 build 2026-08-27-1518-the-beacon-goes-first \u00b7 previous entry moments earlier \u2550\u2550\u2550\n\n=== END LOG \u00b7 325975 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-08-27T02:02:52.948Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-08-27-1518-the-beacon-goes-first)\n  Boot stage: qwen:deferred\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-08-27T02:01:25.127Z\n  Last init success: 2026-08-27T02:01:25.626Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n  Status: none recorded\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-24T11:57:36.105Z (3725m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-24-1483-three-from-the-second-sweep \u00b7 stage ctx-open\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: ctx-open (+0ms)\n  \u2022 2026-08-25T15:08:37.221Z (2094m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-25-1499-star-means-bare-arrow-means-compared \u00b7 stage ctx-release\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: ctx-release (+2639101ms)\n  \u2022 2026-08-25T22:13:33.383Z (1669m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-25-1502-the-swipe-is-the-selector \u00b7 stage rendered\n      Process died with no orderly exit while: action \"attack with the cantor's tuning fork\"\n      doing: action \"attack with the cantor's tuning fork\" \u00b7 room nimari \u00b7 screen exploration\n      last checkpoint: rendered (+10508ms)\n  \u2022 2026-08-25T23:10:28.741Z (1612m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-25-1502-the-swipe-is-the-selector \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+19158ms)\n  \u2022 2026-08-25T23:30:47.449Z (1592m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-25-1503-the-bullseye-is-the-truth \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+41333ms)\n  \u2022 2026-08-26T00:50:13.412Z (1513m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-26-1505-the-crash-brings-its-own-evidence \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+9946ms)\n  \u2022 2026-08-26T22:59:19.885Z (184m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-26-1511-the-spear-leaves-your-hand \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+7808ms)\n  \u2022 2026-08-27T00:34:40.392Z (88m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1514-the-portrait-scrolls-again \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"inventory\"\n      doing: tap \"inventory\" \u00b7 room outpost_gate \u00b7 screen exploration\n      last checkpoint: rendered (+72700ms)\n  \u2022 2026-08-27T01:03:31.295Z (59m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1515-the-log-goes-in-parts \u00b7 stage rendered\n      Process died with no orderly e",
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavojr16pi8 [inline 22/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtavojr16pi8"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "22"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T02:02:52.997682Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T02:02:53.068000Z",
+  "fingerprints": [
+    "6e9b30cbc54cd4e2e055b18014bb1faf"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "f6961d9947024a23bc7b61606455a9ee",
+  "previousEventID": "e4d08ed1044d436dbe18f298ea03e3a9"
+}

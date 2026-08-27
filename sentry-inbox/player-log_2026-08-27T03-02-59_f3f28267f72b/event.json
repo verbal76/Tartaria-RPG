@@ -1,0 +1,221 @@
+{
+  "id": "f3f28267f72b4477abd6305051b823ea",
+  "groupID": "7694761393",
+  "eventID": "f3f28267f72b4477abd6305051b823ea",
+  "projectID": "4511945117532160",
+  "size": 17701,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxtuln8peb [inline 1/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxtuln8peb [inline 1/27]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxtuln8peb [inline 1/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "15b51f4575bd4720814f03ecd3dcf9b7",
+      "span_id": "996fe59a0d2dccdd",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "=== TARTARIA LOG \u00b7 399847 CHARS \u00b7 BEGIN ===\n[2026-08-26T01:50:23.791Z] [combat] Iron Litany Brother Konrad \u2014 d20 \u2192 3 + ATK 8 = 11 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T01:50:23.791Z] [combat] Iron Litany Brother Konrad presses the second strike \u2014 bosses do not yield the tempo.\n",
+      "[2026-08-26T01:50:23.792Z] [combat] Iron Litany Brother Konrad \u2014 d20 \u2192 12 + ATK 8 = 20 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T01:50:23.792Z] [arbiter] \"That Iron Litany Brother Konrad is making the same mistake,\" the Arbiter says, almost bored. \"Capitalize.\"\n[2026-08-26T01:50:24.356Z] [debug] ui: tap \"approach\"\n",
+      "[2026-08-26T01:50:24.363Z] [world] An Aetheric arc finds you \u2014 copper taste, blue afterimage, and a bite of damage. (\u22124 HP)\n[2026-08-26T01:50:24.419Z] [player] approach Iron Litany Brother Konrad\n[2026-08-26T01:50:24.420Z] [debug] parser: intent=advance conf=1.00 verb=approach target=iron litany brother konrad resolved=Iron Litany Brother Konrad range=close enemies=1 hooks=1\n",
+      "[2026-08-26T01:50:24.421Z] [debug] move: advance from range=close enemies=1 weather=Aetheric Storm cost=1 partial=0\n[2026-08-26T01:50:24.421Z] [world] You are already at close / arm's reach with Iron Litany Brother Konrad.\n[2026-08-26T01:50:24.422Z] [debug] arbiter: template (reason=combat)\n[2026-08-26T01:50:24.422Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-26T01:50:24.581Z] [cognitive] neutral  (158ms)\n[2026-08-26T01:50:26.044Z] [debug] ui: tap \"\u2726 bandolier (4)\"\n[2026-08-26T01:50:26.944Z] [reward] You hurl the Acid Flask. It bursts across Iron Litany Brother Konrad \u2014 6 acid (2/turn \u00d7 3). (0 HP left)\n[2026-08-26T01:50:26.947Z] [reward] Iron Litany Brother Konrad defeated.\n",
+      "[2026-08-26T01:50:26.951Z] [reward] \u2726 Boss spoils: Clockwork Core, Wyrm Fang.\n[2026-08-26T01:50:26.952Z] [reward] \u2726 Hard-won spoils \u2014 Aetheric Shard (Uncommon).\n[2026-08-26T01:50:26.953Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 56). [18 enemies defeated]\n[2026-08-26T01:50:26.954Z] [reward] +54 TC pried from the dust.\n",
+      "[2026-08-26T01:50:27.018Z] [arbiter] The Arbiter eyes your new pieces. \"You could make a Wyrm-Fang Blade now, if you wanted.\"\n[2026-08-26T01:50:27.019Z] [arbiter] Konrad slumps against the Core's housing, breath rattling out the last line of the Litany. \"...Aether... keep... the seat...\" The chant goes quiet. The Core comes free in your hand without resistance.\n",
+      "[2026-08-26T01:50:27.019Z] [reward] \u2726 Litany Maul taken from Iron Litany Brother Konrad. \u2726 Litany Greaves taken from Iron Litany Brother Konrad.\n[2026-08-26T01:50:27.020Z] [arbiter] The Nimari Core acknowledges your blood and lets itself be lifted. Family right, family due. 6 Cores still to recover.\n",
+      "[2026-08-26T01:50:27.020Z] [arbiter] A Forgotten Order Reader catches you alone in the Court. \"We have been counting. Three Cores in dynastic hands. The Order will not let four happen without contesting it. The Reader who is being sent to you is good. Be ready or be diplomatic. Either is acceptable to us.\"\n[2026-08-26T01:50:27.021Z] [debug] puppy vendor queued for next outdoor scene\n",
+      "[2026-08-26T01:50:27.199Z] [reward] \u2726 Boss spoils: a Resurrection Gem, prised from the wreckage where Iron Litany Brother Konrad fell. Yours \u2014 the buried world is one boss lighter. (35 held)\n[2026-08-26T01:50:33.514Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-26T01:50:35.399Z] [debug] appstate: active \u2192 background (was active for 297482ms)\n",
+      "[2026-08-26T01:50:50.505Z] [debug] appstate: background \u2192 active (was background for 15106ms)\n[2026-08-26T01:50:53.460Z] [debug] appstate: active \u2192 background (was active for 2956ms)\n[2026-08-26T01:50:54.332Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 20810ms read \u26a0157507ms/write \u26a03244ms NOT-PER-CALL in 654t\u2192out 33t HIT-CAP (153ch)\n",
+      "[2026-08-26T01:50:54.390Z] [debug] homework: scene_intro \"Nimari\" \u2713 20877ms\n[2026-08-26T01:50:57.261Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-26T01:50:57.262Z] [debug] appstate: background \u2192 active (was background for 3801ms)\n[2026-08-26T01:50:57.446Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-26T01:51:00.144Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-26T01:51:00.145Z] [debug] appstate: active \u2192 background (was active for 2884ms)\n[2026-08-26T01:51:00.320Z] [debug] persist sizes(KB): total=217 player=46 wm=84[rooms=38 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=83 scene=4\n",
+      "[2026-08-26T02:04:06.970Z] [debug] appstate: background \u2192 active (was background for 786825ms)\n[2026-08-26T02:04:06.972Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #1).\n[2026-08-26T02:04:07.461Z] [debug] ctx: OPENED \u2014 live=1 (opened=2 released=1) \u2248425MB est\n[2026-08-26T02:04:07.465Z] [debug] qwen-watchdog: reinit #1 settled in 490ms \u2192 status='ready'.\n",
+      "[2026-08-26T02:04:10.504Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-26T02:04:10.505Z] [debug] appstate: active \u2192 background (was active for 3535ms)\n[2026-08-26T02:04:44.638Z] [debug] appstate: background \u2192 active (was background for 34133ms)\n[2026-08-26T02:04:44.647Z] [debug] homework: intro-fill armed after 14990ms idle\n",
+      "[2026-08-26T02:04:44.647Z] [debug] qwen-watchdog: Qwen ready again (recovered after 1 attempt).\n[2026-08-26T02:04:52.882Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-26T02:04:53.157Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 8460ms read 7740ms/write 564ms in 654t\u2192out 17t 11.8ms/t (84ch)\n",
+      "[2026-08-26T02:04:53.272Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 8460ms \u2014 intro-fill:\u2205\n[2026-08-26T02:04:53.272Z] [debug] homework: scene_intro \"Nimari\" \u2205 8627ms\n[2026-08-26T02:05:10.505Z] [world] You set course for The Monarch's Waystation. 23 tiles \u2014 about 2 days, 10 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 THE MONARCH'S WAYST",
+      "ATION on the travel row to close the distance; STOP TRAVEL to halt.\n[2026-08-26T02:05:10.516Z] [world] You push west. The silt is heavy underfoot, the horizon unchanged.\n[2026-08-26T02:05:10.517Z] [world] What you started here has not finished itself in your absence.\n[2026-08-26T02:05:10.517Z] [world] \u2726 Course set \u2014 Tribute of Mud. Heading to the objective: The Monarch's Waystation.\n",
+      "[2026-08-26T02:05:15.841Z] [debug] ui: tap \"missions\"\n[2026-08-26T02:05:16.000Z] [debug] persist sizes(KB): total=219 player=47 wm=86[rooms=40 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=83 scene=3\n[2026-08-26T02:05:29.710Z] [debug] homework: intro-fill armed after 13886ms idle\n",
+      "[2026-08-26T02:05:34.085Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4367ms read \u26a039893ms/write \u26a01145ms NOT-PER-CALL in 654t\u2192out 33t HIT-CAP (153ch)\n[2026-08-26T02:05:34.225Z] [debug] homework: scene_intro \"Nimari\" \u2713 4517ms\n[2026-08-26T02:05:34.652Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-26T02:05:36.069Z] [world] You strip the lantern pole carefully. Something usable comes free in your hand.\n[2026-08-26T02:05:36.069Z] [world] You work the tower wire over. A part of it comes loose, intact.\n[2026-08-26T02:05:36.069Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:05:36.070Z] [reward]     \u2022 Aether Dust (Common)\n[2026-08-26T02:05:36.070Z] [reward]     \u2022 Scrap Metal (Common)\n",
+      "[2026-08-26T02:05:38.054Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T02:05:38.078Z] [debug] spawn: gear=[Bonebreaker Mace, Shaman's Mud Helm, Mud Sledge] window=10 roster=new\n[2026-08-26T02:05:38.081Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n",
+      "[2026-08-26T02:05:38.082Z] [arbiter] The traders were right. Aetherkin. Some kneel to them; some burn them where they stand.\n[2026-08-26T02:05:38.082Z] [world] In life it was a child, no taller than your hip, one small hand closed around nothing \u2014 you find yourself wanting to know their name, and knowing you never will. They surfaced out of the flat mud like a held breath finally, terribly let go.",
+      "\n[2026-08-26T02:05:38.083Z] [world] It flinches from you and puts its back to the wall, hands raised \u2014 not a hunter, just something frightened that has forgotten everything except how to be afraid.\n[2026-08-26T02:05:38.083Z] [world] You set out west. Your boots sink half an inch into the mud-flats and pull free with each step.\n",
+      "[2026-08-26T02:05:38.083Z] [world] The loose end is exactly as loose as you left it.\n[2026-08-26T02:05:42.270Z] [debug] ui: tap \"flee\"\n[2026-08-26T02:05:42.279Z] [player] flee\n[2026-08-26T02:05:42.279Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=1\n[2026-08-26T02:05:42.337Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-26T02:05:42.506Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (168ms)\n[2026-08-26T02:05:44.139Z] [debug] skillcheck: escape d20=8 DEX 12 = 20 vs Pursuit 10 \u2014 Mud-Wracked Aetherkin (d20 7 + SPD 3) \u2192 PASS\n",
+      "[2026-08-26T02:05:44.216Z] [debug] stats: STR20 DEX13 INT10 WIS12 CHA12 STE3 | gear: STR+7,DEX+7,STE+2,WIS+1,CHA+1 | worn: main=Cantor's Tuning Fork off=Plasma Cutter head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring\n",
+      "[2026-08-26T02:05:44.216Z] [debug] train: dexterity (escape check) \u2192 progress 48/100\n[2026-08-26T02:05:44.217Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-08-26T02:05:56.986Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T02:05:58.570Z] [world] The Bonebreaker Mace comes up out of the silt with a small sucking protest.\n",
+      "[2026-08-26T02:05:58.571Z] [reward] \u2726 Bonebreaker Mace (Common).\n[2026-08-26T02:05:58.589Z] [world] The Mud Sledge was half under something. It is not now.\n[2026-08-26T02:05:58.589Z] [reward] \u2726 Mud Sledge (Common).\n[2026-08-26T02:05:58.590Z] [world] You work the Shaman's Mud Helm loose from where the mud had it.\n[2026-08-26T02:05:58.590Z] [reward] \u2726 Shaman's Mud Helm (Common).\n",
+      "[Filtered]",
+      "[2026-08-26T02:05:59.574Z] [world] You break the market debris apart. Among the pieces, something worth keeping.\n[2026-08-26T02:05:59.574Z] [world] You lever something loose from the merchant sign \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-26T02:05:59.575Z] [world] You work the torn tarp over. A part of it comes loose, intact.\n",
+      "[2026-08-26T02:05:59.575Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:05:59.576Z] [reward]     \u2022 Moth-Eaten Felt Scrap (Common)\n[2026-08-26T02:05:59.576Z] [reward]     \u2022 Horn-Capped Dowel (Common)\n[2026-08-26T02:05:59.576Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-08-26T02:05:59.577Z] [reward]     \u2022 Flint Core Nodule (Common)\n[2026-08-26T02:05:59.577Z] [reward]     \u2022 Cloth Scrap x3 (Common)\n",
+      "[2026-08-26T02:06:02.934Z] [debug] ui: tap \"investigate\"\n[2026-08-26T02:06:04.784Z] [player] investigate the ground\n[2026-08-26T02:06:04.784Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-26T02:06:04.790Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Mud Fragment (Common).\n",
+      "[2026-08-26T02:06:04.796Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T02:06:04.935Z] [cognitive] CLIMB  (138ms)\n[2026-08-26T02:06:05.257Z] [debug] persist sizes(KB): total=204 player=47 wm=71[rooms=26 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=82 scene=3\n[2026-08-26T02:06:07.371Z] [debug] ui: tap \"ENTER\"\n",
+      "[2026-08-26T02:06:07.385Z] [world] You step inside ruined banner hall, into the great hall.\n[2026-08-26T02:06:07.385Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n[2026-08-26T02:06:08.454Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-26T02:06:10.001Z] [world] You break the banner apart. Among the pieces, something worth keeping.\n[2026-08-26T02:06:10.001Z] [world] You work the bench over. A part of it comes loose, intact.\n[2026-08-26T02:06:10.002Z] [world] You break the fire pit apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-26T02:06:10.002Z] [world] You work the table over. A part of it comes loose, intact.\n[2026-08-26T02:06:10.002Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:06:10.002Z] [reward]     \u2022 Worn Tartarian Coin x7 (Common)\n[2026-08-26T02:06:10.003Z] [reward]     \u2022 Stick (Common)\n[2026-08-26T02:06:10.003Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-08-26T02:06:11.088Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-26T02:06:12.601Z] [player] investigate the ground\n[2026-08-26T02:06:12.602Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-26T02:06:12.609Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Golem Core (Rare).\n[2026-08-26T02:06:12.619Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-26T02:06:12.756Z] [cognitive] CLIMB  (136ms)\n[2026-08-26T02:06:13.589Z] [debug] ui: tap \"\u2190 Armory\"\n[2026-08-26T02:06:13.594Z] [world] You step into the armory.\n[2026-08-26T02:06:13.595Z] [world] Weapon racks, mostly stripped bare. A whetstone, a barrel of broken hafts, and a weapons chest with a stubborn lock.\n[2026-08-26T02:06:14.913Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-26T02:06:18.561Z] [world] You break the barrel apart. Among the pieces, something worth keeping.\n[2026-08-26T02:06:18.562Z] [world] You break the chest apart. Among the pieces, something worth keeping.\n[2026-08-26T02:06:18.562Z] [world] The rack yields little of value, though a Cloth Scrap ends up in your pack.\n",
+      "[2026-08-26T02:06:18.562Z] [world] You salvage the whetstone. The take is small but real.\n[2026-08-26T02:06:18.562Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:06:18.562Z] [reward]     \u2022 Aether Dust x4 (Common)\n[2026-08-26T02:06:18.562Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-08-26T02:06:18.569Z] [world] Already worked over: barrel, chest, rack, whetstone.\n",
+      "[2026-08-26T02:06:19.388Z] [debug] qwen\u23f1 ambient ok 6522ms read 2553ms/write 1558ms in 359t\u2192out 31t 7.1ms/t HIT-CAP (146ch)\n[2026-08-26T02:06:19.502Z] [debug] arbiter: ambient stale:moved-scene\u2192banked 6883ms\n",
+      "[2026-08-26T02:06:19.503Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You feel the weight of your journey, a burden that never seems to ease. Each step forward, you come to a new challenge, \"\n[2026-08-26T02:06:19.822Z] [debug] ui: tap \"\u2198 Vault\"\n[2026-08-26T02:06:19.828Z] [world] You step into the vault.\n",
+      "[2026-08-26T02:06:19.828Z] [world] An iron door stands ajar. Strongboxes line the floor, most "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxtuln8peb [inline 1/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtaxtuln8peb"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T03:02:59.305356Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "29": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 291,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T03:02:59.782000Z",
+  "fingerprints": [
+    "544c6c9afe0650522c39495d0fbfdbfc"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "f4c744fb9d1346219e3c382d97f94f2a",
+  "previousEventID": "f3ddaddb11ab40bfab651c04f6060971"
+}

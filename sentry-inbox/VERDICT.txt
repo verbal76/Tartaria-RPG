@@ -1,18 +1,97 @@
 
 ════ VERDICT ════
-  ⚠⚠ FETCH PROBLEMS THIS RUN — the deeper read may not have happened:
-    issue list FAILED for tartaria: HTTP Error 400: Bad Request
+  every fetch this run succeeded
+  /organizations/hot-attic-games-llc/issues/7689752967/events/?full=false
+    1 page(s), 2 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7689752968/events/?full=false
+    1 page(s), 20 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7689754199/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7689755171/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7689803963/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7690253544/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7690450029/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7690450327/events/?full=false
+    1 page(s), 3 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7690607357/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694689361/events/?full=false
+    1 page(s), 27 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694689367/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694690094/events/?full=false
+    1 page(s), 45 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694690120/events/?full=false
+    1 page(s), 2 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694691507/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694691570/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694727413/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694727456/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694727486/events/?full=false
+    1 page(s), 46 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694727500/events/?full=false
+    1 page(s), 4 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694727671/events/?full=false
+    1 page(s), 23 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694727735/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694727904/events/?full=false
+    1 page(s), 54 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694727949/events/?full=false
+    1 page(s), 2 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694728258/events/?full=false
+    1 page(s), 22 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694728281/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694761245/events/?full=false
+    1 page(s), 27 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694761255/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694761393/events/?full=false
+    1 page(s), 27 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694761418/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694761507/events/?full=false
+    1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
+  /organizations/hot-attic-games-llc/issues/7694761524/events/?full=false
+    1 page(s), 6 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694762222/events/?full=false
+    1 page(s), 2 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7694762298/events/?full=false
+    1 page(s), 2 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7695394759/events/?full=false
+    1 page(s), 28 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7695394782/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7695395111/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7695395115/events/?full=false
+    1 page(s), 28 rows — COMPLETE — ended short of a full page
   /projects/hot-attic-games-llc/tartaria/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
+  /projects/hot-attic-games-llc/tartaria/issues/?query=&statsPeriod=
+    1 page(s), 37 rows — COMPLETE — ended short of a full page
   ⚠⚠ AT LEAST ONE LISTING IS NOT PROVEN COMPLETE. Any MISSING parts below are UNPROVEN — they may simply be unread. DO NOT conclude the device failed, and DO NOT ask for another send on this basis.
   incomplete bundles:
-    mtawqdrsm78g: 3/23 parts
     mtaxtx2bzl8l: 5/27 parts
   scrub cost per bundle:
     mtavnjvdw4u4: 4 redactions, 60000 chars
-    mtawqnivyk0q: 5 redactions, 74999 chars
+    mtavou0hiube: 1 redactions, 9994 chars
+    mtawq2snlk55: 1 redactions, 12000 chars
+    mtawq56ysvi3: 1 redactions, 12387 chars
+    mtawqdrsm78g: 4 redactions, 59999 chars
+    mtawqnivyk0q: 20 redactions, 153480 chars
     mtawr2axtwkc: 4 redactions, 60000 chars
     mtawr57g7td7: 8 redactions, 61376 chars
+    mtaxtuln8peb: 9 redactions, 3084 chars
     mtaxu4o1qm9m: 4 redactions, 1498 chars
     mtaxudrxsjum: 2 redactions, 778 chars
     mtaxuqrhd0b3: 4 redactions, 1376 chars

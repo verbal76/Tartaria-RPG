@@ -1,0 +1,152 @@
+{
+  "id": "a793b712cca842aa8a21d114acf7178e",
+  "groupID": "7694727671",
+  "eventID": "a793b712cca842aa8a21d114acf7178e",
+  "projectID": "4511945117532160",
+  "size": 17724,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqdrsm78g [inline 6/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqdrsm78g [inline 6/23]",
+  "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqdrsm78g [inline 6/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c1370b4fb9a64abc8cc4868650cf6ad1",
+      "span_id": "97f603e021177db6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunk": " memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=87 scene=4\n[2026-08-21T02:18:51.541Z] [world] You salvage the cracked statue. The take is small but real.\n[2026-08-21T02:18:51.541Z] [world] You salvage the flood debris. The take is small but real.\n[2026-08-21T02:18:51.542Z] [world] You strip the fountain carefully. Something usable comes free in your hand.\n[2026-08-21T02:18:51.542Z] [world] You salvage the noble skeleton. The take is small but real.\n[2026-08-21T02:18:51.542Z] [world] You work the pedestal over. A part of it comes loose, intact.\n[2026-08-21T02:18:51.542Z] [world] You work the seal over. A part of it comes loose, intact.\n[2026-08-21T02:18:51.543Z] [reward] \u2726 Salvage haul:\n[2026-08-21T02:18:51.543Z] [reward]     \u2022 Stick (Common)\n[2026-08-21T02:18:51.543Z] [reward]     \u2022 Aether Crystal x3 (Common)\n[2026-08-21T02:18:51.543Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-21T02:18:51.544Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-08-21T02:18:53.974Z] [debug] ui: tap \"investigate\"\n[2026-08-21T02:18:55.291Z] [player] investigate the ground\n[2026-08-21T02:18:55.292Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-21T02:18:55.307Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-08-21T02:18:55.319Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-21T02:18:55.320Z] [arbiter] The Arbiter looks around. \"Mud Monarch heralds still walk these avenues, though the avenues are buried and the heralds long dead.\"\n[2026-08-21T02:18:55.320Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-21T02:18:55.320Z] [system] \u23f3 Time passed: 24 min\n[2026-08-21T02:18:55.426Z] [cognitive] CLIMB  (105ms)\n[2026-08-21T02:18:58.644Z] [debug] ui: tap \"\u2192 SAMARRAN\"\n[2026-08-21T02:18:58.660Z] [debug] spawn: gear=[Rough Hewn Mask, Mud Sledge, Rough-Hewn Chestplate] window=10 roster=new\n[2026-08-21T02:18:58.662Z] [world] Someone is sitting on their pack at the edge of the path \u2014 no party, no fire, and a long way from anywhere. They stand when they see you.\n[2026-08-21T02:18:58.662Z] [system] Try \"talk to the traveler\" \u2014 they want something from you.\n[2026-08-21T02:18:58.663Z] [world] You walk east through open silt. The compass tells you Samarran lies 3 stretches further east.\n[2026-08-21T02:18:58.663Z] [world] The thread you were following waits where you left it.\n[2026-08-21T02:18:59.927Z] [debug] ui: tap \"take / salvage\"\n[2026-08-21T02:19:01.694Z] [world] You take the Mud Sledge from where it lay.\n[2026-08-21T02:19:01.695Z] [reward] \u2726 Mud Sledge (Common).\n[2026-08-21T02:19:01.710Z] [world] You take the Rough Hewn Mask from where it lay.\n[2026-08-21T02:19:01.710Z] [reward] \u2726 Rough Hewn Mask (Common).\n[2026-08-21T02:19:01.711Z] [world] You take the Rough-Hewn Chestplate from where it lay.\n[2026-08-21T02:19:01.712Z] [reward] \u2726 Rough-Hewn Chestplate (Common).\n[2026-08-21T02:19:02.812Z] [world] You take the Aetheric Locket from where it lay.\n[2026-08-21T02:19:02.813Z] [reward] \u2726 Aetheric Locket (Common).\n[2026-08-21T02:19:03.888Z] [reward] \u2726 Found Oct 12 \u2014 The Siege of St. Petersburg. (open Contracts \u2192 Collectibles to read)\n[2026-08-21T02:19:03.901Z] [world] You work the drain grate over. A part of it comes loose, intact.\n[2026-08-21T02:19:03.901Z] [world] You break the flood basin apart. Among the pieces, something worth keeping.\n[2026-08-21T02:19:03.902Z] [world] You break the rubble pile down. Among the pieces, a fragment of someone's writing \u2014 held against the world by stubbornness alone.\n[2026-08-21T02:19:03.902Z] [reward] \u2726 Salvage haul:\n[2026-08-21T02:19:03.902Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-08-21T02:19:03.902Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-21T02:19:05.044Z] [debug] ui: tap \"investigate\"\n[2026-08-21T02:19:06.332Z] [player] investigate the ground\n[2026-08-21T02:19:06.333Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-08-21T02:19:06.341Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Drone Core (Uncommon).\n[2026-08-21T02:19:06.350Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-21T02:19:06.350Z] [system] \u23f3 Time passed: 24 min\n[2026-08-21T02:19:06.355Z] [world] A Forgotten Order war party crests the rise \u2014 2 of them, blades already out. They've marked you for standing with the Conspiracy Architects.\n[2026-08-21T02:19:06.355Z] [arbiter] \"The Forgotten Order do not forgive a friend of the Conspiracy Architects,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-21T02:19:06.528Z] [cognitive] CLIMB  (177ms)\n[2026-08-21T02:19:06.942Z] [debug] persist sizes(KB): total=184 player=49 wm=43[rooms=14 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=86 scene=6\n[2026-08-21T02:19:14.747Z] [debug] ui: tap \"approach\"\n[2026-08-21T02:19:16.928Z] [player] approach Forgotten Order Raider 1\n[2026-08-21T02:19:16.929Z] [debug] parser: intent=advance conf=1.00 verb=approach target=forgotten order raider 1 resolved=Forgotten Order Raider 1 range=mid enemies=2 hooks=2\n[2026-08-21T02:19:16.936Z] [debug] move: advance from range=mid enemies=2 weather=Aether Lightning cost=1 partial=0\n[2026-08-21T02:19:16.936Z] [debug] move: range mid -> close\n[2026-08-21T02:19:16.936Z] [world] You close the gap with the Forgotten Order Raider 1 and Forgotten Order Raider 2. (range: close / arm's reach)\n[2026-08-21T02:19:16.938Z] [debug] ac-shift 22\u219225: race/base 12 + gear 17 + title 0 \u2192 trimmed 25 + status 0 | worn: head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle\n[2026-08-21T02:19:16.938Z] [combat] Forgotten Order Raider 1 \u2014 d20 \u2192 3 + ATK 16 = 19 vs your AC 25 \u2014 \u2717 MISS\n[2026-08-21T02:19:16.939Z] [combat] Forgotten Order Raider 2 \u2014 d20 \u2192 5 + ATK 16 = 21 vs your AC 25 \u2014 \u2717 MISS\n[2026-08-21T02:19:16.939Z] [debug] arbiter: template (reason=combat)\n[2026-08-21T02:19:16.939Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-21T02:19:17.075Z] [cognitive] neutral  (135ms)\n[2026-08-21T02:19:20.600Z] [debug] ui: tap \"ember (14/14)\"\n[2026-08-21T02:19:22.366Z] [debug] ui: tap \"smoldering repeater crossbow\"\n[2026-08-21T02:19:22.426Z] [player] attack with the mud repeater crossbow\n[2026-08-21T02:19:22.427Z] [debug] parser: intent=attack conf=1.00 verb=attack target=mud repeater crossbow resolved=Mud Repeater Crossbow range=close enemies=2 hooks=2\n[2026-08-21T02:19:22.429Z] [debug] attack: target=Forgotten Order Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Mud Repeater Crossbow bareHand=false\n[2026-08-21T02:19:22.431Z] [debug] attack: status mods tired -1\n[2026-08-21T02:19:22.460Z] [world] You commit forward with the smoldering mud repeater crossbow. Forgotten Order Raider 1 watches your hands.\n[2026-08-21T02:19:22.461Z] [system] \u23f3 Time passed: 6 min\n[2026-08-21T02:19:22.573Z] [cognitive] ATTACK \u00b7 AIM \u00b7 SWIM \u00b7 TAKE_COVER \u00b7 THROW  (111ms)\n[2026-08-21T02:19:26.693Z] [world] You seize the initiative. Forgotten Order Raider 1 has no time to react.\n[2026-08-21T02:19:26.693Z] [combat] You \u2014 d20 \u2192 2 + WIS 6 + 2 (point blank) tired -1 = 9 vs Forgotten Order Raider 1 AC 19 \u2014 \u2717 MISS\n[2026-08-21T02:19:26.693Z] [combat] The smoldering mud repeater crossbow cuts air. Forgotten Order Raider 1 answers immediately.\n[2026-08-21T02:19:26.695Z] [combat] Forgotten Order Raider 1 turns on Ember \u2014 d20 13 + ATK 14 = 27 vs Ember's AC 10 \u2014 \u2713 HIT\n[2026-08-21T02:19:26.696Z] [combat] Ember takes 15. (0/14 HP left)\n[2026-08-21T02:19:26.696Z] [arbiter] Ember drops under the Forgotten Order Raider 1 and drags herself clear of the fight. She is down \u2014 tend her within a day or she won't get back up.\n[2026-08-21T02:19:26.698Z] [combat] Forgotten Order Raider 2 \u2014 d20 \u2192 15 + ATK 14 = 29 vs your AC 25 \u2014 \u2713 HIT\n[2026-08-21T02:19:26.836Z] [combat] Forgotten Order Raider 2 deals 8 bludgeoning damage [armor \u221235%]. You have 26 HP remaining.\n[2026-08-21T02:19:53.811Z] [debug] ui: tap \"inventory\"\n[2026-08-21T02:20:03.002Z] [world] You feed Ember 7\u00d7 Smoke-Cured Jerky Strip. +14 HP (14/14), +loyalty.\n[2026-08-21T02:20:11.390Z] [debug] ui: tap \"dodge\"\n[2026-08-21T02:20:11.408Z] [player] dodge\n[2026-08-21T02:20:11.416Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=2\n[2026-08-21T02:20:11.418Z] [world] You commit to the dodge. Slip Forgotten Order Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-21T02:20:11.459Z] [combat] Forgotten Order Raider 2 \u2014 d20 \u2192 5 + ATK 14 = 19 vs your AC 25 \u2014 \u2717 EVADED\n[2026-08-21T02:20:11.460Z] [combat] Dodge \u2014 d20 \u2192 18 + DEX 16 = 34 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-21T02:20:11.460Z] [world] You slip Forgotten Order Raider 2's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-08-21T02:20:11.462Z] [debug] ac-shift 25\u219228: race/base 12 + gear 17 + title 0 \u2192 trimmed 25 + status 3 | worn: head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle\n[2026-08-21T02:20:11.462Z] [combat] Forgotten Order Raider 1 \u2014 d20 \u2192 12 + ATK 14 = 26 vs your AC 28 \u2014 \u2717 MISS\n[2026-08-21T02:20:11.463Z] [system] \u23f3 Time passed: 6 min\n[2026-08-21T02:20:11.687Z] [cognitive] neutral  (118ms)\n[2026-08-21T02:20:12.878Z] [debug] persist sizes(KB): total=184 player=49 wm=44[rooms=14 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=86 scene=6\n[2026-08-21T02:20:13.953Z] [debug] ui: tap \"off: acid-etched quarry-hewn skewer\"\n[2026-08-21T02:20:13.960Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-21T02:20:14.012Z] [player] attack with the off-hand quarry-hewn skewer\n[2026-08-21T02:20:14.012Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand quarry hewn skewer resolved=Quarry-Hewn Skewer range=close enemies=2 hooks=2\n[2026-08-21T02:20:14.013Z] [debug] attack: target=Forgotten Order Raider 1 range=close reach.bands=[close] reach.label=Quarry-Hewn Skewer bareHand=false\n[2026-08-21T02:20:14.014Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-21T02:20:14.040Z] [world] You raise the acid-etched quarry-hewn skewer toward Forgotten Order Raider 1. The room narrows around the both of you.\n[2026-08-21T02:20:14.040Z] [system] \u23f3 Time passed: 6 min\n[2026-08-21T02:20:14.148Z] [cognitive] AIM \u00b7 THROW \u00b7 ATTACK  (107ms)\n[2026-08-21T02:20:17.370Z] [world] Forgotten Order Raider 1 moves first. The pressure is immediate.\n[2026-08-21T02:20:17.372Z] [debug] ac-shift 28\u219225: race/base 12 + gear 17 + title 0 \u2192 trimmed 25 + status 0 | worn: head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle\n[2026-08-21T02:20:17.372Z] [combat] Forgotten Order Raider 2 \u2014 d20 \u2192 5 + ATK 14 = 19 vs your AC 25 \u2014 \u2717 MISS\n[2026-08-21T02:20:17.373Z] [combat] Forgotten Order Raider 1 \u2014 d20 \u2192 7 + ATK 14 = 21 vs your AC 25 \u2014 \u2717 MISS\n[2026-08-21T02:20:17.373Z] [combat] You \u2014 d20 \u2192 1 + DEX 16 perfect opening (2\u00d7 dice) = 17 vs Forgotten Order Raider 1 AC 19 \u2014 \u2717 FUMBLE\n[2026-08-21T02:20:17.374Z] [combat] Your strike with the acid-etched quarry-hewn skewer glances off. Forgotten Order Raider 1 seizes the opening.\n[2026-08-21T02:20:19.973Z] [debug] ui: tap \"stealth\"\n[2026-08-21T02:20:19.987Z] [player] sneak\n[2026-08-21T02:20:19.987Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=close enemies=2 hooks=2\n[2026-08-21T02:20:20.034Z] [system] \u23f3 Time passed: 15 min\n[2026-08-21T02:20:20.146Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (111ms)\n[2026-08-21T02:20:21.972Z] [debug] skillcheck: stealth d20=20 STE 9 = 29 vs DC 12 \u2014 Hard \u2192 (resolved below)\n[2026-08-21T02:20:22.028Z] [debug] stats: STR6 DEX16 INT6 WIS6 CHA9 STE9 | gear: DEX+10,STR+2,CHA+2,INT+1,WIS+1,STE+2 | worn: main=Mud Repeater Crossbow off=Quarry-Hewn Skewer head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle amulet=Aetheric Compass ring=Ring of Shadows\n[2026-08-21T02:20:22.029Z] [debug] train: stealth (stealth check) \u2192 progress 38/100\n[2026-08-21T02:20:22.029Z] [world] Dusk is with you \u2014 the silt eats sound after dark. (stealth +1, night)\n[2026-08-21T02:20:22.030Z] [world] You break away and throw yourself into cover. By the time Forgotten Order Raider 1 find the angle, you're already gone \u2014 the next strike comes from nowhere. (+5 next attack)\n[2026-08-21T02:20:22.030Z] [debug] stealth: reset WIN init 32 vs 14 (cover, +5 2r)\n[2026-08-21T02:20:22.031Z] [combat] Forgotten Order Raider 1 \u2014 d20 \u2192 16 + ATK 14 = 30 vs your AC 25 \u2014 \u2713 HIT\n[2026-08-21T02:20:22.033Z] [combat] Forgotten Order Raider 2 \u2014 d20 \u2192 12 + ATK 14 = 26 vs your AC 25 \u2014 \u2713 HIT\n[2026-08-21T02:20:22.034Z] [arbiter] The Arbiter looks around. \"Asgardar does not forget being a capital. It only forgets that the world above has moved on.\"\n[2026-08-21T02:20:22.173Z] [combat] Forgotten Order Raider 1 deals 16 bludgeoning damage [armor \u221235%]. You have 10 HP remaining.\n[2026-08-21T02:20:22.173Z] [combat] Forgotten Order Raider 1's strike leaves you bleeding.\n[2026-08-21T02:20:22.173Z] [combat] Forgotten Order Raider 2 deals 11 bludgeoning damage [armor \u221235%]. You fall.\n[2026-08-21T02:20:22.173Z] [combat] An end at Asgardar. The Arbiter watches and says nothing.\n[2026-08-21T02:20:22.173Z] [system] Verbal has fallen. A Resurrection Gem from the title screen can bring them back.\n[2026-08-21T02:20:22.408Z] [system] You join the Fallen of Tartaria \u2014 2 names the buried world keeps now. Read the roll from the Lore Codex.\n[2026-08-21T02:20:22.518Z] [reward] \u2726 A Resurrection Gem pulses in Verbal's pack \u2014 the buried world owes you one. (35 held)\n[2026-08-21T02:20:29.109Z] [debug] scene: loc=asgardar hub=- arrival=n opening=n passing=y\n[2026-08-21T02:20:29.178Z] [world] Bolts of blue-purple energy strike without thunder \u2014 trapped Etherium venting a charge it has held since the calcification. Each flash leaves an afterimage burned onto the eye.\n\nYou are at Asgardar. The ancient capital of Tartaria. Its collector-tower, the Grand Spire of Asgardar, still stands out past the last streets and once channeled cosmic Aether into the city grid.\n\nA Mud Demon (Mud Creature, Legendary) emerges. Its Claw Slash can deal 3D10.\n\nEyes meet at the edge of the lamplight, briefly, and then move on. Briefly is the word to mark.\n[2026-08-21T02:20:29.178Z] [combat] Distance: mid-range. Mud Repeater Crossbow \u2713 in range \u00b7 Quarry-Hewn Skewer \u2014 needs approach.\n[2026-08-21T02:20:29.178Z] [arbiter] The Arbiter's voice drops. \"This one's beyond you for now \u2014 there's no shame in it. Type 'flee' and put ground between you, and come back when you're harder to kill.\"\n[2026-08-21T02:20:2",
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqdrsm78g [inline 6/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtawqdrsm78g"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "6"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T02:32:17.958663Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T02:32:18.242000Z",
+  "fingerprints": [
+    "8e8887eb2ec21d4b16a51b166194fb1c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b8b6957f4c2442758157cc71fd544238",
+  "previousEventID": "a63022c479834523868adf470493e2ec"
+}

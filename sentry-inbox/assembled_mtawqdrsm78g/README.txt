@@ -1,1 +1,1 @@
-bundle mtawqdrsm78g: 3/23 parts, 45000 chars — MISSING [1, 2, 3, 5, 6, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23]
+bundle mtawqdrsm78g: 23/23 parts, 271671 chars — SCRUBBED: 4 redactions cost 59999 chars (parts [9, 17, 20, 21], rules ['@password:filter'])

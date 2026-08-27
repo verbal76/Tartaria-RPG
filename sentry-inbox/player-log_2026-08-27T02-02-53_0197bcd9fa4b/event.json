@@ -1,0 +1,152 @@
+{
+  "id": "0197bcd9fa4b41f89904b7f009f6bb6e",
+  "groupID": "7694690094",
+  "eventID": "0197bcd9fa4b41f89904b7f009f6bb6e",
+  "projectID": "4511945117532160",
+  "size": 17697,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavojr16pi8 [inline 1/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavojr16pi8 [inline 1/23]",
+  "title": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavojr16pi8 [inline 1/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "d40f66b0cbaf4b979feb773ed22807f7",
+      "span_id": "811a571431b2e1f0",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunk": "=== TARTARIA LOG \u00b7 325975 CHARS \u00b7 BEGIN ===\n[2026-08-21T01:50:41.591Z] [debug] persist sizes(KB): total=90 player=46 wm=40[rooms=14 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=0 scene=3\n[2026-08-21T01:50:45.751Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-21T01:50:46.371Z] [debug] ctx: OPENED \u2014 live=1 (opened=4 released=3) \u2248425MB est\n[2026-08-21T01:50:57.559Z] [debug] appstate: active \u2192 background (was active for 11144ms)\n[2026-08-21T01:50:57.844Z] [debug] ctx: RELEASED \u2014 live=0 (opened=4 released=4)\n[2026-08-21T01:51:21.285Z] [debug] appstate: background \u2192 active (was background for 23726ms)\n[2026-08-21T01:51:29.293Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-21T01:51:29.843Z] [debug] ctx: OPENED \u2014 live=1 (opened=5 released=4) \u2248425MB est\n[2026-08-21T01:51:37.282Z] [debug] appstate: active \u2192 background (was active for 7422ms)\n[2026-08-21T01:51:37.414Z] [debug] ctx: RELEASED \u2014 live=0 (opened=5 released=5)\n[2026-08-21T02:02:26.312Z] [debug] appstate: background \u2192 active (was background for 649026ms)\n[2026-08-21T02:02:27.356Z] [debug] OTA session start: 2026-08-20-1390-the-workflows-audit.\n[2026-08-21T02:02:27.356Z] [world] You step back into Asgardar. The world waits for your move.\n[2026-08-21T02:02:27.356Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Verbal. The road kept your place.\"\n[2026-08-21T02:02:32.793Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T02:02:32.794Z] [debug] appstate: active \u2192 background (was active for 6486ms)\n[2026-08-21T02:11:39.981Z] [debug] appstate: background \u2192 active (was background for 547187ms)\n[2026-08-21T02:11:42.743Z] [debug] ui: tap \"\u2192 \u2713 SECOND LANDING\"\n[2026-08-21T02:11:42.768Z] [player] go east\n[2026-08-21T02:11:42.771Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0\n[2026-08-21T02:11:42.773Z] [world] You head on to the Second Landing.\n[2026-08-21T02:11:42.773Z] [debug] scene: loc=asgardar hub=buried_landing_two arrival=n opening=n passing=n\n[2026-08-21T02:11:42.782Z] [world] Architect's Cell \u2014 Second Landing. Pumps west, records east, the cuts south, the stair back north. A laminated sign gives every direction a status code. The south corridor's code is not in the legend, and asking after it is itself a flag.\n[2026-08-21T02:11:42.783Z] [world] You've stood here again. (visit 3)\n[2026-08-21T02:11:42.783Z] [world] Paths: north to First Landing \u00b7 south to Shallow Digs \u00b7 east to Storage Halls \u00b7 west to Pump Room. (Type 'leave outpost' to head into the wilds.)\n[2026-08-21T02:11:44.175Z] [debug] ui: tap \"\u2192 \u2713 STORAGE HALLS\"\n[2026-08-21T02:11:44.207Z] [player] go east\n[2026-08-21T02:11:44.208Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0\n[2026-08-21T02:11:44.209Z] [world] You head on to the Storage Halls.\n[2026-08-21T02:11:44.209Z] [debug] scene: loc=asgardar hub=buried_storage arrival=n opening=n passing=n\n[2026-08-21T02:11:44.215Z] [world] Architect's Cell \u2014 Storage Halls. Tartarian crates re-labelled with barcodes, most rotted through, some intact \u2014 inventory the Architects took possession of rather than bought. The mud-glass containers in the back row are shelved under a category with no name on it. One corridor, back west to the junction.\n[2026-08-21T02:11:44.215Z] [world] You've stood here before. (visit 2)\n[2026-08-21T02:11:44.216Z] [world] Paths: west to Second Landing. (Type 'leave outpost' to head into the wilds.)\n[2026-08-21T02:11:44.216Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-21T02:11:44.216Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-21T02:11:44.338Z] [debug] persist sizes(KB): total=93 player=48 wm=38[rooms=11 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=5 scene=3\n[2026-08-21T02:11:46.478Z] [debug] ui: tap \"\u2190 \u2713 SECOND LANDING\"\n[2026-08-21T02:11:46.510Z] [player] go west\n[2026-08-21T02:11:46.511Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0\n[2026-08-21T02:11:46.512Z] [world] You head on to the Second Landing.\n[2026-08-21T02:11:46.513Z] [debug] scene: loc=asgardar hub=buried_landing_two arrival=n opening=n passing=n\n[2026-08-21T02:11:46.518Z] [world] Architect's Cell \u2014 Second Landing. Pumps west, records east, the cuts south, the stair back north. A laminated sign gives every direction a status code. The south corridor's code is not in the legend, and asking after it is itself a flag.\n[2026-08-21T02:11:46.518Z] [world] You've stood here again. (visit 4)\n[2026-08-21T02:11:46.518Z] [world] Paths: north to First Landing \u00b7 south to Shallow Digs \u00b7 east to Storage Halls \u00b7 west to Pump Room. (Type 'leave outpost' to head into the wilds.)\n[2026-08-21T02:11:46.519Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-21T02:11:46.519Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-21T02:11:47.608Z] [debug] ui: tap \"\u2190 \u2713 PUMP ROOM\"\n[2026-08-21T02:11:47.635Z] [player] go west\n[2026-08-21T02:11:47.636Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0\n[2026-08-21T02:11:47.637Z] [world] You head on to the Pump Room.\n[2026-08-21T02:11:47.637Z] [debug] scene: loc=asgardar hub=buried_pumps arrival=n opening=n passing=n\n[2026-08-21T02:11:47.642Z] [world] Architect's Cell \u2014 The Pump Room. Old Aetheric pumps churn the silt-water out of the lower floors, wired into a modern panel with a maintenance log nobody has signed since the handover. They have run for centuries. The only corridor runs back east to the junction.\n[2026-08-21T02:11:47.642Z] [world] You've stood here before. (visit 2)\n[2026-08-21T02:11:47.642Z] [world] Paths: east to Second Landing. (Type 'leave outpost' to head into the wilds.)\n[2026-08-21T02:11:47.643Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-21T02:11:47.643Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-21T02:11:47.997Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-21T02:11:49.157Z] [debug] ctx: OPENED \u2014 live=1 (opened=6 released=5) \u2248425MB est\n[2026-08-21T02:12:01.779Z] [debug] ui: tap \"\u2192 \u2713 SECOND LANDING\"\n[2026-08-21T02:12:01.807Z] [player] go east\n[2026-08-21T02:12:01.807Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0\n[2026-08-21T02:12:01.809Z] [world] You head on to the Second Landing.\n[2026-08-21T02:12:01.809Z] [debug] scene: loc=asgardar hub=buried_landing_two arrival=n opening=n passing=n\n[2026-08-21T02:12:01.821Z] [world] Architect's Cell \u2014 Second Landing. Pumps west, records east, the cuts south, the stair back north. A laminated sign gives every direction a status code. The south corridor's code is not in the legend, and asking after it is itself a flag.\n[2026-08-21T02:12:01.821Z] [world] You've stood here again. (visit 5)\n[2026-08-21T02:12:01.822Z] [world] Paths: north to First Landing \u00b7 south to Shallow Digs \u00b7 east to Storage Halls \u00b7 west to Pump Room. (Type 'leave outpost' to head into the wilds.)\n[2026-08-21T02:12:01.916Z] [cognitive] neutral  (87ms)\n[2026-08-21T02:12:03.246Z] [debug] ui: tap \"take / salvage\"\n[2026-08-21T02:12:04.520Z] [world] You take the Shaman's Warden Gloves from where it lay.\n[2026-08-21T02:12:04.520Z] [reward] \u2726 Shaman's Warden Gloves (Common).\n[2026-08-21T02:12:04.716Z] [debug] persist sizes(KB): total=101 player=48 wm=40[rooms=13 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=10 scene=3\n[2026-08-21T02:12:06.011Z] [world] You scavenge the lantern thoroughly. One Bent Nail survives the sorting.\n[2026-08-21T02:12:06.012Z] [world] You work the rusted aether-tether grapple point over. A part of it comes loose, intact.\n[2026-08-21T02:12:06.012Z] [world] You work the salt-crusted library archive console over. A part of it comes loose, intact.\n[2026-08-21T02:12:06.012Z] [world] You break the sign apart. Among the pieces, something worth keeping.\n[2026-08-21T02:12:06.012Z] [world] You strip the step carefully. Something usable comes free in your hand.\n[2026-08-21T02:12:06.012Z] [world] You strip the stripped engine room toolbench carefully. Something usable comes free in your hand.\n[2026-08-21T02:12:06.013Z] [reward] \u2726 Salvage haul:\n[2026-08-21T02:12:06.013Z] [reward]     \u2022 Bent Nail (Common)\n[2026-08-21T02:12:06.013Z] [reward]     \u2022 Smooth Stone x4 (Common)\n[2026-08-21T02:12:06.013Z] [reward]     \u2022 Automaton Circuit x2 (Common)\n[2026-08-21T02:12:06.013Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-08-21T02:12:06.013Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-08-21T02:12:09.412Z] [debug] ui: tap \"\u2190 \u2713 PUMP ROOM\"\n[2026-08-21T02:12:09.424Z] [player] go west\n[2026-08-21T02:12:09.424Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0\n[2026-08-21T02:12:09.425Z] [world] You head on to the Pump Room.\n[2026-08-21T02:12:09.425Z] [debug] scene: loc=asgardar hub=buried_pumps arrival=n opening=n passing=n\n[2026-08-21T02:12:09.430Z] [world] Architect's Cell \u2014 The Pump Room. Old Aetheric pumps churn the silt-water out of the lower floors, wired into a modern panel with a maintenance log nobody has signed since the handover. They have run for centuries. The only corridor runs back east to the junction.\n[2026-08-21T02:12:09.430Z] [world] You've stood here again. (visit 3)\n[2026-08-21T02:12:09.430Z] [world] Paths: east to Second Landing. (Type 'leave outpost' to head into the wilds.)\n[2026-08-21T02:12:09.435Z] [debug] arbiter: template (reason=cooldown)\n[2026-08-21T02:12:09.435Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-21T02:12:09.553Z] [cognitive] TRAVEL  (111ms)\n[2026-08-21T02:12:10.914Z] [debug] ui: tap \"take / salvage\"\n[2026-08-21T02:12:11.502Z] [debug] qwen\u23f1 narration:scene_intro preempted 9515ms read 9443ms/write 0ms in 830t\u2192out 0t 11.4ms/t (3ch)\n[2026-08-21T02:12:11.613Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro after 9515ms \u2014 cancelled:player-acted-again\n[2026-08-21T02:12:12.805Z] [world] You work the shattered grand spire capacitor over. A part of it comes loose, intact.\n[2026-08-21T02:12:12.806Z] [reward] \u2726 Salvage haul:\n[2026-08-21T02:12:12.806Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-08-21T02:12:14.263Z] [debug] ui: tap \"investigate\"\n[2026-08-21T02:12:16.102Z] [player] investigate the floor\n[2026-08-21T02:12:16.103Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0\n[2026-08-21T02:12:16.104Z] [world] You scan the floor. Something small catches the light, half-kicked under the boards.\n[2026-08-21T02:12:16.104Z] [reward] \u2726 Cloth Scrap.\n[2026-08-21T02:12:16.599Z] [debug] qwen\u23f1 ambient ok 6945ms wait 1958ms read 2552ms/write 1145ms in 353t\u2192out 31t 7.2ms/t HIT-CAP (156ch)\n[2026-08-21T02:12:16.740Z] [arbiter] You, standing at Asgardar, your eyes reflecting on the journey ahead, your resolve growing stronger with each step.\n[2026-08-21T02:12:16.741Z] [debug] arbiter: ambient \u2713 7300ms\n[2026-08-21T02:12:16.741Z] [debug] arbiter: ambient-said \"You, standing at Asgardar, your eyes reflecting on the journey ahead, your resolve growing stronger with each step.\"\n[2026-08-21T02:12:16.808Z] [cognitive] neutral  (703ms)\n[2026-08-21T02:12:17.532Z] [debug] ui: tap \"\u2192 \u2713 SECOND LANDING\"\n[2026-08-21T02:12:17.553Z] [player] go east\n[2026-08-21T02:12:17.554Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0\n[2026-08-21T02:12:17.555Z] [world] You head on to the Second Landing.\n[2026-08-21T02:12:17.555Z] [debug] scene: loc=asgardar hub=buried_landing_two arrival=n opening=n passing=n\n[2026-08-21T02:12:17.566Z] [world] Architect's Cell \u2014 Second Landing. Pumps west, records east, the cuts south, the stair back north. A laminated sign gives every direction a status code. The south corridor's code is not in the legend, and asking after it is itself a flag.\n[2026-08-21T02:12:17.566Z] [world] You've stood here many times. (visit 6)\n[2026-08-21T02:12:17.567Z] [world] Paths: north to First Landing \u00b7 south to Shallow Digs \u00b7 east to Storage Halls \u00b7 west to Pump Room. (Type 'leave outpost' to head into the wilds.)\n[2026-08-21T02:12:17.567Z] [debug] arbiter: template (reason=cooldown)\n[2026-08-21T02:12:17.567Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-21T02:12:17.653Z] [cognitive] neutral  (80ms)\n[2026-08-21T02:12:18.750Z] [debug] ui: tap \"\u2193 \u2713 SHALLOW DIGS\"\n[2026-08-21T02:12:18.778Z] [player] go south\n[2026-08-21T02:12:18.778Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0\n[2026-08-21T02:12:18.779Z] [world] You head on to the Shallow Digs.\n[2026-08-21T02:12:18.780Z] [debug] scene: loc=asgardar hub=buried_shallow_digs arrival=n opening=n passing=n\n[2026-08-21T02:12:18.787Z] [debug] spawn: gear=[Rough-Hewn Chestplate, Compact Laser Pistol (Ranged)] window=10 roster=new\n[2026-08-21T02:12:18.788Z] [world] Ember noses at the faint ozone and snorts. There's something there.\n[2026-08-21T02:12:18.788Z] [world] Architect's Cell \u2014 The Shallow Digs. An active excavation the Architects run and do not describe. Tarpaulins, rope ladders, work lights on a generator. The cuts open into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth, which appears on the paperwork as an environmental factor. The way out is north, the way you came.\n[2026-08-21T02:12:18.789Z] [world] Paths: north to Second Landing. (Type 'leave outpost' to head into the wilds.)\n[2026-08-21T02:12:18.789Z] [world] You think back to the shattered grand spire capacitor from earlier \u2014 the salvage you pulled from it. Something here reminds you of it.\n[2026-08-21T02:12:18.789Z] [debug] arbiter: template (reason=cooldown)\n[2026-08-21T02:12:18.789Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-21T02:12:18.884Z] [cognitive] neutral  (89ms)\n[2026-08-21T02:12:19.850Z] [debug] ui: tap \"take / salvage\"\n[2026-08-21T02:12:20.772Z] [world] You take the Compact Laser Pistol (Ranged) from where it lay.\n[2026-08-21T02:12:20.772Z] [reward] \u2726 Compact Laser Pistol (Ranged) (Common).\n[2026-08-21T02:12:20.791Z] [world] You take the Rough-Hewn Chestplate from where it lay.\n[2026-08-21T02:12:20.791Z] [reward] \u2726 Rough-Hewn Chestplate (Common).\n[2026-08-21T02:12:20.963Z] [debug] persist sizes(KB): total=112 player=49 wm=41[rooms=14 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=19 scene=3\n[2026-08-21T02:12:22.126Z] [world] You salvage the broken hidden weapon locker. The take is small but real.\n[2026-08-21T02:12:22.126Z] [world] You work the jagged submerged library shelf apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-21T02:12:22.127Z] [world] You lever something loose from the leaning dormant architectural sentinel \u2014 not standard salvage. Odd enough that the Crucible would know what to do",
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavojr16pi8 [inline 1/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtavojr16pi8"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T02:02:52.737055Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T02:02:53.065000Z",
+  "fingerprints": [
+    "6e9b30cbc54cd4e2e055b18014bb1faf"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "12639b5b010e4d2f89d4d4730b49418f",
+  "previousEventID": "01803fbf27aa433887c9c975b90dc948"
+}

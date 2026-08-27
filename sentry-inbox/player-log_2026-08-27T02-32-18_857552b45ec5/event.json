@@ -1,0 +1,152 @@
+{
+  "id": "857552b45ec54138984759ebcbfce6f7",
+  "groupID": "7694727671",
+  "eventID": "857552b45ec54138984759ebcbfce6f7",
+  "projectID": "4511945117532160",
+  "size": 17763,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqdrsm78g [inline 12/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqdrsm78g [inline 12/23]",
+  "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqdrsm78g [inline 12/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c1370b4fb9a64abc8cc4868650cf6ad1",
+      "span_id": "97f603e021177db6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunk": "3:01:39.203Z] [debug] ui: tap \"Vault\"\n[2026-08-21T23:01:39.205Z] [world] You step into the vault.\n[2026-08-21T23:01:39.206Z] [world] An iron door stands ajar. Strongboxes line the floor, most pried open long ago, one still sealed.\n[2026-08-21T23:01:41.208Z] [debug] ui: tap \"take / salvage\"\n[2026-08-21T23:01:42.876Z] [reward] \u2726 Found Third Tablet \u2014 the work \u2014 The Tunneler. (open Contracts \u2192 Collectibles to read)\n[2026-08-21T23:01:42.900Z] [world] You crack the iron door open. A page slides out \u2014 paper somehow dry, ink somehow still legible.\n[2026-08-21T23:01:42.900Z] [world] You strip the lockbox carefully. Something usable comes free in your hand.\n[2026-08-21T23:01:42.901Z] [world] You work the strongbox over. A part of it comes loose, intact.\n[2026-08-21T23:01:42.901Z] [reward] \u2726 Salvage haul:\n[2026-08-21T23:01:42.902Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-08-21T23:01:56.000Z] [debug] homework: intro-fill armed after 8981ms idle\n[2026-08-21T23:02:01.578Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 5452ms read 4074ms/write 1355ms in 822t\u2192out 33t 5.0ms/t HIT-CAP (159ch)\n[2026-08-21T23:02:01.668Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5452ms \u2014 intro-fill:action-opener\n[2026-08-21T23:02:01.668Z] [debug] homework: scene_intro \"The Sunken Enclave\" \u2713 5670ms\n[2026-08-21T23:02:41.013Z] [debug] homework: intro-fill armed after 8548ms idle\n[2026-08-21T23:02:42.239Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1100ms read 0ms/write 1071ms in 822t\u2192out 27t (126ch)\n[2026-08-21T23:02:42.358Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 1100ms \u2014 intro-fill:action-opener\n[2026-08-21T23:02:42.358Z] [debug] homework: scene_intro \"The Sunken Enclave\" \u2713 1346ms\n[2026-08-21T23:03:26.055Z] [debug] homework: intro-fill armed after 7353ms idle\n[2026-08-21T23:03:27.783Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1600ms read 0ms/write 1574ms in 822t\u2192out 34t HIT-CAP (145ch)\n[2026-08-21T23:03:27.905Z] [debug] homework: scene_intro \"The Sunken Enclave\" \u2713 1852ms\n[2026-08-21T23:04:04.974Z] [debug] ui: tap \"investigate\"\n[2026-08-21T23:04:06.424Z] [system] perfect opening fades.\n[2026-08-21T23:04:06.461Z] [player] investigate the ground\n[2026-08-21T23:04:06.462Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-21T23:04:06.467Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Oats (Common).\n[2026-08-21T23:04:06.474Z] [system] \u23f3 Time passed: 24 min\n[2026-08-21T23:04:06.585Z] [cognitive] CLIMB  (110ms)\n[2026-08-21T23:07:36.003Z] [debug] persist sizes(KB): total=177 player=51 wm=46[rooms=16 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=77 scene=3\n[2026-08-21T23:08:59.905Z] [debug] appstate: active \u2192 background (was active for 709135ms)\n[2026-08-21T23:09:00.803Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-21T23:12:14.429Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-21T23:12:14.442Z] [debug] appstate: background \u2192 active (was background for 194536ms)\n[2026-08-21T23:12:18.472Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T23:12:18.474Z] [debug] appstate: active \u2192 background (was active for 4034ms)\n[2026-08-21T23:47:20.702Z] [debug] appstate: background \u2192 active (was background for 2102222ms)\n[2026-08-21T23:47:22.179Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T23:47:22.180Z] [debug] appstate: active \u2192 background (was active for 1484ms)\n[2026-08-21T23:47:22.243Z] [debug] appstate: background \u2192 active (was background for 62ms)\n[2026-08-21T23:47:26.453Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a026b4-5bf3-7e3b-941e-19b824628e34\n[2026-08-21T23:47:26.453Z] [debug] ota: Checking\u2026\n[2026-08-21T23:47:26.640Z] [debug] ota: Already up to date\n[2026-08-21T23:47:26.640Z] [debug] ota: boot check result = noUpdate\n[2026-08-21T23:47:26.715Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-21T23:47:26.716Z] [debug] voice: bundled idle\n[2026-08-21T23:47:29.522Z] [debug] OTA applied: 2026-08-21-1427-x-of-y-names-the-x \u2192 2026-08-21-1428-the-found-hall.\n[2026-08-21T23:47:29.522Z] [debug] OTA session start: 2026-08-21-1428-the-found-hall.\n[2026-08-21T23:47:29.522Z] [world] You step back into Asgardar. The world waits for your move.\n[2026-08-21T23:47:29.522Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Verbal. The road kept your place.\"\n[2026-08-21T23:47:32.354Z] [debug] ui: tap \"ENTER\"\n[2026-08-21T23:47:32.356Z] [world] You step inside forsaken warden hall, into the great hall.\n[2026-08-21T23:47:32.357Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n[2026-08-21T23:47:33.397Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-21T23:47:36.759Z] [debug] appstate: active \u2192 background (was active for 3179ms)\n[2026-08-21T23:47:36.972Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-21T23:47:36.972Z] [debug] appstate: background \u2192 active (was background for 213ms)\n[2026-08-21T23:47:37.139Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-21T23:47:44.989Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-21T23:47:46.771Z] [debug] ctx: OPENED \u2014 live=1 (opened=2 released=1) \u2248425MB est\n[2026-08-21T23:47:51.598Z] [debug] appstate: active \u2192 background (was active for 4701ms)\n[2026-08-21T23:47:52.411Z] [debug] ctx: RELEASED \u2014 live=0 (opened=2 released=2)\n[2026-08-21T23:51:02.493Z] [debug] appstate: background \u2192 active (was background for 190895ms)\n[2026-08-21T23:51:05.392Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T23:51:05.393Z] [debug] appstate: active \u2192 background (was active for 2900ms)\n[2026-08-22T00:21:34.886Z] [debug] appstate: background \u2192 active (was background for 1829488ms)\n[2026-08-22T00:21:42.888Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-22T00:21:43.001Z] [debug] appstate: active \u2192 background (was active for 8120ms)\n[2026-08-22T00:21:45.017Z] [debug] ctx: OPENED \u2014 live=1 (opened=3 released=2) \u2248425MB est\n[2026-08-22T00:21:45.026Z] [debug] ctx: straggler load torn down by the lifecycle guard (count=1)\n[2026-08-22T00:21:45.442Z] [debug] ctx: RELEASED \u2014 live=0 (opened=3 released=3)\n[2026-08-22T00:21:45.450Z] [debug] qwen: LOAD CANCELLED (status=idle) \u2014 app moved on mid-load; will re-warm\n[2026-08-22T00:57:38.007Z] [debug] appstate: background \u2192 active (was background for 2152551ms)\n[2026-08-22T00:57:45.656Z] [debug] persist sizes(KB): total=177 player=51 wm=48[rooms=16 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=76 scene=2\n[2026-08-22T00:57:46.036Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a026f3-8ffd-7e30-b0c9-0c1a9c90dbd9\n[2026-08-22T00:57:46.036Z] [debug] ota: Checking\u2026\n[2026-08-22T00:57:46.114Z] [debug] ota: Already up to date\n[2026-08-22T00:57:46.115Z] [debug] ota: boot check result = noUpdate\n[2026-08-22T00:57:46.136Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-22T00:57:46.136Z] [debug] voice: bundled idle\n[2026-08-22T00:57:50.714Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-22T00:57:52.500Z] [debug] appstate: active \u2192 background (was active for 1781ms)\n[2026-08-22T00:57:52.630Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-22T01:03:50.401Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-22T01:03:50.402Z] [debug] appstate: background \u2192 active (was background for 357902ms)\n[2026-08-22T01:03:52.111Z] [debug] OTA applied: 2026-08-21-1428-the-found-hall \u2192 2026-08-22-1430-every-building-is-a-map.\n[2026-08-22T01:03:52.111Z] [debug] OTA session start: 2026-08-22-1430-every-building-is-a-map.\n[2026-08-22T01:03:52.111Z] [world] You step back into Asgardar. The world waits for your move.\n[2026-08-22T01:03:52.111Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Verbal. The buried country is no place to walk alone.\"\n[2026-08-22T01:03:55.625Z] [debug] ui: tap \"ENTER\"\n[2026-08-22T01:03:55.629Z] [world] You step inside forsaken warden hall, into the great hall.\n[2026-08-22T01:03:55.630Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n[2026-08-22T01:03:58.409Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-22T01:03:59.290Z] [debug] ctx: OPENED \u2014 live=1 (opened=2 released=1) \u2248425MB est\n[2026-08-22T01:04:37.308Z] [debug] ui: tap \"investigate\"\n[2026-08-22T01:04:46.645Z] [debug] ui: tap \"investigate\"\n[2026-08-22T01:04:48.881Z] [player] investigate the ground\n[2026-08-22T01:04:48.883Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-22T01:04:48.890Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Blueberries (Uncommon).\n[2026-08-22T01:04:48.898Z] [system] \u23f3 Time passed: 24 min\n[2026-08-22T01:04:49.004Z] [cognitive] CLIMB  (105ms)\n[2026-08-22T01:04:53.864Z] [debug] ui: tap \"\u2190 Armory\"\n[2026-08-22T01:04:53.868Z] [world] You step into the armory.\n[2026-08-22T01:04:53.868Z] [world] Weapon racks, mostly stripped bare. A whetstone, a barrel of broken hafts, and a weapons chest with a stubborn lock.\n[2026-08-22T01:04:55.529Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-22T01:04:56.461Z] [debug] ui: tap \"investigate\"\n[2026-08-22T01:04:57.459Z] [player] investigate the ground\n[2026-08-22T01:04:57.460Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-22T01:04:57.469Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Bone Shiv (Common).\n[2026-08-22T01:04:57.475Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-22T01:04:57.475Z] [arbiter] \"Eat something,\" the Arbiter says, almost gentle. \"Stamina doesn't refill on grit. You've got rations.\"\n[2026-08-22T01:04:57.476Z] [system] \u23f3 Time passed: 24 min\n[2026-08-22T01:04:57.605Z] [cognitive] CLIMB  (128ms)\n[2026-08-22T01:05:00.298Z] [debug] ui: tap \"\u2192 Hall \u2713\"\n[2026-08-22T01:05:00.303Z] [world] You step into the great hall.\n[2026-08-22T01:05:00.304Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n[2026-08-22T01:05:03.279Z] [debug] ui: tap \"\u2192 Cellar\"\n[2026-08-22T01:05:03.280Z] [world] You step into the cellar.\n[2026-08-22T01:05:03.280Z] [world] Cool dark under the stone. Casks line the walls; a few have not been tapped. Crates molder in the corner.\n[2026-08-22T01:05:04.733Z] [debug] ui: tap \"investigate\"\n[2026-08-22T01:05:05.733Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10107ms read 8930ms/write 1116ms in 801t\u2192out 33t 11.1ms/t HIT-CAP (155ch)\n[2026-08-22T01:05:05.837Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 10107ms \u2014 intro-fill:action-opener\n[2026-08-22T01:05:05.837Z] [debug] homework: scene_intro \"Asgardar\" \u2713 10309ms\n[2026-08-22T01:05:06.000Z] [player] investigate the ground\n[2026-08-22T01:05:06.001Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-22T01:05:06.002Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-22T01:05:06.007Z] [system] \u23f3 Time passed: 24 min\n[2026-08-22T01:05:06.092Z] [cognitive] CLIMB  (84ms)\n[2026-08-22T01:05:08.240Z] [player] investigate cask\n[2026-08-22T01:05:08.241Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cask resolved=cask range=- enemies=0 hooks=0\n[2026-08-22T01:05:08.242Z] [world] You tilt the rim. A residue of something long-evaporated coats the inside \u2014 sour, organic, old.\n[2026-08-22T01:05:08.320Z] [cognitive] neutral  (76ms)\n[2026-08-22T01:05:08.380Z] [debug] persist sizes(KB): total=177 player=52 wm=48[rooms=16 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=75 scene=2\n[2026-08-22T01:05:10.669Z] [debug] qwen\u23f1 investigate_lore ok 2358ms read 1237ms/write 1094ms in 126t\u2192out 35t 9.8ms/t (150ch)\n[2026-08-22T01:05:12.382Z] [debug] ui: tap \"\u2199 Vault\"\n[2026-08-22T01:05:12.385Z] [world] You step into the vault.\n[2026-08-22T01:05:12.386Z] [world] An iron door stands ajar. Strongboxes line the floor, most pried open long ago, one still sealed.\n[2026-08-22T01:05:16.484Z] [debug] ui: tap \"\u2191 Hall \u2713\"\n[2026-08-22T01:05:16.490Z] [world] You step into the great hall.\n[2026-08-22T01:05:16.491Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n[2026-08-22T01:05:18.571Z] [debug] ui: tap \"EXIT\"\n[2026-08-22T01:05:18.575Z] [world] You step back outside, leaving abandoned outpost behind.\n[2026-08-22T01:05:28.847Z] [debug] ui: tap \"\u2192 SAMARRAN\"\n[2026-08-22T01:05:28.900Z] [debug] spawn: gear=[Rough-Hewn Gauntlets, Architect's Aether Gloves] window=10 roster=new\n[2026-08-22T01:05:28.901Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-08-22T01:05:28.901Z] [world] A buried dome's apex breaks the surface ahead, Aetherstone-glazed and humming faintly.\n[2026-08-22T01:05:30.798Z] [debug] ui: tap \"take / salvage\"\n[2026-08-22T01:05:32.785Z] [world] You take the Architect's Aether Gloves from where it lay.\n[2026-08-22T01:05:32.785Z] [reward] \u2726 Architect's Aether Gloves (Common).\n[2026-08-22T01:05:32.804Z] [world] You take the Rough-Hewn Gauntlets from where it lay.\n[2026-08-22T01:05:32.804Z] [reward] \u2726 Rough-Hewn Gauntlets (Common).\n[2026-08-22T01:05:33.822Z] [world] You take the Aether Crystal from where it lay.\n[2026-08-22T01:05:33.823Z] [reward] \u2726 Aether Crystal (Common).\n[2026-08-22T01:05:34.782Z] [reward] \u2726 Found Second Tablet \u2014 discovery \u2014 The Tunneler. (open Contracts \u2192 Collectibles to read)\n[2026-08-22T01:05:34.799Z] [reward] \u2726 Found First Tablet \u2014 a prayer \u2014 The Tunneler. (open Contracts \u2192 Collectibles to read)\n[2026-08-22T01:05:34.800Z] [reward] \u2726 The Tunneler's story is complete \u2014 every fragment recovered.\n[2026-08-22T01:05:34.801Z] [world] Behind the cracked walkway, where the floods didn't reach: a single page, in a hand you haven't read before.\n[2026-08-22T01:05:34.801Z] [world] You salvage the echo horn. The take is small but real.\n[2026-08-22T01:05:34.801Z] [world] You strip the garden statue carefully. Something usable comes free in your hand.\n[2026-08-22T01:05:34.802Z] [world] You strip the lantern carefully. Something usable comes free in your hand.\n[2026-08-22T01:05:34.802Z] [world] You work the ruined fountain apart. Tucked inside, sealed against the silt: a folded note.\n[2026-08-22T01:05:34.802Z] [reward] \u2726 Salvage haul:\n[2026-08-22T01:05:34.802Z] [reward]    ",
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqdrsm78g [inline 12/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtawqdrsm78g"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "12"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T02:32:18.031629Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T02:32:18.243000Z",
+  "fingerprints": [
+    "8e8887eb2ec21d4b16a51b166194fb1c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "8fd2ef780a1a4100ac48f832d5a531db",
+  "previousEventID": "7e5082911ce640228e4274b60d100573"
+}

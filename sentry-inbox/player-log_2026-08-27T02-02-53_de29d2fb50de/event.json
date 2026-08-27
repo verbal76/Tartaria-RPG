@@ -1,0 +1,152 @@
+{
+  "id": "de29d2fb50de434595d816b0b380a3df",
+  "groupID": "7694690094",
+  "eventID": "de29d2fb50de434595d816b0b380a3df",
+  "projectID": "4511945117532160",
+  "size": 17720,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavojr16pi8 [inline 15/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavojr16pi8 [inline 15/23]",
+  "title": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavojr16pi8 [inline 15/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "d40f66b0cbaf4b979feb773ed22807f7",
+      "span_id": "811a571431b2e1f0",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunk": "g walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:12.328Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:09:12.330Z] [world] Bran the Beastmaster keeps their voice low enough that it does not carry past the doorway.\n[2026-08-22T01:09:13.156Z] [player] Ask where he stopped setting traps\n[2026-08-22T01:09:13.157Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:13.158Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:09:13.160Z] [world] Bran the Beastmaster drops their voice, though there is nobody in here but the two of you.\n[2026-08-22T01:09:13.856Z] [player] Ask where he stopped setting traps\n[2026-08-22T01:09:13.858Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:13.859Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:09:14.472Z] [player] Ask where he stopped setting traps\n[2026-08-22T01:09:14.474Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:14.475Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:09:15.039Z] [player] Ask where he stopped setting traps\n[2026-08-22T01:09:15.040Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:15.041Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:09:15.206Z] [debug] persist sizes(KB): total=204 player=47 wm=67[rooms=25 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=86 scene=3\n[2026-08-22T01:09:15.423Z] [player] Ask where he stopped setting traps\n[2026-08-22T01:09:15.426Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:15.427Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:09:15.622Z] [player] Ask where he stopped setting traps\n[2026-08-22T01:09:15.623Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:15.624Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:09:15.838Z] [player] Ask where he stopped setting traps\n[2026-08-22T01:09:15.839Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:15.839Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:09:16.022Z] [player] Ask where he stopped setting traps\n[2026-08-22T01:09:16.023Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:16.023Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:09:16.224Z] [player] Ask where he stopped setting traps\n[2026-08-22T01:09:16.225Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:16.226Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:09:16.408Z] [player] Ask where he stopped setting traps\n[2026-08-22T01:09:16.408Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:16.409Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:09:16.607Z] [player] Ask where he stopped setting traps\n[2026-08-22T01:09:16.608Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:16.608Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:09:16.788Z] [player] Ask where he stopped setting traps\n[2026-08-22T01:09:16.789Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:16.789Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:09:16.971Z] [player] Ask where he stopped setting traps\n[2026-08-22T01:09:16.973Z] [world] \"There is a valley north of my stead I pulled every trap out of, three seasons back.\" Bran refills your cup before he goes on, which is how he buys thinking time. \"Something dens there now that keeps ORDER. No kills inside the valley \u2014 anywhere. The boars water beside the hounds, and everything walks in slow.\" He turns the cup in his hands. \"And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made.\" He meets your eye. \"I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in.\"\n[2026-08-22T01:09:16.973Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep \u2014 ask again when your hands are free.\n[2026-08-22T01:09:17.456Z] [world] You let the conversation go and Bran the Beastmaster gets back to it.\n[2026-08-22T01:09:20.864Z] [debug] appstate: active \u2192 background (was active for 321572ms)\n[2026-08-22T01:09:21.054Z] [debug] persist sizes(KB): total=215 player=47 wm=73[rooms=25 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=92 scene=3\n[2026-08-22T01:09:21.229Z] [debug] ctx: RELEASED \u2014 live=0 (opened=2 released=2)\n[2026-08-22T02:28:36.656Z] [debug] appstate: background \u2192 active (was background for 4755788ms)\n[2026-08-22T02:28:44.665Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-22T02:28:45.380Z] [debug] appstate: active \u2192 background (was active for 8725ms)\n[2026-08-22T02:32:42.674Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a026f3-8ffd-7e30-b0c9-0c1a9c90dbd9\n[2026-08-22T02:32:42.675Z] [debug] ota: Checking\u2026\n[2026-08-22T02:32:46.874Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-22T02:32:47.003Z] [debug] ota: Saving progress\u2026\n[2026-08-22T02:32:47.004Z] [debug] ota: Restarting to apply\u2026\n[2026-08-22T02:32:47.237Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0274e-5cde-78b7-96e8-4af09790df27\n[2026-08-22T02:32:47.237Z] [debug] ota: Checking\u2026\n[2026-08-22T02:32:47.389Z] [debug] ota: Already up to date\n[2026-08-22T02:32:47.390Z] [debug] ota: boot check result = noUpdate\n[2026-08-22T02:32:47.424Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-22T02:32:47.424Z] [debug] voice: bundled idle\n[2026-08-22T02:32:51.852Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-22T02:33:51.877Z] [debug] OTA session start: 2026-08-22-1431-the-emblem-when-you-pick.\n[2026-08-22T02:33:51.877Z] [world] You step back into Samarran. The world waits for your move.\n[2026-08-22T02:33:51.877Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Verbal. The buried country is no place to walk alone.\"\n[2026-08-22T02:34:16.940Z] [debug] appstate: active \u2192 background (was active for 26186ms)\n[2026-08-22T02:34:17.089Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-22T02:40:19.937Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-22T02:40:19.941Z] [debug] appstate: background \u2192 active (was background for 363000ms)\n[2026-08-22T02:40:27.955Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-22T02:40:28.492Z] [debug] ctx: OPENED \u2014 live=1 (opened=2 released=1) \u2248425MB est\n[2026-08-22T02:40:33.586Z] [debug] appstate: active \u2192 background (was active for 5092ms)\n[2026-08-22T02:40:33.699Z] [debug] ctx: RELEASED \u2014 live=0 (opened=2 released=2)\n[2026-08-22T03:10:17.511Z] [debug] appstate: background \u2192 active (was background for 1783921ms)\n[2026-08-22T03:10:22.653Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-22T03:10:22.655Z] [debug] appstate: active \u2192 background (was active for 5148ms)\n[2026-08-22T03:20:12.911Z] [debug] appstate: background \u2192 active (was background for 590251ms)\n[2026-08",
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavojr16pi8 [inline 15/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtavojr16pi8"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "15"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T02:02:52.903305Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T02:02:53.067000Z",
+  "fingerprints": [
+    "6e9b30cbc54cd4e2e055b18014bb1faf"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e3e26dad0af04c84947c9c97603b1146",
+  "previousEventID": "da83517be7cd41b18eed085ecd172d65"
+}

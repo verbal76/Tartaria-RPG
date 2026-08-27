@@ -1,0 +1,242 @@
+{
+  "id": "b970949f832c44a48ba644283fc506b8",
+  "groupID": "7694761393",
+  "eventID": "b970949f832c44a48ba644283fc506b8",
+  "projectID": "4511945117532160",
+  "size": 17360,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxtuln8peb [inline 5/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxtuln8peb [inline 5/27]",
+  "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxtuln8peb [inline 5/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "15b51f4575bd4720814f03ecd3dcf9b7",
+      "span_id": "996fe59a0d2dccdd",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "x4)\n[2026-08-26T02:09:00.935Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Bent Nail \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T02:09:00.937Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-26T02:09:04.287Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-26T02:09:05.842Z] [world] Iron fog disorients you. Compasses spin; intent costs more.\n[2026-08-26T02:09:05.864Z] [player] investigate the ground\n[2026-08-26T02:09:05.865Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T02:09:05.866Z] [world] Something shifted while you were turned away \u2014 a Gutter Rat breaks cover, fast and low. (range: close)\n[2026-08-26T02:09:05.866Z] [combat] Gutter Rat \u2014 Bite ready, 1D6 damage on a hit.\n[2026-08-26T02:09:05.866Z] [debug] enemy: Gutter Rat hp=8 ac=7 atk=Bite dmg=1D6 rarity=Common ap=2\n[2026-08-26T02:09:05.867Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-26T02:09:05.867Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:09:06.049Z] [cognitive] CLIMB  (181ms)\n[2026-08-26T02:09:09.281Z] [debug] ui: tap \"approach\"\n[2026-08-26T02:09:09.325Z] [player] approach Gutter Rat\n",
+      "[2026-08-26T02:09:09.326Z] [debug] parser: intent=advance conf=1.00 verb=approach target=gutter rat resolved=Gutter Rat range=mid enemies=1 hooks=1\n[2026-08-26T02:09:09.328Z] [debug] move: advance from range=mid enemies=1 weather=Iron Fog cost=2 partial=1\n[2026-08-26T02:09:09.328Z] [debug] move: field advance target=Gutter Rat d 1.50->0.50 band mid->close\n",
+      "[2026-08-26T02:09:09.328Z] [world] You close the gap with Gutter Rat. (range: close / arm's reach)\n[2026-08-26T02:09:09.330Z] [combat] Gutter Rat \u2014 d20 \u2192 3 + ATK 3 = 6 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:09:09.525Z] [cognitive] neutral  (193ms)\n[2026-08-26T02:09:10.398Z] [debug] ui: tap \"searing tuning fork\"\n",
+      "[2026-08-26T02:09:10.463Z] [player] attack with the cantor's tuning fork\n[2026-08-26T02:09:10.463Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1\n[2026-08-26T02:09:10.464Z] [debug] attack: target=Gutter Rat range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n",
+      "[2026-08-26T02:09:10.465Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-08-26T02:09:10.465Z] [debug] attack: status mods tired -1\n[2026-08-26T02:09:10.510Z] [world] Your searing cantor's tuning fork comes around in an arc; Gutter Rat squares up to meet it.\n[2026-08-26T02:09:10.510Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:09:10.677Z] [cognitive] neutral  (166ms)\n",
+      "[2026-08-26T02:09:10.881Z] [debug] persist sizes(KB): total=207 player=50 wm=73[rooms=28 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=80 scene=4\n[2026-08-26T02:09:17.176Z] [world] Gutter Rat moves first. The pressure is immediate.\n[2026-08-26T02:09:17.178Z] [combat] Gutter Rat \u2014 d20 \u2192 7 + ATK 3 = 10 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-26T02:09:17.178Z] [combat] You \u2014 d20 \u2192 20 + INT 10 \u2212 2 (Iron Fog) tired -1 = 27 vs Gutter Rat AC 7 \u2014 \u2713 CRITICAL HIT\n[2026-08-26T02:09:17.179Z] [combat] Aetheric flares \u2014 +1 on hit.\n[2026-08-26T02:09:17.179Z] [combat] The killing blow with the searing cantor's tuning fork: 21. Gutter Rat drops where it stood.\n[2026-08-26T02:09:17.180Z] [reward] Gutter Rat defeated. You recover Rat Fur.\n",
+      "[2026-08-26T02:09:17.180Z] [reward] +9 TC pried from the dust.\n[2026-08-26T02:09:20.093Z] [debug] ui: tap \"rest\"\n[2026-08-26T02:09:20.110Z] [player] rest\n[2026-08-26T02:09:20.111Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T02:09:20.113Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 21, afternoon)\n",
+      "[2026-08-26T02:09:20.124Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T02:09:20.282Z] [cognitive] REST  (157ms)\n[2026-08-26T02:09:21.360Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T02:09:21.377Z] [debug] spawn: gear=[Repeater Rifle, Lost Scholar's Robe, Mud-Walker Mask] window=10 roster=new\n",
+      "[2026-08-26T02:09:21.379Z] [world] You move west under a sky the color of rust. Whatever sun there was has been wrung out by the haze.\n[2026-08-26T02:09:21.380Z] [world] Your eye goes back to it before you decide to look.\n[2026-08-26T02:09:22.610Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T02:09:24.094Z] [world] The Repeater Rifle fits the hand better than it has any right to.\n",
+      "[2026-08-26T02:09:24.095Z] [reward] \u2726 Repeater Rifle (Common).\n[2026-08-26T02:09:24.110Z] [world] You turn the Lost Scholar's Robe over once, then keep it.\n[2026-08-26T02:09:24.110Z] [reward] \u2726 Lost Scholar's Robe (Common).\n[2026-08-26T02:09:24.111Z] [world] The Mud-Walker Mask comes away clean.\n[2026-08-26T02:09:24.111Z] [reward] \u2726 Mud-Walker Mask (Common).\n",
+      "[Filtered]",
+      "[2026-08-26T02:09:25.023Z] [reward]     \u2022 Automaton Circuit (Common)\n[2026-08-26T02:09:25.023Z] [reward]     \u2022 Glass-Beaded Strap (Uncommon)\n[2026-08-26T02:09:25.024Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-08-26T02:09:26.947Z] [debug] ui: tap \"investigate\"\n[2026-08-26T02:09:28.453Z] [player] investigate the ground\n",
+      "[2026-08-26T02:09:28.454Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-26T02:09:28.457Z] [world] You scrape at the silt with the aetheric crystal blade. Nothing of worth.\n[2026-08-26T02:09:28.462Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-26T02:09:28.462Z] [arbiter] The Arbiter glances toward the cold. \"Still there. Still yours, if you take it.\"\n[2026-08-26T02:09:28.463Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T02:09:28.613Z] [cognitive] CLIMB  (150ms)\n[2026-08-26T02:09:33.829Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T02:09:33.845Z] [debug] spawn: gear=[Rough Hewn Mask] window=10 roster=new\n",
+      "[2026-08-26T02:09:33.852Z] [world] You press west. Clouds drag along the horizon like silt in still water, slow and indifferent.\n[2026-08-26T02:09:33.853Z] [world] You had a question here. You still have it.\n[2026-08-26T02:09:34.863Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T02:09:36.552Z] [world] It takes two pulls. The Rough Hewn Mask is yours on the second.\n",
+      "[2026-08-26T02:09:36.553Z] [reward] \u2726 Rough Hewn Mask (Common).\n[2026-08-26T02:09:36.772Z] [debug] persist sizes(KB): total=207 player=51 wm=73[rooms=28 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=4\n[2026-08-26T02:09:37.634Z] [world] You strip the barrel lid carefully. Something usable comes free in your hand.\n",
+      "[Filtered]",
+      "[2026-08-26T02:09:37.636Z] [world] You break the tower wire apart. Among the pieces, something worth keeping.\n[2026-08-26T02:09:37.636Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:09:37.637Z] [reward]     \u2022 Worn Tartarian Coin x12 (Common)\n[2026-08-26T02:09:37.637Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-08-26T02:09:37.637Z] [reward]     \u2022 Mortar-Bound Cobble (Common)\n",
+      "[2026-08-26T02:09:37.638Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-26T02:09:39.114Z] [debug] ui: tap \"investigate\"\n[2026-08-26T02:09:41.983Z] [player] investigate the ground\n[2026-08-26T02:09:41.984Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T02:09:41.990Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Raspberries (Uncommon).\n[2026-08-26T02:09:41.996Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T02:09:41.997Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:09:41.997Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-26T02:09:41.997Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T02:09:42.143Z] [cognitive] CLIMB  (145ms)\n[2026-08-26T02:09:52.853Z] [debug] ui: tap \"rest\"\n[2026-08-26T02:09:52.864Z] [player] rest\n[2026-08-26T02:09:52.865Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T02:09:52.866Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 22, night)\n[2026-08-26T02:09:52.866Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-26T02:09:52.880Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n[2026-08-26T02:09:52.881Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-26T02:09:52.881Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T02:09:53.019Z] [cognitive] REST  (135ms)\n[2026-08-26T02:09:54.034Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T02:09:54.048Z] [debug] spawn: gear=[Compact Blaster, Mud Claymore] window=10 roster=new\n",
+      "[2026-08-26T02:09:54.050Z] [world] You walk north. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-26T02:09:54.051Z] [world] Some part of you has been keeping the place bookmarked.\n[2026-08-26T02:09:55.419Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T02:09:57.036Z] [world] The Compact Blaster resists, then does not.\n",
+      "[2026-08-26T02:09:57.036Z] [reward] \u2726 Compact Blaster (Common).\n[2026-08-26T02:09:57.044Z] [world] You brace a foot and the Mud Claymore gives.\n[2026-08-26T02:09:57.044Z] [reward] \u2726 Mud Claymore (Common).\n[2026-08-26T02:09:57.998Z] [world] One good tug and the Aetheric Shard is out.\n[2026-08-26T02:09:57.999Z] [reward] \u2726 Aetheric Shard (Uncommon).\n",
+      "[2026-08-26T02:09:59.307Z] [world] You scavenge the broken lantern thoroughly. One Cloth Scrap survives the sorting.\n[2026-08-26T02:09:59.308Z] [world] You strip the cracked chest down. Mostly debris \u2014 but a Smooth Stone comes loose at the bottom of the pile.\n[2026-08-26T02:09:59.308Z] [world] You salvage the fungal patch. The take is small but real.\n",
+      "[2026-08-26T02:09:59.309Z] [world] You strip the tower relay carefully. Something usable comes free in your hand.\n[2026-08-26T02:09:59.309Z] [world] You break the wagon axle apart. Among the pieces, something worth keeping.\n[2026-08-26T02:09:59.309Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:09:59.310Z] [reward]     \u2022 Cloth Scrap (Common)\n",
+      "[2026-08-26T02:09:59.310Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-08-26T02:09:59.310Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-08-26T02:09:59.311Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-08-26T02:09:59.311Z] [reward]     \u2022 Worn Tartarian Coin x4 (Common)\n[2026-08-26T02:10:01.612Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-26T02:10:02.208Z] [debug] persist sizes(KB): total=208 player=51 wm=73[rooms=28 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=4\n[2026-08-26T02:10:10.217Z] [debug] qwen\u23f1 item_synthesis_hw ok 4340ms read 3611ms/write 689ms in 323t\u2192out 21t 11.2ms/t (88ch)\n[2026-08-26T02:10:10.234Z] [debug] homework: item_desc \"Cloth Scrap\" \u2713 4833ms\n",
+      "[2026-08-26T02:10:22.084Z] [debug] ui: tap \"missions\"\n[2026-08-26T02:10:24.916Z] [debug] ui: tap \"inventory\"\n[2026-08-26T02:10:32.454Z] [debug] ui: tap \"investigate\"\n[2026-08-26T02:10:33.939Z] [player] investigate the ground\n[2026-08-26T02:10:33.940Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T02:10:33.945Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Raspberries (Uncommon).\n[2026-08-26T02:10:33.962Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T02:10:33.963Z] [arbiter] The Arbiter looks around. \"Listen for the bells. Nimari had bells, once. They sometimes remember.\"\n",
+      "[2026-08-26T02:10:33.963Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-26T02:10:33.963Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T02:10:33.965Z] [world] An Eternal Dynasty war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Mud Monarchs.\n",
+      "[2026-08-26T02:10:33.965Z] [arbiter] \"The Eternal Dynasty do not forgive a friend of the Mud Monarchs,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-26T02:10:34.201Z] [cognitive] CLIMB  (237ms)\n[2026-08-26T02:10:34.661Z] [debug] persist sizes(KB): total=212 player=52 wm=73[rooms=28 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=7\n",
+      "[2026-08-26T02:10:34.841Z] [debug] ui: tap \"off: plasma cutter\"\n[2026-08-26T02:10:34.868Z] [player] attack with the off-hand plasma cutter\n[2026-08-26T02:10:34.869Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand plasma cutter resolved=Plasma Cutter range=close enemies=5 hooks=1\n",
+      "[2026-08-26T02:10:34.869Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Plasma Cutter bareHand=false\n[2026-08-26T02:10:34.870Z] [arbiter] Whisper Fog hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-08-26T02:10:34.870Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-26T02:10:34.871Z] [debug] attack: status mods tired -1\n[2026-08-26T02:10:34.915Z] [world] You raise the plasma cutter toward Eternal Dynasty Raider 1. The room narrows around the both of you.\n[2026-08-26T02:10:34.915Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:10:35.096Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 THROW  (180ms)\n[2026-08-26T02:10:36.842Z] [system] Action cancelled.\n",
+      "[2026-08-26T02:10:38.656Z] [debug] ui: tap \"dodge\"\n[2026-08-26T02:10:38.670Z] [player] dodge\n[2026-08-26T02:10:38.671Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=1\n",
+      "[2026-08-26T02:10:38.672Z] [world] You commit to the dodge. Slip Eternal Dynasty Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-26T02:10:38.734Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 8 + ATK 9 = 17 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-08-26T02:10:38.734Z] [combat] Dodge \u2014 d20 \u2192 15 + DEX 13 = 28 vs ATK 17. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-26T02:10:38.734Z] [world] You slip Eternal Dynasty Raider 2's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-08-26T02:10:38.735Z] [debug] ac-shift 28\u219231: race/base 12 + gear 24 + title 0 \u2192 trimmed 28 + status 3 | worn: head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1520-the-scrubber-takes-a-whole-value #mtaxtuln8peb [inline 5/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtaxtuln8peb"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "5"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T03:02:59.387108Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "14": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 388,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "20": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 334,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T03:02:59.782000Z",
+  "fingerprints": [
+    "544c6c9afe0650522c39495d0fbfdbfc"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "d17e8b8333d846a9a9d6b5c8af1c6d78",
+  "previousEventID": "b1bd835facd74b1fa8fb27d5f2610f82"
+}

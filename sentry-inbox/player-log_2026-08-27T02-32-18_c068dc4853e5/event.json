@@ -1,0 +1,152 @@
+{
+  "id": "c068dc4853e54cfca58e1bfda55d94e0",
+  "groupID": "7694727671",
+  "eventID": "c068dc4853e54cfca58e1bfda55d94e0",
+  "projectID": "4511945117532160",
+  "size": 17739,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqdrsm78g [inline 11/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqdrsm78g [inline 11/23]",
+  "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqdrsm78g [inline 11/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c1370b4fb9a64abc8cc4868650cf6ad1",
+      "span_id": "97f603e021177db6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunk": " STORY THREAD (step 1) \u2014 You cross the broken ground toward the spire. The bottom storeys are mud-glassed shut, but a window two heights up gapes open. A coil of old rope tells you someone else has tried.\n[2026-08-21T22:58:02.096Z] [reward] Ilva Sidelong fires up a portable Crucible for you. (\u221225 TC)\n[2026-08-21T22:58:19.474Z] [reward] \u2726 The Crucible drinks the five pieces and works a second coating channel into the Field-Forged Sunder. It can now hold TWO coatings at once \u2014 both bite on every landing hit. (Its damage and edge are unchanged.)\n[2026-08-21T22:58:25.791Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-21T22:58:28.681Z] [debug] ui: tap \"\u2192 SAMARRAN\"\n[2026-08-21T22:58:28.738Z] [debug] spawn: gear=[Reclaimer's Cloak, Bone Shortsword, Lost Seeker's Gloves] window=10 roster=new\n[2026-08-21T22:58:28.739Z] [world] You walk east through open silt. The compass tells you Samarran lies 1 stretch further east.\n[2026-08-21T22:58:28.740Z] [world] A service door at the base of the Red Tower, the kind that does not appear on any of the published floor plans. It opens. Inside: a stairwell descending into red light that has weight. You go down a flight and stop counting. The walls hum at the same frequency as the Tower's Core, but quieter, the way a child hums a song they overheard.\n[2026-08-21T22:58:28.741Z] [world] On a service desk near the bottom, a notebook of Order observations of the Core. The last entry, written in the same hand but more loosely: 'It is not powering the Tower. The Tower is what stops it. We were the wrong builders.'\n[2026-08-21T22:58:28.741Z] [reward] \u2726 Recovered Aetheric Locket.\n[2026-08-21T22:58:28.741Z] [combat] Mud Spider steps out of the shadows of the place \u2014 Web Trap ready, 2D6 damage on a hit. The loot you found will leave with whoever walks out alive. (range: close)\n[2026-08-21T22:58:28.747Z] [world] The thread you were following waits where you left it.\n[2026-08-21T22:58:32.282Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 6363ms read \u26a054760ms/write \u26a01348ms NOT-PER-CALL in 793t\u2192out 33t HIT-CAP (148ch)\n[2026-08-21T22:58:32.437Z] [debug] homework: scene_intro \"Asgardar\" \u2713 6648ms\n[2026-08-21T22:58:35.229Z] [debug] ui: tap \"valve gear\"\n[2026-08-21T22:58:35.310Z] [player] attack with the conspiracy architects valve gear\n[2026-08-21T22:58:35.311Z] [debug] parser: intent=attack conf=1.00 verb=attack target=conspiracy architects valve gear resolved=gear assembly range=close enemies=1 hooks=1\n[2026-08-21T22:58:35.312Z] [debug] attack: target=Mud Spider range=close reach.bands=[close] reach.label=Conspiracy Architects Valve Gear bareHand=false\n[2026-08-21T22:58:35.338Z] [world] You bring the conspiracy architects valve gear to bear on Mud Spider.\n[2026-08-21T22:58:35.338Z] [system] \u23f3 Time passed: 6 min\n[2026-08-21T22:58:35.450Z] [cognitive] neutral  (110ms)\n[2026-08-21T22:58:35.612Z] [debug] persist sizes(KB): total=179 player=50 wm=45[rooms=15 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=79 scene=5\n[2026-08-21T22:58:39.714Z] [world] You seize the initiative. Mud Spider has no time to react.\n[2026-08-21T22:58:39.714Z] [combat] You \u2014 d20 \u2192 9 + STR 7 = 16 vs Mud Spider AC 9 \u2014 \u2713 HIT\n[2026-08-21T22:58:39.716Z] [combat] The blow with the conspiracy architects valve gear finds purchase \u2014 2 damage, 16 HP standing. Mud Spider commits to the counter.\n[2026-08-21T22:58:39.716Z] [combat] Mud Spider turns on Ember \u2014 d20 8 + ATK 5 = 13 vs Ember's AC 15 (vest +5) \u2014 \u2717 MISS\n[2026-08-21T22:58:40.481Z] [debug] ui: tap \"approach\"\n[2026-08-21T22:58:40.523Z] [player] approach Mud Spider\n[2026-08-21T22:58:40.524Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud spider resolved=Mud Spider range=close enemies=1 hooks=1\n[2026-08-21T22:58:40.527Z] [debug] move: advance from range=close enemies=1 weather=Aether Lightning cost=1 partial=0\n[2026-08-21T22:58:40.527Z] [world] You are already at close / arm's reach with Mud Spider.\n[2026-08-21T22:58:40.528Z] [debug] arbiter: template (reason=combat)\n[2026-08-21T22:58:40.528Z] [arbiter] The Arbiter watches the blow land or fail. \"Both are answers.\"\n[2026-08-21T22:58:40.659Z] [cognitive] SWIM \u00b7 DISENGAGE  (129ms)\n[2026-08-21T22:58:42.566Z] [debug] ui: tap \"inventory\"\n[2026-08-21T22:59:15.541Z] [reward] You work the acid flask along the weapon. Now wielding the Acid-Etched Field-Forged Sunder \u2014 1d4 acid on every landing hit.\n[2026-08-21T22:59:50.996Z] [debug] ui: tap \"dodge\"\n[2026-08-21T22:59:51.021Z] [player] dodge\n[2026-08-21T22:59:51.022Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-21T22:59:51.024Z] [world] You commit to the dodge. Slip Mud Spider's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-21T22:59:51.068Z] [combat] Mud Spider \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-08-21T22:59:51.068Z] [combat] Dodge \u2014 d20 \u2192 19 + DEX 16 = 35 vs ATK 17. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-21T22:59:51.069Z] [debug] arbiter: template (reason=combat)\n[2026-08-21T22:59:51.069Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-21T22:59:51.070Z] [system] \u23f3 Time passed: 6 min\n[2026-08-21T22:59:51.294Z] [cognitive] neutral  (224ms)\n[2026-08-21T22:59:54.411Z] [debug] ui: tap \"acid-etched valve gear\"\n[2026-08-21T22:59:54.501Z] [player] attack with the conspiracy architects valve gear\n[2026-08-21T22:59:54.501Z] [debug] parser: intent=attack conf=1.00 verb=attack target=conspiracy architects valve gear resolved=gear assembly range=close enemies=1 hooks=1\n[2026-08-21T22:59:54.503Z] [debug] attack: target=Mud Spider range=close reach.bands=[close] reach.label=Conspiracy Architects Valve Gear bareHand=false\n[2026-08-21T22:59:54.506Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-21T22:59:54.531Z] [world] You bring the conspiracy architects valve gear to bear on Mud Spider.\n[2026-08-21T22:59:54.531Z] [system] \u23f3 Time passed: 6 min\n[2026-08-21T22:59:54.629Z] [cognitive] neutral  (97ms)\n[2026-08-21T23:00:08.055Z] [world] You seize the initiative. Mud Spider has no time to react.\n[2026-08-21T23:00:08.055Z] [combat] You \u2014 d20 \u2192 8 + STR 7 perfect opening (2\u00d7 dice) = 15 vs Mud Spider AC 9 \u2014 \u2713 HIT\n[2026-08-21T23:00:08.057Z] [combat] Your strike with the conspiracy architects valve gear lands for 7. Mud Spider staggers \u2014 9 HP remaining. It answers.\n[2026-08-21T23:00:08.057Z] [combat] Conspiracy Architects Valve Gear \u2014 3 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-08-21T23:00:08.057Z] [combat] Mud Spider turns on Ember \u2014 d20 4 + ATK 5 = 9 vs Ember's AC 15 (vest +5) \u2014 \u2717 MISS\n[2026-08-21T23:00:08.264Z] [debug] persist sizes(KB): total=180 player=50 wm=46[rooms=15 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=79 scene=5\n[2026-08-21T23:00:10.052Z] [debug] ui: tap \"stealth\"\n[2026-08-21T23:00:10.072Z] [player] sneak\n[2026-08-21T23:00:10.073Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-21T23:00:10.116Z] [system] \u23f3 Time passed: 15 min\n[2026-08-21T23:00:10.237Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (121ms)\n[2026-08-21T23:00:15.104Z] [debug] skillcheck: stealth d20=6 STE 9 = 15 vs DC 12 \u2014 Hard \u2192 (resolved below)\n[2026-08-21T23:00:15.163Z] [debug] stats: STR7 DEX16 INT5 WIS5 CHA9 STE9 | gear: DEX+10,STR+2,CHA+2,STE+2 | worn: main=Conspiracy Architects Valve Gear off=Quarry-Hewn Skewer head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle amulet=Aetheric Compass ring=Ring of Shadows\n[2026-08-21T23:00:15.164Z] [debug] train: stealth (stealth check) \u2192 progress 48/100\n[2026-08-21T23:00:15.164Z] [world] The daylight leaves you little cover. (stealth \u22121, day)\n[2026-08-21T23:00:15.164Z] [world] You break away and throw yourself into cover. By the time Mud Spider find the angle, you're already gone \u2014 the next strike comes from nowhere. (+5 next attack)\n[2026-08-21T23:00:15.165Z] [debug] stealth: reset WIN init 16 vs 15 (cover, +5 2r)\n[2026-08-21T23:00:15.165Z] [combat] Mud Spider smokes \u2014 acid eats 3. (6/18 HP, 2 turns left)\n[2026-08-21T23:00:15.166Z] [combat] Mud Spider \u2014 d20 \u2192 14 + ATK 5 = 19 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-21T23:00:16.653Z] [debug] ui: tap \"dodge\"\n[2026-08-21T23:00:16.658Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22122 HP)\n[2026-08-21T23:00:16.666Z] [player] dodge\n[2026-08-21T23:00:16.666Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-21T23:00:16.667Z] [world] You commit to the dodge. Slip Mud Spider's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-21T23:00:16.668Z] [combat] Mud Spider smokes \u2014 acid eats 3. (3/18 HP, 1 turn left)\n[2026-08-21T23:00:16.704Z] [combat] Mud Spider \u2014 d20 \u2192 9 + ATK 5 = 14 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-08-21T23:00:16.704Z] [combat] Dodge \u2014 d20 \u2192 18 + DEX 16 = 34 vs ATK 14. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-21T23:00:16.705Z] [debug] arbiter: template (reason=combat)\n[2026-08-21T23:00:16.705Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-21T23:00:16.705Z] [system] \u23f3 Time passed: 6 min\n[2026-08-21T23:00:16.829Z] [cognitive] neutral  (123ms)\n[2026-08-21T23:00:18.019Z] [debug] ui: tap \"off: acid-etched quarry-hewn skewer\"\n[2026-08-21T23:00:18.020Z] [system] unseen \u2014 next strike +5 fades.\n[2026-08-21T23:00:18.065Z] [player] attack with the off-hand quarry-hewn skewer\n[2026-08-21T23:00:18.066Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand quarry hewn skewer resolved=Quarry-Hewn Skewer range=close enemies=1 hooks=1\n[2026-08-21T23:00:18.066Z] [combat] Mud Spider smokes \u2014 acid eats 3. (0/18 HP, 0 turns left)\n[2026-08-21T23:00:18.066Z] [combat] Mud Spider shakes off the last of the acid \u2014 the Field-Forged Sunder has run its course.\n[2026-08-21T23:00:18.067Z] [reward] Mud Spider defeated. You recover Spider Silk.\n[2026-08-21T23:00:18.068Z] [reward] +8 TC pried from the dust.\n[2026-08-21T23:00:22.806Z] [debug] ui: tap \"take / salvage\"\n[2026-08-21T23:00:24.108Z] [world] You take the Bone Shortsword from where it lay.\n[2026-08-21T23:00:24.108Z] [reward] \u2726 Bone Shortsword (Common).\n[2026-08-21T23:00:24.127Z] [world] You take the Lost Seeker's Gloves from where it lay.\n[2026-08-21T23:00:24.128Z] [reward] \u2726 Lost Seeker's Gloves (Common).\n[2026-08-21T23:00:24.130Z] [world] You take the Reclaimer's Cloak from where it lay.\n[2026-08-21T23:00:24.130Z] [reward] \u2726 Reclaimer's Cloak (Common).\n[2026-08-21T23:00:25.015Z] [world] You take the Aether Dust from where it lay.\n[2026-08-21T23:00:25.015Z] [reward] \u2726 Aether Dust (Common).\n[2026-08-21T23:00:25.894Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-21T23:00:26.028Z] [world] You strip the battery core carefully. Something usable comes free in your hand.\n[2026-08-21T23:00:26.029Z] [world] You work the flood root over. A part of it comes loose, intact.\n[2026-08-21T23:00:26.029Z] [world] You strip the stone stair carefully. Something usable comes free in your hand.\n[2026-08-21T23:00:26.029Z] [reward] \u2726 Salvage haul:\n[2026-08-21T23:00:26.029Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-21T23:00:26.029Z] [reward]     \u2022 Stick (Common)\n[2026-08-21T23:00:26.029Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-08-21T23:00:31.535Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 5534ms read 4201ms/write 1303ms in 799t\u2192out 33t 5.3ms/t HIT-CAP (162ch)\n[2026-08-21T23:00:31.624Z] [debug] homework: scene_intro \"Asgardar\" \u2713 5731ms\n[2026-08-21T23:00:41.361Z] [debug] ui: tap \"ENTER\"\n[2026-08-21T23:00:41.366Z] [world] You step inside abandoned outpost, into the great hall.\n[2026-08-21T23:00:41.367Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n[2026-08-21T23:00:46.011Z] [debug] ui: tap \"take / salvage\"\n[2026-08-21T23:00:48.512Z] [world] The banner yields little of value, though a Cloth Scrap ends up in your pack.\n[2026-08-21T23:00:48.513Z] [world] You work the bench over. A part of it comes loose, intact.\n[2026-08-21T23:00:48.513Z] [world] You salvage the fire pit. The take is small but real.\n[2026-08-21T23:00:48.513Z] [world] Slim pickings on the table. You pocket a Cloth Scrap on the way out.\n[2026-08-21T23:00:48.514Z] [reward] \u2726 Salvage haul:\n[2026-08-21T23:00:48.514Z] [reward]     \u2022 Cloth Scrap x3 (Common)\n[2026-08-21T23:00:48.514Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-08-21T23:00:51.145Z] [debug] ui: tap \"Armory\"\n[2026-08-21T23:00:51.147Z] [world] You step into the armory.\n[2026-08-21T23:00:51.148Z] [world] Weapon racks, mostly stripped bare. A whetstone, a barrel of broken hafts, and a weapons chest with a stubborn lock.\n[2026-08-21T23:00:56.164Z] [debug] ui: tap \"take / salvage\"\n[2026-08-21T23:00:59.452Z] [world] You work the barrel over. A part of it comes loose, intact.\n[2026-08-21T23:00:59.453Z] [world] You work the chest over. A part of it comes loose, intact.\n[2026-08-21T23:00:59.453Z] [world] You salvage the rack. The take is small but real.\n[2026-08-21T23:00:59.454Z] [world] You break the whetstone apart. Among the pieces, something worth keeping.\n[2026-08-21T23:00:59.454Z] [reward] \u2726 Salvage haul:\n[2026-08-21T23:00:59.455Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-08-21T23:00:59.455Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-21T23:00:59.455Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-08-21T23:00:59.456Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-21T23:00:59.718Z] [debug] persist sizes(KB): total=177 player=51 wm=46[rooms=15 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=78 scene=3\n[2026-08-21T23:01:01.631Z] [debug] ui: tap \"Cellar\"\n[2026-08-21T23:01:01.634Z] [world] You step into the cellar.\n[2026-08-21T23:01:01.634Z] [world] Cool dark under the stone. Casks line the walls; a few have not been tapped. Crates molder in the corner.\n[2026-08-21T23:01:10.935Z] [debug] homework: intro-fill armed after 8735ms idle\n[2026-08-21T23:01:15.266Z] [debug] ui: tap \"take / salvage\"\n[2026-08-21T23:01:18.823Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 7775ms read 6332ms/write 1416ms in 822t\u2192out 33t 7.7ms/t HIT-CAP (149ch)\n[2026-08-21T23:01:18.944Z] [debug] homework: scene_intro \"The Sunken Enclave\" \u2713 8010ms\n[2026-08-21T23:01:22.049Z] [world] You strip the crate carefully. Something usable comes free in your hand.\n[2026-08-21T23:01:22.049Z] [world] You salvage the shelf. The take is small but real.\n[2026-08-21T23:01:22.049Z] [reward] \u2726 Salvage haul:\n[2026-08-21T23:01:22.050Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-21T23:01:22.052Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n[2026-08-21T2",
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqdrsm78g [inline 11/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtawqdrsm78g"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T02:32:18.034980Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T02:32:18.243000Z",
+  "fingerprints": [
+    "8e8887eb2ec21d4b16a51b166194fb1c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "cfd7ffef12394837b36b50b0da2d41c1",
+  "previousEventID": "bfc79409482742c5b409027d4c54e919"
+}
