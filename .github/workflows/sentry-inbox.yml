@@ -116,6 +116,55 @@ jobs:
                   fetched.append(safe)
           print('fetched:', fetched or 'nothing new')
 
+          # ⚠⚠⚠ OTA-1515 — REASSEMBLE THE PARTS. A chunked send arrives as N
+          # separate events, each with one slice of the log, all sharing a
+          # `bundleId` tag and carrying their own `part`/`parts`. Twenty
+          # fragments in twenty directories is not evidence anyone can read, so
+          # stitch them back into one file per bundle, IN ORDER, and say plainly
+          # which parts are missing rather than silently concatenating a hole.
+          def tagval(ev, key):
+              for t in (ev.get('tags') or []):
+                  if isinstance(t, dict) and t.get('key') == key:
+                      return str(t.get('value'))
+              return None
+
+          bundles = {}
+          for d in sorted(out_root.glob('player-log_*')):
+              ev_path = d / 'event.json'
+              if not ev_path.exists():
+                  continue
+              try:
+                  ev = json.loads(ev_path.read_text())
+              except Exception:
+                  continue
+              bid = tagval(ev, 'bundleId')
+              part = tagval(ev, 'part')
+              parts = tagval(ev, 'parts')
+              if not bid or not part or not parts:
+                  continue
+              slices = sorted(d.glob('game-log.part*'))
+              if not slices:
+                  continue
+              bundles.setdefault(bid, {'total': int(parts), 'seen': {}})
+              try:
+                  bundles[bid]['seen'][int(part)] = slices[0].read_text(errors='replace')
+              except Exception as e:
+                  print(f'  part {part} of {bid} unreadable: {e}')
+
+          for bid, b in bundles.items():
+              total = b['total']
+              have = sorted(b['seen'])
+              missing = [n for n in range(1, total + 1) if n not in b['seen']]
+              dest = out_root / f'assembled_{bid}'
+              dest.mkdir(parents=True, exist_ok=True)
+              text = ''.join(b['seen'][n] for n in have)
+              (dest / 'game-log.txt').write_text(text)
+              note = f'bundle {bid}: {len(have)}/{total} parts, {len(text)} chars'
+              if missing:
+                  note += f' — MISSING {missing}'
+              (dest / 'README.txt').write_text(note + chr(10))
+              print('  assembled:', note)
+
           # ⚠⚠ 2026-08-25 — THE OUTCOMES LEDGER, because "sent" and "kept" are
           # different facts. Tonight the owner's SEND LOG showed sent (the
           # client got its acknowledgment) and the events never appeared in the

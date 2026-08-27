@@ -24848,7 +24848,53 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ScrollView passes taps through and only intercepts drags). Both gestures
 // now do what they look like they do, and a test pins the nesting order so
 // the next tap-target cannot swallow it again.
-export const OTA_BUILD_ID = '2026-08-27-1514-the-portrait-scrolls-again';
+// ⚠⚠⚠ OTA-1515 — THE LOG GOES IN PARTS (the send audit, and its answer).
+// Owner: "I want a full audit and I want the root cause found and double
+// verified in 2 directions… just the game log, not the inventory or save file
+// or anything else. if over 20 parts it will be a long send, make sure it
+// can't time out."
+// DIRECTION ONE, conclusive by absence: the relay's outcome query was widened
+// from 24h to 30d and the ENTIRE thirty-day ledger reads accepted/error 22 and
+// accepted/attachment 1,212,790 — with no rate_limited, no filtered, no
+// invalid, no client_discard. Sentry has never once refused anything from this
+// org, so every server-side theory (quota, spike protection, a cached 429
+// poisoning the attachment category) is dead: the envelope is not rejected, it
+// never arrives. (24h alone showed only "accepted/error 2", which reads as
+// health and was the lens that hid this for two days.)
+// DIRECTION TWO, read out of the vendor source rather than inferred:
+// @sentry/react-native declares `export function flush()` with ZERO parameters
+// and forwards `client.flush()` with nothing. Core's promise buffer documents
+// what nothing means — "not passing anything will make the promise wait as long
+// as it takes to drain" — and core's _isClientDoneProcessing guards its only
+// exit with `if (timeout && …)`, which undefined never satisfies. So the
+// `await s.flush(10_000)` standing since OTA-1492 was never a ten-second wait.
+// It was an UNBOUNDED one, and when the native captureEnvelope call does not
+// settle the send hangs forever: never true, never false, never thrown, never
+// logged.
+// THE TWO DIRECTIONS AGREE ON WHAT LOOKED LIKE A CONTRADICTION. Crash records
+// kept arriving — twenty-two of them — because the crash transport is
+// fire-and-forget: it captures and NEVER flushes, so nothing waits on the
+// native promise. Bundles are the only path that ever awaited a flush. Unlike
+// the payload-size theory this survives the owner's own controlled experiment:
+// he started a fresh character and sent a tiny bundle, and it failed exactly
+// like the megabyte ones — an unbounded wait does not care how big the thing it
+// is waiting on was. Size is ruled out; the missing deadline is not.
+// THE FIX IS A WALL THAT EXISTS. flushWithRealDeadline races the SDK's flush
+// against our own timer, so a stalled send resolves false and gets written down
+// instead of vanishing; both send paths go through it. Second, three early
+// returns that used to share one silent `false` — reporting switched off, no
+// native module, no DSN — now NAME themselves in the report and in the log, so
+// a refusal stops reading like a transport failure. Third, the payload is the
+// game log ALONE, in 60K-char parts, one attachment apiece, each flushed on its
+// own budget: no single deadline covers a twenty-part send, a part that misses
+// costs that part rather than the send, and nothing is assembled at megabyte
+// scale (insurance against a real second hazard, not the cure). Every part
+// carries the same bundleId plus part/parts and the relay stitches them back in
+// order, NAMING any gap rather than concatenating a hole. The bundle is still
+// persisted whole for the retry and COPY LOG still exports everything. The
+// misleading "WILL RETRY AT BOOT" copy is gone: tapping again retries now.
+export const OTA_BUILD_ID = '2026-08-27-1515-the-log-goes-in-parts';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1514-the-portrait-scrolls-again';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1513-the-other-side-of-the-vial';
 // golem catch-up 2026-08-26: markerless publish of OTA-1513 (enemy weapon coatings, hit location, inflict/cure symmetry) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1512-the-worn-piece-is-readable';

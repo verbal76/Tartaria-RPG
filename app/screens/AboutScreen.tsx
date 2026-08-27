@@ -37,7 +37,7 @@ import { composeAndSendBugReport } from '../diagnostics/bugReport';
 import {
   loadReportingPref, setReportingEnabled, reportingStatusLine, reportingConfigured,
 } from '../diagnostics/crashReporter';
-import { sendDiagnosticsBundle } from '../diagnostics/sentryTransport'; // OTA-1489
+import { sendGameLogChunked, describeChunkedSend } from '../diagnostics/sentryTransport'; // OTA-1489, chunked at OTA-1515
 import { persistPendingBundle, MAX_SEND_ATTEMPTS } from '../diagnostics/pendingBundle'; // OTA-1504
 // ⚠ OTA-1490 — the owner gate is DEVICE-sticky now: any character on a device
 // that has ever held an unlock-named one gets the owner tools ("I have 2
@@ -280,11 +280,35 @@ export function AboutScreen() {
       // retries run even after a "successful" flush, because flush()===true
       // has been caught reporting envelopes that never arrived.
       const pending = await persistPendingBundle(bundle);
-      const ok = await sendDiagnosticsBundle(bundle, pending ? { bundleId: pending.id, attempt: 1 } : {});
+      // ⚠⚠⚠ OTA-1515 — THE GAME LOG, IN PARTS, AND NOTHING ELSE. Owner: *"right
+      // now I am trying to send a full log, and just the game log, not the
+      // inventory or save file or anything else… if over 20 parts it will be a
+      // long send, make sure it can't time out."*
+      //
+      // The ROOT CAUSE lives at sentryTransport's flushWithRealDeadline, not
+      // here: RN's `flush()` takes no arguments, so the ten-second deadline we
+      // had been passing since OTA-1492 was thrown away and every bundle send
+      // waited FOREVER. Crash records kept arriving only because the crash
+      // transport never flushes at all. Parts are the other half of what he
+      // asked for — the game log alone, and no single deadline covering a
+      // twenty-part send.
+      //
+      // ⚠ The bundle is still PERSISTED whole above — the boot retry and the
+      // save/inventory evidence keep their durable copy on disk, and COPY LOG
+      // still exports everything. This changes what goes over the wire.
+      const chunk = await sendGameLogChunked(bundle.log, pending?.id ?? `t${Date.now().toString(36)}`);
+      const ok = chunk.sent > 0 && chunk.sent === chunk.parts;
+      useGameStore.getState().appendLog('debug', describeChunkedSend(chunk));
       // ⚠ OTA-1492 — the outcome goes in the log either way, so a send that
       // "succeeded" on the button but never arrived server-side (the owner's
       // first three taps) leaves a line the next diagnosis can start from.
-      useGameStore.getState().appendLog('debug', `send-log: ${ok ? 'flushed to Sentry' : 'FAILED - envelope did not go out'}${
+      // ⚠⚠ OTA-1515 — a REFUSAL is not a failed send. `chunk.stopped` names the
+      // three causes that used to share one silent `false` (switch off, no
+      // native module, no DSN); reading "0/1 parts confirmed" for any of them
+      // is what sent the last diagnosis hunting the transport for weeks.
+      useGameStore.getState().appendLog('debug', `send-log: ${ok ? 'all parts flushed to Sentry'
+        : chunk.stopped ? `not attempted — ${chunk.stopped}`
+        : `only ${chunk.sent}/${chunk.parts} parts confirmed`}${
         pending
           ? ` — bundle #${pending.id} kept on disk, boots retry up to ${MAX_SEND_ATTEMPTS} sends total`
           : ' — and the retry file could not be written'
@@ -1033,7 +1057,7 @@ export function AboutScreen() {
               <Text style={styles.sessionBtnSecondaryText}>
                 {logSendState === 'busy' ? 'SENDING LOG…'
                   : logSendState === 'sent' ? '✓ LOG SENT — SAFE TO CLOSE'
-                  : logSendState === 'queued' ? '⏳ SAVED — WILL RETRY AT BOOT'
+                  : logSendState === 'queued' ? '⏳ SAVED — TAP AGAIN TO RETRY NOW'
                   : logSendState === 'failed' ? '✗ SEND FAILED — USE COPY LOG'
                   : 'SEND LOG TO SENTRY'}
               </Text>

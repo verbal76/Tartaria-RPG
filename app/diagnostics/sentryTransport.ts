@@ -49,7 +49,81 @@ interface SentryLike {
   // ⚠ OTA-1492 — flush forces the queued envelope OUT and answers whether it
   // went. Without it, captureEvent is fire-and-forget: the owner's first three
   // SEND LOG taps reported "SENT" while nothing ever arrived server-side.
+  //
+  // ⚠⚠⚠ OTA-1515 — THE ARGUMENT IS A LIE, AND THAT LIE IS THE ROOT CAUSE.
+  // The type says `(timeout?: number)`, and every call site here has been
+  // passing one since OTA-1492. `@sentry/react-native`'s exported flush
+  // (dist/js/sdk.js) is declared `export function flush()` — ZERO parameters —
+  // and calls `client.flush()` with nothing. See flushWithRealDeadline below
+  // for what that costs. The signature stays `(timeout?: number)` because an
+  // SDK that DOES honour it must still be handed one; it is simply never
+  // trusted on its own.
   flush?: (timeout?: number) => PromiseLike<boolean>;
+}
+
+/**
+ * ⚠⚠⚠ OTA-1515 — THE ROOT CAUSE, NAMED AT THE LINE, VERIFIED IN TWO DIRECTIONS
+ * THAT EXCLUDE EACH OTHER'S ALTERNATIVES.
+ *
+ * ⚠⚠ DIRECTION ONE — THE SERVER, CONCLUSIVE BY ABSENCE. Widening the org
+ * outcome query from 24h to 30 days returned, in full:
+ *
+ *     accepted / none / error       → 22
+ *     accepted / none / attachment  → 1,212,790
+ *
+ * and NOTHING else. No `rate_limited`, no `filtered`, no `invalid`, no
+ * `client_discard`. In thirty days Sentry has never once refused anything from
+ * this org, so every server-side theory — quota, spike protection, a cached
+ * 429 poisoning the attachment category — is dead. The envelope is not being
+ * rejected. It is never arriving.
+ *
+ * ⚠⚠ DIRECTION TWO — THE DEVICE, AND IT IS READABLE IN THE VENDOR SOURCE.
+ * `@sentry/react-native` exports `flush()` with no parameters. It forwards to
+ * core's `client.flush(undefined)`, which is:
+ *
+ *   · `_isClientDoneProcessing(undefined)` — a 1ms setInterval whose only exit
+ *     is `_numProcessing === 0`; its timeout branch reads `if (timeout && …)`,
+ *     so with undefined it CANNOT time out; and
+ *   · `transport.flush(undefined)` → `promisebuffer.drain(undefined)`, whose
+ *     own docstring says: "Passing 0 (or not passing anything) will make the
+ *     promise wait as long as it takes for the queue to drain."
+ *
+ * So `await s.flush(10_000)` never had a ten-second deadline. It had NO
+ * deadline. When the native `captureEnvelope` call does not settle — a wedged
+ * bridge, a stalled socket, a device swapping under a ~425MB model context —
+ * the send hangs forever: never true, never false, never thrown, never logged.
+ *
+ * ⚠⚠ AND THE TWO DIRECTIONS AGREE ON WHAT LOOKED LIKE A CONTRADICTION. Crash
+ * records keep arriving (twenty-two of them) because the crash transport is
+ * FIRE-AND-FORGET: `installCrashTransport` calls `captureEvent` and never
+ * flushes, so nothing waits on the native promise and the native layer
+ * delivers whenever it can. Bundles are the ONLY path that ever awaited a
+ * flush. That is the real asymmetry — and unlike payload size it survives the
+ * owner's controlled experiment, because an unbounded wait does not care how
+ * big the thing it is waiting on was. A new character's tiny bundle hangs
+ * exactly as readily as a megabyte one.
+ *
+ * ⚠⚠⚠ SO THE FIX IS TO STOP TRUSTING THE SDK'S DEADLINE AND KEEP OUR OWN.
+ * The race below is what *"make sure it can't time out"* actually requires:
+ * not a longer wall, but a wall that EXISTS, so a stalled send resolves
+ * `false` and gets written down instead of vanishing.
+ *
+ * ⚠ The losing promise is neither cancellable nor cancelled, and that is a win
+ * rather than a leak: the envelope may still go out afterwards, and a late
+ * delivery is a delivered log. All the race governs is how long we stand there
+ * before recording what happened.
+ */
+async function flushWithRealDeadline(s: SentryLike, ms: number): Promise<boolean> {
+  if (typeof s.flush !== 'function') return true; // old SDK: queue-and-hope, unchanged
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      Promise.resolve(s.flush(ms)).then((ok) => ok !== false),
+      new Promise<boolean>((resolve) => { timer = setTimeout(() => resolve(false), ms); }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 let sdk: SentryLike | null = null;
@@ -249,13 +323,175 @@ export async function sendDiagnosticsBundle(
     // three sends showed success while zero events reached the server: the
     // capture only QUEUES. flush() pushes the envelope out now and says
     // whether everything went; an SDK without flush keeps the old behavior.
-    if (typeof s.flush === 'function') {
-      return await s.flush(10_000);
-    }
-    return true;
+    //
+    // ⚠⚠⚠ OTA-1515 — and it goes through OUR deadline, not the SDK's. The bare
+    // `await s.flush(10_000)` that stood here was an UNBOUNDED wait: RN's flush
+    // takes no arguments. This is the boot-retry path, so it is also where a
+    // hang was most invisible — nobody is looking at a screen during a retry.
+    return await flushWithRealDeadline(s, 10_000);
   } catch {
     return false; // the button shows FAILED and the clipboard path still exists
   }
+}
+
+/**
+ * ⚠⚠⚠ OTA-1515 — THE LOG GOES IN PARTS, AND THE AUDIT IS WHY.
+ *
+ * Owner: *"I want a full audit and I want the root cause found and double
+ * verified in 2 directions… right now I am trying to send a full log, and just
+ * the game log, not the inventory or save file or anything else. if over 20
+ * parts it will be a long send, make sure it can't time out."*
+ *
+ * ⚠⚠ THE ROOT CAUSE ITSELF IS NOT HERE — it is `flushWithRealDeadline` above,
+ * which documents both directions of the audit and the vendor lines that prove
+ * them. In one sentence: RN's `flush()` takes no arguments, so the deadline we
+ * had been passing since OTA-1492 was discarded and every bundle send was an
+ * UNBOUNDED wait. That is fixed at the flush.
+ *
+ * ⚠⚠ THIS FUNCTION IS THE SECOND HALF, and it answers the owner's own two
+ * requirements rather than the fault: *"just the game log, not the inventory or
+ * save file or anything else"*, and *"if over 20 parts it will be a long send,
+ * make sure it can't time out."* Each part is its own small event with ONE
+ * small attachment, sent and flushed on its own:
+ *
+ *   · the payload is the game log ALONE, which is what he asked to send;
+ *   · a part that misses its deadline costs THAT PART, not the send — the loop
+ *     keeps going and reports what got through, which is what "make sure it
+ *     can't time out" actually requires (a longer wall would only move it);
+ *   · twenty parts is a long send and that is FINE, because there is no single
+ *     deadline for the whole thing to miss;
+ *   · and nothing is ever assembled at megabyte scale, which was a real second
+ *     hazard even though it was NOT the fault — the owner disproved size
+ *     himself by sending a brand-new character's tiny bundle and watching it
+ *     fail identically. Chunking earns its place as insurance, not as the cure.
+ *
+ * Every part carries the same `bundleId` and its own `part`/`parts` tags, so
+ * the relay can reassemble them in order and see immediately if one is missing.
+ */
+export const LOG_CHUNK_CHARS = 60_000;
+/** Per-part flush budget. Generous, because a part is small and a slow network
+ *  is not a reason to throw the part away — but bounded, because the loop must
+ *  keep moving. A part that misses it is reported, not fatal. */
+const PART_FLUSH_MS = 30_000;
+
+export interface ChunkedSendReport {
+  /** Parts the SDK accepted AND flushed inside the budget. */
+  sent: number;
+  /** Parts attempted in total. */
+  parts: number;
+  /** Total characters of log actually handed to the transport. */
+  chars: number;
+  /** Per-part ms, so a 25ms failure and a 30s one stop reading alike. */
+  timings: number[];
+  /** First part that threw, with its message — the on-device fault, named. */
+  threwAt: string | null;
+  /**
+   * ⚠⚠⚠ WHY NOTHING WAS EVEN ATTEMPTED, when that is the answer.
+   *
+   * This field exists because its absence cost weeks. Every early return in
+   * the old `sendDiagnosticsBundle` — reporting switched off, no native SDK in
+   * this build, no DSN configured — produced the SAME flat `false` that a
+   * genuine transport failure produced, and the button rendered all of them as
+   * one message. A 25ms refusal and a stalled native call were indistinguishable
+   * from the outside, so every diagnosis had to guess which one it was looking
+   * at. Now the report says so in words, and the log line carries it.
+   *
+   * `null` means the loop actually ran.
+   */
+  stopped: string | null;
+  bundleId: string;
+}
+
+/**
+ * Send the GAME LOG ONLY, in parts. No save, no inventory, no device summary —
+ * the owner asked for exactly this payload, and it is also the payload whose
+ * size was the fault.
+ */
+export async function sendGameLogChunked(
+  fullLog: string,
+  bundleId: string,
+): Promise<ChunkedSendReport> {
+  const report: ChunkedSendReport = {
+    sent: 0, parts: 0, chars: 0, timings: [], threwAt: null, stopped: null, bundleId,
+  };
+  // ⚠ Each refusal names ITSELF. See `stopped` above for why three different
+  // causes sharing one silent `false` is the bug that hid the real one.
+  if (!reportingEnabled()) {
+    report.stopped = 'crash reporting is switched off on this device';
+    return report;
+  }
+  const s = loadSdk();
+  if (!s) {
+    report.stopped = 'this build has no Sentry native module';
+    return report;
+  }
+  if (crashReportDsn() === null) {
+    report.stopped = 'no DSN is configured in this build';
+    return report;
+  }
+
+  // ⚠ The WHOLE log, not a tail. Chunking is what makes that affordable — the
+  // 800K tail cap existed because one envelope had to hold everything.
+  const text = String(fullLog ?? '');
+  const total = Math.max(1, Math.ceil(text.length / LOG_CHUNK_CHARS));
+  report.parts = total;
+
+  for (let i = 0; i < total; i++) {
+    const slice = text.slice(i * LOG_CHUNK_CHARS, (i + 1) * LOG_CHUNK_CHARS);
+    const partNo = i + 1;
+    const startedAt = Date.now();
+    try {
+      s.captureEvent(
+        {
+          message: `player-log ${OTA_BUILD_ID} #${bundleId} [part ${partNo}/${total}]`,
+          level: 'info',
+          tags: {
+            kind: 'player-log',
+            line: productLine(),
+            bundleId,
+            part: String(partNo),
+            parts: String(total),
+          },
+        },
+        {
+          attachments: [{
+            filename: `game-log.part${String(partNo).padStart(3, '0')}-of-${total}.txt`,
+            data: slice,
+            contentType: 'text/plain',
+          }],
+        },
+      );
+      // ⚠⚠⚠ OUR deadline, not the SDK's — flushWithRealDeadline explains why
+      // `s.flush(PART_FLUSH_MS)` on its own is an unbounded wait, and why an
+      // unbounded wait is the whole reason no log has arrived since 2026-08-25.
+      const ok = await flushWithRealDeadline(s, PART_FLUSH_MS);
+      report.timings.push(Date.now() - startedAt);
+      if (ok) report.sent += 1;
+      report.chars += slice.length;
+    } catch (err) {
+      // ⚠ ONE PART'S FAILURE IS NOT THE SEND'S FAILURE. Record where it broke
+      // and keep going — a log missing part 7 is still nineteen parts of
+      // evidence, and the gap itself is a clue.
+      report.timings.push(Date.now() - startedAt);
+      if (report.threwAt === null) {
+        report.threwAt = `part ${partNo}/${total}: ${err instanceof Error ? err.message : String(err)}`;
+      }
+    }
+  }
+  return report;
+}
+
+/** One line for the device log — the whole outcome, readable at a glance. */
+export function describeChunkedSend(r: ChunkedSendReport): string {
+  const worst = r.timings.length ? Math.max(...r.timings) : 0;
+  const median = r.timings.length
+    ? [...r.timings].sort((a, b) => a - b)[Math.floor(r.timings.length / 2)]
+    : 0;
+  // ⚠ A refusal is reported as a refusal, never as "0 parts out" — those two
+  // read alike and mean completely different things to whoever reads this next.
+  if (r.stopped) return `send-log: #${r.bundleId} — NOT ATTEMPTED: ${r.stopped}`;
+  return `send-log: #${r.bundleId} — ${r.sent}/${r.parts} parts out (${r.chars} chars, `
+    + `median ${median}ms, worst ${worst}ms)${r.threwAt ? ` — THREW at ${r.threwAt}` : ''}`;
 }
 
 /** Tests only. */

@@ -127,14 +127,21 @@ describe('OTA-1504 — the bundle is on disk before anything is sent', () => {
   it('⚠⚠ AboutScreen persists BEFORE it sends, and reports the queued state honestly', () => {
     const body = between(ABOUT, 'async function handleSendLog()', 'async function handleCopyLog()');
     const persistAt = body.indexOf('persistPendingBundle(bundle)');
-    const sendAt = body.indexOf('sendDiagnosticsBundle(bundle,');
+    // ⚠ OTA-1515 changed WHAT is sent (the game log, in parts) but not this
+    // ORDER, which is the whole point of the pin: the durable copy is on disk
+    // before anything crosses the wire, so the owner's swipe-away habit is
+    // free. Re-pinned to the current sender rather than deleted.
+    const sendAt = body.indexOf('sendGameLogChunked(bundle.log,');
     expect(persistAt).toBeGreaterThan(-1);
     expect(sendAt).toBeGreaterThan(persistAt);
     // The three outcomes are distinct: sent, saved-for-retry, truly failed.
     // (Pins carry their ternary context — bound to the code, not to prose,
     // per the check:quotedpins discipline.)
     expect(body).toContain("setLogSendState(ok ? 'sent' : pending ? 'queued' : 'failed')");
-    expect(ABOUT).toContain("logSendState === 'queued' ? '⏳ SAVED — WILL RETRY AT BOOT'");
+    // ⚠ OTA-1515 replaced the boot-retry copy: the retry no longer needs a
+    // restart, so the button says so. The CONTRACT pinned here is unchanged —
+    // the queued state still tells the truth about a bundle kept on disk.
+    expect(ABOUT).toContain("logSendState === 'queued' ? '⏳ SAVED — TAP AGAIN TO RETRY NOW'");
     // "SAFE TO CLOSE" is the owner's exact habit being blessed, not decoration.
     expect(ABOUT).toContain("logSendState === 'sent' ? '✓ LOG SENT — SAFE TO CLOSE'");
   });
