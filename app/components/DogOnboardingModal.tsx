@@ -28,6 +28,18 @@ import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, TextInput, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { defaultDogName } from '../engine/dogCompanion';
+// ⚠⚠⚠ OTA-1525 — THE OWNER WANTED THE SWITCH HERE TOO: "push the dog card tips
+// button too." OTA-1524 had exempted this card because it ASKS rather than tells
+// — its own contract is "No dismiss-without-answering: the dog is already
+// rescued; it needs a name" — and a plain dismiss would leave the save wedged
+// exactly where OTA-1027 found it.
+// ⚠⚠ SO THE BUTTON IS HERE AND IT DOES NOT DISMISS. It silences every FUTURE tip
+// — the thing the player is actually asking for when they reach for it — and
+// leaves this one question standing, because the dog still needs an answer. A
+// switch that silences tips must not also silence a question the game needs
+// answered; honouring the request and protecting the save are not in conflict
+// once the button stops meaning "close this".
+import { setHintsDisabled, getHintsDisabled } from './useFirstTimeHint';
 
 /** How long the fight result gets the screen to itself once any competing
  *  card is gone. Long enough to read "you won" and the spoils; short enough
@@ -43,6 +55,10 @@ export function DogOnboardingModal() {
   const notice = useGameStore((s) => s.missionCompleteNotice);
   const confirm = useGameStore((s) => s.confirmDogOnboarding);
   // null = untouched (falls back to any part-answer a wedged save carried).
+  // ⚠ Local echo so the tap has visible feedback: the link is the only control
+  // on this card that does not change the screen, and a control that appears to
+  // do nothing reads as broken.
+  const [tipsOff, setTipsOff] = useState(false);
   const [breed, setBreed] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
   const [sex, setSex] = useState<'boy' | 'girl' | null>(null);
@@ -152,6 +168,25 @@ export function DogOnboardingModal() {
             <Text style={styles.hint}>
               A blank breed or name is fine — the mud fills in. Boy or girl needs an answer.
             </Text>
+            {/* ⚠⚠ OTA-1525 — the same escape hatch every other card offers, in the
+                same words and writing the same global flag — but WITHOUT the
+                dismiss. Tapping it turns off every future tip and leaves this
+                card up, because the dog is already rescued and still needs a
+                name. The label latches so the tap is visibly acknowledged. */}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={tipsOff || getHintsDisabled()
+                ? 'Tips are off. This card still needs an answer.'
+                : 'Turn off all future tips. This card stays until the dog is named.'}
+              onPress={() => { void setHintsDisabled(true); setTipsOff(true); }}
+              disabled={tipsOff || getHintsDisabled()}
+              hitSlop={8}
+              style={styles.turnOffBtn}
+            >
+              <Text style={styles.turnOffText}>
+                {tipsOff || getHintsDisabled() ? 'Tips off — the dog still needs a name' : 'Turn off tips'}
+              </Text>
+            </Pressable>
           </View>
         </ScrollView>
       </View>
@@ -233,5 +268,7 @@ const styles = StyleSheet.create({
   confirmBtnDisabled: { borderColor: '#4a412c', backgroundColor: '#15130d' },
   confirmText: { color: '#c9a86a', fontSize: 12, letterSpacing: 1.5 },
   confirmTextDisabled: { color: '#6b5c3a' },
+  turnOffBtn: { alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 12, marginTop: 6 },
+  turnOffText: { color: '#8aa0a4', fontSize: 11, letterSpacing: 0.6, textDecorationLine: 'underline', textAlign: 'center' },
   hint: { color: '#8aa0a4', fontSize: 10, letterSpacing: 1, textAlign: 'center', marginTop: 12 },
 });

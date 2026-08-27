@@ -25126,7 +25126,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // a name." It asks rather than tells. A switch that silences tips must not also
 // silence a question the game needs answered, or the save wedges exactly where
 // OTA-1027 found it.
-export const OTA_BUILD_ID = '2026-08-27-1524-cover-the-seven-and-mean-the-switch';
+// OTA-1525 — THE DOG CARD GETS THE SWITCH TOO, on the owner's call: "push the
+// dog card tips button too." OTA-1524 had exempted it because it ASKS rather than
+// tells — OTA-1027's contract is "No dismiss-without-answering: the dog is
+// already rescued; it needs a name" — and a plain dismiss would wedge the save
+// mid-naming, exactly where that OTA found it.
+// HIS CALL STANDS AND THE CONFLICT WAS FALSE. What a player reaching for that
+// link wants is "stop showing me these", not "close this one". So the button is
+// there, same words, same global flag — and it does NOT dismiss. Every future tip
+// goes quiet; this one question stays up. The label latches to "Tips off — the
+// dog still needs a name" and the control goes inert, because it is the only
+// thing on this card that does not change the screen and a link that appears to
+// do nothing reads as broken.
+// The card itself stays UNgated by the flag: turning off tips silences tips, not
+// questions the engine needs answered.
+export const OTA_BUILD_ID = '2026-08-27-1525-the-dog-card-gets-the-switch-too';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1524-cover-the-seven-and-mean-the-switch';
 // golem catch-up 2026-08-27: markerless publish of OTA-1523 (BLOCK / SHIELD BASH
 // / THROW SPEAR, elevation both ways, and the combat readout decoded) and
 // OTA-1524 (the seven remaining systems covered, and the tips switch honoured and

@@ -91,12 +91,22 @@ describe('OTA-1524 — the turn-off switch is real everywhere it should be', () 
     expect(HINT).toContain('<Text style={styles.linkText}>Turn off tips</Text>');
   });
 
-  it('⚠⚠⚠ AND THE DOG CARD IS EXEMPT ON PURPOSE — it asks, it does not tell', () => {
-    // "No dismiss-without-answering: the dog is already rescued; it needs a
-    // name." Silencing tips must not silence a question the game needs answered,
-    // or the save wedges exactly where OTA-1027 found it. Stated as a claim
-    // about the CODE, not as a quote of that comment.
-    expect(DOG).not.toContain('setHintsDisabled');
-    expect(DOG).toContain('disabled={!sex}');   // the commit is gated on an answer
+  it('⚠⚠⚠ THE DOG CARD EXEMPTION WAS OVERTURNED BY OTA-1525 — AND THE REASON SURVIVES', () => {
+    // ⚠ THIS PIN ORIGINALLY REQUIRED `DOG` NOT TO CONTAIN setHintsDisabled AT
+    // ALL. That was the right call for OTA-1524 and the wrong one for the owner,
+    // who asked for the button here too: "push the dog card tips button too."
+    // The pin is amended rather than deleted, because the CONSTRAINT it was
+    // protecting is still real and is now the thing worth pinning.
+    //
+    // What changed: the card offers the switch.
+    // What did NOT change, and must not: the switch does not DISMISS it. OTA-1027's
+    // contract is "No dismiss-without-answering: the dog is already rescued; it
+    // needs a name", so silencing tips must never skip the naming beat and wedge
+    // the save. See ota1525 for the full claim; this end holds the boundary.
+    expect(DOG).toContain('setHintsDisabled');       // OTA-1525 — the button is here
+    expect(DOG).toContain('disabled={!sex}');        // and the commit still needs an answer
+    // The card is still raised regardless of the flag: tips off silences TIPS,
+    // never a question the engine needs answered.
+    expect(DOG).not.toMatch(/useHintsDisabled\(\)/);
   });
 });
