@@ -167,7 +167,45 @@ jobs:
               ctx = ev.get('context') or {}
               return ctx.get(key)
 
+          # ⚠⚠⚠ OTA-1520 — READ `_meta`, BECAUSE SENTRY HAS BEEN NAMING THE RULE
+          # ALL ALONG AND THIS READER NEVER LOOKED. On 2026-08-27 nine of the
+          # forty-nine parts arrived as the literal string `[Filtered]` and were
+          # stitched into the assembled log as if they were text — 135,000
+          # characters of the owner's session replaced by a ten-character
+          # apology, with nothing anywhere saying so. Every one of those events
+          # carried the reason, synced into this very tree:
+          #
+          #   context.chunk."" = {"len": 15000, "rem": [["@password:filter","s",0,10]]}
+          #
+          # `@password:filter` is a DEFAULT Sentry rule, tested against the VALUE
+          # (PatternType::KeyValue), with NO word boundaries, replacing the WHOLE
+          # value on a hit — `secret` inside "the secret door", `auth` inside
+          # "authored by". Verified both ways before anything was changed: the
+          # 588,818 surviving characters contain ZERO matches of that pattern,
+          # and the game's own prose carries `authored` ×246 and `secret` ×35.
+          #
+          # So no redaction is ever anonymous again: whatever the rule, print its
+          # id, where it struck, and what it cost in characters.
+          def scrub_notes(ev, field):
+              meta = ((ev.get('_meta') or {}).get('context') or {}).get(field) or {}
+              out = []
+              if not isinstance(meta, dict):
+                  return out
+              def rems(where, ann):
+                  if isinstance(ann, dict):
+                      for rem in (ann.get('rem') or []):
+                          if isinstance(rem, list) and rem:
+                              out.append((where, str(rem[0]), int(ann.get('len') or 0)))
+              for k, v in meta.items():
+                  if k == '':
+                      rems('whole part', v)            # a scalar `chunk` (pre-1520)
+                  elif isinstance(v, dict):
+                      rems(f'block {k}', v.get(''))    # one element of `chunkBlocks`
+              return out
+
           beacons = []
+          scrubbed = {}   # bundleId -> [(part, rule_id, chars_lost)]
+          short = []      # (bundleId, part, declared, rebuilt)
           for d in sorted(out_root.glob('player-log_*')):
               ev_path = d / 'event.json'
               if not ev_path.exists():
@@ -183,11 +221,41 @@ jobs:
                       beacons.append(bid)
                   continue
               part, parts = tagval(ev, 'part'), tagval(ev, 'parts')
-              chunk = extraval(ev, 'chunk')
-              if not bid or not part or not parts or not isinstance(chunk, str):
+              if not bid or not part or not parts:
                   continue
+              # ⚠⚠ OTA-1520 sends the slice as an ARRAY of ~400-char blocks so a
+              # whole-value redaction costs one block instead of one part. Events
+              # synced BEFORE 1520 still carry a single `chunk` scalar and must
+              # keep reassembling — the evidence that found this fault is in them.
+              blocks = extraval(ev, 'chunkBlocks')
+              if isinstance(blocks, list):
+                  field = 'chunkBlocks'
+                  chunk = ''.join(b for b in blocks if isinstance(b, str))
+              else:
+                  field = 'chunk'
+                  chunk = extraval(ev, 'chunk')
+              if not isinstance(chunk, str):
+                  continue
+              for where, rule, lost in scrub_notes(ev, field):
+                  scrubbed.setdefault(bid, []).append((int(part), rule, lost))
+                  print(f'  ⚠ SCRUBBED: {bid} part {part}, {where} — {rule} took {lost} chars')
+              # ⚠ The declared length is the only defence against a SILENT loss.
+              # A redaction, an event trim or a dropped block all surface here as
+              # a shortfall instead of as a seamless join.
+              declared = extraval(ev, 'chunkChars')
+              if isinstance(declared, int) and declared != len(chunk):
+                  short.append((bid, int(part), declared, len(chunk)))
               bundles.setdefault(bid, {'total': int(parts), 'seen': {}})
               bundles[bid]['seen'].setdefault(int(part), chunk)
+          if short:
+              print('  ⚠⚠ SHORT PARTS (declared chars != reassembled chars):')
+              for bid, part, declared, got in sorted(short):
+                  print(f'     {bid} part {part}: declared {declared}, rebuilt {got} — {declared - got} lost')
+          if scrubbed:
+              print('  ⚠⚠ SCRUB TOTALS — what Sentry took, and under which rule:')
+              for bid, notes in sorted(scrubbed.items()):
+                  rules = sorted(set(r for _, r, _ in notes))
+                  print(f'     {bid}: {len(notes)} redactions, {sum(l for _, _, l in notes)} chars, rules {rules}')
           if beacons:
               print('  ⚠ BEACONS ARRIVED (attachment-free sending WORKS):', sorted(set(beacons)))
           else:
@@ -204,6 +272,14 @@ jobs:
               note = f'bundle {bid}: {len(have)}/{total} parts, {len(text)} chars'
               if missing:
                   note += f' — MISSING {missing}'
+              # ⚠⚠ OTA-1520 — A SCRUBBED HOLE IS NOT A COMPLETE LOG, and until
+              # today the README said "27/27 parts" over a file with 135,000
+              # characters cut out of it. Say what was taken, right here.
+              if bid in scrubbed:
+                  notes = scrubbed[bid]
+                  note += (f' — SCRUBBED: {len(notes)} redactions cost {sum(l for _, _, l in notes)} chars'
+                           f' (parts {sorted(set(p for p, _, _ in notes))},'
+                           f' rules {sorted(set(r for _, r, _ in notes))})')
               (dest / 'README.txt').write_text(note + chr(10))
               print('  assembled:', note)
 
@@ -225,6 +301,36 @@ jobs:
           # EVERY outcome, not just the ones that arrived: rate_limited,
           # filtered, invalid, client_discard (the SDK's own confession that it
           # dropped something locally) all name different faults.
+          # ⚠⚠⚠ OTA-1520 — THE SCRUBBER'S OWN SETTINGS, printed rather than
+          # assumed. `@password:filter` reached the log because `dataScrubber` +
+          # `dataScrubberDefaults` are on and nothing exempts the field. The app
+          # side of the fix (blocks instead of one 15,000-char scalar) caps the
+          # damage at ~400 characters per hit and cannot be undone by a settings
+          # change — but the loss goes to ZERO the moment `chunkBlocks` is listed
+          # under the project's SAFE FIELDS, and that is the owner's switch to
+          # throw, not this token's (it is read-scoped by design). So print the
+          # live values every run: when he adds it, the next sync proves it took,
+          # and if it is ever removed the next sync says so instead of quietly
+          # losing prose again.
+          for p in projects:
+              slug = p['slug']
+              try:
+                  cfg = api(f'/projects/{org}/{slug}/')
+              except Exception as e:
+                  print(f'── scrubbing config for {slug}: fetch failed: {e}')
+                  continue
+              print(f'── scrubbing config for {slug}:')
+              for k in ('dataScrubber', 'dataScrubberDefaults', 'scrubIPAddresses',
+                        'sensitiveFields', 'safeFields'):
+                  print(f'  {k}: {cfg.get(k)!r}')
+              rp = cfg.get('relayPiiConfig')
+              print(f'  relayPiiConfig: {rp if rp else "(none)"}')
+              safe = cfg.get('safeFields') or []
+              print('  ⚠ chunkBlocks exempt: '
+                    + ('YES — redactions should be zero from here on'
+                       if any('chunkBlocks' in str(s) for s in safe)
+                       else 'NO — @password:filter can still take ~400 chars per hit'))
+
           import urllib.parse
           for period in ('24h', '7d', '30d'):
               try:

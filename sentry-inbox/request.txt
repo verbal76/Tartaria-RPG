@@ -1,3 +1,17 @@
-sync 2026-08-27T02:12Z — second look for the beacons. hal beacon 02:01:35
-(bundleId mtavmvn26xli, 27 parts), golem beacon 02:02:07 (mtavnjvdw4u4, 22
-parts). The first sync ran 39s after and may have beaten the ingest window.
+sync 2026-08-27 — four fresh logs pushed from the devices, and the first run of
+the OTA-1520 reader.
+
+What changed here: this relay now READS `_meta`, which Sentry has been sending
+all along and nobody looked at. Each of the nine `[Filtered]` parts from the
+02:01 send carries its own reason, already synced into this tree —
+
+  context.chunk."" = {"len": 15000, "rem": [["@password:filter", "s", 0, 10]]}
+
+— so every redaction is now printed with its rule id, its position and its exact
+cost in characters; each part is length-checked against the `chunkChars` it
+declared; and the assembled README states what was taken instead of writing
+"27/27 parts" over a file with 135,000 characters cut out of it.
+
+Also printing each project's live scrubbing settings (dataScrubber,
+dataScrubberDefaults, sensitiveFields, safeFields, relayPiiConfig), so the one
+switch that would take this loss to zero is visible rather than assumed.
