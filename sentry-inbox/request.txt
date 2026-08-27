@@ -1,21 +1,19 @@
-sync 2026-08-27 — three more logs sent, first pull after OTA-1521 + 1522.
+sync 2026-08-27 — first log from a device actually running OTA-1522.
 
-What to look for in these, in order:
+⚠ ONE TRAP TO AVOID READING WRONG. The reload that APPLIED 1522 was executed by
+the code running at that moment — 1520 — which does not clear the liveness crumb.
+So that specific restart will STILL have minted a phantom PROCESS KILLED record,
+and its presence proves nothing about the fix. OTA-1521 only takes effect from
+the NEXT reload onward, because that one runs under 1522's code.
 
-1. PHANTOM DEATHS. OTA-1521 makes the OTA reload mark its own orderly exit, so a
-   deliberate restart should stop minting `PROCESS KILLED — no JS ran` records.
-   Eight of the previous eighteen followed "ota: Restarting to apply..." by 4s to
-   7s. If the fix works, deaths recorded AFTER an OTA apply disappear and only
-   the ten genuinely unexplained ones remain — which is the whole of #81.
-
-2. THE STUN. OTA-1522 makes the incapacitation gate read the post-tick status
-   list. "stunned fades." should never again be followed a millisecond later by
-   "You cannot move. Your action is lost."
-
-3. mtaxtx2bzl8l, STILL 5/27 AND NOW STRANGE. The device logged
-   `DELIVERED (inline, no attachments): beacon out, 27/27 parts accepted
-   (404834 chars)` at 03:03:03 — accepted AND flush-confirmed — and Sentry holds
-   five parts. Every earlier failure in this hunt was honest about itself; this
-   one is not. The issue walk now runs clean and every listing ends short of a
-   full page, so "unread" is no longer an available excuse. Watch whether the new
-   sends land whole.
+So, in order:
+1. BUILD STAMP. Must read 2026-08-27-1522. If it says 1520, the update had not
+   landed when the log was taken and nothing below is testable.
+2. THE STUN — testable RIGHT NOW. "stunned fades." must never be followed a
+   millisecond later by "You cannot move. Your action is lost." Any occurrence of
+   that pair on a 1522 build is OTA-1522 failing outright.
+3. PHANTOM DEATHS — NOT testable from this log alone, for the reason above. What
+   is testable is the count of deaths whose timestamp falls after the 1522 apply.
+   Zero of those is the first real evidence; one is worth investigating.
+4. The ten deaths not explained by an OTA restart are the whole of #81 and are
+   expected to still be present.
