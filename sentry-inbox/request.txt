@@ -1,2 +1,2 @@
-2026-08-27T00:09:48Z
-pull: owner just tapped SEND LOG on OTA-1513 — did it land this time?
+2026-08-27T00:23:52Z
+pull: EVERYTHING — owner sent again and waited 5 minutes for full ingest
