@@ -25002,6 +25002,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // parts came through whole. Its own defect, tracked, not guessed at here.
 export const OTA_BUILD_ID = '2026-08-27-1519-the-attachment-was-the-fault';
 // golem catch-up 2026-08-27: markerless publish of OTA-1519 (all senders inline,
+// flush restored as the delivery signal) to the golem channel. Both channels
+// level at 1519.
+// golem catch-up 2026-08-27: markerless publish of OTA-1519 (all senders inline,
 // flush restored as the delivery signal) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1518-the-beacon-goes-first';
 // golem catch-up 2026-08-27: markerless publish of OTA-1518 (attachment-free
