@@ -25202,6 +25202,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // One error class: a key that is not the thing it names — a label standing in for
 // an identity, a base stat standing in for the number the player is shown.
 export const OTA_BUILD_ID = '2026-08-27-1528-the-name-was-not-the-identity';
+// golem catch-up 2026-08-27: markerless publish of OTA-1528 (enemy intel keyed on
+// the defence profile instead of the reused display name, so strike-to-learn stops
+// describing one raider with a previous raider's weakness; and the Wisdom gate reads
+// the effective stat the character sheet shows) to the golem channel. Both channels
+// level at 1528.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1527-the-chips-answered-what-the-gate-refused';
 // golem catch-up 2026-08-27: markerless publish of OTA-1527 (the enemy portrait's
 // trait chips now respect the same Wisdom gate as the RESIST/WEAK block above
