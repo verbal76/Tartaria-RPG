@@ -24978,6 +24978,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // that decides what actually arrived, and it now names any beacon it finds.
 export const OTA_BUILD_ID = '2026-08-27-1518-the-beacon-goes-first';
 // golem catch-up 2026-08-27: markerless publish of OTA-1518 (attachment-free
+// beacon + inline log parts) to the golem channel. Both channels now sit level
+// at 1518; golem had 1517 early via the mis-committed 993b5ab7, hal got both
+// together in the marked 43f697fa.
+// golem catch-up 2026-08-27: markerless publish of OTA-1518 (attachment-free
 // beacon + inline log parts) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1517-the-green-button-can-reach';
 // golem catch-up 2026-08-27: markerless publish of OTA-1517 (the weapon button
