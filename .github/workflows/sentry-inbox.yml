@@ -96,6 +96,7 @@ jobs:
           # hours — but if the bound is ever hit, it SAYS so, loudly, instead of
           # returning a short list that looks complete.
           page_audit = {}
+          fetch_notes = []
           def api_all(path, max_pages=40):
               rows, url, pages = [], path, 0
               while url and pages < max_pages:
@@ -153,6 +154,13 @@ jobs:
                   issues = api_all(f'/projects/{org}/{slug}/issues/?statsPeriod=90d')
               except Exception as e:
                   issues = []
+                  # ⚠⚠ 2026-08-27 — THIS FAILURE USED TO VANISH. The issue walk was
+                  # added to reach past the project feed's 100-row cap, it threw,
+                  # and the only trace was one print buried mid-log — so VERDICT.txt
+                  # showed a single capped listing and no hint that the deeper read
+                  # had not happened at all. A fallback that fails silently is a
+                  # fallback you believe in for no reason.
+                  fetch_notes.append(f'issue list FAILED for {slug}: {e}')
                   print(f'{slug}: issue list failed: {e}')
               seen_ids = {e.get('eventID') for e in events}
               for iss in issues:
@@ -162,6 +170,7 @@ jobs:
                   try:
                       iev = api_all(f'/organizations/{org}/issues/{iid}/events/?full=false')
                   except Exception as e:
+                      fetch_notes.append(f'issue {iid} events FAILED: {e}')
                       print(f'  issue {iid} ({iss.get("title", "")[:40]}): events failed: {e}')
                       continue
                   added = 0
@@ -519,6 +528,12 @@ jobs:
               print(line)
           say()
           say('════ VERDICT ════')
+          if fetch_notes:
+              say('  ⚠⚠ FETCH PROBLEMS THIS RUN — the deeper read may not have happened:')
+              for n in fetch_notes:
+                  say(f'    {n}')
+          else:
+              say('  every fetch this run succeeded')
           for path, (pages, rows, capped) in sorted(page_audit.items()):
               if capped:
                   state = 'TRUNCATED — page cap hit, more remain'
