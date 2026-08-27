@@ -1,0 +1,174 @@
+{
+  "id": "8695163ad8d34a0a934108902300fd61",
+  "groupID": "7694690094",
+  "eventID": "8695163ad8d34a0a934108902300fd61",
+  "projectID": "4511945117532160",
+  "size": 2632,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavnjvdw4u4 [inline 10/22]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavnjvdw4u4 [inline 10/22]",
+  "title": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavnjvdw4u4 [inline 10/22]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "70ec6055bb5646ef891da49056cd06db",
+      "span_id": "87f7e10e70385e7a",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunk": "[Filtered]",
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavnjvdw4u4 [inline 10/22]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtavnjvdw4u4"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "part",
+      "value": "10"
+    },
+    {
+      "key": "parts",
+      "value": "22"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T02:02:06.421659Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunk": {
+        "": {
+          "rem": [
+            [
+              "@password:filter",
+              "s",
+              0,
+              10
+            ]
+          ],
+          "len": 15000,
+          "chunks": [
+            {
+              "type": "redaction",
+              "text": "[Filtered]",
+              "rule_id": "@password:filter",
+              "remark": "s"
+            }
+          ]
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T02:02:06.575000Z",
+  "fingerprints": [
+    "6e9b30cbc54cd4e2e055b18014bb1faf"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "aa9d89e747404908bc2e5065ef149ee8",
+  "previousEventID": "8235708221ed45cf93378705b9526b88"
+}

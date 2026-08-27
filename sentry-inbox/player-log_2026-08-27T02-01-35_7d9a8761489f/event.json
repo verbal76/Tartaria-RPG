@@ -1,0 +1,152 @@
+{
+  "id": "7d9a8761489f4888bed1cb9d77a5f912",
+  "groupID": "7694689361",
+  "eventID": "7d9a8761489f4888bed1cb9d77a5f912",
+  "projectID": "4511945117532160",
+  "size": 17725,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavmvn26xli [inline 4/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavmvn26xli [inline 4/27]",
+  "title": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavmvn26xli [inline 4/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "d40f66b0cbaf4b979feb773ed22807f7",
+      "span_id": "811a571431b2e1f0",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunk": "_relic conf=1.00 verb=use target=blue cap mushroom resolved=Blue Cap Mushroom range=close enemies=2 hooks=1\n[2026-08-26T02:08:00.919Z] [world] You use one Blue Cap Mushroom. +1 HP, +2 stamina.\n[2026-08-26T02:08:00.927Z] [system] \u23f3 Time passed: 15 min\n[2026-08-26T02:08:01.861Z] [cognitive] neutral  (933ms)\n[2026-08-26T02:08:05.154Z] [debug] ui: tap \"dodge\"\n[2026-08-26T02:08:05.171Z] [player] dodge\n[2026-08-26T02:08:05.172Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=1\n[2026-08-26T02:08:05.173Z] [world] You commit to the dodge. Slip Eternal Dynasty Raider 4's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-26T02:08:05.174Z] [combat] Eternal Dynasty Raider 3 blisters \u2014 clinging fire sears 3. (0/17 HP, 1 turn left)\n[2026-08-26T02:08:05.176Z] [reward] Eternal Dynasty Raider 3 defeated. You recover Patched Cloth \u00d72.\n[2026-08-26T02:08:05.178Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-08-26T02:08:05.178Z] [combat] 1 attacker remains. Eternal Dynasty Raider 4 now in your sights.\n[2026-08-26T02:08:05.178Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 57). [21 enemies defeated]\n[2026-08-26T02:08:05.179Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-26T02:08:05.180Z] [reward] +14 TC pried from the dust.\n[2026-08-26T02:08:05.321Z] [combat] Eternal Dynasty Raider 4 \u2014 d20 \u2192 2 + ATK 7 = 9 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-08-26T02:08:05.321Z] [combat] Dodge \u2014 d20 \u2192 2 + DEX 13 = 15 vs ATK 9. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-26T02:08:05.321Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:08:05.510Z] [cognitive] neutral  (188ms)\n[2026-08-26T02:08:06.170Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-26T02:08:06.235Z] [player] attack with the cantor's tuning fork\n[2026-08-26T02:08:06.235Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1\n[2026-08-26T02:08:06.236Z] [debug] attack: target=Eternal Dynasty Raider 4 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-26T02:08:06.237Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-08-26T02:08:06.238Z] [debug] attack: status mods tired -1 \u00b7 perfect opening (2\u00d7 dice)\n[2026-08-26T02:08:06.281Z] [world] You bring the searing cantor's tuning fork to bear on Eternal Dynasty Raider 4.\n[2026-08-26T02:08:06.281Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:08:06.449Z] [cognitive] neutral  (167ms)\n[2026-08-26T02:08:14.707Z] [world] Eternal Dynasty Raider 4 moves first. The pressure is immediate.\n[2026-08-26T02:08:14.709Z] [combat] Eternal Dynasty Raider 4 \u2014 d20 \u2192 8 + ATK 7 = 15 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T02:08:14.710Z] [combat] You \u2014 d20 \u2192 19 + INT 10 \u2212 2 (Iron Fog) tired -1 perfect opening (2\u00d7 dice) = 26 vs Eternal Dynasty Raider 4 AC 11 \u2014 \u2713 HIT\n[2026-08-26T02:08:14.710Z] [combat] Eternal Dynasty Raider 4 shrugs off the aetheric. (resisted, \u00d70.5 for 7)\n[2026-08-26T02:08:14.711Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Throwing Knife \u2014 piercing will bite where aetheric won't.\"\n[2026-08-26T02:08:14.711Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter watches the aetheric skid off. \"Swap to the Thro\u2026\"\n[2026-08-26T02:08:14.711Z] [combat] Your strike with the searing cantor's tuning fork lands for 7. Eternal Dynasty Raider 4 staggers \u2014 10 HP remaining. It answers.\n[2026-08-26T02:08:14.712Z] [combat] Searing Cantor's Tuning Fork \u2014 2 burn bites in and festers (3 turns).\n[2026-08-26T02:08:16.524Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-26T02:08:16.587Z] [player] attack with the cantor's tuning fork\n[2026-08-26T02:08:16.587Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1\n[2026-08-26T02:08:16.588Z] [combat] Eternal Dynasty Raider 4 blisters \u2014 clinging fire sears 2. (8/17 HP, 2 turns left)\n[2026-08-26T02:08:16.589Z] [debug] attack: target=Eternal Dynasty Raider 4 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-26T02:08:16.590Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-08-26T02:08:16.590Z] [debug] attack: status mods exhausted -2\n[2026-08-26T02:08:16.636Z] [world] Your searing cantor's tuning fork comes around in an arc; Eternal Dynasty Raider 4 squares up to meet it.\n[2026-08-26T02:08:16.636Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:08:16.805Z] [cognitive] neutral  (168ms)\n[2026-08-26T02:08:20.139Z] [world] Eternal Dynasty Raider 4 moves first. The pressure is immediate.\n[2026-08-26T02:08:20.141Z] [combat] Eternal Dynasty Raider 4 \u2014 d20 \u2192 20 + ATK 7 = 27 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-08-26T02:08:20.141Z] [combat] You \u2014 d20 \u2192 3 + INT 10 \u2212 2 (Iron Fog) exhausted -2 = 9 vs Eternal Dynasty Raider 4 AC 11 \u2014 \u2717 MISS\n[2026-08-26T02:08:20.141Z] [combat] The searing cantor's tuning fork cuts air. Eternal Dynasty Raider 4 answers immediately.\n[2026-08-26T02:08:20.142Z] [arbiter] \"Don't tell me what the Eternal Dynasty Raider 4 is,\" the Arbiter says, eyes flat. \"Show me what it was.\"\n[2026-08-26T02:08:20.332Z] [combat] Eternal Dynasty Raider 4 deals 4 slashing damage [armor \u221265%, plate \u22122, floor 30%]. You have 14 HP remaining.\n[2026-08-26T02:08:20.332Z] [combat] Eternal Dynasty Raider 4's strike leaves you bleeding.\n[2026-08-26T02:08:21.710Z] [debug] ui: tap \"off: plasma cutter\"\n[2026-08-26T02:08:21.763Z] [player] attack with the off-hand plasma cutter\n[2026-08-26T02:08:21.764Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand plasma cutter resolved=Plasma Cutter range=close enemies=1 hooks=1\n[2026-08-26T02:08:21.765Z] [combat] Eternal Dynasty Raider 4 blisters \u2014 clinging fire sears 2. (6/17 HP, 1 turn left)\n[2026-08-26T02:08:21.765Z] [debug] attack: target=Eternal Dynasty Raider 4 range=close reach.bands=[close] reach.label=Plasma Cutter bareHand=false\n[2026-08-26T02:08:21.766Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-08-26T02:08:21.766Z] [debug] attack: status mods exhausted -2\n[2026-08-26T02:08:21.813Z] [world] You bring the plasma cutter to bear on Eternal Dynasty Raider 4.\n[2026-08-26T02:08:21.813Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:08:21.981Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 THROW  (167ms)\n[2026-08-26T02:08:22.190Z] [debug] persist sizes(KB): total=207 player=50 wm=73[rooms=27 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=80 scene=5\n[2026-08-26T02:08:26.815Z] [world] You seize the initiative. Eternal Dynasty Raider 4 has no time to react.\n[2026-08-26T02:08:26.815Z] [combat] You \u2014 d20 \u2192 16 + DEX 12 \u2212 2 (Iron Fog) exhausted -2 = 24 vs Eternal Dynasty Raider 4 AC 11 \u2014 \u2713 HIT\n[2026-08-26T02:08:26.817Z] [combat] Eternal Dynasty Raider 4 takes 2 with the plasma cutter. It reels: 4 left. Then it fights back.\n[2026-08-26T02:08:26.817Z] [combat] Burn sets in \u2014 2/turn for 2 turns.\n[2026-08-26T02:08:26.819Z] [combat] Eternal Dynasty Raider 4 \u2014 d20 \u2192 18 + ATK 7 = 25 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-26T02:08:26.820Z] [arbiter] \"Either you walk away or it does,\" the Arbiter says. \"I'm not particular.\"\n[2026-08-26T02:08:27.024Z] [combat] Eternal Dynasty Raider 4 deals 1 slashing damage [plate \u22122]. You have 13 HP remaining.\n[2026-08-26T02:08:27.024Z] [combat] Eternal Dynasty Raider 4's strike leaves you bleeding.\n[2026-08-26T02:08:28.792Z] [debug] ui: tap \"dodge\"\n[2026-08-26T02:08:28.804Z] [player] dodge\n[2026-08-26T02:08:28.805Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-26T02:08:28.810Z] [world] You commit to the dodge. Slip Eternal Dynasty Raider 4's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-26T02:08:28.810Z] [combat] Eternal Dynasty Raider 4 blisters \u2014 clinging fire sears 2. (2/17 HP, 0 turns left)\n[2026-08-26T02:08:28.811Z] [combat] Eternal Dynasty Raider 4 shakes off the last of the fire \u2014 the Cantor's Tuning Fork has run its course.\n[2026-08-26T02:08:28.811Z] [combat] Eternal Dynasty Raider 4 suffers \u2014 burn eats 2. (0/17 HP, 1 turn left)\n[2026-08-26T02:08:28.812Z] [reward] Eternal Dynasty Raider 4 defeated. You recover Patched Cloth \u00d72.\n[2026-08-26T02:08:28.814Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-08-26T02:08:28.814Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-26T02:08:28.814Z] [system] \u25bc Eternal Dynasty turns HOSTILE \u2014 their patrols hunt you on their own ground now, and their counters mark you up.\n[2026-08-26T02:08:28.815Z] [reward] +18 TC pried from the dust.\n[2026-08-26T02:08:28.867Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:08:29.016Z] [cognitive] neutral  (148ms)\n[2026-08-26T02:08:32.429Z] [debug] ui: tap \"craft\"\n[2026-08-26T02:08:37.984Z] [system] dodging (parry) fades.\n[2026-08-26T02:08:38.040Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=- range=- enemies=0 hooks=1\n[2026-08-26T02:08:38.044Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-26T02:08:38.044Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:08:38.053Z] [system] bleeding fades.\n[2026-08-26T02:08:38.066Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=1\n[2026-08-26T02:08:38.096Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=1\n[2026-08-26T02:08:38.112Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-26T02:08:38.112Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:08:38.123Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=1\n[2026-08-26T02:08:38.139Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-26T02:08:38.139Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:08:38.141Z] [reward] \u2726 Crafted First Aid Kit \u00d74. The Arbiter watches you set the last piece.\n[2026-08-26T02:08:38.510Z] [cognitive] neutral  (463ms)\n[2026-08-26T02:08:38.521Z] [cognitive] neutral  (435ms)\n[2026-08-26T02:08:38.533Z] [cognitive] neutral  (419ms)\n[2026-08-26T02:08:38.536Z] [cognitive] neutral  (395ms)\n[2026-08-26T02:08:41.064Z] [debug] qwen\u23f1 ambient ok 2573ms read 1485ms/write 1023ms in 368t\u2192out 31t 4.0ms/t HIT-CAP (155ch)\n[2026-08-26T02:08:41.065Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro_fill n5 avg9.8s max20.8s read7.7s \u26a04unusable in654t\u2192out17t ms/tok 11.8-11.8 cap2 \u23f83 \u27023/23.6s | ambient n3 avg6.6s max10.8s read2.6s/write1.3s in365t\u2192out31t ms/tok 4.0-10.3 cap3 wait0.6s \u27021/10.8s | investigate_lore n2 avg3.7s max5.8s read0.3s/write1.3s \u26a01unusable in124t\u2192out36t ms/tok 2.4-2.4 wait1.0s || WASTED 4 calls / 34.5s\n[2026-08-26T02:08:41.080Z] [arbiter] You've traversed the far reaches of the ancient, forgotten world of Tartaria, your journey marked by countless challenges and trials.\n[2026-08-26T02:08:41.080Z] [debug] arbiter: ambient \u2713 2940ms\n[2026-08-26T02:08:41.080Z] [debug] arbiter: ambient-said \"You've traversed the far reaches of the ancient, forgotten world of Tartaria, your journey marked by countless challenges and trials.\"\n[2026-08-26T02:08:44.415Z] [debug] ui: tap \"rest\"\n[2026-08-26T02:08:44.427Z] [player] rest\n[2026-08-26T02:08:44.428Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T02:08:44.429Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 21, night)\n[2026-08-26T02:08:44.440Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T02:08:44.440Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-08-26T02:08:44.578Z] [cognitive] REST  (137ms)\n[2026-08-26T02:08:45.138Z] [debug] persist sizes(KB): total=207 player=50 wm=73[rooms=27 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=81 scene=4\n[2026-08-26T02:08:45.433Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T02:08:45.459Z] [world] You head west. Mud-flats stretch the same in every direction \u2014 only the wind tells you you've moved.\n[2026-08-26T02:08:45.461Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n[2026-08-26T02:08:46.482Z] [debug] ui: tap \"\u2726 ability\"\n[2026-08-26T02:08:51.501Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T02:08:53.655Z] [world] The Throwing Knife is lighter than it looks, which is its own kind of warning.\n[2026-08-26T02:08:53.656Z] [reward] \u2726 Throwing Knife (Common).\n[2026-08-26T02:08:54.428Z] [world] The Worn Tartarian Coin is cold through your glove.\n[2026-08-26T02:08:54.429Z] [reward] \u2726 Worn Tartarian Coin (Common).\n[2026-08-26T02:08:55.447Z] [world] You strip the cracked mirror carefully. Something usable comes free in your hand.\n[2026-08-26T02:08:55.448Z] [world] You break the lantern pole apart. Among the pieces, something worth keeping.\n[2026-08-26T02:08:55.448Z] [world] You strip the market debris carefully. Something usable comes free in your hand.\n[2026-08-26T02:08:55.448Z] [world] You lever something loose from the merchant sign \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-26T02:08:55.448Z] [world] You strip the pavement carefully. Something usable comes free in your hand.\n[2026-08-26T02:08:55.449Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:08:55.449Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-08-26T02:08:55.449Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-26T02:08:55.450Z] [reward]     \u2022 Aether Dust (Common)\n[2026-08-26T02:08:55.450Z] [reward]     \u2022 Flint Core Nodule (Common)\n[2026-08-26T02:08:55.450Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-08-26T02:08:56.685Z] [debug] ui: tap \"craft\"\n[2026-08-26T02:09:00.611Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-26T02:09:00.618Z] [world] You repair the Anvil-Struck Footguards. Back to full. (spent: Small Rock x2)\n[2026-08-26T02:09:00.657Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-26T02:09:00.657Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-08-26T02:09:00.658Z] [world] You repair the Burl Aegis. Back to full. (spent: Small Rock x2)\n[2026-08-26T02:09:00.676Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-26T02:09:00.676Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-08-26T02:09:00.677Z] [world] You repair the Forge-Black Cowl. Back to full. (spent: Small Rock x2",
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1518-the-beacon-goes-first #mtavmvn26xli [inline 4/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtavmvn26xli"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "4"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T02:01:34.947011Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T02:01:35.162000Z",
+  "fingerprints": [
+    "da939b2da68624144434b234c1e2a344"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "7fc288cfcad641a9971761fccbc06a4a",
+  "previousEventID": "65d2df74d49544e7bf587b4b520cad6e"
+}
