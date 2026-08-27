@@ -1,14 +1,29 @@
-sync 2026-08-27 — an OLD log repushed from a device now running OTA-1522.
+sync 2026-08-27 — the first log from a device running OTA-1526.
 
-The interesting question is not what the log SAYS — it is old play — but how much
-of it ARRIVES. The device re-sends whatever is on disk through the CURRENT
-sender, so an old bundle pushed from 1522 rides the OTA-1520 block split and
-should land nearly whole where the same content once lost 60,000-75,000 chars.
+OTA-1526 took the survivor breadcrumb read out of its race with the boot's own
+phase stamps. 21 of the 22 native-death records in the corpus were the ledger
+filing this session's handwriting as last session's corpse; exactly one was real.
 
-Three reads, in order:
-1. Part count. Complete (N/N) or short? mtaxtx2bzl8l is the open oddity — device
-   logged 27/27 accepted AND flush-confirmed, Sentry holds five.
-2. Scrub cost. Under a 1519-era scalar this class of bundle cost 60,000+ chars;
-   on 1520 blocks it should be ~1,400-3,500.
-3. Whether the issue walk keeps every listing ending SHORT of a full page, which
-   is the only state that proves a MISSING part is genuinely absent.
+Four reads, in order:
+
+1. THE #81 VERDICT. Any NEW `PROCESS KILLED — no JS ran` record dated within a
+   few seconds of a session boot marker means the fix did not take. Zero such
+   records is the close. The 22 pre-existing records stay in the ledger — 1526
+   stops new ones, it does not prune the file — so compare by DATE, not count.
+
+2. Any death record that DOES appear should name an action: `action "…"` or
+   `tap "…"` with a real room. `(no action yet) · room ? · screen ?` on a
+   boot-adjacent record was the fabrication signature.
+
+3. OTA-1521 CONFIRMATION, still owed. An OTA apply performed while the device
+   was ALREADY on 1521 or later — the 1522 apply ran under 1520's code, so it
+   proved nothing. Look for `ota: Restarting to apply` with no death record
+   following it.
+
+4. OTA-1522 CONFIRMATION, still owed. A fight containing a stun, which must
+   expire on its own tick rather than outliving itself. The last log after the
+   apply had zero stun events, so this is still unmeasured.
+
+And the standing two: an explicit TRAVEL verdict and an explicit COMBAT verdict,
+counting routed movement (`ui: tap "→ DESTINATION"` → `You push west`) as travel,
+not only the cardinal `[player] go east` shape.
