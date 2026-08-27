@@ -1,0 +1,224 @@
+{
+  "id": "ece41b7473ad48c7b3379c64ec305579",
+  "groupID": "7695461101",
+  "eventID": "ece41b7473ad48c7b3379c64ec305579",
+  "projectID": "4511945117532160",
+  "size": 17646,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbhxsw8mus3 [inline 20/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbhxsw8mus3 [inline 20/23]",
+  "title": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbhxsw8mus3 [inline 20/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8f17984014a8400d82d073eb88861657",
+      "span_id": "a134caa407dbaae6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " verb=investigate target=inscription resolved=inscription range=- enemies=0 hooks=2\n[2026-08-25T01:46:21.464Z] [world] The script is half-faded. Most of it is a name, or a list of names, or a debt no one paid.\n[2026-08-25T01:46:21.465Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-08-25T01:46:21.579Z] [cognitive] SEARCH  (113ms)\n",
+      "[2026-08-25T01:46:22.496Z] [debug] qwen\u23f1 investigate_lore ok 924ms read 270ms/write 630ms in 125t\u2192out 20t 2.2ms/t (97ch)\n[2026-08-25T01:46:22.745Z] [debug] ui: tap \"\u2192 YULDRA-TUL\"\n[2026-08-25T01:46:22.752Z] [debug] spawn: gear=[Reclaimer's Mask, Sentinel's Gauntlets] window=10 roster=new\n",
+      "[2026-08-25T01:46:22.753Z] [world] You walk east through open silt. The compass tells you Nimari lies further east \u2014 5 tiles, about 13 hours of travel.\n[2026-08-25T01:46:22.754Z] [world] A glint of metal \u2014 too small to name yet \u2014 lies in the rubble.\n[2026-08-25T01:46:23.689Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n",
+      "[2026-08-25T01:46:23.718Z] [player] investigate the ground\n[2026-08-25T01:46:23.719Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n[2026-08-25T01:46:23.724Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Blue Cap Mushroom (Common).\n[2026-08-25T01:46:23.731Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-25T01:46:23.831Z] [cognitive] CLIMB  (99ms)\n[2026-08-25T01:46:25.595Z] [debug] ui: tap \"take / salvage\"\n[2026-08-25T01:46:27.546Z] [world] The Reclaimer's Mask comes up out of the silt with a small sucking protest.\n[2026-08-25T01:46:27.546Z] [reward] \u2726 Reclaimer's Mask (Common).\n[2026-08-25T01:46:27.562Z] [world] The Sentinel's Gauntlets was half under something. It is not now.\n",
+      "[2026-08-25T01:46:27.562Z] [reward] \u2726 Sentinel's Gauntlets (Common).\n[2026-08-25T01:46:28.597Z] [world] You scavenge the blackboard thoroughly. One Cloth Scrap survives the sorting.\n[2026-08-25T01:46:28.599Z] [world] You break the ledger book apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-25T01:46:28.599Z] [world] You strip the papyrus stack carefully. Something usable comes free in your hand.\n[2026-08-25T01:46:28.600Z] [world] You salvage the shelf. The take is small but real.\n[2026-08-25T01:46:28.600Z] [world] You strip the vellum scroll carefully. Something usable comes free in your hand.\n[2026-08-25T01:46:28.600Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-25T01:46:28.600Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-08-25T01:46:28.601Z] [reward]     \u2022 Aether Dust x3 (Common)\n[2026-08-25T01:46:28.601Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-08-25T01:46:31.999Z] [debug] ui: tap \"\u2192 YULDRA-TUL\"\n[2026-08-25T01:46:32.019Z] [debug] spawn: gear=[Aetheric Scout Greaves, Wanderer's Worn Gauntlets] window=10 roster=new\n",
+      "[2026-08-25T01:46:32.021Z] [world] You walk east through open silt. The compass tells you Nimari lies further east \u2014 4 tiles, about 10 hours of travel.\n[2026-08-25T01:46:32.022Z] [world] What you started here has not finished itself in your absence.\n[2026-08-25T01:46:33.226Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-25T01:46:33.348Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-25T01:46:34.621Z] [world] You work the Aetheric Scout Greaves loose from where the mud had it.\n[2026-08-25T01:46:34.622Z] [reward] \u2726 Aetheric Scout Greaves (Common).\n[2026-08-25T01:46:34.642Z] [world] The Wanderer's Worn Gauntlets had settled into the ground. You unsettle it.\n[2026-08-25T01:46:34.642Z] [reward] \u2726 Wanderer's Worn Gauntlets (Common).\n",
+      "[2026-08-25T01:46:35.670Z] [world] You strip the aetheric meter carefully. Something usable comes free in your hand.\n[2026-08-25T01:46:35.670Z] [world] You scavenge the fountain thoroughly. One Cloth Scrap survives the sorting.\n[2026-08-25T01:46:35.670Z] [world] You strip the observatory dish carefully. Something usable comes free in your hand.\n",
+      "[2026-08-25T01:46:35.670Z] [world] You strip the scribe's quill carefully. Something usable comes free in your hand.\n[2026-08-25T01:46:35.670Z] [reward] \u2726 Salvage haul:\n[2026-08-25T01:46:35.671Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-08-25T01:46:35.671Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-08-25T01:46:35.671Z] [reward]     \u2022 Aether Crystal (Common)\n",
+      "[2026-08-25T01:46:35.671Z] [reward]     \u2022 Aether Dust (Common)\n[2026-08-25T01:46:37.631Z] [debug] ui: tap \"investigate\"\n[2026-08-25T01:46:38.903Z] [player] investigate research chart\n[2026-08-25T01:46:38.903Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=research chart resolved=research chart range=- enemies=0 hooks=3\n",
+      "[2026-08-25T01:46:38.905Z] [world] You study the research chart and find no answer. The silence here is patient; whatever it knew, it has decided to keep.\n[2026-08-25T01:46:38.906Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-25T01:46:38.906Z] [arbiter] The Arbiter looks around. \"Samarran does not rest. The walls are still working on Zalmar's last problem.\"\n",
+      "[2026-08-25T01:46:38.906Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-25T01:46:39.059Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 5727ms read 0ms/write 0ms in 782t\u2192out 0t (0ch)\n[2026-08-25T01:46:39.235Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5727ms \u2014 intro-fill:\u2205\n[2026-08-25T01:46:39.236Z] [debug] homework: scene_intro \"Samarran\" \u2205 6012ms\n",
+      "[2026-08-25T01:46:39.325Z] [cognitive] neutral  (418ms)\n[2026-08-25T01:46:39.456Z] [debug] persist sizes(KB): total=233 player=55 wm=83[rooms=27 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=90 scene=4\n[2026-08-25T01:46:41.176Z] [player] investigate the ground\n",
+      "[2026-08-25T01:46:41.177Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n[2026-08-25T01:46:41.182Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-08-25T01:46:41.192Z] [system] \u23f3 Time passed: 24 min\n[2026-08-25T01:46:41.354Z] [cognitive] CLIMB  (160ms)\n",
+      "[2026-08-25T01:46:41.449Z] [debug] qwen\u23f1 investigate_lore ok 2390ms wait 266ms read \u26a07260ms/write \u26a0762ms NOT-PER-CALL in 126t\u2192out 24t (88ch)\n[2026-08-25T01:46:42.298Z] [debug] ui: tap \"ENTER\"\n[2026-08-25T01:46:42.299Z] [world] You step inside the drowned cottage, into the kitchen.\n",
+      "[2026-08-25T01:46:42.299Z] [world] Floodwater laps at a tilted hearth. Swollen cupboards hang open, their contents long since taken by the silt. A cast pot still sits on the cold stove.\n[2026-08-25T01:46:45.982Z] [debug] ui: tap \"take / salvage\"\n[2026-08-25T01:46:47.170Z] [world] Tucked inside the cupboard: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n",
+      "[2026-08-25T01:46:47.170Z] [world] You work the hearth over. A part of it comes loose, intact.\n[2026-08-25T01:46:47.170Z] [world] Tucked inside the pot: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-08-25T01:46:47.171Z] [reward] \u2726 Salvage haul:\n[2026-08-25T01:46:47.171Z] [reward]     \u2022 Split Slate Piece (Common)\n",
+      "[2026-08-25T01:46:47.171Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-08-25T01:46:47.171Z] [reward]     \u2022 Corroded Hinge Set (Common)\n[2026-08-25T01:46:48.131Z] [debug] ui: tap \"investigate\"\n[2026-08-25T01:46:49.179Z] [player] investigate the ground\n[2026-08-25T01:46:49.180Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-25T01:46:49.184Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Mud (Common).\n[2026-08-25T01:46:49.191Z] [system] \u23f3 Time passed: 24 min\n[2026-08-25T01:46:49.310Z] [cognitive] CLIMB  (118ms)\n[2026-08-25T01:46:51.216Z] [debug] ui: tap \"\u2191 Attic\"\n[2026-08-25T01:46:51.218Z] [world] You step into the attic.\n",
+      "[2026-08-25T01:46:51.219Z] [world] Above the waterline at last, all dust and dry rot. A trunk sits beneath the rafters, and a small round window looks out over the drowned street.\n[2026-08-25T01:46:51.418Z] [player] investigate stove\n[2026-08-25T01:46:51.419Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=stove resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-25T01:46:51.616Z] [cognitive] neutral  (194ms)\n[2026-08-25T01:46:51.735Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'stove' here. Choose words carefully \u2014 try: trunk, rafters, window, dust.\"\n[2026-08-25T01:46:53.685Z] [player] investigate floodwater\n",
+      "[2026-08-25T01:46:53.686Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floodwater resolved=- range=- enemies=0 hooks=0\n[2026-08-25T01:46:53.687Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-25T01:46:53.687Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-25T01:46:53.802Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'floodwater' here. Choose words carefully \u2014 try: trunk, rafters, window, dust.\"\n[2026-08-25T01:46:53.892Z] [cognitive] SWIM  (204ms)\n[2026-08-25T01:46:54.091Z] [debug] ui: tap \"\u2199 Bedroom\"\n[2026-08-25T01:46:54.093Z] [world] You step into the bedroom.\n",
+      "[2026-08-25T01:46:54.093Z] [world] A bed frame furred with mildew floats half off the floor. A wardrobe leans against the wall, its warped doors swollen shut.\n[2026-08-25T01:46:55.475Z] [debug] ui: tap \"\u2197 Attic \u2713\"\n[2026-08-25T01:46:55.488Z] [world] You step into the attic.\n",
+      "[2026-08-25T01:46:55.489Z] [world] Above the waterline at last, all dust and dry rot. A trunk sits beneath the rafters, and a small round window looks out over the drowned street.\n[2026-08-25T01:46:56.675Z] [debug] ui: tap \"investigate\"\n[2026-08-25T01:46:57.754Z] [player] investigate the ground\n",
+      "[2026-08-25T01:46:57.755Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-25T01:46:57.757Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-25T01:46:57.767Z] [system] \u23f3 Time passed: 24 min\n[2026-08-25T01:46:57.887Z] [cognitive] CLIMB  (119ms)\n",
+      "[2026-08-25T01:46:59.309Z] [debug] ui: tap \"\u2199 Bedroom \u2713\"\n[2026-08-25T01:46:59.312Z] [world] You step into the bedroom.\n[2026-08-25T01:46:59.312Z] [world] A bed frame furred with mildew floats half off the floor. A wardrobe leans against the wall, its warped doors swollen shut.\n[2026-08-25T01:47:00.018Z] [player] investigate trunk\n",
+      "[2026-08-25T01:47:00.019Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=trunk resolved=- range=- enemies=0 hooks=0\n[2026-08-25T01:47:00.020Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-25T01:47:00.137Z] [cognitive] neutral  (114ms)\n[2026-08-25T01:47:00.232Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-25T01:47:00.515Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'trunk' here. Choose words carefully \u2014 try: bed, wardrobe, mildew.\"\n[2026-08-25T01:47:00.636Z] [debug] persist sizes(KB): total=217 player=56 wm=75[rooms=19 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=84 scene=2\n",
+      "[2026-08-25T01:47:01.369Z] [world] Slim pickings on the bed. You pocket a Bent Nail on the way out.\n[2026-08-25T01:47:01.369Z] [reward] \u2726 Salvage haul:\n[2026-08-25T01:47:01.370Z] [reward]     \u2022 Bent Nail (Common)\n[2026-08-25T01:47:02.262Z] [player] investigate rafters\n",
+      "[2026-08-25T01:47:02.263Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rafters resolved=- range=- enemies=0 hooks=0\n[2026-08-25T01:47:02.264Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-25T01:47:02.368Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'rafters' here. Choose words carefully \u2014 try: wardrobe, mildew.\"\n",
+      "[Filtered]",
+      "[2026-08-25T01:47:04.522Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=window resolved=- range=- enemies=0 hooks=0\n[2026-08-25T01:47:04.524Z] [world] The Aetheric Vision Lens hums against your temple \u2014 a thread you weren't looking for catches the light.\n",
+      "[2026-08-25T01:47:04.524Z] [world] \u2605 STORY THREAD \u2014 You feel through the window and your fingers close on something that does not belong here.\n[2026-08-25T01:47:04.525Z] [world] A strongbox sits bolted to the floor in the corner, its lock a Tartarian tumbler \u2014 dim, but not dead.\n[2026-08-25T01:47:04.526Z] [system] \u23f3 Time passed: 15 min\n[2026-08-25T01:47:04.656Z] [cognitive] neutral  (129ms)\n",
+      "[2026-08-25T01:47:06.783Z] [player] investigate dust\n[2026-08-25T01:47:06.784Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=dust resolved=Aether Dust range=- enemies=0 hooks=1\n[2026-08-25T01:47:06.789Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Small Rock (Common).\n[2026-08-25T01:47:06.801Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-25T01:47:06.926Z] [cognitive] THROW \u00b7 SEARCH  (123ms)\n[2026-08-25T01:47:07.166Z] [debug] ui: tap \"climb\"\n[2026-08-25T01:47:09.770Z] [debug] ui: tap \"take / salvage\"\n[2026-08-25T01:47:10.841Z] [world] You salvage the desk. The take is small but real.\n[2026-08-25T01:47:10.841Z] [world] You salvage the shelf. The take is small but real.\n[2026-08-25T01:47:10.842Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-25T01:47:10.842Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-08-25T01:47:10.842Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-08-25T01:47:12.439Z] [debug] ui: tap \"investigate\"\n[2026-08-25T01:47:13.581Z] [player] investigate drawer\n[2026-08-25T01:47:13.582Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=drawer resolved=drawer range=- enemies=0 hooks=1\n",
+      "[2026-08-25T01:47:13.583Z] [world] You study the drawer and find no answer. The silence here is patient; whatever it knew, it has decided to keep.\n[2026-08-25T01:47:13.584Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-25T01:47:13.584Z] [arbiter] The Arbiter looks around. \"Diagrams ghost across the stone when the light is wrong. They redraw themselves if watched.\"\n",
+      "[2026-08-25T01:47:13.709Z] [cognitive] neutral  (123ms)\n[2026-08-25T01:47:14.839Z] [debug] qwen\u23f1 investigate_lore ok 1145ms read 291ms/write 821ms in 125t\u2192out 27t 2.3ms/t (118ch)\n[2026-08-25T01:47:15.827Z] [player] investigate books\n[2026-08-25T01:47:15.828Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=books resolved=books range=- enemies=0 hooks=1\n",
+      "[2026-08-25T01:47:15.830Z] [world] The books reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.\n[2026-08-25T01:47:15.831Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-25T01:47:15.831Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-25T01:47:15.942Z] [cogniti"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbhxsw8mus3 [inline 20/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbhxsw8mus3"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "20"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T12:37:05.630380Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "34": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 384,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T12:37:05.940000Z",
+  "fingerprints": [
+    "d702b4e57991f9d9dab704960c2844ee"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "fb61666d7ce64332903214c5ed11a345",
+  "previousEventID": "e74e6b7d4bd647bf8d7a7ca5a554ab12"
+}

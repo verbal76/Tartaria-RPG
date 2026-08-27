@@ -1,0 +1,201 @@
+{
+  "id": "1b2eb9d8497c4f1b94ad3c0882c20007",
+  "groupID": "7695461101",
+  "eventID": "1b2eb9d8497c4f1b94ad3c0882c20007",
+  "projectID": "4511945117532160",
+  "size": 17888,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbhxsw8mus3 [inline 8/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbhxsw8mus3 [inline 8/23]",
+  "title": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbhxsw8mus3 [inline 8/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8f17984014a8400d82d073eb88861657",
+      "span_id": "a134caa407dbaae6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ui: tap \"approach\"\n[2026-08-21T19:01:59.022Z] [player] approach Mud Demon\n[2026-08-21T19:01:59.023Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud demon resolved=Mud Demon range=mid enemies=2 hooks=0\n[2026-08-21T19:01:59.025Z] [debug] move: advance from range=mid enemies=2 weather=Aether Lightning cost=1 partial=0\n[2026-08-21T19:01:59.025Z] [debug] move: range mid -> close\n",
+      "[2026-08-21T19:01:59.025Z] [world] You close the gap with the Mud Demon and Gutter Rat. (range: close / arm's reach)\n[2026-08-21T19:01:59.026Z] [combat] Mud Demon blisters \u2014 clinging fire sears 9. (79/117 HP, 2 turns left)\n[2026-08-21T19:01:59.027Z] [combat] Gutter Rat \u2014 d20 \u2192 19 + ATK 3 = 22 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-08-21T19:01:59.029Z] [combat] Mud Demon \u2014 d20 \u2192 5 + ATK 9 = 14 vs your AC 25 \u2014 \u2717 MISS\n[2026-08-21T19:01:59.168Z] [combat] Gutter Rat deals 2 piercing damage [plate \u22123]. You have 32 HP remaining.\n[2026-08-21T19:01:59.168Z] [combat] Mud Demon regenerates 2 HP (81/117).\n[2026-08-21T19:01:59.285Z] [cognitive] SWIM  (254ms)\n[2026-08-21T19:02:01.871Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-08-21T19:02:01.873Z] [system] bleeding fades.\n[2026-08-21T19:02:01.879Z] [player] dodge\n[2026-08-21T19:02:01.879Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=0\n",
+      "[2026-08-21T19:02:01.880Z] [world] You commit to the dodge. Slip Mud Demon's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-21T19:02:01.880Z] [combat] Mud Demon blisters \u2014 clinging fire sears 9. (72/117 HP, 1 turn left)\n",
+      "[2026-08-21T19:02:01.918Z] [combat] Gutter Rat \u2014 d20 \u2192 8 + ATK 3 = 11 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-08-21T19:02:01.919Z] [combat] Dodge \u2014 d20 \u2192 12 + DEX 16 = 28 vs ATK 11. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-08-21T19:02:01.919Z] [world] You slip Gutter Rat's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-08-21T19:02:01.922Z] [debug] ac-shift 25\u219228: race/base 12 + gear 17 + title 0 \u2192 trimmed 25 + status 3 | worn: head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunte",
+      "r's Boots cloak=Architect's Outer Mantle\n[2026-08-21T19:02:01.922Z] [combat] Mud Demon \u2014 d20 \u2192 19 + ATK 9 = 28 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-21T19:02:01.923Z] [debug] arbiter: template (reason=combat)\n[2026-08-21T19:02:01.923Z] [arbiter] The Arbiter watches the mud demon. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n",
+      "[2026-08-21T19:02:01.923Z] [system] \u23f3 Time passed: 6 min\n[2026-08-21T19:02:02.059Z] [combat] Mud Demon deals 4 slashing damage [armor \u221265%, plate \u22121]. You have 28 HP remaining.\n[2026-08-21T19:02:02.059Z] [combat] Mud Demon regenerates 2 HP (74/117).\n[2026-08-21T19:02:02.173Z] [cognitive] neutral  (136ms)\n",
+      "[2026-08-21T19:02:02.455Z] [debug] persist sizes(KB): total=198 player=50 wm=58[rooms=28 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=85 scene=5\n[2026-08-21T19:02:02.655Z] [debug] ui: tap \"smoldering repeater crossbow\"\n[2026-08-21T19:02:02.656Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-21T19:02:02.688Z] [player] attack with the mud repeater crossbow\n",
+      "[2026-08-21T19:02:02.688Z] [debug] parser: intent=attack conf=1.00 verb=attack target=mud repeater crossbow resolved=Mud Demon range=close enemies=2 hooks=0\n[2026-08-21T19:02:02.688Z] [combat] Mud Demon blisters \u2014 clinging fire sears 9. (65/117 HP, 0 turns left)\n[2026-08-21T19:02:02.689Z] [combat] Mud Demon shakes off the last of the fire \u2014 the Mud Repeater Crossbow has run its course.\n",
+      "[2026-08-21T19:02:02.689Z] [debug] attack: target=Mud Demon range=close reach.bands=[distant,far,mid,close] reach.label=Mud Repeater Crossbow bareHand=false\n[2026-08-21T19:02:02.690Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-21T19:02:02.716Z] [world] Your smoldering mud repeater crossbow comes around in an arc; Mud Demon squares up to meet it.\n",
+      "[2026-08-21T19:02:02.716Z] [system] \u23f3 Time passed: 6 min\n[2026-08-21T19:02:02.832Z] [cognitive] ATTACK \u00b7 AIM \u00b7 SWIM \u00b7 TAKE_COVER \u00b7 THROW  (115ms)\n[2026-08-21T19:02:09.185Z] [world] You seize the initiative. Mud Demon has no time to react.\n[2026-08-21T19:02:09.185Z] [combat] You \u2014 d20 \u2192 19 + WIS 6 + 2 (point blank) perfect opening (2\u00d7 dice) = 27 vs Mud Demon AC 16 \u2014 \u2713 HIT\n",
+      "[2026-08-21T19:02:09.186Z] [combat] Mud Demon shrugs off the piercing. (resisted, \u00d70.5 for 17)\n[2026-08-21T19:02:09.188Z] [combat] Clean hit with the smoldering mud repeater crossbow for 17. Mud Demon has 48 left and does not back away.\n[2026-08-21T19:02:09.188Z] [combat] Smoldering Mud Repeater Crossbow \u2014 7 burn bites in and festers (3 turns).\n",
+      "[2026-08-21T19:02:09.189Z] [debug] ac-shift 28\u219225: race/base 12 + gear 17 + title 0 \u2192 trimmed 25 + status 0 | worn: head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle\n[2026-08-21T19:02:09.190Z] [combat] Gutter Rat \u2014 d20 \u2192 13 + ATK 3 = 16 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-21T19:02:09.191Z] [combat] Mud Demon \u2014 d20 \u2192 3 + ATK 9 = 12 vs your AC 25 \u2014 \u2717 MISS\n[2026-08-21T19:02:09.335Z] [combat] Mud Demon regenerates 2 HP (50/117).\n[2026-08-21T19:02:15.071Z] [debug] ui: tap \"\u2726 bandolier (1)\"\n[2026-08-21T19:02:16.127Z] [reward] You hurl the Acid Flask. It bursts across Mud Demon \u2014 9 acid (3/turn \u00d7 3). (41 HP left)\n",
+      "[2026-08-21T19:02:16.128Z] [combat] Mud Demon blisters \u2014 clinging fire sears 7. (34/117 HP, 2 turns left)\n[2026-08-21T19:02:16.135Z] [combat] Gutter Rat \u2014 d20 \u2192 11 + ATK 3 = 14 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-21T19:02:16.138Z] [combat] Mud Demon \u2014 d20 \u2192 17 + ATK 9 = 26 vs your AC 25 \u2014 \u2713 HIT\n",
+      "[2026-08-21T19:02:16.302Z] [combat] Mud Demon deals 5 slashing damage [armor \u221265%]. You have 23 HP remaining.\n[2026-08-21T19:02:16.302Z] [combat] Mud Demon regenerates 2 HP (36/117).\n[2026-08-21T19:02:18.618Z] [debug] ui: tap \"stealth\"\n[2026-08-21T19:02:18.626Z] [player] sneak\n",
+      "[2026-08-21T19:02:18.627Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=close enemies=2 hooks=0\n[2026-08-21T19:02:18.678Z] [system] \u23f3 Time passed: 15 min\n[2026-08-21T19:02:18.801Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (122ms)\n[2026-08-21T19:02:20.839Z] [debug] skillcheck: stealth d20=2 STE 9 = 11 vs DC 12 \u2014 Hard \u2192 FAIL\n",
+      "[2026-08-21T19:02:20.863Z] [debug] stats: STR7 DEX16 INT6 WIS6 CHA9 STE9 | gear: DEX+10,STR+2,CHA+2,INT+1,WIS+1,STE+2 | worn: main=Mud Repeater Crossbow off=Quarry-Hewn Skewer head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle amulet=Aetheric Compass ring=Ring of Shadows\n",
+      "[2026-08-21T19:02:20.863Z] [world] Your foot scrapes stone. Something stirs in the dark.\n[2026-08-21T19:02:20.863Z] [combat] Mud Demon blisters \u2014 clinging fire sears 7. (29/117 HP, 1 turn left)\n[2026-08-21T19:02:20.864Z] [combat] Mud Demon \u2014 d20 \u2192 2 + ATK 9 = 11 vs your AC 25 \u2014 \u2717 MISS\n",
+      "[2026-08-21T19:02:20.865Z] [combat] Gutter Rat \u2014 d20 \u2192 12 + ATK 3 = 15 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-21T19:02:20.987Z] [combat] Mud Demon regenerates 2 HP (31/117).\n[2026-08-21T19:02:27.155Z] [debug] ui: tap \"dodge\"\n[2026-08-21T19:02:27.172Z] [player] dodge\n",
+      "[2026-08-21T19:02:27.173Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=0\n[2026-08-21T19:02:27.174Z] [world] You commit to the dodge. Slip Mud Demon's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-21T19:02:27.174Z] [combat] Mud Demon blisters \u2014 clinging fire sears 7. (24/117 HP, 0 turns left)\n[2026-08-21T19:02:27.174Z] [combat] Mud Demon shakes off the last of the fire \u2014 the Mud Repeater Crossbow has run its course.\n[2026-08-21T19:02:27.212Z] [combat] Mud Demon \u2014 d20 \u2192 17 + ATK 9 = 26 vs your AC 25 \u2014 \u2717 EVADED\n",
+      "[2026-08-21T19:02:27.212Z] [combat] Dodge \u2014 d20 \u2192 17 + DEX 16 = 33 vs ATK 26. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-21T19:02:27.212Z] [world] You slip Mud Demon's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-08-21T19:02:27.215Z] [debug] ac-shift 25\u219228: race/base 12 + gear 17 + title 0 \u2192 trimmed 25 + status 3 | worn: head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle\n[2026-08-21T19:02:27.215Z] [combat] Gutter Rat \u2014 d20 \u2192 18 + ATK 3 = 21 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-08-21T19:02:27.216Z] [system] \u23f3 Time passed: 6 min\n[2026-08-21T19:02:27.354Z] [combat] Mud Demon regenerates 2 HP (26/117).\n[2026-08-21T19:02:27.355Z] [combat] Gutter Rat deals 1 piercing damage [plate \u22124]. You have 22 HP remaining.\n[2026-08-21T19:02:27.469Z] [cognitive] neutral  (139ms)\n[2026-08-21T19:02:27.889Z] [debug] ui: tap \"smoldering repeater crossbow\"\n",
+      "[2026-08-21T19:02:27.890Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-21T19:02:27.928Z] [player] attack with the mud repeater crossbow\n[2026-08-21T19:02:27.928Z] [debug] parser: intent=attack conf=1.00 verb=attack target=mud repeater crossbow resolved=Mud Demon range=close enemies=2 hooks=0\n",
+      "[2026-08-21T19:02:27.929Z] [debug] attack: target=Mud Demon range=close reach.bands=[distant,far,mid,close] reach.label=Mud Repeater Crossbow bareHand=false\n[2026-08-21T19:02:27.931Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-21T19:02:27.956Z] [world] You commit forward with the smoldering mud repeater crossbow. Mud Demon watches your hands.\n",
+      "[2026-08-21T19:02:27.957Z] [system] \u23f3 Time passed: 6 min\n[2026-08-21T19:02:28.077Z] [cognitive] ATTACK \u00b7 AIM \u00b7 SWIM \u00b7 TAKE_COVER \u00b7 THROW  (120ms)\n[2026-08-21T19:02:31.128Z] [world] Mud Demon moves first. The pressure is immediate.\n",
+      "[2026-08-21T19:02:31.130Z] [debug] ac-shift 28\u219225: race/base 12 + gear 17 + title 0 \u2192 trimmed 25 + status 0 | worn: head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle\n[2026-08-21T19:02:31.130Z] [combat] Gutter Rat \u2014 d20 \u2192 15 + ATK 3 = 18 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-21T19:02:31.132Z] [combat] Mud Demon \u2014 d20 \u2192 17 + ATK 9 = 26 vs your AC 25 \u2014 \u2713 HIT\n[2026-08-21T19:02:31.132Z] [combat] You \u2014 d20 \u2192 2 + WIS 6 + 2 (point blank) perfect opening (2\u00d7 dice) = 10 vs Mud Demon AC 16 \u2014 \u2717 MISS\n[2026-08-21T19:02:31.133Z] [combat] Mud Demon reads the motion and slips it \u2014 the smoldering mud repeater crossbow carves only air. The counter is already coming.\n",
+      "[2026-08-21T19:02:31.305Z] [combat] Mud Demon deals 5 slashing damage [armor \u221265%]. You have 17 HP remaining.\n[2026-08-21T19:02:31.305Z] [combat] Mud Demon's strike leaves you bleeding.\n[2026-08-21T19:02:31.305Z] [combat] Mud Demon regenerates 2 HP (28/117).\n[2026-08-21T19:02:31.757Z] [debug] ui: tap \"approach\"\n[2026-08-21T19:02:31.904Z] [debug] ui: tap \"approach\"\n",
+      "[2026-08-21T19:02:35.473Z] [debug] ui: tap \"inventory\"\n[2026-08-21T19:02:35.774Z] [debug] persist sizes(KB): total=197 player=50 wm=58[rooms=28 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=84 scene=5\n[2026-08-21T19:02:43.326Z] [player] feed dog First Aid Kit\n[2026-08-21T19:02:43.326Z] [world] You feed Ember the First Aid Kit. She eats, slow and serious. (+20 loyalty)\n",
+      "[2026-08-21T19:02:47.360Z] [world] You use 3\u00d7 Trail Rations. +17 HP (34/34).\n[2026-08-21T19:02:50.895Z] [debug] ui: tap \"smoldering repeater crossbow\"\n[2026-08-21T19:02:50.927Z] [player] attack with the mud repeater crossbow\n[2026-08-21T19:02:50.927Z] [debug] parser: intent=attack conf=1.00 verb=attack target=mud repeater crossbow resolved=Mud Demon range=close enemies=2 hooks=0\n",
+      "[2026-08-21T19:02:50.928Z] [debug] attack: target=Mud Demon range=close reach.bands=[distant,far,mid,close] reach.label=Mud Repeater Crossbow bareHand=false\n[2026-08-21T19:02:50.956Z] [world] You commit forward with the smoldering mud repeater crossbow. Mud Demon watches your hands.\n[2026-08-21T19:02:50.956Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-21T19:02:51.071Z] [cognitive] ATTACK \u00b7 AIM \u00b7 SWIM \u00b7 TAKE_COVER \u00b7 THROW  (114ms)\n[2026-08-21T19:02:57.048Z] [world] You seize the initiative. Mud Demon has no time to react.\n[2026-08-21T19:02:57.048Z] [combat] You \u2014 d20 \u2192 11 + WIS 6 + 2 (point blank) = 19 vs Mud Demon AC 16 \u2014 \u2713 HIT\n[2026-08-21T19:02:57.049Z] [combat] Mud Demon shrugs off the piercing. (resisted, \u00d70.5 for 14)\n",
+      "[2026-08-21T19:02:57.049Z] [combat] The piercing has worn Mud Demon's guard through \u2014 it bites full from here.\n[2026-08-21T19:02:57.050Z] [combat] The blow with the smoldering mud repeater crossbow finds purchase \u2014 14 damage, 14 HP standing. Mud Demon commits to the counter.\n[2026-08-21T19:02:57.051Z] [combat] Smoldering Mud Repeater Crossbow \u2014 9 burn bites in and festers (3 turns).\n",
+      "[2026-08-21T19:02:57.054Z] [combat] Mud Demon \u2014 d20 \u2192 18 + ATK 9 = 27 vs your AC 25 \u2014 \u2713 HIT\n[2026-08-21T19:02:57.056Z] [combat] Gutter Rat \u2014 d20 \u2192 20 + ATK 3 = 23 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-08-21T19:02:57.057Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The mud demon is patient. Be patienter.\"\n",
+      "[2026-08-21T19:02:57.202Z] [combat] Mud Demon deals 6 slashing damage [armor \u221265%]. You have 28 HP remaining.\n[2026-08-21T19:02:57.202Z] [combat] Mud Demon's strike leaves you bleeding.\n[2026-08-21T19:02:57.202Z] [combat] Mud Demon regenerates 2 HP (16/117).\n[2026-08-21T19:02:57.202Z] [combat] Gutter Rat deals 1 piercing damage [plate \u22123]. You have 27 HP remaining.\n",
+      "[2026-08-21T19:03:01.823Z] [debug] ui: tap \"\u2726 ability\"\n[2026-08-21T19:03:08.892Z] [reward] \u2726 Latent Powers \u2014 +2 STR for 3 rounds.\n[2026-08-21T19:03:10.762Z] [debug] ui: tap \"dodge\"\n[2026-08-21T19:03:10.776Z] [player] dodge\n[2026-08-21T19:03:10.777Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=0\n",
+      "[2026-08-21T19:03:10.778Z] [world] You commit to the dodge. Slip Mud Demon's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-21T19:03:10.778Z] [combat] Mud Demon blisters \u2014 clinging fire sears 9. (7/117 HP, 2 turns left)\n",
+      "[2026-08-21T19:03:10.816Z] [combat] Gutter Rat \u2014 d20 \u2192 10 + ATK 3 = 13 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-08-21T19:03:10.816Z] [combat] Dodge \u2014 d20 \u2192 15 + DEX 16 = 31 vs ATK 13. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-08-21T19:03:10.816Z] [world] You slip Gutter Rat's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-08-21T19:03:10.817Z] [debug] ac-shift 25\u219228: race/base 12 + gear 17 + title"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbhxsw8mus3 [inline 8/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbhxsw8mus3"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "8"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T12:37:05.438143Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T12:37:05.936000Z",
+  "fingerprints": [
+    "d702b4e57991f9d9dab704960c2844ee"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "4079aea9b8cc4fd6a490f09d706cdadc",
+  "previousEventID": "14f9eb058eaa41ccb56edae0826cee6d"
+}

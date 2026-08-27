@@ -1,0 +1,196 @@
+{
+  "id": "f1e3ce1855474af38727dbc47a18c00d",
+  "groupID": "7695461460",
+  "eventID": "f1e3ce1855474af38727dbc47a18c00d",
+  "projectID": "4511945117532160",
+  "size": 17628,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbicgtwnnz3 [inline 27/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbicgtwnnz3 [inline 27/27]",
+  "title": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbicgtwnnz3 [inline 27/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8f17984014a8400d82d073eb88861657",
+      "span_id": "a134caa407dbaae6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "8:00.560Z] [debug] send-log: bundle #mtauog3lfrgo attempt 2/5 send-log: #mtauog3lfrgo \u2014 0/7 parts out (404838 chars, median 50ms, worst 69ms) \u2014 WHY: flush() resolved false without sending (after 396ms) \u2014 kept for next boot\n[2026-08-27T01:52:09.780Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a040da-b4b1-7339-8553-62264d32e60b\n",
+      "[2026-08-27T01:52:09.781Z] [debug] ota: Checking\u2026\n[2026-08-27T01:52:09.869Z] [debug] ota: Already up to date\n[2026-08-27T01:52:09.870Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T01:52:10.148Z] [debug] send-log: bundle #mtauog3lfrgo attempt 3/5 send-log: #mtauog3lfrgo \u2014 0/7 parts out (404838 chars, median 32ms, worst 51ms) \u2014 WHY: flush() resolved false without sending (after 228ms) \u2014 ke",
+      "pt for next boot\n[2026-08-27T01:52:10.160Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T01:52:10.160Z] [debug] voice: bundled idle\n[2026-08-27T02:01:24.883Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a040f2-3776-721c-a9c2-6a8917e0e4fc\n[2026-08-27T02:01:24.883Z] [debug] ota: Checking\u2026\n[2026-08-27T02:01:24.970Z] [debug] ota: Already up to date\n",
+      "[2026-08-27T02:01:24.971Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T02:01:25.056Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T02:01:25.056Z] [debug] voice: bundled idle\n",
+      "[2026-08-27T02:01:25.284Z] [debug] send-log: bundle #mtauog3lfrgo attempt 4/5 send-log: #mtauog3lfrgo \u2014 0/7 parts out (404838 chars, median 33ms, worst 49ms) \u2014 WHY: flush() resolved false without sending (after 259ms) \u2014 kept for next boot\n[2026-08-27T02:01:29.876Z] [debug] OTA applied: 2026-08-27-1516-the-quiet-path-sends-the-same-way \u2192 2026-08-27-1518-the-beacon-goes-first.\n",
+      "[2026-08-27T02:01:29.876Z] [debug] OTA session start: 2026-08-27-1518-the-beacon-goes-first.\n[2026-08-27T02:01:29.876Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-27T02:01:29.876Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Great Scott. The buried country is no place to walk alone.\"\n",
+      "[2026-08-27T02:01:30.359Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T02:01:30.354Z \u00b7 build 2026-08-27-1518-the-beacon-goes-first \u00b7 updated from 2026-08-27-1516-the-quiet-path-sends-the-same-way \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-27T02:01:31.122Z] [debug] send-log: crash on record (2026-08-27T01:34:40.055Z) \u2014 game log pushed automatically, send-log: #mtavms6aoloo \u2014 0/7 parts out (404747 chars, median 37ms, worst 202ms) \u2014 WHY: flush() resolved false without sending, kept on disk as #mtavms6aoloo\n",
+      "[2026-08-27T02:01:35.704Z] [debug] send-log: #mtavmvn26xli \u2014 INLINE (no attachments): beacon out, 27/27 parts accepted (404783 chars) \u2014 flush said yes\n[2026-08-27T02:01:35.705Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtavmvn26xli kept on disk, boots retry up to 5 sends total\n[2026-08-27T02:32:26.956Z] [debug] OTA session start: 2026-08-27-1519-the-attachment-was-the-fault.\n",
+      "[2026-08-27T02:32:26.956Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-27T02:32:26.956Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Great Scott. We've still got ground to cover, you and I.\"\n",
+      "[2026-08-27T02:32:27.402Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T02:32:27.398Z \u00b7 build 2026-08-27-1519-the-attachment-was-the-fault \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-27T02:32:31.498Z] [debug] send-log: #mtawqnivyk0q \u2014 DELIVERED (inline, no attachments): beacon out, 27/27 parts accepted (404818 chars) \u2014 flush said yes\n",
+      "[2026-08-27T02:32:31.500Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtawqnivyk0q kept on disk, boots retry up to 5 sends total\n[2026-08-27T02:49:58.508Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0410f-234c-7c06-8eb4-72c2b54a1546\n[2026-08-27T02:49:58.508Z] [debug] ota: Checking\u2026\n[2026-08-27T02:49:58.565Z] [debug] ota: Already up to date\n",
+      "[2026-08-27T02:49:58.565Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T02:49:58.825Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T02:49:58.825Z] [debug] voice: bundled idle\n[2026-08-27T02:49:58.986Z] [debug] send-log: bundle #mtawqnivyk0q attempt 2/5 delivered to Sentry\n",
+      "[2026-08-27T03:02:54.512Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04126-1265-7413-a8ac-b08f1f571db7\n[2026-08-27T03:02:54.512Z] [debug] ota: Checking\u2026\n[2026-08-27T03:02:54.636Z] [debug] ota: Already up to date\n[2026-08-27T03:02:54.638Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T03:02:54.740Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-27T03:02:54.740Z] [debug] voice: bundled idle\n[2026-08-27T03:02:55.168Z] [debug] send-log: bundle #mtawqnivyk0q attempt 3/5 delivered to Sentry\n[2026-08-27T03:02:58.998Z] [debug] OTA applied: 2026-08-27-1519-the-attachment-was-the-fault \u2192 2026-08-27-1520-the-scrubber-takes-a-whole-value.\n",
+      "[2026-08-27T03:02:58.998Z] [debug] OTA session start: 2026-08-27-1520-the-scrubber-takes-a-whole-value.\n[2026-08-27T03:02:58.999Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-27T03:02:58.999Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Great Scott. I wondered when you'd take up the thread again.\"\n",
+      "[2026-08-27T03:02:59.331Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T03:02:59.328Z \u00b7 build 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 updated from 2026-08-27-1519-the-attachment-was-the-fault \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-27T03:03:00.288Z] [debug] send-log: crash on record (2026-08-27T02:32:27.198Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtaxtuln8peb\n",
+      "[2026-08-27T03:03:03.374Z] [debug] send-log: #mtaxtx2bzl8l \u2014 DELIVERED (inline, no attachments): beacon out, 27/27 parts accepted (404834 chars) \u2014 flush said yes\n[2026-08-27T03:03:03.376Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtaxtx2bzl8l kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-27T11:52:38.879Z] [debug] OTA session start: 2026-08-27-1520-the-scrubber-takes-a-whole-value.\n[2026-08-27T11:52:38.879Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-27T11:52:38.880Z] [world] The Aetheric grid hum is louder than you remember. Something below has woken or shifted while you were elsewhere.\n",
+      "[2026-08-27T11:52:38.882Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Great Scott. We've still got ground to cover, you and I. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n",
+      "[2026-08-27T11:52:39.175Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T11:52:39.173Z \u00b7 build 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-27T11:52:40.516Z] [debug] send-log: crash on record (2026-08-27T03:03:20.074Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtbgr039mc3t\n",
+      "[2026-08-27T11:52:43.102Z] [debug] send-log: #mtbgr26bocft \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (405165 chars) \u2014 flush said yes\n[2026-08-27T11:52:43.104Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtbgr26bocft kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-27T11:52:48.378Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04126-1265-7413-a8ac-b08f1f571db7\n[2026-08-27T11:52:48.378Z] [debug] ota: Checking\u2026\n[2026-08-27T11:52:48.522Z] [debug] ota: Already up to date\n[2026-08-27T11:52:48.522Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-27T11:52:48.557Z] [debug] send-log: bundle #mtbgr26bocft held \u2014 only 6s since the last try (a restart, not a chance); 4 left\n[2026-08-27T11:52:48.557Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T11:52:48.558Z] [debug] voice: bundled idle\n[2026-08-27T11:52:53.376Z] [debug] OTA session start: 2026-08-27-1520-the-scrubber-takes-a-whole-value.\n",
+      "[2026-08-27T11:52:53.376Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-27T11:52:53.376Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Great Scott. We've still got ground to cover, you and I.\"\n",
+      "[2026-08-27T11:52:53.820Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T11:52:53.817Z \u00b7 build 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-27T11:52:57.264Z] [debug] send-log: #mtbgrdejaghk \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (405037 chars) \u2014 flush said yes\n",
+      "[2026-08-27T11:52:57.271Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtbgrdejaghk kept on disk, boots retry up to 5 sends total\n[2026-08-27T12:25:28.036Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04126-1265-7413-a8ac-b08f1f571db7\n[2026-08-27T12:25:28.036Z] [debug] ota: Checking\u2026\n[2026-08-27T12:25:28.187Z] [debug] ota: Already up to date\n",
+      "[2026-08-27T12:25:28.187Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T12:25:28.267Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T12:25:28.267Z] [debug] voice: bundled idle\n[2026-08-27T12:25:28.817Z] [debug] send-log: bundle #mtbgrdejaghk attempt 2/5 delivered to Sentry\n",
+      "[2026-08-27T12:37:15.432Z] [debug] OTA applied: 2026-08-27-1520-the-scrubber-takes-a-whole-value \u2192 2026-08-27-1522-the-stun-does-not-outlive-itself.\n[2026-08-27T12:37:15.432Z] [debug] OTA session start: 2026-08-27-1522-the-stun-does-not-outlive-itself.\n[2026-08-27T12:37:15.432Z] [world] You step back into Nimari. The world waits for your move.\n",
+      "[2026-08-27T12:37:15.432Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Great Scott. We've still got ground to cover, you and I.\"\n[2026-08-27T12:37:15.914Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T12:37:15.911Z \u00b7 build 2026-08-27-1522-the-stun-does-not-outlive-itself \u00b7 updated from 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "\n=== END LOG \u00b7 399951 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-08-27T12:37:20.370Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n",
+      "  OTA: (2026-08-27-1522-the-stun-does-not-outlive-itself)\n  Boot stage: qwen:deferred\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-08-27T12:37:05.896Z\n  Last init success: 2026-08-27T12:37:06.472Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n",
+      "  Status: none recorded\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-25T23:10:28.741Z (2247m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-25-1502-the-swipe-is-the-selector \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+19158ms)\n",
+      "  \u2022 2026-08-25T23:30:47.449Z (2227m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-25-1503-the-bullseye-is-the-truth \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+41333ms)\n  \u2022 2026-08-26T00:50:13.412Z (2147m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-26-1505-the-crash-brings-its-own-evidence \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+9946ms)\n  \u2022 2026-08-26T22:59:19.885Z (818m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-26-1511-the-spear-leaves-your-hand \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+7808ms)\n  \u2022 2026-08-27T00:34:40.392Z (723m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1514-the-portrait-scrolls-again \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"inventory\"\n",
+      "      doing: tap \"inventory\" \u00b7 room outpost_gate \u00b7 screen exploration\n      last checkpoint: rendered (+72700ms)\n  \u2022 2026-08-27T01:03:31.295Z (694m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1515-the-log-goes-in-parts \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: rendered (+60639ms)\n  \u2022 2026-08-27T01:34:40.055Z (663m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1516-the-quiet-path-sends-the-same-way \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+727ms)\n",
+      "  \u2022 2026-08-27T02:03:02.202Z (634m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1518-the-beacon-goes-first \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+92048ms)\n  \u2022 2026-08-27T02:32:27.198Z (605m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1519-the-attachment-was-the-fault \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+23274ms)\n  \u2022 2026-08-27T03:03:20.074Z (574m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+20786ms)\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n  Memory warnings: none this session\n  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n",
+      "  Native queue: worst wait 0.0s \u00b7 0 job kinds queued >3s \u00b7 worst 0.0ms/prompt-token\n  App state trail: (none recorded)\nModel contexts\n  Live now: 0\n  Opened: 0 \u00b7 Released: 0 \u00b7 Peak live: 0\n  Narration engine: idle\n"
+    ],
+    "chunkChars": 14733
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbicgtwnnz3 [inline 27/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbicgtwnnz3"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "27"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T12:37:20.465484Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T12:37:20.580000Z",
+  "fingerprints": [
+    "34ada6c9e510ca36134b3cfc029477c8"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "fe3006c3d055456db50ab1539c73c4bc",
+  "previousEventID": "db194e00874448359d50036228b8d904"
+}

@@ -1,0 +1,201 @@
+{
+  "id": "d5ca1d5d14dd4693964b0923641b0e83",
+  "groupID": "7695461101",
+  "eventID": "d5ca1d5d14dd4693964b0923641b0e83",
+  "projectID": "4511945117532160",
+  "size": 17911,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbhxsw8mus3 [inline 10/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbhxsw8mus3 [inline 10/23]",
+  "title": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbhxsw8mus3 [inline 10/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8f17984014a8400d82d073eb88861657",
+      "span_id": "a134caa407dbaae6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "rry-Hewn Skewer head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle amulet=Aetheric Compass ring=Ring of Shadows\n[2026-08-21T19:06:23.243Z] [debug] persist sizes(KB): total=201 player=50 wm=65[rooms=34 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=81 scene=5\n",
+      "[2026-08-21T19:06:33.130Z] [debug] homework: intro-fill armed after 11209ms idle\n[2026-08-21T19:06:35.199Z] [debug] appstate: active \u2192 background (was active for 48498ms)\n[2026-08-21T19:07:12.040Z] [debug] qwen\u23f1 narration:scene_intro_fill dormant 38903ms read 0ms/write 0ms in 794t\u2192out 0t (0ch)\n",
+      "[2026-08-21T19:07:12.049Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 38903ms \u2014 intro-fill:\u2205\n[2026-08-21T19:07:12.050Z] [debug] homework: scene_intro \"Asgardar\" \u2205 38922ms\n[2026-08-21T19:07:12.467Z] [debug] ctx: RELEASED \u2014 live=0 (opened=3 released=3)\n[2026-08-21T19:21:58.320Z] [debug] appstate: background \u2192 active (was background for 923109ms)\n",
+      "[2026-08-21T19:22:06.319Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-21T19:22:07.165Z] [debug] ctx: OPENED \u2014 live=1 (opened=4 released=3) \u2248425MB est\n[2026-08-21T19:22:08.312Z] [debug] homework: intro-fill armed after 20000ms idle\n[2026-08-21T19:22:20.709Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 12286ms read 9704ms/write 2538ms in 794t\u2192out 33t 12.2ms/t HIT-CAP (174ch)\n",
+      "[2026-08-21T19:22:20.722Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 12286ms \u2014 intro-fill:action-opener\n[2026-08-21T19:22:20.723Z] [debug] homework: scene_intro \"Asgardar\" \u2713 12413ms\n[2026-08-21T19:22:53.391Z] [debug] homework: intro-fill armed after 19523ms idle\n",
+      "[2026-08-21T19:22:54.590Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1191ms read 0ms/write 1149ms in 794t\u2192out 34t HIT-CAP (169ch)\n[2026-08-21T19:22:54.737Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 1191ms \u2014 intro-fill:action-opener\n[2026-08-21T19:22:54.737Z] [debug] homework: scene_intro \"Asgardar\" \u2713 1348ms\n",
+      "[2026-08-21T19:22:56.709Z] [debug] appstate: active \u2192 background (was active for 49427ms)\n[2026-08-21T19:22:56.984Z] [debug] ctx: RELEASED \u2014 live=0 (opened=4 released=4)\n[2026-08-21T19:54:58.860Z] [debug] appstate: background \u2192 active (was background for 1922145ms)\n",
+      "[2026-08-21T19:55:04.005Z] [debug] persist sizes(KB): total=200 player=50 wm=65[rooms=34 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=80 scene=5\n[2026-08-21T19:55:04.247Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a025d2-3378-773f-a95b-cfacb3db2969\n[2026-08-21T19:55:04.247Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-21T19:55:04.336Z] [debug] ota: Already up to date\n[2026-08-21T19:55:04.336Z] [debug] ota: boot check result = noUpdate\n[2026-08-21T19:55:04.364Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-21T19:55:04.364Z] [debug] voice: bundled idle\n[2026-08-21T19:55:08.880Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-08-21T19:55:08.880Z] [debug] ctx: straggler load torn down by the lifecycle guard (count=1)\n[2026-08-21T19:55:09.013Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-21T19:55:09.014Z] [debug] qwen: LOAD CANCELLED (status=idle) \u2014 app moved on mid-load; will re-warm\n",
+      "[2026-08-21T21:09:33.790Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a025d2-3378-773f-a95b-cfacb3db2969\n[2026-08-21T21:09:33.790Z] [debug] ota: Checking\u2026\n[2026-08-21T21:09:35.137Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-21T21:09:35.224Z] [debug] ota: Saving progress\u2026\n[2026-08-21T21:09:35.225Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-08-21T21:09:35.284Z] [debug] ota: boot check result = applied\n[2026-08-21T21:09:35.461Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a02614-b410-76dc-a1d3-28c9915d5a31\n[2026-08-21T21:09:35.461Z] [debug] ota: Checking\u2026\n[2026-08-21T21:09:35.823Z] [debug] ota: Already up to date\n[2026-08-21T21:09:35.824Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-21T21:09:35.876Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-21T21:09:35.877Z] [debug] voice: bundled idle\n[2026-08-21T21:09:40.684Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-21T21:10:23.093Z] [debug] appstate: active \u2192 background (was active for 42381ms)\n",
+      "[2026-08-21T21:10:23.161Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-21T21:10:23.161Z] [debug] appstate: background \u2192 active (was background for 68ms)\n[2026-08-21T21:10:23.348Z] [debug] qwen: re-warm cancelled (left the foreground first)\n",
+      "[2026-08-21T21:10:23.349Z] [debug] appstate: active \u2192 background (was active for 188ms)\n[2026-08-21T21:10:23.423Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-21T21:11:16.834Z] [debug] appstate: background \u2192 active (was background for 53477ms)\n[2026-08-21T21:11:24.842Z] [debug] qwen: re-warming after 8000ms settled foreground\n",
+      "[2026-08-21T21:11:26.563Z] [debug] ctx: OPENED \u2014 live=1 (opened=2 released=1) \u2248425MB est\n[2026-08-21T21:11:57.198Z] [debug] OTA applied: 2026-08-21-1424-a-weapon-noun-allowlist \u2192 2026-08-21-1427-x-of-y-names-the-x.\n[2026-08-21T21:11:57.198Z] [debug] OTA session start: 2026-08-21-1427-x-of-y-names-the-x.\n[2026-08-21T21:11:57.199Z] [world] You step back into Asgardar. The world waits for your move.\n",
+      "[2026-08-21T21:11:57.199Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Verbal. The road kept your place.\"\n[2026-08-21T21:15:24.853Z] [debug] appstate: active \u2192 background (was active for 238251ms)\n[2026-08-21T21:15:25.476Z] [debug] ctx: RELEASED \u2014 live=0 (opened=2 released=2)\n",
+      "[2026-08-21T21:15:59.888Z] [debug] appstate: background \u2192 active (was background for 35034ms)\n[2026-08-21T21:16:07.437Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T21:16:07.438Z] [debug] appstate: active \u2192 background (was active for 7551ms)\n[2026-08-21T21:16:07.605Z] [debug] appstate: background \u2192 active (was background for 167ms)\n",
+      "[2026-08-21T21:16:15.614Z] [debug] qwen: re-warming after 8000ms settled foreground\n[2026-08-21T21:16:16.633Z] [debug] ctx: OPENED \u2014 live=1 (opened=3 released=2) \u2248425MB est\n[2026-08-21T21:16:19.843Z] [debug] appstate: active \u2192 background (was active for 3031ms)\n[2026-08-21T21:16:20.600Z] [debug] ctx: RELEASED \u2014 live=0 (opened=3 released=3)\n",
+      "[2026-08-21T21:16:43.582Z] [debug] appstate: background \u2192 active (was background for 23717ms)\n[2026-08-21T21:16:44.040Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T21:16:44.045Z] [debug] appstate: active \u2192 background (was active for 484ms)\n[2026-08-21T21:16:44.287Z] [debug] appstate: background \u2192 active (was background for 242ms)\n",
+      "[2026-08-21T21:16:44.806Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T21:16:44.807Z] [debug] appstate: active \u2192 background (was active for 521ms)\n[2026-08-21T21:16:45.014Z] [debug] appstate: background \u2192 active (was background for 207ms)\n[2026-08-21T21:16:45.260Z] [debug] qwen: re-warm cancelled (left the foreground first)\n",
+      "[2026-08-21T21:16:45.265Z] [debug] appstate: active \u2192 background (was active for 251ms)\n[2026-08-21T21:16:45.523Z] [debug] appstate: background \u2192 active (was background for 258ms)\n[2026-08-21T21:16:45.793Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T21:16:45.794Z] [debug] appstate: active \u2192 background (was active for 271ms)\n",
+      "[2026-08-21T21:16:46.963Z] [debug] persist sizes(KB): total=200 player=50 wm=65[rooms=34 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=80 scene=5\n[2026-08-21T21:16:58.389Z] [debug] appstate: background \u2192 active (was background for 12594ms)\n[2026-08-21T21:16:58.615Z] [debug] qwen: re-warm cancelled (left the foreground first)\n",
+      "[2026-08-21T21:16:58.624Z] [debug] appstate: active \u2192 background (was active for 235ms)\n[2026-08-21T21:16:58.880Z] [debug] appstate: background \u2192 active (was background for 257ms)\n[2026-08-21T21:16:59.467Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T21:16:59.469Z] [debug] appstate: active \u2192 background (was active for 589ms)\n",
+      "[2026-08-21T21:17:12.859Z] [debug] appstate: background \u2192 active (was background for 13390ms)\n[2026-08-21T21:17:13.978Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T21:17:13.982Z] [debug] appstate: active \u2192 background (was active for 1123ms)\n[2026-08-21T21:17:14.462Z] [debug] appstate: background \u2192 active (was background for 480ms)\n",
+      "[2026-08-21T21:17:15.420Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T21:17:15.424Z] [debug] appstate: active \u2192 background (was active for 961ms)\n[2026-08-21T21:17:34.800Z] [debug] appstate: background \u2192 active (was background for 19377ms)\n[2026-08-21T21:17:35.426Z] [debug] qwen: re-warm cancelled (left the foreground first)\n",
+      "[2026-08-21T21:17:35.428Z] [debug] appstate: active \u2192 background (was active for 628ms)\n[2026-08-21T21:17:35.702Z] [debug] appstate: background \u2192 active (was background for 273ms)\n[2026-08-21T21:17:36.268Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T21:17:36.269Z] [debug] appstate: active \u2192 background (was active for 568ms)\n",
+      "[2026-08-21T21:23:11.014Z] [debug] appstate: background \u2192 active (was background for 334745ms)\n[2026-08-21T21:23:13.847Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T21:23:13.848Z] [debug] appstate: active \u2192 background (was active for 2834ms)\n[2026-08-21T21:52:37.923Z] [debug] appstate: background \u2192 active (was background for 1764068ms)\n",
+      "[2026-08-21T21:52:38.714Z] [debug] persist sizes(KB): total=200 player=50 wm=65[rooms=34 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=79 scene=5\n[2026-08-21T21:52:45.739Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-21T21:52:45.742Z] [debug] appstate: active \u2192 background (was active for 7826ms)\n",
+      "[2026-08-21T22:57:05.757Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a02614-b410-76dc-a1d3-28c9915d5a31\n[2026-08-21T22:57:05.757Z] [debug] ota: Checking\u2026\n[2026-08-21T22:57:05.822Z] [debug] ota: Already up to date\n[2026-08-21T22:57:05.823Z] [debug] ota: boot check result = noUpdate\n[2026-08-21T22:57:05.879Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-21T22:57:05.879Z] [debug] voice: bundled idle\n[2026-08-21T22:57:10.755Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-21T22:57:18.459Z] [debug] OTA session start: 2026-08-21-1427-x-of-y-names-the-x.\n[2026-08-21T22:57:18.459Z] [world] You step back into Asgardar. The world waits for your move.\n",
+      "[2026-08-21T22:57:18.460Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Verbal. The road kept your place.\"\n[2026-08-21T22:57:20.916Z] [debug] ui: tap \"climb\"\n[2026-08-21T22:57:23.022Z] [player] climb cracked walkway\n",
+      "[2026-08-21T22:57:23.023Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked walkway resolved=cracked walkway range=- enemies=0 hooks=1\n[2026-08-21T22:57:23.080Z] [world] You loop your Reclaimer's Rope around the cracked walkway and walk the line. Tier 1/1 cleared.\n",
+      "[2026-08-21T22:57:23.081Z] [world] You reach the top of the cracked walkway (tier 1/1). The view changes; the room reads differently from here.\n[2026-08-21T22:57:23.082Z] [reward] \u2726 Aether Crystal (Common) \u2014 tucked into a crack at the top of the cracked walkway.\n[2026-08-21T22:57:23.085Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n",
+      "[2026-08-21T22:57:23.085Z] [arbiter] The Arbiter watches. \"I saw the way you came at that.\"\n[2026-08-21T22:57:23.085Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-21T22:57:23.086Z] [system] \u23f3 Time passed: 30 min\n[2026-08-21T22:57:23.338Z] [cognitive] DISENGAGE  (251ms)\n[2026-08-21T22:57:29.349Z] [debug] ui: tap \"look around you\"\n[2026-08-21T22:57:29.359Z] [player] look\n",
+      "[2026-08-21T22:57:29.359Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-21T22:57:29.361Z] [world] You look around. You're in Grand Spire of Asgardar, in Asgardar. You see: hover rail, mud drip. Ilva Sidelong is here. The spire is unaddressed. Cardinal travel: north, east, south, west.\n",
+      "[2026-08-21T22:57:29.362Z] [arbiter] \u25b8 Still open \u2014 Travel south of the outpost. Yulka camps somewhere in tiles 2-3 south, after dark (8 pm to 4 am).\n[2026-08-21T22:57:29.363Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-21T22:57:29.363Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-21T22:57:29.582Z] [cognitive] neutral  (215ms)\n",
+      "[2026-08-21T22:57:35.962Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-21T22:57:36.776Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22122 HP)\n[2026-08-21T22:57:36.824Z] [player] climb the spire\n[2026-08-21T22:57:36.824Z] [debug] parser: intent=climb conf=1.00 verb=climb target=spire resolved=spire range=- enemies=0 hooks=1\n",
+      "[2026-08-21T22:57:36.828Z] [arbiter] The Arbiter measures the gap. \"You're up on the cracked walkway. The spire is its own climb. Down first, then up.\"\n[2026-08-21T22:57:41.250Z] [debug] ui: tap \"climb down\"\n[2026-08-21T22:57:41.275Z] [player] climb down\n[2026-08-21T22:57:41.275Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-21T22:57:41.276Z] [world] You make your way back down the cracked walkway. Boots back on the ground.\n[2026-08-21T22:57:41.277Z] [world] Ember stands and stretches as you hit the ground. She has waited.\n[2026-08-21T22:57:41.278Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n[2026-08-21T22:57:41.278Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-21T22:57:41.278Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-21T22:57:41.279Z] [system] \u23f3 Time passed: 15 min\n[2026-08-21T22:57:41.280Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-08-21T22:57:43.035Z] [debug] ui: tap \"climb\"\n",
+      "[2026-08-21T22:57:45.194Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 9066ms read 0ms/write 0ms in 794t\u2192out 0t (0ch)\n[2026-08-21T22:57:45.363Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9066ms \u2014 intro-fill:\u2205\n[2026-08-21T22:57:45.364Z] [debug] homework: scene_intro \"Asgardar\" \u2205 9403ms\n[2026-08-21T22:57:45.535Z] [cognitive] CLIMB \u00b7 REST \u00b7 TRAVEL  (8704ms)\n",
+      "[2026-08-21T22:57:45.707Z] [cognitive] CLIMB  (4426ms)\n[2026-08-21T22:57:55.653Z] [player] examine the spire\n[2026-08-21T22:57:55.654Z] [debug] parser: intent=investigate conf=1.00 verb=examine target=spire resolved=spire range=- enemies=0 hooks=1\n[2026-08-21T22:57:55.655Z] [debug] route: hook intercept (kind=half_buried_spire, target=\"spire\") \u2014 original intent=investigate\n",
+      "[2026-08-21T22:57:55.655Z] [world] \u2605"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbhxsw8mus3 [inline 10/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbhxsw8mus3"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "10"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T12:37:05.466956Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T12:37:05.937000Z",
+  "fingerprints": [
+    "d702b4e57991f9d9dab704960c2844ee"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e74e6b7d4bd647bf8d7a7ca5a554ab12",
+  "previousEventID": "d59872ae6de24a2a85660fb4e526f354"
+}
