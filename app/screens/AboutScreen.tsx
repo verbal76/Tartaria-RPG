@@ -306,10 +306,13 @@ export function AboutScreen() {
       // Either way one tap answers it — and if attachments ARE the fault, the
       // inline parts behind the beacon deliver the log at the same time.
       const chunk = await sendGameLogInline(bundle.log, pending?.id ?? `t${Date.now().toString(36)}`);
-      // ⚠⚠ NOT GATED ON flush(). It has lied `true` (OTA-1504's whole reason)
-      // and now `false` for two days. A part counts when captureEvent accepted
-      // it; the relay stays the only thing that decides what actually arrived.
-      const ok = chunk.sent > 0 && chunk.sent === chunk.parts;
+      // ⚠⚠⚠ OTA-1519 — GATED ON flush() AGAIN, AND I OWED IT AN APOLOGY. OTA-1518
+      // stopped trusting it on the premise that it had lied both ways. The
+      // owner's devices disproved that in one boot each: the attachment path
+      // said false and the inline path said YES four seconds later, same
+      // process. It was tracking reality the whole time. `delivered` is
+      // every-part-accepted AND flush-confirmed — the honest verdict.
+      const ok = chunk.delivered;
       useGameStore.getState().appendLog('debug', describeInlineSend(chunk));
       // ⚠ OTA-1492 — the outcome goes in the log either way, so a send that
       // "succeeded" on the button but never arrived server-side (the owner's

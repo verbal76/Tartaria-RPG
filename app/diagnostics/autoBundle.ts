@@ -47,8 +47,8 @@ import { loadCrashLedger, settleCrashWrites } from './crashLedger';
 import { reportingEnabled } from './crashReporter';
 import { ownerToolsUnlocked } from './ownerTools';
 import { persistPendingBundle } from './pendingBundle';
-// ⚠⚠⚠ OTA-1516 — chunked, like every other send now. See the call site.
-import { sendGameLogChunked, describeChunkedSend, type DiagnosticsBundle } from './sentryTransport';
+// ⚠⚠⚠ OTA-1519 — inline and attachment-free, like every other send now.
+import { sendGameLogInline, describeInlineSend, type DiagnosticsBundle } from './sentryTransport';
 
 export const AUTO_BUNDLE_MARK_KEY = '@tartaria/lastAutoBundledCrashTs';
 
@@ -101,10 +101,15 @@ export async function maybeAutoQueueCrashBundle(
     // into one JS string for the RN bridge, was asking the freshly-recovered
     // process to make the single largest allocation it ever makes. The game log
     // in 60K parts costs a fraction of it and is what the owner asked to see.
-    const chunk = await sendGameLogChunked(bundle.log, pending?.id ?? `auto${newest.toString(36)}`);
-    const ok = chunk.sent > 0 && chunk.sent === chunk.parts;
+    // ⚠⚠⚠ OTA-1519 — INLINE HERE TOO, and this is the path the owner could watch
+    // fail in real time: 02:01:31 on hal and 02:02:02 on golem, both refused,
+    // both four or five seconds before the attachment-free button went through
+    // in the same process. A path proven not to work has no business running
+    // unattended after a crash.
+    const chunk = await sendGameLogInline(bundle.log, pending?.id ?? `auto${newest.toString(36)}`);
+    const ok = chunk.delivered;
     return `send-log: crash on record (${new Date(newest).toISOString()}) — game log pushed automatically, `
-      + `${ok ? 'flushed to Sentry' : describeChunkedSend(chunk)}${pending ? `, kept on disk as #${pending.id}` : ''}`;
+      + `${ok ? 'delivered to Sentry' : describeInlineSend(chunk)}${pending ? `, kept on disk as #${pending.id}` : ''}`;
   } catch {
     return null; // the auto path must never become a slot-load hazard
   }

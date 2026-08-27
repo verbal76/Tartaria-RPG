@@ -47,8 +47,9 @@
  */
 import * as FileSystem from 'expo-file-system';
 import { reportingEnabled } from './crashReporter';
-// ⚠⚠⚠ OTA-1516 — the retry sends what the BUTTON sends. See the call site.
-import { sendGameLogChunked, describeChunkedSend, type DiagnosticsBundle } from './sentryTransport';
+// ⚠⚠⚠ OTA-1519 — the retry sends what the BUTTON sends, and the button no
+// longer carries attachments. See the call site.
+import { sendGameLogInline, describeInlineSend, type DiagnosticsBundle } from './sentryTransport';
 
 export const PENDING_BUNDLE_FILE = 'pending-diagnostics-bundle.json';
 
@@ -208,10 +209,17 @@ export async function retryPendingBundleAtBoot(): Promise<string | null> {
     // payload than the button, and the owner asked for the game log alone
     // ("not the inventory or save file or anything else"). If the deaths stop,
     // that is the confirmation the crash record could not give.
-    const chunk = await sendGameLogChunked(p.bundle.log, p.id, attempt);
-    const ok = chunk.sent > 0 && chunk.sent === chunk.parts;
+    // ⚠⚠⚠ OTA-1519 — THE LAST TWO ATTACHMENT PATHS COME OFF. The owner's own log
+    // shows this retry failing four seconds before the button succeeded in the
+    // same boot, on both devices — the only difference between them was the
+    // attachment. It burned attempts on a path proven not to work.
+    const chunk = await sendGameLogInline(p.bundle.log, p.id, attempt);
+    // ⚠⚠ AND `delivered` IS THE VERDICT NOW, not "the SDK took it". On the
+    // attachment path the SDK took every part for two days while nothing
+    // arrived; flush is what tells those apart, and it has been proven honest.
+    const ok = chunk.delivered;
     const took = Date.now() - startedAt;
-    const how = ok ? 'flushed to Sentry' : `${describeChunkedSend(chunk)} (after ${took}ms)`;
+    const how = ok ? 'delivered to Sentry' : `${describeInlineSend(chunk)} (after ${took}ms)`;
     if (attempt >= MAX_SEND_ATTEMPTS) {
       await clearPendingBundle();
       return `send-log: bundle #${p.id} attempt ${attempt}/${MAX_SEND_ATTEMPTS} ${how} — final try, cleared`;

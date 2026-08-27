@@ -182,7 +182,10 @@ describe('OTA-1504 — the boot retry', () => {
     mockSentry.flush = jest.fn().mockResolvedValue(true);
     plant({ attempts: 1 });
     const line = await retryPendingBundleAtBoot();
-    expect(line).toContain(`attempt 2/${MAX_SEND_ATTEMPTS} flushed to Sentry`);
+    // ⚠ OTA-1519 — 'delivered' now means accepted AND flush-confirmed, so the
+    // word changed with the meaning. The contract pinned here is unchanged:
+    // a success still KEEPS the file, because a claim is not a receipt.
+    expect(line).toContain(`attempt 2/${MAX_SEND_ATTEMPTS} delivered to Sentry`);
     expect((await readPendingBundle())!.attempts).toBe(2); // kept — next boot goes again
   });
 
@@ -213,7 +216,9 @@ describe('OTA-1504 — the boot retry', () => {
     plant({ attempts: MAX_SEND_ATTEMPTS - 1 });
     const line = await retryPendingBundleAtBoot();
     expect(line).toContain('final try, cleared');
-    expect(mockSentry.captureEvent).toHaveBeenCalledTimes(1);
+    // ⚠ OTA-1519 — beacon + one inline part. The attempt ACCOUNTING this pins
+    // (the last try clears the file, win or lose) is untouched.
+    expect(mockSentry.captureEvent).toHaveBeenCalledTimes(2);
     expect(await readPendingBundle()).toBeNull();
   });
 

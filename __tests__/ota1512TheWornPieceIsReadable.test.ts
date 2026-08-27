@@ -43,11 +43,12 @@ jest.mock('../app/diagnostics/crashReporter', () => ({ reportingEnabled: () => t
 // send succeeds — so the report says nothing went out.
 jest.mock('../app/diagnostics/sentryTransport', () => ({
   sendDiagnosticsBundle: jest.fn(async () => false),
-  sendGameLogChunked: jest.fn(async (_log: string, bundleId: string) => ({
+  sendGameLogInline: jest.fn(async (_log: string, bundleId: string) => ({
     sent: 0, parts: 1, chars: 0, timings: [7], threwAt: null,
     flushNote: 'flush() resolved false without sending', stopped: null, bundleId,
+    beaconOut: true, flushSaid: 'no', delivered: false,
   })),
-  describeChunkedSend: jest.fn(() => 'did not go out (after 7ms)'),
+  describeInlineSend: jest.fn(() => 'did not go out (after 7ms)'),
 }));
 
 import { readFileSync } from 'fs';

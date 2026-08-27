@@ -102,9 +102,16 @@ describe('OTA-1505 — who it fires for', () => {
     _setCrashLedgerForTests([crash(7000)]);
     const line = await maybeAutoQueueCrashBundle(asPlayer('Verbal'), {});
     expect(line).toContain('game log pushed automatically');
-    expect(mockSentry.captureEvent).toHaveBeenCalledTimes(1);
-    const [event, hint] = mockSentry.captureEvent.mock.calls[0] as [
-      { message: string }, { attachments: Array<{ filename: string; data: string }> },
+    // ⚠⚠⚠ OTA-1519 — TWO EVENTS NOW, AND THE SECOND ONE CARRIES NO ATTACHMENT.
+    // The owner's devices proved the attachment was why nothing arrived for two
+    // days, so the auto-push sends an attachment-free BEACON first (shaped like
+    // the crash records that always worked) and then the log inline. What this
+    // test pins — a fresh crash pushes the log with no tap — is unchanged.
+    expect(mockSentry.captureEvent).toHaveBeenCalledTimes(2);
+    const [beacon] = mockSentry.captureEvent.mock.calls[0] as [{ message: string }];
+    expect(beacon.message).toContain('player-log-beacon');
+    const [event] = mockSentry.captureEvent.mock.calls[1] as [
+      { message: string; extra: { chunk: string } },
     ];
     // ⚠⚠ OTA-1516 NARROWED THE WIRE, DELIBERATELY. The auto-push used to send
     // all four artifacts in ONE envelope, on a device that had just been proven
@@ -113,9 +120,10 @@ describe('OTA-1505 — who it fires for', () => {
     // is also the payload the owner asked for ("not the inventory or save file or
     // anything else"). The save and inventory are NOT lost: the bundle is still
     // composed and persisted whole to the OTA-1504 slot, pinned just below.
-    expect(hint.attachments).toHaveLength(1);
-    expect(hint.attachments[0]!.filename).toMatch(/^game-log\.part\d+-of-\d+\.txt$/);
-    expect(hint.attachments[0]!.data).toBe('LOG[THE LOG BODY]');
+    // ⚠ OTA-1519 — the slice rides in the EVENT BODY. Attachments are proven
+    // not to leave this app; the second call must carry none at all.
+    expect(mockSentry.captureEvent.mock.calls[1]).toHaveLength(1);
+    expect(event.extra.chunk).toBe('LOG[THE LOG BODY]');
     // Durable: the same bundle sits in the OTA-1504 slot with its id on the event.
     const pending = await readPendingBundle();
     expect(pending).not.toBeNull();
@@ -202,7 +210,7 @@ describe('OTA-1505 — the wiring is honest', () => {
     // And the durable order survives review: persist BEFORE send, mark between.
     const persistAt = AUTO.indexOf('persistPendingBundle(bundle)');
     const markAt = AUTO.indexOf('AsyncStorage.setItem(AUTO_BUNDLE_MARK_KEY,');
-    const sendAt = AUTO.indexOf('sendGameLogChunked(bundle.log,');
+    const sendAt = AUTO.indexOf('sendGameLogInline(bundle.log,');
     expect(persistAt).toBeGreaterThan(-1);
     expect(markAt).toBeGreaterThan(persistAt);
     expect(sendAt).toBeGreaterThan(markAt);

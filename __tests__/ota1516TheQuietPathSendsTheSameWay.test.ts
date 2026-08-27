@@ -56,7 +56,11 @@ function codeOnly(src: string): string {
 describe('OTA-1516 — every send path sends the same payload the same way', () => {
   it('⚠⚠⚠ THE BOOT RETRY IS CHUNKED — the unattended path stops building megabytes', () => {
     const code = codeOnly(PENDING);
-    expect(code).toContain('await sendGameLogChunked(p.bundle.log, p.id, attempt)');
+    // ⚠ OTA-1519 moved this one step further — inline, no attachments — after
+    // the owner's devices proved the attachment was the fault. The contract
+    // OTA-1516 pinned (the unattended path stops building the whole envelope)
+    // is unchanged and is now enforced harder.
+    expect(code).toContain('await sendGameLogInline(p.bundle.log, p.id, attempt)');
     // The whole-bundle sender must be gone from this file entirely, not merely
     // unused: an import left behind is a call waiting to come back.
     expect(code).not.toMatch(/sendDiagnosticsBundle/);
@@ -64,7 +68,7 @@ describe('OTA-1516 — every send path sends the same payload the same way', () 
 
   it('⚠⚠⚠ THE POST-CRASH AUTO-PUSH IS CHUNKED — the worst possible moment for a megabyte', () => {
     const code = codeOnly(AUTO);
-    expect(code).toContain('await sendGameLogChunked(bundle.log,');
+    expect(code).toContain('await sendGameLogInline(bundle.log,');
     expect(code).not.toMatch(/sendDiagnosticsBundle/);
   });
 
@@ -73,9 +77,11 @@ describe('OTA-1516 — every send path sends the same payload the same way', () 
     // inline sender, while the two quiet paths stay on the chunked one. What
     // this pins is unchanged and is the point of OTA-1516: NO path builds the
     // whole four-artifact envelope any more. They send the game log alone.
-    expect(codeOnly(ABOUT)).toContain('sendGameLogInline(');
-    for (const src of [PENDING, AUTO]) {
-      expect(codeOnly(src)).toContain('sendGameLogChunked(');
+    // ⚠ OTA-1519 brought all three onto the SAME inline sender, which is what
+    // "agree" was always reaching for — 1516 could only get them off the
+    // four-artifact envelope, because the attachment fault was not yet proven.
+    for (const src of [ABOUT, PENDING, AUTO]) {
+      expect(codeOnly(src)).toContain('sendGameLogInline(');
     }
     // And nothing anywhere still reaches for the one-envelope sender.
     for (const src of [ABOUT, PENDING, AUTO]) {
@@ -98,8 +104,10 @@ describe('OTA-1516 — the retry still reports honestly', () => {
     const code = codeOnly(PENDING);
     // describeChunkedSend carries parts/chars/timings — or NOT ATTEMPTED and
     // its reason. A retry that fails now says which of those it was.
-    expect(code).toContain('describeChunkedSend(chunk)');
-    expect(code).toContain('const ok = chunk.sent > 0 && chunk.sent === chunk.parts;');
+    expect(code).toContain('describeInlineSend(chunk)');
+    // ⚠ OTA-1519: `delivered` is accepted AND flush-confirmed. "The SDK took
+    // it" was true for two days while nothing arrived.
+    expect(code).toContain('const ok = chunk.delivered;');
   });
 
   it('⚠ the attempt accounting is unchanged — chunking is not a free extra try', () => {

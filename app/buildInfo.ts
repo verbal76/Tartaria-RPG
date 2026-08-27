@@ -24976,7 +24976,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // for two days, while the one path that never flushes is the one that works. A
 // part counts when captureEvent accepted it; the relay stays the only thing
 // that decides what actually arrived, and it now names any beacon it finds.
-export const OTA_BUILD_ID = '2026-08-27-1518-the-beacon-goes-first';
+// ⚠⚠⚠ OTA-1519 — THE ATTACHMENT WAS THE FAULT, AND THE OWNER'S DEVICES PROVED
+// IT THEMSELVES. OTA-1518 moved the BUTTON to an attachment-free sender and
+// left the crash auto-push on the attachment one, so each device ran the A/B
+// inside a single boot — same process, same SDK, seconds apart, one variable:
+//   hal   (APK 293) 02:01:31 attachments → flush false | 02:01:35 inline → YES 27/27
+//   golem (APK 299) 02:02:02 attachments → flush false | 02:02:07 inline → YES 22/22
+// And the relay confirmed it server-side: both beacons arrived, all 49 inline
+// parts arrived, 588,818 characters of log — the first log to reach Sentry
+// since 2026-08-25. Payload size (his new-character test), the discarded flush
+// deadline (real, fixed, not the cause) and the missing native module (golem's
+// different APK) are all eliminated by his own evidence.
+// SO EVERY PRODUCTION PATH GOES INLINE: button, boot retry, crash auto-push.
+// The two attachment senders are kept only because their suites record how this
+// was established, and both now say RETIRED at their definition; the suite pins
+// that no caller can reach them.
+// AND flush() IS THE SIGNAL AGAIN — I OWED IT AN APOLOGY. OTA-1518 stopped
+// trusting it on the premise that it had lied in both directions. It had not:
+// it said `false` because nothing was leaving and `yes` the instant something
+// did, and the same boot shows it doing both. `delivered` is now every-part-
+// accepted AND flush-confirmed, which is exactly the distinction that was true
+// for two days while nothing arrived. Dropping it was my error, not the SDK's.
+// ⚠ KNOWN AND SEPARATE: Sentry scrubbed 9 of the 49 parts to "[Filtered]" —
+// server-side PII scrubbing on the event body, which attachments bypassed. 40
+// parts came through whole. Its own defect, tracked, not guessed at here.
+export const OTA_BUILD_ID = '2026-08-27-1519-the-attachment-was-the-fault';
+// golem catch-up 2026-08-27: markerless publish of OTA-1519 (all senders inline,
+// flush restored as the delivery signal) to the golem channel.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1518-the-beacon-goes-first';
 // golem catch-up 2026-08-27: markerless publish of OTA-1518 (attachment-free
 // beacon + inline log parts) to the golem channel. Both channels now sit level
 // at 1518; golem had 1517 early via the mis-committed 993b5ab7, hal got both

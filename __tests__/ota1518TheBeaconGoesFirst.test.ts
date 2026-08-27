@@ -69,8 +69,18 @@ describe('OTA-1518 — nothing on this path carries an attachment', () => {
   });
 });
 
-describe('OTA-1518 — flush() no longer decides what counts as sent', () => {
-  it('⚠⚠⚠ A PART COUNTS WHEN captureEvent ACCEPTED IT, not when flush blessed it', () => {
+describe('OTA-1518 — the experiment, and the premise OTA-1519 corrected', () => {
+  // ⚠⚠⚠ THE PREMISE HERE WAS WRONG, AND SAYING SO IS THE POINT OF LEAVING IT.
+  // OTA-1518 stopped gating delivery on flush() because flush appeared to have
+  // lied in both directions. It had not. The owner's own devices settled it
+  // hours later, each running the A/B inside ONE boot, seconds apart:
+  //   hal   02:01:31 attachments → flush false | 02:01:35 inline → flush YES 27/27
+  //   golem 02:02:02 attachments → flush false | 02:02:07 inline → flush YES 22/22
+  // flush said `false` because nothing was leaving and `yes` the instant
+  // something did — it tracked reality exactly. OTA-1519 restored it as the
+  // signal, and these pins are amended to the corrected contract rather than
+  // deleted, because the mistaken step is part of how the fault was found.
+  it('⚠⚠ ACCEPTANCE IS COUNTED SEPARATELY FROM DELIVERY — both facts are kept', () => {
     const body = inlineBody();
     // The increment sits in the try, straight after the capture — no await on
     // a flush between them, and no `ok &&`.
@@ -78,9 +88,8 @@ describe('OTA-1518 — flush() no longer decides what counts as sent', () => {
     expect(body).not.toMatch(/if \(ok\) report\.sent \+= 1;/);
   });
 
-  it('⚠⚠ THE NARRATOR HAS LIED BOTH WAYS, so its answer is kept as ADVICE', () => {
-    // `true` while nothing arrived is why OTA-1504's durable retry exists;
-    // `false` for two days is this OTA. Recorded, never decisive.
+  it('⚠⚠ ONE flush at the END — and OTA-1519 made its answer decisive again', () => {
+    // Recorded here, decisive at the call sites (see ota1519's `delivered`).
     const body = inlineBody();
     expect(body).toContain("report.flushSaid = ok ? 'yes' : 'no';");
     const flushAt = body.indexOf('flushWithRealDeadline');
@@ -88,13 +97,17 @@ describe('OTA-1518 — flush() no longer decides what counts as sent', () => {
     expect(flushAt).toBeGreaterThan(loopAt); // once, at the END — never per part
   });
 
-  it('⚠ the line reports the experiment, not a verdict on delivery', () => {
+  it('⚠ the line reports the experiment AND, since 1519, the verdict', () => {
     const line = describeInlineSend({
       sent: 27, parts: 27, chars: 400_000, timings: [3, 4], threwAt: null,
       flushNote: 'flush() resolved false without sending', stopped: null,
-      bundleId: 'zz9', beaconOut: true, flushSaid: 'no',
+      // ⚠ OTA-1519 added `delivered` — accepted AND flush-confirmed. This
+      // fixture is the two-day trap: every part accepted, flush said no.
+      bundleId: 'zz9', beaconOut: true, flushSaid: 'no', delivered: false,
     });
-    expect(line).toContain('INLINE (no attachments)');
+    // ⚠ OTA-1519 put the verdict first; the experiment's own facts still follow.
+    expect(line).toContain('NOT DELIVERED');
+    expect(line).toContain('inline, no attachments');
     expect(line).toContain('beacon out');
     expect(line).toContain('27/27 parts accepted');
     expect(line).toContain('flush said no');
@@ -103,7 +116,7 @@ describe('OTA-1518 — flush() no longer decides what counts as sent', () => {
   it('⚠ a beacon that failed says FAILED, loudly', () => {
     const line = describeInlineSend({
       sent: 0, parts: 3, chars: 0, timings: [], threwAt: null, flushNote: null,
-      stopped: null, bundleId: 'q', beaconOut: false, flushSaid: 'no-flush',
+      stopped: null, bundleId: 'q', beaconOut: false, flushSaid: 'no-flush', delivered: false,
     });
     expect(line).toContain('beacon FAILED');
   });

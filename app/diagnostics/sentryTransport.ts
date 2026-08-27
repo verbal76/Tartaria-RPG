@@ -328,6 +328,20 @@ export interface DiagnosticsBundle {
   device: string;
 }
 
+/**
+ * ⚠⚠⚠ OTA-1519 — RETIRED. DO NOT CALL THIS FROM A PRODUCTION PATH.
+ *
+ * Attachments are PROVEN not to leave this app. The owner's two devices each
+ * ran the A/B inside a single boot, seconds apart, same process and same SDK:
+ *
+ *   hal   (APK 293)  02:01:31 attachments → flush false   02:01:35 inline → flush YES, 27/27
+ *   golem (APK 299)  02:02:02 attachments → flush false   02:02:07 inline → flush YES, 22/22
+ *
+ * Nothing carrying an attachment has reached Sentry since 2026-08-25; the very
+ * first attachment-free send worked on the first try with 405K of log. This
+ * function and `sendGameLogChunked` below are kept ONLY because their suites
+ * document how that was established — every caller now uses sendGameLogInline.
+ */
 export async function sendDiagnosticsBundle(
   bundle: DiagnosticsBundle,
   // ⚠ OTA-1504 — the durable-send retry stamps each send with its bundle's id
@@ -459,6 +473,11 @@ export interface ChunkedSendReport {
  * Send the GAME LOG ONLY, in parts. No save, no inventory, no device summary —
  * the owner asked for exactly this payload, and it is also the payload whose
  * size was the fault.
+ */
+/**
+ * ⚠⚠⚠ OTA-1519 — RETIRED, same reason as sendDiagnosticsBundle above: the
+ * attachment never leaves the device. Chunking made the envelopes small, which
+ * was worth doing and was not the fault. Kept for its suite's record only.
  */
 export async function sendGameLogChunked(
   fullLog: string,
@@ -619,8 +638,27 @@ export const INLINE_CHUNK_CHARS = 15_000;
 export interface InlineSendReport extends ChunkedSendReport {
   /** Did the no-attachment beacon leave without throwing? The experiment. */
   beaconOut: boolean;
-  /** What flush() claimed, kept as ADVICE only — it no longer gates `sent`. */
+  /**
+   * ⚠⚠⚠ OTA-1519 — flush() IS AN HONEST NARRATOR, AND I OWED IT AN APOLOGY.
+   * OTA-1518 was built on the premise that it had lied in both directions and
+   * therefore could not gate delivery. The owner's two devices disproved that
+   * in a single boot each, four and five seconds apart:
+   *
+   *   hal   02:01:31 auto-push (ATTACHMENTS) → flush false   02:01:35 inline → flush YES, 27/27
+   *   golem 02:02:02 auto-push (ATTACHMENTS) → flush false   02:02:07 inline → flush YES, 22/22
+   *
+   * Same process, same SDK, same second; the only variable was the attachment.
+   * flush() said `false` because nothing was leaving and `yes` the instant
+   * something did — it tracked reality exactly. So it goes back to being the
+   * signal it was designed to be.
+   */
   flushSaid: 'yes' | 'no' | 'no-flush';
+  /**
+   * ⚠⚠ THE HONEST VERDICT: every part accepted AND the flush confirmed it.
+   * `sent` alone only ever meant "the SDK took it" — which, on the attachment
+   * path, was true for two days while nothing arrived. Call sites gate on THIS.
+   */
+  delivered: boolean;
 }
 
 export async function sendGameLogInline(
@@ -630,7 +668,7 @@ export async function sendGameLogInline(
 ): Promise<InlineSendReport> {
   const report: InlineSendReport = {
     sent: 0, parts: 0, chars: 0, timings: [], threwAt: null, flushNote: null,
-    stopped: null, bundleId, beaconOut: false, flushSaid: 'no-flush',
+    stopped: null, bundleId, beaconOut: false, flushSaid: 'no-flush', delivered: false,
   };
   if (!reportingEnabled()) {
     report.stopped = 'crash reporting is switched off on this device';
@@ -712,13 +750,22 @@ export async function sendGameLogInline(
   } catch {
     report.flushSaid = 'no';
   }
+  // ⚠⚠⚠ OTA-1519 — ONE flush at the end, and it DECIDES. Not per part: 27
+  // round trips would be 27 chances to stall for no extra truth, and the parts
+  // share one queue anyway. Accepted-by-the-SDK is necessary; flushed is what
+  // makes it sufficient. An SDK too old to offer flush keeps the old
+  // queue-and-hope answer rather than being called a failure.
+  report.delivered = report.sent === report.parts
+    && report.parts > 0
+    && report.flushSaid !== 'no';
   return report;
 }
 
 /** One line for the device log — the experiment's result, readable at a glance. */
 export function describeInlineSend(r: InlineSendReport): string {
   if (r.stopped) return `send-log: #${r.bundleId} — NOT ATTEMPTED: ${r.stopped}`;
-  return `send-log: #${r.bundleId} — INLINE (no attachments): beacon ${r.beaconOut ? 'out' : 'FAILED'}, `
+  return `send-log: #${r.bundleId} — ${r.delivered ? 'DELIVERED' : 'NOT DELIVERED'} `
+    + `(inline, no attachments): beacon ${r.beaconOut ? 'out' : 'FAILED'}, `
     + `${r.sent}/${r.parts} parts accepted (${r.chars} chars) — flush said ${r.flushSaid}`
     + `${r.flushNote ? ` (${r.flushNote})` : ''}${r.threwAt ? ` — THREW at ${r.threwAt}` : ''}`;
 }
