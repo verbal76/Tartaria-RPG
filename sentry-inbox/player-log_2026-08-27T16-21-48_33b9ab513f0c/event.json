@@ -1,0 +1,221 @@
+{
+  "id": "33b9ab513f0c4fb2a1cce8da9d1a8503",
+  "groupID": "7695893016",
+  "eventID": "33b9ab513f0c4fb2a1cce8da9d1a8503",
+  "projectID": "4511945117532160",
+  "size": 17660,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1524-cover-the-seven-and-mean-the-switch #mtbqd4edoeu9 [inline 1/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1524-cover-the-seven-and-mean-the-switch #mtbqd4edoeu9 [inline 1/27]",
+  "title": "player-log 2026-08-27-1524-cover-the-seven-and-mean-the-switch #mtbqd4edoeu9 [inline 1/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "9f42fd2e16474244a51d6612877c550e",
+      "span_id": "b1a4b370c56113fc",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "=== TARTARIA LOG \u00b7 399882 CHARS \u00b7 BEGIN ===\n[2026-08-26T02:05:10.516Z] [world] You push west. The silt is heavy underfoot, the horizon unchanged.\n[2026-08-26T02:05:10.517Z] [world] What you started here has not finished itself in your absence.\n[2026-08-26T02:05:10.517Z] [world] \u2726 Course set \u2014 Tribute of Mud. Heading to the objective: The Monarch's Waystation.\n",
+      "[2026-08-26T02:05:15.841Z] [debug] ui: tap \"missions\"\n[2026-08-26T02:05:16.000Z] [debug] persist sizes(KB): total=219 player=47 wm=86[rooms=40 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=83 scene=3\n[2026-08-26T02:05:29.710Z] [debug] homework: intro-fill armed after 13886ms idle\n",
+      "[2026-08-26T02:05:34.085Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4367ms read \u26a039893ms/write \u26a01145ms NOT-PER-CALL in 654t\u2192out 33t HIT-CAP (153ch)\n[2026-08-26T02:05:34.225Z] [debug] homework: scene_intro \"Nimari\" \u2713 4517ms\n[2026-08-26T02:05:34.652Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-26T02:05:36.069Z] [world] You strip the lantern pole carefully. Something usable comes free in your hand.\n[2026-08-26T02:05:36.069Z] [world] You work the tower wire over. A part of it comes loose, intact.\n[2026-08-26T02:05:36.069Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:05:36.070Z] [reward]     \u2022 Aether Dust (Common)\n[2026-08-26T02:05:36.070Z] [reward]     \u2022 Scrap Metal (Common)\n",
+      "[2026-08-26T02:05:38.054Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T02:05:38.078Z] [debug] spawn: gear=[Bonebreaker Mace, Shaman's Mud Helm, Mud Sledge] window=10 roster=new\n[2026-08-26T02:05:38.081Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n",
+      "[2026-08-26T02:05:38.082Z] [arbiter] The traders were right. Aetherkin. Some kneel to them; some burn them where they stand.\n[2026-08-26T02:05:38.082Z] [world] In life it was a child, no taller than your hip, one small hand closed around nothing \u2014 you find yourself wanting to know their name, and knowing you never will. They surfaced out of the flat mud like a held breath finally, terribly let go.",
+      "\n[2026-08-26T02:05:38.083Z] [world] It flinches from you and puts its back to the wall, hands raised \u2014 not a hunter, just something frightened that has forgotten everything except how to be afraid.\n[2026-08-26T02:05:38.083Z] [world] You set out west. Your boots sink half an inch into the mud-flats and pull free with each step.\n",
+      "[2026-08-26T02:05:38.083Z] [world] The loose end is exactly as loose as you left it.\n[2026-08-26T02:05:42.270Z] [debug] ui: tap \"flee\"\n[2026-08-26T02:05:42.279Z] [player] flee\n[2026-08-26T02:05:42.279Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=1\n[2026-08-26T02:05:42.337Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-26T02:05:42.506Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (168ms)\n[2026-08-26T02:05:44.139Z] [debug] skillcheck: escape d20=8 DEX 12 = 20 vs Pursuit 10 \u2014 Mud-Wracked Aetherkin (d20 7 + SPD 3) \u2192 PASS\n",
+      "[2026-08-26T02:05:44.216Z] [debug] stats: STR20 DEX13 INT10 WIS12 CHA12 STE3 | gear: STR+7,DEX+7,STE+2,WIS+1,CHA+1 | worn: main=Cantor's Tuning Fork off=Plasma Cutter head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring\n",
+      "[2026-08-26T02:05:44.216Z] [debug] train: dexterity (escape check) \u2192 progress 48/100\n[2026-08-26T02:05:44.217Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-08-26T02:05:56.986Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T02:05:58.570Z] [world] The Bonebreaker Mace comes up out of the silt with a small sucking protest.\n",
+      "[2026-08-26T02:05:58.571Z] [reward] \u2726 Bonebreaker Mace (Common).\n[2026-08-26T02:05:58.589Z] [world] The Mud Sledge was half under something. It is not now.\n[2026-08-26T02:05:58.589Z] [reward] \u2726 Mud Sledge (Common).\n[2026-08-26T02:05:58.590Z] [world] You work the Shaman's Mud Helm loose from where the mud had it.\n[2026-08-26T02:05:58.590Z] [reward] \u2726 Shaman's Mud Helm (Common).\n",
+      "[Filtered]",
+      "[2026-08-26T02:05:59.574Z] [world] You break the market debris apart. Among the pieces, something worth keeping.\n[2026-08-26T02:05:59.574Z] [world] You lever something loose from the merchant sign \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-26T02:05:59.575Z] [world] You work the torn tarp over. A part of it comes loose, intact.\n",
+      "[2026-08-26T02:05:59.575Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:05:59.576Z] [reward]     \u2022 Moth-Eaten Felt Scrap (Common)\n[2026-08-26T02:05:59.576Z] [reward]     \u2022 Horn-Capped Dowel (Common)\n[2026-08-26T02:05:59.576Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-08-26T02:05:59.577Z] [reward]     \u2022 Flint Core Nodule (Common)\n[2026-08-26T02:05:59.577Z] [reward]     \u2022 Cloth Scrap x3 (Common)\n",
+      "[2026-08-26T02:06:02.934Z] [debug] ui: tap \"investigate\"\n[2026-08-26T02:06:04.784Z] [player] investigate the ground\n[2026-08-26T02:06:04.784Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-26T02:06:04.790Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Mud Fragment (Common).\n",
+      "[2026-08-26T02:06:04.796Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T02:06:04.935Z] [cognitive] CLIMB  (138ms)\n[2026-08-26T02:06:05.257Z] [debug] persist sizes(KB): total=204 player=47 wm=71[rooms=26 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=82 scene=3\n[2026-08-26T02:06:07.371Z] [debug] ui: tap \"ENTER\"\n",
+      "[2026-08-26T02:06:07.385Z] [world] You step inside ruined banner hall, into the great hall.\n[2026-08-26T02:06:07.385Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n[2026-08-26T02:06:08.454Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-26T02:06:10.001Z] [world] You break the banner apart. Among the pieces, something worth keeping.\n[2026-08-26T02:06:10.001Z] [world] You work the bench over. A part of it comes loose, intact.\n[2026-08-26T02:06:10.002Z] [world] You break the fire pit apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-26T02:06:10.002Z] [world] You work the table over. A part of it comes loose, intact.\n[2026-08-26T02:06:10.002Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:06:10.002Z] [reward]     \u2022 Worn Tartarian Coin x7 (Common)\n[2026-08-26T02:06:10.003Z] [reward]     \u2022 Stick (Common)\n[2026-08-26T02:06:10.003Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-08-26T02:06:11.088Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-26T02:06:12.601Z] [player] investigate the ground\n[2026-08-26T02:06:12.602Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-26T02:06:12.609Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Golem Core (Rare).\n[2026-08-26T02:06:12.619Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-26T02:06:12.756Z] [cognitive] CLIMB  (136ms)\n[2026-08-26T02:06:13.589Z] [debug] ui: tap \"\u2190 Armory\"\n[2026-08-26T02:06:13.594Z] [world] You step into the armory.\n[2026-08-26T02:06:13.595Z] [world] Weapon racks, mostly stripped bare. A whetstone, a barrel of broken hafts, and a weapons chest with a stubborn lock.\n[2026-08-26T02:06:14.913Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-26T02:06:18.561Z] [world] You break the barrel apart. Among the pieces, something worth keeping.\n[2026-08-26T02:06:18.562Z] [world] You break the chest apart. Among the pieces, something worth keeping.\n[2026-08-26T02:06:18.562Z] [world] The rack yields little of value, though a Cloth Scrap ends up in your pack.\n",
+      "[2026-08-26T02:06:18.562Z] [world] You salvage the whetstone. The take is small but real.\n[2026-08-26T02:06:18.562Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:06:18.562Z] [reward]     \u2022 Aether Dust x4 (Common)\n[2026-08-26T02:06:18.562Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-08-26T02:06:18.569Z] [world] Already worked over: barrel, chest, rack, whetstone.\n",
+      "[2026-08-26T02:06:19.388Z] [debug] qwen\u23f1 ambient ok 6522ms read 2553ms/write 1558ms in 359t\u2192out 31t 7.1ms/t HIT-CAP (146ch)\n[2026-08-26T02:06:19.502Z] [debug] arbiter: ambient stale:moved-scene\u2192banked 6883ms\n",
+      "[2026-08-26T02:06:19.503Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You feel the weight of your journey, a burden that never seems to ease. Each step forward, you come to a new challenge, \"\n[2026-08-26T02:06:19.822Z] [debug] ui: tap \"\u2198 Vault\"\n[2026-08-26T02:06:19.828Z] [world] You step into the vault.\n",
+      "[2026-08-26T02:06:19.828Z] [world] An iron door stands ajar. Strongboxes line the floor, most pried open long ago, one still sealed.\n[2026-08-26T02:06:22.458Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T02:06:23.671Z] [world] You work the iron door over. A part of it comes loose, intact.\n",
+      "[2026-08-26T02:06:23.671Z] [world] You strip the lockbox carefully. Something usable comes free in your hand.\n[2026-08-26T02:06:23.672Z] [world] You salvage the strongbox. The take is small but real.\n[2026-08-26T02:06:23.672Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:06:23.672Z] [reward]     \u2022 Bent Nail x3 (Common)\n[2026-08-26T02:06:23.672Z] [reward]     \u2022 Aether Dust x2 (Common)\n",
+      "[2026-08-26T02:06:23.673Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-08-26T02:06:25.108Z] [debug] ui: tap \"investigate\"\n[2026-08-26T02:06:26.746Z] [player] investigate the ground\n[2026-08-26T02:06:26.747Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-26T02:06:26.749Z] [world] You scrape at the silt with the aetheric crystal blade. Nothing of worth.\n[2026-08-26T02:06:26.758Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T02:06:26.894Z] [cognitive] CLIMB  (135ms)\n[2026-08-26T02:06:28.342Z] [debug] ui: tap \"\u2196 Armory \u2713\"\n[2026-08-26T02:06:28.346Z] [world] You step into the armory.\n",
+      "[2026-08-26T02:06:28.346Z] [world] Weapon racks, mostly stripped bare. A whetstone, a barrel of broken hafts, and a weapons chest with a stubborn lock.\n[2026-08-26T02:06:29.276Z] [debug] ui: tap \"investigate\"\n[2026-08-26T02:06:30.794Z] [player] investigate the ground\n",
+      "[2026-08-26T02:06:30.794Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-26T02:06:30.797Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Aetheric Cloth (Rare).\n[2026-08-26T02:06:30.805Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T02:06:30.946Z] [cognitive] CLIMB  (140ms)\n",
+      "[2026-08-26T02:06:31.255Z] [debug] persist sizes(KB): total=203 player=48 wm=71[rooms=27 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=82 scene=2\n[2026-08-26T02:06:31.709Z] [debug] ui: tap \"\u2192 Cellar\"\n[2026-08-26T02:06:31.712Z] [world] You step into the cellar.\n",
+      "[2026-08-26T02:06:31.712Z] [world] Cool dark under the stone. Casks line the walls; a few have not been tapped. Crates molder in the corner.\n[2026-08-26T02:06:32.709Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T02:06:33.718Z] [world] You break the crate apart. Among the pieces, something worth keeping.\n[2026-08-26T02:06:33.718Z] [world] You salvage the shelf. The take is small but real.\n",
+      "[2026-08-26T02:06:33.719Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:06:33.719Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n[2026-08-26T02:06:33.719Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-26T02:06:34.762Z] [debug] ui: tap \"investigate\"\n[2026-08-26T02:06:36.249Z] [player] investigate the ground\n",
+      "[2026-08-26T02:06:36.250Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-26T02:06:36.253Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Speckled Egg (Uncommon).\n[2026-08-26T02:06:36.261Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T02:06:36.398Z] [cognitive] CLIMB  (136ms)\n",
+      "[2026-08-26T02:06:37.411Z] [debug] ui: tap \"\u2190 Hall \u2713\"\n[2026-08-26T02:06:37.414Z] [world] You step into the great hall.\n[2026-08-26T02:06:37.414Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n[2026-08-26T02:06:38.520Z] [player] investigate cask\n",
+      "[2026-08-26T02:06:38.521Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cask resolved=- range=- enemies=0 hooks=0\n[2026-08-26T02:06:38.651Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'cask' here. Choose words carefully \u2014 try: the mud, the haze, the dust.\"\n[2026-08-26T02:06:38.767Z] [cognitive] neutral  (243ms)\n",
+      "[2026-08-26T02:06:39.262Z] [debug] ui: tap \"\ud83d\udeaa EXIT\"\n[2026-08-26T02:06:39.265Z] [world] You step back outside, leaving abandoned outpost behind.\n[2026-08-26T02:06:41.348Z] [debug] ui: tap \"rest\"\n[2026-08-26T02:06:41.364Z] [player] rest\n[2026-08-26T02:06:41.365Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T02:06:41.367Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 20, afternoon)\n[2026-08-26T02:06:41.367Z] [world] You wake briefly. The Aetheric haze has cleared enough that for a heartbeat you can see further than usual.\n[2026-08-26T02:06:41.379Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T02:06:41.528Z] [cognitive] REST  (148ms)\n",
+      "[2026-08-26T02:06:43.030Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T02:06:43.050Z] [debug] spawn: gear=[Architect's Leg Enhancers, Architect's Mask of Vision, Aetheric Scout Greaves] window=10 roster=new\n[2026-08-26T02:06:43.051Z] [world] You strike out west. The country resists you with sameness more than distance.\n",
+      "[2026-08-26T02:06:43.052Z] [world] Whatever you turned over here is still turned over.\n[2026-08-26T02:06:44.547Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T02:06:46.381Z] [world] The Aetheric Scout Greaves had settled into the ground. You unsettle it.\n[2026-08-26T02:06:46.382Z] [reward] \u2726 Aetheric Scout Greaves (Common).\n",
+      "[2026-08-26T02:06:46.399Z] [world] Whatever the Architect's Leg Enhancers was lying against, it lets go without much argument.\n[2026-08-26T02:06:46.399Z] [reward] \u2726 Architect's Leg Enhancers (Common).\n[2026-08-26T02:06:46.401Z] [world] The Architect's Mask of Vision is heavier than it looks. Most things down here are.\n[2026-08-26T02:06:46.401Z] [reward] \u2726 Architect's Mask of Vision (Common).\n",
+      "[2026-08-26T02:06:47.531Z] [world] You break the aether battery apart. Among the pieces, something worth keeping.\n[2026-08-26T02:06:47.531Z] [world] You break the cooling valve apart. Among the pieces, something worth keeping.\n[2026-08-26T02:06:47.532Z] [world] You strip the cracked mirror carefully. Something usable comes free in yo"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1524-cover-the-seven-and-mean-the-switch #mtbqd4edoeu9 [inline 1/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbqd4edoeu9"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T16:21:47.313214Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "12": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 291,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T16:21:48.056000Z",
+  "fingerprints": [
+    "2a10d03f96486c50c63157805eb658ba"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "37c15e327558486bb395d24a16eade61",
+  "previousEventID": "2e3fa006bf3241d4b7fb8ff9f93c7905"
+}

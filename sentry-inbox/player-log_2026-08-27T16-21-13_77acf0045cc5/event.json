@@ -1,0 +1,223 @@
+{
+  "id": "77acf0045cc54eb894952a97a1a64c19",
+  "groupID": "7695891834",
+  "eventID": "77acf0045cc54eb894952a97a1a64c19",
+  "projectID": "4511945117532160",
+  "size": 17560,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1524-cover-the-seven-and-mean-the-switch #mtbkjdsb293n [inline 1/2]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1524-cover-the-seven-and-mean-the-switch #mtbkjdsb293n [inline 1/2]",
+  "title": "player-log 2026-08-27-1524-cover-the-seven-and-mean-the-switch #mtbkjdsb293n [inline 1/2]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "84702e9729a54c2fba32f05e050cd5ce",
+      "span_id": "acf2c1557cda5b51",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "=== TARTARIA LOG \u00b7 10842 CHARS \u00b7 BEGIN ===\n[2026-08-27T00:33:06.053Z] [debug] APK session start: 2026-08-27-1514-the-portrait-scrolls-again.\n[2026-08-27T00:33:06.055Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=n opening=y passing=n\n[2026-08-27T00:33:06.096Z] [debug] spawn: gear=[Bone Splitter Axe, Salvaged Bow, Mud-Warden's Vest] window=0 roster=new\n",
+      "[2026-08-27T00:33:06.097Z] [world] You walk under the colors of the Mud Monarchs, Tartarian Giants blood in your veins. A thousand years ago the Aetherstone flood drowned Tartaria and most of what made it. The world above kept turning. The world below waited. Today the waiting ends \u2014 you have woken into the buried country.\n",
+      "[2026-08-27T00:33:06.097Z] [world] Monarch Court rises out of the silt at the edge of The Monarch's Waystation. You arrive at The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking \u2014 your business has already been logged elsewhere.\n",
+      "[2026-08-27T00:33:06.097Z] [world] Smoke from the cook-fires turns blue where the Aether crosses it. No one comments. An aether lightning presses on the world \u2014 +1 INT. What you do here is yours to choose.\n[2026-08-27T00:33:06.097Z] [world] Paths: north to Standards \u00b7 south to First Landing. (Type 'leave outpost' to head into the wilds.)\n",
+      "[2026-08-27T00:33:06.097Z] [debug] persist: skipped \u2014 player record missing core identity (name=\u2205, raceId=\u2713, stats=\u2713); slot slot_mtash33y_oepecf left intact\n[2026-08-27T00:33:06.162Z] [debug] persist: skipped \u2014 player record missing core identity (name=\u2205, raceId=\u2713, stats=\u2713); slot slot_mtash33y_oepecf left intact\n",
+      "[2026-08-27T00:33:15.307Z] [arbiter] The Arbiter looks up. \"Your name, traveler. Type it, then tap ACT.\"\n[2026-08-27T00:33:15.308Z] [debug] persist: skipped \u2014 player record missing core identity (name=\u2205, raceId=\u2713, stats=\u2713); slot slot_mtash33y_oepecf left intact\n[2026-08-27T00:33:18.270Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-27T00:33:20.088Z] [world] You take the Salvaged Bow from where it lay.\n[2026-08-27T00:33:20.088Z] [reward] \u2726 Salvaged Bow (Common).\n[2026-08-27T00:33:20.091Z] [debug] take&wear: equipping \"Salvaged Bow\" -> off\n[2026-08-27T00:33:20.095Z] [debug] stats: STR5 DEX9 INT2 WIS7 CHA1 STE1 | gear: STR+1,STE+1 | worn: main=Mud-fist Wraps off=Salvaged Bow\n",
+      "[2026-08-27T00:33:20.759Z] [world] You pick up the Mud-Warden's Vest.\n[2026-08-27T00:33:20.760Z] [reward] \u2726 Mud-Warden's Vest (Common).\n[2026-08-27T00:33:20.762Z] [debug] take&wear: equipping \"Mud-Warden's Vest\" -> chest\n[2026-08-27T00:33:20.767Z] [debug] stats: STR7 DEX9 INT2 WIS7 CHA1 STE1 | gear: STR+3,STE+1 | worn: main=Mud-fist Wraps off=Salvaged Bow chest=Mud-Warden's Vest\n",
+      "[2026-08-27T00:33:21.556Z] [world] You lift the Bone Splitter Axe clear.\n[2026-08-27T00:33:21.557Z] [reward] \u2726 Bone Splitter Axe (Common).\n[2026-08-27T00:33:22.986Z] [reward] \u2726 Found Verse Five \u2014 The Siren of Zharak's Teeth. (open Contracts \u2192 Collectibles to read)\n",
+      "[Filtered]",
+      "[2026-08-27T00:33:22.994Z] [world] You crack the sign open. A page slides out \u2014 paper somehow dry, ink somehow still legible.\n[2026-08-27T00:33:22.994Z] [world] You strip the stripped sentinel diagnostic console carefully. Something usable comes free in your hand.\n",
+      "[2026-08-27T00:33:22.995Z] [world] You work the table apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-27T00:33:22.995Z] [world] You salvage the tilted capacitor coil rack. The take is small but real.\n[2026-08-27T00:33:22.995Z] [reward] \u2726 Salvage haul:\n[2026-08-27T00:33:22.995Z] [reward]     \u2022 Stiffened Leather Offcut (Uncommon)\n",
+      "[2026-08-27T00:33:22.995Z] [reward]     \u2022 Coiled Snare Thread (Common)\n[2026-08-27T00:33:22.996Z] [reward]     \u2022 Aether Dust (Common)\n[2026-08-27T00:33:22.996Z] [reward]     \u2022 Scrap Metal x5 (Common)\n[2026-08-27T00:33:22.996Z] [reward]     \u2022 River-Worn Pebble Set (Common)\n[2026-08-27T00:33:26.672Z] [debug] ui: tap \"more \u25b8\"\n[2026-08-27T00:33:27.690Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-27T00:33:31.435Z] [debug] persist sizes(KB): total=29 player=6 wm=16[rooms=4 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=5 scene=2\n[2026-08-27T00:33:34.976Z] [debug] send-log: FAILED - envelope did not go out \u2014 bundle #mtashpeadyjn kept on disk, boots retry up to 5 sends total\n[2026-08-27T02:03:02.136Z] [debug] OTA session start: 2026-08-27-1518-the-beacon-goes-first.\n",
+      "[2026-08-27T02:03:02.137Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-08-27T02:03:02.137Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Quiet. I kept watch while you were gone.\"\n[2026-08-27T02:03:02.217Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T02:03:02.217Z \u00b7 build 2026-08-27-1518-the-beacon-goes-first \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-27T02:03:06.479Z] [debug] send-log: #mtavou0hiube \u2014 INLINE (no attachments): beacon out, 1/1 parts accepted (9994 chars) \u2014 flush said yes\n[2026-08-27T02:03:06.480Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtavou0hiube kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-27T02:16:32.217Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a040f2-3776-721c-a9c2-6a8917e0e4fc\n[2026-08-27T02:16:32.217Z] [debug] ota: Checking\u2026\n[2026-08-27T02:16:32.305Z] [debug] ota: Already up to date\n[2026-08-27T02:16:32.305Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T02:16:32.362Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-27T02:16:32.362Z] [debug] voice: bundled idle\n[2026-08-27T02:16:32.419Z] [debug] send-log: bundle #mtavou0hiube attempt 2/5 send-log: #mtavou0hiube \u2014 0/1 parts out (9994 chars, median 47ms, worst 47ms) \u2014 WHY: flush() resolved false without sending (after 47ms) \u2014 kept for next boot\n",
+      "[2026-08-27T02:31:59.742Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0410f-234c-7c06-8eb4-72c2b54a1546\n[2026-08-27T02:31:59.742Z] [debug] ota: Checking\u2026\n[2026-08-27T02:31:59.862Z] [debug] ota: Already up to date\n[2026-08-27T02:31:59.863Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T02:31:59.894Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-27T02:31:59.895Z] [debug] voice: bundled idle\n[2026-08-27T02:32:00.106Z] [debug] send-log: bundle #mtavou0hiube attempt 3/5 delivered to Sentry\n[2026-08-27T02:32:03.843Z] [debug] OTA applied: 2026-08-27-1518-the-beacon-goes-first \u2192 2026-08-27-1519-the-attachment-was-the-fault.\n[2026-08-27T02:32:03.843Z] [debug] OTA session start: 2026-08-27-1519-the-attachment-was-the-fault.\n",
+      "[2026-08-27T02:32:03.844Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-08-27T02:32:03.844Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Quiet. I kept watch while you were gone.\"\n",
+      "[2026-08-27T02:32:03.947Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T02:32:03.947Z \u00b7 build 2026-08-27-1519-the-attachment-was-the-fault \u00b7 updated from 2026-08-27-1518-the-beacon-goes-first \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-27T02:32:04.141Z] [debug] send-log: crash on record (2026-08-27T02:03:02.202Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtawq2snlk55\n",
+      "[2026-08-27T02:32:07.291Z] [debug] send-log: #mtawq56ysvi3 \u2014 DELIVERED (inline, no attachments): beacon out, 1/1 parts accepted (12387 chars) \u2014 flush said yes\n[2026-08-27T02:32:07.292Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtawq56ysvi3 kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-27T03:03:20.021Z] [debug] OTA session start: 2026-08-27-1520-the-scrubber-takes-a-whole-value.\n[2026-08-27T03:03:20.021Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-08-27T03:03:20.021Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Quiet. The road kept your place.\"\n",
+      "[2026-08-27T03:03:20.080Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T03:03:20.080Z \u00b7 build 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-27T03:03:24.682Z] [debug] send-log: #mtaxudrxsjum \u2014 DELIVERED (inline, no attachments): beacon out, 1/1 parts accepted (13210 chars) \u2014 flush said yes\n",
+      "[2026-08-27T03:03:24.683Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtaxudrxsjum kept on disk, boots retry up to 5 sends total\n[2026-08-27T03:03:30.501Z] [debug] persist sizes(KB): total=35 player=7 wm=17[rooms=4 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=9 scene=2\n",
+      "[2026-08-27T11:52:33.774Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04126-1265-7413-a8ac-b08f1f571db7\n[2026-08-27T11:52:33.774Z] [debug] ota: Checking\u2026\n[2026-08-27T11:52:33.977Z] [debug] ota: Already up to date\n[2026-08-27T11:52:33.977Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T11:52:34.006Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-27T11:52:34.006Z] [debug] voice: bundled idle\n[2026-08-27T11:52:34.195Z] [debug] send-log: bundle #mtaxudrxsjum attempt 2/5 delivered to Sentry\n[2026-08-27T12:25:33.144Z] [debug] OTA session start: 2026-08-27-1520-the-scrubber-takes-a-whole-value.\n[2026-08-27T12:25:33.145Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n",
+      "[2026-08-27T12:25:33.145Z] [world] A Forgotten Order pilgrim is said to have asked after you in your absence. They left without saying where they were headed.\n[2026-08-27T12:25:33.149Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Quiet. The buried country is no place to walk alone. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World fo",
+      "r the account.\"\n[2026-08-27T12:25:33.259Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T12:25:33.259Z \u00b7 build 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-27T12:25:38.776Z] [debug] send-log: #mtbhxf6flrel \u2014 DELIVERED (inline, no attachments): beacon out, 2/2 parts accepted (15256 chars) \u2014 flush said yes\n",
+      "[2026-08-27T12:25:38.777Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtbhxf6flrel kept on disk, boots retry up to 5 sends total\n[2026-08-27T13:38:41.981Z] [debug] OTA session start: 2026-08-27-1522-the-stun-does-not-outlive-itself.\n[2026-08-27T13:38:41.981Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n",
+      "[2026-08-27T13:38:41.982Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Quiet. The road kept your place.\"\n\n=== END LOG \u00b7 10842 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n",
+      "  Captured at: 2026-08-27T13:38:42.403Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-08-27-1522-the-stun-does-not-outlive-itself)\n  Boot stage: qwen:deferred\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-08-27T13:38:31.792Z\n",
+      "  Last init success: 2026-08-27T13:38:32.752Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6",
+      ".6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n  Status: none recorded\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-25T23:30:47.449Z (2288m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-25-1503-the-bullseye-is-the-truth \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+41333ms)\n  \u2022 2026-08-26T00:50:13.412Z (2208m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-26-1505-the-crash-brings-its-own-evidence \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+9946ms)\n  \u2022 2026-08-26T22:59:19.885Z (879m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-26-1511-the-spear-leaves-your-hand \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+7808ms)\n",
+      "  \u2022 2026-08-27T00:34:40.392Z (784m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1514-the-portrait-scrolls-again \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"inventory\"\n      doing: tap \"inventory\" \u00b7 room outpost_gate \u00b7 screen exploration\n      last checkpoint: rendered (+72700ms)\n  \u2022 2026-08-27T01:03:31.295Z (755m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1515-the-log-goes-in-parts \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+60639ms)\n  \u2022 2026-08-27T01:34:40.055Z (724m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1516-the-quiet-path-sends-the-same-way \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+727ms)\n  \u2022 2026-08-27T02:03:02.202Z (696m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1518-the-beacon-goes-first \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+92048ms)\n  \u2022 2026-08-27T02:32:27.198Z (666m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1519-the-attachment-was-the-fault \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+23274ms)\n",
+      "  \u2022 2026-08-27T03:03:20.074Z (635m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+20786ms)\n  \u2022 2026-08-27T12:37:15.724Z (61m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1524-cover-the-seven-and-mean-the-switch #mtbkjdsb293n [inline 1/2]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbkjdsb293n"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "2"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T16:21:12.633654Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "9": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 389,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T16:21:13.456000Z",
+  "fingerprints": [
+    "9db8bb494c7326dc5378a1652071eb9d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "d85f3d9f06ad4b9d80713d0000207c49",
+  "previousEventID": null
+}

@@ -4,7 +4,7 @@
   /organizations/hot-attic-games-llc/issues/7689752967/events/?full=false
     1 page(s), 2 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7689752968/events/?full=false
-    1 page(s), 21 rows — COMPLETE — ended short of a full page
+    1 page(s), 22 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7689754199/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7689755171/events/?full=false
@@ -88,13 +88,25 @@
   /organizations/hot-attic-games-llc/issues/7695461124/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7695461448/events/?full=false
-    1 page(s), 1 rows — COMPLETE — ended short of a full page
+    1 page(s), 2 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7695461460/events/?full=false
+    1 page(s), 54 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7695568141/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7695568329/events/?full=false
+    1 page(s), 2 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7695891827/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7695891834/events/?full=false
+    1 page(s), 2 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7695893016/events/?full=false
     1 page(s), 27 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7695893072/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /projects/hot-attic-games-llc/tartaria/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /projects/hot-attic-games-llc/tartaria/issues/?query=&statsPeriod=
-    1 page(s), 45 rows — COMPLETE — ended short of a full page
+    1 page(s), 51 rows — COMPLETE — ended short of a full page
   ⚠⚠ AT LEAST ONE LISTING IS NOT PROVEN COMPLETE. Any MISSING parts below are UNPROVEN — they may simply be unread. DO NOT conclude the device failed, and DO NOT ask for another send on this basis.
   incomplete bundles:
     mtaxtx2bzl8l: 5/27 parts
@@ -119,4 +131,6 @@
     mtbhxsw8mus3: 8 redactions, 2996 chars
     mtbhy855ulom: 4 redactions, 1376 chars
     mtbhyaqy0gi8: 4 redactions, 1376 chars
-    mtbicgtwnnz3: 10 redactions, 3526 chars
+    mtbicgtwnnz3: 20 redactions, 7052 chars
+    mtbkjdsb293n: 2 redactions, 778 chars
+    mtbqd4edoeu9: 10 redactions, 3510 chars

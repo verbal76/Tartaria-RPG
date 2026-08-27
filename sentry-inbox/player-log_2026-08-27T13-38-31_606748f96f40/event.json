@@ -1,0 +1,266 @@
+{
+  "id": "606748f96f404575a1cdf64d47125f6e",
+  "groupID": "7695461460",
+  "eventID": "606748f96f404575a1cdf64d47125f6e",
+  "projectID": "4511945117532160",
+  "size": 17116,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbicgtwnnz3 [inline 8/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbicgtwnnz3 [inline 8/27]",
+  "title": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbicgtwnnz3 [inline 8/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f8a6cd91f4ab43db9e949f9c19ba0830",
+      "span_id": "8ed5127511a9c835",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Aetherbat flinches. (bludgeoning \u00d71.5 for 30)\n[2026-08-26T02:13:17.562Z] [combat] Your blow lands clean \u2014 30 damage. Aetherbat crumples in the dust. The Aetherstone settles.\n[2026-08-26T02:13:17.566Z] [reward] Aetherbat defeated. You recover Crystalline Echo, Aether Wing.\n[2026-08-26T02:13:17.569Z] [reward] +11 TC pried from the dust.\n",
+      "[2026-08-26T02:13:17.625Z] [arbiter] The Arbiter eyes your new pieces. \"You could make a Phoenix Rebirth now, if you wanted.\"\n[2026-08-26T02:13:17.631Z] [arbiter] The Arbiter looks around. \"The cracked statues here still bleed Aether when the storms come close.\"\n[2026-08-26T02:13:20.904Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-08-26T02:13:20.924Z] [debug] spawn: gear=[Aetheric Strider Boots] window=10 roster=new\n[2026-08-26T02:13:20.925Z] [world] You walk west. The silence has the weight of old metal. Your breath is the only thing that disagrees.\n[2026-08-26T02:13:20.927Z] [world] You catch yourself checking, the way you check a pocket you already know is empty.\n",
+      "[2026-08-26T02:13:22.237Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T02:13:23.976Z] [world] The Aetheric Strider Boots leaves a shape behind it in the mud, filling slowly.\n[2026-08-26T02:13:23.977Z] [reward] \u2726 Aetheric Strider Boots (Common).\n[2026-08-26T02:13:25.120Z] [world] You strip the cracked chest down. Mostly debris \u2014 but a Cloth Scrap comes loose at the bottom of the pile.\n",
+      "[2026-08-26T02:13:25.120Z] [world] You scavenge the dust bottle thoroughly. One Bone Sliver survives the sorting.\n[2026-08-26T02:13:25.121Z] [world] You strip the fungal patch carefully. Something usable comes free in your hand.\n[2026-08-26T02:13:25.121Z] [world] You strip the fungus carefully. Something usable comes free in your hand.\n",
+      "[2026-08-26T02:13:25.121Z] [world] You strip the pavement carefully. Something usable comes free in your hand.\n[2026-08-26T02:13:25.122Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:13:25.128Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-08-26T02:13:25.129Z] [reward]     \u2022 Bone Sliver x2 (Common)\n[2026-08-26T02:13:25.131Z] [reward]     \u2022 Stick (Common)\n",
+      "[2026-08-26T02:13:25.132Z] [reward]     \u2022 Mud Fragment x3 (Common)\n[2026-08-26T02:13:26.805Z] [debug] ui: tap \"investigate\"\n[2026-08-26T02:13:28.476Z] [player] investigate the ground\n[2026-08-26T02:13:28.476Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T02:13:28.482Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Firewood (Common).\n[2026-08-26T02:13:28.488Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T02:13:28.489Z] [arbiter] The Arbiter looks around. \"Doors in Nimari open inward, even the ones built to open out. The mud rewrote them.\"\n",
+      "[2026-08-26T02:13:28.489Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T02:13:28.650Z] [cognitive] CLIMB  (161ms)\n[2026-08-26T02:13:28.832Z] [debug] persist sizes(KB): total=212 player=55 wm=74[rooms=29 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=4\n[2026-08-26T02:13:30.773Z] [debug] ui: tap \"rest\"\n[2026-08-26T02:13:30.784Z] [player] rest\n",
+      "[2026-08-26T02:13:30.785Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T02:13:30.786Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 22, evening)\n[2026-08-26T02:13:30.786Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-26T02:13:30.788Z] [arbiter] The Arbiter goes still. \"Whatever found you had all night to leave. It stayed.\"\n[2026-08-26T02:13:30.789Z] [world] A Golem Knight rises out of the silt where you took it for a ridge. The rest is over.\n[2026-08-26T02:13:30.789Z] [debug] enemy: Golem Knight hp=184 ac=14 atk=Sword Strike dmg=3D6 rarity=Rare ap=9\n",
+      "[2026-08-26T02:13:30.799Z] [debug] arbiter: template (reason=combat)\n[2026-08-26T02:13:30.800Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:13:30.800Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T02:13:31.005Z] [cognitive] REST  (204ms)\n[2026-08-26T02:13:35.692Z] [debug] ui: tap \"flee\"\n[2026-08-26T02:13:35.702Z] [player] flee\n",
+      "[2026-08-26T02:13:35.703Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=far enemies=1 hooks=1\n[2026-08-26T02:13:35.771Z] [system] \u23f3 Time passed: 15 min\n[2026-08-26T02:13:35.953Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (181ms)\n[2026-08-26T02:13:37.702Z] [debug] skillcheck: escape d20=17 DEX 12 = 29 vs Pursuit 21 \u2014 Golem Knight (d20 15 + SPD 6) \u2192 PASS\n",
+      "[2026-08-26T02:13:37.796Z] [debug] stats: STR20 DEX12 INT10 WIS12 CHA12 STE3 | gear: STR+7,DEX+6,STE+2,WIS+1,CHA+1 | worn: main=Cantor's Tuning Fork off=Bone Crossbow head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring\n",
+      "[2026-08-26T02:13:37.797Z] [debug] train: dexterity (escape check) \u2192 progress 66/100\n[2026-08-26T02:13:37.797Z] [world] You get your legs under you and go, and it does not follow far.\n[2026-08-26T02:13:48.948Z] [debug] send-log: FAILED - envelope did not go out \u2014 bundle #mt9gmr2ylu58 kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-26T02:13:59.752Z] [debug] appstate: active \u2192 background (was active for 555110ms)\n[2026-08-26T22:02:32.127Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a03bd2-6b05-7aee-8965-68ec113a9357\n[2026-08-26T22:02:32.128Z] [debug] ota: Checking\u2026\n[2026-08-26T22:02:32.453Z] [debug] send-log: bundle #mt9gmr2ylu58 attempt 2/5 did not go out \u2014 kept for next boot\n",
+      "[2026-08-26T22:02:33.152Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-26T22:02:33.268Z] [debug] ota: Saving progress\u2026\n[2026-08-26T22:02:33.270Z] [debug] ota: Restarting to apply\u2026\n[2026-08-26T22:02:33.350Z] [debug] ota: boot check result = applied\n",
+      "[2026-08-26T22:02:33.727Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a03c39-c981-7889-8f55-b72d20b3d4c4\n[2026-08-26T22:02:33.727Z] [debug] ota: Checking\u2026\n[2026-08-26T22:02:33.752Z] [debug] send-log: bundle #mt9gmr2ylu58 attempt 3/5 did not go out \u2014 kept for next boot\n[2026-08-26T22:02:33.916Z] [debug] ota: Already up to date\n",
+      "[2026-08-26T22:02:33.916Z] [debug] ota: boot check result = noUpdate\n[2026-08-26T22:02:33.943Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-26T22:02:33.943Z] [debug] voice: bundled idle\n[2026-08-26T22:02:38.457Z] [debug] OTA applied: 2026-08-26-1507-the-band-follows-the-sights \u2192 2026-08-26-1511-the-spear-leaves-your-hand.\n",
+      "[2026-08-26T22:02:38.457Z] [debug] OTA session start: 2026-08-26-1511-the-spear-leaves-your-hand.\n[2026-08-26T22:02:38.457Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-26T22:02:38.458Z] [world] Whispers carried while you slept off the world. Something that was rumour the last time you walked here is closer to fact now.\n",
+      "[2026-08-26T22:02:38.465Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Great Scott. The road kept your place. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n",
+      "[2026-08-26T22:02:39.302Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-26T22:02:39.300Z \u00b7 build 2026-08-26-1511-the-spear-leaves-your-hand \u00b7 updated from 2026-08-26-1507-the-band-follows-the-sights \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-26T22:02:42.110Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T22:02:42.172Z] [debug] spawn: gear=[Titan's Gauntlets] window=10 roster=new\n",
+      "[2026-08-26T22:02:42.174Z] [world] You walk north. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-26T22:02:42.174Z] [world] The thread you were following waits where you left it.\n[2026-08-26T22:02:43.360Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T22:02:50.518Z] [world] You take the Titan's Gauntlets from where it lay.\n",
+      "[2026-08-26T22:02:50.519Z] [reward] \u2726 Titan's Gauntlets (Common).\n[2026-08-26T22:02:51.842Z] [world] You strip the bone charm carefully. Something usable comes free in your hand.\n[2026-08-26T22:02:51.842Z] [world] You scavenge the dust bottle thoroughly. One Stick survives the sorting.\n[2026-08-26T22:02:51.842Z] [world] You salvage the insignia. The take is small but real.\n",
+      "[2026-08-26T22:02:51.843Z] [world] You break the spire apart. Among the pieces, something worth keeping.\n[2026-08-26T22:02:51.843Z] [world] You strip the torn tarp carefully. Something usable comes free in your hand.\n[2026-08-26T22:02:51.843Z] [reward] \u2726 Salvage haul:\n[2026-08-26T22:02:51.844Z] [reward]     \u2022 Worn Tartarian Coin x13 (Common)\n",
+      "[2026-08-26T22:02:51.844Z] [reward]     \u2022 Stick (Common)\n[2026-08-26T22:02:51.844Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-08-26T22:02:51.844Z] [reward]     \u2022 Spider Silk (Common)\n[2026-08-26T22:02:54.844Z] [debug] ui: tap \"rest\"\n[2026-08-26T22:02:54.851Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-26T22:02:54.856Z] [player] rest\n",
+      "[2026-08-26T22:02:54.857Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:02:54.858Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 23, morning)\n[2026-08-26T22:02:54.859Z] [arbiter] The Arbiter, near the embers: \"I remembered a name in the night. It'll come back to me when the road needs it.\"\n",
+      "[Filtered]",
+      "[2026-08-26T22:02:55.907Z] [world] You walk west. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-26T22:02:55.908Z] [world] What you started here has not finished itself in your absence.\n[2026-08-26T22:02:56.644Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-26T22:03:00.463Z] [debug] ui: tap \"take / salvage\"\n",
+      "[Filtered]",
+      "[Filtered]",
+      "[2026-08-26T22:03:22.575Z] [world] You strip the circuit carefully. Something usable comes free in your hand.\n[2026-08-26T22:03:22.575Z] [world] You strip the echo horn carefully. Something usable comes free in your hand.\n[2026-08-26T22:03:22.575Z] [world] You salvage the fungus patch. The take is small but real.\n",
+      "[2026-08-26T22:03:22.576Z] [world] You work the market debris over. A part of it comes loose, intact.\n[2026-08-26T22:03:22.576Z] [world] You salvage the smuggler sack. The take is small but real.\n[2026-08-26T22:03:22.576Z] [reward] \u2726 Salvage haul:\n[2026-08-26T22:03:22.576Z] [reward]     \u2022 Scrap Metal x4 (Common)\n[2026-08-26T22:03:22.577Z] [reward]     \u2022 Spider Silk (Common)\n",
+      "[2026-08-26T22:03:22.577Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-08-26T22:03:22.577Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-08-26T22:03:34.053Z] [debug] appstate: active \u2192 background (was active for 37167ms)\n[2026-08-26T22:03:34.189Z] [debug] persist sizes(KB): total=218 player=61 wm=74[rooms=29 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=4\n",
+      "[2026-08-26T22:09:54.978Z] [debug] appstate: background \u2192 active (was background for 380925ms)\n[2026-08-26T22:09:54.983Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-26T22:09:58.562Z] [debug] ui: tap \"investigate\"\n[2026-08-26T22:10:00.057Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 5017ms read 3754ms/write 1191ms in 648t\u2192out 33t 5.8ms/t HIT-CAP (158ch)\n",
+      "[2026-08-26T22:10:00.211Z] [debug] homework: scene_intro \"Nimari\" \u2713 5228ms\n[2026-08-26T22:10:00.366Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-26T22:10:00.389Z] [player] investigate the ground\n[2026-08-26T22:10:00.390Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-26T22:10:00.394Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Wild Oats (Common).\n[2026-08-26T22:10:00.400Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T22:10:00.400Z] [arbiter] The Arbiter glances toward the cold. \"Still there. Still yours, if you take it.\"\n[2026-08-26T22:10:00.401Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-26T22:10:02.865Z] [debug] ui: tap \"investigate\"\n[2026-08-26T22:10:11.227Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T22:10:11.252Z] [debug] spawn: gear=[Titan's Vest] window=10 roster=new\n[2026-08-26T22:10:11.256Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n",
+      "[2026-08-26T22:10:11.256Z] [arbiter] These are the Aetherkin the roadside traders whisper about \u2014 the flood-dead the Aether would not let rest.\n[2026-08-26T22:10:11.257Z] [world] In life it was a bell-ringer, shoulders rounded from a rope pulled ten thousand times \u2014 they could be anyone's \u2014 a neighbour, a stranger, the person you'd have been. The silt let go of them all at once, and they came up c",
+      "lawing at the light.\n[2026-08-26T22:10:11.257Z] [world] There's no hunger in it, only fright. It shrinks from your step, then squares up on trembling legs \u2014 it will defend itself, and nothing more.\n[2026-08-26T22:10:11.258Z] [world] You push north. The silt is heavy underfoot, the horizon unchanged.\n[2026-08-26T22:10:11.258Z] [world] The loose end is exactly as loose as you left it.\n",
+      "[2026-08-26T22:10:16.771Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T22:10:16.820Z] [player] attack with the off-hand bone crossbow\n[2026-08-26T22:10:16.821Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n",
+      "[2026-08-26T22:10:16.822Z] [debug] attack: target=Drowned Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-26T22:10:16.825Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:10:16.825Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T22:10:16.877Z] [world] You commit forward with the acid-etched bone crossbow. Drowned Aetherkin watches y"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1522-the-stun-does-not-outlive-itself #mtbicgtwnnz3 [inline 8/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbicgtwnnz3"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "8"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T13:38:31.283283Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "27": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 276,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "29": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 380,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "30": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 371,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T13:38:31.862000Z",
+  "fingerprints": [
+    "34ada6c9e510ca36134b3cfc029477c8"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "76b823b8eb794b74a526372b84dca945",
+  "previousEventID": "3f9fdcae2afe4965b8c2947f2d010a99"
+}

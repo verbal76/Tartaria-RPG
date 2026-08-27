@@ -1,0 +1,197 @@
+{
+  "id": "1c939547fd0e4f9eba5039ad5cc0c72a",
+  "groupID": "7695893016",
+  "eventID": "1c939547fd0e4f9eba5039ad5cc0c72a",
+  "projectID": "4511945117532160",
+  "size": 17826,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1524-cover-the-seven-and-mean-the-switch #mtbqd4edoeu9 [inline 23/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1524-cover-the-seven-and-mean-the-switch #mtbqd4edoeu9 [inline 23/27]",
+  "title": "player-log 2026-08-27-1524-cover-the-seven-and-mean-the-switch #mtbqd4edoeu9 [inline 23/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "9f42fd2e16474244a51d6612877c550e",
+      "span_id": "b1a4b370c56113fc",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-27T00:14:10.363Z] [player] attack with the off-hand compact blaster\n[2026-08-27T00:14:10.363Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1\n[2026-08-27T00:14:10.364Z] [combat] Mud Golem suffers \u2014 burn eats 1. (121/156 HP, 0 turns left)\n",
+      "[2026-08-27T00:14:10.364Z] [combat] Mud Golem shakes off the last of the coating \u2014 the burn has run its course.\n[2026-08-27T00:14:10.364Z] [debug] attack: target=Mud Golem range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-27T00:14:10.365Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-27T00:14:10.366Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-27T00:14:10.424Z] [world] You bring the compact blaster to bear on Mud Golem.\n[2026-08-27T00:14:10.425Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T00:14:10.627Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (202ms)\n",
+      "[2026-08-27T00:14:15.772Z] [world] You seize the initiative. Mud Golem has no time to react.\n[2026-08-27T00:14:15.772Z] [combat] You \u2014 d20 \u2192 9 + DEX 14 \u2212 1 (Whisper Fog) perfect opening (2\u00d7 dice) = 22 vs Mud Golem AC 19 \u2014 \u2713 HIT\n[2026-08-27T00:14:15.774Z] [combat] The blow with the compact blaster finds purchase \u2014 9 damage, 112 HP standing. Mud Golem commits to the counter.\n",
+      "[2026-08-27T00:14:15.776Z] [combat] Mud Golem \u2014 d20 \u2192 19 + ATK 8 = 27 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-27T00:14:16.019Z] [combat] Mud Golem deals 7 bludgeoning damage [plate \u22122] [edge of reach \u2014 halved]. You have 51 HP remaining.\n[2026-08-27T00:14:20.282Z] [debug] ui: tap \"approach\"\n[2026-08-27T00:14:20.327Z] [player] approach Mud Golem\n",
+      "[2026-08-27T00:14:20.328Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud golem resolved=Mud Golem range=mid enemies=1 hooks=1\n[2026-08-27T00:14:20.330Z] [debug] move: advance from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0\n[2026-08-27T00:14:20.330Z] [debug] move: field advance target=Mud Golem d 1.50->0.50 band mid->close\n",
+      "[2026-08-27T00:14:20.331Z] [world] You close the gap with Mud Golem. (range: close / arm's reach)\n[2026-08-27T00:14:20.332Z] [combat] Mud Golem \u2014 d20 \u2192 6 + ATK 8 = 14 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-27T00:14:20.333Z] [debug] arbiter: template (reason=combat)\n[2026-08-27T00:14:20.333Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-27T00:14:20.556Z] [cognitive] SWIM  (221ms)\n[2026-08-27T00:14:22.848Z] [debug] ui: tap \"dodge\"\n[2026-08-27T00:14:22.861Z] [player] dodge\n[2026-08-27T00:14:22.861Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n",
+      "[2026-08-27T00:14:22.862Z] [world] You commit to the dodge. Slip Mud Golem's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-27T00:14:22.933Z] [combat] Mud Golem \u2014 d20 \u2192 9 + ATK 8 = 17 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-08-27T00:14:22.933Z] [combat] Dodge \u2014 d20 \u2192 12 + DEX 14 = 26 vs ATK 17. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-27T00:14:22.934Z] [debug] arbiter: template (reason=combat)\n[2026-08-27T00:14:22.934Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-27T00:14:22.934Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-27T00:14:23.146Z] [cognitive] neutral  (211ms)\n[2026-08-27T00:14:23.865Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-27T00:14:23.935Z] [player] attack with the cantor's tuning fork\n[2026-08-27T00:14:23.936Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1\n",
+      "[2026-08-27T00:14:23.937Z] [debug] attack: target=Mud Golem range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-27T00:14:23.937Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-27T00:14:23.938Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-08-27T00:14:23.993Z] [world] You commit forward with the searing cantor's tuning fork. Mud Golem watches your hands.\n[2026-08-27T00:14:23.994Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T00:14:24.205Z] [cognitive] neutral  (210ms)\n[2026-08-27T00:14:24.454Z] [debug] persist sizes(KB): total=236 player=74 wm=80[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=78 scene=5\n",
+      "[2026-08-27T00:14:29.188Z] [world] Mud Golem moves first. The pressure is immediate.\n[2026-08-27T00:14:29.190Z] [combat] Mud Golem \u2014 d20 \u2192 2 + ATK 8 = 10 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-27T00:14:29.190Z] [combat] You \u2014 d20 \u2192 8 + INT 10 \u2212 1 (Whisper Fog) perfect opening (2\u00d7 dice) = 17 vs Mud Golem AC 19 \u2014 \u2717 MISS\n",
+      "[2026-08-27T00:14:29.190Z] [combat] Mud Golem reads the motion and slips it \u2014 the searing cantor's tuning fork carves only air. The counter is already coming.\n[2026-08-27T00:14:31.017Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-27T00:14:31.086Z] [player] attack with the cantor's tuning fork\n",
+      "[2026-08-27T00:14:31.087Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1\n[2026-08-27T00:14:31.087Z] [debug] attack: target=Mud Golem range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-27T00:14:31.088Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-27T00:14:31.089Z] [debug] attack: status mods tired -1\n[2026-08-27T00:14:31.144Z] [world] You commit forward with the searing cantor's tuning fork. Mud Golem watches your hands.\n[2026-08-27T00:14:31.145Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T00:14:31.346Z] [cognitive] neutral  (201ms)\n[2026-08-27T00:14:34.687Z] [world] You seize the initiative. Mud Golem has no time to react.\n",
+      "[2026-08-27T00:14:34.687Z] [combat] You \u2014 d20 \u2192 8 + INT 10 \u2212 1 (Whisper Fog) tired -1 = 16 vs Mud Golem AC 19 \u2014 \u2717 MISS\n[2026-08-27T00:14:34.687Z] [combat] The searing cantor's tuning fork cuts air. Mud Golem answers immediately.\n[2026-08-27T00:14:34.689Z] [combat] Mud Golem \u2014 d20 \u2192 6 + ATK 8 = 14 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-27T00:14:36.318Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-08-27T00:14:36.323Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-27T00:14:36.331Z] [player] dodge\n[2026-08-27T00:14:36.332Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n",
+      "[2026-08-27T00:14:36.333Z] [world] You commit to the dodge. Slip Mud Golem's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-27T00:14:36.404Z] [combat] Mud Golem \u2014 d20 \u2192 1 + ATK 8 = 9 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-08-27T00:14:36.404Z] [combat] Dodge \u2014 Mud Golem overcommits past you. \u2713 Free opening (next strike \u00d72 dice).\n[2026-08-27T00:14:36.405Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T00:14:36.619Z] [cognitive] neutral  (213ms)\n[2026-08-27T00:14:37.370Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-27T00:14:37.441Z] [player] attack with the cantor's tuning fork\n",
+      "[2026-08-27T00:14:37.442Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1\n[2026-08-27T00:14:37.443Z] [debug] attack: target=Mud Golem range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-27T00:14:37.443Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-27T00:14:37.444Z] [debug] attack: status mods tired -1 \u00b7 perfect opening (2\u00d7 dice)\n[2026-08-27T00:14:37.499Z] [world] You raise the searing cantor's tuning fork toward Mud Golem. The room narrows around the both of you.\n[2026-08-27T00:14:37.500Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T00:14:37.703Z] [cognitive] neutral  (202ms)\n",
+      "[2026-08-27T00:14:46.893Z] [world] Mud Golem moves first. The pressure is immediate.\n[2026-08-27T00:14:46.895Z] [combat] Mud Golem \u2014 d20 \u2192 18 + ATK 8 = 26 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-27T00:14:46.895Z] [combat] You \u2014 d20 \u2192 15 + INT 10 \u2212 1 (Whisper Fog) tired -1 perfect opening (2\u00d7 dice) = 23 vs Mud Golem AC 19 \u2014 \u2713 HIT\n",
+      "[2026-08-27T00:14:46.896Z] [combat] Clean hit with the searing cantor's tuning fork for 17. Mud Golem has 95 left and does not back away.\n[2026-08-27T00:14:46.896Z] [combat] Searing Cantor's Tuning Fork \u2014 2 burn bites in and festers (3 turns).\n[2026-08-27T00:14:47.133Z] [combat] Mud Golem deals 17 bludgeoning damage [plate \u22122]. You have 34 HP remaining.\n",
+      "[2026-08-27T00:14:49.622Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-27T00:14:49.684Z] [player] attack with the cantor's tuning fork\n[2026-08-27T00:14:49.685Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1\n[2026-08-27T00:14:49.686Z] [combat] Mud Golem blisters \u2014 clinging fire sears 2. (93/156 HP, 2 turns left)\n",
+      "[2026-08-27T00:14:49.686Z] [debug] attack: target=Mud Golem range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-27T00:14:49.687Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-27T00:14:49.687Z] [debug] attack: status mods tired -1\n",
+      "[2026-08-27T00:14:49.744Z] [world] You raise the searing cantor's tuning fork toward Mud Golem. The room narrows around the both of you.\n[2026-08-27T00:14:49.745Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T00:14:49.950Z] [cognitive] neutral  (205ms)\n[2026-08-27T00:14:53.464Z] [world] Mud Golem moves first. The pressure is immediate.\n",
+      "[2026-08-27T00:14:53.465Z] [combat] Mud Golem \u2014 d20 \u2192 15 + ATK 8 = 23 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-27T00:14:53.465Z] [combat] You \u2014 d20 \u2192 6 + INT 10 \u2212 1 (Whisper Fog) tired -1 = 14 vs Mud Golem AC 19 \u2014 \u2717 MISS\n[2026-08-27T00:14:53.466Z] [combat] The searing cantor's tuning fork cuts air. Mud Golem answers immediately.\n",
+      "[2026-08-27T00:14:53.466Z] [arbiter] \"That one bleeds slow,\" the Arbiter says. \"Make the hit count.\"\n[2026-08-27T00:14:58.598Z] [debug] ui: tap \"step back\"\n[2026-08-27T00:14:58.609Z] [player] step back\n[2026-08-27T00:14:58.610Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=close enemies=1 hooks=1\n",
+      "[2026-08-27T00:14:58.611Z] [debug] move: retreat from range=close enemies=1 weather=Whisper Fog cost=1 partial=0\n[2026-08-27T00:14:58.612Z] [debug] move: field retreat target=Mud Golem d 0.50->1.50 band close->mid\n[2026-08-27T00:14:58.612Z] [world] You pull back from Mud Golem. (range: mid-range)\n",
+      "[2026-08-27T00:14:58.612Z] [combat] Mud Golem blisters \u2014 clinging fire sears 2. (91/156 HP, 1 turn left)\n[2026-08-27T00:14:58.617Z] [combat] Mud Golem \u2014 d20 \u2192 4 + ATK 8 = 12 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-27T00:14:58.904Z] [cognitive] neutral  (285ms)\n",
+      "[2026-08-27T00:14:59.152Z] [debug] persist sizes(KB): total=236 player=73 wm=80[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=78 scene=5\n[2026-08-27T00:14:59.354Z] [debug] ui: tap \"step back\"\n[2026-08-27T00:14:59.359Z] [player] step back\n[2026-08-27T00:14:59.360Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=mid enemies=1 hooks=1\n",
+      "[2026-08-27T00:14:59.361Z] [debug] move: retreat from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0\n[2026-08-27T00:14:59.361Z] [debug] move: field retreat target=Mud Golem d 1.50->2.50 band mid->far\n[2026-08-27T00:14:59.361Z] [world] You pull back from Mud Golem. (range: far)\n[2026-08-27T00:14:59.362Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-27T00:14:59.362Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-27T00:14:59.571Z] [cognitive] neutral  (208ms)\n[2026-08-27T00:14:59.931Z] [debug] ui: tap \"step back\"\n[2026-08-27T00:14:59.947Z] [player] step back\n[2026-08-27T00:14:59.948Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=far enemies=1 hooks=1\n",
+      "[2026-08-27T00:14:59.950Z] [debug] move: retreat from range=far enemies=1 weather=Whisper Fog cost=1 partial=0\n[2026-08-27T00:14:59.951Z] [debug] move: field retreat target=Mud Golem d 2.50->3.50 band far->distant\n[2026-08-27T00:14:59.951Z] [world] You pull back from Mud Golem. (range: distant)\n[2026-08-27T00:15:00.194Z] [cognitive] neutral  (241ms)\n",
+      "[2026-08-27T00:15:01.082Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-27T00:15:01.122Z] [player] attack with the off-hand compact blaster\n[2026-08-27T00:15:01.122Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=distant enemies=1 hooks=1\n",
+      "[2026-08-27T00:15:01.123Z] [combat] Mud Golem blisters \u2014 clinging fire sears 2. (89/156 HP, 0 turns left)\n[2026-08-27T00:15:01.123Z] [combat] Mud Golem shakes off the last of the fire \u2014 the Cantor's Tuning Fork has run its course.\n[2026-08-27T00:15:01.123Z] [debug] attack: target=Mud Golem range=distant reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n",
+      "[2026-08-27T00:15:01.124Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-27T00:15:01.125Z] [debug] attack: status mods exhausted -2\n[2026-08-27T00:15:01.184Z] [world] You commit forward with the compact blaster. Mud Golem watches your hands.\n[2026-08-27T00:15:01.184Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-27T00:15:01.391Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (205ms)\n[2026-08-27T00:15:06.225Z] [world] You seize the initiative. Mud Golem has no time to react.\n[2026-08-27T00:15:06.225Z] [combat] You \u2014 d20 \u2192 10 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 21 vs Mud Golem AC 19 \u2014 \u2713 HIT\n",
+      "[2026-08-27T00:15:06.228Z] [combat] Your strike with the compact blaster lands for 6. Mud Golem staggers \u2014 83 HP remaining. It answers.\n[2026-08-27T00:15:06.228Z] [combat] Mud Golem closes the distance.\n[2026-08-27T00:15:07.884Z] [debug] ui: tap \"golem (46/68)\"\n[2026-08-27T00:15:07.889Z] [player] use golem\n",
+      "[2026-08-27T00:15:07.890Z] [combat] Dick Dragon attacks Mud Golem \u2014 d20 18 + 3 = 21 vs AC 14 \u2014 \u2713 HIT\n[2026-08-27T00:15:07.891Z] [combat] Dick Dragon lands 3 piercing damage on Mud Golem. (80 HP left)\n[2026-08-27T00:15:07.891Z] [combat] Mud Golem retaliates \u2014 d20 5 + 9 hits Dick Dragon for 3 (35% resisted). (43/68)\n[2026-08-27T00:15:07.906Z] [combat] Mud Golem closes the distance.\n",
+      "[2026-08-27T00:15:08.750Z] [debug] ui: tap \"golem (43/68)\"\n[2026-08-27T00:15:08.756Z] [player] use golem\n[2026-08-27T00:15:08.757Z] [combat] Dick Dragon attacks Mud Golem \u2014 d20 10 + 3 = 13 vs AC 14 \u2014 \u2717 MISS\n[2026-08-27T00:15:08.757Z] [world] Dick Dragon's strike sails wide of Mud Golem.\n",
+      "[2026-08-27T00:15:08.757Z] [combat] Mud Golem retaliates \u2014 d20 20 + 9 (NAT 20) hits Dick Dragon for 7 (35% resisted). (36/68)\n[2026-08-27T00:15:08.773Z] [combat] Mud Golem \u2014 d20 \u2192 13 + ATK 8 = 21 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-27T00:15:09.602Z] [debug] ui: tap \"golem ("
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1524-cover-the-seven-and-mean-the-switch #mtbqd4edoeu9 [inline 23/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtbqd4edoeu9"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "23"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T16:21:47.422308Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T16:21:48.059000Z",
+  "fingerprints": [
+    "2a10d03f96486c50c63157805eb658ba"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "2e3fa006bf3241d4b7fb8ff9f93c7905",
+  "previousEventID": "0ce5e27fe7b549e9ba736d12244a0a38"
+}
