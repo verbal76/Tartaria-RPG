@@ -24894,6 +24894,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persisted whole for the retry and COPY LOG still exports everything. The
 // misleading "WILL RETRY AT BOOT" copy is gone: tapping again retries now.
 export const OTA_BUILD_ID = '2026-08-27-1515-the-log-goes-in-parts';
+// golem catch-up 2026-08-27: markerless publish of OTA-1515 (the send root cause
+// — RN's flush() discards the deadline we pass it, so every bundle send waited
+// forever; plus named refusals and the game log in parts) to the golem channel.
+// ⚠ THIS CATCH-UP CARRIES TWO OTAs, NOT ONE. OTA-1514's own golem catch-up was
+// never made — the hal publish went out as 3f1c31c7 and the markerless follow-up
+// was missed — so golem was a release behind before this one. It is stated here
+// rather than backfilled as a separate commit, because a catch-up commit that
+// claims to publish 1514 would publish this tree either way; the honest record
+// is that golem skipped straight from 1513 to 1515 and gained both.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1514-the-portrait-scrolls-again';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-26-1513-the-other-side-of-the-vial';
 // golem catch-up 2026-08-26: markerless publish of OTA-1513 (enemy weapon coatings, hit location, inflict/cure symmetry) to the golem channel.
