@@ -635,6 +635,79 @@ export function _resetSentryTransportForTests(): void {
  */
 export const INLINE_CHUNK_CHARS = 15_000;
 
+/**
+ * ⚠⚠⚠ OTA-1520 — THE SCRUBBER TAKES A WHOLE VALUE, SO STOP HANDING IT WHOLE
+ * PARTS. OTA-1519 delivered 49 inline parts and Sentry replaced NINE of them
+ * with the literal string `[Filtered]` — 135,000 characters of the owner's game
+ * log, gone, with no hint in the app that anything was missing.
+ *
+ * ⚠⚠ AND SENTRY NAMED THE RULE ITSELF. Every one of the nine events carries the
+ * reason in `_meta`, which the relay had been syncing all along without reading:
+ *
+ *   "context": { "chunk": { "": { "len": 15000, "rem": [["@password:filter", "s", 0, 10]],
+ *     "chunks": [{ "type": "redaction", "text": "[Filtered]", "rule_id": "@password:filter" }] } } }
+ *
+ * `@password:filter` is one of Sentry's DEFAULT scrubbing rules. Its pattern is
+ *
+ *   (?i)(password|secret|passwd|api[-_]key|apikey|auth|credentials|mysql_pwd
+ *        |privatekey|private[-_]key|token[^\s]*[:=]|^otp$|^two[-_]factor$)
+ *
+ * and two properties of it are what did the damage:
+ *   · it is a KeyValue pattern, so it is tested against the VALUE, not only the
+ *     field name — `chunk` is an innocent key and was never the trigger;
+ *   · it has NO WORD BOUNDARIES, so it fires on `secret` inside "the secret
+ *     door" and on `auth` inside "authored by".
+ * When it matches, the redaction is `replace_value` — the ENTIRE string goes.
+ *
+ * ⚠⚠ DOUBLE-VERIFIED BEFORE A LINE WAS CHANGED, because three wrong root causes
+ * have already cost the owner a send apiece:
+ *   · forwards — the 588,818 characters that SURVIVED contain exactly ZERO
+ *     matches of that pattern. Perfect discrimination across 40 parts.
+ *   · backwards — the game's own prose is full of substrings that trip it:
+ *     `authored` ×246, `secrets` ×40, `secret` ×35, `authority`, `authoritative`,
+ *     `secretive`. A fantasy RPG log cannot avoid the word "secret".
+ *
+ * ⚠⚠⚠ SO THE DEFECT IS OURS, NOT SENTRY'S: we handed an all-or-nothing redactor
+ * a 15,000-character document as ONE scalar. That is the error class — any
+ * redactor that replaces whole values will destroy everything it is given in one
+ * piece, and it destroys the evidence of its own trigger along with it. The fix
+ * is not to dodge the scrubber; it is to stop giving it 15,000 characters to
+ * take. The slice now rides as an ARRAY of small blocks, each scrubbed on its
+ * own merits: one "secret" costs the ~400 characters around it instead of a
+ * whole part, and the surviving neighbours name the trigger for the first time.
+ *
+ * ⚠ 400 IS CHOSEN, NOT ROUNDED. Blocks end on a line boundary where one falls in
+ * the back half of the window, so a redaction eats whole log lines rather than
+ * halves of two. That puts the block floor at 201 and the ceiling at 400, so a
+ * 15,000-char part is at most 75 array elements — small enough that Sentry's
+ * event trimming never comes near it, and `chunkChars` lets the relay prove that
+ * per part rather than assume it.
+ */
+export const INLINE_BLOCK_CHARS = 400;
+
+/**
+ * Split one part into scrub-sized blocks. `blocks.join('') === slice` exactly —
+ * every character, including the newlines, belongs to precisely one block, so
+ * reassembly is concatenation and nothing has to be inferred.
+ */
+export function splitLogIntoBlocks(slice: string, size = INLINE_BLOCK_CHARS): string[] {
+  const blocks: string[] = [];
+  let i = 0;
+  while (i < slice.length) {
+    let end = Math.min(i + size, slice.length);
+    if (end < slice.length) {
+      // Prefer to break just after a newline, but only if that keeps the block
+      // in the back half of the window — otherwise a run of long lines would
+      // shred into tiny fragments and multiply the element count.
+      const nl = slice.lastIndexOf('\n', end - 1);
+      if (nl >= i + Math.floor(size / 2)) end = nl + 1;
+    }
+    blocks.push(slice.slice(i, end));
+    i = end;
+  }
+  return blocks;
+}
+
 export interface InlineSendReport extends ChunkedSendReport {
   /** Did the no-attachment beacon leave without throwing? The experiment. */
   beaconOut: boolean;
@@ -726,7 +799,12 @@ export async function sendGameLogInline(
           parts: String(total),
           ...(attempt ? { sendAttempt: String(attempt) } : {}),
         },
-        extra: { chunk: slice, chunkChars: slice.length },
+        // ⚠⚠⚠ OTA-1520 — BLOCKS, NOT ONE SCALAR. `@password:filter` replaces a
+      // whole value, so the value it is offered has to be small. `chunkChars`
+      // stays as the honest total: the relay compares it against what it
+      // reassembles and can therefore say EXACTLY how much a redaction cost,
+      // instead of silently stitching a hole the way part 1 did on 08-27.
+      extra: { chunkBlocks: splitLogIntoBlocks(slice), chunkChars: slice.length },
       });
       // ⚠⚠ ACCEPTED, NOT FLUSHED. See the header: flush() has lied both ways,
       // and the path that never flushes is the path that works.

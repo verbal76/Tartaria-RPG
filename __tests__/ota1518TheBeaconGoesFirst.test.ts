@@ -52,7 +52,11 @@ describe('OTA-1518 — nothing on this path carries an attachment', () => {
     expect(body).not.toMatch(/attachments/);
     // And no hint argument at all — captureEvent is called one-arg, exactly
     // like the crash transport that still works.
-    expect(body).toContain('extra: { chunk: slice, chunkChars: slice.length },');
+    // ⚠ OTA-1520 amended the shape, not the principle: the slice still rides in
+    // `extra` with no attachment anywhere, but as an ARRAY of small blocks,
+    // because Sentry's @password rule replaces a whole value and ate nine whole
+    // parts. `chunkChars` stays so the relay can prove nothing went missing.
+    expect(body).toContain('extra: { chunkBlocks: splitLogIntoBlocks(slice), chunkChars: slice.length },');
   });
 
   it('⚠⚠⚠ THE BEACON GOES FIRST, AND IT IS SHAPED LIKE A CRASH RECORD', () => {

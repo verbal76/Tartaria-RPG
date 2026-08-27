@@ -111,7 +111,7 @@ describe('OTA-1505 — who it fires for', () => {
     const [beacon] = mockSentry.captureEvent.mock.calls[0] as [{ message: string }];
     expect(beacon.message).toContain('player-log-beacon');
     const [event] = mockSentry.captureEvent.mock.calls[1] as [
-      { message: string; extra: { chunk: string } },
+      { message: string; extra: { chunkBlocks: string[] } },
     ];
     // ⚠⚠ OTA-1516 NARROWED THE WIRE, DELIBERATELY. The auto-push used to send
     // all four artifacts in ONE envelope, on a device that had just been proven
@@ -123,7 +123,11 @@ describe('OTA-1505 — who it fires for', () => {
     // ⚠ OTA-1519 — the slice rides in the EVENT BODY. Attachments are proven
     // not to leave this app; the second call must carry none at all.
     expect(mockSentry.captureEvent.mock.calls[1]).toHaveLength(1);
-    expect(event.extra.chunk).toBe('LOG[THE LOG BODY]');
+    // ⚠ OTA-1520 — the slice arrives as BLOCKS. Sentry's default @password rule
+    // replaces a WHOLE value and took nine entire parts on 08-27; small blocks
+    // cap that at ~400 characters. Joining is the contract — the blocks are the
+    // log exactly, with nothing inferred at the seams.
+    expect(event.extra.chunkBlocks.join('')).toBe('LOG[THE LOG BODY]');
     // Durable: the same bundle sits in the OTA-1504 slot with its id on the event.
     const pending = await readPendingBundle();
     expect(pending).not.toBeNull();

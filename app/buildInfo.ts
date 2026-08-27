@@ -25000,7 +25000,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ⚠ KNOWN AND SEPARATE: Sentry scrubbed 9 of the 49 parts to "[Filtered]" —
 // server-side PII scrubbing on the event body, which attachments bypassed. 40
 // parts came through whole. Its own defect, tracked, not guessed at here.
-export const OTA_BUILD_ID = '2026-08-27-1519-the-attachment-was-the-fault';
+// ⚠⚠⚠ OTA-1520 — THE SCRUBBER TAKES A WHOLE VALUE, AND SENTRY HAD NAMED THE
+// RULE ALL ALONG. Those nine parts cost 135,000 characters, and every one of
+// the events carried its own reason in `_meta`, already synced into this repo,
+// in a field nothing had ever read:
+//   context.chunk."" = {"len": 15000, "rem": [["@password:filter","s",0,10]]}
+// `@password:filter` is a DEFAULT Sentry rule. Its pattern —
+//   (?i)(password|secret|passwd|api[-_]key|apikey|auth|credentials|mysql_pwd
+//        |privatekey|private[-_]key|token[^\s]*[:=]|^otp$|^two[-_]factor$)
+// — is a KeyValue pattern, so it is tested against the VALUE and not merely the
+// field name, and it carries NO word boundaries: `secret` fires inside "the
+// secret door", `auth` inside "authored by". On a match the redaction is
+// replace_value — the ENTIRE string goes.
+// DOUBLE-VERIFIED BEFORE A LINE CHANGED, because three wrong root causes have
+// already cost the owner a send apiece. Forwards: the 588,818 characters that
+// SURVIVED contain exactly ZERO matches of that pattern, across 40 parts.
+// Backwards: the game's own prose carries `authored` x246, `secrets` x40,
+// `secret` x35, `authority`, `authoritative`, `secretive` — a fantasy RPG log
+// cannot avoid the word "secret".
+// SO THE DEFECT IS OURS, NOT SENTRY'S: we handed an all-or-nothing redactor a
+// 15,000-character document as ONE scalar, and such a redactor destroys
+// everything it is given in one piece — including the evidence of its own
+// trigger. That is the error class. The fix is not to dodge the scrubber, it is
+// to stop offering it 15,000 characters at a time: the slice now rides as an
+// ARRAY of ~400-char blocks, broken on line boundaries, so one "secret" costs
+// the lines around it instead of a whole part, and the surviving neighbours
+// finally name what tripped it. `chunkChars` stays as the receipt, and the
+// relay now reads `_meta`, prints every redaction with its rule and its cost in
+// characters, and checks each part against the length it declared — so a hole
+// can never again be stitched in silence under a README claiming "27/27 parts".
+export const OTA_BUILD_ID = '2026-08-27-1520-the-scrubber-takes-a-whole-value';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1519-the-attachment-was-the-fault';
 // golem catch-up 2026-08-27: markerless publish of OTA-1519 (all senders inline,
 // flush restored as the delivery signal) to the golem channel. Both channels
 // level at 1519.

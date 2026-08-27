@@ -242,9 +242,17 @@ jobs:
               # ⚠ The declared length is the only defence against a SILENT loss.
               # A redaction, an event trim or a dropped block all surface here as
               # a shortfall instead of as a seamless join.
+              # ⚠ COUNT IN UTF-16 UNITS, NOT PYTHON CHARACTERS. `chunkChars` is
+              # JavaScript's `.length`, which counts UTF-16 code units; Python
+              # counts code points. One astral character — an emoji, a rare
+              # glyph — is 2 units and 1 code point, so a naive comparison
+              # reports a phantom "1 lost" forever. The first run of this check
+              # did exactly that on part 2 of mtawqnivyk0q. A watchdog that cries
+              # wolf on clean parts is worse than none: it teaches you to skip it.
               declared = extraval(ev, 'chunkChars')
-              if isinstance(declared, int) and declared != len(chunk):
-                  short.append((bid, int(part), declared, len(chunk)))
+              got = len(chunk.encode('utf-16-le')) // 2
+              if isinstance(declared, int) and declared != got:
+                  short.append((bid, int(part), declared, got))
               bundles.setdefault(bid, {'total': int(parts), 'seen': {}})
               bundles[bid]['seen'].setdefault(int(part), chunk)
           if short:
