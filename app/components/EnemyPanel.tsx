@@ -14,7 +14,7 @@ import {
   type ListRenderItem,
 } from 'react-native';
 import type { Enemy } from '../engine/types';
-import { describeTrait, portraitTraitChips, traitACBonus, traitDefenses } from '../engine/enemyTraits';
+import { describeTrait, enemyIntelKey, portraitTraitChips, traitACBonus, traitDefenses } from '../engine/enemyTraits';
 import { enemyPowerScore, powerMatchup } from '../engine/powerRating';
 import { enemyTypeDefenses } from '../engine/crafting';
 import { enemyDamageType } from '../engine/damageTypes';
@@ -183,8 +183,14 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
   const canReadDefenses = !witholdIntel && (playerWisdom ?? 0) >= WEAKNESS_READ_WIS;
   // OTA-838 — per-enemy observed intel lookup (lowercased name). Passed to each card
   // so an already-learned weakness shows even for a low-Wisdom character.
+  // ⚠⚠ OTA-1528 — LOOKED UP BY DEFENCE PROFILE, NOT BY DISPLAY NAME. This read
+  // `enemyIntel?.[name.toLowerCase()]`, which is how a raider whose own chips said
+  // `Vuln Piercing` came to be described as `WEAK Burn`: the spawn ordinal in
+  // "Eternal Dynasty Raider 1" is reused every encounter, so the row held whatever
+  // the LAST identically-named raider taught. Same key as the writer — see
+  // enemyTraits.enemyIntelKey.
   const intelFor = useCallback(
-    (name: string) => enemyIntel?.[name.toLowerCase()],
+    (e: Enemy) => enemyIntel?.[enemyIntelKey(e.name, e.traits)],
     [enemyIntel],
   );
   // Measure the column we actually live in so cards fit the top-right corner
@@ -256,7 +262,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
   const [detailView, setDetailView] = useState<EnemyView | null>(null);
 
   const renderItem: ListRenderItem<EnemyView> = ({ item }) => scrollWrap(
-    <EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(item.enemy.name)} playerPower={playerPower} />,
+    <EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(item.enemy)} playerPower={playerPower} />,
     () => setDetailView(item),
   );
 
@@ -270,7 +276,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
         // capped to the corner height and vertically scrollable when it's tall.
         // arb146 — tappable to open the full-detail popup.
         scrollWrap(
-          <EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(enemies[0]!.enemy.name)} playerPower={playerPower} />,
+          <EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} canRead={canReadDefenses} observed={intelFor(enemies[0]!.enemy)} playerPower={playerPower} />,
           () => setDetailView(enemies[0]!),
         )
       ) : (
@@ -311,7 +317,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
     <BrandedModal
       visible={!!detailView}
       title={detailView?.enemy.name ?? ''}
-      body={detailView ? enemyDetailBody(detailView, canReadDefenses, intelFor(detailView.enemy.name)) : undefined}
+      body={detailView ? enemyDetailBody(detailView, canReadDefenses, intelFor(detailView.enemy)) : undefined}
       buttons={[{ label: 'Close', tone: 'primary', onPress: () => setDetailView(null) }]}
       onRequestClose={() => setDetailView(null)}
     />

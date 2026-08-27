@@ -71,7 +71,7 @@ import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { climbHeightFor, isClimbCleared, reachableWhileElevated } from '../engine/climbHeight';
 import { findCatalogItem, itemIsShield } from '../engine/crafting'; // itemIsShield: OTA-1523 shield hint
 import { isOversized } from '../engine/portability';
-import { playerHasScannerEquipped } from '../engine/equipment';
+import { effectiveStats, playerHasScannerEquipped } from '../engine/equipment';
 import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
 import { enemyIsAerial } from '../engine/enemyTraits';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
@@ -1265,7 +1265,15 @@ export function ExplorationScreen() {
               activeIndex={activeIdx}
               onSelectActive={setActiveEnemyIdx}
               maxHeight={statsColH}
-              playerWisdom={player?.stats?.wisdom}
+              // ⚠⚠ OTA-1528 — THE EFFECTIVE STAT, NOT THE BASE. This passed
+              // `player.stats.wisdom` while StatsPanel renders
+              // `formatStat(base, effectiveStats(player).wisdom)` — so the owner's
+              // sheet read `WIS 12 (+1)` (base 11, effective 12), the threshold is
+              // 12, and the portrait refused a read the character sheet said he had
+              // earned. The detail popup even says so in as many words: "Wisdom 12
+              // reads them on sight." Gear that raises Wisdom bought nothing for the
+              // one thing Wisdom is advertised to do here.
+              playerWisdom={player ? effectiveStats(player).wisdom : undefined}
               enemyIntel={worldMemory?.enemyIntel}
               playerPower={player ? playerPowerScore(player) : undefined}
               witholdIntel={player ? profileOf(player).witholdIntel : false}

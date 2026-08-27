@@ -2997,7 +2997,14 @@ export function backfillEnemyIntelFromDefeats(
       if (dir > 0) weak.push(dt);
       else if (dir < 0) resist.push(dt);
     }
-    if (weak.length || resist.length) out[rawName] = { weak, resist };
+    // ⚠ OTA-1528 — SAME KEY AS THE WRITER AND THE READER. This wrote the bare
+    // lowercased name, which nothing looks up any more. The backfill's source is
+    // enemies.json — AUTHORED traits, never a per-spawn roll — so the key it
+    // produces is the profile every unrandomized spawn of that enemy will carry.
+    if (weak.length || resist.length) {
+      out[(require('../engine/enemyTraits') as typeof import('../engine/enemyTraits'))
+        .enemyIntelKey(e.name, e.traits)] = { weak, resist };
+    }
   }
   return out;
 }
@@ -20545,7 +20552,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const dmg = Math.max(1, Math.round(rawShot * shotMod.multiplier));
             const shotTag = shotMod.match === 'weak' ? ' (weak — bites deep!)' : shotMod.match === 'resist' ? ' (resisted)' : '';
             // OTA-838 — record the observed match from ranged fire too.
-            recordEnemyIntel(get, set, targetEnemy.name, shotType, shotMod.match);
+            recordEnemyIntel(get, set, targetEnemy.name, shotType, shotMod.match, targetEnemy.traits); // OTA-1528
             // OTA-1140 (pressure test) — a burst that finds the weakness earns
             // the stagger too (parity with the primary attack, which routes
             // through the melee path's OTA-1137 hook). Latched here, applied
@@ -23061,7 +23068,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       // OTA-838 — bank what that swing taught you: the panel/bestiary now reveal this
       // enemy's observed weak/resist types (even below the Wisdom read-threshold).
-      recordEnemyIntel(get, set, enemy.name, weaponType, combinedMod.match);
+      recordEnemyIntel(get, set, enemy.name, weaponType, combinedMod.match, enemy.traits); // OTA-1528
       // OTA-197 — resist swap-nudge. Playtester swung a piercing bolt-caster
       // at a piercing-resistant Silt Serpent + Mud Lurker back-to-back and
       // lost the fight largely because they didn't know to swap weapons.
@@ -28093,7 +28100,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const burstCombined = combineDamageTypeMatch(mod.match, traitMod.match);
       const burst = Math.max(1, Math.round(rawBurst * burstCombined.multiplier));
       // OTA-838 — a thrown coating teaches you the target's reaction to that type too.
-      recordEnemyIntel(get, set, target.name, dtype, burstCombined.match);
+      recordEnemyIntel(get, set, target.name, dtype, burstCombined.match, target.traits); // OTA-1528
       const newHp = Math.max(0, targetHp - burst);
       // Consume one vial + write the enemy's reduced HP + point the active index at
       // the target so resolveEnemyDefeat resolves THIS enemy on a kill.

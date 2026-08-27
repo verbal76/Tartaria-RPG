@@ -75,7 +75,7 @@ import { ARMOR_SLOTS, effectiveStats, aggregateEquippedStatBonuses, resolveEquip
 import { itemIsThrowable } from '../engine/bandolierEligibility';
 import { findFactionQuestById } from '../engine/factionQuests';
 import { weatherRepositionCost } from '../engine/weatherEffects';
-import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, combineDamageTypeMatch } from '../engine/enemyTraits';
+import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, combineDamageTypeMatch, enemyIntelKey } from '../engine/enemyTraits';
 import { incomingHitCue, soakCueLine, leakCueLine } from '../engine/combatCues';
 import { rollIncomingStatusEffect, applyEffect, statusAcAdjustment, hasFullCover, aethericVulnerabilityMultiplier } from '../engine/statusEffects';
 import { enemyDamageType as resolveEnemyDamageType, parseDamageTypeKeyword } from '../engine/damageTypes';
@@ -2477,21 +2477,43 @@ export function damageModClause(opts: {
 
 // OTA-838 — record an OBSERVED damage-type match against an enemy so the panel and
 // bestiary can reveal what you've learned by fighting (the panel's "strike to learn"
-// promise, made real + persistent). Deduped per lowercased enemy name; a type lives
-// in weak OR resist, and a fresh contradicting observation MOVES it (per-spawn
-// randomization can flip a type, so the latest hit is the truth). No-op for 'normal'.
+// promise, made real + persistent). A type lives in weak OR resist, and a fresh
+// contradicting observation MOVES it. No-op for 'normal'.
 // Exported for unit testing the dedup/move logic (OTA-838).
+//
+// ⚠⚠⚠ OTA-1528 — KEYED ON THE DEFENCE PROFILE, NOT THE DISPLAY NAME.
+//
+// This was `enemyName.toLowerCase()`, and OTA-838's own note above admitted the
+// hazard while mis-sizing it: *"per-spawn randomization can flip a type, so the
+// latest hit is the truth."* Moving the type on a contradiction is the right rule
+// INSIDE one fight. Across fights it is not a fix, it is the bug: the ordinal in
+// "Eternal Dynasty Raider 1" is reused by every encounter, so each new spawn
+// overwrote the last one's answer and the panel described whichever raider had
+// been hit most recently — under a name the player reads as one creature.
+//
+// The owner's log, three raiders in one corpus, two different answers:
+//   Raider 1 flinches (burn ×1.5) · Raider 2 flinches (piercing ×2.25)
+//   Raider 3 flinches (piercing ×2.25)
+// His portrait then told him `WEAK Burn` about a raider whose own chips read
+// `Vuln Piercing`, and he fought it with a burn weapon. Stale intel that the
+// player ACTS on is worse than no intel; "strike to learn" has to teach the
+// thing in front of you, not the thing that stood there last time.
+//
+// enemyIntelKey drops the ordinal and appends the defence-bearing traits, so a
+// lesson carries to a genuinely identical spawn and stops at a differently-rolled
+// one. See enemyTraits.enemyIntelKey for why only those traits count.
 export function recordEnemyIntel(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   enemyName: string,
   damageType: string | null | undefined,
   match: 'weak' | 'resist' | 'normal',
+  enemyTraits?: readonly string[],
 ): void {
   if (match === 'normal') return;
   const dt = (damageType ?? '').toLowerCase();
   if (!dt || !enemyName) return;
-  const key = enemyName.toLowerCase();
+  const key = enemyIntelKey(enemyName, enemyTraits);
   set((s) => {
     const wm = s.worldMemory;
     if (!wm) return {};

@@ -268,6 +268,13 @@ describe('OTA-1088 — source locks (damage floor + crack wiring)', () => {
   });
 
   it('the bestiary write still receives the TRUE combinedMod, not effectiveMod', () => {
-    expect(src).toMatch(/recordEnemyIntel\(get, set, enemy\.name, weaponType, combinedMod\.match\)/);
+    // ⚠ OTA-1528 added a traits argument — intel is keyed on the defence profile
+    // now, not the display name — so the call no longer ends at `.match)`. The
+    // claim this test exists for is untouched and still pinned exactly: what the
+    // bestiary is told is `combinedMod`, never the crack-aware `effectiveMod`. A
+    // guard cracked by three resisted hits must not teach the player that the
+    // enemy stopped resisting.
+    expect(src).toMatch(/recordEnemyIntel\(get, set, enemy\.name, weaponType, combinedMod\.match[,)]/);
+    expect(src).not.toMatch(/recordEnemyIntel\(get, set, enemy\.name, weaponType, effectiveMod/);
   });
 });

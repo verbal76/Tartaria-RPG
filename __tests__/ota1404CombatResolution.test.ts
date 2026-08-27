@@ -297,7 +297,18 @@ describe('OTA-1404 — the move changed no behaviour, and here is the arithmetic
     expect(i).toBeGreaterThan(-1);
     expect(j).toBeGreaterThan(i);
     expect(COMBAT.slice(i, j)).toContain('randomization can flip a type');
-    // And the halves are close together now, not seventy lines apart.
-    expect(COMBAT.slice(i, j).split('\n').length).toBeLessThan(12);
+    // ⚠ OTA-1528 — MEASURED ACROSS THE OTA-838 BLOCK ITSELF, NOT ACROSS EVERYTHING
+    // BETWEEN IT AND THE FUNCTION. This counted lines from the comment's first
+    // word to the `export`, so OTA-1528 adding its OWN note underneath — a later
+    // OTA explaining why the key changed, exactly where the next reader needs it —
+    // turned a red build out of a comment nobody had split. That is the
+    // magic-number-window trap OTA-1381 named in ota1276FreezeForensics: it fails
+    // when somebody adds a comment, and teaches the next reader to distrust the
+    // suite. What this test guards is that the OTA-838 comment is CONTIGUOUS and
+    // sits above the function, so that is what it now measures.
+    const end = COMBAT.indexOf('Exported for unit testing the dedup/move logic (OTA-838).');
+    expect(end).toBeGreaterThan(i);
+    expect(end).toBeLessThan(j);
+    expect(COMBAT.slice(i, end).split('\n').length).toBeLessThan(12);
   });
 });

@@ -315,6 +315,63 @@ export function portraitTraitChips(
   return out;
 }
 
+/** ⚠⚠⚠ OTA-1528 — WHAT "STRIKE TO LEARN" IS ALLOWED TO REMEMBER, AND ABOUT WHOM.
+ *
+ *  The owner's portrait said `WEAK Burn` about a raider whose own chips said
+ *  `Vuln Piercing`. It was not an arithmetic error. `recordEnemyIntel` keyed the
+ *  bestiary on `enemy.name.toLowerCase()` — "eternal dynasty raider 1" — while
+ *  `randomizeEnemyDefense` rolls a FRESH weakness for every spawn. His own log,
+ *  one corpus, three raiders:
+ *
+ *    Weakness exposed — Raider 1 flinches. (burn ×1.5 for 5)
+ *    Weakness exposed — Raider 2 flinches. (piercing ×2.25 for 13)
+ *    Weakness exposed — Raider 3 flinches. (piercing ×2.25 for 21)
+ *
+ *  Two different answers under three names that repeat every encounter. So the
+ *  card faithfully reported intel filed under a label that is not an identity:
+ *  a Raider 1 from an earlier fight was weak to burn, and every Raider 1 since
+ *  has been described with that fact. Strike-to-learn was teaching the wrong
+ *  answer to the next fight — worse than teaching nothing, because the player
+ *  acts on it. (He did: burn weapon, piercing-weak foe.)
+ *
+ *  ⚠⚠ THE NAME WAS NEVER THE THING YOU LEARNED ABOUT. The spawn ordinal is
+ *  presentation — which of the four is on the left — and it is reused every
+ *  encounter. What you actually learn by hitting something is a fact about its
+ *  DEFENCE PROFILE: the kind it is, plus the roll it got. So that is the key.
+ *  The ordinal is stripped (a lesson about "Raider 1" is a lesson about raiders),
+ *  and the defence-bearing traits are appended, so:
+ *   • a later raider that rolled the SAME profile shows what you learned — it is
+ *     genuinely the same thing, and re-learning it would be busywork;
+ *   • a raider that rolled DIFFERENTLY shows nothing until struck — it genuinely
+ *     is a different thing, and the old answer would be a lie.
+ *
+ *  ⚠ Only `resist:` / `vulnerable:` / `inured:` go into the signature. Armored,
+ *  Savage, Quick and the rest describe how a thing FIGHTS, not what bites it;
+ *  including them would split the bestiary on facts that have nothing to do with
+ *  the question being asked and quietly re-create the same forgetting.
+ *
+ *  ⚠ Rows written under the old bare-name keys stop matching and simply go
+ *  unread. That is deliberate: they hold exactly the mixed-up data this OTA
+ *  exists to stop trusting, so silently keeping them in play would preserve the
+ *  bug in the saves that already have it. They are left on disk rather than
+ *  deleted — a migration that drops player data to fix a display is a worse
+ *  trade than a few stale keys nobody reads. */
+export function enemyIntelKey(
+  name: string | null | undefined,
+  traits: readonly string[] | undefined,
+): string {
+  const base = (name ?? '').toLowerCase().trim().replace(/\s+\d+$/, '');
+  const sig = (traits ?? [])
+    .filter((t) => {
+      const [key, arg] = t.split(':');
+      return !!arg && (key === 'resist' || key === 'vulnerable' || key === 'inured');
+    })
+    .map((t) => t.toLowerCase())
+    .sort()
+    .join(',');
+  return sig ? `${base}|${sig}` : base;
+}
+
 export function describeTraits(traits: readonly string[] | undefined): string {
   if (!traits || traits.length === 0) return '';
   return traits.map(describeTrait).join(' · ');

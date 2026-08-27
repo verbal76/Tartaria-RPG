@@ -25182,7 +25182,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1093 inversion again — and `profiled`, an idempotence marker that was never
 // a trait, no longer reaches the player at all. Behavioural chips stay ungated:
 // Armored, Savage, Quick, Ambusher, Bleeder, Concussive are how the thing fights.
-export const OTA_BUILD_ID = '2026-08-27-1527-the-chips-answered-what-the-gate-refused';
+// ⚠⚠⚠ OTA-1528 — THE NAME WAS NOT THE IDENTITY, AND THE GATE READ THE WRONG
+// STAT. Two defects behind one question: why did the portrait say `WEAK Burn`
+// about a raider whose own chips said `Vuln Piercing`?
+//  (1) recordEnemyIntel keyed the bestiary on `enemy.name.toLowerCase()` while
+//      randomizeEnemyDefense rolls a fresh weakness per SPAWN. The ordinal in
+//      "Eternal Dynasty Raider 1" is presentation and repeats every encounter, so
+//      each new spawn overwrote the last one's answer. The owner's log holds the
+//      proof — Raider 1 flinches at burn ×1.5, Raiders 2 and 3 at piercing ×2.25 —
+//      and the card described his piercing-weak raider with a dead raider's
+//      weakness. He fought it with a burn weapon. Intel is now keyed on the
+//      DEFENCE PROFILE: ordinal stripped, defence-bearing traits appended, so a
+//      lesson carries to a genuinely identical spawn and stops at a different one.
+//  (2) The Wisdom gate was handed `player.stats.wisdom` — the BASE — while the
+//      sheet renders the effective value. `WIS 12 (+1)` is base 11, effective 12,
+//      and the threshold is 12: the sheet said 12, the popup said "Wisdom 12 reads
+//      them on sight", and the gate saw 11 and refused. Gear that raises Wisdom
+//      bought nothing for the one thing Wisdom is advertised to do on this screen.
+// One error class: a key that is not the thing it names — a label standing in for
+// an identity, a base stat standing in for the number the player is shown.
+export const OTA_BUILD_ID = '2026-08-27-1528-the-name-was-not-the-identity';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1527-the-chips-answered-what-the-gate-refused';
 // golem catch-up 2026-08-27: markerless publish of OTA-1527 (the enemy portrait's
 // trait chips now respect the same Wisdom gate as the RESIST/WEAK block above
 // them, `inured:` reads `Not Weak: X` instead of its raw id, and `profiled`
