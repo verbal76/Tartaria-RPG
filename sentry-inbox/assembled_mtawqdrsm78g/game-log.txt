@@ -1,0 +1,371 @@
+ion a status code. The south corridor's code is not in the legend, and asking after it is itself a flag.
+[2026-08-21T02:14:16.310Z] [world] You've stood here many times. (visit 9)
+[2026-08-21T02:14:16.310Z] [world] Paths: north to First Landing · south to Shallow Digs · east to Storage Halls · west to Pump Room. (Type 'leave outpost' to head into the wilds.)
+[2026-08-21T02:14:16.311Z] [world] You think back to the door from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-08-21T02:14:16.471Z] [cognitive] neutral  (147ms)
+[2026-08-21T02:14:18.674Z] [debug] ui: tap "investigate"
+[2026-08-21T02:14:19.883Z] [player] investigate corridor
+[2026-08-21T02:14:19.883Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=corridor resolved=corridor range=- enemies=0 hooks=1
+[2026-08-21T02:14:19.884Z] [world] The corridor reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-08-21T02:14:20.033Z] [cognitive] neutral  (147ms)
+[2026-08-21T02:14:21.089Z] [debug] ui: tap "→ ✓ STORAGE HALLS"
+[2026-08-21T02:14:21.114Z] [player] go east
+[2026-08-21T02:14:21.115Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=1
+[2026-08-21T02:14:21.116Z] [world] You head on to the Storage Halls.
+[2026-08-21T02:14:21.116Z] [debug] scene: loc=asgardar hub=buried_storage arrival=n opening=n passing=n
+[2026-08-21T02:14:21.121Z] [world] Architect's Cell — Storage Halls. Tartarian crates re-labelled with barcodes, most rotted through, some intact — inventory the Architects took possession of rather than bought. The mud-glass containers in the back row are shelved under a category with no name on it. One corridor, back west to the junction.
+[2026-08-21T02:14:21.121Z] [world] You've stood here again. (visit 3)
+[2026-08-21T02:14:21.122Z] [world] Paths: west to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-08-21T02:14:21.233Z] [cognitive] neutral  (95ms)
+[2026-08-21T02:14:22.225Z] [debug] ui: tap "← ✓ SECOND LANDING"
+[2026-08-21T02:14:22.236Z] [player] go west
+[2026-08-21T02:14:22.237Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-08-21T02:14:22.238Z] [world] You head on to the Second Landing.
+[2026-08-21T02:14:22.238Z] [debug] scene: loc=asgardar hub=buried_landing_two arrival=n opening=n passing=n
+[2026-08-21T02:14:22.242Z] [world] Architect's Cell — Second Landing. Pumps west, records east, the cuts south, the stair back north. A laminated sign gives every direction a status code. The south corridor's code is not in the legend, and asking after it is itself a flag.
+[2026-08-21T02:14:22.243Z] [world] You've stood here many times. (visit 10)
+[2026-08-21T02:14:22.243Z] [world] Paths: north to First Landing · south to Shallow Digs · east to Storage Halls · west to Pump Room. (Type 'leave outpost' to head into the wilds.)
+[2026-08-21T02:14:22.375Z] [cognitive] TRAVEL  (124ms)
+[2026-08-21T02:14:23.275Z] [debug] ui: tap "↓ ✓ SHALLOW DIGS"
+[2026-08-21T02:14:23.295Z] [player] go south
+[2026-08-21T02:14:23.296Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-08-21T02:14:23.297Z] [world] You head on to the Shallow Digs.
+[2026-08-21T02:14:23.297Z] [debug] scene: loc=asgardar hub=buried_shallow_digs arrival=n opening=n passing=n
+[2026-08-21T02:14:23.303Z] [world] Architect's Cell — The Shallow Digs. An active excavation the Architects run and do not describe. Tarpaulins, rope ladders, work lights on a generator. The cuts open into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth, which appears on the paperwork as an environmental factor. The way out is north, the way you came.
+[2026-08-21T02:14:23.303Z] [world] You've stood here before. (visit 2)
+[2026-08-21T02:14:23.304Z] [world] Paths: north to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-08-21T02:14:23.304Z] [debug] arbiter: template (reason=cooldown)
+[2026-08-21T02:14:23.304Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-21T02:14:23.446Z] [cognitive] neutral  (134ms)
+[2026-08-21T02:14:23.577Z] [debug] qwen⏱ narration:scene_intro preempted 13133ms wait 1046ms read 12040ms/write 0ms in 836t→out 0t 14.4ms/t (3ch)
+[2026-08-21T02:14:23.679Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro after 13133ms — cancelled:player-acted-again
+[2026-08-21T02:14:23.956Z] [debug] persist sizes(KB): total=165 player=51 wm=44[rooms=16 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=67 scene=3
+[2026-08-21T02:14:24.606Z] [debug] ui: tap "take / salvage"
+[2026-08-21T02:14:25.932Z] [world] You take the Climbing Rope from where it lay.
+[2026-08-21T02:14:25.933Z] [reward] ✦ Climbing Rope (Common).
+[2026-08-21T02:14:26.072Z] [debug] qwen⏱ investigate_lore ok 5916ms wait 3520ms read 1560ms/write 863ms in 125t→out 26t 12.5ms/t (117ch)
+[2026-08-21T02:14:26.160Z] [debug] qwen⏱ narration:scene_intro preempted 4843ms wait 4843ms (0ch)
+[2026-08-21T02:14:26.247Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro after 4843ms — cancelled:player-acted-again
+[2026-08-21T02:14:27.892Z] [debug] ui: tap "investigate"
+[2026-08-21T02:14:28.964Z] [player] investigate cut
+[2026-08-21T02:14:28.965Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cut resolved=cut range=- enemies=0 hooks=0
+[2026-08-21T02:14:28.967Z] [world] The cut reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.
+[2026-08-21T02:14:29.107Z] [cognitive] neutral  (138ms)
+[2026-08-21T02:14:29.991Z] [debug] ui: tap "↑ ✓ SECOND LANDING"
+[2026-08-21T02:14:30.012Z] [player] go north
+[2026-08-21T02:14:30.013Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-21T02:14:30.014Z] [world] You head on to the Second Landing.
+[2026-08-21T02:14:30.014Z] [debug] scene: loc=asgardar hub=buried_landing_two arrival=n opening=n passing=n
+[2026-08-21T02:14:30.018Z] [world] Architect's Cell — Second Landing. Pumps west, records east, the cuts south, the stair back north. A laminated sign gives every direction a status code. The south corridor's code is not in the legend, and asking after it is itself a flag.
+[2026-08-21T02:14:30.019Z] [world] You've stood here many times. (visit 11)
+[2026-08-21T02:14:30.019Z] [world] Paths: north to First Landing · south to Shallow Digs · east to Storage Halls · west to Pump Room. (Type 'leave outpost' to head into the wilds.)
+[2026-08-21T02:14:30.165Z] [cognitive] TRAVEL  (133ms)
+[2026-08-21T02:14:30.682Z] [debug] qwen⏱ investigate_lore ok 1590ms read 387ms/write 1169ms in 125t→out 35t 3.1ms/t (167ch)
+[2026-08-21T02:14:30.992Z] [debug] ui: tap "↑ ✓ FIRST LANDING"
+[2026-08-21T02:14:31.014Z] [player] go north
+[2026-08-21T02:14:31.015Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-21T02:14:31.016Z] [world] You head on to the First Landing.
+[2026-08-21T02:14:31.016Z] [debug] scene: loc=asgardar hub=buried_landing_one arrival=n opening=n passing=n
+[2026-08-21T02:14:31.020Z] [world] Architect's Cell — First Landing. A wide platform of cracked Tartarian stone with a modern handrail bolted through it and a camera that may or may not be wired to anything. The stair behind you climbs north to reception; ahead it keeps dropping south, and the floor plan on the wall stops at this level.
+[2026-08-21T02:14:31.021Z] [world] You've stood here again. (visit 4)
+[2026-08-21T02:14:31.021Z] [world] Paths: north to Reception · south to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-08-21T02:14:31.028Z] [debug] arbiter: template (reason=cooldown)
+[2026-08-21T02:14:31.028Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-21T02:14:31.113Z] [cognitive] TRAVEL  (83ms)
+[2026-08-21T02:14:32.260Z] [debug] ui: tap "↑ ✓ RECEPTION"
+[2026-08-21T02:14:32.288Z] [player] go north
+[2026-08-21T02:14:32.289Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-21T02:14:32.290Z] [world] You head on to the Reception.
+[2026-08-21T02:14:32.290Z] [debug] scene: loc=asgardar hub=outpost_gate arrival=n opening=n passing=n
+[2026-08-21T02:14:32.339Z] [world] Architect's Cell — The Reception. A clerical office with filing cabinets and a coffee maker. The man at the desk doesn't look up from his paper — your visit is not officially happening.
+[2026-08-21T02:14:32.339Z] [world] You've stood here again. (visit 4) The bodies you left are still here. Nothing has moved in to replace them.
+[2026-08-21T02:14:32.339Z] [world] Paths: north to Operations · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-08-21T02:14:32.340Z] [world] Halem the Trader is already reaching under the table before you've said anything. "Verbal. Held something back for you."
+[2026-08-21T02:14:32.340Z] [debug] arbiter: template (reason=sprinting)
+[2026-08-21T02:14:32.340Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-21T02:14:32.345Z] [debug] arbiter: template (reason=sprinting)
+[2026-08-21T02:14:32.345Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-21T02:14:32.429Z] [cognitive] TRAVEL  (83ms)
+[2026-08-21T02:14:34.376Z] [debug] ui: tap "EXIT"
+[2026-08-21T02:14:34.412Z] [player] leave outpost
+[2026-08-21T02:14:34.413Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0
+[2026-08-21T02:14:34.416Z] [world] You walk back through the gate and out into the open ground. The outpost falls away behind you.
+[2026-08-21T02:14:34.417Z] [debug] scene: loc=asgardar hub=- arrival=n opening=n passing=n
+[2026-08-21T02:14:34.495Z] [debug] spawn: gear=[Sentinel's Greaves, Club, Reclaimer's Trowel] window=10 roster=new
+[2026-08-21T02:14:34.525Z] [world] Ember noses at the hand-pressed clay and snorts. There's something there.
+[2026-08-21T02:14:34.525Z] [world] A wall of grey ash rolls across the plain. Breathing burns. Skin gathers a film of dead world.
+
+You are at Asgardar. The ancient capital of Tartaria. Its collector-tower, the Grand Spire of Asgardar, still stands out past the last streets and once channeled cosmic Aether into the city grid.
+
+Hazard: Magnetic Distortion. Compasses spin. Iron-cored gear stops working. The ground tugs at every buckle and bracket.
+[2026-08-21T02:14:34.527Z] [world] [Asgardar] north: The Architect's Blind (8 days' travel) · east: Samarran (5 days' travel) · south: Grand Spire of Asgardar (a day's travel) · west: Iskan-Veil (7 days' travel)
+[2026-08-21T02:14:34.527Z] [world] Vael of the Listening Stone, Devout Quartermaster, sits at a folding table at the edge of the ground, wares laid out neat. They beckon.
+[2026-08-21T02:14:34.527Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Vael of the Listening Stone, Devout Quartermaster. A faith-soured pilgrim in dust-grey vestments. The carved stone they wear at their throat picks up a hum when Giants' relics pass within reach. Trades reverently, sells nothing without a small prayer first, and watches your eyes for doubt."
+[2026-08-21T02:14:34.531Z] [world] Rare workings for sale: Mudstone Bulwark (200 TC), Phoenix Rebirth (500 TC), Plague Tonic (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-08-21T02:14:34.531Z] [arbiter] Vael of the Listening Stone looks at you sideways. "You still owe us 'Kindling for the Vigil'. Say 'turn in kindling for' when you're ready."
+[2026-08-21T02:14:34.537Z] [system] ⏳ Time passed: 1h
+[2026-08-21T02:14:36.066Z] [cognitive] RETREAT · DISENGAGE · HIDE  (1527ms)
+[2026-08-21T02:14:36.334Z] [debug] persist sizes(KB): total=190 player=51 wm=57[rooms=29 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=77 scene=5
+[2026-08-21T02:14:38.026Z] [debug] ui: tap "take / salvage"
+[2026-08-21T02:14:40.294Z] [world] You take the Club from where it lay.
+[2026-08-21T02:14:40.294Z] [reward] ✦ Club (Common).
+[2026-08-21T02:14:40.295Z] [world] You take the Reclaimer's Trowel from where it lay.
+[2026-08-21T02:14:40.295Z] [reward] ✦ Reclaimer's Trowel (Common).
+[2026-08-21T02:14:40.295Z] [world] You take the Sentinel's Greaves from where it lay.
+[2026-08-21T02:14:40.295Z] [reward] ✦ Sentinel's Greaves (Common).
+[2026-08-21T02:14:41.664Z] [reward] ✦ Found Verse Three — The Siren of Zharak's Teeth. (open Contracts → Collectibles to read)
+[2026-08-21T02:14:41.691Z] [reward] ✦ Found Letter to the Council — Elior Zalmar. (open Contracts → Collectibles to read)
+[2026-08-21T02:14:41.700Z] [world] Something papery rustles as you strip the broken crashed automaton chassis. You pull free a journal leaf.
+[2026-08-21T02:14:41.700Z] [world] You salvage the broken seal. The take is small but real.
+[2026-08-21T02:14:41.700Z] [world] You strip the crystal carefully. Something usable comes free in your hand.
+[2026-08-21T02:14:41.701Z] [world] You break the echo horn down. Among the pieces, a fragment of someone's writing — held against the world by stubbornness alone.
+[2026-08-21T02:14:41.701Z] [world] You salvage the exposed capacitor. The take is small but real.
+[2026-08-21T02:14:41.701Z] [world] You strip the gate carefully. Something usable comes free in your hand.
+[2026-08-21T02:14:41.701Z] [world] The lantern hook yields little of value, though a Bent Nail ends up in your pack.
+[2026-08-21T02:14:41.702Z] [world] You salvage the leaning buried market row rooftop. The take is small but real.
+[2026-08-21T02:14:41.702Z] [world] You strip the spire carefully. Something usable comes free in your hand.
+[2026-08-21T02:14:41.702Z] [reward] ✦ Salvage haul:
+[2026-08-21T02:14:41.702Z] [reward]     • Worn Tartarian Coin x9 (Common)
+[2026-08-21T02:14:41.703Z] [reward]     • Aether Crystal x2 (Common)
+[2026-08-21T02:14:41.703Z] [reward]     • Aether Dust (Common)
+[2026-08-21T02:14:41.703Z] [reward]     • Bent Nail (Common)
+[2026-08-21T02:14:41.703Z] [reward]     • Cloth Scrap x2 (Common)
+[2026-08-21T02:14:43.762Z] [debug] ui: tap "investigate"
+[2026-08-21T02:14:44.949Z] [player] investigate the ground
+[2026-08-21T02:14:44.949Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0
+[2026-08-21T02:14:44.953Z] [world] You scrape at the silt with the reclaimer's trowel. Nothing of worth.
+[2026-08-21T02:14:44.962Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-08-21T02:14:44.964Z] [arbiter] The Arbiter looks around. "The capital is patient. It outwaited an empire. It will outwait you."
+[2026-08-21T02:14:44.964Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-21T02:14:44.965Z] [system] ⏳ Time passed: 24 min
+[2026-08-21T02:14:45.190Z] [cognitive] CLIMB  (224ms)
+[2026-08-21T02:14:48.080Z] [player] Ask about their trade
+[2026-08-21T02:14:48.082Z] [world] "I keep sto9.178Z] [system] Weather effect — Aether Lightning: +1 INT
+[2026-08-21T02:20:29.180Z] [world] [Asgardar] north: The Sunken Enclave (3 days' travel) · east: Samarran (3 days' travel) · south: Varakush (9 days' travel) · west: Asgardar (2 days' travel)
+[2026-08-21T02:20:29.180Z] [combat] A Mud Demon and a Gutter Rat close on you. Tap the right-side panel to cycle targets.
+[2026-08-21T02:20:29.185Z] [reward] ✦ Resurrection. Verbal returns to Tartaria, restored. The Aetherstone hums in recognition.
+[2026-08-21T02:20:35.686Z] [debug] appstate: active → background (was active for 115591ms)
+[2026-08-21T02:20:35.832Z] [debug] ctx: RELEASED — live=0 (opened=7 released=7)
+[2026-08-21T02:20:42.704Z] [debug] appstate: background → active (was background for 7018ms)
+[2026-08-21T02:20:45.905Z] [debug] qwen: re-warm cancelled (left the foreground first)
+[2026-08-21T02:20:45.909Z] [debug] appstate: active → background (was active for 3205ms)
+[2026-08-21T02:20:45.953Z] [debug] persist sizes(KB): total=199 player=50 wm=58[rooms=28 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=86 scene=4
+[2026-08-21T02:20:49.350Z] [debug] appstate: background → active (was background for 3441ms)
+[2026-08-21T02:20:52.522Z] [debug] qwen: re-warm cancelled (left the foreground first)
+[2026-08-21T02:20:52.522Z] [debug] appstate: active → background (was active for 3172ms)
+[2026-08-21T02:20:55.819Z] [debug] appstate: background → active (was background for 3297ms)
+[2026-08-21T02:20:58.945Z] [debug] qwen: re-warm cancelled (left the foreground first)
+[2026-08-21T02:20:58.947Z] [debug] appstate: active → background (was active for 3128ms)
+[2026-08-21T02:47:12.185Z] [debug] appstate: background → active (was background for 1573235ms)
+[2026-08-21T02:47:19.439Z] [debug] qwen: re-warm cancelled (left the foreground first)
+[2026-08-21T02:47:19.440Z] [debug] appstate: active → background (was active for 7258ms)
+[2026-08-21T02:47:41.527Z] [debug] appstate: background → active (was background for 22086ms)
+[2026-08-21T02:47:49.540Z] [debug] qwen: re-warming after 8000ms settled foreground
+[2026-08-21T02:47:50.619Z] [debug] ctx: OPENED — live=1 (opened=8 released=7) ≈425MB est
+[2026-08-21T02:47:56.010Z] [debug] appstate: active → background (was active for 5273ms)
+[2026-08-21T02:47:56.092Z] [debug] persist sizes(KB): total=199 player=50 wm=58[rooms=28 events=1 memos=0 npcs=1 defeated=0 tags=1 discovered=0] log=86 scene=4
+[2026-08-21T02:47:56.165Z] [debug] ctx: RELEASED — live=0 (opened=8 released=8)
+[2026-08-21T02:48:25.188Z] [debug] appstate: background → active (was background for 29178ms)
+[2026-08-21T02:48:32.073Z] [debug] qwen: re-warm cancelled (left the foreground first)
+[2026-08-21T02:48:32.079Z] [debug] appstate: active → background (was active for 6891ms)
+[2026-08-21T12:59:26.711Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a01f9a-db47-7c7f-8aee-9e9af9a3e9f5
+[2026-08-21T12:59:26.711Z] [debug] ota: Checking…
+[2026-08-21T12:59:26.926Z] [debug] ota: Already up to date
+[2026-08-21T12:59:26.926Z] [debug] ota: boot check result = noUpdate
+[2026-08-21T12:59:27.134Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-21T12:59:27.134Z] [debug] voice: bundled idle
+[2026-08-21T12:59:31.399Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-08-21T12:59:46.548Z] [debug] appstate: active → background (was active for 15141ms)
+[2026-08-21T12:59:46.666Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-08-21T13:00:02.517Z] [debug] qwen-watchdog: holding reinit — foreground has not settled (8000ms). App-switching must not cost a ~425MB load.
+[2026-08-21T13:00:02.518Z] [debug] appstate: background → active (was background for 15969ms)
+[2026-08-21T13:00:10.526Z] [debug] qwen: re-warming after 8000ms settled foreground
+[2026-08-21T13:00:11.548Z] [debug] appstate: active → background (was active for 9030ms)
+[2026-08-21T13:00:11.884Z] [debug] ctx: OPENED — live=1 (opened=2 released=1) ≈425MB est
+[2026-08-21T13:00:11.998Z] [debug] ctx: straggler load torn down by the lifecycle guard (count=1)
+[2026-08-21T13:00:12.468Z] [debug] ctx: RELEASED — live=0 (opened=2 released=2)
+[2026-08-21T13:00:12.588Z] [debug] qwen: LOAD FAILED — Qwen failed to initialize
+[2026-08-21T13:01:27.079Z] [debug] appstate: background → active (was background for 74486ms)
+[2026-08-21T13:01:34.167Z] [debug] appstate: active → background (was active for 7089ms)
+[2026-08-21T13:19:46.927Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a01f9a-db47-7c7f-8aee-9e9af9a3e9f5
+[2026-08-21T13:19:46.927Z] [debug] ota: Checking…
+[2026-08-21T13:19:47.193Z] [debug] ota: Already up to date
+[2026-08-21T13:19:47.193Z] [debug] ota: boot check result = noUpdate
+[2026-08-21T13:19:47.215Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-21T13:19:47.215Z] [debug] voice: bundled idle
+[2026-08-21T13:19:51.080Z] [debug] OTA session start: 2026-08-20-1390-the-workflows-audit.
+[2026-08-21T13:19:51.080Z] [world] You step back into Asgardar. The world waits for your move.
+[2026-08-21T13:19:51.081Z] [world] A Forgotten Order pilgrim is said to have asked after you in your absence. They left without saying where they were headed.
+[2026-08-21T13:19:51.083Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Verbal. I wondered when you'd take up the thread again. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-08-21T13:19:51.628Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-08-21T13:19:58.234Z] [debug] appstate: active → background (was active for 6494ms)
+[2026-08-21T13:19:58.443Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-08-21T13:20:29.125Z] [debug] qwen-watchdog: holding reinit — foreground has not settled (8000ms). App-switching must not cost a ~425MB load.
+[2026-08-21T13:20:29.125Z] [debug] appstate: background → active (was background for 30891ms)
+[2026-08-21T14:17:55.966Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a01f9a-db47-7c7f-8aee-9e9af9a3e9f5
+[2026-08-21T14:17:55.966Z] [debug] ota: Checking…
+[2026-08-21T14:17:56.240Z] [debug] ota: Already up to date
+[2026-08-21T14:17:56.240Z] [debug] ota: boot check result = noUpdate
+[2026-08-21T14:17:56.266Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-21T14:17:56.267Z] [debug] voice: bundled idle
+[2026-08-21T14:18:00.618Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-08-21T14:18:05.329Z] [debug] appstate: active → background (was active for 4689ms)
+[2026-08-21T14:20:17.029Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a01f9a-db47-7c7f-8aee-9e9af9a3e9f5
+[2026-08-21T14:20:17.030Z] [debug] ota: Checking…
+[2026-08-21T14:20:17.082Z] [debug] ota: Already up to date
+[2026-08-21T14:20:17.082Z] [debug] ota: boot check result = noUpdate
+[2026-08-21T14:20:17.105Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-21T14:20:17.105Z] [debug] voice: bundled idle
+[2026-08-21T14:20:21.105Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-08-21T14:20:26.192Z] [debug] appstate: active → background (was active for 5064ms)
+[2026-08-21T14:20:26.334Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-08-21T19:00:43.547Z] [debug] qwen-watchdog: holding reinit — foreground has not settled (8000ms). App-switching must not cost a ~425MB load.
+[2026-08-21T19:00:43.551Z] [debug] appstate: background → active (was background for 16817358ms)
+[2026-08-21T19:00:46.225Z] [debug] qwen: re-warm cancelled (left the foreground first)
+[2026-08-21T19:00:46.230Z] [debug] appstate: active → background (was active for 2680ms)
+[2026-08-21T19:00:46.451Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a02555-852c-72ba-bad3-c0407fc4b405
+[2026-08-21T19:00:46.452Z] [debug] ota: Checking…
+[2026-08-21T19:00:46.542Z] [debug] ota: Already up to date
+[2026-08-21T19:00:46.543Z] [debug] ota: boot check result = noUpdate
+[2026-08-21T19:00:46.572Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-21T19:00:46.573Z] [debug] voice: bundled idle
+[2026-08-21T19:00:51.028Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-08-21T19:00:51.157Z] [debug] appstate: active → background (was active for 116ms)
+[2026-08-21T19:00:51.273Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-08-21T19:01:02.603Z] [debug] qwen-watchdog: holding reinit — foreground has not settled (8000ms). App-switching must not cost a ~425MB load.
+[2026-08-21T19:01:02.603Z] [debug] appstate: background → active (was background for 11446ms)
+[2026-08-21T19:01:04.638Z] [debug] OTA applied: 2026-08-20-1390-the-workflows-audit → 2026-08-21-1421-claude-pushes-the-builds.
+[2026-08-21T19:01:04.638Z] [debug] OTA session start: 2026-08-21-1421-claude-pushes-the-builds.
+[2026-08-21T19:01:04.638Z] [world] You step back into Asgardar. The world waits for your move.
+[2026-08-21T19:01:04.640Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Verbal. We've still got ground to cover, you and I. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-08-21T19:01:10.627Z] [debug] qwen: re-warming after 8000ms settled foreground
+[2026-08-21T19:01:11.139Z] [debug] ctx: OPENED — live=1 (opened=2 released=1) ≈425MB est
+[2026-08-21T19:01:22.311Z] [debug] ui: tap "✦ bandolier (1)"
+[2026-08-21T19:01:23.734Z] [reward] You hurl the Acid Flask. It bursts across Mud Demon — 6 acid (2/turn × 3). (111 HP left)
+[2026-08-21T19:01:23.736Z] [combat] Mud Demon stops — and the air in front of it thickens, faintly bright. An AETHER SHIELD stands where its swing should have been (+3 AC).
+[2026-08-21T19:01:23.745Z] [combat] Gutter Rat — d20 → 4 + ATK 3 = 7 vs your AC 25 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-21T19:01:28.805Z] [debug] ui: tap "✦ bandolier (1)"
+[2026-08-21T19:01:31.124Z] [reward] You hurl the Acid Flask. It bursts across Mud Demon — 12 acid (4/turn × 3). (99 HP left)
+[2026-08-21T19:01:31.128Z] [combat] Gutter Rat — d20 → 15 + ATK 3 = 18 vs your AC 25 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-21T19:01:31.133Z] [combat] Mud Demon — d20 → 15 + ATK 11 = 26 vs your AC 25 — ✓ HIT
+[2026-08-21T19:01:31.300Z] [combat] Mud Demon deals 7 slashing damage [armor −65%]. You have 27 HP remaining.
+[2026-08-21T19:01:31.301Z] [combat] That's your slashing resist working — the armor drank most of that hit (7 of 20 got through).
+[2026-08-21T19:01:31.301Z] [combat] Mud Demon regenerates 2 HP (101/117).
+[2026-08-21T19:01:36.832Z] [debug] ui: tap "dodge"
+[2026-08-21T19:01:36.847Z] [player] dodge
+[2026-08-21T19:01:36.848Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=2 hooks=0
+[2026-08-21T19:01:36.849Z] [world] You commit to the dodge. Slip Mud Demon's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-21T19:01:36.887Z] [combat] Gutter Rat — d20 → 9 + ATK 3 = 12 vs your AC 25 (needs nat 16+ — AC capped) — ✗ EVADED
+[2026-08-21T19:01:36.888Z] [combat] Dodge — d20 → 13 + DEX 16 = 29 vs ATK 12. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-08-21T19:01:36.888Z] [world] You slip Gutter Rat's arc clean and stay light on your feet — the rest of the pack still swings, but you're a harder mark for the moment.
+[2026-08-21T19:01:36.890Z] [debug] ac-shift 25→28: race/base 12 + gear 17 + title 0 → trimmed 25 + status 3 | worn: head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle
+[2026-08-21T19:01:36.890Z] [combat] Mud Demon — d20 → 19 + ATK 9 = 28 vs your AC 28 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-08-21T19:01:36.892Z] [system] ⏳ Time passed: 6 min
+[2026-08-21T19:01:37.032Z] [combat] Mud Demon deals 6 slashing damage [armor −65%, plate −1]. You have 21 HP remaining.
+[2026-08-21T19:01:37.032Z] [combat] Mud Demon's strike leaves you bleeding.
+[2026-08-21T19:01:37.032Z] [combat] Mud Demon regenerates 2 HP (103/117).
+[2026-08-21T19:01:37.153Z] [cognitive] neutral  (261ms)
+[2026-08-21T19:01:38.286Z] [debug] ui: tap "smoldering repeater crossbow"
+[2026-08-21T19:01:38.290Z] [system] unseen — next strike +5 fades.
+[2026-08-21T19:01:38.290Z] [system] evasive — harder to hit fades.
+[2026-08-21T19:01:38.294Z] [world] A silent bolt strikes near enough to singe your sleeve. (−2 HP)
+[2026-08-21T19:01:38.339Z] [player] attack with the mud repeater crossbow
+[2026-08-21T19:01:38.339Z] [debug] parser: intent=attack conf=1.00 verb=attack target=mud repeater crossbow resolved=Mud Demon range=mid enemies=2 hooks=0
+[2026-08-21T19:01:38.340Z] [debug] attack: target=Mud Demon range=mid reach.bands=[distant,far,mid,close] reach.label=Mud Repeater Crossbow bareHand=false
+[2026-08-21T19:01:38.345Z] [debug] attack: status mods stealthed +5 · perfect opening (2× dice)
+[2026-08-21T19:01:38.372Z] [world] You bring the smoldering mud repeater crossbow to bear on Mud Demon.
+[2026-08-21T19:01:38.372Z] [system] ⏳ Time passed: 6 min
+[2026-08-21T19:01:38.491Z] [cognitive] ATTACK · AIM · SWIM · TAKE_COVER · THROW  (117ms)
+[2026-08-21T19:01:44.953Z] [world] You seize the initiative. Mud Demon has no time to react.
+[2026-08-21T19:01:44.953Z] [combat] You — d20 → 12 + WIS 6 stealthed +5 perfect opening (2× dice) = 23 vs Mud Demon AC 16 — ✓ HIT
+[2026-08-21T19:01:44.954Z] [combat] Mud Demon shrugs off the piercing. (resisted, ×0.5 for 17)
+[2026-08-21T19:01:44.955Z] [arbiter] The Arbiter watches the piercing skid off. "Swap to the Vaelka's Halberd — bludgeoning will bite where piercing won't."
+[2026-08-21T19:01:44.982Z] [reward] ✦ The work hones you. +1 STR (base 5, 7 as you stand).
+[2026-08-21T19:01:44.982Z] [combat] Your strike with the smoldering mud repeater crossbow lands for 17. Mud Demon staggers — 86 HP remaining. It answers.
+[2026-08-21T19:01:44.983Z] [combat] Smoldering Mud Repeater Crossbow — 9 burn bites in and festers (3 turns).
+[2026-08-21T19:01:44.984Z] [debug] ac-shift 28→25: race/base 12 + gear 17 + title 0 → trimmed 25 + status 0 | worn: head=Sentinel's Faceguard chest=Threadbare Plate hands=Golem Leather Gloves legs=Frayed Faulds feet=Relic Hunter's Boots cloak=Architect's Outer Mantle
+[2026-08-21T19:01:44.984Z] [combat] Mud Demon — d20 → 14 + ATK 9 = 23 vs your AC 25 — ✗ MISS
+[2026-08-21T19:01:44.985Z] [combat] Gutter Rat — d20 → 16 + ATK 3 = 19 vs your AC 25 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-08-21T19:01:45.138Z] [combat] Mud Demon regenerates 2 HP (88/117).
+[2026-08-21T19:01:45.138Z] [combat] Gutter Rat deals 3 piercing damage [plate −3]. You have 16 HP remaining.
+[2026-08-21T19:01:48.486Z] [debug] ui: tap "inventory"
+[2026-08-21T19:01:54.856Z] [world] You use 3× Trail Rations. +18 HP (34/34), +1 stamina.
+[2026-08-21T19:01:57.156Z] [debug] g walks in slow." He turns the cup in his hands. "And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made." He meets your eye. "I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in."
+[2026-08-22T01:09:12.328Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep — ask again when your hands are free.
+[2026-08-22T01:09:12.330Z] [world] Bran the Beastmaster keeps their voice low enough that it does not carry past the doorway.
+[2026-08-22T01:09:13.156Z] [player] Ask where he stopped setting traps
+[2026-08-22T01:09:13.157Z] [world] "There is a valley north of my stead I pulled every trap out of, three seasons back." Bran refills your cup before he goes on, which is how he buys thinking time. "Something dens there now that keeps ORDER. No kills inside the valley — anywhere. The boars water beside the hounds, and everything walks in slow." He turns the cup in his hands. "And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made." He meets your eye. "I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in."
+[2026-08-22T01:09:13.158Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep — ask again when your hands are free.
+[2026-08-22T01:09:13.160Z] [world] Bran the Beastmaster drops their voice, though there is nobody in here but the two of you.
+[2026-08-22T01:09:13.856Z] [player] Ask where he stopped setting traps
+[2026-08-22T01:09:13.858Z] [world] "There is a valley north of my stead I pulled every trap out of, three seasons back." Bran refills your cup before he goes on, which is how he buys thinking time. "Something dens there now that keeps ORDER. No kills inside the valley — anywhere. The boars water beside the hounds, and everything walks in slow." He turns the cup in his hands. "And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made." He meets your eye. "I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in."
+[2026-08-22T01:09:13.859Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep — ask again when your hands are free.
+[2026-08-22T01:09:14.472Z] [player] Ask where he stopped setting traps
+[2026-08-22T01:09:14.474Z] [world] "There is a valley north of my stead I pulled every trap out of, three seasons back." Bran refills your cup before he goes on, which is how he buys thinking time. "Something dens there now that keeps ORDER. No kills inside the valley — anywhere. The boars water beside the hounds, and everything walks in slow." He turns the cup in his hands. "And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made." He meets your eye. "I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in."
+[2026-08-22T01:09:14.475Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep — ask again when your hands are free.
+[2026-08-22T01:09:15.039Z] [player] Ask where he stopped setting traps
+[2026-08-22T01:09:15.040Z] [world] "There is a valley north of my stead I pulled every trap out of, three seasons back." Bran refills your cup before he goes on, which is how he buys thinking time. "Something dens there now that keeps ORDER. No kills inside the valley — anywhere. The boars water beside the hounds, and everything walks in slow." He turns the cup in his hands. "And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made." He meets your eye. "I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in."
+[2026-08-22T01:09:15.041Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep — ask again when your hands are free.
+[2026-08-22T01:09:15.206Z] [debug] persist sizes(KB): total=204 player=47 wm=67[rooms=25 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=86 scene=3
+[2026-08-22T01:09:15.423Z] [player] Ask where he stopped setting traps
+[2026-08-22T01:09:15.426Z] [world] "There is a valley north of my stead I pulled every trap out of, three seasons back." Bran refills your cup before he goes on, which is how he buys thinking time. "Something dens there now that keeps ORDER. No kills inside the valley — anywhere. The boars water beside the hounds, and everything walks in slow." He turns the cup in his hands. "And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made." He meets your eye. "I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in."
+[2026-08-22T01:09:15.427Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep — ask again when your hands are free.
+[2026-08-22T01:09:15.622Z] [player] Ask where he stopped setting traps
+[2026-08-22T01:09:15.623Z] [world] "There is a valley north of my stead I pulled every trap out of, three seasons back." Bran refills your cup before he goes on, which is how he buys thinking time. "Something dens there now that keeps ORDER. No kills inside the valley — anywhere. The boars water beside the hounds, and everything walks in slow." He turns the cup in his hands. "And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made." He meets your eye. "I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in."
+[2026-08-22T01:09:15.624Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep — ask again when your hands are free.
+[2026-08-22T01:09:15.838Z] [player] Ask where he stopped setting traps
+[2026-08-22T01:09:15.839Z] [world] "There is a valley north of my stead I pulled every trap out of, three seasons back." Bran refills your cup before he goes on, which is how he buys thinking time. "Something dens there now that keeps ORDER. No kills inside the valley — anywhere. The boars water beside the hounds, and everything walks in slow." He turns the cup in his hands. "And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made." He meets your eye. "I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in."
+[2026-08-22T01:09:15.839Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep — ask again when your hands are free.
+[2026-08-22T01:09:16.022Z] [player] Ask where he stopped setting traps
+[2026-08-22T01:09:16.023Z] [world] "There is a valley north of my stead I pulled every trap out of, three seasons back." Bran refills your cup before he goes on, which is how he buys thinking time. "Something dens there now that keeps ORDER. No kills inside the valley — anywhere. The boars water beside the hounds, and everything walks in slow." He turns the cup in his hands. "And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made." He meets your eye. "I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in."
+[2026-08-22T01:09:16.023Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep — ask again when your hands are free.
+[2026-08-22T01:09:16.224Z] [player] Ask where he stopped setting traps
+[2026-08-22T01:09:16.225Z] [world] "There is a valley north of my stead I pulled every trap out of, three seasons back." Bran refills your cup before he goes on, which is how he buys thinking time. "Something dens there now that keeps ORDER. No kills inside the valley — anywhere. The boars water beside the hounds, and everything walks in slow." He turns the cup in his hands. "And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made." He meets your eye. "I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in."
+[2026-08-22T01:09:16.226Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep — ask again when your hands are free.
+[2026-08-22T01:09:16.408Z] [player] Ask where he stopped setting traps
+[2026-08-22T01:09:16.408Z] [world] "There is a valley north of my stead I pulled every trap out of, three seasons back." Bran refills your cup before he goes on, which is how he buys thinking time. "Something dens there now that keeps ORDER. No kills inside the valley — anywhere. The boars water beside the hounds, and everything walks in slow." He turns the cup in his hands. "And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made." He meets your eye. "I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in."
+[2026-08-22T01:09:16.409Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep — ask again when your hands are free.
+[2026-08-22T01:09:16.607Z] [player] Ask where he stopped setting traps
+[2026-08-22T01:09:16.608Z] [world] "There is a valley north of my stead I pulled every trap out of, three seasons back." Bran refills your cup before he goes on, which is how he buys thinking time. "Something dens there now that keeps ORDER. No kills inside the valley — anywhere. The boars water beside the hounds, and everything walks in slow." He turns the cup in his hands. "And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made." He meets your eye. "I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in."
+[2026-08-22T01:09:16.608Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep — ask again when your hands are free.
+[2026-08-22T01:09:16.788Z] [player] Ask where he stopped setting traps
+[2026-08-22T01:09:16.789Z] [world] "There is a valley north of my stead I pulled every trap out of, three seasons back." Bran refills your cup before he goes on, which is how he buys thinking time. "Something dens there now that keeps ORDER. No kills inside the valley — anywhere. The boars water beside the hounds, and everything walks in slow." He turns the cup in his hands. "And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made." He meets your eye. "I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in."
+[2026-08-22T01:09:16.789Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep — ask again when your hands are free.
+[2026-08-22T01:09:16.971Z] [player] Ask where he stopped setting traps
+[2026-08-22T01:09:16.973Z] [world] "There is a valley north of my stead I pulled every trap out of, three seasons back." Bran refills your cup before he goes on, which is how he buys thinking time. "Something dens there now that keeps ORDER. No kills inside the valley — anywhere. The boars water beside the hounds, and everything walks in slow." He turns the cup in his hands. "And under the old warren mouth, at dusk, something glints. Metal. Worked metal, down a den no digger made." He meets your eye. "I will not disturb the peace of that valley on curiosity. But you go places I do not. Walk in slow, mind, or do not walk in."
+[2026-08-22T01:09:16.973Z] [world] You are already chasing something. Bran the Beastmaster's tip will keep — ask again when your hands are free.
+[2026-08-22T01:09:17.456Z] [world] You let the conversation go and Bran the Beastmaster gets back to it.
+[2026-08-22T01:09:20.864Z] [debug] appstate: active → background (was active for 321572ms)
+[2026-08-22T01:09:21.054Z] [debug] persist sizes(KB): total=215 player=47 wm=73[rooms=25 events=1 memos=0 npcs=2 defeated=0 tags=1 discovered=0] log=92 scene=3
+[2026-08-22T01:09:21.229Z] [debug] ctx: RELEASED — live=0 (opened=2 released=2)
+[2026-08-22T02:28:36.656Z] [debug] appstate: background → active (was background for 4755788ms)
+[2026-08-22T02:28:44.665Z] [debug] qwen: re-warming after 8000ms settled foreground
+[2026-08-22T02:28:45.380Z] [debug] appstate: active → background (was active for 8725ms)
+[2026-08-22T02:32:42.674Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a026f3-8ffd-7e30-b0c9-0c1a9c90dbd9
+[2026-08-22T02:32:42.675Z] [debug] ota: Checking…
+[2026-08-22T02:32:46.874Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-22T02:32:47.003Z] [debug] ota: Saving progress…
+[2026-08-22T02:32:47.004Z] [debug] ota: Restarting to apply…
+[2026-08-22T02:32:47.237Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0274e-5cde-78b7-96e8-4af09790df27
+[2026-08-22T02:32:47.237Z] [debug] ota: Checking…
+[2026-08-22T02:32:47.389Z] [debug] ota: Already up to date
+[2026-08-22T02:32:47.390Z] [debug] ota: boot check result = noUpdate
+[2026-08-22T02:32:47.424Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-22T02:32:47.424Z] [debug] voice: bundled idle
+[2026-08-22T02:32:51.852Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-08-22T02:33:51.877Z] [debug] OTA session start: 2026-08-22-1431-the-emblem-when-you-pick.
+[2026-08-22T02:33:51.877Z] [world] You step back into Samarran. The world waits for your move.
+[2026-08-22T02:33:51.877Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Verbal. The buried country is no place to walk alone."
+[2026-08-22T02:34:16.940Z] [debug] appstate: active → background (was active for 26186ms)
+[2026-08-22T02:34:17.089Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-08-22T02:40:19.937Z] [debug] qwen-watchdog: holding reinit — foreground has not settled (8000ms). App-switching must not cost a ~425MB load.
+[2026-08-22T02:40:19.941Z] [debug] appstate: background → active (was background for 363000ms)
+[2026-08-22T02:40:27.955Z] [debug] qwen: re-warming after 8000ms settled foreground
+[2026-08-22T02:40:28.492Z] [debug] ctx: OPENED — live=1 (opened=2 released=1) ≈425MB est
+[2026-08-22T02:40:33.586Z] [debug] appstate: active → background (was active for 5092ms)
+[2026-08-22T02:40:33.699Z] [debug] ctx: RELEASED — live=0 (opened=2 released=2)
+[2026-08-22T03:10:17.511Z] [debug] appstate: background → active (was background for 1783921ms)
+[2026-08-22T03:10:22.653Z] [debug] qwen: re-warm cancelled (left the foreground first)
+[2026-08-22T03:10:22.655Z] [debug] appstate: active → background (was active for 5148ms)
+[2026-08-22T03:20:12.911Z] [debug] appstate: background → active (was background for 590251ms)
+[2026-08

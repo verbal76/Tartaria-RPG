@@ -1,0 +1,152 @@
+{
+  "id": "079f8762344949fca1f9538abb68c0dd",
+  "groupID": "7694727904",
+  "eventID": "079f8762344949fca1f9538abb68c0dd",
+  "projectID": "4511945117532160",
+  "size": 17737,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqnivyk0q [inline 8/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqnivyk0q [inline 8/27]",
+  "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqnivyk0q [inline 8/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c1370b4fb9a64abc8cc4868650cf6ad1",
+      "span_id": "97f603e021177db6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunk": " 8 hours. +9 HP, +8 stamina recovered. (Day 22, afternoon)\n[2026-08-26T02:12:47.868Z] [arbiter] The Arbiter goes still. \"It watched you sleep from the treeline and made up its mind about you.\"\n[2026-08-26T02:12:47.868Z] [world] An Aetherbat rises out of the silt where you took it for a ridge. The rest is over.\n[2026-08-26T02:12:47.869Z] [debug] enemy: Aetherbat hp=19 ac=9 atk=Sonic Scream dmg=1D6 rarity=Common ap=4\n[2026-08-26T02:12:47.880Z] [debug] arbiter: template (reason=busy)\n[2026-08-26T02:12:47.880Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:12:47.881Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T02:12:48.072Z] [cognitive] REST  (191ms)\n[2026-08-26T02:12:55.373Z] [debug] ui: tap \"dodge\"\n[2026-08-26T02:12:55.378Z] [player] dodge\n[2026-08-26T02:12:55.378Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=far enemies=1 hooks=1\n[2026-08-26T02:12:55.378Z] [world] You commit to the dodge. Slip Aetherbat's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-26T02:12:55.378Z] [combat] Aetherbat smokes \u2014 acid eats 3. (16/19 HP, 2 turns left)\n[2026-08-26T02:12:55.379Z] [combat] Aetherbat closes the distance.\n[2026-08-26T02:12:55.379Z] [debug] arbiter: template (reason=combat)\n[2026-08-26T02:12:55.379Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:12:55.379Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:12:55.569Z] [cognitive] neutral  (189ms)\n[2026-08-26T02:12:58.379Z] [debug] qwen\u23f1 ambient_fill preempted 10136ms read 4000ms/write 1162ms in 367t\u2192out 31t 10.9ms/t HIT-CAP (141ch)\n[2026-08-26T02:12:58.553Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 3568ms \u00b7 frames 0ms). Something blocked the JS thread \u2014 look for a long synchronous run.\n[2026-08-26T02:12:58.916Z] [debug] arbiter: ambient-fill banked (2/3) 11050ms\n[2026-08-26T02:13:00.831Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T02:13:00.836Z] [system] dodging (parry) fades.\n[2026-08-26T02:13:00.880Z] [player] attack with the off-hand bone crossbow\n[2026-08-26T02:13:00.881Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n[2026-08-26T02:13:00.881Z] [combat] Aetherbat smokes \u2014 acid eats 3. (13/19 HP, 1 turn left)\n[2026-08-26T02:13:00.882Z] [debug] attack: target=Aetherbat range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-26T02:13:00.883Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T02:13:00.933Z] [world] You commit forward with the acid-etched bone crossbow. Aetherbat watches your hands.\n[2026-08-26T02:13:00.933Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:13:01.110Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (176ms)\n[2026-08-26T02:13:01.493Z] [debug] persist sizes(KB): total=212 player=54 wm=74[rooms=29 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=4\n[2026-08-26T02:13:03.567Z] [debug] freeze watch: recovered \u2014 painting again after 1300ms quiet.\n[2026-08-26T02:13:07.517Z] [world] You seize the initiative. Aetherbat has no time to react.\n[2026-08-26T02:13:07.518Z] [combat] You \u2014 d20 \u2192 16 + DEX 12 \u2212 1 (Whisper Fog) = 27 vs Aetherbat AC 9 \u2014 \u2713 HIT\n[2026-08-26T02:13:07.519Z] [combat] The Acid-Etched coating fails to take on Aetherbat.\n[2026-08-26T02:13:07.520Z] [combat] Clean hit with the acid-etched bone crossbow for 6. Aetherbat has 7 left and does not back away.\n[2026-08-26T02:13:07.520Z] [combat] Aetherbat stops \u2014 and the air in front of it thickens, faintly bright. An AETHER SHIELD stands where its swing should have been (+3 AC).\n[2026-08-26T02:13:08.132Z] [debug] ui: tap \"approach\"\n[2026-08-26T02:13:08.165Z] [player] approach Aetherbat\n[2026-08-26T02:13:08.166Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetherbat resolved=Aetherbat range=mid enemies=1 hooks=1\n[2026-08-26T02:13:08.168Z] [debug] move: advance from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0\n[2026-08-26T02:13:08.169Z] [debug] move: field advance target=Aetherbat d 1.50->0.50 band mid->close\n[2026-08-26T02:13:08.169Z] [world] You close the gap with Aetherbat. (range: close / arm's reach)\n[2026-08-26T02:13:08.169Z] [combat] Aetherbat smokes \u2014 acid eats 3. (4/19 HP, 0 turns left)\n[2026-08-26T02:13:08.169Z] [combat] Aetherbat shakes off the last of the acid \u2014 the Bone Crossbow has run its course.\n[2026-08-26T02:13:08.170Z] [combat] Aetherbat \u2014 d20 \u2192 20 + ATK 5 = 25 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-08-26T02:13:08.379Z] [combat] Aetherbat deals 2 aetheric damage [armor \u221253%, plate \u22123, floor 30%]. You have 26 HP remaining.\n[2026-08-26T02:13:08.558Z] [cognitive] RETREAT \u00b7 USE_ITEM  (385ms)\n[2026-08-26T02:13:10.335Z] [debug] ui: tap \"dodge\"\n[2026-08-26T02:13:10.348Z] [player] dodge\n[2026-08-26T02:13:10.348Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-26T02:13:10.350Z] [world] You commit to the dodge. Slip Aetherbat's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-26T02:13:10.410Z] [combat] Aetherbat \u2014 d20 \u2192 7 + ATK 5 = 12 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-08-26T02:13:10.410Z] [combat] Dodge \u2014 d20 \u2192 6 + DEX 12 = 18 vs ATK 12. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-26T02:13:10.411Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:13:10.599Z] [cognitive] neutral  (187ms)\n[2026-08-26T02:13:12.517Z] [debug] ui: tap \"kick\"\n[2026-08-26T02:13:12.522Z] [player] kick\n[2026-08-26T02:13:12.523Z] [debug] parser: intent=attack conf=1.00 verb=kick target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-26T02:13:12.524Z] [debug] attack: target=Aetherbat range=close reach.bands=[close] reach.label=Bare hands bareHand=true\n[2026-08-26T02:13:12.525Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T02:13:12.526Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-26T02:13:12.589Z] [world] You drive toward Aetherbat, set to strike.\n[2026-08-26T02:13:12.590Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T02:13:12.773Z] [cognitive] AGGRESSION \u00b7 DISENGAGE  (182ms)\n[2026-08-26T02:13:17.558Z] [world] You seize the initiative. Aetherbat has no time to react.\n[2026-08-26T02:13:17.559Z] [combat] You \u2014 d20 \u2192 20 + STR 20 \u2212 1 (Whisper Fog) perfect opening (2\u00d7 dice) = 39 vs Aetherbat AC 13 \u2014 \u2713 CRITICAL HIT\n[2026-08-26T02:13:17.560Z] [combat] Weakness exposed \u2014 Aetherbat flinches. (bludgeoning \u00d71.5 for 30)\n[2026-08-26T02:13:17.562Z] [combat] Your blow lands clean \u2014 30 damage. Aetherbat crumples in the dust. The Aetherstone settles.\n[2026-08-26T02:13:17.566Z] [reward] Aetherbat defeated. You recover Crystalline Echo, Aether Wing.\n[2026-08-26T02:13:17.569Z] [reward] +11 TC pried from the dust.\n[2026-08-26T02:13:17.625Z] [arbiter] The Arbiter eyes your new pieces. \"You could make a Phoenix Rebirth now, if you wanted.\"\n[2026-08-26T02:13:17.631Z] [arbiter] The Arbiter looks around. \"The cracked statues here still bleed Aether when the storms come close.\"\n[2026-08-26T02:13:20.904Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T02:13:20.924Z] [debug] spawn: gear=[Aetheric Strider Boots] window=10 roster=new\n[2026-08-26T02:13:20.925Z] [world] You walk west. The silence has the weight of old metal. Your breath is the only thing that disagrees.\n[2026-08-26T02:13:20.927Z] [world] You catch yourself checking, the way you check a pocket you already know is empty.\n[2026-08-26T02:13:22.237Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T02:13:23.976Z] [world] The Aetheric Strider Boots leaves a shape behind it in the mud, filling slowly.\n[2026-08-26T02:13:23.977Z] [reward] \u2726 Aetheric Strider Boots (Common).\n[2026-08-26T02:13:25.120Z] [world] You strip the cracked chest down. Mostly debris \u2014 but a Cloth Scrap comes loose at the bottom of the pile.\n[2026-08-26T02:13:25.120Z] [world] You scavenge the dust bottle thoroughly. One Bone Sliver survives the sorting.\n[2026-08-26T02:13:25.121Z] [world] You strip the fungal patch carefully. Something usable comes free in your hand.\n[2026-08-26T02:13:25.121Z] [world] You strip the fungus carefully. Something usable comes free in your hand.\n[2026-08-26T02:13:25.121Z] [world] You strip the pavement carefully. Something usable comes free in your hand.\n[2026-08-26T02:13:25.122Z] [reward] \u2726 Salvage haul:\n[2026-08-26T02:13:25.128Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-08-26T02:13:25.129Z] [reward]     \u2022 Bone Sliver x2 (Common)\n[2026-08-26T02:13:25.131Z] [reward]     \u2022 Stick (Common)\n[2026-08-26T02:13:25.132Z] [reward]     \u2022 Mud Fragment x3 (Common)\n[2026-08-26T02:13:26.805Z] [debug] ui: tap \"investigate\"\n[2026-08-26T02:13:28.476Z] [player] investigate the ground\n[2026-08-26T02:13:28.476Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-26T02:13:28.482Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Firewood (Common).\n[2026-08-26T02:13:28.488Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T02:13:28.489Z] [arbiter] The Arbiter looks around. \"Doors in Nimari open inward, even the ones built to open out. The mud rewrote them.\"\n[2026-08-26T02:13:28.489Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T02:13:28.650Z] [cognitive] CLIMB  (161ms)\n[2026-08-26T02:13:28.832Z] [debug] persist sizes(KB): total=212 player=55 wm=74[rooms=29 events=4 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=4\n[2026-08-26T02:13:30.773Z] [debug] ui: tap \"rest\"\n[2026-08-26T02:13:30.784Z] [player] rest\n[2026-08-26T02:13:30.785Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T02:13:30.786Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 22, evening)\n[2026-08-26T02:13:30.786Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-26T02:13:30.788Z] [arbiter] The Arbiter goes still. \"Whatever found you had all night to leave. It stayed.\"\n[2026-08-26T02:13:30.789Z] [world] A Golem Knight rises out of the silt where you took it for a ridge. The rest is over.\n[2026-08-26T02:13:30.789Z] [debug] enemy: Golem Knight hp=184 ac=14 atk=Sword Strike dmg=3D6 rarity=Rare ap=9\n[2026-08-26T02:13:30.799Z] [debug] arbiter: template (reason=combat)\n[2026-08-26T02:13:30.800Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T02:13:30.800Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T02:13:31.005Z] [cognitive] REST  (204ms)\n[2026-08-26T02:13:35.692Z] [debug] ui: tap \"flee\"\n[2026-08-26T02:13:35.702Z] [player] flee\n[2026-08-26T02:13:35.703Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=far enemies=1 hooks=1\n[2026-08-26T02:13:35.771Z] [system] \u23f3 Time passed: 15 min\n[2026-08-26T02:13:35.953Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (181ms)\n[2026-08-26T02:13:37.702Z] [debug] skillcheck: escape d20=17 DEX 12 = 29 vs Pursuit 21 \u2014 Golem Knight (d20 15 + SPD 6) \u2192 PASS\n[2026-08-26T02:13:37.796Z] [debug] stats: STR20 DEX12 INT10 WIS12 CHA12 STE3 | gear: STR+7,DEX+6,STE+2,WIS+1,CHA+1 | worn: main=Cantor's Tuning Fork off=Bone Crossbow head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring\n[2026-08-26T02:13:37.797Z] [debug] train: dexterity (escape check) \u2192 progress 66/100\n[2026-08-26T02:13:37.797Z] [world] You get your legs under you and go, and it does not follow far.\n[2026-08-26T02:13:48.948Z] [debug] send-log: FAILED - envelope did not go out \u2014 bundle #mt9gmr2ylu58 kept on disk, boots retry up to 5 sends total\n[2026-08-26T02:13:59.752Z] [debug] appstate: active \u2192 background (was active for 555110ms)\n[2026-08-26T22:02:32.127Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a03bd2-6b05-7aee-8965-68ec113a9357\n[2026-08-26T22:02:32.128Z] [debug] ota: Checking\u2026\n[2026-08-26T22:02:32.453Z] [debug] send-log: bundle #mt9gmr2ylu58 attempt 2/5 did not go out \u2014 kept for next boot\n[2026-08-26T22:02:33.152Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-26T22:02:33.268Z] [debug] ota: Saving progress\u2026\n[2026-08-26T22:02:33.270Z] [debug] ota: Restarting to apply\u2026\n[2026-08-26T22:02:33.350Z] [debug] ota: boot check result = applied\n[2026-08-26T22:02:33.727Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a03c39-c981-7889-8f55-b72d20b3d4c4\n[2026-08-26T22:02:33.727Z] [debug] ota: Checking\u2026\n[2026-08-26T22:02:33.752Z] [debug] send-log: bundle #mt9gmr2ylu58 attempt 3/5 did not go out \u2014 kept for next boot\n[2026-08-26T22:02:33.916Z] [debug] ota: Already up to date\n[2026-08-26T22:02:33.916Z] [debug] ota: boot check result = noUpdate\n[2026-08-26T22:02:33.943Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-26T22:02:33.943Z] [debug] voice: bundled idle\n[2026-08-26T22:02:38.457Z] [debug] OTA applied: 2026-08-26-1507-the-band-follows-the-sights \u2192 2026-08-26-1511-the-spear-leaves-your-hand.\n[2026-08-26T22:02:38.457Z] [debug] OTA session start: 2026-08-26-1511-the-spear-leaves-your-hand.\n[2026-08-26T22:02:38.457Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-26T22:02:38.458Z] [world] Whispers carried while you slept off the world. Something that was rumour the last time you walked here is closer to fact now.\n[2026-08-26T22:02:38.465Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Great Scott. The road kept your place. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n[2026-08-26T22:02:39.302Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-26T22:02:39.300Z \u00b7 build 2026-08-26-1511-the-spear-leaves-your-hand \u00b7 updated from 2026-08-26-1507-the-band-follows-the-sights \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-26T22:02:42.110Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T22:02:42.172Z] [debug] spawn: gear=[Titan's Gauntlets] window=10 roster=new\n[2026-08-26T22:02:42.174Z] [world] You walk north. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-26T22:02:42.174Z] [world] The thread you were following waits where you left it.\n[2026-08-26T22:02:43.360Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T22:02:50.518Z] [world] You take the Titan's Gauntlets from where it lay.\n[2026-08-26T22:02:50.519Z] [reward] \u2726 Titan's Gauntlets (Common).\n[2026-08-26T22:02:51.842Z] [world] You strip the bone charm carefully. Something usable comes free in your hand.\n[2026-08-26T22:02:51.842Z] [world] You scavenge the dust bottle thoroughly. One Stick survives the sorting.\n[2026-08-26T22:02:51.842Z] [world] You salvage the insignia. The take is small but real.\n[2026-08-26T22:02:51.843Z",
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqnivyk0q [inline 8/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtawqnivyk0q"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "8"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T02:32:30.652191Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T02:32:30.886000Z",
+  "fingerprints": [
+    "7328552db1dbe598f0761b9af01eca7c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "08cee6ecece647f6b5f9c642e43ee905",
+  "previousEventID": null
+}

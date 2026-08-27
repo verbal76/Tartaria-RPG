@@ -1,0 +1,152 @@
+{
+  "id": "af9757572bfa46b7903a868c34c2df9d",
+  "groupID": "7694728258",
+  "eventID": "af9757572bfa46b7903a868c34c2df9d",
+  "projectID": "4511945117532160",
+  "size": 17734,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawr2axtwkc [inline 7/22]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawr2axtwkc [inline 7/22]",
+  "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawr2axtwkc [inline 7/22]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "562559eb191148aeaef8ef413bd2e6d8",
+      "span_id": "89d6042795003ecd",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunk": " step towards the knowledge you seek. The Monarch's Wa\"\n[2026-08-19T19:27:55.428Z] [cognitive] neutral  (1955ms)\n[2026-08-19T19:27:56.470Z] [debug] ui: tap \"take / salvage\"\n[2026-08-19T19:27:58.172Z] [debug] qwen\u23f1 investigate_lore ok 4617ms wait 1873ms read 1349ms/write 1375ms in 128t\u2192out 41t 10.5ms/t (209ch)\n[2026-08-19T19:27:58.695Z] [world] You work the broken royal vault pedestal over. A part of it comes loose, intact.\n[2026-08-19T19:27:58.696Z] [reward] \u2726 Salvage haul:\n[2026-08-19T19:27:58.696Z] [reward]     \u2022 Aether Dust (Common)\n[2026-08-19T19:27:59.490Z] [debug] ui: tap \"investigate\"\n[2026-08-19T19:28:00.423Z] [player] investigate the floor\n[2026-08-19T19:28:00.424Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0\n[2026-08-19T19:28:00.425Z] [world] You give the floor a once-over. Clean enough to fail you.\n[2026-08-19T19:28:00.430Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-19T19:28:00.431Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T19:28:00.506Z] [cognitive] neutral  (74ms)\n[2026-08-19T19:28:01.305Z] [debug] ui: tap \"\u2713 BANQUET\"\n[2026-08-19T19:28:01.329Z] [player] go north\n[2026-08-19T19:28:01.330Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0\n[2026-08-19T19:28:01.331Z] [world] You head on to the Banquet.\n[2026-08-19T19:28:01.331Z] [debug] scene: loc=monarch_waystation hub=outpost_messhall arrival=n opening=n passing=n\n[2026-08-19T19:28:01.359Z] [world] Monarch Court \u2014 The Banquet Floor. A long table laid with mismatched silver \u2014 half pre-flood, half common. Halem serves what the Monarchs allow themselves; the kitchen is always five courses behind the proper ones.\n[2026-08-19T19:28:01.360Z] [world] You've stood here many times. (visit 10)\n[2026-08-19T19:28:01.360Z] [world] Paths: south to Chapel \u00b7 east to Court \u00b7 west to Retainers. (Type 'leave outpost' to head into the wilds.)\n[2026-08-19T19:28:01.360Z] [world] Halem the Trader nods once. \"Cinderbound. Come look \u2014 a few things moved since you were last through.\"\n[2026-08-19T19:28:01.367Z] [debug] arbiter: template (reason=busy)\n[2026-08-19T19:28:01.368Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T19:28:01.426Z] [cognitive] TRAVEL  (57ms)\n[2026-08-19T19:28:02.121Z] [debug] ui: tap \"\u2713 COURT\"\n[2026-08-19T19:28:02.133Z] [player] go east\n[2026-08-19T19:28:02.133Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0\n[2026-08-19T19:28:02.134Z] [world] You head on to the Court.\n[2026-08-19T19:28:02.134Z] [debug] scene: loc=monarch_waystation hub=outpost_central arrival=n opening=n passing=n\n[2026-08-19T19:28:02.139Z] [world] Monarch Court \u2014 The Court of Standards. A flagstone court ringed with the standards of every Lost Capital. A Monarch banner hangs over the central plinth where a cracked map-stone has been re-carved twice.\n[2026-08-19T19:28:02.139Z] [world] You've stood here many times. (visit 9)\n[2026-08-19T19:28:02.139Z] [world] Paths: north to Strongroom \u00b7 south to Atrium \u00b7 east to Arsenal \u00b7 west to Banquet. (Type 'leave outpost' to head into the wilds.)\n[2026-08-19T19:28:02.140Z] [debug] arbiter: template (reason=cooldown)\n[2026-08-19T19:28:02.140Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T19:28:02.221Z] [cognitive] neutral  (72ms)\n[2026-08-19T19:28:02.347Z] [debug] persist sizes(KB): total=126 player=13 wm=24[rooms=7 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=87 scene=2\n[2026-08-19T19:28:08.951Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-19T19:28:17.671Z] [debug] qwen\u23f1 narration:scene_intro ok 16201ms read 13402ms/write 2771ms in 726t\u2192out 33t 18.5ms/t HIT-CAP (148ch)\n[2026-08-19T19:28:17.675Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro after 16201ms \u2014 cancelled:player-acted-again\n[2026-08-19T19:28:24.539Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 15585ms wait 8721ms read 4234ms/write 2584ms in 697t\u2192out 33t 6.1ms/t HIT-CAP (165ch)\n[2026-08-19T19:28:24.603Z] [debug] homework: scene_intro \"The Monarch's Waystation\" \u2713 15654ms\n[2026-08-19T19:28:31.365Z] [debug] ui: tap \"\u2713 BANQUET\"\n[2026-08-19T19:28:31.389Z] [player] go west\n[2026-08-19T19:28:31.390Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0\n[2026-08-19T19:28:31.396Z] [world] You head on to the Banquet.\n[2026-08-19T19:28:31.396Z] [debug] scene: loc=monarch_waystation hub=outpost_messhall arrival=n opening=n passing=n\n[2026-08-19T19:28:31.420Z] [arbiter] An off-duty Reclaimer presses a thumb into the salt of her plate. \"Yulka. South. Night work. Aetheric Discs at half the going rate. If she's there.\" She doesn't say what to do if she's not.\n[2026-08-19T19:28:31.421Z] [world] Monarch Court \u2014 The Banquet Floor. A long table laid with mismatched silver \u2014 half pre-flood, half common. Halem serves what the Monarchs allow themselves; the kitchen is always five courses behind the proper ones.\n[2026-08-19T19:28:31.422Z] [world] You've stood here many times. (visit 11)\n[2026-08-19T19:28:31.423Z] [world] Paths: south to Chapel \u00b7 east to Court \u00b7 west to Retainers. (Type 'leave outpost' to head into the wilds.)\n[2026-08-19T19:28:31.423Z] [world] Halem the Trader nods once. \"Cinderbound. Come look \u2014 a few things moved since you were last through.\"\n[2026-08-19T19:28:31.497Z] [cognitive] TRAVEL  (66ms)\n[2026-08-19T19:28:40.355Z] [debug] qwen\u23f1 narration:travel ok 8798ms read 5220ms/write 3449ms in 787t\u2192out 33t 6.6ms/t HIT-CAP (140ch)\n[2026-08-19T19:28:40.355Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n7 avg5.6s max9.6s read1.1s/write1.0s in129t\u2192out30t ms/tok 2.7-11.4 wait3.4s | narration:scene_intro n5 avg9.7s max16.2s read7.7s/write1.6s in721t\u2192out33t ms/tok 3.5-18.5 cap5 \u27025/48.3s | narration:travel n4 avg8.6s max10.4s read5.7s/write1.7s in740t\u2192out33t ms/tok 5.4-11.3 cap4 wait1.1s \u27023/25.7s | ambient n2 avg7.0s max8.0s read3.3s/write2.3s in358t\u2192out31t ms/tok 7.5-10.7 cap2 wait1.2s | flourish n1 avg7.5s max7.5s read1.4s/write0.5s in129t\u2192out14t ms/tok 10.6-10.6 wait5.6s \u27021/7.5s | narration:scene_intro_fill n1 avg15.6s max15.6s read4.2s/write2.6s in697t\u2192out33t ms/tok 6.1-6.1 cap1 wait8.7s || WASTED 9 calls / 81.5s\n[2026-08-19T19:28:40.404Z] [arbiter] You stand west of the toll-court, the only exit you may choose.\n[2026-08-19T19:28:40.405Z] [debug] arbiter: qwen \u2713 8976ms (intent=travel)\n[2026-08-19T19:28:44.682Z] [player] go south\n[2026-08-19T19:28:44.683Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0\n[2026-08-19T19:28:44.685Z] [world] You head on to the Chapel.\n[2026-08-19T19:28:44.685Z] [debug] scene: loc=monarch_waystation hub=outpost_chapel arrival=n opening=n passing=n\n[2026-08-19T19:28:44.690Z] [world] Monarch Court \u2014 The Family Chapel. A small room with portraits of dead Monarchs and a single lit candle. Family business is conducted here when nothing else is appropriate.\n[2026-08-19T19:28:44.691Z] [world] You've stood here again. (visit 4)\n[2026-08-19T19:28:44.691Z] [world] Paths: north to Banquet. (Type 'leave outpost' to head into the wilds.)\n[2026-08-19T19:28:44.700Z] [debug] arbiter: template (reason=busy)\n[2026-08-19T19:28:44.701Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-19T19:28:44.911Z] [cognitive] neutral  (208ms)\n[2026-08-19T19:28:51.939Z] [debug] qwen\u23f1 narration:scene_intro ok 6968ms read 4398ms/write 2532ms in 743t\u2192out 33t 5.9ms/t HIT-CAP (152ch)\n[2026-08-19T19:28:51.960Z] [arbiter] It read \"The Fall of the Tartarian Capital,\" and it was written in a language\n[2026-08-19T19:28:51.961Z] [debug] arbiter: qwen \u2713 7268ms (intent=scene_intro)\n[2026-08-19T19:28:53.995Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-19T19:28:54.381Z] [debug] persist sizes(KB): total=126 player=13 wm=24[rooms=6 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=87 scene=2\n[2026-08-19T19:29:00.484Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 6474ms read 4502ms/write 1939ms in 696t\u2192out 33t 6.5ms/t HIT-CAP (169ch)\n[2026-08-19T19:29:00.579Z] [debug] homework: scene_intro \"The Monarch's Waystation\" \u2713 6591ms\n[2026-08-19T19:29:25.184Z] [player] that was a few blocks east due South should have been the first landing. I'm essentially cut off from the front half of this building\n[2026-08-19T19:29:25.185Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-19T19:29:25.187Z] [debug] meta-comment guard: skipped intent parse on 133-char input\n[2026-08-19T19:29:33.686Z] [debug] appstate: active \u2192 background (was active for 250141ms)\n[2026-08-19T19:29:33.838Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-19T19:32:39.511Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-19T19:32:39.517Z] [debug] appstate: background \u2192 active (was background for 185829ms)\n[2026-08-19T19:32:42.588Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-19T19:32:42.594Z] [debug] appstate: active \u2192 background (was active for 3077ms)\n[2026-08-19T19:32:46.231Z] [debug] appstate: background \u2192 active (was background for 3639ms)\n[2026-08-19T19:32:50.261Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-19T19:32:50.262Z] [debug] appstate: active \u2192 background (was active for 4031ms)\n[2026-08-19T19:32:53.232Z] [debug] appstate: background \u2192 active (was background for 2970ms)\n[2026-08-19T19:32:56.137Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-19T19:32:56.138Z] [debug] appstate: active \u2192 background (was active for 2906ms)\n[2026-08-19T20:04:23.123Z] [debug] appstate: background \u2192 active (was background for 1886978ms)\n[2026-08-19T20:04:28.617Z] [debug] qwen: re-warm cancelled (left the foreground first)\n[2026-08-19T20:04:28.618Z] [debug] appstate: active \u2192 background (was active for 5502ms)\n[2026-08-19T20:04:28.967Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01b94-c7e5-7d49-b5cc-17bdeebdd496\n[2026-08-19T20:04:28.967Z] [debug] ota: Checking\u2026\n[2026-08-19T20:04:29.047Z] [debug] ota: Already up to date\n[2026-08-19T20:04:29.047Z] [debug] ota: boot check result = noUpdate\n[2026-08-19T20:04:29.065Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-19T20:04:29.065Z] [debug] voice: bundled idle\n[2026-08-19T20:04:33.661Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-19T20:04:33.662Z] [debug] ctx: straggler load torn down by the lifecycle guard (count=1)\n[2026-08-19T20:04:33.926Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-19T20:04:33.933Z] [debug] qwen: LOAD FAILED \u2014 Qwen failed to initialize\n[2026-08-19T20:24:59.041Z] [debug] appstate: background \u2192 active (was background for 1225093ms)\n[2026-08-19T20:24:59.054Z] [debug] qwen-watchdog: holding reinit \u2014 foreground has not settled (8000ms). App-switching must not cost a ~425MB load.\n[2026-08-19T20:25:03.153Z] [debug] appstate: active \u2192 background (was active for 4124ms)\n[2026-08-19T20:49:39.631Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01b94-c7e5-7d49-b5cc-17bdeebdd496\n[2026-08-19T20:49:39.631Z] [debug] ota: Checking\u2026\n[2026-08-19T20:49:40.519Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-19T20:49:40.674Z] [debug] ota: Saving progress\u2026\n[2026-08-19T20:49:40.675Z] [debug] ota: Restarting to apply\u2026\n[2026-08-19T20:49:40.898Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01bc6-b420-7262-a3f5-ffa701f7695c\n[2026-08-19T20:49:40.898Z] [debug] ota: Checking\u2026\n[2026-08-19T20:49:40.995Z] [debug] ota: Already up to date\n[2026-08-19T20:49:40.996Z] [debug] ota: boot check result = noUpdate\n[2026-08-19T20:49:41.014Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-19T20:49:41.015Z] [debug] voice: bundled idle\n[2026-08-19T20:49:45.431Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-19T20:49:47.304Z] [debug] appstate: active \u2192 background (was active for 1857ms)\n[2026-08-19T20:52:21.420Z] [debug] ota: boot check \u2014 enabled=true channel=golem-line rt=2.4.1 updateId=01a01bc6-b420-7262-a3f5-ffa701f7695c\n[2026-08-19T20:52:21.420Z] [debug] ota: Checking\u2026\n[2026-08-19T20:52:21.560Z] [debug] ota: Already up to date\n[2026-08-19T20:52:21.561Z] [debug] ota: boot check result = noUpdate\n[2026-08-19T20:52:21.579Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-19T20:52:21.580Z] [debug] voice: bundled idle\n[2026-08-19T20:52:25.471Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-19T20:52:26.394Z] [debug] OTA session start: 2026-08-19-1368-the-native-queue-and-the-undercroft.\n[2026-08-19T20:52:26.394Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-08-19T20:52:26.394Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cinderbound. The road kept your place.\"\n[2026-08-19T20:52:27.727Z] [debug] ui: tap \"\u2713 BANQUET\"\n[2026-08-19T20:52:27.752Z] [player] go north\n[2026-08-19T20:52:27.753Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0\n[2026-08-19T20:52:27.755Z] [world] You head on to the Banquet.\n[2026-08-19T20:52:27.755Z] [debug] scene: loc=monarch_waystation hub=outpost_messhall arrival=n opening=n passing=n\n[2026-08-19T20:52:27.808Z] [world] Monarch Court \u2014 The Banquet Floor. A long table laid with mismatched silver \u2014 half pre-flood, half common. Halem serves what the Monarchs allow themselves; the kitchen is always five courses behind the proper ones.\n[2026-08-19T20:52:27.809Z] [world] You've stood here many times. (visit 12)\n[2026-08-19T20:52:27.809Z] [world] Paths: south to Chapel \u00b7 east to Court \u00b7 west to Retainers. (Type 'leave outpost' to head into the wilds.)\n[2026-08-19T20:52:27.809Z] [world] You think back to the broken royal vault pedestal from earlier \u2014 the salvage you pulled from it. Something here reminds you of it.\n[2026-08-19T20:52:27.809Z] [world] Halem the Trader nods once. \"Cinderbound. Come look \u2014 a few things moved since you were last through.\"\n[2026-08-19T20:52:27.885Z] [cognitive] TRAVEL  (67ms)\n[2026-08-19T20:52:29.094Z] [debug] ui: tap \"\u2713 CHAPEL\"\n[2026-08-19T20:52:29.106Z] [player] go south\n[2026-08-19T20:52:29.107Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1\n[2026-08-19T20:52:29.107Z] [world] You head on to the Chapel.\n[2026-08-19T20:52:29.108Z] [debug] scene: loc=monarch_waystation hub=outpost_chapel arrival=n opening=n passing=n\n[2026-08-19T20:52:29.111Z] [world] Monarch Court \u2014 The Family Chapel. A small room with portraits of dead Monarchs and a sing",
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawr2axtwkc [inline 7/22]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtawr2axtwkc"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "part",
+      "value": "7"
+    },
+    {
+      "key": "parts",
+      "value": "22"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T02:32:49.878094Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T02:32:50.167000Z",
+  "fingerprints": [
+    "18008c8d9658fb2970692993916ff2f3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b579a62010f84ab9a42af3848c1433e9",
+  "previousEventID": "a81d5d2228004897a0deefd58a080dc7"
+}

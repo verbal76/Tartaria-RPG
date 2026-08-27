@@ -1,0 +1,152 @@
+{
+  "id": "5688968837bb4ac5a54c9e512b7cc97f",
+  "groupID": "7694727904",
+  "eventID": "5688968837bb4ac5a54c9e512b7cc97f",
+  "projectID": "4511945117532160",
+  "size": 17718,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqnivyk0q [inline 19/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqnivyk0q [inline 19/27]",
+  "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqnivyk0q [inline 19/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c1370b4fb9a64abc8cc4868650cf6ad1",
+      "span_id": "97f603e021177db6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunk": "combat)\n[2026-08-26T22:46:25.288Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:46:25.534Z] [combat] Eternal Dynasty Raider 1 deals 1 bludgeoning damage [plate \u22122]. You have 57 HP remaining.\n[2026-08-26T22:46:25.749Z] [cognitive] neutral  (459ms)\n[2026-08-26T22:46:27.211Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:46:27.218Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-26T22:46:27.261Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:46:27.261Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=close enemies=2 hooks=1\n[2026-08-26T22:46:27.262Z] [combat] Eternal Dynasty Raider 1 suffers \u2014 burn eats 2. (0/19 HP, 0 turns left)\n[2026-08-26T22:46:27.262Z] [combat] Eternal Dynasty Raider 1 shakes off the last of the coating \u2014 the burn has run its course.\n[2026-08-26T22:46:27.263Z] [reward] Eternal Dynasty Raider 1 defeated. You recover Bone Bolt, Patched Cloth \u00d72.\n[2026-08-26T22:46:27.264Z] [reward] You strip the body: Bone Crossbow, Reclaimer's Salvage Vest (+8 TC). The kit took the fight badly.\n[2026-08-26T22:46:27.264Z] [combat] 1 attacker remains. Eternal Dynasty Raider 2 now in your sights.\n[2026-08-26T22:46:27.264Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-26T22:46:27.265Z] [reward] +22 TC pried from the dust.\n[2026-08-26T22:46:27.307Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:46:27.308Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:46:27.308Z] [debug] attack: status mods exhausted -2\n[2026-08-26T22:46:27.363Z] [world] You bring the compact blaster to bear on Eternal Dynasty Raider 2.\n[2026-08-26T22:46:27.363Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:46:27.591Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (227ms)\n[2026-08-26T22:46:28.148Z] [debug] persist sizes(KB): total=229 player=66 wm=79[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=4\n[2026-08-26T22:46:33.193Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.\n[2026-08-26T22:46:33.194Z] [world] Below, Eternal Dynasty Raider 2 circles the base \u2014 it cannot reach you up here.\n[2026-08-26T22:46:33.194Z] [combat] You \u2014 d20 \u2192 17 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 28 vs Eternal Dynasty Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:46:33.197Z] [combat] Eternal Dynasty Raider 2 takes 6 with the compact blaster. It reels: 19 left. Then it fights back.\n[2026-08-26T22:46:35.064Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:46:35.111Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:46:35.112Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1\n[2026-08-26T22:46:35.113Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:46:35.114Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:46:35.115Z] [debug] attack: status mods exhausted -2\n[2026-08-26T22:46:35.170Z] [world] You raise the compact blaster toward Eternal Dynasty Raider 2. The room narrows around the both of you.\n[2026-08-26T22:46:35.171Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:46:35.375Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (203ms)\n[2026-08-26T22:46:40.182Z] [world] You seize the initiative. Eternal Dynasty Raider 2 has no time to react.\n[2026-08-26T22:46:40.182Z] [combat] You \u2014 d20 \u2192 11 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 22 vs Eternal Dynasty Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:46:40.185Z] [combat] Your strike with the compact blaster lands for 2. Eternal Dynasty Raider 2 staggers \u2014 17 HP remaining. It answers.\n[2026-08-26T22:46:40.185Z] [world] Below, Eternal Dynasty Raider 2 circles the base \u2014 it cannot reach you up here.\n[2026-08-26T22:46:41.957Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:46:42.006Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:46:42.007Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1\n[2026-08-26T22:46:42.007Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:46:42.008Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:46:42.008Z] [debug] attack: status mods exhausted -2\n[2026-08-26T22:46:42.066Z] [world] You bring the compact blaster to bear on Eternal Dynasty Raider 2.\n[2026-08-26T22:46:42.066Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:46:42.269Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (202ms)\n[2026-08-26T22:46:45.487Z] [world] You seize the initiative. Eternal Dynasty Raider 2 has no time to react.\n[2026-08-26T22:46:45.487Z] [combat] You \u2014 d20 \u2192 1 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 12 vs Eternal Dynasty Raider 2 AC 10 \u2014 \u2717 FUMBLE\n[2026-08-26T22:46:45.488Z] [combat] Eternal Dynasty Raider 2 reads the motion and slips it \u2014 the compact blaster carves only air. The counter is already coming.\n[2026-08-26T22:46:45.488Z] [world] Below, Eternal Dynasty Raider 2 circles the base \u2014 it cannot reach you up here.\n[2026-08-26T22:46:46.542Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:46:46.591Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:46:46.592Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1\n[2026-08-26T22:46:46.593Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:46:46.595Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:46:46.595Z] [debug] attack: status mods exhausted -2\n[2026-08-26T22:46:46.665Z] [world] Your compact blaster comes around in an arc; Eternal Dynasty Raider 2 squares up to meet it.\n[2026-08-26T22:46:46.666Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:46:46.869Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (202ms)\n[2026-08-26T22:46:51.520Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.\n[2026-08-26T22:46:51.520Z] [world] Below, Eternal Dynasty Raider 2 circles the base \u2014 it cannot reach you up here.\n[2026-08-26T22:46:51.521Z] [combat] You \u2014 d20 \u2192 7 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 18 vs Eternal Dynasty Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:46:51.524Z] [combat] Your strike with the compact blaster lands for 2. Eternal Dynasty Raider 2 staggers \u2014 15 HP remaining. It answers.\n[2026-08-26T22:46:52.593Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:46:52.641Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:46:52.642Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1\n[2026-08-26T22:46:52.643Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:46:52.644Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:46:52.644Z] [debug] attack: status mods exhausted -2\n[2026-08-26T22:46:52.700Z] [world] You raise the compact blaster toward Eternal Dynasty Raider 2. The room narrows around the both of you.\n[2026-08-26T22:46:52.700Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:46:52.901Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (199ms)\n[2026-08-26T22:46:57.809Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.\n[2026-08-26T22:46:57.810Z] [world] Below, Eternal Dynasty Raider 2 circles the base \u2014 it cannot reach you up here.\n[2026-08-26T22:46:57.811Z] [combat] You \u2014 d20 \u2192 3 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 14 vs Eternal Dynasty Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:46:57.814Z] [combat] Eternal Dynasty Raider 2 takes 2 with the compact blaster. It reels: 13 left. Then it fights back.\n[2026-08-26T22:46:58.961Z] [debug] ui: tap \"stealth\"\n[2026-08-26T22:46:58.967Z] [player] sneak\n[2026-08-26T22:46:58.968Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=1 hooks=1\n[2026-08-26T22:46:59.045Z] [system] \u23f3 Time passed: 15 min\n[2026-08-26T22:46:59.256Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (210ms)\n[2026-08-26T22:46:59.523Z] [debug] persist sizes(KB): total=230 player=66 wm=80[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=4\n[2026-08-26T22:47:00.889Z] [debug] skillcheck: stealth d20=6 STE 3 + 1 (title: Shadow Diver) = 10 vs DC 12 \u2014 Hard \u2192 FAIL\n[2026-08-26T22:47:00.981Z] [debug] stats: STR21 DEX14 INT10 WIS12 CHA11 STE3 | gear: STR+7,DEX+7,STE+2,WIS+1,CHA+1 | worn: main=Cantor's Tuning Fork off=Compact Blaster head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring\n[2026-08-26T22:47:00.982Z] [debug] train: stealth near-miss \u2192 progress 63/100\n[2026-08-26T22:47:00.982Z] [world] Your foot scrapes stone. Something stirs in the dark.\n[2026-08-26T22:47:00.982Z] [world] Below, Eternal Dynasty Raider 2 circles the base \u2014 it cannot reach you up here.\n[2026-08-26T22:47:03.928Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:47:03.975Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:47:03.976Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1\n[2026-08-26T22:47:03.976Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:47:03.977Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:47:03.978Z] [debug] attack: status mods exhausted -2\n[2026-08-26T22:47:04.034Z] [world] You bring the compact blaster to bear on Eternal Dynasty Raider 2.\n[2026-08-26T22:47:04.035Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:47:04.240Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (205ms)\n[2026-08-26T22:47:09.164Z] [world] You seize the initiative. Eternal Dynasty Raider 2 has no time to react.\n[2026-08-26T22:47:09.165Z] [combat] You \u2014 d20 \u2192 14 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 25 vs Eternal Dynasty Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:47:09.167Z] [combat] Clean hit with the compact blaster for 2. Eternal Dynasty Raider 2 has 11 left and does not back away.\n[2026-08-26T22:47:09.167Z] [world] Below, Eternal Dynasty Raider 2 circles the base \u2014 it cannot reach you up here.\n[2026-08-26T22:47:09.168Z] [arbiter] The Arbiter glances at the Eternal Dynasty Raider 2 the way you'd glance at weather. \"Storm. Pass through it.\"\n[2026-08-26T22:47:10.314Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:47:10.361Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:47:10.362Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1\n[2026-08-26T22:47:10.363Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:47:10.365Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:47:10.365Z] [debug] attack: status mods exhausted -2\n[2026-08-26T22:47:10.422Z] [world] You bring the compact blaster to bear on Eternal Dynasty Raider 2.\n[2026-08-26T22:47:10.423Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:47:10.625Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (202ms)\n[2026-08-26T22:47:15.282Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.\n[2026-08-26T22:47:15.283Z] [world] Below, Eternal Dynasty Raider 2 circles the base \u2014 it cannot reach you up here.\n[2026-08-26T22:47:15.283Z] [combat] You \u2014 d20 \u2192 15 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 26 vs Eternal Dynasty Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:47:15.285Z] [combat] Your strike with the compact blaster lands for 3. Eternal Dynasty Raider 2 staggers \u2014 8 HP remaining. It answers.\n[2026-08-26T22:47:15.285Z] [combat] Burn sets in \u2014 4/turn for 2 turns.\n[2026-08-26T22:47:16.950Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:47:17.000Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:47:17.001Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1\n[2026-08-26T22:47:17.002Z] [combat] Eternal Dynasty Raider 2 suffers \u2014 burn eats 4. (4/25 HP, 1 turn left)\n[2026-08-26T22:47:17.002Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:47:17.003Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:47:17.004Z] [debug] attack: status mods exhausted -2\n[2026-08-26T22:47:17.063Z] [world] You commit forward with the compact blaster. Eternal Dynasty Raider 2 watches your hands.\n[2026-08-26T22:47:17.063Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:47:17.266Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (201ms)\n[2026-08-26T22:47:22.902Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.\n[2026-08-26T22:47:22.903Z] [world] Below, Eternal Dynasty Raider 2 circles the base \u2014 it cannot reach you up here.\n[2026-08-26T22:47:22.903Z] [combat] You \u2014 d20 \u2192 2 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 13 vs Eternal Dynasty Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:47:22.905Z] [combat] Eternal Dynasty Raider 2 folds under the compact blaster. 6 damage was enough. The room exhales.\n[2026-08-26T22:47:22.906Z] [reward] Eternal Dynasty Raider 2 defeated. You recover Aether Residue \u00d72.\n[2026-08-26T22:47:22.907Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+10 TC). The kit took the fight badly.\n[2026-08-26T22:47:22.908Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-26T22:47:22.908Z] [reward] +18 TC pried from the dust.\n[2026-08-26T22:47:26.836Z] [debug] ui: tap \"rest\"\n[2026-08-26T22:47:26.848Z] [player] rest\n[2026-08-26T22:47:26.849Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:47:26.850Z] [arbiter] The Arbiter looks up. \"A line gets you up \u2014 it won't hold you asleep. Only a Hardened Climbing Strap will. Climb down, or come back wearing one.\"\n[2026-08-26T22:47:27.017Z] [cognitive] REST  (165ms)\n[2026-08-26T22:47:28.269Z] [debug] ui: tap \"rest\"\n[2026-08-26T22:47:28.276Z] [world] The fog whispers your name in old Tartarian. You forget, for a ",
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqnivyk0q [inline 19/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtawqnivyk0q"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "19"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T02:32:30.817249Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T02:32:30.890000Z",
+  "fingerprints": [
+    "7328552db1dbe598f0761b9af01eca7c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "59ddb1242a214fde9784384582a6bab9",
+  "previousEventID": "47bcb76f495d408c9ecb7f60dcc6d71d"
+}

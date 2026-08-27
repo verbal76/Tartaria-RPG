@@ -1,0 +1,178 @@
+{
+  "id": "2b16d2260fcf4f808c1f7a830afadcbd",
+  "groupID": "7694727486",
+  "eventID": "2b16d2260fcf4f808c1f7a830afadcbd",
+  "projectID": "4511945117532160",
+  "size": 2673,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtavnjvdw4u4 [inline 11/22]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtavnjvdw4u4 [inline 11/22]",
+  "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtavnjvdw4u4 [inline 11/22]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "562559eb191148aeaef8ef413bd2e6d8",
+      "span_id": "89d6042795003ecd",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunk": "[Filtered]",
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtavnjvdw4u4 [inline 11/22]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtavnjvdw4u4"
+    },
+    {
+      "key": "environment",
+      "value": "golem"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "golem"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "22"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T02:32:44.082992Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunk": {
+        "": {
+          "rem": [
+            [
+              "@password:filter",
+              "s",
+              0,
+              10
+            ]
+          ],
+          "len": 15000,
+          "chunks": [
+            {
+              "type": "redaction",
+              "text": "[Filtered]",
+              "rule_id": "@password:filter",
+              "remark": "s"
+            }
+          ]
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T02:32:44.333000Z",
+  "fingerprints": [
+    "75a594f4b948e0689bdc8b098bdc8429"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "319b254461af460790009c7d4a0d28a2",
+  "previousEventID": "2adc2741e85e409d85ab88189df8cd3d"
+}

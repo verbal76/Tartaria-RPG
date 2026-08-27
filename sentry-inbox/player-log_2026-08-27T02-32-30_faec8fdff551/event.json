@@ -1,0 +1,152 @@
+{
+  "id": "faec8fdff55147aabf8b8ccabdc72e27",
+  "groupID": "7694727904",
+  "eventID": "faec8fdff55147aabf8b8ccabdc72e27",
+  "projectID": "4511945117532160",
+  "size": 17744,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqnivyk0q [inline 22/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqnivyk0q [inline 22/27]",
+  "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqnivyk0q [inline 22/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c1370b4fb9a64abc8cc4868650cf6ad1",
+      "span_id": "97f603e021177db6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunk": "8-26T23:16:46.203Z] [combat] Eternal Dynasty Raider 2 shrugs off the aetheric. (resisted, \u00d70.5 for 5)\n[2026-08-26T23:16:46.203Z] [combat] The aetheric has worn Eternal Dynasty Raider 2's guard through \u2014 it bites full from here.\n[2026-08-26T23:16:46.204Z] [combat] Your blow with the searing cantor's tuning fork lands clean \u2014 5 damage. Eternal Dynasty Raider 2 crumples in the dust. The Aetherstone settles.\n[2026-08-26T23:16:46.204Z] [reward] Eternal Dynasty Raider 2 defeated. You recover Patched Cloth \u00d73.\n[2026-08-26T23:16:46.205Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+10 TC). The kit took the fight badly.\n[2026-08-26T23:16:46.206Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-26T23:16:46.206Z] [reward] +14 TC pried from the dust.\n[2026-08-26T23:16:46.429Z] [combat] Eternal Dynasty Raider 2 deals 5 bludgeoning damage [plate \u22123]. You have 53 HP remaining.\n[2026-08-26T23:16:46.647Z] [debug] persist sizes(KB): total=253 player=72 wm=94[rooms=47 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=82 scene=4\n[2026-08-26T23:16:51.017Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-26T23:16:54.160Z] [debug] send-log: FAILED - envelope did not go out \u2014 bundle #mtapr3962bvg kept on disk, boots retry up to 5 sends total\n[2026-08-26T23:17:01.946Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10746ms read 7608ms/write 3099ms in 678t\u2192out 32t 11.2ms/t (132ch)\n[2026-08-26T23:17:01.968Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 10746ms \u2014 intro-fill:near-dup\n[2026-08-26T23:17:01.968Z] [debug] homework: scene_intro \"Nimari\" \u2205 10953ms\n[2026-08-26T23:20:26.156Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04054-4a29-7aaf-9337-beed19306dff\n[2026-08-26T23:20:26.157Z] [debug] ota: Checking\u2026\n[2026-08-26T23:20:26.242Z] [debug] ota: Already up to date\n[2026-08-26T23:20:26.242Z] [debug] ota: boot check result = noUpdate\n[2026-08-26T23:20:26.457Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-26T23:20:26.457Z] [debug] voice: bundled idle\n[2026-08-26T23:20:26.492Z] [debug] send-log: bundle #mtapr3962bvg attempt 2/5 did not go out (after 214ms) \u2014 kept for next boot\n[2026-08-26T23:52:12.633Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04054-4a29-7aaf-9337-beed19306dff\n[2026-08-26T23:52:12.633Z] [debug] ota: Checking\u2026\n[2026-08-26T23:52:14.533Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-26T23:52:14.612Z] [debug] ota: Saving progress\u2026\n[2026-08-26T23:52:14.613Z] [debug] ota: Restarting to apply\u2026\n[2026-08-26T23:52:14.678Z] [debug] ota: boot check result = applied\n[2026-08-26T23:52:14.828Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04076-8e39-72be-9c01-811158d39312\n[2026-08-26T23:52:14.828Z] [debug] ota: Checking\u2026\n[2026-08-26T23:52:14.937Z] [debug] ota: Already up to date\n[2026-08-26T23:52:14.938Z] [debug] ota: boot check result = noUpdate\n[2026-08-26T23:52:15.140Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-26T23:52:15.141Z] [debug] voice: bundled idle\n[2026-08-26T23:52:15.159Z] [debug] send-log: bundle #mtapr3962bvg attempt 3/5 did not go out (after 165ms) \u2014 kept for next boot\n[2026-08-27T00:09:19.004Z] [debug] OTA applied: 2026-08-26-1512-the-worn-piece-is-readable \u2192 2026-08-26-1513-the-other-side-of-the-vial.\n[2026-08-27T00:09:19.004Z] [debug] OTA session start: 2026-08-26-1513-the-other-side-of-the-vial.\n[2026-08-27T00:09:19.004Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-27T00:09:19.004Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Great Scott. The road kept your place.\"\n[2026-08-27T00:09:19.531Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T00:09:19.528Z \u00b7 build 2026-08-26-1513-the-other-side-of-the-vial \u00b7 updated from 2026-08-26-1512-the-worn-piece-is-readable \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-27T00:09:22.569Z] [debug] send-log: FAILED - envelope did not go out \u2014 bundle #mtarmklvp2ex kept on disk, boots retry up to 5 sends total\n[2026-08-27T00:10:31.466Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-27T00:10:31.513Z] [debug] spawn: gear=[Rusted Blade, Bone Club, Aetheric Chainmail] window=10 roster=new\n[2026-08-27T00:10:31.518Z] [world] You walk north. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-27T00:10:31.519Z] [world] The thread you were following waits where you left it.\n[2026-08-27T00:10:32.998Z] [debug] ui: tap \"take / salvage\"\n[2026-08-27T00:10:35.257Z] [world] You take the Bone Club from where it lay.\n[2026-08-27T00:10:35.258Z] [reward] \u2726 Bone Club (Common).\n[2026-08-27T00:10:35.279Z] [world] You pick up the Rusted Blade.\n[2026-08-27T00:10:35.279Z] [reward] \u2726 Rusted Blade (Common).\n[2026-08-27T00:10:35.281Z] [world] You lift the Aetheric Chainmail clear.\n[2026-08-27T00:10:35.281Z] [reward] \u2726 Aetheric Chainmail (Common).\n[2026-08-27T00:10:36.395Z] [world] You salvage the door. The take is small but real.\n[2026-08-27T00:10:36.395Z] [world] You break the merchant bones apart. Among the pieces, something worth keeping.\n[2026-08-27T00:10:36.395Z] [world] You salvage the pavement. The take is small but real.\n[2026-08-27T00:10:36.396Z] [reward] \u2726 Salvage haul:\n[2026-08-27T00:10:36.396Z] [reward]     \u2022 Stick (Common)\n[2026-08-27T00:10:36.396Z] [reward]     \u2022 Worn Tartarian Coin x9 (Common)\n[2026-08-27T00:10:38.216Z] [debug] ui: tap \"investigate\"\n[2026-08-27T00:10:40.027Z] [player] investigate the ground\n[2026-08-27T00:10:40.028Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-27T00:10:40.031Z] [world] You scrape at the silt with the aetheric crystal blade. Nothing of worth.\n[2026-08-27T00:10:40.039Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-27T00:10:40.040Z] [arbiter] The Arbiter looks around. \"Half-swallowed. The half that remains has stopped pretending it is whole.\"\n[2026-08-27T00:10:40.040Z] [system] \u23f3 Time passed: 24 min\n[2026-08-27T00:10:40.233Z] [cognitive] CLIMB  (190ms)\n[2026-08-27T00:10:41.083Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-27T00:10:42.421Z] [debug] ui: tap \"rest\"\n[2026-08-27T00:10:42.436Z] [player] rest\n[2026-08-27T00:10:42.437Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-27T00:10:42.439Z] [world] You rest for 8 hours. +5 HP, +8 stamina recovered. (Day 28, afternoon)\n[2026-08-27T00:10:42.439Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-27T00:10:42.440Z] [world] You wake briefly. The Aetheric haze has cleared enough that for a heartbeat you can see further than usual.\n[2026-08-27T00:10:42.453Z] [system] \u23f3 Time passed: 8h\n[2026-08-27T00:10:42.793Z] [cognitive] REST  (340ms)\n[2026-08-27T00:10:42.985Z] [debug] persist sizes(KB): total=238 player=73 wm=80[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=81 scene=4\n[2026-08-27T00:10:43.275Z] [debug] ui: tap \"rest\"\n[2026-08-27T00:10:43.277Z] [player] rest\n[2026-08-27T00:10:43.278Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-27T00:10:43.278Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 28, evening)\n[2026-08-27T00:10:43.278Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-27T00:10:43.279Z] [arbiter] The Arbiter goes still. \"You weren't alone. Something circled while you were out \u2014 and it stopped circling.\"\n[2026-08-27T00:10:43.279Z] [world] A Mud Golem closes the distance through the dark. The rest is over.\n[2026-08-27T00:10:43.279Z] [debug] enemy: Mud Golem hp=156 ac=14 atk=Slam dmg=2D10 rarity=Rare ap=9\n[2026-08-27T00:10:43.280Z] [system] \u23f3 Time passed: 8h\n[2026-08-27T00:10:43.494Z] [cognitive] REST  (213ms)\n[2026-08-27T00:11:05.179Z] [debug] appstate: active \u2192 background (was active for 23906ms)\n[2026-08-27T00:12:56.329Z] [debug] appstate: background \u2192 active (was background for 111150ms)\n[2026-08-27T00:13:09.068Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-27T00:13:09.120Z] [player] attack with the off-hand compact blaster\n[2026-08-27T00:13:09.121Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=far enemies=1 hooks=1\n[2026-08-27T00:13:09.124Z] [debug] attack: target=Mud Golem range=far reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-27T00:13:09.128Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-27T00:13:09.188Z] [world] You bring the compact blaster to bear on Mud Golem.\n[2026-08-27T00:13:09.188Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T00:13:09.402Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (212ms)\n[2026-08-27T00:13:16.415Z] [world] You seize the initiative. Mud Golem has no time to react.\n[2026-08-27T00:13:16.415Z] [combat] You \u2014 d20 \u2192 19 + DEX 14 \u2212 1 (Whisper Fog) = 32 vs Mud Golem AC 16 \u2014 \u2713 HIT\n[2026-08-27T00:13:16.422Z] [combat] Mud Golem takes 5 with the compact blaster. It reels: 151 left. Then it fights back.\n[2026-08-27T00:13:16.422Z] [combat] Burn sets in \u2014 2/turn for 2 turns.\n[2026-08-27T00:13:16.422Z] [combat] Mud Golem closes the distance.\n[2026-08-27T00:13:18.489Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-27T00:13:18.535Z] [player] attack with the off-hand compact blaster\n[2026-08-27T00:13:18.536Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=1\n[2026-08-27T00:13:18.536Z] [combat] Mud Golem suffers \u2014 burn eats 2. (149/156 HP, 1 turn left)\n[2026-08-27T00:13:18.537Z] [debug] attack: target=Mud Golem range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-27T00:13:18.538Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-27T00:13:18.597Z] [world] You bring the compact blaster to bear on Mud Golem.\n[2026-08-27T00:13:18.597Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T00:13:18.799Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (201ms)\n[2026-08-27T00:13:23.620Z] [world] You seize the initiative. Mud Golem has no time to react.\n[2026-08-27T00:13:23.620Z] [combat] You \u2014 d20 \u2192 20 + DEX 14 \u2212 1 (Whisper Fog) = 33 vs Mud Golem AC 16 \u2014 \u2713 CRITICAL HIT\n[2026-08-27T00:13:23.622Z] [combat] Mud Golem takes 11 with the compact blaster. It reels: 138 left. Then it fights back.\n[2026-08-27T00:13:23.623Z] [combat] Mud Golem stops \u2014 and the air in front of it thickens, faintly bright. An AETHER SHIELD stands where its swing should have been (+3 AC).\n[2026-08-27T00:13:26.257Z] [debug] ui: tap \"step back\"\n[2026-08-27T00:13:26.262Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-27T00:13:26.273Z] [player] step back\n[2026-08-27T00:13:26.274Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=mid enemies=1 hooks=1\n[2026-08-27T00:13:26.275Z] [debug] move: retreat from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0\n[2026-08-27T00:13:26.276Z] [debug] move: field retreat target=Mud Golem d 1.50->2.50 band mid->far\n[2026-08-27T00:13:26.276Z] [world] You pull back from Mud Golem. (range: far)\n[2026-08-27T00:13:26.277Z] [debug] arbiter: template (reason=combat)\n[2026-08-27T00:13:26.278Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-27T00:13:26.712Z] [cognitive] neutral  (433ms)\n[2026-08-27T00:13:28.440Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-27T00:13:28.489Z] [player] attack with the off-hand compact blaster\n[2026-08-27T00:13:28.489Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=far enemies=1 hooks=1\n[2026-08-27T00:13:28.490Z] [combat] Mud Golem suffers \u2014 burn eats 2. (136/156 HP, 0 turns left)\n[2026-08-27T00:13:28.490Z] [combat] Mud Golem shakes off the last of the coating \u2014 the burn has run its course.\n[2026-08-27T00:13:28.490Z] [debug] attack: target=Mud Golem range=far reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-27T00:13:28.491Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-27T00:13:28.549Z] [world] Your compact blaster comes around in an arc; Mud Golem squares up to meet it.\n[2026-08-27T00:13:28.550Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T00:13:28.752Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (201ms)\n[2026-08-27T00:13:29.079Z] [debug] persist sizes(KB): total=238 player=73 wm=80[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=80 scene=5\n[2026-08-27T00:13:33.576Z] [world] Mud Golem moves first. The pressure is immediate.\n[2026-08-27T00:13:33.577Z] [combat] Mud Golem closes the distance.\n[2026-08-27T00:13:33.577Z] [combat] You \u2014 d20 \u2192 6 + DEX 14 \u2212 1 (Whisper Fog) = 19 vs Mud Golem AC 19 \u2014 \u2713 HIT\n[2026-08-27T00:13:33.579Z] [combat] Mud Golem takes 3 with the compact blaster. It reels: 133 left. Then it fights back.\n[2026-08-27T00:13:33.579Z] [arbiter] The Arbiter watches the blow land or fail. \"Both are answers.\"\n[2026-08-27T00:13:34.143Z] [debug] ui: tap \"approach\"\n[2026-08-27T00:13:34.188Z] [player] approach Mud Golem\n[2026-08-27T00:13:34.189Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud golem resolved=Mud Golem range=mid enemies=1 hooks=1\n[2026-08-27T00:13:34.191Z] [debug] move: advance from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0\n[2026-08-27T00:13:34.192Z] [debug] move: field advance target=Mud Golem d 1.50->0.50 band mid->close\n[2026-08-27T00:13:34.192Z] [world] You close the gap with Mud Golem. (range: close / arm's reach)\n[2026-08-27T00:13:34.194Z] [combat] Mud Golem \u2014 d20 \u2192 13 + ATK 8 = 21 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-27T00:13:34.194Z] [debug] arbiter: template (reason=combat)\n[2026-08-27T00:13:34.194Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-27T00:13:34.426Z] [cognitive] SWIM  (230ms)\n[2026-08-27T00:13:37.126Z] [debug] ui: tap \"step back\"\n[2026-08-27T00:13:37.149Z] [player] step back\n[2026-08-27T00:13:37.150Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-27T00:13:37.153Z] [debug] move: retreat from range=close enemies=1 weather=Whisper Fog cost=1 partial=0\n[2026-08-27T00:13:37.153Z] [debug] move: field retreat target=Mud Golem d 0.50->1.50 band close->mid\n[2026-08-27T00:13:37.153Z] [world] You pull back from Mud Golem. (range: mid-range)\n[2026-08-27T00:13:37.156Z] [combat] Mud Golem \u2014 d20 \u2192 14 + ATK 8 = 22 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-27T00:13:37.382Z] [cognitive] neutral  (224ms)\n[2026-08-27T00:13:38.076Z] [debug] ui: tap \"step back\"\n[2026-08-27T00:13:38.092Z] [player] step back\n[2026-08-27T00:13:38.093Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=-",
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1519-the-attachment-was-the-fault #mtawqnivyk0q [inline 22/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtawqnivyk0q"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "22"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-27T02:32:30.861921Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-27T02:32:30.890000Z",
+  "fingerprints": [
+    "7328552db1dbe598f0761b9af01eca7c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.23.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "edd83f7c4432485b84c97d70dfcce691"
+}
