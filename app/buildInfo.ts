@@ -24929,6 +24929,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // COPY LOG still exports everything. Only the wire narrowed.
 export const OTA_BUILD_ID = '2026-08-27-1516-the-quiet-path-sends-the-same-way';
 // golem catch-up 2026-08-27: markerless publish of OTA-1516 (boot retry and
+// crash auto-push chunked like the button; flushNote names why a flush refused)
+// to the golem channel.
+// golem catch-up 2026-08-27: markerless publish of OTA-1516 (boot retry and
 // crash auto-push chunked like the button) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1515-the-log-goes-in-parts';
 // golem catch-up 2026-08-27: markerless publish of OTA-1515 (the send root cause
