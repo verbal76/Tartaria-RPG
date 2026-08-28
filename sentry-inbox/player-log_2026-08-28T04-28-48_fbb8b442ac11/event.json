@@ -1,0 +1,198 @@
+{
+  "id": "fbb8b442ac114296aae4415eafd61f68",
+  "groupID": "7697053520",
+  "eventID": "fbb8b442ac114296aae4415eafd61f68",
+  "projectID": "4511945117532160",
+  "size": 17880,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 26/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 26/27]",
+  "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 26/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "1a8c2055f9314223bb356f454d4f3720",
+      "span_id": "b211a6ed78bafafd",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "he buried world keeps now. Read the roll from the Lore Codex.\n[2026-08-28T04:24:41.382Z] [debug] scene: loc=iskan_veil hub=- arrival=n opening=n passing=n\n[2026-08-28T04:24:41.467Z] [world] A wall of grey ash rolls across the plain. Breathing burns. Skin gathers a film of dead world.\n\n",
+      "You are at Iskan-Veil. A far-northwestern Lost Capital. The Conspiracy Architects' hidden city \u2014 a maze of false doors and overlaid corridors. Every map of Iskan-Veil is wrong by design; the true Core seat is behind the door you didn't see.\n\nHazard: Aether Mist. A glowing low mist that pulses with each heartbeat \u2014 yours, or something else's.\n",
+      "[2026-08-28T04:24:41.468Z] [world] You have been here. The shape of it comes back before the details do. The bodies you left are still here. Nothing has moved in to replace them.\n[2026-08-28T04:24:41.469Z] [world] [Iskan-Veil] north: open ground \u00b7 east: The Monarch's Waystation (3 tiles, 8 hours) \u00b7 south: Reclaimer's Stake (2 tiles, 5 hours) \u00b7 west: open ground\n",
+      "[2026-08-28T04:24:41.469Z] [world] The Cartographer (Keeper of Quiet Plans) is already here when you arrive, stall half-unpacked. They look up and nod once.\n[2026-08-28T04:24:41.470Z] [arbiter] The Arbiter inclines their head toward the newcomer. \"The Cartographer, Keeper of Quiet Plans. A hooded figure who never gives a name, only a nod. Deals in what other people would rather you didn't have \u2014 q",
+      "uiet boots, charms that swallow sound, maps of doors that aren't on any map. Speaks in implications and watches the exits.\"\n[2026-08-28T04:24:41.474Z] [world] Rare workings for sale: Void Edge (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-08-28T04:24:41.480Z] [reward] \u2726 Resurrection. Great Scott returns to Tartaria, restored. The Aetherstone hums in recognition.\n[2026-08-28T04:24:46.235Z] [player] Ask about their trade\n[2026-08-28T04:24:46.239Z] [world] \"Maps,\" says the Cartographer. \"Of places. Some of which are still there.\"\n",
+      "[2026-08-28T04:24:46.240Z] [world] The Cartographer places you, roughly, and adjusts what they were about to say.\n[2026-08-28T04:24:46.987Z] [player] Ask what a map costs\n[2026-08-28T04:24:46.988Z] [world] \"Depends what is on it.\" The Cartographer does not reach for anything. \"A road anyone can walk, two coins. A road with a reason nobody walks it, considerably more \u2014 and the price is the reason, ",
+      "not the paper.\" A pause of exactly the right length. \"There are three I do not price at all. I would rather keep them than be asked where I got them.\"\n[2026-08-28T04:24:46.989Z] [world] There is half a nod in it \u2014 you are a face now, if not much more than one.\n[2026-08-28T04:24:49.153Z] [world] You let the conversation go and The Cartographer gets back to it.\n",
+      "[2026-08-28T04:24:52.216Z] [debug] persist sizes(KB): total=234 player=55 wm=95[rooms=43 events=5 memos=0 npcs=5 defeated=0 tags=1 discovered=0] log=81 scene=3\n[2026-08-28T04:24:59.387Z] [reward] Sold Flame of Aether to The Cartographer for 15 TC. (419 TC on hand)\n[2026-08-28T04:24:59.434Z] [reward] Sold Mud Buckler to The Cartographer for 14 TC. (433 TC on hand)\n",
+      "[2026-08-28T04:24:59.476Z] [reward] Sold Mud Heater Sword to The Cartographer for 14 TC. (447 TC on hand)\n[2026-08-28T04:24:59.517Z] [reward] Sold Bonebreaker Mace to The Cartographer for 14 TC. (461 TC on hand)\n[2026-08-28T04:24:59.558Z] [reward] Sold Gale Binder to The Cartographer for 14 TC. (475 TC on hand)\n",
+      "[2026-08-28T04:24:59.599Z] [reward] Sold Mud Darts to The Cartographer for 14 TC. (489 TC on hand)\n[2026-08-28T04:24:59.640Z] [reward] Sold Aetheric Bolt Gun to The Cartographer for 13 TC. (502 TC on hand)\n[2026-08-28T04:24:59.682Z] [reward] Sold Lost Scholar's Robe to The Cartographer for 8 TC. (510 TC on hand)\n",
+      "[2026-08-28T04:24:59.722Z] [reward] Sold Architect's Aetheric Boots to The Cartographer for 6 TC. (516 TC on hand)\n[2026-08-28T04:24:59.763Z] [reward] Sold Salvager's Worn Greaves to The Cartographer for 6 TC. (522 TC on hand)\n[2026-08-28T04:24:59.804Z] [reward] Sold Wanderer's Footwraps to The Cartographer for 6 TC. (528 TC on hand)\n",
+      "[2026-08-28T04:24:59.844Z] [reward] Sold Bone Knife to The Cartographer for 6 TC. (534 TC on hand)\n[2026-08-28T04:24:59.884Z] [reward] Sold Bone Knife to The Cartographer for 6 TC. (540 TC on hand)\n[2026-08-28T04:24:59.923Z] [reward] Sold Mud-Warden's Vest to The Cartographer for 5 TC. (545 TC on hand)\n",
+      "[2026-08-28T04:24:59.963Z] [reward] Sold Mud-Warden's Vest to The Cartographer for 5 TC. (550 TC on hand)\n[2026-08-28T04:25:32.822Z] [reward] Bought First Aid Kit from The Cartographer for 57 TC. (493 TC left)\n[2026-08-28T04:25:32.822Z] [system] Conspiracy Architects standing +1 (now -21)\n[2026-08-28T04:25:37.871Z] [reward] Bought 7\u00d7 Patched Cloth from The Cartographer for 238 TC. (255 TC left)\n",
+      "[2026-08-28T04:25:37.915Z] [reward] \u2726 You read them well. +1 CHA (now 12).\n[2026-08-28T04:25:41.966Z] [debug] ui: tap \"more \u25b8\"\n[2026-08-28T04:25:43.231Z] [debug] ui: tap \"craft\"\n[2026-08-28T04:25:51.742Z] [system] stunned fades.\n[2026-08-28T04:25:51.744Z] [system] braced \u2014 will not go down again fades.\n",
+      "[2026-08-28T04:25:51.774Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=0\n[2026-08-28T04:25:51.791Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n",
+      "[2026-08-28T04:25:51.806Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=0\n[2026-08-28T04:25:51.830Z] [reward] \u2726 Crafted First Aid Kit \u00d72. The Arbiter watches you set the last piece.\n[2026-08-28T04:25:52.063Z] [cognitive] neutral  (282ms)\n[2026-08-28T04:25:52.071Z] [cognitive] neutral  (241ms)\n",
+      "[2026-08-28T04:25:58.173Z] [world] You repair the Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n[2026-08-28T04:25:58.227Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-28T04:25:58.228Z] [world] You repair the Burl Aegis. Back to full. (spent: Small Rock x2)\n",
+      "[2026-08-28T04:25:58.251Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-28T04:25:58.252Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-08-28T04:25:58.253Z] [world] You repair the Choir-Bound Boots. Back to full. (spent: Small Rock x2)\n",
+      "[2026-08-28T04:25:58.272Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-28T04:25:58.272Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-08-28T04:25:58.274Z] [world] You repair the Forge-Black Cowl. Back to full. (spent: Small Rock x2)\n",
+      "[2026-08-28T04:25:58.291Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-28T04:25:58.291Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-08-28T04:25:58.292Z] [world] You repair the Knot-Grained Gouge. Back to full. (spent: Small Rock x2)\n",
+      "[2026-08-28T04:25:58.307Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-28T04:25:58.307Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-08-28T04:25:58.308Z] [world] You repair the Spore-Crusted Tassets. Back to full. (spent: Small Rock x2)\n",
+      "[2026-08-28T04:25:58.322Z] [world] You repair the Traveler's Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-08-28T04:25:58.342Z] [arbiter] The Arbiter nods. \"Patched in: Crystalline Echo \u2192 Patched Cloth.\"\n[2026-08-28T04:25:58.348Z] [world] You repair the Wanderer's Worn Gauntlets. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-28T04:25:58.380Z] [arbiter] The Arbiter nods. \"Patched in: 3\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 2\u00d7 Tattered Gauze Roll \u2192 Patched Cloth, Glass-Beaded Strap \u2192 Patched Cloth, Rat Fur \u2192 Patched Cloth, 2\u00d7 Moth-Eaten Felt Scrap \u2192 Patched Cloth.\"\n[2026-08-28T04:25:58.399Z] [world] You repair the Vest of the Forgotten Hero. Back to full. (spent: Scrap Metal x10, Golem Core x2, Patched Cloth x6)\n",
+      "[2026-08-28T04:25:58.623Z] [debug] persist sizes(KB): total=227 player=48 wm=94[rooms=43 events=5 memos=0 npcs=5 defeated=0 tags=1 discovered=0] log=82 scene=3\n[2026-08-28T04:26:07.982Z] [player] craft Pulse Scanner\n[2026-08-28T04:26:07.983Z] [debug] parser: intent=craft conf=1.00 verb=craft target=pulse scanner resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-28T04:26:07.999Z] [arbiter] \"Crafting Pulse Scanner would strip 2\u00d7 Worn Tartarian Coin \u2192 Scrap Metal from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-08-28T04:26:08.043Z] [cognitive] neutral  (43ms)\n[2026-08-28T04:26:09.825Z] [player] craft Pulse Scanner\n",
+      "[2026-08-28T04:26:09.826Z] [debug] parser: intent=craft conf=1.00 verb=craft target=pulse scanner resolved=- range=- enemies=0 hooks=0\n[2026-08-28T04:26:09.842Z] [arbiter] The Arbiter nods. \"Stripped for parts: 2\u00d7 Worn Tartarian Coin \u2192 Scrap Metal.\"\n[2026-08-28T04:26:09.857Z] [reward] \u2726 Crafted Pulse Scanner. The Arbiter watches you set the last piece.\n",
+      "[2026-08-28T04:26:09.857Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-28T04:26:09.857Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T04:26:09.933Z] [cognitive] neutral  (74ms)\n[2026-08-28T04:26:26.391Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-28T04:26:26.408Z] [arbiter] \"Crafting Acid Flask would strip Worn Tartarian Coin \u2192 Scrap Metal from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-08-28T04:26:26.453Z] [cognitive] neutral  (43ms)\n[2026-08-28T04:26:27.824Z] [player] craft Acid Flask\n",
+      "[2026-08-28T04:26:27.825Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=- range=- enemies=0 hooks=0\n[2026-08-28T04:26:27.839Z] [arbiter] The Arbiter nods. \"Stripped for parts: Worn Tartarian Coin \u2192 Scrap Metal.\"\n[2026-08-28T04:26:27.853Z] [reward] \u2726 Crafted Acid Flask. The Arbiter watches you set the last piece.\n",
+      "[2026-08-28T04:26:27.854Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-28T04:26:27.854Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T04:26:27.931Z] [cognitive] neutral  (76ms)\n[2026-08-28T04:26:33.551Z] [debug] parser: intent=craft conf=1.00 verb=craft target=frost paste resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-28T04:26:33.554Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-28T04:26:33.554Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T04:26:33.563Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n",
+      "[2026-08-28T04:26:33.582Z] [debug] parser: intent=craft conf=1.00 verb=craft target=frost paste resolved=Frost Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:33.600Z] [reward] \u2726 Crafted Frost Paste \u00d72. The Arbiter watches you set the last piece.\n[2026-08-28T04:26:33.687Z] [cognitive] neutral  (132ms)\n[2026-08-28T04:26:33.701Z] [cognitive] neutral  (100ms)\n",
+      "[2026-08-28T04:26:38.878Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=- range=- enemies=0 hooks=0\n[2026-08-28T04:26:38.893Z] [arbiter] \"Crafting Searing Paste would strip Worn Tartarian Coin \u2192 Scrap Metal from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-08-28T04:26:38.936Z] [cognitive] neutral  (41ms)\n",
+      "[2026-08-28T04:26:40.717Z] [player] craft Searing Paste\n[2026-08-28T04:26:40.718Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=- range=- enemies=0 hooks=0\n[2026-08-28T04:26:40.731Z] [arbiter] The Arbiter nods. \"Stripped for parts: Worn Tartarian Coin \u2192 Scrap Metal.\"\n",
+      "[2026-08-28T04:26:40.731Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Stripped for parts: Worn Tartarian Coin \u2192\u2026\"\n[2026-08-28T04:26:40.747Z] [reward] \u2726 Crafted Searing Paste. The Arbiter watches you set the last piece.\n[2026-08-28T04:26:40.824Z] [cognitive] neutral  (76ms)\n",
+      "[2026-08-28T04:26:44.890Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=- range=- enemies=0 hooks=0\n[2026-08-28T04:26:44.893Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-28T04:26:44.893Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-28T04:26:44.923Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:44.940Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-28T04:26:44.940Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-28T04:26:44.956Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:44.970Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-28T04:26:44.971Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-28T04:26:44.985Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:45.015Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n",
+      "[2026-08-28T04:26:45.043Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:45.072Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n",
+      "[2026-08-28T04:26:45.100Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:45.128Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n",
+      "[2026-08-28T04:26:45.157Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:45.185Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n",
+      "[2026-08-28T04:26:45.213Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:45.241Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:45.255Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-08-28T04:26:45.255Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T04:26:45.256Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-08-28T04:26:45.270Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smolder"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 26/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtcgc1vw57ml"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "26"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-28T04:28:47.441613Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-28T04:28:48.172000Z",
+  "fingerprints": [
+    "be748ce85802371e970795a28e86f05d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "faef2c0e9361443198fba80902c8b390"
+}

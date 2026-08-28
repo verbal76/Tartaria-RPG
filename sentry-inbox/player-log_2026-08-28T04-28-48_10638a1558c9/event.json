@@ -1,0 +1,222 @@
+{
+  "id": "10638a1558c94b338f93331a77628e14",
+  "groupID": "7697053520",
+  "eventID": "10638a1558c94b338f93331a77628e14",
+  "projectID": "4511945117532160",
+  "size": 17628,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 20/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 20/27]",
+  "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 20/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "1a8c2055f9314223bb356f454d4f3720",
+      "span_id": "b211a6ed78bafafd",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " TC on hand)\n[2026-08-27T21:38:25.004Z] [reward] Sold Aetheric Chainmail to Cassia Nightwind for 8 TC. (1080 TC on hand)\n[2026-08-27T21:38:25.062Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 8 TC. (1088 TC on hand)\n[2026-08-27T21:38:25.120Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 8 TC. (1096 TC on hand)\n",
+      "[2026-08-27T21:38:25.178Z] [reward] Sold Mud-Warden's Vest to Cassia Nightwind for 8 TC. (1104 TC on hand)\n[2026-08-27T21:38:25.237Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 8 TC. (1112 TC on hand)\n[2026-08-27T21:38:25.294Z] [reward] Sold Mud-Warden's Vest to Cassia Nightwind for 8 TC. (1120 TC on hand)\n",
+      "[2026-08-27T21:38:25.352Z] [reward] Sold Mud-Warden's Vest to Cassia Nightwind for 8 TC. (1128 TC on hand)\n[2026-08-27T21:38:25.410Z] [reward] Sold Lost Scholar's Robe to Cassia Nightwind for 8 TC. (1136 TC on hand)\n[2026-08-27T21:38:25.467Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 8 TC. (1144 TC on hand)\n",
+      "[2026-08-27T21:38:25.524Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 8 TC. (1152 TC on hand)\n[2026-08-27T21:38:25.582Z] [reward] Sold Mud-Warden's Vest to Cassia Nightwind for 8 TC. (1160 TC on hand)\n[2026-08-27T21:38:25.639Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 8 TC. (1168 TC on hand)\n",
+      "[2026-08-27T21:38:25.696Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 8 TC. (1176 TC on hand)\n[2026-08-27T21:38:25.753Z] [reward] Sold Titan's Gauntlets to Cassia Nightwind for 8 TC. (1184 TC on hand)\n[2026-08-27T21:38:25.810Z] [reward] Sold Titan's Vest to Cassia Nightwind for 8 TC. (1192 TC on hand)\n",
+      "[2026-08-27T21:38:25.865Z] [reward] Sold Mud-Warden's Vest to Cassia Nightwind for 8 TC. (1200 TC on hand)\n[2026-08-27T21:38:25.922Z] [reward] Sold Golem-Born Guardian Mask to Cassia Nightwind for 8 TC. (1208 TC on hand)\n[2026-08-27T21:38:25.978Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 8 TC. (1216 TC on hand)\n",
+      "[2026-08-27T21:38:26.032Z] [reward] Sold Mud-Warden's Vest to Cassia Nightwind for 8 TC. (1224 TC on hand)\n[2026-08-27T21:38:26.087Z] [reward] Sold Sentinel's Faceguard to Cassia Nightwind for 8 TC. (1232 TC on hand)\n[2026-08-27T21:38:26.143Z] [reward] Sold Aetheric Chainmail to Cassia Nightwind for 8 TC. (1240 TC on hand)\n",
+      "[2026-08-27T21:38:26.198Z] [reward] Sold Shaman's Mud Helm to Cassia Nightwind for 6 TC. (1246 TC on hand)\n[2026-08-27T21:38:26.253Z] [reward] Sold Aetheric Scout Greaves to Cassia Nightwind for 6 TC. (1252 TC on hand)\n[2026-08-27T21:38:26.309Z] [reward] Sold Architect's Leg Enhancers to Cassia Nightwind for 6 TC. (1258 TC on hand)\n",
+      "[2026-08-27T21:38:26.363Z] [reward] Sold Architect's Mask of Vision to Cassia Nightwind for 6 TC. (1264 TC on hand)\n[2026-08-27T21:38:26.418Z] [reward] Sold Mud-Walker Mask to Cassia Nightwind for 6 TC. (1270 TC on hand)\n[2026-08-27T21:38:26.473Z] [reward] Sold Rough Hewn Mask to Cassia Nightwind for 6 TC. (1276 TC on hand)\n",
+      "[Filtered]",
+      "[2026-08-27T21:38:26.690Z] [reward] Sold Mud-Bound Cloak to Cassia Nightwind for 6 TC. (1300 TC on hand)\n[2026-08-27T21:38:26.744Z] [reward] Sold Mud-Bound Cloak to Cassia Nightwind for 6 TC. (1306 TC on hand)\n[2026-08-27T21:38:26.799Z] [reward] Sold Seer's Veil of the Aether to Cassia Nightwind for 6 TC. (1312 TC on hand)\n",
+      "[2026-08-27T21:38:26.852Z] [reward] Sold Memory Weaver's Hood to Cassia Nightwind for 6 TC. (1318 TC on hand)\n[2026-08-27T21:38:26.904Z] [reward] Sold Wanderer's Worn Gauntlets to Cassia Nightwind for 6 TC. (1324 TC on hand)\n[2026-08-27T21:38:26.956Z] [reward] Sold Bone Knife to Cassia Nightwind for 5 TC. (1329 TC on hand)\n",
+      "[2026-08-27T21:38:27.009Z] [reward] Sold Bone Knife to Cassia Nightwind for 5 TC. (1334 TC on hand)\n[2026-08-27T21:38:27.062Z] [reward] Sold Cudgel to Cassia Nightwind for 4 TC. (1338 TC on hand)\n[2026-08-27T21:38:27.114Z] [reward] Sold Cudgel to Cassia Nightwind for 4 TC. (1342 TC on hand)\n[2026-08-27T21:38:27.166Z] [reward] Sold Cudgel to Cassia Nightwind for 4 TC. (1346 TC on hand)\n",
+      "[2026-08-27T21:38:27.219Z] [reward] Sold Iron Spear to Cassia Nightwind for 4 TC. (1350 TC on hand)\n[2026-08-27T21:38:27.272Z] [reward] Sold Cudgel to Cassia Nightwind for 4 TC. (1354 TC on hand)\n[2026-08-27T21:38:27.324Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 4 TC. (1358 TC on hand)\n",
+      "[2026-08-27T21:38:27.377Z] [reward] Sold Cudgel to Cassia Nightwind for 4 TC. (1362 TC on hand)\n[2026-08-27T21:38:27.430Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 4 TC. (1366 TC on hand)\n[2026-08-27T21:38:27.483Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 4 TC. (1370 TC on hand)\n",
+      "[2026-08-27T21:38:27.535Z] [reward] Sold Cudgel to Cassia Nightwind for 4 TC. (1374 TC on hand)\n[2026-08-27T21:38:27.586Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 4 TC. (1378 TC on hand)\n[2026-08-27T21:38:27.637Z] [reward] Sold Cudgel to Cassia Nightwind for 4 TC. (1382 TC on hand)\n",
+      "[2026-08-27T21:38:27.690Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 4 TC. (1386 TC on hand)\n[2026-08-27T21:38:27.742Z] [reward] Sold Cudgel to Cassia Nightwind for 4 TC. (1390 TC on hand)\n[2026-08-27T21:38:27.794Z] [reward] Sold Reclaimer's Salvage Vest to Cassia Nightwind for 4 TC. (1394 TC on hand)\n",
+      "[2026-08-27T21:38:45.114Z] [reward] Bought the Titanforged Cuirass working for 500 TC. \u2726 Recipe learned (Legendary)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-08-27T21:38:45.394Z] [debug] persist sizes(KB): total=231 player=54 wm=95[rooms=47 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=78 scene=3\n",
+      "[2026-08-27T21:38:47.014Z] [reward] Bought the Titanforged Gauntlets working for 500 TC. \u2726 Recipe learned (Legendary)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-08-27T21:38:54.297Z] [debug] ui: tap \"craft\"\n[2026-08-27T21:39:05.976Z] [arbiter] The Arbiter nods. \"Patched in: Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-08-27T21:39:05.983Z] [world] You repair the Anvil-Struck Footguards. Back to full. (spent: Small Rock x2)\n[2026-08-27T21:39:06.018Z] [world] You repair the Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n[2026-08-27T21:39:06.036Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-08-27T21:39:06.037Z] [world] You repair the Burl Aegis. Back to full. (spent: Small Rock x2)\n[2026-08-27T21:39:06.050Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-27T21:39:06.050Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n",
+      "[2026-08-27T21:39:06.050Z] [world] You repair the Forge-Black Cowl. Back to full. (spent: Small Rock x2)\n[2026-08-27T21:39:06.062Z] [world] You repair the Mud Buckler. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-08-27T21:39:06.073Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-08-27T21:39:06.073Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-08-27T21:39:06.074Z] [world] You repair the Spore-Crusted Tassets. Back to full. (spent: Small Rock x2)\n[2026-08-27T21:39:06.085Z] [world] You repair the Traveler's Cloak. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-27T21:39:06.103Z] [arbiter] The Arbiter nods. \"Patched in: Disease Sample \u2192 Patched Cloth.\"\n[2026-08-27T21:39:06.111Z] [world] You repair the Wanderer's Worn Gauntlets. Back to full. (spent: Patched Cloth x4)\n[2026-08-27T21:39:06.121Z] [world] You repair the Aetheric Crystal Blade. Back to full. (spent: Scrap Metal x6, Stick x2)\n",
+      "[2026-08-27T21:39:06.139Z] [arbiter] The Arbiter nods. \"Patched in: 3\u00d7 Worn Tartarian Coin \u2192 Scrap Metal.\"\n[2026-08-27T21:39:06.147Z] [world] You repair the Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n[2026-08-27T21:39:06.164Z] [arbiter] The Arbiter nods. \"Patched in: 6\u00d7 Worn Tartarian Coin \u2192 Scrap Metal.\"\n",
+      "[2026-08-27T21:39:06.172Z] [world] You repair the Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n[2026-08-27T21:39:06.190Z] [arbiter] The Arbiter nods. \"Patched in: 10\u00d7 Worn Tartarian Coin \u2192 Scrap Metal.\"\n[2026-08-27T21:39:06.197Z] [world] You repair the Reaver's Greatsword. Back to full. (spent: Scrap Metal x10, Golem Core x2, Stick x4)\n",
+      "[2026-08-27T21:39:06.217Z] [arbiter] The Arbiter nods. \"Patched in: Aether Wing \u2192 Patched Cloth, 3\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-27T21:39:06.227Z] [world] You repair the Reclaimer's Rope. Back to full. (spent: Patched Cloth x4)\n[2026-08-27T21:39:06.237Z] [arbiter] The Arbiter eyes the Vest of the Forgotten Hero. \"Short on stock: Patched Cloth 5 short. Gather, then return.\"\n",
+      "[2026-08-27T21:39:17.442Z] [system] braced \u2014 will not go down again fades.\n[2026-08-27T21:39:17.485Z] [player] summon crystal golem\n[2026-08-27T21:39:17.486Z] [debug] parser: intent=cast conf=1.00 verb=summon target=crystal golem resolved=crystal range=- enemies=0 hooks=0\n[2026-08-27T21:39:17.549Z] [combat] Aether Golem Constructor \u2014 d20 6 + INT 11 = 17 vs DC 22 \u2014 \u2717 FAILED\n",
+      "[2026-08-27T21:39:17.550Z] [world] (2\u00d7 Aether Crystal + 1\u00d7 Aetheric Cloth + 1\u00d7 Aetheric Shard consumed.)\n[2026-08-27T21:39:17.550Z] [world] The shape slips out of your hands. The aether returns to itself, indifferent.\n[2026-08-27T21:39:17.551Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-08-27T21:39:17.551Z] [arbiter] The Arbiter looks around. \"Half-swallowed. The half that remains has stopped pretending it is whole.\"\n[2026-08-27T21:39:17.551Z] [system] \u23f3 Time passed: 30 min\n[2026-08-27T21:39:17.766Z] [cognitive] USE_ITEM  (213ms)\n[2026-08-27T21:39:21.021Z] [debug] ui: tap \"craft\"\n",
+      "[2026-08-27T21:39:25.482Z] [world] An Aetheric arc finds you \u2014 copper taste, blue afterimage, and a bite of damage. (\u22123 HP)\n[2026-08-27T21:39:25.522Z] [player] summon crystal golem\n[2026-08-27T21:39:25.522Z] [debug] parser: intent=cast conf=1.00 verb=summon target=crystal golem resolved=crystal range=- enemies=0 hooks=0\n",
+      "[2026-08-27T21:39:25.583Z] [reward] Aether Golem Constructor \u2014 d20 15 + INT 11 = 26 vs DC 22 \u2014 \u2713 SUMMONED\n[2026-08-27T21:39:25.583Z] [world] (2\u00d7 Aether Crystal + 1\u00d7 Aetheric Cloth + 1\u00d7 Aetheric Shard consumed.)\n",
+      "[2026-08-27T21:39:25.583Z] [world] Aetherstone lifts out of the ground and folds into a shape that walks. Crystal Golem stands ready beside you. Your mastery shapes it stronger than most. (HP 68/68, 1d20 piercing)\n[2026-08-27T21:39:25.584Z] [arbiter] The Arbiter studies the standing shape. \"You gave it life. You might as well give it a name.\"\n",
+      "[2026-08-27T21:39:25.584Z] [system] \u23f3 Time passed: 30 min\n[2026-08-27T21:39:25.781Z] [cognitive] USE_ITEM  (196ms)\n[2026-08-27T21:39:26.299Z] [debug] persist sizes(KB): total=229 player=53 wm=95[rooms=47 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=78 scene=3\n[2026-08-27T21:39:32.513Z] [world] Mason. The name takes hold in the Aetherstone.\n",
+      "[2026-08-27T21:39:32.515Z] [arbiter] The Arbiter nods. \"Mason, then.\"\n[2026-08-27T21:39:36.278Z] [player] Ask who taught them the trade\n[2026-08-27T21:39:36.280Z] [world] Cassia Nightwind is quiet a moment. \"Somebody better than me who did not live to see it. That is the honest answer for anyone in this work, and the ones who claim otherwise trained alone.\" They check a strap that did not need che",
+      "cking. \"You carry your teacher in your guard. Mine is still keeping my left side honest.\"\n[2026-08-27T21:39:36.281Z] [world] Cassia Nightwind turns a piece over twice while she speaks and puts it back facing the other way.\n[2026-08-27T21:39:37.663Z] [world] You let the conversation go and Cassia Nightwind gets back to it.\n[2026-08-27T21:39:43.152Z] [player] fuse\n",
+      "[2026-08-27T21:39:50.631Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.\n[2026-08-27T21:39:50.634Z] [reward] \u2726 The Crucible forges a Legendary close-quarters weapon from your reserved pieces \u2014 and it's in your pack, still cooling.\n",
+      "[2026-08-27T21:39:50.634Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet \u2014 let it finish. You'll know it the moment it announces itself.\n[2026-08-27T21:39:50.644Z] [reward] \u2726 The forging finishes \u2014 the Aether names it Knot-Grained Gouge (Legendary).\n",
+      "[2026-08-27T21:40:05.794Z] [debug] stats: STR20 DEX14 INT10 WIS12 CHA11 STE3 | gear: STR+6,DEX+6,STE+2,WIS+1,CHA+1 | worn: main=Bone Crossbow off=Bone Crossbow head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring\n",
+      "[2026-08-27T21:40:12.187Z] [debug] stats: STR20 DEX16 INT10 WIS12 CHA11 STE3 | gear: STR+6,DEX+8,STE+2,WIS+1,CHA+1 | worn: main=Knot-Grained Gouge off=Bone Crossbow head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring\n",
+      "[2026-08-27T21:40:15.372Z] [reward] Cassia Nightwind fires up a portable Crucible for you. (\u221225 TC)\n[2026-08-27T21:40:30.169Z] [reward] \u2726 The Crucible drinks the five pieces and works a second coating channel into the Knot-Grained Gouge. It can now hold TWO coatings at once \u2014 both bite on every landing hit. (Its damage and edge are unchanged.)\n",
+      "[2026-08-27T21:40:30.446Z] [debug] persist sizes(KB): total=230 player=53 wm=95[rooms=47 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=3\n[2026-08-27T21:40:32.574Z] [debug] ui: tap \"take / salvage\"\n[2026-08-27T21:40:34.234Z] [world] You work the cooling valve over. A part of it comes loose, intact.\n",
+      "[2026-08-27T21:40:34.234Z] [world] You salvage the core. The take is small but real.\n[2026-08-27T21:40:34.234Z] [world] You work the echo horn over. A part of it comes loose, intact.\n[2026-08-27T21:40:34.234Z] [world] You break the fungus patch apart. Among the pieces, something worth keeping.\n[2026-08-27T21:40:34.235Z] [world] You work the insignia over. A part of it comes loose, intact.\n",
+      "[2026-08-27T21:40:34.235Z] [world] You salvage the shattered tartarian relay. The take is small but real.\n[2026-08-27T21:40:34.235Z] [world] You work the zharak's teeth spire over. A part of it comes loose, intact.\n[2026-08-27T21:40:34.235Z] [reward] \u2726 Salvage haul:\n[2026-08-27T21:40:34.235Z] [reward]     \u2022 Aether Crystal x4 (Common)\n[2026-08-27T21:40:34.235Z] [reward]     \u2022 Bent Nail x3 (Common)\n",
+      "[2026-08-27T21:40:34.236Z] [reward]     \u2022 Spider Silk (Common)\n[2026-08-27T21:40:34.236Z] [reward]     \u2022 Aether Dust x3 (Common)\n[2026-08-27T21:40:36.290Z] [reward] Cassia Nightwind fires up a portable Crucible for you. (\u221225 TC)\n[2026-08-27T21:41:06.86"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 20/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtcgc1vw57ml"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "20"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-28T04:28:47.401943Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "9": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 341,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-28T04:28:48.171000Z",
+  "fingerprints": [
+    "be748ce85802371e970795a28e86f05d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "274bb57e3ae5446f92c5a3c778e1c07f",
+  "previousEventID": "0ef44c2ff40e4fd7ae8af569226e555a"
+}

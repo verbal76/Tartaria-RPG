@@ -1,0 +1,197 @@
+{
+  "id": "ab72e91fc071442a908820b76cc60492",
+  "groupID": "7697053520",
+  "eventID": "ab72e91fc071442a908820b76cc60492",
+  "projectID": "4511945117532160",
+  "size": 17876,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 25/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 25/27]",
+  "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 25/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "1a8c2055f9314223bb356f454d4f3720",
+      "span_id": "b211a6ed78bafafd",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "pped) \u2014 \u2717 MISS\n[2026-08-28T04:23:09.486Z] [combat] Bog Hound \u2014 d20 \u2192 6 + ATK 6 = 12 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-28T04:23:09.487Z] [combat] You \u2014 d20 \u2192 6 + DEX 16 \u2212 1 (Ash Storm) exhausted -2 poisoned -2 = 17 vs Bog Hound AC 9 \u2014 \u2713 HIT\n",
+      "[2026-08-28T04:23:09.490Z] [combat] Your blow with the bone crossbow lands clean \u2014 8 damage. Bog Hound crumples in the dust. The Aetherstone settles.\n[2026-08-28T04:23:09.491Z] [reward] Bog Hound defeated. You recover Aetheric Teeth \u00d72.\n[2026-08-28T04:23:09.492Z] [combat] 1 attacker remains. Mud Giant now in your sights.\n[2026-08-28T04:23:09.492Z] [reward] +10 TC pried from the dust.\n",
+      "[2026-08-28T04:23:09.552Z] [arbiter] \"You attack as if you mean to leave,\" the Arbiter murmurs. \"Good.\"\n[2026-08-28T04:23:13.069Z] [debug] ui: tap \"approach\"\n[2026-08-28T04:23:13.112Z] [player] approach Mud Giant\n[2026-08-28T04:23:13.113Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud giant resolved=Mud Giant range=mid enemies=1 hooks=0\n",
+      "[2026-08-28T04:23:13.116Z] [debug] move: advance from range=mid enemies=1 weather=Ash Storm cost=1 partial=0\n[2026-08-28T04:23:13.116Z] [debug] move: field advance target=Mud Giant d 1.27->0.35 band mid->close\n[2026-08-28T04:23:13.116Z] [world] You close the gap with Mud Giant. (range: close / arm's reach)\n",
+      "[2026-08-28T04:23:13.118Z] [combat] Mud Giant \u2014 d20 \u2192 18 + ATK 11 = 29 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-28T04:23:13.119Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-28T04:23:13.120Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-28T04:23:13.384Z] [combat] Mud Giant deals 14 bludgeoning damage [armor \u221212%]. You have 41 HP remaining.\n[2026-08-28T04:23:13.384Z] [combat] Mud Giant's strike leaves you stunned.\n[2026-08-28T04:23:13.607Z] [cognitive] SWIM  (485ms)\n[2026-08-28T04:23:14.187Z] [debug] ui: tap \"dodge\"\n[2026-08-28T04:23:14.190Z] [system] poisoned fades.\n[2026-08-28T04:23:14.190Z] [system] stunned fades.\n",
+      "[2026-08-28T04:23:14.199Z] [player] dodge\n[2026-08-28T04:23:14.200Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n[2026-08-28T04:23:14.202Z] [world] You commit to the dodge. Slip Mud Giant's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-28T04:23:14.277Z] [combat] Mud Giant \u2014 d20 \u2192 20 + ATK 11 = 31 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-08-28T04:23:14.277Z] [combat] Dodge \u2014 Mud Giant rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.\n[2026-08-28T04:23:14.278Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-28T04:23:14.523Z] [combat] Mud Giant deals 32 bludgeoning damage [armor \u221212%]. You have 9 HP remaining.\n[2026-08-28T04:23:14.742Z] [cognitive] neutral  (245ms)\n[2026-08-28T04:23:14.963Z] [debug] ui: tap \"knot-grained gouge\"\n[2026-08-28T04:23:14.984Z] [player] attack with the knot-grained gouge\n",
+      "[2026-08-28T04:23:14.984Z] [debug] parser: intent=attack conf=1.00 verb=attack target=knot grained gouge resolved=Knot-Grained Gouge range=close enemies=1 hooks=0\n[2026-08-28T04:23:14.985Z] [debug] attack: target=Mud Giant range=close reach.bands=[close] reach.label=Knot-Grained Gouge bareHand=false\n[2026-08-28T04:23:14.986Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-08-28T04:23:14.986Z] [debug] attack: status mods exhausted -2\n[2026-08-28T04:23:15.029Z] [world] Your knot-grained gouge comes around in an arc; Mud Giant squares up to meet it.\n[2026-08-28T04:23:15.030Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T04:23:15.240Z] [cognitive] neutral  (209ms)\n[2026-08-28T04:23:20.472Z] [world] You seize the initiative. Mud Giant has no time to react.\n",
+      "[2026-08-28T04:23:20.473Z] [combat] You \u2014 d20 \u2192 7 + DEX 16 \u2212 1 (Ash Storm) exhausted -2 = 20 vs Mud Giant AC 18 \u2014 \u2713 HIT\n[2026-08-28T04:23:20.473Z] [combat] Weakness exposed \u2014 Mud Giant flinches. (bludgeoning \u00d71.5 for 9)\n[2026-08-28T04:23:20.475Z] [combat] Clean hit with the knot-grained gouge for 9. Mud Giant has 102 left and does not back away.\n",
+      "[2026-08-28T04:23:20.477Z] [combat] Mud Giant \u2014 d20 \u2192 10 + ATK 11 = 21 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-28T04:23:20.477Z] [arbiter] The Arbiter does not look away from the mud giant. \"Decide quickly. It already has.\"\n[2026-08-28T04:23:22.406Z] [debug] ui: tap \"inventory\"\n[2026-08-28T04:23:33.326Z] [world] You use 13\u00d7 Wild Oats. +13 HP (22/59), +19 stamina.\n",
+      "[2026-08-28T04:23:39.026Z] [world] You use 6\u00d7 Raspberries. +18 HP (40/59).\n[2026-08-28T04:23:40.717Z] [debug] persist sizes(KB): total=234 player=55 wm=93[rooms=43 events=5 memos=0 npcs=5 defeated=0 tags=1 discovered=0] log=82 scene=3\n[2026-08-28T04:23:44.177Z] [debug] ui: tap \"knot-grained gouge\"\n[2026-08-28T04:23:44.187Z] [system] braced \u2014 will not go down again fades.\n",
+      "[2026-08-28T04:23:44.192Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-08-28T04:23:44.239Z] [player] attack with the knot-grained gouge\n[2026-08-28T04:23:44.240Z] [debug] parser: intent=attack conf=1.00 verb=attack target=knot grained gouge resolved=Knot-Grained Gouge range=close enemies=1 hooks=0\n",
+      "[2026-08-28T04:23:44.242Z] [debug] attack: target=Mud Giant range=close reach.bands=[close] reach.label=Knot-Grained Gouge bareHand=false\n[2026-08-28T04:23:44.243Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-28T04:23:44.244Z] [debug] attack: status mods exhausted -2\n[2026-08-28T04:23:44.301Z] [world] You commit forward with the knot-grained gouge. Mud Giant watches your hands.\n",
+      "[2026-08-28T04:23:44.301Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T04:23:44.519Z] [cognitive] neutral  (216ms)\n[2026-08-28T04:23:50.338Z] [world] You seize the initiative. Mud Giant has no time to react.\n[2026-08-28T04:23:50.339Z] [combat] You \u2014 d20 \u2192 8 + DEX 16 \u2212 1 (Ash Storm) exhausted -2 = 21 vs Mud Giant AC 18 \u2014 \u2713 HIT\n",
+      "[2026-08-28T04:23:50.339Z] [combat] Bludgeoning flares \u2014 +2 on hit (weak \u2014 bites deep!).\n[2026-08-28T04:23:50.339Z] [combat] Weakness exposed \u2014 Mud Giant flinches. (bludgeoning \u00d71.5 for 11)\n[2026-08-28T04:23:50.343Z] [combat] The blow with the knot-grained gouge finds purchase \u2014 11 damage, 91 HP standing. Mud Giant commits to the counter.\n",
+      "[2026-08-28T04:23:50.343Z] [combat] Mud Giant is left exposed \u2014 easier to hit.\n[2026-08-28T04:23:50.345Z] [combat] Mud Giant \u2014 d20 \u2192 13 + ATK 11 = 24 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-28T04:23:51.862Z] [debug] ui: tap \"dodge\"\n[2026-08-28T04:23:51.876Z] [player] dodge\n",
+      "[2026-08-28T04:23:51.877Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n[2026-08-28T04:23:51.878Z] [world] You commit to the dodge. Slip Mud Giant's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-28T04:23:51.957Z] [combat] Mud Giant \u2014 d20 \u2192 13 + ATK 11 = 24 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-08-28T04:23:51.958Z] [combat] Dodge \u2014 d20 \u2192 15 + DEX 16 = 31 vs ATK 24. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-28T04:23:51.961Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T04:23:52.202Z] [cognitive] neutral  (239ms)\n",
+      "[2026-08-28T04:23:53.215Z] [debug] ui: tap \"knot-grained gouge\"\n[2026-08-28T04:23:53.234Z] [player] attack with the knot-grained gouge\n[2026-08-28T04:23:53.235Z] [debug] parser: intent=attack conf=1.00 verb=attack target=knot grained gouge resolved=Knot-Grained Gouge range=close enemies=1 hooks=0\n",
+      "[2026-08-28T04:23:53.236Z] [debug] attack: target=Mud Giant range=close reach.bands=[close] reach.label=Knot-Grained Gouge bareHand=false\n[2026-08-28T04:23:53.236Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-28T04:23:53.237Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-28T04:23:53.280Z] [world] You bring the knot-grained gouge to bear on Mud Giant.\n",
+      "[2026-08-28T04:23:53.281Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T04:23:53.506Z] [cognitive] neutral  (224ms)\n[2026-08-28T04:23:58.595Z] [world] You seize the initiative. Mud Giant has no time to react.\n[2026-08-28T04:23:58.598Z] [combat] You \u2014 d20 \u2192 11 + DEX 16 \u2212 1 (Ash Storm) perfect opening (2\u00d7 dice) = 26 vs Mud Giant AC 18 \u2014 \u2713 HIT\n",
+      "[2026-08-28T04:23:58.599Z] [combat] Bludgeoning flares \u2014 +2 on hit (weak \u2014 bites deep!).\n[2026-08-28T04:23:58.599Z] [combat] Weakness exposed \u2014 Mud Giant flinches. (bludgeoning \u00d71.5 for 26)\n[2026-08-28T04:23:58.601Z] [combat] The blow with the knot-grained gouge finds purchase \u2014 26 damage, 65 HP standing. Mud Giant commits to the counter.\n",
+      "[2026-08-28T04:23:58.601Z] [combat] Mud Giant is left exposed \u2014 easier to hit.\n[2026-08-28T04:23:58.602Z] [combat] Mud Giant \u2014 d20 \u2192 8 + ATK 11 = 19 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-28T04:24:00.829Z] [debug] ui: tap \"off: bone crossbow\"\n[2026-08-28T04:24:00.885Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-28T04:24:00.886Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0\n[2026-08-28T04:24:00.887Z] [debug] attack: target=Mud Giant range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-28T04:24:00.889Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-08-28T04:24:00.946Z] [world] Your bone crossbow comes around in an arc; Mud Giant squares up to meet it.\n[2026-08-28T04:24:00.947Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T04:24:01.165Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (218ms)\n[2026-08-28T04:24:07.230Z] [world] Mud Giant moves first. The pressure is immediate.\n",
+      "[2026-08-28T04:24:07.232Z] [combat] Mud Giant \u2014 d20 \u2192 18 + ATK 11 = 29 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-28T04:24:07.233Z] [combat] You \u2014 d20 \u2192 2 + DEX 16 \u2212 1 (Ash Storm) + 2 (point blank) = 19 vs Mud Giant AC 18 \u2014 \u2713 HIT\n[2026-08-28T04:24:07.234Z] [combat] Mud Giant shrugs off the piercing. (resisted, \u00d70.5 for 6)\n",
+      "[2026-08-28T04:24:07.237Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Mud Buckler \u2014 bludgeoning will bite where piercing won't.\"\n[2026-08-28T04:24:07.238Z] [combat] Mud Giant takes 6 with the bone crossbow. It reels: 59 left. Then it fights back.\n[2026-08-28T04:24:07.497Z] [combat] Mud Giant deals 17 bludgeoning damage [armor \u221212%]. You have 23 HP remaining.\n",
+      "[2026-08-28T04:24:10.213Z] [debug] ui: tap \"dodge\"\n[2026-08-28T04:24:10.230Z] [player] dodge\n[2026-08-28T04:24:10.231Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n",
+      "[2026-08-28T04:24:10.232Z] [world] You commit to the dodge. Slip Mud Giant's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-28T04:24:10.311Z] [combat] Mud Giant \u2014 d20 \u2192 1 + ATK 11 = 12 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-08-28T04:24:10.311Z] [combat] Dodge \u2014 Mud Giant overcommits past you. \u2713 Free opening (next strike \u00d72 dice).\n[2026-08-28T04:24:10.313Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-28T04:24:10.313Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T04:24:10.313Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T04:24:10.544Z] [cognitive] neutral  (230ms)\n",
+      "[2026-08-28T04:24:11.997Z] [debug] ui: tap \"\u2726 bandolier (3)\"\n[2026-08-28T04:24:13.400Z] [reward] You hurl the Acid Flask. It bursts across Mud Giant \u2014 3 acid (1/turn \u00d7 3). (56 HP left)\n[2026-08-28T04:24:13.407Z] [combat] Mud Giant \u2014 d20 \u2192 11 + ATK 11 = 22 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-28T04:24:13.786Z] [debug] persist sizes(KB): total=232 player=55 wm=93[rooms=43 events=5 memos=0 npcs=5 defeated=0 tags=1 discovered=0] log=81 scene=3\n[2026-08-28T04:24:14.796Z] [debug] ui: tap \"\u2726 bandolier (3)\"\n[2026-08-28T04:24:15.682Z] [reward] You hurl the Incendiary Paste. It bursts across Mud Giant \u2014 12 burn (4/turn \u00d7 3, burn-weak). (44 HP left)\n",
+      "[2026-08-28T04:24:15.690Z] [combat] Mud Giant \u2014 d20 \u2192 11 + ATK 11 = 22 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-28T04:24:16.764Z] [debug] ui: tap \"\u2726 bandolier (3)\"\n[2026-08-28T04:24:17.632Z] [reward] You hurl the Searing Paste. It bursts across Mud Giant \u2014 3 burn (1/turn \u00d7 3, burn-weak). (41 HP left)\n",
+      "[2026-08-28T04:24:17.640Z] [combat] Mud Giant \u2014 d20 \u2192 1 + ATK 11 = 12 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n[2026-08-28T04:24:18.913Z] [debug] ui: tap \"knot-grained gouge\"\n[2026-08-28T04:24:18.967Z] [player] attack with the knot-grained gouge\n",
+      "[2026-08-28T04:24:18.967Z] [debug] parser: intent=attack conf=1.00 verb=attack target=knot grained gouge resolved=Knot-Grained Gouge range=close enemies=1 hooks=0\n[2026-08-28T04:24:18.969Z] [debug] attack: target=Mud Giant range=close reach.bands=[close] reach.label=Knot-Grained Gouge bareHand=false\n[2026-08-28T04:24:18.970Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-08-28T04:24:18.971Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-28T04:24:19.037Z] [world] You bring the knot-grained gouge to bear on Mud Giant.\n[2026-08-28T04:24:19.038Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T04:24:19.274Z] [cognitive] neutral  (235ms)\n[2026-08-28T04:24:24.760Z] [world] You seize the initiative. Mud Giant has no time to react.\n",
+      "[2026-08-28T04:24:24.761Z] [combat] You \u2014 d20 \u2192 15 + DEX 16 \u2212 1 (Ash Storm) perfect opening (2\u00d7 dice) = 30 vs Mud Giant AC 18 \u2014 \u2713 HIT\n[2026-08-28T04:24:24.761Z] [combat] Bludgeoning flares \u2014 +4 on hit (weak \u2014 bites deep!).\n[2026-08-28T04:24:24.762Z] [combat] Weakness exposed \u2014 Mud Giant flinches. (bludgeoning \u00d71.5 for 16)\n",
+      "[2026-08-28T04:24:24.763Z] [combat] Your strike with the knot-grained gouge lands for 16. Mud Giant staggers \u2014 25 HP remaining. It answers.\n[2026-08-28T04:24:24.764Z] [combat] Mud Giant is left exposed \u2014 easier to hit.\n[2026-08-28T04:24:24.765Z] [combat] Mud Giant \u2014 d20 \u2192 16 + ATK 11 = 27 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-08-28T04:24:25.031Z] [combat] Mud Giant deals 15 bludgeoning damage [armor \u221212%]. You have 8 HP remaining.\n[2026-08-28T04:24:25.031Z] [combat] Mud Giant's strike leaves you stunned.\n[2026-08-28T04:24:32.565Z] [debug] ui: tap \"\u2726 bandolier (2)\"\n[2026-08-28T04:24:33.818Z] [reward] You hurl the Acid Flask. It bursts across Mud Giant \u2014 3 acid (1/turn \u00d7 3). (22 HP left)\n",
+      "[2026-08-28T04:24:33.824Z] [combat] Mud Giant \u2014 d20 \u2192 19 + ATK 11 = 30 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-28T04:24:34.113Z] [combat] Mud Giant deals 12 bludgeoning damage [armor \u221212%]. You fall.\n[2026-08-28T04:24:34.114Z] [combat] The buried world claims Great Scott. Tartaria keeps the body count.\n",
+      "[2026-08-28T04:24:34.114Z] [system] Great Scott has fallen. A Resurrection Gem from the title screen can bring them back.\n[2026-08-28T04:24:34.114Z] [combat] Pike falls beside you. The buried world claims them too.\n[2026-08-28T04:24:34.788Z] [system] You join the Fallen of Tartaria \u2014 5 names t"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 25/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtcgc1vw57ml"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "25"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-28T04:28:47.441038Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-28T04:28:48.172000Z",
+  "fingerprints": [
+    "be748ce85802371e970795a28e86f05d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b55bfc0d796d48869672cd4562f101b8",
+  "previousEventID": "a7e6d1ae71da4d5aa183b7c48108dd1e"
+}

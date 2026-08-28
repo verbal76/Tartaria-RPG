@@ -1,0 +1,221 @@
+{
+  "id": "274bb57e3ae5446f92c5a3c778e1c07f",
+  "groupID": "7697053520",
+  "eventID": "274bb57e3ae5446f92c5a3c778e1c07f",
+  "projectID": "4511945117532160",
+  "size": 17635,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 15/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 15/27]",
+  "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 15/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "1a8c2055f9314223bb356f454d4f3720",
+      "span_id": "b211a6ed78bafafd",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Nimari. The world waits for your move.\n[2026-08-27T03:02:58.999Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Great Scott. I wondered when you'd take up the thread again.\"\n[2026-08-27T03:02:59.331Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T03:02:59.328Z \u00b7 build 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 updated from 2026-08-27-1519-the-attachment-was-the-fault \u00b7 previous entry momen",
+      "ts earlier \u2550\u2550\u2550\n[2026-08-27T03:03:00.288Z] [debug] send-log: crash on record (2026-08-27T02:32:27.198Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtaxtuln8peb\n[2026-08-27T03:03:03.374Z] [debug] send-log: #mtaxtx2bzl8l \u2014 DELIVERED (inline, no attachments): beacon out, 27/27 parts accepted (404834 chars) \u2014 flush said yes\n",
+      "[2026-08-27T03:03:03.376Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtaxtx2bzl8l kept on disk, boots retry up to 5 sends total\n[2026-08-27T11:52:38.879Z] [debug] OTA session start: 2026-08-27-1520-the-scrubber-takes-a-whole-value.\n[2026-08-27T11:52:38.879Z] [world] You step back into Nimari. The world waits for your move.\n",
+      "[2026-08-27T11:52:38.880Z] [world] The Aetheric grid hum is louder than you remember. Something below has woken or shifted while you were elsewhere.\n[2026-08-27T11:52:38.882Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Great Scott. We've still got ground to cover, you and I. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed",
+      " hands. Read the World for the account.\"\n[2026-08-27T11:52:39.175Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T11:52:39.173Z \u00b7 build 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-27T11:52:40.516Z] [debug] send-log: crash on record (2026-08-27T03:03:20.074Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtbgr039mc3t\n",
+      "[2026-08-27T11:52:43.102Z] [debug] send-log: #mtbgr26bocft \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (405165 chars) \u2014 flush said yes\n[2026-08-27T11:52:43.104Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtbgr26bocft kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-27T11:52:48.378Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04126-1265-7413-a8ac-b08f1f571db7\n[2026-08-27T11:52:48.378Z] [debug] ota: Checking\u2026\n[2026-08-27T11:52:48.522Z] [debug] ota: Already up to date\n[2026-08-27T11:52:48.522Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-27T11:52:48.557Z] [debug] send-log: bundle #mtbgr26bocft held \u2014 only 6s since the last try (a restart, not a chance); 4 left\n[2026-08-27T11:52:48.557Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T11:52:48.558Z] [debug] voice: bundled idle\n[2026-08-27T11:52:53.376Z] [debug] OTA session start: 2026-08-27-1520-the-scrubber-takes-a-whole-value.\n",
+      "[2026-08-27T11:52:53.376Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-27T11:52:53.376Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Great Scott. We've still got ground to cover, you and I.\"\n",
+      "[2026-08-27T11:52:53.820Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T11:52:53.817Z \u00b7 build 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-27T11:52:57.264Z] [debug] send-log: #mtbgrdejaghk \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (405037 chars) \u2014 flush said yes\n",
+      "[2026-08-27T11:52:57.271Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtbgrdejaghk kept on disk, boots retry up to 5 sends total\n[2026-08-27T12:25:28.036Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04126-1265-7413-a8ac-b08f1f571db7\n[2026-08-27T12:25:28.036Z] [debug] ota: Checking\u2026\n[2026-08-27T12:25:28.187Z] [debug] ota: Already up to date\n",
+      "[2026-08-27T12:25:28.187Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T12:25:28.267Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T12:25:28.267Z] [debug] voice: bundled idle\n[2026-08-27T12:25:28.817Z] [debug] send-log: bundle #mtbgrdejaghk attempt 2/5 delivered to Sentry\n",
+      "[2026-08-27T12:37:15.432Z] [debug] OTA applied: 2026-08-27-1520-the-scrubber-takes-a-whole-value \u2192 2026-08-27-1522-the-stun-does-not-outlive-itself.\n[2026-08-27T12:37:15.432Z] [debug] OTA session start: 2026-08-27-1522-the-stun-does-not-outlive-itself.\n[2026-08-27T12:37:15.432Z] [world] You step back into Nimari. The world waits for your move.\n",
+      "[2026-08-27T12:37:15.432Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Great Scott. We've still got ground to cover, you and I.\"\n[2026-08-27T12:37:15.914Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T12:37:15.911Z \u00b7 build 2026-08-27-1522-the-stun-does-not-outlive-itself \u00b7 updated from 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-27T12:37:21.328Z] [debug] send-log: #mtbicgtwnnz3 \u2014 DELIVERED (inline, no attachments): beacon out, 27/27 parts accepted (404733 chars) \u2014 flush said yes\n[2026-08-27T12:37:21.329Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtbicgtwnnz3 kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-27T13:38:31.474Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04332-2bb3-7372-b9e1-5e909a69cd3d\n[2026-08-27T13:38:31.475Z] [debug] ota: Checking\u2026\n[2026-08-27T13:38:31.701Z] [debug] ota: Already up to date\n[2026-08-27T13:38:31.702Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T13:38:31.822Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-27T13:38:31.823Z] [debug] voice: bundled idle\n[2026-08-27T13:38:32.618Z] [debug] send-log: bundle #mtbicgtwnnz3 attempt 2/5 delivered to Sentry\n[2026-08-27T16:21:38.775Z] [debug] OTA session start: 2026-08-27-1524-cover-the-seven-and-mean-the-switch.\n[2026-08-27T16:21:38.776Z] [world] You step back into Nimari. The world waits for your move.\n",
+      "[2026-08-27T16:21:38.776Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Great Scott. The buried country is no place to walk alone.\"\n[2026-08-27T16:21:39.081Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T16:21:39.078Z \u00b7 build 2026-08-27-1524-cover-the-seven-and-mean-the-switch \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-27T16:21:48.377Z] [debug] send-log: #mtbqd4edoeu9 \u2014 DELIVERED (inline, no attachments): beacon out, 27/27 parts accepted (404670 chars) \u2014 flush said yes\n[2026-08-27T16:21:48.378Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtbqd4edoeu9 kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-27T19:35:22.599Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a043ea-4002-75a7-8605-4e7f9d4d55ef\n[2026-08-27T19:35:22.599Z] [debug] ota: Checking\u2026\n[2026-08-27T19:35:23.400Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-27T19:35:23.505Z] [debug] ota: Saving progress\u2026\n",
+      "[2026-08-27T19:35:23.844Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04478-db1d-7ef8-b4e2-4b2062c99e84\n[2026-08-27T19:35:23.844Z] [debug] ota: Checking\u2026\n[2026-08-27T19:35:23.957Z] [debug] ota: Already up to date\n[2026-08-27T19:35:23.957Z] [debug] ota: boot check result = noUpdate\n[2026-08-27T19:35:24.042Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-27T19:35:24.042Z] [debug] voice: bundled idle\n[2026-08-27T19:35:24.328Z] [debug] send-log: bundle #mtbqd4edoeu9 attempt 2/5 delivered to Sentry\n[2026-08-27T19:35:30.520Z] [debug] OTA applied: 2026-08-27-1524-cover-the-seven-and-mean-the-switch \u2192 2026-08-27-1526-the-ledger-was-writing-its-own-corpses.\n",
+      "[2026-08-27T19:35:30.520Z] [debug] OTA session start: 2026-08-27-1526-the-ledger-was-writing-its-own-corpses.\n[2026-08-27T19:35:30.520Z] [world] You step back into Nimari. The world waits for your move.\n[2026-08-27T19:35:30.520Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Great Scott. The buried country is no place to walk alone.\"\n",
+      "[2026-08-27T19:35:30.847Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-27T19:35:30.844Z \u00b7 build 2026-08-27-1526-the-ledger-was-writing-its-own-corpses \u00b7 updated from 2026-08-27-1524-cover-the-seven-and-mean-the-switch \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-27T19:35:31.517Z] [debug] send-log: crash on record (2026-08-27T16:21:51.524Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtbxa8u29r1x\n[2026-08-27T19:35:32.717Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-27T19:35:32.768Z] [debug] spawn: gear=[Aetheric Spark, Repeater Rifle, Mud Knife] window=10 roster=new\n",
+      "[2026-08-27T19:35:32.769Z] [world] You walk west. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-27T19:35:32.769Z] [world] The thread you were following waits where you left it.\n[2026-08-27T19:35:34.285Z] [debug] ui: tap \"take / salvage\"\n[2026-08-27T19:35:36.117Z] [world] You take the Aetheric Spark from where it lay.\n",
+      "[2026-08-27T19:35:36.118Z] [reward] \u2726 Aetheric Spark (Common).\n[2026-08-27T19:35:36.129Z] [world] You pick up the Mud Knife.\n[2026-08-27T19:35:36.130Z] [reward] \u2726 Mud Knife (Common).\n[2026-08-27T19:35:36.131Z] [world] You lift the Repeater Rifle clear.\n[2026-08-27T19:35:36.136Z] [reward] \u2726 Repeater Rifle (Common).\n",
+      "[Filtered]",
+      "[2026-08-27T19:35:37.089Z] [world] You salvage the insignia. The take is small but real.\n[2026-08-27T19:35:37.089Z] [world] Tucked inside the steam pipe: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-08-27T19:35:37.089Z] [reward] \u2726 Salvage haul:\n[2026-08-27T19:35:37.090Z] [reward]     \u2022 Aether Crystal (Common)\n",
+      "[2026-08-27T19:35:37.090Z] [reward]     \u2022 Reed Shaft Cutting (Common)\n[2026-08-27T19:35:37.090Z] [reward]     \u2022 Stick x3 (Common)\n[2026-08-27T19:35:37.090Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-27T19:35:37.090Z] [reward]     \u2022 Verdigris Bell Fragment (Common)\n[2026-08-27T19:35:38.436Z] [debug] ui: tap \"investigate\"\n[2026-08-27T19:35:40.193Z] [player] investigate the ground\n",
+      "[2026-08-27T19:35:40.193Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-27T19:35:40.199Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Stick (Common).\n[2026-08-27T19:35:40.205Z] [system] \u23f3 Time passed: 24 min\n[2026-08-27T19:35:40.386Z] [cognitive] CLIMB  (180ms)\n",
+      "[2026-08-27T19:35:41.285Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-27T19:35:41.685Z] [debug] ui: tap \"rest\"\n[2026-08-27T19:35:41.698Z] [player] rest\n[2026-08-27T19:35:41.699Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-27T19:35:41.701Z] [world] You rest for 8 hours. +9 HP, +8 stamina recovered. (Day 29, morning)\n[2026-08-27T19:35:41.703Z] [world] You shake out your cloak in the morning. Something small falls free that you don't remember picking up.\n[2026-08-27T19:35:41.717Z] [debug] arbiter: template (reason=busy)\n",
+      "[2026-08-27T19:35:41.718Z] [arbiter] The Arbiter looks around. \"Half-swallowed. The half that remains has stopped pretending it is whole.\"\n[2026-08-27T19:35:41.718Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-27T19:35:41.719Z] [system] \u23f3 Time passed: 8h\n[2026-08-27T19:35:42.179Z] [cognitive] REST  (459ms)\n[2026-08-27T19:35:42.618Z] [debug] ui: tap \"ENTER\"\n",
+      "[2026-08-27T19:35:42.618Z] [world] You step inside forsaken warden hall, into the great hall.\n[2026-08-27T19:35:42.619Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n[2026-08-27T19:35:44.620Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-27T19:35:46.089Z] [world] You salvage the banner. The take is small but real.\n[2026-08-27T19:35:46.090Z] [world] You strip the bench carefully. Something usable comes free in your hand.\n[2026-08-27T19:35:46.090Z] [world] You strip the fire pit carefully. Something usable comes free in your hand.\n[2026-08-27T19:35:46.091Z] [world] You salvage the table. The take is small but real.\n",
+      "[2026-08-27T19:35:46.091Z] [reward] \u2726 Salvage haul:\n[2026-08-27T19:35:46.091Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-27T19:35:46.092Z] [reward]     \u2022 Stick (Common)\n[2026-08-27T19:35:46.092Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-27T19:35:46.092Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-08-27T19:35:48.179Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-27T19:35:52.540Z] [debug] qwen\u23f1 ambient_fill ok 10658ms wait 296ms read 5333ms/write 1127ms in 364t\u2192out 31t 14.7ms/t HIT-CAP (153ch)\n[2026-08-27T19:35:52.825Z] [debug] arbiter: ambient-fill \u2205 11123ms\n[2026-08-27T19:35:52.825Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient_fill after 10658ms \u2014 ambient:fill-\u2205\n[2026-08-27T19:35:53.132Z] [player] investigate the ground\n",
+      "[2026-08-27T19:35:53.133Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-27T19:35:53.136Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Small Rock (Common).\n[2026-08-27T19:35:53.142Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-27T19:35:53.143Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-27T19:35:53.143Z] [system] \u23f3 Time passed: 24 min\n[2026-08-27T19:35:53.314Z] [cognitive] CLIMB  (170ms)\n[2026-08-27T19:35:53.716Z] [debug] persist sizes(KB): total=236 player=75 wm=80[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=3\n",
+      "[2026-08-27T19:35:54.105Z] [debug] ui: tap \"\u2190 Armory\"\n[2026-08-27T19:35:54.107Z] [world] You step into the armory.\n[2026-08-27T19:35:54.108Z] [world] Weapon racks, mostly stripped bare. A whetstone, a barrel of broken hafts, and a weapons chest with a stubborn lock.\n[2026-08-27T19:35:55.523Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-27T19:35:56.811Z] [world] You work the barrel over. A part of it comes loose, intact.\n[2026-08-27T19:35:56.811Z] [world] You strip the chest carefully. Something usable comes free in your hand.\n[2026-08-27T19:35:56.812Z] [world] Tucked inside the rack: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n",
+      "[2026-08-27T19:35:56.812Z] [world] You work the whetstone over. A part of it comes loose, intact.\n[2026-08-27T19:35:56.816Z] [reward] \u2726 Salvage haul:\n[2026-08-27T19:35:56.817Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-27T19:35:56.817Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n[2026-08-27T19:35:56.817Z] [reward]     \u2022 Moth-Eaten Felt Scrap (Common)\n",
+      "[2026-08-27T19:35:56.818Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-08-27T19:35:58.140Z] [debug] ui: tap \"investigate\""
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 15/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtcgc1vw57ml"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "15"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-28T04:28:47.346748Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "27": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 339,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-28T04:28:48.171000Z",
+  "fingerprints": [
+    "be748ce85802371e970795a28e86f05d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "4bcbe6e51f844b44baef638c1f4eafe1",
+  "previousEventID": "10638a1558c94b338f93331a77628e14"
+}

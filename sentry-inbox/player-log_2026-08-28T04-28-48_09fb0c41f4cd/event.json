@@ -1,0 +1,219 @@
+{
+  "id": "09fb0c41f4cd48d595b4bf5b1191c1d7",
+  "groupID": "7697053520",
+  "eventID": "09fb0c41f4cd48d595b4bf5b1191c1d7",
+  "projectID": "4511945117532160",
+  "size": 17596,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 27/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 27/27]",
+  "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 27/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "1a8c2055f9314223bb356f454d4f3720",
+      "span_id": "b211a6ed78bafafd",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ing Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:45.298Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:45.326Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n",
+      "[2026-08-28T04:26:45.354Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:45.382Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n",
+      "[2026-08-28T04:26:45.410Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=Smoldering Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:45.424Z] [reward] \u2726 Crafted Smoldering Paste \u00d719. The Arbiter watches you set the last piece.\n[2026-08-28T04:26:45.498Z] [cognitive] neutral  (603ms)\n[2026-08-28T04:26:45.517Z] [cognitive] neutral  (576ms)\n",
+      "[2026-08-28T04:26:45.529Z] [cognitive] neutral  (558ms)\n[2026-08-28T04:26:45.548Z] [cognitive] neutral  (547ms)\n[2026-08-28T04:26:45.557Z] [cognitive] neutral  (527ms)\n[2026-08-28T04:26:45.567Z] [cognitive] neutral  (508ms)\n[2026-08-28T04:26:45.589Z] [cognitive] neutral  (501ms)\n[2026-08-28T04:26:45.597Z] [cognitive] neutral  (481ms)\n[2026-08-28T04:26:45.612Z] [cognitive] neutral  (467ms)\n",
+      "[2026-08-28T04:26:45.617Z] [cognitive] neutral  (445ms)\n[2026-08-28T04:26:45.634Z] [cognitive] neutral  (433ms)\n[2026-08-28T04:26:45.643Z] [debug] persist sizes(KB): total=228 player=48 wm=94[rooms=43 events=5 memos=0 npcs=5 defeated=0 tags=1 discovered=0] log=82 scene=3\n[2026-08-28T04:26:45.674Z] [cognitive] neutral  (446ms)\n[2026-08-28T04:26:45.687Z] [cognitive] neutral  (430ms)\n",
+      "[2026-08-28T04:26:45.704Z] [cognitive] neutral  (418ms)\n[2026-08-28T04:26:45.722Z] [cognitive] neutral  (409ms)\n[2026-08-28T04:26:45.728Z] [cognitive] neutral  (385ms)\n[2026-08-28T04:26:45.733Z] [cognitive] neutral  (362ms)\n[2026-08-28T04:26:45.736Z] [cognitive] neutral  (339ms)\n[2026-08-28T04:26:45.743Z] [cognitive] neutral  (318ms)\n",
+      "[2026-08-28T04:26:48.312Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=Searing Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:48.324Z] [arbiter] \"Crafting Searing Paste would strip Worn Tartarian Coin \u2192 Scrap Metal from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n",
+      "[2026-08-28T04:26:48.324Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"Crafting Searing Paste would strip Worn Tartarian Coin \u2192 Sc\u2026\"\n[2026-08-28T04:26:48.324Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-28T04:26:48.324Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T04:26:48.352Z] [cognitive] neutral  (26ms)\n",
+      "[2026-08-28T04:26:49.854Z] [player] craft Searing Paste\n[2026-08-28T04:26:49.855Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=Searing Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:49.871Z] [arbiter] The Arbiter nods. \"Stripped for parts: Worn Tartarian Coin \u2192 Scrap Metal.\"\n",
+      "[2026-08-28T04:26:49.872Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Stripped for parts: Worn Tartarian Coin \u2192\u2026\"\n[2026-08-28T04:26:49.885Z] [reward] \u2726 Crafted Searing Paste. The Arbiter watches you set the last piece.\n[2026-08-28T04:26:49.964Z] [cognitive] neutral  (77ms)\n",
+      "[2026-08-28T04:26:52.488Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-08-28T04:26:52.527Z] [debug] parser: intent=craft conf=1.00 verb=craft target=incendiary paste resolved=Incendiary Paste range=- enemies=0 hooks=0\n",
+      "[2026-08-28T04:26:52.559Z] [debug] parser: intent=craft conf=1.00 verb=craft target=incendiary paste resolved=Incendiary Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:52.596Z] [debug] parser: intent=craft conf=1.00 verb=craft target=incendiary paste resolved=Incendiary Paste range=- enemies=0 hooks=0\n[2026-08-28T04:26:52.610Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-08-28T04:26:52.611Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T04:26:52.611Z] [reward] \u2726 Crafted Incendiary Paste \u00d73. The Arbiter watches you set the last piece.\n[2026-08-28T04:26:52.695Z] [cognitive] neutral  (164ms)\n[2026-08-28T04:26:52.710Z] [cognitive] neutral  (129ms)\n[2026-08-28T04:26:52.727Z] [cognitive] neutral  (115ms)\n",
+      "[2026-08-28T04:27:03.699Z] [player] Ask about their people\n[2026-08-28T04:27:03.700Z] [world] \"No name, before you ask twice.\" A very small smile. \"A name is a thing that can be put on a list. I draw the lists. I know what they are for.\"\n[2026-08-28T04:27:03.706Z] [world] There is ink on The Cartographer's knuckle, fresh enough to still be wet at the edge.\n",
+      "[2026-08-28T04:27:04.398Z] [player] Ask why they serve\n[2026-08-28T04:27:04.399Z] [world] The Cartographer gives you a look that measures the question for irony and finds none. \"Because somebody stands at this desk, and the last one who stood here was worse. That is the honest shape of it. You do not serve because the cause is clean \u2014 no cause is clean. You serve because you have seen the desk emp",
+      "ty, and empty is worse.\"\n[2026-08-28T04:27:04.400Z] [world] The Cartographer uses your name in the middle of it without making anything of it.\n[2026-08-28T04:27:05.365Z] [player] Ask what the post has cost them\n",
+      "[2026-08-28T04:27:05.366Z] [world] \"Friends, in the ordinary way \u2014 people hear the title before they hear me now.\" The Cartographer straightens something on the desk. \"But the real price is smaller and dearer: I have not said a careless sentence in nine years. Every word weighed, every joke checked for edges. You are hearing the loosest I get, and you will notice I am still watching the door.\"\n",
+      "[2026-08-28T04:27:05.367Z] [world] The Cartographer keeps a finger in a page the whole time, on the chance that you turn out to be brief.\n[2026-08-28T04:27:14.183Z] [world] You let the conversation go and The Cartographer gets back to it.\n[2026-08-28T04:27:18.517Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-28T04:27:19.162Z] [debug] persist sizes(KB): total=229 player=48 wm=95[rooms=43 events=5 memos=0 npcs=5 defeated=0 tags=1 discovered=0] log=83 scene=3\n[2026-08-28T04:27:24.403Z] [world] You clip Aetheric Scanner into your scanner pouch. It runs whenever you search.\n[2026-08-28T04:27:28.840Z] [world] You rack Sentinel Core Plate on your bandolier. Ready to throw.\n",
+      "[2026-08-28T04:27:30.138Z] [world] You pull Sentinel Core Plate off the bandolier and back into your pack.\n[2026-08-28T04:27:32.907Z] [world] You rack Sentinel Core Plate on your bandolier. Ready to throw.\n[2026-08-28T04:27:35.889Z] [world] You rack Acid Flask on your bandolier. Ready to throw.\n[2026-08-28T04:27:41.492Z] [world] You rack Frost Paste on your bandolier. Ready to throw.\n",
+      "[2026-08-28T04:27:43.760Z] [world] You rack Searing Paste on your bandolier. Ready to throw.\n[2026-08-28T04:27:52.928Z] [world] You clip Pulse Scanner into your scanner pouch. It runs whenever you search.\n[2026-08-28T04:27:55.792Z] [debug] persist sizes(KB): total=230 player=48 wm=96[rooms=43 events=5 memos=0 npcs=5 defeated=0 tags=1 discovered=0] log=83 scene=3\n",
+      "[2026-08-28T04:28:13.611Z] [debug] ui: tap \"take / salvage\"\n[2026-08-28T04:28:15.538Z] [world] The Scrap-Forged Breastplate comes up out of the silt with a small sucking protest.\n[2026-08-28T04:28:15.539Z] [reward] \u2726 Scrap-Forged Breastplate (Common).\n[2026-08-28T04:28:18.787Z] [reward] \u2726 Found Diary Entry \u2014 clean-up mission \u2014 The Black Cloak Confessions. (open Contracts \u2192 Collectibles to read)\n",
+      "[2026-08-28T04:28:18.803Z] [world] You strip the concealed grate carefully. Something usable comes free in your hand.\n[2026-08-28T04:28:18.804Z] [world] You work the core apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-28T04:28:18.804Z] [world] You salvage the half-buried wagon. The take is small but real.\n",
+      "[Filtered]",
+      "[2026-08-28T04:28:18.805Z] [world] You crack the shattered tartarian relay open. A page slides out \u2014 paper somehow dry, ink somehow still legible.\n[2026-08-28T04:28:18.805Z] [world] You break the tablet apart. Among the pieces, something worth keeping.\n[2026-08-28T04:28:18.805Z] [world] You salvage the zharak's teeth spire. The take is small but real.\n",
+      "[2026-08-28T04:28:18.806Z] [world] Already worked over: core housing.\n[2026-08-28T04:28:18.806Z] [reward] \u2726 Salvage haul:\n[2026-08-28T04:28:18.806Z] [reward]     \u2022 Bent Nail x4 (Common)\n[2026-08-28T04:28:18.806Z] [reward]     \u2022 River-Worn Pebble Set (Common)\n[2026-08-28T04:28:18.806Z] [reward]     \u2022 Worn Tartarian Coin x8 (Common)\n",
+      "[2026-08-28T04:28:18.807Z] [reward]     \u2022 Clouded Lens Blank (Common)\n[2026-08-28T04:28:18.807Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-08-28T04:28:18.807Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-28T04:28:24.863Z] [debug] ui: tap \"investigate\"\n[2026-08-28T04:28:26.980Z] [player] investigate the ground\n",
+      "[2026-08-28T04:28:26.981Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-28T04:28:26.983Z] [world] You scrape at the silt with the aetheric crystal blade. Nothing of worth.\n[2026-08-28T04:28:26.989Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-28T04:28:26.989Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-08-28T04:28:27.242Z] [cognitive] CLIMB  (252ms)\n[2026-08-28T04:28:44.399Z] [debug] persist sizes(KB): total=232 player=49 wm=96[rooms=44 events=5 memos=0 npcs=5 defeated=0 tags=1 discovered=0] log=83 scene=3\n\n=== END LOG \u00b7 399975 CHARS ===\n\nTartaria Realms\n\nDevice\n",
+      "  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-08-28T04:28:48.034Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-08-28-1530-the-stranger-gets-the-screen)\n",
+      "  Boot stage: qwen:skipped\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-08-28T04:21:41.454Z\n  Last init success: 2026-08-28T04:21:42.076Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: auto-disabled after 1 completion crashes (template narration in use; auto-retry in 1 boot)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n",
+      "  Status: none recorded\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-27T00:34:40.392Z (1674m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1514-the-portrait-scrolls-again \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"inventory\"\n      doing: tap \"inventory\" \u00b7 room outpost_gate \u00b7 screen exploration\n      last checkpoint: rendered (+72700ms)\n",
+      "  \u2022 2026-08-27T01:03:31.295Z (1645m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1515-the-log-goes-in-parts \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+60639ms)\n  \u2022 2026-08-27T01:34:40.055Z (1614m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1516-the-quiet-path-sends-the-same-way \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+727ms)\n  \u2022 2026-08-27T02:03:02.202Z (1586m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1518-the-beacon-goes-first \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+92048ms)\n  \u2022 2026-08-27T02:32:27.198Z (1556m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1519-the-attachment-was-the-fault \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+23274ms)\n  \u2022 2026-08-27T03:03:20.074Z (1525m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: rendered (+20786ms)\n  \u2022 2026-08-27T12:37:15.724Z (952m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1522-the-stun-does-not-outlive-itself \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+0ms)\n",
+      "  \u2022 2026-08-27T16:21:51.524Z (727m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1524-cover-the-seven-and-mean-the-switch \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+12474ms)\n  \u2022 2026-08-27T21:42:59.314Z (406m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"missions\"\n      doing: tap \"missions\" \u00b7 room outpost_central \u00b7 screen exploration\n      last checkpoint: rendered (+23163ms)\n  \u2022 2026-08-28T02:29:33.897Z (119m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n      Process died with no orderly exit while: action \"investigate weathered ruined skyscraper\"\n      doing: action \"investigate weathered ruined skyscraper\" \u00b7 room monarch_waystation \u00b7 screen exploration\n      last checkpoint: rendered (+79547ms)\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\n",
+      "Runtime pressure\n  Memory warnings: none this session\n  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  Native queue: worst wait 0.0s \u00b7 0 job kinds queued >3s \u00b7 worst 0.0ms/prompt-token\n  App state trail: (none recorded)\nModel contexts\n  Live now: 0\n  Opened: 0 \u00b7 Released: 0 \u00b7 Peak live: 0\n  Narration engine: idle\n"
+    ],
+    "chunkChars": 14945
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 27/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtcgc1vw57ml"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "27"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-28T04:28:47.460682Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "23": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 373,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-28T04:28:48.172000Z",
+  "fingerprints": [
+    "be748ce85802371e970795a28e86f05d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "0c79ffc55bf24dda84d8d5ee88a3a531",
+  "previousEventID": "fffc9fd2211d406aafd0a740bed18575"
+}
