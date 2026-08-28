@@ -10168,7 +10168,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (consumedHere.size > 0) {
         const roomRec = get().worldMemory.visitedRooms?.[candidateKey];
         const clearedSeq = roomRec?.clearedAtMacroSeq;
-        if (typeof clearedSeq === 'number' && macroVisitSeq > clearedSeq) {
+        const clearedHour = roomRec?.clearedAtHour;
+        // ⚠⚠⚠ OTA-1529 — A ROUND TRIP IS NOT A UNIT OF TIME. The owner:
+        // *"a tile still regenerates loot when in an auto course."*
+        //
+        // arb105 restocked on a 48h in-game timer. Red-team broke it: `rest`
+        // buys hours for free, so consume → rest → restock, standing still.
+        // arb107 replaced the timer with "travel to a DIFFERENT named location
+        // and come back", which `rest` cannot fake — and that half is right and
+        // stays. What it lost is that a round trip stopped being expensive. An
+        // AUTO-COURSE is a named-location-changing machine: the owner's 5-tile
+        // run to Iskan-Veil crosses named ground repeatedly, so the counter
+        // advances every few taps and the world restocks at travel speed. His
+        // log has the restock line firing 21 seconds into a session.
+        //
+        // So BOTH, not either: the round trip proves you actually left (rest
+        // can't), and the hours prove enough of the world turned over to justify
+        // fresh supplies (a course can't). Neither alone is a restock.
+        //
+        // ⚠ SAVES WRITTEN BEFORE 1529 carry no hour stamp. They restock on the
+        // round trip alone, exactly as they always did — a missing stamp must
+        // not freeze a room's loot forever for someone mid-playthrough.
+        const roundTripped = typeof clearedSeq === 'number' && macroVisitSeq > clearedSeq;
+        const hoursTurned = typeof clearedHour !== 'number'
+          || (player.hoursElapsed ?? 0) - clearedHour >= ROOM_RESTOCK_MIN_HOURS;
+        if (roundTripped && hoursTurned) {
           // The player left to another named location and came back —
           // restock the whole room and clear the stamp so the next consume
           // starts a fresh round-trip clock. Don't filter this scene.
@@ -10186,6 +10210,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     flavorExhaustedNouns: [],
                     dogSmelledHere: false,
                     clearedAtMacroSeq: undefined,
+                    clearedAtHour: undefined, // OTA-1529 — a fresh round-trip clock needs a fresh hour clock
                   },
                 },
               },
@@ -10209,7 +10234,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   ...s.worldMemory,
                   visitedRooms: {
                     ...s.worldMemory.visitedRooms,
-                    [candidateKey]: { ...prev, clearedAtMacroSeq: macroVisitSeq },
+                    [candidateKey]: { ...prev, clearedAtMacroSeq: macroVisitSeq, clearedAtHour: player.hoursElapsed ?? 0 }, // OTA-1529
                   },
                 },
               };
@@ -35206,6 +35231,22 @@ function tryDogCallVerb(
  *  before it bleeds out and dies for real. Matches the "24h recovery
  *  window" the OTA-120 DogCompanion doc already referenced: heal it
  *  (feed / first-aid / rest) inside a day, or lose it. */
+/** ⚠⚠⚠ OTA-1529 — HOW MUCH OF THE WORLD HAS TO TURN OVER BEFORE A ROOM RESTOCKS.
+ *
+ *  48 in-game hours, which is arb105's original number restored rather than a
+ *  fresh guess. arb105 chose it, arb107 deleted it because `rest` could buy the
+ *  hours for free, and the round-trip rule that replaced it has no sense of time
+ *  at all. Both halves now apply together, so the number can go back to what it
+ *  was: `rest` still cannot fake a round trip, and a round trip can no longer
+ *  fake two days.
+ *
+ *  Sized against the owner's own travel. His course to Iskan-Veil is 5 tiles and
+ *  about 13 hours; a there-and-back is ~26. So crossing named ground mid-course —
+ *  even twice — no longer restocks anything, while a genuine expedition that
+ *  spans a couple of days comes home to a world that has moved on. That is the
+ *  renewable world arb105 wanted, without the in/out farm arb107 killed. */
+export const ROOM_RESTOCK_MIN_HOURS = 48;
+
 export const DOG_BLEED_OUT_HOURS = 24;
 
 /** Poplar Anvil — per-action reconciliation of the dog's time-based fates.

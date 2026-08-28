@@ -25201,7 +25201,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //      bought nothing for the one thing Wisdom is advertised to do on this screen.
 // One error class: a key that is not the thing it names — a label standing in for
 // an identity, a base stat standing in for the number the player is shown.
-export const OTA_BUILD_ID = '2026-08-27-1528-the-name-was-not-the-identity';
+// ⚠⚠⚠ OTA-1529 — A ROUND TRIP IS NOT A UNIT OF TIME. The owner: "a tile still
+// regenerates loot when in an auto course." beginScene wipes a room's take /
+// salvage / scanner memory when `macroVisitSeq > clearedAtMacroSeq` — "you left
+// to another named location and came back" — and nothing else. An auto-course is
+// a named-location-changing machine: his 5-tile run to Iskan-Veil crosses named
+// ground repeatedly, so the counter advances every few taps and the world
+// restocks at travel speed. His log shows the restock line 21 seconds into a
+// session. The history matters, because the obvious fix is the one already
+// reverted: arb105 used a 48h timer, red-team broke it (`rest` buys hours
+// standing still), arb107 replaced it with the round trip and deleted the hours.
+// So BOTH now apply — the round trip proves you left (rest cannot), the hours
+// prove the world turned over (a course cannot) — and the number goes back to
+// arb105's own 48. Saves written before 1529 carry no hour stamp and restock on
+// the round trip alone, so nobody's loot freezes mid-playthrough. Also retires a
+// dangling arb107 comment in types.ts that had spent hundreds of OTAs describing
+// a field and a constant it had itself deleted.
+export const OTA_BUILD_ID = '2026-08-28-1529-a-round-trip-is-not-a-unit-of-time';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1528-the-name-was-not-the-identity';
 // golem catch-up 2026-08-27: markerless publish of OTA-1528 (enemy intel keyed on
 // the defence profile instead of the reused display name, so strike-to-learn stops
 // describing one raider with a previous raider's weakness; and the Wisdom gate reads

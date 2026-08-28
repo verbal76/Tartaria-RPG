@@ -2445,12 +2445,14 @@ export interface VisitedRoom {
    *  passed. Wall-clock fallback (lastVisitAt) remains for legacy
    *  saves that don't carry this field. */
   hoursElapsedAtVisit?: number;
-  /** arb105 — in-game hour at which this room's loot/interactables were
-   *  most recently consumed (take/salvage). Used ONLY for hub/outpost
-   *  rooms: once `searchedAmbientNouns` has entries, the chips stay gone
-   *  until HUB_LOOT_RESPAWN_HOURS have elapsed since this stamp, then
-   *  beginScene clears the consumed set so the room's loot respawns. Wild
-   *  tiles ignore this field (their re-roll is handled separately). Lazily
+  /** ⚠⚠ OTA-1529 — THE IN-GAME HOUR THIS ROOM'S LOOT WAS CLEARED, stamped
+   *  beside `clearedAtMacroSeq` and read with it. A restock now needs BOTH a
+   *  real round-trip AND real elapsed time; see the constant's own note in
+   *  gameStore for why one without the other restocks the world at travel
+   *  speed. Absent on saves written before 1529 — those restock on the
+   *  round-trip alone, exactly as they did, rather than being frozen by a
+   *  stamp they never got. */
+  clearedAtHour?: number;
   /** arb105/arb107 — outpost loot restock marker. Originally an in-game
    *  hour stamp (arb105); arb107 changed the restock trigger from a raw
    *  48h timer (which `rest` could skip for free) to "the player traveled
