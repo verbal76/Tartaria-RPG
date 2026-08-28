@@ -1,28 +1,33 @@
-sync 2026-08-27 — the first log from a device running OTA-1526.
+sync 2026-08-28 — a log pushed after OTA-1528, and the first real crash forensic.
 
-OTA-1526 took the survivor breadcrumb read out of its race with the boot's own
-phase stamps. 21 of the 22 native-death records in the corpus were the ledger
-filing this session's handwriting as last session's corpse; exactly one was real.
+The 21:42:59 record on build 1528 is the first native-death in the corpus that
+names an action (`tap "missions"` · outpost_central · exploration) instead of the
+pre-1526 fabrication shape (`(no action yet) · room ? · screen ?`). That is the
+predicted post-fix signature. This pull is to widen the sample.
 
-Four reads, in order:
+Five reads, in order:
 
-1. THE #81 VERDICT. Any NEW `PROCESS KILLED — no JS ran` record dated within a
-   few seconds of a session boot marker means the fix did not take. Zero such
-   records is the close. The 22 pre-existing records stay in the ledger — 1526
-   stops new ones, it does not prune the file — so compare by DATE, not count.
+1. #81. Every death record on a 1526+ build must NAME AN ACTION and must not be
+   dated within seconds of its own session header. A boot-adjacent
+   `(no action yet) · room ? · screen ?` record on 1526+ means the survivor
+   snapshot did not take.
 
-2. Any death record that DOES appear should name an action: `action "…"` or
-   `tap "…"` with a real room. `(no action yet) · room ? · screen ?` on a
-   boot-adjacent record was the fabrication signature.
+2. THE 21:42:59 RECORD ITSELF. It says the process died 23.2s after a "missions"
+   tap while the exploration screen was live. That is a real freeze with real
+   forensics — the first one. Look for what preceded it: what the missions tap
+   loaded, whether Qwen or the voice engine moved, whether memory warnings fired.
 
-3. OTA-1521 CONFIRMATION, still owed. An OTA apply performed while the device
-   was ALREADY on 1521 or later — the 1522 apply ran under 1520's code, so it
-   proved nothing. Look for `ota: Restarting to apply` with no death record
-   following it.
+3. LOOT RESTOCK (OTA-1529's evidence). `The outpost has restocked` /
+   `Time and the wasteland have worked this place over` — count them and note how
+   much in-game time and how many location changes separate each from the visit
+   it reverses. The restock clock counts location changes, not hours, so an
+   auto-course restocks the world at travel speed.
 
-4. OTA-1522 CONFIRMATION, still owed. A fight containing a stun, which must
-   expire on its own tick rather than outliving itself. The last log after the
-   apply had zero stun events, so this is still unmeasured.
+4. WANDERERS (OTA-1530's evidence). Any `This is <name>, a <role>` arrival line —
+   how many world lines land in the same millisecond after it, which is why the
+   introduction reads as missing. Also any `talk to <name>` and what it yielded.
+
+5. Scrub cost per bundle: should hold near 0.8% on 1520+ blocks.
 
 And the standing two: an explicit TRAVEL verdict and an explicit COMBAT verdict,
 counting routed movement (`ui: tap "→ DESTINATION"` → `You push west`) as travel,
