@@ -25274,6 +25274,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //    the feed, or never mounted are three bugs with three fixes and the source
 //    distinguishes none — so this ships the three numbers that do.
 export const OTA_BUILD_ID = '2026-08-28-1532-the-journeys-of-cheddar-bob';
+// golem catch-up 2026-08-28: markerless publish of OTA-1532 (a Nix lead is now
+// paid in distance on a tile step instead of inside beginScene, which a cardinal
+// step never calls; the mud patch gains a Common-only floor and a per-patch cap;
+// a first wrong gift is refused without docking standing; and the text bar
+// records which fallback rung supplied its position) to the golem channel. Both
+// channels level at 1532.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-28-1531-the-escape-hatch-waits-for-the-room';
 // golem catch-up 2026-08-28: markerless publish of OTA-1531 (the SKIP TUTORIAL
 // pill no longer renders while the opening crawl, chapter card, motive picker or
