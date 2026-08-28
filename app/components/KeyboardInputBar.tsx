@@ -61,6 +61,8 @@ import { keyboardPollAction } from '../engine/keyboardPoll';
 // back to this cached value (then a screen-fraction estimate) so the bar always
 // sits just above the keyboard even when the event never arrives.
 let lastKeyboardHeight = 0;
+// OTA-1535 — dedup key so the instrument writes once per distinct state, not per render.
+let bottomLoggedFor = '';
 
 export function KeyboardInputBar() {
   const screen = useGameStore((s) => s.currentScreen);
@@ -270,6 +272,38 @@ export function KeyboardInputBar() {
     : lastKeyboardHeight > 0
       ? lastKeyboardHeight
       : Math.round(Dimensions.get('window').height * 0.36);
+
+  // ⚠⚠⚠ OTA-1535 — AN INSTRUMENT, NOT A FIX, AND DELIBERATELY SO.
+  //
+  // The owner: *"when you type take rope, the text bar was buried again, this is a
+  // huge immersion breaker and confusing"* — and, asked when: *"every time I am in
+  // the tutorial at the take rope part, and only rarely in game."*
+  //
+  // OTA-1075 is the SAME BEAT reported before ("the text bar didn't pop up with
+  // the keyboard, i had to back up and hit it again") and its fix — an explicit
+  // focus() on press-in — addressed focus not landing. This is a different
+  // symptom: the bar exists and is covered. Reading this file cannot settle why.
+  // The offset chain has three fallbacks and looks sound; whether the bar is
+  // under the keyboard, under the feed, or never mounted at all are three
+  // different bugs with three different fixes, and the source distinguishes none
+  // of them.
+  //
+  // So rather than ship a guess at the beat the owner called a huge immersion
+  // breaker, this records the three numbers that DO distinguish them — which
+  // fallback rung supplied the offset, what the window height was, and which
+  // tutorial beat was live — into the log he already sends. One line per mount,
+  // no behaviour change. His next log answers it.
+  const beatForLog = useGameStore.getState().tutorialStep;
+  const rung = keyboardOffset > 0 ? 'live' : lastKeyboardHeight > 0 ? 'cached' : 'estimate';
+  if (bottomLoggedFor !== `${rung}:${bottom}:${beatForLog}`) {
+    bottomLoggedFor = `${rung}:${bottom}:${beatForLog}`;
+    try {
+      useGameStore.getState().appendLog(
+        'debug',
+        `kbbar: mounted bottom=${bottom} from=${rung} winH=${Math.round(Dimensions.get('window').height)} beat=${beatForLog ?? '-'}`,
+      );
+    } catch { /* an instrument may never break the bar it measures */ }
+  }
 
   const retract = () => {
     // ⚠ OTA-1270 — retract no longer WIPES the draft. Closing the keyboard

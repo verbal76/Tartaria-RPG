@@ -242,9 +242,23 @@ export function resolveGift(
     // ⚠ REFUSED, not accepted-and-ignored. If a worthless gift were taken, a
     // player could empty a pack of junk into somebody and the only cost would be
     // taps. Refusing keeps the item AND makes the insult legible.
+    //
+    // ⚠⚠⚠ OTA-1534 — AND A FIRST OFFER COSTS NO STANDING. The owner, after Irma
+    // took −2 for a Salvage Cap: *"I don't think that should give negative
+    // standing since you need to guess at first what they are in to and like."*
+    // He is right, and the comment above already contains the reason: the
+    // REFUSAL is the anti-junk-dump mechanism — the item is not taken, so
+    // nothing is gained by trying. The standing hit was a second punishment
+    // stacked on top of it, charged to a player who had no way to know. Tastes
+    // are authored per person and discoverable only by offering.
+    //
+    // ⚠ A REPEAT still costs. Being told "no" and handing over the same thing
+    // again is not a guess, it is a point being made — and that is exactly the
+    // junk-dumping the refusal exists to discourage, so it keeps its price.
+    const offeredBefore = timesGiven(rel, item.name) > 0;
     return {
       reaction, countsAsBoon: false, refused: true, remember: false,
-      standingDelta: -STANDING_INSULT,
+      standingDelta: offeredBefore ? -STANDING_INSULT : 0,
       line: say(p.insultLine, `${npcName} looks at the {item}, then at you. "No. Keep it."`),
     };
   }

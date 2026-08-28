@@ -109,17 +109,25 @@ describe('OTA-1273 — the give is written down before the reply', () => {
     expect(replyIdx).toBeGreaterThan(giveIdx);   // cause before effect
   });
 
-  it('⚠⚠ the refusal really is the tastes system: item kept, standing docked', async () => {
+  it('⚠⚠ the refusal really is the tastes system: the item is KEPT', async () => {
     await freshPlayerWithLocket();
     const from = useGameStore.getState().gameLog.length;
     useGameStore.getState().giveGift('zz_locket');
     const p = useGameStore.getState().player!;
     // Refused — the locket stays in the pack (junk-dumping is not free taps).
     expect(p.inventory.some((i: { id: string }) => i.id === 'zz_locket')).toBe(true);
-    // And the dock is SAID, exactly as the device log showed it.
+    // ⚠⚠⚠ OTA-1534 — AND NO STANDING IS DOCKED ON A FIRST OFFER. This test used
+    // to require `Standing -N` in the feed, and that requirement was the bug the
+    // owner reported: *"I don't think that should give negative standing since
+    // you need to guess at first what they are in to and like."* Tastes are
+    // authored per person and discoverable only by offering, so the first try is
+    // the guess the game asked for. The claim this test is FOR — that the refusal
+    // is real, not a quiet acceptance — lives in the inventory check above, which
+    // is the half that actually stops junk-dumping. A repeat offer still docks;
+    // ota1060Gifting holds that half.
     const feed = useGameStore.getState().gameLog.slice(from)
       .map((e: LogRow) => String(e.text)).join(' | ');
-    expect(feed).toMatch(/Standing -\d/);
+    expect(feed).not.toMatch(/Standing -\d/);
   });
 
   it('⚠ a BLOCKED give logs the player line too — the refusal has a visible cause', async () => {

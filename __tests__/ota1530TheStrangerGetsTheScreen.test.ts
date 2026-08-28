@@ -145,8 +145,12 @@ describe('OTA-1530 — a persuade can shake a whisper loose', () => {
   it('⚠⚠ it is stacked ON TOP of the lead, not swapped for it', () => {
     // The lead payout must still run on the same branch — a persuade that rolls
     // the whisper is a good day, not a coin-flip between two prizes.
+    // ⚠ OTA-1532 gave the lead a DISTANCE (`stepsLeft`), so the grant line is no
+    // longer `pendingLead: lead`. The claim is unchanged and still pinned: the
+    // lead is written on this branch BEFORE the whisper roll, so a persuade that
+    // rolls the whisper gets both rather than choosing between them.
     const code = codeOnly(STORE);
-    const leadAt = code.indexOf("player: lead ? { ...p, pendingLead: lead } : p,");
+    const leadAt = code.indexOf('player: lead ? { ...p, pendingLead: { ...lead, stepsLeft: LEAD_STEPS_TO_CACHE } } : p,');
     const rollAt = code.indexOf('if (Math.random() < WANDERER_WHISPER_CHANCE) {');
     expect(leadAt).toBeGreaterThan(-1);
     expect(leadAt).toBeLessThan(rollAt);

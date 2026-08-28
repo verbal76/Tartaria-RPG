@@ -25250,7 +25250,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // layering — an escape hatch from a lockdown the player has not been put in yet
 // has nothing to escape, and is not rendered. arb108's contract is otherwise
 // untouched: same lock beats, same disappearance on SKIP or the stay/leave choice.
-export const OTA_BUILD_ID = '2026-08-28-1531-the-escape-hatch-waits-for-the-room';
+// ⚠⚠⚠ OTA-1532 — THE JOURNEYS OF CHEDDAR BOB. Four defects from one
+// new-character log, three of them typed into the game as the owner hit them.
+//  (1532) THE LEAD FROM NIX NEVER PAID. Persuaded Nix, walked west onto fresh
+//    ground, got nothing. The payout lived in beginScene, and OTA-1301 states the
+//    reason in writing: "A cardinal step inside a location does not rebuild the
+//    scene." The one journey the lead's own copy describes was the one journey
+//    that could not pay it. His redesign is better than a re-wire — "the payout
+//    should be from a tile move, like we need to make some distance to keep them
+//    safe" — so a lead now costs DISTANCE, counted where distance happens.
+//  (1533) THE MUD WAS A FOUNTAIN. "how many times can I investigate this mud" —
+//    the answer was forever. The picked-clean guard exempts consumable/misc, and
+//    every dig result is one of those, so it never applied to anything: twelve
+//    scrapes in ninety seconds on one patch, ending on a Rare. The exemption is
+//    kept but gains a floor — Common only, and a per-patch cap.
+//  (1534) A GUESS COST STANDING. Irma took -2 for a Salvage Cap. The refusal
+//    comment already held the answer: the REFUSAL is the anti-junk-dump
+//    mechanism, because the item is not taken. The standing hit was a second
+//    punishment on a player with no way to know. A repeat offer still costs.
+//  (1535) THE TEXT BAR IS INSTRUMENTED, NOT GUESSED AT. "every time at the take
+//    rope part." OTA-1075 is the same beat reported before and its fix addressed
+//    focus not landing; this is the bar being COVERED. Under the keyboard, under
+//    the feed, or never mounted are three bugs with three fixes and the source
+//    distinguishes none — so this ships the three numbers that do.
+export const OTA_BUILD_ID = '2026-08-28-1532-the-journeys-of-cheddar-bob';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-28-1531-the-escape-hatch-waits-for-the-room';
 // golem catch-up 2026-08-28: markerless publish of OTA-1531 (the SKIP TUTORIAL
 // pill no longer renders while the opening crawl, chapter card, motive picker or
 // dedication card are still ahead of a new character) to the golem channel. Both

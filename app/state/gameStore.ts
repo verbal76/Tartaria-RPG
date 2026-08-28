@@ -10611,30 +10611,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('world', `${scene.wanderer.greeting} This is ${scene.wanderer.name}, ${scene.wanderer.role}. (Try "talk to ${scene.wanderer.name}" — a fair word carries.)`);
       }
     }
-    // OTA-809 — pay out a pending LEAD (talked out of a wanderer via PERSUADE) once
-    // the player reaches fresh, peaceful ground: they followed the lead and found the
-    // cache. Grants the reward + clears the lead. Gated to peaceful non-hub arrivals
-    // so it reads as "you traveled and dug it up."
-    {
-      const leadPlayer = get().player;
-      const lead = leadPlayer?.pendingLead ?? null;
-      if (lead && !opts?.isOpening && !hasEnemies && !hubRoom && !isNeutralMarket) {
-        const gainItem = lead.rewardItem ? miscLootItem(lead.rewardItem, 1) : null;
-        set((s) => {
-          if (!s.player) return s;
-          let p = { ...s.player, tc: s.player.tc + lead.rewardTc, pendingLead: null };
-          if (gainItem) {
-            const res = grantItem(p.inventory, gainItem);
-            p = { ...p, inventory: res.inventory };
-          }
-          return { player: p };
-        });
-        get().appendLog(
-          'reward',
-          `Following the lead — ${lead.hint} — you turn up the cache: ${lead.rewardTc} TC${gainItem ? ` + ${gainItem.name}` : ''}.`,
-        );
-      }
-    }
+    // ⚠⚠⚠ OTA-1532 — THE LEAD PAYOUT MOVED TO THE TILE STEP. It used to live here,
+    // inside beginScene, and could therefore never fire on the one journey its own
+    // copy describes. OTA-1301 states the reason in writing: *"A cardinal step
+    // inside a location does not rebuild the scene."* So walking west onto fresh
+    // ground — exactly what "you'll turn it up when you next cross fresh ground"
+    // asks for — ran no beginScene, and the lead sat unpaid. The owner watched it
+    // happen: persuaded Nix at 22:30:16, walked west at 22:31:08, nothing, and
+    // then had to ask the Arbiter where his reward had gone.
+    //
+    // ⚠ AND HIS FIX IS BETTER THAN A RE-WIRE: *"like we need to make some distance
+    // to keep them safe."* A lead now costs DISTANCE — a few tile steps, counted
+    // down where the steps actually happen. See the payout in the cardinal-step
+    // handler and LEAD_STEPS_TO_CACHE.
     // arb120 — occasional Arbiter nudge inviting a deeper question (replaces the
     // dropped "ask arbiter" button with an organic prompt). Peaceful outdoor
     // scenes only, rare, and never piled on a vendor / board / building moment.
@@ -26887,6 +26876,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (liveSceneForEncounter && liveSceneForEncounter.enemies.length === 0 && !stepUnderExitGrace) {
       const wasteSteps = (get().wastelandStepsSinceEncounter ?? 0) + 1;
       set(() => ({ wastelandStepsSinceEncounter: wasteSteps }));
+      // ⚠⚠⚠ OTA-1532 — A LEAD IS PAID IN DISTANCE, AND THIS IS WHERE DISTANCE
+      // HAPPENS. Each overland tile step walks the lead one closer; at zero the
+      // cache turns up. A lead written before 1532 has no `stepsLeft` and pays on
+      // the first step — a missing field must not strand a reward already earned.
+      {
+        const lp = get().player;
+        const lead = lp?.pendingLead ?? null;
+        if (lead && lp) {
+          const left = (typeof lead.stepsLeft === 'number' ? lead.stepsLeft : 1) - 1;
+          if (left > 0) {
+            set((st) => (st.player?.pendingLead
+              ? { player: { ...st.player, pendingLead: { ...st.player.pendingLead, stepsLeft: left } } }
+              : {}));
+          } else {
+            const gainItem = lead.rewardItem ? miscLootItem(lead.rewardItem, 1) : null;
+            set((st) => {
+              if (!st.player) return st;
+              let np = { ...st.player, tc: st.player.tc + lead.rewardTc, pendingLead: null };
+              if (gainItem) np = { ...np, inventory: grantItem(np.inventory, gainItem).inventory };
+              return { player: np };
+            });
+            get().appendLog(
+              'reward',
+              `Following the lead — ${lead.hint} — you turn up the cache: ${lead.rewardTc} TC${gainItem ? ` + ${gainItem.name}` : ''}.`,
+            );
+          }
+        }
+      }
       // OTA-218 — also track peaceful travel for the combat-starvation
       // bias. Incremented here per cardinal step; reset to 0 below
       // when an enemy actually spawns.
@@ -27743,7 +27760,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Stackable consumables/misc are exempt — those can plausibly be
     // re-found because they're commodities, not bespoke drops.
     const dugCat = lookupCraftedItem(found.name);
-    const isStackableCommodity = dugCat.kind === 'consumable' || dugCat.kind === 'misc';
+    // ⚠⚠⚠ OTA-1533 — THE COMMODITY EXEMPTION HAD NO FLOOR, SO THE MUD WAS A
+    // FOUNTAIN. The owner, in-game: *"how many times can I investigate this mud"*.
+    // The honest answer was FOREVER. `roomLootAlreadyGrabbed` below skips the
+    // picked-clean guard for anything `consumable` or `misc` — reasonable on its
+    // face ("commodities can plausibly be re-found") — but EVERY dig result is one
+    // of those two kinds. His log: twelve scrapes in ninety seconds on one tile,
+    // Small Rock, Firewood, Big Rock, Mud Fragment, Stick, Aetheric Shard, and on
+    // the twelfth a MUDSTONE (Rare). The guard never applied once, to anything.
+    //
+    // ⚠ The exemption itself is kept — being able to dig a second Small Rock out
+    // of a mud-flat is right, and deleting that would make the world feel sealed.
+    // What it lacked was a FLOOR: rarity, and a cap on how many times one patch
+    // will give at all. An Uncommon or better is a find, not a commodity, so it
+    // falls back under the picked-clean guard; and a patch that has already given
+    // MUD_DIG_YIELDS_PER_PATCH times is worked out regardless of what comes up.
+    const isCommodityRarity = found.rarity === 'Common';
+    const isStackableCommodity = (dugCat.kind === 'consumable' || dugCat.kind === 'misc')
+      && isCommodityRarity
+      && roomDigYieldCount(get().worldMemory, makeRoomKey(player.currentLocationId, scene?.microMicroId, player.mapX, player.mapY, player.hubRoomId)) < MUD_DIG_YIELDS_PER_PATCH;
     const dugRoomKey = makeRoomKey(player.currentLocationId, scene?.microMicroId, player.mapX, player.mapY, player.hubRoomId);
     if (!isStackableCommodity && roomLootAlreadyGrabbed(get().worldMemory, dugRoomKey, found.name)) {
       get().appendLog(
@@ -27785,6 +27820,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // when at least one unit actually landed.
     if (!isStackableCommodity && grantResult.accepted > 0) {
       set((s) => recordRoomLootGrabbed(s, dugRoomKey, found.name));
+      // OTA-1533 — and the patch spends one of its yields, whatever came up.
+      set((s) => {
+        const prev = s.worldMemory.visitedRooms?.[dugRoomKey];
+        if (!prev) return {};
+        return {
+          worldMemory: {
+            ...s.worldMemory,
+            visitedRooms: {
+              ...s.worldMemory.visitedRooms,
+              [dugRoomKey]: { ...prev, digYields: (prev.digYields ?? 0) + 1 },
+            },
+          },
+        };
+      });
     }
     // arb119 — count every productive dig (stackable OR unique) against
     // this spot so the worked-out cap above can fire. Only successful
@@ -31638,6 +31687,14 @@ function advanceStoryDrip(
 // on re-entry. Item names are compared lowercased; consumables and
 // commodities are intentionally permitted to re-roll (handled by the
 // caller via a "stackable" flag).
+/** OTA-1533 — how many dig yields this patch has already given. */
+function roomDigYieldCount(
+  worldMemory: { visitedRooms?: Record<string, VisitedRoom> },
+  roomKey: string,
+): number {
+  return worldMemory.visitedRooms?.[roomKey]?.digYields ?? 0;
+}
+
 function roomLootAlreadyGrabbed(
   worldMemory: { visitedRooms?: Record<string, VisitedRoom> },
   roomKey: string,
@@ -34937,7 +34994,8 @@ function runParleyOutcome(
         if (!s.player || !s.currentScene) return s;
         const p = advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25);
         return {
-          player: lead ? { ...p, pendingLead: lead } : p,
+          // OTA-1532 — the lead is stamped with the distance it owes.
+          player: lead ? { ...p, pendingLead: { ...lead, stepsLeft: LEAD_STEPS_TO_CACHE } } : p,
           currentScene: { ...s.currentScene, wanderer: null },
         };
       });
@@ -35282,6 +35340,22 @@ function tryDogCallVerb(
  *  spans a couple of days comes home to a world that has moved on. That is the
  *  renewable world arb105 wanted, without the in/out farm arb107 killed. */
 export const ROOM_RESTOCK_MIN_HOURS = 48;
+
+/** ⚠⚠ OTA-1532 — HOW FAR A LEAD IS WORTH. The owner's framing: *"like we need to
+ *  make some distance to keep them safe."* Three overland tile steps — far enough
+ *  that the cache reads as somewhere you WENT rather than something that fell out
+ *  of the conversation, close enough that it pays inside the same session. It is
+ *  counted in tile steps, not hours or locations, because a step is the unit the
+ *  player is actually spending. */
+/** ⚠⚠ OTA-1533 — HOW MANY TIMES ONE PATCH WILL GIVE. Six. The owner pulled twelve
+ *  yields out of a single mud patch in ninety seconds, ending on a Rare. Six keeps
+ *  a mud-flat worth scraping when you are short of Aether Dust — which is the
+ *  point of the verb — while making "stand here and tap" stop being a strategy.
+ *  Rarity is the other half of the floor: an Uncommon or better is a find, not a
+ *  commodity, and falls back under the picked-clean guard on its own. */
+export const MUD_DIG_YIELDS_PER_PATCH = 6;
+
+export const LEAD_STEPS_TO_CACHE = 3;
 
 export const DOG_BLEED_OUT_HOURS = 24;
 

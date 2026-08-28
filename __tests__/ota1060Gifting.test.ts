@@ -112,12 +112,30 @@ describe('OTA-1060 — the door OTA-803 closed stays closed', () => {
   it('TRASH-FLOOD: a worthless gift is REFUSED, not quietly accepted', () => {
     // If junk were accepted, a player could empty a pack into somebody at a
     // cost of taps only. Refusing keeps the item and makes the insult legible.
+    //
+    // ⚠⚠ OTA-1534 — AND THE REFUSAL IS THE WHOLE DETERRENT, which is why the
+    // standing dock left the FIRST offer. The owner, after Irma docked him 2 for
+    // a Salvage Cap: *"I don't think that should give negative standing since you
+    // need to guess at first what they are in to and like."* Tastes are authored
+    // per person and discoverable only by offering, so the first try is a guess
+    // the game asked for. The anti-trash-flood claim this test exists to hold is
+    // untouched: the item is REFUSED, so nothing is gained by emptying a pack.
     const out = resolveGift('irma_ironhand', 'Irma', nail, rel());
     expect(out.reaction).toBe('insulted');
     expect(out.refused).toBe(true);
     expect(out.countsAsBoon).toBe(false);
-    expect(out.standingDelta).toBe(-STANDING_INSULT);
+    expect(out.standingDelta).toBe(0);
     expect(out.remember).toBe(false);
+  });
+
+  it('⚠⚠ OTA-1534 — but the SAME junk offered a second time still costs standing', () => {
+    // Being told "no" and handing over the identical thing again is not a guess,
+    // it is a point being made — and that IS the trash-flood this suite guards.
+    const repeat = rel({ gifts: [{ name: nail.name, at: 1, hours: 0 }] } as never);
+    const out = resolveGift('irma_ironhand', 'Irma', nail, repeat);
+    expect(out.reaction).toBe('insulted');
+    expect(out.refused).toBe(true);
+    expect(out.standingDelta).toBe(-STANDING_INSULT);
   });
 
   it('the insult floor is low enough not to gate the feature behind wealth', () => {

@@ -1248,7 +1248,13 @@ export interface PlayerCharacter {
    *  out the next time the player reaches fresh ground (beginScene on a novel tile):
    *  they follow the lead to the cache and claim it. Cleared on payout. One at a
    *  time — a fresh lead overwrites an unclaimed one. */
-  pendingLead?: { hint: string; rewardTc: number; rewardItem?: string } | null;
+  /** ⚠⚠ OTA-1532 — `stepsLeft` is the DISTANCE still owed on this lead. The owner:
+   *  *"the payout from nix type missions should be from a tile move, like we need
+   *  to make some distance to keep them safe."* Counted down one per overland tile
+   *  step; the cache turns up at zero. Absent on leads granted before 1532 —
+   *  those pay on the first step, rather than being stranded by a field they
+   *  never got. */
+  pendingLead?: { hint: string; rewardTc: number; rewardItem?: string; stepsLeft?: number } | null;
   ac: number;
   tc: number;
   corruption: number;
@@ -2386,6 +2392,13 @@ export interface VisitedRoom {
    *  diggable). Each key is the lowercased item name; cheap to compare
    *  without changing the catalog. */
   lootGrabbed?: string[];
+  /** ⚠⚠ OTA-1533 — HOW MANY TIMES THIS PATCH HAS GIVEN TO A DIG. The commodity
+   *  exemption on the picked-clean guard had no floor, so a mud patch was an
+   *  unbounded fountain (the owner: *"how many times can I investigate this
+   *  mud"* — the answer was forever). Counted per room, checked against
+   *  MUD_DIG_YIELDS_PER_PATCH. Absent on rooms dug before 1533, which read as
+   *  zero and get a fresh allowance rather than being sealed retroactively. */
+  digYields?: number;
   /** Items the player dropped on the floor of this room (via the
    *  drop verb). Each item is a full InventoryItem so quantity / kind
    *  / rarity round-trip cleanly back into player.inventory when the
