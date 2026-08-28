@@ -25218,6 +25218,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dangling arb107 comment in types.ts that had spent hundreds of OTAs describing
 // a field and a constant it had itself deleted.
 export const OTA_BUILD_ID = '2026-08-28-1529-a-round-trip-is-not-a-unit-of-time';
+// golem catch-up 2026-08-28: markerless publish of OTA-1529 (a room restock now
+// needs a real round trip AND 48 in-game hours, so an auto-course stops
+// replenishing the world at travel speed) to the golem channel. Both channels
+// level at 1529.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-27-1528-the-name-was-not-the-identity';
 // golem catch-up 2026-08-27: markerless publish of OTA-1528 (enemy intel keyed on
 // the defence profile instead of the reused display name, so strike-to-learn stops
