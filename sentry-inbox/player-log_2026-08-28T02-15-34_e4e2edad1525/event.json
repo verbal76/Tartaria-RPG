@@ -1,0 +1,203 @@
+{
+  "id": "e4e2edad15254c228f912396de3724a1",
+  "groupID": "7696460753",
+  "eventID": "e4e2edad15254c228f912396de3724a1",
+  "projectID": "4511945117532160",
+  "size": 17904,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 11/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 11/28]",
+  "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 11/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "5607d934f1ec47859a0b9cdcf88adbca",
+      "span_id": "9020f9ca5bf224f4",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "scaffold (tier 3/3). The view changes; the room reads differently from here.\n[2026-08-26T22:45:35.770Z] [reward] \u2726 Aetheric Locket (Common) \u2014 tucked into a crack at the top of the broken scaffold.\n[2026-08-26T22:45:35.771Z] [world] A door at the top of the climb. The hinges are mounted on this side \u2014 as if to keep something IN.\n",
+      "[2026-08-26T22:45:35.771Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n[2026-08-26T22:45:35.771Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:45:35.772Z] [system] \u23f3 Time passed: 30 min\n[2026-08-26T22:45:35.956Z] [cognitive] CLIMB  (183ms)\n[2026-08-26T22:45:37.045Z] [debug] ui: tap \"climb down\"\n[2026-08-26T22:45:37.070Z] [player] climb down\n",
+      "[2026-08-26T22:45:37.071Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0\n[2026-08-26T22:45:37.073Z] [world] You climb down from the sealed door and rejoin the ground beside the broken scaffold. Boots back on the ground.\n[2026-08-26T22:45:37.074Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n",
+      "[2026-08-26T22:45:37.074Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:45:37.074Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-26T22:45:37.075Z] [system] \u23f3 Time passed: 15 min\n[2026-08-26T22:45:37.250Z] [cognitive] CLIMB  (174ms)\n",
+      "[2026-08-26T22:45:37.595Z] [debug] persist sizes(KB): total=226 player=66 wm=79[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=77 scene=4\n[2026-08-26T22:45:38.794Z] [debug] ui: tap \"climb\"\n[2026-08-26T22:45:40.299Z] [player] climb tower relay\n",
+      "[2026-08-26T22:45:40.300Z] [debug] parser: intent=climb conf=1.00 verb=climb target=tower relay resolved=tower relay range=- enemies=0 hooks=1\n[2026-08-26T22:45:40.356Z] [world] You loop your Reclaimer's Rope around the tower relay and walk the line. Tier 1/4 cleared.\n[2026-08-26T22:45:40.357Z] [world] You reach the first hold of the tower relay (tier 1/4). Higher still to go.\n",
+      "[2026-08-26T22:45:40.357Z] [world] Dick Dragon sets its stone feet at the base of tower relay and will climb no further \u2014 the construct holds the ground while you go up alone.\n[2026-08-26T22:45:40.358Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n[2026-08-26T22:45:40.358Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-26T22:45:40.358Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-26T22:45:40.359Z] [system] \u23f3 Time passed: 30 min\n[2026-08-26T22:45:40.548Z] [cognitive] CLIMB  (188ms)\n[2026-08-26T22:45:41.310Z] [debug] ui: tap \"climb up (1/4)\"\n[2026-08-26T22:45:41.349Z] [player] climb tower relay\n",
+      "[2026-08-26T22:45:41.350Z] [debug] parser: intent=climb conf=1.00 verb=climb target=tower relay resolved=tower relay range=- enemies=0 hooks=1\n[2026-08-26T22:45:41.412Z] [world] You loop your Reclaimer's Rope around the tower relay and walk the line. Tier 2/4 cleared.\n[2026-08-26T22:45:41.413Z] [world] You reach the next hold of the tower relay (tier 2/4). Higher still to go.\n",
+      "[2026-08-26T22:45:41.413Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n[2026-08-26T22:45:41.414Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:45:41.414Z] [system] \u23f3 Time passed: 30 min\n[2026-08-26T22:45:41.587Z] [cognitive] CLIMB  (172ms)\n[2026-08-26T22:45:42.328Z] [debug] ui: tap \"climb up (2/4)\"\n",
+      "[2026-08-26T22:45:42.370Z] [player] climb tower relay\n[2026-08-26T22:45:42.372Z] [debug] parser: intent=climb conf=1.00 verb=climb target=tower relay resolved=tower relay range=- enemies=0 hooks=1\n[2026-08-26T22:45:42.430Z] [world] You loop your Reclaimer's Rope around the tower relay and walk the line. Tier 3/4 cleared.\n",
+      "[2026-08-26T22:45:42.430Z] [world] You reach the last stretch of the tower relay (tier 3/4). Higher still to go.\n[2026-08-26T22:45:42.431Z] [system] \u23f3 Time passed: 30 min\n[2026-08-26T22:45:42.607Z] [cognitive] CLIMB  (175ms)\n[2026-08-26T22:45:44.225Z] [debug] ui: tap \"climb up (3/4)\"\n[2026-08-26T22:45:44.244Z] [player] climb tower relay\n",
+      "[2026-08-26T22:45:44.244Z] [debug] parser: intent=climb conf=1.00 verb=climb target=tower relay resolved=tower relay range=- enemies=0 hooks=1\n[2026-08-26T22:45:44.300Z] [world] You loop your Reclaimer's Rope around the tower relay and walk the line. Tier 4/4 cleared.\n",
+      "[2026-08-26T22:45:44.300Z] [world] You reach the top of the tower relay (tier 4/4). The view changes; the room reads differently from here.\n[2026-08-26T22:45:44.302Z] [reward] \u2726 Aether Crystal (Common) \u2014 tucked into a crack at the top of the tower relay.\n[2026-08-26T22:45:44.302Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-26T22:45:44.302Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-26T22:45:44.303Z] [world] An Eternal Dynasty war party crests the rise \u2014 2 of them, blades already out. They've marked you for standing with the Mud Monarchs.\n[2026-08-26T22:45:44.303Z] [arbiter] \"The Eternal Dynasty do not forgive a friend of the Mud Monarchs,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n",
+      "[2026-08-26T22:45:44.304Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"The Eternal Dynasty do not forgive a friend of the Mud Mona\u2026\"\n[2026-08-26T22:45:44.555Z] [cognitive] CLIMB  (251ms)\n[2026-08-26T22:45:47.647Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:45:47.655Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n",
+      "[2026-08-26T22:45:47.702Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:45:47.703Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=close enemies=2 hooks=1\n",
+      "[2026-08-26T22:45:47.704Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:45:47.705Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:45:47.705Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T22:45:47.762Z] [world] You bring the compact blaster to bear on Eternal Dynasty Raider 1.\n[2026-08-26T22:45:47.763Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:45:47.966Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (202ms)\n[2026-08-26T22:45:52.892Z] [world] Eternal Dynasty Raider 1 moves first. The pressure is immediate.\n",
+      "[2026-08-26T22:45:52.897Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 11 + ATK 9 = 20 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:45:52.897Z] [world] Below, Eternal Dynasty Raider 2 circles the base \u2014 it cannot reach you up here.\n",
+      "[2026-08-26T22:45:52.898Z] [combat] You \u2014 d20 \u2192 16 + DEX 14 \u2212 1 (Whisper Fog) + 2 (point blank) exhausted -2 = 29 vs Eternal Dynasty Raider 1 AC 11 \u2014 \u2713 HIT\n[2026-08-26T22:45:52.900Z] [combat] Weakness exposed \u2014 Eternal Dynasty Raider 1 flinches. (burn \u00d71.5 for 2)\n",
+      "[2026-08-26T22:45:52.902Z] [combat] The blow with the compact blaster finds purchase \u2014 2 damage, 17 HP standing. Eternal Dynasty Raider 1 commits to the counter.\n[2026-08-26T22:45:52.902Z] [arbiter] The Arbiter does not move. \"If you can't finish the Eternal Dynasty Raider 1, I will. I'd rather not. My afternoon's planned.\"\n[2026-08-26T22:45:54.215Z] [debug] ui: tap \"off: compact blaster\"\n",
+      "[2026-08-26T22:45:54.266Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:45:54.267Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=close enemies=2 hooks=1\n",
+      "[2026-08-26T22:45:54.268Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:45:54.269Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:45:54.270Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T22:45:54.325Z] [world] You bring the compact blaster to bear on Eternal Dynasty Raider 1.\n[2026-08-26T22:45:54.326Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:45:54.528Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (202ms)\n[2026-08-26T22:45:59.401Z] [world] Eternal Dynasty Raider 1 moves first. The pressure is immediate.\n",
+      "[2026-08-26T22:45:59.404Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n[2026-08-26T22:45:59.404Z] [world] Below, Eternal Dynasty Raider 2 circles the base \u2014 it cannot reach you up here.\n",
+      "[2026-08-26T22:45:59.405Z] [combat] You \u2014 d20 \u2192 5 + DEX 14 \u2212 1 (Whisper Fog) + 2 (point blank) exhausted -2 = 18 vs Eternal Dynasty Raider 1 AC 11 \u2014 \u2713 HIT\n[2026-08-26T22:45:59.406Z] [combat] Weakness exposed \u2014 Eternal Dynasty Raider 1 flinches. (burn \u00d71.5 for 5)\n[2026-08-26T22:45:59.407Z] [combat] Eternal Dynasty Raider 1 takes 5 with the compact blaster. It reels: 12 left. Then it fights back.\n",
+      "[2026-08-26T22:46:00.768Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:46:00.815Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:46:00.816Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=close enemies=2 hooks=1\n",
+      "[2026-08-26T22:46:00.817Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:46:00.818Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:46:00.818Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T22:46:00.874Z] [world] You bring the compact blaster to bear on Eternal Dynasty Raider 1.\n[2026-08-26T22:46:00.874Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:46:01.079Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (204ms)\n[2026-08-26T22:46:05.781Z] [world] Eternal Dynasty Raider 1 moves first. The pressure is immediate.\n",
+      "[2026-08-26T22:46:05.783Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 13 + ATK 7 = 20 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:46:05.783Z] [world] Below, Eternal Dynasty Raider 2 circles the base \u2014 it cannot reach you up here.\n",
+      "[2026-08-26T22:46:05.783Z] [combat] You \u2014 d20 \u2192 9 + DEX 14 \u2212 1 (Whisper Fog) + 2 (point blank) exhausted -2 = 22 vs Eternal Dynasty Raider 1 AC 11 \u2014 \u2713 HIT\n[2026-08-26T22:46:05.785Z] [combat] Weakness exposed \u2014 Eternal Dynasty Raider 1 flinches. (burn \u00d71.5 for 2)\n",
+      "[2026-08-26T22:46:05.786Z] [combat] Your strike with the compact blaster lands for 2. Eternal Dynasty Raider 1 staggers \u2014 10 HP remaining. It answers.\n[2026-08-26T22:46:05.786Z] [combat] Burn sets in \u2014 1/turn for 2 turns.\n[2026-08-26T22:46:06.107Z] [debug] persist sizes(KB): total=229 player=66 wm=80[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=78 scene=5\n",
+      "[2026-08-26T22:46:07.003Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-26T22:46:07.071Z] [player] attack with the cantor's tuning fork\n[2026-08-26T22:46:07.071Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=2 hooks=1\n[2026-08-26T22:46:07.072Z] [combat] Eternal Dynasty Raider 1 suffers \u2014 burn eats 1. (9/19 HP, 1 turn left)\n",
+      "[2026-08-26T22:46:07.072Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-26T22:46:07.073Z] [arbiter] The Arbiter glances over the edge. \"Eternal Dynasty Raider 1 is down at the base \u2014 Cantor's Tuning Fork won't reach from up here. Use something that SHOOTS (or a throwable), or climb down and meet them.\"\n",
+      "[2026-08-26T22:46:07.288Z] [cognitive] neutral  (214ms)\n[2026-08-26T22:46:09.502Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-26T22:46:09.575Z] [player] attack with the cantor's tuning fork\n[2026-08-26T22:46:09.575Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=2 hooks=1\n",
+      "[2026-08-26T22:46:09.576Z] [combat] Eternal Dynasty Raider 1 suffers \u2014 burn eats 1. (8/19 HP, 0 turns left)\n[2026-08-26T22:46:09.576Z] [combat] Eternal Dynasty Raider 1 shakes off the last of the coating \u2014 the burn has run its course.\n[2026-08-26T22:46:09.576Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n",
+      "[2026-08-26T22:46:09.577Z] [arbiter] The Arbiter glances over the edge. \"Eternal Dynasty Raider 1 is down at the base \u2014 Cantor's Tuning Fork won't reach from up here. Use something that SHOOTS (or a throwable), or climb down and meet them.\"\n[2026-08-26T22:46:09.577Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-26T22:46:09.577Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:46:09.794Z] [cognitive] neutral  (216ms)\n[2026-08-26T22:46:10.687Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-26T22:46:10.755Z] [player] attack with the cantor's tuning fork\n",
+      "[2026-08-26T22:46:10.756Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=2 hooks=1\n[2026-08-26T22:46:10.757Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n",
+      "[2026-08-26T22:46:10.757Z] [arbiter] The Arbiter glances over the edge. \"Eternal Dynasty Raider 1 is down at the base \u2014 Cantor's Tuning Fork won't reach from up here. Use something that SHOOTS (or a throwable), or climb down and meet them.\"\n[2026-08-26T22:46:10.979Z] [cognitive] neutral  (221ms)\n[2026-08-26T22:46:13.656Z] [debug] ui: tap \"searing tuning fork\"\n",
+      "[2026-08-26T22:46:13.725Z] [player] attack with the cantor's tuning fork\n[2026-08-26T22:46:13.725Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=2 hooks=1\n[2026-08-26T22:46:13.726Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n",
+      "[2026-08-26T22:46:13.727Z] [arbiter] The Arbiter glances over the edge. \"Eternal Dynasty Raider 1 is down at the base \u2014 Cantor's Tuning Fork won't reach from up here. Use something that SHOOTS (or a throwable), or climb down and meet them.\"\n[2026-08-26T22:46:13.942Z] [cognitive] neutral  (214ms)\n[2026-08-26T22:46:18.440Z] [debug] ui: tap \"off: compact blaster\"\n",
+      "[2026-08-26T22:46:18.494Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:46:18.496Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=close enemies=2 hooks=1\n",
+      "[2026-08-26T22:46:18.497Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:46:18.498Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:46:18.498Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T22:46:18.555Z] [world] You bring the compact blaster to bear on Eternal Dynasty Raider 1.\n[2026-08-26T22:46:18.556Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:46:18.764Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (207ms)\n[2026-08-26T22:46:24.358Z] [world] Eternal Dynast"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 11/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtc1uckf9p7j"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-28T02:15:33.327072Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-28T02:15:34.249000Z",
+  "fingerprints": [
+    "6176f9207cc18053161b308bba4f6577"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "f7b807b40a394e13a5e9a74d08f2a0c3",
+  "previousEventID": "b9167d537b5548809e3ae2b6e51290af"
+}

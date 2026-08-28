@@ -1,0 +1,200 @@
+{
+  "id": "77570a0f6795461cbd1ee20a93c1097e",
+  "groupID": "7696460753",
+  "eventID": "77570a0f6795461cbd1ee20a93c1097e",
+  "projectID": "4511945117532160",
+  "size": 17936,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 27/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 27/28]",
+  "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 27/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "5607d934f1ec47859a0b9cdcf88adbca",
+      "span_id": "9020f9ca5bf224f4",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "estals. The Crucible takes them in.\n[2026-08-27T21:41:37.001Z] [reward] \u2726 The Crucible forges a Legendary piece of armor from your reserved pieces \u2014 and it's in your pack, still cooling.\n[2026-08-27T21:41:37.001Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet \u2014 let it finish. You'll know it the moment it announces itself.\n",
+      "[2026-08-27T21:41:37.017Z] [reward] \u2726 The forging finishes \u2014 the Aether names it Ichor-Slick Casque (Legendary).\n[2026-08-27T21:41:37.499Z] [debug] persist sizes(KB): total=231 player=52 wm=95[rooms=47 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=80 scene=3\n[2026-08-27T21:42:06.611Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-08-27T21:42:06.631Z] [world] You walk north. You arrive at The Monarch's Waystation.\n[2026-08-27T21:42:06.632Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=y opening=n passing=n\n[2026-08-27T21:42:06.718Z] [world] The outpost has restocked since you were last through \u2014 supplies have been set out again.\n",
+      "[2026-08-27T21:42:06.720Z] [world] You've left Nimari and entered The Monarch's Waystation. The seneschal logs your name without asking it. The Monarchs' ledgers have their ways. It's morning. Halem the Trader is the only soul in sight. east leads to Dynasty Border Post; west leads to Iskan-Veil. Nothing named to the north or south.\n",
+      "[2026-08-27T21:42:06.720Z] [world] You pass through the gate into Monarch Court \u2014 The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking \u2014 your business has already been logged elsewhere.\n[2026-08-27T21:42:06.721Z] [world] You have been here. The shape of it comes back before the details do.\n",
+      "[2026-08-27T21:42:06.721Z] [world] Paths: north to Standards \u00b7 south to First Landing. (Type 'leave outpost' to head into the wilds.)\n[2026-08-27T21:42:06.721Z] [system] Weather effect \u2014 Black Rain: -1 CHA\n[2026-08-27T21:42:06.721Z] [world] Halem the Trader places you as you come in. \"Great Scott. What are you after?\"\n",
+      "[2026-08-27T21:42:06.722Z] [world] \"Been a while,\" Halem the Trader says. \"Thought the mud had you.\"\n[2026-08-27T21:42:06.722Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-27T21:42:06.722Z] [arbiter] The Arbiter eyes one corner of The Monarch's Waystation. \"Begin there, if you must begin somewhere.\"\n",
+      "[2026-08-27T21:42:06.728Z] [reward] \u2726 Faction contract complete \u2014 A Seat at the Table. +60 TC, +8 rep with Mud Monarchs.\n[2026-08-27T21:42:06.770Z] [reward] \u2726 You've earned dealing with the Mud Monarchs. From now their vendors cut you the partner's rate \u2014 currently 2% off buys and +2% on sell-backs (it grows with your Charisma).\n",
+      "[2026-08-27T21:42:06.771Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-27T21:42:06.771Z] [arbiter] Word will travel that you finished this clean. The next thread will find you.\n",
+      "[2026-08-27T21:42:06.771Z] [world] A stranger in a clean coat is waiting at the outpost, and he quotes your remaining balance to the disc \u2014 then offers to clear it, whole, for what rides in your pack. He has done the sums too. You decline without a word, and watch him understand, slowly, that the debt is no longer the biggest number in your life.\n",
+      "[2026-08-27T21:42:06.772Z] [world] It is as thin as it gets. Whatever you are still carrying is worth more than what anybody will sell you.\n[2026-08-27T21:42:10.578Z] [arbiter] You do not give a reason. She does not need one and does not ask, only rolls the writ back around the Aetherstone with the ease of somebody who has done it a hundred times and will do it a hundred more. \"Then it stays yours",
+      ",\" she says. \"All of it. That is not the compliment people think it is.\"\n[2026-08-27T21:42:15.679Z] [debug] ui: tap \"take / salvage\"\n[2026-08-27T21:42:17.100Z] [world] You lever something loose from the brick \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-27T21:42:17.101Z] [world] You strip the gate carefully. Something usable comes free in your hand.\n",
+      "[2026-08-27T21:42:17.101Z] [world] You salvage the lantern. The take is small but real.\n[2026-08-27T21:42:17.101Z] [world] You strip the rusted engine chamber scaffolding down. Mostly debris \u2014 but a Bone Sliver comes loose at the bottom of the pile.\n[2026-08-27T21:42:17.102Z] [world] You strip the sign carefully. Something usable comes free in your hand.\n",
+      "[2026-08-27T21:42:17.102Z] [world] You strip the stripped sentinel diagnostic console carefully. Something usable comes free in your hand.\n[2026-08-27T21:42:17.102Z] [world] You work the tilted capacitor coil rack over. A part of it comes loose, intact.\n[2026-08-27T21:42:17.102Z] [reward] \u2726 Salvage haul:\n[2026-08-27T21:42:17.103Z] [reward]     \u2022 Moth-Eaten Felt Scrap (Common)\n",
+      "[2026-08-27T21:42:17.103Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n[2026-08-27T21:42:17.103Z] [reward]     \u2022 Aether Dust (Common)\n[2026-08-27T21:42:17.103Z] [reward]     \u2022 Bone Sliver (Common)\n[2026-08-27T21:42:17.103Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-08-27T21:42:17.104Z] [reward]     \u2022 Sentinel Core Plate (Uncommon)\n",
+      "[2026-08-27T21:42:17.104Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-27T21:42:18.380Z] [debug] ui: tap \"investigate\"\n[2026-08-27T21:42:19.832Z] [system] bleeding fades.\n[2026-08-27T21:42:19.846Z] [player] investigate the floor\n[2026-08-27T21:42:19.847Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-27T21:42:19.850Z] [world] You scan the floor of the room. Whatever was dropped here was swept long ago.\n[2026-08-27T21:42:20.008Z] [cognitive] neutral  (156ms)\n[2026-08-27T21:42:21.094Z] [player] investigate arch\n[2026-08-27T21:42:21.095Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=arch resolved=arch range=- enemies=0 hooks=0\n",
+      "[2026-08-27T21:42:21.095Z] [world] The frame is warped where the hinge anchored \u2014 long-dried iron, blooming with patient rust.\n[2026-08-27T21:42:21.096Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-27T21:42:21.096Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-27T21:42:21.096Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-27T21:42:21.267Z] [cognitive] TALK \u00b7 SEARCH  (169ms)\n[2026-08-27T21:42:32.052Z] [debug] ui: tap \"\u2191 STANDARDS\"\n[2026-08-27T21:42:32.089Z] [player] go north\n[2026-08-27T21:42:32.090Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0\n[2026-08-27T21:42:32.092Z] [world] You head on to the Standards.\n",
+      "[2026-08-27T21:42:32.092Z] [debug] scene: loc=monarch_waystation hub=outpost_central arrival=n opening=n passing=n\n[2026-08-27T21:42:32.098Z] [world] The outpost has restocked since you were last through \u2014 supplies have been set out again.\n",
+      "[2026-08-27T21:42:32.099Z] [world] Monarch Court \u2014 The Court of Standards. A flagstone court ringed with the standards of every Lost Capital. A Monarch banner hangs over the central plinth where a cracked map-stone has been re-carved twice.\n[2026-08-27T21:42:32.099Z] [world] You could walk this stretch with your eyes shut, and nearly do.\n",
+      "[2026-08-27T21:42:32.099Z] [world] Paths: north to Strongroom \u00b7 south to Atrium \u00b7 east to Arsenal \u00b7 west to Banquet. (Type 'leave outpost' to head into the wilds.)\n[2026-08-27T21:42:32.100Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-27T21:42:32.100Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-27T21:42:32.109Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-27T21:42:32.109Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-27T21:42:32.378Z] [cognitive] TRAVEL  (267ms)\n[2026-08-27T21:42:32.571Z] [debug] persist sizes(KB): total=222 player=52 wm=87[rooms=38 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=82 scene=2\n",
+      "[2026-08-27T21:42:33.369Z] [debug] ui: tap \"take / salvage\"\n[2026-08-27T21:42:34.645Z] [world] You salvage the bench. The take is small but real.\n[2026-08-27T21:42:34.645Z] [world] You work the door over. A part of it comes loose, intact.\n[2026-08-27T21:42:34.646Z] [world] You break the lantern apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-27T21:42:34.646Z] [world] The mud-glazed tartarian power conduit yields little of value, though a Smooth Stone ends up in your pack.\n[2026-08-27T21:42:34.646Z] [world] You break the tilting royal vault pedestal apart. Among the pieces, something worth keeping.\n[2026-08-27T21:42:34.647Z] [world] Already worked over: tilted engine room toolbench.\n",
+      "[2026-08-27T21:42:34.647Z] [reward] \u2726 Salvage haul:\n[2026-08-27T21:42:34.648Z] [reward]     \u2022 Bent Nail x3 (Common)\n[2026-08-27T21:42:34.648Z] [reward]     \u2022 Stick x2 (Common)\n[2026-08-27T21:42:34.648Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-08-27T21:42:34.649Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-08-27T21:42:34.649Z] [reward]     \u2022 Worn Tartarian Coin x7 (Common)\n",
+      "[2026-08-27T21:42:36.151Z] [debug] ui: tap \"missions\"\n[2026-08-27T21:43:02.318Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04513-38e1-73b3-acbd-1d3273df8cc5\n[2026-08-27T21:43:02.318Z] [debug] ota: Checking\u2026\n[2026-08-27T21:43:03.140Z] [debug] ota: Already up to date\n[2026-08-27T21:43:03.141Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-27T21:43:03.260Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-27T21:43:03.260Z] [debug] voice: bundled idle\n[2026-08-27T21:43:04.393Z] [debug] send-log: bundle #mtbxo8c42v25 attempt 3/5 delivered to Sentry\n[2026-08-27T21:43:06.883Z] [debug] OTA session start: 2026-08-27-1528-the-name-was-not-the-identity.\n",
+      "[2026-08-27T21:43:06.883Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-08-27T21:43:06.884Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Great Scott. I wondered when you'd take up the thread again.\"\n\n=== END LOG \u00b7 399917 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n",
+      "  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-08-27T21:43:07.454Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-08-27-1528-the-name-was-not-the-identity)\n  Boot stage: qwen:deferred\n\nML runtime health\n",
+      "  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-08-27T21:43:03.271Z\n  Last init success: 2026-08-27T21:43:03.915Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: auto-disabled after 1 completion crashes (template narration in use; auto-retry in 4 boots)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n",
+      "  Status: none recorded\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-26T22:59:19.885Z (1364m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-26-1511-the-spear-leaves-your-hand \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+7808ms)\n",
+      "  \u2022 2026-08-27T00:34:40.392Z (1268m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1514-the-portrait-scrolls-again \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"inventory\"\n      doing: tap \"inventory\" \u00b7 room outpost_gate \u00b7 screen exploration\n      last checkpoint: rendered (+72700ms)\n  \u2022 2026-08-27T01:03:31.295Z (1240m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1515-the-log-goes-in-parts \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+60639ms)\n  \u2022 2026-08-27T01:34:40.055Z (1208m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1516-the-quiet-path-sends-the-same-way \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+727ms)\n  \u2022 2026-08-27T02:03:02.202Z (1180m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1518-the-beacon-goes-first \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+92048ms)\n  \u2022 2026-08-27T02:32:27.198Z (1151m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1519-the-attachment-was-the-fault \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: rendered (+23274ms)\n  \u2022 2026-08-27T03:03:20.074Z (1120m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+20786ms)\n",
+      "  \u2022 2026-08-27T12:37:15.724Z (546m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1522-the-stun-does-not-outlive-itself \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+0ms)\n  \u2022 2026-08-27T16:21:51.524Z (321m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1524-cover-the-seven-and-mean-the-switch \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+12474ms)\n  \u2022 2026-08-27T21:42:59.314Z (0m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: tap \"missions\"\n      doing: tap \"missions\" \u00b7 room outpost_central \u00b7 screen exploration\n      last checkpoint: rendered (+23163ms)\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n  \u26a0\u26a0 LAST BOOT DIED MID-ACTION \u2014 no orderly exit was recorded.\n     Last thing the app did: tap \"missions\"\n",
+      "     Where: outpost_central on exploration screen\n     Last seen alive: 2026-08-27T21:42:59.314Z (0 min before this boot \u2014 the kill landed somewhere in that gap)\n     Last checkpoint reached: rendered (+23163ms after it)\n     \u26a0 The disk log's tail is UNRELIABLE for that session \u2014 batched lines\n       die in memory when the JS thread wedges. Trust this line over it.\n",
+      "  Memory warnings: none this session\n  Freeze watch: no stall"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtc1uckf9p7j [inline 27/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtc1uckf9p7j"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "27"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-28T02:15:33.463026Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-28T02:15:34.255000Z",
+  "fingerprints": [
+    "6176f9207cc18053161b308bba4f6577"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "8475af5671734d15b273b5e44e7d857f",
+  "previousEventID": "741b795fa7a04bed868e260498964b77"
+}

@@ -4,7 +4,7 @@
   /organizations/hot-attic-games-llc/issues/7689752967/events/?full=false
     1 page(s), 2 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7689752968/events/?full=false
-    1 page(s), 23 rows — COMPLETE — ended short of a full page
+    1 page(s), 24 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7689754199/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7689755171/events/?full=false
@@ -107,10 +107,18 @@
     1 page(s), 81 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7696249533/events/?full=false
     1 page(s), 3 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7696460753/events/?full=false
+    1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
+  /organizations/hot-attic-games-llc/issues/7696460869/events/?full=false
+    1 page(s), 4 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7696904441/events/?full=false
+    1 page(s), 27 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7696904453/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /projects/hot-attic-games-llc/tartaria/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /projects/hot-attic-games-llc/tartaria/issues/?query=&statsPeriod=
-    1 page(s), 53 rows — COMPLETE — ended short of a full page
+    1 page(s), 57 rows — COMPLETE — ended short of a full page
   ⚠⚠ AT LEAST ONE LISTING IS NOT PROVEN COMPLETE. Any MISSING parts below are UNPROVEN — they may simply be unread. DO NOT conclude the device failed, and DO NOT ask for another send on this basis.
   incomplete bundles:
     mtaxtx2bzl8l: 5/27 parts
@@ -139,4 +147,6 @@
     mtbkjdsb293n: 2 redactions, 778 chars
     mtbqd4edoeu9: 20 redactions, 7020 chars
     mtbxa8u29r1x: 10 redactions, 3526 chars
-    mtbxo8c42v25: 9 redactions, 3251 chars
+    mtbxo8c42v25: 27 redactions, 9753 chars
+    mtc1uckf9p7j: 18 redactions, 6528 chars
+    mtcc94ponsaa: 8 redactions, 2903 chars

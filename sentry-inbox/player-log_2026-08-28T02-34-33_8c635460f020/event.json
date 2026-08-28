@@ -1,0 +1,199 @@
+{
+  "id": "8c635460f0204fcb9224bf05003be723",
+  "groupID": "7696904441",
+  "eventID": "8c635460f0204fcb9224bf05003be723",
+  "projectID": "4511945117532160",
+  "size": 17864,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtcc94ponsaa [inline 5/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtcc94ponsaa [inline 5/27]",
+  "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtcc94ponsaa [inline 5/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "5607d934f1ec47859a0b9cdcf88adbca",
+      "span_id": "9020f9ca5bf224f4",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "y penalty \u22121 (Whisper Fog)\n[2026-08-26T22:39:17.127Z] [debug] attack: status mods exhausted -2\n[2026-08-26T22:39:17.183Z] [world] You commit forward with the acid-etched bone crossbow. Mud Harpy watches your hands.\n[2026-08-26T22:39:17.183Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:39:17.381Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (197ms)\n",
+      "[2026-08-26T22:39:24.088Z] [world] You seize the initiative. Mud Harpy has no time to react.\n[2026-08-26T22:39:24.088Z] [combat] You \u2014 d20 \u2192 8 + DEX 12 \u2212 1 (Whisper Fog) exhausted -2 = 17 vs Mud Harpy AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:39:24.090Z] [combat] Piercing flares \u2014 +2 on hit.\n[2026-08-26T22:39:24.090Z] [combat] Mud Harpy shrugs off the piercing. (resisted, \u00d70.5 for 12)\n",
+      "[2026-08-26T22:39:24.092Z] [combat] Clean hit with the acid-etched bone crossbow for 12. Mud Harpy has 56 left and does not back away.\n[2026-08-26T22:39:24.093Z] [combat] Acid-Etched Bone Crossbow \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 2 total).\n",
+      "[2026-08-26T22:39:24.094Z] [combat] Mud Harpy \u2014 d20 \u2192 6 + ATK 6 = 12 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:39:25.230Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T22:39:25.275Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-26T22:39:25.276Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n[2026-08-26T22:39:25.277Z] [combat] Mud Harpy smokes \u2014 acid eats 4. (52/76 HP, 2 turns left)\n[2026-08-26T22:39:25.277Z] [debug] attack: target=Mud Harpy range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-26T22:39:25.279Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:39:25.279Z] [debug] attack: status mods exhausted -2\n[2026-08-26T22:39:25.342Z] [world] You bring the acid-etched bone crossbow to bear on Mud Harpy.\n[2026-08-26T22:39:25.342Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:39:25.545Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (202ms)\n",
+      "[2026-08-26T22:39:31.741Z] [world] Mud Harpy moves first. The pressure is immediate.\n[2026-08-26T22:39:31.743Z] [combat] Mud Harpy \u2014 d20 \u2192 6 + ATK 6 = 12 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:39:31.744Z] [combat] You \u2014 d20 \u2192 3 + DEX 12 \u2212 1 (Whisper Fog) exhausted -2 = 12 vs Mud Harpy AC 9 \u2014 \u2713 HIT\n",
+      "[2026-08-26T22:39:31.745Z] [combat] Mud Harpy shrugs off the piercing. (resisted, \u00d70.5 for 7)\n[2026-08-26T22:39:31.745Z] [combat] The piercing has worn Mud Harpy's guard through \u2014 it bites full from here.\n[2026-08-26T22:39:31.747Z] [combat] Your strike with the acid-etched bone crossbow lands for 7. Mud Harpy staggers \u2014 45 HP remaining. It answers.\n",
+      "[2026-08-26T22:39:31.747Z] [combat] Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 3 total).\n[2026-08-26T22:39:35.111Z] [debug] ui: tap \"off: acid-etched bone crossbow\"\n[2026-08-26T22:39:35.163Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-26T22:39:35.164Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n[2026-08-26T22:39:35.165Z] [combat] Mud Harpy smokes \u2014 acid eats 2. (43/76 HP, 2 turns left)\n[2026-08-26T22:39:35.165Z] [debug] attack: target=Mud Harpy range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-26T22:39:35.169Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:39:35.170Z] [debug] attack: status mods exhausted -2\n[2026-08-26T22:39:35.228Z] [world] You commit forward with the acid-etched bone crossbow. Mud Harpy watches your hands.\n[2026-08-26T22:39:35.229Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-26T22:39:35.429Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (200ms)\n[2026-08-26T22:39:41.755Z] [world] You seize the initiative. Mud Harpy has no time to react.\n[2026-08-26T22:39:41.755Z] [combat] You \u2014 d20 \u2192 4 + DEX 12 \u2212 1 (Whisper Fog) exhausted -2 = 13 vs Mud Harpy AC 8 \u2014 \u2713 HIT\n[2026-08-26T22:39:41.756Z] [combat] Piercing flares \u2014 +4 on hit.\n",
+      "[2026-08-26T22:39:41.820Z] [reward] \u2726 The work hones you. +1 DEX (base 7, 13 as you stand).\n[2026-08-26T22:39:41.821Z] [combat] Mud Harpy takes 8 with the acid-etched bone crossbow. It reels: 35 left. Then it fights back.\n[2026-08-26T22:39:41.821Z] [combat] Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 3 total).\n",
+      "[2026-08-26T22:39:41.822Z] [combat] Mud Harpy \u2014 d20 \u2192 4 + ATK 6 = 10 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:39:42.044Z] [combat] Your Bone Crossbow shatters from wear. It is gone. A twist of Scrap Metal comes free in your hand.\n[2026-08-26T22:39:42.044Z] [reward] \u2726 Scrap Metal (Common).\n[2026-08-26T22:39:51.763Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-26T22:40:19.415Z] [debug] stats: STR20 DEX14 INT10 WIS12 CHA12 STE3 | gear: STR+7,DEX+7,STE+2,WIS+1,CHA+1 | worn: main=Cantor's Tuning Fork off=Compact Blaster head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring\n",
+      "[2026-08-26T22:40:21.675Z] [debug] persist sizes(KB): total=231 player=64 wm=78[rooms=32 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=81 scene=7\n[2026-08-26T22:40:23.298Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:40:23.349Z] [player] attack with the off-hand compact blaster\n",
+      "[2026-08-26T22:40:23.350Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=0\n[2026-08-26T22:40:23.352Z] [combat] Mud Harpy smokes \u2014 acid eats 2. (33/76 HP, 2 turns left)\n",
+      "[2026-08-26T22:40:23.352Z] [debug] attack: target=Mud Harpy range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:40:23.354Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:40:23.354Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T22:40:23.411Z] [world] You commit forward with the compact blaster. Mud Harpy watches your hands.\n[2026-08-26T22:40:23.411Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:40:23.619Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (207ms)\n[2026-08-26T22:40:28.126Z] [world] Mud Harpy moves first. The pressure is immediate.\n",
+      "[2026-08-26T22:40:28.128Z] [combat] Mud Harpy \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:40:28.129Z] [combat] You \u2014 d20 \u2192 9 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 20 vs Mud Harpy AC 8 \u2014 \u2713 HIT\n[2026-08-26T22:40:28.130Z] [combat] Weakness exposed \u2014 Mud Harpy flinches. (burn \u00d71.5 for 8)\n",
+      "[2026-08-26T22:40:28.131Z] [combat] The blow with the compact blaster finds purchase \u2014 8 damage, 25 HP standing. Mud Harpy commits to the counter.\n[2026-08-26T22:40:30.516Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:40:30.566Z] [player] attack with the off-hand compact blaster\n",
+      "[2026-08-26T22:40:30.566Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=0\n[2026-08-26T22:40:30.567Z] [combat] Mud Harpy smokes \u2014 acid eats 2. (23/76 HP, 1 turn left)\n",
+      "[2026-08-26T22:40:30.567Z] [debug] attack: target=Mud Harpy range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:40:30.568Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:40:30.568Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T22:40:30.623Z] [world] You raise the compact blaster toward Mud Harpy. The room narrows around the both of you.\n[2026-08-26T22:40:30.624Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:40:30.820Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (195ms)\n[2026-08-26T22:40:34.054Z] [world] You seize the initiative. Mud Harpy has no time to react.\n",
+      "[2026-08-26T22:40:34.056Z] [combat] You \u2014 d20 \u2192 1 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 12 vs Mud Harpy AC 8 \u2014 \u2717 FUMBLE\n[2026-08-26T22:40:34.057Z] [combat] Mud Harpy reads the motion and slips it \u2014 the compact blaster carves only air. The counter is already coming.\n[2026-08-26T22:40:34.059Z] [combat] Mud Harpy \u2014 d20 \u2192 17 + ATK 6 = 23 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-08-26T22:40:34.297Z] [combat] Mud Harpy deals 1 slashing damage [armor \u221265%, plate \u22123] [edge of reach \u2014 halved]. You have 55 HP remaining.\n[2026-08-26T22:40:35.860Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:40:35.918Z] [player] attack with the off-hand compact blaster\n",
+      "[2026-08-26T22:40:35.919Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=0\n[2026-08-26T22:40:35.922Z] [combat] Mud Harpy smokes \u2014 acid eats 2. (21/76 HP, 0 turns left)\n[2026-08-26T22:40:35.922Z] [combat] Mud Harpy shakes off the last of the acid \u2014 the Bone Crossbow has run its course.\n",
+      "[2026-08-26T22:40:35.924Z] [debug] attack: target=Mud Harpy range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:40:35.927Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:40:35.927Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T22:40:35.983Z] [world] You commit forward with the compact blaster. Mud Harpy watches your hands.\n[2026-08-26T22:40:35.983Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:40:36.181Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (196ms)\n[2026-08-26T22:40:40.747Z] [world] You seize the initiative. Mud Harpy has no time to react.\n",
+      "[2026-08-26T22:40:40.747Z] [combat] You \u2014 d20 \u2192 20 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 31 vs Mud Harpy AC 9 \u2014 \u2713 CRITICAL HIT\n[2026-08-26T22:40:40.748Z] [combat] Weakness exposed \u2014 Mud Harpy flinches. (burn \u00d71.5 for 12)\n[2026-08-26T22:40:40.753Z] [combat] The blow with the compact blaster finds purchase \u2014 12 damage, 9 HP standing. Mud Harpy commits to the counter.\n",
+      "[2026-08-26T22:40:40.753Z] [combat] Burn sets in \u2014 3/turn for 2 turns.\n[2026-08-26T22:40:40.755Z] [combat] Mud Harpy \u2014 d20 \u2192 5 + ATK 6 = 11 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:40:42.454Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-26T22:40:42.501Z] [player] attack with the off-hand compact blaster\n",
+      "[2026-08-26T22:40:42.502Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=0\n[2026-08-26T22:40:42.502Z] [combat] Mud Harpy suffers \u2014 burn eats 3. (6/76 HP, 1 turn left)\n",
+      "[2026-08-26T22:40:42.503Z] [debug] attack: target=Mud Harpy range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:40:42.504Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:40:42.504Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T22:40:42.560Z] [world] Your compact blaster comes around in an arc; Mud Harpy squares up to meet it.\n[2026-08-26T22:40:42.560Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:40:42.759Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (198ms)\n[2026-08-26T22:40:47.439Z] [world] Mud Harpy moves first. The pressure is immediate.\n",
+      "[2026-08-26T22:40:47.441Z] [combat] Mud Harpy \u2014 d20 \u2192 6 + ATK 6 = 12 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:40:47.441Z] [combat] You \u2014 d20 \u2192 2 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 13 vs Mud Harpy AC 10 \u2014 \u2713 HIT\n[2026-08-26T22:40:47.443Z] [combat] Weakness exposed \u2014 Mud Harpy flinches. (burn \u00d71.5 for 2)\n",
+      "[2026-08-26T22:40:47.444Z] [combat] Mud Harpy takes 2 with the compact blaster. It reels: 4 left. Then it fights back.\n[2026-08-26T22:40:47.444Z] [combat] Burn sets in \u2014 2/turn for 2 turns.\n[2026-08-26T22:40:47.444Z] [arbiter] \"You attack as if you mean to leave,\" the Arbiter murmurs. \"Good.\"\n[2026-08-26T22:40:49.005Z] [debug] ui: tap \"off: compact blaster\"\n",
+      "[2026-08-26T22:40:49.052Z] [player] attack with the off-hand compact blaster\n[2026-08-26T22:40:49.053Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=mid enemies=1 hooks=0\n[2026-08-26T22:40:49.053Z] [combat] Mud Harpy suffers \u2014 burn eats 2. (2/76 HP, 1 turn left)\n",
+      "[2026-08-26T22:40:49.054Z] [debug] attack: target=Mud Harpy range=mid reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-26T22:40:49.055Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-26T22:40:49.055Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-26T22:40:49.114Z] [world] You raise the compact blaster toward Mud Harpy. The room narrows around the both of you.\n[2026-08-26T22:40:49.114Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:40:49.311Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (196ms)\n",
+      "[2026-08-26T22:40:49.569Z] [debug] persist sizes(KB): total=230 player=64 wm=78[rooms=32 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=81 scene=7\n[2026-08-26T22:40:54.038Z] [world] Mud Harpy moves first. The pressure is immediate.\n[2026-08-26T22:40:54.040Z] [combat] Mud Harpy \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-08-26T22:40:54.041Z] [combat] You \u2014 d20 \u2192 5 + DEX 14 \u2212 1 (Whisper Fog) exhausted -2 = 16 vs Mud Harpy AC 11 \u2014 \u2713 HIT\n[2026-08-26T22:40:54.042Z] [combat] Weakness exposed \u2014 Mud Harpy flinches. (burn \u00d71.5 for 2)\n[2026-08-26T22:40:54.043Z] [combat] Final strike with the compact blaster for 2. Mud Harpy is still. The Aetherstone hums on, indifferent.\n",
+      "[2026-08-26T22:40:54.044Z] [reward] Mud Harpy defeated. You recover Mud Fragment \u00d72, Harpy Feather.\n[2026-08-26T22:40:54.045Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 58). [35 enemies defeated]\n[2026-08-26T22:40:54.045Z] [reward] +20 TC pried from the dust.\n",
+      "[2026-08-26T22:40:54.265Z] [combat] Mud Harpy deals 1 slashing damage [armor \u221265%, plate \u22123] [edge of reach \u2014 halved]. You have 54 HP remaining.\n[2026-08-26T22:41:01.192Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T22:41:02.768Z] [world] You work the scope stand over. A part of it comes loose, intact.\n",
+      "[2026-08-26T22:41:02.768Z] [world] You strip the spent flare carefully. Something usable comes free in your hand.\n[2026-08-26T22:41:02.769Z] [reward] \u2726 Salvage haul:\n[2026-08-26T22:41:02.769Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-26T22:41:02.769Z] [reward]     \u2022 Aether Dust x3 (Common)\n[2026-08-26T22:41:04.127Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-26T22:41:05.880Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-26T22:41:05.881Z] [arbiter] The Arbiter studies you a long moment. \"You have earned a name to carry: Stormcaller. Passive: halves incoming Aetheric damage (in combat AND from Etheric weather) \u2014 and halves incoming electrical damage in combat.\"\n",
+      "[2026-08-26T22:41:05.893Z] [player] in"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-27-1528-the-name-was-not-the-identity #mtcc94ponsaa [inline 5/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtcc94ponsaa"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "5"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db98:da7c:ad2:ae57:4fff:992d",
+      "query": "user.ip:\"2607:fb90:db98:da7c:ad2:ae57:4fff:992d\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-28T02:34:32.606834Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-28T02:34:33.397000Z",
+  "fingerprints": [
+    "c0eeb2809b097e87b3497879eb4b3966"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "92405e7d027d493fad52f53c3b5b63c4",
+  "previousEventID": "84ffbcddf30d47ab8742a8f9461ef85b"
+}
