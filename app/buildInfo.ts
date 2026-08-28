@@ -25251,6 +25251,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // has nothing to escape, and is not rendered. arb108's contract is otherwise
 // untouched: same lock beats, same disappearance on SKIP or the stay/leave choice.
 export const OTA_BUILD_ID = '2026-08-28-1531-the-escape-hatch-waits-for-the-room';
+// golem catch-up 2026-08-28: markerless publish of OTA-1531 (the SKIP TUTORIAL
+// pill no longer renders while the opening crawl, chapter card, motive picker or
+// dedication card are still ahead of a new character) to the golem channel. Both
+// channels level at 1531.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-28-1530-the-stranger-gets-the-screen';
 // golem catch-up 2026-08-28: markerless publish of OTA-1530 (the road-stranger's
 // introduction gets its own card instead of being buried under five arrival lines,
