@@ -25236,6 +25236,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stacked on top of the lead. It hangs on persuade because intimidate already
 // takes what they CARRY; persuade takes what they KNOW, and a rumour is knowledge.
 export const OTA_BUILD_ID = '2026-08-28-1530-the-stranger-gets-the-screen';
+// golem catch-up 2026-08-28: markerless publish of OTA-1530 (the road-stranger's
+// introduction gets its own card instead of being buried under five arrival lines,
+// the wanderer chip loses the smiley, and a PERSUADE can rarely shake a whisper
+// loose) to the golem channel. Both channels level at 1530.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-28-1529-a-round-trip-is-not-a-unit-of-time';
 // golem catch-up 2026-08-28: markerless publish of OTA-1529 (a room restock now
 // needs a real round trip AND 48 in-game hours, so an auto-course stops
