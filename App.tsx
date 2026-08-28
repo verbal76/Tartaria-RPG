@@ -54,6 +54,7 @@ import { MotivePickerModal } from './app/components/MotivePickerModal'; // OTA-1
 import { StoryIntroOverlay } from './app/components/StoryIntroOverlay'; // OTA-1023 — global (was exploration-only)
 import { DeathOverlay } from './app/components/DeathOverlay'; // OTA-1110 — the closing scene, global by necessity
 import { DogOnboardingModal } from './app/components/DogOnboardingModal'; // OTA-1027
+import { WandererEncounterModal } from './app/components/WandererEncounterModal'; // OTA-1530
 import { GolemNamingModal } from './app/components/GolemNamingModal'; // OTA-1027
 import { KeyboardInputBar } from './app/components/KeyboardInputBar';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
@@ -1048,6 +1049,13 @@ export default function App() {
           the old takeover swallowed it as the answer). */}
       <SilentBoundary tag="DogOnboardingModal">
         <DogOnboardingModal />
+      </SilentBoundary>
+      {/* ⚠ OTA-1530 — the road-stranger's introduction, taken out of the arrival
+          feed where six world lines landed on top of it in the same millisecond.
+          Mounted beside the other blocking cards, and behind the same
+          SilentBoundary: a popup that throws must never take the game with it. */}
+      <SilentBoundary tag="WandererEncounterModal">
+        <WandererEncounterModal />
       </SilentBoundary>
       <SilentBoundary tag="GolemNamingModal">
         <GolemNamingModal />

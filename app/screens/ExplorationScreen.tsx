@@ -1760,7 +1760,12 @@ export function ExplorationScreen() {
         >
           <View style={styles.wandererStripe} />
           <View style={styles.placeChipBody}>
-            <Text style={styles.wandererName} numberOfLines={1}>☺ {currentScene.wanderer.name}</Text>
+            {/* ⚠ OTA-1530 — ❖, not ☺. The owner: "the icon is a horrible choice." He was
+                right — a smiley is the only emoticon anywhere in the game, and it read
+                as a chat sticker glued to a buried country. ❖ is a traveller's marker:
+                same weight as the vendor stripe beside it, in the ✦ ★ ⚄ ⚠ family the
+                rest of the UI already speaks, and it has no face. */}
+            <Text style={styles.wandererName} numberOfLines={1}>❖ {currentScene.wanderer.name}</Text>
             <Text style={styles.placeChipHint} numberOfLines={1}>{currentScene.wanderer.role} · tap to speak</Text>
           </View>
           {/* ⚠ OTA-1154 — GIFT reaches the wanderer now. They were always a valid

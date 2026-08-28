@@ -137,6 +137,27 @@ export function makeWanderer(seed: number, factions: string[] = []): Wanderer {
 // something from everyone." DC 12: CHA 10 whiffs only on a 1; CHA 1 is a coin flip.
 export const WANDERER_TALK_DC = 12;
 
+/** ⚠⚠⚠ OTA-1530 — THE RARE FOURTH OUTCOME: A WHISPER OFF THE ROAD.
+ *
+ *  The owner asked whether a wanderer could be pressed for a whisper. They could
+ *  not: every whisper chain in the game plants from a hub-room overheard beat or
+ *  an authored vendor topic, and of the 347 authored dialogue topics — 42 of them
+ *  on the seven wanderer archetypes — exactly ZERO grant one. A stranger on the
+ *  road, the one person in Tartaria whose whole function is carrying word from
+ *  somewhere else, was the one person who could not give you word.
+ *
+ *  ⚠ It hangs on PERSUADE, not INTIMIDATE, and that asymmetry is the design.
+ *  Intimidate already takes what they CARRY — coins and goods, the concrete
+ *  payload, at the price of standing if they are affiliated. Persuade takes what
+ *  they KNOW. A rumour worth following is knowledge, so it belongs to the branch
+ *  that was already about knowledge, and it gives the gentler verb a jackpot the
+ *  harder one cannot buy.
+ *
+ *  ⚠ 1 in 5, and stacked ON TOP of the lead rather than replacing it — a
+ *  persuade that rolls the whisper is a good day, not a coin-flip between two
+ *  prizes. A player who never rolls it loses nothing they had before. */
+export const WANDERER_WHISPER_CHANCE = 0.2;
+
 export type WandererRewardKind = 'tip' | 'tc' | 'standing';
 
 export interface WandererReward {

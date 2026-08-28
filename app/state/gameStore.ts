@@ -479,7 +479,7 @@ import {
 import { sellPriceFor, isUnsellable, applySellCaps } from '../engine/sellPrice';
 import { vendorPriceMod, rapportQuestId, chaPriceDiscount, standingTier, standingTierLabel, standingPriceDiscount } from '../engine/factionRapport';
 import { isTalkDownBlocked } from '../engine/talkDown';
-import { makeWanderer, wandererCagey, type Wanderer } from '../engine/wanderers';
+import { makeWanderer, wandererCagey, WANDERER_WHISPER_CHANCE, type Wanderer } from '../engine/wanderers';
 import {
   type ParleyChoice, type ParleyKind, type Temperament,
   isRightKey, revealsTemperament, parleyDC, deriveAnimalTemperament,
@@ -34952,6 +34952,42 @@ function runParleyOutcome(
         get().appendLog('reward', `${targetName} lowers their voice: "${lead.hint}." (a lead — you'll turn it up when you next cross fresh ground)`);
       } else {
         get().appendLog('reward', `${targetName} tells you what they know.`);
+      }
+      // ⚠⚠⚠ OTA-1530 — AND, RARELY, A WHISPER. The owner asked whether a wanderer
+      // could be pressed for one; they could not. Every chain plants from a
+      // hub-room overheard beat or an authored vendor topic, and none of the 347
+      // authored dialogue topics — 42 of them on the wanderer archetypes — grants
+      // one. The person whose whole function is carrying word from somewhere else
+      // was the one person who could not give you word.
+      //
+      // ⚠ On PERSUADE only. Intimidate already takes what they CARRY; persuade
+      // takes what they KNOW, and a rumour is knowledge. Stacked on top of the
+      // lead, not swapped for it, so rolling it is a good day rather than a
+      // coin-flip between two prizes. See wanderers.WANDERER_WHISPER_CHANCE.
+      if (Math.random() < WANDERER_WHISPER_CHANCE) {
+        const lp = get().player;
+        const held = new Set([
+          ...(lp?.activeWhispers ?? []).map((x) => x.id),
+          ...(lp?.completedWhisperIds ?? []),
+        ]);
+        const chain = CHAINS.find((c) => !held.has(c.id));
+        if (chain && lp) {
+          const tile = pickTargetTile(chain, lp.mapX ?? 0, lp.mapY ?? 0);
+          const whisper: WhisperRecord = {
+            id: chain.id,
+            stage: 'planted',
+            plantedAtHour: lp.hoursElapsed ?? 0,
+            targetMapX: tile.x,
+            targetMapY: tile.y,
+            targetLocationId: lp.currentLocationId,
+            activeFromHour: chain.activeHours?.[0],
+            activeToHour: chain.activeHours?.[1],
+          };
+          set((st) => (st.player ? {
+            player: { ...st.player, activeWhispers: [...(st.player.activeWhispers ?? []), whisper] },
+          } : {}));
+          get().appendLog('reward', `${targetName} glances past you before they say it. "One more thing, since you asked like a person." ✦ Whisper — ${chain.title}. (Check the Whispers panel.)`);
+        }
       }
     } else {
       // OTA-809 — Intimidate a person → extort their actual CARRIED GOODS (coins +

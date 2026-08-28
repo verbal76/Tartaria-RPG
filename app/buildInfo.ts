@@ -25217,7 +25217,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the round trip alone, so nobody's loot freezes mid-playthrough. Also retires a
 // dangling arb107 comment in types.ts that had spent hundreds of OTAs describing
 // a field and a constant it had itself deleted.
-export const OTA_BUILD_ID = '2026-08-28-1529-a-round-trip-is-not-a-unit-of-time';
+// ⚠⚠⚠ OTA-1530 — THE STRANGER GETS THE SCREEN, AND CAN FINALLY GIVE YOU WORD.
+// Three things the owner raised about his first wanderer in many characters of
+// play. (1) THE GREETING WAS NEVER MISSING — it fired exactly as OTA-807 wrote
+// it, and then the ash-storm block, the location description, the compass line
+// and the Arbiter landed in the same millisecond. The introduction to the only
+// person he had met on the open road in thirty days was line one of a six-line
+// dump fired by walking out of a door. So it gets a card — the same trade
+// OTA-1043 made for the dog after the identical complaint — showing the archetype
+// greeting and, for players who still want it, what a wanderer IS. Offered once
+// per person, after a dwell so it never covers what it interrupted, handing off
+// to the parley rather than re-deciding the exchange. (2) THE ICON: the smiley
+// was the only emoticon in the game; it is now the traveller's marker, in the
+// family the rest of the UI speaks, with no face. (3) A WHISPER OFF THE ROAD —
+// there was no route to one from a person on the road: every chain plants from a
+// hub beat or a vendor topic, and none of the 347 authored topics (42 of them on
+// the wanderer archetypes) grants one. A PERSUADE now can, one time in five,
+// stacked on top of the lead. It hangs on persuade because intimidate already
+// takes what they CARRY; persuade takes what they KNOW, and a rumour is knowledge.
+export const OTA_BUILD_ID = '2026-08-28-1530-the-stranger-gets-the-screen';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-28-1529-a-round-trip-is-not-a-unit-of-time';
 // golem catch-up 2026-08-28: markerless publish of OTA-1529 (a room restock now
 // needs a real round trip AND 48 in-game hours, so an auto-course stops
 // replenishing the world at travel speed) to the golem channel. Both channels
