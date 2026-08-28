@@ -25235,7 +25235,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the wanderer archetypes) grants one. A PERSUADE now can, one time in five,
 // stacked on top of the lead. It hangs on persuade because intimidate already
 // takes what they CARRY; persuade takes what they KNOW, and a rumour is knowledge.
-export const OTA_BUILD_ID = '2026-08-28-1530-the-stranger-gets-the-screen';
+// ⚠⚠⚠ OTA-1531 — AN ESCAPE HATCH FROM A ROOM YOU ARE NOT IN YET. The owner,
+// starting a new character: "first thing I notice is the skip tutorial button is
+// immediately visible. it shouldn't show until the player story cards are done
+// and you are in the tutorial screen." The pill's visibility was derived from the
+// TUTORIAL alone: arb108 shows it for exactly as long as the outpost lockdown
+// holds, and `tutorialStep` reaches the `name` beat while the opening crawl, the
+// chapter card, the motive picker and the dedication card are all still ahead of
+// the player — so by its own rule it was due on screen from the first frame, and
+// the only thing holding it back was z-order. Which is not a guarantee: those
+// cards are RN Modals, the pill is a raised View mounted outside SafeAreaView,
+// and OTA-234 already established on this codebase that the stacking between the
+// two is not something to reason about from the source. So the gate is state, not
+// layering — an escape hatch from a lockdown the player has not been put in yet
+// has nothing to escape, and is not rendered. arb108's contract is otherwise
+// untouched: same lock beats, same disappearance on SKIP or the stay/leave choice.
+export const OTA_BUILD_ID = '2026-08-28-1531-the-escape-hatch-waits-for-the-room';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-28-1530-the-stranger-gets-the-screen';
 // golem catch-up 2026-08-28: markerless publish of OTA-1530 (the road-stranger's
 // introduction gets its own card instead of being buried under five arrival lines,
 // the wanderer chip loses the smiley, and a PERSUADE can rarely shake a whisper
