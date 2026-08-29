@@ -25363,6 +25363,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // nudge, not a rescue, and it does nothing at all at late game. The dominant knob
 // for the overall feel is that cap, not this knee - tune there next.
 export const OTA_BUILD_ID = '2026-08-29-1539-the-brake-sat-above-the-whole-game';
+// golem catch-up 2026-08-29: markerless publish of OTA-1538/1539 (the 13 dog-rescue
+// hook nouns that matched nothing in the world are placed, so the opening dog
+// mission fires on props that read as the scenario instead of on a chain bridge;
+// and the AC tail-trim knee moves 22 -> 16 at rate 0.5, taking early and mid game
+// from the 25% cap floor to 30% incoming hits while leaving the opening
+// bit-for-bit unchanged) to the golem channel. Both channels level at 1539.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1538-the-dog-had-nowhere-left-to-be-found';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1537-two-pieces-or-it-is-not-made-of-that';
 // golem catch-up 2026-08-29: markerless publish of OTA-1536/1537 (the Crucible's
