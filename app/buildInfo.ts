@@ -25485,6 +25485,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // reports it, and the filler line and the 20% trader roll stand down for that
 // step - you did not lose track of distance, you arrived somewhere.
 export const OTA_BUILD_ID = '2026-08-29-1547-the-conversation-holds-the-floor';
+// golem catch-up 2026-08-29: markerless publish of OTA-1547 (SPEAK TO YULKA
+// bar + conversation sheet with per-instance transcript; step filler and
+// trader roll yield to fired whisper beats) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1546-the-dying-breath-names-the-native-job';
 // golem catch-up 2026-08-29: markerless publish of OTA-1543/1544/1545/1546 (no
 // raw fragments in the feed + stock-filler gate, refused gifts go back in the
