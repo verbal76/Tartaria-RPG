@@ -25315,7 +25315,56 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // price does not read as a bug, and every OTA-967 exemption survives: a pre-paid
 // wild bench and the Hidden Market cauldron fire free, and the charge still
 // lands after every gate and before any consume.
-export const OTA_BUILD_ID = '2026-08-29-1537-two-pieces-or-it-is-not-made-of-that';
+// OTA-1538 - THE DOG HAD NOWHERE LEFT TO BE FOUND. Owner: "investigate if we
+// lost the dog opening mission, haven't seen a dog in a while." The wiring was
+// never broken - matchRescueHookNoun to tryFireRescueScenario to
+// completeRescueScenario to the onboarding popup is intact, and so is the gate
+// (no dog, no onboarding, empty scene, six intents). What broke is that the
+// world stopped containing the hooks: a census of all 1,281 noun strings across
+// 38 locations found 13 of the 19 authored rescue hook nouns matching NOTHING
+// (anvil post, smelter, forge ruin, wagon wheel, roadside camp, overturned
+// wagon, cellar door, cellar, trapdoor, buried structure, snare pit, snare,
+// trapper camp). The rescue was firing almost entirely through words that merely
+// share a token with a hook - the slag-floor smelter rescue reached through
+// "chain bridge" and "barnacle chain", the wagon rescue through "pulley wheel",
+// the cellar rescue only ever through a "drain hatch". This is OTA-1241's
+// unfinished half: it fixed the matcher, documented this exact gap in the same
+// breath ("13 of the 20 ... match NOTHING in the game's 975 scene nouns"), wrote
+// down that the loose matcher was LOAD-BEARING, and shipped without placing the
+// props. The world has grown to 1,281 nouns since and the dead count was still
+// 13. Fixed as content, not code: each hook placed in two locations chosen for
+// its own fiction and weighted to low-danger starter ground, because the rescue
+// can only fire before the player has a dog. Matcher, gate and scenarios
+// untouched, with a ratchet test so the count can never silently climb again.
+// OTA-1539 - THE BRAKE SAT ABOVE THE WHOLE EARLY AND MID GAME. Owner: "having
+// high AC so far early or mid game is like wearing plate steel armor and trying
+// to get hurt by somebody throwing a tennis ball." The seam is one constant.
+// trimStandingAc's knee was 22, but a player reaches raw 23 the moment they
+// finish a set of Uncommon armour - so the entire early and mid game ran on the
+// UNTRIMMED linear part of the curve where every point of AC is worth a full 5%
+// and nothing opposes it. OTA-924 chose 22 to stop a fully-fused Legendary build
+// at raw ~37: a late-game problem, and the brake was installed above the road.
+// Measured against the tier each stage is meant to fight (attack bonuses
+// censused over all 111 enemy rows - Common +3, Uncommon +5, Rare +7, Legendary
+// +9), incoming hit chance goes: opening 40% -> 40% (untouched on purpose), early
+// 25% -> 30%, mid 25% -> 30%, late 25% -> 25% (unchanged - see below). The two
+// curves diverge 3:1 - player AC climbs 16/23/28/38 across a run (+22) while
+// enemy attack climbs +3 to +9 (+6). 16 is chosen, not rounded:
+// it is exactly the raw AC of the best Common set, so the opening is bit-for-bit
+// identical and the curve bends only where the player starts outrunning the
+// world. The late ceiling may stay high because it is now earned - raw 38 needs
+// three fused Legendary pieces, ~990 TC all in post-1537, where it used to be
+// four junk fuses and 100 TC.
+// ⚠ CORRECTION CARRIED IN THE OPEN: the first analysis modelled the to-hit roll as
+// a plain d20 and reported 10.0 swings at early/mid/late - 2.5x the truth. The
+// resolver caps the natural roll an enemy needs at ENEMY_HIT_NEEDED_CAP = 16
+// (~25% floor vs ANY AC, owner-tuned 13 -> 16 in OTA-1141 for this same concern)
+// and converts the AC wasted past that cap into plate DR. So this ships as a
+// nudge, not a rescue, and it does nothing at all at late game. The dominant knob
+// for the overall feel is that cap, not this knee - tune there next.
+export const OTA_BUILD_ID = '2026-08-29-1539-the-brake-sat-above-the-whole-game';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1538-the-dog-had-nowhere-left-to-be-found';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1537-two-pieces-or-it-is-not-made-of-that';
 // golem catch-up 2026-08-29: markerless publish of OTA-1536/1537 (the Crucible's
 // output tier is now bounded by the second-best rarity among its inputs instead
 // of by material variety alone, so four Common scraps no longer mint the best

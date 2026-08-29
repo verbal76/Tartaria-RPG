@@ -2,14 +2,21 @@
 import { trimStandingAc } from '../app/engine/equipment';
 
 describe('OTA-924 — AC tail-trim (trimStandingAc)', () => {
+  // ⚠ OTA-1539 moved the knee 22 -> 16 and the rate 0.4 -> 0.5: the old knee sat
+  // above the whole early and mid game (a player reaches raw 23 on a set of
+  // Uncommon armour), so those stages ran on the untrimmed linear part of the
+  // curve. 16 is exactly the raw AC of the best Common set, leaving the opening
+  // bit-for-bit unchanged. OTA-924's CONTRACT is untouched and still pinned
+  // below: at-or-below the knee is identity, past it bends, and it is monotone.
   it('leaves AC at or below the knee untouched', () => {
     expect(trimStandingAc(10)).toBe(10);
-    expect(trimStandingAc(22)).toBe(22);
+    expect(trimStandingAc(16)).toBe(16);
   });
-  it('bends the tail past the knee (0.4/point)', () => {
-    expect(trimStandingAc(27)).toBe(24); // 22 + 5*0.4
-    expect(trimStandingAc(32)).toBe(26); // 22 + 10*0.4
-    expect(trimStandingAc(37)).toBe(28); // 22 + 15*0.4 = 28
+  it('bends the tail past the knee (0.5/point)', () => {
+    expect(trimStandingAc(22)).toBe(19); // 16 + 6*0.5
+    expect(trimStandingAc(27)).toBe(22); // 16 + 11*0.5 = 21.5 -> 22
+    expect(trimStandingAc(32)).toBe(24); // 16 + 16*0.5
+    expect(trimStandingAc(38)).toBe(27); // 16 + 22*0.5
   });
   it('is monotonic — more raw AC never means less effective AC', () => {
     let prev = -1;

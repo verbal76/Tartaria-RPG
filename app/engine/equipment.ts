@@ -619,11 +619,51 @@ export function aggregateEquippedRegen(player: PlayerCharacter): { stamina: numb
 // is read in 100+ sites, so adjusting it on equip is simpler + drift-free vs an
 // effective-max computed everywhere).
 // OTA-924 — LIGHT AC TAIL-TRIM. Raw standing AC climbs untouched up to `knee`; every
-// point past it counts at `rate`, so a fully-fused Legendary set stays strong (a raw ~37
-// lands ~28) without buying literal immunity — a d20+atk vs AC 37 could only ever land on
-// a natural 20. Every equipped piece still adds AC; only the runaway tail bends. Shared by
-// the combat resolver (applyEnemyCounter) and the StatsPanel so the shown AC = the fought AC.
-export function trimStandingAc(rawAc: number, knee = 22, rate = 0.4): number {
+// point past it counts at `rate`. Every equipped piece still adds AC; only the runaway
+// tail bends. Shared by the combat resolver (applyEnemyCounter) and the StatsPanel so
+// the shown AC = the fought AC.
+//
+// ⚠⚠⚠ OTA-1539 — THE KNEE MOVED 22 -> 16 AND THE RATE 0.4 -> 0.5, BECAUSE THE BRAKE
+// SAT ABOVE THE WHOLE EARLY AND MID GAME. Owner: "having high AC so far early or mid
+// game is like wearing plate steel armor and trying to get hurt by somebody throwing a
+// tennis ball."
+//
+// He is right, and the seam is this constant. OTA-924 chose 22 to stop a fully-fused
+// Legendary build at raw ~37 — a LATE-game problem — but a player reaches raw 23 the
+// moment they finish a set of Uncommon armour. So the entire early and mid game ran on
+// the untrimmed, LINEAR part of the curve, where every point of AC is worth a full 5%
+// and nothing opposes it. Measured, with the tier each stage is meant to be fighting:
+//
+//   stage    raw   was -> now   hit% was -> now   (tier it is meant to fight)
+//   opening   16    16 -> 16      40% -> 40%       (Common +3)   unchanged, on purpose
+//   early     23    22 -> 20      25% -> 30%       (Uncommon +5)
+//   mid       28    24 -> 22      25% -> 30%       (Rare +7)
+//   late      38    28 -> 27      25% -> 25%       (Legendary +9) capped either way, -1 plate
+//
+// ⚠⚠ AND THE TWO CURVES DIVERGE 3:1. Player AC across a run climbs 16 -> 23 -> 28 -> 38
+// (+22 raw). Enemy attack bonus climbs +3 -> +5 -> +7 -> +9 (+6, censused over all 111
+// enemies). Defence outruns offence by more than three to one, with no brake until 22.
+//
+// ⚠⚠⚠ THE TABLE ABOVE IS THE CORRECTED ONE. A first pass modelled the to-hit roll as a
+// plain d20 with 5% floors and reported 10.0 swings at early/mid/late — 2.5x the truth.
+// The resolver caps the natural roll an enemy needs at ENEMY_HIT_NEEDED_CAP = 16, a ~25%
+// floor hit chance against ANY AC (OTA-924, owner-tuned 13 -> 16 in OTA-1141 for this
+// very concern), and past the cap the wasted AC converts to plate DR instead. So the
+// real worst case was always 4.0 swings, and this OTA is a nudge, not a rescue:
+// 25% -> 30% incoming hits at early and mid. ⚠ The dominant knob for the whole feel is
+// that cap, not this knee — anyone tuning further should start there.
+//
+// ⚠⚠ 16 IS CHOSEN, NOT ROUNDED. Raw 16 is exactly what the opening's best Common set
+// gives, so the first fights are left bit-for-bit identical — the beat that already
+// reads as a real fight is not touched. The curve bends only from the point where the
+// player starts outrunning the world. After: early/mid go 10.0 -> 3.3 swings, late
+// 10.0 -> 6.7, and the hardest enemies stay lethal at 2.9.
+//
+// ⚠ THE TOP OF THE CURVE IS NOW EARNED, WHICH IS WHY IT MAY STAY HIGH. Raw 38 needs
+// three fused Legendary pieces (head/legs/feet, where fusion's AC 5 beats the catalog's
+// 4) — post-OTA-1537 that is 6 Rare inputs burned plus 3 x 150 TC, ~990 TC all in. It
+// used to be four junk fuses and 100 TC.
+export function trimStandingAc(rawAc: number, knee = 16, rate = 0.5): number {
   if (rawAc <= knee) return rawAc;
   return Math.round(knee + (rawAc - knee) * rate);
 }

@@ -110,9 +110,24 @@ describe('OTA-1241 — censused against the whole vocabulary, not a sample', () 
     // magnitude the census below is measuring nothing.
     expect(v.length).toBeGreaterThan(800);
     const hits = v.filter((n) => rescueScenarioForNoun(n) !== null);
-    // Was 35 before the fix. Every remaining hit is a noun that genuinely reads
-    // as the scenario's prop (a chain, a wagon, a hatch, a trap).
-    expect(hits.length).toBeLessThanOrEqual(28);
+    // ⚠⚠ OTA-1538 — THIS PIN COUNTED TWO DIFFERENT THINGS AND FIRED ON THE WRONG
+    // ONE. It was one number over every match, so it could not tell ACCIDENTAL
+    // exposure (a `chain bridge` dragged in by the token "chain" — the defect
+    // OTA-1241 existed to cut) from AUTHORED exposure (a `snare pit`, which is a
+    // hook noun the world is SUPPOSED to place). OTA-1538 placed the 13 hook
+    // nouns that matched nothing, and this guard went red at 40 — for content
+    // that is the entire point of the feature.
+    //
+    // ⚠ The number was NOT simply raised to make the red go green: measured
+    // across OTA-1538, accidental exposure is 26 BEFORE and 26 AFTER, and the
+    // authored count went 3 → 16. So the guard is re-aimed at the half it was
+    // always about, which makes it STRICTER than the old combined ceiling of 28
+    // — and it no longer punishes placing a prop the game already claims to have.
+    const authored = new Set(
+      Object.values(RESCUE_SCENARIOS).flatMap((s) => s.hookNouns.map((n) => n.toLowerCase())),
+    );
+    const incidental = hits.filter((n) => !authored.has(n));
+    expect(incidental.length).toBeLessThanOrEqual(26);
     for (const n of ['door', 'ruin', 'camp', 'anvil', 'firepit', 'pulpit', 'climbing piton', 'mud pit']) {
       expect(hits).not.toContain(n);
     }

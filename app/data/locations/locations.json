@@ -63,7 +63,12 @@
       "sludge pool",
       "bone tool",
       "broken flare",
-      "buried statue"
+      "buried statue",
+      "snare pit",
+      "trapper camp",
+      "wagon wheel",
+      "overturned wagon",
+      "buried structure"
     ]
   },
   {
@@ -1105,7 +1110,9 @@
       "tide valve",
       "flood seal",
       "broken ladder",
-      "rope bundle"
+      "rope bundle",
+      "wagon wheel",
+      "overturned wagon"
     ]
   },
   {
@@ -1458,7 +1465,10 @@
       "lantern",
       "defense lever",
       "bent spike",
-      "pulse emitter"
+      "pulse emitter",
+      "snare pit",
+      "snare",
+      "trapper camp"
     ]
   },
   {
@@ -1589,7 +1599,10 @@
       "rusted lantern",
       "skull pile",
       "shadow stain",
-      "whispering vent"
+      "whispering vent",
+      "cellar door",
+      "trapdoor",
+      "buried structure"
     ]
   },
   {
@@ -1788,7 +1801,9 @@
       "communal well",
       "relic altar",
       "watch-post",
-      "shaped pillar"
+      "shaped pillar",
+      "cellar door",
+      "cellar"
     ]
   },
   {
@@ -1867,7 +1882,8 @@
       "stone marker",
       "watch fire",
       "footprint",
-      "waystation"
+      "waystation",
+      "roadside camp"
     ]
   },
   {
@@ -2008,7 +2024,9 @@
       "stone marker",
       "watch fire",
       "footprint",
-      "pilgrim camp"
+      "pilgrim camp",
+      "snare",
+      "roadside camp"
     ]
   },
   {
@@ -2055,7 +2073,10 @@
       "stone marker",
       "watch fire",
       "footprint",
-      "survey camp"
+      "survey camp",
+      "smelter",
+      "forge ruin",
+      "anvil post"
     ]
   },
   {
@@ -2149,7 +2170,9 @@
       "stone marker",
       "watch fire",
       "footprint",
-      "reclaimer stake"
+      "reclaimer stake",
+      "smelter",
+      "anvil post"
     ]
   },
   {
@@ -2196,7 +2219,10 @@
       "stone marker",
       "watch fire",
       "footprint",
-      "architect blind"
+      "architect blind",
+      "forge ruin",
+      "cellar",
+      "trapdoor"
     ]
   },
   {

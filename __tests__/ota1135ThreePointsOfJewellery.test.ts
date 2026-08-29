@@ -143,7 +143,13 @@ describe('OTA-1135 — ⚠ the panel could not see the rings', () => {
     // Before this OTA the two players below returned the SAME standing AC,
     // because the amulet and rings were invisible to the function the panel
     // called. That is the 15-vs-18 the owner reported.
-    expect(standingAc(reported())).toBe(standingAc(bare()) + 3);
+    // ⚠ OTA-1539 — the subject is that the accessories are COUNTED AT ALL (they
+    // used to be invisible, so both players returned the same number). Their raw
+    // +3 now lands past the knee-16 curve and renders as +2; asserting the raw
+    // delta would be asserting the curve, not the bug this OTA closed.
+    expect(standingAc(reported())).toBeGreaterThan(standingAc(bare()));
+    const bareRaw = 10 + equippedGearAc(bare()).worn + equippedGearAc(bare()).accessories;
+    expect(standingAc(reported())).toBe(trimStandingAc(bareRaw + 3));
   });
 
   it('the total is base + worn + accessories, trimmed — no fourth term', () => {

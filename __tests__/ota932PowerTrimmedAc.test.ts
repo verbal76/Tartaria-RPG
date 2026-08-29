@@ -17,12 +17,15 @@ const mkPlayer = (ac: number): PlayerCharacter =>
   } as unknown as PlayerCharacter);
 
 describe('OTA-932 — Power AC term equals the trimmed (shown/fought) AC', () => {
-  it('below the knee nothing changes: +10 raw AC is +10 Power', () => {
-    expect(playerPowerScore(mkPlayer(20)) - playerPowerScore(mkPlayer(10))).toBe(10);
+  // ⚠ OTA-1539 moved the knee 22 -> 16, so the "below the knee" probe moves with
+  // it. The SUBJECT is unchanged: the Power gauge must read the same trimmed AC
+  // the player is defended at, whatever the curve is.
+  it('below the knee nothing changes: +6 raw AC is +6 Power', () => {
+    expect(playerPowerScore(mkPlayer(16)) - playerPowerScore(mkPlayer(10))).toBe(6);
   });
 
-  it('above the knee the gauge tracks trimStandingAc exactly (raw 37 scores as 28)', () => {
-    expect(trimStandingAc(37)).toBe(28);
+  it('above the knee the gauge tracks trimStandingAc exactly (raw 37 scores as 27)', () => {
+    expect(trimStandingAc(37)).toBe(27);
     const base = playerPowerScore(mkPlayer(10));
     expect(playerPowerScore(mkPlayer(37)) - base).toBe(trimStandingAc(37) - 10);
   });
