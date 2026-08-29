@@ -1,0 +1,157 @@
+{
+  "id": "6f5aa0fc73f6493988d74d50db053075",
+  "groupID": "7689752968",
+  "eventID": "6f5aa0fc73f6493988d74d50db053075",
+  "projectID": "4511945117532160",
+  "size": 2967,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: tap \"missions\" \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "Process died with no orderly exit while: tap \"missions\" \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer",
+  "title": "Process died with no orderly exit while: tap \"missions\" \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8cfb9edabb2d4d69ab3e79f695411f72",
+      "span_id": "87c7ce5c27942fb8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "id": "1788027296559_native-death",
+    "lastAction": "tap \"missions\"",
+    "lastPhase": "rendered",
+    "lastPhaseAgeMs": 0,
+    "lastRoom": "reclaimer_stake",
+    "lastScreen": "exploration",
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: tap \"missions\" \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-08-29-1542-the-rendezvous-is-a-place"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "stage",
+      "value": "rendered"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-29T18:57:30.380104Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-29T18:14:56.559000Z",
+  "fingerprints": [
+    "d2a856763bc7c5254aad1c4fed660793"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "8fc455c7a8bb4ad5af7eb3d46f3a3c3e"
+}
