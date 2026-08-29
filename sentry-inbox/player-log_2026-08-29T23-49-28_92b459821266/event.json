@@ -1,0 +1,197 @@
+{
+  "id": "92b4598212664f11adee4295e4edecee",
+  "groupID": "7700076616",
+  "eventID": "92b4598212664f11adee4295e4edecee",
+  "projectID": "4511945117532160",
+  "size": 17812,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 20/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 20/23]",
+  "title": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 20/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "0bacdf0ca6c24c7fa856ec3c83e85625",
+      "span_id": "94482cea9db2f9a1",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "wisely.\"\n[2026-08-29T23:44:12.841Z] [debug] ui: tap \"dodge\"\n[2026-08-29T23:44:12.850Z] [player] dodge\n[2026-08-29T23:44:12.851Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n",
+      "[2026-08-29T23:44:12.856Z] [world] You commit to the dodge. Slip Drowned Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-29T23:44:12.883Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 1 + ATK 2 = 3 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-08-29T23:44:12.883Z] [combat] Dodge \u2014 Drowned Aetherkin overcommits past you. \u2713 Free opening (next strike \u00d72 dice).\n[2026-08-29T23:44:12.884Z] [debug] arbiter: template (reason=combat)\n[2026-08-29T23:44:12.884Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-29T23:44:12.884Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:44:12.994Z] [cognitive] neutral  (109ms)\n",
+      "[2026-08-29T23:44:13.542Z] [debug] ui: tap \"cudgel\"\n[2026-08-29T23:44:13.570Z] [player] attack with the cudgel\n[2026-08-29T23:44:13.570Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=1 hooks=0\n[2026-08-29T23:44:13.571Z] [debug] attack: target=Drowned Aetherkin range=close reach.bands=[close] reach.label=Cudgel bareHand=false\n",
+      "[2026-08-29T23:44:13.572Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:44:13.573Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-29T23:44:13.595Z] [world] Your cudgel comes around in an arc; Drowned Aetherkin squares up to meet it.\n[2026-08-29T23:44:13.596Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-29T23:44:13.696Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 TAKE_COVER \u00b7 DISENGAGE  (99ms)\n[2026-08-29T23:44:17.930Z] [world] You seize the initiative. Drowned Aetherkin has no time to react.\n[2026-08-29T23:44:17.931Z] [combat] You \u2014 d20 \u2192 9 + STR 5 \u2212 1 (Ash Storm) perfect opening (2\u00d7 dice) = 13 vs Drowned Aetherkin AC 8 \u2014 \u2713 HIT\n",
+      "[2026-08-29T23:44:17.933Z] [combat] Drowned Aetherkin takes 9 with the cudgel. It reels: 1 left. Then it fights back.\n[2026-08-29T23:44:17.934Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 5 + ATK 2 = 7 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-29T23:44:18.141Z] [debug] persist sizes(KB): total=142 player=25 wm=33[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=3\n[2026-08-29T23:44:18.492Z] [debug] ui: tap \"approach\"\n[2026-08-29T23:44:18.530Z] [player] approach Drowned Aetherkin\n",
+      "[2026-08-29T23:44:18.530Z] [debug] parser: intent=advance conf=1.00 verb=approach target=drowned aetherkin resolved=Drowned Aetherkin range=close enemies=1 hooks=0\n[2026-08-29T23:44:18.531Z] [debug] move: advance from range=close enemies=1 weather=Ash Storm cost=1 partial=0\n[2026-08-29T23:44:18.532Z] [debug] move: field advance target=Drowned Aetherkin d 0.50->0.35 band close->close\n",
+      "[2026-08-29T23:44:18.532Z] [world] You close the gap with Drowned Aetherkin. (range: close / arm's reach)\n[2026-08-29T23:44:18.536Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 17 + ATK 2 = 19 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-29T23:44:18.650Z] [combat] Drowned Aetherkin deals 7 aetheric damage [armor \u221239%] +3 electrical [Reclaimer's Scrapplate took it]. You have 19 HP remaining.\n",
+      "[2026-08-29T23:44:18.745Z] [cognitive] RETREAT \u00b7 REST \u00b7 HIDE \u00b7 SWIM \u00b7 SEARCH  (114ms)\n[2026-08-29T23:44:20.408Z] [debug] ui: tap \"kick\"\n[2026-08-29T23:44:20.412Z] [player] kick\n[2026-08-29T23:44:20.412Z] [debug] parser: intent=attack conf=1.00 verb=kick target=- resolved=- range=close enemies=1 hooks=0\n",
+      "[2026-08-29T23:44:20.413Z] [debug] attack: target=Drowned Aetherkin range=close reach.bands=[close] reach.label=Bare hands bareHand=true\n[2026-08-29T23:44:20.415Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:44:20.446Z] [world] Drowned Aetherkin fixes on you. You commit to the strike.\n[2026-08-29T23:44:20.446Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-29T23:44:20.555Z] [cognitive] AGGRESSION \u00b7 DISENGAGE  (108ms)\n[2026-08-29T23:44:25.150Z] [world] Drowned Aetherkin moves first. The pressure is immediate.\n[2026-08-29T23:44:25.157Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 11 + ATK 2 = 13 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-29T23:44:25.158Z] [combat] You \u2014 d20 \u2192 10 + STR 5 \u2212 1 (Ash Storm) = 14 vs Drowned Aetherkin AC 8 \u2014 \u2713 HIT\n[2026-08-29T23:44:25.159Z] [combat] Bludgeoning flares \u2014 +3 on hit.\n[2026-08-29T23:44:25.160Z] [combat] The killing blow: 9. Drowned Aetherkin drops where it stood.\n[2026-08-29T23:44:25.165Z] [reward] Drowned Aetherkin defeated. You recover Veil of Peace \u00d72.\n",
+      "[2026-08-29T23:44:25.168Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-29T23:44:25.168Z] [system] Word travels among those who keep the flood-dead sacred: you put one of the Aetherkin down.\n[2026-08-29T23:44:25.169Z] [reward] +5 TC pried from the dust.\n[2026-08-29T23:44:28.296Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-08-29T23:44:28.627Z] [debug] ui: tap \"take / salvage\"\n[2026-08-29T23:44:29.784Z] [world] You work the workbench over. A part of it comes loose, intact.\n[2026-08-29T23:44:29.785Z] [reward] \u2726 Salvage haul:\n[2026-08-29T23:44:29.785Z] [reward]     \u2022 Bent Nail (Common)\n[2026-08-29T23:44:34.412Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:44:36.174Z] [player] investigate the mud\n",
+      "[2026-08-29T23:44:36.174Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n[2026-08-29T23:44:36.177Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Mud Fragment (Common).\n[2026-08-29T23:44:36.182Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-29T23:44:36.263Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 7901ms read 0ms/write 0ms in 740t\u2192out 0t (0ch)\n[2026-08-29T23:44:36.344Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 7901ms \u2014 intro-fill:\u2205\n[2026-08-29T23:44:36.344Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2205 8048ms\n[2026-08-29T23:44:36.410Z] [cognitive] SWIM  (227ms)\n",
+      "[2026-08-29T23:44:37.422Z] [player] investigate tools\n[2026-08-29T23:44:37.423Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tools resolved=tools range=- enemies=0 hooks=0\n[2026-08-29T23:44:37.424Z] [world] You take the measure of the tools. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.\n",
+      "[2026-08-29T23:44:37.519Z] [cognitive] neutral  (92ms)\n[2026-08-29T23:44:38.657Z] [player] investigate pegs\n[2026-08-29T23:44:38.657Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pegs resolved=pegs range=- enemies=0 hooks=0\n[2026-08-29T23:44:38.658Z] [world] You study the pegs and find no answer. The silence here is patient; whatever it knew, it has decided to keep.\n",
+      "[2026-08-29T23:44:39.648Z] [debug] qwen\u23f1 investigate_lore ok 2143ms read/write unusable (native mis-reported 10328ms/876ms \u2014 llama.rn split bug, not this call) in 126t\u2192out 27t (128ch)\n[2026-08-29T23:44:39.822Z] [cognitive] neutral  (1162ms)\n[2026-08-29T23:44:39.887Z] [player] investigate floorboards\n",
+      "[2026-08-29T23:44:39.888Z] [world] Hidden until now: The Hidden Cellar opens up. It joins the rooms you can reach.\n[2026-08-29T23:44:40.921Z] [debug] qwen\u23f1 investigate_lore ok 2154ms wait 1056ms read 312ms/write 770ms in 127t\u2192out 24t 2.5ms/t (114ch)\n[2026-08-29T23:44:41.112Z] [player] investigate shelf\n",
+      "[2026-08-29T23:44:41.112Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shelf resolved=- range=- enemies=0 hooks=0\n[2026-08-29T23:44:41.113Z] [world] You comb through the shelf. You find something half-buried.\n[2026-08-29T23:44:41.114Z] [reward] \u2726 Architect's Sight Enhancer (Uncommon).\n[2026-08-29T23:44:41.114Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-29T23:44:41.229Z] [cognitive] neutral  (114ms)\n[2026-08-29T23:44:41.336Z] [debug] persist sizes(KB): total=143 player=26 wm=35[rooms=9 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=2\n[2026-08-29T23:44:41.565Z] [debug] ui: tap \"\u2197 Bedroom\"\n[2026-08-29T23:44:41.567Z] [world] You step into the bedroom.\n",
+      "[2026-08-29T23:44:41.567Z] [world] Somebody slept in here long after the shed stopped being a shed \u2014 a low bed under the eaves, a cupboard of stoppered jars, and a lamp burned down to its socket.\n[2026-08-29T23:44:42.881Z] [debug] ui: tap \"take / salvage\"\n[2026-08-29T23:44:44.177Z] [world] You break the bed apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-29T23:44:44.178Z] [world] You work the cupboard over. A part of it comes loose, intact.\n[2026-08-29T23:44:44.178Z] [world] You strip the jars carefully. Something usable comes free in your hand.\n[2026-08-29T23:44:44.178Z] [world] You salvage the lamp. The take is small but real.\n[2026-08-29T23:44:44.179Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-29T23:44:44.179Z] [reward]     \u2022 Stick x3 (Common)\n[2026-08-29T23:44:44.179Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-08-29T23:44:44.180Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n[2026-08-29T23:44:44.180Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-29T23:44:45.165Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:44:46.858Z] [player] investigate the mud\n",
+      "[2026-08-29T23:44:46.859Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n[2026-08-29T23:44:46.861Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-29T23:44:46.870Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-29T23:44:46.871Z] [arbiter] The Arbiter looks around. \"Claim-posts driven in rows, each one a bet against the mud. The Guild plays long odds on purpose.\"\n[2026-08-29T23:44:46.871Z] [system] \u23f3 Time passed: 24 min\n[2026-08-29T23:44:46.955Z] [cognitive] SWIM  (83ms)\n[2026-08-29T23:44:48.125Z] [player] investigate shelf\n",
+      "[2026-08-29T23:44:48.126Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shelf resolved=- range=- enemies=0 hooks=0\n[2026-08-29T23:44:48.127Z] [world] \u2605 A QUIET MOMENT \u2014 A small wooden box, no lid, no nails. Inside: a single dry rose, brown to black. Someone meant to come back for it.\n[2026-08-29T23:44:48.128Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-29T23:44:48.206Z] [cognitive] neutral  (76ms)\n[2026-08-29T23:44:52.622Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:44:55.060Z] [player] investigate the mud\n[2026-08-29T23:44:55.061Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-29T23:44:55.065Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-08-29T23:44:55.073Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-29T23:44:55.074Z] [system] \u23f3 Time passed: 24 min\n[2026-08-29T23:44:55.153Z] [cognitive] SWIM  (78ms)\n",
+      "[2026-08-29T23:45:05.364Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=-\n[2026-08-29T23:45:05.558Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=live winH=986 beat=-\n[2026-08-29T23:45:05.633Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n[2026-08-29T23:45:11.485Z] [player] take the single dry roads\n",
+      "[2026-08-29T23:45:11.486Z] [debug] parser: intent=pickup conf=1.00 verb=take target=single dry roads resolved=- range=- enemies=0 hooks=0\n[2026-08-29T23:45:11.487Z] [world] The ground here is bare. Nothing to pick up.\n[2026-08-29T23:45:11.657Z] [cognitive] TRAVEL  (166ms)\n[2026-08-29T23:45:15.128Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-\n",
+      "[2026-08-29T23:45:15.286Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:45:15.421Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:45:18.279Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-29T23:45:23.306Z] [player] when I typed in take the single dry rows there was no text box\n",
+      "[2026-08-29T23:45:23.307Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-29T23:45:23.309Z] [debug] meta-comment guard: skipped intent parse (engine-vocabulary: \"text box\") on 62-char input\n",
+      "[2026-08-29T23:45:24.964Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 6598ms read 0ms/write 0ms in 738t\u2192out 0t (0ch)\n[2026-08-29T23:45:25.069Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6598ms \u2014 intro-fill:\u2205\n[2026-08-29T23:45:25.070Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2205 6797ms\n[2026-08-29T23:45:26.357Z] [debug] ui: tap \"\u2193 Storage\"\n",
+      "[2026-08-29T23:45:26.361Z] [world] You step into the storage.\n[2026-08-29T23:45:26.361Z] [world] Shelves run the length of the wall, stacked with bottles, tins and sacking. Whatever was worth keeping was kept here, and most of it is still keeping.\n[2026-08-29T23:45:27.941Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-29T23:45:29.167Z] [world] You lever something loose from the bottles \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-29T23:45:29.168Z] [world] You salvage the sacking. The take is small but real.\n[2026-08-29T23:45:29.174Z] [reward] \u2726 Salvage haul:\n[2026-08-29T23:45:29.174Z] [reward]     \u2022 Coiled Snare Thread (Common)\n",
+      "[2026-08-29T23:45:29.175Z] [reward]     \u2022 Cloth Scrap x3 (Common)\n[2026-08-29T23:45:30.275Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:45:31.855Z] [player] investigate the mud\n[2026-08-29T23:45:31.856Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-29T23:45:31.859Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-29T23:45:31.866Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-29T23:45:31.866Z] [arbiter] The Arbiter looks around. \"The tally-board lists marked ruins in grease-pencil: DUG, DIGGING, DEEP, LATER. 'Later' is doing heavy work.\"\n",
+      "[2026-08-29T23:45:31.866Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-29T23:45:31.867Z] [system] \u23f3 Time passed: 24 min\n[2026-08-29T23:45:31.944Z] [cognitive] SWIM  (76ms)\n[2026-08-29T23:45:32.170Z] [debug] persist sizes(KB): total=142 player=26 wm=34[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=2\n[2026-08-29T23:45:33.094Z] [player] investigate shelves\n",
+      "[2026-08-29T23:45:33.100Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shelves resolved=shelves range=- enemies=0 hooks=0\n[2026-08-29T23:45:33.101Z] [world] Empty hooks and dust marks where things used to rest. The shelf remembers what was taken; you do not.\n[2026-08-29T23:45:33.102Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-29T23:45:33.198Z] [cognitive] neutral  (94ms)\n[2026-08-29T23:45:34.333Z] [player] investigate tins\n[2026-08-29T23:45:"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 20/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtf18j1mlkuk"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "20"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-29T23:49:28.355377Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-29T23:49:28.055000Z",
+  "fingerprints": [
+    "14c799cb88dcf9f9206b5cbcc59d3a6a"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "9ad24d39f1534881a5e1a571153572f6",
+  "previousEventID": "7b587291ac7d4d0393c7cf85d2ccd509"
+}

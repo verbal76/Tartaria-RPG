@@ -1,0 +1,173 @@
+{
+  "id": "18eff00adee04c50bf6eab856878c043",
+  "groupID": "7700061603",
+  "eventID": "18eff00adee04c50bf6eab856878c043",
+  "projectID": "4511945117532160",
+  "size": 9740,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-29-1547-the-conversation-holds-the-floor #mtf0hncu56cv [inline 18/18]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-29-1547-the-conversation-holds-the-floor #mtf0hncu56cv [inline 18/18]",
+  "title": "player-log 2026-08-29-1547-the-conversation-holds-the-floor #mtf0hncu56cv [inline 18/18]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "67a4a4e1f7a04c7784c502eff2186eb2",
+      "span_id": "a715e0b9096bf664",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "e conf=1.00 verb=investigate target=small fire resolved=small fire range=- enemies=0 hooks=1\n[2026-08-29T23:28:22.444Z] [world] The small fire sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-08-29T23:28:22.528Z] [cognitive] neutral  (82ms)\n[2026-08-29T23:28:23.692Z] [player] investigate shelf\n",
+      "[2026-08-29T23:28:23.693Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shelf resolved=- range=- enemies=0 hooks=1\n[2026-08-29T23:28:23.695Z] [world] You sift the shelf and pull out a piece worth keeping.\n[2026-08-29T23:28:23.696Z] [reward] \u2726 Bone Crossbow (Uncommon).\n[2026-08-29T23:28:23.697Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-29T23:28:24.421Z] [debug] qwen\u23f1 investigate_lore ok 1902ms read 1245ms/write 632ms in 127t\u2192out 20t 9.8ms/t (86ch)\n[2026-08-29T23:28:24.596Z] [cognitive] neutral  (899ms)\n[2026-08-29T23:28:26.365Z] [debug] ui: tap \"climb down\"\n[2026-08-29T23:28:26.384Z] [player] climb down\n",
+      "[2026-08-29T23:28:26.384Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-29T23:28:26.385Z] [world] You climb down from the pilgrim's perch and rejoin the ground beside the ladder. Boots back on the ground.\n[2026-08-29T23:28:26.386Z] [system] \u23f3 Time passed: 15 min\n[2026-08-29T23:28:26.480Z] [cognitive] CLIMB  (93ms)\n\n",
+      "=== END LOG \u00b7 256294 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-08-29T23:28:33.861Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n",
+      "  OTA: (2026-08-29-1547-the-conversation-holds-the-floor)\n  Boot stage: qwen:done\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-08-29T23:17:16.755Z\n  Last init success: 2026-08-29T23:17:17.840Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n",
+      "  Status: none recorded\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-27T02:03:02.202Z (4166m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1518-the-beacon-goes-first \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+92048ms)\n",
+      "  \u2022 2026-08-27T02:32:27.198Z (4136m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1519-the-attachment-was-the-fault \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+23274ms)\n  \u2022 2026-08-27T03:03:20.074Z (4105m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+20786ms)\n  \u2022 2026-08-27T12:37:15.724Z (3531m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1522-the-stun-does-not-outlive-itself \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+0ms)\n  \u2022 2026-08-27T16:21:51.524Z (3307m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1524-cover-the-seven-and-mean-the-switch \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+12474ms)\n  \u2022 2026-08-27T21:42:59.314Z (2986m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"missions\"\n",
+      "      doing: tap \"missions\" \u00b7 room outpost_central \u00b7 screen exploration\n      last checkpoint: rendered (+23163ms)\n  \u2022 2026-08-28T02:29:33.897Z (2699m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n      Process died with no orderly exit while: action \"investigate weathered ruined skyscraper\"\n",
+      "      doing: action \"investigate weathered ruined skyscraper\" \u00b7 room monarch_waystation \u00b7 screen exploration\n      last checkpoint: rendered (+79547ms)\n  \u2022 2026-08-28T04:28:43.279Z (2580m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-28-1530-the-stranger-gets-the-screen \u00b7 stage rendered\n      Process died with no orderly exit while: action \"investigate the ground\"\n",
+      "      doing: action \"investigate the ground\" \u00b7 room iskan_veil \u00b7 screen exploration\n      last checkpoint: rendered (+16317ms)\n  \u2022 2026-08-29T18:14:56.559Z (314m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-29-1542-the-rendezvous-is-a-place \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: tap \"missions\" \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer\n      doing: tap \"missions\" \u00b7 room reclaimer_stake \u00b7 screen exploration\n      last checkpoint: rendered (+306713ms)\n  \u2022 2026-08-29T22:34:17.576Z (54m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-29-1547-the-conversation-holds-the-floor \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done (+575ms)\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n",
+      "  \u26a0\u26a0 LAST BOOT DIED MID-ACTION \u2014 no orderly exit was recorded.\n     Last thing the app did: (no action yet)\n     Where: (unknown) on (unknown) screen\n     Last seen alive: 2026-08-29T22:34:17.576Z (54 min before this boot \u2014 the kill landed somewhere in that gap)\n     Last checkpoint reached: native:cognition:done (+575ms after it)\n",
+      "     \u26a0 The disk log's tail is UNRELIABLE for that session \u2014 batched lines\n       die in memory when the JS thread wedges. Trust this line over it.\n  Memory warnings: none this session\n  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  \u26a0 Native queue: worst wait 1.8s \u00b7 0 job kinds queued >3s \u00b7 worst 11.1ms/prompt-token \u00b7 13 generations thrown away (72.1s)\n",
+      "     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.\n  App state trail: background \u2192 active \u2192 background \u2192 active\nModel contexts\n  Live now: 1\n  Opened: 1 \u00b7 Released: 0 \u00b7 Peak live: 1\n  Narration engine: ready\n"
+    ],
+    "chunkChars": 7052
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-29-1547-the-conversation-holds-the-floor #mtf0hncu56cv [inline 18/18]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtf0hncu56cv"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "18"
+    },
+    {
+      "key": "parts",
+      "value": "18"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-29T23:28:34.351372Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-29T23:28:33.938000Z",
+  "fingerprints": [
+    "4949fcdbffb47690bfd14ac8cc0e8f12"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "2922eb096701432fbefa9ef68a6fcae6",
+  "previousEventID": "17b360d9848048d3a2ab795aa750c125"
+}

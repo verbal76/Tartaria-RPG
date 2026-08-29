@@ -1,0 +1,198 @@
+{
+  "id": "c3dade2939364d948765127c1bb85e92",
+  "groupID": "7700076616",
+  "eventID": "c3dade2939364d948765127c1bb85e92",
+  "projectID": "4511945117532160",
+  "size": 17814,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 15/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 15/23]",
+  "title": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 15/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "0bacdf0ca6c24c7fa856ec3c83e85625",
+      "span_id": "94482cea9db2f9a1",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "] [player] craft Frost Paste\n[2026-08-29T23:18:36.115Z] [debug] parser: intent=craft conf=1.00 verb=craft target=frost paste resolved=- range=- enemies=0 hooks=1\n[2026-08-29T23:18:36.117Z] [reward] \u2726 Crafted Frost Paste. The Arbiter watches you set the last piece.\n[2026-08-29T23:18:38.000Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 8985ms read 0ms/write 0ms in 746t\u2192out 0t (0ch)\n",
+      "[2026-08-29T23:18:38.024Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 8985ms \u2014 intro-fill:\u2205\n[2026-08-29T23:18:38.025Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2205 9014ms\n[2026-08-29T23:18:38.032Z] [cognitive] neutral  (1912ms)\n[2026-08-29T23:18:38.188Z] [player] craft Searing Paste\n",
+      "[2026-08-29T23:18:38.189Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=- range=- enemies=0 hooks=1\n[2026-08-29T23:18:38.190Z] [reward] \u2726 Crafted Searing Paste. The Arbiter watches you set the last piece.\n[2026-08-29T23:18:40.509Z] [player] craft Smoldering Paste\n",
+      "[2026-08-29T23:18:40.509Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=- range=- enemies=0 hooks=1\n[2026-08-29T23:18:40.511Z] [reward] \u2726 Crafted Smoldering Paste. The Arbiter watches you set the last piece.\n",
+      "[2026-08-29T23:18:41.764Z] [debug] qwen\u23f1 ambient ok 5573ms wait 1841ms read/write unusable (native mis-reported 11680ms/1019ms \u2014 llama.rn split bug, not this call) in 364t\u2192out 31t HIT-CAP (171ch)\n[2026-08-29T23:18:41.769Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 5573ms \u2014 ambient:\u2205\n[2026-08-29T23:18:41.770Z] [debug] arbiter: ambient \u2205 5652ms\n",
+      "[2026-08-29T23:18:41.772Z] [debug] arbiter: ambient-empty reason=unknown raw=\"You have traversed through the streets of the Borderlands, navigating through the bustling market square. The air is ali\"\n[2026-08-29T23:18:44.805Z] [debug] voice\u23f1 gap 3487ms (wait 444ms + synth 3038ms, live) \"You have traversed through thuh streets \u2026\"\n[2026-08-29T23:18:44.898Z] [cognitive] neutral  (6707ms)\n",
+      "[2026-08-29T23:18:44.904Z] [cognitive] neutral  (4391ms)\n[2026-08-29T23:19:14.073Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-29T23:19:22.693Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 8618ms read 7481ms/write 1086ms in 743t\u2192out 33t 10.1ms/t HIT-CAP (179ch)\n[2026-08-29T23:19:22.707Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 8618ms \u2014 intro-fill:\u2205\n",
+      "[2026-08-29T23:19:22.708Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2205 8637ms\n[2026-08-29T23:19:29.654Z] [debug] appstate: active \u2192 background (was active for 131814ms)\n[2026-08-29T23:20:20.446Z] [debug] appstate: background \u2192 active (was background for 50792ms)\n[2026-08-29T23:20:20.490Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-08-29T23:20:21.701Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1207ms read 0ms/write 1178ms in 743t\u2192out 34t (139ch)\n[2026-08-29T23:20:21.712Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 1207ms \u2014 intro-fill:\u2205\n[2026-08-29T23:20:21.713Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2205 1223ms\n",
+      "[2026-08-29T23:20:22.616Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-08-29T23:20:22.642Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=1\n",
+      "[2026-08-29T23:20:22.667Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=1\n[2026-08-29T23:20:22.675Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-29T23:20:22.675Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-29T23:20:22.676Z] [reward] \u2726 Crafted Acid Flask \u00d72. The Arbiter watches you set the last piece.\n[2026-08-29T23:20:28.298Z] [debug] ui: tap \"craft\"\n[2026-08-29T23:20:28.399Z] [debug] persist sizes(KB): total=138 player=19 wm=37[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n[2026-08-29T23:20:31.917Z] [player] summon crystal golem\n",
+      "[2026-08-29T23:20:31.917Z] [debug] parser: intent=cast conf=1.00 verb=summon target=crystal golem resolved=- range=- enemies=0 hooks=1\n[2026-08-29T23:20:31.937Z] [combat] Aether Golem Constructor \u2014 d20 7 + INT 12 = 19 vs DC 22 \u2014 \u2717 FAILED\n[2026-08-29T23:20:31.937Z] [world] (2\u00d7 Aether Crystal + 1\u00d7 Aetheric Cloth + 1\u00d7 Aetheric Shard consumed.)\n",
+      "[2026-08-29T23:20:31.937Z] [world] The shape slips out of your hands. The aether returns to itself, indifferent.\n[2026-08-29T23:20:31.938Z] [system] \u23f3 Time passed: 30 min\n[2026-08-29T23:20:32.044Z] [cognitive] USE_ITEM  (104ms)\n[2026-08-29T23:20:34.684Z] [debug] ui: tap \"craft\"\n[2026-08-29T23:20:38.058Z] [player] summon crystal golem\n",
+      "[2026-08-29T23:20:38.059Z] [debug] parser: intent=cast conf=1.00 verb=summon target=crystal golem resolved=- range=- enemies=0 hooks=1\n[2026-08-29T23:20:38.074Z] [reward] Aether Golem Constructor \u2014 d20 11 + INT 12 = 23 vs DC 22 \u2014 \u2713 SUMMONED\n[2026-08-29T23:20:38.075Z] [world] (2\u00d7 Aether Crystal + 1\u00d7 Aetheric Cloth + 1\u00d7 Aetheric Shard consumed.)\n",
+      "[2026-08-29T23:20:38.075Z] [world] Aetherstone lifts out of the ground and folds into a shape that walks. Crystal Golem stands ready beside you. (HP 52/52, 1d12 piercing)\n[2026-08-29T23:20:38.075Z] [arbiter] The Arbiter studies the standing shape. \"You gave it life. You might as well give it a name.\"\n[2026-08-29T23:20:38.076Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-29T23:20:38.168Z] [cognitive] USE_ITEM  (91ms)\n[2026-08-29T23:20:40.366Z] [debug] ui: tap \"craft\"\n[2026-08-29T23:20:41.764Z] [debug] qwen\u23f1 ambient ok 3536ms read 2580ms/write 933ms in 364t\u2192out 29t 7.1ms/t (147ch)\n[2026-08-29T23:20:41.772Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 3536ms \u2014 ambient:\u2205\n[2026-08-29T23:20:41.773Z] [debug] arbiter: ambient \u2205 3697ms\n",
+      "[2026-08-29T23:20:41.775Z] [debug] arbiter: ambient-empty reason=action-opener raw=\"You look at your companion, who has spent years at the Black Market Bazaar, feeling a renewed sense of resilience and co\"\n[2026-08-29T23:20:45.609Z] [world] Talus. The name takes hold in the Aetherstone.\n[2026-08-29T23:20:45.610Z] [arbiter] The Arbiter nods. \"Talus, then.\"\n",
+      "[2026-08-29T23:20:45.828Z] [debug] voice\u23f1 gap 4093ms (wait 26ms + synth 4060ms, live) \"You look at your companion, who has spen\u2026\"\n[2026-08-29T23:20:53.124Z] [player] craft Mud Scanner\n[2026-08-29T23:20:53.124Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mud scanner resolved=mud range=- enemies=0 hooks=1\n",
+      "[2026-08-29T23:20:53.130Z] [arbiter] \"Crafting Mud Scanner would strip Mud Essence \u2192 Aether Mud from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-08-29T23:20:53.131Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-29T23:20:53.131Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-29T23:20:53.178Z] [cognitive] neutral  (45ms)\n[2026-08-29T23:20:54.806Z] [player] craft Mud Scanner\n[2026-08-29T23:20:54.807Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mud scanner resolved=mud range=- enemies=0 hooks=1\n[2026-08-29T23:20:54.813Z] [arbiter] The Arbiter nods. \"Stripped for parts: Mud Essence \u2192 Aether Mud.\"\n",
+      "[2026-08-29T23:20:54.818Z] [reward] \u2726 Crafted Mud Scanner. The Arbiter watches you set the last piece.\n[2026-08-29T23:20:54.880Z] [cognitive] neutral  (61ms)\n[2026-08-29T23:20:59.028Z] [player] craft Pulse Scanner\n[2026-08-29T23:20:59.028Z] [debug] parser: intent=craft conf=1.00 verb=craft target=pulse scanner resolved=Pulse Scanner range=- enemies=0 hooks=1\n",
+      "[2026-08-29T23:20:59.031Z] [reward] \u2726 Crafted Pulse Scanner. The Arbiter watches you set the last piece.\n[2026-08-29T23:20:59.094Z] [cognitive] neutral  (61ms)\n[2026-08-29T23:20:59.157Z] [debug] persist sizes(KB): total=139 player=19 wm=37[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n",
+      "[2026-08-29T23:21:01.809Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-08-29T23:21:01.831Z] [player] craft Pulse Scanner\n[2026-08-29T23:21:01.833Z] [debug] parser: intent=craft conf=1.00 verb=craft target=pulse scanner resolved=Pulse Scanner range=- enemies=0 hooks=1\n",
+      "[2026-08-29T23:21:01.836Z] [arbiter] \"Crafting Pulse Scanner would strip Bent Nail \u2192 Scrap Metal from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-08-29T23:21:01.836Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-29T23:21:01.836Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-29T23:21:01.857Z] [cognitive] neutral  (19ms)\n[2026-08-29T23:21:03.225Z] [arbiter] The Arbiter sets the schematic down. \"Left them be, then. Your pieces stay in your pack.\"\n[2026-08-29T23:21:06.393Z] [player] craft Aetheric Torch\n[2026-08-29T23:21:06.394Z] [debug] parser: intent=craft conf=1.00 verb=craft target=aetheric torch resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-29T23:21:06.396Z] [reward] \u2726 Crafted Aetheric Torch. The Arbiter watches you set the last piece.\n[2026-08-29T23:21:06.467Z] [cognitive] USE_ITEM \u00b7 THROW  (70ms)\n[2026-08-29T23:21:15.530Z] [debug] homework: intro-fill armed after 7838ms idle\n[2026-08-29T23:21:17.744Z] [player] shape stone\n",
+      "[2026-08-29T23:21:17.744Z] [debug] parser: intent=cast conf=1.00 verb=shape target=stone resolved=stone marker range=- enemies=0 hooks=1\n[2026-08-29T23:21:17.766Z] [combat] Aetherstone Manipulation \u2014 d20 1 + INT 12 = 13 vs DC 15 \u2014 \u2717 FAILED\n[2026-08-29T23:21:17.766Z] [world] (1 Aether Crystal consumed.)\n",
+      "[2026-08-29T23:21:17.766Z] [world] The shape slips out of your hands. The aether returns to itself, indifferent.\n[2026-08-29T23:21:17.767Z] [debug] arbiter: template (reason=intent-not-allowed:cast)\n[2026-08-29T23:21:17.767Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-29T23:21:17.768Z] [system] \u23f3 Time passed: 30 min\n[2026-08-29T23:21:19.972Z] [debug] ui: tap \"craft\"\n",
+      "[2026-08-29T23:21:21.467Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 5935ms read 0ms/write 0ms in 740t\u2192out 0t (0ch)\n[2026-08-29T23:21:21.475Z] [cognitive] neutral  (3704ms)\n[2026-08-29T23:21:21.476Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5935ms \u2014 intro-fill:\u2205\n[2026-08-29T23:21:21.476Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2205 5947ms\n",
+      "[2026-08-29T23:21:23.895Z] [player] shape stone\n[2026-08-29T23:21:23.896Z] [debug] parser: intent=cast conf=1.00 verb=shape target=stone resolved=stone marker range=- enemies=0 hooks=1\n[2026-08-29T23:21:23.922Z] [reward] Aetherstone Manipulation \u2014 d20 12 + INT 12 = 24 vs DC 15 \u2014 \u2713 SHAPED\n[2026-08-29T23:21:23.923Z] [world] (1 Aether Crystal consumed.)\n",
+      "[2026-08-29T23:21:23.923Z] [world] You shape the Aetherstone but have no Small Rock to bind it to. The shape dissipates.\n[2026-08-29T23:21:23.924Z] [system] \u23f3 Time passed: 30 min\n[2026-08-29T23:21:24.026Z] [cognitive] neutral  (101ms)\n[2026-08-29T23:21:34.884Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=-\n",
+      "[2026-08-29T23:21:35.036Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:21:35.152Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:22:00.576Z] [debug] homework: intro-fill armed after 7733ms idle\n",
+      "[2026-08-29T23:22:04.940Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4274ms read/write unusable (native mis-reported 48306ms/1072ms \u2014 llama.rn split bug, not this call) in 738t\u2192out 33t HIT-CAP (145ch)\n[2026-08-29T23:22:05.036Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2713 4463ms\n",
+      "[2026-08-29T23:22:25.122Z] [player] whenever I cast anything etheric under craft it goes straight to the exploration screen, it should stay in the crafting menu like crafting. anything else does that way don't have to craft one thing go all the way back into it. craft another thing all the way back into it craft another thing what if I want to craft 20 shards in a row?\n",
+      "[2026-08-29T23:22:25.123Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-29T23:22:25.123Z] [debug] meta-comment guard: skipped intent parse (ui-vocabulary: \"screen\") on 335-char input\n",
+      "[2026-08-29T23:22:32.941Z] [debug] ui: tap \"look around you\"\n[2026-08-29T23:22:32.952Z] [player] look\n[2026-08-29T23:22:32.953Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-29T23:22:32.955Z] [world] You look around. You're in Black Market Bazaar, in Reclaimer's Stake. You see: ladder. The shelf is unaddressed. Cardinal travel: north, east, south, west.\n[2026-08-29T23:22:32.956Z] [arbiter] \u25b8 Still open \u2014 You're at Yulka's fire. Type 'accept yulka' to take the fetch (5 Discs on return), 'buy from yulka' to pay 50 TC for 5 Discs, or 'leave yulka' to walk.\n",
+      "[2026-08-29T23:22:32.957Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-29T23:22:32.957Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-29T23:22:33.056Z] [cognitive] neutral  (95ms)\n[2026-08-29T23:22:37.487Z] [debug] qwen\u23f1 ambient ok 4442ms read 2502ms/write 1069ms in 364t\u2192out 31t 6.9ms/t HIT-CAP (153ch)\n",
+      "[2026-08-29T23:22:37.546Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 4442ms \u2014 ambient:\u2205\n[2026-08-29T23:22:37.546Z] [debug] arbiter: ambient \u2205 4587ms\n[2026-08-29T23:22:37.547Z] [debug] arbiter: ambient-empty reason=unknown raw=\"You, my companion, have traversed countless markets, each one a new discovery. The streets, once bustling with commerce,\"\n",
+      "[2026-08-29T23:22:39.690Z] [debug] voice\u23f1 gap 3094ms (wait 169ms + synth 2144ms, live) \"You, my companion, have traversed countl\u2026\"\n[2026-08-29T23:22:41.187Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-08-29T23:22:41.359Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-\n",
+      "[2026-08-29T23:22:41.429Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:22:45.593Z] [debug] homework: intro-fill armed after 7255ms idle\n[2026-08-29T23:22:49.174Z] [player] accept yulka\n",
+      "[2026-08-29T23:22:49.176Z] [arbiter] \"Three tiles east.\" Yulka jerks her chin at the dark. \"If you don't come back, I never knew your face.\" She turns to her tray and doesn't look up again.\n[2026-08-29T23:22:49.176Z] [system] \u25c8 Task taken \u2014 see WHISPERS in Contracts. SET COURSE walks you to the thief.\n",
+      "[2026-08-29T23:22:49.380Z] [debug] persist sizes(KB): total=139 player=20 wm=37[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n[2026-08-29T23:22:51.488Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 5816ms read 0ms/write 0ms in 804t\u2192out 0t (0ch)\n[2026-08-29T23:22:51.548Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5816ms \u2014 intro-fill:\u2205\n",
+      "[2026-08-29T23:22:51.549Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2205 5958ms\n[2026-08-29T23:23:10.762Z] [debug] appst"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 15/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtf18j1mlkuk"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "15"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-29T23:49:28.276230Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-29T23:49:28.054000Z",
+  "fingerprints": [
+    "14c799cb88dcf9f9206b5cbcc59d3a6a"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "d3c6895e98254556b85b38b8bfd78230",
+  "previousEventID": "c209c72996864c9c8b94980361a329c4"
+}
