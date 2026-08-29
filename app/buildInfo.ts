@@ -25465,6 +25465,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //    inside inference - or native:llm:done - native exonerated. Either answer
 //    moves #81.
 export const OTA_BUILD_ID = '2026-08-29-1546-the-dying-breath-names-the-native-job';
+// golem catch-up 2026-08-29: markerless publish of OTA-1543/1544/1545/1546 (no
+// raw fragments in the feed + stock-filler gate, refused gifts go back in the
+// pack out loud, one AC derivation + quarantined native timing lie, native ML
+// breadcrumb stamps for #81) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1542-the-rendezvous-is-a-place';
 // golem catch-up 2026-08-29: markerless publish of OTA-1540/1541/1542 (the
 // floating text bar positioned from the keyboard's top edge so a Gboard
