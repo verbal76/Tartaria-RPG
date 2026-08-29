@@ -76,7 +76,11 @@ describe('OTA-631 — materializing fusion', () => {
     expect(fused!.name).not.toBe('Cooling Crucible-Work');
     expect(fused!.name.length).toBeGreaterThan(0);
     expect(fused!.materializing).toBeFalsy();
-    expect(['Rare', 'Legendary']).toContain(fused!.rarity);
+    // OTA-1536 — incidental to this test's subject (the materialize/settle
+    // flow), but the fixture feeds the forge Common scrap, which now floors at
+    // Uncommon instead of being handed a Rare. The assertion that matters here
+    // is that SOME real tier was stamped, not which one.
+    expect(['Uncommon', 'Rare', 'Legendary']).toContain(fused!.rarity);
     expect(fused!.uniqueStats).toBeTruthy(); // real stats were stamped instantly
 
     // Inputs were consumed by the forge.

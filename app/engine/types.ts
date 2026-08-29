@@ -590,8 +590,11 @@ export interface UniqueItemStats {
   /** What this fused item IS. Drives equip slot routing and which
    *  combat resolver reads it. */
   kind: 'weapon' | 'armor' | 'dog_armor';
-  /** Rarity floor — fusion never produces Common items. */
-  rarity: 'Rare' | 'Legendary';
+  /** Rarity floor - fusion never produces Common items. OTA-1536 widened this
+   *  from 'Rare' | 'Legendary' to the full ladder: the tier a fusion reaches is
+   *  now bounded by the best rarity among its inputs, so a scrap pack forges an
+   *  Uncommon instead of tying the best armor in the catalog. */
+  rarity: Rarity;
   /** Per-instance durability. Always present on fused items so
    *  scrap / repair routing works the same way as authored gear. */
   durability: { current: number; max: number };

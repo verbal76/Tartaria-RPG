@@ -24,16 +24,20 @@ jest.mock('@react-native-async-storage/async-storage', () => {
 });
 
 import { synthesizeFusionDeterministic } from '../app/engine/itemFusion';
-import type { InventoryItem } from '../app/engine/types';
+import type { InventoryItem, Rarity } from '../app/engine/types';
 
-function mkInferred(name: string, tags: string[]): InventoryItem {
+// OTA-1536 — the fixture now says what grade of scrap it is. Every input here
+// was 'Common' and the assertions below still expected Legendary out, which is
+// precisely the defect the owner reported ("fuse just keeps spitting out AC5
+// gear"). Rarity is a parameter now because it is an INPUT to the answer.
+function mkInferred(name: string, tags: string[], rarity: Rarity = 'Common'): InventoryItem {
   return {
     id: `i_${name.toLowerCase().replace(/\s+/g, '_')}`,
     name,
     kind: 'misc',
     quantity: 1,
     tags,
-    rarity: 'Common',
+    rarity,
     description: 'inferred test',
     reservedForFusion: true,
   };
@@ -46,6 +50,13 @@ describe('OTA-221 — deterministic fusion fallback', () => {
     mkInferred('Tortoise Shell', ['loot', 'improvised']),
   ];
   const tagProfile = ['aether', 'cloth', 'improvised'];
+  // OTA-1536 — the same three pieces, but Rare. This is what an EARNED fusion
+  // looks like, and it is what the OTA-445 power assertions below now measure.
+  const richInputs = [
+    mkInferred('Aetheric Cog', ['loot', 'improvised', 'aether'], 'Rare'),
+    mkInferred('Mud Cloth', ['loot', 'cloth'], 'Rare'),
+    mkInferred('Tortoise Shell', ['loot', 'improvised'], 'Rare'),
+  ];
 
   it('returns a name, description, and uniqueStats shape', () => {
     const r = synthesizeFusionDeterministic(inputs, tagProfile);
@@ -53,7 +64,9 @@ describe('OTA-221 — deterministic fusion fallback', () => {
     expect(r.description.length).toBeGreaterThan(0);
     expect(r.stats).toBeDefined();
     expect(['weapon', 'armor', 'dog_armor']).toContain(r.stats.kind);
-    expect(['Rare', 'Legendary']).toContain(r.stats.rarity);
+    // OTA-1536 — Uncommon joined the ladder as the scrap-fuse floor. Common
+    // never appears: the Crucible costs a fee and three reserved pieces.
+    expect(['Uncommon', 'Rare', 'Legendary']).toContain(r.stats.rarity);
   });
 
   it('produces the same name for identical inputs (deterministic via hash)', () => {
@@ -91,23 +104,37 @@ describe('OTA-221 — deterministic fusion fallback', () => {
     }
   });
 
-  // OTA-445 — fusion is an investment, so the payoff is above-rare. Legendary
-  // now lands at 4+ tags (was 5+); exactly 3 tags is the Rare floor.
-  it('rarity is Legendary when 4+ tags are present', () => {
+  // ⚠⚠⚠ OTA-1536 — THIS PAIR ENCODED THE DEFECT AS INTENT. OTA-445 read the
+  // tag count as the whole story ("4+ tags is Legendary, 3 is the Rare floor"),
+  // and since the fixture is Common scrap, the suite was asserting that four
+  // pieces of junk forge the best armor in the game — the exact behaviour the
+  // owner reported. The tag count is still the +1; what it is added to is now
+  // the best rarity among the inputs. Both halves are pinned below.
+  it('4+ tags earns a tier ABOVE what the pack is worth, not Legendary outright', () => {
     const r4 = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised', 'metal']);
-    expect(r4.stats.rarity).toBe('Legendary');
+    expect(r4.stats.rarity).toBe('Uncommon');
     const r5 = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised', 'metal', 'organic']);
-    expect(r5.stats.rarity).toBe('Legendary');
+    expect(r5.stats.rarity).toBe('Uncommon');
+    // …and on Rare scrap the same breadth reaches Legendary, so the variety
+    // reward itself is intact.
+    const rich = synthesizeFusionDeterministic(richInputs, ['aether', 'cloth', 'improvised', 'metal']);
+    expect(rich.stats.rarity).toBe('Legendary');
   });
 
-  it('rarity is Rare for exactly 3 tags', () => {
+  it('exactly 3 tags returns the pack\'s own grade, floored at Uncommon', () => {
     const r = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised']);
-    expect(r.stats.rarity).toBe('Rare');
+    expect(r.stats.rarity).toBe('Uncommon');
+    const rich = synthesizeFusionDeterministic(richInputs, ['aether', 'cloth', 'improvised']);
+    expect(rich.stats.rarity).toBe('Rare');
   });
 
   // OTA-445 — every fused piece carries a real perk and above-rare power.
-  it('fused gear is above-rare: a real perk + premium stats', () => {
-    const r = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised', 'metal']);
+  // ⚠ OTA-1536 — measured on richInputs now. "Above-rare power" was always a
+  // claim about an EARNED fusion; asserting it on Common scrap is what let the
+  // scrap path reach AC 5. The perk half still holds at every tier (see the
+  // separate floor test below).
+  it('an EARNED fusion is above-rare: a real perk + premium stats', () => {
+    const r = synthesizeFusionDeterministic(richInputs, ['aether', 'cloth', 'improvised', 'metal']);
     expect(r.stats.statBonus).toBeDefined();
     expect(r.stats.statBonus!.amount).toBeGreaterThanOrEqual(1);
     if (r.stats.kind === 'weapon') {
@@ -118,11 +145,24 @@ describe('OTA-221 — deterministic fusion fallback', () => {
     }
   });
 
-  it('durability scales with rarity (35 Rare / 45 Legendary)', () => {
-    const rare = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised']);
+  it('durability scales with rarity (25 Uncommon / 35 Rare / 45 Legendary)', () => {
+    // OTA-1536 — same numbers OTA-445 set for Rare and Legendary; the pack that
+    // reaches each tier is what changed. Uncommon is the new scrap floor.
+    const scrap = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised']);
+    expect(scrap.stats.durability).toEqual({ current: 25, max: 25 });
+    const rare = synthesizeFusionDeterministic(richInputs, ['aether', 'cloth', 'improvised']);
     expect(rare.stats.durability).toEqual({ current: 35, max: 35 });
-    const legendary = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised', 'metal']);
+    const legendary = synthesizeFusionDeterministic(richInputs, ['aether', 'cloth', 'improvised', 'metal']);
     expect(legendary.stats.durability).toEqual({ current: 45, max: 45 });
+  });
+
+  // ⚠ OTA-1536 — the half of OTA-445's promise that must hold at EVERY tier: a
+  // fused piece is never inert, however humble the scrap that made it.
+  it('even the scrap-floor fusion carries a real perk', () => {
+    const r = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised']);
+    expect(r.stats.rarity).toBe('Uncommon');
+    expect(r.stats.statBonus).toBeDefined();
+    expect(r.stats.statBonus!.amount).toBeGreaterThanOrEqual(1);
   });
 
   it('description mentions the Crucible', () => {

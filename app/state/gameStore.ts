@@ -4244,20 +4244,44 @@ export function anyTrackedContract(p: PlayerCharacter | null | undefined): boole
   return live(p.activeFactionQuests) || live(p.activeHunts) || live(p.activeMysteries) || live(p.activeStorylines);
 }
 
+/** OTA-1537 - the toll now scales with the tier the pack will forge. `tier` is
+ *  the output rarity fusionOutputRarity already computed from the gated inputs;
+ *  callers that are not forging a tiered item (the extra-channel upgrade) omit
+ *  it and pay the original flat rate. Every exemption OTA-967 wrote is
+ *  untouched: a pre-paid wild bench (fusionPending) and the Hidden Market
+ *  cauldron still fire free, and the charge still lands AFTER every gate and
+ *  BEFORE any consume, so a refusal never costs a coin or an item. */
 export function chargeOutpostCrucibleFee(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  tier?: import('../engine/types').Rarity,
 ): boolean {
   const p = get().player;
   if (!p) return false;
   if (p.fusionPending || get().activeBuildingId === 'market') return true;
-  const FEE = 25;
+  // Lazy require, matching every other itemFusion reference in this file - the
+  // module graph does not admit a top-level import here.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { FUSION_FEE_BY_TIER } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+  const FEE = tier ? (FUSION_FEE_BY_TIER[tier] ?? 25) : 25;
   if (p.tc < FEE) {
-    get().appendLog('system', `The Crucible costs ${FEE} TC to fire; you have ${p.tc}.`);
+    // Name the tier as well as the price - a player who has just been quoted
+    // 150 TC is owed the reason, or the number reads as a bug.
+    get().appendLog(
+      'system',
+      tier && FEE > 25
+        ? `The Crucible costs ${FEE} TC to fire a ${tier} piece; you have ${p.tc}.`
+        : `The Crucible costs ${FEE} TC to fire; you have ${p.tc}.`,
+    );
     return false;
   }
   set((s2) => (s2.player ? { player: { ...s2.player, tc: s2.player.tc - FEE } } : s2));
-  get().appendLog('reward', `The outpost Crucible takes its fee. (−${FEE} TC)`);
+  get().appendLog(
+    'reward',
+    tier && FEE > 25
+      ? `The outpost Crucible takes its fee for a ${tier} forge. (−${FEE} TC)`
+      : `The outpost Crucible takes its fee. (−${FEE} TC)`,
+  );
   return true;
 }
 

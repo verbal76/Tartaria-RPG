@@ -5,7 +5,7 @@ import {
   synthesizeFusionDeterministic,
   type FactionTheme,
 } from '../app/engine/itemFusion';
-import type { InventoryItem } from '../app/engine/types';
+import type { InventoryItem, Rarity } from '../app/engine/types';
 
 // arb105 — a reserved faction-gear item acts as an optional fusion
 // CATALYST: it themes the output into a unique faction item (faction-prefixed
@@ -15,8 +15,12 @@ import type { InventoryItem } from '../app/engine/types';
 // scraps required). findFactionCatalyst takes an excludeIds set so an EQUIPPED
 // faction piece is never chosen (the Crucible would consume it).
 
-function scrap(id: string, name: string, tags: string[]): InventoryItem {
-  return { id, name, kind: 'misc', quantity: 1, tags, reservedForFusion: true };
+// OTA-1536 — `scrap()` set no rarity at all, which now reads as Common (the
+// deliberate choice: a sparse old-save field must not inherit a free tier). The
+// rarity is a parameter so a test that needs a genuinely Legendary synth can
+// build a pack that EARNS one instead of assuming tag breadth is enough.
+function scrap(id: string, name: string, tags: string[], rarity?: Rarity): InventoryItem {
+  return { id, name, kind: 'misc', quantity: 1, tags, rarity, reservedForFusion: true };
 }
 
 const SCRAPS: InventoryItem[] = [
@@ -131,12 +135,18 @@ describe('faction fusion catalyst (arb105)', () => {
   });
 
   it('arb107 — applyFusion never DOWNGRADES below the synth rarity', () => {
-    const gate = gateFusion(SCRAPS); // 5 tags → synth Legendary
+    // ⚠ OTA-1536 — the SUBJECT of this test (a themed rarity never overrides a
+    // higher synth rarity) is unchanged and still asserted below. What changed
+    // is the setup: "5 tags → synth Legendary" was only true while tag breadth
+    // alone decided the tier. To get a Legendary synth the pack now has to be
+    // worth one, so these scraps are Rare.
+    const rich = SCRAPS.map((it) => ({ ...it, rarity: 'Rare' as Rarity }));
+    const gate = gateFusion(rich);
     const result = synthesizeFusionDeterministic(gate.inputs, gate.tagProfile);
     expect(result.stats.rarity).toBe('Legendary');
     // Even if a (wrong) Rare theme were passed, the Legendary synth wins.
     const theme: FactionTheme = { id: 'mud_monarchs', label: 'Mud Monarchs', catalystId: 'x', rarity: 'Rare' };
-    const { fused } = applyFusion(SCRAPS, gate.inputs, result, 'seedND', theme);
+    const { fused } = applyFusion(rich, gate.inputs, result, 'seedND', theme);
     expect(fused.rarity).toBe('Legendary');
   });
 });

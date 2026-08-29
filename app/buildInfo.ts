@@ -25273,7 +25273,51 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //    focus not landing; this is the bar being COVERED. Under the keyboard, under
 //    the feed, or never mounted are three bugs with three fixes and the source
 //    distinguishes none — so this ships the three numbers that do.
-export const OTA_BUILD_ID = '2026-08-28-1532-the-journeys-of-cheddar-bob';
+// OTA-1536 - THE CRUCIBLE'S CEILING IS WHAT YOU FEED IT. Owner: "we should tier
+// the rarity of what can be built at the fuse cruciable, since I have legendary
+// gear that is useless the minute I see a cruciable. fuse just keeps spitting out
+// AC5 gear and kills it." Measurably true, and confined to ARMOR: catalog
+// Legendary armor is acBonus 4-5 across 67 rows and catalog Rare armor is 1-3
+// across 60, while a fused Legendary was AC 5 and a fused Rare was AC 3 - each
+// tying the ceiling of its whole tier. Weapons never had it (fused Legendary is
+// 2d8 against a catalog Legendary range of 2d8-3d10, the BOTTOM of that tier).
+// The tier was chosen by tagProfile.length alone, and the file's own doc comment
+// stated the rule out loud: rarity comes from distinct materials, "NOT by the
+// inputs' own rarity". Four Common scraps spanning four materials therefore
+// minted the best armor in the game for free. Three sites shared the defect - the
+// deterministic synth, craftingSlice's faction-catalyst rarity (which duplicated
+// the expression verbatim, making arb107's "one tier above" contract untrue), and
+// the Qwen path, whose validator cannot see the inputs at all. The fix is a rule
+// this file already contained: material variety still earns the +1, but input
+// QUALITY decides what the +1 is added to. Floor Uncommon, ceiling Legendary.
+// Rare and Legendary keep OTA-445's exact numbers - all that changed is that
+// Legendary can no longer be REACHED from trash.
+// OTA-1537 - TWO PIECES, OR IT IS NOT MADE OF THAT. Pricing 1536 out showed the
+// job was two-thirds done, and the owner asked for both remaining levers. Fused
+// gear is unsellable (arb107), so a fuse really costs the forgone sale value of
+// what it burns (Common 12 / Uncommon 35 / Rare 90 / Legendary 240), against
+// ~220-380 TC to buy an AC 5 Legendary off a stall. Before 1536: 4 Common + 25
+// fee = ~73 TC. After 1536: 1 Rare + 3 Common + 25 = ~151 TC, still about half
+// price. After 1537: 2 Rare + 2 Common + 150 = ~354 TC, inside the band.
+// LEVER ONE - the tier must be SUPPORTED, not merely touched. 1536 let the
+// single best input set the ceiling, so one Rare sliver carried three Commons.
+// The output now grades on the SECOND-highest rarity. 1536's reason for best-of
+// still holds and is preserved: the diversity gate FORCES odd materials into
+// every pack, so a strong core plus the scrap it demands must still forge what
+// the core is worth - two is the smallest number that means "made of that"
+// while leaving room for the gate's mandatory oddments.
+// LEVER TWO - the fire is priced by what it forges: 25 / 60 / 150 TC for
+// Uncommon / Rare / Legendary. OTA-967 met this same faucet with a flat 25 and
+// its own note named the faucet exactly, but a fee prices the FIRE and the
+// faucet was in the rarity rule; at ~10% of a fuse's real cost it never bound,
+// and it decayed further every hour the player got richer. The scrap-floor fuse
+// still costs the 25 it always did, the quote names the tier so a six-fold
+// price does not read as a bug, and every OTA-967 exemption survives: a pre-paid
+// wild bench and the Hidden Market cauldron fire free, and the charge still
+// lands after every gate and before any consume.
+export const OTA_BUILD_ID = '2026-08-29-1537-two-pieces-or-it-is-not-made-of-that';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-28-1536-the-crucible-ceiling-is-what-you-feed-it';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-28-1532-the-journeys-of-cheddar-bob';
 // golem catch-up 2026-08-28: markerless publish of OTA-1532 (a Nix lead is now
 // paid in distance on a tile step instead of inside beginScene, which a cardinal
 // step never calls; the mud patch gains a Common-only floor and a per-patch cap;

@@ -21,7 +21,7 @@
 // / out-of-range value returns null and the caller logs an arbiter
 // refusal instead of crafting a degenerate item.
 
-import type { InventoryItem, UniqueItemStats } from './types';
+import type { InventoryItem, Rarity, UniqueItemStats } from './types';
 import { canonicalItemTags, isInferredItem, isRecipeIngredientName, findWeaponByName, findArmorByName, WEAPONS } from './crafting';
 import { inferGearTagPack } from './itemDefaults';
 // OTA-1086 — the salvage-curio catalog, so the forge can refuse to name its
@@ -100,9 +100,109 @@ export interface FusionGate {
  *  so a reserved material you could SEE (♥) didn't actually count. */
 const FUSION_EQUIP_KINDS = ['weapon', 'armor', 'accessory', 'amulet', 'ring'];
 const FUSION_EDIBLE_TAG = /food|drink|healing|potion|weapon_coating|edible|ration|alcohol|treat|forag/i;
+/** OTA-1536 - THE CRUCIBLE'S CEILING IS WHAT YOU FEED IT.
+ *
+ *  Owner: "we should tier the rarity of what can be built at the fuse crucible,
+ *  since I have legendary gear that is useless the minute I see a cruciable.
+ *  fuse just keeps spitting out AC5 gear and kills it."
+ *
+ *  He is measurably right, and the damage is confined to ARMOR. Counted off the
+ *  catalog: Legendary armor is acBonus 4-5 across 67 rows, Rare armor is 1-3
+ *  across 60. A fused Legendary was AC 5 and a fused Rare was AC 3 - each tying
+ *  the CEILING of its whole tier - and the tier was chosen by
+ *  `tagProfile.length` alone. Four COMMON scraps spanning four materials
+ *  therefore minted the best armor in the game. Weapons never had the problem:
+ *  a fused Legendary is 2d8 where catalog Legendary weapons run 2d8 to 3d10, so
+ *  fusion already sits at the BOTTOM of that tier.
+ *
+ *  The rule this needed is one the file already contains. arb107 wrote it for
+ *  the faction catalyst - "ONE tier above the inputs' natural fusion rarity
+ *  (capped at Legendary)" - and the base path never got the same discipline.
+ *  Material variety still decides whether you earn the +1; input QUALITY now
+ *  decides what the +1 is added to.
+ *
+ *  THE FLOOR STAYS UNCOMMON. The Crucible is an investment (collect, reserve,
+ *  pay the fire) and must never hand back Common. What it may no longer do is
+ *  manufacture Legendary out of trash. */
+export const FUSION_RARITY_LADDER = ['Common', 'Uncommon', 'Rare', 'Legendary'] as const;
+
+/** Step a rarity along the ladder, clamped to [Uncommon, Legendary]. The lower
+ *  clamp is the floor above - a fusion result is never Common. */
+export function bumpRarity(r: Rarity, steps: number): Rarity {
+  const at = FUSION_RARITY_LADDER.indexOf(r as (typeof FUSION_RARITY_LADDER)[number]);
+  const from = at < 0 ? 0 : at;
+  const to = Math.min(FUSION_RARITY_LADDER.length - 1, Math.max(1, from + steps));
+  return FUSION_RARITY_LADDER[to]!;
+}
+
+/** The natural rarity of a fusion: the tier TWO of the reserved inputs can
+ *  support, plus one when the pack spans 4+ distinct materials (OTA-445's
+ *  variety reward, kept intact - it is a BONUS on top of quality rather than
+ *  the sole input). A missing rarity reads as Common, so old saves grade
+ *  honestly rather than inheriting a free Legendary.
+ *
+ *  OTA-1537 - TWO INPUTS, NOT ONE. OTA-1536 let the single BEST input set the
+ *  ceiling, so one Rare scrap carried three Commons to Legendary and a fused
+ *  AC 5 still landed at roughly half the price of buying one. Owner's call
+ *  after seeing the numbers. Taking the SECOND-highest rarity is the whole
+ *  change: a tier has to be supported, not merely touched.
+ *
+ *  Why not the average, and why not all of them: the diversity gate FORCES odd
+ *  materials into the pack (3+ distinct types, or 2 with a catalyst), so a
+ *  player topping up a strong core with the scrap the gate demands must not be
+ *  punished for obeying it. Two is the smallest number that means "this pack is
+ *  actually made of that." */
+export function fusionOutputRarity(
+  inputs: readonly InventoryItem[],
+  tagProfile: readonly string[],
+): Rarity {
+  const ranks = inputs
+    .map((it) => FUSION_RARITY_LADDER.indexOf(
+      (it.rarity ?? 'Common') as (typeof FUSION_RARITY_LADDER)[number],
+    ))
+    .map((at) => (at < 0 ? 0 : at))
+    .sort((a, b) => b - a);
+  // The gate never admits fewer than 2 inputs, but a direct caller might; a
+  // single-piece pack grades on the piece it has rather than throwing.
+  const supported = ranks.length >= 2 ? ranks[1]! : (ranks[0] ?? 0);
+  return bumpRarity(FUSION_RARITY_LADDER[supported]!, tagProfile.length >= 4 ? 1 : 0);
+}
+
+/** OTA-1537 - WHAT THE FIRE COSTS DEPENDS ON WHAT IT IS FORGING.
+ *
+ *  OTA-967 met the Crucible faucet with a flat 25 TC fee, which was the wrong
+ *  lever: a fee prices the FIRE, and the faucet was in the rarity rule. It also
+ *  never bound - measured against the forgone sale value of the pieces you burn
+ *  (fused gear is unsellable per arb107, so there is no recouping them), 25 TC
+ *  was about a tenth of a fuse's real cost and a smaller share every hour the
+ *  player got richer. Now the toll scales with the tier being forged, so the
+ *  fee stays meaningful at the top of the game instead of decaying into a
+ *  rounding error. The scrap-floor fuse still costs exactly what it always
+ *  did. */
+export const FUSION_FEE_BY_TIER: Record<Rarity, number> = {
+  Common: 25,
+  Uncommon: 25,
+  Rare: 60,
+  Legendary: 150,
+};
+
+/** OTA-1536 - the fused stat block per tier. Rare and Legendary are UNCHANGED
+ *  from OTA-445 (AC 3 / 2d6 / +1 / 35 and AC 5 / 2d8 / +2 / 45): a fusion you
+ *  actually earned forges exactly what it always forged. All that changes is
+ *  that Legendary can no longer be REACHED from four Common scraps. Uncommon is
+ *  the new working floor and sits deliberately below catalog Rare armor's
+ *  ceiling of 3, so a scrap fuse is still worth doing without erasing found
+ *  gear. Common is unreachable through bumpRarity's floor; it is present
+ *  because the Record must be total. */
+const FUSED_TIER: Record<Rarity, { ac: number; dice: string; bonus: number; durability: number }> = {
+  Common: { ac: 1, dice: '1d6', bonus: 1, durability: 20 },
+  Uncommon: { ac: 2, dice: '1d8', bonus: 1, durability: 25 },
+  Rare: { ac: 3, dice: '2d6', bonus: 1, durability: 35 },
+  Legendary: { ac: 5, dice: '2d8', bonus: 2, durability: 45 },
+};
 /** OTA-999 — the material tag(s) an item contributes to a fusion, for the info block.
- *  Output RARITY is driven by how many DISTINCT materials the chosen inputs span
- *  (3 different \u2192 Rare, 4+ \u2192 Legendary), NOT by the inputs' own rarity. */
+ *  Output RARITY spans BOTH how many DISTINCT materials the chosen inputs span
+ *  and the best rarity among them - see fusionOutputRarity (OTA-1536). */
 export function fusionMaterialTags(item: { name: string; tags?: readonly string[] }): string[] {
   const out = new Set<string>();
   for (const t of item.tags ?? []) { const k = t.toLowerCase(); if (MATERIAL_TAG_SET.has(k)) out.add(k); }
@@ -356,8 +456,10 @@ export interface FactionTheme {
    *  Legendary). With the minimum 3-tag input set this lands on Rare; a
    *  richer 4+-tag set reaches Legendary. Replaces arb105's unconditional
    *  Legendary stamp, which (with free scrap + a cheap catalyst) trivialized
-   *  the rarity ladder. */
-  rarity: 'Rare' | 'Legendary';
+   *  the rarity ladder. OTA-1536 widened this to the full ladder: the natural
+   *  rarity it sits one tier above is now bounded by input QUALITY, so a
+   *  catalyst on a scrap pack confers Rare rather than Legendary. */
+  rarity: Rarity;
 }
 
 /** Stable hash of an input set so reloads / re-attempts with the same
@@ -553,7 +655,23 @@ export async function synthesizeFusionViaQwen(
     } catch {
       return null;
     }
-    return validateFusionResponse(parsed);
+    const row = validateFusionResponse(parsed);
+    // OTA-1536 - THE THIRD SITE OF THE SAME ERROR CLASS, closed pre-emptively.
+    // validateFusionResponse takes the raw row alone, so it cannot know what
+    // went into the Crucible; it accepts whatever tier the model asked for, and
+    // the prompt still tells the model to say Legendary at 4+ material tags.
+    // This path has no production caller today (the deterministic synth owns
+    // stats - see craftingSlice), but if it is ever re-wired it would re-open
+    // the exact hole the other two sites just closed. So the model's answer is
+    // capped at the same quality-bounded ceiling, and may only ever come in
+    // BELOW it.
+    if (!row) return null;
+    const ceiling = fusionOutputRarity(inputs, tagProfile);
+    const capped = FUSION_RARITY_LADDER.indexOf(row.stats.rarity as (typeof FUSION_RARITY_LADDER)[number])
+      > FUSION_RARITY_LADDER.indexOf(ceiling as (typeof FUSION_RARITY_LADDER)[number])
+      ? ceiling
+      : row.stats.rarity;
+    return { ...row, stats: { ...row.stats, rarity: capped } };
   } catch {
     return null;
   }
@@ -1026,7 +1144,8 @@ export function synthesizeFusionDeterministic(
   // just find. Legendary now lands at 4+ tags (was 5+); the 3-tag floor is still
   // Rare but its stats below are bumped ABOVE a same-rarity catalog piece. So a
   // fused item is reliably "a level above rare."
-  const rarity: 'Rare' | 'Legendary' = tagProfile.length >= 4 ? 'Legendary' : 'Rare';
+  const rarity: Rarity = fusionOutputRarity(inputs, tagProfile);
+  const tier = FUSED_TIER[rarity];
   // Name from a theme word + suffix. Deterministic via the input hash
   // so the same input set always produces the same name.
   // arb114 — MUCH larger word banks so the Crucible stops repeating names. Each
@@ -1151,7 +1270,7 @@ export function synthesizeFusionDeterministic(
   const baseStats: UniqueItemStats = {
     kind,
     rarity,
-    durability: rarity === 'Legendary' ? { current: 45, max: 45 } : { current: 35, max: 35 },
+    durability: { current: tier.durability, max: tier.durability },
   };
   const scale: UniqueItemStats['scalesWith'] =
     dominantTag === 'aether' ? 'intelligence'
@@ -1160,7 +1279,7 @@ export function synthesizeFusionDeterministic(
   if (kind === 'weapon') {
     // OTA-445 — Legendary 2d8 / Rare 2d6 (was 2d6 / 1d8). damageType + scaling
     // stat by dominant tag.
-    const dice = rarity === 'Legendary' ? '2d8' : '2d6';
+    const dice = tier.dice;
     const dmgType: UniqueItemStats['damageType'] =
       dominantTag === 'aether' ? 'aetheric'
       : dominantTag === 'metal' ? 'slashing'
@@ -1172,7 +1291,7 @@ export function synthesizeFusionDeterministic(
     baseStats.reachClass = weaponReach ?? 'melee';
   } else {
     // OTA-445 — Legendary AC +5 / Rare AC +3 (was 4 / 2).
-    baseStats.acBonus = rarity === 'Legendary' ? 5 : 3;
+    baseStats.acBonus = tier.ac;
     if (kind === 'armor') {
       // OTA-739/OTA-832 — the forged slot is now computed up front (see above) so
       // the item's NOUN can be chosen to match it; just apply it here.
@@ -1182,7 +1301,7 @@ export function synthesizeFusionDeterministic(
   // OTA-445 — a fused piece always carries a real perk: +2 (Legendary) / +1
   // (Rare) to its scaling stat. A stealthy input set overrides this with the
   // stealth bonus below (preserving the OTA-349 stealth-fusion path).
-  baseStats.statBonus = { stat: scale, amount: rarity === 'Legendary' ? 2 : 1 };
+  baseStats.statBonus = { stat: scale, amount: tier.bonus };
   // Resistance from dominant tag.
   const resistance =
     dominantTag === 'aether' ? 'aetheric'
@@ -1195,7 +1314,7 @@ export function synthesizeFusionDeterministic(
   // (Rare +1 / Legendary +2). Detected off the tag profile, which is built
   // from the inputs' tags.
   if (tagSet.has('stealth')) {
-    baseStats.statBonus = { stat: 'stealth', amount: rarity === 'Legendary' ? 2 : 1 };
+    baseStats.statBonus = { stat: 'stealth', amount: tier.bonus };
   }
   baseStats.special = `Field-forged from ${inputs.length} reclaimer scraps. The Crucible answered.`;
   const reachPhrase = kind === 'weapon'
@@ -1326,8 +1445,8 @@ export function applyFusion(
   // above the inputs' natural rarity" (the caller passes `faction.rarity`),
   // and never DOWNGRADES below what the synth produced — so a rich input
   // set that already synthesized Legendary stays Legendary.
-  const rank = (r: 'Rare' | 'Legendary') => (r === 'Legendary' ? 1 : 0);
-  const themedRarity: 'Rare' | 'Legendary' = faction
+  const rank = (r: Rarity) => FUSION_RARITY_LADDER.indexOf(r as (typeof FUSION_RARITY_LADDER)[number]);
+  const themedRarity: Rarity = faction
     ? (rank(faction.rarity) >= rank(result.stats.rarity) ? faction.rarity : result.stats.rarity)
     : result.stats.rarity;
   const stats: UniqueItemStats = faction

@@ -218,7 +218,15 @@ export const createCraftingSlice = (
     // result from the input tag profile. Less varied than Qwen-
     // synthesized but always serviceable.
     // OTA-967 — outpost fires cost coin now, same as the roadside vendor's rig.
-    if (!deps.chargeOutpostCrucibleFee(get, set)) { set({ pendingFusionSelection: null }); return; }
+    // OTA-1537 - the toll is quoted for the tier this pack will actually forge.
+    // selGate is already resolved above, so the tier is knowable BEFORE the
+    // charge - which keeps OTA-967's ordering intact (fee after every gate,
+    // before any consume) while making the price honest about what is bought.
+    if (!deps.chargeOutpostCrucibleFee(
+      get,
+      set,
+      fusion.fusionOutputRarity(selGate.inputs, selGate.tagProfile),
+    )) { set({ pendingFusionSelection: null }); return; }
     get().appendLog(
       'world',
       `You set your reserved pieces on the three pedestals. The Crucible takes them in.`,
@@ -254,7 +262,17 @@ export const createCraftingSlice = (
       // faction-id tag nulled the theme — the catalyst burned un-themed.
       const fac = FACTIONS.find((f) => canonicalItemTags(catalyst).includes(f.id));
       if (fac) {
-        const facRarity: 'Rare' | 'Legendary' = selGate.tagProfile.length >= 4 ? 'Legendary' : 'Rare';
+        // OTA-1536 - THE SAME DEFECT LIVED HERE TOO. This line duplicated the
+        // synth's old expression verbatim, so the catalyst path also graded a
+        // pack purely on material variety and also minted Legendary from four
+        // Commons. Worse, it made arb107's documented contract untrue: computing
+        // the SAME value as the synth is not "one tier above" anything. Both are
+        // fixed at once - the natural rarity is now quality-bounded, and the
+        // catalyst genuinely confers the tier above it (capped at Legendary).
+        const facRarity = fusion.bumpRarity(
+          fusion.fusionOutputRarity(selGate.inputs, selGate.tagProfile),
+          1,
+        );
         factionTheme = { id: fac.id, label: fac.name, catalystId: catalyst.id, rarity: facRarity };
       }
     }
