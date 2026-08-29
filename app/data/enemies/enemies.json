@@ -2092,7 +2092,15 @@
     "name": "Reclaimer Ambusher",
     "flavor": "A scavenger-guild raider who fires from cover and fades before the bolt's echo dies.",
     "type": "Human",
-    "carries": { "weapons": ["Bone Crossbow"], "armor": ["Reclaimer's Salvage Vest"], "tc": 8 },
+    "carries": {
+      "weapons": [
+        "Bone Crossbow"
+      ],
+      "armor": [
+        "Reclaimer's Salvage Vest"
+      ],
+      "tc": 8
+    },
     "abilityPoint": "Dexterity 5",
     "attack": "Crossbow Volley",
     "damage": "1D6",
@@ -2118,7 +2126,12 @@
     "name": "Black Cloak Agent",
     "flavor": "A blade-for-hire of the hidden orders, working from shadow with a poisoned edge.",
     "type": "Human",
-    "carries": { "armor": ["Mud-Bound Cloak"], "tc": 15 },
+    "carries": {
+      "armor": [
+        "Mud-Bound Cloak"
+      ],
+      "tc": 15
+    },
     "signatureWeapon": {
       "name": "the Hollow Edge",
       "reason": "You crouch for the blade — the Hollow Edge, the black mark of the Forgotten Order's enforcers, its steel weeping a faint corruption that fogs the air. But the grip is wrong. It's honed: razored along the inner curve so the handle itself is a second blade, and only one of its edges is meant for the enemy. Take it up untrained and you flay your own palm to the bone. Only a hand that knows the Order's hold — that two-finger grip they teach behind sealed doors — can carry it. You leave it where it fell."
@@ -2335,7 +2348,15 @@
     "name": "Tartarian Reaver",
     "flavor": "A warlord of the old bloodlines, armored and merciless, cutting a red sweep through any line.",
     "type": "Human",
-    "carries": { "weapons": ["Reaver's Greatsword"], "armor": ["Vest of the Forgotten Hero"], "tc": 60 },
+    "carries": {
+      "weapons": [
+        "Reaver's Greatsword"
+      ],
+      "armor": [
+        "Vest of the Forgotten Hero"
+      ],
+      "tc": 60
+    },
     "abilityPoint": "Strength 12",
     "attack": "Reaver's Sweep",
     "damage": "3D8",
@@ -2364,7 +2385,15 @@
     "name": "Silt Thief",
     "flavor": "A quick-fingered marsh-rat who'd rather cut your purse than your throat — but will do both.",
     "type": "Human",
-    "carries": { "weapons": ["Bone Knife"], "armor": ["Mud-Warden's Vest"], "tc": 6 },
+    "carries": {
+      "weapons": [
+        "Bone Knife"
+      ],
+      "armor": [
+        "Mud-Warden's Vest"
+      ],
+      "tc": 6
+    },
     "abilityPoint": "Dexterity 5",
     "attack": "Quick Knife",
     "damage": "1D8",
@@ -2390,7 +2419,15 @@
     "name": "Disc Hijacker",
     "flavor": "A road-brigand who clubs travelers senseless and makes off with their Discs and their boots.",
     "type": "Human",
-    "carries": { "weapons": ["Cudgel"], "armor": ["Reclaimer's Salvage Vest"], "tc": 10 },
+    "carries": {
+      "weapons": [
+        "Cudgel"
+      ],
+      "armor": [
+        "Reclaimer's Salvage Vest"
+      ],
+      "tc": 10
+    },
     "abilityPoint": "Strength 4",
     "attack": "Cudgel Smash",
     "damage": "2D6",
@@ -2415,7 +2452,15 @@
     "name": "Mud Monarch Purifier",
     "flavor": "A zealot-knight of a drowned faith, wielding a lance of channeled radiance against the unclean.",
     "type": "Human",
-    "carries": { "weapons": ["Iron Spear"], "armor": ["Mud-Warden's Vest"], "tc": 20 },
+    "carries": {
+      "weapons": [
+        "Iron Spear"
+      ],
+      "armor": [
+        "Mud-Warden's Vest"
+      ],
+      "tc": 20
+    },
     "abilityPoint": "Wisdom 5",
     "attack": "Radiant Lance",
     "damage": "2D8",
@@ -2497,6 +2542,732 @@
       "resist:piercing",
       "resist:bludgeoning",
       "vulnerable:burn"
+    ]
+  },
+  {
+    "name": "Lens Prier",
+    "flavor": "A dig-site sneak who works other people's claims by dark, prying up glass he never learned to grind.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Cudgel"
+      ],
+      "armor": [
+        "Reclaimer's Salvage Vest"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Dexterity 5",
+    "attack": "Pry-Bar Swing",
+    "damage": "1D8",
+    "hp": 28,
+    "rarity": "Uncommon",
+    "loot": [
+      "Patched Cloth",
+      "Aether Residue"
+    ],
+    "aliases": [
+      "prier",
+      "lens prier",
+      "the prier"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike"
+    ]
+  },
+  {
+    "name": "Marsh Poacher",
+    "flavor": "A tarp-and-knife opportunist who lives off other people's camps and calls it foraging.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Bone Knife"
+      ],
+      "armor": [
+        "Mud-Warden's Vest"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Dexterity 5",
+    "attack": "Skinning Knife",
+    "damage": "1D8",
+    "hp": 30,
+    "rarity": "Uncommon",
+    "loot": [
+      "Patched Cloth",
+      "Aether Residue"
+    ],
+    "aliases": [
+      "poacher",
+      "marsh poacher",
+      "the poacher"
+    ],
+    "traits": [
+      "quick",
+      "bleeder"
+    ]
+  },
+  {
+    "name": "Copper Stripper",
+    "flavor": "A wire-shaver with cutter-callused hands, bleeding other people's lines a span a night.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Bone Knife"
+      ],
+      "armor": [
+        "Reclaimer's Salvage Vest"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Dexterity 4",
+    "attack": "Cutter Slash",
+    "damage": "1D8",
+    "hp": 27,
+    "rarity": "Uncommon",
+    "loot": [
+      "Aether Residue",
+      "Patched Cloth"
+    ],
+    "aliases": [
+      "stripper",
+      "copper stripper",
+      "the stripper"
+    ],
+    "traits": [
+      "quick"
+    ]
+  },
+  {
+    "name": "Chart Runner",
+    "flavor": "A long-legged courier gone crooked, selling the roads out from under the man who drew them.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Bone Knife"
+      ],
+      "armor": [
+        "Mud-Bound Cloak"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Dexterity 6",
+    "attack": "Running Slash",
+    "damage": "1D8",
+    "hp": 26,
+    "rarity": "Uncommon",
+    "loot": [
+      "Patched Cloth"
+    ],
+    "aliases": [
+      "runner",
+      "chart runner",
+      "the runner"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike"
+    ]
+  },
+  {
+    "name": "Dice Palmer",
+    "flavor": "A table cheat with a conjurer's fingers and a debtor's nerve, smiling right up until the knife.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Bone Knife"
+      ],
+      "armor": [
+        "Mud-Warden's Vest"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Dexterity 6",
+    "attack": "Sleeve Blade",
+    "damage": "1D8",
+    "hp": 28,
+    "rarity": "Uncommon",
+    "loot": [
+      "Patched Cloth",
+      "Worn Tartarian Coin"
+    ],
+    "aliases": [
+      "palmer",
+      "dice palmer",
+      "the palmer"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike",
+      "bleeder"
+    ]
+  },
+  {
+    "name": "Brine Runner",
+    "flavor": "A salt-flat scrounger crusted white to the elbows, strong from hauling other people's loads.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Cudgel"
+      ],
+      "armor": [
+        "Mud-Warden's Vest"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Strength 5",
+    "attack": "Flat Iron",
+    "damage": "2D6",
+    "hp": 32,
+    "rarity": "Uncommon",
+    "loot": [
+      "Patched Cloth"
+    ],
+    "aliases": [
+      "brine runner",
+      "the runner",
+      "salt runner"
+    ],
+    "traits": [
+      "savage",
+      "concussive"
+    ]
+  },
+  {
+    "name": "Verse Peddler",
+    "flavor": "A patter-mouthed hawker of stolen scripture, reading holy verses out like market prices.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Cudgel"
+      ],
+      "armor": [
+        "Mud-Bound Cloak"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Dexterity 4",
+    "attack": "Crate Board",
+    "damage": "1D6",
+    "hp": 26,
+    "rarity": "Uncommon",
+    "loot": [
+      "Patched Cloth"
+    ],
+    "aliases": [
+      "peddler",
+      "verse peddler",
+      "the peddler"
+    ],
+    "traits": [
+      "quick"
+    ]
+  },
+  {
+    "name": "Tin Grubber",
+    "flavor": "A metal-hungry scrounger who files at anything shiny with tools too dull for the work.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Bone Knife"
+      ],
+      "armor": [
+        "Reclaimer's Salvage Vest"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Strength 4",
+    "attack": "File Stab",
+    "damage": "1D8",
+    "hp": 29,
+    "rarity": "Uncommon",
+    "loot": [
+      "Scrap Metal",
+      "Patched Cloth"
+    ],
+    "aliases": [
+      "grubber",
+      "tin grubber",
+      "the grubber"
+    ],
+    "traits": [
+      "savage"
+    ]
+  },
+  {
+    "name": "Latch Picker",
+    "flavor": "A door-worrier who jingles when he walks, rich in other people's keys and poor in everything else.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Cudgel"
+      ],
+      "armor": [
+        "Mud-Bound Cloak"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Dexterity 5",
+    "attack": "Pry-Bar Swing",
+    "damage": "1D8",
+    "hp": 28,
+    "rarity": "Uncommon",
+    "loot": [
+      "Patched Cloth",
+      "Aether Residue"
+    ],
+    "aliases": [
+      "picker",
+      "latch picker",
+      "the picker"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike"
+    ]
+  },
+  {
+    "name": "Quiver Rat",
+    "flavor": "A hoarder of other archers' bolts, bristling with ammunition he is too jealous to loose.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Bone Knife"
+      ],
+      "armor": [
+        "Mud-Warden's Vest"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Dexterity 5",
+    "attack": "Bolt Jab",
+    "damage": "1D6",
+    "hp": 25,
+    "rarity": "Uncommon",
+    "loot": [
+      "Bone Bolt",
+      "Patched Cloth"
+    ],
+    "aliases": [
+      "rat",
+      "quiver rat",
+      "the rat"
+    ],
+    "traits": [
+      "quick"
+    ]
+  },
+  {
+    "name": "Spore Skimmer",
+    "flavor": "A glow-thief who smothers living light under canvas and wonders why it keeps dying on him.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Bone Knife"
+      ],
+      "armor": [
+        "Mud-Warden's Vest"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Dexterity 4",
+    "attack": "Trowel Swipe",
+    "damage": "1D8",
+    "hp": 27,
+    "rarity": "Uncommon",
+    "loot": [
+      "Patched Cloth",
+      "Aether Residue"
+    ],
+    "aliases": [
+      "skimmer",
+      "spore skimmer",
+      "the skimmer"
+    ],
+    "traits": [
+      "quick"
+    ]
+  },
+  {
+    "name": "Ash Robber",
+    "flavor": "A knife-point scavenger of holy things, gray to the wrist with ashes that were never his to carry.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Bone Knife"
+      ],
+      "armor": [
+        "Mud-Bound Cloak"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Dexterity 5",
+    "attack": "Ashen Blade",
+    "damage": "1D8",
+    "hp": 31,
+    "rarity": "Uncommon",
+    "loot": [
+      "Patched Cloth"
+    ],
+    "aliases": [
+      "robber",
+      "ash robber",
+      "the robber"
+    ],
+    "traits": [
+      "quick",
+      "bleeder"
+    ]
+  },
+  {
+    "name": "Page Tearer",
+    "flavor": "A ledger-thief who moves his lips over stolen accounts, dangerous mostly to the people written in them.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Cudgel"
+      ],
+      "armor": [
+        "Mud-Warden's Vest"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Strength 4",
+    "attack": "Book Clout",
+    "damage": "1D6",
+    "hp": 28,
+    "rarity": "Uncommon",
+    "loot": [
+      "Patched Cloth",
+      "Worn Tartarian Coin"
+    ],
+    "aliases": [
+      "tearer",
+      "page tearer",
+      "the tearer"
+    ],
+    "traits": [
+      "concussive"
+    ]
+  },
+  {
+    "name": "Loadstone Lifter",
+    "flavor": "A magnet-thief learning by ruin why charged stone travels in wooden boxes.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Cudgel"
+      ],
+      "armor": [
+        "Reclaimer's Salvage Vest"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Strength 5",
+    "attack": "Bent Pry-Bar",
+    "damage": "2D6",
+    "hp": 33,
+    "rarity": "Uncommon",
+    "loot": [
+      "Scrap Metal",
+      "Aether Residue"
+    ],
+    "aliases": [
+      "lifter",
+      "loadstone lifter",
+      "the lifter"
+    ],
+    "traits": [
+      "savage",
+      "concussive"
+    ]
+  },
+  {
+    "name": "Ink Dipper",
+    "flavor": "A flask-thief printed with his own guilt, black fingermarks on everything he has touched for a week.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Cudgel"
+      ],
+      "armor": [
+        "Mud-Warden's Vest"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Dexterity 4",
+    "attack": "Stained Club",
+    "damage": "1D8",
+    "hp": 27,
+    "rarity": "Uncommon",
+    "loot": [
+      "Patched Cloth"
+    ],
+    "aliases": [
+      "dipper",
+      "ink dipper",
+      "the dipper"
+    ],
+    "traits": [
+      "quick"
+    ]
+  },
+  {
+    "name": "Coal Creeper",
+    "flavor": "A fuel-thief black to the elbows, dragging stolen forge-sacks toward fires he cannot light.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Cudgel"
+      ],
+      "armor": [
+        "Mud-Warden's Vest"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Strength 5",
+    "attack": "Mattock Swing",
+    "damage": "2D6",
+    "hp": 31,
+    "rarity": "Uncommon",
+    "loot": [
+      "Patched Cloth",
+      "Scrap Metal"
+    ],
+    "aliases": [
+      "coal creeper",
+      "the creeper"
+    ],
+    "traits": [
+      "savage"
+    ]
+  },
+  {
+    "name": "Charm Cutter",
+    "flavor": "A ward-thief wrapped in bone charms cut for other necks, sleepless under their quiet disagreement.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Bone Knife"
+      ],
+      "armor": [
+        "Mud-Bound Cloak"
+      ],
+      "tc": 14
+    },
+    "abilityPoint": "Dexterity 6",
+    "attack": "Skinning Knife",
+    "damage": "2D6",
+    "hp": 42,
+    "rarity": "Rare",
+    "loot": [
+      "Aetheric Shard",
+      "Patched Cloth"
+    ],
+    "aliases": [
+      "cutter",
+      "charm cutter",
+      "the cutter"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike",
+      "bleeder"
+    ]
+  },
+  {
+    "name": "Glass Creeper",
+    "flavor": "A twin-knived sneak who steals listening glass to hear what the sky says about him.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Bone Knife"
+      ],
+      "armor": [
+        "Mud-Bound Cloak"
+      ],
+      "tc": 14
+    },
+    "abilityPoint": "Dexterity 7",
+    "attack": "Twin Knives",
+    "damage": "2D6",
+    "hp": 44,
+    "rarity": "Rare",
+    "loot": [
+      "Aetheric Shard",
+      "Aether Residue"
+    ],
+    "aliases": [
+      "glass creeper",
+      "the creeper"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike",
+      "bleeder"
+    ]
+  },
+  {
+    "name": "Horn Filcher",
+    "flavor": "A crowd-cutter with a hatchet and no music in him, red-faced from an instrument that refuses cowards.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Cudgel"
+      ],
+      "armor": [
+        "Reclaimer's Salvage Vest"
+      ],
+      "tc": 14
+    },
+    "abilityPoint": "Strength 6",
+    "attack": "Hatchet Chop",
+    "damage": "2D8",
+    "hp": 46,
+    "rarity": "Rare",
+    "loot": [
+      "Patched Cloth",
+      "Worn Tartarian Coin"
+    ],
+    "aliases": [
+      "filcher",
+      "horn filcher",
+      "the filcher"
+    ],
+    "traits": [
+      "savage",
+      "bleeder"
+    ]
+  },
+  {
+    "name": "Ring Slipper",
+    "flavor": "A table-thief bleeding from eight small bites of obedient iron that will not obey him.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Bone Knife"
+      ],
+      "armor": [
+        "Mud-Bound Cloak"
+      ],
+      "tc": 14
+    },
+    "abilityPoint": "Dexterity 7",
+    "attack": "Long Knife",
+    "damage": "2D8",
+    "hp": 48,
+    "rarity": "Rare",
+    "loot": [
+      "Aetheric Shard",
+      "Aether Residue"
+    ],
+    "aliases": [
+      "slipper",
+      "ring slipper",
+      "the slipper"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike",
+      "venomous"
+    ]
+  },
+  {
+    "name": "Road Skimmer",
+    "flavor": "A path-side toll-taker with no authority but the dark and a loose-handed way with a club.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Cudgel"
+      ],
+      "armor": [
+        "Mud-Warden's Vest"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Strength 5",
+    "attack": "Club Swing",
+    "damage": "2D6",
+    "hp": 30,
+    "rarity": "Uncommon",
+    "loot": [
+      "Patched Cloth"
+    ],
+    "aliases": [
+      "road skimmer",
+      "the skimmer",
+      "mugger"
+    ],
+    "traits": [
+      "savage",
+      "concussive"
+    ]
+  },
+  {
+    "name": "Silt Footpad",
+    "flavor": "A soft-stepping purse-cutter who sounds friendly right up until the ground takes you.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Bone Knife"
+      ],
+      "armor": [
+        "Mud-Warden's Vest"
+      ],
+      "tc": 6
+    },
+    "abilityPoint": "Dexterity 5",
+    "attack": "Quick Knife",
+    "damage": "1D8",
+    "hp": 28,
+    "rarity": "Uncommon",
+    "loot": [
+      "Patched Cloth",
+      "Aether Residue"
+    ],
+    "aliases": [
+      "footpad",
+      "silt footpad",
+      "the footpad"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike",
+      "bleeder"
+    ]
+  },
+  {
+    "name": "Dusk Prowler",
+    "flavor": "A patient professional of the half-light who paces a mark for a tile before naming the price.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Bone Knife"
+      ],
+      "armor": [
+        "Mud-Bound Cloak"
+      ],
+      "tc": 14
+    },
+    "abilityPoint": "Dexterity 7",
+    "attack": "Hooked Blade",
+    "damage": "2D8",
+    "hp": 50,
+    "rarity": "Rare",
+    "loot": [
+      "Aetheric Shard",
+      "Patched Cloth"
+    ],
+    "aliases": [
+      "prowler",
+      "dusk prowler",
+      "the prowler"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike",
+      "bleeder"
     ]
   }
 ]

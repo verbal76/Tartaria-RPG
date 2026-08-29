@@ -23,8 +23,22 @@ import type { Enemy } from './types';
 /** Every HUMAN in the enemy roster, keyed by rarity. Locked by test against
  *  enemies.json — if a human is added there, it belongs here too. */
 export const FACTION_BODIES: Readonly<Record<string, readonly string[]>> = {
-  Uncommon: ['Silt Thief', 'Reclaimer Ambusher', 'Disc Hijacker'],
-  Rare: ['Black Cloak Agent', 'Mud Monarch Purifier'],
+  Uncommon: [
+    'Silt Thief', 'Reclaimer Ambusher', 'Disc Hijacker',
+    // OTA-1548 — the whisper-chain marks and road ambushers. Every one is a
+    // Human on the roster, so they belong here by this file's own law; ambient
+    // faction fights get nineteen more faces out of the deal.
+    'Lens Prier', 'Marsh Poacher', 'Copper Stripper', 'Chart Runner',
+    'Dice Palmer', 'Brine Runner', 'Verse Peddler', 'Tin Grubber',
+    'Latch Picker', 'Quiver Rat', 'Spore Skimmer', 'Ash Robber',
+    'Page Tearer', 'Loadstone Lifter', 'Ink Dipper', 'Coal Creeper',
+    'Road Skimmer', 'Silt Footpad',
+  ],
+  Rare: [
+    'Black Cloak Agent', 'Mud Monarch Purifier',
+    // OTA-1548 — the higher-stakes marks.
+    'Charm Cutter', 'Glass Creeper', 'Horn Filcher', 'Ring Slipper', 'Dusk Prowler',
+  ],
   Legendary: ['Tartarian Reaver'],
 };
 
@@ -37,6 +51,30 @@ export const FACTION_NOUN_BY_BODY: Readonly<Record<string, 'Raider' | 'Soldier'>
   'Black Cloak Agent': 'Soldier',
   'Mud Monarch Purifier': 'Soldier',
   'Tartarian Reaver': 'Soldier',
+  // OTA-1548 — every chain mark is a cutpurse of one flavor or another.
+  'Lens Prier': 'Raider',
+  'Marsh Poacher': 'Raider',
+  'Copper Stripper': 'Raider',
+  'Chart Runner': 'Raider',
+  'Dice Palmer': 'Raider',
+  'Brine Runner': 'Raider',
+  'Verse Peddler': 'Raider',
+  'Tin Grubber': 'Raider',
+  'Latch Picker': 'Raider',
+  'Quiver Rat': 'Raider',
+  'Spore Skimmer': 'Raider',
+  'Ash Robber': 'Raider',
+  'Page Tearer': 'Raider',
+  'Loadstone Lifter': 'Raider',
+  'Ink Dipper': 'Raider',
+  'Coal Creeper': 'Raider',
+  'Road Skimmer': 'Raider',
+  'Silt Footpad': 'Raider',
+  'Charm Cutter': 'Raider',
+  'Glass Creeper': 'Raider',
+  'Horn Filcher': 'Raider',
+  'Ring Slipper': 'Raider',
+  'Dusk Prowler': 'Raider',
 };
 
 const RARITY_LADDER = ['Common', 'Uncommon', 'Rare', 'Legendary'] as const;

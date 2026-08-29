@@ -22,6 +22,13 @@ import type { WhisperRecord, WhisperTalkTurn, Enemy, InventoryItem } from './typ
 import { canonicalCellOf, WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from './worldMap';
 import { rollDie } from './rng';
 import { findEnemyByName } from './encounter';
+// OTA-1548 — the chain table and its content model moved to their own file:
+// twenty-one authored chains would drown the machinery here. Re-exported so
+// every existing importer keeps working through this module.
+import { CHAINS, type ChainDef, type ChainContent, type ChainReward } from './whisperChains';
+
+export { CHAINS };
+export type { ChainDef, ChainContent, ChainReward };
 
 /** OTA-1547 — append one conversation turn to one whisper's per-instance
  *  transcript, immutably. Pure so the store can map with it and tests can
@@ -47,43 +54,48 @@ export function isHourInWindow(hour: number, from: number | undefined, to: numbe
   return hour >= from || hour <= to;
 }
 
-/** A chain definition. Authored in code so the engine can run typed
- *  callbacks per stage; future iterations may move to JSON once the
- *  stage-language stabilises. */
-export interface ChainDef {
-  id: string;
-  /** Player-facing title for the ContractsScreen Whispers section. */
-  title: string;
-  /** Hub-room id where this whisper plants (e.g. 'reclaimer_mess'). */
-  plantLocations: string[];
-  /** Per-visit roll. 0.15 = 15%. */
-  plantChance: number;
-  /** Authored Arbiter / world lines spoken when the whisper plants.
-   *  rotatingPick keeps repeats from grating; one is picked. */
-  plantLines: string[];
-  /** How the target tile is computed from the player's plant-time
-   *  position. Random within a per-chain offset range. */
-  targetOffset: { dxRange: [number, number]; dyRange: [number, number] };
-  /** Tile-time gate on the rendezvous (when the spawn fires).
-   *  When omitted, any time-of-day works. */
-  activeHours?: [number, number];
+// OTA-1548 — DIRECTION AND DISTANCE COME FROM THE OFFSET, NOT FROM PROSE.
+// The audit that opened this OTA caught Yulka's own copy saying "south" while
+// her stored offset walked NORTH; generating every panel line from the offset
+// makes that class impossible to author again. (north = y−1, south = y+1,
+// east = x+1, west = x−1 — the same mapping stepDirection walks.)
+export function offsetDirWord(off: { dxRange: [number, number]; dyRange: [number, number] }): string {
+  const dx = (off.dxRange[0] + off.dxRange[1]) / 2;
+  const dy = (off.dyRange[0] + off.dyRange[1]) / 2;
+  if (Math.abs(dx) >= Math.abs(dy)) return dx >= 0 ? 'east' : 'west';
+  return dy >= 0 ? 'south' : 'north';
 }
 
-export const CHAINS: ChainDef[] = [
-  {
-    id: 'yulka_discs',
-    title: 'Yulka and the Aetheric Discs',
-    plantLocations: ['outpost_messhall'],
-    plantChance: 0.15,
-    plantLines: [
-      `A pilgrim at the corner table cups her hands around a steaming mug and looks over at you. "South of here, past the gate. After the moon's up. Mud Dweller name of Yulka camps out there some nights — sells Aetheric Discs cheap. Don't ask where she gets them."`,
-      `A Reclaimer one table over leans back: "If you need Aetheric Discs and don't want to pay Irma's mark-up, walk south after dark. Yulka. She's there some nights, gone others. Two tiles, three. You'll see her fire."`,
-      `An off-duty Reclaimer presses a thumb into the salt of her plate. "Yulka. South. Night work. Aetheric Discs at half the going rate. If she's there." She doesn't say what to do if she's not.`,
-    ],
-    targetOffset: { dxRange: [-1, 1], dyRange: [-3, -2] },
-    activeHours: [20, 4],
-  },
-];
+/** '2-3' (or '3' for a fixed distance) along the offset's dominant axis. */
+export function offsetSpanText(off: { dxRange: [number, number]; dyRange: [number, number] }): string {
+  const dx = (off.dxRange[0] + off.dxRange[1]) / 2;
+  const dy = (off.dyRange[0] + off.dyRange[1]) / 2;
+  const r = Math.abs(dx) >= Math.abs(dy) ? off.dxRange : off.dyRange;
+  const lo = Math.min(Math.abs(r[0]), Math.abs(r[1]));
+  const hi = Math.max(Math.abs(r[0]), Math.abs(r[1]));
+  return lo === hi ? `${lo}` : `${lo}-${hi}`;
+}
+
+function hourWord(h: number): string {
+  if (h === 0 || h === 24) return 'midnight';
+  if (h === 12) return 'noon';
+  return h < 12 ? `${h} am` : `${h - 12} pm`;
+}
+
+/** ', after dark (8 pm to 4 am)' / ', in daylight (6 am to 6 pm)' / ''. */
+export function activeHoursText(hours?: [number, number]): string {
+  if (!hours) return '';
+  const [from, to] = hours;
+  const mood = from >= 17 || to <= 6 ? 'after dark' : 'in daylight';
+  return `, ${mood} (${hourWord(from)} to ${hourWord(to)})`;
+}
+
+/** she→her/She owes; he→him/He owes; they→them/They owe. */
+export function pronounForms(p: ChainContent['pronoun']): { obj: string; subjCap: string; owes: string } {
+  if (p === 'she') return { obj: 'her', subjCap: 'She', owes: 'owes' };
+  if (p === 'he') return { obj: 'him', subjCap: 'He', owes: 'owes' };
+  return { obj: 'them', subjCap: 'They', owes: 'owe' };
+}
 
 // ⚠⚠⚠ OTA-1542 — A RENDEZVOUS IS A PLACE, NOT A PAIR OF FRAME COORDINATES.
 // Owner: *"not only was this broken because yulka wasn't there"*. Whisper
@@ -221,32 +233,40 @@ export function reapExpiredWhispers(
  *  doesn't define one (which means I forgot to add it; loud-fail
  *  in dev would be nice). */
 export function describeWhisperStage(whisper: WhisperRecord): string {
-  if (whisper.id === 'yulka_discs') {
+  // OTA-1548 — generated from the chain's own offsets, hours, nouns and
+  // prices, for all twenty-one chains at once. Yulka's lines render exactly
+  // as OTA-1542 authored them; the direction word can no longer disagree
+  // with the dirt (her data was the one out of step, and it was fixed).
+  const chain = findChain(whisper.id);
+  if (chain) {
+    const c = chain.content;
+    const dir = offsetDirWord(chain.targetOffset);
+    const span = offsetSpanText(chain.targetOffset);
+    const hoursTxt = activeHoursText(chain.activeHours);
+    const fdir = offsetDirWord(c.fetchOffset);
+    const fspan = offsetSpanText(c.fetchOffset);
+    const p = pronounForms(c.pronoun);
     switch (whisper.stage) {
       case 'planted':
-        // OTA-1542 — SAY WHO SENT YOU, AND FROM WHERE. Owner: *"I'm still
-        // trying to figure out if this was the whisper promised by Nix."* The
-        // record never carried its source, and this line always said "south of
-        // the outpost" even when the whisper was granted by a wanderer on the
-        // road — whose camp is 2-3 tiles south of WHERE YOU MET THEM, not of
-        // any outpost. SET COURSE on this card walks to the exact tile either
-        // way; the copy now tells the truth about the reference point.
+        // OTA-1542 — SAY WHO SENT YOU, AND FROM WHERE. A wanderer-granted
+        // whisper is offset from WHERE YOU MET THEM, not from any outpost.
         return whisper.source
-          ? `Word from ${whisper.source}: Yulka camps 2-3 tiles south of where you met them, after dark (8 pm to 4 am). SET COURSE below walks you to the spot.`
-          : `Travel south of the outpost. Yulka camps somewhere in tiles 2-3 south, after dark (8 pm to 4 am).`;
+          ? `Word from ${whisper.source}: ${c.npcName} camps ${span} tiles ${dir} of where you met them${hoursTxt}. SET COURSE below walks you to the spot.`
+          : `Travel ${dir} of the outpost. ${c.npcName} camps somewhere in tiles ${span} ${dir}${hoursTxt}.`;
       case 'met_yulka':
-        return `You're at Yulka's fire. Type 'accept yulka' to take the fetch (5 Discs on return), 'buy from yulka' to pay 50 TC for 5 Discs, or 'leave yulka' to walk.`;
+        // OTA-1548 — the historically-named "met the giver" stage (see
+        // gameStore's resolver): every chain uses it, only the name is Yulka's.
+        return `You're with ${c.npcName}. Answer from the SPEAK TO ${c.npcName.toUpperCase()} bar — take the job${c.buy ? `, buy for ${c.buy.costTc} TC` : ''}, or walk away.`;
       case 'fetch_in_progress':
-        return `Travel east of Yulka's tile. The thief is 2-3 tiles over.`;
+        return `Travel ${fdir} of ${c.npcName}'s tile. ${c.markNoun.charAt(0).toUpperCase()}${c.markNoun.slice(1)} is ${fspan} tiles over.`;
       case 'fetch_active':
-        // OTA-458 — include the location hint. If a player was stranded here by the
-        // old disc-clobber bug (thief gone, stage stuck), returning to the thief
-        // tile east of Yulka re-spawns the encounter so they can finish.
-        return `Defeat the Silt Thief and recover the Aetheric Discs — east of Yulka's tile (2-3 over). If the thief isn't there, step back onto that tile to draw them out again.`;
+        // OTA-458 — include the location hint so a player stranded mid-fetch
+        // can walk back onto the tile and re-draw the encounter.
+        return `Defeat the ${c.fetchEnemy} and recover ${c.goodsLong} — ${fdir} of ${c.npcName}'s tile (${fspan} over). If ${c.markNoun} isn't there, step back onto that tile to draw them out again.`;
       case 'fetch_returned':
-        return `Return to Yulka's tile with the recovered Discs. She owes you 5.`;
+        return `Return to ${c.npcName}'s tile with the recovered ${c.goodsShort}. ${p.subjCap} ${p.owes} you ${c.reward.item ? c.reward.item.qty : `${c.reward.tc} TC`}.`;
       case 'ambush_armed':
-        return `Walk home with the Discs. Someone may notice.`;
+        return `Walk home with the ${c.goodsShort}. Someone may notice.`;
       default:
         return `Stage: ${whisper.stage}`;
     }
@@ -277,22 +297,26 @@ export function whisperRouteTarget(
   const target = whisperTargetGrid(whisper);
   const hasTarget = typeof whisper.targetMapX === 'number' && typeof whisper.targetMapY === 'number'
     || typeof whisper.targetGridX === 'number';
-  if (whisper.id === 'yulka_discs') {
+  // OTA-1548 — stage-aware for EVERY chain, labels from the chain's own
+  // content. Yulka's labels render exactly as they always did.
+  const chain = findChain(whisper.id);
+  if (chain) {
+    const c = chain.content;
     switch (whisper.stage) {
       case 'fetch_in_progress':
       case 'fetch_active':
-        return thief ? { gridX: thief.x, gridY: thief.y, label: 'the Silt Thief' } : null;
+        return thief ? { gridX: thief.x, gridY: thief.y, label: c.fetchRouteLabel } : null;
       case 'fetch_returned':
-        return hasTarget ? { gridX: target.x, gridY: target.y, label: "Yulka (return the Discs)" } : null;
+        return hasTarget ? { gridX: target.x, gridY: target.y, label: c.returnRouteLabel } : null;
       case 'planted':
       case 'met_yulka':
-        return hasTarget ? { gridX: target.x, gridY: target.y, label: "Yulka's fire" } : null;
+        return hasTarget ? { gridX: target.x, gridY: target.y, label: c.meetRouteLabel } : null;
       default:
         return null; // ambush_armed / done — no fixed tile.
     }
   }
-  // Generic chains: route to the thief-style sub-tile if one is set, else the
-  // whisper's target tile.
+  // Unknown chain id (a save from a future build): route to whatever tile the
+  // record itself names.
   if (thief) return { gridX: thief.x, gridY: thief.y, label: describeWhisperTitle(whisper) };
   if (hasTarget) return { gridX: target.x, gridY: target.y, label: describeWhisperTitle(whisper) };
   return null;
@@ -309,9 +333,23 @@ export function spawnChainEnemy(name: string): Enemy {
   return JSON.parse(JSON.stringify(proto)) as Enemy;
 }
 
-/** Build a fresh "Stolen Aetheric Discs" inventory item the player
- *  picks up off the thief. Carries a marker tag so the return
- *  step can find them in the player's pack. */
+/** OTA-1548 — build a chain's stolen-goods item, fresh off the mark. The
+ *  name is the return step's lookup key, so it comes from the chain content
+ *  and nowhere else. */
+export function makeStolenGoods(chain: ChainDef): InventoryItem {
+  return {
+    id: `whisper_loot_${Date.now()}_${rollDie(9999)}`,
+    name: chain.content.stolen.name,
+    kind: 'misc',
+    rarity: 'Uncommon',
+    quantity: chain.content.stolen.qty,
+    tags: chain.content.stolen.tags,
+  };
+}
+
+/** Build a fresh "Stolen Aetheric Discs" inventory item. Kept for the suites
+ *  that exercise the Yulka chain directly; new code goes through
+ *  makeStolenGoods so the name and the chain can never disagree. */
 export function makeStolenDiscs(quantity: number): InventoryItem {
   return {
     id: `whisper_loot_${Date.now()}_${rollDie(9999)}`,
@@ -320,5 +358,17 @@ export function makeStolenDiscs(quantity: number): InventoryItem {
     rarity: 'Uncommon',
     quantity,
     tags: ['whisper', 'aether', 'quest'],
+  };
+}
+
+/** OTA-1548 — build a chain's reward (or buy-grant) item. */
+export function makeChainRewardItem(r: ChainReward): InventoryItem {
+  return {
+    id: `whisper_reward_${Date.now()}_${rollDie(9999)}`,
+    name: r.name,
+    kind: 'misc',
+    rarity: r.rarity,
+    quantity: r.qty,
+    tags: r.tags,
   };
 }

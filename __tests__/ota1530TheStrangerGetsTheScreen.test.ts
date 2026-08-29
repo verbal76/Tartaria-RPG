@@ -139,7 +139,12 @@ describe('OTA-1530 — a persuade can shake a whisper loose', () => {
     const code = codeOnly(STORE);
     expect(code).toContain('...(lp?.activeWhispers ?? []).map((x) => x.id)');
     expect(code).toContain('...(lp?.completedWhisperIds ?? [])');
-    expect(code).toContain('CHAINS.find((c) => !held.has(c.id))');
+    // ⚠ OTA-1548 — the held-set filter IS the property here, and it survives.
+    // The pick changed: with one chain, find() was fine; with twenty-one it
+    // handed every wanderer the same rumour until the player worked the table
+    // in authoring order, so the choice is now random among the unheld.
+    expect(code).toContain('const unheld = CHAINS.filter((c) => !held.has(c.id));');
+    expect(code).toContain('unheld[Math.floor(Math.random() * unheld.length)]');
   });
 
   it('⚠⚠ it is stacked ON TOP of the lead, not swapped for it', () => {

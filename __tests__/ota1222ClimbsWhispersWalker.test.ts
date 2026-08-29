@@ -243,7 +243,10 @@ describe('OTA-1222 — Texas Ranger on the Great Climbs and the whisper chains',
           tc: 0,
           activeWhispers: [],
           activeHunts: [], activeMysteries: [], activeStorylines: [], activeQuests: [],
-          inventory: p.inventory.filter((i) => i.name !== 'Aetheric Disc' && i.name !== 'Stolen Aetheric Discs'),
+          // OTA-1548 — clear this CHAIN's goods and reward names, whatever
+          // they are; the payout assertions below are delta-based anyway.
+          inventory: p.inventory.filter((i) =>
+            i.name !== chain.content.stolen.name && i.name !== chain.content.reward.item?.name),
         },
       });
       clearEnemies();
@@ -282,20 +285,29 @@ describe('OTA-1222 — Texas Ranger on the Great Climbs and the whisper chains',
       await settle(() => rec()?.stage === 'met_yulka');
       expect({ chain: chain.id, stage: rec()?.stage }).toEqual({ chain: chain.id, stage: 'met_yulka' });
 
-      // Take the fetch.
-      await store.getState().submitPlayerAction(`accept yulka`);
+      // Take the fetch — by the giver's own name (OTA-1548: the command is
+      // built from the chain content, same as the game's short-circuit).
+      await store.getState().submitPlayerAction(`accept ${chain.content.npcName.toLowerCase()}`);
       await settle(() => rec()?.stage === 'fetch_in_progress');
       expect(rec()?.stage).toBe('fetch_in_progress');
+      // OTA-1548 — the mark's tile is offset in the CHAIN'S direction, not
+      // always east; walk both axes generically.
       const thiefX = rec()!.ctx!.thiefMapX as number;
-      const stepsEast = thiefX - (store.getState().player!.mapX ?? 0);
-      expect(stepsEast).toBeGreaterThan(0);
+      const thiefY = rec()!.ctx!.thiefMapY as number;
+      const dxToThief = thiefX - (store.getState().player!.mapX ?? 0);
+      const dyToThief = thiefY - (store.getState().player!.mapY ?? 0);
+      expect(Math.abs(dxToThief) + Math.abs(dyToThief)).toBeGreaterThan(0);
+      const walkOffset = (dx: number, dy: number) => {
+        for (let i = 0; i < Math.abs(dx); i++) stepOpen(dx > 0 ? 'east' : 'west');
+        for (let i = 0; i < Math.abs(dy); i++) stepOpen(dy > 0 ? 'south' : 'north');
+      };
 
-      // Walk east to the thief's tile — the combat spawns on arrival.
-      for (let i = 0; i < stepsEast; i++) stepOpen('east');
+      // Walk to the mark's tile — the combat spawns on arrival.
+      walkOffset(dxToThief, dyToThief);
       await settle(() => rec()?.stage === 'fetch_active');
       expect(rec()?.stage).toBe('fetch_active');
       await settle(() => (store.getState().currentScene?.enemies ?? []).length > 0);
-      // Wound the thief to a sliver, keep ONLY the thief, and finish it.
+      // Wound the mark to a sliver, keep ONLY the mark, and finish it.
       const thief = store.getState().currentScene!.enemies[0]!;
       useGameStore.setState({
         currentScene: {
@@ -314,17 +326,26 @@ describe('OTA-1222 — Texas Ranger on the Great Climbs and the whisper chains',
       }
       await settle(() => rec()?.stage === 'fetch_returned');
       expect(rec()?.stage).toBe('fetch_returned');
-      expect(store.getState().player!.inventory.some((i) => i.name === 'Stolen Aetheric Discs' && i.quantity > 0)).toBe(true);
+      expect(store.getState().player!.inventory.some((i) => i.name === chain.content.stolen.name && i.quantity > 0)).toBe(true);
 
-      // Walk back west to the fire — the turn-in pays and completes outright.
+      // Walk back to the giver — the turn-in pays and completes outright.
+      // OTA-1548 — delta-based: reward items like Scrap Metal can already be
+      // in the pack, and each chain pays its own amounts.
       const tcBefore = store.getState().player!.tc;
-      for (let i = 0; i < stepsEast; i++) stepOpen('west');
+      const rewardName = chain.content.reward.item?.name;
+      const qtyOf = (name: string | undefined) => name
+        ? store.getState().player!.inventory.filter((i) => i.name === name).reduce((n, i) => n + i.quantity, 0)
+        : 0;
+      const rewardBefore = qtyOf(rewardName);
+      walkOffset(-dxToThief, -dyToThief);
       await settle(() => (store.getState().player!.completedWhisperIds ?? []).includes(chain.id));
       expect(store.getState().player!.completedWhisperIds ?? []).toContain(chain.id);
       expect(rec()).toBeUndefined(); // off the slate — no lingering epilogue (arb120)
-      const discs = store.getState().player!.inventory.find((i) => i.name === 'Aetheric Disc');
-      expect(discs?.quantity).toBe(5);
-      expect(store.getState().player!.tc).toBe(tcBefore + 30);
+      if (rewardName) {
+        expect({ chain: chain.id, item: rewardName, gained: qtyOf(rewardName) - rewardBefore })
+          .toEqual({ chain: chain.id, item: rewardName, gained: chain.content.reward.item!.qty });
+      }
+      expect(store.getState().player!.tc).toBe(tcBefore + chain.content.reward.tc);
     });
   }
 });

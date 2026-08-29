@@ -83,7 +83,10 @@ describe('OTA-1547 — the meet stops burying its own speaker', () => {
   });
 
   it('⚠⚠⚠ …replaced by one pointer to the bar (typed commands still named)', () => {
-    expect(STORE).toContain('Answer her from the SPEAK TO YULKA bar below');
+    // OTA-1548 — the pointer is templated off the chain content now; for
+    // Yulka it renders the same 'Answer her from the SPEAK TO YULKA bar
+    // below — or type "accept yulka", …' it always did.
+    expect(STORE).toContain('Answer ${pronounForms(c.pronoun).obj} from the SPEAK TO ${c.npcName.toUpperCase()} bar below');
   });
 
   it('⚠⚠ the meet seeds the transcript with her sighting and her pitch', () => {
@@ -103,7 +106,8 @@ describe('OTA-1547 — the meet stops burying its own speaker', () => {
 
   it("⚠⚠ a short-TC buy keeps the record, so the refusal joins the transcript too", () => {
     const code = codeOnly(STORE);
-    expect(code).toContain("withTalkTurn(s.player.activeWhispers, whisper.id, 'you', 'You offer to buy the Discs outright.')");
+    // OTA-1548 — chain-generic wording; the refusal turn still lands.
+    expect(code).toContain("withTalkTurn(s.player.activeWhispers, whisper.id, 'you', 'You offer to buy outright.')");
     expect(code).toContain("whisper.id, 'them', short,");
   });
 });
@@ -134,35 +138,42 @@ describe('OTA-1547 — the step machinery yields to a fired beat', () => {
 });
 
 describe('OTA-1547 — the sheet and the typed commands are one road', () => {
-  it('⚠⚠⚠ answerYulka routes all three buttons through the SAME handlers the parser uses', () => {
+  it('⚠⚠⚠ answerWhisper routes all three buttons through the SAME handlers the parser uses', () => {
+    // OTA-1548 — renamed answerYulka → answerWhisper when the machine went
+    // chain-generic; the one-road property is the thing pinned.
     const code = codeOnly(STORE);
-    expect(code).toContain("if (choice === 'accept') handleYulkaAccept(get, set, w);");
-    expect(code).toContain("else if (choice === 'buy') handleYulkaBuy(get, set, w);");
-    expect(code).toContain('else handleYulkaLeave(get, set, w);');
+    expect(code).toContain("if (choice === 'accept') handleWhisperAccept(get, set, w, chain);");
+    expect(code).toContain("else if (choice === 'buy') handleWhisperBuy(get, set, w, chain);");
+    expect(code).toContain('else handleWhisperLeave(get, set, w, chain);');
   });
 
-  it('⚠⚠ the typed short-circuit is untouched — "accept yulka" still works', () => {
+  it('⚠⚠ the typed short-circuit still runs — "accept yulka" and every sibling name', () => {
+    // OTA-1548 — the regexes are built from the chain's own npcName, so
+    // 'accept yulka' compiles to exactly the pattern it always was.
     const code = codeOnly(STORE);
-    expect(code).toContain('handleYulkaAccept(get, set, yulkaActive);');
-    expect(code).toContain('handleYulkaBuy(get, set, yulkaActive);');
-    expect(code).toContain('handleYulkaLeave(get, set, yulkaActive);');
+    expect(code).toContain('handleWhisperAccept(get, set, mw, chain);');
+    expect(code).toContain('handleWhisperBuy(get, set, mw, chain);');
+    expect(code).toContain('handleWhisperLeave(get, set, mw, chain);');
+    expect(code).toContain('^accept (${name}|the (fetch|job|deal))');
   });
 
-  it('⚠⚠⚠ the bar is loud while she waits and quiet afterwards — and only while the instance lives', () => {
+  it('⚠⚠⚠ the bar is loud while the giver waits and quiet afterwards — and only while the instance lives', () => {
     const code = codeOnly(SHEET);
     expect(code).toContain("const deciding = w.stage === 'met_yulka';");
-    expect(code).toContain("{deciding ? 'SPEAK TO YULKA' : 'YULKA — WHAT SHE SAID'}");
+    expect(code).toContain('`SPEAK TO ${c.npcName.toUpperCase()}`');
     expect(code).toContain("(x.talk?.length ?? 0) > 0 && x.stage !== 'done' && x.stage !== 'ambush_armed'");
   });
 
-  it('⚠⚠ ACCEPT keeps the sheet open on the brief; BUY and WALK AWAY close with the record', () => {
+  it('⚠⚠ ACCEPT (and a refused buy) keep the sheet open; WALK AWAY closes with the record', () => {
     // If visibility keyed on met_yulka alone, accepting would vanish the sheet
     // with the instructions unread — the burial rebuilt out of its own cure.
-    expect(codeOnly(SHEET)).toContain("if (choice !== 'accept') setOpen(false);");
+    // A SUCCESSFUL buy removes the record and the unmount closes the sheet; a
+    // refused one keeps the transcript up so the refusal is read where it landed.
+    expect(codeOnly(SHEET)).toContain("if (choice === 'leave') setOpen(false);");
   });
 
   it('⚠⚠ combat owns the controls — the bar yields exactly like the wanderer card', () => {
-    expect(codeOnly(SHEET)).toContain('if (!w || enemies > 0) return null;');
+    expect(codeOnly(SHEET)).toContain('if (!w || !chain || enemies > 0) return null;');
   });
 
   it('⚠ the sheet is mounted above the controls slot in ExplorationScreen', () => {

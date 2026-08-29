@@ -25484,7 +25484,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the step machinery now yields to any fired whisper beat: the resolver
 // reports it, and the filler line and the 20% trader roll stand down for that
 // step - you did not lose track of distance, you arrived somewhere.
-export const OTA_BUILD_ID = '2026-08-29-1547-the-conversation-holds-the-floor';
+// OTA-1548 - TWENTY MORE FIRES IN THE DARK. Owner: "we need at least 20 more
+// whispers that follow the yulka chain but have different quests different
+// people giving them out different rewards and different themes." Two moves:
+// (1) THE MACHINE WENT DATA-DRIVEN. Every stage of the whisper loop - meet,
+// accept, buy, leave, fetch, recover, return, ambush, panel copy, route
+// labels, typed commands, the talk sheet - was hardcoded to Yulka by name in
+// ~8 places. All of it now runs off ChainDef.content
+// (app/engine/whisperChains.ts): fireWhisperMeet/Fetch/Return/Ambush,
+// handleWhisperAccept/Buy/Leave, answerWhisper, a per-chain typed
+// short-circuit ("accept brasko" works like "accept yulka"), a death hook
+// keyed on each chain's own mark, and panel copy GENERATED from the chain's
+// offsets/hours/nouns/prices. Yulka is row one, byte-identical where pinned.
+// (2) TWENTY NEW CHAINS, distinct givers in distinct rooms (mess, workshop,
+// chapel, lab, gate, central, quarters, armory), day/night/any-hour windows,
+// all four compass directions, varied rewards (20-90 TC, discs, lenses,
+// vials, thread, compasses, tools, keys, bolts, fungus, charms, crystals,
+// horns, rings), ten sell a buy-out and eleven refuse in voice, and
+// twenty-three new Human marks/ambushers on the roster (pooled into
+// FACTION_BODIES per OTA-1035's law).
+// AND THE AUDIT CAUGHT YULKA LYING ABOUT SOUTH: her targetOffset was dyRange
+// [-3,-2] - which walks NORTH (north = y-1 everywhere) - while every authored
+// line says "south". SET COURSE masked it by routing to the stored tile; a
+// player following the prose on foot could never have found her. Data flipped
+// to [2,3], and every chain's plant-line direction is now suite-locked
+// against its offset so the class cannot be authored again.
+export const OTA_BUILD_ID = '2026-08-29-1548-twenty-more-fires-in-the-dark';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1547-the-conversation-holds-the-floor';
 // golem catch-up 2026-08-29: markerless publish of OTA-1547 (SPEAK TO YULKA
 // bar + conversation sheet with per-instance transcript; step filler and
 // trader roll yield to fired whisper beats) to the golem channel.

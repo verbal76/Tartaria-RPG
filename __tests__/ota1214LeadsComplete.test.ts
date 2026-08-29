@@ -43,7 +43,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import objectivesData from '../app/data/quests/objectives.json';
 import { LEAD_VERB_TRIGGERS } from '../app/engine/questGenerator';
-import { CHAINS } from '../app/engine/whispers';
+import { CHAINS, findChain } from '../app/engine/whispers';
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 
@@ -66,9 +66,27 @@ describe('OTA-1214 — the audit: no lead verb without a trigger', () => {
     expect(offenders).toEqual([]);
   });
   it('⚠ every whisper chain has a dispatcher arm (a chain that plants but cannot fire is the same defect)', () => {
+    // ⚠ OTA-1548 — this used to hunt each chain id as a LITERAL in gameStore,
+    // because the dispatcher was a hand-written arm per chain and a missing id
+    // was how you spotted a chain that could plant but never fire. The
+    // dispatcher is now ONE table-driven path (findChain on the record's id),
+    // so no chain id appears in the store at all — and the property this pin
+    // exists to protect got STRONGER: membership in CHAINS *is* the dispatch.
+    // Assert that directly, plus the generic arms that carry every stage.
     const store = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
     for (const chain of CHAINS) {
-      expect(store).toContain(`'${chain.id}'`);
+      expect({ id: chain.id, dispatchable: findChain(chain.id)?.id }).toEqual({ id: chain.id, dispatchable: chain.id });
+      // Content completeness — every arm below reads these.
+      expect({ id: chain.id, mark: !!chain.content.fetchEnemy, goods: !!chain.content.stolen.name })
+        .toEqual({ id: chain.id, mark: true, goods: true });
+    }
+    for (const arm of [
+      'fireWhisperMeet(get, set, meet, meetChain);',
+      'fireWhisperFetch(get, set, fetch, fetchChain);',
+      'fireWhisperReturn(get, set, ret, retChain);',
+      'ch.content.fetchEnemy === enemy.name',
+    ]) {
+      expect(store).toContain(arm);
     }
   });
 });

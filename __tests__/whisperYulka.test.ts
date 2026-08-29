@@ -83,11 +83,14 @@ describe('Whisper engine — pure helpers', () => {
   it('pickTargetTile picks within the chain range, deterministically against the player tile', () => {
     const chain = findChain('yulka_discs')!;
     const tile = pickTargetTile(chain, 10, 10);
-    // yulka_discs targetOffset: dx [-1,1], dy [-3,-2]
+    // yulka_discs targetOffset: dx [-1,1], dy [2,3].
+    // ⚠ OTA-1548 — dy flipped from [-3,-2]: that offset walked NORTH (north is
+    // y−1 everywhere in the engine) while every authored line says "south".
+    // The camp is now on the side of the outpost the prose always claimed.
     expect(tile.x).toBeGreaterThanOrEqual(9);
     expect(tile.x).toBeLessThanOrEqual(11);
-    expect(tile.y).toBeGreaterThanOrEqual(7);
-    expect(tile.y).toBeLessThanOrEqual(8);
+    expect(tile.y).toBeGreaterThanOrEqual(12);
+    expect(tile.y).toBeLessThanOrEqual(13);
   });
 
   // OTA-465 — the Contracts "set course" uses whisperRouteTarget to pick the tile.

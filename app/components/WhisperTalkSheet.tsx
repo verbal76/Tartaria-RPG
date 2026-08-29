@@ -42,26 +42,38 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { findChain, pronounForms } from '../engine/whispers';
 
 export function WhisperTalkSheet() {
   const whispers = useGameStore((s) => s.player?.activeWhispers);
   const enemies = useGameStore((s) => s.currentScene?.enemies?.length ?? 0);
-  const answer = useGameStore((s) => s.answerYulka);
+  const answer = useGameStore((s) => s.answerWhisper);
   const [open, setOpen] = useState(false);
   const scrollRef = useRef<ScrollView | null>(null);
 
   // The one whisper with a conversation on it, still live. done/ambush_armed
   // are the chain's terminal beats — the fire is cold, the bar goes away.
+  // OTA-1548 — any chain's whisper qualifies; the name, pronoun, kicker and
+  // buttons all come off its ChainDef content.
   const w = useMemo(
     () => (whispers ?? []).find(
-      (x) => (x.talk?.length ?? 0) > 0 && x.stage !== 'done' && x.stage !== 'ambush_armed',
+      (x) => (x.talk?.length ?? 0) > 0 && x.stage !== 'done' && x.stage !== 'ambush_armed' && findChain(x.id),
     ),
     [whispers],
   );
+  const chain = w ? findChain(w.id) : undefined;
+  // OTA-1548 — when the armed whisper changes identity (this one resolved,
+  // another chain armed later), the sheet must not inherit the old open state
+  // and pop up uninvited over the new encounter.
+  const wid = w?.id;
+  React.useEffect(() => { setOpen(false); }, [wid]);
 
   // Combat owns the controls; the bar yields (same rule as the wanderer card).
-  if (!w || enemies > 0) return null;
+  if (!w || !chain || enemies > 0) return null;
 
+  const c = chain.content;
+  const saidWord = pronounForms(c.pronoun).subjCap.toUpperCase();
+  const waitingWord = c.pronoun === 'they' ? "they're waiting" : `${c.pronoun}'s waiting`;
   const deciding = w.stage === 'met_yulka';
 
   const bar = (
@@ -71,22 +83,24 @@ export function WhisperTalkSheet() {
       activeOpacity={0.7}
       accessibilityRole="button"
       accessibilityLabel={deciding
-        ? 'Speak to Yulka — she is waiting on your answer'
-        : 'Yulka — re-read what she said'}
+        ? `Speak to ${c.npcName} — waiting on your answer`
+        : `${c.npcName} — re-read what was said`}
     >
       <Text style={[styles.barText, deciding ? styles.barTextDeciding : styles.barTextQuiet]}>
-        {deciding ? 'SPEAK TO YULKA' : 'YULKA — WHAT SHE SAID'}
+        {deciding ? `SPEAK TO ${c.npcName.toUpperCase()}` : `${c.npcName.toUpperCase()} — WHAT ${saidWord} SAID`}
       </Text>
-      {deciding && <Text style={styles.barHint}>she's waiting</Text>}
+      {deciding && <Text style={styles.barHint}>{waitingWord}</Text>}
     </TouchableOpacity>
   );
 
   const choose = (choice: 'accept' | 'buy' | 'leave') => {
     answer(choice);
-    // BUY / WALK AWAY end the exchange and remove the record — close with it.
-    // ACCEPT keeps the sheet up: the send-off and the task brief land in the
-    // transcript the player is already looking at.
-    if (choice !== 'accept') setOpen(false);
+    // WALK AWAY ends the exchange and removes the record — close with it. A
+    // successful BUY removes the record too (the unmount closes the sheet),
+    // but a FAILED buy (short TC, or a giver who won't sell) keeps the record,
+    // and the sheet stays up so the refusal lands in the transcript the
+    // player is already looking at. ACCEPT keeps the sheet up for the brief.
+    if (choice === 'leave') setOpen(false);
   };
 
   return (
@@ -102,8 +116,8 @@ export function WhisperTalkSheet() {
           <View style={styles.sheet}>
             <View style={styles.header}>
               <View style={styles.headerText}>
-                <Text style={styles.kicker}>AT THE FIRE</Text>
-                <Text style={styles.npcName}>Yulka</Text>
+                <Text style={styles.kicker}>{c.kicker}</Text>
+                <Text style={styles.npcName}>{c.npcName}</Text>
               </View>
               <TouchableOpacity
                 style={styles.closeBtn}
@@ -143,19 +157,21 @@ export function WhisperTalkSheet() {
                   onPress={() => choose('accept')}
                   activeOpacity={0.7}
                   accessibilityRole="button"
-                  accessibilityLabel="Take the fetch job — five Discs on return"
+                  accessibilityLabel="Take the fetch job"
                 >
-                  <Text style={styles.primaryText}>TAKE THE JOB — FIVE DISCS ON RETURN</Text>
+                  <Text style={styles.primaryText}>{c.acceptBtnLabel}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.secondaryBtn}
-                  onPress={() => choose('buy')}
-                  activeOpacity={0.7}
-                  accessibilityRole="button"
-                  accessibilityLabel="Buy five Discs for fifty TC"
-                >
-                  <Text style={styles.secondaryText}>BUY — 50 TC FOR 5 DISCS</Text>
-                </TouchableOpacity>
+                {c.buy && c.buyBtnLabel && (
+                  <TouchableOpacity
+                    style={styles.secondaryBtn}
+                    onPress={() => choose('buy')}
+                    activeOpacity={0.7}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Buy for ${c.buy.costTc} TC`}
+                  >
+                    <Text style={styles.secondaryText}>{c.buyBtnLabel}</Text>
+                  </TouchableOpacity>
+                )}
                 <TouchableOpacity
                   style={styles.secondaryBtn}
                   onPress={() => choose('leave')}
