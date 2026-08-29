@@ -1,0 +1,191 @@
+{
+  "id": "004e7d3544484bfabe5448eb430968f2",
+  "groupID": "7698664282",
+  "eventID": "004e7d3544484bfabe5448eb430968f2",
+  "projectID": "4511945117532160",
+  "size": 14670,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-28-1532-the-journeys-of-cheddar-bob #mtdki0hdtv3e [inline 12/12]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-28-1532-the-journeys-of-cheddar-bob #mtdki0hdtv3e [inline 12/12]",
+  "title": "player-log 2026-08-28-1532-the-journeys-of-cheddar-bob #mtdki0hdtv3e [inline 12/12]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "4e54ac83694848d1875756a62a5fbf39",
+      "span_id": "a6f2ae465c0ec2fb",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "12.5s read9.5s/write2.5s in743t\u2192out33t ms/tok 12.7-12.7 cap1 | ambient_fill n1 avg2.6s max2.6s \u26a01unusable in364t\u2192out0t \u23f81 \u27021/2.6s || WASTED 12 calls / 91.3s\n[2026-08-28T23:09:48.790Z] [debug] homework: item_desc \"Reclaimer's Cloak\" \u2713 5022ms\n",
+      "[2026-08-28T23:10:14.279Z] [debug] persist sizes(KB): total=140 player=20 wm=37[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=3\n[2026-08-28T23:10:15.157Z] [debug] qwen\u23f1 item_synthesis_hw ok 1120ms read 347ms/write 745ms in 323t\u2192out 23t 1.1ms/t (111ch)\n[2026-08-28T23:10:15.163Z] [debug] homework: item_desc \"Automaton Circuit\" \u2713 1338ms\n",
+      "[2026-08-28T23:10:21.609Z] [player] give the Aetheric Helm of Command to Ilva Sidelong\n[2026-08-28T23:10:21.613Z] [world] You watched me sidelong for an hour to hand over a Aetheric Helm of Command. Watch the road instead.\n[2026-08-28T23:10:32.487Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-28T23:10:38.866Z] [debug] stats: STR5 DEX16 INT12 WIS4 CHA2 STE6 | gear: DEX+10,INT+3,STR+3,STE+3 | worn: main=Cudgel off=Earthshaker head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak ring=Light-Finger Guild Band\n[2026-08-28T23:10:54.737Z] [player] she gave it back?\n",
+      "[2026-08-28T23:10:54.737Z] [debug] parser: intent=help conf=0.64 verb=backup target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-28T23:10:54.738Z] [world] You shoulder in beside the nearest ally \u2014 but here, alone on the road, there's no second pair of hands to lift. The gesture costs you the moment and gains you nothing. (No allies to help in single-player.)\n",
+      "[2026-08-28T23:10:54.739Z] [debug] arbiter: template (reason=intent-not-allowed:help)\n[2026-08-28T23:10:54.739Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T23:10:54.739Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T23:10:54.894Z] [cognitive] neutral  (154ms)\n[2026-08-28T23:11:10.344Z] [debug] ui: tap \"missions\"\n",
+      "[2026-08-28T23:11:22.683Z] [debug] ui: tap \"look around you\"\n[2026-08-28T23:11:22.691Z] [player] look\n[2026-08-28T23:11:22.692Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-28T23:11:22.693Z] [world] You look around. You're in Black Market Bazaar, in Reclaimer's Stake. You see: footprint. Ilva Sidelong is here. The shelf is unaddressed. Cardinal travel: north, east, south, west.\n[2026-08-28T23:11:22.694Z] [arbiter] \u25b8 Still open \u2014 Travel south of the outpost. Yulka camps somewhere in tiles 2-3 south, after dark (8 pm to 4 am).\n",
+      "[2026-08-28T23:11:22.695Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-28T23:11:22.695Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T23:11:22.796Z] [cognitive] neutral  (99ms)\n[2026-08-28T23:11:22.910Z] [debug] persist sizes(KB): total=139 player=20 wm=38[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=3\n",
+      "[2026-08-28T23:11:32.472Z] [player] approach yulka\n[2026-08-28T23:11:32.473Z] [debug] parser: intent=advance conf=1.00 verb=approach target=yulka resolved=- range=- enemies=0 hooks=1\n[2026-08-28T23:11:32.475Z] [debug] move: advance from range=- enemies=0 weather=Aether Lightning cost=1 partial=0\n[2026-08-28T23:11:32.477Z] [debug] move: bail \u2014 no active enemy\n",
+      "[2026-08-28T23:11:32.477Z] [arbiter] The Arbiter shrugs. \"Nothing to advance on. The ground here is quiet.\"\n[2026-08-28T23:11:32.639Z] [cognitive] neutral  (159ms)\n[2026-08-28T23:11:52.171Z] [player] myission says yulkas on this tile, take me to her\n[2026-08-28T23:11:52.172Z] [debug] parser: intent=pickup conf=1.00 verb=take target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-28T23:11:52.172Z] [world] The ground here is bare. Nothing to pick up.\n[2026-08-28T23:11:52.340Z] [cognitive] neutral  (166ms)\n[2026-08-28T23:11:58.908Z] [debug] qwen\u23f1 ambient ok 6657ms read 3833ms/write 1971ms in 364t\u2192out 31t 10.5ms/t HIT-CAP (165ch)\n",
+      "[2026-08-28T23:11:59.049Z] [arbiter] You had traversed the borders of the ancient lands, navigating through the labyrinthine streets of the bustling markets, each one a testament to the rich tapestry of\n[2026-08-28T23:11:59.049Z] [debug] arbiter: ambient \u2713 6876ms\n",
+      "[2026-08-28T23:11:59.050Z] [debug] arbiter: ambient-said \"You had traversed the borders of the ancient lands, navigating through the labyrinthine streets of the bustling markets, each one a testament to the rich tapest\"\n[2026-08-28T23:12:15.009Z] [player] when I typed that take me to her line, there was no text box\n",
+      "[2026-08-28T23:12:15.010Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-28T23:12:15.010Z] [debug] meta-comment guard: skipped intent parse (engine-vocabulary: \"text box\") on 60-char input\n",
+      "[2026-08-28T23:12:31.645Z] [debug] send-log: #mtdkh5r6ci9z \u2014 DELIVERED (inline, no attachments): beacon out, 12/12 parts accepted (175583 chars) \u2014 flush said yes\n[2026-08-28T23:12:31.647Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtdkh5r6ci9z kept on disk, boots retry up to 5 sends total\n[2026-08-28T23:12:36.957Z] [debug] appstate: active \u2192 background (was active for 298373ms)\n",
+      "[2026-08-28T23:12:44.394Z] [debug] appstate: background \u2192 active (was background for 7437ms)\n[2026-08-28T23:12:47.460Z] [debug] appstate: active \u2192 background (was active for 3066ms)\n[2026-08-28T23:12:51.403Z] [debug] appstate: background \u2192 active (was background for 3943ms)\n[2026-08-28T23:12:54.345Z] [debug] appstate: active \u2192 background (was active for 2942ms)\n",
+      "[2026-08-28T23:12:57.756Z] [debug] appstate: background \u2192 active (was background for 3411ms)\n[2026-08-28T23:13:00.484Z] [debug] appstate: active \u2192 background (was active for 2728ms)\n[2026-08-28T23:13:03.407Z] [debug] appstate: background \u2192 active (was background for 2923ms)\n[2026-08-28T23:13:06.178Z] [debug] appstate: active \u2192 background (was active for 2771ms)\n",
+      "[2026-08-28T23:13:09.081Z] [debug] appstate: background \u2192 active (was background for 2902ms)\n\n=== END LOG \u00b7 171120 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-08-28T23:13:10.833Z\n\nInstall\n",
+      "  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-08-28-1530-the-stranger-gets-the-screen)\n  Boot stage: qwen:done\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-08-28T22:16:38.770Z\n  Last init success: 2026-08-28T22:16:39.764Z\n",
+      "  Crashes-before-disable threshold: 2\n  Qwen completion guard: retrying this boot (cooldown elapsed after 1 completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-andr",
+      "oid15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n  Status: none recorded\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-27T01:03:31.295Z (2770m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1515-the-log-goes-in-parts \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+60639ms)\n  \u2022 2026-08-27T01:34:40.055Z (2739m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1516-the-quiet-path-sends-the-same-way \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+727ms)\n  \u2022 2026-08-27T02:03:02.202Z (2710m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1518-the-beacon-goes-first \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+92048ms)\n",
+      "  \u2022 2026-08-27T02:32:27.198Z (2681m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1519-the-attachment-was-the-fault \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+23274ms)\n  \u2022 2026-08-27T03:03:20.074Z (2650m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+20786ms)\n  \u2022 2026-08-27T12:37:15.724Z (2076m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1522-the-stun-does-not-outlive-itself \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+0ms)\n  \u2022 2026-08-27T16:21:51.524Z (1851m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1524-cover-the-seven-and-mean-the-switch \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+12474ms)\n  \u2022 2026-08-27T21:42:59.314Z (1530m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"missions\"\n",
+      "      doing: tap \"missions\" \u00b7 room outpost_central \u00b7 screen exploration\n      last checkpoint: rendered (+23163ms)\n  \u2022 2026-08-28T02:29:33.897Z (1244m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n      Process died with no orderly exit while: action \"investigate weathered ruined skyscraper\"\n",
+      "      doing: action \"investigate weathered ruined skyscraper\" \u00b7 room monarch_waystation \u00b7 screen exploration\n      last checkpoint: rendered (+79547ms)\n  \u2022 2026-08-28T04:28:43.279Z (1124m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-28-1530-the-stranger-gets-the-screen \u00b7 stage rendered\n      Process died with no orderly exit while: action \"investigate the ground\"\n",
+      "      doing: action \"investigate the ground\" \u00b7 room iskan_veil \u00b7 screen exploration\n      last checkpoint: rendered (+16317ms)\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n  \u26a0\u26a0 LAST BOOT DIED MID-ACTION \u2014 no orderly exit was recorded.\n     Last thing the app did: action \"investigate the ground\"\n     Where: iskan_veil on exploration screen\n",
+      "     Last seen alive: 2026-08-28T04:28:43.279Z (1124 min before this boot \u2014 the kill landed somewhere in that gap)\n     Last checkpoint reached: rendered (+16317ms after it)\n     \u26a0 The disk log's tail is UNRELIABLE for that session \u2014 batched lines\n       die in memory when the JS thread wedges. Trust this line over it.\n  Memory warnings: none this session\n",
+      "  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  \u26a0 Native queue: worst wait 10.5s \u00b7 2 job kinds queued >3s \u00b7 worst 19.0ms/prompt-token \u00b7 12 generations thrown away (91.3s)\n     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.\n",
+      "  App state trail: background \u2192 active \u2192 background \u2192 active \u2192 background \u2192 active\nModel contexts\n  Live now: 1\n  Opened: 1 \u00b7 Released: 0 \u00b7 Peak live: 1\n  Narration engine: ready\n"
+    ],
+    "chunkChars": 11801
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-28-1532-the-journeys-of-cheddar-bob #mtdki0hdtv3e [inline 12/12]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtdki0hdtv3e"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "12"
+    },
+    {
+      "key": "parts",
+      "value": "12"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39",
+      "query": "user.ip:\"2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-29T00:21:37.361422Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-29T00:21:37.084000Z",
+  "fingerprints": [
+    "da7ebe0bfda6bde4f185b1d3386bc74d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "1d0355919f7e4607bfd94c2ed9da0354",
+  "previousEventID": "fc81b4219b6c4888aacea536ad6da0b7"
+}

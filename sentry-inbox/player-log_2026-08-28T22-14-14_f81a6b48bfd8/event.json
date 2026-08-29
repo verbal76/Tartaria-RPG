@@ -1,0 +1,201 @@
+{
+  "id": "f81a6b48bfd84de0a330a2345852c403",
+  "groupID": "7697053520",
+  "eventID": "f81a6b48bfd84de0a330a2345852c403",
+  "projectID": "4511945117532160",
+  "size": 17870,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 18/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 18/27]",
+  "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 18/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "7b3fcdf9d94c43a8a477de1aea938687",
+      "span_id": "843b24ec022fd6b6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "[combat] Eternal Dynasty Raider 1 takes 3 with the compact blaster. It reels: 45 left. Then it fights back.\n[2026-08-27T19:40:11.646Z] [combat] Your Compact Blaster shatters from wear. It is gone. A twist of Scrap Metal comes free in your hand.\n[2026-08-27T19:40:11.646Z] [reward] \u2726 Scrap Metal (Common).\n",
+      "[2026-08-27T19:40:11.924Z] [debug] persist sizes(KB): total=243 player=77 wm=83[rooms=36 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=77 scene=5\n[2026-08-27T19:40:24.690Z] [debug] appstate: active \u2192 background (was active for 283241ms)\n[2026-08-27T19:40:51.574Z] [debug] appstate: background \u2192 active (was background for 26880ms)\n",
+      "[2026-08-27T19:41:03.924Z] [debug] appstate: active \u2192 background (was active for 12354ms)\n[2026-08-27T19:43:02.071Z] [debug] appstate: background \u2192 active (was background for 118142ms)\n[2026-08-27T19:43:03.121Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-27T19:43:03.176Z] [player] attack with the cantor's tuning fork\n",
+      "[2026-08-27T19:43:03.177Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=2 hooks=1\n[2026-08-27T19:43:03.178Z] [combat] Eternal Dynasty Raider 1 blisters \u2014 clinging fire sears 2. (43/55 HP, 1 turn left)\n",
+      "[2026-08-27T19:43:03.178Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-27T19:43:03.179Z] [debug] attack: status mods exhausted -2\n[2026-08-27T19:43:03.239Z] [world] You commit forward with the searing cantor's tuning fork. Eternal Dynasty Raider 1 watches your hands.\n",
+      "[2026-08-27T19:43:03.240Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T19:43:10.201Z] [world] You seize the initiative. Eternal Dynasty Raider 1 has no time to react.\n[2026-08-27T19:43:10.201Z] [combat] You \u2014 d20 \u2192 20 + INT 11 exhausted -2 = 29 vs Eternal Dynasty Raider 1 AC 20 \u2014 \u2713 CRITICAL HIT\n[2026-08-27T19:43:10.201Z] [combat] Aetheric flares \u2014 +3 on hit.\n",
+      "[2026-08-27T19:43:10.202Z] [combat] Eternal Dynasty Raider 1 takes 23 with the searing cantor's tuning fork. It reels: 20 left. Then it fights back.\n[2026-08-27T19:43:10.203Z] [combat] Searing Cantor's Tuning Fork \u2014 3 burn bites in and festers (3 turns).\n[2026-08-27T19:43:10.203Z] [combat] Eternal Dynasty Raider 1 is left exposed \u2014 easier to hit.\n",
+      "[2026-08-27T19:43:10.204Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 16 + ATK 15 = 31 vs your AC 28 \u2014 \u2713 HIT\n[2026-08-27T19:43:10.205Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 8 + ATK 15 = 23 vs your AC 28 \u2014 \u2717 MISS\n[2026-08-27T19:43:10.206Z] [arbiter] The Arbiter watches the blow land or fail. \"Both are answers.\"\n",
+      "[2026-08-27T19:43:10.476Z] [combat] Eternal Dynasty Raider 2 deals 8 bludgeoning damage [edge of reach \u2014 halved]. You have 32 HP remaining.\n[2026-08-27T19:43:10.476Z] [combat] Eternal Dynasty Raider 2's strike leaves you stunned.\n[2026-08-27T19:43:11.847Z] [debug] ui: tap \"dodge\"\n[2026-08-27T19:43:11.849Z] [system] bleeding fades.\n[2026-08-27T19:43:11.849Z] [system] stunned fades.\n",
+      "[2026-08-27T19:43:11.855Z] [player] dodge\n[2026-08-27T19:43:11.856Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=1\n[2026-08-27T19:43:11.857Z] [world] You commit to the dodge. Slip Eternal Dynasty Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-27T19:43:11.857Z] [combat] Eternal Dynasty Raider 1 blisters \u2014 clinging fire sears 3. (17/55 HP, 2 turns left)\n[2026-08-27T19:43:11.933Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 15 + ATK 15 = 30 vs your AC 28 \u2014 \u2713 HIT\n[2026-08-27T19:43:11.933Z] [combat] Dodge \u2014 d20 \u2192 10 + DEX 13 = 23 vs ATK 30. \u2717 You misread it \u2014 no opening, and the blow lands as it normally would (armor still counts).\n",
+      "[2026-08-27T19:43:11.933Z] [world] Your read is a beat off \u2014 you fail to make the opening, and the swing lands the way it always meant to.\n[2026-08-27T19:43:11.935Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 16 + ATK 15 = 31 vs your AC 28 \u2014 \u2713 HIT\n[2026-08-27T19:43:11.935Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-27T19:43:12.197Z] [combat] Eternal Dynasty Raider 2 deals 7 bludgeoning damage [edge of reach \u2014 halved]. You have 25 HP remaining.\n[2026-08-27T19:43:12.197Z] [combat] Eternal Dynasty Raider 1 deals 8 bludgeoning damage. You have 17 HP remaining.\n[2026-08-27T19:43:12.197Z] [combat] Eternal Dynasty Raider 1's strike leaves you bleeding.\n",
+      "[2026-08-27T19:43:12.420Z] [cognitive] neutral  (262ms)\n[2026-08-27T19:43:12.666Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-27T19:43:12.714Z] [player] attack with the cantor's tuning fork\n[2026-08-27T19:43:12.715Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=2 hooks=1\n",
+      "[2026-08-27T19:43:12.715Z] [combat] Eternal Dynasty Raider 1 blisters \u2014 clinging fire sears 3. (14/55 HP, 1 turn left)\n[2026-08-27T19:43:12.716Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-27T19:43:12.718Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-27T19:43:12.778Z] [world] Your searing cantor's tuning fork comes around in an arc; Eternal Dynasty Raider 1 squares up to meet it.\n[2026-08-27T19:43:12.779Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T19:43:12.998Z] [cognitive] neutral  (219ms)\n[2026-08-27T19:43:19.592Z] [world] Eternal Dynasty Raider 1 moves first. The pressure is immediate.\n",
+      "[2026-08-27T19:43:19.593Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 3 + ATK 15 = 18 vs your AC 28 \u2014 \u2717 MISS\n[2026-08-27T19:43:19.594Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 4 + ATK 15 = 19 vs your AC 28 \u2014 \u2717 MISS\n[2026-08-27T19:43:19.594Z] [combat] You \u2014 d20 \u2192 11 + INT 11 exhausted -2 = 20 vs Eternal Dynasty Raider 1 AC 20 \u2014 \u2713 HIT\n",
+      "[2026-08-27T19:43:19.595Z] [combat] Aetheric flares \u2014 +3 on hit.\n[2026-08-27T19:43:19.595Z] [combat] Final strike with the searing cantor's tuning fork for 15. Eternal Dynasty Raider 1 is still. The Aetherstone hums on, indifferent.\n[2026-08-27T19:43:19.596Z] [reward] Eternal Dynasty Raider 1 defeated. You recover Reaver's Pauldron \u00d73, Eternal Dynasty Sigil.\n",
+      "[2026-08-27T19:43:19.597Z] [reward] You strip the body: Reaver's Greatsword, Vest of the Forgotten Hero (+60 TC). The kit took the fight badly.\n[2026-08-27T19:43:19.603Z] [reward] \u2726 Recipe recovered from the kill: Hollow Crown Circlet (Rare)! Open Crafting to forge it.\n[2026-08-27T19:43:19.603Z] [combat] 1 attacker remains. Eternal Dynasty Raider 2 now in your sights.\n",
+      "[2026-08-27T19:43:19.606Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-27T19:43:19.606Z] [reward] +66 TC pried from the dust.\n[2026-08-27T19:43:23.346Z] [debug] ui: tap \"inventory\"\n[2026-08-27T19:43:24.135Z] [debug] persist sizes(KB): total=243 player=78 wm=83[rooms=36 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=77 scene=5\n",
+      "[2026-08-27T19:43:31.344Z] [world] You use 2\u00d7 First Aid Kit. +41 HP (58/58), +19 stamina.\n[2026-08-27T19:43:39.845Z] [system] braced \u2014 will not go down again fades.\n[2026-08-27T19:43:39.880Z] [player] drink water\n[2026-08-27T19:43:39.881Z] [debug] parser: intent=drink conf=1.00 verb=drink target=water resolved=- range=mid enemies=1 hooks=1\n",
+      "[2026-08-27T19:43:39.882Z] [world] You cup the puddle in your hands and drink. You weren't tired; mostly you were thirsty. (+1 corruption, 5 min)\n[2026-08-27T19:43:39.882Z] [arbiter] The Arbiter watches you wipe your mouth. \"Raw puddle carries what the ground put in it. Fill a bottle next time \u2014 the filter takes the taint out.\"\n[2026-08-27T19:43:39.883Z] [system] \u23f3 Time passed: 5 min\n",
+      "[2026-08-27T19:43:40.366Z] [cognitive] SWIM  (482ms)\n[2026-08-27T19:43:48.320Z] [debug] ui: tap \"approach\"\n[2026-08-27T19:43:48.325Z] [system] braced \u2014 will not go down again fades.\n[2026-08-27T19:43:48.382Z] [player] approach Eternal Dynasty Raider 2\n",
+      "[2026-08-27T19:43:48.383Z] [debug] parser: intent=advance conf=1.00 verb=approach target=eternal dynasty raider 2 resolved=Eternal Dynasty Raider 2 range=mid enemies=1 hooks=1\n[2026-08-27T19:43:48.384Z] [debug] move: advance from range=mid enemies=1 weather=Aether Lightning cost=1 partial=0\n",
+      "[2026-08-27T19:43:48.385Z] [debug] move: field advance target=Eternal Dynasty Raider 2 d 1.31->0.35 band mid->close\n[2026-08-27T19:43:48.385Z] [world] You close the gap with Eternal Dynasty Raider 2. (range: close / arm's reach)\n[2026-08-27T19:43:48.387Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 11 + ATK 15 = 26 vs your AC 28 \u2014 \u2717 MISS\n[2026-08-27T19:43:48.638Z] [cognitive] neutral  (250ms)\n",
+      "[2026-08-27T19:43:49.820Z] [debug] ui: tap \"approach\"\n[2026-08-27T19:43:49.822Z] [system] bleeding fades.\n[2026-08-27T19:43:49.876Z] [player] approach Eternal Dynasty Raider 2\n[2026-08-27T19:43:49.877Z] [debug] parser: intent=advance conf=1.00 verb=approach target=eternal dynasty raider 2 resolved=Eternal Dynasty Raider 2 range=close enemies=1 hooks=1\n",
+      "[2026-08-27T19:43:49.878Z] [debug] move: advance from range=close enemies=1 weather=Aether Lightning cost=1 partial=0\n[2026-08-27T19:43:49.878Z] [world] You are already at close / arm's reach with Eternal Dynasty Raider 2.\n[2026-08-27T19:43:49.878Z] [debug] arbiter: template (reason=combat)\n[2026-08-27T19:43:49.879Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-27T19:43:50.115Z] [cognitive] neutral  (235ms)\n[2026-08-27T19:43:50.759Z] [debug] ui: tap \"golem (17/68)\"\n[2026-08-27T19:43:50.761Z] [player] use golem\n[2026-08-27T19:43:50.761Z] [combat] Dick Dragon attacks Eternal Dynasty Raider 2 \u2014 d20 14 + 3 = 17 vs AC 18 \u2014 \u2717 MISS\n[2026-08-27T19:43:50.761Z] [world] Dick Dragon's strike sails wide of Eternal Dynasty Raider 2.\n",
+      "[2026-08-27T19:43:50.761Z] [combat] Eternal Dynasty Raider 2 retaliates \u2014 d20 20 + 13 (NAT 20) hits Dick Dragon for 23 (35% resisted). (0/68)\n[2026-08-27T19:43:50.762Z] [world] Dick Dragon stills, then crumbles back into a scatter of crystal shards.\n[2026-08-27T19:43:50.762Z] [reward] \u2726 Inert Golem Core recovered \u2014 feed it to your next golem to pass on half of Dick Dragon's training.\n",
+      "[2026-08-27T19:43:50.763Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 18 + ATK 15 = 33 vs your AC 28 \u2014 \u2713 HIT\n[2026-08-27T19:43:51.021Z] [combat] Eternal Dynasty Raider 2 deals 17 bludgeoning damage. You have 41 HP remaining.\n[2026-08-27T19:43:51.021Z] [combat] Eternal Dynasty Raider 2's strike leaves you bleeding.\n[2026-08-27T19:43:54.222Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-08-27T19:43:54.236Z] [player] dodge\n[2026-08-27T19:43:54.237Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-27T19:43:54.238Z] [world] You commit to the dodge. Slip Eternal Dynasty Raider 2's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-27T19:43:54.319Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 15 + ATK 15 = 30 vs your AC 28 \u2014 \u2713 HIT\n[2026-08-27T19:43:54.320Z] [combat] Dodge \u2014 d20 \u2192 6 + DEX 13 = 19 vs ATK 30. \u2717 You misread it \u2014 no opening, and the blow lands as it normally would (armor still counts).\n",
+      "[2026-08-27T19:43:54.320Z] [world] Your read is a beat off \u2014 you fail to make the opening, and the swing lands the way it always meant to.\n[2026-08-27T19:43:54.321Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T19:43:54.579Z] [combat] Eternal Dynasty Raider 2 deals 14 bludgeoning damage. You have 27 HP remaining.\n",
+      "[2026-08-27T19:43:54.579Z] [combat] Eternal Dynasty Raider 2's strike leaves you bleeding.\n[2026-08-27T19:43:54.800Z] [cognitive] neutral  (258ms)\n[2026-08-27T19:43:55.028Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-27T19:43:55.032Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22123 HP)\n[2026-08-27T19:43:55.082Z] [player] attack with the cantor's tuning fork\n",
+      "[2026-08-27T19:43:55.083Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=1 hooks=1\n[2026-08-27T19:43:55.084Z] [debug] attack: target=Eternal Dynasty Raider 2 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n",
+      "[2026-08-27T19:43:55.144Z] [world] Your searing cantor's tuning fork comes around in an arc; Eternal Dynasty Raider 2 squares up to meet it.\n[2026-08-27T19:43:55.145Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T19:43:55.361Z] [cognitive] neutral  (216ms)\n[2026-08-27T19:43:58.790Z] [world] You seize the initiative. Eternal Dynasty Raider 2 has no time to react.\n",
+      "[2026-08-27T19:43:58.791Z] [combat] You \u2014 d20 \u2192 8 + INT 11 = 19 vs Eternal Dynasty Raider 2 AC 20 \u2014 \u2717 MISS\n[2026-08-27T19:43:58.791Z] [combat] Half a beat too slow. Eternal Dynasty Raider 2 steps inside your reach.\n[2026-08-27T19:43:58.792Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 19 + ATK 15 = 34 vs your AC 28 \u2014 \u2713 HIT\n",
+      "[2026-08-27T19:43:59.044Z] [combat] Eternal Dynasty Raider 2 deals 19 bludgeoning damage. You have 5 HP remaining.\n[2026-08-27T19:43:59.044Z] [combat] Eternal Dynasty Raider 2's strike leaves you bleeding.\n[2026-08-27T19:43:59.417Z] [debug] ui: tap \"approach\"\n[2026-08-27T19:43:59.465Z] [player] approach Eternal Dynasty Raider 2\n",
+      "[2026-08-27T19:43:59.466Z] [debug] parser: intent=advance conf=1.00 verb=approach target=eternal dynasty raider 2 resolved=Eternal Dynasty Raider 2 range=close enemies=1 hooks=1\n[2026-08-27T19:43:59.467Z] [debug] move: advance from range=close enemies=1 weather=Aether Lightning cost=1 partial=0\n",
+      "[2026-08-27T19:43:59.467Z] [world] You are already at close / arm's reach with Eternal Dynasty Raider 2.\n[2026-08-27T19:43:59.696Z] [cognitive] neutral  (227ms)\n[2026-08-27T19:43:59.995Z] [debug] persist sizes(KB): total=240 player=78 wm=83[rooms=36 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=75 scene=5\n[2026-08-27T19:44:00.465Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-27T19:44:16.901Z] [debug] stats: STR20 DEX13 INT10 WIS12 CHA11 STE3 | gear: STR+6,DEX+6,STE+2,WIS+1,CHA+1 | worn: main=Bone Crossbow head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring\n",
+      "[2026-08-27T19:44:28.174Z] [debug] stats: STR21 DEX13 INT10 WIS12 CHA11 STE3 | gear: STR+7,DEX+6,STE+2,WIS+1,CHA+1 | worn: main=Bone Crossbow off=Cantor's Tuning Fork head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring\n",
+      "[2026-08-27T19:44:59.021Z] [debug] stats: STR20 DEX15 INT10 WIS12 CHA11 STE3 | gear: STR+6,DEX+8,STE+2,WIS+1,CHA+1 | worn: main=Bone Crossbow off=Mud Buckler head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Anvil-Struck Footguards cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring\n",
+      "[2026-08-27T19:45:15.080Z] [player] use Wild Chicken\n[2026-08-27T19:45:15.080Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=wild chick"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 18/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtcgc1vw57ml"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "18"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39",
+      "query": "user.ip:\"2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-28T22:14:15.307000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-28T22:14:14.840000Z",
+  "fingerprints": [
+    "be748ce85802371e970795a28e86f05d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "40ef599874bc478dbe03964c91c9e2af",
+  "previousEventID": "ef837208166f45968e8dd8ec75498419"
+}

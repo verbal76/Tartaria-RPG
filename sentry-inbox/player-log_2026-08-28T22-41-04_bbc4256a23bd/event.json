@@ -1,0 +1,164 @@
+{
+  "id": "bbc4256a23bd4f27b5207a4d5a2e14a1",
+  "groupID": "7698613068",
+  "eventID": "bbc4256a23bd4f27b5207a4d5a2e14a1",
+  "projectID": "4511945117532160",
+  "size": 6401,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtdjcpyiijyl [inline 9/9]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtdjcpyiijyl [inline 9/9]",
+  "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtdjcpyiijyl [inline 9/9]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "7b3fcdf9d94c43a8a477de1aea938687",
+      "span_id": "843b24ec022fd6b6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "  \u2022 2026-08-27T02:03:02.202Z (2678m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1518-the-beacon-goes-first \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+92048ms)\n  \u2022 2026-08-27T02:32:27.198Z (2649m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1519-the-attachment-was-the-fault \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+23274ms)\n  \u2022 2026-08-27T03:03:20.074Z (2618m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+20786ms)\n  \u2022 2026-08-27T12:37:15.724Z (2044m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1522-the-stun-does-not-outlive-itself \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+0ms)\n  \u2022 2026-08-27T16:21:51.524Z (1819m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1524-cover-the-seven-and-mean-the-switch \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: rendered (+12474ms)\n  \u2022 2026-08-27T21:42:59.314Z (1498m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"missions\"\n      doing: tap \"missions\" \u00b7 room outpost_central \u00b7 screen exploration\n      last checkpoint: rendered (+23163ms)\n",
+      "  \u2022 2026-08-28T02:29:33.897Z (1212m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n      Process died with no orderly exit while: action \"investigate weathered ruined skyscraper\"\n      doing: action \"investigate weathered ruined skyscraper\" \u00b7 room monarch_waystation \u00b7 screen exploration\n",
+      "      last checkpoint: rendered (+79547ms)\n  \u2022 2026-08-28T04:28:43.279Z (1092m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-28-1530-the-stranger-gets-the-screen \u00b7 stage rendered\n      Process died with no orderly exit while: action \"investigate the ground\"\n      doing: action \"investigate the ground\" \u00b7 room iskan_veil \u00b7 screen exploration\n",
+      "      last checkpoint: rendered (+16317ms)\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n  \u26a0\u26a0 LAST BOOT DIED MID-ACTION \u2014 no orderly exit was recorded.\n     Last thing the app did: action \"investigate the ground\"\n     Where: iskan_veil on exploration screen\n",
+      "     Last seen alive: 2026-08-28T04:28:43.279Z (1092 min before this boot \u2014 the kill landed somewhere in that gap)\n     Last checkpoint reached: rendered (+16317ms after it)\n     \u26a0 The disk log's tail is UNRELIABLE for that session \u2014 batched lines\n       die in memory when the JS thread wedges. Trust this line over it.\n  Memory warnings: none this session\n",
+      "  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  \u26a0 Native queue: worst wait 10.5s \u00b7 2 job kinds queued >3s \u00b7 worst 18.9ms/prompt-token \u00b7 8 generations thrown away (67.2s)\n     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.\n",
+      "  App state trail: background \u2192 active \u2192 background \u2192 active \u2192 background \u2192 active\nModel contexts\n  Live now: 1\n  Opened: 1 \u00b7 Released: 0 \u00b7 Peak live: 1\n  Narration engine: ready\n"
+    ],
+    "chunkChars": 3750
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtdjcpyiijyl [inline 9/9]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtdjcpyiijyl"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "9"
+    },
+    {
+      "key": "parts",
+      "value": "9"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39",
+      "query": "user.ip:\"2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-28T22:41:04.777062Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-28T22:41:04.431000Z",
+  "fingerprints": [
+    "3c98045bd1033d85b0a542521235fc87"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c98e8f33d01f46428d870f717da0152b",
+  "previousEventID": "b75d4a011c57448d973125f0ec0f2e99"
+}
