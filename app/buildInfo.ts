@@ -25435,6 +25435,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ("Word from Nix: ... 2-3 tiles south of where you met them"), so the player
 // never again has to reverse-engineer which promise they are walking down.
 export const OTA_BUILD_ID = '2026-08-29-1542-the-rendezvous-is-a-place';
+// golem catch-up 2026-08-29: markerless publish of OTA-1540/1541/1542 (the
+// floating text bar positioned from the keyboard's top edge so a Gboard
+// suggestion strip can no longer bury it; ground-tile ledgers keyed on the
+// absolute canon grid so an auto-course can never silently re-address and
+// restock cleared tiles; and whisper rendezvous, thief tiles, courses and the
+// distance badge all on the absolute grid with source provenance on the card)
+// to the golem channel. Both channels level at 1542.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1541-a-tile-is-where-it-is';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1540-the-keyboard-lied-about-its-height';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1539-the-brake-sat-above-the-whole-game';
