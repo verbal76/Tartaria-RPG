@@ -405,7 +405,10 @@ export function isValidAttackStat(stat: string | undefined): boolean {
     || stat === 'intelligence' || stat === 'wisdom';
 }
 
-function enemyAC(enemy: Enemy): number {
+// OTA-1545 — exported: the debug spawn line was a hand-rolled copy of this
+// derivation that drifted (it omitted traitACBonus, so the owner's log said
+// ac=10 while every attack fought AC 11). One number, one derivation.
+export function enemyAC(enemy: Enemy): number {
   // OTA-419 — `abilityPoint` is stored as "Strength 4" / "Dexterity 6" etc., so
   // parseInt() returned NaN and EVERY enemy collapsed to the AC-8 fallback (bosses
   // 14) — flattening all stat-based AND Core-Guardian-tier AC scaling (a T1 and a

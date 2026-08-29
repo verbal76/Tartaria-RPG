@@ -601,7 +601,8 @@ function narrationEntityAllow(get: () => GameStore): ReadonlySet<string> {
   return set;
 }
 
-function trimToLastSentence(raw: string): string {
+// Exported for the OTA-1543 regression suite (a capped run-on must yield '').
+export function trimToLastSentence(raw: string): string {
   const s = (raw ?? '').trim();
   if (!s) return '';
   // Iterate backwards looking for terminal punctuation followed by either
@@ -617,7 +618,44 @@ function trimToLastSentence(raw: string): string {
       }
     }
   }
-  return s; // no terminal punctuation found — keep the raw text
+  // ⚠⚠⚠ OTA-1543 — NO COMPLETE SENTENCE MEANS NOTHING TO SAY. This used to
+  // return the raw text, and the owner's log shows what that prints: a
+  // generation that hit the token cap mid-run-on ("…each one a testament to
+  // the rich tapestry of") went to the feed BEHEADED, because a single
+  // sentence with no terminal punctuation sailed past the loop above
+  // untouched. The whole point of this function is that the player never
+  // sees a partial ending; the fallback was the function disagreeing with
+  // its own contract. Empty is honest: the live path falls back to its
+  // authored template, and ambient (which has no template on purpose)
+  // discards as ∅ — a silence, never a fragment.
+  return '';
+}
+
+/** ⚠⚠ OTA-1543 — THE REGISTER GATE, built from MEASURED slips only. The owner
+ *  has now caught the 0.5B model drifting into stock fantasy-filler three
+ *  times: "You find yourself at the bazaar", and tonight "You had traversed
+ *  the borders of the ancient lands, navigating through the labyrinthine
+ *  streets of the bustling markets, each one a testament to the rich tapestry
+ *  of". Tartaria is a drowned mud-world; none of that register exists here,
+ *  and the off-canon entity guard cannot catch it because nothing in it is a
+ *  NAMED place. This is deliberately a small list of the exact clichés that
+ *  have appeared — the OTA-1124 note's warning stands: policing generic
+ *  scenery wholesale needs a content system, and guessing at one is how
+ *  OTA-1031 ate the feature. Grow it one measured slip at a time. */
+const STOCK_LLM_FILLER: readonly RegExp[] = [
+  /\brich tapestry\b/i,
+  /\ba testament to\b/i,
+  /\blabyrinthine\b/i,
+  /\bbustling (?:market|street|bazaar|city|town)/i,
+  /\byou find yourself\b/i,
+  // Past-perfect travelogue opener — ambient is a present-tense aside about
+  // the PERSON; "You had traversed/wandered/journeyed…" is the model
+  // recapping a road trip that never happened.
+  /^\s*you had \w+ed\b/i,
+];
+// Exported for the OTA-1543 regression suite.
+export function sentenceIsStockLlmFiller(sentence: string): boolean {
+  return STOCK_LLM_FILLER.some((p) => p.test(sentence));
 }
 
 /**
@@ -1064,6 +1102,8 @@ export async function narrateViaArbiter(
       // line. Nothing survives → the `|| trimmed` fallback restores the template.
       .filter((s) => !looksLikeInstructionEcho(s))
       .filter((s) => !sentenceNamesOffCanonEntity(s, narrationAllow))
+      // OTA-1543 — the register gate: measured stock-LLM clichés never print.
+      .filter((s) => !sentenceIsStockLlmFiller(s))
       .join(' ')
       .trim();
     let finalText = trimToLastSentence(survivors) || trimmed;
@@ -1388,6 +1428,8 @@ export async function maybeGenerateAmbientArbiter(
       // OTA-1030 — the brief recited back is not a line. Empty → stays silent.
       .filter((s) => !looksLikeInstructionEcho(s))
       .filter((s) => !sentenceNamesOffCanonEntity(s, ambientAllow))
+      // OTA-1543 — the register gate: measured stock-LLM clichés never print.
+      .filter((s) => !sentenceIsStockLlmFiller(s))
       .join(' ')
       .trim();
     const finalText = trimToLastSentence(survivors);

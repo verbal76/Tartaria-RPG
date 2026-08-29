@@ -441,7 +441,7 @@ import {
   type ArmorSlotResist,
   type Recipe,
 } from '../engine/crafting';
-import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor, enemyDamageDisplay, enemyDamageCompact, bossSwingsTwice } from '../engine/combatRules';
+import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor, enemyDamageDisplay, enemyDamageCompact, bossSwingsTwice, enemyAC } from '../engine/combatRules';
 import { reachBandsFor, reachFiresDown, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 import { knocksOutHumanoid } from '../engine/knockout';
 import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, COATING_RESIST_LAND_CHANCE, ACID_SHRED_PER_HIT, ACID_SHRED_DECAY_PER_ROUND, acidShredCap, corruptionStackCap, rollLootCoating, secondCoatRolled } from '../engine/weaponCoating';
@@ -5143,7 +5143,12 @@ function debugEnemy(e: Record<string, unknown>): string {
   // so both printed as a placeholder '?'. Compute the real AC the attack paths use
   // and surface the parsed ability-point (`ap`) as the actual threat number.
   const ap = parseEnemyAP(e as { abilityPoint?: string });
-  const ac = Math.max(5, Math.min(18, 5 + ap)) + (e['boss'] ? 6 : 0);
+  // ⚠ OTA-1545 — THE FOUGHT AC, FROM THE ONE DERIVATION THAT FIGHTS IT. This
+  // line used to re-derive `5 + ap (+boss)` by hand and drifted from
+  // combatRules.enemyAC by exactly traitACBonus — the owner's log printed
+  // ac=10 on a Dust Fiend every attack resolved against AC 11. A debug ledger
+  // that disagrees with the fight by a silent modifier is worse than none.
+  const ac = enemyAC(e as unknown as Parameters<typeof enemyAC>[0]);
   return `enemy: ${g('name')} hp=${g('hp')} ac=${ac} atk=${g('attack')} dmg=${g('damage')} rarity=${g('rarity')} ap=${ap}${e['boss'] ? ' BOSS' : ''}`;
 }
 

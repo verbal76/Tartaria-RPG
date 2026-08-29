@@ -231,7 +231,12 @@ export const createBootSlice = (
       const split = r.prefillMs != null || r.decodeMs != null
         ? (timingsOk
           ? ` read ${r.prefillMs ?? '?'}ms/write ${r.decodeMs ?? '?'}ms`
-          : ` read ⚠${r.prefillMs ?? '?'}ms/write ⚠${r.decodeMs ?? '?'}ms NOT-PER-CALL`)
+          // OTA-1545 — the owner read "⚠364996ms NOT-PER-CALL" as a live fault.
+          // The root cause is llama.rn's native split (OTA-1405's finding, kept
+          // deliberately), which an OTA cannot reach — so the fix owed here is a
+          // rendering nobody can misread: the impossible pair is quarantined in
+          // words, never printed AS this call's read/write.
+          : ` read/write unusable (native mis-reported ${r.prefillMs ?? '?'}ms/${r.decodeMs ?? '?'}ms — llama.rn split bug, not this call)`)
         : '';
       const sizes = r.promptTokens != null ? ` in ${r.promptTokens}t→out ${r.outTokens ?? '?'}t` : '';
       // ⚠⚠ OTA-1259 (N4) — THE `reuse Nt` NUMBER WAS STRUCTURALLY ZERO AND IS GONE.

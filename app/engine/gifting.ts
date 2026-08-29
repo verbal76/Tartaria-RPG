@@ -31,6 +31,7 @@
 // broken rather than as varied.
 import rawPrefs from '../data/npcs/gift_prefs.json';
 import type { NpcRelation } from './types';
+import { withArticle } from './grammar';
 
 /** Below this, offering it is an insult rather than a gift. Deliberately low —
  *  the point is to exclude bent nails and mud, not to gate the feature behind
@@ -234,8 +235,16 @@ export function resolveGift(
   rel: NpcRelation | null | undefined,
 ): GiftOutcome {
   const p = giftPrefFor(npcId, npcName);
+  // ⚠ OTA-1544 — AN AUTHORED ARTICLE GETS CORRECTED, NOT OBEYED. Templates like
+  // Ilva's carry their own "a {item}", and the raw substitution printed
+  // "a Aetheric Helm of Command" into the owner's feed. The renderer owns
+  // grammar, not seventy-two JSON lines: "a {item}"/"an {item}" collapse to
+  // withArticle so the article always matches the name that lands in it.
   const say = (tpl: string | undefined, fallback: string) =>
-    (tpl ?? fallback).replace(/\{item\}/g, item.name).replace(/\{npc\}/g, npcName);
+    (tpl ?? fallback)
+      .replace(/\ban? \{item\}/gi, withArticle(item.name))
+      .replace(/\{item\}/g, item.name)
+      .replace(/\{npc\}/g, npcName);
   const reaction = reactionFor(npcId, item, npcName);
 
   if (reaction === 'insulted') {
@@ -256,10 +265,26 @@ export function resolveGift(
     // again is not a guess, it is a point being made — and that is exactly the
     // junk-dumping the refusal exists to discourage, so it keeps its price.
     const offeredBefore = timesGiven(rel, item.name) > 0;
+    // ⚠⚠⚠ OTA-1544 — THE REFUSAL SAYS WHERE THE ITEM WENT, AND WHY. The owner,
+    // after Ilva's line: *"did she give it back? ... it didn't leave my
+    // inventory"* — the authored refusal carried her VOICE but nothing said
+    // the item never changed hands, so a correct refusal read as a broken
+    // gift. And the WHY is honest by construction: the ONLY road to
+    // 'insulted' is reactionFor's worth floor (worth < GIFT_FLOOR_TC), so the
+    // hint the coda gives — the thing read as near-worthless — is the actual
+    // reason, not flavour guessing at one. The coda varies deterministically
+    // so a session of refusals does not print one sentence four times.
+    const codas = [
+      `You slip ${withArticle(item.name)} back into your pack. Whatever ${npcName} wants, it is worth more than this.`,
+      `The ${item.name} goes back into your pack, unclaimed — to their eye it is loose salvage, not a gift.`,
+      `You pocket the ${item.name} again. A present has to be worth something before anybody's tastes even enter into it.`,
+      `Back into your pack it goes. If you mean to win ${npcName} over, bring something of real worth.`,
+    ];
+    const coda = codas[(npcName.length + item.name.length) % codas.length]!;
     return {
       reaction, countsAsBoon: false, refused: true, remember: false,
       standingDelta: offeredBefore ? -STANDING_INSULT : 0,
-      line: say(p.insultLine, `${npcName} looks at the {item}, then at you. "No. Keep it."`),
+      line: `${say(p.insultLine, `${npcName} looks at the {item}, then at you. "No. Keep it."`)} ${coda}`,
     };
   }
 

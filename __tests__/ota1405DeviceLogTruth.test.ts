@@ -298,7 +298,12 @@ describe('OTA-1405 (4) — an impossible timing is refused everywhere, by one ru
     // Marked, not deleted: that llama.rn reports these at all is itself a finding.
     const i = BOOT.indexOf('const timingsOk =');
     const block = blockAt(BOOT, 'const timingsOk =');
-    expect(block).toContain("read ⚠${r.prefillMs ?? '?'}ms");
+    // ⚠ OTA-1545 — the mark changed FORM, not job. The ⚠ glyph beside the raw
+    // number ("read ⚠364996ms") still read to the owner as a live fault, so the
+    // impossible pair is now quarantined in words and never printed AS this
+    // call's read/write. The pin follows the successor rendering.
+    expect(block).toContain('read/write unusable (native mis-reported');
+    expect(block).not.toContain("read ⚠${r.prefillMs");
   });
 
   it('⚠⚠ the rule is defined ONCE and re-derived nowhere', () => {

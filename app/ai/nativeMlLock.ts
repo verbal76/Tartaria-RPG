@@ -234,6 +234,41 @@ let voiceReservedUntil = 0;
  *  timer at a time — a deferred pump re-evaluates the whole queue anyway. */
 let deferTimer: ReturnType<typeof setTimeout> | null = null;
 
+// ⚠⚠⚠ OTA-1546 — THE DYING BREATH LEARNS WHAT THE NATIVE SIDE WAS DOING.
+//
+// All three post-1526 process deaths on the owner's device share one shape:
+// PROCESS KILLED with no JS crash, no memory warning, freeze watch clean — and
+// every one during a model-invoking action (investigate x2, missions), with the
+// same session logging "Native queue: worst wait 10.5s · 12 generations thrown
+// away (91.3s)". The freeze watch is JS clocks only; the one witness we cannot
+// hear from is the native inference that was (or wasn't) on the CPU when
+// Android reaped the process. Native code can't be changed by OTA, but the
+// dying breath can testify: every native-ML op already funnels through this ONE
+// lock, so stamping the breadcrumb phase on start and settle means the crash
+// ledger's next post-mortem reads either
+//
+//   last checkpoint: native:llm:start q1 (+8342ms)   -> died INSIDE inference
+//   last checkpoint: native:llm:done (+241ms)        -> native side exonerated
+//
+// Either answer moves #81. Priority already names the job class, so no caller
+// changes and no new API: -1 homework, 1 llm, 1.5 cognition, 2 voice,
+// 3 teardown. Queue depth rides along — a death with q3 backed up is a
+// different fact from a death on an idle queue. Lazy-required so this file
+// stays importable in isolation, and wrapped so a broken stamp can never
+// wedge the ML chain it is observing.
+function stampNativePhase(tag: 'start' | 'done', priority: number, queued: number): void {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { stampBreadcrumbPhase } = require('../engine/saveSystem') as typeof import('../engine/saveSystem');
+    const cls = priority <= ML_PRIORITY_HOMEWORK ? 'homework'
+      : priority >= ML_PRIORITY_TEARDOWN ? 'teardown'
+      : priority >= ML_PRIORITY_VOICE ? 'voice'
+      : priority >= ML_PRIORITY_COGNITION ? 'cognition'
+      : 'llm';
+    stampBreadcrumbPhase(`native:${cls}:${tag}`, tag === 'start' ? `q${queued}` : undefined);
+  } catch { /* an instrument may never break the thing it measures */ }
+}
+
 function pumpMl(): void {
   if (running || pending.length === 0) return;
   // Pick the highest priority; FIFO (lowest seq) within the same priority. A
@@ -265,10 +300,12 @@ function pumpMl(): void {
   running = true;
   runningPriority = task.priority;
   runningPreempt = task.onPreempt ?? null;
+  stampNativePhase('start', task.priority, pending.length); // OTA-1546
   Promise.resolve()
     .then(task.fn)
     .then(task.resolve, task.reject)
     .then(() => {
+      stampNativePhase('done', task.priority, pending.length); // OTA-1546
       running = false;
       runningPreempt = null;
       pumpMl();

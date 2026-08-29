@@ -25434,7 +25434,38 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // record now carries source: a persuade-granted whisper says who handed it over
 // ("Word from Nix: ... 2-3 tiles south of where you met them"), so the player
 // never again has to reverse-engineer which promise they are walking down.
-export const OTA_BUILD_ID = '2026-08-29-1542-the-rendezvous-is-a-place';
+// OTA-1543/1544/1545/1546 - four root causes from the owner's directive list.
+//  (1543) THE FEED NEVER PRINTS A FRAGMENT. The Arbiter said "...each one a
+//    testament to the rich tapestry of" - beheaded mid-phrase - because
+//    trimToLastSentence, whose whole contract is "never display a partial
+//    ending", RETURNED THE RAW TEXT when no terminal punctuation existed. Empty
+//    is honest now: live narration falls back to its template, ambient discards
+//    silently. And a register gate of MEASURED stock-LLM cliches (rich tapestry,
+//    a testament to, labyrinthine, bustling market, you find yourself, past-
+//    perfect travelogue openers) drops the wrong-world filler the off-canon
+//    entity guard cannot see - grown one measured slip at a time, per OTA-1124's
+//    warning that wholesale scenery-policing is how OTA-1031 ate a feature.
+//  (1544) A REFUSED GIFT SAYS WHERE THE ITEM WENT, AND WHY. All 72 NPCs already
+//    carry authored refusal voices; the prose ended at the voice, so a correct
+//    refusal read as a broken gift ("did she give it back? ... it didn't leave
+//    my inventory"). The refusal now closes with a varied pack-return coda whose
+//    hint is honest by construction (the only road to 'insulted' is the worth
+//    floor), and the renderer owns grammar: an authored "a {item}" collapses to
+//    withArticle, ending "a Aetheric Helm of Command".
+//  (1545) ONE NUMBER, ONE DERIVATION. The spawn debug line hand-rolled
+//    5+ap(+boss) and drifted from combatRules.enemyAC by exactly traitACBonus
+//    (ledger ac=10, fought AC 11); it calls the exported real derivation now.
+//    The qwen "read 364996ms NOT-PER-CALL" - llama.rn's native mis-split,
+//    unreachable by OTA - is re-rendered as words no one can misread.
+//  (1546) THE DYING BREATH NAMES THE NATIVE JOB. All three post-1526 process
+//    deaths land on model-invoking actions with the native queue degraded, and
+//    the freeze watch is JS-only. Every native-ML op funnels through the ONE
+//    lock; its pump now stamps the breadcrumb at start (with queue depth) and
+//    settle, so the next post-mortem reads native:llm:start q1 (+8342ms) - died
+//    inside inference - or native:llm:done - native exonerated. Either answer
+//    moves #81.
+export const OTA_BUILD_ID = '2026-08-29-1546-the-dying-breath-names-the-native-job';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1542-the-rendezvous-is-a-place';
 // golem catch-up 2026-08-29: markerless publish of OTA-1540/1541/1542 (the
 // floating text bar positioned from the keyboard's top edge so a Gboard
 // suggestion strip can no longer bury it; ground-tile ledgers keyed on the
