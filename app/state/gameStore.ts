@@ -666,6 +666,7 @@ import {
   spawnChainEnemy,
   makeStolenDiscs,
   describeWhisperStage,
+  withTalkTurn,
 } from '../engine/whispers';
 import { TUTORIAL_STEPS, TUTORIAL_SELF_DEFENCE, TUT_LOCK_BEATS, type TutorialStep } from '../components/tutorialSteps';
 import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome, storyCompletedBy, completedStoryCount, assembledStory, CHARACTER_STORIES } from '../engine/collectables';
@@ -7271,6 +7272,11 @@ export interface GameStore {
   setWhisperCourse: (gridX: number, gridY: number, label: string) => void;
   continueWhisperCourse: () => void;
   stopWhisperCourse: () => void;
+  /** OTA-1547 — the SPEAK TO YULKA sheet's three buttons. Routes to the same
+   *  handlers the typed commands ("accept yulka" / "buy from yulka" / "leave
+   *  yulka") have always used, so the two paths cannot drift. No-op unless a
+   *  met_yulka whisper is live. */
+  answerYulka: (choice: 'accept' | 'buy' | 'leave') => void;
   /** OTA-478 "Golem Armaments" — arm the active golem with a crafted golem weapon
    *  matching its kind (the weapon moves from pack to golem.weapon); disarmGolem
    *  returns it to the pack. */
@@ -26109,6 +26115,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog('world', 'You set the course aside. Cardinal direction is yours again.');
   },
 
+  // OTA-1547 — the SPEAK TO YULKA sheet answers through the SAME handlers the
+  // typed commands run, so a button tap and "accept yulka" cannot diverge. The
+  // player line goes to the feed here (the typed path logs the typed text at
+  // its own short-circuit); the handlers own every reply and transcript turn.
+  answerYulka(choice) {
+    const w = (get().player?.activeWhispers ?? []).find(
+      (x) => x.id === 'yulka_discs' && x.stage === 'met_yulka',
+    );
+    if (!w) return;
+    get().appendLog(
+      'player',
+      choice === 'accept' ? 'You take the job.'
+        : choice === 'buy' ? 'You buy the Discs outright.'
+        : 'You walk away from her fire.',
+    );
+    if (choice === 'accept') handleYulkaAccept(get, set, w);
+    else if (choice === 'buy') handleYulkaBuy(get, set, w);
+    else handleYulkaLeave(get, set, w);
+    void get().persist();
+  },
+
   // 2026-05-25 OTA-035 — outpost-aware travel confirmation. When the
   // player issues `travel to <city>` from inside an outpost, parser
   // and Set Course paths route here instead of calling setTravelCourse
@@ -26634,7 +26661,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     //   4. Return check — back at Yulka's tile with stolen stock
     //   5. Ambush check — completed-and-armed whisper triggers a
     //      one-shot ambush on the NEXT cardinal step after reward
-    resolveWhispersForTile(get, set, step.x, step.y);
+    // OTA-1547 — the resolver reports whether a beat fired. The owner's log
+    // showed the mundane step machinery talking OVER the encounter it landed
+    // on: "You walk west… lost track of distance" printed after Yulka's whole
+    // introduction, and a 20% trader roll could drop a stall on her fire in
+    // the same breath. A step that fired a chain beat is narrated by the beat
+    // — the filler line and the trader roll stand down for that one step.
+    const whisperBeatFired = resolveWhispersForTile(get, set, step.x, step.y);
 
     // OTA 034 — per-step roadside trader spawn. The cardinal-step
     // handler stays inside the same macro scene, so beginScene never
@@ -26660,7 +26693,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // arb119 — gate on tileIsNovel (like the wasteland-encounter roll). Without
       // it, pacing two tiles re-spawned a FRESH stall every step (unlimited rare
       // stock). Now a stall only appears on ground you haven't just walked.
-      if (outdoorPeaceful && !inAnyHubRoom && tileIsNovel && Math.random() < 0.20) {
+      if (!whisperBeatFired && outdoorPeaceful && !inAnyHubRoom && tileIsNovel && Math.random() < 0.20) {
         const stall = withSkyreacherChartOffer(pickRoadsideTrader(), get().worldMemory)!;
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, vendor: stall } } : s);
         // OTA-1055 — SIGHT THE TRADER. stepDirection never calls beginScene (its
@@ -26947,7 +26980,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // Open ground — narrate a wander and plant a hook. Compass in pack
     // adds direction-aware hint of what's ahead.
-    const hasCompass = player.inventory.some(
+    // OTA-1547 — silent when a whisper beat fired above: the owner's log had
+    // "You walk west… lost track of distance" printing AFTER Yulka's entire
+    // introduction, because this filler runs late in the step. You did not
+    // lose track of anything — you arrived somewhere.
+    const hasCompass = !whisperBeatFired && player.inventory.some(
       (i) => /compass|cradle of dusk compass/i.test(i.name) && i.quantity > 0,
     );
     if (hasCompass) {
@@ -26991,7 +27028,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ],
         `wander.directional.${dir}`,
       );
-      get().appendLog('world', directional);
+      // OTA-1547 — same guard as the compass branch: the beat owns the step.
+      if (!whisperBeatFired) get().appendLog('world', directional);
     }
     // Wasteland encounter roll — every ~7-8 cardinal steps the player
     // walks into something: an abandoned caravan with a note, a
@@ -30951,14 +30989,19 @@ export function bumpQuestsAccepted(
 // chain means adding a stage block here AND a CHAINS entry in
 // app/engine/whispers.ts. The Yulka chain is the only chain right
 // now — it ships as the Pittsburgh-loop MVP.
+// OTA-1547 — returns whether a chain beat FIRED, so stepDirection can hold its
+// tongue: the owner's log showed "You walk west… lost track of distance"
+// printing AFTER Yulka's whole introduction, because this resolver runs early
+// in the step and the open-ground filler prints near the end. A step that
+// landed on an encounter is narrated BY the encounter.
 function resolveWhispersForTile(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   mapX: number,
   mapY: number,
-): void {
+): boolean {
   const live = get().player;
-  if (!live) return;
+  if (!live) return false;
   const hours = live.hoursElapsed ?? 0;
 
   // Reap pass kept for forward compatibility — currently a no-op
@@ -30966,7 +31009,7 @@ function resolveWhispersForTile(
   // wire in here.
   reapExpiredWhispers(live.activeWhispers, hours);
   const p = get().player;
-  if (!p) return;
+  if (!p) return false;
   // OTA-1542 — match on the ABSOLUTE cell, not the caller's frame coords. The
   // step coords passed in are current-frame; the whisper targets are places.
   const pg = playerGridCell(p);
@@ -30975,21 +31018,21 @@ function resolveWhispersForTile(
   const meet = findReadyMeetWhisper(p.activeWhispers, hours, pg.x, pg.y);
   if (meet && meet.id === 'yulka_discs') {
     fireYulkaMeet(get, set, meet);
-    return;
+    return true;
   }
 
   // 3) Fetch combat — player arrived at the thief's tile.
   const fetch = findReadyFetchWhisper(p.activeWhispers, pg.x, pg.y);
   if (fetch && fetch.id === 'yulka_discs') {
     fireYulkaFetch(get, set, fetch);
-    return;
+    return true;
   }
 
   // 4) Return-to-Yulka with the recovered Discs.
   const ret = findReadyReturnWhisper(p.activeWhispers, pg.x, pg.y);
   if (ret && ret.id === 'yulka_discs') {
     fireYulkaReturn(get, set, ret);
-    return;
+    return true;
   }
 
   // 5) Ambush armed by a recent completion. Fires on the NEXT
@@ -30997,7 +31040,9 @@ function resolveWhispersForTile(
   const ambushers = (p.activeWhispers ?? []).filter((w) => w.stage === 'ambush_armed');
   if (ambushers.length > 0) {
     fireYulkaAmbush(get, set, ambushers[0]!);
+    return true;
   }
+  return false;
 }
 
 function fireYulkaMeet(
@@ -31017,29 +31062,31 @@ function fireYulkaMeet(
   const thiefG = whisperTargetGrid(whisper);
   const thiefGridX = thiefG.x + thiefDx;
   const thiefGridY = thiefG.y;
-  // Spawn Yulka as a transient combat-style NPC line + offer chip.
-  // She is NOT a full vendor object (the vendor system is anchored
-  // to hub rooms), so the chain manages her dialogue through the
-  // world log + status. A type-Yulka-action input drives stage
-  // advance.
-  get().appendLog(
-    'world',
-    `A hooded figure crouches over a small Aether-fire ahead. She watches you approach without standing. The fire's blue glow plays across a flat tin tray covered in palm-sized Aetheric Discs.`,
-  );
-  get().appendLog(
-    'arbiter',
-    `"Yulka," she says without asking your name. "If you came for Discs, sit. Five for fifty TC. If you came for trouble, keep walking." She watches your hands more than your face. "There's a third option. Some pendejo took half my stock — three tiles east, that direction." She nods at the dark. "Get them back, you keep five. I keep the rest. Either way, decide now. I've got somewhere to be by sunrise."`,
-  );
+  // OTA-1547 — she is not a vendor object, but she now gets the vendor
+  // TREATMENT: her sighting and voice stay in the feed (the record of truth),
+  // and the same lines seed the whisper's own per-instance transcript, which
+  // the SPEAK TO YULKA sheet renders. The old three-command [system] burst is
+  // what buried her ("yulka spoke, but then it was buried by instruction
+  // text") — it shrinks to one pointer, and the decisions become buttons.
+  const sighting = `A hooded figure crouches over a small Aether-fire ahead. She watches you approach without standing. The fire's blue glow plays across a flat tin tray covered in palm-sized Aetheric Discs.`;
+  const pitch = `"Yulka," she says without asking your name. "If you came for Discs, sit. Five for fifty TC. If you came for trouble, keep walking." She watches your hands more than your face. "There's a third option. Some pendejo took half my stock — three tiles east, that direction." She nods at the dark. "Get them back, you keep five. I keep the rest. Either way, decide now. I've got somewhere to be by sunrise."`;
+  get().appendLog('world', sighting);
+  get().appendLog('arbiter', pitch);
   get().appendLog(
     'system',
-    `Type "accept yulka" to take the fetch (five Discs on return). Type "buy from yulka" to skip the fetch and trade 50 TC for 5 Discs. Type "leave yulka" to walk away.`,
+    `Answer her from the SPEAK TO YULKA bar below — or type "accept yulka", "buy from yulka", or "leave yulka".`,
   );
   set((s) => (s.player ? {
     player: {
       ...s.player,
       activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
         w.id === whisper.id
-          ? { ...w, stage: 'met_yulka', ctx: { ...(w.ctx ?? {}), thiefMapX, thiefMapY, thiefGridX, thiefGridY } }
+          ? {
+              ...w,
+              stage: 'met_yulka',
+              ctx: { ...(w.ctx ?? {}), thiefMapX, thiefMapY, thiefGridX, thiefGridY },
+              talk: [...(w.talk ?? []), { who: 'them' as const, text: sighting }, { who: 'them' as const, text: pitch }],
+            }
           : w,
       ),
     },
@@ -31054,18 +31101,26 @@ function handleYulkaAccept(
   const tx = whisper.ctx?.thiefMapX as number | undefined;
   const ty = whisper.ctx?.thiefMapY as number | undefined;
   if (tx == null || ty == null) return;
+  // OTA-1547 — the send-off and the instructions land in the whisper's own
+  // transcript, where the sheet keeps them re-readable for the whole fetch leg.
+  // The feed gets her voice plus ONE compact task pointer — never the wall of
+  // directions that buried her introduction.
+  const sendOff = `"Three tiles east." Yulka jerks her chin at the dark. "If you don't come back, I never knew your face." She turns to her tray and doesn't look up again.`;
+  const brief = `The thief is three tiles east of her fire. Your Contracts panel tracks the job — SET COURSE walks you there. Recover the Discs and bring them back to Yulka; five are yours on return.`;
   set((s) => (s.player ? {
     player: {
       ...s.player,
-      activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
-        w.id === whisper.id ? { ...w, stage: 'fetch_in_progress' } : w,
-      ),
+      activeWhispers: withTalkTurn(
+        withTalkTurn(
+          withTalkTurn(s.player.activeWhispers, whisper.id, 'you', 'You take the job.'),
+          whisper.id, 'them', sendOff,
+        ),
+        whisper.id, 'note', brief,
+      ).map((w) => (w.id === whisper.id ? { ...w, stage: 'fetch_in_progress' } : w)),
     },
   } : s));
-  get().appendLog(
-    'arbiter',
-    `"Three tiles east." Yulka jerks her chin at the dark. "If you don't come back, I never knew your face." She turns to her tray and doesn't look up again.`,
-  );
+  get().appendLog('arbiter', sendOff);
+  get().appendLog('system', `◈ Task taken — see WHISPERS in Contracts. SET COURSE walks you to the thief.`);
 }
 
 function handleYulkaBuy(
@@ -31076,10 +31131,19 @@ function handleYulkaBuy(
   const live = get().player;
   if (!live) return;
   if (live.tc < 50) {
-    get().appendLog(
-      'arbiter',
-      `Yulka glances at your hands. "Fifty TC for five. You're short." She doesn't bargain.`,
-    );
+    // OTA-1547 — the refusal is part of the conversation; the record survives
+    // (the offer stands), so the sheet's transcript carries it too.
+    const short = `Yulka glances at your hands. "Fifty TC for five. You're short." She doesn't bargain.`;
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        activeWhispers: withTalkTurn(
+          withTalkTurn(s.player.activeWhispers, whisper.id, 'you', 'You offer to buy the Discs outright.'),
+          whisper.id, 'them', short,
+        ),
+      },
+    } : s));
+    get().appendLog('arbiter', short);
     return;
   }
   set((s) => {

@@ -25464,7 +25464,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //    settle, so the next post-mortem reads native:llm:start q1 (+8342ms) - died
 //    inside inference - or native:llm:done - native exonerated. Either answer
 //    moves #81.
-export const OTA_BUILD_ID = '2026-08-29-1546-the-dying-breath-names-the-native-job';
+// OTA-1547 - YULKA'S CONVERSATION GETS THE SCREEN. The 1542 fix put her camp on
+// real dirt and the meet fired on the owner's next walk - and her speech was
+// immediately buried, twice over: fireYulkaMeet's own three-command [system]
+// burst printed right behind it, and stepDirection's open-ground filler ("You
+// walk west... lost track of distance") printed AFTER the whole introduction,
+// because the whisper resolver runs early in the step and the filler prints
+// near the end. OTA-1530's disease in the whisper organ. Owner's spec, built
+// as asked: a SPEAK TO YULKA bar appears above the input slot (no self-opening
+// popup - the 1530 dwell lesson); tapping it raises a TalkSheet-style gold
+// sheet where the conversation is the focus and the decision is three buttons
+// - TAKE THE JOB / BUY 50 TC / WALK AWAY - plus step-back-decide-later. The
+// instructions land in the sheet as a task brief after accepting (feed gets
+// ONE compact pointer line instead of the burst), and the transcript lives on
+// WhisperRecord.talk itself: persistent across restarts for as long as that
+// encounter instance lives, gone with the record when it resolves - "the
+// memory of that instance is persistent, but only for that instance." The
+// typed commands still work and share the same handlers and transcript. And
+// the step machinery now yields to any fired whisper beat: the resolver
+// reports it, and the filler line and the 20% trader roll stand down for that
+// step - you did not lose track of distance, you arrived somewhere.
+export const OTA_BUILD_ID = '2026-08-29-1547-the-conversation-holds-the-floor';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1546-the-dying-breath-names-the-native-job';
 // golem catch-up 2026-08-29: markerless publish of OTA-1543/1544/1545/1546 (no
 // raw fragments in the feed + stock-filler gate, refused gifts go back in the
 // pack out loud, one AC derivation + quarantined native timing lie, native ML

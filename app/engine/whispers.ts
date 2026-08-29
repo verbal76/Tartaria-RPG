@@ -18,10 +18,26 @@
 // is otherwise stateless. Adding a new chain = adding an entry to
 // CHAINS + an entry to applyChainStage's switch.
 
-import type { WhisperRecord, Enemy, InventoryItem } from './types';
+import type { WhisperRecord, WhisperTalkTurn, Enemy, InventoryItem } from './types';
 import { canonicalCellOf, WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from './worldMap';
 import { rollDie } from './rng';
 import { findEnemyByName } from './encounter';
+
+/** OTA-1547 — append one conversation turn to one whisper's per-instance
+ *  transcript, immutably. Pure so the store can map with it and tests can
+ *  exercise it without a store. Unknown id = the array back unchanged (the
+ *  record may have resolved between the tap and the write — losing the turn
+ *  is correct then, because the transcript's lifetime IS the instance). */
+export function withTalkTurn(
+  whispers: readonly WhisperRecord[] | undefined,
+  id: string,
+  who: WhisperTalkTurn['who'],
+  text: string,
+): WhisperRecord[] {
+  return (whispers ?? []).map((w) =>
+    w.id === id ? { ...w, talk: [...(w.talk ?? []), { who, text }] } : w,
+  );
+}
 
 /** Time window check that handles midnight wraparound. */
 export function isHourInWindow(hour: number, from: number | undefined, to: number | undefined): boolean {

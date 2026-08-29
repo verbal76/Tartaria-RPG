@@ -746,6 +746,14 @@ export interface EscortPool {
   count?: number;
 }
 
+/** OTA-1547 — one exchange in a whisper encounter's conversation sheet.
+ *  'them' = the whisper NPC speaking, 'you' = the player's choice restated,
+ *  'note' = out-of-voice instructions (the task block shown after accepting). */
+export interface WhisperTalkTurn {
+  who: 'them' | 'you' | 'note';
+  text: string;
+}
+
 export interface WhisperRecord {
   /** Unique chain id (e.g. 'yulka_discs'). Each whisper has authored
    *  text + spawn rules in the engine; this field is the lookup key. */
@@ -797,6 +805,12 @@ export interface WhisperRecord {
    *  carries the thief's tile coords so the chain knows where to
    *  spawn the combat encounter. */
   ctx?: Record<string, number | string>;
+  /** OTA-1547 — the encounter's conversation, persisted ON the record so it
+   *  lives exactly as long as this instance of the chain: reopen the sheet
+   *  mid-fetch and re-read what was said, and when the record resolves the
+   *  memory goes with it. Owner: "the memory of that instance is persistent,
+   *  but only for that instance." */
+  talk?: WhisperTalkTurn[];
   /** `false` = the player has DEACTIVATED (paused) this whisper: it stays on
    *  the slate but is dropped from the standing look-around / mission reminders
    *  and won't advance until re-activated. Absent/true = active. */

@@ -85,6 +85,7 @@ import { MissionCompleteModal } from '../components/MissionCompleteModal';
 import { ParleySheet } from '../components/ParleySheet';
 import { PayoffSheet } from '../components/PayoffSheet';
 import { TalkSheet } from '../components/TalkSheet';
+import { WhisperTalkSheet } from '../components/WhisperTalkSheet';
 import { GiftModal } from '../components/GiftModal';
 import { hasTopicsFor } from '../engine/dialogue';
 // OTA-1064 — the SAME identity function the store and the ledger use. See the
@@ -1981,6 +1982,12 @@ export function ExplorationScreen() {
           </View>
         )}
       </TutorialTarget>
+
+      {/* OTA-1547 — the SPEAK TO YULKA bar + its conversation sheet. Sits
+          above the controls slot so it never competes with the input box or
+          the other sheets for the slot itself; the component renders nothing
+          unless a whisper encounter with a transcript is live. */}
+      <WhisperTalkSheet />
 
       <View style={styles.controls}>
         {pendingRolls ? (
