@@ -25510,6 +25510,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // to [2,3], and every chain's plant-line direction is now suite-locked
 // against its offset so the class cannot be authored again.
 export const OTA_BUILD_ID = '2026-08-29-1548-twenty-more-fires-in-the-dark';
+// golem catch-up 2026-08-29: markerless publish of OTA-1548 (the whisper
+// machine goes data-driven off ChainDef.content + twenty new chains, twenty-
+// three new Human marks, Yulka's camp finally on the south side her prose
+// always claimed, and no chain planting in the gate corridor) to the golem
+// channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1547-the-conversation-holds-the-floor';
 // golem catch-up 2026-08-29: markerless publish of OTA-1547 (SPEAK TO YULKA
 // bar + conversation sheet with per-instance transcript; step filler and
