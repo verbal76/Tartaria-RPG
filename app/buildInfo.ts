@@ -25316,6 +25316,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // wild bench and the Hidden Market cauldron fire free, and the charge still
 // lands after every gate and before any consume.
 export const OTA_BUILD_ID = '2026-08-29-1537-two-pieces-or-it-is-not-made-of-that';
+// golem catch-up 2026-08-29: markerless publish of OTA-1536/1537 (the Crucible's
+// output tier is now bounded by the second-best rarity among its inputs instead
+// of by material variety alone, so four Common scraps no longer mint the best
+// armor in the game; and the fire is priced by what it forges - 25 / 60 / 150 TC
+// for Uncommon / Rare / Legendary) to the golem channel. Both channels level at
+// 1537.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-28-1536-the-crucible-ceiling-is-what-you-feed-it';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-28-1532-the-journeys-of-cheddar-bob';
 // golem catch-up 2026-08-28: markerless publish of OTA-1532 (a Nix lead is now
