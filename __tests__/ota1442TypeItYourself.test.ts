@@ -87,7 +87,9 @@ describe('OTA-1442 — the floating bar trusts the keyboard, not the event', () 
     expect(check).toBeGreaterThan(timer);
     expect(check).toBeLessThan(retract);
     // …and a still-standing keyboard re-syncs the height instead of retracting.
-    const resync = BAR.indexOf('if (m?.height) applyHeight(m.height);', check);
+    // OTA-1540 — the re-sync now also hands over screenY (the strip-aware top
+    // edge); the SUBJECT here — ask the keyboard before retracting — is intact.
+    const resync = BAR.indexOf('if (m?.height) applyHeight(m.height, m.screenY);', check);
     expect(resync).toBeGreaterThan(check);
     expect(resync).toBeLessThan(retract);
   });

@@ -661,6 +661,7 @@ import {
   findReadyMeetWhisper,
   findReadyFetchWhisper,
   findReadyReturnWhisper,
+  whisperTargetGrid,
   reapExpiredWhispers,
   spawnChainEnemy,
   makeStolenDiscs,
@@ -3045,7 +3046,80 @@ export function migrateLoadedWorldMemory(wm: WorldMemory): WorldMemory {
     fusionCompensationGranted: wm.fusionCompensationGranted ?? false,
     pendingDogOnboarding: wm.pendingDogOnboarding ?? null,
     enemyIntel: wm.enemyIntel ?? backfillEnemyIntelFromDefeats(wm.defeatedEnemies),
+    // OTA-1541 — re-file every ground record under its ABSOLUTE cell. See
+    // makeRoomKey: old ground keys carried the frame they were seen from, so a
+    // save holds the same tile under several addresses. The old key RECORDS its
+    // own frame (its locationId), so the conversion is exact, not guessed.
+    visitedRooms: migrateGroundRoomKeys(wm.visitedRooms),
   };
+}
+
+/** ⚠ OTA-1541 — one-shot, lossless re-keying of ground records to `grid@mm@ax,ay`.
+ *
+ *  An old ground key `locId@mm@x,y` names the exact frame that produced it, so
+ *  its absolute cell is `canonCell(locId) + (x,y − CENTER)` — the same formula
+ *  playerGridCell has always used for the legacy fallback. Hub keys (4 segments)
+ *  and coordinate-less keys (`_`) keep their shape; they were never unstable.
+ *
+ *  ⚠ COLLISIONS ARE THE BUG MADE VISIBLE: two old records landing on one new key
+ *  ARE the same tile filed under two frames. The merge must never resurrect
+ *  anything the player consumed in EITHER ledger, so consumption unions, counters
+ *  take the max, and per-visit scalars follow whichever ledger saw the tile last.
+ *  Wiped-looking fields must not un-wipe a restock either: clearedAt stamps come
+ *  from the later ledger as a pair, never mixed across the two. */
+export function migrateGroundRoomKeys(
+  rooms: Record<string, VisitedRoom> | undefined,
+): Record<string, VisitedRoom> | undefined {
+  if (!rooms) return rooms;
+  let changed = false;
+  const out: Record<string, VisitedRoom> = {};
+  const put = (key: string, rec: VisitedRoom): void => {
+    const prior = out[key];
+    if (!prior) { out[key] = rec; return; }
+    const [older, newer] = (prior.lastVisitAt ?? 0) <= (rec.lastVisitAt ?? 0) ? [prior, rec] : [rec, prior];
+    const uni = (a?: string[], b?: string[]) => (a || b ? Array.from(new Set([...(a ?? []), ...(b ?? [])])) : undefined);
+    out[key] = {
+      ...older,
+      ...newer,
+      firstVisitAt: Math.min(older.firstVisitAt ?? Infinity, newer.firstVisitAt ?? Infinity),
+      lastVisitAt: Math.max(older.lastVisitAt ?? 0, newer.lastVisitAt ?? 0),
+      visitCount: Math.max(older.visitCount ?? 0, newer.visitCount ?? 0),
+      enemiesCleared: uni(older.enemiesCleared, newer.enemiesCleared),
+      lootGrabbed: uni(older.lootGrabbed, newer.lootGrabbed),
+      containersOpened: uni(older.containersOpened, newer.containersOpened),
+      searchedAmbientNouns: uni(older.searchedAmbientNouns, newer.searchedAmbientNouns),
+      flavorExhaustedNouns: uni(older.flavorExhaustedNouns, newer.flavorExhaustedNouns),
+      digYields: Math.max(older.digYields ?? 0, newer.digYields ?? 0) || undefined,
+      groundDigCount: Math.max(older.groundDigCount ?? 0, newer.groundDigCount ?? 0) || undefined,
+      droppedItems: older.droppedItems || newer.droppedItems
+        ? [...(older.droppedItems ?? []), ...(newer.droppedItems ?? [])]
+        : undefined,
+      // A consumed investigation entry outranks an unconsumed copy of itself.
+      roomInvestigationTable: older.roomInvestigationTable || newer.roomInvestigationTable
+        ? Object.fromEntries(
+            Object.entries({ ...(older.roomInvestigationTable ?? {}), ...(newer.roomInvestigationTable ?? {}) })
+              .map(([k, v]) => [k, older.roomInvestigationTable?.[k]?.consumed ? older.roomInvestigationTable[k]! : v]),
+          )
+        : undefined,
+      dogSmelledHere: (older.dogSmelledHere ?? false) || (newer.dogSmelledHere ?? false),
+      firstInvestigateDone: (older.firstInvestigateDone ?? false) || (newer.firstInvestigateDone ?? false),
+    };
+  };
+  for (const [key, rec] of Object.entries(rooms)) {
+    const parts = key.split('@');
+    // Ground shape only: exactly locId@mm@x,y with numeric coords. Hub keys have
+    // a 4th segment; `grid@…` keys are already converted; `_,_` has no cell.
+    const m = parts.length === 3 && parts[0] !== 'grid'
+      ? /^(-?\d+),(-?\d+)$/.exec(parts[2] ?? '')
+      : null;
+    if (!m) { put(key, rec); continue; }
+    const cell = canonicalCellOf(parts[0]!);
+    const ax = cell.x + (parseInt(m[1]!, 10) - WORLD_MAP_CENTER_X);
+    const ay = cell.y + (parseInt(m[2]!, 10) - WORLD_MAP_CENTER_Y);
+    put(`grid@${parts[1]}@${ax},${ay}`, rec);
+    changed = true;
+  }
+  return changed ? out : rooms;
 }
 
 /** OTA-1029 — the scope a "hide this chip" ✕ applies to: the macro TILE
@@ -5265,12 +5339,17 @@ function applyTopicGrant(
       const px = typeof player.mapX === 'number' ? player.mapX : 0;
       const py = typeof player.mapY === 'number' ? player.mapY : 0;
       const tile = pickTargetTile(chain, px, py);
+      // OTA-1542 — the target is a PLACE: stamp its absolute cell alongside the
+      // frame coords, so no later recenter can move it (see whisperTargetGrid).
+      const plantG = playerGridCell(player);
       const whisper: WhisperRecord = {
         id: chain.id,
         stage: 'planted',
         plantedAtHour: player.hoursElapsed ?? 0,
         targetMapX: tile.x,
         targetMapY: tile.y,
+        targetGridX: plantG.x + (tile.x - px),
+        targetGridY: plantG.y + (tile.y - py),
         targetLocationId: player.currentLocationId,
         activeFromHour: chain.activeHours?.[0],
         activeToHour: chain.activeHours?.[1],
@@ -7181,7 +7260,10 @@ export interface GameStore {
    *  (mapX/mapY). Sets player.whisperCourse and takes the first cardinal step.
    *  continueWhisperCourse steps once more; stopWhisperCourse clears it. Reuses
    *  the travel-row continue/stop UX. */
-  setWhisperCourse: (mapX: number, mapY: number, label: string) => void;
+  /** OTA-1542 — takes the target's ABSOLUTE canon-grid cell (whisperRouteTarget
+   *  hands it over pre-converted), so the course means the same dirt whatever
+   *  frame the player sets it from. */
+  setWhisperCourse: (gridX: number, gridY: number, label: string) => void;
   continueWhisperCourse: () => void;
   stopWhisperCourse: () => void;
   /** OTA-478 "Golem Armaments" — arm the active golem with a crafted golem weapon
@@ -10501,12 +10583,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const py = typeof livePlayer.mapY === 'number' ? livePlayer.mapY : 0;
           const tile = pickTargetTile(chain, px, py);
           const hours = livePlayer.hoursElapsed ?? 0;
+          // OTA-1542 — absolute cell stamped at plant time (see whisperTargetGrid).
+          const plantG = playerGridCell(livePlayer);
           const whisper: WhisperRecord = {
             id: chain.id,
             stage: 'planted',
             plantedAtHour: hours,
             targetMapX: tile.x,
             targetMapY: tile.y,
+            targetGridX: plantG.x + (tile.x - px),
+            targetGridY: plantG.y + (tile.y - py),
             targetLocationId: livePlayer.currentLocationId,
             activeFromHour: chain.activeHours?.[0],
             activeToHour: chain.activeHours?.[1],
@@ -23808,13 +23894,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // auto-route off the now-pointless thief tile onto Yulka's return tile, so
         // the travel readout names the CURRENT objective ("→ Yulka (return the
         // Discs)") instead of a stale "… N steps to the Silt Thief".
-        if (live.targetMapX != null && live.targetMapY != null) {
-          const yx = live.targetMapX;
-          const yy = live.targetMapY;
+        {
+          // OTA-1542 — absolute cell, so the return course survives any named
+          // arrival made while chasing the thief.
+          const yg = whisperTargetGrid(live);
           set((s) => (s.player?.whisperCourse ? {
             player: {
               ...s.player,
-              whisperCourse: { mapX: yx, mapY: yy, label: 'Yulka (return the Discs)' },
+              whisperCourse: { gridX: yg.x, gridY: yg.y, label: 'Yulka (return the Discs)' },
             },
           } : s));
           get().appendLog('world', `Discs in hand. The thread pulls you back the way you came — Yulka's owed.`);
@@ -25919,18 +26006,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // travel-row UX. Reaching the tile lets the chain's own beat fire (e.g. the
   // Silt-Thief spawn). Players kept losing the objective; this gives them a
   // "set course" from the Contracts screen.
-  setWhisperCourse(mapX, mapY, label) {
+  setWhisperCourse(gridX, gridY, label) {
     const player = get().player;
     if (!player) return;
-    // OTA-502 — the place this whisper objective points to becomes install-canon:
-    // canonized at the EXACT canonical grid cell it sits on (the player's current
-    // cell + the tile offset), so it's plotted on the map, routable, and carries an
-    // exact grid-to-grid distance like any location ("any place mentioned becomes
-    // canon and is plotted on an exact grid").
+    // OTA-502 — the place this whisper objective points to becomes install-canon,
+    // plotted on the map, routable, with an exact grid-to-grid distance.
+    // ⚠ OTA-1542 — the course now ARRIVES already absolute. The old conversion
+    // here (`player's current cell + the tile offset`) was only correct when the
+    // course was set in the same frame the whisper was planted in; set it after
+    // any named arrival and the canon pin landed on the wrong cell — the map
+    // said "?" over dirt Yulka was never on.
     if (label) {
-      const cur = canonicalCellOf(player.currentLocationId);
-      const gx = cur.x + (mapX - WORLD_MAP_CENTER_X);
-      const gy = cur.y + (mapY - WORLD_MAP_CENTER_Y);
+      const gx = gridX;
+      const gy = gridY;
       const id = `mention_${label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')}`;
       if (id !== 'mention_') {
         // OTA-503 — a discovered whisper objective is a PENDING grid event ("?"
@@ -25941,7 +26029,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // A whisper course and a location course are mutually exclusive — clear any
     // location travel first so the travel row shows the whisper destination.
-    set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined, whisperCourse: { mapX, mapY, label } } } : s));
+    set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined, whisperCourse: { gridX, gridY, label } } } : s));
     get().appendLog('world', `You set out toward ${label}. Tap the travel row to press on; STOP to halt.`);
     get().continueWhisperCourse();
   },
@@ -25951,9 +26039,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = get().currentScene;
     if (!player || !scene || !player.whisperCourse) return;
     const tgt = player.whisperCourse;
-    const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
-    const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
-    if (fromX === tgt.mapX && fromY === tgt.mapY) {
+    // OTA-1542 — the course walks toward an ABSOLUTE cell, so it stays aimed at
+    // the same dirt across every recenter. A legacy course saved mid-walk
+    // carries only mapX/mapY: resolve it ONCE in the current frame (exactly
+    // what it meant before) and re-stamp it absolute so the rest of the walk
+    // is frame-proof.
+    const from = playerGridCell(player);
+    let tx = tgt.gridX;
+    let ty = tgt.gridY;
+    if (typeof tx !== 'number' || typeof ty !== 'number') {
+      const c = canonicalCellOf(player.currentLocationId);
+      tx = c.x + ((tgt.mapX ?? WORLD_MAP_CENTER_X) - WORLD_MAP_CENTER_X);
+      ty = c.y + ((tgt.mapY ?? WORLD_MAP_CENTER_Y) - WORLD_MAP_CENTER_Y);
+      const fx = tx, fy = ty;
+      set((s) => (s.player?.whisperCourse ? {
+        player: { ...s.player, whisperCourse: { ...s.player.whisperCourse, gridX: fx, gridY: fy } },
+      } : s));
+    }
+    if (from.x === tx && from.y === ty) {
       // Already on the tile — clear the course; the chain beat fires on its own.
       set((s) => (s.player ? { player: { ...s.player, whisperCourse: null } } : s));
       get().appendLog('world', `You're standing where ${tgt.label} should be.`);
@@ -25968,7 +26071,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       buzzBlocked();
       return;
     }
-    const dir = nextCardinalToward(fromX, fromY, tgt.mapX, tgt.mapY);
+    // Grid deltas share the map frame's orientation (grid = canon + (map −
+    // CENTER)), so the cardinal picker works on them unchanged.
+    const dir = nextCardinalToward(from.x, from.y, tx, ty);
     if (!dir) {
       set((s) => (s.player ? { player: { ...s.player, whisperCourse: null } } : s));
       return;
@@ -25980,7 +26085,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), TILE_HOURS) });
     get().stepDirection(dir);
     const after = get().player;
-    if (after && (after.mapX ?? WORLD_MAP_CENTER_X) === tgt.mapX && (after.mapY ?? WORLD_MAP_CENTER_Y) === tgt.mapY) {
+    const afterG = after ? playerGridCell(after) : null;
+    if (afterG && afterG.x === tx && afterG.y === ty) {
       // Arrived — clear the course. Any spawned encounter/beat is already in play.
       set((s) => (s.player ? { player: { ...s.player, whisperCourse: null } } : s));
     } else if (after && after.travelTarget) {
@@ -30856,23 +30962,26 @@ function resolveWhispersForTile(
   reapExpiredWhispers(live.activeWhispers, hours);
   const p = get().player;
   if (!p) return;
+  // OTA-1542 — match on the ABSOLUTE cell, not the caller's frame coords. The
+  // step coords passed in are current-frame; the whisper targets are places.
+  const pg = playerGridCell(p);
 
   // 2) Meet check — planted whisper, right tile, right time.
-  const meet = findReadyMeetWhisper(p.activeWhispers, hours, mapX, mapY);
+  const meet = findReadyMeetWhisper(p.activeWhispers, hours, pg.x, pg.y);
   if (meet && meet.id === 'yulka_discs') {
     fireYulkaMeet(get, set, meet);
     return;
   }
 
   // 3) Fetch combat — player arrived at the thief's tile.
-  const fetch = findReadyFetchWhisper(p.activeWhispers, mapX, mapY);
+  const fetch = findReadyFetchWhisper(p.activeWhispers, pg.x, pg.y);
   if (fetch && fetch.id === 'yulka_discs') {
     fireYulkaFetch(get, set, fetch);
     return;
   }
 
   // 4) Return-to-Yulka with the recovered Discs.
-  const ret = findReadyReturnWhisper(p.activeWhispers, mapX, mapY);
+  const ret = findReadyReturnWhisper(p.activeWhispers, pg.x, pg.y);
   if (ret && ret.id === 'yulka_discs') {
     fireYulkaReturn(get, set, ret);
     return;
@@ -30898,6 +31007,11 @@ function fireYulkaMeet(
   const thiefDx = 2 + Math.floor(Math.random() * 2); // 2-3 east
   const thiefMapX = whisper.targetMapX + thiefDx;
   const thiefMapY = whisper.targetMapY;
+  // OTA-1542 — the thief's tile is a place too; anchor it absolutely off the
+  // whisper's own (grid-first, exactly-falling-back) target cell.
+  const thiefG = whisperTargetGrid(whisper);
+  const thiefGridX = thiefG.x + thiefDx;
+  const thiefGridY = thiefG.y;
   // Spawn Yulka as a transient combat-style NPC line + offer chip.
   // She is NOT a full vendor object (the vendor system is anchored
   // to hub rooms), so the chain manages her dialogue through the
@@ -30920,7 +31034,7 @@ function fireYulkaMeet(
       ...s.player,
       activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
         w.id === whisper.id
-          ? { ...w, stage: 'met_yulka', ctx: { ...(w.ctx ?? {}), thiefMapX, thiefMapY } }
+          ? { ...w, stage: 'met_yulka', ctx: { ...(w.ctx ?? {}), thiefMapX, thiefMapY, thiefGridX, thiefGridY } }
           : w,
       ),
     },
@@ -31237,6 +31351,43 @@ export function makeRoomKey(
   const x = typeof mapX === 'number' ? mapX : '_';
   const y = typeof mapY === 'number' ? mapY : '_';
   const hubSuffix = hubRoomId ? `@${hubRoomId}` : '';
+  // ⚠⚠⚠ OTA-1541 — A TILE'S IDENTITY MUST NOT DEPEND ON THE FRAME IT WAS SEEN
+  // FROM. Owner: *"this tile just repopulated after I hit autoroute to the
+  // mission"* — the FOURTH report of the same symptom, after arb105 (48h
+  // timer), arb107 (round trip) and OTA-1529 (both ANDed) each "fixed" it.
+  //
+  // All three fixed the restock GATE, and the gate was never the leak. This key
+  // was `locationId@mm@mapX,mapY` — but `mapX/mapY` are coordinates on a map
+  // that travelToLocation RECENTERS on every named arrival (`mapX:
+  // WORLD_MAP_CENTER_X`), and `currentLocationId` changes with it. So the same
+  // physical tile is filed under a different address after every named-location
+  // arrival. An auto-course to a mission ends in exactly such an arrival: every
+  // wasteland ledger around the player — consumed nouns, gear roster, dig
+  // counts, clearedAt stamps — is orphaned under the old address, the new key
+  // reads EMPTY, `consumedHere.size > 0` is false, and OTA-1529's gate is never
+  // even consulted. Three fixes hardened a door standing next to a hole. (The
+  // proof is in the owner's log: the tile refilled with NO restock line —
+  // a real restock always prints one.)
+  //
+  // arb47 already established the authoritative ABSOLUTE cell (gridX/gridY,
+  // playerGridCell — "ONE source of truth for where the player is"), and the
+  // conversion from this key's own inputs is exact: the map is always generated
+  // centered on currentLocationId, so absolute = canonCell(locationId) +
+  // (map - CENTER). Ground keys are now `grid@mm@ax,ay` — frame-free, stable
+  // across every recenter, and computed here at the ONE choke point so all 47
+  // call sites are fixed without being touched.
+  //
+  // ⚠ HUB INTERIORS KEEP THEIR KEY SHAPE, deliberately. Inside a hub nothing
+  // recenters (room moves never call travelToLocation), the old keys were
+  // already stable there, and every hub record in every save is filed under
+  // them. The bug lives on open ground only, so only open ground re-keys.
+  // Missing coords also keep the legacy shape — there is no cell to convert.
+  if (!hubRoomId && typeof mapX === 'number' && typeof mapY === 'number') {
+    const cell = canonicalCellOf(locationId);
+    const ax = cell.x + (mapX - WORLD_MAP_CENTER_X);
+    const ay = cell.y + (mapY - WORLD_MAP_CENTER_Y);
+    return `grid@${mm}@${ax},${ay}`;
+  }
   return `${locationId}@${mm}@${x},${y}${hubSuffix}`;
 }
 
@@ -35055,13 +35206,25 @@ function runParleyOutcome(
         const chain = CHAINS.find((c) => !held.has(c.id));
         if (chain && lp) {
           const tile = pickTargetTile(chain, lp.mapX ?? 0, lp.mapY ?? 0);
+          // OTA-1542 — THE ROAD PLANT WAS THE WORST CASE OF THE FRAME BUG. The
+          // camp is offset from where the WANDERER stood, out on open ground —
+          // and by the time the player hunts it, at least one named arrival has
+          // recentered the frame, so the stored map pair denoted different dirt
+          // ("not only was this broken because yulka wasn't there"). Absolute
+          // cell stamped at plant; `source` stamped so the panel can answer
+          // "was this the whisper promised by Nix" instead of the player
+          // having to reverse-engineer their own contract list.
+          const plantG = playerGridCell(lp);
           const whisper: WhisperRecord = {
             id: chain.id,
             stage: 'planted',
             plantedAtHour: lp.hoursElapsed ?? 0,
             targetMapX: tile.x,
             targetMapY: tile.y,
+            targetGridX: plantG.x + (tile.x - (lp.mapX ?? 0)),
+            targetGridY: plantG.y + (tile.y - (lp.mapY ?? 0)),
             targetLocationId: lp.currentLocationId,
+            source: targetName,
             activeFromHour: chain.activeHours?.[0],
             activeToHour: chain.activeHours?.[1],
           };

@@ -42,6 +42,7 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
+import { canonicalCellOf, WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from '../app/engine/worldMap';
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { canonicalLocationAtCell } from '../app/engine/worldMap';
@@ -90,23 +91,33 @@ describe('Whisper engine — pure helpers', () => {
   });
 
   // OTA-465 — the Contracts "set course" uses whisperRouteTarget to pick the tile.
+  // ⚠ OTA-1542 — the route target is an ABSOLUTE cell now. This legacy record
+  // has no targetGridX, so the exact fallback applies: canonCell('x') + (map −
+  // CENTER). The SUBJECT (stage-aware routing: thief mid-fetch, Yulka on
+  // return, null when done) is unchanged.
   it('whisperRouteTarget routes Yulka to the thief tile mid-fetch, and to Yulka on return', () => {
     const base: WhisperRecord = {
       id: 'yulka_discs', stage: 'fetch_active', plantedAtHour: 0,
       targetMapX: 5, targetMapY: 5, targetLocationId: 'x',
       ctx: { thiefMapX: 8, thiefMapY: 5 },
     };
-    // Mid-fetch → head to the Silt Thief's tile.
+    const c = canonicalCellOf('x');
+    const yulkaG = { x: c.x + (5 - WORLD_MAP_CENTER_X), y: c.y + (5 - WORLD_MAP_CENTER_Y) };
+    // Mid-fetch → head to the Silt Thief's tile (3 east of Yulka in this fixture).
     const fetch = whisperRouteTarget(base);
-    expect(fetch).toEqual({ mapX: 8, mapY: 5, label: 'the Silt Thief' });
+    expect(fetch).toEqual({ gridX: yulkaG.x + 3, gridY: yulkaG.y, label: 'the Silt Thief' });
     // Recovered → head back to Yulka.
     const ret = whisperRouteTarget({ ...base, stage: 'fetch_returned' });
-    expect(ret?.mapX).toBe(5);
-    expect(ret?.mapY).toBe(5);
+    expect(ret?.gridX).toBe(yulkaG.x);
+    expect(ret?.gridY).toBe(yulkaG.y);
     // Just-met → still head to Yulka's tile.
-    expect(whisperRouteTarget({ ...base, stage: 'met_yulka' })?.mapX).toBe(5);
+    expect(whisperRouteTarget({ ...base, stage: 'met_yulka' })?.gridX).toBe(yulkaG.x);
     // No fixed tile once the deed is done.
     expect(whisperRouteTarget({ ...base, stage: 'ambush_armed' })).toBeNull();
+    // ⚠ And the 1542 point itself: a record that carries targetGridX routes to
+    // it VERBATIM, ignoring the frame coords entirely.
+    expect(whisperRouteTarget({ ...base, stage: 'met_yulka', targetGridX: 40, targetGridY: 41 }))
+      .toEqual({ gridX: 40, gridY: 41, label: "Yulka's fire" });
   });
 });
 
@@ -336,22 +347,30 @@ describe('Yulka chain — full state-machine drive', () => {
     expect(clear).toBeDefined();
     const tgtMapX = baseMapX + 2 * clear.dx;
     const tgtMapY = baseMapY + 2 * clear.dy;
+    // ⚠ OTA-1542 — setWhisperCourse takes the ABSOLUTE cell now. This test used
+    // to hand it map coords, and because both are plain numbers the compiler
+    // could not object — the exact silent-wrong-frame call the API change was
+    // meant to end. Passing the grid cell is the new contract.
+    const tgtGridX = baseGridX + 2 * clear.dx;
+    const tgtGridY = baseGridY + 2 * clear.dy;
 
     // Set a course two cells out: the first step moves toward it and the course
     // persists (still one cell short).
-    store.getState().setWhisperCourse(tgtMapX, tgtMapY, 'the Silt Thief');
+    store.getState().setWhisperCourse(tgtGridX, tgtGridY, 'the Silt Thief');
     let after = store.getState().player!;
     expect(after.mapX).toBe(baseMapX + clear.dx);
     expect(after.mapY).toBe(baseMapY + clear.dy);
     expect(after.gridX).toBe(baseGridX + clear.dx); // authoritative cell stepped one
     expect(after.gridY).toBe(baseGridY + clear.dy);
-    expect(after.whisperCourse).toEqual({ mapX: tgtMapX, mapY: tgtMapY, label: 'the Silt Thief' });
+    expect(after.whisperCourse).toEqual({ gridX: tgtGridX, gridY: tgtGridY, label: 'the Silt Thief' });
 
     // One more continue lands on the tile and clears the course.
     store.getState().continueWhisperCourse();
     after = store.getState().player!;
     expect(after.mapX).toBe(tgtMapX);
     expect(after.mapY).toBe(tgtMapY);
+    expect(after.gridX).toBe(tgtGridX);
+    expect(after.gridY).toBe(tgtGridY);
     expect(after.gridX).toBe(baseGridX + 2 * clear.dx);
     expect(after.gridY).toBe(baseGridY + 2 * clear.dy);
     expect(after.whisperCourse).toBeNull();

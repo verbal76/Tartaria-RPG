@@ -22,6 +22,7 @@ import { GREAT_CLIMBS } from '../engine/greatClimbs';
 import { theLower } from '../engine/grammar';
 import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS, storyPerkLabel } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
+import { playerGridCell } from '../state/playerGrid';
 import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
 import { openContractMarkers } from '../engine/contractMarkers';
 import { missionLegs } from '../engine/broker';
@@ -1878,9 +1879,12 @@ export function ContractsScreen() {
                 // "set course" that walks the player there (the player kept
                 // losing where to go for Yulka's discs).
                 const route = whisperRouteTarget(rec);
-                const here = !!route
-                  && player?.mapX === route.mapX
-                  && player?.mapY === route.mapY;
+                // OTA-1542 — the route target is an ABSOLUTE cell now; compare
+                // against the player's absolute cell, not the frame coords.
+                const pg = player ? playerGridCell(player) : null;
+                const here = !!route && !!pg
+                  && pg.x === route.gridX
+                  && pg.y === route.gridY;
                 // arb99 — if this objective is plotted as a numbered "?" on the
                 // atlas, lead the SET COURSE block with the same number.
                 const qNum = route ? questionNumbers[mentionIdForLabel(route.label)] : undefined;
@@ -1899,7 +1903,7 @@ export function ContractsScreen() {
                       <Pressable
                         style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                         onPress={() => {
-                          setWhisperCourse(route.mapX, route.mapY, route.label);
+                          setWhisperCourse(route.gridX, route.gridY, route.label);
                           setScreen('exploration');
                         }}
                         accessibilityRole="button"

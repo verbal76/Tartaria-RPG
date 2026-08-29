@@ -62,7 +62,7 @@ const _origLog = console.log;
 const _origWarn = console.warn;
 const _origErr = console.error;
 
-import { useGameStore } from '../app/state/gameStore';
+import { makeRoomKey, useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 
 describe('Tourist and the Vandal — persistent-memory stress test', () => {
@@ -162,7 +162,13 @@ describe('Tourist and the Vandal — persistent-memory stress test', () => {
         mapY: s.player?.mapY ?? 4,
       };
     })();
-    const nodeAKey = `${nodeA.locId}@${nodeA.microMicroId ?? '_'}@${nodeA.mapX},${nodeA.mapY}`;
+    // ⚠ OTA-1541 — build the key with the REAL makeRoomKey, not a hand-rolled
+    // template. The old literal duplicated the key format, so when ground keys
+    // moved to the absolute grid this suite broke on the format rather than on
+    // any behaviour. Better: this suite's own scenario — drop at A, walk away,
+    // return, expect the ledger intact — is the exact class 1541 fixed; a
+    // commute that crosses a named arrival now re-addresses NOTHING.
+    const nodeAKey = makeRoomKey(nodeA.locId, nodeA.microMicroId, nodeA.mapX, nodeA.mapY);
 
     // Pick a unique item to drop — the starter knife. Race-agnostic
     // fallback to whatever the player has if Rusted Blade isn't in

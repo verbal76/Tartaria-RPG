@@ -61,6 +61,10 @@ import { keyboardPollAction } from '../engine/keyboardPoll';
 // back to this cached value (then a screen-fraction estimate) so the bar always
 // sits just above the keyboard even when the event never arrives.
 let lastKeyboardHeight = 0;
+// OTA-1540 — the last RAW `endCoordinates.height` the platform reported, kept
+// only so the instrument can print it beside the corrected offset. When these
+// differ, the screenY path is doing its job and the next log says so outright.
+let lastReportedHeight = 0;
 // OTA-1535 — dedup key so the instrument writes once per distinct state, not per render.
 let bottomLoggedFor = '';
 
@@ -98,12 +102,48 @@ export function KeyboardInputBar() {
     //     the case where the keyboard is already up when we mount
     //     (came from another screen with keyboard open).
     let hideTimer: ReturnType<typeof setTimeout> | null = null;
-    const applyHeight = (height: number) => {
-      if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
-      if (height > 0) { lastKeyboardHeight = height; setKeyboardOffset(height); }
+    // ⚠⚠⚠ OTA-1540 — POSITION FROM THE KEYBOARD'S TOP EDGE, NOT ITS REPORTED
+    // HEIGHT. The OTA-1535 instrument caught this on the owner's device:
+    //
+    //   23:28 session  kbbar: mounted bottom=407.79 from=live winH=986   (fine)
+    //   01:10 session  kbbar: mounted bottom=359.79 from=live winH=986   ("no text box")
+    //                  [player] still none, it's too low I can see the very top edge of it
+    //
+    // Same device, same 986pt window, two DIFFERENT live keyboard heights exactly
+    // 48.0 apart — a Gboard suggestion strip. Android reports the keyboard's base
+    // height in `endCoordinates.height` and draws the strip on top without a
+    // follow-up frame event, so the bar believed 359.79 while the keys actually
+    // occupied 407.79 and buried it with 48px of its top edge showing.
+    //
+    // ⚠ THE LISTENERS WERE NEVER THE BUG, which is why three passes missed it.
+    // OTA-215 added change-frame, arb71 added the ghost guard, OTA-1442 added the
+    // Android isVisible() re-sync — the event fires reliably. The NUMBER it
+    // carries is short. `screenY` is the keyboard's top edge in window space, so
+    // `winH - screenY` measures what the keyboard actually occupies, strip
+    // included, and it is already read below for the ghost-bar guard.
+    //
+    // ⚠ MAX, NOT REPLACE. screenY is used only when it is present and sane; the
+    // larger of the two wins, so a platform that reports screenY oddly can never
+    // position the bar LOWER than the old behaviour did. The failure mode this
+    // fixes is the bar sitting too low; it must not be able to create the
+    // opposite one.
+    const occupiedHeight = (height: number, screenY?: number): number => {
+      const winH = Dimensions.get('window').height;
+      if (typeof screenY !== 'number' || !Number.isFinite(screenY)) return height;
+      if (screenY <= 0 || screenY >= winH) return height;
+      const fromTop = winH - screenY;
+      // A keyboard taking more than three quarters of the window is a bad frame,
+      // not a tall keyboard.
+      if (fromTop > winH * 0.75) return height;
+      return Math.max(height, fromTop);
     };
-    const onShow = (e: { endCoordinates: { height: number } }) => {
-      applyHeight(e.endCoordinates?.height ?? 0);
+    const applyHeight = (height: number, screenY?: number) => {
+      if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+      const h = occupiedHeight(height, screenY);
+      if (h > 0) { lastReportedHeight = height; lastKeyboardHeight = h; setKeyboardOffset(h); }
+    };
+    const onShow = (e: { endCoordinates: { height: number; screenY?: number } }) => {
+      applyHeight(e.endCoordinates?.height ?? 0, e.endCoordinates?.screenY);
     };
     const onChangeFrame = (e: { endCoordinates: { height: number; screenY?: number } }) => {
       // On iOS the keyboard can change height mid-flight (predictive
@@ -121,7 +161,7 @@ export function KeyboardInputBar() {
       const winH = Dimensions.get('window').height;
       const offscreen = typeof screenY === 'number' && screenY >= winH - 1;
       if (offscreen) { onHide(); return; }
-      if (h > 0) applyHeight(h);
+      if (h > 0) applyHeight(h, screenY);
     };
     const onHide = () => {
       // Defer the zero-out so quick refocus events don't flicker.
@@ -146,7 +186,7 @@ export function KeyboardInputBar() {
             const k = Keyboard as any;
             if (typeof k.isVisible === 'function' && k.isVisible()) {
               const m = typeof k.metrics === 'function' ? k.metrics() : null;
-              if (m?.height) applyHeight(m.height);
+              if (m?.height) applyHeight(m.height, m.screenY);
               return;
             }
           } catch { /* metrics unavailable — fall through to the retract */ }
@@ -180,7 +220,7 @@ export function KeyboardInputBar() {
       const visible = typeof k.isVisible === 'function' ? k.isVisible() : false;
       if (visible && typeof k.metrics === 'function') {
         const m = k.metrics();
-        if (m?.height) applyHeight(m.height);
+        if (m?.height) applyHeight(m.height, m.screenY);
       }
     } catch { /* metrics API not available on this RN — fine */ }
 
@@ -295,12 +335,17 @@ export function KeyboardInputBar() {
   // no behaviour change. His next log answers it.
   const beatForLog = useGameStore.getState().tutorialStep;
   const rung = keyboardOffset > 0 ? 'live' : lastKeyboardHeight > 0 ? 'cached' : 'estimate';
+  // OTA-1540 — `raw=` is the height the platform reported. When bottom > raw the
+  // screenY correction fired and the number in between is what used to bury the
+  // bar (48.0 on the owner's Gboard). Keeping the instrument in is the point: a
+  // fix for a bug measured on one device is a hypothesis until his next log.
+  const rawForLog = lastReportedHeight > 0 ? Math.round(lastReportedHeight) : 0;
   if (bottomLoggedFor !== `${rung}:${bottom}:${beatForLog}`) {
     bottomLoggedFor = `${rung}:${bottom}:${beatForLog}`;
     try {
       useGameStore.getState().appendLog(
         'debug',
-        `kbbar: mounted bottom=${bottom} from=${rung} winH=${Math.round(Dimensions.get('window').height)} beat=${beatForLog ?? '-'}`,
+        `kbbar: mounted bottom=${bottom} raw=${rawForLog} from=${rung} winH=${Math.round(Dimensions.get('window').height)} beat=${beatForLog ?? '-'}`,
       );
     } catch { /* an instrument may never break the bar it measures */ }
   }

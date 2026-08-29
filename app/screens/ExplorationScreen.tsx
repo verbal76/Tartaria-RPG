@@ -3,6 +3,7 @@ import { canonicalItemTags } from '../engine/crafting';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey, chipDismissTileKey, logUiTap } from '../state/gameStore';
+import { playerGridCell } from '../state/playerGrid';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { enemyBandOf, enemyIsAirborne, enemyThreatAt, playerWeaponReach } from '../state/combatResolution';
 // OTA-1480 — "am I really at the place my record names", once, for all four readers.
@@ -2406,10 +2407,20 @@ export function ExplorationScreen() {
               // Legacy path stays as a safety net for older saves
               // that travel started before this OTA landed.
               // OTA-465 — whisper course distance = Manhattan to the tile.
+              // OTA-1542 — measured on the ABSOLUTE grid. The frame-relative
+              // version was the same defect the comment above records for
+              // travelTarget ("the badge jumped 23 → 2 → 26" across a
+              // boundary); a legacy mid-course save (mapX only) reads in the
+              // current frame, exactly as it did before.
               if (player?.whisperCourse && !player?.travelTarget) {
+                const wc = player.whisperCourse;
+                const g = playerGridCell(player);
+                if (typeof wc.gridX === 'number' && typeof wc.gridY === 'number') {
+                  return Math.abs(wc.gridX - g.x) + Math.abs(wc.gridY - g.y);
+                }
                 const fx = typeof player.mapX === 'number' ? player.mapX : 0;
                 const fy = typeof player.mapY === 'number' ? player.mapY : 0;
-                return Math.abs(player.whisperCourse.mapX - fx) + Math.abs(player.whisperCourse.mapY - fy);
+                return Math.abs((wc.mapX ?? fx) - fx) + Math.abs((wc.mapY ?? fy) - fy);
               }
               if (!player?.travelTarget) return null;
               if (typeof player.travelTarget.distanceRemaining === 'number') {

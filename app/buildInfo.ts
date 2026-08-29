@@ -25362,7 +25362,82 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and converts the AC wasted past that cap into plate DR. So this ships as a
 // nudge, not a rescue, and it does nothing at all at late game. The dominant knob
 // for the overall feel is that cap, not this knee - tune there next.
-export const OTA_BUILD_ID = '2026-08-29-1539-the-brake-sat-above-the-whole-game';
+// OTA-1540 - THE KEYBOARD LIED ABOUT ITS HEIGHT. Owner, mid-session: "no text
+// box right jere", then "still none, it's too low I can see the very top edge of
+// it". The OTA-1535 instrument answered on its first outing. Same device, same
+// 986pt window, two sessions: 23:28 bottom=407.79 from=live (fine) and 01:10
+// bottom=359.79 from=live (buried) - exactly 48.0 apart, a Gboard suggestion
+// strip. Android reports the keyboard's BASE height in endCoordinates.height and
+// draws the strip on top without a follow-up frame event, so the bar believed
+// 359.79 while the keys occupied 407.79 and buried it with 48px of its top edge
+// showing, which is what he described to the pixel.
+// This also KILLED the previous diagnosis, which is why the instrument was worth
+// shipping: OTA-1535's first reading blamed the `estimate` rung (winH*0.36 = 355
+// against a real 407.79). That shortfall is real but every burial fires on
+// from=live, so it was never this bug - and three earlier passes had gone into
+// the listeners (OTA-215 change-frame, arb71 ghost guard, OTA-1442 Android
+// isVisible re-sync) on the natural assumption that the event was missing. The
+// event is fine; the number it carries is short.
+// Fix: position from endCoordinates.screenY, the keyboard's top edge in window
+// space, so winH - screenY measures what it really occupies (strip included).
+// The field was already read one line away for arb71's ghost guard; it just
+// never drove the position. MAX, not replace, and sanity-bounded - screenY is
+// used only when finite and inside the window, the larger of the two wins, and a
+// frame claiming over three quarters of the screen is discarded. The failure
+// being fixed is a bar sitting too LOW; it must not be able to manufacture the
+// opposite. All four entry points carry it (show, change-frame, both metrics
+// re-syncs). The instrument stays in and now prints raw= beside the offset: when
+// bottom > raw the correction fired, so the next log confirms or kills this.
+// OTA-1541 - A TILE IS WHERE IT IS, NOT WHERE YOU SAW IT FROM. Owner: "this
+// tile just repopulated after I hit autoroute to the mission" - the FOURTH
+// report of the symptom, after arb105 (48h timer), arb107 (round trip) and
+// OTA-1529 (both ANDed) each fixed it. All three fixed the restock GATE, and the
+// gate was never the leak. Room ledgers were filed under
+// makeRoomKey(currentLocationId, mm, mapX, mapY) - but mapX/mapY live on a map
+// that travelToLocation RECENTERS on every named arrival (mapX:
+// WORLD_MAP_CENTER_X) and currentLocationId changes with it, so the same
+// physical tile is re-addressed after every named-location arrival. An
+// auto-course to a mission ENDS in such an arrival: the return leg walks tiles
+// whose ledgers (consumed nouns, gear roster, dig counts, clearedAt stamps) sit
+// orphaned under the previous frame's address, the new key reads empty,
+// consumedHere.size > 0 is false, and OTA-1529's gate is never consulted at all.
+// The tell was in the log: the tile refilled with NO restock line, and a real
+// restock always prints one. arb47 already established the authoritative
+// absolute cell ("ONE source of truth for where the player is") and converted
+// the marker, distances and movement to it - the room-key system never was.
+// Ground keys are now grid@mm@ax,ay, computed inside makeRoomKey from its own
+// inputs (absolute = canonCell(locationId) + (map - CENTER), playerGridCell's
+// own legacy formula), so all 47 call sites are fixed without being touched.
+// Hub interiors keep their key shape - nothing recenters inside a hub and every
+// save's hub records are filed under it. Saves migrate LOSSLESSLY at the one
+// OTA-998 load door: an old ground key records its own frame in its locationId
+// prefix, so its absolute cell is recoverable exactly; collisions under the new
+// key are the bug made visible (one tile, two frames) and merge by union so
+// nothing the player consumed in either ledger is resurrected.
+// OTA-1542 - THE RENDEZVOUS IS A PLACE, NOT A PAIR OF FRAME COORDINATES.
+// Owner: "not only was this broken because yulka wasn't there, I'm still trying
+// to figure out if this was the whisper promised by nix" - two defects, and the
+// first is OTA-1541's disease in a second organ. Whisper targets lived in
+// targetMapX/targetMapY - coordinates on a map travelToLocation recenters at
+// every named arrival - and were matched against the player's CURRENT frame
+// coords. His whisper was granted by Nix ON THE ROAD, so the plant frame died at
+// his next arrival; by the hunt the stored pair denoted different dirt, and the
+// pin even said "south of the outpost" (the Mess-overheard copy) when the camp
+// was offset from where NIX stood. He searched the right words in the wrong
+// world. No migration is needed because every old record names its own frame:
+// targetLocationId is the plant-time map center, so canonCell(targetLocationId)
+// + (targetMap - CENTER) recovers the absolute cell exactly. New plants stamp
+// targetGridX/Y outright; the matchers, the thief sub-tile, the course stepper,
+// the Contracts SET COURSE button, the OTA-502 canon pin and the travel-row
+// distance badge (whose own comment records this class's symptom: "the badge
+// jumped 23 -> 2 -> 26") all read grid-first with the exact fallback. And the
+// record now carries source: a persuade-granted whisper says who handed it over
+// ("Word from Nix: ... 2-3 tiles south of where you met them"), so the player
+// never again has to reverse-engineer which promise they are walking down.
+export const OTA_BUILD_ID = '2026-08-29-1542-the-rendezvous-is-a-place';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1541-a-tile-is-where-it-is';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1540-the-keyboard-lied-about-its-height';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1539-the-brake-sat-above-the-whole-game';
 // golem catch-up 2026-08-29: markerless publish of OTA-1538/1539 (the 13 dog-rescue
 // hook nouns that matched nothing in the world are placed, so the opening dog
 // mission fires on props that read as the scenario instead of on a chain bridge;

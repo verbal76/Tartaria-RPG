@@ -770,6 +770,19 @@ export interface WhisperRecord {
    *  different patch of silt). */
   targetMapX: number;
   targetMapY: number;
+  /** OTA-1542 — the target's ABSOLUTE canon-grid cell, the coordinates that
+   *  actually mean a place. targetMapX/Y above are frame coordinates on a map
+   *  travelToLocation recenters at every named arrival, so on their own they
+   *  denote different dirt after every trip (the owner hunted Yulka on ground
+   *  she had silently moved off). New plants write these outright; readers fall
+   *  back for old saves via canonCell(targetLocationId) + (targetMap − CENTER),
+   *  which is exact because targetLocationId names the plant-time frame. */
+  targetGridX?: number;
+  targetGridY?: number;
+  /** OTA-1542 — who handed the player this whisper ("Nix", or absent for one
+   *  overheard at an outpost Mess). Owner: "I'm still trying to figure out if
+   *  this was the whisper promised by Nix" — the record never said. */
+  source?: string;
   /** Macro location id the target tile is in (usually the player's
    *  current location when planted; the chain doesn't currently
    *  cross macro boundaries). */
@@ -1589,7 +1602,10 @@ export interface PlayerCharacter {
    *  (mapX/mapY), distinct from travelTarget (which routes to a named
    *  location). Drives the same travel-row continue/stop UX, but steps
    *  cardinally within the current area toward the coordinate. */
-  whisperCourse?: { mapX: number; mapY: number; label: string } | null;
+  /** OTA-1542 — courses aim at ABSOLUTE cells now (gridX/gridY); the legacy
+   *  mapX/mapY pair survives so a save captured mid-course still resumes (it is
+   *  read once, in the current frame — exactly what it meant before). */
+  whisperCourse?: { gridX?: number; gridY?: number; mapX?: number; mapY?: number; label: string } | null;
   /** 2026-05-25 [MECHANIC-1b] — active golem sidekick. Persists on
    *  the player so it survives cardinal moves + scene transitions
    *  (the "follows until needed again" requirement). null when no

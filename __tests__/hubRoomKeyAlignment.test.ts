@@ -50,11 +50,25 @@ jest.mock('expo-av', () => ({
 }));
 
 import { makeRoomKey } from '../app/state/gameStore';
+import { canonicalCellOf, WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from '../app/engine/worldMap';
+
+// OTA-1542-era note: OTA-1541 re-keyed GROUND records to the absolute grid
+// (`grid@mm@ax,ay`), because the old locId@mm@x,y shape depended on the frame
+// the tile was seen from and every named arrival re-addressed the world. This
+// suite's SUBJECT — hub and non-hub keys never collide, hub rooms are
+// disambiguated by suffix — is untouched; the non-hub expectations below now
+// assert the frame-free shape instead of the frame-bound literal.
+const groundKey = (locId: string, mm: string | null, x: number, y: number): string => {
+  const c = canonicalCellOf(locId);
+  return `grid@${mm ?? '_'}@${c.x + (x - WORLD_MAP_CENTER_X)},${c.y + (y - WORLD_MAP_CENTER_Y)}`;
+};
 
 describe('OTA-164 — makeRoomKey aligns hub vs non-hub keys', () => {
-  it('non-hub call produces locId@mm@x,y (no trailing suffix)', () => {
+  it('non-hub call produces the frame-free grid key (no trailing suffix)', () => {
     const k = makeRoomKey('tartarian_outskirts', null, 5, 7);
-    expect(k).toBe('tartarian_outskirts@_@5,7');
+    expect(k).toBe(groundKey('tartarian_outskirts', null, 5, 7));
+    expect(k.startsWith('grid@')).toBe(true);
+    expect(k.split('@').length).toBe(3);
   });
 
   it('hub call appends @${hubRoomId}', () => {
@@ -81,6 +95,7 @@ describe('OTA-164 — makeRoomKey aligns hub vs non-hub keys', () => {
 
   it('null hubRoomId is treated as non-hub (no trailing suffix)', () => {
     const k = makeRoomKey('voronov', null, 1, 2, null);
-    expect(k).toBe('voronov@_@1,2');
+    expect(k).toBe(groundKey('voronov', null, 1, 2));
+    expect(k.split('@').length).toBe(3);
   });
 });

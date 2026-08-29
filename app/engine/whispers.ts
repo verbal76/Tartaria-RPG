@@ -19,6 +19,7 @@
 // CHAINS + an entry to applyChainStage's switch.
 
 import type { WhisperRecord, Enemy, InventoryItem } from './types';
+import { canonicalCellOf, WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from './worldMap';
 import { rollDie } from './rng';
 import { findEnemyByName } from './encounter';
 
@@ -68,6 +69,41 @@ export const CHAINS: ChainDef[] = [
   },
 ];
 
+// ⚠⚠⚠ OTA-1542 — A RENDEZVOUS IS A PLACE, NOT A PAIR OF FRAME COORDINATES.
+// Owner: *"not only was this broken because yulka wasn't there"*. Whisper
+// targets were stored as `targetMapX/targetMapY` — coordinates on a map that
+// travelToLocation RECENTERS on every named arrival — and matched against the
+// player's CURRENT frame coords. Plant the whisper on the road (persuading
+// Nix), cross any named ground, and the stored pair now denotes different
+// dirt: Yulka's camp silently moves, or stops existing anywhere the player can
+// stand. Same disease OTA-1541 cured in room keys, in a second organ.
+//
+// ⚠ THE CURE COSTS NO MIGRATION, because every record already names its own
+// frame: `targetLocationId` is the location the map was centered on at plant
+// time, so `canonCell(targetLocationId) + (targetMap − CENTER)` recovers the
+// absolute cell EXACTLY. New plants also write targetGridX/Y outright; these
+// two readers prefer them and fall back losslessly for old saves.
+export function whisperTargetGrid(w: WhisperRecord): { x: number; y: number } {
+  if (typeof w.targetGridX === 'number' && typeof w.targetGridY === 'number') {
+    return { x: w.targetGridX, y: w.targetGridY };
+  }
+  const c = canonicalCellOf(w.targetLocationId);
+  return { x: c.x + (w.targetMapX - WORLD_MAP_CENTER_X), y: c.y + (w.targetMapY - WORLD_MAP_CENTER_Y) };
+}
+
+/** The thief sub-tile, absolute. Old ctx coords were minted in the plant frame
+ *  (targetMapX + offset), so the same fallback conversion is exact for them. */
+export function whisperThiefGrid(w: WhisperRecord): { x: number; y: number } | null {
+  const gx = w.ctx?.thiefGridX;
+  const gy = w.ctx?.thiefGridY;
+  if (typeof gx === 'number' && typeof gy === 'number') return { x: gx, y: gy };
+  const mx = w.ctx?.thiefMapX;
+  const my = w.ctx?.thiefMapY;
+  if (typeof mx !== 'number' || typeof my !== 'number') return null;
+  const c = canonicalCellOf(w.targetLocationId);
+  return { x: c.x + (mx - WORLD_MAP_CENTER_X), y: c.y + (my - WORLD_MAP_CENTER_Y) };
+}
+
 export function findChain(id: string): ChainDef | undefined {
   return CHAINS.find((c) => c.id === id);
 }
@@ -93,13 +129,15 @@ export function pickTargetTile(
 export function findReadyMeetWhisper(
   whispers: readonly WhisperRecord[] | undefined,
   hoursElapsed: number,
-  playerMapX: number,
-  playerMapY: number,
+  // OTA-1542 — ABSOLUTE cell (playerGridCell), never frame coords.
+  playerGridX: number,
+  playerGridY: number,
 ): WhisperRecord | null {
   if (!whispers) return null;
   for (const w of whispers) {
     if (w.stage !== 'planted') continue;
-    if (w.targetMapX !== playerMapX || w.targetMapY !== playerMapY) continue;
+    const t = whisperTargetGrid(w);
+    if (t.x !== playerGridX || t.y !== playerGridY) continue;
     const hourOfDay = Math.floor(hoursElapsed % 24);
     if (!isHourInWindow(hourOfDay, w.activeFromHour, w.activeToHour)) continue;
     return w;
@@ -112,8 +150,8 @@ export function findReadyMeetWhisper(
  *  carries thiefMapX/Y matching the current tile. */
 export function findReadyFetchWhisper(
   whispers: readonly WhisperRecord[] | undefined,
-  playerMapX: number,
-  playerMapY: number,
+  playerGridX: number,
+  playerGridY: number,
 ): WhisperRecord | null {
   if (!whispers) return null;
   for (const w of whispers) {
@@ -124,9 +162,8 @@ export function findReadyFetchWhisper(
     // (fireYulkaFetch guards against a double-spawn if one is already live), so a
     // player stranded by the old bug can walk back and finish the chain.
     if (w.stage !== 'fetch_in_progress' && w.stage !== 'fetch_active') continue;
-    const tx = w.ctx?.thiefMapX as number | undefined;
-    const ty = w.ctx?.thiefMapY as number | undefined;
-    if (tx === playerMapX && ty === playerMapY) return w;
+    const t = whisperThiefGrid(w);
+    if (t && t.x === playerGridX && t.y === playerGridY) return w;
   }
   return null;
 }
@@ -135,13 +172,14 @@ export function findReadyFetchWhisper(
  *  they're back on Yulka's tile, fire the reward. */
 export function findReadyReturnWhisper(
   whispers: readonly WhisperRecord[] | undefined,
-  playerMapX: number,
-  playerMapY: number,
+  playerGridX: number,
+  playerGridY: number,
 ): WhisperRecord | null {
   if (!whispers) return null;
   for (const w of whispers) {
     if (w.stage !== 'fetch_returned') continue;
-    if (w.targetMapX === playerMapX && w.targetMapY === playerMapY) return w;
+    const t = whisperTargetGrid(w);
+    if (t.x === playerGridX && t.y === playerGridY) return w;
   }
   return null;
 }
@@ -170,7 +208,16 @@ export function describeWhisperStage(whisper: WhisperRecord): string {
   if (whisper.id === 'yulka_discs') {
     switch (whisper.stage) {
       case 'planted':
-        return `Travel south of the outpost. Yulka camps somewhere in tiles 2-3 south, after dark (8 pm to 4 am).`;
+        // OTA-1542 — SAY WHO SENT YOU, AND FROM WHERE. Owner: *"I'm still
+        // trying to figure out if this was the whisper promised by Nix."* The
+        // record never carried its source, and this line always said "south of
+        // the outpost" even when the whisper was granted by a wanderer on the
+        // road — whose camp is 2-3 tiles south of WHERE YOU MET THEM, not of
+        // any outpost. SET COURSE on this card walks to the exact tile either
+        // way; the copy now tells the truth about the reference point.
+        return whisper.source
+          ? `Word from ${whisper.source}: Yulka camps 2-3 tiles south of where you met them, after dark (8 pm to 4 am). SET COURSE below walks you to the spot.`
+          : `Travel south of the outpost. Yulka camps somewhere in tiles 2-3 south, after dark (8 pm to 4 am).`;
       case 'met_yulka':
         return `You're at Yulka's fire. Type 'accept yulka' to take the fetch (5 Discs on return), 'buy from yulka' to pay 50 TC for 5 Discs, or 'leave yulka' to walk.`;
       case 'fetch_in_progress':
@@ -205,29 +252,33 @@ export function describeWhisperTitle(whisper: WhisperRecord): string {
  *  any other chain with a target tile routes there. */
 export function whisperRouteTarget(
   whisper: WhisperRecord,
-): { mapX: number; mapY: number; label: string } | null {
-  const thiefX = whisper.ctx?.thiefMapX as number | undefined;
-  const thiefY = whisper.ctx?.thiefMapY as number | undefined;
-  const hasThief = typeof thiefX === 'number' && typeof thiefY === 'number';
-  const hasTarget = typeof whisper.targetMapX === 'number' && typeof whisper.targetMapY === 'number';
+): { gridX: number; gridY: number; label: string } | null {
+  // OTA-1542 — ABSOLUTE cells out, so a course set today still points at the
+  // dirt the whisper meant, however many recenters happened in between. The
+  // return shape changed on purpose: every consumer breaks at compile time
+  // instead of silently routing in the wrong frame.
+  const thief = whisperThiefGrid(whisper);
+  const target = whisperTargetGrid(whisper);
+  const hasTarget = typeof whisper.targetMapX === 'number' && typeof whisper.targetMapY === 'number'
+    || typeof whisper.targetGridX === 'number';
   if (whisper.id === 'yulka_discs') {
     switch (whisper.stage) {
       case 'fetch_in_progress':
       case 'fetch_active':
-        return hasThief ? { mapX: thiefX!, mapY: thiefY!, label: 'the Silt Thief' } : null;
+        return thief ? { gridX: thief.x, gridY: thief.y, label: 'the Silt Thief' } : null;
       case 'fetch_returned':
-        return hasTarget ? { mapX: whisper.targetMapX, mapY: whisper.targetMapY, label: "Yulka (return the Discs)" } : null;
+        return hasTarget ? { gridX: target.x, gridY: target.y, label: "Yulka (return the Discs)" } : null;
       case 'planted':
       case 'met_yulka':
-        return hasTarget ? { mapX: whisper.targetMapX, mapY: whisper.targetMapY, label: "Yulka's fire" } : null;
+        return hasTarget ? { gridX: target.x, gridY: target.y, label: "Yulka's fire" } : null;
       default:
         return null; // ambush_armed / done — no fixed tile.
     }
   }
   // Generic chains: route to the thief-style sub-tile if one is set, else the
   // whisper's target tile.
-  if (hasThief) return { mapX: thiefX!, mapY: thiefY!, label: describeWhisperTitle(whisper) };
-  if (hasTarget) return { mapX: whisper.targetMapX, mapY: whisper.targetMapY, label: describeWhisperTitle(whisper) };
+  if (thief) return { gridX: thief.x, gridY: thief.y, label: describeWhisperTitle(whisper) };
+  if (hasTarget) return { gridX: target.x, gridY: target.y, label: describeWhisperTitle(whisper) };
   return null;
 }
 
