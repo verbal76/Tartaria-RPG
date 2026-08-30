@@ -26115,6 +26115,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
 // evidence stays greppable.
 export const OTA_BUILD_ID = '2026-08-30-1575-the-stone-marks-you';
+// golem catch-up 2026-08-30: markerless publish of OTA-1575 (the obelisk mark
+// pays a real buff, on a new status semantic that waits for combat).
 // OTA-1575 — the obelisk climb used to charge 2 HP for a memo. The mark now
 // grants +2 WIS for the first 3 rounds of the next fight, which needed a new
 // status semantic: a buff that WAITS for combat instead of ticking away on
