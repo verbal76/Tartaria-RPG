@@ -26115,6 +26115,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
 // evidence stays greppable.
 export const OTA_BUILD_ID = '2026-08-30-1569-the-glyph-brings-its-own-ground';
+// golem catch-up 2026-08-30: markerless publish of OTA-1569 (the coating glyph
+// gets a dark cell of its own so its colour no longer has to survive two
+// opposite chip fills, plus his burnt-orange acid) to the golem channel.
 // golem catch-up 2026-08-30: markerless publish of OTA-1568 (a black halo on the
 // coating glyphs so a colour emoji reads on the light strike chip, and a per-kind
 // colour for the monochrome ones so acid stops borrowing the label's) to the
