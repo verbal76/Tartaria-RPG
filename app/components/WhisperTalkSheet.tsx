@@ -42,12 +42,26 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { findChain, pronounForms } from '../engine/whispers';
+import { findChain, pronounForms, whisperRouteTarget } from '../engine/whispers';
+import { playerGridCell } from '../state/playerGrid';
 
 export function WhisperTalkSheet() {
   const whispers = useGameStore((s) => s.player?.activeWhispers);
   const enemies = useGameStore((s) => s.currentScene?.enemies?.length ?? 0);
   const answer = useGameStore((s) => s.answerWhisper);
+  // OTA-1549 — the course is set from INSIDE the conversation. Owner: "from
+  // that talking screen, we should be able to Auto route and accept from that
+  // instead of typing … that button should be highlighted inside the talk
+  // screen. same as the auto route button."
+  const setWhisperCourse = useGameStore((s) => s.setWhisperCourse);
+  const setScreen = useGameStore((s) => s.setScreen);
+  // The player's ABSOLUTE cell (arb47 / OTA-1542), subscribed so the course
+  // button knows when you are already standing on the objective.
+  // ⚠ Subscribe to the PLAYER (a stable reference between updates) and derive
+  // the cell — a selector returning playerGridCell()'s fresh object every call
+  // hands zustand a new snapshot on every render and spins.
+  const player = useGameStore((s) => s.player);
+  const cell = useMemo(() => (player ? playerGridCell(player) : null), [player]);
   const [open, setOpen] = useState(false);
   const scrollRef = useRef<ScrollView | null>(null);
 
@@ -87,11 +101,30 @@ export function WhisperTalkSheet() {
         : `${c.npcName} — re-read what was said`}
     >
       <Text style={[styles.barText, deciding ? styles.barTextDeciding : styles.barTextQuiet]}>
-        {deciding ? `SPEAK TO ${c.npcName.toUpperCase()}` : `${c.npcName.toUpperCase()} — WHAT ${saidWord} SAID`}
+        {deciding ? `▸ SPEAK TO ${c.npcName.toUpperCase()}` : `${c.npcName.toUpperCase()} — WHAT ${saidWord} SAID`}
       </Text>
-      {deciding && <Text style={styles.barHint}>{waitingWord}</Text>}
+      {deciding && <Text style={styles.barHintDeciding}>{waitingWord}</Text>}
     </TouchableOpacity>
   );
+
+  // ⚠⚠ OTA-1549 — SET COURSE LIVES IN THE CONVERSATION. Owner: *"from that
+  // talking screen, we should be able to Auto route and accept from that
+  // instead of typing."* The route is the SAME whisperRouteTarget the
+  // Contracts panel walks, so the sheet cannot send you anywhere Contracts
+  // wouldn't — and it is stage-aware, so after ACCEPT the very same button
+  // re-aims from the giver's fire onto the mark's tile without being re-read.
+  const route = whisperRouteTarget(w);
+  // ⚠ SUBSCRIBED, not snapshotted: the player's cell moves under this
+  // component (the course walks them a tile at a time), and a getState() read
+  // would leave the button offering a walk to ground they are standing on.
+  const here = !!route && cell != null && cell.x === route.gridX && cell.y === route.gridY;
+
+  const takeCourse = () => {
+    if (!route) return;
+    setWhisperCourse(route.gridX, route.gridY, route.label);
+    setOpen(false);
+    setScreen('exploration');
+  };
 
   const choose = (choice: 'accept' | 'buy' | 'leave') => {
     answer(choice);
@@ -149,6 +182,23 @@ export function WhisperTalkSheet() {
                 </Text>
               ))}
             </ScrollView>
+
+            {/* ⚠⚠ OTA-1549 — the route rides ABOVE the decision buttons and
+                stays through every stage: while deciding it is the walk to the
+                fire you are already at (so it is hidden — `here`), and the
+                moment you ACCEPT it re-aims at the mark without the sheet
+                closing. Filled, like the SPEAK chip: a thing you can use now. */}
+            {route && !here && (
+              <TouchableOpacity
+                style={styles.routeBtn}
+                onPress={takeCourse}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel={`Set course to ${route.label}`}
+              >
+                <Text style={styles.routeBtnText}>▸ SET COURSE TO {route.label.toUpperCase()}</Text>
+              </TouchableOpacity>
+            )}
 
             {deciding ? (
               <>
@@ -222,14 +272,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     marginBottom: 6,
   },
-  // Undecided: the loudest row on the screen — she asked you to decide NOW.
-  barDeciding: { backgroundColor: '#2a1f12', borderColor: '#f0c96a' },
-  // Decided: a quiet re-read handle, not a demand.
+  // ⚠⚠⚠ OTA-1549 — UNDECIDED IS FILLED, NOT OUTLINED. Owner: *"in the yulka
+  // what she said button I didn't even see that thing. maybe if that button is
+  // active and can be used we make it a different color, or we make it filled
+  // in like we do the weapons that can be used during combat."* An outlined
+  // gold-on-soot row above the input slot reads as chrome; the game's own
+  // convention for A THING YOU CAN USE RIGHT NOW is a filled plate. So the
+  // waiting state is solid gold with dark text — the loudest row on the
+  // screen, because someone is standing there waiting on an answer.
+  barDeciding: { backgroundColor: '#f0c96a', borderColor: '#f7dc9a' },
+  // Decided: back to a quiet outlined re-read handle, not a demand.
   barQuiet: { backgroundColor: '#17150f', borderColor: '#3a342c' },
   barText: { fontSize: 13, fontWeight: '700', letterSpacing: 1.5 },
-  barTextDeciding: { color: '#f0c96a' },
+  barTextDeciding: { color: '#241a09' },
   barTextQuiet: { color: '#a2977b' },
   barHint: { color: '#a2977b', fontSize: 11, fontStyle: 'italic' },
+  // The hint rides ON the filled plate while deciding, so it needs the dark ink.
+  barHintDeciding: { color: '#4a3714', fontSize: 11, fontStyle: 'italic' },
   backdrop: {
     flex: 1,
     justifyContent: 'center',
@@ -295,6 +354,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: '#13110f',
   },
+  // OTA-1549 — the in-sheet course button, in the SET COURSE blue every other
+  // route control in the game already uses (ContractsScreen.routeBtn), but
+  // FILLED rather than outlined, because in here it is the live action.
+  routeBtn: {
+    backgroundColor: '#22364e',
+    borderColor: '#6f93c4',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  routeBtnText: { color: '#cfe2ff', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
   primaryBtn: {
     borderColor: '#c9a86a',
     borderWidth: 1,

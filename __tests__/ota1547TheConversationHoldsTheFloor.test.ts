@@ -160,7 +160,9 @@ describe('OTA-1547 — the sheet and the typed commands are one road', () => {
   it('⚠⚠⚠ the bar is loud while the giver waits and quiet afterwards — and only while the instance lives', () => {
     const code = codeOnly(SHEET);
     expect(code).toContain("const deciding = w.stage === 'met_yulka';");
-    expect(code).toContain('`SPEAK TO ${c.npcName.toUpperCase()}`');
+    // ⚠ OTA-1549 added the ▸ every live control in the game wears, when the
+    // owner reported he could not see this bar at all. The NAME is the pin.
+    expect(code).toContain('SPEAK TO ${c.npcName.toUpperCase()}');
     expect(code).toContain("(x.talk?.length ?? 0) > 0 && x.stage !== 'done' && x.stage !== 'ambush_armed'");
   });
 

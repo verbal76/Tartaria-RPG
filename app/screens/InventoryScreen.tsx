@@ -506,6 +506,44 @@ export function InventoryScreen() {
     list.push(slot);
     equippedSlotsById.set(id, list);
   }
+  // ⚠⚠⚠ OTA-1550 — THE NAME FALLBACK MUST NOT OUTRANK AN ID THAT ALREADY
+  // ANSWERED. Owner, on the APPLY ACID FLASK picker: *"why is cudgel listed
+  // twice if I can only hold one in my hand at a time"* — and both rows read
+  // EQUIPPED (MAIN HAND).
+  //
+  // He was holding an Acid-Etched Cudgel and carrying a plain Cudgel. A
+  // coating changes the DISPLAY name (coatedDisplayName), not the stored
+  // `item.name`, and `equipped.main` stores a NAME — so both instances answer
+  // to "Cudgel". equippedSlotLabelFor resolved the held one exactly by
+  // `mainId`, then, for the pack one, missed on id and fell through to the
+  // by-name map — which still said main hand. One slot, claimed twice.
+  //
+  // The fallback exists for pre-id saves and has to stay, so it is narrowed
+  // rather than removed: a slot whose instance id is SET has already been
+  // resolved exactly and must never be re-matched by name. Same discipline
+  // the EQUIPPED badge's own `hasIdForThisName` guard uses two blocks up —
+  // this reader was simply the one that never got it.
+  const legacySlotsByName = new Map<string, EquipSlot[]>();
+  const nameIdSlotTriples: Array<[EquipSlot, string | undefined, string | undefined]> = [
+    ['main', player.equipped?.main, eq.mainId],
+    ['off', player.equipped?.off, eq.offId],
+    ['head', player.equipped?.head, eq.headId],
+    ['chest', player.equipped?.chest, eq.chestId],
+    ['hands', player.equipped?.hands, eq.handsId],
+    ['legs', player.equipped?.legs, eq.legsId],
+    ['feet', player.equipped?.feet, eq.feetId],
+    ['cloak', player.equipped?.cloak, eq.cloakId],
+    ['amulet', player.equipped?.amulet, eq.amuletId],
+    ['ring', player.equipped?.ring, eq.ringId],
+    ['ring', player.equipped?.ring2, eq.ring2Id],
+    ['ring', player.equipped?.ring3, eq.ring3Id],
+  ];
+  for (const [slot, name, id] of nameIdSlotTriples) {
+    if (!name || id) continue; // an id-bearing slot is settled — never by name
+    const list = legacySlotsByName.get(name) ?? [];
+    list.push(slot);
+    legacySlotsByName.set(name, list);
+  }
   const equippedSlotLabelFor = (item: InventoryItem): string => {
     // OTA-685 — a dog vest reads "(on <dogname>)", since it's worn on the dog,
     // not in a player slot. OTA — matched by INSTANCE ID via the shared
@@ -515,7 +553,11 @@ export function InventoryScreen() {
       return dogForVest?.name ? `on ${dogForVest.name}` : 'on your dog';
     }
     let slots = equippedSlotsById.get(item.id);
-    if (!slots || slots.length === 0) slots = slotsByEquippedName.get(item.name) ?? [];
+    // ⚠ OTA-1550 — the LEGACY-ONLY map (slots with no instance id). Using the
+    // full by-name map here tagged a pack duplicate as equipped whenever the
+    // held instance shared its stored name — the owner's two Cudgels, both
+    // reading EQUIPPED (MAIN HAND).
+    if (!slots || slots.length === 0) slots = legacySlotsByName.get(item.name) ?? [];
     if (slots.length === 0) return '';
     // Two-handed weapons take both hands by design — keep the existing wording.
     if (findWeaponByName(item.name)?.style === 'two_handed') return 'two-handed';

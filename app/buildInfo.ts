@@ -25509,7 +25509,42 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // player following the prose on foot could never have found her. Data flipped
 // to [2,3], and every chain's plant-line direction is now suite-locked
 // against its offset so the class cannot be authored again.
-export const OTA_BUILD_ID = '2026-08-29-1548-twenty-more-fires-in-the-dark';
+// OTA-1549 - THE BUTTON YOU CAN SEE, AND THE ROAD YOU CAN TAKE FROM INSIDE.
+// Owner on the 1547 bar: "in the yulka what she said button I didn't even see
+// that thing. maybe if that button is active and can be used we make it a
+// different color, or we make it filled in like we do the weapons that can be
+// used during combat. And from that talking screen, we should be able to Auto
+// route and accept from that instead of typing." Two fixes. (1) AN OUTLINED
+// ROW IS CHROME: 1547 shipped the bar gold-on-soot with a one-pixel border -
+// the same treatment the screen's furniture wears - so the one control between
+// the player and a person waiting on an answer read as decoration. The game
+// already has a vocabulary for A THING YOU CAN USE RIGHT NOW (the filled plate
+// on an in-reach weapon), so the waiting state wears it: solid gold ground,
+// dark ink, a chevron - and drops back to the quiet outline once the decision
+// is made and the bar is only a re-read handle. (2) SET COURSE LIVES IN THE
+// CONVERSATION: the sheet carries its own route control, filled in the house
+// SET-COURSE blue, driven by the SAME whisperRouteTarget the Contracts panel
+// uses, so the two can never send you to different dirt. Stage-aware for free
+// - hidden while you stand at the fire, and the instant you ACCEPT (which
+// keeps the sheet open, per 1547) the very same button re-aims at the mark.
+// OTA-1550 - ONE SLOT, ONE WEAPON. Owner, on the APPLY ACID FLASK picker with
+// two rows both reading EQUIPPED (MAIN HAND): "why is cudgel listed twice if I
+// can only hold one in my hand at a time". He had a plain Cudgel and an
+// Acid-Etched Cudgel. A coating changes the DISPLAY name (coatedDisplayName),
+// not the stored item.name, and equipped.main stores a NAME - so both
+// instances answer to "Cudgel". equippedSlotLabelFor resolved the held one
+// EXACTLY by equipped.mainId, then, for the other instance, missed on id and
+// fell through to a by-name map built from every slot - which still said main
+// hand. One hand, claimed by two weapons. The fallback exists for pre-id saves
+// and has to stay, so it is NARROWED rather than removed: a slot whose
+// instance id is set has already answered and is never re-matched by name -
+// the same discipline the EQUIPPED badge's own hasIdForThisName guard two
+// blocks up already used. (First cut of the fix read `eq.mainId` above `const
+// eq = ...` and took the whole inventory screen down with a TDZ
+// ReferenceError; the suite pins the ordering now.)
+export const OTA_BUILD_ID = '2026-08-29-1550-one-slot-one-weapon';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1549-the-button-you-can-see';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1548-twenty-more-fires-in-the-dark';
 // golem catch-up 2026-08-29: markerless publish of OTA-1548 (the whisper
 // machine goes data-driven off ChainDef.content + twenty new chains, twenty-
 // three new Human marks, Yulka's camp finally on the south side her prose
