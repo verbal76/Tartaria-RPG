@@ -153,7 +153,13 @@ describe('OTA-1563 — seven weapons were promising it in verbs nobody read', ()
     // between the two words, and was handed a permanent unconditional shield-
     // break on every swing: a Rare quietly out-performing the Legendary that has
     // to earn the same thing.
-    expect(row('Bone Spear Launcher').effect).toContain('third max roll');
+    // ⚠ RETARGETED BY OTA-1564, which took the ordinal OUT of this weapon's line
+    // for the same reason the guard existed. Pinned against the literal wording
+    // rather than the catalog row, so the guard stays tested even though nothing
+    // in the data uses that shape any more — which is the only way a leak this
+    // quiet stays closed.
+    expect(parseWeaponEffect('Bypasses shields permanently on third max roll.')?.armorIgnore).toBeUndefined();
+    expect(parseWeaponEffect('Ignores armor on 5th max roll.')?.armorIgnore).toBeUndefined();
     expect(parseWeaponEffect(row('Bone Spear Launcher').effect)?.armorIgnore).toBeUndefined();
     expect(parseWeaponEffect('Bypasses shields on rolls of 18+.')?.armorIgnore).toBeUndefined();
     expect(parseWeaponEffect(row('Plasma Executioner\'s Axe').effect)?.armorIgnore).toBeUndefined();

@@ -612,9 +612,11 @@ export function buildCombatSteps(
   // exact distinction OTA-957 had to fix for the ranged/melee split. A
   // caller-side lookup would pierce with the main hand's weapon on every
   // off-hand swing.
-  const armorPierce = equipped
-    ? armorIgnoreReduction(parseWeaponEffect(equipped.effect)?.armorIgnore, enemy)
-    : 0;
+  const swungEffect = equipped ? parseWeaponEffect(equipped.effect) : null;
+  const armorPierce = equipped ? armorIgnoreReduction(swungEffect?.armorIgnore, enemy) : 0;
+  // ⚠ OTA-1564 — clamped at 4 so a mis-authored "fires 20 bolts per round" is a
+  // strong weapon rather than a one-shot for the rest of the game.
+  const shotsPerRound = Math.max(1, Math.min(4, swungEffect?.shotsPerRound ?? 1));
   const ac = Math.max(1, enemyAC(enemy) - Math.max(0, opts?.acReduction ?? 0) - armorPierce);
   const enemyInit = rollDie(10);
   // Use equipped damage dice if available; parse "2d6" or "1d10+1d6".
@@ -771,7 +773,15 @@ export function buildCombatSteps(
       id: 'damage',
       label: 'Roll for DAMAGE',
       sides: dmg.sides,
-      count: (perfectOpening || backstab) ? dmg.count * 2 : dmg.count,
+      // ⚠⚠⚠ OTA-1564 — A REPEATER ACTUALLY FIRES MORE THAN ONCE. Three weapons
+      // say so on the card — "Fires twice per round", "Fires 2 bolts per round",
+      // "Fires 3 bolts per round" — and all three fired exactly once. Extra shots
+      // arrive as extra DICE on the one damage roll rather than as extra roll
+      // steps, because a second dice modal per swing would change the rhythm of
+      // every fight, and because the multiplier then rides the same line a crit,
+      // a backstab and a perfect opening already use: one place decides how many
+      // dice a swing throws, so the four can never disagree.
+      count: ((perfectOpening || backstab) ? dmg.count * 2 : dmg.count) * shotsPerRound,
       bonus: damageBonus + aetherSurge + runeBonus.total,
       bonusLabel: [
         damageBonus !== 0 ? `${damageBonus > 0 ? '+' : ''}${damageBonus} (race)` : '',
@@ -783,7 +793,7 @@ export function buildCombatSteps(
           ? `+${runeBonus.total} (${runeBonus.slots} rune ${runeBonus.slots === 1 ? 'passive' : 'passives'} × ${String(runeBonus.stat).slice(0, 3).toUpperCase()})`
           : '',
       ].filter(Boolean).join(' '),
-      context: `damage dealt to ${enemy.name}${damageTypeNote}${perfectOpening ? ' — PERFECT OPENING (double dice)' : backstab ? ' — BACKSTAB (double dice)' : ''}`,
+      context: `damage dealt to ${enemy.name}${damageTypeNote}${perfectOpening ? ' — PERFECT OPENING (double dice)' : backstab ? ' — BACKSTAB (double dice)' : ''}${shotsPerRound > 1 ? ` — ${shotsPerRound}-SHOT VOLLEY` : ''}${swungEffect?.maxRollFloor ? ` — ${swungEffect.maxRollFloor}+ counts as max` : ''}`,
       // no target — always applies if the attack hit
     },
   ];

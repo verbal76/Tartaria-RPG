@@ -298,8 +298,13 @@ describe('OTA-1562 — the wiring', () => {
     // OTA-957 is the precedent: a caller-side lookup read the main hand on every
     // off-hand swing, and a point-blank bonus landed on a blade. `equipped` in
     // buildCombatSteps is already resolved for the hand that swings.
-    expect(RULES).toContain('const armorPierce = equipped');
-    expect(RULES).toContain("armorIgnoreReduction(parseWeaponEffect(equipped.effect)?.armorIgnore, enemy)");
+    // ⚠ RETARGETED BY OTA-1564, which lifted the parse into a shared
+    // `swungEffect` (the multi-shot multiplier needs the same weapon). The
+    // PROPERTY is unchanged and is what this pins: both reads come off
+    // `equipped`, which buildCombatSteps has already resolved for the hand that
+    // swings, so neither can drift onto the other hand.
+    expect(RULES).toContain('const swungEffect = equipped ? parseWeaponEffect(equipped.effect) : null;');
+    expect(RULES).toContain('const armorPierce = equipped ? armorIgnoreReduction(swungEffect?.armorIgnore, enemy) : 0;');
   });
 
   it('⚠⚠⚠ the range note is resolved ABOVE every branch of playerWeaponReach', () => {

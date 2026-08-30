@@ -23,7 +23,7 @@
 import { rollFromNotation } from './rng';
 import { enemyIsAerial, armorACPortions, PLATE_TRAIT_AC } from './enemyTraits';
 import { reachBandsFor } from './types';
-import type { CombatRange, Enemy } from './types';
+import type { CombatRange, Enemy, Stats } from './types';
 
 export type BonusCondition =
   | 'large'
@@ -79,6 +79,53 @@ export interface ArmorIgnore {
   points?: number;
 }
 
+/**
+ * ⚠⚠⚠ OTA-1564 (slice 1b) — WHAT HAPPENS WHEN THE DICE COME UP PERFECT. The
+ * catalog says "on a max roll" on TWENTY-SIX weapons and nothing anywhere reads
+ * it. (My own estimate when I split the slices was four. That was wrong by more
+ * than six times, and worth saying plainly: the max-roll family is the single
+ * largest unread promise in the game.) Every payload differs — bonus damage,
+ * stun, knockback, an execute — but they all wait on the SAME question, so the
+ * trigger is built once here and the payloads read it.
+ *
+ * ⚠⚠ WHY THIS IS RISKIER THAN 1a, IN ONE SENTENCE: 1a adjusted a number BEFORE
+ * the roll; everything here is decided AFTER one, and some of it has to be
+ * remembered into the next round. That is the whole difference, and it is why
+ * the payloads landed in this slice are only the ones that ride machinery that
+ * already exists.
+ */
+export interface OnMaxRoll {
+  /** "+1d6 on max roll" / "+1d6 fire damage on max roll". */
+  bonusDice?: string;
+  /** "+5 Aetheric damage on max roll". */
+  bonusFlat?: number;
+  /** "Reduces enemy armor by 1d6 on max roll" — rides the OTA-362 shred lever. */
+  shredDice?: string;
+  /** "Ignores armor on a max damage roll" / "Splits shields on a max roll". The
+   *  attack roll is long resolved by the time a damage die lands, so this cannot
+   *  lower the AC that was already beaten — what it does instead is OPEN the
+   *  guard from here on, through the same shred the acid coating writes. */
+  pierce?: 'armor' | 'shields';
+  /** "+2 STR (permanent, once) on a max damage roll". Kept in this slice — and
+   *  the ordinal versions of it were not — because write-once-forever needs a
+   *  flag, where "on the 5th max roll" needs a tally that survives a round, a
+   *  fight and a save/load. */
+  permanentStat?: { stat: keyof Stats; amount: number };
+}
+
+/** "Natural 1 → overheat, useless 2 rounds." A weapon that punishes you later. */
+export interface OverheatSpec {
+  /** Rounds the weapon is unusable. */
+  rounds: number;
+  /** "1d6 self damage" on the Aetheric Hand Cannon's overload. */
+  selfDice?: string;
+  /** A jam is confirmed by a second roll rather than automatic (Rust Rifle). */
+  confirmed?: boolean;
+  /** The word the weapon itself uses, so the Arbiter's line sounds like the
+   *  weapon and not like a generic failure. */
+  word: 'overheat' | 'overload' | 'jam';
+}
+
 export interface ParsedWeaponEffect {
   /** Every "+NdN against X" clause on the weapon, each stacking additively. */
   bonuses?: Array<{ dice: string; condition: BonusCondition }>;
@@ -86,9 +133,21 @@ export interface ParsedWeaponEffect {
   onHitBurn?: boolean;
   /** OTA-1562 — "short range" / "long range" / "at any range". */
   rangeNote?: WeaponRangeNote;
-  /** OTA-1562 — an unconditional armour piercer. See the note above on why
-   *  outcome-gated ignores are NOT parsed into this field. */
+  /** OTA-1562 — an UNCONDITIONAL armour piercer. Outcome-gated ignores are not
+   *  parsed into this field; they arrive as `onMaxRoll.pierce` instead. */
   armorIgnore?: ArmorIgnore;
+  /** OTA-1564 — the payload owed when the damage dice come up perfect. */
+  onMaxRoll?: OnMaxRoll;
+  /** OTA-1564 — "Rolls of 19+ count as max roll" (Plasma Cutter). Widens the
+   *  trigger without adding a payload: the weapon's whole identity is that it
+   *  maxes out more often than anything else. */
+  maxRollFloor?: number;
+  /** OTA-1564 — "Fires twice per round" / "Fires 3 bolts per round". */
+  shotsPerRound?: number;
+  /** OTA-1564 — the round cost a repeater pays for that volume. */
+  reloadRounds?: number;
+  /** OTA-1564 — "Natural 1 → overheat, useless 2 rounds." */
+  overheat?: OverheatSpec;
 }
 
 /**
@@ -159,6 +218,93 @@ function armorIgnoreFromClause(clause: string): ArmorIgnore | null {
   if (/\barmou?r\b|\bdefen[cs]es?\b/.test(clause)) return { scope: 'all' };
   return { scope: 'shields' };
 }
+
+/** True when a clause hangs its effect on the dice coming up perfect. */
+const MAX_ROLL_RE = /\bmax(?:imum)?\s+(?:damage\s+)?rolls?\b|\bon\s+all\s+max\s+roll\b/;
+
+/**
+ * ⚠⚠ OTA-1564 — READ THE PAYLOAD OFF THE CLAUSE THAT CARRIES THE TRIGGER, not
+ * off the line. "+1d6 energy; bypasses shield on max rolls" has TWO effects and
+ * only the second one waits on a max roll — reading the line as a whole would
+ * make the flat +1d6 conditional and hand the player a weapon that is worse than
+ * its card most of the time. Same reason 1562 split armour-ignore by clause.
+ */
+/**
+ * ⚠⚠⚠ AN ORDINAL IS A TALLY, AND A TALLY IS NOT THIS SLICE. "on 5th max roll",
+ * "on first max roll", "on third max roll" each need a count that survives a
+ * round, a fight and a save/load — the same bookkeeping the owner had removed
+ * from the game with the per-encounter charge. Three weapons carried one and all
+ * three would have fired on EVERY max roll without this guard: a Legendary's
+ * signature payoff turning up several times a fight instead of once.
+ */
+const ORDINAL_GATED_RE = /\b(?:first|second|third|fourth|fifth|\d+(?:st|nd|rd|th))\s+max\b/;
+
+const STAT_WORD: Record<string, keyof Stats> = {
+  str: 'strength', dex: 'dexterity', int: 'intelligence',
+  wis: 'wisdom', cha: 'charisma', ste: 'stealth',
+};
+
+function onMaxRollFrom(text: string): OnMaxRoll | null {
+  const out: OnMaxRoll = {};
+  let touched = false;
+  for (const clause of text.split(/[.;]/)) {
+    if (!MAX_ROLL_RE.test(clause)) continue;
+    if (ORDINAL_GATED_RE.test(clause)) continue;
+    // ⚠ A PERMANENT STAT GAIN IS NOT DAMAGE, and reading it as damage is the
+    // exact mistake the first draft made: "+2 STR (permanent)" became +2 to the
+    // hit. Claim the clause before the bonus-damage patterns can see the number.
+    const stat = clause.match(/\+\s*(\d+)\s*(str|dex|int|wis|cha|ste)\w*/);
+    if (stat && /\bpermanent\b/.test(clause)) {
+      out.permanentStat = { stat: STAT_WORD[stat[2]!]!, amount: parseInt(stat[1]!, 10) };
+      touched = true;
+      continue;
+    }
+    // Bonus damage — dice first, because "+1d6" and "+5" both start with '+'.
+    const dice = clause.match(/\+\s*(\d+d\d+)/);
+    if (dice) { out.bonusDice = dice[1]!; touched = true; }
+    else {
+      const flat = clause.match(/\+\s*(\d+)\s/);
+      if (flat) { out.bonusFlat = parseInt(flat[1]!, 10); touched = true; }
+    }
+    // "Reduces enemy armor by 1d6 on max roll" — the shred family, which has a
+    // lever already (the acid coating writes the same number).
+    const shred = clause.match(/reduces?\s+enemy\s+armou?r\s+by\s+(\d+d\d+|\d+)/);
+    if (shred) { out.shredDice = shred[1]!; touched = true; }
+    // A pierce that waits on the roll. `armorIgnoreFromClause` deliberately
+    // refuses these (see IGNORE_DEFERRED_RE); this is where they land instead.
+    if (/\bignor\w*|\bsplits?\b|\bbypass\w*|\bpierces?\b|\bcuts?\s+through\b/.test(clause)) {
+      if (/\barmou?r\b|\bdefen[cs]es?\b/.test(clause)) { out.pierce = 'armor'; touched = true; }
+      else if (/\bshields?\b/.test(clause)) { out.pierce = 'shields'; touched = true; }
+    }
+  }
+  return touched ? out : null;
+}
+
+/**
+ * ⚠⚠ OTA-1564 — THE WEAPON THAT PUNISHES YOU LATER. Four firearms say a natural
+ * 1 costs them rounds, and `ActionReferenceScreen` has documented the rule to
+ * players the whole time — *"Roll a natural 1 on a firearm: jam."* — while no
+ * code has ever applied it. That is the same defect as an unread effect column,
+ * only worse, because it is printed in the rulebook screen.
+ */
+function overheatFrom(text: string): OverheatSpec | null {
+  if (!/\bnatural\s*1\b/.test(text)) return null;
+  const word: OverheatSpec['word'] =
+    /\boverload\b/.test(text) ? 'overload' : /\bjam\b/.test(text) ? 'jam' : 'overheat';
+  if (!/\boverheat|\boverload|\bjam\b/.test(text)) return null;
+  const rounds = text.match(/useless\s+(\d+)\s+(?:rounds?|turns?)/);
+  const self = text.match(/(\d+d\d+)\s+self\s+damage/);
+  return {
+    // A jam with no stated duration costs one round — the action the rulebook
+    // screen already says you spend clearing it.
+    rounds: rounds ? parseInt(rounds[1]!, 10) : 1,
+    ...(self ? { selfDice: self[1]! } : {}),
+    ...(/\breroll\b/.test(text) ? { confirmed: true } : {}),
+    word,
+  };
+}
+
+const WORD_COUNT: Record<string, number> = { twice: 2, three: 3, thrice: 3, two: 2, four: 4 };
 
 function rangeNoteFrom(text: string): WeaponRangeNote | null {
   if (/\bat any range\b/.test(text)) return 'any';
@@ -330,6 +476,26 @@ export function parseWeaponEffect(effect: string | undefined | null): ParsedWeap
     touched = true;
   }
 
+  // ── OTA-1564 (slice 1b) — the outcome-gated families ──────────────────────
+  const onMax = onMaxRollFrom(text);
+  if (onMax) { out.onMaxRoll = onMax; touched = true; }
+
+  // "Rolls of 19+ count as max roll" — the Plasma Cutter's entire identity.
+  const floor = text.match(/rolls?\s+of\s+(\d+)\s*\+?\s+count\s+as\s+(?:a\s+)?max/);
+  if (floor) { out.maxRollFloor = parseInt(floor[1]!, 10); touched = true; }
+
+  // "Fires twice per round" / "Fires 2 bolts per round" / "Fires 3 bolts…".
+  const shots = text.match(/fires?\s+(\w+)\s+(?:bolts?\s+)?per\s+round/);
+  if (shots) {
+    const n = /^\d+$/.test(shots[1]!) ? parseInt(shots[1]!, 10) : (WORD_COUNT[shots[1]!] ?? 0);
+    if (n >= 2) { out.shotsPerRound = n; touched = true; }
+  }
+  const reload = text.match(/needs?\s+(\d+)\s+rounds?\s+to\s+reload/);
+  if (reload) { out.reloadRounds = parseInt(reload[1]!, 10); touched = true; }
+
+  const oh = overheatFrom(text);
+  if (oh) { out.overheat = oh; touched = true; }
+
   return touched ? out : null;
 }
 
@@ -382,4 +548,66 @@ export function rollEffectBonusDamage(
     if (effectConditionMatches(b.condition, enemy)) total += rollFromNotation(b.dice);
   }
   return total;
+}
+
+/**
+ * ⚠⚠⚠ OTA-1564 — DID THIS SWING COME UP PERFECT? One reader, because twenty-six
+ * weapons ask the same question and twenty-six local copies of it is how two of
+ * them end up disagreeing about what "max" means on a crit.
+ *
+ * ⚠⚠ IT READS THE FACES, NOT THE TOTAL. `total` carries the STR bonus, the race
+ * bonus, the rune passives and the aether surge, so a well-built character would
+ * clear any total-based threshold on ordinary dice and proc a Legendary's signature
+ * effect every single swing. Every DIE at its top face is the only reading that
+ * means what the card says.
+ *
+ * ⚠⚠ AND IT SURVIVES DOUBLED DICE. A crit, a backstab and a perfect opening all
+ * double `count`, and a multi-shot weapon multiplies it further — so the check is
+ * "every die that was actually rolled", never a comparison against the weapon's
+ * printed dice count, which would silently stop firing on exactly the biggest
+ * swings in the game.
+ *
+ * `floor` is the Plasma Cutter's *"Rolls of 19+ count as max roll"*: the bar drops
+ * for that weapon and nothing else changes.
+ */
+export function damageRollIsMax(
+  step: { values?: number[]; sides?: number } | null | undefined,
+  floor?: number | null,
+): boolean {
+  const values = step?.values;
+  const sides = step?.sides ?? 0;
+  if (!values || values.length === 0 || sides <= 0) return false;
+  // A floor above the die's own top face can never be met — treat it as "max",
+  // so a mis-authored "rolls of 19+" on a d6 weapon is merely strict, not broken.
+  const bar = floor && floor > 0 ? Math.min(floor, sides) : sides;
+  return values.every((v) => v >= bar);
+}
+
+/** The damage the max-roll payload adds, rolled. 0 when nothing is owed. */
+export function rollMaxRollBonus(spec: OnMaxRoll | null | undefined): number {
+  if (!spec) return 0;
+  let total = spec.bonusFlat ?? 0;
+  if (spec.bonusDice) total += rollFromNotation(spec.bonusDice);
+  return total;
+}
+
+/**
+ * ⚠⚠ HOW MUCH GUARD A MAX ROLL OPENS. The attack roll is long resolved by the
+ * time a damage die lands, so a pierce owed "on a max damage roll" cannot lower
+ * an AC that has already been beaten. What it CAN do is leave the guard open:
+ * the same `enemyArmorShred` lever the acid coating writes, which every later
+ * swing in the fight already reads. `shredDice` is the authored amount; a
+ * `pierce` with no number opens what armour there is.
+ */
+export function maxRollShredAmount(
+  spec: OnMaxRoll | null | undefined,
+  enemy: { traits?: readonly string[]; name?: string; type?: string } | null | undefined,
+): number {
+  if (!spec || !enemy) return 0;
+  if (spec.shredDice) {
+    return /d/.test(spec.shredDice) ? rollFromNotation(spec.shredDice) : parseInt(spec.shredDice, 10) || 0;
+  }
+  if (!spec.pierce) return 0;
+  const { plate, field } = armorACPortions(enemy.traits);
+  return spec.pierce === 'shields' ? field : plate + field;
 }

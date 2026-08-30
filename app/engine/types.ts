@@ -981,6 +981,15 @@ export type StatusEffectKind =
   // (consumed in applyEnemyCounter), the rest land normally. Distinct from
   // the retired 'blocking' so no legacy cached effect resurrects into it.
   | 'shield_block'
+  // ⚠⚠⚠ OTA-1564 — THE WEAPON IS OUT OF ACTION. Four firearms say a natural 1
+  // costs them rounds ("overheat, useless 2 rounds", "overload: 1d6 self damage",
+  // "may jam"), and ActionReferenceScreen has told players the rule the whole
+  // time — "Roll a natural 1 on a firearm: jam. Spend an action to clear." — with
+  // no code anywhere applying it. One kind serves overheat, overload, jam AND a
+  // repeater's reload, because they are the same shape: this weapon cannot be
+  // swung for N rounds. `label` carries the weapon's NAME, so a jammed sidearm
+  // never locks the blade in the other hand.
+  | 'weapon_overheated'
   // Action-card status effects. Each one is a one-round die modifier
   // routed through rollMods() in combatRules.ts.
   | 'aiming'         // +2 on next ranged attack vs the same target
@@ -1123,6 +1132,12 @@ export interface MainQuestState {
 }
 
 export interface PlayerCharacter {
+  /** ⚠⚠ OTA-1564 — weapon NAMES whose "permanent, once" max-roll payout has
+   *  already been collected. Two Legendaries in the catalog grant a permanent
+   *  stat point on a perfect strike; without this the same weapon would pay out
+   *  on every max roll for the rest of the character's life. Keyed by name (not
+   *  instance id) so a second copy of the same weapon cannot claim it twice. */
+  permanentStatWeapons?: string[];
   name: string;
   raceId: string;
   factionId: string;

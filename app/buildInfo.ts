@@ -25862,7 +25862,59 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // came out stronger than its own sentence. "Reduces enemy armor by N" is still
 // deliberately NOT a piercing verb: that is a lasting shred, which the acid
 // path already models, and folding it in would make it permanent and free.
-export const OTA_BUILD_ID = '2026-08-30-1563-nobodys-weapon-gets-worse';
+// OTA-1564 - WHEN THE DICE COME UP PERFECT (slice 1b). I UNDERCOUNTED THIS
+// SLICE BY SIX TIMES. When slice 1 was split by risk the threshold family was
+// called "(4)". The catalog says "on a max roll" on TWENTY-SIX weapons and
+// nothing anywhere has ever read one - the single largest unread promise in the
+// game, larger than the armour-ignore family that took two whole OTAs.
+//
+// WHY 1b IS RISKIER THAN 1a, IN ONE SENTENCE: 1a adjusted a number BEFORE the
+// roll; everything here is decided AFTER one, and some of it has to be
+// remembered into the next round, which is where a bug survives a save/load
+// instead of showing up on the next swing. So the trigger is built once and only
+// the payloads that ride machinery already in the game are wired.
+//
+// THE TRIGGER READS THE FACES, NEVER THE TOTAL. `total` carries STR, the race
+// bonus, rune passives and the aether surge - any total-based bar would be
+// cleared on ordinary dice by a well-built character and every Legendary's
+// signature would fire on every swing. It also survives DOUBLED dice, because a
+// crit, a backstab, a perfect opening and a repeater all multiply the count, and
+// a check against the printed dice count would go quiet on exactly the biggest
+// swings in the game. The Plasma Cutter's "rolls of 19+ count as max roll" drops
+// the bar for that weapon and nothing else.
+//
+// THE OWNER'S CUT, VERBATIM: "1b, do all except the once per encounter one.
+// remove that from the game." Every per-encounter/per-day charge is a bank the
+// game must open at the start of a fight, spend, remember and close - and the
+// Plasma Scythe's was DECLINABLE, which is a modal plus saved state plus a
+// cleanup. Three weapons carried one; all three now say the plain effect
+// underneath. THAT CUT WAS EXTENDED TO ORDINALS - "on 5th max roll", "on first
+// max roll", "on third max roll" - which is the same bookkeeping in different
+// words: four more weapons, and without the guard all of them fired on EVERY max
+// roll. A PERMANENT stat gain was KEPT, because write-once-forever needs only a
+// flag saying it already happened, keyed by weapon name so two copies of the
+// same Legendary cannot pay out twice.
+//
+// LANDED: bonus damage (7), the armour shred and the after-the-roll pierce - a
+// pierce owed on a max DAMAGE roll cannot lower an AC the attack already beat,
+// so it leaves the guard OPEN through OTA-362's shred instead, which is both
+// implementable and closer to what "splits shields" means - the permanent stat
+// (2), the multi-shot repeaters (3, as extra dice on the one damage roll rather
+// than a second dice modal per swing), and the overheat family (4). That last
+// one closes a rule the ACTION REFERENCE SCREEN has printed to players the whole
+// time - "Roll a natural 1 on a firearm: jam. Spend an action to clear." - with
+// no code anywhere applying it, which is the worst version of this defect
+// because the player was told to plan around it. It hangs off the ATTACK roll,
+// not the damage roll, because a natural 1 is a MISS and the damage step never
+// runs. The lock is by weapon NAME so a seized sidearm never freezes the blade
+// in the other hand, and the refusal sits above the stamina spend so tapping
+// attack on a dead weapon costs nothing.
+//
+// NOT LANDED, AND NOT PARSED: stun, trip, knockback, AoE, reflect and the
+// execute all hang off a max roll and the trigger now fires for them, but their
+// payloads belong to systems 1c and slice 2 own. Half-building one here is how a
+// weapon ends up with a signature move that fires and does nothing.
+export const OTA_BUILD_ID = '2026-08-30-1564-when-the-dice-come-up-perfect';
 // golem catch-up 2026-08-30: markerless publish of OTA-1563 (the range nerf
 // removed catalog-wide, six unread piercing verbs wired, and twenty new
 // armour-piercing lines on a rarity ladder) to the golem channel.

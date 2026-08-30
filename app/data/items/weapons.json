@@ -1044,7 +1044,7 @@
         "firearm",
         "unknowing_masses"
       ],
-      "effect": "Rapid plasma — natural 1 triggers an overheat reroll. After 4 overheats it explodes (1d10 to everyone in your range).",
+      "effect": "Rapid plasma — a natural 1 overheats it, useless 1 round (even/odd reroll to confirm).",
       "description": "Pre-flood plasma weapon. Fast. Hot. Unstable."
     },
     {
@@ -1176,7 +1176,7 @@
         "polearm",
         "aetheric"
       ],
-      "effect": "Ignores armor on max damage roll once per encounter (declinable, save for later).",
+      "effect": "Ignores armor on a max damage roll.",
       "description": "Crescent of plasma on a long shaft. Cuts the way the Aether wills."
     },
     {
@@ -1623,7 +1623,7 @@
         "giants",
         "legendary"
       ],
-      "effect": "Advantage on all attacks vs giants and golems. +2 STR (permanent) on 5th max roll; does not stack.",
+      "effect": "Advantage on all attacks vs giants and golems. +2 STR (permanent, once) on a max damage roll.",
       "description": "Bone spear carved from a Titan's shin. Reads the species it was made from."
     },
     {
@@ -1794,7 +1794,7 @@
         "axe",
         "giants"
       ],
-      "effect": "1 damage reroll per encounter.",
+      "effect": "+1d6 on a max damage roll.",
       "description": "Throwable hand axe. Hammered from old Tartarian alloy."
     },
     {
@@ -2661,7 +2661,7 @@
         "mud_dwellers",
         "legendary"
       ],
-      "effect": "Deflects runecasters / powers once per day; +3 AC. Grants +50 HP.",
+      "effect": "Deflects runecasters and powers; +3 AC. Grants +50 HP.",
       "description": "Banner-shield of the Mud Royal Guard. Etched with old glyphs.",
       "statBonuses": [
         {
@@ -3546,7 +3546,7 @@
         "firearm",
         "unknowing_masses"
       ],
-      "effect": "Permanent +1 STR on first max roll.",
+      "effect": "+1 STR (permanent, once) on a max damage roll.",
       "description": "Hand-cannon of contained plasma. The kick builds you."
     },
     {
@@ -4377,7 +4377,7 @@
         "giants",
         "two_handed"
       ],
-      "effect": "Bypasses shields permanently on third max roll.",
+      "effect": "Bypasses shields on a max damage roll.",
       "description": "Crank-fed bone spear launcher. Devastating at close range."
     },
     {

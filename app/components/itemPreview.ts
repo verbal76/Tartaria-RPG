@@ -273,6 +273,34 @@ function previewWeapon(w: CatalogWeapon): ItemPreview {
       : 'Pierces armour',
     );
   }
+  // ⚠⚠ OTA-1564 — AND WHAT IT DOES WHEN THE DICE COME UP PERFECT, plus the cost
+  // it charges for the privilege. A repeater's volume and a firearm's overheat
+  // are the two halves of the same buying decision, so they belong on the same
+  // card rather than one being a pleasant surprise and the other an ambush.
+  if (parsedRules?.shotsPerRound && parsedRules.shotsPerRound > 1) {
+    stats.push(`Fires ${parsedRules.shotsPerRound}× per round (${parsedRules.shotsPerRound}× damage dice)`);
+  }
+  if (parsedRules?.maxRollFloor) {
+    stats.push(`Rolls of ${parsedRules.maxRollFloor}+ count as a max roll`);
+  }
+  if (parsedRules?.onMaxRoll) {
+    const m = parsedRules.onMaxRoll;
+    const parts: string[] = [];
+    if (m.bonusDice) parts.push(`+${m.bonusDice} damage`);
+    if (m.bonusFlat) parts.push(`+${m.bonusFlat} damage`);
+    if (m.shredDice) parts.push(`strips ${m.shredDice} armour`);
+    if (m.pierce) parts.push(m.pierce === 'shields' ? 'opens the shield' : 'opens the armour');
+    if (m.permanentStat) {
+      parts.push(`+${m.permanentStat.amount} ${m.permanentStat.stat.toUpperCase().slice(0, 3)} permanently, once ever`);
+    }
+    if (parts.length > 0) stats.push(`On a max damage roll: ${parts.join('; ')}`);
+  }
+  if (parsedRules?.overheat) {
+    const o = parsedRules.overheat;
+    stats.push(
+      `Natural 1: ${o.word}s${o.confirmed ? ' (even/odd to confirm)' : ''} — unusable ${o.rounds} round${o.rounds === 1 ? '' : 's'}${o.selfDice ? `, ${o.selfDice} to you` : ''}`,
+    );
+  }
   // ⚠ AND THE ONE-LINE RULE A RUNE-CASTER LIVES BY, said on the item rather than
   // only in a refusal the player has to trip over. Owner: *"a runecaster is a
   // power weapon so it can only use the power it can generate, so you cannot

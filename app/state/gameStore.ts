@@ -615,7 +615,11 @@ import {
 } from '../engine/factionStorylines';
 import { tickWeather, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers } from '../engine/weatherEffects';
 import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, enemyDodgesHit, enemyIsAerial, combineDamageTypeMatch } from '../engine/enemyTraits';
-import { parseWeaponEffect, rollEffectBonusDamage } from '../engine/weaponEffects';
+import {
+  parseWeaponEffect, rollEffectBonusDamage,
+  // OTA-1564 (slice 1b) — the max-roll trigger and its payloads.
+  damageRollIsMax, rollMaxRollBonus, maxRollShredAmount,
+} from '../engine/weaponEffects';
 import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { nounTokensMatch } from '../engine/ambientNounMatch';
@@ -14212,6 +14216,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
               break;
             }
           }
+          // ⚠⚠⚠ OTA-1564 — A JAMMED WEAPON DOES NOT SWING. The refusal sits
+          // ABOVE the stamina spend, beside the reach and elevation gates, so a
+          // player who taps attack on a dead weapon loses nothing — the same
+          // courtesy every other free refusal on this path already gives. It is
+          // matched by NAME against the lock, so a seized sidearm never stops the
+          // blade in the other hand, and it names the round count so the player
+          // can decide between waiting and drawing something else.
+          {
+            const swungName = offHandSwing ? player.equipped?.off : (player.equipped?.main ?? player.equipped?.weaponName);
+            const lock = (player.statusEffects ?? []).find(
+              (e) => e.kind === 'weapon_overheated' && e.remainingRounds > 0
+                && (e.label ?? '').toLowerCase() === String(swungName ?? '').toLowerCase(),
+            );
+            if (lock && swungName) {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter nods at your hand. "The ${swungName} is still cooling — ${lock.remainingRounds} round${lock.remainingRounds === 1 ? '' : 's'}. Draw something else, or wait it out."`,
+                { skipDedup: true },
+              );
+              break;
+            }
+          }
           set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.attack), 0.1) } : sLive));
           const visPenalty = weatherAttackPenalty(currentScene.weather, playerArmorResistKinds(player));
           if (visPenalty > 0) {
@@ -22988,6 +23014,52 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'combat',
         `You — d20 → ${naturalRoll} + ${attack.bonusLabel} = ${attack.total} ${acTag} — ${outcome}`,
       );
+
+      // ⚠⚠⚠ OTA-1564 — THE WEAPON THAT PUNISHES YOU FOR A NATURAL 1. Four
+      // firearms have said so on the card forever, and `ActionReferenceScreen`
+      // has printed the rule to players in the rulebook the whole time — *"Roll
+      // a natural 1 on a firearm: jam. Spend an action to clear."* — while no
+      // code anywhere applied it. A rule stated in the rulebook screen and not
+      // implemented is the worst version of this defect, because the player has
+      // been told to plan around it.
+      //
+      // ⚠⚠ IT HANGS OFF THE ATTACK ROLL, NOT THE DAMAGE ROLL, because a natural
+      // 1 is a MISS — the damage step never runs, so anything reading it would
+      // never fire. This is the mirror of the max-roll payloads below and the
+      // reason both live on the step that actually produced the number.
+      if (naturalRoll === 1) {
+        const hotWeapon = getEquippedWeapon(player, /\boff[- ]?hand\b/.test(actionText) ? 'off' : 'main');
+        const oh = parseWeaponEffect(hotWeapon?.effect)?.overheat;
+        // A `confirmed` jam is the weapon's own even/odd reroll — the Rust Rifle
+        // is UNRELIABLE, not doomed, and honouring the reroll is the difference.
+        const confirmed = oh && (!oh.confirmed || rollDie(6) % 2 === 0);
+        if (oh && hotWeapon && confirmed) {
+          const selfHit = oh.selfDice ? rollFromNotation(oh.selfDice) : 0;
+          set((s) => (s.player
+            ? {
+                player: {
+                  ...s.player,
+                  hp: Math.max(0, s.player.hp - selfHit),
+                  statusEffects: applyEffect(s.player.statusEffects ?? [], {
+                    kind: 'weapon_overheated',
+                    remainingRounds: oh.rounds,
+                    // The NAME is the lock. Without it a jammed sidearm would
+                    // seize the blade in the other hand too.
+                    label: hotWeapon.name,
+                  }),
+                },
+              }
+            : s));
+          get().appendLog(
+            'combat',
+            selfHit > 0
+              ? `The ${hotWeapon.name} ${oh.word}s in your grip — ${selfHit} damage to you, and it is dead weight for ${oh.rounds} round${oh.rounds === 1 ? '' : 's'}.`
+              : `The ${hotWeapon.name} ${oh.word}s. Dead weight for ${oh.rounds} round${oh.rounds === 1 ? '' : 's'} — draw something else or ride it out.`,
+          );
+        } else if (oh && hotWeapon) {
+          get().appendLog('combat', `The ${hotWeapon.name} coughs and catches itself. No ${oh.word} this time.`);
+        }
+      }
     }
 
     if (attack?.success) {
@@ -23112,6 +23184,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // the type+trait math.
       const parsedEffect = equipped ? parseWeaponEffect(equipped.effect) : null;
       const effectBonus = parsedEffect ? rollEffectBonusDamage(parsedEffect, enemy) : 0;
+      // ⚠⚠⚠ OTA-1564 (slice 1b) — THE DICE CAME UP PERFECT. Twenty-six catalog
+      // weapons hang an effect on "a max roll" and nothing has ever read one.
+      // The trigger is asked ONCE, here, off the damage step's raw FACES — never
+      // its total, which carries STR, race bonus, rune passives and the aether
+      // surge, so a well-built character would clear any total-based bar on
+      // ordinary dice and proc a Legendary's signature every single swing.
+      // Payloads that ride machinery already in the game land below; stun,
+      // knockback, AoE and the execute wait for the slices that own those.
+      const swungMaxRoll = damageRollIsMax(damage, parsedEffect?.maxRollFloor);
+      const maxRollBonus = swungMaxRoll ? rollMaxRollBonus(parsedEffect?.onMaxRoll) : 0;
       // arb-fix — Bane of Sentinels: an earned title's "extra damage die vs
       // mechanical foes" now actually rolls (was exposed but never applied).
       // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -23145,7 +23227,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       // OTA-1088 — floor 2 (was 1): a landed hit always tells the HP bar
       // something, so a resisted chip-fight can't grind out "for 1" forever.
-      let dmg = Math.max(2, Math.round(rawDmg * effectiveMod.multiplier) + effectBonus + titleDmgBonus + surgeBonus);
+      // ⚠ OTA-1564 — the max-roll bonus joins the OTHER flat adders, OUTSIDE the
+      // resistance multiplier, for the same reason `effectBonus` is: a weapon's
+      // signature effect is the weapon's, not the swing's damage type, and
+      // folding it inside would let a resistant enemy halve the payoff the card
+      // promised in full.
+      let dmg = Math.max(2, Math.round(rawDmg * effectiveMod.multiplier) + effectBonus + maxRollBonus + titleDmgBonus + surgeBonus);
       // OTA-362 — weapon coating on-hit. If the weapon that landed this
       // blow carries a coating, roll its dice ONCE: the roll lands as
       // IMMEDIATE bonus damage this strike (folded into `dmg` so it
@@ -23378,6 +23465,66 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       if (effectBonus > 0) {
         get().appendLog('combat', `${equipped?.name ?? 'Your weapon'}'s effect triggers — +${effectBonus} bonus damage.`);
+      }
+
+      // ⚠⚠⚠ OTA-1564 — THE MAX-ROLL PAYLOADS, PAID. Named out loud on the beat
+      // they happen: a signature effect the player cannot SEE fire is, from
+      // inside the fight, indistinguishable from one that still does nothing —
+      // which is the defect this whole program is closing.
+      if (swungMaxRoll && parsedEffect?.onMaxRoll) {
+        const wname = equipped?.name ?? 'Your weapon';
+        const onMax = parsedEffect.onMaxRoll;
+        if (maxRollBonus > 0) {
+          get().appendLog('combat', `Every die on its face. The ${wname} finds the gap — +${maxRollBonus} more.`);
+        }
+        // The shred and the pierce share one lever: OTA-362's `enemyArmorShred`,
+        // which the AC step already subtracts on every later swing. A pierce owed
+        // "on a max damage roll" cannot lower an AC the attack has already beaten,
+        // so what it does instead is leave the guard OPEN — which is both
+        // implementable and closer to what "splits shields" means anyway.
+        const shred = maxRollShredAmount(onMax, enemy);
+        if (shred > 0) {
+          const idxShred = Math.max(0, Math.min(activeIdx, currentScene.enemies.length - 1));
+          set((s) => {
+            if (!s.currentScene) return s;
+            const arr = [...(s.currentScene.enemyArmorShred ?? [])];
+            while (arr.length < s.currentScene.enemies.length) arr.push(0);
+            arr[idxShred] = (arr[idxShred] ?? 0) + shred;
+            return { currentScene: { ...s.currentScene, enemyArmorShred: arr } };
+          });
+          get().appendLog(
+            'combat',
+            onMax.pierce
+              ? `The ${wname} goes through the guard and leaves it open — ${enemy.name} is −${shred} AC from here.`
+              : `The ${wname} tears ${shred} points off ${enemy.name}'s armour.`,
+          );
+        }
+        // ⚠⚠ WRITE-ONCE-FOREVER, and that is precisely why it survived into this
+        // slice while the ordinal versions ("on the 5th max roll") did not: a flag
+        // saying "already happened" needs no tally to survive a round, a fight or
+        // a save/load. `permanentStatWeapons` is keyed by weapon NAME, so two
+        // copies of the same Legendary cannot pay out twice.
+        if (onMax.permanentStat) {
+          const pnow = get().player;
+          const claimed = pnow?.permanentStatWeapons ?? [];
+          const key = equipped?.name ?? '';
+          if (pnow && key && !claimed.includes(key)) {
+            const st = onMax.permanentStat;
+            set((s) => (s.player
+              ? {
+                  player: {
+                    ...s.player,
+                    stats: { ...s.player.stats, [st.stat]: (s.player.stats[st.stat] ?? 0) + st.amount },
+                    permanentStatWeapons: [...(s.player.permanentStatWeapons ?? []), key],
+                  },
+                }
+              : s));
+            get().appendLog(
+              'reward',
+              `✦ The ${key} answers a perfect strike. +${st.amount} ${st.stat.toUpperCase().slice(0, 3)}, permanently — it only ever does this once.`,
+            );
+          }
+        }
       }
 
       // Weapon wear: any successful hit chips one point off the weapon
