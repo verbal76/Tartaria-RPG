@@ -181,7 +181,12 @@ describe('OTA-1236 — SALVAGE ALL leaves the lead alone, and says so', () => {
     const i = store.indexOf('const bulkLeadCtx =');
     const block = blockAt(store, 'const bulkLeadCtx =');
     expect(block).toContain('rescueEligible');
-    expect(block).toContain('player?.dog');
+    // ⚠ OTA-1558 — RETARGETED, NOT RELAXED. The gate now asks `hasActiveDog`,
+    // because a raw `player.dog` stays truthy for a DEAD or ABANDONED dog — so
+    // this protection lifted the moment a dog died and SALVAGE would strip the
+    // snare that was the player's last thread back into the quest. Same gate,
+    // correct question.
+    expect(block).toContain('hasActiveDog');
     expect(block).toContain('pendingDogOnboarding');
   });
 });

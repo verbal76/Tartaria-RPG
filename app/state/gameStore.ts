@@ -3059,6 +3059,9 @@ export function migrateLoadedWorldMemory(wm: WorldMemory): WorldMemory {
     earnedTitleAnnounced: wm.earnedTitleAnnounced ?? [],
     fusionCompensationGranted: wm.fusionCompensationGranted ?? false,
     pendingDogOnboarding: wm.pendingDogOnboarding ?? null,
+    // OTA-1558 — legacy saves default false, so the one-off dog amnesty gets its
+    // single run on any character that predates it. See worldMemory.dogRescueAmnesty.
+    dogRescueAmnestyDone: wm.dogRescueAmnestyDone ?? false,
     enemyIntel: wm.enemyIntel ?? backfillEnemyIntelFromDefeats(wm.defeatedEnemies),
     // OTA-1541 — re-file every ground record under its ABSOLUTE cell. See
     // makeRoomKey: old ground keys carried the frame they were seen from, so a
@@ -8613,6 +8616,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     aggregateArmor,
     assembleBeaconRifle,
     debugLoadout,
+    hasActiveDog,
     effectiveStaminaMax,
     freshInstanceId,
     ledgeredSalvage,
@@ -9179,6 +9183,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   ...createSlotSlice(set, get, {
     backfillPlayer, maintainPatrols, migrateLoadedWorldMemory,
     recordMemorableEvent, simulatePatrols, welcomeBackLine,
+    hasActiveDog,
   }),
 
 
@@ -10223,7 +10228,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // cache just becomes an ordinary noun.
     const rescuePropNouns: string[] = (() => {
       if (get().player?.hubRoomId) return []; // indoor outpost rooms — never
-      if (get().player?.dog || get().worldMemory.pendingDogOnboarding) return [];
+      // ⚠⚠⚠ OTA-1558 — hasActiveDog, NOT a raw `player.dog`, AND THIS LINE IS THE
+      // ONE THAT BROKE THE DOG SYSTEM. `player.dog` stays TRUTHY after a dog dies
+      // or is abandoned: the record is deliberately kept with status 'dead' /
+      // 'abandoned' so grief narration and the death-write verification can read
+      // it. So this gate read "you already have a dog" forever, the rescue props
+      // stopped being seeded on every tile from that moment on, and the quest
+      // became unfindable for the rest of the save. OTA-346 fixed exactly this
+      // bug in the puppy-vendor arc and wrote `hasActiveDog` to fix it with; the
+      // OTA-1243 prop injection was written later and never got the memo.
+      if (hasActiveDog(get().player) || get().worldMemory.pendingDogOnboarding) return [];
       const locTags = (location.tags ?? []).map((t) => String(t).toLowerCase());
       const eligible = (Object.values(RESCUE_SCENARIOS) as RescueScenario[])
         .filter((sc) => sc.archetypes.some((a) => locTags.includes(a)));
@@ -13517,7 +13531,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'investigate', 'attack', 'advance', 'travel', 'ask', 'use_relic',
       ];
       const liveWorldMem = get().worldMemory;
-      const dogAcquired = !!get().player?.dog;
+      // ⚠⚠⚠ OTA-1558 — THE TEXT GATE, and the second half of the same defect.
+      // Even with the props seeded again, typing `investigate the cage` was
+      // refused here, because a dead dog still satisfied "dogAcquired". Both the
+      // prop that puts the noun in front of the player and the sentence that
+      // acts on it have to agree about what "already has a dog" means.
+      const dogAcquired = hasActiveDog(get().player);
       const onboardingActive = !!liveWorldMem.pendingDogOnboarding;
       if (
         !dogAcquired &&
@@ -27053,7 +27072,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const dayCount = Math.floor((livePlayer?.hoursElapsed ?? 0) / 24);
       if (
         livePlayer
-        && !livePlayer.dog
+        // OTA-1558 — third reader of the same rule. The Arbiter's rumour about a
+        // dog held to the north exists for the player who never stumbles on a
+        // hook noun; a player who LOST a dog is exactly that player again.
+        && !hasActiveDog(livePlayer)
         && !liveWm.pendingDogOnboarding
         && !liveWm.dogRescueTipFired
         && dayCount >= 5

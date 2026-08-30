@@ -29,6 +29,57 @@ export function spireMoveNoticeLine(memory: WorldMemory): string | null {
     + 'still holds. Set a course from the TRAVEL list when you’re ready to climb.';
 }
 
+/**
+ * ⚠⚠⚠ OTA-1558 — THE ONE-OFF DOG AMNESTY, AND IT RUNS IN SILENCE ON PURPOSE.
+ *
+ * Four separate gates asked `!player.dog` when they meant "no LIVING dog": the
+ * rescue-prop seeding, the text/intent dispatch that acts on `investigate the
+ * cage`, the Arbiter's rumour, and the lead context that protects a snare from
+ * being salvaged. `player.dog` is deliberately KEPT after a death or an
+ * abandonment — status 'dead' / 'abandoned', so grief narration and the
+ * death-write verification can still read it — so every one of those gates
+ * answered "he already has a dog" for the rest of the save. Once a player lost a
+ * dog, the quest could never be found again.
+ *
+ * ⚠⚠ FIXING THE PREDICATE IS NOT ENOUGH, which is the only reason this exists. A
+ * save can also be wedged by state those broken gates already WROTE — a
+ * `pendingDogOnboarding` left standing from a rescue that could never finish, a
+ * `dogRescueTipFired` spent on a rumour the player could no longer act on. No
+ * amount of correcting a boolean clears a flag that is already on disk.
+ *
+ * ⚠⚠ SILENT, ON THE OWNER'S EXPLICIT INSTRUCTION: *"remember silently, we don't
+ * want to advertise a fix broke the dog system."* So this returns state and no
+ * narration. A player without a dog simply finds, some tiles later, that the
+ * world has cages and wagons in it again — which is what it should have had all
+ * along. The only record is a debug line in the on-disk log, where a support
+ * question can find it and a player never will.
+ *
+ * ⚠ ONCE PER SAVE. `dogRescueAmnestyDone` is the latch. Without it the rumour
+ * flag would clear on EVERY load for any dogless player, and a deliberately
+ * single-shot hint would become a recurring one — trading a sealed quest for a
+ * nagging Arbiter. Pure: returns the patch to apply, or null when there is
+ * nothing to do.
+ *
+ * `hasDog` is passed in rather than derived here, so this leaf never has to reach
+ * up into the store for `hasActiveDog`.
+ */
+export function dogRescueAmnesty(
+  hasDog: boolean,
+  memory: WorldMemory,
+): Partial<WorldMemory> | null {
+  if (hasDog) return null;
+  if (memory.dogRescueAmnestyDone) return null;
+  return {
+    // A rescue that was interrupted — or that the broken gates could never let
+    // finish — leaves this standing, and every gate downstream reads it as "a dog
+    // is already on the way."
+    pendingDogOnboarding: null,
+    // Let the Arbiter's rumour be findable again by a player who has no dog.
+    dogRescueTipFired: false,
+    dogRescueAmnestyDone: true,
+  };
+}
+
 // OTA-500 — register a dynamically-mentioned place as install-canon. Idempotent by
 // id; enriches an existing entry if a later mention is richer. Once registered it
 // gets a permanent grid cell + is plotted/routable like a static location.

@@ -1399,7 +1399,14 @@ export function InventoryScreen() {
         coatPickerBody = 'Nothing in your pack can hold this coating. A coating needs an edge or a point to carry it — a blade, an arrow-arm, or a bolt-caster.'
           + refusedNote;
       } else {
-        coatPickerBody = `Paint the ${coatTarget.name.toLowerCase()} onto which weapon? It stays on until the weapon breaks (a repair won't scrub it off).`
+        // ⚠ OTA-1557 — SAY WHERE THE COATING ACTUALLY GOES. Owner: *"coatings
+        // are applied to the bolts not the weapon, but the weapon carries the
+        // tag."* That is the right fiction and the modal had never said it — it
+        // talked only about painting the weapon, which reads as nonsense on a
+        // crossbow. Nothing mechanical moves: the coating still lives on the
+        // weapon instance, which is exactly what "the weapon carries the tag"
+        // means and what a repair and a break already reason about.
+        coatPickerBody = `Paint the ${coatTarget.name.toLowerCase()} onto which weapon? It stays on until the weapon breaks (a repair won't scrub it off). On a bow, crossbow or bolt-caster the coating rides the ammunition — the weapon carries it and every shot delivers it.`
           + refusedNote;
         // ⚠⚠⚠ OTA-1556 — TWO ROWS CARRYING THE SAME WORD ARE NOT A LIST, THEY ARE
         // A COIN TOSS.

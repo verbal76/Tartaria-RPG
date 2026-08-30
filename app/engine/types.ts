@@ -2247,6 +2247,15 @@ export interface WorldMemory {
    *  scene where a captor + dog encounter could be found. Single-
    *  shot per save so the hint doesn't become noise. */
   dogRescueTipFired?: boolean;
+  /** ⚠⚠ OTA-1558 — the one-off dog amnesty has already run on this save. See
+   *  worldMemory.dogRescueAmnesty: four gates read a raw `player.dog`, which
+   *  stays truthy for a DEAD or ABANDONED dog, so any save that lost one had the
+   *  rescue quest sealed shut. The gates are fixed now, but a save can also be
+   *  wedged by state those broken gates already WROTE — a stale
+   *  `pendingDogOnboarding`, a spent `dogRescueTipFired` — and correcting a
+   *  predicate cannot clear a flag already on disk. This latch makes the cleanup
+   *  happen once per save instead of re-arming the Arbiter's rumour every load. */
+  dogRescueAmnestyDone?: boolean;
 }
 
 /** OTA 454 — record of a single named NPC encounter. */

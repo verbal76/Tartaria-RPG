@@ -103,6 +103,10 @@ export interface InventorySliceDeps {
   debugLoadout: typeof Store.debugLoadout;
   effectiveStaminaMax: typeof Store.effectiveStaminaMax;
   freshInstanceId: typeof Store.freshInstanceId;
+  // OTA-1558 — "is there a LIVING dog with this player", the one predicate every
+  // rescue gate must ask. A raw `player.dog` is truthy for a dead or abandoned
+  // one and that is what broke the quest; see the note at the call site.
+  hasActiveDog: typeof Store.hasActiveDog;
   ledgeredSalvage: typeof Store.ledgeredSalvage;
   makeRoomKey: typeof Store.makeRoomKey;
   nonClimbMarkers: typeof Store.nonClimbMarkers;
@@ -1261,7 +1265,11 @@ export const createInventorySlice = (
       // ⚠ The same conditions the engine's own rescue dispatch checks. Once the
       // player HAS a dog, a snare is just a snare again — protecting it forever
       // would keep scrap out of their hands for a quest that already happened.
-      rescueEligible: !get().player?.dog && !get().worldMemory.pendingDogOnboarding,
+      // ⚠⚠ OTA-1558 — hasActiveDog, for the fourth time. `player.dog` survives a
+      // death or an abandonment (status 'dead' / 'abandoned'), so this read
+      // "already has a dog" forever and SALVAGE happily started stripping the
+      // snare that was the player's only remaining way back into the quest.
+      rescueEligible: !deps.hasActiveDog(get().player) && !get().worldMemory.pendingDogOnboarding,
     };
     // 2026-05-25 OTA-037 — track nouns that the modal surfaced but
     // rollSalvagePool didn't recognize. Previously these were swallowed

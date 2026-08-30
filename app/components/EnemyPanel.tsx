@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { enemyDamageCompact } from '../engine/combatRules';
 import {
   View,
@@ -114,6 +114,25 @@ const FALLBACK_H = 165;
 const CARD_CHROME = 18;
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/**
+ * ⚠⚠ OTA-1557 — WHICH PAGE IS A GIVEN SCROLL OFFSET ON, clamped to the roster.
+ *
+ * Pulled out of the scroll handler so the ARITHMETIC is pinnable rather than
+ * only the wiring, and because it now has two callers (a flick and a dead-stop
+ * drag) that must agree — the second of which did not exist before this OTA and
+ * is the reason the portrait could park between two enemies with nobody
+ * noticing.
+ *
+ * The clamp is not decoration: a kill splices the roster mid-gesture, so an
+ * offset measured against the OLD list can resolve past the end of the new one.
+ */
+export function pageIndexForOffset(offsetX: number, cardWidth: number, count: number): number {
+  if (!Number.isFinite(offsetX) || !Number.isFinite(cardWidth) || cardWidth <= 0) return 0;
+  if (count <= 0) return 0;
+  const raw = Math.round(offsetX / cardWidth);
+  return Math.max(0, Math.min(raw, count - 1));
+}
 
 /** Combine the macro type-resistance map with the enemy's per-instance
  *  resist:/vulnerable: traits into the damage types it resists / is weak to.
@@ -240,16 +259,70 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
     </ScrollView>
   );
 
-  const onMomentumEnd = useCallback(
+  // ⚠⚠⚠ OTA-1557 — THE PORTRAIT THAT HANGS BETWEEN TWO ENEMIES. Owner, on a
+  // stacked fight: *"I killed one and the enemy portrait hung between enemies.
+  // this has been ongoing."* His screenshot shows it exactly — the tail of one
+  // card at the left edge, the next card pushed right and clipped off-screen.
+  // The list is parked at an offset that is not a multiple of cardWidth.
+  //
+  // ⚠⚠ THREE THINGS COMBINED, AND WHY EARLIER PASSES MISSED IT. OTA-929 fixed
+  // the BLANK card after a kill by remounting the pager on a roster change; that
+  // was a different symptom (wrong content) and it is still correct and still
+  // here. This is about the OFFSET, and nothing owned it:
+  //   1. TWO SNAP AUTHORITIES. `pagingEnabled` snaps to the SCROLL VIEW's width;
+  //      `snapToInterval` snaps to cardWidth. They agree only while those two
+  //      numbers are identical, and they are not identical during the frames
+  //      after a kill, when the roster remount and the panel measurement land on
+  //      different ticks. Two mechanisms that must agree, with nothing making
+  //      them agree, is the whole defect.
+  //   2. NO RESOLUTION WITHOUT MOMENTUM. Every cell is a vertical ScrollView
+  //      (OTA-1514, and it must stay one). On Android an inner scroller can
+  //      claim a horizontal drag and hand it back, and a drag released that way
+  //      produces NO momentum event — so `onMomentumScrollEnd`, the only reader,
+  //      never fired and the half-scrolled offset was never even noticed.
+  //   3. NOTHING PUT IT BACK. There was no path at all from "activeEnemyIdx
+  //      changed" to "scroll there" — the pager only ever learned position from
+  //      the finger. A kill re-points the target in the store (sweepDeadEnemies)
+  //      and the pager simply did not follow.
+  //
+  // ⚠ SO: ONE snap authority (below), BOTH drag endings resolve to a page, and
+  // an effect that drives the pager from the target whenever the target or the
+  // roster moves. Any one of the three alone leaves a door open.
+  const listRef = useRef<FlatList<EnemyView>>(null);
+  const rosterKey = enemies.map((v) => v.enemy.name).join('|');
+
+  /** Offset → page, clamped to the roster. Exported logic lives in
+   *  `pageIndexForOffset` so the arithmetic is pinned, not just the wiring. */
+  const resolvePage = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const x = e.nativeEvent.contentOffset.x;
-      const idx = Math.round(x / cardWidth);
-      if (idx !== activeIndex && idx >= 0 && idx < enemies.length) {
-        onSelectActive(idx);
-      }
+      const idx = pageIndexForOffset(e.nativeEvent.contentOffset.x, cardWidth, enemies.length);
+      if (idx !== activeIndex) onSelectActive(idx);
     },
     [activeIndex, enemies.length, onSelectActive, cardWidth],
   );
+  const onMomentumEnd = resolvePage;
+  // ⚠ A drag that stops dead — finger down, move, lift without a flick — ends
+  // here and NOWHERE else. This is the event that was missing.
+  const onDragEnd = resolvePage;
+
+  // ⚠⚠ THE PAGER FOLLOWS THE TARGET. A kill splices the roster and re-points
+  // activeEnemyIdx in the store; without this the card the player is looking at
+  // and the enemy his buttons are aimed at are two different creatures. Not
+  // animated: after a death the correct card should already BE there, not slide
+  // in — an animation here reads as the panel drifting on its own.
+  useEffect(() => {
+    if (enemies.length < 2 || cardWidth <= 0) return;
+    const idx = Math.max(0, Math.min(activeIndex, enemies.length - 1));
+    // scrollToIndex throws when the cell is not laid out yet (a fresh remount is
+    // exactly that moment), and a thrown error here would take the whole combat
+    // panel down with it. getItemLayout makes the offset exact, so falling back
+    // to it is not an approximation.
+    try {
+      listRef.current?.scrollToIndex({ index: idx, animated: false });
+    } catch {
+      try { listRef.current?.scrollToOffset({ offset: idx * cardWidth, animated: false }); } catch { /* pre-layout */ }
+    }
+  }, [activeIndex, rosterKey, cardWidth, enemies.length]);
 
   // arb146 — tapping a card opens a full-detail popup (everything the cramped
   // corner portrait can't fit: full trait descriptions, resist/weak/deals, all
@@ -291,13 +364,30 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
           // OTA 197 — extraData forces FlatList to re-render the visible cells
           // when a value not present in `data` changes (HP ticking down).
           extraData={`${cardWidth}|${enemies.map((v) => `${v.currentHp}/${v.enemy.hp}/${(v.statuses ?? []).map((s) => `${s.kind}:${s.turnsRemaining}`).join(',')}`).join('|')}`}
+          ref={listRef}
           keyExtractor={(_, i) => String(i)}
           horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onMomentumScrollEnd={onMomentumEnd}
-          renderItem={renderItem}
+          // ⚠⚠⚠ OTA-1557 — ONE SNAP AUTHORITY. `pagingEnabled` used to sit here
+          // alongside snapToInterval, and the two do NOT measure the same thing:
+          // paging snaps to the scroll view's own width, snapToInterval snaps to
+          // cardWidth. They agree only while those numbers are identical, and in
+          // the frames after a kill — roster remount on one tick, panel
+          // measurement on another — they are not. Two mechanisms that must
+          // agree, with nothing making them agree, is how a card comes to rest
+          // between two enemies. snapToInterval is the one that survives because
+          // it is expressed in the same unit as getItemLayout and the page math.
           snapToInterval={cardWidth}
+          snapToAlignment="start"
+          disableIntervalMomentum
+          showsHorizontalScrollIndicator={false}
+          // ⚠⚠ BOTH ENDINGS RESOLVE TO A PAGE. A flick ends in momentum; a drag
+          // released without a flick — which is also what an inner vertical
+          // ScrollView hands back when it returns a horizontal gesture — ends
+          // only in onScrollEndDrag. That second door had no reader at all, so a
+          // half-scrolled pager was never noticed, let alone corrected.
+          onMomentumScrollEnd={onMomentumEnd}
+          onScrollEndDrag={onDragEnd}
+          renderItem={renderItem}
           decelerationRate="fast"
         />
       )}

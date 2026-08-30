@@ -175,22 +175,27 @@ describe('coating consumables carry a coating effect spec', () => {
 });
 
 describe('Disease Sample crafted items (OTA-370)', () => {
-  it('Plague Tonic is a premium 1d6 corruption coating', () => {
+  // ⚠ OTA-1559 — RETARGETED, NOT RELAXED. A Plague Tonic demands a DISEASE
+  // SAMPLE, the scarcest coating ingredient in the game, and rolled the same die
+  // as a foraged Uncommon. The word this suite cares about is PREMIUM, and 1d8
+  // is what premium now means; the ladder itself is pinned in ota1559.
+  it('Plague Tonic is a premium 1d8 corruption coating', () => {
     const fx = resolveItemEffect('Plague Tonic', [findGearByName]);
     expect(fx?.kind).toBe('consumable');
     if (fx?.kind === 'consumable') {
       expect(fx.coating?.kind).toBe('corruption');
-      expect(fx.coating?.dice).toBe('1d6');
+      expect(fx.coating?.dice).toBe('1d8');
       expect(fx.coating?.label).toBe('Plagued');
     }
   });
 
-  it('Plague Vial is a premium 1d6 poison coating', () => {
+  // ⚠ OTA-1559 — RETARGETED, same reason as the Tonic above.
+  it('Plague Vial is a premium 1d8 poison coating', () => {
     const fx = resolveItemEffect('Plague Vial', [findGearByName]);
     expect(fx?.kind).toBe('consumable');
     if (fx?.kind === 'consumable') {
       expect(fx.coating?.kind).toBe('poison');
-      expect(fx.coating?.dice).toBe('1d6');
+      expect(fx.coating?.dice).toBe('1d8');
       expect(fx.coating?.label).toBe('Festering');
     }
   });

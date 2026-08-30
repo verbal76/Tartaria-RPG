@@ -2,7 +2,9 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { canonicalItemTags } from '../engine/crafting';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { useGameStore, makeRoomKey, chipDismissTileKey, logUiTap } from '../state/gameStore';
+// OTA-1558 — `hasActiveDog`: a dead or abandoned dog leaves its record behind, so
+// a raw `player.dog` answers "yes" forever. Every rescue gate asks this instead.
+import { useGameStore, makeRoomKey, chipDismissTileKey, logUiTap, hasActiveDog } from '../state/gameStore';
 import { playerGridCell } from '../state/playerGrid';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { enemyBandOf, enemyIsAirborne, enemyThreatAt, playerWeaponReach } from '../state/combatResolution';
@@ -591,9 +593,13 @@ export function ExplorationScreen() {
   const leadCtx = useMemo(
     () => ({
       hooks: currentScene?.hooks ?? [],
-      rescueEligible: !player?.dog && !worldMemory.pendingDogOnboarding,
+      // ⚠⚠ OTA-1558 — hasActiveDog, not a raw `player.dog`. A dead or abandoned
+      // dog leaves the record behind (status 'dead' / 'abandoned'), so this read
+      // "already has a dog" for the rest of the save and the rescue nouns stopped
+      // being marked as leads — the last visible thread back into the quest.
+      rescueEligible: !hasActiveDog(player) && !worldMemory.pendingDogOnboarding,
     }),
-    [currentScene?.hooks, player?.dog, worldMemory.pendingDogOnboarding],
+    [currentScene?.hooks, player, worldMemory.pendingDogOnboarding],
   );
   const leadNouns = useMemo(
     () =>

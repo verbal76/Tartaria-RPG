@@ -164,7 +164,12 @@ describe('OTA-1243 — the rescue props are placed, not hoped for', () => {
     expect(i).toBeGreaterThan(-1);
     const block = blockAt(store, 'const rescuePropNouns: string[] =');
     expect(block).toContain('hubRoomId');
-    expect(block).toContain('player?.dog');
+    // ⚠ OTA-1558 — RETARGETED, NOT RELAXED. `hasActiveDog`, not a raw
+    // `player.dog`: the record survives a death or an abandonment, so this
+    // injection stopped seeding cages and wagons forever the first time a
+    // player lost a dog. The gating condition is the same one the rescue
+    // dispatch checks — which is exactly what this test asserts.
+    expect(block).toContain('hasActiveDog');
     expect(block).toContain('pendingDogOnboarding');
     expect(block).toContain('archetypes.some');
     // Seeded per tile, like the water sources — stable, not farmable.

@@ -56,7 +56,7 @@ import {
 } from '../../engine/saveSystem';
 import { seamBanner, lastEntryTime } from '../../engine/logSeam'; // OTA-1494
 import { findMicroMicroAnywhere } from '../../engine/worldLadder';
-import { discoverLocation, emptyMemory, spireMoveNoticeLine } from '../../engine/worldMemory';
+import { discoverLocation, emptyMemory, spireMoveNoticeLine, dogRescueAmnesty } from '../../engine/worldMemory';
 import { extractAmbientNouns } from '../../engine/ambientNouns';
 import { hubRoomFor, hubSkinFactionFor } from '../../engine/hub';
 import { findCatalogItem } from '../../engine/crafting';
@@ -113,6 +113,9 @@ export interface SlotSliceDeps {
   recordMemorableEvent: typeof Store.recordMemorableEvent;
   simulatePatrols: typeof Store.simulatePatrols;
   welcomeBackLine: typeof Store.welcomeBackLine;
+  // OTA-1558 — "is there a LIVING dog with this player". A raw `player.dog` is
+  // truthy for a dead or abandoned one, which is what sealed the rescue quest.
+  hasActiveDog: typeof Store.hasActiveDog;
 }
 
 
@@ -581,6 +584,27 @@ export const createSlotSlice = (
         if (spireNotice) {
           get().appendLog('world', spireNotice, { skipDedup: true });
           set((s2) => ({ worldMemory: { ...s2.worldMemory, spireMoveNoticeShown: true } }));
+        }
+      }
+      // ⚠⚠⚠ OTA-1558 — THE ONE-OFF DOG AMNESTY, AND IT SAYS NOTHING.
+      //
+      // Four gates asked `!player.dog` when they meant "no LIVING dog", and
+      // `player.dog` survives a death or an abandonment by design — so any save
+      // that lost a dog had the rescue quest sealed shut for good. The gates are
+      // fixed now, but a save can also be wedged by state those broken gates
+      // already WROTE, and correcting a predicate cannot clear a flag that is
+      // already on disk. This sits OUTSIDE the greeting block on purpose: it has
+      // to reach every load, not only the ones where the Arbiter speaks.
+      //
+      // ⚠ SILENT, on the owner's instruction — *"remember silently, we don't want
+      // to advertise a fix broke the dog system."* No world line, no arbiter
+      // line. The only trace is this debug entry, which lands in the on-disk log
+      // where a support question can find it and a player never will.
+      {
+        const amnesty = dogRescueAmnesty(deps.hasActiveDog(get().player), get().worldMemory);
+        if (amnesty) {
+          set((s2) => ({ worldMemory: { ...s2.worldMemory, ...amnesty } }));
+          get().appendLog('debug', 'dog: rescue amnesty applied at load — no active companion, quest gates reopened');
         }
       }
       // arb38 — hydration completed cleanly. Clear the in-progress

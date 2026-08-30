@@ -20,6 +20,9 @@ import {
   inferAccessory,
   inferGear,
 } from '../engine/itemDefaults';
+// OTA-1557 — the ranged sub-class ("Bolt-Caster", "Crossbow", "Bow", …), so the
+// stat line can say WHICH kind of ranged weapon this is.
+import { rangedClassLabel } from '../engine/combatRules';
 
 export type ItemPreview = {
   name: string;
@@ -227,6 +230,19 @@ function previewWeapon(w: CatalogWeapon): ItemPreview {
     `Damage: ${w.damageDice} (${w.damageType})`,
     `Scales with ${w.stat.toUpperCase().slice(0, 3)}`,
   ];
+  // ⚠⚠ OTA-1557 — WHICH KIND OF RANGED, on the line the owner asked for it:
+  // *"a boltcaster is a crossbow style weapon, it needs something like that in
+  // the stats line so players know what class of ranged."* Sixty-five weapons
+  // shared the two words "Ranged Weapon" and nothing told a bow from a rifle
+  // from a thrown knife. See combatRules.rangedClassLabel for why the
+  // precedence is what it is.
+  const rangedClass = rangedClassLabel({ weaponKind: w.weaponKind, name: w.name, tags: w.tags });
+  if (rangedClass) stats.push(`Class: ${rangedClass}`);
+  // ⚠ AND THE ONE-LINE RULE A RUNE-CASTER LIVES BY, said on the item rather than
+  // only in a refusal the player has to trip over. Owner: *"a runecaster is a
+  // power weapon so it can only use the power it can generate, so you cannot
+  // apply coatings."*
+  if (w.weaponKind === 'runecaster') stats.push('Power weapon — takes no coating');
   if (w.baseDurability !== undefined) stats.push(`Durability: ${w.baseDurability}`);
   return { name: w.name, kindLabel, rarity: w.rarity, description: w.description, stats };
 }

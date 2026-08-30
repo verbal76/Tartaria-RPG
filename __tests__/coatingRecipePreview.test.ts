@@ -28,9 +28,13 @@ describe('OTA-704 — coating output is legible on the recipe card', () => {
     expect(coatingLine('Poison Vial')).toBe('Coats weapon: +1d4 poison (Poisoned)');
   });
 
-  it('a higher-dice variant reads stronger (Plague Vial 1d6 > Poison Vial 1d4)', () => {
+  // ⚠ OTA-1559 — RETARGETED. The PROPERTY is that a premium coating reads
+  // stronger on the card than a foraged one, and it still does — the gap simply
+  // widened from 1d4→1d6 to 1d4→1d8 when the plague pair was moved onto the rung
+  // its Disease Sample actually pays for. See ota1559 for the whole ladder.
+  it('a higher-dice variant reads stronger (Plague Vial 1d8 > Poison Vial 1d4)', () => {
     expect(coatingLine('Poison Vial')).toContain('+1d4 poison');
-    expect(coatingLine('Plague Vial')).toContain('+1d6 poison');
+    expect(coatingLine('Plague Vial')).toContain('+1d8 poison');
   });
 
   it('a stat-bonus variant surfaces the buff (Searing = same 1d4 fire + STR)', () => {

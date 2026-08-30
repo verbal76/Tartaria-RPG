@@ -381,6 +381,92 @@ export function reachClassFor(opts: {
   return 'melee';
 }
 
+/**
+ * ⚠⚠⚠ OTA-1557 — WHAT KIND OF RANGED WEAPON IS THIS? Owner: *"a boltcaster is a
+ * crossbow style weapon, it needs something like that in the stats line so
+ * players know what class of ranged."*
+ *
+ * He is right that the game never said. `weaponKind: 'ranged'` covers 65 weapons
+ * that behave nothing alike to somebody choosing between them — a Salvaged Bow,
+ * a Plasma Long Rifle, a Throwing Knife and a Bolt-Caster all read as the
+ * identical two words, "Ranged Weapon". The distinction was sitting in the tags
+ * the entire time; nothing ever surfaced it.
+ *
+ * ⚠⚠ THE ORDER IS THE DESIGN, not an implementation detail. A Bone Crossbow
+ * carries BOTH `crossbow` and `bolt-caster`, so precedence decides what the
+ * player is told, and bolt-caster wins because it is the more specific claim and
+ * the word the owner uses himself. `thrown` outranks the frame words for the
+ * same reason: a Mud Spear (Throwing) is a thrown weapon that happens to be
+ * shaped like a spear, and calling it a "Spear" would describe the object while
+ * hiding how it is used.
+ *
+ * Returns null for anything that is not a ranged weapon, so a caller can omit
+ * the line entirely rather than print an empty one.
+ */
+const RANGED_CLASS_ORDER: Array<{ tag: RegExp; label: string }> = [
+  { tag: /^bolt-caster$/i, label: 'Bolt-Caster' },
+  { tag: /^crossbow$/i, label: 'Crossbow' },
+  { tag: /^bow$/i, label: 'Bow' },
+  { tag: /^sling$/i, label: 'Sling' },
+  // ⚠ `throwable` sits beside `thrown` because the catalog uses BOTH and does
+  // not always use both together — Mud Spear (Throwing) carries `throwable` and
+  // no `thrown` at all. Matching only one of them left it unlabelled.
+  { tag: /^(thrown|throwable)$/i, label: 'Thrown' },
+  // A ranged weapon tagged `spear` is a shaft you send at something: the pikes
+  // and javelins. The tag is the authored signal and it is trusted over the name.
+  { tag: /^(spear|javelin)$/i, label: 'Thrown' },
+  { tag: /^firearm$/i, label: 'Firearm' },
+];
+
+/** ⚠⚠ NAME FALLBACK, second and never first. Six catalog rows carry no class tag
+ *  at all — Beacon Rifle, Revivalist Field Carbine, Bone Harpoon Launcher and
+ *  the pikes — and an unlabelled row is the same silence this OTA exists to
+ *  break. Tags stay authoritative because they are what the author wrote; the
+ *  name is only consulted when the author wrote nothing. */
+const RANGED_NAME_FALLBACK: Array<{ re: RegExp; label: string }> = [
+  { re: /\bcrossbow\b/i, label: 'Crossbow' },
+  { re: /\bbow\b|\blongbow\b/i, label: 'Bow' },
+  { re: /\bsling\b/i, label: 'Sling' },
+  // Launcher before harpoon: a Bone Harpoon Launcher is the launcher, and the
+  // harpoon is what it fires — which is also the fact the coating fiction needs.
+  { re: /\b(rifle|carbine|cannon|blaster|pistol|gun|launcher|repeater|thrower|railgun)\b/i, label: 'Firearm' },
+  { re: /\b(spear|pike|javelin|harpoon|dart)\b/i, label: 'Thrown' },
+];
+
+export function rangedClassLabel(opts: {
+  weaponKind?: 'melee' | 'ranged' | 'runecaster';
+  name?: string;
+  tags?: readonly string[];
+}): string | null {
+  if (opts.weaponKind !== 'ranged') return null;
+  const tags = opts.tags ?? [];
+  for (const row of RANGED_CLASS_ORDER) {
+    if (tags.some((t) => row.tag.test(String(t)))) return row.label;
+  }
+  const name = opts.name ?? '';
+  for (const row of RANGED_NAME_FALLBACK) {
+    if (row.re.test(name)) return row.label;
+  }
+  return null;
+}
+
+/** ⚠ OTA-1557 — does this class fire AMMUNITION rather than throw the weapon
+ *  itself? Owner: *"coatings are applied to the bolts not the weapon, but the
+ *  weapon carries the tag."* That is the right fiction and it was said nowhere —
+ *  the coating modal only ever talked about painting the weapon. The MECHANICS
+ *  do not change (the coating still lives on the weapon instance, which is what
+ *  a repair and a break already reason about, and what "the weapon carries the
+ *  tag" means); the WORDS do. */
+export function firesAmmunition(opts: {
+  weaponKind?: 'melee' | 'ranged' | 'runecaster';
+  name?: string;
+  tags?: readonly string[];
+}): boolean {
+  const cls = rangedClassLabel(opts);
+  return cls === 'Bolt-Caster' || cls === 'Crossbow' || cls === 'Bow'
+    || cls === 'Firearm' || cls === 'Sling';
+}
+
 function attackStatFor(
   wc: WeaponClass,
   stats: PlayerCharacter['stats'],

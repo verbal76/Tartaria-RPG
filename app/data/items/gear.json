@@ -732,7 +732,7 @@
     {
       "name": "Corruption Tonic",
       "kind": "consumable",
-      "rarity": "Rare",
+      "rarity": "Uncommon",
       "tags": [
         "potion",
         "weapon_coating",
@@ -765,7 +765,7 @@
         "kind": "consumable",
         "coating": {
           "kind": "corruption",
-          "dice": "1d6",
+          "dice": "1d8",
           "label": "Plagued"
         }
       }
@@ -786,7 +786,7 @@
         "kind": "consumable",
         "coating": {
           "kind": "poison",
-          "dice": "1d6",
+          "dice": "1d8",
           "label": "Festering"
         }
       }
@@ -993,7 +993,7 @@
         "kind": "consumable",
         "coating": {
           "kind": "cold",
-          "dice": "1d4",
+          "dice": "1d6",
           "label": "Frost-Rimed"
         }
       }

@@ -25669,7 +25669,62 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // weaponKind:"runecaster" and describes itself as a slab-runecaster, so it has
 // no edge for a coating to ride - making rune-casters coatable is a design
 // change and his call.
-export const OTA_BUILD_ID = '2026-08-30-1556-two-cudgels-are-two-objects';
+// OTA-1557 - THE PORTRAIT STOPS BETWEEN THEM. Owner: "in a stacked enemy I
+// fought I killed one and the enemy portrait hung between enemies. this has been
+// ongoing." Three faults at once, which is why earlier passes missed it. OTA-929
+// fixed the BLANK card after a kill by remounting the pager on a roster change -
+// a different symptom, still correct, untouched. Nothing owned the OFFSET:
+// (1) TWO SNAP AUTHORITIES - pagingEnabled snaps to the scroll view's width,
+// snapToInterval to cardWidth, and they agree only while those numbers are
+// identical, which in the frames after a kill they are not; (2) NO RESOLUTION
+// WITHOUT MOMENTUM - every cell is a vertical ScrollView (OTA-1514, and it must
+// stay one), and on Android an inner scroller can claim a horizontal drag and
+// hand it back with no momentum event, so onMomentumScrollEnd, the only reader,
+// never ran and a half-scrolled pager was never even noticed; (3) NOTHING PUT IT
+// BACK - there was no path from "activeEnemyIdx changed" to "scroll there", so a
+// kill re-pointed the target in the store and the pager simply did not follow.
+// All three are closed: one snap authority, both drag endings resolve to a page
+// through one resolver, and an effect drives the pager from the target whenever
+// the target or the roster moves. The same report carried two smaller asks, both
+// about the game naming what it already knew: a ranged weapon now states its
+// CLASS ("a boltcaster is a crossbow style weapon, it needs something like that
+// in the stats line") - 65 weapons shared the two words "Ranged Weapon" - and
+// the coating modal says where the coat actually rides ("coatings are applied to
+// the bolts not the weapon, but the weapon carries the tag"). A rune-caster also
+// states its own rule on the item now instead of only in a refusal.
+//
+// OTA-1558 - A DEAD DOG IS NOT A DOG. Four gates asked `!player.dog` when they
+// meant "no LIVING dog", and `player.dog` is deliberately KEPT after a death or
+// an abandonment (status dead/abandoned) so grief narration and the death-write
+// verification can read it. OTA-346 wrote hasActiveDog for exactly this and
+// fixed the puppy-vendor arc with it; four other readers never got the memo -
+// the rescue-PROP seeding (so the world stopped staging cages and wagons at
+// all), the TEXT/INTENT dispatch (the gate the owner named: even with a prop in
+// front of him, `investigate the cage` was refused), the Arbiter's day-5 RUMOUR,
+// and the lead context twice (so SALVAGE would strip the snare he needed). Lose
+// a dog once and the rescue quest was sealed for the rest of the save. All five
+// now ask hasActiveDog. Fixing the predicate is not enough on its own, because a
+// save can also be wedged by state those broken gates already WROTE, so a
+// one-off amnesty runs at load for any character with no living companion:
+// clears a stale pendingDogOnboarding, re-arms the rumour, latches itself done
+// so it happens once per save rather than nagging every load. SILENT on the
+// owner's instruction - "we don't want to advertise a fix broke the dog system"
+// - so no world line and no arbiter line, only a debug entry in the on-disk log.
+//
+// OTA-1559 - THE COATING LADDER MEANS SOMETHING. Owner: "all coatings are still
+// 1d4." Ten of fourteen were. The RECIPES already described a ladder the dice
+// never followed: base (cheap foraged mats), variant (base plus one material,
+// which buys a stat rider), premium (needs a scarce ingredient - a Disease
+// Sample, Viper Venom, an Aetheric Shard). Four values corrected, no more,
+// because a blanket buff is a different decision than a coherence fix:
+// Corruption Tonic was RARE rolling 1d4 off a pure base-tier recipe (its rarity
+// was the lie, not its dice) -> Uncommon; Plague Tonic and Plague Vial each
+// demand the scarcest ingredient in the game and rolled the same die as a
+// foraged Uncommon -> 1d8; Frost Paste cost a Mudstone more than the pastes
+// beside it and bought nothing for it -> 1d6. Three rungs are now in play and no
+// Rare rolls an Uncommon's die. The four rider pastes deliberately keep 1d4:
+// they trade damage for a stat and cost an extra material for the trade.
+export const OTA_BUILD_ID = '2026-08-30-1559-the-coating-ladder-means-something';
 // golem catch-up 2026-08-30: markerless publish of OTA-1549/1550/1551 (the
 // SPEAK TO bar filled + SET COURSE inside the talk sheet, one slot one weapon,
 // and the standing keyboard's session latch) to the golem channel.
