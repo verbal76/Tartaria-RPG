@@ -4821,7 +4821,8 @@
       "tags": [
         "runecaster",
         "rune_power",
-        "aetheric"
+        "aetheric",
+        "unmaking"
       ],
       "effect": "Disables magical effects in a small area. 2 rounds.",
       "description": "Cracked-crystal runecaster. Severs the Aether-thread of nearby effects."
@@ -5215,7 +5216,8 @@
         "runecaster",
         "rune_power",
         "aetheric",
-        "legendary"
+        "legendary",
+        "unmaking"
       ],
       "effect": "Teleports caster to a visible location. Instantaneous.",
       "description": "Spiral-runecaster. Pulls the caster sideways through the Veil."
@@ -5608,7 +5610,8 @@
         "runecaster",
         "rune_power",
         "aetheric",
-        "crafted"
+        "crafted",
+        "unmaking"
       ],
       "effect": "2d6 void; pulls the target 5 ft closer to the caster.",
       "description": "Void Pulse. A negative-space runecaster — fires a hole in the air that nearby matter falls toward."
@@ -5629,7 +5632,8 @@
         "runecaster",
         "rune_power",
         "aetheric",
-        "crafted"
+        "crafted",
+        "unmaking"
       ],
       "effect": "2d8 aetheric; caster turns invisible for 1 round after the hit.",
       "description": "Shadow Caller. A black-glass runecaster. The strike lands, then you aren't where you were."
@@ -5742,7 +5746,8 @@
         "rune_power",
         "aetheric",
         "legendary",
-        "crafted"
+        "crafted",
+        "unmaking"
       ],
       "effect": "2d20 void; opens a damaging rift on the target tile for 2 rounds.",
       "description": "Void Edge. A blade-shaped runecaster, no edge — the cut happens in the Veil. Whatever stands in the rift keeps bleeding."
@@ -6166,6 +6171,192 @@
         "collect_only"
       ],
       "description": "Built by breaking down the five Aether Collection Beacons and re-wiring their collector-arrays to fire instead of feed. It grabs Aether-charge out of empty air and throws it as an electrical bolt sheathed in a caustic acid load — the two elements every Tartarian machine and tower-guardian dreads most. Cannot be forged, bought, or upgraded at a Crucible."
+    },
+    {
+      "name": "Rime Spike",
+      "weaponKind": "runecaster",
+      "damageType": "cold",
+      "damageDice": "1d6",
+      "stat": "intelligence",
+      "statRequirement": 2,
+      "rarity": "Uncommon",
+      "style": "runecaster",
+      "tc": 95,
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "runecaster",
+        "rune_power",
+        "aetheric",
+        "cold",
+        "frost",
+        "debuff",
+        "crafted"
+      ],
+      "effect": "1d6 cold; the chill sets in the joints — the target slows and strikes late for 2 rounds.",
+      "description": "Rime Spike. A stubby blue-white caster that breathes a needle of cold. It does not kill quickly. It makes a thing slow, and slow is what kills it."
+    },
+    {
+      "name": "Hoarfrost Ward",
+      "weaponKind": "runecaster",
+      "damageType": "cold",
+      "damageDice": "1d8",
+      "stat": "intelligence",
+      "statRequirement": 3,
+      "rarity": "Rare",
+      "style": "runecaster",
+      "tc": 240,
+      "defense": 2,
+      "tags": [
+        "weapon",
+        "runecaster",
+        "rune_power",
+        "aetheric",
+        "cold",
+        "frost",
+        "ward",
+        "crafted"
+      ],
+      "effect": "Sheathes you in a shell of standing frost that cracks before you do.",
+      "description": "Hoarfrost Ward. Frost grown outward in plates until it stands off the body — it takes the blow and shatters, and you walk out of the shards."
+    },
+    {
+      "name": "Killing Frost",
+      "weaponKind": "runecaster",
+      "damageType": "cold",
+      "damageDice": "2d8",
+      "stat": "intelligence",
+      "statRequirement": 3,
+      "rarity": "Rare",
+      "style": "runecaster",
+      "tc": 300,
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "runecaster",
+        "rune_power",
+        "aetheric",
+        "cold",
+        "frost",
+        "crafted"
+      ],
+      "effect": "2d8 cold; deep enough to seize a Construct's joints outright.",
+      "description": "Killing Frost. The cold that comes off it is not weather. Metal goes brittle, mud goes to stone, and whatever was moving stops being able to."
+    },
+    {
+      "name": "Winter's Verdict",
+      "weaponKind": "runecaster",
+      "damageType": "cold",
+      "damageDice": "2d10",
+      "stat": "intelligence",
+      "statRequirement": 4,
+      "rarity": "Legendary",
+      "style": "runecaster",
+      "tc": 1000,
+      "defense": 1,
+      "tags": [
+        "weapon",
+        "runecaster",
+        "rune_power",
+        "aetheric",
+        "cold",
+        "frost",
+        "legendary",
+        "crafted"
+      ],
+      "effect": "2d10 cold; the freeze carries through armour and holds — a sentence, not a strike.",
+      "description": "Winter's Verdict. Pre-Flood judgment work. It does not argue with what it is pointed at; it simply decides the matter is closed and the cold agrees."
+    },
+    {
+      "name": "Glowrot",
+      "weaponKind": "runecaster",
+      "damageType": "radiation",
+      "damageDice": "1d8",
+      "stat": "intelligence",
+      "statRequirement": 2,
+      "rarity": "Uncommon",
+      "style": "runecaster",
+      "tc": 120,
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "runecaster",
+        "rune_power",
+        "aetheric",
+        "radiation",
+        "crafted"
+      ],
+      "effect": "1d8 radiation; the wound keeps working after the light is gone.",
+      "description": "Glowrot. A cracked lens over a seed of something that has not stopped burning since before the water came. Point it and the light does the rest."
+    },
+    {
+      "name": "Sickening Light",
+      "weaponKind": "runecaster",
+      "damageType": "radiation",
+      "damageDice": "2d6",
+      "stat": "intelligence",
+      "statRequirement": 3,
+      "rarity": "Rare",
+      "style": "runecaster",
+      "tc": 280,
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "runecaster",
+        "rune_power",
+        "aetheric",
+        "radiation",
+        "debuff",
+        "crafted"
+      ],
+      "effect": "2d6 radiation; the target sickens — its attacks weaken for 3 rounds.",
+      "description": "Sickening Light. A dull amber pulse that does nothing you can see, until the thing you aimed it at starts swinging like it is tired."
+    },
+    {
+      "name": "Fallout Bloom",
+      "weaponKind": "runecaster",
+      "damageType": "radiation",
+      "damageDice": "2d6",
+      "stat": "intelligence",
+      "statRequirement": 3,
+      "rarity": "Rare",
+      "style": "runecaster",
+      "tc": 320,
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "runecaster",
+        "rune_power",
+        "aetheric",
+        "radiation",
+        "aoe",
+        "crafted"
+      ],
+      "effect": "2d6 radiation to everything close — the light opens and does not choose.",
+      "description": "Fallout Bloom. It opens like a flower and it does not care whose side anyone is on. Reclaimers who carry one learn to throw it and step back."
+    },
+    {
+      "name": "Half-Life Pulse",
+      "weaponKind": "runecaster",
+      "damageType": "radiation",
+      "damageDice": "2d10",
+      "stat": "intelligence",
+      "statRequirement": 4,
+      "rarity": "Legendary",
+      "style": "runecaster",
+      "tc": 1080,
+      "defense": 1,
+      "tags": [
+        "weapon",
+        "runecaster",
+        "rune_power",
+        "aetheric",
+        "radiation",
+        "legendary",
+        "crafted"
+      ],
+      "effect": "2d10 radiation; the decay keeps going long after the pulse ends.",
+      "description": "Half-Life Pulse. Whatever powers it has been dying for ten thousand years and is not finished. Neither is what it points at."
     }
   ]
 }

@@ -25724,7 +25724,44 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // beside it and bought nothing for it -> 1d6. Three rungs are now in play and no
 // Rare rolls an Uncommon's die. The four rider pastes deliberately keep 1d4:
 // they trade damage for a stat and cost an extra material for the trade.
-export const OTA_BUILD_ID = '2026-08-30-1559-the-coating-ladder-means-something';
+// OTA-1560 - WHAT POWER TIES TO WHAT STAT. The rune-caster passive design,
+// settled with the owner over three messages and now in data + one engine leaf,
+// ready for the Crucible channel to call. He set the frame: "a runecaster is a
+// power weapon so it can only use the power it can generate, so you cannot apply
+// coatings, but they can be upgraded at the crucible, but it adds passive stats
+// instead that improve with character stats", and then the axis: "say you're
+// going for stealth and you want a dexterity passive so then maybe that only
+// applies to mud."
+//
+// HIS EXAMPLE OVERRULED MY FIRST ANSWER. I modelled damage type -> stat, and it
+// put Slick Mud and Dust Cloud on STRENGTH because both are bludgeoning - when
+// those two are exactly what a stealth build reaches for. The ROLE is the
+// playstyle; the damage type is only what the spell is made of. So the role
+// picks the stat, and the damage type is consulted for PLAIN STRIKES alone,
+// because a strike has no playstyle of its own. School changes nothing, on his
+// agreement: two spells doing the same job give the same result, and the schools
+// are already separated somewhere better - mud has no healing, aether has no
+// summons.
+//
+// THE CATALOGUE WAS NOT THE PROBLEM, which he asked about directly ("do we need
+// to change the catalogue? is it unevenly distributed? I don't want a bandaid").
+// Measured: the schools COMPLEMENT (mud owns cover/summon/terrain, aether owns
+// buff/debuff/healing/utility) and the eighteen aether strikes are a clean rarity
+// LADDER, not a pile - the default school being deepest is correct. Nothing was
+// re-typed, because re-tagging shipped weapons silently changes items sitting in
+// live saves. What was genuinely thin got WRITTEN instead: cold and radiation had
+// exactly one caster each, so four frost and four radiation casters were authored
+// across rarity and role (cold 1->5, radiation 1->5), each with a recipe. Plus
+// the INT/WIS split he asked for by name, and it is not a quota either - force
+// applied outward stays INT, the spells that UNMAKE (Disrupt severs a thread,
+// Displace moves a thing out of true, the Void trio takes something away) go to
+// WIS behind an `unmaking` tag so the rule reads off data and not a name list.
+// Result across 63 casters: STR 19%, DEX 14%, INT 22%, WIS 25%, CHA 9%,
+// STEALTH 9% - INT no longer swamps it and WIS has something to want. Caps are
+// his, verbatim: two passives, three at Legendary. One pre-existing hole closed
+// in passing - Frostbind was tagged `crafted` with no recipe, the only runecaster
+// in that state, and a dead end at the bench for anyone who read the tag.
+export const OTA_BUILD_ID = '2026-08-30-1560-what-power-ties-to-what-stat';
 // golem catch-up 2026-08-30: markerless publish of OTA-1549/1550/1551 (the
 // SPEAK TO bar filled + SET COURSE inside the talk sheet, one slot one weapon,
 // and the standing keyboard's session latch) to the golem channel.

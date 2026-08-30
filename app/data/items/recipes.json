@@ -2174,6 +2174,159 @@
           "quantity": 1
         }
       ]
+    },
+    {
+      "result": "Frostbind",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Uncommon)",
+          "quantity": 1
+        },
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Rime Spike",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Uncommon)",
+          "quantity": 1
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Hoarfrost Ward",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Rare)",
+          "quantity": 1
+        },
+        {
+          "name": "Crystal Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Killing Frost",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Rare)",
+          "quantity": 1
+        },
+        {
+          "name": "Crystal Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Winter's Verdict",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Legendary)",
+          "quantity": 1
+        },
+        {
+          "name": "Aetherstone Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Crystal Core",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Glowrot",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Uncommon)",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Automaton Circuit",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Sickening Light",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Rare)",
+          "quantity": 1
+        },
+        {
+          "name": "Phantom Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Fallout Bloom",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Rare)",
+          "quantity": 1
+        },
+        {
+          "name": "Shadow Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Mud",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Half-Life Pulse",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Legendary)",
+          "quantity": 1
+        },
+        {
+          "name": "Demon Core",
+          "quantity": 1
+        },
+        {
+          "name": "Iron Core",
+          "quantity": 1
+        }
+      ]
     }
   ]
 }
