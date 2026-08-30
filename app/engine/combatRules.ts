@@ -3,6 +3,9 @@ import { rollDie } from './rng';
 import { findWeaponByName, type CatalogWeapon } from './crafting';
 import { effectiveStats } from './equipment';
 import { traitACBonus, enemyIsAerial } from './enemyTraits';
+// ⚠ OTA-1562 — safe to import here: weaponEffects reaches only rng / enemyTraits
+// / types, none of which reach back into combatRules, so no cycle is created.
+import { parseWeaponEffect, armorIgnoreReduction } from './weaponEffects';
 import { barehandDamageFor } from './raceMechanics';
 import { titlePerkModifiers, type TitlePerks } from './titles';
 
@@ -596,7 +599,23 @@ export function buildCombatSteps(
   // OTA-362 — acid armor shred lowers the target's effective AC (floored
   // at 1) so an acid-coated weapon makes a tough foe progressively easier
   // to land.
-  const ac = Math.max(1, enemyAC(enemy) - Math.max(0, opts?.acReduction ?? 0));
+  //
+  // ⚠⚠⚠ OTA-1562 — AND SO DOES A WEAPON THAT SAYS IT IGNORES ARMOUR. Eight
+  // catalog rows make that promise in the effect column and not one of them kept
+  // it: the Aetheric Railgun, billed *"Ignores armor; long range"*, rolled
+  // against an armoured foe's full AC like a stick. It rides the SAME reduction
+  // the acid shred already established rather than opening a parallel path, so
+  // the two stack the way a player would expect and one AC floor covers both.
+  //
+  // ⚠⚠ IT IS COMPUTED HERE, not at the call site, because `equipped` above is
+  // already resolved for the hand that SWINGS (main / off / forced bare) — the
+  // exact distinction OTA-957 had to fix for the ranged/melee split. A
+  // caller-side lookup would pierce with the main hand's weapon on every
+  // off-hand swing.
+  const armorPierce = equipped
+    ? armorIgnoreReduction(parseWeaponEffect(equipped.effect)?.armorIgnore, enemy)
+    : 0;
+  const ac = Math.max(1, enemyAC(enemy) - Math.max(0, opts?.acReduction ?? 0) - armorPierce);
   const enemyInit = rollDie(10);
   // Use equipped damage dice if available; parse "2d6" or "1d10+1d6".
   // OTA 038 — barehanded path now reads race.barehandDamage instead of
@@ -739,7 +758,11 @@ export function buildCombatSteps(
         bonus: stat.value + totalMod,
         bonusLabel: pieces.join(' '),
         target: ac,
-        targetLabel: `AC ${ac}`,
+        // ⚠ OTA-1562 — SAY THAT THE ARMOUR WAS PIERCED. A lowered AC with no
+        // explanation reads as a weaker enemy, not a better weapon; naming it on
+        // the card is what turns "Ignores armor" from a sentence on a shop
+        // listing into something the player watches happen.
+        targetLabel: armorPierce > 0 ? `AC ${ac} (armour pierced −${armorPierce})` : `AC ${ac}`,
         context: `${ctxPieces.join(' ')} to hit ${enemy.name}`,
         ...(rollMode ? { rollMode, rollModeLabel } : {}),
       };

@@ -21,8 +21,9 @@
 // nothing matches — caller falls through.
 
 import { rollFromNotation } from './rng';
-import { enemyIsAerial } from './enemyTraits';
-import type { Enemy } from './types';
+import { enemyIsAerial, armorACPortions, PLATE_TRAIT_AC } from './enemyTraits';
+import { reachBandsFor } from './types';
+import type { CombatRange, Enemy } from './types';
 
 export type BonusCondition =
   | 'large'
@@ -36,11 +37,160 @@ export type BonusCondition =
   | 'aetheric'
   | 'aerial';
 
+/**
+ * ⚠⚠⚠ OTA-1562 — THE EFFECT COLUMN WAS MOSTLY DECORATION. An audit of all 284
+ * weapons found that only 56 of them carry an effect line anything reads: 23 go
+ * through the "+NdN against X" clause above, 33 through `statBonuses`. The other
+ * 184 print a sentence under a rules heading that no code has ever asked about.
+ * The Compact Laser Pistol says *"Ignores light armor."* and does not. The
+ * Aetheric Railgun says *"Ignores armor; long range."* and does neither. A
+ * player who reads the card and buys the weapon for the promise on it has been
+ * lied to by the game, which is a worse defect than the missing mechanic.
+ *
+ * ⚠⚠ THIS OTA TAKES THE TWO FAMILIES THAT LAND ON SYSTEMS THAT ALREADY EXIST —
+ * range notes ride the reach bands, armour-ignore rides the AC step — so nothing
+ * new has to be invented to make the sentences true. What deliberately does NOT
+ * land here is any ignore gated on an outcome (*"on max damage roll"*, *"on
+ * advantage rolls"*): those are decided AFTER the roll this reads, so they are a
+ * different mechanic wearing the same words, and they wait for their own slice.
+ * Parsing them here and quietly not applying them would just recreate the bug in
+ * a new place.
+ */
+
+/** How a weapon's effect line changes the bands it can strike from. */
+export type WeaponRangeNote = 'short' | 'long' | 'any';
+
+export type ArmorIgnoreScope =
+  /** "ignores armor" / "cuts through any armor" — worn plate AND raised fields. */
+  | 'all'
+  /** "ignores non-magical armor" / "non-Aetheric armor" — plate only, and
+   *  nothing at all when the creature's own nature is the armour. */
+  | 'nonmagical'
+  /** "ignores light armor" — capped at one tier of plate. */
+  | 'light'
+  /** "ignores shields" — the raised Aether Shield only. */
+  | 'shields'
+  /** "ignores N armor points" — a flat number off whatever armour is there. */
+  | 'points';
+
+export interface ArmorIgnore {
+  scope: ArmorIgnoreScope;
+  /** Only meaningful for scope 'points'. */
+  points?: number;
+}
+
 export interface ParsedWeaponEffect {
   /** Every "+NdN against X" clause on the weapon, each stacking additively. */
   bonuses?: Array<{ dice: string; condition: BonusCondition }>;
   onHitBleed?: boolean;
   onHitBurn?: boolean;
+  /** OTA-1562 — "short range" / "long range" / "at any range". */
+  rangeNote?: WeaponRangeNote;
+  /** OTA-1562 — an unconditional armour piercer. See the note above on why
+   *  outcome-gated ignores are NOT parsed into this field. */
+  armorIgnore?: ArmorIgnore;
+}
+
+/**
+ * ⚠⚠ THE GUARD THAT KEEPS THE PROMISE HONEST. An ignore clause qualified by an
+ * outcome — a max damage roll, an advantage roll, once per encounter — is not
+ * what this OTA implements, and a parser that matched it anyway would hand every
+ * Plasma Scythe swing an unconditional armour pierce it was never meant to have.
+ * Refusing the clause outright leaves the weapon exactly as it was, which is the
+ * honest state until its own slice lands.
+ */
+const IGNORE_DEFERRED_RE = /\bon\s+(?:a\s+|the\s+)?max\b|\badvantage\b|\bonce per\b|\bcritical\b/;
+
+/** Rank the scopes so a two-clause line ("Cuts through any armor; ignores
+ *  non-magical defenses") resolves to the STRONGER claim rather than the last
+ *  one the regex happened to reach. */
+const IGNORE_RANK: Record<ArmorIgnoreScope, number> = {
+  all: 5, nonmagical: 4, light: 3, shields: 2, points: 1,
+};
+
+function armorIgnoreFromClause(clause: string): ArmorIgnore | null {
+  if (!/\bignor\w*\b|\bcuts?\s+through\b|\bpunches?\s+through\b/.test(clause)) return null;
+  // "Ignores cover" and "Ignores wind conditions" are real effects — they are
+  // just not THIS effect. Requiring an armour noun keeps them out of the AC math
+  // and leaves them for the weather/cover slice.
+  if (!/\barmou?r\b|\barmou?r\s+points?\b|\bdefen[cs]es?\b|\bshields?\b/.test(clause)) return null;
+  if (IGNORE_DEFERRED_RE.test(clause)) return null;
+  const pts = clause.match(/(\d+)\s+armou?r\s+points?/);
+  if (pts) return { scope: 'points', points: parseInt(pts[1]!, 10) };
+  if (/\blight\s+armou?r\b/.test(clause)) return { scope: 'light' };
+  if (/\bnon-?\s*(?:magical|aetheric|aether)\b/.test(clause)) return { scope: 'nonmagical' };
+  if (/\barmou?r\b|\bdefen[cs]es?\b/.test(clause)) return { scope: 'all' };
+  return { scope: 'shields' };
+}
+
+function rangeNoteFrom(text: string): WeaponRangeNote | null {
+  if (/\bat any range\b/.test(text)) return 'any';
+  if (/\bshort[- ]?ranged?\b/.test(text)) return 'short';
+  if (/\blong[- ]?ranged?\b/.test(text)) return 'long';
+  return null;
+}
+
+/**
+ * ⚠⚠ OTA-1562 — WHAT A RANGE NOTE DOES TO THE BANDS. `bands` arrives ordered
+ * OUTERMOST-FIRST (`['distant','far','mid','close']`), which is what makes
+ * "short" a single shift off the front rather than a rewritten table.
+ *
+ * A note can only ever move a weapon WITHIN the ranged family — it never
+ * promotes a melee weapon into a shooter (a pike that reaches `mid` is still a
+ * pike), and `short` never strips a weapon below close+mid, because a thrown
+ * knife you cannot throw is not a short-ranged weapon, it is a broken one.
+ */
+export function applyRangeNote(
+  bands: readonly CombatRange[],
+  note: WeaponRangeNote | null | undefined,
+): CombatRange[] {
+  const out = [...bands];
+  if (!note || out.length <= 1) return out;
+  if (note === 'any' || note === 'long') {
+    const full = reachBandsFor('ranged');
+    return out.length >= full.length ? out : full;
+  }
+  // 'short' — give up the outermost band, never dropping below close + mid.
+  return out.length > 2 ? out.slice(1) : out;
+}
+
+/**
+ * ⚠⚠ OTA-1562 — HOW MUCH AC AN ARMOUR PIERCER ACTUALLY REMOVES. The rule is
+ * that "ignores armour" removes exactly the AC that ARMOUR added, no more: the
+ * portions come from `armorACPortions`, so a piercer can never eat the `agile`
+ * +1 (footwork is not armour) and can never drive AC below what an unarmoured
+ * version of the same creature would have. It returns a positive number the
+ * caller subtracts, so a creature wearing nothing gives back 0 and the weapon
+ * simply behaves as it always did.
+ */
+export function armorIgnoreReduction(
+  ignore: ArmorIgnore | null | undefined,
+  enemy: { traits?: readonly string[]; name?: string; type?: string } | null | undefined,
+): number {
+  if (!ignore || !enemy) return 0;
+  const { plate, field } = armorACPortions(enemy.traits);
+  switch (ignore.scope) {
+    case 'all':
+      return plate + field;
+    case 'shields':
+      return field;
+    case 'light':
+      return Math.min(plate, PLATE_TRAIT_AC);
+    case 'nonmagical': {
+      // ⚠ "Ignores non-Aetheric armour" has to mean something against an
+      // Aetheric creature, or the qualifier is decoration. On a thing whose own
+      // substance is aether, the armour IS magical and the edge finds nothing to
+      // skip; a raised field is likewise never mundane, so it is excluded either
+      // way.
+      const sig = `${enemy.name ?? ''} ${enemy.type ?? ''}`.toLowerCase();
+      if (/aether|magical|spirit|wraith|apparition|phantom/.test(sig)) return 0;
+      return plate;
+    }
+    case 'points':
+      return Math.max(0, Math.min(ignore.points ?? 0, plate + field));
+    default:
+      return 0;
+  }
 }
 
 /** Map the free-text target phrase to a structured condition, or null. */
@@ -89,6 +239,31 @@ export function parseWeaponEffect(effect: string | undefined | null): ParsedWeap
   }
   if (/\bcauses?\s+burn\b/.test(text) || /\bburn(?:ing)?\s+damage\b/.test(text)) {
     out.onHitBurn = true;
+    touched = true;
+  }
+
+  // OTA-1562 — the range note is read off the whole line; there is never more
+  // than one, and no weapon in the catalog claims two.
+  const note = rangeNoteFrom(text);
+  if (note) {
+    out.rangeNote = note;
+    touched = true;
+  }
+
+  // OTA-1562 — armour-ignore is read CLAUSE BY CLAUSE, because the qualifier
+  // that matters ("on max damage roll") attaches to its own clause and must not
+  // be able to disqualify — or license — a different one on the same line.
+  let best: ArmorIgnore | null = null;
+  for (const clause of text.split(/[.;]/)) {
+    const found = armorIgnoreFromClause(clause);
+    if (!found) continue;
+    if (!best || IGNORE_RANK[found.scope] > IGNORE_RANK[best.scope]) best = found;
+    else if (best.scope === 'points' && found.scope === 'points') {
+      best = { scope: 'points', points: Math.max(best.points ?? 0, found.points ?? 0) };
+    }
+  }
+  if (best) {
+    out.armorIgnore = best;
     touched = true;
   }
 

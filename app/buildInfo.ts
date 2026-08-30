@@ -25791,7 +25791,39 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // in the WEAPONS list as permanent refusals under copy about coating channels),
 // the damage roll NAMES the stat that made the bonus so the player can see what
 // to raise, and the item card says what the weapon takes instead of a coating.
-export const OTA_BUILD_ID = '2026-08-30-1561-the-power-it-generates';
+// OTA-1562 - THE CARD MAKES A PROMISE. An audit of all 284 catalog weapons found
+// that only 56 carry an effect line anything reads - 23 through the "+NdN against
+// X" clause parser, 33 through statBonuses - and 44 have no effect line at all.
+// The other 184 print a sentence under a rules heading that no code has ever
+// asked about. The Compact Laser Pistol said "Ignores light armor." and did not.
+// The Aetheric Railgun said "Ignores armor; long range." and did neither. A
+// Throwing Knife billed SHORT RANGE threw exactly as far as a Bone War Javelin
+// billed LONG. That is worse than a missing mechanic: the player reads the card,
+// spends the coin, and has no way to discover the game lied, because a weapon
+// that ignores its own rule looks identical to one that has none.
+//
+// This is the first of four slices closing that finding, and it takes the two
+// families that land on systems ALREADY BUILT - range notes ride the reach bands
+// (OTA-550/1006/1508), armour-ignore rides the AC reduction the acid shred
+// established in OTA-362 - so nineteen sentences became true without inventing a
+// single new mechanic. Five weapons billed "short range" give up their outermost
+// band; the one billed "long range" gains one, which is what makes the pair of
+// words a real choice instead of two spellings of the same weapon. Four more are
+// confirmed rather than changed. Eight weapons now actually pierce armour, and
+// the roll card says so on the AC line so a lowered target reads as a better
+// weapon rather than a weaker enemy.
+//
+// WHAT IS DELIBERATELY LEFT ALONE is the honest half. An ignore qualified by an
+// OUTCOME - the Plasma Scythe's "on max damage roll once per encounter", the
+// Plasma Burst Rifle's "on advantage rolls" - is decided after the roll this
+// touches, so the parser refuses those clauses outright and both weapons stay
+// exactly as they were. Applying them unconditionally would have been the same
+// defect moved somewhere harder to see. "Ignores cover" and "ignores wind" are
+// likewise left for the weather slice rather than matched on the word "ignores".
+// A piercer removes only the AC that ARMOUR added - never the `agile` +1, never
+// a raised field when the text says non-magical, and nothing at all from an
+// unarmoured foe, so "ignores armour" can never quietly become "+2 to hit rats".
+export const OTA_BUILD_ID = '2026-08-30-1562-the-card-makes-a-promise';
 // golem catch-up 2026-08-30: markerless publish of OTA-1549/1550/1551 (the
 // SPEAK TO bar filled + SET COURSE inside the talk sheet, one slot one weapon,
 // and the standing keyboard's session latch) to the golem channel.

@@ -18,7 +18,10 @@ import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from './tutorialSteps';
 import { useGameStore, logUiTap } from '../state/gameStore';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { playerWeaponReach } from '../state/combatResolution';
-import { itemIsShield } from '../engine/crafting';
+import { itemIsShield, findWeaponByName } from '../engine/crafting';
+// OTA-1562 — the bandolier button has to give the SAME reach answer the throw
+// gate will give; see the note at its `inRange` below.
+import { parseWeaponEffect, applyRangeNote } from '../engine/weaponEffects';
 import { itemIsHandThrownSpear } from '../engine/bandolierEligibility';
 import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
@@ -995,7 +998,22 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             // 'far' inward (far/mid/close); the only out-of-range band is
             // 'distant'. RED when the current combat range is beyond reach
             // (too far to throw), GREEN when in range.
-            const inRange = range ? reachBandsFor('throwable').includes(range) : true;
+            //
+            // ⚠⚠ OTA-1562 — …AND NOW BY ITS OWN RANGE NOTE. This button could
+            // not call playerWeaponReach (the item isn't in a hand until the
+            // throw racks it), so it re-derived the bands from the class alone —
+            // harmless while every throwable reached identically, a live
+            // disagreement the moment "Short-range" started meaning something.
+            // A racked Throwing Knife would have glowed GREEN at `far` and then
+            // been refused by the gate. Reading the same note the gate reads
+            // keeps one authority on reach, which is the whole point of OTA-1006.
+            // A coating vial has no catalog weapon row, so the note is null and
+            // its colour is exactly what it always was.
+            const throwBands = applyRangeNote(
+              reachBandsFor('throwable'),
+              parseWeaponEffect(findWeaponByName(it.name)?.effect)?.rangeNote ?? null,
+            );
+            const inRange = range ? throwBands.includes(range) : true;
             return (
               <Pressable
                 key={it.id}

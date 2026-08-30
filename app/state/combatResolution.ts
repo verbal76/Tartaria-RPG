@@ -61,6 +61,7 @@ import { buildDeathScene, daysBelow } from '../engine/deathScene';
 import { rollDie, rollFromNotation, pick } from '../engine/rng';
 import { findArmorByName, findWeaponByName, findDogGearByName, applyDamageTypeModifier, applyArmorResistance, armorResistances, fusedArmorResistances, type ArmorSlotResist } from '../engine/crafting';
 import { reachClassFor, bossSwingsTwice } from '../engine/combatRules';
+import { parseWeaponEffect, applyRangeNote } from '../engine/weaponEffects';
 import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 // ⚠ OTA-1506 — the bullseye (per-enemy bearing + distance). See the FIELD
 // helpers below activeEnemy for how the legacy shared band is derived from it.
@@ -616,6 +617,16 @@ export function playerWeaponReach(
   const eq = player.equipped ?? {};
   const wpName = slot === 'off' ? eq.off : (eq.main ?? eq.weaponName);
   if (!wpName) return { bands: reachBandsFor('barehanded'), label: 'Bare hands' };
+  const w = findWeaponByName(wpName);
+  // ⚠⚠⚠ OTA-1562 — THE WEAPON'S OWN SENTENCE GETS A VOTE. Nine catalog rows say
+  // "short range" / "long range" / "at any range" in the effect column and the
+  // reach classifier never read a word of it, so a Throwing Knife billed as
+  // SHORT RANGE threw exactly as far as a Bone War Javelin billed as LONG. The
+  // note is resolved HERE, above every branch, because the classifier has four
+  // exits (throwable instance, forge stamp, catalog row, low-INT caster) and a
+  // note applied at only some of them is the OTA-1006 bug again — a second
+  // authority on reach that disagrees with the gate.
+  const rangeNote = parseWeaponEffect(w?.effect)?.rangeNote ?? null;
   // OTA-550 — a throwable inventory item (Shaped Aetheric Shard, etc.) equipped
   // to a hand throws from 'far' inward even though it's not in the weapon
   // catalog. Detect it off the inventory tags before the catalog lookup.
@@ -623,9 +634,8 @@ export function playerWeaponReach(
     (it) => it.name.toLowerCase() === wpName.toLowerCase() && itemIsThrowable(it),
   );
   if (throwInst) {
-    return { bands: reachBandsFor('throwable'), label: throwInst.name };
+    return { bands: applyRangeNote(reachBandsFor('throwable'), rangeNote), label: throwInst.name };
   }
-  const w = findWeaponByName(wpName);
   if (!w) {
     // OTA-955 — a weapon with no catalog row (Crucible forges) reads reach from
     // its OWN identity: the forge-stamped uniqueStats.reachClass first, then
@@ -635,16 +645,19 @@ export function playerWeaponReach(
     const inst = (player.inventory ?? []).find((it) => it.name.toLowerCase() === wpName.toLowerCase());
     const stamped = inst?.uniqueStats?.reachClass;
     const cls = stamped ?? reachClassFor({ name: wpName, tags: inst?.tags });
-    return { bands: reachBandsFor(cls), label: wpName };
+    return { bands: applyRangeNote(reachBandsFor(cls), rangeNote), label: wpName };
   }
   const cls = reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags });
   // OTA-550 — preserve the legacy runecaster INT gate: a low-INT caster
   // (Common/Uncommon, INT < 9) can't reach the outermost 'distant' band;
   // it tops out at 'far' inward. INT ≥ 9 (Rare/Legendary access) reaches all.
+  // ⚠ OTA-1562 — the note is NOT applied here. This branch is a PENALTY the
+  // character has earned by being under-statted, and a note that promoted the
+  // bands back would let a weapon's flavour text overrule a stat gate.
   if (cls === 'runecaster' && (player.stats.intelligence ?? 0) < 9) {
     return { bands: reachBandsFor('throwable'), label: w.name }; // far/mid/close
   }
-  return { bands: reachBandsFor(cls), label: w.name };
+  return { bands: applyRangeNote(reachBandsFor(cls), rangeNote), label: w.name };
 }
 
 // OTA-934 — a frost/cold coating on armour (-> a 'cold' entry in the piece's addedResists)

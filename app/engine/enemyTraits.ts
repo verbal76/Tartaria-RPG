@@ -24,19 +24,48 @@ export function enemyIsAerial(enemy: {
   return /\bdrone\b|\bbat\b|flying|airborne|wyvern|harpy|aetherwing/.test(sig);
 }
 
+/** The armour half of the AC traits, named once so `traitACBonus` and the
+ *  OTA-1562 armour-piercing reader can never drift apart on what a trait costs. */
+export const PLATE_TRAIT_AC = 2;
+export const FIELD_TRAIT_AC = 3;
+
 /** Stat-style modifiers — applied to enemy AC / attack rolls. */
 export function traitACBonus(traits: readonly string[] | undefined): number {
   if (!traits) return 0;
   let bonus = 0;
   for (const t of traits) {
-    if (t === 'armored') bonus += 2;
+    if (t === 'armored') bonus += PLATE_TRAIT_AC;
     // OTA-1202 — a raised Aether Shield IS armour while it stands: same +3 the player's
     // field grants, read here so enemyAC and the panel agree for free.
-    else if (t === 'field:aether_shield') bonus += 3;
+    else if (t === 'field:aether_shield') bonus += FIELD_TRAIT_AC;
     else if (t === 'weak_armor') bonus -= 2;
     else if (t === 'agile') bonus += 1;
   }
   return bonus;
+}
+
+/**
+ * ⚠⚠ OTA-1562 — HOW MUCH OF THAT AC IS ACTUALLY ARMOUR? `traitACBonus` answers
+ * "what do the traits add up to", which is the wrong question to ask on behalf
+ * of a weapon that claims to ignore armour: `agile` is +1 because the thing
+ * MOVES, and no railgun ever built pierces footwork. Splitting the sum here
+ * means the armour-ignore reader subtracts exactly the AC that armour put on.
+ *
+ * `plate` is mundane worn armour; `field` is a raised Aether Shield, which is
+ * armour AND magical — so a "non-magical armour" piercer must leave it standing.
+ * `weak_armor` is deliberately excluded: it is NEGATIVE, and folding it in would
+ * have an armour-piercing hit HAND AC BACK to a badly-armoured foe.
+ */
+export function armorACPortions(
+  traits: readonly string[] | undefined,
+): { plate: number; field: number } {
+  let plate = 0;
+  let field = 0;
+  for (const t of traits ?? []) {
+    if (t === 'armored') plate += PLATE_TRAIT_AC;
+    else if (t === 'field:aether_shield') field += FIELD_TRAIT_AC;
+  }
+  return { plate, field };
 }
 
 export function traitAttackBonus(traits: readonly string[] | undefined): number {

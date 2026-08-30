@@ -22,7 +22,12 @@ import {
 } from '../engine/itemDefaults';
 // OTA-1557 — the ranged sub-class ("Bolt-Caster", "Crossbow", "Bow", …), so the
 // stat line can say WHICH kind of ranged weapon this is.
-import { rangedClassLabel } from '../engine/combatRules';
+import { rangedClassLabel, reachClassFor } from '../engine/combatRules';
+// OTA-1562 — the range note and the armour-piercing rule, read off the SAME
+// parser the combat gate reads so the card can never promise a band or a pierce
+// the swing then refuses.
+import { parseWeaponEffect, applyRangeNote } from '../engine/weaponEffects';
+import { reachBandsFor, RANGE_LABELS } from '../engine/types';
 // OTA-1561 — what a rune-caster takes instead of a coating, and which stat it
 // will scale on, said on the item card rather than only at the Crucible.
 import { runecasterPassiveStat, runecasterPassiveSlots } from '../engine/runecasterPassives';
@@ -241,6 +246,33 @@ function previewWeapon(w: CatalogWeapon): ItemPreview {
   // precedence is what it is.
   const rangedClass = rangedClassLabel({ weaponKind: w.weaponKind, name: w.name, tags: w.tags });
   if (rangedClass) stats.push(`Class: ${rangedClass}`);
+  // ⚠⚠ OTA-1562 — SAY WHAT THE BANDS ACTUALLY ARE. The effect column has been
+  // saying "Short range" / "Long range" all along; as of this OTA it means
+  // something, and a player deciding between a Throwing Knife and a Bone War
+  // Javelin deserves the answer on the card rather than by dying at `far`.
+  // Printed from the SAME resolver the gate uses, so the card cannot promise a
+  // band the swing then refuses.
+  const parsedRules = parseWeaponEffect(w.effect);
+  if (parsedRules?.rangeNote) {
+    const bands = applyRangeNote(
+      reachBandsFor(reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags })),
+      parsedRules.rangeNote,
+    );
+    stats.push(`Reach: ${bands.map((b) => RANGE_LABELS[b]).reverse().join(' → ')}`);
+  }
+  // ⚠⚠ …AND WHAT IT DOES TO ARMOUR, for the eight weapons that promise it. This
+  // is deliberately phrased as the rule the AC step applies, not the catalog's
+  // own wording, so the card and the roll can be checked against each other.
+  if (parsedRules?.armorIgnore) {
+    const ig = parsedRules.armorIgnore;
+    stats.push(
+      ig.scope === 'points' ? `Pierces ${ig.points} point${ig.points === 1 ? '' : 's'} of armour`
+      : ig.scope === 'light' ? 'Pierces light armour'
+      : ig.scope === 'nonmagical' ? 'Pierces armour that is not itself magical'
+      : ig.scope === 'shields' ? 'Pierces raised shields'
+      : 'Pierces armour',
+    );
+  }
   // ⚠ AND THE ONE-LINE RULE A RUNE-CASTER LIVES BY, said on the item rather than
   // only in a refusal the player has to trip over. Owner: *"a runecaster is a
   // power weapon so it can only use the power it can generate, so you cannot
