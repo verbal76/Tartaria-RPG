@@ -26115,6 +26115,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
 // evidence stays greppable.
 export const OTA_BUILD_ID = '2026-08-30-1580-the-guy-who-was-never-there';
+// golem catch-up 2026-08-30: markerless publish of OTA-1580 — the 42-role NPC
+// roster with successors, and the mission-encounter state machine.
 // OTA-1580 — foundation for the mission conversation card. 114 stages name a
 // person and `npcName` was read in ONE place in the codebase (a hint string),
 // so there was no guy anywhere in the game. Adds the 42-role NPC roster with
