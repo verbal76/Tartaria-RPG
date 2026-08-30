@@ -25824,6 +25824,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // a raised field when the text says non-magical, and nothing at all from an
 // unarmoured foe, so "ignores armour" can never quietly become "+2 to hit rats".
 export const OTA_BUILD_ID = '2026-08-30-1562-the-card-makes-a-promise';
+// golem catch-up 2026-08-30: markerless publish of OTA-1562 (the weapon effect
+// column starts meaning something - range notes ride the reach bands, armour-
+// ignore rides the AC step, and the two families of promise that land on systems
+// already built are now kept) to the golem channel.
 // golem catch-up 2026-08-30: markerless publish of OTA-1549/1550/1551 (the
 // SPEAK TO bar filled + SET COURSE inside the talk sheet, one slot one weapon,
 // and the standing keyboard's session latch) to the golem channel.
