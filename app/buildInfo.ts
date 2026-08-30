@@ -26151,6 +26151,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // must NOT advance the stage, or the aftermath the buttons promised - TAKE, or
 // TAKE AND KILL - is skipped by the engine on the player's behalf.
 export const OTA_BUILD_ID = '2026-08-30-1581-the-card-they-cannot-walk-past';
+// golem catch-up 2026-08-30: markerless publish of OTA-1581 — the mission
+// conversation card wired end to end (arming selector, card UI, persuade roll,
+// the post-keyed kill ledger), plus the two engine holes the wiring exposed:
+// a stage `spawn` that only ran inside the boss branch, and an escort clear
+// that advanced past the card's own aftermath.
 // golem catch-up 2026-08-30: markerless publish of OTA-1580 — the 42-role NPC
 // roster with successors, and the mission-encounter state machine.
 // OTA-1580 — foundation for the mission conversation card. 114 stages name a
