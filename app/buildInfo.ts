@@ -25863,6 +25863,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // deliberately NOT a piercing verb: that is a lasting shred, which the acid
 // path already models, and folding it in would make it permanent and free.
 export const OTA_BUILD_ID = '2026-08-30-1563-nobodys-weapon-gets-worse';
+// golem catch-up 2026-08-30: markerless publish of OTA-1563 (the range nerf
+// removed catalog-wide, six unread piercing verbs wired, and twenty new
+// armour-piercing lines on a rarity ladder) to the golem channel.
 // golem catch-up 2026-08-30: markerless publish of OTA-1562 (the weapon effect
 // column starts meaning something - range notes ride the reach bands, armour-
 // ignore rides the AC step, and the two families of promise that land on systems
