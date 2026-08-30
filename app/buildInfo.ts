@@ -26115,6 +26115,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
 // evidence stays greppable.
 export const OTA_BUILD_ID = '2026-08-30-1572-the-card-says-stunned';
+// golem catch-up 2026-08-30: markerless publish of OTA-1572 (slice 2 — on-hit
+// control effects: 33 weapon cards that promised a stun / trip / bind / blind
+// and had nowhere on an enemy to put one, plus the anti-lock brace).
 // OTA-1572 (weapon-effects slice 2) — on-hit CONTROL effects. 33 weapons
 // promise stun / prone / restrained / paralyze / slow / blind / knockback and
 // none could ever have worked: every enemyStatuses kind is damage-over-time,
