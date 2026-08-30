@@ -97,10 +97,14 @@ describe('OTA-1568 — the split says exactly what the flat label says', () => {
     // `⚗` renders monochrome, so it inherited the chip's own text — `#15180f` on
     // a strike chip, `#9ec96a` on a ready one. Now it is acid green-yellow on
     // both, which is the entire ask.
-    expect(COATING_GLYPH_COLOR.acid).toBe('#b4e619');
+    // ⚠ RETARGETED BY OTA-1569. The hex moved — my `#b4e619` was an acid green
+    // sitting on a sage-green button, which is the collision he photographed —
+    // but the PROPERTY this pins is unchanged and is the thing he asked for:
+    // acid has a colour of its own instead of inheriting the chip's label.
     const INPUT = src('app/components/InputBox.tsx');
     expect(COATING_GLYPH_COLOR.acid).not.toBe('#15180f');
     expect(COATING_GLYPH_COLOR.acid).not.toBe('#9ec96a');
+    expect(COATING_GLYPH_COLOR.acid).toMatch(/^#[0-9a-f]{6}$/);
     expect(INPUT).toContain('quickStrikeText: { color: \'#15180f\'');
   });
 

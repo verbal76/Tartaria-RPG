@@ -238,7 +238,15 @@ export const COATING_GLYPH_COLOR: Record<WeaponCoating['kind'], string> = {
   burn: '#ff7a3d',        // ember orange
   cold: '#79d2ff',        // ice, brighter than the emoji's own blue
   poison: '#e6e6c8',      // bone — a skull is bone, and green would vanish on sage
-  acid: '#b4e619',        // the one he asked for: acid green-yellow
+  // ⚠⚠ OTA-1569 — HIS PICK, AND IT IS BETTER THAN MINE FOR TWO REASONS. He sent
+  // the reference: burnt orange is what corrosive-hazard warnings actually use,
+  // and real acid burns are "charred dark browns, deep oranges" rather than neon
+  // green. It is also as far from `quickStrike`'s sage as the wheel allows, which
+  // is the failure he photographed. It does NOT collide with burn's entry below,
+  // because `🔥` is an emoji-presentation codepoint — it renders as a fire in its
+  // own colours on any device that has one, so that entry is a fallback that
+  // almost never paints. The alembic is the one that actually takes its colour.
+  acid: '#cc5500',
   corruption: '#c98aff',  // violet, the only hue nothing else uses
   electrical: '#ffe14d',  // lightning yellow
 };

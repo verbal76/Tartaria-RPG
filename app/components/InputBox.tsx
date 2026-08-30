@@ -1241,7 +1241,12 @@ function QuickBtn({
         <Text style={textStyle}>
           {glyphs.map((g, i) => (
             <Text key={`${g.kind}${i}`} style={[styles.coatGlyph, { color: COATING_GLYPH_COLOR[g.kind] }]}>
-              {g.ch}
+              {/* ⚠ OTA-1569 — hair spaces pad the dark cell. Inline Text takes no
+                  padding in React Native, and a cell clamped to the glyph's exact
+                  box reads as a clipping artifact rather than a deliberate inlay.
+                  They are added HERE and never to `label`, so the tap breadcrumb
+                  and the screen-reader string stay byte-for-byte what they were. */}
+              {`\u200a${g.ch}\u200a`}
             </Text>
           ))}
           <Text>{` ${glyphText ?? ''}`.toUpperCase()}</Text>
@@ -1500,7 +1505,29 @@ const styles = StyleSheet.create({
   // Offset 0 with a radius makes it a halo on every side rather than a drop
   // shadow on two. On the near-black chips it is invisible and harmless, which
   // is correct: there the bright glyph already carries itself.
+  // ⚠⚠⚠ OTA-1569 — THE GLYPH BRINGS ITS OWN BACKGROUND, and that is the fix
+  // OTA-1568 should have been. He looked at the acid alembic on a strike chip:
+  // *"it's blended into the active button color."* He is right, and the cause is
+  // that I chose `#b4e619` — an acid green-yellow — for a glyph that sits on
+  // `quickStrike`'s sage green `#9ec96a`. Same hue family. My error.
+  //
+  // ⚠⚠⚠ BUT SWAPPING THE HUE WOULD ONLY MOVE THE COLLISION, because the real
+  // problem is structural: a chip has TWO fills that are nearly opposite —
+  // light sage when it is a strike, near-black (`#1b2417`, `#1a1714`) otherwise
+  // — and I was hunting for six hues that read on both at once. There is no such
+  // set. Every colour bright enough for the black chip is at risk on the sage
+  // one, and every colour dark enough for the sage chip dies on the black.
+  //
+  // ⚠⚠ SO THE GLYPH STOPS CARING WHAT IS BEHIND IT. An inline `backgroundColor`
+  // gives it a dark cell of its own, which means all six colours are now chosen
+  // against ONE known backdrop instead of two hostile ones — permanently, for
+  // any colour added later. On the dark chips the cell matches the fill and is
+  // invisible, which is correct: nothing there needed fixing.
+  //
+  // ⚠ The halo stays. On the sage chip it now softens the cell's hard edge; on
+  // the dark chips it is what it always was — invisible and harmless.
   coatGlyph: {
+    backgroundColor: '#0d0b09',
     textShadowColor: '#000000',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 3,

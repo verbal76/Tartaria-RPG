@@ -26078,7 +26078,43 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the same content in pieces and a test reassembles it character-for-character
 // against the flat one. Every chip without a coating takes the untouched render
 // path, so the change is confined to weapon buttons that carry a coating.
-export const OTA_BUILD_ID = '2026-08-30-1568-one-string-two-fonts';
+// OTA-1569 - THE GLYPH BRINGS ITS OWN GROUND. My error, and the fix 1568 should
+// have been. The owner, on a screenshot: "look at the acid symbol, it's blended
+// into the active button color." He is right - I chose #b4e619, an acid
+// green-yellow, for a glyph that renders on quickStrike's sage green #9ec96a.
+// Same hue family. I picked a green to sit on a green button. Measured: 1.3:1.
+//
+// BUT SWAPPING THE HUE WOULD ONLY MOVE THE COLLISION, which is why this is a
+// different fix and not a different colour. A quick chip has TWO fills that are
+// nearly opposite - light sage when it is a strike, near-black (#1b2417,
+// #1a1714) otherwise - and 1568 was hunting for six hues that read on BOTH at
+// once. No such set exists: every colour bright enough to carry on the black
+// chip is at risk on the sage one, and every colour dark enough for the sage
+// chip dies on the black. A test now measures that claim over the whole table,
+// including pure black and pure white.
+//
+// SO THE GLYPH STOPS CARING WHAT IS BEHIND IT. An inline backgroundColor gives it
+// a dark cell of its own, so every colour is chosen against ONE known backdrop
+// instead of two hostile ones - permanently, including for any coating added
+// later. On the dark chips the cell matches the fill and is invisible, which is
+// correct: nothing there was ever broken. The 1568 halo stays and its job grows -
+// it still reaches the colour emoji that no `color:` can touch, and it now also
+// softens the cell's edge. Hair spaces pad the cell, because inline Text takes no
+// padding in React Native and a cell clamped to the glyph box reads as clipping.
+//
+// AND THE ACID COLOUR IS HIS. He sent the reference: burnt orange #cc5500 is what
+// corrosive-hazard warnings actually use, and real acid burns are charred browns
+// and deep oranges rather than neon green. It is a large improvement on its own
+// (1.3 -> 2.26 against the sage) and it is STILL under the 3:1 bar for a
+// graphical object - which is the cleanest proof that the cell is load-bearing
+// rather than belt-and-braces. On the cell it reads at 4.55:1. It does not
+// collide with burn's entry, because the fire glyph is an emoji-presentation
+// codepoint that paints in its own colours on any device that has one.
+//
+// The tap breadcrumb is untouched again: the hair spaces live in the JSX only, so
+// logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
+// evidence stays greppable.
+export const OTA_BUILD_ID = '2026-08-30-1569-the-glyph-brings-its-own-ground';
 // golem catch-up 2026-08-30: markerless publish of OTA-1568 (a black halo on the
 // coating glyphs so a colour emoji reads on the light strike chip, and a per-kind
 // colour for the monochrome ones so acid stops borrowing the label's) to the
