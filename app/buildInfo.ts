@@ -25742,6 +25742,13 @@ export const OTA_BUILD_ID = '2026-08-30-1559-the-coating-ladder-means-something'
 // weapons carry their condition so the picker can tell its own rows apart, plus
 // a name fallback so a coated weapon on a save with no slot ids still shows its
 // glyphs) to the golem channel.
+// golem catch-up 2026-08-30: markerless publish of OTA-1557/1558/1559 (the enemy
+// pager can no longer rest between two cards after a kill - one snap authority,
+// both drag endings resolved, and the pager follows the target; a ranged weapon
+// states its class and the coating modal says the coat rides the ammunition; the
+// dog rescue quest is reachable again after a dog dies, with a silent one-off
+// amnesty at load for saves already wedged; and the coating ladder finally has
+// three rungs instead of ten items at 1d4) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1550-one-slot-one-weapon';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1549-the-button-you-can-see';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1548-twenty-more-fires-in-the-dark';
