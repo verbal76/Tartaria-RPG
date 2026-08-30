@@ -98,6 +98,9 @@ import { profileOf } from '../engine/pressure';
 // OTA-1553 — the ★ on a combat weapon button reads the same discovered
 // weaknesses the enemy card prints, from one shared function.
 import { knownEnemyWeaknesses } from '../engine/weaponGlyphs';
+// OTA-1554 — the shared "is this patch worked out?" predicate, so the pinned
+// surface chip and the INVESTIGATE badge grey on exactly what the dig refuses.
+import { digSpotWorkedOut } from '../engine/digging';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from '../components/tutorialSteps';
 import { reachBandsFor, RANGE_LABELS } from '../engine/types';
@@ -1018,6 +1021,20 @@ export function ExplorationScreen() {
   ]);
   const activeIdx = Math.min(currentScene?.activeEnemyIdx ?? 0, Math.max(0, enemyViews.length - 1));
 
+  // ⚠ OTA-1554 — THE ROOM KEY, ONCE, AT COMPONENT SCOPE. There was already one
+  // of these inside the productivelyConsumedSet memo (OTA-164's canonical-key
+  // fix), but it is trapped in that closure — so the pinned surface chip and the
+  // INVESTIGATE badge, which live down in the JSX, had no way to ask the world
+  // memory anything about the tile the player is standing on. That is a large
+  // part of why the dig ceiling could never reach them. Same makeRoomKey call,
+  // same argument order, so hub interiors canonicalise identically.
+  const surfaceRoomKey = useMemo(
+    () => (player
+      ? makeRoomKey(player.currentLocationId, currentScene?.microMicroId, player.mapX, player.mapY, player.hubRoomId)
+      : ''),
+    [player, currentScene?.microMicroId],
+  );
+
   const inCombat = enemyViews.length > 0;
   const equippedMain = player?.equipped?.main ?? null;
   const equippedOff = player?.equipped?.off ?? null;
@@ -1029,12 +1046,27 @@ export function ExplorationScreen() {
   // which is why a weapon carrying two coats could only ever advertise one: the
   // shape had room for a single string. Handing the instance across lets the
   // button draw a glyph per coat and ask whether the weapon bites this foe.
-  const instanceForSlot = (id: string | null | undefined): InventoryItem | null => {
-    if (!id) return null;
-    return player?.inventory?.find((i) => i.id === id) ?? null;
+  //
+  // ⚠⚠ OTA-1556 — AND A NAME FALLBACK, BECAUSE A SLOT IS NOT ALWAYS AN ID. This
+  // is OTA-1550's finding from the other side: `equipped.main` stores a NAME, and
+  // `mainId` is the newer, better key that older saves simply do not carry. An
+  // id-only lookup returns null on those, so a coated weapon in an upgraded save
+  // would show its glyphs while the same weapon in a legacy save showed none — a
+  // difference the player can only read as the feature being broken, with nothing
+  // on screen to suggest otherwise.
+  //
+  // ⚠ THE ID ALWAYS WINS WHERE IT EXISTS, which is exactly OTA-1550's rule that
+  // an id-bearing slot is settled and never re-resolved by name. The name path is
+  // reached only when there is no id to trust, and it matches a WEAPON, so a
+  // same-named material in the pack can never stand in for the thing in your hand.
+  const instanceForSlot = (id: string | null | undefined, name: string | null | undefined): InventoryItem | null => {
+    if (id) return player?.inventory?.find((i) => i.id === id) ?? null;
+    if (!name) return null;
+    const lower = name.toLowerCase();
+    return player?.inventory?.find((i) => i.kind === 'weapon' && i.name.toLowerCase() === lower) ?? null;
   };
-  const equippedMainItem = instanceForSlot(player?.equipped?.mainId);
-  const equippedOffItem = instanceForSlot(player?.equipped?.offId);
+  const equippedMainItem = instanceForSlot(player?.equipped?.mainId, player?.equipped?.main);
+  const equippedOffItem = instanceForSlot(player?.equipped?.offId, player?.equipped?.off);
   // ⚠⚠⚠ OTA-1553 — WHAT THE PLAYER ACTUALLY KNOWS ABOUT THE FOE HE IS FACING,
   // from the same function the enemy card reads (knownEnemyWeaknesses): a boss,
   // or the Wisdom 12 read, or what he has already learned by hitting it. The ★ is
@@ -2309,7 +2341,13 @@ export function ExplorationScreen() {
                   const groundOutOfReach = !!gElev && !currentScene?.elevatedOverlayMeta
                     && !gElev.noun.toLowerCase().includes(surfaceNoun)
                     && !surfaceNoun.includes(gElev.noun.toLowerCase());
-                  if (surfaceUnlocked && !groundOutOfReach) groundCount = 1;
+                  // ⚠⚠⚠ OTA-1554 — and the worked-out gate, the other half of the
+                  // chip's new refusal. The badge and the picker have to agree or
+                  // the player is told to open a menu that has nothing in it —
+                  // the OTA-1124 rule, applied to the state that caused the
+                  // owner's thirty taps.
+                  const groundSpent = digSpotWorkedOut(worldMemory, surfaceRoomKey);
+                  if (surfaceUnlocked && !groundOutOfReach && !groundSpent) groundCount = 1;
                 }
               }
               // OTA-1210 — eye-only chips (a marked story lead that is not an
@@ -2605,6 +2643,24 @@ export function ExplorationScreen() {
               if (!climbed.includes(key) && !key.includes(climbed)) {
                 unmetRequirement = 'climb down to reach';
               }
+            }
+            // ⚠⚠⚠ OTA-1554 — AND THE PATCH BEING WORKED OUT, which is the state
+            // this chip has never known about.
+            //
+            // Owner: he tapped INVESTIGATE about thirty times on a spent patch
+            // before the game admitted it had nothing left. The dig's ceiling
+            // (DIG_SPOT_PRODUCTIVE_CAP) refuses every attempt past it, but that
+            // ceiling was compared inline in the dig handler and nowhere else —
+            // and "worked out" is not "consumed", so neither of the two sets
+            // this chip greys on could ever contain it. Bright chip, green
+            // badge, thirty identical refusals.
+            //
+            // The gate order is the same reasoning OTA-1124 used for elevation:
+            // a missing scanner is the more specific thing to say and outranks
+            // this, but a worked-out patch outranks nothing — it is the last
+            // word on ground you are standing on and cannot fix.
+            if (!unmetRequirement && !player.hubRoomId && digSpotWorkedOut(worldMemory, surfaceRoomKey)) {
+              unmetRequirement = 'worked out — try fresh ground';
             }
             return [{ noun, consumed: isAmbientConsumed(key), alwaysShow: true, unmetRequirement }];
           })(),

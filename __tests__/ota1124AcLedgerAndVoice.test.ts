@@ -211,7 +211,12 @@ describe('OTA-1124 — the pinned surface chip stops lying on a perch', () => {
   it('⚠ and the COUNT drops it too — chip and badge must agree', () => {
     // The badge reading active while the modal is entirely greyed is the whole
     // reported symptom. Fixing one side without the other just moves the lie.
-    expect(UI).toContain('if (surfaceUnlocked && !groundOutOfReach) groundCount = 1;');
+    // ⚠ OTA-1554 — RETARGETED, NOT RELAXED. A third gate joined this line,
+    // `!groundSpent`, for a patch whose dig ceiling has been reached. It is the
+    // SAME lesson this OTA exists to teach — the badge and the picker must agree
+    // — arriving for a fourth kind of state. The elevation half pinned here is
+    // untouched and still required.
+    expect(UI).toContain('if (surfaceUnlocked && !groundOutOfReach && !groundSpent) groundCount = 1;');
     expect(UI).toContain('const groundOutOfReach = !!gElev');
   });
 

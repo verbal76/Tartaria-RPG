@@ -1401,6 +1401,43 @@ export function InventoryScreen() {
       } else {
         coatPickerBody = `Paint the ${coatTarget.name.toLowerCase()} onto which weapon? It stays on until the weapon breaks (a repair won't scrub it off).`
           + refusedNote;
+        // ⚠⚠⚠ OTA-1556 — TWO ROWS CARRYING THE SAME WORD ARE NOT A LIST, THEY ARE
+        // A COIN TOSS.
+        //
+        // Owner, from the device: *"double weapons show for the same hand."* They
+        // are not one weapon listed twice — he owns two Cudgels, and listing
+        // INSTANCES is right, because a coating lands on one specific weapon and
+        // this picker is where he chooses which. But the two rows read
+        // `CUDGEL · EQUIPPED (MAIN HAND)` and `CUDGEL`, so the only thing telling
+        // them apart was a tag on one of them; for two rows where NEITHER is
+        // equipped there was nothing at all. He read it as a duplicate because a
+        // list that cannot tell its own rows apart behaves like one.
+        //
+        // ⚠⚠ DISAMBIGUATE BY WEAR, WHICH IS THE THING THAT ACTUALLY DIFFERS. Two
+        // copies of a durable weapon are rarely at the same condition, and
+        // condition is precisely what you want to know before spending a finite
+        // coating on one of them — you paint the good one. Only COLLIDING rows
+        // take the suffix, so a pack holding one Cudgel looks exactly as it did.
+        //
+        // ⚠ A last-resort ordinal covers what wear cannot separate (two pristine
+        // copies, or a weapon with no durability at all). It claims nothing beyond
+        // "these are different objects", which is the one thing the player must
+        // not be left guessing about.
+        const coatLabelCounts = new Map<string, number>();
+        for (const w of coatable as InventoryItem[]) {
+          const base = coatedDisplayName(w) as string;
+          coatLabelCounts.set(base, (coatLabelCounts.get(base) ?? 0) + 1);
+        }
+        const coatOrdinalSoFar = new Map<string, number>();
+        const disambiguateCoatRow = (label: string, w: InventoryItem): string => {
+          const base = coatedDisplayName(w) as string;
+          if ((coatLabelCounts.get(base) ?? 0) < 2) return label;
+          const seen = (coatOrdinalSoFar.get(base) ?? 0) + 1;
+          coatOrdinalSoFar.set(base, seen);
+          const dur = w.durability;
+          if (dur && dur.max > 0) return `${label} · ${dur.current}/${dur.max}`;
+          return `${label} · #${seen}`;
+        };
         coatPickerButtons = coatable.map((w: InventoryItem) => {
           // OTA-873 — dual-slot aware label: an upgraded weapon with an open 2nd slot
           // ADDS a coating; a full weapon REPLACES slot 1; a bare one just coats.
@@ -1412,7 +1449,7 @@ export function InventoryScreen() {
               : w.name;
           const isReplace = slot === 'replace';
           return {
-            label: withEquippedTag(label, w),
+            label: withEquippedTag(disambiguateCoatRow(label, w), w),
             onPress: () => {
               if (isReplace) {
                 // OTA-921/922 — never scrub off a coating on one tap. Stage a picker of

@@ -25621,7 +25621,55 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // side, and the word restated their own arrangement while crowding out the thing
 // worth reading. The attack ACTION still carries the hand keyword, because the
 // parser needs it to resolve the right instance.
-export const OTA_BUILD_ID = '2026-08-30-1553-glyph-glyph-name-star';
+// OTA-1554 - WORKED-OUT GROUND SAYS SO. Owner tapped INVESTIGATE about thirty
+// times on a spent patch before the game admitted it had nothing left. The dig
+// has a hard ceiling (groundDigCount >= DIG_SPOT_PRODUCTIVE_CAP, 16) and past it
+// EVERY attempt refuses - but that ceiling was an inline comparison inside the
+// dig handler and nowhere else. The INVESTIGATE badge counts actionable chips
+// out of the productively-consumed and flavour-exhausted sets, and the pinned
+// surface chip is in NEITHER and never can be, because a patch is not consumed,
+// it is worked out - a different ledger. Bright chip, green badge, thirty
+// identical refusals. Same defect for the fourth time (OTA-179 scanner gate,
+// OTA-1124 elevation gate, OTA-1263 take/salvage over an empty picker): the
+// state the ACTION checks and the state the BUTTON reads are two different
+// places. So the ceiling became a shared predicate, digSpotWorkedOut, that the
+// refusal and the greying both call; the chip now greys with "worked out - try
+// fresh ground" and the badge stops counting it. Hub floors are exempt (their
+// restock is a different path) and the cap itself is unchanged - this reports
+// the ceiling, it does not move it.
+//
+// OTA-1555 - A SENTENCE IS ALLOWED TO WRAP. Second half of the text-bar
+// complaint, and a different bug from the one 1551 fixed: that was WHERE the bar
+// sits, this is what the field does with a sentence. Neither TextInput carried
+// `multiline`, so a long action did not wrap - it scrolled sideways in a fixed
+// box and the player could see only its tail, in a game whose entire input is
+// typed English. Both fields get it, because OTA-1270 made them two views of ONE
+// draft and fixing only one would mean the same sentence wraps or not depending
+// on how the keyboard was opened. The bar is anchored by `bottom` with no fixed
+// height, so extra lines push its TOP edge away from the keyboard - the latch is
+// untouched. Capped at three lines then it scrolls internally, because an
+// uncapped field would grow over the feed the player is typing about, and
+// blurOnSubmit keeps Enter meaning send rather than letting Android swallow it
+// as a newline.
+//
+// OTA-1556 - TWO CUDGELS ARE TWO OBJECTS. Owner: "double weapons show for the
+// same hand." They were two genuinely different Cudgels, and listing INSTANCES
+// is right - a coating lands on one specific weapon - but the rows read
+// `CUDGEL - EQUIPPED (MAIN HAND)` and `CUDGEL`, so a tag on one of them was the
+// only thing telling them apart, and for two rows where neither is equipped
+// there was nothing at all. Colliding rows now carry their condition (you paint
+// the good one), with an ordinal where wear cannot separate them; a lone weapon
+// is untouched. Second fix from the same report: the equipped instance now falls
+// back to the NAME when the slot carries no id - `equipped.main` stores a name
+// and `mainId` is the newer key older saves do not carry, so a coated weapon on
+// a legacy save showed no glyphs at all, which reads as the feature being
+// broken. The id still wins wherever it exists. His other two complaints were
+// not defects and are pinned as such: nothing coated was in his hands (both
+// acid-etched weapons sat in the pack), and Earthshaker is authored
+// weaponKind:"runecaster" and describes itself as a slab-runecaster, so it has
+// no edge for a coating to ride - making rune-casters coatable is a design
+// change and his call.
+export const OTA_BUILD_ID = '2026-08-30-1556-two-cudgels-are-two-objects';
 // golem catch-up 2026-08-30: markerless publish of OTA-1549/1550/1551 (the
 // SPEAK TO bar filled + SET COURSE inside the talk sheet, one slot one weapon,
 // and the standing keyboard's session latch) to the golem channel.

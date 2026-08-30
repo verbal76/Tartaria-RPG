@@ -1051,6 +1051,19 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             }
             placeholderTextColor="#c9a86a"
             onSubmitEditing={handleSubmit}
+            // ⚠⚠ OTA-1555 — THE SAME WRAP FIX AS THE FLOATING BAR, and it has to
+            // be here too because these two fields share ONE draft (OTA-1270).
+            // The player types into whichever is up, so fixing only the floating
+            // one would mean the same sentence wraps or does not depending on how
+            // he happened to open the keyboard — a difference with no meaning he
+            // could ever learn. Single-line meant a long action scrolled sideways
+            // and he could see only its tail. Capped at three lines, then it
+            // scrolls inside itself; `blurOnSubmit` keeps Enter meaning "send"
+            // rather than letting Android swallow it as a newline.
+            multiline
+            blurOnSubmit
+            scrollEnabled
+            textAlignVertical="top"
             returnKeyType="send"
             autoCorrect={false}
             autoCapitalize={awaitingTutorialName ? 'words' : 'none'}
@@ -1460,6 +1473,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     fontSize: 14,
+    // OTA-1555 — one line is unchanged from before; a longer sentence wraps to
+    // three before the field scrolls internally. Same ceiling as the floating
+    // bar, so the two behave identically on the same text.
+    minHeight: 38,
+    maxHeight: 96,
   },
   send: {
     backgroundColor: '#3a342c',

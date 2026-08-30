@@ -214,6 +214,37 @@ const DIG_LOOT: DigEntry[] = [
 // farm dead. Hub/outpost digs use their own restock path and ignore this.
 export const DIG_SPOT_PRODUCTIVE_CAP = 16;
 
+/**
+ * ⚠⚠⚠ OTA-1554 — IS THIS PATCH WORKED OUT? ONE ANSWER, FOR THE ACTION AND THE
+ * BUTTON ALIKE.
+ *
+ * The owner tapped INVESTIGATE about thirty times on one spent patch before the
+ * game admitted it had nothing left. It was not being coy: the dig has a hard
+ * ceiling (`groundDigCount >= DIG_SPOT_PRODUCTIVE_CAP`, arb119) and refuses
+ * every attempt past it — but that ceiling lived ONLY inside the dig handler.
+ * The INVESTIGATE badge counts actionable chips out of the productively-consumed
+ * and flavour-exhausted sets, and the pinned surface chip ("the mud" / "the
+ * ground" / "the floor") is in NEITHER, because a patch is never "consumed" in
+ * that sense — it is worked out, which is a different ledger entirely. So the
+ * chip stayed bright and the badge stayed green over ground that could not
+ * produce another thing.
+ *
+ * ⚠⚠ THIS IS THE SAME DEFECT FOR THE FOURTH TIME, and the code is honest about
+ * the previous three: OTA-179 (the scanner gate the pinned chip never got),
+ * OTA-1124 (the elevation gate the pinned chip never got), OTA-1263 (TAKE and
+ * SALVAGE green over an empty picker). Every one is "the state the ACTION checks
+ * and the state the BUTTON reads are two different places." So the ceiling stops
+ * being a number one handler happens to compare against and becomes a shared
+ * predicate: the refusal and the greying call the same function, and a change to
+ * one can no longer leave the other behind.
+ */
+export function digSpotWorkedOut(
+  worldMemory: { visitedRooms?: Record<string, { groundDigCount?: number }> } | null | undefined,
+  roomKey: string,
+): boolean {
+  return (worldMemory?.visitedRooms?.[roomKey]?.groundDigCount ?? 0) >= DIG_SPOT_PRODUCTIVE_CAP;
+}
+
 // Roll the dig outcome. Returns null when nothing was found (always
 // possible, especially with low score). Includes a flat "found nothing"
 // chance that decreases as score increases.

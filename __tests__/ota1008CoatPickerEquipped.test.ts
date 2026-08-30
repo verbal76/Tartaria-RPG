@@ -21,7 +21,13 @@ describe('OTA-1008 — coating pickers show what is equipped', () => {
   });
 
   it('the weapon-coating picker tags its rows (old bare label is gone)', () => {
-    expect(SRC.includes('label: withEquippedTag(label, w),')).toBe(true);
+    // ⚠ OTA-1556 — RETARGETED, NOT RELAXED. The label now passes through
+    // `disambiguateCoatRow` first, which appends the weapon's condition when two
+    // coatable rows would otherwise carry the identical word (the owner's two
+    // Cudgels). The property THIS suite guards — every row still goes through
+    // withEquippedTag, so the picker says which one you are holding — is
+    // unchanged, and the suffix sits inside the tag rather than replacing it.
+    expect(SRC.includes('label: withEquippedTag(disambiguateCoatRow(label, w), w),')).toBe(true);
     // Old shape: the row passed the bare label straight through.
     expect(SRC).not.toMatch(/label,\n\s*onPress: \(\) => \{\n\s*if \(isReplace\) \{/);
   });

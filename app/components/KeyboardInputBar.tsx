@@ -419,6 +419,36 @@ export function KeyboardInputBar() {
           placeholder="What do you do?"
           placeholderTextColor="#c9a86a"
           onSubmitEditing={handleSubmit}
+          // ⚠⚠⚠ OTA-1555 — THE SECOND HALF OF THE TEXT-BAR COMPLAINT, and a
+          // different defect from the one OTA-1551 closed.
+          //
+          // Owner: *"text box grows as you type without wrapping."* The 1551
+          // session latch fixed WHERE the bar sits; it never touched what the
+          // field does with a sentence. This TextInput was single-line — no
+          // `multiline` — so a long action does not wrap: it scrolls sideways
+          // inside a fixed-height box and the player can only ever see the tail
+          // of what he typed. In a game whose entire input is typed English
+          // sentences, that is the field being wrong about its own job.
+          //
+          // ⚠⚠ THE BAR GROWS UPWARD, WHICH IS WHY THIS IS SAFE. `styles.bar` is
+          // absolutely positioned, anchored by `bottom`, with no fixed height, so
+          // extra lines push its TOP edge up and away from the keyboard rather
+          // than sliding the field under it. The latch is not involved and does
+          // not need to be.
+          //
+          // ⚠ CAPPED AT ROUGHLY THREE LINES, then it scrolls internally. With no
+          // ceiling a long paste would grow the bar over the whole screen — the
+          // opposite failure and a worse one, because it would cover the feed the
+          // player is typing about.
+          //
+          // ⚠ `blurOnSubmit` KEEPS THE RETURN KEY MEANING "SEND". On Android a
+          // multiline field otherwise swallows Enter as a newline, which would
+          // quietly remove the fastest way to act — a regression dressed as a
+          // feature.
+          multiline
+          blurOnSubmit
+          scrollEnabled
+          textAlignVertical="top"
           // arb-fix — when this field loses focus the typing session is over
           // (keyboard dismissed, back button, focus moved away). Retract the bar
           // so it can't linger on-screen after the keyboard closes. Deferred one
@@ -465,6 +495,12 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 4,
     fontSize: 14,
+    // OTA-1555 — one line looks exactly as it did before (minHeight matches the
+    // old single-line box), and a longer sentence wraps down to three lines
+    // before the field starts scrolling inside itself. See the note on
+    // `multiline` at the TextInput.
+    minHeight: 38,
+    maxHeight: 96,
   },
   send: {
     backgroundColor: '#3a342c',

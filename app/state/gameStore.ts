@@ -634,7 +634,7 @@ import { isClimbable, isSwimmable, isSearchable } from '../engine/interactionTag
 import { rollSalvagePool } from '../engine/salvagePools';
 import { scaledHealHP } from '../engine/itemEffect';
 import { isOversized, refusalLine, sceneFeatureRefusalLine } from '../engine/portability';
-import { bestDigTool, rollDig, DIG_SPOT_PRODUCTIVE_CAP } from '../engine/digging';
+import { bestDigTool, rollDig, DIG_SPOT_PRODUCTIVE_CAP, digSpotWorkedOut } from '../engine/digging';
 import {
   generateWorldMap,
   surveyAll,
@@ -27983,8 +27983,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // out; the player has to move to fresh ground. The cap is generous
     // (enough to build a Stone Spear / Cudgel without walking) but kills
     // the in-place farm. Failed ("nothing") digs don't count toward it.
-    const groundDigCount = get().worldMemory.visitedRooms?.[groundRoomKey]?.groundDigCount ?? 0;
-    if (groundDigCount >= DIG_SPOT_PRODUCTIVE_CAP) {
+    // ⚠ OTA-1554 — the SAME predicate the chip greys on. It was an inline
+    // comparison here and nowhere else, which is exactly why INVESTIGATE stayed
+    // green over a patch this branch would refuse thirty times running. See
+    // engine/digging.ts:digSpotWorkedOut for the defect and its three ancestors.
+    if (digSpotWorkedOut(get().worldMemory, groundRoomKey)) {
       get().appendLog(
         'world',
         `You work the same patch of ground again, but it's spent — you've turned over everything this spot had to give. Try fresh ground.`,

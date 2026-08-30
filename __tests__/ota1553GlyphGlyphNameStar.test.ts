@@ -233,8 +233,14 @@ describe('OTA-1553 — the wiring', () => {
     expect(BOX).not.toContain('equippedOffCoating');
     expect(BOX).toContain('equippedMainItem');
     expect(BOX).toContain('equippedOffItem');
-    expect(EXPLORE).toContain('const equippedMainItem = instanceForSlot(player?.equipped?.mainId);');
-    expect(EXPLORE).toContain('const equippedOffItem = instanceForSlot(player?.equipped?.offId);');
+    // ⚠ OTA-1556 — RETARGETED. `instanceForSlot` gained a NAME fallback for slots
+    // that carry no id (older saves store `equipped.main` as a name and have no
+    // `mainId`), so a coated weapon on such a save showed no glyphs at all. The
+    // property this line guards — the button is handed the INSTANCE, not a
+    // coating adjective — is unchanged, and the id still wins wherever it exists;
+    // ota1556 pins that precedence.
+    expect(EXPLORE).toContain('const equippedMainItem = instanceForSlot(player?.equipped?.mainId, player?.equipped?.main);');
+    expect(EXPLORE).toContain('const equippedOffItem = instanceForSlot(player?.equipped?.offId, player?.equipped?.off);');
   });
 
   it('⚠⚠⚠ both hands build their label through the SAME function', () => {
