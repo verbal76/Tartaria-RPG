@@ -1,0 +1,202 @@
+{
+  "id": "8a85d15e7d964ec39665607213308921",
+  "groupID": "7700974887",
+  "eventID": "8a85d15e7d964ec39665607213308921",
+  "projectID": "4511945117532160",
+  "size": 17904,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 13/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 13/28]",
+  "title": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 13/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "4b0cf476f27040b8b2108305b39805d0",
+      "span_id": "a4891636688aff3a",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "e remembered.\n[2026-08-30T08:01:29.441Z] [cognitive] SWIM  (138ms)\n[2026-08-30T08:01:30.552Z] [player] investigate watch fire\n[2026-08-30T08:01:30.553Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=watch fire resolved=watch fire range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:01:30.554Z] [world] The watch fire sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-08-30T08:01:30.555Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:01:30.556Z] [arbiter] The Arbiter looks around. \"The oath-stones stand where they were set, silt-scoured but readable. The oaths still scan.\"\n",
+      "[2026-08-30T08:01:31.992Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-\n[2026-08-30T08:01:32.118Z] [debug] qwen\u23f1 investigate_lore ok 2682ms read 1506ms/write 1021ms in 126t\u2192out 32t 12.0ms/t (158ch)\n[2026-08-30T08:01:32.301Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-30T08:01:32.395Z] [cognitive] READY  (1838ms)\n",
+      "[2026-08-30T08:01:33.448Z] [debug] qwen\u23f1 investigate_lore ok 2740ms wait 1687ms read 296ms/write 745ms in 126t\u2192out 23t 2.3ms/t (103ch)\n[2026-08-30T08:01:37.128Z] [player] drink water\n[2026-08-30T08:01:37.129Z] [debug] parser: intent=drink conf=1.00 verb=drink target=water resolved=waterskin range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:01:37.130Z] [world] You cup the pool in your hands and drink. The wet cuts the dust in your throat. (+1 stamina, +1 corruption, 5 min)\n[2026-08-30T08:01:37.131Z] [arbiter] The Arbiter watches you wipe your mouth. \"Raw pool carries what the ground put in it. Fill a bottle next time \u2014 the filter takes the taint out.\"\n",
+      "[2026-08-30T08:01:37.131Z] [debug] arbiter: template (reason=intent-not-allowed:drink)\n[2026-08-30T08:01:37.131Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:01:37.132Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T08:01:37.132Z] [system] \u23f3 Time passed: 5 min\n[2026-08-30T08:01:37.342Z] [cognitive] SWIM  (209ms)\n",
+      "[2026-08-30T08:01:43.280Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-30T08:01:49.274Z] [debug] ui: tap \"climb\"\n[2026-08-30T08:01:51.493Z] [player] climb jagged ruined skyscraper\n[2026-08-30T08:01:51.494Z] [debug] parser: intent=climb conf=1.00 verb=climb target=jagged ruined skyscraper resolved=jagged ruined skyscraper range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:01:51.526Z] [world] You loop your Reclaimer's Rope around the jagged ruined skyscraper and walk the line. Tier 1/4 cleared.\n[2026-08-30T08:01:51.527Z] [world] You reach the first hold of the jagged ruined skyscraper (tier 1/4). Higher still to go.\n",
+      "[2026-08-30T08:01:51.527Z] [world] Talus sets its stone feet at the base of jagged ruined skyscraper and will climb no further \u2014 the construct holds the ground while you go up alone.\n[2026-08-30T08:01:51.527Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T08:01:51.528Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-30T08:01:51.636Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 8251ms read 0ms/write 0ms in 727t\u2192out 0t (0ch)\n[2026-08-30T08:01:51.730Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 8251ms \u2014 intro-fill:\u2205\n[2026-08-30T08:01:51.730Z] [debug] homework: scene_intro \"Dynasty Border Post\" \u2205 8451ms\n[2026-08-30T08:01:51.817Z] [cognitive] neutral  (289ms)\n",
+      "[2026-08-30T08:02:05.463Z] [debug] ui: tap \"climb up (1/4)\"\n[2026-08-30T08:02:05.520Z] [player] climb jagged ruined skyscraper\n[2026-08-30T08:02:05.521Z] [debug] parser: intent=climb conf=1.00 verb=climb target=jagged ruined skyscraper resolved=jagged ruined skyscraper range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:02:05.551Z] [world] You loop your Reclaimer's Rope around the jagged ruined skyscraper and walk the line. Tier 2/4 cleared.\n[2026-08-30T08:02:05.552Z] [world] You reach the next hold of the jagged ruined skyscraper (tier 2/4). Higher still to go.\n[2026-08-30T08:02:05.552Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n",
+      "[2026-08-30T08:02:05.552Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:02:05.553Z] [system] \u23f3 Time passed: 30 min\n[2026-08-30T08:02:05.659Z] [cognitive] neutral  (105ms)\n[2026-08-30T08:02:06.428Z] [debug] ui: tap \"climb up (2/4)\"\n[2026-08-30T08:02:06.476Z] [player] climb jagged ruined skyscraper\n",
+      "[2026-08-30T08:02:06.476Z] [debug] parser: intent=climb conf=1.00 verb=climb target=jagged ruined skyscraper resolved=jagged ruined skyscraper range=- enemies=0 hooks=1\n[2026-08-30T08:02:06.520Z] [world] You loop your Reclaimer's Rope around the jagged ruined skyscraper and walk the line. Tier 3/4 cleared.\n",
+      "[2026-08-30T08:02:06.520Z] [world] You reach the last stretch of the jagged ruined skyscraper (tier 3/4). Higher still to go.\n[2026-08-30T08:02:06.521Z] [system] \u23f3 Time passed: 30 min\n[2026-08-30T08:02:06.678Z] [cognitive] neutral  (155ms)\n[2026-08-30T08:02:06.854Z] [debug] persist sizes(KB): total=164 player=35 wm=44[rooms=18 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=3\n",
+      "[2026-08-30T08:02:07.329Z] [debug] ui: tap \"climb up (3/4)\"\n[2026-08-30T08:02:07.381Z] [player] climb jagged ruined skyscraper\n[2026-08-30T08:02:07.382Z] [debug] parser: intent=climb conf=1.00 verb=climb target=jagged ruined skyscraper resolved=jagged ruined skyscraper range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:02:07.424Z] [world] You loop your Reclaimer's Rope around the jagged ruined skyscraper and walk the line. Tier 4/4 cleared.\n[2026-08-30T08:02:07.424Z] [world] You reach the top of the jagged ruined skyscraper (tier 4/4). The view changes; the room reads differently from here.\n",
+      "[2026-08-30T08:02:07.426Z] [reward] \u2726 Bioluminescent Fungus (Uncommon) \u2014 tucked into a crack at the top of the jagged ruined skyscraper.\n[2026-08-30T08:02:07.427Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n[2026-08-30T08:02:07.427Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:02:07.427Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-30T08:02:07.598Z] [cognitive] neutral  (169ms)\n[2026-08-30T08:02:11.187Z] [debug] qwen\u23f1 ambient ok 5439ms read/write unusable (native mis-reported 24834ms/1079ms \u2014 llama.rn split bug, not this call) in 364t\u2192out 31t HIT-CAP (145ch)\n[2026-08-30T08:02:11.273Z] [debug] ui: tap \"climb down\"\n[2026-08-30T08:02:11.280Z] [player] climb down\n",
+      "[2026-08-30T08:02:11.280Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T08:02:11.281Z] [world] You make your way back down the jagged ruined skyscraper. Boots back on the ground.\n[2026-08-30T08:02:11.281Z] [system] \u23f3 Time passed: 15 min\n[2026-08-30T08:02:11.288Z] [debug] ui: tap \"climb down\"\n",
+      "[2026-08-30T08:02:11.295Z] [player] climb down\n[2026-08-30T08:02:11.295Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T08:02:11.323Z] [world] You loop your Reclaimer's Rope around the surface in front of you and walk the line. Tier 1/2 cleared.\n",
+      "[2026-08-30T08:02:11.323Z] [world] You reach the first hold of the the surface in front of you (tier 1/2). Higher still to go.\n[2026-08-30T08:02:11.324Z] [world] Talus sets its stone feet at the base of the surface in front of you and will climb no further \u2014 the construct holds the ground while you go up alone.\n[2026-08-30T08:02:11.324Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n",
+      "[2026-08-30T08:02:11.324Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:02:11.324Z] [system] \u23f3 Time passed: 30 min\n[2026-08-30T08:02:11.424Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 5439ms \u2014 ambient:stale:log-moved-on\n[2026-08-30T08:02:11.424Z] [debug] arbiter: ambient stale:log-moved-on 5871ms\n",
+      "[2026-08-30T08:02:11.424Z] [debug] arbiter: ambient-empty reason=action-opener raw=\"You walk with a heavy heart, your eyes still glued to the market, the sights of items swarming your vision. The air feel\"\n[2026-08-30T08:02:11.518Z] [cognitive] CLIMB  (236ms)\n[2026-08-30T08:02:11.606Z] [cognitive] CLIMB  (280ms)\n[2026-08-30T08:02:14.331Z] [debug] ui: tap \"climb down\"\n",
+      "[2026-08-30T08:02:14.359Z] [player] climb down\n[2026-08-30T08:02:14.360Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T08:02:14.361Z] [world] You make your way back down the the surface in front of you. Boots back on the ground.\n[2026-08-30T08:02:14.362Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n",
+      "[2026-08-30T08:02:14.362Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:02:14.363Z] [system] \u23f3 Time passed: 15 min\n[2026-08-30T08:02:14.366Z] [world] A Mud Monarchs patrol crosses your path in the open \u2014 and turns toward you.\n[2026-08-30T08:02:14.366Z] [arbiter] \"Mud Monarchs riders,\" the Arbiter says. \"They've marked you. No outrunning this one.\"\n",
+      "[2026-08-30T08:02:14.559Z] [cognitive] CLIMB  (196ms)\n[2026-08-30T08:02:29.688Z] [debug] ui: tap \"\u2697 cudgel\"\n[2026-08-30T08:02:29.719Z] [player] attack with the cudgel\n[2026-08-30T08:02:29.720Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=4 hooks=1\n",
+      "[2026-08-30T08:02:29.722Z] [debug] attack: target=Mud Monarchs Patrol 1 range=close reach.bands=[close] reach.label=Cudgel bareHand=false\n[2026-08-30T08:02:29.724Z] [arbiter] Iron Fog hangs between you. \"\u22122 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-08-30T08:02:29.724Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n",
+      "[2026-08-30T08:02:29.761Z] [world] You commit forward with the acid-etched cudgel. Mud Monarchs Patrol 1 watches your hands.\n[2026-08-30T08:02:29.761Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:02:29.922Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 TAKE_COVER \u00b7 DISENGAGE  (160ms)\n[2026-08-30T08:02:36.428Z] [world] Mud Monarchs Patrol 1 moves first. The pressure is immediate.\n",
+      "[2026-08-30T08:02:36.430Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:02:36.432Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 7 + ATK 6 = 13 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:02:36.433Z] [combat] Mud Monarchs Patrol 1 \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:02:36.434Z] [combat] Mud Monarchs Patrol 3 closes the distance.\n",
+      "[2026-08-30T08:02:36.434Z] [combat] You \u2014 d20 \u2192 10 + STR 5 \u2212 2 (Iron Fog) = 13 vs Mud Monarchs Patrol 1 AC 9 \u2014 \u2713 HIT\n[2026-08-30T08:02:36.436Z] [combat] Your strike with the acid-etched cudgel lands for 6. Mud Monarchs Patrol 1 staggers \u2014 8 HP remaining. It answers.\n",
+      "[2026-08-30T08:02:36.436Z] [combat] Acid-Etched Cudgel \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-08-30T08:02:44.025Z] [debug] ui: tap \"dodge\"\n[2026-08-30T08:02:44.037Z] [player] dodge\n[2026-08-30T08:02:44.038Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=1\n",
+      "[2026-08-30T08:02:44.039Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-30T08:02:44.040Z] [combat] Mud Monarchs Patrol 1 smokes \u2014 acid eats 4. (4/14 HP, 2 turns left)\n",
+      "[2026-08-30T08:02:44.080Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 9 + ATK 6 = 15 vs your AC 19 \u2014 \u2717 EVADED\n[2026-08-30T08:02:44.080Z] [combat] Dodge \u2014 d20 \u2192 5 + DEX 16 = 21 vs ATK 15. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-08-30T08:02:44.080Z] [world] You slip Mud Monarchs Patrol 2's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-08-30T08:02:44.082Z] [debug] ac-shift 19\u219222: race/base 10 + gear 12 + title 0 \u2192 trimmed 19 + status 3 | worn: head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aethe",
+      "ric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak\n[2026-08-30T08:02:44.082Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 2 + ATK 8 = 10 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-30T08:02:44.083Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 11 + ATK 6 = 17 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-08-30T08:02:44.084Z] [combat] Mud Monarchs Patrol 1 \u2014 d20 \u2192 14 + ATK 5 = 19 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-30T08:02:44.085Z] [debug] arbiter: template (reason=combat)\n[2026-08-30T08:02:44.085Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:02:44.085Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-30T08:02:44.412Z] [cognitive] neutral  (326ms)\n[2026-08-30T08:02:44.892Z] [debug] ui: tap \"\u2697 cudgel\"\n[2026-08-30T08:02:44.896Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-30T08:02:44.900Z] [world] Iron fog disorients you. Compasses spin; intent costs more.\n[2026-08-30T08:02:44.922Z] [player] attack with the cudgel\n",
+      "[2026-08-30T08:02:44.923Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=4 hooks=1\n[2026-08-30T08:02:44.923Z] [combat] Mud Monarchs Patrol 1 smokes \u2014 acid eats 4. (0/14 HP, 1 turn left)\n[2026-08-30T08:02:44.924Z] [reward] Mud Monarchs Patrol 1 defeated. You recover Aether Residue \u00d72.\n",
+      "[2026-08-30T08:02:44.926Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-08-30T08:02:44.926Z] [combat] 3 attackers remain. Mud Monarchs Patrol 2 now in your sights.\n[2026-08-30T08:02:44.926Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-30T08:02:44.926Z] [reward] +12 TC pried from the dust.\n",
+      "[2026-08-30T08:02:44.959Z] [debug] attack: target=Mud Monarchs Patrol 2 range=mid reach.bands=[close] reach.label=Cudgel bareHand=false\n[2026-08-30T08:02:44.959Z] [arbiter] The Arbiter holds up a hand. \"Cudgel works at close / arm's reach range only \u2014 you're at mid-range. ADVANCE to close in (they'll answer the approach), or attack with something that reaches.\"\n",
+      "[2026-08-30T08:02:45.138Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 TAKE_COVER \u00b7 DISENGAGE  (178ms)\n[2026-08-30T08:02:56.429Z] [debug] ui: tap \"approach\"\n[2026-08-30T08:02:56.433Z] [system] perfect opening fades.\n[2026-08-30T08:02:56.487Z] [player] approach Mud Monarchs Patrol 2\n",
+      "[2026-08-30T08:02:56.488Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs patrol 2 resolved=Mud Monarchs Patrol 2 range=mid enemies=3 hooks=1\n[2026-08-30T08:02:56.489Z] [debug] move: advance from range=mid enemies=3 weather=Iron Fog cost=2 partial=0\n",
+      "[2026-08-30T08:02:56.490Z] [world] Iron Fog slows you down. You push toward the Mud Monarchs Patrol 2 and 2 others but the compass spins and your footing drags. (1/2 \u2014 type 'advance' again to close)\n[2026-08-30T08:02:56.490Z] [debug] move: slow weather progress 1/2\n[2026-08-30T08:02:56.814Z] [cognitive] SWIM \u00b7 RETREAT  (322ms)\n",
+      "[2026-08-30T08:02:57.011Z] [debug] persist sizes(KB): total=166 player=36 wm=44[rooms=18 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=5\n[2026"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 13/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfva3flr9ic"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "13"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T17:13:20.083664Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T17:13:15.969000Z",
+  "fingerprints": [
+    "b9740788dc1a13de79038081caa5b280"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "9c93dfc2ffd44af990de3ca5c9b51a19",
+  "previousEventID": "89cc82dfd9814d63bdfee4d48a4f2393"
+}

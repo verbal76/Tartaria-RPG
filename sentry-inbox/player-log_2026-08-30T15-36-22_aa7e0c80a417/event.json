@@ -1,0 +1,201 @@
+{
+  "id": "aa7e0c80a4174bf786d67299805ef634",
+  "groupID": "7700811178",
+  "eventID": "aa7e0c80a4174bf786d67299805ef634",
+  "projectID": "4511945117532160",
+  "size": 17840,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1568-one-string-two-fonts #mtfva3flr9ic [inline 14/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1568-one-string-two-fonts #mtfva3flr9ic [inline 14/28]",
+  "title": "player-log 2026-08-30-1568-one-string-two-fonts #mtfva3flr9ic [inline 14/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "92f988728f4940798659c2ad5e77600a",
+      "span_id": "a2cdde7ddf9d4150",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "-08-30T08:02:57.628Z] [debug] ui: tap \"approach\"\n[2026-08-30T08:02:57.670Z] [player] approach Mud Monarchs Patrol 2\n[2026-08-30T08:02:57.671Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs patrol 2 resolved=Mud Monarchs Patrol 2 range=mid enemies=3 hooks=1\n[2026-08-30T08:02:57.672Z] [debug] move: advance from range=mid enemies=3 weather=Iron Fog cost=2 partial=1\n",
+      "[2026-08-30T08:02:57.672Z] [debug] move: field advance target=Mud Monarchs Patrol 2 d 1.25->0.35 band mid->close\n[2026-08-30T08:02:57.673Z] [world] You close the gap with the Mud Monarchs Patrol 2 and 2 others. (range: close / arm's reach)\n[2026-08-30T08:02:57.673Z] [world] The field shifts around you \u2014 Mud Monarchs Patrol 3 now close / arm's reach.\n",
+      "[2026-08-30T08:02:57.674Z] [debug] ac-shift 22\u219219: race/base 10 + gear 12 + title 0 \u2192 trimmed 19 + status 0 | worn: head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak\n[2026-08-30T08:02:57.674Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 3 + ATK 6 = 9 vs your AC 19 \u2014 \u2717 MISS\n",
+      "[2026-08-30T08:02:57.676Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 9 + ATK 6 = 15 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:02:57.677Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 6 + ATK 6 = 12 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:02:57.846Z] [cognitive] SWIM \u00b7 RETREAT  (168ms)\n[2026-08-30T08:02:59.579Z] [debug] ui: tap \"dodge\"\n[2026-08-30T08:02:59.589Z] [player] dodge\n",
+      "[2026-08-30T08:02:59.590Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=3 hooks=1\n[2026-08-30T08:02:59.591Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 2's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-30T08:02:59.634Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 15 + ATK 6 = 21 vs your AC 19 \u2014 \u2717 EVADED\n[2026-08-30T08:02:59.635Z] [combat] Dodge \u2014 d20 \u2192 17 + DEX 16 = 33 vs ATK 21. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-08-30T08:02:59.635Z] [world] You slip Mud Monarchs Patrol 4's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-08-30T08:02:59.637Z] [debug] ac-shift 19\u219222: race/base 10 + gear 12 + title 0 \u2192 trimmed 19 + status 3 | worn: head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aethe",
+      "ric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak\n[2026-08-30T08:02:59.637Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-30T08:02:59.638Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 2 + ATK 6 = 8 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-30T08:02:59.638Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-30T08:02:59.638Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:02:59.639Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:02:59.807Z] [cognitive] neutral  (168ms)\n[2026-08-30T08:03:00.229Z] [debug] ui: tap \"\u2697 cudgel\"\n[2026-08-30T08:03:00.231Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-30T08:03:00.255Z] [player] attack with the cudgel\n",
+      "[2026-08-30T08:03:00.256Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=3 hooks=1\n[2026-08-30T08:03:00.258Z] [debug] attack: target=Mud Monarchs Patrol 2 range=close reach.bands=[close] reach.label=Cudgel bareHand=false\n[2026-08-30T08:03:00.259Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n",
+      "[2026-08-30T08:03:00.260Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-30T08:03:00.290Z] [world] You commit forward with the acid-etched cudgel. Mud Monarchs Patrol 2 watches your hands.\n[2026-08-30T08:03:00.291Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:03:00.441Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 TAKE_COVER \u00b7 DISENGAGE  (149ms)\n",
+      "[2026-08-30T08:03:08.490Z] [world] You seize the initiative. Mud Monarchs Patrol 2 has no time to react.\n[2026-08-30T08:03:08.491Z] [combat] You \u2014 d20 \u2192 11 + STR 5 \u2212 2 (Iron Fog) perfect opening (2\u00d7 dice) = 14 vs Mud Monarchs Patrol 2 AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:03:08.492Z] [combat] Bludgeoning flares \u2014 +3 on hit.\n",
+      "[2026-08-30T08:03:08.493Z] [combat] You crack the Mud Monarchs Patrol 2 with the Acid-Etched Cudgel for 11 \u2014 half their fight, gone in one blow. They crumple, out cold. (5/16 HP) Loot them before they come to.\n[2026-08-30T08:03:08.494Z] [combat] Mud Monarchs Patrol 2 is out of it. Mud Monarchs Patrol 3 now in your sights.\n",
+      "[2026-08-30T08:03:08.494Z] [combat] Acid-Etched Cudgel \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-08-30T08:03:08.494Z] [combat] Mud Monarchs Patrol 2 is left exposed \u2014 easier to hit.\n",
+      "[2026-08-30T08:03:08.496Z] [debug] ac-shift 22\u219219: race/base 10 + gear 12 + title 0 \u2192 trimmed 19 + status 0 | worn: head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak\n[2026-08-30T08:03:08.496Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 3 + ATK 6 = 9 vs your AC 19 \u2014 \u2717 MISS\n",
+      "[2026-08-30T08:03:08.498Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:03:10.150Z] [debug] ui: tap \"mud shell\"\n[2026-08-30T08:03:10.204Z] [player] attack with the off-hand mud shell\n[2026-08-30T08:03:10.205Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand mud shell resolved=Mud Monarchs Patrol 2 range=close enemies=3 hooks=1\n",
+      "[2026-08-30T08:03:10.205Z] [combat] Mud Monarchs Patrol 2 smokes \u2014 acid eats 1. (4/16 HP, 2 turns left)\n[2026-08-30T08:03:10.206Z] [debug] attack: target=Mud Monarchs Patrol 3 range=close reach.bands=[distant,far,mid,close] reach.label=Mud Shell bareHand=false\n[2026-08-30T08:03:10.207Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n",
+      "[2026-08-30T08:03:10.241Z] [world] Your mud shell comes around in an arc; Mud Monarchs Patrol 3 squares up to meet it.\n[2026-08-30T08:03:10.242Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:03:10.407Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 SWIM \u00b7 THROW \u00b7 TAKE_COVER \u00b7 ATTACK \u00b7 RETREAT \u00b7 CLIMB \u00b7 MANEUVER  (164ms)\n",
+      "[2026-08-30T08:03:17.126Z] [world] Mud Monarchs Patrol 3 moves first. The pressure is immediate.\n[2026-08-30T08:03:17.129Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 2 + ATK 6 = 8 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:03:17.131Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 19 \u2014 \u2717 MISS\n",
+      "[2026-08-30T08:03:17.131Z] [combat] You \u2014 d20 \u2192 19 + INT 12 \u2212 2 (Iron Fog) + 2 (point blank) = 31 vs Mud Monarchs Patrol 3 AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:03:17.132Z] [combat] Bludgeoning flares \u2014 +1 on hit.\n[2026-08-30T08:03:17.164Z] [reward] \u2726 The work hones you. +1 STR (base 4, 6 as you stand).\n",
+      "[2026-08-30T08:03:17.164Z] [combat] Your strike with the mud shell lands for 7. Mud Monarchs Patrol 3 staggers \u2014 7 HP remaining. It answers.\n[2026-08-30T08:03:17.165Z] [combat] Mud Monarchs Patrol 3 is left exposed \u2014 easier to hit.\n[2026-08-30T08:03:17.165Z] [arbiter] The Arbiter does not look away from the Mud Monarchs Patrol 3. \"Decide quickly. It already has.\"\n",
+      "[2026-08-30T08:03:25.637Z] [debug] ui: tap \"dodge\"\n[2026-08-30T08:03:25.649Z] [player] dodge\n[2026-08-30T08:03:25.649Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=3 hooks=1\n",
+      "[2026-08-30T08:03:25.650Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-30T08:03:25.650Z] [combat] Mud Monarchs Patrol 2 smokes \u2014 acid eats 1. (3/16 HP, 1 turn left)\n",
+      "[2026-08-30T08:03:25.690Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 15 + ATK 6 = 21 vs your AC 19 \u2014 \u2717 EVADED\n[2026-08-30T08:03:25.690Z] [combat] Dodge \u2014 d20 \u2192 16 + DEX 16 = 32 vs ATK 21. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-08-30T08:03:25.691Z] [world] You slip Mud Monarchs Patrol 4's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-08-30T08:03:25.692Z] [debug] ac-shift 19\u219222: race/base 10 + gear 12 + title 0 \u2192 trimmed 19 + status 3 | worn: head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aethe",
+      "ric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak\n[2026-08-30T08:03:25.692Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 17 + ATK 6 = 23 vs your AC 22 \u2014 \u2713 HIT\n[2026-08-30T08:03:25.693Z] [debug] arbiter: template (reason=combat)\n[2026-08-30T08:03:25.693Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:03:25.694Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-30T08:03:25.872Z] [combat] Mud Monarchs Patrol 3 deals 2 bludgeoning damage. You have 33 HP remaining.\n[2026-08-30T08:03:26.025Z] [cognitive] neutral  (179ms)\n[2026-08-30T08:03:26.177Z] [debug] ui: tap \"\u2697 cudgel\"\n[2026-08-30T08:03:26.178Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-30T08:03:26.190Z] [player] attack with the cudgel\n",
+      "[2026-08-30T08:03:26.191Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=3 hooks=1\n[2026-08-30T08:03:26.191Z] [combat] Mud Monarchs Patrol 2 smokes \u2014 acid eats 1. (2/16 HP, 0 turns left)\n[2026-08-30T08:03:26.191Z] [combat] Mud Monarchs Patrol 2 shakes off the last of the acid \u2014 the Cudgel has run its course.\n",
+      "[2026-08-30T08:03:26.192Z] [debug] attack: target=Mud Monarchs Patrol 3 range=close reach.bands=[close] reach.label=Cudgel bareHand=false\n[2026-08-30T08:03:26.192Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-08-30T08:03:26.193Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-08-30T08:03:26.221Z] [world] You raise the acid-etched cudgel toward Mud Monarchs Patrol 3. The room narrows around the both of you.\n[2026-08-30T08:03:26.222Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:03:26.366Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 TAKE_COVER \u00b7 DISENGAGE  (143ms)\n[2026-08-30T08:03:32.819Z] [world] You seize the initiative. Mud Monarchs Patrol 3 has no time to react.\n",
+      "[2026-08-30T08:03:32.820Z] [combat] You \u2014 d20 \u2192 11 + STR 6 \u2212 2 (Iron Fog) perfect opening (2\u00d7 dice) = 15 vs Mud Monarchs Patrol 3 AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:03:32.822Z] [combat] The killing blow with the acid-etched cudgel: 17. Mud Monarchs Patrol 3 drops where it stood.\n[2026-08-30T08:03:32.823Z] [reward] Mud Monarchs Patrol 3 defeated. You recover Aether Residue \u00d73, Mud Monarch Sigil.\n",
+      "[2026-08-30T08:03:32.825Z] [reward] You strip the body: Cudgel, Mud-Bound Cloak (+6 TC). The kit took the fight badly.\n[2026-08-30T08:03:32.825Z] [combat] 1 attacker remains. Mud Monarchs Patrol 4 now in your sights.\n[2026-08-30T08:03:32.825Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-30T08:03:32.826Z] [reward] +20 TC pried from the dust.\n",
+      "[2026-08-30T08:03:32.867Z] [debug] ac-shift 22\u219219: race/base 10 + gear 12 + title 0 \u2192 trimmed 19 + status 0 | worn: head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak\n[2026-08-30T08:03:32.867Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 19 \u2014 \u2713 HIT\n",
+      "[2026-08-30T08:03:33.060Z] [combat] Mud Monarchs Patrol 4 deals 5 piercing damage [edge of reach \u2014 halved]. You have 28 HP remaining.\n[2026-08-30T08:03:33.627Z] [debug] persist sizes(KB): total=167 player=36 wm=45[rooms=18 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=4\n[2026-08-30T08:03:42.803Z] [debug] ui: tap \"punch\"\n[2026-08-30T08:03:42.810Z] [player] punch\n",
+      "[2026-08-30T08:03:42.811Z] [debug] parser: intent=attack conf=1.00 verb=punch target=- resolved=- range=close enemies=2 hooks=1\n[2026-08-30T08:03:42.812Z] [debug] attack: target=Mud Monarchs Patrol 2 range=close reach.bands=[close] reach.label=Bare hands bareHand=true\n[2026-08-30T08:03:42.814Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n",
+      "[2026-08-30T08:03:42.867Z] [world] You close on Mud Monarchs Patrol 2. The room narrows around the both of you.\n[2026-08-30T08:03:42.868Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:03:43.029Z] [cognitive] AGGRESSION \u00b7 DISENGAGE  (161ms)\n[2026-08-30T08:03:47.612Z] [world] Mud Monarchs Patrol 2 moves first. The pressure is immediate.\n",
+      "[2026-08-30T08:03:47.618Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 15 + ATK 6 = 21 vs your AC 19 \u2014 \u2713 HIT\n[2026-08-30T08:03:47.619Z] [combat] You \u2014 d20 \u2192 15 + STR 6 \u2212 2 (Iron Fog) = 19 vs Mud Monarchs Patrol 2 AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:03:47.620Z] [combat] Bludgeoning flares \u2014 +1 on hit.\n[2026-08-30T08:03:47.621Z] [combat] The killing blow: 3. Mud Monarchs Patrol 2 drops where it stood.\n",
+      "[2026-08-30T08:03:47.624Z] [reward] Mud Monarchs Patrol 2 defeated. You recover Patched Cloth \u00d73.\n[2026-08-30T08:03:47.626Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-08-30T08:03:47.627Z] [combat] 1 attacker remains. Mud Monarchs Patrol 4 now in your sights.\n",
+      "[2026-08-30T08:03:47.627Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 36). [13 enemies defeated]\n[2026-08-30T08:03:47.628Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-30T08:03:47.634Z] [reward] +12 TC pried from the dust.\n",
+      "[2026-08-30T08:03:47.860Z] [combat] Mud Monarchs Patrol 4 deals 1 piercing damage [edge of reach \u2014 halved]. You have 27 HP remaining.\n[2026-08-30T08:03:52.144Z] [debug] ui: tap \"approach\"\n[2026-08-30T08:03:52.204Z] [player] approach Mud Monarchs Patrol 4\n",
+      "[2026-08-30T08:03:52.205Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs patrol 4 resolved=Mud Monarchs Patrol 4 range=distant enemies=1 hooks=1\n[2026-08-30T08:03:52.207Z] [debug] move: advance from range=distant enemies=1 weather=Iron Fog cost=2 partial=0\n",
+      "[2026-08-30T08:03:52.207Z] [world] Iron Fog slows you down. You push toward Mud Monarchs Patrol 4 but the compass spins and your footing drags. (1/2 \u2014 type 'advance' again to close)\n[2026-08-30T08:03:52.207Z] [debug] move: slow weather progress 1/2\n[2026-08-30T08:03:52.382Z] [cognitive] SWIM \u00b7 RETREAT  (173ms)\n[2026-08-30T08:03:53.113Z] [debug] ui: tap \"approach\"\n",
+      "[2026-08-30T08:03:53.160Z] [player] approach Mud Monarchs Patrol 4\n[2026-08-30T08:03:53.160Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs patrol 4 resolved=Mud Monarchs Patrol 4 range=distant enemies=1 hooks=1\n[2026-08-30T08:03:53.162Z] [debug] move: advance from range=distant enemies=1 weather=Iron Fog cost=2 partial=1\n",
+      "[2026-08-30T08:03:53.162Z] [debug] move: field advance target=Mud Monarchs Patrol 4 d 3.06->2.06 band distant->far\n[2026-08-30T08:03:53.162Z] [world] You close the gap with Mud Monarchs Patrol 4. (range: far)\n[2026-08-30T08:03:53.163Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 5 + ATK 6 = 11 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:03:53.164Z] ["
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1568-one-string-two-fonts #mtfva3flr9ic [inline 14/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfva3flr9ic"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "14"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T15:36:21.970904Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T15:36:22.808000Z",
+  "fingerprints": [
+    "e1071513e990170768dca90bece93c8f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b47fad8d77fa4b7d9e7348ed6b07495a",
+  "previousEventID": "a463e4ad547a41cca6ff92916609877d"
+}

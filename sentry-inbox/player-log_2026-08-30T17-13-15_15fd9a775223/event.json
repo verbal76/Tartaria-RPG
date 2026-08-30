@@ -1,0 +1,200 @@
+{
+  "id": "15fd9a7752234780b71ebf8d18653371",
+  "groupID": "7700974887",
+  "eventID": "15fd9a7752234780b71ebf8d18653371",
+  "projectID": "4511945117532160",
+  "size": 17942,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 27/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 27/28]",
+  "title": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 27/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "4b0cf476f27040b8b2108305b39805d0",
+      "span_id": "a4891636688aff3a",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "combat] Aetheric Raven is here \u2014 and it has seen you.\n[2026-08-30T08:25:37.338Z] [debug] enemy: Aetheric Raven hp=18 ac=10 atk=Beak Peck dmg=1D6 rarity=Common ap=4\n[2026-08-30T08:25:37.338Z] [debug] arbiter: template (reason=combat)\n[2026-08-30T08:25:37.338Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:25:37.338Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-30T08:25:37.501Z] [cognitive] CLIMB  (161ms)\n[2026-08-30T08:25:37.819Z] [debug] persist sizes(KB): total=164 player=29 wm=51[rooms=22 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=5\n[2026-08-30T08:25:41.912Z] [debug] ui: tap \"\u2744 golem pike\"\n[2026-08-30T08:25:41.920Z] [reward] \u2726 The corruption tightens its grip \u2014 Tainted. (CHA \u22121)\n",
+      "[2026-08-30T08:25:41.920Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-08-30T08:25:41.954Z] [player] attack with the crude golem pike\n[2026-08-30T08:25:41.955Z] [debug] parser: intent=attack conf=1.00 verb=attack target=crude golem pike resolved=Crude Golem Pike range=mid enemies=1 hooks=0\n",
+      "[2026-08-30T08:25:41.956Z] [debug] attack: target=Aetheric Raven range=mid reach.bands=[mid,close] reach.label=Crude Golem Pike bareHand=false\n[2026-08-30T08:25:41.992Z] [world] Your frost-rimed crude golem pike comes around in an arc; Aetheric Raven squares up to meet it.\n[2026-08-30T08:25:41.992Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:25:42.129Z] [cognitive] TAKE_COVER  (136ms)\n",
+      "[2026-08-30T08:25:49.812Z] [world] You seize the initiative. Aetheric Raven has no time to react.\n[2026-08-30T08:25:49.813Z] [combat] You \u2014 d20 \u2192 17 + STR 9 = 26 vs Aetheric Raven AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:25:49.814Z] [combat] Piercing flares \u2014 +2 on hit.\n[2026-08-30T08:25:49.815Z] [combat] Aetheric Raven takes 8 with the frost-rimed crude golem pike. It reels: 10 left. Then it fights back.\n",
+      "[2026-08-30T08:25:49.816Z] [combat] Frost-Rimed Crude Golem Pike \u2014 2 cold bites in and festers (3 turns).\n[2026-08-30T08:25:49.821Z] [combat] Aetheric Raven \u2014 d20 \u2192 17 + ATK 5 = 22 vs your AC 19 \u2014 \u2713 HIT\n[2026-08-30T08:25:49.990Z] [combat] Aetheric Raven deals 1 piercing damage [edge of reach \u2014 halved]. You have 18 HP remaining.\n[2026-08-30T08:25:50.913Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n",
+      "[2026-08-30T08:25:50.958Z] [player] attack with the off-hand bone crossbow\n[2026-08-30T08:25:50.960Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n[2026-08-30T08:25:50.960Z] [debug] attack: target=Aetheric Raven range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-30T08:25:50.988Z] [world] Your searing bone crossbow comes around in an arc; Aetheric Raven squares up to meet it.\n[2026-08-30T08:25:50.988Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:25:51.125Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (136ms)\n[2026-08-30T08:25:57.221Z] [world] Aetheric Raven moves first. The pressure is immediate.\n",
+      "[2026-08-30T08:25:57.223Z] [combat] Aetheric Raven \u2014 d20 \u2192 5 + ATK 5 = 10 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:25:57.223Z] [combat] You \u2014 d20 \u2192 20 + DEX 19 = 39 vs Aetheric Raven AC 10 \u2014 \u2713 CRITICAL HIT\n[2026-08-30T08:25:57.224Z] [combat] Your blow with the searing bone crossbow lands clean \u2014 17 damage. Aetheric Raven crumples in the dust. The Aetherstone settles.\n",
+      "[2026-08-30T08:25:57.225Z] [reward] Aetheric Raven defeated. You recover Aether Wing.\n[2026-08-30T08:25:57.226Z] [reward] +9 TC pried from the dust.\n[2026-08-30T08:25:57.262Z] [arbiter] The Arbiter looks around. \"A wall of small stones grows at the camp's south edge, one placed for each pilgrim who went down.\"\n[2026-08-30T08:25:59.218Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-30T08:26:00.764Z] [world] You break the bone fragments apart. Among the pieces, something worth keeping.\n[2026-08-30T08:26:00.764Z] [world] You salvage the matted nest. The take is small but real.\n[2026-08-30T08:26:00.764Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:26:00.765Z] [reward]     \u2022 Worn Tartarian Coin x10 (Common)\n[2026-08-30T08:26:00.765Z] [reward]     \u2022 Mud Fragment (Common)\n",
+      "[2026-08-30T08:26:01.800Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:26:03.194Z] [player] investigate roost\n[2026-08-30T08:26:03.195Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=roost resolved=roost range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:26:03.196Z] [world] You take the measure of the roost. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.\n[2026-08-30T08:26:03.320Z] [cognitive] neutral  (123ms)\n[2026-08-30T08:26:04.434Z] [player] investigate feathers\n",
+      "[2026-08-30T08:26:04.435Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=feathers resolved=feathers range=- enemies=0 hooks=0\n[2026-08-30T08:26:04.436Z] [world] You look the feathers over. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n",
+      "[2026-08-30T08:26:04.437Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:26:04.437Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:26:05.488Z] [debug] qwen\u23f1 investigate_lore ok 2181ms read/write unusable (native mis-reported 34005ms/890ms \u2014 llama.rn split bug, not this call) in 128t\u2192out 28t (136ch)\n",
+      "[2026-08-30T08:26:05.691Z] [cognitive] SEARCH  (1252ms)\n[2026-08-30T08:26:05.782Z] [debug] ui: tap \"climb down\"\n[2026-08-30T08:26:05.789Z] [player] climb down\n[2026-08-30T08:26:05.789Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:26:05.790Z] [world] You climb down from the roost and rejoin the ground beside the tilting submerged giant statue. Boots back on the ground.\n[2026-08-30T08:26:05.790Z] [world] Soot stands and stretches as you hit the ground. She has waited.\n[2026-08-30T08:26:05.790Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n",
+      "[2026-08-30T08:26:05.790Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:26:05.791Z] [system] \u23f3 Time passed: 15 min\n[2026-08-30T08:26:05.891Z] [cognitive] CLIMB  (99ms)\n[2026-08-30T08:26:07.165Z] [debug] qwen\u23f1 investigate_lore ok 2590ms wait 1115ms read 365ms/write 1092ms in 127t\u2192out 36t 2.9ms/t (169ch)\n",
+      "[2026-08-30T08:26:10.249Z] [debug] persist sizes(KB): total=163 player=29 wm=52[rooms=23 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=3\n[2026-08-30T08:26:15.464Z] [debug] homework: intro-fill armed after 8785ms idle\n[2026-08-30T08:26:24.556Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9083ms read 7917ms/write 1124ms in 742t\u2192out 33t 10.7ms/t HIT-CAP (134ch)\n",
+      "[2026-08-30T08:26:24.572Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9083ms \u2014 intro-fill:action-opener\n[2026-08-30T08:26:24.572Z] [debug] homework: scene_intro \"Builders' Survey Camp\" \u2713 9110ms\n[2026-08-30T08:27:00.511Z] [debug] homework: intro-fill armed after 8946ms idle\n",
+      "[2026-08-30T08:27:01.736Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1221ms read 0ms/write 1183ms in 742t\u2192out 34t HIT-CAP (152ch)\n[2026-08-30T08:27:01.749Z] [debug] homework: scene_intro \"Builders' Survey Camp\" \u2713 1240ms\n[2026-08-30T08:27:28.384Z] [debug] appstate: active \u2192 background (was active for 753527ms)\n",
+      "[2026-08-30T08:28:06.500Z] [debug] appstate: background \u2192 active (was background for 38116ms)\n[2026-08-30T08:28:10.377Z] [debug] appstate: active \u2192 background (was active for 3877ms)\n[2026-08-30T08:28:14.867Z] [debug] appstate: background \u2192 active (was background for 4491ms)\n[2026-08-30T08:28:18.320Z] [debug] appstate: active \u2192 background (was active for 3453ms)\n",
+      "[2026-08-30T08:28:27.833Z] [debug] appstate: background \u2192 active (was background for 9512ms)\n[2026-08-30T08:28:31.496Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-30T08:28:31.745Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a051b9-dc07-70ba-85f0-a0c79bdb92ad\n[2026-08-30T08:28:31.745Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-30T08:28:31.867Z] [debug] ota: Already up to date\n[2026-08-30T08:28:31.868Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T08:28:31.937Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-30T08:28:31.937Z] [debug] voice: bundled idle\n[2026-08-30T08:28:32.499Z] [debug] send-log: bundle #mtfj7rmu3rzy attempt 2/5 delivered to Sentry\n",
+      "[2026-08-30T13:50:23.977Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a051b9-dc07-70ba-85f0-a0c79bdb92ad\n[2026-08-30T13:50:23.977Z] [debug] ota: Checking\u2026\n[2026-08-30T13:50:24.943Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-30T13:50:25.051Z] [debug] ota: Saving progress\u2026\n[2026-08-30T13:50:25.053Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-08-30T13:50:25.134Z] [debug] ota: boot check result = applied\n[2026-08-30T13:50:25.273Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05233-daa6-71c7-ace4-912c1ccdd272\n[2026-08-30T13:50:25.273Z] [debug] ota: Checking\u2026\n[2026-08-30T13:50:25.379Z] [debug] ota: Already up to date\n[2026-08-30T13:50:25.380Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-30T13:50:25.450Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-30T13:50:25.450Z] [debug] voice: bundled idle\n[2026-08-30T13:50:26.252Z] [debug] send-log: bundle #mtfj7rmu3rzy attempt 3/5 delivered to Sentry\n[2026-08-30T13:50:29.117Z] [debug] OTA applied: 2026-08-30-1567-the-heartbeat-ate-the-checkpoint \u2192 2026-08-30-1568-one-string-two-fonts.\n",
+      "[2026-08-30T13:50:29.117Z] [debug] OTA session start: 2026-08-30-1568-one-string-two-fonts.\n[2026-08-30T13:50:29.117Z] [world] You step back into Tartarian Pilgrim Camp. The world waits for your move.\n",
+      "[2026-08-30T13:50:29.119Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cheddar Bob. We've still got ground to cover, you and I. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n\n=== END LOG \u00b7 399989 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n",
+      "  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-08-30T13:50:29.519Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-08-30-1568-one-string-two-fonts)\n  Boot stage: qwen:deferred\n\nML runtime health\n",
+      "  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-08-30T13:50:25.472Z\n  Last init success: 2026-08-30T13:50:26.071Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n",
+      "  Status: none recorded\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-27T21:42:59.314Z (3848m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"missions\"\n      doing: tap \"missions\" \u00b7 room outpost_central \u00b7 screen exploration\n      last checkpoint: rendered (+23163ms)\n",
+      "  \u2022 2026-08-28T02:29:33.897Z (3561m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n      Process died with no orderly exit while: action \"investigate weathered ruined skyscraper\"\n      doing: action \"investigate weathered ruined skyscraper\" \u00b7 room monarch_waystation \u00b7 screen exploration\n",
+      "      last checkpoint: rendered (+79547ms)\n  \u2022 2026-08-28T04:28:43.279Z (3442m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-28-1530-the-stranger-gets-the-screen \u00b7 stage rendered\n      Process died with no orderly exit while: action \"investigate the ground\"\n      doing: action \"investigate the ground\" \u00b7 room iskan_veil \u00b7 screen exploration\n",
+      "      last checkpoint: rendered (+16317ms)\n  \u2022 2026-08-29T18:14:56.559Z (1176m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-29-1542-the-rendezvous-is-a-place \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"missions\" \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer\n",
+      "      doing: tap \"missions\" \u00b7 room reclaimer_stake \u00b7 screen exploration\n      last checkpoint: rendered (+306713ms)\n  \u2022 2026-08-29T22:34:17.576Z (916m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-29-1547-the-conversation-holds-the-floor \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: native:cognition:done (+575ms)\n  \u2022 2026-08-30T00:56:46.075Z (774m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1552-are-you-sure-about-that \u00b7 stage native:voice:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:voice:done (+11080ms)\n",
+      "  \u2022 2026-08-30T01:15:03.072Z (755m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1553-glyph-glyph-name-star \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+9351ms)\n  \u2022 2026-08-30T02:14:43.966Z (696m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-30-1556-two-cudgels-are-two-objects \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done (+4739ms)\n  \u2022 2026-08-30T03:06:04.800Z (644m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-30-1559-the-coating-ladder-means-something \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done (+5502ms)\n  \u2022 2026-08-30T08:28:32.485Z (322m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-30-1567-the-heartbeat-ate-the-checkpoint \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] (+459ms)\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n  Memory warnings: none this session\n",
+      "  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  Native queue: worst wait 0.0s \u00b7 0 job kinds queued >3s \u00b7 w"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 27/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfva3flr9ic"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "27"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T17:13:29.725538Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T17:13:15.972000Z",
+  "fingerprints": [
+    "b9740788dc1a13de79038081caa5b280"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "346ba7c5a61540b5af189c3ceee99fbb",
+  "previousEventID": "117676ac2d794633892c9d5087703527"
+}

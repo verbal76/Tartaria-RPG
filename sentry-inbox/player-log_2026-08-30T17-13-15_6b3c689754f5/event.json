@@ -1,0 +1,225 @@
+{
+  "id": "6b3c689754f549df8c7e02c0deab6866",
+  "groupID": "7700974887",
+  "eventID": "6b3c689754f549df8c7e02c0deab6866",
+  "projectID": "4511945117532160",
+  "size": 17624,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 23/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 23/28]",
+  "title": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 23/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "4b0cf476f27040b8b2108305b39805d0",
+      "span_id": "a4891636688aff3a",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "[Filtered]",
+      "[2026-08-30T08:16:24.111Z] [world] You strip the lantern carefully. Something usable comes free in your hand.\n[2026-08-30T08:16:24.111Z] [world] You salvage the rusted ruined skyscraper. The take is small but real.\n[2026-08-30T08:16:24.112Z] [world] You work the shattered tartarian relay over. A part of it comes loose, intact.\n[2026-08-30T08:16:24.112Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-30T08:16:24.112Z] [reward]     \u2022 Hollow Quill Sheaf (Uncommon)\n[2026-08-30T08:16:24.112Z] [reward]     \u2022 Spider Silk (Common)\n[2026-08-30T08:16:24.113Z] [reward]     \u2022 Aether Dust x3 (Common)\n[2026-08-30T08:16:24.113Z] [reward]     \u2022 Bent Nail (Common)\n[2026-08-30T08:16:24.113Z] [reward]     \u2022 Automaton Circuit (Common)\n",
+      "[2026-08-30T08:16:25.151Z] [debug] persist sizes(KB): total=177 player=48 wm=48[rooms=21 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=2\n[2026-08-30T08:16:27.430Z] [player] investigate cage\n",
+      "[2026-08-30T08:16:27.433Z] [dog_quest] You come up on the cage, and past it the slag-floor opens out. The Reclaimer Deserter is there, working a chain that ends in a dog's collar. Reclaimer Deserter sees you. \"Walk on. This one's not yours.\"\n[2026-08-30T08:16:32.628Z] [debug] ui: tap \"golem pike\"\n[2026-08-30T08:16:32.677Z] [player] attack with the crude golem pike\n",
+      "[2026-08-30T08:16:32.677Z] [debug] parser: intent=attack conf=1.00 verb=attack target=crude golem pike resolved=Crude Golem Pike range=mid enemies=1 hooks=0\n[2026-08-30T08:16:32.678Z] [debug] attack: target=Reclaimer Deserter range=mid reach.bands=[mid,close] reach.label=Crude Golem Pike bareHand=false\n",
+      "[2026-08-30T08:16:32.725Z] [world] You bring the crude golem pike to bear on Reclaimer Deserter.\n[2026-08-30T08:16:32.725Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:16:32.907Z] [cognitive] TAKE_COVER  (181ms)\n[2026-08-30T08:16:39.286Z] [world] Reclaimer Deserter moves first. The pressure is immediate.\n",
+      "[2026-08-30T08:16:39.288Z] [combat] Reclaimer Deserter \u2014 d20 \u2192 20 + ATK 4 = 24 vs your AC 19 \u2014 \u2713 CRITICAL HIT\n[2026-08-30T08:16:39.288Z] [system] \u26a0 Your Wanderer's Worn Gauntlets is coming apart \u2014 a few more hits will finish it. Mend it or lose it.\n[2026-08-30T08:16:39.289Z] [combat] You \u2014 d20 \u2192 19 + STR 9 = 28 vs Reclaimer Deserter AC 9 \u2014 \u2713 HIT\n",
+      "[2026-08-30T08:16:39.290Z] [combat] Piercing flares \u2014 +3 on hit.\n[2026-08-30T08:16:39.291Z] [combat] The blow with the crude golem pike finds purchase \u2014 9 damage, 5 HP standing. Reclaimer Deserter commits to the counter.\n[2026-08-30T08:16:39.511Z] [combat] Reclaimer Deserter deals 5 bludgeoning damage [edge of reach \u2014 halved]. You have 26 HP remaining.\n",
+      "[2026-08-30T08:16:42.100Z] [debug] ui: tap \"dodge\"\n[2026-08-30T08:16:42.112Z] [player] dodge\n[2026-08-30T08:16:42.112Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0\n",
+      "[2026-08-30T08:16:42.113Z] [world] You commit to the dodge. Slip Reclaimer Deserter's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-30T08:16:42.179Z] [combat] Reclaimer Deserter \u2014 d20 \u2192 15 + ATK 4 = 19 vs your AC 19 \u2014 \u2713 HIT\n",
+      "[2026-08-30T08:16:42.179Z] [combat] Dodge \u2014 d20 \u2192 1 + DEX 19 = 20 vs ATK 19. \u2717 You misread it \u2014 no opening, and the blow lands as it normally would (armor still counts).\n[2026-08-30T08:16:42.181Z] [world] Your read is a beat off \u2014 you fail to make the opening, and the swing lands the way it always meant to.\n[2026-08-30T08:16:42.183Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-30T08:16:42.183Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:16:42.183Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:16:42.392Z] [combat] Reclaimer Deserter deals 3 bludgeoning damage [edge of reach \u2014 halved]. You have 23 HP remaining.\n[2026-08-30T08:16:42.576Z] [cognitive] neutral  (209ms)\n[2026-08-30T08:16:43.399Z] [debug] ui: tap \"golem pike\"\n",
+      "[2026-08-30T08:16:43.438Z] [player] attack with the crude golem pike\n[2026-08-30T08:16:43.439Z] [debug] parser: intent=attack conf=1.00 verb=attack target=crude golem pike resolved=Crude Golem Pike range=mid enemies=1 hooks=0\n[2026-08-30T08:16:43.440Z] [debug] attack: target=Reclaimer Deserter range=mid reach.bands=[mid,close] reach.label=Crude Golem Pike bareHand=false\n",
+      "[2026-08-30T08:16:43.482Z] [world] You commit forward with the crude golem pike. Reclaimer Deserter watches your hands.\n[2026-08-30T08:16:43.482Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:16:43.661Z] [cognitive] TAKE_COVER  (178ms)\n[2026-08-30T08:16:48.464Z] [world] You seize the initiative. Reclaimer Deserter has no time to react.\n",
+      "[2026-08-30T08:16:48.464Z] [combat] You \u2014 d20 \u2192 19 + STR 9 = 28 vs Reclaimer Deserter AC 9 \u2014 \u2713 HIT\n[2026-08-30T08:16:48.467Z] [combat] The blow with the crude golem pike finds purchase \u2014 3 damage, 2 HP standing. Reclaimer Deserter commits to the counter.\n[2026-08-30T08:16:48.468Z] [combat] Reclaimer Deserter \u2014 d20 \u2192 17 + ATK 4 = 21 vs your AC 19 \u2014 \u2713 HIT\n",
+      "[2026-08-30T08:16:48.690Z] [combat] Reclaimer Deserter deals 5 bludgeoning damage [edge of reach \u2014 halved]. You have 18 HP remaining.\n[2026-08-30T08:16:51.260Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-30T08:16:51.306Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-30T08:16:51.306Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n[2026-08-30T08:16:51.307Z] [debug] attack: target=Reclaimer Deserter range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-30T08:16:51.347Z] [world] You raise the searing bone crossbow toward Reclaimer Deserter. The room narrows around the both of you.\n[2026-08-30T08:16:51.349Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:16:51.533Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (183ms)\n[2026-08-30T08:16:58.888Z] [world] You seize the initiative. Reclaimer Deserter has no time to react.\n",
+      "[2026-08-30T08:16:58.888Z] [combat] You \u2014 d20 \u2192 11 + DEX 19 = 30 vs Reclaimer Deserter AC 9 \u2014 \u2713 HIT\n[2026-08-30T08:16:58.893Z] [combat] The killing blow with the searing bone crossbow: 10. Reclaimer Deserter drops where it stood.\n[2026-08-30T08:16:58.893Z] [reward] Reclaimer Deserter defeated. You recover Scrap Metal \u00d72.\n",
+      "[2026-08-30T08:16:58.894Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 32). [19 enemies defeated]\n[2026-08-30T08:16:58.895Z] [dog_quest] The Reclaimer deserter falls into the slag. The dog is still chained, watching you with the wary level look of an animal that has read its odds. They were keeping the dog illegally. No faction reckoning falls on you for this.\n",
+      "[2026-08-30T08:16:58.895Z] [reward] +10 TC pried from the dust.\n[2026-08-30T08:17:04.937Z] [debug] homework: intro-fill armed after 9808ms idle\n[2026-08-30T08:17:08.947Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 3882ms read 3229ms/write 620ms in 733t\u2192out 18t 4.4ms/t (84ch)\n[2026-08-30T08:17:09.081Z] [debug] homework: scene_intro \"Tartarian Pilgrim Camp\" \u2713 4146ms\n",
+      "[2026-08-30T08:17:19.800Z] [world] A Parakeet. Soot. The name settles on the dog like a coat.\n[2026-08-30T08:17:19.802Z] [world] Soot circles three times and curls beside you. Her breathing slows to yours.\n[2026-08-30T08:17:19.803Z] [dog_quest] The Arbiter studies the new pair. \"Soot, then. The chain is off. The road is open.\"\n",
+      "[2026-08-30T08:17:20.234Z] [debug] persist sizes(KB): total=179 player=48 wm=49[rooms=21 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n[2026-08-30T08:17:23.334Z] [debug] ui: tap \"inventory\"\n[2026-08-30T08:17:32.606Z] [debug] ui: tap \"craft\"\n[2026-08-30T08:17:39.573Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n",
+      "[2026-08-30T08:17:39.620Z] [player] summon crystal golem\n[2026-08-30T08:17:39.621Z] [debug] parser: intent=cast conf=1.00 verb=summon target=crystal golem resolved=Crude Golem Pike range=- enemies=0 hooks=0\n[2026-08-30T08:17:39.667Z] [combat] Aether Golem Constructor \u2014 d20 7 + INT 11 = 18 vs DC 22 \u2014 \u2717 FAILED\n",
+      "[2026-08-30T08:17:39.668Z] [world] (2\u00d7 Aether Crystal + 1\u00d7 Aetheric Cloth + 1\u00d7 Aetheric Shard consumed.)\n[2026-08-30T08:17:39.668Z] [world] The shape slips out of your hands. The aether returns to itself, indifferent.\n[2026-08-30T08:17:39.668Z] [debug] arbiter: template (reason=intent-not-allowed:cast)\n[2026-08-30T08:17:39.668Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-30T08:17:39.669Z] [system] \u23f3 Time passed: 30 min\n[2026-08-30T08:17:39.840Z] [cognitive] USE_ITEM  (170ms)\n[2026-08-30T08:17:44.167Z] [debug] ui: tap \"craft\"\n[2026-08-30T08:17:51.243Z] [player] summon crystal golem\n[2026-08-30T08:17:51.243Z] [debug] parser: intent=cast conf=1.00 verb=summon target=crystal golem resolved=Crude Golem Pike range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:17:51.289Z] [combat] Aether Golem Constructor \u2014 d20 3 + INT 11 = 14 vs DC 22 \u2014 \u2717 FAILED\n[2026-08-30T08:17:51.290Z] [world] (2\u00d7 Aether Crystal + 1\u00d7 Aetheric Cloth + 1\u00d7 Aetheric Shard consumed.)\n[2026-08-30T08:17:51.290Z] [world] The shape slips out of your hands. The aether returns to itself, indifferent.\n[2026-08-30T08:17:51.291Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-30T08:17:51.443Z] [cognitive] USE_ITEM  (151ms)\n[2026-08-30T08:17:56.749Z] [debug] ui: tap \"craft\"\n[2026-08-30T08:17:56.750Z] [debug] ui: tap \"craft\"\n[2026-08-30T08:17:57.250Z] [debug] qwen\u23f1 ambient ok 5696ms read 2660ms/write 1086ms in 366t\u2192out 31t 7.3ms/t HIT-CAP (139ch)\n[2026-08-30T08:17:57.255Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 5696ms \u2014 ambient:\u2205\n",
+      "[2026-08-30T08:17:57.256Z] [debug] arbiter: ambient \u2205 5965ms\n[2026-08-30T08:17:57.256Z] [debug] arbiter: ambient-empty reason=unknown raw=\"You, the Companion, have traversed many paths, and now you stand at Monarch Staging Camp. The scenery here is a testamen\"\n",
+      "[2026-08-30T08:17:57.354Z] [debug] persist sizes(KB): total=179 player=48 wm=48[rooms=21 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n[2026-08-30T08:18:04.825Z] [player] summon crystal golem\n[2026-08-30T08:18:04.826Z] [debug] parser: intent=cast conf=1.00 verb=summon target=crystal golem resolved=Crude Golem Pike range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:18:04.872Z] [combat] Aether Golem Constructor \u2014 d20 7 + INT 11 = 18 vs DC 22 \u2014 \u2717 FAILED\n[2026-08-30T08:18:04.873Z] [world] (2\u00d7 Aether Crystal + 1\u00d7 Aetheric Cloth + 1\u00d7 Aetheric Shard consumed.)\n[2026-08-30T08:18:04.873Z] [world] The shape slips out of your hands. The aether returns to itself, indifferent.\n[2026-08-30T08:18:04.873Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-30T08:18:05.027Z] [cognitive] USE_ITEM  (152ms)\n[2026-08-30T08:18:08.101Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:18:09.752Z] [player] investigate the mud\n[2026-08-30T08:18:09.753Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:18:09.758Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:18:09.766Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:18:09.919Z] [cognitive] SWIM  (152ms)\n[2026-08-30T08:18:10.652Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T08:18:11.037Z] [player] investigate cage\n",
+      "[2026-08-30T08:18:11.038Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cage resolved=cage range=- enemies=0 hooks=0\n[2026-08-30T08:18:11.038Z] [world] You give the cage your full attention. It returns the gesture by being exactly what it appears to be.\n[2026-08-30T08:18:11.039Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-30T08:18:11.039Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:18:11.174Z] [cognitive] neutral  (133ms)\n[2026-08-30T08:18:12.265Z] [player] investigate still pond\n[2026-08-30T08:18:12.266Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:18:12.267Z] [world] The still pond resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n[2026-08-30T08:18:12.486Z] [reward] \u2726 Found Entry 6 \u2014 the Teeth \u2014 The Greedy Reclaimer. (open Contracts \u2192 Collectibles to read)\n",
+      "[2026-08-30T08:18:12.488Z] [world] Behind the cage, where the floods didn't reach: a single page, in a hand you haven't read before.\n[2026-08-30T08:18:12.488Z] [world] You salvage the half-buried wagon. The take is small but real.\n[2026-08-30T08:18:12.489Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:18:12.489Z] [reward]     \u2022 Scrap Metal (Common)\n",
+      "[2026-08-30T08:18:13.488Z] [debug] qwen\u23f1 investigate_lore ok 2324ms read 1255ms/write 1024ms in 127t\u2192out 26t 9.9ms/t (114ch)\n[2026-08-30T08:18:13.758Z] [cognitive] SWIM  (1489ms)\n[2026-08-30T08:18:14.980Z] [debug] qwen\u23f1 investigate_lore ok 2522ms wait 1300ms read 305ms/write 887ms in 128t\u2192out 28t 2.4ms/t (129ch)\n[2026-08-30T08:18:16.054Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-30T08:18:24.610Z] [debug] qwen\u23f1 item_synthesis_hw ok 4592ms read 3536ms/write 1022ms in 332t\u2192out 31t 10.7ms/t (126ch)\n[2026-08-30T08:18:24.621Z] [debug] homework: item_desc \"Aetheric Scout Greaves\" \u2713 4616ms\n[2026-08-30T08:18:37.640Z] [reward] You work the frost paste along the weapon. Now wielding the Frost-Rimed Crude Golem Pike \u2014 1d6 cold on every landing hit.\n",
+      "[2026-08-30T08:18:52.561Z] [debug] qwen\u23f1 item_synthesis_hw ok 2516ms read 400ms/write 1620ms in 332t\u2192out 49t 1.2ms/t (196ch)\n[2026-08-30T08:18:52.565Z] [debug] homework: item_desc \"Light-Finger Guild Band\" \u2713 2532ms\n[2026-08-30T08:18:55.523Z] [debug] persist sizes(KB): total=179 player=47 wm=49[rooms=21 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n",
+      "[2026-08-30T08:18:56.568Z] [debug] ui: tap \"craft\"\n[2026-08-30T08:19:04.826Z] [world] You repair the Aetheric Scout Greaves. Back to full. (spent: Patched Cloth x4)\n[2026-08-30T08:19:04.861Z] [world] You repair the Searing Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n",
+      "[2026-08-30T08:19:04.873Z] [world] You repair the Frost-Rimed Crude Golem Pike. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-08-30T08:19:04.893Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Forgotten Seeker's Mask \u2014 1 piece of this is Crucible stock: Aether Feather. Say the word and I'll set it aside instead.\"\n",
+      "[2026-08-30T08:19:07.646Z] [arbiter] The Arbiter sets it aside on the bench. \"\u2665 Held for the Crucible: Aether Feather. I'll not touch it.\"\n[2026-08-30T08:19:09.666Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-30T08:19:09.678Z] [world] You repair the Forgotten Seeker's Mask. Back "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 23/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfva3flr9ic"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "23"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T17:13:27.574979Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "0": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 383,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T17:13:15.971000Z",
+  "fingerprints": [
+    "b9740788dc1a13de79038081caa5b280"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "6c8bee94cc7a4aeeb74b12413224a693",
+  "previousEventID": "567b2f1a000b4d88ade43ad4537d4b66"
+}

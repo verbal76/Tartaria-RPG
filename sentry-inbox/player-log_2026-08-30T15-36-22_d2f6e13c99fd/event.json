@@ -1,0 +1,202 @@
+{
+  "id": "d2f6e13c99fd403dac9d3ccacad9f136",
+  "groupID": "7700811178",
+  "eventID": "d2f6e13c99fd403dac9d3ccacad9f136",
+  "projectID": "4511945117532160",
+  "size": 17875,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1568-one-string-two-fonts #mtfva3flr9ic [inline 1/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1568-one-string-two-fonts #mtfva3flr9ic [inline 1/28]",
+  "title": "player-log 2026-08-30-1568-one-string-two-fonts #mtfva3flr9ic [inline 1/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "92f988728f4940798659c2ad5e77600a",
+      "span_id": "a2cdde7ddf9d4150",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "=== TARTARIA LOG \u00b7 399989 CHARS \u00b7 BEGIN ===\n[2026-08-29T23:25:18.211Z] [cognitive] neutral  (104ms)\n[2026-08-29T23:25:18.867Z] [debug] ui: tap \"cudgel\"\n[2026-08-29T23:25:18.894Z] [player] attack with the cudgel\n[2026-08-29T23:25:18.895Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=1 hooks=1\n",
+      "[2026-08-29T23:25:18.896Z] [debug] attack: target=Silt Thief range=close reach.bands=[close] reach.label=Cudgel bareHand=false\n[2026-08-29T23:25:18.899Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:25:18.899Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-29T23:25:18.916Z] [world] You bring the cudgel to bear on Silt Thief.\n",
+      "[2026-08-29T23:25:18.916Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:25:19.012Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 TAKE_COVER \u00b7 DISENGAGE  (94ms)\n[2026-08-29T23:25:23.240Z] [world] You seize the initiative. Silt Thief has no time to react.\n[2026-08-29T23:25:23.240Z] [combat] You \u2014 d20 \u2192 20 + STR 5 \u2212 1 (Ash Storm) perfect opening (2\u00d7 dice) = 24 vs Silt Thief AC 10 \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-08-29T23:25:23.241Z] [combat] Final strike with the cudgel for 16. Silt Thief is still. The Aetherstone hums on, indifferent.\n[2026-08-29T23:25:23.242Z] [world] The Silt Thief drops. Under their cloak, wrapped in oilcloth, half-stamped Aetheric Discs spill across the silt. You scoop them into your own pack. Yulka's stock, recovered.\n",
+      "[2026-08-29T23:25:23.242Z] [reward] \u2726 Stolen Aetheric Discs (12).\n[2026-08-29T23:25:23.242Z] [world] Discs in hand. The thread pulls you back the way you came \u2014 Yulka's owed.\n[2026-08-29T23:25:23.243Z] [reward] Silt Thief defeated. You recover Patched Cloth \u00d72.\n[2026-08-29T23:25:23.245Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n",
+      "[2026-08-29T23:25:23.245Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 33). [3 enemies defeated]\n[2026-08-29T23:25:23.245Z] [reward] +8 TC pried from the dust.\n[2026-08-29T23:25:23.268Z] [arbiter] The Arbiter eyes your new pieces. \"You could make a Riveted Leather Vest now, if you wanted.\"\n[2026-08-29T23:25:27.590Z] [debug] homework: intro-fill armed after 6756ms idle\n",
+      "[2026-08-29T23:25:32.353Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4671ms read 3224ms/write 1418ms in 740t\u2192out 33t 4.4ms/t HIT-CAP (155ch)\n[2026-08-29T23:25:32.442Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2713 4853ms\n[2026-08-29T23:25:49.706Z] [debug] ui: tap \"missions\"\n",
+      "[2026-08-29T23:26:01.444Z] [world] You set out toward Yulka (return the Discs). Tap the travel row to press on; STOP to halt.\n[2026-08-29T23:26:01.461Z] [world] You walk west. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-29T23:26:01.462Z] [world] Whatever you turned over here is still turned over.\n",
+      "[2026-08-29T23:26:06.391Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-08-29T23:26:06.532Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:26:06.653Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n",
+      "[2026-08-29T23:26:12.671Z] [debug] homework: intro-fill armed after 6641ms idle\n[2026-08-29T23:26:17.790Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-08-29T23:26:17.838Z] [player] take the five discs for yulka\n",
+      "[2026-08-29T23:26:17.839Z] [debug] parser: intent=pickup conf=1.00 verb=take target=five discs yulka resolved=- range=- enemies=0 hooks=1\n[2026-08-29T23:26:17.840Z] [world] The ground here is bare. Nothing to pick up.\n[2026-08-29T23:26:17.929Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 5197ms read 0ms/write 0ms in 702t\u2192out 0t (0ch)\n",
+      "[2026-08-29T23:26:17.996Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5197ms \u2014 intro-fill:\u2205\n[2026-08-29T23:26:17.996Z] [debug] homework: scene_intro \"the Silt Thief\" \u2205 5325ms\n[2026-08-29T23:26:18.062Z] [cognitive] neutral  (221ms)\n",
+      "[2026-08-29T23:26:18.171Z] [debug] persist sizes(KB): total=135 player=21 wm=32[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=78 scene=2\n[2026-08-29T23:26:21.273Z] [debug] ui: tap \"take / salvage\"\n[2026-08-29T23:26:22.840Z] [world] You work the lamp over. A part of it comes loose, intact.\n",
+      "[2026-08-29T23:26:22.841Z] [world] You lever something loose from the stall \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-29T23:26:22.841Z] [reward] \u2726 Salvage haul:\n[2026-08-29T23:26:22.841Z] [reward]     \u2022 Aether Dust x3 (Common)\n[2026-08-29T23:26:22.842Z] [reward]     \u2022 Tar-Black Lashing (Common)\n",
+      "[2026-08-29T23:26:23.873Z] [debug] ui: tap \"use aetheric torch\"\n[2026-08-29T23:26:23.900Z] [player] use Aetheric Torch\n[2026-08-29T23:26:23.901Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=aetheric torch resolved=Aetheric Torch range=- enemies=0 hooks=1\n",
+      "[2026-08-29T23:26:23.902Z] [world] Under the Aetheric Torch's light the shelf throws a second shadow it should not have. Something is layered in there. Work the shelf \u2014 investigate it and it will give up something rare.\n[2026-08-29T23:26:23.912Z] [system] \u23f3 Time passed: 15 min\n[2026-08-29T23:26:23.992Z] [cognitive] USE_ITEM \u00b7 THROW  (79ms)\n",
+      "[2026-08-29T23:26:27.586Z] [debug] qwen\u23f1 ambient ok 3599ms read/write unusable (native mis-reported 13831ms/989ms \u2014 llama.rn split bug, not this call) in 364t\u2192out 31t HIT-CAP (164ch)\n[2026-08-29T23:26:27.670Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 3599ms \u2014 ambient:\u2205\n[2026-08-29T23:26:27.671Z] [debug] arbiter: ambient \u2205 3759ms\n",
+      "[2026-08-29T23:26:27.671Z] [debug] arbiter: ambient-empty reason=third-person raw=\"The player, with their eyes scanning the horizon, noted with a slight smirk that their journey through the Borderlands h\"\n[2026-08-29T23:26:29.614Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n",
+      "[2026-08-29T23:26:29.765Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:26:29.836Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:26:33.767Z] [player] investigate the shelf\n",
+      "[2026-08-29T23:26:33.768Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shelf resolved=shelf range=- enemies=0 hooks=1\n[2026-08-29T23:26:33.769Z] [debug] route: hook intercept (kind=thread, target=\"shelf\") \u2014 original intent=investigate\n",
+      "[2026-08-29T23:26:33.769Z] [world] \u2605 STORY THREAD (step 1) \u2014 You pull the rubble aside. A draft of cold, old air, and a tight passage angling down into the dark.\n[2026-08-29T23:26:35.031Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You wedge yourself into the gap. At the bottom \u2014 a small antechamber, half-flooded, with three sealed jars on a shelf. You take what you can carry.\n",
+      "[2026-08-29T23:26:35.031Z] [reward] \u2726 Trail Rations, Aether Residue, +12 TC.\n[2026-08-29T23:26:35.062Z] [reward] \u2726 The torch's mark pays out \u2014 Phantom Core (Rare)!\n[2026-08-29T23:26:35.062Z] [reward] \u2726 For your persistence \u2014 Drone Core (Uncommon).\n[2026-08-29T23:26:39.193Z] [debug] ui: tap \"\u2192 YULKA (RETURN THE DISCS)\"\n",
+      "[2026-08-29T23:26:39.204Z] [world] A quiet outbuilding stands off the path here \u2014 weathered and quiet, a way in still clear. (You\u2019re on a route \u2014 type ENTER to step inside, or keep traveling.)\n[2026-08-29T23:26:39.205Z] [world] You push west. The silt is heavy underfoot, the horizon unchanged.\n[2026-08-29T23:26:39.206Z] [world] A faint smell of burning Aetherstone drifts from somewhere north.\n",
+      "[2026-08-29T23:26:41.226Z] [debug] ui: tap \"\u2192 YULKA (RETURN THE DISCS)\"\n[2026-08-29T23:26:41.242Z] [world] Yulka takes the bundle and counts without looking up. \"Faster than I thought.\" She pulls five clean Discs from her own tray and stacks them in your palm, then drops thirty TC on top. \"Don't come back. We're done.\"\n[2026-08-29T23:26:41.242Z] [reward] \u2726 Aetheric Disc \u00d7 5.\n",
+      "[2026-08-29T23:26:41.243Z] [reward] +30 TC.\n[2026-08-29T23:26:41.244Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n[2026-08-29T23:26:49.181Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-08-29T23:26:49.335Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-\n",
+      "[2026-08-29T23:26:49.467Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:27:02.682Z] [debug] homework: intro-fill armed after 6625ms idle\n[2026-08-29T23:27:03.396Z] [player] how come it never told me that it awarded me the five discs after the fight. it only showed like the random loot. it should have said something on the lines of you recovered ",
+      "yokus discs. she'll be happy now or something like that\n[2026-08-29T23:27:03.396Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n",
+      "[2026-08-29T23:27:03.397Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n[2026-08-29T23:27:03.397Z] [debug] meta-comment guard: skipped intent parse (suggestion: \"it should have\") on 229-char input\n[2026-08-29T23:27:07.097Z] [debug] ui: tap \"climb\"\n[2026-08-29T23:27:08.748Z] [player] climb ladder\n",
+      "[2026-08-29T23:27:08.748Z] [debug] parser: intent=climb conf=1.00 verb=climb target=ladder resolved=ladder range=- enemies=0 hooks=2\n[2026-08-29T23:27:08.778Z] [world] You loop your Reclaimer's Rope around the ladder and walk the line. Tier 1/2 cleared.\n[2026-08-29T23:27:08.779Z] [world] You reach the first hold of the ladder (tier 1/2). Higher still to go.\n",
+      "[2026-08-29T23:27:08.779Z] [world] Talus sets its stone feet at the base of ladder and will climb no further \u2014 the construct holds the ground while you go up alone.\n[2026-08-29T23:27:08.780Z] [system] \u23f3 Time passed: 30 min\n[2026-08-29T23:27:08.917Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 6148ms read 0ms/write 0ms in 746t\u2192out 0t (0ch)\n",
+      "[2026-08-29T23:27:08.985Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6148ms \u2014 intro-fill:\u2205\n[2026-08-29T23:27:08.986Z] [debug] homework: scene_intro \"Iskan-Veil\" \u2205 6305ms\n[2026-08-29T23:27:09.053Z] [cognitive] CLIMB  (272ms)\n[2026-08-29T23:27:13.233Z] [debug] ui: tap \"inventory\"\n[2026-08-29T23:27:18.354Z] [world] You rack Frost Paste on your bandolier. Ready to throw.\n",
+      "[2026-08-29T23:27:20.587Z] [world] You rack Smoldering Paste on your bandolier. Ready to throw.\n[2026-08-29T23:27:22.278Z] [debug] qwen\u23f1 item_synthesis_hw ok 4553ms read/write unusable (native mis-reported 18554ms/928ms \u2014 llama.rn split bug, not this call) in 336t\u2192out 29t (110ch)\n[2026-08-29T23:27:22.282Z] [debug] homework: item_desc \"Wanderer's Worn Gauntlets\" \u2713 4579ms\n",
+      "[2026-08-29T23:27:22.404Z] [world] You rack Searing Paste on your bandolier. Ready to throw.\n[2026-08-29T23:27:22.695Z] [debug] persist sizes(KB): total=140 player=21 wm=37[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=3\n[2026-08-29T23:27:47.721Z] [debug] homework: intro-fill armed after 6731ms idle\n",
+      "[2026-08-29T23:27:56.973Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=cached winH=986 beat=-\n[2026-08-29T23:27:57.175Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:27:57.280Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n",
+      "[2026-08-29T23:27:57.795Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10063ms read 8696ms/write 1337ms in 784t\u2192out 25t 11.1ms/t (113ch)\n[2026-08-29T23:27:57.887Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 10063ms \u2014 intro-fill:action-opener\n[2026-08-29T23:27:57.888Z] [debug] homework: scene_intro \"Iskan-Veil\" \u2713 10168ms\n",
+      "[2026-08-29T23:28:10.497Z] [player] we did a lot of work on the fusible section of this game. now all of a sudden nothing I have is feasible. I had like 35 or 40 items before. what happened to them? did we break something?\n",
+      "[2026-08-29T23:28:10.498Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-29T23:28:10.498Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n",
+      "[2026-08-29T23:28:10.498Z] [debug] meta-comment guard: skipped intent parse (ui-vocabulary: \"this game\") on 186-char input\n[2026-08-29T23:28:12.463Z] [debug] ui: tap \"climb up (1/2)\"\n[2026-08-29T23:28:12.485Z] [player] climb ladder\n[2026-08-29T23:28:12.485Z] [debug] parser: intent=climb conf=1.00 verb=climb target=ladder resolved=ladder range=- enemies=0 hooks=2\n",
+      "[2026-08-29T23:28:12.511Z] [world] You loop your Reclaimer's Rope around the ladder and walk the line. Tier 2/2 cleared.\n[2026-08-29T23:28:12.511Z] [world] You reach the top of the ladder (tier 2/2). The view changes; the room reads differently from here.\n[2026-08-29T23:28:12.512Z] [reward] \u2726 Bioluminescent Fungus (Uncommon) \u2014 tucked into a crack at the top of the ladder.\n",
+      "[2026-08-29T23:28:12.513Z] [world] An old pilgrim sits cross-legged, palms up to the sky. They don't open their eyes as you arrive. \"Sit. I won't make you stay long. I have something you should know before the Aether tells you the harder way.\"\n[2026-08-29T23:28:12.514Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n",
+      "[2026-08-29T23:28:12.514Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-29T23:28:12.514Z] [system] \u23f3 Time passed: 30 min\n[2026-08-29T23:28:12.593Z] [cognitive] CLIMB  (77ms)\n[2026-08-29T23:28:13.578Z] [debug] ui: tap \"take / salvage\"\n[2026-08-29T23:28:14.921Z] [world] You break the prayer beads apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-29T23:28:14.922Z] [world] You strip the walking-staff carefully. Something usable comes free in your hand.\n[2026-08-29T23:28:14.923Z] [reward] \u2726 Salvage haul:\n[2026-08-29T23:28:14.923Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-08-29T23:28:14.924Z] [reward]     \u2022 Aether Dust (Common)\n[2026-08-29T23:28:16.304Z] [player] investigate pilgrim\n",
+      "[2026-08-29T23:28:16.305Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pilgrim resolved=pilgrim range=- enemies=0 hooks=1\n[2026-08-29T23:28:16.306Z] [debug] route: hook intercept (kind=whisper_crystal, target=\"pilgrim\") \u2014 original intent=investigate\n",
+      "[2026-08-29T23:28:16.306Z] [world] \u2605 STORY THREAD (step 1) \u2014 You lean toward the crystal. The whispering shapes itself \u2014 Tartarian, you think, though no language you can name. It is saying a location.\n[2026-08-29T23:28:17.433Z] [world] \u2605 STORY THREAD (step 2) \u2014 You pry the crystal loose. The whispering stops \u2014 but the direction it gave you stays.\n",
+      "[2026-08-29T23:28:17.434Z] [reward] \u2726 Aether Crystal.\n[2026-08-29T23:28:18.649Z] [worl"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1568-one-string-two-fonts #mtfva3flr9ic [inline 1/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfva3flr9ic"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T15:36:21.841000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T15:36:22.806000Z",
+  "fingerprints": [
+    "e1071513e990170768dca90bece93c8f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "db988dd955074cf1ab9d110a82f54528",
+  "previousEventID": "d24d79707e354cc6881e3b1cab790a40"
+}

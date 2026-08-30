@@ -1,0 +1,200 @@
+{
+  "id": "584794fc638f4838866994268aab1547",
+  "groupID": "7700974887",
+  "eventID": "584794fc638f4838866994268aab1547",
+  "projectID": "4511945117532160",
+  "size": 17916,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 18/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 18/28]",
+  "title": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 18/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "6c4db1e452ad4463aef15511475e3fb1",
+      "span_id": "a604a81600b97261",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      ". (22/95 HP, 2 turns left)\n[2026-08-30T08:08:16.195Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 16 + ATK 4 = 20 vs your AC 19 \u2014 \u2717 EVADED\n[2026-08-30T08:08:16.195Z] [combat] Dodge \u2014 d20 \u2192 10 + DEX 19 = 29 vs ATK 20. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-30T08:08:16.196Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:08:16.361Z] [cognitive] neutral  (164ms)\n",
+      "[2026-08-30T08:08:17.100Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-30T08:08:17.145Z] [player] attack with the off-hand bone crossbow\n[2026-08-30T08:08:17.145Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=1\n[2026-08-30T08:08:17.146Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 3. (19/95 HP, 0 turns left)\n",
+      "[2026-08-30T08:08:17.146Z] [combat] Mud-Wracked Aetherkin shakes off the last of the acid \u2014 the Cudgel has run its course.\n[2026-08-30T08:08:17.146Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 2. (17/95 HP, 1 turn left)\n[2026-08-30T08:08:17.146Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-30T08:08:17.147Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-08-30T08:08:17.147Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-30T08:08:17.180Z] [world] Your searing bone crossbow comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n[2026-08-30T08:08:17.181Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-30T08:08:17.337Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (156ms)\n[2026-08-30T08:08:24.887Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-08-30T08:08:24.887Z] [combat] You \u2014 d20 \u2192 3 + DEX 18 \u2212 2 (Iron Fog) + 2 (point blank) perfect opening (2\u00d7 dice) = 21 vs Mud-Wracked Aetherkin AC 9 \u2014 \u2713 HIT\n",
+      "[2026-08-30T08:08:24.888Z] [combat] Mud-Wracked Aetherkin shrugs off the piercing. (resisted, \u00d70.5 for 18)\n[2026-08-30T08:08:24.890Z] [combat] Final strike with the searing bone crossbow for 18. Mud-Wracked Aetherkin is still. The Aetherstone hums on, indifferent.\n[2026-08-30T08:08:24.891Z] [reward] Mud-Wracked Aetherkin defeated. You recover Aether Mud, Aetherstone Fragment, Veil of Peace.\n",
+      "[2026-08-30T08:08:24.894Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-30T08:08:24.894Z] [system] Word travels among those who keep the flood-dead sacred: you put one of the Aetherkin down.\n[2026-08-30T08:08:24.894Z] [reward] +12 TC pried from the dust.\n[2026-08-30T08:08:27.604Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-30T08:08:28.691Z] [debug] homework: intro-fill armed after 10570ms idle\n[2026-08-30T08:08:29.156Z] [world] You work the Rusty Shortbow loose from where the mud had it.\n[2026-08-30T08:08:29.157Z] [reward] \u2726 Rusty Shortbow (Common).\n[2026-08-30T08:08:29.169Z] [world] The Shaman's Mud Helm had settled into the ground. You unsettle it.\n",
+      "[2026-08-30T08:08:29.169Z] [reward] \u2726 Shaman's Mud Helm (Common).\n[2026-08-30T08:08:30.711Z] [world] You scavenge the barrel thoroughly. One Stick survives the sorting.\n[2026-08-30T08:08:30.711Z] [world] You work the jagged ruined skyscraper over. A part of it comes loose, intact.\n",
+      "[2026-08-30T08:08:30.711Z] [world] You lever something loose from the shattered tartarian relay \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-30T08:08:30.711Z] [world] You salvage the signpost. The take is small but real.\n[2026-08-30T08:08:30.712Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:08:30.712Z] [reward]     \u2022 Stick (Common)\n",
+      "[2026-08-30T08:08:30.712Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-08-30T08:08:30.712Z] [reward]     \u2022 Glass-Beaded Strap (Uncommon)\n[2026-08-30T08:08:30.712Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-08-30T08:08:32.886Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n",
+      "[2026-08-30T08:08:32.894Z] [debug] spawn: gear=[Lost Seeker's Gloves, Architect's Grip, Relic Hunter's Gauntlets] window=10 roster=new\n[2026-08-30T08:08:32.895Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n",
+      "[2026-08-30T08:08:32.895Z] [world] You set out east. Your boots sink half an inch into the mud-flats and pull free with each step.\n[2026-08-30T08:08:32.896Z] [world] The loose end is exactly as loose as you left it.\n[2026-08-30T08:08:34.403Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T08:08:36.508Z] [world] Whatever the Architect's Grip was lying against, it lets go without much argument.\n",
+      "[2026-08-30T08:08:36.508Z] [reward] \u2726 Architect's Grip (Common).\n[2026-08-30T08:08:36.522Z] [world] The Lost Seeker's Gloves is heavier than it looks. Most things down here are.\n[2026-08-30T08:08:36.522Z] [reward] \u2726 Lost Seeker's Gloves (Common).\n[2026-08-30T08:08:36.524Z] [world] The Relic Hunter's Gauntlets is lighter than it looks, which is its own kind of warning.\n",
+      "[2026-08-30T08:08:36.524Z] [reward] \u2726 Relic Hunter's Gauntlets (Uncommon).\n[2026-08-30T08:08:36.982Z] [debug] persist sizes(KB): total=162 player=40 wm=40[rooms=12 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=3\n[2026-08-30T08:08:37.191Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 8366ms read 7333ms/write 996ms in 736t\u2192out 30t 10.0ms/t (146ch)\n",
+      "[2026-08-30T08:08:37.301Z] [debug] homework: scene_intro \"Dynasty Border Post\" \u2713 8611ms\n[2026-08-30T08:08:37.606Z] [reward] \u2726 Found Chit 5 \u2014 Intruder \u2014 Logic Core 04-B. (open Contracts \u2192 Collectibles to read)\n[2026-08-30T08:08:37.625Z] [world] Wedged into the barrel, half-hidden by the dust: a sealed letter. You pocket it carefully.\n",
+      "[2026-08-30T08:08:37.625Z] [world] You work the cart apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-30T08:08:37.625Z] [world] You lever something loose from the rusted petrified mud wave \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-08-30T08:08:37.625Z] [world] You break the sign apart. Among the pieces, something worth keeping.\n[2026-08-30T08:08:37.626Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:08:37.626Z] [reward]     \u2022 Waxed Yarn Bundle (Common)\n[2026-08-30T08:08:37.626Z] [reward]     \u2022 Iron-Pinned Plank Shard (Uncommon)\n[2026-08-30T08:08:37.626Z] [reward]     \u2022 Smooth Stone x2 (Common)\n",
+      "[2026-08-30T08:08:39.887Z] [debug] ui: tap \"ENTER\"\n[2026-08-30T08:08:39.888Z] [world] You step inside the old workshed, into the shed.\n[2026-08-30T08:08:39.888Z] [world] Tools hang on pegs over a scarred workbench; the air is oil and dust. The floorboards by the bench sit oddly proud, as if something underneath pushes them up.\n[2026-08-30T08:08:41.356Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-30T08:08:42.581Z] [world] You strip the workbench carefully. Something usable comes free in your hand.\n[2026-08-30T08:08:42.582Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:08:42.582Z] [reward]     \u2022 Stick x2 (Common)\n[2026-08-30T08:08:45.843Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:08:47.463Z] [player] investigate the mud\n",
+      "[2026-08-30T08:08:47.464Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:08:47.469Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:08:47.476Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:08:47.596Z] [cognitive] SWIM  (119ms)\n",
+      "[2026-08-30T08:08:48.214Z] [debug] ui: tap \"\u2197 Bedroom\"\n[2026-08-30T08:08:48.215Z] [world] You step into the bedroom.\n[2026-08-30T08:08:48.216Z] [world] Somebody slept in here long after the shed stopped being a shed \u2014 a low bed under the eaves, a cupboard of stoppered jars, and a lamp burned down to its socket.\n[2026-08-30T08:08:48.715Z] [player] investigate tools\n",
+      "[2026-08-30T08:08:48.716Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tools resolved=- range=- enemies=0 hooks=0\n[2026-08-30T08:08:48.718Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:08:48.718Z] [arbiter] The Arbiter looks around. \"The garrison's roll-call includes names no one answers to. They are called anyway, every morning.\"\n",
+      "[2026-08-30T08:08:48.722Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T08:08:49.498Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T08:08:49.947Z] [player] investigate pegs\n[2026-08-30T08:08:49.948Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pegs resolved=- range=- enemies=0 hooks=0\n[2026-08-30T08:08:49.950Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-30T08:08:51.771Z] [world] You lever something loose from the bed \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-30T08:08:51.771Z] [world] You salvage the cupboard. The take is small but real.\n[2026-08-30T08:08:51.771Z] [world] You strip the jars carefully. Something usable comes free in your hand.\n",
+      "[2026-08-30T08:08:51.771Z] [world] You strip the lamp carefully. Something usable comes free in your hand.\n[2026-08-30T08:08:51.771Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:08:51.771Z] [reward]     \u2022 Weathered Granite Knob (Common)\n[2026-08-30T08:08:51.772Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-30T08:08:51.772Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n",
+      "[2026-08-30T08:08:51.772Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-30T08:08:52.656Z] [player] investigate floorboards\n[2026-08-30T08:08:52.657Z] [world] Hidden until now: The Hidden Cellar opens up. It joins the rooms you can reach.\n[2026-08-30T08:08:53.789Z] [debug] qwen\u23f1 ambient ok 6099ms read 2668ms/write 1174ms in 362t\u2192out 31t 7.4ms/t HIT-CAP (148ch)\n",
+      "[2026-08-30T08:08:53.986Z] [debug] arbiter: ambient stale:moved-scene\u2192banked 6510ms\n[2026-08-30T08:08:53.987Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"Your eyes scanned the array of buildings before you, each one a piece of history that you had once seen. Some stood tall\"\n[2026-08-30T08:08:54.082Z] [debug] ui: tap \"\u2193 Storage\"\n",
+      "[2026-08-30T08:08:54.082Z] [world] You step into the storage.\n[2026-08-30T08:08:54.083Z] [world] Shelves run the length of the wall, stacked with bottles, tins and sacking. Whatever was worth keeping was kept here, and most of it is still keeping.\n[2026-08-30T08:08:54.190Z] [cognitive] neutral  (5467ms)\n[2026-08-30T08:08:54.300Z] [cognitive] neutral  (4349ms)\n",
+      "[2026-08-30T08:08:54.432Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'tools' here. Choose words carefully \u2014 try: the mud, the haze, the dust.\"\n[2026-08-30T08:08:54.546Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'pegs' here. Choose words carefully \u2014 try: the mud, the haze, the dust.\"\n[2026-08-30T08:08:55.516Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-30T08:08:57.166Z] [world] You break the bottles apart. Among the pieces, something worth keeping.\n[2026-08-30T08:08:57.166Z] [world] You work the sacking over. A part of it comes loose, intact.\n[2026-08-30T08:08:57.167Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:08:57.167Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-30T08:08:57.167Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n",
+      "[2026-08-30T08:09:05.219Z] [debug] ui: tap \"\u2191 Bedroom \u2713\"\n[2026-08-30T08:09:05.223Z] [world] You step into the bedroom.\n[2026-08-30T08:09:05.224Z] [world] Somebody slept in here long after the shed stopped being a shed \u2014 a low bed under the eaves, a cupboard of stoppered jars, and a lamp burned down to its socket.\n[2026-08-30T08:09:06.501Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-30T08:09:07.985Z] [player] investigate the mud\n[2026-08-30T08:09:07.985Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:07.989Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Bone Knife (Common).\n",
+      "[2026-08-30T08:09:07.996Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:09:07.996Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:09:07.997Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:08.113Z] [cognitive] SWIM  (115ms)\n",
+      "[2026-08-30T08:09:08.262Z] [debug] persist sizes(KB): total=162 player=40 wm=40[rooms=13 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n[2026-08-30T08:09:09.669Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:09:11.107Z] [player] investigate the mud\n",
+      "[2026-08-30T08:09:11.107Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:11.109Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:09:11.116Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:11.226Z] [cognitive] SWIM  (110ms)\n",
+      "[2026-08-30T08:09:11.720Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:09:14.635Z] [player] investigate the mud\n[2026-08-30T08:09:14.636Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:14.639Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n",
+      "[2026-08-30T08:09:14.647Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:14.760Z] [cognitive] SWIM  (112ms)\n[2026-08-30T08:09:15.187Z] [debug] ui: tap \"\u2193 Storage \u2713\"\n[2026-08-30T08:09:15.189Z] [world] You step into the storage.\n",
+      "[2026-08-30T08:09:15.190Z] [world] Shelves run the length of the wall, stacked with bottles, tins and sacking. Whatever was worth keeping was kept here, and most of it is still keeping.\n[2026-08-30T08:09:17.205Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:09:19.127Z] [player] investigate the mud\n",
+      "[2026-08-30T08:09:19.128Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:19.130Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:09:19.136Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:19.252Z] [cognitive] SWIM  (115ms)\n",
+      "[2026-08-30T08:09:20.371Z] [player] investigate shelves\n[2026-08-30T08:09:20.372Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shelves resolved=shelves range=- enemies=0 hooks=0\n[2026-08-30T08:09:20.373Z] [world] Empty hooks and dust marks where things used to rest. The shelf remembers what was taken; you do not.\n[2026-08-30T08:09:20.503Z] [cognitive] neutral  (125ms)\n",
+      "[2026-08-30T08:09:21.613Z] [player] investigate tins\n[2026-08-30T08:09:21.614Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tins resolved=tins range=- enemies=0 hooks=0\n[2026-08-30T08:09:21.615Z] [world] The tins reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.\n",
+      "[2026-08-30T08:09:22.316Z] [debug] qwen\u23f1 investigate_lore ok 1832ms read 1234ms/write 574ms in 125t\u2192out 18t 9.9ms/t (91ch)\n[2026-08-30T08:09:22.538Z] [cognitive] neutral  (922ms)\n[2026-08-30T08:09:23.487Z] [debug] qwen\u23f1 investigate_lore ok 1713m"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 18/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfva3flr9ic"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "18"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "5"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T17:26:52.753216Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T17:26:49.344000Z",
+  "fingerprints": [
+    "b9740788dc1a13de79038081caa5b280"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "5994d1833c084faeb3973d88aa0a2e88",
+  "previousEventID": "528822bd76714f72a8b1fe9c94a9a4e3"
+}

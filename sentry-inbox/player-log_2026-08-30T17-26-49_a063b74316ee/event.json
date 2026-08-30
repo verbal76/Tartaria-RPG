@@ -1,0 +1,204 @@
+{
+  "id": "a063b74316ee45878a7b48593e35b37e",
+  "groupID": "7700974887",
+  "eventID": "a063b74316ee45878a7b48593e35b37e",
+  "projectID": "4511945117532160",
+  "size": 17956,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 15/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 15/28]",
+  "title": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 15/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "6c4db1e452ad4463aef15511475e3fb1",
+      "span_id": "a604a81600b97261",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "debug] arbiter: template (reason=combat)\n[2026-08-30T08:03:53.164Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:03:53.327Z] [cognitive] SWIM \u00b7 RETREAT  (162ms)\n[2026-08-30T08:03:54.216Z] [debug] ui: tap \"approach\"\n[2026-08-30T08:03:54.224Z] [world] Iron fog disorients you. Compasses spin; intent costs more.\n",
+      "[2026-08-30T08:03:54.268Z] [player] approach Mud Monarchs Patrol 4\n[2026-08-30T08:03:54.269Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs patrol 4 resolved=Mud Monarchs Patrol 4 range=far enemies=1 hooks=1\n[2026-08-30T08:03:54.271Z] [debug] move: advance from range=far enemies=1 weather=Iron Fog cost=2 partial=0\n",
+      "[2026-08-30T08:03:54.271Z] [world] Iron Fog slows you down. You push toward Mud Monarchs Patrol 4 but the compass spins and your footing drags. (1/2 \u2014 type 'advance' again to close)\n[2026-08-30T08:03:54.271Z] [debug] move: slow weather progress 1/2\n[2026-08-30T08:03:54.272Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-30T08:03:54.272Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:03:54.438Z] [cognitive] SWIM \u00b7 RETREAT  (165ms)\n[2026-08-30T08:03:55.948Z] [debug] ui: tap \"approach\"\n[2026-08-30T08:03:56.003Z] [player] approach Mud Monarchs Patrol 4\n",
+      "[2026-08-30T08:03:56.005Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs patrol 4 resolved=Mud Monarchs Patrol 4 range=far enemies=1 hooks=1\n[2026-08-30T08:03:56.007Z] [debug] move: advance from range=far enemies=1 weather=Iron Fog cost=2 partial=1\n[2026-08-30T08:03:56.008Z] [debug] move: field advance target=Mud Monarchs Patrol 4 d 2.06->1.06 band far->mid\n",
+      "[2026-08-30T08:03:56.008Z] [world] You close the gap with Mud Monarchs Patrol 4. (range: mid-range)\n[2026-08-30T08:03:56.009Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 2 + ATK 6 = 8 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:03:56.174Z] [cognitive] SWIM \u00b7 RETREAT  (163ms)\n[2026-08-30T08:03:56.981Z] [debug] ui: tap \"approach\"\n[2026-08-30T08:03:57.035Z] [player] approach Mud Monarchs Patrol 4\n",
+      "[2026-08-30T08:03:57.037Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs patrol 4 resolved=Mud Monarchs Patrol 4 range=mid enemies=1 hooks=1\n[2026-08-30T08:03:57.039Z] [debug] move: advance from range=mid enemies=1 weather=Iron Fog cost=2 partial=0\n",
+      "[2026-08-30T08:03:57.039Z] [world] Iron Fog slows you down. You push toward Mud Monarchs Patrol 4 but the compass spins and your footing drags. (1/2 \u2014 type 'advance' again to close)\n[2026-08-30T08:03:57.039Z] [debug] move: slow weather progress 1/2\n[2026-08-30T08:03:57.040Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-30T08:03:57.040Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:03:57.204Z] [cognitive] SWIM \u00b7 RETREAT  (163ms)\n[2026-08-30T08:04:01.125Z] [debug] ui: tap \"mud shell\"\n[2026-08-30T08:04:01.169Z] [player] attack with the off-hand mud shell\n",
+      "[2026-08-30T08:04:01.170Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand mud shell resolved=Mud Monarchs Patrol 4 range=mid enemies=1 hooks=1\n[2026-08-30T08:04:01.171Z] [debug] attack: target=Mud Monarchs Patrol 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Mud Shell bareHand=false\n[2026-08-30T08:04:01.172Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n",
+      "[2026-08-30T08:04:01.202Z] [world] You raise the mud shell toward Mud Monarchs Patrol 4. The room narrows around the both of you.\n[2026-08-30T08:04:01.203Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:04:01.355Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 SWIM \u00b7 THROW \u00b7 TAKE_COVER \u00b7 ATTACK \u00b7 RETREAT \u00b7 CLIMB \u00b7 MANEUVER  (151ms)\n",
+      "[2026-08-30T08:04:06.049Z] [world] You seize the initiative. Mud Monarchs Patrol 4 has no time to react.\n[2026-08-30T08:04:06.049Z] [combat] You \u2014 d20 \u2192 3 + INT 12 \u2212 2 (Iron Fog) = 13 vs Mud Monarchs Patrol 4 AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:04:06.051Z] [combat] Mud Monarchs Patrol 4 takes 4 with the mud shell. It reels: 9 left. Then it fights back.\n",
+      "[2026-08-30T08:04:06.054Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 6 + ATK 6 = 12 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:04:06.311Z] [debug] persist sizes(KB): total=167 player=37 wm=45[rooms=18 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=3\n[2026-08-30T08:04:07.234Z] [debug] ui: tap \"dodge\"\n[2026-08-30T08:04:07.245Z] [player] dodge\n",
+      "[2026-08-30T08:04:07.246Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1\n[2026-08-30T08:04:07.247Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 4's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-30T08:04:07.290Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 19 \u2014 \u2713 CRITICAL HIT\n[2026-08-30T08:04:07.291Z] [combat] Dodge \u2014 Mud Monarchs Patrol 4 rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.\n[2026-08-30T08:04:07.291Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-30T08:04:07.291Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:04:07.292Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:04:07.469Z] [combat] Mud Monarchs Patrol 4 deals 5 piercing damage. You have 23 HP remaining.\n[2026-08-30T08:04:07.619Z] [cognitive] neutral  (177ms)\n[2026-08-30T08:04:07.850Z] [debug] ui: tap \"mud shell\"\n",
+      "[2026-08-30T08:04:07.882Z] [player] attack with the off-hand mud shell\n[2026-08-30T08:04:07.882Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand mud shell resolved=Mud Monarchs Patrol 4 range=mid enemies=1 hooks=1\n[2026-08-30T08:04:07.883Z] [debug] attack: target=Mud Monarchs Patrol 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Mud Shell bareHand=false\n",
+      "[2026-08-30T08:04:07.884Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-08-30T08:04:07.920Z] [world] You bring the mud shell to bear on Mud Monarchs Patrol 4.\n[2026-08-30T08:04:07.920Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:04:08.071Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 SWIM \u00b7 THROW \u00b7 TAKE_COVER \u00b7 ATTACK \u00b7 RETREAT \u00b7 CLIMB \u00b7 MANEUVER  (150ms)\n",
+      "[2026-08-30T08:04:13.611Z] [world] You seize the initiative. Mud Monarchs Patrol 4 has no time to react.\n[2026-08-30T08:04:13.611Z] [combat] You \u2014 d20 \u2192 7 + INT 12 \u2212 2 (Iron Fog) = 17 vs Mud Monarchs Patrol 4 AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:04:13.613Z] [combat] Bludgeoning flares \u2014 +1 on hit.\n",
+      "[2026-08-30T08:04:13.617Z] [combat] The blow with the mud shell finds purchase \u2014 3 damage, 6 HP standing. Mud Monarchs Patrol 4 commits to the counter.\n[2026-08-30T08:04:13.617Z] [combat] Mud Monarchs Patrol 4 is left exposed \u2014 easier to hit.\n[2026-08-30T08:04:13.619Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 1 + ATK 6 = 7 vs your AC 19 \u2014 \u2717 FUMBLE\n",
+      "[2026-08-30T08:04:14.720Z] [debug] ui: tap \"mud shell\"\n[2026-08-30T08:04:14.764Z] [player] attack with the off-hand mud shell\n[2026-08-30T08:04:14.764Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand mud shell resolved=Mud Monarchs Patrol 4 range=mid enemies=1 hooks=1\n",
+      "[2026-08-30T08:04:14.765Z] [debug] attack: target=Mud Monarchs Patrol 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Mud Shell bareHand=false\n[2026-08-30T08:04:14.767Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-08-30T08:04:14.796Z] [world] Your mud shell comes around in an arc; Mud Monarchs Patrol 4 squares up to meet it.\n",
+      "[2026-08-30T08:04:14.797Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:04:14.949Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 SWIM \u00b7 THROW \u00b7 TAKE_COVER \u00b7 ATTACK \u00b7 RETREAT \u00b7 CLIMB \u00b7 MANEUVER  (152ms)\n[2026-08-30T08:04:19.362Z] [world] You seize the initiative. Mud Monarchs Patrol 4 has no time to react.\n",
+      "[2026-08-30T08:04:19.362Z] [combat] You \u2014 d20 \u2192 19 + INT 12 \u2212 2 (Iron Fog) = 29 vs Mud Monarchs Patrol 4 AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:04:19.367Z] [combat] Bludgeoning flares \u2014 +2 on hit.\n[2026-08-30T08:04:19.367Z] [combat] Final strike with the mud shell for 7. Mud Monarchs Patrol 4 is still. The Aetherstone hums on, indifferent.\n",
+      "[2026-08-30T08:04:19.369Z] [reward] Mud Monarchs Patrol 4 defeated. You recover Bone Bolt \u00d72, Patched Cloth, Mud Monarch Sigil.\n[2026-08-30T08:04:19.371Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-08-30T08:04:19.371Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n",
+      "[2026-08-30T08:04:19.372Z] [reward] +14 TC pried from the dust.\n[2026-08-30T08:04:23.445Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-30T08:04:31.231Z] [debug] ui: tap \"inventory\"\n[2026-08-30T08:04:31.668Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 8105ms read 6716ms/write 1113ms in 734t\u2192out 33t 9.1ms/t HIT-CAP (134ch)\n",
+      "[2026-08-30T08:04:31.676Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 8105ms \u2014 intro-fill:action-opener\n[2026-08-30T08:04:31.677Z] [debug] homework: scene_intro \"Dynasty Border Post\" \u2713 8233ms\n[2026-08-30T08:04:34.852Z] [debug] ui: tap \"craft\"\n[2026-08-30T08:04:37.490Z] [world] You repair the Aetheric Scout Greaves. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-30T08:04:37.539Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Forgotten Seeker's Mask \u2014 2 pieces of this is Crucible stock: Beetle-Chitin Flake, Brittle Antler Fork. Say the word and I'll set it aside instead.\"\n",
+      "[2026-08-30T08:04:38.072Z] [debug] persist sizes(KB): total=167 player=37 wm=45[rooms=18 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=3\n[2026-08-30T08:04:38.269Z] [debug] qwen\u23f1 item_synthesis_hw ok 4792ms read 3489ms/write 1273ms in 333t\u2192out 39t 10.5ms/t (139ch)\n[2026-08-30T08:04:38.272Z] [debug] homework: item_desc \"Earthshaker\" \u2713 4804ms\n",
+      "[2026-08-30T08:04:40.178Z] [arbiter] The Arbiter sets it aside on the bench. \"\u2665 Held for the Crucible: Beetle-Chitin Flake, Brittle Antler Fork. I'll not touch it.\"\n[2026-08-30T08:04:42.204Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-30T08:04:42.223Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-30T08:04:42.241Z] [arbiter] The Arbiter eyes the Reclaimer's Scrapplate. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.242Z] [arbiter] The Arbiter eyes the Wanderer's Footwraps. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.242Z] [arbiter] The Arbiter eyes the Wanderer's Worn Gauntlets. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.242Z] [arbiter] The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.242Z] [arbiter] The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.242Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patch\u2026\"\n",
+      "[2026-08-30T08:04:42.242Z] [arbiter] The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.242Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patch\u2026\"\n",
+      "[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.243Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Pat\u2026\"\n[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.243Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Pat\u2026\"\n[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.243Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Pat\u2026\"\n[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.243Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Pat\u2026\"\n[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.243Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Pat\u2026\"\n[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.243Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Pat\u2026\"\n[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Reclaimer's Rope. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.244Z] [arbiter] The Arbiter eyes the Reclaimer's Rope. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.244Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Reclaimer's Rope. \"Short on stock: Patc\u2026\"\n",
+      "[2026-08-30T08:04:42.244Z] [arbiter] The Arbiter eyes the Reclaimer's Salvage Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.244Z] [arbiter] The Arbiter eyes the Reclaimer's Salvage Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.244Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Reclaimer's Salvage Vest. \"Short on sto\u2026\"\n[2026-08-30T08:04:54.468Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-30T08:04:54.483Z] [debug] spawn: gear=[Golem-Bound Cloak, Plasma Dagger, Tartarian Bone Knife] window=10 roster=new\n",
+      "[2026-08-30T08:04:54.485Z] [world] You walk east. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-30T08:04:54.486Z] [world] Footsteps behind you the wrong way \u2014 too close, too fast. A Silt Thief peels out of a side passage, hand already in your line of sight where your coin-pouch hangs. They thought you'd sleep deeper than you did.\n",
+      "[2026-08-30T08:04:54.489Z] [combat] Silt Thief closes \u2014 Quick Knife ready, 1D8 damage on a hit. (range: close)\n[2026-08-30T08:04:54.497Z] [world] The thread you were following waits where you left it.\n[2026-08-30T08:04:56.736Z] [debug] ui: tap \"golem (52/52)\"\n[2026-08-30T08:04:56.754Z] [player] use golem\n",
+      "[2026-08-30T08:04:56.754Z] [combat] Talus attacks Silt Thief \u2014 d20 9 + 3 = 12 vs AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:04:56.756Z] [combat] Talus lands 21 piercing damage on Silt Thief. (7 HP left)\n[2026-08-30T08:04:56.757Z] [combat] Silt Thief retaliates \u2014 d20 10 + 5 hits Talus for 1 (35% resisted)"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 15/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfva3flr9ic"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "15"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "5"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T17:26:52.267272Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T17:26:49.343000Z",
+  "fingerprints": [
+    "b9740788dc1a13de79038081caa5b280"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "a8df3e71c2f5466c97245fbf965e4198",
+  "previousEventID": "9bf069c3979241b880a527283f9cab16"
+}

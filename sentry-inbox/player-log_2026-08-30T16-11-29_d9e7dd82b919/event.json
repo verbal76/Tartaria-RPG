@@ -1,0 +1,247 @@
+{
+  "id": "d9e7dd82b9194ccd9ba65a11d40ffd30",
+  "groupID": "7700974887",
+  "eventID": "d9e7dd82b9194ccd9ba65a11d40ffd30",
+  "projectID": "4511945117532160",
+  "size": 17360,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 10/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 10/28]",
+  "title": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 10/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "2ef5d7a05b1d405d8de29c5368a8e45b",
+      "span_id": "8462e46a6d895701",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "south.\n[2026-08-30T01:56:54.238Z] [combat] Distance: mid-range. Cudgel \u2014 needs approach \u00b7 Bone Crossbow \u2713 in range.\n[2026-08-30T01:56:54.275Z] [world] [The Monarch's Waystation] north: the Silt Thief (19 tiles, 2 days) \u00b7 east: Dynasty Border Post (4 tiles, 10 hours) \u00b7 south: The Architect's Blind (5 tiles, 13 hours) \u00b7 west: Iskan-Veil (3 tiles, 8 hours)\n",
+      "[2026-08-30T01:56:54.275Z] [debug] arbiter: template (reason=combat)\n[2026-08-30T01:56:54.275Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T01:56:54.281Z] [world] The stalls are the same stalls, and the prices are not. Somebody upstream has started keeping more back.\n",
+      "[2026-08-30T01:56:55.502Z] [debug] qwen\u23f1 investigate_lore ok 2045ms read/write unusable (native mis-reported 8282ms/757ms \u2014 llama.rn split bug, not this call) in 127t\u2192out 24t (105ch)\n[2026-08-30T01:56:59.910Z] [debug] ui: tap \"\u2697 bone crossbow\"\n[2026-08-30T01:56:59.959Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-30T01:56:59.959Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n[2026-08-30T01:56:59.960Z] [debug] attack: target=Black Cloak Agent range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-30T01:56:59.985Z] [world] You commit forward with the acid-etched bone crossbow. Black Cloak Agent watches your hands.\n[2026-08-30T01:56:59.985Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T01:57:00.115Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (128ms)\n[2026-08-30T01:57:10.421Z] [world] You seize the initiative. Black Cloak Agent has no time to react.\n",
+      "[2026-08-30T01:57:10.421Z] [combat] You \u2014 d20 \u2192 15 + DEX 16 = 31 vs Black Cloak Agent AC 11 \u2014 \u2713 HIT\n[2026-08-30T01:57:10.423Z] [combat] The blow with the acid-etched bone crossbow finds purchase \u2014 10 damage, 22 HP standing. Black Cloak Agent commits to the counter.\n",
+      "[2026-08-30T01:57:10.423Z] [combat] Acid-Etched Bone Crossbow \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-08-30T01:57:10.425Z] [combat] Black Cloak Agent \u2014 d20 \u2192 8 + ATK 9 = 17 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T01:57:12.250Z] [debug] ui: tap \"dodge\"\n[2026-08-30T01:57:12.262Z] [player] dodge\n",
+      "[2026-08-30T01:57:12.262Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0\n[2026-08-30T01:57:12.263Z] [world] You commit to the dodge. Slip Black Cloak Agent's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-30T01:57:12.264Z] [combat] Black Cloak Agent smokes \u2014 acid eats 4. (18/32 HP, 2 turns left)\n[2026-08-30T01:57:12.302Z] [combat] Black Cloak Agent \u2014 d20 \u2192 7 + ATK 7 = 14 vs your AC 19 \u2014 \u2717 EVADED\n[2026-08-30T01:57:12.302Z] [combat] Dodge \u2014 d20 \u2192 9 + DEX 16 = 25 vs ATK 14. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-30T01:57:12.303Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-30T01:57:12.449Z] [cognitive] neutral  (145ms)\n[2026-08-30T01:57:13.100Z] [debug] ui: tap \"\u2697 bone crossbow\"\n[2026-08-30T01:57:13.144Z] [player] attack with the off-hand bone crossbow\n[2026-08-30T01:57:13.144Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n",
+      "[2026-08-30T01:57:13.145Z] [combat] Black Cloak Agent smokes \u2014 acid eats 4. (14/32 HP, 1 turn left)\n[2026-08-30T01:57:13.145Z] [debug] attack: target=Black Cloak Agent range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-30T01:57:13.146Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-08-30T01:57:13.172Z] [world] You commit forward with the acid-etched bone crossbow. Black Cloak Agent watches your hands.\n[2026-08-30T01:57:13.173Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T01:57:13.306Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (132ms)\n",
+      "[2026-08-30T01:57:13.485Z] [debug] persist sizes(KB): total=156 player=31 wm=41[rooms=16 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=4\n[2026-08-30T01:57:20.794Z] [world] Black Cloak Agent moves first. The pressure is immediate.\n[2026-08-30T01:57:20.796Z] [combat] Black Cloak Agent \u2014 d20 \u2192 11 + ATK 7 = 18 vs your AC 19 \u2014 \u2717 MISS\n",
+      "[2026-08-30T01:57:20.796Z] [combat] You \u2014 d20 \u2192 12 + DEX 16 perfect opening (2\u00d7 dice) = 28 vs Black Cloak Agent AC 10 \u2014 \u2713 HIT\n[2026-08-30T01:57:20.797Z] [system] \u26a0 Your Bone Crossbow is coming apart \u2014 a few more hits will finish it. Mend it or lose it.\n",
+      "[2026-08-30T01:57:20.798Z] [combat] Your strike with the acid-etched bone crossbow lands for 13. Black Cloak Agent staggers \u2014 1 HP remaining. It answers.\n[2026-08-30T01:57:20.798Z] [combat] Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 2 total).\n[2026-08-30T01:57:22.785Z] [debug] ui: tap \"approach\"\n",
+      "[2026-08-30T01:57:22.829Z] [player] approach Black Cloak Agent\n[2026-08-30T01:57:22.829Z] [debug] parser: intent=advance conf=1.00 verb=approach target=black cloak agent resolved=Black Cloak Agent range=mid enemies=1 hooks=0\n[2026-08-30T01:57:22.830Z] [debug] move: advance from range=mid enemies=1 weather=Black Rain cost=1 partial=0\n",
+      "[2026-08-30T01:57:22.830Z] [debug] move: field advance target=Black Cloak Agent d 1.50->0.50 band mid->close\n[2026-08-30T01:57:22.831Z] [world] You close the gap with Black Cloak Agent. (range: close / arm's reach)\n[2026-08-30T01:57:22.831Z] [combat] Black Cloak Agent smokes \u2014 acid eats 2. (0/32 HP, 2 turns left)\n",
+      "[2026-08-30T01:57:22.832Z] [reward] Black Cloak Agent defeated. You recover Aether Residue \u00d72, Burlap Vest.\n[2026-08-30T01:57:22.832Z] [world] You crouch for the blade \u2014 the Hollow Edge, the black mark of the Forgotten Order's enforcers, its steel weeping a faint corruption that fogs the air. But the grip is wrong. It's honed: razored along the inner curve so the handle itself is a second blade, a",
+      "nd only one of its edges is meant for the enemy. Take it up untrained and you flay your own palm to the bone. Only a hand that knows the Order's hold \u2014 that two-finger grip they teach behind sealed doors \u2014 can carry it. You leave it where it fell.\n[2026-08-30T01:57:22.833Z] [reward] You strip the body: Mud-Bound Cloak (+15 TC). The kit took the fight badly.\n",
+      "[2026-08-30T01:57:22.833Z] [reward] +18 TC pried from the dust.\n[2026-08-30T01:57:22.981Z] [cognitive] HIDE \u00b7 TAKE_COVER  (118ms)\n[2026-08-30T01:57:26.286Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T01:57:27.615Z] [world] You pick up the Bone Sling.\n[2026-08-30T01:57:27.618Z] [reward] \u2726 Bone Sling (Common).\n[2026-08-30T01:57:27.634Z] [world] You lift the Cudgel clear.\n",
+      "[2026-08-30T01:57:27.637Z] [reward] \u2726 Cudgel (Common).\n[2026-08-30T01:57:27.639Z] [world] You get a hand under the Scholar's Headband of Knowledge and take it.\n[2026-08-30T01:57:27.639Z] [reward] \u2726 Scholar's Headband of Knowledge (Common).\n[2026-08-30T01:57:28.730Z] [world] You claim the Scrap Metal.\n[2026-08-30T01:57:28.731Z] [reward] \u2726 Scrap Metal (Common).\n",
+      "[2026-08-30T01:57:29.921Z] [world] You strip the lantern carefully. Something usable comes free in your hand.\n[2026-08-30T01:57:29.922Z] [world] You break the rubble apart. Among the pieces, something worth keeping.\n[2026-08-30T01:57:29.922Z] [world] You break the sack apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-30T01:57:29.922Z] [world] You work the shattered buried reclaimer cache over. A part of it comes loose, intact.\n[2026-08-30T01:57:29.923Z] [world] You lever something loose from the shattered endless stair landing \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-08-30T01:57:29.923Z] [world] You strip the tilting obsidian pillar carefully. Something usable comes free in your hand.\n[2026-08-30T01:57:29.923Z] [reward] \u2726 Salvage haul:\n[2026-08-30T01:57:29.924Z] [reward]     \u2022 Scrap Metal x4 (Common)\n[2026-08-30T01:57:29.924Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-08-30T01:57:29.924Z] [reward]     \u2022 Aether Crystal (Common)\n",
+      "[2026-08-30T01:57:29.924Z] [reward]     \u2022 Charred Twig Bundle (Common)\n[2026-08-30T01:57:29.924Z] [reward]     \u2022 Worn Tartarian Coin x8 (Common)\n[2026-08-30T01:57:31.320Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-30T01:57:32.221Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n",
+      "[2026-08-30T01:57:32.236Z] [debug] spawn: gear=[Architect's Field Jacket, Mud Grinder Axe] window=10 roster=new\n[2026-08-30T01:57:32.237Z] [world] You push east. The silt is heavy underfoot, the horizon unchanged.\n[2026-08-30T01:57:32.239Z] [world] Movement low and fast \u2014 a Rust Lurker cuts across your path. You're closer than either of you wanted to be.\n",
+      "[2026-08-30T01:57:32.241Z] [combat] Rust Lurker closes \u2014 Claw Slash ready, 2D6 damage on a hit. (range: close)\n[2026-08-30T01:57:32.247Z] [world] A green lantern hangs at the mouth of a culvert \u2014 the Mud Dwellers mark their hidden markets with that exact green.\n",
+      "[2026-08-30T01:57:42.698Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 11262ms read 10104ms/write 1121ms in 735t\u2192out 33t 13.7ms/t HIT-CAP (134ch)\n[2026-08-30T01:57:42.845Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 11262ms \u2014 intro-fill:near-dup\n[2026-08-30T01:57:42.846Z] [debug] homework: scene_intro \"The Monarch's Waystation\" \u2205 11529ms\n",
+      "[2026-08-30T01:57:49.178Z] [debug] ui: tap \"flee\"\n[2026-08-30T01:57:49.188Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-08-30T01:57:49.192Z] [player] flee\n[2026-08-30T01:57:49.192Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-30T01:57:49.235Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-30T01:57:49.376Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (140ms)\n[2026-08-30T01:57:50.901Z] [debug] skillcheck: escape d20=14 DEX 15 = 29 vs Pursuit 16 \u2014 Rust Lurker (d20 12 + SPD 4) \u2192 PASS\n[2026-08-30T01:57:50.952Z] [debug] stats: STR5 DEX16 INT11 WIS4 CHA2 STE6 | gear: DEX+10,INT+2,STR+2,STE+3 | worn: main=Cudgel off=Bone Crossbow head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate ha",
+      "nds=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak ring=Light-Finger Guild Band\n[2026-08-30T01:57:50.952Z] [debug] train: dexterity (escape check) \u2192 progress 45/100\n[2026-08-30T01:57:50.952Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n",
+      "[2026-08-30T01:57:51.140Z] [debug] persist sizes(KB): total=151 player=32 wm=36[rooms=10 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=2\n[2026-08-30T01:57:52.544Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T01:57:53.798Z] [world] The Mud Grinder Axe comes up out of the silt with a small sucking protest.\n[2026-08-30T01:57:53.799Z] [reward] \u2726 Mud Grinder Axe (Common).\n",
+      "[2026-08-30T01:57:53.812Z] [world] The Architect's Field Jacket was half under something. It is not now.\n[2026-08-30T01:57:53.812Z] [reward] \u2726 Architect's Field Jacket (Common).\n[2026-08-30T01:57:54.991Z] [world] You work the marker over. A part of it comes loose, intact.\n",
+      "[Filtered]",
+      "[2026-08-30T01:57:54.998Z] [reward]     \u2022 Brittle Antler Fork (Common)\n[2026-08-30T01:57:54.999Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-30T01:57:56.078Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-30T01:57:56.101Z] [debug] spawn: gear=[Shaman's Warden Gloves, Salvager's Worn Boots] window=10 roster=new\n",
+      "[2026-08-30T01:57:56.102Z] [world] You set out east. Your boots sink half an inch into the mud-flats and pull free with each step.\n[2026-08-30T01:57:56.103Z] [world] What you started here has not finished itself in your absence.\n[2026-08-30T01:57:57.845Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T01:57:59.050Z] [world] You work the Salvager's Worn Boots loose from where the mud had it.\n",
+      "[2026-08-30T01:57:59.051Z] [reward] \u2726 Salvager's Worn Boots (Common).\n[2026-08-30T01:57:59.070Z] [world] The Shaman's Warden Gloves had settled into the ground. You unsettle it.\n[2026-08-30T01:57:59.070Z] [reward] \u2726 Shaman's Warden Gloves (Common).\n[2026-08-30T01:58:00.229Z] [world] You strip the cracked supply crate carefully. Something usable comes free in your hand.\n",
+      "[Filtered]",
+      "[2026-08-30T01:58:00.230Z] [world] You break the tilting obsidian pillar apart. Among the pieces, something worth keeping.\n[2026-08-30T01:58:00.231Z] [reward] \u2726 Salvage haul:\n[2026-08-30T01:58:00.231Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-30T01:58:00.231Z] [reward]     \u2022 Copper Wire Spool (Uncommon)\n[2026-08-30T01:58:00.231Z] [reward]     \u2022 Bent Nail (Common)\n",
+      "[2026-08-30T01:58:00.232Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-08-30T01:58:01.762Z] [debug] ui: tap \"investigate\"\n[2026-08-30T01:58:03.370Z] [player] investigate the mud\n[2026-08-30T01:58:03.371Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n",
+      "[2026-08-30T01:58:03.376Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Mud (Common).\n[2026-08-30T01:58:03.387Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-30T01:58:03.388Z] [arbiter] The Arbiter watches. \"I saw the way you came at that.\" \"Do not look behind you. Whatever waits there has been waiting longer than your bloodline.\" the Arbiter says.\n[2026-08-30T01:58:03.388Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T01:58:03.388Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T01:58:03.490Z] [cognitive] SWIM  (101ms)\n",
+      "[2026-08-30T01:58:04.649Z] [player] investigate still pond\n[2026-08-30T01:58:04.650Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=1\n[2026-08-30T01:58:04.653Z] [world] The still pond resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n",
+      "[2026-08-30T01:58:04.654Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T01:58:04.654Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T01:58:04.654Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T01:58:04.855Z] [cognitive] SWIM  (199ms)\n[2026-08-30T01:58:04.936Z] [debug] ui: tap \"climb\"\n",
+      "[2026-08-30T01:58:06.763Z] [player] clim"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 10/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfva3flr9ic"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "10"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T16:11:28.729000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "33": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 394,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "37": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 306,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T16:11:29.603000Z",
+  "fingerprints": [
+    "b9740788dc1a13de79038081caa5b280"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "daebdfc3bb494e558b89512df15b98c6",
+  "previousEventID": "d493412f5a5742adb54bbaeaf243a8e6"
+}

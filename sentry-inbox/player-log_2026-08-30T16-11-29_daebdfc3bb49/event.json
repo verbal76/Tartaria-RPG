@@ -1,0 +1,202 @@
+{
+  "id": "daebdfc3bb494e558b89512df15b98c6",
+  "groupID": "7700974887",
+  "eventID": "daebdfc3bb494e558b89512df15b98c6",
+  "projectID": "4511945117532160",
+  "size": 17898,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 24/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 24/28]",
+  "title": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 24/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "2ef5d7a05b1d405d8de29c5368a8e45b",
+      "span_id": "8462e46a6d895701",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "to full. (spent: Patched Cloth x6)\n[2026-08-30T08:19:09.712Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-30T08:19:09.720Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-08-30T08:19:09.731Z] [arbiter] The Arbiter eyes the Reclaimer's Scrapplate. \"Short on stock: Patched Cloth 1 short. Gather, then return.\"\n",
+      "[2026-08-30T08:19:09.731Z] [arbiter] The Arbiter eyes the Wanderer's Footwraps. \"Short on stock: Patched Cloth 1 short. Gather, then return.\"\n[2026-08-30T08:19:09.731Z] [arbiter] The Arbiter eyes the Wanderer's Worn Gauntlets. \"Short on stock: Patched Cloth 1 short. Gather, then return.\"\n",
+      "[2026-08-30T08:19:09.731Z] [world] You repair the Aetheric Rod. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-08-30T08:19:09.747Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Bone Knife \u2014 2 pieces of this is Crucible stock: Charred Twig Bundle, Salt-Cured Dowel. Say the word and I'll set it aside instead.\"\n",
+      "[2026-08-30T08:19:12.299Z] [arbiter] The Arbiter sets it aside on the bench. \"\u2665 Held for the Crucible: Charred Twig Bundle, Salt-Cured Dowel. I'll not touch it.\"\n[2026-08-30T08:19:17.831Z] [player] craft First Aid Kit\n[2026-08-30T08:19:17.832Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:19:17.841Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the First Aid Kit \u2014 1 piece of this is Crucible stock: Glass-Beaded Strap. Say the word and I'll set it aside instead.\"\n[2026-08-30T08:19:17.884Z] [cognitive] neutral  (40ms)\n",
+      "[2026-08-30T08:19:20.301Z] [arbiter] The Arbiter sets it aside on the bench. \"\u2665 Held for the Crucible: Glass-Beaded Strap. I'll not touch it.\"\n[2026-08-30T08:19:25.019Z] [player] craft First Aid Kit\n[2026-08-30T08:19:25.020Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:19:25.051Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the First Aid Kit \u2014 1 piece of this is Crucible stock: Waxed Yarn Bundle. Say the word and I'll set it aside instead.\"\n[2026-08-30T08:19:25.066Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-30T08:19:25.066Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-30T08:19:25.096Z] [cognitive] neutral  (27ms)\n[2026-08-30T08:19:25.165Z] [debug] persist sizes(KB): total=179 player=47 wm=49[rooms=21 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=2\n[2026-08-30T08:19:30.008Z] [debug] qwen\u23f1 ambient ok 4911ms read 3860ms/write 1033ms in 366t\u2192out 31t 10.5ms/t HIT-CAP (143ch)\n",
+      "[2026-08-30T08:19:30.013Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 4911ms \u2014 ambient:\u2205\n[2026-08-30T08:19:30.013Z] [debug] arbiter: ambient \u2205 4946ms\n[2026-08-30T08:19:30.015Z] [debug] arbiter: ambient-empty reason=unknown raw=\"You, the Companion, reflect on how far you have come. The Monarch Staging Camp, with its ancient ruins and the memory of\"\n",
+      "[2026-08-30T08:19:30.219Z] [player] craft First Aid Kit\n[2026-08-30T08:19:30.220Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=- range=- enemies=0 hooks=0\n[2026-08-30T08:19:30.235Z] [arbiter] The Arbiter nods. \"Stripped for parts: Waxed Yarn Bundle \u2192 Patched Cloth.\"\n",
+      "[2026-08-30T08:19:30.248Z] [reward] \u2726 Crafted First Aid Kit. The Arbiter watches you set the last piece.\n[2026-08-30T08:19:30.602Z] [cognitive] neutral  (353ms)\n[2026-08-30T08:19:46.549Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-08-30T08:19:46.594Z] [player] summon iron golem\n",
+      "[2026-08-30T08:19:46.595Z] [debug] parser: intent=cast conf=1.00 verb=summon target=iron golem resolved=Crude Golem Pike range=- enemies=0 hooks=0\n[2026-08-30T08:19:46.639Z] [reward] Aether Golem Constructor \u2014 d20 17 + INT 11 = 28 vs DC 18 \u2014 \u2713 SUMMONED\n[2026-08-30T08:19:46.639Z] [world] (3\u00d7 Scrap Metal + 1\u00d7 Golem Core consumed.)\n",
+      "[2026-08-30T08:19:46.640Z] [world] Aetherstone lifts out of the ground and folds into a shape that walks. Iron Golem stands ready beside you. (HP 40/40, 1d8 slashing)\n[2026-08-30T08:19:46.640Z] [arbiter] The Arbiter studies the standing shape. \"You gave it life. You might as well give it a name.\"\n[2026-08-30T08:19:46.641Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-30T08:19:46.807Z] [cognitive] neutral  (165ms)\n[2026-08-30T08:19:53.532Z] [world] Plinth. The name takes hold in the Aetherstone.\n[2026-08-30T08:19:53.534Z] [arbiter] The Arbiter nods. \"Plinth, then.\"\n[2026-08-30T08:20:00.036Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:20:01.933Z] [player] investigate the mud\n",
+      "[2026-08-30T08:20:01.933Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:20:01.940Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Raspberries (Uncommon).\n[2026-08-30T08:20:01.947Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-30T08:20:01.947Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:20:01.947Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:20:02.078Z] [cognitive] SWIM  (129ms)\n[2026-08-30T08:20:03.154Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-30T08:20:03.170Z] [debug] spawn: gear=[Earthshaker, Aetheric Warplate] window=10 roster=new\n",
+      "[2026-08-30T08:20:03.172Z] [world] You strike out east. The country resists you with sameness more than distance.\n[2026-08-30T08:20:03.173Z] [world] A patch of mud just off the path pulses with a faint blue glow, in time with nothing you can hear.\n[2026-08-30T08:20:04.355Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-30T08:20:06.040Z] [world] It takes two pulls. The Earthshaker is yours on the second.\n[2026-08-30T08:20:06.041Z] [reward] \u2726 Earthshaker (Common).\n[2026-08-30T08:20:06.055Z] [world] The Aetheric Warplate resists, then does not.\n[2026-08-30T08:20:06.055Z] [reward] \u2726 Aetheric Warplate (Common).\n",
+      "[2026-08-30T08:20:07.179Z] [world] Tucked inside the bedroll: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-08-30T08:20:07.179Z] [world] You strip the cage carefully. Something usable comes free in your hand.\n[2026-08-30T08:20:07.179Z] [world] You salvage the firepit. The take is small but real.\n",
+      "[2026-08-30T08:20:07.179Z] [world] You salvage the snare. The take is small but real.\n[2026-08-30T08:20:07.179Z] [world] You work the stone marker apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-30T08:20:07.180Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:20:07.180Z] [reward]     \u2022 Slate-Weighted Netting (Common)\n",
+      "[2026-08-30T08:20:07.180Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n[2026-08-30T08:20:07.180Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-08-30T08:20:07.180Z] [reward]     \u2022 Bent Nail (Common)\n[2026-08-30T08:20:07.180Z] [reward]     \u2022 Beetle-Chitin Flake (Common)\n",
+      "[2026-08-30T08:20:07.660Z] [debug] persist sizes(KB): total=173 player=47 wm=42[rooms=15 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=2\n[2026-08-30T08:20:08.304Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:20:09.928Z] [player] investigate still pond\n",
+      "[2026-08-30T08:20:09.929Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=1\n[2026-08-30T08:20:09.931Z] [world] The still pond resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n[2026-08-30T08:20:09.932Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-30T08:20:09.932Z] [arbiter] The Arbiter looks around. \"Prayer-strips tied to the camp posts spell out names of the drowned cities, over and over.\"\n[2026-08-30T08:20:10.050Z] [cognitive] SWIM  (116ms)\n[2026-08-30T08:20:11.071Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-30T08:20:11.142Z] [reward] \u2726 Your bearing reads. +1 CHA (now 3).\n",
+      "[2026-08-30T08:20:11.143Z] [debug] spawn: gear=[Architect's Aetheric Boots] window=10 roster=new\n[2026-08-30T08:20:11.144Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Riska Panhandle, wandering trader. Tap the vendor banner to trade.\n",
+      "[2026-08-30T08:20:11.153Z] [world] Rare workings for sale: Mudstone Bulwark (200 TC), Phoenix Rebirth (500 TC), Plague Tonic (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-08-30T08:20:11.154Z] [world] You head east. Mud-flats stretch the same in every direction \u2014 only the wind tells you you've moved.\n[2026-08-30T08:20:11.154Z] [world] Whatever you turned over here is still turned over.\n[2026-08-30T08:20:11.352Z] [player] investigate the mud\n",
+      "[2026-08-30T08:20:11.352Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:20:11.352Z] [debug] route: hook intercept (kind=pulsing_mud, target=\"aether mud\") \u2014 original intent=investigate\n",
+      "[2026-08-30T08:20:11.353Z] [world] \u2605 STORY THREAD (step 1) \u2014 You step toward the glow. The mud is warm against your boot \u2014 an Aetherstone deposit, surface-thin but real.\n[2026-08-30T08:20:12.836Z] [debug] qwen\u23f1 investigate_lore ok 2688ms read 1292ms/write 1370ms in 128t\u2192out 44t 10.1ms/t (208ch)\n",
+      "[2026-08-30T08:20:12.837Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n12 avg2.4s max3.1s read0.9s/write1.0s in127t\u2192out29t ms/tok 2.3-15.2 | narration:scene_intro_fill n8 avg7.4s max9.8s read7.1s/write1.1s \u26a01unusable in731t\u2192out27t ms/tok 4.4-11.9 cap5 \u23f81 \u27024/27.7s | ambient n6 avg6.1s max7.4s read3.4s/write1.3s \u26a01unusable in364t\u2192out31t ms/tok 7.3-10.7 cap6 \u27024/23.0s | item_synthesis_hw n4 avg4.1s max4.8",
+      "s read2.7s/write1.2s in333t\u2192out38t ms/tok 1.2-10.7 || WASTED 8 calls / 50.7s\n[2026-08-30T08:20:24.955Z] [reward] Sold Bone Knife to Riska Panhandle for 15 TC. (613 TC on hand)\n[2026-08-30T08:20:24.999Z] [reward] Sold Plasma Dagger to Riska Panhandle for 15 TC. (628 TC on hand)\n[2026-08-30T08:20:25.033Z] [reward] Sold Tartarian Bone Knife to Riska Panhandle for 15 TC. (643 TC on hand)\n",
+      "[2026-08-30T08:20:25.066Z] [reward] Sold Rusty Shortbow to Riska Panhandle for 15 TC. (658 TC on hand)\n[2026-08-30T08:20:25.100Z] [reward] Sold Bone Knife to Riska Panhandle for 15 TC. (673 TC on hand)\n[2026-08-30T08:20:25.133Z] [reward] Sold Bone Shiv to Riska Panhandle for 15 TC. (688 TC on hand)\n[2026-08-30T08:20:25.165Z] [reward] Sold Mud Knife to Riska Panhandle for 14 TC. (702 TC on hand)\n",
+      "[2026-08-30T08:20:25.198Z] [reward] Sold Cudgel to Riska Panhandle for 14 TC. (716 TC on hand)\n[2026-08-30T08:20:25.230Z] [reward] Sold Cudgel to Riska Panhandle for 14 TC. (730 TC on hand)\n[2026-08-30T08:20:25.263Z] [reward] Sold Aetherium Spear to Riska Panhandle for 14 TC. (744 TC on hand)\n[2026-08-30T08:20:25.295Z] [reward] Sold Bonebreaker Mace to Riska Panhandle for 14 TC. (758 TC on hand)\n",
+      "[2026-08-30T08:20:25.328Z] [reward] Sold Earthshaker to Riska Panhandle for 14 TC. (772 TC on hand)\n[2026-08-30T08:20:25.360Z] [reward] Sold Aetheric Rod to Riska Panhandle for 13 TC. (785 TC on hand)\n[2026-08-30T08:20:25.392Z] [reward] Sold Bone Splitter Axe to Riska Panhandle for 13 TC. (798 TC on hand)\n",
+      "[2026-08-30T08:20:25.424Z] [reward] Sold Bone Sling to Riska Panhandle for 13 TC. (811 TC on hand)\n[2026-08-30T08:20:25.455Z] [reward] Sold Mud Grinder Axe to Riska Panhandle for 13 TC. (824 TC on hand)\n[2026-08-30T08:20:25.487Z] [reward] Sold Mud Shell to Riska Panhandle for 13 TC. (837 TC on hand)\n[2026-08-30T08:20:25.518Z] [reward] Sold Cudgel to Riska Panhandle for 8 TC. (845 TC on hand)\n",
+      "[2026-08-30T08:20:25.549Z] [reward] Sold Earthshaker to Riska Panhandle for 8 TC. (853 TC on hand)\n[2026-08-30T08:20:25.580Z] [reward] Sold Reclaimer's Salvage Vest to Riska Panhandle for 8 TC. (861 TC on hand)\n[2026-08-30T08:20:25.611Z] [reward] Sold Stone Seeker's Brow Guard to Riska Panhandle for 8 TC. (869 TC on hand)\n",
+      "[2026-08-30T08:20:25.642Z] [reward] Sold Titan's Trail Leggings to Riska Panhandle for 8 TC. (877 TC on hand)\n[2026-08-30T08:20:25.673Z] [reward] Sold Aetheric Warplate to Riska Panhandle for 8 TC. (885 TC on hand)\n[2026-08-30T08:20:25.703Z] [reward] Sold Aetheric Gauntlets to Riska Panhandle for 6 TC. (891 TC on hand)\n",
+      "[2026-08-30T08:20:25.733Z] [reward] Sold Cudgel to Riska Panhandle for 6 TC. (897 TC on hand)\n[2026-08-30T08:20:25.764Z] [reward] Sold Bone Knife to Riska Panhandle for 6 TC. (903 TC on hand)\n[2026-08-30T08:20:25.793Z] [reward] Sold Bone Knife to Riska Panhandle for 6 TC. (909 TC on hand)\n[2026-08-30T08:20:25.823Z] [reward] Sold Aether-Weaver's Mantle to Riska Panhandle for 6 TC. (915 TC on hand)\n",
+      "[2026-08-30T08:20:25.853Z] [reward] Sold Scholar's Headband of Knowledge to Riska Panhandle for 6 TC. (921 TC on hand)\n[2026-08-30T08:20:25.883Z] [reward] Sold Architect's Field Jacket to Riska Panhandle for 6 TC. (927 TC on hand)\n[2026-08-30T08:20:25.912Z] [reward] Sold Salvager's Worn Boots to Riska Panhandle for 6 TC. (933 TC on hand)\n",
+      "[2026-08-30T08:20:25.943Z] [reward] Sold Shaman's Warden Gloves to Riska Panhandle for 6 TC. (939 TC on hand)\n[2026-08-30T08:20:25.972Z] [reward] Sold Bone Knife to Riska Panhandle for 6 TC. (945 TC on hand)\n[2026-08-30T08:20:26.001Z] [reward] Sold Bone Knife to Riska Panhandle for 6 TC. (951 TC on hand)\n",
+      "[2026-08-30T08:20:26.029Z] [reward] Sold Bone Knife to Riska Panhandle for 6 TC. (957 TC on hand)\n[2026-08-30T08:20:26.058Z] [reward] Sold Golem-Bound Cloak to Riska Panhandle for 6 TC. (963 TC on hand)\n[2026-08-30T08:20:26.086Z] [reward] Sold Shaman's Mud Helm to Riska Panhandle for 6 TC. (969 TC on hand)\n",
+      "[2026-08-30T08:20:26.114Z] [reward] Sold Architect's Grip to Riska Panhandle for 6 TC. (975 TC on hand)\n[2026-08-30T08:20:26.143Z] [reward] Sold Lost Seeker's Gloves to Riska Panhandle for 6 TC. (981 TC on hand)\n[2026-08-30T08:20:26.170Z] [reward] Sold Bone Knife to Riska Panhandle for 6 TC. (987 TC on hand)\n",
+      "[2026-08-30T08:20:26.198Z] [reward] Sold Shaman's Warden Gloves to Riska Panhandle for 6 TC. (993 TC on hand)\n[2026-08-30T08:20:26.225Z] [reward] Sold Reclaimer's Salvage Vest to Riska Panhandle for 5 TC. (998 TC on hand)\n[2026-08-30T08:20:26.253Z] [reward] Sold Mud-Warden's Vest to Riska Panhandle for 5 TC. (1003 TC on hand)\n",
+      "[2026-08-30T08:20:26.279Z] [reward] Sold Cudgel to Riska Panhandle for 5 TC. (1008 TC on hand)\n[2026-08-30T08:20:26.306Z] [reward] Sold Reclaimer's Salvage Vest to Riska Panhandle for 5 TC. (1013 TC on hand)\n[2026-08-30T08:20:26.333Z] [reward] Sold Cudgel to Riska Panhandle for 5 TC. (1018 TC on hand)\n",
+      "[2026-08-30T08:20:26.359Z] [reward] Sold Mud-Warden's Vest to Riska Panhandle for 5 TC. (1023 TC on hand)\n[2026-08-30T08:20:26.386Z] [reward] Sold Mud-Bound Cloak to Riska Panhandle for 5 TC. (1028 TC on hand)\n[2026-08-30T08:20:26.412Z] [reward] Sold Cudgel to Riska Panhandle for 5 TC. (1033 TC on hand)\n[2026-08-30T08:20:26.438Z] [reward] Sold M"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1569-the-glyph-brings-its-own-ground #mtfva3flr9ic [inline 24/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfva3flr9ic"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "24"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T16:11:28.867731Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T16:11:29.606000Z",
+  "fingerprints": [
+    "b9740788dc1a13de79038081caa5b280"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "efdb455692a849708d8cb294b3fdc77b",
+  "previousEventID": "d9e7dd82b9194ccd9ba65a11d40ffd30"
+}
