@@ -26115,6 +26115,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
 // evidence stays greppable.
 export const OTA_BUILD_ID = '2026-08-30-1578-the-stage-says-who-is-there';
+// golem catch-up 2026-08-30: markerless publish of OTA-1576/1577/1578 — noun
+// coverage ranking, stage-authored spawns, the Tartarian Raider, the escort
+// clear that resolves a false summit, and the keyboard latch scope fix.
 // OTA-1578 adds the owner's ruling on top of 1576/1577: the false-summit text
 // is rewritten to name the three raiders and say plainly that there is no way
 // past them, and the stage now HOLDS until the last of them is down instead
