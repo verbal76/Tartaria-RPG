@@ -26114,7 +26114,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The tap breadcrumb is untouched again: the hair spaces live in the JSX only, so
 // logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
 // evidence stays greppable.
-export const OTA_BUILD_ID = '2026-08-30-1572-the-card-says-stunned';
+export const OTA_BUILD_ID = '2026-08-30-1574-the-weapon-answers-the-sky';
+// OTA-1574 (weapon-effects slice 3) — weather. 21 weapons talk about the sky
+// and none listened: the engine side already worked (weatherAttackPenalty,
+// weatherRepositionCost, resists), only the WEAPON's clause was unwired. Five
+// weapons promise to shrug weather off — one of them a Legendary — and all
+// five ate the full penalty. Ships with the 12 penalties that make the
+// immunity worth carrying.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-30-1573-one-curer-one-ladder';
+// OTA-1573 — the Field Dressing actually stops the bleeding (three consume
+// paths, only one had ever learned the cures; the one he hit in combat was
+// not it), and the coating dice ladder that never got built: rarity sets the
+// base, a second payload costs a die step. Seven cards were quoting a die
+// they did not roll — four of them before this OTA touched anything.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-30-1572-the-card-says-stunned';
 // golem catch-up 2026-08-30: markerless publish of OTA-1572 (slice 2 — on-hit
 // control effects: 33 weapon cards that promised a stun / trip / bind / blind
 // and had nowhere on an enemy to put one, plus the anti-lock brace).

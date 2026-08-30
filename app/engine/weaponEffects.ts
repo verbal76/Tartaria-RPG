@@ -192,6 +192,40 @@ export interface ParsedWeaponEffect {
   splash?: SplashSpec;
   /** OTA-1572 — what the hit DOES to them, past the damage. */
   onHitControl?: OnHitControl;
+  /** OTA-1574 — how this weapon answers the sky. */
+  weather?: WeatherNote;
+}
+
+/**
+ * ⚠⚠⚠ OTA-1574 (slice 3) — TWENTY-ONE WEAPONS TALK ABOUT THE WEATHER AND NOT ONE
+ * OF THEM LISTENED TO IT. The engine side has existed for a long time and works:
+ * `weatherAttackPenalty` docks the attack roll (the owner's log, verbatim —
+ * `attack: visibility penalty −1 (Ash Storm)`), `weatherRepositionCost` slows
+ * movement, and armour resists can zero both. What was never wired is the
+ * WEAPON's own clause.
+ *
+ * ⚠⚠⚠ SO THE IMMUNITIES WERE THE WORST OF IT. Five weapons promise to shrug the
+ * weather off — Laser Crossbow *"Accuracy unaffected by weather"*, Aetheric
+ * Longbow *"Ignores wind conditions"*, Aetheric Throwing Disk *"unaffected by
+ * wind"*, Mud Darts *"weather does not affect effectiveness"*, and the LEGENDARY
+ * Aetheric Sniper Bow *"ignores cover; unaffected by weather"* — and every one of
+ * them ate the full visibility penalty like a rusted shortbow. A Legendary's
+ * headline clause, doing nothing, in the one condition it was written for.
+ *
+ * ⚠⚠ AND THE PENALTIES ARE THE PRICE THAT MAKES THE IMMUNITY WORTH BUYING. Twelve
+ * weapons say they get worse in rain / wind / fog / cold. Shipping only the
+ * immunities would make five weapons strictly better with nothing given up; both
+ * halves land together or neither means anything.
+ */
+export type WeatherCondition = 'rain' | 'wind' | 'fog' | 'cold' | 'heat' | 'any';
+
+export interface WeatherNote {
+  /** Conditions this weapon is explicitly unaffected by. 'any' = all weather. */
+  immuneTo?: readonly WeatherCondition[];
+  /** Conditions that cost it, and what they cost. */
+  penalty?: { conditions: readonly WeatherCondition[]; kind: 'accuracy' | 'range' | 'damage' | 'reload' };
+  /** A condition it is BETTER in, and by how much. */
+  bonus?: { conditions: readonly WeatherCondition[]; dice?: string };
 }
 
 /**
@@ -557,6 +591,70 @@ function controlFrom(text: string): OnHitControl | null {
   return out;
 }
 
+/**
+ * ⚠⚠ THE CONDITION WORDS THE CATALOG ACTUALLY USES. As in every slice before
+ * this, the vocabulary is taken from the 21 real strings rather than from what a
+ * weather system "should" call things: "bad weather", "high wind", "dense fog",
+ * "extreme cold", "extreme heat".
+ */
+const WEATHER_WORDS: ReadonlyArray<readonly [WeatherCondition, RegExp]> = [
+  ['rain', /\brain\w*\b/],
+  ['wind', /\bwind\w*\b/],
+  ['fog', /\bfog\w*\b|\bmist\w*\b/],
+  ['cold', /\bextreme\s+cold\b|\bfreezing\b|\bblizzard\b/],
+  ['heat', /\bextreme\s+heat\b|\bscorching\b/],
+  ['any', /\b(?:bad\s+)?weather\b|\bweather\s+conditions?\b/],
+];
+
+/** ⚠ "Ignores X" / "unaffected by X" / "X does not affect" — the three ways the
+ *  catalog spells an immunity, and all three appear. */
+const WX_IMMUNE_RE = /\bignores?\b|\bunaffected\s+by\b|\bdoes\s+not\s+affect\b|\bregardless\s+of\b|\bno\s+penalty\s+in\b/;
+/** The costs the catalog names, mapped to what they cost. */
+const WX_PENALTY_RE = /\breduced?\b|\breduces?\b|\bloses?\b|\blosing\b|\bdrops?\b|\bpoor\s+performance\b|\bless\s+effective\b/;
+
+function conditionsIn(clause: string): WeatherCondition[] {
+  const out: WeatherCondition[] = [];
+  for (const [cond, re] of WEATHER_WORDS) if (re.test(clause)) out.push(cond);
+  return out;
+}
+
+function weatherFrom(text: string): WeatherNote | null {
+  const note: WeatherNote = {};
+  let touched = false;
+  for (const clause of text.split(/[.;]/)) {
+    const conds = conditionsIn(clause);
+    if (conds.length === 0) continue;
+    // ⚠ IMMUNITY IS TESTED FIRST. "Accuracy unaffected by weather" contains no
+    // penalty verb, but "Ignores wind conditions" and "reduced range in wind"
+    // are one word apart in shape — reading the immunity as a penalty would
+    // turn five weapons' headline clause into its exact opposite.
+    if (WX_IMMUNE_RE.test(clause)) {
+      note.immuneTo = [...(note.immuneTo ?? []), ...conds];
+      touched = true;
+      continue;
+    }
+    // A bonus reads as "+NdN in <condition>" and must be checked before the
+    // penalty verbs, because "+1d6 in extreme heat" has no penalty word in it
+    // and would otherwise fall through to nothing.
+    const plus = clause.match(/\+\s*(\d+d\d+)/);
+    if (plus && !WX_PENALTY_RE.test(clause)) {
+      note.bonus = { conditions: conds, dice: plus[1]! };
+      touched = true;
+      continue;
+    }
+    if (WX_PENALTY_RE.test(clause)) {
+      const kind: NonNullable<WeatherNote['penalty']>['kind'] =
+        /\breload\b/.test(clause) ? 'reload'
+          : /\bdamage\b/.test(clause) ? 'damage'
+            : /\brange\b/.test(clause) ? 'range'
+              : 'accuracy';
+      note.penalty = { conditions: conds, kind };
+      touched = true;
+    }
+  }
+  return touched ? note : null;
+}
+
 function splashFrom(text: string): SplashSpec | null {
   if (SPLASH_DEFERRED_RE.test(text)) return null;
   for (const clause of text.split(/[.;]/)) {
@@ -779,6 +877,10 @@ export function parseWeaponEffect(effect: string | undefined | null): ParsedWeap
   // OTA-1572 (slice 2) — the thing the hit DOES to them beyond damage.
   const ctrl = controlFrom(text);
   if (ctrl) { out.onHitControl = ctrl; touched = true; }
+
+  // OTA-1574 (slice 3) — how the weapon answers the sky.
+  const wx = weatherFrom(text);
+  if (wx) { out.weather = wx; touched = true; }
 
   return touched ? out : null;
 }

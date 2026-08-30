@@ -255,3 +255,122 @@ export function describeWeatherStatModifiers(weather: WeatherEntry | null): stri
   }
   return parts.join(' · ');
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OTA-1574 (weapon-effects slice 3) — THE WEAPON'S OWN ANSWER TO THE SKY.
+//
+// ⚠⚠⚠ EVERYTHING ABOVE THIS LINE ALREADY WORKED. `weatherAttackPenalty` docks
+// the roll and the owner's log shows it landing — `attack: visibility penalty −1
+// (Ash Storm)`. `weatherRepositionCost` slows movement. Armour resists zero
+// both. The ONE thing never wired was the weapon's own clause, so 21 weapons
+// discussed the weather and none of them heard it.
+//
+// ⚠⚠⚠ THE IMMUNITIES WERE THE EXPENSIVE HALF. Five weapons promise to shrug it
+// off, including the LEGENDARY Aetheric Sniper Bow ("ignores cover; unaffected
+// by weather"), and every one of them ate the full penalty like a rusted
+// shortbow. A Legendary's headline clause doing nothing in the exact condition
+// it was written for.
+
+import type { WeatherCondition, WeatherNote } from './weaponEffects';
+
+/**
+ * ⚠⚠ WHICH REAL WEATHER EACH CATALOG WORD MEANS. The catalog was written before
+ * the nine weather states existed, so it talks about "wind" and "extreme cold"
+ * while the world has `ash_storm` and `silent_blizzard`. Mapped by what the
+ * condition DOES to a projectile rather than by name: an ash storm and glass
+ * hail are both wind-driven, both fogs are fog.
+ *
+ * ⚠⚠ 'heat' MAPS TO NOTHING, AND THAT IS A REAL HOLE, NOT AN OVERSIGHT HERE.
+ * There is no hot weather state in weather.json, so Plasma Long Rifle's "+1d6 in
+ * extreme heat" cannot fire under any sky the game can generate. Left empty on
+ * purpose and surfaced rather than papered over — inventing a mapping would make
+ * the clause "work" by quietly redefining what the card says.
+ */
+export const WEATHER_FOR_CONDITION: Record<WeatherCondition, readonly string[]> = {
+  rain: ['black_rain'],
+  wind: ['ash_storm', 'glass_hail'],
+  fog: ['iron_fog', 'whisper_fog'],
+  cold: ['silent_blizzard'],
+  heat: [],
+  any: ['etheric_storm', 'aether_lightning', 'ash_storm', 'black_rain',
+    'iron_fog', 'glass_hail', 'whisper_fog', 'silent_blizzard'],
+};
+
+/** Does this condition word cover the weather that is actually blowing? */
+export function conditionMatchesWeather(
+  cond: WeatherCondition,
+  weatherId: string | null | undefined,
+): boolean {
+  if (!weatherId) return false;
+  return WEATHER_FOR_CONDITION[cond]?.includes(weatherId) ?? false;
+}
+
+export interface WeaponWeatherAdjust {
+  /** Added to the attack roll. Negative is a cost; a cancelled penalty is 0. */
+  attackDelta: number;
+  /** Extra damage dice the weather earns this weapon ("1d6"), if any. */
+  bonusDice: string | null;
+  /** Damage dice the weather costs it, if any. */
+  penaltyDice: string | null;
+  /** True when the weapon's own clause cancelled the ambient penalty. */
+  shrugged: boolean;
+  /** Short line for the combat log, or null when the sky is irrelevant. */
+  note: string | null;
+}
+
+const NO_ADJUST: WeaponWeatherAdjust = {
+  attackDelta: 0, bonusDice: null, penaltyDice: null, shrugged: false, note: null,
+};
+
+/**
+ * ⚠⚠⚠ THE ONE RESOLVER. Takes the weapon's parsed clause and the sky, returns
+ * what actually changes.
+ *
+ * ⚠⚠ IMMUNITY CANCELS THE AMBIENT PENALTY, IT DOES NOT INVERT IT. "Unaffected by
+ * weather" means you roll as if the sky were clear — not that you roll better
+ * than clear. `ambientPenalty` is passed in (already computed by
+ * `weatherAttackPenalty`, resists and all) and the immunity refunds exactly that
+ * much and no more, so a Legendary in fog equals a Legendary in sunshine.
+ *
+ * ⚠⚠ AND A WEAPON CANNOT BE BOTH. A clause that claims immunity to a condition
+ * wins over a penalty in the same condition, because that is the reading a
+ * player takes off the card — nothing in the catalog says both, and if something
+ * ever does, the promise beats the fine print.
+ */
+export function weaponWeatherAdjust(
+  note: WeatherNote | null | undefined,
+  weatherId: string | null | undefined,
+  ambientPenalty: number,
+): WeaponWeatherAdjust {
+  if (!note || !weatherId) return NO_ADJUST;
+
+  const immune = (note.immuneTo ?? []).some((c) => conditionMatchesWeather(c, weatherId));
+  if (immune) {
+    return ambientPenalty > 0
+      ? { ...NO_ADJUST, attackDelta: ambientPenalty, shrugged: true, note: 'shrugs off the weather' }
+      : NO_ADJUST;
+  }
+
+  if (note.bonus && note.bonus.conditions.some((c) => conditionMatchesWeather(c, weatherId))) {
+    return { ...NO_ADJUST, bonusDice: note.bonus.dice ?? null, note: 'the conditions suit it' };
+  }
+
+  if (note.penalty && note.penalty.conditions.some((c) => conditionMatchesWeather(c, weatherId))) {
+    switch (note.penalty.kind) {
+      // ⚠ A RANGE clause is not modelled as a band change on purpose. Bands are
+      // resolved before the swing (reachBandsFor), and quietly shortening a
+      // weapon's reach mid-fight would make a weapon the player aimed with
+      // simply refuse — the OTA-1563 lesson, where removing a band read to the
+      // player as the weapon breaking. It costs accuracy instead, which is the
+      // same "harder to land at distance" in a form the player can see.
+      case 'damage':
+        return { ...NO_ADJUST, penaltyDice: '1d6', note: 'the weather blunts it' };
+      case 'reload':
+      case 'range':
+      case 'accuracy':
+      default:
+        return { ...NO_ADJUST, attackDelta: -2, note: 'the weather fights it' };
+    }
+  }
+  return NO_ADJUST;
+}

@@ -699,12 +699,12 @@
         "poison",
         "crafted"
       ],
-      "description": "A stoppered vial of rendered venom — leech mucus cooked down with violet caps until it clings. Paint it on a blade, an arrow, or a bolt and every landing hit leaks poison into the wound. Pure rot: 1d4 poison a turn until it burns off. Survives a repair; lost only when the weapon breaks.",
+      "description": "A stoppered vial of rendered venom — leech mucus cooked down with violet caps until it clings. Paint it on a blade, an arrow, or a bolt and every landing hit leaks poison into the wound. Pure rot: 1d6 poison a turn until it burns off. Survives a repair; lost only when the weapon breaks.",
       "effect": {
         "kind": "consumable",
         "coating": {
           "kind": "poison",
-          "dice": "1d4",
+          "dice": "1d6",
           "label": "Poisoned"
         }
       }
@@ -760,7 +760,7 @@
         "crafted",
         "alchemy"
       ],
-      "description": "A premium hollowing brew — a live disease sample cultured into blue-cap rot until the vial sweats. Painted on a weapon, every strike drives a virulent corruption into the target (1d6 a turn) that stacks a sickening, accelerating rot — worst against the tough foes you hit again and again. Survives a repair; lost only when the weapon breaks.",
+      "description": "A premium hollowing brew — a live disease sample cultured into blue-cap rot until the vial sweats. Painted on a weapon, every strike drives a virulent corruption into the target (1d8 a turn) that stacks a sickening, accelerating rot — worst against the tough foes you hit again and again. Survives a repair; lost only when the weapon breaks.",
       "effect": {
         "kind": "consumable",
         "coating": {
@@ -781,12 +781,12 @@
         "crafted",
         "alchemy"
       ],
-      "description": "A premium venom — a live disease sample rendered down with violet caps into a clinging, septic oil. Coats an edge so each landing hit leaks a fever-bright poison into the wound (1d6 a turn) until it burns off. Survives a repair; lost only when the weapon breaks.",
+      "description": "A premium venom — a live disease sample rendered down with violet caps into a clinging, septic oil. Coats an edge so each landing hit leaks a fever-bright poison into the wound (1d10 a turn) until it burns off. Survives a repair; lost only when the weapon breaks.",
       "effect": {
         "kind": "consumable",
         "coating": {
           "kind": "poison",
-          "dice": "1d8",
+          "dice": "1d10",
           "label": "Festering"
         }
       }
@@ -840,12 +840,12 @@
         "crafted",
         "alchemy"
       ],
-      "description": "Aether dust whipped with raw egg into a grey paste that crackles when it dries. Smear it along an edge or a point and every landing hit arcs ELECTRICAL damage into the wound (1d4 a turn) — and the strike itself counts as electrical, so it bites extra-deep into constructs and automatons. Survives a repair; lost only when the weapon breaks.",
+      "description": "Aether dust whipped with raw egg into a grey paste that crackles when it dries. Smear it along an edge or a point and every landing hit arcs ELECTRICAL damage into the wound (1d6 a turn) — and the strike itself counts as electrical, so it bites extra-deep into constructs and automatons. Survives a repair; lost only when the weapon breaks.",
       "effect": {
         "kind": "consumable",
         "coating": {
           "kind": "electrical",
-          "dice": "1d4",
+          "dice": "1d6",
           "label": "Charged"
         }
       }
@@ -914,12 +914,12 @@
         "crafted",
         "alchemy"
       ],
-      "description": "Aether dust packed around a cracked aether crystal until the whole mess runs hot — the same over-harnessed aether that boiled the old world into mud, dialed down to a weapon's edge. Smear it on and every landing hit sears BURN damage into the wound (1d4 a turn); the strike itself counts as burn, so it bites extra-deep into mud creatures and anything else that hates fire. Survives a repair; lost only when the weapon breaks.",
+      "description": "Aether dust packed around a cracked aether crystal until the whole mess runs hot — the same over-harnessed aether that boiled the old world into mud, dialed down to a weapon's edge. Smear it on and every landing hit sears BURN damage into the wound (1d6 a turn); the strike itself counts as burn, so it bites extra-deep into mud creatures and anything else that hates fire. Survives a repair; lost only when the weapon breaks.",
       "effect": {
         "kind": "consumable",
         "coating": {
           "kind": "burn",
-          "dice": "1d4",
+          "dice": "1d6",
           "label": "Burning"
         }
       }
@@ -988,7 +988,7 @@
         "crafted",
         "alchemy"
       ],
-      "description": "Aetheric rime whipped into a paste that never quite melts — smear it on a blade and every hit sinks a biting frost (1d4 a turn, counts as cold — machines seize, joints lock). DRINK it instead as a warming counter: it shakes off a chill and knits a little hurt closed. Coat a weapon, coat armor for cold resistance, or lob the vial for a one-time frost burst. Survives a repair; lost only when the weapon breaks.",
+      "description": "Aetheric rime whipped into a paste that never quite melts — smear it on a blade and every hit sinks a biting frost (1d6 a turn, counts as cold — machines seize, joints lock). DRINK it instead as a warming counter: it shakes off a chill and knits a little hurt closed. Coat a weapon, coat armor for cold resistance, or lob the vial for a one-time frost burst. Survives a repair; lost only when the weapon breaks.",
       "effect": {
         "kind": "consumable",
         "coating": {
@@ -1010,12 +1010,12 @@
         "crafted",
         "alchemy"
       ],
-      "description": "A concentrated frost distillate — a heavier cold bite (1d6 a turn, counts as cold), and holding that focused chill steadies a cold, clear mind: +1 wisdom while you wield it. Drink it to warm through and lift a chill; coat a weapon or armor, or throw it for a one-time frost burst. Survives a repair; lost only when the weapon breaks.",
+      "description": "A concentrated frost distillate — a heavier cold bite (1d8 a turn, counts as cold), and holding that focused chill steadies a cold, clear mind: +1 wisdom while you wield it. Drink it to warm through and lift a chill; coat a weapon or armor, or throw it for a one-time frost burst. Survives a repair; lost only when the weapon breaks.",
       "effect": {
         "kind": "consumable",
         "coating": {
           "kind": "cold",
-          "dice": "1d6",
+          "dice": "1d8",
           "label": "Rimebound",
           "statBonus": {
             "stat": "wisdom",

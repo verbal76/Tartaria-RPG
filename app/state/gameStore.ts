@@ -37,6 +37,7 @@ import { buildingNameFor, buildingHookLabel, buildingArrow } from '../engine/bui
 // OTA-1440 — the first reader of vendors.json's gender field.
 import { npcGenderFor } from '../engine/npcGender';
 import { koShare } from '../engine/combatProse';
+import { applyConsumableCures } from '../engine/consumableCures';
 import { landControl, controlLabel } from '../engine/enemyControl';
 // ⚠ OTA-1236 — ONE rule for "this noun carries a next step", shared by the engine
 // dispatch, the bulk-salvage guard, the loot picker's lead lane and the
@@ -615,7 +616,7 @@ import {
   availableStorylines,
   fuzzyFindStoryline,
 } from '../engine/factionStorylines';
-import { tickWeather, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers } from '../engine/weatherEffects';
+import { tickWeather, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers, weaponWeatherAdjust } from '../engine/weatherEffects';
 import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, enemyDodgesHit, enemyIsAerial, combineDamageTypeMatch } from '../engine/enemyTraits';
 import {
   parseWeaponEffect, rollEffectBonusDamage, effectConditionMatches,
@@ -14256,7 +14257,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
           set((sLive) => (sLive.player ? { player: advanceTime(spendStamina(sLive.player, STAMINA_COSTS.attack), 0.1) } : sLive));
-          const visPenalty = weatherAttackPenalty(currentScene.weather, playerArmorResistKinds(player));
+          const ambientVis = weatherAttackPenalty(currentScene.weather, playerArmorResistKinds(player));
+          // ⚠⚠⚠ OTA-1574 (slice 3) — AND NOW THE WEAPON GETS A SAY. Twenty-one
+          // weapons talk about the weather; until this line none of them was
+          // heard. The expensive half is the IMMUNITIES: five weapons promise to
+          // shrug it off — the Legendary Aetheric Sniper Bow's headline clause
+          // among them — and every one ate the full penalty like a rusted
+          // shortbow. `weaponWeatherAdjust` refunds exactly the ambient penalty
+          // and no more, so shrugging the weather equals clear sky, never better.
+          // ⚠ Resolved off the CATALOG by the equipped name, the same idiom every
+          // other reader of the swung weapon uses here — the clause is a property
+          // of the weapon design, not of the instance in the pack.
+          const wxWeapon = player.equipped?.main ? findWeaponByName(player.equipped.main) : null;
+          const wxAdj = weaponWeatherAdjust(
+            parseWeaponEffect(wxWeapon?.effect)?.weather,
+            currentScene.weather?.id,
+            ambientVis,
+          );
+          const visPenalty = Math.max(0, ambientVis - wxAdj.attackDelta);
           if (visPenalty > 0) {
             // Announce the swing penalty only the FIRST time this weather
             // bites in the current fight. It doesn't change round-to-round,
@@ -14274,6 +14292,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 : {}));
             }
             get().appendLog('debug', `attack: visibility penalty −${visPenalty} (${weatherName})`);
+          }
+          // ⚠⚠ OTA-1574 — AND THE SHRUG IS SAID OUT LOUD. A cancelled penalty is
+          // invisible by construction: the player sees a roll with no minus on
+          // it and cannot tell the weapon earned that or the weather simply did
+          // not apply. An effect the player cannot see fire is indistinguishable
+          // from one that still does nothing, which is the defect this whole
+          // program has been closing. Announced once per weather system, like
+          // the penalty line above it.
+          if (wxAdj.shrugged && currentScene.weather) {
+            const shrugKey = `shrug:${currentScene.weather.name}`;
+            if (currentScene.weatherSwingAnnounced !== shrugKey) {
+              get().appendLog(
+                'combat',
+                `${currentScene.weather.name} means nothing to the ${wxWeapon?.name ?? 'weapon'} — no penalty to the swing.`,
+                { skipDedup: true },
+              );
+              set((s) => (s.currentScene
+                ? { currentScene: { ...s.currentScene, weatherSwingAnnounced: shrugKey } }
+                : {}));
+            }
+            get().appendLog('debug', `attack: weather shrugged (+${wxAdj.attackDelta}) by ${wxWeapon?.name}`);
           }
           // Aggregate the player's status-effect modifiers (aim, sprint,
           // surprise, etc.) so the dice prompt and the final attack
@@ -16674,6 +16713,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 p = { ...p, stamina: p.stamina + amt };
                 messages.push(amt > 0 ? `+${amt} stamina` : 'stamina already full');
               }
+              // ⚠⚠⚠ OTA-1573 — AND THE CURES, WHICH THIS PATH NEVER APPLIED. The
+              // owner's log: a Field Dressing used mid-fight healed 10 and left
+              // the bleed running for another 75 seconds until it expired on its
+              // own. `use_relic` is the route a TAPPED item takes in combat —
+              // exactly when a dressing matters — and it was the one route that
+              // dropped the flag the card and the catalog both carry. One curer
+              // now, shared with the other two paths.
+              {
+                const cures = applyConsumableCures(p.statusEffects, fx);
+                if (cures.cured) {
+                  p = { ...p, statusEffects: cures.effects };
+                  messages.push(...cures.messages);
+                }
+              }
               if (fx.reduceCorruption) {
                 const before = p.corruption;
                 p = { ...p, corruption: Math.max(0, before - fx.reduceCorruption) };
@@ -16985,26 +17038,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // stat so the "Wild Carrot (+1 WIS) fades." line is readable.
           let newStatusEffects = player.statusEffects ?? [];
           let buffLine = '';
-          // v2.4.1 (OTA 021) — cureBleed strips the bleed status when
-          // a medical consumable promises it (First Aid Kit).
-          let bleedCured = false;
-          if (fx && fx.cureBleed) {
-            const hadBleed = newStatusEffects.some((e) => e.kind === 'bleed');
-            if (hadBleed) {
-              newStatusEffects = newStatusEffects.filter((e) => e.kind !== 'bleed');
-              bleedCured = true;
-            }
-          }
-          // OTA-383 — curePoison strips the poisoned status (Antivenom). Mirrors
-          // cureBleed so an envenomed player has a drink-able answer mid-fight.
-          let poisonCured = false;
-          if (fx && fx.curePoison) {
-            const hadPoison = newStatusEffects.some((e) => e.kind === 'poisoned');
-            if (hadPoison) {
-              newStatusEffects = newStatusEffects.filter((e) => e.kind !== 'poisoned');
-              poisonCured = true;
-            }
-          }
+          // v2.4.1 (OTA 021) — cureBleed strips the bleed status when a medical
+          // consumable promises it (First Aid Kit). OTA-383 — curePoison mirrors
+          // it for Antivenom.
+          //
+          // ⚠⚠ OTA-1573 — THIS WAS THE ONLY PATH THAT EVER DID THIS, and its two
+          // siblings (`use_relic`, `useConsumableOnTarget`) did not. The logic is
+          // no longer inline here precisely so a third copy cannot drift: all
+          // three now call the one curer. See engine/consumableCures.
+          const cureResult = applyConsumableCures(newStatusEffects, fx);
+          newStatusEffects = cureResult.effects;
+          const bleedCured = cureResult.messages.includes('bleeding stopped');
+          const poisonCured = cureResult.messages.includes('poison neutralized');
           if (fx && fx.buffStat && fx.buffBonus && fx.buffDuration && fx.buffBonus > 0 && fx.buffDuration > 0) {
             const buff: StatusEffect = {
               kind: 'food_buff',

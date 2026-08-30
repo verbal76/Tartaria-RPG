@@ -2,6 +2,7 @@ import {
   isCoatableWeapon, isCoatableItem, coatedDisplayName, coatingBlurb,
   coatingStatusKind, coatingDotPerTurn, rollLootCoating,
   COATING_DOT_TURNS, ACID_SHRED_PER_HIT, ACID_SHRED_MAX, CORRUPTION_STACK_BONUS, acidShredCap, ACID_SHRED_BOSS_BONUS,
+  coatingDiceFor, coatingHasSecondPayload,
 } from '../app/engine/weaponCoating';
 import { mergeOrPushItem } from '../app/engine/inventory';
 import type { InventoryItem } from '../app/engine/types';
@@ -161,7 +162,16 @@ describe('coating consumables carry a coating effect spec', () => {
       expect(fx.coating).toBeDefined();
       expect(fx.coating?.kind).toBe(kind);
       expect(fx.coating?.label).toBe(label);
-      expect(fx.coating?.dice).toBe('1d4');
+      // ⚠ OTA-1573 RETARGET, NOT A RELAXATION. This pinned a bare '1d4' for every
+      // case, which stopped being one number the moment the ladder gained rungs.
+      // The claim it was making — "the spec resolves with the catalog's die" — is
+      // now checked against the LADDER rather than a literal, which is strictly
+      // stronger: a data row that drifts off the rule fails here as well as in
+      // ota1573.
+      expect(fx.coating?.dice).toBe(coatingDiceFor(
+        findGearByName(name)?.rarity,
+        coatingHasSecondPayload(fx.coating),
+      ));
     }
   });
 
@@ -190,12 +200,15 @@ describe('Disease Sample crafted items (OTA-370)', () => {
   });
 
   // ⚠ OTA-1559 — RETARGETED, same reason as the Tonic above.
-  it('Plague Vial is a premium 1d8 poison coating', () => {
+  // ⚠ OTA-1573 — 1d10. Plain poison at Rare carries no rider, so it sits on the
+  // top rung; the Tonic holds at 1d8 because corruption stacks. Both still clear
+  // every foragable Uncommon, which is the claim this suite actually makes.
+  it('Plague Vial is a premium 1d10 poison coating', () => {
     const fx = resolveItemEffect('Plague Vial', [findGearByName]);
     expect(fx?.kind).toBe('consumable');
     if (fx?.kind === 'consumable') {
       expect(fx.coating?.kind).toBe('poison');
-      expect(fx.coating?.dice).toBe('1d8');
+      expect(fx.coating?.dice).toBe('1d10');
       expect(fx.coating?.label).toBe('Festering');
     }
   });

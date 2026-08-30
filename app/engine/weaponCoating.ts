@@ -173,6 +173,62 @@ export function coatingBlurb(kind: WeaponCoating['kind']): string {
 
 /** Ongoing DOT duration (turns) after the immediate on-hit tick. */
 export const COATING_DOT_TURNS = 3;
+
+/**
+ * ⚠⚠⚠ OTA-1573 — THE COATING DICE LADDER, which never existed. The owner, at the
+ * Recipes screen: *"all the coatings listed under crafting all still say 1d4, I
+ * thought we took care of that last night."* The screen was telling the truth.
+ * What shipped the night before was the STAT-BONUS half of the differentiation
+ * (+1 STE on Galvanic, +1 CHA on Resonant, and so on, all visible on the cards);
+ * the DICE half was never built. The table he was looking at:
+ *
+ *   Uncommon 1d4 ×9   Poison Vial, Acid Flask, Corruption Tonic, Static,
+ *                     Galvanic, Resonant, Incendiary, Searing, Smoldering
+ *   Uncommon 1d6 ×2   Viper Venom Vial, Frost Paste
+ *   Rare     1d6 ×1   Rime Draught   ← a RARE ticking no harder than an Uncommon
+ *   Rare     1d8 ×2   Plague Tonic, Plague Vial
+ *
+ * Nine items at one value, and a Rare that loses to two Uncommons. Not stale
+ * text — an unprincipled table.
+ *
+ * ⚠⚠ THE RULE: RARITY SETS THE BASE, AND A SECOND PAYLOAD COSTS ONE DIE STEP.
+ * "Second payload" is anything the coating does BEYOND ticking damage, and the
+ * first draft of this ladder only counted stat bonuses — which left seven
+ * coatings piled on one value and was the same failure, one notch quieter. Two
+ * ELEMENTS carry mechanical riders of their own: acid shreds armour every hit
+ * (enemyArmorShred) and corruption stacks so tough foes rot faster
+ * (coatingDotPerTurn). Those are worth exactly what a +1 stat is worth, so they
+ * pay the same step. That is what makes Galvanic a real choice against Static,
+ * and Acid Flask a real choice against Poison Vial, rather than either being a
+ * strict upgrade.
+ *
+ * ⚠⚠ AND NOTHING IS NERFED. The ladder was fitted to his existing table rather
+ * than imposed on it, because taking damage off a coating he already owns is not
+ * a fix, it is a tax. Five plain Uncommons rise 1d4→1d6, Plague Vial 1d8→1d10,
+ * Rime Draught 1d6→1d8 (a Rare now beats every Uncommon, as it always should
+ * have), and every other row keeps the die it already had.
+ */
+export function coatingDiceFor(
+  rarity: string | null | undefined,
+  hasSecondPayload: boolean,
+): string {
+  const r = (rarity ?? '').toLowerCase();
+  const rare = r === 'rare' || r === 'legendary';
+  if (rare) return hasSecondPayload ? '1d8' : '1d10';
+  return hasSecondPayload ? '1d4' : '1d6';
+}
+
+/** The two elements that carry a mechanical rider, and so pay a die step for it
+ *  exactly as a stat bonus does. Kept beside the ladder so the two cannot drift. */
+export const RIDER_COATING_KINDS: ReadonlySet<string> = new Set(['acid', 'corruption']);
+
+/** Does this coating do anything beyond ticking damage? */
+export function coatingHasSecondPayload(
+  spec: { kind?: string; statBonus?: unknown } | null | undefined,
+): boolean {
+  if (!spec) return false;
+  return !!spec.statBonus || RIDER_COATING_KINDS.has((spec.kind ?? '').toLowerCase());
+}
 /** engine_Dev (design call) — chance a coating still "takes" when the enemy RESISTS
  *  its damage type. A coating ALWAYS lands vs a weak or neutral foe; only a resisted
  *  type gets gated to this small chance (a weakness is a guaranteed opening; a resisted
@@ -309,6 +365,9 @@ export function rollLootCoating(
   if (rng() >= (opts?.chance ?? LOOT_COATING_CHANCE)) return null;
   const kinds: WeaponCoating['kind'][] = ['poison', 'acid', 'corruption'];
   const kind = kinds[Math.min(kinds.length - 1, Math.floor(rng() * kinds.length))]!;
+  // ⚠ OTA-1573 — a FOUND coating deliberately sits below the crafted ladder
+  // (coatingDiceFor). It cost nothing and carries no rarity of its own; the
+  // floor is what "it came on the weapon" is worth.
   return { kind, dice: '1d4', label: LOOT_COATING_LABELS[kind] };
 }
 

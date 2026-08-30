@@ -37,6 +37,22 @@
  * for the trade, so the plain base coating beside them is the CHEAP option
  * rather than a dominated one. Raising them would be a straight power increase
  * nobody asked for, and it would flatten the ladder from the other end.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * ⚠⚠⚠ SUPERSEDED IN PART BY OTA-1573, AND THE REASON IS THIS FILE'S OWN RESULT.
+ * The owner raised the identical complaint again — *"all the coatings listed
+ * under crafting all still say 1d4"* — looking at the Uncommon paste cluster,
+ * where four rider pastes and Incendiary all read 1d4. Re-reading the table this
+ * OTA produced showed an inconsistency it left behind: POISON VIAL, STATIC PASTE
+ * and INCENDIARY PASTE are plain base coatings at 1d4, while VIPER VENOM VIAL and
+ * FROST PASTE — also plain, also Uncommon — sit at 1d6. Same rung, two dice.
+ *
+ * OTA-1573 keeps this file's central judgement (a rider costs a die step; the
+ * four stat pastes stay at 1d4) and settles the leftover: rarity sets the base,
+ * a SECOND PAYLOAD costs one step, and a payload is a stat bonus OR a mechanical
+ * rider — which is why acid and corruption also hold at 1d4. The pins below are
+ * retargeted to the values that rule produces, never relaxed. Where 1573 moved a
+ * number, the `it` says so and why.
  */
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -68,21 +84,44 @@ describe('OTA-1559 — the four corrections', () => {
   it('⚠⚠⚠ THE PLAGUE PAIR hit harder than anything you can forage', () => {
     // Both need a Disease Sample. They rolled the same die as a Viper Venom Vial
     // made from foraged venom, which made the scarce ingredient pointless.
+    //
+    // ⚠ OTA-1573 RETARGET, NOT A RELAXATION. The CLAIM is unchanged and the bar
+    // is higher: the Plague pair must out-roll everything foragable. 1573 raised
+    // the Rare base to 1d10 (and Plague Tonic holds at 1d8 because corruption
+    // carries a stacking rider, exactly the trade this file established for the
+    // stat pastes). Both still beat every Uncommon by a clear step, which is
+    // what the Disease Sample is for.
     expect(dice('Plague Tonic')).toBe('1d8');
-    expect(dice('Plague Vial')).toBe('1d8');
+    expect(dice('Plague Vial')).toBe('1d10');
+    expect(faces(dice('Plague Tonic'))).toBeGreaterThan(faces(dice('Viper Venom Vial')));
+    expect(faces(dice('Plague Vial'))).toBeGreaterThan(faces(dice('Viper Venom Vial')));
   });
 
   it('⚠⚠⚠ FROST PASTE finally buys something with its extra Mudstone', () => {
     expect(dice('Frost Paste')).toBe('1d6');
   });
 
-  it('⚠⚠ …and nothing else moved — this is a coherence fix, not a buff pass', () => {
-    expect(dice('Poison Vial')).toBe('1d4');
-    expect(dice('Acid Flask')).toBe('1d4');
-    expect(dice('Static Paste')).toBe('1d4');
-    expect(dice('Incendiary Paste')).toBe('1d4');
-    expect(dice('Viper Venom Vial')).toBe('1d6');
-    expect(dice('Rime Draught')).toBe('1d6');
+  it('⚠⚠⚠ THE LEFTOVER THIS FILE DID NOT CATCH — same rung, two different dice', () => {
+    // ⚠ OTA-1573 SUPERSEDES the original "nothing else moved" pin, and this file's
+    // own output is the argument. Poison Vial, Static Paste and Incendiary Paste
+    // are plain base coatings; so are Viper Venom Vial and Frost Paste. This OTA
+    // left the first three at 1d4 and the last two at 1d6 — one rung, two dice —
+    // which is why the owner read the screen and said "still 1d4" a second time.
+    // All five now roll the plain-Uncommon die.
+    for (const n of ['Poison Vial', 'Static Paste', 'Incendiary Paste',
+      'Viper Venom Vial', 'Frost Paste']) {
+      expect(dice(n)).toBe('1d6');
+    }
+    // ⚠ AND THIS FILE'S CENTRAL JUDGEMENT SURVIVES INTACT: a coating that carries
+    // a second payload gives back a die step. The four stat pastes still roll
+    // 1d4 — 1573 only widened "payload" to include the mechanical riders, so Acid
+    // Flask (armour shred) and Corruption Tonic (stacking) join them rather than
+    // getting a free step the stat pastes were denied.
+    for (const n of ['Galvanic Paste', 'Resonant Paste', 'Searing Paste',
+      'Smoldering Paste', 'Acid Flask', 'Corruption Tonic']) {
+      expect(dice(n)).toBe('1d4');
+    }
+    expect(dice('Rime Draught')).toBe('1d8');
   });
 });
 
@@ -90,7 +129,8 @@ describe('OTA-1559 — the ladder holds as a whole', () => {
   it('⚠⚠⚠ NOT ALL 1d4 ANY MORE — three rungs are in play, which was the complaint', () => {
     const distinct = new Set(coatings.map((c) => c.effect!.coating!.dice));
     expect(distinct.size).toBeGreaterThanOrEqual(3);
-    expect([...distinct].sort()).toEqual(['1d4', '1d6', '1d8']);
+    // OTA-1573 added a fourth rung (Rare-without-a-rider at 1d10).
+    expect([...distinct].sort()).toEqual(['1d10', '1d4', '1d6', '1d8']);
   });
 
   it('⚠⚠⚠ NO RARE ROLLS AN UNCOMMON\'S DIE — the rung you paid for is the rung you get', () => {

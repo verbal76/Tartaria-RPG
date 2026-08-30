@@ -27,6 +27,7 @@
  * ⚠ NO MUTABLE STATE. ⚠ WHAT DID NOT CHANGE: twelve bodies, verbatim.
  */
 import { withArticle } from '../../engine/grammar';
+import { applyConsumableCures, consumableDoesSomething } from '../../engine/consumableCures';
 import type { InventoryItem } from '../../engine/types';
 import { makeEntry, persistEntry } from '../../engine/gameLog';
 import { isQuestLockedItem } from '../../engine/questItems';
@@ -436,7 +437,15 @@ export const createInventorySlice = (
 
     const fx = resolveItemEffect(item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
     const perHP = fx?.kind === 'consumable' ? scaledHealHP(fx.healHP ?? 0, player.hpMax) : 0; // OTA-978 — #120
-    if (perHP <= 0) { get().appendLog('arbiter', `The Arbiter studies the ${item.name}. "That won't mend anything in bulk."`); return; }
+    // ⚠⚠ OTA-1573 — HEALING WAS NEVER THE WHOLE TEST. This refused any item with
+    // no healHP, so a pure cure (an antivenom that only cleanses) was rejected by
+    // the inventory screen — "That won't mend anything in bulk." — while the same
+    // item worked from the combat bar. Two screens disagreeing about whether an
+    // item does anything is the same defect as a card the engine ignores.
+    if (!consumableDoesSomething(fx?.kind === 'consumable' ? fx : null)) {
+      get().appendLog('arbiter', `The Arbiter studies the ${item.name}. "That won't mend anything in bulk."`);
+      return;
+    }
 
     if (target === 'dog') {
       const dog = player.dog;
@@ -461,12 +470,25 @@ export const createInventorySlice = (
     const stamGap = Math.max(0, deps.effectiveStaminaMax(player) - player.stamina);
     const healHP = Math.min(hpGap, perHP * use);
     const healStam = Math.min(stamGap, perStam * use);
+    // ⚠⚠⚠ OTA-1573 — AND THE CURES, on the third and last path that was missing
+    // them. See engine/consumableCures for the owner's log line that found this.
+    const cures = applyConsumableCures(player.statusEffects, fx?.kind === 'consumable' ? fx : null);
     set((s) => {
       if (!s.player) return s;
-      const healed = { ...s.player, hp: s.player.hp + healHP, stamina: s.player.stamina + healStam, inventory: spend(s.player.inventory) };
+      const healed = {
+        ...s.player,
+        hp: s.player.hp + healHP,
+        stamina: s.player.stamina + healStam,
+        statusEffects: cures.cured ? cures.effects : s.player.statusEffects,
+        inventory: spend(s.player.inventory),
+      };
       return { player: deps.advanceTime(healed, 0.25) };
     });
-    get().appendLog('world', `You use ${use}× ${item.name}. +${healHP} HP (${Math.min(player.hpMax, player.hp + healHP)}/${player.hpMax})${healStam > 0 ? `, +${healStam} stamina` : ''}.`);
+    const bits: string[] = [];
+    if (healHP > 0) bits.push(`+${healHP} HP (${Math.min(player.hpMax, player.hp + healHP)}/${player.hpMax})`);
+    if (healStam > 0) bits.push(`+${healStam} stamina`);
+    bits.push(...cures.messages);
+    get().appendLog('world', `You use ${use}× ${item.name}.${bits.length > 0 ? ` ${bits.join(', ')}.` : ''}`);
     void get().persist();
   },
 
