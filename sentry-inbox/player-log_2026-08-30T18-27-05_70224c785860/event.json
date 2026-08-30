@@ -1,0 +1,196 @@
+{
+  "id": "70224c785860404a8081814bf45fdcdc",
+  "groupID": "7701135687",
+  "eventID": "70224c785860404a8081814bf45fdcdc",
+  "projectID": "4511945117532160",
+  "size": 17837,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 22/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 22/28]",
+  "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 22/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "3e241a85a156420cbf206fad74d51e76",
+      "span_id": "84f960230db1a7b4",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "gate the mud\n[2026-08-30T08:25:13.171Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:25:13.174Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:25:13.181Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-30T08:25:13.181Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:25:13.182Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:25:13.290Z] [cognitive] SWIM  (107ms)\n[2026-08-30T08:25:14.792Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:25:17.303Z] [player] investigate the mud\n",
+      "[2026-08-30T08:25:17.304Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:25:17.307Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-08-30T08:25:17.312Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-30T08:25:17.312Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:25:17.312Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:25:17.412Z] [cognitive] SWIM  (99ms)\n[2026-08-30T08:25:18.495Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:25:19.093Z] [debug] qwen\u23f1 ambient ok 5713ms read 2526ms/write 1117ms in 365t\u2192out 31t 6.9ms/t HIT-CAP (146ch)\n",
+      "[2026-08-30T08:25:19.267Z] [arbiter] As you step out of the bustling crowd, the black market bazaar, you're greeted by the vibrant energy of the market.\n[2026-08-30T08:25:19.267Z] [debug] arbiter: ambient \u2713 6085ms\n[2026-08-30T08:25:19.268Z] [debug] arbiter: ambient-said \"As you step out of the bustling crowd, the black market bazaar, you're greeted by the vibrant energy of the market.\"\n",
+      "[2026-08-30T08:25:20.651Z] [player] investigate the mud\n[2026-08-30T08:25:20.651Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:25:20.660Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Mud Essence (Uncommon).\n[2026-08-30T08:25:20.666Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-30T08:25:20.773Z] [cognitive] SWIM  (106ms)\n[2026-08-30T08:25:24.430Z] [debug] ui: tap \"pickpocket\"\n[2026-08-30T08:25:30.438Z] [debug] homework: intro-fill armed after 8848ms idle\n[2026-08-30T08:25:33.573Z] [debug] ui: tap \"climb\"\n[2026-08-30T08:25:35.241Z] [player] climb tilting submerged giant statue\n",
+      "[2026-08-30T08:25:35.241Z] [debug] parser: intent=climb conf=1.00 verb=climb target=tilting submerged giant statue resolved=tilting submerged giant statue range=- enemies=0 hooks=1\n[2026-08-30T08:25:35.282Z] [world] You loop your Reclaimer's Rope around the tilting submerged giant statue and walk the line. Tier 1/3 cleared.\n",
+      "[2026-08-30T08:25:35.282Z] [world] You reach the first hold of the tilting submerged giant statue (tier 1/3). Higher still to go.\n[2026-08-30T08:25:35.283Z] [world] Soot eyes the tilting submerged giant statue, then settles at its base. She is not built for the climb.\n",
+      "[2026-08-30T08:25:35.283Z] [world] Plinth sets its stone feet at the base of tilting submerged giant statue and will climb no further \u2014 the construct holds the ground while you go up alone.\n[2026-08-30T08:25:35.284Z] [system] \u23f3 Time passed: 30 min\n[2026-08-30T08:25:36.491Z] [debug] ui: tap \"climb up (1/3)\"\n[2026-08-30T08:25:36.538Z] [player] climb tilting submerged giant statue\n",
+      "[2026-08-30T08:25:36.539Z] [debug] parser: intent=climb conf=1.00 verb=climb target=tilting submerged giant statue resolved=tilting submerged giant statue range=- enemies=0 hooks=1\n[2026-08-30T08:25:36.579Z] [world] You loop your Reclaimer's Rope around the tilting submerged giant statue and walk the line. Tier 2/3 cleared.\n",
+      "[2026-08-30T08:25:36.580Z] [world] You reach the last stretch of the tilting submerged giant statue (tier 2/3). Higher still to go.\n[2026-08-30T08:25:36.580Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n[2026-08-30T08:25:36.581Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:25:36.581Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-30T08:25:36.878Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 6329ms read 0ms/write 0ms in 744t\u2192out 0t (0ch)\n[2026-08-30T08:25:36.983Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6329ms \u2014 intro-fill:\u2205\n[2026-08-30T08:25:36.984Z] [debug] homework: scene_intro \"Builders' Survey Camp\" \u2205 6546ms\n[2026-08-30T08:25:37.074Z] [cognitive] CLIMB  (1789ms)\n",
+      "[2026-08-30T08:25:37.158Z] [cognitive] CLIMB  (576ms)\n[2026-08-30T08:25:37.275Z] [debug] ui: tap \"climb up (2/3)\"\n[2026-08-30T08:25:37.307Z] [player] climb tilting submerged giant statue\n[2026-08-30T08:25:37.308Z] [debug] parser: intent=climb conf=1.00 verb=climb target=tilting submerged giant statue resolved=tilting submerged giant statue range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:25:37.336Z] [world] You loop your Reclaimer's Rope around the tilting submerged giant statue and walk the line. Tier 3/3 cleared.\n[2026-08-30T08:25:37.336Z] [world] You reach the top of the tilting submerged giant statue (tier 3/3). The view changes; the room reads differently from here.\n",
+      "[2026-08-30T08:25:37.337Z] [reward] \u2726 Aetheric Shard (Uncommon) \u2014 tucked into a crack at the top of the tilting submerged giant statue.\n[2026-08-30T08:25:37.337Z] [world] A bowl-shaped roost matted with feathers and bone fragments. The smell is still warm.\n[2026-08-30T08:25:37.337Z] [combat] Aetheric Raven is here \u2014 and it has seen you.\n",
+      "[2026-08-30T08:25:37.338Z] [debug] enemy: Aetheric Raven hp=18 ac=10 atk=Beak Peck dmg=1D6 rarity=Common ap=4\n[2026-08-30T08:25:37.338Z] [debug] arbiter: template (reason=combat)\n[2026-08-30T08:25:37.338Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:25:37.338Z] [system] \u23f3 Time passed: 30 min\n[2026-08-30T08:25:37.501Z] [cognitive] CLIMB  (161ms)\n",
+      "[2026-08-30T08:25:37.819Z] [debug] persist sizes(KB): total=164 player=29 wm=51[rooms=22 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=5\n[2026-08-30T08:25:41.912Z] [debug] ui: tap \"\u2744 golem pike\"\n[2026-08-30T08:25:41.920Z] [reward] \u2726 The corruption tightens its grip \u2014 Tainted. (CHA \u22121)\n",
+      "[2026-08-30T08:25:41.920Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-08-30T08:25:41.954Z] [player] attack with the crude golem pike\n[2026-08-30T08:25:41.955Z] [debug] parser: intent=attack conf=1.00 verb=attack target=crude golem pike resolved=Crude Golem Pike range=mid enemies=1 hooks=0\n",
+      "[2026-08-30T08:25:41.956Z] [debug] attack: target=Aetheric Raven range=mid reach.bands=[mid,close] reach.label=Crude Golem Pike bareHand=false\n[2026-08-30T08:25:41.992Z] [world] Your frost-rimed crude golem pike comes around in an arc; Aetheric Raven squares up to meet it.\n[2026-08-30T08:25:41.992Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:25:42.129Z] [cognitive] TAKE_COVER  (136ms)\n",
+      "[2026-08-30T08:25:49.812Z] [world] You seize the initiative. Aetheric Raven has no time to react.\n[2026-08-30T08:25:49.813Z] [combat] You \u2014 d20 \u2192 17 + STR 9 = 26 vs Aetheric Raven AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:25:49.814Z] [combat] Piercing flares \u2014 +2 on hit.\n[2026-08-30T08:25:49.815Z] [combat] Aetheric Raven takes 8 with the frost-rimed crude golem pike. It reels: 10 left. Then it fights back.\n",
+      "[2026-08-30T08:25:49.816Z] [combat] Frost-Rimed Crude Golem Pike \u2014 2 cold bites in and festers (3 turns).\n[2026-08-30T08:25:49.821Z] [combat] Aetheric Raven \u2014 d20 \u2192 17 + ATK 5 = 22 vs your AC 19 \u2014 \u2713 HIT\n[2026-08-30T08:25:49.990Z] [combat] Aetheric Raven deals 1 piercing damage [edge of reach \u2014 halved]. You have 18 HP remaining.\n[2026-08-30T08:25:50.913Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n",
+      "[2026-08-30T08:25:50.958Z] [player] attack with the off-hand bone crossbow\n[2026-08-30T08:25:50.960Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n[2026-08-30T08:25:50.960Z] [debug] attack: target=Aetheric Raven range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-30T08:25:50.988Z] [world] Your searing bone crossbow comes around in an arc; Aetheric Raven squares up to meet it.\n[2026-08-30T08:25:50.988Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:25:51.125Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (136ms)\n[2026-08-30T08:25:57.221Z] [world] Aetheric Raven moves first. The pressure is immediate.\n",
+      "[2026-08-30T08:25:57.223Z] [combat] Aetheric Raven \u2014 d20 \u2192 5 + ATK 5 = 10 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:25:57.223Z] [combat] You \u2014 d20 \u2192 20 + DEX 19 = 39 vs Aetheric Raven AC 10 \u2014 \u2713 CRITICAL HIT\n[2026-08-30T08:25:57.224Z] [combat] Your blow with the searing bone crossbow lands clean \u2014 17 damage. Aetheric Raven crumples in the dust. The Aetherstone settles.\n",
+      "[2026-08-30T08:25:57.225Z] [reward] Aetheric Raven defeated. You recover Aether Wing.\n[2026-08-30T08:25:57.226Z] [reward] +9 TC pried from the dust.\n[2026-08-30T08:25:57.262Z] [arbiter] The Arbiter looks around. \"A wall of small stones grows at the camp's south edge, one placed for each pilgrim who went down.\"\n[2026-08-30T08:25:59.218Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-30T08:26:00.764Z] [world] You break the bone fragments apart. Among the pieces, something worth keeping.\n[2026-08-30T08:26:00.764Z] [world] You salvage the matted nest. The take is small but real.\n[2026-08-30T08:26:00.764Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:26:00.765Z] [reward]     \u2022 Worn Tartarian Coin x10 (Common)\n[2026-08-30T08:26:00.765Z] [reward]     \u2022 Mud Fragment (Common)\n",
+      "[2026-08-30T08:26:01.800Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:26:03.194Z] [player] investigate roost\n[2026-08-30T08:26:03.195Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=roost resolved=roost range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:26:03.196Z] [world] You take the measure of the roost. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.\n[2026-08-30T08:26:03.320Z] [cognitive] neutral  (123ms)\n[2026-08-30T08:26:04.434Z] [player] investigate feathers\n",
+      "[2026-08-30T08:26:04.435Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=feathers resolved=feathers range=- enemies=0 hooks=0\n[2026-08-30T08:26:04.436Z] [world] You look the feathers over. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n",
+      "[2026-08-30T08:26:04.437Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:26:04.437Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:26:05.488Z] [debug] qwen\u23f1 investigate_lore ok 2181ms read/write unusable (native mis-reported 34005ms/890ms \u2014 llama.rn split bug, not this call) in 128t\u2192out 28t (136ch)\n",
+      "[2026-08-30T08:26:05.691Z] [cognitive] SEARCH  (1252ms)\n[2026-08-30T08:26:05.782Z] [debug] ui: tap \"climb down\"\n[2026-08-30T08:26:05.789Z] [player] climb down\n[2026-08-30T08:26:05.789Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:26:05.790Z] [world] You climb down from the roost and rejoin the ground beside the tilting submerged giant statue. Boots back on the ground.\n[2026-08-30T08:26:05.790Z] [world] Soot stands and stretches as you hit the ground. She has waited.\n[2026-08-30T08:26:05.790Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n",
+      "[2026-08-30T08:26:05.790Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:26:05.791Z] [system] \u23f3 Time passed: 15 min\n[2026-08-30T08:26:05.891Z] [cognitive] CLIMB  (99ms)\n[2026-08-30T08:26:07.165Z] [debug] qwen\u23f1 investigate_lore ok 2590ms wait 1115ms read 365ms/write 1092ms in 127t\u2192out 36t 2.9ms/t (169ch)\n",
+      "[2026-08-30T08:26:10.249Z] [debug] persist sizes(KB): total=163 player=29 wm=52[rooms=23 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=3\n[2026-08-30T08:26:15.464Z] [debug] homework: intro-fill armed after 8785ms idle\n[2026-08-30T08:26:24.556Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9083ms read 7917ms/write 1124ms in 742t\u2192out 33t 10.7ms/t HIT-CAP (134ch)\n",
+      "[2026-08-30T08:26:24.572Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9083ms \u2014 intro-fill:action-opener\n[2026-08-30T08:26:24.572Z] [debug] homework: scene_intro \"Builders' Survey Camp\" \u2713 9110ms\n[2026-08-30T08:27:00.511Z] [debug] homework: intro-fill armed after 8946ms idle\n",
+      "[2026-08-30T08:27:01.736Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1221ms read 0ms/write 1183ms in 742t\u2192out 34t HIT-CAP (152ch)\n[2026-08-30T08:27:01.749Z] [debug] homework: scene_intro \"Builders' Survey Camp\" \u2713 1240ms\n[2026-08-30T08:27:28.384Z] [debug] appstate: active \u2192 background (was active for 753527ms)\n",
+      "[2026-08-30T08:28:06.500Z] [debug] appstate: background \u2192 active (was background for 38116ms)\n[2026-08-30T08:28:10.377Z] [debug] appstate: active \u2192 background (was active for 3877ms)\n[2026-08-30T08:28:14.867Z] [debug] appstate: background \u2192 active (was background for 4491ms)\n[2026-08-30T08:28:18.320Z] [debug] appstate: active \u2192 background (was active for 3453ms)\n",
+      "[2026-08-30T08:28:27.833Z] [debug] appstate: background \u2192 active (was background for 9512ms)\n[2026-08-30T08:28:31.496Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-30T08:28:31.745Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a051b9-dc07-70ba-85f0-a0c79bdb92ad\n[2026-08-30T08:28:31.745Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-30T08:28:31.867Z] [debug] ota: Already up to date\n[2026-08-30T08:28:31.868Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T08:28:31.937Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-30T08:28:31.937Z] [debug] voice: bundled idle\n[2026-08-30T08:28:32.499Z] [debug] send-log: bundle #mtfj7rmu3rzy attempt 2/5 delivered to Sentry\n",
+      "[2026-08-30T13:50:23.977Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a051b9-dc07-70ba-85f0-a0c79bdb92ad\n[2026-08-30T13:50:23.977Z] [debug] ota: Checking\u2026\n[2026-08-30T13:50:24.943Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-30T13:50:25.051Z] [debug] ota: Saving progress\u2026\n[2026-08-30T13:50:25.053Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-08-30T13:50:25.134Z] [debug] ota: boot check result = applied\n[2026-08-30T13:50:25.273Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05233-daa6-71c7-ace4-912c1ccdd272\n[2026-08-30T13:50:25.273Z] [debug] ota: Checking\u2026\n[2026-08-30T13:50:25.379Z] [debug] ota: Already up to date\n[2026-08-30T13:50:25.380Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-30T13:50:25.450Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-30T13:50:25.450Z] [debug] voice: bundled idle\n[2026-08-30T13:50:26.252Z] [debug] send-log: bundle #mtfj7rmu3rzy attempt 3/5 delivered to Sentry\n[2026-08-30T13:50:29.117Z] [debug] OTA applied: 2026-08-30-1567-the-heartbeat-ate-the-checkpoint \u2192 2026-08-30-1568-one-strin"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 22/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtg55shijei7"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "22"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T18:27:04.315888Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T18:27:05.001000Z",
+  "fingerprints": [
+    "f954e4a09440bd3f4a4806ae1d4d19aa"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "7f3795256cf34908bd10d3e72e29ad4b",
+  "previousEventID": "6e209525ee5d46f18dac023332ea8374"
+}

@@ -1,0 +1,200 @@
+{
+  "id": "8084ecc9aeb64e7fa3e04b162badcf6c",
+  "groupID": "7701135687",
+  "eventID": "8084ecc9aeb64e7fa3e04b162badcf6c",
+  "projectID": "4511945117532160",
+  "size": 17808,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 26/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 26/28]",
+  "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 26/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "9394a627eb254079a1b5f345484de6b1",
+      "span_id": "8a1307759b1f5a69",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "-08-30T16:11:38.692Z] [world] Soot does the old circle \u2014 some instinct about grass that has not been grass in a thousand years.\n[2026-08-30T16:11:38.692Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 21, morning)\n[2026-08-30T16:11:38.693Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:38.701Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-08-30T16:11:38.702Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T16:11:38.702Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:38.703Z] [system] \u23f3 Time passed: 8h\n[2026-08-30T16:11:38.810Z] [cognitive] REST  (106ms)\n",
+      "[2026-08-30T16:11:39.130Z] [debug] persist sizes(KB): total=161 player=29 wm=52[rooms=23 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=77 scene=3\n[2026-08-30T16:11:39.373Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:11:39.376Z] [player] rest\n[2026-08-30T16:11:39.377Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-30T16:11:39.378Z] [world] Her ribs rise and fall and slow until you cannot hear them.\n[2026-08-30T16:11:39.378Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 21, evening)\n[2026-08-30T16:11:39.378Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-30T16:11:39.422Z] [reward] \u2726 The watch sharpens your sense of the dark. +1 WIS (base 5, 6 as you stand).\n[2026-08-30T16:11:39.428Z] [system] \u23f3 Time passed: 8h\n[2026-08-30T16:11:39.517Z] [cognitive] REST  (88ms)\n[2026-08-30T16:11:40.041Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:11:40.052Z] [player] rest\n",
+      "[2026-08-30T16:11:40.053Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T16:11:40.055Z] [world] You listen for her breathing and lose it in the wind, which means she is asleep.\n[2026-08-30T16:11:40.055Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 22, night)\n",
+      "[2026-08-30T16:11:40.056Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:40.066Z] [system] \u23f3 Time passed: 8h\n[2026-08-30T16:11:40.174Z] [cognitive] REST  (107ms)\n[2026-08-30T16:11:40.723Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:11:40.730Z] [player] rest\n[2026-08-30T16:11:40.731Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-30T16:11:40.739Z] [world] Two breaths in the dark: yours, and one shorter.\n[2026-08-30T16:11:40.739Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 22, morning)\n[2026-08-30T16:11:40.740Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-30T16:11:40.740Z] [world] Pre-dawn light catches a glint near your boots. The silt offered you something while you weren't looking.\n[2026-08-30T16:11:40.749Z] [system] \u23f3 Time passed: 8h\n[2026-08-30T16:11:40.854Z] [cognitive] REST  (104ms)\n[2026-08-30T16:11:41.510Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:11:41.512Z] [player] rest\n",
+      "[2026-08-30T16:11:41.513Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T16:11:41.513Z] [world] Her breathing finds your rhythm and then falls behind it, deeper.\n[2026-08-30T16:11:41.513Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 22, evening)\n",
+      "[2026-08-30T16:11:41.513Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:41.517Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-30T16:11:41.517Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T16:11:41.518Z] [system] \u23f3 Time passed: 8h\n[2026-08-30T16:11:41.597Z] [cognitive] REST  (78ms)\n[2026-08-30T16:11:42.091Z] [debug] ui: tap \"rest\"\n",
+      "[2026-08-30T16:11:42.101Z] [player] rest\n[2026-08-30T16:11:42.102Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T16:11:42.104Z] [world] Soot presses a shoulder against your leg and leaves it there.\n[2026-08-30T16:11:42.105Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 23, night)\n",
+      "[2026-08-30T16:11:42.105Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:42.115Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-30T16:11:42.118Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T16:11:42.119Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-08-30T16:11:42.120Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-08-30T16:11:42.120Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"There's coin on the board for a willing blade,\" the Arbiter\u2026\"\n[2026-08-30T16:11:42.223Z] [cognitive] REST  (103ms)\n",
+      "[2026-08-30T16:11:42.576Z] [debug] persist sizes(KB): total=160 player=29 wm=52[rooms=23 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=76 scene=3\n[2026-08-30T16:11:42.740Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:11:42.745Z] [player] rest\n[2026-08-30T16:11:42.745Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-30T16:11:42.746Z] [world] The cold comes up out of the ground and stops at the length of her.\n[2026-08-30T16:11:42.746Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 23, morning)\n[2026-08-30T16:11:42.747Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:42.755Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-08-30T16:11:42.755Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T16:11:42.755Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:42.756Z] [system] \u23f3 Time passed: 8h\n[2026-08-30T16:11:42.869Z] [cognitive] REST  (112ms)\n[2026-08-30T16:11:43.424Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:11:43.432Z] [player] rest\n",
+      "[2026-08-30T16:11:43.433Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T16:11:43.435Z] [world] Soot takes the side the wind is on. She did not make a show of it.\n[2026-08-30T16:11:43.435Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 23, evening)\n",
+      "[2026-08-30T16:11:43.436Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:43.448Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-30T16:11:43.449Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T16:11:43.449Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:43.450Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-08-30T16:11:43.557Z] [cognitive] REST  (106ms)\n[2026-08-30T16:11:52.366Z] [reward] Sold Architect's Aetheric Boots to Riska Panhandle for 6 TC. (271 TC on hand)\n[2026-08-30T16:11:52.401Z] [reward] Sold Crude Golem Pike to Riska Panhandle for 5 TC. (276 TC on hand)\n[2026-08-30T16:12:01.747Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:12:01.760Z] [player] rest\n",
+      "[2026-08-30T16:12:01.761Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T16:12:01.763Z] [world] Somewhere in the night she has moved closer without waking.\n[2026-08-30T16:12:01.764Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 24, night)\n",
+      "[2026-08-30T16:12:01.764Z] [world] You shake out your cloak in the morning. Something small falls free that you don't remember picking up.\n[2026-08-30T16:12:01.776Z] [system] \u23f3 Time passed: 8h\n[2026-08-30T16:12:01.883Z] [cognitive] REST  (106ms)\n",
+      "[2026-08-30T16:12:02.210Z] [debug] persist sizes(KB): total=159 player=29 wm=52[rooms=23 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=76 scene=3\n[2026-08-30T16:12:02.663Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:12:02.673Z] [player] rest\n[2026-08-30T16:12:02.674Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-30T16:12:02.676Z] [world] Soot lies down facing the way you came in.\n[2026-08-30T16:12:02.676Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 24, morning)\n[2026-08-30T16:12:02.686Z] [system] \u23f3 Time passed: 8h\n[2026-08-30T16:12:02.820Z] [cognitive] REST  (132ms)\n[2026-08-30T16:12:03.228Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:12:03.236Z] [player] rest\n",
+      "[2026-08-30T16:12:03.236Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T16:12:03.237Z] [world] One ear stays up. It does not come down all night.\n[2026-08-30T16:12:03.238Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 24, evening)\n[2026-08-30T16:12:03.244Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-08-30T16:12:03.343Z] [cognitive] REST  (98ms)\n[2026-08-30T16:12:03.830Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:12:03.840Z] [player] rest\n[2026-08-30T16:12:03.841Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T16:12:03.842Z] [world] Soot sleeps the way a working animal sleeps \u2014 most of the way, and no further.\n",
+      "[2026-08-30T16:12:03.843Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 25, night)\n[2026-08-30T16:12:03.843Z] [world] You wake briefly. The Aetheric haze has cleared enough that for a heartbeat you can see further than usual.\n[2026-08-30T16:12:03.853Z] [system] \u23f3 Time passed: 8h\n[2026-08-30T16:12:03.961Z] [cognitive] REST  (107ms)\n",
+      "[2026-08-30T16:12:04.481Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:12:04.492Z] [player] rest\n[2026-08-30T16:12:04.493Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T16:12:04.495Z] [world] Twice she lifts her head at nothing, and twice puts it back.\n",
+      "[2026-08-30T16:12:04.495Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 25, morning)\n[2026-08-30T16:12:04.509Z] [system] \u23f3 Time passed: 8h\n[2026-08-30T16:12:04.611Z] [cognitive] REST  (101ms)\n[2026-08-30T16:12:05.199Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-30T16:12:05.224Z] [world] You walk east. You arrive at Builders' Survey Camp.\n",
+      "[2026-08-30T16:12:05.225Z] [debug] scene: loc=builders_survey_camp hub=- arrival=y opening=n passing=y\n[2026-08-30T16:12:05.276Z] [debug] spawn: gear=[Mud-Stalker Leggings, Rough-Hewn Chestplate] window=10 roster=new\n[2026-08-30T16:12:05.294Z] [world] Soot noses at the blood-spotted cloth and snorts. There's something there.\n",
+      "[2026-08-30T16:12:05.298Z] [world] You've left Tartarian Pilgrim Camp and entered Builders' Survey Camp. Theodolite stakes march to the edge of the ruin-field and stop, like a sentence that thought better of itself. It's midday. Nobody else is in sight. east leads to Giant-Watch Shrine; west leads to Tartarian Pilgrim Camp. Nothing named to the north or south.\n",
+      "[2026-08-30T16:12:05.301Z] [world] [Builders' Survey Camp] north: the Silt Thief (19 tiles, 2 days) \u00b7 east: Great Tartary Plains (5 tiles, 13 hours) \u00b7 south: Obsidian Pillars (6 tiles, 15 hours) \u00b7 west: Sinking Cathedral (3 tiles, 8 hours)\n[2026-08-30T16:12:05.301Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-08-30T16:12:05.301Z] [arbiter] \"You have put down 22 things in Tartaria so far,\" the Arbiter says. \"None of them got up. That counts for something.\"\n[2026-08-30T16:12:05.307Z] [arbiter] \"Every walker checks their gear at first light,\" the Arbiter says. \"You check the hum first \u2014 pitch, direction, mood \u2014 and your gear after. I have kept the ledger a long time. The ones who hear it either lear",
+      "n its grammar or are unmade by its grammar. You appear to be learning. Continue.\"\n[2026-08-30T16:12:05.307Z] [world] It is as thin as it gets. Whatever you are still carrying is worth more than what anybody will sell you.\n[2026-08-30T16:12:05.728Z] [debug] persist sizes(KB): total=159 player=29 wm=51[rooms=22 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=76 scene=3\n",
+      "[2026-08-30T16:12:06.583Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:12:06.590Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-08-30T16:12:06.594Z] [player] rest\n[2026-08-30T16:12:06.595Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-30T16:12:06.597Z] [world] Soot settles, but her eyes take a while to agree to it.\n[2026-08-30T16:12:06.597Z] [world] You rest for 8 hours. +1 stamina recovered. (Day 25, evening)\n[2026-08-30T16:12:06.598Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:12:06.606Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:12:06.607Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-08-30T16:12:06.721Z] [cognitive] REST  (113ms)\n[2026-08-30T16:12:09.348Z] [debug] ui: tap \"\u2605 Take & wear Rough-Hewn Chestplate \u2014 your chest slot is bare\"\n[2026-08-30T16:12:09.351Z] [world] You take the Rough-Hewn Chestplate from where it lay.\n[2026-08-30T16:12:09.352Z] [reward] \u2726 Rough-Hewn Chestplate (Common).\n",
+      "[2026-08-30T16:12:09.367Z] [debug] take&wear: equipping \"Rough-Hewn Chestplate\" -> chest\n[2026-08-30T16:12:09.408Z] [debug] stats: STR8 DEX20 INT12 WIS6 CHA2 STE6 | gear: DEX+13,INT+3,STR+4,STE+3,WIS+1 | worn: main=Reclaimers Guild Geode-Cored Cleaver off=Bone Crossbow head=Forgotten Seeker's Mask chest=Rough-Hewn Chestplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer",
+      "'s Footwraps cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-08-30T16:12:11.051Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T16:12:12.421Z] [world] You pick up the Mud-Stalker Leggings.\n[2026-08-30T16:12:12.421Z] [reward] \u2726 Mud-Stalker Leggings (Common).\n",
+      "[2026-08-30T16:12:13.468Z] [reward] \u2726 Found Entry 2 \u2014 the Plains \u2014 The Greedy Reclaimer. (open Contracts \u2192 Collectibles to read)\n[2026-08-30T16:12:13.480Z] [reward] \u2726 Found A Child's Drawing \u2014 The Family in the Mud. (open Contracts \u2192 Collectibles to read)\n[2026-08-30T16:12:13.481Z] [world] You salvage the anvil post. The take is small but real.\n",
+      "[2026-08-30T16:12:13.482Z] [world] You work the bedroll over. A part of it comes loose, intact.\n[2026-08-30T16:12:13.482Z] [world] You break the blood-spotted cloth apart. Among the pieces, something worth keeping.\n[2026-08-30T16:12:13.482Z] [world] You strip the half-buried petrified mud wave carefully. Something usable comes free in your hand.\n",
+      "[2026-08-30T16:12:13.482Z] [world] You strip the lantern carefully. Something usable comes free in your hand.\n[2026-08-30T16:12:13.483Z] [world] You crack the mud-glazed toppled obelisk fragment open. A page slides out \u2014 paper somehow dry, ink somehow still legible.\n[2026-08-30T16:12:13.483Z] [world] You work the rubble over. A part of it comes loose, intact.\n",
+      "[2026-08-30T16:12:13.483Z] [world] Behind the shattered tartarian relay, where the floods didn't reach: a single page, in a hand you haven't read before.\n[2026-08-30T16:12:13.485Z] [reward] \u2726 Salvage haul:\n[2026-08-30T16:12:13.486Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-08-30T16:12:13.486Z] [reward]     \u2022 Stick x2 (Common)\n[2026-08-30T16:12:13.486Z] "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 26/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtg55shijei7"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "26"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T18:44:23.929329Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T18:44:24.931000Z",
+  "fingerprints": [
+    "f954e4a09440bd3f4a4806ae1d4d19aa"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "82ade01cc6354905acd909592d38b88f",
+  "previousEventID": "7c2f65d02fcb4a7c9c81bbf10b58354e"
+}

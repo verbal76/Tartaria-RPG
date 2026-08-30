@@ -1,0 +1,198 @@
+{
+  "id": "f00e8411336f40ecbf7715567ed723ae",
+  "groupID": "7701135687",
+  "eventID": "f00e8411336f40ecbf7715567ed723ae",
+  "projectID": "4511945117532160",
+  "size": 17862,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 19/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 19/28]",
+  "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 19/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "3e241a85a156420cbf206fad74d51e76",
+      "span_id": "84f960230db1a7b4",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "m] \u23f3 Time passed: 30 min\n[2026-08-30T08:17:51.443Z] [cognitive] USE_ITEM  (151ms)\n[2026-08-30T08:17:56.749Z] [debug] ui: tap \"craft\"\n[2026-08-30T08:17:56.750Z] [debug] ui: tap \"craft\"\n[2026-08-30T08:17:57.250Z] [debug] qwen\u23f1 ambient ok 5696ms read 2660ms/write 1086ms in 366t\u2192out 31t 7.3ms/t HIT-CAP (139ch)\n[2026-08-30T08:17:57.255Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 5696ms \u2014 ambient:\u2205\n",
+      "[2026-08-30T08:17:57.256Z] [debug] arbiter: ambient \u2205 5965ms\n[2026-08-30T08:17:57.256Z] [debug] arbiter: ambient-empty reason=unknown raw=\"You, the Companion, have traversed many paths, and now you stand at Monarch Staging Camp. The scenery here is a testamen\"\n",
+      "[2026-08-30T08:17:57.354Z] [debug] persist sizes(KB): total=179 player=48 wm=48[rooms=21 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n[2026-08-30T08:18:04.825Z] [player] summon crystal golem\n[2026-08-30T08:18:04.826Z] [debug] parser: intent=cast conf=1.00 verb=summon target=crystal golem resolved=Crude Golem Pike range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:18:04.872Z] [combat] Aether Golem Constructor \u2014 d20 7 + INT 11 = 18 vs DC 22 \u2014 \u2717 FAILED\n[2026-08-30T08:18:04.873Z] [world] (2\u00d7 Aether Crystal + 1\u00d7 Aetheric Cloth + 1\u00d7 Aetheric Shard consumed.)\n[2026-08-30T08:18:04.873Z] [world] The shape slips out of your hands. The aether returns to itself, indifferent.\n[2026-08-30T08:18:04.873Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-30T08:18:05.027Z] [cognitive] USE_ITEM  (152ms)\n[2026-08-30T08:18:08.101Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:18:09.752Z] [player] investigate the mud\n[2026-08-30T08:18:09.753Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:18:09.758Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:18:09.766Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:18:09.919Z] [cognitive] SWIM  (152ms)\n[2026-08-30T08:18:10.652Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T08:18:11.037Z] [player] investigate cage\n",
+      "[2026-08-30T08:18:11.038Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cage resolved=cage range=- enemies=0 hooks=0\n[2026-08-30T08:18:11.038Z] [world] You give the cage your full attention. It returns the gesture by being exactly what it appears to be.\n[2026-08-30T08:18:11.039Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-30T08:18:11.039Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:18:11.174Z] [cognitive] neutral  (133ms)\n[2026-08-30T08:18:12.265Z] [player] investigate still pond\n[2026-08-30T08:18:12.266Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:18:12.267Z] [world] The still pond resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n[2026-08-30T08:18:12.486Z] [reward] \u2726 Found Entry 6 \u2014 the Teeth \u2014 The Greedy Reclaimer. (open Contracts \u2192 Collectibles to read)\n",
+      "[2026-08-30T08:18:12.488Z] [world] Behind the cage, where the floods didn't reach: a single page, in a hand you haven't read before.\n[2026-08-30T08:18:12.488Z] [world] You salvage the half-buried wagon. The take is small but real.\n[2026-08-30T08:18:12.489Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:18:12.489Z] [reward]     \u2022 Scrap Metal (Common)\n",
+      "[2026-08-30T08:18:13.488Z] [debug] qwen\u23f1 investigate_lore ok 2324ms read 1255ms/write 1024ms in 127t\u2192out 26t 9.9ms/t (114ch)\n[2026-08-30T08:18:13.758Z] [cognitive] SWIM  (1489ms)\n[2026-08-30T08:18:14.980Z] [debug] qwen\u23f1 investigate_lore ok 2522ms wait 1300ms read 305ms/write 887ms in 128t\u2192out 28t 2.4ms/t (129ch)\n[2026-08-30T08:18:16.054Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-30T08:18:24.610Z] [debug] qwen\u23f1 item_synthesis_hw ok 4592ms read 3536ms/write 1022ms in 332t\u2192out 31t 10.7ms/t (126ch)\n[2026-08-30T08:18:24.621Z] [debug] homework: item_desc \"Aetheric Scout Greaves\" \u2713 4616ms\n[2026-08-30T08:18:37.640Z] [reward] You work the frost paste along the weapon. Now wielding the Frost-Rimed Crude Golem Pike \u2014 1d6 cold on every landing hit.\n",
+      "[2026-08-30T08:18:52.561Z] [debug] qwen\u23f1 item_synthesis_hw ok 2516ms read 400ms/write 1620ms in 332t\u2192out 49t 1.2ms/t (196ch)\n[2026-08-30T08:18:52.565Z] [debug] homework: item_desc \"Light-Finger Guild Band\" \u2713 2532ms\n[2026-08-30T08:18:55.523Z] [debug] persist sizes(KB): total=179 player=47 wm=49[rooms=21 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n",
+      "[2026-08-30T08:18:56.568Z] [debug] ui: tap \"craft\"\n[2026-08-30T08:19:04.826Z] [world] You repair the Aetheric Scout Greaves. Back to full. (spent: Patched Cloth x4)\n[2026-08-30T08:19:04.861Z] [world] You repair the Searing Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n",
+      "[2026-08-30T08:19:04.873Z] [world] You repair the Frost-Rimed Crude Golem Pike. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-08-30T08:19:04.893Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Forgotten Seeker's Mask \u2014 1 piece of this is Crucible stock: Aether Feather. Say the word and I'll set it aside instead.\"\n",
+      "[2026-08-30T08:19:07.646Z] [arbiter] The Arbiter sets it aside on the bench. \"\u2665 Held for the Crucible: Aether Feather. I'll not touch it.\"\n[2026-08-30T08:19:09.666Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-30T08:19:09.678Z] [world] You repair the Forgotten Seeker's Mask. Back to full. (spent: Patched Cloth x6)\n",
+      "[2026-08-30T08:19:09.712Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-30T08:19:09.720Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-08-30T08:19:09.731Z] [arbiter] The Arbiter eyes the Reclaimer's Scrapplate. \"Short on stock: Patched Cloth 1 short. Gather, then return.\"\n",
+      "[2026-08-30T08:19:09.731Z] [arbiter] The Arbiter eyes the Wanderer's Footwraps. \"Short on stock: Patched Cloth 1 short. Gather, then return.\"\n[2026-08-30T08:19:09.731Z] [arbiter] The Arbiter eyes the Wanderer's Worn Gauntlets. \"Short on stock: Patched Cloth 1 short. Gather, then return.\"\n",
+      "[2026-08-30T08:19:09.731Z] [world] You repair the Aetheric Rod. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-08-30T08:19:09.747Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Bone Knife \u2014 2 pieces of this is Crucible stock: Charred Twig Bundle, Salt-Cured Dowel. Say the word and I'll set it aside instead.\"\n",
+      "[2026-08-30T08:19:12.299Z] [arbiter] The Arbiter sets it aside on the bench. \"\u2665 Held for the Crucible: Charred Twig Bundle, Salt-Cured Dowel. I'll not touch it.\"\n[2026-08-30T08:19:17.831Z] [player] craft First Aid Kit\n[2026-08-30T08:19:17.832Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:19:17.841Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the First Aid Kit \u2014 1 piece of this is Crucible stock: Glass-Beaded Strap. Say the word and I'll set it aside instead.\"\n[2026-08-30T08:19:17.884Z] [cognitive] neutral  (40ms)\n",
+      "[2026-08-30T08:19:20.301Z] [arbiter] The Arbiter sets it aside on the bench. \"\u2665 Held for the Crucible: Glass-Beaded Strap. I'll not touch it.\"\n[2026-08-30T08:19:25.019Z] [player] craft First Aid Kit\n[2026-08-30T08:19:25.020Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:19:25.051Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the First Aid Kit \u2014 1 piece of this is Crucible stock: Waxed Yarn Bundle. Say the word and I'll set it aside instead.\"\n[2026-08-30T08:19:25.066Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-30T08:19:25.066Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-30T08:19:25.096Z] [cognitive] neutral  (27ms)\n[2026-08-30T08:19:25.165Z] [debug] persist sizes(KB): total=179 player=47 wm=49[rooms=21 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=2\n[2026-08-30T08:19:30.008Z] [debug] qwen\u23f1 ambient ok 4911ms read 3860ms/write 1033ms in 366t\u2192out 31t 10.5ms/t HIT-CAP (143ch)\n",
+      "[2026-08-30T08:19:30.013Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 4911ms \u2014 ambient:\u2205\n[2026-08-30T08:19:30.013Z] [debug] arbiter: ambient \u2205 4946ms\n[2026-08-30T08:19:30.015Z] [debug] arbiter: ambient-empty reason=unknown raw=\"You, the Companion, reflect on how far you have come. The Monarch Staging Camp, with its ancient ruins and the memory of\"\n",
+      "[2026-08-30T08:19:30.219Z] [player] craft First Aid Kit\n[2026-08-30T08:19:30.220Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=- range=- enemies=0 hooks=0\n[2026-08-30T08:19:30.235Z] [arbiter] The Arbiter nods. \"Stripped for parts: Waxed Yarn Bundle \u2192 Patched Cloth.\"\n",
+      "[2026-08-30T08:19:30.248Z] [reward] \u2726 Crafted First Aid Kit. The Arbiter watches you set the last piece.\n[2026-08-30T08:19:30.602Z] [cognitive] neutral  (353ms)\n[2026-08-30T08:19:46.549Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-08-30T08:19:46.594Z] [player] summon iron golem\n",
+      "[2026-08-30T08:19:46.595Z] [debug] parser: intent=cast conf=1.00 verb=summon target=iron golem resolved=Crude Golem Pike range=- enemies=0 hooks=0\n[2026-08-30T08:19:46.639Z] [reward] Aether Golem Constructor \u2014 d20 17 + INT 11 = 28 vs DC 18 \u2014 \u2713 SUMMONED\n[2026-08-30T08:19:46.639Z] [world] (3\u00d7 Scrap Metal + 1\u00d7 Golem Core consumed.)\n",
+      "[2026-08-30T08:19:46.640Z] [world] Aetherstone lifts out of the ground and folds into a shape that walks. Iron Golem stands ready beside you. (HP 40/40, 1d8 slashing)\n[2026-08-30T08:19:46.640Z] [arbiter] The Arbiter studies the standing shape. \"You gave it life. You might as well give it a name.\"\n[2026-08-30T08:19:46.641Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-30T08:19:46.807Z] [cognitive] neutral  (165ms)\n[2026-08-30T08:19:53.532Z] [world] Plinth. The name takes hold in the Aetherstone.\n[2026-08-30T08:19:53.534Z] [arbiter] The Arbiter nods. \"Plinth, then.\"\n[2026-08-30T08:20:00.036Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:20:01.933Z] [player] investigate the mud\n",
+      "[2026-08-30T08:20:01.933Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:20:01.940Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Raspberries (Uncommon).\n[2026-08-30T08:20:01.947Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-30T08:20:01.947Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:20:01.947Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:20:02.078Z] [cognitive] SWIM  (129ms)\n[2026-08-30T08:20:03.154Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-30T08:20:03.170Z] [debug] spawn: gear=[Earthshaker, Aetheric Warplate] window=10 roster=new\n",
+      "[2026-08-30T08:20:03.172Z] [world] You strike out east. The country resists you with sameness more than distance.\n[2026-08-30T08:20:03.173Z] [world] A patch of mud just off the path pulses with a faint blue glow, in time with nothing you can hear.\n[2026-08-30T08:20:04.355Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-30T08:20:06.040Z] [world] It takes two pulls. The Earthshaker is yours on the second.\n[2026-08-30T08:20:06.041Z] [reward] \u2726 Earthshaker (Common).\n[2026-08-30T08:20:06.055Z] [world] The Aetheric Warplate resists, then does not.\n[2026-08-30T08:20:06.055Z] [reward] \u2726 Aetheric Warplate (Common).\n",
+      "[2026-08-30T08:20:07.179Z] [world] Tucked inside the bedroll: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-08-30T08:20:07.179Z] [world] You strip the cage carefully. Something usable comes free in your hand.\n[2026-08-30T08:20:07.179Z] [world] You salvage the firepit. The take is small but real.\n",
+      "[2026-08-30T08:20:07.179Z] [world] You salvage the snare. The take is small but real.\n[2026-08-30T08:20:07.179Z] [world] You work the stone marker apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-30T08:20:07.180Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:20:07.180Z] [reward]     \u2022 Slate-Weighted Netting (Common)\n",
+      "[2026-08-30T08:20:07.180Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n[2026-08-30T08:20:07.180Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-08-30T08:20:07.180Z] [reward]     \u2022 Bent Nail (Common)\n[2026-08-30T08:20:07.180Z] [reward]     \u2022 Beetle-Chitin Flake (Common)\n",
+      "[2026-08-30T08:20:07.660Z] [debug] persist sizes(KB): total=173 player=47 wm=42[rooms=15 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=2\n[2026-08-30T08:20:08.304Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:20:09.928Z] [player] investigate still pond\n",
+      "[2026-08-30T08:20:09.929Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=1\n[2026-08-30T08:20:09.931Z] [world] The still pond resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n[2026-08-30T08:20:09.932Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-30T08:20:09.932Z] [arbiter] The Arbiter looks around. \"Prayer-strips tied to the camp posts spell out names of the drowned cities, over and over.\"\n[2026-08-30T08:20:10.050Z] [cognitive] SWIM  (116ms)\n[2026-08-30T08:20:11.071Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-30T08:20:11.142Z] [reward] \u2726 Your bearing reads. +1 CHA (now 3).\n",
+      "[2026-08-30T08:20:11.143Z] [debug] spawn: gear=[Architect's Aetheric Boots] window=10 roster=new\n[2026-08-30T08:20:11.144Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Riska Panhandle, wandering trader. Tap the vendor banner to trade.\n",
+      "[2026-08-30T08:20:11.153Z] [world] Rare workings for sale: Mudstone Bulwark (200 TC), Phoenix Rebirth (500 TC), Plague Tonic (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-08-30T08:20:11.154Z] [world] You head east. Mud-flats stretch the same in every direction \u2014 only the wind tells you you've moved.\n[2026-08-30T08:20:11.154Z] [world] Whatever you turned over here is still turned over.\n[2026-08-30T08:20:11.352Z] [player] investigate the mud\n",
+      "[2026-08-30T08:20:11.352Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:20:11.352Z] [debug] route: hook intercept (kind=pulsing_mud, target=\"aether mud\") \u2014 original intent=investigate\n",
+      "[2026-08-30T08:20:11.353Z] [world] \u2605 STORY THREAD (step 1) \u2014 You step toward the glow. The mud is warm against your boot \u2014 an Aetherstone deposit, surface-thin but real.\n[2026-08-30T08:20:12.836Z] [debug] qwen\u23f1 investigate_lore ok 2688ms read 1292ms/write 1370ms in 128t\u2192out 44t 10.1ms/t (208ch)\n[2026-08-30T08:20:12.837Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n12 avg2.4s max3.1s read0.9s/write"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 19/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtg55shijei7"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "19"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T18:27:04.286522Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T18:27:05Z",
+  "fingerprints": [
+    "f954e4a09440bd3f4a4806ae1d4d19aa"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "0375ce32c36c4fcf94edaae3fa4f3c97",
+  "previousEventID": "e8b8adb1bca74e27b2724a607aa444b6"
+}

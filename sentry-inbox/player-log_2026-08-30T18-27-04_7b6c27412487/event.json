@@ -1,0 +1,198 @@
+{
+  "id": "7b6c2741248746ae9df593919993c588",
+  "groupID": "7701135687",
+  "eventID": "7b6c2741248746ae9df593919993c588",
+  "projectID": "4511945117532160",
+  "size": 17839,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 13/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 13/28]",
+  "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 13/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "3e241a85a156420cbf206fad74d51e76",
+      "span_id": "84f960230db1a7b4",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "cked Aetherkin range=close reach.bands=[close] reach.label=Cudgel bareHand=false\n[2026-08-30T08:06:53.609Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-08-30T08:06:53.642Z] [world] You raise the acid-etched cudgel toward Mud-Wracked Aetherkin. The room narrows around the both of you.\n[2026-08-30T08:06:53.642Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-30T08:06:53.795Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 TAKE_COVER \u00b7 DISENGAGE  (152ms)\n[2026-08-30T08:07:00.204Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n[2026-08-30T08:07:00.206Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 20 + ATK 4 = 24 vs your AC 19 \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-08-30T08:07:00.207Z] [combat] You \u2014 d20 \u2192 17 + STR 6 \u2212 2 (Iron Fog) = 21 vs Mud-Wracked Aetherkin AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:07:00.208Z] [combat] Bludgeoning flares \u2014 +1 on hit.\n[2026-08-30T08:07:00.208Z] [combat] Mud-Wracked Aetherkin shrugs off the bludgeoning. (resisted, \u00d70.5 for 6)\n",
+      "[2026-08-30T08:07:00.212Z] [combat] The bludgeoning has worn Mud-Wracked Aetherkin's guard through \u2014 it bites full from here.\n[2026-08-30T08:07:00.213Z] [combat] Your strike with the acid-etched cudgel lands for 6. Mud-Wracked Aetherkin staggers \u2014 36 HP remaining. It answers.\n",
+      "[2026-08-30T08:07:00.214Z] [combat] Acid-Etched Cudgel \u2014 3 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-08-30T08:07:00.214Z] [combat] Mud-Wracked Aetherkin is left exposed \u2014 easier to hit.\n",
+      "[2026-08-30T08:07:00.214Z] [arbiter] \"There are two killers here right now,\" the Arbiter says, watching the mud-wracked aetherkin. \"Be the calmer one.\"\n[2026-08-30T08:07:00.404Z] [combat] Mud-Wracked Aetherkin deals 7 aetheric damage [armor \u221239%]. You have 29 HP remaining.\n[2026-08-30T08:07:02.617Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-30T08:07:10.097Z] [debug] persist sizes(KB): total=161 player=38 wm=38[rooms=12 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=3\n[2026-08-30T08:07:12.613Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-30T08:07:27.892Z] [debug] stats: STR6 DEX18 INT11 WIS4 CHA2 STE6 | gear: DEX+12,INT+2,STR+2,STE+3 | worn: main=Cudgel off=Bone Crossbow head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak ring=Light-Finger Guild Band\n",
+      "[2026-08-30T08:07:38.786Z] [debug] stats: STR6 DEX19 INT11 WIS4 CHA2 STE6 | gear: DEX+13,INT+2,STR+2,STE+3 | worn: main=Aetheric Rod off=Bone Crossbow head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak ring=Light-Finger Guild Band\n",
+      "[2026-08-30T08:07:43.214Z] [debug] ui: tap \"inventory\"\n[2026-08-30T08:08:02.230Z] [reward] You work the searing paste along the weapon. Now wielding the Searing Bone Crossbow \u2014 1d4 burn on every landing hit.\n[2026-08-30T08:08:06.800Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-30T08:08:06.844Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-30T08:08:06.844Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=1\n[2026-08-30T08:08:06.845Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 3. (33/95 HP, 2 turns left)\n",
+      "[2026-08-30T08:08:06.845Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-30T08:08:06.846Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-08-30T08:08:06.879Z] [world] Your searing bone crossbow comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n",
+      "[2026-08-30T08:08:06.879Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:08:07.046Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (165ms)\n[2026-08-30T08:08:07.233Z] [debug] persist sizes(KB): total=161 player=38 wm=39[rooms=12 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=3\n",
+      "[2026-08-30T08:08:14.077Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-08-30T08:08:14.077Z] [combat] You \u2014 d20 \u2192 17 + DEX 18 \u2212 2 (Iron Fog) + 2 (point blank) = 35 vs Mud-Wracked Aetherkin AC 8 \u2014 \u2713 HIT\n[2026-08-30T08:08:14.078Z] [combat] Mud-Wracked Aetherkin shrugs off the piercing. (resisted, \u00d70.5 for 6)\n",
+      "[2026-08-30T08:08:14.079Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Aetherium Spear \u2014 aetheric or burn will bite where piercing won't.\"\n[2026-08-30T08:08:14.080Z] [combat] Your strike with the searing bone crossbow lands for 6. Mud-Wracked Aetherkin staggers \u2014 27 HP remaining. It answers.\n",
+      "[2026-08-30T08:08:14.081Z] [combat] Searing Bone Crossbow \u2014 2 burn bites in and festers (3 turns).\n[2026-08-30T08:08:14.082Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 14 + ATK 4 = 18 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:08:16.135Z] [debug] ui: tap \"dodge\"\n[2026-08-30T08:08:16.155Z] [player] dodge\n",
+      "[2026-08-30T08:08:16.156Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-30T08:08:16.156Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-30T08:08:16.156Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 3. (24/95 HP, 1 turn left)\n[2026-08-30T08:08:16.157Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 2. (22/95 HP, 2 turns left)\n[2026-08-30T08:08:16.195Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 16 + ATK 4 = 20 vs your AC 19 \u2014 \u2717 EVADED\n",
+      "[2026-08-30T08:08:16.195Z] [combat] Dodge \u2014 d20 \u2192 10 + DEX 19 = 29 vs ATK 20. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-30T08:08:16.196Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:08:16.361Z] [cognitive] neutral  (164ms)\n[2026-08-30T08:08:17.100Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-30T08:08:17.145Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-30T08:08:17.145Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=1\n[2026-08-30T08:08:17.146Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 3. (19/95 HP, 0 turns left)\n[2026-08-30T08:08:17.146Z] [combat] Mud-Wracked Aetherkin shakes off the last of the acid \u2014 the Cudgel has run its course.\n",
+      "[2026-08-30T08:08:17.146Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 2. (17/95 HP, 1 turn left)\n[2026-08-30T08:08:17.146Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-30T08:08:17.147Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n",
+      "[2026-08-30T08:08:17.147Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-30T08:08:17.180Z] [world] Your searing bone crossbow comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n[2026-08-30T08:08:17.181Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:08:17.337Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (156ms)\n",
+      "[2026-08-30T08:08:24.887Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-08-30T08:08:24.887Z] [combat] You \u2014 d20 \u2192 3 + DEX 18 \u2212 2 (Iron Fog) + 2 (point blank) perfect opening (2\u00d7 dice) = 21 vs Mud-Wracked Aetherkin AC 9 \u2014 \u2713 HIT\n[2026-08-30T08:08:24.888Z] [combat] Mud-Wracked Aetherkin shrugs off the piercing. (resisted, \u00d70.5 for 18)\n",
+      "[2026-08-30T08:08:24.890Z] [combat] Final strike with the searing bone crossbow for 18. Mud-Wracked Aetherkin is still. The Aetherstone hums on, indifferent.\n[2026-08-30T08:08:24.891Z] [reward] Mud-Wracked Aetherkin defeated. You recover Aether Mud, Aetherstone Fragment, Veil of Peace.\n[2026-08-30T08:08:24.894Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n",
+      "[2026-08-30T08:08:24.894Z] [system] Word travels among those who keep the flood-dead sacred: you put one of the Aetherkin down.\n[2026-08-30T08:08:24.894Z] [reward] +12 TC pried from the dust.\n[2026-08-30T08:08:27.604Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T08:08:28.691Z] [debug] homework: intro-fill armed after 10570ms idle\n",
+      "[2026-08-30T08:08:29.156Z] [world] You work the Rusty Shortbow loose from where the mud had it.\n[2026-08-30T08:08:29.157Z] [reward] \u2726 Rusty Shortbow (Common).\n[2026-08-30T08:08:29.169Z] [world] The Shaman's Mud Helm had settled into the ground. You unsettle it.\n[2026-08-30T08:08:29.169Z] [reward] \u2726 Shaman's Mud Helm (Common).\n",
+      "[2026-08-30T08:08:30.711Z] [world] You scavenge the barrel thoroughly. One Stick survives the sorting.\n[2026-08-30T08:08:30.711Z] [world] You work the jagged ruined skyscraper over. A part of it comes loose, intact.\n[2026-08-30T08:08:30.711Z] [world] You lever something loose from the shattered tartarian relay \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-08-30T08:08:30.711Z] [world] You salvage the signpost. The take is small but real.\n[2026-08-30T08:08:30.712Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:08:30.712Z] [reward]     \u2022 Stick (Common)\n[2026-08-30T08:08:30.712Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-08-30T08:08:30.712Z] [reward]     \u2022 Glass-Beaded Strap (Uncommon)\n",
+      "[2026-08-30T08:08:30.712Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-08-30T08:08:32.886Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-30T08:08:32.894Z] [debug] spawn: gear=[Lost Seeker's Gloves, Architect's Grip, Relic Hunter's Gauntlets] window=10 roster=new\n",
+      "[2026-08-30T08:08:32.895Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n[2026-08-30T08:08:32.895Z] [world] You set out east. Your boots sink half an inch into the mud-flats and pull free with each step.\n[2026-08-30T08:08:32.896Z] [world] The loose end is exactly as loose as you left it.\n",
+      "[2026-08-30T08:08:34.403Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T08:08:36.508Z] [world] Whatever the Architect's Grip was lying against, it lets go without much argument.\n[2026-08-30T08:08:36.508Z] [reward] \u2726 Architect's Grip (Common).\n[2026-08-30T08:08:36.522Z] [world] The Lost Seeker's Gloves is heavier than it looks. Most things down here are.\n",
+      "[2026-08-30T08:08:36.522Z] [reward] \u2726 Lost Seeker's Gloves (Common).\n[2026-08-30T08:08:36.524Z] [world] The Relic Hunter's Gauntlets is lighter than it looks, which is its own kind of warning.\n[2026-08-30T08:08:36.524Z] [reward] \u2726 Relic Hunter's Gauntlets (Uncommon).\n",
+      "[2026-08-30T08:08:36.982Z] [debug] persist sizes(KB): total=162 player=40 wm=40[rooms=12 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=3\n[2026-08-30T08:08:37.191Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 8366ms read 7333ms/write 996ms in 736t\u2192out 30t 10.0ms/t (146ch)\n[2026-08-30T08:08:37.301Z] [debug] homework: scene_intro \"Dynasty Border Post\" \u2713 8611ms\n",
+      "[2026-08-30T08:08:37.606Z] [reward] \u2726 Found Chit 5 \u2014 Intruder \u2014 Logic Core 04-B. (open Contracts \u2192 Collectibles to read)\n[2026-08-30T08:08:37.625Z] [world] Wedged into the barrel, half-hidden by the dust: a sealed letter. You pocket it carefully.\n[2026-08-30T08:08:37.625Z] [world] You work the cart apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-08-30T08:08:37.625Z] [world] You lever something loose from the rusted petrified mud wave \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-30T08:08:37.625Z] [world] You break the sign apart. Among the pieces, something worth keeping.\n[2026-08-30T08:08:37.626Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-30T08:08:37.626Z] [reward]     \u2022 Waxed Yarn Bundle (Common)\n[2026-08-30T08:08:37.626Z] [reward]     \u2022 Iron-Pinned Plank Shard (Uncommon)\n[2026-08-30T08:08:37.626Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-08-30T08:08:39.887Z] [debug] ui: tap \"ENTER\"\n[2026-08-30T08:08:39.888Z] [world] You step inside the old workshed, into the shed.\n",
+      "[2026-08-30T08:08:39.888Z] [world] Tools hang on pegs over a scarred workbench; the air is oil and dust. The floorboards by the bench sit oddly proud, as if something underneath pushes them up.\n[2026-08-30T08:08:41.356Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T08:08:42.581Z] [world] You strip the workbench carefully. Something usable comes free in your hand.\n",
+      "[2026-08-30T08:08:42.582Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:08:42.582Z] [reward]     \u2022 Stick x2 (Common)\n[2026-08-30T08:08:45.843Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:08:47.463Z] [player] investigate the mud\n[2026-08-30T08:08:47.464Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:08:47.469Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:08:47.476Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:08:47.596Z] [cognitive] SWIM  (119ms)\n[2026-08-30T08:08:48.214Z] [debug] ui: tap \"\u2197 Bedroom\"\n[2026-08-30T08:08:48.215Z] [world] You step into the bedroom.\n",
+      "[2026-08-30T08:08:48.216Z] [world] Somebody slept in here long after the shed stopped being a shed \u2014 a low bed under the eaves, a cupboard of stoppered jars, and a lamp burned down to its socket.\n[2026-08-30T08:08:48.715Z] [player] investigate tools\n[2026-08-30T08:08:48.716Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tools resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:08:48.718Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:08:48.718Z] [arbiter] The Arbiter looks around. \"The garrison's roll-call includes names no one answers to. They are called anyway, every morning.\"\n[2026-08-30T08:08:48.722Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T08:08:49.498Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-30T08:08:49.947Z] [player] investigate pegs\n[2026-08-30T08:08:49.948Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pegs resolved=- range=- enemies=0 hooks=0\n[2026-08-30T08:08:49.950Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-30T08:08:51.771Z] [world] You lever something loose from the bed \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-30T08:08:51.771Z] [world] You salvage the cupboard. The take is small but real.\n[2026-08-30T08:08:51.771Z] [world] You strip the jars carefully. Something usable comes free in your hand.\n",
+      "[2026-08-30T08:08:51.771Z] [world] You strip the lamp carefully. Something usable comes free in your hand.\n[2026-08-30T08:08:51.771Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:08:51.771Z] [reward]     \u2022 Weathered Granite Knob (Common)\n[2026-08-30T08:08:51.772Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-30T08:08:51.772Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n",
+      "[2026-08-30T08:08:51.772Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-30T08:08:52.656Z] [player] investigate floorboards\n[2026-08-30T08:08:52.657Z] [world] Hidden until "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 13/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtg55shijei7"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "13"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T18:27:04.225592Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T18:27:04.998000Z",
+  "fingerprints": [
+    "f954e4a09440bd3f4a4806ae1d4d19aa"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "aa6a909140224530bb2295fcf82feca6",
+  "previousEventID": "6c23e99738f548c2aae4ec73fae008c1"
+}

@@ -1,0 +1,200 @@
+{
+  "id": "f67603bd1bfb4feaa178561043e48293",
+  "groupID": "7701135687",
+  "eventID": "f67603bd1bfb4feaa178561043e48293",
+  "projectID": "4511945117532160",
+  "size": 17783,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 25/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 25/28]",
+  "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 25/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "9394a627eb254079a1b5f345484de6b1",
+      "span_id": "8a1307759b1f5a69",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "\"rest\"\n[2026-08-30T15:36:54.875Z] [player] rest\n[2026-08-30T15:36:54.876Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T15:36:54.877Z] [world] Soot paws the ground flat before trusting it, then folds down onto it.\n[2026-08-30T15:36:54.877Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 19, morning)\n",
+      "[2026-08-30T15:36:54.878Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T15:36:54.888Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-30T15:36:54.889Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T15:36:54.889Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T15:36:54.890Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-08-30T15:36:54.985Z] [cognitive] REST  (94ms)\n[2026-08-30T15:36:55.136Z] [debug] persist sizes(KB): total=162 player=30 wm=51[rooms=23 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=78 scene=3\n[2026-08-30T15:36:55.604Z] [debug] ui: tap \"rest\"\n[2026-08-30T15:36:55.612Z] [player] rest\n",
+      "[2026-08-30T15:36:55.613Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T15:36:55.614Z] [world] Soot tests three spots and settles on the one nearest your boot.\n[2026-08-30T15:36:55.615Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 19, evening)\n",
+      "[2026-08-30T15:36:55.615Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T15:36:55.617Z] [arbiter] The Arbiter goes still. \"The quiet you slept through was not the quiet of an empty place. It was something being patient.\"\n[2026-08-30T15:36:55.617Z] [world] A Scrap Drone is already inside the reach of your fire. The rest is over.\n",
+      "[2026-08-30T15:36:55.617Z] [debug] enemy: Scrap Drone hp=15 ac=10 atk=Drill Arm dmg=2D6 rarity=Common ap=3\n[2026-08-30T15:36:55.625Z] [system] \u23f3 Time passed: 8h\n[2026-08-30T15:36:55.782Z] [cognitive] REST  (157ms)\n[2026-08-30T15:36:59.504Z] [debug] ui: tap \"approach\"\n[2026-08-30T15:36:59.530Z] [player] approach Scrap Drone\n",
+      "[2026-08-30T15:36:59.531Z] [debug] parser: intent=advance conf=1.00 verb=approach target=scrap drone resolved=Scrap Drone range=far enemies=1 hooks=1\n[2026-08-30T15:36:59.533Z] [debug] move: advance from range=far enemies=1 weather=Black Rain cost=1 partial=0\n[2026-08-30T15:36:59.533Z] [debug] move: field advance target=Scrap Drone d 2.50->1.50 band far->mid\n",
+      "[2026-08-30T15:36:59.533Z] [world] You close the gap with Scrap Drone. (range: mid-range)\n[2026-08-30T15:36:59.535Z] [combat] Scrap Drone \u2014 d20 \u2192 4 + ATK 3 = 7 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T15:36:59.536Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-30T15:36:59.536Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-30T15:36:59.691Z] [cognitive] neutral  (153ms)\n[2026-08-30T15:37:00.338Z] [debug] ui: tap \"approach\"\n[2026-08-30T15:37:00.377Z] [player] approach Scrap Drone\n[2026-08-30T15:37:00.377Z] [debug] parser: intent=advance conf=1.00 verb=approach target=scrap drone resolved=Scrap Drone range=mid enemies=1 hooks=1\n",
+      "[2026-08-30T15:37:00.379Z] [debug] move: advance from range=mid enemies=1 weather=Black Rain cost=1 partial=0\n[2026-08-30T15:37:00.380Z] [debug] move: field advance target=Scrap Drone d 1.50->0.50 band mid->close\n[2026-08-30T15:37:00.380Z] [world] You close the gap with Scrap Drone. (range: close / arm's reach)\n",
+      "[2026-08-30T15:37:00.382Z] [combat] Scrap Drone \u2014 d20 \u2192 11 + ATK 3 = 14 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T15:37:00.532Z] [cognitive] neutral  (149ms)\n[2026-08-30T15:37:40.728Z] [arbiter] Riska Panhandle taps the cold Crucible. \"Need at least 3 inferred items reserved for fusion (\u2665 in inventory). You have 1.\" No charge until you are ready.\n",
+      "[2026-08-30T15:37:40.733Z] [debug] dedup: suppressed arbiter repeat \u2014 \"Riska Panhandle taps the cold Crucible. \"Need at least 3 inf\u2026\"\n[2026-08-30T15:37:42.649Z] [debug] ui: tap \"inventory\"\n[2026-08-30T15:37:45.781Z] [debug] persist sizes(KB): total=162 player=30 wm=51[rooms=23 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=77 scene=3\n",
+      "[2026-08-30T15:37:48.529Z] [reward] Riska Panhandle fires up a portable Crucible for you. (\u221225 TC)\n[2026-08-30T15:38:07.777Z] [reward] \u2726 The Crucible drinks the five pieces and works an extra resist channel into the Reclaimer's Cloak. It can now hold one more worked-in resist. (Its armor rating is unchanged.)\n",
+      "[2026-08-30T15:38:10.232Z] [reward] Riska Panhandle fires up a portable Crucible for you. (\u221225 TC)\n[2026-08-30T15:38:13.978Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.\n[2026-08-30T15:38:13.984Z] [reward] \u2726 The Crucible forges an Uncommon close-quarters weapon from your reserved pieces \u2014 and it's in your pack, still cooling.\n",
+      "[2026-08-30T15:38:13.985Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet \u2014 let it finish. You'll know it the moment it announces itself.\n[2026-08-30T15:38:13.995Z] [reward] \u2726 The forging finishes \u2014 the Aether names it Pillar Brand (Uncommon).\n[2026-08-30T15:38:16.842Z] [reward] Riska Panhandle fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-08-30T15:38:21.504Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.\n[2026-08-30T15:38:21.506Z] [reward] \u2726 The Crucible forges an Uncommon piece of armor from your reserved pieces \u2014 and it's in your pack, still cooling.\n",
+      "[2026-08-30T15:38:21.507Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet \u2014 let it finish. You'll know it the moment it announces itself.\n[2026-08-30T15:38:21.520Z] [reward] \u2726 The forging finishes \u2014 the Aether names it Resonant Faulds (Uncommon).\n",
+      "[2026-08-30T15:38:25.106Z] [debug] persist sizes(KB): total=162 player=30 wm=52[rooms=23 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=77 scene=3\n[2026-08-30T15:38:33.137Z] [reward] Riska Panhandle fires up a portable Crucible for you. (\u221225 TC)\n[2026-08-30T15:38:43.174Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.\n",
+      "[2026-08-30T15:38:43.177Z] [reward] \u2726 The Crucible forges a Legendary close-quarters weapon from your reserved pieces \u2014 and it's in your pack, still cooling.\n[2026-08-30T15:38:43.177Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet \u2014 let it finish. You'll know it the moment it announces itself.\n",
+      "[2026-08-30T15:38:43.187Z] [reward] \u2726 The forging finishes \u2014 the Aether names it Reclaimers Guild Geode-Cored Cleaver (Legendary).\n[2026-08-30T15:39:10.110Z] [debug] stats: STR7 DEX20 INT11 WIS5 CHA2 STE6 | gear: DEX+13,INT+2,STR+3,STE+3,WIS+1 | worn: main=Reclaimers Guild Geode-Cored Cleaver off=Bone Crossbow head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlet",
+      "s legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-08-30T15:39:22.915Z] [reward] You work the smoldering paste along the weapon. Now wielding the Smoldering Reclaimers Guild Geode-Cored Cleaver \u2014 1d4 burn on every landing hit.\n[2026-08-30T15:39:33.026Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-08-30T15:39:33.038Z] [player] dodge\n[2026-08-30T15:39:33.039Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-30T15:39:33.041Z] [world] You commit to the dodge. Slip Scrap Drone's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-30T15:39:33.043Z] [combat] Scrap Drone turns on Soot \u2014 d20 10 + ATK 3 = 13 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-08-30T15:39:33.044Z] [combat] Soot takes 12. (3/15 HP left)\n[2026-08-30T15:39:33.044Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-30T15:39:33.045Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-30T15:39:33.046Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T15:39:33.305Z] [cognitive] neutral  (259ms)\n[2026-08-30T15:39:35.027Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-30T15:39:35.032Z] [system] dodging (parry) fades.\n[2026-08-30T15:39:35.095Z] [player] attack with the reclaimers guild geode-cored cleaver\n",
+      "[2026-08-30T15:39:35.096Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=Reclaimers Guild Geode-Cored Cleaver range=close enemies=1 hooks=1\n[2026-08-30T15:39:35.097Z] [debug] attack: target=Scrap Drone range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false\n",
+      "[2026-08-30T15:39:35.120Z] [world] Your smoldering reclaimers guild geode-cored cleaver comes around in an arc; Scrap Drone squares up to meet it.\n[2026-08-30T15:39:35.121Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T15:39:35.240Z] [cognitive] TALK  (118ms)\n",
+      "[2026-08-30T15:39:35.494Z] [debug] persist sizes(KB): total=162 player=29 wm=52[rooms=23 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=78 scene=3\n[2026-08-30T15:39:41.313Z] [world] You seize the initiative. Scrap Drone has no time to react.\n[2026-08-30T15:39:41.313Z] [combat] You \u2014 d20 \u2192 19 + DEX 20 = 39 vs Scrap Drone AC 10 \u2014 \u2713 HIT\n",
+      "[2026-08-30T15:39:41.314Z] [combat] Bludgeoning flares \u2014 +2 on hit (weak \u2014 bites deep!).\n[2026-08-30T15:39:41.314Z] [combat] Weakness exposed \u2014 Scrap Drone flinches. (bludgeoning \u00d71.5 for 19)\n[2026-08-30T15:39:41.315Z] [combat] Final strike with the smoldering reclaimers guild geode-cored cleaver for 19. Scrap Drone is still. The Aetherstone hums on, indifferent.\n",
+      "[2026-08-30T15:39:41.316Z] [reward] Scrap Drone defeated. You recover Aetheric Cog \u00d72.\n[2026-08-30T15:39:41.317Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 33). [22 enemies defeated]\n[2026-08-30T15:39:41.317Z] [reward] +10 TC pried from the dust.\n",
+      "[2026-08-30T16:11:29.376Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05363-eb3d-7b1b-898d-d1ac7c07c799\n[2026-08-30T16:11:29.376Z] [debug] ota: Checking\u2026\n[2026-08-30T16:11:29.550Z] [debug] ota: Already up to date\n[2026-08-30T16:11:29.551Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T16:11:29.667Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-30T16:11:29.667Z] [debug] voice: bundled idle\n[2026-08-30T16:11:30.120Z] [debug] send-log: bundle #mtfva3flr9ic attempt 3/5 delivered to Sentry\n[2026-08-30T16:11:33.691Z] [debug] OTA applied: 2026-08-30-1568-one-string-two-fonts \u2192 2026-08-30-1569-the-glyph-brings-its-own-ground.\n[2026-08-30T16:11:33.692Z] [debug] OTA session start: 2026-08-30-1569-the-glyph-brings-its-own-ground.\n",
+      "[2026-08-30T16:11:33.692Z] [world] You step back into Tartarian Pilgrim Camp. The world waits for your move.\n[2026-08-30T16:11:33.692Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cheddar Bob. The road kept your place.\"\n",
+      "[2026-08-30T16:11:33.966Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-30T16:11:33.963Z \u00b7 build 2026-08-30-1569-the-glyph-brings-its-own-ground \u00b7 updated from 2026-08-30-1568-one-string-two-fonts \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-30T16:11:35.927Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:11:35.933Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n",
+      "[2026-08-30T16:11:35.938Z] [player] rest\n[2026-08-30T16:11:35.938Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T16:11:35.940Z] [world] Soot circles three times and curls beside you. Her breathing slows to yours.\n[2026-08-30T16:11:35.940Z] [world] You rest for 8 hours. +1 stamina recovered. (Day 20, night)\n",
+      "[2026-08-30T16:11:35.940Z] [world] You dream the same dream three times in the night \u2014 a corridor, a door, your own hand reaching for the handle.\n[2026-08-30T16:11:35.949Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-30T16:11:35.950Z] [arbiter] The Arbiter looks around. \"The fires are kept low and the songs lower. The road they rest for does not forgive noise.\"\n",
+      "[2026-08-30T16:11:35.950Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter looks around. \"The fires are kept low and the so\u2026\"\n[2026-08-30T16:11:35.950Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:35.950Z] [system] \u23f3 Time passed: 8h\n[2026-08-30T16:11:36.069Z] [cognitive] REST  (118ms)\n[2026-08-30T16:11:36.594Z] [debug] ui: tap \"rest\"\n",
+      "[2026-08-30T16:11:36.612Z] [player] rest\n[2026-08-30T16:11:36.614Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T16:11:36.615Z] [world] Soot turns twice, thinks about a third, and drops where she stands.\n[2026-08-30T16:11:36.616Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 20, morning)\n",
+      "[2026-08-30T16:11:36.616Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:36.626Z] [system] \u23f3 Time passed: 8h\n[2026-08-30T16:11:36.735Z] [cognitive] REST  (108ms)\n[2026-08-30T16:11:37.274Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:11:37.290Z] [player] rest\n[2026-08-30T16:11:37.291Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-30T16:11:37.298Z] [world] Soot paws the ground flat before trusting it, then folds down onto it.\n[2026-08-30T16:11:37.298Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 20, evening)\n[2026-08-30T16:11:37.299Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:37.308Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-08-30T16:11:37.308Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T16:11:37.309Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:37.309Z] [system] \u23f3 Time passed: 8h\n[2026-08-30T16:11:37.413Z] [cognitive] REST  (103ms)\n[2026-08-30T16:11:37.974Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:11:37.987Z] [player] rest\n",
+      "[2026-08-30T16:11:37.989Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T16:11:37.997Z] [world] Soot tests three spots and settles on the one nearest your boot.\n[2026-08-30T16:11:37.998Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 21, night)\n",
+      "[2026-08-30T16:11:37.998Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:37.999Z] [arbiter] The Arbiter is quiet a long moment after you stir. \"I was wrong about something earlier. I'll say so when the moment's right.\"\n[2026-08-30T16:11:38.007Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T16:11:38.008Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-08-30T16:11:38.109Z] [cognitive] REST  (101ms)\n[2026-08-30T16:11:38.674Z] [debug] ui: tap \"rest\"\n[2026-08-30T16:11:38.680Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-08-30T16:11:38.690Z] [player] rest\n[2026-08-30T16:11:38.690Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 25/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtg55shijei7"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "25"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T18:44:23.928840Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T18:44:24.931000Z",
+  "fingerprints": [
+    "f954e4a09440bd3f4a4806ae1d4d19aa"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "fecd41f717c4479e875ea14f8312d8bd",
+  "previousEventID": "f65f9b8237b449e8952f7491e0e3a3e6"
+}

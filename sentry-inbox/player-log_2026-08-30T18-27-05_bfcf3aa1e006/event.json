@@ -1,0 +1,198 @@
+{
+  "id": "bfcf3aa1e006430a848db249a9d41038",
+  "groupID": "7701135687",
+  "eventID": "bfcf3aa1e006430a848db249a9d41038",
+  "projectID": "4511945117532160",
+  "size": 17818,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 20/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 20/28]",
+  "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 20/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "3e241a85a156420cbf206fad74d51e76",
+      "span_id": "84f960230db1a7b4",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "1.0s in127t\u2192out29t ms/tok 2.3-15.2 | narration:scene_intro_fill n8 avg7.4s max9.8s read7.1s/write1.1s \u26a01unusable in731t\u2192out27t ms/tok 4.4-11.9 cap5 \u23f81 \u27024/27.7s | ambient n6 avg6.1s max7.4s read3.4s/write1.3s \u26a01unusable in364t\u2192out31t ms/tok 7.3-10.7 cap6 \u27024/23.0s | item_synthesis_hw n4 avg4.1s max4.8s read2.7s/write1.2s in333t\u2192out38t ms/tok 1.2-10.7 || WASTED 8 calls / 50.7s\n",
+      "[2026-08-30T08:20:24.955Z] [reward] Sold Bone Knife to Riska Panhandle for 15 TC. (613 TC on hand)\n[2026-08-30T08:20:24.999Z] [reward] Sold Plasma Dagger to Riska Panhandle for 15 TC. (628 TC on hand)\n[2026-08-30T08:20:25.033Z] [reward] Sold Tartarian Bone Knife to Riska Panhandle for 15 TC. (643 TC on hand)\n",
+      "[2026-08-30T08:20:25.066Z] [reward] Sold Rusty Shortbow to Riska Panhandle for 15 TC. (658 TC on hand)\n[2026-08-30T08:20:25.100Z] [reward] Sold Bone Knife to Riska Panhandle for 15 TC. (673 TC on hand)\n[2026-08-30T08:20:25.133Z] [reward] Sold Bone Shiv to Riska Panhandle for 15 TC. (688 TC on hand)\n[2026-08-30T08:20:25.165Z] [reward] Sold Mud Knife to Riska Panhandle for 14 TC. (702 TC on hand)\n",
+      "[2026-08-30T08:20:25.198Z] [reward] Sold Cudgel to Riska Panhandle for 14 TC. (716 TC on hand)\n[2026-08-30T08:20:25.230Z] [reward] Sold Cudgel to Riska Panhandle for 14 TC. (730 TC on hand)\n[2026-08-30T08:20:25.263Z] [reward] Sold Aetherium Spear to Riska Panhandle for 14 TC. (744 TC on hand)\n[2026-08-30T08:20:25.295Z] [reward] Sold Bonebreaker Mace to Riska Panhandle for 14 TC. (758 TC on hand)\n",
+      "[2026-08-30T08:20:25.328Z] [reward] Sold Earthshaker to Riska Panhandle for 14 TC. (772 TC on hand)\n[2026-08-30T08:20:25.360Z] [reward] Sold Aetheric Rod to Riska Panhandle for 13 TC. (785 TC on hand)\n[2026-08-30T08:20:25.392Z] [reward] Sold Bone Splitter Axe to Riska Panhandle for 13 TC. (798 TC on hand)\n",
+      "[2026-08-30T08:20:25.424Z] [reward] Sold Bone Sling to Riska Panhandle for 13 TC. (811 TC on hand)\n[2026-08-30T08:20:25.455Z] [reward] Sold Mud Grinder Axe to Riska Panhandle for 13 TC. (824 TC on hand)\n[2026-08-30T08:20:25.487Z] [reward] Sold Mud Shell to Riska Panhandle for 13 TC. (837 TC on hand)\n[2026-08-30T08:20:25.518Z] [reward] Sold Cudgel to Riska Panhandle for 8 TC. (845 TC on hand)\n",
+      "[2026-08-30T08:20:25.549Z] [reward] Sold Earthshaker to Riska Panhandle for 8 TC. (853 TC on hand)\n[2026-08-30T08:20:25.580Z] [reward] Sold Reclaimer's Salvage Vest to Riska Panhandle for 8 TC. (861 TC on hand)\n[2026-08-30T08:20:25.611Z] [reward] Sold Stone Seeker's Brow Guard to Riska Panhandle for 8 TC. (869 TC on hand)\n",
+      "[2026-08-30T08:20:25.642Z] [reward] Sold Titan's Trail Leggings to Riska Panhandle for 8 TC. (877 TC on hand)\n[2026-08-30T08:20:25.673Z] [reward] Sold Aetheric Warplate to Riska Panhandle for 8 TC. (885 TC on hand)\n[2026-08-30T08:20:25.703Z] [reward] Sold Aetheric Gauntlets to Riska Panhandle for 6 TC. (891 TC on hand)\n",
+      "[2026-08-30T08:20:25.733Z] [reward] Sold Cudgel to Riska Panhandle for 6 TC. (897 TC on hand)\n[2026-08-30T08:20:25.764Z] [reward] Sold Bone Knife to Riska Panhandle for 6 TC. (903 TC on hand)\n[2026-08-30T08:20:25.793Z] [reward] Sold Bone Knife to Riska Panhandle for 6 TC. (909 TC on hand)\n[2026-08-30T08:20:25.823Z] [reward] Sold Aether-Weaver's Mantle to Riska Panhandle for 6 TC. (915 TC on hand)\n",
+      "[2026-08-30T08:20:25.853Z] [reward] Sold Scholar's Headband of Knowledge to Riska Panhandle for 6 TC. (921 TC on hand)\n[2026-08-30T08:20:25.883Z] [reward] Sold Architect's Field Jacket to Riska Panhandle for 6 TC. (927 TC on hand)\n[2026-08-30T08:20:25.912Z] [reward] Sold Salvager's Worn Boots to Riska Panhandle for 6 TC. (933 TC on hand)\n",
+      "[2026-08-30T08:20:25.943Z] [reward] Sold Shaman's Warden Gloves to Riska Panhandle for 6 TC. (939 TC on hand)\n[2026-08-30T08:20:25.972Z] [reward] Sold Bone Knife to Riska Panhandle for 6 TC. (945 TC on hand)\n[2026-08-30T08:20:26.001Z] [reward] Sold Bone Knife to Riska Panhandle for 6 TC. (951 TC on hand)\n",
+      "[2026-08-30T08:20:26.029Z] [reward] Sold Bone Knife to Riska Panhandle for 6 TC. (957 TC on hand)\n[2026-08-30T08:20:26.058Z] [reward] Sold Golem-Bound Cloak to Riska Panhandle for 6 TC. (963 TC on hand)\n[2026-08-30T08:20:26.086Z] [reward] Sold Shaman's Mud Helm to Riska Panhandle for 6 TC. (969 TC on hand)\n",
+      "[2026-08-30T08:20:26.114Z] [reward] Sold Architect's Grip to Riska Panhandle for 6 TC. (975 TC on hand)\n[2026-08-30T08:20:26.143Z] [reward] Sold Lost Seeker's Gloves to Riska Panhandle for 6 TC. (981 TC on hand)\n[2026-08-30T08:20:26.170Z] [reward] Sold Bone Knife to Riska Panhandle for 6 TC. (987 TC on hand)\n",
+      "[2026-08-30T08:20:26.198Z] [reward] Sold Shaman's Warden Gloves to Riska Panhandle for 6 TC. (993 TC on hand)\n[2026-08-30T08:20:26.225Z] [reward] Sold Reclaimer's Salvage Vest to Riska Panhandle for 5 TC. (998 TC on hand)\n[2026-08-30T08:20:26.253Z] [reward] Sold Mud-Warden's Vest to Riska Panhandle for 5 TC. (1003 TC on hand)\n",
+      "[2026-08-30T08:20:26.279Z] [reward] Sold Cudgel to Riska Panhandle for 5 TC. (1008 TC on hand)\n[2026-08-30T08:20:26.306Z] [reward] Sold Reclaimer's Salvage Vest to Riska Panhandle for 5 TC. (1013 TC on hand)\n[2026-08-30T08:20:26.333Z] [reward] Sold Cudgel to Riska Panhandle for 5 TC. (1018 TC on hand)\n",
+      "[2026-08-30T08:20:26.359Z] [reward] Sold Mud-Warden's Vest to Riska Panhandle for 5 TC. (1023 TC on hand)\n[2026-08-30T08:20:26.386Z] [reward] Sold Mud-Bound Cloak to Riska Panhandle for 5 TC. (1028 TC on hand)\n[2026-08-30T08:20:26.412Z] [reward] Sold Cudgel to Riska Panhandle for 5 TC. (1033 TC on hand)\n",
+      "[2026-08-30T08:20:26.438Z] [reward] Sold Mud-Warden's Vest to Riska Panhandle for 5 TC. (1038 TC on hand)\n[2026-08-30T08:20:26.464Z] [reward] Sold Mud-Warden's Vest to Riska Panhandle for 5 TC. (1043 TC on hand)\n[2026-08-30T08:20:26.489Z] [reward] Sold Mud-Bound Cloak to Riska Panhandle for 5 TC. (1048 TC on hand)\n",
+      "[2026-08-30T08:20:26.514Z] [reward] Sold Mud-Warden's Vest to Riska Panhandle for 5 TC. (1053 TC on hand)\n[2026-08-30T08:20:26.539Z] [reward] Sold Cudgel to Riska Panhandle for 5 TC. (1058 TC on hand)\n[2026-08-30T08:20:26.564Z] [reward] Sold Mud-Bound Cloak to Riska Panhandle for 5 TC. (1063 TC on hand)\n[2026-08-30T08:20:26.589Z] [reward] Sold Cudgel to Riska Panhandle for 5 TC. (1068 TC on hand)\n",
+      "[2026-08-30T08:20:26.614Z] [reward] Sold Mud-Warden's Vest to Riska Panhandle for 5 TC. (1073 TC on hand)\n[2026-08-30T08:20:26.639Z] [reward] Sold Mud-Warden's Vest to Riska Panhandle for 5 TC. (1078 TC on hand)\n[2026-08-30T08:20:26.664Z] [reward] Sold Mud-Warden's Vest to Riska Panhandle for 5 TC. (1083 TC on hand)\n",
+      "[2026-08-30T08:20:26.689Z] [reward] Sold Mud-Warden's Vest to Riska Panhandle for 5 TC. (1088 TC on hand)\n[2026-08-30T08:20:26.713Z] [reward] Sold Cudgel to Riska Panhandle for 5 TC. (1093 TC on hand)\n[2026-08-30T08:20:26.738Z] [reward] Sold Mud-Warden's Vest to Riska Panhandle for 5 TC. (1098 TC on hand)\n",
+      "[2026-08-30T08:20:26.762Z] [reward] Sold Mud-Bound Cloak to Riska Panhandle for 5 TC. (1103 TC on hand)\n[2026-08-30T08:20:27.266Z] [debug] homework: intro-fill armed after 9189ms idle\n[2026-08-30T08:20:36.558Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9034ms read 7859ms/write 1150ms in 734t\u2192out 33t 10.7ms/t HIT-CAP (146ch)\n",
+      "[2026-08-30T08:20:36.570Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9034ms \u2014 intro-fill:\u2205\n[2026-08-30T08:20:36.571Z] [debug] homework: scene_intro \"Builders' Survey Camp\" \u2205 9305ms\n[2026-08-30T08:20:43.839Z] [reward] Bought the Mudstone Bulwark working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-08-30T08:20:45.598Z] [reward] Bought the Phoenix Rebirth working for 500 TC. \u2726 Recipe learned (Legendary)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-08-30T08:20:47.430Z] [reward] Bought the Plague Tonic working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-08-30T08:20:51.670Z] [reward] Bought Trail Rations from Riska Panhandle for 6 TC. (197 TC left)\n[2026-08-30T08:20:54.541Z] [reward] Bought 5\u00d7 Smoke-Cured Jerky Strip from Riska Panhandle for 35 TC. (162 TC left)\n[2026-08-30T08:20:54.665Z] [debug] persist sizes(KB): total=155 player=28 wm=43[rooms=15 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=3\n",
+      "[2026-08-30T08:20:59.788Z] [reward] Bought 6\u00d7 Patched Cloth from Riska Panhandle for 24 TC. (138 TC left)\n[2026-08-30T08:21:08.058Z] [reward] Riska Panhandle fires up a portable Crucible for you. (\u221225 TC)\n[2026-08-30T08:21:15.169Z] [debug] homework: intro-fill armed after 9423ms idle\n",
+      "[2026-08-30T08:21:15.405Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.\n[2026-08-30T08:21:15.408Z] [arbiter] The Arbiter studies you a long moment. \"You have earned a name to carry: Master of Aethercraft. Passive: golems you summon come out tougher (+30% HP, one larger attack die).\"\n",
+      "[2026-08-30T08:21:15.408Z] [reward] \u2726 The Crucible forges an Uncommon piece of dog armor from your reserved pieces \u2014 and it's in your pack, still cooling.\n[2026-08-30T08:21:15.409Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet \u2014 let it finish. You'll know it the moment it announces itself.\n",
+      "[2026-08-30T08:21:17.141Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 1842ms read 0ms/write 0ms in 734t\u2192out 0t (0ch)\n[2026-08-30T08:21:17.273Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 1842ms \u2014 intro-fill:\u2205\n[2026-08-30T08:21:17.274Z] [debug] homework: scene_intro \"Builders' Survey Camp\" \u2205 2108ms\n",
+      "[2026-08-30T08:21:21.539Z] [debug] qwen\u23f1 forge_name ok 5968ms wait 1702ms read/write unusable (native mis-reported 4113ms/2079ms \u2014 llama.rn split bug, not this call) in 206t\u2192out 63t HIT-CAP (231ch)\n[2026-08-30T08:21:21.673Z] [reward] \u2726 The forging finishes \u2014 the Aether names it Woven Stride (Uncommon).\n",
+      "[2026-08-30T08:21:34.853Z] [debug] qwen\u23f1 item_synthesis_hw ok 4648ms read 3488ms/write 1127ms in 332t\u2192out 34t 10.5ms/t (133ch)\n[2026-08-30T08:21:34.864Z] [debug] homework: item_desc \"Reclaimer's Scrapplate\" \u2713 4674ms\n[2026-08-30T08:21:49.441Z] [world] You strap the Riveted Leather Vest onto Soot.\n[2026-08-30T08:22:00.229Z] [debug] homework: intro-fill armed after 8710ms idle\n",
+      "[2026-08-30T08:22:05.866Z] [debug] stats: STR9 DEX19 INT11 WIS5 CHA3 STE6 | gear: DEX+12,INT+2,STR+5,STE+3,WIS+1 | worn: main=Crude Golem Pike off=Bone Crossbow head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-08-30T08:22:10.486Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10248ms read 9115ms/write 1095ms in 734t\u2192out 33t 12.4ms/t HIT-CAP (171ch)\n[2026-08-30T08:22:10.621Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 10248ms \u2014 intro-fill:\u2205\n[2026-08-30T08:22:10.621Z] [debug] homework: scene_intro \"Builders' Survey Camp\" \u2205 10392ms\n",
+      "[2026-08-30T08:22:12.855Z] [player] Ask why the stall is here\n[2026-08-30T08:22:12.857Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n[2026-08-30T08:22:12.859Z] [world] Whatever Riska Panhandle is chewing goes over to the other cheek.\n",
+      "[2026-08-30T08:22:13.822Z] [debug] qwen\u23f1 flourish ok 2454ms read 1820ms/write 603ms in 175t\u2192out 19t 10.4ms/t (92ch)\n[2026-08-30T08:22:13.917Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 2454ms \u2014 flourish:empty\n[2026-08-30T08:22:13.917Z] [debug] flourish: \u2205 2661ms\n[2026-08-30T08:22:14.238Z] [player] Ask how far they range\n",
+      "[2026-08-30T08:22:14.239Z] [world] \"I do this stretch and one other.\" They gesture vaguely. \"Any more and you are travelling, not trading. Travelling is how you lose stock.\"\n[2026-08-30T08:22:14.240Z] [world] Riska Panhandle talks to you while doing something else, which is its own kind of trust.\n",
+      "[2026-08-30T08:22:14.409Z] [debug] persist sizes(KB): total=156 player=28 wm=44[rooms=15 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=3\n[2026-08-30T08:22:15.289Z] [player] Ask why they trade out here\n",
+      "[2026-08-30T08:22:15.291Z] [world] \"Because out here I am the only shop in the world.\" The trader grins at their own arithmetic. \"In a settlement I am one stall among twenty. On this stretch of road I am civilization ITSELF for half a day's walk in both directions. The mark-up is not greed, it is geography.\" The grin softens a notch. \"Also \u2014 and do not spread this \u2014 somebody should be out here. Th",
+      "e road is long. A fire and a fair-enough price change what the road IS.\"\n[2026-08-30T08:22:15.293Z] [world] Riska Panhandle keeps facing the way they were going, and talks to you sideways.\n[2026-08-30T08:22:21.564Z] [world] You let the conversation go and Riska Panhandle gets back to it.\n",
+      "[2026-08-30T08:22:34.651Z] [debug] qwen\u23f1 item_synthesis_hw ok 4367ms read 3508ms/write 832ms in 323t\u2192out 25t 10.9ms/t (106ch)\n[2026-08-30T08:22:34.655Z] [debug] qwen\u23f1 \u2702 DISCARDED item_synthesis_hw after 4367ms \u2014 item_synth:rejected-by-clamp bad-kind=\"cloth\"\n[2026-08-30T08:22:34.657Z] [debug] homework: item_desc \"Aetheric Cloth\" \u2205 4387ms\n",
+      "[2026-08-30T08:22:44.239Z] [player] give the Shrike Claw to Riska Panhandle\n[2026-08-30T08:22:44.244Z] [world] I could have panhandled a better gift out of a wet ditch than that Shrike Claw. You pocket the Shrike Claw again. A present has to be worth something before anybody's tastes even enter into it.\n[2026-08-30T08:22:45.277Z] [debug] homework: intro-fill armed after 9083ms idle\n",
+      "[2026-08-30T08:22:49.090Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T08:22:50.694Z] [world] You brace a foot and the Architect's Aetheric Boots gives.\n[2026-08-30T08:22:50.695Z] [reward] \u2726 Architect's Aetheric Boots (Common).\n[2026-08-30T08:22:51.767Z] [world] You work the barrel over. A part of it comes loose, intact.\n",
+      "[2026-08-30T08:22:51.767Z] [world] You break the cage apart. Among the pieces, something worth keeping.\n[2026-08-30T08:22:51.767Z] [world] You break the stone marker apart. Among the pieces, something worth keeping.\n[2026-08-30T08:22:51.768Z] [world] You work the tilting submerged giant statue over. A part of it comes loose, intact.\n[2026-08-30T08:22:51.768Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-30T08:22:51.768Z] [reward]     \u2022 Worn Tartarian Coin x11 (Common)\n[2026-08-30T08:22:51.768Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-08-30T08:22:52.991Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:22:54.421Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9029ms read 8356ms/write 646ms in 754t\u2192out 18t 11.1ms/t (68ch)\n",
+      "[2026-08-30T08:22:54.524Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9029ms \u2014 intro-fill:\u2205\n[2026-08-30T08:22:54.524Z] [debug] homework: scene_intro \"Builders' Survey Camp\" \u2205 9248ms\n[2026-08-30T08:22:54.718Z] [player] investigate still pond\n",
+      "[2026-08-30T08:22:54.719Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=1\n[2026-08-30T08:22:54.720Z] [world] The still pond resists your reading. Not hostile \u2014 just closed. S"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 20/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtg55shijei7"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "20"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T18:27:04.286860Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T18:27:05Z",
+  "fingerprints": [
+    "f954e4a09440bd3f4a4806ae1d4d19aa"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e8b8adb1bca74e27b2724a607aa444b6",
+  "previousEventID": "99d9da83686f40aa84cb00c1340e2aa0"
+}

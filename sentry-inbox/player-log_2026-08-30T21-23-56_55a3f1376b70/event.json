@@ -1,0 +1,149 @@
+{
+  "id": "55a3f1376b704910885fc86d70af8a33",
+  "groupID": "7701330833",
+  "eventID": "55a3f1376b704910885fc86d70af8a33",
+  "projectID": "4511945117532160",
+  "size": 2410,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-08-30-1578-the-stage-says-who-is-there #mtg5s8s9w0sz"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log-beacon 2026-08-30-1578-the-stage-says-who-is-there #mtg5s8s9w0sz",
+  "title": "player-log-beacon 2026-08-30-1578-the-stage-says-who-is-there #mtg5s8s9w0sz",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f3cdb203001b41a584e7ba8a72920502",
+      "span_id": "b8cfec75f351122e",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-08-30-1578-the-stage-says-who-is-there #mtg5s8s9w0sz"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtg5s8s9w0sz"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "1"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T21:23:55.668099Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T21:23:56.523000Z",
+  "fingerprints": [
+    "d72d6051fb6d07fd5d2cf71ef12cd54a"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "f4431b14450048e083e551cd68fd6de1",
+  "previousEventID": null
+}

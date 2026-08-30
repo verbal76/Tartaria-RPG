@@ -1,0 +1,200 @@
+{
+  "id": "fecd41f717c4479e875ea14f8312d8bd",
+  "groupID": "7701135687",
+  "eventID": "fecd41f717c4479e875ea14f8312d8bd",
+  "projectID": "4511945117532160",
+  "size": 17808,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 21/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 21/28]",
+  "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 21/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "9394a627eb254079a1b5f345484de6b1",
+      "span_id": "8a1307759b1f5a69",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ome things in the buried world don't open for the curious.\n[2026-08-30T08:22:54.720Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:22:54.720Z] [arbiter] The Arbiter looks around. \"The faithful sleep in rows aligned toward the Buried Cities. Even asleep, they are pointed.\"\n[2026-08-30T08:22:54.817Z] [cognitive] SWIM  (95ms)\n",
+      "[2026-08-30T08:22:55.965Z] [player] investigate the mud\n[2026-08-30T08:22:55.966Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:22:55.966Z] [debug] route: hook intercept (kind=pulsing_mud, target=\"aether mud\") \u2014 original intent=investigate\n",
+      "[2026-08-30T08:22:55.970Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You pry the deposit out of the silt. A few good shards, dense and humming, plus a thumb-sized core.\n[2026-08-30T08:22:55.970Z] [reward] \u2726 Aetheric Shard, Aetheric Shard, Aether Crystal.\n[2026-08-30T08:22:57.156Z] [debug] qwen\u23f1 investigate_lore ok 2251ms read 1331ms/write 900ms in 128t\u2192out 27t 10.4ms/t (120ch)\n",
+      "[2026-08-30T08:23:01.301Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:02.699Z] [player] investigate the mud\n[2026-08-30T08:23:02.699Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:23:02.702Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n",
+      "[2026-08-30T08:23:02.709Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T08:23:02.709Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:02.820Z] [cognitive] SWIM  (110ms)\n[2026-08-30T08:23:02.975Z] [debug] persist sizes(KB): total=164 player=28 wm=51[rooms=21 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=3\n",
+      "[2026-08-30T08:23:03.618Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:05.019Z] [player] investigate the mud\n[2026-08-30T08:23:05.020Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:23:05.024Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Mud (Common).\n",
+      "[2026-08-30T08:23:05.035Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:23:05.035Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:23:05.036Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:05.148Z] [cognitive] SWIM  (111ms)\n[2026-08-30T08:23:06.054Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-30T08:23:07.358Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-08-30T08:23:07.367Z] [player] investigate the mud\n[2026-08-30T08:23:07.368Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:23:07.370Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Big Rock (Common).\n[2026-08-30T08:23:07.375Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:07.476Z] [cognitive] SWIM  (101ms)\n[2026-08-30T08:23:07.903Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:09.199Z] [player] investigate the mud\n",
+      "[2026-08-30T08:23:09.200Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:23:09.209Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aetheric Dust (Uncommon).\n[2026-08-30T08:23:09.216Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-30T08:23:09.216Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:23:09.216Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T08:23:09.217Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:09.324Z] [cognitive] SWIM  (106ms)\n[2026-08-30T08:23:09.705Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:11.085Z] [player] investigate the mud\n",
+      "[2026-08-30T08:23:11.085Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:23:11.092Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Mud Fragment (Common).\n[2026-08-30T08:23:11.099Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:11.204Z] [cognitive] SWIM  (104ms)\n",
+      "[2026-08-30T08:23:11.654Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:12.925Z] [player] investigate the mud\n[2026-08-30T08:23:12.926Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:23:12.930Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Residue (Common).\n",
+      "[2026-08-30T08:23:12.939Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:13.050Z] [cognitive] SWIM  (111ms)\n[2026-08-30T08:23:13.295Z] [debug] persist sizes(KB): total=162 player=28 wm=50[rooms=21 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=3\n[2026-08-30T08:23:13.489Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:14.754Z] [player] investigate the mud\n",
+      "[2026-08-30T08:23:14.755Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:23:14.758Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:23:14.770Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:14.872Z] [cognitive] SWIM  (102ms)\n",
+      "[2026-08-30T08:23:15.221Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:16.511Z] [player] investigate the mud\n[2026-08-30T08:23:16.512Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:23:16.520Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Trail Rations (Common).\n",
+      "[2026-08-30T08:23:16.529Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T08:23:16.529Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:16.638Z] [cognitive] SWIM  (107ms)\n[2026-08-30T08:23:17.072Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:18.454Z] [player] investigate the mud\n",
+      "[2026-08-30T08:23:18.454Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:23:18.458Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Firewood (Common).\n[2026-08-30T08:23:18.466Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:18.574Z] [cognitive] SWIM  (107ms)\n",
+      "[2026-08-30T08:23:18.938Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:20.194Z] [player] investigate the mud\n[2026-08-30T08:23:20.195Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:23:20.204Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Small Rock (Common).\n",
+      "[2026-08-30T08:23:20.213Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:20.318Z] [cognitive] SWIM  (104ms)\n[2026-08-30T08:23:20.705Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:22.007Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-08-30T08:23:22.022Z] [player] investigate the mud\n",
+      "[2026-08-30T08:23:22.023Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:23:22.027Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Mud Fragment (Common).\n[2026-08-30T08:23:22.034Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:22.198Z] [cognitive] SWIM  (163ms)\n",
+      "[2026-08-30T08:23:22.391Z] [debug] persist sizes(KB): total=161 player=28 wm=50[rooms=21 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=3\n[2026-08-30T08:23:22.674Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:23.970Z] [player] investigate the mud\n",
+      "[2026-08-30T08:23:23.971Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:23:23.973Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:23:23.983Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:24.148Z] [cognitive] SWIM  (162ms)\n",
+      "[2026-08-30T08:23:24.874Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:27.555Z] [debug] qwen\u23f1 ambient ok 7156ms read 3889ms/write 2127ms in 364t\u2192out 31t 10.7ms/t HIT-CAP (150ch)\n[2026-08-30T08:23:27.555Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n13 avg2.4s max3.1s read1.0s/write1.0s in127t\u2192out29t ms/tok 2.3-15.2 | narration:scene_intro_fill n12 avg7.4s max10.2s read7.5s/write1.1s \u26a02unusable in7",
+      "34t\u2192out25t ms/tok 4.4-12.4 cap7 \u23f82 \u27028/57.9s | ambient n7 avg6.2s max7.4s read3.5s/write1.4s \u26a01unusable in364t\u2192out31t ms/tok 7.3-10.7 cap7 \u27024/23.0s | item_synthesis_hw n6 avg4.3s max4.8s read3.0s/write1.1s in331t\u2192out35t ms/tok 1.2-10.9 \u27021/4.4s | forge_name n1 avg6.0s max6.0s \u26a01unusable in206t\u2192out63t cap1 wait1.7s | flourish n1 avg2.5s max2.5s read1.8s/write0.6s in175t\u2192out19t ms/tok 10.4-10.4 \u27021/2.5",
+      "s || WASTED 14 calls / 87.6s\n[2026-08-30T08:23:27.644Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 7156ms \u2014 ambient:\u2205\n[2026-08-30T08:23:27.644Z] [debug] arbiter: ambient \u2205 7432ms\n[2026-08-30T08:23:27.644Z] [debug] arbiter: ambient-empty reason=unknown raw=\"You've come a long way from your previous residence, and now you find yourself in the bustling heart of the Black Market\"\n",
+      "[2026-08-30T08:23:27.747Z] [player] investigate the mud\n[2026-08-30T08:23:27.748Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:23:27.750Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Red Cap Mushroom (Common).\n[2026-08-30T08:23:27.751Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-30T08:23:27.856Z] [cognitive] SWIM  (104ms)\n[2026-08-30T08:23:28.608Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:30.104Z] [player] investigate the mud\n[2026-08-30T08:23:30.104Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:23:30.111Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Mudstone (Rare).\n[2026-08-30T08:23:30.118Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:23:30.118Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:23:30.119Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-30T08:23:30.227Z] [cognitive] SWIM  (107ms)\n[2026-08-30T08:23:30.676Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:32.006Z] [player] investigate the mud\n[2026-08-30T08:23:32.007Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:23:32.011Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Small Rock (Common).\n[2026-08-30T08:23:32.019Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:32.132Z] [cognitive] SWIM  (112ms)\n[2026-08-30T08:23:32.726Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:34.097Z] [player] investigate the mud\n",
+      "[2026-08-30T08:23:34.098Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:23:34.106Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Mud Fragment (Common).\n[2026-08-30T08:23:34.113Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:34.220Z] [cognitive] SWIM  (106ms)\n",
+      "[2026-08-30T08:23:34.728Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:36.048Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-08-30T08:23:36.069Z] [player] investigate the mud\n[2026-08-30T08:23:36.070Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:23:36.072Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:23:36.082Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:36.186Z] [cognitive] SWIM  (104ms)\n[2026-08-30T08:23:36.345Z] [debug] persist sizes(KB): total=160 player=29 wm=48[rooms=21 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=3\n",
+      "[2026-08-30T08:23:36.777Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:23:38.199Z] [player] investigate the mud\n[2026-08-30T08:23:38.200Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T08:23:38.205Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Mud (Common).\n",
+      "[2026-08-30T08:23:38.216Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:23:38.321Z] [cognitive] SWIM  (103ms)\n[2026-08-30T08:23:50.335Z] [debug] homework: intro-fill armed after 9266ms idle\n[2026-08-30T08:23:59.248Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 8910ms read 7780ms/write 1089ms in 744t\u2192out 33t 10.5ms/t HIT-CAP (158ch)\n",
+      "[2026-08-30T08:23:59.254Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 8910ms \u2014 intro-fill:\u2205\n[2026-08-30T08:23:59.254Z] [debug] homework: scene_intro \"Builders' Survey Camp\" \u2205 8922ms\n[2026-08-30T08:24:03.529Z] [reward] Sold 87\u00d7 Worn Tartarian Coin to Riska Panhandle for 435 TC (5 TC each). (548 TC on hand)\n",
+      "[2026-08-30T08:24:18.763Z] [reward] Bought Mud Armor from Riska Panhandle for 184 TC. (364 TC left)\n[2026-08-30T08:24:18.763Z] [reward] They don't charge a friend full price \u2014 10 TC stayed in your pouch.\n[2026-08-30T08:24:23.347Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=-\n",
+      "[2026-08-30T08:24:23.553Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-30T08:24:35.384Z] [debug] homework: intro-fill armed after 9410ms idle\n[2026-08-30T08:24:36.729Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1226ms read 0ms/write 1171ms in 744t\u2192out 34t HIT-CAP (166ch)\n",
+      "[2026-08-30T08:24:36.817Z] [debug] homework: scene_intro \"Builders' Survey Camp\" \u2713 1434ms\n[2026-08-30T08:25:03.676Z] [debug] multi-clause: 2 parts\n[2026-08-30T08:25:03.766Z] [player] I thought the sell all common would only sell of common weapons and armor\n[2026-08-30T08:25:03.766Z] [debug] parser: intent=unknown conf=0.10 verb=- target=- resolved=stall range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:25:03.767Z] [arbiter] The Arbiter follows your gaze toward the stall. \"Tell me what you would do with it.\"\n[2026-08-30T08:25:03.767Z] [system] Try: look around \u00b7 search \u00b7 rest\n[2026-08-30T08:25:03.818Z] [player] did I just sell off rares and uncommons as well?\n[2026-08-30T08:25:03.819Z] [debug] parser: intent=unknown conf=0.10 verb=- target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:25:03.819Z] [arbiter] The Arbiter glances at your pack. \"Your reclaimer's cloak is still there, if it suits the moment.\"\n[2026-08-30T08:25:03.819Z] [system] Try: look around \u00b7 search \u00b7 rest\n[2026-08-30T08:25:04.195Z] [debug] persist sizes(KB): total=161 player=28 wm=50[rooms=21 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=3\n",
+      "[2026-08-30T08:25:11.642Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:25:13.171Z] [player] investi"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 21/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtg55shijei7"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "21"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T18:44:23.892306Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T18:44:24.930000Z",
+  "fingerprints": [
+    "f954e4a09440bd3f4a4806ae1d4d19aa"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "1f1144c841af4d2392c9ddf79694be04",
+  "previousEventID": "f67603bd1bfb4feaa178561043e48293"
+}

@@ -1,0 +1,202 @@
+{
+  "id": "2c1633c9918d46baabb3f8bb59be558e",
+  "groupID": "7701135687",
+  "eventID": "2c1633c9918d46baabb3f8bb59be558e",
+  "projectID": "4511945117532160",
+  "size": 17796,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 2/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 2/28]",
+  "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 2/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "9394a627eb254079a1b5f345484de6b1",
+      "span_id": "8a1307759b1f5a69",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "29T23:48:24.659Z] [cognitive] SWIM  (79ms)\n[2026-08-29T23:48:24.775Z] [debug] persist sizes(KB): total=140 player=27 wm=35[rooms=10 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=77 scene=2\n[2026-08-29T23:48:25.145Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:48:26.368Z] [player] investigate the mud\n",
+      "[2026-08-29T23:48:26.370Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-29T23:48:26.374Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Blueberries (Uncommon).\n[2026-08-29T23:48:26.386Z] [system] \u23f3 Time passed: 24 min\n[2026-08-29T23:48:26.463Z] [cognitive] SWIM  (76ms)\n",
+      "[2026-08-29T23:48:26.915Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:48:28.208Z] [player] investigate the mud\n[2026-08-29T23:48:28.209Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n",
+      "[2026-08-29T23:48:28.210Z] [world] You work the same patch of ground again, but it's spent \u2014 you've turned over everything this spot had to give. Try fresh ground.\n[2026-08-29T23:48:28.285Z] [cognitive] SWIM  (73ms)\n[2026-08-29T23:48:28.763Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:48:30.041Z] [player] investigate the mud\n",
+      "[2026-08-29T23:48:30.042Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-29T23:48:30.047Z] [world] You work the same patch of ground again, but it's spent \u2014 you've turned over everything this spot had to give. Try fresh ground.\n[2026-08-29T23:48:30.125Z] [cognitive] SWIM  (76ms)\n",
+      "[2026-08-29T23:48:30.563Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:48:31.820Z] [player] investigate the mud\n[2026-08-29T23:48:31.821Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n",
+      "[2026-08-29T23:48:31.822Z] [world] You work the same patch of ground again, but it's spent \u2014 you've turned over everything this spot had to give. Try fresh ground.\n[2026-08-29T23:48:31.901Z] [cognitive] SWIM  (77ms)\n[2026-08-29T23:48:32.246Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:48:33.487Z] [player] investigate the mud\n",
+      "[2026-08-29T23:48:33.488Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-29T23:48:33.490Z] [world] You work the same patch of ground again, but it's spent \u2014 you've turned over everything this spot had to give. Try fresh ground.\n",
+      "[2026-08-29T23:48:33.490Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-29T23:48:33.490Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-29T23:48:33.568Z] [cognitive] SWIM  (76ms)\n[2026-08-29T23:48:35.549Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:48:36.929Z] [player] investigate the mud\n",
+      "[2026-08-29T23:48:36.929Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-29T23:48:36.931Z] [world] You work the same patch of ground again, but it's spent \u2014 you've turned over everything this spot had to give. Try fresh ground.\n",
+      "[2026-08-29T23:48:36.932Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-29T23:48:36.932Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-29T23:48:37.008Z] [cognitive] SWIM  (74ms)\n[2026-08-29T23:48:37.485Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:48:38.720Z] [player] investigate the mud\n",
+      "[2026-08-29T23:48:38.721Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-29T23:48:38.722Z] [world] You work the same patch of ground again, but it's spent \u2014 you've turned over everything this spot had to give. Try fresh ground.\n[2026-08-29T23:48:38.798Z] [cognitive] SWIM  (74ms)\n",
+      "[2026-08-29T23:48:38.914Z] [debug] persist sizes(KB): total=141 player=27 wm=35[rooms=10 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=77 scene=2\n[2026-08-29T23:48:39.334Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-08-29T23:48:39.504Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=live winH=986 beat=-\n",
+      "[2026-08-29T23:48:39.577Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n[2026-08-29T23:48:53.519Z] [debug] homework: intro-fill armed after 10288ms idle\n[2026-08-29T23:49:03.410Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9810ms read 7220ms/write 2536ms in 704t\u2192out 33t 10.3ms/t HIT-CAP (155ch)\n",
+      "[2026-08-29T23:49:03.483Z] [debug] homework: scene_intro \"Yulka (return the Discs)\" \u2713 9965ms\n[2026-08-29T23:49:20.140Z] [player] The investigate button is still actively green though. I'll keep trying and also there was no text bar while I'm typing this statement I can see the very edge of the words and as I keep typing in this sentence gets longer and longer the text box expands even though the t",
+      "ext doesn't wrap, it just stays as a solid line in the middle to text box is silently growing so it began off screen and as I make this sentence longer and longer and longer, the text box grows more and more, but there's only a simple line of text in the middle. I will surprise it out. yeah, try that again. I will provide a picture\n",
+      "[2026-08-29T23:49:20.141Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-29T23:49:20.141Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n",
+      "[2026-08-29T23:49:20.141Z] [debug] meta-comment guard: skipped intent parse (engine-vocabulary: \"text box\") on 604-char input\n[2026-08-29T23:49:29.131Z] [debug] send-log: #mtf18j1mlkuk \u2014 DELIVERED (inline, no attachments): beacon out, 23/23 parts accepted (335133 chars) \u2014 flush said yes\n",
+      "[2026-08-29T23:49:29.133Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtf18j1mlkuk kept on disk, boots retry up to 5 sends total\n[2026-08-29T23:49:31.488Z] [debug] appstate: active \u2192 background (was active for 363343ms)\n[2026-08-29T23:55:11.543Z] [debug] appstate: background \u2192 active (was background for 340052ms)\n",
+      "[2026-08-29T23:55:11.552Z] [debug] homework: intro-fill armed after 10616ms idle\n[2026-08-29T23:55:16.152Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4571ms read 3323ms/write 1174ms in 831t\u2192out 33t 4.0ms/t HIT-CAP (164ch)\n[2026-08-29T23:55:16.160Z] [debug] homework: scene_intro \"Yulka (return the Discs)\" \u2713 4609ms\n",
+      "[2026-08-29T23:55:17.265Z] [debug] appstate: active \u2192 background (was active for 5724ms)\n[2026-08-29T23:55:20.548Z] [debug] appstate: background \u2192 active (was background for 3284ms)\n[2026-08-29T23:55:24.498Z] [debug] appstate: active \u2192 background (was active for 3950ms)\n[2026-08-29T23:55:27.562Z] [debug] appstate: background \u2192 active (was background for 3064ms)\n",
+      "[2026-08-29T23:55:30.696Z] [debug] appstate: active \u2192 background (was active for 3134ms)\n[2026-08-29T23:55:33.712Z] [debug] appstate: background \u2192 active (was background for 3016ms)\n[2026-08-29T23:55:36.784Z] [debug] appstate: active \u2192 background (was active for 3072ms)\n[2026-08-29T23:55:39.915Z] [debug] appstate: background \u2192 active (was background for 3131ms)\n",
+      "[2026-08-29T23:55:43.240Z] [debug] appstate: active \u2192 background (was active for 3325ms)\n[2026-08-29T23:55:46.429Z] [debug] appstate: background \u2192 active (was background for 3189ms)\n[2026-08-29T23:55:49.464Z] [debug] appstate: active \u2192 background (was active for 3035ms)\n",
+      "[2026-08-29T23:55:49.531Z] [debug] persist sizes(KB): total=141 player=27 wm=35[rooms=10 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=77 scene=2\n[2026-08-29T23:55:52.814Z] [debug] appstate: background \u2192 active (was background for 3350ms)\n[2026-08-29T23:55:55.965Z] [debug] appstate: active \u2192 background (was active for 3151ms)\n",
+      "[2026-08-29T23:55:58.933Z] [debug] appstate: background \u2192 active (was background for 2968ms)\n[2026-08-29T23:56:02.221Z] [debug] appstate: active \u2192 background (was active for 3288ms)\n[2026-08-29T23:56:05.014Z] [debug] appstate: background \u2192 active (was background for 2793ms)\n[2026-08-29T23:56:08.086Z] [debug] appstate: active \u2192 background (was active for 3072ms)\n",
+      "[2026-08-29T23:56:11.167Z] [debug] appstate: background \u2192 active (was background for 3081ms)\n[2026-08-29T23:56:14.672Z] [debug] appstate: active \u2192 background (was active for 3505ms)\n[2026-08-29T23:56:20.334Z] [debug] appstate: background \u2192 active (was background for 5662ms)\n[2026-08-29T23:56:23.526Z] [debug] appstate: active \u2192 background (was active for 3192ms)\n",
+      "[2026-08-29T23:56:26.918Z] [debug] appstate: background \u2192 active (was background for 3391ms)\n[2026-08-29T23:56:30.889Z] [debug] appstate: active \u2192 background (was active for 3972ms)\n[2026-08-29T23:56:34.642Z] [debug] appstate: background \u2192 active (was background for 3753ms)\n[2026-08-29T23:56:37.865Z] [debug] appstate: active \u2192 background (was active for 3222ms)\n",
+      "[2026-08-29T23:56:40.906Z] [debug] appstate: background \u2192 active (was background for 3041ms)\n[2026-08-29T23:56:44.241Z] [debug] appstate: active \u2192 background (was active for 3336ms)\n[2026-08-30T00:00:51.533Z] [debug] appstate: background \u2192 active (was background for 247292ms)\n",
+      "[2026-08-30T00:00:51.626Z] [debug] persist sizes(KB): total=141 player=27 wm=35[rooms=10 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=76 scene=2\n[2026-08-30T00:00:53.837Z] [debug] voice\u23f1 gap 840ms (wait 0ms + synth 825ms, live) \"Choose your character.\"\n[2026-08-30T00:01:00.728Z] [debug] appstate: active \u2192 background (was active for 9195ms)\n",
+      "[2026-08-30T00:04:23.878Z] [debug] appstate: background \u2192 active (was background for 203149ms)\n[2026-08-30T00:04:27.609Z] [debug] appstate: active \u2192 background (was active for 3732ms)\n[2026-08-30T00:06:02.875Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04fda-0843-7cb2-9480-9136533ae9db\n[2026-08-30T00:06:02.875Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-30T00:06:02.935Z] [debug] ota: Already up to date\n[2026-08-30T00:06:02.935Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T00:06:03.031Z] [debug] voice: engine=bundled tts=on voice=am_michael\n[2026-08-30T00:06:03.031Z] [debug] voice: bundled loading\n[2026-08-30T00:06:03.861Z] [debug] send-log: bundle #mtf18j1mlkuk attempt 2/5 delivered to Sentry\n",
+      "[2026-08-30T00:06:06.377Z] [debug] voice: bundled ready\n[2026-08-30T00:06:07.274Z] [debug] voice\u23f1 gap 855ms (wait 103ms + synth 750ms, live) \"Choose your character.\"\n[2026-08-30T00:06:11.386Z] [debug] OTA session start: 2026-08-29-1548-twenty-more-fires-in-the-dark.\n[2026-08-30T00:06:11.387Z] [world] You step back into Reclaimer's Stake. The world waits for your move.\n",
+      "[2026-08-30T00:06:11.387Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Cheddar Bob. I wondered when you'd take up the thread again.\"\n[2026-08-30T00:06:11.536Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-30T00:06:11.533Z \u00b7 build 2026-08-29-1548-twenty-more-fires-in-the-dark \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-30T00:25:14.029Z] [debug] voice\u23f1 gap 3484ms (wait 1ms + synth 3458ms, live) \"Choose your character.\"\n[2026-08-30T00:26:23.666Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05009-29cd-7344-9567-bbbedea5f74f\n[2026-08-30T00:26:23.667Z] [debug] ota: Checking\u2026\n[2026-08-30T00:26:23.764Z] [debug] ota: Already up to date\n",
+      "[2026-08-30T00:26:23.765Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T00:26:23.821Z] [debug] voice: engine=bundled tts=on voice=am_michael\n[2026-08-30T00:26:23.821Z] [debug] voice: bundled loading\n[2026-08-30T00:26:24.271Z] [debug] send-log: bundle #mtf18j1mlkuk attempt 3/5 delivered to Sentry\n[2026-08-30T00:26:27.125Z] [debug] voice: bundled ready\n",
+      "[2026-08-30T00:26:28.075Z] [debug] voice\u23f1 gap 878ms (wait 110ms + synth 765ms, live) \"Choose your character.\"\n[2026-08-30T00:26:30.128Z] [debug] OTA applied: 2026-08-29-1548-twenty-more-fires-in-the-dark \u2192 2026-08-30-1551-a-standing-keyboard-does-not-shrink.\n[2026-08-30T00:26:30.128Z] [debug] OTA session start: 2026-08-30-1551-a-standing-keyboard-does-not-shrink.\n",
+      "[2026-08-30T00:26:30.129Z] [world] You step back into Reclaimer's Stake. The world waits for your move.\n[2026-08-30T00:26:30.129Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n",
+      "[2026-08-30T00:26:30.293Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-30T00:26:30.291Z \u00b7 build 2026-08-30-1551-a-standing-keyboard-does-not-shrink \u00b7 updated from 2026-08-29-1548-twenty-more-fires-in-the-dark \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-30T00:26:32.963Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n",
+      "[2026-08-30T00:26:33.047Z] [world] You walk east. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-30T00:26:33.047Z] [world] The thread you were following waits where you left it.\n[2026-08-30T00:26:34.709Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-30T00:26:36.187Z] [world] Tucked inside the banner: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-08-30T00:26:36.187Z] [world] You work the bedroll apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-30T00:26:36.188Z] [world] You salvage the firepit. The take is small but real.\n",
+      "[2026-08-30T00:26:36.188Z] [world] You salvage the signpost. The take is small but real.\n[2026-08-30T00:26:36.188Z] [reward] \u2726 Salvage haul:\n[2026-08-30T00:26:36.189Z] [reward]     \u2022 Tattered Gauze Roll (Common)\n[2026-08-30T00:26:36.189Z] [reward]     \u2022 Copper-Threaded Veil (Uncommon)\n[2026-08-30T00:26:36.189Z] [reward]     \u2022 Scrap Metal (Common)\n",
+      "[2026-08-30T00:26:36.189Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-08-30T00:26:37.393Z] [debug] ui: tap \"investigate\"\n[2026-08-30T00:26:38.857Z] [player] investigate silt\n[2026-08-30T00:26:38.858Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=silt resolved=silt range=- enemies=0 hooks=1\n",
+      "[2026-08-30T00:26:38.861Z] [world] You study the silt. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n[2026-08-30T00:26:38.863Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n",
+      "[2026-08-30T00:26:38.863Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"There's coin on the board for a willing blade,\" the Arbiter\u2026\"\n[2026-08-30T00:26:38.867Z] [world] A Mud Monarchs war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Reclaimers Guild.\n",
+      "[2026-08-30T00:26:38.867Z] [arbiter] \"The Mud Monarchs do not forgive a friend of the Reclaimers Guild,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-30T00:26:39.020Z] [cognitive] neutral  (157ms)\n[2026-08-30T00:26:39.942Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425M"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 2/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtg55shijei7"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "2"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T18:44:23.751182Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T18:44:24.925000Z",
+  "fingerprints": [
+    "f954e4a09440bd3f4a4806ae1d4d19aa"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "2f6aa4d7dfe44616915c446f4700ae25",
+  "previousEventID": "23184093a560454da4b4d8ccc5dd5f69"
+}

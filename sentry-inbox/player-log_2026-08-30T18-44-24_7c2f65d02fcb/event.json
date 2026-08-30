@@ -1,0 +1,202 @@
+{
+  "id": "7c2f65d02fcb4a7c9c81bbf10b58354e",
+  "groupID": "7701135687",
+  "eventID": "7c2f65d02fcb4a7c9c81bbf10b58354e",
+  "projectID": "4511945117532160",
+  "size": 17761,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 4/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 4/28]",
+  "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 4/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "9394a627eb254079a1b5f345484de6b1",
+      "span_id": "8a1307759b1f5a69",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "-30T01:50:15.162Z] [combat] 4 attackers remain. Mud Monarchs Raider 2 now in your sights.\n[2026-08-30T01:50:15.163Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-30T01:50:15.163Z] [reward] +12 TC pried from the dust.\n",
+      "[2026-08-30T01:50:15.196Z] [debug] ac-shift 22\u219219: race/base 10 + gear 12 + title 0 \u2192 trimmed 19 + status 0 | worn: head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak\n[2026-08-30T01:50:15.196Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 14 + ATK 6 = 20 vs your AC 19 \u2014 \u2713 HIT\n",
+      "[2026-08-30T01:50:15.197Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 17 + ATK 5 = 22 vs your AC 19 \u2014 \u2713 HIT\n[2026-08-30T01:50:15.199Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 17 + ATK 6 = 23 vs your AC 19 \u2014 \u2713 HIT\n[2026-08-30T01:50:15.200Z] [combat] Mud Monarchs Raider 3 \u2014 d20 \u2192 3 + ATK 6 = 9 vs your AC 19 \u2014 \u2717 MISS\n",
+      "[2026-08-30T01:50:15.341Z] [combat] Mud Monarchs Raider 4 deals 2 piercing damage [edge of reach \u2014 halved]. You have 15 HP remaining.\n[2026-08-30T01:50:15.341Z] [combat] Mud Monarchs Raider 5 deals 2 bludgeoning damage [edge of reach \u2014 halved]. You have 13 HP remaining.\n",
+      "[2026-08-30T01:50:15.341Z] [combat] Mud Monarchs Raider 2 deals 2 bludgeoning damage [edge of reach \u2014 halved]. You have 11 HP remaining.\n[2026-08-30T01:50:22.230Z] [debug] ui: tap \"step back\"\n[2026-08-30T01:50:22.236Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-08-30T01:50:22.246Z] [player] step back\n",
+      "[2026-08-30T01:50:22.246Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=mid enemies=4 hooks=1\n[2026-08-30T01:50:22.248Z] [debug] move: retreat from range=mid enemies=4 weather=Ash Storm cost=1 partial=0\n[2026-08-30T01:50:22.249Z] [debug] move: field retreat target=Mud Monarchs Raider 2 d 1.20->2.20 band mid->far\n",
+      "[2026-08-30T01:50:22.249Z] [world] You pull back from the Mud Monarchs Raider 2 and 3 others. (range: far)\n[2026-08-30T01:50:22.249Z] [world] The field shifts around you \u2014 Mud Monarchs Raider 3 now far; Mud Monarchs Raider 4 now out of range; Mud Monarchs Raider 5 now far.\n[2026-08-30T01:50:22.250Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-30T01:50:22.251Z] [arbiter] The Arbiter watches the blow land or fail. \"Both are answers.\"\n[2026-08-30T01:50:22.251Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter watches the blow land or fail. \"Both are answers\u2026\"\n[2026-08-30T01:50:22.403Z] [cognitive] neutral  (150ms)\n[2026-08-30T01:50:23.211Z] [debug] ui: tap \"\u2697 bone crossbow\"\n",
+      "[2026-08-30T01:50:23.212Z] [system] braced \u2014 will not go down again fades.\n[2026-08-30T01:50:23.235Z] [player] attack with the off-hand bone crossbow\n[2026-08-30T01:50:23.235Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=far enemies=4 hooks=1\n",
+      "[2026-08-30T01:50:23.236Z] [debug] attack: target=Mud Monarchs Raider 2 range=far reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-30T01:50:23.237Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-30T01:50:23.257Z] [world] You commit forward with the acid-etched bone crossbow. Mud Monarchs Raider 2 watches your hands.\n",
+      "[2026-08-30T01:50:23.257Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T01:50:23.377Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (119ms)\n[2026-08-30T01:50:23.667Z] [debug] persist sizes(KB): total=150 player=29 wm=38[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=78 scene=5\n[2026-08-30T01:50:29.462Z] [world] Mud Monarchs Raider 2 moves first. The pressure is immediate.\n",
+      "[2026-08-30T01:50:29.463Z] [combat] Mud Monarchs Raider 2 and 3 others close the distance.\n[2026-08-30T01:50:29.463Z] [combat] You \u2014 d20 \u2192 5 + DEX 16 \u2212 1 (Ash Storm) = 20 vs Mud Monarchs Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-08-30T01:50:29.464Z] [combat] Weakness exposed \u2014 Mud Monarchs Raider 2 flinches. (piercing \u00d72.25 for 21)\n",
+      "[2026-08-30T01:50:29.469Z] [combat] Mud Monarchs Raider 2 folds under the acid-etched bone crossbow. 21 damage was enough. The room exhales.\n[2026-08-30T01:50:29.470Z] [reward] Mud Monarchs Raider 2 defeated. You recover Patched Cloth \u00d73.\n[2026-08-30T01:50:29.471Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n",
+      "[2026-08-30T01:50:29.471Z] [combat] 3 attackers remain. Mud Monarchs Raider 3 now in your sights.\n[2026-08-30T01:50:29.472Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-30T01:50:29.472Z] [reward] +12 TC pried from the dust.\n[2026-08-30T01:50:31.501Z] [debug] ui: tap \"step back\"\n[2026-08-30T01:50:31.516Z] [player] step back\n",
+      "[2026-08-30T01:50:31.517Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=mid enemies=3 hooks=1\n[2026-08-30T01:50:31.518Z] [debug] move: retreat from range=mid enemies=3 weather=Ash Storm cost=1 partial=0\n[2026-08-30T01:50:31.519Z] [debug] move: field retreat target=Mud Monarchs Raider 3 d 1.54->2.54 band mid->far\n",
+      "[2026-08-30T01:50:31.519Z] [world] You pull back from the Mud Monarchs Raider 3 and 2 others. (range: far)\n[2026-08-30T01:50:31.519Z] [world] The field shifts around you \u2014 Mud Monarchs Raider 4 now out of range; Mud Monarchs Raider 5 now far.\n[2026-08-30T01:50:31.660Z] [cognitive] neutral  (138ms)\n[2026-08-30T01:50:32.365Z] [debug] ui: tap \"\u2697 bone crossbow\"\n",
+      "[2026-08-30T01:50:32.409Z] [player] attack with the off-hand bone crossbow\n[2026-08-30T01:50:32.409Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=far enemies=3 hooks=1\n[2026-08-30T01:50:32.410Z] [debug] attack: target=Mud Monarchs Raider 3 range=far reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-30T01:50:32.411Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-30T01:50:32.435Z] [world] You bring the acid-etched bone crossbow to bear on Mud Monarchs Raider 3.\n[2026-08-30T01:50:32.435Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T01:50:32.552Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (116ms)\n",
+      "[2026-08-30T01:50:39.769Z] [world] Mud Monarchs Raider 3 moves first. The pressure is immediate.\n[2026-08-30T01:50:39.769Z] [combat] Mud Monarchs Raider 4 and 2 others close the distance.\n[2026-08-30T01:50:39.769Z] [combat] You \u2014 d20 \u2192 15 + DEX 16 \u2212 1 (Ash Storm) = 30 vs Mud Monarchs Raider 3 AC 10 \u2014 \u2713 HIT\n[2026-08-30T01:50:39.770Z] [combat] Piercing flares \u2014 +1 on hit.\n",
+      "[2026-08-30T01:50:39.771Z] [combat] You crack the Mud Monarchs Raider 3 with the Acid-Etched Bone Crossbow for 10 \u2014 half their fight, gone in one blow. They crumple, out cold. (4/14 HP) Loot them before they come to.\n[2026-08-30T01:50:39.771Z] [combat] Mud Monarchs Raider 3 is out of it. Mud Monarchs Raider 4 now in your sights.\n",
+      "[2026-08-30T01:50:39.772Z] [combat] Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-08-30T01:50:39.773Z] [arbiter] \"Make the next strike count for two,\" the Arbiter says. \"Tartaria taxes the first.\"\n[2026-08-30T01:50:41.409Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-30T01:50:49.658Z] [world] You use 4\u00d7 Trail Rations. +22 HP (33/33), +1 stamina.\n[2026-08-30T01:50:55.173Z] [debug] ui: tap \"\u2697 bone crossbow\"\n[2026-08-30T01:50:55.226Z] [player] attack with the off-hand bone crossbow\n[2026-08-30T01:50:55.227Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=distant enemies=3 hooks=1\n",
+      "[2026-08-30T01:50:55.230Z] [combat] Mud Monarchs Raider 3 smokes \u2014 acid eats 2. (2/14 HP, 2 turns left)\n[2026-08-30T01:50:55.231Z] [debug] attack: target=Mud Monarchs Raider 4 range=distant reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-30T01:50:55.232Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-08-30T01:50:55.270Z] [world] Your acid-etched bone crossbow comes around in an arc; Mud Monarchs Raider 4 squares up to meet it.\n[2026-08-30T01:50:55.271Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T01:50:55.483Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (205ms)\n",
+      "[2026-08-30T01:50:55.754Z] [debug] persist sizes(KB): total=151 player=29 wm=38[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=78 scene=4\n[2026-08-30T01:51:01.837Z] [world] You seize the initiative. Mud Monarchs Raider 4 has no time to react.\n[2026-08-30T01:51:01.838Z] [combat] You \u2014 d20 \u2192 6 + DEX 16 \u2212 1 (Ash Storm) = 21 vs Mud Monarchs Raider 4 AC 10 \u2014 \u2713 HIT\n",
+      "[2026-08-30T01:51:01.839Z] [combat] You crack the Mud Monarchs Raider 4 with the Acid-Etched Bone Crossbow for 8 \u2014 half their fight, gone in one blow. They crumple, out cold. (3/11 HP) Loot them before they come to.\n[2026-08-30T01:51:01.840Z] [combat] Mud Monarchs Raider 4 is out of it. Mud Monarchs Raider 5 now in your sights.\n",
+      "[2026-08-30T01:51:01.841Z] [combat] Acid-Etched Bone Crossbow \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-08-30T01:51:01.843Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 18 + ATK 5 = 23 vs your AC 19 \u2014 \u2713 HIT\n",
+      "[2026-08-30T01:51:01.987Z] [combat] Mud Monarchs Raider 5 deals 4 bludgeoning damage [edge of reach \u2014 halved]. You have 29 HP remaining.\n[2026-08-30T01:51:05.628Z] [debug] ui: tap \"stealth\"\n[2026-08-30T01:51:05.632Z] [player] sneak\n[2026-08-30T01:51:05.633Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=3 hooks=1\n",
+      "[2026-08-30T01:51:05.675Z] [system] \u23f3 Time passed: 15 min\n[2026-08-30T01:51:05.798Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (122ms)\n[2026-08-30T01:51:07.337Z] [debug] skillcheck: stealth d20=17 STE 6 = 23 vs DC 12 \u2014 Hard \u2192 (resolved below)\n",
+      "[2026-08-30T01:51:07.384Z] [debug] stats: STR5 DEX16 INT11 WIS4 CHA2 STE6 | gear: DEX+10,INT+2,STR+2,STE+3 | worn: main=Cudgel off=Bone Crossbow head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak ring=Light-Finger Guild Band\n",
+      "[2026-08-30T01:51:07.385Z] [debug] train: stealth (stealth check) \u2192 progress 30/100\n[2026-08-30T01:51:07.385Z] [world] The daylight leaves you little cover. (stealth \u22121, day)\n[2026-08-30T01:51:07.386Z] [world] You drop low and move quiet, closing on Mud Monarchs Raider 5 unseen across the open ground. (+5 next attack)\n",
+      "[2026-08-30T01:51:07.386Z] [debug] stealth: opener carried by the skill roll (23 vs DC 12 \u2014 Hard) \u2014 UNSEEN\n[2026-08-30T01:51:15.380Z] [debug] ui: tap \"dodge\"\n[2026-08-30T01:51:15.391Z] [player] dodge\n[2026-08-30T01:51:15.391Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=3 hooks=1\n",
+      "[2026-08-30T01:51:15.393Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 5's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-30T01:51:15.393Z] [combat] Mud Monarchs Raider 3 smokes \u2014 acid eats 2. (0/14 HP, 1 turn left)\n",
+      "[2026-08-30T01:51:15.393Z] [combat] Mud Monarchs Raider 4 smokes \u2014 acid eats 1. (2/11 HP, 2 turns left)\n[2026-08-30T01:51:15.395Z] [reward] Mud Monarchs Raider 3 defeated. You recover Patched Cloth \u00d73.\n[2026-08-30T01:51:15.397Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+6 TC). The kit took the fight badly.\n",
+      "[2026-08-30T01:51:15.398Z] [combat] 1 attacker remains. Mud Monarchs Raider 5 now in your sights.\n[2026-08-30T01:51:15.398Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 34). [7 enemies defeated]\n[2026-08-30T01:51:15.398Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-30T01:51:15.399Z] [reward] +20 TC pried from the dust.\n",
+      "[2026-08-30T01:51:15.455Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 19 \u2014 \u2717 EVADED\n[2026-08-30T01:51:15.455Z] [combat] Dodge \u2014 d20 \u2192 17 + DEX 16 = 33 vs ATK 17. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-08-30T01:51:15.455Z] [world] You slip Mud Monarchs Raider 5's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-08-30T01:51:15.456Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T01:51:15.608Z] [cognitive] neutral  (151ms)\n[2026-08-30T01:51:16.514Z] [debug] ui: tap \"\u2697 bone crossbow \u2605\"\n",
+      "[2026-08-30T01:51:16.519Z] [system] unseen \u2014 next strike +5 fades.\n[2026-08-30T01:51:16.520Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-30T01:51:16.522Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-08-30T01:51:16.568Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-30T01:51:16.569Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=2 hooks=1\n[2026-08-30T01:51:16.569Z] [combat] Mud Monarchs Raider 4 smokes \u2014 acid eats 1. (1/11 HP, 1 turn left)\n",
+      "[2026-08-30T01:51:16.570Z] [debug] attack: target=Mud Monarchs Raider 5 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-30T01:51:16.571Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-30T01:51:16.572Z] [debug] attack: status mods stealthed +5 \u00b7 perfect opening (2\u00d7 dice)\n",
+      "[2026-08-30T01:51:16.598Z] [world] Your acid-etched bone crossbow comes around in an arc; Mud Monarchs Raider 5 squares up to meet it.\n[2026-08-30T01:51:16.599Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T01:51:16.718Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (119ms)\n[2026-08-30T01:51:23.932Z] [world] You seize the initiative. Mud Monarchs Raider 5 has no time to react.\n",
+      "[2026-08-30T01:51:23.932Z] [combat] You \u2014 d20 \u2192 16 + DEX 16 \u2212 1 (Ash Storm) stealthed +5 perfect opening (2\u00d7 dice) = 36 vs Mud Monarchs Raider 5 AC 9 \u2014 \u2713 HIT\n[2026-08-30T01:51:23.937Z] [combat] Piercing flares \u2014 +3 on hit (weak \u2014 bites deep!).\n[2026-08-30T01:51:23.938Z] [combat] Weakness exposed \u2014 Mud Monarchs Raider 5 flinches. (piercing \u00d72.25 for 33)\n",
+      "[2026-08-30T01:51:23.939Z] [combat] The killing blow with the acid-etched bone crossbow: 33. Mud Monarchs Raider 5 drops where it stood.\n[2026-08-30T01:51:23.940Z] [reward] Mud Monarchs Raider 5 defeated. You recover Patched Cloth \u00d72.\n[2026-08-30T01:51:23.940Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n",
+      "[2026-08-30T01:51:23.940Z] [combat] Nobody left standing \u2014 the fight is yours. You strip the sleepers where they lie.\n[2026-08-30T01:51:23.941Z] [reward] You strip the unconscious Mud Monarchs Raider 4 \u2014 Bone Knife, Mud-Warden's Vest, Bone Bolt, Patched Cloth, +20 TC. The gear's seen better days (worn from the fight).\n",
+      "[2026-08-30T01:51:23.948Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-30T01:51:23.949Z] [system] \u25bc Mud Monarchs turns HOSTILE \u2014 their patrols hunt you on their own g"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1571-the-slot-moves-on #mtg55shijei7 [inline 4/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtg55shijei7"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "4"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T18:44:23.755335Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T18:44:24.926000Z",
+  "fingerprints": [
+    "f954e4a09440bd3f4a4806ae1d4d19aa"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "8084ecc9aeb64e7fa3e04b162badcf6c",
+  "previousEventID": "78b03ad62d8b41fb886b487792373b86"
+}
