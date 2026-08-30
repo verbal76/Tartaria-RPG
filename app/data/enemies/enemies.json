@@ -2345,6 +2345,39 @@
     "boss": true
   },
   {
+    "name": "Tartarian Raider",
+    "flavor": "Jaw-marked in the old sign, sworn to a man who is already somewhere else. They were told to wait here, and they waited.",
+    "type": "Human",
+    "carries": {
+      "weapons": [
+        "Cudgel"
+      ],
+      "armor": [
+        "Mud-Warden's Vest"
+      ],
+      "tc": 10
+    },
+    "abilityPoint": "Strength 5",
+    "attack": "Jaw-Marked Charge",
+    "damage": "1D8",
+    "hp": 34,
+    "rarity": "Uncommon",
+    "aliases": [
+      "raider",
+      "tartarian raider",
+      "jaw-marked raider",
+      "sworn follower",
+      "follower"
+    ],
+    "loot": [
+      "Patched Cloth",
+      "Worn Tartarian Coin"
+    ],
+    "traits": [
+      "ambush_strike"
+    ]
+  },
+  {
     "name": "Tartarian Reaver",
     "flavor": "A warlord of the old bloodlines, armored and merciless, cutting a red sweep through any line.",
     "type": "Human",

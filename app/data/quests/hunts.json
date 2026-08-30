@@ -460,13 +460,17 @@
         },
         {
           "stageType": "false_summit",
-          "narration": "The south spires stand out of the Mud Seas exactly where the poster said. You wade in expecting the Queen. The Queen is gone. Three lesser Sirens uncoil from the wreckage instead, calm and ready. The crew the drifter mentioned were the bait, not the prize. So are you.",
-          "arbiter": null,
+          "narration": "The south spires stand out of the Mud Seas exactly where the poster said. You wade in expecting the Queen. What comes up out of the silt instead are three of her daughters, mouths already open — she left her song in them and went deeper. They will not let you pass to look for her. Silence them first.",
+          "arbiter": "\"She is listening through them,\" the Arbiter says. \"So mind what you say with your hands.\"",
           "checkKind": "boss",
           "requires": {
             "item": "Drifter's South-Spire Poster"
           },
-          "locationName": "Mud Seas"
+          "locationName": "Mud Seas",
+          "spawn": {
+            "enemyName": "Mud Siren",
+            "count": 3
+          }
         },
         {
           "stageType": "investigation",
@@ -535,13 +539,17 @@
         },
         {
           "stageType": "false_summit",
-          "narration": "You make the camp on the Plains by dusk. Embers still warm. Reaver gone. Three of his sworn followers rise from positions they'd set hours ago — jaw-marked Tartarian raiders, waiting on exactly the kind of hunter a shrine sends. He left them for you the way another man leaves a note.",
-          "arbiter": null,
+          "narration": "You make the camp on the Plains by dusk. Embers still warm, bedrolls still shaped to their sleepers — and the Reaver long gone west. He did not run. He LEFT you something: three of his sworn, jaw-marked in the old sign, standing up out of positions they took hours ago. They have been waiting for exactly the kind of hunter a shrine sends. There is no way past them and no one here to talk to. Put them down, and the trail he left is yours to read.",
+          "arbiter": "\"He spent three men to learn what you are,\" the Arbiter says. \"Answer the question.\"",
           "checkKind": "boss",
           "requires": {
             "item": "Servants' Mark of Sanction"
           },
-          "locationName": "Great Tartary Plains"
+          "locationName": "Great Tartary Plains",
+          "spawn": {
+            "enemyName": "Tartarian Raider",
+            "count": 3
+          }
         },
         {
           "stageType": "investigation",

@@ -77,7 +77,7 @@ import {
   wrongCounterpartyLine,
 } from '../../engine/contractRefusal';
 import { findFactionQuestById, availableFactionQuests, factionOfFactionQuest } from '../../engine/factionQuests';
-import { HUNTS, findHuntById, availableHunts, fuzzyFindHunt, scaleHuntBoss, firstActionableHuntStage, huntBlockReason, emptyBoardTally, emptyBoardLine } from '../../engine/hunts';
+import { HUNTS, findHuntById, availableHunts, fuzzyFindHunt, scaleHuntBoss, scaleHuntEscort, firstActionableHuntStage, huntBlockReason, emptyBoardTally, emptyBoardLine } from '../../engine/hunts';
 import { MYSTERIES, findMysteryById, availableMysteries, fuzzyFindMystery } from '../../engine/mysteries';
 import { findStorylineById, availableStorylines, fuzzyFindStoryline } from '../../engine/factionStorylines';
 
@@ -1445,11 +1445,53 @@ export const createQuestSlice = (
     for (let i = 0; i < hunt.stages.length; i++) {
       if (hunt.stages[i]?.checkKind === 'boss') lastBossIndex = i;
     }
-    const freezeForKill = stageDef.checkKind === 'boss' && record.stage === lastBossIndex;
+    // ⚠⚠ OTA-1578 — AND AN ESCORT STAGE FREEZES TOO. It used to advance on the
+    // SPAWN, so three raiders could be left standing and the hunt moved on
+    // regardless. A stage that puts bodies in front of you is resolved by
+    // dealing with them — the clear is handled where the last one dies.
+    const freezeForKill =
+      (stageDef.checkKind === 'boss' && record.stage === lastBossIndex)
+      || !!stageDef.spawn;
     if (stageDef.checkKind === 'boss') {
       // ⚠ OTA-1167 — pass the REAL power measure, so the boss sees stats, weapon and AC
       // rather than max HP alone. `scalePowerOf` carries the guarded gear read.
-      const boss = scaleHuntBoss(player, hunt, deps.scalePowerOf(player));
+      //
+      // ⚠⚠⚠ OTA-1576 — AND THE STAGE GETS TO SAY WHAT IS ACTUALLY THERE. Every
+      // boss stage used to spawn the hunt's ONE global `targetEnemyName`, which
+      // is right for an `apex` and exactly backwards for a `false_summit` — a
+      // stage type whose whole job is to say the target was NOT here. Both of
+      // the game's two spawned the very boss their sentence says has left:
+      // "Embers still warm. REAVER GONE. Three of his sworn followers rise …"
+      // and "You wade in expecting the Queen. THE QUEEN IS [gone]". The owner
+      // hit the first, was told to find three Tartarian raiders, found none,
+      // and typed the problem into the game in plain English.
+      const override = stageDef.spawn;
+      const escort = override
+        ? scaleHuntEscort(player, override.enemyName, deps.scalePowerOf(player), override.count ?? 1)
+        : null;
+      if (escort && escort.length > 0) {
+        set((s) =>
+          s.currentScene
+            ? {
+                currentScene: {
+                  ...s.currentScene,
+                  ...deps.FRESH_ENEMY_ARRAYS,
+                  enemies: escort,
+                  enemyHps: escort.map((e) => e.hp),
+                  activeEnemyIdx: 0,
+                  range: 'mid',
+                },
+              }
+            : s,
+        );
+        get().appendLog(
+          'combat',
+          escort.length > 1
+            ? `${escort.length} ${escort[0]!.name}s rise from the positions they were left in.`
+            : `${escort[0]!.name} rises from the position it was left in.`,
+        );
+      }
+      const boss = override ? null : scaleHuntBoss(player, hunt, deps.scalePowerOf(player));
       if (boss) {
         set((s) =>
           s.currentScene

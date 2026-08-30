@@ -236,7 +236,48 @@ describe('OTA-1219 — the hunt walker: every hunt in the catalog completes, in 
       await store.getState().submitPlayerAction(verb);
       drainRolls();
 
-      if (kind === 'boss' && s === lastBoss) {
+      // ⚠⚠⚠ OTA-1578 — AN ESCORT STAGE IS RESOLVED BY CLEARING IT, not by arriving.
+      // The two `false_summit` beats now spawn a named pack of their own and FREEZE
+      // until the last of them is down (the owner: "have someone there waiting to
+      // fight to resolve that stage to move to the next"). The walker has to earn
+      // the beat the way a player does — and this branch is also the proof that a
+      // hunt carrying one is still COMPLETABLE, which is the risk the freeze
+      // introduced. Without it, two hunts in the catalog would dead-end forever.
+      const escortSpawn = def.stages[s]!.spawn;
+      if (escortSpawn) {
+        const want = escortSpawn.enemyName;
+        await settle(() => (store.getState().currentScene?.enemies ?? []).some((e) => e.name === want));
+        const pack = store.getState().currentScene!.enemies.filter((e) => e.name === want);
+        expect({ hunt: def.id, at: s, spawned: pack.length, wanted: escortSpawn.count ?? 1 })
+          .toEqual({ hunt: def.id, at: s, spawned: escortSpawn.count ?? 1, wanted: escortSpawn.count ?? 1 });
+        // Frozen on arrival — the pack standing there is not the beat being done.
+        expect(stage()).toBe(s);
+        // Kill them one at a time; only the LAST death may advance the stage.
+        for (let k = pack.length; k > 0; k--) {
+          const live = store.getState().currentScene!;
+          const alive = live.enemies.filter((e, i) => e.name === want && (live.enemyHps[i] ?? 0) > 0);
+          useGameStore.setState({
+            currentScene: {
+              ...live,
+              enemies: alive, enemyHps: alive.map(() => 1), activeEnemyIdx: 0, range: 'close',
+              enemyAmbushUsed: alive.map(() => false), enemyKnockedOut: alive.map(() => false),
+              enemyStatuses: alive.map(() => []), enemyArmorShred: alive.map(() => 0),
+              enemyCorruptionStacks: alive.map(() => 0),
+            },
+          });
+          if (k > 1) expect(stage()).toBe(s);
+          for (let round = 0; round < 6 && stage() === s
+            && (store.getState().currentScene?.enemies.length ?? 0) >= k; round++) {
+            await store.getState().submitPlayerAction('attack');
+            drainRolls();
+            await new Promise((r) => setTimeout(r, 150));
+            drainRolls();
+          }
+        }
+        await settle(() => stage() > s);
+        expect({ hunt: def.id, at: s, kind, advanced: stage() > s })
+          .toEqual({ hunt: def.id, at: s, kind, advanced: true });
+      } else if (kind === 'boss' && s === lastBoss) {
         // The apex: spawn, FREEZE (OTA-796), kill, complete.
         const hunted = `${def.targetEnemyName} (hunted)`;
         await settle(() => (store.getState().currentScene?.enemies ?? []).some((e) => e.name === hunted));

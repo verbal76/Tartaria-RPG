@@ -24467,6 +24467,54 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }));
       }
     }
+    // ⚠⚠⚠ OTA-1578 — CLEARING THE ESCORT IS WHAT RESOLVES A FALSE SUMMIT. OTA-1576
+    // gave the stage its own spawn, but the stage still advanced the moment the
+    // pack APPEARED (`freezeForKill` only covered the final boss), so a player
+    // could walk away from three raiders and be on the next beat anyway. The
+    // owner's ruling: "have someone there waiting to fight to resolve that stage
+    // to move to the next." So the beat now costs what it says it costs — the
+    // stage holds until the last of them is down.
+    {
+      const escortRec = (player.activeHunts ?? [])
+        .map((rec) => ({ rec, def: findHuntById(rec.id) }))
+        .find(({ rec, def }) => def?.stages[rec.stage]?.spawn?.enemyName === enemy.name);
+      if (escortRec?.def) {
+        // Is this the LAST of them? The scene is read live because the corpse
+        // count is what decides, not the spawn count — a fight can be joined by
+        // a wandering third party, and one of those must not resolve the stage.
+        // ⚠⚠ EXCLUDE THE ONE BEING RESOLVED. This runs DURING the defeat, and the
+        // dying body's HP is not necessarily written back to 0 yet — reading the
+        // scene naively counts the corpse as still standing, so the last kill
+        // never satisfies the check and the stage can never close. That would
+        // have made both false-summit hunts unfinishable, which is a worse bug
+        // than the one this OTA set out to fix. Keyed on INDEX, because three
+        // raiders share a name and identity here is positional.
+        const live = get().currentScene;
+        const stillUp = (live?.enemies ?? []).some(
+          (e, i) => i !== activeIdx && e.name === enemy.name && (live!.enemyHps[i] ?? 0) > 0,
+        );
+        if (!stillUp) {
+          const nextStage = escortRec.rec.stage + 1;
+          set((st) => (st.player
+            ? {
+                player: {
+                  ...st.player,
+                  activeHunts: (st.player.activeHunts ?? []).map((h) =>
+                    h.id === escortRec.rec.id ? { ...h, stage: nextStage } : h,
+                  ),
+                },
+              }
+            : st));
+          const nextDef = escortRec.def.stages[nextStage];
+          get().appendLog('reward', `✦ The last of them is down. "${escortRec.def.title}" moves on.`);
+          if (nextDef) {
+            get().appendLog('world', nextDef.narration);
+            if (nextDef.arbiter) get().appendLog('arbiter', nextDef.arbiter);
+          }
+          void get().persist();
+        }
+      }
+    }
     // Hunt-boss kill: if the slain enemy's name matches a target of an
     // active hunt currently at its boss stage, advance the hunt one more
     // beat (past the boss stage) so the player can turn it in.

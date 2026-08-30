@@ -33,6 +33,12 @@ export const FACTION_BODIES: Readonly<Record<string, readonly string[]>> = {
     'Latch Picker', 'Quiver Rat', 'Spore Skimmer', 'Ash Robber',
     'Page Tearer', 'Loadstone Lifter', 'Ink Dipper', 'Coal Creeper',
     'Road Skimmer', 'Silt Footpad',
+    // ⚠ OTA-1576 — the jaw-marked sworn authored for the Doubter's false summit.
+    // A Human on the roster belongs here by this file's own law, and the
+    // ota1035 pin enforces exactly that: the body list IS the humans, no one
+    // left out. Adding a Human and not listing it here is how the victory card
+    // learns to skip somebody.
+    'Tartarian Raider',
   ],
   Rare: [
     'Black Cloak Agent', 'Mud Monarch Purifier',
@@ -51,6 +57,9 @@ export const FACTION_NOUN_BY_BODY: Readonly<Record<string, 'Raider' | 'Soldier'>
   'Black Cloak Agent': 'Soldier',
   'Mud Monarch Purifier': 'Soldier',
   'Tartarian Reaver': 'Soldier',
+  // OTA-1576 — sworn to the Reaver, but rank and file. A Raider, not a Soldier:
+  // the word is what the man is, not who he follows.
+  'Tartarian Raider': 'Raider',
   // OTA-1548 — every chain mark is a cutpurse of one flavor or another.
   'Lens Prier': 'Raider',
   'Marsh Poacher': 'Raider',

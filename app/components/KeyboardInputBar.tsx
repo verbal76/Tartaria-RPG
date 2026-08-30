@@ -67,6 +67,29 @@ let lastKeyboardHeight = 0;
 let lastReportedHeight = 0;
 // OTA-1535 — dedup key so the instrument writes once per distinct state, not per render.
 let bottomLoggedFor = '';
+/**
+ * ⚠⚠⚠ OTA-1577 — THE HIGH-WATER MARK LIVES AS LONG AS THE KEYBOARD, NOT AS LONG
+ * AS THE COMPONENT. OTA-1551 added this latch and its own comment states the
+ * intent exactly right — *"Held for as long as this keyboard is up; cleared only
+ * by the committed retraction in onHide"* — but it was declared INSIDE the
+ * effect, so its real lifetime was one MOUNT. Every remount reset it to 0 while
+ * Gboard was still standing, and the very next short frame won.
+ *
+ * The owner's 4.32.11 log, fifth report of this burial:
+ *
+ *   18:36:44  bottom=407.79  raw=408  from=live     ← latch set to 407.79
+ *   18:37:08  bottom=407.79  raw=408  from=cached   ← REMOUNT (module value survives)
+ *   18:37:08  bottom=359.79  raw=360  from=live     ← latch is 0 again → 359.79 wins
+ *
+ * 48.0 apart — the Gboard suggestion strip, the same number OTA-1540 identified.
+ * The three module-scope values beside this one (lastKeyboardHeight,
+ * lastReportedHeight, bottomLoggedFor) already survived remounts, which is why
+ * `from=cached` carried the right number and `from=live` then threw it away.
+ *
+ * ⚠ Still one-way and still cleared by the committed hide: a standing keyboard
+ * cannot shrink, and a genuinely shorter next keyboard measures from nothing.
+ */
+let sessionMaxHeight = 0;
 
 export function KeyboardInputBar() {
   const screen = useGameStore((s) => s.currentScreen);
@@ -105,7 +128,6 @@ export function KeyboardInputBar() {
     // OTA-1551 — the standing keyboard's high-water mark. Held for as long as
     // this keyboard is up; cleared only by the committed retraction in onHide,
     // so the NEXT keyboard measures itself from nothing.
-    let sessionMaxHeight = 0;
     // ⚠⚠⚠ OTA-1540 — POSITION FROM THE KEYBOARD'S TOP EDGE, NOT ITS REPORTED
     // HEIGHT. The OTA-1535 instrument caught this on the owner's device:
     //

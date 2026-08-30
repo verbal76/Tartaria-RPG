@@ -26114,7 +26114,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The tap breadcrumb is untouched again: the hair spaces live in the JSX only, so
 // logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
 // evidence stays greppable.
-export const OTA_BUILD_ID = '2026-08-30-1575-the-stone-marks-you';
+export const OTA_BUILD_ID = '2026-08-30-1578-the-stage-says-who-is-there';
+// OTA-1578 adds the owner's ruling on top of 1576/1577: the false-summit text
+// is rewritten to name the three raiders and say plainly that there is no way
+// past them, and the stage now HOLDS until the last of them is down instead
+// of advancing the moment they appear.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-30-1577-the-stage-says-who-is-there';
+// OTA-1576 — the noun resolver matched on ONE token of two, so "find the
+// tartarian raider" landed on Tartarian Trap; the false_summit stages spawned
+// the very boss their prose says has left; and the raiders that prose names
+// did not exist in enemies.json at all. OTA-1577 — the keyboard high-water
+// mark was declared inside the effect, so it reset on every remount while
+// Gboard was still up, and the next short frame buried the text box.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-30-1575-the-stone-marks-you';
 // golem catch-up 2026-08-30: markerless publish of OTA-1575 (the obelisk mark
 // pays a real buff, on a new status semantic that waits for combat).
 // OTA-1575 — the obelisk climb used to charge 2 HP for a memo. The mark now

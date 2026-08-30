@@ -140,7 +140,10 @@ describe('OTA-1159 — one place builds a scale power', () => {
     // STRONGER: "every spawner routes through scalePowerOf" is more true than it was.
     // If it ever DROPS, a spawner has gone back to rolling its own measure.
     const uses = STORE.match(/scalePowerOf\(/g) ?? [];
-    expect(uses.length).toBe(9);
+    // ⚠ OTA-1576 RETARGET, and the ratchet moved the RIGHT way: the false-summit
+    // escort spawn (scaleHuntEscort) routes through the same shared measure, so
+    // this is a tenth spawner joining the rule rather than one leaving it.
+    expect(uses.length).toBe(10);
   });
 
   it('AC comes from standingAc, not a third re-derivation', () => {

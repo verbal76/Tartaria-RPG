@@ -52,6 +52,26 @@ export interface HuntStageDef extends StageBinding {
   narration: string;
   arbiter: string | null;
   checkKind: HuntCheckKind;
+  /**
+   * ⚠⚠⚠ OTA-1576 — WHAT THIS STAGE ACTUALLY PUTS IN FRONT OF YOU. Every boss
+   * stage used to spawn `HuntDef.targetEnemyName` — the hunt's ONE global
+   * target — whatever the stage's own prose said. That is fine for an `apex`,
+   * and it is exactly backwards for a `false_summit`, a stage type that exists
+   * to say THE TARGET WAS NOT HERE:
+   *
+   *   "You make the camp on the Plains by dusk. Embers still warm. REAVER GONE.
+   *    Three of his sworn followers rise … jaw-marked Tartarian raiders."
+   *   "You wade in expecting the Queen. THE QUEEN IS [gone] …"
+   *
+   * Both spawned the very boss the sentence says has left. The owner hit the
+   * first one, was told to find three Tartarian raiders, and found none —
+   * then typed the problem into the game in plain English.
+   *
+   * This is OTA-1086's rule, which hooks already got: when the prose names the
+   * creature, the spawn honours the name. `count` lets a stage that says
+   * "three" mean three.
+   */
+  spawn?: { enemyName: string; count?: number };
   /** 2026-05-26 OTA-055 — narrative slot in the standardized template.
    *  Surfaced as "Stage 3/7 — The Toll" in the ContractsScreen so the
    *  player knows what kind of beat they're on. */
@@ -440,6 +460,44 @@ export function scaleHuntBoss(player: PlayerCharacter, def: HuntDef, power?: num
     hp,
     damage,
   };
+}
+
+/**
+ * ⚠⚠⚠ OTA-1576 — THE ESCORT A STAGE NAMES FOR ITSELF. `scaleHuntBoss` always
+ * reads `HuntDef.targetEnemyName`, so every boss stage in a hunt produced the
+ * same single creature no matter what its own prose said — which turned both
+ * `false_summit` stages in the game into the opposite of the beat they were
+ * written for. See `HuntStageDef.spawn`.
+ *
+ * ⚠⚠ SCALED LIKE A BOSS BUT NOT NAMED LIKE ONE. It rides the identical HP curve
+ * so a pack authored at tier 2 still bites at end-game, and deliberately does
+ * NOT take the "(hunted)" suffix — three of them are a fight, not three bosses,
+ * and the suffix is how the player reads "this is the one you came for".
+ *
+ * ⚠ HP is spread, not multiplied: `count` bodies of the catalog creature, each
+ * at its own scaled HP. Three raiders at 34 is a real fight for a tier-2 hunt;
+ * three at a boss's 310 would be a wall.
+ */
+export function scaleHuntEscort(
+  player: PlayerCharacter,
+  enemyName: string,
+  power?: number,
+  count = 1,
+): Enemy[] {
+  const base = (enemiesData as Enemy[]).find((e) => e.name === enemyName);
+  if (!base) return [];
+  const t = power === undefined ? null : overLevelT(power);
+  const hpFactor = t === null
+    ? Math.min(1.6, Math.max(1.0, player.hpMax / 30))
+    : 1 + t * (HUNT_HP_CEILING - 1);
+  const hp = Math.round(base.hp * hpFactor);
+  let damage = String(base.damage);
+  const dangerous = t === null ? player.hpMax > 50 : t >= HUNT_DAMAGE_STEP_T;
+  if (dangerous) {
+    damage = damage.replace(/(\d+)([dD]\d+)/, (_m, c, rest) => `${parseInt(c, 10) + 1}${rest}`);
+  }
+  const n = Math.max(1, Math.min(5, Math.floor(count)));
+  return Array.from({ length: n }, () => ({ ...base, hp, damage }));
 }
 
 // Player-side hunt progress record stored on the player.

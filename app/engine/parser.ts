@@ -1041,17 +1041,62 @@ function resolveContextNoun(
     }
     return matches[0];
   };
-  const substrMatches = recentNouns.filter((noun) => {
+  // ⚠⚠⚠ OTA-1576 — ONE TOKEN OUT OF TWO USED TO BE ENOUGH, and it cost the owner
+  // a mission stage. From his 4.32.11 log, on a tile where he had been told to
+  // find three Tartarian Raiders:
+  //
+  //   [player] find the tartarian raider
+  //   parser: intent=investigate verb=find target=tartarian raider
+  //           resolved=Tartarian Trap
+  //
+  // `targetTokens.some(...)` accepted a noun that matched ANY single token, so
+  // "Tartarian Trap" — which shares only the ADJECTIVE and does not contain the
+  // word "raider" at all — was a first-class hit. He then typed the problem into
+  // the game in plain English, which is how far a wrong noun can push a player.
+  //
+  // ⚠⚠ THE FIX IS RANKING, NOT NARROWING. Refusing partial matches outright would
+  // break every legitimate shorthand ("the cloth" for "blood-spotted cloth"), so
+  // coverage is SCORED and the best-covered noun wins: a noun matching both
+  // tokens beats one matching either. Ties keep the old recency preference and
+  // array order, so nothing that resolved unambiguously before moves.
+  //
+  // ⚠⚠ AND WHEN NOTHING COVERS THE WHOLE TARGET, THE HEAD NOUN DECIDES. English
+  // puts the head last — "tartarian RAIDER" is a raider, not a tartarian — so a
+  // partial match that misses the head is matching the adjective and nothing
+  // else. That is the exact shape of his bug, and it is the one partial worth
+  // refusing: better to resolve nothing and let the refusal speak than to send
+  // him to a trap when he asked for a person.
+  const head = targetTokens[targetTokens.length - 1]!;
+  const rank = (noun: string): number => {
     const nounLower = noun.toLowerCase();
-    return targetTokens.some((t) => nounLower.includes(t));
-  });
-  const substrHit = preferFrom(substrMatches);
-  if (substrHit) return substrHit;
-  const fuzzyMatches = recentNouns.filter((noun) => {
+    const hits = targetTokens.filter((t) => nounLower.includes(t)).length;
+    if (hits === 0) return 0;
+    if (hits < targetTokens.length && !nounLower.includes(head)) return 0;
+    return hits;
+  };
+  const scored = recentNouns
+    .map((noun) => ({ noun, score: rank(noun) }))
+    .filter((r) => r.score > 0);
+  if (scored.length > 0) {
+    const best = Math.max(...scored.map((r) => r.score));
+    const substrHit = preferFrom(scored.filter((r) => r.score === best).map((r) => r.noun));
+    if (substrHit) return substrHit;
+  }
+  // Fuzzy pass, ranked the same way — a near-spelling of the head still has to
+  // be the head.
+  const fuzzyRank = (noun: string): number => {
     const words = noun.toLowerCase().split(/\s+/);
-    return targetTokens.some((t) => words.some((w) => fuzzyEqual(t, w)));
-  });
-  return preferFrom(fuzzyMatches);
+    const hits = targetTokens.filter((t) => words.some((w) => fuzzyEqual(t, w))).length;
+    if (hits === 0) return 0;
+    if (hits < targetTokens.length && !words.some((w) => fuzzyEqual(head, w))) return 0;
+    return hits;
+  };
+  const fuzzyScored = recentNouns
+    .map((noun) => ({ noun, score: fuzzyRank(noun) }))
+    .filter((r) => r.score > 0);
+  if (fuzzyScored.length === 0) return undefined;
+  const bestFuzzy = Math.max(...fuzzyScored.map((r) => r.score));
+  return preferFrom(fuzzyScored.filter((r) => r.score === bestFuzzy).map((r) => r.noun));
 }
 
 export interface ParseContext {
