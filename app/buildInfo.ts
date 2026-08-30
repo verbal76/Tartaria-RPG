@@ -25562,6 +25562,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // so the next keyboard measures itself from nothing. One-way, like 1540: it can
 // only ever hold the bar higher.
 export const OTA_BUILD_ID = '2026-08-30-1551-a-standing-keyboard-does-not-shrink';
+// golem catch-up 2026-08-30: markerless publish of OTA-1549/1550/1551 (the
+// SPEAK TO bar filled + SET COURSE inside the talk sheet, one slot one weapon,
+// and the standing keyboard's session latch) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1550-one-slot-one-weapon';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1549-the-button-you-can-see';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1548-twenty-more-fires-in-the-dark';
