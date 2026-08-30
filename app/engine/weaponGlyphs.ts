@@ -201,3 +201,71 @@ export function combatWeaponLabel(
   const head = glyphs ? `${glyphs} ` : '';
   return `${head}${shortWeaponName(name).toLowerCase()}${star}`;
 }
+
+/**
+ * ⚠⚠⚠ OTA-1568 — WHY THE GLYPHS NEED THEIR OWN TEXT NODE. The owner, looking at
+ * a frost-coated pike on a strike-tone chip: *"The snowflake being blue is hard
+ * to see on the green background… And the acid symbol has no color at all."*
+ *
+ * ⚠⚠⚠ THOSE ARE ONE ROOT CAUSE WEARING OPPOSITE SYMPTOMS, and the cause is that
+ * nothing ever DECIDED how these six characters render. Android picks a
+ * presentation per codepoint out of font fallback: `❄` lands in a COLOR emoji
+ * font, so it is permanently that one blue and ignores any `color:` we set —
+ * invisible against `quickStrike`'s light sage `#9ec96a`. `⚗` lands in a
+ * MONOCHROME text font, so it inherits the chip's own label colour and reads as
+ * "no colour at all". One string, two fonts, no control over either.
+ *
+ * ⚠⚠ SO THE FIX IS TWO MECHANISMS, because neither one can serve both:
+ *
+ *   · A BLACK HALO reaches the colour-emoji glyphs, which is the only thing that
+ *     can — a shadow is drawn from the glyph's own alpha mask, so it outlines
+ *     `❄` without needing to recolour it. That is exactly what he asked for.
+ *   · A PER-KIND COLOUR reaches the monochrome ones (`⚗`, plus whichever others a
+ *     given device renders as text), giving acid a hue of its own instead of
+ *     borrowing the label's.
+ *
+ * ⚠⚠ AND THE COLOURS ARE CHOSEN FOR BOTH CHIPS AT ONCE. `quickStrike` is light
+ * sage; `quickReady` and the default chip are near-black (`#1b2417`, `#1a1714`).
+ * No single hue reads on both — which is precisely why the halo is not a
+ * nice-to-have: it lets these stay BRIGHT, so they carry on the dark chips,
+ * while the black outline separates them from the light one.
+ *
+ * ⚠ STATED PLAINLY: on a device that renders `🔥` as colour emoji, its entry
+ * below does nothing. These are the fallback for the text-presentation case, not
+ * a claim that an emoji has been recoloured — that cannot be done.
+ */
+export const COATING_GLYPH_COLOR: Record<WeaponCoating['kind'], string> = {
+  burn: '#ff7a3d',        // ember orange
+  cold: '#79d2ff',        // ice, brighter than the emoji's own blue
+  poison: '#e6e6c8',      // bone — a skull is bone, and green would vanish on sage
+  acid: '#b4e619',        // the one he asked for: acid green-yellow
+  corruption: '#c98aff',  // violet, the only hue nothing else uses
+  electrical: '#ffe14d',  // lightning yellow
+};
+
+/** One glyph and the coating it came from, so a caller can style it per kind. */
+export interface CoatingGlyphPart { ch: string; kind: WeaponCoating['kind'] }
+
+/**
+ * ⚠⚠ THE SAME LABEL, SPLIT SO IT CAN BE STYLED — never a second opinion about
+ * what it says. `combatWeaponLabel` above stays the single source of the flat
+ * string, because that string is ALSO the tap breadcrumb (`logUiTap`) and the
+ * screen-reader label, and OTA-1172 is on record that the breadcrumb is forensic
+ * evidence in the freeze hunt. This returns the same content in pieces; it does
+ * not rebuild it differently, and a test pins the two against each other.
+ */
+export function combatWeaponLabelParts(
+  name: string,
+  item: Pick<InventoryItem, 'coating' | 'coating2'> | null | undefined,
+  rawDamageType: string | null | undefined,
+  knownWeaknesses: readonly string[],
+): { glyphs: CoatingGlyphPart[]; text: string } {
+  const kinds = coatingKinds(item);
+  const star = weaponHitsKnownWeakness(weaponStrikeTypes(item, rawDamageType), knownWeaknesses)
+    ? ' ★'
+    : '';
+  return {
+    glyphs: kinds.map((k) => ({ ch: COATING_GLYPH[k] ?? '', kind: k })).filter((g) => g.ch !== ''),
+    text: `${shortWeaponName(name).toLowerCase()}${star}`,
+  };
+}

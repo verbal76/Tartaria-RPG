@@ -26037,7 +26037,48 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // three sit at phase `rendered`, so the tap had completed and the app was idle.
 // They are the same OS reclaim with a stale action label. The genuine signal is
 // the SEVEN deaths at a ctx-* or native:* phase, with native ML work in flight.
-export const OTA_BUILD_ID = '2026-08-30-1567-the-heartbeat-ate-the-checkpoint';
+// OTA-1568 - ONE STRING, TWO FONTS. The owner, looking at a frost-coated pike on
+// a strike chip: "The snowflake being blue is hard to see on the green
+// background. is there any way to get a black outline around it? And the acid
+// symbol has no color at all. can we give it some kind of coloring."
+//
+// THOSE TWO COMPLAINTS ARE ONE ROOT CAUSE WEARING OPPOSITE SYMPTOMS, which is
+// why they ship as a single revertible OTA. OTA-1553 put six characters into a
+// label string and nothing ever DECIDED how they render; Android picks a
+// presentation per codepoint out of font fallback. The snowflake lands in a
+// COLOR emoji font - permanently that one blue, deaf to `color:`, invisible
+// against quickStrike's light sage #9ec96a. The alembic lands in a MONOCHROME
+// text font - so it inherits the chip's own label colour, which is why it reads
+// as having no colour at all. One string, two fonts, no control over either.
+//
+// SO THE FIX IS TWO MECHANISMS, because neither one reaches both cases. A BLACK
+// HALO is the only thing that can touch a colour emoji: React Native cannot
+// stroke a glyph outline, but a text shadow is drawn from the glyph's own alpha
+// mask, so it outlines the snowflake without needing to recolour it - which is
+// exactly what he asked for. A PER-KIND COLOUR reaches the monochrome ones and
+// gives acid a hue of its own. Applying only one would have fixed half of what
+// he reported.
+//
+// The colours are chosen for BOTH chip fills at once: quickStrike is light sage,
+// while quickReady and the default chip are near-black (#1b2417, #1a1714). No
+// single hue reads on both, which is why the halo is load-bearing rather than
+// decorative - it lets the glyphs stay BRIGHT so they carry on the dark chips
+// while the black outline separates them from the light one. On the dark chips
+// the halo is invisible and harmless, which is correct.
+//
+// STATED HONESTLY IN THE SOURCE AND THE TESTS: on a device that renders the fire
+// glyph as a colour emoji, its colour entry does nothing. The colours are the
+// fallback for the text-presentation case; an emoji's own colours cannot be
+// overridden, and the halo is what serves those.
+//
+// EASY TO ROLL BACK, deliberately. `combatWeaponLabel` is untouched and still the
+// single source of the flat string - which is ALSO the tap breadcrumb (logUiTap)
+// and the screen-reader label, and OTA-1172 is on record that the breadcrumb is
+// forensic evidence in the freeze hunt. The new `combatWeaponLabelParts` returns
+// the same content in pieces and a test reassembles it character-for-character
+// against the flat one. Every chip without a coating takes the untouched render
+// path, so the change is confined to weapon buttons that carry a coating.
+export const OTA_BUILD_ID = '2026-08-30-1568-one-string-two-fonts';
 // golem catch-up 2026-08-30: markerless publish of OTA-1567 (the render
 // heartbeat split from the phase checkpoint, the age field made real, idle
 // reclaims recorded but no longer fatal) to the golem channel.

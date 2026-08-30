@@ -28,7 +28,11 @@ import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefine
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 // OTA-1553 — the combat weapon label: coating glyphs, the name, and a ★ when
 // this weapon hits a weakness the player has actually discovered.
-import { combatWeaponLabel } from '../engine/weaponGlyphs';
+import {
+  combatWeaponLabel,
+  // OTA-1568 — the glyphs get their own styled nodes; see COATING_GLYPH_COLOR.
+  combatWeaponLabelParts, COATING_GLYPH_COLOR, type CoatingGlyphPart,
+} from '../engine/weaponGlyphs';
 import { reachBandsFor, reachFiresDown } from '../engine/types';
 // ⚠ OTA-1423 — the three Arbiter refusals below name the dog, so they also
 // have to gender it. Without this they read "bring it up" about a companion
@@ -770,13 +774,15 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 const mainT = weaponTone(reachPlayer, 'main', range, groundedFoesBelow);
                 const raw = resolveDisplayWeaponByName(equippedMain, inventory)?.damageType ?? null;
                 const label = combatWeaponLabel(equippedMain, equippedMainItem, raw, activeEnemyKnownWeak ?? []);
-                return <QuickBtn label={label} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
+                const parts = combatWeaponLabelParts(equippedMain, equippedMainItem, raw, activeEnemyKnownWeak ?? []);
+                return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
               })() : null}
               {equippedOff ? (() => {
                 const offT = weaponTone(reachPlayer, 'off', range, groundedFoesBelow);
                 const raw = resolveDisplayWeaponByName(equippedOff, inventory)?.damageType ?? null;
                 const label = combatWeaponLabel(equippedOff, equippedOffItem, raw, activeEnemyKnownWeak ?? []);
-                return <QuickBtn label={label} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
+                const parts = combatWeaponLabelParts(equippedOff, equippedOffItem, raw, activeEnemyKnownWeak ?? []);
+                return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
               })() : null}
             </View>
 
@@ -1128,6 +1134,8 @@ function QuickBtn({
   blocked,
   outOfRange,
   cooldownFill,
+  glyphs,
+  glyphText,
 }: {
   label: string;
   onPress: () => void;
@@ -1148,6 +1156,11 @@ function QuickBtn({
    *  ⚠ The chip stays TAPPABLE while red: the engine answers with a buzz and a line naming
    *  the beats remaining, because a control that refuses in silence is the OTA-1164 bug. */
   cooldownFill?: number;
+  /** ⚠ OTA-1568 — the coating glyphs, split out of `label` so each can carry its
+   *  own colour and the black halo. When present, `glyphText` carries the rest of
+   *  the same label. `label` itself is untouched and still the breadcrumb. */
+  glyphs?: readonly CoatingGlyphPart[];
+  glyphText?: string;
 }) {
   const resolvedTone: QuickBtnTone | undefined = blocked
     ? undefined
@@ -1217,7 +1230,25 @@ function QuickBtn({
           <View style={[styles.cooldownFill, { width: `${Math.max(0, Math.min(1, cooldownFill)) * 100}%` }]} pointerEvents="none" />
         </>
       ) : null}
-      <Text style={textStyle}>{label.toUpperCase()}</Text>
+      {/* ⚠⚠⚠ OTA-1568 — THE GLYPHS RENDER AS THEIR OWN NODES so they can carry a
+          black halo and a per-kind colour; see weaponGlyphs.COATING_GLYPH_COLOR
+          for why one string in one Text could never be styled.
+          ⚠ `label` is UNCHANGED and still the flat string — it is the tap
+          breadcrumb (logUiTap, above) and the screen-reader label, and OTA-1172
+          is on record that the breadcrumb is forensic evidence. This only
+          changes how the same characters are PAINTED. */}
+      {glyphs && glyphs.length > 0 ? (
+        <Text style={textStyle}>
+          {glyphs.map((g, i) => (
+            <Text key={`${g.kind}${i}`} style={[styles.coatGlyph, { color: COATING_GLYPH_COLOR[g.kind] }]}>
+              {g.ch}
+            </Text>
+          ))}
+          <Text>{` ${glyphText ?? ''}`.toUpperCase()}</Text>
+        </Text>
+      ) : (
+        <Text style={textStyle}>{label.toUpperCase()}</Text>
+      )}
     </TouchableOpacity>
   );
 }
@@ -1461,6 +1492,19 @@ const styles = StyleSheet.create({
   quickDisabledText: { color: '#6a6253' },
   // Soot on the solid block — the dark-on-light inversion is what makes it read
   // as FILLED at a glance rather than as another outlined chip.
+  // ⚠⚠⚠ OTA-1568 — THE BLACK HALO, and it is a SHADOW rather than a border on
+  // purpose: React Native cannot stroke glyph outlines, but a text shadow is
+  // drawn from the glyph's own alpha mask, which is the only technique that
+  // reaches a COLOUR EMOJI. That is what makes `❄` — permanently its own blue,
+  // deaf to `color:` — legible against quickStrike's light sage `#9ec96a`.
+  // Offset 0 with a radius makes it a halo on every side rather than a drop
+  // shadow on two. On the near-black chips it is invisible and harmless, which
+  // is correct: there the bright glyph already carries itself.
+  coatGlyph: {
+    textShadowColor: '#000000',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 3,
+  },
   quickStrikeText: { color: '#15180f', fontWeight: '700' },
   quickDefensiveText: { color: '#6a9bbf' },
   quickReadyText: { color: '#9ec96a' },
