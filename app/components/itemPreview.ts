@@ -295,6 +295,17 @@ function previewWeapon(w: CatalogWeapon): ItemPreview {
     }
     if (parts.length > 0) stats.push(`On a max damage roll: ${parts.join('; ')}`);
   }
+  // ⚠⚠⚠ OTA-1565 — THE BLAST, AND WHO IS INSIDE IT. Friendly fire is stated
+  // here because this card is the only warning a player gets before they buy a
+  // weapon that can kill their own dog. A weapon whose card hides its cost is
+  // the same defect as one whose card hides its effect.
+  if (parsedRules?.splash) {
+    const s = parsedRules.splash;
+    stats.push(
+      `${s.whenMaxRoll ? 'On a max damage roll: ' : ''}${s.dice} to every other enemy in the target's range`
+      + (s.hitsAllies ? ' — AND to your companions in it' : ''),
+    );
+  }
   if (parsedRules?.overheat) {
     const o = parsedRules.overheat;
     stats.push(

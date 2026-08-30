@@ -25914,7 +25914,48 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // execute all hang off a max roll and the trigger now fires for them, but their
 // payloads belong to systems 1c and slice 2 own. Half-building one here is how a
 // weapon ends up with a signature move that fires and does nothing.
-export const OTA_BUILD_ID = '2026-08-30-1564-when-the-dice-come-up-perfect';
+// OTA-1565 - THE BLAST DOES NOT CHOOSE (slice 1c). The last and riskiest family
+// in slice 1, held to the end on purpose: 1a adjusted a number before the roll,
+// 1b read the roll's own outcome, and this one reaches PAST the target to touch
+// bodies the swing never named. Ten weapons say the damage does not stop where
+// you aimed it and every one of them hit exactly one enemy.
+//
+// FRIENDLY FIRE IS IMPLEMENTED, and it is the hard call in this OTA. The
+// Magna-Cannon promises "1d10 AoE damage to enemies or allies in arm's reach of
+// target"; the Aetheric Sword of Storms says "1d10 AoE Close range (allies
+// included)". Quietly sparing the dog would be the same defect this programme
+// exists to close, only inverted - a card stating a COST the game declines to
+// charge - and the cost is the reason those two hit as hard as they do. Spare it
+// and they are simply the best weapons in the game. So it is charged, stated on
+// the item card before the coin is spent, and named in full by the Arbiter on
+// the beat. Two weapons out of 284 can do it, both claim it in their own text,
+// and nothing was given the property that did not already have it.
+//
+// The blast runs BEFORE resolveEnemyDefeat, on the roster it actually went off
+// in - running it after a kill would splash a list the corpse had already been
+// spliced out of, and OTA-1140 is on record for what index drift after a kill
+// costs. It is rolled ONCE for the explosion rather than per victim, because per
+// body turns a 1d10 into "1d10 x however many showed up", which scales hardest
+// exactly when the fight already is. It never double-dips the target, never
+// re-kills a corpse, and never reaches a body standing in another band.
+//
+// KNOCKBACK AND STUN ARE NOT DAMAGE and get no blast. The Shockwave Club,
+// Shockwave Buckler and Gravity Hammer are all written in the same shockwave
+// vocabulary; a reader matching the word would hand three weapons a damage blast
+// their cards never promised while STILL doing nothing about the effect they
+// did. Two bugs were caught by this OTA's own tests, in opposite directions: the
+// disqualifiers were first judged clause by clause, so "2d8 damage to all
+// enemies; knocks prone" slipped through with the rider in the next clause - and
+// the dice were first scoped to the blast clause alone, so "2d8 fire; 15 ft AoE"
+// lost its damage to the neighbouring one. Riders now defer the whole line;
+// dice fall back to it.
+//
+// Two data fixes: the Giant Warblade promised "Damage to all enemies" and named
+// no amount, so there was nothing to apply even once a reader existed (1d6, one
+// tier under the Legendary blasts); and the Mud Army War Hammer's "even/odd
+// reroll to suppress the effect for one attack" was the declinable pattern the
+// owner had already had removed from the Plasma Scythe, wearing a coin flip.
+export const OTA_BUILD_ID = '2026-08-30-1565-the-blast-does-not-choose';
 // golem catch-up 2026-08-30: markerless publish of OTA-1564 (the max-roll
 // trigger, the repeaters' extra shots, and the overheat family) to the golem
 // channel.

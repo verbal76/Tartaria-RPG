@@ -23338,6 +23338,80 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const livePrevHp = get().currentScene?.enemyHps[activeIdx] ?? prevHp;
       let newEnemyHp = livePrevHp - dmg;
 
+      // ⚠⚠⚠ OTA-1565 (slice 1c) — THE BLAST. Nine weapons say the damage does
+      // not stop at the thing you aimed at, and every one of them hit exactly
+      // one enemy. This is the riskiest family in slice 1, held to last on
+      // purpose: the earlier slices adjusted the swing, this one reaches PAST
+      // the target and touches bodies the swing never named.
+      //
+      // ⚠⚠ IT RUNS BEFORE resolveEnemyDefeat, so the roster it reads is the one
+      // the blast actually went off in. Running it after a kill would splash a
+      // list the corpse had already been spliced out of — and OTA-1140 is on
+      // record for what index drift after a kill costs.
+      //
+      // ⚠⚠ ROLLED ONCE, NOT PER VICTIM: an explosion is one event, and rolling
+      // per body turns a 1d10 into "1d10 × however many showed up", which scales
+      // the wrong way — hardest exactly when the fight is already hardest.
+      const splashSpec = parsedEffect?.splash;
+      if (splashSpec && (!splashSpec.whenMaxRoll || swungMaxRoll)) {
+        const blastScene = get().currentScene;
+        const targetBand = blastScene ? enemyBandOf(blastScene, activeIdx) : null;
+        const blast = Math.max(1, rollFromNotation(splashSpec.dice));
+        const caught: string[] = [];
+        if (blastScene && targetBand) {
+          const victims: number[] = [];
+          blastScene.enemies.forEach((e, i) => {
+            if (i === activeIdx) return;                                  // the target took the swing itself
+            if ((blastScene.enemyHps[i] ?? 0) <= 0) return;               // never re-kill a corpse
+            if (blastScene.enemyKnockedOut?.[i]) return;
+            if (enemyBandOf(blastScene, i) !== targetBand) return;        // a blast has a place
+            victims.push(i);
+            caught.push(e.name);
+          });
+          if (victims.length > 0) {
+            set((s) => {
+              if (!s.currentScene) return s;
+              const hps = [...s.currentScene.enemyHps];
+              for (const i of victims) hps[i] = Math.max(0, (hps[i] ?? 0) - blast);
+              return { currentScene: { ...s.currentScene, enemyHps: hps } };
+            });
+          }
+        }
+        // ⚠⚠⚠ FRIENDLY FIRE IS REAL, ON THE TWO WEAPONS THAT SAY SO. The
+        // Magna-Cannon promises "enemies or allies"; the Sword of Storms says
+        // "(allies included)". Quietly sparing the dog would be the same defect
+        // as ignoring the effect entirely — a card stating a COST the game does
+        // not charge — and the cost is the reason those two hit as hard as they
+        // do. It is stated on the item card before the coin is spent, and the
+        // Arbiter names it in full when it happens.
+        let dogHit = 0;
+        if (splashSpec.hitsAllies && targetBand === 'close') {
+          const pWithDog = get().player;
+          if (hasActiveDog(pWithDog) && pWithDog?.dog && (pWithDog.dog.hp ?? 0) > 0) {
+            dogHit = blast;
+            set((s) => (s.player?.dog
+              ? { player: { ...s.player, dog: { ...s.player.dog, hp: Math.max(0, (s.player.dog.hp ?? 0) - dogHit) } } }
+              : s));
+          }
+        }
+        if (caught.length > 0 || dogHit > 0) {
+          get().appendLog(
+            'combat',
+            `The blast opens past ${enemy.name}${caught.length > 0 ? ` — ${caught.join(', ')} caught for ${blast}` : ''}${
+              dogHit > 0 ? `${caught.length > 0 ? ', and' : ' —'} your dog is inside the radius for ${dogHit}` : ''}.`,
+          );
+          if (dogHit > 0) {
+            const dogNow = get().player?.dog;
+            get().appendLog(
+              'arbiter',
+              (dogNow?.hp ?? 0) > 0
+                ? `The Arbiter does not look away. "That one does not choose. Mind where the dog is standing."`
+                : `The Arbiter is quiet a moment. "It does not choose, and it did not know."`,
+            );
+          }
+        }
+      }
+
       // 2026-05-25 — removed dead OTA-039 'golem_companion' status
       // follow-up block. The status kind is no longer emitted by any
       // code path (MECHANIC-1b OTA-011 replaced it with player.golem

@@ -113,6 +113,28 @@ export interface OnMaxRoll {
   permanentStat?: { stat: keyof Stats; amount: number };
 }
 
+/**
+ * ⚠⚠⚠ OTA-1565 (slice 1c) — THE BLAST. Nine weapons say the damage does not
+ * stop at the thing you aimed at, and every one of them hit exactly one enemy.
+ * This is the riskiest family in slice 1 and it was held to last on purpose: the
+ * other slices adjusted the swing, this one reaches PAST the target and touches
+ * things the swing never named — other enemies, and on two weapons, your own dog.
+ *
+ * ⚠⚠ `dice` is what each additional body takes; it is rolled ONCE for the blast
+ * rather than per victim, because an explosion is one event. `whenMaxRoll` marks
+ * the three that only go off on a perfect roll (OTA-1564's trigger, reused —
+ * this slice adds no second answer to "did the dice come up perfect"). And
+ * `hitsAllies` is carried explicitly rather than inferred, because a weapon that
+ * can kill your companion must say so in its own data and on its own card.
+ */
+export interface SplashSpec {
+  dice: string;
+  /** Only on a max damage roll (Giant Warblade, Sword of Storms, War Hammer). */
+  whenMaxRoll?: boolean;
+  /** "enemies or allies", "(allies included)" — friendly fire is real. */
+  hitsAllies?: boolean;
+}
+
 /** "Natural 1 → overheat, useless 2 rounds." A weapon that punishes you later. */
 export interface OverheatSpec {
   /** Rounds the weapon is unusable. */
@@ -148,6 +170,8 @@ export interface ParsedWeaponEffect {
   reloadRounds?: number;
   /** OTA-1564 — "Natural 1 → overheat, useless 2 rounds." */
   overheat?: OverheatSpec;
+  /** OTA-1565 — damage that does not stop at the thing you aimed at. */
+  splash?: SplashSpec;
 }
 
 /**
@@ -305,6 +329,61 @@ function overheatFrom(text: string): OverheatSpec | null {
 }
 
 const WORD_COUNT: Record<string, number> = { twice: 2, three: 3, thrice: 3, two: 2, four: 4 };
+
+/**
+ * ⚠⚠⚠ OTA-1565 — WHICH SENTENCES ARE ACTUALLY A BLAST. The catalog says this
+ * eight different ways ("splash", "AoE", "explosive rounds", "shockwave …
+ * radius", "to all enemies", "to everything in arm's reach"), so the reader
+ * matches the CLAIM rather than any one word.
+ *
+ * ⚠⚠ WHAT IS DELIBERATELY NOT A BLAST, and the distinction is the whole reason
+ * this reads clause by clause: KNOCKBACK moves bodies between range bands
+ * (Shockwave Club, Shockwave Buckler) and STUN incapacitates them (Gravity
+ * Hammer). Both are frequently written in the same shockwave vocabulary and
+ * neither is damage — a "shockwave" reader that took them would hand three
+ * weapons a damage blast their cards never promised, on top of doing nothing
+ * about the effect they DID promise. They wait for their own systems.
+ *
+ * ⚠⚠ AND "+1d6 to arm's-reach TARGETS" IS NOT A BLAST EITHER. The Giant Bone
+ * Knuckles' line is a bonus against something you are already hitting — the same
+ * shape as "+1d6 against constructs", which the clause parser above has read
+ * since long before this OTA. Matching it here would double-count it.
+ */
+/**
+ * ⚠⚠⚠ THE DISQUALIFIERS ARE JUDGED ON THE WHOLE LINE, NOT PER CLAUSE — and the
+ * first draft got this backwards in BOTH directions, which is why it is spelled
+ * out here. Clause-scoped, `"2d8 damage to all enemies; knocks prone."` slipped
+ * through: the blast clause read clean because the rider sat in the next one, so
+ * the weapon would have gained a damage blast and still owed a prone it never
+ * got. A rider this slice cannot build makes the WEAPON not-this-slice, wherever
+ * on the line it is written.
+ */
+const SPLASH_DEFERRED_RE = /\bknock|\bpush\b|\bstun\b|\bprone\b|\bburning ground\b/;
+
+function splashFrom(text: string): SplashSpec | null {
+  if (SPLASH_DEFERRED_RE.test(text)) return null;
+  for (const clause of text.split(/[.;]/)) {
+    const isBlast =
+      /\bsplash\b|\baoe\b|\bexplosive\b/.test(clause)
+      || /\bto all enemies\b|\bto everything\b|\ball enemies in\b/.test(clause)
+      || (/\bshockwave\b/.test(clause) && /\bradius\b/.test(clause))
+      || (/\bdamage\b/.test(clause) && /\bnearby enemies\b/.test(clause));
+    if (!isBlast) continue;
+    // ⚠⚠ THE DICE MAY LIVE IN A NEIGHBOURING CLAUSE — the mirror of the bug
+    // above, and just as real: `"2d8 fire; 15 ft AoE"` names the blast in one
+    // clause and its damage in the other. Falling back to the line finds it.
+    const dice = clause.match(/(\d+d\d+)/) ?? text.match(/(\d+d\d+)/);
+    if (!dice) continue;
+    return {
+      dice: dice[1]!,
+      ...(MAX_ROLL_RE.test(clause) || MAX_ROLL_RE.test(text) ? { whenMaxRoll: true } : {}),
+      // Stated in the weapon's own words, never inferred. A weapon that can kill
+      // your companion has to say so in its data.
+      ...(/\ballies\b|\bally\b/.test(clause) ? { hitsAllies: true } : {}),
+    };
+  }
+  return null;
+}
 
 function rangeNoteFrom(text: string): WeaponRangeNote | null {
   if (/\bat any range\b/.test(text)) return 'any';
@@ -495,6 +574,10 @@ export function parseWeaponEffect(effect: string | undefined | null): ParsedWeap
 
   const oh = overheatFrom(text);
   if (oh) { out.overheat = oh; touched = true; }
+
+  // OTA-1565 (slice 1c) — the blast.
+  const blast = splashFrom(text);
+  if (blast) { out.splash = blast; touched = true; }
 
   return touched ? out : null;
 }

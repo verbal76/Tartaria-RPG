@@ -1675,7 +1675,7 @@
         "mud_dwellers",
         "legendary"
       ],
-      "effect": "Close-in shockwave on max roll; +2d10 to everything in arm's reach radius. Even/odd reroll to suppress the effect for one attack. Grants +25 HP.",
+      "effect": "Close-in shockwave on max roll; +2d10 to everything in arm's reach radius. Grants +25 HP.",
       "description": "Banner-weapon of the Mud Army. The world hears it land.",
       "statBonuses": [
         {
@@ -3348,7 +3348,7 @@
         "blade",
         "giants"
       ],
-      "effect": "Damage to all enemies in same range on max roll.",
+      "effect": "1d6 to all enemies in the same range on a max roll.",
       "description": "Heavy single-handed blade. Sweeps wide on the kill stroke."
     },
     {
