@@ -73,6 +73,11 @@ export interface CrashRecord {
     phase?: string;
     phaseDetail?: string;
     phaseAt?: number;
+    /** ⚠⚠ OTA-1567 — the last sign of life, kept apart from the last CHECKPOINT.
+     *  The `rendered` heartbeat used to overwrite `phase` on every React commit,
+     *  so 25 of 32 native-death receipts named `rendered` — the instrument
+     *  reporting "the player was playing". See saveSystem.LiveBreadcrumb. */
+    aliveAt?: number;
   };
   /** Set once a transport has accepted it. Absent = never delivered anywhere. */
   sent?: boolean;

@@ -212,7 +212,13 @@ describe('OTA-1546 — the dying breath names the native job', () => {
   it('⚠⚠ the stamp can never wedge the chain it observes', () => {
     const lock = src('app', 'ai', 'nativeMlLock.ts');
     const i = lock.indexOf('function stampNativePhase');
-    expect(lock.slice(i, i + 900)).toContain('catch');
+    // ⚠ WINDOW WIDENED BY OTA-1567, which added a long note above the stamp
+    // explaining why queue depth now rides `done` as well as `start`. The
+    // property is unchanged — the stamp is wrapped, so a broken instrument can
+    // never wedge the ML chain it observes — and a fixed character window is
+    // the fragile way to assert it, so this reads to the end of the function.
+    const fnEnd = lock.indexOf('\n}', i);
+    expect(lock.slice(i, fnEnd)).toContain('catch');
   });
 
   it('⚠ priority maps to a legible job class — the ledger reads like a sentence', () => {

@@ -25987,7 +25987,57 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // YOU (the gun is in your hands), so it is your own band that burns, and the
 // count resets on detonation - left banked it would detonate on every shot from
 // then on, which is a broken weapon rather than a dangerous one.
-export const OTA_BUILD_ID = '2026-08-30-1566-the-first-one-is-the-one-that-counts';
+// OTA-1567 - THE HEARTBEAT ATE THE CHECKPOINT. From a sweep of all 32
+// native-death receipts the owner's devices have filed since 2026-08-21. Three
+// findings, and the first two are the same shape: a number reported confidently
+// and wrongly for weeks, because nothing ever compared it against what it was
+// supposed to mean.
+//
+// 1. `rendered` IS A HEARTBEAT AND IT WAS OVERWRITING THE PHASE. It is stamped
+// from a useEffect with NO dependency array, so it fires after every React
+// commit of the exploration screen, and it shared the `phase` field with the
+// real checkpoints - so native:llm:start, ctx-open, parsed:attack each survived
+// only until the next commit. The 500ms throttle never protected them: it
+// applies only when the PREVIOUS phase was also `rendered`, so a real checkpoint
+// was overwritten immediately. TWENTY-FIVE of the thirty-two receipts name
+// `rendered` as the phase they died in - not a fact about the app, but the
+// instrument answering "the player was playing", which is true essentially
+// always. The seven specific phases on file are only the deaths that landed in a
+// window where no commit ran. An instrument built by OTA-1356 to answer "which
+// phase did it die in" has been answering "the exploration screen was mounted".
+//
+// 2. `lastPhaseAgeMs` HAS NEVER ONCE CARRIED A REAL VALUE, in either era. Builds
+// <=1503 dated the record at the ACTION'S START, so ts - phaseAt came out
+// NEGATIVE whenever a phase stamped after the action began - ten receipts, down
+// to -2,639,101ms, and an age cannot be negative. Builds >=1504 redated the
+// record to the last sign of life (correctly), which made ts BE phaseAt, so the
+// subtraction became phaseAt - phaseAt - twenty-two receipts, every one exactly
+// 0. The split falls exactly at 1504: the highest build with a negative age is
+// 1503. The record was fixed and its reader was not, which is the quietest way an
+// instrument can fail - it never threw, it just answered the same number forever.
+//
+// 3. 78% OF THE LEDGER IS AN IDLE PROCESS BEING RECLAIMED. Twenty-five receipts
+// read `rendered` + `(no action yet)`: the app on a screen with nothing in
+// flight, killed by Android for being a ~400MB idle process. OTA-1413 made
+// exactly this argument for the teardown flavour - "an instrument that fires on
+// every app-switch buries the one real event in noise" - and suppressed it. This
+// is the same event one layer over. It is still RECORDED, only not as fatal;
+// suppressing a false positive is worth doing, buying it with a blind spot is
+// not, which is the line OTA-1377 and OTA-1413 both drew.
+//
+// The heartbeat now keeps its own `aliveAt` and leaves `phase` standing, so the
+// difference between them is the number this instrument has wanted since
+// OTA-1356: how long the app went on living after its last checkpoint. Near zero
+// indicts that checkpoint; large exonerates it. And the action-age bootSlice
+// already computed - then spent on a prose sentence nothing can group or sort -
+// is now a field.
+//
+// A CORRECTION OWED: I told the owner the three tap "missions" / tap "inventory"
+// deaths were the first real B9 signal out of this ledger. They are not - all
+// three sit at phase `rendered`, so the tap had completed and the app was idle.
+// They are the same OS reclaim with a stale action label. The genuine signal is
+// the SEVEN deaths at a ctx-* or native:* phase, with native ML work in flight.
+export const OTA_BUILD_ID = '2026-08-30-1567-the-heartbeat-ate-the-checkpoint';
 // golem catch-up 2026-08-30: markerless publish of OTA-1565/1566 (the blast, the
 // ordinals restored as firsts, and the repeater's visible fuse) to the golem
 // channel.

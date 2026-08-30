@@ -265,7 +265,15 @@ function stampNativePhase(tag: 'start' | 'done', priority: number, queued: numbe
       : priority >= ML_PRIORITY_VOICE ? 'voice'
       : priority >= ML_PRIORITY_COGNITION ? 'cognition'
       : 'llm';
-    stampBreadcrumbPhase(`native:${cls}:${tag}`, tag === 'start' ? `q${queued}` : undefined);
+    // ⚠⚠⚠ OTA-1567 — QUEUE DEPTH ON `done` TOO, and this is not a tidy-up. The
+    // note above promises *"queue depth rides along — a death with q3 backed up
+    // is a different fact from a death on an idle queue"* — but it was only ever
+    // stamped on `start`, so a death at `:done` carried no queue information at
+    // all. Both of the owner's most recent native deaths (2026-08-29 and
+    // 2026-08-30 — the only two of all 32 receipts with a `native:*` phase) are
+    // `native:cognition:done` with an empty detail. The one live lead in the
+    // whole ledger is the exact shape the instrument declined to describe.
+    stampBreadcrumbPhase(`native:${cls}:${tag}`, `q${queued}`);
   } catch { /* an instrument may never break the thing it measures */ }
 }
 

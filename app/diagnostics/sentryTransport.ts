@@ -242,7 +242,29 @@ export function toSentryEvent(rec: CrashRecord): Record<string, unknown> {
       lastScreen: bc?.screen,
       lastPhase: bc?.phase,
       lastPhaseDetail: bc?.phaseDetail,
-      lastPhaseAgeMs: bc?.phaseAt ? rec.ts - bc.phaseAt : undefined,
+      // ⚠⚠⚠ OTA-1567 — THIS FIELD HAS NEVER ONCE CARRIED A REAL VALUE, across
+      // all 32 native-death receipts on file, in either of its two eras:
+      //
+      //   builds ≤1503 — `ts` was the ACTION'S START, so `ts - phaseAt` came out
+      //     NEGATIVE whenever a phase stamped after the action began. Ten
+      //     receipts, down to −2,639,101ms. An age cannot be negative.
+      //   builds ≥1504 — OTA-1504 correctly redated the record to the last sign
+      //     of life, which made `ts` BE `phaseAt`, so the subtraction became
+      //     `phaseAt − phaseAt`. Twenty-two receipts, every one exactly 0.
+      //
+      // The record was fixed and its reader was not, which is the quietest way
+      // an instrument can fail: it never threw, it just answered the same number
+      // forever. It is now computed from the two timestamps that are genuinely
+      // different — the last sign of life and the last real CHECKPOINT — so it
+      // finally means what its name says: how long the app went on living after
+      // its last checkpoint. Near zero indicts that checkpoint; large exonerates
+      // it, which is the question OTA-1356 built this instrument to answer.
+      lastPhaseAgeMs: bc?.phaseAt && bc?.aliveAt ? Math.max(0, bc.aliveAt - bc.phaseAt) : undefined,
+      // ⚠⚠ AND THE NUMBER bootSlice ALREADY COMPUTES AND THROWS AWAY. It works
+      // out how long the action had been standing at the last sign of life, uses
+      // that to decide whether to call the label stale — and then spends it on a
+      // prose sentence, where nothing can group, sort or alert on it.
+      actionAgeMs: bc?.aliveAt && bc?.at ? Math.max(0, bc.aliveAt - bc.at) : undefined,
     },
   };
 }

@@ -124,7 +124,11 @@ describe('OTA-1380 — the native death finally becomes a crash', () => {
     // crumb was already proof of death; it was only ever printed to the debug
     // log and then discarded.
     expect(store).toContain("kind: 'native-death',");
-    expect(store).toContain('message: `Process died with no orderly exit while: ${crumb.what}`');
+    // ⚠ RETARGETED BY OTA-1567, which added an IDLE branch beside this one so
+    // an OS reclaim of a process with nothing in flight stops paging as a
+    // fatal crash. The property pinned here is unchanged: a death that
+    // happened WHILE SOMETHING WAS LIVE still says so, in the crumb's words.
+    expect(store).toContain('`Process died with no orderly exit while: ${crumb.what}`');
     expect(store).toContain('breadcrumb: crumb,');
   });
 

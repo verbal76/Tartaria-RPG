@@ -181,18 +181,41 @@ export const createBootSlice = (
           // and this boot. So `ts` is the last stamp, and an action that had
           // already been standing a long while at that point is SAID to be
           // stale rather than presented as what killed the app.
-          const lastAlive = crumb.phaseAt ?? crumb.at;
+          // ⚠⚠⚠ OTA-1567 — `aliveAt` FIRST. The heartbeat now keeps its own
+          // timestamp (see saveSystem.stampBreadcrumbPhase), so the last sign of
+          // life is no longer whichever checkpoint happened to be overwritten
+          // last — it is the later of the last render commit and the last real
+          // checkpoint, which is what "last seen alive" always meant.
+          const lastAlive = crumb.aliveAt ?? crumb.phaseAt ?? crumb.at;
           const staleMs = Math.max(0, lastAlive - crumb.at);
+          // ⚠⚠⚠ AND AN IDLE PROCESS BEING RECLAIMED IS NOT A FATAL CRASH.
+          // Twenty-five of the owner's 32 receipts read `rendered` +
+          // `(no action yet)`: the app sitting on a screen with nothing in
+          // flight, killed by Android for being a ~400MB idle process. OTA-1413
+          // already made exactly this argument for the teardown flavour —
+          // *"an instrument that fires on every app-switch buries the one real
+          // event in noise"* — and suppressed it. This is the same event one
+          // layer over, and it is 78% of the ledger.
+          //
+          // ⚠⚠ IT IS STILL RECORDED, only not as FATAL. That is the line
+          // OTA-1377 and OTA-1413 both drew: suppressing a false positive is
+          // worth doing, buying it with a blind spot is not. The record stays in
+          // the ledger, in About and in the bug report; what changes is that it
+          // stops paging as a crash, so the seven deaths that DID happen with
+          // native work in flight are no longer buried under it.
+          const idle = crumb.phase === 'rendered' && crumb.what === '(no action yet)';
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           (require('../../diagnostics/crashLedger') as typeof import('../../diagnostics/crashLedger')).recordCrash({
             kind: 'native-death',
             ts: lastAlive,
             stage: crumb.phase ?? 'mid-action',
-            message: `Process died with no orderly exit while: ${crumb.what}`
-              + (staleMs > 120_000
-                ? ` — begun ${Math.round(staleMs / 60_000)}m before the last sign of life; treat the action label as stale, not as the killer`
-                : ''),
-            isFatal: true,
+            message: idle
+              ? `Process reclaimed while idle at a rendered screen — nothing was in flight (${Math.round((lastAlive - (crumb.phaseAt ?? lastAlive)) / 1000)}s since the last checkpoint)`
+              : `Process died with no orderly exit while: ${crumb.what}`
+                + (staleMs > 120_000
+                  ? ` — begun ${Math.round(staleMs / 60_000)}m before the last sign of life; treat the action label as stale, not as the killer`
+                  : ''),
+            isFatal: !idle,
             breadcrumb: crumb,
           });
         }

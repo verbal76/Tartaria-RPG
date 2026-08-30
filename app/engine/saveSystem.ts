@@ -767,6 +767,31 @@ export interface LiveBreadcrumb {
   phase?: string;
   phaseAt?: number;
   phaseDetail?: string;
+  /**
+   * ⚠⚠⚠ OTA-1567 — THE HEARTBEAT, SPLIT OUT FROM THE CHECKPOINT, because for
+   * eleven days they shared one field and the heartbeat ate the checkpoint.
+   *
+   * `rendered` is stamped from a `useEffect` with NO dependency array — it runs
+   * after every React commit of the exploration screen. Sharing `phase` with the
+   * real checkpoints meant any of them (`native:llm:start`, `ctx-open`,
+   * `parsed:attack`) survived only until the next commit, which is milliseconds.
+   * The 500ms throttle never helped: it applies only when the PREVIOUS phase was
+   * also `rendered`, so a real checkpoint is overwritten immediately.
+   *
+   * Measured over the owner's 32 native-death receipts: TWENTY-FIVE name
+   * `rendered` as the phase they died in. That is not a finding about the app —
+   * it is the instrument reporting "the player was playing", which is true
+   * essentially always and answers nothing. The 7 specific phases are only the
+   * deaths that happened to land in a window where no commit ran.
+   *
+   * So the heartbeat now updates `aliveAt` alone and leaves `phase` standing.
+   * `aliveAt` is the last sign of life (what dates the death); `phaseAt` is the
+   * last real checkpoint; and the DIFFERENCE between them is the number this
+   * instrument has been trying to produce since OTA-1356 — how long the app kept
+   * rendering after its last checkpoint. Near zero indicts the checkpoint; large
+   * exonerates it.
+   */
+  aliveAt?: number;
   /** ⚠⚠ OTA-1413 — THIS CRUMB WAS WRITTEN AFTER THE APP ALREADY LEFT CLEANLY.
    *  Set when a phase is stamped between an orderly `background` exit and the
    *  next foreground. Such a crumb surviving to the next boot means the OS
@@ -855,13 +880,51 @@ export function _resetBreadcrumbMirrorForTest(): void {
 // 1ms into the return to foreground, before any action) which is one of the
 // three B9 freezes this whole hunt exists for. What was actually broken was
 // WHO READ THE CRUMB; see readSurvivingBreadcrumb below.
+/**
+ * ⚠⚠⚠ OTA-1567 — `rendered` IS A HEARTBEAT, NOT A CHECKPOINT, and treating it
+ * as one cost this instrument most of its value. It fires after every React
+ * commit of the exploration screen; every other phase in the vocabulary marks a
+ * specific thing starting or finishing. Twenty-five of the owner's 32
+ * native-death receipts name `rendered`, which only ever meant "the player was
+ * playing". Keeping the two apart is the whole fix.
+ */
+const HEARTBEAT_PHASE = 'rendered';
+
 export function stampBreadcrumbPhase(phase: string, detail?: string): void {
   try {
     const base: LiveBreadcrumb = _lastLiveCrumb ?? { at: Date.now(), what: '(no action yet)' };
     const now = Date.now();
-    // The render phase fires once per React commit; collapse bursts so the
-    // instrumentation costs at most a couple of tiny writes per second.
-    if (phase === 'rendered' && base.phase === 'rendered' && now - _lastPhaseWriteAt < 500) return;
+    // ⚠⚠⚠ OTA-1567 — THE HEARTBEAT UPDATES `aliveAt` AND LEAVES `phase` ALONE.
+    // Before this it overwrote the phase on the very next React commit, so a
+    // checkpoint lived for milliseconds and the death record almost always said
+    // `rendered`. The heartbeat's real job — dating the last sign of life — is
+    // unchanged and still exactly what OTA-1504 needs to date a death.
+    //
+    // ⚠⚠ It still SETS the phase when there is no checkpoint to protect, so an
+    // idle process's death is not left phaseless. That is OTA-1526's rule kept:
+    // an idle death is still a death worth a record, and blinding the instrument
+    // to it was the first draft of that fix and was wrong.
+    if (phase === HEARTBEAT_PHASE) {
+      // ⚠⚠⚠ THE THROTTLE MUST NEVER SKIP THE ORDERLY-EXIT RECONCILIATION, and
+      // the first draft of this OTA did — caught by ota1413's own suite on the
+      // SECOND background→foreground cycle, where the two renders fell inside
+      // one 500ms window and the stale `afterOrderlyExit` survived the return to
+      // foreground. That is not a cosmetic leak: OTA-1413 files such a crumb as
+      // a routine OS reclaim rather than a crash, so a death 1ms into the
+      // foreground would have been dropped — which is the third B9 freeze
+      // exactly, and the one that instrument exists to catch. Throttle the
+      // writes, never the flag.
+      const flagNeedsChange = _exitedCleanly !== !!base.afterOrderlyExit;
+      if (!flagNeedsChange && now - _lastPhaseWriteAt < 500 && base.aliveAt) return;
+      const beat: LiveBreadcrumb = { ...base, aliveAt: now };
+      if (!base.phase) { beat.phase = HEARTBEAT_PHASE; beat.phaseAt = now; }
+      if (_exitedCleanly) beat.afterOrderlyExit = true;
+      else delete beat.afterOrderlyExit;
+      _lastLiveCrumb = beat;
+      _lastPhaseWriteAt = now;
+      void AsyncStorage.setItem(LAST_BREADCRUMB_KEY, JSON.stringify(_lastLiveCrumb)).catch(() => { /* ignore */ });
+      return;
+    }
     // ⚠⚠ SET FROM THE LATCH, NEVER INHERITED FROM `base`. The first draft of
     // this spread the flag forward out of the previous crumb, which made it
     // STICKY: once a background stamp set it, the `appstate:background→active`
@@ -870,7 +933,11 @@ export function stampBreadcrumbPhase(phase: string, detail?: string): void {
     // That is the third B9 freeze exactly, and OTA-1357 exists because of it.
     // Suppressing a false positive is worth doing; buying it with a blind spot
     // over the one event this instrument was built to catch is not.
-    const next: LiveBreadcrumb = { ...base, phase, phaseAt: now, phaseDetail: detail };
+    // A real checkpoint is also a sign of life, so it moves `aliveAt` too — the
+    // heartbeat only runs on one screen, and a death during a long native call
+    // on any other must still be dated at its last stamp rather than at whenever
+    // the exploration screen last happened to commit.
+    const next: LiveBreadcrumb = { ...base, phase, phaseAt: now, phaseDetail: detail, aliveAt: now };
     if (_exitedCleanly) next.afterOrderlyExit = true;
     else delete next.afterOrderlyExit;
     _lastLiveCrumb = next;

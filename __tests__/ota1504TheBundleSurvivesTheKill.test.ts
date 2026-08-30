@@ -259,7 +259,13 @@ describe('OTA-1504 — the death is dated at the last sign of life', () => {
   it('⚠⚠⚠ THE LEDGER RECORD USES phaseAt, NOT THE ACTION START — the 44-minute misdating dies here', () => {
     const block = between(BOOT, "kind: 'native-death'", 'breadcrumb: crumb,');
     expect(block).toContain('ts: lastAlive,');
-    expect(BOOT).toContain('const lastAlive = crumb.phaseAt ?? crumb.at;');
+    // ⚠ RETARGETED BY OTA-1567. This OTA's whole point — date the death at the
+    // LAST SIGN OF LIFE rather than at the action's start — is unchanged and is
+    // what this still pins. What changed is that the last sign of life is no
+    // longer whichever checkpoint happened to survive being overwritten: the
+    // `rendered` heartbeat now keeps its own `aliveAt`, so the record reads the
+    // later of the two instead of the one the heartbeat left standing.
+    expect(BOOT).toContain('const lastAlive = crumb.aliveAt ?? crumb.phaseAt ?? crumb.at;');
   });
 
   it('⚠⚠ an action standing longer than 2 minutes at the last stamp is CALLED stale in the record', () => {
