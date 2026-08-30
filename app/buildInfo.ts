@@ -25822,6 +25822,12 @@ export const OTA_BUILD_ID = '2026-08-30-1561-the-power-it-generates';
 // radiation casters with recipes, cold 1->5 and radiation 1->5; the INT/WIS split
 // behind an `unmaking` tag; two passive slots, three at Legendary; and Frostbind
 // finally craftable) to the golem channel.
+// golem catch-up 2026-08-30: markerless publish of OTA-1561 (the Crucible opens
+// to rune-casters - they take PASSIVES instead of a coating channel, computed off
+// the wielder's stat on every swing rather than stamped at the bench, one per
+// visit to a cap of two or three at Legendary; their own heading in the upgrade
+// picker; the damage roll names the stat that made the bonus; and energy ranged
+// weapons keep the old no-edge refusal) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1550-one-slot-one-weapon';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1549-the-button-you-can-see';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1548-twenty-more-fires-in-the-dark';
