@@ -102,28 +102,33 @@ describe('OTA-1564 — the bookkeeping the owner had removed, and what I removed
     expect(offenders.map((w) => w.name)).toEqual([]);
   });
 
-  it('⚠⚠⚠ …NOR AN ORDINAL TALLY, which is the same thing in different words', () => {
-    // "on the 5th max roll" needs a count that survives a round, a fight and a
-    // save/load — exactly the state the per-encounter charge needed.
+  // ⚠⚠⚠ RETARGETED BY OTA-1566, WHERE THE OWNER OVERRULED THIS CUT AND WAS
+  // RIGHT. These three pinned "no ordinal at all". His ruling — *"change the on
+  // 3rd and 5th roll to on first roll on the weapons they were on"* — keeps
+  // every payload and reduces the state to a FLAG instead of a TALLY, which is
+  // the distinction that actually mattered and the one now pinned. A FIRST is
+  // "already happened, or not"; a FIFTH is a count that can drift, double, or be
+  // lost across a save.
+  it('⚠⚠⚠ A DEEPER ORDINAL IS STILL REFUSED — a tally is the part that was wrong', () => {
     const offenders = WEAPONS.filter((w) =>
-      /\b(?:first|second|third|fourth|fifth|\d+(?:st|nd|rd|th))\s+max\b/i.test(w.effect ?? ''));
+      /\b(?:second|third|fourth|fifth|\d+(?:nd|rd|th))\s+max\b/i.test(w.effect ?? ''));
     expect(offenders.map((w) => w.name)).toEqual([]);
   });
 
   it('⚠⚠⚠ AND THE GUARD HOLDS EVEN IF ONE IS AUTHORED TOMORROW', () => {
-    // The data is clean today; the parser is what keeps it honest. Without this
-    // guard all three ordinal weapons fired on EVERY max roll — a Legendary's
-    // signature payoff turning up several times a fight instead of once.
+    // Without it, all three of those weapons fired on EVERY max roll — a
+    // Legendary's signature payoff turning up several times a fight instead of
+    // once. A future author has to write a FIRST, not get silent per-swing fire.
     expect(parseWeaponEffect('+2 STR (permanent) on 5th max roll.')?.onMaxRoll).toBeUndefined();
     expect(parseWeaponEffect('Bypasses shields permanently on third max roll.')?.onMaxRoll).toBeUndefined();
-    expect(parseWeaponEffect('Permanent +1 STR on first max roll.')?.onMaxRoll).toBeUndefined();
+    // …and a FIRST is now the supported shape, not a refusal.
+    expect(parseWeaponEffect('+1 STR permanently on your first max damage roll.')?.onMaxRoll?.onceEver).toBe(true);
   });
 
-  it('⚠⚠ the three rewritten weapons kept their payload, only lost the counting', () => {
-    // The point of removing the bookkeeping was never to remove the weapon.
+  it('⚠⚠ every rewritten weapon kept its payload — the point was never to remove one', () => {
     expect(parseWeaponEffect(row('Plasma Scythe').effect)?.onMaxRoll?.pierce).toBe('armor');
     expect(parseWeaponEffect(row('Tartarian Hand Axe').effect)?.onMaxRoll?.bonusDice).toBe('1d6');
-    expect(parseWeaponEffect(row('Bone Spear Launcher').effect)?.onMaxRoll?.pierce).toBe('shields');
+    expect(parseWeaponEffect(row('Bone Spear Launcher').effect)?.onMaxRoll?.permanentPierce).toBe('shields');
     expect(parseWeaponEffect(row('Giant Bone Spear').effect)?.onMaxRoll?.permanentStat)
       .toEqual({ stat: 'strength', amount: 2 });
   });
@@ -301,7 +306,10 @@ describe('OTA-1564 — the wiring', () => {
 
   it('⚠ the card states the volley, the payoff and the cost before the coin is spent', () => {
     expect(PREVIEW).toContain('Fires ${parsedRules.shotsPerRound}× per round');
-    expect(PREVIEW).toContain('On a max damage roll: ${parts.join(\'; \')}');
+    // ⚠ RETARGETED BY OTA-1566, which had to distinguish a first-roll unlock
+    // from an every-roll payoff on the card. Same property: the max-roll payload
+    // is stated before the coin is spent.
+    expect(PREVIEW).toContain("max damage roll${m.onceEver ? ' (once ever)' : ''}: ${parts.join('; ')}");
     expect(PREVIEW).toContain('Natural 1: ${o.word}s');
   });
 });

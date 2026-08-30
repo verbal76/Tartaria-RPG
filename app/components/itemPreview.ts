@@ -291,9 +291,17 @@ function previewWeapon(w: CatalogWeapon): ItemPreview {
     if (m.shredDice) parts.push(`strips ${m.shredDice} armour`);
     if (m.pierce) parts.push(m.pierce === 'shields' ? 'opens the shield' : 'opens the armour');
     if (m.permanentStat) {
-      parts.push(`+${m.permanentStat.amount} ${m.permanentStat.stat.toUpperCase().slice(0, 3)} permanently, once ever`);
+      parts.push(`+${m.permanentStat.amount} ${m.permanentStat.stat.toUpperCase().slice(0, 3)} permanently`);
     }
-    if (parts.length > 0) stats.push(`On a max damage roll: ${parts.join('; ')}`);
+    // ⚠ OTA-1566 — say that the unlock is PERMANENT, because that is the whole
+    // reason to chase the first one. A player who reads "opens the shield" and
+    // does not know it stays open has been told the smaller half of the truth.
+    if (m.permanentPierce) {
+      parts.push(`${m.permanentPierce === 'shields' ? 'shields' : 'armour'} bypassed permanently from then on`);
+    }
+    if (parts.length > 0) {
+      stats.push(`On your ${m.onceEver ? 'FIRST' : ''} max damage roll${m.onceEver ? ' (once ever)' : ''}: ${parts.join('; ')}`.replace('your  max', 'a max'));
+    }
   }
   // ⚠⚠⚠ OTA-1565 — THE BLAST, AND WHO IS INSIDE IT. Friendly fire is stated
   // here because this card is the only warning a player gets before they buy a
@@ -311,6 +319,12 @@ function previewWeapon(w: CatalogWeapon): ItemPreview {
     stats.push(
       `Natural 1: ${o.word}s${o.confirmed ? ' (even/odd to confirm)' : ''} — unusable ${o.rounds} round${o.rounds === 1 ? '' : 's'}${o.selfDice ? `, ${o.selfDice} to you` : ''}`,
     );
+    // ⚠⚠ OTA-1566 — THE FUSE IS PART OF THE PURCHASE. A weapon that eventually
+    // detonates in your hands has to say so on the card, not only in the log
+    // line the fourth time it heats up.
+    if (o.explodeAfter) {
+      stats.push(`After ${o.explodeAfter} ${o.word}s it EXPLODES: ${o.explodeDice ?? '1d10'} to everything at arm's reach, you included`);
+    }
   }
   // ⚠ AND THE ONE-LINE RULE A RUNE-CASTER LIVES BY, said on the item rather than
   // only in a refusal the player has to trip over. Owner: *"a runecaster is a

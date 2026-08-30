@@ -613,7 +613,20 @@ export function buildCombatSteps(
   // caller-side lookup would pierce with the main hand's weapon on every
   // off-hand swing.
   const swungEffect = equipped ? parseWeaponEffect(equipped.effect) : null;
-  const armorPierce = equipped ? armorIgnoreReduction(swungEffect?.armorIgnore, enemy) : 0;
+  // ⚠⚠⚠ OTA-1566 — AN UNLOCKED WEAPON PIERCES LIKE ANY OTHER. Once the Bone
+  // Spear Launcher has landed its first max damage roll, "bypasses shields
+  // PERMANENTLY" means exactly that: the bypass folds into the ordinary AC step
+  // beside the weapons that were born with one, rather than living in a second
+  // place that could disagree with it. The unlock is the event; the pierce is
+  // just what the weapon is afterwards.
+  const unlockedPierce = equipped
+    && swungEffect?.onMaxRoll?.permanentPierce
+    && (player.permanentPierceWeapons ?? []).includes(equipped.name)
+      ? { scope: swungEffect.onMaxRoll.permanentPierce === 'shields' ? 'shields' as const : 'all' as const }
+      : null;
+  const armorPierce = equipped
+    ? armorIgnoreReduction(swungEffect?.armorIgnore ?? unlockedPierce, enemy)
+    : 0;
   // ⚠ OTA-1564 — clamped at 4 so a mis-authored "fires 20 bolts per round" is a
   // strong weapon rather than a one-shot for the rest of the game.
   const shotsPerRound = Math.max(1, Math.min(4, swungEffect?.shotsPerRound ?? 1));

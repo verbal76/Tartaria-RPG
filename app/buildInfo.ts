@@ -25955,7 +25955,39 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // tier under the Legendary blasts); and the Mud Army War Hammer's "even/odd
 // reroll to suppress the effect for one attack" was the declinable pattern the
 // owner had already had removed from the Plasma Scythe, wearing a coin flip.
-export const OTA_BUILD_ID = '2026-08-30-1565-the-blast-does-not-choose';
+// OTA-1566 - THE FIRST ONE IS THE ONE THAT COUNTS. The owner overruled two of my
+// cuts and was right on both. Verbatim: "1a, keep the on first roll buff and
+// change the on 3rd and 5th roll to on first roll on the weapons they were on.
+// 1b, add the explode option back to it, and add a counter number in the text
+// after you use it."
+//
+// THE FIRST RULING DISSOLVES THE PROBLEM RATHER THAN ACCEPTING IT. I removed the
+// ordinal payloads because "on the 5th max roll" needs a TALLY that survives a
+// round, a fight and a save/load. Rewriting them as "on your FIRST max roll"
+// keeps every payload and reduces the state to a FLAG - already happened, or
+// not. Same words, completely different amount of machinery, and only one of the
+// two can go wrong quietly. Three weapons get their effect back (Bone Spear
+// Launcher, Giant Bone Spear, Plasma Hand Cannon) and the deeper ordinals stay
+// refused by the parser, so a future author has to write a first rather than
+// getting silent per-swing firing.
+//
+// A permanent pierce is deliberately NOT routed through the per-swing pierce
+// field: that would re-earn it on every perfect roll and never actually make it
+// permanent. The first max roll UNLOCKS the weapon, and afterwards the bypass
+// folds into the ordinary AC step beside the weapons born with one - the unlock
+// is the event, the pierce is just what the weapon is from then on.
+//
+// THE SECOND RULING IS A BETTER MECHANIC THAN THE ONE I CUT. I removed the Plasma
+// Repeater Rifle's "After 4 overheats it explodes" as another hidden counter. The
+// owner put it back AND asked for the number to be shown, which is the difference
+// between a bomb and an ambush: a visible fuse asks the player a question every
+// round - keep firing, or holster it - where a hidden one just takes their HP at
+// a moment they could not have seen coming. Still a tally, but a tally the player
+// can read is a different object from one they cannot. The blast is centred on
+// YOU (the gun is in your hands), so it is your own band that burns, and the
+// count resets on detonation - left banked it would detonate on every shot from
+// then on, which is a broken weapon rather than a dangerous one.
+export const OTA_BUILD_ID = '2026-08-30-1566-the-first-one-is-the-one-that-counts';
 // golem catch-up 2026-08-30: markerless publish of OTA-1564 (the max-roll
 // trigger, the repeaters' extra shots, and the overheat family) to the golem
 // channel.

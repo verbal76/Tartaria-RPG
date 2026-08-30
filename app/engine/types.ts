@@ -1138,6 +1138,16 @@ export interface PlayerCharacter {
    *  on every max roll for the rest of the character's life. Keyed by name (not
    *  instance id) so a second copy of the same weapon cannot claim it twice. */
   permanentStatWeapons?: string[];
+  /** ⚠⚠ OTA-1566 — weapon NAMES that have landed their first max damage roll and
+   *  UNLOCKED a permanent bypass ("Bypasses shields permanently on your first max
+   *  damage roll"). After this the weapon's pierce is unconditional: it stops
+   *  being an event and becomes part of what the weapon is. */
+  permanentPierceWeapons?: string[];
+  /** ⚠⚠ OTA-1566 — overheats banked per weapon name, for the Plasma Repeater
+   *  Rifle's fuse. The owner asked for the count to be SHOWN — "add a counter
+   *  number in the text after you use it" — which is what makes a bomb on your
+   *  hip a decision each round instead of an ambush. */
+  overheatCounts?: Record<string, number>;
   name: string;
   raceId: string;
   factionId: string;

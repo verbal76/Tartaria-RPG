@@ -106,11 +106,17 @@ export interface OnMaxRoll {
    *  lower the AC that was already beaten — what it does instead is OPEN the
    *  guard from here on, through the same shred the acid coating writes. */
   pierce?: 'armor' | 'shields';
-  /** "+2 STR (permanent, once) on a max damage roll". Kept in this slice — and
-   *  the ordinal versions of it were not — because write-once-forever needs a
-   *  flag, where "on the 5th max roll" needs a tally that survives a round, a
-   *  fight and a save/load. */
+  /** "+2 STR permanently on your first max damage roll". Write-once-forever
+   *  needs only a flag saying it already happened — which is why it can land
+   *  where "on the 5th max roll" could not. */
   permanentStat?: { stat: keyof Stats; amount: number };
+  /** ⚠⚠ OTA-1566 — "Bypasses shields PERMANENTLY on your first max damage
+   *  roll." Not a per-swing pierce: the first perfect strike UNLOCKS the weapon,
+   *  and from then on its bypass is unconditional — it stops being an event and
+   *  becomes part of what the weapon is. Same write-once flag as the stat gain. */
+  permanentPierce?: 'armor' | 'shields';
+  /** True when the payload is claimed on the FIRST max roll only. */
+  onceEver?: boolean;
 }
 
 /**
@@ -146,6 +152,18 @@ export interface OverheatSpec {
   /** The word the weapon itself uses, so the Arbiter's line sounds like the
    *  weapon and not like a generic failure. */
   word: 'overheat' | 'overload' | 'jam';
+  /**
+   * ⚠⚠⚠ OTA-1566 — THE FUSE, restored on the owner's call: *"add the explode
+   * option back to it, and add a counter number in the text after you use it."*
+   * The counter is what makes this a good mechanic rather than the chore I cut
+   * it as: a bomb with a VISIBLE fuse is a decision every round — keep firing or
+   * holster it — where a hidden one is only an ambush. It is a tally, which is
+   * the state shape 1b avoided, but a tally the player can read is a different
+   * object from one they cannot.
+   */
+  explodeAfter?: number;
+  /** What the detonation deals to everyone in the player's own band. */
+  explodeDice?: string;
 }
 
 export interface ParsedWeaponEffect {
@@ -261,7 +279,21 @@ const MAX_ROLL_RE = /\bmax(?:imum)?\s+(?:damage\s+)?rolls?\b|\bon\s+all\s+max\s+
  * three would have fired on EVERY max roll without this guard: a Legendary's
  * signature payoff turning up several times a fight instead of once.
  */
-const ORDINAL_GATED_RE = /\b(?:first|second|third|fourth|fifth|\d+(?:st|nd|rd|th))\s+max\b/;
+/**
+ * ⚠⚠⚠ OTA-1566 — THE OWNER PUT THE ORDINALS BACK, AS FIRSTS. Verbatim: *"keep
+ * the on first roll buff and change the on 3rd and 5th roll to on first roll on
+ * the weapons they were on."* That is the right call and it dissolves the
+ * problem rather than accepting it: "your FIRST max roll" is write-once-forever,
+ * which needs a FLAG saying it already happened — where "your fifth" needs a
+ * TALLY that survives a round, a fight and a save/load. Same words, completely
+ * different amount of state, and only one of them can go wrong quietly.
+ *
+ * So `first` is now a supported shape and the deeper ordinals stay refused: if
+ * one is ever authored again it must be rewritten as a first, not silently fired
+ * on every max roll.
+ */
+const ORDINAL_GATED_RE = /\b(?:second|third|fourth|fifth|\d+(?:nd|rd|th))\s+max\b/;
+const FIRST_ROLL_RE = /\b(?:first|1st)\s+max\b/;
 
 const STAT_WORD: Record<string, keyof Stats> = {
   str: 'strength', dex: 'dexterity', int: 'intelligence',
@@ -274,12 +306,23 @@ function onMaxRollFrom(text: string): OnMaxRoll | null {
   for (const clause of text.split(/[.;]/)) {
     if (!MAX_ROLL_RE.test(clause)) continue;
     if (ORDINAL_GATED_RE.test(clause)) continue;
+    const isFirst = FIRST_ROLL_RE.test(clause);
+    if (isFirst) { out.onceEver = true; touched = true; }
     // ⚠ A PERMANENT STAT GAIN IS NOT DAMAGE, and reading it as damage is the
     // exact mistake the first draft made: "+2 STR (permanent)" became +2 to the
     // hit. Claim the clause before the bonus-damage patterns can see the number.
     const stat = clause.match(/\+\s*(\d+)\s*(str|dex|int|wis|cha|ste)\w*/);
-    if (stat && /\bpermanent\b/.test(clause)) {
+    if (stat && /\bpermanent/.test(clause)) {
       out.permanentStat = { stat: STAT_WORD[stat[2]!]!, amount: parseInt(stat[1]!, 10) };
+      touched = true;
+      continue;
+    }
+    // ⚠⚠ OTA-1566 — A PERMANENT PIERCE IS NOT A PER-SWING ONE. "Bypasses shields
+    // PERMANENTLY on your first max damage roll" unlocks the weapon once and
+    // then holds; routing it through `pierce` would re-earn it on every perfect
+    // roll and never make it permanent at all.
+    if (/\bpermanent/.test(clause) && /\bbypass\w*|\bignor\w*|\bpierces?\b/.test(clause)) {
+      out.permanentPierce = /\bshields?\b/.test(clause) ? 'shields' : 'armor';
       touched = true;
       continue;
     }
@@ -318,7 +361,10 @@ function overheatFrom(text: string): OverheatSpec | null {
   if (!/\boverheat|\boverload|\bjam\b/.test(text)) return null;
   const rounds = text.match(/useless\s+(\d+)\s+(?:rounds?|turns?)/);
   const self = text.match(/(\d+d\d+)\s+self\s+damage/);
+  // OTA-1566 — "After 4 overheats it explodes: 1d10 to everyone in your range."
+  const fuse = text.match(/after\s+(\d+)\s+overheats?\s+it\s+explodes?\s*[:—-]?\s*(\d+d\d+)?/);
   return {
+    ...(fuse ? { explodeAfter: parseInt(fuse[1]!, 10), ...(fuse[2] ? { explodeDice: fuse[2] } : {}) } : {}),
     // A jam with no stated duration costs one round — the action the rulebook
     // screen already says you spend clearing it.
     rounds: rounds ? parseInt(rounds[1]!, 10) : 1,

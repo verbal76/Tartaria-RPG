@@ -304,7 +304,11 @@ describe('OTA-1562 — the wiring', () => {
     // `equipped`, which buildCombatSteps has already resolved for the hand that
     // swings, so neither can drift onto the other hand.
     expect(RULES).toContain('const swungEffect = equipped ? parseWeaponEffect(equipped.effect) : null;');
-    expect(RULES).toContain('const armorPierce = equipped ? armorIgnoreReduction(swungEffect?.armorIgnore, enemy) : 0;');
+    // ⚠ RETARGETED AGAIN BY OTA-1566, which folded an UNLOCKED permanent pierce
+    // into this same call rather than opening a second path for it. The property
+    // is unchanged and is the whole reason the pin exists: one authority decides
+    // how much armour a swing ignores, and it reads the hand that swings.
+    expect(RULES).toContain('armorIgnoreReduction(swungEffect?.armorIgnore ?? unlockedPierce, enemy)');
   });
 
   it('⚠⚠⚠ the range note is resolved ABOVE every branch of playerWeaponReach', () => {

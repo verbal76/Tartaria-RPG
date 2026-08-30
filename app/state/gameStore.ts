@@ -23050,12 +23050,69 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 },
               }
             : s));
+          // ⚠⚠⚠ OTA-1566 — THE FUSE, AND ITS NUMBER. Owner: *"add the explode
+          // option back to it, and add a counter number in the text after you
+          // use it."* The count is what turns this from a chore into a decision:
+          // a bomb with a VISIBLE fuse asks you every round whether to keep
+          // firing, where a hidden one is only an ambush. It is a tally — the
+          // state shape slice 1b avoided — but a tally the player can read is a
+          // different object from one they cannot.
+          let fuseNote = '';
+          let detonated = 0;
+          if (oh.explodeAfter) {
+            const key = hotWeapon.name;
+            const banked = ((get().player?.overheatCounts ?? {})[key] ?? 0) + 1;
+            if (banked >= oh.explodeAfter) {
+              detonated = Math.max(1, rollFromNotation(oh.explodeDice ?? '1d10'));
+              // The count RESETS on detonation — the weapon has spent what it
+              // was holding. Leaving it banked would detonate on every shot from
+              // then on, which is a broken weapon, not a dangerous one.
+              set((s) => (s.player
+                ? { player: { ...s.player, hp: Math.max(0, s.player.hp - detonated), overheatCounts: { ...(s.player.overheatCounts ?? {}), [key]: 0 } } }
+                : s));
+            } else {
+              fuseNote = ` (${banked}/${oh.explodeAfter} before it goes)`;
+              set((s) => (s.player
+                ? { player: { ...s.player, overheatCounts: { ...(s.player.overheatCounts ?? {}), [key]: banked } } }
+                : s));
+            }
+          }
           get().appendLog(
             'combat',
             selfHit > 0
-              ? `The ${hotWeapon.name} ${oh.word}s in your grip — ${selfHit} damage to you, and it is dead weight for ${oh.rounds} round${oh.rounds === 1 ? '' : 's'}.`
-              : `The ${hotWeapon.name} ${oh.word}s. Dead weight for ${oh.rounds} round${oh.rounds === 1 ? '' : 's'} — draw something else or ride it out.`,
+              ? `The ${hotWeapon.name} ${oh.word}s in your grip — ${selfHit} damage to you, and it is dead weight for ${oh.rounds} round${oh.rounds === 1 ? '' : 's'}.${fuseNote}`
+              : `The ${hotWeapon.name} ${oh.word}s. Dead weight for ${oh.rounds} round${oh.rounds === 1 ? '' : 's'} — draw something else or ride it out.${fuseNote}`,
           );
+          if (detonated > 0) {
+            // "1d10 to everyone in your range" — the blast is centred on YOU, so
+            // it is your band that burns, not the target's. Rolled once, like
+            // every other blast in OTA-1565.
+            const boomScene = get().currentScene;
+            const caughtNames: string[] = [];
+            if (boomScene) {
+              const victims: number[] = [];
+              boomScene.enemies.forEach((e, i) => {
+                if ((boomScene.enemyHps[i] ?? 0) <= 0) return;
+                if (boomScene.enemyKnockedOut?.[i]) return;
+                if (enemyBandOf(boomScene, i) !== 'close') return;
+                victims.push(i);
+                caughtNames.push(e.name);
+              });
+              if (victims.length > 0) {
+                set((s) => {
+                  if (!s.currentScene) return s;
+                  const hps = [...s.currentScene.enemyHps];
+                  for (const i of victims) hps[i] = Math.max(0, (hps[i] ?? 0) - detonated);
+                  return { currentScene: { ...s.currentScene, enemyHps: hps } };
+                });
+              }
+            }
+            get().appendLog(
+              'combat',
+              `THE ${hotWeapon.name.toUpperCase()} LETS GO. ${detonated} to everything at arm's reach — you included${caughtNames.length > 0 ? `, and ${caughtNames.join(', ')}` : ''}.`,
+            );
+            get().appendLog('arbiter', `The Arbiter watches you count your fingers. "It told you how many it had."`);
+          }
         } else if (oh && hotWeapon) {
           get().appendLog('combat', `The ${hotWeapon.name} coughs and catches itself. No ${oh.word} this time.`);
         }
@@ -23572,6 +23629,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ? `The ${wname} goes through the guard and leaves it open — ${enemy.name} is −${shred} AC from here.`
               : `The ${wname} tears ${shred} points off ${enemy.name}'s armour.`,
           );
+        }
+        // ⚠⚠⚠ OTA-1566 — THE FIRST PERFECT STRIKE UNLOCKS THE WEAPON. The
+        // owner's ruling put the ordinals back as FIRSTS, which dissolves the
+        // problem rather than accepting it: "your first max roll" is a flag,
+        // "your fifth" is a tally. After this the bypass is unconditional and
+        // rides the ordinary AC step (see combatRules `unlockedPierce`) — it
+        // stops being an event and becomes part of what the weapon is.
+        if (onMax.permanentPierce) {
+          const pNow = get().player;
+          const wkey = equipped?.name ?? '';
+          if (pNow && wkey && !(pNow.permanentPierceWeapons ?? []).includes(wkey)) {
+            set((s) => (s.player
+              ? { player: { ...s.player, permanentPierceWeapons: [...(s.player.permanentPierceWeapons ?? []), wkey] } }
+              : s));
+            get().appendLog(
+              'reward',
+              `✦ The ${wkey} learns the shape of a guard. From here it goes through ${onMax.permanentPierce === 'shields' ? 'shields' : 'armour'} every time — you only had to do that once.`,
+            );
+          }
         }
         // ⚠⚠ WRITE-ONCE-FOREVER, and that is precisely why it survived into this
         // slice while the ordinal versions ("on the 5th max roll") did not: a flag
