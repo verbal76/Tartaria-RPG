@@ -26114,7 +26114,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The tap breadcrumb is untouched again: the hair spaces live in the JSX only, so
 // logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
 // evidence stays greppable.
-export const OTA_BUILD_ID = '2026-08-30-1574-the-weapon-answers-the-sky';
+export const OTA_BUILD_ID = '2026-08-30-1575-the-stone-marks-you';
+// OTA-1575 — the obelisk climb used to charge 2 HP for a memo. The mark now
+// grants +2 WIS for the first 3 rounds of the next fight, which needed a new
+// status semantic: a buff that WAITS for combat instead of ticking away on
+// the walk (food_buff) or being wiped out of combat (COMBAT_ONLY).
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-30-1574-the-weapon-answers-the-sky';
 // golem catch-up 2026-08-30: markerless publish of OTA-1573 (one curer for all
 // three consume paths + the coating dice ladder, superseding part of OTA-1559)
 // and OTA-1574 (slice 3 — the weapon's own weather clause, finally read).

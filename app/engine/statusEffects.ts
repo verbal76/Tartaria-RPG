@@ -166,6 +166,20 @@ const COMBAT_ONLY_STATUSES: ReadonlySet<StatusEffectKind> = new Set([
 ]);
 const STAMINA_GATED_STATUSES: ReadonlySet<StatusEffectKind> = new Set(['tired', 'exhausted']);
 
+/**
+ * ⚠⚠⚠ OTA-1575 — STATUSES THAT WAIT FOR THE FIGHT. A third category, and the
+ * two that existed could not express it:
+ *   · an ordinary timed buff (food_buff) ticks EVERY action, so three rounds
+ *     granted at a standing stone in the wild burn off over three steps of
+ *     walking and are gone before any enemy appears;
+ *   · a COMBAT_ONLY status EXPIRES the moment you are not fighting, so the same
+ *     grant is wiped on the spot.
+ * A reward earned by exploring and spent in combat needs neither. These do not
+ * tick and do not expire out of combat — they sit until a fight starts and then
+ * run their clock like anything else.
+ */
+const WAITS_FOR_COMBAT_STATUSES: ReadonlySet<StatusEffectKind> = new Set(['stone_marked']);
+
 export function tickEffects(
   current: readonly StatusEffect[],
   opts?: { inCombat?: boolean },
@@ -181,6 +195,8 @@ export function tickEffects(
     // Combat-only: per-encounter. Cleared the moment the fight is over so a
     // stance/buff never carries into a separate, later encounter.
     if (COMBAT_ONLY_STATUSES.has(eff.kind) && !inCombat) { expired.push(eff); continue; }
+    // OTA-1575 — waits for the fight: held intact, clock untouched, until one starts.
+    if (WAITS_FOR_COMBAT_STATUSES.has(eff.kind) && !inCombat) { next.push(eff); continue; }
     const nextRounds = eff.remainingRounds - 1;
     if (nextRounds > 0) {
       next.push({ ...eff, remainingRounds: nextRounds });

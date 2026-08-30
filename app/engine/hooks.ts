@@ -299,7 +299,13 @@ export type HookEffect =
   | { type: 'start_escort_contract'; idSuffix: string }
   // OTA-981 — THE HOLLOWED: call one of this install's un-avenged fallen out of
   // the mud as a revenant BOSS in the current scene. Empty pool = cold trail.
-  | { type: 'spawn_fallen_revenant' };
+  | { type: 'spawn_fallen_revenant' }
+  // ⚠⚠⚠ OTA-1575 — A HOOK CAN FINALLY PAY YOU IN SOMETHING OTHER THAN LOOT. There
+  // was no way for a story beat to grant a buff, which is why the obelisk climb
+  // ended in `damage 2` and a memo. `rounds` is COMBAT rounds and the status
+  // waits for a fight rather than ticking down on the walk home — see the
+  // 'stone_marked' note in types.ts for why that needed a new semantic.
+  | { type: 'grant_buff'; stat: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma'; amount: number; rounds: number; label: string };
 
 // OTA-185 — minimal vendor-spec for hook-spawned traders. Mirrors
 // the VendorInstance fields the engine needs to render + serve a
@@ -396,6 +402,13 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       arbiterLine: '"That is older than the Mud Monarchs," the Arbiter murmurs. "It will know you again."',
       effects: [
         { type: 'damage', amount: 2, cause: 'the rune\'s recognition' },
+        // ⚠⚠⚠ OTA-1575 — AND THE CLIMB IS WORTH SOMETHING NOW. This beat used to
+        // charge you 2 HP for a memo and a reputation note; the owner, having
+        // done it: "let's have the mark give the character a buff for 3 rounds,
+        // so the climb was worth it." WISDOM because of what the Arbiter says
+        // next — "It will know you again" — the stone recognises you, so what it
+        // sharpens is recognition.
+        { type: 'grant_buff', stat: 'wisdom', amount: 2, rounds: 3, label: "the stone's mark" },
         { type: 'rep_change', factionId: 'true_tartarians', amount: 2 },
         { type: 'memo', text: 'A Tartarian rune marked you. The True Tartarians will know.' },
       ],

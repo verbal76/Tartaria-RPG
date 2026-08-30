@@ -848,7 +848,11 @@ export function effectiveStats(
   // them per stat. No cap — these expire on their own.
   const food: Partial<Stats> = {};
   for (const eff of player.statusEffects ?? []) {
-    if (eff.kind !== 'food_buff' || !eff.buffStat || !eff.buffBonus) continue;
+    // OTA-1575 — the stone's mark rides the same bucket as a food buff (it is a
+    // timed stat bonus and should stack and floor identically), but keeps its own
+    // KIND so it never collides with a food buff on the same stat the way two
+    // food_buffs would.
+    if ((eff.kind !== 'food_buff' && eff.kind !== 'stone_marked') || !eff.buffStat || !eff.buffBonus) continue;
     food[eff.buffStat] = (food[eff.buffStat] ?? 0) + eff.buffBonus;
   }
   // OTA-831 — a `chilled` status (from a cold-typed hit) slows the hands: −2 DEX while

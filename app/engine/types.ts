@@ -971,6 +971,20 @@ export type StatusEffectKind =
   // land, so a pack of concussive hitters re-rolling 20% per landed blow
   // can't chain the player's turns away (sim: 844 stuns/run before this).
   | 'braced'
+  // ⚠⚠⚠ OTA-1575 — THE STONE'S MARK. Granted by the obelisk story beat, which
+  // until now paid you in DAMAGE: 2 HP off, +2 rep, a memo, and nothing else for
+  // the climb. Owner: "let's have the mark give the character a buff for 3
+  // rounds, so the climb was worth it."
+  //
+  // ⚠⚠ AND IT NEEDED A SEMANTIC THAT DID NOT EXIST. A `food_buff` ticks EVERY
+  // ACTION regardless of combat (tickEffects), so three rounds granted at a
+  // standing stone in the wild would burn off over three steps of walking and be
+  // gone before any fight — worthless, and worse than no buff because the card
+  // would say otherwise. `COMBAT_ONLY_STATUSES` is the opposite failure: those
+  // EXPIRE the moment you are out of a fight, so the mark would be wiped
+  // instantly. This kind WAITS: it does not tick and does not expire until
+  // combat starts, then runs its three rounds. See WAITS_FOR_COMBAT_STATUSES.
+  | 'stone_marked'
   | 'dodging'
   // OTA-365 — 'blocking' removed (retired: no engine path ever applied
   // it; the dodge rework folded block into dodge).

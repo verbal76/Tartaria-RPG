@@ -30443,6 +30443,31 @@ function applyHookEffect(
       set((s) => (s.player ? { player: advanceTime(s.player, effect.hours) } : s));
       return { inlineSummary: null, fatal: false };
     }
+    // ⚠⚠⚠ OTA-1575 — THE HOOK PAYS A BUFF. The obelisk beat charged 2 HP for a
+    // memo; now the mark it describes is a real thing you carry into the next
+    // fight. The status WAITS for combat rather than ticking on the walk (see
+    // WAITS_FOR_COMBAT_STATUSES) — a three-round buff granted at a standing
+    // stone in open country is worthless otherwise, and worse than nothing,
+    // because the line would still promise it.
+    case 'grant_buff': {
+      const bp = get().player;
+      if (!bp) return { inlineSummary: null, fatal: false };
+      const buff: StatusEffect = {
+        kind: 'stone_marked',
+        remainingRounds: Math.max(1, effect.rounds),
+        buffStat: effect.stat,
+        buffBonus: effect.amount,
+        label: `${effect.label} (+${effect.amount} ${effect.stat.toUpperCase().slice(0, 3)})`,
+      };
+      set((sv) => (sv.player
+        ? { player: { ...sv.player, statusEffects: applyEffect(sv.player.statusEffects ?? [], buff) } }
+        : sv));
+      get().appendLog(
+        'reward',
+        `✦ ${effect.label} — +${effect.amount} ${effect.stat.toUpperCase().slice(0, 3)} for the first ${effect.rounds} rounds of your next fight.`,
+      );
+      return { inlineSummary: null, fatal: false };
+    }
     case 'rep_change': {
       const player = get().player;
       if (!player) return { inlineSummary: null, fatal: false };
