@@ -26114,7 +26114,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The tap breadcrumb is untouched again: the hair spaces live in the JSX only, so
 // logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
 // evidence stays greppable.
-export const OTA_BUILD_ID = '2026-08-30-1578-the-stage-says-who-is-there';
+export const OTA_BUILD_ID = '2026-08-30-1580-the-guy-who-was-never-there';
+// OTA-1580 — foundation for the mission conversation card. 114 stages name a
+// person and `npcName` was read in ONE place in the codebase (a hint string),
+// so there was no guy anywhere in the game. Adds the 42-role NPC roster with
+// successors and the encounter state machine that encodes the owner's ten rules.
+//
+// ⚠ NO NEW LOCATION. The gap report's "the Sentinel Ward does not exist" was a
+// FALSE POSITIVE of my own making — the report used a name-only index while the
+// real resolver (posterLocationIndex) reads aliases, and "the Sentinel Ward" has
+// always resolved to the Aetheric Chamber. The prose agrees: "the inner archive
+// is colder than the Ward outside" is that vault's own alias vocabulary.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-30-1578-the-stage-says-who-is-there';
 // golem catch-up 2026-08-30: markerless publish of OTA-1576/1577/1578 — noun
 // coverage ranking, stage-authored spawns, the Tartarian Raider, the escort
 // clear that resolves a false summit, and the keyboard latch scope fix.

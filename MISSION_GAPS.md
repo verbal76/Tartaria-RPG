@@ -131,16 +131,7 @@ over. Every stage below names somebody who is not there.
 
 ## 2. GO TO — tiles that do not resolve
 
-**9 stages.**
-- Hunt · The Iron Titan in the Sentinel Ward · stage 6 (catalyst) — "the Sentinel Ward"
-- Hunt · The Iron Titan in the Sentinel Ward · stage 7 (apex) — "the Sentinel Ward"
-- Mystery · The Second Flood Cipher · stage 2 (?) — "the Sentinel Ward"
-- Mystery · The Second Flood Cipher · stage 3 (?) — "the Sentinel Ward"
-- Storyline · The Red Tower's Mouth · stage 5 (?) — "the Sentinel Ward"
-- Storyline · Sasha's Gambit · stage 2 (?) — "the Sentinel Ward"
-- Storyline · Sasha's Gambit · stage 3 (?) — "the Sentinel Ward"
-- Storyline · Sasha's Gambit · stage 4 (?) — "the Sentinel Ward"
-- Storyline · Sasha's Gambit · stage 5 (?) — "the Sentinel Ward"
+**None.** Every authored `locationName` resolves.
 
 ## 3. Prose promises a fight, nothing spawns it
 

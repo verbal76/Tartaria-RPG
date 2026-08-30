@@ -20,14 +20,28 @@ const story = dicts(rows(J('app/data/quests/faction-storylines.json')));
 const locs = dicts(rows(J('app/data/locations/locations.json')));
 
 // ── location resolution, mirroring resolvePosterLocation ────────────────────
+//
+// ⚠⚠⚠ THIS INDEX WAS NAME-ONLY AND THE REPORT LIED BECAUSE OF IT. The first run
+// announced that nine stages — including the APEX of "The Iron Titan in the
+// Sentinel Ward" — pointed at a tile that does not exist on a 38-tile map. They
+// did not. The real resolver, contractMarkers.posterLocationIndex, indexes
+// ALIASES as well as names, and "the Sentinel Ward" has always resolved to the
+// Aetheric Chamber, which carries it beside "inner archive". The mission prose
+// is written in that vault's own vocabulary — "the inner archive is colder than
+// the Ward outside".
+//
+// A report that mirrors the resolver APPROXIMATELY is worse than no report: it
+// manufactures work and, in this case, nearly added a 39th location competing
+// for a name the game already had. Mirror it exactly or do not check it.
 const norm = (s) => String(s ?? '').replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
 const locIndex = new Set();
 for (const l of locs) {
   const n = norm(l.name);
-  if (!n) continue;
-  locIndex.add(n);
-  locIndex.add(n.replace(/^the\s+/, ''));
-  locIndex.add(`the ${n}`);
+  if (n) { locIndex.add(n); locIndex.add(n.replace(/^the\s+/, '')); locIndex.add(`the ${n}`); }
+  for (const a of l.aliases ?? []) {
+    const k = norm(a);
+    if (k) { locIndex.add(k); locIndex.add(k.replace(/^the\s+/, '')); locIndex.add(`the ${k}`); }
+  }
 }
 const locResolves = (name) => {
   const c = norm(name);
