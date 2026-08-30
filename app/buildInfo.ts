@@ -25679,6 +25679,14 @@ export const OTA_BUILD_ID = '2026-08-30-1556-two-cudgels-are-two-objects';
 // combat weapon label, `glyph glyph name star`, with both coats shown, the star
 // answering for the coats AND the raw damage, the star obeying discovery, and
 // the `off:` prefix dropped from the fight) to the golem channel.
+// golem catch-up 2026-08-30: markerless publish of OTA-1554/1555/1556 (a
+// worked-out dig patch now greys its own chip and stops lighting the INVESTIGATE
+// badge, off one shared predicate the refusal and the greying both call; both
+// text fields wrap a long sentence instead of scrolling it sideways, capped at
+// three lines, with Enter still meaning send; and two same-named coatable
+// weapons carry their condition so the picker can tell its own rows apart, plus
+// a name fallback so a coated weapon on a save with no slot ids still shows its
+// glyphs) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1550-one-slot-one-weapon';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1549-the-button-you-can-see';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1548-twenty-more-fires-in-the-dark';
