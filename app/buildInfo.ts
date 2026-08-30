@@ -25786,6 +25786,12 @@ export const OTA_BUILD_ID = '2026-08-30-1560-what-power-ties-to-what-stat';
 // dog rescue quest is reachable again after a dog dies, with a silent one-off
 // amnesty at load for saves already wedged; and the coating ladder finally has
 // three rungs instead of ten items at 1d4) to the golem channel.
+// golem catch-up 2026-08-30: markerless publish of OTA-1560 (the rune-caster
+// passive design in data plus one engine leaf - role picks the stat, damage type
+// only for plain strikes, school changes nothing; four new frost and four new
+// radiation casters with recipes, cold 1->5 and radiation 1->5; the INT/WIS split
+// behind an `unmaking` tag; two passive slots, three at Legendary; and Frostbind
+// finally craftable) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1550-one-slot-one-weapon';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1549-the-button-you-can-see';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1548-twenty-more-fires-in-the-dark';
