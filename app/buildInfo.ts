@@ -25625,6 +25625,12 @@ export const OTA_BUILD_ID = '2026-08-30-1553-glyph-glyph-name-star';
 // golem catch-up 2026-08-30: markerless publish of OTA-1549/1550/1551 (the
 // SPEAK TO bar filled + SET COURSE inside the talk sheet, one slot one weapon,
 // and the standing keyboard's session latch) to the golem channel.
+// golem catch-up 2026-08-30: markerless publish of OTA-1552/1553 (the Crucible
+// safeguard - a repair or craft about to spend forge-grade material now stops
+// and offers to set it aside instead of burning it silently in bulk - and the
+// combat weapon label, `glyph glyph name star`, with both coats shown, the star
+// answering for the coats AND the raw damage, the star obeying discovery, and
+// the `off:` prefix dropped from the fight) to the golem channel.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1550-one-slot-one-weapon';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1549-the-button-you-can-see';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1548-twenty-more-fires-in-the-dark';
