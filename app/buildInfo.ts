@@ -26115,6 +26115,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
 // evidence stays greppable.
 export const OTA_BUILD_ID = '2026-08-30-1571-the-slot-moves-on';
+// golem catch-up 2026-08-30: markerless publish of OTA-1570/1571 to the golem
+// channel — the rune-caster sell exclusion, rarity on every sell line, the
+// knockout line's four bands, the scene-intro three-strike ledger, and the
+// crash ledger's two newly-named numbers.
 // OTA-1570 + OTA-1571 ship together: SELL ALL COMMON stops sweeping
 // rune-casters (the hole OTA-1561 opened under it), every sell line names
 // the rarity, the knockout line stops calling 85% "half their fight", the
