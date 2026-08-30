@@ -79,6 +79,8 @@ import { weatherRepositionCost } from '../engine/weatherEffects';
 import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, combineDamageTypeMatch, enemyIntelKey } from '../engine/enemyTraits';
 import { incomingHitCue, soakCueLine, leakCueLine } from '../engine/combatCues';
 import { rollIncomingStatusEffect, applyEffect, statusAcAdjustment, hasFullCover, aethericVulnerabilityMultiplier } from '../engine/statusEffects';
+import { isSkipControl, controlLabel, tickControl } from '../engine/enemyControl';
+import type { EnemyControlState } from '../engine/enemyControl';
 import { enemyDamageType as resolveEnemyDamageType, parseDamageTypeKeyword } from '../engine/damageTypes';
 // ⚠ TYPE-ONLY, and that is load-bearing: an `import type` is erased at compile
 // time, so this file never appears in gameStore's runtime module graph.
@@ -1366,6 +1368,8 @@ export function runEnemyGroupCounters(
   // ⚠ OTA-1506 — the pursuit is per-BODY, and names collide ("2 Gutter Rats"),
   // so the indices of the benched are tracked alongside the narration names.
   const outOfReachIdx: number[] = [];
+  // OTA-1572 — bodies that lost the round to a stun / paralyze / restraint.
+  const heldByControl: string[] = [];
   for (let i = 0; i < volleyOrder.length; i++) {
     const enemy = volleyOrder[i]!;
     // Skip enemies that died earlier this round (HP <= 0 in the live
@@ -1378,6 +1382,18 @@ export function runEnemyGroupCounters(
     if (hpAtCounter === undefined || hpAtCounter <= 0) continue;
     // OTA-361 — a knocked-out enemy is unconscious: it never counters.
     if (liveScene.enemyKnockedOut?.[liveIdx]) continue;
+    // ⚠⚠⚠ OTA-1572 — AND A STUNNED, PARALYZED OR RESTRAINED ENEMY FORFEITS ITS
+    // SWING. This is the line that makes thirty-three weapon cards true: before
+    // it, Sparkstrike's "1-round stun on a hit" cost the enemy nothing at all.
+    // Placed beside the knocked-out skip because it is the same claim at a
+    // smaller scale — this body is not acting this round. The HINDER kinds
+    // deliberately do NOT land here: a prone or blinded enemy still swings, it
+    // just swings worse (see controlAttackPenalty).
+    const ctrlNow = liveScene.enemyControl?.[liveIdx];
+    if (isSkipControl(ctrlNow)) {
+      heldByControl.push(`${enemy.name} (${controlLabel(ctrlNow!.kind)})`);
+      continue;
+    }
     // Range gate — melee enemies can't counter when THEY stand at 'far';
     // ranged enemies (matched on attack/damage flavor) reach from far too.
     // ⚠ OTA-1506 — judged at THIS enemy's own band, not a shared one: the
@@ -1555,6 +1571,58 @@ export function runEnemyGroupCounters(
         : `${first} presses in behind the others, waiting for an opening.`,
     );
   }
+  // ⚠⚠ OTA-1572 — AND THE PLAYER IS TOLD THE CONTROL WORKED. A skipped swing
+  // with no line is indistinguishable from an enemy that simply missed, which
+  // is the same defect as a weapon card that promises what the engine ignores:
+  // the effect exists and the player cannot tell. One line for the whole group,
+  // like every other bench above it.
+  if (heldByControl.length > 0 && (get().player?.hp ?? 0) > 0) {
+    const first = heldByControl[0]!;
+    const rest = heldByControl.length - 1;
+    get().appendLog(
+      'combat',
+      rest > 0
+        ? `${first} and ${rest} other${rest > 1 ? 's' : ''} cannot act — your last blow is still holding them.`
+        : `${first} — held by your last blow, and it loses the round.`,
+    );
+  }
+  // ⚠⚠ OTA-1572 — AND THE CLOCK RUNS, once per volley, AFTER the skips above
+  // have been taken. Ticking any earlier would spend a 1-round stun before it
+  // cost anybody a swing, which is the same as not having it at all.
+  tickEnemyControls(get, set);
+}
+
+/**
+ * OTA-1572 — one round off every enemy's control and its brace.
+ *
+ * ⚠⚠ THE BRACE TICKS INDEPENDENTLY of the control that granted it, and that is
+ * the entire anti-lock mechanism. If they shared a clock, a 1-round stun and its
+ * immunity would expire together and the very next swing would re-stun — the
+ * 844-stuns/run shape OTA-1089 measured on the player side, pointed the other
+ * way. Exported because a lock is a multi-round property that cannot be proved
+ * from a single call.
+ */
+export function tickEnemyControls(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const sc = get().currentScene;
+  if (!sc || (!sc.enemyControl && !sc.enemyBraced)) return;
+  set((s) => {
+    const cur = s.currentScene;
+    if (!cur) return {};
+    const n = cur.enemies.length;
+    const ctrls = cur.enemyControl ?? [];
+    const braces = cur.enemyBraced ?? [];
+    const nextC: Array<EnemyControlState | null> = [];
+    const nextB: number[] = [];
+    for (let i = 0; i < n; i++) {
+      const r = tickControl(ctrls[i] ?? null, braces[i] ?? 0);
+      nextC.push(r.control);
+      nextB.push(r.braceRounds);
+    }
+    return { currentScene: { ...cur, enemyControl: nextC, enemyBraced: nextB } };
+  });
 }
 
 // arb119 — damage-type parsing/inference moved to engine/damageTypes.ts

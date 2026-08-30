@@ -37,6 +37,7 @@ import { buildingNameFor, buildingHookLabel, buildingArrow } from '../engine/bui
 // OTA-1440 — the first reader of vendors.json's gender field.
 import { npcGenderFor } from '../engine/npcGender';
 import { koShare } from '../engine/combatProse';
+import { landControl, controlLabel } from '../engine/enemyControl';
 // ⚠ OTA-1236 — ONE rule for "this noun carries a next step", shared by the engine
 // dispatch, the bulk-salvage guard, the loot picker's lead lane and the
 // INVESTIGATE ALL ordering. See engine/storyNouns.ts for why they must agree.
@@ -617,7 +618,7 @@ import {
 import { tickWeather, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers } from '../engine/weatherEffects';
 import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, enemyDodgesHit, enemyIsAerial, combineDamageTypeMatch } from '../engine/enemyTraits';
 import {
-  parseWeaponEffect, rollEffectBonusDamage,
+  parseWeaponEffect, rollEffectBonusDamage, effectConditionMatches,
   // OTA-1564 (slice 1b) — the max-roll trigger and its payloads.
   damageRollIsMax, rollMaxRollBonus, maxRollShredAmount,
 } from '../engine/weaponEffects';
@@ -1688,6 +1689,21 @@ export interface CurrentScene {
    *  its second swing. Lazily created on the first weakness hit, and consumed by
    *  the thing it prevents — see `staggerEnemy` / the boss second-strike block. */
   enemyStaggered?: number[];
+  /** ⚠⚠⚠ OTA-1572 — WHAT THE WEAPON DID TO THEM BESIDES DAMAGE. Parallel to
+   *  `enemies`. Thirty-three weapons promise a control effect — stun, prone,
+   *  restrained, paralyze, slow, blind, knockback — and until this field existed
+   *  there was nowhere to put one: every `enemyStatuses` kind is damage-over-
+   *  time. One control per enemy, deliberately: two at once is a lock however it
+   *  is spelled, so a new one replaces the old rather than stacking beside it.
+   *  Lazily created on the first control that lands. See engine/enemyControl. */
+  enemyControl?: Array<import('../engine/enemyControl').EnemyControlState | null>;
+  /** ⚠⚠⚠ OTA-1572 — THE ANTI-LOCK GUARD, and it is half the feature, not a
+   *  follow-up. Rounds of incapacitation-immunity per enemy, mirroring the
+   *  player's `braced` (OTA-1089, whose note records 844 stuns/run before it
+   *  existed). Sparkstrike is a COMMON rune-caster with an unconditional
+   *  1-round stun; without this, one of those ends every single-enemy fight
+   *  before the enemy swings once. */
+  enemyBraced?: number[];
   /** OTA-362 — accumulated corruption stacks per enemy (parallel to
    *  enemies). Each corruption-coated hit adds a stack; the corruption
    *  DOT ticks harder per stack (coatingDotPerTurn), so tough foes hit
@@ -23597,6 +23613,61 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       if (effectBonus > 0) {
         get().appendLog('combat', `${equipped?.name ?? 'Your weapon'}'s effect triggers — +${effectBonus} bonus damage.`);
+      }
+
+      // ⚠⚠⚠ OTA-1572 (slice 2) — THE CONTROL LANDS. Thirty-three weapons promise
+      // to stun / trip / bind / blind / slow what they hit, and until this block
+      // existed not one of them did anything: every `enemyStatuses` kind is
+      // damage-over-time, so there was nowhere on an enemy to PUT "stunned".
+      //
+      // ⚠⚠ THE BRACE IS READ AND WRITTEN HERE, through `landControl`, which is
+      // the only function allowed to grant a control precisely so no call site
+      // can forget the guard. OTA-1089 measured 844 stuns/run on the player side
+      // before the mirror of this existed; Sparkstrike is a COMMON rune-caster
+      // with an unconditional 1-round stun, so without the brace a single one of
+      // those ends every duel before the enemy swings once.
+      if (parsedEffect?.onHitControl) {
+        const ctl = parsedEffect.onHitControl;
+        const idxCtl = Math.max(0, Math.min(activeIdx, currentScene.enemies.length - 1));
+        // Did THIS swing earn it? The parser knows what is owed; only the swing
+        // knows whether it happened.
+        // ⚠⚠ 'threshold' ROUTES THROUGH THE SAME READER AS 'max-roll'. Mud Venom
+        // Blade's "on rolls of 15+" is the Plasma Cutter's "rolls of 19+ count as
+        // max roll" with a different number, and OTA-1564's whole finding was that
+        // twenty-six local copies of "did the dice come up big" is how two of them
+        // end up disagreeing. One reader, a lowered floor.
+        const triggered =
+          ctl.trigger === 'always' ? true
+            : ctl.trigger === 'max-roll' ? swungMaxRoll
+              : ctl.trigger === 'chance' ? Math.random() < (ctl.chance ?? 0.5)
+                : ctl.trigger === 'threshold' ? damageRollIsMax(damage, ctl.threshold)
+                  : false;
+        const landed = landControl({
+          control: ctl,
+          sourceName: equipped?.name ?? 'your weapon',
+          braceRounds: currentScene.enemyBraced?.[idxCtl] ?? 0,
+          restrictionMet: !ctl.restrictedTo || effectConditionMatches(ctl.restrictedTo, enemy),
+          triggered,
+        });
+        if (landed) {
+          set((s) => {
+            if (!s.currentScene) return s;
+            const n = s.currentScene.enemies.length;
+            const ctrls = [...(s.currentScene.enemyControl ?? [])];
+            const braces = [...(s.currentScene.enemyBraced ?? [])];
+            while (ctrls.length < n) ctrls.push(null);
+            while (braces.length < n) braces.push(0);
+            ctrls[idxCtl] = landed.control;
+            braces[idxCtl] = landed.braceRounds;
+            return { currentScene: { ...s.currentScene, enemyControl: ctrls, enemyBraced: braces } };
+          });
+          const lbl = controlLabel(landed.control.kind);
+          const rds = landed.control.roundsRemaining;
+          get().appendLog(
+            'combat',
+            `${enemy.name} is ${lbl} — ${rds} round${rds > 1 ? 's' : ''}.`,
+          );
+        }
       }
 
       // ⚠⚠⚠ OTA-1564 — THE MAX-ROLL PAYLOADS, PAID. Named out loud on the beat

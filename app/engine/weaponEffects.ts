@@ -190,6 +190,60 @@ export interface ParsedWeaponEffect {
   overheat?: OverheatSpec;
   /** OTA-1565 — damage that does not stop at the thing you aimed at. */
   splash?: SplashSpec;
+  /** OTA-1572 — what the hit DOES to them, past the damage. */
+  onHitControl?: OnHitControl;
+}
+
+/**
+ * ⚠⚠⚠ OTA-1572 — WHAT A HIT DOES BESIDES DAMAGE, and until now the answer was
+ * "nothing, whatever the card says". FORTY-TWO weapons promise a control effect
+ * in their effect text — stun, prone, restrained, paralyze, slow, blind,
+ * knockback — and `enemyStatuses` has never had a field that could hold one: its
+ * kinds are all damage-over-time (`poison_coat`, `typed_dot`, …). The one thing
+ * that DID read a weapon's status promise, `rollIncomingStatusEffect`, keys off
+ * the DAMAGE TYPE and never looks at the text at all, so Energy Baton's "stuns
+ * target on max roll" and Rusted Blade's silence produced identical behaviour.
+ *
+ * ⚠⚠ THE FAMILIES ARE SPLIT BY WHAT THEY COST THE ENEMY, not by flavour.
+ * `skip` kinds take the enemy's swing away outright; `hinder` kinds leave it
+ * swinging but worse. That distinction is the whole safety budget — see
+ * ENEMY_BRACE_ROUNDS.
+ */
+export type ControlKind =
+  | 'stunned' | 'paralyzed' | 'restrained'   // skip: the swing is gone
+  | 'prone' | 'slowed' | 'blinded'           // hinder: the swing lands worse
+  | 'knockback';                             // hinder: it lands from further off
+
+/** Kinds that cost the enemy its counter-attack outright. */
+export const CONTROL_SKIPS: ReadonlySet<ControlKind> = new Set<ControlKind>([
+  'stunned', 'paralyzed', 'restrained',
+]);
+
+export interface OnHitControl {
+  kind: ControlKind;
+  /** Rounds it lasts. Always ≥ 1 — a zero-round control is a no-op that would
+   *  read on the card as a promise. */
+  rounds: number;
+  /** How the hit earns it. 'always' is the dangerous one and is deliberately
+   *  rare in the catalog; see the brace guard. */
+  trigger: 'always' | 'max-roll' | 'chance' | 'threshold';
+  /** 0..1, for trigger 'chance'. */
+  chance?: number;
+  /** Natural-roll floor, for trigger 'threshold' ("on rolls of 15+"). */
+  threshold?: number;
+  /**
+   * ⚠⚠ OTA-1572 — WHO IT ACTUALLY SEIZES. Four cold weapons say their freeze
+   * takes a MACHINE apart and merely inconveniences a person: Killing Frost is
+   * *"deep enough to seize a Construct's joints outright"*, Frost Maul *"seizes
+   * machinery and staggers the living"*. Read without this the Rare Frost Maul
+   * paralyses everything it touches unconditionally, which is both a lie about
+   * the card and the strongest melee weapon in the game by a wide margin. When
+   * set, the control lands only on a matching enemy — and where the card names
+   * a lesser effect for everyone else (`fallback`), that is what they get.
+   */
+  restrictedTo?: BonusCondition;
+  /** The weaker control everyone outside `restrictedTo` receives instead. */
+  fallback?: ControlKind;
 }
 
 /**
@@ -405,6 +459,103 @@ const WORD_COUNT: Record<string, number> = { twice: 2, three: 3, thrice: 3, two:
  * on the line it is written.
  */
 const SPLASH_DEFERRED_RE = /\bknock|\bpush\b|\bstun\b|\bprone\b|\bburning ground\b/;
+
+/**
+ * ⚠⚠⚠ OTA-1572 — THE CONTROL VOCABULARY, and the verb list is the ceiling again.
+ * Slices 1a and 1c both taught the same lesson the hard way: the catalog was
+ * never the limit, the parser's verb list was. Seven weapons already promised
+ * armour-piercing in words 1a's first draft didn't know, and the blast was said
+ * eight different ways in 1c. So this is built from the ACTUAL 42 strings in the
+ * catalog rather than from what a control effect "should" be called — "seizes
+ * machinery", "strikes late", "DEX save or fall", "restrained", "sickens" are
+ * all in there, and none of them is the word a rulebook would have used.
+ *
+ * ⚠⚠ ORDER MATTERS. `paralyzed` is tested before `stunned` because "knock-stun"
+ * and "paralyze" can co-occur in one line, and the stronger reading is the one
+ * the card's own emphasis carries. Within a line the FIRST kind matched wins;
+ * a weapon that promises two control effects gets the more severe, never both,
+ * because two controls off one swing is a lock however it is spelled.
+ */
+const CONTROL_PATTERNS: ReadonlyArray<readonly [ControlKind, RegExp]> = [
+  ['paralyzed', /\bparaly\w*|\bshackle|\bbinds?\s+\w*\s*target|\bseizes?\s+(?:a\s+\w+'s\s+)?joints?\b|\bseizes?\s+machin\w*|\bchill\s+seizes\b/],
+  ['restrained', /\brestrain\w*|\bentangl\w*|\bsnare\w*|\bimmobiliz\w*|\bvines?\s+to\b|\broots?\s+entangl/],
+  ['stunned', /\bstuns?\b|\bstunned\b|\bstunning\b|\bknock-stun\b|\bdaze\w*/],
+  ['knockback', /\bknock(?:s|ed)?\s*back\b|\bknockback\b|\bpush(?:es)?\s+enem|\bpush\s+\w+\s+to\s+far\b/],
+  ['prone', /\bprone\b|\bknocks?\s+\w*\s*down\b|\bor\s+fall\b|\btrip\s+enem|\bfall\b/],
+  ['blinded', /\bblind\w*/],
+  ['slowed', /\bslow\w*|\bstrikes?\s+late\b|\bstaggers?\b|\bchill\s+sets\s+in\b|\bsickens?\b|\bweaken\b/],
+];
+
+/**
+ * ⚠⚠ THE COLD-VS-MACHINE FAMILY. Four weapons scope their freeze to constructs
+ * in the catalog's own words. Matching on the machine noun rather than on a
+ * "construct" keyword is deliberate: not one of the four uses the word the
+ * condition is called.
+ */
+const MACHINE_SCOPED_RE = /\bmachin\w*|\bconstruct\w*|\bautomation/;
+/** The lesser thing the card promises everyone who is not a machine. */
+const MACHINE_FALLBACK_RE = /\bstaggers?\s+the\s+living\b|\band\s+staggers?\b/;
+
+/** Durations the catalog actually writes, in the two shapes it writes them. */
+function controlRoundsFrom(clause: string, whole: string): number {
+  const m =
+    clause.match(/(\d+)\s*-?\s*rounds?\b/) ??
+    clause.match(/for\s+(\d+)\s+(?:rounds?|turns?)/) ??
+    whole.match(/(\d+)\s*-?\s*rounds?\b/);
+  const n = m ? parseInt(m[1]!, 10) : 1;
+  // ⚠ "Instantaneous" is how the catalog spells a knockdown that is over the
+  // moment it lands. That is still one round of consequence, not zero — a
+  // zero-round control would read on the card as a promise and do nothing.
+  return Number.isFinite(n) && n >= 1 ? Math.min(n, 5) : 1;
+}
+
+function controlFrom(text: string): OnHitControl | null {
+  let found: ControlKind | null = null;
+  let clause = text;
+  outer: for (const c of text.split(/[.;—]/)) {
+    for (const [kind, re] of CONTROL_PATTERNS) {
+      if (re.test(c)) { found = kind; clause = c; break outer; }
+    }
+  }
+  if (!found) return null;
+
+  // ⚠⚠ HOW THE HIT EARNS IT. An unconditional control is the expensive case, so
+  // every gated spelling in the catalog is recognised before we fall back to it.
+  let trigger: OnHitControl['trigger'] = 'always';
+  let chance: number | undefined;
+  let threshold: number | undefined;
+
+  const pct = text.match(/(\d+)\s*%\s*chance/);
+  const thr = text.match(/\brolls?\s+of\s+(\d+)\s*\+/);
+  if (/\bmax(?:imum)?\s+(?:damage\s+)?roll\b|\bon\s+max\s+roll\b|\bmax-roll\b/.test(text)) {
+    trigger = 'max-roll';
+  } else if (pct) {
+    trigger = 'chance';
+    chance = Math.min(1, Math.max(0, parseInt(pct[1]!, 10) / 100));
+  } else if (thr) {
+    trigger = 'threshold';
+    threshold = parseInt(thr[1]!, 10);
+  } else if (/\beven\/odd\b|\beven\s*=|\breroll\s+to\b|\bto\s+confirm\b|\bsave\s+or\b|\bchance\s+to\b/.test(text)) {
+    // The catalog's own coin-flip spellings. Treated as a real 50% rather than
+    // as unconditional — "even/odd to confirm" and "even = stun for 3 turns"
+    // are gates, and reading either as "always" is how a weapon becomes a lock.
+    trigger = 'chance';
+    chance = 0.5;
+  }
+
+  const out: OnHitControl = {
+    kind: found, rounds: controlRoundsFrom(clause, text), trigger, chance, threshold,
+  };
+
+  // ⚠⚠ Scope the freeze to what the card actually says it seizes. Only the
+  // incapacitating kinds are ever narrowed — a slow that reads broadly is not
+  // the failure mode this guards against.
+  if (CONTROL_SKIPS.has(found) && MACHINE_SCOPED_RE.test(text)) {
+    out.restrictedTo = 'construct';
+    if (MACHINE_FALLBACK_RE.test(text)) out.fallback = 'slowed';
+  }
+  return out;
+}
 
 function splashFrom(text: string): SplashSpec | null {
   if (SPLASH_DEFERRED_RE.test(text)) return null;
@@ -624,6 +775,10 @@ export function parseWeaponEffect(effect: string | undefined | null): ParsedWeap
   // OTA-1565 (slice 1c) — the blast.
   const blast = splashFrom(text);
   if (blast) { out.splash = blast; touched = true; }
+
+  // OTA-1572 (slice 2) — the thing the hit DOES to them beyond damage.
+  const ctrl = controlFrom(text);
+  if (ctrl) { out.onHitControl = ctrl; touched = true; }
 
   return touched ? out : null;
 }

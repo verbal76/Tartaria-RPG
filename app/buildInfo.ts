@@ -26114,7 +26114,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The tap breadcrumb is untouched again: the hair spaces live in the JSX only, so
 // logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
 // evidence stays greppable.
-export const OTA_BUILD_ID = '2026-08-30-1571-the-slot-moves-on';
+export const OTA_BUILD_ID = '2026-08-30-1572-the-card-says-stunned';
+// OTA-1572 (weapon-effects slice 2) — on-hit CONTROL effects. 33 weapons
+// promise stun / prone / restrained / paralyze / slow / blind / knockback and
+// none could ever have worked: every enemyStatuses kind is damage-over-time,
+// so there was nowhere on an enemy to put 'stunned'. Adds enemyControl +
+// enemyBraced, the parser's control vocabulary, and the anti-lock brace that
+// mirrors OTA-1089's player-side guard (844 stuns/run before that existed).
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-30-1571-the-slot-moves-on';
 // golem catch-up 2026-08-30: markerless publish of OTA-1570/1571 to the golem
 // channel — the rune-caster sell exclusion, rarity on every sell line, the
 // knockout line's four bands, the scene-intro three-strike ledger, and the
