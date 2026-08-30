@@ -26079,6 +26079,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // against the flat one. Every chip without a coating takes the untouched render
 // path, so the change is confined to weapon buttons that carry a coating.
 export const OTA_BUILD_ID = '2026-08-30-1568-one-string-two-fonts';
+// golem catch-up 2026-08-30: markerless publish of OTA-1568 (a black halo on the
+// coating glyphs so a colour emoji reads on the light strike chip, and a per-kind
+// colour for the monochrome ones so acid stops borrowing the label's) to the
+// golem channel.
 // golem catch-up 2026-08-30: markerless publish of OTA-1567 (the render
 // heartbeat split from the phase checkpoint, the age field made real, idle
 // reclaims recorded but no longer fatal) to the golem channel.
