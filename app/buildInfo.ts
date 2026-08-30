@@ -26038,6 +26038,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // They are the same OS reclaim with a stale action label. The genuine signal is
 // the SEVEN deaths at a ctx-* or native:* phase, with native ML work in flight.
 export const OTA_BUILD_ID = '2026-08-30-1567-the-heartbeat-ate-the-checkpoint';
+// golem catch-up 2026-08-30: markerless publish of OTA-1567 (the render
+// heartbeat split from the phase checkpoint, the age field made real, idle
+// reclaims recorded but no longer fatal) to the golem channel.
 // golem catch-up 2026-08-30: markerless publish of OTA-1565/1566 (the blast, the
 // ordinals restored as firsts, and the repeater's visible fuse) to the golem
 // channel.
