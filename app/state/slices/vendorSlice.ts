@@ -618,7 +618,16 @@ export const createVendorSlice = (
     // One line per NEGOTIATION. A 155-line receipt was its own defect — the feed
     // is a story, not a cash-register tape. The unit price stays visible so the
     // player can still check the arithmetic.
-    const soldWhat = units === 1 ? item.name : `${units}× ${item.name}`;
+    // ⚠⚠⚠ OTA-1570 — NAME THE RARITY, because he had to ASK. After a 66-line
+    // bulk sweep he typed into the game: *"I thought the sell all common would
+    // only sell of common weapons and armor"* and *"did I just sell off rares and
+    // uncommons as well?"* — and the answer was no, every item was Common and the
+    // button had worked exactly as specified. What made him doubt it is that the
+    // line never SAID so: `Sold Aetherium Spear … for 14 TC` reads like a Rare
+    // going for pocket change, because several Commons have Rare-sounding names.
+    // One word closes a question the receipt was always able to answer.
+    const rarityTag = item.rarity ? ` (${item.rarity})` : '';
+    const soldWhat = units === 1 ? `${item.name}${rarityTag}` : `${units}× ${item.name}${rarityTag}`;
     const forWhat = units === 1 ? `${total} TC` : `${total} TC (${price} TC each)`;
     get().appendLog(
       'reward',

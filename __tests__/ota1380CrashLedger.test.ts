@@ -153,7 +153,14 @@ describe('OTA-1380 — the native death finally becomes a crash', () => {
     expect(out).toContain('PROCESS KILLED — no JS ran');
     expect(out).toContain('doing: look around');
     expect(out).toContain('last checkpoint: qwen-load');
-    expect(out).toContain('+120ms');
+    // ⚠ OTA-1571 RETARGET, NOT A RELAXATION. This pinned the bare `+120ms`, and
+    // the bare number was the defect: with nothing naming it, `phaseAt - at`
+    // read as the checkpoint's own age, so the owner's `(+306713ms)` looked
+    // like a five-minute stall rather than a five-minute-old action string.
+    // The claim is unchanged and now stronger — the number is still there AND
+    // it says which of the two it is.
+    expect(out).toContain('120ms into the action');
+    expect(out).not.toContain('(+120ms)');
   });
 
   it('the four kinds stay distinct, so a recovered screen is never read as a death', async () => {

@@ -69,6 +69,9 @@ import {
 import { introPagesFor } from '../../engine/story';
 import { discoverLocation, emptyMemory } from '../../engine/worldMemory';
 import type { InventoryItem } from '../../engine/types';
+// OTA-1571 — the scene-intro slot's strike ledger. Without it this file's
+// `.find` re-picks one unwritable location forever; see sceneIntroRefusals.
+import { introFillExhausted, introFillMissCount, INTRO_FILL_STRIKES } from '../../engine/sceneIntroRefusals';
 
 /** ⚠ Fully erased at compile time — see slice 3 for why `typeof Store.fn` is the
  *  right way to type injected deps: a signature change in gameStore breaks
@@ -527,7 +530,16 @@ export const createBootSlice = (
           const idleNeeded = introIdleMs();
           if (lastAct === null || Date.now() - lastAct < idleNeeded) return false;
           const target = deps.introPrefetchCandidates(get)
-            .find((l) => (deps.sceneIntroBank.get(l.id)?.length ?? 0) < deps.INTRO_BANK_PER_LOC);
+            // ⚠⚠⚠ OTA-1571 — SKIP A LOCATION THAT HAS SPENT ITS STRIKES. This
+            // `.find` takes the FIRST hungry bank, so before this line one
+            // location that could not be written did not merely waste its own
+            // generations — it HELD THE SLOT and starved every other location
+            // behind it. The owner's log: twelve fills for one place, eight
+            // discarded, 57.9s gone, nothing else banked. That is exactly the
+            // shape OTA-1465 fixed in the item slot below, and the reason its
+            // comment says the blockage was the expensive half.
+            .find((l) => (deps.sceneIntroBank.get(l.id)?.length ?? 0) < deps.INTRO_BANK_PER_LOC
+              && !introFillExhausted(l.id));
           if (!target) return false;
           const scene = get().currentScene;
           const pl = get().player;
@@ -559,7 +571,13 @@ export const createBootSlice = (
             });
           // ⚠ The threshold this fill was armed at, so a device log can tell a
           // preemption caused by a bad threshold from one caused by a busy player.
-          get().appendLog('debug', `homework: intro-fill armed after ${idleNeeded}ms idle`);
+          // ⚠ OTA-1571 — the strike count rides the arming line, so a device log
+          // shows a location working through its attempts rather than only the
+          // outcome of each one.
+          const strikes = introFillMissCount(target.id);
+          get().appendLog('debug',
+            `homework: intro-fill armed after ${idleNeeded}ms idle`
+            + (strikes > 0 ? ` (strike ${strikes + 1}/${INTRO_FILL_STRIKES})` : ''));
           return true;
         };
         let lastHomeworkAt = 0;

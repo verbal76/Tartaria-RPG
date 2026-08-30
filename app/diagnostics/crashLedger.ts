@@ -207,8 +207,24 @@ export function crashLedgerSummary(): string {
       const b = r.breadcrumb;
       out.push(`      doing: ${b.what} · room ${b.room ?? '?'} · screen ${b.screen ?? '?'}`);
       if (b.phase) {
-        const dt = b.phaseAt != null ? ` (+${Math.max(0, b.phaseAt - b.at)}ms)` : '';
-        out.push(`      last checkpoint: ${b.phase}${b.phaseDetail ? ` [${b.phaseDetail}]` : ''}${dt}`);
+        // ⚠⚠ OTA-1571 — THE BARE `(+Nms)` HERE HAS BEEN MISREAD SINCE IT SHIPPED,
+        // by me included. It is `phaseAt - at`: how far INTO THE ACTION the
+        // checkpoint landed. Printed with no unit-of-meaning right after the
+        // phase name it reads as the checkpoint's own age, which is why a
+        // `(+306713ms)` on an idle breadcrumb looked like a five-minute stall
+        // instead of what it was — an action string that had simply been sitting
+        // there for five minutes. Both numbers are worth having, so both are
+        // named. `aliveAt` (OTA-1567) is the one that answers the question the
+        // reader is actually asking: how long the process outlived the
+        // checkpoint before it was killed.
+        const into = b.phaseAt != null ? ` · ${Math.max(0, b.phaseAt - b.at)}ms into the action` : '';
+        const after =
+          b.phaseAt != null && b.aliveAt != null
+            ? ` · alive ${Math.max(0, b.aliveAt - b.phaseAt)}ms after it`
+            : '';
+        out.push(
+          `      last checkpoint: ${b.phase}${b.phaseDetail ? ` [${b.phaseDetail}]` : ''}${into}${after}`,
+        );
       }
     }
     if (r.stack) out.push(`      ${r.stack.split('\n').slice(0, 4).join('\n      ')}`);

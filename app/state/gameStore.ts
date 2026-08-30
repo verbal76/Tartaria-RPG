@@ -36,6 +36,7 @@ import {
 import { buildingNameFor, buildingHookLabel, buildingArrow } from '../engine/buildingMaps';
 // OTA-1440 — the first reader of vendors.json's gender field.
 import { npcGenderFor } from '../engine/npcGender';
+import { koShare } from '../engine/combatProse';
 // ⚠ OTA-1236 — ONE rule for "this noun carries a next step", shared by the engine
 // dispatch, the bulk-salvage guard, the loot picker's lead lane and the
 // INVESTIGATE ALL ordering. See engine/storyNouns.ts for why they must agree.
@@ -23846,7 +23847,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (knocksOut) {
           get().appendLog(
             'combat',
-            `You crack the ${enemy.name} with the ${weaponName} for ${dmg} — half their fight, gone in one blow. They crumple, out cold. (${newEnemyHp}/${enemyMaxHp} HP) Loot them before they come to.`,
+            // ⚠⚠ OTA-1570 — SAY WHAT THE BLOW ACTUALLY DID. "Half their fight" was
+            // a fixed string on a line that prints the real numbers right beside
+            // it, so the sentence and the parenthesis contradicted each other in
+            // the owner's logs twice over: 11 damage on a 13 HP raider (85%) and
+            // 28 on a 32 HP agent (87%), both narrated as "half". A knockout is a
+            // dramatic beat and the fraction is the drama — reading it off `dmg`
+            // costs nothing and stops the line from being the one part of a
+            // combat log that is not true.
+            `You crack the ${enemy.name} with the ${weaponName} for ${dmg} — ${koShare(dmg, enemyMaxHp)}, gone in one blow. They crumple, out cold. (${newEnemyHp}/${enemyMaxHp} HP) Loot them before they come to.`,
             { combatOutcome: 'player_dmg' },
           );
           // OTA-1089 — a knockout has to MOVE the fight, not park it. A KO'd
@@ -36218,6 +36227,10 @@ export function tickDogStatus(
 // gated on a raw `!player.dog`, so once a dog died the slot was never "empty" and
 // the replacement vendor could never fire. Gate on this instead so the arc the
 // feature unlocks is actually reachable, without erasing the dead-dog record.
+// ⚠ OTA-1570 — `koShare` lives in engine/combatProse. It is a pure display
+// string with no store behind it, and keeping it here meant a test of four
+// `if`s had to boot the whole native ML stack to reach it.
+
 export function hasActiveDog(player: PlayerCharacter | null | undefined): boolean {
   const dog = player?.dog;
   return !!dog && (dog.status === 'with_player' || dog.status === 'waiting_at_base');

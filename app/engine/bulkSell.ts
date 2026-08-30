@@ -32,6 +32,9 @@ import { WEAPONS, ARMOR } from './crafting';
 
 const WEAPON_NAMES = new Set(WEAPONS.map((w) => w.name.toLowerCase()));
 const ARMOR_NAMES = new Set(ARMOR.map((a) => a.name.toLowerCase()));
+const RUNECASTER_NAMES = new Set(
+  WEAPONS.filter((w) => w.weaponKind === 'runecaster').map((w) => w.name.toLowerCase()),
+);
 
 /** Weapons and armor only — never consumables, never materials, never relics. */
 export function isGearItem(item: Pick<InventoryItem, 'name'>): boolean {
@@ -43,6 +46,35 @@ export function isGearItem(item: Pick<InventoryItem, 'name'>): boolean {
  *  Excluded from every bulk sweep. */
 function isForged(item: InventoryItem): boolean {
   return !!(item as InventoryItem & { uniqueStats?: unknown }).uniqueStats;
+}
+
+/**
+ * ⚠⚠⚠ OTA-1570 — A RUNE-CASTER IS NOT SPARE GEAR ANY MORE, AND THIS HOLE IS MINE.
+ *
+ * The owner's log, two hours after OTA-1561 shipped: `Sold Earthshaker … for 14
+ * TC`, `Sold Mud Shell … for 13 TC` — both swept by SELL ALL COMMON GEAR. Every
+ * item in that sweep was correctly Common and the button did exactly what it
+ * says. What changed is what a Common rune-caster IS.
+ *
+ * OTA-1561 opened the Crucible to rune-casters: they take PASSIVES that scale
+ * with the wielder's stats, two of them (three at Legendary), at five reserved
+ * pieces a visit. A Common rune-caster is now the cheapest way into that entire
+ * system — the thing you upgrade, not the thing you clear out. Selling one for
+ * 13 TC was a fine trade the day before 1561 and a bad one the day after, and
+ * the sweep had no way to know the rules had moved under it.
+ *
+ * ⚠⚠ THIS IS THE SAME REASONING `isForged` ALREADY USES, one step earlier. That
+ * spares a piece the player has ALREADY put work into; this spares the piece the
+ * work is done TO. Rarity was never the question — "can this become something"
+ * is, and rarity is a poor proxy for it in both directions.
+ */
+function isRunecaster(item: InventoryItem): boolean {
+  if (item.kind === 'runecaster') return true;
+  if ((item.tags ?? []).some((t) => t.toLowerCase() === 'runecaster')) return true;
+  // ⚠ The catalog is the last word. An instance can reach here with no tags at
+  // all (an inferred row, a migrated save), and the sweep must still spare it —
+  // the same reason isGearItem keys on the catalog rather than on the instance.
+  return RUNECASTER_NAMES.has(item.name.toLowerCase());
 }
 
 export interface BulkSellCandidate {
@@ -71,7 +103,8 @@ export function planCommonGearSale(sellable: readonly BulkSellCandidate[]): Bulk
   const rows = sellable.filter(({ item }) =>
     item.rarity === 'Common'      // explicit — never the colour, never a default
     && isGearItem(item)           // weapons + armor only
-    && !isForged(item),           // never something the player built
+    && !isForged(item)            // never something the player built
+    && !isRunecaster(item),       // OTA-1570 — never the thing the Crucible upgrades
   );
   const count = rows.reduce((n, r) => n + Math.max(1, r.item.quantity ?? 1), 0);
   const total = rows.reduce((n, r) => n + r.price * Math.max(1, r.item.quantity ?? 1), 0);

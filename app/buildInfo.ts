@@ -26114,7 +26114,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The tap breadcrumb is untouched again: the hair spaces live in the JSX only, so
 // logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
 // evidence stays greppable.
-export const OTA_BUILD_ID = '2026-08-30-1569-the-glyph-brings-its-own-ground';
+export const OTA_BUILD_ID = '2026-08-30-1571-the-slot-moves-on';
+// OTA-1570 + OTA-1571 ship together: SELL ALL COMMON stops sweeping
+// rune-casters (the hole OTA-1561 opened under it), every sell line names
+// the rarity, the knockout line stops calling 85% "half their fight", the
+// scene-intro homework slot gives up after three misses instead of holding
+// the slot forever, and the crash ledger's bare (+Nms) finally says which
+// number it is.
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-30-1569-the-glyph-brings-its-own-ground';
 // golem catch-up 2026-08-30: markerless publish of OTA-1569 (the coating glyph
 // gets a dark cell of its own so its colour no longer has to survive two
 // opposite chip fills, plus his burnt-orange acid) to the golem channel.

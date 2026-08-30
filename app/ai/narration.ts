@@ -69,6 +69,9 @@ import conceptsData from '../data/lore/concepts.json';
 import { playerIsSprinting } from '../state/sprint';
 import { playerGridCell } from '../state/playerGrid';
 import { visibleLogTotal } from '../state/visibleLogCount';
+// OTA-1571 — the scene-intro slot's strike ledger; see sceneIntroRefusals for
+// why the homework scan needs one and what it cost not to have it.
+import { noteIntroFillMiss, noteIntroFillHit } from '../engine/sceneIntroRefusals';
 
 const allLocations = locationsData as Location[];
 
@@ -1153,7 +1156,21 @@ export async function narrateViaArbiter(
             : narratesAction ? 'intro-fill:action-opener'
               : repDup ? 'intro-fill:near-dup' : 'intro-fill:∅',
         );
+        // ⚠⚠⚠ OTA-1571 — AND THE LOCATION TAKES A STRIKE. Without this the
+        // homework scan re-picks the same hungry bank forever: the owner's log
+        // shows twelve fills for "Builders' Survey Camp", eight discarded, 57.9s
+        // burned, and NO other location banked while it ran. See
+        // sceneIntroRefusals — this is OTA-1465's starvation bug in the slot
+        // that never got its guard.
+        //
+        // ⚠ A PREEMPTED fill is NOT a strike. It was cut off by the player
+        // acting, which says nothing about whether this place can be written;
+        // counting it would retire locations for being visited at a busy moment.
+        if (!truncated) noteIntroFillMiss(forLoc?.id ?? scene.location.id);
       } else {
+        // A location that banks a line has proved it can be written — see
+        // noteIntroFillHit for why the count must not survive a success.
+        noteIntroFillHit(forLoc?.id ?? scene.location.id);
         bankSceneIntro(
           forLoc
             ? introBankKey(forLoc.id, null)
