@@ -25542,7 +25542,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // blocks up already used. (First cut of the fix read `eq.mainId` above `const
 // eq = ...` and took the whole inventory screen down with a TDZ
 // ReferenceError; the suite pins the ordering now.)
-export const OTA_BUILD_ID = '2026-08-29-1550-one-slot-one-weapon';
+// OTA-1551 - A STANDING KEYBOARD DOES NOT SHRINK. Fourth report of the same
+// burial, and the OTA-1535 instrument finally caught the mechanism. Two LIVE
+// frames 73ms apart, same keyboard, same 986pt window (owner's log 23:48:39):
+// "bottom=407.79 raw=360 from=live" then "bottom=359.79 raw=360 from=live".
+// Both live, both reporting raw 360, resolving 48pt apart - so screenY, the
+// keyboard's top edge, MOVED DOWN by the Gboard suggestion strip while the
+// keyboard itself never moved. Android counts the strip inside the frame on one
+// event and outside it on the next. OTA-1540 cannot help: its max() compares
+// the two numbers WITHIN a frame, and in the offending frame both say 360, so
+// it honestly follows the short one straight back under the keys. Every prior
+// pass (OTA-215 change-frame, arb71 ghost guard, OTA-1442 re-sync, OTA-1540
+// screenY) hardened a pipeline that was working - the defect is that a
+// per-frame reading cannot describe a keyboard whose frame lies between events.
+// So the max spans the SESSION: a standing keyboard cannot occupy less than it
+// already occupied, and only hiding shrinks it. The high-water mark holds while
+// the keyboard is up and is released by onHide's COMMITTED retraction (not the
+// deferred hide event, which a refocus can cancel - that door is OTA-1442's),
+// so the next keyboard measures itself from nothing. One-way, like 1540: it can
+// only ever hold the bar higher.
+export const OTA_BUILD_ID = '2026-08-30-1551-a-standing-keyboard-does-not-shrink';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1550-one-slot-one-weapon';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1549-the-button-you-can-see';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-29-1548-twenty-more-fires-in-the-dark';
 // golem catch-up 2026-08-29: markerless publish of OTA-1548 (the whisper

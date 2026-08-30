@@ -118,7 +118,15 @@ describe('OTA-1540 — the bar is positioned from the keyboard top edge', () => 
   it('⚠⚠ the offset feeding the bar is the corrected one, not the raw report', () => {
     const code = codeOnly(BAR);
     expect(code).toContain('const h = occupiedHeight(height, screenY);');
-    expect(code).toContain('lastKeyboardHeight = h; setKeyboardOffset(h);');
+    // ⚠ OTA-1551 — the corrected height now passes through a SESSION LATCH
+    // before it reaches the bar (a standing keyboard cannot shrink; see that
+    // suite for the two live frames that proved it). `latched` is
+    // Math.max(h, sessionMaxHeight), so it can never be lower than the `h`
+    // this OTA computes — the property pinned here, that the bar is fed the
+    // CORRECTED number and never the raw report, holds through it.
+    expect(code).toContain('const latched = Math.max(h, sessionMaxHeight);');
+    expect(code).toContain('lastKeyboardHeight = latched;');
+    expect(code).toContain('setKeyboardOffset(latched);');
   });
 
   it('⚠⚠ arb71\'s ghost guard still owns the hide path — screenY is read twice, for two jobs', () => {

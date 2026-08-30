@@ -102,6 +102,10 @@ export function KeyboardInputBar() {
     //     the case where the keyboard is already up when we mount
     //     (came from another screen with keyboard open).
     let hideTimer: ReturnType<typeof setTimeout> | null = null;
+    // OTA-1551 — the standing keyboard's high-water mark. Held for as long as
+    // this keyboard is up; cleared only by the committed retraction in onHide,
+    // so the NEXT keyboard measures itself from nothing.
+    let sessionMaxHeight = 0;
     // ⚠⚠⚠ OTA-1540 — POSITION FROM THE KEYBOARD'S TOP EDGE, NOT ITS REPORTED
     // HEIGHT. The OTA-1535 instrument caught this on the owner's device:
     //
@@ -137,10 +141,41 @@ export function KeyboardInputBar() {
       if (fromTop > winH * 0.75) return height;
       return Math.max(height, fromTop);
     };
+    // ⚠⚠⚠ OTA-1551 — A STANDING KEYBOARD DOES NOT SHRINK.
+    //
+    // Fourth report of this burial, and the OTA-1540 instrument finally caught
+    // it in the act. Two LIVE frames 73ms apart, same keyboard, same 986pt
+    // window (owner's log, 23:48:39):
+    //
+    //   bottom=407.79  raw=360  from=live   — corrected (screenY said 578.21)
+    //   bottom=359.79  raw=360  from=live   — NOT corrected; screenY moved down
+    //
+    // Android reports the Gboard suggestion strip inside the frame on one
+    // event and outside it on the next, so `screenY` genuinely slides by the
+    // 48pt strip while the keyboard itself never moves. OTA-1540 reads each
+    // frame in isolation and honestly follows the second one — straight back
+    // under the keys. Its max() cannot help: it compares the two numbers
+    // WITHIN a frame, and in that frame both say 360.
+    //
+    // ⚠⚠ SO THE MAX SPANS THE SESSION, NOT THE FRAME. A keyboard that is
+    // standing cannot occupy less than it already occupied — only HIDING can
+    // shrink it. The high-water mark holds while the keyboard is up and is
+    // cleared by onHide's committed retraction, so the next keyboard (a
+    // shorter one, another language, a rotation) measures itself from nothing.
+    //
+    // ⚠ Like OTA-1540, this is one-way: it can only ever hold the bar HIGHER.
+    // The failure being fixed is a bar sitting too low, and the cure must not
+    // be able to manufacture the opposite one.
     const applyHeight = (height: number, screenY?: number) => {
       if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
       const h = occupiedHeight(height, screenY);
-      if (h > 0) { lastReportedHeight = height; lastKeyboardHeight = h; setKeyboardOffset(h); }
+      if (h > 0) {
+        lastReportedHeight = height;
+        const latched = Math.max(h, sessionMaxHeight);
+        sessionMaxHeight = latched;
+        lastKeyboardHeight = latched;
+        setKeyboardOffset(latched);
+      }
     };
     const onShow = (e: { endCoordinates: { height: number; screenY?: number } }) => {
       applyHeight(e.endCoordinates?.height ?? 0, e.endCoordinates?.screenY);
@@ -192,6 +227,8 @@ export function KeyboardInputBar() {
           } catch { /* metrics unavailable — fall through to the retract */ }
         }
         setKeyboardOffset(0);
+        // OTA-1551 — the keyboard is really gone: release the latch.
+        sessionMaxHeight = 0;
         setText('');
         // Keyboard is really gone (not a quick refocus) → retract the bar.
         useGameStore.getState().setExplorationInputActive(false);
