@@ -25915,6 +25915,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // payloads belong to systems 1c and slice 2 own. Half-building one here is how a
 // weapon ends up with a signature move that fires and does nothing.
 export const OTA_BUILD_ID = '2026-08-30-1564-when-the-dice-come-up-perfect';
+// golem catch-up 2026-08-30: markerless publish of OTA-1564 (the max-roll
+// trigger, the repeaters' extra shots, and the overheat family) to the golem
+// channel.
 // golem catch-up 2026-08-30: markerless publish of OTA-1563 (the range nerf
 // removed catalog-wide, six unread piercing verbs wired, and twenty new
 // armour-piercing lines on a rarity ladder) to the golem channel.
