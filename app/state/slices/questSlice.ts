@@ -111,7 +111,14 @@ export interface QuestSlice {
   routeMission: (id: string) => void;
   turnInFactionQuest: (titleOrId: string, remote?: boolean) => void;
   acceptHunt: (titleOrId: string) => void;
-  advanceHunt: (huntId: string) => void;
+  /** ⚠⚠ OTA-1581 — `peaceful` means NOBODY IS PUT IN FRONT OF YOU. Two callers,
+   *  both from the mission conversation card: a persuade that landed (owner's
+   *  rule 4 — *"a good enough charisma roll should eliminate the fight and you
+   *  complete that stage"*), and TAKE in the aftermath, where the bodies are
+   *  already down and re-running the spawn would stand them back up. The stage
+   *  advances exactly as it would have; only the spawn and the freeze-for-kill
+   *  are skipped. Absent/false is the old behaviour, unchanged. */
+  advanceHunt: (huntId: string, opts?: { peaceful?: boolean }) => void;
   turnInHunt: (titleOrId: string, remote?: boolean) => void;
   acceptMystery: (titleOrId: string) => void;
   advanceMystery: (mysteryId: string) => void;
@@ -1373,7 +1380,8 @@ export const createQuestSlice = (
     void get().persist();
   },
 
-  advanceHunt(huntId) {
+  advanceHunt(huntId, opts) {
+    const peaceful = opts?.peaceful === true;
     const state = get();
     const player = state.player;
     if (!player) return;
@@ -1449,48 +1457,62 @@ export const createQuestSlice = (
     // SPAWN, so three raiders could be left standing and the hunt moved on
     // regardless. A stage that puts bodies in front of you is resolved by
     // dealing with them — the clear is handled where the last one dies.
-    const freezeForKill =
+    // ⚠ OTA-1581 — a PEACEFUL advance freezes for nothing: there is no fight to
+    // wait on, which is the entire thing the persuade bought.
+    const freezeForKill = !peaceful && (
       (stageDef.checkKind === 'boss' && record.stage === lastBossIndex)
-      || !!stageDef.spawn;
+      || !!stageDef.spawn
+    );
+    // ⚠⚠⚠ OTA-1576 — THE STAGE GETS TO SAY WHAT IS ACTUALLY THERE. Every boss
+    // stage used to spawn the hunt's ONE global `targetEnemyName`, which is
+    // right for an `apex` and exactly backwards for a `false_summit` — a stage
+    // type whose whole job is to say the target was NOT here. Both of the
+    // game's two spawned the very boss their sentence says has left: "Embers
+    // still warm. REAVER GONE. Three of his sworn followers rise …" and "You
+    // wade in expecting the Queen. THE QUEEN IS [gone]". The owner hit the
+    // first, was told to find three Tartarian raiders, found none, and typed
+    // the problem into the game in plain English.
+    //
+    // ⚠⚠⚠ OTA-1581 — AND THE SPAWN LEAVES THE BOSS BRANCH, because it was a
+    // LATENT SOFTLOCK sitting directly in the mission-card's path. OTA-1578 put
+    // `|| !!stageDef.spawn` into `freezeForKill` — correctly: a stage that puts
+    // bodies in front of you is resolved by dealing with them. But the spawn
+    // itself stayed nested under `checkKind === 'boss'`. Both authored spawns
+    // happen to be boss stages, so nothing was broken TODAY; the moment a
+    // `diplomacy` stage authored one — which is exactly what the conversation
+    // card's "I get jumped by three raiders" beat is — the hunt would freeze
+    // waiting for a kill that nothing had spawned. Unwinnable, silently.
+    //
+    // The boss SCALING stays boss-only. Only the escort moved out.
+    const override = peaceful ? null : stageDef.spawn;
+    const escort = override
+      ? scaleHuntEscort(player, override.enemyName, deps.scalePowerOf(player), override.count ?? 1)
+      : null;
+    if (escort && escort.length > 0) {
+      set((s) =>
+        s.currentScene
+          ? {
+              currentScene: {
+                ...s.currentScene,
+                ...deps.FRESH_ENEMY_ARRAYS,
+                enemies: escort,
+                enemyHps: escort.map((e) => e.hp),
+                activeEnemyIdx: 0,
+                range: 'mid',
+              },
+            }
+          : s,
+      );
+      get().appendLog(
+        'combat',
+        escort.length > 1
+          ? `${escort.length} ${escort[0]!.name}s rise from the positions they were left in.`
+          : `${escort[0]!.name} rises from the position it was left in.`,
+      );
+    }
     if (stageDef.checkKind === 'boss') {
       // ⚠ OTA-1167 — pass the REAL power measure, so the boss sees stats, weapon and AC
       // rather than max HP alone. `scalePowerOf` carries the guarded gear read.
-      //
-      // ⚠⚠⚠ OTA-1576 — AND THE STAGE GETS TO SAY WHAT IS ACTUALLY THERE. Every
-      // boss stage used to spawn the hunt's ONE global `targetEnemyName`, which
-      // is right for an `apex` and exactly backwards for a `false_summit` — a
-      // stage type whose whole job is to say the target was NOT here. Both of
-      // the game's two spawned the very boss their sentence says has left:
-      // "Embers still warm. REAVER GONE. Three of his sworn followers rise …"
-      // and "You wade in expecting the Queen. THE QUEEN IS [gone]". The owner
-      // hit the first, was told to find three Tartarian raiders, found none,
-      // and typed the problem into the game in plain English.
-      const override = stageDef.spawn;
-      const escort = override
-        ? scaleHuntEscort(player, override.enemyName, deps.scalePowerOf(player), override.count ?? 1)
-        : null;
-      if (escort && escort.length > 0) {
-        set((s) =>
-          s.currentScene
-            ? {
-                currentScene: {
-                  ...s.currentScene,
-                  ...deps.FRESH_ENEMY_ARRAYS,
-                  enemies: escort,
-                  enemyHps: escort.map((e) => e.hp),
-                  activeEnemyIdx: 0,
-                  range: 'mid',
-                },
-              }
-            : s,
-        );
-        get().appendLog(
-          'combat',
-          escort.length > 1
-            ? `${escort.length} ${escort[0]!.name}s rise from the positions they were left in.`
-            : `${escort[0]!.name} rises from the position it was left in.`,
-        );
-      }
       const boss = override ? null : scaleHuntBoss(player, hunt, deps.scalePowerOf(player));
       if (boss) {
         set((s) =>

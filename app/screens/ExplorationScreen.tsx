@@ -89,6 +89,7 @@ import { ParleySheet } from '../components/ParleySheet';
 import { PayoffSheet } from '../components/PayoffSheet';
 import { TalkSheet } from '../components/TalkSheet';
 import { WhisperTalkSheet } from '../components/WhisperTalkSheet';
+import { MissionEncounterCard } from '../components/MissionEncounterCard';
 import { GiftModal } from '../components/GiftModal';
 import { hasTopicsFor } from '../engine/dialogue';
 // OTA-1064 — the SAME identity function the store and the ledger use. See the
@@ -2048,6 +2049,14 @@ export function ExplorationScreen() {
           the other sheets for the slot itself; the component renders nothing
           unless a whisper encounter with a transcript is live. */}
       <WhisperTalkSheet />
+
+      {/* ⚠⚠ OTA-1581 — the mission conversation card. It renders NOTHING unless
+          the player is standing on the tile of a live stage that names a person,
+          and it yields to combat, so it can sit here beside the whisper bar
+          without competing for the controls slot. When it is up it is a modal
+          over everything: the owner asked for a beat that cannot be walked past,
+          and this is the only placement that gives him one. */}
+      <MissionEncounterCard />
 
       <View style={styles.controls}>
         {pendingRolls ? (

@@ -688,6 +688,18 @@ import {
   describeWhisperStage,
   withTalkTurn,
 } from '../engine/whispers';
+// ⚠ OTA-1581 — the mission conversation card. `armedEncounter` is a pure
+// selector over the save (see its file note: a selector, not a hook into
+// movement), and every button routes through `applyChoice`.
+import { armedEncounter } from '../engine/missionEncounterArm';
+import {
+  applyChoice as applyEncounterChoice,
+  freshEncounter,
+  onReenter as onEncounterReenter,
+  persuadeDc,
+  type EncounterState,
+} from '../engine/missionEncounter';
+import { ledgerKeyFor } from '../engine/missionRoles';
 import { TUTORIAL_STEPS, TUTORIAL_SELF_DEFENCE, TUT_LOCK_BEATS, type TutorialStep } from '../components/tutorialSteps';
 import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome, storyCompletedBy, completedStoryCount, assembledStory, CHARACTER_STORIES } from '../engine/collectables';
 
@@ -7247,7 +7259,9 @@ export interface GameStore {
    *  postings in the feed with accept instructions. Fired by the board chip. */
   readMissionBoard: () => void;
   acceptHunt: (titleOrId: string) => void;
-  advanceHunt: (huntId: string) => void;
+  /** ⚠ OTA-1581 — `peaceful` skips the spawn and the freeze-for-kill; see the
+   *  questSlice declaration for why the mission card needs both. */
+  advanceHunt: (huntId: string, opts?: { peaceful?: boolean }) => void;
   turnInHunt: (titleOrId: string, remote?: boolean) => void;
   acceptMystery: (titleOrId: string) => void;
   advanceMystery: (mysteryId: string) => void;
@@ -7315,6 +7329,19 @@ export interface GameStore {
    *  use, so the two paths cannot drift. OTA-1548 — chain-generic: acts on
    *  the first met-stage whisper of any chain. No-op when none is live. */
   answerWhisper: (choice: 'accept' | 'buy' | 'leave') => void;
+  /** ⚠⚠⚠ OTA-1581 — THE MISSION CONVERSATION CARD'S BUTTONS. Every one of them
+   *  routes through `applyChoice`, the single transition function, for the same
+   *  reason `landControl` is the only way to grant a control (OTA-1572): the
+   *  one-persuade-ever rule and the fight hand-off cannot be forgotten at a call
+   *  site that does not exist. No-op when no encounter is armed on this tile. */
+  answerMissionEncounter: (
+    choice: import('../engine/missionEncounter').EncounterChoice,
+  ) => void;
+  /** ⚠ OTA-1581 — owner's rule 10: *"if the mission is active then it opens
+   *  automatically. if you had to flee and you come back, there should be a
+   *  summon button."* Re-arms a fled (or abandoned-mid-fight) encounter, and
+   *  carries the mocking the failed persuader has coming — once. */
+  summonMissionEncounter: () => void;
   /** OTA-478 "Golem Armaments" — arm the active golem with a crafted golem weapon
    *  matching its kind (the weapon moves from pack to golem.weapon); disarmGolem
    *  returns it to the pack. */
@@ -24494,24 +24521,57 @@ export const useGameStore = create<GameStore>((set, get) => ({
           (e, i) => i !== activeIdx && e.name === enemy.name && (live!.enemyHps[i] ?? 0) > 0,
         );
         if (!stillUp) {
-          const nextStage = escortRec.rec.stage + 1;
-          set((st) => (st.player
-            ? {
-                player: {
-                  ...st.player,
-                  activeHunts: (st.player.activeHunts ?? []).map((h) =>
-                    h.id === escortRec.rec.id ? { ...h, stage: nextStage } : h,
-                  ),
-                },
-              }
-            : st));
-          const nextDef = escortRec.def.stages[nextStage];
-          get().appendLog('reward', `✦ The last of them is down. "${escortRec.def.title}" moves on.`);
-          if (nextDef) {
-            get().appendLog('world', nextDef.narration);
-            if (nextDef.arbiter) get().appendLog('arbiter', nextDef.arbiter);
+          // ⚠⚠⚠ OTA-1581 — IF THE CARD SENT YOU INTO THIS FIGHT, THE CARD FINISHES
+          // IT. Owner's rule 8, verbatim: *"if it does go to a fight, it drops back
+          // into the exploration screen until that part is over. then it goes back
+          // to the pop-up to resolve the rest of it."* The rest of it is TAKE or
+          // TAKE AND KILL — his rule 7 — and both of those close the stage
+          // themselves, peacefully, from the card.
+          //
+          // ⚠ So this branch must NOT advance here. Advancing would hand the player
+          // the next beat while a body they were told they could rob is still on the
+          // ground with the card's aftermath never shown — the beat promised in the
+          // buttons, silently skipped. It is the same disease as the burial bugs,
+          // only committed by the engine instead of the feed.
+          const encKey = `hunt:${escortRec.rec.id}:${escortRec.rec.stage}`;
+          const owning = get().player?.missionEncounters?.[encKey];
+          if (owning?.phase === 'fighting') {
+            set((st) => (st.player
+              ? {
+                  player: {
+                    ...st.player,
+                    missionEncounters: {
+                      ...(st.player.missionEncounters ?? {}),
+                      [encKey]: { ...owning, phase: 'aftermath' as const },
+                    },
+                  },
+                }
+              : st));
+            get().appendLog('reward', `✦ The last of them is down. There is business left with ${escortRec.def.stages[escortRec.rec.stage]?.npcName ?? 'them'}.`);
+            void get().persist();
+          } else {
+            // ⚠ NOT a `return` — the rest of resolveEnemyDefeat (the hunt-boss
+            // kill, loot, the standing writes) still has to run for this corpse.
+            // Only the STAGE ADVANCE is what the card takes over.
+            const nextStage = escortRec.rec.stage + 1;
+            set((st) => (st.player
+              ? {
+                  player: {
+                    ...st.player,
+                    activeHunts: (st.player.activeHunts ?? []).map((h) =>
+                      h.id === escortRec.rec.id ? { ...h, stage: nextStage } : h,
+                    ),
+                  },
+                }
+              : st));
+            const nextDef = escortRec.def.stages[nextStage];
+            get().appendLog('reward', `✦ The last of them is down. "${escortRec.def.title}" moves on.`);
+            if (nextDef) {
+              get().appendLog('world', nextDef.narration);
+              if (nextDef.arbiter) get().appendLog('arbiter', nextDef.arbiter);
+            }
+            void get().persist();
           }
-          void get().persist();
         }
       }
     }
@@ -26714,6 +26774,112 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (choice === 'accept') handleWhisperAccept(get, set, w, chain);
     else if (choice === 'buy') handleWhisperBuy(get, set, w, chain);
     else handleWhisperLeave(get, set, w, chain);
+    void get().persist();
+  },
+
+  // ⚠⚠⚠ OTA-1581 — THE MISSION CONVERSATION CARD ANSWERS HERE, and this is the
+  // only place an encounter's state is ever written. See missionEncounter.ts for
+  // the owner's ruleset; this function is the half that touches the world.
+  answerMissionEncounter(choice) {
+    const player = get().player;
+    if (!player) return;
+    const armed = armedEncounter(player);
+    if (!armed) return;
+    const prev: EncounterState = player.missionEncounters?.[armed.key] ?? freshEncounter(armed.key);
+
+    // ⚠ THE ROLL IS TAKEN HERE AND NOWHERE ELSE. `resolvePersuade` invents no
+    // modifiers of its own (OTA-1564's lesson: one reader per question), so the
+    // whole build — gear, food buffs, the stone's mark — has to arrive folded in.
+    const cha = effectiveStats(player).charisma ?? 0;
+    const d20 = 1 + Math.floor(Math.random() * 20);
+    const step = applyEncounterChoice(prev, choice, {
+      hasFight: armed.hasFight,
+      persuade:
+        choice === 'persuade'
+          ? {
+              stakes: armed.stakes,
+              charisma: cha,
+              predecessorsKilled: armed.person.predecessorsKilled,
+              roll: d20,
+            }
+          : undefined,
+    });
+
+    const killed = step.effect.kind === 'complete_stage' && step.effect.killed;
+    // ⚠⚠ THE LEDGER IS KEYED BY POST AND NEVER CLEARED — see Player.roleKills.
+    // A killing here prices every future conversation with whoever holds that
+    // post, which is the owner's rule 7 made durable.
+    const ledgerKey = killed && armed.person.canKill ? (armed.person.role ?? ledgerKeyFor(armed.person.name)) : null;
+    set((s) => (s.player
+      ? {
+          player: {
+            ...s.player,
+            missionEncounters: { ...(s.player.missionEncounters ?? {}), [armed.key]: step.next },
+            roleKills: ledgerKey
+              ? { ...(s.player.roleKills ?? {}), [ledgerKey]: (s.player.roleKills?.[ledgerKey] ?? 0) + 1 }
+              : s.player.roleKills,
+          },
+        }
+      : s));
+
+    if (choice === 'persuade' && !prev.persuadeSpent) {
+      const dc = persuadeDc(armed.stakes, armed.person.predecessorsKilled);
+      get().appendLog('player', `You make the case to ${armed.person.name}.`);
+      // ⚠ THE NUMBERS ARE SHOWN. A social check the player cannot see is a social
+      // check the player cannot build for, and the owner's ruling was explicitly
+      // that this should reward training and gear — which means telling them what
+      // the bar was and what they brought to it.
+      get().appendLog(
+        'arbiter',
+        `Persuade — d20 ${d20} + CHA ${cha} = ${d20 + cha} vs DC ${dc} (${armed.stakes}).`,
+      );
+    }
+    if (step.say) get().appendLog('arbiter', step.say);
+
+    if (step.effect.kind === 'leave') {
+      get().appendLog('player', `You break off and step away from ${armed.person.name}.`);
+    } else if (step.effect.kind === 'start_fight') {
+      // ⚠⚠ THE CARD DOES NOT SPAWN. It hands off to the stage's OWN advance, the
+      // same one the typed verb runs, which spawns the pack and freezes the stage
+      // for the kill. A second spawner would be a second truth about what is
+      // standing on this tile.
+      if (armed.family === 'hunt') get().advanceHunt(armed.missionId);
+    } else if (step.effect.kind === 'complete_stage') {
+      if (killed) {
+        get().appendLog('combat', `You finish ${armed.person.name} where they stand. The post will be filled by someone who remembers this.`);
+      }
+      // ⚠ PEACEFUL: nothing is put in front of the player. Either the persuade
+      // removed the fight, or the fight is already over and the bodies are down —
+      // re-running the spawn would stand them back up.
+      if (armed.family === 'hunt') get().advanceHunt(armed.missionId, { peaceful: true });
+      else if (armed.family === 'mystery') get().advanceMystery(armed.missionId);
+      else get().advanceStoryline(armed.missionId);
+    }
+    void get().persist();
+  },
+
+  summonMissionEncounter() {
+    const player = get().player;
+    if (!player) return;
+    const armed = armedEncounter(player);
+    if (!armed) return;
+    const prev = player.missionEncounters?.[armed.key];
+    if (!prev) return;
+    // ⚠ A fight the player walked out of leaves the encounter parked in
+    // `fighting` with nothing on the tile. Normalise it to `fled` first so the
+    // one re-entry path handles both — and so the mocking still lands.
+    const base: EncounterState = prev.phase === 'fighting' ? { ...prev, phase: 'fled' } : prev;
+    const { next, mock } = onEncounterReenter(base);
+    set((s) => (s.player
+      ? { player: { ...s.player, missionEncounters: { ...(s.player.missionEncounters ?? {}), [armed.key]: next } } }
+      : s));
+    if (mock) {
+      // Owner's rule 5: *"have them mock you a little bit then fight you."* Once.
+      get().appendLog(
+        'arbiter',
+        `${armed.person.name} watches you walk back up. "Changed your mind about the talking, then." There is nothing left to say.`,
+      );
+    }
     void get().persist();
   },
 

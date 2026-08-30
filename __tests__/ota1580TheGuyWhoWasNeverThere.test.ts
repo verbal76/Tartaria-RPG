@@ -206,7 +206,14 @@ describe('OTA-1580 — one attempt, ever (owner rule 5)', () => {
     expect(back.next.phase).toBe('opening');
     // The button is GONE, not greyed out and not silently ignored.
     expect(choicesFor(back.next)).not.toContain('persuade');
-    expect(choicesFor(back.next)).toEqual(['talk', 'fight', 'flee']);
+    // ⚠ SUPERSEDED BY OTA-1581, DELIBERATELY AND IN THE OPEN. 1580 opened every
+    // card with a TALK button. Counting the shipped data afterwards showed that
+    // of the 114 stages naming a person, ZERO spawn anything — so TALK-then-
+    // FIGHT would have put a FIGHT button that swings at nobody on all of them.
+    // 1581 replaces `talk` with `proceed` (the stage's own action) and offers
+    // PERSUADE/FIGHT only where a `spawn` actually stands someone up. The rule
+    // this test exists for — a spent persuade never comes back — is unchanged.
+    expect(choicesFor(back.next)).toEqual(['fight', 'flee']);
   });
 
   it('⚠⚠⚠ THEY MOCK YOU ON THE WAY BACK IN — once, not every time', () => {
@@ -301,7 +308,10 @@ describe('OTA-1580 — the card owns the encounter (owner rules 8, 10)', () => {
     expect(choicesFor(freshEncounter('k'))).toContain('flee');
     expect(choicesFor({ key: 'k', phase: 'opening', persuadeSpent: true, mocked: true })).toContain('flee');
     // …even when the stage has no fight in it at all.
-    expect(choicesFor(freshEncounter('k'), { hasFight: false })).toEqual(['talk', 'persuade', 'flee']);
+    // ⚠ OTA-1581: no fight to remove means no persuade to sell — the beat gets
+    // its own action as a button instead. FLEE still stands, which is the rule
+    // this test is actually pinning.
+    expect(choicesFor(freshEncounter('k'), { hasFight: false })).toEqual(['proceed', 'flee']);
   });
 
   it('⚠⚠ a resolved encounter never re-opens; a fled one does', () => {

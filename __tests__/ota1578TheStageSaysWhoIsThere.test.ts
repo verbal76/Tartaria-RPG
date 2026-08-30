@@ -188,7 +188,13 @@ describe('OTA-1578 — the escort has to be dealt with, not walked away from', (
     // so three raiders could be left standing and the hunt moved on regardless.
     // Owner's ruling: "have someone there waiting to fight to resolve that
     // stage to move to the next."
-    expect(QS).toContain('|| !!stageDef.spawn;');
+    // ⚠ RETARGETED BY OTA-1581, and the claim is UNCHANGED — only the line it
+    // sits on moved. 1581 wrapped `freezeForKill` in `!peaceful && (...)` so a
+    // persuade that removed the fight, and TAKE after the bodies are down, can
+    // advance without waiting on a kill that will never come. The freeze this
+    // test exists for still fires for every ordinary spawn stage.
+    expect(QS).toContain('|| !!stageDef.spawn');
+    expect(QS).toContain('const freezeForKill = !peaceful && (');
   });
 
   it('⚠⚠⚠ AND CLEARING THEM IS WHAT MOVES IT ON', () => {

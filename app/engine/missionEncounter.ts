@@ -35,9 +35,26 @@ export type EncounterPhase =
   | 'resolved'     // the stage is done
   | 'fled';        // player left; the tile keeps a SUMMON button
 
-/** What the player can press. FLEE is always offered — a modal with no exit is
- *  how a player gets wedged when a check cannot be passed. */
-export type EncounterChoice = 'talk' | 'persuade' | 'fight' | 'flee' | 'take' | 'take_and_kill';
+/**
+ * What the player can press. FLEE is always offered — a modal with no exit is
+ * how a player gets wedged when a check cannot be passed.
+ *
+ * ⚠⚠⚠ OTA-1581 SUPERSEDES OTA-1580'S BUTTON SET, and the reason is a
+ * MEASUREMENT, not a redesign. 1580 offered `talk` as the opening button on
+ * every card. Counting the shipped data afterwards: of the 114 stages that name
+ * a person, exactly ZERO put bodies in front of you — the only two `spawn`
+ * blocks in the whole game sit on boss stages that name nobody. So a card
+ * built around TALK-then-FIGHT would have shown a FIGHT button that spawned
+ * nothing on all 114, which is the exact lie this card exists to end.
+ *
+ * `talk` is therefore replaced by `proceed`: the stage's OWN action, as a
+ * visible button. That is the owner's actual complaint answered — *"make sure
+ * the events actually happen and are not hidden under text, that they're
+ * noticeable as a pop-up on the screen like talk to yulka. has that button
+ * now."* 99 of the 114 are conversations, and a conversation's button is
+ * "hand it over", not "swing".
+ */
+export type EncounterChoice = 'proceed' | 'persuade' | 'fight' | 'flee' | 'take' | 'take_and_kill';
 
 /**
  * ⚠⚠ THE PERSUADE BAR IS DELIBERATELY HIGH. Owner: "making him give it up
@@ -147,23 +164,39 @@ export function freshEncounter(key: string): EncounterState {
 /** Which buttons the card shows right now. */
 export function choicesFor(
   st: EncounterState,
-  opts?: { hasFight?: boolean; canPersuade?: boolean },
+  opts?: { hasFight?: boolean; canPersuade?: boolean; canKill?: boolean },
 ): EncounterChoice[] {
   const hasFight = opts?.hasFight ?? true;
   switch (st.phase) {
     case 'opening': {
-      const out: EncounterChoice[] = ['talk'];
-      // ⚠ The persuade button DISAPPEARS once spent — it is not greyed out and
-      // it is not silently ignored. A button that does nothing is the same lie
-      // as a card that promises what the engine will not do.
-      if (!st.persuadeSpent && (opts?.canPersuade ?? true)) out.push('persuade');
-      if (hasFight) out.push('fight');
+      const out: EncounterChoice[] = [];
+      if (hasFight) {
+        // ⚠ PERSUADE ONLY EXISTS WHERE THERE IS A FIGHT TO REMOVE. Owner's rule
+        // 4 is precisely that: *"a good enough charisma roll should eliminate
+        // the fight and you complete that stage."* On a beat with nobody posted
+        // to stop you there is nothing for a roll to buy, and offering one would
+        // be a dice screen that changes nothing.
+        //
+        // ⚠ And it DISAPPEARS once spent — not greyed out, not silently
+        // ignored. A button that does nothing is the same lie as a card that
+        // promises what the engine will not do.
+        if (!st.persuadeSpent && (opts?.canPersuade ?? true)) out.push('persuade');
+        out.push('fight');
+      } else if (opts?.canPersuade ?? true) {
+        // ⚠ `canPersuade` doubles as "the pack satisfies this stage" — a stage
+        // that wants a logbook you are not carrying offers no way forward, and
+        // the card names what is owed instead of showing a button that refuses.
+        out.push('proceed');
+      }
       out.push('flee');
       return out;
     }
     // The fight is on the exploration screen; the card is not showing.
     case 'fighting': return [];
-    case 'aftermath': return ['take', 'take_and_kill'];
+    // ⚠ TAKE AND KILL IS FOR A POST, NOT A PERSON. `canKill` is false for the 19
+    // authored individuals (Old Mira, Brother Ammon…) who have no successor to
+    // hold their place — see missionRoles.
+    case 'aftermath': return (opts?.canKill ?? true) ? ['take', 'take_and_kill'] : ['take'];
     case 'resolved': return [];
     // ⚠ A fled encounter is re-entered by the tile's SUMMON button, not by the
     // card — see the owner's rule 10. Nothing to press here.
@@ -239,7 +272,14 @@ export function applyChoice(
     };
   }
 
-  // 'talk' just turns the page of the conversation; the card owns that text.
+  if (choice === 'proceed') {
+    // ⚠ THE STAGE'S OWN ACTION, AS A BUTTON. No roll, no fight — this is the
+    // beat the prose describes, performed deliberately instead of happening to
+    // the player somewhere in a scroll of feed text.
+    if (st.phase !== 'opening') return { next: st, effect: { kind: 'none' } };
+    return { next: { ...st, phase: 'resolved' }, effect: { kind: 'complete_stage', killed: false } };
+  }
+
   return { next: st, effect: { kind: 'none' } };
 }
 

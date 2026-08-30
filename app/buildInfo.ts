@@ -26114,7 +26114,43 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The tap breadcrumb is untouched again: the hair spaces live in the JSX only, so
 // logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
 // evidence stays greppable.
-export const OTA_BUILD_ID = '2026-08-30-1580-the-guy-who-was-never-there';
+// OTA-1581 - THE CARD THEY CANNOT WALK PAST.
+//
+// The owner's design, and the answer to "this is the third time you had to do
+// this": *"each individual instance of a thing that you're specifically there to
+// do should have a pop-up ... nothing can interrupt that conversation until you
+// make a choice of all of the available options ... that way you can't miss what
+// you're there for."* A card cannot disagree with itself. If the beat IS a set
+// of buttons, the text cannot promise an option the buttons do not offer, which
+// is the whole class of bug three previous mission-text passes kept re-finding.
+//
+// 1580 wrote the 42 people down and built the state machine. This is the half
+// that touches the game: a pure selector that raises the card when the player is
+// standing on the tile of a live stage that names somebody, the roster lookup
+// that says who that is, the persuade roll with its bar printed on the button,
+// and the ledger of who you have killed - keyed by POST, never cleared, so the
+// next holder of that office prices your next conversation accordingly.
+//
+// AND THE MEASUREMENT CHANGED THE BUTTONS. After 1580, counting the shipped
+// data: of the 114 stages naming a person, ZERO put bodies in front of you. The
+// only two `spawn` blocks in the game sit on boss stages that name nobody. A
+// TALK-then-FIGHT card would therefore have shown a FIGHT button that swings at
+// nobody on all 114 - the exact lie it exists to end. So TALK became PROCEED,
+// the stage's own action as a visible button, labelled with the thing that
+// changes hands: HAND OVER THE FIRST FRAGMENT, not CONTINUE. PERSUADE and FIGHT
+// appear only where a spawn actually stands someone up.
+//
+// TWO ENGINE HOLES CAME OUT OF THE WIRING, and one of them was a softlock in
+// waiting. OTA-1578 froze any stage carrying a `spawn` until the pack is cleared
+// - correctly - but the spawn itself stayed nested inside the boss branch.
+// Nothing was broken today, because both authored spawns happen to be boss
+// stages. The moment a diplomacy stage authored one, which is precisely the
+// "I meet a guy for a note and get jumped by three raiders" beat the next
+// content pass writes, the hunt would have frozen waiting on a kill nothing had
+// spawned. The second: when the card sends you into a fight, the escort clear
+// must NOT advance the stage, or the aftermath the buttons promised - TAKE, or
+// TAKE AND KILL - is skipped by the engine on the player's behalf.
+export const OTA_BUILD_ID = '2026-08-30-1581-the-card-they-cannot-walk-past';
 // golem catch-up 2026-08-30: markerless publish of OTA-1580 — the 42-role NPC
 // roster with successors, and the mission-encounter state machine.
 // OTA-1580 — foundation for the mission conversation card. 114 stages name a

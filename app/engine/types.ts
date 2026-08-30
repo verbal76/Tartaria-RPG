@@ -1578,6 +1578,32 @@ export interface PlayerCharacter {
    *  completed, expired, declined). Prevents re-planting the same
    *  whisper twice on the same character. */
   completedWhisperIds?: string[];
+  /** ⚠⚠ OTA-1581 — THE MISSION CONVERSATION CARDS IN FLIGHT, keyed
+   *  `family:missionId:stageIndex`. One entry per stage the player has actually
+   *  stood in front of; absent means "never opened", which is the correct
+   *  reading of every save written before this OTA.
+   *
+   *  ⚠ It carries `persuadeSpent`, and that is the point. Owner: *"you only get
+   *  one chance at persuade — after that it's always the fight. even if you flee
+   *  and come back."* A flag on the card instance would reset on every re-entry,
+   *  which is precisely the rule he ruled out. */
+  missionEncounters?: Record<
+    string,
+    {
+      key: string;
+      phase: 'opening' | 'fighting' | 'aftermath' | 'resolved' | 'fled';
+      persuadeSpent: boolean;
+      mocked: boolean;
+    }
+  >;
+  /** ⚠⚠⚠ OTA-1581 — THE BODY COUNT PER POST, AND IT OUTLIVES THE MISSION.
+   *  Keyed by the ROLE ("the Dynasty enforcer"), never by the person, and never
+   *  cleared. The owner's rules 3 and 7 pull against each other — the people
+   *  exist only while their mission is live, yet a successor in a LATER mission
+   *  has to know what you did in an earlier one. This map is the resolution: the
+   *  person is per-mission, the post's history is permanent, and it prices every
+   *  future conversation with whoever holds that post. */
+  roleKills?: Record<string, number>;
   /** ⚠ OTA-1190 (PUNCHLIST P13) — the heart of the Labyrinth has been reached ONCE.
    *  The maze is fully re-enterable (`enterLabyrinth` carries no attempt gate), so the
    *  lore ending and its keepsake are gated on this rather than paid per run — a
