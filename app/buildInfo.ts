@@ -25988,6 +25988,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // count resets on detonation - left banked it would detonate on every shot from
 // then on, which is a broken weapon rather than a dangerous one.
 export const OTA_BUILD_ID = '2026-08-30-1566-the-first-one-is-the-one-that-counts';
+// golem catch-up 2026-08-30: markerless publish of OTA-1565/1566 (the blast, the
+// ordinals restored as firsts, and the repeater's visible fuse) to the golem
+// channel.
 // golem catch-up 2026-08-30: markerless publish of OTA-1564 (the max-roll
 // trigger, the repeaters' extra shots, and the overheat family) to the golem
 // channel.
