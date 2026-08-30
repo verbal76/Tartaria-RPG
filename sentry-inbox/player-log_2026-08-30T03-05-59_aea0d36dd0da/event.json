@@ -1,0 +1,183 @@
+{
+  "id": "aea0d36dd0da4146bc2fd22b3bfc09a6",
+  "groupID": "7700255477",
+  "eventID": "aea0d36dd0da4146bc2fd22b3bfc09a6",
+  "projectID": "4511945117532160",
+  "size": 12154,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1559-the-coating-ladder-means-something #mtf5ivgldrkj [inline 24/24]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1559-the-coating-ladder-means-something #mtf5ivgldrkj [inline 24/24]",
+  "title": "player-log 2026-08-30-1559-the-coating-ladder-means-something #mtf5ivgldrkj [inline 24/24]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "a9c56051e8544bfdb0cf2d461b7acf42",
+      "span_id": "b706549a0c840527",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-30T01:13:16.297Z] [world] You seize the initiative. Mud Monarchs Raider 1 has no time to react.\n[2026-08-30T01:13:16.297Z] [combat] You \u2014 d20 \u2192 5 + INT 12 \u2212 1 (Ash Storm) + 2 (point blank) = 18 vs Mud Monarchs Raider 1 AC 10 \u2014 \u2713 HIT\n[2026-08-30T01:13:16.298Z] [combat] Bludgeoning flares \u2014 +4 on hit.\n",
+      "[2026-08-30T01:13:16.300Z] [combat] The blow with the earthshaker finds purchase \u2014 6 damage, 9 HP standing. Mud Monarchs Raider 1 commits to the counter.\n[2026-08-30T01:13:16.300Z] [combat] Mud Monarchs Raider 1 is left exposed \u2014 easier to hit.\n[2026-08-30T01:13:16.301Z] [combat] Mud Monarchs Raider 1 \u2014 d20 \u2192 11 + ATK 6 = 17 vs your AC 19 \u2014 \u2717 MISS\n",
+      "[2026-08-30T01:13:16.302Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 6 + ATK 6 = 12 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T01:13:16.304Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 4 + ATK 6 = 10 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T01:13:16.304Z] [combat] Mud Monarchs Raider 3 and 1 other close the distance.\n[2026-08-30T01:13:16.305Z] [arbiter] The Arbiter watches the blow land or fail. \"Both are answers.\"\n",
+      "[2026-08-30T01:13:19.751Z] [debug] ui: tap \"inventory\"\n[2026-08-30T01:13:49.058Z] [debug] appstate: active \u2192 background (was active for 37025ms)\n[2026-08-30T01:14:44.344Z] [debug] appstate: background \u2192 active (was background for 55292ms)\n[2026-08-30T01:14:50.028Z] [debug] appstate: active \u2192 background (was active for 5682ms)\n",
+      "[2026-08-30T01:14:53.508Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05036-cb7b-7b5a-a613-be8fc8593c48\n[2026-08-30T01:14:53.508Z] [debug] ota: Checking\u2026\n[2026-08-30T01:14:53.636Z] [debug] ota: Already up to date\n[2026-08-30T01:14:53.636Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T01:14:53.721Z] [debug] voice: engine=bundled tts=on voice=am_michael\n",
+      "[2026-08-30T01:14:53.722Z] [debug] voice: bundled loading\n[2026-08-30T01:14:54.126Z] [debug] send-log: bundle #mtf482aclxul attempt 2/5 delivered to Sentry\n[2026-08-30T01:14:57.246Z] [debug] voice: bundled ready\n[2026-08-30T01:14:58.331Z] [debug] voice\u23f1 gap 924ms (wait 33ms + synth 888ms, live) \"Choose your character.\"\n",
+      "[2026-08-30T01:15:00.624Z] [debug] OTA session start: 2026-08-30-1553-glyph-glyph-name-star.\n[2026-08-30T01:15:00.624Z] [world] You step back into Reclaimer's Stake. The world waits for your move.\n[2026-08-30T01:15:00.624Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n",
+      "[2026-08-30T01:15:01.009Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-30T01:15:01.007Z \u00b7 build 2026-08-30-1553-glyph-glyph-name-star \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-30T01:49:21.562Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05036-cb7b-7b5a-a613-be8fc8593c48\n[2026-08-30T01:49:21.562Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-30T01:49:22.589Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-30T01:49:22.701Z] [debug] ota: Saving progress\u2026\n[2026-08-30T01:49:22.702Z] [debug] ota: Restarting to apply\u2026\n[2026-08-30T01:49:22.960Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05050-a87c-7218-acf2-c163fbaab18d\n[2026-08-30T01:49:22.960Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-30T01:49:23.056Z] [debug] ota: Already up to date\n[2026-08-30T01:49:23.056Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T01:49:23.145Z] [debug] voice: engine=bundled tts=on voice=am_michael\n[2026-08-30T01:49:23.145Z] [debug] voice: bundled loading\n[2026-08-30T01:49:23.454Z] [debug] send-log: bundle #mtf482aclxul attempt 3/5 delivered to Sentry\n",
+      "[2026-08-30T01:49:26.541Z] [debug] voice: bundled ready\n[2026-08-30T01:49:27.486Z] [debug] voice\u23f1 gap 883ms (wait 105ms + synth 770ms, live) \"Choose your character.\"\n[2026-08-30T01:49:28.715Z] [debug] OTA applied: 2026-08-30-1553-glyph-glyph-name-star \u2192 2026-08-30-1556-two-cudgels-are-two-objects.\n[2026-08-30T01:49:28.715Z] [debug] OTA session start: 2026-08-30-1556-two-cudgels-are-two-objects.\n",
+      "[2026-08-30T01:49:28.715Z] [world] You step back into Reclaimer's Stake. The world waits for your move.\n[2026-08-30T01:49:28.716Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Cheddar Bob. I wondered when you'd take up the thread again.\"\n\n=== END LOG \u00b7 349217 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n",
+      "  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-08-30T01:49:29.093Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-08-30-1556-two-cudgels-are-two-objects)\n  Boot stage: qwen:deferred\n\nML runtime health\n",
+      "  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-08-30T01:49:23.218Z\n  Last init success: 2026-08-30T01:49:27.861Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n",
+      "  Status: none recorded\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-27T03:03:20.074Z (4246m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1520-the-scrubber-takes-a-whole-value \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+20786ms)\n",
+      "  \u2022 2026-08-27T12:37:15.724Z (3672m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1522-the-stun-does-not-outlive-itself \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+0ms)\n  \u2022 2026-08-27T16:21:51.524Z (3448m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1524-cover-the-seven-and-mean-the-switch \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+12474ms)\n  \u2022 2026-08-27T21:42:59.314Z (3126m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"missions\"\n      doing: tap \"missions\" \u00b7 room outpost_central \u00b7 screen exploration\n      last checkpoint: rendered (+23163ms)\n  \u2022 2026-08-28T02:29:33.897Z (2840m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n      Process died with no orderly exit while: action \"investigate weathered ruined skyscraper\"\n      doing: action \"investigate weathered ruined skyscraper\" \u00b7 room monarch_waystation \u00b7 screen exploration\n      last checkpoint: rendered (+79547ms)\n",
+      "  \u2022 2026-08-28T04:28:43.279Z (2721m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-28-1530-the-stranger-gets-the-screen \u00b7 stage rendered\n      Process died with no orderly exit while: action \"investigate the ground\"\n      doing: action \"investigate the ground\" \u00b7 room iskan_veil \u00b7 screen exploration\n      last checkpoint: rendered (+16317ms)\n",
+      "  \u2022 2026-08-29T18:14:56.559Z (455m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-29-1542-the-rendezvous-is-a-place \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"missions\" \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer\n      doing: tap \"missions\" \u00b7 room reclaimer_stake \u00b7 screen exploration\n",
+      "      last checkpoint: rendered (+306713ms)\n  \u2022 2026-08-29T22:34:17.576Z (195m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-29-1547-the-conversation-holds-the-floor \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done (+575ms)\n",
+      "  \u2022 2026-08-30T00:56:46.075Z (53m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1552-are-you-sure-about-that \u00b7 stage native:voice:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:voice:done (+11080ms)\n  \u2022 2026-08-30T01:15:03.072Z (34m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-30-1553-glyph-glyph-name-star \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+9351ms)\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n  Memory warnings: none this session\n",
+      "  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  Native queue: worst wait 0.0s \u00b7 0 job kinds queued >3s \u00b7 worst 0.0ms/prompt-token\n  App state trail: (none recorded)\nModel contexts\n  Live now: 0\n  Opened: 0 \u00b7 Released: 0 \u00b7 Peak live: 0\n  Narration engine: idle\n"
+    ],
+    "chunkChars": 9312
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1559-the-coating-ladder-means-something #mtf5ivgldrkj [inline 24/24]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtf5ivgldrkj"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "24"
+    },
+    {
+      "key": "parts",
+      "value": "24"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T03:05:59.171041Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T03:05:59.277000Z",
+  "fingerprints": [
+    "a50f7259a8f999f2fb1cf39b976f34cc"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b4216ee781184378a46c54b0b1e2e002",
+  "previousEventID": "9c084f3f5b544058b8d76b2127be4f65"
+}
