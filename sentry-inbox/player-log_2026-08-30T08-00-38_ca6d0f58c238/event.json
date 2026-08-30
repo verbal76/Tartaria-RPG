@@ -1,0 +1,220 @@
+{
+  "id": "ca6d0f58c238465cabdcd2590779a70e",
+  "groupID": "7700501708",
+  "eventID": "ca6d0f58c238465cabdcd2590779a70e",
+  "projectID": "4511945117532160",
+  "size": 17628,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1566-the-first-one-is-the-one-that-counts #mtfis6air29i [inline 26/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1566-the-first-one-is-the-one-that-counts #mtfis6air29i [inline 26/28]",
+  "title": "player-log 2026-08-30-1566-the-first-one-is-the-one-that-counts #mtfis6air29i [inline 26/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "14fb1662b1e748139aecec692fa4a78b",
+      "span_id": "9a078668d45d3575",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "t.\n[2026-08-30T01:57:54.998Z] [reward] \u2726 Salvage haul:\n[2026-08-30T01:57:54.998Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-08-30T01:57:54.998Z] [reward]     \u2022 Brittle Antler Fork (Common)\n[2026-08-30T01:57:54.999Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-30T01:57:56.078Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n",
+      "[2026-08-30T01:57:56.101Z] [debug] spawn: gear=[Shaman's Warden Gloves, Salvager's Worn Boots] window=10 roster=new\n[2026-08-30T01:57:56.102Z] [world] You set out east. Your boots sink half an inch into the mud-flats and pull free with each step.\n[2026-08-30T01:57:56.103Z] [world] What you started here has not finished itself in your absence.\n",
+      "[2026-08-30T01:57:57.845Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T01:57:59.050Z] [world] You work the Salvager's Worn Boots loose from where the mud had it.\n[2026-08-30T01:57:59.051Z] [reward] \u2726 Salvager's Worn Boots (Common).\n[2026-08-30T01:57:59.070Z] [world] The Shaman's Warden Gloves had settled into the ground. You unsettle it.\n",
+      "[Filtered]",
+      "[2026-08-30T01:58:00.230Z] [world] You strip the stone marker down. Mostly debris \u2014 but a Bent Nail comes loose at the bottom of the pile.\n[2026-08-30T01:58:00.230Z] [world] You break the tilting obsidian pillar apart. Among the pieces, something worth keeping.\n[2026-08-30T01:58:00.231Z] [reward] \u2726 Salvage haul:\n[2026-08-30T01:58:00.231Z] [reward]     \u2022 Aether Crystal (Common)\n",
+      "[2026-08-30T01:58:00.231Z] [reward]     \u2022 Copper Wire Spool (Uncommon)\n[2026-08-30T01:58:00.231Z] [reward]     \u2022 Bent Nail (Common)\n[2026-08-30T01:58:00.232Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-08-30T01:58:01.762Z] [debug] ui: tap \"investigate\"\n[2026-08-30T01:58:03.370Z] [player] investigate the mud\n",
+      "[2026-08-30T01:58:03.371Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-30T01:58:03.376Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Mud (Common).\n[2026-08-30T01:58:03.387Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-30T01:58:03.388Z] [arbiter] The Arbiter watches. \"I saw the way you came at that.\" \"Do not look behind you. Whatever waits there has been waiting longer than your bloodline.\" the Arbiter says.\n[2026-08-30T01:58:03.388Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T01:58:03.388Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T01:58:03.490Z] [cognitive] SWIM  (101ms)\n",
+      "[2026-08-30T01:58:04.649Z] [player] investigate still pond\n[2026-08-30T01:58:04.650Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=1\n[2026-08-30T01:58:04.653Z] [world] The still pond resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n",
+      "[2026-08-30T01:58:04.654Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T01:58:04.654Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T01:58:04.654Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T01:58:04.855Z] [cognitive] SWIM  (199ms)\n[2026-08-30T01:58:04.936Z] [debug] ui: tap \"climb\"\n",
+      "[2026-08-30T01:58:06.763Z] [player] climb ladder\n[2026-08-30T01:58:06.764Z] [debug] parser: intent=climb conf=1.00 verb=climb target=ladder resolved=ladder range=- enemies=0 hooks=1\n[2026-08-30T01:58:06.806Z] [world] You loop your Reclaimer's Rope around the ladder and walk the line. Tier 1/2 cleared.\n",
+      "[2026-08-30T01:58:06.807Z] [world] You reach the first hold of the ladder (tier 1/2). Higher still to go.\n[2026-08-30T01:58:06.808Z] [world] Talus sets its stone feet at the base of ladder and will climb no further \u2014 the construct holds the ground while you go up alone.\n[2026-08-30T01:58:06.809Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-30T01:58:07.035Z] [debug] persist sizes(KB): total=160 player=34 wm=43[rooms=17 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=3\n[2026-08-30T01:58:07.270Z] [debug] qwen\u23f1 investigate_lore ok 2507ms read 1383ms/write 946ms in 129t\u2192out 29t 10.7ms/t (138ch)\n[2026-08-30T01:58:07.357Z] [cognitive] CLIMB  (548ms)\n[2026-08-30T01:58:07.780Z] [debug] ui: tap \"climb up (1/2)\"\n",
+      "[2026-08-30T01:58:07.805Z] [player] climb ladder\n[2026-08-30T01:58:07.805Z] [debug] parser: intent=climb conf=1.00 verb=climb target=ladder resolved=ladder range=- enemies=0 hooks=1\n[2026-08-30T01:58:07.839Z] [world] You loop your Reclaimer's Rope around the ladder and walk the line. Tier 2/2 cleared.\n",
+      "[2026-08-30T01:58:07.840Z] [world] You reach the top of the ladder (tier 2/2). The view changes; the room reads differently from here.\n[2026-08-30T01:58:07.841Z] [reward] \u2726 First Aid Kit (Uncommon) \u2014 tucked into a crack at the top of the ladder.\n[2026-08-30T01:58:07.842Z] [world] A wind-scoured ledge. Someone watched the road from here, and not long ago \u2014 the charcoal sketches are barely smudged.\n",
+      "[2026-08-30T01:58:07.842Z] [combat] Aetheric Shrike is here \u2014 and it has seen you.\n[2026-08-30T01:58:07.842Z] [debug] enemy: Aetheric Shrike hp=47 ac=11 atk=Talon Slash dmg=2D6 rarity=Uncommon ap=5\n[2026-08-30T01:58:07.842Z] [system] \u23f3 Time passed: 30 min\n[2026-08-30T01:58:08.003Z] [cognitive] CLIMB  (159ms)\n[2026-08-30T01:58:13.850Z] [debug] ui: tap \"\u2697 bone crossbow\"\n",
+      "[2026-08-30T01:58:13.907Z] [player] attack with the off-hand bone crossbow\n[2026-08-30T01:58:13.909Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n[2026-08-30T01:58:13.911Z] [debug] attack: target=Aetheric Shrike range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-30T01:58:13.912Z] [arbiter] Glass Hail hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-08-30T01:58:13.912Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-08-30T01:58:13.941Z] [world] You commit forward with the acid-etched bone crossbow. Aetheric Shrike watches your hands.\n[2026-08-30T01:58:13.941Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-30T01:58:14.077Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (135ms)\n[2026-08-30T01:58:20.778Z] [world] Aetheric Shrike moves first. The pressure is immediate.\n[2026-08-30T01:58:20.780Z] [combat] Aetheric Shrike \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T01:58:20.780Z] [combat] You \u2014 d20 \u2192 15 + DEX 15 \u2212 1 (Glass Hail) = 29 vs Aetheric Shrike AC 11 \u2014 \u2713 HIT\n",
+      "[2026-08-30T01:58:20.781Z] [combat] The Acid-Etched coating fails to take on Aetheric Shrike.\n[2026-08-30T01:58:20.781Z] [combat] The blow with the acid-etched bone crossbow finds purchase \u2014 7 damage, 40 HP standing. Aetheric Shrike commits to the counter.\n[2026-08-30T01:58:20.782Z] [arbiter] \"You attack as if you mean to leave,\" the Arbiter murmurs. \"Good.\"\n",
+      "[2026-08-30T01:58:22.835Z] [debug] ui: tap \"\u2697 bone crossbow\"\n[2026-08-30T01:58:22.892Z] [player] attack with the off-hand bone crossbow\n[2026-08-30T01:58:22.895Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n",
+      "[2026-08-30T01:58:22.897Z] [debug] attack: target=Aetheric Shrike range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-30T01:58:22.900Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-08-30T01:58:22.929Z] [world] You commit forward with the acid-etched bone crossbow. Aetheric Shrike watches your hands.\n",
+      "[2026-08-30T01:58:22.929Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T01:58:23.061Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (131ms)\n[2026-08-30T01:58:29.176Z] [world] Aetheric Shrike moves first. The pressure is immediate.\n[2026-08-30T01:58:29.178Z] [combat] Aetheric Shrike \u2014 d20 \u2192 18 + ATK 6 = 24 vs your AC 19 \u2014 \u2713 HIT\n",
+      "[2026-08-30T01:58:29.179Z] [combat] You \u2014 d20 \u2192 2 + DEX 15 \u2212 1 (Glass Hail) = 16 vs Aetheric Shrike AC 11 \u2014 \u2713 HIT\n[2026-08-30T01:58:29.180Z] [combat] The Acid-Etched coating fails to take on Aetheric Shrike.\n[2026-08-30T01:58:29.182Z] [combat] Aetheric Shrike takes 8 with the acid-etched bone crossbow. It reels: 32 left. Then it fights back.\n",
+      "[2026-08-30T01:58:29.340Z] [combat] Aetheric Shrike deals 2 slashing damage [armor \u221247%] [edge of reach \u2014 halved]. You have 27 HP remaining.\n[2026-08-30T01:58:29.340Z] [combat] That's your slashing resist working \u2014 the armor drank most of that hit (2 of 4 got through).\n[2026-08-30T01:58:29.340Z] [combat] Aetheric Shrike's strike leaves you bleeding.\n",
+      "[2026-08-30T01:58:30.602Z] [debug] ui: tap \"stealth\"\n[2026-08-30T01:58:30.609Z] [player] sneak\n[2026-08-30T01:58:30.610Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=1 hooks=0\n[2026-08-30T01:58:30.655Z] [system] \u23f3 Time passed: 15 min\n[2026-08-30T01:58:30.792Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (136ms)\n",
+      "[2026-08-30T01:58:32.293Z] [debug] skillcheck: stealth d20=13 STE 6 = 19 vs DC 12 \u2014 Hard \u2192 (resolved below)\n[2026-08-30T01:58:32.350Z] [debug] stats: STR5 DEX16 INT11 WIS4 CHA2 STE6 | gear: DEX+10,INT+2,STR+2,STE+3 | worn: main=Cudgel off=Bone Crossbow head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps clo",
+      "ak=Reclaimer's Cloak ring=Light-Finger Guild Band\n[2026-08-30T01:58:32.351Z] [debug] train: stealth (stealth check) \u2192 progress 39/100\n[2026-08-30T01:58:32.351Z] [world] Dusk is with you \u2014 the silt eats sound after dark. (stealth +1, night)\n[2026-08-30T01:58:32.352Z] [world] You drop low and move quiet, closing on Aetheric Shrike unseen across the open ground. (+5 next attack)\n",
+      "[2026-08-30T01:58:32.353Z] [debug] stealth: opener carried by the skill roll (19 vs DC 12 \u2014 Hard) \u2014 UNSEEN\n[2026-08-30T01:58:33.685Z] [debug] ui: tap \"\u2697 bone crossbow\"\n[2026-08-30T01:58:33.730Z] [player] attack with the off-hand bone crossbow\n[2026-08-30T01:58:33.731Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n",
+      "[2026-08-30T01:58:33.731Z] [debug] attack: target=Aetheric Shrike range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-30T01:58:33.732Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-08-30T01:58:33.732Z] [debug] attack: status mods stealthed +5\n",
+      "[2026-08-30T01:58:33.761Z] [world] You bring the acid-etched bone crossbow to bear on Aetheric Shrike.\n[2026-08-30T01:58:33.761Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T01:58:33.896Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (133ms)\n[2026-08-30T01:58:36.995Z] [world] You seize the initiative. Aetheric Shrike has no time to react.\n",
+      "[2026-08-30T01:58:36.995Z] [combat] You \u2014 d20 \u2192 1 + DEX 15 \u2212 1 (Glass Hail) stealthed +5 = 20 vs Aetheric Shrike AC 11 \u2014 \u2717 FUMBLE\n[2026-08-30T01:58:36.995Z] [combat] Aetheric Shrike reads the motion and slips it \u2014 the acid-etched bone crossbow carves only air. The counter is already coming.\n[2026-08-30T01:58:36.997Z] [combat] Aetheric Shrike \u2014 d20 \u2192 1 + ATK 6 = 7 vs your AC 19 \u2014 \u2717 FUMBLE\n",
+      "[2026-08-30T01:58:37.357Z] [debug] persist sizes(KB): total=164 player=34 wm=43[rooms=17 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=5\n[2026-08-30T01:58:38.471Z] [debug] ui: tap \"stealth\"\n[2026-08-30T01:58:38.474Z] [system] bleeding fades.\n[2026-08-30T01:58:38.483Z] [player] sneak\n",
+      "[2026-08-30T01:58:38.483Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=1 hooks=0\n[2026-08-30T01:58:38.521Z] [system] \u23f3 Time passed: 15 min\n[2026-08-30T01:58:38.658Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (136ms)\n[2026-08-30T01:58:40.233Z] [debug] skillcheck: stealth d20=18 STE 6 = 24 vs DC 12 \u2014 Hard \u2192 (resolved below)\n",
+      "[2026-08-30T01:58:40.286Z] [debug] stats: STR5 DEX16 INT11 WIS4 CHA2 STE6 | gear: DEX+10,INT+2,STR+2,STE+3 | worn: main=Cudgel off=Bone Crossbow head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak ring=Light-Finger Guild Band\n",
+      "[2026-08-30T01:58:40.286Z] [debug] train: stealth (stealth check) \u2192 progress 45/100\n[2026-08-30T01:58:40.287Z] [world] Dusk is with you \u2014 the silt eats sound after dark. (stealth +1, night)\n[2026-08-30T01:58:40.287Z] [world] You fling a fistful of grit into Aetheric Shrike's eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)\n",
+      "[2026-08-30T01:58:40.289Z] [debug] stealth: reset WIN init 27 vs 4 (dust, +5 1r)\n[2026-08-30T01:58:40.291Z] [combat] Aetheric Shrike \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 19 \u2014 \u2713 CRITICAL HIT\n[2026-08-30T01:58:40.454Z] [combat] Aetheric Shrike deals 4 slashing damage [armor \u221247%] [edge of reach \u2014 halved]. You have 23 HP remaining.\n[2026-08-30T01:58:42.089Z] [debug] ui: tap \"\u2697 bone crossbow\"\n",
+      "[2026-08-30T01:58:42.092Z] [system] unseen \u2014 next strike +5 fades.\n[2026-08-30T01:58:42.138Z] [player] attack with the off-hand bone crossbow\n[2026-08-30T01:58:42.139Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n",
+      "[2026-08-30T01:58:42.139Z] [debug] attack: target=Aetheric Shrike range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-30T01:58:42.140Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-08-30T01:58:42.140Z] [debug] attack: status mods stealthed +5\n",
+      "[2026-08-30T01:58:42.168Z] [world] Your acid-etched bone crossbow comes around in an arc; Aetheric Shrike squares up to meet it.\n[2026-08-30T01:58:42.168Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T01:58:42.301Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (132ms)\n[2026-08-30T01:58:49.389Z] [world] Aetheric Shrike moves first. The pressure is immediate.\n",
+      "[2026-08-30T01:58:49.391Z] [combat] Aetheric Shrike \u2014 d20 \u2192 15 + ATK 6 = 21 vs your AC 19 \u2014 \u2713 HIT\n[2026-08-30T01:58:49.392Z] [combat] You \u2014 d20 \u2192 20 + DEX 15 \u2212 1 (Glass Hail) stealthed +5 = 39 vs Aetheric Shrike AC 11 \u2014 \u2713 CRITICAL HIT\n[2026-08-30T01:58:49.395Z] [combat] The blow with the acid-etched bone crossbow finds purchase \u2014 24 damage, 8 HP standing. Aetheric Shrike commits to the counter.\n",
+      "[2026-08-30T01:58:49.395Z] [combat] Acid-Etched Bone Crossbow \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-08-30T01:58:49.559Z] [combat] Aetheric Shrike deals 3 slashing damage [armor \u221247%] [edge of reach \u2014 halved]. You have 20 HP remaining.\n",
+      "[2026-08-30T01:58:49.559Z] [combat] Your Bone Crossbow shatters from wear. It is gone. A twist of Scrap Metal comes free in your hand.\n[2026-08-30T0"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1566-the-first-one-is-the-one-that-counts #mtfis6air29i [inline 26/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfis6air29i"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "26"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T08:00:37.467489Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "3": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 361,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T08:00:38.136000Z",
+  "fingerprints": [
+    "c16480cb1bba9152f8febe8bfd3ed5b3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "ce3ee705690740d38fb8985948756f42",
+  "previousEventID": "c448192bde1e462f845c7a212016a705"
+}

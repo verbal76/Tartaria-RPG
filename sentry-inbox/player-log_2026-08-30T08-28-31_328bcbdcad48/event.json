@@ -1,0 +1,199 @@
+{
+  "id": "328bcbdcad4849078668bed3f9039b0c",
+  "groupID": "7700523236",
+  "eventID": "328bcbdcad4849078668bed3f9039b0c",
+  "projectID": "4511945117532160",
+  "size": 17917,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 27/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 27/28]",
+  "title": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 27/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "2971a7b7676b4ad385af0bbabee681fd",
+      "span_id": "b68dffe87b7c4dae",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "mbat] Mud Monarchs Raider 5 presses in behind the others, waiting for an opening.\n[2026-08-30T08:12:12.829Z] [combat] Mud Monarchs Raider 2 deals 6 bludgeoning damage. You have 18 HP remaining.\n[2026-08-30T08:12:12.829Z] [combat] Mud Monarchs Raider 3 deals 3 slashing damage [armor \u221247%]. You have 15 HP remaining.\n",
+      "[2026-08-30T08:12:12.829Z] [combat] That's your slashing resist working \u2014 the armor drank most of that hit (3 of 5 got through).\n[2026-08-30T08:12:13.009Z] [cognitive] SWIM  (204ms)\n[2026-08-30T08:12:13.248Z] [debug] persist sizes(KB): total=170 player=42 wm=46[rooms=20 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=77 scene=6\n[2026-08-30T08:12:13.786Z] [debug] ui: tap \"aetheric rod\"\n",
+      "[2026-08-30T08:12:13.823Z] [player] attack with the aetheric rod\n[2026-08-30T08:12:13.824Z] [debug] parser: intent=attack conf=1.00 verb=attack target=aetheric rod resolved=Aetheric Rod range=close enemies=5 hooks=1\n[2026-08-30T08:12:13.825Z] [combat] Mud Monarchs Raider 1 blisters \u2014 clinging fire sears 1. (0/13 HP, 1 turn left)\n",
+      "[2026-08-30T08:12:13.826Z] [reward] Mud Monarchs Raider 1 defeated. You recover Patched Cloth \u00d72, Aether Residue, Burlap Vest, Mud Monarch Sigil.\n[2026-08-30T08:12:13.829Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-08-30T08:12:13.829Z] [combat] 4 attackers remain. Mud Monarchs Raider 2 now in your sights.\n",
+      "[2026-08-30T08:12:13.829Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-30T08:12:13.830Z] [reward] +8 TC pried from the dust.\n[2026-08-30T08:12:13.867Z] [debug] attack: target=Mud Monarchs Raider 2 range=close reach.bands=[close] reach.label=Aetheric Rod bareHand=false\n[2026-08-30T08:12:13.868Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n",
+      "[2026-08-30T08:12:13.902Z] [world] You commit forward with the aetheric rod. Mud Monarchs Raider 2 watches your hands.\n[2026-08-30T08:12:13.902Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:12:14.125Z] [cognitive] ATTACK \u00b7 RETREAT \u00b7 THROW \u00b7 USE_ITEM \u00b7 TAKE_COVER  (221ms)\n[2026-08-30T08:12:19.632Z] [world] You seize the initiative. Mud Monarchs Raider 2 has no time to react.\n",
+      "[2026-08-30T08:12:19.632Z] [combat] You \u2014 d20 \u2192 5 + DEX 19 \u2212 2 (Iron Fog) = 22 vs Mud Monarchs Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:12:19.635Z] [combat] Clean hit with the aetheric rod for 2. Mud Monarchs Raider 2 has 12 left and does not back away.\n[2026-08-30T08:12:19.636Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 19 \u2014 \u2717 MISS\n",
+      "[2026-08-30T08:12:19.638Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 4 + ATK 8 = 12 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:12:19.640Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 19 + ATK 6 = 25 vs your AC 19 \u2014 \u2713 HIT\n[2026-08-30T08:12:19.640Z] [combat] Mud Monarchs Raider 3 presses in behind the others, waiting for an opening.\n",
+      "[2026-08-30T08:12:19.856Z] [combat] Mud Monarchs Raider 2 deals 6 bludgeoning damage. You have 9 HP remaining.\n[2026-08-30T08:12:22.008Z] [debug] ui: tap \"dodge\"\n[2026-08-30T08:12:22.011Z] [player] dodge\n[2026-08-30T08:12:22.011Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=1\n",
+      "[2026-08-30T08:12:22.012Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 2's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-30T08:12:22.048Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 17 + ATK 5 = 22 vs your AC 19 \u2014 \u2717 EVADED\n",
+      "[2026-08-30T08:12:22.048Z] [combat] Dodge \u2014 d20 \u2192 3 + DEX 20 = 23 vs ATK 22. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-30T08:12:22.048Z] [world] You slip Mud Monarchs Raider 4's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-08-30T08:12:22.049Z] [debug] ac-shift 19\u219222: race/base 10 + gear 12 + title 0 \u2192 trimmed 19 + status 3 | worn: head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak\n[2026-08-30T08:12:22.049Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-08-30T08:12:22.050Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 3 + ATK 6 = 9 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-30T08:12:22.050Z] [combat] Mud Monarchs Raider 3 presses in behind the others, waiting for an opening.\n[2026-08-30T08:12:22.051Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:12:22.235Z] [cognitive] neutral  (183ms)\n[2026-08-30T08:12:23.736Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow \u2605\"\n",
+      "[2026-08-30T08:12:23.740Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-30T08:12:23.744Z] [world] Iron fog disorients you. Compasses spin; intent costs more.\n[2026-08-30T08:12:23.782Z] [player] attack with the off-hand bone crossbow\n[2026-08-30T08:12:23.783Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=4 hooks=1\n",
+      "[2026-08-30T08:12:23.784Z] [debug] attack: target=Mud Monarchs Raider 2 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-30T08:12:23.785Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-08-30T08:12:23.785Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-08-30T08:12:23.822Z] [world] You commit forward with the searing bone crossbow. Mud Monarchs Raider 2 watches your hands.\n[2026-08-30T08:12:23.822Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:12:24.002Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (178ms)\n[2026-08-30T08:12:31.078Z] [world] You seize the initiative. Mud Monarchs Raider 2 has no time to react.\n",
+      "[2026-08-30T08:12:31.078Z] [combat] You \u2014 d20 \u2192 16 + DEX 19 \u2212 2 (Iron Fog) + 2 (point blank) perfect opening (2\u00d7 dice) = 35 vs Mud Monarchs Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:12:31.080Z] [combat] Piercing flares \u2014 +1 on hit (weak \u2014 bites deep!).\n[2026-08-30T08:12:31.080Z] [combat] Weakness exposed \u2014 Mud Monarchs Raider 2 flinches. (piercing \u00d72.25 for 29)\n",
+      "[2026-08-30T08:12:31.081Z] [combat] The killing blow with the searing bone crossbow: 29. Mud Monarchs Raider 2 drops where it stood.\n[2026-08-30T08:12:31.082Z] [reward] Mud Monarchs Raider 2 defeated. You recover Patched Cloth \u00d73.\n[2026-08-30T08:12:31.083Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n",
+      "[2026-08-30T08:12:31.083Z] [combat] 3 attackers remain. Mud Monarchs Raider 3 now in your sights.\n[2026-08-30T08:12:31.084Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-30T08:12:31.084Z] [system] \u25b2 Forgotten Order now counts you KNOWN \u2014 their counters take 5% off.\n[2026-08-30T08:12:31.085Z] [reward] +12 TC pried from the dust.\n",
+      "[2026-08-30T08:12:31.126Z] [debug] ac-shift 22\u219219: race/base 10 + gear 12 + title 0 \u2192 trimmed 19 + status 0 | worn: head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak\n[2026-08-30T08:12:31.126Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 19 \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-08-30T08:12:31.127Z] [combat] Mud Monarchs Raider 3 \u2014 d20 \u2192 6 + ATK 6 = 12 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:12:31.128Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 16 + ATK 5 = 21 vs your AC 19 \u2014 \u2713 HIT\n[2026-08-30T08:12:31.129Z] [arbiter] The Arbiter does not move. \"If you can't finish the Mud Monarchs Raider 3, I will. I'd rather not. My afternoon's planned.\"\n",
+      "[2026-08-30T08:12:31.333Z] [combat] Mud Monarchs Raider 5 deals 7 bludgeoning damage [edge of reach \u2014 halved]. You have 2 HP remaining.\n[2026-08-30T08:12:31.333Z] [combat] Mud Monarchs Raider 4 deals 2 bludgeoning damage [edge of reach \u2014 halved]. You fall.\n[2026-08-30T08:12:31.333Z] [combat] Cheddar Bob does not rise. The ruins remember another.\n",
+      "[2026-08-30T08:12:31.333Z] [system] Cheddar Bob has fallen. A Resurrection Gem from the title screen can bring them back.\n[2026-08-30T08:12:31.883Z] [system] You join the Fallen of Tartaria \u2014 6 names the buried world keeps now. Read the roll from the Lore Codex.\n[2026-08-30T08:12:40.602Z] [debug] scene: loc=dynasty_border_post hub=- arrival=n opening=n passing=y\n",
+      "[2026-08-30T08:12:40.627Z] [world] An old workshed stands off the path here \u2014 weathered and quiet, a way in still clear. (You\u2019re on a route \u2014 type ENTER to step inside, or keep traveling.)\n[2026-08-30T08:12:40.627Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n\n",
+      "You are at Dynasty Border Post. An old garrison of the Eternal Dynasty kept lit at the edge of the ruins. The oath-stones are still standing; the road past them runs down into the flooded capitals.\n\nA low wind moves through the ruins like a sentence trying to finish itself.\n[2026-08-30T08:12:40.627Z] [system] Weather effect \u2014 Black Rain: -1 CHA\n",
+      "[2026-08-30T08:12:40.629Z] [world] [Tartarian Pilgrim Camp Outskirts] north: the Silt Thief (16 tiles, 1 day, 16 hours) \u00b7 east: Tartarian Pilgrim Camp (1 tile, 3 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (3 tiles, 8 hours)\n",
+      "[2026-08-30T08:12:40.629Z] [world] A circular Tartarian vault door, mud-pasted but intact, lies recessed into the slope. The locking glyphs are dim \u2014 but not gone.\n[2026-08-30T08:12:40.630Z] [arbiter] You investigate the mud at Dynasty Border Post, your footsteps echoing through the old ruins as you uncover the remnants of the Aetheric Conflux war.\n",
+      "[2026-08-30T08:12:40.630Z] [debug] arbiter: intro \u2713 0ms (banked, 1 left)\n[2026-08-30T08:12:40.635Z] [reward] \u2726 Resurrection. Cheddar Bob returns to Tartaria, restored. The Aetherstone hums in recognition.\n[2026-08-30T08:12:42.463Z] [debug] persist sizes(KB): total=174 player=46 wm=47[rooms=20 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=78 scene=2\n",
+      "[2026-08-30T08:12:43.875Z] [debug] homework: intro-fill armed after 10543ms idle\n\n=== END LOG \u00b7 399925 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-08-30T08:12:45.468Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n",
+      "  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-08-30-1566-the-first-one-is-the-one-that-counts)\n  Boot stage: qwen:done\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-08-30T08:00:45.049Z\n  Last init success: 2026-08-30T08:00:46.284Z\n  Crashes-before-disable threshold: 2\n",
+      "  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n",
+      "  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n  Status: none recorded\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-27T16:21:51.524Z (3831m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1524-cover-the-seven-and-mean-the-switch \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+12474ms)\n  \u2022 2026-08-27T21:42:59.314Z (3510m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"missions\"\n",
+      "      doing: tap \"missions\" \u00b7 room outpost_central \u00b7 screen exploration\n      last checkpoint: rendered (+23163ms)\n  \u2022 2026-08-28T02:29:33.897Z (3223m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-27-1528-the-name-was-not-the-identity \u00b7 stage rendered\n      Process died with no orderly exit while: action \"investigate weathered ruined skyscraper\"\n",
+      "      doing: action \"investigate weathered ruined skyscraper\" \u00b7 room monarch_waystation \u00b7 screen exploration\n      last checkpoint: rendered (+79547ms)\n  \u2022 2026-08-28T04:28:43.279Z (3104m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-28-1530-the-stranger-gets-the-screen \u00b7 stage rendered\n      Process died with no orderly exit while: action \"investigate the ground\"\n",
+      "      doing: action \"investigate the ground\" \u00b7 room iskan_veil \u00b7 screen exploration\n      last checkpoint: rendered (+16317ms)\n  \u2022 2026-08-29T18:14:56.559Z (838m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-29-1542-the-rendezvous-is-a-place \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: tap \"missions\" \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer\n      doing: tap \"missions\" \u00b7 room reclaimer_stake \u00b7 screen exploration\n      last checkpoint: rendered (+306713ms)\n  \u2022 2026-08-29T22:34:17.576Z (578m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-29-1547-the-conversation-holds-the-floor \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done (+575ms)\n  \u2022 2026-08-30T00:56:46.075Z (436m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-30-1552-are-you-sure-about-that \u00b7 stage native:voice:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:voice:done (+11080ms)\n  \u2022 2026-08-30T01:15:03.072Z (418m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1553-glyph-glyph-name-star \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered (+9351ms)\n  \u2022 2026-08-30T02:14:43.966Z (358m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1556-two-cudgels-are-two-objects \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done (+4739ms)\n  \u2022 2026-08-30T03:06:04.800Z (307m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1559-the-coating-ladder-means-something \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: native:cognition:done (+5502ms)\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n  Memory warnings: none this session\n  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  \u26a0 Native queue: worst wait 1.7s \u00b7 0 job kinds queued >3s \u00b7 worst 12.0ms/prompt-token \u00b7 4 generations thrown away (28.7s)\n     The JS thr"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 27/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfj7rmu3rzy"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "27"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T08:28:31.454074Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T08:28:31.924000Z",
+  "fingerprints": [
+    "653eda02628932b299a6613fbdb4bdbf"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "38bf98766c5e455096812b58280edae9",
+  "previousEventID": "2d2185e9678d4bf1a8770e8ac1d2618e"
+}

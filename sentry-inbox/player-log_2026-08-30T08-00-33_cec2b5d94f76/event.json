@@ -1,0 +1,225 @@
+{
+  "id": "cec2b5d94f7648ceb1a3013a168812ec",
+  "groupID": "7700501608",
+  "eventID": "cec2b5d94f7648ceb1a3013a168812ec",
+  "projectID": "4511945117532160",
+  "size": 17695,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1566-the-first-one-is-the-one-that-counts #mtf5ivgldrkj [inline 10/24]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1566-the-first-one-is-the-one-that-counts #mtf5ivgldrkj [inline 10/24]",
+  "title": "player-log 2026-08-30-1566-the-first-one-is-the-one-that-counts #mtf5ivgldrkj [inline 10/24]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "14fb1662b1e748139aecec692fa4a78b",
+      "span_id": "9a078668d45d3575",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "r banner to trade.\n[2026-08-28T22:59:15.710Z] [world] Rare workings for sale: Aether-Wing Cloak (200 TC), Aetherforged Gauntlets (200 TC), Aetherforged Greaves (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-08-28T22:59:15.710Z] [world] You push north. The silt is heavy underfoot, the horizon unchanged.\n[2026-08-28T22:59:15.711Z] [world] Whatever you turned over here is still turned over.\n[2026-08-28T22:59:16.784Z] [debug] ui: tap \"take / salvage\"\n[2026-08-28T22:59:18.341Z] [world] You crouch, take the Salvager's Worn Gloves, and are moving again before you have straightened up.\n",
+      "[2026-08-28T22:59:18.342Z] [reward] \u2726 Salvager's Worn Gloves (Common).\n[2026-08-28T22:59:18.537Z] [debug] persist sizes(KB): total=138 player=24 wm=30[rooms=7 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=3\n[2026-08-28T22:59:19.048Z] [world] You do not think about it. The Climbing Rope is simply in your hand now.\n[2026-08-28T22:59:19.048Z] [reward] \u2726 Climbing Rope (Common).\n",
+      "[2026-08-28T22:59:19.891Z] [world] You salvage the cart. The take is small but real.\n[2026-08-28T22:59:19.892Z] [world] You salvage the cold spring. The take is small but real.\n[2026-08-28T22:59:19.892Z] [world] You strip the cracked supply crate carefully. Something usable comes free in your hand.\n[2026-08-28T22:59:19.892Z] [world] You salvage the tent. The take is small but real.\n",
+      "[2026-08-28T22:59:19.892Z] [reward] \u2726 Salvage haul:\n[2026-08-28T22:59:19.893Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-28T22:59:19.893Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-08-28T22:59:19.893Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-28T22:59:19.893Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n",
+      "[2026-08-28T22:59:20.157Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9196ms read 8024ms/write 1118ms in 703t\u2192out 33t 11.4ms/t HIT-CAP (146ch)\n[2026-08-28T22:59:20.158Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n9 avg3.9s max8.1s read1.0s/write1.0s in128t\u2192out33t ms/tok 2.2-19.0 wait1.9s | ambient n6 avg9.9s max14.3s read4.4s/write2.0s in364t\u2192out31t ms/tok 6.8-16.1 cap5 wait4.2s \u27023/32.2s | narration",
+      ":travel n3 avg9.8s max10.5s read9.8s in800t\u2192out0t ms/tok 11.7-13.2 \u23f83 \u27023/29.5s | item_synthesis_hw n3 avg5.8s max7.1s read4.7s/write1.0s in329t\u2192out32t ms/tok 10.5-18.9 | narration:scene_intro_fill n3 avg6.6s max9.2s read5.5s/write1.1s in724t\u2192out33t ms/tok 4.2-11.4 cap3 | flourish n2 avg2.7s max3.2s read2.2s/write0.5s in179t\u2192out16t ms/tok 10.7-14.2 \u27022/5.5s | ask_arbiter n2 avg3.7s max4.4s read2.9s/",
+      "write0.9s in248t\u2192out28t ms/tok 10.2-12.9 | parse_fallback n1 avg4.8s max4.8s read4.3s/write0.5s in404t\u2192out14t ms/tok 10.6-10.6 | narration:scene_intro n1 avg12.5s max12.5s read9.5s/write2.5s in743t\u2192out33t ms/tok 12.7-12.7 cap1 || WASTED 8 calls / 67.2s\n[2026-08-28T22:59:20.238Z] [debug] homework: scene_intro \"Yulka's fire\" \u2713 9385ms\n[2026-08-28T22:59:21.785Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-28T22:59:23.245Z] [player] investigate the mud\n[2026-08-28T22:59:23.246Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=1\n[2026-08-28T22:59:23.248Z] [world] You crouch beside the mud. The silt has half-swallowed it.\n",
+      "[2026-08-28T22:59:23.248Z] [world] Fine grey-blue dust sifts off the mud when you handle it. You catch what you can.\n[2026-08-28T22:59:23.249Z] [reward] \u2726 Aether Dust (Common).\n[2026-08-28T22:59:23.249Z] [world] Mud Scanner reads flat. Nothing in the mud.\n[2026-08-28T22:59:23.355Z] [cognitive] SWIM  (104ms)\n",
+      "[2026-08-28T22:59:24.473Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22123 HP)\n[2026-08-28T22:59:24.494Z] [player] investigate silt\n[2026-08-28T22:59:24.495Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=silt resolved=silt range=- enemies=0 hooks=1\n",
+      "[2026-08-28T22:59:24.497Z] [world] You study the silt. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n[2026-08-28T22:59:24.663Z] [cognitive] neutral  (164ms)\n[2026-08-28T22:59:26.588Z] [debug] qwen\u23f1 investigate_lore ok 2002ms read 1261ms/write 640ms in 127t\u2192out 21t 9.9ms/t (89ch)\n[2026-08-28T22:59:27.519Z] [player] Ask why the stall is here\n",
+      "[2026-08-28T22:59:27.519Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n[2026-08-28T22:59:27.520Z] [world] Ilva Sidelong shifts the pack higher on their shoulder and does not put it down.\n[2026-08-28T22:59:28.809Z] [debug] qwen\u23f1 flourish ok 2213ms read 1874ms/write 258ms in 175t\u2192out 9t 10.7ms/t (25ch)\n",
+      "[2026-08-28T22:59:28.879Z] [debug] flourish: \u2713 2409ms\n[2026-08-28T22:59:28.944Z] [world] You let the conversation go and Ilva Sidelong gets back to it.\n[2026-08-28T22:59:37.273Z] [reward] Sold Repeater Crossbow to Ilva Sidelong for 15 TC. (73 TC on hand)\n[2026-08-28T22:59:37.305Z] [reward] Sold Mud Throwing Knife to Ilva Sidelong for 14 TC. (87 TC on hand)\n",
+      "[2026-08-28T22:59:37.325Z] [reward] Sold Mud Grinder Axe to Ilva Sidelong for 14 TC. (101 TC on hand)\n[2026-08-28T22:59:37.344Z] [reward] Sold Rusty Shortbow to Ilva Sidelong for 14 TC. (115 TC on hand)\n[2026-08-28T22:59:37.361Z] [reward] Sold Reclaimer's Salvage Vest to Ilva Sidelong for 8 TC. (123 TC on hand)\n",
+      "[2026-08-28T22:59:37.379Z] [reward] Sold Mud-Encrusted Armor to Ilva Sidelong for 8 TC. (131 TC on hand)\n[2026-08-28T22:59:37.396Z] [reward] Sold Reclaimer's Salvage Cap to Ilva Sidelong for 6 TC. (137 TC on hand)\n[2026-08-28T22:59:37.413Z] [reward] Sold Aether-Walker's Cape to Ilva Sidelong for 6 TC. (143 TC on hand)\n",
+      "[Filtered]",
+      "[2026-08-28T22:59:37.478Z] [reward] Sold Salvager's Worn Gloves to Ilva Sidelong for 6 TC. (167 TC on hand)\n[2026-08-28T22:59:55.998Z] [debug] homework: intro-fill armed after 8280ms idle\n[2026-08-28T23:00:08.637Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 12635ms read 10450ms/write 2160ms in 742t\u2192out 33t 14.1ms/t HIT-CAP (145ch)\n",
+      "[2026-08-28T23:00:08.651Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 12635ms \u2014 intro-fill:action-opener\n[2026-08-28T23:00:08.652Z] [debug] homework: scene_intro \"Iskan-Veil\" \u2713 12654ms\n[2026-08-28T23:00:15.932Z] [reward] Sold 62\u00d7 Worn Tartarian Coin to Ilva Sidelong for 310 TC (5 TC each). (477 TC on hand)\n",
+      "[2026-08-28T23:00:15.957Z] [reward] \u2726 You named your price and held it. +1 CHA (now 2).\n[2026-08-28T23:00:25.619Z] [debug] persist sizes(KB): total=140 player=20 wm=36[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=3\n[2026-08-28T23:00:26.578Z] [reward] Bought Skyreacher Map 1 of 5 \u2014 Grand Spire from Ilva Sidelong for 118 TC. (359 TC left)\n",
+      "[2026-08-28T23:00:26.578Z] [reward] They don't charge a friend full price \u2014 6 TC stayed in your pouch.\n[2026-08-28T23:00:31.112Z] [reward] Bought 4\u00d7 Trail Rations from Ilva Sidelong for 20 TC. (339 TC left)\n[2026-08-28T23:00:37.001Z] [reward] Bought 3\u00d7 Aether Crystal from Ilva Sidelong for 33 TC. (306 TC left)\n",
+      "[2026-08-28T23:00:37.002Z] [reward] They don't charge a friend full price \u2014 3 TC stayed in your pouch.\n[2026-08-28T23:00:45.909Z] [debug] homework: intro-fill armed after 10159ms idle\n[2026-08-28T23:00:49.894Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 3978ms read 2732ms/write 1133ms in 741t\u2192out 33t 3.7ms/t HIT-CAP (166ch)\n",
+      "[2026-08-28T23:00:49.903Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 3978ms \u2014 intro-fill:action-opener\n[2026-08-28T23:00:49.903Z] [debug] homework: scene_intro \"Iskan-Veil\" \u2713 3996ms\n[2026-08-28T23:00:52.148Z] [reward] Bought the Aetherforged Greaves working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-08-28T23:01:14.927Z] [player] Ask how far they range\n[2026-08-28T23:01:14.927Z] [world] \"I do this stretch and one other.\" They gesture vaguely. \"Any more and you are travelling, not trading. Travelling is how you lose stock.\"\n[2026-08-28T23:01:14.928Z] [world] Whatever Ilva Sidelong is chewing goes over to the other cheek.\n",
+      "[2026-08-28T23:01:16.259Z] [debug] qwen\u23f1 flourish ok 2472ms read 1835ms/write 624ms in 175t\u2192out 21t 10.5ms/t (79ch)\n[2026-08-28T23:01:16.364Z] [debug] flourish: \u2713 2666ms\n[2026-08-28T23:01:16.861Z] [player] Ask why they trade out here\n",
+      "[2026-08-28T23:01:16.862Z] [world] \"Because out here I am the only shop in the world.\" The trader grins at their own arithmetic. \"In a settlement I am one stall among twenty. On this stretch of road I am civilization ITSELF for half a day's walk in both directions. The mark-up is not greed, it is geography.\" The grin softens a notch. \"Also \u2014 and do not spread this \u2014 somebody should be out here. Th",
+      "e road is long. A fire and a fair-enough price change what the road IS.\"\n[2026-08-28T23:01:16.862Z] [world] Ilva Sidelong, fence, stands at her post, adjusting her grip on the fence post.\n[2026-08-28T23:01:18.361Z] [world] You let the conversation go and Ilva Sidelong gets back to it.\n[2026-08-28T23:01:30.974Z] [debug] homework: intro-fill armed after 9121ms idle\n",
+      "[2026-08-28T23:01:40.690Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9634ms read 8514ms/write 1097ms in 746t\u2192out 33t 11.4ms/t HIT-CAP (145ch)\n[2026-08-28T23:01:40.779Z] [debug] homework: scene_intro \"Iskan-Veil\" \u2713 9807ms\n[2026-08-28T23:02:16.048Z] [debug] homework: intro-fill armed after 9608ms idle\n",
+      "[2026-08-28T23:02:17.360Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1233ms read 0ms/write 1202ms in 746t\u2192out 34t HIT-CAP (139ch)\n[2026-08-28T23:02:17.453Z] [debug] homework: scene_intro \"Iskan-Veil\" \u2713 1407ms\n",
+      "[2026-08-28T23:03:18.276Z] [player] maybe we should tier the rarity of what can be built at the fuse cruciable, since I have legendary gear that is useless the minute I see a cruciable. might as well not even have it. fuse just keeps spitting out AC5 gear and kills it. the only good natural gear are ones that have effects and scale with stats. but no one reads that, they all go for the fuse gear b",
+      "ecause high AC is almost unbearable.\n[2026-08-28T23:03:18.277Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n",
+      "[2026-08-28T23:03:18.278Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n[2026-08-28T23:03:18.278Z] [debug] meta-comment guard: skipped intent parse (suggestion: \"we should\") on 400-char input\n[2026-08-28T23:03:24.776Z] [debug] ui: tap \"rest\"\n[2026-08-28T23:03:24.784Z] [player] rest\n",
+      "[2026-08-28T23:03:24.785Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-28T23:03:24.787Z] [world] You rest for 8 hours. +3 HP, +7 stamina recovered. (Day 3, afternoon)\n[2026-08-28T23:03:24.789Z] [world] You dream the same dream three times in the night \u2014 a corridor, a door, your own hand reaching for the handle.\n",
+      "[2026-08-28T23:03:24.797Z] [system] \u23f3 Time passed: 8h\n[2026-08-28T23:03:24.880Z] [cognitive] REST  (82ms)\n[2026-08-28T23:03:25.135Z] [debug] persist sizes(KB): total=139 player=20 wm=36[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=3\n[2026-08-28T23:03:25.459Z] [debug] ui: tap \"rest\"\n[2026-08-28T23:03:25.468Z] [player] rest\n",
+      "[2026-08-28T23:03:25.469Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-28T23:03:25.470Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 3, evening)\n[2026-08-28T23:03:25.476Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n",
+      "[2026-08-28T23:03:25.476Z] [arbiter] The Arbiter follows your eyes. \"I see what you saw.\"\n[2026-08-28T23:03:25.476Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-28T23:03:25.477Z] [system] \u23f3 Time passed: 8h\n[2026-08-28T23:03:25.586Z] [cognitive] REST  (108ms)\n[2026-08-28T23:03:26.208Z] [debug] ui: tap \"rest\"\n[2026-08-28T23:03:26.216Z] [player] rest\n",
+      "[2026-08-28T23:03:26.216Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-28T23:03:26.217Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 4, morning)\n[2026-08-28T23:03:26.218Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-28T23:03:26.226Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-08-28T23:03:26.335Z] [cognitive] REST  (108ms)\n[2026-08-28T23:03:26.976Z] [debug] ui: tap \"rest\"\n[2026-08-28T23:03:26.984Z] [player] rest\n[2026-08-28T23:03:26.985Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-28T23:03:26.986Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 4, afternoon)\n",
+      "[2026-08-28T23:03:26.987Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-28T23:03:27.001Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n[2026-08-28T23:03:27.001Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T23:03:27.002Z] [system] \u23f3 Time passed: 8h\n[2026-08-28T23:03:27.114Z] [cognitive] REST  (111ms)\n",
+      "[2026-08-28T23:03:27.544Z] [debug] qwen\u23f1 ambient_fill preempted 2598ms read 0ms/write 0ms in 364t\u2192out 0t (0ch)\n[2026-08-28T23:03:27.631Z] [debug] arbiter: ambient-fill \u2205 2842ms\n[2026-08-28T23:03:27.631Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient_fill after 2598ms \u2014 ambient:fill-\u2205\n[2026-08-28T23:03:27.944Z] [debug] ui: tap \"rest\"\n[2026-08-28T23:03:27.951Z] [player] rest\n",
+      "[2026-08-28T23:03:27.952Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-28T23:03:27.953Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 4, evening)\n[2026-08-28T23:03:27.953Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-28T23:03:27.953Z] [world] You roll up your bedroll and find a small object beneath it \u2014 a gift from the ground, in the buried country's way.\n[2026-08-28T23:03:27.965Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n[2026-08-28T23:03:27.965Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T23:03:27.965Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-28T23:03:27.966Z] [system] \u23f3 Time passed: 8h\n[2026-08-28T23:03:28.052Z] [cognitive] REST  (85ms)\n[2026-08-28T23:03:28.892Z] [debug] ui: tap \"rest\"\n[2026-08-28T23:03:28.899Z] [player] rest\n[2026-08-28T23:03:28.900Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-28T23:03:28.901Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 5, morning)\n[2026-08-28T23:03:28.901Z] [debug] arbiter:"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1566-the-first-one-is-the-one-that-counts #mtf5ivgldrkj [inline 10/24]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtf5ivgldrkj"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "10"
+    },
+    {
+      "key": "parts",
+      "value": "24"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T08:00:32.590000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "16": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 325,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T08:00:33.321000Z",
+  "fingerprints": [
+    "4e316ab7af946c33ea73d7694a5dd961"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "fba9930be55a4b5cb544ea735fdc6a14",
+  "previousEventID": "cbf60532e0db4a61b3a3d0fa039851c8"
+}

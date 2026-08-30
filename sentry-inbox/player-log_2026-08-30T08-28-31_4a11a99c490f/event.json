@@ -1,0 +1,200 @@
+{
+  "id": "4a11a99c490f4da6a92b6c3623cbc67d",
+  "groupID": "7700523236",
+  "eventID": "4a11a99c490f4da6a92b6c3623cbc67d",
+  "projectID": "4511945117532160",
+  "size": 17884,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 8/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 8/28]",
+  "title": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 8/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "2971a7b7676b4ad385af0bbabee681fd",
+      "span_id": "b68dffe87b7c4dae",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " electrical [Reclaimer's Scrapplate took it]. You have 12 HP remaining.\n[2026-08-29T23:34:19.463Z] [debug] ui: tap \"dodge\"\n[2026-08-29T23:34:19.474Z] [player] dodge\n[2026-08-29T23:34:19.475Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=distant enemies=1 hooks=0\n",
+      "[2026-08-29T23:34:19.476Z] [world] You commit to the dodge. Slip Drowned Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-29T23:34:19.506Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 3 + ATK 2 = 5 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-08-29T23:34:19.506Z] [combat] Dodge \u2014 d20 \u2192 7 + DEX 16 = 23 vs ATK 5. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-29T23:34:19.506Z] [debug] arbiter: template (reason=combat)\n[2026-08-29T23:34:19.507Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The drowned aetherkin is patient. Be patienter.\"\n[2026-08-29T23:34:19.507Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-29T23:34:19.617Z] [cognitive] neutral  (109ms)\n[2026-08-29T23:34:20.130Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:34:20.173Z] [player] attack with the off-hand earthshaker\n[2026-08-29T23:34:20.174Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=distant enemies=1 hooks=0\n",
+      "[2026-08-29T23:34:20.174Z] [debug] attack: target=Drowned Aetherkin range=distant reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:34:20.175Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:34:20.176Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-08-29T23:34:20.193Z] [world] You bring the earthshaker to bear on Drowned Aetherkin.\n[2026-08-29T23:34:20.193Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:34:20.285Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (91ms)\n[2026-08-29T23:34:20.461Z] [debug] persist sizes(KB): total=140 player=25 wm=32[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n",
+      "[2026-08-29T23:34:24.699Z] [world] Drowned Aetherkin moves first. The pressure is immediate.\n[2026-08-29T23:34:24.701Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 19 + ATK 2 = 21 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-29T23:34:24.702Z] [combat] You \u2014 d20 \u2192 17 + INT 12 \u2212 1 (Ash Storm) perfect opening (2\u00d7 dice) = 28 vs Drowned Aetherkin AC 8 \u2014 \u2713 HIT\n",
+      "[2026-08-29T23:34:24.706Z] [combat] The blow with the earthshaker finds purchase \u2014 5 damage, 38 HP standing. Drowned Aetherkin commits to the counter.\n[2026-08-29T23:34:24.706Z] [arbiter] The Arbiter does not look away from the drowned aetherkin. \"Decide quickly. It already has.\"\n",
+      "[2026-08-29T23:34:24.822Z] [combat] Drowned Aetherkin deals 4 aetheric damage [edge of reach \u2014 halved] +1 electrical [Reclaimer's Scrapplate took it]. You have 8 HP remaining.\n[2026-08-29T23:34:24.822Z] [combat] The aetheric went through clean \u2014 nothing you're wearing resists aetheric. A matching coating worked into your armor would blunt the next one.\n",
+      "[2026-08-29T23:34:26.731Z] [debug] ui: tap \"stealth\"\n[2026-08-29T23:34:26.736Z] [player] sneak\n[2026-08-29T23:34:26.737Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=distant enemies=1 hooks=0\n[2026-08-29T23:34:26.770Z] [system] \u23f3 Time passed: 15 min\n[2026-08-29T23:34:26.876Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (105ms)\n",
+      "[2026-08-29T23:34:28.334Z] [debug] skillcheck: stealth d20=2 STE 6 = 8 vs DC 12 \u2014 Hard \u2192 FAIL\n[2026-08-29T23:34:28.382Z] [debug] stats: STR6 DEX16 INT12 WIS4 CHA2 STE6 | gear: DEX+10,INT+3,STR+3,STE+3 | worn: main=Cudgel off=Earthshaker head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's C",
+      "loak ring=Light-Finger Guild Band\n[2026-08-29T23:34:28.382Z] [world] Your foot scrapes stone. Something stirs in the dark.\n[2026-08-29T23:34:28.384Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 10 + ATK 2 = 12 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-29T23:34:29.351Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:34:29.393Z] [player] attack with the off-hand earthshaker\n",
+      "[2026-08-29T23:34:29.394Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=distant enemies=1 hooks=0\n[2026-08-29T23:34:29.394Z] [debug] attack: target=Drowned Aetherkin range=distant reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:34:29.395Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-08-29T23:34:29.413Z] [world] You commit forward with the earthshaker. Drowned Aetherkin watches your hands.\n[2026-08-29T23:34:29.413Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:34:29.505Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (91ms)\n[2026-08-29T23:34:36.056Z] [world] You seize the initiative. Drowned Aetherkin has no time to react.\n",
+      "[2026-08-29T23:34:36.056Z] [combat] You \u2014 d20 \u2192 9 + INT 12 \u2212 1 (Ash Storm) = 20 vs Drowned Aetherkin AC 8 \u2014 \u2713 HIT\n[2026-08-29T23:34:36.058Z] [combat] Your strike with the earthshaker lands for 2. Drowned Aetherkin staggers \u2014 36 HP remaining. It answers.\n[2026-08-29T23:34:36.059Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 17 + ATK 2 = 19 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-08-29T23:34:36.175Z] [combat] Drowned Aetherkin deals 3 aetheric damage [armor \u221239%] [edge of reach \u2014 halved] +1 electrical [Wanderer's Worn Gauntlets took it]. You have 5 HP remaining.\n[2026-08-29T23:34:37.433Z] [debug] ui: tap \"inventory\"\n[2026-08-29T23:34:43.555Z] [world] You use 5\u00d7 Trail Rations. +28 HP (33/33), +1 stamina.\n[2026-08-29T23:34:48.206Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-29T23:34:57.834Z] [debug] persist sizes(KB): total=141 player=25 wm=33[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n[2026-08-29T23:35:06.129Z] [debug] ui: tap \"dodge\"\n[2026-08-29T23:35:06.143Z] [player] dodge\n[2026-08-29T23:35:06.144Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=distant enemies=1 hooks=0\n",
+      "[2026-08-29T23:35:06.145Z] [world] You commit to the dodge. Slip Drowned Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-29T23:35:06.181Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 17 + ATK 2 = 19 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-08-29T23:35:06.181Z] [combat] Dodge \u2014 d20 \u2192 3 + DEX 16 = 19 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-29T23:35:06.182Z] [debug] arbiter: template (reason=combat)\n[2026-08-29T23:35:06.182Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-29T23:35:06.182Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-29T23:35:06.288Z] [cognitive] neutral  (104ms)\n[2026-08-29T23:35:08.331Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:35:08.385Z] [player] attack with the off-hand earthshaker\n[2026-08-29T23:35:08.385Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=distant enemies=1 hooks=0\n",
+      "[2026-08-29T23:35:08.386Z] [debug] attack: target=Drowned Aetherkin range=distant reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:35:08.387Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:35:08.388Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-08-29T23:35:08.413Z] [world] Your earthshaker comes around in an arc; Drowned Aetherkin squares up to meet it.\n[2026-08-29T23:35:08.414Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:35:08.506Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (91ms)\n[2026-08-29T23:35:13.019Z] [world] Drowned Aetherkin moves first. The pressure is immediate.\n",
+      "[2026-08-29T23:35:13.020Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 7 + ATK 2 = 9 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-29T23:35:13.021Z] [combat] You \u2014 d20 \u2192 17 + INT 12 \u2212 1 (Ash Storm) perfect opening (2\u00d7 dice) = 28 vs Drowned Aetherkin AC 8 \u2014 \u2713 HIT\n",
+      "[2026-08-29T23:35:13.024Z] [combat] The blow with the earthshaker finds purchase \u2014 7 damage, 29 HP standing. Drowned Aetherkin commits to the counter.\n[2026-08-29T23:35:15.932Z] [debug] ui: tap \"stealth\"\n[2026-08-29T23:35:15.937Z] [player] sneak\n[2026-08-29T23:35:15.938Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=distant enemies=1 hooks=0\n",
+      "[2026-08-29T23:35:15.969Z] [system] \u23f3 Time passed: 15 min\n[2026-08-29T23:35:16.067Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (97ms)\n[2026-08-29T23:35:17.588Z] [debug] skillcheck: stealth d20=13 STE 6 = 19 vs DC 12 \u2014 Hard \u2192 (resolved below)\n",
+      "[2026-08-29T23:35:17.632Z] [debug] stats: STR6 DEX16 INT12 WIS4 CHA2 STE6 | gear: DEX+10,INT+3,STR+3,STE+3 | worn: main=Cudgel off=Earthshaker head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak ring=Light-Finger Guild Band\n",
+      "[2026-08-29T23:35:17.632Z] [debug] train: stealth (stealth check) \u2192 progress 24/100\n[2026-08-29T23:35:17.633Z] [world] The daylight leaves you little cover. (stealth \u22121, day)\n[2026-08-29T23:35:17.633Z] [world] You drop low and move quiet, closing on Drowned Aetherkin unseen across the open ground. (+5 next attack)\n",
+      "[2026-08-29T23:35:17.634Z] [debug] stealth: opener carried by the skill roll (19 vs DC 12 \u2014 Hard) \u2014 UNSEEN\n[2026-08-29T23:35:18.859Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:35:18.904Z] [player] attack with the off-hand earthshaker\n[2026-08-29T23:35:18.906Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=distant enemies=1 hooks=0\n",
+      "[2026-08-29T23:35:18.908Z] [debug] attack: target=Drowned Aetherkin range=distant reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:35:18.911Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:35:18.911Z] [debug] attack: status mods stealthed +5\n[2026-08-29T23:35:18.929Z] [world] You bring the earthshaker to bear on Drowned Aetherkin.\n",
+      "[2026-08-29T23:35:18.929Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:35:19.022Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (91ms)\n[2026-08-29T23:35:23.395Z] [world] Drowned Aetherkin moves first. The pressure is immediate.\n[2026-08-29T23:35:23.397Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 17 + ATK 2 = 19 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-08-29T23:35:23.398Z] [combat] You \u2014 d20 \u2192 11 + INT 12 \u2212 1 (Ash Storm) stealthed +5 = 27 vs Drowned Aetherkin AC 8 \u2014 \u2713 HIT\n[2026-08-29T23:35:23.399Z] [combat] The blow with the earthshaker finds purchase \u2014 4 damage, 25 HP standing. Drowned Aetherkin commits to the counter.\n",
+      "[2026-08-29T23:35:23.517Z] [combat] Drowned Aetherkin deals 2 aetheric damage [armor \u221239%] [edge of reach \u2014 halved] +1 electrical [Aetheric Scout Greaves took it]. You have 31 HP remaining.\n[2026-08-29T23:35:26.160Z] [debug] ui: tap \"dodge\"\n[2026-08-29T23:35:26.168Z] [player] dodge\n",
+      "[2026-08-29T23:35:26.169Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=distant enemies=1 hooks=0\n[2026-08-29T23:35:26.170Z] [world] You commit to the dodge. Slip Drowned Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-29T23:35:26.205Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 5 + ATK 2 = 7 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-08-29T23:35:26.206Z] [combat] Dodge \u2014 d20 \u2192 15 + DEX 16 = 31 vs ATK 7. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-29T23:35:26.206Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-29T23:35:26.207Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-29T23:35:26.207Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:35:26.315Z] [cognitive] neutral  (107ms)\n[2026-08-29T23:35:26.978Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:35:27.019Z] [player] attack with the off-hand earthshaker\n",
+      "[2026-08-29T23:35:27.020Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=distant enemies=1 hooks=0\n[2026-08-29T23:35:27.021Z] [debug] attack: target=Drowned Aetherkin range=distant reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:35:27.022Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-08-29T23:35:27.022Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-29T23:35:27.041Z] [world] You raise the earthshaker toward Drowned Aetherkin. The room narrows around the both of you.\n[2026-08-29T23:35:27.041Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:35:27.132Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (89ms)\n",
+      "[2026-08-29T23:35:27.275Z] [debug] persist sizes(KB): total=141 player=25 wm=33[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n[2026-08-29T23:35:31.752Z] [world] Drowned Aetherkin moves first. The pressure is immediate.\n[2026-08-29T23:35:31.754Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 15 + ATK 2 = 17 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-29T23:35:31.754Z] [combat] You \u2014 d20 \u2192 12 + INT 12 \u2212 1 (Ash Storm) perfect opening (2\u00d7 dice) = 23 vs Drowned Aetherkin AC 8 \u2014 \u2713 HIT\n[2026-08-29T23:35:31.755Z] [combat] Bludgeoning flares \u2014 +3 on hit.\n[2026-08-29T23:35:31.756Z] [combat] Clean hit with the earthshaker for 12. Drowned Aetherkin has 13 left and does not back away.\n",
+      "[2026-08-29T23:35:31.756Z] [combat] Drowned Aetherkin is left exposed \u2014 easier to hit.\n[2026-08-29T23:35:48.590Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:35:48.643Z] [player] attack with the off-hand earthshaker\n[2026-08-29T23:35:48.644Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=distant enemies=1 hooks=0\n",
+      "[2026-08-29T23:35:48.645Z] [debug] attack: target=Drowned Aetherkin range=distant reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:35:48.646Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:35:48.670Z] [world] Your earthshaker comes around in an arc; Drowned Aetherkin squares up to meet it.\n",
+      "[2026-08-29T23:35:48.671Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:35:48.767Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (95ms)\n[2026-08-29T23:35:51.975Z] [world] You seize the initiative. Drowned Aetherkin has no time to react.\n[2026-08-29T23:35:51.976Z] [combat] You \u2014 d20 \u2192 1 + INT 12 \u2212 1 (Ash Storm) = 12 vs Drowned Aetherkin AC 8 \u2014 \u2717 FUMBLE\n",
+      "[2026-08-29T23:35:51.976Z] [combat] Drowned Aetherkin reads the motion and slips it \u2014 the earthshaker carves only air. The counter is already coming.\n[2026-08-29T23:35:51.978Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 20 + ATK 2 = 22 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-08-29T23:35:52.097Z] [combat] Drowned Aetherkin deals 5 aetheric damage"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 8/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfj7rmu3rzy"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "8"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T08:28:31.307447Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T08:28:31.921000Z",
+  "fingerprints": [
+    "653eda02628932b299a6613fbdb4bdbf"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "4a79e90b86e84f00b55e6e49f2ce59f5",
+  "previousEventID": "4018f66652b24bda9373343f20ab08f0"
+}

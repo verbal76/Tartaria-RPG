@@ -1,0 +1,201 @@
+{
+  "id": "d9d314e4a2ed4b03acbd0446c87a8cd2",
+  "groupID": "7700523236",
+  "eventID": "d9d314e4a2ed4b03acbd0446c87a8cd2",
+  "projectID": "4511945117532160",
+  "size": 17923,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 26/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 26/28]",
+  "title": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 26/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "2971a7b7676b4ad385af0bbabee681fd",
+      "span_id": "b68dffe87b7c4dae",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ld (he just spoke)\n[2026-08-30T08:11:05.568Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:11:05.681Z] [cognitive] SWIM  (112ms)\n[2026-08-30T08:11:06.353Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:11:07.667Z] [player] investigate the mud\n[2026-08-30T08:11:07.668Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:11:07.671Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:11:07.680Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:11:07.680Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:11:07.680Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-30T08:11:07.681Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:11:07.796Z] [cognitive] SWIM  (114ms)\n[2026-08-30T08:11:10.438Z] [debug] ui: tap \"\u2191 Bedroom \u2713\"\n[2026-08-30T08:11:10.441Z] [world] You step into the bedroom.\n",
+      "[2026-08-30T08:11:10.442Z] [world] Somebody slept in here long after the shed stopped being a shed \u2014 a low bed under the eaves, a cupboard of stoppered jars, and a lamp burned down to its socket.\n[2026-08-30T08:11:11.403Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:11:12.794Z] [player] investigate the mud\n",
+      "[2026-08-30T08:11:12.794Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:11:12.798Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Mud (Common).\n[2026-08-30T08:11:12.804Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:11:12.918Z] [cognitive] SWIM  (113ms)\n",
+      "[2026-08-30T08:11:13.078Z] [debug] persist sizes(KB): total=160 player=42 wm=40[rooms=13 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=77 scene=2\n[2026-08-30T08:11:13.773Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:11:15.136Z] [player] investigate the mud\n",
+      "[2026-08-30T08:11:15.137Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:11:15.141Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aetheric Cloth (Rare).\n[2026-08-30T08:11:15.150Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:11:15.264Z] [cognitive] SWIM  (113ms)\n",
+      "[2026-08-30T08:11:15.907Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:11:17.154Z] [player] investigate the mud\n[2026-08-30T08:11:17.155Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:11:17.161Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aetheric Shard (Uncommon).\n",
+      "[2026-08-30T08:11:17.167Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:11:17.283Z] [cognitive] SWIM  (115ms)\n[2026-08-30T08:11:17.789Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:11:19.085Z] [player] investigate the mud\n[2026-08-30T08:11:19.086Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:11:19.087Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:11:19.095Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:11:19.095Z] [arbiter] The Arbiter looks around. \"The garrison's roll-call includes names no one answers to. They are called anyway, every morning.\"\n",
+      "[2026-08-30T08:11:19.095Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter looks around. \"The garrison's roll-call includes\u2026\"\n[2026-08-30T08:11:19.095Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:11:19.211Z] [cognitive] SWIM  (115ms)\n[2026-08-30T08:11:20.055Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:11:21.552Z] [player] investigate the mud\n",
+      "[2026-08-30T08:11:21.553Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:11:21.557Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Mud Fragment (Common).\n[2026-08-30T08:11:21.567Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T08:11:21.568Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-30T08:11:21.681Z] [cognitive] SWIM  (112ms)\n[2026-08-30T08:11:23.409Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-08-30T08:11:23.643Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-30T08:11:26.714Z] [player] drink\n",
+      "[2026-08-30T08:11:26.715Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=0\n[2026-08-30T08:11:26.715Z] [arbiter] The Arbiter tilts their head. \"Drink what? You'd need a water source nearby, or a Water Bottle in your pack.\"\n[2026-08-30T08:11:26.717Z] [debug] arbiter: template (reason=intent-not-allowed:drink)\n",
+      "[2026-08-30T08:11:26.717Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:11:26.956Z] [cognitive] neutral  (237ms)\n[2026-08-30T08:11:27.133Z] [debug] persist sizes(KB): total=159 player=42 wm=40[rooms=13 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=76 scene=2\n",
+      "[2026-08-30T08:11:29.877Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-08-30T08:11:30.128Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-30T08:11:34.465Z] [player] drink\n[2026-08-30T08:11:34.466Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:11:34.467Z] [arbiter] The Arbiter tilts their head. \"Drink what? You'd need a water source nearby, or a Water Bottle in your pack.\"\n[2026-08-30T08:11:34.468Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter tilts their head. \"Drink what? You'd need a wate\u2026\"\n[2026-08-30T08:11:34.468Z] [debug] arbiter: template (reason=intent-not-allowed:drink)\n",
+      "[2026-08-30T08:11:34.469Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:11:34.595Z] [cognitive] neutral  (125ms)\n[2026-08-30T08:11:38.309Z] [debug] ui: tap \"\u2199 Shed \u2713\"\n[2026-08-30T08:11:38.312Z] [world] You step into the shed.\n",
+      "[2026-08-30T08:11:38.313Z] [world] Tools hang on pegs over a scarred workbench; the air is oil and dust. The floorboards by the bench sit oddly proud, as if something underneath pushes them up.\n[2026-08-30T08:11:39.312Z] [debug] ui: tap \"\ud83d\udeaa EXIT\"\n[2026-08-30T08:11:39.315Z] [world] You step back outside, leaving shed behind.\n[2026-08-30T08:11:40.944Z] [debug] ui: tap \"climb\"\n",
+      "[2026-08-30T08:11:42.659Z] [player] climb rusted petrified mud wave\n[2026-08-30T08:11:42.660Z] [debug] parser: intent=climb conf=1.00 verb=climb target=rusted petrified mud wave resolved=rusted petrified mud wave range=- enemies=0 hooks=1\n[2026-08-30T08:11:42.695Z] [world] You loop your Reclaimer's Rope around the rusted petrified mud wave and walk the line. Tier 1/2 cleared.\n",
+      "[2026-08-30T08:11:42.696Z] [world] You reach the first hold of the rusted petrified mud wave (tier 1/2). Higher still to go.\n[2026-08-30T08:11:42.696Z] [world] Talus sets its stone feet at the base of rusted petrified mud wave and will climb no further \u2014 the construct holds the ground while you go up alone.\n[2026-08-30T08:11:42.696Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n",
+      "[2026-08-30T08:11:42.696Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:11:42.697Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T08:11:42.697Z] [system] \u23f3 Time passed: 30 min\n[2026-08-30T08:11:42.833Z] [cognitive] SWIM \u00b7 SEARCH \u00b7 REST  (135ms)\n[2026-08-30T08:11:43.862Z] [debug] ui: tap \"climb up (1/2)\"\n",
+      "[2026-08-30T08:11:43.916Z] [player] climb rusted petrified mud wave\n[2026-08-30T08:11:43.917Z] [debug] parser: intent=climb conf=1.00 verb=climb target=rusted petrified mud wave resolved=rusted petrified mud wave range=- enemies=0 hooks=1\n[2026-08-30T08:11:43.952Z] [world] You loop your Reclaimer's Rope around the rusted petrified mud wave and walk the line. Tier 2/2 cleared.\n",
+      "[2026-08-30T08:11:43.952Z] [world] You reach the top of the rusted petrified mud wave (tier 2/2). The view changes; the room reads differently from here.\n[2026-08-30T08:11:43.953Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n[2026-08-30T08:11:43.953Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:11:43.954Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-30T08:11:44.075Z] [cognitive] SWIM \u00b7 SEARCH \u00b7 REST  (120ms)\n[2026-08-30T08:11:45.112Z] [debug] ui: tap \"climb down\"\n[2026-08-30T08:11:45.133Z] [player] climb down\n[2026-08-30T08:11:45.134Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:11:45.135Z] [world] You make your way back down the rusted petrified mud wave. Boots back on the ground.\n[2026-08-30T08:11:45.136Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n[2026-08-30T08:11:45.136Z] [arbiter] The Arbiter looks around. \"The road past the post runs straight down into the flooded capitals. The garrison watches it like a wound.\"\n",
+      "[2026-08-30T08:11:45.137Z] [system] \u23f3 Time passed: 15 min\n[2026-08-30T08:11:45.261Z] [cognitive] CLIMB  (122ms)\n[2026-08-30T08:11:46.429Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:11:47.919Z] [player] investigate shallow pool\n[2026-08-30T08:11:47.920Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:11:47.921Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n[2026-08-30T08:11:47.922Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T08:11:48.034Z] [cognitive] SWIM  (110ms)\n",
+      "[2026-08-30T08:11:49.833Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-08-30T08:11:50.090Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-30T08:11:50.705Z] [debug] qwen\u23f1 investigate_lore ok 2575ms read 1228ms/write 1324ms in 126t\u2192out 32t 9.7ms/t (163ch)\n",
+      "[2026-08-30T08:11:53.858Z] [world] Iron fog disorients you. Compasses spin; intent costs more.\n[2026-08-30T08:11:53.864Z] [player] drink\n[2026-08-30T08:11:53.865Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:11:53.866Z] [world] You cup the pool in your hands and drink. You weren't tired; mostly you were thirsty. (+1 corruption, 5 min)\n[2026-08-30T08:11:53.866Z] [arbiter] The Arbiter watches you wipe your mouth. \"Raw pool carries what the ground put in it. Fill a bottle next time \u2014 the filter takes the taint out.\"\n",
+      "[2026-08-30T08:11:53.868Z] [debug] arbiter: template (reason=intent-not-allowed:drink)\n[2026-08-30T08:11:53.873Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:11:53.873Z] [system] \u23f3 Time passed: 5 min\n",
+      "[2026-08-30T08:11:53.876Z] [world] A Mud Monarchs war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Reclaimers Guild.\n[2026-08-30T08:11:53.876Z] [arbiter] \"The Mud Monarchs do not forgive a friend of the Reclaimers Guild,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-30T08:11:54.096Z] [cognitive] neutral  (222ms)\n",
+      "[2026-08-30T08:11:57.465Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-30T08:11:57.516Z] [player] attack with the off-hand bone crossbow\n[2026-08-30T08:11:57.517Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=5 hooks=1\n",
+      "[2026-08-30T08:11:57.518Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-30T08:11:57.519Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-08-30T08:11:57.557Z] [world] You raise the searing bone crossbow toward Mud Monarchs Raider 1. The room narrows around the both of you.\n",
+      "[2026-08-30T08:11:57.557Z] [system] \u23f3 Time passed: 6 min\n[2026-08-30T08:11:57.738Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (180ms)\n[2026-08-30T08:12:04.266Z] [world] You seize the initiative. Mud Monarchs Raider 1 has no time to react.\n[2026-08-30T08:12:04.267Z] [combat] You \u2014 d20 \u2192 14 + DEX 19 \u2212 2 (Iron Fog) + 2 (point blank) = 33 vs Mud Monarchs Raider 1 AC 10 \u2014 \u2713 HIT\n",
+      "[2026-08-30T08:12:04.269Z] [combat] You crack the Mud Monarchs Raider 1 with the Searing Bone Crossbow for 11 \u2014 half their fight, gone in one blow. They crumple, out cold. (2/13 HP) Loot them before they come to.\n[2026-08-30T08:12:04.270Z] [combat] Mud Monarchs Raider 1 is out of it. Mud Monarchs Raider 2 now in your sights.\n",
+      "[2026-08-30T08:12:04.270Z] [combat] Searing Bone Crossbow \u2014 1 burn bites in and festers (3 turns).\n[2026-08-30T08:12:04.272Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 4 + ATK 6 = 10 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:12:04.273Z] [combat] Mud Monarchs Raider 3 and 2 others close the distance.\n[2026-08-30T08:12:11.434Z] [debug] ui: tap \"approach\"\n",
+      "[2026-08-30T08:12:11.496Z] [player] approach Mud Monarchs Raider 2\n[2026-08-30T08:12:11.496Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs raider 2 resolved=Mud Monarchs Raider 2 range=mid enemies=5 hooks=1\n[2026-08-30T08:12:11.500Z] [debug] move: advance from range=mid enemies=5 weather=Iron Fog cost=2 partial=0\n",
+      "[2026-08-30T08:12:11.501Z] [world] Iron Fog slows you down. You push toward the Mud Monarchs Raider 2 and 4 others but the compass spins and your footing drags. (1/2 \u2014 type 'advance' again to close)\n[2026-08-30T08:12:11.501Z] [debug] move: slow weather progress 1/2\n[2026-08-30T08:12:11.711Z] [cognitive] SWIM  (209ms)\n[2026-08-30T08:12:12.567Z] [debug] ui: tap \"approach\"\n",
+      "[2026-08-30T08:12:12.618Z] [player] approach Mud Monarchs Raider 2\n[2026-08-30T08:12:12.619Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs raider 2 resolved=Mud Monarchs Raider 2 range=mid enemies=5 hooks=1\n[2026-08-30T08:12:12.620Z] [debug] move: advance from range=mid enemies=5 weather=Iron Fog cost=2 partial=1\n",
+      "[2026-08-30T08:12:12.620Z] [debug] move: field advance target=Mud Monarchs Raider 2 d 1.32->0.35 band mid->close\n[2026-08-30T08:12:12.621Z] [world] You close the gap with the Mud Monarchs Raider 2 and 4 others. (range: close / arm's reach)\n",
+      "[2026-08-30T08:12:12.621Z] [world] The field shifts around you \u2014 Mud Monarchs Raider 3 now close / arm's reach; Mud Monarchs Raider 4 now mid-range; Mud Monarchs Raider 5 now mid-range.\n[2026-08-30T08:12:12.621Z] [combat] Mud Monarchs Raider 1 blisters \u2014 clinging fire sears 1. (1/13 HP, 2 turns left)\n",
+      "[2026-08-30T08:12:12.622Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 14 + ATK 6 = 20 vs your AC 19 \u2014 \u2713 HIT\n[2026-08-30T08:12:12.624Z] [combat] Mud Monarchs Raider 3 \u2014 d20 \u2192 11 + ATK 8 = 19 vs your AC 19 \u2014 \u2713 HIT\n[2026-08-30T08:12:12.625Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 10 + ATK 5 = 15 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-30T08:12:12.625Z] [co"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 26/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfj7rmu3rzy"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "26"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T08:28:31.456345Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T08:28:31.924000Z",
+  "fingerprints": [
+    "653eda02628932b299a6613fbdb4bdbf"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "ddd52666d5924ee8897cded546f5f5e8",
+  "previousEventID": "d8b49146586541b19cfbbf6c1d707b25"
+}

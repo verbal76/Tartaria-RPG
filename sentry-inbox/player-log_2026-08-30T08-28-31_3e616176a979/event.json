@@ -1,0 +1,158 @@
+{
+  "id": "3e616176a9794a889b567c59b092eb0e",
+  "groupID": "7700523236",
+  "eventID": "3e616176a9794a889b567c59b092eb0e",
+  "projectID": "4511945117532160",
+  "size": 2832,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 28/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 28/28]",
+  "title": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 28/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "2971a7b7676b4ad385af0bbabee681fd",
+      "span_id": "b68dffe87b7c4dae",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ead was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.\n  App state trail: (none recorded)\nModel contexts\n  Live now: 1\n  Opened: 1 \u00b7 Released: 0 \u00b7 Peak live: 1\n  Narration engine: ready\n"
+    ],
+    "chunkChars": 240
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 28/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfj7rmu3rzy"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "28"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T08:28:31.500961Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T08:28:31.924000Z",
+  "fingerprints": [
+    "653eda02628932b299a6613fbdb4bdbf"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "4018f66652b24bda9373343f20ab08f0",
+  "previousEventID": "3b654efeef1f451b9eb3d371692d0ce9"
+}

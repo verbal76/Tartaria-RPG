@@ -1,0 +1,200 @@
+{
+  "id": "a27111caafe74de1afc455399fc2faaf",
+  "groupID": "7700523236",
+  "eventID": "a27111caafe74de1afc455399fc2faaf",
+  "projectID": "4511945117532160",
+  "size": 17896,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 3/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 3/28]",
+  "title": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 3/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "2971a7b7676b4ad385af0bbabee681fd",
+      "span_id": "b68dffe87b7c4dae",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-29T23:17:12.638Z] [world] You salvage the rubble. The take is small but real.\n[2026-08-29T23:17:12.638Z] [world] You strip the stone marker carefully. Something usable comes free in your hand.\n[2026-08-29T23:17:12.638Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-29T23:17:12.639Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-08-29T23:17:12.639Z] [reward]     \u2022 Coiled Snare Thread (Common)\n[2026-08-29T23:17:12.639Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-08-29T23:17:12.639Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-08-29T23:17:15.019Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:17:16.767Z] [player] investigate footprint\n",
+      "[2026-08-29T23:17:16.767Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=footprint resolved=footprint range=- enemies=0 hooks=1\n[2026-08-29T23:17:16.768Z] [world] The footprint sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n",
+      "[2026-08-29T23:17:16.770Z] [world] A Mud Monarchs war party crests the rise \u2014 2 of them, blades already out. They've marked you for standing with the Reclaimers Guild.\n[2026-08-29T23:17:16.770Z] [arbiter] \"The Mud Monarchs do not forgive a friend of the Reclaimers Guild,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-29T23:17:16.914Z] [cognitive] neutral  (144ms)\n",
+      "[2026-08-29T23:17:17.718Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-29T23:17:20.396Z] [debug] ui: tap \"approach\"\n[2026-08-29T23:17:20.439Z] [player] approach Mud Monarchs Raider 1\n[2026-08-29T23:17:20.441Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs raider 1 resolved=Mud Monarchs Raider 1 range=close enemies=2 hooks=1\n",
+      "[2026-08-29T23:17:20.446Z] [debug] move: advance from range=close enemies=2 weather=Ash Storm cost=1 partial=0\n[2026-08-29T23:17:20.446Z] [world] You are already at close / arm's reach with the Mud Monarchs Raider 1 and Mud Monarchs Raider 2.\n[2026-08-29T23:17:20.447Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-29T23:17:20.447Z] [arbiter] The Arbiter watches the Mud Monarchs Raider 1. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n[2026-08-29T23:17:20.580Z] [cognitive] neutral  (131ms)\n[2026-08-29T23:17:22.813Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:17:22.854Z] [player] attack with the off-hand earthshaker\n",
+      "[2026-08-29T23:17:22.854Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=close enemies=2 hooks=1\n[2026-08-29T23:17:22.855Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n",
+      "[2026-08-29T23:17:22.856Z] [arbiter] Ash Storm hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-08-29T23:17:22.858Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:17:22.878Z] [world] You bring the earthshaker to bear on Mud Monarchs Raider 1.\n[2026-08-29T23:17:22.878Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-29T23:17:23.003Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (124ms)\n[2026-08-29T23:17:35.436Z] [world] You seize the initiative. Mud Monarchs Raider 1 has no time to react.\n[2026-08-29T23:17:35.437Z] [combat] You \u2014 d20 \u2192 10 + INT 12 \u2212 1 (Ash Storm) + 2 (point blank) = 23 vs Mud Monarchs Raider 1 AC 9 \u2014 \u2713 HIT\n[2026-08-29T23:17:35.438Z] [combat] Bludgeoning flares \u2014 +3 on hit.\n",
+      "[2026-08-29T23:17:35.438Z] [combat] The blow with the earthshaker finds purchase \u2014 9 damage, 10 HP standing. Mud Monarchs Raider 1 commits to the counter.\n[2026-08-29T23:17:35.439Z] [combat] Mud Monarchs Raider 1 is left exposed \u2014 easier to hit.\n[2026-08-29T23:17:35.444Z] [combat] Mud Monarchs Raider 1 \u2014 d20 \u2192 3 + ATK 5 = 8 vs your AC 19 \u2014 \u2717 MISS\n",
+      "[2026-08-29T23:17:35.446Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 1 + ATK 8 = 9 vs your AC 19 \u2014 \u2717 FUMBLE\n[2026-08-29T23:17:36.865Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:17:36.907Z] [player] attack with the off-hand earthshaker\n[2026-08-29T23:17:36.908Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=close enemies=2 hooks=1\n",
+      "[2026-08-29T23:17:36.909Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:17:36.909Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:17:36.929Z] [world] You raise the earthshaker toward Mud Monarchs Raider 1. The room narrows around the both of you.\n",
+      "[2026-08-29T23:17:36.930Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:17:37.038Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (107ms)\n[2026-08-29T23:17:41.456Z] [world] Mud Monarchs Raider 1 moves first. The pressure is immediate.\n[2026-08-29T23:17:41.458Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 9 + ATK 6 = 15 vs your AC 19 \u2014 \u2717 MISS\n",
+      "[2026-08-29T23:17:41.459Z] [combat] Mud Monarchs Raider 1 \u2014 d20 \u2192 17 + ATK 5 = 22 vs your AC 19 \u2014 \u2713 HIT\n[2026-08-29T23:17:41.460Z] [combat] You \u2014 d20 \u2192 10 + INT 12 \u2212 1 (Ash Storm) + 2 (point blank) = 23 vs Mud Monarchs Raider 1 AC 9 \u2014 \u2713 HIT\n[2026-08-29T23:17:41.461Z] [combat] Your strike with the earthshaker lands for 2. Mud Monarchs Raider 1 staggers \u2014 8 HP remaining. It answers.\n",
+      "[2026-08-29T23:17:41.596Z] [combat] Mud Monarchs Raider 1 deals 7 bludgeoning damage. You have 19 HP remaining.\n[2026-08-29T23:17:44.266Z] [debug] ui: tap \"dodge\"\n[2026-08-29T23:17:44.281Z] [player] dodge\n[2026-08-29T23:17:44.281Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=1\n",
+      "[2026-08-29T23:17:44.282Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-29T23:17:44.311Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 19 + ATK 6 = 25 vs your AC 19 \u2014 \u2713 HIT\n",
+      "[2026-08-29T23:17:44.312Z] [combat] Dodge \u2014 d20 \u2192 5 + DEX 16 = 21 vs ATK 25. \u2717 You misread it \u2014 no opening, and the blow lands as it normally would (armor still counts).\n[2026-08-29T23:17:44.312Z] [world] Your read is a beat off \u2014 you fail to make the opening, and the swing lands the way it always meant to.\n",
+      "[2026-08-29T23:17:44.313Z] [combat] Mud Monarchs Raider 1 \u2014 d20 \u2192 18 + ATK 5 = 23 vs your AC 19 \u2014 \u2713 HIT\n[2026-08-29T23:17:44.314Z] [debug] arbiter: template (reason=combat)\n[2026-08-29T23:17:44.314Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-29T23:17:44.315Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-29T23:17:44.443Z] [combat] Mud Monarchs Raider 2 deals 1 bludgeoning damage. You have 18 HP remaining.\n[2026-08-29T23:17:44.443Z] [combat] Mud Monarchs Raider 1 deals 7 bludgeoning damage. You have 11 HP remaining.\n[2026-08-29T23:17:44.443Z] [combat] Mud Monarchs Raider 1's strike leaves you stunned.\n[2026-08-29T23:17:44.559Z] [cognitive] neutral  (244ms)\n",
+      "[2026-08-29T23:17:44.823Z] [debug] persist sizes(KB): total=142 player=22 wm=37[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=4\n[2026-08-29T23:17:45.516Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:17:45.518Z] [system] stunned fades.\n[2026-08-29T23:17:45.556Z] [player] attack with the off-hand earthshaker\n",
+      "[2026-08-29T23:17:45.557Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=close enemies=2 hooks=1\n[2026-08-29T23:17:45.557Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:17:45.558Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-08-29T23:17:45.578Z] [world] You commit forward with the earthshaker. Mud Monarchs Raider 1 watches your hands.\n[2026-08-29T23:17:45.579Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:17:45.688Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (108ms)\n[2026-08-29T23:17:50.920Z] [world] You seize the initiative. Mud Monarchs Raider 1 has no time to react.\n",
+      "[2026-08-29T23:17:50.920Z] [combat] You \u2014 d20 \u2192 4 + INT 12 \u2212 1 (Ash Storm) + 2 (point blank) = 17 vs Mud Monarchs Raider 1 AC 9 \u2014 \u2713 HIT\n[2026-08-29T23:17:50.922Z] [combat] Mud Monarchs Raider 1 takes 5 with the earthshaker. It reels: 3 left. Then it fights back.\n[2026-08-29T23:17:50.923Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 19 \u2014 \u2713 HIT\n",
+      "[2026-08-29T23:17:50.925Z] [combat] Mud Monarchs Raider 1 \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-29T23:17:50.925Z] [arbiter] The Arbiter watches the blow land or fail. \"Both are answers.\"\n[2026-08-29T23:17:51.060Z] [combat] Mud Monarchs Raider 2 deals 5 bludgeoning damage. You have 6 HP remaining.\n[2026-08-29T23:17:51.834Z] [debug] ui: tap \"cudgel\"\n",
+      "[2026-08-29T23:17:51.841Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-08-29T23:17:51.863Z] [player] attack with the cudgel\n[2026-08-29T23:17:51.863Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=2 hooks=1\n",
+      "[2026-08-29T23:17:51.864Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[close] reach.label=Cudgel bareHand=false\n[2026-08-29T23:17:51.865Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:17:51.888Z] [world] You raise the cudgel toward Mud Monarchs Raider 1. The room narrows around the both of you.\n[2026-08-29T23:17:51.888Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-29T23:17:52.110Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 TAKE_COVER \u00b7 DISENGAGE  (221ms)\n[2026-08-29T23:17:57.740Z] [world] You seize the initiative. Mud Monarchs Raider 1 has no time to react.\n[2026-08-29T23:17:57.741Z] [combat] You \u2014 d20 \u2192 8 + STR 4 \u2212 1 (Ash Storm) = 11 vs Mud Monarchs Raider 1 AC 9 \u2014 \u2713 HIT\n[2026-08-29T23:17:57.741Z] [combat] Bludgeoning flares \u2014 +1 on hit.\n",
+      "[2026-08-29T23:17:57.742Z] [combat] Your blow with the cudgel lands clean \u2014 5 damage. Mud Monarchs Raider 1 crumples in the dust. The Aetherstone settles.\n[2026-08-29T23:17:57.743Z] [reward] Mud Monarchs Raider 1 defeated. You recover Aether Residue, Patched Cloth.\n[2026-08-29T23:17:57.749Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+10 TC). The kit took the fight badly.\n",
+      "[2026-08-29T23:17:57.749Z] [combat] 1 attacker remains. Mud Monarchs Raider 2 now in your sights.\n[2026-08-29T23:17:57.749Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-29T23:17:57.750Z] [reward] +8 TC pried from the dust.\n[2026-08-29T23:17:57.787Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 7 + ATK 6 = 13 vs your AC 19 \u2014 \u2717 MISS\n",
+      "[2026-08-29T23:17:57.787Z] [arbiter] \"Make the next strike count for two,\" the Arbiter says. \"Tartaria taxes the first.\"\n[2026-08-29T23:18:00.369Z] [debug] ui: tap \"inventory\"\n[2026-08-29T23:18:04.571Z] [system] braced \u2014 will not go down again fades.\n[2026-08-29T23:18:04.598Z] [player] use First Aid Kit\n",
+      "[2026-08-29T23:18:04.599Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=first aid kit resolved=Mud Monarchs Raider 2 range=mid enemies=1 hooks=1\n[2026-08-29T23:18:04.602Z] [world] You use one First Aid Kit. +25 HP, +1 stamina.\n[2026-08-29T23:18:04.609Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-29T23:18:04.609Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-29T23:18:04.610Z] [system] \u23f3 Time passed: 15 min\n[2026-08-29T23:18:05.169Z] [cognitive] neutral  (558ms)\n[2026-08-29T23:18:07.187Z] [debug] persist sizes(KB): total=140 player=22 wm=37[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=3\n",
+      "[2026-08-29T23:18:09.371Z] [debug] ui: tap \"dodge\"\n[2026-08-29T23:18:09.377Z] [system] braced \u2014 will not go down again fades.\n[2026-08-29T23:18:09.384Z] [player] dodge\n[2026-08-29T23:18:09.384Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1\n",
+      "[2026-08-29T23:18:09.385Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 2's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-29T23:18:09.418Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 14 + ATK 6 = 20 vs your AC 19 \u2014 \u2713 HIT\n",
+      "[2026-08-29T23:18:09.419Z] [combat] Dodge \u2014 d20 \u2192 2 + DEX 16 = 18 vs ATK 20. \u2717 You misread it \u2014 no opening, and the blow lands as it normally would (armor still counts).\n[2026-08-29T23:18:09.419Z] [world] Your read is a beat off \u2014 you fail to make the opening, and the swing lands the way it always meant to.\n[2026-08-29T23:18:09.420Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-29T23:18:09.420Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-29T23:18:09.420Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:18:09.549Z] [combat] Mud Monarchs Raider 2 deals 2 bludgeoning damage. You have 29 HP remaining.\n[2026-08-29T23:18:09.656Z] [cognitive] neutral  (129ms)\n[2026-08-29T23:18:10.103Z] [debug] ui: tap \"off: earthshaker\"\n",
+      "[2026-08-29T23:18:10.127Z] [player] attack with the off-hand earthshaker\n[2026-08-29T23:18:10.127Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=mid enemies=1 hooks=1\n[2026-08-29T23:18:10.127Z] [debug] attack: target=Mud Monarchs Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n",
+      "[2026-08-29T23:18:10.128Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:18:10.149Z] [world] Your earthshaker comes around in an arc; Mud Monarchs Raider 2 squares up to meet it.\n[2026-08-29T23:18:10.150Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:18:10.254Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (104ms)\n",
+      "[2026-08-29T23:18:14.825Z] [world] Mud Monarchs Raider 2 moves first. The pressure is immediate.\n[2026-08-29T23:18:14.827Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 19 + ATK 6 = 25 vs your AC 19 \u2014 \u2713 HIT\n[2026-08-29T23:18:14.828Z] [combat] You \u2014 d20 \u2192 16 + INT 12 \u2212 1 (Ash Storm) = 27 vs Mud Monarchs Raider 2 AC 10 \u2014 \u2713 HIT\n",
+      "[2026-08-29T23:18:14.829Z] [combat] Your strike with the earthshaker lands for 2. Mud Monarchs Raider 2 staggers \u2014 13 HP remaining. It answers.\n[2026-08-29T23:18:14.961Z] [combat] Mud Monarchs Raider 2 deals 4 bludgeoning damage. You have 25 HP remaining.\n[2026-08-29T23:18:16.774Z] [debug] ui: tap \"stealth\"\n[2026-08-29T23:18:16.779Z] [player] sneak\n",
+      "[2026-08-29T23:18:16.780Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=1 hooks=1\n[2026-08-29T23:18:16.814Z] [system] \u23f3 Time passed: 15 min\n[2026-08-29T23:18:16.926Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (110ms)\n[2026-08-29T23:18:18.392Z] [debug] skillcheck: stealth d20=15 STE 6 = 21 vs DC 12 \u2014 Hard \u2192 (resolved below)\n",
+      "[2026-08-29T23:18:18.431Z] [debug] stats: STR5 DEX16 INT12 WIS4 CHA2 STE6 | gear: DEX+10,INT+3,STR+3,STE+3 | worn: main=Cudgel off=Earthshaker head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wan"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1567-the-heartbeat-ate-the-checkpoint #mtfj7rmu3rzy [inline 3/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfj7rmu3rzy"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "3"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T08:28:31.158138Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T08:28:31.921000Z",
+  "fingerprints": [
+    "653eda02628932b299a6613fbdb4bdbf"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c1918d177bc94dfba9eafdeb4892269b",
+  "previousEventID": "93b882fa90174f4c997fa4ea574334bd"
+}

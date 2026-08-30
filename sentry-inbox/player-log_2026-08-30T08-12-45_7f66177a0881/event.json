@@ -1,0 +1,197 @@
+{
+  "id": "7f66177a08814c5aa2da89129e30ce49",
+  "groupID": "7700501708",
+  "eventID": "7f66177a08814c5aa2da89129e30ce49",
+  "projectID": "4511945117532160",
+  "size": 17940,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1566-the-first-one-is-the-one-that-counts #mtfj7rmu3rzy [inline 24/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1566-the-first-one-is-the-one-that-counts #mtfj7rmu3rzy [inline 24/28]",
+  "title": "player-log 2026-08-30-1566-the-first-one-is-the-one-that-counts #mtfj7rmu3rzy [inline 24/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "14fb1662b1e748139aecec692fa4a78b",
+      "span_id": "9a078668d45d3575",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ld] Shelves run the length of the wall, stacked with bottles, tins and sacking. Whatever was worth keeping was kept here, and most of it is still keeping.\n[2026-08-30T08:08:54.190Z] [cognitive] neutral  (5467ms)\n[2026-08-30T08:08:54.300Z] [cognitive] neutral  (4349ms)\n",
+      "[2026-08-30T08:08:54.432Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'tools' here. Choose words carefully \u2014 try: the mud, the haze, the dust.\"\n[2026-08-30T08:08:54.546Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'pegs' here. Choose words carefully \u2014 try: the mud, the haze, the dust.\"\n[2026-08-30T08:08:55.516Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-30T08:08:57.166Z] [world] You break the bottles apart. Among the pieces, something worth keeping.\n[2026-08-30T08:08:57.166Z] [world] You work the sacking over. A part of it comes loose, intact.\n[2026-08-30T08:08:57.167Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:08:57.167Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-30T08:08:57.167Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n",
+      "[2026-08-30T08:09:05.219Z] [debug] ui: tap \"\u2191 Bedroom \u2713\"\n[2026-08-30T08:09:05.223Z] [world] You step into the bedroom.\n[2026-08-30T08:09:05.224Z] [world] Somebody slept in here long after the shed stopped being a shed \u2014 a low bed under the eaves, a cupboard of stoppered jars, and a lamp burned down to its socket.\n[2026-08-30T08:09:06.501Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-30T08:09:07.985Z] [player] investigate the mud\n[2026-08-30T08:09:07.985Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:07.989Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Bone Knife (Common).\n",
+      "[2026-08-30T08:09:07.996Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:09:07.996Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:09:07.997Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:08.113Z] [cognitive] SWIM  (115ms)\n",
+      "[2026-08-30T08:09:08.262Z] [debug] persist sizes(KB): total=162 player=40 wm=40[rooms=13 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n[2026-08-30T08:09:09.669Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:09:11.107Z] [player] investigate the mud\n",
+      "[2026-08-30T08:09:11.107Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:11.109Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:09:11.116Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:11.226Z] [cognitive] SWIM  (110ms)\n",
+      "[2026-08-30T08:09:11.720Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:09:14.635Z] [player] investigate the mud\n[2026-08-30T08:09:14.636Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:14.639Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n",
+      "[2026-08-30T08:09:14.647Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:14.760Z] [cognitive] SWIM  (112ms)\n[2026-08-30T08:09:15.187Z] [debug] ui: tap \"\u2193 Storage \u2713\"\n[2026-08-30T08:09:15.189Z] [world] You step into the storage.\n",
+      "[2026-08-30T08:09:15.190Z] [world] Shelves run the length of the wall, stacked with bottles, tins and sacking. Whatever was worth keeping was kept here, and most of it is still keeping.\n[2026-08-30T08:09:17.205Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:09:19.127Z] [player] investigate the mud\n",
+      "[2026-08-30T08:09:19.128Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:19.130Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:09:19.136Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:19.252Z] [cognitive] SWIM  (115ms)\n",
+      "[2026-08-30T08:09:20.371Z] [player] investigate shelves\n[2026-08-30T08:09:20.372Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shelves resolved=shelves range=- enemies=0 hooks=0\n[2026-08-30T08:09:20.373Z] [world] Empty hooks and dust marks where things used to rest. The shelf remembers what was taken; you do not.\n[2026-08-30T08:09:20.503Z] [cognitive] neutral  (125ms)\n",
+      "[2026-08-30T08:09:21.613Z] [player] investigate tins\n[2026-08-30T08:09:21.614Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tins resolved=tins range=- enemies=0 hooks=0\n[2026-08-30T08:09:21.615Z] [world] The tins reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.\n",
+      "[2026-08-30T08:09:22.316Z] [debug] qwen\u23f1 investigate_lore ok 1832ms read 1234ms/write 574ms in 125t\u2192out 18t 9.9ms/t (91ch)\n[2026-08-30T08:09:22.538Z] [cognitive] neutral  (922ms)\n[2026-08-30T08:09:23.487Z] [debug] qwen\u23f1 investigate_lore ok 1713ms wait 764ms read 292ms/write 641ms in 126t\u2192out 20t 2.3ms/t (92ch)\n[2026-08-30T08:09:26.608Z] [debug] ui: tap \"\u2193 Cellar\"\n",
+      "[2026-08-30T08:09:26.612Z] [world] You step into the hidden cellar.\n[2026-08-30T08:09:26.612Z] [world] Beneath the lifted boards, a ladder drops into a cramped stone cellar. Whoever dug it did not want it found.\n[2026-08-30T08:09:27.991Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T08:09:29.554Z] [world] The crate yields little of value, though a Stick ends up in your pack.\n",
+      "[2026-08-30T08:09:29.555Z] [world] You strip the strongbox carefully. Something usable comes free in your hand.\n[2026-08-30T08:09:29.556Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:09:29.556Z] [reward]     \u2022 Stick (Common)\n[2026-08-30T08:09:29.557Z] [reward]     \u2022 Aether Crystal (Common)\n",
+      "[2026-08-30T08:09:29.859Z] [debug] persist sizes(KB): total=162 player=40 wm=40[rooms=13 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=2\n[2026-08-30T08:09:31.509Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:09:33.084Z] [player] investigate the mud\n",
+      "[2026-08-30T08:09:33.085Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:33.088Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:09:33.096Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:33.216Z] [cognitive] SWIM  (118ms)\n",
+      "[2026-08-30T08:09:33.694Z] [debug] ui: tap \"climb\"\n[2026-08-30T08:09:34.331Z] [player] investigate ladder\n[2026-08-30T08:09:34.332Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ladder resolved=ladder range=- enemies=0 hooks=0\n[2026-08-30T08:09:34.334Z] [world] The ladder reads as ordinary, which down here is a small kind of relief. You leave it be.\n",
+      "[2026-08-30T08:09:34.475Z] [cognitive] neutral  (139ms)\n[2026-08-30T08:09:35.259Z] [player] climb ladder\n[2026-08-30T08:09:35.260Z] [debug] parser: intent=climb conf=1.00 verb=climb target=ladder resolved=ladder range=- enemies=0 hooks=0\n[2026-08-30T08:09:35.295Z] [world] You loop your Reclaimer's Rope around the ladder and walk the line. Tier 1/2 cleared.\n",
+      "[2026-08-30T08:09:35.326Z] [reward] \u2726 Your grip remembers. +1 DEX (base 6, 20 as you stand).\n[2026-08-30T08:09:35.327Z] [world] You reach the first hold of the ladder (tier 1/2). Higher still to go.\n[2026-08-30T08:09:35.327Z] [world] Talus sets its stone feet at the base of ladder and will climb no further \u2014 the construct holds the ground while you go up alone.\n",
+      "[2026-08-30T08:09:35.328Z] [system] \u23f3 Time passed: 30 min\n[2026-08-30T08:09:35.780Z] [debug] qwen\u23f1 investigate_lore ok 1322ms read 283ms/write 1000ms in 125t\u2192out 30t 2.3ms/t (126ch)\n[2026-08-30T08:09:35.987Z] [cognitive] CLIMB  (658ms)\n[2026-08-30T08:09:36.409Z] [debug] ui: tap \"climb up (1/2)\"\n[2026-08-30T08:09:36.435Z] [player] climb ladder\n",
+      "[2026-08-30T08:09:36.435Z] [debug] parser: intent=climb conf=1.00 verb=climb target=ladder resolved=ladder range=- enemies=0 hooks=0\n[2026-08-30T08:09:36.477Z] [world] You loop your Reclaimer's Rope around the ladder and walk the line. Tier 2/2 cleared.\n[2026-08-30T08:09:36.477Z] [world] You reach the top of the ladder (tier 2/2). The view changes; the room reads differently from here.\n",
+      "[2026-08-30T08:09:36.478Z] [system] \u23f3 Time passed: 30 min\n[2026-08-30T08:09:36.594Z] [cognitive] CLIMB  (115ms)\n[2026-08-30T08:09:37.609Z] [debug] ui: tap \"climb down\"\n[2026-08-30T08:09:37.620Z] [player] climb down\n[2026-08-30T08:09:37.621Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:09:37.622Z] [world] You make your way back down the ladder. Boots back on the ground.\n[2026-08-30T08:09:37.623Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n[2026-08-30T08:09:37.623Z] [arbiter] The Arbiter looks around. \"Boot-prints in the mud parade ground, in formation, fresh each dawn.\"\n[2026-08-30T08:09:37.624Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-30T08:09:37.624Z] [system] \u23f3 Time passed: 15 min\n[2026-08-30T08:09:37.752Z] [cognitive] CLIMB  (127ms)\n[2026-08-30T08:09:39.678Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:09:41.236Z] [player] investigate the mud\n[2026-08-30T08:09:41.236Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:09:41.238Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:09:41.245Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:09:41.245Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:09:41.245Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-30T08:09:41.245Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:41.361Z] [cognitive] SWIM  (114ms)\n[2026-08-30T08:09:41.862Z] [debug] ui: tap \"\u2191 Storage \u2713\"\n[2026-08-30T08:09:41.865Z] [world] You step into the storage.\n",
+      "[2026-08-30T08:09:41.866Z] [world] Shelves run the length of the wall, stacked with bottles, tins and sacking. Whatever was worth keeping was kept here, and most of it is still keeping.\n[2026-08-30T08:09:43.762Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:09:45.880Z] [player] investigate the mud\n",
+      "[2026-08-30T08:09:45.880Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:45.883Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Orange Sporecap (Common).\n[2026-08-30T08:09:45.887Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:45.998Z] [cognitive] SWIM  (110ms)\n",
+      "[2026-08-30T08:09:46.293Z] [debug] persist sizes(KB): total=162 player=41 wm=41[rooms=14 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=2\n[2026-08-30T08:09:46.681Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:09:48.113Z] [player] investigate the mud\n",
+      "[2026-08-30T08:09:48.113Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:48.121Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aetheric Cloth (Rare).\n[2026-08-30T08:09:48.127Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:48.240Z] [cognitive] SWIM  (111ms)\n",
+      "[2026-08-30T08:09:49.130Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:09:50.606Z] [player] investigate the mud\n[2026-08-30T08:09:50.607Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:50.609Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n",
+      "[2026-08-30T08:09:50.617Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T08:09:50.618Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:50.732Z] [cognitive] SWIM  (113ms)\n[2026-08-30T08:09:51.887Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:09:53.163Z] [player] investigate the mud\n",
+      "[2026-08-30T08:09:53.163Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:53.166Z] [world] You scrape at the silt with the bent nail. The patch is picked clean \u2014 you've already taken what was here.\n[2026-08-30T08:09:53.173Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:53.286Z] [cognitive] SWIM  (112ms)\n",
+      "[2026-08-30T08:09:53.949Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:09:55.337Z] [player] investigate the mud\n[2026-08-30T08:09:55.338Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:55.343Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Big Rock (Common).\n",
+      "[2026-08-30T08:09:55.354Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:09:55.355Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-30T08:09:55.355Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:09:55.467Z] [cognitive] SWIM  (111ms)\n[2026-08-30T08:09:56.850Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-30T08:09:59.521Z] [player] investigate the mud\n[2026-08-30T08:09:59.522Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:09:59.526Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-08-30T08:09:59.533Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-30T08:09:59.648Z] [cognitive] SWIM  (114ms)\n[2026-08-30T08:09:59.950Z] [debug] persist sizes(KB): total=162 player=41 wm=41[rooms=14 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=2\n[2026-08-30T08:10:00.301Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:10:01.717Z] [player] investigate the mud\n",
+      "[2026-08-30T08:10:01.717Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:10:01.720Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:10:01.729Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:10:01.840Z] [cognitive] SWIM  (110ms)\n",
+      "[2026-08-30T08:10:02.436Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:10:03.859Z] [player] investigate the mud\n[2026-08-30T08:10:03.860Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-08-30T08:10:03.862Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Big Rock (Common).\n",
+      "[2026-08-30T08:10:03.869Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:10:03.976Z] [cognitive] SWIM  (106ms)\n[2026-08-30T08:10:04.419Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:10:05.769Z] [player] investigate the mud\n[2026-08-30T08:10:05.770Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n",
+      "[2026-08-30T08:10:05.772Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-30T08:10:05.783Z] [system] \u23f3 Time passed: 24 min\n[2026-08-30T08:10:05.894Z] [cognitive] SWIM  (110ms)\n[2026-08-30T08:10:06.386Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:10:07.704Z] [player] investigate the mud\n[2026-08-30T08:10:07.705Z] [debug] parser"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1566-the-first-one-is-the-one-that-counts #mtfj7rmu3rzy [inline 24/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfj7rmu3rzy"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "24"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T08:12:45.346376Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T08:12:45.624000Z",
+  "fingerprints": [
+    "c16480cb1bba9152f8febe8bfd3ed5b3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "8238900c22f84669b1fbfa157ccb3933",
+  "previousEventID": "7a2145fe6b7a4265b152f45e8c2accd6"
+}
