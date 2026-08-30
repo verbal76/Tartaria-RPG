@@ -116,6 +116,41 @@ export function runecasterPassiveSlots(weapon: {
   return isLegendary ? 3 : 2;
 }
 
+/** ⚠ How much ONE passive is worth per point of the governing stat, and the
+ *  ceiling on a single passive. Owner: *"passives like damage multipliers or dex
+ *  boosts or something"* that *"improve with character stats"* — so the number a
+ *  passive gives is read off the wielder, not stamped on the weapon. A stat of 4
+ *  buys +1; a stat of 16 buys +4; the cap stops a late-game stat from turning a
+ *  three-slot Legendary into the only weapon worth carrying. */
+export const PASSIVE_STAT_DIVISOR = 4;
+export const PASSIVE_PER_SLOT_CAP = 5;
+
+/**
+ * ⚠⚠⚠ WHAT A CASTER'S PASSIVES ARE ACTUALLY WORTH TO *THIS* CHARACTER.
+ *
+ * This is the whole point of the design. The same Void Edge is a different weapon
+ * in two different hands: at WIS 4 its three passives are worth +3, at WIS 16
+ * they are worth +12. The owner asked for passives that *"improve with character
+ * stats"*, and a bonus computed from the wielder — rather than a number stamped
+ * on the item at the bench — is the only version of that which stays true as the
+ * character grows.
+ *
+ * Returns the governing stat, what each slot is worth, and the total, so a caller
+ * can show the arithmetic rather than a mystery number.
+ */
+export function runecasterPassiveBonus(
+  weapon: { weaponKind?: string; damageType?: string; tags?: readonly string[] },
+  stats: Stats | null | undefined,
+  passives: number | undefined,
+): { stat: PassiveStat | null; perSlot: number; slots: number; total: number } {
+  const stat = runecasterPassiveStat(weapon);
+  const slots = Math.max(0, Math.floor(passives ?? 0));
+  if (!stat || slots <= 0 || !stats) return { stat, perSlot: 0, slots: 0, total: 0 };
+  const raw = Math.floor((stats[stat] ?? 0) / PASSIVE_STAT_DIVISOR);
+  const perSlot = Math.max(0, Math.min(raw, PASSIVE_PER_SLOT_CAP));
+  return { stat, perSlot, slots, total: perSlot * slots };
+}
+
 /** What a passive on this caster DOES — the role decides the shape, the stat
  *  only decides how hard it scales. Player-facing wording, one line, so the
  *  Crucible screen and the item card can say the same thing. */

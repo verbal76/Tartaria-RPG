@@ -665,6 +665,24 @@ export function buildCombatSteps(
   // OTA-873 — a Crucible-upgraded weapon carries a SECOND coating that also rolls
   // and applies on every landing hit (staged as its own 'coating2' roll step below).
   const coating2 = coatInst?.coating2 ?? null;
+  // ⚠⚠⚠ OTA-1561 — THE RUNE-CASTER PASSIVE, APPLIED. A rune-caster takes no
+  // coating (no edge to paint), so the two steps above never fire for one. What
+  // it takes instead is PASSIVES worked in at the Crucible, and the owner's rule
+  // is that they *"improve with character stats"* — so the bonus is read off the
+  // WIELDER on every swing, not stamped on the weapon at the bench. The same Void
+  // Edge is worth +3 at WIS 4 and +12 at WIS 16, and it keeps rising as the
+  // character does. `coatInst` is already the exact equipped instance the coating
+  // steps use, so the hand this reads is the hand that swings.
+  const runeBonus = (() => {
+    if (!coatInst || !equipped) return { stat: null as string | null, perSlot: 0, slots: 0, total: 0 };
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const rp = require('./runecasterPassives') as typeof import('./runecasterPassives');
+    return rp.runecasterPassiveBonus(
+      { weaponKind: equipped.weaponKind, damageType: equipped.damageType, tags: [...(coatInst.tags ?? []), ...(equipped.tags ?? [])] },
+      player.stats,
+      coatInst.runePassives,
+    );
+  })();
 
   const steps: RollStep[] = [
     {
@@ -731,10 +749,16 @@ export function buildCombatSteps(
       label: 'Roll for DAMAGE',
       sides: dmg.sides,
       count: (perfectOpening || backstab) ? dmg.count * 2 : dmg.count,
-      bonus: damageBonus + aetherSurge,
+      bonus: damageBonus + aetherSurge + runeBonus.total,
       bonusLabel: [
         damageBonus !== 0 ? `${damageBonus > 0 ? '+' : ''}${damageBonus} (race)` : '',
         aetherSurge > 0 ? `+${aetherSurge} (Aetheric surge 1d6)` : '',
+        // ⚠ OTA-1561 — name the STAT in the label. The whole point of the design
+        // is that the caster grows with the character, and a bare "+9" teaches
+        // nobody that raising WIS is what did it.
+        runeBonus.total > 0
+          ? `+${runeBonus.total} (${runeBonus.slots} rune ${runeBonus.slots === 1 ? 'passive' : 'passives'} × ${String(runeBonus.stat).slice(0, 3).toUpperCase()})`
+          : '',
       ].filter(Boolean).join(' '),
       context: `damage dealt to ${enemy.name}${damageTypeNote}${perfectOpening ? ' — PERFECT OPENING (double dice)' : backstab ? ' — BACKSTAB (double dice)' : ''}`,
       // no target — always applies if the attack hit

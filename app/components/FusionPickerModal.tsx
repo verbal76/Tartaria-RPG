@@ -7,7 +7,7 @@ import React, { useMemo, useState } from 'react';
 import { Modal, View, Text, StyleSheet, ScrollView, Pressable, TouchableWithoutFeedback } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { canonicalItemTags } from '../engine/crafting';
-import { eligibleInputs, fusionMaterialTags, visibleFusionInputs, crucibleUpgradeVerdict, isWeaponRow } from '../engine/itemFusion';
+import { eligibleInputs, fusionMaterialTags, visibleFusionInputs, crucibleUpgradeVerdict, isWeaponRow, type CrucibleUpgradeKind } from '../engine/itemFusion';
 import { coatedDisplayName } from '../engine/weaponCoating';
 import { wornInstanceIds, equippedInstanceIds } from '../engine/equipment';
 import type { InventoryItem } from '../engine/types';
@@ -74,7 +74,9 @@ export function FusionPickerModal() {
   // OTA-1094 — every candidate, upgradeable or not, with its verdict attached.
   // A blocked piece is still LISTED (greyed, with the reason) so the player never
   // faces a heading that just isn't there.
-  type Candidate = { item: InventoryItem; blocked: string | null; group: 'armor' | 'weapon' };
+  // OTA-1561 — 'runecaster' joins the groups: it is upgradeable now (passives
+  // instead of a coating channel), so the picker needs a heading for it.
+  type Candidate = { item: InventoryItem; blocked: string | null; group: CrucibleUpgradeKind };
   const candidates = useMemo<Candidate[]>(
     () => (inventory ?? [])
       .filter((i) => i.quantity > 0 && (isArmorPiece(i) || isWeaponRow(i)))
@@ -88,7 +90,7 @@ export function FusionPickerModal() {
       }),
     [inventory],
   );
-  const splitGroup = (want: 'armor' | 'weapon') => {
+  const splitGroup = (want: CrucibleUpgradeKind) => {
     const rows = candidates.filter((c) => c.group === want);
     return {
       open: rows.filter((c) => !c.blocked).map((c) => c.item).sort(wornFirst),
@@ -97,9 +99,17 @@ export function FusionPickerModal() {
   };
   const armorGroup = splitGroup('armor');
   const weaponGroup = splitGroup('weapon');
+  // ⚠⚠ OTA-1561 — RUNE-CASTERS GET THEIR OWN HEADING. They were classified as
+  // weapons and then blocked with "fires no edge to carry a coating", so 55 of
+  // them sat in the WEAPONS list as permanent refusals. They take a different
+  // upgrade now — passives, not a channel — and a different upgrade needs its own
+  // section, or the player reads the section's copy ("a second coating channel")
+  // and correctly concludes the thing he is holding cannot be upgraded.
+  const runeGroup = splitGroup('runecaster');
   const upgradeableArmor = armorGroup.open;
   const upgradeableWeapons = weaponGroup.open;
-  const upgradeable = [...upgradeableArmor, ...upgradeableWeapons];
+  const upgradeableRunes = runeGroup.open;
+  const upgradeable = [...upgradeableArmor, ...upgradeableWeapons, ...upgradeableRunes];
 
   const [picked, setPicked] = useState<string[]>([]);
   const [catalystId, setCatalystId] = useState<string | null>(null);
@@ -196,6 +206,7 @@ export function FusionPickerModal() {
                       {[
                         { label: 'ARMOR & VESTS', group: armorGroup, none: 'No armor or vest can take another resist channel right now.' },
                         { label: 'WEAPONS', group: weaponGroup, none: 'No weapon in your pack can take a second coating channel right now.' },
+                        { label: 'RUNE-CASTERS', group: runeGroup, none: 'No rune-caster in your pack has room for another passive right now.' },
                       ].map((section) => (
                         <View key={section.label}>
                           <Text style={styles.sectionLabel}>{section.label}</Text>

@@ -549,6 +549,19 @@ export interface InventoryItem {
   /** OTA-873 — coating capacity for THIS weapon instance. Absent / 1 = the normal
    *  single slot; 2 = upgraded (can hold `coating2`). Set by the Crucible upgrade. */
   coatingSlots?: number;
+  /** ⚠⚠ OTA-1561 — how many PASSIVES the Crucible has worked into this RUNE-CASTER
+   *  instance. Owner: *"a runecaster is a power weapon so it can only use the
+   *  power it can generate, so you cannot apply coatings, but they can be
+   *  upgraded at the crucible, but it adds passive stats instead that improve
+   *  with character stats."*
+   *
+   *  A count, not a list, and deliberately so: WHICH stat a passive scales on is
+   *  a property of the WEAPON, not of the slot (see
+   *  engine/runecasterPassives.runecasterPassiveStat), so two passives on one
+   *  caster can only ever key off the same stat. Storing the stat per slot would
+   *  be storing the same answer twice and inviting the two copies to disagree.
+   *  Absent / 0 = un-upgraded. Cap is 2, or 3 at Legendary. */
+  runePassives?: number;
   /** engine_Dev — damage-type resists worked into THIS ARMOR instance from a
    *  coating vial (the "apply to armor" use). Permanent for the piece's life;
    *  aggregateArmor adds these to the slot's resistances while it's worn, so the

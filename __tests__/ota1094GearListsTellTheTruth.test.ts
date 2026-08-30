@@ -36,7 +36,18 @@ const item = (over: Partial<InventoryItem>): InventoryItem => ({
 // game uses, not through a hand-built fixture that could drift from the data.
 const catalogWeapons = (weaponsData as { weapons: { name: string; weaponKind: string; damageType: string }[] }).weapons;
 const coatableName = catalogWeapons.find((w) => w.weaponKind === 'melee' && w.damageType === 'slashing')!.name;
-const energyName = catalogWeapons.find((w) => w.weaponKind === 'runecaster')!.name;
+// ⚠⚠ OTA-1561 — RETARGETED, NOT RELAXED. This used to pick a RUNE-CASTER as the
+// "energy weapon that can never take a channel", and that was true right up until
+// rune-casters got a channel of their own: the Crucible now works PASSIVES into
+// them instead of a coating. The property this suite guards — a weapon that
+// cannot be upgraded says WHY, out loud, instead of vanishing from the picker —
+// is unchanged, and it still has a real subject: an energy RANGED weapon (a
+// plasma thrower, a beam caster) genuinely has no channel of any kind.
+const energyName = catalogWeapons.find(
+  (w) => w.weaponKind === 'ranged' && (w.damageType === 'burn' || w.damageType === 'electrical'),
+)!.name;
+// …and the rune-caster is now pinned from the OTHER side: it must be OFFERED.
+const runecasterName = catalogWeapons.find((w) => w.weaponKind === 'runecaster')!.name;
 
 describe('OTA-1094 #1 — the Crucible says WHY a weapon cannot be upgraded', () => {
   it('a physical weapon is offered', () => {
@@ -48,6 +59,15 @@ describe('OTA-1094 #1 — the Crucible says WHY a weapon cannot be upgraded', ()
     const v = crucibleUpgradeVerdict(item({ name: energyName, kind: 'weapon' }));
     expect(v.kind).toBeNull();
     expect(v.blocked).toMatch(/no edge to carry a coating/i);
+  });
+
+  it('⚠ OTA-1561 — a RUNE-CASTER is now OFFERED, not refused: it takes passives', () => {
+    // The owner hit the old refusal twice with Earthshaker. A rune-caster has no
+    // edge and never will; what changed is that "no edge" stopped being the end
+    // of the sentence.
+    const v = crucibleUpgradeVerdict(item({ name: runecasterName, kind: 'weapon' }));
+    expect(v.kind).toBe('runecaster');
+    expect(v.blocked).toBeNull();
   });
 
   it('a weapon that already has two channels says so rather than disappearing', () => {

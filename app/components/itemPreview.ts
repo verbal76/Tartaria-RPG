@@ -23,6 +23,9 @@ import {
 // OTA-1557 — the ranged sub-class ("Bolt-Caster", "Crossbow", "Bow", …), so the
 // stat line can say WHICH kind of ranged weapon this is.
 import { rangedClassLabel } from '../engine/combatRules';
+// OTA-1561 — what a rune-caster takes instead of a coating, and which stat it
+// will scale on, said on the item card rather than only at the Crucible.
+import { runecasterPassiveStat, runecasterPassiveSlots } from '../engine/runecasterPassives';
 
 export type ItemPreview = {
   name: string;
@@ -242,7 +245,14 @@ function previewWeapon(w: CatalogWeapon): ItemPreview {
   // only in a refusal the player has to trip over. Owner: *"a runecaster is a
   // power weapon so it can only use the power it can generate, so you cannot
   // apply coatings."*
-  if (w.weaponKind === 'runecaster') stats.push('Power weapon — takes no coating');
+  if (w.weaponKind === 'runecaster') {
+    // OTA-1561 — and what it takes INSTEAD, with the stat named, so the card
+    // explains the trade rather than only the refusal.
+    const rs = runecasterPassiveStat({ weaponKind: w.weaponKind, damageType: w.damageType, tags: w.tags });
+    const slots = runecasterPassiveSlots({ rarity: w.rarity, tags: w.tags });
+    stats.push('Power weapon — takes no coating');
+    stats.push(`Crucible: up to ${slots} passives, scaling with ${String(rs).slice(0, 3).toUpperCase()}`);
+  }
   if (w.baseDurability !== undefined) stats.push(`Durability: ${w.baseDurability}`);
   return { name: w.name, kindLabel, rarity: w.rarity, description: w.description, stats };
 }

@@ -25761,7 +25761,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // his, verbatim: two passives, three at Legendary. One pre-existing hole closed
 // in passing - Frostbind was tagged `crafted` with no recipe, the only runecaster
 // in that state, and a dead end at the bench for anyone who read the tag.
-export const OTA_BUILD_ID = '2026-08-30-1560-what-power-ties-to-what-stat';
+// OTA-1561 - THE POWER IT GENERATES. The Crucible opens to rune-casters, which
+// is where the thread that started at "still cannot apply a coating to
+// earthshaker" actually lands. ONE LINE WAS THE WHOLE BLOCKAGE:
+// crucibleUpgradeVerdict collapsed every non-coatable weapon into a single
+// refusal - "fires no edge to carry a coating - energy weapons take no channel" -
+// which is TRUE and was the entire answer, so 55 rune-casters could be carried to
+// the bench and turned away. The refusal was never wrong; it was the only thing
+// the function could say. Now a rune-caster is its own upgrade KIND and takes
+// PASSIVES instead of a coating channel, on the owner's design: "a runecaster is
+// a power weapon so it can only use the power it can generate ... they can be
+// upgraded at the cruciable, but it adds passive stats instead that improve with
+// character stats." The coating refusal SURVIVES for energy ranged weapons -
+// plasma throwers, beam casters - which genuinely have no channel of any kind.
+//
+// THE PASSIVE IS COMPUTED, NOT STAMPED, and that is the feature. A number written
+// onto the weapon at the bench is fixed the moment it is written and cannot
+// "improve with character stats"; this one is read off the WIELDER on every
+// swing, so the same Void Edge is worth +3 to a WIS 4 character and +12 to a
+// WIS 16 one, and it keeps rising as they do. WHICH stat comes from OTA-1560's
+// table, so no new judgement is made here - it only spends the answer already
+// agreed. Per slot it is floor(stat/4), capped at 5, so a late-game stat cannot
+// make one weapon the only weapon worth carrying. Caps are his, verbatim: two
+// passives, three at Legendary, one per Crucible visit at five reserved pieces a
+// visit - so a three-slot Legendary is fifteen pieces of gathered fodder, which
+// is exactly the material OTA-1552 now stops a repair bench from eating.
+//
+// Rune-casters also get their OWN heading in the upgrade picker (they used to sit
+// in the WEAPONS list as permanent refusals under copy about coating channels),
+// the damage roll NAMES the stat that made the bonus so the player can see what
+// to raise, and the item card says what the weapon takes instead of a coating.
+export const OTA_BUILD_ID = '2026-08-30-1561-the-power-it-generates';
 // golem catch-up 2026-08-30: markerless publish of OTA-1549/1550/1551 (the
 // SPEAK TO bar filled + SET COURSE inside the talk sheet, one slot one weapon,
 // and the standing keyboard's session latch) to the golem channel.

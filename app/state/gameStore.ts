@@ -29038,8 +29038,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
       || piece.uniqueStats?.kind === 'armor' || piece.uniqueStats?.kind === 'dog_armor'
       || !!findArmorByName(piece.name)
     );
-    if (!isWeaponTarget && !isArmorTarget) {
-      get().appendLog('world', `The ${piece.name} can't take a coating channel — upgrade a coatable weapon (blade / arrow-arm / bolt-caster) or a piece of armor or a dog vest.`);
+    // ⚠⚠⚠ OTA-1561 — THE THIRD CHANNEL. A rune-caster takes no coating (it has no
+    // edge; it generates its own power) and so it was refused here entirely. It
+    // now takes PASSIVES instead — the owner's design, and the reason this action
+    // needed a third arm rather than a wider weapon test.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const runeMod = require('../engine/runecasterPassives') as typeof import('../engine/runecasterPassives');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const rcCatalog = (require('../engine/crafting') as typeof import('../engine/crafting')).findWeaponByName(piece.name);
+    const isRuneTarget = !isWeaponTarget && !isArmorTarget && (
+      rcCatalog?.weaponKind === 'runecaster'
+      || canonicalItemTags(piece).includes('runecaster')
+    );
+    const runeCap = runeMod.runecasterPassiveSlots({
+      rarity: rcCatalog?.rarity ?? piece.rarity,
+      tags: [...(piece.tags ?? []), ...(rcCatalog?.tags ?? [])],
+    });
+    if (!isWeaponTarget && !isArmorTarget && !isRuneTarget) {
+      get().appendLog('world', `The ${piece.name} can't take a Crucible channel — upgrade a coatable weapon (blade / arrow-arm / bolt-caster), a rune-caster, a piece of armor, or a dog vest.`);
+      return;
+    }
+    if (isRuneTarget && (piece.runePassives ?? 0) >= runeCap) {
+      get().appendLog('world', `The ${piece.name} already carries ${runeCap} worked-in passives — its limit.`);
       return;
     }
     if (isWeaponTarget && coatingCapacity(piece) >= 2) {
@@ -29076,7 +29096,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const peeledId = isStack ? freshInstanceId('upg') : itemId;
       const stampUpgrade = (i: InventoryItem): InventoryItem => (isWeaponTarget
         ? { ...i, coatingSlots: 2 }
-        : { ...i, resistCapBonus: (i.resistCapBonus ?? 0) + 1 });
+        : isRuneTarget
+          // ⚠ OTA-1561 — ONE passive per visit, exactly like a coating slot. The
+          // cap is enforced above, so this only ever counts upward into room the
+          // piece actually has.
+          ? { ...i, runePassives: Math.min(runeCap, (i.runePassives ?? 0) + 1) }
+          : { ...i, resistCapBonus: (i.resistCapBonus ?? 0) + 1 });
       let inv = s.player.inventory
         .map((i) => {
           if (i.id === itemId) {
@@ -29109,7 +29134,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       isWeaponTarget
         ? `✦ The Crucible drinks the five pieces and works a second coating channel into the ${piece.name}. It can now hold TWO coatings at once — both bite on every landing hit. (Its damage and edge are unchanged.)`
-        : `✦ The Crucible drinks the five pieces and works an extra resist channel into the ${piece.name}. It can now hold one more worked-in resist. (Its armor rating is unchanged.)`,
+        : isRuneTarget
+          ? (() => {
+              const worked = Math.min(runeCap, (piece.runePassives ?? 0) + 1);
+              const bonus = runeMod.runecasterPassiveBonus(
+                { weaponKind: 'runecaster', damageType: rcCatalog?.damageType, tags: [...(piece.tags ?? []), ...(rcCatalog?.tags ?? [])] },
+                get().player?.stats,
+                worked,
+              );
+              const statName = bonus.stat ? bonus.stat.slice(0, 3).toUpperCase() : 'INT';
+              // ⚠ Say the ARITHMETIC, not a mystery number. The whole design is
+              // that the passive is read off the WIELDER, so a player has to be
+              // able to see that growing the stat grows the weapon.
+              return `✦ The Crucible drinks the five pieces and works a passive into the ${piece.name} — ${runeMod.runecasterPassiveShape([...(piece.tags ?? []), ...(rcCatalog?.tags ?? [])])}. ${worked} of ${runeCap} passives now. It draws on your ${statName}: +${bonus.perSlot} each, +${bonus.total} in all at your current ${statName}. Raise the stat and the caster rises with it.`;
+            })()
+          : `✦ The Crucible drinks the five pieces and works an extra resist channel into the ${piece.name}. It can now hold one more worked-in resist. (Its armor rating is unchanged.)`,
     );
     void get().persist();
   },

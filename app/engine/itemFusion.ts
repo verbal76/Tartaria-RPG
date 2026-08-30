@@ -317,7 +317,7 @@ export function eligibleInputs(inventory: readonly InventoryItem[]): InventoryIt
  *  `kind` is what the upgrade WOULD grant (null = this piece takes no channel at
  *  all); `blocked` is null when the piece is upgradeable right now, otherwise the
  *  player-facing reason. */
-export type CrucibleUpgradeKind = 'weapon' | 'armor';
+export type CrucibleUpgradeKind = 'weapon' | 'armor' | 'runecaster';
 export interface CrucibleUpgradeVerdict {
   kind: CrucibleUpgradeKind | null;
   blocked: string | null;
@@ -341,6 +341,36 @@ export function crucibleUpgradeVerdict(item: InventoryItem): CrucibleUpgradeVerd
     return (item.resistCapBonus ?? 0) >= 1
       ? { kind: 'armor', blocked: 'already carries an extra resist channel' }
       : { kind: 'armor', blocked: null };
+  }
+  // ⚠⚠⚠ OTA-1561 — A RUNE-CASTER IS UPGRADEABLE NOW, AND THE LINE BELOW IS WHY IT
+  // WAS NOT. Every non-coatable weapon collapsed into one refusal — "fires no
+  // edge to carry a coating" — which is TRUE, and was the whole answer, so 55
+  // rune-casters could be carried to the Crucible and turned away. The owner hit
+  // it twice with Earthshaker before naming the right answer: *"I don't want
+  // runecasters to have an edge ... they can be upgraded at the crucible, but it
+  // adds passive stats instead that improve with character stats."*
+  //
+  // ⚠ THE COATING REFUSAL SURVIVES for energy RANGED weapons — plasma throwers,
+  // beam casters — which genuinely have no channel of any kind. Only rune-casters
+  // get the new door, because only a rune-caster generates its own power, which
+  // is the whole reason it has no edge to paint in the first place.
+  const rcCatalog = findWeaponByName(item.name);
+  // ⚠ No uniqueStats check: a FUSED piece is a weapon / armor / dog vest by
+  // construction — the forge cannot mint a rune-caster — so there is no third
+  // case to miss here, and asking would be dead code that reads as coverage.
+  const isRunecaster = rcCatalog?.weaponKind === 'runecaster'
+    || canonicalItemTags(item).includes('runecaster');
+  if (isRunecaster) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const rp = require('./runecasterPassives') as typeof import('./runecasterPassives');
+    const cap = rp.runecasterPassiveSlots({
+      rarity: rcCatalog?.rarity ?? item.rarity,
+      tags: [...(item.tags ?? []), ...(rcCatalog?.tags ?? [])],
+    });
+    const worked = item.runePassives ?? 0;
+    return worked >= cap
+      ? { kind: 'runecaster', blocked: `already carries ${cap} worked-in passives — its limit` }
+      : { kind: 'runecaster', blocked: null };
   }
   // A real weapon that simply can't hold a coating — the common case behind the
   // vanishing WEAPONS section, and the one that most needs saying out loud.
