@@ -26115,6 +26115,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // logUiTap still records the flat string OTA-1553 built and OTA-1172's forensic
 // evidence stays greppable.
 export const OTA_BUILD_ID = '2026-08-30-1574-the-weapon-answers-the-sky';
+// golem catch-up 2026-08-30: markerless publish of OTA-1573 (one curer for all
+// three consume paths + the coating dice ladder, superseding part of OTA-1559)
+// and OTA-1574 (slice 3 — the weapon's own weather clause, finally read).
 // OTA-1574 (weapon-effects slice 3) — weather. 21 weapons talk about the sky
 // and none listened: the engine side already worked (weatherAttackPenalty,
 // weatherRepositionCost, resists), only the WEAPON's clause was unwired. Five
