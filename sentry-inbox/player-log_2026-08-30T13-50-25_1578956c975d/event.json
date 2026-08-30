@@ -1,0 +1,203 @@
+{
+  "id": "1578956c975d44ec92e7ea61147c8a9b",
+  "groupID": "7700811178",
+  "eventID": "1578956c975d44ec92e7ea61147c8a9b",
+  "projectID": "4511945117532160",
+  "size": 17927,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1568-one-string-two-fonts #mtfj7rmu3rzy [inline 21/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1568-one-string-two-fonts #mtfj7rmu3rzy [inline 21/28]",
+  "title": "player-log 2026-08-30-1568-one-string-two-fonts #mtfj7rmu3rzy [inline 21/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c86e5c6ab07a4b078342283aaf715740",
+      "span_id": "81bdd8c93b97c9b1",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "er's Scrapplate. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.242Z] [arbiter] The Arbiter eyes the Wanderer's Footwraps. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.242Z] [arbiter] The Arbiter eyes the Wanderer's Worn Gauntlets. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.242Z] [arbiter] The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.242Z] [arbiter] The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.242Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patch\u2026\"\n[2026-08-30T08:04:42.242Z] [arbiter] The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.242Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patch\u2026\"\n[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.243Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Pat\u2026\"\n",
+      "[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.243Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Pat\u2026\"\n",
+      "[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.243Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Pat\u2026\"\n",
+      "[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.243Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Pat\u2026\"\n",
+      "[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.243Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Pat\u2026\"\n",
+      "[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.243Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Pat\u2026\"\n",
+      "[2026-08-30T08:04:42.243Z] [arbiter] The Arbiter eyes the Reclaimer's Rope. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.244Z] [arbiter] The Arbiter eyes the Reclaimer's Rope. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.244Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Reclaimer's Rope. \"Short on stock: Patc\u2026\"\n[2026-08-30T08:04:42.244Z] [arbiter] The Arbiter eyes the Reclaimer's Salvage Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n",
+      "[2026-08-30T08:04:42.244Z] [arbiter] The Arbiter eyes the Reclaimer's Salvage Vest. \"Short on stock: Patched Cloth 3 short. Gather, then return.\"\n[2026-08-30T08:04:42.244Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Reclaimer's Salvage Vest. \"Short on sto\u2026\"\n[2026-08-30T08:04:54.468Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n",
+      "[2026-08-30T08:04:54.483Z] [debug] spawn: gear=[Golem-Bound Cloak, Plasma Dagger, Tartarian Bone Knife] window=10 roster=new\n[2026-08-30T08:04:54.485Z] [world] You walk east. The ground here looks much like the ground behind you. You have lost track of distance.\n",
+      "[2026-08-30T08:04:54.486Z] [world] Footsteps behind you the wrong way \u2014 too close, too fast. A Silt Thief peels out of a side passage, hand already in your line of sight where your coin-pouch hangs. They thought you'd sleep deeper than you did.\n[2026-08-30T08:04:54.489Z] [combat] Silt Thief closes \u2014 Quick Knife ready, 1D8 damage on a hit. (range: close)\n",
+      "[2026-08-30T08:04:54.497Z] [world] The thread you were following waits where you left it.\n[2026-08-30T08:04:56.736Z] [debug] ui: tap \"golem (52/52)\"\n[2026-08-30T08:04:56.754Z] [player] use golem\n[2026-08-30T08:04:56.754Z] [combat] Talus attacks Silt Thief \u2014 d20 9 + 3 = 12 vs AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:04:56.756Z] [combat] Talus lands 21 piercing damage on Silt Thief. (7 HP left)\n",
+      "[2026-08-30T08:04:56.757Z] [combat] Silt Thief retaliates \u2014 d20 10 + 5 hits Talus for 1 (35% resisted). (51/52)\n[2026-08-30T08:04:56.771Z] [combat] Silt Thief \u2014 d20 \u2192 17 + ATK 8 = 25 vs your AC 19 \u2014 \u2713 HIT\n[2026-08-30T08:04:56.955Z] [combat] Silt Thief deals 1 slashing damage. You have 22 HP remaining.\n[2026-08-30T08:04:58.002Z] [debug] ui: tap \"golem (51/52)\"\n",
+      "[2026-08-30T08:04:58.010Z] [player] use golem\n[2026-08-30T08:04:58.010Z] [combat] Talus attacks Silt Thief \u2014 d20 14 + 3 = 17 vs AC 10 \u2014 \u2713 HIT\n[2026-08-30T08:04:58.011Z] [combat] Talus lands 24 piercing damage on Silt Thief. (0 HP left)\n[2026-08-30T08:04:58.011Z] [world] Silt Thief crumbles under Talus's assault.\n",
+      "[2026-08-30T08:04:58.014Z] [reward] Silt Thief defeated. You recover Aether Residue, Patched Cloth \u00d72.\n[2026-08-30T08:04:58.016Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-08-30T08:04:58.016Z] [reward] +16 TC pried from the dust.\n",
+      "[2026-08-30T08:04:58.053Z] [arbiter] The Arbiter eyes your new pieces. \"You could make a Riveted Leather Vest now, if you wanted.\"\n[2026-08-30T08:05:01.319Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T08:05:02.822Z] [world] You claim the Plasma Dagger.\n[2026-08-30T08:05:02.823Z] [reward] \u2726 Plasma Dagger (Common).\n",
+      "[2026-08-30T08:05:02.838Z] [world] The Tartarian Bone Knife comes up out of the silt with a small sucking protest.\n[2026-08-30T08:05:02.838Z] [reward] \u2726 Tartarian Bone Knife (Common).\n[2026-08-30T08:05:02.840Z] [world] The Golem-Bound Cloak was half under something. It is not now.\n[2026-08-30T08:05:02.840Z] [reward] \u2726 Golem-Bound Cloak (Common).\n",
+      "[2026-08-30T08:05:03.173Z] [debug] persist sizes(KB): total=161 player=38 wm=38[rooms=11 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=3\n[2026-08-30T08:05:03.846Z] [world] You break the bedroll apart. Among the pieces, something worth keeping.\n[2026-08-30T08:05:03.846Z] [world] You salvage the cracked submerged giant statue. The take is small but real.\n",
+      "[2026-08-30T08:05:03.846Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:05:03.847Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-08-30T08:05:03.847Z] [reward]     \u2022 Stick (Common)\n[2026-08-30T08:05:05.221Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:05:07.355Z] [player] investigate the mud\n",
+      "[2026-08-30T08:05:07.355Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=rusted petrified mud wave range=- enemies=0 hooks=1\n[2026-08-30T08:05:07.357Z] [world] The rusted petrified mud wave reads as ordinary, which down here is a small kind of relief. You leave it be.\n[2026-08-30T08:05:07.464Z] [cognitive] SWIM  (105ms)\n",
+      "[2026-08-30T08:05:08.624Z] [player] investigate shallow pool\n[2026-08-30T08:05:08.625Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=1\n[2026-08-30T08:05:08.626Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n",
+      "[2026-08-30T08:05:08.776Z] [cognitive] SWIM  (147ms)\n[2026-08-30T08:05:10.048Z] [debug] ui: tap \"climb\"\n[2026-08-30T08:05:10.309Z] [debug] qwen\u23f1 investigate_lore ok 2757ms read 1342ms/write 1313ms in 131t\u2192out 42t 10.2ms/t (183ch)\n[2026-08-30T08:05:11.547Z] [debug] qwen\u23f1 investigate_lore ok 2638ms wait 1494ms read 304ms/write 787ms in 126t\u2192out 25t 2.4ms/t (108ch)\n",
+      "[2026-08-30T08:05:11.548Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n4 avg2.7s max2.8s read0.9s/write1.0s in127t\u2192out31t ms/tok 2.3-12.0 wait0.8s | narration:scene_intro_fill n3 avg8.5s max9.0s read7.3s/write1.1s \u26a01unusable in728t\u2192out22t ms/tok 9.1-10.8 cap2 \u23f81 \u27022/16.4s | item_synthesis_hw n2 avg4.7s max4.8s read3.5s/write1.1s in334t\u2192out35t ms/tok 10.5-10.5 | ambient n1 avg5.4s max5.4s \u26a01unusable in3",
+      "64t\u2192out31t cap1 \u27021/5.4s || WASTED 3 calls / 21.8s\n[2026-08-30T08:05:11.904Z] [player] climb cracked submerged giant statue\n[2026-08-30T08:05:11.904Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked submerged giant statue resolved=cracked submerged giant statue range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:05:11.936Z] [world] You loop your Reclaimer's Rope around the cracked submerged giant statue and walk the line. Tier 1/3 cleared.\n[2026-08-30T08:05:11.936Z] [world] You reach the first hold of the cracked submerged giant statue (tier 1/3). Higher still to go.\n[2026-08-30T08:05:11.936Z] [world] Wedged in a seam at your tier: a wax-sealed satchel someone meant to come back for.\n",
+      "[2026-08-30T08:05:11.937Z] [world] Talus sets its stone feet at the base of cracked submerged giant statue and will climb no further \u2014 the construct holds the ground while you go up alone.\n[2026-08-30T08:05:11.938Z] [system] \u23f3 Time passed: 30 min\n[2026-08-30T08:05:12.068Z] [cognitive] CLIMB  (125ms)\n[2026-08-30T08:05:13.672Z] [debug] ui: tap \"climb up (1/3)\"\n",
+      "[2026-08-30T08:05:13.726Z] [player] climb cracked submerged giant statue\n[2026-08-30T08:05:13.727Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked submerged giant statue resolved=cracked submerged giant statue range=- enemies=0 hooks=1\n[2026-08-30T08:05:13.772Z] [world] You loop your Reclaimer's Rope around the cracked submerged giant statue and walk the line. Tier 2/3 cleared.\n",
+      "[2026-08-30T08:05:13.773Z] [world] You reach the last stretch of the cracked submerged giant statue (tier 2/3). Higher still to go.\n[2026-08-30T08:05:13.774Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n[2026-08-30T08:05:13.774Z] [arbiter] The Arbiter looks around. \"The watch-bell is rung at dusk whether anyone is watching or not. Especially then.\"\n",
+      "[2026-08-30T08:05:13.774Z] [system] \u23f3 Time passed: 30 min\n[2026-08-30T08:05:13.775Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-08-30T08:05:13.942Z] [cognitive] CLIMB  (166ms)\n[2026-08-30T08:05:14.606Z] [debug] ui: tap \"climb up (2/3)\"\n[2026-08-30T08:05:14.663Z] [player] climb cracked submerged giant statue\n",
+      "[2026-08-30T08:05:14.663Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked submerged giant statue resolved=cracked submerged giant statue range=- enemies=0 hooks=1\n[2026-08-30T08:05:14.709Z] [world] You loop your Reclaimer's Rope around the cracked submerged giant statue and walk the line. Tier 3/3 cleared.\n",
+      "[2026-08-30T08:05:14.709Z] [world] You reach the top of the cracked submerged giant statue (tier 3/3). The view changes; the room reads differently from here.\n[2026-08-30T08:05:14.710Z] [reward] \u2726 Aetheric Cloth (Rare) \u2014 tucked into a crack at the top of the cracked submerged giant statue.\n",
+      "[2026-08-30T08:05:14.711Z] [world] An old pilgrim sits cross-legged, palms up to the sky. They don't open their eyes as you arrive. \"Sit. I won't make you stay long. I have something you should know before the Aether tells you the harder way.\"\n[2026-08-30T08:05:14.711Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-30T08:05:14.712Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-30T08:05:14.851Z] [cognitive] CLIMB  (138ms)\n[2026-08-30T08:05:17.274Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T08:05:18.965Z] [debug] qwen\u23f1 ambient ok 6919ms read 3834ms/write 1083ms in 364t\u2192out 31t 10.5ms/t HIT-CAP (172ch)\n[2026-08-30T08:05:19.060Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 6919ms \u2014 ambient:stale:log-moved-on\n",
+      "[2026-08-30T08:05:19.060Z] [debug] arbiter: ambient stale:log-moved-on 7123ms\n[2026-08-30T08:05:19.060Z] [debug] arbiter: ambient-empty reason=unknown raw=\"You, the ancient companion, have traversed countless miles through the bustling streets of the Borderlands. Your journey\"\n[2026-08-30T08:05:20.730Z] [world] You strip the prayer beads carefully. Something usable comes free in your hand.\n",
+      "[2026-08-30T08:05:20.730Z] [world] You strip the walking-staff carefully. Something usable comes free in your hand.\n[2026-08-30T08:05:20.731Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:05:20.731Z] [reward]     \u2022 Worn Tartarian Coin (Common)\n[2026-08-30T08:05:20.732Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-08-30T08:05:22.193Z] [player] investigate pilgrim\n",
+      "[2026-08-30T08:05:22.194Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pilgrim resolved=pilgrim range=- enemies=0 hooks=1\n[2026-08-30T08:05:22.194Z] [debug] route: hook intercept (kind=whisper_crystal, target=\"pilgrim\") \u2014 original intent=investigate\n",
+      "[2026-08-30T08:05:22.195Z] [world] \u2605 STORY THREAD (step 1) \u2014 You lean toward the crystal. The whispering shapes itself \u2014 Tartarian, you think, though no language you can name. It is saying a location.\n[2026-08-30T08:05:23.396Z] [world] \u2605 STORY THREAD (step 2) \u2014 You pry the crystal loose. The whispering stops \u2014 but the direction it gave you stays.\n",
+      "[2026-08-30T08:05:23.397Z] [reward] \u2726 Aether Crystal.\n[2026-08-30T08:05:24.242Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You stand at the place the crystal indicated. The whispering crystal in your pack warms once and goes still.\n[2026-08-30T08:05:27.244Z] [debug] ui: tap \"climb down\"\n[2026-08-30T08:05:27.266Z] [player] climb down\n",
+      "[2026-08-30T08:05:27.267Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-30T08:05:27.268Z] [world] You climb down from the pilgrim's perch and rejoin the ground beside the cracked submerged giant statue. Boots back on the ground.\n[2026-08-30T08:05:27.269Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-30T08:05:27.385Z] [cognitive] CLIMB  (116ms)\n[2026-08-30T08:05:27.633Z] [debug] persist sizes(KB): total=169 player=39 wm=46[rooms=19 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=3\n[2026-08-30T08:05:28.360Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:05:30.064Z] [world] Iron fog disorients you. Compasses spin; intent costs more.\n",
+      "[2026-08-30T08:05:30.078Z] [player] investigate the mud\n[2026-08-30T08:05:30.079Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=rusted petrified mud wave range=- enemies=0 hooks=1\n[2026-08-30T08:05:30.080Z] [world] You've already examined the mud. There's nothing more to find here.\n[2026-08-30T08:05:30.190Z] [cognitive] SWIM  (109ms)\n",
+      "[2026-08-30T08:05:31.077Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:05:32.443Z] [player] investigate the mud\n[2026-08-30T08:05:32.444Z] [debug] "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1568-one-string-two-fonts #mtfj7rmu3rzy [inline 21/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfj7rmu3rzy"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "21"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T13:50:24.940139Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T13:50:25.430000Z",
+  "fingerprints": [
+    "e1071513e990170768dca90bece93c8f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "20441a1f4dd24ebdaf81a7de04d27492",
+  "previousEventID": "0c33779e0d0d43c5b06028f79f290ac6"
+}

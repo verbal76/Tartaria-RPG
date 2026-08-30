@@ -1,0 +1,200 @@
+{
+  "id": "753a1a0641b1484fa98724f44ac92579",
+  "groupID": "7700811178",
+  "eventID": "753a1a0641b1484fa98724f44ac92579",
+  "projectID": "4511945117532160",
+  "size": 17887,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1568-one-string-two-fonts #mtfj7rmu3rzy [inline 10/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1568-one-string-two-fonts #mtfj7rmu3rzy [inline 10/28]",
+  "title": "player-log 2026-08-30-1568-one-string-two-fonts #mtfj7rmu3rzy [inline 10/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c86e5c6ab07a4b078342283aaf715740",
+      "span_id": "81bdd8c93b97c9b1",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "inst the mud. The Guild plays long odds on purpose.\"\n[2026-08-29T23:44:46.871Z] [system] \u23f3 Time passed: 24 min\n[2026-08-29T23:44:46.955Z] [cognitive] SWIM  (83ms)\n[2026-08-29T23:44:48.125Z] [player] investigate shelf\n[2026-08-29T23:44:48.126Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shelf resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-29T23:44:48.127Z] [world] \u2605 A QUIET MOMENT \u2014 A small wooden box, no lid, no nails. Inside: a single dry rose, brown to black. Someone meant to come back for it.\n[2026-08-29T23:44:48.128Z] [system] \u23f3 Time passed: 15 min\n[2026-08-29T23:44:48.206Z] [cognitive] neutral  (76ms)\n[2026-08-29T23:44:52.622Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:44:55.060Z] [player] investigate the mud\n",
+      "[2026-08-29T23:44:55.061Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n[2026-08-29T23:44:55.065Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-08-29T23:44:55.073Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-29T23:44:55.074Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-29T23:44:55.153Z] [cognitive] SWIM  (78ms)\n[2026-08-29T23:45:05.364Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=-\n[2026-08-29T23:45:05.558Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=live winH=986 beat=-\n[2026-08-29T23:45:05.633Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n",
+      "[2026-08-29T23:45:11.485Z] [player] take the single dry roads\n[2026-08-29T23:45:11.486Z] [debug] parser: intent=pickup conf=1.00 verb=take target=single dry roads resolved=- range=- enemies=0 hooks=0\n[2026-08-29T23:45:11.487Z] [world] The ground here is bare. Nothing to pick up.\n[2026-08-29T23:45:11.657Z] [cognitive] TRAVEL  (166ms)\n",
+      "[2026-08-29T23:45:15.128Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-\n[2026-08-29T23:45:15.286Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:45:15.421Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n",
+      "[2026-08-29T23:45:18.279Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-29T23:45:23.306Z] [player] when I typed in take the single dry rows there was no text box\n[2026-08-29T23:45:23.307Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rub",
+      "ble', 'go east', 'attack the figure'.\"\n[2026-08-29T23:45:23.309Z] [debug] meta-comment guard: skipped intent parse (engine-vocabulary: \"text box\") on 62-char input\n[2026-08-29T23:45:24.964Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 6598ms read 0ms/write 0ms in 738t\u2192out 0t (0ch)\n[2026-08-29T23:45:25.069Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6598ms \u2014 intro-fill:\u2205\n",
+      "[2026-08-29T23:45:25.070Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2205 6797ms\n[2026-08-29T23:45:26.357Z] [debug] ui: tap \"\u2193 Storage\"\n[2026-08-29T23:45:26.361Z] [world] You step into the storage.\n[2026-08-29T23:45:26.361Z] [world] Shelves run the length of the wall, stacked with bottles, tins and sacking. Whatever was worth keeping was kept here, and most of it is still keeping.\n",
+      "[2026-08-29T23:45:27.941Z] [debug] ui: tap \"take / salvage\"\n[2026-08-29T23:45:29.167Z] [world] You lever something loose from the bottles \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-29T23:45:29.168Z] [world] You salvage the sacking. The take is small but real.\n[2026-08-29T23:45:29.174Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-29T23:45:29.174Z] [reward]     \u2022 Coiled Snare Thread (Common)\n[2026-08-29T23:45:29.175Z] [reward]     \u2022 Cloth Scrap x3 (Common)\n[2026-08-29T23:45:30.275Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:45:31.855Z] [player] investigate the mud\n[2026-08-29T23:45:31.856Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-29T23:45:31.859Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-29T23:45:31.866Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-29T23:45:31.866Z] [arbiter] The Arbiter looks around. \"The tally-board lists marked ruins in grease-pencil: DUG, DIGGING, DEEP, LATER. 'Later' is doing heavy work.\"\n",
+      "[2026-08-29T23:45:31.866Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-29T23:45:31.867Z] [system] \u23f3 Time passed: 24 min\n[2026-08-29T23:45:31.944Z] [cognitive] SWIM  (76ms)\n[2026-08-29T23:45:32.170Z] [debug] persist sizes(KB): total=142 player=26 wm=34[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=2\n[2026-08-29T23:45:33.094Z] [player] investigate shelves\n",
+      "[2026-08-29T23:45:33.100Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shelves resolved=shelves range=- enemies=0 hooks=0\n[2026-08-29T23:45:33.101Z] [world] Empty hooks and dust marks where things used to rest. The shelf remembers what was taken; you do not.\n[2026-08-29T23:45:33.102Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-29T23:45:33.198Z] [cognitive] neutral  (94ms)\n[2026-08-29T23:45:34.333Z] [player] investigate tins\n[2026-08-29T23:45:34.334Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tins resolved=tins range=- enemies=0 hooks=0\n[2026-08-29T23:45:34.335Z] [world] The tins reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.\n",
+      "[2026-08-29T23:45:34.336Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-29T23:45:35.375Z] [debug] qwen\u23f1 investigate_lore ok 2189ms read/write unusable (native mis-reported 16096ms/891ms \u2014 llama.rn split bug, not this call) in 126t\u2192out 28t (138ch)\n[2026-08-29T23:45:35.524Z] [cognitive] neutral  (1187ms)\n[2026-08-29T23:45:35.602Z] [player] investigate shelf\n",
+      "[2026-08-29T23:45:35.602Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shelf resolved=- range=- enemies=0 hooks=0\n[2026-08-29T23:45:35.603Z] [world] You find a small purse forgotten in the shelf.\n[2026-08-29T23:45:35.603Z] [reward] +7 TC.\n[2026-08-29T23:45:35.603Z] [system] \u23f3 Time passed: 15 min\n[2026-08-29T23:45:35.684Z] [cognitive] neutral  (79ms)\n",
+      "[2026-08-29T23:45:36.686Z] [debug] qwen\u23f1 investigate_lore ok 2244ms wait 1082ms read 350ms/write 796ms in 127t\u2192out 25t 2.8ms/t (101ch)\n[2026-08-29T23:45:46.409Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:45:47.916Z] [player] investigate the mud\n[2026-08-29T23:45:47.917Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-29T23:45:47.919Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-29T23:45:47.927Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-29T23:45:47.928Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-29T23:45:47.928Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-29T23:45:47.928Z] [system] \u23f3 Time passed: 24 min\n[2026-08-29T23:45:48.086Z] [cognitive] SWIM  (154ms)\n[2026-08-29T23:45:49.111Z] [debug] ui: tap \"\u2193 Cellar\"\n[2026-08-29T23:45:49.114Z] [world] You step into the hidden cellar.\n[2026-08-29T23:45:49.115Z] [world] Beneath the lifted boards, a ladder drops into a cramped stone cellar. Whoever dug it did not want it found.\n",
+      "[2026-08-29T23:45:50.211Z] [debug] ui: tap \"take / salvage\"\n[2026-08-29T23:45:51.384Z] [world] You break the crate apart. Among the pieces, something worth keeping.\n[2026-08-29T23:45:51.384Z] [world] You salvage the strongbox. The take is small but real.\n[2026-08-29T23:45:51.385Z] [reward] \u2726 Salvage haul:\n[2026-08-29T23:45:51.385Z] [reward]     \u2022 Worn Tartarian Coin x7 (Common)\n",
+      "[2026-08-29T23:45:51.386Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-29T23:45:52.461Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:45:53.936Z] [player] investigate the mud\n[2026-08-29T23:45:53.937Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-29T23:45:53.946Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Mud Fragment (Common).\n[2026-08-29T23:45:53.951Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-29T23:45:53.952Z] [system] \u23f3 Time passed: 24 min\n[2026-08-29T23:45:54.025Z] [cognitive] SWIM  (73ms)\n[2026-08-29T23:45:55.203Z] [player] investigate ladder\n",
+      "[2026-08-29T23:45:55.204Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ladder resolved=ladder range=- enemies=0 hooks=0\n[2026-08-29T23:45:55.205Z] [world] The ladder reads as ordinary, which down here is a small kind of relief. You leave it be.\n[2026-08-29T23:45:55.292Z] [cognitive] neutral  (85ms)\n",
+      "[2026-08-29T23:45:55.393Z] [debug] persist sizes(KB): total=142 player=26 wm=35[rooms=9 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n[2026-08-29T23:45:56.471Z] [player] investigate shelf\n[2026-08-29T23:45:56.472Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shelf resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-29T23:45:56.473Z] [world] \u2605 STORY THREAD \u2014 You comb the shelf. The silt parts on something the Arbiter would call worth following.\n[2026-08-29T23:45:56.473Z] [world] One shelf of books doesn't match the others \u2014 same spines, no dust, and they don't quite sit flush against the wall.\n[2026-08-29T23:45:56.474Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-29T23:45:56.579Z] [cognitive] neutral  (103ms)\n[2026-08-29T23:45:57.321Z] [debug] qwen\u23f1 investigate_lore ok 2035ms read 271ms/write 1733ms in 126t\u2192out 46t 2.2ms/t (205ch)\n[2026-08-29T23:46:03.332Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-29T23:46:10.980Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n",
+      "[2026-08-29T23:46:11.263Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n[2026-08-29T23:46:13.645Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10215ms read 8728ms/write 1445ms in 736t\u2192out 33t 11.9ms/t HIT-CAP (149ch)\n[2026-08-29T23:46:13.736Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2713 10407ms\n",
+      "[2026-08-29T23:46:16.662Z] [player] pull the book that doesn't match\n[2026-08-29T23:46:16.662Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n",
+      "[2026-08-29T23:46:16.666Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n[2026-08-29T23:46:16.666Z] [debug] meta-comment guard: skipped intent parse (report-of-behaviour: \"that doesn't match\") on 32-char input\n[2026-08-29T23:46:28.498Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-\n",
+      "[2026-08-29T23:46:28.657Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:46:28.729Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:46:32.866Z] [player] investigate the books that don't match\n",
+      "[2026-08-29T23:46:32.867Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-29T23:46:32.867Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n",
+      "[2026-08-29T23:46:32.867Z] [debug] meta-comment guard: skipped intent parse (report-of-behaviour: \"that don't match\") on 38-char input\n[2026-08-29T23:46:36.882Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:46:38.887Z] [player] investigate the mud\n[2026-08-29T23:46:38.893Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-29T23:46:38.899Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-29T23:46:38.908Z] [system] \u23f3 Time passed: 24 min\n[2026-08-29T23:46:38.985Z] [cognitive] SWIM  (76ms)\n[2026-08-29T23:46:40.931Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:46:43.032Z] [player] investigate the mud\n",
+      "[2026-08-29T23:46:43.033Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=1\n[2026-08-29T23:46:43.034Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-29T23:46:43.040Z] [system] \u23f3 Time passed: 24 min\n[2026-08-29T23:46:43.122Z] [cognitive] SWIM  (81ms)\n",
+      "[2026-08-29T23:46:44.251Z] [debug] qwen\u23f1 ambient ok 5205ms read 2656ms/write 1093ms in 363t\u2192out 31t 7.3ms/t HIT-CAP (155ch)\n[2026-08-29T23:46:44.322Z] [arbiter] You have traversed countless realms, each one more stunning than the last, and today's journey has only brought you closer to your destiny.\n[2026-08-29T23:46:44.322Z] [debug] arbiter: ambient \u2713 5415ms\n",
+      "[2026-08-29T23:46:44.322Z] [debug] arbiter: ambient-said \"You have traversed countless realms, each one more stunning than the last, and today's journey has only brought you closer to your destiny.\"\n[2026-08-29T23:46:44.414Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n",
+      "[2026-08-29T23:46:44.581Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:46:44.668Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-29T23:46:47.127Z] [debug] voice\u23f1 gap 4105ms (wait 0ms + synth 2810ms, live) \"You have traversed countless realms, eac\u2026\"\n",
+      "[2026-08-29T23:46:53.387Z] [debug] homework: intro-fill armed after 10298ms idle\n[2026-08-29T23:47:04.232Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10760ms read 9302ms/write 1414ms in 742t\u2192out 26t 12.5ms/t (126ch)\n",
+      "[2026-08-29T23:47:04.233Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n5 avg2.2s max2.2s read0.3s/write1.1s \u26a02unusable in126t\u2192out30t ms/tok 2.2-2.8 | narration:scene_intro_fill n4 avg8.9s max10.8s read9.0s/write1.4s \u26a02unusable in739t\u2192out15t ms/tok 11.9-12.5 cap1 \u23f82 \u27022/14.5s | ambient n1 avg5.2s max5.2s read2.7s/write1.1s in363t\u2192out31t ms/tok 7.3-7.3 cap1 || WASTED 2 calls / 14.5s\n",
+      "[2026-08-29T23:47:04.327Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2713 10941ms\n[2026-08-29T23:47:05.023Z] [player] when I typed in pull the book that does not match. there was no text bar. I also think I'm in the investigate mud forever problem\n",
+      "[2026-08-29T23:47:05.024Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-29T23:47:05.024Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n",
+      "[2026-08-29T23:47:05.024Z] [debug] m"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1568-one-string-two-fonts #mtfj7rmu3rzy [inline 10/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfj7rmu3rzy"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "10"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T13:50:24.693834Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T13:50:25.428000Z",
+  "fingerprints": [
+    "e1071513e990170768dca90bece93c8f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "838b2fa682764cf7a9cad00f9efd9dfe",
+  "previousEventID": "5bf83c63fa0847a49a76a0e937f8ed80"
+}
