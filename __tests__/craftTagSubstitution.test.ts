@@ -151,7 +151,14 @@ describe('OTA-193 — substitution preview lists what will be consumed', () => {
     const inv: InventoryItem[] = [material('Stick', 1), inferred('Brass Sextant', 'metal')];
     const subs = previewCraftSubstitutions(IRON_SPEAR, inv);
     expect(subs).toHaveLength(1);
-    expect(subs[0]).toEqual({ ingredient: 'Scrap Metal', substitute: 'Brass Sextant', quantity: 1 });
+    // ⚠ OTA-1552 — the preview now also carries the substitute's INSTANCE ID.
+    // It always knew which row it was about to drain (it keys its allocation map
+    // by item.id); it just threw the identity away, which is why nothing
+    // downstream could offer "save THAT stack." `toMatchObject` keeps this
+    // assertion about what OTA-193 is for — the ingredient/substitute/quantity
+    // mapping — while the id is pinned in ota1552 where it belongs.
+    expect(subs[0]).toMatchObject({ ingredient: 'Scrap Metal', substitute: 'Brass Sextant', quantity: 1 });
+    expect(subs[0]!.id).toBe('inf_brass_sextant');
   });
 
   it('does NOT preview a substitution when the canonical material covers it', () => {

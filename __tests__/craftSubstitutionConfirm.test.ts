@@ -37,10 +37,24 @@ async function boot(name: string) {
 
 // Acid Flask = Aether Dust ×1 + Scrap Metal ×1. We supply Aether Dust by name
 // and a metal-tagged misc piece that substitutes for the Scrap Metal.
+//
+// ⚠⚠ OTA-1552 — THE SUBSTITUTE CHANGED, AND THE REASON MATTERS. This suite used
+// to hand the craft a "Scrap Bracket": a name with no catalog row, i.e. exactly
+// the CATALOG-ABSENT CURIOSITY the Fusing Crucible eats. Under OTA-1552 a craft
+// about to strip forge-grade material raises the CRUCIBLE GUARD instead of this
+// prompt — a strictly better question, because it names the material as Crucible
+// stock and offers to set it aside rather than only asking yes/no. So the old
+// fixture would now be exercising the new path while claiming to test this one.
+//
+// A Bent Nail is the honest fixture for OTA-439: a real catalog material
+// (Common; tags metal/junk/scrap; no `loot` tag), so it substitutes for Scrap
+// Metal exactly as the Bracket did but is NOT forge-reservable. The interaction
+// between the two prompts is pinned in ota1552 rather than left to be
+// rediscovered by whoever changes one of them next.
 function loadout(): InventoryItem[] {
   return [
     { id: 'dust1', name: 'Aether Dust', kind: 'misc', quantity: 1, tags: [] },
-    { id: 'bracket1', name: 'Scrap Bracket', kind: 'misc', quantity: 1, tags: ['metal'] },
+    { id: 'bracket1', name: 'Bent Nail', kind: 'misc', quantity: 1, tags: ['metal'] },
   ];
 }
 
@@ -56,7 +70,10 @@ describe('OTA-439 — craft substitution confirmation', () => {
     const prompt = store.getState().craftSubstitutionPrompt;
     expect(prompt).not.toBeNull();
     expect(prompt!.recipeResult).toBe('Acid Flask');
-    expect(prompt!.subsList).toMatch(/Scrap Bracket → Scrap Metal/);
+    expect(prompt!.subsList).toMatch(/Bent Nail → Scrap Metal/);
+    // …and the Crucible guard stayed out of it, because a Bent Nail is not
+    // forge stock. Only one of the two prompts may ever be standing at once.
+    expect(store.getState().crucibleGuardPrompt).toBeNull();
     const inv = store.getState().player!.inventory;
     expect(inv.some((i) => i.name === 'Acid Flask')).toBe(false); // not crafted yet
     expect(inv.some((i) => i.id === 'bracket1')).toBe(true);       // substitute intact

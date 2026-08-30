@@ -312,6 +312,15 @@ import { createBootSlice } from './slices/bootSlice';
 import { createVendorSlice } from './slices/vendorSlice';
 import { createCraftingSlice } from './slices/craftingSlice';
 import { createInventorySlice } from './slices/inventorySlice';
+// OTA-1552 — the Crucible guard's vocabulary. Type-only: the predicate itself is
+// required lazily at the two call sites, same as every other engine module the
+// store reaches for mid-session.
+import type {
+  CrucibleGuardPrompt,
+  CrucibleGuardMode,
+  RepairOpts,
+  RepairVerdict,
+} from '../engine/crucibleGuard';
 import { createQuestSlice } from './slices/questSlice';
 import { createBoardSlice } from './slices/boardSlice';
 import { setLastBootBreadcrumb } from '../diagnostics/runtimePressure'; // OTA-1276
@@ -7677,6 +7686,17 @@ export interface GameStore {
   confirmCraftSubstitution: () => void;
   /** Dismiss the substitution prompt without crafting. */
   cancelCraftSubstitution: () => void;
+  /** ⚠⚠⚠ OTA-1552 — THE CRUCIBLE GUARD. Set when a repair or a craft is about to
+   *  spend material the Fusing Crucible would have accepted and the player has
+   *  not said it may. Non-null holds the job: nothing is consumed and nothing is
+   *  mended until resolveCrucibleGuard answers. See engine/crucibleGuard.ts for
+   *  the defect this closes (the owner's REPAIR ALL ate eight curiosities he had
+   *  been hoarding for the forge, silently, in one tap). */
+  crucibleGuardPrompt: CrucibleGuardPrompt | null;
+  /** One-shot latch, mirroring craftSubConfirmedFor: set by resolveCrucibleGuard
+   *  so the re-dispatched CRAFT skips the guard it just answered. Cleared the
+   *  moment it is consumed. */
+  crucibleGuardAllowedFor: string | null;
   /** arb142 — a "you just got something notable" reveal overlay. Used for the
    *  first-time pickup of a collectible (so the player learns the Collectibles
    *  screen exists) and for a Crucible-forged weapon (so the new item's NAME is
@@ -7726,7 +7746,18 @@ export interface GameStore {
    *  No-ops with a refusal Arbiter line if the item isn't found,
    *  isn't durability-tracked, is already at full durability, or
    *  the player doesn't have the materials in inventory. */
-  repairInventoryItem: (itemId: string) => void;
+  repairInventoryItem: (itemId: string, opts?: RepairOpts) => RepairVerdict;
+  /** ⚠ OTA-1552 — repair a LIST of pieces as one job. REPAIR ALL and the repair
+   *  group used to loop `repairInventoryItem` from the screen, which meant the
+   *  Crucible guard would have had to raise (and be answered) once per piece.
+   *  Running the batch here lets the guard stop the whole run, keep the rest of
+   *  the queue, and resume it on "spend it". */
+  repairInventoryItems: (itemIds: readonly string[], opts?: RepairOpts) => void;
+  /** ⚠ OTA-1552 — answer the Crucible guard. 'save-all' reserves every listed
+   *  stack, 'save' reserves the ticked ones, 'spend' proceeds and burns them,
+   *  'cancel' walks away. Saving deliberately does NOT resume the job — see the
+   *  resolver for why. */
+  resolveCrucibleGuard: (mode: CrucibleGuardMode, ids?: readonly string[]) => void;
 
   bootCognitive: () => Promise<void>;
   shutdownCognitive: () => Promise<void>;
@@ -8001,6 +8032,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   craftSubstitutionPrompt: null,
   craftSubConfirmedFor: null,
+  // OTA-1552 — the Crucible guard starts silent; it is raised only by a repair
+  // or craft that is genuinely about to spend forge-grade material.
+  crucibleGuardPrompt: null,
+  crucibleGuardAllowedFor: null,
   discoveryReveal: null,
   dismissDiscoveryReveal() {
     set({ discoveryReveal: null });
@@ -21485,6 +21520,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         // OTA-193 — narrate any substitutions so the player understands
         // why their "Brass Sextant" disappeared in service of a craft.
+        // ⚠⚠⚠ OTA-1552 — THE CRUCIBLE GUARD ON THE CRAFT DOOR. Craft already had
+        // a confirm (OTA-439, below) and repair had none, which is why the
+        // owner's loss came through REPAIR ALL — but the craft confirm asks the
+        // wrong question. "Strip these for parts?" reads as a question about
+        // junk, because for almost every substitution it IS about junk. It never
+        // said that some of what it was about to strip is exactly the material
+        // the Fusing Crucible eats, and it offered no way to save it. So when
+        // forge-grade stock is in the pile, this raises the specific question
+        // INSTEAD of the generic one, and the answer can set it aside.
+        //
+        // ⚠ The latch mirrors craftSubConfirmedFor exactly: one-shot, cleared on
+        // use, so the re-dispatched craft after a "spend it" walks straight past
+        // both prompts rather than asking again forever.
+        if (get().crucibleGuardAllowedFor === recipe.result) {
+          set({ crucibleGuardAllowedFor: null });
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const guard = require('../engine/crucibleGuard') as typeof import('../engine/crucibleGuard');
+          const atRisk = guard.crucibleAtRisk(recipe.ingredients, player.inventory);
+          if (atRisk.length > 0) {
+            get().appendLog('arbiter', guard.crucibleWarningLine(atRisk, `the ${recipe.result}`));
+            set({
+              crucibleGuardPrompt: {
+                action: 'craft',
+                label: recipe.result,
+                queue: [],
+                recipeResult: recipe.result,
+                atRisk,
+                allow: [],
+              },
+            });
+            break;
+          }
+        }
         const subs = previewCraftSubstitutions(recipe, player.inventory);
         if (subs.length > 0) {
           const list = subs.map((s) =>

@@ -46,6 +46,15 @@ import { rollAreaSearch } from '../../engine/areaSearch';
 import { rollSalvagePool } from '../../engine/salvagePools';
 import { scaledHealHP } from '../../engine/itemEffect';
 import { pickFragmentForBiome } from '../../engine/collectables';
+// ⚠ OTA-1552 — the Crucible guard. A real runtime import: crucibleGuard is a leaf
+// that sits ABOVE crafting and itemFusion and is imported by neither, so it
+// cannot form a cycle back into this file.
+import { crucibleAtRisk, crucibleWarningLine } from '../../engine/crucibleGuard';
+import type {
+  CrucibleGuardMode,
+  RepairOpts,
+  RepairVerdict,
+} from '../../engine/crucibleGuard';
 
 /**
  * ⚠ `import type * as` is fully erased at compile time, so this is NOT a runtime
@@ -75,7 +84,9 @@ export interface InventorySlice {
   applyCoating: (coatingItemId: string, weaponId: string, replaceSlot?: 'coating' | 'coating2') => void;
   applyCoatingToArmor: (coatingItemId: string, armorId: string, replaceResist?: string) => void;
   scrapInventoryItem: (itemName: string, itemId?: string) => void;
-  repairInventoryItem: (itemId: string) => void;
+  repairInventoryItem: (itemId: string, opts?: RepairOpts) => RepairVerdict;
+  repairInventoryItems: (itemIds: readonly string[], opts?: RepairOpts) => void;
+  resolveCrucibleGuard: (mode: CrucibleGuardMode, ids?: readonly string[]) => void;
   salvageAllAmbient: (nouns: readonly string[]) => void;
 }
 
@@ -1004,17 +1015,17 @@ export const createInventorySlice = (
     void get().persist();
   },
 
-  repairInventoryItem(itemId) {
+  repairInventoryItem(itemId, opts) {
     const player = get().player;
-    if (!player) return;
+    if (!player) return 'refused';
     const item = player.inventory.find((i) => i.id === itemId);
     if (!item) {
       get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see that piece on you anymore."`);
-      return;
+      return 'refused';
     }
     if (!item.durability) {
       get().appendLog('arbiter', `The Arbiter taps the ${item.name}. "Nothing to repair — this one doesn't wear."`);
-      return;
+      return 'refused';
     }
     // Use the coated display name in every line so a repaired coated weapon
     // reads as itself ("Acid-Etched Rusty Shortbow") — the coating survives the
@@ -1023,12 +1034,12 @@ export const createInventorySlice = (
     const display = require('../../engine/weaponCoating').coatedDisplayName(item) as string;
     if (item.durability.current >= item.durability.max) {
       get().appendLog('arbiter', `The Arbiter looks the ${display} over. "Already whole. Don't waste materials."`);
-      return;
+      return 'refused';
     }
     const cost = repairCostMaterials(item);
     if (cost.length === 0) {
       get().appendLog('arbiter', `The Arbiter taps the ${display}. "No recipe to mend this one. Sell it on or scrap for parts."`);
-      return;
+      return 'refused';
     }
     // OTA-205 — substitution-aware shortage check. Previously the
     // repair handler required exact-name matches on the cost list
@@ -1046,7 +1057,38 @@ export const createInventorySlice = (
         'arbiter',
         `The Arbiter eyes the ${display}. "Short on stock: ${shortages.join(', ')}. Gather, then return."`,
       );
-      return;
+      return 'refused';
+    }
+    // ⚠⚠⚠ OTA-1552 — THE CRUCIBLE GUARD, AND IT SITS EXACTLY HERE ON PURPOSE.
+    //
+    // Everything above this line is the repair deciding it CAN pay. Everything
+    // below it spends. Between the two there was nothing at all — the narration
+    // three lines down ("Patched in: …") describes the drain, it does not gate
+    // it, so a REPAIR ALL walked eight of the owner's hoarded curiosities into a
+    // boot in a single tap and told him about it afterwards, in the past tense.
+    //
+    // He is right that this is a safeguard bug and not a player mistake: SELL
+    // warns, GIFT refuses outright, FUSE asks — repair, alone, and in bulk, did
+    // not. So the drain stops here and asks, and because a warning you cannot
+    // act on is only a slower way to lose the item, the answer includes SAVING
+    // it (see resolveCrucibleGuard).
+    //
+    // ⚠ NOTHING HAS BEEN CONSUMED AT THIS POINT and nothing has been mended.
+    // The verdict 'crucible' says so, and repairInventoryItems relies on it to
+    // hold the rest of the queue rather than plough on through it.
+    const atRisk = crucibleAtRisk(cost, player.inventory, new Set(opts?.allowIds ?? []));
+    if (atRisk.length > 0) {
+      get().appendLog('arbiter', crucibleWarningLine(atRisk, `the ${display}`));
+      set({
+        crucibleGuardPrompt: {
+          action: 'repair',
+          label: display,
+          queue: [itemId],
+          atRisk,
+          allow: [...(opts?.allowIds ?? [])],
+        },
+      });
+      return 'crucible';
     }
     // Narrate substitutions BEFORE the drain so the player understands
     // why their Cloth Scrap disappeared in service of the repair.
@@ -1076,6 +1118,97 @@ export const createInventorySlice = (
     const costSummary = cost.map((c) => c.quantity > 1 ? `${c.name} x${c.quantity}` : c.name).join(', ');
     get().appendLog('world', `You repair the ${display}. Back to full. (spent: ${costSummary})`);
     void get().persist();
+    return 'done';
+  },
+
+  /** ⚠⚠ OTA-1552 — REPAIR ALL AND THE REPAIR GROUP RUN THROUGH HERE NOW.
+   *
+   *  They used to loop `repairInventoryItem` from the crafting screen. That was
+   *  fine while repair could not stop — but a guard that stops has to stop the
+   *  WHOLE run, or answering it would mend one boot and leave nine more prompts
+   *  behind it. Running the batch inside the store lets the guard keep the rest
+   *  of the queue and resume it on "spend it".
+   *
+   *  ⚠ THE PER-PIECE BEHAVIOUR IS UNCHANGED. Each call still re-checks stock
+   *  against the live inventory and refuses honestly when an earlier repair
+   *  drained a shared material, which is what made the screen-side loop
+   *  trustworthy in the first place. This is the same loop, one level down. */
+  repairInventoryItems(itemIds, opts) {
+    const allow = [...(opts?.allowIds ?? [])];
+    for (let i = 0; i < itemIds.length; i += 1) {
+      const id = itemIds[i];
+      if (!id) continue;
+      const verdict = get().repairInventoryItem(id, { allowIds: allow });
+      if (verdict !== 'crucible') continue;
+      // The single repair raised the guard for THIS piece and knows nothing
+      // about the ones behind it. Widen the held queue to the whole remainder
+      // so one answer covers the run the player actually asked for.
+      const raised = get().crucibleGuardPrompt;
+      if (raised) set({ crucibleGuardPrompt: { ...raised, queue: [...itemIds.slice(i)] } });
+      return;
+    }
+  },
+
+  /** ⚠⚠⚠ OTA-1552 — THE ANSWER. Four ways out, and the asymmetry between them is
+   *  deliberate.
+   *
+   *  ⚠⚠ SAVING DOES NOT RESUME THE JOB. "Save it for the Crucible" is an answer
+   *  about the MATERIAL, not permission to carry on with the repair — and once
+   *  the stock is reserved the repair usually cannot be paid for anyway, so
+   *  resuming would spend a second breath printing a shortage the player did not
+   *  ask about. It sets the material aside, says exactly what it set aside, and
+   *  stops. Tapping REPAIR ALL again then mends whatever real junk still covers.
+   *  Spending, which IS permission, resumes the whole queue.
+   *
+   *  ⚠ SAVING RESERVES THE WHOLE STACK, not just the units the repair wanted.
+   *  `reserveManyForFusion` moves whole rows, and that is the right reading of
+   *  "save this for the Crucible" — half a saved stack still being eaten by the
+   *  next repair would be the same bug wearing a smaller number. */
+  resolveCrucibleGuard(mode, ids) {
+    const prompt = get().crucibleGuardPrompt;
+    if (!prompt) return;
+    set({ crucibleGuardPrompt: null });
+
+    if (mode === 'cancel') {
+      get().appendLog('arbiter', `The Arbiter withdraws his hand. "Nothing spent, nothing set aside. It keeps."`);
+      return;
+    }
+
+    const saveIds = mode === 'save-all'
+      ? prompt.atRisk.map((a) => a.id)
+      : mode === 'save'
+        ? prompt.atRisk.filter((a) => (ids ?? []).includes(a.id)).map((a) => a.id)
+        : [];
+
+    if (saveIds.length > 0) {
+      get().reserveManyForFusion(saveIds, true);
+      const saved = prompt.atRisk.filter((a) => saveIds.includes(a.id));
+      const list = saved.map((a) => (a.held > 1 ? `${a.name} ×${a.held}` : a.name)).join(', ');
+      get().appendLog(
+        'arbiter',
+        `The Arbiter sets it aside on the bench. "♥ Held for the Crucible: ${list}. I'll not touch it."`,
+      );
+    }
+
+    // Anything the player did NOT save, they have now looked at and let go. Bless
+    // those instance ids for the rest of this run so a ten-piece REPAIR ALL asks
+    // about each stack at most once — the alternative is a prompt storm that
+    // trains the player to tap through the very warning this OTA exists to show.
+    const blessed = prompt.atRisk.filter((a) => !saveIds.includes(a.id)).map((a) => a.id);
+    const allow = [...prompt.allow, ...blessed];
+
+    // Saving stops here (see the header). Only 'spend' carries the job forward.
+    if (mode !== 'spend') return;
+
+    if (prompt.action === 'craft' && prompt.recipeResult) {
+      // Mirror the OTA-439 latch: the guard already showed the full substitution
+      // list and took a yes, so the generic "strip these for parts?" prompt must
+      // not fire a second time for the same craft.
+      set({ crucibleGuardAllowedFor: prompt.recipeResult, craftSubConfirmedFor: prompt.recipeResult });
+      get().craftRecipe(prompt.recipeResult);
+      return;
+    }
+    get().repairInventoryItems(prompt.queue, { allowIds: allow });
   },
 
   salvageAllAmbient(nouns) {

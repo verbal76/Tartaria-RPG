@@ -25561,7 +25561,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // deferred hide event, which a refocus can cancel - that door is OTA-1442's),
 // so the next keyboard measures itself from nothing. One-way, like 1540: it can
 // only ever hold the bar higher.
-export const OTA_BUILD_ID = '2026-08-30-1551-a-standing-keyboard-does-not-shrink';
+// OTA-1552 - ARE YOU SURE ABOUT THAT? Owner, after a REPAIR ALL: "in pokemon if
+// I go to transfer a pokemon to the professor and it's an event pokemon it says,
+// are you sure you want to transfer this rare pokemon. in this game you're like,
+// hey, do you want to break stuff down and spend it and I'm like well, yeah I
+// can break it down, it's just garbage right? you never say are you sure cuz
+// this should be saved for the fuse crucible ... I didn't even know I could burn
+// my items without knowing it." His 23:18:30 REPAIR ALL consumed eight
+// catalog-absent curiosities - Slate-Weighted Netting, Salt-Cured Dowel,
+// Yellowed Tusk Stub, Coiled Snare Thread, Faded Ribbon Coil, Frayed Rigging
+// Twine, Glass-Beaded Strap, Tar-Black Lashing - which is exactly the
+// isInferredItem pool the Fusing Crucible accepts. isSubstitutable (OTA-194)
+// protects fusion material, but only material ALREADY heart-tapped
+// (reservedForFusion); fodder gathered and not yet reserved is
+// indistinguishable from junk to the substitution drain. The asymmetry was the
+// defect: selling forge stock warns, gifting refuses, fusing asks, crafting
+// asks - repair, the one path that spends it in BULK on a single tap, said
+// nothing, and the "Patched in:" line that looks like a warning is printed by
+// the drain in the past tense. So a guard now sits exactly between the point
+// where the repair decides it CAN pay and the point where it spends (there was
+// nothing there at all), reading the drain's OWN preview so it can never warn
+// about a different set than it would take. Because a warning you cannot act on
+// is only a slower way to lose the item, the answer includes saving it: a picker
+// with everything ticked, SAVE ALL FOR THE CRUCIBLE, SAVE TICKED, SPEND IT ALL,
+// CANCEL. Saving routes through the existing reserveManyForFusion and stops -
+// it is an answer about the material, not permission to carry on - while
+// spending resumes the whole held queue, so one answer covers a REPAIR ALL.
+// REPAIR ALL and the repair group moved into the store as repairInventoryItems
+// so the guard can keep the remainder of a run. The craft door raises the same
+// specific question in place of OTA-439's generic "strip these for parts?"
+// whenever forge stock is in the pile.
+export const OTA_BUILD_ID = '2026-08-30-1552-are-you-sure-about-that';
 // golem catch-up 2026-08-30: markerless publish of OTA-1549/1550/1551 (the
 // SPEAK TO bar filled + SET COURSE inside the talk sheet, one slot one weapon,
 // and the standing keyboard's session latch) to the golem channel.

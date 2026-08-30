@@ -6,6 +6,9 @@ import { missingIngredientsList, consumeIngredientsList, craftableRecipeCounts }
 import { RecipesView } from '../components/RecipesView';
 import { CraftRefusalModal } from '../components/CraftRefusalModal';
 import { BrandedModal } from '../components/BrandedModal';
+// OTA-1552 — the Crucible guard. Mounted on both screens that can start a job
+// which spends substitutes, exactly like the craft substitution prompt above it.
+import { CrucibleGuardModal } from '../components/CrucibleGuardModal';
 import type { InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -301,6 +304,10 @@ export function CraftingScreen() {
   // prompt "only appeared after hitting back." Render it here too.
   const craftSubstitutionPrompt = useGameStore((s) => s.craftSubstitutionPrompt);
   const repairInventoryItem = useGameStore((s) => s.repairInventoryItem);
+  // ⚠ OTA-1552 — REPAIR ALL and the repair group hand the whole list to the store
+  // now instead of looping here. A guard that can stop the run has to be able to
+  // keep the REST of the run, and a screen-side loop has nowhere to keep it.
+  const repairInventoryItems = useGameStore((s) => s.repairInventoryItems);
   const [tab, setTab] = useState<Tab>('craft');
   // OTA-264 — post-craft confirmation modal state. Non-null after a
   // successful craft (RecipesView's inventory diff produced items);
@@ -477,7 +484,7 @@ export function CraftingScreen() {
   // per-repair lines land within the feed's 500ms same-channel window, so they
   // group into one card rather than spraying the log.
   const repairAllReady = () => {
-    for (const id of repairReadyInView) repairInventoryItem(id);
+    repairInventoryItems(repairReadyInView);
   };
 
   // OTA-1102 — THE RUNNING MATERIAL BUDGET. This is the part that makes a repair
@@ -550,7 +557,7 @@ export function CraftingScreen() {
     // derived from. `repairInventoryItem` re-checks stock itself, so even if
     // something shifts underneath, the worst case is an honest shortage line
     // rather than a silent skip.
-    for (const id of repairPlan.picked.map((r) => r.item.id)) repairInventoryItem(id);
+    repairInventoryItems(repairPlan.picked.map((r) => r.item.id));
     exitRepairSelect();
   };
 
@@ -1113,6 +1120,12 @@ export function CraftingScreen() {
         ]}
         onRequestClose={() => useGameStore.getState().cancelCraftSubstitution()}
       />
+
+      {/* ⚠ OTA-1552 — the Crucible guard. Rendered here for the same reason
+          arb137 rendered the substitution prompt here: repair and craft both
+          start on THIS screen, and a modal set with nothing on screen is a
+          silent no-op the player reads as a broken button. */}
+      <CrucibleGuardModal />
 
       {/* arb147 — golem summon confirm. Dispatches the summon and returns to
           exploration so the d20+INT roll plays out live (no clipboard paste). */}

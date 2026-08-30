@@ -111,7 +111,14 @@ describe('OTA-1102 — the same grip as SELL and DROP', () => {
   });
 
   it('the group reuses the single-row repair, not a second path', () => {
-    expect(view).toContain('for (const id of repairPlan.picked.map((r) => r.item.id)) repairInventoryItem(id);');
+    // ⚠ OTA-1552 — RETARGETED, NOT RELAXED. The loop moved from this click
+    // handler into the store (`repairInventoryItems`) so the Crucible guard can
+    // stop a run and KEEP THE REST OF IT — a loop inside an onPress has nowhere
+    // to keep a remainder. The picked ids, and their order, still go straight
+    // through; and the batch still calls the single-row repair, one level down.
+    expect(view).toContain('repairInventoryItems(repairPlan.picked.map((r) => r.item.id));');
+    const slice = readFileSync(join(__dirname, '..', 'app/state/slices/inventorySlice.ts'), 'utf8');
+    expect(slice).toContain("const verdict = get().repairInventoryItem(id, { allowIds: allow });");
   });
 });
 
@@ -129,7 +136,12 @@ describe('OTA-1102 — the running material budget', () => {
     // …and the repairs then run in that same order, so what the plan promised
     // is what the hammer delivers.
     expect(view).toMatch(/for \(const id of repairSelected\) \{[\s\S]{0,700}picked\.push\(row\);/);
-    expect(view).toContain('for (const id of repairPlan.picked.map((r) => r.item.id)) repairInventoryItem(id);');
+    // OTA-1552 — the ORDER is the property, and it survives the move into the
+    // store: the picked ids go across as an array, and repairInventoryItems
+    // walks it with an index rather than reordering or de-duplicating it.
+    expect(view).toContain('repairInventoryItems(repairPlan.picked.map((r) => r.item.id));');
+    const slice = readFileSync(join(__dirname, '..', 'app/state/slices/inventorySlice.ts'), 'utf8');
+    expect(slice).toContain('for (let i = 0; i < itemIds.length; i += 1) {');
   });
 
   it('adding is GATED on the remaining stock — a group can never hold what it cannot pay for', () => {

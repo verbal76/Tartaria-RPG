@@ -510,12 +510,20 @@ export function missingIngredients(
 
 /** OTA-205 — substitution preview for a flat ingredient list, used by
  *  the repair handler to narrate "Repaired with 2 Cloth Scrap for the
- *  Patched Cloth." Same drain order as previewCraftSubstitutions. */
+ *  Patched Cloth." Same drain order as previewCraftSubstitutions.
+ *
+ *  ⚠ OTA-1552 — each entry now carries the substitute's INSTANCE ID. The loop
+ *  always knew exactly which row it was about to drain (it keys `consumed` by
+ *  item.id); it just threw that identity away and returned a bare name, which is
+ *  why nothing downstream could say "save THAT stack." The Crucible guard
+ *  (engine/crucibleGuard.ts) needs the id to ask isForgeReservableItem about the
+ *  real stack and to hand the player a picker that can reserve it. Purely
+ *  additive — every existing caller reads ingredient/substitute/quantity. */
 export function previewSubstitutionsList(
   ingredients: ReadonlyArray<{ name: string; quantity: number }>,
   inventory: readonly InventoryItem[],
-): Array<{ ingredient: string; substitute: string; quantity: number }> {
-  const out: Array<{ ingredient: string; substitute: string; quantity: number }> = [];
+): Array<{ ingredient: string; substitute: string; quantity: number; id: string }> {
+  const out: Array<{ ingredient: string; substitute: string; quantity: number; id: string }> = [];
   const consumed = new Map<string, number>(); // id → already-counted
 
   for (const ing of ingredients) {
@@ -537,7 +545,7 @@ export function previewSubstitutionsList(
       const available = item.quantity - alreadyTaken;
       if (available <= 0) continue;
       const take = Math.min(available, stillNeed);
-      out.push({ ingredient: ing.name, substitute: item.name, quantity: take });
+      out.push({ ingredient: ing.name, substitute: item.name, quantity: take, id: item.id });
       consumed.set(item.id, alreadyTaken + take);
       stillNeed -= take;
     }

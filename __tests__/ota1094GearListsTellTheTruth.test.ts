@@ -164,10 +164,21 @@ describe('OTA-1094 #3 — source locks on the lists that must not regress', () =
     const src = read('app/screens/CraftingScreen.tsx');
     // repairableView, not repairable — so searching narrows what the button mends.
     expect(src).toContain('() => repairableView.filter((r) => r.available).map((r) => r.item.id),');
-    expect(src).toContain('for (const id of repairReadyInView) repairInventoryItem(id);');
+    // ⚠ OTA-1552 — RETARGETED, NOT RELAXED. The screen-side `for` loop moved
+    // into the store as `repairInventoryItems`, because the Crucible guard has
+    // to be able to stop a run AND KEEP THE REST OF IT, and a loop living in a
+    // click handler has nowhere to keep it. The two properties this line has
+    // always guarded are both re-asserted, one here and one below:
+    //   · REPAIR ALL still acts on exactly repairReadyInView, in that order;
+    //   · it still reuses the single-row repair rather than a second path.
+    expect(src).toContain('repairInventoryItems(repairReadyInView);');
     // It reuses the single-row action rather than growing a second repair path
-    // that could disagree about cost, substitutions, or eligibility.
+    // that could disagree about cost, substitutions, or eligibility. The batch
+    // is now one level down, so the proof is one level down with it.
     expect(src).not.toMatch(/consumeIngredientsList[\s\S]{0,200}repairAllReady/);
+    const slice = read('app/state/slices/inventorySlice.ts');
+    expect(slice).toContain("const verdict = get().repairInventoryItem(id, { allowIds: allow });");
+    expect(slice).not.toMatch(/repairInventoryItems\([\s\S]{0,900}consumeIngredientsList/);
     // Hidden when there is nothing to do, rather than sitting there dead.
     // OTA-1102 — RETARGETED. The `&&` became the middle arm of a ternary when
     // the group bar took this slot: `{repairSelectMode ? (bar) : readyInView > 0

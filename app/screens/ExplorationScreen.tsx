@@ -80,6 +80,7 @@ import { ApproachModal } from '../components/ApproachModal';
 import { PickpocketSheet } from '../components/PickpocketSheet';
 import { MissionBoardModal } from '../components/MissionBoardModal';
 import { FusionPickerModal } from '../components/FusionPickerModal';
+import { CrucibleGuardModal } from '../components/CrucibleGuardModal';
 import { FusionBlockedModal } from '../components/FusionBlockedModal';
 import { MissionCompleteModal } from '../components/MissionCompleteModal';
 import { ParleySheet } from '../components/ParleySheet';
@@ -2919,6 +2920,10 @@ export function ExplorationScreen() {
 
       <FusionPickerModal />
       <FusionBlockedModal />
+      {/* ⚠ OTA-1552 — the Crucible guard, mounted alongside the craft
+          substitution prompt below for the same reason: a typed `craft X` from
+          this screen must not set a modal flag with nothing on screen. */}
+      <CrucibleGuardModal />
       <MissionCompleteModal />
       {/* OTA-1023 — the opening crawl moved to App.tsx's GLOBAL overlay
           stack so REPLAY OPENING plays over any screen. */}
