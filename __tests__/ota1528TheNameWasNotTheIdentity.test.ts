@@ -152,7 +152,15 @@ describe('OTA-1528 — the Wisdom gate agrees with the character sheet', () => {
   });
 
   it('⚠ the threshold itself is untouched — this OTA fixes the input, not the bar', () => {
-    expect(PANEL).toContain('const WEAKNESS_READ_WIS = 12;');
+    // ⚠ OTA-1553 — RETARGETED, NOT RELAXED. The constant is still 12 and the
+    // comparison is still the same comparison; the DECLARATION moved into
+    // engine/weaponGlyphs, because the combat buttons' ★ has to clear the exact
+    // same bar as this card and a second copy of the number is how two readers
+    // of one rule drift apart. The panel now imports it. Both halves are still
+    // pinned — the literal at its new home, and the panel reading that one.
+    const GLYPHS = readFileSync(join(__dirname, '..', 'app', 'engine', 'weaponGlyphs.ts'), 'utf8');
+    expect(GLYPHS).toContain('export const WEAKNESS_READ_WIS = 12;');
+    expect(codeOnly(PANEL)).toContain('const WEAKNESS_READ_WIS = SHARED_WEAKNESS_READ_WIS;');
     expect(codeOnly(PANEL)).toContain('(playerWisdom ?? 0) >= WEAKNESS_READ_WIS');
   });
 });

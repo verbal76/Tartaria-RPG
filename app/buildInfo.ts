@@ -25591,7 +25591,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // so the guard can keep the remainder of a run. The craft door raises the same
 // specific question in place of OTA-439's generic "strip these for parts?"
 // whenever forge stock is in the pile.
-export const OTA_BUILD_ID = '2026-08-30-1552-are-you-sure-about-that';
+// OTA-1553 - GLYPH GLYPH NAME STAR. Owner, twice, the second time spelled out
+// because I had asked him questions he had already answered: "We have a cudgel
+// that does bludgeoning but it's coded in Frost, encoded and incendiary. There
+// should be a fire glyph then a snowflake glyph then the word cudgel and then at
+// the end if the enemy is weak to either the frost or the fire or the
+// bludgeoning from the cudgel there should be a star at the very end. So the
+// format is glyph glyph name and then either a star or no star depending on the
+// weaknesses of the enemy." And ruling out what I had wrongly offered: "I don't
+// want the weapon button during combat to show 1d4. I don't want it to show dice
+// rolls. I wanted to show a glyph of the types of damage." So the label is now
+// `fire snowflake cudgel star`: one glyph per applied coating in slot order,
+// then the name, then a star. THREE damage types feed that one star - both coats
+// AND the weapon's own raw damage, because a coated cudgel is still a cudgel and
+// he named that case explicitly. The old prop could not do any of this: it was a
+// single coating ADJECTIVE, so a two-coat weapon could only ever advertise one,
+// and the word itself spent the room the damage needed. A glyph is one
+// character. The star obeys discovery on his instruction - "only base it off of
+// what the player has discovered or is shown" - so it reads the same verdict the
+// enemy card prints: a boss, or the Wisdom 12 read, or what has been learned by
+// hitting the thing, and NOTHING KNOWN DRAWS NO STAR. To make that literally
+// true rather than nearly true, the weakness reconcile (type map against
+// per-spawn resist:/vulnerable: traits, OTA-798) and the WIS gate moved out of
+// EnemyPanel into engine/weaponGlyphs, and the card now imports what it used to
+// own - two copies of one truth is how a star and a card come to disagree about
+// the same enemy. The `off:` prefix is gone from combat on his word ("I don't
+// need off: because in combat the hand doesn't matter, only in the inventories
+// equip choice card"): in a fight the two buttons ARE the two hands, side by
+// side, and the word restated their own arrangement while crowding out the thing
+// worth reading. The attack ACTION still carries the hand keyword, because the
+// parser needs it to resolve the right instance.
+export const OTA_BUILD_ID = '2026-08-30-1553-glyph-glyph-name-star';
 // golem catch-up 2026-08-30: markerless publish of OTA-1549/1550/1551 (the
 // SPEAK TO bar filled + SET COURSE inside the talk sheet, one slot one weapon,
 // and the standing keyboard's session latch) to the golem channel.

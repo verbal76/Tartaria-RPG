@@ -23,6 +23,9 @@ import { itemIsHandThrownSpear } from '../engine/bandolierEligibility';
 import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
+// OTA-1553 — the combat weapon label: coating glyphs, the name, and a ★ when
+// this weapon hits a weakness the player has actually discovered.
+import { combatWeaponLabel } from '../engine/weaponGlyphs';
 import { reachBandsFor, reachFiresDown } from '../engine/types';
 // ⚠ OTA-1423 — the three Arbiter refusals below name the dog, so they also
 // have to gender it. Without this they read "bring it up" about a companion
@@ -136,14 +139,27 @@ interface Props {
   inCombat: boolean;
   equippedMain: string | null;
   equippedOff: string | null;
-  // OTA-406 — coating adjective ("Acid-Etched", "Poisoned", …) for the equipped
-  // weapon INSTANCE in each hand, or null. Resolved by the equipped slot id (so
-  // two same-named weapons — one coated, one not — are told apart) and prepended
-  // to the quick-button label so a coated weapon reads as itself ("off:
-  // acid-etched rusty shortbow"). The attack ACTION still uses the base name +
-  // hand keyword, so the parser resolves the right instance.
-  equippedMainCoating?: string | null;
-  equippedOffCoating?: string | null;
+  // OTA-406 — the equipped weapon INSTANCE in each hand, resolved by the equipped
+  // slot id (so two same-named weapons — one coated, one not — are told apart).
+  //
+  // ⚠⚠ OTA-1553 — WAS A COATING ADJECTIVE, NOW THE INSTANCE ITSELF. The prop used
+  // to be a single string ("Acid-Etched") prepended to the label, which had two
+  // defects the owner hit at once: it could only ever show ONE coat, so his
+  // frost-AND-incendiary cudgel read as though it carried one; and it spent a
+  // whole word — sometimes two — before reaching the weapon's own name, which is
+  // what pushed the damage off the button. Handing over the instance lets the
+  // label carry a glyph per coat AND ask whether this weapon bites this foe.
+  // The attack ACTION still uses the base name + hand keyword, so the parser
+  // resolves the right instance.
+  equippedMainItem?: InventoryItem | null;
+  equippedOffItem?: InventoryItem | null;
+  /** ⚠⚠⚠ OTA-1553 — the weaknesses of the ACTIVE enemy that the player has
+   *  actually discovered (boss / Wisdom 12 read / learned by hitting it), from
+   *  knownEnemyWeaknesses. Drives the ★. Empty — which is the common case early
+   *  — draws no star at all, because the owner was explicit that the label may
+   *  only say what he already knows: *"only base it off of what the player has
+   *  discovered or is shown."* */
+  activeEnemyKnownWeak?: readonly string[];
   inventory: ReadonlyArray<InventoryItem>;
   range?: CombatRange | null;
   // OTA-361 — at least one enemy in the scene is knocked out and lootable.
@@ -212,11 +228,11 @@ function buzzSpent() {
   try { Vibration.vibrate(28); } catch { /* ignore */ }
 }
 
-function shortWeaponLabel(name: string): string {
-  const tokens = name.split(/\s+/);
-  if (tokens.length <= 2) return name;
-  return tokens.slice(-2).join(' ');
-}
+// ⚠ OTA-1553 — the two-word trim moved to engine/weaponGlyphs as
+// `shortWeaponName`, where combatWeaponLabel applies it. It is one rule about
+// how much of a weapon's name fits on a button, and it now sits beside the
+// glyphs and the ★ that share that room with it, rather than in a component
+// where a second caller would have had to reimplement it.
 
 /** ⚠⚠ OTA-1379 — THE MORE TRAY STAYS OPEN UNTIL THE PLAYER CLOSES IT.
  *
@@ -250,7 +266,7 @@ function shortWeaponLabel(name: string): string {
  *  player's own choice for the rest of the session. */
 let MORE_TRAY_OPEN = false;
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, pickpocketPossible, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, groundedFoesBelow, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, investigateSweeping, parserHint, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, pickpocketPossible, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, groundedFoesBelow, inCombat, equippedMain, equippedOff, equippedMainItem, equippedOffItem, activeEnemyKnownWeak, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, investigateSweeping, parserHint, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   // arb-fix (OTA — adaptive quick row) — the out-of-combat quick row shows the
   // world-interaction verbs (look / rest / investigate / take / salvage / climb /
@@ -735,15 +751,29 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   })()}
                 </>
               )}
+              {/* ⚠⚠⚠ OTA-1553 — `🔥 ❄ cudgel ★`. The owner's format, exactly:
+                  *"fire glyph then a snowflake glyph then the word cudgel and
+                  then at the end if the enemy is weak to either the frost or the
+                  fire or the bludgeoning from the cudgel there should be a star
+                  at the very end."* Both coats now show (the old prop carried a
+                  single adjective, so a dual-coated weapon read as though it had
+                  one), the star answers for BOTH coats and the weapon's raw
+                  damage, and it obeys discovery — no star at all when nothing is
+                  known, because the button may only say what he already knows.
+                  The `off:` prefix is gone: in a fight the two buttons ARE the
+                  two hands, side by side, and the word restated their own
+                  arrangement while crowding out the thing worth reading. */}
               {equippedMain ? (() => {
                 const mainT = weaponTone(reachPlayer, 'main', range, groundedFoesBelow);
-                const coat = equippedMainCoating ? `${equippedMainCoating.toLowerCase()} ` : '';
-                return <QuickBtn label={`${coat}${shortWeaponLabel(equippedMain).toLowerCase()}`} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
+                const raw = resolveDisplayWeaponByName(equippedMain, inventory)?.damageType ?? null;
+                const label = combatWeaponLabel(equippedMain, equippedMainItem, raw, activeEnemyKnownWeak ?? []);
+                return <QuickBtn label={label} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
               })() : null}
               {equippedOff ? (() => {
                 const offT = weaponTone(reachPlayer, 'off', range, groundedFoesBelow);
-                const coat = equippedOffCoating ? `${equippedOffCoating.toLowerCase()} ` : '';
-                return <QuickBtn label={`off: ${coat}${shortWeaponLabel(equippedOff).toLowerCase()}`} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
+                const raw = resolveDisplayWeaponByName(equippedOff, inventory)?.damageType ?? null;
+                const label = combatWeaponLabel(equippedOff, equippedOffItem, raw, activeEnemyKnownWeak ?? []);
+                return <QuickBtn label={label} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
               })() : null}
             </View>
 

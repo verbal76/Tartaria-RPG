@@ -95,10 +95,13 @@ import { npcLedgerId } from '../engine/npcMemory';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
 import { profileOf } from '../engine/pressure';
+// OTA-1553 — the ★ on a combat weapon button reads the same discovered
+// weaknesses the enemy card prints, from one shared function.
+import { knownEnemyWeaknesses } from '../engine/weaponGlyphs';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from '../components/tutorialSteps';
 import { reachBandsFor, RANGE_LABELS } from '../engine/types';
-import type { CombatRange } from '../engine/types';
+import type { CombatRange, InventoryItem } from '../engine/types';
 import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
 import { useBackAction } from '../ui/desktopBack'; // OTA-1229 — right-click / Escape closes the top popup
 // ⚠⚠ OTA-1236 — the ONE rule for "this noun carries a next step", shared with the
@@ -1018,18 +1021,36 @@ export function ExplorationScreen() {
   const inCombat = enemyViews.length > 0;
   const equippedMain = player?.equipped?.main ?? null;
   const equippedOff = player?.equipped?.off ?? null;
-  // OTA-406 — coating adjective for the equipped instance in each hand, resolved
-  // by the equipped slot id (NOT by name — two same-named weapons, one coated
-  // and one not, must be told apart). Feeds the combat quick-button label so a
-  // coated weapon reads as itself ("off: acid-etched rusty shortbow") instead of
-  // its bare base name. Null when the hand is empty or the weapon is uncoated.
-  const coatingForSlot = (id: string | null | undefined): string | null => {
+  // OTA-406 — the equipped INSTANCE in each hand, resolved by the equipped slot
+  // id (NOT by name — two same-named weapons, one coated and one not, must be
+  // told apart).
+  //
+  // ⚠⚠ OTA-1553 — this used to return the coating's ADJECTIVE and nothing else,
+  // which is why a weapon carrying two coats could only ever advertise one: the
+  // shape had room for a single string. Handing the instance across lets the
+  // button draw a glyph per coat and ask whether the weapon bites this foe.
+  const instanceForSlot = (id: string | null | undefined): InventoryItem | null => {
     if (!id) return null;
-    const inst = player?.inventory?.find((i) => i.id === id);
-    return inst?.coating?.label ?? null;
+    return player?.inventory?.find((i) => i.id === id) ?? null;
   };
-  const equippedMainCoating = coatingForSlot(player?.equipped?.mainId);
-  const equippedOffCoating = coatingForSlot(player?.equipped?.offId);
+  const equippedMainItem = instanceForSlot(player?.equipped?.mainId);
+  const equippedOffItem = instanceForSlot(player?.equipped?.offId);
+  // ⚠⚠⚠ OTA-1553 — WHAT THE PLAYER ACTUALLY KNOWS ABOUT THE FOE HE IS FACING,
+  // from the same function the enemy card reads (knownEnemyWeaknesses): a boss,
+  // or the Wisdom 12 read, or what he has already learned by hitting it. The ★ is
+  // drawn from this and nothing else — the owner: *"only base it off of what the
+  // player has discovered or is shown."* A star that knew more than the card
+  // would be a free intel channel quietly cancelling the WIS gate and the
+  // `witholdIntel` dial.
+  const activeEnemyKnownWeak = useMemo<string[]>(() => {
+    const active = enemyViews[activeIdx]?.enemy;
+    if (!active || !player) return [];
+    return knownEnemyWeaknesses(active, {
+      playerWisdom: player.stats?.wisdom,
+      witholdIntel: profileOf(player).witholdIntel,
+      intel: worldMemory?.enemyIntel,
+    });
+  }, [enemyViews, activeIdx, player, worldMemory?.enemyIntel]);
 
   if (!player) {
     return (
@@ -2162,8 +2183,9 @@ export function ExplorationScreen() {
             inCombat={inCombat}
             equippedMain={equippedMain}
             equippedOff={equippedOff}
-            equippedMainCoating={equippedMainCoating}
-            equippedOffCoating={equippedOffCoating}
+            equippedMainItem={equippedMainItem}
+            equippedOffItem={equippedOffItem}
+            activeEnemyKnownWeak={activeEnemyKnownWeak}
             inventory={player?.inventory ?? []}
             range={currentScene?.range ?? null}
             knockedOutPresent={(currentScene?.enemyKnockedOut ?? []).some(Boolean)}

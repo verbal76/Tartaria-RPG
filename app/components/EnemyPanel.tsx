@@ -17,6 +17,10 @@ import type { Enemy } from '../engine/types';
 import { describeTrait, enemyIntelKey, portraitTraitChips, traitACBonus, traitDefenses } from '../engine/enemyTraits';
 import { enemyPowerScore, powerMatchup } from '../engine/powerRating';
 import { enemyTypeDefenses } from '../engine/crafting';
+// OTA-1553 — the weakness reconcile and the WIS gate now live in the engine so
+// the combat buttons' ★ and this card answer from one function. See the note at
+// `defensesFor` below.
+import { reconciledDefenses, WEAKNESS_READ_WIS as SHARED_WEAKNESS_READ_WIS } from '../engine/weaponGlyphs';
 import { enemyDamageType } from '../engine/damageTypes';
 import { BrandedModal } from './BrandedModal';
 
@@ -118,28 +122,21 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
  *  type-map weakness (and a `vulnerable:X` overrides a type resist). Without this the
  *  panel would still list an enemy's ORIGINAL type weakness even after per-spawn
  *  randomization flipped it — showing a weakness that's actually now a resistance. */
-function defensesFor(enemy: Enemy): { resists: string[]; weaknesses: string[] } {
-  const type = enemyTypeDefenses(enemy.type);
-  const trait = traitDefenses(enemy.traits);
-  const all = Array.from(new Set([...type.resist, ...type.weak, ...trait.resists, ...trait.weaknesses]));
-  const resists: string[] = [];
-  const weaknesses: string[] = [];
-  for (const dt of all) {
-    const typeDir = type.weak.includes(dt) ? 1 : type.resist.includes(dt) ? -1 : 0;
-    const traitDir = trait.weaknesses.includes(dt) ? 1 : trait.resists.includes(dt) ? -1 : 0;
-    // Discord → the per-enemy trait wins (matches combineDamageTypeMatch); else sum.
-    const dir = typeDir !== 0 && traitDir !== 0 && typeDir !== traitDir ? traitDir : typeDir + traitDir;
-    if (dir > 0) weaknesses.push(dt);
-    else if (dir < 0) resists.push(dt);
-  }
-  return { resists, weaknesses };
-}
+// ⚠⚠ OTA-1553 — THE ARITHMETIC MOVED OUT, THE MEANING DID NOT. This reconcile
+// used to live here as a private function, and it was the only copy — right up
+// until the combat buttons needed the same verdict to decide whether to draw the
+// ★ (engine/weaponGlyphs.ts). Two readers of one truth with a copy in each is
+// exactly how a star and a card come to disagree about the same enemy, so the
+// function moved to the engine leaf and BOTH import it. Nothing about the sum
+// changed; `defensesFor` is now the local name for the shared one.
+const defensesFor = reconciledDefenses;
 
 // OTA-798 — a WISDOM ≥ this reads an enemy's (randomized) weaknesses off the portrait
 // up front; below it you must discover them by landing hits (the combat log's
 // "Weakness exposed" line is the feedback). Matches the parley WIS_REVEAL_THRESHOLD, so
 // Wisdom is the consistent "scout the enemy" stat. Bosses always show (OTA-798).
-const WEAKNESS_READ_WIS = 12;
+// OTA-1553 — re-exported from the same leaf, for the same reason as above.
+const WEAKNESS_READ_WIS = SHARED_WEAKNESS_READ_WIS;
 
 // OTA-799 — the WIS read is DIEGETIC: instead of a bare "WEAK: burn" label, the detail
 // popup narrates what you notice about the creature that gives the weakness/resistance
