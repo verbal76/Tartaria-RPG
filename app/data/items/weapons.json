@@ -415,7 +415,8 @@
       ],
       "description": "A spring-loaded Reclaimer carbine — mud-resistant, single-bolt action, fires Aether-tempered bolts. The closest Tartaria has to a rifle. Reloads one bolt at a time unless you take the full action to swap magazines.",
       "statRequirement": null,
-      "tc": 130
+      "tc": 130,
+      "effect": "Ignores 1 armor point — the bolt is driven, not loosed."
     },
     {
       "name": "Aether Bolt-Caster",
@@ -435,7 +436,8 @@
       ],
       "description": "A Forgotten Order experimental bolt-caster, its bolts plated with raw Aetherstone. Burns the target on hit. Heats the wielder's hand if fired more than three times in a row.",
       "statRequirement": null,
-      "tc": 310
+      "tc": 310,
+      "effect": "Aether-honed bolts; ignores 2 armor points."
     },
     {
       "name": "Sentinel Cleaver",
@@ -453,7 +455,8 @@
       ],
       "description": "Repurposed plate from a fallen Sentinel, ground to an edge. Heavier than it looks.",
       "statRequirement": null,
-      "tc": 340
+      "tc": 340,
+      "effect": "Ignores 2 armor points — Sentinel steel was cut to open Sentinel plate."
     },
     {
       "name": "Aetherstone Gauntlet",
@@ -472,7 +475,7 @@
       "description": "A gauntlet cored with Aetherstone. Every strike pulses a concussive ring.",
       "statRequirement": null,
       "tc": 270,
-      "effect": "Grants +15 HP.",
+      "effect": "Grants +15 HP. Ignores light armor.",
       "statBonuses": [
         {
           "stat": "hp",
@@ -514,7 +517,8 @@
       ],
       "description": "Said to have been carried by one of Tartaria's first builders. Cuts through Aetheric haze like it isn't there.",
       "statRequirement": null,
-      "tc": 950
+      "tc": 950,
+      "effect": "Ignores armor. What the Founders drew a line through stayed cut."
     },
     {
       "name": "Crown of Verdict",
@@ -811,7 +815,8 @@
         "firearm",
         "mud_dwellers"
       ],
-      "description": "Single shot per turn, reliable. The basic long-arm of the buried world."
+      "description": "Single shot per turn, reliable. The basic long-arm of the buried world.",
+      "effect": "Ignores 1 armor point on every round in the tube."
     },
     {
       "name": "Bone Splitter Axe",
@@ -1082,7 +1087,8 @@
         "two_handed",
         "giants"
       ],
-      "description": "Fires large bone harpoons. Slow to reload, brutal to receive."
+      "description": "Fires large bone harpoons. Slow to reload, brutal to receive.",
+      "effect": "Ignores 1 armor point — the barb sets under the plate."
     },
     {
       "name": "Mud Spear (Throwing)",
@@ -1126,7 +1132,7 @@
         "bow",
         "giants"
       ],
-      "effect": "+1d6 damage to machines.",
+      "effect": "+1d6 damage to machines. Ignores 1 armor point.",
       "description": "Heavy bone composite bow. Built for siege work."
     },
     {
@@ -1308,7 +1314,7 @@
         "firearm",
         "unknowing_masses"
       ],
-      "effect": "Requires 1 round to charge; deals 1d6 as a club while charging.",
+      "effect": "Requires 1 round to charge; deals 1d6 as a club while charging. Ignores armor.",
       "description": "Pre-flood railgun. Charges with a whine you feel in your teeth."
     },
     {
@@ -1330,7 +1336,8 @@
         "firearm",
         "unknowing_masses"
       ],
-      "description": "Heavy energy weapon. No frills, just punch."
+      "description": "Heavy energy weapon. No frills, just punch.",
+      "effect": "Ignores 2 armor points; the round arrives before the sound."
     },
     {
       "name": "Magna-Cannon",
@@ -1417,7 +1424,7 @@
         "spear",
         "aetheric"
       ],
-      "effect": "+1d6 vs mechanical traps or machines.",
+      "effect": "+1d6 vs mechanical traps or machines. Ignores 2 armor points.",
       "description": "Polearm with a railgun core. Fires its tip on command."
     },
     {
@@ -1593,7 +1600,7 @@
         "aetheric",
         "legendary"
       ],
-      "effect": "Fires energy blasts (assigned damage roll) or melee to stun (even = stun for 3 turns).",
+      "effect": "Fires energy blasts (assigned damage roll) or melee to stun (even = stun for 3 turns). The blast carries at any range.",
       "description": "Pike of contained plasma. Ranged threat as well as melee."
     },
     {
@@ -5373,7 +5380,8 @@
         "crafted"
       ],
       "description": "Mud-Iron Greatblade. A two-hander forged around a mud-iron heart, the spine flecked with hardened mudstone. Heavy on the draw, devastating on the landing.",
-      "statRequirement": null
+      "statRequirement": null,
+      "effect": "Ignores light armor; the weight does the rest."
     },
     {
       "name": "Flame of Aether",
@@ -5959,7 +5967,7 @@
         "faction_gear",
         "tartarian_revivalists"
       ],
-      "effect": "Faction-issue armament of the tartarian revivalists.",
+      "effect": "Faction-issue armament of the tartarian revivalists. Ignores 1 armor point.",
       "description": "Faction-issue ranged weapon, struck for the tartarian revivalists. Marked with their sigil."
     },
     {
@@ -6036,7 +6044,8 @@
       "baseDurability": 45,
       "description": "A scrap-forged greatsword balanced for a construct's reach. Too heavy to swing yourself; perfect for a thing that doesn't tire. Takes a coating and carries it through every swing.",
       "statRequirement": null,
-      "tc": 0
+      "tc": 0,
+      "effect": "Ignores 1 armor point."
     },
     {
       "name": "Crude Golem Greatsword",
@@ -6074,7 +6083,8 @@
       "baseDurability": 60,
       "description": "An elder greatsword balanced for a construct's tireless arm — a single sweep that shears a line clean. Holds a coating through every cut.",
       "statRequirement": null,
-      "tc": 0
+      "tc": 0,
+      "effect": "Cuts through any armor."
     },
     {
       "name": "Golem Pike",
@@ -6093,7 +6103,8 @@
       "baseDurability": 45,
       "description": "A two-handed pike sized for a construct — a single driving thrust that punches through a guard. Coat the point and the golem carries the bite home.",
       "statRequirement": null,
-      "tc": 0
+      "tc": 0,
+      "effect": "Ignores 2 armor points."
     },
     {
       "name": "Crude Golem Pike",
@@ -6131,7 +6142,8 @@
       "baseDurability": 60,
       "description": "An elder driving pike sized for a construct — a single thrust that punches through any guard and out the far side. Coat the point; it rides home.",
       "statRequirement": null,
-      "tc": 0
+      "tc": 0,
+      "effect": "Ignores armor."
     },
     {
       "name": "Golem Aether-Lance",
@@ -6150,7 +6162,8 @@
       "baseDurability": 45,
       "description": "A lance of bound Aether keyed to a construct's frame; it strikes with the same charge that animates the golem. Coatings ride the discharge.",
       "statRequirement": null,
-      "tc": 0
+      "tc": 0,
+      "effect": "Ignores 2 armor points; a shaft of contained aether does not care what is in the way."
     },
     {
       "name": "Beacon Rifle",

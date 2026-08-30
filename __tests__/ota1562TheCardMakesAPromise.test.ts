@@ -85,13 +85,19 @@ const PLATED = { traits: ['armored'], name: 'Scav Raider', type: 'Human' };
 const WARDEN = { traits: ['armored', 'field:aether_shield', 'agile'], name: 'Iron Warden', type: 'Construct' };
 
 describe('OTA-1562 — the range note finally means something', () => {
-  it('⚠⚠⚠ FIVE WEAPONS BILLED "SHORT RANGE" NOW ACTUALLY ARE', () => {
-    // Every one of these threw to `far` yesterday, identically to a weapon whose
-    // card said LONG. The word on the card had no consequence at all.
+  // ⚠⚠⚠ RETARGETED BY OTA-1563, NOT RELAXED. This test used to assert that a
+  // "short range" note took the outermost band away — five weapons players
+  // already owned got shorter so the word would mean something. The owner's
+  // call: *"remove the nerfs from 1a."* The note is still read and still
+  // required to be there; what changed is that the ladder is now built out of
+  // PROMOTIONS only. See ota1563 for the replacement ladder assertion.
+  it('⚠⚠⚠ THE SHORT NOTE IS STILL READ — and takes nothing away from anybody', () => {
     for (const name of ['Throwing Knife', 'Mud Throwing Knife', 'Bone Throwing Axe',
                         'Plasma Spear', 'Tartarian Hand Spear']) {
       expect(parseWeaponEffect(row(name).effect)?.rangeNote).toBe('short');
-      expect(bandsOf(name)).toEqual(['mid', 'close']);
+      // A throwable's class bands already stop short of `distant`. That IS short
+      // range, correctly modelled — the note describes it, it does not impose it.
+      expect(bandsOf(name)).toEqual(['far', 'mid', 'close']);
     }
   });
 
@@ -102,20 +108,27 @@ describe('OTA-1562 — the range note finally means something', () => {
     expect(bandsOf('Bone War Javelin').length).toBeGreaterThan(bandsOf('Throwing Knife').length);
   });
 
-  it('⚠⚠ a SHORT note on a firearm gives up one band, not three', () => {
-    // The Plasma Thrower is a `firearm`, not a throwable, so "short range" for it
-    // means short FOR A GUN. Collapsing every short-ranged weapon onto the same
-    // two bands would have quietly deleted the difference between a knife and a
-    // rifle — a note adjusts a class, it does not replace one.
-    expect(bandsOf('Plasma Thrower')).toEqual(['far', 'mid', 'close']);
+  // ⚠⚠⚠ RETARGETED BY OTA-1563. Both of these pinned HOW MUCH a short note took
+  // away. It now takes nothing away from anything, which is the stronger and
+  // simpler property, and the one worth pinning: applying the note is idempotent
+  // and cannot shrink a band set no matter how it is spelled or how often it is
+  // applied.
+  it('⚠⚠⚠ NO NOTE, ON ANY CLASS, EVER MAKES A WEAPON REACH LESS FAR', () => {
+    for (const cls of ['ranged', 'throwable', 'long', 'melee', 'barehanded'] as const) {
+      const base = reachBandsFor(cls);
+      for (const note of ['short', 'long', 'any', null] as const) {
+        const after = applyRangeNote(base, note);
+        expect(after.length).toBeGreaterThanOrEqual(base.length);
+        // …and every band it had, it keeps.
+        for (const b of base) expect(after).toContain(b);
+      }
+    }
   });
 
-  it('⚠⚠ a note NEVER strips a thrown weapon below close + mid', () => {
-    // A throwing knife you cannot throw is not a short-ranged weapon, it is a
-    // broken one. Applying the note twice must not walk the bands to nothing.
-    const once = applyRangeNote(reachBandsFor('throwable'), 'short');
-    expect(applyRangeNote(once, 'short')).toEqual(['mid', 'close']);
-    expect(applyRangeNote(['close'], 'short')).toEqual(['close']);
+  it('⚠⚠ the Plasma Thrower keeps all four bands — a firearm is not a knife', () => {
+    // It is a `firearm`, not a throwable, so "short range" for it means short FOR
+    // A GUN. Its class is the answer; the note is a description of the class.
+    expect(bandsOf('Plasma Thrower')).toEqual(['distant', 'far', 'mid', 'close']);
   });
 
   it('⚠⚠ a note NEVER promotes a melee weapon into a shooter', () => {

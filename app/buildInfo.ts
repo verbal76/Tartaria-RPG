@@ -25823,7 +25823,46 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // A piercer removes only the AC that ARMOUR added - never the `agile` +1, never
 // a raised field when the text says non-magical, and nothing at all from an
 // unarmoured foe, so "ignores armour" can never quietly become "+2 to hit rats".
-export const OTA_BUILD_ID = '2026-08-30-1562-the-card-makes-a-promise';
+// OTA-1563 - NOBODY'S WEAPON GETS WORSE. The owner, on OTA-1562: "remove the
+// nerfs from 1a ... also add these effects to more catalog weapons. they
+// increase the game enjoyability more." 1562 made "short range" mean something
+// by taking the outermost band from five weapons players already owned - it
+// bought the word its meaning with somebody else's gear, and it was the wrong
+// half of the ladder to build on. The note now takes NOTHING from anything: a
+// thrown weapon's class bands already stop short of `distant`, which IS short
+// range and always was. The half genuinely missing was the top - a thrown weapon
+// whose card says it flies FURTHER than its class does - so the ladder is now
+// entirely promotions and no save gets a worse weapon than it had. Pinned over
+// the whole catalog rather than five names, so a future note or reclassification
+// cannot quietly shorten anyone's gear either.
+//
+// THE VERB LIST WAS THE REAL CEILING, and this is worth more than the content
+// pass. 1562 read "ignores" and "cuts through" and found eight weapons. Six
+// other verbs were sitting in the catalog making the identical promise, and
+// every weapon behind them was failing for a reason with nothing to do with its
+// design: Bone Siege Crossbow "Pierces armor", Plasma Cutter Knife "Melts
+// through armor", Aetheric Blade "bypasses non-magical defenses", Energy Blade
+// "Cuts non-magical armor", Laser Blade "Cuts through metal", Aether Lance
+// "Disrupts energy shields", Winter's Verdict "carries through armour". Seven
+// weapons, no authoring - they had been promising it the whole time.
+//
+// Then twenty more were written on a rarity ladder rather than scattered:
+// Common/Uncommon pierce one point, Rare two or a class of armour, Legendary
+// pierce outright, and they go to the families whose fiction is penetration -
+// rail and magnetic drive, siege draws, energy edges, golem-forged mass. Eight
+// piercers in a 284-weapon catalog meant most builds had no answer to plate;
+// thirty-three makes armour something you counter with a weapon you chose.
+//
+// Two leaks closed on the way. The Bone Spear Launcher's "Bypasses shields
+// permanently on THIRD max roll" slipped the deferral guard because an ordinal
+// sat between "on" and "max", handing a Rare a permanent unconditional shield-
+// break - a Rare quietly out-performing the Legendary that has to earn it. And
+// the Bone Siege Crossbow's "only energy armor resists" sits in a clause with no
+// verb of its own, so clause-by-clause ranking scored it nothing and the weapon
+// came out stronger than its own sentence. "Reduces enemy armor by N" is still
+// deliberately NOT a piercing verb: that is a lasting shred, which the acid
+// path already models, and folding it in would make it permanent and free.
+export const OTA_BUILD_ID = '2026-08-30-1563-nobodys-weapon-gets-worse';
 // golem catch-up 2026-08-30: markerless publish of OTA-1562 (the weapon effect
 // column starts meaning something - range notes ride the reach bands, armour-
 // ignore rides the AC step, and the two families of promise that land on systems

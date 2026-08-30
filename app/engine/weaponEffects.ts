@@ -99,7 +99,15 @@ export interface ParsedWeaponEffect {
  * Refusing the clause outright leaves the weapon exactly as it was, which is the
  * honest state until its own slice lands.
  */
-const IGNORE_DEFERRED_RE = /\bon\s+(?:a\s+|the\s+)?max\b|\badvantage\b|\bonce per\b|\bcritical\b/;
+// ⚠ OTA-1563 — WIDENED, because the first draft leaked. The Bone Spear
+// Launcher's *"Bypasses shields permanently on THIRD max roll"* slipped the
+// "on max" shape (an ordinal sat between the two words) and was handed a
+// permanent, unconditional shield-break on every swing — a Rare weapon quietly
+// out-performing the Legendary that has to earn it. Matching "max roll" and
+// "rolls of N+" ANYWHERE in the clause closes the shape rather than one spelling
+// of it.
+const IGNORE_DEFERRED_RE =
+  /\bmax\b|\badvantage\b|\bonce per\b|\bcritical\b|\brolls?\s+of\s+\d+/;
 
 /** Rank the scopes so a two-clause line ("Cuts through any armor; ignores
  *  non-magical defenses") resolves to the STRONGER claim rather than the last
@@ -108,17 +116,46 @@ const IGNORE_RANK: Record<ArmorIgnoreScope, number> = {
   all: 5, nonmagical: 4, light: 3, shields: 2, points: 1,
 };
 
+/**
+ * ⚠⚠⚠ OTA-1563 — THE VERB LIST WAS THE REAL LIMIT. OTA-1562 read "ignores" and
+ * "cuts through" and found eight weapons. The catalog was making the same
+ * promise in six other verbs the whole time, and each of those weapons was
+ * failing for a reason that had nothing to do with its design:
+ *
+ *   Bone Siege Crossbow  "Pierces armor; only energy armor resists."
+ *   Plasma Cutter Knife  "Melts through armor; 1d6 burning damage."
+ *   Aetheric Blade       "bypasses non-magical defenses."
+ *   Energy Blade         "Cuts non-magical armor; +1d6 on max roll."
+ *   Laser Blade          "Cuts through metal; +1d6 against armor."
+ *   Aether Lance         "Disrupts energy shields; …"
+ *   Winter's Verdict     "the freeze carries through armour and holds"
+ *
+ * ⚠⚠ WHAT IS DELIBERATELY STILL NOT A VERB, because the distinction is real:
+ * `reduces` / `splits`. The four Mud blades that *"reduce enemy armor by N"* are
+ * a SHRED — a lasting change to the enemy that the acid-coating path already
+ * models — not a one-swing bypass, and folding them in here would make the shred
+ * permanent, free, and invisible. They wait for the shred slice.
+ */
+const IGNORE_VERB_RE =
+  /\bignor\w*\b|\bcuts?\b|\bmelts?\s+through\b|\bpunches?\s+through\b|\bpierces?\b|\bbypass\w*\b|\bdisrupts?\b|\bcarries\s+through\b/;
+
 function armorIgnoreFromClause(clause: string): ArmorIgnore | null {
-  if (!/\bignor\w*\b|\bcuts?\s+through\b|\bpunches?\s+through\b/.test(clause)) return null;
+  if (!IGNORE_VERB_RE.test(clause)) return null;
   // "Ignores cover" and "Ignores wind conditions" are real effects — they are
   // just not THIS effect. Requiring an armour noun keeps them out of the AC math
-  // and leaves them for the weather/cover slice.
-  if (!/\barmou?r\b|\barmou?r\s+points?\b|\bdefen[cs]es?\b|\bshields?\b/.test(clause)) return null;
+  // and leaves them for the weather/cover slice. `metal` joins the nouns for the
+  // Laser Blade's "cuts through metal", which is what plate is made of.
+  if (!/\barmou?r\b|\barmou?r\s+points?\b|\bdefen[cs]es?\b|\bshields?\b|\bmetal\b/.test(clause)) return null;
   if (IGNORE_DEFERRED_RE.test(clause)) return null;
   const pts = clause.match(/(\d+)\s+armou?r\s+points?/);
   if (pts) return { scope: 'points', points: parseInt(pts[1]!, 10) };
   if (/\blight\s+armou?r\b/.test(clause)) return { scope: 'light' };
   if (/\bnon-?\s*(?:magical|aetheric|aether)\b/.test(clause)) return { scope: 'nonmagical' };
+  // ⚠ "only energy armor resists" and "cuts through metal" are the same claim
+  // said from the other side: mundane plate opens, an energised field does not.
+  if (/\bonly\s+energy\s+armou?r\s+resists\b|\bmetal\b/.test(clause)) return { scope: 'nonmagical' };
+  // A clause naming ONLY shields is a shield-breaker; one naming armour (with or
+  // without shields alongside) is the broader claim.
   if (/\barmou?r\b|\bdefen[cs]es?\b/.test(clause)) return { scope: 'all' };
   return { scope: 'shields' };
 }
@@ -126,7 +163,13 @@ function armorIgnoreFromClause(clause: string): ArmorIgnore | null {
 function rangeNoteFrom(text: string): WeaponRangeNote | null {
   if (/\bat any range\b/.test(text)) return 'any';
   if (/\bshort[- ]?ranged?\b/.test(text)) return 'short';
-  if (/\blong[- ]?ranged?\b/.test(text)) return 'long';
+  // ⚠ OTA-1563 — a thrown weapon says it reaches in the vocabulary of THROWING,
+  // not of range bands: the Bone Javelin's *"Longer throw than a knife"* and the
+  // Tartarian Spear's *"Long throw"* are the same claim the Bone War Javelin
+  // spells out as "Long range", and were the only three the note could ever
+  // matter for (a thrown weapon's class already stops short of `distant`; a
+  // rifle's does not).
+  if (/\blong[- ]?ranged?\b|\blong(?:er)?\s+throw\b/.test(text)) return 'long';
   return null;
 }
 
@@ -150,8 +193,18 @@ export function applyRangeNote(
     const full = reachBandsFor('ranged');
     return out.length >= full.length ? out : full;
   }
-  // 'short' — give up the outermost band, never dropping below close + mid.
-  return out.length > 2 ? out.slice(1) : out;
+  // ⚠⚠⚠ OTA-1563 — 'short' TAKES NOTHING AWAY. It used to give up the outermost
+  // band, which made the word mean something at the cost of shortening five
+  // weapons players already own. The owner's call: *"remove the nerfs from 1a."*
+  //
+  // ⚠⚠ AND THE NOTE STILL MEANS SOMETHING, because the difference was never
+  // supposed to come from the short end. A throwable's class bands ALREADY stop
+  // short of `distant` — that IS short range, correctly modelled, and always was.
+  // What was missing was the other half of the ladder: a "long range" throwable
+  // reaching a band its class does not. So the ladder is now built entirely out
+  // of PROMOTIONS — a long-range weapon climbs, a short-range one is simply
+  // telling you what its class already does. Nobody's weapon gets worse.
+  return out;
 }
 
 /**
@@ -263,6 +316,16 @@ export function parseWeaponEffect(effect: string | undefined | null): ParsedWeap
     }
   }
   if (best) {
+    // ⚠⚠ OTA-1563 — A QUALIFIER CAN SIT IN A DIFFERENT CLAUSE FROM THE CLAIM.
+    // The Bone Siege Crossbow says *"Pierces armor; only energy armor resists."*
+    // — clause one is an unqualified `all`, and clause two is the exception that
+    // makes it `nonmagical`. Clause-by-clause ranking cannot see that on its own
+    // (the exception carries no ignore verb, so it scores nothing), and the
+    // weapon came out stronger than its own sentence. The cap is applied to the
+    // finished answer, where the whole line is in view.
+    if (best.scope === 'all' && /\bonly\s+energy\s+armou?r\s+resists\b/.test(text)) {
+      best = { scope: 'nonmagical' };
+    }
     out.armorIgnore = best;
     touched = true;
   }
