@@ -198,19 +198,24 @@ describe('OTA-1578 — the escort has to be dealt with, not walked away from', (
   });
 
   it('⚠⚠⚠ AND CLEARING THEM IS WHAT MOVES IT ON', () => {
-    expect(GS).toContain("def?.stages[rec.stage]?.spawn?.enemyName === enemy.name");
-    expect(GS).toContain('The last of them is down.');
+        // ⚠ RETARGETED BY OTA-1583 — GS → QS. The escort clear moved out of
+    // gameStore's resolveEnemyDefeat and into questSlice.resolveStageEscortClear:
+    // ninety lines of contract-stage logic that happened to sit in the combat
+    // path, and gameStore's shrink-only line ratchet is what forced the issue.
+    // Every claim below is unchanged; only the address moved.
+    expect(QS).toContain("def?.stages[rec.stage]?.spawn?.enemyName === enemy.name");
+    expect(QS).toContain('The last of them is down.');
   });
 
   it('⚠⚠⚠ THE LAST ONE DECIDES — killing raider 1 of 3 resolves nothing', () => {
     // Read from the LIVE scene rather than a spawn count, so a wandering third
     // party joining the fight can never resolve the stage on its own.
-    expect(GS).toContain("(e, i) => i !== activeIdx && e.name === enemy.name && (live!.enemyHps[i] ?? 0) > 0,");
-    expect(GS).toContain('if (!stillUp) {');
+    expect(QS).toContain("(e, i) => i !== activeIdx && e.name === enemy.name && (live!.enemyHps[i] ?? 0) > 0,");
+    expect(QS).toContain('if (!stillUp) {');
   });
 
   it('⚠⚠ the next beat is narrated on the spot, not silently entered', () => {
-    expect(GS).toContain('get().appendLog(\'world\', nextDef.narration);');
+    expect(QS).toContain('get().appendLog(\'world\', nextDef.narration);');
   });
 });
 

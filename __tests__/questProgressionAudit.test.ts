@@ -675,8 +675,26 @@ describe('Quest progression audit', () => {
           reason: 'not on active list after accept' });
         continue;
       }
-      for (let i = rec.stage; i < s.stages.length; i++) {
+      // ⚠⚠⚠ OTA-1583 — A CHAPTER THAT STANDS SOMETHING UP IS CLOSED BY THE KILL,
+      // not by the next advance. `spawn` moved up to the shared stage binding
+      // this OTA so a storyline can finally put on the stair the thing its own
+      // prose says is on the stair — and the chapter FREEZES until the pack is
+      // down, which is exactly what the hunt loop above has always had to handle
+      // for boss stages. This audit fast-forwards, so it resolves the pack the
+      // same way the hunt loop does; ota1220's walker plays it properly, verb by
+      // verb, and is the end-to-end proof.
+      for (let i = rec.stage; i < s.stages.length + 2; i++) {
+        const cur = (store.getState().player?.activeStorylines ?? []).find((r) => r.id === s.id);
+        if (!cur || cur.stage >= s.stages.length) break;
         store.getState().advanceStoryline(s.id);
+        const scene = store.getState().currentScene;
+        const liveEnemy = !!scene && scene.enemies.some((_, idx) => (scene.enemyHps[idx] ?? 0) > 0);
+        if (liveEnemy) {
+          store.setState((st) => (st.currentScene
+            ? { ...st, currentScene: { ...st.currentScene, enemyHps: st.currentScene.enemyHps.map(() => 0) } }
+            : st));
+          store.getState().resolveEnemyDefeat();
+        }
       }
       const final = (store.getState().player?.activeStorylines ?? []).find((r) => r.id === s.id);
       if (!final || final.stage < s.stages.length) {

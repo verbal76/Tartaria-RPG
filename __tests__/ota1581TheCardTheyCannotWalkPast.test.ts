@@ -218,7 +218,10 @@ describe('OTA-1581 — the two engine holes the wiring exposed', () => {
     // Owner rule 8: the fight drops to the exploration screen and then "goes
     // back to the pop-up to resolve the rest of it" — TAKE, or TAKE AND KILL.
     // Advancing here would skip the aftermath the buttons promised.
-    const clear = blockAt(STORE, '        if (!stillUp) {');
+    // ⚠ RETARGETED BY OTA-1583 — GS → QS. The escort clear moved out of
+    // gameStore's resolveEnemyDefeat and into questSlice.resolveStageEscortClear.
+    // The claim is unchanged; only the address moved.
+    const clear = blockAt(QUEST, '  if (!stillUp) {');
     expect(clear).toContain("owning?.phase === 'fighting'");
     expect(clear).toContain("phase: 'aftermath' as const");
     // ⚠ NOT a bare `return` — the rest of resolveEnemyDefeat still has to run

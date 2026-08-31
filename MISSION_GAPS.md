@@ -148,16 +148,7 @@ walks past.
 Apex stages are exempt — the hunt boss is spawned by `scaleHuntBoss`, verified
 end-to-end by the hunt walker.
 
-**9 stages.**
-- Hunt · The Bog Dragon of Old Drakova · stage 3 (toll) — verb diplomacy
-- Hunt · The Bog Dragon of Old Drakova · stage 6 (catalyst) — verb attack_provoke
-- Hunt · The Sludge Behemoth at the Cradle of Dusk · stage 1 (inciting_hook) — verb diplomacy
-- Hunt · The Iron Titan in the Sentinel Ward · stage 6 (catalyst) — verb attack_provoke
-- Hunt · The Siren Queen of Zharak's Teeth · stage 4 (gauntlet) — verb attack_provoke
-- Hunt · The Weaver of the Obsidian Pillars · stage 6 (catalyst) — verb cast
-- Hunt · The Warden of Thametan's Tower · stage 5 (revelation) — verb diplomacy
-- Storyline · The Path of the True Tartarian · stage 4 (?) — verb investigate
-- Storyline · The Drowned Library · stage 4 (?) — verb escape
+**None.**
 
 ## 4. No early completion — auto stages whose prose describes an action
 
@@ -177,6 +168,5 @@ you performed.
 
 ## 5. Prose says you take something, the stage grants nothing
 
-**2 stages.**
+**1 stages.**
 - Storyline · Scripture in Stone · stage 6 (?)
-- Storyline · The Drowned Library · stage 5 (?)

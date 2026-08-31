@@ -52,26 +52,6 @@ export interface HuntStageDef extends StageBinding {
   narration: string;
   arbiter: string | null;
   checkKind: HuntCheckKind;
-  /**
-   * ⚠⚠⚠ OTA-1576 — WHAT THIS STAGE ACTUALLY PUTS IN FRONT OF YOU. Every boss
-   * stage used to spawn `HuntDef.targetEnemyName` — the hunt's ONE global
-   * target — whatever the stage's own prose said. That is fine for an `apex`,
-   * and it is exactly backwards for a `false_summit`, a stage type that exists
-   * to say THE TARGET WAS NOT HERE:
-   *
-   *   "You make the camp on the Plains by dusk. Embers still warm. REAVER GONE.
-   *    Three of his sworn followers rise … jaw-marked Tartarian raiders."
-   *   "You wade in expecting the Queen. THE QUEEN IS [gone] …"
-   *
-   * Both spawned the very boss the sentence says has left. The owner hit the
-   * first one, was told to find three Tartarian raiders, and found none —
-   * then typed the problem into the game in plain English.
-   *
-   * This is OTA-1086's rule, which hooks already got: when the prose names the
-   * creature, the spawn honours the name. `count` lets a stage that says
-   * "three" mean three.
-   */
-  spawn?: { enemyName: string; count?: number };
   /** 2026-05-26 OTA-055 — narrative slot in the standardized template.
    *  Surfaced as "Stage 3/7 — The Toll" in the ContractsScreen so the
    *  player knows what kind of beat they're on. */

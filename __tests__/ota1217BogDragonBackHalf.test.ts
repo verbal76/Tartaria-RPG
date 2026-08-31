@@ -168,6 +168,41 @@ describe('OTA-1217 — Bog Dragon back half, in order, each stage on its own ver
         await new Promise((r) => setTimeout(r, 150));
         drainRolls();
       }
+      // ⚠⚠⚠ OTA-1583 — AND STAGE 5 NOW HAS A PACK ON IT. Its own prose always
+      // said so — "a flight of Mud Harpies drops off the reeds, the Dragon's
+      // brood, sent to thin you before you arrive" — and nothing ever appeared,
+      // because a `boss` stage that is not the LAST boss silently spawned the
+      // apex instead and an `attack_provoke` stage spawned nothing at all. The
+      // beat freezes for the kill now, so the walker earns it the way a player
+      // does. This assertion is also the proof the freeze did not brick the hunt.
+      const packSpawn = (def.stages[sIdx] as { spawn?: { enemyName: string; count?: number } }).spawn;
+      if (packSpawn && stage() === sIdx) {
+        const want = packSpawn.enemyName;
+        await settle(() => (store.getState().currentScene?.enemies ?? []).some((e) => e.name === want));
+        const pack = store.getState().currentScene!.enemies.filter((e) => e.name === want);
+        expect({ stage: sIdx, spawned: pack.length }).toEqual({ stage: sIdx, spawned: packSpawn.count ?? 1 });
+        for (let k = pack.length; k > 0; k--) {
+          const live = store.getState().currentScene!;
+          const alive = live.enemies.filter((e, i) => e.name === want && (live.enemyHps[i] ?? 0) > 0);
+          useGameStore.setState({
+            currentScene: {
+              ...live,
+              enemies: alive, enemyHps: alive.map(() => 1), activeEnemyIdx: 0, range: 'close',
+              enemyAmbushUsed: alive.map(() => false), enemyKnockedOut: alive.map(() => false),
+              enemyStatuses: alive.map(() => []), enemyArmorShred: alive.map(() => 0),
+              enemyCorruptionStacks: alive.map(() => 0),
+            } as never,
+          });
+          for (let round = 0; round < 6 && stage() === sIdx
+            && (store.getState().currentScene?.enemies.length ?? 0) >= k; round++) {
+            await store.getState().submitPlayerAction('attack');
+            drainRolls();
+            await new Promise((r) => setTimeout(r, 150));
+            drainRolls();
+          }
+        }
+        await settle(() => stage() > sIdx);
+      }
       expect({ stage: sIdx, kind, advanced: stage() > sIdx }).toEqual({ stage: sIdx, kind, advanced: true });
     }
     expect(stage()).toBe(apexIdx0);

@@ -26179,7 +26179,49 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // carries no verb, which a fresh record starts ON and which nothing can ever
 // advance. Verified to fire. The prose-promises-a-fight-with-no-spawn count
 // rides as a shrink-only ratchet at 9.
-export const OTA_BUILD_ID = '2026-08-30-1582-the-guy-who-gives-you-the-job';
+// OTA-1583 - THE FAVOUR BEAT FIGHTS THE THING ITS OWN PROSE NAMES.
+//
+// THE MEASUREMENT. Fourteen hunts carry a mid-chain `boss` stage - the "favor"
+// beat of the standard_7 template - and every one of them names a specific
+// lesser creature in its own sentence: a Mud Wraith feeding on a dead boy, a
+// Rust Lurker come to finish an injured apprentice, an Aetheric Raven flock
+// picking over a Harpy's cache. Not one carried a `spawn`. A boss stage without
+// one spawns the hunt's LEGENDARY apex, so all fourteen stood the Bog Dragon,
+// the Sludge Behemoth, the Iron Titan up at stage 3 of 7 - and because only the
+// LAST boss freezes for the kill, the stage advanced on the spawn and the player
+// could simply walk away from it.
+//
+// This is OTA-1576's bug, unfixed. That OTA found the sentence on the two
+// false_summit stages, gave those two a spawn, and stopped. It was true of
+// fourteen more, and no prose pattern could ever have found them - the narration
+// reads perfectly. The defect is STRUCTURAL: boss, not last, no spawn. That is a
+// hard check in check:missionclaims now, verified to fire.
+//
+// THE OWNER'S RULING on what should happen instead, verbatim: "identify an
+// appropriate someone derived from the existing catalogue based on the lore and
+// narration of the mission and make them spawn in and draw first blood - sounds
+// like an ambush to me." Every creature here is one the prose already named;
+// where it invented one (a Bog Wraith, a Mud Crab, Drowned Reclaimers,
+// Wing-Things) the narration was reworded onto its nearest catalogued kin rather
+// than the catalogue being grown to match a passing noun. Twenty-one stage
+// spawns now, seventeen of them ambushes - and an ambush is only authored where
+// the sentence earns it: concealed cradles, a wall they walk out of, pillars
+// already waiting, something coming up under you. Where the player plainly moves
+// first ("it hesitates, deciding between you and him. You decide first") there
+// is no ambush.
+//
+// First blood is literal: close range, the `surprised` penalty the rest of the
+// game already uses, and one enemy volley before the player acts - through
+// runEnemyGroupCounters, the same single volley every combat round runs. A
+// second private way for enemies to hit the player is how two screens come to
+// disagree about what a round is.
+//
+// AND `spawn` MOVED UP to the shared stage binding, because the hole was never
+// hunt-shaped: a storyline whose prose says an Aetheric Ooze "bars the only
+// stair" had nothing on the stair. The escort CLEAR moved with it - a spawn
+// without a clear is a wedge, and extending one without the other would have
+// bricked the very storyline this fixed.
+export const OTA_BUILD_ID = '2026-08-31-1583-the-favour-beat-fights-what-it-names';
 // golem catch-up 2026-08-31: markerless publish of OTA-1582 — the opening stage
 // of all 50 staged missions stops being skipped, so the person who hands you the
 // job is finally somebody you meet; one shared definition of where a record

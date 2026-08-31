@@ -52,7 +52,16 @@ const locResolves = (name) => {
 // Deliberately conservative: each pattern is a phrase that describes a thing
 // HAPPENING to the player, not scenery. A false positive here inflates the
 // backlog; a false negative just means we find it on device instead.
-const PROMISES_COMBAT = /\b(attack|attacks|attacking|ambush|ambushes|rise from|rises|rush you|come at you|jump you|set on you|drop on you|charge|charges you|close on you|swing|draw steel|block your|bar your way|will not let you|no way past)\b/i;
+/**
+ * ⚠⚠ OTA-1583 TIGHTENED THIS, because five of its nine hits were its own noise.
+ * The first cut matched bare nouns and unrelated verbs: "he survived the last
+ * ATTACK" (a briefing), "you CHARGE a cutter against that hum" (a cast beat),
+ * "bait the SWING" (a man drawing timing on a flagstone in chalk), "the water
+ * RISES to reclaim its library" (a flood, no enemy). A check that cries wolf
+ * five times in nine gets ignored, and then the four real ones get ignored with
+ * it. Every clause below now has to be aimed AT THE PLAYER.
+ */
+const PROMISES_COMBAT = /\b(attacks? you|attacking you|ambush(?:es)? you|rises? from|rise from|rush(?:es)? you|come at you|comes at you|jump you|set on you|drop on you|charges? you|close on you|closes on you|draw steel|bars? your way|block your way|will not let you pass|no way past)\b/i;
 const PROMISES_PERSON = /\b(says|said|tells you|asks|nods|hands you|presses|pushes .* across|looks up|waves you|greets|meets you|waiting for you|speaks)\b/i;
 const PROMISES_TAKE = /\b(you (?:work|pull|lift|take|pocket|prise|pry|free|recover|collect|scoop|cut) [^.]*(?:free|loose|out|up)?|you put .* in your pack|slides out|comes free)\b/i;
 

@@ -51,6 +51,42 @@ export interface StageBinding {
   locationName?: string;
   /** Who is standing there for this stage — "his sister" needs to be somebody. */
   npcName?: string;
+  /**
+   * ⚠⚠⚠ OTA-1576 — WHAT THIS STAGE ACTUALLY PUTS IN FRONT OF YOU. Every boss
+   * stage used to spawn `HuntDef.targetEnemyName` — the hunt's ONE global
+   * target — whatever the stage's own prose said. That is fine for an `apex`,
+   * and it is exactly backwards for a `false_summit`, a stage type that exists
+   * to say THE TARGET WAS NOT HERE:
+   *
+   *   "You make the camp on the Plains by dusk. Embers still warm. REAVER GONE.
+   *    Three of his sworn followers rise … jaw-marked Tartarian raiders."
+   *   "You wade in expecting the Queen. THE QUEEN IS [gone] …"
+   *
+   * Both spawned the very boss the sentence says has left. The owner hit the
+   * first one, was told to find three Tartarian raiders, and found none —
+   * then typed the problem into the game in plain English.
+   *
+   * This is OTA-1086's rule, which hooks already got: when the prose names the
+   * creature, the spawn honours the name. `count` lets a stage that says
+   * "three" mean three.
+   *
+   * ⚠⚠ OTA-1583 MOVED THIS UP FROM HuntStageDef, because the hole was never
+   * hunt-shaped. `story_order_drowned_library` stage 4 says an Aetheric Ooze
+   * "bars the only stair" and you "cut through" it; a storyline's boss stage
+   * spawns nothing at all, so the stair was never barred and nothing was cut.
+   * The three families share one answer to "what is standing here", the same
+   * way P19 gave them one answer to grants / requires / locationName / npcName.
+   *
+   * ⚠⚠⚠ `ambush` IS THE OWNER'S RULING, verbatim: *"identify an appropriate
+   * someone derived from the existing catalogue based on the lore and narration
+   * of the mission and make them spawn in and draw first blood — sounds like an
+   * ambush to me."* First blood is literal: the pack opens at CLOSE range, the
+   * player takes the `surprised` penalty the rest of the game already uses, and
+   * the enemy group takes one volley before the player acts. It reuses
+   * `runEnemyGroupCounters` — the same single volley every other round runs —
+   * rather than inventing a second way for enemies to hit you.
+   */
+  spawn?: { enemyName: string; count?: number; ambush?: boolean };
 }
 
 /**
@@ -81,6 +117,49 @@ export function firstActionableStage(
   if (!stages) return 0;
   let i = 0;
   while (i < stages.length && stages[i]!.checkKind === null && !stages[i]!.npcName) i += 1;
+  return i;
+}
+
+/**
+ * ⚠⚠⚠ OTA-1583 — THE SAME QUESTION, ASKED FROM THE MIDDLE, and a bug the
+ * mystery/storyline walker caught within the hour.
+ *
+ * The escort clear in `resolveEnemyDefeat` advances a stage with a bare `+ 1`.
+ * That was safe while only hunts could carry a `spawn` and no hunt had a
+ * narration-only stage behind one. This OTA gave storylines spawns, and
+ * `story_order_drowned_library` has exactly that shape: the Ooze on stage 4, a
+ * pure-narration epilogue on stage 5. Killing the Ooze parked the record ON the
+ * epilogue, which no verb can pay and the auto-consume loops — which live inside
+ * `advance*`, not in the kill path — never saw. Chapter dead, silently, on the
+ * very stage this OTA set out to fix.
+ *
+ * ⚠⚠⚠ AND IT IS NOT THE SAME RULE AS `firstActionableStage`, which the walker
+ * proved within minutes of the first attempt to share one. `story_order_drowned_
+ * library` stage 5 is a null stage that NAMES A PERSON — Vesryn reading your
+ * salvage — so an npcName-aware skip stopped on it, and the chapter died there
+ * instead: no verb can pay a null stage, and the conversation card is the only
+ * other door. Trading one wedge for another.
+ *
+ * The two positions are genuinely different questions:
+ *
+ *   AT ACCEPT — never skip the person who hands you the job. That is the whole
+ *     of OTA-1582: fifty missions opened on a named giver and skipped all fifty.
+ *   MID-CHAIN — a trailing beat with no verb is an EPILOGUE, and the owner ruled
+ *     on exactly these fourteen: *"that sounds like a cue for a remote turn in
+ *     with prose, I'm ok with that."* They are consumed and READ OUT, the same
+ *     way OTA-871's and OTA-1219's loops have always consumed them, and their
+ *     words land as the chain closes.
+ *
+ * So this one skips on the verb alone — matching the advance loops it exists to
+ * agree with — and the npcName guard lives only at the door where it belongs.
+ */
+export function nextActionableStage(
+  stages: ReadonlyArray<{ checkKind: string | null; npcName?: string }> | undefined,
+  from: number,
+): number {
+  if (!stages) return from;
+  let i = Math.max(0, from);
+  while (i < stages.length && stages[i]!.checkKind === null) i += 1;
   return i;
 }
 

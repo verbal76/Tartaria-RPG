@@ -89,6 +89,12 @@ import { findStorylineById, availableStorylines, fuzzyFindStoryline } from '../.
  * this file stops compiling rather than silently accepting the wrong shape.
  */
 import { fuzzyFindFactionQuest } from '../../engine/factionQuests';
+// ⚠ OTA-1583 — pure data module, safe to import for value: an ambush hands the
+// player the SAME `surprised` effect a lost initiative does.
+import { applyEffect } from '../../engine/statusEffects';
+// ⚠ OTA-1583 — the escort clear moved here from gameStore; it asks the same
+// "where does this chain actually continue" question the accept doors ask.
+import { nextActionableStage } from '../../engine/questStage';
 import type * as Store from '../gameStore';
 // ⚠ OTA-1404 — type-only, same as the Store import above and for the same
 //   reason: it is erased at compile time, so it cannot form a runtime cycle.
@@ -165,6 +171,11 @@ export interface QuestSliceDeps {
   bumpQuestsAccepted: typeof Store.bumpQuestsAccepted;
   desiredMissionLeg: typeof Store.desiredMissionLeg;
   failEscortQuests: typeof Combat.failEscortQuests;
+  /** ⚠ OTA-1583 — the ONE enemy volley every combat round already runs. An
+   *  ambush's first blood routes through it rather than inventing a second way
+   *  for enemies to hit the player. Threaded like the two above to keep this
+   *  file free of a runtime cycle. */
+  runEnemyGroupCounters: typeof Combat.runEnemyGroupCounters;
   freshInstanceId: typeof Store.freshInstanceId;
   grantStageItems: typeof Store.grantStageItems;
   logRepChanges: typeof Store.logRepChanges;
@@ -178,6 +189,257 @@ export interface QuestSliceDeps {
   sightPerson: typeof Store.sightPerson;
   statNowClause: typeof Store.statNowClause;
   vendorNpcId: typeof Store.vendorNpcId;
+}
+
+/**
+ * ⚠⚠⚠ OTA-1583 — THE ESCORT CLEAR, MOVED OUT OF THE COMBAT PATH.
+ *
+ * It lived inside `resolveEnemyDefeat` in gameStore: ninety lines of
+ * CONTRACT-STAGE logic — which record is on a spawn stage, is this the last of
+ * the pack, does the conversation card own the aftermath, which family's array
+ * to bump, what to read out on the way past an epilogue — sitting in the middle
+ * of a combat function. It belongs here, beside the code that stood the pack up.
+ *
+ * ⚠ THE MOVE WAS FORCED BY A RATCHET, AND THAT IS THE RATCHET WORKING. gameStore
+ * is under a shrink-only line ceiling (OTA-1400's slice programme) and this OTA
+ * pushed it seven lines over. The cheapest way past a ceiling is always to put
+ * code where it belongs rather than to raise the ceiling.
+ *
+ * Behaviour is unchanged. Called once, from resolveEnemyDefeat.
+ */
+export function resolveStageEscortClear(
+  get: () => GameStore,
+  set: SetState,
+  player: PlayerCharacter,
+  enemy: { name: string },
+  activeIdx: number,
+): void {
+  // ⚠⚠⚠ OTA-1578 — CLEARING THE ESCORT IS WHAT RESOLVES A FALSE SUMMIT. OTA-1576
+  // gave the stage its own spawn, but the stage still advanced the moment the
+  // pack APPEARED (`freezeForKill` only covered the final boss), so a player
+  // could walk away from three raiders and be on the next beat anyway. The
+  // owner's ruling: "have someone there waiting to fight to resolve that stage
+  // to move to the next." So the beat now costs what it says it costs — the
+  // stage holds until the last of them is down.
+  //
+  // ⚠⚠⚠ OTA-1583 — AND IT COVERS ALL THREE FAMILIES NOW. `spawn` moved up to
+  // the shared StageBinding so a storyline whose prose says an Aetheric Ooze
+  // "bars the only stair" can actually put it on the stair — but a spawn with
+  // no clear is a WEDGE, not a feature: the chapter holds for a kill nothing
+  // is watching for. This block was hunt-only, so extending the spawn without
+  // extending the clear would have bricked that storyline on the stage it was
+  // meant to fix. One list, three families, one clear.
+  {
+    type EscortHit = {
+      family: 'hunt' | 'mystery' | 'storyline';
+      rec: { id: string; stage: number };
+      def: { id: string; title: string; stages: ReadonlyArray<{ narration: string; arbiter: string | null; checkKind: string | null; npcName?: string; spawn?: { enemyName: string } }> };
+    };
+    const escortRec: EscortHit | undefined = [
+      ...(player.activeHunts ?? []).map((rec) => ({ family: 'hunt' as const, rec, def: findHuntById(rec.id) })),
+      ...(player.activeMysteries ?? []).map((rec) => ({ family: 'mystery' as const, rec, def: findMysteryById(rec.id) })),
+      ...(player.activeStorylines ?? []).map((rec) => ({ family: 'storyline' as const, rec, def: findStorylineById(rec.id) })),
+    ].find(({ rec, def }) => def?.stages[rec.stage]?.spawn?.enemyName === enemy.name) as EscortHit | undefined;
+    if (escortRec?.def) {
+      // Is this the LAST of them? The scene is read live because the corpse
+      // count is what decides, not the spawn count — a fight can be joined by
+      // a wandering third party, and one of those must not resolve the stage.
+      // ⚠⚠ EXCLUDE THE ONE BEING RESOLVED. This runs DURING the defeat, and the
+      // dying body's HP is not necessarily written back to 0 yet — reading the
+      // scene naively counts the corpse as still standing, so the last kill
+      // never satisfies the check and the stage can never close. That would
+      // have made both false-summit hunts unfinishable, which is a worse bug
+      // than the one this OTA set out to fix. Keyed on INDEX, because three
+      // raiders share a name and identity here is positional.
+      const live = get().currentScene;
+      const stillUp = (live?.enemies ?? []).some(
+        (e, i) => i !== activeIdx && e.name === enemy.name && (live!.enemyHps[i] ?? 0) > 0,
+      );
+      if (!stillUp) {
+        // ⚠⚠⚠ OTA-1581 — IF THE CARD SENT YOU INTO THIS FIGHT, THE CARD FINISHES
+        // IT. Owner's rule 8, verbatim: *"if it does go to a fight, it drops back
+        // into the exploration screen until that part is over. then it goes back
+        // to the pop-up to resolve the rest of it."* The rest of it is TAKE or
+        // TAKE AND KILL — his rule 7 — and both of those close the stage
+        // themselves, peacefully, from the card.
+        //
+        // ⚠ So this branch must NOT advance here. Advancing would hand the player
+        // the next beat while a body they were told they could rob is still on the
+        // ground with the card's aftermath never shown — the beat promised in the
+        // buttons, silently skipped. It is the same disease as the burial bugs,
+        // only committed by the engine instead of the feed.
+        const encKey = `${escortRec.family}:${escortRec.rec.id}:${escortRec.rec.stage}`;
+        const owning = get().player?.missionEncounters?.[encKey];
+        if (owning?.phase === 'fighting') {
+          set((st) => (st.player
+            ? {
+                player: {
+                  ...st.player,
+                  missionEncounters: {
+                    ...(st.player.missionEncounters ?? {}),
+                    [encKey]: { ...owning, phase: 'aftermath' as const },
+                  },
+                },
+              }
+            : st));
+          get().appendLog('reward', `✦ The last of them is down. There is business left with ${escortRec.def.stages[escortRec.rec.stage]?.npcName ?? 'them'}.`);
+          void get().persist();
+        } else {
+          // ⚠ NOT a `return` — the rest of resolveEnemyDefeat (the hunt-boss
+          // kill, loot, the standing writes) still has to run for this corpse.
+          // Only the STAGE ADVANCE is what the card takes over.
+          // ⚠⚠⚠ OTA-1583 — NOT A BARE `+ 1`. A pure-narration beat behind a
+          // spawn stage — `story_order_drowned_library` has exactly that, the
+          // Ooze on 4 and an epilogue on 5 — parked the record ON a stage no
+          // verb can pay, because the auto-consume loops live inside `advance*`
+          // and never see the kill path. The mystery/storyline walker caught it
+          // within the hour. Same question the accept doors ask, asked from
+          // here, and each skipped beat still gets read out.
+          const nextStage = nextActionableStage(escortRec.def.stages, escortRec.rec.stage + 1);
+          for (let i = escortRec.rec.stage + 1; i < nextStage; i += 1) {
+            const skipped = escortRec.def.stages[i];
+            if (!skipped) continue;
+            get().appendLog('world', skipped.narration);
+            if (skipped.arbiter) get().appendLog('arbiter', skipped.arbiter);
+          }
+          // ⚠ The record lives on a different array per family; the advance is
+          // otherwise identical, so the list is chosen and the rest is shared.
+          const bump = <T extends { id: string; stage: number }>(list: T[] | undefined): T[] =>
+            (list ?? []).map((r) => (r.id === escortRec.rec.id ? { ...r, stage: nextStage } : r));
+          set((st) => (st.player
+            ? {
+                player: {
+                  ...st.player,
+                  ...(escortRec.family === 'hunt' ? { activeHunts: bump(st.player.activeHunts) } : {}),
+                  ...(escortRec.family === 'mystery' ? { activeMysteries: bump(st.player.activeMysteries) } : {}),
+                  ...(escortRec.family === 'storyline' ? { activeStorylines: bump(st.player.activeStorylines) } : {}),
+                },
+              }
+            : st));
+          const nextDef = escortRec.def.stages[nextStage];
+          get().appendLog('reward', `✦ The last of them is down. "${escortRec.def.title}" moves on.`);
+          if (nextDef) {
+            get().appendLog('world', nextDef.narration);
+            if (nextDef.arbiter) get().appendLog('arbiter', nextDef.arbiter);
+          } else if (escortRec.family === 'storyline') {
+            // ⚠⚠⚠ OTA-1583 — A CHAIN THAT ENDS ON A KILL STILL HAS TO SAY IT IS
+            // OVER. `story_order_drowned_library` now closes on the Ooze, and the
+            // "complete in the field" notice lives in `advanceStoryline` — which
+            // this path deliberately does not call. The walker caught it: the
+            // record reached `stages.length` and the player was told nothing.
+            // A chapter that ends in silence is the same defect as a beat that
+            // happens in silence, which is the whole subject of this run of OTAs.
+            get().appendLog(
+              'reward',
+              `✦ Storyline complete in the field — ${escortRec.def.title}. Return to a posting agent to turn it in.`,
+            );
+          }
+          void get().persist();
+        }
+      }
+    }
+  }
+}
+
+/**
+ * ⚠⚠⚠ OTA-1583 — WHAT THE STAGE SAID WOULD BE THERE, PUT THERE. One writer, all
+ * three families.
+ *
+ * THE MEASUREMENT that forced this. Fourteen hunts carry a mid-chain `boss`
+ * stage — the "favor" beat of the standard_7 template — and every one of them
+ * names a specific lesser creature in its own prose: a Mud Wraith feeding on a
+ * dead boy, a Rust Lurker come to finish an injured apprentice, an Aetheric
+ * Raven flock picking a Harpy's cache. Not one of them carried a `spawn`, and a
+ * `boss` stage without one spawns `HuntDef.targetEnemyName` — the hunt's
+ * LEGENDARY apex — at stage 3 of 7. Then, because only the LAST boss freezes for
+ * the kill, the stage advanced on the spawn and the player could simply walk
+ * away from it.
+ *
+ * That is OTA-1576's bug, unfixed. 1576 found it on the two `false_summit`
+ * stages, gave those two a `spawn`, and stopped. The same sentence was true of
+ * fourteen more.
+ *
+ * ⚠⚠ AND `spawn` WAS ONLY EVER READ INSIDE THE HUNT BOSS BRANCH, so a storyline
+ * could not have one at all: `story_order_drowned_library` says an Aetheric Ooze
+ * "bars the only stair" and that you "cut through" it, and nothing was ever on
+ * the stair. This helper is called from all three advance paths.
+ *
+ * ⚠⚠⚠ THE AMBUSH IS THE OWNER'S RULING, verbatim: *"identify an appropriate
+ * someone derived from the existing catalogue based on the lore and narration of
+ * the mission and make them spawn in and draw first blood — sounds like an
+ * ambush to me."* First blood is literal here:
+ *
+ *   • the pack opens at CLOSE range, not mid — they were already on you;
+ *   • the player takes `surprised`, the same effect a lost initiative applies
+ *     (−2, disadvantage, consumed once) rather than a new bespoke penalty;
+ *   • the enemy group takes ONE volley before the player acts, through
+ *     `runEnemyGroupCounters` — the same single volley every combat round runs.
+ *
+ * Reusing the volley matters: OTA-1017 already made "the enemies went first"
+ * a real state, and a second, private way for enemies to hit the player is how
+ * two screens come to disagree about how a round works.
+ *
+ * @returns true when bodies were actually placed.
+ */
+function spawnStageEscort(
+  get: () => GameStore,
+  set: SetState,
+  deps: QuestSliceDeps,
+  player: PlayerCharacter,
+  spawn: { enemyName: string; count?: number; ambush?: boolean } | null | undefined,
+): boolean {
+  if (!spawn) return false;
+  const escort = scaleHuntEscort(player, spawn.enemyName, deps.scalePowerOf(player), spawn.count ?? 1);
+  if (!escort || escort.length === 0) return false;
+  const ambush = spawn.ambush === true;
+  const many = escort.length > 1;
+  const who = escort[0]!.name;
+  set((s) =>
+    s.currentScene
+      ? {
+          currentScene: {
+            ...s.currentScene,
+            ...deps.FRESH_ENEMY_ARRAYS,
+            enemies: escort,
+            enemyHps: escort.map((e) => e.hp),
+            activeEnemyIdx: 0,
+            range: ambush ? 'close' : 'mid',
+          },
+        }
+      : s,
+  );
+  get().appendLog(
+    'combat',
+    ambush
+      ? (many
+        ? `${escort.length} ${who}s are on you before you have the room to turn.`
+        : `${who} is on you before you have the room to turn.`)
+      : (many
+        ? `${escort.length} ${who}s rise from the positions they were left in.`
+        : `${who} rises from the position it was left in.`),
+  );
+  if (!ambush) return true;
+  // ⚠ The penalty lands BEFORE the volley, so the ambusher's opening swing is
+  // the one the player is least ready for — which is the whole of "first blood".
+  set((s) =>
+    s.player
+      ? {
+          player: {
+            ...s.player,
+            statusEffects: applyEffect(s.player.statusEffects ?? [], {
+              kind: 'surprised',
+              remainingRounds: 1,
+              label: 'ambushed',
+            }),
+          },
+        }
+      : s,
+  );
+  const live = get().player;
+  if (live && (get().currentScene?.enemies.length ?? 0) > 0) {
+    deps.runEnemyGroupCounters(get, set, live);
+  }
+  return true;
 }
 
 export const createQuestSlice = (
@@ -1502,31 +1764,7 @@ export const createQuestSlice = (
     //
     // The boss SCALING stays boss-only. Only the escort moved out.
     const override = peaceful ? null : stageDef.spawn;
-    const escort = override
-      ? scaleHuntEscort(player, override.enemyName, deps.scalePowerOf(player), override.count ?? 1)
-      : null;
-    if (escort && escort.length > 0) {
-      set((s) =>
-        s.currentScene
-          ? {
-              currentScene: {
-                ...s.currentScene,
-                ...deps.FRESH_ENEMY_ARRAYS,
-                enemies: escort,
-                enemyHps: escort.map((e) => e.hp),
-                activeEnemyIdx: 0,
-                range: 'mid',
-              },
-            }
-          : s,
-      );
-      get().appendLog(
-        'combat',
-        escort.length > 1
-          ? `${escort.length} ${escort[0]!.name}s rise from the positions they were left in.`
-          : `${escort[0]!.name} rises from the position it was left in.`,
-      );
-    }
+    spawnStageEscort(get, set, deps, player, override);
     if (stageDef.checkKind === 'boss') {
       // ⚠ OTA-1167 — pass the REAL power measure, so the boss sees stats, weapon and AC
       // rather than max HP alone. `scalePowerOf` carries the guarded gear read.
@@ -1950,6 +2188,14 @@ export const createQuestSlice = (
         }
       }
     }
+    // ⚠⚠⚠ OTA-1583 — MYSTERIES AND STORYLINES CAN PUT SOMETHING IN FRONT OF YOU
+    // TOO. `spawn` was read in exactly one place — the hunt boss branch — so a
+    // storyline whose prose says an Aetheric Ooze "bars the only stair" had
+    // nothing on the stair. Same writer as the hunts now, so the freeze-for-kill
+    // and the conversation card's FIGHT branch behave identically in all three
+    // families.
+    const spawnedM = spawnStageEscort(get, set, deps, player, stageDef.spawn);
+    if (spawnedM) { void get().persist(); return; }
     // Final stage is the "synthesis" — the player has the trophy in hand
     // (narratively); advance the stage past the end so turn-in unlocks.
     let nextStage = record.stage + 1;
@@ -2280,6 +2526,10 @@ export const createQuestSlice = (
         }
       }
     }
+    // ⚠⚠⚠ OTA-1583 — see the mystery path above and spawnStageEscort's note. A
+    // storyline stage that authors a `spawn` now stands it up, and the chapter
+    // holds until it is cleared.
+    if (spawnStageEscort(get, set, deps, player, stageDef.spawn)) { void get().persist(); return; }
     let nextStage = record.stage + 1;
     // OTA-871 — auto-consume trailing pure-narration (checkKind: null) epilogue stages so a
     // storyline authored with a denouement after its final action doesn't hang one stage

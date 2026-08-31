@@ -67,7 +67,16 @@ const roleKeys = new Set(roster.map((r) => String(r.role).trim().toLowerCase()))
 // ── what the prose promises ─────────────────────────────────────────────────
 // Deliberately the SAME pattern the gap report uses, so the two never disagree
 // about what counts as "the text says there is a fight here".
-const PROMISES_COMBAT = /\b(attack|attacks|attacking|ambush|ambushes|rise from|rises|rush you|come at you|jump you|set on you|drop on you|charge|charges you|close on you|swing|draw steel|block your|bar your way|will not let you|no way past)\b/i;
+/**
+ * ⚠⚠ OTA-1583 TIGHTENED THIS, because five of its nine hits were its own noise.
+ * The first cut matched bare nouns and unrelated verbs: "he survived the last
+ * ATTACK" (a briefing), "you CHARGE a cutter against that hum" (a cast beat),
+ * "bait the SWING" (a man drawing timing on a flagstone in chalk), "the water
+ * RISES to reclaim its library" (a flood, no enemy). A check that cries wolf
+ * five times in nine gets ignored, and then the four real ones get ignored with
+ * it. Every clause below now has to be aimed AT THE PLAYER.
+ */
+const PROMISES_COMBAT = /\b(attacks? you|attacking you|ambush(?:es)? you|rises? from|rise from|rush(?:es)? you|come at you|comes at you|jump you|set on you|drop on you|charges? you|close on you|closes on you|draw steel|bars? your way|block your way|will not let you pass|no way past)\b/i;
 
 const errors = [];
 let fightProseNoSpawn = 0;
@@ -94,6 +103,31 @@ for (const [family, path] of FAMILIES) {
         'unwinnable from accept. Give the stage a verb (diplomacy fits a meeting) or take the ' +
         'person out of it.',
       );
+    }
+
+    // ⚠⚠⚠ CHECK 1b — THE ONE THE PROSE REGEX COULD NEVER SEE, and the reason
+    // OTA-1583 exists. A hunt `boss` stage with no `spawn` spawns
+    // `HuntDef.targetEnemyName` — the hunt's LEGENDARY apex. That is right for
+    // the last one and wrong for every other: fourteen hunts carried a mid-chain
+    // boss stage whose own prose named a lesser creature (a Mud Wraith feeding
+    // on a dead boy, a Rust Lurker at an injured apprentice, a Raven flock on a
+    // Harpy's cache) and every one of them stood the apex up at stage 3 of 7
+    // instead. Worse, only the LAST boss freezes for the kill, so the stage
+    // advanced on the spawn and the player could walk away from it.
+    //
+    // No prose pattern can catch that — the sentence reads fine. The STRUCTURE
+    // is the defect: boss + not-last + no spawn.
+    if (family === 'Hunt') {
+      let lastBoss = -1;
+      stages.forEach((s, i) => { if (s.checkKind === 'boss') lastBoss = i; });
+      stages.forEach((s, i) => {
+        if (s.checkKind !== 'boss' || i === lastBoss || s.spawn) return;
+        errors.push(
+          `Hunt ${m.id} stage ${i}: a mid-chain \`boss\` stage with no \`spawn\` stands up ` +
+          `"${m.targetEnemyName}" — this hunt's apex — at stage ${i} of ${stages.length - 1}. ` +
+          'Author the creature the stage\'s own prose names, or make it the last boss.',
+        );
+      });
     }
 
     stages.forEach((s, idx) => {

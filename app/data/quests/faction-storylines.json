@@ -549,7 +549,7 @@
           "locationName": "Karok-Sa"
         },
         {
-          "narration": "Something in the drowned nave has been alone a very long time. A Shifting Shade, born of the soured field, walks out of a wall between you and the shrine and will not let the faithful pass. You make it let them.",
+          "narration": "Something in the drowned nave has been alone a very long time. A Shifting Shade, born of the soured field, walks out of a wall between you and the shrine, and the faithful are behind you with nowhere left to go.",
           "arbiter": null,
           "checkKind": "attack_provoke",
           "grants": {
@@ -558,7 +558,12 @@
           "requires": {
             "item": "A Corridor of Clean Air"
           },
-          "locationName": "Karok-Sa"
+          "locationName": "Karok-Sa",
+          "spawn": {
+            "enemyName": "Shifting Shade",
+            "count": 1,
+            "ambush": true
+          }
         },
         {
           "narration": "At the shrine the eldest pilgrim breaks — this was her birth-city, drowned when she was a child. She will not leave the water's edge. You talk her back from it, and she gives you the relighting-word her mother taught her, which she has carried sixty years to say here.",
@@ -1108,13 +1113,17 @@
           "locationName": "The Sunken Enclave"
         },
         {
-          "narration": "At the Enclave mouth an Aetheric Ooze — grown fat on a century of dissolved ink and lost thought — bars the only stair. It has read, in its way, everything that dissolved into it. You cut through the sum of the Order's losses to reach the light.",
+          "narration": "At the Enclave mouth an Aetheric Ooze — grown fat on a century of dissolved ink and lost thought — bars the only stair. It has read, in its way, everything that dissolved into it. There is no way up that does not go through the sum of the Order's losses.",
           "arbiter": null,
           "checkKind": "boss",
           "requires": {
             "item": "The Chosen Salvage"
           },
-          "locationName": "The Sunken Enclave"
+          "locationName": "The Sunken Enclave",
+          "spawn": {
+            "enemyName": "Aetheric Ooze",
+            "count": 1
+          }
         },
         {
           "narration": "You lay your salvage on Vesryn's table — a handful of what once filled a hall. He reads the founder's treatise on the cores and goes very still. \"This changes what we thought we knew about the Flood,\" he says. \"You chose these pages. You should be here when we learn what they mean.\"",

@@ -101,11 +101,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Mud Flood Nexus | — | Mira's Shrine-Map | The Boy's Locket | boss | — |
+| Mud Flood Nexus | — | Mira's Shrine-Map | The Boy's Locket | boss | Mud Wraith ×1 |
 
 **Text:**
 
-> Mira's map takes you down through the Nexus to where the flood-works pool. The shrine is silt-glass and old prayer. You find the boy where he fell, a Bog Wraith feeding on what's left. You drive it off and free the locket from his hand. It is still warm to the touch.
+> Mira's map takes you down through the Nexus to where the flood-works pool. The shrine is silt-glass and old prayer. You find the boy where he fell — and the Mud Wraith that has been feeding on what is left of him comes off the body fast, before your hand is anywhere near the locket.
 
 **Checklist:**
 
@@ -131,11 +131,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Mud Seas | — | Eshren's Name-Token | — | attack_provoke | — |
+| Mud Seas | — | Eshren's Name-Token | — | attack_provoke | Mud Harpy ×3 |
 
 **Text:**
 
-> You push out into the Mud Seas with the name in your fist. Before the steeple is even in sight a flock of lesser Wing-Things rises off the reeds — the Dragon's brood, sent to thin you before you arrive. Cut through them. The steeple is not going anywhere.
+> You push out into the Mud Seas with the name in your fist. Before the steeple is even in sight a flight of Mud Harpies drops off the reeds — the Dragon's brood, sent to thin you before you arrive. The steeple is not going anywhere. They are.
 
 **Checklist:**
 
@@ -217,11 +217,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Giant Vault | — | Karin's Archive Seal | Karin's Blueprint Tube | boss | — |
+| The Giant Vault | — | Karin's Archive Seal | Karin's Blueprint Tube | boss | Mud Wraith ×3 |
 
 **Text:**
 
-> The Vault's seals open to Karin's plate at the touch. As you pull the blueprint tube from its cradle a clutch of Mud Wraiths peels off the wall behind you — the Titan's vibration woke them weeks ago and nothing has come down here since to put them back to sleep. You clear them and take the tube out under your arm.
+> The Vault's seals open to Karin's plate at the touch. As you pull the blueprint tube from its cradle a clutch of Mud Wraiths peels off the wall behind you — the Titan's vibration woke them weeks ago and nothing has come down here since to put them back to sleep.
 
 **Checklist:**
 
@@ -303,11 +303,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Mud Seas | — | Sealed Coordinate Tube | Dive-Camp Tally | boss | — |
+| Mud Seas | — | Sealed Coordinate Tube | Dive-Camp Tally | boss | Swamp Crab ×1 |
 
 **Text:**
 
-> Out on the Mud Seas you cross a half-drowned dive-camp. Three tubes torn open. One man still breathing, ribs broken, calling for water. A Mud Crab the size of a pony hesitates at the edge of the camp, deciding between you and him. You decide first. The camp's tally-board comes away in your hand — four crews, all struck at slack tide.
+> Out on the Mud Seas you cross a half-drowned dive-camp. Three tubes torn open. One man still breathing, ribs broken, calling for water. A Swamp Crab the size of a pony hesitates at the edge of the camp, deciding between you and him. You decide first.
 
 **Checklist:**
 
@@ -331,11 +331,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Zharak's Teeth | — | Jarn's Wreck-Bearing | Jarn's Harpoon-Rig | boss | — |
+| Zharak's Teeth | — | Jarn's Wreck-Bearing | Jarn's Harpoon-Rig | boss | Drowned Aetherkin ×3 |
 
 **Text:**
 
-> Jarn's bearing puts you over the Marlin's half-sunk hull. The harpoon-rig is wedged under the ship's rib, where his crew went down with it. They didn't all stay dead — three Drowned Reclaimers turn at the sound of your tank. You clear them and bring the rig up.
+> Jarn's bearing puts you over the Marlin's half-sunk hull. The harpoon-rig is wedged under the ship's rib, where his crew went down with it. They did not all stay dead — three Drowned Aetherkin turn at the sound of your tank and come off the wreck together.
 
 **Checklist:**
 
@@ -443,11 +443,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Grand Spire of Etheria | — | Ammon's Relay Warrant | The Ward Patrol Log | boss | — |
+| Grand Spire of Etheria | — | Ammon's Relay Warrant | The Ward Patrol Log | boss | Lens Prier ×1 |
 
 **Text:**
 
-> The Spire's relay room is half-buried and leaning hard. An Order Apostate is standing in the doorway — left his faith and stayed for the relics. He reads the warrant, laughs at it, and won't let you pass with the log. You take it from him.
+> The Spire's relay room is half-buried and leaning hard. A Lens Prier is standing in the doorway — Order-trained once, left his faith and stayed for the relics. He reads the warrant, laughs at it, and puts a bar across your chest before you have finished the sentence.
 
 **Checklist:**
 
@@ -471,11 +471,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| the Sentinel Ward | — | Ammon's Signet Ring | Ward Bypass Codes | attack_provoke | — |
+| the Sentinel Ward | — | Ammon's Signet Ring | Ward Bypass Codes | attack_provoke | Aetheric Drone ×3 |
 
 **Text:**
 
-> You lift the ring to the seal and the Ward opens for you. It also wakes: drones rise from concealed cradles across the approach, two thousand years patient and done waiting. Put them down. Ammon's codes come out of the ring only once the approach is clear.
+> You lift the ring to the seal and the Ward opens for you. It also wakes: Aetheric Drones rise from concealed cradles across the approach, two thousand years patient and done waiting. Ammon's codes come out of the ring only once the approach is clear.
 
 **Checklist:**
 
@@ -556,11 +556,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Zharak's Teeth | — | Reclaimer's Survey-Pen | North-Pillar Bearing | attack_provoke | — |
+| Zharak's Teeth | — | Reclaimer's Survey-Pen | North-Pillar Bearing | attack_provoke | Mud Siren ×3 |
 
 **Text:**
 
-> You wade the Teeth spire by spire on the pen's line. Every pillar carries another Siren in waiting. The chorus rises around you, half song and half scream. You hold your line and put them down until the water goes quiet, and the last one dies pointing north.
+> You wade the Teeth spire by spire on the pen's line. Every pillar carries another Mud Siren in waiting, and the chorus rises around you — half song, half scream — before you have the line half walked. Whatever is still standing when the water goes quiet will be pointing north.
 
 **Checklist:**
 
@@ -724,11 +724,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Yuldra-Tul | — | Ost's Scree-Line Sketch | The Apprentice's Toolroll | boss | — |
+| Yuldra-Tul | — | Ost's Scree-Line Sketch | The Apprentice's Toolroll | boss | Rust Lurker ×1 |
 
 **Text:**
 
-> The sketch puts you on the frost side of Yuldra-Tul, where the apprentice is pinned in a scree-slip with a broken leg — alive by the luck of the Walker passing him for dead. A Rust Lurker has come to finish what the mountain started. You drive it off, splint the leg, and carry the boy and his toolroll down.
+> The sketch puts you on the frost side of Yuldra-Tul, where the apprentice is pinned in a scree-slip with a broken leg — alive by the luck of the Walker passing him for dead. A Rust Lurker has come to finish what the mountain started, and it reaches the boy's line before you do.
 
 **Checklist:**
 
@@ -837,11 +837,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| the Sinking Cathedral | — | Wren's Transept Sketch | Wren's Body | boss | — |
+| the Sinking Cathedral | — | Wren's Transept Sketch | Wren's Body | boss | Mud Wraith ×1 |
 
 **Text:**
 
-> The sketch takes you down through the flooded transept, and you find Wren where the Serpent left her — and a Bog Wraith risen from the drowned to guard the drowned. You put it back down and bring Wren up into the light.
+> The sketch takes you down through the flooded transept, and you find Wren where the Serpent left her — and a Mud Wraith risen from the drowned to guard the drowned. It comes up out of the silt between you and her.
 
 **Checklist:**
 
@@ -950,11 +950,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Thametan's Tower | — | Bael's Vigil-Candle | Bael's High-Turn Rubbing | boss | — |
+| Thametan's Tower | — | Bael's Vigil-Candle | Bael's High-Turn Rubbing | boss | Aetheric Apparition ×1 |
 
 **Text:**
 
-> In the small hours a lesser dark tests the Tower — an Aetheric Apparition drawn straight to Bael's fear. You hold the candle and put the thing down, and Bael sleeps through the dawn for the first time in a year. In the morning he gives you the charcoal rubbing he took off the high turn, the one he has never shown anyone.
+> In the small hours a lesser dark tests the Tower — an Aetheric Apparition drawn straight to Bael's fear. It is inside the candle-ring before either of you has a word for it.
 
 **Checklist:**
 
@@ -1063,11 +1063,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Mud Seas | — | Halla's Shallows-Bearing | The Netter's Brother | boss | — |
+| Mud Seas | — | Halla's Shallows-Bearing | The Netter's Brother | boss | Bog Creeper ×1 |
 
 **Text:**
 
-> You wade Halla's bearing out into the shallows and find her brother — and a Bog Creeper that has claimed the body for its own larder. You drive it off and carry the man up onto dry ground, out of the Siren's reach at last.
+> You wade Halla's bearing out into the shallows and find her brother face-down in the reeds — and the Bog Creeper that has claimed the body for its own larder comes up under you for the trespass.
 
 **Checklist:**
 
@@ -1174,11 +1174,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Obsidian Pillars | — | Pike's Web-Map | The Cocooned Salvager | boss | — |
+| Obsidian Pillars | — | Pike's Web-Map | The Cocooned Salvager | boss | Aetheric Spider ×3 |
 
 **Text:**
 
-> Pike's lines take you up to where his partner hangs wound in iron silk — alive, half-mad, and with an Aetheric Spider brood already feeding at the cocoon's edge. You clear them and cut the man free into the light.
+> Pike's lines take you up to where his partner hangs wound in iron silk — alive, half-mad, and with an Aetheric Spider brood already feeding at the cocoon's edge. The strand you are standing on tells them exactly where you are.
 
 **Checklist:**
 
@@ -1285,11 +1285,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| the Red Tower of Nimari | — | Vesryn's Gallery Plan | The Lead Scholar's Remains | boss | — |
+| the Red Tower of Nimari | — | Vesryn's Gallery Plan | The Lead Scholar's Remains | boss | Shifting Shade ×1 |
 
 **Text:**
 
-> The plan takes you up to the third gallery, where the Tower's cursed Aether caught the student — and a Shifting Shade is circling what remains. You put the Shade down and carry her out, and Vesryn covers his face when he sees what you are carrying.
+> The plan takes you up to the third gallery, where the Tower's cursed Aether caught the student — and a Shifting Shade is circling what remains of her. It stops circling the moment your lamp finds it.
 
 **Checklist:**
 
@@ -1396,11 +1396,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Cradle of Dusk | — | Ferel's High-Spire Line | Ferel's Daughter | boss | — |
+| Cradle of Dusk | — | Ferel's High-Spire Line | Ferel's Daughter | boss | Aetheric Raven ×4 |
 
 **Text:**
 
-> Ferel's line takes you up to where the Harpy caches its kills. You find his daughter among older bones with an Aetheric Raven flock already picking the site. You scatter them and bring her down.
+> Ferel's line takes you up to where the Harpy caches its kills. You find his daughter among older bones with an Aetheric Raven flock already picking over the site — and the flock does not scatter. It turns.
 
 **Checklist:**
 
@@ -1509,11 +1509,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Samarran | — | Yenna's Pump-Works Key | Cistern Fouling-Plate | boss | — |
+| Samarran | — | Yenna's Pump-Works Key | Cistern Fouling-Plate | boss | Bog Creeper ×1 |
 
 **Text:**
 
-> You unlock the pump-works and go down into the cistern, and find the foulness breeding in the dark: a Bog Creeper denned in the intake. You clear it out. The well runs clean above you, and you bring up the fouling-plate as proof.
+> You unlock the pump-works and go down into the cistern and find the foulness breeding in the dark: a Bog Creeper denned in the intake, awake, and between you and the fouling-plate.
 
 **Checklist:**
 
@@ -1620,11 +1620,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Thametan's Tower | — | Del's Upper-Chamber Route | The Builders' Treatise | boss | — |
+| Thametan's Tower | — | Del's Upper-Chamber Route | The Builders' Treatise | boss | Iron Spider ×2 |
 
 **Text:**
 
-> Del's route takes you past the Golem to the upper chamber, where the treatise sits exactly where the Builders dropped it — and an Iron Spider has nested in their abandoned gear, guarding it entirely by accident. You clear the nest and take the reading.
+> Del's route takes you past the Golem to the upper chamber, where the treatise sits exactly where the Builders dropped it — and a pair of Iron Spiders have nested in the abandoned gear, guarding it entirely by accident. They come off the gear the moment you reach for the page.
 
 **Checklist:**
 
@@ -3795,11 +3795,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Karok-Sa | — | A Corridor of Clean Air | The Nave, Cleared | attack_provoke | — |
+| Karok-Sa | — | A Corridor of Clean Air | The Nave, Cleared | attack_provoke | Shifting Shade ×1 |
 
 **Text:**
 
-> Something in the drowned nave has been alone a very long time. A Shifting Shade, born of the soured field, walks out of a wall between you and the shrine and will not let the faithful pass. You make it let them.
+> Something in the drowned nave has been alone a very long time. A Shifting Shade, born of the soured field, walks out of a wall between you and the shrine, and the faithful are behind you with nowhere left to go.
 
 **Checklist:**
 
@@ -4495,11 +4495,11 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Sunken Enclave | — | The Chosen Salvage | — | boss | — |
+| The Sunken Enclave | — | The Chosen Salvage | — | boss | Aetheric Ooze ×1 |
 
 **Text:**
 
-> At the Enclave mouth an Aetheric Ooze — grown fat on a century of dissolved ink and lost thought — bars the only stair. It has read, in its way, everything that dissolved into it. You cut through the sum of the Order's losses to reach the light.
+> At the Enclave mouth an Aetheric Ooze — grown fat on a century of dissolved ink and lost thought — bars the only stair. It has read, in its way, everything that dissolved into it. There is no way up that does not go through the sum of the Order's losses.
 
 **Checklist:**
 

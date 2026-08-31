@@ -324,7 +324,7 @@ import type {
   RepairOpts,
   RepairVerdict,
 } from '../engine/crucibleGuard';
-import { createQuestSlice } from './slices/questSlice';
+import { createQuestSlice, resolveStageEscortClear } from './slices/questSlice';
 import { createBoardSlice } from './slices/boardSlice';
 import { setLastBootBreadcrumb } from '../diagnostics/runtimePressure'; // OTA-1276
 import { makeEntry, persistEntry } from '../engine/gameLog';
@@ -8634,6 +8634,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     mergeRewardLines,
     nextAcceptBurstIndex,
     recordMemorableEvent,
+    // ⚠ OTA-1583 — an ambushing stage spawn draws first blood through the SAME
+    // volley every combat round runs. See spawnStageEscort.
+    runEnemyGroupCounters,
     safeLocName,
     sameStackUnit,
     scalePowerOf,
@@ -24494,87 +24497,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }));
       }
     }
-    // ⚠⚠⚠ OTA-1578 — CLEARING THE ESCORT IS WHAT RESOLVES A FALSE SUMMIT. OTA-1576
-    // gave the stage its own spawn, but the stage still advanced the moment the
-    // pack APPEARED (`freezeForKill` only covered the final boss), so a player
-    // could walk away from three raiders and be on the next beat anyway. The
-    // owner's ruling: "have someone there waiting to fight to resolve that stage
-    // to move to the next." So the beat now costs what it says it costs — the
-    // stage holds until the last of them is down.
-    {
-      const escortRec = (player.activeHunts ?? [])
-        .map((rec) => ({ rec, def: findHuntById(rec.id) }))
-        .find(({ rec, def }) => def?.stages[rec.stage]?.spawn?.enemyName === enemy.name);
-      if (escortRec?.def) {
-        // Is this the LAST of them? The scene is read live because the corpse
-        // count is what decides, not the spawn count — a fight can be joined by
-        // a wandering third party, and one of those must not resolve the stage.
-        // ⚠⚠ EXCLUDE THE ONE BEING RESOLVED. This runs DURING the defeat, and the
-        // dying body's HP is not necessarily written back to 0 yet — reading the
-        // scene naively counts the corpse as still standing, so the last kill
-        // never satisfies the check and the stage can never close. That would
-        // have made both false-summit hunts unfinishable, which is a worse bug
-        // than the one this OTA set out to fix. Keyed on INDEX, because three
-        // raiders share a name and identity here is positional.
-        const live = get().currentScene;
-        const stillUp = (live?.enemies ?? []).some(
-          (e, i) => i !== activeIdx && e.name === enemy.name && (live!.enemyHps[i] ?? 0) > 0,
-        );
-        if (!stillUp) {
-          // ⚠⚠⚠ OTA-1581 — IF THE CARD SENT YOU INTO THIS FIGHT, THE CARD FINISHES
-          // IT. Owner's rule 8, verbatim: *"if it does go to a fight, it drops back
-          // into the exploration screen until that part is over. then it goes back
-          // to the pop-up to resolve the rest of it."* The rest of it is TAKE or
-          // TAKE AND KILL — his rule 7 — and both of those close the stage
-          // themselves, peacefully, from the card.
-          //
-          // ⚠ So this branch must NOT advance here. Advancing would hand the player
-          // the next beat while a body they were told they could rob is still on the
-          // ground with the card's aftermath never shown — the beat promised in the
-          // buttons, silently skipped. It is the same disease as the burial bugs,
-          // only committed by the engine instead of the feed.
-          const encKey = `hunt:${escortRec.rec.id}:${escortRec.rec.stage}`;
-          const owning = get().player?.missionEncounters?.[encKey];
-          if (owning?.phase === 'fighting') {
-            set((st) => (st.player
-              ? {
-                  player: {
-                    ...st.player,
-                    missionEncounters: {
-                      ...(st.player.missionEncounters ?? {}),
-                      [encKey]: { ...owning, phase: 'aftermath' as const },
-                    },
-                  },
-                }
-              : st));
-            get().appendLog('reward', `✦ The last of them is down. There is business left with ${escortRec.def.stages[escortRec.rec.stage]?.npcName ?? 'them'}.`);
-            void get().persist();
-          } else {
-            // ⚠ NOT a `return` — the rest of resolveEnemyDefeat (the hunt-boss
-            // kill, loot, the standing writes) still has to run for this corpse.
-            // Only the STAGE ADVANCE is what the card takes over.
-            const nextStage = escortRec.rec.stage + 1;
-            set((st) => (st.player
-              ? {
-                  player: {
-                    ...st.player,
-                    activeHunts: (st.player.activeHunts ?? []).map((h) =>
-                      h.id === escortRec.rec.id ? { ...h, stage: nextStage } : h,
-                    ),
-                  },
-                }
-              : st));
-            const nextDef = escortRec.def.stages[nextStage];
-            get().appendLog('reward', `✦ The last of them is down. "${escortRec.def.title}" moves on.`);
-            if (nextDef) {
-              get().appendLog('world', nextDef.narration);
-              if (nextDef.arbiter) get().appendLog('arbiter', nextDef.arbiter);
-            }
-            void get().persist();
-          }
-        }
-      }
-    }
+    // ⚠⚠ OTA-1583 — THE ESCORT CLEAR MOVED TO questSlice. It is 90 lines of
+    // CONTRACT-STAGE logic that happened to live in the combat path, and this
+    // file is under a shrink-only line ratchet for exactly that reason: the
+    // cheapest way past a ceiling is always to put code where it belongs rather
+    // than to raise the ceiling. Same behaviour, one call.
+    resolveStageEscortClear(get, set, player, enemy, activeIdx);
+
     // Hunt-boss kill: if the slain enemy's name matches a target of an
     // active hunt currently at its boss stage, advance the hunt one more
     // beat (past the boss stage) so the player can turn it in.

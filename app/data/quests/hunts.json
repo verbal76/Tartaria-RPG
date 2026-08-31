@@ -57,7 +57,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "Mira's map takes you down through the Nexus to where the flood-works pool. The shrine is silt-glass and old prayer. You find the boy where he fell, a Bog Wraith feeding on what's left. You drive it off and free the locket from his hand. It is still warm to the touch.",
+          "narration": "Mira's map takes you down through the Nexus to where the flood-works pool. The shrine is silt-glass and old prayer. You find the boy where he fell — and the Mud Wraith that has been feeding on what is left of him comes off the body fast, before your hand is anywhere near the locket.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -66,7 +66,12 @@
           "requires": {
             "item": "Mira's Shrine-Map"
           },
-          "locationName": "Mud Flood Nexus"
+          "locationName": "Mud Flood Nexus",
+          "spawn": {
+            "enemyName": "Mud Wraith",
+            "count": 1,
+            "ambush": true
+          }
         },
         {
           "stageType": "revelation",
@@ -84,13 +89,18 @@
         },
         {
           "stageType": "catalyst",
-          "narration": "You push out into the Mud Seas with the name in your fist. Before the steeple is even in sight a flock of lesser Wing-Things rises off the reeds — the Dragon's brood, sent to thin you before you arrive. Cut through them. The steeple is not going anywhere.",
+          "narration": "You push out into the Mud Seas with the name in your fist. Before the steeple is even in sight a flight of Mud Harpies drops off the reeds — the Dragon's brood, sent to thin you before you arrive. The steeple is not going anywhere. They are.",
           "arbiter": null,
           "checkKind": "attack_provoke",
           "requires": {
             "item": "Eshren's Name-Token"
           },
-          "locationName": "Mud Seas"
+          "locationName": "Mud Seas",
+          "spawn": {
+            "enemyName": "Mud Harpy",
+            "count": 3,
+            "ambush": true
+          }
         },
         {
           "stageType": "apex",
@@ -160,7 +170,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "The Vault's seals open to Karin's plate at the touch. As you pull the blueprint tube from its cradle a clutch of Mud Wraiths peels off the wall behind you — the Titan's vibration woke them weeks ago and nothing has come down here since to put them back to sleep. You clear them and take the tube out under your arm.",
+          "narration": "The Vault's seals open to Karin's plate at the touch. As you pull the blueprint tube from its cradle a clutch of Mud Wraiths peels off the wall behind you — the Titan's vibration woke them weeks ago and nothing has come down here since to put them back to sleep.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -169,7 +179,12 @@
           "requires": {
             "item": "Karin's Archive Seal"
           },
-          "locationName": "The Giant Vault"
+          "locationName": "The Giant Vault",
+          "spawn": {
+            "enemyName": "Mud Wraith",
+            "count": 3,
+            "ambush": true
+          }
         },
         {
           "stageType": "revelation",
@@ -242,7 +257,7 @@
         },
         {
           "stageType": "first_friction",
-          "narration": "Out on the Mud Seas you cross a half-drowned dive-camp. Three tubes torn open. One man still breathing, ribs broken, calling for water. A Mud Crab the size of a pony hesitates at the edge of the camp, deciding between you and him. You decide first. The camp's tally-board comes away in your hand — four crews, all struck at slack tide.",
+          "narration": "Out on the Mud Seas you cross a half-drowned dive-camp. Three tubes torn open. One man still breathing, ribs broken, calling for water. A Swamp Crab the size of a pony hesitates at the edge of the camp, deciding between you and him. You decide first.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -251,7 +266,11 @@
           "requires": {
             "item": "Sealed Coordinate Tube"
           },
-          "locationName": "Mud Seas"
+          "locationName": "Mud Seas",
+          "spawn": {
+            "enemyName": "Swamp Crab",
+            "count": 1
+          }
         },
         {
           "stageType": "toll",
@@ -269,7 +288,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "Jarn's bearing puts you over the Marlin's half-sunk hull. The harpoon-rig is wedged under the ship's rib, where his crew went down with it. They didn't all stay dead — three Drowned Reclaimers turn at the sound of your tank. You clear them and bring the rig up.",
+          "narration": "Jarn's bearing puts you over the Marlin's half-sunk hull. The harpoon-rig is wedged under the ship's rib, where his crew went down with it. They did not all stay dead — three Drowned Aetherkin turn at the sound of your tank and come off the wreck together.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -278,7 +297,12 @@
           "requires": {
             "item": "Jarn's Wreck-Bearing"
           },
-          "locationName": "Zharak's Teeth"
+          "locationName": "Zharak's Teeth",
+          "spawn": {
+            "enemyName": "Drowned Aetherkin",
+            "count": 3,
+            "ambush": true
+          }
         },
         {
           "stageType": "revelation",
@@ -378,7 +402,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "The Spire's relay room is half-buried and leaning hard. An Order Apostate is standing in the doorway — left his faith and stayed for the relics. He reads the warrant, laughs at it, and won't let you pass with the log. You take it from him.",
+          "narration": "The Spire's relay room is half-buried and leaning hard. A Lens Prier is standing in the doorway — Order-trained once, left his faith and stayed for the relics. He reads the warrant, laughs at it, and puts a bar across your chest before you have finished the sentence.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -387,7 +411,12 @@
           "requires": {
             "item": "Ammon's Relay Warrant"
           },
-          "locationName": "Grand Spire of Etheria"
+          "locationName": "Grand Spire of Etheria",
+          "spawn": {
+            "enemyName": "Lens Prier",
+            "count": 1,
+            "ambush": true
+          }
         },
         {
           "stageType": "revelation",
@@ -405,7 +434,7 @@
         },
         {
           "stageType": "catalyst",
-          "narration": "You lift the ring to the seal and the Ward opens for you. It also wakes: drones rise from concealed cradles across the approach, two thousand years patient and done waiting. Put them down. Ammon's codes come out of the ring only once the approach is clear.",
+          "narration": "You lift the ring to the seal and the Ward opens for you. It also wakes: Aetheric Drones rise from concealed cradles across the approach, two thousand years patient and done waiting. Ammon's codes come out of the ring only once the approach is clear.",
           "arbiter": null,
           "checkKind": "attack_provoke",
           "grants": {
@@ -414,7 +443,12 @@
           "requires": {
             "item": "Ammon's Signet Ring"
           },
-          "locationName": "the Sentinel Ward"
+          "locationName": "the Sentinel Ward",
+          "spawn": {
+            "enemyName": "Aetheric Drone",
+            "count": 3,
+            "ambush": true
+          }
         },
         {
           "stageType": "apex",
@@ -484,7 +518,7 @@
         },
         {
           "stageType": "gauntlet",
-          "narration": "You wade the Teeth spire by spire on the pen's line. Every pillar carries another Siren in waiting. The chorus rises around you, half song and half scream. You hold your line and put them down until the water goes quiet, and the last one dies pointing north.",
+          "narration": "You wade the Teeth spire by spire on the pen's line. Every pillar carries another Mud Siren in waiting, and the chorus rises around you — half song, half scream — before you have the line half walked. Whatever is still standing when the water goes quiet will be pointing north.",
           "arbiter": null,
           "checkKind": "attack_provoke",
           "grants": {
@@ -493,7 +527,12 @@
           "requires": {
             "item": "Reclaimer's Survey-Pen"
           },
-          "locationName": "Zharak's Teeth"
+          "locationName": "Zharak's Teeth",
+          "spawn": {
+            "enemyName": "Mud Siren",
+            "count": 3,
+            "ambush": true
+          }
         },
         {
           "stageType": "apex",
@@ -645,7 +684,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "The sketch puts you on the frost side of Yuldra-Tul, where the apprentice is pinned in a scree-slip with a broken leg — alive by the luck of the Walker passing him for dead. A Rust Lurker has come to finish what the mountain started. You drive it off, splint the leg, and carry the boy and his toolroll down.",
+          "narration": "The sketch puts you on the frost side of Yuldra-Tul, where the apprentice is pinned in a scree-slip with a broken leg — alive by the luck of the Walker passing him for dead. A Rust Lurker has come to finish what the mountain started, and it reaches the boy's line before you do.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -654,7 +693,12 @@
           "requires": {
             "item": "Ost's Scree-Line Sketch"
           },
-          "locationName": "Yuldra-Tul"
+          "locationName": "Yuldra-Tul",
+          "spawn": {
+            "enemyName": "Rust Lurker",
+            "count": 1,
+            "ambush": true
+          }
         },
         {
           "stageType": "revelation",
@@ -754,7 +798,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "The sketch takes you down through the flooded transept, and you find Wren where the Serpent left her — and a Bog Wraith risen from the drowned to guard the drowned. You put it back down and bring Wren up into the light.",
+          "narration": "The sketch takes you down through the flooded transept, and you find Wren where the Serpent left her — and a Mud Wraith risen from the drowned to guard the drowned. It comes up out of the silt between you and her.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -763,7 +807,12 @@
           "requires": {
             "item": "Wren's Transept Sketch"
           },
-          "locationName": "the Sinking Cathedral"
+          "locationName": "the Sinking Cathedral",
+          "spawn": {
+            "enemyName": "Mud Wraith",
+            "count": 1,
+            "ambush": true
+          }
         },
         {
           "stageType": "revelation",
@@ -863,7 +912,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "In the small hours a lesser dark tests the Tower — an Aetheric Apparition drawn straight to Bael's fear. You hold the candle and put the thing down, and Bael sleeps through the dawn for the first time in a year. In the morning he gives you the charcoal rubbing he took off the high turn, the one he has never shown anyone.",
+          "narration": "In the small hours a lesser dark tests the Tower — an Aetheric Apparition drawn straight to Bael's fear. It is inside the candle-ring before either of you has a word for it.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -872,7 +921,12 @@
           "requires": {
             "item": "Bael's Vigil-Candle"
           },
-          "locationName": "Thametan's Tower"
+          "locationName": "Thametan's Tower",
+          "spawn": {
+            "enemyName": "Aetheric Apparition",
+            "count": 1,
+            "ambush": true
+          }
         },
         {
           "stageType": "revelation",
@@ -969,7 +1023,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "You wade Halla's bearing out into the shallows and find her brother — and a Bog Creeper that has claimed the body for its own larder. You drive it off and carry the man up onto dry ground, out of the Siren's reach at last.",
+          "narration": "You wade Halla's bearing out into the shallows and find her brother face-down in the reeds — and the Bog Creeper that has claimed the body for its own larder comes up under you for the trespass.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -978,7 +1032,12 @@
           "requires": {
             "item": "Halla's Shallows-Bearing"
           },
-          "locationName": "Mud Seas"
+          "locationName": "Mud Seas",
+          "spawn": {
+            "enemyName": "Bog Creeper",
+            "count": 1,
+            "ambush": true
+          }
         },
         {
           "stageType": "revelation",
@@ -1078,7 +1137,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "Pike's lines take you up to where his partner hangs wound in iron silk — alive, half-mad, and with an Aetheric Spider brood already feeding at the cocoon's edge. You clear them and cut the man free into the light.",
+          "narration": "Pike's lines take you up to where his partner hangs wound in iron silk — alive, half-mad, and with an Aetheric Spider brood already feeding at the cocoon's edge. The strand you are standing on tells them exactly where you are.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -1087,7 +1146,12 @@
           "requires": {
             "item": "Pike's Web-Map"
           },
-          "locationName": "Obsidian Pillars"
+          "locationName": "Obsidian Pillars",
+          "spawn": {
+            "enemyName": "Aetheric Spider",
+            "count": 3,
+            "ambush": true
+          }
         },
         {
           "stageType": "revelation",
@@ -1187,7 +1251,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "The plan takes you up to the third gallery, where the Tower's cursed Aether caught the student — and a Shifting Shade is circling what remains. You put the Shade down and carry her out, and Vesryn covers his face when he sees what you are carrying.",
+          "narration": "The plan takes you up to the third gallery, where the Tower's cursed Aether caught the student — and a Shifting Shade is circling what remains of her. It stops circling the moment your lamp finds it.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -1196,7 +1260,12 @@
           "requires": {
             "item": "Vesryn's Gallery Plan"
           },
-          "locationName": "the Red Tower of Nimari"
+          "locationName": "the Red Tower of Nimari",
+          "spawn": {
+            "enemyName": "Shifting Shade",
+            "count": 1,
+            "ambush": true
+          }
         },
         {
           "stageType": "revelation",
@@ -1296,7 +1365,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "Ferel's line takes you up to where the Harpy caches its kills. You find his daughter among older bones with an Aetheric Raven flock already picking the site. You scatter them and bring her down.",
+          "narration": "Ferel's line takes you up to where the Harpy caches its kills. You find his daughter among older bones with an Aetheric Raven flock already picking over the site — and the flock does not scatter. It turns.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -1305,7 +1374,12 @@
           "requires": {
             "item": "Ferel's High-Spire Line"
           },
-          "locationName": "Cradle of Dusk"
+          "locationName": "Cradle of Dusk",
+          "spawn": {
+            "enemyName": "Aetheric Raven",
+            "count": 4,
+            "ambush": true
+          }
         },
         {
           "stageType": "revelation",
@@ -1405,7 +1479,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "You unlock the pump-works and go down into the cistern, and find the foulness breeding in the dark: a Bog Creeper denned in the intake. You clear it out. The well runs clean above you, and you bring up the fouling-plate as proof.",
+          "narration": "You unlock the pump-works and go down into the cistern and find the foulness breeding in the dark: a Bog Creeper denned in the intake, awake, and between you and the fouling-plate.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -1414,7 +1488,12 @@
           "requires": {
             "item": "Yenna's Pump-Works Key"
           },
-          "locationName": "Samarran"
+          "locationName": "Samarran",
+          "spawn": {
+            "enemyName": "Bog Creeper",
+            "count": 1,
+            "ambush": true
+          }
         },
         {
           "stageType": "revelation",
@@ -1514,7 +1593,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "Del's route takes you past the Golem to the upper chamber, where the treatise sits exactly where the Builders dropped it — and an Iron Spider has nested in their abandoned gear, guarding it entirely by accident. You clear the nest and take the reading.",
+          "narration": "Del's route takes you past the Golem to the upper chamber, where the treatise sits exactly where the Builders dropped it — and a pair of Iron Spiders have nested in the abandoned gear, guarding it entirely by accident. They come off the gear the moment you reach for the page.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -1523,7 +1602,12 @@
           "requires": {
             "item": "Del's Upper-Chamber Route"
           },
-          "locationName": "Thametan's Tower"
+          "locationName": "Thametan's Tower",
+          "spawn": {
+            "enemyName": "Iron Spider",
+            "count": 2,
+            "ambush": true
+          }
         },
         {
           "stageType": "revelation",
