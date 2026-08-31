@@ -26300,6 +26300,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // nothing about why he had come. Arrival now names the mission, the place and
 // the ask - person or no person - and says what is still owed.
 export const OTA_BUILD_ID = '2026-08-31-1586-the-slate-in-every-part';
+// golem catch-up 2026-08-31: markerless publish of OTA-1586 — the mission trace
+// on every arrival and under every session seam, and the arrival line that tells
+// the player why they walked here even when no one is standing on the tile.
 // golem catch-up 2026-08-31: markerless publish of OTA-1585 — the parser's
 // ambient pre-pass stops matching a scene noun from the middle of a longer word,
 // which is what turned "attack with the geode-cored cleaver" into a lecture
