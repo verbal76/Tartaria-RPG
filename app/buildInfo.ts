@@ -26481,7 +26481,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "My purpose is to ensure the safety...") - an out-of-character sieve nulls
 // the leak to the authored silent line, and a question naming a live whisper
 // NPC now answers from the chain record instead of the model.
-export const OTA_BUILD_ID = '2026-08-31-1595-the-guide-and-the-ground-agree';
+// OTA-1596 - THE MARK CATCHES UP AT THE DOOR. From the 22:12 session (bundle
+// mthspfn82jjo): Silence the Doubter parked at stage 1 WITHOUT stage 0's grant
+// (Servants' Mark of Sanction) - the P19 self-heal existed but fired only on
+// an ATTACK verb, and a spawn stage with nothing spawned offers no attack
+// affordance, so he stood on green ground told "finish it (you still need
+// Servants' Mark of Sanction)" with no road forward. All 19 hunt spawn stages
+// are requires-gated the same way. Repair: at arrival, earlier-stage debts are
+// back-granted BEFORE the receipt prints (all three families), and a hunt
+// spawn stage ARMS through advanceHunt the moment the player stands on it paid
+// up - "arrived on the tile, that's me starting it." Plus his copy note: the
+// card now reads "Advance by winning the fight," not "by defeat in combat."
+export const OTA_BUILD_ID = '2026-08-31-1596-the-mark-catches-up-at-the-door';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1595-the-guide-and-the-ground-agree';
 // golem catch-up 2026-08-31: markerless publish of OTA-1595 — a whisper course
 // clears the outpost room (the minimap stops showing the interior on open
 // silt), whisper hints state the true remaining walk from where you stand, the

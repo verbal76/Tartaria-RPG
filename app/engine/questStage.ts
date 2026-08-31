@@ -265,7 +265,11 @@ const VERB_LABEL: Record<string, string> = {
   escape: 'escape / disengage',
   cast: 'use Aethercraft',
   attack_provoke: 'attack to provoke',
-  attack: 'defeat in combat',
+  // ⚠ OTA-1596 — was 'defeat in combat', which rendered as "Advance by defeat
+  // in combat" — the owner read it as being told to LOSE: *"it should say
+  // advance by winning in combat not defeat. that sounds like the opposite of
+  // what I want."* The gerund fits the card's "Advance by …" frame.
+  attack: 'winning the fight',
 };
 
 export function stageVerbLabel(

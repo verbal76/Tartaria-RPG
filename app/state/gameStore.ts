@@ -8984,9 +8984,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : wandererMark ? vendorNpcId(wandererMark)
         : vendorNpcId({ id: `escort_${markName}`, name: markName });
       set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, markId, { pocketsLifted: 1 }) }));
-      // ⚠⚠ OTA-1594 — A CLEAN LIFT IS A TRIGGER, like a kill and a travel. The
-      // theft quest could never be paid by the deed it asks for, because the
-      // deed never told the quest machine it happened.
+      // ⚠⚠ OTA-1594 — a clean lift is a TRIGGER, like a kill and a travel; the
+      // deed has to tell the quest machine it happened.
       advanceActiveFactionQuests(get, set, 'steal');
     } else if ((stats.stealth ?? 0) >= STEALTH_QUIET_FAIL_STE) {
       // OTA-847 quiet fail — the practiced thief withdraws a beat early.
@@ -9693,6 +9692,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // See missionTrace.ts — it is a READER, using the same resolvers the engine
     // decides with.
     for (const l of missionTraceLines(get().player)) get().appendLog('debug', l);
+    // ⚠⚠ OTA-1596 — the debt is settled BEFORE the receipt prints, so the
+    // arrival line reads "finish it" instead of naming an item the player has
+    // no road to. See stageArrival.ts.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    (require('./stageArrival') as typeof import('./stageArrival')).healStageDebtsAtArrival(get, set, grantStageItems);
     // ⚠⚠⚠ OTA-1586 — AND THE PLAYER IS TOLD WHY THEY CAME. See
     // missionTrace.missionArrivalLines: the conversation card only arms where a
     // stage NAMES somebody, so every investigate / stealth / cast beat ended a
@@ -10809,6 +10813,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ⚠ OTA-1409 — stamped in the SAME set() that installs the scene, so there is
     // no window in which the scene is current and the boundary is not.
     set({ currentScene: scene, pendingRolls: null, pendingHookContinue: null, sceneStartedAt: Date.now() });
+    // ⚠⚠⚠ OTA-1596 — AND THE SPAWN STANDS UP AT THE DOOR: a hunt spawn stage
+    // arms when the player stands on its ground paid up — after the commit so
+    // the pack survives the scene build, a microtask later so beginScene's
+    // writes settle, and not on load (a save does not re-arrive). stageArrival.ts.
+    if (!opts?.isOpening) {
+      void Promise.resolve().then(() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        (require('./stageArrival') as typeof import('./stageArrival')).armSpawnStagesAtArrival(get, set);
+      });
+    }
     // arb36 — announce a discovered structure so the new ENTER affordance
     // isn't unexplained. Skipped on the opening scene (you start on the
     // anchor, so sceneBuilding is null there anyway).
@@ -25860,11 +25874,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
-      // ⚠⚠ OTA-1594 — BOTH clean-theft doors report the deed, or the quest pays
-      // at only one of them. "Steal successfully from any vendor" reads most
-      // literally as THIS path — the item off the table — while the pickpocket
-      // path is the pocket. A 'steal'-gated stage that only one door advances
-      // would be the OTA-1584 partial-instrument lesson as gameplay.
+      // ⚠⚠ OTA-1594 — BOTH clean-theft doors report the deed (this table lift
+      // and the pickpocket), or a 'steal'-gated stage pays at only one of them.
       advanceActiveFactionQuests(get, set, 'steal');
     } else if ((stats.stealth ?? 0) >= STEALTH_QUIET_FAIL_STE) {
       // OTA-847 (STEALTH SYSTEM) — STE-gated QUIET FAIL. A practiced thief

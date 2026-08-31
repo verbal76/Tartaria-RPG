@@ -69,16 +69,19 @@ describe('OTA-1588 — one answer to what pays a stage', () => {
     }
   });
 
-  it('⚠ the hunt labels are byte-identical to the switch they replaced', () => {
-    // checkKindLabel now delegates. If that changed a single hunt's wording it
-    // would be a regression bought for nothing.
+  it('⚠ the hunt labels match the one table the card renders from', () => {
+    // checkKindLabel now delegates. This originally pinned the labels
+    // byte-identical to the switch they replaced; OTA-1596 then reworded the
+    // attack label on the owner's note — "Advance by defeat in combat" read as
+    // being told to LOSE ("it should say advance by winning in combat not
+    // defeat"). The pin moves with the ruling.
     expect(checkKindLabel('investigate')).toBe('investigate the area');
     expect(checkKindLabel('stealth')).toBe('use stealth');
     expect(checkKindLabel('diplomacy')).toBe('talk it out');
     expect(checkKindLabel('escape')).toBe('escape / disengage');
     expect(checkKindLabel('cast')).toBe('use Aethercraft');
     expect(checkKindLabel('attack_provoke')).toBe('attack to provoke');
-    expect(checkKindLabel('boss')).toBe('defeat in combat');
+    expect(checkKindLabel('boss')).toBe('winning the fight');
     expect(checkKindLabel(null)).toBeNull();
   });
 
