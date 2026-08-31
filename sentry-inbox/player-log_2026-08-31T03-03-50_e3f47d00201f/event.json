@@ -1,0 +1,197 @@
+{
+  "id": "e3f47d00201f4e668ae507da94cec0a2",
+  "groupID": "7701654168",
+  "eventID": "e3f47d00201f4e668ae507da94cec0a2",
+  "projectID": "4511945117532160",
+  "size": 17910,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1583-the-favour-beat-fights-what-it-names #mtgnmcrn0ya9 [inline 10/13]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-31-1583-the-favour-beat-fights-what-it-names #mtgnmcrn0ya9 [inline 10/13]",
+  "title": "player-log 2026-08-31-1583-the-favour-beat-fights-what-it-names #mtgnmcrn0ya9 [inline 10/13]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9f:6b0a:ad2:ae57:4e16:2ac6",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "03c26489655e487ba0c6d687a1dcb402",
+      "span_id": "903cc64832a39533",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " scene=4\n[2026-08-31T02:59:00.129Z] [debug] ui: tap \"inventory\"\n[2026-08-31T02:59:09.334Z] [debug] ui: tap \"investigate\"\n[2026-08-31T02:59:11.124Z] [debug] qwen\u23f1 item_synthesis_hw ok 4067ms read 3412ms/write 598ms in 324t\u2192out 18t 10.5ms/t (82ch)\n[2026-08-31T02:59:11.228Z] [debug] homework: item_desc \"Climbing Rope\" \u2713 4181ms\n[2026-08-31T02:59:11.451Z] [player] investigate the ground\n",
+      "[2026-08-31T02:59:11.451Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-08-31T02:59:11.455Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Big Rock (Common).\n[2026-08-31T02:59:11.460Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T02:59:11.578Z] [cognitive] CLIMB  (118ms)\n",
+      "[2026-08-31T02:59:12.711Z] [player] investigate crevice-pool\n[2026-08-31T02:59:12.712Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=2\n[2026-08-31T02:59:12.713Z] [world] You study the crevice-pool. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n",
+      "[2026-08-31T02:59:12.714Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T02:59:12.714Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T02:59:12.839Z] [cognitive] SWIM  (123ms)\n[2026-08-31T02:59:14.066Z] [debug] ui: tap \"rest\"\n[2026-08-31T02:59:14.076Z] [player] rest\n",
+      "[2026-08-31T02:59:14.077Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2\n[2026-08-31T02:59:14.078Z] [world] Soot circles three times and curls beside you. Her breathing slows to yours.\n[2026-08-31T02:59:14.079Z] [world] You rest for 8 hours. +6 HP, +8 stamina recovered. (Day 30, evening)\n",
+      "[2026-08-31T02:59:14.079Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T02:59:14.088Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n[2026-08-31T02:59:14.088Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T02:59:14.089Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-08-31T02:59:14.432Z] [debug] persist sizes(KB): total=197 player=41 wm=70[rooms=36 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=4\n[2026-08-31T02:59:15.050Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T02:59:15.066Z] [debug] spawn: gear=[Mud Sling, Reclaimer's Salvage Cap, Mud-Stalker's Footwraps] window=10 roster=new\n",
+      "[2026-08-31T02:59:15.067Z] [world] You walk north through open silt. The compass points north into open ground.\n[2026-08-31T02:59:15.068Z] [world] Some part of you has been keeping the place bookmarked.\n[2026-08-31T02:59:15.367Z] [debug] qwen\u23f1 investigate_lore ok 2428ms read 1584ms/write 737ms in 127t\u2192out 23t 12.5ms/t (99ch)\n[2026-08-31T02:59:15.475Z] [cognitive] REST  (1385ms)\n",
+      "[2026-08-31T02:59:16.434Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T02:59:18.070Z] [world] Where the Reclaimer's Salvage Cap was, the ground is a shade darker.\n[2026-08-31T02:59:18.071Z] [reward] \u2726 Reclaimer's Salvage Cap (Common).\n[2026-08-31T02:59:19.079Z] [world] You take the Worn Tartarian Coin. The hollow it came out of starts closing.\n",
+      "[2026-08-31T02:59:19.079Z] [reward] \u2726 Worn Tartarian Coin (Common).\n[2026-08-31T02:59:20.183Z] [world] You work the gate over. A part of it comes loose, intact.\n[2026-08-31T02:59:20.183Z] [world] You salvage the mirror. The take is small but real.\n[2026-08-31T02:59:20.183Z] [reward] \u2726 Salvage haul:\n[2026-08-31T02:59:20.184Z] [reward]     \u2022 Aether Dust (Common)\n",
+      "[2026-08-31T02:59:20.184Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-08-31T02:59:21.286Z] [debug] ui: tap \"investigate\"\n[2026-08-31T02:59:22.759Z] [player] investigate the ground\n[2026-08-31T02:59:22.760Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-08-31T02:59:22.767Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Patched Cloth (Common).\n[2026-08-31T02:59:22.773Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T02:59:22.773Z] [arbiter] The Arbiter looks around. \"The Mud Monarchs were born here, as much as they were born anywhere.\"\n[2026-08-31T02:59:22.773Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-31T02:59:22.896Z] [cognitive] CLIMB  (122ms)\n[2026-08-31T02:59:23.885Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T02:59:23.945Z] [reward] \u2726 Your bearing reads. +1 CHA (base 4, 3 as you stand).\n[2026-08-31T02:59:23.946Z] [debug] spawn: gear=[Repeater Crossbow] window=10 roster=new\n",
+      "[2026-08-31T02:59:23.947Z] [world] You walk north through open silt. The compass points north into open ground.\n[2026-08-31T02:59:23.948Z] [world] Your foot snags on the silt. You crouch, look \u2014 and find something worth keeping.\n[2026-08-31T02:59:23.948Z] [reward] \u2726 Aether Dust x2 (Common).\n",
+      "[2026-08-31T02:59:23.948Z] [world] You catch yourself checking, the way you check a pocket you already know is empty.\n[2026-08-31T02:59:24.079Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n",
+      "[2026-08-31T02:59:24.079Z] [arbiter] The Arbiter studies you a long moment. \"You have earned a name to carry: Survivor of Aetherstone. Passive: halves corruption gained from Etheric weather.\"\n[2026-08-31T02:59:24.093Z] [player] investigate crevice-pool\n",
+      "[2026-08-31T02:59:24.094Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=2\n[2026-08-31T02:59:24.097Z] [world] You study the crevice-pool. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n",
+      "[2026-08-31T02:59:24.098Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T02:59:24.098Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T02:59:24.098Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T02:59:24.215Z] [cognitive] SWIM  (115ms)\n",
+      "[2026-08-31T02:59:25.121Z] [debug] qwen\u23f1 investigate_lore ok 804ms read 0ms/write 778ms in 127t\u2192out 25t (102ch)\n[2026-08-31T02:59:25.334Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T02:59:27.258Z] [world] The Throwing Knife goes in your pack. Its outline stays in the silt a while.\n[2026-08-31T02:59:27.259Z] [reward] \u2726 Throwing Knife (Common).\n",
+      "[2026-08-31T02:59:27.274Z] [world] You crouch, take the Repeater Crossbow, and are moving again before you have straightened up.\n[2026-08-31T02:59:27.275Z] [reward] \u2726 Repeater Crossbow (Common).\n[2026-08-31T02:59:28.291Z] [world] You do not think about it. The Aetheric Shard is simply in your hand now.\n[2026-08-31T02:59:28.292Z] [reward] \u2726 Aetheric Shard (Uncommon).\n",
+      "[2026-08-31T02:59:28.506Z] [debug] persist sizes(KB): total=197 player=42 wm=69[rooms=36 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=4\n[2026-08-31T02:59:29.449Z] [world] You break the market debris apart. Among the pieces, something worth keeping.\n[2026-08-31T02:59:29.449Z] [world] You strip the merchant sign carefully. Something usable comes free in your hand.\n",
+      "[2026-08-31T02:59:29.450Z] [world] You work the salvage crate over. A part of it comes loose, intact.\n[2026-08-31T02:59:29.450Z] [world] You break the vault apart. Among the pieces, something worth keeping.\n[2026-08-31T02:59:29.450Z] [reward] \u2726 Salvage haul:\n[2026-08-31T02:59:29.451Z] [reward]     \u2022 Mud Fragment x3 (Common)\n[2026-08-31T02:59:29.451Z] [reward]     \u2022 Smooth Stone (Common)\n",
+      "[2026-08-31T02:59:29.451Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-08-31T02:59:30.620Z] [debug] ui: tap \"investigate\"\n[2026-08-31T02:59:32.873Z] [player] investigate the ground\n[2026-08-31T02:59:32.874Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-08-31T02:59:32.878Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-08-31T02:59:32.884Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T02:59:33.009Z] [cognitive] CLIMB  (124ms)\n[2026-08-31T02:59:35.971Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T02:59:35.987Z] [debug] spawn: gear=[Bone Knife, Rust Rifle] window=10 roster=new\n",
+      "[2026-08-31T02:59:35.989Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n[2026-08-31T02:59:35.990Z] [arbiter] These are the Aetherkin the roadside traders whisper about \u2014 the flood-dead the Aether would not let rest.\n",
+      "[2026-08-31T02:59:35.990Z] [world] In life it was a market-scribe, ink and silt run together down the front of them \u2014 or maybe just someone who happened to live here \u2014 you can't be sure. Something you stirred woke the Aetherstone that held them; now they're awake and out.\n",
+      "[2026-08-31T02:59:35.991Z] [world] It flinches from you and puts its back to the wall, hands raised \u2014 not a hunter, just something frightened that has forgotten everything except how to be afraid.\n[2026-08-31T02:59:35.991Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 7 tiles, about 18 hours of travel.\n",
+      "[2026-08-31T02:59:35.991Z] [world] The thought you set down here is right where you set it down.\n[2026-08-31T02:59:39.289Z] [debug] ui: tap \"flee\"\n[2026-08-31T02:59:39.298Z] [player] flee\n[2026-08-31T02:59:39.299Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=2\n[2026-08-31T02:59:39.351Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-31T02:59:39.537Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (185ms)\n[2026-08-31T02:59:40.966Z] [debug] skillcheck: escape d20=2 DEX 23 = 25 vs Pursuit 9 \u2014 Drowned Aetherkin (d20 9 + SPD 0) \u2192 PASS\n[2026-08-31T02:59:41.036Z] [debug] stats: STR12 DEX23 INT11 WIS10 CHA3 STE5 | gear: WIS+4,INT+2,STR+6,DEX+15,STE+2 | worn: main=Reclaimers Guild Geode-Cored Cleaver off=Bone Crossbow head=Architect's Si",
+      "ght Enhancer chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-08-31T02:59:41.038Z] [debug] train: dexterity (escape check) \u2192 progress 48/100\n",
+      "[2026-08-31T02:59:41.038Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-08-31T02:59:41.040Z] [arbiter] The Arbiter looks around. \"Faction agents pass each other in Nimari's plazas without acknowledging the other exists. It is a small etiquette.\"\n[2026-08-31T02:59:43.103Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-31T02:59:44.345Z] [world] Old habit: see it, take it, keep walking. The Throwing Knife is yours.\n[2026-08-31T02:59:44.347Z] [reward] \u2726 Throwing Knife (Common).\n[2026-08-31T02:59:44.365Z] [world] You take the Rust Rifle the way you take everything out here \u2014 quickly, and without ceremony.\n[2026-08-31T02:59:44.365Z] [reward] \u2726 Rust Rifle (Common).\n",
+      "[2026-08-31T02:59:45.474Z] [world] You strip the cache carefully. Something usable comes free in your hand.\n[2026-08-31T02:59:45.475Z] [world] You salvage the market debris. The take is small but real.\n[2026-08-31T02:59:45.475Z] [world] You strip the merchant sign carefully. Something usable comes free in your hand.\n",
+      "[2026-08-31T02:59:45.475Z] [world] You break the pebble apart. Among the pieces, something worth keeping.\n[2026-08-31T02:59:45.476Z] [world] You work the rusted fallen sentinel husk over. A part of it comes loose, intact.\n[2026-08-31T02:59:45.476Z] [reward] \u2726 Salvage haul:\n[2026-08-31T02:59:45.476Z] [reward]     \u2022 Aether Dust x3 (Common)\n",
+      "[2026-08-31T02:59:45.476Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-08-31T02:59:45.477Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-08-31T02:59:45.477Z] [reward]     \u2022 Worn Tartarian Coin (Common)\n[2026-08-31T02:59:47.142Z] [debug] ui: tap \"investigate\"\n[2026-08-31T02:59:48.710Z] [player] investigate the ground\n",
+      "[2026-08-31T02:59:48.710Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-08-31T02:59:48.713Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-31T02:59:48.719Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T02:59:48.846Z] [cognitive] CLIMB  (126ms)\n",
+      "[2026-08-31T02:59:49.100Z] [debug] persist sizes(KB): total=186 player=43 wm=57[rooms=24 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=4\n[2026-08-31T02:59:49.977Z] [player] investigate crevice-pool\n[2026-08-31T02:59:49.979Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=2\n",
+      "[2026-08-31T02:59:49.983Z] [world] You study the crevice-pool. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n[2026-08-31T02:59:50.097Z] [cognitive] SWIM  (113ms)\n[2026-08-31T02:59:50.423Z] [debug] ui: tap \"rest\"\n[2026-08-31T02:59:50.428Z] [player] rest\n",
+      "[2026-08-31T02:59:50.429Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2\n[2026-08-31T02:59:50.430Z] [world] Soot turns twice, thinks about a third, and drops where she stands.\n[2026-08-31T02:59:50.430Z] [world] You rest for 8 hours. +2 HP, +8 stamina recovered. (Day 31, morning)\n",
+      "[2026-08-31T02:59:50.432Z] [world] Wind in the silt overnight. Patterns in the mud around your camp \u2014 boot prints not yours, walked around you and away.\n[2026-08-31T02:59:50.442Z] [debug] arbiter: template (reason=busy)\n[2026-08-31T02:59:50.443Z] [arbiter] The Arbiter looks around. \"The cracked statues here still bleed Aether when the storms come close.\"\n",
+      "[2026-08-31T02:59:50.443Z] [system] \u23f3 Time passed: 8h\n[2026-08-31T02:59:50.449Z] [world] A Conspiracy Architects war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Forgotten Order.\n[2026-08-31T02:59:50.449Z] [arbiter] \"The Conspiracy Architects do not forgive a friend of the Forgotten Order,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n",
+      "[2026-08-31T02:59:50.762Z] [cognitive] REST  (317ms)\n[2026-08-31T02:59:52.723Z] [debug] qwen\u23f1 investigate_lore ok 2518ms read 0ms/write 2284ms in 127t\u2192out 40t (198ch)\n[2026-08-31T02:59:54.210Z] [debug] ui: tap \"dodge\"\n[2026-08-31T02:59:54.228Z] [player] dodge\n[2026-08-31T02:59:54.229Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=2\n",
+      "[2026-08-31T02:59:54.230Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-31T02:59:54.287Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 18 + ATK 10 = 28 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-08-31T02:59:54.287Z] [combat] Dodge \u2014 d20 \u2192 2 + DEX 23 = 25 vs ATK 28. \u2717 You misread it \u2014 no opening, and the blow lands as it normally would (armor still counts).\n[2026-08-31T02:59:54.288Z] [world] Your read is a beat off \u2014 you fail to make the opening, and the swing lands the way it always meant to.\n[2026-08-"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1583-the-favour-beat-fights-what-it-names #mtgnmcrn0ya9 [inline 10/13]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtgnmcrn0ya9"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "10"
+    },
+    {
+      "key": "parts",
+      "value": "13"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9f:6b0a:ad2:ae57:4e16:2ac6",
+      "query": "user.ip:\"2607:fb90:db9f:6b0a:ad2:ae57:4e16:2ac6\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T03:03:49.864494Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T03:03:50.841000Z",
+  "fingerprints": [
+    "3e8310a5f5606ceccdf8374e2b35a956"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "f227c01cfba748b1bf0fd4c092b06d16",
+  "previousEventID": "d6c213f26493496697d493ccf4e8a8a2"
+}

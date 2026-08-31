@@ -1,0 +1,226 @@
+{
+  "id": "765874503b344d45b6c4799b377e05d9",
+  "groupID": "7701696457",
+  "eventID": "765874503b344d45b6c4799b377e05d9",
+  "projectID": "4511945117532160",
+  "size": 17615,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1585-the-core-inside-the-cleaver #mtgnmcrn0ya9 [inline 2/13]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-31-1585-the-core-inside-the-cleaver #mtgnmcrn0ya9 [inline 2/13]",
+  "title": "player-log 2026-08-31-1585-the-core-inside-the-cleaver #mtgnmcrn0ya9 [inline 2/13]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9f:6b0a:ad2:ae57:4e16:2ac6",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "68ba01e10ec54f8bbc32b1edd568833b",
+      "span_id": "9a13374321bd9b8d",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "g] voice: engine=bundled tts=off voice=am_michael\n[2026-08-30T22:25:39.481Z] [debug] voice: bundled idle\n[2026-08-30T22:25:39.925Z] [debug] send-log: bundle #mtgc5ut96dzn attempt 2/5 delivered to Sentry\n[2026-08-30T23:42:06.377Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a054bc-60ff-74b7-bd2c-a1e3ab983c2c\n[2026-08-30T23:42:06.377Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-30T23:42:08.922Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-30T23:42:08.991Z] [debug] ota: Saving progress\u2026\n[2026-08-30T23:42:08.993Z] [debug] ota: Restarting to apply\u2026\n[2026-08-30T23:42:09.054Z] [debug] ota: boot check result = applied\n",
+      "[2026-08-30T23:42:09.214Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05503-b522-7120-a224-c3bd40c41c8b\n[2026-08-30T23:42:09.214Z] [debug] ota: Checking\u2026\n[2026-08-30T23:42:09.284Z] [debug] ota: Already up to date\n[2026-08-30T23:42:09.284Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T23:42:09.324Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-30T23:42:09.324Z] [debug] voice: bundled idle\n[2026-08-30T23:42:09.425Z] [debug] send-log: bundle #mtgc5ut96dzn attempt 3/5 delivered to Sentry\n[2026-08-31T00:07:24.004Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05503-b522-7120-a224-c3bd40c41c8b\n[2026-08-31T00:07:24.004Z] [debug] ota: Checking\u2026\n[2026-08-31T00:07:24.052Z] [debug] ota: Already up to date\n",
+      "[2026-08-31T00:07:24.053Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T00:07:24.081Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-31T00:07:24.081Z] [debug] voice: bundled idle\n[2026-08-31T00:07:24.241Z] [debug] send-log: bundle #mtgc5ut96dzn attempt 4/5 delivered to Sentry\n",
+      "[2026-08-31T00:07:28.127Z] [debug] OTA session start: 2026-08-30-1581-the-card-they-cannot-walk-past.\n[2026-08-31T00:07:28.127Z] [world] You step back into Great Tartary Plains. The world waits for your move.\n[2026-08-31T00:07:28.127Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cheddar Bob. I kept watch while you were gone.\"\n",
+      "[2026-08-31T00:07:28.276Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-31T00:07:28.276Z \u00b7 build 2026-08-30-1581-the-card-they-cannot-walk-past \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-31T00:07:28.613Z] [debug] send-log: crash on record (2026-08-30T23:42:09.758Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtghbjcewf3z\n",
+      "[2026-08-31T00:07:31.713Z] [debug] send-log: #mtghbloc64g4 \u2014 DELIVERED (inline, no attachments): beacon out, 2/2 parts accepted (23208 chars) \u2014 flush said yes\n[2026-08-31T00:07:31.713Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtghbloc64g4 kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-31T00:21:56.531Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05503-b522-7120-a224-c3bd40c41c8b\n[2026-08-31T00:21:56.531Z] [debug] ota: Checking\u2026\n[2026-08-31T00:21:57.511Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-31T00:21:57.608Z] [debug] ota: Saving progress\u2026\n[2026-08-31T00:21:57.609Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-08-31T00:21:57.681Z] [debug] ota: boot check result = applied\n[2026-08-31T00:21:57.806Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0552e-ecd7-7809-9d77-60c13c17117a\n[2026-08-31T00:21:57.806Z] [debug] ota: Checking\u2026\n[2026-08-31T00:21:57.896Z] [debug] ota: Already up to date\n[2026-08-31T00:21:57.896Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-31T00:21:57.928Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-31T00:21:57.928Z] [debug] voice: bundled idle\n[2026-08-31T00:21:58.136Z] [debug] send-log: bundle #mtghbloc64g4 attempt 2/5 delivered to Sentry\n[2026-08-31T02:44:51.154Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0552e-ecd7-7809-9d77-60c13c17117a\n",
+      "[2026-08-31T02:44:51.154Z] [debug] ota: Checking\u2026\n[2026-08-31T02:44:52.191Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-31T02:44:52.296Z] [debug] ota: Saving progress\u2026\n[2026-08-31T02:44:52.298Z] [debug] ota: Restarting to apply\u2026\n[2026-08-31T02:44:52.373Z] [debug] ota: boot check result = applied\n",
+      "[2026-08-31T02:44:52.534Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0556e-99da-7f43-bd28-ff011ea84139\n[2026-08-31T02:44:52.534Z] [debug] ota: Checking\u2026\n[2026-08-31T02:44:52.664Z] [debug] ota: Already up to date\n[2026-08-31T02:44:52.665Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T02:44:52.702Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-31T02:44:52.703Z] [debug] voice: bundled idle\n[2026-08-31T02:44:52.893Z] [debug] send-log: bundle #mtghbloc64g4 attempt 3/5 delivered to Sentry\n[2026-08-31T02:44:56.640Z] [debug] OTA applied: 2026-08-30-1582-the-guy-who-gives-you-the-job \u2192 2026-08-31-1583-the-favour-beat-fights-what-it-names.\n",
+      "[2026-08-31T02:44:56.640Z] [debug] OTA session start: 2026-08-31-1583-the-favour-beat-fights-what-it-names.\n[2026-08-31T02:44:56.640Z] [world] You step back into Great Tartary Plains. The world waits for your move.\n[2026-08-31T02:44:56.641Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n",
+      "[2026-08-31T02:44:56.784Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-31T02:44:56.783Z \u00b7 build 2026-08-31-1583-the-favour-beat-fights-what-it-names \u00b7 updated from 2026-08-30-1582-the-guy-who-gives-you-the-job \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-31T02:44:57.112Z] [debug] send-log: crash on record (2026-08-31T00:21:58.332Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtgmy1ut4oor\n[2026-08-31T02:45:03.748Z] [debug] ui: tap \"\u2192 NIMARI\"\n[2026-08-31T02:45:03.797Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Ymer Tinpot, wandering trader. Tap the vendor banner to trade.\n",
+      "[2026-08-31T02:45:03.803Z] [world] Rare workings for sale: Lich-Heart Pendant (200 TC), Many-Colored Tonic (200 TC), Mire Stave (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-08-31T02:45:03.803Z] [world] You walk south. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-31T02:45:03.804Z] [world] A crystal embedded in a half-broken pillar whispers \u2014 actual words, almost \u2014 when you pass within arm's reach.\n[2026-08-31T02:45:06.133Z] [reward] Ymer Tinpot fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-08-31T02:45:16.011Z] [reward] \u2726 The Crucible drinks the five pieces and works an extra resist channel into the Aetheric Scout Greaves. It can now hold one more worked-in resist. (Its armor rating is unchanged.)\n[2026-08-31T02:45:18.114Z] [reward] Ymer Tinpot fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-08-31T02:45:30.907Z] [reward] \u2726 The Crucible drinks the five pieces and works an extra resist channel into the Forgotten Seeker's Mask. It can now hold one more worked-in resist. (Its armor rating is unchanged.)\n",
+      "[2026-08-31T02:45:33.806Z] [arbiter] Ymer Tinpot taps the cold Crucible. \"Need at least 3 inferred items reserved for fusion (\u2665 in inventory). You have 1.\" No charge until you are ready.\n[2026-08-31T02:45:36.501Z] [debug] ui: tap \"more \u25b8\"\n[2026-08-31T02:45:38.267Z] [debug] ui: tap \"inventory\"\n[2026-08-31T02:45:44.278Z] [reward] Ymer Tinpot fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-08-31T02:45:58.586Z] [reward] \u2726 The Crucible drinks the five pieces and works an extra resist channel into the Relic Hunter's Gauntlets. It can now hold one more worked-in resist. (Its armor rating is unchanged.)\n[2026-08-31T02:46:01.798Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T02:46:03.063Z] [world] You take the Aetheric Compass from where it lay.\n",
+      "[2026-08-31T02:46:03.064Z] [reward] \u2726 Aetheric Compass (Uncommon).\n[2026-08-31T02:46:03.075Z] [world] You pick up the Aetheric Torch.\n[2026-08-31T02:46:03.075Z] [reward] \u2726 Aetheric Torch (Common).\n[2026-08-31T02:46:04.245Z] [world] You break the fossil rib apart. Among the pieces, something worth keeping.\n",
+      "[Filtered]",
+      "[2026-08-31T02:46:04.246Z] [reward]     \u2022 Copper Wire Spool (Uncommon)\n[2026-08-31T02:46:04.246Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-08-31T02:46:04.589Z] [debug] persist sizes(KB): total=107 player=34 wm=50[rooms=19 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=19 scene=4\n[2026-08-31T02:47:41.355Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-31T02:47:54.083Z] [player] Ask why the stall is here\n[2026-08-31T02:47:54.086Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n[2026-08-31T02:47:54.087Z] [world] Ymer Tinpot shifts the pack higher on their shoulder and does not put it down.\n",
+      "[2026-08-31T02:47:56.349Z] [world] You let the conversation go and Ymer Tinpot gets back to it.\n[2026-08-31T02:48:02.536Z] [debug] ui: tap \"investigate\"\n[2026-08-31T02:48:04.156Z] [player] investigate the ground\n[2026-08-31T02:48:04.157Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-08-31T02:48:04.160Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Small Rock (Common).\n[2026-08-31T02:48:04.163Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-31T02:48:04.163Z] [arbiter] The Arbiter looks around. \"The horizon refuses to settle. Aether moves under the grass like breath under a sheet.\"\n",
+      "[2026-08-31T02:48:04.164Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T02:48:04.164Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T02:48:04.294Z] [cognitive] CLIMB  (129ms)\n[2026-08-31T02:48:05.285Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-31T02:48:05.401Z] [player] investigate storm crystal\n",
+      "[2026-08-31T02:48:05.401Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=storm crystal resolved=storm crystal range=- enemies=0 hooks=2\n[2026-08-31T02:48:05.401Z] [debug] route: hook intercept (kind=whisper_crystal, target=\"storm crystal\") \u2014 original intent=investigate\n",
+      "[2026-08-31T02:48:05.402Z] [world] \u2605 STORY THREAD (step 1) \u2014 You lean toward the crystal. The whispering shapes itself \u2014 Tartarian, you think, though no language you can name. It is saying a location.\n[2026-08-31T02:48:11.416Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-31T02:48:13.193Z] [reward] Sold Short Hunting Bow (Common) to Ymer Tinpot for 14 TC. (499 TC on hand)\n",
+      "[2026-08-31T02:48:13.228Z] [reward] Sold Order Letter-Opener (Common) to Ymer Tinpot for 14 TC. (513 TC on hand)\n[2026-08-31T02:48:13.260Z] [reward] Sold Mud Claymore (Common) to Ymer Tinpot for 12 TC. (525 TC on hand)\n[2026-08-31T02:48:13.292Z] [reward] Sold Throwing Knife (Common) to Ymer Tinpot for 12 TC. (537 TC on hand)\n",
+      "[2026-08-31T02:48:13.323Z] [reward] Sold Iron Buckler (Common) to Ymer Tinpot for 12 TC. (549 TC on hand)\n[2026-08-31T02:48:13.354Z] [reward] Sold Aetheric Helm of Command (Common) to Ymer Tinpot for 6 TC. (555 TC on hand)\n[2026-08-31T02:48:13.386Z] [reward] Sold Wanderer's Outercoat (Common) to Ymer Tinpot for 6 TC. (561 TC on hand)\n",
+      "[2026-08-31T02:48:13.416Z] [reward] Sold Seer's Veil of the Aether (Common) to Ymer Tinpot for 6 TC. (567 TC on hand)\n[2026-08-31T02:48:13.829Z] [debug] persist sizes(KB): total=110 player=34 wm=50[rooms=19 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=22 scene=4\n",
+      "[2026-08-31T02:48:20.871Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9446ms read 8358ms/write 1044ms in 734t\u2192out 33t 11.4ms/t HIT-CAP (178ch)\n[2026-08-31T02:48:20.895Z] [debug] homework: scene_intro \"Great Tartary Plains\" \u2713 9481ms\n[2026-08-31T02:48:29.954Z] [reward] Bought 4\u00d7 Wild Oats from Ymer Tinpot for 16 TC. (551 TC left)\n",
+      "[2026-08-31T02:48:32.150Z] [reward] Bought 3\u00d7 Smoke-Cured Jerky Strip from Ymer Tinpot for 24 TC. (527 TC left)\n[2026-08-31T02:48:34.041Z] [reward] Bought Water Bottle from Ymer Tinpot for 5 TC. (522 TC left)\n[2026-08-31T02:48:38.660Z] [reward] Bought 3\u00d7 Firewood from Ymer Tinpot for 9 TC. (513 TC left)\n[2026-08-31T02:48:42.768Z] [debug] ui: tap \"craft\"\n",
+      "[2026-08-31T02:48:54.092Z] [world] You repair the Searing Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n[2026-08-31T02:48:54.115Z] [world] You repair the Forgotten Seeker's Mask. Back to full. (spent: Patched Cloth x6)\n[2026-08-31T02:48:54.127Z] [world] You repair the Reclaimer's Rope. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-31T02:48:54.136Z] [world] You repair the Reclaimer's Rope. Back to full. (spent: Patched Cloth x4)\n[2026-08-31T02:48:55.637Z] [debug] persist sizes(KB): total=110 player=31 wm=51[rooms=19 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=24 scene=4\n[2026-08-31T02:48:56.443Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-08-31T02:48:58.008Z] [debug] ui: tap \"\u2192 NIMARI\"\n[2026-08-31T02:48:58.025Z] [debug] spawn: gear=[Mud-Bound Cloak, Reclaimer's Trousers, Aether-Walker's Cape] window=10 roster=new\n[2026-08-31T02:48:58.026Z] [world] You walk south through open silt. The compass points south into open ground.\n",
+      "[2026-08-31T02:48:58.027Z] [world] A body sits cross-legged in the silt, mud-glassed in place. The pose is patient. Whatever they were waiting for never arrived.\n[2026-08-31T02:48:58.028Z] [world] A locket on their chest holds a pre-flood photograph \u2014 a face you don't recognise, smiling at a sky that doesn't exist anymore.\n[2026-08-31T02:48:58.028Z] [reward] \u2726 Recovered Aether Dust x3.\n",
+      "[2026-08-31T02:48:58.032Z] [world] The thread you were following waits where you left it.\n[2026-08-31T02:48:59.506Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T02:49:00.630Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4094ms read 2934ms/write 1123ms in 737t\u2192out 33t 4.0ms/t HIT-CAP (170ch)\n",
+      "[2026-08-31T02:49:00.698Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 4094ms \u2014 intro-fill:action-opener\n[2026-08-31T02:49:00.699Z] [debug] homework: scene_intro \"Great Tartary Plains\" \u2713 4257ms\n[2026-08-31T02:49:01.199Z] [world] You lift the Aether-Walker's Cape clear.\n[2026-08-31T02:49:01.201Z] [reward] \u2726 Aether-Walker's Cape (Common).\n",
+      "[2026-08-31T02:49:01.213Z] [world] You get a hand under the Mud-Bound Cloak and take it.\n[2026-08-31T02:49:01.213Z] [reward] \u2726 Mud-Bound Cloak (Common).\n[2026-08-31T02:49:01.215Z] [world] You claim the Reclaimer's Trousers.\n[2026-08-31T02:49:01.215Z] [reward] \u2726 Reclaimer's Trousers (Common).\n[2026-08-31T02:49:02.000Z] [world] The Scrap Metal comes up out of the silt with a small sucking protest.\n",
+      "[2026-08-31T02:49"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1585-the-core-inside-the-cleaver #mtgnmcrn0ya9 [inline 2/13]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtgnmcrn0ya9"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "2"
+    },
+    {
+      "key": "parts",
+      "value": "13"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9f:6b0a:ad2:ae57:4e16:2ac6",
+      "query": "user.ip:\"2607:fb90:db9f:6b0a:ad2:ae57:4e16:2ac6\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T03:25:54.566740Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "24": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 376,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T03:25:55.854000Z",
+  "fingerprints": [
+    "b58fe997ae90a347b90d5f3e90e49128"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b07eb70b7a8346d39c63ed7ae4ba0d10",
+  "previousEventID": "6323e626d4094632b2a4df4e1304aba3"
+}

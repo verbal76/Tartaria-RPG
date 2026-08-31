@@ -1,0 +1,183 @@
+{
+  "id": "2c4f82dff45740b1bbaab133576fec7e",
+  "groupID": "7701654168",
+  "eventID": "2c4f82dff45740b1bbaab133576fec7e",
+  "projectID": "4511945117532160",
+  "size": 13445,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1583-the-favour-beat-fights-what-it-names #mtgmy1ut4oor [inline 2/2]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-31-1583-the-favour-beat-fights-what-it-names #mtgmy1ut4oor [inline 2/2]",
+  "title": "player-log 2026-08-31-1583-the-favour-beat-fights-what-it-names #mtgmy1ut4oor [inline 2/2]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9f:6b0a:ad2:ae57:4e16:2ac6",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "03c26489655e487ba0c6d687a1dcb402",
+      "span_id": "903cc64832a39533",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "] voice: engine=bundled tts=off voice=am_michael\n[2026-08-30T22:25:39.481Z] [debug] voice: bundled idle\n[2026-08-30T22:25:39.925Z] [debug] send-log: bundle #mtgc5ut96dzn attempt 2/5 delivered to Sentry\n[2026-08-30T23:42:06.377Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a054bc-60ff-74b7-bd2c-a1e3ab983c2c\n[2026-08-30T23:42:06.377Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-30T23:42:08.922Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-30T23:42:08.991Z] [debug] ota: Saving progress\u2026\n[2026-08-30T23:42:08.993Z] [debug] ota: Restarting to apply\u2026\n[2026-08-30T23:42:09.054Z] [debug] ota: boot check result = applied\n",
+      "[2026-08-30T23:42:09.214Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05503-b522-7120-a224-c3bd40c41c8b\n[2026-08-30T23:42:09.214Z] [debug] ota: Checking\u2026\n[2026-08-30T23:42:09.284Z] [debug] ota: Already up to date\n[2026-08-30T23:42:09.284Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T23:42:09.324Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-30T23:42:09.324Z] [debug] voice: bundled idle\n[2026-08-30T23:42:09.425Z] [debug] send-log: bundle #mtgc5ut96dzn attempt 3/5 delivered to Sentry\n[2026-08-31T00:07:24.004Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05503-b522-7120-a224-c3bd40c41c8b\n[2026-08-31T00:07:24.004Z] [debug] ota: Checking\u2026\n[2026-08-31T00:07:24.052Z] [debug] ota: Already up to date\n",
+      "[2026-08-31T00:07:24.053Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T00:07:24.081Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-31T00:07:24.081Z] [debug] voice: bundled idle\n[2026-08-31T00:07:24.241Z] [debug] send-log: bundle #mtgc5ut96dzn attempt 4/5 delivered to Sentry\n",
+      "[2026-08-31T00:07:28.127Z] [debug] OTA session start: 2026-08-30-1581-the-card-they-cannot-walk-past.\n[2026-08-31T00:07:28.127Z] [world] You step back into Great Tartary Plains. The world waits for your move.\n[2026-08-31T00:07:28.127Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cheddar Bob. I kept watch while you were gone.\"\n",
+      "[2026-08-31T00:07:28.276Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-31T00:07:28.276Z \u00b7 build 2026-08-30-1581-the-card-they-cannot-walk-past \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-31T00:07:28.613Z] [debug] send-log: crash on record (2026-08-30T23:42:09.758Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtghbjcewf3z\n",
+      "[2026-08-31T00:07:31.713Z] [debug] send-log: #mtghbloc64g4 \u2014 DELIVERED (inline, no attachments): beacon out, 2/2 parts accepted (23208 chars) \u2014 flush said yes\n[2026-08-31T00:07:31.713Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtghbloc64g4 kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-31T00:21:56.531Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05503-b522-7120-a224-c3bd40c41c8b\n[2026-08-31T00:21:56.531Z] [debug] ota: Checking\u2026\n[2026-08-31T00:21:57.511Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-31T00:21:57.608Z] [debug] ota: Saving progress\u2026\n[2026-08-31T00:21:57.609Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-08-31T00:21:57.681Z] [debug] ota: boot check result = applied\n[2026-08-31T00:21:57.806Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0552e-ecd7-7809-9d77-60c13c17117a\n[2026-08-31T00:21:57.806Z] [debug] ota: Checking\u2026\n[2026-08-31T00:21:57.896Z] [debug] ota: Already up to date\n[2026-08-31T00:21:57.896Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-31T00:21:57.928Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-31T00:21:57.928Z] [debug] voice: bundled idle\n[2026-08-31T00:21:58.136Z] [debug] send-log: bundle #mtghbloc64g4 attempt 2/5 delivered to Sentry\n[2026-08-31T02:44:51.154Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0552e-ecd7-7809-9d77-60c13c17117a\n",
+      "[2026-08-31T02:44:51.154Z] [debug] ota: Checking\u2026\n[2026-08-31T02:44:52.191Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-31T02:44:52.296Z] [debug] ota: Saving progress\u2026\n[2026-08-31T02:44:52.298Z] [debug] ota: Restarting to apply\u2026\n[2026-08-31T02:44:52.373Z] [debug] ota: boot check result = applied\n",
+      "[2026-08-31T02:44:52.534Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0556e-99da-7f43-bd28-ff011ea84139\n[2026-08-31T02:44:52.534Z] [debug] ota: Checking\u2026\n[2026-08-31T02:44:52.664Z] [debug] ota: Already up to date\n[2026-08-31T02:44:52.665Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T02:44:52.702Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-31T02:44:52.703Z] [debug] voice: bundled idle\n[2026-08-31T02:44:52.893Z] [debug] send-log: bundle #mtghbloc64g4 attempt 3/5 delivered to Sentry\n[2026-08-31T02:44:56.640Z] [debug] OTA applied: 2026-08-30-1582-the-guy-who-gives-you-the-job \u2192 2026-08-31-1583-the-favour-beat-fights-what-it-names.\n",
+      "[2026-08-31T02:44:56.640Z] [debug] OTA session start: 2026-08-31-1583-the-favour-beat-fights-what-it-names.\n[2026-08-31T02:44:56.640Z] [world] You step back into Great Tartary Plains. The world waits for your move.\n[2026-08-31T02:44:56.641Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n\n=== END LOG \u00b7 20251 CHARS ===\n\n",
+      "Tartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-08-31T02:44:56.856Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n",
+      "  OTA: (2026-08-31-1583-the-favour-beat-fights-what-it-names)\n  Boot stage: qwen:deferred\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-08-31T02:44:52.685Z\n  Last init success: 2026-08-31T02:44:53.192Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n",
+      "  Status: none recorded\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-30T01:15:03.072Z (1530m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1553-glyph-glyph-name-star \u00b7 stage rendered\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: rendered \u00b7 9351ms into the action\n",
+      "  \u2022 2026-08-30T02:14:43.966Z (1470m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1556-two-cudgels-are-two-objects \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done \u00b7 4739ms into the action\n",
+      "  \u2022 2026-08-30T03:06:04.800Z (1419m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1559-the-coating-ladder-means-something \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done \u00b7 5502ms into the action\n",
+      "  \u2022 2026-08-30T08:28:32.485Z (1096m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1567-the-heartbeat-ate-the-checkpoint \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 459ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-30T16:12:35.586Z (632m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1569-the-glyph-brings-its-own-ground \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"\u2726 bandolier (1)\"\n      doing: tap \"\u2726 bandolier (1)\" \u00b7 room builders_survey_camp \u00b7 screen exploration\n      last checkpoint: rendered \u00b7 126ms into the action \u00b7 alive 5884ms after it\n",
+      "  \u2022 2026-08-30T18:43:29.524Z (481m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1571-the-slot-moves-on \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: action \"rest\"\n      doing: action \"rest\" \u00b7 room great_tartary_plains \u00b7 screen exploration\n      last checkpoint: native:cognition:done [q0] \u00b7 80822ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-30T21:23:57.150Z (321m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1578-the-stage-says-who-is-there \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 535ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-30T22:25:39.849Z (259m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1580-the-guy-who-was-never-there \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 329ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-30T23:42:09.758Z (183m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1581-the-card-they-cannot-walk-past \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 414ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-31T00:21:58.332Z (143m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1582-the-guy-who-gives-you-the-job \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 383ms into the action \u00b7 alive 0ms after it\n",
+      "Crash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n  Memory warnings: none this session\n  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  Native queue: worst wait 0.0s \u00b7 0 job kinds queued >3s \u00b7 worst 0.0ms/prompt-token\n  App state trail: (none recorded)\nModel contexts\n  Live now: 0\n  Opened: 0 \u00b7 Released: 0 \u00b7 Peak live: 0\n",
+      "  Narration engine: idle\n"
+    ],
+    "chunkChars": 10613
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1583-the-favour-beat-fights-what-it-names #mtgmy1ut4oor [inline 2/2]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtgmy1ut4oor"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "2"
+    },
+    {
+      "key": "parts",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9f:6b0a:ad2:ae57:4e16:2ac6",
+      "query": "user.ip:\"2607:fb90:db9f:6b0a:ad2:ae57:4e16:2ac6\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T02:44:55.651290Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T02:44:57.004000Z",
+  "fingerprints": [
+    "3e8310a5f5606ceccdf8374e2b35a956"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "a677deb26f1f44ac94344a8cb8da1194",
+  "previousEventID": "b8abe4477db04ef6abdc1782a3ca0aeb"
+}
