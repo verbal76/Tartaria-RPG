@@ -1,0 +1,200 @@
+{
+  "id": "532aa9eb59f44251a8d5e5aa3bcf7577",
+  "groupID": "7701392226",
+  "eventID": "532aa9eb59f44251a8d5e5aa3bcf7577",
+  "projectID": "4511945117532160",
+  "size": 17817,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1580-the-guy-who-was-never-there #mtgc5ut96dzn [inline 1/2]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1580-the-guy-who-was-never-there #mtgc5ut96dzn [inline 1/2]",
+  "title": "player-log 2026-08-30-1580-the-guy-who-was-never-there #mtgc5ut96dzn [inline 1/2]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "2184e5d2d16f4de5a1d451fa931c4405",
+      "span_id": "9b1665cc05f76631",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "=== TARTARIA LOG \u00b7 13876 CHARS \u00b7 BEGIN ===\n[2026-08-30T18:43:30.754Z] [debug] persist sizes(KB): total=102 player=37 wm=61[rooms=30 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=0 scene=3\n[2026-08-30T18:44:24.801Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a053da-1891-7b49-8e92-321b7cba6e67\n[2026-08-30T18:44:24.802Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-30T18:44:24.865Z] [debug] ota: Already up to date\n[2026-08-30T18:44:24.865Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T18:44:24.921Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-30T18:44:24.922Z] [debug] voice: bundled idle\n[2026-08-30T18:44:25.206Z] [debug] send-log: bundle #mtg55shijei7 attempt 2/5 delivered to Sentry\n",
+      "[2026-08-30T18:44:28.734Z] [debug] OTA session start: 2026-08-30-1571-the-slot-moves-on.\n[2026-08-30T18:44:28.734Z] [world] You step back into Great Tartary Plains. The world waits for your move.\n[2026-08-30T18:44:28.734Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cheddar Bob. We've still got ground to cover, you and I.\"\n",
+      "[2026-08-30T18:44:28.885Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-30T18:44:28.885Z \u00b7 build 2026-08-30-1571-the-slot-moves-on \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-30T18:44:29.238Z] [debug] send-log: crash on record (2026-08-30T18:43:29.524Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtg5s64oul66\n",
+      "[2026-08-30T18:44:32.575Z] [debug] send-log: #mtg5s8s9w0sz \u2014 DELIVERED (inline, no attachments): beacon out, 1/1 parts accepted (7273 chars) \u2014 flush said yes\n[2026-08-30T18:44:32.576Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtg5s8s9w0sz kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-30T20:29:25.327Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a053da-1891-7b49-8e92-321b7cba6e67\n[2026-08-30T20:29:25.328Z] [debug] ota: Checking\u2026\n[2026-08-30T20:29:27.196Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-30T20:29:27.348Z] [debug] ota: Saving progress\u2026\n[2026-08-30T20:29:27.351Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-08-30T20:29:27.464Z] [debug] ota: boot check result = applied\n[2026-08-30T20:29:27.613Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05438-45c0-73a1-babe-4f1f7c9e3724\n[2026-08-30T20:29:27.614Z] [debug] ota: Checking\u2026\n[2026-08-30T20:29:27.779Z] [debug] ota: Already up to date\n[2026-08-30T20:29:27.780Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-30T20:29:27.809Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-30T20:29:27.810Z] [debug] voice: bundled idle\n[2026-08-30T20:29:28.159Z] [debug] send-log: bundle #mtg5s8s9w0sz attempt 2/5 delivered to Sentry\n[2026-08-30T20:40:33.780Z] [debug] OTA applied: 2026-08-30-1571-the-slot-moves-on \u2192 2026-08-30-1575-the-stone-marks-you.\n",
+      "[2026-08-30T20:40:33.780Z] [debug] OTA session start: 2026-08-30-1575-the-stone-marks-you.\n[2026-08-30T20:40:33.780Z] [world] You step back into Great Tartary Plains. The world waits for your move.\n[2026-08-30T20:40:33.780Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n",
+      "[2026-08-30T20:40:33.979Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-30T20:40:33.979Z \u00b7 build 2026-08-30-1575-the-stone-marks-you \u00b7 updated from 2026-08-30-1571-the-slot-moves-on \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-30T20:41:24.080Z] [debug] ui: tap \"more \u25b8\"\n[2026-08-30T20:41:26.383Z] [debug] ui: tap \"missions\"\n",
+      "[2026-08-30T20:51:53.463Z] [world] You set course for Nimari. 8 tiles \u2014 about 20 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 NIMARI on the travel row to close the distance; STOP TRAVEL to halt.\n[2026-08-30T20:51:53.513Z] [debug] spawn: gear=[Seer's Veil of the Aether, Order Letter-Opener] window=10 roster=new\n",
+      "[2026-08-30T20:51:53.514Z] [world] You walk south. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-30T20:51:53.516Z] [world] The top of a flooded Tartarian cathedral pierces the standing water ahead \u2014 steeple intact, the rest drowned.\n[2026-08-30T20:51:55.448Z] [debug] ui: tap \"missions\"\n",
+      "[2026-08-30T20:51:57.126Z] [debug] persist sizes(KB): total=98 player=42 wm=50[rooms=19 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=3 scene=4\n[2026-08-30T20:51:58.663Z] [debug] ui: tap \"craft\"\n[2026-08-30T20:52:01.150Z] [world] You repair the Smoldering Reclaimers Guild Geode-Cored Cleaver. Back to full. (spent: Small Rock x2)\n",
+      "[2026-08-30T20:52:02.334Z] [arbiter] The Arbiter nods. \"Patched in: Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-30T20:52:02.343Z] [world] You repair the Rough-Hewn Chestplate. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-08-30T20:52:09.335Z] [debug] ui: tap \"inventory\"\n[2026-08-30T20:52:52.337Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-08-30T20:52:52.373Z] [world] The first pass on the Bone Knife crumbles in your hands \u2014 but your training kicks in. You stop, breathe, change angle, and try again.\n[2026-08-30T20:52:52.373Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-08-30T20:52:52.403Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-08-30T20:52:52.431Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-08-30T20:52:52.458Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-08-30T20:52:52.486Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-08-30T20:52:52.514Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-08-30T20:52:52.541Z] [world] You break the Cudgel down. \u2726 Recovered: Small Rock x2, Stick.\n[2026-08-30T20:52:52.568Z] [world] You break the Cudgel down. \u2726 Recovered: Small Rock x2, Stick.\n[2026-08-30T20:52:52.596Z] [world] You break the Cudgel down. \u2726 Recovered: Small Rock x2, Stick.\n",
+      "[2026-08-30T20:53:03.805Z] [debug] persist sizes(KB): total=97 player=39 wm=50[rooms=19 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=5 scene=4\n[2026-08-30T20:53:17.764Z] [debug] stats: STR11 DEX27 INT12 WIS6 CHA2 STE5 | gear: DEX+20,INT+3,STR+6,STE+2,WIS+1 | worn: main=Reclaimers Guild Geode-Cored Cleaver off=Bone Crossbow head=Forgotten Seeker's Mask chest=Rough-Hewn Chestplate han",
+      "ds=Relic Hunter's Gauntlets legs=Aetheric Scout Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-08-30T20:53:49.349Z] [debug] ui: tap \"inventory\"\n[2026-08-30T20:54:39.403Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n",
+      "[2026-08-30T20:54:39.438Z] [world] The first pass on the Mud-Warden's Vest crumbles in your hands \u2014 but your training kicks in. You stop, breathe, change angle, and try again.\n[2026-08-30T20:54:39.438Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n",
+      "[2026-08-30T20:54:39.466Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-08-30T20:54:39.493Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-08-30T20:54:39.519Z] [world] You break the Reclaimer's Salvage Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n",
+      "[2026-08-30T20:54:39.545Z] [world] You break the Reclaimer's Salvage Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-08-30T20:54:39.571Z] [world] You break the Reclaimer's Salvage Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-08-30T20:54:39.597Z] [world] You break the Reclaimer's Salvage Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n",
+      "[2026-08-30T20:54:39.622Z] [world] You break the Mud-Stalker Leggings down. \u2726 Recovered: Patched Cloth x2.\n[2026-08-30T20:54:39.647Z] [world] You break the Resonant Faulds down. \u2726 Recovered: Small Rock.\n[2026-08-30T20:54:39.671Z] [world] You break the Sentinel's Greaves down. \u2726 Recovered: Patched Cloth x2.\n",
+      "[2026-08-30T20:54:39.695Z] [world] You break the Wanderer's Footwraps down. \u2726 Recovered: Patched Cloth x2.\n[2026-08-30T20:54:39.719Z] [world] You break the Mud-Bound Cloak down. \u2726 Recovered: Patched Cloth x2.\n[2026-08-30T20:54:39.743Z] [world] You break the Mud-Bound Cloak down. \u2726 Recovered: Patched Cloth x2.\n",
+      "[2026-08-30T20:54:39.767Z] [world] You break the Reclaimer's Cloak down. \u2726 Recovered: Patched Cloth x2.\n[2026-08-30T20:55:09.897Z] [world] You break the Mud Buckler down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-08-30T20:55:10.714Z] [debug] persist sizes(KB): total=94 player=34 wm=49[rooms=19 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=7 scene=4\n",
+      "[2026-08-30T20:55:23.338Z] [debug] ui: tap \"craft\"\n[2026-08-30T21:22:56.351Z] [debug] OTA session start: 2026-08-30-1575-the-stone-marks-you.\n[2026-08-30T21:22:56.351Z] [world] You step back into Great Tartary Plains. The world waits for your move.\n",
+      "[2026-08-30T21:22:56.351Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cheddar Bob. We've still got ground to cover, you and I.\"\n[2026-08-30T21:22:56.453Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-30T21:22:56.453Z \u00b7 build 2026-08-30-1575-the-stone-marks-you \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-30T21:23:01.940Z] [debug] ui: tap \"craft\"\n",
+      "[2026-08-30T21:23:38.143Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T21:23:39.646Z] [world] You take the Order Letter-Opener from where it lay.\n[2026-08-30T21:23:39.647Z] [reward] \u2726 Order Letter-Opener (Common).\n[2026-08-30T21:23:39.661Z] [world] You pick up the Seer's Veil of the Aether.\n[2026-08-30T21:23:39.661Z] [reward] \u2726 Seer's Veil of the Aether (Common).\n",
+      "[2026-08-30T21:23:39.823Z] [debug] persist sizes(KB): total=95 player=34 wm=49[rooms=19 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=9 scene=3\n[2026-08-30T21:23:40.780Z] [reward] \u2726 Found Final Entry \u2014 Upper Tower \u2014 Elior Zalmar. (open Contracts \u2192 Collectibles to read)\n[2026-08-30T21:23:40.793Z] [world] You salvage the overturned wagon. The take is small but real.\n",
+      "[2026-08-30T21:23:40.793Z] [world] You work the track apart. Tucked inside, sealed against the silt: a folded note.\n[2026-08-30T21:23:40.793Z] [world] You salvage the weathered obsidian pillar. The take is small but real.\n[2026-08-30T21:23:40.794Z] [reward] \u2726 Salvage haul:\n[2026-08-30T21:23:40.794Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n",
+      "[2026-08-30T21:23:40.794Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-30T21:23:42.452Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-08-30T21:23:42.468Z] [player] investigate standing water\n",
+      "[2026-08-30T21:23:42.469Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=standing water resolved=standing water range=- enemies=0 hooks=1\n[2026-08-30T21:23:42.469Z] [debug] route: hook intercept (kind=submerged_steeple, target=\"standing water\") \u2014 original intent=investigate\n",
+      "[2026-08-30T21:23:42.471Z] [world] \u2605 STORY THREAD (step 1) \u2014 You wade out to the steeple. The window-slits at the top open onto a flooded nave \u2014 Aetherstone shimmer in the water below.\n[2026-08-30T21:23:42.472Z] [arbiter] \"Explorers have gone in,\" the Arbiter says, \"and the water keeps them.\"\n[2026-08-30T21:23:43.459Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-08-30T21:23:44.078Z] [combat] You take 4 damage from the flooded nave.\n[2026-08-30T21:23:44.085Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You dive. The Aetherstone gives you a half-minute of breathable air. You grab what you can \u2014 a heavy reliquary off the altar \u2014 and break back to the surface, lungs burning.\n[2026-08-30T21:23:44.085Z] [reward] \u2726 Golem Core, +60 TC.\n",
+      "[2026-08-30T21:23:44.086Z] [reward] \u2726 For your persistence \u2014 Sentinel Core Plate (Uncommon).\n[2026-08-30T21:23:50.320Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-30T21:23:56.074Z] [debug] qwen\u23f1 narration:scene_intro_fill dormant 5650ms read 0ms/write 0ms in 723t\u2192out 0t (0ch)\n",
+      "[2026-08-30T21:23:56.102Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5650ms \u2014 intro-fill:\u2205\n[2026-08-30T21:23:56.103Z] [debug] homework: scene_intro \"Great Tartary Plains\" \u2205 5783ms\n[2026-08-30T21:23:56.161Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-30T21:23:56.208Z] [debug] appstate: active \u2192 background (was active for 12664ms)\n",
+      "[2026-08-30T21:23:56.399Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0548b-3a99-7834-b7c6-55cf5141fe11\n[2026-08-30T21:23:56.399Z] [debug] ota: Checking\u2026\n[2026-08-30T21:23:56.493Z] [debug] ota: Already up to date\n[2026-08-30T21:23:56.494Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T21:23:56.573Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-30T21:23:56.573Z] [debug] voice: bundled idle\n[2026-08-30T21:23:57.011Z] [debug] send-log: bundle #mtg5s8s9w0sz attempt 3/5 delivered to Sentry\n[2026-08-30T21:43:01.182Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0548b-3a99-7834-b7c6-55cf5141fe11\n[2026-08-30T21:43:01.182Z] [debug] ota: Checking\u2026\n[2026-08-30T21:43:01.242Z] [debug] ota: Already up to date\n",
+      "[2026-08-30T21:43:01.243Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T21:43:01.288Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-30T21:43:01.290Z] [debug] voice: bundled idle\n[2026-08-30T21:43:01.452Z] [debug] send-log: bundle #mtg5s8s9w0sz attempt 4/5 delivered to Sentry\n",
+      "[2026-08-30T21:43:04.949Z] [debug] OTA session start: 2026-08-30-1578-the-stage-says-who-is-there.\n[2026-08-30T21:43:04.950Z] [world] You step back into Great Tartary Plains. The world waits for your move.\n[2026-08-30T21:43:04.950Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n\n=== END LOG \u00b7 13876 CHARS ===\n\nTartaria Realms\n\n",
+      "Device\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-08-30T21:43:05.198Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-08-30-1578-the-stage-says-who-is-there)\n",
+      "  Boot stage: qwen:deferred\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-08-30T21:43:01.294Z\n  Last init success: 2026-08-30T21:43:01.825Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1580-the-guy-who-was-never-there #mtgc5ut96dzn [inline 1/2]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtgc5ut96dzn"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "2"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T22:25:38.298857Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T22:25:39.495000Z",
+  "fingerprints": [
+    "a24093cdaf8d1a1d7d245ac0c1d4b1f5"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "fe0cca0cb4f64f0da18ae032acad5d02",
+  "previousEventID": null
+}
