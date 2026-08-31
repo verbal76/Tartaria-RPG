@@ -1,0 +1,236 @@
+{
+  "id": "45b165ec8d784753b3a7171b2d866e03",
+  "groupID": "7703253341",
+  "eventID": "45b165ec8d784753b3a7171b2d866e03",
+  "projectID": "4511945117532160",
+  "size": 18193,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 3/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1594-the-pinch-demands-the-lift",
+  "message": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 3/28]",
+  "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 3/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba3:126:ad2:ae57:4eb7:1198",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "6fd9390f3c424ca98b111fa99490d756",
+      "span_id": "b8b1f8596d57a4d0",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " tap \"investigate\"\n[2026-08-31T02:49:05.302Z] [player] investigate the ground\n[2026-08-31T02:49:05.303Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-08-31T02:49:05.308Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Small Rock (Common).\n[2026-08-31T02:49:05.314Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-31T02:49:05.394Z] [cognitive] CLIMB  (79ms)\n[2026-08-31T02:49:06.211Z] [debug] ui: tap \"\u2192 NIMARI\"\n[2026-08-31T02:49:06.228Z] [debug] spawn: gear=[Titan's Vest] window=10 roster=new\n[2026-08-31T02:49:06.229Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-08-31T02:49:06.230Z] [world] What you started here has not finished itself in your absence.\n",
+      "[2026-08-31T02:49:06.564Z] [player] investigate flood trench\n[2026-08-31T02:49:06.564Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=flood trench resolved=flood trench range=- enemies=0 hooks=2\n[2026-08-31T02:49:06.566Z] [world] You study the flood trench. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n",
+      "[2026-08-31T02:49:06.650Z] [cognitive] SEARCH \u00b7 TALK \u00b7 RETREAT \u00b7 SWIM  (83ms)\n[2026-08-31T02:49:07.591Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T02:49:09.274Z] [debug] qwen\u23f1 investigate_lore ok 2632ms read 1346ms/write 1262ms in 127t\u2192out 39t 10.6ms/t (188ch)\n[2026-08-31T02:49:09.993Z] [world] The Titan's Vest was half under something. It is not now.\n",
+      "[2026-08-31T02:49:09.994Z] [reward] \u2726 Titan's Vest (Common).\n[2026-08-31T02:49:10.153Z] [debug] persist sizes(KB): total=128 player=32 wm=62[rooms=30 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=30 scene=4\n[2026-08-31T02:49:11.037Z] [world] You break the buried structure apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-31T02:49:11.037Z] [world] You break the fossil rib apart. Among the pieces, something worth keeping.\n[2026-08-31T02:49:11.038Z] [world] You strip the lantern shard carefully. Something usable comes free in your hand.\n[2026-08-31T02:49:11.039Z] [reward] \u2726 Salvage haul:\n[2026-08-31T02:49:11.039Z] [reward]     \u2022 Cloth Scrap (Common)\n",
+      "[2026-08-31T02:49:11.039Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-31T02:49:11.039Z] [reward]     \u2022 Aether Dust x3 (Common)\n[2026-08-31T02:49:12.077Z] [debug] ui: tap \"investigate\"\n[2026-08-31T02:49:13.570Z] [player] investigate the ground\n[2026-08-31T02:49:13.570Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-08-31T02:49:13.575Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Residue (Common).\n[2026-08-31T02:49:13.583Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T02:49:13.584Z] [arbiter] The Arbiter glances toward the crystal. \"Still there. Still yours, if you take it.\"\n[2026-08-31T02:49:13.584Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-31T02:49:13.671Z] [cognitive] CLIMB  (86ms)\n[2026-08-31T02:49:14.832Z] [player] investigate dust whirlwind\n[2026-08-31T02:49:14.833Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=dust whirlwind resolved=dust whirlwind range=- enemies=0 hooks=2\n",
+      "[2026-08-31T02:49:14.834Z] [world] Something shifted while you were turned away \u2014 an Aetheric Leech breaks cover, fast and low. (range: close)\n[2026-08-31T02:49:14.834Z] [combat] Aetheric Leech \u2014 Energy Drain ready, 1D10 Aetheric damage on a hit.\n[2026-08-31T02:49:14.834Z] [debug] enemy: Aetheric Leech hp=16 ac=9 atk=Energy Drain dmg=1D10 Aetheric rarity=Common ap=4\n",
+      "[2026-08-31T02:49:14.834Z] [debug] arbiter: template (reason=combat)\n[2026-08-31T02:49:14.834Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T02:49:14.977Z] [cognitive] THROW  (141ms)\n[2026-08-31T02:49:17.396Z] [debug] ui: tap \"approach\"\n[2026-08-31T02:49:17.442Z] [player] approach Aetheric Leech\n",
+      "[2026-08-31T02:49:17.443Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetheric leech resolved=Aetheric Leech range=mid enemies=1 hooks=2\n[2026-08-31T02:49:17.444Z] [debug] move: advance from range=mid enemies=1 weather=Ash Storm cost=1 partial=0\n[2026-08-31T02:49:17.445Z] [debug] move: field advance target=Aetheric Leech d 1.50->0.50 band mid->close\n",
+      "[2026-08-31T02:49:17.445Z] [world] You close the gap with Aetheric Leech. (range: close / arm's reach)\n[2026-08-31T02:49:17.445Z] [combat] Aetheric Leech blisters \u2014 clinging fire sears 4. (12/16 HP, 2 turns left)\n[2026-08-31T02:49:17.447Z] [combat] Aetheric Leech \u2014 d20 \u2192 7 + ATK 4 = 11 vs your AC 21 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-31T02:49:17.448Z] [debug] arbiter: template (reason=combat)\n[2026-08-31T02:49:17.448Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T02:49:17.583Z] [cognitive] USE_ITEM \u00b7 RETREAT  (134ms)\n[2026-08-31T02:49:19.632Z] [debug] ui: tap \"dodge\"\n[2026-08-31T02:49:19.647Z] [player] dodge\n",
+      "[2026-08-31T02:49:19.648Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2\n[2026-08-31T02:49:19.649Z] [world] You commit to the dodge. Slip Aetheric Leech's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-31T02:49:19.649Z] [combat] Aetheric Leech blisters \u2014 clinging fire sears 4. (8/16 HP, 1 turn left)\n[2026-08-31T02:49:19.685Z] [combat] Aetheric Leech \u2014 d20 \u2192 20 + ATK 4 = 24 vs your AC 21 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-08-31T02:49:19.685Z] [combat] Dodge \u2014 Aetheric Leech rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.\n",
+      "[2026-08-31T02:49:19.686Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T02:49:19.825Z] [combat] Aetheric Leech deals 2 aetheric damage [armor \u221246%, title \u00bd, floor 30%]. You have 28 HP remaining.\n[2026-08-31T02:49:19.825Z] [combat] That's your aetheric resist working \u2014 the armor drank most of that hit (2 of 6 got through).\n",
+      "[2026-08-31T02:49:19.825Z] [combat] Aetheric Leech's strike leaves you bleeding.\n[2026-08-31T02:49:20.055Z] [cognitive] neutral  (368ms)\n[2026-08-31T02:49:20.885Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T02:49:20.937Z] [player] attack with the reclaimers guild geode-cored cleaver\n",
+      "[2026-08-31T02:49:20.937Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=Reclaimers Guild Geode-Cored Cleaver range=close enemies=1 hooks=2\n[2026-08-31T02:49:20.938Z] [combat] Aetheric Leech blisters \u2014 clinging fire sears 4. (4/16 HP, 0 turns left)\n",
+      "[2026-08-31T02:49:20.938Z] [combat] Aetheric Leech shakes off the last of the fire \u2014 the Bone Crossbow has run its course.\n[2026-08-31T02:49:20.938Z] [debug] attack: target=Aetheric Leech range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false\n[2026-08-31T02:49:20.939Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-08-31T02:49:20.963Z] [world] Your smoldering reclaimers guild geode-cored cleaver comes around in an arc; Aetheric Leech squares up to meet it.\n[2026-08-31T02:49:20.963Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T02:49:21.086Z] [cognitive] TALK  (120ms)\n[2026-08-31T02:49:27.990Z] [world] Aetheric Leech moves first. The pressure is immediate.\n",
+      "[2026-08-31T02:49:27.992Z] [combat] Aetheric Leech \u2014 d20 \u2192 15 + ATK 4 = 19 vs your AC 21 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-31T02:49:27.992Z] [combat] You \u2014 d20 \u2192 13 + DEX 27 \u2212 1 (Ash Storm) = 39 vs Aetheric Leech AC 9 \u2014 \u2713 HIT\n[2026-08-31T02:49:27.993Z] [combat] Bludgeoning flares \u2014 +2 on hit (weak \u2014 bites deep!).\n",
+      "[2026-08-31T02:49:27.993Z] [combat] Weakness exposed \u2014 Aetheric Leech flinches. (bludgeoning \u00d71.5 for 7)\n[2026-08-31T02:49:27.994Z] [combat] Your blow with the smoldering reclaimers guild geode-cored cleaver lands clean \u2014 7 damage. Aetheric Leech crumples in the dust. The Aetherstone settles.\n[2026-08-31T02:49:27.995Z] [reward] Aetheric Leech defeated. You recover Leech Mucus.\n",
+      "[2026-08-31T02:49:27.996Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 35). [33 enemies defeated]\n[2026-08-31T02:49:27.996Z] [reward] +2 TC pried from the dust.\n[2026-08-31T02:49:32.291Z] [debug] ui: tap \"investigate\"\n[2026-08-31T02:49:34.938Z] [player] investigate dust whirlwind\n",
+      "[2026-08-31T02:49:34.938Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=dust whirlwind resolved=dust whirlwind range=- enemies=0 hooks=2\n[2026-08-31T02:49:34.939Z] [world] You give the dust whirlwind your full attention. It returns the gesture by being exactly what it appears to be.\n[2026-08-31T02:49:35.024Z] [cognitive] THROW  (84ms)\n",
+      "[2026-08-31T02:49:35.150Z] [debug] persist sizes(KB): total=139 player=32 wm=62[rooms=31 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=41 scene=4\n[2026-08-31T02:49:36.358Z] [debug] ui: tap \"\u2192 NIMARI\"\n[2026-08-31T02:49:36.372Z] [debug] spawn: gear=[Tartarian Bone Knife, Minor Repair] window=10 roster=new\n",
+      "[2026-08-31T02:49:36.374Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-08-31T02:49:36.376Z] [world] The ground rolls before you hear them. A herd of Mud Boars breaks the rise at full panic \u2014 something behind them, probably an Aether-storm cell, has driven them past the threshold a Boar usually keeps. They do not see you. They do not need to.\n",
+      "[2026-08-31T02:49:36.377Z] [combat] Mud Boar closes \u2014 Tusk Charge ready, 2D6 damage on a hit. (range: close)\n[2026-08-31T02:49:36.387Z] [world] The loose end is exactly as loose as you left it.\n[2026-08-31T02:49:37.081Z] [debug] qwen\u23f1 investigate_lore ok 1987ms read 293ms/write 1668ms in 128t\u2192out 54t 2.3ms/t (252ch)\n[2026-08-31T02:49:38.959Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n",
+      "[2026-08-31T02:49:38.964Z] [system] bleeding fades.\n[2026-08-31T02:49:39.016Z] [player] attack with the reclaimers guild geode-cored cleaver\n[2026-08-31T02:49:39.016Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=Reclaimers Guild Geode-Cored Cleaver range=close enemies=1 hooks=2\n",
+      "[2026-08-31T02:49:39.017Z] [debug] attack: target=Mud Boar range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false\n[2026-08-31T02:49:39.042Z] [world] You raise the smoldering reclaimers guild geode-cored cleaver toward Mud Boar. The room narrows around the both of you.\n[2026-08-31T02:49:39.042Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T02:49:39.162Z] [cognitive] TALK  (119ms)\n[2026-08-31T02:49:45.766Z] [world] You seize the initiative. Mud Boar has no time to react.\n[2026-08-31T02:49:45.767Z] [combat] You \u2014 d20 \u2192 18 + DEX 27 = 45 vs Mud Boar AC 9 \u2014 \u2713 HIT\n[2026-08-31T02:49:45.768Z] [combat] Bludgeoning flares \u2014 +3 on hit.\n",
+      "[2026-08-31T02:49:45.769Z] [combat] The blow with the smoldering reclaimers guild geode-cored cleaver finds purchase \u2014 16 damage, 4 HP standing. Mud Boar commits to the counter.\n[2026-08-31T02:49:45.770Z] [combat] Smoldering Reclaimers Guild Geode-Cored Cleaver \u2014 4 burn bites in and festers (3 turns).\n[2026-08-31T02:49:45.770Z] [combat] Mud Boar is left exposed \u2014 easier to hit.\n",
+      "[2026-08-31T02:49:45.772Z] [combat] Mud Boar \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 21 \u2014 \u2717 MISS\n[2026-08-31T02:49:46.995Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T02:49:47.040Z] [player] attack with the off-hand bone crossbow\n[2026-08-31T02:49:47.041Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=2\n",
+      "[2026-08-31T02:49:47.042Z] [combat] Mud Boar blisters \u2014 clinging fire sears 4. (0/20 HP, 2 turns left)\n[2026-08-31T02:49:47.043Z] [reward] Mud Boar defeated. You recover Boar Hide.\n[2026-08-31T02:49:47.043Z] [reward] +10 TC pried from the dust.\n[2026-08-31T02:49:48.778Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T02:49:50.084Z] [world] You work the Minor Repair loose from where the mud had it.\n",
+      "[2026-08-31T02:49:50.085Z] [reward] \u2726 Minor Repair (Common).\n[2026-08-31T02:49:50.101Z] [world] The Tartarian Bone Knife had settled into the ground. You unsettle it.\n[2026-08-31T02:49:50.102Z] [reward] \u2726 Tartarian Bone Knife (Common).\n[2026-08-31T02:49:50.849Z] [world] Whatever the Aetheric Torch was lying against, it lets go without much argument.\n",
+      "[2026-08-31T02:49:50.851Z] [reward] \u2726 Aetheric Torch (Common).\n[2026-08-31T02:49:52.093Z] [world] You strip the bone tool carefully. Something usable comes free in your hand.\n[2026-08-31T02:49:52.093Z] [world] You break the weather beacon apart. Among the pieces, something worth keeping.\n[2026-08-31T02:49:52.093Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-31T02:49:52.094Z] [reward]     \u2022 Aether Dust x4 (Common)\n[2026-08-31T02:49:53.230Z] [debug] ui: tap \"investigate\"\n[2026-08-31T02:49:55.102Z] [player] investigate the ground\n[2026-08-31T02:49:55.103Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-08-31T02:49:55.107Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Small Rock (Common).\n[2026-08-31T02:49:55.113Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T02:49:55.113Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T02:49:55.113Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-31T02:49:55.200Z] [cognitive] CLIMB  (86ms)\n[2026-08-31T02:49:55.466Z] [debug] persist sizes(KB): total=136 player=33 wm=51[rooms=20 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=48 scene=4\n[2026-08-31T02:49:56.352Z] [player] investigate window\n",
+      "[2026-08-31T02:49:56.353Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=window resolved=window range=- enemies=0 hooks=2\n[2026-08-31T02:49:56.356Z] [world] You look the window over. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n[2026-08-31T02:49:56.452Z] [cognitive] neutral  (93ms)\n",
+      "[2026-08-31T02:49:58.072Z] [debug] qwen\u23f1 investigate_lore ok 1623ms read 286ms/write 1314ms in 126t\u2192out 41t 2.3ms/t (184ch)\n[2026-08-31T02:49:58.681Z] [debug] ui: tap \"look around you\"\n[2026-08-31T02:49:58.688Z] [player] look\n[2026-08-31T02:49:58.689Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-08-31T02:49:58.690Z] [world] You look around. You're in Submerged Transit Hub, in Great Tartary Plains. You see: standing water, dead tree. The crystal is unaddressed. Hazard active: Tartarian Trap. Cardinal travel: north, east, south, west. You're near a flooded house \u2014 a way in stands clear. (Tap ENTER, or type 'enter', to step inside.)\n",
+      "[2026-08-31T02:50:04.308Z] [debug] qwen\u23f1 ambient ok 7859ms wait 1724ms read 3792ms/write 1584ms in 367t\u2192out 31t 10.3ms/t HIT-CAP (146ch)\n[2026-08-31T02:50:04.380Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 7859ms \u2014 ambient:\u2205\n[2026-08-31T02:50:04.380Z] [debug] arbiter: ambient \u2205 8023ms\n[2026-08-31T02:50:04.381Z] [debug] arbiter: ambient-empty reas"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 3/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthqftbaluhw"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "3"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba3:126:ad2:ae57:4eb7:1198",
+      "query": "user.ip:\"2607:fb90:dba3:126:ad2:ae57:4eb7:1198\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T21:37:51.485004Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T21:37:49.651000Z",
+  "fingerprints": [
+    "6634c6e2ed54099c9e7ef9834dd3dbf3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1946489288,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T17:38:33.982000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1594-the-pinch-demands-the-lift",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1594-the-pinch-demands-the-lift)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "4d4360c5a49649b085ae228fad40326a",
+  "previousEventID": "43f6192e0a354d80ae7e1e109a84e259"
+}

@@ -1,0 +1,237 @@
+{
+  "id": "50280806e27c4ebb939af2b0790069d2",
+  "groupID": "7703253341",
+  "eventID": "50280806e27c4ebb939af2b0790069d2",
+  "projectID": "4511945117532160",
+  "size": 18176,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 17/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1594-the-pinch-demands-the-lift",
+  "message": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 17/28]",
+  "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 17/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba3:126:ad2:ae57:4eb7:1198",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "6fd9390f3c424ca98b111fa99490d756",
+      "span_id": "b8b1f8596d57a4d0",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "8:07.416Z] [reward] \u2726 Aether-Walker's Cape (Common).\n[2026-08-31T16:38:07.432Z] [world] The Salvager's Trench Coat resists, then does not.\n[2026-08-31T16:38:07.432Z] [reward] \u2726 Salvager's Trench Coat (Common).\n[2026-08-31T16:38:07.870Z] [debug] persist sizes(KB): total=201 player=53 wm=62[rooms=27 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=4\n",
+      "[2026-08-31T16:38:08.354Z] [world] Tucked inside the pillar: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-08-31T16:38:08.355Z] [world] You salvage the tracks. The take is small but real.\n[2026-08-31T16:38:08.355Z] [world] You work the trapper camp over. A part of it comes loose, intact.\n[2026-08-31T16:38:08.355Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-31T16:38:08.356Z] [reward]     \u2022 Clouded Lens Blank (Common)\n[2026-08-31T16:38:08.356Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-08-31T16:38:08.356Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-08-31T16:38:09.408Z] [debug] ui: tap \"investigate\"\n[2026-08-31T16:38:10.975Z] [player] investigate the ground\n",
+      "[2026-08-31T16:38:10.975Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-31T16:38:10.978Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-31T16:38:10.985Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-31T16:38:10.985Z] [arbiter] The Arbiter taps the air near your pack. \"Rations. Now. Tartaria does not forgive an empty stomach.\"\n[2026-08-31T16:38:10.985Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T16:38:10.985Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T16:38:11.125Z] [cognitive] CLIMB  (139ms)\n[2026-08-31T16:38:12.044Z] [debug] ui: tap \"\u2192 RECLAIMER'S STAKE\"\n",
+      "[2026-08-31T16:38:12.045Z] [world] Your legs are done \u2014 you can't travel until you rest. Tap REST (8h) and the road will still be there.\n[2026-08-31T16:38:12.220Z] [player] investigate flat\n[2026-08-31T16:38:12.220Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=flat resolved=flat range=- enemies=0 hooks=1\n",
+      "[2026-08-31T16:38:12.222Z] [world] You study the flat and find no answer. The silence here is patient; whatever it knew, it has decided to keep.\n[2026-08-31T16:38:12.222Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T16:38:12.352Z] [cognitive] neutral  (128ms)\n[2026-08-31T16:38:13.058Z] [debug] ui: tap \"rest\"\n",
+      "[2026-08-31T16:38:13.064Z] [world] An Aetheric arc finds you \u2014 copper taste, blue afterimage, and a bite of damage. (\u22124 HP)\n[2026-08-31T16:38:13.069Z] [player] rest\n[2026-08-31T16:38:13.070Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-31T16:38:13.071Z] [world] Soot turns twice, thinks about a third, and drops where she stands.\n",
+      "[2026-08-31T16:38:13.071Z] [world] You rest for 8 hours. +6 HP, +8 stamina recovered. (Day 32, afternoon)\n[2026-08-31T16:38:13.072Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T16:38:13.081Z] [system] \u23f3 Time passed: 8h\n[2026-08-31T16:38:13.101Z] [world] A Conspiracy Architects patrol crosses your path in the open \u2014 and turns toward you.\n",
+      "[2026-08-31T16:38:13.101Z] [arbiter] \"Conspiracy Architects riders,\" the Arbiter says. \"They've marked you. No outrunning this one.\"\n[2026-08-31T16:38:13.467Z] [cognitive] REST  (385ms)\n[2026-08-31T16:38:13.999Z] [debug] qwen\u23f1 investigate_lore ok 1532ms read 277ms/write 1031ms in 126t\u2192out 34t 2.2ms/t (140ch)\n[2026-08-31T16:38:16.743Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-08-31T16:38:16.748Z] [world] An Aetheric arc finds you \u2014 copper taste, blue afterimage, and a bite of damage. (\u22122 HP)\n[2026-08-31T16:38:16.754Z] [player] dodge\n[2026-08-31T16:38:16.755Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=1\n",
+      "[2026-08-31T16:38:16.756Z] [world] You commit to the dodge. Slip Conspiracy Architects Patrol 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-31T16:38:16.811Z] [combat] Conspiracy Architects Patrol 1 \u2014 d20 \u2192 14 + ATK 6 = 20 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-08-31T16:38:16.811Z] [combat] Dodge \u2014 d20 \u2192 19 + DEX 24 = 43 vs ATK 20. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-31T16:38:16.811Z] [world] You slip Conspiracy Architects Patrol 1's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-08-31T16:38:16.813Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-08-31T16:38:16.813Z] [combat] Conspiracy Architects Patrol 2 \u2014 d20 \u2192 13 + ATK 9 = 22 vs your AC 25 \u2014 \u2717 MISS\n",
+      "[2026-08-31T16:38:16.814Z] [combat] Conspiracy Architects Patrol 3 and 1 other close the distance.\n[2026-08-31T16:38:16.814Z] [debug] arbiter: template (reason=combat)\n[2026-08-31T16:38:16.814Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T16:38:16.815Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T16:38:17.031Z] [cognitive] neutral  (215ms)\n",
+      "[2026-08-31T16:38:17.593Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T16:38:17.595Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-31T16:38:17.649Z] [player] attack with the reclaimers guild geode-cored cleaver\n",
+      "[2026-08-31T16:38:17.650Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=Reclaimers Guild Geode-Cored Cleaver range=close enemies=4 hooks=1\n[2026-08-31T16:38:17.651Z] [debug] attack: target=Conspiracy Architects Patrol 1 range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false\n",
+      "[2026-08-31T16:38:17.652Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-31T16:38:17.692Z] [world] Your smoldering reclaimers guild geode-cored cleaver comes around in an arc; Conspiracy Architects Patrol 1 squares up to meet it.\n[2026-08-31T16:38:17.692Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T16:38:17.897Z] [cognitive] TALK  (204ms)\n",
+      "[2026-08-31T16:38:24.671Z] [world] Conspiracy Architects Patrol 1 moves first. The pressure is immediate.\n[2026-08-31T16:38:24.677Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-08-31T16:38:24.677Z] [combat] Conspiracy Architects Patrol 1 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-31T16:38:24.677Z] [combat] Conspiracy Architects Patrol 2 turns on Soot \u2014 d20 8 + ATK 7 = 15 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-08-31T16:38:24.677Z] [combat] Soot takes 5. (10/15 HP left)\n",
+      "[2026-08-31T16:38:24.679Z] [combat] Conspiracy Architects Patrol 3 \u2014 d20 \u2192 6 + ATK 9 = 15 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-31T16:38:24.679Z] [combat] Conspiracy Architects Patrol 4 closes the distance.\n[2026-08-31T16:38:24.679Z] [combat] You \u2014 d20 \u2192 9 + DEX 24 perfect opening (2\u00d7 dice) = 33 vs Conspiracy Architects Patrol 1 AC 10 \u2014 \u2713 HIT\n",
+      "[2026-08-31T16:38:24.679Z] [combat] Bludgeoning flares \u2014 +1 on hit.\n[2026-08-31T16:38:24.680Z] [combat] Final strike with the smoldering reclaimers guild geode-cored cleaver for 23. Conspiracy Architects Patrol 1 is still. The Aetherstone hums on, indifferent.\n[2026-08-31T16:38:24.680Z] [reward] Conspiracy Architects Patrol 1 defeated. You recover Patched Cloth \u00d72, Architect Sigil.\n",
+      "[2026-08-31T16:38:24.681Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-08-31T16:38:24.682Z] [combat] 3 attackers remain. Conspiracy Architects Patrol 2 now in your sights.\n[2026-08-31T16:38:24.682Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 39). [49 enemies defeated]\n",
+      "[2026-08-31T16:38:24.682Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-31T16:38:24.682Z] [reward] +4 TC pried from the dust.\n[2026-08-31T16:38:25.288Z] [debug] persist sizes(KB): total=212 player=53 wm=73[rooms=37 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=81 scene=6\n[2026-08-31T16:38:33.313Z] [debug] ui: tap \"approach\"\n",
+      "[2026-08-31T16:38:33.373Z] [player] approach Conspiracy Architects Patrol 2\n[2026-08-31T16:38:33.373Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects patrol 2 resolved=Conspiracy Architects Patrol 2 range=mid enemies=3 hooks=1\n[2026-08-31T16:38:33.374Z] [debug] move: advance from range=mid enemies=3 weather=Aetheric Storm cost=1 partial=0\n",
+      "[2026-08-31T16:38:33.375Z] [debug] move: field advance target=Conspiracy Architects Patrol 2 d 1.58->0.58 band mid->close\n[2026-08-31T16:38:33.375Z] [world] You close the gap with the Conspiracy Architects Patrol 2 and 2 others. (range: close / arm's reach)\n",
+      "[2026-08-31T16:38:33.375Z] [world] The field shifts around you \u2014 Conspiracy Architects Patrol 3 now close / arm's reach; Conspiracy Architects Patrol 4 now close / arm's reach.\n[2026-08-31T16:38:33.376Z] [combat] Conspiracy Architects Patrol 3 \u2014 d20 \u2192 16 + ATK 7 = 23 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-08-31T16:38:33.378Z] [combat] Conspiracy Architects Patrol 4 \u2014 d20 \u2192 18 + ATK 6 = 24 vs your AC 22 \u2014 \u2713 HIT\n[2026-08-31T16:38:33.378Z] [combat] Conspiracy Architects Patrol 2 turns on Soot \u2014 d20 15 + ATK 7 = 22 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-08-31T16:38:33.378Z] [combat] Soot takes 1. (9/15 HP left)\n",
+      "[2026-08-31T16:38:33.611Z] [combat] Conspiracy Architects Patrol 3 deals 7 bludgeoning damage. You have 14 HP remaining.\n[2026-08-31T16:38:33.611Z] [combat] Conspiracy Architects Patrol 4 deals 1 bludgeoning damage. You have 13 HP remaining.\n[2026-08-31T16:38:33.821Z] [cognitive] RETREAT \u00b7 HIDE  (441ms)\n[2026-08-31T16:38:34.591Z] [debug] ui: tap \"dodge\"\n[2026-08-31T16:38:34.594Z] [player] dodge\n",
+      "[2026-08-31T16:38:34.595Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=3 hooks=1\n[2026-08-31T16:38:34.595Z] [world] You commit to the dodge. Slip Conspiracy Architects Patrol 2's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-31T16:38:34.636Z] [combat] Conspiracy Architects Patrol 2 \u2014 d20 \u2192 5 + ATK 7 = 12 vs your AC 22 \u2014 \u2717 EVADED\n[2026-08-31T16:38:34.636Z] [combat] Dodge \u2014 d20 \u2192 14 + DEX 24 = 38 vs ATK 12. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-08-31T16:38:34.636Z] [world] You slip Conspiracy Architects Patrol 2's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-08-31T16:38:34.637Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gaun",
+      "tlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-08-31T16:38:34.637Z] [combat] Conspiracy Architects Patrol 3 \u2014 d20 \u2192 7 + ATK 7 = 14 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-31T16:38:34.638Z] [combat] Conspiracy Architects Patrol 4 \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-31T16:38:34.639Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T16:38:34.850Z] [cognitive] neutral  (210ms)\n[2026-08-31T16:38:35.664Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T16:38:35.666Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-31T16:38:35.722Z] [player] attack with the reclaimers guild geode-cored cleaver\n",
+      "[2026-08-31T16:38:35.723Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=Reclaimers Guild Geode-Cored Cleaver range=close enemies=3 hooks=1\n[2026-08-31T16:38:35.723Z] [debug] attack: target=Conspiracy Architects Patrol 2 range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false\n",
+      "[2026-08-31T16:38:35.725Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-31T16:38:35.765Z] [world] You raise the smoldering reclaimers guild geode-cored cleaver toward Conspiracy Architects Patrol 2. The room narrows around the both of you.\n[2026-08-31T16:38:35.766Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T16:38:35.977Z] [cognitive] TALK  (211ms)\n",
+      "[2026-08-31T16:38:42.870Z] [world] Conspiracy Architects Patrol 2 moves first. The pressure is immediate.\n[2026-08-31T16:38:42.873Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-08-31T16:38:42.873Z] [combat] Conspiracy Architects Patrol 2 \u2014 d20 \u2192 4 + ATK 7 = 11 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-31T16:38:42.873Z] [combat] Conspiracy Architects Patrol 3 turns on Soot \u2014 d20 5 + ATK 7 = 12 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-08-31T16:38:42.874Z] [combat] Soot takes 6. (3/15 HP left)\n",
+      "[2026-08-31T16:38:42.881Z] [combat] Conspiracy Architects Patrol 4 \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 22 \u2014 \u2713 HIT\n[2026-08-31T16:38:42.882Z] [combat] You \u2014 d20 \u2192 8 + DEX 24 perfect opening (2\u00d7 dice) = 32 vs Conspiracy Architects Patrol 2 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-08-31T16:38:42.884Z] [combat] You crack the Conspiracy Architects Patrol 2 with the Smoldering Reclaimers Guild Geode-Cored Cleaver for 12 \u2014 nearly the whole of their fight, gone in one blow. They crumple, out cold. (1/13 HP) Loot them before they come to.\n[2026-08-31T16:38:42.884Z] [combat] Conspiracy Architects Patrol 2 is out of it. Conspiracy Architects Patrol 3 now in your sights.\n",
+      "[2026-08-31T16:38:42.884Z] [combat] Smoldering Reclaimers Guild Geode-Cored Cleaver \u2014 4 burn bites in and festers (3 turns).\n[2026-08-31T16:38:43.121Z] [combat] Conspiracy Architects Patrol 4 deals 4 bludgeoning damage. You have 9 HP remaining.\n[2026-08-31T16:38:45.218Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n",
+      "[2026-08-31T16:38:45.278Z] [player] attack with the reclaimers guild geode-cored cleaver\n[2026-08-31T16:38:45.279Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=Reclaimers Guild Geode-Cored Cleaver range=close enemies=3 hooks=1\n",
+      "[2026-08-31T16:38:45.281Z] [combat] Conspiracy Architects Patrol 2 blisters \u2014 clinging fire sears 4. (0/13 HP, 2 turns left)\n[2026-08-31T16:38:45.285Z] [reward] Conspiracy Architects Patrol 2 defeated. You recover Bone Bolt \u00d72, Patched Cloth, Architect Sigil.\n[2026-08-31T16:38:45.286Z] [reward] You strip the body: Bone Crossbow, Reclaimer's Salvage Vest (+8 TC). The kit took the fight badly.\n",
+      "[2026-08-31T16:38:45.287Z] [combat] 2 attackers remain. Conspiracy Architects Patrol 3 now in your sights.\n[2026-08-31T16:38:45.287Z] [system] Word moves through the buried world \u2014 many people view y"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 17/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthqftbaluhw"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "17"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba3:126:ad2:ae57:4eb7:1198",
+      "query": "user.ip:\"2607:fb90:dba3:126:ad2:ae57:4eb7:1198\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T21:37:51.950538Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T21:37:49.653000Z",
+  "fingerprints": [
+    "6634c6e2ed54099c9e7ef9834dd3dbf3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1946489288,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T17:38:33.982000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1594-the-pinch-demands-the-lift",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1594-the-pinch-demands-the-lift)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "5c53fb2cbd5846b7859815b3b1ab4ec4",
+  "previousEventID": "4da0e303d2fb4b23ae69fea39de3a4e0"
+}

@@ -1,0 +1,185 @@
+{
+  "id": "bae7fe84c2824fdea92fa535741a6ce5",
+  "groupID": "7703255351",
+  "eventID": "bae7fe84c2824fdea92fa535741a6ce5",
+  "projectID": "4511945117532160",
+  "size": 2805,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1594-the-pinch-demands-the-lift",
+  "message": "player-log-beacon 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw",
+  "title": "player-log-beacon 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba3:126:ad2:ae57:4eb7:1198",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "6fd9390f3c424ca98b111fa99490d756",
+      "span_id": "b8b1f8596d57a4d0",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthqftbaluhw"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba3:126:ad2:ae57:4eb7:1198",
+      "query": "user.ip:\"2607:fb90:dba3:126:ad2:ae57:4eb7:1198\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T21:37:51.222334Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T21:37:49.650000Z",
+  "fingerprints": [
+    "023a1c19f8433508bc7862f555446ebd"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1946489288,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T17:38:33.982000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1594-the-pinch-demands-the-lift",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1594-the-pinch-demands-the-lift)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "5d8ab4091dd04aed942a2d7bc0124b3e"
+}

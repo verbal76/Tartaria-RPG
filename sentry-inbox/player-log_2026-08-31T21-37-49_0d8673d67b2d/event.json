@@ -1,0 +1,261 @@
+{
+  "id": "0d8673d67b2d46d685593954206e59ab",
+  "groupID": "7703253341",
+  "eventID": "0d8673d67b2d46d685593954206e59ab",
+  "projectID": "4511945117532160",
+  "size": 17997,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 19/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1594-the-pinch-demands-the-lift",
+  "message": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 19/28]",
+  "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 19/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba3:126:ad2:ae57:4eb7:1198",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "6fd9390f3c424ca98b111fa99490d756",
+      "span_id": "b8b1f8596d57a4d0",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "eska Nightweigh for 6 TC. (1115 TC on hand)\n[2026-08-31T16:40:47.355Z] [reward] Sold Architect's Aether Gloves (Common) to Teska Nightweigh for 6 TC. (1121 TC on hand)\n[2026-08-31T16:40:47.389Z] [reward] Sold Forgotten Faceshroud (Common) to Teska Nightweigh for 6 TC. (1127 TC on hand)\n",
+      "[2026-08-31T16:40:47.423Z] [reward] Sold Reclaimer's Salvage Cap (Common) to Teska Nightweigh for 6 TC. (1133 TC on hand)\n[2026-08-31T16:40:47.457Z] [reward] Sold Mud-Bound Cloak (Common) to Teska Nightweigh for 6 TC. (1139 TC on hand)\n[2026-08-31T16:40:47.490Z] [reward] Sold Mud-Bound Cloak (Common) to Teska Nightweigh for 6 TC. (1145 TC on hand)\n",
+      "[2026-08-31T16:40:47.524Z] [reward] Sold Traveler's Cloak (Common) to Teska Nightweigh for 6 TC. (1151 TC on hand)\n[2026-08-31T16:40:47.558Z] [reward] Sold Aether-Walker's Cape (Common) to Teska Nightweigh for 6 TC. (1157 TC on hand)\n[2026-08-31T16:40:47.591Z] [reward] Sold Salvager's Trench Coat (Common) to Teska Nightweigh for 6 TC. (1163 TC on hand)\n",
+      "[2026-08-31T16:40:47.623Z] [reward] Sold Bone Knife (Common) to Teska Nightweigh for 6 TC. (1169 TC on hand)\n[2026-08-31T16:40:47.656Z] [reward] Sold Mud-Warden's Vest (Common) to Teska Nightweigh for 5 TC. (1174 TC on hand)\n[2026-08-31T16:40:47.689Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Teska Nightweigh for 5 TC. (1179 TC on hand)\n",
+      "[2026-08-31T16:40:47.721Z] [reward] Sold Cudgel (Common) to Teska Nightweigh for 5 TC. (1184 TC on hand)\n[2026-08-31T16:40:47.753Z] [reward] Sold Cudgel (Common) to Teska Nightweigh for 5 TC. (1189 TC on hand)\n[2026-08-31T16:40:47.785Z] [reward] Sold Mud-Warden's Vest (Common) to Teska Nightweigh for 5 TC. (1194 TC on hand)\n",
+      "[2026-08-31T16:40:47.818Z] [reward] Sold Mud-Bound Cloak (Common) to Teska Nightweigh for 5 TC. (1199 TC on hand)\n[2026-08-31T16:40:47.850Z] [reward] Sold Mud-Bound Cloak (Common) to Teska Nightweigh for 5 TC. (1204 TC on hand)\n[2026-08-31T16:40:47.882Z] [reward] Sold Mud-Bound Cloak (Common) to Teska Nightweigh for 5 TC. (1209 TC on hand)\n",
+      "[2026-08-31T16:40:47.913Z] [reward] Sold Cudgel (Common) to Teska Nightweigh for 5 TC. (1214 TC on hand)\n[2026-08-31T16:40:47.945Z] [reward] Sold Mud-Warden's Vest (Common) to Teska Nightweigh for 5 TC. (1219 TC on hand)\n[2026-08-31T16:40:47.976Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Teska Nightweigh for 5 TC. (1224 TC on hand)\n",
+      "[2026-08-31T16:40:48.007Z] [reward] Sold Cudgel (Common) to Teska Nightweigh for 5 TC. (1229 TC on hand)\n[2026-08-31T16:40:48.038Z] [reward] Sold Mud-Bound Cloak (Common) to Teska Nightweigh for 5 TC. (1234 TC on hand)\n[2026-08-31T16:40:48.069Z] [reward] Sold Mud-Warden's Vest (Common) to Teska Nightweigh for 5 TC. (1239 TC on hand)\n[2026-08-31T16:40:53.019Z] [player] Ask how far they range\n",
+      "[2026-08-31T16:40:53.021Z] [world] \"I do this stretch and one other.\" They gesture vaguely. \"Any more and you are travelling, not trading. Travelling is how you lose stock.\"\n[2026-08-31T16:40:53.022Z] [world] Teska Nightweigh uses your name in the middle of it without making anything of it.\n[2026-08-31T16:40:53.836Z] [player] Ask why they trade out here\n",
+      "[2026-08-31T16:40:53.838Z] [world] \"Because out here I am the only shop in the world.\" The trader grins at their own arithmetic. \"In a settlement I am one stall among twenty. On this stretch of road I am civilization ITSELF for half a day's walk in both directions. The mark-up is not greed, it is geography.\" The grin softens a notch. \"Also \u2014 and do not spread this \u2014 somebody should be out here. Th",
+      "e road is long. A fire and a fair-enough price change what the road IS.\"\n[2026-08-31T16:40:53.839Z] [world] Teska Nightweigh talks to you while doing something else, which is its own kind of trust.\n[2026-08-31T16:40:54.024Z] [debug] persist sizes(KB): total=199 player=39 wm=75[rooms=37 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=4\n",
+      "[2026-08-31T16:40:54.736Z] [world] You let the conversation go and Teska Nightweigh gets back to it.\n[2026-08-31T16:41:00.549Z] [debug] ui: tap \"\u2192 RECLAIMER'S STAKE\"\n[2026-08-31T16:41:00.568Z] [debug] spawn: gear=[Stone-Stride Greaves, Wanderer's Footwraps] window=10 roster=new\n",
+      "[2026-08-31T16:41:00.569Z] [world] You walk west through open silt. The compass tells you The Architect's Blind lies further west \u2014 6 tiles, about 15 hours of travel.\n[2026-08-31T16:41:00.570Z] [world] Some part of you has been keeping the place bookmarked.\n[2026-08-31T16:41:02.347Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-31T16:41:03.449Z] [world] You brace a foot and the Stone-Stride Greaves gives.\n[2026-08-31T16:41:03.450Z] [reward] \u2726 Stone-Stride Greaves (Common).\n[2026-08-31T16:41:03.464Z] [world] One good tug and the Wanderer's Footwraps is out.\n[2026-08-31T16:41:03.464Z] [reward] \u2726 Wanderer's Footwraps (Common).\n",
+      "[2026-08-31T16:41:04.289Z] [reward] \u2726 Found Entry 7 \u2014 last page \u2014 The Greedy Reclaimer. (open Contracts \u2192 Collectibles to read)\n[2026-08-31T16:41:04.304Z] [world] You scavenge the glass thoroughly. One Bent Nail survives the sorting.\n[2026-08-31T16:41:04.304Z] [world] Something papery rustles as you strip the sphere. You pull free a journal leaf.\n",
+      "[2026-08-31T16:41:04.304Z] [reward] \u2726 Salvage haul:\n[2026-08-31T16:41:04.305Z] [reward]     \u2022 Bent Nail (Common)\n[2026-08-31T16:41:05.397Z] [debug] ui: tap \"investigate\"\n[2026-08-31T16:41:06.727Z] [player] investigate the ground\n[2026-08-31T16:41:06.727Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-31T16:41:06.732Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Raspberries (Uncommon).\n[2026-08-31T16:41:06.738Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T16:41:06.739Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T16:41:06.739Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-31T16:41:06.864Z] [cognitive] CLIMB  (124ms)\n[2026-08-31T16:41:07.581Z] [debug] ui: tap \"\u2192 RECLAIMER'S STAKE\"\n[2026-08-31T16:41:07.593Z] [debug] spawn: gear=[Aetheric Bolt Gun, Architect's Field Jacket, Reclaimer's Cloak] window=10 roster=new\n",
+      "[2026-08-31T16:41:07.594Z] [world] You walk west through open silt. The compass tells you The Architect's Blind lies further west \u2014 5 tiles, about 13 hours of travel.\n[2026-08-31T16:41:07.595Z] [world] You catch yourself checking, the way you check a pocket you already know is empty.\n[2026-08-31T16:41:07.980Z] [player] investigate flood trench\n",
+      "[2026-08-31T16:41:07.980Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=flood trench resolved=flood trench range=- enemies=0 hooks=1\n[2026-08-31T16:41:07.982Z] [world] You study the flood trench. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n[2026-08-31T16:41:08.157Z] [cognitive] SEARCH \u00b7 TALK \u00b7 RETREAT \u00b7 SWIM  (172ms)\n",
+      "[2026-08-31T16:41:08.432Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T16:41:09.238Z] [player] investigate mud fissure\n[2026-08-31T16:41:09.239Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud fissure resolved=mud fissure range=- enemies=0 hooks=1\n",
+      "[2026-08-31T16:41:09.240Z] [world] You study the mud fissure and find no answer. The silence here is patient; whatever it knew, it has decided to keep.\n[2026-08-31T16:41:09.414Z] [cognitive] SWIM  (171ms)\n[2026-08-31T16:41:09.577Z] [world] The Aetheric Bolt Gun leaves a shape behind it in the mud, filling slowly.\n[2026-08-31T16:41:09.577Z] [reward] \u2726 Aetheric Bolt Gun (Common).\n",
+      "[2026-08-31T16:41:09.578Z] [world] Where the Architect's Field Jacket was, the ground is a shade darker.\n[2026-08-31T16:41:09.578Z] [reward] \u2726 Architect's Field Jacket (Common).\n[2026-08-31T16:41:09.579Z] [world] You take the Reclaimer's Cloak. The hollow it came out of starts closing.\n[2026-08-31T16:41:09.579Z] [reward] \u2726 Reclaimer's Cloak (Common).\n",
+      "[2026-08-31T16:41:10.459Z] [world] Slim pickings on the mound. You pocket a Bent Nail on the way out.\n[2026-08-31T16:41:10.460Z] [world] You work the obelisk apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-08-31T16:41:10.460Z] [world] You lever something loose from the stone \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-31T16:41:10.460Z] [reward] \u2726 Salvage haul:\n[2026-08-31T16:41:10.461Z] [reward]     \u2022 Bent Nail (Common)\n[2026-08-31T16:41:10.461Z] [reward]     \u2022 Knotted Sinew Braid (Common)\n",
+      "[2026-08-31T16:41:10.461Z] [reward]     \u2022 Verdigris Bell Fragment (Common)\n[2026-08-31T16:41:12.531Z] [debug] ui: tap \"investigate\"\n[2026-08-31T16:41:14.782Z] [debug] qwen\u23f1 ambient ok 7822ms read 4203ms/write 1132ms in 364t\u2192out 31t 11.5ms/t HIT-CAP (159ch)\n[2026-08-31T16:41:14.993Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 7822ms \u2014 ambient:stale:log-moved-on\n",
+      "[2026-08-31T16:41:14.993Z] [debug] arbiter: ambient stale:log-moved-on 8254ms\n[2026-08-31T16:41:14.994Z] [debug] arbiter: ambient-empty reason=action-opener raw=\"You look down from the rooftop of the collapsed Residential Home, your eyes scanning the horizon. Each step you make is \"\n",
+      "[2026-08-31T16:41:15.110Z] [debug] persist sizes(KB): total=201 player=40 wm=76[rooms=39 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=81 scene=3\n[2026-08-31T16:41:16.389Z] [player] investigate the ground\n[2026-08-31T16:41:16.392Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-31T16:41:16.396Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Cudgel (Common).\n[2026-08-31T16:41:16.401Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T16:41:16.401Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T16:41:16.402Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-31T16:41:16.540Z] [cognitive] CLIMB  (137ms)\n[2026-08-31T16:41:17.470Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-08-31T16:41:17.665Z] [player] investigate floor\n[2026-08-31T16:41:17.666Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=floor range=- enemies=0 hooks=1\n",
+      "[2026-08-31T16:41:17.667Z] [world] You look closer at the floor. Mud-glazed, undisturbed for a long while.\n[2026-08-31T16:41:17.667Z] [world] A bent nail works free of the floor. Salvageable, barely.\n[2026-08-31T16:41:17.668Z] [reward] \u2726 Bent Nail (Common).\n[2026-08-31T16:41:17.668Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-31T16:41:17.668Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T16:41:17.802Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n[2026-08-31T16:41:17.914Z] [debug] qwen\u23f1 investigate_lore ok 9603ms wait 6574ms read 1353ms/write 1364ms in 127t\u2192out 41t 10.7ms/t (197ch)\n[2026-08-31T16:41:18.025Z] [cognitive] neutral  (355ms)\n",
+      "[2026-08-31T16:41:19.414Z] [debug] qwen\u23f1 investigate_lore ok 9839ms wait 8450ms read 317ms/write 1041ms in 128t\u2192out 31t 2.5ms/t (159ch)\n[2026-08-31T16:41:25.257Z] [player] slight freeze just before tiis\n[2026-08-31T16:41:25.257Z] [debug] parser: intent=aim conf=0.84 verb=sight target=freeze just before tiis resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-31T16:41:25.260Z] [arbiter] The Arbiter waits. \"Aim what? You need a ranged weapon \u2014 a bow, a bolt-caster, a runecaster \u2014 in hand.\"\n[2026-08-31T16:41:25.261Z] [debug] arbiter: template (reason=intent-not-allowed:aim)\n[2026-08-31T16:41:25.262Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T16:41:25.484Z] [cognitive] neutral  (221ms)\n",
+      "[2026-08-31T16:41:30.822Z] [debug] ui: tap \"\u2192 RECLAIMER'S STAKE\"\n[2026-08-31T16:41:30.845Z] [debug] spawn: gear=[Sentinel's Chestplate] window=10 roster=new\n[2026-08-31T16:41:30.846Z] [world] You walk west through open silt. The compass tells you The Architect's Blind lies further west \u2014 4 tiles, about 10 hours of travel.\n",
+      "[2026-08-31T16:41:30.847Z] [world] The thought you set down here is right where you set it down.\n[2026-08-31T16:41:31.688Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T16:41:32.958Z] [world] The Sentinel's Chestplate goes in your pack. Its outline stays in the silt a while.\n[2026-08-31T16:41:32.959Z] [reward] \u2726 Sentinel's Chestplate (Common).\n",
+      "[2026-08-31T16:41:33.711Z] [world] You crouch, take the Aetheric Compass, and are moving again before you have straightened up.\n[2026-08-31T16:41:33.711Z] [reward] \u2726 Aetheric Compass (Uncommon).\n[2026-08-31T16:41:34.680Z] [world] You break the buried statue apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-31T16:41:34.681Z] [world] You strip the spark stone carefully. Something usable comes free in your hand.\n[2026-08-31T16:41:34.681Z] [world] You salvage the wagon wheel. The take is small but real.\n[2026-08-31T16:41:34.681Z] [reward] \u2726 Salvage haul:\n[2026-08-31T16:41:34.681Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-08-31T16:41:34.681Z] [reward]     \u2022 Scrap Metal x2 (Common)\n",
+      "[2026-08-31T16:41:34.681Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n[2026-08-31T16:41:35.738Z] [debug] ui: tap \"investigate\"\n[2026-08-31T16:41:37.134Z] [player] investigate the ground\n[2026-08-31T16:41:37.135Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-31T16:41:37.137Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-31T16:41:37.143Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T16:41:37.273Z] [cognitive] CLIMB  (129ms)\n[2026-08-31T16:41:38.393Z] [player] investigate sinkhole\n",
+      "[2026-08-31T16:41:38.394Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=sinkhole resolved=sinkhole range=- enemies=0 hooks=1\n[2026-08-31T16:41:38.396Z] [world] You take the measure of the sinkhole. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.\n[2026-08-31T16:41:38.529Z] [debug] ui: tap \"\u2192 RECLAIMER'S STAKE\"\n",
+      "[Filtered]",
+      "[2026-08-31T16:41:38.534Z] [world] Long enough has passed that it should have changed. It has not.\n[2026-08-31T16:41:38.648Z] [cognitive] neutral  (249ms)\n[2026-08-31T16:41:38.787Z] [debug] persist sizes(KB): total=200 player=41 wm=75[rooms=38 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=81 scene=3\n[2026-08-31T16:41:39.489Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-31T16:41:39.698Z] [world] An Aetheric arc finds you \u2014 copper taste, blue afterimage, and a bite of damage. (\u22124 HP)\n[2026-08-31T16:41:39.710Z] [player] investigate rift\n[2026-08-31T16:41:39.711Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rift resolved=rift range=- enemies=0 hooks=1\n[2026-08-31T16:41:39.714Z] [world] The rift r"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 19/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthqftbaluhw"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "19"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba3:126:ad2:ae57:4eb7:1198",
+      "query": "user.ip:\"2607:fb90:dba3:126:ad2:ae57:4eb7:1198\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T21:37:52.021814Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "41": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 312,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T21:37:49.653000Z",
+  "fingerprints": [
+    "6634c6e2ed54099c9e7ef9834dd3dbf3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1946489288,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T17:38:33.982000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1594-the-pinch-demands-the-lift",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1594-the-pinch-demands-the-lift)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "172814b45f984877b7db7819a1e0344d",
+  "previousEventID": "0d4a90d39ab94cf5b80622cd1a4d0e78"
+}
