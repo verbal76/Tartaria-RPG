@@ -26389,6 +26389,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // verb can pay - each repair logged beside the session marker so the next device
 // log shows exactly what was moved and why.
 export const OTA_BUILD_ID = '2026-08-31-1589-the-pin-comes-home';
+// golem catch-up 2026-08-31: markerless publish of OTA-1589 — a finished
+// contract's pin routes to the nearest pay window instead of the far anchor, the
+// READY card says HAND IN AT, arriving there says find the counter, and a
+// load-time repair pass unsticks records old builds parked on beats no verb can
+// pay, logging every repair beside the session marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1588-the-verb-that-pays-it';
 // golem catch-up 2026-08-31: markerless publish of OTA-1588 — one family-aware
 // answer to "what verb pays this stage", so the last beat of every mystery and
