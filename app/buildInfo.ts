@@ -26455,6 +26455,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // buffer the save load replaces (the owner's log had the trace and the banner
 // and not one launch line).
 export const OTA_BUILD_ID = '2026-08-31-1593-the-boot-gets-checkpoints';
+// golem catch-up 2026-08-31: markerless publish of OTA-1593 — every boot stage
+// stamps the dying breath (boot:<stage>), and the seam re-emits the launch line
+// hydrate had been printing into a buffer nobody keeps.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1592-the-events-say-which-build';
 // golem catch-up 2026-08-31: markerless publish of OTA-1592 — every Sentry
 // event now carries release (tartaria@version+stamp) and dist (the stamp), so
