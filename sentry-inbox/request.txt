@@ -34,3 +34,4 @@ counting routed movement (`ui: tap "→ DESTINATION"` → `You push west`) as tr
 not only the cardinal `[player] go east` shape.
 pull 2026-08-31T14:31:20Z — owner pushed a play-session log, fetch it
 pull 2026-08-31T14:38:27Z — retrigger without skip-ci
+pull 2026-08-31T16:46:38Z — owner pushed a new play log
