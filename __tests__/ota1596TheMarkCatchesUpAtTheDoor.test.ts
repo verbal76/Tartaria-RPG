@@ -223,4 +223,63 @@ describe('OTA-1596 — the class, pinned in the data', () => {
       expect((st as { requires?: unknown }).requires).toBeTruthy();
     }
   });
+
+  it('⚠⚠ AGED-SAVE LEDGER — a mission item name, once shipped, is never renamed away', () => {
+    // The aged-record audit's sweep 4, made permanent. Measured across the
+    // FULL git history of all three quest files before this baseline was cut:
+    // zero renames ever — so today's names ARE the complete historic set. A
+    // rename that keeps grants/requires consistent passes every other sweep
+    // while orphaning the item sitting in an old save's pack; this ledger is
+    // APPEND-ONLY, so that edit fails here and has to ship a migration instead.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const baseline = require('./fixtures/missionItemNames.json') as string[];
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { MYSTERIES } = require('../app/engine/mysteries') as typeof import('../app/engine/mysteries');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { STORYLINES } = require('../app/engine/factionStorylines') as typeof import('../app/engine/factionStorylines');
+    const current = new Set<string>();
+    for (const defs of [HUNTS, MYSTERIES, STORYLINES] as ReadonlyArray<ReadonlyArray<{ stages?: readonly unknown[] }>>) {
+      for (const d of defs) {
+        for (const st of (d.stages ?? []) as Array<{ grants?: { item: string }; requires?: { item: string } }>) {
+          if (st.grants?.item) current.add(st.grants.item);
+          if (st.requires?.item) current.add(st.requires.item);
+        }
+      }
+    }
+    expect(baseline.length).toBeGreaterThanOrEqual(125);
+    const orphaned = baseline.filter((n) => !current.has(n));
+    expect(orphaned).toEqual([]);
+  });
+
+  it('⚠ every stage ground across all three families resolves to a real location', () => {
+    // Sweep 3 of the same audit: a record aged onto a stage whose locationName
+    // stopped resolving would be routed to an anchor it never asked for.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { MYSTERIES } = require('../app/engine/mysteries') as typeof import('../app/engine/mysteries');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { STORYLINES } = require('../app/engine/factionStorylines') as typeof import('../app/engine/factionStorylines');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const QS = require('../app/engine/questStage') as typeof import('../app/engine/questStage');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CM = require('../app/engine/contractMarkers') as typeof import('../app/engine/contractMarkers');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { getLocationById } = require('../app/engine/encounter') as typeof import('../app/engine/encounter');
+    const bad: string[] = [];
+    const check = (family: string, defs: ReadonlyArray<never>, anchorOf: (d: never) => string) => {
+      for (const d of defs as ReadonlyArray<{ id: string; stages?: readonly unknown[] }>) {
+        (d.stages ?? []).forEach((st, i) => {
+          const ground = QS.stageLocationId(st as never, anchorOf(d as never), CM.resolvePosterLocation);
+          try {
+            if (!getLocationById(ground)?.name) bad.push(`${family}:${d.id}#${i} → ${ground}`);
+          } catch {
+            bad.push(`${family}:${d.id}#${i} → ${ground}`);
+          }
+        });
+      }
+    };
+    check('hunt', HUNTS as never, ((d: never) => CM.huntAnchorId(d)) as never);
+    check('mystery', MYSTERIES as never, ((d: never) => CM.contractAnchorId(d)) as never);
+    check('storyline', STORYLINES as never, ((d: never) => CM.contractAnchorId(d)) as never);
+    expect(bad).toEqual([]);
+  });
 });
