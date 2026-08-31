@@ -180,17 +180,36 @@ describe('OTA-1596 — the class, pinned in the data', () => {
     // This is the invariant that makes the heal always able to pay: a required
     // item with no earlier grantor is a debt no machinery can settle, and the
     // stage carrying it is his wedge waiting for a save to age into it.
-    for (const h of HUNTS) {
-      const stages = h.stages ?? [];
-      stages.forEach((st, i) => {
-        const req = (st as { requires?: { item: string } }).requires;
-        if (!req) return;
-        const grantedEarlier = stages.slice(0, i).some(
-          (e) => (e as { grants?: { item: string } }).grants?.item === req.item,
-        );
-        expect(`${h.id}#${i}:${req.item}:${grantedEarlier}`).toBe(`${h.id}#${i}:${req.item}:true`);
-      });
+    //
+    // ⚠⚠ ALL THREE STAGED FAMILIES, because the owner asked the right question
+    // ("did you run that same regression across all the missions?") and the
+    // honest answer was: the heal covers all three, the sweep covered one.
+    // Now it covers what the heal covers — 18 hunts, 18 mysteries, 14
+    // storylines, every stage. (Faction quests carry no grants/requires stage
+    // machinery; their class audit is ota1594's trigger-vs-objective sweep.)
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { MYSTERIES } = require('../app/engine/mysteries') as typeof import('../app/engine/mysteries');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { STORYLINES } = require('../app/engine/factionStorylines') as typeof import('../app/engine/factionStorylines');
+    const catalogues: Array<[string, ReadonlyArray<{ id: string; stages?: readonly unknown[] }>]> = [
+      ['hunt', HUNTS as never], ['mystery', MYSTERIES as never], ['storyline', STORYLINES as never],
+    ];
+    let requiresChecked = 0;
+    for (const [family, defs] of catalogues) {
+      for (const h of defs) {
+        const stages = (h.stages ?? []) as Array<{ requires?: { item: string }; grants?: { item: string } }>;
+        stages.forEach((st, i) => {
+          const req = st.requires;
+          if (!req) return;
+          requiresChecked += 1;
+          const grantedEarlier = stages.slice(0, i).some((e) => e.grants?.item === req.item);
+          expect(`${family}:${h.id}#${i}:${req.item}:${grantedEarlier}`).toBe(`${family}:${h.id}#${i}:${req.item}:true`);
+        });
+      }
     }
+    // The sweep must actually be sweeping — a refactor that empties a catalogue
+    // import would pass vacuously without this floor.
+    expect(requiresChecked).toBeGreaterThanOrEqual(25);
   });
 
   it('⚠ the surface the arm covers: every hunt spawn stage is requires-gated', () => {
