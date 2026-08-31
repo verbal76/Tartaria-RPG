@@ -428,11 +428,15 @@ export function ContractsScreen() {
   // off by non-vendor NPCs in hubs, tracked here so they're not lost
   // in the log scroll. No expiry — they stay open until the player
   // resolves them one way or another.
+  // ⚠ OTA-1595 — the card states the TRUE remaining walk from where the player
+  // stands (the record's concrete tile), not the authored range from the plant
+  // origin. Same cells SET COURSE steps, so the two can never disagree again.
+  const whisperGrid = playerGridCell(player);
   const whispers = (player.activeWhispers ?? []).map((w) => ({
     rec: w,
     chain: findChain(w.id),
     title: describeWhisperTitle(w),
-    stageDesc: describeWhisperStage(w),
+    stageDesc: describeWhisperStage(w, whisperGrid),
   }));
 
   // OTA 220 — leads from the investigate-spawn path

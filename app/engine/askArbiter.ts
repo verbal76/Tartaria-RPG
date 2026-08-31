@@ -180,6 +180,33 @@ export function findLoreConceptOffline(
 /** Default fallback line when no concept hits the threshold. */
 export const ARBITER_SILENT_LINE = 'The Arbiter is silent on that. The name does not surface in the lore.';
 
+// ⚠⚠⚠ OTA-1595 — THE ARBITER CANNOT BREAK CHARACTER, AND A PROMPT RULE IS NOT
+// A GUARANTEE. Three leaks in one play session, straight past the persona
+// prompt's "never break character": *"I'm not familiar with this specific band
+// or its music"*, *"I have finished the mission. My purpose is to ensure the
+// safety..."*, *"I was typing in the Arbiter's voice."* A 0.5B model WILL slip
+// under an off-distribution question; this sieve is the enforcement. A hit
+// nulls the answer and the caller lands on ARBITER_SILENT_LINE — silence in
+// voice beats fluency out of it. Patterns are assistant-speak fingerprints,
+// not topic filters: self-narration about helping/typing, meta about the voice
+// itself, the model claiming the PLAYER's deeds in first person.
+const ARBITER_OUT_OF_CHARACTER = [
+  /\bAI\b|language model|\bassistant\b|\bchatbot\b/i,
+  /i'?m not familiar with/i,
+  /provide more (details|context|information)/i,
+  /i('?m| am) here to (listen|help|assist|understand)/i,
+  /my (purpose|role|goal|job) is to/i,
+  /(happy|glad) to help/i,
+  /i was typing/i,
+  /in the arbiter'?s voice/i,
+  /never breaks? character|breaking character/i,
+  /i have (finished|completed) the (mission|quest|contract)/i,
+  /as (an? )?(witness|arbiter), i\b/i,
+];
+export function arbiterAnswerOutOfCharacter(line: string): boolean {
+  return ARBITER_OUT_OF_CHARACTER.some((re) => re.test(line));
+}
+
 export { formatArbiterAnswer };
 
 /** Test-only — reset the in-memory vector cache. */

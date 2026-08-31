@@ -136,6 +136,36 @@ export function findChain(id: string): ChainDef | undefined {
   return CHAINS.find((c) => c.id === id);
 }
 
+// ⚠⚠ OTA-1595 — THE HINT AND THE COMPASS COUNT THE SAME TILES. Owner, typed
+// into the game while hunting Hollis: *"The text in The whisperer says this is
+// one block away but the actual number on the world exploration screen says
+// three blocks away. they don't give the same answer."* He was right that they
+// couldn't: the panel re-printed the AUTHORED offset range measured from the
+// plant origin ("tiles 2-3 south of the outpost") while the course walks to the
+// CONCRETE tile the record stores — two origins, two numbers, one player caught
+// between them. This phrase is the one writer: the record's own tile against
+// the player's live cell, the exact Manhattan walk the course will take.
+export function whisperDistancePhrase(
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+): string {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const total = Math.abs(dx) + Math.abs(dy);
+  if (total === 0) return 'on the tile you are standing on';
+  const parts: string[] = [];
+  if (dy !== 0) parts.push(`${Math.abs(dy)} ${dy > 0 ? 'south' : 'north'}`);
+  if (dx !== 0) parts.push(`${Math.abs(dx)} ${dx > 0 ? 'east' : 'west'}`);
+  return `${total} tile${total === 1 ? '' : 's'} from where you stand (${parts.join(', ')})`;
+}
+
+/** OTA-1595 — does this record actually carry a concrete meet tile? (Mirrors
+ *  whisperRouteTarget's own guard, so hint and route agree on that too.) */
+function hasConcreteTarget(w: WhisperRecord): boolean {
+  return (typeof w.targetMapX === 'number' && typeof w.targetMapY === 'number')
+    || typeof w.targetGridX === 'number';
+}
+
 /** Compute the rendezvous tile for a freshly-planted whisper. Uses
  *  the chain's offset range against the player's current map
  *  coordinates. Random within the range so two characters who
@@ -169,6 +199,30 @@ export function findReadyMeetWhisper(
     const hourOfDay = Math.floor(hoursElapsed % 24);
     if (!isHourInWindow(hourOfDay, w.activeFromHour, w.activeToHour)) continue;
     return w;
+  }
+  return null;
+}
+
+/** ⚠⚠ OTA-1595 — THE COLD CAMP SPEAKS. The meet check above it misses in two
+ *  ways that used to look identical: wrong tile, and RIGHT tile at the wrong
+ *  hour. The owner walked Hollis's course, stood on the ground, and got
+ *  nothing — *"so I'm supposed to be at hollis's camp but I'm at an active dig
+ *  site"* — because the 5am-5pm window had closed and nothing said so. This
+ *  finds the planted whisper whose tile matches but whose hours do not, so
+ *  the caller can say who works when instead of nothing. */
+export function findMeetWhisperOffHours(
+  whispers: readonly WhisperRecord[] | undefined,
+  hoursElapsed: number,
+  playerGridX: number,
+  playerGridY: number,
+): WhisperRecord | null {
+  if (!whispers) return null;
+  for (const w of whispers) {
+    if (w.stage !== 'planted') continue;
+    const t = whisperTargetGrid(w);
+    if (t.x !== playerGridX || t.y !== playerGridY) continue;
+    const hourOfDay = Math.floor(hoursElapsed % 24);
+    if (!isHourInWindow(hourOfDay, w.activeFromHour, w.activeToHour)) return w;
   }
   return null;
 }
@@ -232,7 +286,15 @@ export function reapExpiredWhispers(
  *  this chain. Falls back to the raw stage name if the chain
  *  doesn't define one (which means I forgot to add it; loud-fail
  *  in dev would be nice). */
-export function describeWhisperStage(whisper: WhisperRecord): string {
+export function describeWhisperStage(
+  whisper: WhisperRecord,
+  // ⚠ OTA-1595 — the player's live ABSOLUTE cell (playerGridCell). When given,
+  // every stage with a concrete tile states the TRUE remaining walk from it —
+  // the same cells the course steps — instead of re-printing the authored
+  // offset range from the plant origin. Omitted (old callers, fixtures), the
+  // lines render exactly as before.
+  playerGrid?: { x: number; y: number },
+): string {
   // OTA-1548 — generated from the chain's own offsets, hours, nouns and
   // prices, for all twenty-one chains at once. Yulka's lines render exactly
   // as OTA-1542 authored them; the direction word can no longer disagree
@@ -246,10 +308,18 @@ export function describeWhisperStage(whisper: WhisperRecord): string {
     const fdir = offsetDirWord(c.fetchOffset);
     const fspan = offsetSpanText(c.fetchOffset);
     const p = pronounForms(c.pronoun);
+    const meetAt = playerGrid && hasConcreteTarget(whisper)
+      ? whisperDistancePhrase(playerGrid, whisperTargetGrid(whisper))
+      : null;
+    const thief = playerGrid ? whisperThiefGrid(whisper) : null;
+    const thiefAt = thief ? whisperDistancePhrase(playerGrid!, thief) : null;
     switch (whisper.stage) {
       case 'planted':
         // OTA-1542 — SAY WHO SENT YOU, AND FROM WHERE. A wanderer-granted
         // whisper is offset from WHERE YOU MET THEM, not from any outpost.
+        if (meetAt) {
+          return `${c.npcName} camps ${meetAt}${hoursTxt}. SET COURSE walks you to the spot.`;
+        }
         return whisper.source
           ? `Word from ${whisper.source}: ${c.npcName} camps ${span} tiles ${dir} of where you met them${hoursTxt}. SET COURSE below walks you to the spot.`
           : `Travel ${dir} of the outpost. ${c.npcName} camps somewhere in tiles ${span} ${dir}${hoursTxt}.`;
@@ -258,12 +328,21 @@ export function describeWhisperStage(whisper: WhisperRecord): string {
         // gameStore's resolver): every chain uses it, only the name is Yulka's.
         return `You're with ${c.npcName}. Answer from the SPEAK TO ${c.npcName.toUpperCase()} bar — take the job${c.buy ? `, buy for ${c.buy.costTc} TC` : ''}, or walk away.`;
       case 'fetch_in_progress':
+        if (thiefAt) {
+          return `${c.markNoun.charAt(0).toUpperCase()}${c.markNoun.slice(1)} is ${thiefAt}. SET COURSE walks you there.`;
+        }
         return `Travel ${fdir} of ${c.npcName}'s tile. ${c.markNoun.charAt(0).toUpperCase()}${c.markNoun.slice(1)} is ${fspan} tiles over.`;
       case 'fetch_active':
         // OTA-458 — include the location hint so a player stranded mid-fetch
         // can walk back onto the tile and re-draw the encounter.
+        if (thiefAt) {
+          return `Defeat the ${c.fetchEnemy} and recover ${c.goodsLong} — ${thiefAt}. If ${c.markNoun} isn't there, step back onto that tile to draw them out again.`;
+        }
         return `Defeat the ${c.fetchEnemy} and recover ${c.goodsLong} — ${fdir} of ${c.npcName}'s tile (${fspan} over). If ${c.markNoun} isn't there, step back onto that tile to draw them out again.`;
       case 'fetch_returned':
+        if (meetAt) {
+          return `Return to ${c.npcName}'s tile — ${meetAt} — with the recovered ${c.goodsShort}. ${p.subjCap} ${p.owes} you ${c.reward.item ? c.reward.item.qty : `${c.reward.tc} TC`}.`;
+        }
         return `Return to ${c.npcName}'s tile with the recovered ${c.goodsShort}. ${p.subjCap} ${p.owes} you ${c.reward.item ? c.reward.item.qty : `${c.reward.tc} TC`}.`;
       case 'ambush_armed':
         return `Walk home with the ${c.goodsShort}. Someone may notice.`;

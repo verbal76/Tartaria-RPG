@@ -26467,7 +26467,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // advance, out loud, until the purse holds 100; the mission trace learns the
 // faction family (his live quest was invisible while two PAUSED hunts traced
 // faithfully); the Contracts card speaks the new verb.
-export const OTA_BUILD_ID = '2026-08-31-1594-the-pinch-demands-the-lift';
+// OTA-1595 - THE GUIDE AND THE GROUND AGREE. Three defects from the 21:00 play
+// session on 1594, all one disease - a guide describing a world the ground no
+// longer matched. (1) setWhisperCourse/continueWhisperCourse never learned
+// OTA-993's "a course begins OUTSIDE": routing to Hollis from inside the Gate
+// walked the silt with hubRoomId still set, so the minimap faithfully rendered
+// the stale room ("the mini map still shows the interior of the Outpost").
+// (2) The whisper hint re-printed the authored offset range from the plant
+// origin while the course walks the record's concrete tile ("they don't give
+// the same answer") - describeWhisperStage now states the true remaining walk
+// from the player's live cell, the same cells SET COURSE steps. (3) The 0.5B
+// ask persona leaked out of character ("not familiar with this specific band",
+// "My purpose is to ensure the safety...") - an out-of-character sieve nulls
+// the leak to the authored silent line, and a question naming a live whisper
+// NPC now answers from the chain record instead of the model.
+export const OTA_BUILD_ID = '2026-08-31-1595-the-guide-and-the-ground-agree';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1594-the-pinch-demands-the-lift';
 // golem catch-up 2026-08-31: markerless publish of OTA-1594 — the theft quest
 // is paid only by a theft ('steal' trigger from both clean-lift doors), the
 // haul's final advance counts the purse against its spoken 100 TC price, and

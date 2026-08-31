@@ -681,6 +681,8 @@ import {
   findChain,
   pickTargetTile,
   findReadyMeetWhisper,
+  findMeetWhisperOffHours,
+  activeHoursText,
   findReadyFetchWhisper,
   findReadyReturnWhisper,
   whisperTargetGrid,
@@ -1883,7 +1885,13 @@ async function arbiterPersonaAnswer(question: string, brief = ''): Promise<strin
     // OTA-494 — sieve foreign words from the Ask-the-Arbiter answer too (same
     // model code-switch risk as the narration feed).
     const line = repairGluedNarration(stripForeignWords((out ?? '').trim()));
-    return line.length > 0 ? line : null;
+    if (line.length === 0) return null;
+    // OTA-1595 — the out-of-character sieve (see askArbiter.ts). Null, not a
+    // rewrite: the silent line is authored and in voice; a patched leak is not.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { arbiterAnswerOutOfCharacter } = require('../engine/askArbiter') as typeof import('../engine/askArbiter');
+    if (arbiterAnswerOutOfCharacter(line)) return null;
+    return line;
   } catch {
     return null;
   }
@@ -18808,6 +18816,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // opening the offline door without this would have made a farm of it.
             creditLoreRead(get, set, `bank_${hit.concept.id}`);
           }
+          // ⚠⚠ OTA-1595 — A QUESTION THAT NAMES A LIVE WHISPER NPC IS A LOOKUP,
+          // NOT A CREATIVE-WRITING PROMPT. The owner asked "what's at Hollis
+          // camps" with the Hollis lead open on his slate, and the 0.5B persona
+          // answered about a band it wasn't familiar with. The engine KNOWS
+          // Hollis: the chain record carries the stage, the tile, the hours.
+          // Answer from that — with the true remaining walk — and only fall to
+          // the persona for questions the world's data genuinely cannot field.
+          if (!answered) {
+            const pNow = get().player;
+            const qLower = trimmed.toLowerCase();
+            for (const w of pNow?.activeWhispers ?? []) {
+              const name = findChain(w.id)?.content.npcName;
+              if (name && qLower.includes(name.toLowerCase())) {
+                const desc = describeWhisperStage(w, playerGridCell(pNow!));
+                if (desc && !/^Stage:\s/.test(desc)) {
+                  get().appendLog('arbiter', `The Arbiter doesn't have to think. "${desc}"`);
+                  answered = true;
+                }
+                break;
+              }
+            }
+          }
           if (!answered) {
             // OTA-1067 — read the brief HERE rather than closing over a stale
             // player: this runs after an await, and the run may have moved.
@@ -26605,6 +26635,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setWhisperCourse(gridX, gridY, label) {
     const player = get().player;
     if (!player) return;
+    // ⚠⚠ OTA-1595 — A COURSE BEGINS OUTSIDE, this door too. OTA-993 put that rule
+    // at setTravelCourse's choke point, but the WHISPER course never learned it:
+    // the owner set out toward Hollis's salt cart from inside the Gate, walked
+    // the open silt for two minutes, and the minimap kept faithfully rendering
+    // the room his hubRoomId still claimed he was in ("the mini map still shows
+    // the interior of the Outpost"). The map was honest; the state was stale.
+    if (player.hubRoomId || get().activeBuildingId) {
+      set((s2) => (s2.player ? { player: { ...s2.player, hubRoomId: null }, activeBuildingId: null } : s2));
+      get().appendLog('world', 'You step out under open sky and take your bearings.');
+    }
     // OTA-502 — the place this whisper objective points to becomes install-canon,
     // plotted on the map, routable, with an exact grid-to-grid distance.
     // ⚠ OTA-1542 — the course now ARRIVES already absolute. The old conversion
@@ -26634,6 +26674,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = get().player;
     const scene = get().currentScene;
     if (!player || !scene || !player.whisperCourse) return;
+    // ⚠ OTA-1595 — and a course RESUMED from a save set before this fix still
+    // starts with the stale room attached; clear it here too so the first tap
+    // on the travel row is enough.
+    if (player.hubRoomId || get().activeBuildingId) {
+      set((s2) => (s2.player ? { player: { ...s2.player, hubRoomId: null }, activeBuildingId: null } : s2));
+    }
     const tgt = player.whisperCourse;
     // OTA-1542 — the course walks toward an ABSOLUTE cell, so it stays aimed at
     // the same dirt across every recenter. A legacy course saved mid-walk
@@ -31813,6 +31859,15 @@ function resolveWhispersForTile(
     fireWhisperMeet(get, set, meet, meetChain);
     return true;
   }
+  // ⚠ OTA-1595 — the RIGHT tile at the WRONG hour used to be silence ("so I'm
+  // supposed to be at hollis's camp but I'm at an active dig site"). Say who
+  // works when; appendLog's dedup keeps repeat steps quiet.
+  const cold = findMeetWhisperOffHours(p.activeWhispers, hours, pg.x, pg.y);
+  const coldChain = cold ? findChain(cold.id) : undefined;
+  if (cold && coldChain) {
+    const who = coldChain.content.npcName;
+    get().appendLog('world', `This is ${who}'s spot — but the camp is cold. ${who} works here${activeHoursText(coldChain.activeHours)}. Wait for the hour and look again.`);
+  }
 
   // 3) Fetch combat — player arrived at the mark's tile.
   const fetch = findReadyFetchWhisper(p.activeWhispers, pg.x, pg.y);
@@ -33741,10 +33796,14 @@ function narrateCasualLook(
     // screen uses. Skip the bare "Stage: X" fallback (a chain with no authored
     // per-stage line) so we never print a useless reminder.
     let threadsShown = 0;
+    // ⚠ OTA-1595 — pass the live cell so the reminder states the TRUE remaining
+    // walk to the record's concrete tile, not the authored range from the plant
+    // origin (the two disagreed on Hollis and the owner caught it).
+    const reminderGrid = player ? playerGridCell(player) : undefined;
     for (const w of player?.activeWhispers ?? []) {
       if (threadsShown >= 3) break; // don't wall off the feed if many are open
       if (w.tracked === false) continue; // DEACTIVATED (paused) — off the reminder feed
-      const obj = describeWhisperStage(w);
+      const obj = describeWhisperStage(w, reminderGrid);
       if (obj && !/^Stage:\s/.test(obj)) {
         get().appendLog('arbiter', `▸ Still open — ${obj}`);
         threadsShown += 1;
