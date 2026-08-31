@@ -25,11 +25,13 @@ import { findHuntById } from './hunts';
 import { findMysteryById } from './mysteries';
 import { findStorylineById } from './factionStorylines';
 import { huntAnchorId, contractAnchorId, resolvePosterLocation } from './contractMarkers';
-import { stageLocationId, stageRequirementMet } from './questStage';
+import { stageLocationId, stageRequirementMet, payingIntent, type MissionFamily } from './questStage';
 import { personFor, stakesForStage, stageHasFight, type MissionPerson } from './missionRoles';
 import type { PersuadeStakes } from './missionEncounter';
 
-export type EncounterFamily = 'hunt' | 'mystery' | 'storyline';
+/** ⚠ OTA-1588 — the same three families questStage names, and deliberately the
+ *  same strings, so one can be passed straight to `payingIntent`. */
+export type EncounterFamily = MissionFamily;
 
 export interface ArmedEncounter {
   /** Stable across app restarts and re-entries — `family:missionId:stageIndex`.
@@ -61,6 +63,11 @@ export interface ArmedEncounter {
    *  gets missed even when it has a button. */
   needs: string | null;
   gives: string | null;
+  /** ⚠⚠ OTA-1588 — THE VERB THAT PAYS THIS STAGE, NOT THE RAW LABEL. This carried
+   *  `checkKind` straight through, so a MYSTERY's `boss` reached the button as
+   *  'boss' — and `boss` is paid by INVESTIGATE there and by DIPLOMACY in a
+   *  storyline. Resolved through questStage.payingIntent, once, like every other
+   *  reader. */
   verb: string | null;
   locationId: string;
 }
@@ -109,7 +116,7 @@ function build(
     owed: met || !req ? null : `${(req.quantity ?? 1) > 1 ? `${req.quantity}× ` : ''}${req.item}`,
     needs: req?.item ?? null,
     gives: stage.grants?.item ?? null,
-    verb: stage.checkKind ?? null,
+    verb: payingIntent(family, stage),
     locationId: where,
   };
 }

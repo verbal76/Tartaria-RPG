@@ -193,6 +193,67 @@ for (const r of roster) {
   }
 }
 
+// ⚠⚠⚠ CHECK 5 (OTA-1588) — EXACTLY ONE ANSWER TO "WHAT VERB PAYS A `boss`".
+//
+// `checkKind: 'boss'` is paid by ATTACK in a hunt, INVESTIGATE in a mystery and
+// DIPLOMACY in a storyline. The engine knew that four times over, under a comment
+// telling the next person to keep the copies in step by hand — and a fifth reader
+// (OTA-1586's arrival line) did not read that comment, guessed "finish it", and
+// shipped it onto the last actionable beat of all 15 mysteries and all 15
+// storylines: thirty stages telling the player to end a fight that is not there.
+//
+// So the map lives once, in questStage.ts, and this fails the build if a second
+// one appears. It matches the SHAPE of the bug rather than a spelling: any file
+// but questStage that pairs the literal 'boss' with a verb literal on one line of
+// CODE is reinventing the table. Comments are exempt and are meant to explain it.
+const VERB_LITERALS = ['attack', 'investigate', 'diplomacy', 'stealth', 'cast', 'escape'];
+const BOSS_MAP_WATCH = [
+  'app/engine/missionTrace.ts',
+  'app/engine/missionRoles.ts',
+  'app/engine/missionEncounterArm.ts',
+  'app/engine/hunts.ts',
+  'app/engine/mysteries.ts',
+  'app/engine/factionStorylines.ts',
+  'app/state/gameStore.ts',
+  'app/state/slices/questSlice.ts',
+  'app/screens/ContractsScreen.tsx',
+  'app/components/MissionEncounterCard.tsx',
+];
+for (const rel of BOSS_MAP_WATCH) {
+  const abs = join(root, rel);
+  if (!existsSync(abs)) continue;
+  const code = readFileSync(abs, 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .split('\n')
+    .filter((l) => !l.trim().startsWith('//') && !l.trim().startsWith('*'))
+    .join('\n');
+  for (const line of code.split('\n')) {
+    // Shape A — a checkKind comparison that also names a verb. This is the four
+    // matchers' old form: `next.checkKind === 'boss' && intent === 'investigate'`.
+    // ⚠ The `checkKind` requirement is not decoration: without it the enemy debug
+    // line (`atk=${g('attack')} … ${e['boss'] ? ' BOSS' : ''}`) fires, and a check
+    // that cries wolf is the thing OTA-1584 was about.
+    const verb = VERB_LITERALS.find((v) => line.includes(`'${v}'`));
+    if (line.includes("'boss'") && line.includes('checkKind') && verb) {
+      errors.push(
+        `${rel}: a line of code pairs checkKind 'boss' with '${verb}'. That is the family map, ` +
+        'and it lives in app/engine/questStage.ts (payingIntent / stageVerbLabel / ' +
+        'stageVerbAsk). Call it rather than copying it — see OTA-1588.',
+      );
+    }
+    // Shape B — a lookup table KEYED by boss. This is OTA-1586's form, the one
+    // that actually shipped wrong: `boss: 'finish it'` inside a verb→phrase map,
+    // with no `checkKind` anywhere near it.
+    if (/(^|[{,\s])boss\s*:\s*'/.test(line)) {
+      errors.push(
+        `${rel}: a table maps \`boss\` to a phrase of its own. A boss beat means a different ` +
+        'verb in every family, so a single-entry table is wrong for two of the three. Use ' +
+        'app/engine/questStage.ts (stageVerbLabel / stageVerbAsk) — see OTA-1588.',
+      );
+    }
+  }
+}
+
 const baseline = existsSync(baselineFile)
   ? Number(readFileSync(baselineFile, 'utf8').trim()) || 0
   : fightProseNoSpawn;

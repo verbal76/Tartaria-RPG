@@ -197,6 +197,110 @@ export function stageRequirementLine(stage: StageBinding, contractTitle: string)
   return `The Arbiter stops you. "Not yet — ${contractTitle} wants ${what} in your hands first."`;
 }
 
+// ⚠⚠⚠ OTA-1588 — THE VERB THAT PAYS A STAGE, ANSWERED ONCE.
+//
+// `checkKind: 'boss'` DOES NOT MEAN THE SAME THING IN EVERY FAMILY, and that has
+// been true since P19 without ever being written down in one place:
+//
+//     a HUNT's boss is paid by ATTACK         — the apex is a fight
+//     a MYSTERY's boss is paid by INVESTIGATE — the "confirm what you have" beat
+//     a STORYLINE's boss is paid by DIPLOMACY — the same beat, talked through
+//
+// The engine has always known this. It knew it FOUR TIMES — once in
+// `stageAwaitsIntentHere` and once in each family's matcher — under a comment
+// warning that the map "MUST MIRROR EACH FAMILY'S MATCHER, quirks included".
+// That warning was the tell, and OTA-1585 had already named the error class it
+// describes: two implementations of one question is one implementation plus a
+// time bomb.
+//
+// ⚠⚠ THE BOMB WENT OFF ON THE OWNER'S DEVICE, INSIDE MY OWN FIX FOR IT.
+// OTA-1586 added the arrival line precisely so a player standing on a mission
+// tile would never again be told nothing. Its ask table maps `boss → "finish
+// it"` for every family. There are THIRTY spawn-less `boss` stages across
+// mysteries and storylines and every one of them is the LAST ACTIONABLE BEAT of
+// its chain — so after OTA-1586 all 15 mysteries and all 15 storylines in the
+// game ended by telling the player to finish a fight that does not exist, on a
+// beat actually paid by investigating or by talking. That is the reported bug
+// rebuilt one layer up, by the fix for it.
+//
+// ⚠ SO THE ANSWER LIVES HERE, ONCE, AND EVERY READER ASKS FOR IT: the matchers,
+// the arrival line, the mission trace, and the Contracts card. A reader that
+// guesses is now the outlier rather than the norm, and check:missionclaims fails
+// the build if a second boss map appears anywhere.
+export type MissionFamily = 'hunt' | 'mystery' | 'storyline';
+
+/** ⚠ The whole quirk, in three lines, in one place. */
+const BOSS_IS_PAID_BY: Record<MissionFamily, string> = {
+  hunt: 'attack',
+  mystery: 'investigate',
+  storyline: 'diplomacy',
+};
+
+/** What the player must actually DO to advance this stage, in this family.
+ *  `null` for a verbless beat, which advances on its own and must never be
+ *  advertised as an action — that promise is the lie OTA-1584 closed. */
+export function payingIntent(
+  family: MissionFamily,
+  stage: { checkKind?: string | null } | null | undefined,
+): string | null {
+  const kind = stage?.checkKind ?? null;
+  if (kind === null) return null;
+  if (kind === 'boss') return BOSS_IS_PAID_BY[family];
+  // ⚠ `attack_provoke` is a real distinction in the DATA (you are starting the
+  // fight rather than finishing one) and no distinction at all to the parser:
+  // both are paid by ATTACK. Kept apart in the labels below, folded together
+  // here — which is exactly how every matcher has always treated it.
+  if (kind === 'attack_provoke') return 'attack';
+  return kind;
+}
+
+/** The Contracts card's "→ Advance by …" phrasing. ⚠ Keyed on the raw kind where
+ *  the raw kind is honest, and resolved through the family only for `boss` —
+ *  folding `attack_provoke` into "defeat in combat" would lose a distinction the
+ *  writing deliberately makes. */
+const VERB_LABEL: Record<string, string> = {
+  investigate: 'investigate the area',
+  stealth: 'use stealth',
+  diplomacy: 'talk it out',
+  escape: 'escape / disengage',
+  cast: 'use Aethercraft',
+  attack_provoke: 'attack to provoke',
+  attack: 'defeat in combat',
+};
+
+export function stageVerbLabel(
+  family: MissionFamily,
+  stage: { checkKind?: string | null } | null | undefined,
+): string | null {
+  const kind = stage?.checkKind ?? null;
+  if (kind === null) return null;
+  if (kind !== 'boss') return VERB_LABEL[kind] ?? null;
+  return VERB_LABEL[BOSS_IS_PAID_BY[family]] ?? null;
+}
+
+/** The arrival line's second-person phrasing — "this is the place — <ask>". Same
+ *  table, different register: one is a UI label, one is spoken to a player
+ *  standing on the ground. Both resolve `boss` through the same family map. */
+const VERB_ASK: Record<string, string> = {
+  investigate: 'search this ground',
+  stealth: 'go quietly',
+  diplomacy: 'talk it through',
+  cast: 'work the aether',
+  escape: 'break away',
+  attack_provoke: 'force the issue',
+  attack: 'finish it',
+};
+
+export function stageVerbAsk(
+  family: MissionFamily,
+  stage: { checkKind?: string | null } | null | undefined,
+): string | null {
+  const kind = stage?.checkKind ?? null;
+  if (kind === null) return null;
+  if (kind !== 'boss') return VERB_ASK[kind] ?? kind;
+  return VERB_ASK[BOSS_IS_PAID_BY[family]] ?? null;
+}
+
 /** Where a stage happens: its own location if it names one, else the contract's anchor.
  *  ⚠ The resolver is passed in rather than imported, so this module stays free of the
  *  atlas and can be unit-tested on its own. */

@@ -10,6 +10,10 @@ import { getItemPreview } from '../components/itemPreview';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
 import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
 import { findFactionQuestById, FACTION_QUESTS, type FactionQuestDef } from '../engine/factionQuests';
+// ⚠⚠ OTA-1588 — the family-aware "what verb pays this stage" answer. `boss` means
+// a different verb in each family, and this screen only ever had the hunt reading
+// of it (via checkKindLabel), so the other two families were shown nothing at all.
+import { stageVerbLabel } from '../engine/questStage';
 import { missionTurnInReady } from '../engine/missionReady';
 import { escortToggleLabel } from '../engine/escort';
 import { FACTIONS } from '../engine/factions';
@@ -1505,7 +1509,20 @@ export function ContractsScreen() {
                     {trackToggle('mystery', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {!open && def.stages[run.stage] && !ready && (
-                      <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
+                      <>
+                        <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
+                        {/* ⚠⚠⚠ OTA-1588 — THE HINT HUNTS HAVE HAD SINCE OTA-053, FINALLY
+                            HERE TOO. Hunts printed "→ Advance by …" on the card and in the
+                            expanded list; mysteries got the narration and nothing else, on
+                            every one of their stages. The game knew the verb the whole
+                            time and never said it — the same silence OTA-1586 closed on
+                            the tile, still standing on the screen he actually taps. */}
+                        {(() => {
+                          const label = stageVerbLabel('mystery', def.stages[run.stage]);
+                          if (!label) return null;
+                          return <Text style={styles.cardHint}>→ Advance by {label}</Text>;
+                        })()}
+                      </>
                     )}
                     {open && (
                       <View style={styles.expanded}>
@@ -1575,7 +1592,20 @@ export function ContractsScreen() {
                     {trackToggle('storyline', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {!open && def.stages[run.stage] && !ready && (
-                      <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
+                      <>
+                        <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
+                        {/* ⚠⚠⚠ OTA-1588 — THE HINT HUNTS HAVE HAD SINCE OTA-053, FINALLY
+                            HERE TOO. Hunts printed "→ Advance by …" on the card and in the
+                            expanded list; storylines got the narration and nothing else, on
+                            every one of their stages. The game knew the verb the whole
+                            time and never said it — the same silence OTA-1586 closed on
+                            the tile, still standing on the screen he actually taps. */}
+                        {(() => {
+                          const label = stageVerbLabel('storyline', def.stages[run.stage]);
+                          if (!label) return null;
+                          return <Text style={styles.cardHint}>→ Advance by {label}</Text>;
+                        })()}
+                      </>
                     )}
                     {open && (
                       <View style={styles.expanded}>

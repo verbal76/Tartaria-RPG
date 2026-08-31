@@ -45,12 +45,18 @@ import {
 function proceedLabel(needs: string | null, gives: string | null, verb: string | null): string {
   if (needs) return `HAND OVER ${needs.toUpperCase()}`;
   if (gives) return `TAKE ${gives.toUpperCase()}`;
+  // ⚠⚠ OTA-1588 — KEYED ON THE VERB THAT PAYS THE STAGE, which is what `armed.verb`
+  // now carries. It used to be the raw `checkKind`, so `boss` arrived here from all
+  // three families and got one label — while a MYSTERY's boss is paid by INVESTIGATE
+  // and a STORYLINE's by DIPLOMACY. Those two now land on their own rows and read as
+  // what they are; a HUNT's boss resolves to `attack` and keeps the old wording.
   switch (verb) {
     case 'investigate': return 'LOOK IT OVER WITH THEM';
     case 'stealth': return 'SLIP PAST';
     case 'diplomacy': return 'HEAR THEM OUT';
     case 'cast': return 'WORK THE AETHER';
-    case 'boss': return 'SETTLE IT HERE';
+    case 'escape': return 'GET CLEAR';
+    case 'attack': return 'SETTLE IT HERE';
     default: return 'GET ON WITH IT';
   }
 }

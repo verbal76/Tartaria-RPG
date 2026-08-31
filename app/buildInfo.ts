@@ -26329,7 +26329,39 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // contextLedger.ts and violated once at a cost of a day: measure the cause, or
 // ship an instrument. The candidate above is not a number yet, so it ships as a
 // question the next device log answers, not as a fix.
-export const OTA_BUILD_ID = '2026-08-31-1587-which-life-died';
+// OTA-1588 - THE VERB THAT PAYS THE STAGE.
+//
+// Owner: "reaudit and repair all missions for similar issues" - the shared shape
+// of OTA-1584/1585/1586 being A PROMISE THE MACHINE CANNOT PAY.
+//
+// WHAT THE RE-AUDIT FOUND. checkKind 'boss' does not mean the same thing in every
+// family, and never has: a HUNT's boss is paid by ATTACK (the apex is a fight), a
+// MYSTERY's by INVESTIGATE and a STORYLINE's by DIPLOMACY - the "confirm what you
+// have" beat, which spawns nothing. The engine knew that FOUR TIMES, once per
+// matcher, under a comment telling the next person to keep the copies in step by
+// hand. OTA-1585 had already named that shape: two implementations of one
+// question is one implementation plus a time bomb.
+//
+// AND IT WENT OFF INSIDE THE FIX FOR IT, THE SAME DAY. OTA-1586 added the arrival
+// line so a player standing on a mission tile would never again be told nothing,
+// and its own ask table mapped boss to "finish it" for all three families. There
+// are THIRTY spawn-less boss stages across the mysteries and storylines and every
+// one of them is the LAST ACTIONABLE BEAT of its chain - so all 15 mysteries and
+// all 15 storylines ended by telling the player to finish a fight that does not
+// exist, on a beat paid by searching or by talking.
+//
+// SECOND FINDING, same shape: the Contracts card has printed "Advance by ..." for
+// HUNTS since OTA-053 and printed nothing for the other two families - 165 stages
+// where the game knew the verb and never said it.
+//
+// So the answer lives once, in questStage (payingIntent / stageVerbLabel /
+// stageVerbAsk), and every reader asks for it: the four matchers, the arrival
+// line, the trace (which now prints boss->investigate so a log shows both halves),
+// the conversation card's PROCEED button, and the Contracts card for all three
+// families. check:missionclaims fails the build if a second boss map appears, in
+// either of the two shapes this defect took.
+export const OTA_BUILD_ID = '2026-08-31-1588-the-verb-that-pays-it';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1587-which-life-died';
 // golem catch-up 2026-08-31: markerless publish of OTA-1587 — a JS life now has
 // a name and an age, the reload leaves the next boot a note carrying its model
 // ledger, the OTA window is phase-stamped, and the crash ledger prints how many

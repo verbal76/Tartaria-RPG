@@ -140,6 +140,14 @@ export interface StakesShape {
  *   requires → YOU are the one delivering. The trade is already agreed.
  *   grants   → they hold the thing and you want it handed over.
  */
+// ⚠ OTA-1588 — DELIBERATELY LEFT FAMILY-BLIND, and worth writing down because
+// every other reader of `checkKind` was made family-aware in that OTA. This one
+// cannot reach the thirty spawn-less mystery/storyline `boss` beats:
+// `stageHasFight` is false for all of them, so `choicesFor` opens with PROCEED
+// and FLEE and never offers PERSUADE — and a stake prices nothing else.
+// Threading the family through here would change no button and no number, and
+// quietly re-tuning a DC ladder nobody can see is not a repair. So `boss` here
+// means what it means to a HUNT, which is the only family that can reach it.
 export function stakesForStage(s: StakesShape | null | undefined): PersuadeStakes {
   if (!s) return 'favour';
   if (s.checkKind === 'boss') return 'surrender';

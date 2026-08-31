@@ -38,7 +38,9 @@ import { findHuntById } from './hunts';
 import { findMysteryById } from './mysteries';
 import { findStorylineById } from './factionStorylines';
 import { huntAnchorId, contractAnchorId, resolvePosterLocation } from './contractMarkers';
-import { stageLocationId, stageRequirementMet } from './questStage';
+import {
+  stageLocationId, stageRequirementMet, stageVerbAsk, payingIntent, type MissionFamily,
+} from './questStage';
 
 type Rec = { id: string; stage: number; tracked?: boolean };
 
@@ -52,7 +54,7 @@ interface StageLike {
 }
 
 function line(
-  family: string,
+  family: MissionFamily,
   rec: Rec,
   def: { id: string; title: string; stages?: StageLike[] } | null,
   anchor: string | undefined,
@@ -71,7 +73,14 @@ function line(
   }
   const where = stageLocationId(st, anchor ?? '', resolvePosterLocation);
   const here = where === player.currentLocationId ? ' HERE' : '';
-  const verb = st.checkKind ?? 'auto';
+  // ⚠⚠ OTA-1588 — BOTH HALVES, because they differ and a log reader needs to see
+  // which. `[boss→investigate]` says at a glance that the beat is LABELLED as the
+  // chain's last confrontation and PAID by searching — the exact mismatch that
+  // made OTA-1586's arrival line lie on 30 stages. Where the two agree the arrow
+  // is dropped, so the common case stays short.
+  const kind = st.checkKind ?? 'auto';
+  const pays = payingIntent(family, st);
+  const verb = pays && pays !== kind ? `${kind}→${pays}` : kind;
   const bits = [`${family}:${rec.id} stage ${rec.stage}/${total} [${verb}]`, `@${where || '?'}${here}`];
   if (st.npcName) bits.push(`npc="${st.npcName}"`);
   if (st.requires) {
@@ -140,16 +149,15 @@ export function missionTraceLines(player: PlayerCharacter | null | undefined): s
 export function missionArrivalLines(player: PlayerCharacter | null | undefined): string[] {
   if (!player?.currentLocationId) return [];
   const out: string[] = [];
-  const VERB_ASK: Record<string, string> = {
-    investigate: 'search this ground',
-    stealth: 'go quietly',
-    diplomacy: 'talk it through',
-    cast: 'work the aether',
-    escape: 'break away',
-    attack_provoke: 'force the issue',
-    boss: 'finish it',
-  };
+  // ⚠⚠⚠ OTA-1588 — THE ASK COMES FROM THE ENGINE'S OWN ANSWER NOW, NOT FROM A
+  // TABLE THIS FILE KEPT. The table this file kept mapped `boss → "finish it"`
+  // for every family, and a MYSTERY's boss is paid by INVESTIGATE while a
+  // STORYLINE's is paid by DIPLOMACY. Thirty stages carry that label and all
+  // thirty are the last actionable beat of their chain, so every mystery and
+  // every storyline in the game ended by telling the player to finish a fight
+  // that does not exist. See questStage.payingIntent.
   const consider = (
+    family: MissionFamily,
     rec: Rec,
     def: { title: string; stages?: StageLike[] } | null,
     anchor: string | undefined,
@@ -159,7 +167,7 @@ export function missionArrivalLines(player: PlayerCharacter | null | undefined):
     if (!st) return;
     if (stageLocationId(st, anchor ?? '', resolvePosterLocation) !== player.currentLocationId) return;
     const who = st.npcName ? ` — find ${st.npcName}` : '';
-    const ask = st.checkKind ? (VERB_ASK[st.checkKind] ?? st.checkKind) : null;
+    const ask = stageVerbAsk(family, st);
     // ⚠ A verbless beat advances on its own, so promising an action would be the
     // lie this line exists to end. It still says the player is in the right
     // place, which is the part that was missing.
@@ -171,15 +179,15 @@ export function missionArrivalLines(player: PlayerCharacter | null | undefined):
   };
   for (const rec of player.activeHunts ?? []) {
     const def = findHuntById(rec.id);
-    consider(rec, def, def ? huntAnchorId(def) : undefined);
+    consider('hunt', rec, def, def ? huntAnchorId(def) : undefined);
   }
   for (const rec of player.activeMysteries ?? []) {
     const def = findMysteryById(rec.id);
-    consider(rec, def, def ? contractAnchorId(def) : undefined);
+    consider('mystery', rec, def, def ? contractAnchorId(def) : undefined);
   }
   for (const rec of player.activeStorylines ?? []) {
     const def = findStorylineById(rec.id);
-    consider(rec, def, def ? contractAnchorId(def) : undefined);
+    consider('storyline', rec, def, def ? contractAnchorId(def) : undefined);
   }
   return out;
 }

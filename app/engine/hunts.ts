@@ -1,5 +1,5 @@
 import { findByTitle } from './titleMatch';
-import { firstActionableStage, type StageBinding } from './questStage';
+import { firstActionableStage, stageVerbLabel, type StageBinding } from './questStage';
 // Hunt engine — long-form, multi-stage monster hunts (5-9 prep stages + a
 // final boss combat). Hunts are accepted from vendors or from beast-sign
 // hooks, scale the target enemy to the player's current power level, and
@@ -112,17 +112,17 @@ interface HuntDataShape {
  *  systemic (`attack_provoke`, `cast`); these are the imperative
  *  the player should act on at this stage. Null = pure narration
  *  stage (auto-advance on any action). */
+/**
+ * ⚠⚠ OTA-1588 — DELEGATED, NOT DUPLICATED. This switch was the label table, and
+ * it is right for hunts and ONLY for hunts: a HUNT's `boss` really is "defeat in
+ * combat", but a MYSTERY's is paid by INVESTIGATE and a STORYLINE's by DIPLOMACY.
+ * Keeping it here and adding a second copy for the other two families is exactly
+ * the shape that produced this OTA, so the table moved to
+ * `questStage.stageVerbLabel`, which takes the family. This stays as the
+ * hunt-flavoured door onto it; the hunt output is unchanged, label for label.
+ */
 export function checkKindLabel(kind: HuntCheckKind): string | null {
-  switch (kind) {
-    case 'investigate': return 'investigate the area';
-    case 'stealth': return 'use stealth';
-    case 'diplomacy': return 'talk it out';
-    case 'escape': return 'escape / disengage';
-    case 'cast': return 'use Aethercraft';
-    case 'attack_provoke': return 'attack to provoke';
-    case 'boss': return 'defeat in combat';
-    default: return null;
-  }
+  return stageVerbLabel('hunt', { checkKind: kind });
 }
 
 /** 2026-05-26 OTA-053 — friendly label for a biomeTag when a hunt

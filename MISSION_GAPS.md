@@ -148,6 +148,13 @@ walks past.
 Apex stages are exempt — the hunt boss is spawned by `scaleHuntBoss`, verified
 end-to-end by the hunt walker.
 
+⚠ OTA-1588 — and `checkKind: 'boss'` is NOT a fight outside a hunt. Thirty
+spawn-less boss beats sit across the mysteries and storylines, every one of them
+the last actionable stage of its chain, and they are handovers: a mystery's boss
+is paid by INVESTIGATE and a storyline's by DIPLOMACY. They are absent from this
+section because their prose promises nothing — the label was the only thing
+claiming a fight, and it was misread by three readers before it was found.
+
 **None.**
 
 ## 4. No early completion — auto stages whose prose describes an action

@@ -34,6 +34,10 @@ import {
   type RescueScenario,
 } from '../engine/dogCompanion';
 import { buildingNameFor, buildingHookLabel, buildingArrow } from '../engine/buildingMaps';
+// ⚠ OTA-1588 — TYPE-ONLY, so the lazy `require` this file uses for questStage is
+// untouched: `import type` is erased at compile time and cannot create the module
+// cycle those requires exist to avoid.
+import type { MissionFamily } from '../engine/questStage';
 // OTA-1440 — the first reader of vendors.json's gender field.
 import { npcGenderFor } from '../engine/npcGender';
 import { koShare } from '../engine/combatProse';
@@ -930,11 +934,12 @@ export function grantStageItems(
  *  still be there afterwards; the stage is the reason the player walked here. Deliberately
  *  narrow — same ground, same verb, tracked contract, not in combat.
  *
- *  ⚠ THE checkKind→intent MAP MUST MIRROR EACH FAMILY'S MATCHER, quirks included: a
- *  MYSTERY's `boss` is paid by INVESTIGATE and a STORYLINE's by DIPLOMACY (neither spawns
- *  anything — they are the "confirm what you have" beat). Getting it wrong here does not
- *  break the gate; it just fails to yield, so the symptom is the silent swallow coming
- *  back. */
+ *  ⚠⚠ OTA-1588 — THE checkKind→intent MAP IS NO LONGER COPIED HERE. This comment used to
+ *  read "MUST MIRROR EACH FAMILY'S MATCHER, quirks included" — which is a warning that one
+ *  question was being answered in four places, and the fourth copy (OTA-1586's arrival
+ *  line) got it wrong on thirty stages. `QS.payingIntent(family, stage)` is the single
+ *  answer now: a MYSTERY's `boss` is paid by INVESTIGATE and a STORYLINE's by DIPLOMACY,
+ *  and that fact lives in exactly one file. */
 function stageAwaitsIntentHere(get: () => GameStore, intent: Intent): boolean {
   const player = get().player;
   if (!player) return false;
@@ -944,32 +949,28 @@ function stageAwaitsIntentHere(get: () => GameStore, intent: Intent): boolean {
   const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
   const here = player.currentLocationId;
 
-  const wants = (stage: { checkKind: string | null } | undefined, bossIntent: Intent): boolean => {
-    if (!stage || stage.checkKind === null) return false;
-    if (stage.checkKind === 'boss') return intent === bossIntent;
-    if (stage.checkKind === 'attack_provoke') return intent === 'attack';
-    return stage.checkKind === intent;
-  };
+  const wants = (stage: { checkKind: string | null } | undefined, family: MissionFamily): boolean =>
+    QS.payingIntent(family, stage) === intent;
 
   for (const rec of player.activeHunts ?? []) {
     if (rec.tracked === false) continue;
     const def = findHuntById(rec.id);
     const stage = def?.stages[rec.stage];
-    if (!def || !wants(stage, 'attack')) continue;
+    if (!def || !wants(stage, 'hunt')) continue;
     if (QS.stageLocationId(stage, CM.huntAnchorId(def), CM.resolvePosterLocation) === here) return true;
   }
   for (const rec of player.activeMysteries ?? []) {
     if (rec.tracked === false) continue;
     const def = findMysteryById(rec.id);
     const stage = def?.stages[rec.stage];
-    if (!def || !wants(stage, 'investigate')) continue;
+    if (!def || !wants(stage, 'mystery')) continue;
     if (QS.stageLocationId(stage, CM.contractAnchorId(def), CM.resolvePosterLocation) === here) return true;
   }
   for (const rec of player.activeStorylines ?? []) {
     if (rec.tracked === false) continue;
     const def = findStorylineById(rec.id);
     const stage = def?.stages[rec.stage];
-    if (!def || !wants(stage, 'diplomacy')) continue;
+    if (!def || !wants(stage, 'storyline')) continue;
     if (QS.stageLocationId(stage, CM.contractAnchorId(def), CM.resolvePosterLocation) === here) return true;
   }
   return false;
@@ -1001,6 +1002,12 @@ function advanceStagesOnIntent(
   const inCombat = (currentScene.enemies?.length ?? 0) > 0;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { huntAnchorId } = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
+  // ⚠⚠⚠ OTA-1588 — ONE ANSWER TO "WHAT VERB PAYS THIS STAGE", ASKED PER FAMILY.
+  // The three matchers below each carried their own copy of the checkKind→intent
+  // map, quirks included, and `stageAwaitsIntentHere` carried a fourth. A fifth
+  // reader — OTA-1586's arrival line — guessed, and got thirty stages wrong.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const QSV = require('../engine/questStage') as typeof import('../engine/questStage');
 
   const huntMatch = (player.activeHunts ?? [])
     .map((rec) => ({ rec, def: findHuntById(rec.id) }))
@@ -1009,21 +1016,15 @@ function advanceStagesOnIntent(
       if (rec.tracked === false) return false; // DEACTIVATED (paused) — frozen
       const next = def.stages[rec.stage];
       if (!next) return false;
-      return (
-        (!inCombat && next.checkKind === 'investigate' && intent === 'investigate') ||
-        (!inCombat && next.checkKind === 'stealth' && intent === 'stealth') ||
-        (!inCombat && next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
-        (next.checkKind === 'escape' && intent === 'escape') ||
-        (!inCombat && next.checkKind === 'cast' && intent === 'cast') ||
-        // ⚠⚠ OTA-1217 — the attack rows are OUT-OF-COMBAT DELIBERATE ACTIONS
-        // too (escape alone stays in-combat: fleeing IS combat). Without the
-        // guard, the frozen apex stage (OTA-796) re-matched on EVERY swing of
-        // the boss fight itself — each attack re-ran advanceHunt, which
-        // re-spawned the boss at FULL HP, reset the range, and re-logged the
-        // apex narration. The fight literally could not be won.
-        (!inCombat && next.checkKind === 'attack_provoke' && intent === 'attack') ||
-        (!inCombat && next.checkKind === 'boss' && intent === 'attack')
-      );
+      if (QSV.payingIntent('hunt', next) !== intent) return false;
+      // ⚠⚠ OTA-1217 — EVERY ROW BUT ESCAPE IS AN OUT-OF-COMBAT DELIBERATE ACTION
+      // (escape alone stays in-combat: fleeing IS combat). Without the guard, the
+      // frozen apex stage (OTA-796) re-matched on EVERY swing of the boss fight
+      // itself — each attack re-ran advanceHunt, which re-spawned the boss at
+      // FULL HP, reset the range, and re-logged the apex narration. The fight
+      // literally could not be won. ⚠ OTA-1588 kept this guard byte for byte and
+      // replaced only the verb table above it.
+      return next.checkKind === 'escape' ? true : !inCombat;
     });
   if (huntMatch && huntMatch.def) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -1118,14 +1119,10 @@ function advanceStagesOnIntent(
       if (rec.tracked === false) return false; // DEACTIVATED (paused) — frozen
       const next = def.stages[rec.stage];
       if (!next) return false;
-      return (
-        (next.checkKind === 'investigate' && intent === 'investigate') ||
-        (next.checkKind === 'stealth' && intent === 'stealth') ||
-        (next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
-        (next.checkKind === 'escape' && intent === 'escape') ||
-        (next.checkKind === 'cast' && intent === 'cast') ||
-        (next.checkKind === 'boss' && intent === 'investigate')
-      );
+      // ⚠ OTA-1588 — a MYSTERY's `boss` is paid by INVESTIGATE, and that fact now
+      // lives once, in questStage.payingIntent, instead of here and in three
+      // other places that had to be kept in step by hand.
+      return QSV.payingIntent('mystery', next) === intent;
     });
   if (mysteryMatch && mysteryMatch.def && !inCombat) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -1178,15 +1175,8 @@ function advanceStagesOnIntent(
       if (rec.tracked === false) return false; // DEACTIVATED (paused) — frozen
       const next = def.stages[rec.stage];
       if (!next) return false;
-      return (
-        (next.checkKind === 'investigate' && intent === 'investigate') ||
-        (next.checkKind === 'stealth' && intent === 'stealth') ||
-        (next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
-        (next.checkKind === 'escape' && intent === 'escape') ||
-        (next.checkKind === 'cast' && intent === 'cast') ||
-        (next.checkKind === 'attack_provoke' && intent === 'attack') ||
-        (next.checkKind === 'boss' && intent === 'diplomacy')
-      );
+      // ⚠ OTA-1588 — a STORYLINE's `boss` is paid by DIPLOMACY. Same single answer.
+      return QSV.payingIntent('storyline', next) === intent;
     });
   if (storyMatch && storyMatch.def && !inCombat) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
