@@ -36,3 +36,4 @@ pull 2026-08-31T14:31:20Z — owner pushed a play-session log, fetch it
 pull 2026-08-31T14:38:27Z — retrigger without skip-ci
 pull 2026-08-31T16:46:38Z — owner pushed a new play log
 pull 2026-08-31T21:32:40Z — owner pushed the 21:00 play-session bundle; fetch it to diff against his 16-part paste (verify no truncation)
+pull 2026-08-31T22:15:39Z — owner pushed a log: Silence the Doubter stage 2, green HERE marker, hint says advance by combat, but nothing spawned to fight. Fetch it.
