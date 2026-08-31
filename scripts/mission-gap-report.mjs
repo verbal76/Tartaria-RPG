@@ -69,7 +69,7 @@ const VERBLESS = new Set([null, undefined, '']);
 
 const out = [];
 const W = (s = '') => out.push(s);
-const tally = { stages: 0, byFamily: {}, npcNotPlaced: 0, npcStages: [], npcUnreachable: [], locBad: [], combatProseNoSpawn: [], autoWithAction: [], takeProseNoGrant: [] };
+const tally = { stages: 0, byFamily: {}, npcNotPlaced: 0, npcStages: [], npcUnreachable: [], locBad: [], combatProseNoSpawn: [], autoWithAction: [], takeProseNoGrant: [], epilogues: [] };
 
 function scan(family, items) {
   for (const h of items) {
@@ -114,15 +114,38 @@ function scan(family, items) {
         tally.combatProseNoSpawn.push(`${ref} — verb ${s.checkKind ?? 'auto'}`);
       }
 
-      // 4. "No early completion": an auto stage whose prose describes the player
-      //    DOING something, or a person doing something at them.
-      if (VERBLESS.has(s.checkKind) && (PROMISES_PERSON.test(prose) || PROMISES_TAKE.test(prose))) {
-        tally.autoWithAction.push(ref);
-      }
+      // ⚠⚠⚠ OTA-1584 — THE EPILOGUE CLASS, and it is a RULING, not a loophole.
+      //
+      // Sections 4 and 5 were both crying wolf, and at the same eight stages. All
+      // eight are the FINAL beat of their mission: verbless, naming a person, and
+      // written as the aftermath — "you carry the Drowned Bell back and the
+      // founder strikes it", "the lodge-master carves your name small among the
+      // founders". The report called them "no early completion" violations
+      // because arrival alone closes them. The owner ruled on exactly these:
+      // *"that sounds like a cue for a remote turn in with prose, I'm ok with
+      // that."* There is nothing for a player to DO in them — they are the
+      // turn-in's words, and the advance loops read them out as the chain closes.
+      //
+      // ⚠ So they are counted and listed, but as their own class rather than as
+      // defects. A check that is wrong at every site it fires is worse than no
+      // check: the four real hits in section 3 were nearly lost inside five false
+      // ones for exactly this reason.
+      const isEpilogue = VERBLESS.has(s.checkKind)
+        && i === st.length - 1
+        && st.slice(i).every((x) => VERBLESS.has(x.checkKind));
+      if (isEpilogue) {
+        tally.epilogues.push(`${ref} — "${who || 'no one named'}"`);
+      } else {
+        // 4. "No early completion": an auto stage whose prose describes the player
+        //    DOING something, or a person doing something at them.
+        if (VERBLESS.has(s.checkKind) && (PROMISES_PERSON.test(prose) || PROMISES_TAKE.test(prose))) {
+          tally.autoWithAction.push(ref);
+        }
 
-      // 5. Prose says you pick something up and the stage grants nothing.
-      if (PROMISES_TAKE.test(prose) && !s.grants?.item) {
-        tally.takeProseNoGrant.push(ref);
+        // 5. Prose says you pick something up and the stage grants nothing.
+        if (PROMISES_TAKE.test(prose) && !s.grants?.item) {
+          tally.takeProseNoGrant.push(ref);
+        }
       }
     });
   }
@@ -150,7 +173,7 @@ W('walks past.');
 W();
 W(`**Stages naming a person: ${tally.npcNotPlaced}.**`);
 W(`- **${tally.npcStages.length} are reachable** — the stage carries a verb, so the chain stops there and the card opens.`);
-W(`- **${tally.npcUnreachable.length} are not** — no verb, so the beat is consumed on the way past and the person is named but never met.`);
+W(`- **${tally.npcUnreachable.length} are not** — no verb, so the beat is consumed on the way past. Every one of them is an EPILOGUE (see 4b): the mission's last word, which the owner ruled is the turn-in's prose.`);
 W();
 W('### Still walked past');
 W();
@@ -182,6 +205,16 @@ W('you performed.');
 W();
 W(tally.autoWithAction.length ? `**${tally.autoWithAction.length} stages.**` : '**None.**');
 for (const r of tally.autoWithAction) W(`- ${r}`);
+W();
+W('## 4b. Epilogues — the turn-in\'s prose, by the owner\'s ruling');
+W();
+W('The final beat of a mission, verbless, naming a person, written as aftermath.');
+W('The owner: *"that sounds like a cue for a remote turn in with prose, I\'m ok');
+W('with that."* There is nothing for a player to DO in them; the advance loops read');
+W('them out as the chain closes. Listed so the class stays visible, not as a gap.');
+W();
+W(tally.epilogues.length ? `**${tally.epilogues.length} stages.**` : '**None.**');
+for (const r of tally.epilogues) W(`- ${r}`);
 W();
 W('## 5. Prose says you take something, the stage grants nothing');
 W();

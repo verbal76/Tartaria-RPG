@@ -16,7 +16,7 @@ walks past.
 
 **Stages naming a person: 114.**
 - **100 are reachable** — the stage carries a verb, so the chain stops there and the card opens.
-- **14 are not** — no verb, so the beat is consumed on the way past and the person is named but never met.
+- **14 are not** — no verb, so the beat is consumed on the way past. Every one of them is an EPILOGUE (see 4b): the mission's last word, which the owner ruled is the turn-in's prose.
 
 ### Still walked past
 
@@ -156,17 +156,31 @@ end-to-end by the hunt walker.
 you or the player taking something, arrival alone completes a beat the text says
 you performed.
 
-**8 stages.**
-- Mystery · The Singing Stone of Ostragar · stage 4 (?)
-- Mystery · The Second Flood Cipher · stage 4 (?)
-- Mystery · The Giant's Tooth · stage 4 (?)
-- Mystery · The Ashen Codex · stage 4 (?)
-- Mystery · The Tuning Fork of Asgardar · stage 4 (?)
-- Storyline · Scripture in Stone · stage 6 (?)
-- Storyline · Sasha's Gambit · stage 6 (?)
-- Storyline · The Drowned Library · stage 6 (?)
+**None.**
+
+## 4b. Epilogues — the turn-in's prose, by the owner's ruling
+
+The final beat of a mission, verbless, naming a person, written as aftermath.
+The owner: *"that sounds like a cue for a remote turn in with prose, I'm ok
+with that."* There is nothing for a player to DO in them; the advance loops read
+them out as the chain closes. Listed so the class stays visible, not as a gap.
+
+**14 stages.**
+- Mystery · The Drowned Bell of Samarran · stage 4 (?) — "the bell-founder"
+- Mystery · The Singing Stone of Ostragar · stage 4 (?) — "the lodge-scribe"
+- Mystery · The Second Flood Cipher · stage 4 (?) — "the Revivalist cell-leader"
+- Mystery · The Giant's Tooth · stage 4 (?) — "the pilgrim-elder"
+- Mystery · The Ashen Codex · stage 4 (?) — "the Order archivist"
+- Mystery · The Tuning Fork of Asgardar · stage 4 (?) — "the lodge-master"
+- Storyline · The Descent to Karok-Sa · stage 7 (?) — "the enclave-mother"
+- Storyline · Blood of the Aetherborn · stage 6 (?) — "the Dynasty proctor"
+- Storyline · The Giant-Watch Vigil · stage 6 (?) — "the vigil-keeper"
+- Storyline · Scripture in Stone · stage 6 (?) — "the lodge-master"
+- Storyline · Sasha's Gambit · stage 6 (?) — "Sasha Ironheart"
+- Storyline · The Silence Protocol · stage 6 (?) — "the Architect handler"
+- Storyline · The Drowned Library · stage 6 (?) — "Vesryn"
+- Storyline · The Purge at Asgardar · stage 6 (?) — "the Dynasty enforcer"
 
 ## 5. Prose says you take something, the stage grants nothing
 
-**1 stages.**
-- Storyline · Scripture in Stone · stage 6 (?)
+**None.**

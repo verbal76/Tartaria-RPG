@@ -26221,7 +26221,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stair" had nothing on the stair. The escort CLEAR moved with it - a spawn
 // without a clear is a wedge, and extending one without the other would have
 // bricked the very storyline this fixed.
-export const OTA_BUILD_ID = '2026-08-31-1583-the-favour-beat-fights-what-it-names';
+// OTA-1584 - THE REPORT STOPS CRYING WOLF.
+//
+// OTA-1583 tightened the prose pattern because five of its nine hits were the
+// pattern's own noise and the four real ones were nearly lost inside them.
+// Sections 4 and 5 of the gap report were the same failure, uncaught: both fired
+// at the SAME EIGHT STAGES, and all eight are the final beat of their mission -
+// verbless, naming a person, written as aftermath. The owner ruled on exactly
+// those: "that sounds like a cue for a remote turn in with prose, I'm ok with
+// that." There is nothing for a player to DO in them. They are counted as their
+// own class now and both gap sections read None. Every section of the report is
+// at zero.
+//
+// AND THE CLASS GOT A GUARD, because it is only true at the END. A verbless stage
+// naming a person is one of two things and the position decides which: at the end
+// an epilogue, anywhere else a person the chain walks past without meeting - no
+// verb can pay it, and the conversation card is the only other door. That is the
+// defect the 1580 roster and the 1582 accept fix were built to end, reintroduced
+// mid-chain. Hard check, verified to fire.
+//
+// The last two spawns that did not name their own pack are closed too. The
+// OTA-1576 false summits said "three of her daughters" and "three of his sworn,
+// jaw-marked in the old sign" - good prose a player could not connect to the name
+// in the combat log, which is the very class 1576 was filed for surviving inside
+// 1576's own fix. Both say the species out loud now without losing the voice.
+export const OTA_BUILD_ID = '2026-08-31-1584-the-report-stops-crying-wolf';
 // golem catch-up 2026-08-31: markerless publish of OTA-1583 — the fourteen
 // mid-chain boss stages that stood the hunt's Legendary apex up at stage 3 now
 // fight the creature their own prose names, seventeen of the twenty-one stage

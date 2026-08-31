@@ -130,6 +130,28 @@ for (const [family, path] of FAMILIES) {
       });
     }
 
+    // ⚠⚠⚠ CHECK 1c — AN EPILOGUE HAS TO BE LAST. OTA-1584.
+    //
+    // A verbless stage that names a person is one of exactly two things, and the
+    // position decides which. At the END it is an EPILOGUE — the mission's last
+    // word, which the owner ruled is the turn-in's prose: "that sounds like a cue
+    // for a remote turn in with prose, I'm ok with that." All fourteen shipped
+    // ones are last.
+    //
+    // ANYWHERE ELSE it is neither: not a meeting (no verb can pay it, and the
+    // conversation card is the only other door), not a turn-in (the chain
+    // continues past it). It is a person consumed on the way through for no
+    // reason — the exact defect OTA-1580's roster and OTA-1582's accept fix were
+    // built to end, reintroduced in the middle of a chain.
+    stages.forEach((s, i) => {
+      if (s.checkKind !== null || !s.npcName || i === stages.length - 1) return;
+      errors.push(
+        `${family} ${m.id} stage ${i}: "${s.npcName}" stands in a verbless MID-CHAIN beat. ` +
+        'No verb can pay it, so the chain walks past the person without meeting them. ' +
+        'Give the stage a verb (it is a meeting) or move it to the end (it is the epilogue).',
+      );
+    });
+
     stages.forEach((s, idx) => {
       const ref = `${family} ${m.id} stage ${idx}`;
 

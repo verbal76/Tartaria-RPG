@@ -530,7 +530,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 **Text:**
 
-> The south spires stand out of the Mud Seas exactly where the poster said. You wade in expecting the Queen. What comes up out of the silt instead are three of her daughters, mouths already open — she left her song in them and went deeper. They will not let you pass to look for her. Silence them first.
+> The south spires stand out of the Mud Seas exactly where the poster said. You wade in expecting the Queen. What comes up out of the silt instead are three Mud Sirens — her daughters, mouths already open. She left her song in them and went deeper. They will not let you pass to look for her. Silence them first.
 
 > **Arbiter —** "She is listening through them," the Arbiter says. "So mind what you say with your hands."
 
@@ -615,7 +615,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 **Text:**
 
-> You make the camp on the Plains by dusk. Embers still warm, bedrolls still shaped to their sleepers — and the Reaver long gone west. He did not run. He LEFT you something: three of his sworn, jaw-marked in the old sign, standing up out of positions they took hours ago. They have been waiting for exactly the kind of hunter a shrine sends. There is no way past them and no one here to talk to. Put them down, and the trail he left is yours to read.
+> You make the camp on the Plains by dusk. Embers still warm, bedrolls still shaped to their sleepers — and the Reaver long gone west. He did not run. He LEFT you something: three of his sworn, Tartarian Raiders jaw-marked in the old sign, standing up out of positions they took hours ago. They have been waiting for exactly the kind of hunter a shrine sends. There is no way past them and no one here to talk to. Put them down, and the trail he left is yours to read.
 
 > **Arbiter —** "He spent three men to learn what you are," the Arbiter says. "Answer the question."
 

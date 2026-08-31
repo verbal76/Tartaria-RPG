@@ -247,7 +247,13 @@ describe('OTA-1578 — the stage text says who is there and what to do', () => {
     const siren = HUNTS.find((h) => h.title === "The Siren Queen of Zharak's Teeth")!;
     const ss = siren.stages.find((s) => s.stageType === 'false_summit' && s.checkKind === 'boss')!;
     expect(ss.spawn?.enemyName).toBe('Mud Siren');
-    expect(ss.narration).toMatch(/three of her daughters/i);
+    // ⚠ RETARGETED BY OTA-1584, and the claim GREW rather than moved. 1578 wanted
+    // the stage to say the Queen is absent and something of hers is present.
+    // "three of her daughters" did that obliquely — good prose a player could not
+    // connect to "Mud Siren" in the combat log, which is the very class 1576 was
+    // filed for surviving inside 1576's own fix. It now says both.
+    expect(ss.narration).toMatch(/three Mud Sirens/i);
+    expect(ss.narration).toMatch(/her daughters/i);
     expect(ss.narration).toMatch(/silence them first/i);
   });
 });

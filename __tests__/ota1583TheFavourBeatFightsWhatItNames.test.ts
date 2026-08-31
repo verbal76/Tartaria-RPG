@@ -99,10 +99,12 @@ describe('OTA-1583 — no stage stands up the apex four beats early', () => {
     const silent = spawnStages
       .filter(({ s }) => !namesIt(s.narration, s.spawn!.enemyName))
       .map(({ m, i }) => `${m.id}#${i}`);
-    // ⚠ The two OTA-1576 false-summit spawns are the known exceptions: their
-    // prose says "three of his sworn followers" and leaves the species to the
-    // spawn. Recorded rather than waved through.
-    expect(silent).toEqual(['hunt_mud_siren_queen#1', 'hunt_servants_doubter#1']);
+    // ⚠ OTA-1584 CLOSED THE LAST TWO. The OTA-1576 false summits named their
+    // packs obliquely — "three of her daughters", "three of his sworn, jaw-marked
+    // in the old sign" — good prose that a player could not connect to the name
+    // in the combat log. Both now say the species out loud without losing the
+    // voice, so this check is universal rather than universal-with-exceptions.
+    expect(silent).toEqual([]);
   });
 
   it('⚠⚠⚠ AN AMBUSH IS ONLY AUTHORED WHERE THE PROSE SAYS THEY GOT THERE FIRST', () => {
