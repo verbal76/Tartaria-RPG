@@ -325,6 +325,23 @@ export default function App() {
     // process dies.
     const setStage = (s: string) => {
       (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE = s;
+      // ⚠⚠⚠ OTA-1593 — AND THE DYING BREATH LEARNS THE BOOT. The owner's last
+      // seven process kills all read `stage native:cognition:done · (no action
+      // yet) · alive 0ms after it`: every one died between the classifier's
+      // first job and the first screen, and NOTHING in that window stamped the
+      // crumb — the heartbeat only runs on the exploration screen, so the
+      // ledger could not narrow the window past "after the classifier, before
+      // the game". This global already names every boot step (28 call sites,
+      // one writer); mirroring it into the phase stamp means the next
+      // boot-time kill names the exact step it died under — qwen:deferred,
+      // audio:start and boot:complete are three different suspects with three
+      // different fixes. Lazy require + swallow: a boot tracer that can break
+      // boot is worse than no tracer.
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const save = require('./app/engine/saveSystem') as typeof import('./app/engine/saveSystem');
+        save.stampBreadcrumbPhase(`boot:${s}`);
+      } catch { /* an instrument may never break the thing it measures */ }
     };
     // arb78 — load the player's saved background settings (notifies the
     // AppShell's useDisplaySettings hook once storage resolves).

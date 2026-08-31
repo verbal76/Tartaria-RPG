@@ -26440,7 +26440,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // outgoing event; Sentry auto-creates the release record from the first event
 // that names one. The CI set-commits half of #109 remains open - it needs a
 // workflow this box cannot test and will be handed over as a reviewed diff.
-export const OTA_BUILD_ID = '2026-08-31-1592-the-events-say-which-build';
+// OTA-1593 - THE BOOT GETS CHECKPOINTS.
+//
+// The first log on 1592 put OTA-1587's instrument to work and it delivered:
+// "died 859ms into the process - not an OTA-apply boot - o0/r0/l0/p0/dn0".
+// The #110 kills are COLD-BOOT deaths of second-old processes with zero model
+// contexts open - the orphaned-context-across-reload hypothesis is dead. But
+// every receipt still ends at native:cognition:done with alive 0ms after,
+// because nothing between the classifier's first job and the first screen
+// stamps the crumb. So: (1) App.tsx's setStage - the one boot-stage writer,
+// 28 call sites - now mirrors every stage into the breadcrumb as boot:<stage>,
+// so the next kill names the exact step it died under; (2) the seam re-emits
+// the 1587 launch line, which hydrate() had been printing into the pre-slot
+// buffer the save load replaces (the owner's log had the trace and the banner
+// and not one launch line).
+export const OTA_BUILD_ID = '2026-08-31-1593-the-boot-gets-checkpoints';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1592-the-events-say-which-build';
 // golem catch-up 2026-08-31: markerless publish of OTA-1592 — every Sentry
 // event now carries release (tartaria@version+stamp) and dist (the stamp), so
 // the repo link's suspect-commit and grouping features have something to key on.

@@ -435,6 +435,16 @@ export const createSlotSlice = (
             // eslint-disable-next-line @typescript-eslint/no-require-imports
             const mt = require('../../engine/missionTrace') as typeof import('../../engine/missionTrace');
             for (const l of mt.missionTraceLines(get().player)) get().appendLog('debug', l);
+            // ⚠⚠ OTA-1593 — AND THE LAUNCH LINE, which hydrate() printed into a
+            // buffer nobody keeps. The owner's first 1592 log carried the trace
+            // and the seam banner and NOT ONE launch line — hydrate runs before
+            // a slot is active, so its appendLog landed in the pre-slot buffer
+            // the save load replaces. Re-emitted here from the cache boot
+            // resolved, beside the slate it belongs with.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const bi = require('../../diagnostics/bootIdentity') as typeof import('../../diagnostics/bootIdentity');
+            const ll = bi.launchLineCached();
+            if (ll) get().appendLog('debug', ll);
           })
           .catch(() => { /* a missing banner must never cost a load */ });
       } catch { /* hardened: never block slot load on a debug log failure */ }

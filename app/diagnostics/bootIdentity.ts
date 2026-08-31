@@ -278,6 +278,18 @@ let _facts: LaunchFacts | null = null;
 export function noteLaunchFacts(f: LaunchFacts): void { _facts = f; }
 export function _resetLaunchFactsForTest(): void { _facts = null; }
 
+/** ⚠⚠ OTA-1593 — the one-line launch statement, from the cache. `hydrate()`
+ *  prints `launchLine` the moment it resolves the handoff — and the owner's
+ *  first 1592 log proved that line never reaches anyone: hydrate runs before a
+ *  slot is active, so its appendLog lands in the pre-slot buffer the save load
+ *  replaces. The SEAM is where the persisted log actually begins (the same
+ *  lesson as OTA-1586's trace), so the seam re-emits the line from this cache.
+ *  Null before boot has resolved it, so the seam can stay silent rather than
+ *  guess. */
+export function launchLineCached(): string | null {
+  return _facts ? launchLine(_facts) : null;
+}
+
 /** The bug-report block. ⚠ An unresolved launch says "not resolved yet" rather
  *  than "cold start" — those are different facts, and a report that guesses at
  *  one of them is worse than a report that admits it does not know. */
