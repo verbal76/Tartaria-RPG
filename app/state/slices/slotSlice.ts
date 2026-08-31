@@ -410,6 +410,15 @@ export const createSlotSlice = (
               previousEntryAt: lastEntryTime(existing),
               appliedFrom: ota099UpdatedFrom ?? null,
             }));
+            // ⚠⚠⚠ OTA-1586 — AND THE SLATE, RIGHT UNDER THE SEAM. The arrival
+            // trace covers "every part"; this covers the case the arrival trace
+            // cannot — a log whose first entries are a session start, where the
+            // player loads in and reads the contracts screen without moving. The
+            // banner already answers "which build, how long ago"; this answers
+            // "carrying what", which is the other half of reading a log cold.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const mt = require('../../engine/missionTrace') as typeof import('../../engine/missionTrace');
+            for (const l of mt.missionTraceLines(get().player)) get().appendLog('debug', l);
           })
           .catch(() => { /* a missing banner must never cost a load */ });
       } catch { /* hardened: never block slot load on a debug log failure */ }

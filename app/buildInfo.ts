@@ -26272,7 +26272,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and never propagated to the parser's private copy of the same logic. The copy
 // is deleted rather than patched. Two implementations of one question is one
 // implementation plus a time bomb.
-export const OTA_BUILD_ID = '2026-08-31-1585-the-core-inside-the-cleaver';
+// OTA-1586 - THE SLATE IN EVERY PART, AND WHY YOU CAME.
+//
+// He sent a complete 4,000-line log with "mission is still broken" and the
+// honest answer was: I cannot tell you which mission, because the log never
+// says. Every tap, every die, every parse, every kilobyte of the save - and not
+// one line about what contracts were on the slate. Eight parts, and the only
+// mission evidence was three taps on "missions" and a bare travel course.
+//
+// His instruction: "figure out a way to track the missions in every part, and
+// find out how it actually starts. did you see where I set it active and
+// autoroutes to it, then arrived on the tile. yeah that's me starting it."
+//
+// So the trace now rides every arrival and sits under every session seam: family
+// and id, stage owed of total, the VERB it wants, the GROUND it happens on and
+// whether the player is standing on it, what it needs and whether the pack has
+// it, who is standing there, and whether it is paused. "No missions" prints too
+// - an absent line is not an answer.
+//
+// AND FINDING OUT HOW IT STARTS FOUND THE DEFECT. Routing is not the problem:
+// ROUTE TO and the stage's own ground agree on all 281 stages, measured and
+// pinned. The END of the walk is the problem. OTA-1581's conversation card arms
+// on the 114 stages that NAME A PERSON; every investigate / stealth / cast beat
+// with nobody in it announced NOTHING on arrival. Nimari is his own case: four
+// live stages anchor there, two of them want INVESTIGATE with no npcName, so he
+// walked twenty hours to the tile the game routed him to and the game said
+// nothing about why he had come. Arrival now names the mission, the place and
+// the ask - person or no person - and says what is still owed.
+export const OTA_BUILD_ID = '2026-08-31-1586-the-slate-in-every-part';
 // golem catch-up 2026-08-31: markerless publish of OTA-1585 — the parser's
 // ambient pre-pass stops matching a scene noun from the middle of a longer word,
 // which is what turned "attack with the geode-cored cleaver" into a lecture

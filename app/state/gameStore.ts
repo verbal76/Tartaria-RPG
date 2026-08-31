@@ -691,6 +691,7 @@ import {
 // ⚠ OTA-1581 — the mission conversation card. `armedEncounter` is a pure
 // selector over the save (see its file note: a selector, not a hook into
 // movement), and every button routes through `applyChoice`.
+import { missionTraceLines, missionArrivalLines } from '../engine/missionTrace';
 import { armedEncounter } from '../engine/missionEncounterArm';
 import {
   applyChoice as applyEncounterChoice,
@@ -9680,6 +9681,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const hubRoom = inHub && hubRoomId ? hubRoomFor(hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId)) : null;
     get().appendLog('debug', `scene: loc=${location.id} hub=${hubRoomId ?? '-'} arrival=${opts?.arrivalFromName ? 'y' : 'n'} opening=${opts?.isOpening ? 'y' : 'n'} passing=${passingThrough ? 'y' : 'n'}`);
+    // ⚠⚠⚠ OTA-1586 — THE SLATE, ON EVERY ARRIVAL. The owner sent a complete
+    // 4,000-line log with "mission is still broken" and it did not contain one
+    // line about what missions he was carrying — so "I arrived on the tile and
+    // nothing happened" could not be checked against where the stage thought it
+    // was. His instruction: "figure out a way to track the missions in every
+    // part." This is the every-part half: the trace rides the arrival line, so
+    // every tile change in every log part carries the answer beside the question.
+    // See missionTrace.ts — it is a READER, using the same resolvers the engine
+    // decides with.
+    for (const l of missionTraceLines(get().player)) get().appendLog('debug', l);
+    // ⚠⚠⚠ OTA-1586 — AND THE PLAYER IS TOLD WHY THEY CAME. See
+    // missionTrace.missionArrivalLines: the conversation card only arms where a
+    // stage NAMES somebody, so every investigate / stealth / cast beat ended a
+    // twenty-hour walk in silence. This fires for every live stage standing on
+    // this ground, person or none.
+    for (const l of missionArrivalLines(get().player)) get().appendLog('world', l);
     if (!inHub && hubRoomId) {
       // Player left the hub — clear the hubRoomId.
       set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
