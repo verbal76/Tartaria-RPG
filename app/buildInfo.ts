@@ -26431,6 +26431,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // prose moved with the behaviour ("buzzes and nothing happens" described the
 // old game), and ota1321's rule-2 pin moved with it.
 export const OTA_BUILD_ID = '2026-08-31-1591-the-buzz-learns-to-talk';
+// golem catch-up 2026-08-31: markerless publish of OTA-1591 — an out-of-range
+// weapon tap now reaches the store's spoken refusal instead of dying as a
+// silent 30ms buzz, and the combat primer describes the new behaviour.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1590-the-whole-gamut';
 // golem catch-up 2026-08-31: markerless publish of OTA-1590 — the gamut walker
 // plays all 18 hunts through the conversation-card door and the turn-in leg
